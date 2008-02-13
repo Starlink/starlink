@@ -66,7 +66,7 @@
 *        non-zero.
 *     oskymap = AstFrameSet * (Given)
 *        A Mapping from 2D sky coordinates in the output cube to 2D
-*        spatial pixel coordinates in the output cube.
+*        spatial grid coordinates in the output cube.
 *     ospecfrm = AstFrame * (Given)
 *        Pointer to the SpecFrame within the current Frame of the output WCS 
 *        Frameset.

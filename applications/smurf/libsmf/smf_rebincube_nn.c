@@ -85,7 +85,7 @@
 *        non-zero.
 *     oskymap = AstFrameSet * (Given)
 *        A Mapping from 2D sky coordinates in the output cube to 2D
-*        spatial pixel coordinates in the output cube.
+*        spatial grid coordinates in the output cube.
 *     detgrp = Grp * (Given)
 *        A Group containing the names of the detectors to be used. All
 *        detectors will be used if this group is empty.
