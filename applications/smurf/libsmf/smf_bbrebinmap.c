@@ -60,6 +60,8 @@
 *        -adding moving to interface
 *        -Replaced calculation of bolo2map with a call to smf_rebincube_totmap
 *        -Changed name of smf_rebincube_totmap to smf_rebin_totmap
+*     2008-02-12 (AGG):
+*        Deprecated: smf_rebinmap now has the ability to deal with BPM
 *     {enter_further_changes_here}
 
 *  Notes:
