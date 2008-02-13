@@ -162,6 +162,8 @@
 #         Added action GSD2ACSIS
 #     12-FEB-2008 (DSB):
 #         Added parameter POLBINZERO to MAKECUBE.
+#     12-FEB-2008 (AGG):
+#         Add USEBAD parameter to QLMAKEMAP
 #     {enter_changes_here}
 
 #  Bugs:
@@ -442,6 +444,13 @@ package @PACKAGE@ {
             default TRACKING
             helpkey *
 	  }
+
+          parameter usebad {
+            type _LOGICAL
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
 
 	  parameter msg_filter {
 	    type _CHAR
@@ -1475,7 +1484,6 @@ package @PACKAGE@ {
      }
 
      action gsd2acsis {
-
          helplib {$SMURF_HELP}
 
          parameter in {
@@ -1518,8 +1526,6 @@ package @PACKAGE@ {
             helpkey *
           }
      }
-
-
    }
 
     command jcmtstate2cat {
