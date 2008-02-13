@@ -75,9 +75,11 @@
 *        Add status checking
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-02-12 (AGG):
+*        Change name from BPM to BBM - Bad Bolometer Mask
 
 *  Copyright:
-*     Copyright (C) 2006-7 University of British Columbia. All Rights
+*     Copyright (C) 2006-8 University of British Columbia. All Rights
 *     Reserved.
 
 *  Licence:
@@ -156,7 +158,7 @@ void smurf_badbolos( int *status ) {
    int bndf;                      /* NDF identifier of bad pixel
                                      extension */
    int *bolos = NULL;             /* Array of all bolometers */
-   HDSLoc *bpmloc=NULL;           /* HDS locator of bad pixel extension */      
+   HDSLoc *bbmloc=NULL;           /* HDS locator of bad pixel extension */      
    int curbad;                    /* The current bad object */
    int i;                         /* Loop counter */
    int j;                         /* Loop counter */
@@ -200,18 +202,18 @@ void smurf_badbolos( int *status ) {
 
    /* Check to see if a bad bolo mask already exists for this NDF.  If 
       if does, open it for updating, otherwise create a new extension */
-   ndfXloc ( indf, "BPM", "WRITE", &bpmloc, status );
+   ndfXloc ( indf, "BBM", "WRITE", &bbmloc, status );
    if ( *status == NDF__NOEXT ) {
       errAnnul ( status );
       msgOutif(MSG__VERB," ",
                   "No bad bolo extension exists, creating new extension.", status);
-      ndfXnew ( indf, "BPM", "NDF", 0, 0, &bpmloc, status );
+      ndfXnew ( indf, "BBM", "NDF", 0, 0, &bbmloc, status );
    } else {
       msgOutif(MSG__VERB," ",
                   "Bad bolo extension already exists, overwriting.", status);
    }
 
-   bndf = smf_get_ndfid ( bpmloc, "", "WRITE", "NEW", 
+   bndf = smf_get_ndfid ( bbmloc, "", "WRITE", "NEW", 
                          "_INTEGER", 2, lbnd, ubnd, status );
 
    ndfMap ( bndf, "DATA", "_INTEGER", "WRITE", &bolos, &n, status );
@@ -379,7 +381,7 @@ void smurf_badbolos( int *status ) {
    }
 
    /* Free resources */
-   datAnnul ( &bpmloc, status );       
+   datAnnul ( &bbmloc, status );       
    ndfUnmap ( bndf, "DATA", status );
    ndfAnnul ( &bndf, status );
    ndfAnnul ( &indf, status );
