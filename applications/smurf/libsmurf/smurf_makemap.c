@@ -25,9 +25,9 @@
 *  ADAM Parameters:
 *     CONFIG = GROUP (Read) 
 *        Specifies values for the configuration parameters used by the
-*        iterative map maker (METHOD=ITERATE). If the string "def" (case-insensitive)
-*        or a null (!) value is supplied, a set of default configuration 
-*        parameter values will be used.
+*        iterative map maker (METHOD=ITERATE). If the string "def"
+*        (case-insensitive) or a null (!) value is supplied, a set of
+*        default configuration parameter values will be used.
 *
 *        The supplied value should be either a comma-separated list of strings 
 *        or the name of a text file preceded by an up-arrow character
@@ -69,8 +69,79 @@
 *
 *     OUT = NDF (Write)
 *          Output file
+*     PARAMS( 2 ) = _DOUBLE (Read)
+*          An optional array which consists of additional parameters
+*          required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
+*          SombCos, and Gauss spreading methods (see parameter SPREAD).
+*	   
+*          PARAMS( 1 ) is required by all the above schemes. It is used to 
+*          specify how many pixels on either side of the output position
+*          (that is, the output position corresponding to the centre of the 
+*          input pixel) are to receive contributions from the input pixel.
+*          Typically, a value of 2 is appropriate and the minimum allowed 
+*          value is 1 (i.e. one pixel on each side). A value of zero or 
+*          fewer indicates that a suitable number of pixels should be 
+*          calculated automatically. [0]
+*	   
+*          PARAMS( 2 ) is required only by the SombCos, Gauss, SincSinc, 
+*          SincCos, and SincGauss schemes.  For the SombCos, SincSinc, and
+*          SincCos schemes, it specifies the number of pixels at which the
+*          envelope of the function goes to zero.  The minimum value is
+*          1.0, and the run-time default value is 2.0.  For the Gauss and
+*          SincGauss scheme, it specifies the full-width at half-maximum
+*          (FWHM) of the Gaussian envelope.  The minimum value is 0.1, and
+*          the run-time default is 1.0.  On astronomical images and 
+*          spectra, good results are often obtained by approximately 
+*          matching the FWHM of the envelope function, given by PARAMS(2),
+*          to the point-spread function of the input data.  []
 *     PIXSIZE = REAL (Read)
 *          Pixel size in output image, in arcsec. []
+*     SPREAD = LITERAL (Read)
+*          The method to use when spreading each input pixel value out
+*          between a group of neighbouring output pixels. If SPARSE is set 
+*          TRUE, then SPREAD is not accessed and a value of "Nearest" is
+*          always assumed. SPREAD can take the following values:
+*	   
+*          - "Linear" -- The input pixel value is divided bi-linearly between 
+*          the four nearest output pixels.  Produces smoother output NDFs than 
+*          the nearest-neighbour scheme.
+*	   
+*          - "Nearest" -- The input pixel value is assigned completely to the
+*          single nearest output pixel. This scheme is much faster than any
+*          of the others. 
+*	   
+*          - "Sinc" -- Uses the sinc(pi*x) kernel, where x is the pixel
+*          offset from the interpolation point (resampling) or transformed
+*          input pixel centre (rebinning), and sinc(z)=sin(z)/z.  Use of 
+*          this scheme is not recommended.
+*	   
+*          - "SincSinc" -- Uses the sinc(pi*x)sinc(k*pi*x) kernel. A
+*          valuable general-purpose scheme, intermediate in its visual
+*          effect on NDFs between the bi-linear and nearest-neighbour
+*          schemes. 
+*	   
+*          - "SincCos" -- Uses the sinc(pi*x)cos(k*pi*x) kernel.  Gives
+*          similar results to the "Sincsinc" scheme.
+*	   
+*          - "SincGauss" -- Uses the sinc(pi*x)exp(-k*x*x) kernel.  Good 
+*          results can be obtained by matching the FWHM of the
+*          envelope function to the point-spread function of the
+*          input data (see parameter PARAMS).
+*	   
+*          - "Somb" -- Uses the somb(pi*x) kernel, where x is the pixel
+*          offset from the transformed input pixel centre, and 
+*          somb(z)=2*J1(z)/z (J1 is the first-order Bessel function of the 
+*          first kind.  This scheme is similar to the "Sinc" scheme.
+*	   
+*          - "SombCos" -- Uses the somb(pi*x)cos(k*pi*x) kernel.  This
+*          scheme is similar to the "SincCos" scheme.
+*	   
+*          - "Gauss" -- Uses the exp(-k*x*x) kernel. The FWHM of the Gaussian 
+*          is given by parameter PARAMS(2), and the point at which to truncate 
+*          the Gaussian to zero is given by parameter PARAMS(1).
+*	   
+*          For further details of these schemes, see the descriptions of 
+*          routine AST_REBINx in SUN/211. ["Nearest"]
 *     SYSTEM = LITERAL (Read)
 *          The celestial coordinate system for the output cube. One of
 *          ICRS, GAPPT, FK5, FK4, FK4-NO-E, AZEL, GALACTIC, ECLIPTIC. It
@@ -177,11 +248,14 @@
 *        - Update to reflect new API for smf_rebinmap
 *        - Note smf_bbrebinmap is now deprecated
 *        - Remove sky subtraction and extinction calls
+*     2008-02-13 (AGG):
+*        Add SPREAD and PARAMS parameters to allow choice of
+*        pixel-spreading scheme, update call to smf_rebinmap
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
-*     Council. Copyright (C) 2005-2007 University of British Columbia.
+*     Council. Copyright (C) 2005-2008 University of British Columbia.
 *     Copyright (C) 2007 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -260,17 +334,22 @@ void smurf_makemap( int *status ) {
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   void *map=NULL;            /* Pointer to the rebinned map data */
   char method[LEN__METHOD];  /* String for map-making method */
+  int moving = 0;            /* Is the telescope base position changing? */
+  int nparam = 0;            /* Number of extra parameters for pixel spreading scheme*/
   AstKeyMap * obsidmap = NULL; /* Map of OBSIDs from input data */
   smfData *odata=NULL;       /* Pointer to output SCUBA2 data struct */
   Grp *ogrp = NULL;          /* Group containing output file */
   int ondf = NDF__NOID;      /* output NDF identifier */
   int outsize;               /* Number of files in output group */
   AstFrameSet *outfset=NULL; /* Frameset containing sky->output mapping */
+  char pabuf[ 10 ];          /* Text buffer for parameter value */
+  double params[ 4 ];        /* astRebinSeq parameters */
   int parstate;              /* State of ADAM parameters */
   float pixsize=3;           /* Size of an output map pixel in arcsec */
   AstKeyMap * prvkeymap = NULL; /* Keymap of input files for PRVxxx headers */
   int size;                  /* Number of files in input group */
   int smfflags=0;            /* Flags for smfData */
+  int spread;                /* Code for pixel spreading scheme */
   char system[10];           /* Celestial coordinate system for output image */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   int usebad;                /* Flag for whether to use bad bolos mask */
@@ -280,8 +359,6 @@ void smurf_makemap( int *status ) {
   smfData *wdata=NULL;       /* Pointer to SCUBA2 data struct for weights */
   void *weights=NULL;        /* Pointer to the weights map */
   HDSLoc *weightsloc=NULL;   /* HDS locator of weights array */
-
-  int moving = 0;            /* Is the telescope base position changing? */
 
   /* Main routine */
   ndfBegin();
@@ -359,6 +436,15 @@ void smurf_makemap( int *status ) {
 
   /* Create the map using the chosen METHOD */
   if( strncmp( method, "REBIN", 5 ) == 0 ) {
+    parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
+	      "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
+	      1, pabuf, 10, status );
+
+    smf_get_spread( pabuf, &spread, &nparam, status );
+
+    /* Get an additional parameter vector if required. */
+    if ( nparam > 0 ) parExacd( "PARAMS", nparam, params, status );
+
     /* Simple Regrid of the data */
     msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using REBIN method", 
 	     status);
@@ -408,7 +494,7 @@ void smurf_makemap( int *status ) {
       }
       msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Beginning the REBIN step", status);
       /* Rebin the data onto the output grid */
-      smf_rebinmap(data, usebad, indf, i, size, outfset, moving, 
+      smf_rebinmap(data, usebad, indf, i, size, outfset, spread, params, moving, 
 		   lbnd_out, ubnd_out, map, variance, weights, status );
   
       /* Close the data file */
