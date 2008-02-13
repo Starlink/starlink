@@ -51,6 +51,8 @@
 *        (that is, no error is reported). [current value]
 *     IN = NDF (Read)
 *          Input file(s)
+*     USEBAD = LOGICAL (Read)
+*          Flag to denote whether to take bad detectors into account (FALSE)
 *     METHOD = LITERAL (Read)
 *          Specify which map maker should be used to construct the map. The
 *          parameter can take the following values:
@@ -171,6 +173,10 @@
 *        Fixed flag in smf_open_file
 *     2008-01-22 (EC):
 *        Added hitsmap to smf_iteratemap interface
+*     2008-02-12 (AGG):
+*        - Update to reflect new API for smf_rebinmap
+*        - Note smf_bbrebinmap is now deprecated
+*        - Remove sky subtraction and extinction calls
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -248,7 +254,7 @@ void smurf_makemap( int *status ) {
   int flag;                  /* Flag */
   dim_t i;                   /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
-  int indf;                  /* NDF identifier of output file */
+  int indf = 0;              /* NDF identifier of output file */
   AstKeyMap *keymap=NULL;    /* Pointer to keymap of config settings */
   int ksize=0;               /* Size of group containing CONFIG file */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
@@ -357,27 +363,10 @@ void smurf_makemap( int *status ) {
     msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using REBIN method", 
 	     status);
 
-    for(i=1; i<=size; i++ ) {
+    for(i=1; (i<=size) && (*status == SAI__OK); i++ ) {
       /* Read data from the ith input file in the group */      
       smf_open_and_flatfield( igrp, NULL, i, &data, status ); 
-      if (*status != SAI__OK) break;
 
-      /* ****** 
-	 These calls are not needed - we should probably check that we
-	 have sky-subtracted and extinction-corrected data 
-
-	 Actually I think a parameter called AUTOSKY should be used to
-	 decide whether or not to do the `optimal' sky removal IFF sky
-	 removal and ext correction have not been done already
-
-	 ****** */
-
-      /* Remove sky - assume MEAN is good enough for now */
-      smf_subtract_plane(data, NULL, "MEAN", status);
-
-      /* Use raw WVM data to make the extinction correction */
-      smf_correct_extinction(data, "WVMR", 0, 0, NULL, status);
-      
       /* Check that the data dimensions are 3 (for time ordered data) */
       if( *status == SAI__OK ) {
 	if( data->ndims != 3 ) {
@@ -412,26 +401,18 @@ void smurf_makemap( int *status ) {
       if (*status == SAI__OK)
 	smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
 
+      /* Retrieve the NDF identifier for this input file to read the
+	 bad bolometer mask */
       if ( usebad ) {
-	/* Retrieve the NDF identifier for this input file */   
 	ndgNdfas ( igrp, i, "READ", &indf, status );
-	/* Rebin the data onto the output grid with bad bolometer mask */ 
-	smf_bbrebinmap(data, indf, i, size, outfset, moving, lbnd_out, 
-		       ubnd_out, map, variance, weights, status );
-      } else {
-
-	msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Beginning the REBIN step", status);
-
-     	/* Rebin the data onto the output grid without bad bolometer mask */
-	smf_rebinmap(data, i, size, outfset, moving, lbnd_out, ubnd_out, 
-		     map, variance, weights, status );
       }
+      msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Beginning the REBIN step", status);
+      /* Rebin the data onto the output grid */
+      smf_rebinmap(data, usebad, indf, i, size, outfset, moving, 
+		   lbnd_out, ubnd_out, map, variance, weights, status );
   
       /* Close the data file */
-      if( data != NULL ) {
-	smf_close_file( &data, status);
-	data = NULL;
-      }
+      smf_close_file( &data, status);
       
       /* Break out of loop over data files if bad status */
       if (*status != SAI__OK) {
