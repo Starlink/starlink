@@ -14,22 +14,14 @@
 *     Subroutine
 
 *  Invocation:
-*     gsdac_getStartIdx ( const struct gsdac_gsd_struct *gsd, 
-*                         const char *samMode, const int *numPtsX, 
-*                         const int *numPtsY,const char *obsDirection, 
-(                         int *startIdx, int *status )
+*     gsdac_getStartIdx ( const struct gsdac_gsdVars_struct *gsdVars, 
+*                         const char *samMode, int *startIdx, int *status )
 
 *  Arguments:
-*     gsd = const struct gsdac_gsd_struct* (Given)
-*        GSD file access parameters
+*     gsdVars = const struct gsdac_gsdVars_struct* (Given)
+*        GSD headers and arrays
 *     samMode = const char* (Given)
 *        Sampling mode
-*     numPtsX = const int* (Given)
-*        Number of points in the x direction
-*     numPtsY = const int* (Given)
-*        Number of points in the y direction
-*     obsDirection = const char* (Given)
-*        Direction of map rows
 *     startIdx = int* (Given and Returned)
 *        Index into start of pattern
 *     status = int* (Given and Returned)
@@ -45,6 +37,8 @@
 *  History :
 *     2008-02-05 (JB):
 *        Original
+*     2008-02-14 (JB):
+*        Use gsdVars struct to store headers/arrays
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -85,10 +79,8 @@
 
 #define FUNC_NAME "gsdac_getStartIdx"
 
-void gsdac_getStartIdx ( const struct gsdac_gsd_struct *gsd, 
-                         const char *samMode, const int *numPtsX, 
-                         const int *numPtsY, const char *obsDirection,
-                         int *startIdx, int *status )
+void gsdac_getStartIdx ( const struct gsdac_gsdVars_struct *gsdVars, 
+                         const char *samMode, int *startIdx, int *status )
 
 {
 
@@ -106,47 +98,6 @@ void gsdac_getStartIdx ( const struct gsdac_gsd_struct *gsd,
   if ( *status != SAI__OK ) return;
 
 /** KLUDGED FOR NOW **/
-  if ( 0 ) {
-
-
-  /* Check the sampling mode.  If not grid or raster, startIdx is 1.  */
-  //if ( strcmp ( samMode, "grid" ) || strcmp ( samMode, "raster" ) ) {
-    
-    /* Get the start x and y indices. */
-    gsdac_get0r ( gsd, "C6XGC", &mapStartX, status );
-    gsdac_get0r ( gsd, "C6YGC", &mapStartY, status );
-
-    /* Get the start x and y directions. */
-    gsdac_get0l ( gsd, "c6xpos", &mapPositiveX, status );
-    gsdac_get0l ( gsd, "c6ypos", &mapPositiveY, status );
-
-    /* Check the start directions. */
-    if ( mapPositiveX == '0' ) signX = 1;
-    if ( mapPositiveY == '0' ) signY = 1;
-
-    /* Get the expected starting coordinates. */
-    expectStartX = (double)signX * ( (double)*numPtsX - 1.0 ) / 2.0;
-    expectStartY = (double)signY * ( (double)*numPtsY - 1.0 ) / 2.0;
-
-printf ( "expected: %f %f\n", expectStartX, expectStartY );
-
-    /* Check the starting XY coordinates. */
-    if ( mapStartX == expectStartX && mapStartY == expectStartY ) {
-
-      *startIdx = 1;
-
-    } else {
-
-      /* Find the starting index. */
-      
-
-
-    }
-
-  } else {
-
-    *startIdx = 1;
-
-  }
+  *startIdx = 1;
 
 }

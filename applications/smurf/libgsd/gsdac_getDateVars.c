@@ -14,7 +14,7 @@
 *     Subroutine
 
 *  Invocation:
-*     gsdac_getDateVars ( const struct gsdac_gsd_struct *gsd, 
+*     gsdac_getDateVars ( const struct gsdac_gsdVars_struct *gsdVars, 
 *                         const int subsysNum, const int obsNum, 
 *                         const char *backend, char *dateObs, char *dateEnd, 
 *                         char *obsID, char *obsIDs, char *HSTstart, 
@@ -22,7 +22,7 @@
 *                         int *status )
 
 *  Arguments:
-*     gsd = const struct gsdac_gsd_struct* (Given)
+*     gsdVars = const struct gsdac_gsdVars_struct* (Given)
 *        GSD file access parameters
 *     subsysNum = const int (Given)
 *        Subsystem number
@@ -60,6 +60,8 @@
 *  History :
 *     2008-02-05 (JB):
 *        Original
+*     2008-02-14 (JB):
+*        Use gsdVars struct to store headers/arrays
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -103,7 +105,8 @@
 #define MAXFITS 80
 #define FUNC_NAME "gsdac_getDateVars"
 
-void gsdac_getDateVars ( const struct gsdac_gsd_struct *gsd, const int subsysNum,
+void gsdac_getDateVars ( const struct gsdac_gsdVars_struct *gsdVars, 
+                         const int subsysNum,
                          const int obsNum, const char *backend, char *dateObs, 
                          char *dateEnd, char *obsID,
                          char *obsIDs, char *HSTstart, char *HSTend,
@@ -117,19 +120,16 @@ void gsdac_getDateVars ( const struct gsdac_gsd_struct *gsd, const int subsysNum
   char dateString[MAXFITS];   /* temporary string for date conversions. */
   int day = 0;                /* days */
   double dut1 = 0.0;          /* UT1-UTC correction */
-  double gsdDate = 0.0;       /* GSD date */
-  double gsdTime = 0.0;;      /* GSD time */
   int hour = 0;               /* hours */
   int i = 0;                  /* loop counter */
   int min = 0;                /* minutes */
   int month = 0;              /* months */
   float sec = 0.0;            /* seconds */
-  float *tableDat = NULL;     /* table data */
   int tableDims = 0;          /* dimensionality of data table */
   unsigned int tableSize;     /* number of elements of data table */
   AstTimeFrame *tempFrame = NULL; /* AstTimeFrame for UT1-UTC conversion */
   const char *tempString;     /* temporary string */
-  AstTimeFrame *tFrame = NULL;    /* AstTimeFrame for UT1-UTC conversion */
+  AstTimeFrame *tFrame = NULL;  /* AstTimeFrame for UT1-UTC conversion */
   double utcEnd = 0.0;        /* end UTC time */
   double utcHSTend = 0.0;     /* end HST time */
   double utcHSTstart = 0.0;   /* start HST time */
@@ -139,40 +139,16 @@ void gsdac_getDateVars ( const struct gsdac_gsd_struct *gsd, const int subsysNum
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
 
-  /* Get the gsd date, time, and UT1-UTC correction. */
-  gsdac_get0d ( gsd, "C3DAT", &gsdDate, status );
-
-  gsdac_get0d ( gsd, "C3UT", &gsdTime, status );
-
-  gsdac_get0d ( gsd, "c3ut1c", &dut1, status );
-
-  /* Get the dimensionality of the scan table 1. */
-  gsdac_get0i ( gsd, "C3NO_SCAN_VARS1", &tableDims, status );
-
-  /* Get the size of the scan table 1. */
-  gsdac_getArraySize ( gsd, "C12SCAN_TABLE_1", &tableSize, status );
-
-  tableDat = smf_malloc ( tableSize, sizeof( float ), 0, status );
-
-  /* Get the data from scan table 1. */
-  gsdac_get1r ( gsd, "C12SCAN_TABLE_1", tableDat, status );
-
-  if ( *status != SAI__OK ) {
-    *status = SAI__ERROR;
-    errRep ( FUNC_NAME, "Error retrieving GSD headers", status );
-    return;
-  }
-
   /* Get the DATE-OBS. */
 
   /* Parse date to get year/month/day. */
-  sprintf ( dateString, "%8.4f", gsdDate );
+  sprintf ( dateString, "%8.4f", gsdVars->obsUT1d );
   sscanf ( dateString, "%04d.%02d%02d", &year, &month, &day );
 
   /* Parse time to get hour/min/sec. */
-  hour = (double)( (int)gsdTime );
-  min = (double) ( (int)( ( gsdTime - hour ) * 60.0 ) );
-  sec = ( ( ( gsdTime - hour ) * 60.0 ) - min ) * 60.0;
+  hour = (double)( (int)gsdVars->obsUT1h );
+  min = (double) ( (int)( ( gsdVars->obsUT1h - hour ) * 60.0 ) );
+  sec = ( ( ( gsdVars->obsUT1h - hour ) * 60.0 ) - min ) * 60.0;
 
   /* Set up the timeframe. */
   tFrame = astTimeFrame ( "timescale=UT1" );
@@ -181,7 +157,7 @@ void gsdac_getDateVars ( const struct gsdac_gsd_struct *gsd, const int subsysNum
            year, month, day, hour, min, sec );
 
   /* Apply the UT1-UTC correction. */
-  dut1 = dut1 * 86400.0;
+  dut1 = gsdVars->obsUT1C * 86400.0;
   
   astSet ( tFrame, "DUT1=%f", dut1 );
   astSet ( tFrame, "timescale=UTC" );
@@ -219,7 +195,11 @@ void gsdac_getDateVars ( const struct gsdac_gsd_struct *gsd, const int subsysNum
 
 
   /* Get the DATE-END. This will be DATE-OBS + ( last LST - first LST ). */ 
-  utcEnd = utcStart + ( tableDat[tableSize - tableDims] - tableDat[0] ) / 24.0;
+  tableSize = gsdVars->nScanVars1 * gsdVars->noScans;
+  tableDims = gsdVars->nScanVars1;
+  utcEnd = utcStart + ( (gsdVars->scanTable1)[tableSize-tableDims] - 
+                        (gsdVars->scanTable1)[0] ) 
+                         / 24.0;
 
   tempString = astFormat ( tempFrame, 1, utcEnd );
 
@@ -229,16 +209,17 @@ void gsdac_getDateVars ( const struct gsdac_gsd_struct *gsd, const int subsysNum
   strcpy ( &(dateEnd[11]), &(tempString[11]) );
 
   /* Get the LSTstart. */ 
-  hour = (int)tableDat[0];
-  min = (int)(( tableDat[0] - hour ) * 60.0 );
-  sec = ( tableDat[0] - hour - ( min / 60.0 ) ) * 3600.0;
+  hour = (int)( (gsdVars->scanTable1)[0] );
+  min = (int)(( (gsdVars->scanTable1)[0] - hour ) * 60.0 );
+  sec = ( (gsdVars->scanTable1)[0] - hour - ( min / 60.0 ) ) * 3600.0;
 
   sprintf ( LSTstart, "%02d:%02d:%6.4f", hour, min, sec );
 
-  /* Get the LSTend. */ 
-  hour = (int)tableDat[tableSize - tableDims];
-  min = (int)(( tableDat[tableSize - tableDims] - hour ) * 60.0 );
-  sec = ( tableDat[tableSize - tableDims] - hour - ( min / 60.0 ) ) * 3600.0;
+  /* Get the LSTend. */
+  hour = (int)( (gsdVars->scanTable1)[tableSize-tableDims] ); 
+  min = (int)(( (gsdVars->scanTable1)[tableSize-tableDims] - hour ) * 60.0 );
+  sec = ( (gsdVars->scanTable1)[tableSize-tableDims] - hour - 
+        ( min / 60.0 ) ) * 3600.0;
 
   sprintf ( LSTend, "%02d:%02d:%6.4f", hour, min, sec );
 
@@ -259,8 +240,5 @@ void gsdac_getDateVars ( const struct gsdac_gsd_struct *gsd, const int subsysNum
   strncpy ( HSTend, tempString, 10 );
   HSTend[10] =  'T';
   strcpy ( &(HSTend[11]), &(tempString[11]) ); 
-
-  /* Free the memory. */
-  smf_free ( tableDat, status );   
 
 }

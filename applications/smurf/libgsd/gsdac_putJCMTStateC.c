@@ -13,15 +13,18 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_putJCMTStateC ( const gsdac_gsd_struct *gsd,
+*     gsdac_putJCMTStateC ( const gsdac_gsdVars_struct *gsdVars,
 *                           const unsigned int stepNum,
+*                           const char *backend,
 *                           struct JCMTState *record, int *status );
 
 *  Arguments:
-*     gsd = const gsdac_gsd_struct* (Given)
-*        GSD file access parameters
+*     gsdVars = const gsdac_gsdVars_struct* (Given)
+*        GSD headers and arrays
 *     stepNum = const unsigned int (Given)
-*        time step of this spectrum
+*        Time step of this spectrum
+*     backend = const char* (Given)
+*        Name of the backend
 *     record = JCMTState* (Given and returned)
 *        JCMTState headers
 *     status = int* (Given and Returned)
@@ -40,6 +43,8 @@
 *  History:
 *     2008-01-29 (JB):
 *        Original
+*     2008-02-14 (JB):
+*        Use gsdVars struct to store headers/arrays
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -87,10 +92,18 @@
 
 #include "jcmt/state.h"
 
-void gsdac_putJCMTStateC ( const struct gsdac_gsd_struct *gsd, 
+#define FUNC_NAME "gsdac_putJCMTStateC"
+
+void gsdac_putJCMTStateC ( const struct gsdac_gsdVars_struct *gsdVars, 
                            const unsigned int stepNum, 
+                           const char *backend,
                            struct JCMTState *record, int *status )
 {
+
+  /* Local variables */
+
+  int LSTStartTime;           /* start time in LST */
+  AstTimeFrame *tFrame = NULL;  /* AstTimeFrame for LST-TAI conversion */
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
@@ -102,7 +115,17 @@ void gsdac_putJCMTStateC ( const struct gsdac_gsd_struct *gsd,
 
   record->rts_end = 0.0;//k
 
-  strncpy ( record->rts_tasks, "tasklist", 8 );//k
+  /* Check the frequency band to determine tasklist. */
+  if ( (gsdVars->centreFreqs)[0] < 290.0 ) {
+    strncpy ( record->rts_tasks, "PTCS FE_A ", 11 );
+  } else if ( (gsdVars->centreFreqs)[0] < 395.0 ) {  
+    strncpy ( record->rts_tasks, "PTCS FE_B ", 11 );
+  } else if ( (gsdVars->centreFreqs)[0] < 600.0 ) {
+    strncpy ( record->rts_tasks, "PTCS FE_C ", 11 );
+  } else {
+    strncpy ( record->rts_tasks, "PTCS FE_D ", 11 );
+  }
+  strcat ( record->rts_tasks, backend );
 
   record->smu_x = 0.0;
 
@@ -129,6 +152,10 @@ void gsdac_putJCMTStateC ( const struct gsdac_gsd_struct *gsd,
   record->smu_tr_chop_x = 0.0;
 
   record->smu_tr_chop_y = 0.0;
+
+  /* Get the TAI time of this step.   First, determine the number
+     of elements in the scan table array in GSD to retrieve the 
+     times in LST, then convert to TAI. */
 
   record->tcs_tai = 0.0;//k
 

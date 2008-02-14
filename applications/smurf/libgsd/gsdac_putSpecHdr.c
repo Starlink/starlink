@@ -13,7 +13,7 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_putSpecHdr ( const gsdac_gsd_struct *gsd,
+*     gsdac_putSpecHdr ( const gsdac_gsdVars_struct *gsdVars,
 *                        const unsigned int nSteps,
 *                        const unsigned int stepNum,
 *                        const unsigned int subsysNum,
@@ -21,8 +21,8 @@
 *                        struct ACSISSpecHdr *specHdr, int *status );
 
 *  Arguments:
-*     gsd = const gsdac_gsd_struct* (Given)
-*        GSD file access parameters
+*     gsdVars = const gsdac_gsdVars_struct* (Given)
+*        GSD headers and arrays
 *     nSteps = const unsigned int (Given)
 *        Number of time steps
 *     stepNum = const unsigned int (Given)
@@ -45,8 +45,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     2008-01-18 (JB):
+*     2008-01-28 (JB):
 *        Original
+*     2008-02-14 (JB):
+*        Use gsdVars struct to store headers/arrays
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -94,7 +96,7 @@
 #define SZ_RECNAME 80
 #define MAXRECEP 8  
 
-void gsdac_putSpecHdr ( const struct gsdac_gsd_struct *gsd, 
+void gsdac_putSpecHdr ( const struct gsdac_gsdVars_struct *gsdVars, 
                         const unsigned int nSteps,
                         const unsigned int stepNum,
                         const unsigned int subsysNum,
@@ -102,19 +104,10 @@ void gsdac_putSpecHdr ( const struct gsdac_gsd_struct *gsd,
                         struct ACSISSpecHdr *specHdr, int *status )
 {
 
-  /* Local variables */
-
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
 
-  /* Get the tsys for this subsystem. */
-  gsdac_getElemr ( gsd, "C12SST", subsysNum-1, &(specHdr->acs_tsys), status );
-
-  if ( *status != SAI__OK ) {
-    *status = SAI__ERROR;
-    errRep ( FUNC_NAME, "Error retrieving SpecHdr values", status );
-    return;
-  }    
+  specHdr->acs_tsys = (gsdVars->sourceSysTemps)[subsysNum-1];
 
   /* Fill the specHdr. */
   specHdr->rts_endnum = nSteps;

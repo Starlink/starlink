@@ -38,6 +38,8 @@
 *  History:
 *     28-JAN-2008 (JB):
 *        Original version.
+*     14-FEB-2008 (JB):
+*        Use gsdVars struct to store headers/arrays
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -92,29 +94,29 @@
 #define FUNC_NAME "smurf_gsd2acsis"
 #define TASK_NAME "GSD2ACSIS"
 
-#define MAXSTRING 80
+#define MAXNAME 80
 #define NRECEP 2  
 
 void smurf_gsd2acsis( int *status ) {
 
   /* Local variables */
-  char directory[MAXSTRING];   /* directory to write the file */
-  char filename[MAXSTRING];    /* name of the GSD file */
+  char directory[MAXNAME];    /* directory to write the file */
+  char filename[MAXNAME];     /* name of the GSD file */
   struct gsdac_gsd_struct gsd; /* GSD file access parameters */
-  unsigned int nMapPts;        /* number of map points */
-  unsigned int nSteps;         /* number of time steps in the observation */
-  float version;               /* GSD file version */
-  char label[41];              /* GSD label */
-  int nitem;                   /* number of items in GSD file */
-  FILE *fptr;                  /* pointer to GSD file */
+  struct gsdac_gsdVars_struct gsdVars; /* GSD headers and arrays */
+  unsigned int nSteps;        /* number of time steps */
+  float version;              /* GSD file version */
+  char label[41];             /* GSD label */
+  int nitem;                  /* number of items in GSD file */
+  FILE *fptr;                 /* pointer to GSD file */
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
 
   /* Get the user defined input and output file names */
-  parGet0c ( "IN", filename, MAXSTRING, status );
+  parGet0c ( "IN", filename, MAXNAME, status );
 
-  parGet0c ( "DIRECTORY", directory, MAXSTRING, status );
+  parGet0c ( "DIRECTORY", directory, MAXNAME, status );
 
   msgOutif(MSG__VERB," ", 
 	     "Opening GSD file for reading", status); 
@@ -127,6 +129,7 @@ void smurf_gsd2acsis( int *status ) {
     if ( *status != SAI__OK ) { 
       *status = SAI__ERROR;
        errRep ( FUNC_NAME, "Could not find input GSD file.", status );
+       return;
     }
   } 
 
@@ -137,20 +140,25 @@ void smurf_gsd2acsis( int *status ) {
   if ( *status == SAI__OK ) {
     if ( ( fabs(version) - 5.300 ) > 0.0001 ) {
       *status = SAI__ERROR;
-       errRep ( FUNC_NAME, "GSD version is not 5.300.", status );
+      errRep ( FUNC_NAME, "GSD version is not 5.300.", status );
+      return;
     }
   }
 
-  /* Get the number of time steps in this observation. */
-  gsdac_get0i ( &gsd, "C3NIS", &nSteps, status );
+  /* Get the GSD file headers and data arrays. */
+  gsdac_getGSDVars ( &gsd, &gsdVars, status );
 
-  /* Get the number of map points in this observation. */
-  gsdac_get0i ( &gsd, "C3MXP", &nMapPts, status );
+  if ( *status != SAI__OK ) {
+    *status = SAI__ERROR;
+    errRep ( FUNC_NAME, "Couldn't get GSD headers and arrays.", status );
+    return;
+  }
 
-  nSteps = nSteps * nMapPts;
+  /* Get the number of time steps in the observation. */
+  nSteps = gsdVars.noScans * gsdVars.nScanPts;
 
   /* Convert and write out the new file. */
-  gsdac_wrtData ( &gsd, nSteps, directory, status );
+  gsdac_wrtData ( &gsdVars, directory, nSteps, status );
 
   /* Close the GSD file. */
   msgOutif(MSG__VERB," ", 
@@ -159,6 +167,8 @@ void smurf_gsd2acsis( int *status ) {
   if ( *status == SAI__OK ) {
     *status = gsdClose ( fptr, gsd.fileDsc, gsd.itemDsc, gsd.dataPtr );
   }
+
+  gsdac_freeArrays ( &gsdVars, status );
 
   if ( *status == SAI__OK ) {
     printf ( "Conversion completed successfully.\n" );

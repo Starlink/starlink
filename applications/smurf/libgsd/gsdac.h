@@ -25,6 +25,10 @@
 *  History:
 *     2008-02-01 (JB):
 *        Original
+*     2008-02-13 (JB):
+*        Add freeArrays, getGSDVars
+*     2008-02-14 (JB):
+*        Use gsdVars struct to store headers/arrays 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -59,6 +63,13 @@
 
 #ifndef GSDAC_DEFINED
 #define GSDAC_DEFINED
+
+void gsdac_freeArrays
+(
+const struct gsdac_gsdVars_struct *gsdVars, 
+                     /* GSD headers and arrays (given) */
+int *status          /* pointer to global status (given and returned) */
+);
 
 void gsdac_get0b
 ( 
@@ -198,7 +209,8 @@ int *status          /* pointer to global status (given and returned) */
 
 void gsdac_getDateVars
 (
-const struct gsdac_gsd_struct *gsd, /* GSD file access parameters (given) */
+const struct gsdac_gsdVars_struct *gsdVars, 
+                     /* GSD headers and arrays (given) */
 const int subsysNum, /* subsystem number (given) */
 const int obsNum,    /* observation number (given) */
 const char *backend, /* name of the backend (given) */
@@ -220,7 +232,7 @@ char *name,          /* name of the item (should be an array of
                         16 characters) (given) */
 const int index,     /* index of element to be returned (given) */
 char *value,         /* data values (returned) */
-int *statuss         /* pointer to global status (given and returned) */ 
+int *status          /* pointer to global status (given and returned) */ 
 );
 
 void gsdac_getElemc
@@ -230,7 +242,7 @@ char *name,          /* name of the item (should be an array of
                         16 characters) (given) */
 const int index,     /* index of element to be returned (given) */
 char *value,         /* data values (returned) */
-int *statuss         /* pointer to global status (given and returned) */ 
+int *status          /* pointer to global status (given and returned) */ 
 );
 
 void gsdac_getElemd
@@ -240,7 +252,7 @@ char *name,          /* name of the item (should be an array of
                         16 characters) (given) */
 const int index,     /* index of element to be returned (given) */
 double *value,       /* data values (returned) */
-int *statuss         /* pointer to global status (given and returned) */ 
+int *status          /* pointer to global status (given and returned) */ 
 );
 
 void gsdac_getElemi
@@ -250,7 +262,7 @@ char *name,          /* name of the item (should be an array of
                         16 characters) (given) */
 const int index,     /* index of element to be returned (given) */
 int *value,          /* data values (returned) */
-int *statuss         /* pointer to global status (given and returned) */ 
+int *status          /* pointer to global status (given and returned) */ 
 );
 
 void gsdac_getEleml
@@ -260,7 +272,7 @@ char *name,          /* name of the item (should be an array of
                         16 characters) (given) */
 const int index,     /* index of element to be returned (given) */
 char *value,         /* data values (returned) */
-int *statuss         /* pointer to global status (given and returned) */ 
+int *status          /* pointer to global status (given and returned) */ 
 );
 
 void gsdac_getElemr
@@ -270,7 +282,7 @@ char *name,          /* name of the item (should be an array of
                         16 characters) (given) */
 const int index,     /* index of element to be returned (given) */
 float *value,        /* data values (returned) */
-int *statuss         /* pointer to global status (given and returned) */ 
+int *status          /* pointer to global status (given and returned) */ 
 );
 
 void gsdac_getElemw
@@ -280,35 +292,32 @@ char *name,          /* name of the item (should be an array of
                         16 characters) (given) */
 const int index,     /* index of element to be returned (given) */
 short *value,        /* data values (returned) */
-int *statuss         /* pointer to global status (given and returned) */ 
+int *status          /* pointer to global status (given and returned) */ 
+);
+
+void gsdac_getGSDVars
+( 
+const struct gsdac_gsd_struct *gsd, /* GSD file access parameters (given) */
+struct gsdac_gsdVars_struct *gsdVars, /* GSD headers and arrays (given and
+                                         returned) */
+int *status          /* pointer to global status (given and returned) */
 );
 
 void gsdac_getMapVars
 (
-const struct gsdac_gsd_struct *gsd, /* GSD file access parameters (given) */
-char *samMode,       /* sampling mode (given and returned) */
-char *swMode,        /* switch mode (given and returned) */
+const struct gsdac_gsdVars_struct *gsdVars, 
+                     /* GSD headers and arrays (given) */
+const char *samMode, /* sampling mode (given) */
+const char *obsType, /* observation type (given) */
 char *skyRefX,       /* x-coord of reference position (given and returned) */
 char *skyRefY,       /* y-coord of reference position (given and returned) */
-char *obsType,       /* observation type (given and returned) */
+char *swMode,        /* switch mode (given and returned) */
 char *chopCrd,       /* chop coordinate frame (given and returned) */
-float *chopFrq,      /* chop frequency (given and returned) */
-float *chopPA,       /* chop position angle (given and returned) */
-float *chopThr,      /* chop throw (given and returned) */
 float *mapHght,      /* requested height of map (given and returned) */
 float *mapPA,        /* requested position angle of map 
                         (given and returned) */
 float *mapWdth,      /* requested width of map (given and returned) */
-int *numPtsX,        /* number of points in X direction 
-                        (given and returned) */
-int *numPtsY,        /* number of points in Y direction 
-                        (given and returned) */
-char *obsDirection,  /* direction of map rows (given and returned) */
 char *loclCrd,       /* local offset coordinates system for map 
-                        (given and returned) */
-double *mapX,        /* requested map x offset from centre 
-                        (given and returned) */
-double *mapY,        /* requested map x offset from centre 
                         (given and returned) */
 char *scanCrd,       /* coordinate system of scan (given and returned) */
 float *scanVel,      /* scan velocity */
@@ -319,29 +328,36 @@ char *scanPat,       /* name of scanning scheme (given and returned) */
 int *status          /* global status (given and returned) */
 );
 
+void gsdac_getSampleMode
+(
+const struct gsdac_gsdVars_struct *gsdVars, 
+                     /* GSD headers and arrays (given) */
+char *samMode,       /* sampling mode (given and returned) */
+char *obsType,       /* observation type (given and returned) */
+int *status          /* global status (given and returned) */
+);
+
 void gsdac_getStartIdx
 (
-const struct gsdac_gsd_struct *gsd, /* GSD file access parameters (given) */ 
+const struct gsdac_gsdVars_struct *gsdVars, 
+                     /* GSD headers and arrays (given) */
 const char *samMode, /* sampling mode (given) */
-const int *numPtsX,  /* number of points in x direction (given) */
-const int *numPtsY,  /* number of points in y direction (given) */
-const char *obsDirection, /* direction of rows (given) */
 int *startIdx,       /* start index into pattern (given and returned) */
 int *status          /* global status (given and returned) */
 );
 
 void gsdac_putFits
 (
-const struct gsdac_gsd_struct *gsd, /* GSD file access parameters (given) */
-const int nSubsys,   /* number of subsystems (given) */
+const struct gsdac_gsdVars_struct *gsdVars, 
+                     /* GSD headers and arrays (given) */
 const int subsysNum, /* subsystem number (given) */
 const int obsNum,    /* observation number (given) */
 const int utDate,    /* UT date (given) */
-const int nChans,    /* total number of channels used in observation (given) */
 const int nSteps,    /* number of time steps in observation (given) */
 const char *backend, /* name of the backend (given) */
-const int nRecep,    /* number of receptors (given) */
 char *recepNames[],  /* names of receptors (given) */
+const char *samMode, /* sample mode (given) */
+const char *obsType, /* observation type (given) */
 const struct JCMTState *record, /* JCMTState headers (given) */
 const AstFitsChan *fitschan,  /* FITS headers (given and returned) */
 int *status          /* pointer to global status (given and returned) */
@@ -349,15 +365,18 @@ int *status          /* pointer to global status (given and returned) */
 
 void gsdac_putJCMTStateC
 (
-const struct gsdac_gsd_struct *gsd, /* GSD file access parameters */
+const struct gsdac_gsdVars_struct *gsdVars, 
+                     /* GSD headers and arrays (given) */
 const unsigned int stepNum,    /* time step of this spectrum (given) */
+const char *backend,      /* name of the backend (given) */
 struct JCMTState *record, /* JCMTState headers (given and returned ) */
 int *status          /* pointer to global status (given and returned) */
 );
 
 void gsdac_putJCMTStateS
 (
-const struct gsdac_gsd_struct *gsd, /* GSD file access parameters */
+const struct gsdac_gsdVars_struct *gsdVars, 
+                     /* GSD headers and arrays (given) */
 const unsigned int stepNum,    /* time step of this spectrum (given) */
 const unsigned int subsysNum, /* subsystem number (given) */
 struct JCMTState *record, /* JCMTState headers (given and returned ) */
@@ -366,7 +385,8 @@ int *status          /* pointer to global status (given and returned) */
 
 void gsdac_putSpecHdr
 (
-const struct gsdac_gsd_struct *gsd, /* GSD file access parameters */ 
+const struct gsdac_gsdVars_struct *gsdVars, 
+                     /* GSD headers and arrays (given) */
 const unsigned int nSteps,    /* number of time steps (given) */
 const unsigned int stepNum,   /* time step of this spectrum (given) */
 const unsigned int subsysNum, /* subsystem number (given) */
@@ -377,9 +397,10 @@ int *status          /* pointer to global status (given and returned) */
 
 void gsdac_wrtData
 (
-const struct gsdac_gsd_struct *gsd, /* GSD file access parameters (given) */
-const unsigned int nSteps, /* number of time steps (given) */
+const struct gsdac_gsdVars_struct *gsdVars, 
+                     /* GSD headers and arrays (given) */
 const char *directory,     /* output write directory (given) */
+const int nSteps,    /* number of steps in the observation (given) */
 int *status          /* pointer to global status (given and returned) */
 );
 

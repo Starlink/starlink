@@ -13,15 +13,15 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_putJCMTStateS ( const gsdac_gsd_struct *gsd, 
+*     gsdac_putJCMTStateS ( const gsdac_gsdVars_struct *gsdVars, 
 *                           const unsigned int stepNum, 
 *                           const unsigned int subsysNum, 
 *                           struct JCMTState *record, 
 *                           int *status );
 
 *  Arguments:
-*     gsd = const gsdac_gsd_struct* (Given)
-*        GSD file access parameters
+*     gsdVars = const gsdac_gsdVars_struct* (Given)
+*        GSD headers and arrays
 *     stepNum = const unsigned int (Given)
 *        time step of this spectrum
 *     subsysNum = const unsigned int (Given)
@@ -44,6 +44,8 @@
 *  History:
 *     2008-01-29 (JB):
 *        Original
+*     2008-02-14 (JB):
+*        Use gsdVars struct to store headers/arrays
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -89,7 +91,7 @@
 
 #include "jcmt/state.h"
 
-void gsdac_putJCMTStateS ( const struct gsdac_gsd_struct *gsd, 
+void gsdac_putJCMTStateS ( const struct gsdac_gsdVars_struct *gsdVars, 
                            const unsigned int stepNum, 
                            const unsigned int subsysNum,
                            struct JCMTState *record, int *status )
@@ -98,12 +100,7 @@ void gsdac_putJCMTStateS ( const struct gsdac_gsd_struct *gsd,
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
 
-  /* Fill the JCMTState (KLUDGED with default vals). */
-
-  /* Get the frontend LO frequency. */
-  gsdac_getElemd ( gsd, "C3BEFENULO", subsysNum-1, 
-                   &(record->fe_lofreq), status );
-
- 
+ /* Get the frontend LO frequency. */
+  record->fe_lofreq = (gsdVars->LOFreqs)[subsysNum-1]; 
 
 }

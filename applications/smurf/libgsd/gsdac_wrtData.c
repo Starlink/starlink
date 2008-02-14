@@ -13,17 +13,16 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_wrtData ( const gsdac_gsd_struct *gsd,
-*                     const unsigned int nSteps,
-*                     char *directory, int *status );
+*     gsdac_wrtData ( const gsdac_gsdVars_struct *gsdVars,
+*                     char *directory, const int nSteps, int *status );
 
 *  Arguments:
-*     gsd = const gsdac_gsd_struct* (Given)
-*        GSD file access parameters
-*     nSteps = const unsigned int* (Given)
-*        Number of time steps
+*     gsdVars = const gsdac_gsdVars_struct* (Given)
+*        GSD headers and arrays
 *     directory = char* (Given)
 *        Directory to write the file
+*     nSteps = const int (Given)
+*        Number of steps in the observation
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -39,6 +38,8 @@
 *  History:
 *     2008-02-05 (JB):
 *        Original.
+*     2008-02-14 (JB):
+*        Use gsdVars struct to store headers/arrays
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -92,36 +93,29 @@
 #define MAXRECEP 8  
 #define MAXSUBSYS 16
 
-void gsdac_wrtData ( const struct gsdac_gsd_struct *gsd, 
-                     const unsigned int nSteps,
-                     const char *directory, int *status )
+void gsdac_wrtData ( const struct gsdac_gsdVars_struct *gsdVars, 
+                     const char *directory, const int nSteps, int *status )
 {
 
   /* Local variables */
   char backend[MAXFITS];      /* name of the backend */
-  double centreFreq;          /* centre frequency */
   const AstFitsChan *fitschan[nSteps];  /* Array of FITS headers */
+  long fitsIndex;             /* current FITSchan */
   char *focalStation = NULL;  /* focal station of the instrument */
   float fPlaneX[MAXRECEP]; 
   float fPlaneY[MAXRECEP];
-  double gsdObsNum;           /* GSD observation number */
-  double gsdUTDate;           /* GSD UT date */
   int i;                      /* loop counter */
   double mem;                 /* amount of memory for spectrum */
-  unsigned int nChans;        /* number of channels in each subsystem */
-  unsigned int nRecep;        /* number of receptors participating in 
-                                 this observation */
-  unsigned int nSubsys;       /* number of subsystems */
-  unsigned int nTotChans;     /* total number of channels in observation */
   unsigned int obsNum;        /* current observation number */
+  char obsType[MAXFITS];      /* type of observation */
   char *OCSConfig = NULL;     /* OCS configuration XML */
   JCMTState *record = NULL;   /* JCMT state information for the 
                                  current spectrum */
   char *recepNames[MAXRECEP]; /* names of the receptors */
+  char samMode[MAXFITS];      /* sampling mode (raster or grid) */
   ACSISSpecHdr *specHdr;      /* ACSIS spectrum-specific information */
   unsigned long specIndex;    /* index into spectral data */
-  float *spectrum = NULL;     /* single spectrum data */
-  unsigned int spectrumSize;  /* size of spectrum data */
+  long spectrumSize;          /* size of spectrum data */
   unsigned int stepNum;       /* current step */
   unsigned int subsysNum;     /* subsystem used for the current spectrum */
   unsigned int utDate;        /* UT date in YYYYMMDD format */
@@ -133,46 +127,22 @@ void gsdac_wrtData ( const struct gsdac_gsd_struct *gsd,
   msgOutif(MSG__VERB," ", 
 	   "Checking UTDate to retrieve observation number", status);
 
-  gsdac_get0d ( gsd, "C3DAT", &gsdUTDate, status );
+  /* Get the sample mode and obs type. */
+  gsdac_getSampleMode ( gsdVars, samMode, obsType, status );
 
-  utDate = (int)( ( gsdUTDate + 0.00001 ) * 10000.0 );
+  utDate = (int)( ( gsdVars->obsUT1d + 0.00001 ) * 10000.0 );
 
   /* If the UTDate is prior to 20030202, prompt the user for the observation
      number.  Otherwise, use the value in NOBS. */
-  if ( utDate < 20030202 ) {
+  if ( utDate < 20030202 )
     parGet0i ( "OBSNUM", &obsNum, status ); 
-  } else {
-    gsdac_get0d ( gsd, "C1SNO", &gsdObsNum, status );
-    if ( *status == SAI__OK ) {
-      obsNum = (int)gsdObsNum;
-    }
-  }
-
-  /* Get the number of subsystems in this observation. */
-  gsdac_get0i ( gsd, "C3NRS", &nSubsys, status );
-
-  /* Get the total number of channels in this observation. */
-  gsdac_get0i ( gsd, "C3NCH", &nTotChans, status );
-
-  /* Get the number of receptors. */
-  gsdac_get0i ( gsd, "C3NFOC", &nRecep, status );
-
-  /* Get the centre frequency to determine receptor names. */
-  gsdac_getElemd ( gsd, "C12CF", 0, &centreFreq, status );
-
-  /* Get the size of the data array. */
-  gsdac_getArraySize ( gsd, "C13DAT", &spectrumSize, status ); 
+  else 
+    obsNum = (int)gsdVars->nObs;
 
   /* Get the focal station. */
   focalStation = "DIRECT";
 
-  if ( *status != SAI__OK ) {
-    *status = SAI__ERROR;
-    errRep ( "", "Error retrieving GSD headers", status );
-    return;
-  }
-
-  for ( i = 0; i < nRecep; i++ ) { 
+  for ( i = 0; i < gsdVars->nFEChans; i++ ) { 
     recepNames[i] = smf_malloc ( 2, sizeof( char ), 0, status );
     fPlaneX[i] = 0.0;
     fPlaneY[i] = 0.0;
@@ -180,51 +150,51 @@ void gsdac_wrtData ( const struct gsdac_gsd_struct *gsd,
 
   /* Check to make sure we have the right number of receptors for
      this frontend, and copy the receptor names. */
-  if ( centreFreq < 290.0 ) {
+  if ( (gsdVars->centreFreqs)[0] < 290.0 ) {
 
-    if ( nRecep != 1 ) {
+    if ( gsdVars->nFEChans != 1 ) {
       *status = SAI__ERROR;
       errRep ( FUNC_NAME, "Front end is receiver A but has seems to have more than 1 receptor", status );
       return;
     }
 
-    strncpy ( recepNames[0], "A", 1 );
+    strncpy ( recepNames[0], "A", 2 );
 
-  } else if ( centreFreq < 395.0 ) {
+  } else if ( (gsdVars->centreFreqs)[0] < 395.0 ) {
 
-    if ( nRecep != 2 ) {
+    if ( gsdVars->nFEChans != 2 ) {
       *status = SAI__ERROR;
       errRep ( "", "Front end is receiver B but does not have 2 receptors", 
                status ); 
       return; 
     }
     
-    strncpy ( recepNames[0], "BA", 2 );
-    strncpy ( recepNames[1], "BB", 2 );   
+    strncpy ( recepNames[0], "BA", 3 );
+    strncpy ( recepNames[1], "BB", 3 );   
 
-  } else if ( centreFreq < 600.0 ) {
+  } else if ( (gsdVars->centreFreqs)[0] < 600.0 ) {
 
-    if ( nRecep != 2 ) {
+    if ( gsdVars->nFEChans != 2 ) {
       *status = SAI__ERROR;
       errRep ( "", "Front end is receiver C but does not have 2 receptors", 
                status ); 
       return; 
     }
     
-    strncpy ( recepNames[0], "CA", 2 );
-    strncpy ( recepNames[1], "CB", 2 ); 
+    strncpy ( recepNames[0], "CA", 3 );
+    strncpy ( recepNames[1], "CB", 3 ); 
    
-  } else if ( centreFreq < 750 ) {
+  } else if ( (gsdVars->centreFreqs)[0] < 750 ) {
 
-    if ( nRecep != 2 ) {
+    if ( gsdVars->nFEChans != 2 ) {
       *status = SAI__ERROR;
       errRep ( "", "Front end is receiver D but does not have 2 receptors", 
                status ); 
       return; 
     }
 
-    strncpy ( recepNames[0], "DA", 2 );
-    strncpy ( recepNames[1], "DB", 2 );
+    strncpy ( recepNames[0], "DA", 3 );
+    strncpy ( recepNames[1], "DB", 3 );
 
   } else {
     *status = SAI__ERROR;
@@ -241,82 +211,73 @@ void gsdac_wrtData ( const struct gsdac_gsd_struct *gsd,
   msgOutif(MSG__VERB," ", 
 	     "Preparing file writing system", status); 
 
-  acsSpecOpenTS ( directory, utDate, obsNum, nRecep, nSubsys, 
-                  recepNames, focalStation, fPlaneX, fPlaneY,
-                  OCSConfig, status );
+  acsSpecOpenTS ( directory, utDate, obsNum, gsdVars->nFEChans, 
+                  gsdVars->nBESections, recepNames, focalStation, 
+                  fPlaneX, fPlaneY, OCSConfig, status );
 
-  /* Get the name of the backend. */
-  gsdac_get0c ( gsd, "C1BKE", backend, status );
 
-  if ( *status == SAI__OK ) {
+  /* Truncate the name of the backend. */
+  cnfImprt ( gsdVars->backend, 16, backend );
 
-    /* Truncate the name of the backend. */
-    cnfImprt ( backend, 16, backend );
-
-    /* Set the backendFlag. */
-    if ( strncmp ( backend, "DAS", 3 ) == 0 )
-      acsSpecSetBackend ( ACS__BACKEND_DAS, status );
-    else if ( strncmp ( backend, "AOSC", 4 ) == 0 )
-      acsSpecSetBackend ( ACS__BACKEND_AOS, status );
-    else {
-      *status = SAI__ERROR;
-      msgSetc ( "BACKEND", backend );
-      errRep ( "", "Backend ^BACKEND not supported", status );
-      return;
-
-    } 
-  }
+  /* Set the backendFlag. */
+  if ( strncmp ( backend, "DAS", 3 ) == 0 )
+    acsSpecSetBackend ( ACS__BACKEND_DAS, status );
+  else if ( strncmp ( backend, "AOSC", 4 ) == 0 )
+    acsSpecSetBackend ( ACS__BACKEND_AOS, status );
+  else {
+    *status = SAI__ERROR;
+    msgSetc ( "BACKEND", backend );
+    errRep ( "", "Backend ^BACKEND not supported", status );
+    return;
+  } 
 
   /* Allocate memory for JCMTState, SpecHdr, and data. */
   record = smf_malloc ( 1, sizeof ( *record ), 0, status );
   specHdr = smf_malloc ( 1, sizeof ( *specHdr ), 0, status );
+
+  /* Get the size of the data array */
+  spectrumSize = gsdVars->nBEChansOut * gsdVars->nScanPts * gsdVars->noScans;
                  
-  /* Retrieve the full spectral data and flag bad values. */
-  spectrum = smf_malloc ( spectrumSize, sizeof( float ), 0, status );
-  gsdac_get1r ( gsd, "C13DAT", spectrum, status );
-
-  if ( *status == SAI__OK ) {
-
-    for ( i = 0; i < spectrumSize; i++ ) {
-      if ( spectrum[i] == 9999 ) spectrum[i] = VAL__BADR;
-    }
-  }  
+  /* Flag bad values in the data. */
+  for ( i = 0; i < spectrumSize; i++ ) {
+    if ( (gsdVars->data)[i] == 9999 ) (gsdVars->data)[i] = VAL__BADR;
+  }
 
   /* Iterate through each time step. */
   for ( stepNum = 0; stepNum < nSteps; stepNum++ ) {
 
-    specIndex = stepNum * ( spectrumSize / nSteps );
+    specIndex = ( stepNum * spectrumSize ) / nSteps;
 
     /* Fill JCMTState. */
-    gsdac_putJCMTStateC ( gsd, stepNum, record, status );  
+    gsdac_putJCMTStateC ( gsdVars, stepNum, backend, record, status );  
 
     /* For each subsystem, write the files. */
-    for ( subsysNum = 1; subsysNum <= nSubsys; subsysNum++ ) {
-
-      /* Get the number of channels. */
-      gsdac_getElemi ( gsd, "C3LSPC", subsysNum-1, &nChans, status );
+    for ( subsysNum = 1; subsysNum <= gsdVars->nBESections; subsysNum++ ) {
 
       /* Get the subsystem-dependent JCMTState values. */
-      gsdac_putJCMTStateS ( gsd, stepNum, subsysNum, record, status );
+      gsdac_putJCMTStateS ( gsdVars, stepNum, subsysNum, record, status );
 
       /* Get the ACSIS SpecHdr. */
-      gsdac_putSpecHdr ( gsd, nSteps, stepNum, subsysNum, record, specHdr, status );
+      gsdac_putSpecHdr ( gsdVars, nSteps, stepNum, subsysNum, record, 
+                         specHdr, status );
 
       msgOutif(MSG__VERB," ", "Writing data", status); 
 
       /* Write a spectrum to the file. */
-      acsSpecWriteTS( subsysNum, nChans, &(spectrum[specIndex]), 
-                      record, specHdr, status );
+      acsSpecWriteTS( subsysNum, (gsdVars->BEChans)[subsysNum-1], 
+                      &((gsdVars->data)[specIndex]), record, specHdr, status );
 
       /* Initialize the astFitsChan for this file. */
-      fitschan[ ( stepNum * nSubsys ) + ( subsysNum - 1 ) ] = astFitsChan ( NULL, NULL, "" );
+      fitsIndex = ( stepNum * gsdVars->nBESections ) + ( subsysNum - 1 );
+
+      fitschan[fitsIndex] = astFitsChan ( NULL, NULL, "" );
 
       /* Fill the FITS headers. */
-      gsdac_putFits ( gsd, nSubsys, subsysNum, obsNum, utDate, nChans, 
-                      nSteps, backend, nRecep, recepNames, record, 
-                      fitschan[ ( stepNum * nSubsys ) + ( subsysNum - 1 ) ], status ); 
+      gsdac_putFits ( gsdVars, subsysNum, obsNum, utDate, nSteps, backend, 
+                      recepNames, samMode, obsType, record, 
+                      fitschan[fitsIndex], status ); 
 
-      specIndex = specIndex + nChans;
+      specIndex = specIndex + (gsdVars->BEChans)[subsysNum-1];
 
     }
 
@@ -324,7 +285,7 @@ void gsdac_wrtData ( const struct gsdac_gsd_struct *gsd,
 
   if ( *status != SAI__OK ) {
     *status = SAI__ERROR;
-    errRep ( "", "Error writing data", status );
+    errRep ( FUNC_NAME, "Error writing data", status );
     return;
   }  
 
@@ -336,9 +297,9 @@ void gsdac_wrtData ( const struct gsdac_gsd_struct *gsd,
 
   /* Free allocated memory. */
   smf_free ( record, status );
-  smf_free ( spectrum, status );
+  smf_free ( specHdr, status );
 
-  for ( i = 0; i < nRecep; i++ ) { 
+  for ( i = 0; i < gsdVars->nFEChans; i++ ) { 
     smf_free ( recepNames[i], status );
   }
 

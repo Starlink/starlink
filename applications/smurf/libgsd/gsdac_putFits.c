@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     "gsdac_putFits.c
+*     gsdac_putFits.c
 
 *  Purpose:
 *     Retrieve values from the GSD headers to fill the FITS headers
@@ -14,35 +14,33 @@
 *     Subroutine
 
 *  Invocation:
-*     gsdac_putFits ( const struct gsdac_gsd_struct *gsd, 
-*                     const int nSubsys, const int subsysNum, 
-*                     const int obsNum, const int utDate, const int nChans, 
-*                     const int nSteps, const char *backend, 
-*                     const int nRecep, char *recepNames[],
+*     gsdac_putFits ( const struct gsdac_gsdVars_struct *gsdVars, 
+*                     const int subsysNum, const int obsNum, 
+*                     const int utDate, const int nSteps, 
+*                     const char *backend, char *recepNames[],
+*                     const char *samMode, const char *obsType,
 *                     const struct JCMTState *record, 
 *                     const AstFitsChan *fitschan, int *status )
 
 *  Arguments:
-*     gsd = const struct gsdac_gsd_struct* (Given)
+*     gsdVars = const struct gsdac_gsdVars_struct* (Given)
 *        GSD file access parameters
-*     nSubsys = const int (Given)
-*        Number of subsystems
 *     subsysNum = const int (Given)
 *        Subsystem number
 *     obsNum = const int (Given)
 *        Observation number
 *     utDate = const int (Given)
 *        UT observation date
-*     nChans = const int (Given)
-*        Number of channels used in this subsection
 *     nSteps = const int (Given)
 *        Number of time steps in observation
 *     backend = const char* (Given)
 *        Name of the backend
-*     nRecep = const int (Given)
-*        Number of receptors
 *     recepnames = char*[] (Given)
 *        Names of receptors
+*     samMode = const char* (Given)
+*        Sample mode
+*     obsType = const char* (Given)
+*        Observation type
 *     record = const JCMTState* (Given)
 *        JCMTState headers
 *     fitschan = const AstFitsChan* (Given and Returned)
@@ -61,6 +59,8 @@
 *  History :
 *     2008-02-04 (JB):
 *        Original
+*     2008-02-14 (JB):
+*        Use gsdVars struct to store headers/arrays
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -106,60 +106,41 @@
 
 #define MAXFITS 80
 
-/* Debug level, 0 = quiet, 1 = loud. */
-#define DEBUGLVL 0
-
 #define FUNC_NAME "gsdac_putFits"
 
-void gsdac_putFits ( const struct gsdac_gsd_struct *gsd, 
-                     const int nSubsys, const int subsysNum, 
-                     const int obsNum, const int utDate, const int nChans, 
-                     const int nSteps, const char *backend, 
-                     const int nRecep, char *recepNames[],
+void gsdac_putFits ( const struct gsdac_gsdVars_struct *gsdVars, 
+                     const int subsysNum, const int obsNum, 
+                     const int utDate, const int nSteps, 
+                     const char *backend, char *recepNames[],
+                     const char *samMode, const char *obsType,
                      const struct JCMTState *record, 
                      const AstFitsChan *fitschan, int *status )
 
 {
 
   /* Local variables */
-  float alignDX;              /* SMU tables X axis alignment offset */
-  float alignDY;              /* SMU tables Y axis alignment offset */
   float amEnd;                /* airmass at end of observation */
   float amStart;              /* airmass at start of observation */
-  double atEnd;               /* air temp at end of observation (degC) */
-  double atStart;             /* air temp at start of observation (degC) */
   double azEnd;               /* Azimuth at observation end (deg) */
   double azStart;             /* Azimuth at observation start (deg) */
-  float bandwidth;            /* bandwidth */
-  double bpEnd;               /* pressure at observation end (mbar) */
-  double bpStart;             /* pressure at observation start (mbar) */
+  double bp;                  /* pressure (mbar) */
   char bwMode[MAXFITS];       /* ACSIS total bandwidth setup */
-
   char chopCrd[MAXFITS];      /* chopper coordinate system */
-  float chopFrq;              /* chopper frequency (Hz) */
-  float chopPA;               /* chopper position angle (deg) */
-  float chopThr;              /* chop throw (arcsec) */
   char curChar;               /* character pointer */
   char dateEnd[MAXFITS];      /* UTC datetime of end of observation 
                                  in format YYYY-MM-DDTHH:MM:SS */
   char dateObs[MAXFITS];      /* UTC datetime of start of observation 
                                  in format YYYY-MM-DDTHH:MM:SS */
   int day;                    /* days for time conversion. */
-  float dAz;                  /* SMU azimuth pointing offset */
-  float dEl;                  /* SMU elevation pointing offset */
   char doppler[MAXFITS];      /* doppler velocity definition */
-  double dut1;                /* UT1-UTC correction (day) */
   double elEnd;               /* elevation at observation end (deg) */
   double elStart;             /* elevation at observation start (deg) */
   double etal;                /* telescope efficiency */
-  float focusDZ;              /* SMU tables Z axis focus offset */
   int hour;                   /* hours for time conversion. */
   char HSTend[MAXFITS];       /* HST at observation end in format 
                                  YYYY-MM-DDTHH:MM:SS */
   char HSTstart[MAXFITS];     /* HST at observation start in format 
                                  YYYY-MM-DDTHH:MM:SS */
-  double humEnd;              /* humidity at observation end (%) */ 
-  double humStart;            /* humidity at observation start (%) */
   int i;                      /* loop counter */
   float IFchanSp;             /* TOPO IF channel spacing (Hz) */
   double IFfreq;              /* IF frequency (GHz) */
@@ -168,8 +149,6 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
   int josMin;                 /* ?? */
   char loclCrd[MAXFITS];      /* local offset coordinate system for 
                                  map_x / map_y */
-  double LOfreqE;             /* LO frequency at end of observation (GHz) */
-  double LOfreqS;             /* LO frequency at start of observation (GHz) */
   char LSTstart[MAXFITS];     /* LST at observation start in format
                                  YYYY-MM-DDTHH:MM:SS */
   char LSTend[MAXFITS];       /* LST at observation end in format
@@ -178,85 +157,46 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
                                  (arcsec) */
   float mapPA;                /* requested PA of map vertical, +ve towards
                                  +ve long */
-  char mapPositiveX;          /* flag for x-direction increase in first row. */
-  char mapPositiveY;          /* flag for y-direction increase in first row. */
-  double mapStartX;           /* Start map x index. */
-  double mapStartY;           /* Start map y index. */
   float mapWdth;              /* requested width of rectangle to be mapped
                                  (arcsec) */
-  double mapX;                /* requested map X offset from telescope
-                                 centre (arcsec) */
-  double mapY;                /* requested map Y offset from telescope
-                                 centre (arcsec) */
-  float medTSys;              /* median of T_sys across all receptors */
   int min;                    /* minutes for time conversion. */
   char molecule[MAXFITS];     /* target molecular species */
   int month;                  /* months for time conversion. */
   int nMix;                   /* number of mixers */
   double nRefStep;            /* number of nod sets repeated */
-  int numCyc;                 /* number of times to repeat entire recipe */
-  int numNods;                /* number of nod sets repeated */
-  int numPtsX;                /* number of points in x direction */
-  int numPtsY;                /* number of points in y direction */
-  int numScanPts;             /* number of points in a phase */
   char object[MAXFITS];       /* object of interest */
   char object2[MAXFITS];      /* object of interest (second half of name) */
-  char obsDirection[MAXFITS]; /* direction of scan (horizontal or
-                                 vertical) */
   char obsID[MAXFITS];        /* unique observation number in format
                                  INSTR_NNNNN_YYYYMMDDTHHMMSS */
   char obsIDs[MAXFITS];       /* unique observation number + subsystem
                                  number in format
                                  INSTR_NNNNN_YYYYMMDDTHHMMSS_N */
   char obsSB[MAXFITS];        /* observed sideband */
-  char obsType[MAXFITS];      /* type of observation */
   int parse;                  /* flag for incorrect date string. */
-  char project[MAXFITS];      /* observing program */
   char recptors[MAXFITS];     /* active FE receptor IDs for this obs */
   double refChan;             /* reference IF channel no. */
-  char refrecep[MAXFITS];     /* receptor with unit sensitivity */
-  int remainder;              /* remainder when parsing dates. */
-  char samMode[MAXFITS];      /* sampling mode (raster or grid) */
-  char sbMode[MAXFITS];       /* sideband mode */
-  int sbSign;                 /* sideband sign */
   char scanCrd[MAXFITS];      /* coordinate system of scan */
   float scanDy;               /* scan spacing perpendicular to scan
                                  (arcsec) */
   float scanPA;               /* Scan PA rel. to lat. line; 0=lat, 
                                  90=long in scanCrd system */
   char scanPat[MAXFITS];      /* name of scanning scheme */
-  double scanTime;            /* time of one scan. */
   float scanVel;              /* scan velocity (arcsec/sec) */
-  char seeDatEn[MAXFITS];     /* time of seeingEn in format
-                                 YYYY-MM-DDTHH:MM:SS */
   char seeDatSt[MAXFITS];     /* time of seeingSt in format
                                  YYYY-MM-DDTHH:MM:SS */
-  float seeingEn;             /* SAO atmospheric seeing at end (arcsec) */
-  float seeingSt;             /* SAO atmospheric seeing at start (arcsec) */
   char skyRefX[MAXFITS];      /* X co-ord of reference position (arcsec) */  
   char skyRefY[MAXFITS];      /* Y co-ord of reference position (arcsec) */  
   char sSysObs[MAXFITS];      /* spectral ref. frame during observation */
   int standard;               /* true for spectral line standards */
   int startIdx;               /* index in pattern at start of observation */
   int stBetRef;               /* max number of steps between refs */
-  int stepTime;               /* RTS step time (s) */
   char subBands[MAXFITS];     /* ACSIS sub-band set-up */
-  int subRefP1;               /* reference channel for subband1 */
-  char swMode[MAXFITS];       /* switch mode (chop, pssw, freq, or NONE) */
-  float *tableDat;            /* table data */
-  int tableDims = 0;          /* dimensionality of data table */
+  char swMode[MAXFITS];       /* switch mode */
   int tableSize = 0;          /* number of elements of data table */
-  float tau225En;             /* 225 GHz tau from CSO at end */
-  float tau225St;             /* 225 GHz tau from CSO at start */
-  char tauDatEn[MAXFITS];     /* time of tau225En observation in 
-				  format YYYY-MM-DDTHH:MM:SS */
   char tauDatSt[MAXFITS];     /* time of tau225St observation in 
                                  format YYYY-MM-DDTHH:MM:SS */
   char telName[MAXFITS];      /* telescope name */
-  char time[MAXFITS];         /* time before converting format. */
   char transiti[MAXFITS];     /* target transition for molecule */
-  double uAz;                 /* user azimuth pointing offset */
-  double uEl;                 /* user elevation pointing offset */
   int year;                   /* year for time conversion. */  
 
   /* Check inherited status */
@@ -264,57 +204,29 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
 
 /* NOTE!!!!!! Kludged calcs indicated by //k */
 
-  if ( DEBUGLVL > 0 ) printf ( "Getting general FITS headers...\n" );
-
-  /* Get the telescope name. */
-  gsdac_get0c ( gsd, "C1TEL", telName, status );
-
   /* Get the telescope efficiency and convert from percentage to decimal */
-  gsdac_get0d ( gsd, "C8EL", &etal, status ); 
-
-  etal = etal / 100.0; 
-
-
-
-  /* OMP and ORAC-DR Specific */
-  if ( DEBUGLVL > 0 ) printf ( "Getting OMP FITS headers...\n" );
-
-  /* Get the Project name */
-/***** NOTE: possibly CAL for calibration sources (planets) *****/
-  gsdac_get0c ( gsd, "C1PID", project, status ); 
-
+  etal = gsdVars->etal / 100.0; 
 
 
   /* Obs Id, Date, Pointing Info */
-  if ( DEBUGLVL > 0 ) printf ( "Getting Obs ID FITS headers...\n" );
 
-  /* Get the Object name. */
-  gsdac_get0c ( gsd, "C1SNA1", object, status );
-  gsdac_get0c ( gsd, "C1SNA2", object2, status );
 
-  if ( *status == SAI__OK ) {
+  /* Truncate the object names and concatenate. */
+  cnfImprt ( gsdVars->object1, 16, object );
+  cnfImprt ( gsdVars->object2, 16, object2 );
 
-    /* Truncate the object names and concatenate. */
-    cnfImprt ( object, 16, object );
-    cnfImprt ( object2, 16, object2 );
-
-    if ( strncmp ( object2, " ", 1 ) != 0 ) {
-      strcat ( object, ", " ); 
-      strcat ( object, object2 );
-    }
-
+  if ( strncmp ( object2, " ", 1 ) != 0 ) {
+    strcat ( object, ", " ); 
+    strcat ( object, object2 );
   }
 
   /* Determine if this is a spectral line standard. */
   standard = 0;//k
 
-  /* Get the UT1-UTC correction. */
-  gsdac_get0d ( gsd, "c3ut1c", &dut1, status );
-
   /* Get the UTC start and end times and observation IDs. */
-  gsdac_getDateVars ( gsd, subsysNum, obsNum, backend, dateObs, 
-                      dateEnd, obsID, obsIDs, 
-                      HSTstart, HSTend, LSTstart, LSTend, status );
+  gsdac_getDateVars ( gsdVars, subsysNum, obsNum, backend, dateObs, 
+                      dateEnd, obsID, obsIDs, HSTstart, HSTend, 
+                      LSTstart, LSTend, status );
   
   if ( *status == SAI__OK ) {
  
@@ -335,18 +247,8 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
 
   /* Integration time related. */
 
-  if ( DEBUGLVL > 0 ) printf ( "Getting integ-time FITS headers...\n" );
-
   /* Get the dimensionality of the scan table 2. */
-  gsdac_get0i ( gsd, "C3NO_SCAN_VARS2", &tableDims, status );
-
-  /* Get the size of the scan table 1. */
-  gsdac_getArraySize ( gsd, "C12SCAN_TABLE_2", &tableSize, status );
-
-  tableDat = smf_malloc ( tableSize, sizeof( float ), 0, status );
-
-  /* Get the data from scan table 1. */
-  gsdac_get1r ( gsd, "C12SCAN_TABLE_2", tableDat, status ); 
+  tableSize = gsdVars->nScanVars2 * gsdVars->noScans;
 
   /* Get the sum of the integration times. */
   if ( *status == SAI__OK ) {
@@ -354,18 +256,14 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
     i = 0;
     intTime = 0.0;
     while ( i < tableSize ) {
-      intTime += tableDat[i];
-      i += tableDims;
+      intTime += (gsdVars->intTimes)[i];
+      i += gsdVars->nScanVars2;
     }
 
   }
 
-  smf_free ( tableDat, status );
-
-
 
   /* ACSIS Specific. */
-  if ( DEBUGLVL > 0 ) printf ( "Getting ACSIS FITS headers...\n" );
 
   /* Get the molecule. */
   strcpy ( molecule, "" );//k
@@ -375,239 +273,116 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
 
   /* Get the bandwidth setup. */
 /***** NOTE: may be different for rxb widebands *****/  
-  gsdac_getElemr ( gsd, "C12BW", subsysNum-1, &bandwidth, status );
-  
-  if ( *status == SAI__OK ) {
-  
-    sprintf ( bwMode, "%iMHzx%i", (int)bandwidth, nChans );
+  sprintf ( bwMode, "%iMHzx%i", (int)(gsdVars->bandwidths)[subsysNum-1], 
+            (gsdVars->BEChans)[subsysNum-1] );
 
 /***** NOTE: Possibly undef? *****/
-    strcpy ( subBands, bwMode );
+  strcpy ( subBands, bwMode );
 
-    /* Get the reference channel. */
-    refChan = (double)nChans / 2.0;
+  /* Get the reference channel. */
+  refChan = (double)( (gsdVars->BEChans)[subsysNum-1] ) / 2.0;
 
-  }
-
-  /* Get the IF channel spacing and convert to Hz. */
-  gsdac_getElemr ( gsd, "C12FR", subsysNum-1, &IFchanSp, status );
-
-  if ( *status == SAI__OK ) IFchanSp = IFchanSp * 1000000.0;
-  
+  IFchanSp = (gsdVars->freqRes)[subsysNum-1] * 1000000.0;
 
 
   /* FE Specific. */
-  if ( DEBUGLVL > 0 ) printf ( "Getting FE FITS headers...\n" );
 
-  /* Get the name of the frontend. */
-  gsdac_get0c ( gsd, "C1RCV", instrume, status ); 
-
-  if ( *status == SAI__OK ) {
-
-    /* Truncate the name of the frontend. */
-    cnfImprt ( instrume, 16, instrume );
-
-  }
-
-  /* Get the sideband mode. */
-  gsdac_get0c ( gsd, "C3SBMODE", sbMode, status );
+  /* Truncate the name of the frontend. */
+  cnfImprt ( gsdVars->frontend, 16, instrume );
 
   /* Get the IF frequency and make sure it's always positive. */
-  gsdac_getElemd ( gsd, "C3BETOTIF", subsysNum-1, &IFfreq, status ); 
-
-  IFfreq = abs( IFfreq );  
+  IFfreq = abs( (gsdVars->totIFs)[subsysNum-1] );  
 
   /* Get the number of mixers. */
   nMix = 1;//k
 
   /* Get the observed sideband (-ve value = LSB, +ve value = USB ). */
-  gsdac_getElemi ( gsd, "C3BEFESB", subsysNum-1, &sbSign, status );
-
-  if ( *status == SAI__OK ) {
-
-    if ( sbSign > 0 ) strcpy ( obsSB, "USB" );
-    else strcpy ( obsSB, "LSB" );
-
-  }
-
-  /* Get the LO frequency at the start of the observation. */
-  gsdac_getElemd ( gsd, "C3BEFENULO", subsysNum-1, &LOfreqS, status );  
-
-  /* Get the LO frequency at the end of the observation. */
-  gsdac_getElemd ( gsd, "C3BEFENULO", subsysNum-1, &LOfreqE, status ); 
+  if ( (gsdVars->sbSigns)[subsysNum-1] > 0 ) strcpy ( obsSB, "USB" );
+  else strcpy ( obsSB, "LSB" );
 
   /* Get the names of the receptors. */
   strcpy ( recptors, recepNames[0] );
-  for ( i = 1; i < nRecep; i++ ) {
+  for ( i = 1; i < gsdVars->nFEChans; i++ ) {
     strcat ( recptors, " " );
     strcat ( recptors, recepNames[i] );   
   }
 
-  /* Get the name of the receptor with unit sensitivity. */
-  strcpy ( refrecep, recepNames[0] );
-
-  /* Get the median of the T_sys across all receptors. */
-  gsdac_getElemr ( gsd, "C12SST", subsysNum-1, &medTSys, status );
-
-  /* Get the Doppler velocity definition. */
-  gsdac_get0c ( gsd, "c12vdef", doppler, status ); 
-
-  if ( *status == SAI__OK ) {
-
-    /* Truncate the doppler velocity definition and set
-       to lowercase. */
-    cnfImprt ( doppler, 16, doppler );
-    i = 0;
+  /* Truncate the doppler velocity definition and set
+     to lowercase. */
+  cnfImprt ( gsdVars->velDefn, 16, doppler );
+  i = 0;
+  curChar = doppler[i];
+  while ( curChar != '\0' ) {
+    doppler[i] = tolower(curChar);
+    i++;
     curChar = doppler[i];
-    while ( curChar != '\0' ) {
-      doppler[i] = tolower(curChar);
-      i++;
-      curChar = doppler[i];
-    }  
+  }  
 
 /***** NOTE : Possibly comes from VEL_REF (c12vref). */
     strcpy ( sSysObs, "TOPOCENT" );
 
-  }  
-
-
 
   /* Environmental data. */
-  if ( DEBUGLVL > 0 ) printf ( "Getting Env FITS headers...\n" );
 
-  /* Get the air temp. */
-  gsdac_get0d ( gsd, "C5AT", &atStart, status );
+  /* Convert pressure from mmHg to mbar. */
+  bp = (gsdVars->pamb) * 1.33322;
 
-  /* Get the relative humidity. */
-  gsdac_get0d ( gsd, "C5RH", &humStart, status );
+  /* Convert dates from YYMMDDHHMMSS to 
+     YYYY-MM-DDTHH:MM:SS. */
+  parse = sscanf ( gsdVars->tauTime, "%02d%02d%02d%02d%02d", &year, 
+                   &month, &day, &hour, &min );
 
-  /* Get the pressure. */
-  gsdac_get0d ( gsd, "C5PRS", &bpStart, status );
+  if ( parse == 0 || parse == EOF ) {
 
-  /* Get the Tau at 225 GHz. */
-  gsdac_get0r ( gsd, "c7tau225", &tau225St, status );
+    msgOut ( FUNC_NAME, "Couldn't convert CSO tau time.", status );
+    strcpy ( tauDatSt, "" );
 
-  /* Get the time of the 225 GHz Tau. */
-  gsdac_get0c ( gsd, "c7tautime", time, status );
-
-  if ( *status == SAI__OK ) {
-
-    /* Convert dates from YYMMDDHHMMSS to 
-       YYYY-MM-DDTHH:MM:SS. */
-    parse = sscanf ( time, "%02d%02d%02d%02d%02d", &year, &month, &day, 
-                   &hour, &min );
-
-    if ( parse == 0 || parse == EOF ) {
-
-      msgOut ( FUNC_NAME, "Couldn't convert CSO tau time.", status );
-      strcpy ( tauDatSt, "" );
-
-    } else {
+  } else {
     
-      /* Inelegant method to get YYYY from YY. */
-      if ( year > 70 ) year = year + 1900;
-      else year = year + 2000;
+    /* Inelegant method to get YYYY from YY. */
+    if ( year > 70 ) year = year + 1900;
+    else year = year + 2000;
  
-      sprintf ( tauDatSt, "%04d-%02d-%02dT%02d:%02d:00", 
-                year, month, day, hour, min );
-
-    }
-
-  }
-
-  /* Get the seeing. */
-  gsdac_get0r ( gsd, "c7seeing", &seeingSt, status );
-
-  /* Get the time of the seeing. */
-  gsdac_get0c ( gsd, "c7seetime", time, status );
-
-  if ( *status == SAI__OK ) {
-
-    /* Convert dates from YYMMDDHHMMSS to 
-       YYYY-MM-DDTHH:MM:SS. */
-    parse = sscanf ( time, "%02d%02d%02d%02d%02d", &year, &month, &day, 
-                   &hour, &min );
-
-    if ( parse == 0 || parse == EOF ) {\
-      msgOut ( FUNC_NAME, "Couldn't convert seeing time, continuing anyway.", 
-               status );
-      strcpy ( seeDatSt, "" );
-
-    } else {
-    
-      /* Kludge to get YYYY from YY. */
-      if ( year > 70 ) year = year + 1900;
-      else year = year + 2000;
- 
-      sprintf ( seeDatSt, "%04d-%02d-%02dT%02d:%02d:00", 
+    sprintf ( tauDatSt, "%04d-%02d-%02dT%02d:%02d:00", 
               year, month, day, hour, min );
 
-    }
-
   }
 
-  if ( *status == SAI__OK ) {
 
-    /* Copy end values from start values. */
-    atEnd = atStart;
-    humEnd = humStart;
-    bpEnd = bpStart;
-    tau225En = tau225St;
-    seeingEn = seeingSt;
-    strcpy ( tauDatEn, tauDatSt );
-    strcpy ( seeDatEn, seeDatSt );
+  /* Convert dates from YYMMDDHHMMSS to 
+     YYYY-MM-DDTHH:MM:SS. */
+  parse = sscanf ( gsdVars->seeTime, "%02d%02d%02d%02d%02d", &year, 
+                   &month, &day, &hour, &min );
+
+  if ( parse == 0 || parse == EOF ) {\
+    msgOut ( FUNC_NAME, "Couldn't convert seeing time, continuing anyway.", 
+             status );
+    strcpy ( seeDatSt, "" );
+  } else {
+    
+    /* Kludge to get YYYY from YY. */
+    if ( year > 70 ) year = year + 1900;
+    else year = year + 2000;
+
+    sprintf ( seeDatSt, "%04d-%02d-%02dT%02d:%02d:00", 
+           year, month, day, hour, min );
 
   }
-
 
 
   /* Switching and Map setup for the observation. */
-  if ( DEBUGLVL > 0 ) printf ( "Getting Map FITS headers...\n" );
-
-  gsdac_getMapVars ( gsd, samMode, swMode, skyRefX, skyRefY, 
-                     obsType, chopCrd, &chopFrq, &chopPA, &chopThr,
-                     &mapHght, &mapPA, &mapWdth, &numPtsX, 
-                     &numPtsY, obsDirection, loclCrd, &mapX,
-                     &mapY, scanCrd, &scanVel, &scanDy, &scanPA, scanPat, 
-                     status );
-
-
-
-  /* SMU */
-  if ( DEBUGLVL > 0 ) printf ( "Getting SMU FITS headers...\n" );
-
-  /* Get the SMU table alignment offsets. */
-  gsdac_get0r ( gsd, "C2FV", &alignDX, status );
-  gsdac_get0r ( gsd, "C2FL", &alignDY, status );
-
-  /* Get the SMU tables z axis focus offset. */
-  gsdac_get0r ( gsd, "C2FR", &focusDZ, status );
-
-  /* Get the SMU Az/El pointing offsets. */
-  gsdac_get0r ( gsd, "c4offs_ew", &dAz, status );
-  gsdac_get0r ( gsd, "c4offs_ns", &dEl, status );
-
-  /* Get the SMU Az/El user pointing offsets. */
-  gsdac_get0d ( gsd, "c4azerr", &uAz, status );
-  gsdac_get0d ( gsd, "c4elerr", &uEl, status );  
-
+  gsdac_getMapVars ( gsdVars, samMode, obsType, skyRefX, skyRefY, 
+                     swMode, chopCrd, &mapHght, &mapPA, &mapWdth, 
+                     loclCrd, scanCrd, &scanVel, &scanDy, 
+                     &scanPA, scanPat, status );
 
 
   /* JOS parameters */
-  if ( DEBUGLVL > 0 ) printf ( "Getting JOS FITS headers...\n" );
-
-  /* Get the steptime. */
-  gsdac_get0i ( gsd, "C3CL", &stepTime, status );//k
-
-  /* Get the number of cycles. */
-  gsdac_get0i ( gsd, "c3ncycle", &numCyc, status );//k
 
   /* Get the JOS_MIN (1 for raster, for sample this is the number
      of STEPTIME integrations coadded into a single spectrum. */
-  if ( strcmp ( samMode, "raster" ) == 0 )
-    josMin = 1;//k
-  else if ( strcmp ( samMode, "sample" ) == 0 )
-    gsdac_get0i ( gsd, "C3NIS", &josMin, status );//k 
+  if ( strcmp ( samMode, "sample" ) == 0 )
+    josMin = gsdVars->noScans;
   else
     josMin = 1;//k
 
@@ -620,15 +395,14 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
        the row / number of points in the row.  The length
        of time in the reference is then sqrt (number of 
        points in the row) * (time per point). */
-    gsdac_get0i ( gsd, "c3ncp", &numScanPts, status );
-    gsdac_get0d ( gsd, "C3SRT", &scanTime, status );
-    nRefStep = sqrt ( (double)numScanPts ) * ( scanTime / (double)numScanPts );
+    nRefStep = sqrt ( (double)(gsdVars->noCyclePts) ) * 
+           ( (double)(gsdVars->scanTime) / (double)(gsdVars->noCyclePts) );
 
-    stBetRef = numScanPts;
+    stBetRef = gsdVars->noCyclePts;
     
   } else { 
 
-    nRefStep = (double)stepTime;
+    nRefStep = (double)(gsdVars->scanTime);
 
     stBetRef = 1;
 
@@ -638,8 +412,7 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
     stBetRef = AST__UNDEFI;
 
   /* Get the starting index into the pattern. */
-  gsdac_getStartIdx ( gsd, samMode, &numPtsX, &numPtsY,
-                      obsDirection, &startIdx, status );
+  gsdac_getStartIdx ( gsdVars, samMode, &startIdx, status );
 
 
 
@@ -647,9 +420,7 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
   /*      WRITE OUT FITS HEADERS      */
   /************************************/
 
-  if ( DEBUGLVL > 0 ) printf ( "Writing general FITS headers...\n" );
-
-  astSetFitsS ( fitschan, "TELESCOP", telName, 
+  astSetFitsS ( fitschan, "TELESCOP", gsdVars->telName, 
 	        "Name of Telescope", *status );
 
   astSetFitsS ( fitschan, "ORIGIN", "Joint Astronomy Centre, Hilo", 
@@ -678,12 +449,10 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
 
 
   /* OMP and ORAC-DR Specific */
-  if ( DEBUGLVL > 0 ) printf ( "Writing OMP FITS headers...\n" );
-
   astSetFitsCN ( fitschan, "COMMENT", "", 
                  "---- OMP and ORAC-DR Specific ----", *status );
 
-  astSetFitsS ( fitschan, "PROJECT", project, 
+  astSetFitsS ( fitschan, "PROJECT", gsdVars->project, 
 	        "PATT number", *status );
 
 /***** NOTE: possiby REDUCE_POINTING for spectral 5 points *****/
@@ -710,8 +479,6 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
 
 
   /* Obs Id, Date, Pointing Info */
-  if ( DEBUGLVL > 0 ) printf ( "Writing Obs ID FITS headers...\n" );
-
   astSetFitsCN ( fitschan, "COMMENT", "", 
                  "---- Obs Id, Date, pointing Info ----", *status );
 
@@ -740,7 +507,7 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
   astSetFitsS ( fitschan, "DATE-END", dateEnd, 
                 "UTC Datetime of end of observation", *status );
 
-  astSetFitsF ( fitschan, "DUT1", dut1, 
+  astSetFitsF ( fitschan, "DUT1", gsdVars->obsUT1C, 
                 "[d] UT1-UTC correction", *status );
 
   astSetFitsS ( fitschan, "OBSID", obsID, 
@@ -792,8 +559,6 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
                 "LST at end of observation", *status );
 
   /* Integration time related. */
-  if ( DEBUGLVL > 0 ) printf ( "Writing integ-time FITS headers...\n" );
-
   astSetFitsCN ( fitschan, "COMMENT", "", 
                  "---- Integration time related ----", *status );
 
@@ -802,8 +567,6 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
 
 
   /* ACSIS Specific. */
-  if ( DEBUGLVL > 0 ) printf ( "Writing ACSIS FITS headers...\n" );
-
   astSetFitsCN ( fitschan, "COMMENT", "", 
                  "---- ACSIS Specific ----", *status );
 
@@ -819,7 +582,7 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
   astSetFitsI ( fitschan, "SUBSYSNR", subsysNum, 
                 "Sub-system number", *status );
 
-  astSetFitsS ( fitschan, "SUBBANDS", subBands,
+  astSetFitsS ( fitschan, "SUBBANDS", bwMode,
                 "Sub-band setup", *status );
 
   astSetFitsI ( fitschan, "NSUBBAND", 1, 
@@ -848,15 +611,13 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
 
 
   /* FE Specific. */
-  if ( DEBUGLVL > 0 ) printf ( "Writing FE FITS headers...\n" );
-
   astSetFitsCN ( fitschan, "COMMENT", "", 
                  "---- FE Specific ----", *status );
 
   astSetFitsS ( fitschan, "INSTRUME", instrume, 
 	        "Front-end receiver", *status ); 
 
-  astSetFitsS ( fitschan, "SB_MODE", sbMode, 
+  astSetFitsS ( fitschan, "SB_MODE", gsdVars->sbMode, 
 	        "Sideband mode", *status ); 
 
   astSetFitsF ( fitschan, "IFFREQ", IFfreq,
@@ -868,29 +629,28 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
   astSetFitsS ( fitschan, "OBS_SB", obsSB, 
 		"The observed sideband", *status );
 
-  astSetFitsF ( fitschan, "LOFREQS", LOfreqS,
+  astSetFitsF ( fitschan, "LOFREQS", (gsdVars->LOFreqs)[subsysNum-1],
 		"[GHz] LO Frequency at start of obs", *status );
 
-  astSetFitsF ( fitschan, "LOFREQE", LOfreqE,
+  astSetFitsF ( fitschan, "LOFREQE", (gsdVars->LOFreqs)[subsysNum-1],
                 "[GHz] LO Frequency at end of obs", *status );
 
   astSetFitsS ( fitschan, "RECPTORS", recptors,
                 "Active FE receptor IDs for this obs", *status );
 
-  astSetFitsS ( fitschan, "REFRECEP", refrecep, 
+  astSetFitsS ( fitschan, "REFRECEP", recepNames[0], 
                 "Receptor with unit sensitivity", *status );
 
   if ( strcmp ( samMode, "sample" ) == 0 ) {
-
     astSetFitsF ( fitschan, "MEDTSYS", AST__UNDEFF,
 		  "[K] Median of the T-sys across all receptors", 
                   *status );
-
+  } else {
+    astSetFitsF ( fitschan, "MEDTSYS", 
+                  (gsdVars->sourceSysTemps)[subsysNum-1],
+		  "[K] Median of the T-sys across all receptors", 
+                  *status );
   }
-
-  astSetFitsF ( fitschan, "MEDTSYS", medTSys,
-		"[K] Median of the T-sys across all receptors", 
-                *status );
 
   astSetFitsS ( fitschan, "TEMPSCAL", "TA*", 
                 "Temperature scale in use", *status );
@@ -903,30 +663,28 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
 
 
   /* Environmental data. */
-  if ( DEBUGLVL > 0 ) printf ( "Writing Env FITS headers...\n" );
-
   astSetFitsCN ( fitschan, "COMMENT", "", 
                  "---- Environmental Data ----", *status );
 
-  astSetFitsF ( fitschan, "ATSTART", atStart, 
+  astSetFitsF ( fitschan, "ATSTART", gsdVars->tamb, 
                 "[degC] Air temp at start of observation", 
                 *status );
 
-  astSetFitsF ( fitschan, "ATEND", atEnd, 
+  astSetFitsF ( fitschan, "ATEND", gsdVars->tamb, 
                 "[degC] Air temp at end of observation", 
                 *status );
 
-  astSetFitsF ( fitschan, "HUMSTART", humStart, 
+  astSetFitsF ( fitschan, "HUMSTART",gsdVars->hamb , 
                 "Rel Humidity at observation start", *status );
 
-  astSetFitsF ( fitschan, "HUMEND", humEnd, 
+  astSetFitsF ( fitschan, "HUMEND", gsdVars->hamb, 
                 "Rel Humidity observation end", *status );
 
-  astSetFitsF ( fitschan, "BPSTART", bpStart, 
+  astSetFitsF ( fitschan, "BPSTART", bp, 
                 "[mbar] Pressure at observation start", 
                 *status );
 
-  astSetFitsF ( fitschan, "BPEND", bpEnd, 
+  astSetFitsF ( fitschan, "BPEND", bp, 
                 "[mbar] Pressure at observation end", *status );
 
   astSetFitsF ( fitschan, "WNDSPDST", AST__UNDEFF, 
@@ -943,16 +701,16 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
                 "[deg] Wind direction, azimuth at obs end", 
                 *status );
 
-  astSetFitsF ( fitschan, "TAU225ST", tau225St,
+  astSetFitsF ( fitschan, "TAU225ST", gsdVars->tau225,
 		"Tau at 225 GHz from CSO at start", *status );
 
-  astSetFitsF ( fitschan, "TAU225EN", tau225En,
+  astSetFitsF ( fitschan, "TAU225EN", gsdVars->tau225,
 		"Tau at 225 GHz from CSO at end", *status );
 
   astSetFitsS ( fitschan, "TAUDATST", tauDatSt,
 		"Time of TAU225ST observation", *status );
 
-  astSetFitsS ( fitschan, "TAUDATEN", tauDatEn,
+  astSetFitsS ( fitschan, "TAUDATEN", tauDatSt,
 		"Time of TAU225EN observation", *status );
 
   astSetFitsS ( fitschan, "TAUSRC", "CSO225GHZ",
@@ -970,18 +728,18 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
   astSetFitsS ( fitschan, "WVMDATEN", AST__UNDEFS,
 		"Time of WVMTAUEN", *status );
 
-  astSetFitsF ( fitschan, "SEEINGST", seeingSt,
+  astSetFitsF ( fitschan, "SEEINGST", gsdVars->seeing,
 		"[arcsec] SAO atmospheric seeing (start)", 
 		*status );
 
-  astSetFitsF ( fitschan, "SEEINGSEN", seeingEn,
+  astSetFitsF ( fitschan, "SEEINGSEN", gsdVars->seeing,
 		"[arcsec] SAO atmospheric seeing (end)", 
 		*status );
 
   astSetFitsS ( fitschan, "SEEDATST", seeDatSt,
 		"Date/Time of SEEINGST", *status );
 
-  astSetFitsS ( fitschan, "SEEDATEN", seeDatEn,
+  astSetFitsS ( fitschan, "SEEDATEN", seeDatSt,
 		"Date/Time of SEEINGEN", *status );
 
   astSetFitsF ( fitschan, "FRLEGTST", AST__UNDEFF,
@@ -998,8 +756,6 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
 
 
   /* Switching and Map setup for the observation. */
-  if ( DEBUGLVL > 0 ) printf ( "Writing Map FITS headers...\n" );
-
   astSetFitsCN ( fitschan, "COMMENT", "", 
                  "---- Switching and Map setup for the observationi ----", 
                  *status );
@@ -1026,13 +782,13 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
     astSetFitsS ( fitschan, "CHOP_CRD", chopCrd,
                   "Chopping co-ordinate system", *status );
 
-    astSetFitsF ( fitschan, "CHOP_FRQ", chopFrq,
+    astSetFitsF ( fitschan, "CHOP_FRQ", gsdVars->chopFrequency,
 		  "[Hz] Chop frequency", *status );
 
-    astSetFitsF ( fitschan, "CHOP_PA", chopPA,
+    astSetFitsF ( fitschan, "CHOP_PA", gsdVars->chopPA,
 		  "[deg] Chop PA; 0=in lat, 90=in long", *status );
 
-    astSetFitsF ( fitschan, "CHOP_THR", chopThr,
+    astSetFitsF ( fitschan, "CHOP_THR", gsdVars->chopThrow,
 		  "[arcsec] Chop throw", *status );
 
   } else {
@@ -1079,11 +835,11 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
 		  "Local offset/map PA co-ordinate system",
 		  *status );
 
-    astSetFitsF ( fitschan, "MAP_X", mapX,
+    astSetFitsF ( fitschan, "MAP_X", gsdVars->centreOffsetX,
 		  "[arcsec] Requested map offset from telescope centre",
 		  *status );
 
-    astSetFitsF ( fitschan, "MAP_Y", mapY,
+    astSetFitsF ( fitschan, "MAP_Y", gsdVars->centreOffsetY,
 		  "[arcsec] Requested map offset from telescope centre",
 		  *status );  
 
@@ -1140,43 +896,39 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
 
 
   /* SMU */
-  if ( DEBUGLVL > 0 ) printf ( "Writing SMU FITS headers...\n" );
-
   astSetFitsCN ( fitschan, "COMMENT", "", 
                  "---- SMU ----", *status );
 
-  astSetFitsF ( fitschan, "ALIGN_DX", alignDX, 
+  astSetFitsF ( fitschan, "ALIGN_DX", gsdVars->smuDX, 
 		"SMU tables X axis focus offset", *status );
 
-  astSetFitsF ( fitschan, "ALIGN_DY", alignDY, 
+  astSetFitsF ( fitschan, "ALIGN_DY", gsdVars->smuDY, 
 		"SMU tables Y axis focus offset", *status );
 
-  astSetFitsF ( fitschan, "FOCUS_DZ", focusDZ, 
+  astSetFitsF ( fitschan, "FOCUS_DZ", gsdVars->smuDZ, 
 		"SMU tables Z axis focus offset", *status );
 
-  astSetFitsF ( fitschan, "DAZ", dAz, 
+  astSetFitsF ( fitschan, "DAZ", gsdVars->smuOffsEW, 
 		"SMU azimuth pointing offset", *status );
 
-  astSetFitsF ( fitschan, "DEL", dEl, 
+  astSetFitsF ( fitschan, "DEL", gsdVars->smuOffsNS, 
 		"SMU elevation pointing offset", *status );
 
-  astSetFitsF ( fitschan, "UAZ", uAz, 
+  astSetFitsF ( fitschan, "UAZ", gsdVars->errAz, 
 		"User azimuth pointing offset", *status );
 
-  astSetFitsF ( fitschan, "UEL", uEl, 
+  astSetFitsF ( fitschan, "UEL", gsdVars->errEl, 
 		"User elevation pointing offset", *status );
 
 
   /* JOS parameters */
-  if ( DEBUGLVL > 0 ) printf ( "Writing JOS FITS headers...\n" );
-
   astSetFitsCN ( fitschan, "COMMENT", "", 
                  "---- JOS parameters ----", *status );
 
-  astSetFitsF ( fitschan, "STEPTIME", stepTime, 
+  astSetFitsF ( fitschan, "STEPTIME", gsdVars->cycleTime, 
                 "RTS step time during an RTS sequence", *status ); 
 
-  astSetFitsI ( fitschan, "NUM_CYC", numCyc, 
+  astSetFitsI ( fitschan, "NUM_CYC", gsdVars->nCycle, 
                 "Number of times to repeat entire recipe", *status );  
 
   astSetFitsI ( fitschan, "NUM_NODS", 1, 
@@ -1216,8 +968,6 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
 
 
   /* Miscellaneous parameters */
-  if ( DEBUGLVL > 0 ) printf ( "Writing MISC FITS headers...\n" ); 
-
   astSetFitsCN ( fitschan, "COMMENT", "", 
                  "---- Miscellaneous ----", *status );
 
@@ -1247,8 +997,6 @@ void gsdac_putFits ( const struct gsdac_gsd_struct *gsd,
 
 
   /* Rover=specific parameters */
-  if ( DEBUGLVL > 0 ) printf ( "Writing ROVER FITS headers...\n" ); 
-
   astSetFitsCN ( fitschan, "COMMENT", "", 
                  "---- ROVER Specific ----", *status );
 
