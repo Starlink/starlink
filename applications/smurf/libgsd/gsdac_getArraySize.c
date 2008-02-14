@@ -14,11 +14,11 @@
 *     Subroutine
 
 *  Invocation:
-*     gsdac_getArraySize ( struct gsdac_gsd_struct *gsd,
+*     gsdac_getArraySize ( const gsd *gsd,
 *                          char *name, unsigned int *size, int *status )
 
 *  Arguments:
-*     gsd = const struct gsdac_gsd_struct* (Given)
+*     gsd = const gsd* (Given)
 *        GSD file access parameters.
 *     name = char* (Given)
 *        The name of the item. This should be an array of 16 characters (char
@@ -68,12 +68,12 @@
 #include "gsd.h"
 #include "sae_par.h"
 
-/* GSDAC includes */
+/* SMURF includes */
 #include "gsdac.h"
 
 #define MAXDIMS 3
 
-void gsdac_getArraySize ( const struct gsdac_gsd_struct *gsd,
+void gsdac_getArraySize ( const gsd *gsd,
                           char *name, int *size, int *status ) {
 
   /* Local variables */

@@ -13,13 +13,13 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_putJCMTStateC ( const gsdac_gsdVars_struct *gsdVars,
+*     gsdac_putJCMTStateC ( const gsdVars *gsdVars,
 *                           const unsigned int stepNum,
 *                           const char *backend,
 *                           struct JCMTState *record, int *status );
 
 *  Arguments:
-*     gsdVars = const gsdac_gsdVars_struct* (Given)
+*     gsdVars = const gsdVars* (Given)
 *        GSD headers and arrays
 *     stepNum = const unsigned int (Given)
 *        Time step of this spectrum
@@ -75,26 +75,18 @@
 #include <string.h>
 #include <stdio.h>
 
-/* STARLINK includes */
-#include "mers.h"
-#include "ndf.h"
-#include "gsd.h"
-#include "prm_par.h"
+/* Starlink includes */
+#include "ast.h"
 #include "sae_par.h"
-#include "star/slalib.h"
+#include "prm_par.h"
 
 /* SMURF includes */
-#include "smurf_par.h"
-#include "libacsis/specwrite.h"
-
-#include "libgsd/gsdac.h"
-#include "libgsd/gsdac_struct.h"
-
+#include "gsdac.h"
 #include "jcmt/state.h"
 
 #define FUNC_NAME "gsdac_putJCMTStateC"
 
-void gsdac_putJCMTStateC ( const struct gsdac_gsdVars_struct *gsdVars, 
+void gsdac_putJCMTStateC ( const gsdVars *gsdVars, 
                            const unsigned int stepNum, 
                            const char *backend,
                            struct JCMTState *record, int *status )
@@ -153,9 +145,7 @@ void gsdac_putJCMTStateC ( const struct gsdac_gsdVars_struct *gsdVars,
 
   record->smu_tr_chop_y = 0.0;
 
-  /* Get the TAI time of this step.   First, determine the number
-     of elements in the scan table array in GSD to retrieve the 
-     times in LST, then convert to TAI. */
+  /* Get the TAI time of this step.*/   
 
   record->tcs_tai = 0.0;//k
 

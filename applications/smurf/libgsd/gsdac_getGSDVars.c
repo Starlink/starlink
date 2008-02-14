@@ -62,13 +62,10 @@
 */
 
 /* STARLINK includes */
-#include "gsd.h"
-#include "mers.h"
 #include "sae_par.h"
 
 /* SMURF includes */
-#include "libgsd/gsdac.h"
-#include "libgsd/gsdac_struct.h"
+#include "gsdac.h"
 #include "libsmf/smf.h"
 
 #define FUNC_NAME "gsdac_getGSDVars.c"

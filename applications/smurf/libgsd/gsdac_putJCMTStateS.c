@@ -13,14 +13,14 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_putJCMTStateS ( const gsdac_gsdVars_struct *gsdVars, 
+*     gsdac_putJCMTStateS ( const gsdVars *gsdVars, 
 *                           const unsigned int stepNum, 
 *                           const unsigned int subsysNum, 
 *                           struct JCMTState *record, 
 *                           int *status );
 
 *  Arguments:
-*     gsdVars = const gsdac_gsdVars_struct* (Given)
+*     gsdVars = const gsdVars* (Given)
 *        GSD headers and arrays
 *     stepNum = const unsigned int (Given)
 *        time step of this spectrum
@@ -76,22 +76,14 @@
 #include <string.h>
 #include <stdio.h>
 
-/* STARLINK includes */
-#include "mers.h"
-#include "ndf.h"
-#include "gsd.h"
+/* Starlink includes */
 #include "sae_par.h"
 
 /* SMURF includes */
-#include "smurf_par.h"
-#include "libacsis/specwrite.h"
-
-#include "libgsd/gsdac.h"
-#include "libgsd/gsdac_struct.h"
-
+#include "gsdac.h"
 #include "jcmt/state.h"
 
-void gsdac_putJCMTStateS ( const struct gsdac_gsdVars_struct *gsdVars, 
+void gsdac_putJCMTStateS ( const gsdVars *gsdVars, 
                            const unsigned int stepNum, 
                            const unsigned int subsysNum,
                            struct JCMTState *record, int *status )

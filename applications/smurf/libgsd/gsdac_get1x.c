@@ -13,11 +13,11 @@
 *     Subroutine
 
 *  Invocation:
-*     gsdac_get1{blwirdc} ( struct gsdac_gsd_struct *gsd,
+*     gsdac_get1{blwirdc} ( const gsd *gsd,
 *                           char *name, <type> *values , int *status )
 
 *  Arguments:
-*     gsd = const struct gsdac_gsd_struct* (Given)
+*     gsd = const gsd* (Given)
 *        GSD file access parameters
 *     name = char* (Given)
 *        The name of the item. This should be an array of 16 characters (char
@@ -82,12 +82,12 @@
 #include "gsd.h"
 #include "sae_par.h"
 
-/* GSDAC includes */
+/* SMURF includes */
 #include "gsdac.h"
 
 #define MAXDIMS 3
 
-void gsdac_get1b ( const struct gsdac_gsd_struct *gsd,
+void gsdac_get1b ( const gsd *gsd,
                    char *name, char *values, int *status ) {
 
   /* Local variables */
@@ -172,7 +172,7 @@ void gsdac_get1b ( const struct gsdac_gsd_struct *gsd,
 
 }
 
-void gsdac_get1c ( const struct gsdac_gsd_struct *gsd,
+void gsdac_get1c ( const gsd *gsd,
                    char *name, char *values, int *status ) {
 
   /* Local variables */
@@ -257,7 +257,7 @@ void gsdac_get1c ( const struct gsdac_gsd_struct *gsd,
 
 }
 
-void gsdac_get1d ( const struct gsdac_gsd_struct *gsd,
+void gsdac_get1d ( const gsd *gsd,
                    char *name, double *values, int *status ) {
 
   /* Local variables */
@@ -342,7 +342,7 @@ void gsdac_get1d ( const struct gsdac_gsd_struct *gsd,
 
 }
 
-void gsdac_get1i ( const struct gsdac_gsd_struct *gsd,
+void gsdac_get1i ( const gsd *gsd,
                    char *name, int *values, int *status ) {
 
   /* Local variables */
@@ -428,7 +428,7 @@ void gsdac_get1i ( const struct gsdac_gsd_struct *gsd,
 }
 
 
-void gsdac_get1l ( const struct gsdac_gsd_struct *gsd,
+void gsdac_get1l ( const gsd *gsd,
                    char *name, char *values, int *status ) {
 
   /* Local variables */
@@ -514,7 +514,7 @@ void gsdac_get1l ( const struct gsdac_gsd_struct *gsd,
 
 }
 
-void gsdac_get1r ( const struct gsdac_gsd_struct *gsd,
+void gsdac_get1r ( const gsd *gsd,
                    char *name, float *values, int *status ) {
 
   /* Local variables */
@@ -600,7 +600,7 @@ void gsdac_get1r ( const struct gsdac_gsd_struct *gsd,
 
 }
 
-void gsdac_get1w ( const struct gsdac_gsd_struct *gsd,
+void gsdac_get1w ( const gsd *gsd,
                    char *name, short *values, int *status ) {
 
   /* Local variables */

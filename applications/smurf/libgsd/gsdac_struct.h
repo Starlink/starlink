@@ -53,14 +53,14 @@
 #ifndef GSDAC_STRUCT_DEFINED
 #define GSDAC_STRUCT_DEFINED
 
-struct gsdac_gsd_struct       /* GSD file access parameters */
+typedef struct gsdac_gsd_struct  /* GSD file access parameters */
 {
   char *dataPtr;              /* GSD data */
   void *fileDsc;              /* GSD file descriptor */
   void *itemDsc;              /* GSD item descriptors */
-};
+} gsd;
 
-struct gsdac_gsdVars_struct   /* GSD header and array data */
+typedef struct gsdac_gsdVars_struct /* GSD header and array data */
 {
   float *alphas;              /* ?? */
   double antennaGain;         /* antenna gain */
@@ -261,6 +261,24 @@ struct gsdac_gsdVars_struct   /* GSD header and array data */
   char velRef[MAXSTRING];     /* velocity reference frame */
   double velocity;            /* radial velocity of the source (km/sec) */
   double *vRadial;            /* array of radial velocities */
-};
+} gsdVars;
+
+typedef struct gsdac_wcs_struct  /* pointing and time */
+{  
+  double *airmass;            /* airmass */
+  double *acAz;               /* actual telescope Az */
+  double *acEl;               /* actual telescope El */
+  double *acTr1;              /* actual telescope in Tracking */
+  double *acTr2;              /* actual telescope in Tracking */
+  double *azAng;              /* angle between focal plane and AZEL */
+  double *baseAz;             /* base Az */
+  double *baseEl;             /* base El */
+  double *baseTr1;            /* base in Tracking */
+  double *baseTr2;            /* base in Tracking */
+  double *el;                 /* actual telescope El */
+  double *index;              /* index into observing area */
+  double *tai;                /* TAI time */
+  double *trAng;              /* angle between focal and tracking planes */
+} wcs;
    
 #endif /* GSDAC_STRUCT_DEFINED */

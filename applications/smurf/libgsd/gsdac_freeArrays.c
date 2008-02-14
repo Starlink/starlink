@@ -13,11 +13,11 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_freeArrays ( const struct gsdac_gsdVars_struct *gsdVars,
+*     gsdac_freeArrays ( const gsdVars *gsdVars,
 *                        int *status );
 
 *  Arguments:
-*     gsdVars = const gsdac_gsdVars_struct* (Given and returned)
+*     gsdVars = const gsdVars* (Given and returned)
 *        GSD headers and array data 
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -59,17 +59,15 @@
 */
 
 /* STARLINK includes */
-#include "mers.h"
 #include "sae_par.h"
 
 /* SMURF includes */
-#include "libgsd/gsdac.h"
-#include "libgsd/gsdac_struct.h"
+#include "gsdac.h"
 #include "libsmf/smf.h"
 
 #define FUNC_NAME "gsdac_freeArrays.c"
 
-void gsdac_freeArrays ( const struct gsdac_gsdVars_struct *gsdVars,
+void gsdac_freeArrays ( const gsdVars *gsdVars,
                         int *status )
 {
 

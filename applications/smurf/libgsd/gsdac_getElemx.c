@@ -13,12 +13,12 @@
 *     Subroutine
 
 *  Invocation:
-*     gsdac_getElem{blwirdc} ( struct gsdac_gsd_struct *gsd,
+*     gsdac_getElem{blwirdc} ( const gsd *gsd,
 *                              char *name, const int index, 
 *                              <type> *value, int *status )
 
 *  Arguments:
-*     gsd = const struct gsdac_gsd_struct* (Given)
+*     gsd = const gsd* (Given)
 *        GSD file access parameters
 *     name = char* (Given)
 *        The name of the item. This should be an array of 16 characters (char
@@ -82,16 +82,14 @@
 #include "gsd.h"
 #include "sae_par.h"
 
-/* GSDAC includes */
-#include "gsdac.h"
-
 /* SMURF includes */
 #include "libsmf/smf.h"
+#include "gsdac.h"
 
 #define MAXDIMS 3
 
-void gsdac_getElemb ( const struct gsdac_gsd_struct *gsd,
-                      char *name, const int index, char *value, 
+void gsdac_getElemb ( const gsd *gsd, char *name, 
+                      const int index, char *value, 
                       int *status ) {
  
   /* Local variables */
@@ -141,7 +139,7 @@ void gsdac_getElemb ( const struct gsdac_gsd_struct *gsd,
 
 }
 
-void gsdac_getElemc ( const struct gsdac_gsd_struct *gsd,
+void gsdac_getElemc ( const gsd *gsd,
                       char *name, const int index, char *value, 
                       int *status ) {
 
@@ -193,7 +191,7 @@ void gsdac_getElemc ( const struct gsdac_gsd_struct *gsd,
 
 }
 
-void gsdac_getElemd ( const struct gsdac_gsd_struct *gsd,
+void gsdac_getElemd ( const gsd *gsd,
                       char *name, const int index, double *value, 
                       int *status ) {
 
@@ -244,7 +242,7 @@ void gsdac_getElemd ( const struct gsdac_gsd_struct *gsd,
 
 }
 
-void gsdac_getElemi ( const struct gsdac_gsd_struct *gsd,
+void gsdac_getElemi ( const gsd *gsd,
                       char *name, const int index, int *value, 
                       int *status ) {
 
@@ -294,7 +292,7 @@ void gsdac_getElemi ( const struct gsdac_gsd_struct *gsd,
 
 }
 
-void gsdac_getEleml ( const struct gsdac_gsd_struct *gsd,
+void gsdac_getEleml ( const gsd *gsd,
                       char *name, const int index, char *value, 
                       int *status ) {
 
@@ -345,7 +343,7 @@ void gsdac_getEleml ( const struct gsdac_gsd_struct *gsd,
 
 }
 
-void gsdac_getElemr ( const struct gsdac_gsd_struct *gsd,
+void gsdac_getElemr ( const gsd *gsd,
                       char *name, const int index, float *value, 
                       int *status ) {
 
@@ -396,7 +394,7 @@ void gsdac_getElemr ( const struct gsdac_gsd_struct *gsd,
 
 }
 
-void gsdac_getElemw ( const struct gsdac_gsd_struct *gsd,
+void gsdac_getElemw ( const gsd *gsd,
                       char *name, const int index, short *value, 
                       int *status ) {
 

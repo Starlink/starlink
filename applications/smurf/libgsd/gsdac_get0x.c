@@ -13,11 +13,11 @@
 *     Subroutine
 
 *  Invocation:
-*     gsdac_get0{blwirdc} ( struct gsdac_gsd_struct *gsd,
+*     gsdac_get0{blwirdc} ( const gsd *gsd,
 *                           char *name, <type> *value , int *status )
 
 *  Arguments:
-*     gsd = const struct gsdac_gsd_struct* (Given)
+*     gsd = const gsd* (Given)
 *        GSD file access parameters
 *     name = char* (Given)
 *        The name of the item. This should be an array of 16 characters (char
@@ -79,11 +79,10 @@
 #include "gsd.h"
 #include "sae_par.h"
 
-/* GSDAC includes */
-#include "libgsd/gsdac_struct.h"
+/* SMURF includes */
 #include "gsdac.h"
 
-void gsdac_get0b ( const struct gsdac_gsd_struct *gsd,
+void gsdac_get0b ( const gsd *gsd,
                    char *name, char *value, int *status ) {
 
   /* Local variables */
@@ -122,7 +121,7 @@ void gsdac_get0b ( const struct gsdac_gsd_struct *gsd,
                        itemno, value );
 }
 
-void gsdac_get0c ( const struct gsdac_gsd_struct *gsd, 
+void gsdac_get0c ( const gsd *gsd, 
                    char *name, char *value, int *status ) {
 
   /* Local variables */
@@ -162,7 +161,7 @@ void gsdac_get0c ( const struct gsdac_gsd_struct *gsd,
 
 }
 
-void gsdac_get0d ( const struct gsdac_gsd_struct *gsd,
+void gsdac_get0d ( const gsd *gsd,
                    char *name, double *value, int *status ) {
 
   /* Local variables */
@@ -202,7 +201,7 @@ void gsdac_get0d ( const struct gsdac_gsd_struct *gsd,
 
 }
 
-void gsdac_get0i ( const struct gsdac_gsd_struct *gsd, 
+void gsdac_get0i ( const gsd *gsd, 
                    char *name, int *value, int *status ) {
 
   /* Local variables */
@@ -242,7 +241,7 @@ void gsdac_get0i ( const struct gsdac_gsd_struct *gsd,
 
 }
 
-void gsdac_get0l ( const struct gsdac_gsd_struct *gsd, 
+void gsdac_get0l ( const gsd *gsd, 
                    char *name, char *value, int *status ) {
 
   /* Local variables */
@@ -282,7 +281,7 @@ void gsdac_get0l ( const struct gsdac_gsd_struct *gsd,
 
 }
 
-void gsdac_get0r ( const struct gsdac_gsd_struct *gsd,
+void gsdac_get0r ( const gsd *gsd,
                    char *name, float *value, int *status ) {
 
   /* Local variables */
@@ -302,7 +301,7 @@ void gsdac_get0r ( const struct gsdac_gsd_struct *gsd,
     msgSetc ( "NAME", name );
     errRep ( "gsdac_get0r", "Could not find element ^NAME in file", status );
     return;
-  } 
+ } 
 
   /* Check that the array flag is false and the data type is R. */
   if ( array ) {
@@ -322,7 +321,7 @@ void gsdac_get0r ( const struct gsdac_gsd_struct *gsd,
 
 }
 
-void gsdac_get0w ( const struct gsdac_gsd_struct *gsd, 
+void gsdac_get0w ( const gsd *gsd, 
                    char *name, short *value, int *status ) {
 
   /* Local variables */

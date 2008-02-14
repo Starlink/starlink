@@ -14,7 +14,7 @@
 *     Subroutine
 
 *  Invocation:
-*     gsdac_getDateVars ( const struct gsdac_gsdVars_struct *gsdVars, 
+*     gsdac_getDateVars ( const gsdVars *gsdVars, 
 *                         const int subsysNum, const int obsNum, 
 *                         const char *backend, char *dateObs, char *dateEnd, 
 *                         char *obsID, char *obsIDs, char *HSTstart, 
@@ -22,7 +22,7 @@
 *                         int *status )
 
 *  Arguments:
-*     gsdVars = const struct gsdac_gsdVars_struct* (Given)
+*     gsdVars = const gsdVars* (Given)
 *        GSD file access parameters
 *     subsysNum = const int (Given)
 *        Subsystem number
@@ -93,19 +93,15 @@
 
 /* Starlink includes */
 #include "ast.h"
-#include "gsd.h"
 #include "sae_par.h"
-#include "mers.h"
-#include "cnf.h"
 
 /* SMURF includes */
-#include "libsmf/smf.h"
+#include "smurf_par.h"
 #include "gsdac.h"
 
-#define MAXFITS 80
 #define FUNC_NAME "gsdac_getDateVars"
 
-void gsdac_getDateVars ( const struct gsdac_gsdVars_struct *gsdVars, 
+void gsdac_getDateVars ( const gsdVars *gsdVars, 
                          const int subsysNum,
                          const int obsNum, const char *backend, char *dateObs, 
                          char *dateEnd, char *obsID,
@@ -117,7 +113,7 @@ void gsdac_getDateVars ( const struct gsdac_gsdVars_struct *gsdVars,
 
   /* Local variables */
   char curChar;               /* character pointer */
-  char dateString[MAXFITS];   /* temporary string for date conversions. */
+  char dateString[SZFITSCARD];/* temporary string for date conversions. */
   int day = 0;                /* days */
   double dut1 = 0.0;          /* UT1-UTC correction */
   int hour = 0;               /* hours */

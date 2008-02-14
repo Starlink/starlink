@@ -14,7 +14,7 @@
 *     Subroutine
 
 *  Invocation:
-*     gsdac_getMapVars ( const struct gsdac_gsdVars_struct *gsdVars, 
+*     gsdac_getMapVars ( const gsdVars *gsdVars, 
 *                        const char *samMode, const char *obsType,
 *                        char *skyRefX, char *skyRefY, char *swMode, 
 *                        char *chopCrd, float *mapHght, float *mapPA, 
@@ -23,7 +23,7 @@
 *                        float *scanPA, char *scanPat, int *status )
 
 *  Arguments:
-*     gsdVars = const struct gsdac_gsdVars_struct* (Given)
+*     gsdVars = const gsdVars* (Given)
 *        GSD file access parameters
 *     samMode = const char* (Given)
 *        Sampling Mode
@@ -102,19 +102,15 @@
 #include <string.h>
 
 /* Starlink includes */
-#include "ast.h"
-#include "gsd.h"
 #include "sae_par.h"
 #include "mers.h"
 
-/* GSDAC includes */
+/* SMURF includes */
 #include "gsdac.h"
-
-#define MAXFITS 80
 
 #define FUNC_NAME "gsdac_getMapVars"
 
-void gsdac_getMapVars ( const struct gsdac_gsdVars_struct *gsdVars, 
+void gsdac_getMapVars ( const gsdVars *gsdVars, 
                         const char *samMode, const char *obsType,
                         char *skyRefX, char *skyRefY, char *swMode, 
                         char *chopCrd, float *mapHght, float *mapPA, 

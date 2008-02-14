@@ -14,11 +14,11 @@
 *     Subroutine
 
 *  Invocation:
-*     gsdac_getStartIdx ( const struct gsdac_gsdVars_struct *gsdVars, 
+*     gsdac_getStartIdx ( const gsdVars *gsdVars, 
 *                         const char *samMode, int *startIdx, int *status )
 
 *  Arguments:
-*     gsdVars = const struct gsdac_gsdVars_struct* (Given)
+*     gsdVars = const gsdVars* (Given)
 *        GSD headers and arrays
 *     samMode = const char* (Given)
 *        Sampling mode
@@ -69,17 +69,14 @@
 #include <string.h>
 
 /* Starlink includes */
-#include "ast.h"
-#include "gsd.h"
 #include "sae_par.h"
-#include "mers.h"
 
-/* GSDAC includes */
+/* SMURF includes */
 #include "gsdac.h"
 
 #define FUNC_NAME "gsdac_getStartIdx"
 
-void gsdac_getStartIdx ( const struct gsdac_gsdVars_struct *gsdVars, 
+void gsdac_getStartIdx ( const gsdVars *gsdVars, 
                          const char *samMode, int *startIdx, int *status )
 
 {

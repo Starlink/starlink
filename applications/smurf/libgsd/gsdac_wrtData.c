@@ -13,11 +13,11 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_wrtData ( const gsdac_gsdVars_struct *gsdVars,
-*                     char *directory, const int nSteps, int *status );
+*     gsdac_wrtData ( const gsdVars *gsdVars, char *directory, 
+*                     const int nSteps, int *status );
 
 *  Arguments:
-*     gsdVars = const gsdac_gsdVars_struct* (Given)
+*     gsdVars = const gsdVars* (Given)
 *        GSD headers and arrays
 *     directory = char* (Given)
 *        Directory to write the file
@@ -72,33 +72,28 @@
 
 /* STARLINK includes */
 #include "ast.h"
-#include "mers.h"
-#include "ndf.h"
-#include "gsd.h"
 #include "sae_par.h"
+#include "mers.h"
 #include "prm_par.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
 #include "libacsis/specwrite.h"
 #include "libsmf/smf.h"
-#include "libgsd/gsdac.h"
-#include "libgsd/gsdac_struct.h"
-
+#include "gsdac.h"
 #include "jcmt/state.h"
 
 #define FUNC_NAME "gsdac_wrtData"
 
-#define MAXFITS 80
 #define MAXRECEP 8  
 #define MAXSUBSYS 16
 
-void gsdac_wrtData ( const struct gsdac_gsdVars_struct *gsdVars, 
-                     const char *directory, const int nSteps, int *status )
+void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory, 
+                     const int nSteps, int *status )
 {
 
   /* Local variables */
-  char backend[MAXFITS];      /* name of the backend */
+  char backend[SZFITSCARD];   /* name of the backend */
   const AstFitsChan *fitschan[nSteps];  /* Array of FITS headers */
   long fitsIndex;             /* current FITSchan */
   char *focalStation = NULL;  /* focal station of the instrument */
@@ -107,12 +102,12 @@ void gsdac_wrtData ( const struct gsdac_gsdVars_struct *gsdVars,
   int i;                      /* loop counter */
   double mem;                 /* amount of memory for spectrum */
   unsigned int obsNum;        /* current observation number */
-  char obsType[MAXFITS];      /* type of observation */
+  char obsType[SZFITSCARD];   /* type of observation */
   char *OCSConfig = NULL;     /* OCS configuration XML */
   JCMTState *record = NULL;   /* JCMT state information for the 
                                  current spectrum */
   char *recepNames[MAXRECEP]; /* names of the receptors */
-  char samMode[MAXFITS];      /* sampling mode (raster or grid) */
+  char samMode[SZFITSCARD];   /* sampling mode (raster or grid) */
   ACSISSpecHdr *specHdr;      /* ACSIS spectrum-specific information */
   unsigned long specIndex;    /* index into spectral data */
   long spectrumSize;          /* size of spectrum data */

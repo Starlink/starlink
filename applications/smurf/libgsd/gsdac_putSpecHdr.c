@@ -13,7 +13,7 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_putSpecHdr ( const gsdac_gsdVars_struct *gsdVars,
+*     gsdac_putSpecHdr ( const gsdVars *gsdVars,
 *                        const unsigned int nSteps,
 *                        const unsigned int stepNum,
 *                        const unsigned int subsysNum,
@@ -21,7 +21,7 @@
 *                        struct ACSISSpecHdr *specHdr, int *status );
 
 *  Arguments:
-*     gsdVars = const gsdac_gsdVars_struct* (Given)
+*     gsdVars = const gsdVars* (Given)
 *        GSD headers and arrays
 *     nSteps = const unsigned int (Given)
 *        Number of time steps
@@ -80,23 +80,18 @@
 #include <stdio.h>
 
 /* STARLINK includes */
-#include "mers.h"
-#include "ndf.h"
-#include "gsd.h"
 #include "sae_par.h"
 
 /* SMURF includes */
-#include "smurf_par.h"
-#include "libacsis/specwrite.h"
-#include "libgsd/gsdac_struct.h"
-#include "libgsd/gsdac.h"
+#include "gsdac.h"
+#include "jcmt/state.h"
 
 #define FUNC_NAME "gsdac_putSpecHdr"
 
 #define SZ_RECNAME 80
 #define MAXRECEP 8  
 
-void gsdac_putSpecHdr ( const struct gsdac_gsdVars_struct *gsdVars, 
+void gsdac_putSpecHdr ( const gsdVars *gsdVars, 
                         const unsigned int nSteps,
                         const unsigned int stepNum,
                         const unsigned int subsysNum,

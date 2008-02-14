@@ -14,7 +14,7 @@
 *     Subroutine
 
 *  Invocation:
-*     gsdac_putFits ( const struct gsdac_gsdVars_struct *gsdVars, 
+*     gsdac_putFits ( const gsdVars *gsdVars, 
 *                     const int subsysNum, const int obsNum, 
 *                     const int utDate, const int nSteps, 
 *                     const char *backend, char *recepNames[],
@@ -23,7 +23,7 @@
 *                     const AstFitsChan *fitschan, int *status )
 
 *  Arguments:
-*     gsdVars = const struct gsdac_gsdVars_struct* (Given)
+*     gsdVars = const gsdVars* (Given)
 *        GSD file access parameters
 *     subsysNum = const int (Given)
 *        Subsystem number
@@ -92,23 +92,16 @@
 #include <string.h>
 
 /* Starlink includes */
-#include "ast.h"
-#include "gsd.h"
 #include "sae_par.h"
-#include "mers.h"
 #include "cnf.h"
 
-/* GSDAC includes */
-#include "gsdac.h"
-
 /* SMURF includes */
-#include "libsmf/smf.h"
-
-#define MAXFITS 80
+#include "smurf_par.h"
+#include "gsdac.h"
 
 #define FUNC_NAME "gsdac_putFits"
 
-void gsdac_putFits ( const struct gsdac_gsdVars_struct *gsdVars, 
+void gsdac_putFits ( const gsdVars *gsdVars, 
                      const int subsysNum, const int obsNum, 
                      const int utDate, const int nSteps, 
                      const char *backend, char *recepNames[],
@@ -124,34 +117,34 @@ void gsdac_putFits ( const struct gsdac_gsdVars_struct *gsdVars,
   double azEnd;               /* Azimuth at observation end (deg) */
   double azStart;             /* Azimuth at observation start (deg) */
   double bp;                  /* pressure (mbar) */
-  char bwMode[MAXFITS];       /* ACSIS total bandwidth setup */
-  char chopCrd[MAXFITS];      /* chopper coordinate system */
+  char bwMode[SZFITSCARD];    /* ACSIS total bandwidth setup */
+  char chopCrd[SZFITSCARD];   /* chopper coordinate system */
   char curChar;               /* character pointer */
-  char dateEnd[MAXFITS];      /* UTC datetime of end of observation 
+  char dateEnd[SZFITSCARD];   /* UTC datetime of end of observation 
                                  in format YYYY-MM-DDTHH:MM:SS */
-  char dateObs[MAXFITS];      /* UTC datetime of start of observation 
+  char dateObs[SZFITSCARD];   /* UTC datetime of start of observation 
                                  in format YYYY-MM-DDTHH:MM:SS */
   int day;                    /* days for time conversion. */
-  char doppler[MAXFITS];      /* doppler velocity definition */
+  char doppler[SZFITSCARD];   /* doppler velocity definition */
   double elEnd;               /* elevation at observation end (deg) */
   double elStart;             /* elevation at observation start (deg) */
   double etal;                /* telescope efficiency */
   int hour;                   /* hours for time conversion. */
-  char HSTend[MAXFITS];       /* HST at observation end in format 
+  char HSTend[SZFITSCARD];    /* HST at observation end in format 
                                  YYYY-MM-DDTHH:MM:SS */
-  char HSTstart[MAXFITS];     /* HST at observation start in format 
+  char HSTstart[SZFITSCARD];  /* HST at observation start in format 
                                  YYYY-MM-DDTHH:MM:SS */
   int i;                      /* loop counter */
   float IFchanSp;             /* TOPO IF channel spacing (Hz) */
   double IFfreq;              /* IF frequency (GHz) */
-  char instrume[MAXFITS];     /* front-end receiver */
+  char instrume[SZFITSCARD];  /* front-end receiver */
   double intTime;             /* total time spent integrating (s) */
   int josMin;                 /* ?? */
-  char loclCrd[MAXFITS];      /* local offset coordinate system for 
+  char loclCrd[SZFITSCARD];   /* local offset coordinate system for 
                                  map_x / map_y */
-  char LSTstart[MAXFITS];     /* LST at observation start in format
+  char LSTstart[SZFITSCARD];  /* LST at observation start in format
                                  YYYY-MM-DDTHH:MM:SS */
-  char LSTend[MAXFITS];       /* LST at observation end in format
+  char LSTend[SZFITSCARD];    /* LST at observation end in format
                                  YYYY-MM-DDTHH:MM:SS */
   float mapHght;              /* requested height of rectangle to be mapped 
                                  (arcsec) */
@@ -160,43 +153,43 @@ void gsdac_putFits ( const struct gsdac_gsdVars_struct *gsdVars,
   float mapWdth;              /* requested width of rectangle to be mapped
                                  (arcsec) */
   int min;                    /* minutes for time conversion. */
-  char molecule[MAXFITS];     /* target molecular species */
+  char molecule[SZFITSCARD];  /* target molecular species */
   int month;                  /* months for time conversion. */
   int nMix;                   /* number of mixers */
   double nRefStep;            /* number of nod sets repeated */
-  char object[MAXFITS];       /* object of interest */
-  char object2[MAXFITS];      /* object of interest (second half of name) */
-  char obsID[MAXFITS];        /* unique observation number in format
+  char object[SZFITSCARD];    /* object of interest */
+  char object2[SZFITSCARD];   /* object of interest (second half of name) */
+  char obsID[SZFITSCARD];     /* unique observation number in format
                                  INSTR_NNNNN_YYYYMMDDTHHMMSS */
-  char obsIDs[MAXFITS];       /* unique observation number + subsystem
+  char obsIDs[SZFITSCARD];    /* unique observation number + subsystem
                                  number in format
                                  INSTR_NNNNN_YYYYMMDDTHHMMSS_N */
-  char obsSB[MAXFITS];        /* observed sideband */
+  char obsSB[SZFITSCARD];     /* observed sideband */
   int parse;                  /* flag for incorrect date string. */
-  char recptors[MAXFITS];     /* active FE receptor IDs for this obs */
+  char recptors[SZFITSCARD];  /* active FE receptor IDs for this obs */
   double refChan;             /* reference IF channel no. */
-  char scanCrd[MAXFITS];      /* coordinate system of scan */
+  char scanCrd[SZFITSCARD];   /* coordinate system of scan */
   float scanDy;               /* scan spacing perpendicular to scan
                                  (arcsec) */
   float scanPA;               /* Scan PA rel. to lat. line; 0=lat, 
                                  90=long in scanCrd system */
-  char scanPat[MAXFITS];      /* name of scanning scheme */
+  char scanPat[SZFITSCARD];   /* name of scanning scheme */
   float scanVel;              /* scan velocity (arcsec/sec) */
-  char seeDatSt[MAXFITS];     /* time of seeingSt in format
+  char seeDatSt[SZFITSCARD];  /* time of seeingSt in format
                                  YYYY-MM-DDTHH:MM:SS */
-  char skyRefX[MAXFITS];      /* X co-ord of reference position (arcsec) */  
-  char skyRefY[MAXFITS];      /* Y co-ord of reference position (arcsec) */  
-  char sSysObs[MAXFITS];      /* spectral ref. frame during observation */
+  char skyRefX[SZFITSCARD];   /* X co-ord of reference position (arcsec) */  
+  char skyRefY[SZFITSCARD];   /* Y co-ord of reference position (arcsec) */  
+  char sSysObs[SZFITSCARD];   /* spectral ref. frame during observation */
   int standard;               /* true for spectral line standards */
   int startIdx;               /* index in pattern at start of observation */
   int stBetRef;               /* max number of steps between refs */
-  char subBands[MAXFITS];     /* ACSIS sub-band set-up */
-  char swMode[MAXFITS];       /* switch mode */
+  char subBands[SZFITSCARD];  /* ACSIS sub-band set-up */
+  char swMode[SZFITSCARD];    /* switch mode */
   int tableSize = 0;          /* number of elements of data table */
-  char tauDatSt[MAXFITS];     /* time of tau225St observation in 
+  char tauDatSt[SZFITSCARD];  /* time of tau225St observation in 
                                  format YYYY-MM-DDTHH:MM:SS */
-  char telName[MAXFITS];      /* telescope name */
-  char transiti[MAXFITS];     /* target transition for molecule */
+  char telName[SZFITSCARD];   /* telescope name */
+  char transiti[SZFITSCARD];  /* target transition for molecule */
   int year;                   /* year for time conversion. */  
 
   /* Check inherited status */

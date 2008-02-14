@@ -13,12 +13,12 @@
 *     Subroutine
 
 *  Invocation:
-*     gsdac_getSampleMode ( const struct gsdac_gsdVars_struct *gsdVars, 
+*     gsdac_getSampleMode ( const gsdVars *gsdVars, 
 *                           char *samMode, char *obsType, 
 *                           int *status )
 
 *  Arguments:
-*     gsdVars = const struct gsdac_gsdVars_struct* (Given)
+*     gsdVars = const gsdVars* (Given)
 *        GSD headers and arrays
 *     samMode = char* (Given and Returned)
 *        Sampling Mode
@@ -68,19 +68,14 @@
 #include <string.h>
 
 /* Starlink includes */
-#include "ast.h"
-#include "gsd.h"
 #include "sae_par.h"
-#include "mers.h"
 
-/* GSDAC includes */
+/* SMURF includes */
 #include "gsdac.h"
-
-#define MAXFITS 80
 
 #define FUNC_NAME "gsdac_getSampleMode"
 
-void gsdac_getSampleMode ( const struct gsdac_gsdVars_struct *gsdVars, 
+void gsdac_getSampleMode ( const gsdVars *gsdVars, 
                            char *samMode, char *obsType,
                            int *status )
 

@@ -77,18 +77,13 @@
 
 /* STARLINK includes */
 #include "mers.h"
-#include "ndf.h"
 #include "gsd.h"
 #include "sae_par.h"
 
 /* SMURF includes */
 #include "smurflib.h"
-#include "smurf_par.h"
-#include "libacsis/specwrite.h"
-
 #include "libgsd/gsdac_struct.h"
 #include "libgsd/gsdac.h"
-
 #include "jcmt/state.h"
 
 #define FUNC_NAME "smurf_gsd2acsis"
@@ -103,7 +98,7 @@ void smurf_gsd2acsis( int *status ) {
   char directory[MAXNAME];    /* directory to write the file */
   char filename[MAXNAME];     /* name of the GSD file */
   struct gsdac_gsd_struct gsd; /* GSD file access parameters */
-  struct gsdac_gsdVars_struct gsdVars; /* GSD headers and arrays */
+  gsdVars gsdVars;            /* GSD headers and arrays */
   unsigned int nSteps;        /* number of time steps */
   float version;              /* GSD file version */
   char label[41];             /* GSD label */
@@ -154,19 +149,23 @@ void smurf_gsd2acsis( int *status ) {
     return;
   }
 
+  /* Close the GSD file. */
+  msgOutif(MSG__VERB," ", 
+	     "Closing GSD file", status); 
+
+  *status = gsdClose ( fptr, gsd.fileDsc, gsd.itemDsc, gsd.dataPtr );
+
+  if ( *status != SAI__OK ) {
+    *status = SAI__ERROR;
+    errRep ( FUNC_NAME, "Error closing GSD file.", status );
+    return;
+  }
+
   /* Get the number of time steps in the observation. */
   nSteps = gsdVars.noScans * gsdVars.nScanPts;
 
   /* Convert and write out the new file. */
   gsdac_wrtData ( &gsdVars, directory, nSteps, status );
-
-  /* Close the GSD file. */
-  msgOutif(MSG__VERB," ", 
-	     "Closing GSD file", status); 
-
-  if ( *status == SAI__OK ) {
-    *status = gsdClose ( fptr, gsd.fileDsc, gsd.itemDsc, gsd.dataPtr );
-  }
 
   gsdac_freeArrays ( &gsdVars, status );
 
