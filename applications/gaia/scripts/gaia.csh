@@ -1,4 +1,4 @@
-#!/bin/csh 
+#!/bin/csh -f
 
 #+
 #  Name:
@@ -56,15 +56,11 @@
 #  script only exists for this purpose (the gaia.sh script also initialises
 #  CONVERT, but that is bash specific, not sh, so this is more portable).
 if ( $?CONVERT_DIR && ! $?NDF_FORMATS_IN ) then
-   alias echo 'echo >/dev/null'
-   if ( "`alias convert`" != "" ) then 
-      convert
-   else 
-      if ( -e $CONVERT_DIR/convert.csh ) then 
-         source $CONVERT_DIR/convert.csh
-      endif
+   if ( -e $CONVERT_DIR/convert.csh ) then 
+      alias echo 'echo >/dev/null'
+      source $CONVERT_DIR/convert.csh
+      unalias echo
    endif
-   unalias echo
 endif
 
 #  Now start up the application proper. 

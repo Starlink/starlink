@@ -1,4 +1,4 @@
-#!/bin/csh 
+#!/bin/csh -f
 
 #+
 #  Name:
@@ -50,15 +50,11 @@
 
 #  If available and not set then initialize the CONVERT package.
 if ( $?CONVERT_DIR && ! $?NDF_FORMATS_IN ) then
-   alias echo 'echo >/dev/null'
-   if ( "`alias convert`" != "" ) then 
-      convert
-   else 
-      if ( -e $CONVERT_DIR/convert.csh ) then 
-         source $CONVERT_DIR/convert.csh
-      endif
+   if ( -e $CONVERT_DIR/convert.csh ) then 
+      alias echo 'echo >/dev/null'
+      source $CONVERT_DIR/convert.csh
+      unalias echo
    endif
-   unalias echo
 endif
 
 #  Now start up the application proper. 
