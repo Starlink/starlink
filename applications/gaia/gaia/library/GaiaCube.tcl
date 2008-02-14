@@ -178,7 +178,7 @@ itcl::class gaia::GaiaCube {
       #  Choice of cube component.
       set submenu [menu $Options.component]
       $Options add cascade -label "Data component" -menu $submenu
-      foreach type {DATA VARIANCE QUALITY} {
+      foreach type {DATA VARIANCE ERROR QUALITY} {
          $submenu add radiobutton \
             -variable [scope component_] \
             -value $type \
@@ -311,7 +311,7 @@ itcl::class gaia::GaiaCube {
             -labelwidth $lwidth \
             -valuewidth $vwidth \
             -spec_coords [code $spec_coords_] \
-            -component $component_ \
+            -component [get_component_] \
             -transient_spectralplot $itk_option(-transient_spectralplot) \
             -notify_cmd [code $this spectrum_moved_]
       }
@@ -827,9 +827,9 @@ itcl::class gaia::GaiaCube {
       }
       set zp [expr round($plane_+1-$zo)]
 
-      #  Access the image data for this plane and replace
-      #  the displayed copy.
-      set adr [$cubeaccessor_ getimage $axis_ $zp 1 $component_]
+      #  Access the image data for this plane and replace the displayed copy.
+      set comp [get_component_]
+      set adr [$cubeaccessor_ getimage $axis_ $zp 1 $comp]
       lassign [$cubeaccessor_ getinfo $adr] realadr nel type
       $itk_option(-rtdimage) replaceimagedata $realadr
 
@@ -1049,11 +1049,22 @@ itcl::class gaia::GaiaCube {
    protected method component_changed_ {} {
 
       if { $cubeaccessor_ != {} } {
-         if { [$cubeaccessor_ exists $component_] } {
+
+         #  The ERROR component is the VARIANCE component in fact, that just
+         #  applies when mapping.
+         set component $component_
+         if { $component == "ERROR" } {
+            $cubeaccessor_ configure -maperrors 1
+            set component "VARIANCE"
+         } else {
+            $cubeaccessor_ configure -maperrors 0
+         }
+
+         if { [$cubeaccessor_ exists $component] } {
             #  Only the DATA component is mapped by default, so make sure
             #  we access the others too.
-            if { $component_ != "DATA" } {
-               set adr [$cubeaccessor_ map "READ" $component_]
+            if { $component != "DATA" } {
+               set adr [$cubeaccessor_ map "READ" $component]
             }
 
             #  Cause an update of the image.
@@ -1070,7 +1081,7 @@ itcl::class gaia::GaiaCube {
 
       #  Get extracted spectra to display this component.
       if { [info exists itk_component(spectrum)] } {
-         $itk_component(spectrum) configure -component $component_
+         $itk_component(spectrum) configure -component [get_component_]
       }
 
       #  Fallback when component doesn't exist.
@@ -1289,6 +1300,15 @@ itcl::class gaia::GaiaCube {
    protected method spectrum_moved_ {type init desc} {
       renderers_spectrum_moved_ $type $desc
       slave_spectrum_moved_ $type $init $desc
+   }
+
+   #  Get the component, normally component_ but will be VARIANCE if
+   #  component_ is ERROR.
+   protected method get_component_ {} {
+      if { $component_ == "ERROR" } {
+         return "VARIANCE"
+      }
+      return $component_
    }
 
    #  ============
@@ -1629,8 +1649,8 @@ itcl::class gaia::GaiaCube {
    #  Data access object for the cube.
    protected variable cubeaccessor_ {}
 
-   #  The component to display/extract. Usually DATA but could be VARIANCE
-   #  or QUALITY. Keep last component value as a fallback.
+   #  The component to display/extract. Usually DATA but could be VARIANCE,
+   #  ERROR or QUALITY. Keep last component value as a fallback.
    protected variable component_ "DATA"
    protected variable last_component_ "DATA"
 

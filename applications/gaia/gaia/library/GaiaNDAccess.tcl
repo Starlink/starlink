@@ -248,8 +248,14 @@ itcl::class gaia::GaiaNDAccess {
       if { $addr_($component) != 0 } {
          unmap $component
       }
-      set addr_($component) \
-         [${type_}::map $handle_ $usemmap $access $component]
+
+      #  Map VARIANCE as ERROR if asked.
+      set comp $component
+      if { $comp == "VARIANCE" && $maperrors } {
+         set comp "ERROR"
+      }
+
+      set addr_($component) [${type_}::map $handle_ $usemmap $access $comp]
       return $addr_($component)
    }
 
@@ -694,6 +700,16 @@ itcl::class gaia::GaiaNDAccess {
    #  after a mmap it is the callers responsibility to unmap and remap.
    public variable usemmap 1
 
+   #  Whether to map the variance array as standard deviations.
+   public variable maperrors 0 {
+      #  Twist, if already mapped and this value toggles we need to release 
+      #  the component.
+      if { $maperrors != $last_maperrors_ && $addr_(VARIANCE) != 0 } {
+         unmap "VARIANCE"
+      }
+      set last_maperrors_ $maperrors
+   }
+
    #  Protected variables: (available to instance)
    #  --------------------
 
@@ -729,6 +745,9 @@ itcl::class gaia::GaiaNDAccess {
 
    #  Integer which will be incremented when a property is changed.
    protected variable prop_changes_ 0
+
+   #  Last value of maperrors.
+   protected variable last_maperrors_ 0
 
    #  Common variables: (shared by all instances)
    #  -----------------
