@@ -29,6 +29,7 @@
 
 *  Copyright:
 *     Copyright (C) 1992 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -54,6 +55,8 @@
 *  History:
 *     18-AUG-1992 (DSB):
 *        Original version
+*     15-FEB-2008 (DSB):
+*        Correct error message.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -107,7 +110,7 @@
       IF( SIZE .GT. CMN_GSIZE( SLOT ) ) THEN
          STATUS = GRP__SZINC
          CALL MSG_SETI( 'NEW', SIZE )
-         CALL MSG_SETI( 'OLD', CMN_SIZE )
+         CALL MSG_SETI( 'OLD', CMN_GSIZE( SLOT ) )
          CALL ERR_REP( 'GRP_SETSZ_ERR1',
      : 'GRP_SETSZ: New size (^NEW) is greater than the old size (^OLD)',
      :                  STATUS )
