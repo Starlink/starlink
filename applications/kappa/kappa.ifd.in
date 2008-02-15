@@ -2151,6 +2151,16 @@ package kappa {
             helpkey *
           }
 
+         parameter readonly {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Flag that the quality name cannot be removed?}
+            default FALSE
+            helpkey *
+          }
+
          parameter select {
             type LITERAL
             access UPDATE

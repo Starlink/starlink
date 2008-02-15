@@ -23,6 +23,10 @@
 *     This routine removes selected quality name definitions from an
 *     NDF (see task SETQUAL).  All quality names information may
 *     be removed by specifying a quality name of "ANY". 
+*
+*     An error will be reported if an attempt is made to remove a quality
+*     name that has been flagged as "read-only" (e.g. using the READONLY
+*     parameter of the SETQUAL application).
 
 *  Usage:
 *     remqual ndf qnames

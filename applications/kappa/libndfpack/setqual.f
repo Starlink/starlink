@@ -123,6 +123,10 @@
 *        within the input NDF, then a definition of the name is
 *        added to the NDF. The user is warned if the quality name is
 *        already defined within the NDF.
+*     READONLY = _LOGICAL (Read)
+*        If TRUE, then an error will be reported if any attempt is
+*        subsequently made to remove the quality name (e.g. using
+*        REMQUAL). [FALSE]
 *     SELECT = LITERAL (Read)
 *        This parameter determines how the pixels are selected, and can
 *        take the values "Mask", "List" or "ARD" (see parameters MASK, 
@@ -175,8 +179,9 @@
 *  Copyright:
 *     Copyright (C) 1991, 1994 Science & Engineering Research Council.
 *     Copyright (C) 2002, 2004 Central Laboratory of the Research
-*     Councils. Copyright (C) 2006 Particle Physics & Astronomy
-*     Research Council. All Rights Reserved.
+*     Councils. Copyright (C) 2006 Particle Physics & Astronomy Research Council. 
+*     Copyright (C) 2008 Science & Technology Facilities Council. 
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -212,6 +217,8 @@
 *        Use CNF_PVAL.
 *     2006 April 12 (MJC):
 *        Remove unused variables and wrapped long lines.
+*     15-FEB-2008 (DSB):
+*        Add READONLY parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -283,6 +290,7 @@
       INTEGER NINDEX             ! The total number of pixel indices 
                                  ! obtained.
       CHARACTER QNAME*(IRQ__SZQNM)! Supplied quality name.
+      LOGICAL RDONLY             ! Read-only flag for quality name
       INTEGER REGVAL             ! Highest value in ARD mask
       CHARACTER SELECT*4         ! Value of parameter SELECT
       INTEGER SET                ! The number of pixels which hold the 
@@ -486,6 +494,10 @@
          CALL MSG_OUT( 'SETQUAL_MSG3', ' Using pre-existing '//
      :                 'definition of quality "^QN" - ^COM', STATUS )
       END IF
+
+*  Flag the name as read-only if required.
+      CALL PAR_GET0L( 'READONLY', RDONLY, STATUS )
+      CALL IRQ_RWQN( LOCS, QNAME, .TRUE., RDONLY, RDONLY, STATUS )
 
 *  If the function "HS+NU" has been selected, remove the quality from
 *  all pixels, and change the function to "HS".

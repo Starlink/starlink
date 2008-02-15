@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.34}
 \newcommand{\stardocnumber}    {95.34}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2008 February 4}
+\newcommand{\stardocdate}      {2008 February 15}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.9}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -40292,6 +40292,10 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
       This routine removes selected \htmlref{quality name}{se:qnames}~ definitions 
       from an \NDFref{NDF}~ (see task SETQUAL).  All quality names information may
       be removed by specifying a quality name of {\tt "ANY"}.
+
+      An error will be reported if an attempt is made to remove a quality
+      name that has been flagged as ``read-only'' (\emph{e.g.} using the 
+      READONLY parameter of the SETQUAL application).
    }
    \sstusage{
       remqual ndf qnames
@@ -42822,6 +42826,13 @@ KAPPA: \htmlref{SETBOUND}{SETBOUND}.
          within the input NDF, then a definition of the name is
          added to the NDF.  The user is warned if the quality name is
          already defined within the NDF.
+      }
+      \sstsubsection{
+         READONLY = \_LOGICAL (Read)
+      }{
+         If TRUE, then an error will be reported if any attempt is
+         subsequently made to remove the quality name (\emph{e.g.} using
+         REMQUAL). {\tt [FALSE]}
       }
       \sstsubsection{
          SELECT = LITERAL (Read)
@@ -53778,6 +53789,14 @@ The following applications have been modified:
          variance array (see new parameter GENVAR).  If the NDF is
          processed as a set of spectra or images, then each individual 
          spectrum or image is assigned its own noise level.
+      \end{itemize}
+
+   \item [\htmlref{SETQUAL}{SETQUAL}] \mbox{}
+      \begin{itemize}
+         \item A new parameter, READONLY, allows the new quality name to be
+         flagged as ``read only''. This flag indicates that an error
+         should be reported if any subsequent attempt is made to remove the 
+         quality name (for instance, using REMQUAL).
       \end{itemize}
 
    \item [\htmlref{WCSMOSAIC}{WCSMOSAIC}] \mbox{}
