@@ -251,6 +251,8 @@
 *     2008-02-13 (AGG):
 *        Add SPREAD and PARAMS parameters to allow choice of
 *        pixel-spreading scheme, update call to smf_rebinmap
+*     2008-02-15 (AGG):
+*        Expand number of dimensions for weights array if using REBIN
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -329,13 +331,16 @@ void smurf_makemap( int *status ) {
   dim_t i;                   /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
   int indf = 0;              /* NDF identifier of output file */
+  int iterate=0;             /* Flag to denote whether to use the ITERATE method */
   AstKeyMap *keymap=NULL;    /* Pointer to keymap of config settings */
   int ksize=0;               /* Size of group containing CONFIG file */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
+  int lbnd_wgt[3];           /* Lower pixel bounds for weight array */
   void *map=NULL;            /* Pointer to the rebinned map data */
   char method[LEN__METHOD];  /* String for map-making method */
   int moving = 0;            /* Is the telescope base position changing? */
   int nparam = 0;            /* Number of extra parameters for pixel spreading scheme*/
+  int nwgtdim=2;             /* No. of axes in the weights array */
   AstKeyMap * obsidmap = NULL; /* Map of OBSIDs from input data */
   smfData *odata=NULL;       /* Pointer to output SCUBA2 data struct */
   Grp *ogrp = NULL;          /* Group containing output file */
@@ -347,11 +352,13 @@ void smurf_makemap( int *status ) {
   int parstate;              /* State of ADAM parameters */
   float pixsize=3;           /* Size of an output map pixel in arcsec */
   AstKeyMap * prvkeymap = NULL; /* Keymap of input files for PRVxxx headers */
+  int rebin=1;               /* Flag to denote whether to use the REBIN method */
   int size;                  /* Number of files in input group */
   int smfflags=0;            /* Flags for smfData */
   int spread;                /* Code for pixel spreading scheme */
   char system[10];           /* Celestial coordinate system for output image */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
+  int ubnd_wgt[3];           /* Upper pixel bounds for weight array */
   int usebad;                /* Flag for whether to use bad bolos mask */
   int uselonlat = 0;         /* Flag for whether to use given lon_0 and
 				lat_0 for output frameset */
@@ -389,6 +396,14 @@ void smurf_makemap( int *status ) {
 	    "REBIN, ITERATE.", 1,
 	    method, LEN__METHOD, status);
 
+  if( strncmp( method, "REBIN", 5 ) == 0 ) {
+    rebin = 1;
+    iterate = 0;
+  } else if ( strncmp( method, "ITERATE", 5 ) == 0 ) {
+    rebin = 0;
+    iterate = 1;
+  }
+
   /* Calculate the map bounds */
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Determine map bounds", status);
   smf_mapbounds( igrp, size, system, 0, 0, uselonlat, pixsize, lbnd_out, ubnd_out, 
@@ -412,14 +427,11 @@ void smurf_makemap( int *status ) {
 		     &odata, status );
 
   if ( *status == SAI__OK ) {
-
     file = odata->file;
     ondf = file->ndfid;
-
-    /* Map the data, variance, and weights arrays */
+    /* Map the data and variance arrays */
     map = (odata->pntr)[0];
     variance = (odata->pntr)[1];
-
   }
 
   /* Create provenance keymap */
@@ -427,15 +439,27 @@ void smurf_makemap( int *status ) {
 
   /* Create WEIGHTS extension in the output file and map pointer to
      weights array */
-  weightsloc = smf_get_xloc ( odata, "SCU2RED", "SCUBA2_WT_ARR", "WRITE", 
+  weightsloc = smf_get_xloc ( odata, "SMURF", "SCUBA2_WT_ARR", "WRITE", 
                               0, 0, status );
+
+  /* Determine bounds of weights array */
+  lbnd_wgt[0] = lbnd_out[0];
+  ubnd_wgt[0] = ubnd_out[0];
+  lbnd_wgt[1] = lbnd_out[1];
+  ubnd_wgt[1] = ubnd_out[1];
+  /* If using the REBIN method, allocated extra work space for
+     calculating variances */
+  if ( rebin ) {
+    lbnd_wgt[nwgtdim] = 0;
+    ubnd_wgt[nwgtdim] = 1;
+    nwgtdim = 3;
+  }
   smf_open_ndfname ( weightsloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
-                     2, lbnd_out, ubnd_out, &wdata, status );
-  if ( *status == SAI__OK ) 
-    weights = (wdata->pntr)[0];
+                     nwgtdim, lbnd_wgt, ubnd_wgt, &wdata, status );
+  if ( wdata ) weights = (wdata->pntr)[0];
 
   /* Create the map using the chosen METHOD */
-  if( strncmp( method, "REBIN", 5 ) == 0 ) {
+  if( rebin ) {
     parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
 	      "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
 	      1, pabuf, 10, status );
@@ -506,7 +530,7 @@ void smurf_makemap( int *status ) {
 	break;
       }
     }
-  } else if( strncmp( method, "ITERATE", 5 ) == 0 ) {
+  } else if( iterate ) {
 
     /* Iterative map-maker */
     msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using ITERATE method", 
