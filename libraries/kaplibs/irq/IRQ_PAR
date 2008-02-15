@@ -18,6 +18,7 @@
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -43,6 +44,8 @@
 *  History:
 *     28-JUN-1991 (DSB):
 *        Original version.
+*     15-FEB-2008 (DSB):
+*        Added definition of IRQ__RONAM.
 *     {enter_changes_here}
 
 *-
@@ -67,6 +70,10 @@
 *  The name of the QUAL component which holds a descriptive comment.
       CHARACTER IRQ__CMNAM*7
       PARAMETER ( IRQ__CMNAM = 'COMMENT' )
+
+*  The name of the QUAL component that holds a read-only flag.
+      CHARACTER IRQ__RONAM*8
+      PARAMETER ( IRQ__RONAM = 'READONLY' )
 
 *  The name of the QUAL component which indicates if the quality is 
 *  the same for all pixels, or varies from pixel to pixel.

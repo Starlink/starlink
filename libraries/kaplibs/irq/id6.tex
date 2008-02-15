@@ -5,9 +5,9 @@
 %------------------------------------------------------------------------------
 \newcommand{\irasdoccategory}  {IRAS90 Document}
 \newcommand{\irasdocinitials}  {ID}
-\newcommand{\irasdocnumber}    {6.4}
+\newcommand{\irasdocnumber}    {6.5}
 \newcommand{\irasdocauthors}   {D.S. Berry}
-\newcommand{\irasdocdate}      {26th May 1992}
+\newcommand{\irasdocdate}      {15th February 2008}
 \newcommand{\irasdoctitle}     {IRQ: Handling of QUALITY within IRAS90}
 %------------------------------------------------------------------------------
 
@@ -296,7 +296,9 @@ returns various items of information about it (such as which bit of the QUALITY
 component it is assigned to). IRQ\_NUMQN returns the number of defined quality 
 names. IRQ\_NXTQN returns the next defined quality name. Repeated calls to 
 IRQ\_NXTQN can be made to get a list of all the quality names defined within an 
-NDF. IRQ\_REMQN removes the definition of a quality name from an NDF.
+NDF. IRQ\_REMQN removes the definition of a quality name from an NDF, so
+long as the quality name has not been flagged as ``read-only'' (see
+IRQ\_RWQN).
 
 \subsection{Assigning and removing qualities to and from NDF pixels}
 Once quality names have been defined, they can be assigned to selected pixels
@@ -489,6 +491,8 @@ apostrophy (') in the above {\bf alink} command.
    {Ensure pixels selected by a mask do not hold a specified quality.}
 \noteroutine{IRQ\_RLSE(LOCS,STATUS)}
    {Release the resource used to locate quality name information.}
+\noteroutine{IRQ\_RWQN( LOCS, QNAME, SET, NEWVAL, OLDVAL, STATUS )}
+   {Get and/or set the read-only flag for a quality name.}
 \noteroutine{IRQ\_SBAD(IDQ,HELD,SIZE,VEC,ALLBAD,NOBAD,STATUS)}
    {Set pixels bad which satisfy a given quality expression.}
 \noteroutine{IRQ\_SETQ(LOCS,QNAME,STATUS)}
@@ -523,6 +527,8 @@ apostrophy (') in the above {\bf alink} command.
    {Return information about the next defined quality name.}
 \noteroutine{IRQ\_REMQN(LOCS,QNAME,STATUS)}
    {Remove the definition of a quality name.}
+\noteroutine{IRQ\_RWQN( LOCS, QNAME, SET, NEWVAL, OLDVAL, STATUS )}
+   {Get and/or set the read-only flag for a quality name.}
 
 \subsection{Handling Quality Expressions}
 \noteroutine{IRQ\_ANNUL(IDQ,STATUS)}
@@ -1273,7 +1279,8 @@ apostrophy (') in the above {\bf alink} command.
       names to be removed.
 
       Note, an error is reported if only read access is available to the
-      NDF.
+      NDF, or if the quality name has been flagged as read-only using
+      routine IRQ\_RWQN.
    }
    \sstinvocation{
       CALL IRQ\_REMQN( LOCS, QNAME, STATUS )
@@ -1509,6 +1516,67 @@ apostrophy (') in the above {\bf alink} command.
          An array of 5 HDS locators. These locators identify the NDF
          and the associated quality name information.  They should have
          been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRQ\_RWQN
+}{
+   Get and/or set the read-only flag for a quality name
+}{
+   \sstdescription{
+      This routine returns the current value of the read-only flag
+      associated with a quality name, and optionally assigns a new
+      value to the flag.
+
+      If the read-only flag is set for a quality name, any attempt to
+      remove the quality name using IRQ\_REMQN will result in an error
+      being reported.
+   }
+   \sstinvocation{
+      CALL IRQ\_RWQN( LOCS, QNAME, SET, NEWVAL, OLDVAL, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         An array of 5 HDS locators. These locators identify the NDF
+         and the associated quality name information.  They should have
+         been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
+      }
+      \sstsubsection{
+         QNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The quality name to use. Leading blanks are ignored and
+         the search is case-insensitive. The maximum allowed length for
+         quality names is given by symbolic constant IRQ\_\_SZQNM which
+         currently has the value of 15.
+      }
+      \sstsubsection{
+         SET = LOGICAL (Given)
+      }{
+         If true, then the read-only flag for the quality name will be
+         set to the value supplied in NEWVAL. Otherwise, the current
+         value of the flag will be left unchanged.
+      }
+      \sstsubsection{
+         NEWVAL = LOGICAL (Given)
+      }{
+         The new value for the read-only flag. Only accessed if SET is
+         true.
+      }
+      \sstsubsection{
+         OLDVAL = LOGICAL (Returned)
+      }{
+         The value of the read-only flag on entry to this routine. If the
+         old value is of no interest, it is safe to supply the same
+         variable for OLDVAL as for NEWVAL since OLDVAL is updated after
+         NEWVAL is used.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
@@ -2611,6 +2679,8 @@ Quality name too long.
 Too many quality names in quality expression.
 \item {\bf IRQ\_\_QUNDF}\\ 
 QUALITY component is undefined.
+\item {\bf IRQ\_\_RDONL}\\ 
+An attempt has been made to remove a read-only quality name.
 \item {\bf IRQ\_\_STKOV}\\ 
 Evaluation stack overflow.
 \item {\bf IRQ\_\_STKUN}\\ 
@@ -2621,6 +2691,11 @@ No bits left in QUALITY component.
 
 \section {Changes Introduced in the Current Version of this Document}
 \label {SEC:CHANGES}
+
+Changes introduced in version 5 of ID6:
+\begin {enumerate}
+\item Routine IRQ\_RWQN added.
+\end {enumerate}
 
 Changes introduced in version 4 of ID6:
 \begin {enumerate}

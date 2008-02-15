@@ -63,6 +63,8 @@
 *  History:
 *     15-JAN-2008 (DSB):
 *        Original version.
+*     15-FEB-2008 (DSB):
+*        Added RDONLY argument to IRQ1_SEARC and IRQ1_MOD.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -100,6 +102,7 @@
                                  ! quality names information.
       INTEGER LAST               ! Index of last non-blank character
       CHARACTER LQNAME*(IRQ__SZQNM) ! Upper case copy of quality name.
+      LOGICAL RDONLY             ! Read-only flag for quality name.
       INTEGER SLOT               ! Index into the QUALITY_NAMES
                                  ! structure at which the new name will
                                  ! be stored.
@@ -124,8 +127,8 @@
       CALL CHR_UCASE( LQNAME )
 
 *  Find the quality name information.
-      CALL IRQ1_SEARC( LOCS, LQNAME, FIXED, VALUE, BIT, COMMNT, SLOT,
-     :                 STATUS )
+      CALL IRQ1_SEARC( LOCS, LQNAME, FIXED, VALUE, BIT, COMMNT, RDONLY,
+     :                 SLOT, STATUS )
 
 *  If the quality name already has a bit number assigned to it, return
 *  it. Otherwise we assign a bit number to the quality name now.
@@ -147,7 +150,8 @@
 
 *  Modify the FIXED, VALUE and BIT settings in the quality name
 *  information.
-         CALL IRQ1_MOD( LOCS, SLOT, .FALSE., VALUE, BIT, STATUS )
+         CALL IRQ1_MOD( LOCS, SLOT, .FALSE., VALUE, BIT, RDONLY, 
+     :                  STATUS )
       END IF
 
 *  If an error occur, give context information.

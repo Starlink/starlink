@@ -45,4 +45,6 @@ MSDOT  <Missing delimter "." in quality expression>
 BADSY  <Unrecognised logical operator or constant>
 NOOPS  <No operands can be found>
 
+RDONL  <Quality name is read-only>
+
 .END

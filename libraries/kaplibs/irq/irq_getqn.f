@@ -54,6 +54,7 @@
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -79,6 +80,8 @@
 *  History:
 *     25-JUL-1991 (DSB):
 *        Original version.
+*     15-FEB-2008 (DSB):
+*        Added RDONLY argument to IRQ1_SEARC.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -113,6 +116,7 @@
                                  ! quality names information.
       INTEGER LAST               ! Position of last non-blank character.
       CHARACTER LQNAME*(IRQ__SZQNM) ! Upper case copy of quality name.
+      LOGICAL RDONLY             ! Read-only flag for quality name.
       INTEGER SLOT               ! Index into the QUAL structure at
                                  ! which the name was found.
 *.
@@ -131,7 +135,7 @@
 
 *  Search for the requested quality name.
       CALL IRQ1_SEARC( LOCS, LQNAME( : LAST - FIRST + 1 ), FIXED, VALUE,
-     :                 BIT, COMMNT, SLOT, STATUS )
+     :                 BIT, COMMNT, RDONLY, SLOT, STATUS )
 
 *  If an error occur, give context information.
       IF( STATUS .NE. SAI__OK ) THEN

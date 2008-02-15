@@ -1,5 +1,5 @@
       SUBROUTINE IRQ1_GET( LOCS, SLOT, QNAME, FIXED, VALUE, BIT, COMMNT,
-     :                     STATUS )
+     :                     RDONLY, STATUS )
 *+
 *  Name:
 *     IRQ1_GET
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL IRQ1_GET( LOCS, SLOT, QNAME, FIXED, VALUE, BIT, COMMNT,
-*                    STATUS )
+*                    RDONLY, STATUS )
 
 *  Description:
 *     The quality information is retrieved from the given slot. If the
@@ -48,11 +48,14 @@
 *        bit is called bit 1 (not bit 0).
 *     COMMNT = CHARACTER * ( * ) (Returned)
 *        A descriptive comment stored with the name.
+*     RDONLY = LOGICAL (Returned)
+*        The read-only flag for the quality name.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -78,6 +81,8 @@
 *  History:
 *     26-JUL-1991 (DSB):
 *        Original version.
+*     15-FEB-2008 (DSB):
+*        Added argument RDONLY.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -104,6 +109,7 @@
       LOGICAL VALUE
       INTEGER BIT
       CHARACTER COMMNT*(*)
+      LOGICAL RDONLY
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -112,7 +118,7 @@
       INTEGER LUSED              ! Index of last used slot in QUAL array.
       CHARACTER QULOC*(DAT__SZLOC)! Locator to a single cell of the QUAL
                                  ! array.
-
+      LOGICAL THERE              ! Does the component exist?
 *.
 
 *  Check inherited global status.
@@ -165,6 +171,15 @@
       CALL CMP_GET0L( QULOC, IRQ__VLNAM, VALUE, STATUS )
       CALL CMP_GET0I( QULOC, IRQ__BTNAM, BIT, STATUS )
       CALL CMP_GET0C( QULOC, IRQ__CMNAM, COMMNT, STATUS )
+
+*  The read-only flag was added at 15/2/2008, so check it exists before
+*  accessing it (we may be accessing an NDF Created before 15/2/2008).
+      CALL DAT_THERE( QULOC, IRQ__RONAM, THERE, STATUS )
+      IF( THERE ) THEN
+         CALL CMP_GET0L( QULOC, IRQ__RONAM, RDONLY, STATUS )
+      ELSE
+         RDONLY = .FALSE.
+      END IF     
 
 *  Annul the locator to the cell of QUAL.
  999  CONTINUE

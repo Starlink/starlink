@@ -55,6 +55,7 @@
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 2004 Central Laboratory of the Research Councils.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -83,6 +84,8 @@
 *        Original version.
 *     2004 September 1 (TIMJ):
 *        Use CNF_PVAL
+*     15-FEB-2008 (DSB):
+*        Added RDONLY to IRQ1_SEARC and IRQ1_MOD call.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -133,6 +136,7 @@
       INTEGER NEL                ! No. of pixels in the NDF.
       INTEGER NGOOD              ! No. of good values found in the mask.
       INTEGER PNT                ! Pointer to the mapped QUALITY array.
+      LOGICAL RDONLY             ! Read-only flag for quality name.
       INTEGER SLOT               ! Index into the QUALITY_NAMES
                                  ! structure at which the new name will
                                  ! be stored.
@@ -165,8 +169,8 @@
       CALL CHR_UCASE( LQNAME )
 
 *  Find the quality name information.
-      CALL IRQ1_SEARC( LOCS, LQNAME, FIXED, VALUE, BIT, COMMNT, SLOT,
-     :                 STATUS )
+      CALL IRQ1_SEARC( LOCS, LQNAME, FIXED, VALUE, BIT, COMMNT, RDONLY, 
+     :                 SLOT, STATUS )
 
 *  If no pixels have the quality which is to be removed, return
 *  without further action.
@@ -249,7 +253,7 @@
       END IF
 
 *  Update the quality information.
-      CALL IRQ1_MOD( LOCS, SLOT, FIXED, VALUE, BIT, STATUS )
+      CALL IRQ1_MOD( LOCS, SLOT, FIXED, VALUE, BIT, RDONLY, STATUS )
 
 *  If an error occur, give context information.
  999  CONTINUE

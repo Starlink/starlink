@@ -81,6 +81,7 @@
 
 *  Copyright:
 *     Copyright (C) 1990 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -106,6 +107,8 @@
 *  History:
 *     5-DEC-1990 (DSB):
 *        Original version.
+*     15-FEB-2008 (DSB):
+*        Added RDONLY argument to IRQ1_SEARC.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -172,6 +175,7 @@
                                  ! expression.
       CHARACTER QNAMES( IRQ__QNREF )*(IRQ__SZQNM )! Quality names
                                  ! referenced in the quality expression.
+      LOGICAL RDONLY             ! Read-only flag for quality name.
       LOGICAL REPORT             ! True if an undefined quality name is
                                  ! to be reported to the user.
       INTEGER SLOT               ! Slot in the QUAL array in which the
@@ -211,7 +215,7 @@
 
 *  Try to find the quality name in the QUALITY_NAMES structure.
          CALL IRQ1_SEARC( LOCS, QNAMES( I ), FIXED, HELD, BIT, COMMNT,
-     :                    SLOT, STATUS )
+     :                    RDONLY, SLOT, STATUS )
 
 *  If the name was found...
          IF( STATUS .EQ. SAI__OK ) THEN

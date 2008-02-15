@@ -37,6 +37,7 @@
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -62,6 +63,8 @@
 *  History:
 *     26-JUL-1991 (DSB):
 *        Original version.
+*     15-FEB-2008 (DSB):
+*        Added a read-only flag to the QUAL structure.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -125,6 +128,11 @@
 *  5) A character string which holds a comment describing the quality
 *  name.
       CALL DAT_NEW0C( QCLOC, IRQ__CMNAM, IRQ__SZCOM, STATUS )
+
+*  6) A logical value indicating if the quality is read-only. If so, then 
+*  the slot describing the quality name cannot be removed using IRQ_REMQN 
+*  until such time as the quality is made read-write. 
+      CALL DAT_NEW0L( QCLOC, IRQ__RONAM, STATUS )
 
 *  Increment the number of free slots.
       CALL DAT_GET0I( LOCS(4), NFREE, STATUS )

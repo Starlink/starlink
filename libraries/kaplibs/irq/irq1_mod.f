@@ -1,4 +1,5 @@
-      SUBROUTINE IRQ1_MOD( LOCS, SLOT, FIXED, VALUE, BIT, STATUS )
+      SUBROUTINE IRQ1_MOD( LOCS, SLOT, FIXED, VALUE, BIT, RDONLY,
+     :                     STATUS )
 *+
 *  Name:
 *     IRQ1_MOD
@@ -10,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL IRQ1_MOD( LOCS, SLOT, FIXED, VALUE, BIT, STATUS )
+*     CALL IRQ1_MOD( LOCS, SLOT, FIXED, VALUE, BIT, RDONLY, STATUS )
 
 *  Description:
 *     The quality information is stored in the given slot. If the
@@ -42,11 +43,16 @@
 *        QUALITY component which corresponds with the quality name. If
 *        FIXED is true, then BIT is ignored. The least significant
 *        bit is called bit 1 (not bit 0).
+*     RDONLY = LOGICAL (Given)
+*        The read-only flag for the quality name. Controls whether an
+*        error is reported if an attempt is made to delete the quality
+*        name using IRQ_REMQN.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -72,6 +78,8 @@
 *  History:
 *     26-JUL-1991 (DSB):
 *        Original version.
+*     15-FEB-2008 (DSB):
+*        Added argument RDONLY.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -94,6 +102,7 @@
       LOGICAL FIXED
       LOGICAL VALUE
       INTEGER BIT
+      LOGICAL RDONLY
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -103,7 +112,7 @@
       CHARACTER QNAME*(IRQ__SZQNM)! NAME from current QUAL slot.
       CHARACTER QULOC*(DAT__SZLOC)! Locator to a single cell of the QUAL
                                  ! array.
-
+      LOGICAL THERE              ! Does the component exists?
 *.
 
 *  Check inherited global status.
@@ -171,6 +180,12 @@
       ELSE
          CALL CMP_PUT0I( QULOC, IRQ__BTNAM, BIT, STATUS )
       END IF
+
+*  The read-only flag is new (15/2/2008) and so may not exist in the
+*  supplied structure. So firs make sure it exists, then store its value.
+      CALL DAT_THERE( QULOC, IRQ__RONAM, THERE, STATUS )
+      IF( .NOT. THERE ) CALL DAT_NEW0L( QULOC, IRQ__RONAM, STATUS )
+      CALL CMP_PUT0L( QULOC, IRQ__RONAM, RDONLY, STATUS )
 
 *  Annul the locator to the cell of QUAL.
  999  CONTINUE

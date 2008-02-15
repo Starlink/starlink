@@ -65,6 +65,7 @@
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -90,6 +91,8 @@
 *  History:
 *     25-JUL-1991 (DSB):
 *        Original version.
+*     15-FEB-2008 (DSB):
+*        Add argument RDONLY to IRQ1_GET call.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -128,7 +131,7 @@
       INTEGER INDF               ! Identifier for the NDF containing the
                                  ! quality names information.
       INTEGER LUSED              ! Index of last used slot.
-
+      LOGICAL RDONLY             ! Read-only flag for quality name
 *.
 
 *  Check inherited global status.
@@ -169,7 +172,7 @@
             CALL ERR_MARK
 
             CALL IRQ1_GET( LOCS, CONTXT, QNAME, FIXED, VALUE, BIT,
-     :                     COMMNT, STATUS )
+     :                     COMMNT, RDONLY, STATUS )
 
 *  If the slot was not in use, annul the error.
             IF( STATUS .EQ. IRQ__BADSL ) THEN

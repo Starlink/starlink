@@ -1,5 +1,5 @@
       SUBROUTINE IRQ1_SEARC( LOCS, QNAME, FIXED, VALUE, BIT, COMMNT,
-     :                       SLOT, STATUS )
+     :                       RDONLY, SLOT, STATUS )
 *+
 *  Name:
 *     IRQ1_SEARC
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL IRQ1_SEARC( LOCS, QNAME, FIXED, VALUE, BIT, COMMNT,
-*                      SLOT, STATUS )
+*                      RDONLY, SLOT, STATUS )
 
 *  Description:
 *     The supplied name is compared with each name stored in the QUAL
@@ -47,6 +47,8 @@
 *        bit is called bit 1 (not bit 0).
 *     COMMNT = CHARACTER * ( * ) (Returned)
 *        A descriptive comment stored with the name.
+*     RDONLY = LOGICAL (Returned)
+*        The read-only flag for the quality name.
 *     SLOT = INTEGER (Returned)
 *        The index at which the name is stored in the QUAL array.
 *     STATUS = INTEGER (Given and Returned)
@@ -54,6 +56,7 @@
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -79,6 +82,8 @@
 *  History:
 *     26-JUL-1991 (DSB):
 *        Original version.
+*     15-FEB-2008 (DSB):
+*        Added argument RDONLY.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -103,6 +108,7 @@
       LOGICAL VALUE
       INTEGER BIT
       CHARACTER COMMNT*(*)
+      LOGICAL RDONLY
       INTEGER SLOT
 
 *  Status:
@@ -123,7 +129,7 @@
 *  If the name was found, get the other associated information.
       IF( THERE ) THEN
          CALL IRQ1_GET( LOCS, SLOT, NAME, FIXED, VALUE, BIT, COMMNT,
-     :                  STATUS )
+     :                  RDONLY, STATUS )
 
 *  If the name was not found, report an error.
       ELSE

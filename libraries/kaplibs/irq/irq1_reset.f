@@ -18,6 +18,8 @@
 *     re-used for a new quality name.  The number of free slots
 *     (located by LOCS(4) ) is incremented, and the slot number added
 *     to the list of free slots (located by LOCS(5) ).
+*
+*     An error occurs if the slot is flagged as read-only.
 
 *  Arguments:
 *     LOCS( 5 ) = CHARACTER * ( * ) (Given)
@@ -36,6 +38,7 @@
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -61,6 +64,8 @@
 *  History:
 *     26-JUL-1991 (DSB):
 *        Original version.
+*     15-FEB-2008 (DSB):
+*        Report an error if the slot is read-only.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -95,6 +100,7 @@
                                  ! of a QUAL cell.
       CHARACTER * ( DAT__SZLOC ) QCLOC ! Locator to a single cell
                                  ! in the QUAL array.
+      LOGICAL RDONLY             ! True if the the slot is read-only
       LOGICAL THERE              ! True if the components of QUAL
                                  ! already exist.
       CHARACTER * ( DAT__SZLOC ) TLOC ! Temporary locator to a single
@@ -127,6 +133,24 @@
          CALL ERR_REP( 'IRQ1_RESET_ERR1',
      :                 'IRQ1_RESET: Incomplete slot structure found',
      :                 STATUS )
+         GO TO 999
+      END IF
+
+*  If the "read-only" flag is set for this slot, report an error. Older
+*  versiosn of IRQ (pre 15/2/2008) did not store a read-only flag in the
+*  QUAL structure, so check for this, assuming .FALSE. if no flag is
+*  available.
+      CALL DAT_THERE( QCLOC, IRQ__RONAM, THERE, STATUS )
+      IF( THERE ) THEN
+         CALL CMP_GET0L( QCLOC, IRQ__RONAM, RDONLY, STATUS )
+         IF( RDONLY .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = IRQ__RDONL
+            CALL MSG_SETC( 'N', NAME )
+            CALL ERR_REP( 'IRQ1_RESET_ERR2', 'IRQ1_RESET: The '//
+     :                    'specified quality name (^N) is read-only.',
+     :                    STATUS )
+            GO TO 999
+         END IF        
       END IF
 
 *  If the slot has already been reset, then leave the slot as it is.

@@ -49,6 +49,7 @@
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -74,6 +75,8 @@
 *  History:
 *     25-JUL-1991 (DSB):
 *        Original version.
+*     15-FEB-2008 (DSB):
+*        Add RDONLY argument to IRQ1_SEARC.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -109,6 +112,7 @@
                                  ! quality names information.
       INTEGER LAST               ! Position of last non-blank character.
       CHARACTER LQNAME*(IRQ__SZQNM) ! Upper case copy of quality name.
+      LOGICAL RDONLY             ! Read-only flag for quality name.
       INTEGER SLOT               ! Index into the QUAL structure at
                                  ! which the new name will be stored.
       LOGICAL VALUE              ! True if all pixels hold the quality.
@@ -155,8 +159,8 @@
       CALL ERR_MARK
 
 *  See if the name is already defined. If, so report an error.
-      CALL IRQ1_SEARC( LOCS, LQNAME, FIXED, VALUE, BIT, COMMNT, SLOT,
-     :                 STATUS )
+      CALL IRQ1_SEARC( LOCS, LQNAME, FIXED, VALUE, BIT, COMMNT, RDONLY,
+     :                 SLOT, STATUS )
       IF( STATUS .EQ. SAI__OK ) THEN
          STATUS = IRQ__QNEXS
          CALL ERR_REP( 'IRQ_ADDQN_ERR3',

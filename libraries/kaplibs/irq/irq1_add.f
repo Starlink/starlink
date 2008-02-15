@@ -21,8 +21,9 @@
 *     none of the NDF pixels (as determined by DEFLT). Therefore FIXED
 *     is given a true value, and VALUE is set equal to DEFLT. The
 *     associated QUALITY bit is set to the illegal value of zero. The
-*     number of free slots in QUAL is decremented, and if necessary,
-*     the index of the last used slot in QUAL is modified.
+*     quality name is mad "read-write" (i.e. it can be deleted using 
+*     IRQ_REMQN). The number of free slots in QUAL is decremented, and 
+*     if necessary, the index of the last used slot in QUAL is modified.
 
 *  Arguments:
 *     LOCS( 5 ) = CHARACTER * ( * ) (Given)
@@ -49,6 +50,7 @@
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -74,6 +76,8 @@
 *  History:
 *     26-JUL-1991 (DSB):
 *        Original version.
+*     15-FEB-2008 (DSB):
+*        Added a read-only flag to the QUAL structure.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -176,6 +180,7 @@
       CALL CMP_PUT0L( QCLOC, IRQ__VLNAM, DEFLT, STATUS )
       CALL CMP_PUT0C( QCLOC, IRQ__CMNAM, COMMNT, STATUS )
       CALL CMP_PUT0I( QCLOC, IRQ__BTNAM, 0, STATUS )
+      CALL CMP_PUT0L( QCLOC, IRQ__RONAM, .FALSE., STATUS )
 
 *  If neccessary, update the last used slot number.
       CALL DAT_GET0I( LOCS(3), LUSED, STATUS )

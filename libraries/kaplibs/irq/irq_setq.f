@@ -35,6 +35,7 @@
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -60,6 +61,8 @@
 *  History:
 *     25-JUL-1991 (DSB):
 *        Original version.
+*     15-FEB-2008 (DSB):
+*        Added RDONLY to IRA1_SEARC and IRQ1_MOD call.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -94,6 +97,7 @@
                                  ! quality names information.
       INTEGER LAST               ! Position of last non-blank character.
       CHARACTER LQNAME*(IRQ__SZQNM) ! Upper case copy of quality name.
+      LOGICAL RDONLY             ! Read-only flag for quality name.
       INTEGER SLOT               ! Index into the QUALITY_NAMES
                                  ! structure at which the new name will
                                  ! be stored.
@@ -127,12 +131,12 @@
       CALL CHR_UCASE( LQNAME )
 
 *  Find the quality name information.
-      CALL IRQ1_SEARC( LOCS, LQNAME, FIXED, VALUE, BIT, COMMNT, SLOT,
-     :                 STATUS )
+      CALL IRQ1_SEARC( LOCS, LQNAME, FIXED, VALUE, BIT, COMMNT, RDONLY,
+     :                 SLOT, STATUS )
 
 *  Modify the FIXED and VALUE settings in the quality name
 *  information.
-      CALL IRQ1_MOD( LOCS, SLOT, .TRUE., .TRUE., BIT, STATUS )
+      CALL IRQ1_MOD( LOCS, SLOT, .TRUE., .TRUE., BIT, RDONLY, STATUS )
 
 *  If an error occur, give context information.
  999  CONTINUE
