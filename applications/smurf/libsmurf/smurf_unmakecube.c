@@ -327,7 +327,7 @@ void smurf_unmakecube( int *status ) {
 
 /* Get the WCS FrameSet from the (ra,dec,spectrum) cube, together with 
    its bounds. */
-   kpg1Asget( indf, 3, 1, 1, 1, sdim, slbnd, subnd, &wcsin, status );
+   kpg1Asget( indf, 3, 0, 1, 1, sdim, slbnd, subnd, &wcsin, status );
 
 /* Get the base->current Mapping from the input WCS FrameSet, and split it 
    into two Mappings; one (iskymap) that maps the first 2 GRID axes into 
