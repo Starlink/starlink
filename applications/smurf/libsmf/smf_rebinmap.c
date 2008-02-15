@@ -87,13 +87,16 @@
 *        updates deprecate smf_bbrebinmap.
 *     2008-02-13 (AGG):
 *        Add parameters for pixel spreading scheme
+*     2008-02-15 (AGG):
+*        Enable AST__GENVAR to return variances
 *     {enter_further_changes_here}
 
 *  Notes:
 *     Currently lon_0 and lat_0 are interpreted only as ra/dec of tangent point
 
 *  Copyright:
-*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
+*     Council. Copyright (C) 2005-2008 University of British Columbia
 *     All Rights Reserved.
 
 *  Licence:
@@ -256,7 +259,7 @@ void smf_rebinmap( smfData *data, int usebad, int indf, int index, int size,
       rebinflags = rebinflags | AST__REBINEND;
 
     /* Generate VARIANCE */
-    /*rebinflags = rebinflags | AST__GENVAR;*/
+    rebinflags = rebinflags | AST__GENVAR;
  
     /* Rebin this time slice */
     astRebinSeqD( bolo2map, 0.0, 2, lbnd_in, ubnd_in, &(boldata[i*nbol]),
