@@ -52,6 +52,7 @@
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 2002 Central Laboratory of the Research Councils.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -79,6 +80,8 @@
 *        Original version.
 *     17-JAN-2002 (DSB):
 *        Brought into KAPPA.
+*     15-FEB-2008 (DSB):
+*        Initialise NNAMES.
 *     {enter_further_changes_here}
 
 *-
@@ -135,6 +138,7 @@
 *  Obtain the quality names to be removed, storing them in the group
 *  just created. Loop until the group expression obtained from the
 *  environment does not terminate with a minus sign.
+      NNAMES = 0
       FLAG = .TRUE.
       DO WHILE( FLAG .AND. STATUS .EQ. SAI__OK )
 
