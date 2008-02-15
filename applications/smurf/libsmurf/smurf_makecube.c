@@ -742,8 +742,9 @@
 *        outside the polarisation bin loop.
 *     13-FEB-2008 (AGG):
 *        Factor out code for setting pixel-spreading parameters into new routine
-*     15-FEB-2008 (AGG):
-*        Expand the GENVAR documentation.
+*     15-FEB-2008 (DSB):
+*        - Expand the GENVAR documentation.
+*        - Display the bin angle for each polarisation bin.
 
 *  Copyright:
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
@@ -1498,8 +1499,9 @@ void smurf_makecube( int *status ) {
             if( !blank ) msgBlank( status );
             msgSeti( "I", ipbin + 1 );
             msgSeti( "N", npbin );
+            msgSetr( "A", (float) ( pangle[ ipbin ]*AST__DR2D ) );
             msgOutif( MSG__NORM, "PBIN_MSG1", "      Polarisation bin ^I of "
-                      "^N...", status );
+                      "^N (^A degrees)...", status );
             msgBlank( status );
             blank = 1;
          }
