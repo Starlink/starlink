@@ -207,10 +207,19 @@
 *
 *          - "Spread" -- the output Variance values are based on the spread 
 *          of input data values contributing to each output pixel. This option 
-*          is not available if parameter SPARSE is set TRUE. 
+*          is not available if parameter SPARSE is set TRUE. If the BADMASK 
+*          value is "OR" or "FIRST", then a single variance value will be
+*          produced for each output spectrum (i.e. all channels in an output
+*          spectrum will have the same variance value). If BADMASK is "AND",
+*          then an independent variance value will be calculated for each
+*          channel in each output spectrum.
 *
 *          - "Tsys" -- the output Variance values are based on the system 
-*          noise temperature values supplied in the input NDFs. 
+*          noise temperature values supplied in the input NDFs. Since
+*          each input spectrum is characterised by a single Tsys value,
+*          each output spectrum will have a constant Variance value (i.e. 
+*          all channels in an output spectrum will have the same variance 
+*          value). 
 *
 *          - "None" -- no output Variance values are created.
 *
@@ -733,6 +742,8 @@
 *        outside the polarisation bin loop.
 *     13-FEB-2008 (AGG):
 *        Factor out code for setting pixel-spreading parameters into new routine
+*     15-FEB-2008 (AGG):
+*        Expand the GENVAR documentation.
 
 *  Copyright:
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
