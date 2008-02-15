@@ -155,6 +155,8 @@
 *     2008-02-13 (AGG):
 *        Add SPREAD and PARAMS parameters to allow choice of
 *        pixel-spreading scheme, update call to smf_rebinmap
+*     2008-02-15 (AGG):
+*        Weights array is now written as an NDF extension
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -223,6 +225,7 @@ void smurf_qlmakemap( int *status ) {
   Grp *igrp = NULL;          /* Group of input files */
   int indf = 0;              /* NDF identifier of output file */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
+  int lbnd_wgt[3];           /* Lower pixel bounds for weight array */
   void *map = NULL;          /* Pointer to the rebinned map data */
   int moving = 0;            /* Flag to denote a moving object */
   int nparam = 0;            /* Number of extra parameters for pixel spreading scheme*/
@@ -242,9 +245,12 @@ void smurf_qlmakemap( int *status ) {
   char system[10];           /* Celestial coordinate system for output image */
   double tau;                /* 225 GHz optical depth */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
+  int ubnd_wgt[3];           /* Upper pixel bounds for weight array */
   int usebad;                /* Flag for whether to use bad bolos mask */
   void *variance = NULL;     /* Pointer to the variance map */
+  smfData *wdata = NULL;     /* Pointer to SCUBA2 data struct for weights */
   void *weights = NULL;      /* Pointer to the weights map */
+  HDSLoc *weightsloc=NULL;   /* HDS locator of weights array */
 
   /* Main routine */
   ndfBegin();
@@ -299,10 +305,30 @@ void smurf_qlmakemap( int *status ) {
     map = (odata->pntr)[0];
     variance = (odata->pntr)[1];
   }
+
+  /* Create WEIGHTS extension in the output file and map pointer to
+     weights array */
+  weightsloc = smf_get_xloc ( odata, "SMURF", "SCUBA2_WT_ARR", "WRITE", 
+                              0, 0, status );
+
+  /* Determine bounds of weights array - QLMAKEMAP always uses the
+     REBIN method so the weights bounds array is 3-D to ensure
+     variances are calculated */
+  lbnd_wgt[0] = lbnd_out[0];
+  ubnd_wgt[0] = ubnd_out[0];
+  lbnd_wgt[1] = lbnd_out[1];
+  ubnd_wgt[1] = ubnd_out[1];
+  lbnd_wgt[2] = 0;
+  ubnd_wgt[2] = 1;
+  smf_open_ndfname ( weightsloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
+                     3, lbnd_wgt, ubnd_wgt, &wdata, status );
+  if ( wdata ) weights = (wdata->pntr)[0];
+
+
   /* Allocate memory for weights and initialise to zero */
-  weights = smf_malloc( (ubnd_out[0]-lbnd_out[0]+1) *
+  /*  weights = smf_malloc( (ubnd_out[0]-lbnd_out[0]+1) *
 			(ubnd_out[1]-lbnd_out[1]+1), sizeof(double),
-			1, status );
+			1, status );*/
 
   /* Create provenance keymap */
   prvkeymap = astKeyMap( "" );
@@ -371,7 +397,7 @@ void smurf_qlmakemap( int *status ) {
   smf_close_file ( &odata, status );
   if ( ogrp != NULL ) grpDelet( &ogrp, status );
 
-  weights = smf_free( weights, status );
+  /*  weights = smf_free( weights, status );*/
   grpDelet( &igrp, status );
   
   ndfEnd( status );
