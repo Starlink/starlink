@@ -13,6 +13,9 @@
     when either a master starts an extraction, or the 3D scene starts
     moving the spectral extraction shape (region or line).
 
+    A bug displaying the extraction limits on the spectral plot which
+    caused the limits to be reversed when moving the graphics, has been fixed.
+
     New hot keys "1", "2" and "3" have been added to the 3D display for
     pointing an axis out of the screen. Note that the existing binding
     to "3" has been moved to "7" (switch to stereo mode).

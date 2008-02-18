@@ -40,6 +40,7 @@
 
 #  Copyright:
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2008 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -559,7 +560,7 @@ itcl::class gaia::GaiaCubeSpectrum {
                #  Create new shape.
                $toolbox_ parse_description $region
             }
-            
+
             #  And extract the spectrum.
             display_region_spectrum_ localstart $region
          } else {
@@ -627,7 +628,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       #  Cannot display the current coordinate, so make sure it is empty.
       $spectrum_ update_label ""
 
-      #  Eval the notification command, if have one. Note contract assumes 
+      #  Eval the notification command, if have one. Note contract assumes
       #  a single character string, no remove any newlines (polygon).
       if { $itk_option(-notify_cmd) != {} } {
          regsub -all {\n} $region { } region
@@ -1084,7 +1085,11 @@ itcl::class gaia::GaiaCubeSpectrum {
       }
 
       #  Update the bounds.
-      apply_limits $coord1 $coord2
+      if { $coord1 < $coord2 } {
+         apply_limits $coord1 $coord2
+      } else {
+         apply_limits $coord2 $coord1
+      }
 
       if { $action == "move" } {
          $itk_component(bounds) configure -show_ref_range $oldvalue
