@@ -257,6 +257,8 @@
 *        - Check for all ADAM parameters before call to smf_mapbounds
 *        - Change weightsloc to smurfloc
 *        - Add EXP_TIME component to output file
+*     2008-02-19 (AGG):
+*        Add status check before attempting to access hitsmap pointer
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -569,7 +571,7 @@ void smurf_makemap( int *status ) {
        note even if weights is a 3-D array we only use the first
        mapsize number of values which represent the `hits' per
        pixel */
-    for (i=0; i<mapsize; i++) {
+    for (i=0; (i<mapsize) && (*status == SAI__OK); i++) {
       if ( weights[i] == VAL__BADD ) {
 	exp_time[i] = VAL__BADR;
       } else {
@@ -623,7 +625,7 @@ void smurf_makemap( int *status ) {
 		    map, hitsmap, variance, weights, status );
 
     /* Calculate exposure time per output pixel from hitsmap */
-    for (i=0; i<mapsize; i++) {
+    for (i=0; (i<mapsize) && (*status == SAI__OK); i++) {
       if ( hitsmap[i] == VAL__BADI) {
 	exp_time[i] = VAL__BADR;
       } else {
