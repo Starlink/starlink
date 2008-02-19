@@ -40,6 +40,7 @@
 
 #  Copyright:
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2008 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -1070,7 +1071,11 @@ itcl::class gaia::GaiaCubeSpectrum {
       }
 
       #  Update the bounds.
-      apply_limits $coord1 $coord2
+      if { $coord1 < $coord2 } {
+         apply_limits $coord1 $coord2
+      } else {
+         apply_limits $coord2 $coord1
+      }
 
       if { $action == "move" } {
          $itk_component(bounds) configure -show_ref_range $oldvalue
