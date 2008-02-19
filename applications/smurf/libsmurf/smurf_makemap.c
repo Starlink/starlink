@@ -253,6 +253,10 @@
 *        pixel-spreading scheme, update call to smf_rebinmap
 *     2008-02-15 (AGG):
 *        Expand number of dimensions for weights array if using REBIN
+*     2008-02-18 (AGG):
+*        - Check for all ADAM parameters before call to smf_mapbounds
+*        - Change weightsloc to smurfloc
+*        - Add EXP_TIME component to output file
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -325,9 +329,11 @@ void smurf_makemap( int *status ) {
   /* Local Variables */
   Grp *confgrp = NULL;       /* Group containing configuration file */
   smfData *data=NULL;        /* Pointer to SCUBA2 data struct */
+  float *exp_time = NULL;    /* Exposure time array written to output file */
   AstFitsChan *fchan = NULL; /* FitsChan holding output NDF FITS extension */
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
   int flag;                  /* Flag */
+  unsigned int *hitsmap;     /* Hitsmap array calculated in ITERATE method */
   dim_t i;                   /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
   int indf = 0;              /* NDF identifier of output file */
@@ -337,6 +343,7 @@ void smurf_makemap( int *status ) {
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   int lbnd_wgt[3];           /* Lower pixel bounds for weight array */
   void *map=NULL;            /* Pointer to the rebinned map data */
+  size_t mapsize;            /* Number of pixels in output image */
   char method[LEN__METHOD];  /* String for map-making method */
   int moving = 0;            /* Is the telescope base position changing? */
   int nparam = 0;            /* Number of extra parameters for pixel spreading scheme*/
@@ -355,7 +362,10 @@ void smurf_makemap( int *status ) {
   int rebin=1;               /* Flag to denote whether to use the REBIN method */
   int size;                  /* Number of files in input group */
   int smfflags=0;            /* Flags for smfData */
+  HDSLoc *smurfloc=NULL;     /* HDS locator of SMURF extension */
   int spread;                /* Code for pixel spreading scheme */
+  smfData *tdata=NULL;       /* Exposure time data */
+  double steptime;           /* Integration time per sample, from FITS header */
   char system[10];           /* Celestial coordinate system for output image */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   int ubnd_wgt[3];           /* Upper pixel bounds for weight array */
@@ -364,8 +374,7 @@ void smurf_makemap( int *status ) {
 				lat_0 for output frameset */
   void *variance=NULL;       /* Pointer to the variance map */
   smfData *wdata=NULL;       /* Pointer to SCUBA2 data struct for weights */
-  void *weights=NULL;        /* Pointer to the weights map */
-  HDSLoc *weightsloc=NULL;   /* HDS locator of weights array */
+  double *weights=NULL;        /* Pointer to the weights map */
 
   /* Main routine */
   ndfBegin();
@@ -391,11 +400,10 @@ void smurf_makemap( int *status ) {
      unspecified, use the mask */
   parGtd0l ("USEBAD", 1, 1, &usebad, status);
 
-  /* Get METHOD */
+  /* Get METHOD - set rebin/iterate flags */
   parChoic( "METHOD", "REBIN", 
 	    "REBIN, ITERATE.", 1,
 	    method, LEN__METHOD, status);
-
   if( strncmp( method, "REBIN", 5 ) == 0 ) {
     rebin = 1;
     iterate = 0;
@@ -404,10 +412,33 @@ void smurf_makemap( int *status ) {
     iterate = 1;
   }
 
+  /* Get remaining parameters so errors are caught early */
+  if ( rebin ) {
+    parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
+	      "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
+	      1, pabuf, 10, status );
+
+    smf_get_spread( pabuf, &spread, &nparam, status );
+
+    /* Get an additional parameter vector if required. */
+    if ( nparam > 0 ) parExacd( "PARAMS", nparam, params, status );
+  } else if ( iterate ) {
+    /* Read a group of configuration settings into keymap */
+    parState( "CONFIG", &parstate, status );
+    if( parstate == PAR__ACTIVE ) {
+      kpg1Gtgrp( "CONFIG", &confgrp, &ksize, status );
+      kpg1Kymap( confgrp, &keymap, status );
+      if( confgrp ) grpDelet( &confgrp, status );      
+    } else {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "CONFIG unspecified", status);      
+    }
+  }
+
   /* Calculate the map bounds */
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Determine map bounds", status);
-  smf_mapbounds( igrp, size, system, 0, 0, uselonlat, pixsize, lbnd_out, ubnd_out, 
-		 &outfset, &moving, status );
+  smf_mapbounds( igrp, size, system, 0.0, 0.0, uselonlat, pixsize, 
+		 lbnd_out, ubnd_out, &outfset, &moving, status );
   if (*status != SAI__OK) {
     errRep(FUNC_NAME, "Unable to determine map bounds", status);
   }
@@ -437,38 +468,37 @@ void smurf_makemap( int *status ) {
   /* Create provenance keymap */
   prvkeymap = astKeyMap( "" );
 
-  /* Create WEIGHTS extension in the output file and map pointer to
-     weights array */
-  weightsloc = smf_get_xloc ( odata, "SMURF", "SCUBA2_WT_ARR", "WRITE", 
-                              0, 0, status );
+  /* Compute number of pixels in output map */
+  mapsize = (ubnd_out[0] - lbnd_out[0] + 1) * (ubnd_out[1] - lbnd_out[1] + 1);
 
+  /* Create SMURF extension in the output file and map pointers to
+     WEIGHTS and EXP_TIME arrays */
+  smurfloc = smf_get_xloc ( odata, "SMURF", "SMURF", "WRITE", 0, 0, status );
   /* Determine bounds of weights array */
   lbnd_wgt[0] = lbnd_out[0];
   ubnd_wgt[0] = ubnd_out[0];
   lbnd_wgt[1] = lbnd_out[1];
   ubnd_wgt[1] = ubnd_out[1];
-  /* If using the REBIN method, allocated extra work space for
-     calculating variances */
+  /* Allocate extra work space for calculating variances for the REBIN
+     method - perhaps the ITERATE method should be brought into line
+     with rebin? */
   if ( rebin ) {
-    lbnd_wgt[nwgtdim] = 0;
-    ubnd_wgt[nwgtdim] = 1;
+    lbnd_wgt[2] = 0;
+    ubnd_wgt[2] = 1;
     nwgtdim = 3;
   }
-  smf_open_ndfname ( weightsloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
+  /* Create WEIGHTS component in output file */
+  smf_open_ndfname ( smurfloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
                      nwgtdim, lbnd_wgt, ubnd_wgt, &wdata, status );
   if ( wdata ) weights = (wdata->pntr)[0];
 
-  /* Create the map using the chosen METHOD */
-  if( rebin ) {
-    parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
-	      "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
-	      1, pabuf, 10, status );
+  /* Create EXP_TIME component in output file */
+  smf_open_ndfname ( smurfloc, "WRITE", NULL, "EXP_TIME", "NEW", "_REAL",
+		     2, lbnd_out, ubnd_out, &tdata, status );
+  if ( tdata ) exp_time = (tdata->pntr)[0];
 
-    smf_get_spread( pabuf, &spread, &nparam, status );
-
-    /* Get an additional parameter vector if required. */
-    if ( nparam > 0 ) parExacd( "PARAMS", nparam, params, status );
-
+  /* Create the output map using the chosen METHOD */
+  if ( rebin ) {
     /* Simple Regrid of the data */
     msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using REBIN method", 
 	     status);
@@ -501,9 +531,13 @@ void smurf_makemap( int *status ) {
 	}
       }
 
+      /* Store steptime for calculating EXP_TIME */
+      if ( i==1 ) {
+	smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
+      }
+
       /* Store the filename in the keymap for later - the GRP would be fine
 	 as is but we use a keymap in order to reuse smf_fits_add_prov */
-
       if (*status == SAI__OK)
         smf_accumulate_prov( prvkeymap, data->file, igrp, i, status );
 
@@ -529,24 +563,28 @@ void smurf_makemap( int *status ) {
 	errRep(FUNC_NAME, "Rebinning step failed", status);
 	break;
       }
+
     }
-  } else if( iterate ) {
+    /* Calculate exposure time per output pixel from weights array -
+       note even if weights is a 3-D array we only use the first
+       mapsize number of values which represent the `hits' per
+       pixel */
+    for (i=0; i<mapsize; i++) {
+      if ( weights[i] == VAL__BADD ) {
+	exp_time[i] = VAL__BADR;
+      } else {
+	exp_time[i] = steptime * weights[i];
+      }
+    }
+  } else if ( iterate ) {
 
     /* Iterative map-maker */
     msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using ITERATE method", 
 	     status);
 
-    /* Read a group of configuration settings into keymap */
-    parState( "CONFIG", &parstate, status );
-    if( parstate == PAR__ACTIVE ) {
-      kpg1Gtgrp( "CONFIG", &confgrp, &ksize, status );
-      kpg1Kymap( confgrp, &keymap, status );
-      if( confgrp ) grpDelet( &confgrp, status );      
-    } else {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "CONFIG unspecified", status);      
-    }
-    
+    /* Allocate space for hitsmap */
+    hitsmap = smf_malloc( mapsize, sizeof (int), 1, status);
+
     /* Loop over all input data files to setup provenance handling */
     if( *status == SAI__OK ) {
       for(i=1; i<=size; i++ ) {	
@@ -556,6 +594,11 @@ void smurf_makemap( int *status ) {
           errRep(FUNC_NAME, "Bad status opening smfData", status);      
         }
         
+	/* Store steptime for calculating EXP_TIME */
+	if ( i==1 ) {
+	  smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
+	}
+
 	/* Store the filename in the keymap for later - the GRP would be fine
 	   as is but we use a keymap in order to reuse smf_fits_add_prov */
 	if (*status == SAI__OK)
@@ -577,7 +620,17 @@ void smurf_makemap( int *status ) {
 
     /* Call the low-level iterative map-maker */
     smf_iteratemap( igrp, keymap, outfset, moving, lbnd_out, ubnd_out,
-		    map, NULL, variance, weights, status );
+		    map, hitsmap, variance, weights, status );
+
+    /* Calculate exposure time per output pixel from hitsmap */
+    for (i=0; i<mapsize; i++) {
+      if ( hitsmap[i] == VAL__BADI) {
+	exp_time[i] = VAL__BADR;
+      } else {
+	exp_time[i] = steptime * hitsmap[i];
+      }
+    }
+    smf_free( hitsmap, status );
   }
 
   /* Write WCS */
