@@ -22,12 +22,16 @@
 *        Pointer to global status.
 
 *  Description:
-*     This is the main routine implementing the quick-look polynomial
-*     sky subtraction. 
+*     This is the main routine implementing the subtraction of a
+*     polynomial from the data. The polynomial is previously
+*     independently fitted to the timestream for each detector. The
+*     polynomial coefficients are retrieved from the input
+*     smfData. The routine returns immediately if there is no
+*     polynomial extension.
 
 *  Notes:
 *     Is is assumed that the polynomial is a function of the timeslice
-*     index.
+*     index and not of a physical quantity (i.e. time).
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -38,11 +42,13 @@
 *        Initial test version
 *     2006-04-21 (AGG):
 *        Add history check, and update history if routine successful
+*     2008-02-19 (AGG):
+*        Minor comment/documentation changes, use size_t
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2006-2008 University of British Columbia. All
+*     Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -86,21 +92,20 @@
 void smf_subtract_poly(smfData *data, int *status) {
 
   /* Local variables */
-  int i;                      /* Bolometer index loop counter */
-  int j;                      /* Timeslice index loop counter */
-  int k;                      /* Coefficient index loop counter */
-  int nbol;                   /* Number of bolometers */
-  int nframes;                /* Number of time slices */
-
-  double *outdata = NULL;            /* Pointer to output data array */
   double baseline = 0.0;      /* Baseline level to be subtracted */
-
-  double *poly;
-  int ncoeff;
+  size_t i;                   /* Bolometer index loop counter */
+  size_t j;                   /* Timeslice index loop counter */
+  size_t k;                   /* Coefficient index loop counter */
+  size_t nbol;                /* Number of bolometers */
+  size_t ncoeff = 0;          /* Number of polynomial coefficients */
+  size_t nframes;             /* Number of time slices */
+  double *outdata = NULL;     /* Pointer to output data array */
+  double *poly = NULL;        /* Pointer to polynomial coefficents */
 
   /* Check status */
   if (*status != SAI__OK) return;
 
+  /* Return if this has already been done */
   if ( smf_history_check( data, FUNC_NAME, status) ) return;
 
   /* Retrieve polynomial data */
@@ -129,7 +134,7 @@ void smf_subtract_poly(smfData *data, int *status) {
       /* Construct the polynomial for this bolometer */
       baseline = 0.0;
       for (k=0; k<ncoeff; k++) {
-	baseline += poly[i + nbol*k] * (double)pow(j, k);
+	baseline += poly[i + nbol*k] * pow((double)j, (double)k);
       }
       outdata[i + nbol*j] -= baseline;
     }
@@ -141,7 +146,7 @@ void smf_subtract_poly(smfData *data, int *status) {
   /* Write history entry */
   if ( *status == SAI__OK ) {
     smf_history_add( data, FUNC_NAME, 
-		       "Polynomial sky subtraction successful", status);
+		       "Polynomial subtraction successful", status);
   } else {
     errRep(FUNC_NAME, "Error: status set bad. Possible programming error.", 
 	   status);
