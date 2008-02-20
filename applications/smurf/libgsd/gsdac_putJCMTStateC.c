@@ -13,7 +13,7 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_putJCMTStateC ( const gsdVars *gsdVars, const int dasFlag,
+*     gsdac_putJCMTStateC ( const gsdVars *gsdVars, const dasFlag dasFlag,
 *                           const gsdWCS *wcs,
 *                           const unsigned int stepNum,
 *                           const char *backend,
@@ -22,7 +22,7 @@
 *  Arguments:
 *     gsdVars = const gsdVars* (Given)
 *        GSD headers and arrays
-*     dasFlag = const int (Given)
+*     dasFlag = const dasFlag (Given)
 *        DAS file structure type
 *     wcs = const gsdWCS* (Given)
 *        Pointing and time values
@@ -93,7 +93,7 @@
 
 #define FUNC_NAME "gsdac_putJCMTStateC"
 
-void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const int dasFlag,
+void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const dasFlag dasFlag,
                            const gsdWCS *wcs,
                            const unsigned int stepNum, 
                            const char *backend,

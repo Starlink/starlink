@@ -14,14 +14,14 @@
 
 *  Invocation:
 *     gsdac_getGSDVars ( const gsdac_gsd_struct *gsd,
-*                        const int dasFlag,
+*                        const dasFlag dasFlag,
 *                        struct gsdac_gsdVars_struct *gsdVars,
 *                        int *status );
 
 *  Arguments:
 *     gsd = const gsdac_gsd_struct* (Given)
 *        GSD file access parameters
-*     dasFlag = const int (Given)
+*     dasFlag = const dasFlag (Given)
 *        DAS file type
 *     gsdVars = gsdac_gsdVars_struct* (Given and returned)
 *        GSD headers and array data 
@@ -76,7 +76,7 @@
 #define FUNC_NAME "gsdac_getGSDVars.c"
 
 void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
-                        const int dasFlag,
+                        const dasFlag dasFlag,
                         struct gsdac_gsdVars_struct *gsdVars,
                         int *status )
 {

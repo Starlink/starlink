@@ -97,7 +97,7 @@
 void smurf_gsd2acsis( int *status ) {
 
   /* Local variables */
-  int dasFlag;                /* file structure type */
+  dasFlag dasFlag;            /* file structure type */
   char directory[MAXNAME];    /* directory to write the file */
   char filename[MAXNAME];     /* name of the GSD file */
   struct gsdac_gsd_struct gsd; /* GSD file access parameters */

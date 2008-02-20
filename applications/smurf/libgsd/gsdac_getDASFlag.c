@@ -14,12 +14,12 @@
 
 *  Invocation:
 *     gsdac_getDASFlag ( const gsdac_gsd_struct *gsd,
-*                        int *dasFlag, int *status );
+*                        dasFlag *dasFlag, int *status );
 
 *  Arguments:
 *     gsd = const gsdac_gsd_struct* (Given)
 *        GSD file access parameters
-*     dasFlag = int* (Given and Returned)
+*     dasFlag = dasFlag* (Given and Returned)
 *        DAS file type
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -73,7 +73,7 @@
 #define FUNC_NAME "gsdac_getDASFlag.c"
 
 void gsdac_getDASFlag ( const struct gsdac_gsd_struct *gsd,
-                        int *dasFlag, int *status )
+                        dasFlag *dasFlag, int *status )
 {
 
   /* Local variables. */

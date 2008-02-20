@@ -69,7 +69,7 @@
 
 void gsdac_freeArrays
 (
-const int dasFlag,      /* DAS file structure flag (given) */
+const dasFlag dasFlag,  /* DAS file structure flag (given) */
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 int *status          /* pointer to global status (given and returned) */
 );
@@ -204,7 +204,7 @@ int *statuss         /* pointer to global status (given and returned) */
 void gsdac_getDASFlag
 (
 const gsd *gsd,      /* GSD file access parameters (given) */
-int *dasFlag,        /* DAS file type (given and returned) */
+dasFlag *dasFlag,        /* DAS file type (given and returned) */
 int *status          /* pointer to global status (given and returned) */ 
 );
 
@@ -228,7 +228,7 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_getGSDVars
 ( 
 const gsd *gsd,      /* GSD file access parameters (given) */
-const int dasFlag,   /* DAS file type (given) */
+const dasFlag dasFlag, /* DAS file type (given) */
 gsdVars *gsdVars,    /* GSD headers and arrays (given and returned) */
 int *status          /* pointer to global status (given and returned) */
 );
@@ -300,7 +300,7 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_putJCMTStateC
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
-int dasFlag,            /* DAS file structure flag (given) */
+const dasFlag dasFlag,            /* DAS file structure flag (given) */
 const gsdWCS *wcs,      /* pointing and time values (given) */
 const unsigned int stepNum,    /* time step of this spectrum (given) */
 const char *backend,      /* name of the backend (given) */
@@ -311,7 +311,7 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_putJCMTStateS
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
-int dasFlag,            /* DAS file structure flag (given) */
+const dasFlag dasFlag,            /* DAS file structure flag (given) */
 const unsigned int stepNum,    /* time step of this spectrum (given) */
 const unsigned int subsysNum, /* subsystem number (given) */
 struct JCMTState *record, /* JCMTState headers (given and returned ) */
@@ -332,7 +332,7 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_wrtData
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
-const int dasFlag,      /* DAS file structure flag (given) */
+const dasFlag dasFlag,      /* DAS file structure flag (given) */
 const char *directory,     /* output write directory (given) */
 const int nSteps,    /* number of steps in the observation (given) */
 int *status          /* pointer to global status (given and returned) */

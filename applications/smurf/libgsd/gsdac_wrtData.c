@@ -13,13 +13,13 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_wrtData ( const gsdVars *gsdVars, const int dasFlag, 
+*     gsdac_wrtData ( const gsdVars *gsdVars, const dasFlag dasFlag, 
 *                     char *directory, const int nSteps, int *status );
 
 *  Arguments:
 *     gsdVars = const gsdVars* (Given)
 *        GSD headers and arrays
-*     dasFlag = const int (Given)
+*     dasFlag = const dasFlag (Given)
 *        DAS file structure type
 *     directory = char* (Given)
 *        Directory to write the file
@@ -44,6 +44,8 @@
 *        Use gsdVars struct to store headers/arrays
 *     2008-02-19 (JB):
 *        Check dasFlag, fill gsdWCS
+*     2008-02-20 (JB):
+*        Set memory usage for specwrite
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -92,7 +94,7 @@
 #define MAXRECEP 8  
 #define MAXSUBSYS 16
 
-void gsdac_wrtData ( const gsdVars *gsdVars, const int dasFlag, 
+void gsdac_wrtData ( const gsdVars *gsdVars, const dasFlag dasFlag, 
                      const char *directory, const int nSteps, int *status )
 {
 
@@ -205,8 +207,9 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const int dasFlag,
   /* Determine how much memory we need and set the memory
      allocation in specwrite accordingly.  acsSpecSetMem wants
      to know how many bytes to allocate. */
-  //mem = (double)spectrumSize * sizeof (float) / (double)( nSubsys );
-  //acsSpecSetMem ( mem,status );   
+  mem = gsdVars->nBEChansOut * gsdVars->noScans * 
+        gsdVars->nScanPts * sizeof(float);
+  acsSpecSetMem ( mem, status );   
 
   msgOutif(MSG__VERB," ", 
 	     "Preparing file writing system", status); 

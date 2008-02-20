@@ -13,7 +13,7 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_putJCMTStateS ( const gsdVars *gsdVars, const int dasFlag,  
+*     gsdac_putJCMTStateS ( const gsdVars *gsdVars, const dasFlag dasFlag,  
 *                           const unsigned int stepNum, 
 *                           const unsigned int subsysNum, 
 *                           struct JCMTState *record, 
@@ -22,7 +22,7 @@
 *  Arguments:
 *     gsdVars = const gsdVars* (Given)
 *        GSD headers and arrays
-*     dasFlag = const int (Given)
+*     dasFlag = const dasFlag (Given)
 *        DAS file structure type
 *     stepNum = const unsigned int (Given)
 *        time step of this spectrum
@@ -87,7 +87,7 @@
 #include "gsdac.h"
 #include "jcmt/state.h"
 
-void gsdac_putJCMTStateS ( const gsdVars *gsdVars, const int dasFlag,
+void gsdac_putJCMTStateS ( const gsdVars *gsdVars, const dasFlag dasFlag,
                            const unsigned int stepNum, 
                            const unsigned int subsysNum,
                            struct JCMTState *record, int *status )
