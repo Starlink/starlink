@@ -258,7 +258,8 @@
 *        - Change weightsloc to smurfloc
 *        - Add EXP_TIME component to output file
 *     2008-02-19 (AGG):
-*        Add status check before attempting to access hitsmap pointer
+*        - Add status check before attempting to access hitsmap pointer
+*        - Set exp_time values to BAD if no data exists for that pixel
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -344,7 +345,7 @@ void smurf_makemap( int *status ) {
   int ksize=0;               /* Size of group containing CONFIG file */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   int lbnd_wgt[3];           /* Lower pixel bounds for weight array */
-  void *map=NULL;            /* Pointer to the rebinned map data */
+  double *map=NULL;          /* Pointer to the rebinned map data */
   size_t mapsize;            /* Number of pixels in output image */
   char method[LEN__METHOD];  /* String for map-making method */
   int moving = 0;            /* Is the telescope base position changing? */
@@ -366,9 +367,9 @@ void smurf_makemap( int *status ) {
   int smfflags=0;            /* Flags for smfData */
   HDSLoc *smurfloc=NULL;     /* HDS locator of SMURF extension */
   int spread;                /* Code for pixel spreading scheme */
-  smfData *tdata=NULL;       /* Exposure time data */
   double steptime;           /* Integration time per sample, from FITS header */
   char system[10];           /* Celestial coordinate system for output image */
+  smfData *tdata=NULL;       /* Exposure time data */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   int ubnd_wgt[3];           /* Upper pixel bounds for weight array */
   int usebad;                /* Flag for whether to use bad bolos mask */
@@ -572,7 +573,7 @@ void smurf_makemap( int *status ) {
        mapsize number of values which represent the `hits' per
        pixel */
     for (i=0; (i<mapsize) && (*status == SAI__OK); i++) {
-      if ( weights[i] == VAL__BADD ) {
+      if ( map[i] == VAL__BADD ) {
 	exp_time[i] = VAL__BADR;
       } else {
 	exp_time[i] = steptime * weights[i];
@@ -626,7 +627,7 @@ void smurf_makemap( int *status ) {
 
     /* Calculate exposure time per output pixel from hitsmap */
     for (i=0; (i<mapsize) && (*status == SAI__OK); i++) {
-      if ( hitsmap[i] == VAL__BADI) {
+      if ( map[i] == VAL__BADD) {
 	exp_time[i] = VAL__BADR;
       } else {
 	exp_time[i] = steptime * hitsmap[i];
