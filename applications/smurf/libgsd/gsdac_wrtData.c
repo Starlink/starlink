@@ -13,12 +13,14 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_wrtData ( const gsdVars *gsdVars, char *directory, 
-*                     const int nSteps, int *status );
+*     gsdac_wrtData ( const gsdVars *gsdVars, const int dasFlag, 
+*                     char *directory, const int nSteps, int *status );
 
 *  Arguments:
 *     gsdVars = const gsdVars* (Given)
 *        GSD headers and arrays
+*     dasFlag = const int (Given)
+*        DAS file structure type
 *     directory = char* (Given)
 *        Directory to write the file
 *     nSteps = const int (Given)
@@ -40,6 +42,8 @@
 *        Original.
 *     2008-02-14 (JB):
 *        Use gsdVars struct to store headers/arrays
+*     2008-02-19 (JB):
+*        Check dasFlag, fill gsdWCS
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -88,8 +92,8 @@
 #define MAXRECEP 8  
 #define MAXSUBSYS 16
 
-void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory, 
-                     const int nSteps, int *status )
+void gsdac_wrtData ( const gsdVars *gsdVars, const int dasFlag, 
+                     const char *directory, const int nSteps, int *status )
 {
 
   /* Local variables */
@@ -99,7 +103,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   char *focalStation = NULL;  /* focal station of the instrument */
   float fPlaneX[MAXRECEP]; 
   float fPlaneY[MAXRECEP];
-  int i;                      /* loop counter */
+  long i;                     /* loop counter */
   double mem;                 /* amount of memory for spectrum */
   unsigned int obsNum;        /* current observation number */
   char obsType[SZFITSCARD];   /* type of observation */
@@ -114,6 +118,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   unsigned int stepNum;       /* current step */
   unsigned int subsysNum;     /* subsystem used for the current spectrum */
   unsigned int utDate;        /* UT date in YYYYMMDD format */
+  gsdWCS wcs[nSteps];         /* pointing and time values for JCMTState */
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
@@ -226,13 +231,19 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
     return;
   } 
 
-  /* Allocate memory for JCMTState, SpecHdr, and data. */
+  /* Allocate memory for JCMTState, and SpecHdr. */
   record = smf_malloc ( 1, sizeof ( *record ), 0, status );
   specHdr = smf_malloc ( 1, sizeof ( *specHdr ), 0, status );
 
+  msgOutif(MSG__VERB," ", 
+	     "Getting times and pointing values", status); 
+
+  /* Get the pointing and time values. */
+  gsdac_getWCS ( gsdVars, nSteps, wcs, status );
+
   /* Get the size of the data array */
   spectrumSize = gsdVars->nBEChansOut * gsdVars->nScanPts * gsdVars->noScans;
-                 
+                
   /* Flag bad values in the data. */
   for ( i = 0; i < spectrumSize; i++ ) {
     if ( (gsdVars->data)[i] == 9999 ) (gsdVars->data)[i] = VAL__BADR;
@@ -244,13 +255,15 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
     specIndex = ( stepNum * spectrumSize ) / nSteps;
 
     /* Fill JCMTState. */
-    gsdac_putJCMTStateC ( gsdVars, stepNum, backend, record, status );  
+    gsdac_putJCMTStateC ( gsdVars, dasFlag, wcs, stepNum, backend, 
+                          record, status );  
 
     /* For each subsystem, write the files. */
     for ( subsysNum = 1; subsysNum <= gsdVars->nBESections; subsysNum++ ) {
 
       /* Get the subsystem-dependent JCMTState values. */
-      gsdac_putJCMTStateS ( gsdVars, stepNum, subsysNum, record, status );
+      gsdac_putJCMTStateS ( gsdVars, dasFlag, stepNum, subsysNum, 
+                            record, status );
 
       /* Get the ACSIS SpecHdr. */
       gsdac_putSpecHdr ( gsdVars, nSteps, stepNum, subsysNum, record, 
@@ -269,7 +282,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
 
       /* Fill the FITS headers. */
       gsdac_putFits ( gsdVars, subsysNum, obsNum, utDate, nSteps, backend, 
-                      recepNames, samMode, obsType, record, 
+                      recepNames, samMode, obsType, wcs, 
                       fitschan[fitsIndex], status ); 
 
       specIndex = specIndex + (gsdVars->BEChans)[subsysNum-1];

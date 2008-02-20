@@ -40,6 +40,8 @@
 *        Original version.
 *     14-FEB-2008 (JB):
 *        Use gsdVars struct to store headers/arrays
+*     19-FEB-2008 (JB):
+*        Check dasFlag
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -95,6 +97,7 @@
 void smurf_gsd2acsis( int *status ) {
 
   /* Local variables */
+  int dasFlag;                /* file structure type */
   char directory[MAXNAME];    /* directory to write the file */
   char filename[MAXNAME];     /* name of the GSD file */
   struct gsdac_gsd_struct gsd; /* GSD file access parameters */
@@ -140,8 +143,27 @@ void smurf_gsd2acsis( int *status ) {
     }
   }
 
+  /* Get the file structure flag. */
+  gsdac_getDASFlag ( &gsd, &dasFlag, status );
+
+  if ( dasFlag == DAS_NONE ) 
+    msgOutif(MSG__VERB," ", 
+	     "DAS file type is DAS_NONE", status);
+  else if ( dasFlag == DAS_TP ) 
+    msgOutif(MSG__VERB," ", 
+	     "DAS file type is DAS_TP", status); 
+  else if ( dasFlag == DAS_CONT_CAL ) 
+    msgOutif(MSG__VERB," ", 
+	     "DAS file type is DAS_CONT_CAL", status); 
+  else if ( dasFlag == DAS_CROSS_CORR ) 
+    msgOutif(MSG__VERB," ", 
+	     "DAS file type is DAS_CROSS_CORR", status); 
+  else  
+    msgOutif(MSG__VERB," ", 
+	     "DAS file type is incorrect!", status); 
+
   /* Get the GSD file headers and data arrays. */
-  gsdac_getGSDVars ( &gsd, &gsdVars, status );
+  gsdac_getGSDVars ( &gsd, dasFlag, &gsdVars, status );
 
   if ( *status != SAI__OK ) {
     *status = SAI__ERROR;
@@ -165,9 +187,9 @@ void smurf_gsd2acsis( int *status ) {
   nSteps = gsdVars.noScans * gsdVars.nScanPts;
 
   /* Convert and write out the new file. */
-  gsdac_wrtData ( &gsdVars, directory, nSteps, status );
+  gsdac_wrtData ( &gsdVars, dasFlag, directory, nSteps, status );
 
-  gsdac_freeArrays ( &gsdVars, status );
+  gsdac_freeArrays ( dasFlag, &gsdVars, status );
 
   if ( *status == SAI__OK ) {
     printf ( "Conversion completed successfully.\n" );

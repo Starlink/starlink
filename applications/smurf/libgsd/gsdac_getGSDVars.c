@@ -14,12 +14,15 @@
 
 *  Invocation:
 *     gsdac_getGSDVars ( const gsdac_gsd_struct *gsd,
+*                        const int dasFlag,
 *                        struct gsdac_gsdVars_struct *gsdVars,
 *                        int *status );
 
 *  Arguments:
 *     gsd = const gsdac_gsd_struct* (Given)
 *        GSD file access parameters
+*     dasFlag = const int (Given)
+*        DAS file type
 *     gsdVars = gsdac_gsdVars_struct* (Given and returned)
 *        GSD headers and array data 
 *     status = int* (Given and Returned)
@@ -35,6 +38,8 @@
 *  History:
 *     2008-02-12 (JB):
 *        Original.
+*     2008-02-19 (JB):
+*        Check dasFlag, get CROSS_CORR and TP data
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -71,6 +76,7 @@
 #define FUNC_NAME "gsdac_getGSDVars.c"
 
 void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
+                        const int dasFlag,
                         struct gsdac_gsdVars_struct *gsdVars,
                         int *status )
 {
@@ -328,6 +334,60 @@ void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
   /* Get the sideband mode. */
   gsdac_get0c ( gsd, "C3SBMODE", gsdVars->sbMode, status );
 
+  if ( dasFlag == DAS_TP || dasFlag == DAS_CROSS_CORR ) {
+
+    /* Get the interferometry observation values. */
+    gsdac_get0i ( gsd, "C55NPH", &(gsdVars->IFONPhase), status );
+
+    /* Get the data processing values. */
+    gsdac_get0i ( gsd, "C55DASPRBIT", &(gsdVars->procBits), status );
+    gsdac_get0c ( gsd, "C55DASPRLOC", gsdVars->procLoc, status );
+
+  }
+
+  if ( dasFlag == DAS_CROSS_CORR ) {
+
+    /* Get the cross correlation values. */
+    gsdac_get0i ( gsd, "C55NCYC", &(gsdVars->IFONCycle), status );
+    gsdac_get0i ( gsd, "C55NINT", &(gsdVars->IFONIntCycle), status );
+    gsdac_get0i ( gsd, "C55NCORR", &(gsdVars->nCorrCycle), status );
+    gsdac_get0d ( gsd, "C55LX", &(gsdVars->RXJLengthX), status );
+    gsdac_get0d ( gsd, "C55LY", &(gsdVars->RXJLengthY), status );
+    gsdac_get0d ( gsd, "C55LZ", &(gsdVars->RXJLengthZ), status );
+    gsdac_get0d ( gsd, "C55A", &(gsdVars->RXJSin), status );
+    gsdac_get0d ( gsd, "C55B", &(gsdVars->RXJCos), status );
+    gsdac_get0d ( gsd, "C55C", &(gsdVars->RXJConstant), status );
+    gsdac_get0i ( gsd, "C55CSOSW", &(gsdVars->RXJCSOSwitch), status );
+    gsdac_get0i ( gsd, "C55JCMTSW", &(gsdVars->RXJJCMTSwitch), status );
+    gsdac_get0i ( gsd, "C55SECOND", &(gsdVars->RXJNSecs), status );
+    gsdac_get0c ( gsd, "C55ABSORB", gsdVars->CSOAbsorb, status );
+    gsdac_get0r ( gsd, "C55TAU", &(gsdVars->CSOTau), status );
+    gsdac_get0r ( gsd, "C55DAZ", &(gsdVars->CSODAz), status );
+    gsdac_get0r ( gsd, "C55DEL", &(gsdVars->CSODEl), status );
+    gsdac_get0d ( gsd, "C55RA", &(gsdVars->CSORA), status );
+    gsdac_get0d ( gsd, "C55DEC", &(gsdVars->CSODec), status );
+    gsdac_get0d ( gsd, "C55EPOCH", &(gsdVars->CSOEpoch), status );
+    gsdac_get0r ( gsd, "C55PAZ", &(gsdVars->CSOPAz), status );
+    gsdac_get0r ( gsd, "C55PEL", &(gsdVars->CSOPEl), status );
+    gsdac_get0c ( gsd, "C55TRACK", gsdVars->CSOTrack, status );
+    gsdac_get0c ( gsd, "C55FMODE", gsdVars->CSOFocus, status );
+    gsdac_get0r ( gsd, "C55FX", &(gsdVars->CSOFocusX), status );
+    gsdac_get0r ( gsd, "C55FY", &(gsdVars->CSOFocusY), status );
+    gsdac_get0r ( gsd, "C55FZ", &(gsdVars->CSOFocusZ), status );
+    gsdac_get0r ( gsd, "C55VLSR", &(gsdVars->CSOVelocity), status );
+    gsdac_get0r ( gsd, "C55VOFF", &(gsdVars->CSOVelOffset), status );
+    gsdac_get0r ( gsd, "C55VRAD", &(gsdVars->CSORadVel), status );
+    gsdac_get0c ( gsd, "C55PLOCK", gsdVars->CSOPhaseLock, status );
+    gsdac_get0d ( gsd, "C55RFREQ", &(gsdVars->CSORestFreq), status );
+    gsdac_get0d ( gsd, "C55IFFREQ", &(gsdVars->CSOIFFreq), status );
+    gsdac_get0d ( gsd, "C55FREQOFF", &(gsdVars->CSOFreqOffset), status );
+    gsdac_get0c ( gsd, "C55SIDEBAND", gsdVars->CSOSideband, status );
+    gsdac_get0i ( gsd, "C55MHN", &(gsdVars->CSOMultHarm), status );
+    gsdac_get0i ( gsd, "C55CSOSTATUS", &(gsdVars->CSOStatus), status );
+    gsdac_get0d ( gsd, "C55TELAZ", &(gsdVars->telAz), status );
+    gsdac_get0d ( gsd, "C55TELEL", &(gsdVars->telEl), status );
+  }
+
   if ( *status != SAI__OK ) {
     *status = SAI__ERROR;
     errRep ( FUNC_NAME, "Error getting scalar GSD headers", status );
@@ -335,62 +395,157 @@ void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
   }
 
   /* Allocate memory for the GSD arrays. */
-  gsdVars->vRadial = smf_malloc ( gsdVars->nVRad, sizeof(double), 0, status );
-  gsdVars->scanVars1 = smf_malloc ( gsdVars->nScanVars1, MAXSTRING-1, 
-                                    0, status );
-  gsdVars->scanVars2 = smf_malloc ( gsdVars->nScanVars2, MAXSTRING-1, 
-                                    0, status );  
+
+  if ( dasFlag == DAS_CROSS_CORR ) {
+    gsdVars->FEFreqs = smf_malloc ( gsdVars->nFEChans, 
+                                    sizeof(double), 0, status );
+    gsdVars->FESBSigns = smf_malloc ( gsdVars->nFEChans, 
+                                      sizeof(int), 0, status );   
+    gsdVars->FELOFreqs = smf_malloc ( gsdVars->nFEChans, 
+                                      sizeof(double), 0, status );   
+  }
+
+  if ( dasFlag == DAS_NONE || dasFlag == DAS_CONT_CAL ) {
+    gsdVars->vRadial = smf_malloc ( gsdVars->nVRad, 
+                                    sizeof(double), 0, status );
+  }
+
+  gsdVars->scanVars1 = smf_malloc ( gsdVars->nScanVars1, 
+                                    MAXSTRING-1, 0, status );
+  gsdVars->scanVars2 = smf_malloc ( gsdVars->nScanVars2, 
+                                    MAXSTRING-1, 0, status );  
   gsdVars->scanTable1 = smf_malloc ( ( gsdVars->nScanVars1 * gsdVars->noScans ), 
                                      sizeof(float), 0, status );
   gsdVars->scanTable2 = smf_malloc ( ( gsdVars->nScanVars2 * gsdVars->noScans ), 
                                      sizeof(float), 0, status );
   gsdVars->mapTable = smf_malloc ( ( gsdVars->nMapDims * gsdVars->nMapPts ), 
                                    sizeof(float), 0, status );
-  gsdVars->phaseVars = smf_malloc ( gsdVars->nPhaseVars, MAXSTRING-1,
-                                    0, status );
+  gsdVars->phaseVars = smf_malloc ( gsdVars->nPhaseVars, 
+                                    MAXSTRING-1, 0, status );
   gsdVars->phaseTable = smf_malloc ( ( gsdVars->nPhaseVars * gsdVars->nPhases ),
                                      sizeof(float), 0, status );
-  gsdVars->corrModes = smf_malloc ( gsdVars->nBESections, sizeof(int), 0, status );
-  gsdVars->bitModes = smf_malloc ( gsdVars->nBESections, sizeof(int), 0, status );
-  gsdVars->sbOverlaps = smf_malloc ( gsdVars->nBESections, sizeof(float), 0, status );
-  gsdVars->mixNums = smf_malloc ( gsdVars->nBESections, sizeof(float), 0, status );
-  gsdVars->BEInputChans = smf_malloc ( gsdVars->nBESections, sizeof(int), 0, status );
-  gsdVars->BEConnChans = smf_malloc ( gsdVars->nBEChansIn, sizeof(int), 0, status );
-  gsdVars->BEChans = smf_malloc ( gsdVars->nBESections, sizeof(int), 0, status );
-  gsdVars->BESubsys = smf_malloc ( gsdVars->nBESections, sizeof(int), 0, status );
-  gsdVars->centreFreqs = smf_malloc ( gsdVars->nBESections, sizeof(double), 
-                                      0, status );
-  gsdVars->restFreqs = smf_malloc ( gsdVars->nBESections, sizeof(double), 0, status );
-  gsdVars->LOFreqs = smf_malloc ( gsdVars->nBESections, sizeof(double), 0, status );
-  gsdVars->totIFs = smf_malloc ( gsdVars->nBESections, sizeof(double), 0, status );
-  gsdVars->sbSigns = smf_malloc ( gsdVars->nBESections, sizeof(int), 0, status );
-  gsdVars->BEInputFreqs = smf_malloc ( gsdVars->nBEChansIn, sizeof(double), 
-                                       0, status );
-  gsdVars->freqRes = smf_malloc ( gsdVars->nBESections, sizeof(float), 0, status );
-  gsdVars->bandwidths = smf_malloc ( gsdVars->nBESections, sizeof(float), 0, status );
-  gsdVars->recTemps = smf_malloc ( gsdVars->nBESections, sizeof(float), 0, status );
-  gsdVars->sourceSysTemps = smf_malloc ( gsdVars->nBESections, sizeof(float), 
-                                         0, status );
-  gsdVars->skyTemps = smf_malloc ( gsdVars->nBESections, sizeof(float), 0, status );
-  gsdVars->telTemps = smf_malloc ( gsdVars->nBESections, sizeof(float), 0, status );
-  gsdVars->gains = smf_malloc ( gsdVars->nBESections, sizeof(float), 0, status );
-  gsdVars->calTemps = smf_malloc ( gsdVars->nBESections, sizeof(float), 0, status );
-  gsdVars->opacities = smf_malloc ( gsdVars->nBESections, sizeof(float), 0, status );
-  gsdVars->skyTrans = smf_malloc ( gsdVars->nBESections, sizeof(float), 0, status );
-  gsdVars->alphas = smf_malloc ( gsdVars->nBESections, sizeof(float), 0, status );
-  gsdVars->sbGainNorms = smf_malloc ( gsdVars->nBESections, sizeof(float), 
-                                      0, status );
-  gsdVars->telTrans = smf_malloc ( gsdVars->nBESections, sizeof(float), 0, status );
-  gsdVars->FETSkyIm = smf_malloc ( gsdVars->nBESections, sizeof(float), 0, status );
-  gsdVars->FESkyTrans = smf_malloc ( gsdVars->nBESections, sizeof(float), 0, status );
-  gsdVars->FETSysIm = smf_malloc ( gsdVars->nBESections, sizeof(float), 0, status );
-  gsdVars->sbRatios = smf_malloc ( gsdVars->nBESections, sizeof(float), 0, status );
-  gsdVars->intTimes = smf_malloc ( gsdVars->noScans, sizeof(int), 0, status );
+  gsdVars->corrModes = smf_malloc ( gsdVars->nBESections, 
+                                    sizeof(int), 0, status );
+  gsdVars->bitModes = smf_malloc ( gsdVars->nBESections, 
+                                   sizeof(int), 0, status );
+  gsdVars->sbOverlaps = smf_malloc ( gsdVars->nBESections, 
+                                     sizeof(float), 0, status );
+  gsdVars->mixNums = smf_malloc ( gsdVars->nBESections, 
+                                  sizeof(float), 0, status );
+  gsdVars->BEInputChans = smf_malloc ( gsdVars->nBESections, 
+                                       sizeof(int), 0, status );
+  gsdVars->BEConnChans = smf_malloc ( gsdVars->nBEChansIn, 
+                                      sizeof(int), 0, status );
+  gsdVars->BEChans = smf_malloc ( gsdVars->nBESections, 
+                                  sizeof(int), 0, status );
+  gsdVars->BESubsys = smf_malloc ( gsdVars->nBESections, 
+                                   sizeof(int), 0, status );
+  gsdVars->centreFreqs = smf_malloc ( gsdVars->nBESections, 
+                                      sizeof(double), 0, status );
+  gsdVars->restFreqs = smf_malloc ( gsdVars->nBESections, 
+                                    sizeof(double), 0, status );
+  gsdVars->LOFreqs = smf_malloc ( gsdVars->nBESections, 
+                                  sizeof(double), 0, status );
+  gsdVars->totIFs = smf_malloc ( gsdVars->nBESections, 
+                                 sizeof(double), 0, status );
+  gsdVars->sbSigns = smf_malloc ( gsdVars->nBESections, 
+                                  sizeof(int), 0, status );
+  gsdVars->BEInputFreqs = smf_malloc ( gsdVars->nBEChansIn, 
+                                       sizeof(double), 0, status );
+  gsdVars->freqRes = smf_malloc ( gsdVars->nBESections, 
+                                  sizeof(float), 0, status );
+  gsdVars->bandwidths = smf_malloc ( gsdVars->nBESections,
+                                     sizeof(float), 0, status );
+  gsdVars->recTemps = smf_malloc ( gsdVars->nBESections, 
+                                   sizeof(float), 0, status );
+
+  if ( dasFlag == DAS_CONT_CAL ) {
+    gsdVars->sourceSysTemps = smf_malloc ( gsdVars->nBESections * gsdVars->noScans, 
+                                           sizeof(float), 0, status );
+    gsdVars->skyTemps = smf_malloc ( gsdVars->nBESections * gsdVars->noScans, 
+                                     sizeof(float), 0, status );
+  } else {
+    gsdVars->sourceSysTemps = smf_malloc ( gsdVars->nBESections, 
+                                           sizeof(float), 0, status );
+    gsdVars->skyTemps = smf_malloc ( gsdVars->nBESections, 
+                                     sizeof(float), 0, status );
+  }
+
+  gsdVars->telTemps = smf_malloc ( gsdVars->nBESections, 
+                                   sizeof(float), 0, status );
+  gsdVars->gains = smf_malloc ( gsdVars->nBESections, 
+                                sizeof(float), 0, status );
+  gsdVars->calTemps = smf_malloc ( gsdVars->nBESections,
+                                   sizeof(float), 0, status );
+  gsdVars->opacities = smf_malloc ( gsdVars->nBESections, 
+                                    sizeof(float), 0, status );
+
+  if ( dasFlag == DAS_CONT_CAL ) {
+    gsdVars->skyTrans = smf_malloc ( gsdVars->nBESections * gsdVars->noScans, 
+                                     sizeof(float), 0, status );
+  } else {
+    gsdVars->skyTrans = smf_malloc ( gsdVars->nBESections, 
+                                     sizeof(float), 0, status );
+  }
+
+  gsdVars->alphas = smf_malloc ( gsdVars->nBESections, 
+                                 sizeof(float), 0, status );
+  gsdVars->sbGainNorms = smf_malloc ( gsdVars->nBESections, 
+                                      sizeof(float), 0, status );
+  gsdVars->telTrans = smf_malloc ( gsdVars->nBESections, 
+                                   sizeof(float), 0, status );
+
+  if ( dasFlag == DAS_CONT_CAL ) {
+    gsdVars->FETSkyIm = smf_malloc ( gsdVars->nBESections * gsdVars->noScans, 
+                                     sizeof(float), 0, status );
+    gsdVars->FESkyTrans = smf_malloc ( gsdVars->nBESections * gsdVars->noScans, 
+                                       sizeof(float), 0, status );
+    gsdVars->FETSysIm = smf_malloc ( gsdVars->nBESections * gsdVars->noScans, 
+                                     sizeof(float), 0, status );
+    gsdVars->sbRatios = smf_malloc ( gsdVars->nBESections * gsdVars->noScans,
+                                     sizeof(float), 0, status );
+  } else {
+    gsdVars->FETSkyIm = smf_malloc ( gsdVars->nBESections, 
+                                     sizeof(float), 0, status );
+    gsdVars->FESkyTrans = smf_malloc ( gsdVars->nBESections, 
+                                       sizeof(float), 0, status );
+    gsdVars->FETSysIm = smf_malloc ( gsdVars->nBESections, 
+                                     sizeof(float), 0, status );
+    gsdVars->sbRatios = smf_malloc ( gsdVars->nBESections, 
+                                     sizeof(float), 0, status );
+  }
+
+  gsdVars->intTimes = smf_malloc ( gsdVars->noScans, 
+                                   sizeof(int), 0, status );
   gsdVars->data = smf_malloc ( ( gsdVars->nBEChansOut * gsdVars->nScanPts
                                  * gsdVars->noScans ), sizeof(float), 0, status );
 
-  /* Get the radial velocities. */
-  gsdac_get1d ( gsd, "C7VRADIAL", gsdVars->vRadial, status );
+  if ( dasFlag == DAS_CROSS_CORR ) {
+    gsdVars->hotPower = smf_malloc ( gsdVars->nBESections * gsdVars->IFPerSection, 
+                                     sizeof(float), 0, status );
+    gsdVars->skyPower = smf_malloc ( gsdVars->nBESections * gsdVars->IFPerSection, 
+                                     sizeof(float), 0, status );
+    gsdVars->samples = smf_malloc ( gsdVars->nBEChansOut * gsdVars->IFONPhase *
+                                    gsdVars->noCycles, sizeof(float), 0, status );
+    gsdVars->totPower = smf_malloc ( gsdVars->nBESections * gsdVars->IFPerSection *
+                                     gsdVars->IFONPhase * gsdVars->noCycles,
+                                     sizeof(float), 0, status );
+  } else if ( dasFlag == DAS_TP ) {
+    gsdVars->totPower = smf_malloc ( gsdVars->nBESections * gsdVars->IFPerSection *
+                                     gsdVars->IFONPhase * gsdVars->nPhases *
+                                     gsdVars->noCycles, sizeof(float), 0, status );
+  }
+
+  if ( dasFlag == DAS_CROSS_CORR ) {
+    gsdac_get1d ( gsd, "C55FENUOBS", gsdVars->FEFreqs, status );
+    gsdac_get1i ( gsd, "C55FESBSIGN", gsdVars->FESBSigns, status );
+    gsdac_get1d ( gsd, "C55FENULO", gsdVars->FELOFreqs, status );
+  }
+
+  if ( dasFlag == DAS_NONE || dasFlag == DAS_CONT_CAL ) {
+    /* Get the radial velocities. */
+    gsdac_get1d ( gsd, "C7VRADIAL", gsdVars->vRadial, status );
+  }
 
   /* Get the scan table column names and data. */
   gsdac_get1c ( gsd, "C12SCAN_VARS1", gsdVars->scanVars1, status );
@@ -417,7 +572,7 @@ void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
 
   /* Get the number of BE input channels for each section. */
   gsdac_get1i ( gsd, "C3BESCONN", gsdVars->BEInputChans, status );
-
+  
   /* Get the number of IF output channels connected to 
      BE input channels. */
   gsdac_get1i ( gsd, "C3BEINCON", gsdVars->BEConnChans, status );
@@ -474,7 +629,7 @@ void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
 
   /* Get the telescope transmissions. */
   gsdac_get1r ( gsd, "C12ETATEL", gsdVars->telTrans, status );
-
+  
   /* Get the FE-derived tsky image sideband for each section. */
   gsdac_get1r ( gsd, "C12TSKYIM", gsdVars->FETSkyIm, status );
 
@@ -493,7 +648,16 @@ void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
 
   /* Get the data. */
   gsdac_get1r ( gsd, "C13DAT", gsdVars->data, status );
-  
+
+  if ( dasFlag == DAS_CROSS_CORR ) {
+    gsdac_get0r ( gsd, "C55HOTPOWER", gsdVars->hotPower, status );
+    gsdac_get0r ( gsd, "C55SKYPOWER", gsdVars->skyPower, status );
+    gsdac_get0r ( gsd, "C55SAM", gsdVars->samples, status );    
+ } 
+
+  if ( dasFlag == DAS_TP || dasFlag == DAS_CROSS_CORR ) {
+    gsdac_get0r ( gsd, "C55POWER", gsdVars->totPower, status );
+  }
 
   if ( *status != SAI__OK ) {
     *status = SAI__ERROR;

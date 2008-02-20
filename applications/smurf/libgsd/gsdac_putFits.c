@@ -19,7 +19,7 @@
 *                     const int utDate, const int nSteps, 
 *                     const char *backend, char *recepNames[],
 *                     const char *samMode, const char *obsType,
-*                     const struct JCMTState *record, 
+*                     const gsdWCS *wcs, 
 *                     const AstFitsChan *fitschan, int *status )
 
 *  Arguments:
@@ -41,6 +41,8 @@
 *        Sample mode
 *     obsType = const char* (Given)
 *        Observation type
+*     wcs = const *gsdWCS (Given)
+*        pointing and time values
 *     record = const JCMTState* (Given)
 *        JCMTState headers
 *     fitschan = const AstFitsChan* (Given and Returned)
@@ -61,6 +63,8 @@
 *        Original
 *     2008-02-14 (JB):
 *        Use gsdVars struct to store headers/arrays
+*     2008-02-19 (JB):
+*        Pass in gsdWCS struct instead of JCMTState
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -106,7 +110,7 @@ void gsdac_putFits ( const gsdVars *gsdVars,
                      const int utDate, const int nSteps, 
                      const char *backend, char *recepNames[],
                      const char *samMode, const char *obsType,
-                     const struct JCMTState *record, 
+                     const gsdWCS *wcs, 
                      const AstFitsChan *fitschan, int *status )
 
 {
@@ -224,16 +228,16 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   if ( *status == SAI__OK ) {
  
     /* Get the airmass at start/end. */
-    amStart = record[0].tcs_airmass;
-    amEnd = record[nSteps - 1].tcs_airmass;
+    amStart = wcs[0].airmass;
+    amEnd = wcs[nSteps - 1].airmass;
 
     /* Get the azimuth at start/end. */
-    azStart = record[0].tcs_az_ac1;
-    azEnd = record[nSteps - 1].tcs_az_ac1;
+    azStart = wcs[0].acAz;
+    azEnd = wcs[nSteps - 1].acAz;
 
     /* Get the elevation at start/end. */
-    elStart = record[0].tcs_az_ac2;
-    elEnd = record[nSteps - 1].tcs_az_ac2;
+    elStart = wcs[0].acEl;
+    elEnd = wcs[nSteps - 1].acEl;
 
   }
 

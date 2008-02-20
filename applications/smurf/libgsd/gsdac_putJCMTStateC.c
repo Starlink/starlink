@@ -13,7 +13,8 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_putJCMTStateC ( const gsdVars *gsdVars,
+*     gsdac_putJCMTStateC ( const gsdVars *gsdVars, const int dasFlag,
+*                           const gsdWCS *wcs,
 *                           const unsigned int stepNum,
 *                           const char *backend,
 *                           struct JCMTState *record, int *status );
@@ -21,6 +22,10 @@
 *  Arguments:
 *     gsdVars = const gsdVars* (Given)
 *        GSD headers and arrays
+*     dasFlag = const int (Given)
+*        DAS file structure type
+*     wcs = const gsdWCS* (Given)
+*        Pointing and time values
 *     stepNum = const unsigned int (Given)
 *        Time step of this spectrum
 *     backend = const char* (Given)
@@ -45,6 +50,8 @@
 *        Original
 *     2008-02-14 (JB):
 *        Use gsdVars struct to store headers/arrays
+*     2008-02-18 (JB):
+*        Get values from gsdWCS
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -86,16 +93,12 @@
 
 #define FUNC_NAME "gsdac_putJCMTStateC"
 
-void gsdac_putJCMTStateC ( const gsdVars *gsdVars, 
+void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const int dasFlag,
+                           const gsdWCS *wcs,
                            const unsigned int stepNum, 
                            const char *backend,
                            struct JCMTState *record, int *status )
 {
-
-  /* Local variables */
-
-  int LSTStartTime;           /* start time in LST */
-  AstTimeFrame *tFrame = NULL;  /* AstTimeFrame for LST-TAI conversion */
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
@@ -145,55 +148,51 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars,
 
   record->smu_tr_chop_y = 0.0;
 
-  /* Get the TAI time of this step.*/   
+  record->tcs_tai = wcs[stepNum].tai;
 
-  record->tcs_tai = 0.0;//k
+  record->tcs_airmass = wcs[stepNum].airmass;
 
-  record->tcs_airmass = 0.0;//k
+  record->tcs_az_ang = wcs[stepNum].azAng;
 
-  record->tcs_az_ang = 0.0;//k
+  record->tcs_az_ac1 = wcs[stepNum].acAz;
 
-  record->tcs_az_ac1 = 0.0;//k
-
-  record->tcs_az_ac2 = 0.0;//k
+  record->tcs_az_ac2 = wcs[stepNum].acEl;
 
   record->tcs_az_ac1 = record->tcs_az_ac1;
 
   record->tcs_az_ac2 = record->tcs_az_ac2;
 
-  record->tcs_az_bc1 = 0.0;//k
+  record->tcs_az_bc1 = wcs[stepNum].baseAz;
 
-  record->tcs_az_bc2 = 0.0;//k
+  record->tcs_az_bc2 = wcs[stepNum].baseEl;
 
   strncpy( record->tcs_beam, "M", 1 );    
 
-  record->tcs_index = 0;//k
+  record->tcs_index = wcs[stepNum].index;
 
   strncpy( record->tcs_source, "SCIENCE", 8 ); 
 
   strncpy( record->tcs_tr_sys, "COORDS", 7 );
 
-  record->tcs_tr_ang = 0.0;//k
+  record->tcs_tr_ang = wcs[stepNum].trAng;
 
-  record->tcs_tr_ac1 = 0.0;//k
+  record->tcs_tr_ac1 = wcs[stepNum].acTr1;
 
-  record->tcs_tr_ac2 = 0.0;//k
+  record->tcs_tr_ac2 = wcs[stepNum].acTr2;
 
   record->tcs_tr_dc1 = record->tcs_tr_ac1;
 
   record->tcs_tr_dc2 = record->tcs_tr_ac2;
 
-  record->tcs_tr_bc1 = 0.0;//k
+  record->tcs_tr_bc1 = wcs[stepNum].baseTr1;
 
-  record->tcs_tr_bc2 = 0.0;//k
+  record->tcs_tr_bc2 = wcs[stepNum].baseTr2;
 
   record->jos_drcontrol = 0;
 
-  record->enviro_rel_hum = 0.0;//k
+  record->enviro_rel_hum = gsdVars->hamb;
 
-  record->enviro_pressure = 0.0;//k
-
-  record->enviro_air_temp = 0.0;//k
+  record->enviro_pressure = (gsdVars->pamb) * 1.33322;
 
   record->acs_exposure = 0.0;//k
 

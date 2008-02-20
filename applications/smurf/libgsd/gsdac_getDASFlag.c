@@ -1,43 +1,40 @@
 /*
 *+
 *  Name:
-*     gsdac_getArraySize.c
+*     gsdac_getDASFlag
 
 *  Purpose:
-*     Return the number of elements in a GSD array given
-*     by name.
+*     Return the correct DAS file type
 
 *  Language:
 *     Starlink ANSI C
 
 *  Type of Module:
-*     Subroutine
+*     ADAM A-task
 
 *  Invocation:
-*     gsdac_getArraySize ( const gsd *gsd,
-*                          char *name, unsigned int *size, int *status )
+*     gsdac_getDASFlag ( const gsdac_gsd_struct *gsd,
+*                        int *dasFlag, int *status );
 
 *  Arguments:
-*     gsd = const gsd* (Given)
-*        GSD file access parameters.
-*     name = char* (Given)
-*        The name of the item. This should be an array of 16 characters (char
-*        name[16]) and a null-terminated string.
-*     size = int* (Returned)
-*        The size of the array in bytes.
+*     gsd = const gsdac_gsd_struct* (Given)
+*        GSD file access parameters
+*     dasFlag = int* (Given and Returned)
+*        DAS file type
 *     status = int* (Given and Returned)
-*        Pointer to global status.  
+*        Pointer to global status.
 
 *  Description:
-*     Retrieves the number of elements in a GSD file array.
+*     Checks the GSD file contents to determine the file 
+*     structure and returns the correct flag.
 
 *  Authors:
-*     J.Balfour (UBC)
+*     Jen Balfour (JAC, UBC)
 *     {enter_new_authors_here}
 
-*  History :
-*     2008-02-04 (JB):
-*        Original
+*  History:
+*     2008-02-15 (JB):
+*        Original.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -50,13 +47,13 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+*     Software Foundation, Inc., 59 Temple Place,Suite 330, Boston,
 *     MA 02111-1307, USA
 
 *  Bugs:
@@ -64,21 +61,24 @@
 *-
 */
 
-/* Starlink includes */
-#include "gsd.h"
+/* STARLINK includes */
 #include "sae_par.h"
+#include "gsd.h"
 
 /* SMURF includes */
 #include "gsdac.h"
 
-#define MAXDIMS 3
+#define MAXDIMS 5
 
-void gsdac_getArraySize ( const gsd *gsd,
-                          char *name, int *size, int *status ) {
+#define FUNC_NAME "gsdac_getDASFlag.c"
 
-  /* Local variables */
+void gsdac_getDASFlag ( const struct gsdac_gsd_struct *gsd,
+                        int *dasFlag, int *status )
+{
+
+  /* Local variables. */
   int actDims;                 /* actual number of dimensions */
-  char array;                  /* array flag (should always be true) */ 
+  char array;                  /* array flag (should always be false) */ 
   char dimMem[MAXDIMS][16];    /* actual memory for dimension names */
   char *dimNames[MAXDIMS];     /* pointers to dimension names */
   int dimVals[MAXDIMS];        /* array dimensions */
@@ -86,7 +86,8 @@ void gsdac_getArraySize ( const gsd *gsd,
   int itemno;                  /* item number of the GSD header */
   int nDims;                   /* number of dimensions of the array */
   int nElem;                   /* number of elements in the array */
-  char type;                   /* data type of the item (should always be B) */
+  char type;                   /* data type of the item */
+  int statFlag;                /* indicates if item was found */
   char unit[11];               /* unit of the GSD header */
   char unitMem[MAXDIMS][11];   /* actual memory for dimension units */
   char *unitNames[MAXDIMS];    /* pointers to unit names */
@@ -94,22 +95,26 @@ void gsdac_getArraySize ( const gsd *gsd,
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
 
-  /* Get the item number. */
-  *status = gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
-                      unit, &type, &array );  
+  /* Check for the presence of C55NCYC for DAS_CROSS_CORR. */
+  statFlag = gsdFind ( gsd->fileDsc, gsd->itemDsc, "C55NCYC", &itemno, 
+                       unit, &type, &array );
 
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_getArraySize", "Could not find element ^NAME in file", status );
-    return;
-  }   
-
-  /* Check that the array flag is true. */
-  if ( !array ) {
-    *status = SAI__ERROR;
-    errRep ( "gsdac_getArraySize", "Expected array data, got a scalar", status );
+  if ( statFlag == SAI__OK ) {
+    *dasFlag = DAS_CROSS_CORR;
     return;
   }
+
+  /* Check for the presence of C55NCYC for DAS_TP. */
+  statFlag = gsdFind ( gsd->fileDsc, gsd->itemDsc, "C55NPH", &itemno, 
+                       unit, &type, &array );
+
+  if ( statFlag == SAI__OK ) {
+    *dasFlag = DAS_TP;
+    return;
+  }
+  
+  /* Check the dimensionality of the C12SST array.  Continuous calibrations
+     (DAS_CONT_CAL) have two dimensions. */
 
   /* Set up pointers for the dimension names (see NOTES in gsdInqSize for
      explanation). */
@@ -121,18 +126,21 @@ void gsdac_getArraySize ( const gsd *gsd,
   for ( i = 0; i < MAXDIMS; i++ ) 
     unitNames[i] = unitMem[i];
 
-  /* Get the dimensionality. */
-  *status = gsdInqSize ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
-                         itemno, MAXDIMS, dimNames, unitNames, 
-                         dimVals, &actDims, &nElem );
+  *status = gsdFind ( gsd->fileDsc, gsd->itemDsc, "C12SST", &itemno, 
+                      unit, &type, &array );
 
   if ( *status != SAI__OK ) {
-    errRep ( "gsdac_getArraySize", "Error retrieving array dimensionality", status );
+    errRep ( FUNC_NAME, "Error getting DAS file structure", status );
     return;
-  }  
+  }
 
-  /* Determine the size of the array. */
-  *size = nElem;
+  /* Get the dimensionality. */
+  statFlag = gsdInqSize ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
+                          itemno, MAXDIMS, dimNames, unitNames, 
+                          dimVals, &actDims, &nElem );
+
+  if ( actDims > 1 ) *dasFlag = DAS_CONT_CAL;
+  else *dasFlag = DAS_NONE;  
+    
 
 }
-  

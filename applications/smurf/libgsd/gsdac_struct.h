@@ -23,7 +23,9 @@
  *     2008-01-28 (JB):
  *        Original.
  *     2008-02-14 (JB):
- *        Add gsdac_gsdVars_struct   
+ *        Add gsdac_gsdVars_struct  
+ *     2008-02-19 (JB):
+ *        Add gsdWCS struct
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -52,6 +54,9 @@
 
 #ifndef GSDAC_STRUCT_DEFINED
 #define GSDAC_STRUCT_DEFINED
+
+/* Enumerated type for DAS file type */
+typedef enum {DAS_NONE, DAS_TP, DAS_CONT_CAL, DAS_CROSS_CORR} dasFlag;
 
 typedef struct gsdac_gsd_struct  /* GSD file access parameters */
 {
@@ -120,17 +125,45 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
   float chopThrow;            /* chop throw (arcsec) */
   char chopWaveform[MAXSTRING]; /* SMU chopping waveform */
   int *corrModes;             /* correlation function modes. */
+  char CSOAbsorb[MAXSTRING];  /* position of absorber IN or OUT */
+  float CSODAz;               /* position offset in Az (arcsec) */
+  double CSODec;              /* Dec */
+  float CSODEl;               /* position offset in elevation (arcsec) */
+  double CSOEpoch;            /* epoch of CSO RA and Dec */
+  char CSOFocus[MAXSTRING];   /* focus mode of CSO */
+  float CSOFocusX;            /* CSO X position of focus */
+  float CSOFocusY;            /* CSO Y position of focus */
+  float CSOFocusZ;            /* CSO Z position of focus */
+  double CSOFreqOffset;       /* Frequency offset (GHz) */
+  double CSOIFFreq;           /* IF frequency (GHz) */
+  double CSOLOFreq;           /* LO frequency (GHz) */
+  int CSOMultHarm;            /* Multiplier Harmonic number */
+  float CSOPAz;               /* pointing Az offset (arcsec) */
+  float CSOPEl;               /* pointing El offset (arcsec) */
+  char CSOPhaseLock[MAXSTRING]; /* phase lock status L or U */
+  double CSORA;               /* RA */
+  float CSORadVel;            /* radial velocity (km/x) */
+  double CSORestFreq;         /* Rest frequency of line (GHz) */
+  char CSOSideband[MAXSTRING]; /* Sideband U or L */
+  int CSOStatus;              /* overall status 0 = bad 1 = good */
+  float CSOTau;               /* CSO TAU value */
+  char CSOTrack[MAXSTRING];   /* CSO Track mode of telescope Y or N */
+  float CSOVelocity;          /* velocity of source (km/s) */
+  float CSOVelOffset;         /* velocity offset (km/s) */
   int cycleTime;              /* duration of each cycle (seconds) */
   float *data;                /* complete data array */
   char dataOutput[MAXSTRING]; /* description of output */
   char dataUnits[MAXSTRING];  /* units of data */
   char epochType[MAXSTRING];  /* epoch type */
-  double errEl;               /* El offset at start (arcsec) */
   double errAz;               /* Az offset at start (arcsec) */
+  double errEl;               /* El offset at start (arcsec) */
   double etafss;              /* forward spillover and scattering
                                  efficiency */
   double etal;                /* rear spillover and scattering 
                                  efficiency */
+  double *FEFreqs;            /* observing frequencies */
+  double *FELOFreqs;          /* FE LO frequencies */
+  int *FESBSigns;             /* FE sideband signs */
   float *FESkyTrans;          /* FE-derived sky transmission */
   float *FETSkyIm;            /* FE-derived tsky, image sideband */
   float *FETSysIm;            /* FE-derived tsys, image sideband */
@@ -139,6 +172,11 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
   char frontend[MAXSTRING];   /* name of the frontend */
   float *gains;               /* gains */
   double hamb;                /* mean atmospheric relative humidity (%) */
+  float *hotPower;            /* total power measurement on hot load */
+  int IFONCycle;              /* ?? */
+  int IFONIntCycle;           /* ?? */
+  int IFONPhase;              /* number of phases for interferometry 
+                                 observing */
   int IFPerSection;           /* number of IF inputs per section */
   int *intTimes;              /* integration times. */
   double *LOFreqs;            /* frontend LO frequencies */
@@ -151,6 +189,7 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
   int nBEChansIn;             /* number of BE input channels */
   int nBEChansOut;            /* number of BE output channels */
   int nBESections;            /* number of BE sections */
+  int nCorrCycle;             /* nunber of correlation cycles */
   int nCycle;                 /* number of cycles done */
   int nCyclePts;              /* number of sky points complete in
                                  observation */
@@ -166,16 +205,11 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
   int noScans;                /* number of scans */
   int nPhases;                /* number of phases per cycle */
   int nPhaseVars;             /* number of phase table variables */
-  unsigned int nRecep;        /* number of receptors participating in 
-                                 this observation */
   int nScan;                  /* number of scans done */
   int nScanPts;               /* maximum number of map points done in 
                                  a phase */
   int nScanVars1;             /* number of scan table 1 variables */
   int nScanVars2;             /* number of scan table 2 variables */
-  unsigned int nSteps;        /* number of time steps in the observation */
-  unsigned int nSubsys;       /* number of subsystems */
-  unsigned int nTotChans;     /* total number of channels in observation */
   int nVRad;                  /* number of elements in vradial array */
   char object1[MAXSTRING];    /* object of interest */
   char object2[MAXSTRING];    /* object of interest (second half of name) */
@@ -195,6 +229,8 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
   float *phaseTable;          /* phase table */
   char *phaseVars;            /* phase table column names */
   char polarity[MAXSTRING];   /* polarity ? */
+  int procBits;               /* data processing done */
+  char procLoc[MAXSTRING];    /* desription of where processing is done */
   char project[MAXSTRING];    /* name of the project */
   char projectObs1[MAXSTRING];/* name of the primary observer */
   char projectObs2[MAXSTRING];/* name of the support scientist */
@@ -203,6 +239,20 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
   double referenceX;          /* reference X position (arcsec) */
   double referenceY;          /* reference Y position (arcsec) */
   double *restFreqs;          /* rest frequencies (GHz) */
+  double RXJLengthX;          /* X length of projected baseline (metres) */
+  double RXJLengthY;          /* Y length of projected baseline (metres) */
+  double RXJLengthZ;          /* Z length of projected baseline (metres) */
+  double RXJConstant;         /* coefficient of constant term in expression 
+                                 for fringe rate */
+  double RXJCos;              /* coefficient of cos term in expression 
+                                 for fringe rate */
+  int RXJCSOSwitch;           /* delay setting of RXJ micro for CSO side */
+  int RXJJCMTSwitch;          /* delay setting of RXJ micro for JCMT side */
+  int RXJNSecs;               /* number of the tick on which integration 
+                                 started */
+  double RXJSin;              /* coefficient of sin term in expression 
+                                 for fringe rate */
+  float *samples;             /* samples to store for cross_correlation mode */
   float *sbGainNorms;         /* normalizes signal sideband gain */
   char sbMode[MAXSTRING];     /* sideband mode */
   float *sbOverlaps;          /* sideband overlaps */
@@ -218,6 +268,7 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
   float seeing;               /* seeing at JCMT */
   char seeTime[MAXSTRING];    /* time of seeing (YYMMDDHHMM) */
   float shiftFrac;            /* ?? */
+  float *skyPower;            /* ?? */
   float *skyTemps;            /* sky temperatures (K) */
   float *skyTrans;            /* sky transmissions */
   float smuDX;                /* SMU X displacement at start (mm) */
@@ -244,6 +295,8 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
   float tauRMS;               /* CSO Tau rms */
   char tauTime[MAXSTRING];    /* Time of CSO Tau 225 (YYMMDDHHMM) */
   float tCold;                /* cold load temperature (K) */
+  double telAz;               /* centre_az from tel sdis array */
+  double telEl;               /* centre_el from tel sdis array */
   char telCoords[MAXSTRING];  /* telescope mount coordinates */
   double telHeight;           /* height ot telescope above sea level (km) */
   double telLatitude;         /* geographical latitude of telescope
@@ -255,6 +308,8 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
   float *telTrans;            /* telescope transmissions */
   float tHot;                 /* ambient load temperature (K) */
   double *totIFs;             /* total IF for each section */
+  float *totPower;            /* total power measurement per subband
+                                 per integration */
   double userAz;              /* user Az correction (arcsec) */
   double userEl;              /* user El correction (arcsec) */
   char velDefn[MAXSTRING];    /* velocity definition */
@@ -263,22 +318,21 @@ typedef struct gsdac_gsdVars_struct /* GSD header and array data */
   double *vRadial;            /* array of radial velocities */
 } gsdVars;
 
-typedef struct gsdac_wcs_struct  /* pointing and time */
+typedef struct gsdac_gsdWCS_struct  /* pointing and time */
 {  
-  double *airmass;            /* airmass */
-  double *acAz;               /* actual telescope Az */
-  double *acEl;               /* actual telescope El */
-  double *acTr1;              /* actual telescope in Tracking */
-  double *acTr2;              /* actual telescope in Tracking */
-  double *azAng;              /* angle between focal plane and AZEL */
-  double *baseAz;             /* base Az */
-  double *baseEl;             /* base El */
-  double *baseTr1;            /* base in Tracking */
-  double *baseTr2;            /* base in Tracking */
-  double *el;                 /* actual telescope El */
-  double *index;              /* index into observing area */
-  double *tai;                /* TAI time */
-  double *trAng;              /* angle between focal and tracking planes */
-} wcs;
+  double airmass;            /* airmass */
+  double acAz;               /* actual telescope Az */
+  double acEl;               /* actual telescope El */
+  double acTr1;              /* actual telescope in Tracking */
+  double acTr2;              /* actual telescope in Tracking */
+  double azAng;              /* angle between focal plane and AZEL */
+  double baseAz;             /* base Az */
+  double baseEl;             /* base El */
+  double baseTr1;            /* base in Tracking */
+  double baseTr2;            /* base in Tracking */
+  double index;              /* index into observing area */
+  double tai;                /* TAI time */
+  double trAng;              /* angle between focal and tracking planes */
+} gsdWCS;
    
 #endif /* GSDAC_STRUCT_DEFINED */

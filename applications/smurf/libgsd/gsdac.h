@@ -29,6 +29,9 @@
 *        Add freeArrays, getGSDVars
 *     2008-02-14 (JB):
 *        Use gsdVars struct to store headers/arrays 
+*     2008-02-19 (JB):
+*        Check dasFlag.  Added getDASFlag, removed getArraySize
+*        and getElemx
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -66,6 +69,7 @@
 
 void gsdac_freeArrays
 (
+const int dasFlag,      /* DAS file structure flag (given) */
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 int *status          /* pointer to global status (given and returned) */
 );
@@ -197,12 +201,10 @@ short *values,       /* data values (returned) */
 int *statuss         /* pointer to global status (given and returned) */ 
 );
 
-void gsdac_getArraySize
+void gsdac_getDASFlag
 (
 const gsd *gsd,      /* GSD file access parameters (given) */
-char *name,          /* name of the item (should be an array of 
-                        16 characters) (given) */ 
-int *size,           /* number of elements in the array (given and returned) */
+int *dasFlag,        /* DAS file type (given and returned) */
 int *status          /* pointer to global status (given and returned) */ 
 );
 
@@ -223,79 +225,10 @@ char *LSTend,        /* LST at obs end (given and returned) */
 int *status          /* pointer to global status (given and returned) */ 
 );
 
-void gsdac_getElemb
-(
-const gsd *gsd,      /* GSD file access parameters (given) */
-char *name,          /* name of the item (should be an array of 
-                        16 characters) (given) */
-const int index,     /* index of element to be returned (given) */
-char *value,         /* data values (returned) */
-int *status          /* pointer to global status (given and returned) */ 
-);
-
-void gsdac_getElemc
-(
-const gsd *gsd,      /* GSD file access parameters (given) */
-char *name,          /* name of the item (should be an array of 
-                        16 characters) (given) */
-const int index,     /* index of element to be returned (given) */
-char *value,         /* data values (returned) */
-int *status          /* pointer to global status (given and returned) */ 
-);
-
-void gsdac_getElemd
-(
-const gsd *gsd,      /* GSD file access parameters (given) */
-char *name,          /* name of the item (should be an array of 
-                        16 characters) (given) */
-const int index,     /* index of element to be returned (given) */
-double *value,       /* data values (returned) */
-int *status          /* pointer to global status (given and returned) */ 
-);
-
-void gsdac_getElemi
-(
-const gsd *gsd,      /* GSD file access parameters (given) */
-char *name,          /* name of the item (should be an array of 
-                        16 characters) (given) */
-const int index,     /* index of element to be returned (given) */
-int *value,          /* data values (returned) */
-int *status          /* pointer to global status (given and returned) */ 
-);
-
-void gsdac_getEleml
-(
-const gsd *gsd,      /* GSD file access parameters (given) */
-char *name,          /* name of the item (should be an array of 
-                        16 characters) (given) */
-const int index,     /* index of element to be returned (given) */
-char *value,         /* data values (returned) */
-int *status          /* pointer to global status (given and returned) */ 
-);
-
-void gsdac_getElemr
-(
-const gsd *gsd,      /* GSD file access parameters (given) */
-char *name,          /* name of the item (should be an array of 
-                        16 characters) (given) */
-const int index,     /* index of element to be returned (given) */
-float *value,        /* data values (returned) */
-int *status          /* pointer to global status (given and returned) */ 
-);
-
-void gsdac_getElemw
-(
-const gsd *gsd,      /* GSD file access parameters (given) */
-char *name,          /* name of the item (should be an array of 
-                        16 characters) (given) */
-const int index,     /* index of element to be returned (given) */
-short *value,        /* data values (returned) */
-int *status          /* pointer to global status (given and returned) */ 
-);
-
 void gsdac_getGSDVars
 ( 
 const gsd *gsd,      /* GSD file access parameters (given) */
+const int dasFlag,   /* DAS file type (given) */
 gsdVars *gsdVars,    /* GSD headers and arrays (given and returned) */
 int *status          /* pointer to global status (given and returned) */
 );
@@ -343,7 +276,8 @@ int *status          /* global status (given and returned) */
 void gsdac_getWCS
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
-wcs *wcs,            /* pointing and time values (given and returned) */
+const int nSteps,    /* number of steps in the observation (given) */
+gsdWCS *wcs,         /* pointing and time values (given and returned) */
 int *status          /* global status (given and returned) */
 );
 
@@ -358,7 +292,7 @@ const char *backend, /* name of the backend (given) */
 char *recepNames[],  /* names of receptors (given) */
 const char *samMode, /* sample mode (given) */
 const char *obsType, /* observation type (given) */
-const struct JCMTState *record, /* JCMTState headers (given) */
+const gsdWCS *wcs,      /* pointing and time values (given) */
 const AstFitsChan *fitschan,  /* FITS headers (given and returned) */
 int *status          /* pointer to global status (given and returned) */
 ); 
@@ -366,6 +300,8 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_putJCMTStateC
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
+int dasFlag,            /* DAS file structure flag (given) */
+const gsdWCS *wcs,      /* pointing and time values (given) */
 const unsigned int stepNum,    /* time step of this spectrum (given) */
 const char *backend,      /* name of the backend (given) */
 struct JCMTState *record, /* JCMTState headers (given and returned ) */
@@ -375,6 +311,7 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_putJCMTStateS
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
+int dasFlag,            /* DAS file structure flag (given) */
 const unsigned int stepNum,    /* time step of this spectrum (given) */
 const unsigned int subsysNum, /* subsystem number (given) */
 struct JCMTState *record, /* JCMTState headers (given and returned ) */
@@ -395,6 +332,7 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_wrtData
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
+const int dasFlag,      /* DAS file structure flag (given) */
 const char *directory,     /* output write directory (given) */
 const int nSteps,    /* number of steps in the observation (given) */
 int *status          /* pointer to global status (given and returned) */

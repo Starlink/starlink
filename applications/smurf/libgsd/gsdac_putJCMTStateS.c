@@ -13,7 +13,7 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_putJCMTStateS ( const gsdVars *gsdVars, 
+*     gsdac_putJCMTStateS ( const gsdVars *gsdVars, const int dasFlag,  
 *                           const unsigned int stepNum, 
 *                           const unsigned int subsysNum, 
 *                           struct JCMTState *record, 
@@ -22,6 +22,8 @@
 *  Arguments:
 *     gsdVars = const gsdVars* (Given)
 *        GSD headers and arrays
+*     dasFlag = const int (Given)
+*        DAS file structure type
 *     stepNum = const unsigned int (Given)
 *        time step of this spectrum
 *     subsysNum = const unsigned int (Given)
@@ -46,6 +48,8 @@
 *        Original
 *     2008-02-14 (JB):
 *        Use gsdVars struct to store headers/arrays
+*     2008-02-18 (JB):
+*        Check dasFlag
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -83,16 +87,34 @@
 #include "gsdac.h"
 #include "jcmt/state.h"
 
-void gsdac_putJCMTStateS ( const gsdVars *gsdVars, 
+void gsdac_putJCMTStateS ( const gsdVars *gsdVars, const int dasFlag,
                            const unsigned int stepNum, 
                            const unsigned int subsysNum,
                            struct JCMTState *record, int *status )
 {
+
+  /* Local variables */
+  int arrayIndex;             /* index into array for retrieving values */
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
 
  /* Get the frontend LO frequency. */
   record->fe_lofreq = (gsdVars->LOFreqs)[subsysNum-1]; 
+
+  /* Use the dasFlag to determine the dimensionality/size of
+     the TSKY array. */
+  if ( dasFlag == DAS_CONT_CAL ) {
+    arrayIndex =  ( stepNum * gsdVars->nBESections ) +
+                  subsysNum - 1;
+  } else {
+    arrayIndex = subsysNum - 1;
+  }
+
+  /* Set the enviro_air_temp to the correct value from the
+     TSKY array. */
+  record->enviro_air_temp = (gsdVars->skyTemps)[arrayIndex];
+
+  record->enviro_air_temp = 0.0;
 
 }
