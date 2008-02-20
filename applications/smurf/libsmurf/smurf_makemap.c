@@ -260,6 +260,8 @@
 *     2008-02-19 (AGG):
 *        - Add status check before attempting to access hitsmap pointer
 *        - Set exp_time values to BAD if no data exists for that pixel
+*     2008-02-20 (AGG):
+*        Calculate median exposure time and write FITS entry
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -347,8 +349,10 @@ void smurf_makemap( int *status ) {
   int lbnd_wgt[3];           /* Lower pixel bounds for weight array */
   double *map=NULL;          /* Pointer to the rebinned map data */
   size_t mapsize;            /* Number of pixels in output image */
+  float medtexp = 0.0;       /* Median exposure time */
   char method[LEN__METHOD];  /* String for map-making method */
   int moving = 0;            /* Is the telescope base position changing? */
+  int neluse;                /* Number of pixels with a non-zero exposure time */
   int nparam = 0;            /* Number of extra parameters for pixel spreading scheme*/
   int nwgtdim=2;             /* No. of axes in the weights array */
   AstKeyMap * obsidmap = NULL; /* Map of OBSIDs from input data */
@@ -378,6 +382,7 @@ void smurf_makemap( int *status ) {
   void *variance=NULL;       /* Pointer to the variance map */
   smfData *wdata=NULL;       /* Pointer to SCUBA2 data struct for weights */
   double *weights=NULL;        /* Pointer to the weights map */
+  float *work_array = NULL;  /* Temporary work space */
 
   /* Main routine */
   ndfBegin();
@@ -417,6 +422,7 @@ void smurf_makemap( int *status ) {
 
   /* Get remaining parameters so errors are caught early */
   if ( rebin ) {
+    /* Obtain desired pixel-spreading scheme */
     parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
 	      "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
 	      1, pabuf, 10, status );
@@ -638,6 +644,16 @@ void smurf_makemap( int *status ) {
 
   /* Write WCS */
   ndfPtwcs( outfset, ondf, status );
+
+  /* Calculate unweighted median exposure time - work_array is needed
+     because kpg1Medur optimizes the order of the input array */
+  work_array = smf_malloc( mapsize, sizeof(float), 1, status);
+  if ( work_array ) {
+    work_array = astStore( work_array, exp_time, mapsize*sizeof(float));
+    kpg1Medur( 1, (int)mapsize, work_array, &medtexp, &neluse, status);
+    astSetFitsF(fchan, "MEDTEXP", medtexp, "[s] Median MAKEMAP exposure time", 0);
+    smf_free( work_array, status );
+  }
 
 /* Retrieve the unique OBSID keys from the KeyMap and populate the OBSnnnnn
    and PROVCNT headers from this information. */
