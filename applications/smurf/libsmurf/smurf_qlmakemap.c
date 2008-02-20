@@ -157,6 +157,8 @@
 *        pixel-spreading scheme, update call to smf_rebinmap
 *     2008-02-15 (AGG):
 *        Weights array is now written as an NDF extension
+*     2008-02-19 (AGG):
+*        Add EXP_TIME array to output file
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -218,6 +220,7 @@ void smurf_qlmakemap( int *status ) {
 
   /* Local Variables */
   smfData *data = NULL;      /* Pointer to input SCUBA2 data struct */
+  float *exp_time = NULL;    /* Exposure time array written to output file */
   AstFitsChan *fchan = NULL; /* FitsChan holding output NDF FITS extension */
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
   int flag;                  /* Flag */
@@ -226,7 +229,8 @@ void smurf_qlmakemap( int *status ) {
   int indf = 0;              /* NDF identifier of output file */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   int lbnd_wgt[3];           /* Lower pixel bounds for weight array */
-  void *map = NULL;          /* Pointer to the rebinned map data */
+  double *map = NULL;        /* Pointer to the rebinned map data */
+  size_t mapsize;            /* Number of pixels in output image */
   int moving = 0;            /* Flag to denote a moving object */
   int nparam = 0;            /* Number of extra parameters for pixel spreading scheme*/
   AstKeyMap * obsidmap = NULL; /* Map of OBSIDs from input data */
@@ -241,16 +245,18 @@ void smurf_qlmakemap( int *status ) {
   AstKeyMap * prvkeymap = NULL; /* Keymap of input files for PRVxxx headers */
   int size;                  /* Number of files in input group */
   int smfflags = 0;          /* Flags for creating a new smfData */
+  HDSLoc *smurfloc = NULL;   /* HDS locator of SMURF extension */
   int spread;                /* Code for pixel spreading scheme */
+  double steptime;           /* Integration time per sample, from FITS header */
   char system[10];           /* Celestial coordinate system for output image */
   double tau;                /* 225 GHz optical depth */
+  smfData *tdata = NULL;     /* Exposure time data */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   int ubnd_wgt[3];           /* Upper pixel bounds for weight array */
   int usebad;                /* Flag for whether to use bad bolos mask */
   void *variance = NULL;     /* Pointer to the variance map */
   smfData *wdata = NULL;     /* Pointer to SCUBA2 data struct for weights */
-  void *weights = NULL;      /* Pointer to the weights map */
-  HDSLoc *weightsloc=NULL;   /* HDS locator of weights array */
+  double *weights = NULL;    /* Pointer to the weights map */
 
   /* Main routine */
   ndfBegin();
@@ -306,10 +312,11 @@ void smurf_qlmakemap( int *status ) {
     variance = (odata->pntr)[1];
   }
 
-  /* Create WEIGHTS extension in the output file and map pointer to
-     weights array */
-  weightsloc = smf_get_xloc ( odata, "SMURF", "SCUBA2_WT_ARR", "WRITE", 
-                              0, 0, status );
+  /* Create SMURF extension in the output file */
+  smurfloc = smf_get_xloc ( odata, "SMURF", "SMURF", "WRITE", 0, 0, status );
+
+  /* Compute number of pixels in output map */
+  mapsize = (ubnd_out[0] - lbnd_out[0] + 1) * (ubnd_out[1] - lbnd_out[1] + 1);
 
   /* Determine bounds of weights array - QLMAKEMAP always uses the
      REBIN method so the weights bounds array is 3-D to ensure
@@ -320,15 +327,14 @@ void smurf_qlmakemap( int *status ) {
   ubnd_wgt[1] = ubnd_out[1];
   lbnd_wgt[2] = 0;
   ubnd_wgt[2] = 1;
-  smf_open_ndfname ( weightsloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
+  /* Create WEIGHTS component in output file */
+  smf_open_ndfname ( smurfloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
                      3, lbnd_wgt, ubnd_wgt, &wdata, status );
   if ( wdata ) weights = (wdata->pntr)[0];
-
-
-  /* Allocate memory for weights and initialise to zero */
-  /*  weights = smf_malloc( (ubnd_out[0]-lbnd_out[0]+1) *
-			(ubnd_out[1]-lbnd_out[1]+1), sizeof(double),
-			1, status );*/
+  /* Create EXP_TIME component in output file */
+  smf_open_ndfname ( smurfloc, "WRITE", NULL, "EXP_TIME", "NEW", "_REAL",
+		     2, lbnd_out, ubnd_out, &tdata, status );
+  if ( tdata ) exp_time = (tdata->pntr)[0];
 
   /* Create provenance keymap */
   prvkeymap = astKeyMap( "" );
@@ -346,10 +352,15 @@ void smurf_qlmakemap( int *status ) {
     if (*status == SAI__OK)
       smf_accumulate_prov( prvkeymap, data->file, igrp, i, status );
 
+    /* Store steptime for calculating EXP_TIME */
+    if ( i==1 ) {
+      smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
+    }
+
     /* Handle output FITS header creation */
     smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
 
-    /* Remove bolometer drifts */
+    /* Remove bolometer drifts if a fit is present */
     smf_subtract_poly( data, status );
 
     /* Remove a mean sky level */
@@ -365,13 +376,25 @@ void smurf_qlmakemap( int *status ) {
     if ( usebad ) {
       ndgNdfas ( igrp, i, "READ", &indf, status );
     }
-    msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Beginning the REBIN step", status);
+    msgOutif(MSG__VERB, " ", "SMURF_QLMAKEMAP: Beginning the REBIN step", status);
     /* Rebin the data onto the output grid */
     smf_rebinmap(data, usebad, indf, i, size, outframeset, spread, params, moving, 
 		 lbnd_out, ubnd_out, map, variance, weights, status );
 
     smf_close_file( &data, status );
   }
+
+  /* Calculate exposure time per output pixel from weights array -
+     note even if weights is a 3-D array we only use the first mapsize
+     number of values which represent the `hits' per pixel */
+  for (i=0; (i<mapsize) && (*status == SAI__OK); i++) {
+    if ( map[i] == VAL__BADD ) {
+      exp_time[i] = VAL__BADR;
+    } else {
+      exp_time[i] = steptime * weights[i];
+    }
+  }
+
   /* Write WCS FrameSet to output file */
   ndfPtwcs( outframeset, ondf, status );
 
