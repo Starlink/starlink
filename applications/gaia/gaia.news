@@ -23,6 +23,11 @@
     The cube toolbox can now display the data variances as standard
     deviations (ERROR component).
 
+    When creating a channel map from a cube some of the combination 
+    estimators require more than one channel to operate (median for
+    instance), this problem is now reported avoiding an uninformative
+    error message.
+
   Humu Release
   ============
 
