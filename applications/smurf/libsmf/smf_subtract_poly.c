@@ -30,8 +30,8 @@
 *     polynomial extension.
 
 *  Notes:
-*     Is is assumed that the polynomial is a function of the timeslice
-*     index and not of a physical quantity (i.e. time).
+*     - It is assumed that the polynomial is a function of the
+*       timeslice index and not of a physical quantity (i.e. time).
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -44,6 +44,8 @@
 *        Add history check, and update history if routine successful
 *     2008-02-19 (AGG):
 *        Minor comment/documentation changes, use size_t
+*     2008-02-20 (AGG):
+*        Swap loop order to gain speed increase
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -101,6 +103,8 @@ void smf_subtract_poly(smfData *data, int *status) {
   size_t nframes;             /* Number of time slices */
   double *outdata = NULL;     /* Pointer to output data array */
   double *poly = NULL;        /* Pointer to polynomial coefficents */
+  double jay;                 /* Double-precision version of j */
+
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -125,16 +129,24 @@ void smf_subtract_poly(smfData *data, int *status) {
   nbol = (data->dims)[0] * (data->dims)[1];
   nframes = (data->dims)[2];
   
+  /* Loop over the timeslices for this bolometer */
+  for (j=0; j<nframes; j++) {
+    jay = (double)j; /* Cast outside the loop over bolometers */
+
   /* Loop over the number of bolometers */
-  for (i=0; i<nbol; i++) {
-
-    /* Loop over the timeslices for this bolometer */
-    for (j=0; j<nframes; j++) {
-
-      /* Construct the polynomial for this bolometer */
+    for (i=0; i<nbol; i++) {
+      /* Construct the polynomial for this bolometer - the first two
+	 terms are trivial and are determined manually. This is
+	 quicker than calling pow() unnecessarily. */
       baseline = 0.0;
       for (k=0; k<ncoeff; k++) {
-	baseline += poly[i + nbol*k] * pow((double)j, (double)k);
+	if ( k==0 ) {
+	  baseline += poly[i];
+	} else if ( k==1 ) {
+	  baseline +=  jay*poly[i+nbol];
+	} else {
+	  baseline += poly[i + nbol*k] * pow(jay, (double)k);
+	}
       }
       outdata[i + nbol*j] -= baseline;
     }
