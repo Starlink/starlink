@@ -159,6 +159,8 @@
 *        Weights array is now written as an NDF extension
 *     2008-02-19 (AGG):
 *        Add EXP_TIME array to output file
+*     2008-02-20 (AGG):
+*        Calculate median exposure time and write FITS entry
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -231,7 +233,9 @@ void smurf_qlmakemap( int *status ) {
   int lbnd_wgt[3];           /* Lower pixel bounds for weight array */
   double *map = NULL;        /* Pointer to the rebinned map data */
   size_t mapsize;            /* Number of pixels in output image */
+  float medtexp = 0.0;       /* Median exposure time */
   int moving = 0;            /* Flag to denote a moving object */
+  int neluse;                /* Number of pixels with a non-zero exposure time */
   int nparam = 0;            /* Number of extra parameters for pixel spreading scheme*/
   AstKeyMap * obsidmap = NULL; /* Map of OBSIDs from input data */
   smfData *odata=NULL;       /* Pointer to output SCUBA2 data struct */
@@ -257,6 +261,7 @@ void smurf_qlmakemap( int *status ) {
   void *variance = NULL;     /* Pointer to the variance map */
   smfData *wdata = NULL;     /* Pointer to SCUBA2 data struct for weights */
   double *weights = NULL;    /* Pointer to the weights map */
+  float *work_array = NULL;  /* Temporary work space */
 
   /* Main routine */
   ndfBegin();
@@ -281,6 +286,7 @@ void smurf_qlmakemap( int *status ) {
      unspecified, use the mask */
   parGtd0l ("USEBAD", 0, 1, &usebad, status);
 
+  /* Obtain desired pixel-spreading scheme */
   parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
 	    "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
 	    1, pabuf, 10, status );
@@ -296,7 +302,6 @@ void smurf_qlmakemap( int *status ) {
   smf_mapbounds_approx( igrp, 1, system, pixsize, lbnd_out, ubnd_out, 
 			&outframeset, &moving, status );
  
-
   /* Create an output smfData */
   ndgCreat( "OUT", NULL, &ogrp, &outsize, &flag, status );
   smfflags |= SMF__MAP_VAR;
@@ -398,6 +403,16 @@ void smurf_qlmakemap( int *status ) {
   /* Write WCS FrameSet to output file */
   ndfPtwcs( outframeset, ondf, status );
 
+  /* Calculate unweighted median exposure time - work_array is needed
+     because kpg1Medur optimizes the order of the input array */
+  work_array = smf_malloc( mapsize, sizeof(float), 1, status);
+  if ( work_array ) {
+    work_array = astStore( work_array, exp_time, mapsize*sizeof(float));
+    kpg1Medur( 1, (int)mapsize, work_array, &medtexp, &neluse, status);
+    astSetFitsF(fchan, "MEDTEXP", medtexp, "[s] Median MAKEMAP exposure time", 0);
+    smf_free( work_array, status );
+  }
+
 /* Retrieve the unique OBSID keys from the KeyMap and populate the OBSnnnnn
    and PROVCNT headers from this information. */
   smf_fits_add_prov( fchan, "OBS", obsidmap, status ); 
@@ -420,7 +435,6 @@ void smurf_qlmakemap( int *status ) {
   smf_close_file ( &odata, status );
   if ( ogrp != NULL ) grpDelet( &ogrp, status );
 
-  /*  weights = smf_free( weights, status );*/
   grpDelet( &igrp, status );
   
   ndfEnd( status );
