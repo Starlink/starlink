@@ -94,7 +94,8 @@
 #                            the delivery of double clicks.
 #                 12 Jan 08  Allow extra space to be taken by the file list
 #                            by default. Add a panedwindow to control dir
-#                            and file list share of space.
+#                            and file list share of space (double click
+#                            problem seems fixed).
 
 
 itk::usual FileSelect {}
@@ -127,7 +128,7 @@ itcl::class util::FileSelect {
 	set f [frame $w_.fs]
 
 	set fs(filterf) [frame $f.filterf]
-        set fs(listf) [panedwindow $f.listf -width 4i -orient horizontal]
+        set fs(listf) [panedwindow $f.listf -width 5i -orient horizontal]
 	set fs(self) [frame $f.self]
 	set fs(btnf) [frame $f.btnf -height 30]
 
