@@ -581,6 +581,10 @@
 *  leaving the standard of rest set to "Source").
       CALL AST_SETC( IWCS, 'StdOfRest', SOR, STATUS )
 
+*  Export the FrameSet pointer so that it is not anulled by the following
+*  call to AST_END.
+      CALL AST_EXPORT( IWCS, STATUS )
+
  999  CONTINUE
 
 *  End the AST context.
