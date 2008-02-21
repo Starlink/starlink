@@ -1,12 +1,13 @@
 /*
  * rtdPolyLine.c --
  *
- *      This file implements line items for canvas widgets.
+ *      This file imlements line items for canvas widgets.
  *
  * Copyright (c) 1991-1994 The Regents of the University of California.
  * Copyright (c) 1994-1995 Sun Microsystems, Inc.
  * Copyright (c) 1999-2005 Central Laboratory of the Research Councils
  * Copyright (c) 2006 Particle Physics and Astronomy Research Council
+ * Copyright (c) 2008 Science and Technology Facilities Council
  *
  * See the Tcl distribution file "license.terms" for information on usage and
  * redistribution of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -16,19 +17,21 @@
  *    to allow the line coordinates to be supplied via the routine
  *    RtdSetLineCoords, which considerably speeds up coordinate
  *    passing (essential for contour drawing). The canvas type is
- *    renamed to rtd_polyline. 
+ *    renamed to rtd_polyline.
  *    16 March 2006: Now supports line breaks using the badValue. Only
  *    works for un-smoother lines and the badValue applies to the Y
  *    coordinates (data values).
+ *    19 February 2008: Add support for a line style.
  */
 #if HAVE_CONFIG_H
-#include <config.h> 
+#include <config.h>
 #endif
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <float.h>
+#include <string.h>
 #include <tk.h>
 #include <rtdCanvas.h>
 
@@ -108,12 +111,13 @@ typedef struct PolyLineItem  {
     int smooth;                 /* Non-zero means draw line smoothed (i.e.
                                  * with Bezier splines). */
     int splineSteps;            /* Number of steps in each spline segment. */
+    int style;                  /* Line drawing style, 0, 1, 2 or 3. */
+    char dash[32];              /* Dash array, can be used for custom styles. */
 } PolyLineItem;
 
 /*
  * Number of points in an arrowHead:
  */
-
 #define PTS_IN_ARROW 6
 
 /*
@@ -133,6 +137,12 @@ static int              ConfigureArrows _ANSI_ARGS_((Tk_Canvas canvas,
 static int              CreateLine _ANSI_ARGS_((Tcl_Interp *interp,
                             Tk_Canvas canvas, struct Tk_Item *itemPtr,
                             int objc, Tcl_Obj *CONST objv[]));
+static int              DashParseProc _ANSI_ARGS_((ClientData clientData,
+                            Tcl_Interp *interp, Tk_Window tkwin, char *value,
+                            char *recordPtr, int offset));
+static char *           DashPrintProc _ANSI_ARGS_((ClientData clientData,
+                            Tk_Window tkwin, char *recordPtr, int offset,
+                            Tcl_FreeProc **freeProcPtr));
 static void             DeleteLine _ANSI_ARGS_((Tk_Canvas canvas,
                             Tk_Item *itemPtr, Display *display));
 static int              LineCoords _ANSI_ARGS_((Tcl_Interp *interp,
@@ -164,7 +174,10 @@ static Tk_CustomOption arrowShapeOption = {
     ParseArrowShape, PrintArrowShape, (ClientData) NULL
 };
 static Tk_CustomOption tagsOption = {
-    Tk_CanvasTagsParseProc, Tk_CanvasTagsPrintProc, (ClientData) NULL
+    (Tk_OptionParseProc *) Tk_CanvasTagsParseProc, Tk_CanvasTagsPrintProc, (ClientData) NULL
+};
+static Tk_CustomOption dashOption = {
+    DashParseProc, DashPrintProc, (ClientData) NULL
 };
 
 static Tk_ConfigSpec configSpecs[] = {
@@ -175,6 +188,8 @@ static Tk_ConfigSpec configSpecs[] = {
         TK_CONFIG_DONT_SET_DEFAULT, &arrowShapeOption},
     {TK_CONFIG_CAP_STYLE, "-capstyle", (char *) NULL, (char *) NULL,
         "butt", Tk_Offset(PolyLineItem, capStyle), TK_CONFIG_DONT_SET_DEFAULT},
+    {TK_CONFIG_CUSTOM, "-dash", (char *) NULL, (char *) NULL, (char *) NULL, 
+     Tk_Offset(PolyLineItem, dash), TK_CONFIG_NULL_OK, &dashOption},
     {TK_CONFIG_COLOR, "-fill", (char *) NULL, (char *) NULL,
         "black", Tk_Offset(PolyLineItem, fg), TK_CONFIG_NULL_OK},
     {TK_CONFIG_JOIN_STYLE, "-joinstyle", (char *) NULL, (char *) NULL,
@@ -187,6 +202,8 @@ static Tk_ConfigSpec configSpecs[] = {
         "12", Tk_Offset(PolyLineItem, splineSteps), TK_CONFIG_DONT_SET_DEFAULT},
     {TK_CONFIG_BITMAP, "-stipple", (char *) NULL, (char *) NULL,
         (char *) NULL, Tk_Offset(PolyLineItem, fillStipple), TK_CONFIG_NULL_OK},
+    {TK_CONFIG_INT, "-style", (char *) NULL, (char *) NULL,
+        "0", Tk_Offset(PolyLineItem, style), TK_CONFIG_DONT_SET_DEFAULT},
     {TK_CONFIG_CUSTOM, "-tags", (char *) NULL, (char *) NULL,
         (char *) NULL, 0, TK_CONFIG_NULL_OK, &tagsOption},
     {TK_CONFIG_PIXELS, "-width", (char *) NULL, (char *) NULL,
@@ -239,6 +256,15 @@ static Tk_Uid bothUid = NULL;
  */
 
 #define MAX_STATIC_POINTS 200
+
+/*
+ *  Dash patterns for the non-filled line styles, should give dot, dash and
+ *  dot-dash.
+ */
+static char dot[] = { 6, 6, 0 };
+static char dash[] = { 12, 6, 0 };
+static char dotdash[] = { 18, 6, 6, 6, 0 };
+static char *dashes[] = { dot, dash, dotdash };
 
 /*  Definitions etc. for backdoor command which allows coordinates to
     be passed without conversion to string */
@@ -346,6 +372,8 @@ static int CreateLine( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     linePtr->coordPtr = NULL;
     linePtr->nullValue = -DBL_MAX;
     linePtr->width = 1;
+    linePtr->style = 0;
+    linePtr->dash[0] = '\0';
     linePtr->fg = None;
     linePtr->fillStipple = None;
     linePtr->capStyle = CapButt;
@@ -428,7 +456,7 @@ static int LineCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         numCoords = 2*linePtr->numPoints;
         if (linePtr->firstArrowPtr != NULL) {
             coordPtr = linePtr->firstArrowPtr;
-        } 
+        }
         else {
             coordPtr = linePtr->coordPtr;
         }
@@ -444,19 +472,19 @@ static int LineCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         }
         Tcl_SetObjResult(interp, obj);
         return TCL_OK;
-    } 
+    }
     else if (objc < 4) {
         Tcl_AppendResult(interp,
                 "too few coordinates for line: must have at least 4",
                 (char *) NULL);
         return TCL_ERROR;
-    } 
+    }
     else if (objc & 1) {
         Tcl_AppendResult(interp,
                 "odd number of coordinates specified for line",
                 (char *) NULL);
         return TCL_ERROR;
-    } 
+    }
     else {
 	numPoints = objc/2;
 	if (linePtr->numPoints != numPoints) {
@@ -542,7 +570,7 @@ ConfigureLine(Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 
     if (linePtr->fg == NULL) {
         newGC = arrowGC = None;
-    } 
+    }
     else {
         gcValues.foreground = linePtr->fg->pixel;
         gcValues.join_style = linePtr->joinStyle;
@@ -556,6 +584,20 @@ ConfigureLine(Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
             gcValues.fill_style = FillStippled;
             mask |= GCStipple|GCFillStyle;
         }
+
+        /* Dashes if needed (offset is zero). Use style if dash is NULL. */
+        if ( linePtr->style > 0 && linePtr->dash[0] == '\0' ) {
+            linePtr->style = ( linePtr->style > 3 ) ? 3 : linePtr->style;
+            strncpy( linePtr->dash, dashes[linePtr->style-1], 31 );
+            linePtr->dash[31] = '\0';
+        }
+
+        if ( linePtr->dash[0] != '\0' ) {
+            gcValues.line_style = LineOnOffDash;
+            gcValues.dashes = *linePtr->dash;
+            mask |= GCLineStyle|GCDashList;
+        }
+
         if (linePtr->arrow == noneUid) {
             gcValues.cap_style = linePtr->capStyle;
             mask |= GCCapStyle;
@@ -579,7 +621,7 @@ ConfigureLine(Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 
     if (linePtr->splineSteps < 1) {
         linePtr->splineSteps = 1;
-    } 
+    }
     else if (linePtr->splineSteps > 100) {
         linePtr->splineSteps = 100;
     }
@@ -816,14 +858,14 @@ RtdLineDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
 
     if ((linePtr->smooth) && (linePtr->numPoints > 2)) {
         numPoints = 1 + linePtr->numPoints*linePtr->splineSteps;
-    } 
+    }
     else {
         numPoints = linePtr->numPoints;
     }
 
     if (numPoints <= MAX_STATIC_POINTS) {
         pointPtr = staticPoints;
-    } 
+    }
     else {
         pointPtr = (XPoint *) ckalloc((unsigned) (numPoints * sizeof(XPoint)));
     }
@@ -839,6 +881,14 @@ RtdLineDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
         Tk_CanvasSetStippleOrigin(canvas, linePtr->arrowGC);
     }
 
+    /* 
+     * Same for dashing.
+     */
+    if ( linePtr->dash[0] != '\0' ) {
+        XSetDashes( display, linePtr->gc, 0, linePtr->dash,  
+                    strlen( linePtr->dash ) );
+    }
+
     /*
      * If there are breaks in the line, indicated by our null value in the Y
      * coordinate, then we draw the polyline piece-by-piece. Note breaks are
@@ -852,7 +902,7 @@ RtdLineDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
 
         XDrawLines( display, drawable, linePtr->gc, pointPtr, numPoints,
                     CoordModeOrigin );
-    } 
+    }
     else {
         int count = 0;
         pPtr = pointPtr;
@@ -952,7 +1002,7 @@ LineToPoint(Tk_Canvas canvas, Tk_Item *itemPtr, double *pointPtr )
         numPoints = 1 + linePtr->numPoints*linePtr->splineSteps;
         if (numPoints <= MAX_STATIC_POINTS) {
             linePoints = staticSpace;
-        } 
+        }
         else {
             linePoints = (double *) ckalloc((unsigned)
                     (2*numPoints*sizeof(double)));
@@ -960,7 +1010,7 @@ LineToPoint(Tk_Canvas canvas, Tk_Item *itemPtr, double *pointPtr )
         numPoints = TkMakeBezierCurve(canvas, linePtr->coordPtr,
                 linePtr->numPoints, linePtr->splineSteps, (XPoint *) NULL,
                 linePoints);
-    } 
+    }
     else {
         numPoints = linePtr->numPoints;
         linePoints = linePtr->coordPtr;
@@ -990,7 +1040,7 @@ LineToPoint(Tk_Canvas canvas, Tk_Item *itemPtr, double *pointPtr )
             if (dist <= 0.0) {
                 bestDist = 0.0;
                 goto done;
-            } 
+            }
             else if (dist < bestDist) {
                 bestDist = dist;
             }
@@ -1005,13 +1055,13 @@ LineToPoint(Tk_Canvas canvas, Tk_Item *itemPtr, double *pointPtr )
         if (count == numPoints) {
             TkGetButtPoints(coordPtr+2, coordPtr, (double) linePtr->width,
                     linePtr->capStyle == CapProjecting, poly, poly+2);
-        } 
+        }
         else if ((linePtr->joinStyle == JoinMiter) && !changedMiterToBevel) {
             poly[0] = poly[6];
             poly[1] = poly[7];
             poly[2] = poly[4];
             poly[3] = poly[5];
-        } 
+        }
         else {
             TkGetButtPoints(coordPtr+2, coordPtr, (double) linePtr->width, 0,
                     poly, poly+2);
@@ -1030,7 +1080,7 @@ LineToPoint(Tk_Canvas canvas, Tk_Item *itemPtr, double *pointPtr )
                 if (dist <= 0.0) {
                     bestDist = 0.0;
                     goto done;
-                } 
+                }
                 else if (dist < bestDist) {
                     bestDist = dist;
                 }
@@ -1040,7 +1090,7 @@ LineToPoint(Tk_Canvas canvas, Tk_Item *itemPtr, double *pointPtr )
         if (count == 2) {
             TkGetButtPoints(coordPtr, coordPtr+2, (double) linePtr->width,
                     linePtr->capStyle == CapProjecting, poly+4, poly+6);
-        } 
+        }
         else if (linePtr->joinStyle == JoinMiter) {
             if (TkGetMiterPoints(coordPtr, coordPtr+2, coordPtr+4,
                     (double) linePtr->width, poly+4, poly+6) == 0) {
@@ -1048,7 +1098,7 @@ LineToPoint(Tk_Canvas canvas, Tk_Item *itemPtr, double *pointPtr )
                 TkGetButtPoints(coordPtr, coordPtr+2, (double) linePtr->width,
                         0, poly+4, poly+6);
             }
-        } 
+        }
         else {
             TkGetButtPoints(coordPtr, coordPtr+2, (double) linePtr->width, 0,
                     poly+4, poly+6);
@@ -1059,7 +1109,7 @@ LineToPoint(Tk_Canvas canvas, Tk_Item *itemPtr, double *pointPtr )
         if (dist <= 0.0) {
             bestDist = 0.0;
             goto done;
-        } 
+        }
         else if (dist < bestDist) {
             bestDist = dist;
         }
@@ -1076,7 +1126,7 @@ LineToPoint(Tk_Canvas canvas, Tk_Item *itemPtr, double *pointPtr )
         if (dist <= 0.0) {
             bestDist = 0.0;
             goto done;
-        } 
+        }
         else if (dist < bestDist) {
             bestDist = dist;
         }
@@ -1093,7 +1143,7 @@ LineToPoint(Tk_Canvas canvas, Tk_Item *itemPtr, double *pointPtr )
             if (dist <= 0.0) {
                 bestDist = 0.0;
                 goto done;
-            } 
+            }
             else if (dist < bestDist) {
                 bestDist = dist;
             }
@@ -1104,7 +1154,7 @@ LineToPoint(Tk_Canvas canvas, Tk_Item *itemPtr, double *pointPtr )
             if (dist <= 0.0) {
                 bestDist = 0.0;
                 goto done;
-            } 
+            }
             else if (dist < bestDist) {
                 bestDist = dist;
             }
@@ -1154,7 +1204,7 @@ LineToArea( Tk_Canvas canvas, Tk_Item *itemPtr, double *rectPtr )
         numPoints = 1 + linePtr->numPoints*linePtr->splineSteps;
         if (numPoints <= MAX_STATIC_POINTS) {
             linePoints = staticSpace;
-        } 
+        }
         else {
             linePoints = (double *) ckalloc((unsigned)
                     (2*numPoints*sizeof(double)));
@@ -1162,7 +1212,7 @@ LineToArea( Tk_Canvas canvas, Tk_Item *itemPtr, double *rectPtr )
         numPoints = TkMakeBezierCurve(canvas, linePtr->coordPtr,
                 linePtr->numPoints, linePtr->splineSteps, (XPoint *) NULL,
                 linePoints);
-    } 
+    }
     else {
         numPoints = linePtr->numPoints;
         linePoints = linePtr->coordPtr;
@@ -1469,7 +1519,7 @@ ConfigureArrows( Tk_Canvas canvas, PolyLineItem *linePtr )
         length = hypot(dx, dy);
         if (length == 0) {
             sinTheta = cosTheta = 0.0;
-        } 
+        }
         else {
             sinTheta = dy/length;
             cosTheta = dx/length;
@@ -1516,7 +1566,7 @@ ConfigureArrows( Tk_Canvas canvas, PolyLineItem *linePtr )
         length = hypot(dx, dy);
         if (length == 0) {
             sinTheta = cosTheta = 0.0;
-        } 
+        }
         else {
             sinTheta = dy/length;
             cosTheta = dx/length;
@@ -1568,8 +1618,9 @@ RtdLineToPostscript( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     PolyLineItem *linePtr = (PolyLineItem *) itemPtr;
     char buffer[200];
     char *style;
+    int i;
 
-    if (linePtr->fg == NULL) {
+    if ( linePtr->fg == NULL ) {
         return TCL_OK;
     }
 
@@ -1580,12 +1631,12 @@ RtdLineToPostscript( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
 
     if ((!linePtr->smooth) || (linePtr->numPoints <= 2)) {
         Tk_CanvasPsPath(interp, canvas, linePtr->coordPtr, linePtr->numPoints);
-    } 
+    }
     else {
         if (linePtr->fillStipple == None) {
             TkMakeBezierPostscript(interp, canvas, linePtr->coordPtr,
                     linePtr->numPoints);
-        } 
+        }
         else {
             /*
              * Special hack: Postscript printers don't appear to be able
@@ -1619,13 +1670,12 @@ RtdLineToPostscript( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     /*
      * Set other line-drawing parameters and stroke out the line.
      */
-
     sprintf(buffer, "%d setlinewidth\n", linePtr->width);
     Tcl_AppendResult(interp, buffer, (char *) NULL);
     style = "0 setlinecap\n";
     if (linePtr->capStyle == CapRound) {
         style = "1 setlinecap\n";
-    } 
+    }
     else if (linePtr->capStyle == CapProjecting) {
         style = "2 setlinecap\n";
     }
@@ -1633,11 +1683,24 @@ RtdLineToPostscript( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
     style = "0 setlinejoin\n";
     if (linePtr->joinStyle == JoinRound) {
         style = "1 setlinejoin\n";
-    } 
+    }
     else if (linePtr->joinStyle == JoinBevel) {
         style = "2 setlinejoin\n";
     }
     Tcl_AppendResult(interp, style, (char *) NULL);
+
+    if ( linePtr->dash[0] != '\0' ) {
+        char *str = buffer;
+        char *ptr = linePtr->dash;
+        str += sprintf( str, "[");
+        i = strlen( linePtr->dash );
+        while ( i-- > 1 ) {
+            str += sprintf( str, "%d ", *ptr++ & 0xff );
+        }
+        str += sprintf(str, "%d] 0 setdash\n", *ptr++ & 0xff);
+        Tcl_AppendResult( interp, buffer, (char *) NULL );
+    }
+
     if (Tk_CanvasPsColor(interp, canvas, linePtr->fg) != TCL_OK) {
         return TCL_ERROR;
     };
@@ -1647,7 +1710,7 @@ RtdLineToPostscript( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
                 != TCL_OK) {
             return TCL_ERROR;
         }
-    } 
+    }
     else {
         Tcl_AppendResult(interp, "stroke\n", (char *) NULL);
     }
@@ -1716,7 +1779,7 @@ ArrowheadPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
                 != TCL_OK) {
             return TCL_ERROR;
         }
-    } 
+    }
     else {
         Tcl_AppendResult(interp, "fill\n", (char *) NULL);
     }
@@ -1828,4 +1891,93 @@ EXTERN void RtdLineSetWidth( Display *display, Tk_Item *itemPtr, int width )
     linePtr->width = width;
     XSetLineAttributes( display, linePtr->gc, linePtr->width, LineSolid,
                         linePtr->capStyle, linePtr->joinStyle );
+}
+
+/*
+ *--------------------------------------------------------------
+ *
+ * DashParseProc --
+ *
+ *      This procedure is called back during option parsing to
+ *      parse the -dash option.
+ *
+ *--------------------------------------------------------------
+ */
+static int
+DashParseProc( ClientData clientData, Tcl_Interp *interp, Tk_Window tkwin,
+               char *value, char *recordPtr, int offset )
+{
+    PolyLineItem *linePtr = (PolyLineItem *) recordPtr;
+    char **argv = NULL;
+    int a;
+    int argc;
+    int i;
+
+    if ( offset != Tk_Offset( PolyLineItem, dash ) ) {
+        Tcl_Panic( "ParseDashProc received bogus offset" );
+    }
+
+    /* -dash is a list of integers which we code to encode into 
+     * a character array. Allow an empty string to clear value.
+     */
+    if ( value[0] == '\0' ) {
+        linePtr->dash[0] = '\0';
+        return TCL_OK;
+    }
+    if ( Tcl_SplitList( interp, value, &argc, &argv ) == TCL_OK && argc > 0 ) {
+        for ( i = 0; i < argc; i++ ) {
+            if ( Tcl_GetInt( interp, argv[i], &a ) != TCL_OK ) {
+                ckfree( (char *) argv );
+                return TCL_ERROR;
+            }
+            linePtr->dash[i] = (char) a;
+        }
+        linePtr->dash[argc] = '\0';
+        ckfree( (char *) argv );
+        return TCL_OK;
+    }
+
+    Tcl_ResetResult( interp );
+    Tcl_AppendResult( interp, "bad dash value \"", value, (char *) NULL);
+    if ( argv != NULL ) {
+        ckfree( (char *) argv );
+    }
+    return TCL_ERROR;
+}
+
+/*
+ *--------------------------------------------------------------
+ *
+ * DashPrintProc --
+ *
+ *      This procedure is a callback invoked by the configuration
+ *      code to return a printable value describing a dash.
+ *
+ * Results:
+ *      None.
+ *
+ * Side effects:
+ *      None.
+ *
+ *--------------------------------------------------------------
+ */
+static char *
+DashPrintProc( ClientData clientData, Tk_Window tkwin, char *recordPtr,
+               int offset, Tcl_FreeProc **freeProcPtr )
+{
+    PolyLineItem *linePtr = (PolyLineItem *) recordPtr;
+    char *buffer;
+    char *ptr1;
+    char *ptr2;
+    
+    ptr1 = linePtr->dash;
+    ptr2 = buffer = ckalloc( 120 );
+
+    while ( ptr1 ) {
+        ptr2 += sprintf( ptr2, "%c", ptr1 );
+        ptr1++;
+    }
+
+    *freeProcPtr = TCL_DYNAMIC;
+    return buffer;
 }

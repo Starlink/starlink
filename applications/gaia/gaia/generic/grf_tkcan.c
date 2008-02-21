@@ -33,7 +33,7 @@
  *  Copyright:
  *     Copyright (C) 1997-2004 Central Laboratory of the Research Councils
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
- *     Copyright (C) 2007 Science and Technology Facilities Council.
+ *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -278,7 +278,7 @@ int astTk_Init( Tcl_Interp *theinterp, const char *thecanvas ) {
     }
 
     /*  Set the default configuration information. */
-    ConfigInfo.style = 1.0;
+    ConfigInfo.style = 0.0;
     ConfigInfo.width = 1.0;
     ConfigInfo.size = 1.0;
     ConfigInfo.font = 0;
@@ -738,9 +738,10 @@ int astGLine( int n, const float *x, const float *y ) {
             /*  Configure the command by adding the canvas name and all the
                 required options. */
             (void) sprintf( buffer, 
-                            " -fill %s -width %f -tag {%s} -smooth %d\n",
+                            " -fill %s -width %f -tag {%s} -smooth %d -style %d\n",
                             Colours[ConfigInfo.colour], ConfigInfo.width,
-                            ConfigInfo.tag, ConfigInfo.smooth );
+                            ConfigInfo.tag, ConfigInfo.smooth, 
+                            (int) ConfigInfo.style );
             if ( Tcl_VarEval( Interp, Canvas, " create rtd_polyline ",
                               coords, buffer, (char *) NULL ) != TCL_OK ) {
                 
@@ -1207,27 +1208,25 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
     }
     
     /* If required retrieve the current line style, and set a new line
-       style. The Tk line does not have any "styles" as recognised
-       here so always set this to 1.0. It may be possible to use
-       stipples to get other effects if really necessary. */
-    if( attr == GRF__STYLE ){
-        if( old_value ) *old_value = ConfigInfo.style;
+       style. This can be 0, 1, 2 or 3. */
+    if ( attr == GRF__STYLE ) {
+        if ( old_value ) *old_value = ConfigInfo.style;
         
-        if( value != AST__BAD ){
+        if ( value != AST__BAD ) {
             
             /* Need a new segment item if the value has changed. */
             if ( value != ConfigInfo.style ) {
                 NewSegment = 1;
             }
-            ConfigInfo.style = 1.0;
+            ConfigInfo.style = MAX( 0.0, MIN( value, 3.0 ) );
         }
-        
-    } else if( attr == GRF__WIDTH ){
+    } 
+    else if ( attr == GRF__WIDTH ) {
         
         /* If required retrieve the current line width, and set a new
            line width.  Line width is scaled betwen 0.0 (minimum
            thickness) and 1.0 (maximum thickness). */
-        if( old_value ) *old_value = ConfigInfo.width / 200.0;
+        if ( old_value ) *old_value = ConfigInfo.width / 200.0;
         
         if( value != AST__BAD ){
             dval = MAX( 0.0, MIN( 200.0, ( value * 200.0 ) ) );

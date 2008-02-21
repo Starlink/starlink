@@ -54,6 +54,7 @@
 #  Copyright:
 #     Copyright (C) 1999-2001 Central Laboratory of the Research Councils
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2008 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -196,6 +197,16 @@ itcl::class gaia::GaiaContour {
          {Use single width} \
          {Draw all contours with the same width}
 
+      #  Add an option to use same style for all lines.
+      $Options add checkbutton \
+         -label {Use single style} \
+         -variable [scope single_style_] \
+         -onvalue 1 \
+         -offvalue 0
+      $short_help_win_ add_menu_short_help $Options \
+         {Use single style} \
+         {Draw all contours with the same style}
+
       #  Add an option to add a customized colour to menus.
       $Options add command \
          -label {Add custom colour...} \
@@ -211,7 +222,7 @@ itcl::class gaia::GaiaContour {
       #  single pane).
       itk_component add tab {
          ::iwidgets::tabnotebook $w_.tab \
-            -angle 30 -tabpos w -width 370 -height 400
+            -angle 30 -tabpos w -width 500 -height 400
       }
 
       #  Get pane for levels and attributes.
@@ -360,8 +371,8 @@ itcl::class gaia::GaiaContour {
    #  Write the current configuration to a named file. This is written
    #  in a the format:
    #
-   #     level  colour width
-   #     level  colour width
+   #     level  colour width style
+   #     level  colour width style
    #     ...
    #
    #     parameter = value
@@ -389,10 +400,11 @@ itcl::class gaia::GaiaContour {
             #  Get the level attributes.
             set levatts [get_levels_and_atts_]
 
-            puts $fid [format "\# %-26s %-10s %-10s" level colour width]
+            puts $fid [format "\# %-26s %-10s %-10s %-10s" level colour width style]
             foreach line $levatts {
-               lassign $line level colour width
-               puts $fid [format "  %-26s %-10s %-10s" $level $colour $width]
+               lassign $line level colour width style
+               puts $fid \
+                  [format "  %-26s %-10s %-10s %-10s" $level $colour $width $style]
             }
 
             #  Add the contour image name (use the disk file, not the
@@ -479,10 +491,12 @@ itcl::class gaia::GaiaContour {
       }
    }
 
-   #  Add a new contour at a given position.
-   protected method add_contour_ {ncont value index width} {
+   #  Add a new contour at a given position. Style is optional for backwards
+   #  compatibility with old-save files.
+   protected method add_contour_ {ncont value index width {style 0}} {
       $itk_component(value$ncont) configure -value $value
       $itk_component(width$ncont) configure -value $width
+      $itk_component(style$ncont) configure -value $style
       $itk_component(colour$ncont) \
          configure -value [gaia::AstColours::lookup_colour $index]
    }
@@ -560,7 +574,6 @@ itcl::class gaia::GaiaContour {
          {Displayed image that will be contoured}
 
       #  Add a binding to update the menu item whenever it is pressed.
-      #  XXX bit of a cheat to get menubutton name.
       set menu [$itk_component(targets) component mb]
       bind $menu <ButtonPress-1> "+[code $this update_targets_]"
 
@@ -606,9 +619,12 @@ itcl::class gaia::GaiaContour {
       itk_component add athead3 {
          label $parent.width -text "Width"
       }
+      itk_component add athead4 {
+         label $parent.style -text "Style"
+      }
 
       grid $itk_component(athead1) $itk_component(athead2) \
-         $itk_component(athead3)
+         $itk_component(athead3) $itk_component(athead4)
 
       #  Set up the default colours (wrapped at maximum number).
       for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
@@ -658,13 +674,28 @@ itcl::class gaia::GaiaContour {
          }
          $itk_component(width$i) configure -value 1
 
+         #  Add menu for selecting the style.
+         itk_component add style$i {
+            util::LabelMenu $parent.style$i \
+               -relief raised
+         }
+
+         #  Now add the range of styles to it.
+         for {set j 0} {$j <= 3} {incr j} {
+            $itk_component(style$i) add \
+               -label $j \
+               -value $j \
+               -command [code $this set_style_ $i]
+         }
+         $itk_component(style$i) configure -value 0
+
          #  Need to make geometries up to date, otherwise a user define
          #  BorderWidth property seems to leave all widgets size 1.
          update idletasks
 
          #  Add these to the grid.
          grid $itk_component(value$i) $itk_component(colour$i) \
-              $itk_component(width$i)
+              $itk_component(width$i) $itk_component(style$i)
       }
    }
 
@@ -838,7 +869,7 @@ itcl::class gaia::GaiaContour {
       }
    }
 
-   #  Get the attributes from the colour and width widgets.
+   #  Get the attributes from the colour, width and style widgets.
    protected method get_ast_atts_ {} {
       set atts {}
       for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
@@ -848,13 +879,15 @@ itcl::class gaia::GaiaContour {
             set was $colour
             set colour [gaia::AstColours::lookup_index $colour]
             set width [expr [$itk_component(width$i) get]*0.005]
-            lappend atts "colour(curve)=$colour,width(curve)=$width"
+            set style [$itk_component(style$i) get]
+            lappend atts \
+               "colour(curve)=$colour,width(curve)=$width,style(curve)=$style"
          }
       }
       return $atts
    }
 
-   #  Get the attributes from the colour and width widgets for a
+   #  Get the attributes from the colour, width and style widgets for a
    #  single contour.
    protected method get_ast_att_ {index} {
       set atts {}
@@ -863,7 +896,8 @@ itcl::class gaia::GaiaContour {
          set colour [$itk_component(colour$index) get]
          set colour [gaia::AstColours::lookup_index $colour]
          set width [expr [$itk_component(width$index) get]*0.005]
-         set atts "colour(curve)=$colour,width(curve)=$width"
+         set style [$itk_component(style$index) get]
+         set atts "colour(curve)=$colour,width(curve)=$width,style(curve)=$style"
       }
       return $atts
    }
@@ -875,7 +909,8 @@ itcl::class gaia::GaiaContour {
       if { $value != {} } {
          set colour [$itk_component(colour$index) get]
          set width [$itk_component(width$index) get]
-         set atts "$colour $width"
+         set style [$itk_component(style$index) get]
+         set atts "$colour $width $style"
       }
       return $atts
    }
@@ -889,7 +924,8 @@ itcl::class gaia::GaiaContour {
             set colour [$itk_component(colour$i) get]
             set colour [gaia::AstColours::lookup_index $colour]
             set width [$itk_component(width$i) get]
-            lappend atts "$value $colour $width"
+            set style [$itk_component(style$i) get]
+            lappend atts "$value $colour $width $style"
          }
       }
       return $atts
@@ -920,6 +956,7 @@ itcl::class gaia::GaiaContour {
             $itk_component(value$i) configure -value {}
             $itk_component(colour$i) configure -value $coldefault_($i)
             $itk_component(width$i) configure -value 1
+            $itk_component(style$i) configure -value 0
          }
       } else {
          for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
@@ -1231,6 +1268,24 @@ itcl::class gaia::GaiaContour {
       $itk_option(-canvas) itemconfigure $texttag_ -width 0
    }
 
+   #  Set the style of a contour (if it is drawn), or all contours if
+   #  using a single style.
+   protected method set_style_ {index} {
+      set style [$itk_component(style$index) get]
+      if { $single_style_ } {
+         for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
+            if { $i != $index } {
+               $itk_component(style$i) configure -value $style
+            }
+            $itk_option(-canvas) itemconfigure $leveltags_($i) \
+               -dash [get_dash_ $style]
+         }
+      } else {
+         $itk_option(-canvas) itemconfigure $leveltags_($index) \
+            -dash [get_dash_ $style]
+      }
+   }
+
    #  Add controls for configuring the contour key.
    protected method add_key_controls_ {w} {
 
@@ -1433,7 +1488,6 @@ itcl::class gaia::GaiaContour {
       set dy 15.0
 
       #  Title.
-      lassign [get_att_ 0] colour width
       set title [$itk_component(keytitle) get]
       if { $title != {} } {
          $itk_option(-canvas) create text [expr $x+$dx] $y \
@@ -1450,16 +1504,19 @@ itcl::class gaia::GaiaContour {
       for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
          if { $drawn_($i) } {
             set value [lindex $levels $i]
-            lassign [get_att_ $i] colour width
+            lassign [get_att_ $i] colour width style
+
             $itk_option(-canvas) create line $x $y [expr $x+$dx] $y \
                -fill $colour \
                -width $width \
+               -dash [get_dash_ $style] \
                -tags "$itk_option(-ast_tag) $keytag_ $leveltags_($i)"
+
             $itk_option(-canvas) create text [expr $x+$dx+5] $y \
                -text "$value" \
                -anchor w \
                -fill $colour \
-               -tags "$itk_option(-ast_tag) $keytag_ $leveltags_($i) $texttag_" \
+               -tags "$itk_option(-ast_tag) $keytag_ $texttag_" \
                -width 0 \
                -font $font
             set y [expr $y+$dy]
@@ -1605,6 +1662,19 @@ itcl::class gaia::GaiaContour {
       set $which $value
    }
 
+   #  Convert style into a standard dash pattern. Needs to match the
+   #  styles of rtd_polyline.
+   protected method get_dash_ {style} {
+      if { $style == 0 } {
+         return ""
+      } elseif { $style == 1 } {
+         return "6 6"
+      } elseif { $style == 2 } {
+         return "12 6"
+      }
+      return "18 6 6 6"
+   }
+
    #  Configuration options: (public variables)
    #  ----------------------
    #  Name of canvas.
@@ -1735,6 +1805,9 @@ itcl::class gaia::GaiaContour {
 
    #  Whether to use a single width for all lines.
    protected variable single_width_ 0
+
+   #  Whether to use a single style for all lines.
+   protected variable single_style_ 0
 
    #  Array of the ColourLabelMenu objects in use.
    protected variable colour_menu_
