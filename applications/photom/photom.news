@@ -1,8 +1,9 @@
 1 Update_to_PHOTOM
 
   PHOTOM is described in SUN/45, which you can view with the command 
-  "showme sun45". The support programmer can be reached my emailing
-  photom@star.rl.ac.uk
+  "showme sun45". Support may be available from the Starlink Software 
+  User Support mailing list (starlink@jiscmail.ac.uk, you can join
+  the list by going to http://www.jiscmail.ac.uk/lists/starlink.html).
 
   Major Changes
   -------------
@@ -40,6 +41,17 @@
   ---------
     Since v1.10
     -----------
+
+    A bug in the PHOTOM interface stopped the PHOTON parameter from being
+    greater than 2 (excluding the options for estimating errors from the
+    data variance and gaussian estimation).
+
+    Various coding errors that could result in the failure to output 
+    information and error messages have been fixed (mainly in the optimal
+    photometry code support).
+
+    Humu release
+    ============
 
     A memory fault in the optimal photometry code when stars where close to
     the edges of the image has been fixed. Various initialisation issues have

@@ -31,6 +31,7 @@
 *  Authors :
 *     KM: Koji Mukai (Oxford University)
 *     AA: Alasdair Allan (Starlink, Keele University)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 *
 *  History :
@@ -40,6 +41,9 @@
 *        Revised
 *     08-FEB-1999 (AA):
 *        Cut and hack for Starlink
+*     21-FEB-2008 (PWD):
+*        Stop using internal writes to copy constant strings. Initialise
+*        STATUS so that messages are output. Increase output buffer size.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -49,6 +53,10 @@
 *  Type Definitions :
 
 	IMPLICIT NONE
+
+*  Include files:
+        INCLUDE 'SAE_PAR'
+        INCLUDE 'MSG_PAR'
 
 	INTEGER M_PAR
 	PARAMETER( M_PAR = 32 )
@@ -79,9 +87,13 @@
 	COMMON / CYCLIC_LIST / LIST_CYCLIC, TAB_PERIOD, TAB_BOTTOM
 	COMMON / BUG / DEBUG
 	
-	CHARACTER TEXT * 72
+	CHARACTER TEXT * ( MSG__SZMSG )
 	
 	INTEGER STATUS
+
+
+*   STATUS needs initialising if we are to see any reports.
+        STATUS = SAI__OK
 
 *   Is any parameter going off-boundary?
 
@@ -113,8 +125,8 @@
 	         WRITE(TEXT, '(''@ Parameter #'', I2, '' was about'
      1           // ' to go off-limit'')') J
 	         CALL MSG_OUT(' ', TEXT, STATUS)
-     		 WRITE(TEXT, '(''  NOT UPDATING PARAMETERS DURING'
-     1           // ' THIS ITERATION'')' )
+     		 TEXT = 
+     1           '  NOT UPDATING PARAMETERS DURING THIS ITERATION'
 	         CALL MSG_OUT(' ', TEXT, STATUS)
 
 	      END IF

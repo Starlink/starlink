@@ -48,6 +48,8 @@
 *  Type Definitions :
       IMPLICIT NONE
 
+      INCLUDE 'SAE_PAR'
+
 *  Arguments Given :
       INTEGER IZONE
       INTEGER NE
@@ -58,7 +60,7 @@
 *.
 
 *   Initialise status
-      STATUS = 0
+      STATUS = SAI__OK
 
 *   Draw ellipse
       CALL SGS_SELZ ( IZONE, STATUS )

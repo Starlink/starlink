@@ -1,7 +1,7 @@
 ************************************************************************
 
       SUBROUTINE HEADER ( NX, NY, A, E, THETA, STATUS )
-     
+
 *+
 *  Name :
 *     HEADER
@@ -40,17 +40,20 @@
 *
 *  Authors :
 *     NE: Nick Eaton (Durham University)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 *
 *  History :
-*     10-FEB-1988 (NE)
+*     10-FEB-1988 (NE):
 *        Original version.
+*     21-FEB-2008 (PWD):
+*        Use simple assignment for constant strings.
 *     {enter_changes_here}
 *
 *  Bugs :
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions :
       IMPLICIT NONE
 
@@ -69,21 +72,22 @@
 *.
 
 *   Write out the header to the terminal
-      WRITE( TEXT, '(''=================================='//
-     :                   '=================================='')' )
+      TEXT = '=================================='//
+     :       '=================================='
       CALL MSG_OUT( ' ', TEXT, STATUS )
-      WRITE( TEXT, '(''         nx       ny'//
-     :                   '        a        e       theta'')' )    
+
+      TEXT = '         nx       ny        a        e       theta'
       CALL MSG_OUT( ' ', TEXT, STATUS )
+
       WRITE( TEXT, '( 2X, 2I9, F11.2, F10.3, F9.1 )' )
-     :          NX, NY, A, E, THETA
+     :       NX, NY, A, E, THETA
       CALL MSG_OUT( ' ', TEXT, STATUS )
-      WRITE ( TEXT, '('' '')' )
+
+      CALL MSG_OUT( ' ', ' ', STATUS )
+
+      TEXT = '           x        y      mag     magerr      sky'//
+     :       '       signal code'
       CALL MSG_OUT( ' ', TEXT, STATUS )
-      WRITE( TEXT, '(''           x        y      mag'//
-     :          '     magerr      sky       signal code'')' )
-      CALL MSG_OUT( ' ', TEXT, STATUS )
-  
 
       END
 

@@ -69,6 +69,7 @@
 *  Authors :
 *     TN: Tim Naylor (Keele University)
 *     AA: Alasdair Allan (Starlink, Keele University)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 *
 *  History :
@@ -81,6 +82,8 @@
 *        Added CODE to passed arguements
 *     28-SEP-2000 (AA):
 *        Added code to handle bad pixels inside the PSF mask
+*     21-FEB-2008 (PWD):
+*        Stop using internal writes to copy constant strings.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -156,6 +159,7 @@
 *.
 
 *      WRITE(*,*) ' DEBUG --- --- --- Entering GFIT()'
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *   Initialise DA(6)
 
@@ -216,8 +220,8 @@
 *   Unless the saturated pixel is within the mask this will not cause
 *   a major problem so long as the sky estimate takes account of it.
 	  
-                   WRITE( TEXT, '(''WARNING   > Saturated pixels' 
-     :		         //' inside quick look box.'')')
+                   TEXT = 'WARNING   > Saturated pixels'//
+     :		          ' inside quick look box.'
 		   CALL MSG_OUT( ' ', TEXT, STATUS )
 		     
 		  ENDIF
@@ -242,8 +246,8 @@
 *   If we have a bad pixel inside the PSF mask we have a serious problem
 *   as the PSF FWHM will fit incorrectly and the photometry will be wrong!
 
-                   WRITE( TEXT, '(''WARNING   > Bad pixels' 
-     :		         //' inside quick look box.'')')
+                   TEXT = 'WARNING   > Bad pixels'//
+     :		          ' inside quick look box.'
 		   CALL MSG_OUT( ' ', TEXT, STATUS )                     
 		     Y1(ICOUNT) = 0.0
 		     W1(ICOUNT) = 0.0

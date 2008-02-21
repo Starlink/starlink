@@ -1,13 +1,13 @@
 ************************************************************************
 
 
-      SUBROUTINE MEASUR ( BZONE, IZONE, CLEAR, PENO, PENS, PENP, NE, 
-     :                    ELLIPS, A, A2, A3, E, THETA, NX, NY, ORIGIN, 
-     :                    IMAGE, ISVAR, IMVAR, GRID, GS, MASK, USEMSK, 
-     :                    L, R, YLIST, LYLIST, RYLIST, INSL, INSR, 
-     :                    POLY, CENTRO, CONCEN, SEARCH, POSTVE, 
+      SUBROUTINE MEASUR ( BZONE, IZONE, CLEAR, PENO, PENS, PENP, NE,
+     :                    ELLIPS, A, A2, A3, E, THETA, NX, NY, ORIGIN,
+     :                    IMAGE, ISVAR, IMVAR, GRID, GS, MASK, USEMSK,
+     :                    L, R, YLIST, LYLIST, RYLIST, INSL, INSR,
+     :                    POLY, CENTRO, CONCEN, SEARCH, POSTVE,
      :                    MXSHFT, MXITER, TOLER, PADU, MAGS, SKYMAG,
-     :                    SKYEST, SKY, SKYSIG, PHOTON, BIASLE, SATURE, 
+     :                    SKYEST, SKY, SKYSIG, PHOTON, BIASLE, SATURE,
      :                    ETIME, FOUT, IMGDIS, OPTIMA, CLIP, SEE,
      :                    STATUS )
 *+
@@ -22,14 +22,14 @@
 *
 *  Invocation :
 *
-*      SUBROUTINE MEASUR ( BZONE, IZONE, CLEAR, PENO, PENS, PENP, NE, 
-*     :                    ELLIPS, A, A2, A3, E, THETA, NX, NY, ORIGIN, 
-*     :                    IMAGE, ISVAR, IMVAR, GRID, GS, MASK, USEMSK, 
-*     :                    L, R, YLIST, LYLIST, RYLIST, INSL, INSR, 
-*     :                    POLY, CENTRO, CONCEN, SEARCH, POSTVE, 
+*      SUBROUTINE MEASUR ( BZONE, IZONE, CLEAR, PENO, PENS, PENP, NE,
+*     :                    ELLIPS, A, A2, A3, E, THETA, NX, NY, ORIGIN,
+*     :                    IMAGE, ISVAR, IMVAR, GRID, GS, MASK, USEMSK,
+*     :                    L, R, YLIST, LYLIST, RYLIST, INSL, INSR,
+*     :                    POLY, CENTRO, CONCEN, SEARCH, POSTVE,
 *     :                    MXSHFT, MXITER, TOLER, PADU, MAGS, SKYMAG,
-*     :                    SKYEST, SKY, SKYSIG, PHOTON, BIASLE, SATURE, 
-*     :                    ETIME, FOUT, IMGDIS, OPTIMA, CLIP, SEE, 
+*     :                    SKYEST, SKY, SKYSIG, PHOTON, BIASLE, SATURE,
+*     :                    ETIME, FOUT, IMGDIS, OPTIMA, CLIP, SEE,
 *     :                    STATUS )
 *+
 *
@@ -220,12 +220,15 @@
 *        Changes to support modifications to PSFCAL()
 *     07-SEP-2004 (PWD):
 *        Changed to use CNF pointers.
+*     21-FEB-2008 (PWD):
+*        Stop using internal writes to copy constant strings. Increase
+*        buffer size to stop overruns.
 *     {enter_changes_here}
 *
 *  Bugs :
 *     {note_any_bugs_here}
 *-
-      
+
 *  Type Definitions :
       IMPLICIT NONE
 
@@ -233,6 +236,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'CNF_PAR'
+      INCLUDE 'MSG_PAR'
 
 *  Arguments Given :
       INTEGER BZONE
@@ -308,8 +312,8 @@
      :     ERROR, XFIT, YFIT, XERR, YERR, PEAK, BESTN
 
       CHARACTER * ( DAT__SZLOC ) VLOC
-      CHARACTER CODE * 2, TEXT * 72
-      
+      CHARACTER CODE * 2, TEXT * ( MSG__SZMSG )
+
       REAL SHAPE(3)
 
 *  Local Data :
@@ -317,13 +321,14 @@
       DATA INDEX / 0 /
       SAVE INDEX
 *.
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *   Calculate the ellipticity factor
       EFACT = 3.14159265 * SQRT( 1.0 - E ** 2 )
-      
+
 *   We have not made a PSF measurement so
       DOPSF = .FALSE.
-      
+
 *   We have yet to make a sky measurement
       SKYFLG = .FALSE.
 
@@ -334,11 +339,10 @@
          IF ( ISVAR ) THEN
             USEVAR = .TRUE.
          ELSE
-            WRITE( TEXT, '(''ERROR   > Cannot calculate errors without '
-     :             //'a data variance component.'')' )
+            TEXT = 'ERROR   > Cannot calculate errors without a '//
+     :             'data variance component.'
             CALL MSG_OUT( ' ', TEXT, STATUS )
-            WRITE( TEXT, '(''          Change the error estimator '
-     :             //'( Command P ).'')' )
+            TEXT = '          Change the error estimator ( Command P ).'
             CALL MSG_OUT( ' ', TEXT, STATUS )
             GOTO 99
          ENDIF
@@ -374,7 +378,7 @@
 
 *   Write out the output file header
       IF( OPTIMA ) THEN
-         CALL OHEAD(NX,NY,CLIP,SEE,STATUS)      
+         CALL OHEAD(NX,NY,CLIP,SEE,STATUS)
       ELSE
           CALL HEADER(NX,NY,A,E,THETA,STATUS )
       ENDIF
@@ -423,7 +427,7 @@
          IF ( CHOICE .EQ. 5 ) CHOICE = 1
 
 *   0 and . mean exit as well as mouse button 3.
-         IF ( CHOICE .EQ. 3 .OR. CHOICE .EQ. 4 ) THEN 
+         IF ( CHOICE .EQ. 3 .OR. CHOICE .EQ. 4 ) THEN
             CHOICE = -1
          END IF
 
@@ -478,42 +482,41 @@
 	    IF ( OPTIMA ) THEN
 
 *                ********************
-*   We are using *OPTIMAL EXTRACTION* 	 
+*   We are using *OPTIMAL EXTRACTION*
 *                ********************
 
-*   Check we have a sky measurement, or that we going to have one	    
+*   Check we have a sky measurement, or that we going to have one
 	       IF( (.NOT. SKYFLG) .AND. (.NOT. CONCEN)) THEN
-	       
+
 *   Tell the user to do a sky measurement
 
-              
-                  WRITE( TEXT, '(''ERROR > Need sky estimate to do '
-     :                   //'optimal extraction.'')' )
+                  TEXT = 'ERROR > Need sky estimate to do optimal'//
+     :                   ' extraction.'
                   CALL MSG_OUT( ' ', TEXT, STATUS )
-                  WRITE( TEXT, '(''        Do a sky measurement or '
-     :             //'use a concentric aperture (Command A).'')')
+                  TEXT = '        Do a sky measurement or use a '//
+     :                   'concentric aperture (Command A).'
                   CALL MSG_OUT( ' ', TEXT, STATUS )
                   GOTO 99
-		  
-               ELSE	
-	       
-*   Have we already selected a PSF star?	 
+
+               ELSE
+
+*   Have we already selected a PSF star?
 	          IF( .NOT. DOPSF ) THEN
-		  
+
 *   PSF stars must have an ID of 0 otherwise things get confused
-		  
+
 		     INDEX = 0
 
 *   Get the sky value if using concentric annulus
                      IF( CONCEN ) THEN
 
                         CALL SKYCON(SKYEST,XCEN,YCEN,A2,A3,E,THETA,
-     :                              NX, NY, IMAGE, IMVAR, USEVAR, MASK, 
-     :                              USEMSK, VALUES, NV, LOCSKY, SIGMA, 
+     :                              NX, NY, IMAGE, IMVAR, USEVAR, MASK,
+     :                              USEMSK, VALUES, NV, LOCSKY, SIGMA,
      :                              VSKY, MAXSKY, SKY,SKYSIG, AREA,
-     :                              SKYARE, EFACT, ASKY, STATUS ) 
-     
-	 
+     :                              SKYARE, EFACT, ASKY, STATUS )
+
+
                     ENDIF
 
 *   Do the PSF measurement
@@ -521,37 +524,37 @@
 		          DCEN = CLIP
                     ELSE
 		          DCEN = 0.0
-                    ENDIF   
+                    ENDIF
 		    IF( USEVAR ) THEN
 		         VSKY = VSKY
 			 SIGMA = SIGMA/SQRT(REAL(NV))
 	            ELSE
                          VSKY = SIGMA**2.0
-			 SIGMA  = SIGMA/SQRT(REAL(NV))  
+			 SIGMA  = SIGMA/SQRT(REAL(NV))
 	            END IF
 
 		    CODE = ' '
-                    
+
 *   For some reason we're already in GRID co-ordinates here instead of
-*   pixel like the entire rest of the code, odd huh?                    
-*                    XCEN = XCEN + 0.5 
+*   pixel like the entire rest of the code, odd huh?
+*                    XCEN = XCEN + 0.5
 *                    YCEN = YCEN + 0.5
                     CALL PSFCAL(XCEN, YCEN, DCEN, 1, IMAGE,
-     :                          NX, NY, SEE, CLIP, PADU, 
-     :                          SATURE, XFINAL, YFINAL, SHAPE, LOCSKY, 
-     :                          SIGMA, VSKY, CODE, SEARCH, POSTVE, 
+     :                          NX, NY, SEE, CLIP, PADU,
+     :                          SATURE, XFINAL, YFINAL, SHAPE, LOCSKY,
+     :                          SIGMA, VSKY, CODE, SEARCH, POSTVE,
      :                          MXSHFT, MXITER, TOLER, STATUS)
-*                    XFINAL = XFINAL - 0.5 
+*                    XFINAL = XFINAL - 0.5
 *                    YFINAL = YFINAL - 0.5
-                    
+
 * We've already plotted the ellipse (circle) at the cursor position
 * don't want to change the centre co-ordinates at this stage.
 *
 *                    XCEN = XFINAL
 *                    YCEN = YFINAL
 
-		  	      
-*   Done a PSF measurement so reset the box title to STAR	
+
+*   Done a PSF measurement so reset the box title to STAR
 		     DOPSF = .TRUE.
                      IF( .NOT. DOBOX ) THEN
                         CALL SGS_SELZ ( CZONE, STATUS )
@@ -568,7 +571,7 @@
                         CALL SGS_BOX ( 0.68, 0.95, 0.075, 0.1 )
                         CALL SGS_TX(0.685, 0.08, 'RETURN TO KEYBOARD')
 	                DOBOX = .TRUE.
-		     ENDIF	  
+		     ENDIF
 
 *   Plot the position of the ellipse, nasty hack
                      CALL SGS_SPEN( PENP )
@@ -584,20 +587,20 @@
                        CALL PLOTEL(IZONE,NE,ELLIPS)
                        CALL SGS_SPEN(PENO)
 		     ENDIF
-		       		     
+
 *   Output the results of this measurement.
-                          IF( CODE.NE.'S' .AND. CODE.NE.'B' .AND. 
+                          IF( CODE.NE.'S' .AND. CODE.NE.'B' .AND.
      :                        CODE.NE.'E' .AND. CODE.NE.'?' ) THEN
                               CODE = 'OK'
-			  ENDIF         
+			  ENDIF
                           IF( CODE .EQ. 'B' ) THEN
-                             WRITE( TEXT, '(''WARNING   > Bad pixels' 
-     :        //' in PSF candidate star, photometry dubious.'')')
-	                     CALL MSG_OUT( ' ', TEXT, STATUS )  
-                          ENDIF 
-                          CALL OUTPSF (FOUT, INDEX, XCEN, YCEN, ORIGIN, 
+                             TEXT = 'WARNING   > Bad pixels in PSF '//
+     :                              'candidate star, photometry dubious'
+	                     CALL MSG_OUT( ' ', TEXT, STATUS )
+                          ENDIF
+                          CALL OUTPSF (FOUT, INDEX, XCEN, YCEN, ORIGIN,
      :                            SHAPE, LOCSKY, PADU, CODE, STATUS)
-     
+
 *   Do a extraction
                   ELSE
 
@@ -605,79 +608,78 @@
                      INDEX = INDEX + 1
 
 *   Plot the position of the ellipse
-                     CALL PLOTEL ( IZONE, NE, ELLIPS )	       
+                     CALL PLOTEL ( IZONE, NE, ELLIPS )
 
 *   Get the sky value if using concentric annulus
                      IF( CONCEN ) THEN
                         CALL SKYCON(SKYEST,XCEN,YCEN,A2,A3,E,THETA,
-     :                              NX,NY,IMAGE,IMVAR,USEVAR,MASK, 
-     :                              USEMSK,VALUES,NV,LOCSKY,SIGMA, 
+     :                              NX,NY,IMAGE,IMVAR,USEVAR,MASK,
+     :                              USEMSK,VALUES,NV,LOCSKY,SIGMA,
      :                              VSKY,MAXSKY,SKY,SKYSIG,AREA,
-     :                              SKYARE,EFACT,ASKY,STATUS ) 
-     
+     :                              SKYARE,EFACT,ASKY,STATUS )
+
                         CALL SGS_SPEN(PENS)
                         CALL MAKELL(XCEN,YCEN,A3,0.0,0.0,NE,ELLIPS)
                         CALL PLOTEL(IZONE,NE,ELLIPS)
-                        CALL MAKELL(XCEN,YCEN,A2,0.0,0.0,NE,ELLIPS) 
+                        CALL MAKELL(XCEN,YCEN,A2,0.0,0.0,NE,ELLIPS)
                         CALL PLOTEL(IZONE,NE,ELLIPS)
                         CALL SGS_SPEN(PENO)
                      ENDIF
 
-*   Do the star measurement	       
+*   Do the star measurement
 	            IF( CENTRO )  THEN
 		          DCEN = CLIP
                     ELSE
 		          DCEN = 0.0
-                    ENDIF   
+                    ENDIF
 		    IF( USEVAR ) THEN
 		         VSKY = VSKY
 			 SIGMA = SIGMA/SQRT(REAL(NV))
 	            ELSE
                          VSKY = SIGMA**2.0
-			 SIGMA  = SIGMA/SQRT(REAL(NV))  
-	            END IF		    
-		    
+			 SIGMA  = SIGMA/SQRT(REAL(NV))
+	            END IF
+
                     COMPAN = .FALSE.
 		    OPTNRM = 0.0
 		    CODE = ' '
                     XCEN = XCEN - 0.5    ! Convert to pixel co-ordinates
-                    YCEN = YCEN - 0.5		    
+                    YCEN = YCEN - 0.5
                     CALL EXTR(XCEN, YCEN, DCEN, IMAGE, NX, NY, SEE,
      :                        CLIP, PADU, SATURE, SHAPE, OPTNRM,
      :                        COMPAN, XCOMP, YCOMP, FLUX, ERROR,
      :                        XFIT, YFIT, XERR, YERR, PEAK, BESTN,
      :                        LOCSKY, SIGMA, VSKY, CODE, STATUS)
                     XFIT = XFIT - 0.5    ! Convert to pixel co-ordinates
-                    YFIT = YFIT - 0.5	
-                         
+                    YFIT = YFIT - 0.5
+
                     IF( STATUS .NE. SAI__OK ) THEN
-                      WRITE( TEXT, 
-     :		      '(''ERROR   > Problem with optimal extraction.'')')
-                     CALL MSG_OUT( ' ', TEXT, STATUS )
-                     GOTO 99		    
+                       TEXT='ERROR   > Problem with optimal extraction'
+                       CALL MSG_OUT( ' ', TEXT, STATUS )
+                       GOTO 99
 		    ENDIF
-		         
+
 
 *   Output the results of this measurement.
-                         IF( CODE.NE.'S' .AND. CODE.NE.'B' .AND. 
+                         IF( CODE.NE.'S' .AND. CODE.NE.'B' .AND.
      :                       CODE.NE.'E' .AND. CODE.NE.'?' ) THEN
                              CODE = 'OK'
 			 ENDIF
-                         CALL OUTOPT ( FOUT, INDEX, XFIT, YFIT, ORIGIN, 
-     :			          PADU, FLUX, AREA, ERROR, LOCSKY, 
-     :			          SKYARE, SIGMA, VSKY, MAGS, SKYMAG, 
+                         CALL OUTOPT ( FOUT, INDEX, XFIT, YFIT, ORIGIN,
+     :			          PADU, FLUX, AREA, ERROR, LOCSKY,
+     :			          SKYARE, SIGMA, VSKY, MAGS, SKYMAG,
      :			          PHOTON, BIASLE, CODE, ETIME, STATUS )
-     
+
 
 	          ENDIF
 	       ENDIF
-	    
+
 *               *********************
-*   We're doing *APERTURE EXTRACTION*	    
+*   We're doing *APERTURE EXTRACTION*
 *               *********************
 
-	    ELSE       
-	    
+	    ELSE
+
 *   Update the index number of the star
                INDEX = INDEX + 1
 
@@ -685,16 +687,16 @@
                CALL PLOTEL ( IZONE, NE, ELLIPS )
 
 *   Integrate the ellipse over the image array
-               CALL BOXELL ( NE, ELLIPS, NXL, NXH, NYL, NYH, 
-     :                       NX, NY, 1.0, GRID, GS, AREA, CUTOFF, 
-     :                       L, R, YLIST, LYLIST, RYLIST, INSL, 
+               CALL BOXELL ( NE, ELLIPS, NXL, NXH, NYL, NYH,
+     :                       NX, NY, 1.0, GRID, GS, AREA, CUTOFF,
+     :                       L, R, YLIST, LYLIST, RYLIST, INSL,
      :                       INSR, POLY )
-               CALL INTELL ( NX, NY, IMAGE, GRID, GS, NXL, NXH, 
+               CALL INTELL ( NX, NY, IMAGE, GRID, GS, NXL, NXH,
      :                       NYL, NYH, SATURE, CODE, STAR, AREA )
 
 *   Integrate the ellipse over the variance array
                IF ( USEVAR ) THEN
-                  CALL INTELL ( NX, NY, IMVAR, GRID, GS, NXL, 
+                  CALL INTELL ( NX, NY, IMVAR, GRID, GS, NXL,
      :                 NXH, NYL, NYH, SATURE, CODE, VSTAR, VAREA )
                ENDIF
 
@@ -706,11 +708,11 @@
                IF ( CONCEN ) THEN
 
                         CALL SKYCON(SKYEST,XCEN,YCEN,A2,A3,E,THETA,
-     :                              NX, NY, IMAGE, IMVAR, USEVAR, MASK, 
-     :                              USEMSK, VALUES, NV, LOCSKY, SIGMA, 
+     :                              NX, NY, IMAGE, IMVAR, USEVAR, MASK,
+     :                              USEMSK, VALUES, NV, LOCSKY, SIGMA,
      :                              VSKY, MAXSKY, SKY,SKYSIG, AREA,
-     :                              SKYARE, EFACT, ASKY, STATUS ) 
-       
+     :                              SKYARE, EFACT, ASKY, STATUS )
+
 *   Calculate the mean sky and reset the sums
                ELSE
                   IF ( SKYEST .EQ. 4 ) THEN
@@ -740,7 +742,7 @@
 *   Output the results of this measurement.
             CALL OUTRES ( FOUT, INDEX, XCEN, YCEN, ORIGIN, PADU, STAR,
      :                    AREA, VSTAR, LOCSKY, SKYARE, SIGMA, VSKY,
-     :                    MAGS, SKYMAG, PHOTON, BIASLE, A, E, THETA, 
+     :                    MAGS, SKYMAG, PHOTON, BIASLE, A, E, THETA,
      :                    CODE, ETIME, STATUS )
 
 *   Plot on sky aperture. Use the ELLIPS array as workspace.
@@ -804,7 +806,7 @@
                   IF ( STATUS .NE. SAI__OK ) GOTO 99
                   CALL BACK ( SKYEST, NX, NY, IMAGE, IMVAR, USEVAR,
      :                        GRID, GS, MASK, USEMSK, NXL, NXH, NYL,
-     :                        NYH, %VAL( CNF_PVAL( IV ) ), NV, LOCSKY, 
+     :                        NYH, %VAL( CNF_PVAL( IV ) ), NV, LOCSKY,
      :                        SIGMA, VSKY )
                   CALL DAT_UNMAP( VLOC, STATUS )
                   CALL DAT_ANNUL( VLOC, STATUS )
@@ -826,14 +828,14 @@
                CALL CLGRID ( GS, GS, GRID, 1, NXH - NXL + 1,
      :                       1, NYH - NYL + 1 )
             ENDIF
-	    
+
 *   Set the flag to tell the optimal extraction routine we've done
 *   a sky estimation
- 
-            SKYFLG = .TRUE.    
+
+            SKYFLG = .TRUE.
 
          ENDIF
-         
+
       END DO
 
 *   Release the zone used for displaying the button menu

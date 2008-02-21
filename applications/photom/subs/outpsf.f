@@ -50,11 +50,14 @@
 *
 *  Authors :
 *     AA: Alasdair Allan (Starlink, Keele University)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 *
 *  History :
 *     25-JAN-1999 (AA)
 *          Original version
+*     21-FEB-2008 (PWD):
+*        Stop using internal writes to copy constant strings.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -91,13 +94,12 @@
       CHARACTER CXCEN * 9, CYCEN * 9
       CHARACTER CFWHM1 * 11, CFWHM2 * 11, CROT * 9      
       CHARACTER CSKY * 11     
-      CHARACTER TEXT65 * 65, TEXT80 * 80
-      CHARACTER * 68 TEXT
+      CHARACTER TEXT * 80
 
 *.
 
 *   Check status on entry
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 
 *   Code the output into seperate character strings
@@ -129,25 +131,15 @@
       ENDIF
 
 *   Concatenate these into the output strings
-      TEXT65 = CINDEX//CXCEN//CYCEN//CFWHM1//CFWHM2//
-     :         CROT//' '//CODE
-      CALL MSG_OUT( ' ', TEXT65, STATUS )
-
-      TEXT80 = TEXT65
-      CALL FIO_WRITE( FOUT, TEXT80, STATUS )
+      TEXT = CINDEX//CXCEN//CYCEN//CFWHM1//CFWHM2//
+     :       CROT//' '//CODE
+      CALL MSG_OUT( ' ', TEXT, STATUS )
+      CALL FIO_WRITE( FOUT, TEXT, STATUS )
 
 *   Write out the header to the terminal
-*      WRITE( TEXT, '(''=================================='//
-*     :                   '=================================='')' )
-*      CALL MSG_OUT( ' ', TEXT, STATUS )
-      WRITE ( TEXT, '('' '')' )
-      CALL MSG_OUT( ' ', TEXT, STATUS )
-      WRITE( TEXT, '(''           x        y      mag'//
-     :          '     magerr      sky       signal code'')' )
-      CALL MSG_OUT( ' ', TEXT, STATUS )
-
+      CALL MSG_OUT( ' ', ' ', STATUS )
+      CALL MSG_OUT( ' ', '           x        y      mag     magerr'//
+     :              '      sky       signal code', STATUS )
       
-  99  CONTINUE
-
       END
 

@@ -34,6 +34,7 @@
 *  Authors :
 *     KM: Koji Mukai (Oxford University)
 *     AA: Alasdair Allan (Starlink, Keele University)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 *
 *  History :
@@ -41,6 +42,9 @@
 *        Original version written by Koji Mukai
 *     04-JAN-1999
 *        Cut and hack for Starlink
+*     21-FEB-2008 (PWD):
+*        Stop using internal writes to copy constant strings. Initialise
+*        STATUS so that messages are output.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -51,6 +55,7 @@
       IMPLICIT NONE
 
 *  Global Constants :
+      INCLUDE 'SAE_PAR'
 
 *  Arguments Given : 
 
@@ -80,6 +85,7 @@
       INTEGER STATUS
       
 *.
+      STATUS = SAI__OK
 
 *   First, make sure it's not a linked parameter
 
@@ -88,7 +94,7 @@
 	  WRITE(TEXT, '(''ERROR > Parameter #'', I2, '' is '
      1               // ' linked'')') N
 	  CALL MSG_OUT(' ', TEXT, STATUS) 
- 	  WRITE(TEXT, '(''        This call to FIX_PAR is ignored'')')
+ 	  TEXT = '        This call to FIX_PAR is ignored'
 	  CALL MSG_OUT(' ', TEXT, STATUS) 
 
 *   Error status
@@ -105,7 +111,7 @@
 	    WRITE(TEXT, '(''ERROR > Parameter #'', I2, '' is '
      1               // ' linked'')') N
 	    CALL MSG_OUT(' ', TEXT, STATUS) 
- 	    WRITE(TEXT, '(''        This call to FIX_PAR is ignored'')')
+ 	    TEXT = '        This call to FIX_PAR is ignored'
 	    CALL MSG_OUT(' ', TEXT, STATUS) 	
 	        
 *   Error status
@@ -123,7 +129,7 @@
 	  WRITE(TEXT, '(''ERROR > Parameter #'', I2, '' is '
      1               // ' already fixed'')') N
 	  CALL MSG_OUT(' ', TEXT, STATUS) 
- 	  WRITE(TEXT, '(''        This call to FIX_PAR is ignored'')')      
+ 	  TEXT = '        This call to FIX_PAR is ignored'
 	  CALL MSG_OUT(' ', TEXT, STATUS)
 
 *   Warning status
@@ -204,6 +210,8 @@
 
 *  Type Definitions :
 	IMPLICIT NONE
+        
+        INCLUDE 'SAE_PAR'
 
 
 	INTEGER M_PAR
@@ -226,26 +234,26 @@
         INTEGER STATUS
 	
 *.	
+        STATUS = SAI__OK
+
 	IF( N .GE. 1 .AND. N .LE. N_PAR ) THEN	! Single mode
 	  IF( L_INDEX( N ) .NE. N ) THEN
 
 	    WRITE(TEXT, '(''ERROR > Parameter #'', I2, '' is '
      1                // ' linked'')') N
 	    CALL MSG_OUT(' ', TEXT, STATUS) 
-	    WRITE(TEXT, '(''        Use SEPARATE_PAR to separate'')')
+	    TEXT = '        Use SEPARATE_PAR to separate'
 	    CALL MSG_OUT(' ', TEXT, STATUS) 
 
 	    FREE_PAR = -1
 	    RETURN
 	  ELSE IF( TABLE_FREE( N ) .EQ. 0 ) THEN
 	  
-	    WRITE(TEXT, '(''ERROR > Parameter #'', I2, '' is '
+            WRITE(TEXT, '(''ERROR > Parameter #'', I2, '' is '
      1                // ' free'')') N
 	    CALL MSG_OUT(' ', TEXT, STATUS) 
-	    WRITE(TEXT, '(''        This call to FREE_PAR is ignored'')')
+	    TEXT = '        This call to FREE_PAR is ignored'
 	    CALL MSG_OUT(' ', TEXT, STATUS) 
-
-
 
 	    FREE_PAR = 0
 	    RETURN
@@ -266,9 +274,9 @@
 	ELSE	
 
 *   Unknown mode
-	    WRITE(TEXT, '(''ERROR > invalid arguement'')')
+	    TEXT = 'ERROR > invalid arguement'
 	    CALL MSG_OUT(' ', TEXT, STATUS) 
-	    WRITE(TEXT, '(''        This call to FREE_PAR is ignored'')')
+	    TEXT = '        This call to FREE_PAR is ignored'
 	    CALL MSG_OUT(' ', TEXT, STATUS) 
 
 	  FREE_PAR = -1

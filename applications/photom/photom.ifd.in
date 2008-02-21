@@ -150,7 +150,7 @@ package photom {
          parameter photon {
             position 15
             type _INTEGER
-            range 1 2
+            range 1 4
             vpath CURRENT DEFAULT PROMPT
             ppath DYNAMIC DEFAULT
             default 2
