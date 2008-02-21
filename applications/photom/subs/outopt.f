@@ -81,6 +81,8 @@
 *  History :
 *     25-JAN-1999 (AA)
 *         Original version, heavily based on OUTRES
+*     21-FEB-2008 (PWD):
+*        Stop using internal writes to copy constant strings.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -129,11 +131,11 @@
      :                 VSKY, SKYMAG, BIASLE, ETIME
 
       CHARACTER CINDEX * 5, CXCEN * 9, CYCEN * 9, CMAG * 9, CERRMG * 9
-      CHARACTER CSKY * 11, CSIG * 11, CA * 5, CE * 5, CT * 5, CTEMP * 80
-      CHARACTER TEXT65 * 65, TEXT80 * 80
+      CHARACTER CSKY * 11, CSIG * 11, CA * 5, CE * 5, CT * 5
+      CHARACTER TEXT * 80
 *.
 *   Check status on entry
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *   Transform all input REAL variables into DOUBLE PRECISION for
 *   better accuracy.
@@ -213,8 +215,8 @@
 
 *   Code the output into seperate character strings
 *   Index - limit to 5 characters
-      WRITE( CTEMP, '( I80 )' ) INDEX
-      CINDEX = CTEMP( 76:80 )
+      WRITE( TEXT, '( I80 )' ) INDEX
+      CINDEX = TEXT( 76:80 )
 
 *   Xcen
       WRITE( CXCEN, '( F9.2 )' ) XCEN + REAL( ORIGIN( 1 ) - 1 )
@@ -244,13 +246,9 @@
       ENDIF
 
 *   Concatenate these into the output strings
-      TEXT65 = CINDEX//CXCEN//CYCEN//CMAG//CERRMG//CSKY//CSIG//' '//CODE
-      CALL MSG_OUT( ' ', TEXT65, STATUS )
-
-      TEXT80 = TEXT65
-      CALL FIO_WRITE( FOUT, TEXT80, STATUS )
-
-  99  CONTINUE
+      TEXT = CINDEX//CXCEN//CYCEN//CMAG//CERRMG//CSKY//CSIG//' '//CODE
+      CALL MSG_OUT( ' ', TEXT, STATUS )
+      CALL FIO_WRITE( FOUT, TEXT, STATUS )
 
       END
 

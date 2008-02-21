@@ -37,11 +37,15 @@
 *  Authors :
 *     KM: Koji Mukai (Oxford University)
 *     AA: Alasdair Allan (Starlink, Keele University)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 *
 *  History :
 *     08-FEB-1999
 *        Cut and hack for Starlink
+*     21-FEB-2008 (PWD):
+*        Stop using internal writes to copy constant strings. Initialise
+*        STATUS so that messages are output.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -49,6 +53,8 @@
 *-
 
 	IMPLICIT NONE
+
+	INCLUDE 'SAE_PAR'
 
 	INTEGER M_PAR
 	PARAMETER( M_PAR = 32 )
@@ -71,13 +77,14 @@
 
         CHARACTER TEXT * 72
         INTEGER STATUS
+
+	STATUS = SAI__OK
       
 	IF( LO .GE. HI ) THEN
 	
-	  WRITE(TEXT, '(''ERROR > Upper limit is smaller'
-     1              // ' than lower limit'')') 
+	  TEXT = 'ERROR > Upper limit is smaller than lower limit'
 	  CALL MSG_OUT(' ', TEXT, STATUS) 
- 	  WRITE(TEXT, '(''        This call to LIMIT_PAR is ignored'')')
+ 	  TEXT = '        This call to LIMIT_PAR is ignored'
 	  CALL MSG_OUT(' ', TEXT, STATUS) 
 	
 	  LIMIT_PAR = -1
@@ -85,8 +92,7 @@
 	  IF( LIST_CYCLIC( N ) .NE. 0 ) THEN	! Cyclic
 	    IF( L_INDEX( N ) .NE. N ) THEN
 
- 	      WRITE(TEXT,'(''ERROR > LIMIT_PAR says you can'
-     1              // ' not do this!'')')
+	      TEXT = 'ERROR > LIMIT_PAR says you can not do this!'
 	      CALL MSG_OUT(' ', TEXT, STATUS) 	    
 	 
 	      LIMIT_PAR = -1
@@ -94,7 +100,7 @@
 	    ELSE IF( LO .GE. TAB_BOTTOM( N )
      1		.AND. HI .LT. TAB_BOTTOM( N ) + TAB_PERIOD( N ) ) THEN
 
-	      WRITE(TEXT,'(''ERROR > LIMITing a cyclic parameter'')')
+	      TEXT = 'ERROR > LIMITing a cyclic parameter'
 	      CALL MSG_OUT(' ', TEXT, STATUS)
 
 	      LO_A( N ) = LO
@@ -103,7 +109,7 @@
 	      LIMIT_PAR = 0
 	    ELSE
 	      IF( HI - LO .LT. TAB_PERIOD( N ) ) THEN
-	        WRITE(TEXT,'(''ERROR > LIMITing a cyclic parameter'')')
+		TEXT = 'ERROR > LIMITing a cyclic parameter'
 	        CALL MSG_OUT(' ', TEXT, STATUS)
 		LO_A( N ) = LO
 		HI_A( N ) = HI
@@ -111,8 +117,8 @@
 	        LIMIT_PAR = 0
 	      ELSE
 
-	        WRITE(TEXT,'(''ERROR > Illegal attempt to LIMIT'
-     1                   // ' a cyclic parameter'')')
+		TEXT =  'ERROR > Illegal attempt to LIMIT a '//
+     :                  'cyclic parameter'
 	        CALL MSG_OUT(' ', TEXT, STATUS)
 
 		LIMIT_PAR = -1
@@ -141,7 +147,7 @@
 	ELSE
 	  WRITE(TEXT, '(''ERROR > No such parameter #'', I2)') N
 	  CALL MSG_OUT(' ', TEXT, STATUS) 
- 	  WRITE(TEXT, '(''        This call to LIMIT_PAR is ignored'')')
+ 	  TEXT = '        This call to LIMIT_PAR is ignored'
 	  CALL MSG_OUT(' ', TEXT, STATUS) 
 
 	  LIMIT_PAR = -1
@@ -197,6 +203,8 @@
 
 	IMPLICIT NONE
 
+	INCLUDE 'SAE_PAR'
+
 	INTEGER M_PAR
 	REAL N_LARGE, P_LARGE
 	PARAMETER( M_PAR = 32 )
@@ -219,6 +227,8 @@
 
         CHARACTER TEXT * 72
         INTEGER STATUS
+
+	STATUS = SAI__OK
 	
         IF( N .GE. 1 .AND. N .LE. M_PAR ) THEN
           IF( LIST_CYCLIC( N ) .EQ. 1 ) THEN
@@ -251,8 +261,8 @@
 		END IF
 	      END DO
 	    ELSE
- 	      WRITE(TEXT, '(''ERROR >  Illegal attempt on a '
-     1		 //   'cyclic slave parameter'')')
+ 	      TEXT = 'ERROR >  Illegal attempt on a cyclic'//
+     :               ' slave parameter'
 	      CALL MSG_OUT(' ', TEXT, STATUS) 
 
      
@@ -266,8 +276,8 @@
 	  NOLIMIT_PAR = 0
 	  DO K = 1, M_PAR
 	    IF( LIST_CYCLIC( K ) .EQ. 1 ) THEN
- 	      WRITE(TEXT, '(''ERROR >  No limit has been set '
-     1		 //   'for cyclic parameter'', I3)') K
+ 	      WRITE(TEXT, '(''ERROR >  No limit has been set '//
+     1		          'for cyclic parameter'', I3)') K
 	      CALL MSG_OUT(' ', TEXT, STATUS) 
 
 	      NOLIMIT_PAR = -1
@@ -298,8 +308,7 @@
 	ELSE
  	  WRITE(TEXT, '(''ERROR > No such parameter # '', I3)') N
 	  CALL MSG_OUT(' ', TEXT, STATUS) 
- 	  WRITE(TEXT, 
-     1       '(''        This call to NOLIMIT_PAR is ignored'')')
+ 	  TEXT = '        This call to NOLIMIT_PAR is ignored'
 	  CALL MSG_OUT(' ', TEXT, STATUS) 
 
 	  NOLIMIT_PAR = -1

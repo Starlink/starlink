@@ -74,6 +74,7 @@
 *
 *  Authors :
 *     NE: Nick Eaton (Durham University)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 *
 *  History :
@@ -88,6 +89,8 @@
 *     10-JAN-1992 (NE):
 *        Limit size of grid array to a square of size GS.
 *        Include data variance.
+*     21-FEB-2008 (PWD):
+*        Stop using internal writes to copy constant strings. Use SAI__OK.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -99,7 +102,7 @@
 
 *  Global Constants :
       INCLUDE 'PRM_PAR'
-
+      INCLUDE 'SAE_PAR'
 
 *  Arguments Given :
       INTEGER SKYEST
@@ -139,13 +142,13 @@
 *.
 
 *   Set the status
-      STATUS = 0
+      STATUS = SAI__OK
 
 *   Check that SKYEST has a valid value
       IF ( ( SKYEST .LT. 1 ) .OR. ( SKYEST .GT. 3 ) ) THEN
          SIGMA = -1.0
          SKY = 0.0
-         WRITE( TEXT, '(''Sky estimator is not valid'')' )
+         TEXT = 'Sky estimator is not valid'
          CALL MSG_OUT( ' ', TEXT, STATUS )
          GOTO 99
       ENDIF
@@ -212,7 +215,7 @@
       IF ( NV .LT. 1 ) THEN
          SIGMA = -1.0
          SKY = 0.0
-         WRITE( TEXT, '(''Sky region is not valid'')' )
+         TEXT = 'Sky region is not valid'
          CALL MSG_OUT( ' ', TEXT, STATUS )
          GOTO 99
       ENDIF

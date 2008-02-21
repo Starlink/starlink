@@ -150,7 +150,7 @@
       CHARACTER TEXT65 * 65, TEXT80 * 80
 *.
 *   Check status on entry
-      IF ( STATUS .NE. SAI__OK ) GOTO 99
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *   Transform all input REAL variables into DOUBLE PRECISION for
 *   better accuracy.
@@ -320,8 +320,6 @@
 
       TEXT80 = TEXT65//CA//CE//CT
       CALL FIO_WRITE( FOUT, TEXT80, STATUS )
-
-  99  CONTINUE
 
       END
 

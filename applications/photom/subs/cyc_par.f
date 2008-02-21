@@ -35,19 +35,24 @@
 *  Authors :
 *     KM: Koji Mukai (Oxford University)
 *     AA: Alasdair Allan (Starlink, Keele University)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 *
 *  History :
 *     08-FEB-1999
 *        Cut and hack for Starlink
+*     21-FEB-2008 (PWD):
+*        Stop using internal writes to copy constant strings. Initialise
+*        STATUS so that messages are output. Increase output buffer size
+*        to stop overwrites.
 *     {enter_changes_here}
 *
 *  Bugs :
 *     {note_any_bugs_here}
 *-
-
-
 	IMPLICIT NONE
+
+	INCLUDE 'SAE_PAR'
 
 	INTEGER M_PAR
 	REAL N_LARGE, P_LARGE
@@ -69,41 +74,39 @@
 	COMMON / CYCLIC_LIST / LIST_CYCLIC, TAB_PERIOD, TAB_BOTTOM
 	COMMON / LINK_STATUS / L_INDEX, L_OFFSET
 
-        CHARACTER TEXT * 72
+        CHARACTER TEXT * 80
         INTEGER STATUS
+
+	STATUS = SAI__OK
 	
 	IF( HI .LE. LO ) THEN
- 	  WRITE(TEXT,'(''ERROR > Range of cyclic behaviour is'
-     1              // ' not positive'')')
+	  TEXT = 'ERROR > Range of cyclic behaviour is not positive'
 	  CALL MSG_OUT(' ', TEXT, STATUS) 	    	
 	  CYC_PAR = -1
 	ELSE IF( N .LE. 0 .OR. N .GT. M_PAR ) THEN
- 	  WRITE(TEXT,'(''ERROR > A non-existant parameter'
-     1              // ' has been specified'')')
+ 	  TEXT = 'ERROR > A non-existant parameter has been specified'
 	  CALL MSG_OUT(' ', TEXT, STATUS) 		
           CYC_PAR = -1
         ELSE IF( LIST_CYCLIC( N ) .NE. 0 ) THEN
- 	  WRITE(TEXT,'(''ERROR > Parameter'', I2,
-     1               ''  is already declared cyclic'')') N
+ 	  WRITE(TEXT,'(''ERROR > Parameter'', I2, 
+     1	        ''  is already declared cyclic'')') N
 	  CALL MSG_OUT(' ', TEXT, STATUS) 			
 	  CYC_PAR = -1
 	ELSE IF( L_INDEX( N ) .NE. N ) THEN
- 	  WRITE(TEXT,'(''ERROR > Parameter'', I2,
-     1               ''  is linked'')') N
+ 	  WRITE(TEXT,'(''ERROR > Parameter'', I2,''  is linked'')') N
 	  CALL MSG_OUT(' ', TEXT, STATUS) 	
 	  CYC_PAR = -1
 	ELSE IF( LO_A( N ) .NE. N_LARGE .OR. HI_A( N ) .NE. P_LARGE ) 
      1  THEN
 	  IF( HI_A( N ) - LO_A( N ) .GE. HI - LO ) THEN
- 	    WRITE(TEXT,'(''ERROR > Conflict between LIMIT_PAR'
-     1              // ' and CYC_PAR'')')
+	    TEXT = 'ERROR > Conflict between LIMIT_PAR and CYC_PAR'
 	    CALL MSG_OUT(' ', TEXT, STATUS) 		  
 	    CYC_PAR = -1
 	  ELSE
 	    DO K = 1, M_Par
 	      IF( L_INDEX( K ) .eq. -N ) Then
- 	        WRITE(TEXT,'(''ERROR > Illegal attempt to use CYC_PAR'
-     1              // ' on a LINKed parameter'')')
+ 	        TEXT = 'ERROR > Illegal attempt to use CYC_PAR'
+     1              // ' on a LINKed parameter'
 	        CALL MSG_OUT(' ', TEXT, STATUS) 	      
 		CYC_PAR = -1
 		RETURN
@@ -113,8 +116,7 @@
 		TAB_PERIOD( K ) = HI - LO
 	      END IF
 	    END DO
- 	    WRITE(TEXT,'(''ERROR > This parameter has already'
-     1              // ' been LIMITed'')')
+ 	    TEXT = 'ERROR > This parameter has already been LIMITed'
 	    CALL MSG_OUT(' ', TEXT, STATUS) 	    
 	    LIST_CYCLIC( N ) = -1
 	    TAB_BOTTOM( N ) = LO
@@ -124,8 +126,7 @@
 	ELSE
 	  DO K = 1, M_PAR
 	    IF( L_INDEX( K ) .EQ. -N ) THEN
- 	      WRITE(TEXT,'(''ERROR > This parameter has already'
-     1              // ' been LIMITed'')')
+ 	      TEXT = 'ERROR > This parameter has already been LIMITed'
 	      CALL MSG_OUT(' ', TEXT, STATUS) 	    
 	      CYC_PAR = -1
 	      RETURN

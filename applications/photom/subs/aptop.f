@@ -119,6 +119,9 @@
 *        Changed to use CNF pointers.
 *     11-DEC-2006 (PWD):
 *        Allow Gaussian errors from sky variance.
+*     21-FEB-2008 (PWD):
+*        Stop using internal writes to copy constant strings. Increase
+*        the output buffer size to stop overwrites.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -135,6 +138,7 @@
       INCLUDE 'PAR_ERR'
       INCLUDE 'FIO_ERR'
       INCLUDE 'CNF_PAR'
+      INCLUDE 'MSG_PAR'
 
 *  Arguments Given :
       INTEGER NX
@@ -176,9 +180,10 @@
      :     OLDSIG, OLDSKY, OUTER, PADU, RAD, SATURE, SKY, SKYMAG,
      :     SKYSIG, THETA, TOLER, XPOS, YPOS, CLIP, SEE
 
-      CHARACTER COMMAND, HELP1 * 80, HELP2 * 80, TEXT * 80
+      CHARACTER COMMAND, HELP1 * 80, HELP2 * 80, TEXT * ( MSG__SZMSG )
       CHARACTER * ( DAT__SZLOC ) GLOC
 *.
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *   Flag that SGS has not been initialised
       SGSOFF = .TRUE.
@@ -371,10 +376,10 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *   Print out the help message to begin with
-      WRITE( HELP1, '(''Commands are - Annulus, Centroid, End, File,'//
-     :              ' Help, Ishape, Measure,'')' )
-      WRITE( HELP2, '(''               Nshape, Options, Photons, Sky,'//
-     :              ' Values, eXtraction'')' )
+      HELP1 = 'Commands are - Annulus, Centroid, End, File,'//
+     :        ' Help, Ishape, Measure,'
+      HELP2 = '               Nshape, Options, Photons, Sky,'//
+     :        ' Values, eXtraction'
       CALL MSG_OUT( ' ', HELP1, STATUS )
       CALL MSG_OUT( ' ', HELP2, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
@@ -402,10 +407,10 @@
             CONCEN = .NOT. CONCEN
 
             IF ( CONCEN ) THEN
-               WRITE( TEXT, '(''Concentric aperture in use'')' )
+               TEXT = 'Concentric aperture in use'
                CALL MSG_OUT( ' ', TEXT, STATUS )
             ELSE
-               WRITE( TEXT, '(''Interactive aperture in use'')' )
+               TEXT = 'Interactive aperture in use'
                CALL MSG_OUT( ' ', TEXT, STATUS)
             ENDIF
 
@@ -422,21 +427,21 @@
 *   Optimal extraction really does require centroiding if selecting
 *   star positions using a cursor, PSF is rather critical to the proceedure
 	    IF( OPTIMA .AND. CENTRO) THEN
-	       WRITE( TEXT, '(''Optimal extraction in use, cannot '//
-     :                      'turn off centroiding'')' )
+	       TEXT = 'Optimal extraction in use, cannot '//
+     :                'turn off centroiding'
                CALL MSG_OUT( ' ', TEXT, STATUS )
 	    ELSE IF ( OPTIMA .AND. (.NOT. CENTRO)) THEN
 	       CENTRO = .NOT. CENTRO
-               WRITE( TEXT, '(''Centroiding in stellar aperture'')' )
+               TEXT = 'Centroiding in stellar aperture'
                CALL MSG_OUT( ' ', TEXT, STATUS )
 	    ELSE
                CENTRO = .NOT. CENTRO
 
                IF ( CENTRO ) THEN
-                  WRITE( TEXT, '(''Centroiding in stellar aperture'')' )
+                  TEXT = 'Centroiding in stellar aperture'
                   CALL MSG_OUT( ' ', TEXT, STATUS )
                ELSE
-                  WRITE( TEXT, '(''No centroiding'')' )
+                  TEXT = 'No centroiding'
                   CALL MSG_OUT( ' ', TEXT, STATUS )
                ENDIF
 
@@ -475,7 +480,7 @@
             ELSEIF ( STATUS .NE. SAI__OK ) THEN
                CALL FIO_CANCL( 'POSFILE', STATUS )
                CALL ERR_ANNUL( STATUS )
-               WRITE( TEXT, '(''ERROR   > File not suitable'')' )
+               TEXT = 'ERROR   > File not suitable'
                CALL MSG_OUT( ' ', TEXT, STATUS )
 
 *   Else go ahead with the measurements
@@ -542,45 +547,37 @@
          ELSEIF ( ( COMMAND .EQ. 'H' ) .OR. ( COMMAND .EQ. 'h' ) ) THEN
             CALL MSG_OUT( ' ', HELP1, STATUS )
             CALL MSG_OUT( ' ', HELP2, STATUS )
-            WRITE( TEXT, '(''  '')' )          
-	    CALL MSG_OUT( ' ', TEXT, STATUS )
-            WRITE( TEXT, '(''Annulus   - Toggle between sky measured'
-     :             //' in concentric or in selected area'')' )
+	    CALL MSG_OUT( ' ', ' ', STATUS )
+            TEXT = 'Annulus   - Toggle between sky measured'//
+     :             ' in concentric or in selected area'
             CALL MSG_OUT( ' ', TEXT, STATUS )
-            WRITE( TEXT, '(''Centroid  - Toggle between measuring '//
-     :             'around centroid of image or given position'')' )
+            TEXT = 'Centroid  - Toggle between measuring '//
+     :             'around centroid of image or given position'
             CALL MSG_OUT( ' ', TEXT, STATUS )
-            WRITE( TEXT, '(''End       - Exit program'')' )
+            TEXT = 'End       - Exit program'
             CALL MSG_OUT( ' ', TEXT, STATUS )
-            WRITE( TEXT, '(''File      - Supply a file of object '//
-     :             'positions'')' )
+            TEXT = 'File      - Supply a file of object positions'
             CALL MSG_OUT( ' ', TEXT, STATUS )
-            WRITE( TEXT, '(''Help      - This help message'')' )
+            TEXT = 'Help      - This help message'
             CALL MSG_OUT( ' ', TEXT, STATUS )
-            WRITE( TEXT, '(''Ishape    - Select aperture shape '//
-     :             'interactively'')' )
+            TEXT = 'Ishape    - Select aperture shape interactively'
             CALL MSG_OUT( ' ', TEXT, STATUS )
-            WRITE( TEXT, '(''Measure   - Make measurements '//
-     :             'interactively'')' )
+            TEXT = 'Measure   - Make measurements interactively'
             CALL MSG_OUT( ' ', TEXT, STATUS )
-            WRITE( TEXT, '(''Nshape    - Select aperture shape '//
-     :             'non-interactively'')' )
+            TEXT = 'Nshape    - Select aperture shape non-interactively'
             CALL MSG_OUT( ' ', TEXT, STATUS )
-            WRITE( TEXT, '(''Options   - Change values of some '//
-     :             'parameters'')' )
+            TEXT = 'Options   - Change values of some parameters'
             CALL MSG_OUT( ' ', TEXT, STATUS )
-            WRITE( TEXT, '(''Photons   - Select error estimate - '//
-     :             'photon statistics, sky or data variance, '//
-     :             'gaussian sky'')' )
+            TEXT = 'Photons   - Select error estimate - photon '//
+     :             'statistics, sky or data variance, gaussian sky'
             CALL MSG_OUT( ' ', TEXT, STATUS )
-            WRITE( TEXT, '(''Sky       - Sky estimator - mean, '//
-     :             'mean within 2 sigma, mode or user given'')' )
+            TEXT = 'Sky       - Sky estimator - mean, '//
+     :             'mean within 2 sigma, mode or user given'
             CALL MSG_OUT( ' ', TEXT, STATUS )
-            WRITE( TEXT, '(''Values    - Output current parameter '//
-     :             'values'')' )
+            TEXT = 'Values    - Output current parameter values'
             CALL MSG_OUT( ' ', TEXT, STATUS )
-            WRITE( TEXT, '(''Xtraction - Toggle between doing '//
-     :             'optimal and aperture photometry'')' )
+            TEXT = 'Xtraction - Toggle between doing optimal and '//
+     :             'aperture photometry'
             CALL MSG_OUT( ' ', TEXT, STATUS )
      
 ***************
@@ -590,8 +587,8 @@
          ELSEIF ( ( COMMAND .EQ. 'I' ) .OR. ( COMMAND .EQ. 'i' ) ) THEN
 	 
 	    IF( OPTIMA ) THEN
-	       WRITE( TEXT, '(''Using optimal extraction, you '//
-     :                      'need to change the clipping radius'')' )
+	       TEXT = 'Using optimal extraction, you need to change '//
+     :                'the clipping radius'
                CALL MSG_OUT( ' ', TEXT, STATUS )	    
 	    ELSE
                IF ( SGSOFF ) THEN
@@ -694,8 +691,8 @@
 *   defaults to the current values
          ELSEIF ( ( COMMAND .EQ. 'N' ) .OR. ( COMMAND .EQ. 'n' ) ) THEN
 	    IF( OPTIMA ) THEN
-	       WRITE( TEXT, '(''Using optimal extraction, you '//
-     :                      'need to change the clipping radius'')' )
+	       TEXT = 'Using optimal extraction, you need to change '//
+     :                'the clipping radius'
                CALL MSG_OUT( ' ', TEXT, STATUS )	    
 	    ELSE
 	       CALL PAR_CANCL( 'SEMIM', STATUS )
@@ -768,27 +765,26 @@
 
 *   Write out reminders
             IF ( PHOTON. EQ. 1 ) THEN
-               WRITE( TEXT, '(''Errors from photon statistics'')' )
+               TEXT = 'Errors from photon statistics'
                CALL MSG_OUT( ' ', TEXT, STATUS )
 
             ELSEIF ( PHOTON .EQ. 2 ) THEN
-               WRITE( TEXT, '(''Errors from sky variance'')' )
+               TEXT = 'Errors from sky variance'
                CALL MSG_OUT( ' ', TEXT, STATUS )
 
             ELSEIF ( PHOTON .EQ. 3 ) THEN
 
 *   Check that there is a data variance component
                IF ( ISVAR ) THEN
-                  WRITE( TEXT, '(''Errors from data variance'')' )
+                  TEXT = 'Errors from data variance'
                   CALL MSG_OUT( ' ', TEXT, STATUS )
                ELSE
-                  WRITE( TEXT, '(''Data does not have a '//
-     :                            'variance component'')' )
+                  TEXT = 'Data does not have a variance component'
                   CALL MSG_OUT( ' ', TEXT, STATUS )
                   GOTO 40
                ENDIF
             ELSEIF ( PHOTON .EQ. 4 ) THEN
-               WRITE( TEXT, '(''Gaussian errors from sky variance'')' )
+               TEXT = 'Gaussian errors from sky variance'
                CALL MSG_OUT( ' ', TEXT, STATUS )
             ENDIF
 
@@ -812,16 +808,15 @@
 
 *   Write out reminders
             IF ( SKYEST .EQ. 1 ) THEN
-               WRITE( TEXT, '(''Sky estimator is mean'')' )
+               TEXT = 'Sky estimator is mean'
                CALL MSG_OUT( ' ', TEXT, STATUS )
 
             ELSEIF ( SKYEST .EQ. 2 ) THEN
-               WRITE( TEXT, '(''Sky estimator is mean with '//
-     :                '2 sigma clipping'')' )
+               TEXT = 'Sky estimator is mean with 2 sigma clipping'
                CALL MSG_OUT( ' ', TEXT, STATUS )
 
             ELSEIF ( SKYEST .EQ. 3 ) THEN
-               WRITE( TEXT, '(''Sky estimator is mode'')' )
+               TEXT = 'Sky estimator is mode'
                CALL MSG_OUT( ' ', TEXT, STATUS )
 
 *   Else prompt user for value
@@ -858,7 +853,7 @@
             OPTIMA = .NOT. OPTIMA
 
             IF ( OPTIMA ) THEN
-               WRITE( TEXT, '(''Using optimal extraction'')' )
+               TEXT = 'Using optimal extraction'
                CALL MSG_OUT( ' ', TEXT, STATUS )
 	       
 *   If selecting positions via the cursor, centroiding should be on 
@@ -866,11 +861,11 @@
 
                IF( .NOT. CENTRO ) THEN
                   CENTRO = .NOT. CENTRO
-                  WRITE(TEXT, '(''Centroiding in stellar aperture'')')
+                  TEXT = 'Centroiding in stellar aperture'
                   CALL MSG_OUT( ' ', TEXT, STATUS )
 	       ENDIF
 	    ELSE
-               WRITE( TEXT, '(''Using aperture extraction'')' )
+               TEXT = 'Using aperture extraction'
                CALL MSG_OUT( ' ', TEXT, STATUS )
             ENDIF
 
@@ -883,7 +878,7 @@
 ***************
 *   Error line
          ELSE
-            WRITE( TEXT, '(''Command not recognised'')' )
+            TEXT = 'Command not recognised'
             CALL MSG_OUT( ' ', TEXT, STATUS )
 
          ENDIF
@@ -900,7 +895,7 @@
 
 * Error with the mask file
   98  CONTINUE
-      WRITE( TEXT, '(''ERROR   > Mask file not suitable'')' )
+      TEXT = 'ERROR   > Mask file not suitable'
       CALL MSG_OUT( ' ', TEXT, STATUS )
       CALL FIO_CANCL( 'MASKFILE', STATUS )
 

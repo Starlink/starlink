@@ -30,11 +30,15 @@
 *  Authors :
 *     KM: Koji Mukai (Oxford University)
 *     AA: Alasdair Allan (Starlink, Keele University)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 *
 *  History :
 *     14-FEB-1999
 *        Cut and hack for Starlink
+*     21-FEB-2008 (PWD):
+*        Stop using internal writes to copy constant strings. Initialise
+*        STATUS so that messages are output.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -42,6 +46,8 @@
 *-
 
 	IMPLICIT NONE
+
+	INCLUDE 'SAE_PAR'
 
 	REAL CYCLE
 
@@ -51,9 +57,11 @@
         CHARACTER TEXT * 72
 	
 	INTEGER STATUS
+
+	STATUS = SAI__OK
 	
 	IF( CYCLE .LE. 0.0 ) THEN
-	  WRITE(TEXT, '(''ERROR > CYC_DAT unacceptable periodicity'')')
+	  TEXT = 'ERROR > CYC_DAT unacceptable periodicity'
 	  CALL MSG_OUT(' ', TEXT, STATUS) 
 	  CYCLIC_DATA = .FALSE.
 	  CYCLE_DATA = 0.0

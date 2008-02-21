@@ -70,6 +70,8 @@
         
         INTEGER STATUS
 
+	IF ( STATUS .NE. SAI__OK ) RETURN
+
 	IF( SIZE_X .LT. SIZE_Y ) THEN
             STATUS  =  SAI__ERROR
             CALL ERR_REP( 'ERR_SVD_TOLARGE',

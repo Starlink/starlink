@@ -155,6 +155,8 @@
 *     10-JAN-2008 (PWD):
 *        Add checks around CHR_ calls and report an error if they fail.
 *        CHR_ calls set status with making an error report.
+*     21-FEB-2008 (PWD):
+*        Stop using internal writes to copy constant strings.
 *     {enter_changes_here}
 
 *  Bugs :
@@ -169,6 +171,7 @@
       INCLUDE 'PRM_PAR'         ! Primitive constants
       INCLUDE 'GRP_PAR'         ! GRP constants
       INCLUDE 'CNF_PAR'         ! CNF functions
+      INCLUDE 'MSG_PAR'         ! MSG constants
 
 *  Arguments Given:
       LOGICAL MAGS
@@ -227,7 +230,7 @@
 
 *  Local Variables:
       CHARACTER * ( 2 ) CODE    ! Error code for object measurement
-      CHARACTER * ( 72 ) TEXT   ! Buffer for output messages
+      CHARACTER * ( MSG__SZMSG ) TEXT ! Buffer for output messages
       CHARACTER * ( GRP__SZNAM ) BUFFER ! GRP line buffer
       CHARACTER * ( GRP__SZNAM ) BUFOBJ ! GRP line buffer
       CHARACTER * ( VAL__SZD ) APRWRD( 12 ) ! Object aperture information
@@ -575,8 +578,8 @@
      :       CODE .NE. 'E' .AND. CODE .NE. '?' ) CODE = 'OK'
          
          IF( CODE .EQ. 'B' ) THEN
-            WRITE( TEXT, '(''WARNING   > Bad pixels' 
-     :      //' in PSF candidate star, photometry dubious.'')')
+            TEXT = 'WARNING   > Bad pixels in PSF candidate star, '//
+     :             'photometry dubious.'
 	    CALL MSG_OUT( ' ', TEXT, STATUS )   
          ENDIF  
          
@@ -651,8 +654,8 @@
 *  initial values for the position
                ELSE
                   CALL ERR_ANNUL( STATUS )
-                  WRITE(TEXT, '(''WARNING > Problems during'
-     :		         //'centroiding. '')')
+                  TEXT = 'WARNING > Problems during centroiding.'
+                  CALL MSG_OUT( ' ', TEXT, STATUS )
                ENDIF
                CALL ERR_RLSE
             ENDIF
@@ -883,8 +886,7 @@
          XFIT = XFIT - 0.5 ! and back again
          YFIT = YFIT - 0.5
          IF( STATUS .NE. SAI__OK ) THEN
-            WRITE( TEXT,
-     :             '(''ERROR   > Problem with optimal extraction.'')')
+            TEXT = 'ERROR   > Problem with optimal extraction.'
             CALL MSG_OUT( ' ', TEXT, STATUS )
             GO TO 99
          END IF
@@ -954,8 +956,7 @@
 *  initial values for the position
             ELSE
                CALL ERR_ANNUL( STATUS )
-               WRITE(TEXT, '(''WARNING > Problems during'
-     :		         //'centroiding. '')')
+               TEXT = 'WARNING > Problems during centroiding.'
 	       CALL MSG_OUT( ' ', TEXT, STATUS )      
             ENDIF
             CALL ERR_RLSE

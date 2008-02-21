@@ -93,6 +93,8 @@
 *     19-APR-1996 (PWD):
 *        Changed MASK data type to INTEGER from REAL to correspond with
 *        ARD usage. Renamed PHO1_BACK to differentiate from old version.
+*     21-FEB-2008 (PWD):
+*        Stop using internal writes to copy constant strings. Use SAI__OK.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -103,6 +105,7 @@
       IMPLICIT NONE
 
 *  Global Constants :
+      INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'
 
 
@@ -140,18 +143,16 @@
 
       REAL SKEW, SMEAN, SMED
 
-      CHARACTER * 23 TEXT
 *.
 
 *   Set the status
-      STATUS = 0
+      STATUS = SAI__OK
 
 *   Check that SKYEST has a valid value
       IF ( ( SKYEST .LT. 1 ) .OR. ( SKYEST .GT. 3 ) ) THEN
          SIGMA = -1.0
          SKY = 0.0
-         WRITE( TEXT, '(''Sky estimator is not valid'')' )
-         CALL MSG_OUT( ' ', TEXT, STATUS )
+         CALL MSG_OUT( ' ', 'Sky estimator is not valid', STATUS )
          GOTO 99
       ENDIF
 
@@ -217,8 +218,7 @@
       IF ( NV .LT. 1 ) THEN
          SIGMA = -1.0
          SKY = 0.0
-         WRITE( TEXT, '(''Sky region is not valid'')' )
-         CALL MSG_OUT( ' ', TEXT, STATUS )
+         CALL MSG_OUT( ' ', 'Sky region is not valid', STATUS )
          GOTO 99
       ENDIF
 

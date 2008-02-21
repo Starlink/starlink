@@ -38,11 +38,15 @@
 *
 *  Authors :
 *     AA: Alasdair Allan (Starlink, Keele University)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 *
 *  History :
 *     25-JAN-1999
 *          Original version
+*     21-FEB-2008 (PWD):
+*        Stop using internal writes to copy constant strings. Initialise
+*        STATUS so that messages are output.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -51,6 +55,10 @@
       
 *  Type Definitions :
       IMPLICIT NONE
+
+*  Global parameters:
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'MSG_PAR'
 
 *  Arguments Given :
       INTEGER NX
@@ -61,26 +69,26 @@
       INTEGER STATUS
 
 *  Local Variables :
-      CHARACTER * 68 TEXT
+      CHARACTER * ( MSG__SZMSG ) TEXT
 *.
 
+*   Initialise STATUS.
+      STATUS = SAI__OK
 
 *   Write out the header to the terminal
-      WRITE( TEXT, '(''================================'//
-     :                   '===================================='')' )
+      CALL MSG_OUT( ' ', '========================================'//
+     :                   '============================', STATUS )
+
+      CALL MSG_OUT( ' ', '         nx       ny        clip        see', 
+     :              STATUS )
+
+      WRITE( TEXT, '( 2X, 2I9, F11.2, F11.2 )' ) NX, NY, CLIP, SEE
       CALL MSG_OUT( ' ', TEXT, STATUS )
-      WRITE( TEXT, '(''         nx       ny        clip'//
-     :                   '        see'')' )    
-      CALL MSG_OUT( ' ', TEXT, STATUS )
-      WRITE( TEXT, '( 2X, 2I9, F11.2, F11.2 )' )
-     :          NX, NY, CLIP, SEE
-      CALL MSG_OUT( ' ', TEXT, STATUS )
-      WRITE ( TEXT, '('' '')' )
-      CALL MSG_OUT( ' ', TEXT, STATUS )
-      WRITE( TEXT, '(''           x        y      fwhm'//
-     :        '      fwhm     rot    code'')' )
-      CALL MSG_OUT( ' ', TEXT, STATUS )
-  
+
+      CALL MSG_OUT( ' ', ' ', STATUS )
+
+      CALL MSG_OUT( ' ', '           x        y      fwhm      '//
+     :              'fwhm     rot    code', STATUS )
 
       END
 

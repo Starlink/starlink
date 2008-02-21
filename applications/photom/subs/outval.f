@@ -100,6 +100,9 @@
 *        Added OPTIMA parameter and made associated changes.
 *     6-DEC-1998 (AA)
 *        Added CLIP and SEE paraemters and made associated changes.
+*     21-FEB-2008 (PWD):
+*        Stop using internal writes to copy constant strings. Increase
+*        output buffer to stop overwrites.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -111,7 +114,7 @@
 
 *  Global Constants :
       INCLUDE 'SAE_PAR'
-
+      INCLUDE 'MSG_PAR'
 
 *  Arguments Given :
       REAL A
@@ -139,7 +142,7 @@
       INTEGER STATUS
 
 *  Local Variables :
-      CHARACTER TEXT * 80
+      CHARACTER TEXT * ( MSG__SZMSG )
 *.
 
       IF ( STATUS .EQ. SAI__OK ) THEN
@@ -158,16 +161,15 @@
 
          CALL MSG_OUT( ' ', ' ', STATUS )
          IF ( CENTRO ) THEN
-            WRITE( TEXT, '('' Centroiding of star in aperture'')' )
+            TEXT = ' Centroiding of star in aperture'
          ELSE
-            WRITE( TEXT, '('' No centroiding of star in aperture'')' )
+            TEXT = ' No centroiding of star in aperture'
          ENDIF
          CALL MSG_OUT( ' ', TEXT, STATUS )
 
          CALL MSG_OUT( ' ', ' ', STATUS )
          IF ( CONCEN ) THEN
-            WRITE( TEXT, '('' Concentric sky aperture '')' )
-            CALL MSG_OUT( ' ', TEXT, STATUS )
+            CALL MSG_OUT( ' ', ' Concentric sky aperture ', STATUS )
             WRITE( TEXT, '('' Inner radius    ='', F6.1 )' ) INNER
             CALL MSG_OUT( ' ', TEXT, STATUS )
 	    IF ( .NOT. OPTIMA ) THEN
@@ -179,8 +181,7 @@
             ENDIF	    
             CALL MSG_OUT( ' ', TEXT, STATUS )
          ELSE
-            WRITE( TEXT, '('' Interactive sky aperture '')' )
-            CALL MSG_OUT( ' ', TEXT, STATUS )
+            CALL MSG_OUT( ' ', ' Interactive sky aperture ', STATUS )
          ENDIF
 
 *   Output the type of sky estimator used and whether a mask is in use
@@ -190,16 +191,14 @@
 *   Skyest = 4 = User supplied
          CALL MSG_OUT( ' ', ' ', STATUS )
          IF ( USEMSK ) THEN
-            WRITE ( TEXT, '('' Sky mask in use '')' )
-            CALL MSG_OUT( ' ', TEXT, STATUS )
+            CALL MSG_OUT( ' ', ' Sky mask in use ', STATUS )
          ENDIF
          IF ( SKYEST .EQ. 1 ) THEN
-            WRITE ( TEXT, '('' Sky estimator   =  Simple mean'')' )
+            TEXT = ' Sky estimator   =  Simple mean'
          ELSEIF ( SKYEST .EQ. 2 ) THEN
-            WRITE ( TEXT, '('' Sky estimator   =  ''
-     :              ''Mean with 2 sigma rejection'')' )
+            TEXT = ' Sky estimator   =  Mean with 2 sigma rejection'
          ELSEIF ( SKYEST .EQ. 3 ) THEN
-            WRITE ( TEXT, '('' Sky estimator   =  Mode'')' )
+            TEXT = ' Sky estimator   =  Mode'
          ELSEIF ( SKYEST .EQ. 4 ) THEN
             WRITE ( TEXT, '('' Sky estimator   =  User given   ='',
      :              F7.1, 3X, '' Sky variance ='', F6.1 )' ) SKY, SKYSIG
@@ -226,17 +225,14 @@
 *   Photon = 3 = data variance
          CALL MSG_OUT( ' ', ' ', STATUS )
          IF ( PHOTON .EQ. 1 ) THEN
-            WRITE( TEXT, '('' Errors from photon statistics'')' )
-            CALL MSG_OUT( ' ', TEXT, STATUS )
-            WRITE( TEXT, '('' Bias level ( data units )       ='',
-     :             F7.1 )' ) BIASLE
+            CALL MSG_OUT(' ', ' Errors from photon statistics', STATUS)
+            WRITE( TEXT, 
+     :      '('' Bias level ( data units )       ='', F7.1 )' ) BIASLE
             CALL MSG_OUT( ' ', TEXT, STATUS )
          ELSEIF ( PHOTON .EQ. 2 ) THEN
-            WRITE( TEXT, '('' Errors from sky variance'')' )
-            CALL MSG_OUT( ' ', TEXT, STATUS )
+            CALL MSG_OUT( ' ', ' Errors from sky variance', STATUS )
          ELSEIF ( PHOTON .EQ. 3 ) THEN
-            WRITE( TEXT, '('' Errors from data variance'')' )
-            CALL MSG_OUT( ' ', TEXT, STATUS )
+            CALL MSG_OUT( ' ', ' Errors from data variance', STATUS )
          ENDIF
 
 *   Remind user of output data values units.
@@ -250,15 +246,15 @@
 
 *   Optimal extraction?
          IF ( OPTIMA ) THEN
-            WRITE( TEXT, '('' Using optimal extraction'')' )
-            CALL MSG_OUT( ' ', TEXT, STATUS )
+            CALL MSG_OUT( ' ', ' Using optimal extraction', STATUS )
+
             WRITE(TEXT, '(''    Clipping radius      ='', F5.1 )') CLIP
             CALL MSG_OUT( ' ', TEXT, STATUS )
+
             WRITE(TEXT, '(''    Approx seeing (pix)  ='', F5.1 )') SEE
             CALL MSG_OUT( ' ', TEXT, STATUS )
 	 ELSE
-            WRITE( TEXT, '('' Using aperture extraction'')' )
-            CALL MSG_OUT( ' ', TEXT, STATUS )
+            CALL MSG_OUT( ' ', ' Using aperture extraction', STATUS )
          ENDIF
 	 
       ENDIF

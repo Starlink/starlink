@@ -135,6 +135,7 @@
 *  Authors :
 *     NE: Nick Eaton (Durham University)
 *     AA: Alasdair Allan (Starlink, Keele University)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 *
 *  History :
@@ -161,6 +162,8 @@
 *     19-AUG-2002 (AA):
 *        Changes to support modifications to PSFCAL()
 *        Fixed PSFCAL() parameter list, outstanding since PWD mods to PSFCAL()
+*     21-FEB-2008 (PWD):
+*        Stop using internal writes to copy constant strings.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -250,6 +253,7 @@
 *.
 
 *      WRITE(*,*) ' DEBUG --- Entering AUTOM()'
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *   Calculate the ellipticity factor
       EFACT = 3.14159265 * SQRT( 1.0 - E**2 )
@@ -266,11 +270,10 @@
          IF ( ISVAR ) THEN
             USEVAR = .TRUE.
          ELSE
-            WRITE( TEXT, '(''ERROR   > Cannot calculate errors without '
-     :             //'a data variance component.'')' )
+            TEXT = 'ERROR   > Cannot calculate errors without '//
+     :             'a data variance component.'
             CALL MSG_OUT( ' ', TEXT, STATUS )
-            WRITE( TEXT, '(''          Change the error estimator '
-     :             //'( Command P ).'')' )
+            TEXT = '          Change the error estimator ( Command P ).'
             CALL MSG_OUT( ' ', TEXT, STATUS )
             GOTO 99
          ENDIF
@@ -280,7 +283,7 @@
       IF( OPTIMA ) THEN
          CALL OHEAD(NX,NY,CLIP,SEE,STATUS)      
       ELSE
-          CALL HEADER(NX,NY,A,E,THETA,STATUS )
+         CALL HEADER(NX,NY,A,E,THETA,STATUS )
       ENDIF
 
 *      WRITE(*,*) ' DEBUG --- written output file header'
@@ -317,7 +320,7 @@
 *   and index of 0 and be a PSF candidate or we abort
 	    
 	    IF(OPTIMA .AND. (.NOT.DOPSF) .AND. (INDEX.NE.0)) THEN
-               WRITE( TEXT, '(''ERROR   > No PSF star present.'')' )
+               TEXT = 'ERROR   > No PSF star present.'
                CALL MSG_OUT( ' ', TEXT, STATUS )
                GOTO 98  
 	    ENDIF                  		    
@@ -444,10 +447,10 @@
                     YFIT = YFIT - 0.5     
                     
                     IF( STATUS .NE. SAI__OK ) THEN
-                      WRITE( TEXT, 
-     :		      '(''ERROR   > Problem with optimal extraction.'')')
-                     CALL MSG_OUT( ' ', TEXT, STATUS )
-                     GOTO 99		    
+                       TEXT = 'ERROR   > Problem with optimal '//
+     :                        'extraction.'
+                       CALL MSG_OUT( ' ', TEXT, STATUS )
+                       GOTO 99		    
 		    ENDIF
 		         
 
@@ -533,7 +536,7 @@
 
 *   Problem with positions file
   98  CONTINUE
-      WRITE( TEXT, '(''ERROR   > Position file not suitable'')' )
+      TEXT = 'ERROR   > Position file not suitable'
       CALL MSG_OUT( ' ', TEXT, STATUS )
 
   99  CONTINUE

@@ -137,10 +137,7 @@
 *.
 
 *   Check status on entry - return if not o.k.
-
-
       IF ( STATUS .NE. SAI__OK ) RETURN      
-
       
 *   Simulate the functionality of the F90 floor() and
 *   ceiling() intrinsic functions. This entire hack
