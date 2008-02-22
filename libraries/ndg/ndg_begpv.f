@@ -82,12 +82,12 @@
 
 *  Indicate that the routine NDG1_HNDLR should be called whenever an NDF
 *  is opened or closed.
-      CALL NDF_HNDLR( "READ_EXISTING_NDF", NDG1_HNDLR, .TRUE., STATUS )
-      CALL NDF_HNDLR( "WRITE_EXISTING_NDF", NDG1_HNDLR, .TRUE., STATUS )
-      CALL NDF_HNDLR( "UPDATE_EXISTING_NDF", NDG1_HNDLR, .TRUE., 
+      CALL NDF_HNDLR( 'READ_EXISTING_NDF', NDG1_HNDLR, .TRUE., STATUS )
+      CALL NDF_HNDLR( 'WRITE_EXISTING_NDF', NDG1_HNDLR, .TRUE., STATUS )
+      CALL NDF_HNDLR( 'UPDATE_EXISTING_NDF', NDG1_HNDLR, .TRUE., 
      :                 STATUS )
-      CALL NDF_HNDLR( "OPEN_NEW_NDF", NDG1_HNDLR, .TRUE., STATUS )
-      CALL NDF_HNDLR( "CLOSE_NDF", NDG1_HNDLR, .TRUE., STATUS )
+      CALL NDF_HNDLR( 'OPEN_NEW_NDF', NDG1_HNDLR, .TRUE., STATUS )
+      CALL NDF_HNDLR( 'CLOSE_NDF', NDG1_HNDLR, .TRUE., STATUS )
 
 *  Indicate that the PROVENANCE extension should not be propagated by
 *  default when NDF_PROP or NDF_SCOPY is called.
