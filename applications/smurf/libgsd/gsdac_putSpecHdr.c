@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     gsdac_putSpecHdr ( const gsdVars *gsdVars,
-*                        const unsigned int nSteps,
+*                        const dasFlag dasFlag,
+*                        const int nSteps,
 *                        const unsigned int stepNum,
 *                        const unsigned int subsysNum,
 *                        const JCMTState *record,
@@ -23,8 +24,10 @@
 *  Arguments:
 *     gsdVars = const gsdVars* (Given)
 *        GSD headers and arrays
-*     nSteps = const unsigned int (Given)
-*        Number of time steps
+*     dasFlag = const dasFlag (Given)
+*        DAS file structure type
+*     nSteps = const int (Given)
+*        Number of steps in the observation
 *     stepNum = const unsigned int (Given)
 *        Time step of this spectrum
 *     subsysNum = const unsigned int (Given)
@@ -49,6 +52,8 @@
 *        Original
 *     2008-02-14 (JB):
 *        Use gsdVars struct to store headers/arrays
+*     2008-02-22 (JB):
+*        Fill feed and trx, correct tsys for DAS_CONT_CAL
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -92,6 +97,7 @@
 #define MAXRECEP 8  
 
 void gsdac_putSpecHdr ( const gsdVars *gsdVars, 
+                        const dasFlag dasFlag,
                         const unsigned int nSteps,
                         const unsigned int stepNum,
                         const unsigned int subsysNum,
@@ -99,19 +105,27 @@ void gsdac_putSpecHdr ( const gsdVars *gsdVars,
                         struct ACSISSpecHdr *specHdr, int *status )
 {
 
+  /* Local variables. */
+  int index;                  /* index into array */
+  long fitsIndex;             /* current FITSchan */
+
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
 
-  specHdr->acs_tsys = (gsdVars->sourceSysTemps)[subsysNum-1];
+  /* Check for continuous calibration to get the correct index
+     into the array of source system temperatures. */
+  if ( dasFlag == DAS_CONT_CAL ) {
+    index = ( stepNum * gsdVars->nBESections ) + subsysNum-1;
+  } else {
+    index = subsysNum-1;
+  }
 
   /* Fill the specHdr. */
   specHdr->rts_endnum = nSteps;
-
   specHdr->acs_feedx = record->tcs_tr_ac1;
   specHdr->acs_feedy = record->tcs_tr_ac2;
-
-  /* KLUDGE with defaults. */
-  specHdr->acs_feed = 0;//k
-  specHdr->acs_trx = 0.0;//k
+  specHdr->acs_feed = subsysNum-1;
+  specHdr->acs_tsys = (gsdVars->sourceSysTemps)[index];
+  specHdr->acs_trx = (gsdVars->recTemps)[subsysNum-1];
 
 }

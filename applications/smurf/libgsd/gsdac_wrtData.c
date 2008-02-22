@@ -270,7 +270,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const dasFlag dasFlag,
       	                    record, status );
 
       /* Get the ACSIS SpecHdr. */
-      gsdac_putSpecHdr ( gsdVars, nSteps, stepNum, subsysNum, record, 
+      gsdac_putSpecHdr ( gsdVars, dasFlag, nSteps, stepNum, subsysNum, record, 
       	                 specHdr, status );
 
       msgOutif(MSG__VERB," ", "Writing data", status); 
