@@ -467,7 +467,7 @@ itcl::class gaia::GaiaContour {
                         #  Comment do nothing.
                      }
                      default {
-                        if { [llength $line] == 3 } {
+                        if { [llength $line] == 3 || [llength $line] == 4 } {
                            eval add_contour_ $count $line
                            incr count
                         } else {
@@ -786,20 +786,6 @@ itcl::class gaia::GaiaContour {
             update
          }
 
-         #  Get the levels.
-         if { $all } {
-            set levels [get_levels_]
-         } else {
-            set levels [$itk_component(value$index) get]
-         }
-
-         #  Get the attributes.
-         if { $all } {
-            set atts [get_ast_atts_]
-         } else {
-            set atts [get_ast_att_ $index]
-         }
-
          #  If requested just display over the visible canvas +/- a little.
          if { ! $whole_ } {
             set bounds [calc_bounds_]
@@ -810,26 +796,29 @@ itcl::class gaia::GaiaContour {
          #  Draw the contours. Do this one at a time so that we can
          #  update the interface.
          if { $all } {
-            set ncont 0
-            foreach value "$levels" {
-               set att [lindex $atts $ncont]
+            for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
+               set att [get_ast_att_ $i]
+               set level [$itk_component(value$i) get]
 
                #  Set the tag used to control clear etc.
                $itk_option(-rtdimage) configure -ast_tag \
-                  "$itk_option(-ast_tag) $leveltags_($ncont)"
+                  "$itk_option(-ast_tag) $leveltags_($i)"
 
                #  Draw the contour (return value is number of points).
-               set drawn_($ncont) \
+               set drawn_($i) \
                   [$itk_option(-rtdimage) contour \
-                      $value $rtdimage $careful_ $smooth_ \
-                      $att $bounds [expr {$ncont == 0}]]
+                      $level $rtdimage $careful_ $smooth_ \
+                      $att $bounds [expr {$i == 0}]]
 
                #  Add/update the key.
                draw_key_
                update idletasks
-               incr ncont
             }
          } else {
+
+            set atts [get_ast_att_ $index]
+            set level [$itk_component(value$index) get]
+
             #  Set the tag used to control clear etc.
             $itk_option(-rtdimage) configure -ast_tag \
                "$itk_option(-ast_tag) $leveltags_($index)"
@@ -837,7 +826,7 @@ itcl::class gaia::GaiaContour {
             #  Draw the contour.
             set drawn_($index) \
                [$itk_option(-rtdimage) contour \
-                   $levels $rtdimage $careful_ $smooth_ \
+                   $level $rtdimage $careful_ $smooth_ \
                    $atts $bounds 1]
 
             #  Add/update the key.
@@ -1466,7 +1455,7 @@ itcl::class gaia::GaiaContour {
 	  return
       }
 
-      #  Get current levels.
+      #  Get current levels to see if we have any.
       set levels [get_levels_ 1]
       if { $levels == {} } {
          return
@@ -1503,7 +1492,7 @@ itcl::class gaia::GaiaContour {
       #  Now add each line and level.
       for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
          if { $drawn_($i) } {
-            set value [lindex $levels $i]
+            set level [$itk_component(value$i) get]
             lassign [get_att_ $i] colour width style
 
             $itk_option(-canvas) create line $x $y [expr $x+$dx] $y \
@@ -1513,7 +1502,7 @@ itcl::class gaia::GaiaContour {
                -tags "$itk_option(-ast_tag) $keytag_ $leveltags_($i)"
 
             $itk_option(-canvas) create text [expr $x+$dx+5] $y \
-               -text "$value" \
+               -text "$level" \
                -anchor w \
                -fill $colour \
                -tags "$itk_option(-ast_tag) $keytag_ $texttag_" \
