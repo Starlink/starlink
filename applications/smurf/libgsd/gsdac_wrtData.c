@@ -46,6 +46,8 @@
 *        Check dasFlag, fill gsdWCS
 *     2008-02-20 (JB):
 *        Set memory usage for specwrite
+*     2008-02-21 (JB):
+*        Allocate enough memory for fitschans       
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -100,7 +102,8 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const dasFlag dasFlag,
 
   /* Local variables */
   char backend[SZFITSCARD];   /* name of the backend */
-  const AstFitsChan *fitschan[nSteps];  /* Array of FITS headers */
+  const AstFitsChan *fitschan[nSteps * gsdVars->nBESections];  
+                              /* Array of FITS headers */
   long fitsIndex;             /* current FITSchan */
   char *focalStation = NULL;  /* focal station of the instrument */
   float fPlaneX[MAXRECEP]; 
@@ -145,7 +148,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const dasFlag dasFlag,
   focalStation = "DIRECT";
 
   for ( i = 0; i < gsdVars->nFEChans; i++ ) { 
-    recepNames[i] = smf_malloc ( 2, sizeof( char ), 0, status );
+    recepNames[i] = smf_malloc ( 3, sizeof( char ), 0, status );
     fPlaneX[i] = 0.0;
     fPlaneY[i] = 0.0;
   }
@@ -210,14 +213,12 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const dasFlag dasFlag,
   mem = gsdVars->nBEChansOut * gsdVars->noScans * 
         gsdVars->nScanPts * sizeof(float);
   acsSpecSetMem ( mem, status );   
-
   msgOutif(MSG__VERB," ", 
 	     "Preparing file writing system", status); 
 
   acsSpecOpenTS ( directory, utDate, obsNum, gsdVars->nFEChans, 
                   gsdVars->nBESections, recepNames, focalStation, 
                   fPlaneX, fPlaneY, OCSConfig, status );
-
 
   /* Truncate the name of the backend. */
   cnfImprt ( gsdVars->backend, 16, backend );
@@ -266,17 +267,17 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const dasFlag dasFlag,
 
       /* Get the subsystem-dependent JCMTState values. */
       gsdac_putJCMTStateS ( gsdVars, dasFlag, stepNum, subsysNum, 
-                            record, status );
+      	                    record, status );
 
       /* Get the ACSIS SpecHdr. */
       gsdac_putSpecHdr ( gsdVars, nSteps, stepNum, subsysNum, record, 
-                         specHdr, status );
+      	                 specHdr, status );
 
       msgOutif(MSG__VERB," ", "Writing data", status); 
 
       /* Write a spectrum to the file. */
       acsSpecWriteTS( subsysNum, (gsdVars->BEChans)[subsysNum-1], 
-                      &((gsdVars->data)[specIndex]), record, specHdr, status );
+      	&((gsdVars->data)[specIndex]), record, specHdr, status );
 
       /* Initialize the astFitsChan for this file. */
       fitsIndex = ( stepNum * gsdVars->nBESections ) + ( subsysNum - 1 );
@@ -286,7 +287,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const dasFlag dasFlag,
       /* Fill the FITS headers. */
       gsdac_putFits ( gsdVars, subsysNum, obsNum, utDate, nSteps, backend, 
                       recepNames, samMode, obsType, wcs, 
-                      fitschan[fitsIndex], status ); 
+                      fitschan[fitsIndex], status );
 
       specIndex = specIndex + (gsdVars->BEChans)[subsysNum-1];
 
@@ -302,6 +303,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const dasFlag dasFlag,
 
   msgOutif(MSG__VERB," ", 
 	   "Closing new file(s)", status);
+
 
   /* Close the file. */
   acsSpecCloseTS ( fitschan, 0, status );

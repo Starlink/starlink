@@ -41,6 +41,8 @@
 *        Original
 *     2008-02-20 (JB):
 *        Calculate TAI for each time step
+*     2008-02-21 (JB):
+*        Fix TAI calculations for rasters
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -79,6 +81,8 @@
 #include "gsdac.h"
 #include "smurf_par.h"
 
+#define SOLSID 1.00273790935
+
 #define FUNC_NAME "gsdac_getWCS.c"
 
 void gsdac_getWCS ( const gsdVars *gsdVars, const int nSteps,
@@ -89,6 +93,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const int nSteps,
   /* Local variables */
   char dateString[SZFITSCARD];/* temporary string for date conversions. */
   int day;                    /* days */
+  double dLST;                /* difference in LSTs */
   double dut1;                /* UT1-UTC correction */
   int hour;                   /* hours */
   int i;                      /* loop counter */
@@ -170,11 +175,32 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const int nSteps,
     wcs[i].baseTr2 = 0.0;
     wcs[i].index = 0.0;
 
-    /* Get the difference between the start LST and this LST
-       and add it to the start TAI. */
-    index = i * gsdVars->nScanVars1;
-    wcs[i].tai = TAIStart + 
-                 ( ( (gsdVars->scanTable1)[index] - LSTStart ) / 24.0 );
+    /* If this is a raster, work out the LST from the scan_time
+       and the number of map points in each scan. */
+    if ( gsdVars->obsContinuous ) {
+
+      /* Get the dLST of the start of this row. */
+      index = (int) ( i / gsdVars->nScanPts );
+      dLST = ( (gsdVars->scanTable1)[index] - LSTStart ) / 24.0;
+
+      /* Add the integration times up to this scan point. */
+      dLST = dLST + ( ( nSteps % gsdVars->nScanPts ) *
+                      ( gsdVars->scanTime / gsdVars->nScanPts ) );
+
+    } else {
+
+      /* Get the difference between the start LST and this LST
+         and add it to the start TAI. */
+      index = i * gsdVars->nScanVars1;
+      dLST = ( (gsdVars->scanTable1)[index] - LSTStart ) / 24.0;
+
+    }
+
+    /* Check for wrapping LST times. */
+    if ( dLST < 0 ) dLST = dLST + 1.0;
+
+    /* Correct for difference between solar and sidereal time. */
+    wcs[i].tai = TAIStart + ( dLST / SOLSID );
 
     wcs[i].trAng = 0.0;//k
 

@@ -65,6 +65,8 @@
 *        Use gsdVars struct to store headers/arrays
 *     2008-02-19 (JB):
 *        Pass in gsdWCS struct instead of JCMTState
+*     2008-02-21 (JB):
+*        Fix integration time calculation
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -94,9 +96,11 @@
 
 /* Standard includes */
 #include <string.h>
+#include <ctype.h>
 
 /* Starlink includes */
 #include "sae_par.h"
+#include "mers.h"
 #include "cnf.h"
 
 /* SMURF includes */
@@ -189,7 +193,6 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   int stBetRef;               /* max number of steps between refs */
   char subBands[SZFITSCARD];  /* ACSIS sub-band set-up */
   char swMode[SZFITSCARD];    /* switch mode */
-  int tableSize = 0;          /* number of elements of data table */
   char tauDatSt[SZFITSCARD];  /* time of tau225St observation in 
                                  format YYYY-MM-DDTHH:MM:SS */
   char telName[SZFITSCARD];   /* telescope name */
@@ -224,7 +227,7 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   gsdac_getDateVars ( gsdVars, subsysNum, obsNum, backend, dateObs, 
                       dateEnd, obsID, obsIDs, HSTstart, HSTend, 
                       LSTstart, LSTend, status );
-  
+
   if ( *status == SAI__OK ) {
  
     /* Get the airmass at start/end. */
@@ -244,16 +247,13 @@ void gsdac_putFits ( const gsdVars *gsdVars,
 
   /* Integration time related. */
 
-  /* Get the dimensionality of the scan table 2. */
-  tableSize = gsdVars->nScanVars2 * gsdVars->noScans;
-
   /* Get the sum of the integration times. */
   if ( *status == SAI__OK ) {
 
     i = 0;
     intTime = 0.0;
-    while ( i < tableSize ) {
-      intTime += (gsdVars->intTimes)[i];
+    while ( i < ( gsdVars->nScanVars2 * gsdVars->noScans ) ) {
+      intTime += (gsdVars->scanTable2)[i];
       i += gsdVars->nScanVars2;
     }
 
@@ -366,13 +366,11 @@ void gsdac_putFits ( const gsdVars *gsdVars,
 
   }
 
-
   /* Switching and Map setup for the observation. */
   gsdac_getMapVars ( gsdVars, samMode, obsType, skyRefX, skyRefY, 
                      swMode, chopCrd, &mapHght, &mapPA, &mapWdth, 
                      loclCrd, scanCrd, &scanVel, &scanDy, 
                      &scanPA, scanPat, status );
-
 
   /* JOS parameters */
 
@@ -392,11 +390,11 @@ void gsdac_putFits ( const gsdVars *gsdVars,
        the row / number of points in the row.  The length
        of time in the reference is then sqrt (number of 
        points in the row) * (time per point). */
-    nRefStep = sqrt ( (double)(gsdVars->noCyclePts) ) * 
-           ( (double)(gsdVars->scanTime) / (double)(gsdVars->noCyclePts) );
+    nRefStep = sqrt ( (double)(gsdVars->nScanPts) ) * 
+           ( (double)(gsdVars->scanTime) / (double)(gsdVars->nScanPts) );
 
-    stBetRef = gsdVars->noCyclePts;
-    
+    stBetRef = gsdVars->nScanPts;
+   
   } else { 
 
     nRefStep = (double)(gsdVars->scanTime);
@@ -411,7 +409,7 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   /* Get the starting index into the pattern. */
   gsdac_getStartIdx ( gsdVars, samMode, &startIdx, status );
 
-
+ 
 
   /************************************/
   /*      WRITE OUT FITS HEADERS      */
@@ -1006,6 +1004,5 @@ void gsdac_putFits ( const gsdVars *gsdVars,
 
   astSetFitsF ( fitschan, "ROTAFREQ", AST__UNDEFF,
 		"[Hz] Spin frequency (if spinning)", *status );
-
 
 }

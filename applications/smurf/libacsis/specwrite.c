@@ -313,7 +313,7 @@ static size_t hdsRecordSizes[JCMT_COMP_NUM];
 #define NGROW  (MAXRATE * PRESIZETIME)
 
 /* Number of bytes we should accumulate before opening a new file */
-//#define MAXBYTES ( 512 * 1024 * 1024 )
+/*#define MAXBYTES ( 512 * 1024 * 1024 )*/
 static double maxbytes = 536870912;
 
 /* if we have unfeasibly small spectra and 1 receptor we could get
@@ -327,7 +327,7 @@ static double maxbytes = 536870912;
    or more feasibly
           MAXBYTES / (4 * 1024 * 1       ) = 130,000 sequences
  */
-//#define MAXSEQ ( ( 512 * 1024 * 1024 ) / ( 4 * 1024 * 1 ) )
+/*#define MAXSEQ ( ( 512 * 1024 * 1024 ) / ( 4 * 1024 * 1 ) )*/
 static double maxsequence = 131072;
 
 /*
