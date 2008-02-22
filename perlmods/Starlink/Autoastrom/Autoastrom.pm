@@ -2076,8 +2076,8 @@ sub _create_frameset {
   $fits .= sprintf( "CUNIT2  = 'deg     '           / Unit of right ascension co-ordinates           " );
   $fits .= sprintf( "CRVAL1  =   %18.12f / [deg] Right ascension at the reference pixel   ", $ra );
   $fits .= sprintf( "CRVAL2  =   %18.12f / [deg] Declination at the reference pixel       ", $dec );
-  $fits .= sprintf( "CRPIX1  =                %5.1f / [pixel] Reference pixel along RA axis          ", $xcen );
-  $fits .= sprintf( "CRPIX2  =                %5.1f / [pixel] Reference pixel along Dec axis         ", $ycen );
+  $fits .= sprintf( "CRPIX1  =   %18.1f / [pixel] Reference pixel along RA axis          ", $xcen );
+  $fits .= sprintf( "CRPIX2  =   %18.1f / [pixel] Reference pixel along Dec axis         ", $ycen );
   $fits .= sprintf( "CD1_1   =   %18.12f /                                                ", $sign * $scale * cos( $rotangle ) );
   $fits .= sprintf( "CD1_2   =   %18.12f /                                                ", $sign * $scale * sin( $rotangle ) );
   $fits .= sprintf( "CD2_1   =   %18.12f /                                                ",  -1.0 * $scale * sin( $rotangle ) );
