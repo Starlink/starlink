@@ -22,6 +22,7 @@ libprm_a_la_SOURCES = \
 if !NOPIC
 libprm_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 libprm_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
+libprm_a_la_CFLAGS = $(AM_CFLAGS) -prefer-pic
 endif
 
 make_prm_par_SOURCES = make-prm-par.c
