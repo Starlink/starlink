@@ -577,7 +577,7 @@
 
                IF ( SAMESZ ) THEN
                   WRITE( PRBUF, '(6X,I6,9X,G13.6,4X,G13.6,2X,G13.6)' )
-     :              ITER, SIZE, CNGMAX, CNGRMS
+     :              ITER, SIZE( 1 ), CNGMAX, CNGRMS
                   CALL MSG_OUTIF( MSG__NORM, 'PROGRESS', PRBUF, STATUS )
                ELSE
                   I = 1
