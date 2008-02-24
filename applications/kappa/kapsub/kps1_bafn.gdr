@@ -321,7 +321,7 @@
 *  Process along a line along the current dimension.
                      DO PIX = FIRST, LAST, DIRN
 
-*  Form index to sum arrays that are one duimension fewer than the
+*  Form index to sum arrays that are one dimension fewer than the
 *  current dimension.
                         I = MOD( PIX - 1, STRIDE( IDIM ) ) + 1
 
@@ -492,7 +492,7 @@
 *  Process along a line along the current dimension.
                      DO PIX = FIRST, LAST, DIRN
 
-*  Form index to sum arrays that are one duimension fewer than the
+*  Form index to sum arrays that are one dimension fewer than the
 *  current dimension.
                         I = MOD( PIX - 1, STRIDE( IDIM ) ) + 1
 
