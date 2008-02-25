@@ -74,6 +74,8 @@
 *        Added argument VAR.
 *      21-FEB-2008 (DSB):
 *        The bulk of the working has been moved out to ATL_WCSPX.
+*      25-FEB-2008 (DSB):
+*        New interface for ATL_WCSPX.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -102,12 +104,19 @@
       INTEGER STATUS               ! Global status
 
 *  Local Variables:
+      CHARACTER CVAL*60      ! Character extension item value
+      CHARACTER KEY*20       ! Key for KeyMap entry
+      DOUBLE PRECISION DVAL  ! Double precision extension item value
       INTEGER DIM( 3 )       ! Dimensions of output NDF
       INTEGER INTT           ! Integration time in ms
+      INTEGER IVAL           ! Integer extension item value
       INTEGER IWCS           ! Pointer to NDF's WCS FrameSet
       INTEGER IWCS0          ! Pointer to SPECX's WCS FrameSet
       INTEGER JFINC          ! Pixel size (Hz) on spectral axis 
+      INTEGER KM1            ! KeyMap for SPECX items
+      INTEGER KM2            ! KeyMap for SPECX_MAP items
       INTEGER NDIM           ! No. of pixel axes in output NDF
+      LOGICAL THERE          ! Does SPECX_MAP extension exist?
       REAL CT                ! Product of channel spacing and integ time
       REAL TSYS              ! Tsys 
 *.
@@ -124,8 +133,82 @@
 *  Get the dimensions of the output NDF, in pixels.
       CALL NDF_DIM( INDF, 3, DIM, NDIM, STATUS )
 
+*  Extract the required items from the SPECX extension, and put them in
+*  an AST KeyMap as required by ATL_WCSPX.
+      KM1 = AST_KEYMAP( ' ', STATUS )
+
+      KEY = 'JFREST(1)'
+      CALL NDF_XGT0I( IMAP, 'SPECX', KEY, IVAL, STATUS )
+      CALL AST_MAPPUT0I( KM1, KEY, IVAL, ' ', STATUS )
+
+      KEY = 'RA_DEC(1)'
+      CALL NDF_XGT0D( IMAP, 'SPECX', KEY, DVAL, STATUS )
+      CALL AST_MAPPUT0D( KM1, KEY, DVAL, ' ', STATUS )
+
+      KEY = 'RA_DEC(2)'
+      CALL NDF_XGT0D( IMAP, 'SPECX', KEY, DVAL, STATUS )
+      CALL AST_MAPPUT0D( KM1, KEY, DVAL, ' ', STATUS )
+
+      KEY = 'DPOS(1)'
+      CALL NDF_XGT0D( IMAP, 'SPECX', KEY, DVAL, STATUS )
+      CALL AST_MAPPUT0D( KM1, KEY, DVAL, ' ', STATUS )
+
+      KEY = 'DPOS(2)'
+      CALL NDF_XGT0D( IMAP, 'SPECX', KEY, DVAL, STATUS )
+      CALL AST_MAPPUT0D( KM1, KEY, DVAL, ' ', STATUS )
+
+      KEY = 'IDATE'
+      CALL NDF_XGT0C( IMAP, 'SPECX', KEY, CVAL, STATUS )
+      CALL AST_MAPPUT0C( KM1, KEY, CVAL, ' ', STATUS )
+
+      KEY = 'ITIME'
+      CALL NDF_XGT0C( IMAP, 'SPECX', KEY, CVAL, STATUS )
+      CALL AST_MAPPUT0C( KM1, KEY, CVAL, ' ', STATUS )
+
+      KEY = 'LSRFLG'
+      CALL NDF_XGT0I( IMAP, 'SPECX', KEY, IVAL, STATUS )
+      CALL AST_MAPPUT0I( KM1, KEY, IVAL, ' ', STATUS )
+
+      KEY = 'V_SETL(4)'
+      CALL NDF_XGT0D( IMAP, 'SPECX', KEY, DVAL, STATUS )
+      CALL AST_MAPPUT0D( KM1, KEY, DVAL, ' ', STATUS )
+
+      KEY = 'JFCEN(1)'
+      CALL NDF_XGT0I( IMAP, 'SPECX', KEY, IVAL, STATUS )
+      CALL AST_MAPPUT0I( KM1, KEY, IVAL, ' ', STATUS )
+
+      KEY = 'JFINC(1)'
+      CALL NDF_XGT0I( IMAP, 'SPECX', KEY, IVAL, STATUS )
+      CALL AST_MAPPUT0I( KM1, KEY, IVAL, ' ', STATUS )
+
+      KEY = 'IFFREQ(1)'
+      CALL NDF_XGT0I( IMAP, 'SPECX', KEY, IVAL, STATUS )
+      CALL AST_MAPPUT0I( KM1, KEY, IVAL, ' ', STATUS )
+
+*  Extract the required items from the SPECX_MAP extension (if it exists), 
+*  and put them in an AST KeyMap as required by ATL_WCSPX.
+      CALL NDF_XSTAT( IMAP, 'SPECX_MAP', THERE, STATUS )
+      IF( THERE ) THEN
+         KM2 = AST_KEYMAP( ' ', STATUS )
+
+         KEY = 'CELLSIZE(1)'
+         CALL NDF_XGT0D( IMAP, 'SPECX_MAP', KEY, DVAL, STATUS )
+         CALL AST_MAPPUT0D( KM2, KEY, DVAL, ' ', STATUS )
+
+         KEY = 'CELLSIZE(2)'
+         CALL NDF_XGT0D( IMAP, 'SPECX_MAP', KEY, DVAL, STATUS )
+         CALL AST_MAPPUT0D( KM2, KEY, DVAL, ' ', STATUS )
+
+         KEY = 'POSANGLE'
+         CALL NDF_XGT0D( IMAP, 'SPECX_MAP', KEY, DVAL, STATUS )
+         CALL AST_MAPPUT0D( KM2, KEY, DVAL, ' ', STATUS )
+
+      ELSE
+         KM2 = AST__NULL
+      END IF
+
 *  Create the FrameSet describing the SPECX WCS information.
-      CALL ATL_WCSPX( IMAP, DIM, OBSLON, OBSLAT, IWCS0, STATUS )
+      CALL ATL_WCSPX( KM1, KM2, DIM, OBSLON, OBSLAT, IWCS0, STATUS )
 
 *  Get a pointer to the FrameSet which forms the default WCS component for 
 *  the output NDF. This just contains GRID, PIXEL and AXIS Frames. The 

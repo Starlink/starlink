@@ -1,4 +1,5 @@
-      SUBROUTINE ATL_WCSPX( IMAP, DIM, OBSLON, OBSLAT, IWCS, STATUS )
+      SUBROUTINE ATL_WCSPX( KM1, KM2, DIM, OBSLON, OBSLAT, IWCS, 
+     :                      STATUS )
 *+
 *  Name:
 *     ATL_WCSPX
@@ -10,19 +11,50 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ATL_WCSPX( IMAP, DIM, OBSLON, OBSLAT, IWCS, STATUS )
+*     CALL ATL_WCSPX( KM1, KM2, DIM, OBSLON, OBSLAT, IWCS, STATUS )
 
 *  Description:
-*     This returns a pointer to a FrameSet describing the WCS information
-*     in the given SPECX file. The current Frame is a 3D Frame with RA on 
-*     axis 1, DEC on axis 2, and frequency on axis 3. The base Frame is a
-*     3D GRID Frame. The parameters defining the axes are read from the 
-*     SPECX extensions in the supplied SPECX map, except for the 
-*     observatory location which is provided by the caller.
+*     This returns a pointer to a FrameSet describing the WCS
+*     information in a SPECX file. The current Frame is a 3D Frame
+*     with RA on axis 1, DEC on axis 2, and frequency on axis 3. The
+*     base Frame is a 3D GRID Frame. The parameters defining the axes
+*     are read from two supplied AST KeyMaps, which should contain
+*     values for various items read from a SPECX and SPECX_MAP
+*     extensions in a SPECX map (the observatory location are provided
+*     separately by the caller).
 
 *  Arguments:
-*     IMAP = INTEGER (Given)
-*        The NDF identifier for the SPECX map file.
+*     KM1 = INTEGER (Given)
+*        Pointer to an AST KeyMap holding items read from the SPECX
+*        extension in the required SPECX map file. The key for each entry 
+*        is identicial to the name of the item in the SPECX extension.
+*        It should contain entries with the following keys (the data type 
+*        with which each entry is accessed is also shown):
+*
+*           "JFREST(1)" - _INTEGER
+*           "RA_DEC(1)" - _DOUBLE 
+*           "RA_DEC(2)" - _DOUBLE
+*           "DPOS(1)" - _DOUBLE
+*           "DPOS(2)" - _DOUBLE
+*           "IDATE" - _CHAR
+*           "ITIME" - _CHAR
+*           "LSRFLG" - _INTEGER
+*           "V_SETL(4)" - _DOUBLE 
+*           "JFCEN(1)" - _INTEGER
+*           "JFINC(1)" - _INTEGER
+*           "IFFREQ(1)" - _DOUBLE
+*
+*     KM2 = INTEGER (Given)
+*        Pointer to an AST KeyMap holding items read from the SPECX_MAP
+*        extension in the required SPECX map file. The value AST__NULL
+*        should be provided if the SPECX file does not have a SPECX_MAP
+*        extension. If supplied, it should contain entries with the 
+*        following keys:
+*
+*           "CELLSIZE(1)" - _DOUBLE
+*           "CELLSIZE(2)"  - _DOUBLE
+*           "POSANGLE" - _DOUBLE
+*
 *     DIM( 3 ) = INTEGER (Given)
 *        The dimensions of the pixel axes of the array into which the SPECX 
 *        data is being placed.
@@ -47,6 +79,9 @@
 *  History:
 *     21-FEB-2008 (DSB):
 *        Original version, derived from CON_WCSPX in the CONVERT package.
+*     25-FEB-2008 (DSB):
+*        Obtain SPECX information from supplied KeyMaps rather than a
+*        supplied NDF.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -63,7 +98,8 @@
       INCLUDE 'AST_PAR'          ! AST constants
 
 *  Arguments Given:
-      INTEGER IMAP
+      INTEGER KM1
+      INTEGER KM2
       INTEGER DIM( 3 )
       DOUBLE PRECISION OBSLON
       DOUBLE PRECISION OBSLAT
@@ -84,10 +120,20 @@
       DOUBLE PRECISION DIAM        ! Diameter of JCMT (metres)
       PARAMETER ( DIAM = 15.0 )
 
+      CHARACTER KM1ERR*68          ! Error message for missing KM1 items
+      PARAMETER ( KM1ERR = 'ATL_WCSPX: Key ''^K'' not present '//
+     :            'in KeyMap KM1 (programming error).' )
+
+      CHARACTER KM2ERR*68          ! Error message for missing KM2 items
+      PARAMETER ( KM2ERR = 'ATL_WCSPX: Key ''^K'' not present '//
+     :            'in KeyMap KM2 (programming error).' )
+
+
 *  Local Variables:
       CHARACTER CARD*80      ! FITS header card
       CHARACTER CMONTH*3     ! Month as a three-character abbreviation
       CHARACTER EPOCH*50     ! Epoch string
+      CHARACTER KEY*20       ! KeyMap key
       CHARACTER MONTHS(12)*3 ! Months of the year.
       CHARACTER SIDEBAND*3   ! USB or LSB?
       CHARACTER SOR*10       ! Value for StdOfRest attribute
@@ -120,12 +166,12 @@
       INTEGER FS             ! Pointer to AST FrameSet
       INTEGER HOUR           ! Hour of observation
       INTEGER IAT            ! Used length of string
-      INTEGER INTT           ! Integration time in ms
       INTEGER ISOR           ! LSR identifier extracted from LSRFLG
       INTEGER ISYS           ! Spectral system identifier from LSRFLG
       INTEGER JFCEN          ! Frequency (kHz) at spectral axis centre
       INTEGER JFINC          ! Pixel size (Hz) on spectral axis 
       INTEGER JFREST         ! Rest frequency (kHz)
+      INTEGER LEN            ! Used length of string
       INTEGER LOOP           ! Loop index
       INTEGER LSRFLG         ! Value of SPECX LSRFLG header item
       INTEGER MAP            ! Pointer to AST Mapping 
@@ -140,11 +186,8 @@
       INTEGER UT1FRM         ! TimeFrame describing the UT1 timescale
       INTEGER YEAR           ! Year 
       LOGICAL ISDSB          ! Is this a double sideband observation?
-      LOGICAL THERE          ! Does object exist?
-      REAL CT                ! Product of channel spacing and integ time
       REAL DAYS              ! Time of observation as fraction of a day
       REAL SEC               ! Seconds of observation
-      REAL TSYS              ! Tsys 
 
       DATA MONTHS /'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL',
      :             'AUG', 'SEP', 'OCT', 'NOV', 'DEC'/
@@ -188,16 +231,30 @@
 *  read. [alternatively we could move those reads up]
 
 *  Rest frequency. Convert from kHz to GHz.
-      CALL NDF_XGT0I( IMAP, 'SPECX', 'JFREST(1)', JFREST, STATUS )
+      KEY = 'JFREST(1)'
+      CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
+      IF( .NOT. AST_MAPGET0I( KM1, KEY, JFREST, STATUS ) ) GO TO 999
+
       CALL AST_SETD( SPCFRM, 'RestFreq', DBLE( JFREST )*1.0D-6, STATUS )
 
 *  Source position. We create an FK4 B1950 SkyFrame which AST_SETREFPOS 
 *  will use to interpret the supplied values. 
-      CALL NDF_XGT0D( IMAP, 'SPECX', 'RA_DEC(1)', RA, STATUS )
-      CALL NDF_XGT0D( IMAP, 'SPECX', 'RA_DEC(2)', DEC, STATUS )
+      KEY = 'RA_DEC(1)'
+      CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
+      IF( .NOT. AST_MAPGET0D( KM1, KEY, RA, STATUS ) ) GO TO 999
 
-      CALL NDF_XGT0D( IMAP, 'SPECX', 'DPOS(1)', DRA, STATUS )
-      CALL NDF_XGT0D( IMAP, 'SPECX', 'DPOS(2)', DDEC, STATUS )
+      KEY = 'RA_DEC(2)'
+      CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
+      IF( .NOT. AST_MAPGET0D( KM1, KEY, DEC, STATUS ) ) GO TO 999
+
+      KEY = 'DPOS(1)'
+      CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
+      IF( .NOT. AST_MAPGET0D( KM1, KEY, DRA, STATUS ) ) GO TO 999
+
+      KEY = 'DPOS(2)'
+      CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
+      IF( .NOT. AST_MAPGET0D( KM1, KEY, DDEC, STATUS ) ) GO TO 999
+
       DEC = DEC + DDEC/3600.0
       RA = RA + DRA/( 3600.0*COS( DEC*D2R ) )
 
@@ -208,7 +265,10 @@
 *  UTC from the IDATE item in the SPECX extension, and convert them to 
 *  integers.  Then attempt to calculate the MJD. Report an error if it
 *  fails.
-      CALL NDF_XGT0C( IMAP, 'SPECX', 'IDATE', UTDATE, STATUS )
+      KEY = 'IDATE'
+      CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
+      IF( .NOT. AST_MAPGET0C( KM1, KEY, UTDATE, LEN, 
+     :                        STATUS ) ) GO TO 999
 
       CALL CHR_CTOI( UTDATE( 1:2 ), DAY, STATUS )
       CALL CHR_CTOI( UTDATE( 8: ), YEAR, STATUS )
@@ -235,7 +295,10 @@
 
 *  Now extract the hours mins and seconds fields from the ITIME header
 *  item and convert to a fraction of a day.
-      CALL NDF_XGT0C( IMAP, 'SPECX', 'ITIME', UTIME, STATUS )
+      KEY = 'ITIME'
+      CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
+      IF( .NOT. AST_MAPGET0C( KM1, KEY, UTIME, LEN, STATUS ) ) GO TO 999
+
 
       CALL CHR_CTOI( UTIME( 1:2 ), HOUR, STATUS )
       CALL CHR_CTOI( UTIME( 4:5 ), MIN, STATUS )
@@ -291,7 +354,10 @@
 *  the rest frame given by the bottom 4 bits of the LSRFLG extension item 
 *  (0=Topocentric (called "Telluric" within SPECX), 1=kinematic LSR 
 *  2=Heliocentric, 3 = geocentric). Set the source velocity rest frame.
-      CALL NDF_XGT0I( IMAP, 'SPECX', 'LSRFLG', LSRFLG, STATUS)
+      KEY = 'LSRFLG'
+      CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
+      IF( .NOT. AST_MAPGET0I( KM1, KEY, LSRFLG, STATUS ) ) GO TO 999
+
       ISOR = MOD( LSRFLG, 16 )
 
       IF( ISOR .EQ. 0 ) THEN
@@ -346,7 +412,9 @@
 
 *  Get the assumed velocity of the source in the rest frame and spectral
 *  system obtained from LSRFLG.
-      CALL NDF_XGT0D( IMAP, 'SPECX', 'V_SETL(4)', SRCVEL, STATUS )
+      KEY = 'V_SETL(4)'
+      CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
+      IF( .NOT. AST_MAPGET0D( KM1, KEY, SRCVEL, STATUS ) ) GO TO 999
 
 *  If the source velocity is not zero, assign it to the SourceVel
 *  attribute. It will be interpreted as a velocity within the rest frame
@@ -372,12 +440,17 @@
       CRPIX3 = 0.5*( DIM( 3 ) + 1 )
          
 *  Get the central frequency, in kHz. Convert to GHz.
-      CALL NDF_XGT0I( IMAP, 'SPECX', 'JFCEN(1)', JFCEN, STATUS )
+      KEY = 'JFCEN(1)'
+      CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
+      IF( .NOT. AST_MAPGET0I( KM1, KEY, JFCEN, STATUS ) ) GO TO 999
+
       CRVAL3 = DBLE( JFCEN )*1.0E-6
 
 *  Get the frequency increment per pixel, in Hz. Convert to GHz.
-      JFINC = 0
-      CALL NDF_XGT0I( IMAP, 'SPECX', 'JFINC(1)', JFINC, STATUS)
+      KEY = 'JFINC(1)'
+      CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
+      IF( .NOT. AST_MAPGET0I( KM1, KEY, JFINC, STATUS ) ) GO TO 999
+
       CD3 = DBLE( JFINC )*1.0E-9
 
 *  The specx user manual implies that, whilst the JFCEN value is in the
@@ -404,7 +477,9 @@
 *  For dual sideband instruments we need to get the IF frequency
 *  This is always in GHz in specx. It must be -ve if the observed
 *  sideband is upper, positive if we are in LSB
-         CALL NDF_XGT0D( IMAP, 'SPECX', 'IFFREQ(1)', IFFREQ, STATUS )
+         KEY = 'IFFREQ(1)'
+         CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
+         IF( .NOT. AST_MAPGET0D( KM1, KEY, IFFREQ, STATUS ) ) GO TO 999
 
 *  Calculate observed sidband. SPECX uses a positive IF if we are USB,
 *  negative IF if we are LSB.
@@ -434,20 +509,26 @@
       CRPIX2 = 0.5*( DIM( 2 ) + 1 )
 
 *  Does the input NDF have a SPECX_MAP extension?
-      CALL NDF_XSTAT( IMAP, 'SPECX_MAP', THERE, STATUS ) 
+      IF( KM2 .NE. AST__NULL ) THEN
 
 *  If so, get the RA and Dec pixel sizes from the SPECX map. Convert from 
 *  arc-seconds to degrees.
-      IF( THERE ) THEN 
+         KEY = 'CELLSIZE(1)'
+         CALL ATL_KYCHK( KM2, KEY, KM2ERR, STATUS )
+         IF( .NOT. AST_MAPGET0D( KM2, KEY, CD1, STATUS ) ) GO TO 999
 
-         CALL NDF_XGT0D( IMAP, 'SPECX_MAP', 'CELLSIZE(1)', CD1, STATUS )
          CD1 = CD1/3600.0
 
-         CALL NDF_XGT0D( IMAP, 'SPECX_MAP', 'CELLSIZE(2)', CD2, STATUS )
+         KEY = 'CELLSIZE(2)'
+         CALL ATL_KYCHK( KM2, KEY, KM2ERR, STATUS )
+         IF( .NOT. AST_MAPGET0D( KM2, KEY, CD2, STATUS ) ) GO TO 999
+
          CD2 = CD2/3600.0
 
 *  Get the position angle of the Y axis (assumed to be in degrees).
-         CALL NDF_XGT0D( IMAP, 'SPECX_MAP', 'POSANGLE', POSANG, STATUS )
+         KEY = 'POSANGLE'
+         CALL ATL_KYCHK( KM2, KEY, KM2ERR, STATUS )
+         IF( .NOT. AST_MAPGET0D( KM2, KEY, POSANG, STATUS ) ) GO TO 999
 
 *  If no SPECX_MAP extension, use default values. The pixel size is
 *  assumed to be equal to half the resolution of the telescope (assumed 
@@ -480,7 +561,7 @@
 
       CALL AST_PUTFITS( FC, 'NAXIS3  = 1', .FALSE., STATUS ) 
 
-      CALL AST_PUTFITS( FC, 'CTYPE1  =  ''RA---SIN''', .FALSE., STATUS ) 
+      CALL AST_PUTFITS( FC, 'CTYPE1  =  ''RA---SIN''', .FALSE., STATUS )
 
       CARD = 'CRPIX1  = '
       IAT = 10
@@ -497,7 +578,7 @@
       CALL CHR_PUTD( -CD1, CARD, IAT )
       CALL AST_PUTFITS( FC, CARD, .FALSE., STATUS ) 
 
-      CALL AST_PUTFITS( FC, 'CTYPE2  =  ''DEC--SIN''', .FALSE., STATUS ) 
+      CALL AST_PUTFITS( FC, 'CTYPE2  =  ''DEC--SIN''', .FALSE., STATUS )
 
       CARD = 'CRPIX2  = '
       IAT = 10
@@ -522,7 +603,7 @@
       CALL AST_PUTFITS( FC, 'EQUINOX = 1950.0', .FALSE., STATUS ) 
       CALL AST_PUTFITS( FC, 'RADESYS = ''FK4''', .FALSE., STATUS ) 
 
-      CALL AST_PUTFITS( FC, 'CTYPE3  =  ''FREQ    ''', .FALSE., STATUS ) 
+      CALL AST_PUTFITS( FC, 'CTYPE3  =  ''FREQ    ''', .FALSE., STATUS )
 
       CARD = 'CRPIX3  = '
       IAT = 10
@@ -591,3 +672,6 @@
       CALL AST_END( STATUS )
 
       END
+
+
+

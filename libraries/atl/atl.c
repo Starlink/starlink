@@ -408,6 +408,92 @@ void atlTolut( AstMapping *inmap, double xlo, double xhi, double dx,
    return;
 }
 
+F77_SUBROUTINE(atl_wcspx)( INTEGER(KM1), 
+                           INTEGER(KM2), 
+                           INTEGER_ARRAY(DIM),
+                           DOUBLE(OBSLON),
+                           DOUBLE(OBSLAT),
+                           INTEGER(IWCS),
+                           INTEGER(STATUS) );
+
+void atlWcspx( AstKeyMap *km1, AstKeyMap *km2, int dim[3], double obslon,
+               double obslat, AstFrameSet **iwcs, int *status ){
+
+   DECLARE_INTEGER(KM1);
+   DECLARE_INTEGER(KM2);
+   DECLARE_INTEGER_ARRAY(DIM,3);
+   DECLARE_DOUBLE(OBSLON);
+   DECLARE_DOUBLE(OBSLAT);
+   DECLARE_INTEGER(IWCS);
+   DECLARE_INTEGER(STATUS);
+   int iiwcs, i;
+
+   if( !astOK ) return;
+
+   F77_EXPORT_INTEGER( astP2I( km1 ), KM1 );
+   F77_EXPORT_INTEGER( astP2I( km2 ), KM2 );
+
+   for( i = 0; i < 3; i++ ) DIM[ i ] = (F77_INTEGER_TYPE) dim[ i ];
+
+   F77_EXPORT_DOUBLE( obslon, OBSLON );
+   F77_EXPORT_DOUBLE( obslat, OBSLAT );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(atl_wcspx)( INTEGER_ARG(&KM1),
+                        INTEGER_ARG(&KM2),
+                        INTEGER_ARRAY_ARG(DIM),
+                        DOUBLE_ARG(&OBSLON),
+                        DOUBLE_ARG(&OBSLAT),
+                        INTEGER_ARG(&IWCS),
+                        INTEGER_ARG(&STATUS) );
+
+   if( astOK ) {
+      F77_IMPORT_INTEGER( IWCS, iiwcs );
+      *iwcs = astI2P( iiwcs );
+   } else {
+      *iwcs = AST__NULL;
+   }      
+
+   return;
+}
+
+F77_SUBROUTINE(atl_kychk)( INTEGER(KEYMAP), 
+                           CHARACTER(KEY), 
+                           CHARACTER(ERRMSG), 
+                           INTEGER(STATUS)
+                           TRAIL(KEY)
+                           TRAIL(ERRMSG) );
+
+void atlKychk( AstKeyMap *keymap, const char *key, const char *errmsg,
+               int *status ){
+   DECLARE_INTEGER(KEYMAP);
+   DECLARE_CHARACTER_DYN(KEY);  
+   DECLARE_CHARACTER_DYN(ERRMSG);  
+   DECLARE_INTEGER(STATUS);
+
+   if( !astOK ) return;
+
+   F77_EXPORT_INTEGER( astP2I( keymap ), KEYMAP );
+
+   F77_CREATE_CHARACTER( KEY, strlen( key ) );
+   F77_EXPORT_CHARACTER( key, KEY, KEY_length );
+
+   F77_CREATE_CHARACTER( ERRMSG, strlen( errmsg ) );
+   F77_EXPORT_CHARACTER( errmsg, ERRMSG, ERRMSG_length );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(atl_kychk)( INTEGER_ARG(&KEYMAP),
+                        CHARACTER_ARG(KEY),
+                        CHARACTER_ARG(ERRMSG),
+                        INTEGER_ARG(&STATUS)
+                        TRAIL_ARG(KEY)
+                        TRAIL_ARG(ERRMSG) );
+
+   F77_FREE_CHARACTER( KEY );
+   F77_FREE_CHARACTER( ERRMSG );
+   F77_IMPORT_INTEGER( STATUS, *status );
+}
+
 
 
 
