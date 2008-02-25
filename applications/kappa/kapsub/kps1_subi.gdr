@@ -4,22 +4,22 @@
  
 *+
 *  Name:
-*     KPS1_SUBI<T>
+*     KPS1_SUBIx
 
 *  Purpose:
-*     Bins a 2-d array into rectangular bins via a variety of estimators
-*     and thresholding.
+*     Bins a two-dimensional array into rectangular bins via a variety 
+*     of estimators and thresholding.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_SUBI<T>( DIM1, DIM2, ARRAY, BINX, BINY, ESTIMA, NCLIP,
+*     CALL KPS1_SUBIx( DIM1, DIM2, ARRAY, BINX, BINY, ESTIMA, NCLIP,
 *                      CLIP, THRLO, THRHI, FRAC, MAXBIN, BIN, TBIN, X,
 *                      Y, Z, W, NBIN, STATUS )
 
 *  Description:
-*     This routine bins a 2-dimensional array into a grid rectangular
+*     This routine bins a two-dimensional array into a grid rectangular
 *     sections spanning the whole array.  For each bin an estimator is
 *     calculated from the non-bad array pixels to represent a global
 *     value for the bin.  The estimators are the mean, mean after
@@ -37,9 +37,9 @@
 
 *  Arguments:
 *     DIM1 = INTEGER (Given)
-*        The first dimension of the 2-d array.
+*        The first dimension of the two-dimensional array.
 *     DIM2 = INTEGER (Given)
-*        The second dimension of the 2-d array.
+*        The second dimension of the two-dimensional array.
 *     ARRAY( DIM1, DIM2 ) = REAL (Given)
 *        The input data array which is to be binned.
 *     BINX = INTEGER (Given)
@@ -48,9 +48,9 @@
 *        The number of pixels in a bin in the y direction
 *     ESTIMA = CHARACTER (Given)
 *        The estimator for the bin.  It must one of the following
-*        values:- 'MEAN' for the mean value, 'KSIG' for the mean
-*        with kappa-sigma clipping; 'MODE' for the mode, and 'MEDI'
-*        for the median. If it is none of these, the mode is used.
+*        values: 'MEAN' for the mean value, 'KSIG' for the mean with
+*        kappa-sigma clipping; 'MODE' for the mode, and 'MEDI' for the
+*        median.  If it is none of these, the mode is used.
 *     NCLIP = INTEGER (Given)
 *        The number of clipping cycles. This is only needed if %ESTIMA
 *        is 'KSIG'.
@@ -69,7 +69,7 @@
 *        analysis to derive representative values for the bins.  If
 *        it equals the undefined (bad) value, there will be no upper
 *        threshold.
-*     FRAC = REAL  (Given)
+*     FRAC = REAL (Given)
 *        The minimum fraction of good pixels in a bin that permits
 *        the bin to be included in the fit.  Here good pixels are
 *        ones that participated in the calculation of the bin's
@@ -86,18 +86,18 @@
 *        there is no thresholding to be done, this can be a
 *        single-element array, otherwise it should have %BINX * %BINY
 *        elements.
-*     X( MAXBIN ) = <COMM> (Returned)
+*     X( MAXBIN ) = ? (Returned)
 *        The mean x positions for each bin.
-*     Y( MAXBIN ) = <COMM> (Returned)
+*     Y( MAXBIN ) = ? (Returned)
 *        The mean y positions for each bin.
-*     Z( MAXBIN ) = <COMM> (Returned)
+*     Z( MAXBIN ) = ? (Returned)
 *        The global value as measured by the requested estimator for
 *        each bin.
-*     W( MAXBIN ) = <COMM> (Returned)
+*     W( MAXBIN ) = ? (Returned)
 *        The weight for each bin.
 *     NBIN = INTEGER (Returned)
 *        Number of bins with defined statistics.
-*     STATUS  =  INTEGER (Given and Returned)
+*     STATUS = INTEGER (Given and Returned)
 *        Global status value.
 
 *  Notes:
@@ -128,7 +128,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -138,8 +138,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -335,7 +335,7 @@
 *  Put the result of the thresholding back into the original bin array,
 *  for later processing.
                CALL VEC_RTOR( .FALSE., BINTOT, TBIN, BIN, IERR, NERR,
-     :              STATUS )
+     :                        STATUS )
             END IF
  
 *  There is a choice of estimators for the value of the bin.  These
