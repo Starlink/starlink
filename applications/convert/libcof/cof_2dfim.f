@@ -223,12 +223,12 @@
       CHARACTER * ( DAT__SZLOC ) OLOC ! Locator to OBJECT structure
       INTEGER PCOUNT             ! Value of FITS PCOUNT keyword
       INTEGER PLACE              ! NDF placeholder for <NDF> extension
-      LOGICAL WRTEXT             ! Write NDF FITS extension?
       INTEGER PNTR( 1 )          ! Pointer to NDF array
       INTEGER REPNTR             ! Pointer to header-propagation flags
       LOGICAL SIMPLE             ! FITS file is simple?
       LOGICAL THERE              ! Keyword is present?
       CHARACTER * ( DAT__SZNAM ) TYPE ! Data type
+      LOGICAL WRTEXT             ! Write NDF FITS extension?
       CHARACTER * ( DAT__SZLOC ) XLOC ! Locator to an NDF extension
       CHARACTER * ( 20 ) XTENS   ! Name of FITS extension
 
