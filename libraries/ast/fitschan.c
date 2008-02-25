@@ -801,6 +801,9 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        than the source rest frame.
 *     31-JAN-2008 (DSB):
 *        Correct calculation of redshift from radio velocity in ClassTrans.
+*     25-FEB-2008 (DSB):
+*        Ensure a SkyFrame represents absolute (rather than offset)
+*        coords before writing it out in any non-native encoding.
 *class--
 */
 
@@ -1731,6 +1734,7 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
    AstMapping *mapping;     /* Mapping from pixel to WCS Frame */
    AstMapping *tmap2;       /* Temporary Mapping */
    AstMapping *tmap;        /* Temporary Mapping */
+   const char *old_skyrefis;/* Old value of SkyRefIs attribute */
    double *crvals;          /* Pointer to array holding default CRVAL values */
    double cdelt2;           /* Sum of squared PC values */
    double cdelt;            /* CDELT value for axis */
@@ -1743,6 +1747,7 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
    int fits_j;              /* FITS pixel axis index */
    int iax;                 /* Frame axis index */
    int nwcs;                /* No. of axes in WCS frame */
+   int oldrep;              /* Old error reporting flag */
    int ret;                 /* Returned value */
 
 /* Initialise */
@@ -1750,6 +1755,36 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
 
 /* Check the inherited status. */
    if( !astOK ) return ret;
+
+/* We need to ensure that any SkyFrame represents absolute coords rather 
+   than offset coords. Since the current Frame may not contain a
+   SkyFrame, we temporarily switch off error reporting. */
+   oldrep = astReporting( 0 );
+
+/* If the SkyRefIs attribute is set, remember the original value so that 
+   it can be re-instated later. */
+   if( astTest( fs, "SkyRefIs" ) ) {
+      old_skyrefis = astGetC( fs, "SkyRefIs" );
+
+/* Take a copy of the string value because the pointer returned by
+   astGetC points to static memory and may be changed by future calls 
+   to astGetC. */
+      if( old_skyrefis ) {
+         old_skyrefis = astStore( NULL, old_skyrefis, 
+                                  strlen( old_skyrefis ) + 1 );
+
+/* Set the new value. The Mapping inside the FrameSet is adjusted to take 
+   account of the changed Frame properties. */
+         astSet( fs, "SkyRefIs=Ignored" ); 
+      }
+
+   } else {
+      old_skyrefis = NULL;
+   }
+
+/* Cancel any error and switch error reporting back on again. */
+   astClearStatus;
+   astReporting( oldrep );
 
 /* Construct a new FrameSet holding the pixel and WCS Frames from the 
    supplied FrameSet, but in which the current Frame is a copy of the 
@@ -1881,6 +1916,14 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
                      floor( crpix*1.0E6 + 0.5 )*1.0E-6);
          }
       }
+   }
+
+/* If required, re-instate the original value of the SkyRefIs attribute. */
+   if( old_skyrefis ) {
+      astSetC( fs, "SkyRefIs", old_skyrefis ); 
+      old_skyrefis = astFree( (void *) old_skyrefis );
+   } else {
+      astClear( fs, "SkyRefIs" ); 
    }
 
 /* Free remaining resources. */
