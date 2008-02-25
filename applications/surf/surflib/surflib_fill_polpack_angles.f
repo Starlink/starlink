@@ -66,6 +66,7 @@
 
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
@@ -103,7 +104,7 @@
 
 *  Arguments Returned:
       REAL    ANG_INT(MAX_FILE, MAX_INT, 2)
-      REAL    ANG_MEAS(MAX_FILE, MAX_INT, 2)
+      REAL    ANG_MEAS(MAX_FILE, MAX_MEAS, 2)
 
 *  Global Status:
       INTEGER STATUS
