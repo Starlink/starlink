@@ -23,10 +23,10 @@
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2007 October 26}
+\newcommand{\stardocdate}      {2008 February 12}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
-\newcommand{\stardocversion}   {Version 1.5-12}
+\newcommand{\stardocversion}   {Version 1.5-13}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {
 The \CONVERT\ package contains utilities for converting data files
@@ -2705,6 +2705,11 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             provided the HISTORY headers have not been tampered.  Such
             headers are not transferred to the FITS airlock, when
             PROFITS=\texttt{TRUE}.
+            \sstitem
+            Any SMURF package's ancillary IMAGE sub-files are restored
+            to a SMURF extension, with the original names and structure
+            contents.  Thus the global HISTORY present in each sub-file
+            is not duplicated in each SMURF-extension NDF.
          }
 
          \bigskip
@@ -4422,7 +4427,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 	    \htmlref{\texttt{"}Provenance\texttt{"}}{ndf2fits_provenance}
 	    for more details.
          }
-         {\texttt ["None"]}
+         \texttt{["None"]}
       }
    }
    \sstexamples{
@@ -7305,5 +7310,13 @@ information to FITS headers.  There is a choice of generic propagation
 that attempts to propagate all the information, or to write
 CADC-specific headers, or to exclude provenance (the default),
 governed by the new PROVENANCE parameter.
+
+NDF2FITS now handles extensions containing only NDFs by adding a dummy
+FITS sub-file that retains the name and type of the wrapper
+structure.
+ 
+\htmlref{FITS2NDF}{FITS2NDF} processes SMURF-package data
+better, permitting a roundtrip via FITS, perserving the original
+data structures, save for some additional FITS headers.
 
 \end{document}

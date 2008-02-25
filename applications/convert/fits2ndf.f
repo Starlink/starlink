@@ -614,6 +614,11 @@
 *     headers are not transferred to the FITS airlock, when
 *     PROFITS=TRUE.
 *
+*     -  Any SMURF package's ancillary IMAGE sub-files are restored
+*     to a SMURF extension, with the original names and structure
+*     contents.  Thus the global HISTORY present in each sub-file is 
+*     not duplicated in each SMURF-extension NDF.
+*
 *     o  IUE Final Archive LILO, LIHI, SILO, SIHI
 *
 *     -  This converts an IUE LI or SI product stored as a FITS primary

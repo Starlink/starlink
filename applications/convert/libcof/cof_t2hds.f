@@ -29,12 +29,11 @@
 *  Prior Requirements:
 *     -  The FITS file should already have been opened by FITSIO, and
 *     the current HDU is a BINTABLE or TABLE extension.
-*     [routine_prior_requirements]...
 
 *  Notes:
 *     -  The conversion from table columns to NDF objects is as
 *     follows:
-*
+*     - Ignores the special DUMMY_FOR_STRUC column created by COF_WSTR.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -48,8 +47,11 @@
 *     2002 March 13 (AJC):
 *        Adjust dimensions for multi-dimensional CHARACTER arrays
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
-*     {enter_changes_here}
+*        Use CNF_PVAL.
+*     2008 February 12 (MJC):
+*        Ignore the special DUMMY_FOR_STRUC column used to preserve
+*        extension structures containing only NDFs.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -138,7 +140,7 @@
          CALL FTKEYN( 'TTYPE', COLNUM, KEYWRD, FSTAT )
          CALL COF_GKEYC( FUNIT, KEYWRD, THERE, COLNAM, COMENT, STATUS )
 
-         IF ( THERE ) THEN
+         IF ( THERE .AND. COLNAM .NE. 'DUMMY_FOR_STRUC' ) THEN
 
 *  Find the data type of the output data column.
 *  =============================================
@@ -171,7 +173,7 @@
                END IF
             END IF
 
-*  Obtain the  count and width if it's a string.
+*  Obtain the count and width if it's a string.
             CALL FTGTCL( FUNIT, COLNUM, DATCOD, REPEAT, WIDTH, FSTAT )
 
 *  Check for an error.  Flush the error stack.
@@ -202,6 +204,7 @@
      :                      FSTAT )
                IF ( ( NDIM .GT. 2 ) .AND.
      :              ( CTYPE(1:5) .EQ. '_CHAR' ) ) THEN
+
 *  The first dimension is the CHARACTER width - remove it
                   DO I = 2, NDIM
                      DIMS(I - 1) = DIMS(I)

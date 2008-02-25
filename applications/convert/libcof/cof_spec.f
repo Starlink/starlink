@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_SPEC( FUNIT, NDF, STATUS )
+*     CALL COF_SPEC( FUNIT, NAME, STATUS )
 
 *  Description:
 *     This routine determines if a FITS file belongs to a special set,
@@ -38,6 +38,7 @@
 
 *  Notes:
 *     The supported values of NAME are as follows.
+*     -  'AAO2DF'   AAO, 2df and 6dF fibre spectroscopy
 *     -  'SWSAA'    ISO, SWS instrument, auto-analysis product (SWAA)
 *     -  'LWSAA'    ISO, LWS instrument, auto-analysis product (LSAN)
 *     -  'CAMAA'    ISO, CAM instrument, auto-analysis products (CMxx)
@@ -48,8 +49,8 @@
 *     -  'IUERI'    IUE, RILO or RIHI raw-image products 
 *     -  'IUESI'    IUE, SILO or SIHI resampled-image products
 *     -  'IUEVD'    IUE, VDLO or VDHI vector-displacement products
+*     -  'SMURF'    JCMT time-series processed by the SMURF package
 
-*  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     AJC: Alan J. Chipperfield (STARLINK)
@@ -81,6 +82,8 @@
 *        Added header check for AAOMOSFT=T to assert that this is AAO
 *        data format.  This is a fail safe to make the conversion work
 *        for data produced by new instruments on non AAO telescopes.
+*     2008 February 12 (MJC):
+*        Added support for SMURF.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -282,6 +285,15 @@
      :          AAOFTV( 1:1 ) .NE. 'F' .AND. 
      :          AAOFTV( 1:1 ) .NE. 'f' ) THEN
           NAME = 'AAO2DF'
+
+*  Test for SMURF data.
+*  ====================
+
+*  Preliminary test.  May need to search through the extensions
+*  looking for an EXTNAME containing 'MORE.SMURF'.
+      ELSE IF ( TELPRE .AND. TELESC .EQ. 'JCMT' .AND. 
+     :          INSPRE .AND. INSTRU .EQ. 'HARP'  ) THEN
+         NAME = 'SMURF'
       END IF
 
   999 CONTINUE

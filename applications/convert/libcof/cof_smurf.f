@@ -33,7 +33,7 @@
 *        The name of structure.  It is used to form the EXTNAME
 *        keyword.
 *     LOC = CHARACTER * ( DAT__SZLOC ) (Given)
-*        Locator to the 2dF extension structure whose contents are to
+*        Locator to the SMURF extension structure whose contents are to
 *        be converted to binary tables.
 *     FUNIT = INTEGER (Given)
 *        The logical unit number of the output FITS file.
@@ -156,8 +156,10 @@
       INTEGER NDFE               ! Extension NDF identifier
       CHARACTER*68 NAME          ! Name of HDS path
       INTEGER NLEV               ! Number of hierarchical levels
+      INTEGER NONNDF             ! Number of non-NDF SMURF components
       CHARACTER*( DAT__SZTYP ) TYPE ! Type of the NDF component
       LOGICAL VALID              ! The NDF identifier is valid?
+      LOGICAL WRITTN             ! Dummy structure is written?
       
 *.
 
@@ -190,6 +192,40 @@
 *  Find the number of components within the extension.
       CALL DAT_NCOMP( LOC, NCOMP, STATUS )
 
+*  Look for any non-NDF components.
+*  ================================
+
+*  The SMURF type should define the contents, but it is not clear how 
+*  rigid or final this structure is.  Since we need FITS2NDF to be
+*  able to recreate the original NDF structure, yet use generic code,
+*  the SMURF structure must be first recreated to hold its named
+*  NDFs.
+
+*  Enumerate the SMURF extension components.
+      NONNDF = 0
+      DO I = 1, NCOMP
+         CALL DAT_INDEX( LOC, I, CLOC, STATUS )
+
+*  Get the object's path name and assign it to the extension name.
+         CALL HDS_TRACE( CLOC, NLEV, NAME, FILE, STATUS )
+
+*  Check if the component is an NDF.
+         CALL DAT_TYPE( CLOC, TYPE, STATUS )
+         IF ( TYPE .NE. 'NDF' ) NONNDF = NONNDF + 1
+
+         CALL DAT_ANNUL( CLOC, STATUS )
+      END DO
+
+*  There are no non-NDF objects that would propagate the SMURF structure
+*  in a BINTABLE.  So created a small table with one dummy value.
+*  FITS2NDF will recognise this as be a dummy component and wil not
+*  create an NDF extension component for it.
+      IF ( NONNDF .EQ. 0 ) THEN
+         CALL HDS_TRACE( LOC, NLEV, NAME, FILE, STATUS )
+
+         CALL COF_WSTR( FUNIT, NAME, 'SMURF', NLEV, WRITTN, STATUS )
+      END IF
+
 *  Enumerate the SMURF extension components.
       DO I = 1, NCOMP
          CALL DAT_INDEX( LOC, I, CLOC, STATUS )
@@ -216,6 +252,7 @@
 
 *  Process the component into a hierarchy if its a structure.
             CALL COF_THIER( NAME, CLOC, FUNIT, STATUS )
+            NONNDF = NONNDF + 1
          END IF
 
          CALL DAT_ANNUL( CLOC, STATUS )

@@ -1,39 +1,48 @@
 1 CONVERT_Version_1.5-13
 
-NDF2FITS supports the propagation of provenance information to FITS
-headers.  There is a choice of generic propagation that attempts to
-propagate all the information, or to write CADC-specific headers, or
-to exclude provenance (the default), governed by the new PROVENANCE
-parameter.
+ NDF2FITS supports the propagation of provenance information to FITS
+ headers.  There is a choice of generic propagation that attempts to
+ propagate all the information, or to write CADC-specific headers,
+ or to exclude provenance (the default), governed by the new
+ PROVENANCE parameter.
+
+ NDF2FITS now handles extensions containing only NDFs by adding a
+ dummy FITS sub-file that retains the name and type of the wrapper
+ structure.
+ 
+ FITS2NDF processes SMURF-package data better, permitting a
+ roundtrip via FITS, perserving the original data structures, save
+ for some additional FITS headers.
 
 1 CONVERT_Version_1.5-12
 
-NDF2FITS now makes special provision for the JCMT SMURF-package
-extension.  It treats the extension contents as NDFs rather than
-arbitrary HDS structures.
+ NDF2FITS now makes special provision for the JCMT SMURF-package
+ extension.  It treats the extension contents as NDFs rather than
+ arbitrary HDS structures.
 
 1 CONVERT_Version_1.5-11
 
-NDF2FITS writes the correct BUNIT keyword value in the IMAGE
-extension storing the VARIANCE component.  The BUNIT keyword is
-absent for a QUALITY array.
+ NDF2FITS writes the correct BUNIT keyword value in the IMAGE
+ extension storing the VARIANCE component.  The BUNIT keyword is
+ absent for a QUALITY array.
 
-There is a new DUPLEX parameter.  When set TRUE (and PROFITS is also
-TRUE), it permits the FITS airlock headers to appear also in the
-IMAGE extensions for the VARIANCE and QUALITY arrays.
+ There is a new DUPLEX parameter.  When set TRUE (and PROFITS is
+ also TRUE), it permits the FITS airlock headers to appear also in
+ the IMAGE extensions for the VARIANCE and QUALITY arrays.
 
 1 CONVERT_Version_1.5-10
 
 FITS2NDF supports externally and internally compressed FITS files.
 
-NDF2FITS writes integrity check keywords CHECKSUM and DATASUM at the
-end of each header if new parameter CHECKSUMS is TRUE.
+ NDF2FITS writes integrity check keywords CHECKSUM and DATASUM at
+ the end of each header if new parameter CHECKSUMS is TRUE.
 
 1 CONVERT_Version_1.5-9
 
-NDF2FITS parameter ENCODING has a new allowed value of "FITS-WCS(CD)".
-This is the same as "FITS-WCS" except that it uses the old CD matrix
-formalism to describe the data array's rotation and scaling.
+ NDF2FITS parameter ENCODING has a new allowed value of 
+ "FITS-WCS(CD)". This is the same as "FITS-WCS" except that it uses
+ the old CD matrix formalism to describe the data array's rotation
+ and scaling.
 
 1 CONVERT_Version_1.5-8
 

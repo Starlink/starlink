@@ -47,7 +47,7 @@
 *        LOGHDR is .FALSE..  The file should be formatted and have
 *        a record length of at least 80 characters.  There is no
 *        validation because the record length is machine dependent.
-*     FMTCNV = CHARACTER * ( * )(Given)
+*     FMTCNV = CHARACTER * ( * ) (Given)
 *        This specifies whether or not format conversion will occur.
 *        The conversion applies the values of the FITS keywords BSCALE
 *        and BZERO to the FITS data to generate the "true" data values.
@@ -120,7 +120,7 @@
 *        The preferred AST encodings to use when creating the NDF WCS
 *        component, in order of preference (most preferable first). 
 *        It is ignored if NENCOD is zero.
-*     WCSATT = CARACTER * ( * ) (Given)
+*     WCSATT = CHARACTER * ( * ) (Given)
 *        Attribute settings for the WCS FitsChan.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
@@ -189,8 +189,9 @@
 *     from the values of PTYPEm in the main header, where m is the
 *     number of the group parameter.
 *     -  If FILNAM specifies a particular FITS sub-file, that sub-file
-*     will be treated as if it  were the primary HDU.  No other sub-
+*     will be treated as if it were the primary HDU.  No other sub-
 *     files will be propagated, regardless of the value of PROEXTS.
+*     -  Compressed FITS may be supplied.
 
 *  Special Formats:
 *     o  Compressed
@@ -231,6 +232,11 @@
 *        headers are not transferred to the FITS airlock, when
 *        PROFIT = .TRUE..
 *
+*        -  Any SMURF package's ancillary IMAGE sub-files are restored
+*        to a SMURF extension, with the original names and structure
+*        contents.  Thus the global HISTORY present in each sub-file is 
+*        not duplicated in each SMURF-extension NDF.
+
 *     o  IUE Final Archive LILO, LIHI, SILO, SIHI
 *
 *        See routine COF_IUESI for details.
@@ -362,6 +368,9 @@
 *        create a scaled NDF array for that case.
 *     2007 July 9 (PWD):
 *        Added support for compressed images.
+*     2008 February 12 (MJC):
+*        Added support for reading SMURF MEF files, ignoring duplicated
+*        HISTORY and AXIS information.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -638,9 +647,13 @@
          CALL COF_LWSAN( FUNITH, FILNAM, NDF, PROFIT, LOGHDR, FDL,
      :                   ' ', STATUS )
 
-      ELSE IF ( SPENAM .EQ. 'AAO2DF') THEN
+      ELSE IF ( SPENAM .EQ. 'AAO2DF' ) THEN
          CALL COF_2DFIM( FUNITH, FILNAM, NDF, PROFIT, LOGHDR, FDL,
      :                   FMTCVT, STATUS )
+
+      ELSE IF ( SPENAM .EQ. 'SMURF' ) THEN
+         CALL COF_SMFIM( FUNITH, FILNAM, NDF, PROFIT, LOGHDR, FDL,
+     :                   FMTCVT, NENCOD, ENCODS, WCSATT, STATUS )
 
       ELSE IF ( SPENAM .EQ. 'CAMAA' ) THEN
          CALL COF_CAMAA( FUNITH, FILNAM, NDF, PROFIT, LOGHDR, FDL,
@@ -926,7 +939,7 @@
                         COMP ='DATA'
                      END IF
 
-                     IF ( COMP .EQ. 'DATA' ) THEN
+                     IF ( COMP .EQ. 'DATA' .AND. .NOT. EXNDF ) THEN
 
 *  Generate the name of the extension.  NPOS is updated so cannot be
 *  defined outside the FITS_extension loop.
@@ -946,7 +959,12 @@
                         CALL NDF_PLACE( ELOC, EXTNAM, PLACE, STATUS )
                         CALL NDF_NEW( '_UBYTE', 1, 1, 1, PLACE, NDFE,
      :                                STATUS )
-                     END IF  ! COMP eq DATA
+
+*  Want to recreate the path if this IMAGE sub-file originally was an
+*  NDF within an NDF extension.
+                     ELSE IF ( EXNDF ) THEN
+                        CALL COF_FI2NE( FUNITD, NDF, NDFE, STATUS )
+                     END IF  ! COMP eq DATA +/- EXNDF
 
                   END IF  ! Not FIRST and XTENS eq IMAGE
 

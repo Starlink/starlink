@@ -61,6 +61,9 @@
 *     1997 November 15 (MJC):
 *        Corrected some errors in the prologue, notably the accesses
 *        for the returned arguments.
+*     2008 February 12 (MJC):
+*        Default to scalar if EXTSHAPE is missing rather than report
+*        an error and exit.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -103,7 +106,7 @@
       INTEGER START( MAXWRD )    ! Start columns of words (not used)
       LOGICAL THERE              ! Keyword is present?
       CHARACTER * ( DAT__SZNAM ) WORDS( MAXWRD ) ! Words in the
-                                 ! component specfication
+                                 ! component specification
 
 *.
 
@@ -144,26 +147,26 @@
 *  Obtain the EXTSHAPE keyword.
       CALL COF_GKEYC( FUNIT, 'EXTSHAPE', THERE, EXSHAP, COMENT, STATUS )
 
+*  Default to a scalar.
       IF ( .NOT. THERE ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'COF_EXDIM_EXTSHAPE',
-     :     'EXTSHAPE keyword is missing.  Unable to recreate the '/
-     :     /'NDF extension.', STATUS )
-         GOTO 999
-      END IF
+         DIMS( 1 ) = 0
+
+      ELSE
 
 *  Replace the commas by spaces in the shape.
-      CALL CHR_TRCHR( ',', ' ', EXSHAP, STATUS )
+         CALL CHR_TRCHR( ',', ' ', EXSHAP, STATUS )
 
 *  Break the shape into words.
-      CALL CHR_DCWRD( EXSHAP, MAXWRD, NWORD, START, END, WORDS, STATUS )
+         CALL CHR_DCWRD( EXSHAP, MAXWRD, NWORD, START, END, WORDS,
+     :                   STATUS )
 
 *  Assign the indices.  Convert the string to integer.  Thus assumes no
 *  range definition, which is reasonable because the FITS writing code
 *  only creates a single cell per FITS binary table.
-      DO I = 1, NWORD
-         CALL CHR_CTOI( WORDS( I ), DIMS( I ), STATUS )
-      END DO
+         DO I = 1, NWORD
+            CALL CHR_CTOI( WORDS( I ), DIMS( I ), STATUS )
+         END DO
+      END IF
 
   999 CONTINUE
 
