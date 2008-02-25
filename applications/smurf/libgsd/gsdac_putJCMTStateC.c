@@ -52,6 +52,8 @@
 *        Use gsdVars struct to store headers/arrays
 *     2008-02-18 (JB):
 *        Get values from gsdWCS
+*     2008-02-22 (JB):
+*        Move fe_doppler calc to getJCMTStateS
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -81,6 +83,7 @@
 /* Standard includes */
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 
 /* Starlink includes */
 #include "ast.h"
@@ -103,12 +106,21 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const dasFlag dasFlag,
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
 
-  /* Fill the JCMTState (KLUDGED with default vals). */
-  /* KLUDGES indicated by "//k". */
+  /* Fill the JCMTState. */
     
-  record->rts_num = stepNum;
+  record->rts_num = stepNum + 1;
 
-  record->rts_end = 0.0;//k
+  /* Get the rts_end which is the TAI time plus half the 
+     on-source integration time.  For rasters the on-source
+     integration time is the scan_time divided by the 
+     number of map points per scan.  For non-rasters the 
+     on-source integration time is given by the scan_time. */
+  if ( gsdVars->obsContinuous ) {
+    record->rts_end = wcs[stepNum].tai + 
+                      ( gsdVars->scanTime / ( gsdVars->nScanPts * 2.0 ) );
+  } else {
+    record->rts_end = wcs[stepNum].tai + ( gsdVars->scanTime / 2.0 );
+  }
 
   /* Check the frequency band to determine tasklist. */
   if ( (gsdVars->centreFreqs)[0] < 290.0 ) {
@@ -194,9 +206,21 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const dasFlag dasFlag,
 
   record->enviro_pressure = (gsdVars->pamb) * 1.33322;
 
-  record->acs_exposure = 0.0;//k
-
-  record->acs_offexposure = 0.0;//k  
+  /* If this is a raster, the on-source integration time is
+     the scan time divided by the number of points in the scan,
+     and the off-source time is the square root of the 
+     number of points in the scan times the on-source time.
+     For non-rasters use the values stored in the INTGRN_TIME
+     array for both on- and off-exposure times. */     
+  if ( gsdVars->obsContinuous ) {  
+    record->acs_exposure = (double)(gsdVars->scanTime) /
+                           (double)(gsdVars->nScanPts);
+    record->acs_offexposure = record->acs_exposure *
+                              sqrt(gsdVars->nScanPts);
+  } else {  
+    record->acs_exposure = (gsdVars->intTimes)[stepNum];
+    record->acs_offexposure = record->acs_exposure;
+  }
 
   record->acs_no_prev_ref = VAL__BADI;
 
@@ -207,7 +231,5 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const dasFlag dasFlag,
   strncpy( record->acs_source_ro, "SPECTRUM_RESULT", 16 );
 
   record->pol_ang = VAL__BADD;
-
-  record->fe_doppler = 0.0;//k
 
 }

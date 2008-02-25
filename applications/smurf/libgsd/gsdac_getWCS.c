@@ -162,18 +162,65 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const int nSteps,
 
   for ( i = 0; i < nSteps; i++ ) {
 
-    /* Kludges for now... */
-    wcs[i].airmass = 0.0;
-    wcs[i].acAz = 0.0;
-    wcs[i].acEl = 0.0;
-    wcs[i].acTr1 = 0.0;
-    wcs[i].acTr2 = 0.0;    
-    wcs[i].azAng = 0.0;  
-    wcs[i].baseAz = 0.0;
-    wcs[i].baseEl = 0.0;  
-    wcs[i].baseTr1 = 0.0;
-    wcs[i].baseTr2 = 0.0;
-    wcs[i].index = 0.0;
+    wcs[i].airmass = 0.0;//k
+    wcs[i].acAz = 0.0;//k
+    wcs[i].acEl = 0.0;//k
+    wcs[i].acTr1 = 0.0;//k
+    wcs[i].acTr2 = 0.0;//k   
+    wcs[i].azAng = 0.0;
+    wcs[i].baseAz = 0.0;//k
+    wcs[i].baseEl = 0.0;//k 
+
+    /* Figure out what coordinates we are tracking in.  Then 
+       the base can be copied from the corresponding CENTRE_
+       value in the GSD header.  Remember that the GSD file
+       stored RAs in degrees! */
+    switch ( gsdVars->centreCode ) {
+    
+      case COORD_AZ:
+        wcs[i].baseTr1 = gsdVars->centreAz;
+        wcs[i].baseTr2 = gsdVars->centreEl;
+        break;
+      case COORD_EQ:
+        wcs[i].baseTr1 = gsdVars->obsLST - 
+	                 ( gsdVars->centreRA * 24.0 / 360.0 );
+        if ( wcs[i].baseTr1 < 0 ) wcs[i].baseTr1 += 24.0;
+        wcs[i].baseTr2 = gsdVars->centreEl;
+        break;
+      case COORD_RD:
+        wcs[i].baseTr1 = gsdVars->centreRA * 24.0 / 360.;
+        wcs[i].baseTr2 = gsdVars->centreDec;
+        break;
+      case COORD_RB:
+        wcs[i].baseTr1 = gsdVars->centreRA1950 * 24.0 / 360.;
+        wcs[i].baseTr2 = gsdVars->centreDec1950;
+        break;
+      case COORD_RJ:
+        wcs[i].baseTr1 = gsdVars->centreRA2000 * 24.0 / 360;
+        wcs[i].baseTr2 = gsdVars->centreDec2000;
+        break;
+      case COORD_GA:
+        wcs[i].baseTr1 = gsdVars->centreGL;
+        wcs[i].baseTr2 = gsdVars->centreGB;
+        break;
+      default:
+        *status = SAI__ERROR;
+        errRep ( FUNC_NAME, "Error getting tracking coordinates of base", 
+                 status );
+        return;
+        break;
+
+    }
+
+
+    /* Get the index into the observing area.  For rasters, this is
+       the row number (incremented on new rows) and for grids it is
+       the grid offset. */
+    if ( gsdVars->obsContinuous ) {
+      wcs[i].index = (int)( i / gsdVars->nScanPts );
+    } else {
+      wcs[i].index = i;
+    }
 
     /* If this is a raster, work out the LST from the scan_time
        and the number of map points in each scan. */
@@ -184,7 +231,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const int nSteps,
       dLST = ( (gsdVars->scanTable1)[index] - LSTStart ) / 24.0;
 
       /* Add the integration times up to this scan point. */
-      dLST = dLST + ( ( nSteps % gsdVars->nScanPts ) *
+      dLST = dLST + ( (i % gsdVars->nScanPts ) *
                       ( gsdVars->scanTime / gsdVars->nScanPts ) );
 
     } else {

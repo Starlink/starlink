@@ -58,6 +58,10 @@
 /* Enumerated type for DAS file type */
 typedef enum {DAS_NONE, DAS_TP, DAS_CONT_CAL, DAS_CROSS_CORR} dasFlag;
 
+/* Enumerated type for DAS file type */
+enum {COORD_AZ = 1, COORD_EQ = 3, COORD_RD = 4, 
+      COORD_RB = 6, COORD_RJ = 7, COORD_GA = 8};
+
 typedef struct gsdac_gsd_struct  /* GSD file access parameters */
 {
   char *dataPtr;              /* GSD data */

@@ -42,6 +42,8 @@
 *        Use gsdVars struct to store headers/arrays
 *     19-FEB-2008 (JB):
 *        Check dasFlag
+*     22-FEB-2008 (JB):
+*        Include math.h
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -76,6 +78,7 @@
 /* Standard includes */
 #include <string.h>
 #include <stdio.h>
+#include <math.h>
 
 /* STARLINK includes */
 #include "mers.h"

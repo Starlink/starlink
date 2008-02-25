@@ -50,6 +50,8 @@
 *        Use gsdVars struct to store headers/arrays
 *     2008-02-18 (JB):
 *        Check dasFlag
+*     2008-02-22 (JB):
+*        Calculate fe_doppler
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -115,6 +117,7 @@ void gsdac_putJCMTStateS ( const gsdVars *gsdVars, const dasFlag dasFlag,
      TSKY array. */
   record->enviro_air_temp = (gsdVars->skyTemps)[arrayIndex];
 
-  record->enviro_air_temp = 0.0;
+  record->fe_doppler = (gsdVars->restFreqs)[subsysNum-1] / 
+               ( record->fe_lofreq + (gsdVars->totIFs)[subsysNum-1] );
 
 }

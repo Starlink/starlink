@@ -383,7 +383,7 @@ void gsdac_putFits ( const gsdVars *gsdVars,
 
   /* Get the length of time in the reference, and the number
      of steps between references. */
-  if ( strcmp ( samMode, "raster" ) == 0 ) {
+  if ( gsdVars->obsContinuous ) {
 
     /* For rasters, determine the number of time scanning
        each point in one row from the total time for

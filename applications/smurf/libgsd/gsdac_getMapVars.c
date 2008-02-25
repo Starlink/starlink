@@ -201,22 +201,22 @@ void gsdac_getMapVars ( const gsdVars *gsdVars,
   /* Get the local offset coordinate system. */
   switch ( gsdVars->cellCode ) {
     
-    case 1:
+    case COORD_AZ:
       strcpy ( loclCrd, "AZEL" );
       break;
-    case 3:
+    case COORD_EQ:
       strcpy ( loclCrd, "EQ" );//k
       break;
-    case 4:
+    case COORD_RD:
       strcpy ( loclCrd, "RA/Dec" );//k
       break;
-    case 6:
+    case COORD_RB:
       strcpy ( loclCrd, "B1950" );
       break;
-    case 7:
+    case COORD_RJ:
       strcpy ( loclCrd, "J2000" );
       break;
-    case 8:
+    case COORD_GA:
       strcpy ( loclCrd, "GA" );//k
       break;
     default:
