@@ -35,8 +35,6 @@
 *     EXPATH = CHARACTER * ( * ) (Given)
 *        A string (usually a prefix) to exclude from the object path
 *        used by the EXTNAME keyword in the FITS header.
-*     EXTLEV = INTEGER (Given)
-*        Extension level for the FITS header.
 *     WRITTN = LOGICAL (Returned)
 *        If .TRUE. the binary table has been written successfully.
 *     STATUS = INTEGER (Given and Returned)
@@ -78,10 +76,6 @@
 *        Use the correct FITISO routine names in two COF_FIOER calls.
 *        Some tidying.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
-
 *-
       
 *  Type Definitions:
