@@ -1137,7 +1137,8 @@
                   ELSE IF ( SMURF ) THEN
                   
 *  Handle SMURF extension's NDFs as NDFs rather than a general HDS
-*  structure, but also inherit the parent NDFs.
+*  structure, but also may inherit the metadata (FITS airlock, HISTORY)
+*  of the parent NDFs.
                      CALL COF_SMURF( XNAME, XLOC, FUNIT, NDF, FILNAM, 
      :                               NOARR, ARRNAM, BITPIX, BLOCKF, 
      :                               ORIGIN, PROFIT, DUPLEX, PROHIS, 
