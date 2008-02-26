@@ -44,6 +44,19 @@
 *           "JFINC(1)" - _INTEGER
 *           "IFFREQ(1)" - _DOUBLE
 *
+*        In addition, the KeyMap may contain an item "CELLCODE" (_INTEGER)
+*        that specifies the coordinate system to which the RA_DEC and DPOS 
+*        values refer. It may take any of the following values:
+*
+*           1 : AZEL
+*           4 : RD (geocentric apparent RA and Dec)
+*           6 : RB (FK4 1950 RA and Dec)
+*           7 : RJ (FK5 2000 RA and Dec)
+*           8 : GA (galactic longitude and latitude)
+*
+*        An error is reported if any other value is supplied for CELLCODE. 
+*        If CELLCODE is missing a value of 6 (FK4 B1950) is assumed.
+*
 *     KM2 = INTEGER (Given)
 *        Pointer to an AST KeyMap holding items read from the SPECX_MAP
 *        extension in the required SPECX map file. The value AST__NULL
@@ -82,6 +95,9 @@
 *     25-FEB-2008 (DSB):
 *        Obtain SPECX information from supplied KeyMaps rather than a
 *        supplied NDF.
+*     26-FEB-2008 (DSB):
+*        Added item CELLCODE, which determines the celestial
+*        longitude/latitude system used by the other values.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -156,10 +172,8 @@
       DOUBLE PRECISION POSANG! Position angle of Y axis (degs East of North)
       DOUBLE PRECISION RA    ! Central RA (degrees)
       DOUBLE PRECISION SRCVEL! Assumed source velocity (km/s)
-      INTEGER AXES( 2 )      ! Axes to be selected from the Frame
       INTEGER BFRM           ! Pointer to new GRID Frame
       INTEGER DAY            ! Day
-      INTEGER DMAP           ! An unused Mapping pointer
       INTEGER DSTAT          ! Local SLA status
       INTEGER FC             ! Pointer to AST FitsChan
       INTEGER FRM            ! Pointer to AST Frame to be added to NDF
@@ -177,7 +191,6 @@
       INTEGER MAP            ! Pointer to AST Mapping 
       INTEGER MIN            ! Minute of observation
       INTEGER MONTH          ! Month
-      INTEGER SF             ! Pointer to AST SkyFrame
       INTEGER SKYFRM         ! Pointer to AST SkyFrame
       INTEGER SPCFRM         ! Pointer to AST SpecFrame
       INTEGER TDBFRM         ! TimeFrame describing the TDB timescale
@@ -210,56 +223,36 @@
 *  Either this should always be true, or we should prompt for it.
       ISDSB = .TRUE.
 
-*  First create an AST SpecFrame to represent the spectral axis. This
-*  will be used as axis 1 within the Frame which is finally added to the 
-*  WCS component of the output NDF.
-*  ===================================================================
+*  First create a SkyFrame that describes the celestial coordinate system
+*  specified by the CELLCODE item.
+*  ======================================================================
 
-*  Create a [DSB]SpecFrame describing frequency in units of GHz.
-      IF (ISDSB) THEN
-         SPCFRM = AST_DSBSPECFRAME( 'System=freq,unit=GHz', STATUS )
-      ELSE
-         SPCFRM = AST_SPECFRAME( 'System=freq,unit=GHz', STATUS )
+*  Get the integer CELLCODE value, using a default value of 6.
+      KEY = 'CELLCODE'
+      IF( .NOT. AST_MAPGET0I( KM1, KEY, ISYS, STATUS ) ) ISYS = 6
+
+*  Find the corresponding AST "System" code.
+      IF( ISYS .EQ. 1 ) THEN
+         SYS = 'AZEL'
+      ELSE IF( ISYS .EQ. 4 ) THEN
+         SYS = 'GAPPT'
+      ELSE IF( ISYS .EQ. 6 ) THEN
+         SYS = 'FK4'
+      ELSE IF( ISYS .EQ. 7 ) THEN
+         SYS = 'FK5'
+      ELSE IF( ISYS .EQ. 8 ) THEN
+         SYS = 'GALACTIC'
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_SETI( 'I', ISYS )
+         CALL ERR_REP( 'ATL_WCSPX_ERR1', 'ATL_WCSPX: Illegal value '//
+     :                 '^I supplied for item CELLCODE.', STATUS )
       END IF
 
-*  Set its attributes so that they correspond to the information stored
-*  in the SPECX extensions in the input map...
-
-*  Since the DSB SpecFrame attributes can only be derived from
-*  knowledge of the observed sideband which in specx requires JFINC
-*  we defer setting of these attributes until JFINC and JFCEN are
-*  read. [alternatively we could move those reads up]
-
-*  Rest frequency. Convert from kHz to GHz.
-      KEY = 'JFREST(1)'
-      CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
-      IF( .NOT. AST_MAPGET0I( KM1, KEY, JFREST, STATUS ) ) GO TO 999
-
-      CALL AST_SETD( SPCFRM, 'RestFreq', DBLE( JFREST )*1.0D-6, STATUS )
-
-*  Source position. We create an FK4 B1950 SkyFrame which AST_SETREFPOS 
-*  will use to interpret the supplied values. 
-      KEY = 'RA_DEC(1)'
-      CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
-      IF( .NOT. AST_MAPGET0D( KM1, KEY, RA, STATUS ) ) GO TO 999
-
-      KEY = 'RA_DEC(2)'
-      CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
-      IF( .NOT. AST_MAPGET0D( KM1, KEY, DEC, STATUS ) ) GO TO 999
-
-      KEY = 'DPOS(1)'
-      CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
-      IF( .NOT. AST_MAPGET0D( KM1, KEY, DRA, STATUS ) ) GO TO 999
-
-      KEY = 'DPOS(2)'
-      CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
-      IF( .NOT. AST_MAPGET0D( KM1, KEY, DDEC, STATUS ) ) GO TO 999
-
-      DEC = DEC + DDEC/3600.0
-      RA = RA + DRA/( 3600.0*COS( DEC*D2R ) )
-
-      SF = AST_SKYFRAME( 'System=FK4', STATUS )
-      CALL AST_SETREFPOS( SPCFRM, SF, RA*D2R, DEC*D2R, STATUS )
+*  Create a default SkyFrame and then set its System to that specified by
+*  CELLCODE.
+      SKYFRM = AST_SKYFRAME( ' ', STATUS )
+      CALL AST_SETC( SKYFRM, 'System', SYS, STATUS )
 
 *  Epoch of observation. First extract the year, month and day of the 
 *  UTC from the IDATE item in the SPECX extension, and convert them to 
@@ -299,7 +292,6 @@
       CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
       IF( .NOT. AST_MAPGET0C( KM1, KEY, UTIME, LEN, STATUS ) ) GO TO 999
 
-
       CALL CHR_CTOI( UTIME( 1:2 ), HOUR, STATUS )
       CALL CHR_CTOI( UTIME( 4:5 ), MIN, STATUS )
       CALL CHR_CTOR( UTIME( 7: ), SEC, STATUS )
@@ -335,6 +327,69 @@
 
 *  Format the TDB MJD into a form suitable for use with AST_SETC.
       WRITE( EPOCH, * ) 'MJD ',MJD
+
+*  Set the Epoch attribute in the SkyFrame.
+      CALL AST_SETC( SKYFRM, 'Epoch', EPOCH, STATUS )
+
+*  Observatory position. 
+      CALL AST_SETD( SKYFRM, 'ObsLon', OBSLON/D2R, STATUS )
+      CALL AST_SETD( SKYFRM, 'ObsLat', OBSLAT/D2R, STATUS )
+      
+*  Now create an AST SpecFrame to represent the spectral axis. This
+*  will be used as axis 1 within the Frame which is finally added to the 
+*  WCS component of the output NDF.
+*  ===================================================================
+
+*  Create a [DSB]SpecFrame describing frequency in units of GHz.
+      IF (ISDSB) THEN
+         SPCFRM = AST_DSBSPECFRAME( 'System=freq,unit=GHz', STATUS )
+      ELSE
+         SPCFRM = AST_SPECFRAME( 'System=freq,unit=GHz', STATUS )
+      END IF
+
+*  Set its attributes so that they correspond to the information stored
+*  in the SPECX extensions in the input map...
+
+*  Since the DSB SpecFrame attributes can only be derived from
+*  knowledge of the observed sideband which in specx requires JFINC
+*  we defer setting of these attributes until JFINC and JFCEN are
+*  read. [alternatively we could move those reads up]
+
+*  Rest frequency. Convert from kHz to GHz.
+      KEY = 'JFREST(1)'
+      CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
+      IF( .NOT. AST_MAPGET0I( KM1, KEY, JFREST, STATUS ) ) GO TO 999
+
+      CALL AST_SETD( SPCFRM, 'RestFreq', DBLE( JFREST )*1.0D-6, STATUS )
+
+*  Source position. These are interpreted as being in the system
+*  specified by the CELLCODE item. The "SKYFRM" SkyFrame created above 
+*  describes this system.
+      KEY = 'RA_DEC(1)'
+      CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
+      IF( .NOT. AST_MAPGET0D( KM1, KEY, RA, STATUS ) ) GO TO 999
+
+      KEY = 'RA_DEC(2)'
+      CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
+      IF( .NOT. AST_MAPGET0D( KM1, KEY, DEC, STATUS ) ) GO TO 999
+
+      KEY = 'DPOS(1)'
+      CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
+      IF( .NOT. AST_MAPGET0D( KM1, KEY, DRA, STATUS ) ) GO TO 999
+
+      KEY = 'DPOS(2)'
+      CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
+      IF( .NOT. AST_MAPGET0D( KM1, KEY, DDEC, STATUS ) ) GO TO 999
+
+      DEC = DEC + DDEC/3600.0
+      RA = RA + DRA/( 3600.0*COS( DEC*D2R ) )
+
+      CALL AST_SETREFPOS( SPCFRM, SKYFRM, RA*D2R, DEC*D2R, STATUS )
+
+*  Also set the reference position in the SkyFrame to the same value.
+      CALL AST_SETD( SKYFRM, 'SkyRef(1)', RA*D2R, STATUS )
+      CALL AST_SETD( SKYFRM, 'SkyRef(2)', DEC*D2R, STATUS )
+      CALL AST_SETC( SKYFRM, 'SkyRefIs', 'Ignored', STATUS )
 
 *  Set the Epoch attribute.
       CALL AST_SETC( SPCFRM, 'Epoch', EPOCH, STATUS )
@@ -376,7 +431,7 @@
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'I', LSRFLG )
          CALL MSG_SETI( 'J', ISOR )
-         CALL ERR_REP( 'ATL_WCSPX_ERR1', 'The ''LSRFLG'' item in the '//
+         CALL ERR_REP( 'ATL_WCSPX_ERR6', 'The ''LSRFLG'' item in the '//
      :                 'SPECX header has value ^I which specifies an '//
      :                 'unknown standard of rest value (^J).', STATUS )
          GO TO 999
@@ -418,8 +473,8 @@
 
 *  If the source velocity is not zero, assign it to the SourceVel
 *  attribute. It will be interpreted as a velocity within the rest frame
-*  specified by the current value of SourceVRF (i.e. the rest frame extracted 
-*  from LSRFLG above). 
+*  specified by the current value of SourceVRF (i.e. the rest frame 
+*  extracted from LSRFLG above). 
       IF( SRCVEL .NE. 0.0 ) THEN
          CALL AST_SETD( SPCFRM, 'SourceVel', SRCVEL, STATUS )
 
@@ -499,9 +554,9 @@
       END IF
 
 
-*  Now create a SkyFrame describing the spatial position (RA,Dec), and
-*  the 3D Mapping which goes from 3D GRID coords to (RA,Dec,Freq). 
-*  ===================================================================
+*  Now create the 3D Mapping which goes from 3D GRID coords to 
+*  (RA,Dec,Freq). 
+*  ===========================================================
 
 *  Get the central GRID coordinate on the first and second axes of the 
 *  output NDF (the RA and Dec axes).
@@ -511,8 +566,8 @@
 *  Does the input NDF have a SPECX_MAP extension?
       IF( KM2 .NE. AST__NULL ) THEN
 
-*  If so, get the RA and Dec pixel sizes from the SPECX map. Convert from 
-*  arc-seconds to degrees.
+*  If so, get the pixel sizes from the SPECX map. Convert from arc-seconds 
+*  to degrees.
          KEY = 'CELLSIZE(1)'
          CALL ATL_KYCHK( KM2, KEY, KM2ERR, STATUS )
          IF( .NOT. AST_MAPGET0D( KM2, KEY, CD1, STATUS ) ) GO TO 999
@@ -545,8 +600,9 @@
 *  Put FITS cards into the FitsChan representing a SIN projection of the
 *  sky, using the pixel sizes obtained above. It is assumed that north is
 *  parallel to the third axis and east is parallel to the second axis.
-*  It is assumed that the RA and DEC values are FK4 B1950. Axis 3 is the
-*  spectral axis.
+*  Axis 3 is the spectral axis. The headers describing the properties of
+*  the WCS frame are not complete since the resulting Frame is not used 
+*  (the SpecFrame and SkyFrame created above are used instead).
       CALL AST_PUTFITS( FC, ' ', .FALSE., STATUS ) 
 
       CARD = 'NAXIS1  = '
@@ -560,8 +616,6 @@
       CALL AST_PUTFITS( FC, CARD, .FALSE., STATUS ) 
 
       CALL AST_PUTFITS( FC, 'NAXIS3  = 1', .FALSE., STATUS ) 
-
-      CALL AST_PUTFITS( FC, 'CTYPE1  =  ''RA---SIN''', .FALSE., STATUS )
 
       CARD = 'CRPIX1  = '
       IAT = 10
@@ -578,7 +632,7 @@
       CALL CHR_PUTD( -CD1, CARD, IAT )
       CALL AST_PUTFITS( FC, CARD, .FALSE., STATUS ) 
 
-      CALL AST_PUTFITS( FC, 'CTYPE2  =  ''DEC--SIN''', .FALSE., STATUS )
+      CALL AST_PUTFITS( FC, 'CTYPE1  =  ''RA---SIN''', .FALSE., STATUS )
 
       CARD = 'CRPIX2  = '
       IAT = 10
@@ -600,10 +654,7 @@
       CALL CHR_PUTD( -POSANG, CARD, IAT )
       CALL AST_PUTFITS( FC, CARD, .FALSE., STATUS ) 
 
-      CALL AST_PUTFITS( FC, 'EQUINOX = 1950.0', .FALSE., STATUS ) 
-      CALL AST_PUTFITS( FC, 'RADESYS = ''FK4''', .FALSE., STATUS ) 
-
-      CALL AST_PUTFITS( FC, 'CTYPE3  =  ''FREQ    ''', .FALSE., STATUS )
+      CALL AST_PUTFITS( FC, 'CTYPE2  =  ''DEC--SIN''', .FALSE., STATUS )
 
       CARD = 'CRPIX3  = '
       IAT = 10
@@ -620,28 +671,18 @@
       CALL CHR_PUTD( CD3, CARD, IAT )
       CALL AST_PUTFITS( FC, CARD, .FALSE., STATUS ) 
 
+      CALL AST_PUTFITS( FC, 'CTYPE3  =  ''FREQ    ''', .FALSE., STATUS )
+
 *  Read a FrameSet from the FitsChan. 
       CALL AST_CLEAR( FC, 'Card', STATUS )
       FS = AST_READ( FC, STATUS )
 
-*  Get a pointer to the current Frame in this FrameSet, which will be a 
-*  CmpFrame containing a SkyFrame describing the spatial positions within 
-*  the map, and a 1D Frame (for the Freq axis). Extract the SkyFrame
-*  (axes 1 and 2).
-      AXES( 1 ) = 1
-      AXES( 2 ) = 2
-      SKYFRM = AST_PICKAXES( AST_GETFRAME( FS, AST__CURRENT, STATUS ),
-     :                       2, AXES, DMAP, STATUS ) 
-
-*  Set the Epoch to be the same as the SpecFrame.
-      CALL AST_SETC( SKYFRM, 'Epoch', EPOCH, STATUS )
-
-*  The Base Frame in the FrameSet will correspond to 3D GRID coordinates.
-*  Get the Mapping from GRID to SPECTRUM-SKY coordinates.
-      MAP = AST_GETMAPPING( FS, AST__BASE, AST__CURRENT, STATUS )
-
 *  Create the returned FrameSet.
 *  ============================================
+*  The Base Frame in the above FrameSet will correspond to 3D GRID 
+*  coordinates. Get the Mapping from GRID to SPECTRUM-SKY coordinates.
+      MAP = AST_GETMAPPING( FS, AST__BASE, AST__CURRENT, STATUS )
+
 *  Create a 3D GRID Frame, and put it in a new FrameSet.
       BFRM = AST_FRAME( 3, 'Domain=GRID,unit(1)=pixel,unit(2)=pixel,'//
      :                  'unit(3)=pixel', STATUS );
@@ -672,6 +713,4 @@
       CALL AST_END( STATUS )
 
       END
-
-
 

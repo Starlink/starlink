@@ -1533,22 +1533,36 @@ higher-level utility tasks.
          KM1 = INTEGER (Given)
       }{
          Pointer to an AST KeyMap holding items read from the SPECX
-         extension in the required SPECX map file. It should contain
-         entries with the following keys (the data type with which each
-         entry is accessed is shown in parentheses):
+         extension in the required SPECX map file. The key for each entry
+         is identicial to the name of the item in the SPECX extension.
+         It should contain entries with the following keys (the data type
+         with which each entry is accessed is also shown):
 
-            JFREST (\_INTEGER) - The value of SPECX extension item {\tt "}JFREST(1){\tt "}
-            RA (\_DOUBLE) - The value of SPECX extension item {\tt "}RA\_DEC(1){\tt "}
-            DEC (\_DOUBLE) - The value of SPECX extension item {\tt "}RA\_DEC(2){\tt "}
-            DRA (\_DOUBLE) - The value of SPECX extension item {\tt "}DPOS(1){\tt "}
-            DDEC (\_DOUBLE) - The value of SPECX extension item {\tt "}DPOS(2){\tt "}
-            IDATE (\_CHAR) - The value of SPECX extension item {\tt "}IDATE{\tt "}
-            ITIME (\_CHAR) - The value of SPECX extension item {\tt "}ITIME{\tt "}
-            LSRFLG (\_INTEGER) - The value of SPECX extension item {\tt "}LSRFLG{\tt "}
-            SRCVEL (\_DOUBLE)  - The value of SPECX extension item {\tt "}V\_SETL(4){\tt "}
-            JFCEN (\_INTEGER) - The value of SPECX extension item {\tt "}JFCEN(1){\tt "}
-            JFINC (\_INTEGER) - The value of SPECX extension item {\tt "}JFINC(1){\tt "}
-            IFFREQ (\_DOUBLE) - The value of SPECX extension item {\tt "}IFFREQ(1){\tt "}
+            {\tt "}JFREST(1){\tt "} - \_INTEGER
+            {\tt "}RA\_DEC(1){\tt "} - \_DOUBLE
+            {\tt "}RA\_DEC(2){\tt "} - \_DOUBLE
+            {\tt "}DPOS(1){\tt "} - \_DOUBLE
+            {\tt "}DPOS(2){\tt "} - \_DOUBLE
+            {\tt "}IDATE{\tt "} - \_CHAR
+            {\tt "}ITIME{\tt "} - \_CHAR
+            {\tt "}LSRFLG{\tt "} - \_INTEGER
+            {\tt "}V\_SETL(4){\tt "} - \_DOUBLE
+            {\tt "}JFCEN(1){\tt "} - \_INTEGER
+            {\tt "}JFINC(1){\tt "} - \_INTEGER
+            {\tt "}IFFREQ(1){\tt "} - \_DOUBLE
+
+         In addition, the KeyMap may contain an item {\tt "}CELLCODE{\tt "} (\_INTEGER)
+         that specifies the coordinate system to which the RA\_DEC and DPOS
+         values refer. It may take any of the following values:
+
+            1 : AZEL
+            4 : RD (geocentric apparent RA and Dec)
+            6 : RB (FK4 1950 RA and Dec)
+            7 : RJ (FK5 2000 RA and Dec)
+            8 : GA (galactic longitude and latitude)
+
+         An error is reported if any other value is supplied for CELLCODE.
+         If CELLCODE is missing a value of 6 (FK4 B1950) is assumed.
       }
       \sstsubsection{
          KM2 = INTEGER (Given)
@@ -1559,9 +1573,9 @@ higher-level utility tasks.
          extension. If supplied, it should contain entries with the
          following keys:
 
-            CD1 - The value of SPECX\_MAP extension item {\tt "}CELLSIZE(1){\tt "}
-            CD2 - The value of SPECX\_MAP extension item {\tt "}CELLSIZE(2){\tt "}
-            POSANG - The value of SPECX\_MAP extension item {\tt "}POSANGLE{\tt "}
+            {\tt "}CELLSIZE(1){\tt "} - \_DOUBLE
+            {\tt "}CELLSIZE(2){\tt "}  - \_DOUBLE
+            {\tt "}POSANGLE{\tt "} - \_DOUBLE
       }
       \sstsubsection{
          DIM( 3 ) = INTEGER (Given)
