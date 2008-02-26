@@ -11,6 +11,7 @@
 #define ID_NAME "ID"
 
 /* HDS types for components used in the PROVENANCE extension of an NDF */
+#define TEMP_TYPE "STARLINK_PROV"
 #define EXT_TYPE "PROVENANCE"
 #define ANCESTORS_TYPE "PROV"
 #define MORE_TYPE "MORE"
@@ -399,6 +400,112 @@ F77_SUBROUTINE(ndg_gtprv)( INTEGER(indf), INTEGER(ianc), CHARACTER(fprov),
 
 /* Export the locator string. */
    datExportFloc( &prov, 0, fprov_length, fprov, status );
+}
+
+F77_SUBROUTINE(ndg_mdprv)( INTEGER(indf), INTEGER(ianc), CHARACTER(fprov),
+                           INTEGER(status) TRAIL(fprov) ){
+/*
+*+
+*  Name:
+*     NDG_MDPRV
+
+*  Purpose:
+*     Get provenance information from an NDF.
+
+*  Language:
+*     Starlink ANSI C (callable from Fortran)
+
+*  Invocation:
+*     CALL NDG_MDPRV( INDF, IANC, PROV, STATUS )
+
+*  Description:
+*     This routine modifies the information stored for a given ancestor 
+*     in the "PROVENANCE" extension of an NDF. The new values to store 
+*     are supplied in an HDS structure such as is returned by NDG_GTPRV.
+
+*  Arguments:
+*     INDF = INTEGER (Given)
+*        An identifier for the NDF containing the provenance information.
+*     IANC = INTEGER (Given)
+*        The index of the ancestor NDF for which information should be
+*        modified. A value of zero will result in information about the NDF 
+*        specified by INDF being modified. Otherwise, the IANC value
+*        is used as an index into the ANCESTORS array in the PROVENANCE 
+*        extension. An error is reported if IANC is too large.
+*     PROV = CHARACTER * (DAT__SZLOC) (Returned)
+*        A locator for an HDS object containing the values to store. It
+*        should have at least the following components:
+*
+*        - "PATH": A string holding the path of the ancestor NDF.
+*        - "DATE": A string holding the formatted UTC date and time at 
+*          which the provenance information for the ancestor NDF was 
+*          recorded.
+*        - "CREATOR": A string identifying the software that created the
+*          ancestor NDF.
+*        - "MORE": Any extra information stored with the ancestor.
+*
+*        If the "DATE", "CREATOR" or "MORE" components are missing then 
+*        the corresponding item of information will be deleted from the 
+*        provenance extension. An error is reported if "PATH" is missing.
+*        Note, the PARENTS list stored with the specified ancestor cannot 
+*        be modified (any "PARENTS" component in the supplied HDS structure 
+*        will be ignored).
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Copyright:
+*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     26-FEB-2008 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
+   GENPTR_INTEGER(indf)
+   GENPTR_INTEGER(ianc)
+   GENPTR_CHARACTER(fprov) 
+   GENPTR_INTEGER(status)
+
+/* Local variables: */
+   HDSLoc *prov = NULL;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Import the locator string. */
+   if( strncmp( DAT__NOLOC, fprov, fprov_length) ){
+      datImportFloc( fprov, fprov_length, &prov, status );
+   }
+
+/* Call the C function to do the work. */
+   ndgMdprv( *indf, *ianc, prov, status );
+
 }
 
 F77_SUBROUTINE(ndg_ptprv)( INTEGER(indf1), INTEGER(indf2), CHARACTER(fmore),
@@ -902,7 +1009,7 @@ void ndgGtprv( int indf, int ianc, HDSLoc **prov, int *status ){
       anc = prov1->provs[ ianc ];
 
 /* Create the returned temporary HDS object. */
-      datTemp( "STARLINK_PROV", 0, NULL, prov, status );
+      datTemp( TEMP_TYPE, 0, NULL, prov, status );
 
 /* If defined, add a PATH component. */
       if( anc->path ) {
@@ -1153,6 +1260,145 @@ void ndgRtprv( int indf, AstKeyMap **roots, int *status ){
 /* Re-instate the original AST status variable. */
    astWatch( old_status );
 }
+
+void ndgMdprv( int indf, int ianc, HDSLoc *prov, int *status ){
+/*
+*  Name:
+*     ndgMdprv
+
+*  Purpose:
+*     Modify provenance information in an NDF.
+
+*  Synopsis:
+*     void ndgMdprv( int indf, int ianc, HDSLoc *prov, int *status )
+
+*  Description:
+*     This routine modifies the information stored for a given ancestor 
+*     in the "PROVENANCE" extension of an NDF. The new values to store 
+*     are supplied in an HDS structure such as is returned by ndgGtprv.
+
+*  Parameters:
+*     indf
+*        An identifier for the NDF containing the provenance information.
+*     ianc
+*        The index of the ancestor NDF for which information should be
+*        modified. A value of zero will result in information about the NDF 
+*        specified by "indf" being modified. Otherwise, the "ianc" value
+*        is used as an index into the ANCESTORS array in the PROVENANCE 
+*        extension. An error is reported if "ianc" is too large.
+*     prov
+*        A locator for an HDS object containing the values to store. It
+*        should have at least the following components:
+*
+*        - "PATH": A string holding the path of the ancestor NDF.
+*        - "DATE": A string holding the formatted UTC date and time at 
+*          which the provenance information for the ancestor NDF was 
+*          recorded.
+*        - "CREATOR": A string identifying the software that created the
+*          ancestor NDF.
+*        - "MORE": Any extra information stored with the ancestor.
+*
+*        If the "DATE", "CREATOR" or "MORE" components are missing then 
+*        the corresponding item of information will be deleted from the 
+*        provenance extension. An error is reported if "PATH" is missing.
+*        Note, the PARENTS list stored with the specified ancestor cannot 
+*        be modified (any "PARENTS" component in the supplied HDS structure 
+*        will be ignored).
+*     status 
+*        The global status.
+*/
+
+/* Local variables: */
+   HDSLoc *loc = NULL;
+   Prov *anc = NULL;
+   Provenance *prov1 = NULL;
+   char *cval = NULL;
+   int *old_status;
+   int there;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Ensure AST uses the supplied status variable. */
+   old_status = astWatch( status );
+
+/* Read the provenance extension from the NDF. */
+   prov1 = ndg1ReadProvenanceExtension( indf, NULL, NULL, 0, status );
+
+/* Check the "ianc" value is within the bounds of the ANCESTORS array. */
+   if( prov1 && ianc >= 0 && ianc < prov1->nprov ) {
+
+/* Get a pointer to the ancestors Prov structure. */
+      anc = prov1->provs[ ianc ];
+
+/* If defined, copy the PATH component. Report an error otherwise. */
+      cval = ndg1GetTextComp( prov, PATH_NAME, NULL, 0, status );
+      if( cval ) {
+         anc->path = astStore( anc->path, cval, strlen( cval ) + 1 );
+         cval = astFree( cval );
+
+      } else if( *status == SAI__OK ){
+         *status = SAI__ERROR;
+         ndfMsg( "NDF", indf );
+         errRep( " ", "Cannot modify provenance information in '^NDF': "
+                 "no new PATH supplied.", status );
+      }
+
+/* If defined, copy the DATE component. Delete it otherwise. */
+      cval = ndg1GetTextComp( prov, DATE_NAME, NULL, 0, status );
+      if( cval ) {
+         anc->date = astStore( anc->date, cval, strlen( cval ) + 1 );
+         cval = astFree( cval );
+      } else {
+         anc->date = astFree( anc->date );
+      }
+
+/* If defined, copy the CREATOR component. Delete it otherwise. */
+      cval = ndg1GetTextComp( prov, CREATOR_NAME, NULL, 0, status );
+      if( cval ) {
+         anc->creator = astStore( anc->creator, cval, strlen( cval ) + 1 );
+         cval = astFree( cval );
+      } else {
+         anc->creator = astFree( anc->creator );
+      }
+
+/* Delete any pre-existing MORE component and then, if a new one is
+   available in the supplied HDS structure, copy it into the Provenance
+   structure. */
+      if( anc->more ) datAnnul( &(anc->more), status );
+      datThere( prov, MORE_NAME, &there, status );
+      if( there ) {
+         datFind( prov, MORE_NAME, &loc, status );
+         datTemp( TEMP_TYPE, 0, NULL, &( anc->more ), status );
+         datCopy( loc, anc->more, MORE_NAME, status );
+         datAnnul( &loc, status );
+      }
+
+/* Store the modified provenance informtion in the NDF. */
+      ndg1WriteProvenanceExtension( prov1, indf, status );
+
+/* Report an error if the ianc value is bad. */
+   } else if( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      ndfMsg( "NDF", indf );
+      if( prov1 ) {
+         msgSeti( "IANC", ianc );
+         msgSeti( "N", prov1->nprov );
+         errRep( " ", "Cannot modify provenance ancestor ^IANC in '^NDF': "
+                 "only ^N ancestors found.", status );
+      } else {
+         errRep( " ", "Cannot modify provenance information in '^NDF': "
+                 "no provenance found.", status );
+      }
+   }
+
+/* Free resources. */
+   ndg1FreeProvenance( prov1, 1, status );
+
+/* Re-instate the original AST status variable. */
+   astWatch( old_status );
+}
+
 
 
 
@@ -1921,7 +2167,7 @@ static Prov *ndg1MakeProv( const char *path, const char *date,
 /* Store a deep copy of the "more" structure in a temporary HDS object. */
       result->more = NULL;
       if( more ) {
-         datTemp( "STARLINK_PROV", 0, NULL, &( result->more ), status );
+         datTemp( TEMP_TYPE, 0, NULL, &( result->more ), status );
          datCopy( more, result->more, MORE_NAME, status );
       }
 

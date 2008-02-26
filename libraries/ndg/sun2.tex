@@ -9,10 +9,10 @@
 \newcommand{\stardocsource}    {sun2.6}
 \newcommand{\stardocnumber}    {2.6}
 \newcommand{\stardocauthors}   {D.S.\ Berry \\ M.B.\ Taylor}
-\newcommand{\stardocdate}      {24th January 2008}
+\newcommand{\stardocdate}      {26th February 2008}
 \newcommand{\stardoctitle}     {NDG \\ [1ex]
                                 Routines for Accessing Groups of NDFs}
-\newcommand{\stardocversion}   {Version 5.3}
+\newcommand{\stardocversion}   {Version 5.4}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -1754,6 +1754,73 @@ to add further members.
 }
 
 \sstroutine{
+   NDG\_MDPRV
+}{
+   Get provenance information from an NDF
+}{
+   \sstdescription{
+      This routine modifies the information stored for a given ancestor
+      in the {\tt "}PROVENANCE{\tt "} extension of an NDF. The new values to store
+      are supplied in an HDS structure such as is returned by NDG\_GTPRV.
+   }
+   \sstinvocation{
+      CALL NDG\_MDPRV( INDF, IANC, PROV, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         An identifier for the NDF containing the provenance information.
+      }
+      \sstsubsection{
+         IANC = INTEGER (Given)
+      }{
+         The index of the ancestor NDF for which information should be
+         modified. A value of zero will result in information about the NDF
+         specified by INDF being modified. Otherwise, the IANC value
+         is used as an index into the ANCESTORS array in the PROVENANCE
+         extension. An error is reported if IANC is too large.
+      }
+      \sstsubsection{
+         PROV = CHARACTER $*$ (DAT\_\_SZLOC) (Returned)
+      }{
+         A locator for an HDS object containing the values to store. It
+         should have at least the following components:
+
+         \sstitemlist{
+
+            \sstitem
+            {\tt "}PATH{\tt "}: A string holding the path of the ancestor NDF.
+
+            \sstitem
+            {\tt "}DATE{\tt "}: A string holding the formatted UTC date and time at
+              which the provenance information for the ancestor NDF was
+              recorded.
+
+            \sstitem
+            {\tt "}CREATOR{\tt "}: A string identifying the software that created the
+              ancestor NDF.
+
+            \sstitem
+            {\tt "}MORE{\tt "}: Any extra information stored with the ancestor.
+
+         }
+         If the {\tt "}DATE{\tt "}, {\tt "}CREATOR{\tt "} or {\tt "}MORE{\tt "} components are missing then
+         the corresponding item of information will be deleted from the
+         provenance extension. An error is reported if {\tt "}PATH{\tt "} is missing.
+         Note, the PARENTS list stored with the specified ancestor cannot
+         be modified (any {\tt "}PARENTS{\tt "} component in the supplied HDS structure
+         will be ignored).
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+
+\sstroutine{
    NDG\_NDFAS
 }{
    Obtain an NDF identifier for an existing NDF
@@ -2326,6 +2393,11 @@ to add further members.
 }
 
 \newpage
+\section{Changes Introduced in NDG Version 5.4}
+\begin{itemize}
+   \item Added new routines: NDG\_MDPRV.
+\end{itemize}
+
 \section{Changes Introduced in NDG Version 5.3}
 \begin{itemize}
    \item Added routines for storing and retrieving provenance information:
