@@ -14,7 +14,6 @@
 
 *  Invocation:
 *     gsdac_putJCMTStateC ( const gsdVars *gsdVars, const dasFlag dasFlag,
-*                           const gsdWCS *wcs,
 *                           const unsigned int stepNum,
 *                           const char *backend,
 *                           struct JCMTState *record, int *status );
@@ -24,8 +23,6 @@
 *        GSD headers and arrays
 *     dasFlag = const dasFlag (Given)
 *        DAS file structure type
-*     wcs = const gsdWCS* (Given)
-*        Pointing and time values
 *     stepNum = const unsigned int (Given)
 *        Time step of this spectrum
 *     backend = const char* (Given)
@@ -54,6 +51,8 @@
 *        Get values from gsdWCS
 *     2008-02-22 (JB):
 *        Move fe_doppler calc to getJCMTStateS
+*     2008-02-26 (JB):
+*        Make gsdac_getWCS per-subsystem
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -97,7 +96,6 @@
 #define FUNC_NAME "gsdac_putJCMTStateC"
 
 void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const dasFlag dasFlag,
-                           const gsdWCS *wcs,
                            const unsigned int stepNum, 
                            const char *backend,
                            struct JCMTState *record, int *status )
@@ -109,18 +107,6 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const dasFlag dasFlag,
   /* Fill the JCMTState. */
     
   record->rts_num = stepNum + 1;
-
-  /* Get the rts_end which is the TAI time plus half the 
-     on-source integration time.  For rasters the on-source
-     integration time is the scan_time divided by the 
-     number of map points per scan.  For non-rasters the 
-     on-source integration time is given by the scan_time. */
-  if ( gsdVars->obsContinuous ) {
-    record->rts_end = wcs[stepNum].tai + 
-                      ( gsdVars->scanTime / ( gsdVars->nScanPts * 2.0 ) );
-  } else {
-    record->rts_end = wcs[stepNum].tai + ( gsdVars->scanTime / 2.0 );
-  }
 
   /* Check the frequency band to determine tasklist. */
   if ( (gsdVars->centreFreqs)[0] < 290.0 ) {
@@ -160,45 +146,11 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const dasFlag dasFlag,
 
   record->smu_tr_chop_y = 0.0;
 
-  record->tcs_tai = wcs[stepNum].tai;
-
-  record->tcs_airmass = wcs[stepNum].airmass;
-
-  record->tcs_az_ang = wcs[stepNum].azAng;
-
-  record->tcs_az_ac1 = wcs[stepNum].acAz;
-
-  record->tcs_az_ac2 = wcs[stepNum].acEl;
-
-  record->tcs_az_ac1 = record->tcs_az_ac1;
-
-  record->tcs_az_ac2 = record->tcs_az_ac2;
-
-  record->tcs_az_bc1 = wcs[stepNum].baseAz;
-
-  record->tcs_az_bc2 = wcs[stepNum].baseEl;
-
   strncpy( record->tcs_beam, "M", 1 );    
-
-  record->tcs_index = wcs[stepNum].index;
 
   strncpy( record->tcs_source, "SCIENCE", 8 ); 
 
   strncpy( record->tcs_tr_sys, "COORDS", 7 );
-
-  record->tcs_tr_ang = wcs[stepNum].trAng;
-
-  record->tcs_tr_ac1 = wcs[stepNum].acTr1;
-
-  record->tcs_tr_ac2 = wcs[stepNum].acTr2;
-
-  record->tcs_tr_dc1 = record->tcs_tr_ac1;
-
-  record->tcs_tr_dc2 = record->tcs_tr_ac2;
-
-  record->tcs_tr_bc1 = wcs[stepNum].baseTr1;
-
-  record->tcs_tr_bc2 = wcs[stepNum].baseTr2;
 
   record->jos_drcontrol = 0;
 

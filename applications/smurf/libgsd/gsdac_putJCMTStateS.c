@@ -15,7 +15,8 @@
 *  Invocation:
 *     gsdac_putJCMTStateS ( const gsdVars *gsdVars, const dasFlag dasFlag,  
 *                           const unsigned int stepNum, 
-*                           const unsigned int subsysNum, 
+*                           const int subsysNum,
+*                           const gsdWCS *wcs, 
 *                           struct JCMTState *record, 
 *                           int *status );
 
@@ -26,8 +27,10 @@
 *        DAS file structure type
 *     stepNum = const unsigned int (Given)
 *        time step of this spectrum
-*     subsysNum = const unsigned int (Given)
+*     subsysNum = const int (Given)
 *        Subsystem number
+*     wcs = const gsdWCS* (Given)
+*        Pointing and time values
 *     record = JCMTState** (Given and returned)
 *        JCMTState headers
 *     status = int* (Given and Returned)
@@ -52,6 +55,8 @@
 *        Check dasFlag
 *     2008-02-22 (JB):
 *        Calculate fe_doppler
+*     2008-02-26 (JB):
+*        Make gsdac_getWCS per-subsystem
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -91,7 +96,8 @@
 
 void gsdac_putJCMTStateS ( const gsdVars *gsdVars, const dasFlag dasFlag,
                            const unsigned int stepNum, 
-                           const unsigned int subsysNum,
+                           const int subsysNum,
+                           const gsdWCS *wcs,
                            struct JCMTState *record, int *status )
 {
 
@@ -100,6 +106,52 @@ void gsdac_putJCMTStateS ( const gsdVars *gsdVars, const dasFlag dasFlag,
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
+
+  /* Get the rts_end which is the TAI time plus half the 
+     on-source integration time.  For rasters the on-source
+     integration time is the scan_time divided by the 
+     number of map points per scan.  For non-rasters the 
+     on-source integration time is given by the scan_time. */
+  if ( gsdVars->obsContinuous ) {
+    record->rts_end = wcs->tai + 
+                      ( gsdVars->scanTime / ( gsdVars->nScanPts * 2.0 ) );
+  } else {
+    record->rts_end = wcs->tai + ( gsdVars->scanTime / 2.0 );
+  }
+
+  record->tcs_tai = wcs->tai;
+
+  record->tcs_airmass = wcs->airmass;
+
+  record->tcs_az_ang = wcs->azAng;
+
+  record->tcs_az_ac1 = wcs->acAz;
+
+  record->tcs_az_ac2 = wcs->acEl;
+
+  record->tcs_az_ac1 = record->tcs_az_ac1;
+
+  record->tcs_az_ac2 = record->tcs_az_ac2;
+
+  record->tcs_az_bc1 = wcs->baseAz;
+
+  record->tcs_az_bc2 = wcs->baseEl;
+
+  record->tcs_tr_ang = wcs->trAng;
+
+  record->tcs_tr_ac1 = wcs->acTr1;
+
+  record->tcs_tr_ac2 = wcs->acTr2;
+
+  record->tcs_tr_dc1 = record->tcs_tr_ac1;
+
+  record->tcs_tr_dc2 = record->tcs_tr_ac2;
+
+  record->tcs_tr_bc1 = wcs->baseTr1;
+
+  record->tcs_tr_bc2 = wcs->baseTr2;
+
+  record->tcs_index = wcs->index;
 
  /* Get the frontend LO frequency. */
   record->fe_lofreq = (gsdVars->LOFreqs)[subsysNum-1]; 

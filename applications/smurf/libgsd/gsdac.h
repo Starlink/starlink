@@ -32,6 +32,8 @@
 *     2008-02-19 (JB):
 *        Check dasFlag.  Added getDASFlag, removed getArraySize
 *        and getElemx
+*     2008-02-26 (JB):
+*        Make gsdac_getWCS per-subsystem
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -50,7 +52,7 @@
 *     PURPOSE. See the GNU General Public License for more details.
 *
 *     You should have received a copy of the GNU General Public
-*     License along with this program; if not, write to the Free
+*     License along/home/jbalfour with this program; if not, write to the Free
 *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 *     MA 02111-1307, USA
 
@@ -276,7 +278,8 @@ int *status          /* global status (given and returned) */
 void gsdac_getWCS
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
-const int nSteps,    /* number of steps in the observation (given) */
+const unsigned int stepNum,    /* time step of this spectrum (given) */
+const int subsysNum, /* subsystem number (given) */
 gsdWCS *wcs,         /* pointing and time values (given and returned) */
 int *status          /* global status (given and returned) */
 );
@@ -301,7 +304,6 @@ void gsdac_putJCMTStateC
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 const dasFlag dasFlag,  /* DAS file structure flag (given) */
-const gsdWCS *wcs,      /* pointing and time values (given) */
 const unsigned int stepNum,    /* time step of this spectrum (given) */
 const char *backend,      /* name of the backend (given) */
 struct JCMTState *record, /* JCMTState headers (given and returned ) */
@@ -313,7 +315,8 @@ void gsdac_putJCMTStateS
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 const dasFlag dasFlag,  /* DAS file structure flag (given) */
 const unsigned int stepNum,    /* time step of this spectrum (given) */
-const unsigned int subsysNum, /* subsystem number (given) */
+const int subsysNum, /* subsystem number (given) */
+const gsdWCS *wcs,      /* pointing and time values (given) */
 struct JCMTState *record, /* JCMTState headers (given and returned ) */
 int *status          /* pointer to global status (given and returned) */
 );
@@ -324,7 +327,7 @@ const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 const dasFlag dasFlag,  /* DAS file structure flag (given) */
 const unsigned int nSteps,    /* number of time steps (given) */
 const unsigned int stepNum,   /* time step of this spectrum (given) */
-const unsigned int subsysNum, /* subsystem number (given) */
+const int subsysNum, /* subsystem number (given) */
 const JCMTState *record,      /* JCMTState headers (given) */
 struct ACSISSpecHdr *specHdr, /* ACSIS Spec Headers (given and returned ) */
 int *status          /* pointer to global status (given and returned) */ 
@@ -335,7 +338,7 @@ void gsdac_wrtData
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 const dasFlag dasFlag,  /* DAS file structure flag (given) */
 const char *directory,     /* output write directory (given) */
-const int nSteps,    /* number of steps in the observation (given) */
+const unsigned int nSteps, /* number of steps in the observation (given) */
 int *status          /* pointer to global status (given and returned) */
 );
 

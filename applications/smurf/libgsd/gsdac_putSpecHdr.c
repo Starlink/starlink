@@ -17,7 +17,7 @@
 *                        const dasFlag dasFlag,
 *                        const int nSteps,
 *                        const unsigned int stepNum,
-*                        const unsigned int subsysNum,
+*                        const int subsysNum,
 *                        const JCMTState *record,
 *                        struct ACSISSpecHdr *specHdr, int *status );
 
@@ -30,7 +30,7 @@
 *        Number of steps in the observation
 *     stepNum = const unsigned int (Given)
 *        Time step of this spectrum
-*     subsysNum = const unsigned int (Given)
+*     subsysNum = const int (Given)
 *        Subsystem number
 *     record = const JCMTState* (Given)
 *        JCMTState headers
@@ -100,7 +100,7 @@ void gsdac_putSpecHdr ( const gsdVars *gsdVars,
                         const dasFlag dasFlag,
                         const unsigned int nSteps,
                         const unsigned int stepNum,
-                        const unsigned int subsysNum,
+                        const int subsysNum,
                         const JCMTState *record,
                         struct ACSISSpecHdr *specHdr, int *status )
 {
