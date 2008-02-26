@@ -63,10 +63,6 @@ use File::Basename;
 # Global variable definitions
 # Global variables
 
-# $RELAY is the filehandle to the pipe communicating with the relay
-# $RELAY_NAME is the name of the relay in the messaging system
-# $RELAY_PATH is the path to the relay via the messagin system
-# $RELAY_MESSID is the message id of the relay in the AMS
 # %PIDS is a hash containing the process ids of each monolith
 #     eg   $PIDS{KAPPA} is the PID of the kappa monolith
 # %TASKS is a hash containing subroutine references to the task commands
@@ -77,11 +73,9 @@ use File::Basename;
 
 
 use vars qw/$ADAM_STATUS $PARAMREP_SUB $msg_hide $err_hide
-  $ERRHAND $MSGHAND $TIMEOUT $RELAY $RELAY_NAME $RELAY_PATH 
-  $RELAY_MESSID %PIDS %TASKS $adam_started /;
+  $ERRHAND $MSGHAND $TIMEOUT
+  %PIDS %TASKS $adam_started /;
 
-
-$RELAY_NAME = undef;
 
 $msg_hide = 0;
 $err_hide = 0;
@@ -126,10 +120,8 @@ $VERSION = '1.01';
 Initialises the ADAM messaging system. This routine should always be
 called before attempting to control I-tasks.
 
-A relay task is spawned in order to test that the messaging system
-is functioning correctly. The relay itself is not necessary for the
-non-event loop implementation. If this command hangs then it is
-likely that the messaging system is not running correctly (eg
+A test ADAM connection is not tested.  If this command hangs then it
+is likely that the messaging system is not running correctly (eg
 because the system was shutdown uncleanly - try removing named pipes
 from the ~/adam directory).
 
@@ -141,14 +133,7 @@ sub adamtask_init {
 
   my ($taskname);
 
-  # See if we have a RELAY running already
-  if (defined $RELAY_NAME && $RELAY_NAME =~ /./) { 
-    if (adam_path($RELAY_NAME) == 1) {
-      print $MSGHAND "Relay task is already running\n" unless $msg_hide;
-      return &Starlink::ADAM::SAI__OK;
-    }
-  }
-
+  # See if we have already been called
   return &Starlink::ADAM::SAI__OK if $adam_started;
 
   # Set the task name
@@ -163,53 +148,6 @@ sub adamtask_init {
   # need this to protect against exit
 
   $adam_started = 1;
-
-  # Start the relay process
-  # Hardwire the location
-
-#  my $relay_dir = "/local/lib/perl5/site_perl/Starlink/";
-  my $relay = "MessageRelay.pl";
-
-  # Create pipe
-  # Relay should be executable and in the users path.
-  $RELAY = new IO::Pipe;
-  eval {
-    $RELAY->reader("$relay $taskname");
-  };
-  if ($@) {
-    croak "Error starting ADAM relay '$relay': $@";
-  }
-  $RELAY->autoflush;
-
-  # Wait for a message from the RELAY
-#  print "Waiting for relay...(from $RELAY)\n";
-
-  my @reply = adam_receive;
-  # Status is the 7 member
-  $ADAM_STATUS = $reply[7];
-  return $ADAM_STATUS if ($ADAM_STATUS != &Starlink::ADAM::SAI__OK);
-
-#  print join("::",@reply),"\n";
-
-  # Store the path to the relay
-
-  $RELAY_NAME = $reply[1];
-  $RELAY_PATH = $reply[3];
-  $RELAY_MESSID = $reply[4];
-
-  # print "RELAY NAME is $RELAY_NAME and $reply[1]\n";
-
-  # Reply to the obey
-#  print "Replying to OBEY\n";
-  $ADAM_STATUS = 
-    adam_reply($RELAY_PATH, $RELAY_MESSID, "ACTSTART", $reply[1], "");
-  return $ADAM_STATUS if ($ADAM_STATUS != &Starlink::ADAM::SAI__OK);
-
-  # Need to setup an exit handler 
-
-
-  # Print some info
-#  print "Name path messid : $RELAY_NAME $RELAY_PATH $RELAY_MESSID\n";
 
   return $ADAM_STATUS;
   
@@ -467,20 +405,7 @@ sub adamtask {
 
 sub adamtask_send {
 
-  my $command = shift;
-
-  adam_reply($RELAY_PATH, $RELAY_MESSID, "SYNC", "", $command);
-
-  my @reply = adam_getreply(10000, $RELAY_PATH, $RELAY_MESSID);
-
-  $ADAM_STATUS = $reply[5];
-
-  # Status is stored in [7]
-  if ($reply[7] == &Starlink::ADAM::SAI__OK) {
-    return $reply[6];
-  } else {
-    croak "adamtask_send: Error in message relay: $reply[6]\n";
-  }
+  croak "adamtask_send is not currently supported\n";
 
 }
 
@@ -887,19 +812,6 @@ at the top of your program.
 sub adamtask_exit {
 
   my ($pid, $task);
-
-  # Ask the relay to kill itself
-#  print "Ask the relay to kill itself\n";
-  $ADAM_STATUS = adam_reply($RELAY_PATH, $RELAY_MESSID, "SYNC", "", "adam_exit; exit") 
-    if defined $RELAY_PATH;
-
- carp "Error shutting down message relay" 
-    if ($ADAM_STATUS != &Starlink::ADAM::SAI__OK);
-
-#  print "Killing the pipe\n";
-
-  # Remove the pipe
-  undef $RELAY;
 
 #  print "Exit ams\n";
   # Exit AMS
