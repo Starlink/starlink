@@ -33,6 +33,10 @@
     instance), this problem is now reported avoiding an uninformative
     error message.
 
+    When capturing an animation to a GIF the main window must be clear
+    of all overlapping windows. This requirement is now reported as
+    a warning rather than a generic "too many colors" error messages.
+
   Humu Release
   ============
 

@@ -377,7 +377,16 @@ itcl::class gaia::GaiaCubeAnimation {
          $itk_option(-gaiacube) set_display_plane $plane_ 0
 
          if { $loop_ == "capture" } {
-            capture_
+            if { ! [capture_] } {
+               #  Didn't work, probably obscured. Tidy up and stop.
+               set nfrm [llength $capframes_]
+               for { set i 0 } { $i < $nfrm } { incr i } {
+                  ::file delete -force [lindex $capframes_ $i]
+               }
+               set capframes_ {}
+               stop
+               return
+            }
          }
          if { $plane_ == $itk_option(-lower_limit) } {
             #  At lower edge, running backwards, need to let it step below.
@@ -392,6 +401,7 @@ itcl::class gaia::GaiaCubeAnimation {
          if { $itk_option(-lower_limit) == $itk_option(-upper_limit) ||
               $loop_ == "capture" } {
             stop
+            return
          } else {
             #  Force temporary halt as visual clue that end has arrived.
             update idletasks
@@ -415,6 +425,7 @@ itcl::class gaia::GaiaCubeAnimation {
                increment_
             } else {
                stop
+               return
             }
          }
       }
@@ -429,8 +440,18 @@ itcl::class gaia::GaiaCubeAnimation {
       set gif [gaia::GaiaTempName::make_name \
                   "GaiaTempAnimation" $capcount_ ".gif"]
       lappend capframes_ $gif
-      $image write $gif -format gif
+
+      #  This can fail if the window is obscured. Trap and complain.
+      if { [catch {$image write $gif -format gif} msg ] } {
+         if { $msg == "too many colors" } {
+            info_dialog "The image display window must not be obscured, 
+move any overlapping windows and try again"
+            ::image delete $image
+            return 0
+         }
+      }
       ::image delete $image
+      return 1
    }
 
    #  Create an animated GIF from the captured frames.
