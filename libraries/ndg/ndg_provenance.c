@@ -776,7 +776,7 @@ void ndgCtprv( int indf, int *nanc, int *status ){
    prov = ndg1ReadProvenanceExtension( indf, NULL, NULL, 0, status );
 
 /* Return the size of the ancestors array. */
-   *nanc = prov->nprov;
+   *nanc = prov->nprov - 1;
 
 /* Free resources. */
    ndg1FreeProvenance( prov, 1, status );
