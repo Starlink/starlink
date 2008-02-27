@@ -683,7 +683,7 @@ itcl::class gaia::GaiaContour {
          #  Now add the range of styles to it.
          for {set j 0} {$j <= 3} {incr j} {
             $itk_component(style$i) add \
-               -label $j \
+               -bitmap style$j \
                -value $j \
                -command [code $this set_style_ $i]
          }

@@ -11,34 +11,42 @@
 #include <tcl.h>
 #include <tk.h>
 
-
 void defineGaiaBitmaps(Tcl_Interp *interp) {
-    #include "annular_circle.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("annular_circle"), (char*)annular_circle_bits, annular_circle_width, annular_circle_height);
-
-    #include "annular_ellipse.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("annular_ellipse"), (char*)annular_ellipse_bits, annular_ellipse_width, annular_ellipse_height);
-
-    #include "column.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("column"), (char*)column_bits, column_width, column_height);
-
     #include "cross.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("cross"), (char*)cross_bits, cross_width, cross_height);
 
     #include "diamond.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("diamond"), (char*)diamond_bits, diamond_width, diamond_height);
 
-    #include "dot.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("dot"), (char*)dot_bits, dot_width, dot_height);
+    #include "rectangle.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("rectangle"), (char*)rectangle_bits, rectangle_width, rectangle_height);
 
-    #include "ellipse.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("ellipse"), (char*)ellipse_bits, ellipse_width, ellipse_height);
+    #include "gaiaplus.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("gaiaplus"), (char*)gaiaplus_bits, gaiaplus_width, gaiaplus_height);
+
+    #include "row.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("row"), (char*)row_bits, row_width, row_height);
 
     #include "finger.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("finger"), (char*)finger_bits, finger_width, finger_height);
 
-    #include "gaiaplus.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("gaiaplus"), (char*)gaiaplus_bits, gaiaplus_width, gaiaplus_height);
+    #include "symb_rotbox.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("symb_rotbox"), (char*)symb_rotbox_bits, symb_rotbox_width, symb_rotbox_height);
+
+    #include "style0.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("style0"), (char*)style0_bits, style0_width, style0_height);
+
+    #include "pointpoly.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("pointpoly"), (char*)pointpoly_bits, pointpoly_width, pointpoly_height);
+
+    #include "yrange.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("yrange"), (char*)yrange_bits, yrange_width, yrange_height);
+
+    #include "column.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("column"), (char*)column_bits, column_width, column_height);
+
+    #include "annular_circle.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("annular_circle"), (char*)annular_circle_bits, annular_circle_width, annular_circle_height);
 
     #include "line.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("line"), (char*)line_bits, line_width, line_height);
@@ -46,31 +54,37 @@ void defineGaiaBitmaps(Tcl_Interp *interp) {
     #include "pixel.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("pixel"), (char*)pixel_bits, pixel_width, pixel_height);
 
-    #include "pointpoly.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("pointpoly"), (char*)pointpoly_bits, pointpoly_width, pointpoly_height);
+    #include "annular_ellipse.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("annular_ellipse"), (char*)annular_ellipse_bits, annular_ellipse_width, annular_ellipse_height);
 
-    #include "poly.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("poly"), (char*)poly_bits, poly_width, poly_height);
-
-    #include "rectangle.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("rectangle"), (char*)rectangle_bits, rectangle_width, rectangle_height);
-
-    #include "rotbox.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("rotbox"), (char*)rotbox_bits, rotbox_width, rotbox_height);
-
-    #include "row.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("row"), (char*)row_bits, row_width, row_height);
-
-    #include "symb_rotbox.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("symb_rotbox"), (char*)symb_rotbox_bits, symb_rotbox_width, symb_rotbox_height);
+    #include "ellipse.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("ellipse"), (char*)ellipse_bits, ellipse_width, ellipse_height);
 
     #include "triangle.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("triangle"), (char*)triangle_bits, triangle_width, triangle_height);
 
+    #include "rotbox.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("rotbox"), (char*)rotbox_bits, rotbox_width, rotbox_height);
+
+    #include "poly.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("poly"), (char*)poly_bits, poly_width, poly_height);
+
+    #include "dot.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("dot"), (char*)dot_bits, dot_width, dot_height);
+
     #include "xrange.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("xrange"), (char*)xrange_bits, xrange_width, xrange_height);
 
-    #include "yrange.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("yrange"), (char*)yrange_bits, yrange_width, yrange_height);
+    #include "style2.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("style2"), (char*)style2_bits, style2_width, style2_height);
+
+    #include "style3.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("style3"), (char*)style3_bits, style3_width, style3_height);
+
+    #include "width1.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("width1"), (char*)width1_bits, width1_width, width1_height);
+
+    #include "style1.xbm"
+    Tk_DefineBitmap(interp, Tk_GetUid("style1"), (char*)style1_bits, style1_width, style1_height);
 
 }
