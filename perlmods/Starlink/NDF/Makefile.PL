@@ -26,7 +26,7 @@ $install = $StarConfig{Star_Bin};
 
 # This is the list of libraries required to use NDFs
 # $ndflibs = -lndf -lpsx -lary -lhds -lcnf -lerr -lerr_standalone -lems -lchr -lprm -lprm_a 
-$ndflibs = qx/ndf_link/;
+$ndflibs = qx/ndg_link/;
 $cnfrtllibs = qx/cnfrtl_link/;
 $ndflibs .= qx/ one_link/;
 

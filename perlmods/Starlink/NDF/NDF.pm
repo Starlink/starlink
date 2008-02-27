@@ -102,13 +102,16 @@ $VERSION = '1.46';
 			cmp_shape cmp_size cmp_struc cmp_type cmp_unmap
 			/],
 
+    'ndg'=>[qw/ ndg_ctprv ndg_gtprv ndg_mdprv
+                /],
+
 		'misc'=>[qw/mem2string string2mem array2mem mem2array
 			 par_get fits_read_header
 			 fits_get_nth_item fits_get_item fits_extract_key_val
 			 fits_construct_string/]
 	       );
 
-Exporter::export_tags('ndf','ary','msg','err','hds','dat','cmp','misc');
+Exporter::export_tags('ndf','ary','msg','err','hds','dat','cmp','ndg','misc');
 
 # Autoload constants when required
 

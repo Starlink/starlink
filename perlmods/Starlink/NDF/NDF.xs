@@ -30,6 +30,9 @@ extern "C" {
 /* For AST object creation */
 #include "ast.h"
 
+/* For NDG provenance - but we do not use C interface*/
+#include "star/ndg.h"
+
 /* I use a string handling routine (strdup) so read in prototype */
 #include <string.h>
 
@@ -4750,6 +4753,51 @@ errTune(param, value, status)
  PROTOTYPE: $$$
  CODE:
   errTune(param, value, &status);
+ OUTPUT:
+  status
+
+############## NDG PROVENANCE ROUTINES ###########################
+
+# Note that these use the C interface for consitency with the
+# other NDF + HDS interface routines
+
+void
+ndg_ctprv( indf, nanc, status )
+  ndfint &indf
+  ndfint &nanc = NO_INIT
+  ndfint &status
+ PROTOTYPE: $$$
+ CODE:
+   ndg_ctprv_(&indf, &nanc, &status);
+ OUTPUT:
+   nanc
+   status
+
+void
+ndg_gtprv( indf, ianc, prov, status )
+  ndfint &indf
+  ndfint &ianc
+  locator * prov = NO_INIT
+  ndfint &status
+ PROTOTYPE: $$$$
+ PREINIT:
+  locator floc[DAT__SZLOC];
+ CODE:
+  prov = floc;
+  ndg_gtprv_(&indf, &ianc, prov, &status, DAT__SZLOC );
+ OUTPUT:
+  prov
+  status
+
+void
+ndg_mdprv( indf, ianc, prov, status )
+  ndfint &indf
+  ndfint &ianc
+  locator * prov
+  ndfint &status
+ PROTOTYPE: $$$$
+ CODE:
+  ndg_mdprv_(&indf, &ianc, prov, &status, DAT__SZLOC );
  OUTPUT:
   status
 
