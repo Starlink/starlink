@@ -3,6 +3,7 @@
 
     NDF.xs v1.45
 
+       Copyright (C) 2008 Science and Technology Facilities Council.
        Copyright (C) 1996-2003 Tim Jenness, Frossie Economou and the UK
                                Particle Physics and Astronomy Research
                                Council. All Rights Reserved.
@@ -55,11 +56,11 @@ extern "C" {
 
 
 /* Include BAD values */
-#include "img.h"
+#include "prm_par.h"
 
-/* If img.h is not available in /star/include it may be possible
+/* If prm_par.h is not available in /star/include it may be possible
  * to circumvent the problem by using the following instead:
- * (copied directly from img.h)
+ * (copied directly from prm_par.h)
  *
  * #include <float.h>
  * #include <limits.h>
@@ -404,7 +405,7 @@ DAT__NOLOC()
 ndffloat
 VAL__BADF()
  CODE:
-  RETVAL = VAL__BADF;
+  RETVAL = VAL__BADR;
  ALIAS:
   NDF::VAL__BADR = 2
  OUTPUT:
@@ -427,7 +428,7 @@ VAL__BADI()
 short
 VAL__BADS()
  CODE:
-  RETVAL = VAL__BADS;
+  RETVAL = VAL__BADW;
  ALIAS:
   NDF::VAL__BADW = 2
  OUTPUT:
@@ -436,7 +437,7 @@ VAL__BADS()
 unsigned short
 VAL__BADUS()
  CODE:
-  RETVAL = VAL__BADUS;
+  RETVAL = VAL__BADUW;
  ALIAS:
   NDF::VAL__BADUW = 2
  OUTPUT:
