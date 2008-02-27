@@ -387,9 +387,9 @@ static int CreateLine( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
         bothUid = Tk_GetUid("both");
     }
     linePtr->arrow = noneUid;
-    linePtr->arrowShapeA = (float)8.0;
-    linePtr->arrowShapeB = (float)10.0;
-    linePtr->arrowShapeC = (float)3.0;
+    linePtr->arrowShapeA = 8.0f;
+    linePtr->arrowShapeB = 10.0f;
+    linePtr->arrowShapeC = 3.0f;
     linePtr->firstArrowPtr = NULL;
     linePtr->lastArrowPtr = NULL;
     linePtr->smooth = 0;
