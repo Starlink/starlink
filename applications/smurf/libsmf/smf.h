@@ -237,7 +237,10 @@
 *     2008-02-13 (AGG):
 *        - smf_rebinmap: add parameters for pixel spreading scheme
 *        - smf_get_spread: new routine to get parameters for chosen
-           pixel-spreading scheme
+*          pixel-spreading scheme
+*     2008-02-26 (AGG):
+*        Add rel parameter to smf_subtract_poly to get subtraction
+*        relative to first time slice
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -253,13 +256,13 @@
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
 *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 *     PURPOSE. See the GNU General Public License for more details.
 *
 *     You should have received a copy of the GNU General Public
 *     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place,Suite 330, Boston,
+*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 *     MA 02111-1307, USA
 
 *  Bugs:
@@ -574,7 +577,7 @@ void smf_subtract_plane1( smfData *data, const char *fittype, int *status);
 
 void smf_subtract_plane2( smfArray *array, const char *fittype, int *status);
 
-void smf_subtract_poly( smfData *data, int *status );
+void smf_subtract_poly( smfData *data, int rel, int *status );
 
 void smf_telpos_get( const smfHead * hdr, int * status );
 

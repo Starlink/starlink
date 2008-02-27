@@ -13,11 +13,14 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_subtract_poly( smfData **data, int *status ) 
+*     smf_subtract_poly( smfData **data, int rel, int *status ) 
 
 *  Arguments:
 *     data = smfData** (Given and Returned)
 *        Pointer to input data struct
+*     rel = int (Given)
+*        Integer flag to denote whether the polynomial is subtracted
+*        relative to the first value (as for 1/f drifts)
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -28,6 +31,10 @@
 *     polynomial coefficients are retrieved from the input
 *     smfData. The routine returns immediately if there is no
 *     polynomial extension.
+*
+*     The parameter rel is used to specify whether the polynomial is
+*     evaluated relative to the value for the first frame as would be
+*     desired for subtracting drifts in the absolute bolometer level.
 
 *  Notes:
 *     - It is assumed that the polynomial is a function of the
@@ -46,6 +53,9 @@
 *        Minor comment/documentation changes, use size_t
 *     2008-02-20 (AGG):
 *        Swap loop order to gain speed increase
+*     2008-02-26 (AGG):
+*        Add rel parameter to denote whether to subtract changes
+*        relative to first time slice
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -91,20 +101,21 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_subtract_poly"
 
-void smf_subtract_poly(smfData *data, int *status) {
+void smf_subtract_poly(smfData *data, int rel, int *status) {
 
   /* Local variables */
   double baseline = 0.0;      /* Baseline level to be subtracted */
+  double *firstframe = NULL;  /* Pointer to array containing first frame data */
   size_t i;                   /* Bolometer index loop counter */
   size_t j;                   /* Timeslice index loop counter */
+  double jay;                 /* Double-precision version of j */
   size_t k;                   /* Coefficient index loop counter */
   size_t nbol;                /* Number of bolometers */
   size_t ncoeff = 0;          /* Number of polynomial coefficients */
   size_t nframes;             /* Number of time slices */
   double *outdata = NULL;     /* Pointer to output data array */
   double *poly = NULL;        /* Pointer to polynomial coefficents */
-  double jay;                 /* Double-precision version of j */
-
+  size_t start = 0;           /* Starting index: 0 if rel is 0 */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -128,12 +139,30 @@ void smf_subtract_poly(smfData *data, int *status) {
   /* Calculate the number of bolometers and retrieve number of coefficients */
   nbol = (data->dims)[0] * (data->dims)[1];
   nframes = (data->dims)[2];
-  
+
+  /* Allocate memory for first frame of data */
+  firstframe = smf_malloc( nbol, sizeof(double), 1, status );
+  if ( firstframe == NULL ) {
+    *status = SAI__ERROR;
+    goto CLEANUP;
+  }
+
+  /* Store the data for the first frame if the offset is to be
+     subtracted */
+  if ( rel == 1 ) {
+    for (i=0; i<nbol; i++) {
+      firstframe[i] = outdata[i];
+    }
+    start = 1;
+  } else {
+    start = 0;
+  }
+
   /* Loop over the timeslices for this bolometer */
-  for (j=0; j<nframes; j++) {
+  for (j=start; j<nframes; j++) {
     jay = (double)j; /* Cast outside the loop over bolometers */
 
-  /* Loop over the number of bolometers */
+    /* Loop over the number of bolometers */
     for (i=0; i<nbol; i++) {
       /* Construct the polynomial for this bolometer - the first two
 	 terms are trivial and are determined manually. This is
@@ -148,6 +177,10 @@ void smf_subtract_poly(smfData *data, int *status) {
 	  baseline += poly[i + nbol*k] * pow(jay, (double)k);
 	}
       }
+      if (rel == 1) {
+	/* Subtract offset from first value for this bolometer */
+	baseline -= firstframe[i];
+      }
       outdata[i + nbol*j] -= baseline;
     }
 
@@ -155,6 +188,8 @@ void smf_subtract_poly(smfData *data, int *status) {
   /* Store polynomial-subtracted data */
   (data->pntr)[0] = outdata;
 
+ CLEANUP:
+  smf_free( firstframe, status );
   /* Write history entry */
   if ( *status == SAI__OK ) {
     smf_history_add( data, FUNC_NAME, 
