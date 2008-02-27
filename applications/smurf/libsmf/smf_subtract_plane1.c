@@ -88,6 +88,8 @@
 *        Only do the output messsages if message filter is suitable.
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-02-26 (AGG):
+*        Count number of good data points for determining mean
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -161,6 +163,7 @@ void smf_subtract_plane1( smfData *data, const char *fittype, int *status ) {
 
   size_t nframes = 0;       /* Number of frames */
   size_t npts;              /* Number of data points */
+  size_t numgood;           /* Number of pixels with non-BAD values */
   size_t base;              /* Starting point for index into arrays */
   int z;                    /* Counter */
   double sky;               /* Sky power to be subtracted */
@@ -367,13 +370,15 @@ void smf_subtract_plane1( smfData *data, const char *fittype, int *status ) {
     if ( fitmean ) {
       /* Calculate average of all pixels in current timeslice */
       sky0 = 0;
+      numgood = 0;
       for (i=0; i < npts; i++ ) {
 	index = indices[i] + base;
 	if (indata[index] != VAL__BADD) {
 	  sky0 += indata[index];
+	  numgood++;
 	}
       }
-      sky0 /= npts;
+      sky0 /= (double)numgood;
       dskyaz = 0.0;
       dskyel = 0.0;
     } else {
