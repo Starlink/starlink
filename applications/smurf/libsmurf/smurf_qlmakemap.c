@@ -245,7 +245,7 @@ void smurf_qlmakemap( int *status ) {
   int outsize;               /* Number of files in output group */
   char pabuf[ 10 ];          /* Text buffer for parameter value */
   double params[ 4 ];        /* astRebinSeq parameters */
-  float pixsize = 3.0;       /* Size of an output map pixel in arcsec */
+  double pixsize = 3.0;      /* Size of an output map pixel in arcsec */
   AstKeyMap * prvkeymap = NULL; /* Keymap of input files for PRVxxx headers */
   int size;                  /* Number of files in input group */
   int smfflags = 0;          /* Flags for creating a new smfData */
@@ -274,7 +274,7 @@ void smurf_qlmakemap( int *status ) {
 	    "GAPPT,FK4,FK4-NO-E,ECLIPTIC", 1, system, 10, status );
 
   /* Get the user defined pixel size */
-  parGet0r( "PIXSIZE", &pixsize, status );
+  parGet0d( "PIXSIZE", &pixsize, status );
   if ( pixsize <= 0 || pixsize > 60. ) {
     msgSetd( "PIXSIZE", pixsize );
     *status = SAI__ERROR;
@@ -366,10 +366,10 @@ void smurf_qlmakemap( int *status ) {
     smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
 
     /* Remove bolometer drifts if a fit is present */
-    smf_subtract_poly( data, status );
+    smf_subtract_poly( data, 1, status );
 
-    /* Remove a mean sky level */
-    smf_subtract_plane( data, NULL, "MEAN", status );
+    /* Remove a mean sky level - call low-level 1-D routine */
+    smf_subtract_plane1( data, "MEAN", status );
 
     /* Correct for atmospheric extinction using the mean WVM-derived
        225-GHz optical depth */
