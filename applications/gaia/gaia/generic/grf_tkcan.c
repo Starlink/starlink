@@ -622,7 +622,7 @@ int astGLine( int n, const float *x, const float *y ) {
  *- */
 
     /* Local variables. */
-    char coords[] = "0.0 0.0 0.0 0.0";  /*  Dummy coords for creation command */
+    static char coords[] = "0.0 0.0 0.0 0.0";  /*  Dummy coords for creation command */
     char buffer[CMDLEN];
     double *xlines;
     double *ylines;
@@ -661,9 +661,9 @@ int astGLine( int n, const float *x, const float *y ) {
                 
                 /*  Configure the command by adding the canvas name and all the
                     required options. */
-                (void) sprintf( buffer, " -fill %s -width %f -tag {%s} \n",
+                (void) sprintf( buffer, " -fill %s -width %f -tag {%s} -style %d\n",
                                 Colours[ConfigInfo.colour], ConfigInfo.width,
-                                ConfigInfo.tag );
+                                ConfigInfo.tag, (int) ConfigInfo.style );
                 if ( Tcl_VarEval( Interp, Canvas, " create rtd_segment ", 
                                   coords, buffer, (char *) NULL ) != TCL_OK ) {
                     
