@@ -56,6 +56,8 @@
 *     2008-02-26 (AGG):
 *        Add rel parameter to denote whether to subtract changes
 *        relative to first time slice
+*     2008-02-27 (AGG):
+*        Don't subtract from bad values
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -115,7 +117,6 @@ void smf_subtract_poly(smfData *data, int rel, int *status) {
   size_t nframes;             /* Number of time slices */
   double *outdata = NULL;     /* Pointer to output data array */
   double *poly = NULL;        /* Pointer to polynomial coefficents */
-  size_t start = 0;           /* Starting index: 0 if rel is 0 */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -153,13 +154,10 @@ void smf_subtract_poly(smfData *data, int rel, int *status) {
     for (i=0; i<nbol; i++) {
       firstframe[i] = poly[i];
     }
-    start = 1;
-  } else {
-    start = 0;
   }
 
   /* Loop over the timeslices for this bolometer */
-  for (j=start; j<nframes; j++) {
+  for (j=0; j<nframes; j++) {
     jay = (double)j; /* Cast outside the loop over bolometers */
 
     /* Loop over the number of bolometers */
@@ -167,17 +165,19 @@ void smf_subtract_poly(smfData *data, int rel, int *status) {
       /* Construct the polynomial for this bolometer - the first two
 	 terms are trivial and are determined manually. This is
 	 quicker than calling pow() unnecessarily. */
-      baseline = -firstframe[i];
-      for (k=0; k<ncoeff; k++) {
-	if ( k==0 ) {
-	  baseline += poly[i];
-	} else if ( k==1 ) {
-	  baseline +=  jay*poly[i+nbol];
-	} else {
-	  baseline += poly[i + nbol*k] * pow(jay, (double)k);
+      if ( outdata[i + nbol*j] != VAL__BADD ) {
+	baseline = -firstframe[i];
+	for (k=0; k<ncoeff; k++) {
+	  if ( k==0 ) {
+	    baseline += poly[i];
+	  } else if ( k==1 ) {
+	    baseline +=  jay*poly[i+nbol];
+	  } else {
+	    baseline += poly[i + nbol*k] * pow(jay, (double)k);
+	  }
 	}
+	outdata[i + nbol*j] -= baseline;
       }
-      outdata[i + nbol*j] -= baseline;
     }
 
   }
