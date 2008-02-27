@@ -140,18 +140,18 @@ void smf_subtract_poly(smfData *data, int rel, int *status) {
   nbol = (data->dims)[0] * (data->dims)[1];
   nframes = (data->dims)[2];
 
-  /* Allocate memory for first frame of data */
+  /* Allocate memory for one frame of data, initialize to zero */
   firstframe = smf_malloc( nbol, sizeof(double), 1, status );
   if ( firstframe == NULL ) {
     *status = SAI__ERROR;
     goto CLEANUP;
   }
 
-  /* Store the data for the first frame if the offset is to be
+  /* Store the fitted value for the first frame if the offset is to be
      subtracted */
   if ( rel == 1 ) {
     for (i=0; i<nbol; i++) {
-      firstframe[i] = outdata[i];
+      firstframe[i] = poly[i];
     }
     start = 1;
   } else {
@@ -167,7 +167,7 @@ void smf_subtract_poly(smfData *data, int rel, int *status) {
       /* Construct the polynomial for this bolometer - the first two
 	 terms are trivial and are determined manually. This is
 	 quicker than calling pow() unnecessarily. */
-      baseline = 0.0;
+      baseline = -firstframe[i];
       for (k=0; k<ncoeff; k++) {
 	if ( k==0 ) {
 	  baseline += poly[i];
@@ -176,10 +176,6 @@ void smf_subtract_poly(smfData *data, int rel, int *status) {
 	} else {
 	  baseline += poly[i + nbol*k] * pow(jay, (double)k);
 	}
-      }
-      if (rel == 1) {
-	/* Subtract offset from first value for this bolometer */
-	baseline -= firstframe[i];
       }
       outdata[i + nbol*j] -= baseline;
     }
