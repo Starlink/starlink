@@ -99,6 +99,7 @@
 #        add_spacing_selections_ parent
 #        add_position_selections_ parent
 #        add_scaling_selections_ parent
+#        add_style_selections_ parent
 #        add_element_selections_ parent
 #        add_colour_selections_ parent
 #        add_font_selections_ parent
@@ -111,6 +112,7 @@
 #        reset_spacing_
 #        reset_position_
 #        reset_scaling_
+#        reset_style_
 #        reset_element_
 #        reset_colour_
 #        reset_font_
@@ -305,23 +307,29 @@ itcl::class gaia::GaiaAstGrid {
       set pages_(5) scaling
       set revealed_(5) 0
 
+      #  Add a page for the line style options.
+      $itk_component(TabNoteBook) add -label Style \
+                  -command [code $this reveal_ 6]
+      set pages_(6) style
+      set revealed_(6) 0
+
       #  Add a page for the position options.
       $itk_component(TabNoteBook) add -label Position \
-         -command [code $this reveal_ 6]
-      set pages_(6) position
-      set revealed_(6) 0
+         -command [code $this reveal_ 7]
+      set pages_(7) position
+      set revealed_(7) 0
 
       #  Add a page for the font options.
       $itk_component(TabNoteBook) add -label Fonts \
-         -command [code $this reveal_ 7]
-      set pages_(7) font
-      set revealed_(7) 0
+         -command [code $this reveal_ 8]
+      set pages_(8) font
+      set revealed_(8) 0
 
       #  Add a page for setting the formats of the axes numbers.
       $itk_component(TabNoteBook) add -label Format \
-         -command [code $this reveal_ 8]
-      set pages_(8) format
-      set revealed_(8) 0
+         -command [code $this reveal_ 9]
+      set pages_(9) format
+      set revealed_(9) 0
 
       #  Create the button bar
       itk_component add actionframe {frame $w_.action}
@@ -447,7 +455,7 @@ itcl::class gaia::GaiaAstGrid {
          }
       } else {
          #  Reveal all pages.
-         for {set i 0} {$i < 9} {incr i} {
+         for {set i 0} {$i < 10} {incr i} {
             if { !$revealed_($i) } {
                set revealed_($i) 1
                set child [$itk_component(TabNoteBook) childsite $i]
@@ -540,6 +548,11 @@ itcl::class gaia::GaiaAstGrid {
       }
       foreach {sname lname default} $lengthattrib_ {
          lappend options "$sname=[expr $size_($sname)/100.0]"
+      }
+
+      #  Line style options.
+      foreach {sname lname default} $styleattrib_ {
+         lappend options "style($sname)=[expr int($style_($sname))]"
       }
       
       #  Add the elements options.
@@ -732,6 +745,11 @@ itcl::class gaia::GaiaAstGrid {
             puts $fid "set gridsize_(\$this,xfrac) $gridsize_($this,xfrac)"
             puts $fid "set gridsize_(\$this,yfrac) $gridsize_($this,xfrac)"
 
+            #  Add style options.
+            foreach {sname lname default} $styleattrib_ {
+               puts $fid "set style_($sname) $style_($sname)"
+            }
+
             #  Add the elements options.
             foreach {sname lname default} $elementattrib_ {
                puts $fid "set element_(\$this,$sname) $element_($this,$sname)"
@@ -816,6 +834,11 @@ itcl::class gaia::GaiaAstGrid {
             $itk_component(Xfrac) configure -value $gridsize_($this,xfrac)
             $itk_component(Yfrac) configure -value $gridsize_($this,yfrac)
             set_whole_
+
+            #  Style options.
+            foreach {sname lname default} $styleattrib_ {
+               $itk_component(Style$sname) configure -value $style_($sname)
+            }
 
             #  Colour options.
             foreach {sname lname default} $colourattrib_ {
@@ -1072,10 +1095,10 @@ itcl::class gaia::GaiaAstGrid {
    protected method add_scaling_selections_ {parent} {
 
       #  Size of various text elements.
-      itk_component add scale1 {
-         LabelRule $parent.scale1 -text "$fontannounce1_"
+      itk_component add style1 {
+         LabelRule $parent.style1 -text "$fontannounce1_"
       }
-      pack $itk_component(scale1) -fill x -ipadx 1m
+      pack $itk_component(style1) -fill x -ipadx 1m
       foreach {sname lname deffont defsize} $fontattrib_ {
          set size_($sname) $defsize
          itk_component add Size$sname {
@@ -1238,6 +1261,47 @@ itcl::class gaia::GaiaAstGrid {
       set gridsize_($this,$name) $value
       redraw_
    }
+
+   #   Add a series of controls for setting the styles of line elements.
+   protected method add_style_selections_ {parent} {
+
+      #  Width of various line elements.
+      itk_component add scale1 {
+         LabelRule $parent.scale1 -text "$styleannounce_"
+      }
+      pack $itk_component(scale1) -fill x -ipadx 1m
+
+      foreach {sname lname default} $styleattrib_ {
+         set style_($sname) $default
+
+         #  Create a menu as the selection is fixed.
+         itk_component add Style$sname {
+            util::LabelMenu $parent.$sname \
+               -text "$lname:" \
+               -relief raised \
+               -labelwidth $lwidth_
+         }
+         pack $itk_component(Style$sname) -side top -fill x -ipadx 1m -ipady 1m
+
+         #  Now add the style numbers.
+         for { set i 0 } { $i < 4 } { incr i } {
+            $itk_component(Style$sname) add \
+               -command [code $this set_style_config_ $sname $i] \
+               -bitmap style$i \
+               -value $i
+         }
+         $itk_component(Style$sname) configure -value $default
+      }
+   }
+
+   #  Reset the style controls to their defaults.
+   protected method reset_style_ {} {
+      foreach {sname lname default} $styleattrib_ {
+         set style_($sname) $default
+         $itk_component(Style$sname) configure -value $default
+      }
+   }
+
 
    #  Add a series of controls to allow the choice of which elements
    #  to display as part of the plot.
@@ -1662,6 +1726,10 @@ itcl::class gaia::GaiaAstGrid {
       set width_($name) $value
       redraw_
    }
+   protected method set_style_config_ {name value} {
+      set style_($name) $value
+      redraw_
+   }
    protected method set_font_config_ {name value} {
       set font_($name) $value
       redraw_
@@ -1820,6 +1888,7 @@ itcl::class gaia::GaiaAstGrid {
    protected variable width_
    protected variable system_
    protected variable spacing_
+   protected variable style_
 
    #  Short and long names of elements that can be plotted and their
    #  defaults.
@@ -1891,6 +1960,13 @@ itcl::class gaia::GaiaAstGrid {
    protected variable fontattrib_ \
       {title {Plot Title} 6 1.0 numlab {Numbers} 4 1.0
        textlab {Axes Labels} 4 1.0}
+
+   #  Short and long names of line elements that can be changed in
+   #  style and their defaults.
+   protected variable styleannounce_ {Style:}
+   protected variable styleattrib_ \
+      {grid {Grid Lines} 0 border {Border Lines} 0 axes {Axes Lines} 0
+       ticks {Tick Marks} 0}
 
    #  Names of the fonts that we will use and their AST indices.
    #  A text string to very briefly describe the font is also set.

@@ -2,7 +2,8 @@
     Version 4.2-2
     =============
 
-    Contour lines can now be drawn in dotted and dashed styles.
+    Contour and grid overlay lines can now be drawn in dotted and 
+    dashed styles.
 
     Contour levels can now include missing values (previously 
     attempting this caused a Tcl error).

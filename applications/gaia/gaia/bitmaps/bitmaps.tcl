@@ -35,12 +35,12 @@ foreach file [glob -nocomplain *.xbm] {
     puts "    Tk_DefineBitmap(interp, Tk_GetUid(\"$name\"), (char*)${name}_bits, ${name}_width, ${name}_height);\n"
 }
 
-foreach file [glob -nocomplain *.xpm] {
-    set name [file rootname $file]
-    regsub -all -- - $name _ name
-    puts "    #include \"$file\""
-    puts "    Tix_DefinePixmap(interp, Tk_GetUid(\"$name\"), ${name}_xpm);\n"
-}
+#foreach file [glob -nocomplain *.xpm] {
+#    set name [file rootname $file]
+#    regsub -all -- - $name _ name
+#    puts "    #include \"$file\""
+#    puts "    Tix_DefinePixmap(interp, Tk_GetUid(\"$name\"), ${name}_xpm);\n"
+#}
 
 puts "}"
 
