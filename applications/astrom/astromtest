@@ -1,0 +1,3 @@
+#!/bin/sh
+./astrom input=astrom.dat report=astrom.lis
+exit

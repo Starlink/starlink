@@ -33,3 +33,8 @@ BLOCK_DATA_FILES = params.f
 PRIVATE_INCLUDES = params.inc
 
 dist_starnews_DATA = astrom.news
+
+## Simple test.
+
+TESTS = astromtest
+
