@@ -62,6 +62,7 @@ $VERSION = '1.47';
 		'err'=>[qw/err_annul err_begin err_end err_facer err_fioer
 			err_flbel err_flush err_level err_load err_mark
 			err_rep err_rlse err_stat err_syser err_tune
+      err_flush_to_string
 			/],
 			#ADAM only: err_clear err_start err_stop
 
@@ -867,6 +868,27 @@ sub fits_construct_string ($$$) {
   return $fitsent;
 }
 
+# err_flush_to_string
+
+# Retrieve all the error messages on the stack and return them
+# as an array after calling err_flush to clear status. Useful if
+# you want to throw an exception. Returns a single string in
+# list context.
+
+#  @errors = err_flush_to_string( $status );
+
+# $status will be good on exit.
+
+sub err_flush_to_string {
+  my ( $oplen, @errs );
+  do {
+    err_load( my $param, my $parlen, my $opstr, $oplen, $_[0] );
+    push @errs, $opstr;
+  } until ( $oplen == 1 );
+  err_annul($_[0]);
+  return (wantarray() ? @errs : join("\n",@errs) );
+}
+
 1;
 __END__
 # This is the documentation
@@ -917,6 +939,10 @@ This imports most of the  DAT_ functions
 =item :cmp
 
 This imports most of the CMP_ functions
+
+=item :ndg
+
+NDG provenance routines.
 
 =item :misc
 
@@ -1152,6 +1178,18 @@ the location of the parameter files can be determined.
 
 For direct access to ADAM monoliths and parameters see L<Starlink::AMS::Task>.
 
+=head2 Error messages
+
+A helper routine called C<err_flush_to_string> can be called to retrieve
+all the error messages on the stack followed with a call to err_flush to
+reset status. This is useful when you wish to throw an exception with
+the relevant message.
+
+  @errors = err_flush_to_string( $status );
+  $errstr  = err_flush_to_string( $status );
+
+$status will be cleared.
+
 =head1 Implemented routines
 
 The following routines are available from this module:
@@ -1213,11 +1251,15 @@ cmp_put0l cmp_put0r cmp_put1c cmp_put1d cmp_put1i cmp_put1r cmp_putni
 cmp_putvc cmp_putvd cmp_putvi cmp_putvr cmp_shape cmp_size cmp_struc
 cmp_type cmp_unmap
 
+=item :ndg
+
+ndg_gtprv ndg_mdprv ndg_ctprv
+
 =item :misc
 
 mem2string string2mem array2mem mem2array fits_get_nth_item
 fits_read_header fits_get_item fits_extract_key_val 
-fits_construct_string par_get
+fits_construct_string par_get err_flush_to_string
 
 
 =back
@@ -1229,7 +1271,8 @@ Module created by T. Jenness, E<lt>t.jenness@jach.hawaii.eduE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 1996-2000 Tim Jenness, Frossie Economou and the
+Copyright (C) Science and Technology Facilities Council.
+Copyright (C) 1996-2007 Tim Jenness, Frossie Economou and the
 UK Particle Physics and Astronomy Research Council.
 All Rights Reserved.
 
