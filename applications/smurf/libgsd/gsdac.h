@@ -33,7 +33,10 @@
 *        Check dasFlag.  Added getDASFlag, removed getArraySize
 *        and getElemx
 *     2008-02-26 (JB):
-*        Make gsdac_getWCS per-subsystem
+*        Make gsdac_getWCS per-subsystem, add tranDate, tranTime
+*        and velEncode
+*     2008-02-28 (JB):
+*        Replace subsysNum with subBandNum
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -213,7 +216,7 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_getDateVars
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
-const int subsysNum, /* subsystem number (given) */
+const int subBandNum, /* subband number (given) */
 const int obsNum,    /* observation number (given) */
 const char *backend, /* name of the backend (given) */
 char *dateObs,       /* datetime of obs start (given and returned) */
@@ -279,7 +282,7 @@ void gsdac_getWCS
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 const unsigned int stepNum,    /* time step of this spectrum (given) */
-const int subsysNum, /* subsystem number (given) */
+const int subBandNum, /* subband number (given) */
 const dasFlag dasFlag,  /* DAS file structure flag (given) */
 gsdWCS *wcs,         /* pointing and time values (given and returned) */
 int *status          /* global status (given and returned) */
@@ -288,7 +291,7 @@ int *status          /* global status (given and returned) */
 void gsdac_putFits
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
-const int subsysNum, /* subsystem number (given) */
+const int subBandNum, /* subband number (given) */
 const int obsNum,    /* observation number (given) */
 const int utDate,    /* UT date (given) */
 const int nSteps,    /* number of time steps in observation (given) */
@@ -315,7 +318,7 @@ void gsdac_putJCMTStateS
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 const unsigned int stepNum,    /* time step of this spectrum (given) */
-const int subsysNum, /* subsystem number (given) */
+const int subBandNum, /* subband number (given) */
 const dasFlag dasFlag,  /* DAS file structure flag (given) */
 const gsdWCS *wcs,      /* pointing and time values (given) */
 struct JCMTState *record, /* JCMTState headers (given and returned ) */
@@ -327,7 +330,7 @@ void gsdac_putSpecHdr
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 const unsigned int nSteps,    /* number of time steps (given) */
 const unsigned int stepNum,   /* time step of this spectrum (given) */
-const int subsysNum, /* subsystem number (given) */
+const int subBandNum, /* subband number (given) */
 const dasFlag dasFlag,  /* DAS file structure flag (given) */
 const JCMTState *record,      /* JCMTState headers (given) */
 struct ACSISSpecHdr *specHdr, /* ACSIS Spec Headers (given and returned ) */

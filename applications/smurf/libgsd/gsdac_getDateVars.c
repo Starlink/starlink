@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     gsdac_getDateVars ( const gsdVars *gsdVars, 
-*                         const int subsysNum, const int obsNum, 
+*                         const int subBandNum, const int obsNum, 
 *                         const char *backend, char *dateObs, char *dateEnd, 
 *                         char *obsID, char *obsIDs, char *HSTstart, 
 *                         char *HSTend, char *LSTstart, char *LSTend,
@@ -24,8 +24,8 @@
 *  Arguments:
 *     gsdVars = const gsdVars* (Given)
 *        GSD file access parameters
-*     subsysNum = const int (Given)
-*        Subsystem number
+*     subBandNum = const int (Given)
+*        Subband number
 *     obsNum = const int (Given)
 *        Observation number
 *     backend = const char* (Given)
@@ -62,6 +62,8 @@
 *        Original
 *     2008-02-14 (JB):
 *        Use gsdVars struct to store headers/arrays
+*     2008-02-28 (JB):
+*        Replace subsysNum with subBandNum
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -101,8 +103,7 @@
 
 #define FUNC_NAME "gsdac_getDateVars"
 
-void gsdac_getDateVars ( const gsdVars *gsdVars, 
-                         const int subsysNum,
+void gsdac_getDateVars ( const gsdVars *gsdVars, const int subBandNum,
                          const int obsNum, const char *backend, char *dateObs, 
                          char *dateEnd, char *obsID,
                          char *obsIDs, char *HSTstart, char *HSTend,
@@ -186,8 +187,9 @@ void gsdac_getDateVars ( const gsdVars *gsdVars,
   sprintf ( obsID, "%s_%05d_%04d%02d%02dT%02d%02d%02d", backend, obsNum, year, 
             month, day, hour, min, (int)sec );
 
-  sprintf ( obsIDs, "%s_%05d_%04d%02d%02dT%02d%02d%02d_%i", backend, obsNum, year, 
-            month, day, hour, min, (int)sec, subsysNum );
+  sprintf ( obsIDs, "%s_%05d_%04d%02d%02dT%02d%02d%02d_%i", backend, obsNum, 
+            year, month, day, hour, min, (int)sec, 
+            subBandNum % ( gsdVars->nBESections / gsdVars->nFEChans )  + 1);
 
 
   /* Get the DATE-END. This will be DATE-OBS + ( last LST - first LST ). */ 

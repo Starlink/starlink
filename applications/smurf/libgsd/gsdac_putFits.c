@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     gsdac_putFits ( const gsdVars *gsdVars, 
-*                     const int subsysNum, const int obsNum, 
+*                     const int subBandNum, const int obsNum, 
 *                     const int utDate, const int nSteps, 
 *                     const char *backend, char *recepNames[],
 *                     const char *samMode, const char *obsType,
@@ -25,8 +25,8 @@
 *  Arguments:
 *     gsdVars = const gsdVars* (Given)
 *        GSD file access parameters
-*     subsysNum = const int (Given)
-*        Subsystem number
+*     subBandNum = const int (Given)
+*        Subband number
 *     obsNum = const int (Given)
 *        Observation number
 *     utDate = const int (Given)
@@ -67,6 +67,8 @@
 *        Pass in gsdWCS struct instead of JCMTState
 *     2008-02-21 (JB):
 *        Fix integration time calculation
+*     2008-02-28 (JB):
+*        Replace subsysNum with subBandNum
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -110,7 +112,7 @@
 #define FUNC_NAME "gsdac_putFits"
 
 void gsdac_putFits ( const gsdVars *gsdVars, 
-                     const int subsysNum, const int obsNum, 
+                     const int subBandNum, const int obsNum, 
                      const int utDate, const int nSteps, 
                      const char *backend, char *recepNames[],
                      const char *samMode, const char *obsType,
@@ -224,7 +226,7 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   standard = 0;//k
 
   /* Get the UTC start and end times and observation IDs. */
-  gsdac_getDateVars ( gsdVars, subsysNum, obsNum, backend, dateObs, 
+  gsdac_getDateVars ( gsdVars, subBandNum, obsNum, backend, dateObs, 
                       dateEnd, obsID, obsIDs, HSTstart, HSTend, 
                       LSTstart, LSTend, status );
 
@@ -270,16 +272,16 @@ void gsdac_putFits ( const gsdVars *gsdVars,
 
   /* Get the bandwidth setup. */
 /***** NOTE: may be different for rxb widebands *****/  
-  sprintf ( bwMode, "%iMHzx%i", (int)(gsdVars->bandwidths)[subsysNum-1], 
-            (gsdVars->BEChans)[subsysNum-1] );
+  sprintf ( bwMode, "%iMHzx%i", (int)(gsdVars->bandwidths)[subBandNum], 
+            (gsdVars->BEChans)[subBandNum] );
 
 /***** NOTE: Possibly undef? *****/
   strcpy ( subBands, bwMode );
 
   /* Get the reference channel. */
-  refChan = (double)( (gsdVars->BEChans)[subsysNum-1] ) / 2.0;
+  refChan = (double)( (gsdVars->BEChans)[subBandNum] ) / 2.0;
 
-  IFchanSp = (gsdVars->freqRes)[subsysNum-1] * 1000000.0;
+  IFchanSp = (gsdVars->freqRes)[subBandNum] * 1000000.0;
 
 
   /* FE Specific. */
@@ -288,13 +290,13 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   cnfImprt ( gsdVars->frontend, 16, instrume );
 
   /* Get the IF frequency and make sure it's always positive. */
-  IFfreq = abs( (gsdVars->totIFs)[subsysNum-1] );  
+  IFfreq = abs( (gsdVars->totIFs)[subBandNum] );  
 
   /* Get the number of mixers. */
   nMix = 1;//k
 
   /* Get the observed sideband (-ve value = LSB, +ve value = USB ). */
-  if ( (gsdVars->sbSigns)[subsysNum-1] > 0 ) strcpy ( obsSB, "USB" );
+  if ( (gsdVars->sbSigns)[subBandNum] > 0 ) strcpy ( obsSB, "USB" );
   else strcpy ( obsSB, "LSB" );
 
   /* Get the names of the receptors. */
@@ -316,7 +318,7 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   }  
 
 /***** NOTE : Possibly comes from VEL_REF (c12vref). */
-    strcpy ( sSysObs, "TOPOCENT" );
+  strcpy ( sSysObs, "TOPOCENT" );
 
 
   /* Environmental data. */
@@ -574,7 +576,8 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   astSetFitsS ( fitschan, "BWMODE", bwMode,
                 "Bandwidth setup", *status );
 
-  astSetFitsI ( fitschan, "SUBSYSNR", subsysNum, 
+  astSetFitsI ( fitschan, "SUBSYSNR", subBandNum % 
+                ( gsdVars->nBESections / gsdVars->nFEChans ) + 1,
                 "Sub-system number", *status );
 
   astSetFitsS ( fitschan, "SUBBANDS", bwMode,
@@ -624,10 +627,10 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   astSetFitsS ( fitschan, "OBS_SB", obsSB, 
 		"The observed sideband", *status );
 
-  astSetFitsF ( fitschan, "LOFREQS", (gsdVars->LOFreqs)[subsysNum-1],
+  astSetFitsF ( fitschan, "LOFREQS", (gsdVars->LOFreqs)[subBandNum],
 		"[GHz] LO Frequency at start of obs", *status );
 
-  astSetFitsF ( fitschan, "LOFREQE", (gsdVars->LOFreqs)[subsysNum-1],
+  astSetFitsF ( fitschan, "LOFREQE", (gsdVars->LOFreqs)[subBandNum],
                 "[GHz] LO Frequency at end of obs", *status );
 
   astSetFitsS ( fitschan, "RECPTORS", recptors,
@@ -642,7 +645,7 @@ void gsdac_putFits ( const gsdVars *gsdVars,
                   *status );
   } else {
     astSetFitsF ( fitschan, "MEDTSYS", 
-                  (gsdVars->sourceSysTemps)[subsysNum-1],
+                  (gsdVars->sourceSysTemps)[subBandNum],
 		  "[K] Median of the T-sys across all receptors", 
                   *status );
   }

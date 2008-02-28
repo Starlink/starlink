@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
-*                    const int subsysNum, const dasFlag dasFlag
+*                    const int subBandNum, const dasFlag dasFlag
 *                    gsdWCS *wcs, int *status )
 
 *  Arguments:
@@ -23,8 +23,8 @@
 *        GSD headers and arrays
 *     stepNum = const unsigned int (Given)
 *        Number of this time step
-*     subsysNum = const int (Given)
-*        Number of this subsystem
+*     subBandNum = const int (Given)
+*        Number of this subband
 *     dasFlag = const dasFlag (Given)
 *        DAS file structure type
 *     wcs = gsdWCS* (Given and Returned)
@@ -52,6 +52,8 @@
 *        Only calculate values for this time step & subarray
 *     2008-02-27 (JB):
 *        Fill KeyMaps and call atlWcspx
+*     2008-02-28 (JB):
+*        Replace subsysNum with subBandNum
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -96,7 +98,7 @@
 #define FUNC_NAME "gsdac_getWCS.c"
 
 void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
-                    const int subsysNum, const dasFlag dasFlag, 
+                    const int subBandNum, const dasFlag dasFlag, 
                     gsdWCS *wcs, int *status )
 
 {
@@ -267,7 +269,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   /* Fill the keymaps from the input GSD. */
   astMapPut0I( datePointing, "JFREST(1)", 
-               (gsdVars->restFreqs)[subsysNum-1], "" );
+               (gsdVars->restFreqs)[subBandNum], "" );
   astMapPut0D( datePointing, "RA_DEC(1)", gsdVars->centreRA1950, "" );
   astMapPut0D( datePointing, "RA_DEC(2)", gsdVars->centreDec1950, "" );
   astMapPut0I( datePointing, "DPOS(1)", dPos[0], "" );
@@ -282,11 +284,11 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
     astMapPut0D( datePointing, "V_SETL(4)", gsdVars->velocity, "" );
 
   astMapPut0I( datePointing, "JFCEN(1)", 
-               (gsdVars->centreFreqs)[subsysNum-1], "" ); 
+               (gsdVars->centreFreqs)[subBandNum], "" ); 
   astMapPut0I( datePointing, "JFINC(1)", 
-               (gsdVars->freqRes)[subsysNum-1], "" );
+               (gsdVars->freqRes)[subBandNum], "" );
   astMapPut0I( datePointing, "IFFREQ(1)", 
-               (gsdVars->totIFs)[subsysNum-1], "" );
+               (gsdVars->totIFs)[subBandNum], "" );
   astMapPut0I( datePointing, "CELLCODE", gsdVars->cellCode, "" );
   astMapPut0D( cellMap, "CELLSIZE(1)", gsdVars->cellX, "" );
   astMapPut0D( cellMap, "CELLSIZE(2)", gsdVars->cellY, "" );

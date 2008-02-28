@@ -4,7 +4,7 @@
 *     gsdac_putJCMTStateS
 
 *  Purpose:
-*     Fill the subsystem-dependent JCMTState headers. 
+*     Fill the subband-dependent JCMTState headers. 
 
 *  Language:
 *     Starlink ANSI C
@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     gsdac_putJCMTStateS ( const gsdVars *gsdVars, 
-*                           const unsigned int stepNum, const int subsysNum,
+*                           const unsigned int stepNum, const int subBandNum,
 *                           const dasFlag dasFlag, const gsdWCS *wcs, 
 *                           struct JCMTState *record, int *status );
 
@@ -23,8 +23,8 @@
 *        GSD headers and arrays
 *     stepNum = const unsigned int (Given)
 *        time step of this spectrum
-*     subsysNum = const int (Given)
-*        Subsystem number
+*     subBandNum = const int (Given)
+*        Subband number
 *     dasFlag = const dasFlag (Given)
 *        DAS file structure type
 *     wcs = const gsdWCS* (Given)
@@ -38,7 +38,7 @@
 *     Determines the headers required for a JCMTState header
 *     in an ACSIS format file from a GSD file.  This routine determines
 *     the values of the JCMTState elements which are dependent upon
-*     this particular subsystem.  
+*     this particular subband.  
 
 *  Authors:
 *     Jen Balfour (JAC, UBC)
@@ -55,6 +55,9 @@
 *        Calculate fe_doppler
 *     2008-02-26 (JB):
 *        Make gsdac_getWCS per-subsystem
+*     2008-02-28 (JB):
+*        Replace subsysNum with subBandNum
+
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -93,7 +96,7 @@
 #include "jcmt/state.h"
 
 void gsdac_putJCMTStateS ( const gsdVars *gsdVars, 
-                           const unsigned int stepNum, const int subsysNum,
+                           const unsigned int stepNum, const int subBandNum,
                            const dasFlag dasFlag, const gsdWCS *wcs, 
                            struct JCMTState *record, int *status )
 {
@@ -151,22 +154,22 @@ void gsdac_putJCMTStateS ( const gsdVars *gsdVars,
   record->tcs_index = wcs->index;
 
  /* Get the frontend LO frequency. */
-  record->fe_lofreq = (gsdVars->LOFreqs)[subsysNum-1]; 
+  record->fe_lofreq = (gsdVars->LOFreqs)[subBandNum]; 
 
   /* Use the dasFlag to determine the dimensionality/size of
      the TSKY array. */
   if ( dasFlag == DAS_CONT_CAL ) {
     arrayIndex =  ( stepNum * gsdVars->nBESections ) +
-                  subsysNum - 1;
+                  subBandNum;
   } else {
-    arrayIndex = subsysNum - 1;
+    arrayIndex = subBandNum;
   }
 
   /* Set the enviro_air_temp to the correct value from the
      TSKY array. */
   record->enviro_air_temp = (gsdVars->skyTemps)[arrayIndex];
 
-  record->fe_doppler = (gsdVars->restFreqs)[subsysNum-1] / 
-               ( record->fe_lofreq + (gsdVars->totIFs)[subsysNum-1] );
+  record->fe_doppler = (gsdVars->restFreqs)[subBandNum] / 
+               ( record->fe_lofreq + (gsdVars->totIFs)[subBandNum] );
 
 }

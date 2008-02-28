@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     gsdac_putSpecHdr ( const gsdVars *gsdVars, const int nSteps,
-*                        const unsigned int stepNum, const int subsysNum,
+*                        const unsigned int stepNum, const int subBandNum,
 *                        const dasFlag dasFlag, const JCMTState *record,
 *                        struct ACSISSpecHdr *specHdr, int *status );
 
@@ -25,8 +25,8 @@
 *        Number of steps in the observation
 *     stepNum = const unsigned int (Given)
 *        Time step of this spectrum
-*     subsysNum = const int (Given)
-*        Subsystem number
+*     subBandNum = const int (Given)
+*        Subband number
 *     dasFlag = const dasFlag (Given)
 *        DAS file structure type
 *     record = const JCMTState* (Given)
@@ -51,6 +51,8 @@
 *        Use gsdVars struct to store headers/arrays
 *     2008-02-22 (JB):
 *        Fill feed and trx, correct tsys for DAS_CONT_CAL
+*     2008-02-28 (JB):
+*        Replace subsysNum with subBandNum
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -94,7 +96,7 @@
 #define MAXRECEP 8  
 
 void gsdac_putSpecHdr ( const gsdVars *gsdVars, const unsigned int nSteps,
-                        const unsigned int stepNum, const int subsysNum,
+                        const unsigned int stepNum, const int subBandNum,
                         const dasFlag dasFlag, const JCMTState *record,
                         struct ACSISSpecHdr *specHdr, int *status )
 {
@@ -109,17 +111,17 @@ void gsdac_putSpecHdr ( const gsdVars *gsdVars, const unsigned int nSteps,
   /* Check for continuous calibration to get the correct index
      into the array of source system temperatures. */
   if ( dasFlag == DAS_CONT_CAL ) {
-    index = ( stepNum * gsdVars->nBESections ) + subsysNum-1;
+    index = ( stepNum * gsdVars->nBESections ) + subBandNum  ;
   } else {
-    index = subsysNum-1;
+    index = subBandNum  ;
   }
 
   /* Fill the specHdr. */
   specHdr->rts_endnum = nSteps + 1;
   specHdr->acs_feedx = record->tcs_tr_ac1;
   specHdr->acs_feedy = record->tcs_tr_ac2;
-  specHdr->acs_feed = (gsdVars->BESubsys)[subsysNum-1];
+  specHdr->acs_feed = (gsdVars->BESubsys)[subBandNum  ];
   specHdr->acs_tsys = (gsdVars->sourceSysTemps)[index];
-  specHdr->acs_trx = (gsdVars->recTemps)[subsysNum-1];
+  specHdr->acs_trx = (gsdVars->recTemps)[subBandNum  ];
 
 }
