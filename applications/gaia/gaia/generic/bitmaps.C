@@ -81,9 +81,6 @@ void defineGaiaBitmaps(Tcl_Interp *interp) {
     #include "style3.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("style3"), (char*)style3_bits, style3_width, style3_height);
 
-    #include "width1.xbm"
-    Tk_DefineBitmap(interp, Tk_GetUid("width1"), (char*)width1_bits, width1_width, width1_height);
-
     #include "style1.xbm"
     Tk_DefineBitmap(interp, Tk_GetUid("style1"), (char*)style1_bits, style1_width, style1_height);
 
