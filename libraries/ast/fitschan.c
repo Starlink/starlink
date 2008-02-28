@@ -804,6 +804,8 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *     25-FEB-2008 (DSB):
 *        Ensure a SkyFrame represents absolute (rather than offset)
 *        coords before writing it out in any non-native encoding.
+*     28-FEB-2008 (DSB):
+*        Test for existing of SkyRefIs attribute before accessing it.
 *class--
 */
 
@@ -1745,6 +1747,7 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
    int *wperm;              /* FITS axis for each Mapping output (Frame axis) */
    int fits_i;              /* FITS WCS axis index */
    int fits_j;              /* FITS pixel axis index */
+   int has_skyrefis;        /* Does the FrameSet have a SkyRefIs attribute? */
    int iax;                 /* Frame axis index */
    int nwcs;                /* No. of axes in WCS frame */
    int oldrep;              /* Old error reporting flag */
@@ -1763,6 +1766,7 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
 
 /* If the SkyRefIs attribute is set, remember the original value so that 
    it can be re-instated later. */
+   has_skyrefis = 1;
    if( astTest( fs, "SkyRefIs" ) ) {
       old_skyrefis = astGetC( fs, "SkyRefIs" );
 
@@ -1780,6 +1784,7 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
 
    } else {
       old_skyrefis = NULL;
+      if( !astOK ) has_skyrefis = 0;
    }
 
 /* Cancel any error and switch error reporting back on again. */
@@ -1919,11 +1924,13 @@ static int AddVersion( AstFitsChan *this, AstFrameSet *fs, int ipix, int iwcs,
    }
 
 /* If required, re-instate the original value of the SkyRefIs attribute. */
-   if( old_skyrefis ) {
-      astSetC( fs, "SkyRefIs", old_skyrefis ); 
-      old_skyrefis = astFree( (void *) old_skyrefis );
-   } else {
-      astClear( fs, "SkyRefIs" ); 
+   if( has_skyrefis ) {
+      if( old_skyrefis ) {
+         astSetC( fs, "SkyRefIs", old_skyrefis ); 
+         old_skyrefis = astFree( (void *) old_skyrefis );
+      } else {
+         astClear( fs, "SkyRefIs" ); 
+      }
    }
 
 /* Free remaining resources. */
