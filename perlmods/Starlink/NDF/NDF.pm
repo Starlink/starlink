@@ -25,120 +25,119 @@ $VERSION = '1.47';
 # You will also need to link against ndf_link_adam
 
 %EXPORT_TAGS = (
-		'ndf'=>[qw/
-			ndf_acget ndf_aclen ndf_acmsg ndf_acput ndf_acre
-			ndf_aform ndf_amap ndf_annul ndf_anorm ndf_arest
-			ndf_asnrm ndf_astat ndf_astyp ndf_atype
-			ndf_aunmp ndf_bad ndf_base ndf_bb ndf_begin
-			ndf_block ndf_bound ndf_cget ndf_chunk 
-			ndf_clen ndf_clone ndf_cmplx ndf_cmsg ndf_copy
-			ndf_cput ndf_delet ndf_dim
-			ndf_end ndf_find ndf_form ndf_ftype
-			ndf_gtune ndf_happn ndf_hcre ndf_hdef ndf_hend
-			ndf_hfind ndf_hinfo ndf_hnrec ndf_hout ndf_hpurg
-			ndf_hput ndf_hsmod ndf_isacc ndf_isbas ndf_istmp
-			ndf_loc ndf_map ndf_mapql ndf_mapz ndf_mbad
-			ndf_mbadn ndf_mbnd ndf_mbndn ndf_msg ndf_mtype
-			ndf_mtypn ndf_nbloc ndf_nchnk ndf_new ndf_newp
-			ndf_noacc ndf_open ndf_place ndf_qmask ndf_qmf
-			ndf_reset ndf_same ndf_sbad ndf_sbb ndf_sbnd
-			ndf_scopy ndf_sect ndf_shift ndf_size ndf_sqmf
-			ndf_ssary ndf_state ndf_stype ndf_temp ndf_tune
-			ndf_type ndf_unmap ndf_valid ndf_xdel ndf_xgt0c
-			ndf_xgt0d ndf_xgt0i ndf_xgt0l ndf_xgt0r ndf_xiary
-			ndf_xloc ndf_xname ndf_xnew ndf_xnumb ndf_xpt0c
-			ndf_xpt0d ndf_xpt0i ndf_xpt0l ndf_xpt0r ndf_xstat
-			ndfGtwcs ndfPtwcs
-			/],
+                'ndf'=>[qw/
+                            ndf_acget ndf_aclen ndf_acmsg ndf_acput ndf_acre
+                            ndf_aform ndf_amap ndf_annul ndf_anorm ndf_arest
+                            ndf_asnrm ndf_astat ndf_astyp ndf_atype
+                            ndf_aunmp ndf_bad ndf_base ndf_bb ndf_begin
+                            ndf_block ndf_bound ndf_cget ndf_chunk 
+                            ndf_clen ndf_clone ndf_cmplx ndf_cmsg ndf_copy
+                            ndf_cput ndf_delet ndf_dim
+                            ndf_end ndf_find ndf_form ndf_ftype
+                            ndf_gtune ndf_happn ndf_hcre ndf_hdef ndf_hend
+                            ndf_hfind ndf_hinfo ndf_hnrec ndf_hout ndf_hpurg
+                            ndf_hput ndf_hsmod ndf_isacc ndf_isbas ndf_istmp
+                            ndf_loc ndf_map ndf_mapql ndf_mapz ndf_mbad
+                            ndf_mbadn ndf_mbnd ndf_mbndn ndf_msg ndf_mtype
+                            ndf_mtypn ndf_nbloc ndf_nchnk ndf_new ndf_newp
+                            ndf_noacc ndf_open ndf_place ndf_qmask ndf_qmf
+                            ndf_reset ndf_same ndf_sbad ndf_sbb ndf_sbnd
+                            ndf_scopy ndf_sect ndf_shift ndf_size ndf_sqmf
+                            ndf_ssary ndf_state ndf_stype ndf_temp ndf_tune
+                            ndf_type ndf_unmap ndf_valid ndf_xdel ndf_xgt0c
+                            ndf_xgt0d ndf_xgt0i ndf_xgt0l ndf_xgt0r ndf_xiary
+                            ndf_xloc ndf_xname ndf_xnew ndf_xnumb ndf_xpt0c
+                            ndf_xpt0d ndf_xpt0i ndf_xpt0l ndf_xpt0r ndf_xstat
+                            ndfGtwcs ndfPtwcs
+                          /],
 
-		'ary'=>[qw/ary_annul ary_dim ary_find ary_map ary_ndim
-			 ary_size ary_unmap/],
+                'ary'=>[qw/ary_annul ary_dim ary_find ary_map ary_ndim
+                           ary_size ary_unmap/],
 
-		'msg'=>[qw/msg_bell msg_blank msg_fmtc msg_fmtd msg_fmti
-			msg_fmtl msg_fmtr msg_iflev msg_ifset msg_load
-			msg_out msg_outif msg_renew msg_setc msg_setd
-			msg_seti msg_setl msg_setr msg_tune/],
+                'msg'=>[qw/msg_bell msg_blank msg_fmtc msg_fmtd msg_fmti
+                           msg_fmtl msg_fmtr msg_iflev msg_ifset msg_load
+                           msg_out msg_outif msg_renew msg_setc msg_setd
+                           msg_seti msg_setl msg_setr msg_tune/],
 
-		'err'=>[qw/err_annul err_begin err_end err_facer err_fioer
-			err_flbel err_flush err_level err_load err_mark
-			err_rep err_rlse err_stat err_syser err_tune
-      err_flush_to_string
-			/],
-			#ADAM only: err_clear err_start err_stop
+                'err'=>[qw/err_annul err_begin err_end err_facer err_fioer
+                           err_flbel err_flush err_level err_load err_mark
+                           err_rep err_rlse err_stat err_syser err_tune
+                           err_flush_to_string
+                          /],
+                #ADAM only: err_clear err_start err_stop
 
-		'hds'=>[qw/hds_copy hds_erase hds_ewild hds_flush hds_free
-			hds_group hds_gtune hds_link hds_lock hds_new
-			hds_open hds_show hds_state hds_stop hds_trace
-			hds_tune hds_wild
-			/],
+                'hds'=>[qw/hds_copy hds_erase hds_ewild hds_flush hds_free
+                           hds_group hds_gtune hds_link hds_lock hds_new
+                           hds_open hds_show hds_state hds_stop hds_trace
+                           hds_tune hds_wild
+                          /],
 
-		'dat'=>[qw/dat_alter dat_annul dat_basic dat_ccopy dat_cctyp
-			dat_cell dat_clen dat_clone dat_coerc dat_copy
-			dat_drep dat_erase dat_ermsg dat_find dat_get0c
-			dat_get0d dat_get0i dat_get0l dat_get0r dat_get1c
-			dat_get1d dat_get1i dat_get1r dat_getvc dat_getvd
-			dat_getvi dat_getvr dat_index dat_len dat_map
-			dat_mapc dat_mapd dat_mapi dat_mapl dat_mapr
-			dat_mapv dat_mould dat_move dat_msg dat_name
-			dat_ncomp dat_new dat_new0c dat_new0d dat_new0i
-			dat_new0l dat_new0r dat_new1c dat_new1d dat_new1i
-			dat_new1l dat_new1r dat_newc dat_paren dat_prec
-			dat_prim dat_prmry dat_put0c dat_put0d dat_put0i
-			dat_put0l dat_put0r dat_put1d dat_put1i dat_put1r
-			dat_put1c dat_putc dat_putd dat_puti dat_putr dat_putvc
-			dat_putvd dat_putvi
-			dat_putvr dat_ref dat_refct dat_renam dat_reset
-			dat_retyp dat_shape dat_size dat_slice dat_state
-			dat_struc dat_temp dat_there dat_type dat_unmap
-			dat_valid dat_vec dat_where
-			/],
+                'dat'=>[qw/dat_alter dat_annul dat_basic dat_ccopy dat_cctyp
+                           dat_cell dat_clen dat_clone dat_coerc dat_copy
+                           dat_drep dat_erase dat_ermsg dat_find dat_get0c
+                           dat_get0d dat_get0i dat_get0l dat_get0r dat_get1c
+                           dat_get1d dat_get1i dat_get1r dat_getvc dat_getvd
+                           dat_getvi dat_getvr dat_index dat_len dat_map
+                           dat_mapc dat_mapd dat_mapi dat_mapl dat_mapr
+                           dat_mapv dat_mould dat_move dat_msg dat_name
+                           dat_ncomp dat_new dat_new0c dat_new0d dat_new0i
+                           dat_new0l dat_new0r dat_new1c dat_new1d dat_new1i
+                           dat_new1l dat_new1r dat_newc dat_paren dat_prec
+                           dat_prim dat_prmry dat_put0c dat_put0d dat_put0i
+                           dat_put0l dat_put0r dat_put1d dat_put1i dat_put1r
+                           dat_put1c dat_putc dat_putd dat_puti dat_putr dat_putvc
+                           dat_putvd dat_putvi
+                           dat_putvr dat_ref dat_refct dat_renam dat_reset
+                           dat_retyp dat_shape dat_size dat_slice dat_state
+                           dat_struc dat_temp dat_there dat_type dat_unmap
+                           dat_valid dat_vec dat_where
+                          /],
 
-		'cmp'=>[qw/ cmp_get0c cmp_get0d cmp_get0i cmp_get0l cmp_get0r
-			cmp_get1c cmp_get1d cmp_get1i cmp_get1r cmp_getvc
-			cmp_getvd cmp_getvi cmp_getvr cmp_len cmp_mapv
-			cmp_mod cmp_modc cmp_prim cmp_put0c cmp_put0d
-			cmp_put0i cmp_put0l cmp_put0r cmp_put1c cmp_put1d 
-			cmp_put1i cmp_put1r 
-			cmp_putni cmp_putvc cmp_putvd cmp_putvi cmp_putvr
-			cmp_shape cmp_size cmp_struc cmp_type cmp_unmap
-			/],
+                'cmp'=>[qw/ cmp_get0c cmp_get0d cmp_get0i cmp_get0l cmp_get0r
+                            cmp_get1c cmp_get1d cmp_get1i cmp_get1r cmp_getvc
+                            cmp_getvd cmp_getvi cmp_getvr cmp_len cmp_mapv
+                            cmp_mod cmp_modc cmp_prim cmp_put0c cmp_put0d
+                            cmp_put0i cmp_put0l cmp_put0r cmp_put1c cmp_put1d 
+                            cmp_put1i cmp_put1r 
+                            cmp_putni cmp_putvc cmp_putvd cmp_putvi cmp_putvr
+                            cmp_shape cmp_size cmp_struc cmp_type cmp_unmap
+                          /],
 
-    'ndg'=>[qw/ ndg_ctprv ndg_gtprv ndg_mdprv
-                /],
+                'ndg'=>[qw/ ndg_ctprv ndg_gtprv ndg_mdprv
+                          /],
 
-		'misc'=>[qw/mem2string string2mem array2mem mem2array
-			 par_get fits_read_header
-			 fits_get_nth_item fits_get_item fits_extract_key_val
-			 fits_construct_string/]
-	       );
+                'misc'=>[qw/mem2string string2mem array2mem mem2array
+                            par_get fits_read_header
+                            fits_get_nth_item fits_get_item fits_extract_key_val
+                            fits_construct_string/]
+               );
 
 Exporter::export_tags('ndf','ary','msg','err','hds','dat','cmp','ndg','misc');
 
 # Autoload constants when required
 
 sub AUTOLOAD {
-    # This AUTOLOAD is used to 'autoload' constants from the constant()
-    # XS function.  If a constant is not found then control is passed
-    # to the AUTOLOAD in AutoLoader.
+  # This AUTOLOAD is used to 'autoload' constants from the constant()
+  # XS function.  If a constant is not found then control is passed
+  # to the AUTOLOAD in AutoLoader.
 
-    my $constname;
-    ($constname = $AUTOLOAD) =~ s/.*:://;
-    # Note that the default autoloader expects integer argument
-    # if @_ contains something (this can be @_ from the calling routine!)
-    # Since these routines only expect a single argument just pass a 0.
-    my $val = constant($constname);
+  my $constname;
+  ($constname = $AUTOLOAD) =~ s/.*:://;
+  # Note that the default autoloader expects integer argument
+  # if @_ contains something (this can be @_ from the calling routine!)
+  # Since these routines only expect a single argument just pass a 0.
+  my $val = constant($constname);
 
-    if ($! != 0) {
-        if ($! =~ /Invalid/) {
-            $AutoLoader::AUTOLOAD = $AUTOLOAD;
-            goto &AutoLoader::AUTOLOAD;
-        }
-        else {
-                croak "Your vendor has not defined NDF macro $constname";
-        }
+  if ($! != 0) {
+    if ($! =~ /Invalid/) {
+      $AutoLoader::AUTOLOAD = $AUTOLOAD;
+      goto &AutoLoader::AUTOLOAD;
+    } else {
+      croak "Your vendor has not defined NDF macro $constname";
     }
-    eval "sub $AUTOLOAD { $val }";
-    goto &$AUTOLOAD;
+  }
+  eval "sub $AUTOLOAD { $val }";
+  goto &$AUTOLOAD;
 }
 
 bootstrap NDF $VERSION;
@@ -149,7 +148,7 @@ bootstrap NDF $VERSION;
 sub pack1Dchar {
   my ($arg) = shift;
   return $arg if ref(\$arg) eq "SCALAR"; # packed char string
-  my $array_len = $#{$arg} + 1; # How many members in array
+  my $array_len = $#{$arg} + 1;          # How many members in array
   my ($maxlength, $size);
   # Find maximum length of an array member
   $maxlength = 0;
@@ -174,7 +173,7 @@ sub ndf_hput ($$$$\@$$$$$) {
      $indf, $status) = @_;
   $nlines = ($nlines > $#{$text} + 1 ? $#{$text} + 1 : $nlines);
   ndf_hput_r($hmode, $appn, $repl, $nlines, pack1Dchar($text), $trans, 
-	     $wrap, $rjust, $indf, $status);
+             $wrap, $rjust, $indf, $status);
   $_[9] = $status;
 }
 
@@ -237,7 +236,7 @@ sub array2mem  (\@$$) {
   my ($ref, $packtype, $pntr) = @_;
 
   string2mem(pack($packtype, @$ref), &byte_size($packtype) * ($#{$ref}+1), 
-	     $pntr);
+             $pntr);
 }
 
 # Need to know the size of the array to map it from the pointer to perl
@@ -260,10 +259,10 @@ sub ndfGtwcs {
   return undef unless $_[1] == &NDF::SAI__OK;
   my @strings = split(/\n/, $buffer);
   my $chan = new Starlink::AST::Channel( 
-					source => sub { 
-					  return shift(@strings); 
-					}
-				       );
+                                        source => sub { 
+                                          return shift(@strings); 
+                                        }
+                                       );
   return $chan->Read();
 }
 
@@ -398,7 +397,7 @@ sub par_get ($$$) {
 
     if ($#path > 0 && $$status == $SAI__OK) {
       carp 'Only one level of HDS nesting is supported'
-	if $^W;
+        if $^W;
     }
 
   } else {
@@ -483,7 +482,7 @@ sub par_get ($$$) {
 
 sub fits_read_header ($) {
 
-#  Usage: ($hashref, $status) = fits_read_header($file)
+  #  Usage: ($hashref, $status) = fits_read_header($file)
 
   # Variable declarations
   my ($indf, %fitsitem, $status);
@@ -522,16 +521,16 @@ sub fits_read_header ($) {
 
       if ($status == $good) {
 
-	if ($ndim != 1) {
-	  $status = &SAI__ERROR;
-	  err_rep(' ',"$task: Dimensionality of FITS array should be 1 but is $ndim", $status);
+        if ($ndim != 1) {
+          $status = &SAI__ERROR;
+          err_rep(' ',"$task: Dimensionality of FITS array should be 1 but is $ndim", $status);
 
-	}
+        }
 
       }
 
       # Set the FITS array to empty
-      my @fits = ();   # Note that @fits only exists in this block
+      my @fits = ();       # Note that @fits only exists in this block
 
       # Read the FITS extension
       dat_get1c($xloc, $dim[0], \@fits, $nfits, $status);
@@ -542,18 +541,18 @@ sub fits_read_header ($) {
       # Check status and read into hash
       if ($status == $good) {
 
-	# Could use map{} if we were not worried about null keys
-	# or the END FITS tag
-	for (@fits) {
-	  my ($item, $value, $comment) = fits_extract_key_val($_);
-	  next unless defined $item;
-	  next if $item eq 'END';
-	  $fitsitem{$item} = $value if defined $value;
-	}
+        # Could use map{} if we were not worried about null keys
+        # or the END FITS tag
+        for (@fits) {
+          my ($item, $value, $comment) = fits_extract_key_val($_);
+          next unless defined $item;
+          next if $item eq 'END';
+          $fitsitem{$item} = $value if defined $value;
+        }
 
       } else {
 	
-	err_rep(' ',"$task: Error reading FITS array", $status);
+        err_rep(' ',"$task: Error reading FITS array", $status);
 
       }
 
@@ -561,7 +560,7 @@ sub fits_read_header ($) {
 
       # Add my own message to status
       err_rep(' ', "$task: Error locating FITS extension",
-	     $status);
+              $status);
 
     }
 
@@ -662,9 +661,9 @@ sub fits_extract_key_val ($) {
       substr($_[0],8,2) ne "= ") {
     # We have comments
     $comment = substr($_[0],8);
-    $comment =~ s/\s+$//;  # Trailing spaces
-    $comment =~ s/^\s+\///; # Leading spaces and slashes
-    $comment =~ s/^\s+//;  # Leading space
+    $comment =~ s/\s+$//;       # Trailing spaces
+    $comment =~ s/^\s+\///;     # Leading spaces and slashes
+    $comment =~ s/^\s+//;       # Leading space
     return ($keyword, undef, $comment);
   }
 
@@ -681,7 +680,7 @@ sub fits_extract_key_val ($) {
     if (substr($rest,1,1) eq "'") {
       $value = '';
       $comment = substr($rest,2);
-      $comment =~ s/^\s+\///;  # Delete everything before the first slash
+      $comment =~ s/^\s+\///; # Delete everything before the first slash
 
     } else {
       # '' needs to be treated as an escaped ' when inside the string
@@ -689,18 +688,18 @@ sub fits_extract_key_val ($) {
       my $pos = 1;
       my $end = -1;
       while ($pos = index $rest, "'", $pos) {
-	last if $pos == -1; # could not find a close quote
+        last if $pos == -1;     # could not find a close quote
 
-	# Check for the position after this and if it is a '
-	# increment and loop again
-	if (substr($rest, $pos+1, 1) eq "'") {
-	  $pos += 2; # Skip past next one
-	  next;
-	}
+        # Check for the position after this and if it is a '
+        # increment and loop again
+        if (substr($rest, $pos+1, 1) eq "'") {
+          $pos += 2;            # Skip past next one
+          next;
+        }
 
-	# Isolated ' so this is the end of the string
-	$end = $pos;
-	last;
+        # Isolated ' so this is the end of the string
+        $end = $pos;
+        last;
 
       }
 
@@ -708,31 +707,31 @@ sub fits_extract_key_val ($) {
       # position of the last quote
       if ($end != -1) {
 
-	# Value
-	$value = substr($rest,1, $pos-1);
+        # Value
+        $value = substr($rest,1, $pos-1);
 
-	# Replace '' with '
-	$value =~ s/''/'/; #;
+        # Replace '' with '
+        $value =~ s/''/'/;      #;
 
-	# Special case a blank string
-	if ($value =~ /^\s+$/) {
-	  $value = " ";
-	} else {
-	  # Trim
-	  $value =~ s/\s+$//;
-	}
+        # Special case a blank string
+        if ($value =~ /^\s+$/) {
+          $value = " ";
+        } else {
+          # Trim
+          $value =~ s/\s+$//;
+        }
 
-	# Comment
-	$comment = substr($rest,$pos+1); # Extract post string
-	$comment =~ s/^\s+\///;  # Delete everything before the first slash
+        # Comment
+        $comment = substr($rest,$pos+1); # Extract post string
+        $comment =~ s/^\s+\///; # Delete everything before the first slash
 
       } else {
-	# Never found the end so include all of it
-	$value = substr($rest,1);
-	# Trim
-	$value =~ s/\s+$//;
+        # Never found the end so include all of it
+        $value = substr($rest,1);
+        # Trim
+        $value =~ s/\s+$//;
 
-	$comment = '';
+        $comment = '';
       }
 
     }
@@ -804,7 +803,7 @@ sub fits_extract_key_val ($) {
 
 sub fits_construct_string ($$$) {
   my ($keyword, $value, $comment) = @_;
-  $keyword = uc( $keyword ); # must be upper case
+  $keyword = uc( $keyword );    # must be upper case
 
   my ($fitsent);
 
@@ -825,27 +824,27 @@ sub fits_construct_string ($$$) {
 	
       # Check whether we have a number or character string or nothing
       if ($value eq '') {
-	$value = "''" . (" " x 18);
+        $value = "''" . (" " x 18);
       } elsif ($value =~ /^(-?)(\d*)(\.?)(\d*)([EeDd][-\+]?\d+)?$/) {
-	# Number (chop to 67 characters)
-	$value = substr($value,0,67);
-	$value = (' 'x(20-length($value))).$value;
+        # Number (chop to 67 characters)
+        $value = substr($value,0,67);
+        $value = (' 'x(20-length($value))).$value;
 
-	# Translate lower case e to upper
+        # Translate lower case e to upper
         # Probably should test length of exponent to decide
-	# whether we should be using D instead of E
-	# [depends whether the argument is stringified or not]
-	$value =~ tr /ed/ED/;
+        # whether we should be using D instead of E
+        # [depends whether the argument is stringified or not]
+        $value =~ tr /ed/ED/;
 
       } else {
-	# Character
-	# Escape single quotes
-	$value =~ s/'/''/g;  #';
+        # Character
+        # Escape single quotes
+        $value =~ s/'/''/g;     #';
 
-	# chop to 65 characters
-	$value = substr($value,0, 65);
-	$value = "'$value'";
-	$value = $value.(' 'x(20-length($value)));
+        # chop to 65 characters
+        $value = substr($value,0, 65);
+        $value = "'$value'";
+        $value = $value.(' 'x(20-length($value)));
       }
 
     } else {
