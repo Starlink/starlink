@@ -190,7 +190,7 @@ void smurf_gsd2acsis( int *status ) {
   nSteps = gsdVars.noScans * gsdVars.nScanPts;
 
   /* Convert and write out the new file. */
-  gsdac_wrtData ( &gsdVars, dasFlag, directory, nSteps, status );
+  gsdac_wrtData ( &gsdVars, directory, nSteps, dasFlag, status );
 
   gsdac_freeArrays ( dasFlag, &gsdVars, status );
 

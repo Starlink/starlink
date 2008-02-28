@@ -72,7 +72,7 @@
 void gsdac_freeArrays
 (
 const dasFlag dasFlag,  /* DAS file structure flag (given) */
-const gsdVars *gsdVars, /* GSD headers and arrays (given) */
+gsdVars *gsdVars,    /* GSD headers and arrays (given) */
 int *status          /* pointer to global status (given and returned) */
 );
 
@@ -206,7 +206,7 @@ int *statuss         /* pointer to global status (given and returned) */
 void gsdac_getDASFlag
 (
 const gsd *gsd,      /* GSD file access parameters (given) */
-dasFlag *dasFlag,        /* DAS file type (given and returned) */
+dasFlag *dasFlag,    /* DAS file type (given and returned) */
 int *status          /* pointer to global status (given and returned) */ 
 );
 
@@ -280,6 +280,7 @@ void gsdac_getWCS
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 const unsigned int stepNum,    /* time step of this spectrum (given) */
 const int subsysNum, /* subsystem number (given) */
+const dasFlag dasFlag,  /* DAS file structure flag (given) */
 gsdWCS *wcs,         /* pointing and time values (given and returned) */
 int *status          /* global status (given and returned) */
 );
@@ -303,9 +304,9 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_putJCMTStateC
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
-const dasFlag dasFlag,  /* DAS file structure flag (given) */
 const unsigned int stepNum,    /* time step of this spectrum (given) */
 const char *backend,      /* name of the backend (given) */
+const dasFlag dasFlag,  /* DAS file structure flag (given) */
 struct JCMTState *record, /* JCMTState headers (given and returned ) */
 int *status          /* pointer to global status (given and returned) */
 );
@@ -313,9 +314,9 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_putJCMTStateS
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
-const dasFlag dasFlag,  /* DAS file structure flag (given) */
 const unsigned int stepNum,    /* time step of this spectrum (given) */
 const int subsysNum, /* subsystem number (given) */
+const dasFlag dasFlag,  /* DAS file structure flag (given) */
 const gsdWCS *wcs,      /* pointing and time values (given) */
 struct JCMTState *record, /* JCMTState headers (given and returned ) */
 int *status          /* pointer to global status (given and returned) */
@@ -324,21 +325,43 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_putSpecHdr
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
-const dasFlag dasFlag,  /* DAS file structure flag (given) */
 const unsigned int nSteps,    /* number of time steps (given) */
 const unsigned int stepNum,   /* time step of this spectrum (given) */
 const int subsysNum, /* subsystem number (given) */
+const dasFlag dasFlag,  /* DAS file structure flag (given) */
 const JCMTState *record,      /* JCMTState headers (given) */
 struct ACSISSpecHdr *specHdr, /* ACSIS Spec Headers (given and returned ) */
 int *status          /* pointer to global status (given and returned) */ 
 );
 
+void gsdac_tranDate
+(
+const double dDate,  /* date as a double (given) */
+char *iDate,         /* date as string (given and returned) */
+int *status          /* pointer to global status (given and returned) */
+);
+
+void gsdac_tranTime
+(
+const double dTime,  /* time as a double (given) */
+char *iTime,         /* time as string (given and returned) */
+int *status          /* pointer to global status (given and returned) */
+);
+
+void gsdac_velEncode 
+(
+const char *vframe,  /* velocity frame (given) */
+const char *vdef,    /* velocity definition (given) */
+int *LSRFlg,         /* LSR flag */
+int *status          /* pointer to global status (given and returned) */
+);
+
 void gsdac_wrtData
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
-const dasFlag dasFlag,  /* DAS file structure flag (given) */
 const char *directory,     /* output write directory (given) */
 const unsigned int nSteps, /* number of steps in the observation (given) */
+const dasFlag dasFlag,  /* DAS file structure flag (given) */
 int *status          /* pointer to global status (given and returned) */
 );
 

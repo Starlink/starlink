@@ -13,22 +13,20 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_putJCMTStateS ( const gsdVars *gsdVars, const dasFlag dasFlag,  
-*                           const unsigned int stepNum, 
-*                           const int subsysNum,
-*                           const gsdWCS *wcs, 
-*                           struct JCMTState *record, 
-*                           int *status );
+*     gsdac_putJCMTStateS ( const gsdVars *gsdVars, 
+*                           const unsigned int stepNum, const int subsysNum,
+*                           const dasFlag dasFlag, const gsdWCS *wcs, 
+*                           struct JCMTState *record, int *status );
 
 *  Arguments:
 *     gsdVars = const gsdVars* (Given)
 *        GSD headers and arrays
-*     dasFlag = const dasFlag (Given)
-*        DAS file structure type
 *     stepNum = const unsigned int (Given)
 *        time step of this spectrum
 *     subsysNum = const int (Given)
 *        Subsystem number
+*     dasFlag = const dasFlag (Given)
+*        DAS file structure type
 *     wcs = const gsdWCS* (Given)
 *        Pointing and time values
 *     record = JCMTState** (Given and returned)
@@ -94,10 +92,9 @@
 #include "gsdac.h"
 #include "jcmt/state.h"
 
-void gsdac_putJCMTStateS ( const gsdVars *gsdVars, const dasFlag dasFlag,
-                           const unsigned int stepNum, 
-                           const int subsysNum,
-                           const gsdWCS *wcs,
+void gsdac_putJCMTStateS ( const gsdVars *gsdVars, 
+                           const unsigned int stepNum, const int subsysNum,
+                           const dasFlag dasFlag, const gsdWCS *wcs, 
                            struct JCMTState *record, int *status )
 {
 

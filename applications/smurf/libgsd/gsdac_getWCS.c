@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
-*                    const int subsysNum,
+*                    const int subsysNum, const dasFlag dasFlag
 *                    gsdWCS *wcs, int *status )
 
 *  Arguments:
@@ -25,6 +25,8 @@
 *        Number of this time step
 *     subsysNum = const int (Given)
 *        Number of this subsystem
+*     dasFlag = const dasFlag (Given)
+*        DAS file structure type
 *     wcs = gsdWCS* (Given and Returned)
 *        Time and Pointing values
 *     status = int* (Given and Returned)
@@ -48,6 +50,8 @@
 *        Fix TAI calculations for rasters
 *     2008-02-26 (JB):
 *        Only calculate values for this time step & subarray
+*     2008-02-27 (JB):
+*        Fill KeyMaps and call atlWcspx
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -77,6 +81,7 @@
 
 /* Standard includes */
 #include <string.h>
+#include <math.h>
 
 /* Starlink includes */
 #include "ast.h"
@@ -91,25 +96,35 @@
 #define FUNC_NAME "gsdac_getWCS.c"
 
 void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
-                    const int subsysNum, gsdWCS *wcs, int *status )
+                    const int subsysNum, const dasFlag dasFlag, 
+                    gsdWCS *wcs, int *status )
 
 {
 
   /* Local variables */
   AstKeyMap *cellMap;         /* Ast KeyMap for cell description */
+  double cellV2YRad;          /* Position angle of cell y axis in radians */
+  double cellX2YRad;          /* Angle between cell y axis and x axis
+                                 in radians */
   int dataDims[3];            /* dimensions of data */
   AstKeyMap *datePointing;    /* Ast KeyMap for pointing and times */
   char dateString[SZFITSCARD];/* temporary string for date conversions. */
   int day;                    /* days */
   double dLST;                /* difference in LSTs */
+  double dPos[2];             /* RA/Dec offsets */
   double dut1;                /* UT1-UTC correction */
   AstFrameSet *frame;         /* frame for pointing */
   int hour;                   /* hours */
   int i;                      /* loop counter */
+  char iDate[10];             /* date in specx string format */
   long index;                 /* index into array data */
+  char iTime[9];              /* time in specx string format */
+  int LSRFlg;                 /* LSRFlg for velocity frame/def'n */
   double LSTStart;            /* start LST time */
   int min;                    /* minutes */
   int month;                  /* months */
+  float offsetX;              /* x offset in arcsec */
+  float offsetY;              /* y offset in arcsec */
   float sec;                  /* seconds */
   double TAIStart;            /* start TAI time */
   AstTimeFrame *tempFrame = NULL; /* AstTimeFrame for retrieving TAI times */
@@ -169,55 +184,11 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   astSet ( tFrame, "timescale=TAI" );  
   TAIStart = astGetD ( tFrame, "timeOrigin" );
 
-  /* Create the keymaps. */
-  datePointing = astKeyMap( "" );
-  cellMap = astKeyMap( "" );
-
-  
-
-  /* Fill the keymaps from the input GSD. */
-  astMapPut0I( datePointing, "JFREST(1)", 
-               (gsdVars->restFreqs)[subsysNum-1], "" );
-  astMapPut0D( datePointing, "RA_DEC(1)", 0.0, "" );
-  astMapPut0D( datePointing, "RA_DEC(2)", 0.0, "" );
-  astMapPut0I( datePointing, "DPOS(1)", 0.0, "" );
-  astMapPut0I( datePointing, "DPOS(2)", 0.0, "" );
-  astMapPut0C( datePointing, "IDATE", "", "" );
-  astMapPut0C( datePointing, "ITIME", "", "" );   
-  astMapPut0I( datePointing, "LSRFLG", 0, "" );
-  astMapPut0D( datePointing, "V_SETL(4)", 0.0, "" );
-  astMapPut0I( datePointing, "JFCEN(1)", 
-               (gsdVars->centreFreqs)[subsysNum-1], "" ); 
-  astMapPut0I( datePointing, "JFINC(1)", 
-               (gsdVars->freqRes)[subsysNum-1], "" );
-  astMapPut0I( datePointing, "IFFREQ(1)", 
-               (gsdVars->totIFs)[subsysNum-1], "" );
-
-  astMapPut0D( cellMap, "CELLSIZE(1)", gsdVars->cellX, "" );
-  astMapPut0D( cellMap, "CELLSIZE(2)", gsdVars->cellY, "" );
-  astMapPut0D( cellMap, "POSANGLE", 0.0, "" );
-
-  /* Get the dimensions of the data array. */
-  dataDims[0] = gsdVars->nMapPtsX;
-  dataDims[1] = gsdVars->nMapPtsY;
-  dataDims[2] = gsdVars->nBEChansOut;
-
-  //atlWcspx ( datePointing, cellMap, dataDims, gsdVars->telLongitude * -1.0, 
-  //           gsdVars->telLatitude, frame, status );
-
-  wcs->airmass = 0.0;//k
-  wcs->acAz = 0.0;//k
-  wcs->acEl = 0.0;//k
-  wcs->acTr1 = 0.0;//k
-  wcs->acTr2 = 0.0;//k   
-  wcs->azAng = 0.0;
-  wcs->baseAz = 0.0;//k
-  wcs->baseEl = 0.0;//k 
-
   /* Figure out what coordinates we are tracking in.  Then 
      the base can be copied from the corresponding CENTRE_
      value in the GSD header.  Remember that the GSD file
-     stored RAs in degrees! */
+     stored RAs in degrees!  Do this check first in case
+     we encounter EQ as the centreCode. */
   switch ( gsdVars->centreCode ) {
     
     case COORD_AZ:
@@ -225,10 +196,13 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
       wcs->baseTr2 = gsdVars->centreEl;
       break;
     case COORD_EQ:
-      wcs->baseTr1 = gsdVars->obsLST - 
+      *status = SAI__ERROR;
+      errRep ( FUNC_NAME, "Equatorial coordinates not supported", status );
+      return;
+      /*wcs->baseTr1 = gsdVars->obsLST - 
 	               ( gsdVars->centreDec * 24.0 / 360.0 );
       if ( wcs->baseTr1 < 0 ) wcs->baseTr1 += 24.0;
-      wcs->baseTr2 = gsdVars->centreEl;
+      wcs->baseTr2 = gsdVars->centreEl;*/
       break;
     case COORD_RD:
       wcs->baseTr1 = gsdVars->centreRA * 24.0 / 360.;
@@ -255,6 +229,85 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   }
 
+  /* Create the keymaps. */
+  datePointing = astKeyMap( "" );
+  cellMap = astKeyMap( "" ); 
+
+  /* Get the idate and itime. */
+  gsdac_tranDate ( gsdVars->obsUT1d, iDate, status );
+  gsdac_tranTime ( gsdVars->obsUT1h, iTime, status );
+
+  /* Get the velocity definition. */
+  gsdac_velEncode ( gsdVars->velRef, gsdVars->velDefn, &LSRFlg, status );
+
+  if ( *status != SAI__OK ) {
+    *status = SAI__ERROR;
+    errRep ( FUNC_NAME, "Error preparing values for atlWcspx", 
+             status );
+    return; 
+  }
+
+  /* Get the RA & Dec offsets in cells. */
+  offsetX = (gsdVars->mapTable)[stepNum*2];
+  offsetY = (gsdVars->mapTable)[stepNum*2 + 1];
+
+  /* Multiply by cell sizes. */
+  offsetX = offsetX * gsdVars->cellX;
+  offsetY = offsetY * gsdVars->cellY;
+
+  /* Get axis angles in radians. */
+  cellV2YRad = gsdVars->cellV2Y * DD2R;
+  cellX2YRad = gsdVars->cellX2Y * DD2R;
+
+  /* Get the RA/Dec offsets. */
+  dPos[0] = sin( cellV2YRad - cellX2YRad ) * offsetX +
+            sin( cellV2YRad ) * offsetY;
+  dPos[1] = cos( cellV2YRad - cellX2YRad ) * offsetX +
+            cos( cellV2YRad ) * offsetY;
+
+  /* Fill the keymaps from the input GSD. */
+  astMapPut0I( datePointing, "JFREST(1)", 
+               (gsdVars->restFreqs)[subsysNum-1], "" );
+  astMapPut0D( datePointing, "RA_DEC(1)", gsdVars->centreRA1950, "" );
+  astMapPut0D( datePointing, "RA_DEC(2)", gsdVars->centreDec1950, "" );
+  astMapPut0I( datePointing, "DPOS(1)", dPos[0], "" );
+  astMapPut0I( datePointing, "DPOS(2)", dPos[1], "" );
+  astMapPut0C( datePointing, "IDATE", iDate, "" );
+  astMapPut0C( datePointing, "ITIME", iTime, "" ); 
+  astMapPut0I( datePointing, "LSRFLG", LSRFlg, "" );
+
+  if ( dasFlag == DAS_CROSS_CORR || dasFlag == DAS_TP )
+    astMapPut0D( datePointing, "V_SETL(4)", 0, "" );
+  else
+    astMapPut0D( datePointing, "V_SETL(4)", gsdVars->velocity, "" );
+
+  astMapPut0I( datePointing, "JFCEN(1)", 
+               (gsdVars->centreFreqs)[subsysNum-1], "" ); 
+  astMapPut0I( datePointing, "JFINC(1)", 
+               (gsdVars->freqRes)[subsysNum-1], "" );
+  astMapPut0I( datePointing, "IFFREQ(1)", 
+               (gsdVars->totIFs)[subsysNum-1], "" );
+  astMapPut0I( datePointing, "CELLCODE", gsdVars->cellCode, "" );
+  astMapPut0D( cellMap, "CELLSIZE(1)", gsdVars->cellX, "" );
+  astMapPut0D( cellMap, "CELLSIZE(2)", gsdVars->cellY, "" );
+  astMapPut0D( cellMap, "POSANGLE", gsdVars->cellV2Y, "" );
+
+  /* Get the dimensions of the data array. */
+  dataDims[0] = gsdVars->nMapPtsX;
+  dataDims[1] = gsdVars->nMapPtsY;
+  dataDims[2] = gsdVars->nBEChansOut;
+
+  atlWcspx ( datePointing, cellMap, dataDims, gsdVars->telLongitude * -1.0, 
+             gsdVars->telLatitude, &frame, status );
+
+  wcs->airmass = 0.0;//k
+  wcs->acAz = 0.0;//k
+  wcs->acEl = 0.0;//k
+  wcs->acTr1 = 0.0;//k
+  wcs->acTr2 = 0.0;//k   
+  wcs->azAng = 0.0;
+  wcs->baseAz = 0.0;//k
+  wcs->baseEl = 0.0;//k 
 
   /* Get the index into the observing area.  For rasters, this is
      the row number (incremented on new rows) and for grids it is

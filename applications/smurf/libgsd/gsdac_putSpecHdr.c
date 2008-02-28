@@ -13,25 +13,22 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_putSpecHdr ( const gsdVars *gsdVars,
-*                        const dasFlag dasFlag,
-*                        const int nSteps,
-*                        const unsigned int stepNum,
-*                        const int subsysNum,
-*                        const JCMTState *record,
+*     gsdac_putSpecHdr ( const gsdVars *gsdVars, const int nSteps,
+*                        const unsigned int stepNum, const int subsysNum,
+*                        const dasFlag dasFlag, const JCMTState *record,
 *                        struct ACSISSpecHdr *specHdr, int *status );
 
 *  Arguments:
 *     gsdVars = const gsdVars* (Given)
 *        GSD headers and arrays
-*     dasFlag = const dasFlag (Given)
-*        DAS file structure type
 *     nSteps = const int (Given)
 *        Number of steps in the observation
 *     stepNum = const unsigned int (Given)
 *        Time step of this spectrum
 *     subsysNum = const int (Given)
 *        Subsystem number
+*     dasFlag = const dasFlag (Given)
+*        DAS file structure type
 *     record = const JCMTState* (Given)
 *        JCMTState headers
 *     specHdr = struct ACSISSpecHdr* (Given and Returned)
@@ -96,12 +93,9 @@
 #define SZ_RECNAME 80
 #define MAXRECEP 8  
 
-void gsdac_putSpecHdr ( const gsdVars *gsdVars, 
-                        const dasFlag dasFlag,
-                        const unsigned int nSteps,
-                        const unsigned int stepNum,
-                        const int subsysNum,
-                        const JCMTState *record,
+void gsdac_putSpecHdr ( const gsdVars *gsdVars, const unsigned int nSteps,
+                        const unsigned int stepNum, const int subsysNum,
+                        const dasFlag dasFlag, const JCMTState *record,
                         struct ACSISSpecHdr *specHdr, int *status )
 {
 

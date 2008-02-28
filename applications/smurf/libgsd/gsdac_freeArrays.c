@@ -13,13 +13,13 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_freeArrays ( const dasFlag dasFlag, const gsdVars *gsdVars,
+*     gsdac_freeArrays ( const dasFlag dasFlag, gsdVars *gsdVars,
 *                        int *status );
 
 *  Arguments:
 *     dasFlag = const dasFlag (Given)
 *        DAS file structure type
-*     gsdVars = const gsdVars* (Given and returned)
+*     gsdVars = gsdVars* (Given and returned)
 *        GSD headers and array data 
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -71,7 +71,7 @@
 
 #define FUNC_NAME "gsdac_freeArrays.c"
 
-void gsdac_freeArrays ( const dasFlag dasFlag, const gsdVars *gsdVars,  
+void gsdac_freeArrays ( const dasFlag dasFlag, gsdVars *gsdVars,  
                         int *status )
 {
 

@@ -72,6 +72,8 @@
 *        Original
 *     2008-02-14 (JB):
 *        Use gsdVars struct to store headers/arrays
+*     2008-02-27 (JB):
+*        Check for Equatorial cellCode (unsupported)
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -205,7 +207,10 @@ void gsdac_getMapVars ( const gsdVars *gsdVars,
       strcpy ( loclCrd, "AZEL" );
       break;
     case COORD_EQ:
-      strcpy ( loclCrd, "EQ" );//k
+      *status = SAI__ERROR;
+      errRep ( FUNC_NAME, "Equatorial coordinates not supported", status );
+      return;
+      /*strcpy ( loclCrd, "EQ" );//k */
       break;
     case COORD_RD:
       strcpy ( loclCrd, "RA/Dec" );//k

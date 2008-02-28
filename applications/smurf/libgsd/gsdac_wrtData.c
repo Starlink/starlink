@@ -13,19 +13,19 @@
 *     ADAM A-task
 
 *  Invocation:
-*     gsdac_wrtData ( const gsdVars *gsdVars, const dasFlag dasFlag, 
-*                     char *directory, const unsigned int nSteps, 
+*     gsdac_wrtData ( const gsdVars *gsdVars, char *directory, 
+*                     const unsigned int nSteps, const dasFlag dasFlag, 
 *                     int *status );
 
 *  Arguments:
 *     gsdVars = const gsdVars* (Given)
 *        GSD headers and arrays
-*     dasFlag = const dasFlag (Given)
-*        DAS file structure type
 *     directory = char* (Given)
 *        Directory to write the file
 *     nSteps = const unsigned int (Given)
 *        Number of steps in the observation
+*     dasFlag = const dasFlag (Given)
+*        DAS file structure type
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -99,8 +99,8 @@
 #define MAXRECEP 8  
 #define MAXSUBSYS 16
 
-void gsdac_wrtData ( const gsdVars *gsdVars, const dasFlag dasFlag, 
-                     const char *directory, const unsigned int nSteps, 
+void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory, 
+                     const unsigned int nSteps, const dasFlag dasFlag, 
                      int *status )
 {
 
@@ -260,21 +260,21 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const dasFlag dasFlag,
     specIndex = ( stepNum * spectrumSize ) / nSteps;
 
     /* Fill JCMTState. */
-    gsdac_putJCMTStateC ( gsdVars, dasFlag, stepNum, backend, 
+    gsdac_putJCMTStateC ( gsdVars, stepNum, backend, dasFlag, 
                           record, status );  
 
     /* For each subsystem, write the files. */
     for ( subsysNum = 1; subsysNum <= gsdVars->nBESections; subsysNum++ ) {
 
       /* Get the pointing and time values. */
-      gsdac_getWCS ( gsdVars, stepNum, subsysNum, wcs, status );
+      gsdac_getWCS ( gsdVars, stepNum, subsysNum, dasFlag, wcs, status );
 
       /* Get the subsystem-dependent JCMTState values. */
-      gsdac_putJCMTStateS ( gsdVars, dasFlag, stepNum, subsysNum, 
+      gsdac_putJCMTStateS ( gsdVars, stepNum, subsysNum, dasFlag, 
       	                    wcs, record, status );
 
       /* Get the ACSIS SpecHdr. */
-      gsdac_putSpecHdr ( gsdVars, dasFlag, nSteps, stepNum, subsysNum, record, 
+      gsdac_putSpecHdr ( gsdVars, nSteps, stepNum, subsysNum, dasFlag, record, 
       	                 specHdr, status );
 
       msgOutif(MSG__VERB," ", "Writing data", status); 
