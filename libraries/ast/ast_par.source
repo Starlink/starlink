@@ -94,6 +94,7 @@
       LOGICAL AST_TEST
       INTEGER AST_TUNE
       REAL AST_GETR
+      LOGICAL AST_CHRSUB
 
 *  Channel class.
       INTEGER AST_CHANNEL

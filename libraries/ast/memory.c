@@ -101,6 +101,8 @@
 *        block that has already been freed.
 *     25-OCT-2007 (DSB):
 *        Added astRemoveLeadingBlanks.
+*     28-FEB-2009 (DSB):
+*        Added astChrSub.
 */
 
 /* Configuration results. */
@@ -170,6 +172,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <limits.h>
 
 /* Function Macros. */
 /* =============== */
@@ -399,6 +402,8 @@ static int Use_Cache = 0;
 /* Prototypes for Private Functions. */
 /* ================================= */
 static size_t SizeOfMemory( void );
+static char *CheckTempStart( const char *, const char *, char *, int *, int *, int *, int *, int *, int * );
+static char *ChrMatcher( const char *, const char *, const char *[], int, int, int );
 
 #ifdef MEM_DEBUG
 static void Issue( Memory * );
@@ -496,6 +501,218 @@ char *astAppendString_( char *str1, int *nc, const char *str2 ) {
    return result;
 }
 
+static char *CheckTempStart( const char *template, const char *temp, 
+                             char *allowed, int *ntemp, int *allow, 
+                             int *min_nc, int *max_nc, int *start_sub, 
+                             int *end_sub ){
+/*
+*  Name:
+*     CheckTempStart
+
+*  Purpose:
+*     Examine the leading field in an astChrSub template.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     char *CheckTempStart( const char *template, const char *temp, 
+*                           char *allowed, int *ntemp, int *allow, 
+*                           int *min_nc, int *max_nc, int *start_sub, 
+*                           int *end_sub )
+
+*  Description:
+*     This function returns inforation about the leading field in a
+*     template string supplied to astChrSub.
+
+*  Parameters:
+*     template
+*        The full template string (used for error messages).
+*     temp
+*        Pointer to the next character to read from the template string.
+*     allowed
+*        Pointer to a buffer in which to store a string of characters
+*        that the leading temeplate field will match. A NULL pointer may
+*        be supplied in which case new memory will be allocated. The
+*        supplied memory is expanded as necessary, and a pointer to it is 
+*        returned as the function value.
+*     ntemp
+*        Address of an int in which to return the number of characters
+*        consumed from the start of "temp".
+*     allow
+*        Address of an int in which to return a flag which is non-zero if
+*        the returned string contains characters that are allowed in the
+*        test field, or zero if the returned string contains characters that 
+*        are disallowed in the test field.
+*     min_nc
+*        Address of an int in which to return the minimum number of 
+*        test characters that must belong to the returned set of 
+*        allowed characters.
+*     max_nc
+*        Address of an int in which to return the maximum number of 
+*        test characters that must belong to the returned set of 
+*        allowed characters.
+*     start_sub
+*        Address of an int in which to return a flag which is non-zero if
+*        the leading template field indicates the start of a field to be 
+*        substituted. In this case the supplied "allowed" pointer is
+*        returned without change as the function value, "Min_nc" is
+*        returned as zero, and max_nc is returned as zero.
+*     end_sub
+*        Address of an int in which to return a flag which is non-zero if
+*        the leading template field indicates the end of a field to be 
+*        substituted. In this case the supplied "allowed" pointer is
+*        returned without change as the function value, "Min_nc" is
+*        returned as zero, and limit is returned as zero.
+
+*  Returned Value:
+*     Pointer to a (possibly newly allocated) memory area holding a
+*     string of characters that the leading temeplate field will match.
+*     This string should be released using astFree when no longer needed.
+*     If a NULL pointyer is returned, then all characters are allowed
+*     (or disallowed if "*allow" is zero). 
+
+*  Notes:
+*     - The returned value is also stored in the module variable
+*     SizeOf_Memory. 
+*/
+
+/* Local Variables: */
+   char *result;
+   const char *start;
+   const char *end;
+
+/* Initialise. */
+   result = allowed;
+   *ntemp = 0;
+   *allow = 1;
+   *min_nc = 0;
+   *max_nc = 0;
+   *start_sub = 0;
+   *end_sub = 0;
+
+/* Check global status */
+   if( !astOK ) return result;
+
+/* If the next character is an opening parenthesis, this marks the start
+   of a substitution field. */
+   if( *temp == '(' ) {
+      *start_sub = 1;
+      *ntemp = 1;
+
+/* If the next character is an closing parenthesis, this marks the end
+   of a substitution field. */
+   } else if( *temp == ')' ) {
+      *end_sub = 1;
+      *ntemp = 1;
+
+/* If the next character is an opening bracket, this marks the start of a
+   field of allowed or disallowed characters. */
+   } else {
+      if( *temp == '[' ) {
+
+/* If the first character in the brackets is "^" this is a field of
+   disallowed characters, otherwise they are allowed. */
+         if( temp[ 1 ] == '^' ) {
+            *allow = 0;
+            start = temp + 2;
+         } else {
+            start = temp + 1;
+         }
+     
+/* Get a pointer to the closing bracket. */
+         end = strchr( temp, ']' );
+
+/* Copy the intervening string into the returned string. */
+         if( end ) {
+            result = astStore( allowed, start, end - start + 1 );
+            if( result ) result[ end - start  ] = 0;
+
+/* Report an error if no closing bracket was found. */
+         } else {
+            astError( AST__BADSUB, "Invalid substitution template \"%s\": "
+                      "missing ']'.", template );
+         }
+
+/* Indicate how many template characters have been used. */
+         *ntemp = end - temp + 1;
+
+/* A single dot matches any character. */
+      } else if( *temp == '.' ) {
+         result = astFree( result );
+         *ntemp = 1;
+
+/* Now deal with escape sequences. */
+      } else if( *temp == '\\' ) {
+
+/* Digits... */
+         if( temp[ 1 ] == 'd' || temp[ 1 ] == 'D' ) {
+            result = astStore( allowed, "0123456789", 11 );
+            result[ 10 ] = 0;
+            if( temp[ 1 ] == 'D' ) *allow = 0;
+
+/* White space... */
+         } else if( temp[ 1 ] == 's' || temp[ 1 ] == 'S' ) {
+            result = astStore( allowed, " 	\n\r", 5 );
+            result[ 4 ] = 0;
+            if( temp[ 1 ] == 'S' ) *allow = 0;
+              
+/* Word characters... */
+         } else if( temp[ 1 ] == 'w' || temp[ 1 ] == 'W' ) {
+            result = astStore( allowed, "abcdefghijklmnopqrstuvwxyz"
+                               "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_",
+                               64 );                                
+            result[ 63 ] = 0;
+            if( temp[ 1 ] == 'W' ) *allow = 0;
+
+/* Any other character is treated literally. */
+         } else {
+            result = astStore( allowed, temp + 1, 2 );
+            result[ 1 ] = 0;
+         }
+
+/* Set number of template characters consumed. */
+         *ntemp = 2;
+
+/* Everything else must be matched literally. */
+      } else {
+
+         if( *temp == '*' || *temp == '?' || *temp == '+' ){
+            astError( AST__BADSUB, "Invalid substitution template \"%s\": "
+                      "field starts with '%c'.", template, temp[ *ntemp ] );
+         } else {
+            result = astStore( allowed, temp, 2 );
+            result[ 1 ] = 0;
+            *ntemp = 1;
+         }
+
+      }
+
+/* Now see if there is any multiplier. */
+      if( temp[ *ntemp ] == '*' ) {
+         *min_nc = 0;
+         *max_nc = INT_MAX;
+         (*ntemp)++;
+
+      } else if( temp[ *ntemp ] == '+' ) {
+         *min_nc = 1;
+         *max_nc = INT_MAX;
+         (*ntemp)++;
+
+      } else if( temp[ *ntemp ] == '?' ) {
+         *min_nc = 0;
+         *max_nc = 1;
+         (*ntemp)++;
+
+      } else {
+         *min_nc = 1;
+         *max_nc = 1;
+      }
+   }
+
+/* Return the string of allowed characters. */
+   return result;
+}
 
 int astChrMatch_( const char *str1, const char *str2 ) {
 /*
@@ -731,6 +948,254 @@ char **astChrSplit_( const char *str, int *n ) {
    }
 
 /* Return the result. */
+   return result;
+}
+
+char *astChrSub_( const char *test, const char *pattern, const char *subs[],
+                  int nsub ){
+/*
+*+
+*  Name:
+*     astChrSub
+
+*  Purpose:
+*     Performs substitutions on a supplied string.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+c     #include "memory.h"
+c     char *astChrSub( const char *test, const char *pattern, 
+c                      const char *subs[], int nsub )
+f     MATCH = AST_CHRSUB( TEST, PATTERN, RESULT, STATUS )
+
+*  Description:
+*     This function checks a supplied test string to see if it matches a
+*     supplied template. If it does, specified sub-sections of the test
+*     string may optionally be replaced by supplied substitution strings.
+*     The resulting string is returned.
+
+*  Parameters:
+c     test
+f     TEST = CHARACTER * ( * ) (Given)
+*        The string to be tested.
+*     pattern
+f     PATTERN = CHARACTER * ( * ) (Given)
+*        The template string. See "Template Syntax:" below.
+*     subs
+*        An array of strings that are to replace the sections of the test 
+*        string that match each parenthesised sub-string in "pattern". The 
+*        first element of "subs" replaces the part of the test string that 
+*        matches the first parenthesised sub-string in the template, etc.
+*
+*        If "nsub" is zero, then the "subs" pointer is ignored. In this
+*        case, substitution strings may be specified by appended them to 
+*        the end of the "pattern" string, separated by "=" characters.
+*     nsub
+*        The number of substitution strings supplied in array "subs".
+f     RESULT = CHARACTER * ( * ) (Returned)
+f        Returned holding the result of the substitutions. If the test
+f        string does not match the template, then a blank string is
+f        returned.
+
+*  Returned Value:
+*     astChrSub()
+*        A pointer to a dynamically allocated string holding the result
+*	 of the substitutions, or NULL if the test string does not match
+*	 the template string. This string should be freed using astFree
+*	 when no longer needed. If no substituions are specified then a
+*	 copy of the test string is returned if it matches the template.
+f     AST_CHRSUB = LOGICAL
+*        .TRUE. if the test string matched the supplied pattern, and
+*        .FALSE. otherwise.
+
+*  Template Syntax:
+*     The template syntax is a minimal form of regular expression, The
+*     only quantifiers allowed are "*", "+" and "?". The only constraints 
+*     allowed are "^" and "$". The following atoms are allowed:
+*
+*     [chars]: Matches any of the specified characters.
+*     [^chars]: Matches anything but the specified characters.
+*     .: Matches any single character.
+*     x: Matches the character x so long as x has no other significance.
+*     \x: Always matches the character x (except for [dDsSwW]).
+*     \d: Matches a single digit.
+*     \D: Matches anything but a single digit.
+*     \w: Matches any alphanumeric character, and "_".
+*     \W: Matches anything but alphanumeric characters, and "_".
+*     \s: Matches white space.
+*     \S: Matches anything but white space.
+* 
+*     Note, minus signs ("-") within brackets have no special significance, 
+*     so ranges of characters must be specified explicitly.
+*
+c     Parentheses are used within the template to identify sub-strings
+c     that are to be replaced by the strings supplied in "sub".
+c
+c     If "nsub" is supplied as zero, then substitution strings may be
+c     specified by appended them to the end of the "pattern" string,
+c     separated by "=" characters. If "nsub" is not zero, then any
+c     substitution strings appended to the end of "pattern" are ignored.
+f
+f     Parentheses are used within the template to identify sub-strings
+f     that are to be replaced by new strings. The new strings are
+f     specified by appended them to the end of the "pattern" string,
+f     separated by "=" characters. 
+*
+c     Each element of "subs" 
+f     Each new string
+*     may contain a reference to a token of the 
+*     form "$1", "$2", etc. The "$1" token will be replaced by the part 
+*     of the test string that matched the first parenthesised sub-string 
+*     in "pattern". The "$2" token will be replaced by the part of the 
+*     test string that matched the second parenthesised sub-string in 
+*     "pattern", etc.
+
+c  Notes:
+c     -  A NULL pointer is returned if this function is invoked with the
+c     global error status set or if it should fail for any reason, or if
+c     the supplied test string does not match the template.
+
+*-
+*/
+
+/* Local Variables: */
+   char *a;
+   char *b;
+   char *ss;
+   char *result;
+   char *template;
+   const char *equals;
+   const char *start;
+   int done;
+   int patlen;
+   int slen;
+   int tmplen;      
+
+/* Check global status */
+   if( !astOK ) return NULL;
+
+/* Find the first occurrence of an unescaped "=" character in the
+   pattern. This marks the start of any substitution strings that may
+   have been appended tpo the end of the pattern matching template. */
+   equals = strchr( pattern, '=' );
+   while( equals && equals[ -1 ] == '\\' ) {
+      equals = strchr( equals + 1, '=' );
+   }
+
+/* Note the length of the pattern matching template. */
+   if( equals ) {
+      patlen = equals - pattern;
+   } else {
+      patlen = strlen( pattern );
+   }
+
+/* If the pattern matching template starts with "^" or "(^", remove the 
+   "^" character. Otherwise insert ".*" at the start. */
+   if( pattern[ 0 ] == '^' ) {
+      template = astStore( NULL, pattern + 1, patlen );
+      tmplen = patlen - 1;
+
+   } else if( pattern[ 0 ] == '(' && pattern[ 1 ] == '^') {
+      template = astMalloc( patlen );
+      if( template ) {
+         template[ 0 ] = '(';
+         strcpy( template + 1, pattern + 2 );
+         tmplen = patlen - 1;
+      }
+
+   } else {
+      template = astStore( NULL, ".*", 3 );
+      tmplen = 2;
+      template = astAppendString( template, &tmplen, pattern );
+      tmplen = patlen + 2;
+   }
+
+/* If the pattern ends with "$" or "$)", remove the "$" character. 
+   Otherwise insert ".*" at the end. */
+   if( template[ tmplen - 1 ] == '$' ) {
+      tmplen--;
+
+   } else if( template[ tmplen - 2 ] == '$' && template[ tmplen - 1 ] == ')' ) {
+      template[ tmplen - 2 ] = ')';
+      tmplen--;
+
+   } else {
+      template = astAppendString( template, &tmplen, ".*" );
+   }
+
+/* Ensure the string is terminated */
+   template[ tmplen ] = 0;
+
+/* If required, extract any substitution strings from the end of the 
+   pattern string. */
+   done = 0;
+   if( nsub == 0 && equals ) {
+
+/* Loop round each substitution string. */
+      start = equals + 1;
+      while( !done ){
+
+/* The end of the current substitution string is marked by the end of the
+   string or the next unescaped "=" character. */
+         equals = strchr( start, '=' );
+         while( equals && equals[ -1 ] == '\\' ) {
+            equals = strchr( equals + 1, '=' );
+         }
+
+/* Note the length of the substitution string. Set a flag indicating if
+   we this is the last one. */
+         if( equals ) {
+            slen = equals - 1 - start + 1;
+         } else {
+            slen = strlen( start );
+            done = 1;
+         }     
+
+/* Expand the "subs" array so that it will hold another pointer. */
+         subs = astGrow( subs, nsub + 1, sizeof( char * ) );
+         if( subs ) {
+
+/* Take a copy of the substitution string and store a pointer to the copy
+   in "sub". Terminate it. */
+            ss = astStore( NULL, start, slen + 1 );
+            ss[ slen ] = 0;
+
+/* Note the start of the next substitution string (if any). */
+            start += slen + 1;
+
+/* Un-escape any remaining "=" characters in the substitution string. */
+            a = ss;
+            b = a;
+            while( *a ) {
+               if( *a == '=' ) b--;
+               *(b++) = *(a++);
+            }
+            *b = 0;
+            
+/* Store the poitner and increment the number of substitution strings saved 
+   so far. */            
+            subs[ nsub++ ] = ss;
+         }            
+      }      
+
+   }
+
+/* Do the matching. */
+   result = ChrMatcher( test, template, subs, nsub, 0, 1 );
+
+/* Free resources. */
+   template = astFree( template );
+
+   if( done && subs ) {
+      while( nsub-- ) subs[ nsub ] = astFree( (void *) subs[ nsub ] );
+      subs = astFree( subs );
+   }
+
+   if( !astOK ) result = astFree( result );
+
+/* Return the result */
    return result;
 }
 
@@ -1086,6 +1551,380 @@ void *astMalloc_( size_t size ) {
          result = (char *) result + SIZEOF_MEMORY;
       }
    }
+
+/* Return the result. */
+   return result;
+}
+
+static char *ChrMatcher( const char *test, const char *template, 
+                         const char *subs[], int nsub, int ignore,
+                         int expdoll ){
+/*
+*  Name:
+*     ChrMatcher
+
+*  Purpose:
+*     Performs substitutions on a supplied string.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "memory.h"
+*     char *ChrMatcher( const char *test, const char *template, 
+*                       const char *subs[], int nsub, int ignore,
+*                       int expdoll )
+
+*  Description:
+*     This function is performs most of the work for astChrSub.
+
+*  Parameters:
+*     test
+*        The string to be tested.
+*     template
+*        The template string. See astChrSub for details.
+*     subs
+*        An array of strings holding the values that are to be substituted
+*        into each parenthesised substring in "test". 
+*     nsub
+*        The length of the subs arrays.
+*     ignore
+*        If non-zero, then no substitutions are performed, and any
+*        inbalance in parentheses is ignored.
+*     expdoll
+*        If non-zero, then any "$1", "$2", etc, tokens in the
+*        substitution fields will be repalced by the corresponding fields
+*        in the test string.
+
+*  Returned Value:
+*     A pointer to a dynamically allocated string holding the result of the
+*     substitutions, or NULL if the test string does not match the template
+*     string. This string should be freed using astFree when no longer
+*     needed.
+
+*  Notes:
+*     -  A NULL pointer is returned if this function is invoked with the
+*     global error status set or if it should fail for any reason, or if
+*     the supplied test string does not match the template.
+*-
+*/
+
+/* Local Variables: */
+   char **matches;
+   char **newsubs;
+   char **parts;
+   char *allowed;
+   char *r;
+   char *result;
+   char *sres;
+   char *stest;
+   char stemp[10];
+   const char *aaa;
+   const char *aa;
+   const char *a;
+   const char *b;
+   int allow;
+   int dollar;
+   int end_sub;
+   int i;
+   int in_sub;
+   int ipart;
+   int match;
+   int matchlen;
+   int max_na;
+   int min_na;
+   int na;
+   int nb;
+   int nmatch;
+   int npart;
+   int partlen;
+   int reslen;      
+   int start_sub;
+
+/* Check the global error status. */
+   if( !astOK ) return NULL;
+
+/* Initialise. */
+   result = NULL;
+   allowed = NULL;
+
+/* Get memory for a set of pointers to copies of the test sub-strings that 
+   fall between the sub-strings being replaced. */
+   parts = astMalloc( sizeof( char *)*(size_t) ( nsub + 1 ) );
+
+/* Get memory for a set of pointers to copies of the test sub-strings that 
+   match the parenthesised sub-strings in the template. */
+   matches = astMalloc( sizeof( char *)*(size_t) nsub );
+
+/* Initialise pointers to the next test and template characters to read. */ 
+   a = test;
+   b = template;
+
+/* Initialise the pointer to the start of the previous test character */
+   aa = test;
+
+/* Assume the test string matches the template. */
+   match = 1;
+
+/* The template pointer is not currently in a substitution field. */
+   in_sub = 0;
+
+/* Initialise the number of substitution fields found so far. */
+   npart = 0;
+   nmatch = 0;
+
+/* Loop until we have reached the end of either the test or template
+   string. We break out of the loop early if we find that the test string
+   does not match the template string. */
+   while( *a && *b ) {
+
+/* Examine the string at the start of the template string. This returns a
+   string of allowed (or disallowed) characters that the next test character 
+   can match, the number of template characters consumed, the minimum number 
+   of test characters that must match the allowed character set, and a flag
+   indicating if the number of matching test characters can exceed the 
+   minimum number or must be exactly equal to the minimum number.  */
+      allowed = CheckTempStart( template, b, allowed, &nb, &allow, &min_na, 
+                                &max_na, &start_sub, &end_sub );
+      if( !astOK ) break;
+
+/* Increment the the pointer to the next template character. */
+      b += nb;
+
+/* If the leading field in the template indicates the start of a
+   substitution field, record the test string up to the current point. */
+      if( start_sub ){
+
+/* Do nothing if we are ignoring substitutions. */
+         if( ! ignore ){
+
+/* Store a pointer to the first test character that matches the
+   substitution template. */
+            aaa = a;
+
+/* Report an error and abort if we are already inside a substitution
+   field */
+            if( in_sub ) {
+               astError( AST__BADSUB, "Invalid substitution template \"%s\": "
+                         "missing ')'.", template );
+               break;
+            } 
+
+/* Indicate that we are now in a substitution field. */
+            in_sub = 1;
+
+/* If possible, store a copy of the test string that started at the end
+   of the previous substitution field and ends at the current point. */
+            if( parts && npart <= nsub ) {
+               partlen = ( a - aa );
+               parts[ npart ] = astStore( NULL, aa, partlen + 1 );
+               if( parts[ npart ] ) {
+                  parts[ npart ][ partlen ] = 0;
+                  npart++;
+               }
+            }        
+         }
+
+/* If the leading field in the template indicates the end of a
+   substitution field, initialise the start of the next part of the test
+   string. */
+      } else if( end_sub ){
+
+/* Do nothing if we are ignoring substitutions. */
+         if( ! ignore ){
+
+/* Report an error and abort if we are not currently in a substitution
+   field. */
+            if( ! in_sub ) {
+               astError( AST__BADSUB, "Invalid substitution template \"%s\": "
+                         "missing '('.", template );
+               break;
+            }
+
+/* We are no longer in a substitution field. */
+            in_sub = 0; 
+
+/* If possible, store a copy of the test string that matched the
+   substitution template. */
+            if( matches && nmatch < nsub ) {
+               matchlen = ( a - aaa );
+               matches[ nmatch ] = astStore( NULL, aaa, matchlen + 1 );
+               if( matches[ nmatch ] ) {
+                  matches[ nmatch ][ matchlen ] = 0;
+                  nmatch++;
+               }
+            }        
+
+/* Record the start of the next test string part. */
+            aa = a;
+         }
+
+/* Otherwise, find how many characters at the front of the test string
+   match the leading field in the template. Find the number of leading 
+   characters in the test string that are contained in the set of 
+   characters allowed by the leading field in the template. */
+      } else {
+         if( !allowed ) {
+            na = strlen( a );
+
+         } else if( allow ) {
+            na = strspn( a, allowed );
+
+         } else {
+            na = strcspn( a, allowed );
+         }
+
+/* Check that the minmum number of matching characters is available. */
+         if( na < min_na ){
+            match = 0;
+            break;
+         }
+
+/* Dont match more characters than are needed. */
+         if( na > max_na ) na = max_na;
+
+/* If we still have a match, we may choose to use fewer than the max
+   allowed number of test characters in order to allow the next template
+   field to be matched. Don't need to do this if we have reached the end
+   of the template. */
+         if( max_na > min_na && *b ) {
+            match = 0;
+
+/* Try using an increasing number of test characters, starting at the
+   minimum allowed and increasing up to the maximum, until a number is foudn
+   which allows the rest of the string to be matched. */
+            if( na < max_na ) max_na = na;
+            for( na = min_na; na <= max_na; na++ ) {
+               r = ChrMatcher( a + na, b, NULL, 0, 1, 0 );
+               if( r ) {
+                  match = 1;
+                  r = astFree( r );
+                  break;                  
+               }
+            }
+         }
+
+/* Increment the the pointer to the next test character. */
+         a += na;
+      }
+   }
+
+/* If the next character in the template is a closing parenthesis, then
+   we are finishing a substitution field. */
+   if( match && *b == ')' ) {
+
+/*Check we are not ignoring substitutions. */
+      if( ! ignore ){
+
+/* Report an error and abort if we are not currently in a substitution
+   field. */
+         if( ! in_sub ) {
+            astError( AST__BADSUB, "Invalid substitution template \"%s\": "
+                      "missing '('.", template );
+         }
+
+/* We are no longer in a substitution field. */
+         in_sub = 0; 
+
+/* Store a null string following this final substitution field */
+         if( parts && npart <= nsub ) {
+            parts[ npart ] = astStore( NULL, "", 1 );
+            npart++;
+         }
+
+/* If possible, store a copy of the test string that matched the
+   substitution field. */
+         if( matches && nmatch < nsub ) {
+            matchlen = ( a - aaa );
+            matches[ nmatch ] = astStore( NULL, aaa, matchlen + 1 );
+            if( matches[ nmatch ] ) {
+               matches[ nmatch ][ matchlen ] = 0;
+               nmatch++;
+            }
+         }        
+
+         aa = a;
+      }
+      b++;
+   }
+
+/* If the test string is finished but the template string is not, see if
+   the rest of the template string will match a null test string. */
+   if( !*a && *b ) {
+      allowed = CheckTempStart( template, b, allowed, &nb, &allow, &min_na, 
+                                &max_na, &start_sub, &end_sub );
+      if( min_na == 0 ) b += strlen( b );
+      allowed = astFree( allowed );
+   } 
+
+/* No match if either string was not used completely. */
+   if( *a || *b ) match = 0;
+
+/* Report an error if we are still inside a substitution field */
+   if( match && in_sub && !ignore ) {
+      astError( AST__BADSUB, "Invalid substitution template \"%s\": "
+                "missing ')'.", template );
+      match = 0;
+   } 
+
+/* If we have a match, construct the returned string. */
+   if( match && parts ) {
+
+/* Store the test string following the final substitution field. */
+      if( npart <= nsub ) {
+         partlen = ( a - aa );
+         parts[ npart ] = astStore( NULL, aa, partlen + 1 );
+         if( parts[ npart ] ) {
+            parts[ npart ][ partlen ] = 0;
+            npart++;
+         }
+      }        
+
+/* if required, expand  $1, $2, etc within the replacement strings. */
+      if( expdoll) {
+         newsubs = astMalloc( sizeof( char * )*nsub );
+         if( newsubs ) {
+            for( i = 0; i < nsub; i++ ) {
+               stest = astStore( NULL, subs[ i ], strlen( subs[ i ] ) + 1 );
+               for( dollar = 1; dollar <= nsub; dollar++ ) {
+                  sprintf( stemp, ".*($%d).*", dollar );
+                  sres = ChrMatcher( stest, stemp, 
+                                     (void *) matches + dollar - 1, 1, 0, 0 );
+                  if( sres ) {
+                     (void) astFree( stest );
+                     stest = sres;
+                  }
+               }
+               newsubs[ i ] = stest;
+            }
+         }
+
+      } else {
+         newsubs = (char **) subs;
+      }
+
+/* Concatenate the sub-strings to form the final string. */
+      reslen = 0;
+      for( ipart = 0; ipart < npart - 1; ipart++ ) {
+         result = astAppendString( result, &reslen, parts[ ipart ] );
+         result = astAppendString( result, &reslen, newsubs[ ipart ] );
+      }
+      result = astAppendString( result, &reslen, parts[ ipart ] );
+
+/* Free resources. */
+      if( newsubs && newsubs != (char **) subs ) {
+         for( i = 0; i < nsub; i++ ) {
+            newsubs[ i ] = astFree( newsubs[ i ] );
+         }
+         newsubs = astFree( newsubs );
+      }
+   }
+
+   allowed = astFree( allowed );
+   for( ipart = 0; ipart < npart; ipart++ ) {
+      parts[ ipart ] = astFree( parts[ ipart ] );
+   }
+   parts = astFree( parts );
 
 /* Return the result. */
    return result;

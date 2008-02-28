@@ -482,6 +482,9 @@ F77_SUBROUTINE(ast_beginpm)( void ) {
 F77_SUBROUTINE(ast_endpm)( void ) {
 }
 
+
+
+
 #endif
 
 
@@ -501,6 +504,51 @@ F77_INTEGER_FUNCTION(ast_tune)( CHARACTER(NAME),
       name = astFree( name );
    )
    return RESULT;
+}
+
+F77_LOGICAL_FUNCTION(ast_chrsub)( CHARACTER(TEST),
+                                  CHARACTER(PATTERN),
+                                  CHARACTER(RESULT),
+                                  INTEGER(STATUS)
+                                  TRAIL(TEST) 
+                                  TRAIL(PATTERN)
+                                  TRAIL(RESULT) ) {
+   GENPTR_CHARACTER(TEST)
+   GENPTR_CHARACTER(PATTERN)
+   GENPTR_CHARACTER(RESULT)
+   F77_LOGICAL_TYPE(MATCH);
+
+   char *test, *pattern, *result; 
+   int i;
+
+   astAt( "AST_CHRSUB", NULL, 0 );
+   astWatchSTATUS(
+      test = astString( TEST, TEST_length );
+      pattern = astString( PATTERN, PATTERN_length );
+
+      if( pattern ) {
+         test[ astChrLen( test ) ] = 0;
+         pattern[ astChrLen( pattern ) ] = 0;
+      }
+
+      result = astChrSub( test, pattern, NULL, 0 );
+
+      i = 0;
+      if( result ) {
+         MATCH = F77_TRUE;
+         for ( ; result[ i ] && i < RESULT_length; i++ ) {
+            RESULT[ i ] = result[ i ];
+         }
+         result = astFree( result );
+      } else {
+         MATCH = F77_FALSE;
+      }
+      while ( i < RESULT_length ) RESULT[ i++ ] = ' '; /* Pad with blanks */
+
+      test = astFree( test );
+      pattern = astFree( pattern );
+   )
+   return MATCH;
 }
 
 

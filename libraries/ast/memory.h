@@ -105,6 +105,9 @@
 *        Added astIsDynamic.
 *     25-OCT-2007 (DSB):
 *        Added astRemoveLeadingBlanks.
+*     22-FEB-2008 (DSB):
+*        Added astChrSub.
+
 *-
 */
 
@@ -146,6 +149,7 @@ void *astStore_( void *, const void *, size_t );
 size_t astChrLen_( const char * );
 void astRemoveLeadingBlanks_( char * );
 char *astAppendString_( char *, int *, const char * );
+char *astChrSub_( const char *, const char *, const char *[], int );
 
 #ifdef MEM_DEBUG
 void astActiveMemory_( const char * );
@@ -182,6 +186,7 @@ void astEndPM_( void );
 #define astStringArray(chars,nel,len) astERROR_INVOKE(astStringArray_(chars,nel,len))
 #define astChrLen(string) astERROR_INVOKE(astChrLen_(string))
 #define astRemoveLeadingBlanks(string) astERROR_INVOKE(astRemoveLeadingBlanks_(string))
+#define astChrSub(test,template,subs,nsub) astERROR_INVOKE(astChrSub_(test,template,subs,nsub))
 
 #ifdef HAVE_NONANSI_SSCANF
 #define astSscanf astERROR_INVOKE(astSscanf_)
