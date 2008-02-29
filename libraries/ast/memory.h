@@ -133,6 +133,7 @@
                                  /* language or graphics interfaces. */
 int astMemCaching_( int );
 char **astChrSplit_( const char *, int * );
+char **astChrSplitC_( const char *, char, int * );
 int astChrMatch_( const char *, const char * );
 int astChrMatchN_( const char *, const char *, size_t );
 char **astStringArray_( const char *, int, int );
@@ -194,6 +195,7 @@ void astEndPM_( void );
 #define astSscanf astERROR_INVOKE(sscanf)
 #endif
 #define astChrSplit(str,n) astERROR_INVOKE(astChrSplit_(str,n))
+#define astChrSplitC(str,c,n) astERROR_INVOKE(astChrSplitC_(str,c,n))
 
 
 /* Functions used for debugging memory leaks, etc */
