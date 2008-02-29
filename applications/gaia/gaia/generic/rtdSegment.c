@@ -2011,7 +2011,7 @@ DashPrintProc( ClientData clientData, Tk_Window tkwin, char *recordPtr,
     ptr2 = buffer = ckalloc( 120 );
 
     while ( *ptr1 ) {
-        ptr2 += sprintf( ptr2, "%c", ptr1 );
+        ptr2 += sprintf( ptr2, "%c", *ptr1 );
         ptr1++;
     }
 

@@ -82,8 +82,6 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
-*  Local Variables:
-      INTEGER I                  ! Loop variable
 *.
 
 *  Check inherited global status.

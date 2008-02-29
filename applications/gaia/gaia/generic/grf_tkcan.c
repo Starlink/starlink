@@ -263,8 +263,6 @@ int astTk_Init( Tcl_Interp *theinterp, const char *thecanvas ) {
 
  *-
  */
-    int i;         /* Loop variable */
-
     /*  Record the names of the canvas and its interpreter */
     if ( ! astTk_SetCanvas( thecanvas ) ) {
         return 0;
