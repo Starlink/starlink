@@ -90,13 +90,17 @@
 *        Modified interface to smf_open_file.
 *     2007-12-14 (EC):
 *        Call smf_open_file with SMF__NOCREATE_DATA
+*     2008-02-29 (AGG):
+*        Explicitly set SkyRef position, ensure SkyRefIs and
+*        AlignOffset attributes are also set accordingly
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
-*     Council and University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2008 University of British Columbia. 
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -378,17 +382,19 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
   /* Just for kicks, let the user know the value of *moving */
   msgSeti("M",*moving);
   msgOutif(MSG__VERB, " ", "Moving = ^M", status);
+  /* Set the reference position to the telescope BASE position */
+  astSetD( skyframe, "SkyRef(1)", skyref[0] );
+  astSetD( skyframe, "SkyRef(2)", skyref[1] );
   /* Before adding to frameset, ensure that the SkyFrame represents
      offsets from the first telescope base position, rather than
      absolute coordinates */
   if ( *moving ) {
-    astSetD( skyframe, "SkyRef(1)", skyref[0] );
-    astSetD( skyframe, "SkyRef(2)", skyref[1] );
-    astSet( skyframe, "SkyRefIs=origin" );
+    astSet( skyframe, "SkyRefIs=origin,AlignOffset=1" );
     /* Also set tangent position */
     lon_0 = 0.0;
     lat_0 = 0.0;
   } else {
+    astSet( skyframe, "SkyRefIs=ignored,AlignOffset=0" );
     lon_0 = DR2D * skyref[0];
     lat_0 = DR2D * skyref[1];
   }

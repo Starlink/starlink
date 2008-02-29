@@ -93,6 +93,9 @@
 *        Modified interface to smf_open_file.
 *     2007-12-14 (EC):
 *        Call smf_open_file with SMF__NOCREATE_DATA
+*     2008-02-29 (AGG):
+*        Explicitly set SkyRef position, ensure SkyRefIs and
+*        AlignOffset attributes are also set accordingly
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -100,6 +103,7 @@
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2005-2008 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -159,7 +163,6 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
   AstFrameSet *fs = NULL;      /* A general purpose FrameSet pointer */
   smfHead *hdr = NULL;         /* Pointer to data header this time slice */
   int i;                       /* Loop counter */
-  int ibasein;                 /* Index of base Frame in input FrameSet */
   int j;                       /* Loop counter */
   dim_t k;                     /* Loop counter */
   char *pname = NULL;          /* Name of currently opened data file */
@@ -372,17 +375,19 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
           msgOutif(MSG__VERB, " ", "Moving = ^M (^R arcsec)", status);
         } /* End skyframe construction */
 
+	/* Set the reference position to the telescope BASE position */
+	astSetD( skyframe, "SkyRef(1)", skyref[0] );
+	astSetD( skyframe, "SkyRef(2)", skyref[1] );
         /* Before adding to frameset, ensure that the SkyFrame
            represents offsets from the first telescope base position,
            rather than absolute coordinates */
         if ( *moving ) {
-          astSetD( skyframe, "SkyRef(1)", skyref[0] );
-          astSetD( skyframe, "SkyRef(2)", skyref[1] );
-          astSet( skyframe, "SkyRefIs=origin" );
+          astSet( skyframe, "SkyRefIs=origin,AlignOffset=1" );
           /* Also set tangent position */
           lon_0 = 0.0;
           lat_0 = 0.0;
         } else {
+          astSet( skyframe, "SkyRefIs=ignored,AlignOffset=0" );
 	  /* If `flag' is set, use lon_0/lat_0 values given, else set
 	     them to the skyref coordinates  */
 	  if ( !flag ) {
