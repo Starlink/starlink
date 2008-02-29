@@ -2320,6 +2320,41 @@ to add further members.
 }
 
 \sstroutine{
+   NDG\_RMPRV
+}{
+   Remove provenance information from an NDF
+}{
+   \sstdescription{
+      This routine removes a given ancestor from the {\tt "}PROVENANCE{\tt "}
+      extension in INDF. The direct parents of the removed ancestor are
+      assigned to the direct children of the removed ancestor.
+   }
+   \sstinvocation{
+      CALL NDG\_RMPRV( INDF, IANC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         An identifier for the NDF containing the provenance information.
+      }
+      \sstsubsection{
+         IANC = INTEGER (Given)
+      }{
+         The index of the ancestor NDF to be removed. The supplied value
+         must be at least 1, and must be no more than the number of
+         ancestors in the provenance extension (as returned by NDG\_CTPRV).
+         An error is reported otherwise.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+
+\sstroutine{
    NDG\_RTPRV
 }{
    Identify the root ancestors of an NDF

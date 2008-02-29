@@ -649,6 +649,80 @@ F77_SUBROUTINE(ndg_ptprv)( INTEGER(indf1), INTEGER(indf2), CHARACTER(fmore),
 }
 
 
+F77_SUBROUTINE(ndg_rmprv)( INTEGER(indf), INTEGER(ianc), INTEGER(status) ){
+/*
+*+
+*  Name:
+*     NDG_RMPRV
+
+*  Purpose:
+*     Remove provenance information from an NDF.
+
+*  Language:
+*     Starlink ANSI C (callable from Fortran)
+
+*  Invocation:
+*     CALL NDG_RMPRV( INDF, IANC, STATUS )
+
+*  Description:
+*     This routine removes a given ancestor from the "PROVENANCE" 
+*     extension in INDF. The direct parents of the removed ancestor are
+*     assigned to the direct children of the removed ancestor.
+
+*  Arguments:
+*     INDF = INTEGER (Given)
+*        An identifier for the NDF containing the provenance information.
+*     IANC = INTEGER (Given)
+*        The index of the ancestor NDF to be removed. The supplied value
+*        must be at least 1, and must be no more than the number of
+*        ancestors in the provenance extension (as returned by NDG_CTPRV).
+*        An error is reported otherwise.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Copyright:
+*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This programme is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This programme is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this programme; if not, write to the Free Software
+*     Foundation, Inc., 59, Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     29-FEB-2008 (DSB):
+*        Original version.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*/
+   GENPTR_INTEGER(indf)
+   GENPTR_INTEGER(ianc)
+   GENPTR_INTEGER(status)
+
+/* Call the C function to do the work. */
+   ndgRmprv( *indf, *ianc, status );
+
+}
+
 F77_SUBROUTINE(ndg_rtprv)( INTEGER(indf), INTEGER(roots), INTEGER(status) ){
 /*
 *+
@@ -1187,6 +1261,125 @@ void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot,
 /* Free the provenance structures. */
    ndg1FreeProvenance( prov1, 1, status );
    ndg1FreeProvenance( prov2, free_provs, status );
+
+/* Re-instate the original AST status variable. */
+   astWatch( old_status );
+}
+
+void ndgRmprv( int indf, int ianc, int *status ){
+/*
+*  Name:
+*     ndgRmprv
+
+*  Purpose:
+*     Remove provenance information from an NDF.
+
+*  Synopsis:
+*     void ndgRmprv( int indf, int ianc, int *status )
+
+*  Description:
+*     This routine removes a given ancestor from the "PROVENANCE" 
+*     extension in INDF. The direct parents of the removed ancestor are
+*     assigned to the direct children of the removed ancestor.
+
+*  Parameters:
+*     indf
+*        An identifier for the NDF containing the provenance information.
+*     ianc
+*        The index of the ancestor NDF to be removed. The supplied value
+*        must be at least 1, and must be no more than the number of
+*        ancestors in the provenance extension (as returned by NDG_CTPRV).
+*        An error is reported otherwise.
+*     status
+*        The global status.
+
+*/
+
+/* Local Variables: */
+   Prov *anc = NULL;
+   Prov *child = NULL;
+   Prov *parent = NULL;
+   Provenance *prov = NULL;
+   int *old_status;
+   int i;             
+   int ichild;
+   int iparent;
+
+/* Check the inherited status. */
+   if( *status != SAI__OK ) return;
+
+/* Ensure AST uses the supplied status variable. */
+   old_status = astWatch( status );
+
+/* Read the provenance extension from the NDF. */
+   prov = ndg1ReadProvenanceExtension( indf, NULL, NULL, 0, status );
+
+/* Check the "ianc" value is within the bounds of the ANCESTORS array. */
+   if( prov && ianc > 0 && ianc < prov->nprov ) {
+
+/* Get a pointer to the ancestor Prov structure. */
+      anc = prov->provs[ ianc ];
+
+/* Loop round all the direct children of the ancestor. */
+      for( ichild = 0; ichild < anc->nchild; ichild++ ) {
+         child = anc->children[ ichild ];
+
+/* Break the parent-child link between the ancestor and the current
+   child. */
+         ndg1Disown( anc, child, status );
+
+/* Loop round all the direct parents of the ancestor. */
+         for( iparent = 0; iparent < anc->nparent; iparent++ ) {
+            parent = anc->parents[ iparent ];
+
+/* Create a parent-child link between the parent and the child, thus
+   skipping the ancestor that is to be removed. */
+            ndg1ParentChild( parent, child, status );
+         }
+      }
+
+/* Loop round all the direct parents of the ancestor. */
+      for( iparent = 0; iparent < anc->nparent; iparent++ ) {
+         parent = anc->parents[ iparent ];
+
+/* Break the parent-child link between the ancestor and the current
+   parent. */
+         ndg1Disown( parent, anc, status );
+      }
+
+/* Now free the resources used by the ancestor. */
+      prov->provs[ ianc ] = ndg1FreeProv( anc, status );
+
+/* Shuffle all the remaining Provs down one slot. */
+      for( i = ianc + 1; i < prov->nprov; i++ ) {
+         prov->provs[ i - 1 ] = prov->provs[ i ];
+      }
+      prov->provs[ i - 1 ] = NULL;
+      ( prov->nprov )--;
+
+/* Purge any duplicate entries in the provenance information. */
+      ndg1PurgeProvenance( prov, status );
+
+/* Store the modified provenance informtion in the NDF. */
+      ndg1WriteProvenanceExtension( prov, indf, status );
+
+/* Report an error if the ianc value is bad. */
+   } else if( *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      ndfMsg( "NDF", indf );
+      if( prov ) {
+         msgSeti( "IANC", ianc );
+         msgSeti( "N", prov->nprov );
+         errRep( " ", "Cannot remove provenance ancestor ^IANC from '^NDF': "
+                 "only ^N ancestors found.", status );
+      } else {
+         errRep( " ", "Cannot remove provenance information from '^NDF': "
+                 "no provenance found.", status );
+      }
+   }
+
+/* Free resources. */
+   ndg1FreeProvenance( prov, 1, status );
 
 /* Re-instate the original AST status variable. */
    astWatch( old_status );
