@@ -4801,6 +4801,16 @@ ndg_mdprv( indf, ianc, prov, status )
  OUTPUT:
   status
 
+void
+ndg_rmprv( indf, ianc, status )
+  ndfint &indf
+  ndfint &ianc
+  ndfint &status
+ PROTOTYPE: $$$
+ CODE:
+  ndg_rmprv_(&indf, &ianc, &status );
+ OUTPUT:
+  status
 
 
 ########################################
