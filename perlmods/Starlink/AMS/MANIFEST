@@ -1,5 +1,4 @@
 Makefile.PL
-MessageRelay.pl
 Core/Makefile.PL
 Core/Core.pm
 Core/ChangeLog
