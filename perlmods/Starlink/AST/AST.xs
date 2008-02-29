@@ -2826,8 +2826,10 @@ astTranP( this, forward, ... )
           Perl_croak(aTHX_ "Input array %d has differing number of elements to first array (%d != %d)",
                      count, n, npoint);
 
-       /* output coordinates */
-       ptr_out[count] = get_mortalspace( npoint, 'd' );
+    }                    
+    /* Allocate memory for the output coordinates */
+    for (i = 0; i < ncoord_out; i++) {
+       ptr_out[i] = get_mortalspace( npoint, 'd' );
     }
 
     /* Call AST */
