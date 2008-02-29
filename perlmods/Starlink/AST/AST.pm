@@ -298,7 +298,7 @@ sub Clone {
 
 sub Copy {
   my $self = shift;
-  my $new = $self->_Clone();
+  my $new = $self->_Copy();
   return bless $new, ref($self);
 }
 
