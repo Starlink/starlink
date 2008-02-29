@@ -19,7 +19,8 @@
 *                     const int utDate, const int nSteps, 
 *                     const char *backend, char *recepNames[],
 *                     const char *samMode, const char *obsType,
-*                     const gsdWCS *wcs, 
+*                     const dateVars *dateVars, const mapVars *mapVars,
+*                     const gsdWCS *wcs,
 *                     const AstFitsChan *fitschan, int *status )
 
 *  Arguments:
@@ -41,10 +42,12 @@
 *        Sample mode
 *     obsType = const char* (Given)
 *        Observation type
+*     dateVars = const dateVars* (Given)
+*        Date and time variables
+*     mapVars = const mapVars* (Given)
+*        Map/Chop/Scan variables
 *     wcs = const *gsdWCS (Given)
 *        pointing and time values
-*     record = const JCMTState* (Given)
-*        JCMTState headers
 *     fitschan = const AstFitsChan* (Given and Returned)
 *        FITS headers
 *     status = int* (Given and Returned)
@@ -69,6 +72,8 @@
 *        Fix integration time calculation
 *     2008-02-28 (JB):
 *        Replace subsysNum with subBandNum
+*     2008-02-28 (JB):
+*        Move getDateVars and getMapVars to wrtData
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -116,6 +121,7 @@ void gsdac_putFits ( const gsdVars *gsdVars,
                      const int utDate, const int nSteps, 
                      const char *backend, char *recepNames[],
                      const char *samMode, const char *obsType,
+                     const dateVars *dateVars, const mapVars *mapVars,
                      const gsdWCS *wcs, 
                      const AstFitsChan *fitschan, int *status )
 
@@ -128,40 +134,40 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   double azStart;             /* Azimuth at observation start (deg) */
   double bp;                  /* pressure (mbar) */
   char bwMode[SZFITSCARD];    /* ACSIS total bandwidth setup */
-  char chopCrd[SZFITSCARD];   /* chopper coordinate system */
+  //  char chopCrd[SZFITSCARD];   /* chopper coordinate system */
   char curChar;               /* character pointer */
-  char dateEnd[SZFITSCARD];   /* UTC datetime of end of observation 
-                                 in format YYYY-MM-DDTHH:MM:SS */
-  char dateObs[SZFITSCARD];   /* UTC datetime of start of observation 
-                                 in format YYYY-MM-DDTHH:MM:SS */
+  //char dateEnd[SZFITSCARD];   /* UTC datetime of end of observation 
+  //                               in format YYYY-MM-DDTHH:MM:SS */
+  //char dateObs[SZFITSCARD];   /* UTC datetime of start of observation 
+  //                               in format YYYY-MM-DDTHH:MM:SS */
   int day;                    /* days for time conversion. */
   char doppler[SZFITSCARD];   /* doppler velocity definition */
   double elEnd;               /* elevation at observation end (deg) */
   double elStart;             /* elevation at observation start (deg) */
   double etal;                /* telescope efficiency */
   int hour;                   /* hours for time conversion. */
-  char HSTend[SZFITSCARD];    /* HST at observation end in format 
-                                 YYYY-MM-DDTHH:MM:SS */
-  char HSTstart[SZFITSCARD];  /* HST at observation start in format 
-                                 YYYY-MM-DDTHH:MM:SS */
+  //char HSTend[SZFITSCARD];    /* HST at observation end in format 
+  //                               YYYY-MM-DDTHH:MM:SS */
+  //char HSTstart[SZFITSCARD];  /* HST at observation start in format 
+  //                               YYYY-MM-DDTHH:MM:SS */
   int i;                      /* loop counter */
   float IFchanSp;             /* TOPO IF channel spacing (Hz) */
   double IFfreq;              /* IF frequency (GHz) */
   char instrume[SZFITSCARD];  /* front-end receiver */
   double intTime;             /* total time spent integrating (s) */
   int josMin;                 /* ?? */
-  char loclCrd[SZFITSCARD];   /* local offset coordinate system for 
-                                 map_x / map_y */
-  char LSTstart[SZFITSCARD];  /* LST at observation start in format
-                                 YYYY-MM-DDTHH:MM:SS */
-  char LSTend[SZFITSCARD];    /* LST at observation end in format
-                                 YYYY-MM-DDTHH:MM:SS */
-  float mapHght;              /* requested height of rectangle to be mapped 
-                                 (arcsec) */
-  float mapPA;                /* requested PA of map vertical, +ve towards
-                                 +ve long */
-  float mapWdth;              /* requested width of rectangle to be mapped
-                                 (arcsec) */
+  //char loclCrd[SZFITSCARD];   /* local offset coordinate system for 
+  //                               map_x / map_y */
+  //char LSTstart[SZFITSCARD];  /* LST at observation start in format
+  //                               YYYY-MM-DDTHH:MM:SS */
+  //char LSTend[SZFITSCARD];    /* LST at observation end in format
+  //                               YYYY-MM-DDTHH:MM:SS */
+  //float mapHght;              /* requested height of rectangle to be mapped 
+  //                               (arcsec) */
+  //float mapPA;                /* requested PA of map vertical, +ve towards
+  //                               +ve long */
+  //float mapWdth;              /* requested width of rectangle to be mapped
+  //                               (arcsec) */
   int min;                    /* minutes for time conversion. */
   char molecule[SZFITSCARD];  /* target molecular species */
   int month;                  /* months for time conversion. */
@@ -169,32 +175,32 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   double nRefStep;            /* number of nod sets repeated */
   char object[SZFITSCARD];    /* object of interest */
   char object2[SZFITSCARD];   /* object of interest (second half of name) */
-  char obsID[SZFITSCARD];     /* unique observation number in format
-                                 INSTR_NNNNN_YYYYMMDDTHHMMSS */
-  char obsIDs[SZFITSCARD];    /* unique observation number + subsystem
+  //char obsID[SZFITSCARD];     /* unique observation number in format
+  //                               INSTR_NNNNN_YYYYMMDDTHHMMSS */
+  char obsIDSS[SZFITSCARD];   /* unique observation number + subsystem
                                  number in format
                                  INSTR_NNNNN_YYYYMMDDTHHMMSS_N */
   char obsSB[SZFITSCARD];     /* observed sideband */
   int parse;                  /* flag for incorrect date string. */
   char recptors[SZFITSCARD];  /* active FE receptor IDs for this obs */
   double refChan;             /* reference IF channel no. */
-  char scanCrd[SZFITSCARD];   /* coordinate system of scan */
-  float scanDy;               /* scan spacing perpendicular to scan
-                                 (arcsec) */
-  float scanPA;               /* Scan PA rel. to lat. line; 0=lat, 
-                                 90=long in scanCrd system */
-  char scanPat[SZFITSCARD];   /* name of scanning scheme */
-  float scanVel;              /* scan velocity (arcsec/sec) */
+  //char scanCrd[SZFITSCARD];   /* coordinate system of scan */
+  //float scanDy;               /* scan spacing perpendicular to scan
+  //                               (arcsec) */
+  //float scanPA;               /* Scan PA rel. to lat. line; 0=lat, 
+  //                               90=long in scanCrd system */
+  //char scanPat[SZFITSCARD];   /* name of scanning scheme */
+  //float scanVel;              /* scan velocity (arcsec/sec) */
   char seeDatSt[SZFITSCARD];  /* time of seeingSt in format
                                  YYYY-MM-DDTHH:MM:SS */
-  char skyRefX[SZFITSCARD];   /* X co-ord of reference position (arcsec) */  
-  char skyRefY[SZFITSCARD];   /* Y co-ord of reference position (arcsec) */  
+  //char skyRefX[SZFITSCARD];   /* X co-ord of reference position (arcsec) */  
+  //char skyRefY[SZFITSCARD];   /* Y co-ord of reference position (arcsec) */  
   char sSysObs[SZFITSCARD];   /* spectral ref. frame during observation */
   int standard;               /* true for spectral line standards */
   int startIdx;               /* index in pattern at start of observation */
   int stBetRef;               /* max number of steps between refs */
   char subBands[SZFITSCARD];  /* ACSIS sub-band set-up */
-  char swMode[SZFITSCARD];    /* switch mode */
+  //char swMode[SZFITSCARD];    /* switch mode */
   char tauDatSt[SZFITSCARD];  /* time of tau225St observation in 
                                  format YYYY-MM-DDTHH:MM:SS */
   char telName[SZFITSCARD];   /* telescope name */
@@ -211,8 +217,7 @@ void gsdac_putFits ( const gsdVars *gsdVars,
 
 
   /* Obs Id, Date, Pointing Info */
-
-
+ 
   /* Truncate the object names and concatenate. */
   cnfImprt ( gsdVars->object1, 16, object );
   cnfImprt ( gsdVars->object2, 16, object2 );
@@ -224,11 +229,6 @@ void gsdac_putFits ( const gsdVars *gsdVars,
 
   /* Determine if this is a spectral line standard. */
   standard = 0;//k
-
-  /* Get the UTC start and end times and observation IDs. */
-  gsdac_getDateVars ( gsdVars, subBandNum, obsNum, backend, dateObs, 
-                      dateEnd, obsID, obsIDs, HSTstart, HSTend, 
-                      LSTstart, LSTend, status );
 
   if ( *status == SAI__OK ) {
  
@@ -246,6 +246,10 @@ void gsdac_putFits ( const gsdVars *gsdVars,
 
   }
 
+  /* Copy the obsID into the obsIDSS and add the subsystem number. */
+  sprintf ( obsIDSS, "%s_%i", dateVars->obsID, 
+            subBandNum % ( gsdVars->nBESections / gsdVars->nFEChans ) + 1 );
+
 
   /* Integration time related. */
 
@@ -255,7 +259,7 @@ void gsdac_putFits ( const gsdVars *gsdVars,
     i = 0;
     intTime = 0.0;
     while ( i < ( gsdVars->nScanVars2 * gsdVars->noScans ) ) {
-      intTime += (gsdVars->scanTable2)[i];
+      intTime += gsdVars->scanTable2[i];
       i += gsdVars->nScanVars2;
     }
 
@@ -272,16 +276,16 @@ void gsdac_putFits ( const gsdVars *gsdVars,
 
   /* Get the bandwidth setup. */
 /***** NOTE: may be different for rxb widebands *****/  
-  sprintf ( bwMode, "%iMHzx%i", (int)(gsdVars->bandwidths)[subBandNum], 
-            (gsdVars->BEChans)[subBandNum] );
+  sprintf ( bwMode, "%iMHzx%i", (int)(gsdVars->bandwidths[subBandNum]), 
+            gsdVars->BEChans[subBandNum] );
 
 /***** NOTE: Possibly undef? *****/
   strcpy ( subBands, bwMode );
 
   /* Get the reference channel. */
-  refChan = (double)( (gsdVars->BEChans)[subBandNum] ) / 2.0;
+  refChan = (double)( gsdVars->BEChans[subBandNum] ) / 2.0;
 
-  IFchanSp = (gsdVars->freqRes)[subBandNum] * 1000000.0;
+  IFchanSp = gsdVars->freqRes[subBandNum] * 1000000.0;
 
 
   /* FE Specific. */
@@ -290,13 +294,13 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   cnfImprt ( gsdVars->frontend, 16, instrume );
 
   /* Get the IF frequency and make sure it's always positive. */
-  IFfreq = abs( (gsdVars->totIFs)[subBandNum] );  
+  IFfreq = abs( gsdVars->totIFs[subBandNum] );  
 
   /* Get the number of mixers. */
   nMix = 1;//k
 
   /* Get the observed sideband (-ve value = LSB, +ve value = USB ). */
-  if ( (gsdVars->sbSigns)[subBandNum] > 0 ) strcpy ( obsSB, "USB" );
+  if ( gsdVars->sbSigns[subBandNum] > 0 ) strcpy ( obsSB, "USB" );
   else strcpy ( obsSB, "LSB" );
 
   /* Get the names of the receptors. */
@@ -324,7 +328,7 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   /* Environmental data. */
 
   /* Convert pressure from mmHg to mbar. */
-  bp = (gsdVars->pamb) * 1.33322;
+  bp = gsdVars->pamb * 1.33322;
 
   /* Convert dates from YYMMDDHHMMSS to 
      YYYY-MM-DDTHH:MM:SS. */
@@ -368,12 +372,6 @@ void gsdac_putFits ( const gsdVars *gsdVars,
 
   }
 
-  /* Switching and Map setup for the observation. */
-  gsdac_getMapVars ( gsdVars, samMode, obsType, skyRefX, skyRefY, 
-                     swMode, chopCrd, &mapHght, &mapPA, &mapWdth, 
-                     loclCrd, scanCrd, &scanVel, &scanDy, 
-                     &scanPA, scanPat, status );
-
   /* JOS parameters */
 
   /* Get the JOS_MIN (1 for raster, for sample this is the number
@@ -405,7 +403,7 @@ void gsdac_putFits ( const gsdVars *gsdVars,
 
   }  
 
-  if ( strcmp ( swMode, "chop" ) == 0 )
+  if ( strcmp ( mapVars->swMode, "chop" ) == 0 )
     stBetRef = AST__UNDEFI;
 
   /* Get the starting index into the pattern. */
@@ -498,19 +496,19 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   astSetFitsI ( fitschan, "UTDATE", utDate, 
                 "UT Date as integer in yyyymmdd format", *status );
 
-  astSetFitsS ( fitschan, "DATE-OBS", dateObs, 
+  astSetFitsS ( fitschan, "DATE-OBS", dateVars->dateObs, 
                 "UTC Datetime of start of observation", *status );
 
-  astSetFitsS ( fitschan, "DATE-END", dateEnd, 
+  astSetFitsS ( fitschan, "DATE-END", dateVars->dateEnd, 
                 "UTC Datetime of end of observation", *status );
 
   astSetFitsF ( fitschan, "DUT1", gsdVars->obsUT1C, 
                 "[d] UT1-UTC correction", *status );
 
-  astSetFitsS ( fitschan, "OBSID", obsID, 
+  astSetFitsS ( fitschan, "OBSID", dateVars->obsID, 
                 "Unique observation identifier", *status );
 
-  astSetFitsS ( fitschan, "OBSIDS", obsIDs, 
+  astSetFitsS ( fitschan, "OBSIDS", obsIDSS, 
                 "Unique observation + subsystem ID", *status );
 
 /***** NOTE: possibly same as REFRECEP *****/
@@ -543,16 +541,16 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   astSetFitsF ( fitschan, "ELEND", elEnd,
                 "[deg] Elevation at end of observation", *status );
 
-  astSetFitsS ( fitschan, "HSTSTART", HSTstart,
+  astSetFitsS ( fitschan, "HSTSTART", dateVars->HSTstart,
                 "HST at start of observation", *status );
 
-  astSetFitsS ( fitschan, "HSTEND", HSTend,
+  astSetFitsS ( fitschan, "HSTEND", dateVars->HSTend,
                 "HST at end of observation", *status );
 
-  astSetFitsS ( fitschan, "LSTSTART", LSTstart,
+  astSetFitsS ( fitschan, "LSTSTART", dateVars->LSTstart,
                 "LST at start of observation", *status );
 
-  astSetFitsS ( fitschan, "LSTEND", LSTend,
+  astSetFitsS ( fitschan, "LSTEND", dateVars->LSTend,
                 "LST at end of observation", *status );
 
   /* Integration time related. */
@@ -627,10 +625,10 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   astSetFitsS ( fitschan, "OBS_SB", obsSB, 
 		"The observed sideband", *status );
 
-  astSetFitsF ( fitschan, "LOFREQS", (gsdVars->LOFreqs)[subBandNum],
+  astSetFitsF ( fitschan, "LOFREQS", gsdVars->LOFreqs[subBandNum],
 		"[GHz] LO Frequency at start of obs", *status );
 
-  astSetFitsF ( fitschan, "LOFREQE", (gsdVars->LOFreqs)[subBandNum],
+  astSetFitsF ( fitschan, "LOFREQE", gsdVars->LOFreqs[subBandNum],
                 "[GHz] LO Frequency at end of obs", *status );
 
   astSetFitsS ( fitschan, "RECPTORS", recptors,
@@ -645,7 +643,7 @@ void gsdac_putFits ( const gsdVars *gsdVars,
                   *status );
   } else {
     astSetFitsF ( fitschan, "MEDTSYS", 
-                  (gsdVars->sourceSysTemps)[subBandNum],
+                  gsdVars->sourceSysTemps[subBandNum],
 		  "[K] Median of the T-sys across all receptors", 
                   *status );
   }
@@ -761,23 +759,23 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   astSetFitsS ( fitschan, "SAM_MODE", samMode, 
                 "Sampling Mode", *status );  
 
-  astSetFitsS ( fitschan, "SW_MODE", swMode,
+  astSetFitsS ( fitschan, "SW_MODE", mapVars->swMode,
                 "Switch Mode", *status );
 
-  astSetFitsS ( fitschan, "SKYREFX", skyRefX,
+  astSetFitsS ( fitschan, "SKYREFX", mapVars->skyRefX,
                 "X co-ord of Reference Position", *status );
 
-  astSetFitsS ( fitschan, "SKYREFY", skyRefY,
+  astSetFitsS ( fitschan, "SKYREFY", mapVars->skyRefY,
                 "Y co-ord of Reference Position", *status );   
 
   astSetFitsS ( fitschan, "OBS_TYPE", obsType,
 		"Type of observation", *status );
 
   if ( ( strcmp ( samMode, "grid" ) == 0
-       && strcmp ( swMode, "chop" ) == 0 ) ||
+       && strcmp ( mapVars->swMode, "chop" ) == 0 ) ||
        strcmp ( samMode, "sample" ) == 0 ) {
 
-    astSetFitsS ( fitschan, "CHOP_CRD", chopCrd,
+    astSetFitsS ( fitschan, "CHOP_CRD", mapVars->chopCrd,
                   "Chopping co-ordinate system", *status );
 
     astSetFitsF ( fitschan, "CHOP_FRQ", gsdVars->chopFrequency,
@@ -818,18 +816,18 @@ void gsdac_putFits ( const gsdVars *gsdVars,
 		"Jiggling co-ordinate system", *status );
 
   if ( strcmp ( samMode, "raster" ) == 0
-       && strcmp ( swMode, "pssw" ) == 0 ) {
+       && strcmp ( mapVars->swMode, "pssw" ) == 0 ) {
 
-    astSetFitsF ( fitschan, "MAP_HGHT", mapHght,
+    astSetFitsF ( fitschan, "MAP_HGHT", mapVars->mapHght,
 		  "[arcsec] Requested height of map", *status );
 
-    astSetFitsF ( fitschan, "MAP_PA", mapPA,
+    astSetFitsF ( fitschan, "MAP_PA", mapVars->mapPA,
 		  "[deg] Requested PA of map", *status );
 
-    astSetFitsF ( fitschan, "MAP_WDTH", mapWdth,
+    astSetFitsF ( fitschan, "MAP_WDTH", mapVars->mapWdth,
 		  "[arcsec] Requested width of map", *status );
 
-    astSetFitsS ( fitschan, "LOCL_CRD", loclCrd,
+    astSetFitsS ( fitschan, "LOCL_CRD", mapVars->loclCrd,
 		  "Local offset/map PA co-ordinate system",
 		  *status );
 
@@ -841,17 +839,17 @@ void gsdac_putFits ( const gsdVars *gsdVars,
 		  "[arcsec] Requested map offset from telescope centre",
 		  *status );  
 
-    astSetFitsS ( fitschan, "SCAN_CRD", scanCrd,
+    astSetFitsS ( fitschan, "SCAN_CRD", mapVars->scanCrd,
 		  "Co-ordinate system for scan", *status );
 
-    astSetFitsF ( fitschan, "SCAN_VEL", scanVel,
+    astSetFitsF ( fitschan, "SCAN_VEL", mapVars->scanVel,
 		  "[arcsec/sec] Scan velocity along scan direction", 
 		  *status );
 
-    astSetFitsF ( fitschan, "SCAN_DY", scanDy,
+    astSetFitsF ( fitschan, "SCAN_DY", mapVars->scanDy,
 		  "[arcsec] Scan spacing perp. to scan", *status );
 
-    astSetFitsS ( fitschan, "SCAN_PAT", scanPat,
+    astSetFitsS ( fitschan, "SCAN_PAT", mapVars->scanPat,
 		  "Scan pattern name", *status );
 
   } else {

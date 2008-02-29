@@ -26,6 +26,8 @@
  *        Add gsdac_gsdVars_struct  
  *     2008-02-19 (JB):
  *        Add gsdWCS struct
+ *     2008-02-28 (JB):
+ *        Add dateVars and mapVars structs
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -49,6 +51,8 @@
 
  *-
 */
+
+#include "smurf_par.h"
 
 #define MAXSTRING 17
 
@@ -338,5 +342,48 @@ typedef struct gsdac_gsdWCS_struct  /* pointing and time */
   double tai;                /* TAI time */
   double trAng;              /* angle between focal and tracking planes */
 } gsdWCS;
-   
+
+typedef struct gsdac_mapVars_struct  /* map/chop/scan parameters */
+{
+  char chopCrd[SZFITSCARD];   /* chopper coordinate system */
+  char loclCrd[SZFITSCARD];   /* local offset coordinate system for 
+                                 map_x / map_y */
+  float mapHght;              /* requested height of rectangle to be mapped 
+                                 (arcsec) */
+  float mapPA;                /* requested PA of map vertical, +ve towards
+                                 +ve long */
+  float mapWdth;              /* requested width of rectangle to be mapped
+                                 (arcsec) */
+  char scanCrd[SZFITSCARD];   /* coordinate system of scan */
+  float scanDy;               /* scan spacing perpendicular to scan
+                                 (arcsec) */
+  float scanPA;               /* Scan PA rel. to lat. line; 0=lat, 
+                                 90=long in scanCrd system */
+  char scanPat[SZFITSCARD];   /* name of scanning scheme */
+  float scanVel;              /* scan velocity (arcsec/sec) */
+  char skyRefX[SZFITSCARD];   /* X co-ord of reference position (arcsec) */  
+  char skyRefY[SZFITSCARD];   /* Y co-ord of reference position (arcsec) */  
+  char swMode[SZFITSCARD];    /* switch mode */
+} mapVars;
+
+typedef struct gsdac_dateVars_struct  /* date and time data */
+{
+  char dateEnd[SZFITSCARD];   /* UTC datetime of end of observation 
+                                 in format YYYY-MM-DDTHH:MM:SS */
+  char dateObs[SZFITSCARD];   /* UTC datetime of start of observation 
+                                 in format YYYY-MM-DDTHH:MM:SS */
+  char HSTend[SZFITSCARD];    /* HST at observation end in format 
+                                 YYYY-MM-DDTHH:MM:SS */
+  char HSTstart[SZFITSCARD];  /* HST at observation start in format 
+                                 YYYY-MM-DDTHH:MM:SS */
+  char LSTstart[SZFITSCARD];  /* LST at observation start in format
+                                 YYYY-MM-DDTHH:MM:SS */
+  char LSTend[SZFITSCARD];    /* LST at observation end in format
+                                 YYYY-MM-DDTHH:MM:SS */
+  char obsID[SZFITSCARD];     /* unique observation number in format
+                                 INSTR_NNNNN_YYYYMMDDTHHMMSS */
+} dateVars;
+
+
+  
 #endif /* GSDAC_STRUCT_DEFINED */

@@ -250,8 +250,8 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   }
 
   /* Get the RA & Dec offsets in cells. */
-  offsetX = (gsdVars->mapTable)[stepNum*2];
-  offsetY = (gsdVars->mapTable)[stepNum*2 + 1];
+  offsetX = gsdVars->mapTable[stepNum*2];
+  offsetY = gsdVars->mapTable[stepNum*2 + 1];
 
   /* Multiply by cell sizes. */
   offsetX = offsetX * gsdVars->cellX;
@@ -269,7 +269,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   /* Fill the keymaps from the input GSD. */
   astMapPut0I( datePointing, "JFREST(1)", 
-               (gsdVars->restFreqs)[subBandNum], "" );
+               gsdVars->restFreqs[subBandNum], "" );
   astMapPut0D( datePointing, "RA_DEC(1)", gsdVars->centreRA1950, "" );
   astMapPut0D( datePointing, "RA_DEC(2)", gsdVars->centreDec1950, "" );
   astMapPut0I( datePointing, "DPOS(1)", dPos[0], "" );
@@ -284,11 +284,11 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
     astMapPut0D( datePointing, "V_SETL(4)", gsdVars->velocity, "" );
 
   astMapPut0I( datePointing, "JFCEN(1)", 
-               (gsdVars->centreFreqs)[subBandNum], "" ); 
+               gsdVars->centreFreqs[subBandNum], "" ); 
   astMapPut0I( datePointing, "JFINC(1)", 
-               (gsdVars->freqRes)[subBandNum], "" );
+               gsdVars->freqRes[subBandNum], "" );
   astMapPut0I( datePointing, "IFFREQ(1)", 
-               (gsdVars->totIFs)[subBandNum], "" );
+               gsdVars->totIFs[subBandNum], "" );
   astMapPut0I( datePointing, "CELLCODE", gsdVars->cellCode, "" );
   astMapPut0D( cellMap, "CELLSIZE(1)", gsdVars->cellX, "" );
   astMapPut0D( cellMap, "CELLSIZE(2)", gsdVars->cellY, "" );
@@ -326,7 +326,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
    /* Get the dLST of the start of this row. */
     index = (int) ( stepNum / gsdVars->nScanPts );
-    dLST = ( (gsdVars->scanTable1)[index] - LSTStart ) / 24.0;
+    dLST = ( gsdVars->scanTable1[index] - LSTStart ) / 24.0;
 
     /* Add the integration times up to this scan point. */
     dLST = dLST + ( ( stepNum % gsdVars->nScanPts ) *
@@ -337,7 +337,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
     /* Get the difference between the start LST and this LST
        and add it to the start TAI. */
     index = stepNum * gsdVars->nScanVars1;
-    dLST = ( (gsdVars->scanTable1)[index] - LSTStart ) / 24.0;
+    dLST = ( gsdVars->scanTable1[index] - LSTStart ) / 24.0;
 
   }
 

@@ -85,7 +85,8 @@ void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
 
   /* Local variables.*/
   long i;                     /* loop counter */
-  long j;                     /* loop counter */  
+  long j;                     /* loop counter */ 
+  char tempString[MAXSTRING]; /* temporary string */ 
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
@@ -417,9 +418,9 @@ void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
   }
 
   gsdVars->scanVars1 = smf_malloc ( gsdVars->nScanVars1, 
-                                    MAXSTRING-1, 0, status );
+                                    MAXSTRING-1 * sizeof(char), 0, status );
   gsdVars->scanVars2 = smf_malloc ( gsdVars->nScanVars2, 
-                                    MAXSTRING-1, 0, status );  
+                                    MAXSTRING-1 * sizeof(char), 0, status );  
   gsdVars->scanTable1 = smf_malloc ( ( gsdVars->nScanVars1 * gsdVars->noScans ), 
                                      sizeof(float), 0, status );
   gsdVars->scanTable2 = smf_malloc ( ( gsdVars->nScanVars2 * gsdVars->noScans ), 
@@ -427,7 +428,7 @@ void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
   gsdVars->mapTable = smf_malloc ( ( gsdVars->nMapDims * gsdVars->nMapPts ), 
                                    sizeof(float), 0, status );
   gsdVars->phaseVars = smf_malloc ( gsdVars->nPhaseVars, 
-                                    MAXSTRING-1, 0, status );
+                                    MAXSTRING-1 * sizeof(char), 0, status );
   gsdVars->phaseTable = smf_malloc ( ( gsdVars->nPhaseVars * gsdVars->nPhases ),
                                      sizeof(float), 0, status );
   gsdVars->corrModes = smf_malloc ( gsdVars->nBESections, 
@@ -659,7 +660,7 @@ void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
     gsdac_get0r ( gsd, "C55HOTPOWER", gsdVars->hotPower, status );
     gsdac_get0r ( gsd, "C55SKYPOWER", gsdVars->skyPower, status );
     gsdac_get0r ( gsd, "C55SAM", gsdVars->samples, status );    
- } 
+  } 
 
   if ( dasFlag == DAS_TP || dasFlag == DAS_CROSS_CORR ) {
     gsdac_get0r ( gsd, "C55POWER", gsdVars->totPower, status );
@@ -676,12 +677,12 @@ void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
   if ( dasFlag == DAS_CROSS_CORR ) {
 
     for ( i = 0; i < gsdVars->nFEChans; i++ ) {
-      if ( (gsdVars->FEFreqs)[i] == gsdVars->badVal )
-        (gsdVars->FEFreqs)[i] = VAL__BADD;
-      if ( (gsdVars->FESBSigns)[i] == gsdVars->badVal ) 
-        (gsdVars->FESBSigns)[i] = VAL__BADI;
-      if ( (gsdVars->FELOFreqs)[i] == gsdVars->badVal ) 
-        (gsdVars->FELOFreqs)[i] = VAL__BADD;
+      if ( gsdVars->FEFreqs[i] == gsdVars->badVal )
+        gsdVars->FEFreqs[i] = VAL__BADD;
+      if ( gsdVars->FESBSigns[i] == gsdVars->badVal ) 
+        gsdVars->FESBSigns[i] = VAL__BADI;
+      if ( gsdVars->FELOFreqs[i] == gsdVars->badVal ) 
+        gsdVars->FELOFreqs[i] = VAL__BADD;
     } 
 
   }
@@ -689,92 +690,110 @@ void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
   if ( dasFlag == DAS_NONE || dasFlag == DAS_CONT_CAL ) {
 
     for ( i = 0; i < gsdVars->nVRad; i++ ) {
-      if ( (gsdVars->vRadial)[i] == gsdVars->badVal )
-        (gsdVars->vRadial)[i] = VAL__BADD;
+      if ( gsdVars->vRadial[i] == gsdVars->badVal )
+        gsdVars->vRadial[i] = VAL__BADD;
     }
 
   }
 
+  for (i = 0; i < gsdVars->nScanVars1; i++ ) { 
+    strncpy ( tempString, &(gsdVars->scanVars1[i*(MAXSTRING-1)]), MAXSTRING-1 );
+    if ( atof( tempString ) == gsdVars->badVal )
+      strncpy ( &(gsdVars->scanVars1[i*(MAXSTRING-1)]), "", MAXSTRING-1 );
+  }
+
+  for (i = 0; i < gsdVars->nScanVars2; i++ ) { 
+    strncpy ( tempString, &(gsdVars->scanVars2[i*(MAXSTRING-1)]), MAXSTRING-1 );
+    if ( atof( tempString ) == gsdVars->badVal )
+      strncpy ( &(gsdVars->scanVars2[i*(MAXSTRING-1)]), "", MAXSTRING-1 );
+  }
+
   for ( i = 0; i < gsdVars->nScanVars1 * gsdVars->noScans; i++ ) {
-    if ( (gsdVars->scanTable1)[i] == gsdVars->badVal )
-      (gsdVars->scanTable1)[i] = VAL__BADR;
-    if ( (gsdVars->scanTable2)[i] == gsdVars->badVal )
-      (gsdVars->scanTable2)[i] = VAL__BADR; 
+    if ( gsdVars->scanTable1[i] == gsdVars->badVal )
+      gsdVars->scanTable1[i] = VAL__BADR;
+    if ( gsdVars->scanTable2[i] == gsdVars->badVal )
+      gsdVars->scanTable2[i] = VAL__BADR; 
   }  
 
   for ( i = 0; i < gsdVars->nMapDims * gsdVars->nMapPts; i++ ) {
-    if ( (gsdVars->mapTable)[i] == gsdVars->badVal )
-      (gsdVars->mapTable)[i] = VAL__BADR;
+    if ( gsdVars->mapTable[i] == gsdVars->badVal )
+      gsdVars->mapTable[i] = VAL__BADR;
+  }
+
+  for (i = 0; i < gsdVars->nPhaseVars; i++ ) { 
+    strncpy ( tempString, &(gsdVars->phaseVars[i*(MAXSTRING-1)]), MAXSTRING-1 );
+    if ( atof( tempString ) == gsdVars->badVal )
+      strncpy ( &(gsdVars->phaseVars[i*(MAXSTRING-1)]), "", MAXSTRING-1 );
   }
 
   for ( i = 0; i < gsdVars->nPhaseVars * gsdVars->nPhases; i++ ) {
-    if ( (gsdVars->phaseTable)[i] == gsdVars->badVal )
-      (gsdVars->phaseTable)[i] = VAL__BADR;
+    if ( gsdVars->phaseTable[i] == gsdVars->badVal )
+      gsdVars->phaseTable[i] = VAL__BADR;
   }
   
   for ( i = 0; i < gsdVars->nBESections; i++ ) {
 
-    if ( (gsdVars->corrModes)[i] == gsdVars->badVal )
-      (gsdVars->corrModes)[i] = VAL__BADI;
-    if ( (gsdVars->bitModes)[i] == gsdVars->badVal )
-      (gsdVars->corrModes)[i] = VAL__BADI;    
-    if ( (gsdVars->sbOverlaps)[i] == gsdVars->badVal )
-      (gsdVars->sbOverlaps)[i] = VAL__BADR;  
-    if ( (gsdVars->mixNums)[i] == gsdVars->badVal )
-      (gsdVars->mixNums)[i] = VAL__BADI;  
-    if ( (gsdVars->BEInputChans)[i] == gsdVars->badVal )
-      (gsdVars->BEInputChans)[i] = VAL__BADI; 
-    if ( (gsdVars->BEChans)[i] == gsdVars->badVal )
-      (gsdVars->BEChans)[i] = VAL__BADI; 
-    if ( (gsdVars->BESubsys)[i] == gsdVars->badVal )
-      (gsdVars->BESubsys)[i] = VAL__BADI; 
-    if ( (gsdVars->centreFreqs)[i] == gsdVars->badVal )
-      (gsdVars->centreFreqs)[i] = VAL__BADD; 
-    if ( (gsdVars->restFreqs)[i] == gsdVars->badVal )
-      (gsdVars->restFreqs)[i] = VAL__BADD; 
-    if ( (gsdVars->LOFreqs)[i] == gsdVars->badVal )
-      (gsdVars->LOFreqs)[i] = VAL__BADD; 
-    if ( (gsdVars->totIFs)[i] == gsdVars->badVal )
-      (gsdVars->totIFs)[i] = VAL__BADD; 
-    if ( (gsdVars->sbSigns)[i] == gsdVars->badVal )
-      (gsdVars->sbSigns)[i] = VAL__BADI; 
-    if ( (gsdVars->freqRes)[i] == gsdVars->badVal )
-      (gsdVars->freqRes)[i] = VAL__BADR; 
-    if ( (gsdVars->bandwidths)[i] == gsdVars->badVal )
-      (gsdVars->bandwidths)[i] = VAL__BADR; 
-    if ( (gsdVars->recTemps)[i] == gsdVars->badVal )
-      (gsdVars->recTemps)[i] = VAL__BADR; 
-    if ( (gsdVars->telTemps)[i] == gsdVars->badVal )
-      (gsdVars->telTemps)[i] = VAL__BADR;
-    if ( (gsdVars->gains)[i] == gsdVars->badVal )
-      (gsdVars->gains)[i] = VAL__BADR;
-    if ( (gsdVars->calTemps)[i] == gsdVars->badVal )
-      (gsdVars->calTemps)[i] = VAL__BADR;
-    if ( (gsdVars->opacities)[i] == gsdVars->badVal )
-      (gsdVars->opacities)[i] = VAL__BADR;
-    if ( (gsdVars->alphas)[i] == gsdVars->badVal )
-      (gsdVars->alphas)[i] = VAL__BADR;
-    if ( (gsdVars->sbGainNorms)[i] == gsdVars->badVal )
-      (gsdVars->sbGainNorms)[i] = VAL__BADR;
-    if ( (gsdVars->telTrans)[i] == gsdVars->badVal )
-      (gsdVars->telTrans)[i] = VAL__BADR;
+    if ( gsdVars->corrModes[i] == gsdVars->badVal )
+      gsdVars->corrModes[i] = VAL__BADI;
+    if ( gsdVars->bitModes[i] == gsdVars->badVal )
+      gsdVars->corrModes[i] = VAL__BADI;    
+    if ( gsdVars->sbOverlaps[i] == gsdVars->badVal )
+      gsdVars->sbOverlaps[i] = VAL__BADR;  
+    if ( gsdVars->mixNums[i] == gsdVars->badVal )
+      gsdVars->mixNums[i] = VAL__BADI;  
+    if ( gsdVars->BEInputChans[i] == gsdVars->badVal )
+      gsdVars->BEInputChans[i] = VAL__BADI; 
+    if ( gsdVars->BEChans[i] == gsdVars->badVal )
+      gsdVars->BEChans[i] = VAL__BADI; 
+    if ( gsdVars->BESubsys[i] == gsdVars->badVal )
+      gsdVars->BESubsys[i] = VAL__BADI; 
+    if ( gsdVars->centreFreqs[i] == gsdVars->badVal )
+      gsdVars->centreFreqs[i] = VAL__BADD; 
+    if ( gsdVars->restFreqs[i] == gsdVars->badVal )
+      gsdVars->restFreqs[i] = VAL__BADD; 
+    if ( gsdVars->LOFreqs[i] == gsdVars->badVal )
+      gsdVars->LOFreqs[i] = VAL__BADD; 
+    if ( gsdVars->totIFs[i] == gsdVars->badVal )
+      gsdVars->totIFs[i] = VAL__BADD; 
+    if ( gsdVars->sbSigns[i] == gsdVars->badVal )
+      gsdVars->sbSigns[i] = VAL__BADI; 
+    if ( gsdVars->freqRes[i] == gsdVars->badVal )
+      gsdVars->freqRes[i] = VAL__BADR; 
+    if ( gsdVars->bandwidths[i] == gsdVars->badVal )
+      gsdVars->bandwidths[i] = VAL__BADR; 
+    if ( gsdVars->recTemps[i] == gsdVars->badVal )
+      gsdVars->recTemps[i] = VAL__BADR; 
+    if ( gsdVars->telTemps[i] == gsdVars->badVal )
+      gsdVars->telTemps[i] = VAL__BADR;
+    if ( gsdVars->gains[i] == gsdVars->badVal )
+      gsdVars->gains[i] = VAL__BADR;
+    if ( gsdVars->calTemps[i] == gsdVars->badVal )
+      gsdVars->calTemps[i] = VAL__BADR;
+    if ( gsdVars->opacities[i] == gsdVars->badVal )
+      gsdVars->opacities[i] = VAL__BADR;
+    if ( gsdVars->alphas[i] == gsdVars->badVal )
+      gsdVars->alphas[i] = VAL__BADR;
+    if ( gsdVars->sbGainNorms[i] == gsdVars->badVal )
+      gsdVars->sbGainNorms[i] = VAL__BADR;
+    if ( gsdVars->telTrans[i] == gsdVars->badVal )
+      gsdVars->telTrans[i] = VAL__BADR;
 
     if ( dasFlag != DAS_CONT_CAL ) {
 
-      if ( (gsdVars->sourceSysTemps)[i] == gsdVars->badVal )
-        (gsdVars->sourceSysTemps)[i] = VAL__BADR;
-      if ( (gsdVars->skyTemps)[i] == gsdVars->badVal )
-        (gsdVars->skyTemps)[i] = VAL__BADR;
-      if ( (gsdVars->skyTrans)[i] == gsdVars->badVal )
-        (gsdVars->skyTrans)[i] = VAL__BADR;  
-      if ( (gsdVars->FETSkyIm)[i] == gsdVars->badVal )
-        (gsdVars->FETSkyIm)[i] = VAL__BADR;    
-      if ( (gsdVars->FESkyTrans)[i] == gsdVars->badVal )
-        (gsdVars->FESkyTrans)[i] = VAL__BADR; 
-      if ( (gsdVars->FETSysIm)[i] == gsdVars->badVal )
-        (gsdVars->FETSysIm)[i] = VAL__BADR;
-      if ( (gsdVars->sbRatios)[i] == gsdVars->badVal )
-        (gsdVars->sbRatios)[i] = VAL__BADR; 
+      if ( gsdVars->sourceSysTemps[i] == gsdVars->badVal )
+        gsdVars->sourceSysTemps[i] = VAL__BADR;
+      if ( gsdVars->skyTemps[i] == gsdVars->badVal )
+        gsdVars->skyTemps[i] = VAL__BADR;
+      if ( gsdVars->skyTrans[i] == gsdVars->badVal )
+        gsdVars->skyTrans[i] = VAL__BADR;  
+      if ( gsdVars->FETSkyIm[i] == gsdVars->badVal )
+        gsdVars->FETSkyIm[i] = VAL__BADR;    
+      if ( gsdVars->FESkyTrans[i] == gsdVars->badVal )
+        gsdVars->FESkyTrans[i] = VAL__BADR; 
+      if ( gsdVars->FETSysIm[i] == gsdVars->badVal )
+        gsdVars->FETSysIm[i] = VAL__BADR;
+      if ( gsdVars->sbRatios[i] == gsdVars->badVal )
+        gsdVars->sbRatios[i] = VAL__BADR; 
  
     }
 
@@ -783,61 +802,61 @@ void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
   if ( dasFlag == DAS_CONT_CAL ) {
 
     for ( i = 0; i < gsdVars->nBESections * gsdVars->noScans; i++ ) {
-      if ( (gsdVars->sourceSysTemps)[i] == gsdVars->badVal )
-        (gsdVars->sourceSysTemps)[i] = VAL__BADR;
-      if ( (gsdVars->skyTemps)[i] == gsdVars->badVal )
-        (gsdVars->skyTemps)[i] = VAL__BADR;
-      if ( (gsdVars->skyTrans)[i] == gsdVars->badVal )
-        (gsdVars->skyTrans)[i] = VAL__BADR;  
-      if ( (gsdVars->FETSkyIm)[i] == gsdVars->badVal )
-        (gsdVars->FETSkyIm)[i] = VAL__BADR;    
-      if ( (gsdVars->FESkyTrans)[i] == gsdVars->badVal )
-        (gsdVars->FESkyTrans)[i] = VAL__BADR; 
-      if ( (gsdVars->FETSysIm)[i] == gsdVars->badVal )
-        (gsdVars->FETSysIm)[i] = VAL__BADR;
-      if ( (gsdVars->sbRatios)[i] == gsdVars->badVal )
-        (gsdVars->sbRatios)[i] = VAL__BADR;  
+      if ( gsdVars->sourceSysTemps[i] == gsdVars->badVal )
+        gsdVars->sourceSysTemps[i] = VAL__BADR;
+      if ( gsdVars->skyTemps[i] == gsdVars->badVal )
+        gsdVars->skyTemps[i] = VAL__BADR;
+      if ( gsdVars->skyTrans[i] == gsdVars->badVal )
+        gsdVars->skyTrans[i] = VAL__BADR;  
+      if ( gsdVars->FETSkyIm[i] == gsdVars->badVal )
+        gsdVars->FETSkyIm[i] = VAL__BADR;    
+      if ( gsdVars->FESkyTrans[i] == gsdVars->badVal )
+        gsdVars->FESkyTrans[i] = VAL__BADR; 
+      if ( gsdVars->FETSysIm[i] == gsdVars->badVal )
+        gsdVars->FETSysIm[i] = VAL__BADR;
+      if ( gsdVars->sbRatios[i] == gsdVars->badVal )
+        gsdVars->sbRatios[i] = VAL__BADR;  
     }
 
   }
 
   for ( i = 0; i < gsdVars->nBEChansIn; i++ ) {
-    if ( (gsdVars->BEConnChans)[i] == gsdVars->badVal )
-      (gsdVars->BEConnChans)[i] = VAL__BADI; 
-    if ( (gsdVars->BEInputFreqs)[i] == gsdVars->badVal )
-      (gsdVars->BEInputFreqs)[i] = VAL__BADD; 
+    if ( gsdVars->BEConnChans[i] == gsdVars->badVal )
+      gsdVars->BEConnChans[i] = VAL__BADI; 
+    if ( gsdVars->BEInputFreqs[i] == gsdVars->badVal )
+      gsdVars->BEInputFreqs[i] = VAL__BADD; 
   } 
 
   for ( i = 0; i < gsdVars->noScans; i++ ) {
-    if ( (gsdVars->intTimes)[i] == gsdVars->badVal )
-      (gsdVars->intTimes)[i] = VAL__BADI;    
+    if ( gsdVars->intTimes[i] == gsdVars->badVal )
+      gsdVars->intTimes[i] = VAL__BADI;    
   }
 
   for ( i = 0; i < gsdVars->nBEChansOut  * gsdVars->nScanPts  * 
 	gsdVars->noScans; i++ ) {
-    if ( (gsdVars->data)[i] == gsdVars->badVal )
-      (gsdVars->data)[i] = VAL__BADR;
+    if ( gsdVars->data[i] == gsdVars->badVal )
+      gsdVars->data[i] = VAL__BADR;
   }
 
   if ( dasFlag == DAS_CROSS_CORR ) {
 
     for ( i = 0; i < gsdVars->nBESections * gsdVars->IFPerSection; i++ ) {
-      if ( (gsdVars->hotPower)[i] == gsdVars->badVal )
-        (gsdVars->hotPower)[i] = VAL__BADR;
-      if ( (gsdVars->skyPower)[i] == gsdVars->badVal )
-        (gsdVars->skyPower)[i] = VAL__BADR;
+      if ( gsdVars->hotPower[i] == gsdVars->badVal )
+        gsdVars->hotPower[i] = VAL__BADR;
+      if ( gsdVars->skyPower[i] == gsdVars->badVal )
+        gsdVars->skyPower[i] = VAL__BADR;
     }
 
     for ( i = 0; i < gsdVars->nBEChansOut * gsdVars->IFONPhase *
 	  gsdVars->noCycles; i++ ) {
-      if ( (gsdVars->samples)[i] == gsdVars->badVal )
-        (gsdVars->samples)[i] = VAL__BADR;
+      if ( gsdVars->samples[i] == gsdVars->badVal )
+        gsdVars->samples[i] = VAL__BADR;
     }
 
     for ( i = 0; i < gsdVars->nBESections * gsdVars->IFPerSection *
 	  gsdVars->IFONPhase * gsdVars->noCycles; i++ ) {
-      if ( (gsdVars->totPower)[i] == gsdVars->badVal )
-        (gsdVars->totPower)[i] = VAL__BADR;
+      if ( gsdVars->totPower[i] == gsdVars->badVal )
+        gsdVars->totPower[i] = VAL__BADR;
     }
 
   }
@@ -847,10 +866,10 @@ void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
     for ( i = 0; i < gsdVars->nBESections * gsdVars->IFPerSection *
 	  gsdVars->IFONPhase * gsdVars->nPhases *
           gsdVars->noCycles; i++ ) {
-      if ( (gsdVars->totPower)[i] == gsdVars->badVal )
-        (gsdVars->totPower)[i] = VAL__BADR;
+      if ( gsdVars->totPower[i] == gsdVars->badVal )
+        gsdVars->totPower[i] = VAL__BADR;
     }    
 
-  }    
+  }  
 
 }

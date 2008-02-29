@@ -52,7 +52,9 @@
 *     2008-02-26 (JB):
 *        Make gsdac_getWCS per-subsystem  
 *     2008-02-28 (JB):
-*        Send each subband's data to correct file 
+*        Send each subband's data to correct file
+*     2008-02-28 (JB):
+*        Move getDateVars and getMapVars out of putFits
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -107,6 +109,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
 
   /* Local variables */
   char backend[SZFITSCARD];   /* name of the backend */
+  dateVars dateVars;          /* date/time variables */
   const AstFitsChan *fitschan[nSteps * gsdVars->nBESections];  
                               /* Array of FITS headers */
   long fitsIndex;             /* current FITSchan */
@@ -114,6 +117,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   float fPlaneX[MAXRECEP]; 
   float fPlaneY[MAXRECEP];
   int i;                      /* loop counter */
+  mapVars mapVars;            /* map/chop/scan variables */
   double mem;                 /* amount of memory for spectrum */
   int nSubsys;                /* number of subsystems */
   unsigned int obsNum;        /* current observation number */
@@ -161,7 +165,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
 
   /* Check to make sure we have the right number of receptors for
      this frontend, and copy the receptor names. */
-  if ( (gsdVars->centreFreqs)[0] < 290.0 ) {
+  if ( gsdVars->centreFreqs[0] < 290.0 ) {
 
     if ( gsdVars->nFEChans != 1 ) {
       *status = SAI__ERROR;
@@ -171,11 +175,11 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
 
     strncpy ( recepNames[0], "A", 2 );
 
-  } else if ( (gsdVars->centreFreqs)[0] < 395.0 ) {
+  } else if ( gsdVars->centreFreqs[0] < 395.0 ) {
 
     if ( gsdVars->nFEChans != 2 ) {
       *status = SAI__ERROR;
-      errRep ( "", "Front end is receiver B but does not have 2 receptors", 
+      errRep ( FUNC_NAME, "Front end is receiver B but does not have 2 receptors", 
                status ); 
       return; 
     }
@@ -183,11 +187,11 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
     strncpy ( recepNames[0], "BA", 3 );
     strncpy ( recepNames[1], "BB", 3 );   
 
-  } else if ( (gsdVars->centreFreqs)[0] < 600.0 ) {
+  } else if ( gsdVars->centreFreqs[0] < 600.0 ) {
 
     if ( gsdVars->nFEChans != 2 ) {
       *status = SAI__ERROR;
-      errRep ( "", "Front end is receiver C but does not have 2 receptors", 
+      errRep ( FUNC_NAME, "Front end is receiver C but does not have 2 receptors", 
                status ); 
       return; 
     }
@@ -195,11 +199,11 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
     strncpy ( recepNames[0], "CA", 3 );
     strncpy ( recepNames[1], "CB", 3 ); 
    
-  } else if ( (gsdVars->centreFreqs)[0] < 750 ) {
+  } else if ( gsdVars->centreFreqs[0] < 750 ) {
 
     if ( gsdVars->nFEChans != 2 ) {
       *status = SAI__ERROR;
-      errRep ( "", "Front end is receiver D but does not have 2 receptors", 
+      errRep ( FUNC_NAME, "Front end is receiver D but does not have 2 receptors", 
                status ); 
       return; 
     }
@@ -209,7 +213,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
 
   } else {
     *status = SAI__ERROR;
-    errRep ( "", "Couldn't obtain receptor names.", status ); 
+    errRep ( FUNC_NAME, "Couldn't obtain receptor names.", status ); 
     return; 
   }
 
@@ -242,7 +246,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   else {
     *status = SAI__ERROR;
     msgSetc ( "BACKEND", backend );
-    errRep ( "", "Backend ^BACKEND not supported", status );
+    errRep ( FUNC_NAME, "Backend ^BACKEND not supported", status );
     return;
   } 
 
@@ -250,8 +254,18 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   record = smf_malloc ( 1, sizeof ( *record ), 0, status );
   specHdr = smf_malloc ( 1, sizeof ( *specHdr ), 0, status );
 
-  msgOutif(MSG__VERB," ", 
-	     "Getting times and pointing values", status); 
+  msgOutif(MSG__VERB," ", "Getting date and time values", status); 
+
+  gsdac_getDateVars ( gsdVars, backend, obsNum, &dateVars, status );
+
+  msgOutif(MSG__VERB," ", "Getting map, chop, and scan values", status); 
+
+  gsdac_getMapVars ( gsdVars, samMode, obsType, &mapVars, status );
+
+  if ( *status != SAI__OK ) {
+    errRep ( FUNC_NAME, "Error getting date and map parameters", status );
+    return;
+  }
 
   /* Get the size of the data array */
   spectrumSize = gsdVars->nBEChansOut * gsdVars->nScanPts * gsdVars->noScans;
@@ -283,8 +297,8 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
 
       /* Write a spectrum to the file. */
       acsSpecWriteTS( ( subBandNum % nSubsys ) + 1, 
-                      (gsdVars->BEChans)[subBandNum], 
-      	              &((gsdVars->data)[specIndex]), record, 
+                      gsdVars->BEChans[subBandNum], 
+      	              &(gsdVars->data[specIndex]), record, 
                       specHdr, status );
 
       /* Initialize the astFitsChan for this file. */
@@ -294,10 +308,10 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
 
       /* Fill the FITS headers. */
       gsdac_putFits ( gsdVars, subBandNum, obsNum, utDate, nSteps, backend, 
-                      recepNames, samMode, obsType, wcs, 
+                      recepNames, samMode, obsType, &dateVars, &mapVars, wcs, 
                       fitschan[fitsIndex], status );
 
-      specIndex = specIndex + (gsdVars->BEChans)[subBandNum];
+      specIndex = specIndex + gsdVars->BEChans[subBandNum];
 
     }
 

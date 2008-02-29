@@ -120,8 +120,8 @@ void gsdac_putSpecHdr ( const gsdVars *gsdVars, const unsigned int nSteps,
   specHdr->rts_endnum = nSteps + 1;
   specHdr->acs_feedx = record->tcs_tr_ac1;
   specHdr->acs_feedy = record->tcs_tr_ac2;
-  specHdr->acs_feed = (gsdVars->BESubsys)[subBandNum  ];
-  specHdr->acs_tsys = (gsdVars->sourceSysTemps)[index];
-  specHdr->acs_trx = (gsdVars->recTemps)[subBandNum  ];
+  specHdr->acs_feed = gsdVars->BESubsys[subBandNum];
+  specHdr->acs_tsys = gsdVars->sourceSysTemps[index];
+  specHdr->acs_trx = gsdVars->recTemps[subBandNum];
 
 }

@@ -14,38 +14,19 @@
 *     Subroutine
 
 *  Invocation:
-*     gsdac_getDateVars ( const gsdVars *gsdVars, 
-*                         const int subBandNum, const int obsNum, 
-*                         const char *backend, char *dateObs, char *dateEnd, 
-*                         char *obsID, char *obsIDs, char *HSTstart, 
-*                         char *HSTend, char *LSTstart, char *LSTend,
+*     gsdac_getDateVars ( const gsdVars *gsdVars, const char *backend, 
+*                         const unsigned int obsNum, dateVars *dateVars, 
 *                         int *status )
 
 *  Arguments:
 *     gsdVars = const gsdVars* (Given)
 *        GSD file access parameters
-*     subBandNum = const int (Given)
-*        Subband number
-*     obsNum = const int (Given)
-*        Observation number
 *     backend = const char* (Given)
 *        Name of the backend
-*     dateObs = char* (Given and Returned)
-*        UTC Datetime at obs start.
-*     dateEnd = char* (Given and Returned)
-*        UTC Datetime at obs end.
-*     obsID = char* (Given and Returned)
-*        Unique observation ID
-*     obsIDs = char* (Given and Returned)
-*        Unique obs ID + subsystem number
-*     HSTstart = char* (Given and Returned)
-*        HST at obs start
-*     HSTend = char* (Given and Returned)
-*        HST at obs end
-*     LSTstart = char* (Given and Returned)
-*        LST at obs start
-*     LSTend = char* (Given and Returned)
-*        LST at obs end
+*     obsNum = const unsigned int (Given)
+*        Observation number
+*     dateVars = dateVars* (Given and Returned)
+*        Date and time variables
 *     status = int* (Given and Returned)
 *        Pointer to global status.  
 
@@ -64,6 +45,8 @@
 *        Use gsdVars struct to store headers/arrays
 *     2008-02-28 (JB):
 *        Replace subsysNum with subBandNum
+*     2008-02-28 (JB):
+*        Use dateVars struct
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -103,11 +86,8 @@
 
 #define FUNC_NAME "gsdac_getDateVars"
 
-void gsdac_getDateVars ( const gsdVars *gsdVars, const int subBandNum,
-                         const int obsNum, const char *backend, char *dateObs, 
-                         char *dateEnd, char *obsID,
-                         char *obsIDs, char *HSTstart, char *HSTend,
-                         char *LSTstart, char *LSTend,
+void gsdac_getDateVars ( const gsdVars *gsdVars, const char *backend, 
+                         const unsigned int obsNum, dateVars *dateVars, 
                          int *status )
 
 {
@@ -170,11 +150,11 @@ void gsdac_getDateVars ( const gsdVars *gsdVars, const int subBandNum,
   tempString = astFormat ( tempFrame, 1, utcStart );
 
   /* Copy the UTC date string. */  
-  strncpy ( dateObs, tempString, 10 );
-  dateObs[10] =  'T';
-  strcpy ( &(dateObs[11]), &(tempString[11]) );
+  strncpy ( dateVars->dateObs, tempString, 10 );
+  dateVars->dateObs[10] =  'T';
+  strcpy ( &(dateVars->dateObs[11]), &(tempString[11]) );
 
-  /* Get the OBSID and OBSIDS. */
+  /* Get the OBSID. */
 
   /* Check to see that the backend is DAS. */
   if ( strncmp ( backend, "DAS", 3 ) != 0 ) {
@@ -184,42 +164,37 @@ void gsdac_getDateVars ( const gsdVars *gsdVars, const int subBandNum,
     return;
   }
 
-  sprintf ( obsID, "%s_%05d_%04d%02d%02dT%02d%02d%02d", backend, obsNum, year, 
-            month, day, hour, min, (int)sec );
-
-  sprintf ( obsIDs, "%s_%05d_%04d%02d%02dT%02d%02d%02d_%i", backend, obsNum, 
-            year, month, day, hour, min, (int)sec, 
-            subBandNum % ( gsdVars->nBESections / gsdVars->nFEChans )  + 1);
-
+  sprintf ( dateVars->obsID, "%s_%05d_%04d%02d%02dT%02d%02d%02d", 
+            backend, obsNum, year, month, day, hour, min, (int)sec );
 
   /* Get the DATE-END. This will be DATE-OBS + ( last LST - first LST ). */ 
   tableSize = gsdVars->nScanVars1 * gsdVars->noScans;
   tableDims = gsdVars->nScanVars1;
-  utcEnd = utcStart + ( (gsdVars->scanTable1)[tableSize-tableDims] - 
-                        (gsdVars->scanTable1)[0] ) 
+  utcEnd = utcStart + ( gsdVars->scanTable1[tableSize-tableDims] - 
+                        gsdVars->scanTable1[0] ) 
                          / 24.0;
 
   tempString = astFormat ( tempFrame, 1, utcEnd );
 
   /* Copy the UTC date string. */    
-  strncpy ( dateEnd, tempString, 10 );
-  dateEnd[10] =  'T';
-  strcpy ( &(dateEnd[11]), &(tempString[11]) );
+  strncpy ( dateVars->dateEnd, tempString, 10 );
+  dateVars->dateEnd[10] =  'T';
+  strcpy ( &(dateVars->dateEnd[11]), &(tempString[11]) );
 
   /* Get the LSTstart. */ 
-  hour = (int)( (gsdVars->scanTable1)[0] );
-  min = (int)(( (gsdVars->scanTable1)[0] - hour ) * 60.0 );
-  sec = ( (gsdVars->scanTable1)[0] - hour - ( min / 60.0 ) ) * 3600.0;
+  hour = (int)( gsdVars->scanTable1[0] );
+  min = (int)(( gsdVars->scanTable1[0] - hour ) * 60.0 );
+  sec = ( gsdVars->scanTable1[0] - hour - ( min / 60.0 ) ) * 3600.0;
 
-  sprintf ( LSTstart, "%02d:%02d:%6.4f", hour, min, sec );
+  sprintf ( dateVars->LSTstart, "%02d:%02d:%6.4f", hour, min, sec );
 
   /* Get the LSTend. */
-  hour = (int)( (gsdVars->scanTable1)[tableSize-tableDims] ); 
-  min = (int)(( (gsdVars->scanTable1)[tableSize-tableDims] - hour ) * 60.0 );
-  sec = ( (gsdVars->scanTable1)[tableSize-tableDims] - hour - 
+  hour = (int)( gsdVars->scanTable1[tableSize-tableDims] ); 
+  min = (int)(( gsdVars->scanTable1[tableSize-tableDims] - hour ) * 60.0 );
+  sec = ( gsdVars->scanTable1[tableSize-tableDims] - hour - 
         ( min / 60.0 ) ) * 3600.0;
 
-  sprintf ( LSTend, "%02d:%02d:%6.4f", hour, min, sec );
+  sprintf ( dateVars->LSTend, "%02d:%02d:%6.4f", hour, min, sec );
 
   /* Get the HSTstart and HSTend. */
   utcHSTstart = utcStart - 10.0 / 24.0;
@@ -228,15 +203,15 @@ void gsdac_getDateVars ( const gsdVars *gsdVars, const int subBandNum,
   tempString = astFormat ( tempFrame, 1, utcHSTstart ); 
 
   /* Copy the HST date string. */    
-  strncpy ( HSTstart, tempString, 10 );
-  HSTstart[10] =  'T';
-  strcpy ( &(HSTstart[11]), &(tempString[11]) ); 
+  strncpy ( dateVars->HSTstart, tempString, 10 );
+  dateVars->HSTstart[10] =  'T';
+  strcpy ( &(dateVars->HSTstart[11]), &(tempString[11]) ); 
 
   tempString = astFormat ( tempFrame, 1, utcHSTend ); 
 
   /* Copy the HST date string. */    
-  strncpy ( HSTend, tempString, 10 );
-  HSTend[10] =  'T';
-  strcpy ( &(HSTend[11]), &(tempString[11]) ); 
+  strncpy ( dateVars->HSTend, tempString, 10 );
+  dateVars->HSTend[10] =  'T';
+  strcpy ( &(dateVars->HSTend[11]), &(tempString[11]) ); 
 
 }

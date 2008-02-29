@@ -52,6 +52,8 @@
 *        Move fe_doppler calc to getJCMTStateS
 *     2008-02-26 (JB):
 *        Make gsdac_getWCS per-subsystem
+*     2008-02-28 (JB):
+*        Code cleanup
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -107,11 +109,11 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
   record->rts_num = stepNum + 1;
 
   /* Check the frequency band to determine tasklist. */
-  if ( (gsdVars->centreFreqs)[0] < 290.0 ) {
+  if ( gsdVars->centreFreqs[0] < 290.0 ) {
     strncpy ( record->rts_tasks, "PTCS FE_A ", 11 );
-  } else if ( (gsdVars->centreFreqs)[0] < 395.0 ) {  
+  } else if ( gsdVars->centreFreqs[0] < 395.0 ) {  
     strncpy ( record->rts_tasks, "PTCS FE_B ", 11 );
-  } else if ( (gsdVars->centreFreqs)[0] < 600.0 ) {
+  } else if ( gsdVars->centreFreqs[0] < 600.0 ) {
     strncpy ( record->rts_tasks, "PTCS FE_C ", 11 );
   } else {
     strncpy ( record->rts_tasks, "PTCS FE_D ", 11 );
@@ -154,7 +156,7 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   record->enviro_rel_hum = gsdVars->hamb;
 
-  record->enviro_pressure = (gsdVars->pamb) * 1.33322;
+  record->enviro_pressure = gsdVars->pamb * 1.33322;
 
   /* If this is a raster, the on-source integration time is
      the scan time divided by the number of points in the scan,
@@ -168,7 +170,7 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
     record->acs_offexposure = record->acs_exposure *
                               sqrt(gsdVars->nScanPts);
   } else {  
-    record->acs_exposure = (gsdVars->intTimes)[stepNum];
+    record->acs_exposure = gsdVars->intTimes[stepNum];
     record->acs_offexposure = record->acs_exposure;
   }
 

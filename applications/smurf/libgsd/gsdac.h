@@ -37,6 +37,8 @@
 *        and velEncode
 *     2008-02-28 (JB):
 *        Replace subsysNum with subBandNum
+*     2008-02-28 (JB):
+*        Use dateVars and mapVars structs
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -216,17 +218,9 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_getDateVars
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
-const int subBandNum, /* subband number (given) */
-const int obsNum,    /* observation number (given) */
 const char *backend, /* name of the backend (given) */
-char *dateObs,       /* datetime of obs start (given and returned) */
-char *dateEnd,       /* datetime of obs end (given and returned) */
-char *obsID,         /* unique observation ID (given and returned) */
-char *obsIDs,        /* obsID + subsystem number (given and returned) */
-char *HSTstart,      /* HST at obs start (given and returned) */
-char *HSTend,        /* HST at obs end (given and returned) */
-char *LSTstart,      /* LST at obs start (given and returned) */
-char *LSTend,        /* LST at obs end (given and returned) */
+const unsigned int obsNum, /* observation number (given) */
+dateVars *dateVars,  /* date and time variables (given and returned) */
 int *status          /* pointer to global status (given and returned) */ 
 );
 
@@ -243,22 +237,7 @@ void gsdac_getMapVars
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 const char *samMode, /* sampling mode (given) */
 const char *obsType, /* observation type (given) */
-char *skyRefX,       /* x-coord of reference position (given and returned) */
-char *skyRefY,       /* y-coord of reference position (given and returned) */
-char *swMode,        /* switch mode (given and returned) */
-char *chopCrd,       /* chop coordinate frame (given and returned) */
-float *mapHght,      /* requested height of map (given and returned) */
-float *mapPA,        /* requested position angle of map 
-                        (given and returned) */
-float *mapWdth,      /* requested width of map (given and returned) */
-char *loclCrd,       /* local offset coordinates system for map 
-                        (given and returned) */
-char *scanCrd,       /* coordinate system of scan (given and returned) */
-float *scanVel,      /* scan velocity */
-float *scanDy,       /* scan spacing perpendicular to scan 
-                        (given and returned) */
-float *scanPA,       /* scan PA rel. to lat. line (given and returned) */
-char *scanPat,       /* name of scanning scheme (given and returned) */
+mapVars *mapVars,    /* map/chop/scan variables (given and returned) */
 int *status          /* global status (given and returned) */
 );
 
@@ -299,6 +278,8 @@ const char *backend, /* name of the backend (given) */
 char *recepNames[],  /* names of receptors (given) */
 const char *samMode, /* sample mode (given) */
 const char *obsType, /* observation type (given) */
+const dateVars *dateVars, /* date/time variables (given) */
+const mapVars *mapVars, /* map/chop/scan variables (given) */
 const gsdWCS *wcs,      /* pointing and time values (given) */
 const AstFitsChan *fitschan,  /* FITS headers (given and returned) */
 int *status          /* pointer to global status (given and returned) */

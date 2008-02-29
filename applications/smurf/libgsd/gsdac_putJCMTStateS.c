@@ -154,7 +154,7 @@ void gsdac_putJCMTStateS ( const gsdVars *gsdVars,
   record->tcs_index = wcs->index;
 
  /* Get the frontend LO frequency. */
-  record->fe_lofreq = (gsdVars->LOFreqs)[subBandNum]; 
+  record->fe_lofreq = gsdVars->LOFreqs[subBandNum]; 
 
   /* Use the dasFlag to determine the dimensionality/size of
      the TSKY array. */
@@ -167,9 +167,9 @@ void gsdac_putJCMTStateS ( const gsdVars *gsdVars,
 
   /* Set the enviro_air_temp to the correct value from the
      TSKY array. */
-  record->enviro_air_temp = (gsdVars->skyTemps)[arrayIndex];
+  record->enviro_air_temp = gsdVars->skyTemps[arrayIndex];
 
-  record->fe_doppler = (gsdVars->restFreqs)[subBandNum] / 
-               ( record->fe_lofreq + (gsdVars->totIFs)[subBandNum] );
+  record->fe_doppler = gsdVars->restFreqs[subBandNum] / 
+               ( record->fe_lofreq + gsdVars->totIFs[subBandNum] );
 
 }
