@@ -13,7 +13,6 @@ if ($@) {
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 WriteMakefile(
-    'EXE_FILES' => [ 'MessageRelay.pl' ],
     'INSTALLSCRIPT' => "$StarConfig{Star_Bin}",
     'NAME'      => 'Starlink::AMS',
     'VERSION'   => '1.00', # finds $VERSION
