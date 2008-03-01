@@ -52,12 +52,13 @@ use vars qw/ $VERSION @EXPORT_OK $DEBUG %EXPORT_TAGS/;
 use Symbol;             # For lexical file handles
 use Starlink::Config qw/ :override /; # For location of root starlink dir
 use File::Spec;         # For catfile()
+use version;
 
 @EXPORT_OK = qw/ 
   starversion starversion_string starversion_minor
   starversion_major starversion_patchlevel
   starversion_cmp starversion_eq starversion_gt starversion_lt
-  starversion_ge starversion_le
+  starversion_ge starversion_le starversion_vstring
   /;
 
 %EXPORT_TAGS = (
@@ -188,12 +189,11 @@ patchlevel version numbers.
 
   ($major, $minor, $patchlevel) = starversion( 'prog' );
 
-Starting with Perl version 5.6.0, a perl version string is returned
-when C<starversion> is called in a scalar context. This allows 
+In scalar context a perl "version" object is returned. This allows 
 versions to be compared directly using Perl.
 
   $version = starversion( 'prog' );
-  print "yes" if $version gt v0.15.2;
+  print "yes" if $version gt version->new("0.15.2");
 
 Returns undef if a version number can not be determined.
 
@@ -204,8 +204,27 @@ sub starversion {
   if (wantarray) {
     return ( $version{MAJOR}, $version{MINOR}, $version{PATCHLEVEL} );
   } else {
-    return $version{VERSION};
+    return $version{OBJECT};
   }
+}
+
+=item B<starversion_vstring>
+
+Returns the version as a perl v-string. This approach is deprecated.
+It is recommended that perl version objects are used instead (see
+C<starversion> function.
+
+  $vstring = starversion_vstring( 'prog' );
+  print "yes" if $version gt v0.15.2;
+
+Returns undef if no version can be determined or if your perl is older
+than v5.6.0.
+
+=cut
+
+sub starversion_vstring {
+  my %version = _get_version( $_[0] ) or return undef;
+  return $version{ VERSION };
 }
 
 =item B<starversion_string>
@@ -287,11 +306,16 @@ C<undef> is returned if a comparison could not be made due to
 either the application having no version number or if the 
 supplied version string could not be parsed.
 
+In modern perls version objects (as returned by C<starversion>)
+can be used to compare version information directly.
+
 In perl 5.6.0 this affect can be achieved directly using
-the C<starversion> command in a scalar context with a string literal
+the C<starversion_vstring> command in a scalar context with a string literal
 (but not with a standard Starlink version string):
 
-  $cmp = starversion('prog') cmp v0.15.4;
+  $cmp = starversion_vstring('prog') cmp v0.15.4;
+
+This latter approach is not recommended.
 
 =cut
 
@@ -918,6 +942,7 @@ sub _get_version ($) {
 		      MINOR => undef,
 		      PATCHLEVEL => undef,
 		      VERSION => undef,
+          OBJECT => undef,
 		      STRING => $global,
 		     };
     }
@@ -954,7 +979,9 @@ sub _get_version ($) {
 		    MINOR => $version[1],
 		    PATCHLEVEL => $version[2],
 		    STRING => "V$version[0].$version[1]-$version[2]",
+        OBJECT => version->new(join(".",@version[0..2])),
 		   };
+    
     if ($] >= 5.006) {
       # Create a perl-style version 'string' if perl 5.6.0 or newer
       $CACHE{$app}{VERSION} = eval "v$version[0].$version[1].$version[2]";

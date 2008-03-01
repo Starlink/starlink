@@ -33,21 +33,15 @@ $ENV{THIS_PROG_DIR} = File::Spec->curdir;
 
 ########### END OF COPY ########################
 
-my $version = starversion_vstring('this_prog');
+my $version = starversion('this_prog');
 
-SKIP: {
-  skip("Perl version too old for V strings. Need 5.6.0", 7)
-    unless $] >= 5.006;
+is($version, version->new("5.1.17"));
 
-  no strict qw/subs/;
-  is($version, v5.1.17);
+ok($version gt version->new("0.15.2"));
+ok($version lt version->new("20.51.1"));
 
-  ok($version gt v0.15.2);
-  ok($version lt v20.51.1);
+ok($version le version->new("6.2.10"));
+ok($version le version->new("5.1.17"));
 
-  ok($version le v6.2.10);
-  ok($version le v5.1.17);
-
-  ok($version ge v0.12.34);
-  ok($version ge v5.1.17);
-}
+ok($version ge version->new("0.12.34"));
+ok($version ge version->new("5.1.17"));
