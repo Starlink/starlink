@@ -11,6 +11,8 @@
 # P.W.Draper 12 Dec 97   added methods to get equinox and table name
 #            11 May 00   stop immediate delete of images, need backing 
 #                        store for my catalogue handling commands.
+#            03 Mar 08   Remove check in new_catalog, opened file is
+#                        never closed (and can leave a temporary file).
 
 
 itk::usual AstroCat {}
@@ -1592,11 +1594,6 @@ itcl::class cat::AstroCat {
 		# for local catalogs, search automatically when opened
 		$instances_($i) search
 	    }
-	    return
-	}
-
-	if {[catch {$astrocat_ open $name $dirPath} msg]} {
-	    error_dialog $msg
 	    return
 	}
 
