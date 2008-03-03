@@ -2552,6 +2552,113 @@ package kappa {
           }
       }
 
+      action provmod {
+         alias {provm(od)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter ancestor {
+            position 2
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default ALL
+            prompt {The indices of the ancestors to be modified}
+            helpkey *
+          }
+
+         parameter creator {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Substitutions for the CREATOR field}
+            helpkey *
+          }
+
+         parameter date {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Substitutions for the DATE field}
+            helpkey *
+          }
+
+         parameter ndf {
+            position 1
+            type NDF
+            access UPDATE
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <->GLOBAL.DATA_ARRAY
+            prompt {NDF to be modified}
+            helpkey *
+          }
+
+         parameter path {
+            position 3
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Substitutions for the PATH field}
+            helpkey *
+          }
+
+      }
+
+      action provrem {
+         alias {provr(em)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter ancestor {
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {The indices of the ancestors to be removed}
+            helpkey *
+          }
+
+         parameter item {
+            position 3
+            type LITERAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default PATH
+            prompt {Item of provenance information to check}
+            helpkey *
+          }
+
+         parameter ndf {
+            position 1
+            type NDF
+            access UPDATE
+            vpath PROMPT
+            ppath GLOBAL CURRENT
+            association <->GLOBAL.DATA_ARRAY
+            prompt {NDF to be modified}
+            helpkey *
+          }
+
+         parameter pattern {
+            position 2
+            type LITERAL
+            access READ
+            ppath CURRENT
+            prompt {Pattern matching template}
+            helpkey *
+          }
+      }
+
       action provshow {
          alias {provsh(ow)}
 

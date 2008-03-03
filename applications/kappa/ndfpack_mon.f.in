@@ -89,6 +89,10 @@
 *        Use NDG_BEGPV/ENDPV to provide automatic provenance propagation.
 *     24-JAN-2008 (DSB):
 *        Added PROVADD.
+*     26-FEB-2008 (DSB):
+*        Added PROVMOD.
+*     29-FEB-2008 (DSB):
+*        Added PROVREM.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -283,6 +287,14 @@
 *  Store provenance
          ELSE IF ( NAME .EQ. 'PROVADD' ) THEN
             CALL PROVADD ( STATUS )
+
+*  Modify provenance
+         ELSE IF ( NAME .EQ. 'PROVMOD' ) THEN
+            CALL PROVMOD ( STATUS )
+
+*  Remove provenance
+         ELSE IF ( NAME .EQ. 'PROVREM' ) THEN
+            CALL PROVREM ( STATUS )
 
 *  Display provenance
          ELSE IF ( NAME .EQ. 'PROVSHOW' ) THEN
