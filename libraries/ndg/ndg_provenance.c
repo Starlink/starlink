@@ -1304,6 +1304,7 @@ void ndgRmprv( int indf, int ianc, int *status ){
    int i;             
    int ichild;
    int iparent;
+   int n;
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
@@ -1321,11 +1322,17 @@ void ndgRmprv( int indf, int ianc, int *status ){
       anc = prov->provs[ ianc ];
 
 /* Loop round all the direct children of the ancestor. */
-      for( ichild = 0; ichild < anc->nchild; ichild++ ) {
-         child = anc->children[ ichild ];
+      n = anc->nchild;
+      for( ichild = 0; ichild < n; ichild++ ) {
+
+/* The index into the children array is fixed at zero because the
+   following call to ndg1Disown will remove the first child from "anc" on
+   each pass. */
+         child = anc->children[ 0 ];
 
 /* Break the parent-child link between the ancestor and the current
-   child. */
+   child. This reduces the number of children in anc (i.e. anc->nchild) 
+   by 1. */
          ndg1Disown( anc, child, status );
 
 /* Loop round all the direct parents of the ancestor. */
@@ -1339,8 +1346,9 @@ void ndgRmprv( int indf, int ianc, int *status ){
       }
 
 /* Loop round all the direct parents of the ancestor. */
+      n = anc->nparent;
       for( iparent = 0; iparent < anc->nparent; iparent++ ) {
-         parent = anc->parents[ iparent ];
+         parent = anc->parents[ 0 ];
 
 /* Break the parent-child link between the ancestor and the current
    parent. */
@@ -1650,6 +1658,7 @@ static void ndg1Disown( Prov *parent, Prov *child, int *status ){
 
 /* Reduce the number of parents. */
    child->nparent = j;
+   child->parents[ j ] = NULL;
 
 /* NULLify all occurrences of the supplied child within the list of 
    children stored in the supplied parent. */
@@ -1668,6 +1677,7 @@ static void ndg1Disown( Prov *parent, Prov *child, int *status ){
 
 /* Reduce the number of children. */
    parent->nchild = j;
+   parent->children[ j ] = NULL;
 
 }
 
@@ -1724,6 +1734,17 @@ static int ndg1FindAncestorIndex( Prov *prov, Provenance *provenance,
 /* If it is greater than the index of the main NDF in "provs" then reduce
    it by one since the main NDF is not stored in the ANCESTORS array. */
    if( iprov > imain ) iprov--;
+
+/* Sanity check. */
+   if( iprov  < 0 || iprov > provenance->nprov - 2 ) {
+      if( *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         msgSeti( "I", iprov + 1 );
+         msgSeti( "N", provenance->nprov - 1 );
+         errRep( " ", "Ancestor index ^I illegal - should be in range 1 to "
+                 "^N (internal NDG programming error).",  status );
+      }
+   }
 
 /* Add 1 to convert from zero-based to one-based and return. */
    return iprov + 1;
