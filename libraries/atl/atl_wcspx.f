@@ -44,8 +44,8 @@
 *           "JFINC(1)" - _INTEGER
 *           "IFFREQ(1)" - _DOUBLE
 *
-*        In addition, the KeyMap may contain an item "CELLCODE" (_INTEGER)
-*        that specifies the coordinate system to which the RA_DEC and DPOS 
+*        In addition, the KeyMap may contain an item "CENTRECODE" (_INTEGER)
+*        that specifies the co-ordinate system to which the RA_DEC and DPOS 
 *        values refer. It may take any of the following values:
 *
 *           1 : AZEL
@@ -54,9 +54,8 @@
 *           7 : RJ (FK5 2000 RA and Dec)
 *           8 : GA (galactic longitude and latitude)
 *
-*        An error is reported if any other value is supplied for CELLCODE. 
-*        If CELLCODE is missing a value of 6 (FK4 B1950) is assumed.
-*
+*        An error is reported if any other value is supplied for CENTRECODE. 
+*        If CENTRECODE is missing a value of 6 (FK4 B1950) is assumed.
 *     KM2 = INTEGER (Given)
 *        Pointer to an AST KeyMap holding items read from the SPECX_MAP
 *        extension in the required SPECX map file. The value AST__NULL
@@ -68,6 +67,11 @@
 *           "CELLSIZE(2)"  - _DOUBLE
 *           "POSANGLE" - _DOUBLE
 *
+*        In addition, the KeyMap may contain an item "CELLCODE" (_INTEGER)
+*        that specifies the co-ordinate system to which the CELLSIZE and
+*        POSANGLE values refer. It may take any of the values listed for
+*        CENTRECODE in the "KM1" argument description above. If CELLCODE 
+*        is missing a value of 6 (FK4 B1950) is assumed.
 *     DIM( 3 ) = INTEGER (Given)
 *        The dimensions of the pixel axes of the array into which the SPECX 
 *        data is being placed.
@@ -98,6 +102,9 @@
 *     26-FEB-2008 (DSB):
 *        Added item CELLCODE, which determines the celestial
 *        longitude/latitude system used by the other values.
+*     3-MAR-2008 (DSB):
+*        Re-named "KM1" CELLCODE as CENTRECODE, and added new "KM2" item 
+*        CELLCODE.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -147,6 +154,7 @@
 
 *  Local Variables:
       CHARACTER CARD*80      ! FITS header card
+      CHARACTER CENSYS*10    ! System value corresponding to CENTRECODE
       CHARACTER CMONTH*3     ! Month as a three-character abbreviation
       CHARACTER EPOCH*50     ! Epoch string
       CHARACTER KEY*20       ! KeyMap key
@@ -173,6 +181,7 @@
       DOUBLE PRECISION RA    ! Central RA (degrees)
       DOUBLE PRECISION SRCVEL! Assumed source velocity (km/s)
       INTEGER BFRM           ! Pointer to new GRID Frame
+      INTEGER CELFRM         ! SkyFrame describing CELLCODE co-ords
       INTEGER DAY            ! Day
       INTEGER DSTAT          ! Local SLA status
       INTEGER FC             ! Pointer to AST FitsChan
@@ -181,7 +190,7 @@
       INTEGER HOUR           ! Hour of observation
       INTEGER IAT            ! Used length of string
       INTEGER ISOR           ! LSR identifier extracted from LSRFLG
-      INTEGER ISYS           ! Spectral system identifier from LSRFLG
+      INTEGER ISYS           ! Integer code for co-ordinate system
       INTEGER JFCEN          ! Frequency (kHz) at spectral axis centre
       INTEGER JFINC          ! Pixel size (Hz) on spectral axis 
       INTEGER JFREST         ! Rest frequency (kHz)
@@ -224,35 +233,36 @@
       ISDSB = .TRUE.
 
 *  First create a SkyFrame that describes the celestial coordinate system
-*  specified by the CELLCODE item.
+*  specified by the CENTRECODE item.
 *  ======================================================================
 
-*  Get the integer CELLCODE value, using a default value of 6.
-      KEY = 'CELLCODE'
+*  Get the integer CENTRECODE value, using a default value of 6.
+      KEY = 'CENTRECODE'
       IF( .NOT. AST_MAPGET0I( KM1, KEY, ISYS, STATUS ) ) ISYS = 6
 
 *  Find the corresponding AST "System" code.
       IF( ISYS .EQ. 1 ) THEN
-         SYS = 'AZEL'
+         CENSYS = 'AZEL'
       ELSE IF( ISYS .EQ. 4 ) THEN
-         SYS = 'GAPPT'
+         CENSYS = 'GAPPT'
       ELSE IF( ISYS .EQ. 6 ) THEN
-         SYS = 'FK4'
+         CENSYS = 'FK4'
       ELSE IF( ISYS .EQ. 7 ) THEN
-         SYS = 'FK5'
+         CENSYS = 'FK5'
       ELSE IF( ISYS .EQ. 8 ) THEN
-         SYS = 'GALACTIC'
+         CENSYS = 'GALACTIC'
       ELSE IF( STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
+         CALL MSG_SETC( 'K', KEY )
          CALL MSG_SETI( 'I', ISYS )
          CALL ERR_REP( 'ATL_WCSPX_ERR1', 'ATL_WCSPX: Illegal value '//
-     :                 '^I supplied for item CELLCODE.', STATUS )
+     :                 '^I supplied for item ^K.', STATUS )
       END IF
 
 *  Create a default SkyFrame and then set its System to that specified by
-*  CELLCODE.
+*  CENTRECODE.
       SKYFRM = AST_SKYFRAME( ' ', STATUS )
-      CALL AST_SETC( SKYFRM, 'System', SYS, STATUS )
+      CALL AST_SETC( SKYFRM, 'System', CENSYS, STATUS )
 
 *  Epoch of observation. First extract the year, month and day of the 
 *  UTC from the IDATE item in the SPECX extension, and convert them to 
@@ -363,7 +373,7 @@
       CALL AST_SETD( SPCFRM, 'RestFreq', DBLE( JFREST )*1.0D-6, STATUS )
 
 *  Source position. These are interpreted as being in the system
-*  specified by the CELLCODE item. The "SKYFRM" SkyFrame created above 
+*  specified by the CENTRECODE item. The "SKYFRM" SkyFrame created above 
 *  describes this system.
       KEY = 'RA_DEC(1)'
       CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
@@ -585,6 +595,51 @@
          CALL ATL_KYCHK( KM2, KEY, KM2ERR, STATUS )
          IF( .NOT. AST_MAPGET0D( KM2, KEY, POSANG, STATUS ) ) GO TO 999
 
+*  If the central position was given in a different celestial co-ordinate 
+*  system, we need to convert it into the system specified by CELLCODE.
+*  Get the CELLCODE co-ordinate system.
+         KEY = 'CELLCODE'
+         IF( .NOT. AST_MAPGET0I( KM2, KEY, ISYS, STATUS ) ) ISYS = 6
+
+         IF( ISYS .EQ. 1 ) THEN
+            SYS = 'AZEL'
+         ELSE IF( ISYS .EQ. 4 ) THEN
+            SYS = 'GAPPT'
+         ELSE IF( ISYS .EQ. 6 ) THEN
+            SYS = 'FK4'
+         ELSE IF( ISYS .EQ. 7 ) THEN
+            SYS = 'FK5'
+         ELSE IF( ISYS .EQ. 8 ) THEN
+            SYS = 'GALACTIC'
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETI( 'I', ISYS )
+            CALL MSG_SETC( 'K', KEY )
+            CALL ERR_REP( 'ATL_WCSPX_ERR1B', 'ATL_WCSPX: Illegal '//
+     :                    'value ^I supplied for item ^K.', STATUS )
+         END IF
+
+*  If it is different to the CENTRECODE system, create a SkyFrame describing 
+*  the CELLCODE co-ordinate system.
+         IF( SYS .NE. CENSYS ) THEN
+            CELFRM = AST_COPY( SKYFRM, STATUS )
+            CALL AST_SETC( CELFRM, 'System', SYS, STATUS )
+
+*  Create a FrameSet connecting the CELLCODE and CENTRECODE co-ordinate 
+*  systems.
+            FS = AST_CONVERT( SKYFRM, CELFRM, ' ', STATUS )
+
+*  Convert the central "RA" and "DEC" position from the CENTRECODE system 
+*  to the CELLCODE system.
+            CALL AST_TRAN2( FS, 1, RA*D2R, DEC*D2R, .TRUE., RA, DEC, 
+     :                      STATUS )
+            RA = RA/D2R
+            DEC = DEC/D2R
+
+         ELSE
+            CELFRM = AST_CLONE( SKYFRM, STATUS )
+         END IF
+
 *  If no SPECX_MAP extension, use default values. The pixel size is
 *  assumed to be equal to half the resolution of the telescope (assumed 
 *  to be  JCMT with a diameter of 15 metres).
@@ -592,6 +647,7 @@
          CD1 = 0.5*R2D*C/(JFCEN*1000.0*DIAM)
          CD2 = CD1
          POSANG = 0.0
+         CELFRM = AST_CLONE( SKYFRM, STATUS )
       END IF
 
 *  Create an empty AST FitsChan.
@@ -690,7 +746,7 @@
 
 *  Construct a 3D CmpFrame describing all 3 axes. RA becomes axis 1 and DEC 
 *  becomes axis 2, and the spectral axis becomes axis 3.
-      FRM = AST_CMPFRAME( SKYFRM, SPCFRM, 'Title=Compound '//
+      FRM = AST_CMPFRAME( CELFRM, SPCFRM, 'Title=Compound '//
      :                    'coordinates describing celestial position '//
      :                    'and spectral position', STATUS )
 
@@ -702,6 +758,10 @@
 *  the LSRFLG extension item. This was requested by JACH (rather than
 *  leaving the standard of rest set to "Source").
       CALL AST_SETC( IWCS, 'StdOfRest', SOR, STATUS )
+
+*  Set the celestial co-ordinate system to the system specified by
+*  CENTRECODE (it currently represents CELLCODE co-ords).
+      CALL AST_SETC( IWCS, 'System(1)', CENSYS, STATUS )
 
 *  Export the FrameSet pointer so that it is not anulled by the following
 *  call to AST_END.
