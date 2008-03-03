@@ -402,7 +402,7 @@ static int Use_Cache = 0;
 /* Prototypes for Private Functions. */
 /* ================================= */
 static size_t SizeOfMemory( void );
-static char *CheckTempStart( const char *, const char *, const char *, char *, int *, int *, int *, int *, int *, int * );
+static char *CheckTempStart( const char *, const char *, const char *, char *, int *, int *, int *, int *, int *, int *, int * );
 static char *ChrMatcher( const char *, const char *, const char *, const char *[], int, int, int );
 
 #ifdef MEM_DEBUG
@@ -505,7 +505,7 @@ static char *CheckTempStart( const char *template, const char *temp,
                              const char *pattern,
                              char *allowed, int *ntemp, int *allow, 
                              int *min_nc, int *max_nc, int *start_sub, 
-                             int *end_sub ){
+                             int *end_sub, int *greedy ){
 /*
 *  Name:
 *     CheckTempStart
@@ -521,7 +521,7 @@ static char *CheckTempStart( const char *template, const char *temp,
 *                           const char *pattern,
 *                           char *allowed, int *ntemp, int *allow, 
 *                           int *min_nc, int *max_nc, int *start_sub, 
-*                           int *end_sub )
+*                           int *end_sub, int *greedy )
 
 *  Description:
 *     This function returns inforation about the leading field in a
@@ -569,6 +569,9 @@ static char *CheckTempStart( const char *template, const char *temp,
 *        substituted. In this case the supplied "allowed" pointer is
 *        returned without change as the function value, "Min_nc" is
 *        returned as zero, and limit is returned as zero.
+*     greedy
+*        Address of an int in which to return a flag which is non-zero if
+*        the template starts with a greedy quantifier.
 
 *  Returned Value:
 *     Pointer to a (possibly newly allocated) memory area holding a
@@ -595,6 +598,7 @@ static char *CheckTempStart( const char *template, const char *temp,
    *max_nc = 0;
    *start_sub = 0;
    *end_sub = 0;
+   *greedy = 1;
 
 /* Check global status */
    if( !astOK ) return result;
@@ -693,16 +697,24 @@ static char *CheckTempStart( const char *template, const char *temp,
 
       }
 
-/* Now see if there is any multiplier. */
+/* Now see if there is any quantifier. */
       if( temp[ *ntemp ] == '*' ) {
          *min_nc = 0;
          *max_nc = INT_MAX;
          (*ntemp)++;
+         if( temp[ *ntemp ] == '?' ){
+            *greedy = 0;
+            (*ntemp)++;
+         }             
 
       } else if( temp[ *ntemp ] == '+' ) {
          *min_nc = 1;
          *max_nc = INT_MAX;
          (*ntemp)++;
+         if( temp[ *ntemp ] == '?' ){
+            *greedy = 0;
+            (*ntemp)++;
+         }             
 
       } else if( temp[ *ntemp ] == '?' ) {
          *min_nc = 0;
@@ -1065,14 +1077,12 @@ char **astChrSplitC_( const char *str, char c, int *n ) {
       p++;
    }
 
-/* Store any text following the final delimitier. */
-   if( wordlen ) {
-      result = astGrow( result, *n + 1, sizeof( char * ) );
-      word = astGrow( word, wordlen + 1, 1 );
-      if( result && word ) {
-         word[ wordlen ] = 0;
-         result[ (*n)++ ] = word;
-      }
+/* Store the text following the final delimitier. */
+   result = astGrow( result, *n + 1, sizeof( char * ) );
+   word = astGrow( word, wordlen + 1, 1 );
+   if( result && word ) {
+      word[ wordlen ] = 0;
+      result[ (*n)++ ] = word;
    }
 
 /* Return the result. */
@@ -1140,7 +1150,8 @@ f     AST_CHRSUB = LOGICAL
 
 *  Template Syntax:
 *     The template syntax is a minimal form of regular expression, The
-*     only quantifiers allowed are "*", "+" and "?". The only constraints 
+*     only quantifiers allowed are "*", "*?", "+", "+?" and "?" ("*" and
+*     "+" are greedy, "*?" and "+?" are not). The only constraints 
 *     allowed are "^" and "$". The following atoms are allowed:
 *
 *     [chars]: Matches any of the specified characters.
@@ -1240,17 +1251,17 @@ c     the supplied test string does not match the template.
       tlen = strlen( temp );
 
 /* If the template starts with "^" or "(^", remove the "^" character. 
-   Otherwise insert ".*" at the start. Allocate two extra characters in
-   case we later need to add ".*" to the end of the string. */
+   Otherwise insert ".*?" at the start. Allocate three extra characters 
+   in case we later need to add ".*?" to the end of the string. */
       if( temp[ 0 ] == '^' ) {
-         template = astMalloc( tlen + 2 );
+         template = astMalloc( tlen + 3 );
          if( template ) {
             strcpy( template, temp + 1 );
             tlen--;
          }
    
       } else if( temp[ 0 ] == '(' && temp[ 1 ] == '^') {
-         template = astMalloc( tlen + 2 );
+         template = astMalloc( tlen + 3 );
          if( template ) {
             template[ 0 ] = '(';
             strcpy( template + 1, temp + 2 );
@@ -1258,17 +1269,18 @@ c     the supplied test string does not match the template.
          }
    
       } else {
-         template = astMalloc( tlen + 5 );
+         template = astMalloc( tlen + 6 );
          if( template ) {
             template[ 0 ] = '.';
             template[ 1 ] = '*';
-            strcpy( template + 2, temp );
-            tlen += 2;
+            template[ 2 ] = '?';
+            strcpy( template + 3, temp );
+            tlen += 3;
          }
       }
 
 /* If the pattern ends with "$" or "$)", remove the "$" character. Otherwise 
-   insert ".*" at the end. */
+   insert ".*?" at the end. */
       if( template[ tlen - 1 ] == '$' ) {
          tlen--;
 
@@ -1279,7 +1291,8 @@ c     the supplied test string does not match the template.
       } else {
          template[ tlen ] = '.';
          template[ tlen + 1 ] = '*';
-         tlen += 2;
+         template[ tlen + 2 ] = '?';
+         tlen += 3;
       }
 
 /* Ensure the string is terminated */
@@ -1738,6 +1751,7 @@ static char *ChrMatcher( const char *test, const char *template,
    int allow;
    int dollar;
    int end_sub;
+   int greedy;
    int i;
    int in_sub;
    int ipart;
@@ -1753,8 +1767,12 @@ static char *ChrMatcher( const char *test, const char *template,
    int reslen;      
    int start_sub;
 
+   static int depth = 0;
+
 /* Check the global error status. */
    if( !astOK ) return NULL;
+
+   depth++;
 
 /* Initialise. */
    result = NULL;
@@ -1788,7 +1806,7 @@ static char *ChrMatcher( const char *test, const char *template,
 /* Loop until we have reached the end of either the test or template
    string. We break out of the loop early if we find that the test string
    does not match the template string. */
-   while( *a && *b ) {
+   while( match && *a && *b ) {
 
 /* Examine the string at the start of the template string. This returns a
    string of allowed (or disallowed) characters that the next test character 
@@ -1797,7 +1815,8 @@ static char *ChrMatcher( const char *test, const char *template,
    indicating if the number of matching test characters can exceed the 
    minimum number or must be exactly equal to the minimum number.  */
       allowed = CheckTempStart( template, b, pattern, allowed, &nb, &allow, 
-                                &min_na, &max_na, &start_sub, &end_sub );
+                                &min_na, &max_na, &start_sub, &end_sub,
+                                &greedy );
       if( !astOK ) break;
 
 /* Increment the the pointer to the next template character. */
@@ -1895,23 +1914,47 @@ static char *ChrMatcher( const char *test, const char *template,
 /* Dont match more characters than are needed. */
          if( na > max_na ) na = max_na;
 
+/* We cannot match more characters than are available. */
+         if( na < max_na ) max_na = na;
+
+/* If we have exhausted the template, match the maximum number of
+   characters. */
+         if( ! *b ) {
+            na = max_na;
+
 /* If we still have a match, we may choose to use fewer than the max
    allowed number of test characters in order to allow the next template
    field to be matched. Don't need to do this if we have reached the end
    of the template. */
-         if( max_na > min_na && *b ) {
+         } else if( max_na > min_na ) {
             match = 0;
 
-/* Try using an increasing number of test characters, starting at the
-   minimum allowed and increasing up to the maximum, until a number is foudn
-   which allows the rest of the string to be matched. */
-            if( na < max_na ) max_na = na;
-            for( na = min_na; na <= max_na; na++ ) {
-               r = ChrMatcher( a + na, b, pattern, NULL, 0, 1, 0 );
-               if( r ) {
-                  match = 1;
-                  r = astFree( r );
-                  break;                  
+/* If a greedy quantifier was used, try using a decreasing number of test 
+   characters, starting at the maximum allowed and decreasing down to the 
+   minimum, until a number is found which allows the rest of the string 
+   to be matched. */
+            if( greedy ) {
+               for( na = max_na; na >= min_na; na-- ) {
+                  r = ChrMatcher( a + na, b, pattern, NULL, 0, 1, 0 );
+                  if( r ) {
+                     match = 1;
+                     r = astFree( r );
+                     break;                  
+                  }
+               }
+
+/* If a non-greedy quantifier was used, try using an increasing number of 
+   test characters, starting at the minimum allowed and increasing up to 
+   the maximum, until a number is found which allows the rest of the string 
+   to be matched. */
+            } else {
+               for( na = min_na; na <= max_na; na++ ) {
+                  r = ChrMatcher( a + na, b, pattern, NULL, 0, 1, 0 );
+                  if( r ) {
+                     match = 1;
+                     r = astFree( r );
+                     break;                  
+                  }
                }
             }
          }
@@ -1962,19 +2005,21 @@ static char *ChrMatcher( const char *test, const char *template,
 
 /* If the test string is finished but the template string is not, see if
    the rest of the template string will match a null test string. */
-   if( !*a && *b ) {
+   if( !*a && *b && match ) {
 
-      allowed = CheckTempStart( template, b, pattern, allowed, &nb, &allow, 
-                                &min_na, &max_na, &start_sub, &end_sub );
-
-      while( start_sub || end_sub ) {
-         b++;
+      while( *b ) {
          allowed = CheckTempStart( template, b, pattern, allowed, &nb, &allow, 
-                                   &min_na, &max_na, &start_sub, &end_sub );
+                                   &min_na, &max_na, &start_sub, &end_sub, 
+                                   &greedy );
+         b += nb;
+         allowed = astFree( allowed );
+
+         if( min_na > 0 ) {
+            match = 0;
+            break;
+         }
       }
 
-      if( min_na == 0 ) b += strlen( b );
-      allowed = astFree( allowed );
    } 
 
 /* No match if either string was not used completely. */
@@ -2008,8 +2053,8 @@ static char *ChrMatcher( const char *test, const char *template,
                stest = astStore( NULL, subs[ i ], strlen( subs[ i ] ) + 1 );
                for( dollar = 1; dollar <= nsub; dollar++ ) {
                   sprintf( stemp, ".*($%d).*", dollar );
-                  sres = ChrMatcher( stest, stemp, pattern,
-                                     (void *) matches + dollar - 1, 1, 0, 0 );
+                  sres = ChrMatcher( stest, stemp, stemp,
+                                     (void *) ( matches + dollar - 1 ), 1, 0, 0 );
                   if( sres ) {
                      (void) astFree( stest );
                      stest = sres;
@@ -2045,6 +2090,9 @@ static char *ChrMatcher( const char *test, const char *template,
       parts[ ipart ] = astFree( parts[ ipart ] );
    }
    parts = astFree( parts );
+
+
+   depth--;
 
 /* Return the result. */
    return result;
