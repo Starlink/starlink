@@ -9084,7 +9084,8 @@ from one graphical element to another.
       NDFs quality names information is required.
 
       The QUALITY component of the NDF is reset to an undefined state by
-      this routine.
+      this routine. Therefore, the QUALITY component should not be mapped
+      for access prior to calling this routine.
 
       The LOCS argument returned by this routine specifies the NDF
       which will be operated on by subsequent IRQ routines.
