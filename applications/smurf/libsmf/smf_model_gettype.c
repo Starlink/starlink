@@ -35,6 +35,8 @@
 *        Initial Version
 *     2007-08-21 (EC):
 *        Added typedef SMF__NUL
+*     2008-03-03 (EC):
+*        Added QUA/LUT
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -110,6 +112,10 @@ smf_modeltype smf_model_gettype( const char *modelname, int *status ) {
     return SMF__NOI;
   } else if( strncmp( tempstring, "EXT", 3 ) == 0 ) {
     return SMF__EXT;
+  } else if( strncmp( tempstring, "LUT", 3 ) == 0 ) {
+    return SMF__LUT;
+  } else if( strncmp( tempstring, "QUA", 3 ) == 0 ) {
+    return SMF__QUA;
   } else {
     *status = SAI__ERROR;
     msgSetc("MNAME",modelname);

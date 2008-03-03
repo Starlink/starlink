@@ -42,6 +42,8 @@
 *        Return simple string, form grpex in smf_model_create instead
 *     2007-06-13 (EC):
 *        Added LUT
+*     2008-03-03 (EC):
+*        Added QUA
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -124,6 +126,10 @@ char *smf_model_getname( smf_modeltype type, int *status) {
 
   case SMF__LUT:
     retval = "lut";
+    break;
+
+  case SMF__QUA:
+    retval = "qua";
     break;
 
   default:
