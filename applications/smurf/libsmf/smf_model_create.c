@@ -75,6 +75,8 @@
 *     projection information must be supplied: outfset, moving and ?bnd_out.
 
 *  Notes:
+*     QUAlity components are initialized to 0. Before using the caller
+*     should synchronize the SMF__Q_BADS bits with smf_update_quality.
 
 *  Authors:
 *     Edward Chapin (UBC)
@@ -123,6 +125,9 @@
 *     2008-01-24 (EC):
 *        -Template can now be non-flatfielded.
 *        -Better file names for models based on iarray
+*     2008-03-03 (EC):
+*        -handle QUAlity
+
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -195,25 +200,20 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
   dim_t i;                      /* Loop counter */
   smfData *idata=NULL;          /* Pointer to input smfdata data */
   int idx=0;                    /* Index within subgroup */
-  int indf=0;                   /* NDF ID for propagation */
   int isize=0;                  /* Number of files in input group */
   dim_t j;                      /* Loop counter */
   dim_t k;                      /* Loop counter */
   Grp *mgrp=NULL;               /* Temporary group to hold model names */
   char *mname=NULL;             /* String model component name */
-  int mndf=0;                   /* NDF ID for propagation */
   int msize=0;                  /* Number of files in model group */
   char name[GRP__SZNAM+1];      /* Name of container file without suffix */
   size_t ndata=0;               /* Number of elements in data array */
-  int nmap=0;                   /* Number of elements mapped */
   int nrel=0;                   /* Number of related elements (subarrays) */
   int oflag=0;                  /* Flags for opening template file */
   long pagesize=0;              /* Size of memory page used by mmap */
   char *pname=NULL;             /* Poiner to fname */
-  smfData *refdata=NULL;        /* Pointer to ref smfData on disk */
   long remainder=0;             /* Extra length beyond integer pagesize */
   char suffix[] = SMF__DIMM_SUFFIX; /* String containing model suffix */
-  smfData *tempdata=NULL;       /* Temporary smfData pointer */
   int thisnrel;                 /* Number of related items for this model */
 
   /* Main routine */
@@ -461,6 +461,20 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	    head.dims[1] = (idata->dims)[1];
 	    head.dims[2] = (idata->dims)[2];
 	    break;
+
+	  case SMF__QUA: /* Quality byte for each data point */
+	    head.dtype = SMF__UBYTE;
+	    head.ndims = 3;
+	    head.dims[0] = (idata->dims)[0];
+	    head.dims[1] = (idata->dims)[1];
+	    head.dims[2] = (idata->dims)[2];
+	    break;
+
+	  default:
+	    *status = SAI__ERROR;
+	    msgSetc( "TYPE", smf_model_getname(mtype, status) );
+	    errRep(FUNC_NAME, "Don't know how to handle model type ^TYPE",
+		   status);
 	  }
 
 	  /* Propagate information from template if copying */
@@ -563,7 +577,6 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	    if( copyinput ) {
 	      /* memcpy because target and source are same type */
 	      memcpy( dataptr, (idata->pntr)[0], datalen );
-	      
 	    } else {
 	      /* otherwise zero the buffer */
 	      memset( dataptr, 0, datalen );
