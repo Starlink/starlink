@@ -511,6 +511,64 @@ void irqNew( int indf, const char *xname, IRQLocs **locs, int *status ){
    }
 }
 
+/* ------------------------------------- */
+
+F77_SUBROUTINE(irq_find)( INTEGER(INDF),
+                          CHARACTER_ARRAY(LOCS), 
+                          CHARACTER(XNAME), 
+                          INTEGER(STATUS)
+                          TRAIL(LOCS)
+                          TRAIL(XNAME) );
+
+void irqFind( int indf, IRQLocs **locs, char xname[DAT__SZNAM + 1], int *status ){
+
+   DECLARE_INTEGER(INDF);
+   DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
+   DECLARE_CHARACTER_DYN(XNAME);  
+   DECLARE_INTEGER(STATUS);
+   int j;
+
+   if( !locs ) return;
+   *locs= NULL;
+
+   F77_EXPORT_INTEGER( indf, INDF );
+   F77_CREATE_CHARACTER( XNAME, DAT__SZNAM );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(irq_find)( INTEGER_ARG(&INDF),
+                       CHARACTER_ARRAY_ARG(LOCS),
+                       CHARACTER_ARG(XNAME),
+                       INTEGER_ARG(&STATUS) 
+                       TRAIL_ARG(LOCS) 
+                       TRAIL_ARG(XNAME) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_IMPORT_CHARACTER( XNAME, XNAME_length, xname );
+
+   if( *status == SAI__OK ) {
+      *locs = malloc( sizeof( IRQLocs ) );
+      if( *locs ) {
+         for( j = 0; j < 5; j++ ) (*locs)->loc[j] = NULL;
+         for( j = 0; j < 5; j++ ) {
+            HDS_IMPORT_FLOCATOR( LOCS[j], &((*locs)->loc[j]), status );
+         }
+      } else {
+         F77_CALL(irq_rlse)( CHARACTER_ARRAY_ARG(LOCS),
+                             INTEGER_ARG(&STATUS) 
+                             TRAIL_ARG(LOCS) );
+
+         if( *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            errRep( "IRQFIND_ERR", "Cannot allocate memory for a new "
+                    "IRQLocs structure.", status );
+         }
+      }
+   }
+
+   F77_FREE_CHARACTER( XNAME );
+
+}
+
 /* ------------------------------- */
 
 F77_SUBROUTINE(irq_addqn)( CHARACTER_ARRAY(LOCS), 
@@ -608,6 +666,56 @@ void irqSetqm( IRQLocs *locs, int bad, const char *qname, int size,
    F77_IMPORT_INTEGER( SET, *set );
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_FREE_REAL( MASK );
+}
+
+
+/* ------------------------------- */
+
+F77_SUBROUTINE(irq_rwqn)( CHARACTER_ARRAY(LOCS), 
+                          CHARACTER(QNAME), 
+                          LOGICAL(SET),
+                          LOGICAL(NEWVAL),
+                          LOGICAL(OLDVAL),
+                          INTEGER(STATUS)
+                          TRAIL(LOCS)
+                          TRAIL(QNAME) );
+
+void irqRwqn( IRQLocs *locs, const char *qname, int set, int newval,
+              int *oldval, int *status ){
+
+   DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
+   DECLARE_CHARACTER_DYN(QNAME);  
+   DECLARE_LOGICAL(SET);
+   DECLARE_LOGICAL(NEWVAL);
+   DECLARE_LOGICAL(OLDVAL);
+   DECLARE_INTEGER(STATUS);
+
+   HDS_EXPORT_CLOCATOR( locs->loc[0], LOCS[0], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[1], LOCS[1], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[2], LOCS[2], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[3], LOCS[3], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[4], LOCS[4], status );
+
+   F77_CREATE_CHARACTER( QNAME, strlen( qname ) );
+   F77_EXPORT_CHARACTER( qname, QNAME, QNAME_length );
+
+   F77_EXPORT_LOGICAL( set, SET );
+   F77_EXPORT_LOGICAL( newval, NEWVAL );
+
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(irq_rwqn)( CHARACTER_ARRAY_ARG(LOCS),
+                       CHARACTER_ARG(QNAME),
+                       LOGICAL_ARG(&SET),
+                       LOGICAL_ARG(&NEWVAL),
+                       LOGICAL_ARG(&OLDVAL),
+                       INTEGER_ARG(&STATUS) 
+                       TRAIL_ARG(LOCS) 
+                       TRAIL_ARG(QNAME) );
+
+   F77_FREE_CHARACTER( QNAME );
+   F77_IMPORT_LOGICAL( OLDVAL, *oldval );
+   F77_IMPORT_INTEGER( STATUS, *status );
 }
 
 

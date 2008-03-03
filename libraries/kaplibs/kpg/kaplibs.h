@@ -100,13 +100,15 @@ void kpg1Wgndf( const char *, Grp *, int, int, const char *, Grp **, int *, int 
 void kpg1Wrlst( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, int, int * );
 void kpg1Wrtab( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, Grp *, Grp *, int, int * );
 
-void irqDelet( int, int * );
-void irqRlse( IRQLocs **, int * );
-void irqNew( int, const char *, IRQLocs **, int * );
 void irqAddqn( IRQLocs *, const char *, int, const char *, int * );
-void irqSetqm( IRQLocs *, int, const char *, int, float *, int *, int * );
+void irqDelet( int, int * );
+void irqFind( int, IRQLocs **, char[DAT__SZNAM + 1], int * );
 void irqGetqn( IRQLocs *, char *, int *, int *, int *, char *, int, int * );
+void irqNew( int, const char *, IRQLocs **, int * );
 void irqRbit( IRQLocs *, const char *, int *, int * );
+void irqRlse( IRQLocs **, int * );
+void irqRwqn( IRQLocs *, const char *, int, int, int *, int * );
+void irqSetqm( IRQLocs *, int, const char *, int, float *, int *, int * );
 
 int kpgGtfts( int, AstFitsChan ** fchan, int * status );
 int kpgPtfts( int, const AstFitsChan * fchan, int * status );
