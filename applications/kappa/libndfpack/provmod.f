@@ -27,123 +27,128 @@
 *     provmod ndf ancestor path
 
 *  ADAM Parameters:
-*     ANCESTOR = LITERAL (Update)
+*     ANCESTOR = LITERAL (Read)
 *        Specifies the indices of one or more ancestors that are to be
 *        modified.  An index of zero refers to the supplied NDF itself.
 *        A positive index refers to one of the NDFs listed in the 
-*        ANCESTORS table in the PROVENANCE extension of the NDF. The maximum 
-*        number of ancestors is limited to 100 unless "ALL" or "*" is 
-*        specified.  The supplied parameter value can take any of the 
-*        following forms.
+*        ANCESTORS table in the PROVENANCE extension of the NDF.  The 
+*        maximum number of ancestors is limited to 100 unless "ALL" or 
+*        "*" is specified.  The supplied parameter value can take any of
+*        the following forms.
 *
 *        - "ALL" or "*" --  All ancestors.
 *
-*        - "xx,yy,zz" -- A list of anestor indices.
+*        - "xx,yy,zz" -- A list of ancestor indices.
 *
-*        - "xx:yy" --  Ancestor indices between xx and yy inclusively.  When
-*        xx is omitted the range begins from 0; when yy is omitted the range 
-*        ends with the maximum value it can take, that is the number of 
-*        ancestors described in the PROVENANCE extension.
+*        - "xx:yy" --  Ancestor indices between xx and yy inclusively.
+*        When xx is omitted, the range begins from 0; when yy is 
+*        omitted, the range ends with the maximum value it can take, 
+*        that is the number of ancestors described in the PROVENANCE 
+*        extension.
 *
 *        - Any reasonable combination of above values separated by 
-*        commas. ["ALL"]
+*        commas.  ["ALL"]
 *     CREATOR = LITERAL (Read)
-*        Specifies one or more substitutions to be performed on the "CREATOR"
-*        string read from each of the ancestors being modified. See
-*        "Substitution Syntax:" below. If null (!) is supplied, the PATH
-*        item is left unchanged. [!]
+*        Specifies one or more substitutions to be performed on the 
+*        "CREATOR" string read from each of the ancestors being 
+*        modified.  See "Substitution Syntax" below.  If null (!) is 
+*        supplied, the PATH item is left unchanged.  [!]
 *     DATE = LITERAL (Read)
-*        Specifies one or more substitutions to be performed on the "DATE"
-*        string read from each of the ancestors being modified. See
-*        "Substitution Syntax:" below. An error will be reported if any of
-*        these substitutions result in a string that is not a valid date 
-*        and time string. If null (!) is supplied, the PATH item is left 
-*        unchanged. [!]
+*        Specifies one or more substitutions to be performed on the 
+*        "DATE" string read from each of the ancestors being modified. 
+*        See "Substitution Syntax" below.  An error will be reported if 
+*        any of these substitutions result in a string that is not a 
+*        valid date-and-time string.  If null (!) is supplied, the PATH 
+*        item is left unchanged.  [!]
 *     NDF = NDF (Update)
 *        The NDF data structure.
 *     PATH = LITERAL (Read)
-*        Specifies one or more substitutions to be performed on the "PATH"
-*        string read from each of the ancestors being modified. See
-*        "Substitution Syntax:" below. If null (!) is supplied, the PATH
-*        item is left unchanged. [!]
+*        Specifies one or more substitutions to be performed on the 
+*        "PATH" string read from each of the ancestors being modified. 
+*        See "Substitution Syntax" below.  If null (!) is supplied, the 
+*        PATH item is left unchanged.  [!]
 
 *  Examples:
-*     provrem ff path='(_x)$=_y'
+*     provmod ff path='(_x)$=_y'
 *        This modifies any ancestor within the NDF called ff that has a
 *        path ending in "_x" by replacing the final "_x" with "_y".
-*     provrem ff path='(_x)$=_y'
+*     provmod ff path='(_x)$=_y'
 *        This modifies any ancestor within the NDF called ff that has a
 *        path ending in "_x" by replacing the final "_x" with "_y".
-*     provrem ff path='(.*)_(.*)=$2=$1'
+*     provmod ff path='(.*)_(.*)=$2=$1'
 *        This modifies any ancestor within the NDF called ff that has a
 *        path consisting of two parts separated by an underscore by
-*        swapping the parts. If there is more than one underscore in the
-*        ancestor path, then the final underscore is used (because the
-*        initial quantifier ".*" is greedy).
-*     provrem ff path='(.*?)_(.*)=$2=$1'
+*        swapping the parts.  If there is more than one underscore in
+*        the ancestor path, then the final underscore is used (because 
+*        the initial quantifier ".*" is greedy).
+*     provmod ff path='(.*?)_(.*)=$2=$1'
 *        This modifies any ancestor within the NDF called ff that has a
 *        path consisting of two parts separated by an underscore by
-*        swapping the parts. If there is more than one underscore in the
-*        ancestor path, then the first underscore is used (because the
-*        initial quantifier ".*?" is not greedy).
+*        swapping the parts.  If there is more than one underscore in
+*        the ancestor path, then the first underscore is used (because
+*        the initial quantifier ".*?" is not greedy).
 
 *  Substitution Syntax:
 *     The syntax for the CREATOR, DATE and PATH parameter values is a 
-*     minimal form of regular expression. The following atoms are allowed:
+*     minimal form of regular expression.  The following atoms are 
+*     allowed.
 *
-*     "[chars]" - Matches any of the characters within the brackets.
-*     "[^chars]" - Matches any character that is not within the brackets
-*                  (ignoring the initiual "^" character).
-*     "." - Matches any single character.
-*     "\d" - Matches a single digit.
-*     "\D" - Matches anything but a single digit.
-*     "\w" - Matches any alphanumeric character, and "_".
-*     "\W" - Matches anything but alphanumeric characters, and "_".
-*     "\s" - Matches white space.
-*     "\S" - Matches anything but white space.
+*     "[chars]" -- Matches any of the characters within the brackets.
+*     "[^chars]" -- Matches any character that is not within the 
+*                   brackets (ignoring the initial "^" character).
+*     "." -- Matches any single character.
+*     "\d" -- Matches a single digit.
+*     "\D" -- Matches anything but a single digit.
+*     "\w" -- Matches any alphanumeric character, and "_".
+*     "\W" -- Matches anything but alphanumeric characters, and "_".
+*     "\s" -- Matches white space.
+*     "\S" -- Matches anything but white space.
 *
 *     Any other character that has no special significance within a
-*     regular expression matches itself. Characters that have special
+*     regular expression matches itself.  Characters that have special
 *     significance can be matched by preceeding them with a backslash
-*     (\) in which case their special significance is ignored (note, this
-*     does not apply to the characters in the set dDsSwW).
+*     (\) in which case their special significance is ignored (note, 
+*     this does not apply to the characters in the set dDsSwW).
 *
-*     Note, minus signs ("-") within brackets have no special significance, 
-*     so ranges of characters must be specified explicitly.
+*     Note, minus signs ("-") within brackets have no special 
+*     significance, so ranges of characters must be specified 
+*     explicitly.
 *
-*     The following quantifiers are allowed:
+*     The following quantifiers are allowed.
 *
-*     "*" - Matches zero or more of the preceeding atom, choosing the
-*           largest posible number that gives a match.
-*     "*?"- Matches zero or more of the preceeding atom, choosing the
-*           smallest posible number that gives a match.
-*     "+" - Matches one or more of the preceeding atom, choosing the
-*           largest posible number that gives a match.
-*     "+?"- Matches one or more of the preceeding atom, choosing the
-*           smallest posible number that gives a match.
-*     "?" - Matches zero or one of the preceeding atom.
+*     "*" -- Matches zero or more of the preceeding atom, choosing the
+*            largest possible number that gives a match.
+*     "*?"-- Matches zero or more of the preceeding atom, choosing the
+*           smallest possible number that gives a match.
+*     "+" -- Matches one or more of the preceeding atom, choosing the
+*            largest possible number that gives a match.
+*     "+?"-- Matches one or more of the preceeding atom, choosing the
+*            smallest possible number that gives a match.
+*     "?" -- Matches zero or one of the preceeding atom.
 
-*     The following constraints are allowed:
+*     The following constraints are allowed.
 *
-*     "^" - Matches the start of the test string.
-*     "$" - Matches the end of the test string.
+*     "^" -- Matches the start of the test string.
+*     "$" -- Matches the end of the test string.
 * 
-*     Multiple templates can be concatenated, using the "|" character to 
-*     separate them. The test string is compared against each one in turn 
-*     until a match is found. 
+*     Multiple templates can be concatenated, using the "|" character to
+*     separate them.  The test string is compared against each one in 
+*     turn until a match is found. 
 *
 *     A template should use parentheses to enclose the sub-strings that 
-*     are to be replaced, and the set of corresponding replacement values 
-*     should be appended to the end of the string, separated by "="
-*     characters. The section of the test string that matches the first 
-*     parenthesised section in the template string will be replaced by the 
-*     first replacement string. The section of the test string that matches 
-*     the second parenthesised section in the template string will be 
-*     replaced by the second replacement string, and so on.
+*     are to be replaced, and the set of corresponding replacement 
+*     values should be appended to the end of the string, separated by 
+*     "=" characters.  The section of the test string that matches the 
+*     first parenthesised section in the template string will be 
+*     replaced by the first replacement string.  The section of the test
+*     string that matches the second parenthesised section in the 
+*     template string will be replaced by the second replacement string,
+*     and so on.
 *
 *     The replacement strings can include the tokens "$1", "$2", etc.
 *     The section of the test string that matched the corresponding 
-*     parenthesised section in the template is used in place of the token.
+*     parenthesised section in the template is used in place of the 
+*     token.
 *
 *     See the "Examples" section above for how to use these facilities.
 
@@ -237,9 +242,9 @@
 *  extension.
       CALL NDG_CTPRV( INDF, NANC, STATUS )
 
-*  Get the indices of the ancestors to be modified. Since KPG1_GILST 
+*  Get the indices of the ancestors to be modified.  Since KPG1_GILST 
 *  limits the number of values that can be supplied, first check the
-*  parameter value directly to see if it set to "ALL". If so, we bypass 
+*  parameter value directly to see if it set to "ALL".  If so, we bypass
 *  KPG1_GILST, setting a flag instead to show that all ancestors should
 *  be modified.
       CALL PAR_GET0C( 'ANCESTOR', ANC, STATUS )
@@ -299,8 +304,9 @@
                CALL DAT_FIND( PROV, 'CREATOR', LOC, STATUS )
                CALL DAT_GET0C( LOC, TEST, STATUS )
 
-*  If the specifier matches the CREATOR string, perform the substitutions
-*  and use the resulting string in place of the current CREATOR string.
+*  If the specifier matches the CREATOR string, perform the 
+*  substitutions and use the resulting string in place of the current 
+*  CREATOR string.
                IF( AST_CHRSUB( TEST, CRESUB, RESULT, STATUS ) ) THEN
                   TEST = RESULT
                END IF

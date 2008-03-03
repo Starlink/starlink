@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.34}
 \newcommand{\stardocnumber}    {95.34}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2008 February 15}
+\newcommand{\stardocdate}      {2008 March 3}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.9}
+\newcommand{\stardocversion}   {1.9-1}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -12107,6 +12107,10 @@ picture.}
  Creates a one-dimensional profile through an \textit{n}-dimensional NDF.}
 \menuitem{PROVADD}{
  Stores \htmlref{provenance information}{apndf:provenance} in an NDF.}
+\menuitem{PROVMOD}{
+ Modifies provenance information for an NDF.}
+\menuitem{PROVREM}{
+ Removes selected provenance information from an NDF.}
 \menuitem{PROVSHOW}{
  Displays provenance information for an NDF.}
 \menuitem{PSF}{
@@ -12697,6 +12701,10 @@ functions as follows.
 \begin{description}
 \classitem{PROVADD}
  Stores \htmlref{provenance information}{apndf:provenance} in an NDF.
+\classitem{PROVMOD}
+ Modifies provenance information for an NDF.
+\classitem{PROVREM}
+ Removes selected provenance information from an NDF.
 \classitem{PROVSHOW}
  Displays provenance information for an NDF.
 \end{description}
@@ -39117,6 +39125,501 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
 }
 
 \sstroutine{
+   PROVMOD
+}{
+   Modifies provenance information for an NDF
+}{
+   \sstdescription{
+      This application modifies the provenance information stored in
+      the PROVENANCE extension of an NDF.
+   }
+   \sstusage{
+      provmod ndf ancestor path
+   }
+   \sstparameters{
+      \sstsubsection{
+         ANCESTOR = LITERAL (Read)
+      }{
+         Specifies the indices of one or more ancestors that are to be
+         modified.  An index of zero refers to the supplied NDF itself.
+         A positive index refers to one of the NDFs listed in the
+         ANCESTORS table in the PROVENANCE extension of the NDF.  The
+         maximum number of ancestors is limited to 100 unless {\tt "ALL"} or
+         {\tt "$*$"} is specified.  The supplied parameter value can take any of
+         the following forms.
+
+         \ssthitemlist{
+
+            \sstitem
+            {\tt "ALL"} or {\tt "$*$"} ---  All ancestors.
+
+            \sstitem
+            {\tt "xx,yy,zz"} --- A list of ancestor indices.
+
+            \sstitem
+            {\tt "xx:yy"} --  Ancestor indices between \emph{xx} and 
+            \emph{yy} inclusively.  When \emph{xx} is omitted, the range 
+            begins from 0; when \emph{yy} is omitted, the range ends with the
+	    maximum value it can take, that is the number of ancestors
+	    described in the PROVENANCE extension.
+
+            \sstitem
+            Any reasonable combination of above values separated by
+            commas.  {\tt ["ALL"]}
+         }
+      }
+      \sstsubsection{
+         CREATOR = LITERAL (Read)
+      }{
+         Specifies one or more substitutions to be performed on the
+         {\tt "CREATOR"} string read from each of the ancestors being
+         modified.  See 
+         \htmlref{``Substitution Syntax''}{substitution_syntax:provmod} 
+         below.  If null {\tt{(!)}} is
+         supplied, the PATH item is left unchanged.  {\tt [!]}
+      }
+      \sstsubsection{
+         DATE = LITERAL (Read)
+      }{
+         Specifies one or more substitutions to be performed on the
+	 {\tt "DATE"} string read from each of the ancestors being
+	 modified.  See ``Substitution Syntax'' below.  An error will
+	 be reported if any of these substitutions result in a string
+	 that is not a valid date-and-time string.  If null {\tt{(!)}}
+	 is supplied, the PATH item is left unchanged.  {\tt [!]}
+      }
+      \sstsubsection{
+         NDF = NDF (Update)
+      }{
+         The NDF data structure.
+      }
+      \sstsubsection{
+         PATH = LITERAL (Read)
+      }{
+         Specifies one or more substitutions to be performed on the
+         {\tt "PATH"} string read from each of the ancestors being modified.
+         See ``Substitution Syntax'' below.  If null {\tt{(!)}} is supplied, 
+         the PATH item is left unchanged.  {\tt [!]}
+      }
+   }
+   \label{examples:provmod}
+   \sstexamples{
+      \sstexamplesubsection{
+         provmod ff path='(\_x)\$=\_y'
+      }{
+         This modifies any ancestor within the NDF called ff that has a
+         path ending in {\tt "\_x"} by replacing the final {\tt "\_x"} with 
+         {\tt "\_y"}.
+      }
+      \sstexamplesubsection{
+         provmod ff path='(.$*$)\_(.$*$)=\$2=\$1'
+      }{
+         This modifies any ancestor within the NDF called ff that has a
+         path consisting of two parts separated by an underscore by
+         swapping the parts.  If there is more than one underscore in
+         the ancestor path, then the final underscore is used (because
+         the initial quantifier {\tt ".$*$"} is greedy).
+      }
+      \sstexamplesubsection{
+         provmod ff path='(.$*$?)\_(.$*$)=\$2=\$1'
+      }{
+         This modifies any ancestor within the NDF called ff that has a
+         path consisting of two parts separated by an underscore by
+         swapping the parts.  If there is more than one underscore in the
+         ancestor path, then the first underscore is used (because the
+         initial quantifier {\tt ".$*$?"} is not greedy).
+      }
+   }
+   \label{substitution_syntax:provmod}
+   \sstdiytopic{
+      Substitution Syntax
+   }{
+      The syntax for the CREATOR, DATE and PATH parameter values is a
+      minimal form of regular expression.  The following atoms are
+      allowed.
+
+% This conditional text is to avoid a space appearing before the backslash 
+% in the hypertext, such as " \W" instead of "\W".
+      \latex{
+         \sstitemlist{
+
+         \sstitem 
+         {\tt "[chars]"} --- Matches any of the characters within the brackets.
+
+         \sstitem 
+         {\tt "[$\wedge$chars]"} --- Matches any character that is not within the
+                       brackets (ignoring the initial {\tt "$\wedge$"} character).
+         \sstitem 
+         {\tt "."} --- Matches any single character.
+
+         \sstitem 
+         {\tt "$\backslash$d"} --- Matches a single digit.
+         
+         \sstitem 
+         {\tt "$\backslash$D"} --- Matches anything but a single digit.
+         
+         \sstitem
+         {\tt "$\backslash$w"} --- Matches any alphanumeric character, and {\tt "\_"}.
+
+         \sstitem
+         {\tt "$\backslash$W"} --- Matches anything but alphanumeric characters, and {\tt "\_"}.
+
+         \sstitem 
+         {\tt "$\backslash$s"} --- Matches white space.
+      
+         \sstitem
+         {\tt "$\backslash$S"} --- Matches anything but white space.
+         }
+      }
+      \html{
+         \sstitemlist{
+
+         \sstitem 
+         {\tt "[chars]"} --- Matches any of the characters within the brackets.
+
+         \sstitem 
+         {\tt "[$\wedge$chars]"} --- Matches any character that is not within the
+                       brackets (ignoring the initial {\tt "$\wedge$"} character).
+         \sstitem 
+         {\tt "."} --- Matches any single character.
+
+         \sstitem 
+         \verb+"\d"+ --- Matches a single digit.
+         
+         \sstitem 
+         \verb+"\D"+ --- Matches anything but a single digit.
+         
+         \sstitem
+         \verb+"\w"+ --- Matches any alphanumeric character, and {\tt "\_"}.
+
+         \sstitem
+         \verb+"\W"+ --- Matches anything but alphanumeric characters, and {\tt "\_"}.
+
+         \sstitem 
+         \verb+"\s"+ --- Matches white space.
+      
+         \sstitem
+         \verb+"\S"+ --- Matches anything but white space.
+         }
+      }
+
+      Any other character that has no special significance within a
+      regular expression matches itself.  Characters that have special
+      significance can be matched by preceeding them with a backslash
+      ($\backslash$) in which case their special significance is ignored (note,
+      this does not apply to the characters in the set \emph{dDsSwW}).
+
+      Note, minus signs ({\tt "-"}) within brackets have no special
+      significance, so ranges of characters must be specified
+      explicitly.
+
+      The following quantifiers are allowed.
+      \ssthitemlist{
+
+         \sstitem 
+         {\tt "*"} --- Matches zero or more of the preceeding atom, choosing the
+             largest possible number that gives a match.
+
+         \sstitem 
+         {\tt "*?"}--- Matches zero or more of the preceeding atom, choosing the
+            smallest possible number that gives a match.
+
+         \sstitem 
+         {\tt "+"} --- Matches one or more of the preceeding atom, choosing the
+             largest possible number that gives a match.
+         
+         \sstitem 
+         {\tt "+?"}--- Matches one or more of the preceeding atom, choosing the
+             smallest possible number that gives a match.
+         
+         \sstitem 
+         {\tt "?"} --- Matches zero or one of the preceeding atom.
+      }
+
+      The following constraints are allowed.
+      \ssthitemlist{
+
+         \sstitem 
+         {\tt "$\wedge$"} --- Matches the start of the test string.
+      
+         \sstitem 
+         {\tt "\$"} --- Matches the end of the test string.
+      }
+
+      Multiple templates can be concatenated, using the {\tt "$|$"} character to
+      separate them.  The test string is compared against each one in
+      turn until a match is found.
+
+      A template should use parentheses to enclose the sub-strings that
+      are to be replaced, and the set of corresponding replacement
+      values should be appended to the end of the string, separated by
+      {\tt "="} characters.  The section of the test string that matches the
+      first parenthesised section in the template string will be
+      replaced by the first replacement string.  The section of the test
+      string that matches the second parenthesised section in the
+      template string will be replaced by the second replacement string,
+      and so on.
+
+      The replacement strings can include the tokens {\tt "\$1"},{\tt "\$2"}, 
+      \emph{etc.} The section of the test string that matched the corresponding
+      parenthesised section in the template is used in place of the
+      token.
+
+      See the \htmlref{``Examples''}{examples:provmod} section above for how to 
+      use these facilities.
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: \htmlref{PROVADD}{PROVADD}, \htmlref{PROVREM}{PROVREM}, \htmlref{PROVSHOW}{PROVSHOW}.
+   }
+}
+
+\sstroutine{
+   PROVREM
+}{
+   Removes selected provenance information from an NDF
+}{
+   \sstdescription{
+      This application removes selected ancestors from the provenance
+      information stored in a given NDF.  The `generation gap' caused by
+      removing an ancestor is bridged by assigning all the direct
+      parents of the removed ancestor to each of the direct children of
+      the ancestor.
+
+      The ancestors to be removed can be specified either by giving
+      their indices (parameter ANCESTOR), or by comparing each ancestor
+      with a supplied pattern matching template (parameter PATTERN).
+   }
+   \sstusage{
+      provrem ndf pattern item
+   }
+   \sstparameters{
+      \sstsubsection{
+         ANCESTOR = LITERAL (Read)
+      }{
+         Specifies the indices of one or more ancestors that are to be
+         removed.  If a null {\tt{(!)}} value is supplied, the ancestors to be
+         removed are instead determined using the PATTERN parameter.
+         Each supplied index must be positive and refers to one of the
+         NDFs listed in the ANCESTORS table in the PROVENANCE extension
+         of the NDF.  The maximum number of ancestors that can be
+         removed is limited to 100 unless {\tt "LL"}, {\tt "*"} or {\tt !} is
+         specified.  The supplied parameter value can take any of the
+         following forms.
+
+         \ssthitemlist{
+
+            \sstitem
+            {\tt "ALL"} or {\tt "*"} ---  All ancestors.
+
+            \sstitem
+            {\tt "xx,yy,zz"} --- A list of ancestor indices.
+
+            \sstitem
+            {\tt "xx:yy"} ---  Ancestor indices between \emph{xx} and \emph{yy} 
+            inclusively.  When \emph{xx} is omitted, the range begins from 0; when
+            \emph{yy} is omitted the range ends with the maximum value it can take, 
+            that is the number of ancestors described in the PROVENANCE extension.
+
+            \sstitem
+            Any reasonable combination of above values separated by
+            commas.  {\tt [!]}
+         }
+      }
+      \sstsubsection{
+         ITEM = \htmlref{LITERAL}{se:parmenu} (Read)
+      }{
+         Specifies the item of provenance information that is checked
+         against the pattern matching template specified for parameter
+         PATTERN.  It can be {\tt "PATH"}, {\tt "CREATOR"} or {\tt "DATE"}.  
+         {\tt ["PATH"]}
+      }
+      \sstsubsection{
+         NDF = NDF (Update)
+      }{
+         The NDF data structure.
+      }
+      \sstsubsection{
+         PATTERN = LITERAL (Read)
+      }{
+         Specifies a pattern matching template using the syntax
+         described below in \htmlref{``Pattern Matching
+         Syntax''}{pattern_matching_syntax:provrem}.  Each ancestor
+         listed in the PROVENANCE extension of the NDF is compared with
+         this template, and each ancestor that matches is removed.  The
+         item of provenance information to be compared to the pattern is
+         specified by parameter ITEM.
+      }
+      \sstsubsection{
+         REMOVE = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, then the ancestors specified by parameter PATTERN or
+         ANCESTORS are removed.  Otherwise, these ancestors are retained
+         and all other ancestors are removed.  {\tt [TRUE]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         provrem ff ancestor=1
+      }{
+         This removes the first ancestor from the NDF called ff.
+      }
+      \sstexamplesubsection{
+         provrem ff ancestor=all
+      }{
+         This erases all provenance information.
+      }
+      \sstexamplesubsection{
+         provrem ff pattern='\_xb\$|\_yb\$'
+      }{
+         This removes all ancestors that have paths that end with {\tt "\_xb"}
+         or {\tt "\_yb"}.  Note, provenance paths do not include a trailing
+         {\tt ".sdf"} string.
+      }
+      \sstexamplesubsection{
+         provrem ff pattern='\_ave'
+      }{
+         This removes all ancestors that have paths that contain the
+         string {\tt "\_ave"} anywhere.
+      }
+      \sstexamplesubsection{
+         provrem ff pattern='\_ave' remove=no
+      }{
+         This removes all ancestors that have paths that do not contain
+         the string {\tt "\_ave"} anywhere.
+      }
+      \sstexamplesubsection{
+         provrem ff pattern='\_d[$\wedge$/]*\$'
+      }{
+         This removes all ancestors that have file base-names that begin
+         with {\tt "\_d"} . The pattern matches {\tt "\_d"} followed by any number of
+         characters that are not {\tt "/"}, followed by the end of the string.
+      }
+      \sstexamplesubsection{
+         provrem ff pattern='$\wedge$m51|$\wedge$m31'
+      }{
+         This removes all ancestors that have paths that begin with
+         {\tt "m51"} or {\tt "m31"}.
+      }
+   }
+   \label{pattern_matching_syntax:provrem}
+   \sstdiytopic{
+      Pattern Matching Syntax
+   }{
+      The syntax for the PATTERN parameter value is a minimal form of
+      regular expression. The following atoms are allowed.
+
+% This conditional text is to avoid a space appearing before the backslash 
+% in the hypertext, such as " \W" instead of "\W".
+      \latex{
+         \sstitemlist{
+
+         \sstitem 
+         {\tt "[chars]"} --- Matches any of the characters within the brackets.
+
+         \sstitem 
+         {\tt "[$\wedge$chars]"} --- Matches any character that is not within the
+                       brackets (ignoring the initial {\tt "$\wedge$"} character).
+         \sstitem 
+         {\tt "."} --- Matches any single character.
+
+         \sstitem 
+         {\tt "$\backslash$d"} --- Matches a single digit.
+         
+         \sstitem 
+         {\tt "$\backslash$D"} --- Matches anything but a single digit.
+         
+         \sstitem
+         {\tt "$\backslash$w"} --- Matches any alphanumeric character, and {\tt "\_"}.
+
+         \sstitem
+         {\tt "$\backslash$W"} --- Matches anything but alphanumeric characters, and {\tt "\_"}.
+
+         \sstitem 
+         {\tt "$\backslash$s"} --- Matches white space.
+      
+         \sstitem
+         {\tt "$\backslash$S"} --- Matches anything but white space.
+         }
+      }
+      \html{
+        \sstitemlist{
+
+         \sstitem 
+         {\tt "[chars]"} --- Matches any of the characters within the brackets.
+
+         \sstitem 
+         {\tt "[$\wedge$chars]"} --- Matches any character that is not within the
+                       brackets (ignoring the initial {\tt "$\wedge$"} character).
+         \sstitem 
+         {\tt "."} --- Matches any single character.
+
+         \sstitem 
+         \verb+"\d"+ --- Matches a single digit.
+         
+         \sstitem 
+         \verb+"\D"+ --- Matches anything but a single digit.
+         
+         \sstitem
+         \verb+"\w"+ --- Matches any alphanumeric character, and {\tt "\_"}.
+
+         \sstitem
+         \verb+"\W"+ --- Matches anything but alphanumeric characters, and {\tt "\_"}.
+
+         \sstitem 
+         \verb+"\s"+ --- Matches white space.
+      
+         \sstitem
+         \verb+"\S"+ --- Matches anything but white space.
+         }
+      }
+
+      Any other character that has no special significance within a
+      regular expression matches itself.  Characters that have special
+      significance can be matched by preceeding them with a backslash
+      ($\backslash$) in which case their special significance is ignored (note,
+      this does not apply to the characters in the set dDsSwW).
+
+      Note, minus signs ({\tt "-"}) within brackets have no special
+      significance, so ranges of characters must be specified
+      explicitly.
+
+      The following quantifiers are allowed.
+      \ssthitemlist{
+      
+         \sstitem
+         {\tt "*"} --- Matches zero or more of the preceeding atom.
+      
+         \sstitem
+         {\tt "+"} --- Matches one or more of the preceeding atom.
+      
+         \sstitem
+         {\tt "?"} --- Matches zero or one of the preceeding atom.
+      }
+
+      The following constraints are allowed.
+      \ssthitemlist{
+      
+         \sstitem
+         {\tt "$\wedge$"} --- Matches the start of the test string.
+      
+         \sstitem
+         {\tt "\$"} --- Matches the end of the test string.
+      }
+
+      Multiple templates can be concatenated, using the {\tt "|"} character to
+      separate them.  The test string is compared against each one in
+      turn until a match is found.
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: \htmlref{PROVADD}{PROVADD}, \htmlref{PROVMOD}{PROVMOD}, \htmlref{PROVSHOW}{PROVSHOW}.
+   }
+}
+
+\sstroutine{
    PROVSHOW
 }{
    Displays provenance information for an NDF
@@ -39134,7 +39637,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
       was when the provenance information was recorded.  It is of course
       possible that the NDF may subsequently have been moved or deleted.
 
-      The remaining lines in the NDF description are as follows:
+      The remaining lines in the NDF description are as follows.
 
       \sstitemlist{
 
@@ -39166,7 +39669,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
       } 
 
       In addition, a text file can be created containing the paths for the
-      direct parents of the supplied NDF. See parameter PARENTS.
+      direct parents of the supplied NDF.  See parameter PARENTS.
 
    } 
    \sstusage{
@@ -39182,8 +39685,8 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          PARENTS = FILENAME (Read)
       }{ 
          Name of a new text file in which to put the paths to the direct
-         parents of the supplied NDF. These are written one per line with
-         no extra text. If null, no file is created. {\tt [!]}
+         parents of the supplied NDF.  These are written one per line with
+         no extra text.  If null, no file is created.  {\tt [!]}
       } 
    } 
    \sstexamples{ 
@@ -49979,11 +50482,13 @@ to its parent NDFs (if any exist) within the PROVENANCE extension.
 There is also a MORE component within PROVENANCE that can be filled
 with arbitrary additional information.  Provenance recording is
 controlled through the AUTOPROV environment variable: set it to {\tt
-1} to enable recording and {\tt 0} to disable.  If a supplied NDF
-already has provenance, the created NDFs will also have provenance
-unless AUTOPROV is set to {\tt 0}.  You can examine provenance with
+1} to enable recording, and set it to any other value to disable
+recording.  When AUTOPROV is undefined, then an output NDF will
+have provenance only if at least one of the input NDFs has provenance.
+You can examine provenance with
 \htmlref{PROVSHOW}{PROVSHOW}, and modify it with
-\htmlref{PROVADD}{PROVADD}.
+\htmlref{PROVADD}{PROVADD} and \htmlref{PROVMOD}{PROVMOD}.  Selected 
+provenance may be removed with \htmlref{PROVREM}{PROVREM}.
 
 \end{description}
 
@@ -53771,6 +54276,27 @@ The following applications have been modified:
 
 \section{\xlabel{se_changes}Release Notes---V1.9\label{se:changes}}
 
+\subsection{New Commands}
+The following new applications have been added:
+
+\begin{description}
+
+   \item [\htmlref{PROVMOD}{PROVMOD}] \mbox{}
+   This allows provenance to be modified within an NDF.  The CREATOR,
+   DATE, and PATH components of the PROVENANCE extension may be
+   altered using a substitution syntax incorporating string matching
+   atoms and quantifiers.
+
+   \item [\htmlref{PROVREM}{PROVREM}] \mbox{}
+   This allows selected provenance to be removed from an NDF.
+   Ancestors can be removed by their indices or by pattern matching
+   against their names.  An example use is where a database may only 
+   wish to record the provenance for only those data it has stored,
+   not intermediate products that existed only during data
+   processing.
+
+\end{description}
+
 \subsection{Modified Commands}
 The following applications have been modified:
 
@@ -54297,6 +54823,10 @@ functions as follows.
 \begin{description}
 \classitem{PROVADD}
  Stores \htmlref{provenance information}{apndf:provenance} in an NDF.
+\classitem{PROVMOD}
+ Modifies provenance information for an NDF.
+\classitem{PROVREM}
+ Removes selected provenance information from an NDF.
 \classitem{PROVSHOW}
  Displays provenance information for an NDF.
 \end{description}

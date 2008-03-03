@@ -4,6 +4,17 @@
    so far are listed below.  For complete details of all changes, see
    the "Release Notes" appendix in SUN/95.
 
+2 New_applications
+
+   o  PROVMOD allows provenance to be modified within an NDF.  The 
+   CREATOR, DATE, and PATH components of the PROVENANCE extension may 
+   be altered using a substitution syntax incorporating string 
+   matching atoms and quantifiers.
+
+   o  PROVREM allows selected provenance to be removed from an NDF.
+   Ancestors can be removed by their indices or by pattern matching
+   against their names.
+
 2 Modified_applications
 
    o  FFCLEAN has been extended to operate on cubes, either by
