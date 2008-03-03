@@ -1269,7 +1269,7 @@ c     the supplied test string does not match the template.
          }
    
       } else {
-         template = astMalloc( tlen + 6 );
+         template = astMalloc( tlen + 7 );
          if( template ) {
             template[ 0 ] = '.';
             template[ 1 ] = '*';
