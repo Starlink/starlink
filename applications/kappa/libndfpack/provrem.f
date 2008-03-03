@@ -55,6 +55,12 @@
 *
 *        - Any reasonable combination of above values separated by 
 *        commas. ["!"]
+*     ITEM = LITERAL (Read)
+*        Specifies the item of provenance information that is checked 
+*        against the pattern matching template specified for parameter 
+*        PATTERN. It can be "PATH", "CREATOR" or "DATE". ["PATH"]
+*     NDF = NDF (Update)
+*        The NDF data structure.
 *     PATTERN = LITERAL (Read)
 *        Specifies a pattern matching template using the syntax described
 *        below in "Pattern Matching Syntax:". Each ancestor listed in the 
@@ -62,12 +68,10 @@
 *        and each ancestor that matches is removed. The item of provenance 
 *        information to be compared to the pattern is specified by parameter 
 *        ITEM. 
-*     ITEM = LITERAL (Read)
-*        Specifies the item of provenance information that is checked 
-*        against the pattern matching template specified for parameter 
-*        PATTERN. It can be "PATH", "CREATOR" or "DATE". ["PATH"]
-*     NDF = NDF (Update)
-*        The NDF data structure.
+*     REMOVE = _LOGICAL (Read)
+*        If TRUE, then the ancestors specified by parameter PATTERN or
+*        ANCESTORS are removed. Otherwise, these ancestors are retained 
+*        and all other ancestors are removed. [TRUE]
 
 *  Examples:
 *     provrem ff ancestor=1
@@ -81,6 +85,9 @@
 *     provrem ff pattern='_ave'
 *        This removes all ancestors that have paths that contain the
 *        string "_ave" anywhere.
+*     provrem ff pattern='_ave' remove=no
+*        This removes all ancestors that have paths that do not contain 
+*        the string "_ave" anywhere.
 *     provrem ff pattern='_d[^/]*$'
 *        This removes all ancestors that have file base-names that begin
 *        with "_d". The pattern matches "_d" followed by any number of
@@ -189,11 +196,13 @@
       CHARACTER RESULT*400       ! result of substitutions
       CHARACTER TEST*400         ! String to be tested
       INTEGER I                  ! Ancestor index
+      INTEGER J                  ! Ancestor index
       INTEGER IANC( MXANC )      ! Indices of selected ancestors
       INTEGER INDF               ! NDF identifier
       INTEGER IPW1               ! Pointer to work space
       INTEGER NANC               ! Total number of ancestors
       INTEGER NREM               ! Number of ancestors removed
+      LOGICAL REMOVE             ! Remove matching ancestors?
       LOGICAL THERE              ! Does component exist?
 *.
 
@@ -212,6 +221,9 @@
 
 *  Initialise the number of ancestors removed.
       NREM = 0
+
+*  See if specified ancestors are to be removed or retained.
+      CALL PAR_GET0L( 'REMOVE', REMOVE, STATUS )
 
 *  Abort if an error has occurred or there is no provenance information.
       IF( STATUS .NE. SAI__OK .OR. NANC .EQ. 0 ) GO TO 999   
@@ -244,8 +256,9 @@
 *  ancestor.
             CALL DAT_ANNUL( PROV, STATUS )
 
-*  See if the pattern matches the item. If it does, remove the ancestor.
-            IF( AST_CHRSUB( TEST, PAT, RESULT, STATUS ) ) THEN
+*  See if the pattern matches the item. If required, remove the ancestor.
+            IF( REMOVE .EQV. 
+     :          AST_CHRSUB( TEST, PAT, RESULT, STATUS ) ) THEN
                CALL NDG_RMPRV( INDF, I, STATUS )
                NREM = NREM + 1
 
@@ -272,7 +285,6 @@
 *  Otherwise, extract the list of ancestors to remove and remove each one
 *  in turn.
          ELSE
-            CALL NDG_CTPRV( INDF, NANC, STATUS )
             CALL PSX_CALLOC( NANC + 1, '_INTEGER', IPW1, STATUS )
             CALL KPG1_GILST( 0, NANC, MXANC, 'ANCESTOR', 
      :                       %VAL( CNF_PVAL( IPW1 ) ), IANC, NREM,
@@ -282,10 +294,30 @@
 *  Sort the ancestor indices.
             CALL KPG1_QSRTI( NREM, 1, NREM, IANC, STATUS )
 
-*  Now remove them in reverse order.
-            DO I = NREM, 1, -1
-               CALL NDG_RMPRV( INDF, IANC( I ), STATUS )
-            END DO
+*  If we are removing the specified ancestors, go through them in reverse 
+*  order, removing each one.
+            IF( REMOVE ) THEN 
+               DO I = NREM, 1, -1
+                  CALL NDG_RMPRV( INDF, IANC( I ), STATUS )
+               END DO
+
+*  If we are removing all except the specified ancestors, go through 
+*  them in reverse order, removing each one that is not in the list of
+*  specified ancestors.
+            ELSE
+               I = NANC
+               J = NREM
+               DO WHILE( I .GT. 0 )
+                  IF( I .GT. IANC( J ) ) THEN
+                     CALL NDG_RMPRV( INDF, I, STATUS )
+                  ELSE
+                     J = J - 1
+                  END IF
+
+                  I = I - 1
+               END DO
+
+            END IF
 
          END IF
       END IF

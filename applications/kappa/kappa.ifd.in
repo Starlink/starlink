@@ -2657,6 +2657,17 @@ package kappa {
             prompt {Pattern matching template}
             helpkey *
           }
+
+         parameter remove {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Remove the specified ancestors?}
+            helpkey *
+          }
+
       }
 
       action provshow {
