@@ -1337,10 +1337,12 @@ itcl::class gaia::GaiaCube {
    #  HDU selection
    #  =============
    protected method show_hdu_list_ {} {
-      if { $hdu_list_ == {} } {
-         set hdu_list_ $w_.hdulist
+      if { $cubeaccessor_ != {} } {
+         if { $hdu_list_ == {} } {
+            set hdu_list_ $w_.hdulist
+         }
+         utilReUseWidget GaiaCubeHduChooser $hdu_list_ -gaiacube $this
       }
-      utilReUseWidget GaiaCubeHduChooser $hdu_list_ -gaiacube $this
    }
 
    # ================
@@ -1351,7 +1353,7 @@ itcl::class gaia::GaiaCube {
    public method make_toolbox {type {clone 0} } {
 
       #  Do nothing if no cube is displayed, unless allowed.
-      if { [$cubeaccessor_ cget -dataset] != "" } {
+      if { $cubeaccessor_ != {} && [$cubeaccessor_ cget -dataset] != "" } {
          set basename $type
          if { $clone } {
             #  Request to create a clone (i.e. another) toolbox. Make
