@@ -241,6 +241,8 @@
 *     2008-02-26 (AGG):
 *        Add rel parameter to smf_subtract_poly to get subtraction
 *        relative to first time slice
+*     2008-03-03 (EC):
+*        Added target to smf_update_quality interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -797,6 +799,7 @@ void smf_resampcube_ast( smfData *data, int index, int size, dim_t nchan,
                          const double params[], float *in_data, 
                          float *out_data, int *status );
 
-void smf_update_quality( smfData *data, unsigned char *badmask, int *status );
+void smf_update_quality( smfData *data, unsigned char *target, 
+			 unsigned char *badmask, int *status );
 
 #endif /* SMF_DEFINED */

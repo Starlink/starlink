@@ -14,12 +14,14 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_update_quality( smfData *data, unsigned char *badmask, 
-*                         int *status );
+*     smf_update_quality( smfData *data, unsigned char *target, 
+*                         unsigned char *badmask, int *status );
 
 *  Arguments:
 *     data = smfData* (Given)
 *        Pointer to smfData that will contain the updated QUALITY array
+*     target = unsigned char* (Given)
+*        If defined update this buffer instead of the QUALITY in data
 *     badmask = unsigned char* (Given)
 *        If given, points to byte array with same dimensions as bolometers.
 *        Each position that is non-zero will set SMF__Q_BAD for all data
@@ -28,12 +30,15 @@
 *        Pointer to global status.
 
 *  Description:
-*     This routine updates an existing QUALITY array. A mask
-*     indicating which bolometers are bad and should be completely
-*     ignored (SMF__Q_BADB) may be supplied. Additionally, the routine
-*     will ensure that QUALITY has SMF__Q_BADS set for each bad data
-*     point (VAL__BADD). If no DATA or QUALITY arrays are associated with the
-*     smfData bad status is set (SAI__ERROR) and the function returns.
+*     This routine updates an existing QUALITY array. By default (if
+*     target is NULL), the QUALITY component associated with data is
+*     updated.  Alternatively a new buffer target can be specified. A
+*     mask indicating which bolometers are bad and should be
+*     completely ignored (SMF__Q_BADB) may be supplied. Additionally,
+*     the routine will ensure that QUALITY has SMF__Q_BADS set for
+*     each bad data point (VAL__BADD). If no DATA or QUALITY (unless
+*     target specified) arrays are associated with the smfData bad
+*     status is set (SAI__ERROR) and the function returns.
 
 *  Notes:
 
@@ -44,6 +49,8 @@
 *  History:
 *     2008-02-01 (EC):
 *        Initial version.
+*     2008-03-03 (EC):
+*        Added target to interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -87,21 +94,30 @@
 
 #define FUNC_NAME "smf_update_quality"
 
-void smf_update_quality( smfData *data, unsigned char *badmask, int *status ) {
+void smf_update_quality( smfData *data, unsigned char *target, 
+			 unsigned char *badmask, int *status ) {
 
   dim_t i;                      /* loop counter */
   dim_t j;                      /* loop counter */
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
   dim_t ntslice;                /* Number of time slices */
+  unsigned char *qual=NULL;     /* Pointer to the QUALITY array */
 
   if ( *status != SAI__OK ) return;
 
   /* Check for QUALITY */
-  if( !data->pntr[2] ) {
-    *status = SAI__ERROR;
-    errRep( FUNC_NAME, "smfData does not contain a QUALITY component", status);
-    return;
+  if( target ) {
+    qual = target;                            /* QUALITY given by target */
+  } else {
+    if( data->pntr[2] ) {
+      qual = (unsigned char *) data->pntr[2]; /* QUALITY given by smfData */
+    } else {
+      *status = SAI__ERROR;
+      errRep( FUNC_NAME, "smfData does not contain a QUALITY component", 
+	      status);
+      return;
+    }
   }
 
   /* Check for DATA */
@@ -145,18 +161,17 @@ void smf_update_quality( smfData *data, unsigned char *badmask, int *status ) {
       /* Loop over time slice */
       for( j=0; j<ntslice; j++ ) {
 	if( data->isTordered ) {
-	  ((unsigned char*)data->pntr[2])[nbolo*j + i] |= SMF__Q_BADB;
+	  qual[nbolo*j + i] |= SMF__Q_BADB;
 	} else {
-	  ((unsigned char*)data->pntr[2])[j + i*ntslice] |= SMF__Q_BADB;
+	  qual[j + i*ntslice] |= SMF__Q_BADB;
 	}
       }
     }
   }
 
-  /* Synchronize quality and VAL__BADD in data array */
+  /* Synchronize SMF__Q_BADS quality and VAL__BADD in data array */
   for( i=0; i<ndata; i++ ) {    /* Loop over all samples */
-    ((unsigned char*)data->pntr[2])[i] |= 
-      (SMF__Q_BADS & (((double *)data->pntr[0])[i] == VAL__BADD) );
+    qual[i] |= (SMF__Q_BADS & (((double *)data->pntr[0])[i] == VAL__BADD) );
   }
 
 
