@@ -10,6 +10,8 @@
 # P.W.Draper 08 Jan 07   only check for image isclear, don't use blank
 #                        name and image size < 10 pixels in plot, that
 #                        is no longer true
+#            03 Mar 08   change add_history to deal with images without
+#                        a WCS (fix from GAIA).
 
 
 itk::usual SkySearch {}
@@ -674,6 +676,10 @@ itcl::class skycat::SkySearch {
 	# add an entry for the given image and filename
 	set id [file tail $filename]
 	lassign [$image wcscenter] ra dec equinox
+        if { $ra == "" } {
+           set ra "00:00:00"
+           set dec "00:00:00"
+        }
 	set object [$image fits get OBJECT] 
 	set naxis [$image fits get NAXIS]
 	set naxis1 [$image fits get NAXIS1]
@@ -702,7 +708,9 @@ itcl::class skycat::SkySearch {
 			    $timestamp $preview]]
 
 	$astrocat_ open $catalog
-	$astrocat_ save $catalog 1 $data $equinox
+        catch {
+            $astrocat_ save $catalog 1 $data $equinox
+        }
 
 	# update history catalog window, if it is showing
 	set w [cat::AstroCat::get_instance [file tail $catalog]]
