@@ -123,7 +123,6 @@ static int queryNdfCoord( AstFrameSet *frameSet, int axis, double *coords,
 static void storeCard( AstFitsChan *channel, const char *keyword,
                        const char *value, const char *comment,
                        const char *type, int overwrite );
-static void hduSearch( NDFinfo info );
 
 /**
  * Register all the NDF access commands.
@@ -267,7 +266,8 @@ static int gaiaNDFTclOpen( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] )
 {
     Tcl_Obj *resultObj;
-    char *error_mess;
+    char *error_mess1;
+    char *error_mess2;
     char *name;
     int ndfid;
 
@@ -282,12 +282,25 @@ static int gaiaNDFTclOpen( ClientData clientData, Tcl_Interp *interp,
 
     /* And open it */
     resultObj = Tcl_GetObjResult( interp );
-    if ( gaiaNDFOpen( name, &ndfid, &error_mess ) == TCL_OK ) {
+    if ( gaiaNDFOpen( name, &ndfid, &error_mess1 ) == TCL_OK ) {
         Tcl_SetLongObj( resultObj, exportNdfHandle( ndfid, NULL ) );
         return TCL_OK;
     }
-    Tcl_SetStringObj( resultObj, error_mess, -1 );
-    free( error_mess );
+
+    /* Failed, but we don't give up just yet. GAIA allows the automatic
+     * opening of NDFs that are immediate children instead (.HDU_1 etc.).
+     * So look for NDFs at that level. If found we pick the first one.
+     */
+    if ( gaiaNDFFindChild( name, &ndfid, &error_mess2 ) == TCL_OK ) {
+        free( error_mess1 );
+        Tcl_SetLongObj( resultObj, exportNdfHandle( ndfid, NULL ) );
+        return TCL_OK;
+    }
+
+    /* Really give up, but use the first message. */
+    if ( error_mess2 != NULL ) free( error_mess2 );
+    Tcl_SetStringObj( resultObj, error_mess1, -1 );
+    free( error_mess1 );
     return TCL_ERROR;
 }
 
@@ -1544,8 +1557,6 @@ static int gaiaNDFTclGetPropertyDims( ClientData clientData,
  * "listheadings"       returns a list of headings for the returned properties.
  * "get <n> filename"   noop.
  *
- * Given just the NDF handle the current HDU number is returned.
- *
  * The headings are: HDU Type ExtName NAXIS NAXIS1 NAXIS2 NAXIS3, note we
  * do not also list the presence of other displayable components in the NDF
  * (variance & quality) and Type is always "NDF".
@@ -1558,7 +1569,8 @@ static int gaiaNDFTclHdu( ClientData clientData, Tcl_Interp *interp,
 
     /* Check arguments, need the NDF handle and the hdu command. */
     if ( objc < 2 || objc > 5 ) {
-        Tcl_WrongNumArgs( interp, 1, objv, "ndf_handle [list|listheadings]" );
+        Tcl_WrongNumArgs( interp, 1, objv, 
+                          "ndf_handle [list|listheadings|get]" );
         return TCL_ERROR;
     }
 
@@ -1570,14 +1582,14 @@ static int gaiaNDFTclHdu( ClientData clientData, Tcl_Interp *interp,
 
     const char *action = Tcl_GetString( objv[2] );
 
-    //  hdu listheadings.
+    /*  hdu listheadings. */
     if ( strcmp( action, "listheadings" ) == 0 ) {
         Tcl_SetResult( interp, "HDU Type ExtName NAXIS NAXIS1 NAXIS2 NAXIS3",
                        TCL_VOLATILE );
         return TCL_OK;
     }
 
-    //  hdu list.
+    /* hdu list. */
     if ( strcmp( action, "list" ) == 0 ) {
 
         /* If this NDF hasn't been check for "HDUs" then do that now. */
@@ -1588,7 +1600,7 @@ static int gaiaNDFTclHdu( ClientData clientData, Tcl_Interp *interp,
         return TCL_OK;
     }
 
-    //  hdu get <n> filename. Does nothing, just satifies the interface.
+    /*  hdu get <n> filename. Does nothing, just satifies the interface. */
     if ( strcmp( action, "get" ) == 0 ) {
         return TCL_OK;
     }
