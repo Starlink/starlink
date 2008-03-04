@@ -12,8 +12,22 @@
     extracted spectra. Previously this didn't happen so saved spectra
     could loose their coordinates.
 
-    A new option for browsing the extensions of an MEF or other NDFs
-    of an HDS container file for cubes has been added to the cube toolbox.
+    All dialogs for opening images, local catalogues and cubes have been
+    enhanced to offer a new "Browse" facility. This allows you to view
+    any FITS extensions (HDUs) or NDFs also present at the same level
+    in the container. Local catalogues can now also have the HDU number given
+    as part of their name (previously this effect could only be acheieved by
+    opening the FITS MEF as an image, selecting the catalogue using the HDU
+    chooser and then loading the actual image). 
+
+    Cubes which at the same level as the currently accessed cube can now be
+    selected using a chooser like that already available for images
+    (View->Select HDU...).
+
+    When opening an HDS container file that does not have an NDF at the
+    top-level a search for cubes at the next level is now made and the
+    first NDF found is opened (this has always been the behaviour when
+    opening images).
 
     The data limits used for spectral extraction will now be updated
     when either a master starts an extraction, or the 3D scene starts
