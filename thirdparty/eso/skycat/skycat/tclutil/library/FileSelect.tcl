@@ -5,8 +5,8 @@
 #
 # ----------------------------------------------------------------------
 # Implements a version of the OSF/Motif standard file selection dialog
-# box using primitive widgets as the building blocks.  
-# 
+# box using primitive widgets as the building blocks.
+#
 #
 #   PUBLIC ATTRIBUTES:
 #
@@ -29,16 +29,23 @@
 #     -button_1 ...... Name of the first button, default ok
 #     -button_2 ...... Name of the second button, default filter
 #     -button_3 ...... Name of the third button, default cancel
+#     -button_4 ...... Name of the fourth button default "", i.e none.
+#
+#     -cmd_4 ......... Command to execute when fourth button is pressed.
+#                      Note assumes that this window should be closed
+#                      (as if pressing OK, but returns 0 for the activate
+#                      status, and this action should take control, by
+#                      accessing the selected file).
 #
 #   METHODS:
 #
 #     config ......... used to change public attributes
 #     get ............ return the selection
-#     activate ....... perform a grab, upon selection of ok(1) or cancel(0), 
+#     activate ....... perform a grab, upon selection of ok(1) or cancel(0),
 #                      return result.
 #
 #   USAGE:
-#     
+#
 #     FileSelect .fs -title "Test File Select" -full 0
 #
 #     if {[.fs activate]} {
@@ -59,7 +66,7 @@
 # ----------------------------------------------------------------------
 #
 #   Contributions:  Shawn Ellis       E-mail: ellis@sctc.com
-#                   o Simple Emacs key bindings for entry widgets              
+#                   o Simple Emacs key bindings for entry widgets
 #                   o Can now paste a filename or directory into entry
 #                     widgets
 #                   o Directories are checked on whether they exist before
@@ -71,18 +78,18 @@
 #
 # who             when       what
 # --------------  ---------  ----------------------------------------
-# Allan Brighton  20 May 96  added quick hack to get this to work in itk2.0. 
+# Allan Brighton  20 May 96  added quick hack to get this to work in itk2.0.
 #                            (New version in iwidgets2.0.1 was too slow)
 #
 # Peter W. Draper 27 Jan 97  added -filter_types option to allow caller
-#                            to see a list of "known" file extensions. 
+#                            to see a list of "known" file extensions.
 #                 30 Mar 00  added changes to add a file filter
 #                            when user just types in a directory
 #                            (which doesn't then show any files).
 #                 05 Jun 00  added catch to directory list expansion,
 #                            this blows up if a file like "~noname" is
 #                            found (a failed attempt to seek
-#                            $env(HOME)/noname is made). 
+#                            $env(HOME)/noname is made).
 #                 16 Oct 00  Also now skips $filename and
 #                            ~$filename. These cannot be handled by
 #                            NDF (user can still enter these names by hand)
@@ -94,18 +101,17 @@
 #                            the delivery of double clicks.
 #                 12 Jan 08  Allow extra space to be taken by the file list
 #                            by default. Add a panedwindow to control dir
-#                            and file list share of space (double click
-#                            problem seems fixed).
+#                            and file list share of space.
 
 
 itk::usual FileSelect {}
 
-# This class implements a version of the OSF/Motif standard file selection 
-# dialog box using primitive widgets as the building blocks. 
+# This class implements a version of the OSF/Motif standard file selection
+# dialog box using primitive widgets as the building blocks.
 # This is a modified version of an old widget written by Mark Ulferts
 # that is still used because of poor performance in the iwidgets2.x version.
 # This should probably be replaced when we move to tcl8.x.
- 
+
 itcl::class util::FileSelect {
     inherit util::TopLevelWidget
 
@@ -122,13 +128,13 @@ itcl::class util::FileSelect {
 	wm title $w_ "$itk_option(-title)"
 
         #
-	# Create an overall frame and separate frames for the filter, 
+	# Create an overall frame and separate frames for the filter,
 	# lists, selection, and buttons.
 	#
 	set f [frame $w_.fs]
 
 	set fs(filterf) [frame $f.filterf]
-        set fs(listf) [panedwindow $f.listf -width 5i -orient horizontal]
+        set fs(listf) [panedwindow $f.listf -width 4i -orient horizontal]
 	set fs(self) [frame $f.self]
 	set fs(btnf) [frame $f.btnf -height 30]
 
@@ -147,7 +153,7 @@ itcl::class util::FileSelect {
         pack $fs(filterf).entry -side top -fill x -expand yes -ipady 1m
 
 	#
-	# Create directory list, scrollbar, and label for the directory 
+	# Create directory list, scrollbar, and label for the directory
 	# frame.  Make the list single select.
 	#
 	set fs(dirf) [frame $fs(listf).dirf]
@@ -216,19 +222,30 @@ itcl::class util::FileSelect {
 
 	pack $fs(self).label -side top -anchor w
 	pack $fs(self).entry -side bottom -fill x -expand yes -ipady 1m
-	
+
 	#
 	# Add the separator and create the buttons in the button frame.
-	# Each button is within a frame used to display as default. 
+	# Each button is within a frame used to display as default.
 	# The placer is used to locate the three buttons at relative
 	# locations.
 	#
 	frame $f.line -height 2 -width 2 -borderwidth 1 -relief sunken
-	
+
 	frame $fs(btnf).okf -borderwidth 1
 	set fs(okbtn) [button $fs(btnf).okf.ok -text $itk_option(-button_1) -width 8]
 	pack $fs(btnf).okf.ok -padx 2 -pady 2
 	raise $fs(btnf).okf.ok
+
+        #  If have a label and command for button 4, enable it.
+        if { $itk_option(-button_4) != {} && $itk_option(-cmd_4) != {} } {
+           frame $fs(btnf).extraf -borderwidth 1
+           set fs(extrabtn) [button $fs(btnf).extraf.extra \
+                                -text $itk_option(-button_4) \
+                                -width 8 \
+                                -command [code $this _extracmd]]
+           pack $fs(btnf).extraf.extra -padx 2 -pady 2
+           raise $fs(btnf).extraf.extra
+        }
 
 	frame $fs(btnf).ff -borderwidth 1
 	set fs(filterbtn) [button $fs(btnf).ff.f -text $itk_option(-button_2) -width 8 \
@@ -241,9 +258,16 @@ itcl::class util::FileSelect {
 	pack $fs(btnf).cf.c -padx 2 -pady 2
 	raise $fs(btnf).cf.c
 
-	place $fs(btnf).okf -relx 0 -rely 0.5 -anchor w
-	place $fs(btnf).ff -relx 0.5 -rely 0.5 -anchor center
-	place $fs(btnf).cf -relx 1 -rely 0.5 -anchor e
+        if { $itk_option(-button_4) != {} && $itk_option(-cmd_4) != {} } {
+           place $fs(btnf).okf    -relx 0.125 -rely 0.5 -anchor center
+           place $fs(btnf).extraf -relx 0.375 -rely 0.5 -anchor center
+           place $fs(btnf).ff     -relx 0.625 -rely 0.5 -anchor center
+           place $fs(btnf).cf     -relx 0.875 -rely 0.5 -anchor center
+        } else {
+           place $fs(btnf).okf -relx 0 -rely 0.5 -anchor w
+           place $fs(btnf).ff -relx 0.5 -rely 0.5 -anchor center
+           place $fs(btnf).cf -relx 1 -rely 0.5 -anchor e
+        }
 
 	#
 	# Pack all the components of the file selection box.  The filter
@@ -252,17 +276,17 @@ itcl::class util::FileSelect {
 
         if {$itk_option(-dispfilter)} {pack $fs(filterf) -fill x -padx $_margin -pady 5}
 
-	pack $fs(listf) -fill both -padx $_margin -pady 5 -expand yes 
+	pack $fs(listf) -fill both -padx $_margin -pady 5 -expand yes
 
 	if {$itk_option(-dispselect)} {pack $fs(self) -fill x -padx $_margin -pady 5}
 
 	pack $f.line -fill x -pady 5
-	pack $fs(btnf) -fill x -padx $_margin -pady 5 
+	pack $fs(btnf) -fill x -padx $_margin -pady 5
 
 	pack $f -fill both -expand yes
 
 	#
-	# Set up the bindings for the list widgets. Single click in either 
+	# Set up the bindings for the list widgets. Single click in either
 	# list executes a select method.  Double click for the both lists
 	# selects the entry and then invokes the button callback.  Focus
 	# events for the filter and select entry widgets control the default
@@ -280,13 +304,13 @@ itcl::class util::FileSelect {
 
 	#
 	# Explicitly handle configs that may have been ignored earlier.
-	# Also, check to see if the user has specified, width, or height.  
+	# Also, check to see if the user has specified, width, or height.
 	# If not, use the default and config.
 	#
 	set _initialized 1
 	eval itk_initialize $args
 
-	# 
+	#
 	# Construction is complete.  Now set up the initial text for the
 	# filter, selection, and both lists.  Finally, set the focus for
 	# either the filter or select widget based on the display attribute.
@@ -297,7 +321,7 @@ itcl::class util::FileSelect {
 	_filldirlist
 	_fillfilelist
 
-	
+
 	if {$itk_option(-dispselect)} {
 	    focus $fs(select)
 	} elseif {$itk_option(-dispfilter)} {
@@ -323,7 +347,7 @@ itcl::class util::FileSelect {
 	$fs(okbtn) configure -command [code $this _okcmd]
 	$fs(cancelbtn) configure -command [code $this _cancelcmd]
 
-	set seldir [file dirname [$fs(filter) get]]	
+	set seldir [file dirname [$fs(filter) get]]
 	cd $seldir
 	configure -dir "[pwd]"
 	configure -filter "[file tail [$fs(filter) get]]"
@@ -344,7 +368,7 @@ itcl::class util::FileSelect {
 	return $_selection
     }
 
-    #  called for double click on a filename 
+    #  called for double click on a filename
 
     protected method _dclickfile {y} {
 	_selectfile $y
@@ -352,7 +376,7 @@ itcl::class util::FileSelect {
 	$fs(okbtn) invoke
     }
 
-    #  called for double click on a dir name 
+    #  called for double click on a dir name
 
     protected method _dclickdir {y} {
 	_selectdir $y
@@ -363,8 +387,8 @@ itcl::class util::FileSelect {
 
     # Select the directory, set the filter to
     # the new directory.  Set the selection to the
-    # new directory if the file list is not 
-    # displayed.  Mark the filter button as the 
+    # new directory if the file list is not
+    # displayed.  Mark the filter button as the
     # default.
 
     protected method _selectdir {y} {
@@ -411,13 +435,13 @@ itcl::class util::FileSelect {
     }
 
     # Update the filter based on the parameters.
-    # If the directory 'd' parameter is null, use 
-    # the 'dir' attribute.  If the file 'f' 
+    # If the directory 'd' parameter is null, use
+    # the 'dir' attribute.  If the file 'f'
     # parameter is null use the tail of the filter
     # entry text.
 
     protected method _setfilter {{d ""} {f ""}} {
-       if { $d == "" } { 
+       if { $d == "" } {
           set filt [$fs(filter) get]
           if { [file isdirectory $filt] } {
              set d $filt
@@ -438,7 +462,7 @@ itcl::class util::FileSelect {
        set last_filter_type_ $f
     }
 
-    # Update the selection based on the 
+    # Update the selection based on the
     # parameter.  If the file 'f' parameter is
     # null, use the 'selection' attribute.
 
@@ -462,8 +486,8 @@ itcl::class util::FileSelect {
 	set _selection [$fs(select) get]
 
 	if {[file isdirectory $_selection]} {
-	    warning_dialog "Please select a file"
-	    return
+	    warning_dialog "Please select a file" $w_
+	    return 0
 	}
 
 	_defaultbtn ok
@@ -475,17 +499,18 @@ itcl::class util::FileSelect {
 	    grab release $w_
 	}
 	set result($this) 1
+        return 1
     }
 
     # Filter button callback.  Change directories
-    # as needed, and set the dir, filter, and 
+    # as needed, and set the dir, filter, and
     # selection attributes.  Change the filter and
     # selection text along with the list contents.
     # Mark the default button as filter.
 
     protected method _filtercmd {} {
        set filt [$fs(filter) get]
-       if { [file isdirectory $filt] } { 
+       if { [file isdirectory $filt] } {
           set seldir $filt
        } else {
           set seldir [file dirname $filt]
@@ -493,18 +518,18 @@ itcl::class util::FileSelect {
        if {![file exists $seldir]} {
           return
        }
-       
+
        cd $seldir
        set seldir [pwd]
        _setfilter $seldir
        configure -dir $seldir
        configure -filter "[file tail [$fs(filter) get]]"
        set _selection "$itk_option(-dir)/"
-       
+
        _setselection
        _filldirlist
        _fillfilelist
-       
+
        _defaultbtn filter
     }
 
@@ -525,6 +550,32 @@ itcl::class util::FileSelect {
 	    grab release $w_
 	}
 	set result($this) 0
+    }
+
+    #  Execute the extra command button. Assumes that this window should be
+    #  closed so prepares the selection and checks that something existent
+    #  has been selected (equivalent to pressing OK first then extra button
+    #  but activate returns 0).
+    protected method _extracmd {} {
+        if { $itk_option(-cmd_4) != {} } {
+            global ::result
+            set _selection [$fs(select) get]
+            if {[file isdirectory $_selection]} {
+                warning_dialog "Please select a file" $w_
+                return
+            }
+            _defaultbtn ok
+
+            $fs(okbtn) configure -command {}
+            $fs(cancelbtn) configure -command {}
+
+            if {$itk_option(-modal)} {
+                grab release $w_
+            }
+            set result($this) 0
+           
+            eval $itk_option(-cmd_4)
+        }
     }
 
     # Clear the directory list filling with the
@@ -552,14 +603,14 @@ itcl::class util::FileSelect {
 	}
     }
 
-    # Clear the file list filling with the results of an 'glob'.  
+    # Clear the file list filling with the results of an 'glob'.
     # Use the full attribute to determine full file name insertion.
     # Select the first element if it exists.  PWD: modification. NDF's
     # cannot start with "$" or "~$", so leave these files alone.
 
     protected method _fillfilelist {} {
        $fs(files) delete 0 end
-       
+
        set file_temp [glob -nocomplain $itk_option(-dir)/$itk_option(-filter)]
        set filefiller [lsort $file_temp]
        foreach i $filefiller {
@@ -681,7 +732,7 @@ itcl::class util::FileSelect {
 	}
     }
 
-    # Label for selection entry, default 
+    # Label for selection entry, default
     # "Selection".
     itk_option define -selectlabel selectLabel SelectLabel "Selection" {
 	if {$_initialized} {
@@ -730,13 +781,19 @@ itcl::class util::FileSelect {
     #  The button label for button 3
     itk_option define -button_3 button_3 Button_3 "Cancel" {}
 
+    #  The button label for button 4
+    itk_option define -button_4 button_4 Button_4 {} {}
+
+    #  Command to execute for a button 4 press.
+    itk_option define -cmd_4 cmd_4 Cmd_4 {}
+
     #  Add an optional menu of file suffixes (preset file filters).
     itk_option define -filter_types filter_types Filter_Types {} {
        if {$_initialized} {
-          if { [info exists fs(filter_types)] } { 
+          if { [info exists fs(filter_types)] } {
              catch {destroy $fs(filter_types)}
           }
-          if { $itk_option(-filter_types) != {} } { 
+          if { $itk_option(-filter_types) != {} } {
              set fs(filter_types) [LabelMenu $fs(filterf).types \
                                       -text {Type Filter:}]
              foreach pair "$itk_option(-filter_types)" {
