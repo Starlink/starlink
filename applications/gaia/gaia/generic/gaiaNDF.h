@@ -167,6 +167,9 @@ extern "C" {
                                 const char *name, int dims[], int *ndim,
                                 char **error_mess );
 
+    /* Search a given HDS path for the first child that is an NDF. */
+    int gaiaNDFFindChild( const char *name, int *ndfid, char **error_mess );
+
     /* Enerumerate the number of siblings an NDF has. */
     int gaiaNDFSiblingSearch( int ndfid, int *nsiblings, char **props );
 

@@ -1817,6 +1817,128 @@ int gaiaNDFGetPropertyDims( int ndfid, const char *extension,
 }
 
 /*
+ * Search an HDS path for any children that are NDFs and return an
+ * identifier to the first one. Usually name is the name of an HDS container
+ * file being presented for opening.
+ */
+int gaiaNDFFindChild( const char *name, int *ndfid, char **error_mess )
+{
+    HDSLoc *baseloc = NULL;
+    HDSLoc *newloc = NULL;
+    HDSLoc *tmploc = NULL;
+    char *filename;
+    char *ftype;
+    char *path = NULL;
+    char ndffile[MAXNDFNAME];
+    char ndfpath[MAXNDFNAME];
+    int i;
+    int level;
+    int ncomp = 0;
+    int status = SAI__OK;
+
+    /*  Mark the error stack */
+    emsMark();
+    *error_mess = NULL;
+
+    /*  Check that we're not going to have problems with the name
+        length */
+    if ( strlen( name ) > MAXNDFNAME ) {
+        *error_mess = (char *) malloc( (size_t) MAXNDFNAME );
+        sprintf( *error_mess, "NDF specification is too long "
+                 "(limit is %d characters)", MAXNDFNAME );
+        return 0;
+    }
+
+    /*  Need to parse down to a filename and an HDS path. */
+    filename = strdup( name );
+    path = strstr( filename, ".sdf" );
+    if ( path ) {
+        *path++ = ' '; /* Have ".sdf" in name, cut it out. */
+        *path++ = ' ';
+        *path++ = ' ';
+        *path++ = ' ';
+    }
+    path = strrchr( filename, '/' );  /* Last / in name */
+    if ( ! path ) {
+        path = strchr( filename, '.' );
+    }
+    else {
+        path = strchr( path, '.' );
+    }
+    if ( path ) {
+        *path = '\0';  /*  Remove "." from filename, rest is HDS path */
+        path++;
+    }
+
+    /*  Attempt to open the file and obtain a base locator. */
+    hdsOpen( filename, "READ", &tmploc, &status );
+
+    /*  Now look for the object specified by the PATH */
+    if ( path ) {
+        datFind( tmploc, path, &baseloc, &status );
+    }
+    else {
+        datClone( tmploc, &baseloc, &status );
+    }
+
+    /*  Look for additional NDFs at baseloc. */
+    datNcomp( baseloc, &ncomp, &status );
+    if ( status == SAI__OK ) {
+        for ( i = 1; i <= ncomp; i++ ) {
+            *ndfid = NDF__NOID;
+            datIndex( baseloc, i, &newloc, &status );
+            
+            /*  Get full name of component and see if it is an NDF */
+            hdsTrace( newloc, &level, ndfpath, ndffile, &status,
+                      MAXNDFNAME, MAXNDFNAME );
+            
+            ftype = strstr( ndffile, ".sdf" ); /* Strip .sdf from filename */
+            if ( ftype ) *ftype = '\0';
+            
+            path = strstr( ndfpath, "." );  /* Now find first component */
+            if ( path == NULL ) {           /* and remove it (not used as */
+                strcat( ndffile, "." );     /* part of NDF name) */
+                path = ndfpath;
+            }
+            strcat( ndffile, path );        /*  Join filename and HDS path to
+                                             *  give NDF full name */
+            
+            /*  Attempt to open NDF to see if it exists */
+            if ( gaiaNDFOpen( ndffile, ndfid, error_mess ) == TCL_OK ) {
+                datAnnul( &newloc, &status );
+                break;
+            }
+            if ( *error_mess ) {
+                free( *error_mess );
+            }
+            
+            datAnnul( &newloc, &status );
+        }
+        
+        /*  Release locators */
+        datAnnul( &baseloc, &status );
+        datAnnul( &tmploc, &status );
+    }
+    else {
+        *ndfid = NDF__NOID;
+    }       
+
+    /* If an error occurred return an error message */
+    if ( status != SAI__OK ) {
+        *error_mess = gaiaUtilsErrMessage();
+        emsRlse();
+        return TCL_ERROR;
+    }
+    emsRlse();
+
+    /*  Return bad if no child NDF was found */
+    if ( *ndfid == NDF__NOID ) {
+        return TCL_ERROR;
+    }
+    return TCL_OK;
+}
+
+/*
  * Search an HDS container file for sibling NDFs. Siblings are at the same HDS
  * level as the given NDF. The number of sibling located and a Tcl list of
  * their basic properties is returned (HDS path and dimensionality followed by
@@ -1827,7 +1949,6 @@ int gaiaNDFSiblingSearch( int ndfid, int *nsiblings, char **props )
     HDSLoc *baseloc = NULL;
     HDSLoc *ndfloc = NULL;
     HDSLoc *newloc = NULL;
-    char *error_mess;
     char *ptr;
     char name[DAT__SZNAM+1];
     int added;
@@ -1843,7 +1964,6 @@ int gaiaNDFSiblingSearch( int ndfid, int *nsiblings, char **props )
     int same;
     int status = SAI__OK;
     int used;
-    int valid;
 
     /*  Mark the error stack */
     emsMark();
@@ -1857,8 +1977,18 @@ int gaiaNDFSiblingSearch( int ndfid, int *nsiblings, char **props )
     *props = (char *) malloc( EMS__SZMSG );
     ptr = *props;
     ndfDim( ndfid, NDF__MXDIM, dims, &ndims, &status );
-    datName( ndfloc, name, &status );
-    *nsiblings = 1;
+
+    /*  Get locator to the NDF parent. */
+    datParen( ndfloc, &baseloc, &status );
+    if ( status == DAT__OBJIN ) {
+        /* No parent, means at toplevel, so no siblings and no path. */
+        name[0] = '\0';
+        baseloc = NULL;
+    }
+    else {
+        datName( ndfloc, name, &status );
+    }
+    *nsiblings = 1; /* self */
     added = sprintf( ptr, "{{%d} {NDF} {%s} {%d} {%d} {%d} {%d}} ",
                      *nsiblings, name, ndims, dims[0], dims[1], dims[2] );
     ptr += added;
@@ -1870,14 +2000,12 @@ int gaiaNDFSiblingSearch( int ndfid, int *nsiblings, char **props )
     avail -= added;
     used = added;
 
-    /*  Get locator to the NDF parent. */
-    datParen( ndfloc, &baseloc, &status );
-    datValid( baseloc, &valid, &status );
-    if ( valid && status == SAI__OK ) {
+    if ( baseloc && status == SAI__OK ) {
 
-        /*  Now look for additional NDFs at baseloc. */
+        /*  Found parent, so now look for additional NDFs at baseloc. */
         datNcomp( baseloc, &ncomp, &status );
         if ( status != SAI__OK || ncomp == 1 ) {
+            /* There's only one. */
             ncomp = 0;
         }
         datName( baseloc, name, &status );
