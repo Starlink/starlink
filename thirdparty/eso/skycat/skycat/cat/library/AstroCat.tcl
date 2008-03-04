@@ -781,7 +781,6 @@ itcl::class cat::AstroCat {
     public proc open_catalog_window {name {id ""} {classname AstroCat} {debug 0} {w ""}} {
 	if {[catch {$astrocat_ open $name} msg]} {
 	    error_dialog $msg
-	    return
 	}
 	cat::AstroCat::select_catalog $name catalog $id $classname 0 $debug $w
     }
@@ -859,7 +858,7 @@ itcl::class cat::AstroCat {
 	set name $itk_option(-catalog)
 	if {[catch {$w_.cat open $name $itk_option(-catalogdir)} msg]} {
 	    error_dialog $msg $w_
-	    return
+	    return -code error
 	}
 
 	# set iscat_ to true if the catalog is not an image server
