@@ -79,7 +79,7 @@
 
 *  The name of the QUAL component that holds a flag indicating if the 
 *  bit number is fixed.
-      CHARACTER IRQ__FBNAM*8
+      CHARACTER IRQ__FBNAM*9
       PARAMETER ( IRQ__FBNAM = 'FIXED_BIT' )
 
 *  The name of the QUAL component which indicates if the quality is 
