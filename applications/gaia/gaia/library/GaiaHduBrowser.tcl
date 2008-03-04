@@ -198,6 +198,9 @@ itcl::class gaia::GaiaHduBrowser {
             } elseif { "$type" == "ascii" || "$type" == "binary" } {
                open_table_ $name $hdu
             }
+
+            #  Close window after open.
+            quit
          } else {
             info_dialog "No row is currently selected" $w_
          }
