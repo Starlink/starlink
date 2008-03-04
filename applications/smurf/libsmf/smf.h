@@ -243,6 +243,9 @@
 *        relative to first time slice
 *     2008-03-03 (EC):
 *        Added target to smf_update_quality interface
+*     2008-03-04 (EC):
+*        Updated smf_calcmodel* routines to use smfDIMMData
+
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -685,21 +688,18 @@ void smf_terr( double phi, double h, double lambda, double pos[3] );
 
 void smf_instap_get( smfHead * hdr, int * status );
 
-void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap, 
-			double *map, double *mapvar, smfArray *model, 
-			int flags, int *status );
 
-void smf_calcmodel_ast( smfArray *res, AstKeyMap *keymap, smfArray *lut,  
-			double *map, double *mapvar, smfArray *model, 
-			int flags, int *status );
+void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
+			smfArray **allmodel, int flags, int *status);
 
-void smf_calcmodel_noi( smfArray *res, AstKeyMap *keymap, 
-			double *map, double *mapvar, smfArray *model, 
-			int flags, int *status );
+void smf_calcmodel_ast( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
+			smfArray **allmodel, int flags, int *status);
 
-void smf_calcmodel_ext( smfArray *res, AstKeyMap *keymap, 
-			double *map, double *mapvar, smfArray *model, 
-			int flags, int *status );
+void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
+			smfArray **allmodel, int flags, int *status);
+
+void smf_calcmodel_ext( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
+			smfArray **allmodel, int flags, int *status);
 
 smf_calcmodelptr smf_model_getptr( smf_modeltype type, int *status);
 

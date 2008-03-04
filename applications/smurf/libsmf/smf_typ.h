@@ -110,6 +110,8 @@
 *        -Added SMF__NOCREATE_QUALITY flag, and data quality SMF__Q* flags
 *        -Added SMF__NOCREATE_VARIANCE, SMF__QUA model component
 *        -Added SMF__UBYTE data type
+*     2008-03-04 (EC):
+*        -Added smfDIMMData; updated smf_calcmodelptr prototype
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -308,9 +310,20 @@ typedef struct smfGroup {
   int nrelated;              /* Maximum number of related files */
 } smfGroup;
 
+/* Structure containing pointers to data required for DIMM component 
+   calculation */
+typedef struct smfDIMMData {
+  smfArray **res;            /* array of smfArray's of model residuals */ 
+  smfArray **qua;            /* array of smfArray's of quality flags */ 
+  smfArray **lut;            /* array of smfArray's of pointing LUTs */ 
+  double *map;               /* pointer to the current map estimate */
+  double *mapvar;            /* pointer to the current map variance estimate */
+} smfDIMMData;
+
+
 /* Prototype for function pointer to different models used by DIMM */
-typedef void(*smf_calcmodelptr)( smfArray*, AstKeyMap*, double*, double*, 
-				 smfArray*, int, int* );
+typedef void(*smf_calcmodelptr)( smfDIMMData*, int, AstKeyMap*, smfArray**, 
+				 int, int* );
 
 /* Represents a box in some 2D cartesian coordinate system. */
 typedef struct smfBox {
