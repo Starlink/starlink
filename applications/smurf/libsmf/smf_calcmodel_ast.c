@@ -13,26 +13,20 @@
 *     Library routine
 
 *  Invocation:
-*     smf_calcmodel_ast( smfArray *res, AstKeyMap *keymap, smfArray *lut,
-*                        double *map, double *mapvar, smfArray *model, 
-*                        int flags, int *status);
+*     smf_calcmodel_ast( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
+*			 smfArray **allmodel, int flags, int *status)
 
 *  Arguments:
-*     res = smfArray * (Given and Returned)
-*        The residual signal from previously calculated model components
+*     dat = smfDIMMData * (Given)
+*        Struct of pointers to information required by model calculation
+*     chunk = int (Given)
+*        Index of time chunk in allmodel to be calculated
 *     keymap = AstKeyMap * (Given)
 *        Parameters that control the iterative map-maker
-*     lut = smfArray* (Given)
-*        Lookup table for map pixel of each data point
-*     map = double * (Given)
-*        Buffer containing current estimate of the map (must match the LUT
-*        in the mapcoord extension of the res data structure)
-*     mapvar = double * (Given)
-*        Buffer containing current variance estimate corresponding to map
-*     model = smfArray * (Returned)
-*        The data structure that will store the calculated model parameters
+*     allmodel = smfArray ** (Returned)
+*        Array of smfArrays (each time chunk) to hold result of model calc
 *     flags = int (Given )
-*        Control flags: 
+*        Control flags: not used 
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -66,6 +60,8 @@
 *        Use smfArray instead of smfData
 *     2007-11-28 (EC)
 *        Added assertions to ensure different data orders will work.
+*     2008-03-04 (EC)
+*        Modified interface to use smfDIMMData
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -107,21 +103,31 @@
 
 #define FUNC_NAME "smf_calcmodel_ast"
 
-void smf_calcmodel_ast( smfArray *res, AstKeyMap *keymap, smfArray *lut, 
-			double *map, double *mapvar, smfArray *model, 
-			int flags, int *status) {
+void smf_calcmodel_ast( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
+			smfArray **allmodel, int flags, int *status) {
 
   /* Local Variables */
   dim_t i;                      /* Loop counter */
   int idx=0;                    /* Index within subgroup */
+  smfArray *lut=NULL;           /* Pointer to LUT at chunk */
+  int *lut_data=NULL;           /* Pointer to DATA component of lut */
+  smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t ndata;                  /* Number of data points */
+  smfArray *qua=NULL;           /* Pointer to QUA at chunk */
+  unsigned char *qua_data=NULL; /* Pointer to quality data */
+  smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
-  int *lut_data=NULL;           /* Pointer to DATA component of lut */
   double sigma;                 /* Array standard deviation */ 
   
   /* Main routine */
   if (*status != SAI__OK) return;
+
+  /* Obtain pointers to relevant smfArrays for this chunk */
+  res = dat->res[chunk];
+  lut = dat->lut[chunk];
+  qua = dat->qua[chunk];
+  model = allmodel[chunk];
 
   /* Loop over index in subgrp (subarray) */
   for( idx=0; idx<res->ndat; idx++ ) {
@@ -133,8 +139,10 @@ void smf_calcmodel_ast( smfArray *res, AstKeyMap *keymap, smfArray *lut,
     res_data = (double *)(res->sdata[idx]->pntr)[0];
     lut_data = (int *)(lut->sdata[idx]->pntr)[0];
     model_data = (double *)(model->sdata[idx]->pntr)[0];
-      
-    if( (res_data == NULL) || (lut_data == NULL) || (model_data == NULL) ) {
+    qua_data = (unsigned char *)(qua->sdata[idx]->pntr)[0];
+
+    if( (res_data == NULL) || (lut_data == NULL) || (model_data == NULL) || 
+	(qua_data == NULL) ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Null data in inputs", status);      
     } else {
@@ -150,7 +158,7 @@ void smf_calcmodel_ast( smfArray *res, AstKeyMap *keymap, smfArray *lut,
 	  res_data[i] += model_data[i];
 	    
 	  /* calculate new model using the map/LUT */
-	  model_data[i] = map[lut_data[i]];
+	  model_data[i] = dat->map[lut_data[i]];
 	    
 	  /* update the residual model */
 	  res_data[i] -= model_data[i];

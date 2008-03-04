@@ -13,24 +13,20 @@
 *     Library routine
 
 *  Invocation:
-*     smf_calcmodel_com( smfArray *res, AstKeyMap *keymap, 
-*                        double *map, double *mapvar, smfArray *model, 
-*                        int flags, int *status);
+*     smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
+*			 smfArray **allmodel, int flags, int *status)
 
 *  Arguments:
-*     res = smfArray * (Given and Returned)
-*        The residual signal from previously calculated model components
+*     dat = smfDIMMData * (Given)
+*        Struct of pointers to information required by model calculation
+*     chunk = int (Given)
+*        Index of time chunk in allmodel to be calculated
 *     keymap = AstKeyMap * (Given)
 *        Parameters that control the iterative map-maker
-*     map = double * (Given)
-*        Buffer containing current estimate of the map (must match the LUT
-*        in the mapcoord extension of the res data structure)
-*     mapvar = double * (Given)
-*        Buffer containing current variance estimate corresponding to map
-*     model = smfArray * (Returned)
-*        The data structure that will store the calculated model parameters
+*     allmodel = smfArray ** (Returned)
+*        Array of smfArrays (each time chunk) to hold result of model calc
 *     flags = int (Given )
-*        Control flags: 
+*        Control flags: not used 
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -69,6 +65,8 @@
 *        Updated to use bolo-ordered data, disabled boxcar smoothing
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-03-04 (EC)
+*        Modified interface to use smfDIMMData
 *     {enter_further_changes_here}
 
 
@@ -111,9 +109,8 @@
 
 #define FUNC_NAME "smf_calcmodel_com"
 
-void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap, 
-			double *map, double *mapvar, smfArray *model, 
-			int flags, int *status ) {
+void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
+			smfArray **allmodel, int flags, int *status) {
 
   /* Local Variables */
   dim_t base;                   /* Store base index for data array offsets */
@@ -122,15 +119,19 @@ void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap,
   dim_t i;                      /* Loop counter */
   int idx=0;                    /* Index within subgroup */
   dim_t j;                      /* Loop counter */
-  double sum=0;                /* Array sum */
+  double lastmean;              /* Mean from previous iteration */
+  smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   double *model_data_copy=NULL; /* Copy of model_data */
   dim_t nbolo=0;                /* Number of bolometers */
   dim_t ndata=0;                /* Total number of data points */
   dim_t ntslice=0;              /* Number of time slices */
-  double lastmean;              /* Mean from previous iteration */
+  smfArray *qua=NULL;           /* Pointer to QUA at chunk */
+  unsigned char *qua_data=NULL; /* Pointer to quality data */
+  smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   double sigma=0;               /* Array standard deviation */ 
+  double sum=0;                 /* Array sum */
   dim_t thisnbolo=0;            /* Check each file same dims as first */
   dim_t thisndata=0;            /* "                                  */
   dim_t thisntslice=0;          /* "                                  */
@@ -138,6 +139,11 @@ void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap,
                                    
   /* Main routine */
   if (*status != SAI__OK) return;
+
+  /* Obtain pointers to relevant smfArrays for this chunk */
+  res = dat->res[chunk];
+  qua = dat->qua[chunk];
+  model = allmodel[chunk];
 
   /* Check for smoothing parameters in the CONFIG file */
   if( astMapGet0I( keymap, "COM_BOXCAR", &boxcar) ) {
@@ -208,7 +214,10 @@ void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap,
     /* Get pointer to DATA component of residual */
     res_data = (double *)(res->sdata[idx]->pntr)[0];
 
-    if( (res_data == NULL) || (model_data == NULL) ) {
+    /* Geta pointer to the QUAlity array */
+    qua_data = (unsigned char *)(qua->sdata[idx]->pntr)[0];
+
+    if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Null data in inputs", status);      
     } else {
@@ -224,7 +233,7 @@ void smf_calcmodel_com( smfArray *res, AstKeyMap *keymap,
 	sum = 0;
 	base = 0; /* Offset to the start of the j'th bolometer in the buffer */
 
-	for( j=0; j<nbolo; j++ ) if( res_data[base+i] != VAL__BADD) {
+	for( j=0; j<nbolo; j++ ) if( !qua_data[base+i] ) {
 	  res_data[base+i] += lastmean;
 	  model_data[i] += res_data[base+i];
 	  weight[i]++;

@@ -13,25 +13,20 @@
 *     Library routine
 
 *  Invocation:
-*     smf_calcmodel_ext( smfArray *res, AstKeyMap *keymap, 
-*                        double *map, double *mapvar, smfArray *model, 
-*                        int flags, int *status);
+*     smf_calcmodel_ext( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
+*			 smfArray **allmodel, int flags, int *status)
 
 *  Arguments:
-*     res = smfArray * (Given and Returned)
-*        The residual signal from previously calculated model components
+*     dat = smfDIMMData * (Given)
+*        Struct of pointers to information required by model calculation
+*     chunk = int (Given)
+*        Index of time chunk in allmodel to be calculated
 *     keymap = AstKeyMap * (Given)
 *        Parameters that control the iterative map-maker
-*     map = double * (Given)
-*        Buffer containing current estimate of the map (must match the LUT
-*        in the mapcoord extension of the res data structure)
-*     mapvar = double * (Given)
-*        Buffer containing current variance estimate corresponding to map
-*     model = smfArray * (Returned)
-*        The data structure that will store the calculated model parameters
+*     allmodel = smfArray ** (Returned)
+*        Array of smfArrays (each time chunk) to hold result of model calc
 *     flags = int (Given )
-*        Control flags: 
-*        SMF__DIMM_FIRSTITER - calc. non-iterated components once
+*        Control flags: only execute if SMF__DIMM_FIRSTITER set
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -55,6 +50,8 @@
 *        Modified data array indexing to avoid unnecessary multiplies
 *     2007-07-10 (EC):
 *        Use smfArray instead of smfData
+*     2008-03-04 (EC)
+*        Modified interface to use smfDIMMData
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -96,9 +93,8 @@
 
 #define FUNC_NAME "smf_calcmodel_ext"
 
-void smf_calcmodel_ext( smfArray *res, AstKeyMap *keymap, 
-			double *map, double *mapvar, smfArray *model, 
-			int flags, int *status) {
+void smf_calcmodel_ext( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
+			smfArray **allmodel, int flags, int *status) {
 
   /* Local Variables */
   dim_t base;                   /* Store base index for data array offsets */
@@ -107,16 +103,22 @@ void smf_calcmodel_ext( smfArray *res, AstKeyMap *keymap,
   int idx=0;                    /* Index within subgroup */
   dim_t j;                      /* Loop counter */
   double mean;                  /* Array mean */
+  smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ndata;                  /* Total number of data points */
   dim_t ntslice;                /* Number of time slices */
   double lastmean;              /* Mean from previous iteration */
+  smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   double sigma;                 /* Array standard deviation */ 
                                    
   /* Main routine */
   if (*status != SAI__OK) return;
+
+  /* Obtain pointers to relevant smfArrays for this chunk */
+  res = dat->res[chunk];
+  model = allmodel[chunk];
 
   /* Obtain the extinction correction method from the CONFIG file */
   if( !astMapGet0C( keymap, "EXT_METHOD", &extmethod ) ) {
