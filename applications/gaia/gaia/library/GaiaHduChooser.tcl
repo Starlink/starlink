@@ -202,29 +202,8 @@ itcl::class gaia::GaiaHduChooser {
       }
    }
 
-   #  Override to trap cubes and direct these to the correct handler.
-   protected method select_image_hdu {hdu} {
-
-      #  Move to the HDU.
-      RtdImageHduChooser::select_image_hdu $hdu
-
-      #  Issue check for cubes command, if given and applicable.
-      if { $itk_option(-cube_cmd) != {} } {
-         set headings [$image_ hdu listheadings]
-         eval lassign [list [lindex [$image_ hdu list] [expr {$hdu -1}] ]] $headings
-         if { "$Type" == "image" && "$NAXIS" >= 3 } {
-            #  Make sure this is syncronised.
-            ::update
-            eval $itk_option(-cube_cmd)
-         }
-      }
-   }
-
    #  Configuration options: (public variables)
    #  ----------------------
-
-   #  Command to execute if a cube is found. Issued after loading.
-   itk_option define -cube_cmd cube_cmd Cube_Cmd {}
 
    #  Protected variables: (available to instance)
    #  --------------------
