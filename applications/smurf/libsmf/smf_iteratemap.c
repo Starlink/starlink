@@ -112,6 +112,9 @@
 *     2008-01-25 (EC):
 *        Handle non-flatfielded input data. Pointing LUT is now calculated
 *        in smf_model_create rather than requiring calls to smf_calc_mapcoord.
+*     2008-03-04 (EC):
+*        -Modified model calculation to use smfDIMMData in interface
+*        -Added QUAlity component
 
 *  Notes:
 
@@ -172,6 +175,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   double *ast_data=NULL;        /* Pointer to DATA component of ast */
   smfGroup *astgroup=NULL;      /* smfGroup of ast model files */
   const char *asttemp=NULL;     /* Pointer to static strings created by ast */
+  smfDIMMData dat;              /* Struct passed around to model components */
   smfData *data=NULL;           /* Temporary smfData pointer */
   int dimmflags;                /* Control flags for DIMM model components */
   dim_t dsize;                  /* Size of data arrays in containers */
@@ -202,6 +206,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   int nmodels=0;                /* Number of model components / iteration */
   int numiter;                  /* Total number iterations */
   int pass;                     /* Two pass parsing of MODELORDER */
+  smfArray **qua=NULL;          /* Quality flags for each file */
+  smfGroup *quagroup=NULL;      /* smfGroup of quality model files */
   int rebinflags;               /* Flags to control rebinning */
   smfArray **res=NULL;          /* Residual signal */
   double *res_data=NULL;        /* Pointer to DATA component of res */
@@ -297,7 +303,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	     status);
       nmodels = 0;
     }
-  } 
+  }
 
   msgSeti("NUMCOMP",nmodels);
   msgOut(" ", "SMF_ITERATEMAP: ^NUMCOMP model components in solution: ", 
@@ -348,9 +354,10 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   /* Components that always get made */
   if( igroup && (*status == SAI__OK) ) {
 
-    /* there is one smfArray for LUT and AST at each chunk */
+    /* there is one smfArray for LUT, AST and QUA at each chunk */
     lut = smf_malloc( nchunks, sizeof(*lut), 1, status );
     ast = smf_malloc( nchunks, sizeof(*ast), 1, status );
+    qua = smf_malloc( nchunks, sizeof(*qua), 1, status );
 
     if( memiter ) {
       /* If iterating in memory then RES has already been created from
@@ -368,6 +375,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 			NULL, 0, NULL, NULL,
 			NULL, memiter, 
 			memiter, ast, status );
+
+      smf_model_create( NULL, res, nchunks, SMF__QUA, 0, 
+			NULL, 0, NULL, NULL,
+			NULL, memiter, 
+			memiter, qua, status );
 
       /* Since a copy of the LUT is still open in res[0] free it up here */
       for( i=0; i<res[0]->ndat; i++ ) {
@@ -399,6 +411,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 			NULL, 0, NULL, NULL,
 			&astgroup, memiter, 
 			memiter, ast, status );
+
+      smf_model_create( igroup, NULL, 0, SMF__QUA, 0, 
+			NULL, 0, NULL, NULL,
+			&quagroup, memiter, 
+			memiter, qua, status );
     }
   }
 
@@ -429,6 +446,16 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     }
   }
 
+  /* Stuff pointers into smfDIMMData to pass around to model component
+     solvers */
+  
+  memset( &dat, 0, sizeof(dat) ); /* Initialize structure */
+  dat.res = res;
+  dat.qua = qua;
+  dat.lut = lut;
+  dat.map = map;
+  dat.mapvar = mapvar;
+
   /* Start the main iteration loop */
   if( *status == SAI__OK ) {
 
@@ -450,11 +477,12 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
 	if( !memiter ) {
 	  
-	  /* If memiter not set, use efficient access modes */
+	  /* If memiter not set open this chunk here */
 	  smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
 	  smf_open_related_model( lutgroup, i, "UPDATE", &lut[i], status );
 	  smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
-
+	  smf_open_related_model( quagroup, i, "UPDATE", &qua[i], status );
+	  
 	  for( j=0; j<nmodels; j++ ) {
 	    smf_open_related_model( modelgroups[j], i, "UPDATE", &model[j][i], 
 				    status );
@@ -462,15 +490,17 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	} 
 
 	/* If first iteration pre-condition the data */
-
-	/*
 	if( iter == 0 ) {
 	  msgOut(" ", "SMF_ITERATEMAP: Pre-conditioning chunk", status);
 	  for( idx=0; idx<res[i]->ndat; idx++ ) {
-	    smf_fft_filter( res[i]->sdata[idx], 200., status );
+	    /* Synchronize quality flags */
+	    smf_update_quality( res[i]->sdata[idx], 
+				(unsigned char *)qua[i]->sdata[idx]->pntr[0],
+				NULL, status );
+	    /*smf_fft_filter( res[i]->sdata[idx], 200., status );*/
 	  }
 	}
-	*/
+
 
 	/* Call the model calculations in the desired order. */
 	if( *status == SAI__OK ) {
@@ -486,8 +516,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	    modelptr = smf_model_getptr( modeltyps[j], status );
 	    
 	    if( *status == SAI__OK ) {
-	      (*modelptr)( res[i], keymap, map, mapvar, model[j][i],
-			   dimmflags, status );
+	      (*modelptr)( &dat, i, keymap, model[j], dimmflags, status );
 	    }
 
 	    /* If bad status set exit condition */
@@ -552,6 +581,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	  smf_close_related( &res[i], status );
 	  smf_close_related( &ast[i], status );    
 	  smf_close_related( &lut[i], status );    
+	  smf_close_related( &qua[i], status );    
 
 	  for( j=0; j<nmodels; j++ ) {
 	    smf_close_related( &model[j][i], status );
@@ -574,6 +604,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	    smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
 	    smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
 	    smf_open_related_model( lutgroup, i, "UPDATE", &lut[i], status );  
+	    smf_open_related_model( quagroup, i, "UPDATE", &qua[i], status );  
 	  }
 
 	  /* Calculate the AST model component. It is a special model
@@ -582,8 +613,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
              separate loop since the map estimate gets updated by
              each chunk in the main model component loop */
 
-	  smf_calcmodel_ast( res[i], keymap, lut[i], map, mapvar, ast[i], 0, 
-			     status );
+	  smf_calcmodel_ast( &dat, i, keymap, ast, 0, status );
 
 	  /* Close files if memiter not set */
 	  if( !memiter ) {
@@ -591,6 +621,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	    smf_close_related( &ast[i], status );    
 	    smf_close_related( &res[i], status );
 	    smf_close_related( &lut[i], status );
+	    smf_close_related( &qua[i], status );
 	  }
         }
       }
@@ -667,6 +698,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   if( resgroup ) smf_close_smfGroup( &resgroup, status );
   if( astgroup ) smf_close_smfGroup( &astgroup, status );  
   if( lutgroup ) smf_close_smfGroup( &lutgroup, status );  
+  if( quagroup ) smf_close_smfGroup( &quagroup, status );  
 
   /* dynamic model smfArrays */
   for( i=0; i<nchunks; i++ ) {
@@ -680,6 +712,10 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
     if( lut ) {
       if( lut[i] ) smf_close_related( &lut[i], status );
+    }
+
+    if( qua ) {
+      if( qua[i] ) smf_close_related( &qua[i], status );
     }
   }
 
