@@ -170,7 +170,7 @@ itcl::class ::gaia3d::Gaia3dExtraIsosurface {
       for { set i 0 } { $i < $itk_option(-maxcubes) } { incr i } {
          if { [info exists cubeaccessor_($i)] } {
             release_cube_ $i
-            object delete $cubeaccessor_($i)
+            ::delete object $cubeaccessor_($i)
          }
       }
 
