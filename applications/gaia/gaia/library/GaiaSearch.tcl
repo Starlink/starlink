@@ -87,21 +87,31 @@ itcl::class gaia::GaiaSearch {
       set tag_ {};               #  Not sure why this is needed.
       eval itk_initialize $args
    }
-   
+
    #  Init method, called after the options have been evaluated.
    public method init {} {
 
       #  Extra GAIA symbols for catalogues.
       #set symbols_("rotbox") 1; TODO: add changes needed to support this.
-      SkySearch::init
-      
+
+      #  The catalogue may be accessed during construction (and converted
+      #  to native format), catch any errors and dispose of this object.
+      if { [catch {SkySearch::init} msg] } {
+         catch {::delete object $this}
+         return
+      }
+
       #  Remove the "Save with image" menu option. This is not
       #  available.
-      if { $iscat_ } { 
-	 set m [get_menu File] 
-	 $m delete "Save with image" 
+      set m [get_menu File]
+      if { $iscat_ } {
+	 $m delete "Save with image"
       }
-      
+
+      #  Use our Open dialog so we can browse for HDUs.
+      $m entryconfigure "Open" -command [code GaiaSearch::get_local_catalog \
+                                            $itk_option(-id) $w_]
+
       #  Remove <Enter> binding as this slows down the zoom window a lot.
       $canvas_ bind $object_tag_  <Any-Enter> {}
       $canvas_ bind $object_tag_  <Any-Leave> {}
@@ -171,7 +181,7 @@ itcl::class gaia::GaiaSearch {
                           -layoutcommand [code $this set_show_cols] \
                           -selectmode extended \
                           -exportselection 0]
-                       
+
       } {
       }
       pack $itk_component(results) -side top -fill both -expand 1
@@ -229,7 +239,7 @@ itcl::class gaia::GaiaSearch {
    #  Redefine search method. Do this so we can inhibit automatic
    #  searching on local catalogues (we need to change the default
    #  behaviour, before doing a search). Also set the origin so that
-   #  this works for the first invocation (otherwise region may be 
+   #  this works for the first invocation (otherwise region may be
    #  still be image based at this point).
    public method search {args} {
       set_origin
@@ -273,7 +283,7 @@ itcl::class gaia::GaiaSearch {
       }
       if { [llength [set box [$canvas_ bbox cat$id]]] } {
          lassign $box x0 y0 x1 y1
-         set x [expr ($x1+$x0)/2.0] 
+         set x [expr ($x1+$x0)/2.0]
          set y [expr ($y1+$y0)/2.0]
 
          set dw [$image_ dispwidth]
@@ -283,7 +293,7 @@ itcl::class gaia::GaiaSearch {
          if {$cw != 1 && $dw && $dh} {
             $canvas_ xview moveto [expr (($x-$cw/2.0)/$dw)]
             $canvas_ yview moveto [expr (($y-$ch/2.0)/$dh)]
-         } 
+         }
       }
    }
 
@@ -302,7 +312,7 @@ itcl::class gaia::GaiaSearch {
       $results_ save_to_file $name $selected [$results_ get_headings]
 
       #  And display it.
-      new_local_catalog $name $itk_option(-id) gaia::GaiaSearch
+      new_local_catalog $name $itk_option(-id) gaia::GaiaSearch "catalog" $w_
    }
 
    #  Save table to a named file.
@@ -354,16 +364,16 @@ itcl::class gaia::GaiaSearch {
    #    name      is the long name of catalogue
    #
    #    id        is an optional unique id to be associated with a new
-   #              catalogue widget. 
+   #              catalogue widget.
    #
    #    classname is the name of the AstroCat subclass to use to
-   #              create new catalogue widgets (defaults to "AstroCat"). 
+   #              create new catalogue widgets (defaults to "AstroCat").
    #
    #    debug     is a flag: if true, run queries in foreground
    #
    #    w         should be the top level window of the caller, if specified
    public proc new_local_catalog {name {id ""} {classname AstroCat}
-                                  {debug 0} {type "catalog"} {w ""}} { 
+                                  {debug 0} {type "catalog"} {w ""}} {
 
       #  Check for existing catalogue.
       set i "$name,$id"
@@ -423,7 +433,7 @@ itcl::class gaia::GaiaSearch {
          set notset 1
       }
 
-      if { $notset } { 
+      if { $notset } {
          if { $defaultcut != 100.0 } {
             $image autocut -percent $defaultcut
          }
@@ -448,11 +458,102 @@ itcl::class gaia::GaiaSearch {
          -command [code $this plot]
    }
 
+   #  Ask the user for the name of a local catalog file and then
+   #  open a window for the catalog.
+   #
+   #  Use this instead of the local_catalog proc so that catalogues with HDU
+   #  specifications can be handled and MEFs can be browsed HDUs.
+   public proc get_local_catalog {id w} {
+      set file [get_file_ "." "*" $id $w]
+      if { $file != {} } {
+         set file [regsub -all {\[} $file "\{"]
+         set file [regsub -all {\]} $file "\}"]
+         GaiaSearch::browsed_open_ $id $w "table" "$file"
+      }
+   }
+
+   #  Get a file containing a local catalogue, also provides browsing
+   #  FITS MEFS for HDUs.
+   protected proc get_file_ {dir pattern id w} {
+      set exists [winfo exists .searchselect]
+      utilReUseWidget util::FileSelect .searchselect \
+         -transient 1 \
+         -withdraw 1 \
+         -button_4 "Browse" \
+         -cmd_4 [code GaiaSearch::browse_file_ $id $w]
+
+      #  If new set once-only values (do not switch directories & filters).
+      if { ! $exists } {
+         .searchselect configure \
+            -dir $dir \
+            -filter $pattern \
+            -filter_types {{any *} {FIT(.fit) *.fit} {FIT(.fits) *.fits}}
+      }
+
+      #  Now a transient of this window, not one that created it.
+      wm transient .searchselect [winfo toplevel $w]
+
+      #  Also deiconfy and raise in case previous parent is iconised.
+      wm deiconify .searchselect
+      raise .searchselect
+
+      if {[.searchselect activate]} {
+         return [.searchselect get]
+      }
+   }
+
+   #  Browse the content of the file selected in the dialog.
+   #  Use to look for HDUs.
+   protected proc browse_file_ {id w} {
+
+      #  Release the file selection window.
+      set file [.searchselect get]
+      if { [::file exists $file] && [::file isfile $file] } {
+         wm withdraw .searchselect
+         utilReUseWidget gaia::GaiaHduBrowser .searchbrowser \
+            -file $file \
+            -transient 1 \
+            -open_cmd [code GaiaSearch::browsed_open_ $id $w] \
+            -cancel_cmd [code GaiaSearch::get_local_catalog $id $w]
+
+         #  Now a transient of this window, not one that created it.
+         wm transient .searchbrowser [winfo toplevel $w]
+      } else {
+         #  Ignore, no such file.
+         warning_dialog "Not a disk filename ($file)" $w
+         get_local_catalog $id $w
+      }
+   }
+
+   #  Handle an open request from the file browser. Only handle
+   #  tables.
+   protected proc browsed_open_ {id w type name {naxes 0}} {
+      if { $type == "table" } {
+
+         #  Set the catalog config entry from the $catinfo table
+         if { [catch {$astrocat_ entry get $name}] } {
+            if { "[string index $name 0]" != "/"} {
+               set fname "[pwd]/$name"
+            } else {
+               set fname "$name"
+            }
+            $astrocat_ entry add \
+               [list "serv_type local" "long_name $fname" "short_name $name" \
+                   "url $fname"]
+         }
+
+         #  Display the catalogue.
+         gaia::GaiaSearch::new_local_catalog "$name" $id ::gaia::GaiaSearch "catalog" $w
+      } else {
+         warning_dialog "Not a table ($type)" $w
+      }
+   }
+
    #  Configuration options (public variables):
    #  =========================================
 
    #  Whether to disable use of image WCS when scaling / orienting
-   #  symbols (this can speed up plotting a lot), but you need X and Y 
+   #  symbols (this can speed up plotting a lot), but you need X and Y
    #  positions in the catalogue.
    itk_option define -plot_wcs plot_wcs Plot_Wcs 1 {}
 

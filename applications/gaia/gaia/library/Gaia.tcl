@@ -269,6 +269,10 @@ itcl::class gaia::Gaia {
       if { $importer_ != {} && [winfo exists $importer_] } {
          catch {delete object $importer_}
       }
+
+      #  The FITS browser needs to release any temporary files
+      #  used for storing in-line compressed images.
+      catch {gaia::GaiaHduBrowser::release_temporary_files}
    }
 
    # Restore the position of the top level window from the previous
@@ -423,12 +427,6 @@ itcl::class gaia::Gaia {
       set_blankcolour
       set_image_background
 
-      #  If looking out for cubes to autoload. Start doing that now
-      #  after the initial file_loaded_.
-      if { $itk_option(-check_for_cubes) } {
-         $image_ configure -cube_cmd [code $this file_loaded_]
-      }
-
       #  Trap window closing and handle that.
       wm protocol $w_ WM_DELETE_WINDOW [code $this quit]
    }
@@ -496,8 +494,9 @@ itcl::class gaia::Gaia {
             -command [code $itk_component(image) about]
 
          add_menuitem $m command "SkyCat..." \
-            {Display information about SkyCat in netscape (if netscape is available)} \
-            -command [code $itk_component(image) send_to_browser $itk_option(-help_url)]
+            {Display information about SkyCat in browser} \
+            -command [code $itk_component(image) send_to_browser \
+                         $itk_option(-help_url)]
 
          add_short_help $itk_component(menubar).help \
             {Help menu: display information about this application}
@@ -576,9 +575,12 @@ itcl::class gaia::Gaia {
       #  Note bindings are not really needed, unless working with
       #  plugin (GAIA version of TopLevelWidget is fixed).
 
-      #  File menu. This needs the bindings changing to work with the
-      #  keyboard shortcuts and the "save region" removing.
+      #  File menu. Change to use local opening dialog (not the Ctrl version,
+      #  that is inefficient for cubes, these go straight to the toolbox),
+      #  also needs the bindings changing to work with the keyboard shortcuts
+      #  and the "save region" removing.
       set m [get_menu File]
+      $m entryconfigure "Open..." -command [code $this open_file]
       bind $w_  <Control-o> [code $image_ open]
       bind $w_  <Control-v> [code $this reopen]
       bind $w_  <Control-s> [code $image_ save_as]
@@ -1389,18 +1391,8 @@ itcl::class gaia::Gaia {
 
       #  Load it into cube browser. Note allow trivial cubes with redundant
       #  dimensions 1, or 2, but not 3.
-      if { ( $naxis4 == {} || $naxis4 == 1 ) && $naxis3 != {} && $naxis3 != 1 } {
-            make_opencube_toolbox
-            set msg {}
-            set result [catch {$itk_component(opencube) configure \
-                                  -cube $fullname} msg]
-            if { $result != 0 } {
-               maybe_release_cube_
-               $itk_component(opencube) close
-               if { $msg != {} } {
-                  info_dialog "$msg" $w_
-               }
-            }
+      if {( $naxis4 == {} || $naxis4 == 1 ) && $naxis3 != {} && $naxis3 != 1} {
+         open_cube_ $fullname
       } else {
          #  Make sure toolbox is withdrawn.
          if { [info exists itk_component(opencube)] } {
@@ -1497,6 +1489,120 @@ itcl::class gaia::Gaia {
    #  Make the "Filters" menu.
    public method make_filters_menu {} {
       StarAppFilter \#auto $w_
+   }
+
+   #  Open a new file using a filebrowser. The filebrowser will open
+   #  images, cubes and tables, and offers the ability to select HDUs
+   #  in FITS and NDF containers using a "Browse" button. Replaces the
+   #  one in GaiaImageCtrl.
+   public method open_file {args} {
+      set file [get_file_]
+      if { $file != {} } {
+	 open_image_ $file
+      }
+   }
+   
+   #  Get a file using a suitably configured dialog for images. Also
+   #  provides browsing of NDFs and FITS MEFS for HDUs.
+   protected method get_file_ {{dir "."} {pattern "*."}} {
+      if { ! [info exists itk_component(fileselect)] || 
+           ! [winfo exists $itk_component(fileselect)] } {
+         itk_component add fileselect {
+            util::FileSelect $w_.select \
+               -dir $dir \
+               -filter $pattern \
+               -transient 1 \
+               -withdraw 1 \
+               -filter_types $itk_option(-file_types) \
+               -button_4 "Browse" \
+               -cmd_4 [code $this browse_file_ $dir $pattern]
+         }
+         wm transient $itk_component(fileselect) [winfo toplevel $w_]
+      } else {
+
+         #  Now a transient of this window, not one that created it.
+         wm transient $itk_component(fileselect) [winfo toplevel $w_]
+
+         #  Also deiconfy and raise in case previous parent is iconised.
+         wm deiconify $itk_component(fileselect)
+         raise $itk_component(fileselect)
+      }
+      if {[$itk_component(fileselect) activate]} {
+         return [$itk_component(fileselect) get]
+      }
+   }
+
+   #  Browse the content of the file selected in the dialog.
+   #  Use to look for HDUs.
+   protected method browse_file_ {dir pattern} {
+
+      #  Release the file selection window.
+      set file [$itk_component(fileselect) get]
+      if { [::file exists $file] && [::file isfile $file] } {
+         wm withdraw $itk_component(fileselect)
+         utilReUseWidget gaia::GaiaHduBrowser $w_.browser \
+            -file $file \
+            -transient 1 \
+            -open_cmd [code $this browsed_open_] \
+            -cancel_cmd [code $this get_file_ $dir $pattern] \
+            -shorthelpwin $itk_option(-shorthelpwin)
+      } else {
+         #  Ignore, no such file.
+         warning_dialog "Not a disk filename ($file)" $w_
+         get_file_ $dir $pattern
+      }
+   }
+
+   #  Handle an open request from the file browser. Could be opening
+   #  and image, cube or table.
+   protected method browsed_open_ {type name {naxes 0}} {
+      if { $type == "image" } {
+         #  If a cube, send this to the cube toolbox.
+         if { $naxes >= 3 } {
+            open_cube_ $name
+         } else {
+            open_image_ $name
+         }
+      } elseif { $type == "table" } {
+         
+         #  Set the catalog config entry from the $catinfo table
+         if { [catch "$astrocat_ entry get $name"] } {
+            if { "[string index $name 0]" != "/"} {
+               set fname [pwd]/$name
+            } else {
+               set fname $name
+            }
+            $astrocat_ entry add \
+               [list "serv_type local" "long_name $fname" "short_name $name" \
+                   "url $fname"]
+         }
+         
+         #  Display the catalogue.
+         gaia::GaiaSearch::new_local_catalog $name $image_ ::gaia::GaiaSearch
+      }
+   }
+
+   #  Open a known cube in the cube toolbox.
+   protected method open_cube_ {name} {
+      make_opencube_toolbox
+      set msg {}
+      set result [catch {$itk_component(opencube) configure -cube $name} msg]
+      if { $result != 0 } {
+         maybe_release_cube_
+         $itk_component(opencube) close
+         if { $msg != {} } {
+            info_dialog "$msg" $w_
+         }
+      }
+   }
+
+   #  Open an image, handling the setting of the HDU number if part
+   #  of the specification.
+   protected method open_image_ {name} {
+      set namer [GaiaImageName \#auto -imagename $name]
+      $image_ configure -hdu [$namer fitshdunum]
+      $image_ configure -file [$namer fullname 0]
+      ::delete object $namer
    }
 
    #  Open a new file without a filebrowser, or return the name of the
@@ -1961,7 +2067,7 @@ itcl::class gaia::Gaia {
          }
          file copy -force $gaia_library/skycat2.0.cfg $config_file
 
-         #  Make a directory entry that access the old configs.
+         #  Make a directory entry that accesses the old configs.
          if { $backupname != "" } {
             ::astrocat tmpcat
             tmpcat load ${backupname} "Configuration of $today"
@@ -2355,6 +2461,9 @@ window gives you access to this."
    #  Prefix to use to create new main windows.
    common prefix_ ".gaia"
 
+   #  Handler for catalogues.
+   common astrocat_ [astrocat ::cat::.astrocat]
+
    #  PLASTIC listener; takes care of communication with the hub.
    common plastic_app_ {}
 
@@ -2365,129 +2474,13 @@ window gives you access to this."
    common is_plastic_registered_ 0
 }
 
-#  XXX redefine the body of AstroCat::new_catalog, as this contains a
-#  reference to an astrocat instance that is never deleted (leaving a
-#  temporary file around at exit). Need to do this here to make sure
-#  that this code is used.
-itcl::body ::cat::AstroCat::new_catalog {name {id ""}
-   {classname AstroCat} {debug 0} {tcs_flag 0} {type "catalog"}
-   {w ""} {dirPath ""}} {
-   if {[check_local_catalog $name $id $classname $debug $tcs_flag $type $w $dirPath] != 0} {
-      return
-   }
-   set i "$name,$id,$dirPath"
-   if {[info exists instances_($i)] && [winfo exists $instances_($i)]} {
-      utilRaiseWindow $instances_($i)
-      if {"[$instances_($i).cat servtype]" == "local"} {
-	 $instances_($i) search
-      }
-      return
-   }
-
-   #if {[catch {$astrocat_ open $name $dirPath} msg]} {
-   #  error_dialog $msg
-   #  return
-   #}
-
-   if {[winfo exists $w]} {
-      set instname $w.ac[incr n_instances_]
-   } else {
-      set instname .ac[incr n_instances_]
-   }
-   set instances_($i) \
-      [$classname $instname \
-	  -id $id \
-	  -debug $debug \
-	  -catalog $name \
-	  -catalogtype $type \
-          -catalogdir $dirPath \
-	  -tcs $tcs_flag \
-	  -transient 0 \
-	  -center 0]
-}
-
-#  XXX redefine the body of SkySearch add_history proc. This doesn't
-#  deal with images without a WCS system well (i.e. it reports an
-#  error about converting "" to an RA and gives up).
-itcl::body ::skycat::SkySearch::add_history {skycat filename} {
-   set catalog $history_catalog_
-   set image [$skycat get_image]
-
-   # make sure at least an empty catalog exists
-   if {! [file exists $catalog] || [file size $catalog] == 0} {
-      # If it doesn't exist yet, create an empty catalog file
-      if {[catch {set fd [::open $catalog w]} msg]} {
-	 error_dialog "can't create image history catalog: %msg"
-	 return
-      }
-      puts $fd "Skycat History Catalog v1.0"
-      puts $fd ""
-      puts $fd "ra_col: -1"
-      puts $fd "dec_col: -1"
-      puts $fd "x_col: -1"
-      puts $fd "y_col: -1"
-      puts $fd "show_cols: file ra dec object NAXIS NAXIS1 NAXIS2 NAXIS3"
-      puts $fd "sort_cols: timestamp"
-      puts $fd "sort_order: decreasing"
-      puts $fd ""
-      puts $fd [join $history_cols_ "\t"]
-      puts $fd "----"
-      ::close $fd
-      # get the catalog into the list of known catalogs
-      $astrocat_ open $catalog
-   }
-
-   if {"$filename" == "" || [string first /tmp $filename] == 0 \
-	  || ! [file exists $filename]} {
-      # ignore temporary and non-existant files
-      return
-   }
-
-   # add an entry for the given image and filename
-   set id [file tail $filename]
-   lassign [$image wcscenter] ra dec equinox
-   if { $ra == "" } {
-      set ra "00:00:00"
-      set dec "00:00:00"
-   }
-   set object [$image fits get OBJECT]
-   set naxis [$image fits get NAXIS]
-   set naxis1 [$image fits get NAXIS1]
-   set naxis2 [$image fits get NAXIS2]
-   set naxis3 [$image fits get NAXIS3]
-   lassign [$image cut] lowcut highcut
-   set colormap [$image cmap file]
-   set itt [$image itt file]
-   set colorscale [$image colorscale]
-   set zoom [lindex [$image scale] 0]
-   if {"$zoom" == ""} {
-      set zoom 1
-   }
-   set timestamp [clock seconds]
-
-   # get full path name of file for preview URL
-   if {"[string index $filename 0]" == "/"} {
-      set fullpath $filename
-   } else {
-      set fullpath [pwd]/$filename
-   }
-   set preview file:$fullpath
-
-   set data [list [list $id $ra $dec $object $naxis $naxis1 $naxis2 $naxis3\
-		      $lowcut $highcut $colormap $itt $colorscale $zoom \
-		      $timestamp $preview]]
-
-   $astrocat_ open $catalog
-   catch {
-      $astrocat_ save $catalog 1 $data $equinox
-   }
-
-   # update history catalog window, if it is showing
-   set w [cat::AstroCat::get_instance [file tail $catalog]]
-   if {"$w" != "" && [winfo viewable $w]} {
-      $w search
-   }
-}
-
 #  Make sure our HelpWin class is used by TopLevelWidget.
 set util::TopLevelWidget::help_window_class gaia::HelpWin
+
+#
+#  Need to override this proc so we use the browser version of the 
+#  open dialog (and we need it here so that it is used in preference).
+#
+itcl::body ::cat::AstroCat::local_catalog {{id ""} {classname AstroCat} {debug 0} {w ""}} {
+   gaia::GaiaSearch::get_local_catalog $id $w
+}

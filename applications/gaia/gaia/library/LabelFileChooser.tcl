@@ -112,16 +112,18 @@ itcl::class gaia::LabelFileChooser {
    #  Methods:
    #  --------
 
-   #  Choose an existing file and entry it into the entry field.
+   #  Choose an existing file and enter it into the entry field.
    protected method choose_file_ {} {
       if { $file_chooser_ == {} } {
-         if { $itk_option(-filter_types) == {} } { 
+         if { $itk_option(-filter_types) == {} } {
             set file_chooser_ \
                [FileSelect .\#auto -title $itk_option(-chooser_title)]
          } else {
             set file_chooser_ [FileSelect .\#auto \
                                   -title $itk_option(-chooser_title) \
-                                  -filter_types $itk_option(-filter_types)]
+                                  -filter_types $itk_option(-filter_types) \
+                                  -button_4 "Browse" \
+                                  -cmd_4 [code $this browse_file_] ]
          }
       }
       if { [$file_chooser_ activate] } {
@@ -129,6 +131,35 @@ itcl::class gaia::LabelFileChooser {
          if { "$itk_option(-command)" != "" } {
             command_proc_ $itk_option(-command)
          }
+      }
+   }
+
+   #  Browse the content of the file selected in the dialog.
+   #  Use to look for HDUs.
+   protected method browse_file_ {} {
+
+      #  Release the file selection window.
+      set file [$file_chooser_ get]
+      if { [::file exists $file] && [::file isfile $file] } {
+         wm withdraw $file_chooser_
+         utilReUseWidget gaia::GaiaHduBrowser $w_.browser \
+            -file $file \
+            -transient 1 \
+            -open_cmd [code $this browsed_open_] \
+            -cancel_cmd [code $this choose_file]
+      } else {
+         #  Ignore, no such file.
+         warning_dialog "Not a disk filename ($file)" $w_
+         choose_file
+      }
+   }
+
+   #  Handle an open request from the file browser. Just same as
+   #  accept from the file open dialog.
+   protected method browsed_open_ {type name {naxes 0}} {
+      configure -value $name
+      if { "$itk_option(-command)" != "" } {
+         command_proc_ $itk_option(-command)
       }
    }
 
