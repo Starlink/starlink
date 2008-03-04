@@ -29,7 +29,9 @@
 *     name even if all pixels do, or do not, hold the quality.
 *
 *     An error will be returned if the named quality is already associated 
-*     with a different bit number when this routine is called.
+*     with a different bit number when this routine is called. An error
+*     will also be reported if the specified bit number is already associated
+*     with a different quality name.
 
 *  Arguments:
 *     LOCS(5) = CHARACTER * ( * ) (Given)
@@ -111,6 +113,7 @@
                                  ! quality names information.
       INTEGER LAST               ! Position of last non-blank character.
       CHARACTER LQNAME*(IRQ__SZQNM) ! Upper case copy of quality name.
+      CHARACTER OLDNAM*(IRQ__SZQNM) ! Existing quality name.
       LOGICAL RDONLY             ! Original read-only flag
       INTEGER SLOT               ! Index into the QUAL structure at
                                  ! which the name was found.
@@ -153,6 +156,20 @@
                END IF
             END IF
          
+         END IF
+
+*  If the specified BIT number is already associated with a different
+*  quality name, report an error.
+         IF( OLDBIT .NE. BIT ) THEN
+            CALL IRQ1_QBIT( LOCS, BIT, OLDNAM, STATUS )
+            IF( OLDNAM .NE. ' ' .AND. OLDNAM .NE. QNAME .AND. 
+     :          STATUS .EQ. SAI__OK ) THEN
+               STATUS = SAI__ERROR
+               CALL MSG_SETC( 'N', OLDNAM )
+               CALL ERR_REP( 'IRQ_FXBIT_ERR0', 'IRQ_FXBIT: The '//
+     :                          'quality name ''^N'' is already '//
+     :                          'associated with bit ^B.', STATUS )
+            END IF
          END IF
 
 *  Store the new information.
