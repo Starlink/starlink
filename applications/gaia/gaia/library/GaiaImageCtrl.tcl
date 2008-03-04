@@ -498,24 +498,8 @@ itcl::class gaia::GaiaImageCtrl {
       #  Set the default for merging headers.
       set_always_merge_
 
-      #  Set the HDU, if not 0. Need to realise the chooser and wait for it
-      #  to complete the first image selection, then apply this choice.
-      if { $itk_option(-hdu) != 0 } {
-         update
-         after idle [code $this apply_hdu_]
-      }
-
       #  Do autofit if needed.
       autofit_
-   }
-
-   #  Apply the current HDU, provided that it isn't zero. Used when setting
-   #  the HDU initially. After call the HDU value is returned to zero.
-   private method apply_hdu_ {} {
-      if { $itk_option(-hdu) != 0 } {
-         $image_ hdu $itk_option(-hdu)
-         set itk_option(-hdu) 0
-      }
    }
 
    #  Set the precision used to display RA/Dec coordinates. By default
@@ -771,10 +755,9 @@ itcl::class gaia::GaiaImageCtrl {
 
          #  Set the initial FITS HDU, but only once.
          if { $itk_option(-hdu) != 0 } {
-            #$image_ hdu $itk_option(-hdu)
-            #configure -hdu 0"
+            $image_ hdu $itk_option(-hdu)
+            configure -hdu 0
          }
-
       } else {
 
          #  File cannot be open for display in GAIA. This could be
@@ -1019,8 +1002,7 @@ itcl::class gaia::GaiaImageCtrl {
          utilReUseWidget gaia::GaiaHduChooser $w_.hdu \
             -image $this \
             -center 0 \
-            -transient 0 \
-            -cube_cmd $itk_option(-cube_cmd)
+            -transient 0
       } else {
          utilReUseWidget gaia::GaiaNDFChooser $w_.ndfhdu \
             -image $this \
@@ -1255,10 +1237,6 @@ itcl::class gaia::GaiaImageCtrl {
          autofit_
       }
    }
-
-   #  Command to execute if a FITS cube is browsed in a HDU. Will be
-   #  trailed by the qualified file specification.
-   itk_option define -cube_cmd cube_cmd Cube_Cmd {}
 
    #  Additional text for the title. Used to mark different instances.
    itk_option define -ident ident Ident {}
