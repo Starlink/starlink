@@ -128,7 +128,11 @@ itcl::class gaia::GaiaConvertTable {
          set rtdimage [::image create rtdimage -file "$in"]
 
          #  Move to the HDU.
-         $rtdimage hdu set $hdu
+         if { [catch {$rtdimage hdu set $hdu}] } {
+            catch {::image delete $rtdimage}
+            error_dialog "No catalog extension $hdu in $in"
+            return 0
+         }
 
          #  Make sure we revisit the disk file, otherwise uses cached version.
          $rtdimage update;#  Doesn't work...????
@@ -138,8 +142,8 @@ itcl::class gaia::GaiaConvertTable {
 
          #  Copy the FITS table to a local catalog.
          if { [catch {$rtdimage hdu get $hdu $out $entry} msg] } {
-            error_dialog $msg
             catch {::image delete $rtdimage}
+            error_dialog $msg
             return 0
          }
          catch {::image delete $rtdimage} msg
