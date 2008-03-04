@@ -290,14 +290,17 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 
   oflag = 0;
 
+  /* Only map head if creating LUT */
   if( mtype != SMF__LUT ) oflag |= SMF__NOCREATE_HEAD;
+
   if( mtype == SMF__RES ) {
+    /* Propagate input if RES */
     copyinput = 1;
   } else {
+    /* For all remaining types don't need data array */
     oflag |= SMF__NOCREATE_DATA;
   }
 	
-
   /* Loop over time chunks */
   if( *status == SAI__OK ) for( i=0; i<nchunks; i++ ) {
     
