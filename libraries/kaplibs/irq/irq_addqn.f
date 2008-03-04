@@ -77,6 +77,8 @@
 *        Original version.
 *     15-FEB-2008 (DSB):
 *        Add RDONLY argument to IRQ1_SEARC.
+*     4-MAR-2008 (DSB):
+*        Add FIXBIT argument to IRQ1_SEARC.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -106,6 +108,7 @@
       INTEGER BIT                ! QUALITY bit used to represent the
                                  ! quality.
       INTEGER FIRST              ! Position of first non-blank character
+      LOGICAL FIXBIT             ! Does quality have a fixed bit number?
       LOGICAL FIXED              ! True if all or no pixels hold the
                                  ! specified quality.
       INTEGER INDF               ! Identifier for the NDF containing the
@@ -160,7 +163,7 @@
 
 *  See if the name is already defined. If, so report an error.
       CALL IRQ1_SEARC( LOCS, LQNAME, FIXED, VALUE, BIT, COMMNT, RDONLY,
-     :                 SLOT, STATUS )
+     :                 FIXBIT, SLOT, STATUS )
       IF( STATUS .EQ. SAI__OK ) THEN
          STATUS = IRQ__QNEXS
          CALL ERR_REP( 'IRQ_ADDQN_ERR3',

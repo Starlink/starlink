@@ -1,5 +1,5 @@
       SUBROUTINE IRQ1_SEARC( LOCS, QNAME, FIXED, VALUE, BIT, COMMNT,
-     :                       RDONLY, SLOT, STATUS )
+     :                       RDONLY, FIXBIT, SLOT, STATUS )
 *+
 *  Name:
 *     IRQ1_SEARC
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL IRQ1_SEARC( LOCS, QNAME, FIXED, VALUE, BIT, COMMNT,
-*                      RDONLY, SLOT, STATUS )
+*                      RDONLY, FIXBIT, SLOT, STATUS )
 
 *  Description:
 *     The supplied name is compared with each name stored in the QUAL
@@ -41,14 +41,17 @@
 *        false, then the quality is held by no pixels. If FIXED is
 *        false, then VALUE is indeterminate.
 *     BIT = INTEGER (Returned)
-*        If FIXED is false, then this gives the bit number within the
-*        QUALITY component which corresponds with the quality name. If
-*        FIXED is true, then BIT is indeterminate. The least significant
-*        bit is called bit 1 (not bit 0).
+*        The bit number within the QUALITY component which corresponds 
+*        to the quality name. If the quality name has no corresponding
+*        quality bit, then zero is returned. 
 *     COMMNT = CHARACTER * ( * ) (Returned)
 *        A descriptive comment stored with the name.
 *     RDONLY = LOGICAL (Returned)
 *        The read-only flag for the quality name.
+*     FIXBIT = LOGICAL (Returned)
+*        A flag indicating if the bit number associated with the quality 
+*        name should never be changed (even if all pixels hold, or do not
+*        hold, the quality).
 *     SLOT = INTEGER (Returned)
 *        The index at which the name is stored in the QUAL array.
 *     STATUS = INTEGER (Given and Returned)
@@ -84,6 +87,8 @@
 *        Original version.
 *     15-FEB-2008 (DSB):
 *        Added argument RDONLY.
+*     4-MAR-2008 (DSB):
+*        Cater for fixed-bit qualities.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -109,13 +114,14 @@
       INTEGER BIT
       CHARACTER COMMNT*(*)
       LOGICAL RDONLY
+      LOGICAL FIXBIT
       INTEGER SLOT
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER NAME*(IRQ__SZQNM) ! The name stored in the current slot.
+      CHARACTER NAME*(IRQ__SZQNM)! The name stored in the current slot.
       LOGICAL THERE              ! True if the name is defined.
 
 *.
@@ -129,7 +135,7 @@
 *  If the name was found, get the other associated information.
       IF( THERE ) THEN
          CALL IRQ1_GET( LOCS, SLOT, NAME, FIXED, VALUE, BIT, COMMNT,
-     :                  RDONLY, STATUS )
+     :                  RDONLY, FIXBIT, STATUS )
 
 *  If the name was not found, report an error.
       ELSE

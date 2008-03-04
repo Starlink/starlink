@@ -31,7 +31,7 @@
 *        currently has the value of 15.
 *     FIXED = LOGICAL (Returned)
 *        If true, then the quality is either held by all pixels, or by
-*        no pixels. In this case the quality does not have a
+*        no pixels. In this case the quality may not have a
 *        corresponding bit in the QUALITY component. If false, then
 *        some pixels have the quality and some don't, as indicated by
 *        the corresponding bit in the QUALITY component.
@@ -41,10 +41,10 @@
 *        quality ( VALUE = .FALSE. ). If FIXED is false, then VALUE is
 *        indeterminate.
 *     BIT = INTEGER (Returned)
-*        If FIXED is false, then BIT holds the corresponding bit number
-*        in the QUALITY component. The least significant bit is called
-*        bit 1 (not bit 0). If FIXED is true, then BIT is
-*        indeterminate.
+*        BIT holds the corresponding bit number in the QUALITY component. 
+*        The least significant bit is called bit 1 (not bit 0). If there
+*        is no corresponding bit, a value of zero is returned, and FIXED
+*        is returned .TRUE.
 *     COMMNT = CHARACTER * ( * ) (Returned)
 *        The descriptive comment which was stored with the quality name.
 *        The supplied character variable should have a declared length
@@ -82,6 +82,8 @@
 *        Original version.
 *     15-FEB-2008 (DSB):
 *        Added RDONLY argument to IRQ1_SEARC.
+*     15-FEB-2008 (DSB):
+*        Added FIXBIT argument to IRQ1_SEARC.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -112,6 +114,7 @@
 
 *  Local Variables:
       INTEGER FIRST              ! Position of first non-blank character
+      LOGICAL FIXBIT             ! Does quality have a fixed bit number?
       INTEGER INDF               ! Identifier for the NDF containing the
                                  ! quality names information.
       INTEGER LAST               ! Position of last non-blank character.
@@ -135,7 +138,7 @@
 
 *  Search for the requested quality name.
       CALL IRQ1_SEARC( LOCS, LQNAME( : LAST - FIRST + 1 ), FIXED, VALUE,
-     :                 BIT, COMMNT, RDONLY, SLOT, STATUS )
+     :                 BIT, COMMNT, RDONLY, FIXBIT, SLOT, STATUS )
 
 *  If an error occur, give context information.
       IF( STATUS .NE. SAI__OK ) THEN

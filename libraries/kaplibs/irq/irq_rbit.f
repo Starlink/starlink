@@ -96,6 +96,7 @@
       CHARACTER COMMNT*(IRQ__SZCOM)! Descriptive comment stored with
                                  ! the quality name.
       INTEGER FIRST              ! Index of first non-blank character
+      LOGICAL FIXBIT             ! Does quality have a fixed bit number?
       LOGICAL FIXED              ! True if all pixels either do or don't
                                  ! have the quality.
       INTEGER INDF               ! Identifier for the NDF containing the
@@ -128,11 +129,11 @@
 
 *  Find the quality name information.
       CALL IRQ1_SEARC( LOCS, LQNAME, FIXED, VALUE, BIT, COMMNT, RDONLY,
-     :                 SLOT, STATUS )
+     :                 FIXBIT, SLOT, STATUS )
 
 *  If the quality name already has a bit number assigned to it, return
 *  it. Otherwise we assign a bit number to the quality name now.
-      IF( FIXED ) THEN
+      IF( BIT .EQ. 0 ) THEN
 
 *  Check that write access is available to the NDF.
          CALL NDF_ISACC( INDF, 'WRITE', WRITE, STATUS )
@@ -151,7 +152,7 @@
 *  Modify the FIXED, VALUE and BIT settings in the quality name
 *  information.
          CALL IRQ1_MOD( LOCS, SLOT, .FALSE., VALUE, BIT, RDONLY, 
-     :                  STATUS )
+     :                  FIXBIT, STATUS )
       END IF
 
 *  If an error occur, give context information.

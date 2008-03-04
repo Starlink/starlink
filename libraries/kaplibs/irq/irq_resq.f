@@ -63,6 +63,8 @@
 *        Original version.
 *     15-FEB-2008 (DSB):
 *        Added RDONLY argument to IRQ1_SEARC and IRQ1_MOD.
+*     4-MAR-2008 (DSB):
+*        Cater for fixed-bit qualities.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -77,6 +79,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'IRQ_PAR'          ! IRQ constants.
       INCLUDE 'IRQ_ERR'          ! IRQ error values.
+      INCLUDE 'CNF_PAR'          ! CNF values.
 
 *  Arguments Given:
       CHARACTER LOCS*(*)
@@ -91,12 +94,18 @@
       CHARACTER COMMNT*(IRQ__SZCOM)! Descriptive comment stored with
                                  ! the quality name.
       INTEGER FIRST              ! Position of first non-blank character
+      LOGICAL DEF                ! True if QUALITY component is in a
+                                 ! defined state.
+      LOGICAL FIXBIT             ! Deos quality have a fixed bit number?
       LOGICAL FIXED              ! True if all pixels either do or don't
                                  ! have the quality.
       INTEGER INDF               ! Identifier for the NDF containing the
                                  ! quality names information.
       INTEGER LAST               ! Position of last non-blank character.
       CHARACTER LQNAME*(IRQ__SZQNM) ! Upper case copy of quality name.
+      CHARACTER MODE*10          ! Mapping mode for QUALITY component.
+      INTEGER NEL                ! No. of pixels in the NDF.
+      INTEGER PNT                ! Pointer to the mapped QUALITY array.
       LOGICAL RDONLY             ! Read-only flag for quality name.
       INTEGER SLOT               ! Index into the QUALITY_NAMES
                                  ! structure at which the new name will
@@ -132,12 +141,30 @@
 
 *  Find the quality name information.
       CALL IRQ1_SEARC( LOCS, LQNAME, FIXED, VALUE, BIT, COMMNT, RDONLY,
-     :                 SLOT, STATUS )
+     :                 FIXBIT, SLOT, STATUS )
+
+*  If the quality has a fixed bit number, we need to reset the bit for
+*  all pixels in the quality component.
+      IF( FIXBIT ) THEN
+         CALL NDF_STATE( INDF, 'QUALITY', DEF, STATUS )
+         IF( DEF ) THEN
+            MODE = 'UPDATE'
+         ELSE
+            MODE = 'WRITE/ZERO'
+         END IF
+
+         CALL NDF_MAP( INDF, 'QUALITY', '_UBYTE', MODE, PNT, NEL,
+     :                 STATUS )
+         IF( DEF ) CALL IRQ1_QSET( BIT, .FALSE., NEL, 
+     :                             %VAL( CNF_PVAL( PNT ) ), STATUS )
+         CALL NDF_UNMAP( INDF, 'QUALITY', STATUS )
+
+      END IF
 
 *  Modify the FIXED and VALUE settings in the quality name
 *  information.
       CALL IRQ1_MOD( LOCS, SLOT, .TRUE., .FALSE., BIT, RDONLY,
-     :               STATUS )
+     :               FIXBIT, STATUS )
 
 *  If an error occur, give context information.
  999  CONTINUE

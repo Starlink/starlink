@@ -1,5 +1,5 @@
       SUBROUTINE IRQ1_GET( LOCS, SLOT, QNAME, FIXED, VALUE, BIT, COMMNT,
-     :                     RDONLY, STATUS )
+     :                     RDONLY, FIXBIT, STATUS )
 *+
 *  Name:
 *     IRQ1_GET
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL IRQ1_GET( LOCS, SLOT, QNAME, FIXED, VALUE, BIT, COMMNT,
-*                    RDONLY, STATUS )
+*                    RDONLY, FIXBIT, STATUS )
 
 *  Description:
 *     The quality information is retrieved from the given slot. If the
@@ -42,14 +42,18 @@
 *        false, then the quality is held by no pixels. If FIXED is
 *        false, then VALUE is indeterminate.
 *     BIT = INTEGER (Returned)
-*        If FIXED is false, then this gives the bit number within the
-*        QUALITY component which corresponds with the quality name. If
-*        FIXED is true, then BIT is indeterminate. The least significant
-*        bit is called bit 1 (not bit 0).
+*        BIT holds the corresponding bit number in the QUALITY component. 
+*        The least significant bit is called bit 1 (not bit 0). A value
+*        of zero is returned if the quality has no associated bit in the 
+*        quality array. In this case, the FIXED argument will indicate if 
+*        all pixel do, or do not, hold the quality.
 *     COMMNT = CHARACTER * ( * ) (Returned)
 *        A descriptive comment stored with the name.
 *     RDONLY = LOGICAL (Returned)
 *        The read-only flag for the quality name.
+*     FIXBIT = LOGICAL (Returned)
+*        The "fixed bit" flag for the quality name. True if the bit
+*        number associated with the quality name should never be changed.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -83,6 +87,8 @@
 *        Original version.
 *     15-FEB-2008 (DSB):
 *        Added argument RDONLY.
+*     4-MAR-2008 (DSB):
+*        Added argument FIXBIT.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -110,6 +116,7 @@
       INTEGER BIT
       CHARACTER COMMNT*(*)
       LOGICAL RDONLY
+      LOGICAL FIXBIT
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -180,6 +187,18 @@
       ELSE
          RDONLY = .FALSE.
       END IF     
+
+*  The "fixed bit" flag was added at 4/3/2008, so check it exists before
+*  accessing it.
+      CALL DAT_THERE( QULOC, IRQ__FBNAM, THERE, STATUS )
+      IF( THERE ) THEN
+         CALL CMP_GET0L( QULOC, IRQ__FBNAM, FIXBIT, STATUS )
+      ELSE
+         RDONLY = .FALSE.
+      END IF     
+
+*  Return a bit number of zero if no bit is assigned to the quality name.
+      IF( FIXED .AND. .NOT. FIXBIT ) BIT = 0
 
 *  Annul the locator to the cell of QUAL.
  999  CONTINUE

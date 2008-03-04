@@ -1,5 +1,5 @@
       SUBROUTINE IRQ1_MOD( LOCS, SLOT, FIXED, VALUE, BIT, RDONLY,
-     :                     STATUS )
+     :                     FIXBIT, STATUS )
 *+
 *  Name:
 *     IRQ1_MOD
@@ -11,7 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL IRQ1_MOD( LOCS, SLOT, FIXED, VALUE, BIT, RDONLY, STATUS )
+*     CALL IRQ1_MOD( LOCS, SLOT, FIXED, VALUE, BIT, RDONLY, FIXBIT,
+*                    STATUS )
 
 *  Description:
 *     The quality information is stored in the given slot. If the
@@ -47,6 +48,9 @@
 *        The read-only flag for the quality name. Controls whether an
 *        error is reported if an attempt is made to delete the quality
 *        name using IRQ_REMQN.
+*     FIXBIT = LOGICAL (Given)
+*        The "fixed-bit" flag for the quality name. If .TRUE., then the
+*        bit number associated with the quality name is never changed.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -80,6 +84,8 @@
 *        Original version.
 *     15-FEB-2008 (DSB):
 *        Added argument RDONLY.
+*     4-MAR-2008 (DSB):
+*        Added argument FIXBIT.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -103,6 +109,7 @@
       LOGICAL VALUE
       INTEGER BIT
       LOGICAL RDONLY
+      LOGICAL FIXBIT
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -171,21 +178,27 @@
       END IF
 
 *  Store the modified items of information. If the quality is fixed,
-*  store a bit value of zero.
+*  and the bit number is not fixed, store a bit value of zero.
       CALL CMP_PUT0L( QULOC, IRQ__FXNAM, FIXED, STATUS )
       CALL CMP_PUT0L( QULOC, IRQ__VLNAM, VALUE, STATUS )
 
-      IF( FIXED ) THEN
+      IF( FIXED .AND. .NOT. FIXBIT ) THEN
          CALL CMP_PUT0I( QULOC, IRQ__BTNAM, 0, STATUS )
       ELSE
          CALL CMP_PUT0I( QULOC, IRQ__BTNAM, BIT, STATUS )
       END IF
 
 *  The read-only flag is new (15/2/2008) and so may not exist in the
-*  supplied structure. So firs make sure it exists, then store its value.
+*  supplied structure. So first make sure it exists, then store its value.
       CALL DAT_THERE( QULOC, IRQ__RONAM, THERE, STATUS )
       IF( .NOT. THERE ) CALL DAT_NEW0L( QULOC, IRQ__RONAM, STATUS )
       CALL CMP_PUT0L( QULOC, IRQ__RONAM, RDONLY, STATUS )
+
+*  The fixed-bit flag is new (4/3/2008) and so may not exist in the
+*  supplied structure. So first make sure it exists, then store its value.
+      CALL DAT_THERE( QULOC, IRQ__FBNAM, THERE, STATUS )
+      IF( .NOT. THERE ) CALL DAT_NEW0L( QULOC, IRQ__FBNAM, STATUS )
+      CALL CMP_PUT0L( QULOC, IRQ__FBNAM, FIXBIT, STATUS )
 
 *  Annul the locator to the cell of QUAL.
  999  CONTINUE

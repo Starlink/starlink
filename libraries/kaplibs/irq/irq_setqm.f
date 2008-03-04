@@ -86,6 +86,8 @@
 *        Use CNF_PVAL
 *     15-FEB-2008 (DSB):
 *        Added RDONLY to IRQ1_SEARC and IRQ1_MOD call.
+*     4-MAR-2008 (DSB):
+*        Cater for fixed bit quality names.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -125,6 +127,7 @@
       LOGICAL DEF                ! True if QUALITY component is in a
                                  ! defined state.
       INTEGER FIRST              ! Position of first non-blank character
+      LOGICAL FIXBIT             ! True if  fixed bit number is used
       LOGICAL FIXED              ! True if all pixels either do or don't
                                  ! have the quality.
       INTEGER INDF               ! Identifier for the NDF containing the
@@ -137,6 +140,7 @@
       INTEGER NGOOD              ! No. of good values found in the mask.
       INTEGER PNT                ! Pointer to the mapped QUALITY array.
       LOGICAL RDONLY             ! Read-only flag for quality name.
+      LOGICAL QMOD               ! Does QUALITY array need to be changed?
       INTEGER SLOT               ! Index into the QUALITY_NAMES
                                  ! structure at which the new name will
                                  ! be stored.
@@ -165,7 +169,7 @@
 
 *  Find the quality name information.
       CALL IRQ1_SEARC( LOCS, LQNAME, FIXED, VALUE, BIT, COMMNT, RDONLY,
-     :                 SLOT, STATUS )
+     :                 FIXBIT, SLOT, STATUS )
 
 *  If all pixels already have the quality, assign a value to SET and 
 *  return without further action.
@@ -191,9 +195,18 @@
          VALUE = .TRUE.
          CALL NDF_SIZE( INDF, SET, STATUS )
 
-*  Otherwise, some but not all of the mask pixels are selected. Map the
-*  QUALITY component of the NDF.
+*  If the quality name has a fixed bit number, we still need to modify
+*  the QUALITY component. 
+         QMOD = FIXBIT
+
+*  Otherwise, some but not all of the mask pixels are selected. So indicate
+*  that we need to modify the QUALITY component.
       ELSE
+         QMOD = .TRUE.
+      END IF
+
+*  If required, modify the QUALITY component of the NDF.
+      IF( QMOD ) THEN
 
          CALL NDF_STATE( INDF, 'QUALITY', DEF, STATUS )
          IF( DEF ) THEN
@@ -217,7 +230,7 @@
 *  If no bit plane in the QUALITY component was reserved for the
 *  quality on input, reserve one know, and initialise it to indicate no
 *  pixels currently hold the quality.
-         IF( FIXED ) THEN
+         IF( BIT .EQ. 0 ) THEN
             CALL IRQ1_RBIT( LOCS, BIT, STATUS )
             CALL IRQ1_QSET( BIT, .FALSE., SIZE, %VAL( CNF_PVAL( PNT ) ),
      :                      STATUS )
@@ -252,7 +265,8 @@
       END IF
 
 *  Update the quality information.
-      CALL IRQ1_MOD( LOCS, SLOT, FIXED, VALUE, BIT, RDONLY, STATUS )
+      CALL IRQ1_MOD( LOCS, SLOT, FIXED, VALUE, BIT, RDONLY, FIXBIT, 
+     :               STATUS )
 
 *  If an error occur, give context information.
  999  CONTINUE

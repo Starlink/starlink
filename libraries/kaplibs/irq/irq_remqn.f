@@ -94,6 +94,7 @@
       CHARACTER COMMNT*(IRQ__SZCOM)! Descriptive comment stored with
                                  ! quality name.
       INTEGER FIRST              ! Position of first non-blank character
+      LOGICAL FIXBIT             ! Does quality have a fixed bit number?
       LOGICAL FIXED              ! true if quality doesn't vary from
                                  ! pixel to pixel.
       INTEGER INDF               ! Identifier for the NDF containing the
@@ -146,7 +147,8 @@
 *  name.
       ELSE
          CALL IRQ1_SEARC( LOCS, LQNAME( : LAST - FIRST + 1 ), FIXED,
-     :                    VALUE, BIT, COMMNT, RDONLY, SLOT, STATUS )
+     :                    VALUE, BIT, COMMNT, RDONLY, FIXBIT,
+     :                    SLOT, STATUS )
 
 *  Reset the slot containing the supplied quality name.
          CALL IRQ1_RESET( LOCS, SLOT, STATUS )

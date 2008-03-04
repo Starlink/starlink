@@ -78,6 +78,8 @@
 *        Original version.
 *     15-FEB-2008 (DSB):
 *        Added a read-only flag to the QUAL structure.
+*     4-MAR-2008 (DSB):
+*        Added a "fixed bit" flag to the QUAL structure.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -181,6 +183,7 @@
       CALL CMP_PUT0C( QCLOC, IRQ__CMNAM, COMMNT, STATUS )
       CALL CMP_PUT0I( QCLOC, IRQ__BTNAM, 0, STATUS )
       CALL CMP_PUT0L( QCLOC, IRQ__RONAM, .FALSE., STATUS )
+      CALL CMP_PUT0L( QCLOC, IRQ__FBNAM, .FALSE., STATUS )
 
 *  If neccessary, update the last used slot number.
       CALL DAT_GET0I( LOCS(3), LUSED, STATUS )

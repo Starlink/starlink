@@ -39,7 +39,7 @@
 *        constant IRQ__SZQNM.
 *     FIXED = LOGICAL (Returned)
 *        If true, then the quality is either held by all pixels, or by
-*        no pixels. In this case the quality does not have a
+*        no pixels. In this case the quality may not have a
 *        corresponding bit in the QUALITY component. If false, then
 *        some pixels have the quality and some don't, as indicated by
 *        the corresponding bit in the QUALITY component.
@@ -49,10 +49,11 @@
 *        quality ( VALUE = .FALSE. ). If FIXED is false, then VALUE is
 *        indeterminate.
 *     BIT = INTEGER (Returned)
-*        If FIXED is false, then BIT holds the corresponding bit number
-*        in the QUALITY component. The least significant bit is called
-*        bit 1 (not bit 0). If FIXED is true, then BIT is
-*        indeterminate.
+*        BIT holds the corresponding bit number in the QUALITY component. 
+*        The least significant bit is called bit 1 (not bit 0). A value
+*        of zero is returned if the quality has no associated bit in the 
+*        quality array. In this case, the FIXED argument will indicate if 
+*        all pixel do, or do not, hold the quality.
 *     COMMNT = CHARACTER * ( * ) (Returned)
 *        The descriptive comment which was stored with the quality name.
 *        The supplied character variable should have a declared length
@@ -128,6 +129,7 @@
 *  Local Variables:
       LOGICAL BLANK              ! True if the current slot is not in
                                  ! use.
+      LOGICAL FIXBIT             ! Does quality have a fixed bit number?
       INTEGER INDF               ! Identifier for the NDF containing the
                                  ! quality names information.
       INTEGER LUSED              ! Index of last used slot.
@@ -172,7 +174,7 @@
             CALL ERR_MARK
 
             CALL IRQ1_GET( LOCS, CONTXT, QNAME, FIXED, VALUE, BIT,
-     :                     COMMNT, RDONLY, STATUS )
+     :                     COMMNT, RDONLY, FIXBIT, STATUS )
 
 *  If the slot was not in use, annul the error.
             IF( STATUS .EQ. IRQ__BADSL ) THEN
@@ -198,6 +200,5 @@
      :       'IRQ_NXTQN: Unable to get next quality name from NDF ^NDF',
      :        STATUS )
       END IF
-
 
       END

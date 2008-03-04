@@ -721,6 +721,50 @@ void irqRwqn( IRQLocs *locs, const char *qname, int set, int newval,
 
 /* ------------------------------- */
 
+F77_SUBROUTINE(irq_fxbit)( CHARACTER_ARRAY(LOCS), 
+                           CHARACTER(QNAME), 
+                           INTEGER(BIT),
+                           LOGICAL(FIXBIT),
+                           INTEGER(STATUS)
+                           TRAIL(LOCS)
+                           TRAIL(QNAME) );
+
+void irqFxbit( IRQLocs *locs, const char *qname, int bit, int *fixbit, 
+               int *status ){
+
+   DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
+   DECLARE_CHARACTER_DYN(QNAME);  
+   DECLARE_INTEGER(BIT);
+   DECLARE_LOGICAL(FIXBIT);
+   DECLARE_INTEGER(STATUS);
+
+   HDS_EXPORT_CLOCATOR( locs->loc[0], LOCS[0], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[1], LOCS[1], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[2], LOCS[2], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[3], LOCS[3], status );
+   HDS_EXPORT_CLOCATOR( locs->loc[4], LOCS[4], status );
+
+   F77_CREATE_CHARACTER( QNAME, strlen( qname ) );
+   F77_EXPORT_CHARACTER( qname, QNAME, QNAME_length );
+   F77_EXPORT_INTEGER( bit, BIT );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(irq_fxbit)( CHARACTER_ARRAY_ARG(LOCS),
+                        CHARACTER_ARG(QNAME),
+                        INTEGER_ARG(&BIT),
+                        LOGICAL_ARG(&FIXBIT),
+                        INTEGER_ARG(&STATUS) 
+                        TRAIL_ARG(LOCS) 
+                        TRAIL_ARG(QNAME) );
+
+   F77_FREE_CHARACTER( QNAME );
+   F77_IMPORT_LOGICAL( FIXBIT, *fixbit );
+   F77_IMPORT_INTEGER( STATUS, *status );
+}
+
+
+/* ------------------------------- */
+
 F77_SUBROUTINE(irq_getqn)( CHARACTER_ARRAY(LOCS), 
                            CHARACTER(QNAME), 
                            LOGICAL(FIXED),

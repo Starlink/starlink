@@ -1,25 +1,35 @@
-      SUBROUTINE IRQ_RWQN( LOCS, QNAME, SET, NEWVAL, OLDVAL, STATUS )
+      SUBROUTINE IRQ_FXBIT( LOCS, QNAME, BIT, FIXBIT, STATUS )
 *+
 *  Name:
-*     IRQ_RWQN
+*     IRQ_FXBIT
 
 *  Purpose:
-*     Get and/or set the read-only flag for a quality name.
+*     Assign a fixed bit number to a quality name.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL IRQ_RWQN( LOCS, QNAME, SET, NEWVAL, OLDVAL, STATUS )
+*     CALL IRQ_FXBIT( LOCS, QNAME, BIT, SET, FIXBIT, STATUS )
 
 *  Description:
-*     This routine returns the current value of the read-only flag
-*     associated with a quality name, and optionally assigns a new 
-*     value to the flag.
+*     This routine associates a fixed bit number with a specified quality
+*     name. Normally, IRQ manages the allocation of bit numbers to named
+*     qualities, but this routine allows the calling application to specify
+*     which bit is to be used for a given quality.
 *
-*     If the read-only flag is set for a quality name, any attempt to
-*     remove the quality name using IRQ_REMQN will result in an error 
-*     being reported.
+*     By default, a QUALITY array bit is associated with a quality name
+*     only if some pixels hold the quality and some do not hold the
+*     quality (i.e. there is a mix of values). Otherwise, a flag is stored
+*     in the QUALITY_NAMES structure indicating this, and any quality bit
+*     previously associated with the quality name is released for re-use.
+*
+*     This default behaviour is changed by calling this routine. The 
+*     specified bit number will continue to be associated with the quality 
+*     name even if all pixels do, or do not, hold the quality.
+*
+*     An error will be returned if the named quality is already associated 
+*     with a different bit number when this routine is called.
 
 *  Arguments:
 *     LOCS(5) = CHARACTER * ( * ) (Given)
@@ -31,18 +41,14 @@
 *        the search is case-insensitive. The maximum allowed length for
 *        quality names is given by symbolic constant IRQ__SZQNM which
 *        currently has the value of 15.
-*     SET = LOGICAL (Given)
-*        If true, then the read-only flag for the quality name will be
-*        set to the value supplied in NEWVAL. Otherwise, the current
-*        value of the flag will be left unchanged.
-*     NEWVAL = LOGICAL (Given)
-*        The new value for the read-only flag. Only accessed if SET is
-*        true.
-*     OLDVAL = LOGICAL (Returned)
-*        The value of the read-only flag on entry to this routine. If the
-*        old value is of no interest, it is safe to supply the same 
-*        variable for OLDVAL as for NEWVAL since OLDVAL is updated after
-*        NEWVAL is used.
+*     BIT = INTEGER (Given)
+*        The bit number to use. The least significant bit is bit 1, not
+*        bit 0. If value below 0 or above 8 is supplied, the properties
+*        of the quality name are left unchanged, but the FIXBIT value is 
+*        still returned.
+*     FIXBIT = LOGICAL (Returned)
+*        Returned .TRUE. if the specified qualit name had a fixed bit
+*        number on entry to this routine, and .FALSE. otherwise.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -71,10 +77,8 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     15-FEB-2008 (DSB):
-*        Original version.
 *     4-MAR-2008 (DSB):
-*        Added FIXBIT.
+*        Original version.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -93,11 +97,10 @@
 *  Arguments Given:
       CHARACTER LOCS(5)*(*)
       CHARACTER QNAME*(*)
-      LOGICAL SET
-      LOGICAL NEWVAL
+      INTEGER BIT
 
-*  Arguments returned:
-      LOGICAL OLDVAL
+*  Arguments Given:
+      LOGICAL FIXBIT
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -111,10 +114,9 @@
       LOGICAL RDONLY             ! Original read-only flag
       INTEGER SLOT               ! Index into the QUAL structure at
                                  ! which the name was found.
-      LOGICAL FIXBIT
       LOGICAL FIXED
       LOGICAL VALUE
-      INTEGER BIT
+      INTEGER OLDBIT
       CHARACTER COMMNT*100
 *.
 
@@ -130,28 +132,41 @@
       LQNAME = QNAME( FIRST : LAST )
       CALL CHR_UCASE( LQNAME )
 
-*  Search for the requested quality name, and return the original
-*  read-only flag value.
+*  Search for the requested quality name.
       CALL IRQ1_SEARC( LOCS, LQNAME( : LAST - FIRST + 1 ), FIXED, VALUE,
-     :                 BIT, COMMNT, RDONLY, FIXBIT, SLOT, STATUS )
+     :                 OLDBIT, COMMNT, RDONLY, FIXBIT, SLOT, STATUS )
 
-*  If required, set the new value. 
-      IF( SET ) THEN
-         CALL IRQ1_MOD( LOCS, SLOT, FIXED, VALUE, BIT, NEWVAL, 
-     :                  FIXBIT, STATUS )
+*  Check the supplied bit number.
+      IF( BIT .GE. 1 .AND. BIT .LE. 8 ) THEN
+
+*  If the quality name is already associated with a different bit, report
+*  an error.
+         IF( OLDBIT .NE. 0 ) THEN
+         
+            IF( OLDBIT .NE. BIT ) THEN
+               IF( STATUS .EQ. SAI__OK ) THEN
+                  STATUS = SAI__ERROR
+                  CALL MSG_SETI( 'B', OLDBIT )
+                  CALL ERR_REP( 'IRQ_FXBIT_ERR0', 'IRQ_FXBIT: The '//
+     :                          'quality name is already associated '//
+     :                          'with bit ^B.', STATUS )
+               END IF
+            END IF
+         
+         END IF
+
+*  Store the new information.
+         CALL IRQ1_MOD( LOCS, SLOT, FIXED, VALUE, BIT, VALUE, .TRUE., 
+     :                  STATUS )
       END IF
-
-*  Now that the new value has been set, it is safe to return the old value
-*  (OLDVAL and NEWVAL may possibly refer to the same variable in the
-*  caller).
-      OLDVAL = RDONLY
 
 *  If an error occur, give context information.
       IF( STATUS .NE. SAI__OK ) THEN
+         CALL MSG_SETI( 'B', BIT )
          CALL NDF_MSG( 'NDF', INDF )
          CALL MSG_SETC( 'QN', QNAME )
-         CALL ERR_REP( 'IRQ_RWQN_ERR1', 'IRQ_RWQN: Unable to set or '//
-     :                 'get read-only flag for quality name ^QN in '//
+         CALL ERR_REP( 'IRQ_FXBIT_ERR1', 'IRQ_FXBIT: Unable to assign'//
+     :                 ' fixed bit number ^B to quality name ^QN in '//
      :                 'NDF ^NDF', STATUS )
       END IF
 

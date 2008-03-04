@@ -88,6 +88,8 @@
 *        Use CNF_PVAL
 *     15-FEB-2008 (DSB):
 *        Added RDONLY to IRQ1_SEARC and IRRQ1_MOD call.
+*     4-MAR-2008 (DSB):
+*        Cater for fixed bit qualities.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -128,6 +130,7 @@
       LOGICAL DEF                ! True if the QUALITY component is in a
                                  ! defined state.
       INTEGER FIRST              ! Position of first non-blank character
+      LOGICAL FIXBIT             ! Does quality have a fixed bit number?
       LOGICAL FIXED              ! True if all pixels either do or don't
                                  ! have the quality.
       INTEGER INDF               ! Identifier for the NDF containing the
@@ -178,7 +181,7 @@
 
 *  Find the quality name information.
       CALL IRQ1_SEARC( LOCS, LQNAME, FIXED, VALUE, BIT, COMMNT, RDONLY,
-     :                 SLOT, STATUS )
+     :                 FIXBIT, SLOT, STATUS )
 
 *  If no pixels currently hold the quality, removing the quality from
 *  the selected pixels won't change anything, so return without further
@@ -209,7 +212,7 @@
 *  If there is currently no bit plane reserved for this quality,
 *  reserve one now and initialise it to indicate that all pixels held
 *  the quality on entry to this routine.
-      IF( FIXED ) THEN
+      IF( BIT .EQ. 0 ) THEN
          CALL IRQ1_RBIT( LOCS, BIT, STATUS )
          CALL IRQ1_QSET( BIT, .TRUE., NEL, %VAL( CNF_PVAL( PNT ) ), 
      :                   STATUS )
@@ -243,7 +246,8 @@
 
 *  Modify the FIXED, VALUE and BIT settings in the quality name
 *  information.
-      CALL IRQ1_MOD( LOCS, SLOT, FIXED, VALUE, BIT, RDONLY, STATUS )
+      CALL IRQ1_MOD( LOCS, SLOT, FIXED, VALUE, BIT, RDONLY, FIXBIT,
+     :               STATUS )
 
 *  If an error occur, give context information.
  999  CONTINUE

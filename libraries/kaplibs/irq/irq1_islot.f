@@ -65,6 +65,8 @@
 *        Original version.
 *     15-FEB-2008 (DSB):
 *        Added a read-only flag to the QUAL structure.
+*     4-MAR-2008 (DSB):
+*        Added a "fixed bit number" flag to the QUAL structure.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -133,6 +135,12 @@
 *  the slot describing the quality name cannot be removed using IRQ_REMQN 
 *  until such time as the quality is made read-write. 
       CALL DAT_NEW0L( QCLOC, IRQ__RONAM, STATUS )
+
+*  7) A logical value indicating if the bit number associated with the
+*  quality should be left unchanged. If not, then the bit number may
+*  change depending on whether or not all pixels do , or do not, have the
+*  specified quality.
+      CALL DAT_NEW0L( QCLOC, IRQ__FBNAM, STATUS )
 
 *  Increment the number of free slots.
       CALL DAT_GET0I( LOCS(4), NFREE, STATUS )

@@ -36,6 +36,7 @@
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -61,6 +62,8 @@
 *  History:
 *     26-JUL-1991 (DSB):
 *        Original version.
+*     4-MAR-2008 (DSB):
+*        Cater for fixed bit numbers.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -88,6 +91,7 @@
 
 *  Local Variables:
       LOGICAL BUSED( IRQ__QBITS )! True if each bit is used.
+      LOGICAL FIXBIT             ! Does the quality have a fixed bit no.?
       LOGICAL FIXED              ! True if the quality does not need a
                                  ! QUALITY bit to represent it.
       INTEGER IBIT               ! Temporary bit number.
@@ -121,7 +125,8 @@
 *  Otherwise, see if the quality has a corresponding bit in the QUALITY
 *  array. If not, pass on.
             CALL CMP_GET0L( QCLOC, IRQ__FXNAM, FIXED, STATUS )
-            IF( .NOT. FIXED ) THEN
+            CALL CMP_GET0L( QCLOC, IRQ__FBNAM, FIXBIT, STATUS )
+            IF( .NOT. FIXED .OR. FIXBIT ) THEN
 
 *  Get the corresponding bit number.
                CALL CMP_GET0I( QCLOC, IRQ__BTNAM, IBIT, STATUS )

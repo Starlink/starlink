@@ -109,6 +109,8 @@
 *        Original version.
 *     15-FEB-2008 (DSB):
 *        Added RDONLY argument to IRQ1_SEARC.
+*     4-MAR-2008 (DSB):
+*        Added FIXBIT argument to IRQ1_SEARC.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -153,6 +155,7 @@
                                  ! quality name.
       CHARACTER COMMNT*(IRQ__SZCOM)! Descriptive comment stored with the
                                  ! quality name.
+      LOGICAL FIXBIT             ! Does quality have a fixed bit number?
       LOGICAL FIXED              ! True if the quality is fixed over the
                                  ! entire NDF.
       LOGICAL HELD               ! Value of a constant quality name.
@@ -215,21 +218,21 @@
 
 *  Try to find the quality name in the QUALITY_NAMES structure.
          CALL IRQ1_SEARC( LOCS, QNAMES( I ), FIXED, HELD, BIT, COMMNT,
-     :                    RDONLY, SLOT, STATUS )
+     :                    RDONLY, FIXBIT, SLOT, STATUS )
 
 *  If the name was found...
          IF( STATUS .EQ. SAI__OK ) THEN
 
-*  If it has an associated QUALITY bit, store a bit mask in which the
-*  only set bit is the one corresponding to the quality bit represented
-*  by the quality name.
+*  If there is a mix of on and off values for the quality, store a bit mask 
+*  in which the only set bit is the one corresponding to the quality bit 
+*  represented by the quality name.
             IF( .NOT. FIXED ) THEN
                NMASKS = NMASKS + 1
                MASKS( NMASKS ) = MASK( BIT )
 
-*  If there is no associated QUALITY bit, replace the "LOAD QUALITY
-*  VALUE" instruction which refers to this quality, with a "LOAD
-*  TRUE" or "LOAD FALSE" instruction.
+*  If all values are either on or off, replace the "LOAD QUALITY VALUE" 
+*  instruction which refers to this quality, with a "LOAD TRUE" or 
+*  "LOAD FALSE" instruction.
             ELSE
                CALL IRQ1_VTOFX( I, HELD, NOPC, OPCODE, STATUS )
 

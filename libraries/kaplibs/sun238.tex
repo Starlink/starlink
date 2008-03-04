@@ -8958,6 +8958,70 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   IRQ\_FXBIT
+}{
+   Assign a fixed bit number to a quality name
+}{
+   \sstdescription{
+      This routine associates a fixed bit number with a specified quality
+      name. Normally, IRQ manages the allocation of bit numbers to named
+      qualities, but this routine allows the calling application to specify
+      which bit is to be used for a given quality.
+
+      By default, a QUALITY array bit is associated with a quality name
+      only if some pixels hold the quality and some do not hold the
+      quality (i.e. there is a mix of values). Otherwise, a flag is stored
+      in the QUALITY\_NAMES structure indicating this, and any quality bit
+      previously associated with the quality name is released for re-use.
+
+      This default behaviour is changed by calling this routine. The
+      specified bit number will continue to be associated with the quality
+      name even if all pixels do, or do not, hold the quality.
+
+      An error will be returned if the named quality is already associated
+      with a different bit number when this routine is called.
+   }
+   \sstinvocation{
+      CALL IRQ\_FXBIT( LOCS, QNAME, BIT, SET, FIXBIT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         LOCS(5) = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         An array of 5 HDS locators. These locators identify the NDF
+         and the associated quality name information.  They should have
+         been obtained using routine IRQ\_FIND or routine IRQ\_NEW.
+      }
+      \sstsubsection{
+         QNAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The quality name to use. Leading blanks are ignored and
+         the search is case-insensitive. The maximum allowed length for
+         quality names is given by symbolic constant IRQ\_\_SZQNM which
+         currently has the value of 15.
+      }
+      \sstsubsection{
+         BIT = INTEGER (Given)
+      }{
+         The bit number to use. The least significant bit is bit 1, not
+         bit 0. If value below 0 or above 8 is supplied, the properties
+         of the quality name are left unchanged, but the FIXBIT value is
+         still returned.
+      }
+      \sstsubsection{
+         FIXBIT = LOGICAL (Returned)
+      }{
+         Returned .TRUE. if the specified qualit name had a fixed bit
+         number on entry to this routine, and .FALSE. otherwise.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    IRQ\_GETQN
 }{
    Search for a specified quality name
@@ -8991,7 +9055,7 @@ from one graphical element to another.
          FIXED = LOGICAL (Returned)
       }{
          If true, then the quality is either held by all pixels, or by
-         no pixels. In this case the quality does not have a
+         no pixels. In this case the quality may not have a
          corresponding bit in the QUALITY component. If false, then
          some pixels have the quality and some don{\tt '}t, as indicated by
          the corresponding bit in the QUALITY component.
@@ -9007,10 +9071,10 @@ from one graphical element to another.
       \sstsubsection{
          BIT = INTEGER (Returned)
       }{
-         If FIXED is false, then BIT holds the corresponding bit number
-         in the QUALITY component. The least significant bit is called
-         bit 1 (not bit 0). If FIXED is true, then BIT is
-         indeterminate.
+         BIT holds the corresponding bit number in the QUALITY component.
+         The least significant bit is called bit 1 (not bit 0). If there
+         is no corresponding bit, a value of zero is returned, and FIXED
+         is returned .TRUE.
       }
       \sstsubsection{
          COMMNT = CHARACTER $*$ ( $*$ ) (Returned)
@@ -9207,7 +9271,7 @@ from one graphical element to another.
          FIXED = LOGICAL (Returned)
       }{
          If true, then the quality is either held by all pixels, or by
-         no pixels. In this case the quality does not have a
+         no pixels. In this case the quality may not have a
          corresponding bit in the QUALITY component. If false, then
          some pixels have the quality and some don{\tt '}t, as indicated by
          the corresponding bit in the QUALITY component.
@@ -9223,10 +9287,11 @@ from one graphical element to another.
       \sstsubsection{
          BIT = INTEGER (Returned)
       }{
-         If FIXED is false, then BIT holds the corresponding bit number
-         in the QUALITY component. The least significant bit is called
-         bit 1 (not bit 0). If FIXED is true, then BIT is
-         indeterminate.
+         BIT holds the corresponding bit number in the QUALITY component.
+         The least significant bit is called bit 1 (not bit 0). A value
+         of zero is returned if the quality has no associated bit in the
+         quality array. In this case, the FIXED argument will indicate if
+         all pixel do, or do not, hold the quality.
       }
       \sstsubsection{
          COMMNT = CHARACTER $*$ ( $*$ ) (Returned)
