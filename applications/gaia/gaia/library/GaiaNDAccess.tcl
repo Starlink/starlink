@@ -664,8 +664,8 @@ itcl::class gaia::GaiaNDAccess {
 
    #  HDU access method. Returns number of HDUs and meta-data describing
    #  the HDUs found. Also provides for the switching of the HDU and
-   #  querying the current HDU. The args can be "list", "listheadings",
-   #  "<n>" (switch to HDU "n"), "get <n> file", or empty (get current HDU).
+   #  querying the current HDU. The args can be "list" or "listheadings"
+   #  and "get <n> filename" for FITS (save compressed images to disk).
    public method hdu {args} {
       if { $args == {} } {
          return [${type_}::hdu $handle_]
