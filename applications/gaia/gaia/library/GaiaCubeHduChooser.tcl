@@ -316,9 +316,6 @@ itcl::class gaia::GaiaCubeHduChooser {
    #  Common variables: (shared by all instances)
    #  -----------------
 
-   #  Instances of this class.
-   common instances_ 0
-
    #  Counter for temporary names.
    common count_ 0
 
