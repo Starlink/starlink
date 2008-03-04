@@ -105,6 +105,9 @@
 *     3-MAR-2008 (DSB):
 *        Re-named "KM1" CELLCODE as CENTRECODE, and added new "KM2" item 
 *        CELLCODE.
+*     4-MAR-2008 (DSB):
+*        Do not use uninitialised parts of the string returned by 
+*        AST_MAPGET0C.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -274,7 +277,7 @@
      :                        STATUS ) ) GO TO 999
 
       CALL CHR_CTOI( UTDATE( 1:2 ), DAY, STATUS )
-      CALL CHR_CTOI( UTDATE( 8: ), YEAR, STATUS )
+      CALL CHR_CTOI( UTDATE( 8:LEN ), YEAR, STATUS )
 
       CMONTH( 1:3 ) = UTDATE( 4:6 )
       CALL CHR_UCASE( CMONTH )
@@ -304,7 +307,7 @@
 
       CALL CHR_CTOI( UTIME( 1:2 ), HOUR, STATUS )
       CALL CHR_CTOI( UTIME( 4:5 ), MIN, STATUS )
-      CALL CHR_CTOR( UTIME( 7: ), SEC, STATUS )
+      CALL CHR_CTOR( UTIME( 7:LEN ), SEC, STATUS )
 
       CALL SLA_CTF2D( HOUR, MIN, SEC, DAYS, DSTAT ) 
       IF( DSTAT .NE. 0 .AND. STATUS .EQ. SAI__OK ) THEN
