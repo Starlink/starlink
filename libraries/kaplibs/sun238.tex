@@ -8979,7 +8979,9 @@ from one graphical element to another.
       name even if all pixels do, or do not, hold the quality.
 
       An error will be returned if the named quality is already associated
-      with a different bit number when this routine is called.
+      with a different bit number when this routine is called. An error
+      will also be reported if the specified bit number is already associated
+      with a different quality name.
    }
    \sstinvocation{
       CALL IRQ\_FXBIT( LOCS, QNAME, BIT, SET, FIXBIT, STATUS )
