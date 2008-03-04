@@ -462,14 +462,20 @@ F77_LOGICAL_FUNCTION(ast_mapget0c)( INTEGER(THIS),
       value = NULL;
       RESULT = astMapGet0C( astI2P( *THIS ), key, &value ) ? F77_TRUE : F77_FALSE;
       astFree( key );
+      i = 0;
       if( value ) {
-         for( i = 0; value[ i ] && ( i < VALUE_length ); i++ ) {
+         for( ; value[ i ] && ( i < VALUE_length ); i++ ) {
             VALUE[ i ] = value[ i ];
          }
          *L = i;
       } else {
          *L = 0;
       }
+
+      for( ; i < VALUE_length; i++ ) {
+         VALUE[ i ] = ' ';
+      }
+
    )
    return RESULT;
 }
