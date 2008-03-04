@@ -44,6 +44,8 @@
 *        Check dasFlag
 *     22-FEB-2008 (JB):
 *        Include math.h
+*     04-MAR-2008 (JB):
+*        Check number of scans actually completed.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -187,7 +189,7 @@ void smurf_gsd2acsis( int *status ) {
   }
 
   /* Get the number of time steps in the observation. */
-  nSteps = gsdVars.noScans * gsdVars.nScanPts;
+  nSteps = gsdVars.nScan * gsdVars.nScanPts;
 
   /* Convert and write out the new file. */
   gsdac_wrtData ( &gsdVars, directory, nSteps, dasFlag, status );

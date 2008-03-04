@@ -55,6 +55,8 @@
 *        Send each subband's data to correct file
 *     2008-02-28 (JB):
 *        Move getDateVars and getMapVars out of putFits
+*     2008-03-04 (JB):
+*        Use number of scans actually completed.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -268,7 +270,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   }
 
   /* Get the size of the data array */
-  spectrumSize = gsdVars->nBEChansOut * gsdVars->nScanPts * gsdVars->noScans;
+  spectrumSize = gsdVars->nBEChansOut * gsdVars->nScanPts * gsdVars->nScan;
                 
   /* Iterate through each time step. */
   for ( stepNum = 0; stepNum < nSteps; stepNum++ ) {

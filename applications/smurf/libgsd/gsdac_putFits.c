@@ -74,6 +74,8 @@
 *        Replace subsysNum with subBandNum
 *     2008-02-28 (JB):
 *        Move getDateVars and getMapVars to wrtData
+*     2008-03-04 (JB):
+*        Use number of scans actually completed.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -134,40 +136,19 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   double azStart;             /* Azimuth at observation start (deg) */
   double bp;                  /* pressure (mbar) */
   char bwMode[SZFITSCARD];    /* ACSIS total bandwidth setup */
-  //  char chopCrd[SZFITSCARD];   /* chopper coordinate system */
   char curChar;               /* character pointer */
-  //char dateEnd[SZFITSCARD];   /* UTC datetime of end of observation 
-  //                               in format YYYY-MM-DDTHH:MM:SS */
-  //char dateObs[SZFITSCARD];   /* UTC datetime of start of observation 
-  //                               in format YYYY-MM-DDTHH:MM:SS */
   int day;                    /* days for time conversion. */
   char doppler[SZFITSCARD];   /* doppler velocity definition */
   double elEnd;               /* elevation at observation end (deg) */
   double elStart;             /* elevation at observation start (deg) */
   double etal;                /* telescope efficiency */
   int hour;                   /* hours for time conversion. */
-  //char HSTend[SZFITSCARD];    /* HST at observation end in format 
-  //                               YYYY-MM-DDTHH:MM:SS */
-  //char HSTstart[SZFITSCARD];  /* HST at observation start in format 
-  //                               YYYY-MM-DDTHH:MM:SS */
   int i;                      /* loop counter */
   float IFchanSp;             /* TOPO IF channel spacing (Hz) */
   double IFfreq;              /* IF frequency (GHz) */
   char instrume[SZFITSCARD];  /* front-end receiver */
   double intTime;             /* total time spent integrating (s) */
   int josMin;                 /* ?? */
-  //char loclCrd[SZFITSCARD];   /* local offset coordinate system for 
-  //                               map_x / map_y */
-  //char LSTstart[SZFITSCARD];  /* LST at observation start in format
-  //                               YYYY-MM-DDTHH:MM:SS */
-  //char LSTend[SZFITSCARD];    /* LST at observation end in format
-  //                               YYYY-MM-DDTHH:MM:SS */
-  //float mapHght;              /* requested height of rectangle to be mapped 
-  //                               (arcsec) */
-  //float mapPA;                /* requested PA of map vertical, +ve towards
-  //                               +ve long */
-  //float mapWdth;              /* requested width of rectangle to be mapped
-  //                               (arcsec) */
   int min;                    /* minutes for time conversion. */
   char molecule[SZFITSCARD];  /* target molecular species */
   int month;                  /* months for time conversion. */
@@ -175,8 +156,6 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   double nRefStep;            /* number of nod sets repeated */
   char object[SZFITSCARD];    /* object of interest */
   char object2[SZFITSCARD];   /* object of interest (second half of name) */
-  //char obsID[SZFITSCARD];     /* unique observation number in format
-  //                               INSTR_NNNNN_YYYYMMDDTHHMMSS */
   char obsIDSS[SZFITSCARD];   /* unique observation number + subsystem
                                  number in format
                                  INSTR_NNNNN_YYYYMMDDTHHMMSS_N */
@@ -184,23 +163,13 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   int parse;                  /* flag for incorrect date string. */
   char recptors[SZFITSCARD];  /* active FE receptor IDs for this obs */
   double refChan;             /* reference IF channel no. */
-  //char scanCrd[SZFITSCARD];   /* coordinate system of scan */
-  //float scanDy;               /* scan spacing perpendicular to scan
-  //                               (arcsec) */
-  //float scanPA;               /* Scan PA rel. to lat. line; 0=lat, 
-  //                               90=long in scanCrd system */
-  //char scanPat[SZFITSCARD];   /* name of scanning scheme */
-  //float scanVel;              /* scan velocity (arcsec/sec) */
   char seeDatSt[SZFITSCARD];  /* time of seeingSt in format
                                  YYYY-MM-DDTHH:MM:SS */
-  //char skyRefX[SZFITSCARD];   /* X co-ord of reference position (arcsec) */  
-  //char skyRefY[SZFITSCARD];   /* Y co-ord of reference position (arcsec) */  
   char sSysObs[SZFITSCARD];   /* spectral ref. frame during observation */
   int standard;               /* true for spectral line standards */
   int startIdx;               /* index in pattern at start of observation */
   int stBetRef;               /* max number of steps between refs */
   char subBands[SZFITSCARD];  /* ACSIS sub-band set-up */
-  //char swMode[SZFITSCARD];    /* switch mode */
   char tauDatSt[SZFITSCARD];  /* time of tau225St observation in 
                                  format YYYY-MM-DDTHH:MM:SS */
   char telName[SZFITSCARD];   /* telescope name */
@@ -258,12 +227,12 @@ void gsdac_putFits ( const gsdVars *gsdVars,
 
     i = 0;
     intTime = 0.0;
-    while ( i < ( gsdVars->nScanVars2 * gsdVars->noScans ) ) {
+    while ( i < ( gsdVars->nScanVars2 * gsdVars->nScan ) ) {
       intTime += gsdVars->scanTable2[i];
       i += gsdVars->nScanVars2;
     }
 
-  }
+  }//k probably not right for rasters...
 
 
   /* ACSIS Specific. */
@@ -294,7 +263,7 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   cnfImprt ( gsdVars->frontend, 16, instrume );
 
   /* Get the IF frequency and make sure it's always positive. */
-  IFfreq = abs( gsdVars->totIFs[subBandNum] );  
+  IFfreq = fabs( gsdVars->totIFs[subBandNum] );  
 
   /* Get the number of mixers. */
   nMix = 1;//k
@@ -357,9 +326,9 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   parse = sscanf ( gsdVars->seeTime, "%02d%02d%02d%02d%02d", &year, 
                    &month, &day, &hour, &min );
 
-  if ( parse == 0 || parse == EOF ) {\
-    msgOut ( FUNC_NAME, "Couldn't convert seeing time, continuing anyway.", 
-             status );
+  if ( parse == 0 || parse == EOF ) {
+    msgOutif(MSG__VERB," ",
+	     "Couldn't convert seeing time, continuing anyway.", status);
     strcpy ( seeDatSt, "" );
   } else {
     
@@ -377,7 +346,7 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   /* Get the JOS_MIN (1 for raster, for sample this is the number
      of STEPTIME integrations coadded into a single spectrum. */
   if ( strcmp ( samMode, "sample" ) == 0 )
-    josMin = gsdVars->noScans;
+    josMin = gsdVars->nScan;
   else
     josMin = 1;//k
 

@@ -54,6 +54,8 @@
 *        Fill KeyMaps and call atlWcspx
 *     2008-02-28 (JB):
 *        Replace subsysNum with subBandNum
+*     2008-03-04 (JB):
+*        Use updated version of atlWcspx.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -269,9 +271,32 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   /* Fill the keymaps from the input GSD. */
   astMapPut0I( datePointing, "JFREST(1)", 
-               gsdVars->restFreqs[subBandNum], "" );
-  astMapPut0D( datePointing, "RA_DEC(1)", gsdVars->centreRA1950, "" );
-  astMapPut0D( datePointing, "RA_DEC(2)", gsdVars->centreDec1950, "" );
+               gsdVars->restFreqs[subBandNum]*1000000.0, "" );
+
+  /* Check CENTRE_CODE (for now...). */
+  switch ( gsdVars->centreCode ) {
+    case COORD_AZ:
+      astMapPut0D( datePointing, "RA_DEC(1)", gsdVars->centreAz, "" );
+      astMapPut0D( datePointing, "RA_DEC(2)", gsdVars->centreEl, "" ); 
+      break;
+    case COORD_RD:
+      astMapPut0D( datePointing, "RA_DEC(1)", gsdVars->centreRA, "" );
+      astMapPut0D( datePointing, "RA_DEC(2)", gsdVars->centreDec, "" ); 
+      break;
+    case COORD_RB:
+      astMapPut0D( datePointing, "RA_DEC(1)", gsdVars->centreRA1950, "" );
+      astMapPut0D( datePointing, "RA_DEC(2)", gsdVars->centreDec1950, "" ); 
+      break;
+    case COORD_RJ:
+      astMapPut0D( datePointing, "RA_DEC(1)", gsdVars->centreRA2000, "" );
+      astMapPut0D( datePointing, "RA_DEC(2)", gsdVars->centreDec2000, "" ); 
+      break;
+    case COORD_GA:
+      astMapPut0D( datePointing, "RA_DEC(1)", gsdVars->centreGL, "" );
+      astMapPut0D( datePointing, "RA_DEC(2)", gsdVars->centreGB, "" ); 
+      break;
+  }            
+
   astMapPut0I( datePointing, "DPOS(1)", dPos[0], "" );
   astMapPut0I( datePointing, "DPOS(2)", dPos[1], "" );
   astMapPut0C( datePointing, "IDATE", iDate, "" );
@@ -282,25 +307,34 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
     astMapPut0D( datePointing, "V_SETL(4)", 0, "" );
   else
     astMapPut0D( datePointing, "V_SETL(4)", gsdVars->velocity, "" );
-
   astMapPut0I( datePointing, "JFCEN(1)", 
-               gsdVars->centreFreqs[subBandNum], "" ); 
+               gsdVars->centreFreqs[subBandNum]*1000000.0, "" ); 
   astMapPut0I( datePointing, "JFINC(1)", 
-               gsdVars->freqRes[subBandNum], "" );
+               gsdVars->freqRes[subBandNum]*1000000.0, "" );
   astMapPut0I( datePointing, "IFFREQ(1)", 
                gsdVars->totIFs[subBandNum], "" );
-  astMapPut0I( datePointing, "CELLCODE", gsdVars->cellCode, "" );
+  astMapPut0I( datePointing, "CENTRECODE", gsdVars->centreCode, "" );
+
   astMapPut0D( cellMap, "CELLSIZE(1)", gsdVars->cellX, "" );
   astMapPut0D( cellMap, "CELLSIZE(2)", gsdVars->cellY, "" );
   astMapPut0D( cellMap, "POSANGLE", gsdVars->cellV2Y, "" );
+  astMapPut0I( cellMap, "CELLCODE", gsdVars->cellCode, "" );
 
   /* Get the dimensions of the data array. */
   dataDims[0] = gsdVars->nMapPtsX;
   dataDims[1] = gsdVars->nMapPtsY;
   dataDims[2] = gsdVars->nBEChansOut;
 
+  /* Get a frameset describing the mapping from cell to sky. */
   atlWcspx ( datePointing, cellMap, dataDims, gsdVars->telLongitude * -1.0, 
              gsdVars->telLatitude, &frame, status );
+
+  if ( *status != SAI__OK ) {
+    *status = SAI__ERROR;
+    errRep ( FUNC_NAME, "Couldn't create FrameSet for grid map", 
+             status );
+    return; 
+  }
 
   wcs->airmass = 0.0;//k
   wcs->acAz = 0.0;//k
@@ -310,6 +344,8 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   wcs->azAng = 0.0;
   wcs->baseAz = 0.0;//k
   wcs->baseEl = 0.0;//k 
+
+  astAnnul( frame );
 
   /* Get the index into the observing area.  For rasters, this is
      the row number (incremented on new rows) and for grids it is

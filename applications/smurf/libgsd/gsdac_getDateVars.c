@@ -47,6 +47,8 @@
 *        Replace subsysNum with subBandNum
 *     2008-02-28 (JB):
 *        Use dateVars struct
+*     2008-03-04 (JB):
+*        Use number of scans actually completed.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -168,8 +170,9 @@ void gsdac_getDateVars ( const gsdVars *gsdVars, const char *backend,
             backend, obsNum, year, month, day, hour, min, (int)sec );
 
   /* Get the DATE-END. This will be DATE-OBS + ( last LST - first LST ). */ 
-  tableSize = gsdVars->nScanVars1 * gsdVars->noScans;
+  tableSize = gsdVars->nScanVars1 * gsdVars->nScan;
   tableDims = gsdVars->nScanVars1;
+
   utcEnd = utcStart + ( gsdVars->scanTable1[tableSize-tableDims] - 
                         gsdVars->scanTable1[0] ) 
                          / 24.0;
