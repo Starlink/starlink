@@ -108,6 +108,8 @@
 *     4-MAR-2008 (DSB):
 *        Do not use uninitialised parts of the string returned by 
 *        AST_MAPGET0C.
+*     5-MAR-2008 (DSB):
+*        SPECX supplied tinme and date appear to be UTC rather than UT1.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -165,8 +167,8 @@
       CHARACTER SIDEBAND*3   ! USB or LSB?
       CHARACTER SOR*10       ! Value for StdOfRest attribute
       CHARACTER SYS*10       ! Value for System attribute
-      CHARACTER UTDATE*15    ! UT date of the observation
-      CHARACTER UTIME*15     ! UT time of the observation
+      CHARACTER UTDATE*15    ! UTC date of the observation
+      CHARACTER UTIME*15     ! UTC time of the observation
       DOUBLE PRECISION CD1   ! RA pixel size
       DOUBLE PRECISION CD2   ! DEC pixel size
       DOUBLE PRECISION CD3   ! Frequency pixel size
@@ -207,8 +209,8 @@
       INTEGER SPCFRM         ! Pointer to AST SpecFrame
       INTEGER TDBFRM         ! TimeFrame describing the TDB timescale
       INTEGER TPFRM          ! SpecFrame describing Topocentric rest frame
-      INTEGER TIMEFS         ! FrameSet connecting TDB abd UT1 timescales
-      INTEGER UT1FRM         ! TimeFrame describing the UT1 timescale
+      INTEGER TIMEFS         ! FrameSet connecting TDB abd UTC timescales
+      INTEGER UTCFRM         ! TimeFrame describing the UTC timescale
       INTEGER YEAR           ! Year 
       LOGICAL ISDSB          ! Is this a double sideband observation?
       REAL DAYS              ! Time of observation as fraction of a day
@@ -322,20 +324,19 @@
 *  Add the fractional day onto the Modified Julian Date.
       MJD = MJD + DAYS
 
-*  We need to convert this MJD from UT1 (used by specx) to TDB (used by
-*  AST). Create two TimeFrames describing these two time systems. SPECX
-*  does not seem to store a DUT1 value, so the default of zero will be used.
-      UT1FRM = AST_TIMEFRAME( 'TimeScale=UT1', STATUS )
-      CALL AST_SETD( UT1FRM, 'ObsLon', OBSLON/D2R, STATUS )
-      CALL AST_SETD( UT1FRM, 'ObsLat', OBSLAT/D2R, STATUS )
+*  We need to convert this MJD from UTC (used by specx) to TDB (used by
+*  AST). Create two TimeFrames describing these two time systems. 
+      UTCFRM = AST_TIMEFRAME( 'TimeScale=UTC', STATUS )
+      CALL AST_SETD( UTCFRM, 'ObsLon', OBSLON/D2R, STATUS )
+      CALL AST_SETD( UTCFRM, 'ObsLat', OBSLAT/D2R, STATUS )
 
       TDBFRM = AST_TIMEFRAME( 'TimeScale=TDB', STATUS )
       CALL AST_SETD( TDBFRM, 'ObsLon', OBSLON/D2R, STATUS )
       CALL AST_SETD( TDBFRM, 'ObsLat', OBSLAT/D2R, STATUS )
 
-*  Get a Mapping that converts from UT1 to TDB, and use it to transform
+*  Get a Mapping that converts from UTC to TDB, and use it to transform
 *  the epoch value.
-      TIMEFS = AST_CONVERT( UT1FRM, TDBFRM, ' ', STATUS )
+      TIMEFS = AST_CONVERT( UTCFRM, TDBFRM, ' ', STATUS )
       CALL AST_TRAN1( TIMEFS, 1, MJD, .TRUE., MJD, STATUS )
 
 *  Format the TDB MJD into a form suitable for use with AST_SETC.
