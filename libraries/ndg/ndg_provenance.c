@@ -1656,9 +1656,11 @@ static void ndg1Disown( Prov *parent, Prov *child, int *status ){
       }
    }
 
+/* Nullify the trailing elements of the array that are no longer used. */
+   for( i = j; i < child->nparent; i++ ) child->parents[ j ] = NULL;
+
 /* Reduce the number of parents. */
    child->nparent = j;
-   child->parents[ j ] = NULL;
 
 /* NULLify all occurrences of the supplied child within the list of 
    children stored in the supplied parent. */
@@ -1675,9 +1677,11 @@ static void ndg1Disown( Prov *parent, Prov *child, int *status ){
       }
    }
 
+/* Nullify the trailing elements of the array that are no longer used. */
+   for( i = j; i < parent->nchild; i++ ) parent->children[ j ] = NULL;
+
 /* Reduce the number of children. */
    parent->nchild = j;
-   parent->children[ j ] = NULL;
 
 }
 
@@ -2641,27 +2645,28 @@ static void ndg1PurgeProvenance( Provenance *provenance,
    the same NDF. */
          for( j = i + 1; j < provenance->nprov; j++ ) {
             prov2 = provenance->provs[ j ];
-            keep = ndg1TheSame( prov1, prov2, status );
-            if( prov2 && keep ) {
+            if( prov2 ) {
+               keep = ndg1TheSame( prov1, prov2, status );
+               if( keep ) {
 
 /* If the two provenance structures refer to the same NDF, break the
    parent-child link for the poorer Prov and register the better Prov with
    the parent in place of the poorer Prov. The better Prov is the one
    that contains most information. */
-               if( keep == 1 ) {
-                  better = prov1;
-                  poorer = prov2;
-               } else {
-                  better = prov2;
-                  poorer = prov1;
+                  if( keep == 1 ) {
+                     better = prov1;
+                     poorer = prov2;
+                  } else {
+                     better = prov2;
+                     poorer = prov1;
+                  }
+   
+                  for( ichild = 0; ichild < poorer->nchild; ichild++ ) {
+                     child = poorer->children[ ichild ];
+                     ndg1Disown( poorer, child, status );
+                     ndg1ParentChild( better, child, status );
+                  }
                }
-
-               for( ichild = 0; ichild < poorer->nchild; ichild++ ) {
-                  child = poorer->children[ ichild ];
-                  ndg1Disown( poorer, child, status );
-                  ndg1ParentChild( better, child, status );
-               }
-
             }
          }
       }
