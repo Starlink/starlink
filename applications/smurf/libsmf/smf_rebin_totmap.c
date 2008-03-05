@@ -116,7 +116,6 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
    const char *system;         /* Coordinate system */
    double a;                   /* Longitude value */
    double b;                   /* Latitude value */
-   int ibasein;                /* Index of base Frame in input WCS FrameSet */
    smfHead *hdr = NULL;        /* Pointer to data header for this time slice */
 
    static int have_azel = 0;   /* Is input sky system an azel system ? */

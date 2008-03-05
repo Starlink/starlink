@@ -777,7 +777,8 @@ void smf_resampcube( smfData *data, int index, int size,
                      AstFrame *ispecfrm, AstMapping *ispecmap, 
                      Grp *detgrp, int moving, int slbnd[ 3 ], 
                      int subnd[ 3 ], int interp, const double params[], 
-                     float *in_data, float *out_data, int *status );
+                     float *in_data, float *out_data, int *overlap, 
+                     int *status );
 
 
 void smf_resampcube_copy( dim_t nchan, dim_t nsky, int *spectab, 
@@ -789,7 +790,7 @@ void smf_resampcube_nn( smfData *data, int index, int size, dim_t nchan,
                    dim_t nsky, dim_t dim[3], AstMapping *ssmap, 
                    AstSkyFrame *abskyfrm, AstMapping *iskymap, 
                    Grp *detgrp, int moving, float *in_data, 
-                   float *out_data, int *status );
+                   float *out_data, int *overlap, int *status );
 
 void smf_resampcube_ast( smfData *data, int index, int size, dim_t nchan,
                          dim_t ndet, dim_t nslice, dim_t nel, dim_t nxy, 

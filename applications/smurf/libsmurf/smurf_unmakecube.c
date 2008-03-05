@@ -29,12 +29,12 @@
 
 *  Description:
 *     This routine creates one or more time series cubes, spanned by
-*     (frequency, detector number, time) axes, from a single input sky
-*     cube spanned by (celestial longitude, celestial latitude, spectrum) 
+*     (frequency, detector number, time) axes, from one or more input sky
+*     cubes spanned by (celestial longitude, celestial latitude, spectrum) 
 *     axes. Thus, it performs a sort of inverse to the MAKECUBE application.
 *
 *     The output time series detector samples are created by interpolating the
-*     supplied input sky cube at the position of the reference time series 
+*     supplied input sky cubes at the position of the reference time series 
 *     sample centre. Various interpolation methods can be used (see parameter 
 *     INTERP).
 *
@@ -48,7 +48,12 @@
 *          will be included in the output time series cubes. If a null (!) 
 *          value is supplied, data for all detectors will be created. [!]
 *     IN = NDF (Read)
-*          The input (ra,dec,spectrum) sky cube.
+*          A group of input (ra,dec,spectrum) sky cubes (for instance, a
+*          set of tiles produced by MAKECUBE). If these sky cubes have
+*          any spatial overlap, then the output time series data will be
+*          derived from the last supplied sky cube that covers the overlap
+*          region. That is, sky cubes near the end of the supplied group
+*          take precedence over those near the start.
 *     INTERP = LITERAL (Read)
 *          The method to use when resampling the input sky cube pixel values. 
 *          For details of these schemes, see the descriptions of routines 
@@ -132,6 +137,8 @@
 *  History:
 *     23-JAN-2008 (DSB):
 *        Original version.
+*     5-MAR-2008 (DSB):
+*        Allow multiple sky cubes to be supplied.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -190,38 +197,50 @@
 #define TASK_NAME "UNMAKECUBE"
 #define LEN__METHOD 20
 
+/* Data types used locally within this file. */
+
+typedef struct SkyCube {
+   AstFrame *ispecfrm;      /* SpecFrame from the input WCS Frameset */
+   AstMapping *iskymap;     /* GRID->SkyFrame Mapping from input WCS */
+   AstMapping *ispecmap;    /* GRID->SpecFrame Mapping from input WCS */
+   AstSkyFrame *abskyfrm;   /* Input SkyFrame (always absolute) */
+   int indf;                /* Input cube NDF identifier */
+   int moving;              /* Is the telescope base position changing? */
+   int slbnd[3];            /* Array of lower bounds of input cube */
+   int subnd[3];            /* Array of lower bounds of input cube */
+} SkyCube;
+
+
 void smurf_unmakecube( int *status ) {
 
 /* Local Variables */
-   AstFrame *ispecfrm = NULL;   /* SpecFrame from the input WCS Frameset */
    AstFrame *tfrm = NULL;       /* Current Frame from input WCS */
    AstFrameSet *wcsin = NULL;   /* WCS Frameset for input cube */
-   AstMapping *iskymap = NULL;  /* GRID->SkyFrame Mapping from input WCS */
-   AstMapping *ispecmap = NULL; /* GRID->SpecFrame Mapping from input WCS */
    AstMapping *tmap = NULL;     /* Base->current Mapping from input WCS */
-   AstSkyFrame *abskyfrm = NULL;/* Input SkyFrame (always absolute) */
    AstSkyFrame *iskyfrm = NULL; /* SkyFrame from the input WCS Frameset */
    Grp *detgrp = NULL;        /* Group of detector names */
-   Grp *igrp = NULL;          /* Group of input files */
+   Grp *igrp1 = NULL;         /* Group of input sky cube files */
+   Grp *igrp2 = NULL;         /* Group of input template files */
    Grp *ogrp = NULL;          /* Group containing output file */
+   SkyCube *sky_cubes = NULL; /* Pointer to array of sky cube descriptions */
+   SkyCube *skycube = NULL;   /* Pointer to next sky cube description */
    char *pname = NULL;        /* Name of currently opened data file */
    char pabuf[ 10 ];          /* Text buffer for parameter value */
    double params[ 4 ];        /* astResample parameters */
-   int slbnd[3];              /* Array of lower bounds of input cube */
-   int subnd[3];              /* Array of lower bounds of input cube */
    int axes[ 2 ];             /* Indices of selected axes */
    int blank;                 /* Was a blank line just output? */
+   int flag;                  /* Was the group expression flagged? */
    int ifile;                 /* Input file index */
    int interp = 0;            /* Pixel interpolation method */
-   int moving;                /* Is the telescope base position changing? */
+   int iskycube;              /* Index of current sky cube */
    int ndet;                  /* Number of detectors supplied for "DETECTORS" */
    int nel;                   /* Number of elements in 3D array */
    int nparam = 0;            /* No. of parameters required for interpolation scheme */
-   int indf;                  /* Input cube NDF identifier */
+   int nskycube;              /* Number of supplied sky cubes */
    int ondf;                  /* Output time series NDF identifier */
-   int flag;                  /* Was the group expression flagged? */
    int outax[ 2 ];            /* Indices of corresponding output axes */
    int outsize;               /* Number of files in output group */
+   int overlap;               /* Does time series overlap sky cube? */
    int sdim[3];               /* Array of significant pixel axes */
    int size;                  /* Number of files in input group */
    int usedetpos;             /* Should the detpos array be used? */
@@ -245,17 +264,64 @@ void smurf_unmakecube( int *status ) {
 /* Begin an NDF context. */
    ndfBegin();
 
-/* Get an identifier for the input (ra,dec,spectrum) cube. We use NDG 
-   (via kpg1_Rgndf) instead of calling ndfAssoc directly since NDF/HDS 
-   has problems with file names containing spaces, which NDG does not 
-   have. */
-   kpg1Rgndf( "IN", 1, 1, "", &igrp, &size, status );
-   ndgNdfas( igrp, 1, "READ", &indf, status );
-   grpDelet( &igrp, status );
+/* Get a group holding the input sky cubes. */
+   kpg1Rgndf( "IN", 0, 1, "", &igrp1, &nskycube, status );
 
-/* Get a group of reference time series files to use as templates for 
-   the output time series files.*/ 
-   ndgAssoc( "REF", 1, &igrp, &size, &flag, status );
+/* Create an array of structures to hold information about each input sky
+   cube. */
+   sky_cubes = astMalloc( sizeof( SkyCube )*(size_t) nskycube );
+
+/* Store a description of each sky cube. */
+   if( sky_cubes ) {
+      for( iskycube = 0; iskycube < nskycube; iskycube++ ) {
+         skycube = sky_cubes + iskycube;
+
+/* Get an NDF identifier for the next sky cube. */
+         ndgNdfas( igrp1, iskycube + 1, "READ", &(skycube->indf), status );
+
+/* Get the WCS FrameSet from the sky cube, together with its pixel index 
+   bounds. */
+         kpg1Asget( skycube->indf, 3, 0, 1, 1, sdim, skycube->slbnd, 
+                    skycube->subnd, &wcsin, status );
+
+/* Get the base->current Mapping from the input WCS FrameSet, and split it 
+   into two Mappings; one (iskymap) that maps the first 2 GRID axes into 
+   celestial sky coordinates, and one (ispecmap) that maps the third GRID
+   axis into a spectral coordinate. Also extract the SpecFrame and
+   SkyFrame from the current Frame. */
+         tmap = astGetMapping( wcsin, AST__BASE, AST__CURRENT );
+         tfrm = astGetFrame( wcsin, AST__CURRENT );
+      
+         axes[ 0 ] = 1;
+         axes[ 1 ] = 2;
+         astMapSplit( tmap, 2, axes, outax, &(skycube->iskymap) );
+         iskyfrm = astPickAxes( tfrm, 2, outax, NULL );
+      
+         axes[ 0 ] = 3;
+         astMapSplit( tmap, 1, axes, outax, &(skycube->ispecmap) );
+         skycube->ispecfrm = astPickAxes( tfrm, 1, outax, NULL );
+
+/* Create a copy of "iskyfrm" representing absolute coords rather than 
+   offsets. We assume the target is moving if the cube represents offsets. */
+         skycube->abskyfrm = astCopy( iskyfrm );
+         astClear( skycube->abskyfrm, "SkyRefIs" );
+         skycube->moving = ( *status == SAI__OK && 
+                             !strcmp( astGetC( iskyfrm, "SkyRefIs" ),
+                                      "Origin" ) ) ? 1 : 0;
+
+/* Invert the Mappings (for the convenience of smf_resamplecube), so 
+   that they go from current Frame to grid axis. */
+         astInvert( skycube->ispecmap );
+         astInvert( skycube->iskymap );
+
+/* For efficiency, annul manually the unneeded AST objects created in 
+   this loop. */
+         wcsin = astAnnul( wcsin );
+         tmap = astAnnul( tmap );
+         tfrm = astAnnul( tfrm );
+         iskyfrm = astAnnul( iskyfrm );
+      }
+   }
 
 /* See if the detector positions are to be read from the RECEPPOS array
    in the template NDFs. Otherwise, they are calculated on the basis of 
@@ -325,44 +391,12 @@ void smurf_unmakecube( int *status ) {
 /* Get an additional parameter vector if required. */
    if( nparam > 0 ) parExacd( "PARAMS", nparam, params, status );
 
-/* Get the WCS FrameSet from the (ra,dec,spectrum) cube, together with 
-   its bounds. */
-   kpg1Asget( indf, 3, 0, 1, 1, sdim, slbnd, subnd, &wcsin, status );
+/* Get a group of reference time series files to use as templates for 
+   the output time series files.*/ 
+   ndgAssoc( "REF", 1, &igrp2, &size, &flag, status );
 
-/* Get the base->current Mapping from the input WCS FrameSet, and split it 
-   into two Mappings; one (iskymap) that maps the first 2 GRID axes into 
-   celestial sky coordinates, and one (ispecmap) that maps the third GRID
-   axis into a spectral coordinate. Also extract the SpecFrame and
-   SkyFrame from the current Frame. */
-   tmap = astGetMapping( wcsin, AST__BASE, AST__CURRENT );
-   tfrm = astGetFrame( wcsin, AST__CURRENT );
-
-   axes[ 0 ] = 1;
-   axes[ 1 ] = 2;
-   astMapSplit( tmap, 2, axes, outax, &iskymap );
-   iskyfrm = astPickAxes( tfrm, 2, outax, NULL );
-
-   axes[ 0 ] = 3;
-   astMapSplit( tmap, 1, axes, outax, &ispecmap );
-   ispecfrm = astPickAxes( tfrm, 1, outax, NULL );
-
-/* Create a copy of "iskyfrm" representing absolute coords rather than 
-   offsets. We assume the target is moving if the cube represents offsets. */
-   abskyfrm = astCopy( iskyfrm );
-   astClear( abskyfrm, "SkyRefIs" );
-   moving = ( *status == SAI__OK && !strcmp( astGetC( iskyfrm, "SkyRefIs" ),
-                                             "Origin" ) ) ? 1 : 0;
-
-/* Invert the Mappings (for the convenience of smf_resamplecube), so 
-   that they go from current Frame to grid axis. */
-   astInvert( ispecmap );
-   astInvert( iskymap );
-
-/* Map the data array in the cube. */
-   ndfMap( indf, "DATA", "_REAL", "READ", &in_data, &nel, status );
-
-/* Create a group holding the names of the output NDFs. */
-   ndgCreat ( "OUT", igrp, &ogrp, &outsize, &flag, status );
+/* Create a group holding the names of the corresponding output NDFs. */
+   ndgCreat ( "OUT", igrp2, &ogrp, &outsize, &flag, status );
    if( outsize != size && *status == SAI__OK ) {
       *status = SAI__ERROR;
       msgSeti( "O", outsize );
@@ -379,7 +413,7 @@ void smurf_unmakecube( int *status ) {
 
 /* Obtain information about the current template NDF, but do not map the
    arrays. */
-      smf_open_file( igrp, ifile, "READ", SMF__NOCREATE_DATA, &data, status );
+      smf_open_file( igrp2, ifile, "READ", SMF__NOCREATE_DATA, &data, status );
 
 /* Issue a suitable message and abort if anything went wrong. */
       if( *status != SAI__OK ) {
@@ -407,8 +441,7 @@ void smurf_unmakecube( int *status ) {
       msgSetc( "FILE", pname );
       msgSeti( "THISFILE", ifile );
       msgSeti( "NUMFILES", size );
-      msgOutif( MSG__VERB, " ", 
-                "SMURF_UNMAKECUBE: Simulating ^THISFILE/^NUMFILES ^FILE",
+      msgOutif( MSG__NORM, " ", "Simulating ^THISFILE/^NUMFILES ^FILE",
                 status );
 
 /* Create the output NDF by propagation from the input template NDF.
@@ -421,13 +454,7 @@ void smurf_unmakecube( int *status ) {
       ndfHcre( ondf, status );
 
 /* Get a pointer to the mapped output data array. */
-      ndfMap( ondf, "DATA", "_REAL", "WRITE", &out_data, &nel, status );
-
-/* Record details of the input cube and template in the provenance
-   extension of the output time series. */
-      ndgPtprv( ondf, data->file->ndfid, NULL, 0, "SMURF:UNMAKECUBE",
-                status );
-      ndgPtprv( ondf, indf, NULL, 0, "SMURF:UNMAKECUBE", status );
+      ndfMap( ondf, "DATA", "_REAL", "WRITE/BAD", &out_data, &nel, status );
 
 /* If the detector positions are to calculated on the basis of FPLANEX/Y
    rather than detpos, then free the detpos array in the templates smfHead
@@ -436,13 +463,52 @@ void smurf_unmakecube( int *status ) {
          smf_free( (double *) data->hdr->detpos, status );      
          data->hdr->detpos = NULL;
       }
-   
-/* Resample the cube data into the output time series. */
-      smf_resampcube( data, ifile, size, abskyfrm, iskymap, ispecfrm, 
-                      ispecmap, detgrp, moving, slbnd, subnd, interp, 
-                      params, in_data, out_data, status );
 
-/* Close the input files. */
+/* Record details of the template in the provenance extension of the 
+   output time series. */
+      ndgPtprv( ondf, data->file->ndfid, NULL, 0, "SMURF:UNMAKECUBE",
+                status );
+
+/* Loop round all input sky cubes. */
+      for( iskycube = 0; iskycube < nskycube; iskycube++ ) {
+         skycube = sky_cubes + iskycube;
+
+/* Record details of the input cube in the provenance extension of the 
+   output time series. */
+         ndgPtprv( ondf, skycube->indf, NULL, 0, "SMURF:UNMAKECUBE", 
+                   status );
+
+/* See if the current time series overlaps the current sky cube. */
+         smf_resampcube( data, ifile, size, skycube->abskyfrm, 
+                         skycube->iskymap, skycube->ispecfrm, 
+                         skycube->ispecmap, detgrp, skycube->moving, 
+                         skycube->slbnd, skycube->subnd, interp, 
+                         params, NULL, NULL, &overlap, status );
+
+/* If not, pass on to the next sky cube. */
+         if( overlap ) {
+
+/* Report the name of the sky cube. */
+            ndfMsg( "NDF", skycube->indf );
+            msgOutif( MSG__NORM, " ", "   Re-sampling ^NDF", status );
+
+/* Map the data array in the current sky cube. */
+            ndfMap( skycube->indf, "DATA", "_REAL", "READ", &in_data, &nel, 
+                    status );
+
+/* Resample the cube data into the output time series. */
+            smf_resampcube( data, ifile, size, skycube->abskyfrm, 
+                            skycube->iskymap, skycube->ispecfrm, 
+                            skycube->ispecmap, detgrp, skycube->moving, 
+                            skycube->slbnd, skycube->subnd, interp, 
+                            params, in_data, out_data, &overlap, status );
+
+/* Unmap the data array. */
+            ndfUnmap( skycube->indf, "DATA", status );
+         }            
+      }
+
+/* Close the input time series file. */
       if( data != NULL ) {
          smf_close_file( &data, status );
          data = NULL;
@@ -461,8 +527,10 @@ void smurf_unmakecube( int *status ) {
 
 /* Free remaining resources. */  
    if( detgrp != NULL) grpDelet( &detgrp, status);
-   if( igrp != NULL) grpDelet( &igrp, status);
+   if( igrp1 != NULL) grpDelet( &igrp1, status);
+   if( igrp2 != NULL) grpDelet( &igrp2, status);
    if( ogrp != NULL) grpDelet( &ogrp, status);
+   sky_cubes = astFree( sky_cubes );
 
 /* End the NDF context. */
    ndfEnd( status );

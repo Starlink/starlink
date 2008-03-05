@@ -18,7 +18,8 @@
 *                     AstFrame *ispecfrm, AstMapping *ispecmap, 
 *                     Grp *detgrp, int moving, int slbnd[ 3 ], 
 *                     int subnd[ 3 ], int interp, const double params[], 
-*                     float *in_data, float *out_data, int *status );
+*                     float *in_data, float *out_data, int *overlap,
+*                     int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
@@ -65,9 +66,15 @@
 *        additional parameters are required, this array is not used and a
 *        NULL pointer may be given. 
 *     in_data = float * (Given)
-*        The 3D data array for the input sky cube.
+*        The 3D data array for the input sky cube. If a NULL pointer is
+*        supplied, then "out_data" and "interp" are ignored, but the 
+*        "overlap" value is still returned.
 *     out_data = float * (Returned)
-*        The 3D data array for the output time series array.
+*        The 3D data array for the output time series array. Ignored if
+*        "in_data" is NULL.
+*     overlap = int * (Returned)
+*        Returned non-zero if any spectra in the template fall within the
+*        bounds of the skycube. 
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
@@ -131,7 +138,8 @@ void smf_resampcube( smfData *data, int index, int size,
                      AstFrame *ispecfrm, AstMapping *ispecmap, 
                      Grp *detgrp, int moving, int slbnd[ 3 ], 
                      int subnd[ 3 ], int interp, const double params[], 
-                     float *in_data, float *out_data, int *status ){
+                     float *in_data, float *out_data, int *overlap,
+                     int *status ){
 
 /* Local Variables */
    AstCmpMap *ssmap = NULL;    /* Input GRID->output GRID Mapping for spectral axis */
@@ -240,14 +248,15 @@ void smf_resampcube( smfData *data, int index, int size,
    were not found in the data. If the supplied group holds the detectors
    to be excluded, modify it so that it holds the detectors to be
    included. */
-      smf_checkdets( detgrp, data, status );
+   smf_checkdets( detgrp, data, status );
 
 /* If we are using nearest neighbour resampling, we can use specialist
-   code that is faster than AST. */
-   if( interp == AST__NEAREST ) {
+   code that is faster than AST. We also use this code if we are just
+   checking if the time series and sky cube have any overlap. */
+   if( interp == AST__NEAREST || ! in_data ) {
       smf_resampcube_nn( data, index, size, nchan, ndet, nslice, nel, nxy, 
                          nout, dim, (AstMapping *) ssmap, abskyfrm, iskymap, 
-                         detgrp, moving, in_data, out_data, status );
+                         detgrp, moving, in_data, out_data, overlap, status );
 
 /* For all other interpolation schemes, we use AST. */
    } else {

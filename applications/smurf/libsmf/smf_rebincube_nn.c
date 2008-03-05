@@ -377,14 +377,16 @@ void smf_rebincube_nn( smfData *data, int first, int last,
    subsequent functions. */
       totmap = smf_rebin_totmap( data, itime, abskyfrm, oskymap, moving, 
 				 status );
-      if( !totmap ) break;
+      if( !totmap ) {
+         astEnd;
+         break;
+      }
 
 /* Get the effective exposure time, the total exposure time, and the
    Tsys->Variance onversion factor for this time slice. Also get a
    pointer to the start of the Tsys array. */
       tsys = smf_rebincube_tcon( hdr, itime, fcon, &texp, &teff, &tcon, 
                                  status );
-
 
 /* Use this Mapping to get the output spatial grid coords for each input 
    detector. */
@@ -443,7 +445,6 @@ void smf_rebincube_nn( smfData *data, int first, int last,
    of the input spectrum data and paste it into the output cube using 
    either the 2D or 3D algorithm. */
                if( !ignore ) {
-
                   ddata = tdata + idet*nchan;
                   naccept_old = *naccept;
 

@@ -19,7 +19,7 @@
 *                             dim_t nsky, dim_t dim[3], AstMapping *ssmap, 
 *                             AstSkyFrame *abskyfrm, AstMapping *iskymap, 
 *                             Grp *detgrp, int moving, float *in_data, 
-*                             float *out_data, int *status );
+*                             float *out_data, int overlap, int *status );
 
 *  Arguments:
 *     data = smfData * (Given)
@@ -62,9 +62,15 @@
 *        TCS_AZ_BC1/2 is mapped on to the same pixel position in the
 *        sky cube.
 *     in_data = float * (Given)
-*        The 3D data array for the input sky cube.
+*        The 3D data array for the input sky cube. If a NULL pointer is
+*        supplied, then "out_data" is ignored, but the "overlap" value is 
+*        still returned.
 *     out_data = float * (Returned)
-*        The 3D data array for the output time series array.
+*        The 3D data array for the output time series array. Ignored if
+*        "in_data" is NULL.
+*     overlap = int * (Returned)
+*        Returned non-zero if any spectra in the template fall within the
+*        bounds of the skycube. 
 *     status = int * (Given and Returned)
 *        Pointer to the inherited status.
 
@@ -83,6 +89,8 @@
 *  History:
 *     25-JAN-2008 (DSB):
 *        Initial version.
+*     5-MAR-2008 (DSB):
+*        Added overlap argument.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -131,7 +139,7 @@ void smf_resampcube_nn( smfData *data, int index, int size, dim_t nchan,
                         dim_t nsky, dim_t dim[3], AstMapping *ssmap, 
                         AstSkyFrame *abskyfrm, AstMapping *iskymap, 
                         Grp *detgrp, int moving, float *in_data, 
-                        float *out_data, int *status ){
+                        float *out_data, int *overlap, int *status ){
 
 /* Local Variables */
    AstMapping *totmap = NULL;  /* WCS->GRID Mapping from template WCS FrameSet */
@@ -144,15 +152,16 @@ void smf_resampcube_nn( smfData *data, int index, int size, dim_t nchan,
    float *ddata = NULL;        /* Pointer to start of output detector data */
    float *tdata = NULL;        /* Pointer to start of sky cube time slice data */
    int *spectab = NULL;        /* Template->sky cube channel number conversion table */
-   int detok;                  /* Did the detector receive any data? */
    int found;                  /* Was current detector name found in detgrp? */
    int gxsky;                  /* Sky cube X grid index */
    int gysky;                  /* Sky cube Y grid index */
-   int ichan;                  /* Output channel index */
    int idet;                   /* Detector index */
    int itime;                  /* Index of current time slice */
    int iv0;                    /* Offset for pixel in 1st sky cube spectral channel */
    smfHead *hdr = NULL;        /* Pointer to data header for this time slice */
+
+/* Initialise */
+   *overlap = 0;
 
 /* Check the inherited status. */
    if( *status != SAI__OK ) return;
@@ -203,7 +212,7 @@ void smf_resampcube_nn( smfData *data, int index, int size, dim_t nchan,
    for( itime = 0; itime < nslice && *status == SAI__OK; itime++ ) {
 
 /* Store a pointer to the first output data value in this time slice. */
-      tdata = out_data + itime*timeslice_size;
+      tdata = in_data ? ( out_data + itime*timeslice_size ) : NULL;
 
 /* Begin an AST context. Having this context within the time slice loop
    helps keep the number of AST objects in use to a minimum. */
@@ -216,7 +225,10 @@ void smf_resampcube_nn( smfData *data, int index, int size, dim_t nchan,
    subsequent functions. */
       totmap = smf_rebin_totmap( data, itime, abskyfrm, iskymap, moving, 
 				 status );
-      if( !totmap ) break;
+      if( !totmap ) {
+         astEnd;
+         break;
+      }
 
 /* Use this Mapping to get the sky cube spatial grid coords for each
    template detector. */
@@ -230,7 +242,6 @@ void smf_resampcube_nn( smfData *data, int index, int size, dim_t nchan,
          ddata = tdata + idet*nchan;
 
 /* Check the detector has a valid position in sky cube grid coords */
-         detok = 0;
          if( detxskycube[ idet ] != AST__BAD && detyskycube[ idet ] != AST__BAD ){
 
 /* Find the closest sky cube pixel and check it is within the bounds of the
@@ -244,25 +255,24 @@ void smf_resampcube_nn( smfData *data, int index, int size, dim_t nchan,
    pixel in the first spectral channel. */
                iv0 = ( gysky - 1 )*dim[ 0 ] + ( gxsky - 1 );
 
-/* Get a pointer to the start of the output spectrum data and copy the 
-   sky cube spectrum into it. */
-               ddata = tdata + idet*nchan;
-               smf_resampcube_copy( nchan, nsky, spectab, iv0, nxy, 
-                                    ddata, in_data, status );
-               detok = 1;
-            }
-         }
-
-/* If the detector did not receive any data, fill it with bad values. */
-         if( ! detok ) {
-            for( ichan = 0; ichan < nchan; ichan++ ) {
-               ddata[ ichan ] = VAL__BADR;
+/* Copy the sky cube spectrum into the output time series cube. */
+               *overlap = 1;
+               if( in_data ) {
+                  smf_resampcube_copy( nchan, nsky, spectab, iv0, nxy, 
+                                       ddata, in_data, status );
+               } else {
+                  break;
+               }
             }
          }
       }
 
 /* End the AST context. */
       astEnd;
+
+/* If no input data was supplied, and we have found at least one input
+   spectrum that overlaps the sky cube, we can finish early. */
+      if( !in_data && *overlap ) break;
    }
 
 /* Free non-static resources. */

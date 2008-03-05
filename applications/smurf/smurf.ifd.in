@@ -1262,7 +1262,7 @@ package @PACKAGE@ {
             vpath {PROMPT }
             ppath GLOBAL CURRENT
             association <-GLOBAL.DATA_ARRAY
-            prompt {Input (ra,dec,vel) cube}
+            prompt {Input sky cubes}
             helpkey *
           }
 
