@@ -347,7 +347,7 @@ package cupid {
             access READ
             vpath DEFAULT
             ppath CURRENT,DEFAULT
-            prompt {Process spectra indepdently of neighbouring spectra?}
+            prompt {Process spectra independently of neighbouring spectra?}
             default FALSE
             helpkey *
           }
