@@ -4,8 +4,8 @@
 *     gsdac_tranTime.c
 
 *  Purpose:
-*     Translates time from hh.fffff to SPECX standard time 
-*     format of hh:mm:ss
+*     Translates datetime from YYYY-MM-DD HH:MM:SS to SPECX standard time 
+*     format of DD-Mon-YY and hh:mm:ss
 
 *  Language:
 *     Starlink ANSI C
@@ -14,18 +14,21 @@
 *     Subroutine
 
 *  Invocation:
-*     gsdac_tranTime ( const double dTime, char *iTime, int *status )
+*     gsdac_tranTime ( const char *dTime,char *iDate,  char *iTime, 
+*                      int *status )
 
 *  Arguments:
-*     dTime = const double (Given and Returned)
-*        Time as number of form HH.fffff
+*     dTime = const char* (Given and Returned)
+*        Date and time as string YYYY-MM-DD HH:MM:SS\
+*     iDate = char* (Given and Returned)
+*        Date as string in SPECX internal format (DD-Mon-YY)
 *     iTime = char* (Given and Returned)
 *        Time as string in SPECX internal format (HH:MM:SS)
 *     status = int* (Given and Returned)
 *        Pointer to global status.  
 
 *  Description:
-*    C version of specx tran_time.f for use with gsdac_getWCS
+*    C version of specx tran_time.f & tran_date.f for use with gsdac_getWCS
 
 *  Authors:
 *     J.Balfour (UBC)
@@ -34,6 +37,8 @@
 *  History :
 *     2008-02-26 (JB):
 *        Original
+*     2008-03-06 (JB):
+*        Merge with tranDate
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -73,23 +78,31 @@
 
 #define FUNC_NAME "gsdac_tranTime.c"
 
-void gsdac_tranTime ( const double dTime, char *iTime, int *status )
+void gsdac_tranTime ( const char *dTime, char *iDate, char *iTime, 
+                      int *status )
 
 {
 
   /* Local variables */
-  float fhour;                /* hour as float */
+  
+  int day;                    /* day */
   int hour;                   /* hour */
+  int i;                      /* loop counter */
   int min;                    /* min */
+  int month;                  /* month */
+  char *months[12] = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL",
+                       "AUG", "SEP", "OCT", "NOV", "DEC" };  
   int sec;                    /* second */
+  int year;                   /* year */
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
 
-  hour = dTime;
-  fhour = dTime - hour;
-  min = 60.0 * fhour;
-  sec = 3600.0 * ( fhour - ( min / 60.0 ) );
+  sscanf( dTime, "%04d-%02d-%02d %02d:%02d:%02d", &year, &month, &day, 
+          &hour, &min, &sec );
+
+  /* Write the date string. */
+  sprintf ( iDate, "%02d-%s-%02d", day, months[month-1], year%100 );
 
   /* Write the time string. */
   sprintf ( iTime, "%02d:%02d:%02d", hour, min, sec );

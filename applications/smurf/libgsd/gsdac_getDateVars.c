@@ -143,8 +143,6 @@ void gsdac_getDateVars ( const gsdVars *gsdVars, const char *backend,
 
   utcStart = astGetD ( tFrame, "timeOrigin" );
 
-  astSet ( tFrame, "format(1)=iso.2" );
-
   tempFrame = astCopy ( tFrame );
   astClear ( tempFrame, "timeOrigin" );
   astSet ( tempFrame, "format(1)=iso.2" );

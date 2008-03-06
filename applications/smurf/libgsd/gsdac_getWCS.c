@@ -107,9 +107,11 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   /* Local variables */
   AstKeyMap *cellMap;         /* Ast KeyMap for cell description */
-  double cellV2YRad;          /* Position angle of cell y axis in radians */
-  double cellX2YRad;          /* Angle between cell y axis and x axis
+  double cellV2YRad;          /* position angle of cell y axis in radians */
+  double cellX2YRad;          /* angle between cell y axis and x axis
                                  in radians */
+  double coordIn[3];          /* input coordinates to transformation */
+  double coordOut[3];         /* output coordinates from transformation */
   int dataDims[3];            /* dimensions of data */
   AstKeyMap *datePointing;    /* Ast KeyMap for pointing and times */
   char dateString[SZFITSCARD];/* temporary string for date conversions. */
@@ -127,13 +129,15 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   double LSTStart;            /* start LST time */
   int min;                    /* minutes */
   int month;                  /* months */
-  float offsetX;              /* x offset in arcsec */
-  float offsetY;              /* y offset in arcsec */
-  float sec;                  /* seconds */
+  double offsetX;             /* x offset in arcsec */
+  double offsetY;             /* y offset in arcsec */
+  double sec;                 /* seconds */
   double TAIStart;            /* start TAI time */
   AstTimeFrame *tempFrame = NULL; /* AstTimeFrame for retrieving TAI times */
   const char *tempString;     /* temporary string */
   AstTimeFrame *tFrame = NULL;  /* AstTimeFrame for retrieving TAI times */
+  const char *UTCString;      /* UTC time as a string */
+  double UTCTime;             /* UTC time */
   int year;                   /* year */
 
   /* Check inherited status */
@@ -179,14 +183,10 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   /* Get the LST start. */
   astSet ( tempFrame, "timescale=LAST" );
-  LSTStart = astGetD ( tempFrame, "timeOrigin" );
+  LSTStart = astGetD ( tempFrame, "TimeOrigin" );
 
   /* Get the LST in hours. */
   LSTStart = ( LSTStart - (int)LSTStart ) * 24.0;
-
-  /* Get the start TAI. */
-  astSet ( tFrame, "timescale=TAI" );  
-  TAIStart = astGetD ( tFrame, "timeOrigin" );
 
   /* Figure out what coordinates we are tracking in.  Then 
      the base can be copied from the corresponding CENTRE_
@@ -233,13 +233,63 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   }
 
-  /* Create the keymaps. */
-  datePointing = astKeyMap( "" );
-  cellMap = astKeyMap( "" ); 
+  /* Get the index into the observing area.  For rasters, this is
+     the row number (incremented on new rows) and for grids it is
+     the grid offset. */
+  if ( gsdVars->obsContinuous ) {
+    wcs->index = (int)( stepNum / gsdVars->nScanPts );
+  } else {
+    wcs->index = stepNum;
+  }
 
-  /* Get the idate and itime. */
-  gsdac_tranDate ( gsdVars->obsUT1d, iDate, status );
-  gsdac_tranTime ( gsdVars->obsUT1h, iTime, status );
+  /* If this is a raster, work out the LST from the scan_time
+     and the number of map points in each scan. */
+  if ( gsdVars->obsContinuous ) {
+
+   /* Get the dLST of the start of this row. */
+    index = (int) ( stepNum / gsdVars->nScanPts );
+    dLST = ( gsdVars->scanTable1[index] - LSTStart ) / 24.0;
+
+    /* Add the integration times up to this scan point. */
+    dLST = dLST + ( ( stepNum % gsdVars->nScanPts ) *
+                    ( gsdVars->scanTime / gsdVars->nScanPts ) );
+
+  } else {
+
+    /* Get the difference between the start LST and this LST
+       and add it to the start TAI. */
+    index = stepNum * gsdVars->nScanVars1;
+    dLST = ( gsdVars->scanTable1[index] - LSTStart ) / 24.0;
+
+  }
+
+  /* Check for wrapping LST times. */
+  if ( dLST < 0 ) dLST = dLST + 1.0;
+
+  /* Get the start TAI. */
+  astSet ( tFrame, "timescale=TAI" );  
+
+  TAIStart = astGetD ( tFrame, "TimeOrigin" );
+
+  /* Correct for difference between solar and sidereal time. */
+  wcs->tai = TAIStart + ( dLST / SOLSID );
+
+  /* Get the idate and itime.  We need to convert the time for this
+     step to UTC and get the correct formatting. */
+
+  astSetD ( tFrame, "TimeOrigin", wcs->tai );
+
+  astSet ( tFrame, "timescale=UTC" );
+
+  UTCTime = astGetD ( tFrame, "TimeOrigin" );
+
+  tempFrame = astCopy ( tFrame );
+  astClear ( tempFrame, "timeOrigin" );
+
+  astSet ( tempFrame, "format(1)=iso.2" );
+  UTCString = astFormat ( tempFrame, 1, UTCTime );
+
+  gsdac_tranTime ( UTCString, iDate, iTime, status );
 
   /* Get the velocity definition. */
   gsdac_velEncode ( gsdVars->velRef, gsdVars->velDefn, &LSRFlg, status );
@@ -268,6 +318,10 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
             sin( cellV2YRad ) * offsetY;
   dPos[1] = cos( cellV2YRad - cellX2YRad ) * offsetX +
             cos( cellV2YRad ) * offsetY;
+
+  /* Create the keymaps. */
+  datePointing = astKeyMap( "" );
+  cellMap = astKeyMap( "" ); 
 
   /* Fill the keymaps from the input GSD. */
   astMapPut0I( datePointing, "JFREST(1)", 
@@ -330,59 +384,34 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
              gsdVars->telLatitude, &frame, status );
 
   if ( *status != SAI__OK ) {
+
     *status = SAI__ERROR;
     errRep ( FUNC_NAME, "Couldn't create FrameSet for grid map", 
              status );
     return; 
   }
 
-  wcs->airmass = 0.0;//k
+  /* Get Az and El of current cell. */
   wcs->acAz = 0.0;//k
   wcs->acEl = 0.0;//k
-  wcs->acTr1 = 0.0;//k
-  wcs->acTr2 = 0.0;//k   
+
+  /* Calculate airmass from El of current cell. */
+  wcs->airmass = 0.0;//k
+
+  coordIn[0] = gsdVars->mapTable[stepNum*2];
+  coordIn[1] = gsdVars->mapTable[stepNum*2+1];
+  coordIn[2] = 0.0;
+
+  astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );//k
+
+  wcs->acTr1 = coordOut[0];
+  wcs->acTr2 = coordOut[1];
+
   wcs->azAng = 0.0;
   wcs->baseAz = 0.0;//k
   wcs->baseEl = 0.0;//k 
+  wcs->trAng = 0.0;//k
 
   astAnnul( frame );
-
-  /* Get the index into the observing area.  For rasters, this is
-     the row number (incremented on new rows) and for grids it is
-     the grid offset. */
-  if ( gsdVars->obsContinuous ) {
-    wcs->index = (int)( stepNum / gsdVars->nScanPts );
-  } else {
-    wcs->index = stepNum;
-  }
-
-  /* If this is a raster, work out the LST from the scan_time
-     and the number of map points in each scan. */
-  if ( gsdVars->obsContinuous ) {
-
-   /* Get the dLST of the start of this row. */
-    index = (int) ( stepNum / gsdVars->nScanPts );
-    dLST = ( gsdVars->scanTable1[index] - LSTStart ) / 24.0;
-
-    /* Add the integration times up to this scan point. */
-    dLST = dLST + ( ( stepNum % gsdVars->nScanPts ) *
-                    ( gsdVars->scanTime / gsdVars->nScanPts ) );
-
-  } else {
-
-    /* Get the difference between the start LST and this LST
-       and add it to the start TAI. */
-    index = stepNum * gsdVars->nScanVars1;
-    dLST = ( gsdVars->scanTable1[index] - LSTStart ) / 24.0;
-
-  }
-
-  /* Check for wrapping LST times. */
-  if ( dLST < 0 ) dLST = dLST + 1.0;
-
-  /* Correct for difference between solar and sidereal time. */
-  wcs->tai = TAIStart + ( dLST / SOLSID );
-
-  wcs->trAng = 0.0;//k
 
 }

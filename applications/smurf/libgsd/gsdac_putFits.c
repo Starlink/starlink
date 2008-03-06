@@ -76,6 +76,9 @@
 *        Move getDateVars and getMapVars to wrtData
 *     2008-03-04 (JB):
 *        Use number of scans actually completed.
+*     2008-03-06 (JB):
+*        Save calculation of am, az, el start/end till after
+*        all spectra completed.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -130,17 +133,11 @@ void gsdac_putFits ( const gsdVars *gsdVars,
 {
 
   /* Local variables */
-  float amEnd;                /* airmass at end of observation */
-  float amStart;              /* airmass at start of observation */
-  double azEnd;               /* Azimuth at observation end (deg) */
-  double azStart;             /* Azimuth at observation start (deg) */
   double bp;                  /* pressure (mbar) */
   char bwMode[SZFITSCARD];    /* ACSIS total bandwidth setup */
   char curChar;               /* character pointer */
   int day;                    /* days for time conversion. */
   char doppler[SZFITSCARD];   /* doppler velocity definition */
-  double elEnd;               /* elevation at observation end (deg) */
-  double elStart;             /* elevation at observation start (deg) */
   double etal;                /* telescope efficiency */
   int hour;                   /* hours for time conversion. */
   int i;                      /* loop counter */
@@ -198,22 +195,6 @@ void gsdac_putFits ( const gsdVars *gsdVars,
 
   /* Determine if this is a spectral line standard. */
   standard = 0;//k
-
-  if ( *status == SAI__OK ) {
- 
-    /* Get the airmass at start/end. */
-    amStart = wcs[0].airmass;
-    amEnd = wcs[nSteps - 1].airmass;
-
-    /* Get the azimuth at start/end. */
-    azStart = wcs[0].acAz;
-    azEnd = wcs[nSteps - 1].acAz;
-
-    /* Get the elevation at start/end. */
-    elStart = wcs[0].acEl;
-    elEnd = wcs[nSteps - 1].acEl;
-
-  }
 
   /* Copy the obsID into the obsIDSS and add the subsystem number. */
   sprintf ( obsIDSS, "%s_%i", dateVars->obsID, 
@@ -385,594 +366,570 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   /************************************/
 
   astSetFitsS ( fitschan, "TELESCOP", gsdVars->telName, 
-	        "Name of Telescope", *status );
+	        "Name of Telescope", 0 );
 
   astSetFitsS ( fitschan, "ORIGIN", "Joint Astronomy Centre, Hilo", 
-                "Origin of file", *status );
+                "Origin of file", 0 );
 
   astSetFitsF ( fitschan, "ALT-OBS", 4111.0, 
-                "[m] Height of observation above sea level", *status );
+                "[m] Height of observation above sea level", 0 );
 
   astSetFitsF ( fitschan, "LAT-OBS", 19.825833335521,
-                "[deg] Latitude of Observatory", *status );
+                "[deg] Latitude of Observatory", 0 );
 
   astSetFitsF ( fitschan, "LONG-OBS", -155.4797222301,
-                "[deg] Latitude of Observatory", *status ); 
+                "[deg] Latitude of Observatory", 0 ); 
   
   astSetFitsF ( fitschan, "OBSGEO-X", -5464594.335493,
-                "[m]", *status );  
+                "[m]", 0 );  
 
   astSetFitsF ( fitschan, "OBSGEO-Y", -2592695.151639,
-                "[m]", *status );  
+                "[m]", 0 );  
 
   astSetFitsF ( fitschan, "OBSGEO-Z", 2150635.34,
-                "[m]", *status ); 
+                "[m]", 0 ); 
 
   astSetFitsF ( fitschan, "ETAL", etal,
-                "Telescope efficiency", *status ); 
+                "Telescope efficiency", 0 ); 
 
 
   /* OMP and ORAC-DR Specific */
   astSetFitsCN ( fitschan, "COMMENT", "", 
-                 "---- OMP and ORAC-DR Specific ----", *status );
+                 "---- OMP and ORAC-DR Specific ----", 0 );
 
   astSetFitsS ( fitschan, "PROJECT", gsdVars->project, 
-	        "PATT number", *status );
+	        "PATT number", 0 );
 
 /***** NOTE: possiby REDUCE_POINTING for spectral 5 points *****/
   astSetFitsS ( fitschan, "RECIPE", "REDUCE_SCIENCE", 
-	        "ORAC-DR recipe", *status );
+	        "ORAC-DR recipe", 0 );
 
   astSetFitsS ( fitschan, "DRGROUP", AST__UNDEFS, 
-	        "Data Reduction group ID", *status );
+	        "Data Reduction group ID", 0 );
 
   astSetFitsS ( fitschan, "MSBID", AST__UNDEFS, 
-	        "ID of minimum schedulable block", *status );
+	        "ID of minimum schedulable block", 0 );
 
   astSetFitsS ( fitschan, "MSBTID", AST__UNDEFS, 
-	        "Transaction ID of MSB", *status );
+	        "Transaction ID of MSB", 0 );
 
   astSetFitsS ( fitschan, "SURVEY", AST__UNDEFS, 
-	        "Survey Name", *status );
+	        "Survey Name", 0 );
 
   astSetFitsS ( fitschan, "RMTAGENT", AST__UNDEFS, 
-	        "name of Remote Agent", *status );
+	        "name of Remote Agent", 0 );
 
   astSetFitsS ( fitschan, "AGENTID", AST__UNDEFS, 
-	        "Unique identifier for remote agent", *status );
+	        "Unique identifier for remote agent", 0 );
 
 
   /* Obs Id, Date, Pointing Info */
   astSetFitsCN ( fitschan, "COMMENT", "", 
-                 "---- Obs Id, Date, pointing Info ----", *status );
+                 "---- Obs Id, Date, pointing Info ----", 0 );
 
   astSetFitsS ( fitschan, "OBJECT", object, 
-	        "Object of interest", *status );
+	        "Object of interest", 0 );
 
   astSetFitsL ( fitschan, "STANDARD", standard, 
-                "True if the spectral line is a standard", *status );
+                "True if the spectral line is a standard", 0 );
 
   astSetFitsI ( fitschan, "OBSNUM", obsNum, 
-                "Observation number", *status );
+                "Observation number", 0 );
 
   astSetFitsI ( fitschan, "NSUBSCAN", 1,
-		"Sub-scan number", *status );
+		"Sub-scan number", 0 );
 
   astSetFitsL ( fitschan, "OBSEND", 1, 
-                "True if the file is the last in current observation",
-		*status );
+                "True if the file is the last in current observation", 0 );
   
   astSetFitsI ( fitschan, "UTDATE", utDate, 
-                "UT Date as integer in yyyymmdd format", *status );
+                "UT Date as integer in yyyymmdd format", 0 );
 
   astSetFitsS ( fitschan, "DATE-OBS", dateVars->dateObs, 
-                "UTC Datetime of start of observation", *status );
+                "UTC Datetime of start of observation", 0 );
 
   astSetFitsS ( fitschan, "DATE-END", dateVars->dateEnd, 
-                "UTC Datetime of end of observation", *status );
+                "UTC Datetime of end of observation", 0 );
 
   astSetFitsF ( fitschan, "DUT1", gsdVars->obsUT1C, 
-                "[d] UT1-UTC correction", *status );
+                "[d] UT1-UTC correction", 0 );
 
   astSetFitsS ( fitschan, "OBSID", dateVars->obsID, 
-                "Unique observation identifier", *status );
+                "Unique observation identifier", 0 );
 
   astSetFitsS ( fitschan, "OBSIDS", obsIDSS, 
-                "Unique observation + subsystem ID", *status );
+                "Unique observation + subsystem ID", 0 );
 
 /***** NOTE: possibly same as REFRECEP *****/
   astSetFitsS ( fitschan, "INSTAP", AST__UNDEFS,
-                "Receptor at tracking centre (if any)", *status );
+                "Receptor at tracking centre (if any)", 0 );
 
   astSetFitsF ( fitschan, "INSTAP_X", AST__UNDEFF,
-                "[arcsec] Aperture X off. rel. to instr centre", 
-                *status );
+                "[arcsec] Aperture X off. rel. to instr centre", 0 );
 
   astSetFitsF ( fitschan, "INSTAP_Y", AST__UNDEFF,
-                "[arcsec] Aperture Y off. rel. to instr centre", 
-                *status );
+                "[arcsec] Aperture Y off. rel. to instr centre", 0 );
 
-  astSetFitsF ( fitschan, "AMSTART", amStart,
-                "Airmass at start of observation", *status );
+  /* The following 6 cards are just placeholders and will be
+     updated later. */
+  astSetFitsF ( fitschan, "AMSTART", AST__UNDEFF,
+                "Airmass at start of observation", 0 );
 
-  astSetFitsF ( fitschan, "AMEND", amEnd,
-                "Airmass at end of observation", *status );
+  astSetFitsF ( fitschan, "AMEND", AST__UNDEFF,
+                "Airmass at end of observation", 0 );
 
-  astSetFitsF ( fitschan, "AZSTART", azStart,
-                "[deg] Azimuth at start of observation", *status );
+  astSetFitsF ( fitschan, "AZSTART", AST__UNDEFF,
+                "[deg] Azimuth at start of observation", 0 );
 
-  astSetFitsF ( fitschan, "AZEND", azEnd,
-                "[deg] Azimuth at end of observation", *status );
+  astSetFitsF ( fitschan, "AZEND", AST__UNDEFF,
+                "[deg] Azimuth at end of observation", 0 );
 
-  astSetFitsF ( fitschan, "ELSTART", elStart,
-                "[deg] Elevation at start of observation", *status );
+  astSetFitsF ( fitschan, "ELSTART", AST__UNDEFF,
+                "[deg] Elevation at start of observation", 0 );
 
-  astSetFitsF ( fitschan, "ELEND", elEnd,
-                "[deg] Elevation at end of observation", *status );
+  astSetFitsF ( fitschan, "ELEND", AST__UNDEFF,
+                "[deg] Elevation at end of observation", 0 );
 
   astSetFitsS ( fitschan, "HSTSTART", dateVars->HSTstart,
-                "HST at start of observation", *status );
+                "HST at start of observation", 0 );
 
   astSetFitsS ( fitschan, "HSTEND", dateVars->HSTend,
-                "HST at end of observation", *status );
+                "HST at end of observation", 0 );
 
   astSetFitsS ( fitschan, "LSTSTART", dateVars->LSTstart,
-                "LST at start of observation", *status );
+                "LST at start of observation", 0 );
 
   astSetFitsS ( fitschan, "LSTEND", dateVars->LSTend,
-                "LST at end of observation", *status );
+                "LST at end of observation", 0 );
 
   /* Integration time related. */
   astSetFitsCN ( fitschan, "COMMENT", "", 
-                 "---- Integration time related ----", *status );
+                 "---- Integration time related ----", 0 );
 
   astSetFitsF ( fitschan, "INT_TIME", intTime,
-                "Time spent integrating, entire", *status );
+                "Time spent integrating, entire", 0 );
 
 
   /* ACSIS Specific. */
   astSetFitsCN ( fitschan, "COMMENT", "", 
-                 "---- ACSIS Specific ----", *status );
+                 "---- ACSIS Specific ----", 0 );
 
   astSetFitsS ( fitschan, "BACKEND", backend,
-                "Name of the backend", *status );
+                "Name of the backend", 0 );
 
   astSetFitsS ( fitschan, "DRRECIPE", AST__UNDEFS,
-                "ACSIS-DR recipe name", *status );
+                "ACSIS-DR recipe name", 0 );
 
   astSetFitsS ( fitschan, "BWMODE", bwMode,
-                "Bandwidth setup", *status );
+                "Bandwidth setup", 0 );
 
   astSetFitsI ( fitschan, "SUBSYSNR", subBandNum % 
                 ( gsdVars->nBESections / gsdVars->nFEChans ) + 1,
-                "Sub-system number", *status );
+                "Sub-system number", 0 );
 
   astSetFitsS ( fitschan, "SUBBANDS", bwMode,
-                "Sub-band setup", *status );
+                "Sub-band setup", 0 );
 
   astSetFitsI ( fitschan, "NSUBBAND", 1, 
-                "Number of subbands", *status );
+                "Number of subbands", 0 );
 
   astSetFitsF ( fitschan, "SUBREFP1", refChan, 
-                "Reference channel for subband1", *status );
+                "Reference channel for subband1", 0 );
 
   astSetFitsF ( fitschan, "SUBREFP2", AST__UNDEFF,
-                "Reference channel for subband2", *status );
+                "Reference channel for subband2", 0 );
 
   astSetFitsI ( fitschan, "REFCHAN", refChan, 
-                "Reference IF channel No.", *status );
+                "Reference IF channel No.", 0 );
 
   astSetFitsF ( fitschan, "IFCHANSP", IFchanSp,
-                "[Hz] TOPO IF channel spacing (signed)", *status ); 
+                "[Hz] TOPO IF channel spacing (signed)", 0 ); 
 
   astSetFitsS ( fitschan, "FFT_WIN", AST__UNDEFS, 
-	        "Type of window used for FFT", *status ); 
+	        "Type of window used for FFT", 0 ); 
 
   astSetFitsF ( fitschan, "BEDEGFAC", AST__UNDEFF, 
-	        "Backend degradation factor", *status ); 
+	        "Backend degradation factor", 0 ); 
 
   astSetFitsS ( fitschan, "MSROOT", AST__UNDEFS, 
-	        "Root name of raw measurement sets", *status ); 
+	        "Root name of raw measurement sets", 0 ); 
 
 
   /* FE Specific. */
   astSetFitsCN ( fitschan, "COMMENT", "", 
-                 "---- FE Specific ----", *status );
+                 "---- FE Specific ----", 0 );
 
   astSetFitsS ( fitschan, "INSTRUME", instrume, 
-	        "Front-end receiver", *status ); 
+	        "Front-end receiver", 0 ); 
 
   astSetFitsS ( fitschan, "SB_MODE", gsdVars->sbMode, 
-	        "Sideband mode", *status ); 
+	        "Sideband mode", 0 ); 
 
   astSetFitsF ( fitschan, "IFFREQ", IFfreq,
-                "[GHz] IF Frequency", *status );
+                "[GHz] IF Frequency", 0 );
 
   astSetFitsI ( fitschan, "N_MIX", nMix, 
-                "No. of mixers", *status );
+                "No. of mixers", 0 );
 
   astSetFitsS ( fitschan, "OBS_SB", obsSB, 
-		"The observed sideband", *status );
+		"The observed sideband", 0 );
 
   astSetFitsF ( fitschan, "LOFREQS", gsdVars->LOFreqs[subBandNum],
-		"[GHz] LO Frequency at start of obs", *status );
+		"[GHz] LO Frequency at start of obs", 0 );
 
   astSetFitsF ( fitschan, "LOFREQE", gsdVars->LOFreqs[subBandNum],
-                "[GHz] LO Frequency at end of obs", *status );
+                "[GHz] LO Frequency at end of obs", 0 );
 
   astSetFitsS ( fitschan, "RECPTORS", recptors,
-                "Active FE receptor IDs for this obs", *status );
+                "Active FE receptor IDs for this obs", 0 );
 
   astSetFitsS ( fitschan, "REFRECEP", recepNames[0], 
-                "Receptor with unit sensitivity", *status );
+                "Receptor with unit sensitivity", 0 );
 
   if ( strcmp ( samMode, "sample" ) == 0 ) {
     astSetFitsF ( fitschan, "MEDTSYS", AST__UNDEFF,
-		  "[K] Median of the T-sys across all receptors", 
-                  *status );
+		  "[K] Median of the T-sys across all receptors", 0 );
   } else {
     astSetFitsF ( fitschan, "MEDTSYS", 
                   gsdVars->sourceSysTemps[subBandNum],
-		  "[K] Median of the T-sys across all receptors", 
-                  *status );
+		  "[K] Median of the T-sys across all receptors", 0 );
   }
 
   astSetFitsS ( fitschan, "TEMPSCAL", "TA*", 
-                "Temperature scale in use", *status );
+                "Temperature scale in use", 0 );
 
   astSetFitsS ( fitschan, "DOPPLER", doppler,
-                "Doppler velocity definition", *status );
+                "Doppler velocity definition", 0 );
 
   astSetFitsS ( fitschan, "SSYSOBS", sSysObs,
-                "Spectral ref. frame during observation", *status );
+                "Spectral ref. frame during observation", 0 );
 
 
   /* Environmental data. */
   astSetFitsCN ( fitschan, "COMMENT", "", 
-                 "---- Environmental Data ----", *status );
+                 "---- Environmental Data ----", 0 );
 
   astSetFitsF ( fitschan, "ATSTART", gsdVars->tamb, 
-                "[degC] Air temp at start of observation", 
-                *status );
+                "[degC] Air temp at start of observation", 0 );
 
   astSetFitsF ( fitschan, "ATEND", gsdVars->tamb, 
-                "[degC] Air temp at end of observation", 
-                *status );
+                "[degC] Air temp at end of observation", 0 );
 
   astSetFitsF ( fitschan, "HUMSTART",gsdVars->hamb , 
-                "Rel Humidity at observation start", *status );
+                "Rel Humidity at observation start", 0 );
 
   astSetFitsF ( fitschan, "HUMEND", gsdVars->hamb, 
-                "Rel Humidity observation end", *status );
+                "Rel Humidity observation end", 0 );
 
   astSetFitsF ( fitschan, "BPSTART", bp, 
-                "[mbar] Pressure at observation start", 
-                *status );
+                "[mbar] Pressure at observation start", 0 );
 
   astSetFitsF ( fitschan, "BPEND", bp, 
-                "[mbar] Pressure at observation end", *status );
+                "[mbar] Pressure at observation end", 0 );
 
   astSetFitsF ( fitschan, "WNDSPDST", AST__UNDEFF, 
-                "[km/h] Wind Speed at obs start", *status );
+                "[km/h] Wind Speed at obs start", 0 );
   
   astSetFitsF ( fitschan, "WNDSPDEN", AST__UNDEFF, 
-                "[km/h] Wind Speed at obs end", *status );
+                "[km/h] Wind Speed at obs end", 0 );
 
   astSetFitsF ( fitschan, "WNDDIRST", AST__UNDEFF, 
-                "[deg] Wind direction, azimuth at obs start", 
-                *status );
+                "[deg] Wind direction, azimuth at obs start", 0 );
 
   astSetFitsF ( fitschan, "WNDDIREN", AST__UNDEFF, 
-                "[deg] Wind direction, azimuth at obs end", 
-                *status );
+                "[deg] Wind direction, azimuth at obs end", 0 );
 
   astSetFitsF ( fitschan, "TAU225ST", gsdVars->tau225,
-		"Tau at 225 GHz from CSO at start", *status );
+		"Tau at 225 GHz from CSO at start", 0 );
 
   astSetFitsF ( fitschan, "TAU225EN", gsdVars->tau225,
-		"Tau at 225 GHz from CSO at end", *status );
+		"Tau at 225 GHz from CSO at end", 0 );
 
   astSetFitsS ( fitschan, "TAUDATST", tauDatSt,
-		"Time of TAU225ST observation", *status );
+		"Time of TAU225ST observation", 0 );
 
   astSetFitsS ( fitschan, "TAUDATEN", tauDatSt,
-		"Time of TAU225EN observation", *status );
+		"Time of TAU225EN observation", 0 );
 
   astSetFitsS ( fitschan, "TAUSRC", "CSO225GHZ",
-		"Source of the TAU225 value", *status );
+		"Source of the TAU225 value", 0 );
 
   astSetFitsF ( fitschan, "WVMTAUST", AST__UNDEFF,
-		"186GHz Tau from JCMT WVM at start", *status );
+		"186GHz Tau from JCMT WVM at start", 0 );
 
   astSetFitsF ( fitschan, "WVMTAUEN", AST__UNDEFF,
-		"185GHz Tau from JCMT WVM at end", *status );
+		"185GHz Tau from JCMT WVM at end", 0 );
 
   astSetFitsS ( fitschan, "WVMDATST", AST__UNDEFS,
-		"Time of WVMTAUST", *status );
+		"Time of WVMTAUST", 0 );
 
   astSetFitsS ( fitschan, "WVMDATEN", AST__UNDEFS,
-		"Time of WVMTAUEN", *status );
+		"Time of WVMTAUEN", 0 );
 
   astSetFitsF ( fitschan, "SEEINGST", gsdVars->seeing,
-		"[arcsec] SAO atmospheric seeing (start)", 
-		*status );
+		"[arcsec] SAO atmospheric seeing (start)", 0 );
 
   astSetFitsF ( fitschan, "SEEINGSEN", gsdVars->seeing,
-		"[arcsec] SAO atmospheric seeing (end)", 
-		*status );
+		"[arcsec] SAO atmospheric seeing (end)", 0 );
 
   astSetFitsS ( fitschan, "SEEDATST", seeDatSt,
-		"Date/Time of SEEINGST", *status );
+		"Date/Time of SEEINGST", 0 );
 
   astSetFitsS ( fitschan, "SEEDATEN", seeDatSt,
-		"Date/Time of SEEINGEN", *status );
+		"Date/Time of SEEINGEN", 0 );
 
   astSetFitsF ( fitschan, "FRLEGTST", AST__UNDEFF,
-		"[degC] Mean Front leg temperature - Start", *status );
+		"[degC] Mean Front leg temperature - Start", 0 );
 
   astSetFitsF ( fitschan, "FRLEGTEN", AST__UNDEFF,
-		"[degC] Mean Front leg temperature - End", *status );
+		"[degC] Mean Front leg temperature - End", 0 );
 
   astSetFitsF ( fitschan, "BKLEGTST", AST__UNDEFF,
-		"[degC] Mean Back leg temperature - Start", *status );
+		"[degC] Mean Back leg temperature - Start", 0 );
 
   astSetFitsF ( fitschan, "BKLEGTEN", AST__UNDEFF,
-		"[degC] Mean Back leg temperature - End", *status );
+		"[degC] Mean Back leg temperature - End", 0 );
 
 
   /* Switching and Map setup for the observation. */
   astSetFitsCN ( fitschan, "COMMENT", "", 
-                 "---- Switching and Map setup for the observationi ----", 
-                 *status );
+                 "---- Switching and Map setup for the observationi ----", 0 );
 
   astSetFitsS ( fitschan, "SAM_MODE", samMode, 
-                "Sampling Mode", *status );  
+                "Sampling Mode", 0 );  
 
   astSetFitsS ( fitschan, "SW_MODE", mapVars->swMode,
-                "Switch Mode", *status );
+                "Switch Mode", 0 );
 
   astSetFitsS ( fitschan, "SKYREFX", mapVars->skyRefX,
-                "X co-ord of Reference Position", *status );
+                "X co-ord of Reference Position", 0 );
 
   astSetFitsS ( fitschan, "SKYREFY", mapVars->skyRefY,
-                "Y co-ord of Reference Position", *status );   
+                "Y co-ord of Reference Position", 0 );   
 
   astSetFitsS ( fitschan, "OBS_TYPE", obsType,
-		"Type of observation", *status );
+		"Type of observation", 0 );
 
   if ( ( strcmp ( samMode, "grid" ) == 0
        && strcmp ( mapVars->swMode, "chop" ) == 0 ) ||
        strcmp ( samMode, "sample" ) == 0 ) {
 
     astSetFitsS ( fitschan, "CHOP_CRD", mapVars->chopCrd,
-                  "Chopping co-ordinate system", *status );
+                  "Chopping co-ordinate system", 0 );
 
     astSetFitsF ( fitschan, "CHOP_FRQ", gsdVars->chopFrequency,
-		  "[Hz] Chop frequency", *status );
+		  "[Hz] Chop frequency", 0 );
 
     astSetFitsF ( fitschan, "CHOP_PA", gsdVars->chopPA,
-		  "[deg] Chop PA; 0=in lat, 90=in long", *status );
+		  "[deg] Chop PA; 0=in lat, 90=in long", 0 );
 
     astSetFitsF ( fitschan, "CHOP_THR", gsdVars->chopThrow,
-		  "[arcsec] Chop throw", *status );
+		  "[arcsec] Chop throw", 0 );
 
   } else {
 
     astSetFitsS ( fitschan, "CHOP_CRD", AST__UNDEFS,
-                  "Chopping co-ordinate system", *status );
+                  "Chopping co-ordinate system", 0 );
 
     astSetFitsF ( fitschan, "CHOP_FRQ", AST__UNDEFF,
-		  "[Hz] Chop frequency", *status );
+		  "[Hz] Chop frequency", 0 );
 
     astSetFitsF ( fitschan, "CHOP_PA", AST__UNDEFF,
-		  "[deg] Chop PA; 0=in lat, 90=in long", *status );
+		  "[deg] Chop PA; 0=in lat, 90=in long", 0 );
 
     astSetFitsF ( fitschan, "CHOP_THR", AST__UNDEFF,
-		  "[arcsec] Chop throw", *status );
+		  "[arcsec] Chop throw", 0 );
 
   }
 
   astSetFitsI ( fitschan, "JIGL_CNT", AST__UNDEFI,
-		"Number of offsets in jiggle pattern", *status );
+		"Number of offsets in jiggle pattern", 0 );
 
   astSetFitsS ( fitschan, "JIGL_NAM", AST__UNDEFS,
-		"File containing the jiggle offsets", *status );
+		"File containing the jiggle offsets", 0 );
 
   astSetFitsF ( fitschan, "JIGL_PA", AST__UNDEFF,
-		"[deg] Jiggle PA; 0=in lat, 90=in long", *status );
+		"[deg] Jiggle PA; 0=in lat, 90=in long", 0 );
 
   astSetFitsS ( fitschan, "JIGL_CRD", AST__UNDEFS,
-		"Jiggling co-ordinate system", *status );
+		"Jiggling co-ordinate system", 0 );
 
   if ( strcmp ( samMode, "raster" ) == 0
        && strcmp ( mapVars->swMode, "pssw" ) == 0 ) {
 
     astSetFitsF ( fitschan, "MAP_HGHT", mapVars->mapHght,
-		  "[arcsec] Requested height of map", *status );
+		  "[arcsec] Requested height of map", 0 );
 
     astSetFitsF ( fitschan, "MAP_PA", mapVars->mapPA,
-		  "[deg] Requested PA of map", *status );
+		  "[deg] Requested PA of map", 0 );
 
     astSetFitsF ( fitschan, "MAP_WDTH", mapVars->mapWdth,
-		  "[arcsec] Requested width of map", *status );
+		  "[arcsec] Requested width of map", 0 );
 
     astSetFitsS ( fitschan, "LOCL_CRD", mapVars->loclCrd,
-		  "Local offset/map PA co-ordinate system",
-		  *status );
+		  "Local offset/map PA co-ordinate system", 0 );
 
     astSetFitsF ( fitschan, "MAP_X", gsdVars->centreOffsetX,
-		  "[arcsec] Requested map offset from telescope centre",
-		  *status );
+		  "[arcsec] Requested map offset from telescope centre", 0 );
 
     astSetFitsF ( fitschan, "MAP_Y", gsdVars->centreOffsetY,
-		  "[arcsec] Requested map offset from telescope centre",
-		  *status );  
+		  "[arcsec] Requested map offset from telescope centre", 0 );  
 
     astSetFitsS ( fitschan, "SCAN_CRD", mapVars->scanCrd,
-		  "Co-ordinate system for scan", *status );
+		  "Co-ordinate system for scan", 0 );
 
     astSetFitsF ( fitschan, "SCAN_VEL", mapVars->scanVel,
-		  "[arcsec/sec] Scan velocity along scan direction", 
-		  *status );
+		  "[arcsec/sec] Scan velocity along scan direction", 0 );
 
     astSetFitsF ( fitschan, "SCAN_DY", mapVars->scanDy,
-		  "[arcsec] Scan spacing perp. to scan", *status );
+		  "[arcsec] Scan spacing perp. to scan", 0 );
 
     astSetFitsS ( fitschan, "SCAN_PAT", mapVars->scanPat,
-		  "Scan pattern name", *status );
+		  "Scan pattern name", 0 );
 
   } else {
 
     astSetFitsF ( fitschan, "MAP_HGHT", AST__UNDEFF,
-		  "[arcsec] Requested height of map", *status );
+		  "[arcsec] Requested height of map", 0 );
 
     astSetFitsF ( fitschan, "MAP_PA", AST__UNDEFF,
-		  "[deg] Requested PA of map", *status );
+		  "[deg] Requested PA of map", 0 );
 
     astSetFitsF ( fitschan, "MAP_WDTH", AST__UNDEFF,
-		  "[arcsec] Requested width of map", *status );
+		  "[arcsec] Requested width of map", 0 );
 
     astSetFitsS ( fitschan, "LOCL_CRD", AST__UNDEFS,
-		  "Local offset/map PA co-ordinate system",
-		  *status );
+		  "Local offset/map PA co-ordinate system", 0 );
 
     astSetFitsF ( fitschan, "MAP_X", AST__UNDEFF,
-		  "[arcsec] Requested map offset from telescope centre",
-		  *status );
+		  "[arcsec] Requested map offset from telescope centre", 0 );
 
     astSetFitsF ( fitschan, "MAP_Y", AST__UNDEFF,
-		  "[arcsec] Requested map offset from telescope centre",
-		  *status );  
+		  "[arcsec] Requested map offset from telescope centre", 0 );  
 
     astSetFitsS ( fitschan, "SCAN_CRD", AST__UNDEFS,
-		  "Co-ordinate system for scan", *status );
+		  "Co-ordinate system for scan", 0 );
 
     astSetFitsF ( fitschan, "SCAN_VEL", AST__UNDEFF,
-		  "[arcsec/sec] Scan velocity along scan direction", 
-		  *status );
+		  "[arcsec/sec] Scan velocity along scan direction", 0 );
 
     astSetFitsF ( fitschan, "SCAN_DY", AST__UNDEFF,
-		  "[arcsec] Scan spacing perp. to scan", *status );
+		  "[arcsec] Scan spacing perp. to scan", 0 );
 
     astSetFitsS ( fitschan, "SCAN_PAT", AST__UNDEFS,
-		  "Scan pattern name", *status );
+		  "Scan pattern name", 0 );
 
   }
 
 
   /* SMU */
   astSetFitsCN ( fitschan, "COMMENT", "", 
-                 "---- SMU ----", *status );
+                 "---- SMU ----", 0 );
 
   astSetFitsF ( fitschan, "ALIGN_DX", gsdVars->smuDX, 
-		"SMU tables X axis focus offset", *status );
+		"SMU tables X axis focus offset", 0 );
 
   astSetFitsF ( fitschan, "ALIGN_DY", gsdVars->smuDY, 
-		"SMU tables Y axis focus offset", *status );
+		"SMU tables Y axis focus offset", 0 );
 
   astSetFitsF ( fitschan, "FOCUS_DZ", gsdVars->smuDZ, 
-		"SMU tables Z axis focus offset", *status );
+		"SMU tables Z axis focus offset", 0 );
 
   astSetFitsF ( fitschan, "DAZ", gsdVars->smuOffsEW, 
-		"SMU azimuth pointing offset", *status );
+		"SMU azimuth pointing offset", 0 );
 
   astSetFitsF ( fitschan, "DEL", gsdVars->smuOffsNS, 
-		"SMU elevation pointing offset", *status );
+		"SMU elevation pointing offset", 0 );
 
   astSetFitsF ( fitschan, "UAZ", gsdVars->errAz, 
-		"User azimuth pointing offset", *status );
+		"User azimuth pointing offset", 0 );
 
   astSetFitsF ( fitschan, "UEL", gsdVars->errEl, 
-		"User elevation pointing offset", *status );
+		"User elevation pointing offset", 0 );
 
 
   /* JOS parameters */
   astSetFitsCN ( fitschan, "COMMENT", "", 
-                 "---- JOS parameters ----", *status );
+                 "---- JOS parameters ----", 0 );
 
   astSetFitsF ( fitschan, "STEPTIME", gsdVars->cycleTime, 
-                "RTS step time during an RTS sequence", *status ); 
+                "RTS step time during an RTS sequence", 0 ); 
 
   astSetFitsI ( fitschan, "NUM_CYC", gsdVars->nCycle, 
-                "Number of times to repeat entire recipe", *status );  
+                "Number of times to repeat entire recipe", 0 );  
 
   astSetFitsI ( fitschan, "NUM_NODS", 1, 
-                "Number of times to repeat nod set", *status );
+                "Number of times to repeat nod set", 0 );
 
-  astSetFitsI ( fitschan, "JOS_MULT", AST__UNDEFI,
-		"", *status );//k description
+  astSetFitsI ( fitschan, "JOS_MULT", AST__UNDEFI, "", 0 );//k description
 
-  astSetFitsI ( fitschan, "JOS_MIN", josMin,
-                "", *status );//k description
+  astSetFitsI ( fitschan, "JOS_MIN", josMin, "", 0 );//k description
 
   astSetFitsI ( fitschan, "NCALSTEP", AST__UNDEFI,
-		"Number of RTS steps for each CAL", *status );
+		"Number of RTS steps for each CAL", 0 );
 
   astSetFitsF ( fitschan, "NREFSTEP", nRefStep,
-		"Mean no. of RTS steps for each REF", *status );
+		"Mean no. of RTS steps for each REF", 0 );
 
   astSetFitsI ( fitschan, "STBETREF", stBetRef, 
-		"Target number of RTS steps between REFs",
-		*status );
+		"Target number of RTS steps between REFs", 0 );
 
   astSetFitsI ( fitschan, "STBETCAL", AST__UNDEFI,
-		"Target number of RTS steps between CALs",
-		*status );
+		"Target number of RTS steps between CALs",0 );
 
   astSetFitsI ( fitschan, "STARTIDX", startIdx,
-		"Index into pattern at start of obs", *status );
+		"Index into pattern at start of obs", 0 );
 
   astSetFitsS ( fitschan, "FOCAXIS", AST__UNDEFS,
-		"Focus Axis to move (X, Y, Z)", *status );
+		"Focus Axis to move (X, Y, Z)", 0 );
 
   astSetFitsI ( fitschan, "NFOCSTEP", AST__UNDEFI,
-		"Number of focal position steps", *status );
+		"Number of focal position steps", 0 );
 
   astSetFitsF ( fitschan, "FOCSTEP", AST__UNDEFF,
-		"Distance between focal steps", *status );
+		"Distance between focal steps", 0 );
 
 
   /* Miscellaneous parameters */
   astSetFitsCN ( fitschan, "COMMENT", "", 
-                 "---- Miscellaneous ----", *status );
+                 "---- Miscellaneous ----", 0 );
 
   astSetFitsS ( fitschan, "OCSCFG", AST__UNDEFS,
-	       "OCS config filename", *status );
+	       "OCS config filename", 0 );
 
   astSetFitsL ( fitschan, "SIM_CORR", 0,
-		"True if any CORRTASK is simualted", *status );
+		"True if any CORRTASK is simualted", 0 );
 
   astSetFitsL ( fitschan, "SIM_SMU", 0,
-		"True if SMU data is simulated", *status );
+		"True if SMU data is simulated", 0 );
 
   astSetFitsL ( fitschan, "SIM_TCS", 0,
-		"True if TCS data is simulated", *status );
+		"True if TCS data is simulated", 0 );
 
   astSetFitsL ( fitschan, "RTS_SMU", 0,
-		"True if RTS data is simulated", *status );
+		"True if RTS data is simulated", 0 );
 
   astSetFitsL ( fitschan, "IF_SMU", 0,
-		"True if IF data is simulated", *status );
+		"True if IF data is simulated", 0 );
 
   astSetFitsL ( fitschan, "SIMULATE", 0,
-		"True if any data are simulated", *status );
+		"True if any data are simulated", 0 );
 
   astSetFitsS ( fitschan, "STATUS", "NORMAL",
-		"Status at end of observation", *status );
+		"Status at end of observation", 0 );
 
 
   /* Rover=specific parameters */
   astSetFitsCN ( fitschan, "COMMENT", "", 
-                 "---- ROVER Specific ----", *status );
+                 "---- ROVER Specific ----", 0 );
 
   astSetFitsL ( fitschan, "POL_CONN", 0,
-		"True if ROVER is connected", *status );
+		"True if ROVER is connected", 0 );
 
   astSetFitsS ( fitschan, "POL_MODE", AST__UNDEFS,
-		"Step-and-integrate (STEPINT) or spinning (SPIN)", 
-                *status );
+		"Step-and-integrate (STEPINT) or spinning (SPIN)", 0 );
 
   astSetFitsF ( fitschan, "ROTAFREQ", AST__UNDEFF,
-		"[Hz] Spin frequency (if spinning)", *status );
+		"[Hz] Spin frequency (if spinning)", 0 );
 
 }

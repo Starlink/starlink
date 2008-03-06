@@ -110,8 +110,15 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
 {
 
   /* Local variables */
+  float amEnd;                /* airmass at end of observation */
+  float amStart;              /* airmass at start of observation */
+  double azEnd;               /* Azimuth at observation end (deg) */
+  double azStart;             /* Azimuth at observation start (deg) */
   char backend[SZFITSCARD];   /* name of the backend */
+  char card[81];              /* FITS card for updating headers */
   dateVars dateVars;          /* date/time variables */
+  double elEnd;               /* elevation at observation end (deg) */
+  double elStart;             /* elevation at observation start (deg) */
   const AstFitsChan *fitschan[nSteps * gsdVars->nBESections];  
                               /* Array of FITS headers */
   long fitsIndex;             /* current FITSchan */
@@ -287,6 +294,22 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
       /* Get the pointing and time values. */
       gsdac_getWCS ( gsdVars, stepNum, subBandNum, dasFlag, wcs, status );
 
+      /* If this is the first spectrum, get the amStart, 
+         azStart and elStart. */
+      if ( stepNum == 0 && subBandNum == 0 ) {
+        amStart = wcs->airmass;
+        azStart = wcs->acAz;
+        elStart = wcs->acEl;
+      }
+
+      /* For each step, update the amEnd, azEnd, and elEnd, so that the 
+         final values are those for the last time step. */
+      if ( stepNum == stepNum-1 && subBandNum == 0 ) {
+        amEnd = wcs->airmass;
+        azEnd = wcs->acAz;
+        elEnd = wcs->acEl;
+      }      
+
       /* Get the subsystem-dependent JCMTState values. */
       gsdac_putJCMTStateS ( gsdVars, stepNum, subBandNum, dasFlag, 
       	                    wcs, record, status );
@@ -318,6 +341,27 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
     }
 
   }
+
+  /* Update the FITS headers for amStart, amEnd, azStart, azEnd, 
+     elStart, and elEnd. */
+  for ( i = 0; i < nSteps * gsdVars->nBESections; i++ ) {
+
+    astClear( fitschan[i], "Card" );
+   
+    astFindFits( fitschan[i], "AMSTART", card, 0 );
+    astSetFitsF( fitschan[i], "AMSTART", amStart, NULL, 1 );
+    astFindFits( fitschan[i], "AMEND", card, 0 );
+    astSetFitsF( fitschan[i], "AMEND", amEnd, NULL, 1 );
+    astFindFits( fitschan[i], "AZSTART", card, 0 );
+    astSetFitsF( fitschan[i], "AZSTART", azStart, NULL, 1 );
+    astFindFits( fitschan[i], "AZEND", card, 0 );
+    astSetFitsF( fitschan[i], "AZEND", azEnd, NULL, 1 );
+    astFindFits( fitschan[i], "ELSTART", card, 0 );
+    astSetFitsF( fitschan[i], "ELSTART", elStart, NULL, 1 );
+    astFindFits( fitschan[i], "ELEND", card, 0 );
+    astSetFitsF( fitschan[i], "ELEND", elEnd, NULL, 1 );
+
+  }    
 
   if ( *status != SAI__OK ) {
     *status = SAI__ERROR;

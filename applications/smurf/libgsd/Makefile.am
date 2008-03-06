@@ -18,7 +18,6 @@ gsdac_putFits.c \
 gsdac_putJCMTStateC.c \
 gsdac_putJCMTStateS.c \
 gsdac_putSpecHdr.c \
-gsdac_tranDate.c \
 gsdac_tranTime.c \
 gsdac_velEncode.c \
 gsdac_wrtData.c 

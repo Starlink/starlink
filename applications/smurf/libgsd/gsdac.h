@@ -39,6 +39,8 @@
 *        Replace subsysNum with subBandNum
 *     2008-02-28 (JB):
 *        Use dateVars and mapVars structs
+*     2008-03-06 (JB):
+*        Removed tranDate, updated tranTime
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -318,16 +320,10 @@ struct ACSISSpecHdr *specHdr, /* ACSIS Spec Headers (given and returned ) */
 int *status          /* pointer to global status (given and returned) */ 
 );
 
-void gsdac_tranDate
-(
-const double dDate,  /* date as a double (given) */
-char *iDate,         /* date as string (given and returned) */
-int *status          /* pointer to global status (given and returned) */
-);
-
 void gsdac_tranTime
 (
-const double dTime,  /* time as a double (given) */
+const char *dTime,   /* time as a string YYYY-MM-DD HH:MM:SS (given) */
+char *iDate,         /* date as string (given and returned) */
 char *iTime,         /* time as string (given and returned) */
 int *status          /* pointer to global status (given and returned) */
 );
