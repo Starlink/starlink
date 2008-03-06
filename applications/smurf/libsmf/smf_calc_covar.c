@@ -82,7 +82,7 @@
 #include <stdio.h>
 
 /* GSL includes */
-#include <gsl/gsl_statistics_double.h>
+#include "gsl/gsl_statistics_double.h"
 
 /* Starlink includes */
 #include "sae_par.h"

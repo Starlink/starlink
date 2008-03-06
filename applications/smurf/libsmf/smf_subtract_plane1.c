@@ -121,8 +121,9 @@
 /* Standard includes */
 #include <stdio.h>
 #include <string.h>
+
 /* GSL includes */
-#include <gsl/gsl_multifit.h>
+#include "gsl/gsl_multifit.h"
 
 /* Starlink includes */
 #include "sae_par.h"
