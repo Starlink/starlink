@@ -14,7 +14,9 @@
 set relocate = 0
 if ($?STARLINK_DIR) then
     if (-e $STARLINK_DIR) then
-      if (-e ${STARLINK_DIR}/bin) set relocate = 1
+        if ($STARLINK_DIR != "@exec_prefix@") then
+            if (-e ${STARLINK_DIR}/bin) set relocate = 1
+        endif
     endif
 endif
 

@@ -26,8 +26,10 @@ test "${ZSH_VERSION+set}" = set && alias -g '${1+"$@"}'='"$@"'
 relocate=0
 if test "${STARLINK_DIR}" != ""; then
     if [ -e ${STARLINK_DIR} ]; then
-        if [ -e ${STARLINK_DIR}/bin ]; then
-            relocate=1
+        if test "${STARLINK_DIR}" != "@exec_prefix@"; then
+            if [ -e ${STARLINK_DIR}/bin ]; then
+                relocate=1
+            fi
         fi
     fi
 fi
