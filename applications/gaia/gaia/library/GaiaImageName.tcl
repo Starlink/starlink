@@ -306,12 +306,16 @@ itcl::class gaia::GaiaImageName {
 
    #  Get any slice information from the image name.
    protected method get_slice_ {} {
-      set i1 [string last {(} $imagename]
-      set i2  [string last {)} $imagename]
+      set i1 [string last "\(" $imagename]
+      set i2 [string last "\)" $imagename]
+
+      set slice_ ""
       if { $i1 > -1 && $i2 > -1 } {
-	 set slice_ [string range $imagename $i1 $i2]
-      } else {
-	 set slice_ ""
+         #  The closing ) must be the last character, if this is a slice
+         #  (otherwise it will be an HDS structure index).
+         if { [string index $imagename end] == "\)" } {
+            set slice_ [string range $imagename $i1 $i2]
+         }
       }
    }
 
@@ -436,7 +440,12 @@ itcl::class gaia::GaiaImageName {
       if { $i1 > -1 } {
 	 set i1 [expr $i1+4]
 	 if { $slice_ != {} } {
-	    set i2 [expr [string first $slice_ $type_]-1]
+	    set i2 [string first $slice_ $type_]
+            if { $i2 > -1 } {
+               incr i2 -1
+            } else {
+               set i2 end
+            }
 	 } else {
 	    set i2 end
 	 }
