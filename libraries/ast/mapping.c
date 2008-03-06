@@ -249,6 +249,10 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Some rebinning kernels (e.g. SINCSINC) have negative values and
 *        can result in overall negative output weights. Therefore do not
 *        set output pixels with negative weights bad.
+*     6-MAR-2008 (DSB):
+*        Add an option for astResample to leave unchanged any output pixels
+*        for which an interpolated value cannot be obtained. This is
+*        controlled by the new AST__NOBAD flag.
 *class--
 */
 
@@ -2689,7 +2693,8 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name ) {
 *        "coords[coord][point]" (assuming both indices to be
 *        zero-based).  If any point has a coordinate value of AST__BAD
 *        associated with it, then the corresponding output data (and
-*        variance) will be set to the value given by "badval".
+*        variance) will be set to the value given by "badval" (unles the
+*        AST__NOBAD flag is specified).
 *     kernel
 *        Pointer to the 1-dimensional kernel function to be used.
 *     neighb
@@ -2709,12 +2714,12 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name ) {
 *        this parameter specifies the value which is used to identify
 *        bad data and/or variance values in the input array(s). Its
 *        numerical type must match that of the "in" (and "in_var")
-*        arrays. The same value will also be used to flag any output
-*        array elements for which resampled values could not be
-*        obtained.  The output arrays(s) may be flagged with this
-*        value whether or not the AST__USEBAD flag is set (the
-*        function return value indicates whether any such values have
-*        been produced).
+*        arrays. Unles the AST__NOBAD flag is specified in "flags", the 
+*        same value will also be used to flag any output array elements 
+*        for which resampled values could not be obtained.  The output 
+*        arrays(s) may be flagged with this value whether or not the 
+*        AST__USEBAD flag is set (the function return value indicates 
+*        whether any such values have been produced).
 *     out
 *        Pointer to an array with the same data type as the "in"
 *        array, into which the resampled data will be returned. Note
@@ -2743,9 +2748,8 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name ) {
 *        should be given.
 
 *  Returned Value:
-*     The number of output grid points to which a data value (or a
-*     variance value if relevant) equal to "badval" has been assigned
-*     because no valid output value could be obtained.
+*     The number of output grid points for which no valid output value 
+*     could be obtained.
 
 *  Notes:
 *     - There is a separate function for each numerical type of
@@ -2810,6 +2814,7 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
    int kerror;                   /* Error signalled by kernel function? */ \
    int lo_x;                     /* Lower pixel index (x dimension) */ \
    int lo_y;                     /* Lower pixel index (y dimension) */ \
+   int nobad;                    /* Was the AST__NOBAD flag set? */ \
    int off1;                     /* Input pixel offset due to y index */ \
    int off_in;                   /* Offset to input pixel */ \
    int off_out;                  /* Offset to output pixel */ \
@@ -2838,6 +2843,7 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
    sum = 0.0; \
 \
 /* Determine if we are processing bad pixels or variances. */ \
+   nobad = flags & AST__NOBAD; \
    usebad = flags & AST__USEBAD; \
    usevar = in_var && out_var; \
 \
@@ -2861,28 +2867,59 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
    the output arrays(s). In each case we assign constant values (0 or \
    1) to the "Usebad" and "Usevar" flags so that code for handling bad \
    pixels and variances can be eliminated when not required. */ \
-      if ( usebad ) { \
-         if ( usevar ) { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,1) \
+      if ( nobad ) { \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,1,1) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,0,1) \
+               } \
             } \
          } else { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,0) \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,1,1) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,0,1) \
+               } \
             } \
          } \
+\
+/* Four more cases as above, but this time with the AST__NOBAD flag \
+   un-set. */ \
       } else { \
-         if ( usevar ) { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,1) \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,1,0) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,0,0) \
+               } \
             } \
          } else { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,0) \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,1,0) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,0,0) \
+               } \
             } \
          } \
       } \
@@ -2915,28 +2952,59 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
    the output arrays(s). In each case we assign constant values (0 or \
    1) to the "Usebad" and "Usevar" flags so that code for handling bad \
    pixels and variances can be eliminated when not required. */ \
-         if ( usebad ) { \
-            if ( usevar ) { \
-               for ( point = 0; point < npoint; point++ ) { \
-                  ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
-                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,1) \
+         if ( nobad ) { \
+            if ( usebad ) { \
+               if ( usevar ) { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,1,1) \
+                  } \
+               } else { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,0,1) \
+                  } \
                } \
             } else { \
-               for ( point = 0; point < npoint; point++ ) { \
-                  ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
-                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,0) \
+               if ( usevar ) { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,1,1) \
+                  } \
+               } else { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,0,1) \
+                  } \
                } \
             } \
+\
+/* Another four cases, as above, but this time without the AST__NOBAD \
+   flag. */ \
          } else { \
-            if ( usevar ) { \
-               for ( point = 0; point < npoint; point++ ) { \
-                  ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
-                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,1) \
+            if ( usebad ) { \
+               if ( usevar ) { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,1,0) \
+                  } \
+               } else { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,0,0) \
+                  } \
                } \
             } else { \
-               for ( point = 0; point < npoint; point++ ) { \
-                  ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
-                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,0) \
+               if ( usevar ) { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,1,0) \
+                  } \
+               } else { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,0,0) \
+                  } \
                } \
             } \
          } \
@@ -2983,28 +3051,59 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
    the output arrays(s). In each case we assign constant values (0 or \
    1) to the "Usebad" and "Usevar" flags so that code for handling bad \
    pixels and variances can be eliminated when not required. */ \
-         if ( usebad ) { \
-            if ( usevar ) { \
-               for ( point = 0; point < npoint; point++ ) { \
-                  ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
-                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,1) \
+         if( nobad ) { \
+            if ( usebad ) { \
+               if ( usevar ) { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,1,1) \
+                  } \
+               } else { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,0,1) \
+                  } \
                } \
             } else { \
-               for ( point = 0; point < npoint; point++ ) { \
-                  ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
-                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,0) \
+               if ( usevar ) { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,1,1) \
+                  } \
+               } else { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,0,1) \
+                  } \
                } \
             } \
+\
+/* Another 4 cases as above, but this time with the AST__NOBAD flag \
+   un-set. */ \
          } else { \
-            if ( usevar ) { \
-               for ( point = 0; point < npoint; point++ ) { \
-                  ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
-                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,1) \
+            if ( usebad ) { \
+               if ( usevar ) { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,1,0) \
+                  } \
+               } else { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,0,0) \
+                  } \
                } \
             } else { \
-               for ( point = 0; point < npoint; point++ ) { \
-                  ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
-                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,0) \
+               if ( usevar ) { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,1,0) \
+                  } \
+               } else { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,0,0) \
+                  } \
                } \
             } \
          } \
@@ -3416,7 +3515,7 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
 /* This subsidiary macro calculates the interpolated output value (and
    variance) from the sums over contributing pixels, checks the
    results for validity, and assigns them to the output array(s). */
-#define CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Usebad,Usevar) \
+#define CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Usebad,Usevar,Nobad) \
 \
 /* If the output data value has not yet been flagged as bad, then \
    check that an interpolated value can actually be produced.  First \
@@ -3460,8 +3559,10 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
 \
 /* Assign a bad output value (and variance) if required and count it. */ \
    if ( bad ) { \
-      out[ off_out ] = badval; \
-      if ( Usevar ) out_var[ off_out ] = badval; \
+      if( !Nobad ) { \
+         out[ off_out ] = badval; \
+         if ( Usevar ) out_var[ off_out ] = badval; \
+      } \
       result++; \
 \
 /* Otherwise, assign the interpolated value. If the output data type \
@@ -3480,7 +3581,9 @@ static int InterpolateKernel1##X( AstMapping *this, int ndim_in, \
    store a bad output variance value and count it. */ \
       if ( Usevar ) { \
          if ( bad_var ) { \
-            out_var[ off_out ] = badval; \
+            if( !Nobad ) { \
+               out_var[ off_out ] = badval; \
+            } \
             result++; \
 \
 /* Otherwise, store the variance estimate, rounding to the nearest \
@@ -3702,10 +3805,11 @@ MAKE_INTERPOLATE_KERNEL1(UB,unsigned char,0,float,0)
 *        contains the values of coordinate number "coord" for each
 *        interpolation point. The value of coordinate number "coord"
 *        for interpolation point number "point" is therefore given by
-*        "coords[coord][point]" (assuming both indices are
+*        "coords[coord][point]" (assuming both indices to be
 *        zero-based).  If any point has a coordinate value of AST__BAD
 *        associated with it, then the corresponding output data (and
-*        variance) will be set to the value given by "badval".
+*        variance) will be set to the value given by "badval" (unles the
+*        AST__NOBAD flag is specified).
 *     flags
 *        The bitwise OR of a set of flag values which control the
 *        operation of the function. Currently, only the flag
@@ -3718,12 +3822,12 @@ MAKE_INTERPOLATE_KERNEL1(UB,unsigned char,0,float,0)
 *        this parameter specifies the value which is used to identify
 *        bad data and/or variance values in the input array(s). Its
 *        numerical type must match that of the "in" (and "in_var")
-*        arrays. The same value will also be used to flag any output
-*        array elements for which resampled values could not be
-*        obtained.  The output arrays(s) may be flagged with this
-*        value whether or not the AST__USEBAD flag is set (the
-*        function return value indicates whether any such values have
-*        been produced).
+*        arrays. Unles the AST__NOBAD flag is specified in "flags", the 
+*        same value will also be used to flag any output array elements 
+*        for which resampled values could not be obtained.  The output 
+*        arrays(s) may be flagged with this value whether or not the 
+*        AST__USEBAD flag is set (the function return value indicates 
+*        whether any such values have been produced).
 *     out
 *        Pointer to an array with the same data type as the "in"
 *        array, into which the resampled data will be returned. Note
@@ -3815,6 +3919,7 @@ static int InterpolateLinear##X( int ndim_in, \
    int iy;                       /* Pixel index in input grid y dimension */ \
    int lo_x;                     /* Lower pixel index (x dimension) */ \
    int lo_y;                     /* Lower pixel index (y dimension) */ \
+   int nobad;                    /* Was the AST__NOBAD flag set? */ \
    int off_in;                   /* Offset to input pixel */ \
    int off_lo;                   /* Offset to "first" input pixel */ \
    int off_out;                  /* Offset to output pixel */ \
@@ -3841,6 +3946,7 @@ static int InterpolateLinear##X( int ndim_in, \
    bad_var = 0; \
 \
 /* Determine if we are processing bad pixels or variances. */ \
+   nobad = flags & AST__NOBAD; \
    usebad = flags & AST__USEBAD; \
    usevar = in_var && out_var; \
 \
@@ -3859,32 +3965,67 @@ static int InterpolateLinear##X( int ndim_in, \
    the output arrays(s). In each case we assign constant values (0 or \
    1) to the "Usebad" and "Usevar" flags so that code for handling bad \
    pixels and variances can be eliminated when not required. */ \
-      if ( usebad ) { \
-         if ( usevar ) { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
-                                      1,1) \
+      if ( nobad ) { \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
+                                         1,1,1) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
+                                         1,0,1) \
+               } \
             } \
          } else { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
-                                      1,0) \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
+                                         0,1,1) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
+                                         0,0,1) \
+               } \
             } \
          } \
+\
+/* Four more cases as above, but this time with the AST__NOBAD flag \
+   un-set. */ \
       } else { \
-         if ( usevar ) { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
-                                      0,1) \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
+                                         1,1,0) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
+                                         1,0,0) \
+               } \
             } \
          } else { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
-                                      0,0) \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
+                                         0,1,0) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
+                                         0,0,0) \
+               } \
             } \
          } \
       } \
@@ -3910,32 +4051,66 @@ static int InterpolateLinear##X( int ndim_in, \
    the output arrays(s). In each case we assign constant values (0 or \
    1) to the "Usebad" and "Usevar" flags so that code for handling bad \
    pixels and variances can be eliminated when not required. */ \
-      if ( usebad ) { \
-         if ( usevar ) { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
-                                      1,1) \
+      if ( nobad ) { \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
+                                         1,1,1) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
+                                         1,0,1) \
+               } \
             } \
          } else { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
-                                      1,0) \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
+                                         0,1,1) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
+                                         0,0,1) \
+               } \
             } \
          } \
+\
+/* Four more case as above, but without the AST__NOBAD flag. */ \
       } else { \
-         if ( usevar ) { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
-                                      0,1) \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
+                                         1,1,0) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
+                                         1,0,0) \
+               } \
             } \
          } else { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
-                                      0,0) \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
+                                         0,1,0) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
+                                         0,0,0) \
+               } \
             } \
          } \
       } \
@@ -3975,32 +4150,66 @@ static int InterpolateLinear##X( int ndim_in, \
    the output arrays(s). In each case we assign constant values (0 or \
    1) to the "Usebad" and "Usevar" flags so that code for handling bad \
    pixels and variances can be eliminated when not required. */ \
-         if ( usebad ) { \
-            if ( usevar ) { \
-               for ( point = 0; point < npoint; point++ ) { \
-                  ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
-                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype, \
-                                         Xsigned,1,1) \
+         if ( nobad ) { \
+            if ( usebad ) { \
+               if ( usevar ) { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype, \
+                                            Xsigned,1,1,1) \
+                  } \
+               } else { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype, \
+                                            Xsigned,1,0,1) \
+                  } \
                } \
             } else { \
-               for ( point = 0; point < npoint; point++ ) { \
-                  ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
-                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype, \
-                                         Xsigned,1,0) \
+               if ( usevar ) { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype, \
+                                            Xsigned,0,1,1) \
+                  } \
+               } else { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype, \
+                                            Xsigned,0,0,1) \
+                  } \
                } \
             } \
+\
+/* Four more case as above, but without the AST__NOBAD flag. */ \
          } else { \
-            if ( usevar ) { \
-               for ( point = 0; point < npoint; point++ ) { \
-                  ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
-                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype, \
-                                         Xsigned,0,1) \
+            if ( usebad ) { \
+               if ( usevar ) { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype, \
+                                            Xsigned,1,1,0) \
+                  } \
+               } else { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype, \
+                                            Xsigned,1,0,0) \
+                  } \
                } \
             } else { \
-               for ( point = 0; point < npoint; point++ ) { \
-                  ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
-                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype, \
-                                         Xsigned,0,0) \
+               if ( usevar ) { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype, \
+                                            Xsigned,0,1,0) \
+                  } \
+               } else { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype, \
+                                            Xsigned,0,0,0) \
+                  } \
                } \
             } \
          } \
@@ -4354,15 +4563,17 @@ static int InterpolateLinear##X( int ndim_in, \
    variance) from the sums over contributing pixels and assigns them
    to the output array(s). */
 #define CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Xsigned, \
-                               Usebad,Usevar) \
+                               Usebad,Usevar,Nobad) \
 \
 /* Obtain the pixel offset into the output array. */ \
    off_out = offset[ point ]; \
 \
 /* Assign a bad output value (and variance) if required and count it. */ \
    if ( bad ) { \
-      out[ off_out ] = badval; \
-      if ( Usevar ) out_var[ off_out ] = badval; \
+      if( !Nobad ) { \
+         out[ off_out ] = badval; \
+         if ( Usevar ) out_var[ off_out ] = badval; \
+      } \
       result++; \
 \
 /* Otherwise, calculate the interpolated value. If the output data \
@@ -4382,7 +4593,7 @@ static int InterpolateLinear##X( int ndim_in, \
    store a bad output variance value and count it. */ \
       if ( Usevar ) { \
          if ( ( ( Xsigned ) || ( Usebad ) ) && bad_var ) { \
-            out_var[ off_out ] = badval; \
+            if( !Nobad ) out_var[ off_out ] = badval; \
             result++; \
 \
 /* Otherwise, calculate the variance estimate and store it, rounding \
@@ -4532,10 +4743,11 @@ MAKE_INTERPOLATE_LINEAR(UB,unsigned char,0,float,0)
 *        contains the values of coordinate number "coord" for each
 *        interpolation point. The value of coordinate number "coord"
 *        for interpolation point number "point" is therefore given by
-*        "coords[coord][point]" (assuming both indices are
+*        "coords[coord][point]" (assuming both indices to be
 *        zero-based).  If any point has a coordinate value of AST__BAD
 *        associated with it, then the corresponding output data (and
-*        variance) will be set to the value given by "badval".
+*        variance) will be set to the value given by "badval" (unles the
+*        AST__NOBAD flag is specified).
 *     flags
 *        The bitwise OR of a set of flag values which control the
 *        operation of the function. Currently, only the flag
@@ -4548,12 +4760,12 @@ MAKE_INTERPOLATE_LINEAR(UB,unsigned char,0,float,0)
 *        this parameter specifies the value which is used to identify
 *        bad data and/or variance values in the input array(s). Its
 *        numerical type must match that of the "in" (and "in_var")
-*        arrays. The same value will also be used to flag any output
-*        array elements for which resampled values could not be
-*        obtained.  The output arrays(s) may be flagged with this
-*        value whether or not the AST__USEBAD flag is set (the
-*        function return value indicates whether any such values have
-*        been produced).
+*        arrays. Unles the AST__NOBAD flag is specified in "flags", the 
+*        same value will also be used to flag any output array elements 
+*        for which resampled values could not be obtained.  The output 
+*        arrays(s) may be flagged with this value whether or not the 
+*        AST__USEBAD flag is set (the function return value indicates 
+*        whether any such values have been produced).
 *     out
 *        Pointer to an array with the same data type as the "in"
 *        array, into which the resampled data will be returned. Note
@@ -4622,6 +4834,7 @@ static int InterpolateNearest##X( int ndim_in, \
    int ix;                       /* Number of pixels offset in x direction */ \
    int ixn;                      /* Number of pixels offset (n-d) */ \
    int iy;                       /* Number of pixels offset in y direction */ \
+   int nobad;                    /* Was the AST__NOBAD flag set? */ \
    int off_in;                   /* Pixel offset into input array */ \
    int off_out;                  /* Pixel offset into output array */ \
    int point;                    /* Loop counter for output points */ \
@@ -4643,6 +4856,7 @@ static int InterpolateNearest##X( int ndim_in, \
    off_in = 0; \
 \
 /* Determine if we are processing bad pixels or variances. */ \
+   nobad = flags & AST__NOBAD; \
    usebad = flags & AST__USEBAD; \
    usevar = in_var && out_var; \
 \
@@ -4661,28 +4875,58 @@ static int InterpolateNearest##X( int ndim_in, \
    the output arrays(s). In each case we assign constant values (0 or \
    1) to the "Usebad" and "Usevar" flags so that code for handling bad \
    pixels and variances can be eliminated when not required. */ \
-      if ( usebad ) { \
-         if ( usevar ) { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_1D(X,Xtype,1,1) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,1,1) \
+      if ( nobad ) { \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,1,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,1,1,1) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,1,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,1,0,1) \
+               } \
             } \
          } else { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_1D(X,Xtype,1,0) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,1,0) \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,0,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,0,1,1) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,0,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,0,0,1) \
+               } \
             } \
          } \
+\
+/* Four more cases as above, but without the AST__NOBAD flag. */ \
       } else { \
-         if ( usevar ) { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_1D(X,Xtype,0,1) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,0,1) \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,1,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,1,1,0) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,1,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,1,0,0) \
+               } \
             } \
          } else { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_1D(X,Xtype,0,0) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,0,0) \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,0,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,0,1,0) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,0,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,0,0,0) \
+               } \
             } \
          } \
       } \
@@ -4708,28 +4952,58 @@ static int InterpolateNearest##X( int ndim_in, \
    the output arrays(s). In each case we assign constant values (0 or \
    1) to the "Usebad" and "Usevar" flags so that code for handling bad \
    pixels and variances can be eliminated when not required. */ \
-      if ( usebad ) { \
-         if ( usevar ) { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_2D(X,Xtype,1,1) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,1,1) \
+      if ( nobad ) { \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,1,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,1,1,1) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,1,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,1,0,1) \
+               } \
             } \
          } else { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_2D(X,Xtype,1,0) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,1,0) \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,0,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,0,1,1) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,0,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,0,0,1) \
+               } \
             } \
          } \
+\
+/* Four more cases as above, but without the AST__NOBAD flag. */ \
       } else { \
-         if ( usevar ) { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_2D(X,Xtype,0,1) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,0,1) \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,1,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,1,1,0) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,1,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,1,0,0) \
+               } \
             } \
          } else { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_2D(X,Xtype,0,0) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,0,0) \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,0,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,0,1,0) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,0,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,0,0,0) \
+               } \
             } \
          } \
       } \
@@ -4762,28 +5036,58 @@ static int InterpolateNearest##X( int ndim_in, \
    the output arrays(s). In each case we assign constant values (0 or \
    1) to the "Usebad" and "Usevar" flags so that code for handling bad \
    pixels and variances can be eliminated when not required. */ \
-         if ( usebad ) { \
-            if ( usevar ) { \
-               for ( point = 0; point < npoint; point++ ) { \
-                  ASSEMBLE_INPUT_ND(X,Xtype,1,1) \
-                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,1,1) \
+         if ( nobad ) { \
+            if ( usebad ) { \
+               if ( usevar ) { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,1,1) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,1,1,1) \
+                  } \
+               } else { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,1,0) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,1,0,1) \
+                  } \
                } \
             } else { \
-               for ( point = 0; point < npoint; point++ ) { \
-                  ASSEMBLE_INPUT_ND(X,Xtype,1,0) \
-                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,1,0) \
+               if ( usevar ) { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,0,1) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,0,1,1) \
+                  } \
+               } else { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,0,0) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,0,0,1) \
+                  } \
                } \
             } \
+\
+/* Another 4 cases as above, but without the AST__NOBAD flag. */ \
          } else { \
-            if ( usevar ) { \
-               for ( point = 0; point < npoint; point++ ) { \
-                  ASSEMBLE_INPUT_ND(X,Xtype,0,1) \
-                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,0,1) \
+            if ( usebad ) { \
+               if ( usevar ) { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,1,1) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,1,1,0) \
+                  } \
+               } else { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,1,0) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,1,0,0) \
+                  } \
                } \
             } else { \
-               for ( point = 0; point < npoint; point++ ) { \
-                  ASSEMBLE_INPUT_ND(X,Xtype,0,0) \
-                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,0,0) \
+               if ( usevar ) { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,0,1) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,0,1,0) \
+                  } \
+               } else { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,0,0) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,0,0,0) \
+                  } \
                } \
             } \
          } \
@@ -4883,7 +5187,7 @@ static int InterpolateNearest##X( int ndim_in, \
 
 /* This subsidiary macro assigns the output value (and variance) to
    the output array(s). */
-#define CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,Usebad,Usevar) \
+#define CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xsigned,Usebad,Usevar,Nobad) \
 \
 /* Obtain the pixel offset into the output array. */ \
    off_out = offset[ point ]; \
@@ -4891,8 +5195,10 @@ static int InterpolateNearest##X( int ndim_in, \
 /* If the input data value is bad, assign a bad output value (and \
    variance, if required) and count it. */ \
    if ( bad ) { \
-      out[ off_out ] = badval; \
-      if ( Usevar ) out_var[ off_out ] = badval; \
+      if( !Nobad ) { \
+         out[ off_out ] = badval; \
+         if ( Usevar ) out_var[ off_out ] = badval; \
+      } \
       result++; \
 \
 /* Otherwise, assign the value obtained from the input grid. */ \
@@ -4911,7 +5217,7 @@ static int InterpolateNearest##X( int ndim_in, \
    the output array and count it. Otherwise, store the variance \
    value. */ \
          if ( ( ( Xsigned ) || ( Usebad ) ) && bad ) { \
-            out_var[ off_out ] = badval; \
+            if( !Nobad ) out_var[ off_out ] = badval; \
             result++; \
          } else { \
             out_var[ off_out ] = var; \
@@ -5054,10 +5360,11 @@ MAKE_INTERPOLATE_NEAREST(UB,unsigned char,0)
 *        contains the values of coordinate number "coord" for each
 *        interpolation point. The value of coordinate number "coord"
 *        for interpolation point number "point" is therefore given by
-*        "coords[coord][point]" (assuming both indices are
+*        "coords[coord][point]" (assuming both indices to be
 *        zero-based).  If any point has a coordinate value of AST__BAD
 *        associated with it, then the corresponding output data (and
-*        variance) will be set to the value given by "badval".
+*        variance) will be set to the value given by "badval" (unles the
+*        AST__NOBAD flag is specified).
 *     params
 *        A pointer to an array of doubles giving further information
 *        about how the resampling is to proceed.  Only the first 
@@ -5078,12 +5385,12 @@ MAKE_INTERPOLATE_NEAREST(UB,unsigned char,0)
 *        this parameter specifies the value which is used to identify
 *        bad data and/or variance values in the input array(s). Its
 *        numerical type must match that of the "in" (and "in_var")
-*        arrays. The same value will also be used to flag any output
-*        array elements for which resampled values could not be
-*        obtained.  The output arrays(s) may be flagged with this
-*        value whether or not the AST__USEBAD flag is set (the
-*        function return value indicates whether any such values have
-*        been produced).
+*        arrays. Unles the AST__NOBAD flag is specified in "flags", the 
+*        same value will also be used to flag any output array elements 
+*        for which resampled values could not be obtained.  The output 
+*        arrays(s) may be flagged with this value whether or not the 
+*        AST__USEBAD flag is set (the function return value indicates 
+*        whether any such values have been produced).
 *     out
 *        Pointer to an array with the same data type as the "in"
 *        array, into which the resampled data will be returned. Note
@@ -5170,6 +5477,7 @@ static void InterpolateBlockAverage##X( int ndim_in, \
    int lo_x;                     /* Lower pixel index (x dimension) */ \
    int lo_y;                     /* Lower pixel index (y dimension) */ \
    int neighb;                   /* Number of adjacent pixels on each side */ \
+   int nobad;                    /* Was the AST__NOBAD flag set? */ \
    int off1;                     /* Input pixel offset due to y index */ \
    int off_in;                   /* Offset to input pixel */ \
    int off_out;                  /* Offset to output pixel */ \
@@ -5195,6 +5503,7 @@ static void InterpolateBlockAverage##X( int ndim_in, \
    bad_var = 0; \
 \
 /* Determine if we are processing bad pixels or variances. */ \
+   nobad = flags & AST__NOBAD; \
    usebad = flags & AST__USEBAD; \
    usevar = in_var && out_var; \
 \
@@ -5217,28 +5526,58 @@ static void InterpolateBlockAverage##X( int ndim_in, \
    the output arrays(s). In each case we assign constant values (0 or \
    1) to the "Usebad" and "Usevar" flags so that code for handling bad \
    pixels and variances can be eliminated when not required. */ \
-      if ( usebad ) { \
-         if ( usevar ) { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,1) \
+      if ( nobad ) { \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,1,1) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,0,1) \
+               } \
             } \
          } else { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,0) \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,1,1) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,0,1) \
+               } \
             } \
          } \
+\
+/* Another 4 cases as above, but without the AST__NOBAD flag. */ \
       } else { \
-         if ( usevar ) { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,1) \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,1,0) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,0,0) \
+               } \
             } \
          } else { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,0) \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,1,0) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_1D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,0,0) \
+               } \
             } \
          } \
       } \
@@ -5257,28 +5596,58 @@ static void InterpolateBlockAverage##X( int ndim_in, \
    the output arrays(s). In each case we assign constant values (0 or \
    1) to the "Usebad" and "Usevar" flags so that code for handling bad \
    pixels and variances can be eliminated when not required. */ \
-      if ( usebad ) { \
-         if ( usevar ) { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,1) \
+      if ( nobad ) { \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,1,1) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,0,1) \
+               } \
             } \
          } else { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,0) \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,1,1) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,0,1) \
+               } \
             } \
          } \
+\
+/* Another 4 cases as above, but without the AST__NOBAD flag. */ \
       } else { \
-         if ( usevar ) { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,1) \
+         if ( usebad ) { \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,1,0) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,0,0) \
+               } \
             } \
          } else { \
-            for ( point = 0; point < npoint; point++ ) { \
-               ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
-               CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,0) \
+            if ( usevar ) { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,1,0) \
+               } \
+            } else { \
+               for ( point = 0; point < npoint; point++ ) { \
+                  ASSEMBLE_INPUT_2D(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
+                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,0,0) \
+               } \
             } \
          } \
       } \
@@ -5314,28 +5683,58 @@ static void InterpolateBlockAverage##X( int ndim_in, \
    the output arrays(s). In each case we assign constant values (0 or \
    1) to the "Usebad" and "Usevar" flags so that code for handling bad \
    pixels and variances can be eliminated when not required. */ \
-         if ( usebad ) { \
-            if ( usevar ) { \
-               for ( point = 0; point < npoint; point++ ) { \
-                  ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
-                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,1) \
+         if ( nobad ) { \
+            if ( usebad ) { \
+               if ( usevar ) { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,1,1) \
+                  } \
+               } else { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,0,1) \
+                  } \
                } \
             } else { \
-               for ( point = 0; point < npoint; point++ ) { \
-                  ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
-                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,0) \
+               if ( usevar ) { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,1,1) \
+                  } \
+               } else { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,0,1) \
+                  } \
                } \
             } \
+\
+/* Another 4 cases as above, but this time without the AST__NOBAD flag. */ \
          } else { \
-            if ( usevar ) { \
-               for ( point = 0; point < npoint; point++ ) { \
-                  ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
-                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,1) \
+            if ( usebad ) { \
+               if ( usevar ) { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,1,1) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,1,0) \
+                  } \
+               } else { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,1,0) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,1,0,0) \
+                  } \
                } \
             } else { \
-               for ( point = 0; point < npoint; point++ ) { \
-                  ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
-                  CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,0) \
+               if ( usevar ) { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,0,1) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,1,0) \
+                  } \
+               } else { \
+                  for ( point = 0; point < npoint; point++ ) { \
+                     ASSEMBLE_INPUT_ND(X,Xtype,Xfloating,Xfloattype,Xsigned,0,0) \
+                     CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,0,0,0) \
+                  } \
                } \
             } \
          } \
@@ -5596,7 +5995,7 @@ static void InterpolateBlockAverage##X( int ndim_in, \
 /* This subsidiary macro calculates the interpolated output value (and
    variance) from the sums over contributing pixels, checks the
    results for validity, and assigns them to the output array(s). */
-#define CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Usebad,Usevar) \
+#define CALC_AND_ASSIGN_OUTPUT(X,Xtype,Xfloating,Xfloattype,Usebad,Usevar,Nobad) \
 \
 /* If the output data value has not yet been flagged as bad, then \
    check that an interpolated value can actually be produced.  First \
@@ -5640,8 +6039,10 @@ static void InterpolateBlockAverage##X( int ndim_in, \
 \
 /* Assign a bad output value (and variance) if required and count it. */ \
    if ( bad ) { \
-      out[ off_out ] = badval; \
-      if ( Usevar ) out_var[ off_out ] = badval; \
+      if( !Nobad ) { \
+         out[ off_out ] = badval; \
+         if ( Usevar ) out_var[ off_out ] = badval; \
+      } \
       (*nbad)++; \
 \
 /* Otherwise, assign the interpolated value. If the output data type \
@@ -5660,7 +6061,7 @@ static void InterpolateBlockAverage##X( int ndim_in, \
    store a bad output variance value and count it. */ \
       if ( Usevar ) { \
          if ( bad_var ) { \
-            out_var[ off_out ] = badval; \
+            if( !Nobad ) out_var[ off_out ] = badval; \
             (*nbad)++; \
 \
 /* Otherwise, store the variance estimate, rounding to the nearest \
@@ -11841,7 +12242,9 @@ c        (and "in_var") array(s).
 f        then this value is used to test for bad pixels in the IN
 f        (and IN_VAR) array(s).
 *
-*        In all cases, this value is also used to flag any output
+c        Unless the AST__NOBAD flag is set via the "flags" parameter,
+f        Unless the AST__NOBAD flag is set via the FLAGS argument,
+*        this value is also used to flag any output
 c        elements in the "out" (and "out_var") array(s) for which
 f        elements in the OUT (and OUT_VAR) array(s) for which
 *        resampled values could not be obtained (see the "Propagation
@@ -11849,7 +12252,9 @@ f        elements in the OUT (and OUT_VAR) array(s) for which
 c        circumstances under which this may occur). The astResample<X>
 f        circumstances under which this may occur). The AST_RESAMPLE<X>
 *        function return value indicates whether any such values have
-*        been produced.
+*        been produced. If the AST__NOBAD flag is set. then output array
+*        elements for which no resampled value could be obtained are
+*        left set to the value they had on entry to this function.
 c     ndim_out
 f     NDIM_OUT = INTEGER (Given)
 *        The number of dimensions in the output grid. This should be
@@ -11946,13 +12351,12 @@ f        The global status.
 *  Returned Value:
 c     astResample<X>()
 f     AST_RESAMPLE<X> = INTEGER
-*        The number of output pixels to which a data value (or a
-c        variance value if relevant) equal to "badval" has been
-f        variance value if relevant) equal to BADVAL has been
-*        assigned because no valid resampled value could be obtained.
-*        Thus, in the absence of any error, a returned value of zero
-*        indicates that all the required output pixels received valid
-*        resampled data values (and variances).
+*        The number of output pixels for which no valid resampled value
+*        could be obtained. Thus, in the absence of any error, a returned 
+*        value of zero indicates that all the required output pixels 
+*        received valid resampled data values (and variances). See the
+c        "badval" and "flags" parameters.
+f        BADVAL and FLAGS arguments.
 
 *  Notes:
 *     - A value of zero will be returned if this function is invoked
@@ -12257,6 +12661,14 @@ f     The following flags are defined in the AST_PAR include file and
 c     bitwise OR of their values via the "flags" parameter:
 f     sum of their values via the FLAGS argument:
 *
+*     - AST__NOBAD: Indicates that any output array elements for which no
+*     resampled value could be obtained should be left set to the value
+*     they had on entry to this function. If this flag is not supplied, 
+*     such output array elements are set to the value supplied for
+c     parameter "badval". Note, this flag cannot be used in conjunction
+f     argument BADVAL. Note, this flag cannot be used in conjunction
+*     with the AST__CONSERVEFLUX flag (an error will be reported if both
+*     flags are specified).
 *     - AST__URESAMP1, 2, 3 & 4: A set of four flags which are
 *     reserved for your own use. They may be used to pass private
 c     information to any sub-pixel interpolation function which you
@@ -12310,6 +12722,9 @@ f     TOL argument
 *     until the difference between adjacent panels is sufficiently small
 *     to be insignificant. 
 *
+*     Note, this flag cannot be used in conjunction with the AST__NOBAD 
+*     flag (an error will be reported if both flags are specified).
+*
 *     Flux conservation can only be approximate when using a resampling
 *     algorithm. For accurate flux conservation use the 
 c     astRebin<X> or astRebinSeq<X> function
@@ -12317,7 +12732,8 @@ f     AST_REBIN<X> or AST_REBINSEQ<X> routine
 *     instead.
 
 *  Propagation of Missing Data:
-*     Instances of missing data (bad pixels) in the output grid are
+*     Unless the AST__NOBAD flag is specified, instances of missing data 
+*     (bad pixels) in the output grid are
 c     identified by occurrences of the "badval" value in the "out"
 f     identified by occurrences of the BADVAL value in the OUT
 *     array. These may be produced if any of the following happen:
@@ -12365,6 +12781,16 @@ f     BADVAL (and the AST__USEBAD flag is set), or because it is
 *     - The variance value lies outside the range which can be
 c     represented using the data type of the "out_var" array.
 f     represented using the data type of the OUT_VAR array.
+*
+*     If the AST__NOBAD flag is specified via
+c     parameter "flags",
+f     argument FLAGS,
+*     then output array elements that would otherwise be set to 
+c     "badval"
+f     BADVAL
+*     are instead left holding the value they had on entry to this
+*     function. The number of such array elements is returned as
+*     the function value.
 *--
 */
 /* Define a macro to implement the function for a specific data
@@ -12761,12 +13187,12 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
 *        pointer to a value which is used to identify bad data and/or
 *        variance values in the input array(s). The referenced value's
 *        data type must match that of the "in" (and "in_var")
-*        arrays. The same value will also be used to flag any output
-*        array elements for which resampled values could not be
-*        obtained.  The output arrays(s) may be flagged with this
-*        value whether or not the AST__USEBAD flag is set (the
-*        function return value indicates whether any such values have
-*        been produced).
+*        arrays. Unless the AST__NOBAD flag is set, the same value will 
+*        also be used to flag any output array elements for which 
+*        resampled values could not be obtained.  The output arrays(s) 
+*        may be flagged with this value whether or not the AST__USEBAD 
+*        flag is set (the function return value indicates whether any 
+*        such values have been produced).
 *     ndim_out
 *        The number of dimensions in the output grid. This should be
 *        at least one.
@@ -12816,9 +13242,8 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
 *        should be given.
 
 *  Returned Value:
-*     The number of output grid points to which a data value (or a
-*     variance value if relevant) equal to "badval" has been assigned
-*     because no valid output value could be obtained.
+*     The number of output grid points for which no valid output value 
+*     could be obtained.
 
 *  Notes:
 *     - A value of zero will be returned if this function is invoked
@@ -13168,12 +13593,12 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 *        pointer to a value which is used to identify bad data and/or
 *        variance values in the input array(s). The referenced value's
 *        data type must match that of the "in" (and "in_var")
-*        arrays. The same value will also be used to flag any output
-*        array elements for which resampled values could not be
-*        obtained.  The output arrays(s) may be flagged with this
-*        value whether or not the AST__USEBAD flag is set (the
-*        function return value indicates whether any such values have
-*        been produced).
+*        arrays. Unless the AST__NOBAD flag is set, the same value will 
+*        also be used to flag any output array elements for which 
+*        resampled values could not be obtained.  The output arrays(s) 
+*        may be flagged with this value whether or not the AST__USEBAD 
+*        flag is set (the function return value indicates whether any 
+*        such values have been produced).
 *     ndim_out
 *        The number of dimensions in the output grid. This should be
 *        at least one.
@@ -13223,9 +13648,8 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
 *        should be given.
 
 *  Returned Value:
-*       The number of output grid points to which a data value (or a
-*       variance value if relevant) equal to "badval" has been
-*       assigned because no valid output value could be obtained.
+*       The number of output grid points for which no valid output value 
+*       could be obtained.
 
 *  Notes:
 *     - This function does not take steps to limit memory usage if the
@@ -13288,7 +13712,16 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
    kernel = NULL;
 
 /* See if we are conserving flux */
-   conserve = flags & AST__CONSERVEFLUX; \
+   conserve = flags & AST__CONSERVEFLUX;
+
+/* If we are conserving flux, then we need some way to tell which output
+   array elements have been assigned a value and which have not. If the  
+   AST__NOBAD flag has been specified then this is not possible to report
+   an error. */
+   if( ( flags & AST__NOBAD ) && conserve ) {
+      astError( AST__BADFLG, "astResample: Cannot use the AST__NOBAD and "
+                "AST__CONSERVEFLUX flags together (programming error)." );
+   }
 
 /* Calculate the number of output points, as given by the product of
    the output grid dimensions. */
@@ -14193,12 +14626,12 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
 *        pointer to a value which is used to identify bad data and/or
 *        variance values in the input array(s). The referenced value's
 *        data type must match that of the "in" (and "in_var")
-*        arrays. The same value will also be used to flag any output
-*        array elements for which resampled values could not be
-*        obtained.  The output arrays(s) may be flagged with this
-*        value whether or not the AST__USEBAD flag is set (the
-*        function return value indicates whether any such values have
-*        been produced).
+*        arrays. Unless the AST__NOBAD flag is set, the same value will 
+*        also be used to flag any output array elements for which 
+*        resampled values could not be obtained.  The output arrays(s) 
+*        may be flagged with this value whether or not the AST__USEBAD 
+*        flag is set (the function return value indicates whether any 
+*        such values have been produced).
 *     ndim_out
 *        The number of dimensions in the output grid. This should be
 *        at least one.
@@ -14248,9 +14681,8 @@ static int ResampleWithBlocking( AstMapping *this, const double *linear_fit,
 *        should be given.
 
 *  Returned Value:
-*     The number of output grid points to which a data value (or a
-*     variance value if relevant) equal to "badval" has been assigned
-*     because no valid output value could be obtained.
+*     The number of output grid points for which no valid output value 
+*     could be obtained.
 
 *  Notes:
 *     - A value of zero will be returned if this function is invoked
@@ -20232,8 +20664,11 @@ f        point number POINT is found in element COORDS(POINT,COORD).
 c        to the value AST__BAD (as defined in the "ast.h" header
 f        to the value AST__BAD (as defined in the AST_PAR include
 *        file), then the corresponding output data (and variance)
-c        should be set to the value given by "badval" (see below).
-f        should be set to the value given by BADVAL (see below).
+c        should either be set to the value given by "badval", 
+f        should either be set to the value given by BADVAL, 
+*        or left unchanged, depending on whether the AST__NOBAD flag is
+c        specified by "flags".
+f        specified by FLAGS.
 c     params
 f     PARAMS( * ) = DOUBLE PRECISION (Given)
 c        This will be a pointer to the same array as was given via the
@@ -20261,15 +20696,17 @@ c        parameter of astResample<X>, and will have the same numerical
 c        type as the data being processed (i.e. as elements of the
 c        "in" array).  It should be used to test for bad pixels in the
 c        input grid (but only if the AST__USEBAD flag is set via the
-c        "flags" parameter) and for identifying bad output values in
+c        "flags" parameter) and (unless the AST__NOBAD flag is set in
+c        "flags") for identifying bad output values in
 c        the "out" (and "out_var") array(s).
 f        This will be the same value as was given for the BADVAL
 f        argument of AST_RESAMPLE<X>, and will have the same numerical
 f        type as the data being processed (i.e. as elements of the IN
 f        array).  It should be used to test for bad pixels in the
 f        input grid (but only if the AST__USEBAD flag is set via the
-f        FLAGS argument) and for identifying bad output values in the
-f        OUT (and OUT_VAR) array(s).
+f        FLAGS argument) and (unless the AST__NOBAD flag is set in
+f        FLAGS) for identifying bad output values in the OUT (and 
+f        OUT_VAR) array(s).
 c     out
 f     OUT( * ) = <Xtype> (Returned)
 c        Pointer to an array with the same numerical type as the "in"
@@ -20323,10 +20760,7 @@ f     NBAD = INTEGER (Returned)
 c        Pointer to an int in which to return the number of interpolation
 c        points at
 f        This should return the number of interpolation points at
-*        which an output data value (and/or a variance value if
-c        relevant) equal to "badval" has been assigned because no
-f        relevant) equal to BADVAL has been assigned because no
-*        valid interpolated value could be obtained.  The maximum
+*        which no valid interpolated value could be obtained.  The maximum
 c        value that should be returned is "npoint", and the minimum is
 f        value that should be returned is NPOINT, and the minimum is
 *        zero (indicating that all output values were successfully
