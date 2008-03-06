@@ -200,8 +200,14 @@ void smf_resampcube_ast( smfData *data, int index, int size, dim_t nchan,
    atlTolut( (AstMapping *) ssmap, 1.0, (double) nchan, 1.0, "LutInterp=1", 
               &sslut, status );
 
-/* Set the flags for astResample. */
-   ast_flags = AST__USEBAD;
+/* Set the flags for astResample. This function will be invoked once for
+   each sky cube. We therefore include the AST__NOBAD flag. This means
+   that elements in the output time series array that receive no
+   contribution from the current sky cube are left unchanged, rather than
+   being set bad. If this were not done, the output time series array
+   would be determiend solely by the final sky cube, with areas set bad
+   that recieve no contribution from the final sky cube. */
+   ast_flags = AST__USEBAD | AST__NOBAD;
 
 /* If we are dealing with more than 1 detector, create a LutMap that holds 
    the template GRID index of every detector to be included in the output, and 

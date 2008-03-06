@@ -453,8 +453,13 @@ void smurf_unmakecube( int *status ) {
 /* Ensure the output NDF has a history component. */
       ndfHcre( ondf, status );
 
-/* Get a pointer to the mapped output data array. */
-      ndfMap( ondf, "DATA", "_REAL", "WRITE/BAD", &out_data, &nel, status );
+/* Get a pointer to the mapped output data array. Set all value sbad if
+   we are using AST to do the resampling. */
+      if( interp == AST__NEAREST ) {
+         ndfMap( ondf, "DATA", "_REAL", "WRITE", &out_data, &nel, status );
+      } else {
+         ndfMap( ondf, "DATA", "_REAL", "WRITE/BAD", &out_data, &nel, status );
+      }
 
 /* If the detector positions are to calculated on the basis of FPLANEX/Y
    rather than detpos, then free the detpos array in the templates smfHead
