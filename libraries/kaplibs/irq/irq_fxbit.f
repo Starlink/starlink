@@ -172,8 +172,8 @@
             END IF
          END IF
 
-*  Store the new information.
-         CALL IRQ1_MOD( LOCS, SLOT, FIXED, VALUE, BIT, VALUE, .TRUE., 
+*  Store the new information. 
+         CALL IRQ1_MOD( LOCS, SLOT, .FALSE., VALUE, BIT, VALUE, .TRUE., 
      :                  STATUS )
       END IF
 

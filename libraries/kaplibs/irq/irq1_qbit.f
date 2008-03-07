@@ -142,6 +142,9 @@
 *  Annul the locator to the current slot.
          CALL DAT_ANNUL( QCLOC, STATUS )
 
+*  Move on to the next slot.
+         SLOT = SLOT + 1
+
       END DO
 
       END
