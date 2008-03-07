@@ -941,14 +941,16 @@ itcl::class gaia::GaiaBlink {
    }
 
    #  Convert image coordinates to wcs coordinates in native units.
-   protected method pix2wcs_ {image xo yo} {
+   protected method pix2wcs_ {image xo yo {radians 1}} {
       lassign [$image astpix2wcs $xo $yo 1] wcs1 wcs2
       #  Undo fudge that returns these in "degrees", the natural
       #  units are "radians". We don't use astpix2cur as this may
       #  not return decimal values (if WCS is RA/Dec may get
       #  sexagesimal).
-      set wcs1 [expr $wcs1*$d2r_]
-      set wcs2 [expr $wcs2*$d2r_]
+      if { $radians } {
+         set wcs1 [expr $wcs1*$d2r_]
+         set wcs2 [expr $wcs2*$d2r_]
+      }
       return "$wcs1 $wcs2"
    }
 
@@ -966,7 +968,6 @@ itcl::class gaia::GaiaBlink {
             set_scroll_region_
 
             for { set i 0 } { $i < $n_ } { incr i } {
-               #if { $i == $mobile_ } continue
 
                #  Roughly orient images.
                match_orientation_ $mobile_ $i
@@ -978,15 +979,15 @@ itcl::class gaia::GaiaBlink {
                $image_($i) convert coords $cxl $cyl canvas xo yo image
 
                #  Convert to WCS.
-               lassign [pix2wcs_ $image_($i) $xo $yo] wcs1 wcs2
+               lassign [pix2wcs_ $image_($i) $xo $yo 0] wcs1 wcs2
 
                #  Back to pixels, but of mobile image.
-               lassign [$image_($mobile_) astcur2pix $wcs1 $wcs2 1] xo yo
+               lassign [$image_($mobile_) astwcs2pix $wcs1 $wcs2] xo yo
 
                # Pixel shift from mobile image upper left to this one.
                set dx $xo
                set dy [expr [$image_($mobile_) height]-1.0-$yo]
-
+               
                # Equivalent canvas shift.
                $image_($mobile_) convert dist $dx $dy image dx dy canvas
 
