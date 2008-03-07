@@ -126,8 +126,28 @@ itcl::class gaia::GaiaStartup {
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
 
+      #  Tabbed window for various controls.
+      itk_component add tabbedpane {
+         iwidgets::tabnotebook $w_.tab -angle 0 -tabpos n \
+            -height 400 -width 400
+      }
+      pack $itk_component(tabbedpane) -side top -fill both -expand 1
+
       #  Add various controls....
-      add_controls_
+      $itk_component(tabbedpane) add -label Elements
+      add_element_controls_ [$itk_component(tabbedpane) childsite 0]
+
+      $itk_component(tabbedpane) add -label Control
+      add_control_controls_ [$itk_component(tabbedpane) childsite 1]
+
+      $itk_component(tabbedpane) add -label Colours
+      add_colour_controls_ [$itk_component(tabbedpane) childsite 2]
+
+      $itk_component(tabbedpane) add -label Fonts
+      add_font_controls_ [$itk_component(tabbedpane) childsite 3]
+
+      #  Reveal a page.
+      $itk_component(tabbedpane) select 0
 
       #  Add action buttons.
       itk_component add actions {
@@ -233,6 +253,7 @@ itcl::class gaia::GaiaStartup {
       set values_($this,labelfont) $::gaia_fonts(labelfont)
       set values_($this,textfont) $::gaia_fonts(textfont)
       set values_($this,wcsfont) $::gaia_fonts(wcsfont)
+      set values_($this,font_scale) 0.0
 
       set values_($this,blank_color) black
       set values_($this,image_background) black
@@ -248,7 +269,7 @@ itcl::class gaia::GaiaStartup {
                    min_scale max_scale zoom_factor default_cut default_cmap \
                    default_itt linear_cartesian always_merge check_for_cubes \
                    isize maxshift autoscale autofit \
-                   labelfont textfont wcsfont pick_zoom_factor \
+                   labelfont textfont wcsfont font_scale pick_zoom_factor \
                    blank_color image_background" {
          $props_ set_named_property Gaia $key $values_($this,$key)
       }
@@ -300,27 +321,25 @@ itcl::class gaia::GaiaStartup {
       set values_($this,$key) $value
    }
 
-   #  Add controls for the startup properties.
-   protected method add_controls_ {} {
+   #  Add "elements" controls, i.e things you can see.
+   protected method add_element_controls_ {parent} {
 
-      set lwidth 25
-
-      # Float panel.
+      #  Float panel.
       itk_component add floatpanel {
-         StarLabelCheck $w_.floatpanel \
+         StarLabelCheck $parent.floatpanel \
             -text "Use a floating panel:" \
             -onvalue 1 -offvalue 0 \
-            -labelwidth $lwidth \
+            -labelwidth $lwidth_ \
             -variable [scope values_($this,float_panel)]
       }
       add_short_help $itk_component(floatpanel) \
          {Create panel area in own window (requires restart)}
       pack $itk_component(floatpanel) -side top -fill x
 
-      # Panel orientation.
+      #  Panel orientation.
       itk_component add panelorient {
-         LabelMenu $w_.panelorient -text "Panel orientation:" \
-            -labelwidth $lwidth \
+         LabelMenu $parent.panelorient -text "Panel orientation:" \
+            -labelwidth $lwidth_ \
             -variable [scope values_($this,panel_orient)]
       }
       foreach value "horizontal vertical" {
@@ -331,203 +350,83 @@ itcl::class gaia::GaiaStartup {
          {Change the orientation of the control panel (requires restart)}
       pack $itk_component(panelorient) -side top -fill x
 
-      # Zoom window
+      #  Zoom window
       itk_component add withzoomwindow {
-         StarLabelCheck $w_.withzoomwindow \
+         StarLabelCheck $parent.withzoomwindow \
             -text "Display a zoom window:" \
             -onvalue 1 -offvalue 0 \
-            -labelwidth $lwidth \
+            -labelwidth $lwidth_ \
             -variable [scope values_($this,with_zoom_window)]
       }
       add_short_help $itk_component(withzoomwindow) \
          {Display a zoom window (requires restart)}
       pack $itk_component(withzoomwindow) -side top -fill x
 
-      # Pan window
+      #  Pan window
       itk_component add withpanwindow {
-         StarLabelCheck $w_.withpanwindow \
+         StarLabelCheck $parent.withpanwindow \
             -text "Display a panner window:" \
             -onvalue 1 -offvalue 0 \
-            -labelwidth $lwidth \
+            -labelwidth $lwidth_ \
             -variable [scope values_($this,with_pan_window)]
       }
       add_short_help $itk_component(withpanwindow) \
          {Display a panner window (requires restart)}
       pack $itk_component(withpanwindow) -side top -fill x
 
-      # Colorramp window
+      #  Colorramp window
       itk_component add withcolorramp {
-         StarLabelCheck $w_.withcolorramp \
+         StarLabelCheck $parent.withcolorramp \
             -text "Display a color ramp:" \
             -onvalue 1 -offvalue 0 \
-            -labelwidth $lwidth \
+            -labelwidth $lwidth_ \
             -variable [scope values_($this,with_colorramp)]
       }
       add_short_help $itk_component(withcolorramp) \
          {Display a color ramp at bottom of window (requires restart)}
       pack $itk_component(withcolorramp) -side top -fill x
 
-      # Focus follows mouse
-      itk_component add focusfollowsmouse {
-         StarLabelCheck $w_.focusfollowsmouse \
-            -text "Focus follows mouse:" \
-            -onvalue 1 -offvalue 0 \
-            -labelwidth $lwidth \
-            -variable [scope values_($this,focus_follows_mouse)]
-      }
-      add_short_help $itk_component(focusfollowsmouse) \
-         {Entry fields focus follows mouse position (requires restart)}
-      pack $itk_component(focusfollowsmouse) -side top -fill x
-
-      # Scrollbars
+      #  Scrollbars
       itk_component add scrollbars {
-         StarLabelCheck $w_.scrollbars \
+         StarLabelCheck $parent.scrollbars \
             -text "Show image scrollbars:" \
             -onvalue 1 -offvalue 0 \
-            -labelwidth $lwidth \
+            -labelwidth $lwidth_ \
             -variable [scope values_($this,scrollbars)]
       }
       add_short_help $itk_component(scrollbars) \
          {Display scrollbars around main image (requires restart)}
       pack $itk_component(scrollbars) -side top -fill x
 
-      # Transient tools
-      itk_component add transienttools {
-         StarLabelCheck $w_.transienttools \
-            -text "Make toolboxes transient:" \
-            -onvalue 1 -offvalue 0 \
-            -labelwidth $lwidth \
-            -variable [scope values_($this,transient_tools)]
-      }
-      add_short_help $itk_component(transienttools) \
-         {Make toolboxes remain above main window (requires restart)}
-      pack $itk_component(transienttools) -side top -fill x
-
-      # Transient spectral plot.
-      itk_component add transientplot {
-         StarLabelCheck $w_.transientplot \
-            -text "Make spectral plot transient:" \
-            -onvalue 1 -offvalue 0 \
-            -labelwidth $lwidth \
-            -variable [scope values_($this,transient_spectralplot)]
-      }
-      add_short_help $itk_component(transientplot) \
-         {Make spectral plot window remain above main window (requires restart)}
-      pack $itk_component(transientplot) -side top -fill x
-
-      # Exit without asking.
-      itk_component add quietexit {
-         StarLabelCheck $w_.quietexit \
-            -text "Exit without prompt:" \
-            -onvalue 1 -offvalue 0 \
-            -labelwidth $lwidth \
-            -variable [scope values_($this,quiet_exit)]
-      }
-      add_short_help $itk_component(quietexit) \
-         {Make "Exit" option ask before closing GAIA}
-      pack $itk_component(quietexit) -side top -fill x
-
-      #  Extended precision.
-      itk_component add precision {
-         StarLabelCheck $w_.precision \
-            -text "Display milli-arcsecs:" \
-            -onvalue 1 -offvalue 0 \
-            -labelwidth $lwidth \
-            -variable [scope values_($this,extended_precision)]
-      }
-      add_short_help $itk_component(precision) \
-         {Display milli-arcsecond resolution in readouts}
-      pack $itk_component(precision) -side top -fill x
-
-      #  Linear cartesian projection.
-      itk_component add cartesian {
-         StarLabelCheck $w_.cartesian \
-            -text "Linear CAR projections:" \
-            -onvalue 1 -offvalue 0 \
-            -labelwidth $lwidth \
-            -variable [scope values_($this,linear_cartesian)]
-      }
-      add_short_help $itk_component(cartesian) \
-         {Assume any FITS CAR projections are simple linear mapping}
-      pack $itk_component(cartesian) -side top -fill x
-
       #  Show HDU chooser by default
       itk_component add hduchooser {
-         StarLabelCheck $w_.hduchooser \
+         StarLabelCheck $parent.hduchooser \
             -text "Show HDU chooser:" \
             -onvalue 1 -offvalue 0 \
-            -labelwidth $lwidth \
+            -labelwidth $lwidth_ \
             -variable [scope values_($this,show_hdu_chooser)]
       }
       add_short_help $itk_component(hduchooser) \
          {Show the HDU chooser, by default, when loading multiextension images}
       pack $itk_component(hduchooser) -side top -fill x
 
-      #  How to merge MEF headers.
-      itk_component add alwaysmerge {
-         StarLabelCheck $w_.alwaysmerge \
-            -text "Always merge MEF headers:" \
-            -onvalue 1 -offvalue 0 \
-            -labelwidth $lwidth \
-            -variable [scope values_($this,always_merge)]
-      }
-      add_short_help $itk_component(alwaysmerge) \
-         {Always merge primary into extension headers for full WCS}
-      pack $itk_component(alwaysmerge) -side top -fill x
-
-      #  Check for cubes.
-      itk_component add checkforcubes {
-         StarLabelCheck $w_.checkforcubes \
-            -text "Check for cubes:" \
-            -onvalue 1 -offvalue 0 \
-            -labelwidth $lwidth \
-            -variable [scope values_($this,check_for_cubes)]
-      }
-      add_short_help $itk_component(checkforcubes) \
-         {Check any opened files for cubes, if found open in cube toolbox}
-      pack $itk_component(checkforcubes) -side top -fill x
-
       #  Display the PLASTIC interop menu.
       itk_component add interopmenu {
-         StarLabelCheck $w_.interopmenu \
+         StarLabelCheck $parent.interopmenu \
             -text "Show Interop menu:" \
             -onvalue 1 -offvalue 0 \
-            -labelwidth $lwidth \
+            -labelwidth $lwidth_ \
             -variable [scope values_($this,interop_menu)]
       }
       add_short_help $itk_component(interopmenu) \
          {Show the main Interop menu for PLASTIC interactions}
       pack $itk_component(interopmenu) -side top -fill x
 
-      #  Autoscale images to fit window.
-      itk_component add autoscale {
-         StarLabelCheck $w_.autoscale \
-            -text "Auto scale:" \
-            -onvalue 1 -offvalue 0 \
-            -labelwidth $lwidth \
-            -variable [scope values_($this,autoscale)]
-      }
-      add_short_help $itk_component(autoscale) \
-         {Auto scale images to fit window, disables zoom}
-      pack $itk_component(autoscale) -side top -fill x
-
-      #  Autofit images to window (once).
-      itk_component add autofit {
-         StarLabelCheck $w_.autofit \
-            -text "Auto fit:" \
-            -onvalue 1 -offvalue 0 \
-            -labelwidth $lwidth \
-            -variable [scope values_($this,autofit)]
-      }
-      add_short_help $itk_component(autofit) \
-         {Auto fit new images to window, keeps zoom}
-      pack $itk_component(autofit) -side top -fill x
-
       #  Minimum zoom scale.
       itk_component add minscale {
-         LabelEntryScale $w_.minscale \
+         LabelEntryScale $parent.minscale \
             -text {Minimum zoom:} \
-            -labelwidth $lwidth \
+            -labelwidth $lwidth_ \
             -valuewidth 4 \
             -from -50 \
             -to 1 \
@@ -544,9 +443,9 @@ itcl::class gaia::GaiaStartup {
 
       #  Maximum zoom scale.
       itk_component add maxscale {
-         LabelEntryScale $w_.maxscale \
+         LabelEntryScale $parent.maxscale \
             -text {Maximum zoom:} \
-            -labelwidth $lwidth \
+            -labelwidth $lwidth_ \
             -valuewidth 4 \
             -from 1 \
             -to 50 \
@@ -561,11 +460,135 @@ itcl::class gaia::GaiaStartup {
          {Maximum zoom scale (requires restart)}
       pack $itk_component(maxscale) -side top -fill x
 
+   }
+
+   #  Add "control" controls, i.e things you can configure.
+   protected method add_control_controls_ {parent} {
+      #  Focus follows mouse
+      itk_component add focusfollowsmouse {
+         StarLabelCheck $parent.focusfollowsmouse \
+            -text "Focus follows mouse:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth_ \
+            -variable [scope values_($this,focus_follows_mouse)]
+      }
+      add_short_help $itk_component(focusfollowsmouse) \
+         {Entry fields focus follows mouse position (requires restart)}
+      pack $itk_component(focusfollowsmouse) -side top -fill x
+
+      # Transient tools
+      itk_component add transienttools {
+         StarLabelCheck $parent.transienttools \
+            -text "Make toolboxes transient:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth_ \
+            -variable [scope values_($this,transient_tools)]
+      }
+      add_short_help $itk_component(transienttools) \
+         {Make toolboxes remain above main window (requires restart)}
+      pack $itk_component(transienttools) -side top -fill x
+
+      # Transient spectral plot.
+      itk_component add transientplot {
+         StarLabelCheck $parent.transientplot \
+            -text "Make spectral plot transient:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth_ \
+            -variable [scope values_($this,transient_spectralplot)]
+      }
+      add_short_help $itk_component(transientplot) \
+         {Make spectral plot window remain above main window (requires restart)}
+      pack $itk_component(transientplot) -side top -fill x
+
+      # Exit without asking.
+      itk_component add quietexit {
+         StarLabelCheck $parent.quietexit \
+            -text "Exit without prompt:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth_ \
+            -variable [scope values_($this,quiet_exit)]
+      }
+      add_short_help $itk_component(quietexit) \
+         {Make "Exit" option ask before closing GAIA}
+      pack $itk_component(quietexit) -side top -fill x
+
+      #  Extended precision.
+      itk_component add precision {
+         StarLabelCheck $parent.precision \
+            -text "Display milli-arcsecs:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth_ \
+            -variable [scope values_($this,extended_precision)]
+      }
+      add_short_help $itk_component(precision) \
+         {Display milli-arcsecond resolution in readouts}
+      pack $itk_component(precision) -side top -fill x
+
+      #  Linear cartesian projection.
+      itk_component add cartesian {
+         StarLabelCheck $parent.cartesian \
+            -text "Linear CAR projections:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth_ \
+            -variable [scope values_($this,linear_cartesian)]
+      }
+      add_short_help $itk_component(cartesian) \
+         {Assume any FITS CAR projections are simple linear mapping}
+      pack $itk_component(cartesian) -side top -fill x
+
+      #  How to merge MEF headers.
+      itk_component add alwaysmerge {
+         StarLabelCheck $parent.alwaysmerge \
+            -text "Always merge MEF headers:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth_ \
+            -variable [scope values_($this,always_merge)]
+      }
+      add_short_help $itk_component(alwaysmerge) \
+         {Always merge primary into extension headers for full WCS}
+      pack $itk_component(alwaysmerge) -side top -fill x
+
+      #  Check for cubes.
+      itk_component add checkforcubes {
+         StarLabelCheck $parent.checkforcubes \
+            -text "Check for cubes:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth_ \
+            -variable [scope values_($this,check_for_cubes)]
+      }
+      add_short_help $itk_component(checkforcubes) \
+         {Check any opened files for cubes, if found open in cube toolbox}
+      pack $itk_component(checkforcubes) -side top -fill x
+
+      #  Autoscale images to fit window.
+      itk_component add autoscale {
+         StarLabelCheck $parent.autoscale \
+            -text "Auto scale:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth_ \
+            -variable [scope values_($this,autoscale)]
+      }
+      add_short_help $itk_component(autoscale) \
+         {Auto scale images to fit window, disables zoom}
+      pack $itk_component(autoscale) -side top -fill x
+
+      #  Autofit images to window (once).
+      itk_component add autofit {
+         StarLabelCheck $parent.autofit \
+            -text "Auto fit:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth_ \
+            -variable [scope values_($this,autofit)]
+      }
+      add_short_help $itk_component(autofit) \
+         {Auto fit new images to window, keeps zoom}
+      pack $itk_component(autofit) -side top -fill x
+
       #  Zoom factor used in zoom window.
       itk_component add zoomfactor {
-         LabelEntryScale $w_.zoomfactor \
+         LabelEntryScale $parent.zoomfactor \
             -text {Zoom factor:} \
-            -labelwidth $lwidth \
+            -labelwidth $lwidth_ \
             -valuewidth 4 \
             -from 2 \
             -to 16 \
@@ -582,9 +605,9 @@ itcl::class gaia::GaiaStartup {
 
       #  Zoom factor used in pick window.
       itk_component add pickzoomfactor {
-         LabelEntryScale $w_.pickzoomfactor \
+         LabelEntryScale $parent.pickzoomfactor \
             -text {Pick zoom factor:} \
-            -labelwidth $lwidth \
+            -labelwidth $lwidth_ \
             -valuewidth 4 \
             -from 2 \
             -to 16 \
@@ -601,9 +624,9 @@ itcl::class gaia::GaiaStartup {
 
       #  Default percentage cut used for new files.
       itk_component add defaultcut {
-         LabelEntryScale $w_.defaultcut \
+         LabelEntryScale $parent.defaultcut \
             -text {Default cut:} \
-            -labelwidth $lwidth \
+            -labelwidth $lwidth_ \
             -valuewidth 4 \
             -from 50 \
             -to 100 \
@@ -620,9 +643,9 @@ itcl::class gaia::GaiaStartup {
 
       #  Search box size used for centroiding.
       itk_component add isize {
-         LabelEntryScale $w_.isize \
+         LabelEntryScale $parent.isize \
             -text {Centroid search box:} \
-            -labelwidth $lwidth \
+            -labelwidth $lwidth_ \
             -valuewidth 4 \
             -from 3 \
             -to 21 \
@@ -639,9 +662,9 @@ itcl::class gaia::GaiaStartup {
 
       #  Maximum shift allowed when centroiding.
       itk_component add maxshift {
-         LabelEntryScale $w_.maxshift \
+         LabelEntryScale $parent.maxshift \
             -text {Centroid max shift:} \
-            -labelwidth $lwidth \
+            -labelwidth $lwidth_ \
             -valuewidth 4 \
             -from 3.5 \
             -to 21.5 \
@@ -655,11 +678,15 @@ itcl::class gaia::GaiaStartup {
       add_short_help $itk_component(maxshift) \
          {Maximum shift from initial position when centroiding}
       pack $itk_component(maxshift) -side top -fill x
+   }
+
+   #  Add "colour" controls.
+   protected method add_colour_controls_ {parent} {
 
       #  Default colormap
       itk_component add defaultcmap {
-         LabelMenu $w_.cmap -text "Default colormap:" \
-            -labelwidth $lwidth \
+         LabelMenu $parent.cmap -text "Default colormap:" \
+            -labelwidth $lwidth_ \
             -variable [scope values_($this,default_cmap)]
       }
       set cmap_files [$itk_option(-image) cmap list]
@@ -674,9 +701,9 @@ itcl::class gaia::GaiaStartup {
 
       #  Blank pixel colour.
       itk_component add blankcolour {
-         LabelMenu $w_.blankcolour \
+         LabelMenu $parent.blankcolour \
             -text "Blank colour:" \
-            -labelwidth $lwidth \
+            -labelwidth $lwidth_ \
             -variable [scope values_($this,blank_color)]
       }
       foreach colour $colours_ {
@@ -693,9 +720,9 @@ itcl::class gaia::GaiaStartup {
 
       #  Image background colour.
       itk_component add backgroundcolour {
-         LabelMenu $w_.backgroundcolour \
+         LabelMenu $parent.backgroundcolour \
             -text "Background colour:" \
-            -labelwidth $lwidth \
+            -labelwidth $lwidth_ \
             -variable [scope values_($this,image_background)]
       }
       foreach colour $colours_ {
@@ -711,11 +738,16 @@ itcl::class gaia::GaiaStartup {
       $itk_component(backgroundcolour) configure \
          -value $values_($this,image_background)
 
+   }
+
+   #  Add "font" controls.
+   protected method add_font_controls_ {parent} {
+
       #  Fonts, label, text and WCS.
       itk_component add labelfont {
-         LabelEntry $w_.labelfont \
+         LabelEntry $parent.labelfont \
             -text "Label font:" \
-            -labelwidth $lwidth \
+            -labelwidth $lwidth_ \
             -value $values_($this,labelfont) \
             -textvariable [scope values_($this,labelfont)]
       }
@@ -724,9 +756,9 @@ itcl::class gaia::GaiaStartup {
       pack $itk_component(labelfont) -side top -fill x -expand 0
 
       itk_component add textfont {
-         LabelEntry $w_.textfont \
+         LabelEntry $parent.textfont \
             -text "Text font:" \
-            -labelwidth $lwidth \
+            -labelwidth $lwidth_ \
             -value $values_($this,textfont) \
             -textvariable [scope values_($this,textfont)]
       }
@@ -735,16 +767,35 @@ itcl::class gaia::GaiaStartup {
       pack $itk_component(textfont) -side top -fill x -expand 0
 
       itk_component add wcsfont {
-         LabelEntry $w_.wcsfont \
+         LabelEntry $parent.wcsfont \
             -text "WCS font:" \
-            -labelwidth $lwidth \
+            -labelwidth $lwidth_ \
             -value $values_($this,wcsfont) \
             -textvariable [scope values_($this,wcsfont)]
       }
       add_short_help $itk_component(wcsfont) \
          {Font used for WCS labels (requires restart)}
       pack $itk_component(wcsfont) -side top -fill x -expand 0
-   }
+
+      #  Font scale. Only scales non-pixel fonts, but adjusts padding anyway.
+      itk_component add fontscale {
+         LabelEntryScale $parent.fontscale \
+            -text {Font scale:} \
+            -labelwidth $lwidth_ \
+            -valuewidth 4 \
+            -from 0.0 \
+            -to 4.0 \
+            -increment 0.1 \
+            -show_arrows 1 \
+            -resolution 0.05 \
+            -anchor w \
+            -value $values_($this,font_scale) \
+            -command [code $this set_value_ font_scale]
+      }
+      add_short_help $itk_component(fontscale) \
+         {Scale factor for non-pixel fonts, 0 for default}
+      pack $itk_component(fontscale) -side top -fill x
+   }   
 
    #  Configuration options: (public variables)
    #  ----------------------
@@ -777,6 +828,9 @@ itcl::class gaia::GaiaStartup {
       black
       red green blue cyan magenta yellow
    }
+
+   #  General label width.
+   protected variable lwidth_ 25
 
    #  Common variables: (shared by all instances)
    #  -----------------

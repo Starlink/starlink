@@ -174,8 +174,8 @@
       <tt>fixed</tt> font doesn't match the expected size (usually 12
       pixel). Any font reported by the <tt>xlsfonts</tt> or selected by the
       <tt>xfontsel</tt> commands can be used, as can Tcl generic fonts (see
-      the section <tt>n</tt> font man page, a good default may be </tt>"Fixed
-      -12"</tt>).
+      the section <tt>n</tt> font man page, a good default may be 
+      </tt>"Fixed -12"</tt>).
       </li>
 
       <li><b>WCS font (-labelfont)</b><br> The font used in the labels showing
@@ -186,6 +186,14 @@
       the alpha and delta labels should be the <tt>a</tt> and <tt>d</tt>
       characters (see the section <tt>n</tt> font man page, a good default may
       be </tt>"Symbol -14"</tt>).
+      </li>
+
+      <li><b>Font scale (-font_scale)</b><br> A scaling factor for non-pixel
+      sized fonts. Note this also changes the apparent size of pixel sized
+      fonts, so the amount of space reserved around labels can be changed
+      (often reducing this will help when working on displays with restricted
+      sizes). Set to 0 to work with the display default (the actual value is
+      usually around the display resolution in DPI divided by 72).
       </li>
 </ul>
 

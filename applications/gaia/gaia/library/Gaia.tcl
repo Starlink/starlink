@@ -2397,6 +2397,13 @@ window gives you access to this."
    #  Colour for image background. Usually black.
    itk_option define -image_background image_background Image_Background black
 
+   #  Font scale factor. See tk scaling command.
+   itk_option define -font_scale font_scale Font_Scale 0.0 {
+      if { $itk_option(-font_scale) > 0.0 } {
+         tk scaling -displayof $w_ $itk_option(-font_scale)
+      }
+   }
+
    # -- Protected variables --
 
    #  Application name.

@@ -55,6 +55,11 @@
     The blink toolbox should now handle the case when RA and Dec
     are not axes aligned more effectively.
 
+    A new command-line and startup option -font_scale has been introduced.
+    This sets the scale of non-pixel based fonts or adjusts the padding
+    around pixel-based ones (no reducing this makes the packing of labels
+    more condensed).
+
   Humu Release
   ============
 
