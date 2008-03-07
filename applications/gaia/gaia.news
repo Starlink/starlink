@@ -52,6 +52,9 @@
     of all overlapping windows. This requirement is now reported as
     a warning rather than a generic "too many colors" error messages.
 
+    The blink toolbox should now handle the case when RA and Dec
+    are not axes aligned more effectively.
+
   Humu Release
   ============
 
