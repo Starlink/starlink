@@ -669,7 +669,7 @@
       
             CALL MSG_OUT( 'WCS_EPOCH', 
      :                 IND( : NIND )//'Epoch of observation: '//
-     :                 '^EPOCH (^DATE ^TIME)', STATUS )
+     :                 '^EPOCH (^DATE ^TIME) TDB', STATUS )
          END IF
 
 * Observers position...
