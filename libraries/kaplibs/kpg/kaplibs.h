@@ -67,6 +67,8 @@
 *        Added kpg1_medur.
 *     22-MAR-2007 (DSB):
 *        Added kpg1_gilst.
+*     7-MAR-2008 (DSB):
+*        Added IRQ constants.
 *-
 */
 
@@ -76,6 +78,34 @@
 #include "star/hds_fortran.h"
 
 
+/* Macros */
+/* ====== */
+
+/* An illegal IRQ_ identifier value. This value can sometimes be
+   specified by an application in place of an IRQ_ identifier in order
+   to supress some operation. */
+#define IRQ__NOID 0
+
+/* The name of the structure holding the quality names information.  */
+#define IRQ__QINAM QUALITY_NAMES
+
+/* The type of the structure holding the quality names information. */
+#define IRQ__QITYP QUALITY_NAMES
+
+/* Maximum length of descriptive comments stored with each quality name. */
+#define IRQ__SZCOM 50 
+
+/* Maximum length of a quality expression. */
+#define IRQ__SZQEX 255 
+
+/* Maximum length of a quality name. */
+#define IRQ__SZQNM 15 
+
+
+
+/* Type definitions */
+/* ================ */
+
 /* A structure used to pass a group of five HDS locators to and from IRQ
    functions. */
 
@@ -84,7 +114,9 @@ typedef struct IRQLocs {
 } IRQLocs;
 
 
+
 /* Prototypes for public functions */
+/* =============================== */
 
 void kpg1Asget( int, int, int, int, int, int *, int *, int *, AstFrameSet **, int * );
 void kpg1Fillr( float, int, float *, int * );
