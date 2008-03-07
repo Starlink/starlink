@@ -56,6 +56,7 @@
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 2002 Central Laboratory of the Research Councils.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -84,6 +85,9 @@
 *     17-JAN-2002 (DSB):
 *        Check that NDF extension is an HDS Structure before using
 *        it with HDS routines which require a structure.
+*     7-MAR-2008 (DSB):
+*        Check that NDF extension is an scalar before using it with HDS 
+*        routines which require a scalar.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -120,6 +124,7 @@
       INTEGER NFOUND             ! No. of QUALITY_NAMES structures
                                  ! found in the NDF.
       CHARACTER QNLOC*(DAT__SZLOC)! Locator to QUALITY_NAMES structure.
+      INTEGER SIZE               ! No. of elements in array
       LOGICAL THERE              ! True if QUALITY_NAMES structure was
                                  ! found in the current extension.
       LOGICAL WRACC              ! True if write access is available to
@@ -154,8 +159,11 @@
          CALL NDF_XNAME( INDF, I, XN, STATUS )
          CALL NDF_XLOC( INDF, XN, 'READ', XLOC, STATUS )
 
-*  See if the extension contains a component named QUALITY_NAMES.
+*  See if the extension is a scalar structure containing a component 
+*  named QUALITY_NAMES.
          CALL DAT_STRUC( XLOC, THERE, STATUS ) 
+         CALL DAT_SIZE( XLOC, SIZE, STATUS )
+         IF( SIZE .NE. 1 ) THERE = .FALSE.
          IF( THERE ) CALL DAT_THERE( XLOC, IRQ__QINAM, THERE, STATUS )
        
 *  If it does, get a locator to it, return the extension name and
