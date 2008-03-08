@@ -65,8 +65,6 @@
 *     MA 02111-1307, USA
 
 *  Bugs:
-*     Many of the values are currently kludged with defaults.
-*     These are indicated by //k.
 *-
 */
 

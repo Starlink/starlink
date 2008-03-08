@@ -57,6 +57,8 @@
 *        Move getDateVars and getMapVars out of putFits
 *     2008-03-04 (JB):
 *        Use number of scans actually completed.
+*     2008-03-07 (JB):
+*        Fix calculation of amStart/End, azStart/End, elStart/End
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -304,7 +306,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
 
       /* For each step, update the amEnd, azEnd, and elEnd, so that the 
          final values are those for the last time step. */
-      if ( stepNum == stepNum-1 && subBandNum == 0 ) {
+      if ( stepNum == nSteps-1 && subBandNum == 0 ) {
         amEnd = wcs->airmass;
         azEnd = wcs->acAz;
         elEnd = wcs->acEl;

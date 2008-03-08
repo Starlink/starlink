@@ -56,6 +56,8 @@
 *        Replace subsysNum with subBandNum
 *     2008-03-04 (JB):
 *        Use updated version of atlWcspx.
+*     2008-03-07 (JB):
+*        Convert to radians before calling atlWcspx
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -106,6 +108,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 {
 
   /* Local variables */
+  int axes[2];                /* axes required from wcs frame */
   AstKeyMap *cellMap;         /* Ast KeyMap for cell description */
   double cellV2YRad;          /* position angle of cell y axis in radians */
   double cellX2YRad;          /* angle between cell y axis and x axis
@@ -117,31 +120,34 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   char dateString[SZFITSCARD];/* temporary string for date conversions. */
   int day;                    /* days */
   double dLST;                /* difference in LSTs */
-  double dPos[2];             /* RA/Dec offsets */
   double dut1;                /* UT1-UTC correction */
   AstFrameSet *frame;         /* frame for pointing */
+  double gapptDec;            /* geocentric apparent declination (radians) */
+  double gapptRA;             /* geocentric apparent hour angle (radians) */
   int hour;                   /* hours */
   int i;                      /* loop counter */
   char iDate[10];             /* date in specx string format */
   long index;                 /* index into array data */
   char iTime[9];              /* time in specx string format */
   int LSRFlg;                 /* LSRFlg for velocity frame/def'n */
+  AstTimeFrame *LSTFrame = NULL; /* AstTimeFrame for retrieving LST times */
   double LSTStart;            /* start LST time */
   int min;                    /* minutes */
   int month;                  /* months */
-  double offsetX;             /* x offset in arcsec */
-  double offsetY;             /* y offset in arcsec */
   double sec;                 /* seconds */
   double TAIStart;            /* start TAI time */
-  AstTimeFrame *tempFrame = NULL; /* AstTimeFrame for retrieving TAI times */
   const char *tempString;     /* temporary string */
   AstTimeFrame *tFrame = NULL;  /* AstTimeFrame for retrieving TAI times */
+  AstTimeFrame *UTCFrame = NULL; /* AstTimeFrame for retrieving UTC times */
   const char *UTCString;      /* UTC time as a string */
   double UTCTime;             /* UTC time */
   int year;                   /* year */
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
+
+  /* Begin a new ast context. */
+  astBegin;
 
   /* To get the TAI times, first retrieve the starting LST, then for
      each time step calculate the difference in the LSTs and add it
@@ -179,11 +185,13 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   /* Make a copy so that we don't mess with the original
      UTC-based TimeFrame (this is a kludge to avoid a current
      glitch in the UTC->LAST conversion). */
-  tempFrame = astCopy ( tFrame );     
+  LSTFrame = astCopy ( tFrame );
 
   /* Get the LST start. */
-  astSet ( tempFrame, "timescale=LAST" );
-  LSTStart = astGetD ( tempFrame, "TimeOrigin" );
+  astSet ( LSTFrame, "timescale=LAST" );
+
+
+  LSTStart = astGetD ( LSTFrame, "timeOrigin" );
 
   /* Get the LST in hours. */
   LSTStart = ( LSTStart - (int)LSTStart ) * 24.0;
@@ -237,7 +245,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
      the row number (incremented on new rows) and for grids it is
      the grid offset. */
   if ( gsdVars->obsContinuous ) {
-    wcs->index = (int)( stepNum / gsdVars->nScanPts );
+    wcs->index = stepNum / gsdVars->nScanPts;
   } else {
     wcs->index = stepNum;
   }
@@ -247,7 +255,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   if ( gsdVars->obsContinuous ) {
 
    /* Get the dLST of the start of this row. */
-    index = (int) ( stepNum / gsdVars->nScanPts );
+    index = stepNum / gsdVars->nScanPts;
     dLST = ( gsdVars->scanTable1[index] - LSTStart ) / 24.0;
 
     /* Add the integration times up to this scan point. */
@@ -283,11 +291,11 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   UTCTime = astGetD ( tFrame, "TimeOrigin" );
 
-  tempFrame = astCopy ( tFrame );
-  astClear ( tempFrame, "timeOrigin" );
+  UTCFrame = astCopy ( tFrame );
+  astClear ( UTCFrame, "timeOrigin" );
 
-  astSet ( tempFrame, "format(1)=iso.2" );
-  UTCString = astFormat ( tempFrame, 1, UTCTime );
+  astSet ( UTCFrame, "format(1)=iso.2" );
+  UTCString = astFormat ( UTCFrame, 1, UTCTime );
 
   gsdac_tranTime ( UTCString, iDate, iTime, status );
 
@@ -301,24 +309,6 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
     return; 
   }
 
-  /* Get the RA & Dec offsets in cells. */
-  offsetX = gsdVars->mapTable[stepNum*2];
-  offsetY = gsdVars->mapTable[stepNum*2 + 1];
-
-  /* Multiply by cell sizes. */
-  offsetX = offsetX * gsdVars->cellX;
-  offsetY = offsetY * gsdVars->cellY;
-
-  /* Get axis angles in radians. */
-  cellV2YRad = gsdVars->cellV2Y * DD2R;
-  cellX2YRad = gsdVars->cellX2Y * DD2R;
-
-  /* Get the RA/Dec offsets. */
-  dPos[0] = sin( cellV2YRad - cellX2YRad ) * offsetX +
-            sin( cellV2YRad ) * offsetY;
-  dPos[1] = cos( cellV2YRad - cellX2YRad ) * offsetX +
-            cos( cellV2YRad ) * offsetY;
-
   /* Create the keymaps. */
   datePointing = astKeyMap( "" );
   cellMap = astKeyMap( "" ); 
@@ -327,32 +317,43 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   astMapPut0I( datePointing, "JFREST(1)", 
                gsdVars->restFreqs[subBandNum]*1000000.0, "" );
 
-  /* Check CENTRE_CODE (for now...). */
+  /* Get the centre coordinates in the right coordinate
+     system, and convert to radians. */
   switch ( gsdVars->centreCode ) {
     case COORD_AZ:
-      astMapPut0D( datePointing, "RA_DEC(1)", gsdVars->centreAz, "" );
-      astMapPut0D( datePointing, "RA_DEC(2)", gsdVars->centreEl, "" ); 
+      astMapPut0D( datePointing, "RA_DEC(1)", 
+                   gsdVars->centreAz * DD2R, "" );
+      astMapPut0D( datePointing, "RA_DEC(2)", 
+                   gsdVars->centreEl * DD2R, "" ); 
       break;
     case COORD_RD:
-      astMapPut0D( datePointing, "RA_DEC(1)", gsdVars->centreRA, "" );
-      astMapPut0D( datePointing, "RA_DEC(2)", gsdVars->centreDec, "" ); 
+      astMapPut0D( datePointing, "RA_DEC(1)", 
+                   gsdVars->centreRA * DD2R, "" );
+      astMapPut0D( datePointing, "RA_DEC(2)", 
+                   gsdVars->centreDec * DD2R, "" ); 
       break;
     case COORD_RB:
-      astMapPut0D( datePointing, "RA_DEC(1)", gsdVars->centreRA1950, "" );
-      astMapPut0D( datePointing, "RA_DEC(2)", gsdVars->centreDec1950, "" ); 
+      astMapPut0D( datePointing, "RA_DEC(1)", 
+                   gsdVars->centreRA1950 * DD2R, "" );
+      astMapPut0D( datePointing, "RA_DEC(2)", 
+                   gsdVars->centreDec1950 * DD2R, "" ); 
       break;
     case COORD_RJ:
-      astMapPut0D( datePointing, "RA_DEC(1)", gsdVars->centreRA2000, "" );
-      astMapPut0D( datePointing, "RA_DEC(2)", gsdVars->centreDec2000, "" ); 
+      astMapPut0D( datePointing, "RA_DEC(1)", 
+                   gsdVars->centreRA2000 * DD2R, "" );
+      astMapPut0D( datePointing, "RA_DEC(2)", 
+                   gsdVars->centreDec2000 * DD2R, "" ); 
       break;
     case COORD_GA:
-      astMapPut0D( datePointing, "RA_DEC(1)", gsdVars->centreGL, "" );
-      astMapPut0D( datePointing, "RA_DEC(2)", gsdVars->centreGB, "" ); 
+      astMapPut0D( datePointing, "RA_DEC(1)", 
+                   gsdVars->centreGL * DD2R, "" );
+      astMapPut0D( datePointing, "RA_DEC(2)", 
+                   gsdVars->centreGB * DD2R, "" ); 
       break;
-  }            
+  }  
 
-  astMapPut0I( datePointing, "DPOS(1)", dPos[0], "" );
-  astMapPut0I( datePointing, "DPOS(2)", dPos[1], "" );
+  astMapPut0I( datePointing, "DPOS(1)", 0.0, "" );
+  astMapPut0I( datePointing, "DPOS(2)", 0.0, "" );
   astMapPut0C( datePointing, "IDATE", iDate, "" );
   astMapPut0C( datePointing, "ITIME", iTime, "" ); 
   astMapPut0I( datePointing, "LSRFLG", LSRFlg, "" );
@@ -380,8 +381,9 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   dataDims[2] = gsdVars->nBEChansOut;
 
   /* Get a frameset describing the mapping from cell to sky. */
-  atlWcspx ( datePointing, cellMap, dataDims, gsdVars->telLongitude * -1.0, 
-             gsdVars->telLatitude, &frame, status );
+  atlWcspx ( datePointing, cellMap, dataDims, 
+             gsdVars->telLongitude * -1.0 * DD2R, 
+             gsdVars->telLatitude * DD2R, &frame, status );
 
   if ( *status != SAI__OK ) {
 
@@ -398,20 +400,43 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   /* Calculate airmass from El of current cell. */
   wcs->airmass = 0.0;//k
 
-  coordIn[0] = gsdVars->mapTable[stepNum*2];
-  coordIn[1] = gsdVars->mapTable[stepNum*2+1];
+  /* Calculate the centre in tracking. */
+  coordIn[0] = (double)(gsdVars->nMapPtsX) / 2.0;
+  coordIn[1] = (double)(gsdVars->nMapPtsY) / 2.0;
   coordIn[2] = 0.0;
 
-  astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );//k
+  astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
 
   wcs->acTr1 = coordOut[0];
   wcs->acTr2 = coordOut[1];
 
+  /* Calculate the cell offsets in tracking. */
+  coordIn[0] = gsdVars->mapTable[stepNum*2] + 
+               (double)(gsdVars->nMapPtsX) / 2.0;
+  coordIn[1] = gsdVars->mapTable[stepNum*2+1] + 
+               (double)(gsdVars->nMapPtsY) / 2.0;
+
+  astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
+
+  wcs->baseTr1 = coordOut[0];
+  wcs->baseTr2 = coordOut[1];
+
   wcs->azAng = 0.0;
   wcs->baseAz = 0.0;//k
   wcs->baseEl = 0.0;//k 
-  wcs->trAng = 0.0;//k
+  wcs->trAng = 0.0;
 
-  astAnnul( frame );
+  /* The angle between the focal plane and PA=0 and PA=0 in the 
+     tracking coordinate frame is determined from the hour angle, 
+     the declination, and the latitude. */
+  astSet( frame, "System(1)=GAPPT" );
+  astTranN( frame, 1, 3, 3, coordIn, 1, 3, 3, coordOut );
+  gapptRA = coordOut[0];
+  gapptDec = coordOut[1];
+  index = (int) ( stepNum / gsdVars->nScanPts );
+  gapptRA = ( gsdVars->scanTable1[index] - gapptRA ) * 2 * AST__DPI / 24.0;
+  //wcs->trAng = slaPa( gapptRA, gapptDec, gsdVars->telLatitude );//k
+
+  astEnd;
 
 }

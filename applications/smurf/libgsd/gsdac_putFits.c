@@ -79,6 +79,8 @@
 *     2008-03-06 (JB):
 *        Save calculation of am, az, el start/end till after
 *        all spectra completed.
+*     2008-03-07 (JB):
+*        Use IFFreq of 4.0, and set refChan as offset channel.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -232,8 +234,10 @@ void gsdac_putFits ( const gsdVars *gsdVars,
 /***** NOTE: Possibly undef? *****/
   strcpy ( subBands, bwMode );
 
-  /* Get the reference channel. */
-  refChan = (double)( gsdVars->BEChans[subBandNum] ) / 2.0;
+  /* Get the reference channel (offset from channel which contains IFFreq). */
+  refChan = ( (double)( gsdVars->BEChans[subBandNum] ) / 2.0 ) + 
+            ( ( 4.0 - ( fabs ( gsdVars->totIFs[subBandNum] ) ) ) / 
+	      ( gsdVars->freqRes[subBandNum] / 1000.0 ) );
 
   IFchanSp = gsdVars->freqRes[subBandNum] * 1000000.0;
 
@@ -244,7 +248,7 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   cnfImprt ( gsdVars->frontend, 16, instrume );
 
   /* Get the IF frequency and make sure it's always positive. */
-  IFfreq = fabs( gsdVars->totIFs[subBandNum] );  
+  IFfreq = 4.0;
 
   /* Get the number of mixers. */
   nMix = 1;//k
@@ -329,7 +333,7 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   if ( strcmp ( samMode, "sample" ) == 0 )
     josMin = gsdVars->nScan;
   else
-    josMin = 1;//k
+    josMin = 1;
 
   /* Get the length of time in the reference, and the number
      of steps between references. */
@@ -516,6 +520,12 @@ void gsdac_putFits ( const gsdVars *gsdVars,
 
   astSetFitsS ( fitschan, "BACKEND", backend,
                 "Name of the backend", 0 );
+
+  astSetFitsS ( fitschan, "MOLECULE", molecule,
+                "Target molecular species", 0 );
+
+  astSetFitsS ( fitschan, "TRANSITI", transiti,
+                "Target transition for MOLECULE", 0 );
 
   astSetFitsS ( fitschan, "DRRECIPE", AST__UNDEFS,
                 "ACSIS-DR recipe name", 0 );
