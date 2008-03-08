@@ -150,12 +150,14 @@
 *     2008-02-08 (EC):
 *        -In general map QUALITY unless SMF__NOCREATE_QUALITY set, or
 *         QUALITY doesn't exist, and access mode READ
+*     2008-03-07 (AGG):
+*        Read/create quality names extension
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2005-2007 University of British Columbia.
+*     Copyright (C) 2005-2008 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -195,6 +197,7 @@
 #include "mers.h"
 #include "star/kaplibs.h"
 #include "kpg_err.h"
+#include "irq_err.h"
 
 /* SC2DA includes */
 #include "sc2da/sc2store.h"
@@ -258,7 +261,6 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
   /* Pasted from readsc2ndf */
   size_t colsize;               /* number of pixels in column */
   char fitsrec[SC2STORE__MAXFITS*80+1];   /* FITS headers read from sc2store */
-  int maxlen = 81;           /* maximum length of a FITS header */
   size_t nfits;              /* number of FITS headers */
   size_t nframes;            /* number of frames */
   size_t rowsize;            /* number of pixels in row (returned) */
@@ -272,6 +274,16 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
   double *opoly;             /* Pointer to store in output struct */
   int npdims;                /* Number of dimensions in the polynomial array */
   int pdims[NDF__MXDIM];     /* Size of each dimension */
+
+
+  int bit;                   /* Bit number for current quality name */
+  IRQLocs *qlocs = NULL;     /* Named quality resources */
+  int fixed;                 /* Flag to denote whether quality bit is fixed */
+  int value;                 /* Value of current quality bit */
+  char comment[IRQ__SZCOM+1];/* Comment for quality name */
+  char xname[DAT__SZNAM+1];  /* Name of extension holding quality names */
+  int there = 0;             /* Flag to denote presence of NDF extension */
+  HDSLoc *smurfloc = NULL;   /* HDS locator for the SMURF extension */
 
   if ( *status != SAI__OK ) return;
 
@@ -294,6 +306,8 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
       errRep(FUNC_NAME, "Could not locate file ^FILE", status);
       return;
     }
+    msgSetc( "F", filename );
+    msgOutif(MSG__VERB, "", "Opening file ^F", status);
   }
 
   /* Determine the dimensions of the DATA component */
@@ -328,27 +342,16 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
   } else {
     /* Report a warning due to non-standard dimensions for file */
     if ( *status == SAI__OK) {
-
       msgSeti( "NDIMS", ndims);
-
-      /*
-      *status = SAI__ERROR;
-      errRep( FUNC_NAME, 
-      "Number of dimensions in output, ^NDIMS, is not equal to 2 or 3",
-      status);
-      */
-      
       msgOutif(MSG__VERB," ", 
 	       "Number of dimensions in output, ^NDIMS is not equal to 2 or 3",
 	       status);
-
       /* Data is neither flat-fielded nor standard time-series data. However
          in this context "flat" data is really just data that doesn't
          need to be de-compressed using the sc2store library, so we set 
          isFlat to true */
       isTseries = 0;
       isFlat = 1;
-
     }
   }
 
@@ -382,31 +385,33 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
 	  if ( gndf == NDF__NOID ) {
 	    *status = SAI__ERROR;
 	    errRep(FUNC_NAME, "Unable to obtain an NDF identifier for the SCANFIT coefficients", status);
+	  } else {
+	    /* Read and store the polynomial coefficients */
+	    ndfMap( gndf, "DATA", "_DOUBLE", "READ", &tpoly[0], &npoly, status );
+	    poly = tpoly[0];
+	    ndfDim( gndf, NDF__MXDIM, pdims, &npdims, status );
+	    (*data)->ncoeff = pdims[2];
+	    /* Allocate memory for poly coeffs & copy over */
+	    opoly = smf_malloc( npoly, sizeof( double ), 0, status);
+	    memcpy( opoly, poly, npoly*sizeof( double ) );
+	    (*data)->poly = opoly;
 	  }
-
-	  /* Read and store the polynomial coefficients */
-	  ndfMap( gndf, "DATA", "_DOUBLE", "READ", &tpoly[0], &npoly, status );
-          poly = tpoly[0];
-	  ndfDim( gndf, NDF__MXDIM, pdims, &npdims, status );
-	  (*data)->ncoeff = pdims[2];
-	  /* Allocate memory for poly coeffs & copy over */
-	  opoly = smf_malloc( npoly, sizeof( double ), 0, status);
-	  memcpy( opoly, poly, npoly*sizeof( double ) );
-	  (*data)->poly = opoly;
-
 	  /* Release these resources immediately as they're not needed */
 	  ndfAnnul( &gndf, status );
 	} else {
+	  /* If status is bad, then the SCANFIT extension does not
+	     exist. This is not fatal so annul the error */
 	  errAnnul(status);
-	  msgOutif(MSG__VERB," ", 
-		   "SCU2RED exists, but not SCANFIT: we probably have STARE or DREAM data", status);
+	  msgOutif(MSG__VERB," ", "SCU2RED exists, but not SCANFIT - continuing", 
+		   status);
 	}
 	/* Annul the locator */
 	datAnnul( &xloc, status );
 
       } else {
 	msgOutif(MSG__VERB," ", 
-		 "File has no SCU2RED extension. ", status);
+		 "File has no SCU2RED extension: no DA-processed data present", 
+		 status);
       }
     }
 
@@ -417,7 +422,6 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
 	ndfState( indf, "QUALITY", &qexists, status);
 	ndfState( indf, "VARIANCE", &vexists, status);
 
-
         /* If access mode is READ, map the QUALITY array only if it
            already existed, and SMF__NOCREATE_QUALITY is not set. However,
            if the access mode is not READ, create QUALITY by default. 
@@ -426,28 +430,133 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
 
 	if ( !(flags & SMF__NOCREATE_QUALITY) && 
 	     ( qexists || strncmp(mode,"READ",4) ) ) {
-	  
-	  if( qexists ) {
+
+	  if ( qexists ) {
+	    irqFind( indf, &qlocs, xname, status );
+	    if ( *status == SAI__OK ) {
+	      /* Now search for specific names */
+	      msgOutif(MSG__VERB, "", "Reading quality names extension", status);
+	      irqGetqn( qlocs, "BADSAM", &fixed, &value, &bit, comment, 
+			IRQ__SZCOM+1, status );
+	      if ( *status == IRQ__NOQNM ) {
+		errAnnul( status );		
+		msgOutif(MSG__VERB, "", "BADSAM quality flag not present", status);
+	      }
+	      irqGetqn( qlocs, "BADBOL", &fixed, &value, &bit, comment, 
+			IRQ__SZCOM+1, status );
+	      if ( *status == IRQ__NOQNM ) {
+		errAnnul( status );		
+		msgOutif(MSG__VERB, "", "BADBOL quality flag not present", status);
+	      }
+	      irqGetqn( qlocs, "DCJUMP", &fixed, &value, &bit, comment, 
+			IRQ__SZCOM+1, status );
+	      if ( *status == IRQ__NOQNM ) {
+		errAnnul( status );		
+		msgOutif(MSG__VERB, "", "DCJUMP quality flag not present", status);
+	      }
+	      irqGetqn( qlocs, "SPIKE", &fixed, &value, &bit, comment, 
+			IRQ__SZCOM+1, status );
+	      if ( *status == IRQ__NOQNM ) {
+		errAnnul( status );		
+		msgOutif(MSG__VERB, "", "SPIKE quality flag not present", status);
+	      }
+	    } else if (*status == IRQ__NOQNI) {
+	      errAnnul( status );
+	      msgOutif( MSG__VERB, "", 
+			"QUALITY present but no quality names extension in file", 
+			status );
+	      /* If no named quality and access is OK then create named quality */
+	      if (strncmp(mode,"READ",4)) {
+		msgOutif( MSG__VERB, "", 
+			  "Access mode permits creating quality names - "
+			  "creating quality names extension", status);
+		ndfXstat( indf, "SMURF", &there, status );
+		if (!there) {
+		  /* Create SMURF extension if it does not already exist */
+		  ndfXnew( indf, "SMURF", "SMURF", 0, NULL, &smurfloc, status );
+		}
+		irqNew( indf, "SMURF", &qlocs, status );
+		/* Add SMURF quality names */
+		irqAddqn( qlocs, "BADSAM", 0, 
+			  "Set iff a bolometer is flagged by the DA", status );
+		irqAddqn( qlocs, "BADBOL", 0, 
+			  "Set iff all data from a bolometer is to be ignored", 
+			  status );
+		irqAddqn( qlocs, "SPIKE", 0, "Set iff a spike is detected", 
+			  status );
+		irqAddqn( qlocs, "DCJUMP", 0, "Set iff a DC jump is present", 
+			  status );
+		/* Now fix the bits to the desired values */
+		irqFxbit( qlocs, "BADSAM", SMF__Q_BADS, &fixed, status );
+		irqFxbit( qlocs, "BADBOL", SMF__Q_BADB, &fixed, status );
+		irqFxbit( qlocs, "SPIKE", SMF__Q_SPIKE, &fixed, status );
+		irqFxbit( qlocs, "DCJUMP", SMF__Q_JUMP, &fixed, status );
+		/* Set names to read only */
+		irqRwqn( qlocs, "BADSAM", 1, 1, &value, status );
+		irqRwqn( qlocs, "BADBOL", 1, 1, &value, status );
+		irqRwqn( qlocs, "SPIKE",  1, 1, &value, status );
+		irqRwqn( qlocs, "DCJUMP", 1, 1, &value, status );
+	      }
+	    }
+	    /* Last step, map quality */
 	    ndfMap( indf, "QUALITY", "_UBYTE", mode, &outdata[2], &nout, 
 		    status );
 	  } else {
+	    irqFind( indf, &qlocs, xname, status );
+	    if ( *status == IRQ__NOQNI ) {
+	      errAnnul(status);
+	      msgOutif(MSG__VERB, "", "Creating quality names extension", status);
+	      ndfXstat( indf, "SMURF", &there, status );
+	      if (!there) {
+		/* Create SMURF extension if it does not already exist */
+		ndfXnew( indf, "SMURF", "SMURF", 0, NULL, &smurfloc, status );
+	      }
+	      irqNew( indf, "SMURF", &qlocs, status );
+	      /* Add SMURF quality names */
+	      msgOutif(MSG__VERB, "", "Adding SMURF quality names", status);
+	      irqAddqn( qlocs, "BADSAM", 0, 
+			"Set iff a bolometer is flagged by the DA", status );
+	      irqAddqn( qlocs, "BADBOL", 0, 
+			"Set iff all data from a bolometer is to be ignored", 
+			status );
+	      irqAddqn( qlocs, "SPIKE", 0, "Set iff a spike is detected", 
+			status );
+	      irqAddqn( qlocs, "DCJUMP", 0, "Set iff a DC jump is present", 
+			status );
+	      /* Now fix the bits to the desired values */
+	      irqFxbit( qlocs, "BADSAM", SMF__Q_BADS, &fixed, status );
+	      irqFxbit( qlocs, "BADBOL", SMF__Q_BADB, &fixed, status );
+	      irqFxbit( qlocs, "SPIKE", SMF__Q_SPIKE, &fixed, status );
+	      irqFxbit( qlocs, "DCJUMP", SMF__Q_JUMP, &fixed, status );
+	      /* Set names to read only */
+	      irqRwqn( qlocs, "BADSAM", 1, 1, &value, status );
+	      irqRwqn( qlocs, "BADBOL", 1, 1, &value, status );
+	      irqRwqn( qlocs, "SPIKE",  1, 1, &value, status );
+	      irqRwqn( qlocs, "DCJUMP", 1, 1, &value, status );
+	      if ( smurfloc ) datAnnul( &smurfloc, status);
+	    } else {
+	      if ( *status == SAI__OK ) {
+		msgOutif(MSG__VERB, "", 
+			 "File has quality names extension but no QUALITY", status);
+	      }
+	    }
 	    ndfMap( indf, "QUALITY", "_UBYTE", "WRITE", &outdata[2], &nout, 
-		       status );
+		    status );
 	  }
+	  /* Done with quality names so free resources */
+	  irqRlse( &qlocs, status );
 	}
-
 	/* Always map DATA if we get this far */
 	ndfMap( indf, "DATA", dtype, mode, &outdata[0], &nout, status );
 
-	/* Default behaviour is to map VARIANCE only if it exists already */
+	/* Default behaviour is to map VARIANCE only if it exists already. */
 	if (vexists) {
-
 	  ndfMap( indf, "VARIANCE", dtype, mode, &outdata[1], &nout, status );
 	}
 
       }
-      if ( !(flags & SMF__NOCREATE_HEAD) ) {
 
+      if ( !(flags & SMF__NOCREATE_HEAD) ) {
 	/* Read the FITS headers */
 	kpgGtfts( indf, &(hdr->fitshdr), status );
 	/* Just continue if there are no FITS headers */
