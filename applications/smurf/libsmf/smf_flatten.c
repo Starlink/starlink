@@ -34,11 +34,14 @@
 *        Initial test version.
 *     26-JUL-2006 (TIMJ):
 *        Remove sc2store_struct
+*     2008-03-10 (AGG):
+*        Add check for bad values on output from flatfield routine and
+*        set quality to SMF__Q_BADS
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
+*     2005-2008 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -87,9 +90,12 @@ void smf_flatten ( smfData *data, int *status ) {
 
   smfDA *da = NULL;            /* Pointer to struct containing flatfield info */
   double *dataArr = NULL;      /* Pointer to flatfielded data array */
+  size_t i;                    /* Loop counter */
+  size_t ndat;                 /* Total number of data points */
   int nboll;                   /* Number of bolometers */
   int nframes;                 /* Number of frames (timeslices) */
   void *pntr[3];               /* Array of pointers for DATA, QUALITY & VARIANCE */
+  unsigned char *qual;         /* Pointer to quality array */
 
   if ( *status != SAI__OK ) return;
 
@@ -97,6 +103,7 @@ void smf_flatten ( smfData *data, int *status ) {
   da = data->da;
   pntr[0] = (data->pntr)[0];
   dataArr = pntr[0];
+  qual = (data->pntr)[2];
 
   if ( da == NULL ) {
     if ( *status == SAI__OK) {
@@ -122,6 +129,17 @@ void smf_flatten ( smfData *data, int *status ) {
     /* Flatfielder */
     sc2math_flatten( nboll, nframes, da->flatname, da->nflat, da->flatcal,
 		     da->flatpar, dataArr, status);
+
+    /* Check for BAD values from flatfield routine and set QUALITY
+       accordingly. Any bad values at this point means that those
+       samples were flagged as such by the DA system and thus should
+       be assigned a quality value of SMF__Q_BADS */
+    ndat = nboll * nframes;
+    for (i=0; i<ndat; i++) {
+      if ( dataArr[i] == VAL__BADD ) {
+	qual[i] = SMF__Q_BADS;
+      }
+    }
 
   }
 }
