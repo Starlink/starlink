@@ -152,6 +152,8 @@
 *         QUALITY doesn't exist, and access mode READ
 *     2008-03-07 (AGG):
 *        Read/create quality names extension
+*     2008-03-10 (AGG):
+*        Factor out quality names code into new routine
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -275,15 +277,8 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
   int npdims;                /* Number of dimensions in the polynomial array */
   int pdims[NDF__MXDIM];     /* Size of each dimension */
 
-
-  int bit;                   /* Bit number for current quality name */
   IRQLocs *qlocs = NULL;     /* Named quality resources */
-  int fixed;                 /* Flag to denote whether quality bit is fixed */
-  int value;                 /* Value of current quality bit */
-  char comment[IRQ__SZCOM+1];/* Comment for quality name */
   char xname[DAT__SZNAM+1];  /* Name of extension holding quality names */
-  int there = 0;             /* Flag to denote presence of NDF extension */
-  HDSLoc *smurfloc = NULL;   /* HDS locator for the SMURF extension */
 
   if ( *status != SAI__OK ) return;
 
@@ -434,112 +429,30 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
 	  if ( qexists ) {
 	    irqFind( indf, &qlocs, xname, status );
 	    if ( *status == SAI__OK ) {
-	      /* Now search for specific names */
-	      msgOutif(MSG__VERB, "", "Reading quality names extension", status);
-	      irqGetqn( qlocs, "BADSAM", &fixed, &value, &bit, comment, 
-			IRQ__SZCOM+1, status );
-	      if ( *status == IRQ__NOQNM ) {
-		errAnnul( status );		
-		msgOutif(MSG__VERB, "", "BADSAM quality flag not present", status);
-	      }
-	      irqGetqn( qlocs, "BADBOL", &fixed, &value, &bit, comment, 
-			IRQ__SZCOM+1, status );
-	      if ( *status == IRQ__NOQNM ) {
-		errAnnul( status );		
-		msgOutif(MSG__VERB, "", "BADBOL quality flag not present", status);
-	      }
-	      irqGetqn( qlocs, "DCJUMP", &fixed, &value, &bit, comment, 
-			IRQ__SZCOM+1, status );
-	      if ( *status == IRQ__NOQNM ) {
-		errAnnul( status );		
-		msgOutif(MSG__VERB, "", "DCJUMP quality flag not present", status);
-	      }
-	      irqGetqn( qlocs, "SPIKE", &fixed, &value, &bit, comment, 
-			IRQ__SZCOM+1, status );
-	      if ( *status == IRQ__NOQNM ) {
-		errAnnul( status );		
-		msgOutif(MSG__VERB, "", "SPIKE quality flag not present", status);
-	      }
+	      msgOutif(MSG__VERB, "", "Quality names defined in file", status);
 	    } else if (*status == IRQ__NOQNI) {
 	      errAnnul( status );
 	      msgOutif( MSG__VERB, "", 
 			"QUALITY present but no quality names extension in file", 
 			status );
-	      /* If no named quality and access is OK then create named quality */
-	      if (strncmp(mode,"READ",4)) {
-		msgOutif( MSG__VERB, "", 
-			  "Access mode permits creating quality names - "
-			  "creating quality names extension", status);
-		ndfXstat( indf, "SMURF", &there, status );
-		if (!there) {
-		  /* Create SMURF extension if it does not already exist */
-		  ndfXnew( indf, "SMURF", "SMURF", 0, NULL, &smurfloc, status );
-		}
-		irqNew( indf, "SMURF", &qlocs, status );
-		/* Add SMURF quality names */
-		irqAddqn( qlocs, "BADSAM", 0, 
-			  "Set iff a bolometer is flagged by the DA", status );
-		irqAddqn( qlocs, "BADBOL", 0, 
-			  "Set iff all data from a bolometer is to be ignored", 
-			  status );
-		irqAddqn( qlocs, "SPIKE", 0, "Set iff a spike is detected", 
-			  status );
-		irqAddqn( qlocs, "DCJUMP", 0, "Set iff a DC jump is present", 
-			  status );
-		/* Now fix the bits to the desired values */
-		irqFxbit( qlocs, "BADSAM", SMF__Q_BADS, &fixed, status );
-		irqFxbit( qlocs, "BADBOL", SMF__Q_BADB, &fixed, status );
-		irqFxbit( qlocs, "SPIKE", SMF__Q_SPIKE, &fixed, status );
-		irqFxbit( qlocs, "DCJUMP", SMF__Q_JUMP, &fixed, status );
-		/* Set names to read only */
-		irqRwqn( qlocs, "BADSAM", 1, 1, &value, status );
-		irqRwqn( qlocs, "BADBOL", 1, 1, &value, status );
-		irqRwqn( qlocs, "SPIKE",  1, 1, &value, status );
-		irqRwqn( qlocs, "DCJUMP", 1, 1, &value, status );
-	      }
+	      smf_create_qualname( mode, indf, &qlocs, status );
 	    }
 	    /* Last step, map quality */
 	    ndfMap( indf, "QUALITY", "_UBYTE", mode, &outdata[2], &nout, 
 		    status );
 	  } else {
+	    /* If no QUALITY, then first check for quality names and
+	       create if not present */
 	    irqFind( indf, &qlocs, xname, status );
-	    if ( *status == IRQ__NOQNI ) {
+	    if ( *status == IRQ__NOQNI && strncmp(mode,"READ",4) ) {
 	      errAnnul(status);
-	      msgOutif(MSG__VERB, "", "Creating quality names extension", status);
-	      ndfXstat( indf, "SMURF", &there, status );
-	      if (!there) {
-		/* Create SMURF extension if it does not already exist */
-		ndfXnew( indf, "SMURF", "SMURF", 0, NULL, &smurfloc, status );
-	      }
-	      irqNew( indf, "SMURF", &qlocs, status );
-	      /* Add SMURF quality names */
-	      msgOutif(MSG__VERB, "", "Adding SMURF quality names", status);
-	      irqAddqn( qlocs, "BADSAM", 0, 
-			"Set iff a bolometer is flagged by the DA", status );
-	      irqAddqn( qlocs, "BADBOL", 0, 
-			"Set iff all data from a bolometer is to be ignored", 
-			status );
-	      irqAddqn( qlocs, "SPIKE", 0, "Set iff a spike is detected", 
-			status );
-	      irqAddqn( qlocs, "DCJUMP", 0, "Set iff a DC jump is present", 
-			status );
-	      /* Now fix the bits to the desired values */
-	      irqFxbit( qlocs, "BADSAM", SMF__Q_BADS, &fixed, status );
-	      irqFxbit( qlocs, "BADBOL", SMF__Q_BADB, &fixed, status );
-	      irqFxbit( qlocs, "SPIKE", SMF__Q_SPIKE, &fixed, status );
-	      irqFxbit( qlocs, "DCJUMP", SMF__Q_JUMP, &fixed, status );
-	      /* Set names to read only */
-	      irqRwqn( qlocs, "BADSAM", 1, 1, &value, status );
-	      irqRwqn( qlocs, "BADBOL", 1, 1, &value, status );
-	      irqRwqn( qlocs, "SPIKE",  1, 1, &value, status );
-	      irqRwqn( qlocs, "DCJUMP", 1, 1, &value, status );
-	      if ( smurfloc ) datAnnul( &smurfloc, status);
+	      smf_create_qualname( mode, indf, &qlocs, status );
 	    } else {
-	      if ( *status == SAI__OK ) {
-		msgOutif(MSG__VERB, "", 
-			 "File has quality names extension but no QUALITY", status);
-	      }
+	      msgOutif(MSG__VERB, "", 
+		       "File has quality names extension but no QUALITY", status);
 	    }
+	    /* Attempt to create QUALITY component - assume we have
+	       write or update access at this point */
 	    ndfMap( indf, "QUALITY", "_UBYTE", "WRITE", &outdata[2], &nout, 
 		    status );
 	  }
