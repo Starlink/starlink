@@ -435,7 +435,7 @@
 
       CHARACTER * ( 20 ) TEMP    
 
-*  Delcare Functions
+*  Declare Functions:
       
 *  Local Data:
       DATA COMP / 'Data', 'Variance', 'Quality' /
@@ -499,7 +499,12 @@
             
          END IF
 
-      ENDIF
+      ELSE 
+
+*  These are checked regardless, so initialise.
+         CLASS( TRN__LIN ) = .FALSE.
+         CLASS( TRN__CONDT ) = .FALSE.
+      END IF
 
 *  See if the user is happy with auto-sizing of the output bounds or
 *  whether they want to specify some (just one chance at this --
