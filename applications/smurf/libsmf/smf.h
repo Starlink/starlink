@@ -245,6 +245,8 @@
 *        Added target to smf_update_quality interface
 *     2008-03-04 (EC):
 *        Updated smf_calcmodel* routines to use smfDIMMData
+*     2008-03-10 (AGG):
+*        Add smf_create_qualname
 
 *     {enter_further_changes_here}
 
@@ -284,6 +286,7 @@
 #include "smurf_par.h"
 #include "star/grp.h"
 #include "smf_typ.h"
+#include "star/kaplibs.h"
 
 void smf_addto_smfArray( smfArray *ary, const smfData *data, int *status );
 
@@ -389,6 +392,8 @@ smfDream *smf_create_smfDream( int * status );
 smfFile* smf_create_smfFile( int * status );
 
 smfHead* smf_create_smfHead( int * status );
+
+void smf_create_qualname( char *mode, int indf, IRQLocs *qlocs, int *status);
 
 smfHead * smf_deepcopy_smfHead ( const smfHead *old, int * status);
 
@@ -554,7 +559,7 @@ void smf_open_related( const smfGroup *group, const int subindex, const char *ac
 void * smf_realloc( void * pntr, size_t nelem, size_t bytes_per_elem,
 		    int * status );
 
-void smf_rebinmap( smfData *data, int usebad, int indf, int index, int size, 
+void smf_rebinmap( smfData *data, int index, int size, 
                    AstFrameSet *outframeset, int spread, const double params[], 
 		   int moving, int *lbnd_out, int *ubnd_out,
                    double *map, double *variance,
