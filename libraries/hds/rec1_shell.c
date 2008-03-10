@@ -37,8 +37,13 @@ void rec1_shell( void ){};       /* This routine not used on VMS and        */
 
 /* External Variables: */
 /* =================== */
-#if defined( _POSIX2_VERSION )   /* External variables for POSIX.2 systems: */
-extern char **environ;           /* Pointer to environment array            */
+
+/* Need to use _NSGetEnviron() to access environ on Darwin. */
+#if HAVE_CRT_EXTERNS_H && HAVE__NSGETENVIRON
+#include <crt_externs.h>
+#define environ (*_NSGetEnviron())
+#else
+extern char **environ;
 #endif
 
    void rec1_shell( pid_t *pid, FILE *stream[ 2 ] )

@@ -83,13 +83,19 @@ AC_CHECK_DECLS(getwd)
 dnl    fsync is only declared if _POSIX_C_SOURCE isn't!!
 AC_CHECK_DECLS(fsync)
 
-dnl Check for largefile support (various macros and fseeko).
-dnl Make sure we don't use the cached version for this (can
-dnl be incorrect due to _POSIX_C_SOURCE on Solaris).
+dnl    On Darwin access to the _environ symbol is only available to
+dnl    the linker when building applications, so cannot be used reliably in
+dnl    shared libraries, so need to use the _NSGetEnviron() function.
+AC_CHECK_HEADERS(crt_externs.h)
+AC_CHECK_FUNCS(_NSGetEnviron)
+
+dnl    Check for largefile support (various macros and fseeko).
+dnl    Make sure we don't use the cached version for this (can
+dnl    be incorrect due to _POSIX_C_SOURCE on Solaris).
 $as_unset ac_cv_sys_largefile_source
 STAR_LARGEFILE_SUPPORT
 
-dnl Calculate sizes and types
+dnl    Calculate sizes and types
 AC_CHECK_TYPES([long long int,int,long,long long,off_t,int64_t])
 AC_CHECK_TYPES([uint64_t, int32_t, uint32_t, long double, signed char])
 
