@@ -59,17 +59,18 @@ enum { ATL__MXDIM  = 7 };
 
 /* Public function prototypes */
 /* -------------------------- */
+int atlMapGet1S( AstKeyMap *, const char *, int, int, int *, char *, int * );
 void atlAxtrm( AstFrameSet *, int *, int *, int *, double *, int * );
+void atlKychk( AstKeyMap *, const char *, const char *, int * );
+void atlMapPut1S( AstKeyMap *, const char *, const char *, int, int, const char *, int * );
+void atlMgfts( int, AstFitsChan *, AstFitsChan *, AstFitsChan **, int * );
 void atlMklut( int, int, int, int, AstFrame *, double *, AstMapping **, int * );
 void atlPlroi( AstPlot *, AstKeyMap **, int * );
-void atlMgfts( int, AstFitsChan *, AstFitsChan *, AstFitsChan **, int * );
-void atlPtftr( AstFitsChan *, const char *, float, const char *, int * );
 void atlPtfti( AstFitsChan *, const char *, int, const char *, int * );
+void atlPtftr( AstFitsChan *, const char *, float, const char *, int * );
 void atlPtfts( AstFitsChan *, const char *, const char *, const char *,  int * );
 void atlTolut( AstMapping *, double, double, double, const char *, AstMapping **, int * );
 void atlWcspx( AstKeyMap *, AstKeyMap *, int[3], double, double, AstFrameSet **, int * );
-void atlKychk( AstKeyMap *, const char *, const char *, int * );
-
 
 
 #endif

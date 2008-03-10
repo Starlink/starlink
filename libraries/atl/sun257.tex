@@ -1551,8 +1551,8 @@ higher-level utility tasks.
             {\tt "}JFINC(1){\tt "} - \_INTEGER
             {\tt "}IFFREQ(1){\tt "} - \_DOUBLE
 
-         In addition, the KeyMap may contain an item {\tt "}CELLCODE{\tt "} (\_INTEGER)
-         that specifies the coordinate system to which the RA\_DEC and DPOS
+         In addition, the KeyMap may contain an item {\tt "}CENTRECODE{\tt "} (\_INTEGER)
+         that specifies the co-ordinate system to which the RA\_DEC and DPOS
          values refer. It may take any of the following values:
 
             1 : AZEL
@@ -1561,8 +1561,8 @@ higher-level utility tasks.
             7 : RJ (FK5 2000 RA and Dec)
             8 : GA (galactic longitude and latitude)
 
-         An error is reported if any other value is supplied for CELLCODE.
-         If CELLCODE is missing a value of 6 (FK4 B1950) is assumed.
+         An error is reported if any other value is supplied for CENTRECODE.
+         If CENTRECODE is missing a value of 6 (FK4 B1950) is assumed.
       }
       \sstsubsection{
          KM2 = INTEGER (Given)
@@ -1576,6 +1576,12 @@ higher-level utility tasks.
             {\tt "}CELLSIZE(1){\tt "} - \_DOUBLE
             {\tt "}CELLSIZE(2){\tt "}  - \_DOUBLE
             {\tt "}POSANGLE{\tt "} - \_DOUBLE
+
+         In addition, the KeyMap may contain an item {\tt "}CELLCODE{\tt "} (\_INTEGER)
+         that specifies the co-ordinate system to which the CELLSIZE and
+         POSANGLE values refer. It may take any of the values listed for
+         CENTRECODE in the {\tt "}KM1{\tt "} argument description above. If CELLCODE
+         is missing a value of 6 (FK4 B1950) is assumed.
       }
       \sstsubsection{
          DIM( 3 ) = INTEGER (Given)
@@ -1613,6 +1619,122 @@ higher-level utility tasks.
 
          \sstitem
          Double Sideband is always assumed
+      }
+   }
+}
+\sstroutine{
+   atlMapGet1S
+}{
+   Retrieve a vector of strings from an AST KeyMap entry as a list
+   of fixed length strings
+}{
+   \sstdescription{
+      This function retrieves the null-terminated strings from a vector
+      element in a KeyMap, and concatenates them into a list of fixed
+      length strings, each padded with spaces.
+   }
+   \sstinvocation{
+      int atlMapGet1S( AstKeyMap $*$this, const char $*$key, int bufsize,
+                       int len, int $*$nval, char $*$buf, int $*$status )
+   }
+   \sstarguments{
+      \sstsubsection{
+         this
+      }{
+         A pointer to the KeyMap.
+      }
+      \sstsubsection{
+         key
+      }{
+         The key for the entry.
+      }
+      \sstsubsection{
+         bufsize
+      }{
+         The length of the {\tt "}buf{\tt "} array.
+      }
+      \sstsubsection{
+         len
+      }{
+         The required size ofr each fixed length string.
+      }
+      \sstsubsection{
+         nval
+      }{
+         Address of an int in which to return the number of fixed length
+         strings returned in {\tt "}buf{\tt "}. This will be less than the number of
+         elements in the KeyMap entry if the supplied buffer is not large
+         enough to hold all the strings in the entry.
+      }
+      \sstsubsection{
+         buf
+      }{
+         A pointer to a buffer in which to return the concatenated, fixed
+         length strings.
+      }
+      \sstsubsection{
+         status
+      }{
+         Pointer to the global status variable.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         Non-zero if an entry with the given key was found in the KeyMap,
+      }{
+      }
+      \sstsubsection{
+         and zero otherwise.
+      }{
+      }
+   }
+}
+\sstroutine{
+   atlMapPut1S
+}{
+   Create a vector character string entry in an AST KeyMap from a list
+   of fixed length strings
+}{
+   \sstdescription{
+      This function splits up a supplied character array into a set of
+      equal length sub-strings, null terminates them, and stores them
+      as a character vector in a KeyMap. See also atlMapGet1S.
+   }
+   \sstinvocation{
+      void atlMapPut1S( AstKeyMap $*$this, const char $*$key, const char $*$value,
+                        int len, int size, const char $*$comment, int $*$status );
+   }
+   \sstarguments{
+      \sstsubsection{
+         this
+      }{
+         A pointer to an existing KeyMap.
+      }
+      \sstsubsection{
+         key
+      }{
+         The key  for the new entry.
+      }
+      \sstsubsection{
+         value
+      }{
+         A character array containing the concatenated fixed length
+         strings. The length of this array should be at least {\tt "}size$*$len{\tt "}.
+      }
+      \sstsubsection{
+         len
+      }{
+         The length of each fixed length string.
+      }
+      \sstsubsection{
+         size
+      }{
+         The number of fixed length strings in {\tt "}value{\tt "}.
+      }
+      \sstsubsection{
+         status
+      }{
+         Pointer to the global status variable.
       }
    }
 }

@@ -3,8 +3,8 @@
 rm -f atl_routines.tex sun257.tex
 touch atl_routines.tex
 
-foreach n (atl_*.f)
-   if( $n != "atl_test.f" ) then
+foreach n (atl_*.f atl*.c)
+   if( $n != "atl_test.f" && $n != "atl_test.c" && $n != "atl.c" ) then
       $STARCONF_DEFAULT_STARLINK/bin/sst/prolat $n out=head \
                                noatask nodocument single nopage
       cat head >> atl_routines.tex
