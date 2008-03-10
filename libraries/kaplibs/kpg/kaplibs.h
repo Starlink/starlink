@@ -163,5 +163,6 @@ void kpg1Gtaxv( const char *, int, int, AstFrame *, int, double *, int *, int * 
 void kpg1Gilst( int, int, int, const char *, int *, int *, int *, int * );
 void kpg1Asffr( AstFrameSet *, const char *, int *, int * );
 void kpg1Datcp( HDSLoc *, HDSLoc *, const char *, int * );
+void kpg1Hdsky( HDSLoc *, AstKeyMap *, int, int, int * );
 
 #endif

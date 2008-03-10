@@ -34643,6 +34643,82 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   KPG1\_HDSKY
+}{
+   Append a primitive HDS object to an AST KeyMap
+}{
+   \sstdescription{
+      This function stores the vectorised data values in the supplied HDS
+      object (which must be primitive) in the supplied KeyMap. The key for
+      the KeyMap entry is the name of the HDS object. If the KeyMap already
+      contains an entry with this name, then what happens is specified
+      by OLD. Likewise, if the KeyMap does not already contain an entry
+      with this name, then what happens is specified by NEW.
+   }
+   \sstinvocation{
+      CALL KPG1\_HDSKY( LOC, KEYMAP, OLD, NEW, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         LOC = CHARACTER $*$ ( DAT\_\_SZLOC ) (Given)
+      }{
+         An HDS locator for a primitive scalar or array object.
+      }
+      \sstsubsection{
+         KEYMAP = INTEGER (Given)
+      }{
+         An AST pointer to an existing KeyMap.
+      }
+      \sstsubsection{
+         OLD = INTEGER (Given)
+      }{
+         Specifies what happens if the supplied KeyMap already contains
+         an entry with the name of the supplied HDS object.
+
+         1 - Append the new vectorised array values read from the HDS
+         object to the end of the values already in the KeyMap. The HDS
+         values will be converted to the data type of the values already
+         in the KeyMap (an error will be reported if this is not possible).
+
+         2 - Replace the existing KeyMap entry with a new entry holding
+         the vectorised array values read from the HDS object.
+
+         3 - Do nothing. The KeyMap is returned unchanged, and no error
+         is reported.
+
+         4 - Report an error. The KeyMap is returned unchanged, and an error
+         is reported.
+      }
+      \sstsubsection{
+         NEW = INTEGER (Given)
+      }{
+         Specifies what happens if the supplied KeyMap does not already
+         contain an entry with the name of the supplied HDS object.
+
+         1 - Create a new entry holding the vectorised array values read from
+         the HDS object.
+
+         2 - Do nothing. The KeyMap is returned unchanged, and no error
+         is reported.
+
+         3 - Report an error. The KeyMap is returned unchanged, and an error
+         is reported.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         An error is reported if the supplied HDS object is a structure.
+      }
+   }
+}
+\sstroutine{
    KPG1\_KYGRP
 }{
    Create an GRP group holding keyword/value pairs read from an AST
