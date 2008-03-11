@@ -34758,6 +34758,67 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   KPG1\_KYHDS
+}{
+   Copy values from an AST KeyMap to a primitive HDS object
+}{
+   \sstdescription{
+      This function fills a specified HDS object with primitive values
+      read from a vector entry in an AST KeyMap. It is the inverse of
+      KPG1\_HDSKY. The HDS object must already exist and must be a
+      primitive array or scalar. The values to store in the HDS object
+      are read sequentially from the vector entry in the specified KeyMap
+      which has a key equal to the name of the HDS object. The length of
+      the vector in the KeyMap can be greater than the number of elements
+      in the HDS object, in which case the index of the first entry to
+      transfer is given by START.
+   }
+   \sstinvocation{
+      CALL KPG1\_KYHDS( KEYMAP, START, MODE, LOC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         KEYMAP = INTEGER (Given)
+      }{
+         An AST pointer to the KeyMap.
+      }
+      \sstsubsection{
+         START = INTEGER (Given)
+      }{
+         The index of the first element to use in the vector entry in the
+         KeyMap. The first element has index 1 in the Fortran interface,
+         and zero in the C interface (kpg1Kyhds).
+      }
+      \sstsubsection{
+         MODE = INTEGER (Given)
+      }{
+         Specifies what happens if the supplied KeyMap does not contain
+         an entry with the name of the supplied HDS object.
+
+         1 - Report an error.
+
+         2 - Do nothing
+      }
+      \sstsubsection{
+         LOC = CHARACTER $*$ ( DAT\_\_SZLOC ) (Given)
+      }{
+         An HDS locator for a primitive scalar or array object.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         An error is reported if the supplied HDS object is a structure.
+      }
+   }
+}
+\sstroutine{
    KPG1\_KYMAP
 }{
    Create an AST KeyMap holding keyword/value pairs read from a GRP
