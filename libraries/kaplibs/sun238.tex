@@ -34767,14 +34767,17 @@ from one graphical element to another.
       read from a vector entry in an AST KeyMap. It is the inverse of
       KPG1\_HDSKY. The HDS object must already exist and must be a
       primitive array or scalar. The values to store in the HDS object
-      are read sequentially from the vector entry in the specified KeyMap
-      which has a key equal to the name of the HDS object. The length of
-      the vector in the KeyMap can be greater than the number of elements
-      in the HDS object, in which case the index of the first entry to
-      transfer is given by START.
+      are read from the KeyMap entry that has a key equal to the name
+      of the HDS object. The vector read from the KeyMap is interpreted
+      as an N-dimension array, where N is the number of dimensions in the
+      HDS object. Array slices can be re-arranged as they are copied from
+      KeyMap to HDS object. The AXIS argument specifies which axis is
+      being re-arranged. Each array slice is perpendicular to this axis.
+      The KeyMap array and the HDS array are assumed to have the same
+      dimensions on all other axes.
    }
    \sstinvocation{
-      CALL KPG1\_KYHDS( KEYMAP, START, MODE, LOC, STATUS )
+      CALL KPG1\_KYHDS( KEYMAP, MAP, AXIS, MODE, LOC, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -34783,11 +34786,21 @@ from one graphical element to another.
          An AST pointer to the KeyMap.
       }
       \sstsubsection{
-         START = INTEGER (Given)
+         MAP( $*$ ) = INTEGER (Given)
       }{
-         The index of the first element to use in the vector entry in the
-         KeyMap. The first element has index 1 in the Fortran interface,
-         and zero in the C interface (kpg1Kyhds).
+         An array which indicates how to map slices in the KeyMap array
+         onto slices in the HDS array. The length of the supplied array
+         should be equal to the HDS array dimension specified by AXIS.
+         Element J of this array says where the data for the J{\tt '}th slice
+         of the HDS array should come from, where J is the index along
+         the axis specified by AXIS. The value of element J is a
+         zero-based index along axis AXIS of the array read from the
+         KeyMap.
+      }
+      \sstsubsection{
+         AXIS = INTEGER (Given)
+      }{
+         The index of the axis to be re-arranged. The first axis is axis 1.
       }
       \sstsubsection{
          MODE = INTEGER (Given)

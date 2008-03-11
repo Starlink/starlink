@@ -2,10 +2,11 @@
 #include "star/atl.h"
 #include "f77.h"
 #include "ast.h"
+#include "ndf.h"
 #include "mers.h"
 #include "sae_par.h"
 
-void kpg1Kyhds( AstKeyMap *keymap, int start, int mode, HDSLoc *loc, 
+void kpg1Kyhds( AstKeyMap *keymap, int *map, int axis, int mode, HDSLoc *loc, 
                 int *status ){
 /*
 *  Name:
@@ -18,27 +19,39 @@ void kpg1Kyhds( AstKeyMap *keymap, int start, int mode, HDSLoc *loc,
 *     C.
 
 *  Invocation:
-*     void kpg1Kyhds( AstKeyMap *keymap, int start, int mode, HDSLoc *loc, 
-*                     int *status )
+*     void kpg1Kyhds( AstKeyMap *keymap, int *map, int axis, int mode, 
+*                     HDSLoc *loc, int *status )
 
 *  Description:
 *     This function fills a specified HDS object with primitive values
 *     read from a vector entry in an AST KeyMap. It is the inverse of 
 *     kpg1Hdsky. The HDS object must already exist and must be a 
 *     primitive array or scalar. The values to store in the HDS object
-*     are read sequentially from the vector entry in the specified KeyMap
-*     which has a key equal to the name of the HDS object. The length of
-*     the vector in the KeyMap can be greater than the number of elements
-*     in the HDS object, in which case the index of the first entry to 
-*     transfer is given by "start".
+*     are read from the KeyMap entry that has a key equal to the name 
+*     of the HDS object. The vector read from the KeyMap is interpreted
+*     as an N-dimension array, where N is the number of dimensions in the
+*     HDS object. Array slices can be re-arranged as they are copied from 
+*     KeyMap to HDS object. The "axis" argument specifies which axis is
+*     being re-arranged. Each array slice is perpendicular to this axis.
+*     The KeyMap array and the HDS array are assumed to have the same
+*     dimensions on all other axes.
 
 *  Arguments:
 *     keymap 
 *        An AST pointer to the KeyMap.
-*     start 
-*        The index of the first element to use in the vector entry in the 
-*        KeyMap. The first element has index 1 in the Fortran interface
-*        (KPG1_KYHDS), and zero in the C interface.
+*     map
+*        An array which indicates how to map slices in the KeyMap array 
+*        onto slices in the HDS array. The length of the supplied array 
+*        should be equal to the HDS array dimension specified by "axis".
+*        Element J of this array says where the data for the J'th slice
+*        of the HDS array should come from, where J is the index along 
+*        the axis specified by "axis". The value of element J is a 
+*        zero-based index along axis "axis" of the array read from the KeyMap.
+*     axis 
+*        The index of the axis to be re-arranged. The first axis is axis 1.
+*        Note, the current version of this routine only allows the array
+*        to be re-arranged on the last axis. An error is reported if any 
+*        other axis is specified. This may change in the future.
 *     mode 
 *        Specifies what happens if the supplied KeyMap does not contain
 *        an entry with the name of the supplied HDS object.
@@ -90,15 +103,22 @@ void kpg1Kyhds( AstKeyMap *keymap, int start, int mode, HDSLoc *loc,
 /* Local Varianles: */
    char name[ DAT__SZNAM + 1 ];
    const char *hdstype;
+   int dim[ NDF__MXDIM ];
+   int ndim;
    int haskey;
+   int hslice;
    int i;   
-   int j;
+   int kdim;
    int kmtype;
+   int kslice;
    int prim;
+   int step;
    int veclen;
-   size_t el;
    size_t elsize;
+   size_t el;
    void *data;            
+   void *hp;
+   void *kp;
    void *pntr;
 
 /* Check inherited status */
@@ -139,8 +159,23 @@ void kpg1Kyhds( AstKeyMap *keymap, int start, int mode, HDSLoc *loc,
       }
    }
 
+/* Get the shape of the HDS array. */
+   datShape( loc, NDF__MXDIM, dim, &ndim, status );
+
+/* Check the supplied value of "axis" is OK. */
+   if( axis < 1 || axis > ndim ) {
+      if( *status == SAI__OK ) {
+         *status = SAI__ERROR;
+         msgSeti( "A", axis );
+         msgSeti( "N", ndim );
+         errRep( "", "KPG1_KYHDS: Supplied value for AXIS (^A) is illegal "
+                 "- it should be in the range 1 to ^N (programming error).", 
+                 status );
+      }
+   }
+
 /* Skip to the end if there is nothing to do. */
-   if( haskey ) {
+   if( haskey && *status == SAI__OK ) {
 
 /* Get the data type of the KeyMap entry. */
       kmtype = astMapType( keymap, name );
@@ -183,46 +218,60 @@ void kpg1Kyhds( AstKeyMap *keymap, int start, int mode, HDSLoc *loc,
       veclen = astMapLength( keymap, name );
       data = astMalloc( elsize*veclen );
 
-/* Map the HDS object as a vector using the data type selected above. */
-      datMapV( loc, hdstype, "READ", &pntr, &el, status );
-
-/* "i" is the index into the HDS vector and "j" is the idnex into the
-   KeyMap vector. Set the initial value for both. */
-      if( start > 0 ) {
-         j = start;
-         i = 0;
-      } else {
-         j = 0;
-         i = -start;
-      }
-
-/* Get the entire vector from the KeyMap, and copy the requested section
-   into the HDS array. */
+/* Get the entire vector from the KeyMap. */
       if( kmtype == AST__INTTYPE ) {
          (void) astMapGet1I( keymap, name, veclen, &veclen, (int *) data );
-         for( ; i < el && j < veclen; i++, j++ ) {
-            ((int *)pntr)[ i ] = ((int *)data)[ j ];
-         }            
 
       } else if( kmtype == AST__DOUBLETYPE ) {
          (void) astMapGet1D( keymap, name, veclen, &veclen, (double *) data );
-         for( ; i < el && j < veclen; i++, j++ ) {
-            ((double *)pntr)[ i ] = ((double *)data)[ j ];
-         }            
 
       } else if( kmtype == AST__FLOATTYPE ) {
          (void) astMapGet1F( keymap, name, veclen, &veclen, (float *) data );
-         for( ; i < el && j < veclen; i++, j++ ) {
-            ((float *)pntr)[ i ] = ((float *)data)[ j ];
-         }            
 
       } else {
          (void) atlMapGet1S( keymap, name, elsize*veclen, elsize, &veclen,
                              (char *) data, status );
-         for( ; i < el && j < veclen; i++, j++ ) {
-            memcpy( ((char*) pntr) + i*elsize, ((char *) data) + j*elsize, 
-                    elsize );
-         }            
+      }
+
+/* Map the HDS object as a vector using the data type selected above. */
+      datMapV( loc, hdstype, "READ", &pntr, &el, status );
+
+/* Assuming the KeyMap and HDS arrays have the same dimensions on all
+   axes other than that specified "axis", find the length of the KeyMap
+   array on axis "axis". */
+      kdim = ( veclen*dim[ axis - 1 ] )/el;
+
+/* For the moment, we can only re-order the last axis. */
+      if( axis != ndim ) {
+         if( *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            msgSeti( "A", axis );
+            msgSeti( "N", ndim );
+            errRep( "", "Currently KPG1_KYHDS can only re-order the last "
+                    "axis, but axis ^A (of ^N) was specified (programming "
+                    "error).", status );
+         }
+      } 
+
+/* Get the vector step between slices. */
+      step = 1;
+      for( i = 0; i < axis - 1; i++ ) step *= dim[ i ];
+
+/* Loop round each slice in the HDS array. */
+      for( hslice = 0; hslice < dim[ axis ]; hslice++ ) {
+
+/* Get the index of the corresponding slice in the KeyMap array, and pass
+   on if it is not within the bounds of the KeyMap array. */
+         kslice = map[ hslice ];
+         if( kslice >= 0 && kslice < kdim ) {
+ 
+/* Get pointers to the start of the slice in KeyMap and HDS arrays. */
+            hp = ( (char *) pntr ) + hslice*step*elsize;
+            kp = ( (char *) data ) + kslice*step*elsize;
+
+/* Copy the slice data. */
+            memcpy( hp, kp, elsize*step );            
+         }
       }
 
 /* Free resources. */

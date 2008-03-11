@@ -1,12 +1,13 @@
 #include "star/hds.h"
 #include "star/hds_fortran.h"
 #include "f77.h"
-#include "star/kaplibs.h"
+#include "kaplibs.h"
 #include "ast.h"
 #include "sae_par.h"
 
-F77_SUBROUTINE(kpg1_kyhds)( INTEGER(KEYMAP),INTEGER(START), INTEGER(MODE), 
-                            CHARACTER(LOC), INTEGER(STATUS) TRAIL(LOC) ) {
+F77_SUBROUTINE(kpg1_kyhds)( INTEGER(KEYMAP), INTEGER_ARRAY(MAP), INTEGER(AXIS),
+                            INTEGER(MODE), CHARACTER(LOC), INTEGER(STATUS) 
+                            TRAIL(LOC) ) {
 /*
 *+
 *  Name:
@@ -19,26 +20,36 @@ F77_SUBROUTINE(kpg1_kyhds)( INTEGER(KEYMAP),INTEGER(START), INTEGER(MODE),
 *     C, designed to be called from Fortran.
 
 *  Invocation:
-*     CALL KPG1_KYHDS( KEYMAP, START, MODE, LOC, STATUS )
+*     CALL KPG1_KYHDS( KEYMAP, MAP, AXIS, MODE, LOC, STATUS )
 
 *  Description:
 *     This function fills a specified HDS object with primitive values
 *     read from a vector entry in an AST KeyMap. It is the inverse of 
 *     KPG1_HDSKY. The HDS object must already exist and must be a 
 *     primitive array or scalar. The values to store in the HDS object
-*     are read sequentially from the vector entry in the specified KeyMap
-*     which has a key equal to the name of the HDS object. The length of
-*     the vector in the KeyMap can be greater than the number of elements
-*     in the HDS object, in which case the index of the first entry to 
-*     transfer is given by START.
+*     are read from the KeyMap entry that has a key equal to the name 
+*     of the HDS object. The vector read from the KeyMap is interpreted
+*     as an N-dimension array, where N is the number of dimensions in the
+*     HDS object. Array slices can be re-arranged as they are copied from 
+*     KeyMap to HDS object. The AXIS argument specifies which axis is
+*     being re-arranged. Each array slice is perpendicular to this axis.
+*     The KeyMap array and the HDS array are assumed to have the same
+*     dimensions on all other axes.
 
 *  Arguments:
 *     KEYMAP = INTEGER (Given)
 *        An AST pointer to the KeyMap.
-*     START = INTEGER (Given)
-*        The index of the first element to use in the vector entry in the 
-*        KeyMap. The first element has index 1 in the Fortran interface,
-*        and zero in the C interface (kpg1Kyhds).
+*     MAP( * ) = INTEGER (Given)
+*        An array which indicates how to map slices in the KeyMap array 
+*        onto slices in the HDS array. The length of the supplied array 
+*        should be equal to the HDS array dimension specified by AXIS. 
+*        Element J of this array says where the data for the J'th slice
+*        of the HDS array should come from, where J is the index along 
+*        the axis specified by AXIS. The value of element J is a
+*        zero-based index along axis AXIS of the array read from the 
+*        KeyMap.
+*     AXIS = INTEGER (Given)
+*        The index of the axis to be re-arranged. The first axis is axis 1.
 *     MODE = INTEGER (Given)
 *        Specifies what happens if the supplied KeyMap does not contain
 *        an entry with the name of the supplied HDS object.
@@ -88,22 +99,23 @@ F77_SUBROUTINE(kpg1_kyhds)( INTEGER(KEYMAP),INTEGER(START), INTEGER(MODE),
 *-
 */
    GENPTR_INTEGER(KEYMAP)
-   GENPTR_INTEGER(START)
+   GENPTR_INTEGER_ARRAY(MAP)
+   GENPTR_INTEGER(AXIS)
    GENPTR_INTEGER(MODE)
    GENPTR_CHARACTER(LOC)
    GENPTR_INTEGER(STATUS)
 
    HDSLoc *locator_c = NULL;
    AstKeyMap *keymap;
-   int cstatus, start, mode;
+   int cstatus, axis, mode;
 
    F77_IMPORT_INTEGER( *STATUS, cstatus );
-   F77_IMPORT_INTEGER( *START, start );
+   F77_IMPORT_INTEGER( *AXIS, axis );
    F77_IMPORT_INTEGER( *MODE, mode );
    keymap = astI2P( *KEYMAP );
    datImportFloc( LOC, LOC_length, &locator_c, &cstatus );
 
-   kpg1Kyhds( keymap, start - 1, mode, locator_c, &cstatus );
+   kpg1Kyhds( keymap, MAP, axis, mode, locator_c, &cstatus );
 
    F77_EXPORT_INTEGER( cstatus, *STATUS );
 
