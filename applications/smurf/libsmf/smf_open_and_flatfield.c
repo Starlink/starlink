@@ -72,11 +72,13 @@
 *        components
 *     2007-10-29 (EC):
 *        Modified interface to smf_open_file.
+*     2008-03-11 (AGG):
+*        Propagate QUALITY from input file
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia. All Rights Reserved.
+*     2006-2008 University of British Columbia. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -132,7 +134,7 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
   void *outdata[1];         /* Pointer to array of output mapped pointers*/
   int outndf;               /* Output NDF identifier */
   char *pname;              /* Pointer to input filename */
-  size_t npts;              /* Number of data points */
+  size_t npts = 0;          /* Number of data points */
   int flags = 0;            /* Flags for creating smfFile and smfHead */
 
   if ( *status != SAI__OK ) return;
@@ -140,7 +142,8 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
   if ( ogrp != NULL ) {
     /* Open the input file solely to propagate it to the output file */
     ndgNdfas( igrp, index, "READ", &indf, status );
-    ndgNdfpr( indf, "WCS", ogrp, index, &outndf, status );
+    /* We want QUALITY too if it's available */
+    ndgNdfpr( indf, "WCS,QUALITY", ogrp, index, &outndf, status );
     ndfAnnul( &indf, status);
 
     /* Set parameters of the DATA array in the output file */
