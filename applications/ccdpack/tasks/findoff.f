@@ -503,6 +503,9 @@
 *     8-FEB-2008 (PWD):
 *        Initialise NSUP so that related resources are not accidently
 *        released when exiting in error.
+*     11-MAR-2008 (PWD):
+*        Don't release memory allocated for output lists. That's done
+*        automatically.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1813,14 +1816,6 @@
 *  End NDF context.
       CALL NDF_END( STATUS )
                   
-*  Release memory for storing output points.
-      DO IS = 1, NSUP
-         CALL CCD1_MFREE( IPID( IS ), STATUS )
-         CALL CCD1_MFREE( IPX( IS ), STATUS )
-         CALL CCD1_MFREE( IPY( IS ), STATUS )
-         CALL CCD1_MFREE( IPRAN( IS ), STATUS )
-      END DO
-
 *  Annul group identifiers.
       CALL CCD1_GRDEL( FIOGR, STATUS )
       CALL CCD1_GRDEL( OUTGRP, STATUS )
