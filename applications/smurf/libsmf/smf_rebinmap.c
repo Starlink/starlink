@@ -89,6 +89,9 @@
 *        Add parameters for pixel spreading scheme
 *     2008-02-15 (AGG):
 *        Enable AST__GENVAR to return variances
+*     2008-03-11 (AGG):
+*        Remove old bad bolometer-mask code: masking is now done with
+*        quality flags
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -135,29 +138,20 @@
 
 #define FUNC_NAME "smf_rebinmap"
 
-void smf_rebinmap( smfData *data, int usebad, int indf, int index, int size, 
+void smf_rebinmap( smfData *data, int index, int size, 
 		   AstFrameSet *outfset, int spread, const double params[], 
 		   int moving, int *lbnd_out, int *ubnd_out, double *map, 
 		   double *variance, double *weights, int *status ) {
 
   /* Local Variables */
   AstSkyFrame *abskyfrm = NULL; /* Output SkyFrame (always absolute) */
-  int baddims;                  /* Number of dimensions in bad pixel mask */
-  int badflag = 0;              /* Flag to indicate using bad pixel mask */
-  int *badbolos = NULL;         /* Array of bolometers with good/bad values */
-  int bdims[2];                 /* Dimensions of bad bolometer mask */
-  int bndf;                     /* NDF identifier of bad bolometer extension */
   AstMapping *bolo2map = NULL;  /* Combined mapping bolo->map coordinates */
   double *boldata = NULL;       /* Pointer to bolometer data */
-  HDSLoc *bbmloc=NULL;          /* NDF extension for bad bolometer mask */
   dim_t i;                      /* Loop counter */
-  dim_t j;                      /* Loop counter */
   int lbnd_in[2];               /* Lower pixel bounds for input maps */
-  int n;                        /* Number of elements mapped by ndfMap */
-  dim_t nbol = 0;                 /* # of bolometers in the sub-array */
+  dim_t nbol;                   /* # of bolometers in the sub-array */
   int nused;                    /* No. of input values used */
   AstSkyFrame *oskyfrm = NULL;  /* SkyFrame from the output WCS Frameset */
-  int place;                    /* NDF placeholder */
   int rebinflags = 0;           /* Control the rebinning procedure */
   AstMapping *sky2map=NULL;     /* Mapping from celestial->map coordinates */
   int ubnd_in[2];               /* Upper pixel bounds for input maps */
@@ -205,33 +199,6 @@ void smf_rebinmap( smfData *data, int usebad, int indf, int index, int size,
   ubnd_in[0] = (data->dims)[0]-1;
   ubnd_in[1] = (data->dims)[1]-1;
 
-  /* Has the user requested that we take notice of a bad bolometer mask? */
-  if ( usebad ) {
-    ndfXloc ( indf, "BBM", "READ", &bbmloc, status );
-    if ( *status == NDF__NOEXT ) {
-      errAnnul ( status );
-      *status = SAI__OK;
-      msgOutif(MSG__VERB, " ", "No bad bolo data available, ignoring bad values", 
-	       status);
-    } else {
-      /* Open the bad bolometer mask extension and make sure that the dimensions
-	 match those of the data */
-      ndfOpen ( bbmloc, " ", "READ", "OLD", &bndf, &place, status );
-      ndfDim ( bndf, 2, bdims, &baddims, status ); 
-      if ( (baddims != 2) || (bdims[0] != (data->dims)[0]) || 
-	   (bdims[1] != (data->dims)[1]) ) {
-        msgOutif(MSG__VERB, " ", 
-		 "Dimensions of bad bolometer mask do not equal those of input data: ignoring bad values", 
-		 status );
-        ndfAnnul ( &bndf, status );
-      } else {
-        /* Retrieve the bad bolometer array */
-        ndfMap( bndf, "DATA", "_INTEGER", "READ", &badbolos, &n, status ); 
-	badflag = 1;
-      }
-    }
-  }
-
   /* Loop over all time slices in the data */
   for( i=0; (i<(data->dims)[2]) && (*status == SAI__OK); i++ ) {
        
@@ -241,21 +208,16 @@ void smf_rebinmap( smfData *data, int usebad, int indf, int index, int size,
 
     /* Set rebin flags */
     rebinflags = 0;
-    if ( badflag == 1 ) {
-      /* Flags use bad values */
-      rebinflags = rebinflags | AST__USEBAD;
-      /* If a bad pixel mask was retrieved, use it to flag the data
-	 from bad bolometers with VAL__BADD */
-      for ( j = 0; j < bdims[0]*bdims[1]; j++ ) {
-	if ( badbolos[j] > 0 ) {
-	  boldata[i*nbol + j] = VAL__BADD;
-	}
-      }
-    }
-    if( (index == 1) && (i == 0) )                    /* Flags start rebin */
+
+    /* There may be bad values */
+    rebinflags = rebinflags | AST__USEBAD;
+
+    /* Set flag at start of rebin */
+    if( (index == 1) && (i == 0) )
       rebinflags = rebinflags | AST__REBININIT;
 
-    if( (index == size) && (i == (data->dims)[2]-1) ) /* Flags end rebin */
+    /* And set flag for end of rebin */
+    if( (index == size) && (i == (data->dims)[2]-1) )
       rebinflags = rebinflags | AST__REBINEND;
 
     /* Generate VARIANCE */
@@ -272,10 +234,6 @@ void smf_rebinmap( smfData *data, int usebad, int indf, int index, int size,
   }
 
   /* Clean Up */
-  if ( badflag == 1 ) {
-    ndfUnmap ( bndf, "DATA", status );
-    ndfAnnul ( &bndf, status );
-  }
   if ( sky2map ) sky2map  = astAnnul( sky2map );
   if ( bolo2map ) bolo2map = astAnnul( bolo2map );
   if ( abskyfrm ) abskyfrm = astAnnul( abskyfrm );
