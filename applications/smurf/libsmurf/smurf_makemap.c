@@ -51,8 +51,6 @@
 *        (that is, no error is reported). [current value]
 *     IN = NDF (Read)
 *          Input file(s)
-*     USEBAD = LOGICAL (Read)
-*          Flag to denote whether to take bad detectors into account (FALSE)
 *     METHOD = LITERAL (Read)
 *          Specify which map maker should be used to construct the map. The
 *          parameter can take the following values:
@@ -262,6 +260,8 @@
 *        - Set exp_time values to BAD if no data exists for that pixel
 *     2008-02-20 (AGG):
 *        Calculate median exposure time and write FITS entry
+*     2008-03-11 (AGG):
+*        Update call to smf_rebinmap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -341,7 +341,6 @@ void smurf_makemap( int *status ) {
   unsigned int *hitsmap;     /* Hitsmap array calculated in ITERATE method */
   dim_t i;                   /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
-  int indf = 0;              /* NDF identifier of output file */
   int iterate=0;             /* Flag to denote whether to use the ITERATE method */
   AstKeyMap *keymap=NULL;    /* Pointer to keymap of config settings */
   int ksize=0;               /* Size of group containing CONFIG file */
@@ -364,7 +363,7 @@ void smurf_makemap( int *status ) {
   char pabuf[ 10 ];          /* Text buffer for parameter value */
   double params[ 4 ];        /* astRebinSeq parameters */
   int parstate;              /* State of ADAM parameters */
-  float pixsize=3;           /* Size of an output map pixel in arcsec */
+  double pixsize=3;          /* Size of an output map pixel in arcsec */
   AstKeyMap * prvkeymap = NULL; /* Keymap of input files for PRVxxx headers */
   int rebin=1;               /* Flag to denote whether to use the REBIN method */
   int size;                  /* Number of files in input group */
@@ -376,12 +375,11 @@ void smurf_makemap( int *status ) {
   smfData *tdata=NULL;       /* Exposure time data */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   int ubnd_wgt[3];           /* Upper pixel bounds for weight array */
-  int usebad;                /* Flag for whether to use bad bolos mask */
   int uselonlat = 0;         /* Flag for whether to use given lon_0 and
 				lat_0 for output frameset */
   void *variance=NULL;       /* Pointer to the variance map */
   smfData *wdata=NULL;       /* Pointer to SCUBA2 data struct for weights */
-  double *weights=NULL;        /* Pointer to the weights map */
+  double *weights=NULL;      /* Pointer to the weights map */
   float *work_array = NULL;  /* Temporary work space */
 
   /* Main routine */
@@ -395,18 +393,14 @@ void smurf_makemap( int *status ) {
 	    "GAPPT,FK4,FK4-NO-E,ECLIPTIC", 1, system, 10, status );
 
   /* Get the user defined pixel size */
-  parGet0r( "PIXSIZE", &pixsize, status );
+  parGet0d( "PIXSIZE", &pixsize, status );
   if ( pixsize <= 0 || pixsize > 60. ) {
-    msgSetr("PIXSIZE", pixsize);
+    msgSetd("PIXSIZE", pixsize);
     *status = SAI__ERROR;
     errRep(" ", 
 	   "Invalid pixel size, ^PIXSIZE (must be positive but < 60 arcsec)", 
 	   status);
   }
-
-  /* Determine whether or not to use the bad bolos mask.  If 
-     unspecified, use the mask */
-  parGtd0l ("USEBAD", 1, 1, &usebad, status);
 
   /* Get METHOD - set rebin/iterate flags */
   parChoic( "METHOD", "REBIN", 
@@ -554,14 +548,9 @@ void smurf_makemap( int *status ) {
       if (*status == SAI__OK)
 	smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
 
-      /* Retrieve the NDF identifier for this input file to read the
-	 bad bolometer mask */
-      if ( usebad ) {
-	ndgNdfas ( igrp, i, "READ", &indf, status );
-      }
       msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Beginning the REBIN step", status);
       /* Rebin the data onto the output grid */
-      smf_rebinmap(data, usebad, indf, i, size, outfset, spread, params, moving, 
+      smf_rebinmap(data, i, size, outfset, spread, params, moving, 
 		   lbnd_out, ubnd_out, map, variance, weights, status );
   
       /* Close the data file */

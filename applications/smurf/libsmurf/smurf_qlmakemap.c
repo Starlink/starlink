@@ -161,6 +161,8 @@
 *        Add EXP_TIME array to output file
 *     2008-02-20 (AGG):
 *        Calculate median exposure time and write FITS entry
+*     2008-03-11 (AGG):
+*        Update call to smf_rebinmap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -228,7 +230,6 @@ void smurf_qlmakemap( int *status ) {
   int flag;                  /* Flag */
   dim_t i;                   /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
-  int indf = 0;              /* NDF identifier of output file */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   int lbnd_wgt[3];           /* Lower pixel bounds for weight array */
   double *map = NULL;        /* Pointer to the rebinned map data */
@@ -257,7 +258,6 @@ void smurf_qlmakemap( int *status ) {
   smfData *tdata = NULL;     /* Exposure time data */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   int ubnd_wgt[3];           /* Upper pixel bounds for weight array */
-  int usebad;                /* Flag for whether to use bad bolos mask */
   void *variance = NULL;     /* Pointer to the variance map */
   smfData *wdata = NULL;     /* Pointer to SCUBA2 data struct for weights */
   double *weights = NULL;    /* Pointer to the weights map */
@@ -281,10 +281,6 @@ void smurf_qlmakemap( int *status ) {
     errRep( " ", "Invalid pixel size, ^PIXSIZE (must be positive but < 60 arcsec)", 
 	   status );
   }
-
-  /* Determine whether or not to use the bad bolos mask.  If 
-     unspecified, use the mask */
-  parGtd0l ("USEBAD", 0, 1, &usebad, status);
 
   /* Obtain desired pixel-spreading scheme */
   parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
@@ -376,14 +372,9 @@ void smurf_qlmakemap( int *status ) {
     smf_fits_getD( data->hdr, "MEANWVM", &tau, status );
     smf_correct_extinction( data, "CSOTAU", 1, tau, NULL, status );
 
-    /* Retrieve the NDF identifier for this input file to read the
-       bad bolometer mask */
-    if ( usebad ) {
-      ndgNdfas ( igrp, i, "READ", &indf, status );
-    }
     msgOutif(MSG__VERB, " ", "SMURF_QLMAKEMAP: Beginning the REBIN step", status);
     /* Rebin the data onto the output grid */
-    smf_rebinmap(data, usebad, indf, i, size, outframeset, spread, params, moving, 
+    smf_rebinmap(data, i, size, outframeset, spread, params, moving, 
 		 lbnd_out, ubnd_out, map, variance, weights, status );
 
     smf_close_file( &data, status );
