@@ -1,7 +1,7 @@
 #include "star/hds.h"
 #include "star/hds_fortran.h"
 #include "f77.h"
-#include "star/kaplibs.h"
+#include "kaplibs.h"
 #include "ast.h"
 #include "sae_par.h"
 
