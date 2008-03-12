@@ -102,10 +102,8 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 # for things like gwm since that would save on shared library overhead
 # Trivial to switch to awish, just change gwmXrefresh.in to use AWISH
 # rather than WISH
-edit = sed -e 's,@WISH\@,@WISH@,g' \
-           -e 's,@ATCLSH\@,$(bindir)/atclsh,g' \
-           -e 's,@AWISH\@,$(bindir)/awish,g' \
-           -e 's,@LIBSYS\@,$(libsysdir),g'
+edit = sed -e 's,@ATCLSH\@,$(bindir)/atclsh,g' \
+           -e 's,@AWISH\@,$(bindir)/awish,g'
 
 gwm: Makefile $(srcdir)/gwm.in
 	rm -f gwm gwm.tmp
