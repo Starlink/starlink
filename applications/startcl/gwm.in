@@ -20,9 +20,6 @@ fi
 # are used as arguments for the widget creation command.
 #
 
-# Add the location of the gwm procedures to the auto load path.
-    lappend auto_path @LIBSYS@
-
 # Set a global variable to the name of the help file.
     global helpfile
     set helpfile [file dirname [info script]]/gwm.help
@@ -98,7 +95,7 @@ fi
 # size allowed by the window manager. Also constrain the minimum size so
 # that the buttons are always visible.
     update idletasks
-    wm maxsize . [winfo width .] [winfo height .]
+    wm maxsize . [winfo reqwidth .] [winfo reqheight .]
     wm minsize . [winfo reqwidth .buttons ] [winfo reqheight .buttons ]
 
 # If the current window title is the default (gwmXrefresh) then change it to
