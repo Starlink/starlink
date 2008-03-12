@@ -256,46 +256,48 @@ void kpg1Hdsky( HDSLoc *loc, AstKeyMap *keymap, int old, int new,
 
 /* Allocate an array to store the data values. */
       data = astMalloc( elsize*newlen );
+      if( *status == SAI__OK ) {
 
 /* Check each supported data type in turn. */
-      if( kmtype == AST__INTTYPE ) {
+         if( kmtype == AST__INTTYPE ) {
 
 /* If required, store any existing data values at the start of this array. */
-         if( oldlen ) (void) astMapGet1I( keymap, name, oldlen, &oldlen, 
-                                          (int *) data );
+            if( oldlen ) (void) astMapGet1I( keymap, name, oldlen, &oldlen, 
+                                             (int *) data );
 
 /* Copy any new values to the end of the array. */
-         memcpy( ( (int *) data ) + oldlen, pntr, el*elsize );
+            memcpy( ( (int *) data ) + oldlen, pntr, el*elsize );
 
 /* Put the array into the KeyMap, erasing any pre-existing entry with the
    same name. */
-         astMapPut1I( keymap, name, newlen, (int *) data, NULL );
+            astMapPut1I( keymap, name, newlen, (int *) data, NULL );
 
 /* Do the same for the other numerical types. */
-      } else if( kmtype == AST__FLOATTYPE ) {
-         if( oldlen ) (void) astMapGet1F( keymap, name, oldlen, &oldlen, 
-                                          (float *) data );
-         memcpy( ( (float *) data ) + oldlen, pntr, el*elsize );
-         astMapPut1F( keymap, name, newlen, (float *) data, NULL );
-
-      } else if( kmtype == AST__DOUBLETYPE ) {
-         if( oldlen ) (void) astMapGet1D( keymap, name, oldlen, &oldlen, 
-                                          (double *) data );
-         memcpy( ( (double *) data ) + oldlen, pntr, el*elsize );
-         astMapPut1D( keymap, name, newlen, (double *) data, NULL );
+         } else if( kmtype == AST__FLOATTYPE ) {
+            if( oldlen ) (void) astMapGet1F( keymap, name, oldlen, &oldlen, 
+                                             (float *) data );
+            memcpy( ( (float *) data ) + oldlen, pntr, el*elsize );
+            astMapPut1F( keymap, name, newlen, (float *) data, NULL );
+   
+         } else if( kmtype == AST__DOUBLETYPE ) {
+            if( oldlen ) (void) astMapGet1D( keymap, name, oldlen, &oldlen, 
+                                             (double *) data );
+            memcpy( ( (double *) data ) + oldlen, pntr, el*elsize );
+            astMapPut1D( keymap, name, newlen, (double *) data, NULL );
 
 /* For string types, datMapV returns a pointer to a concatenated list of
    fixed length strings. So we use wrappers in the ATL library that
    convert to and fro between concatenated fixed length strings and 
    null-terminated strings. */
-      } else {
-         if( oldlen ) (void) atlMapGet1S( keymap, name, elsize*oldlen, 
-                                          elsize, &oldlen, (char *) data,
-                                          status );
-         memcpy( ( (char *) data ) + elsize*oldlen, pntr, el*elsize );
-         atlMapPut1S( keymap, name, (char *) data, elsize, newlen, NULL,
-                      status );
-
+         } else {
+            if( oldlen ) (void) atlMapGet1S( keymap, name, elsize*oldlen, 
+                                             elsize, &oldlen, (char *) data,
+                                             status );
+            memcpy( ( (char *) data ) + elsize*oldlen, pntr, el*elsize );
+            atlMapPut1S( keymap, name, (char *) data, elsize, newlen, NULL,
+                         status );
+   
+         }
       }
 
 /* Free resources. */
