@@ -197,7 +197,7 @@ void kpg1Hdsky( HDSLoc *loc, AstKeyMap *keymap, int old, int new,
             hdstype = "_DOUBLE";
 
          } else if( kmtype == AST__FLOATTYPE ) {
-            hdstype = "_FLOAT";
+            hdstype = "_REAL";
 
          } else if( kmtype == AST__STRINGTYPE ) {
             hdstype = "_CHAR";

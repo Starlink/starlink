@@ -188,7 +188,7 @@ void kpg1Kyhds( AstKeyMap *keymap, int *map, int axis, int mode, HDSLoc *loc,
          hdstype = "_DOUBLE";
 
       } else if( kmtype == AST__FLOATTYPE ) {
-         hdstype = "_FLOAT";
+         hdstype = "_REAL";
 
       } else if( kmtype == AST__STRINGTYPE ) {
          hdstype = "_CHAR";
