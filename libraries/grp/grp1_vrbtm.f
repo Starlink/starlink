@@ -131,13 +131,13 @@
 
 *  If the remaining text starts with the string "<!!", jump over it, and
 *  indicate that we are now in a verbatim section.
-         IF( GEXP( I : I + 2 ) .EQ. '<!!' ) THEN
+         IF( GEXP( I : MIN( I + 2, IMAX ) ) .EQ. '<!!' ) THEN
             I = I + 3
             VERB = .TRUE.
 
 *  If the remaining text starts with the string "!!>", jump over it, and
 *  indicate that we are now not in a verbatim section.
-         ELSE IF( GEXP( I : I + 2 ) .EQ. '!!>' ) THEN
+         ELSE IF( GEXP( I : MIN( I + 2, IMAX ) ) .EQ. '!!>' ) THEN
             I = I + 3
             VERB = .FALSE.
 
