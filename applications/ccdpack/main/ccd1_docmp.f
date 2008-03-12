@@ -279,18 +279,26 @@
          CALL AIF_TEMP( '_INTEGER', 1, ELWRK1, LCWRK1, STATUS )
          CALL DAT_MAP( LCWRK1, '_INTEGER', 'WRITE', 1, ELWRK1, WRK1,
      :                 STATUS )
+      ELSE
+         WRK1 = 0
       END IF
       IF ( ELWRK2( 1 ) .GT. 0 ) THEN
          CALL AIF_TEMP( ITYPE, 1, ELWRK2, LCWRK2, STATUS )
          CALL DAT_MAP( LCWRK2, ITYPE, 'WRITE', 1, ELWRK2, WRK2, STATUS )
+      ELSE
+         WRK2 = 0
       END IF
       IF ( ELWRK3( 1 ) .GT. 0 ) THEN
          CALL AIF_TEMP( ITYPE, 1, ELWRK3, LCWRK3, STATUS )
          CALL DAT_MAP( LCWRK3, ITYPE, 'WRITE', 1, ELWRK3, WRK3, STATUS )
+      ELSE
+         WRK3 = 0
       END IF
       IF ( ELWRK4( 1 ) .GT. 0 ) THEN
          CALL AIF_TEMP( ITYPE, 1, ELWRK4, LCWRK4, STATUS )
          CALL DAT_MAP( LCWRK4, ITYPE, 'WRITE', 1, ELWRK4, WRK4, STATUS )
+      ELSE
+         WRK4 = 0
       END IF
 
 *  Perform the inter-comparisons.

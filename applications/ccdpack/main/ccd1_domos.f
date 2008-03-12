@@ -458,9 +458,15 @@
 
 *  Initialise.
 *  ==========
+      BDOUTV = .FALSE.
+      BDOUTD = .FALSE.
+      NBADV = 0
+      NBADD = 0
 
 *  Minimum number of contributing pixels.
       MINPIX = 1
+      
+
 
 *  Determine the shape of the output NDF.
       CALL NDF_BOUND( NDFOUT, NDF__MXDIM, LBNDX, UBNDX, NDIMX, STATUS )

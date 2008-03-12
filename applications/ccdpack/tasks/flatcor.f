@@ -590,6 +590,7 @@
             IF ( REMAP ) THEN
                CALL NDF_MAP( IDFTMP, 'Data', FTYPE, 'READ', IPDFLT, EL,
      :                       STATUS )
+               IPVFLT = 0
                IF ( HAVFV2 ) CALL NDF_MAP( IDFTMP, 'Variance', FTYPE,
      :                                     'READ', IPVFLT, EL, STATUS )
             END IF
@@ -597,6 +598,7 @@
 *  Map in all the data at the processing precision.(Volatile)
             CALL NDF_MAP( IDIN, 'Data', DTYPE, 'READ', IPDIN, EL,
      :                    STATUS )
+            IPVIN = 0
             IF ( HAVDV ) CALL NDF_MAP( IDIN, 'Variance', DTYPE, 'READ',
      :                                 IPVIN, EL, STATUS )
 
@@ -604,6 +606,7 @@
 *  is not propagated if does not exist. (Volatile)
             CALL NDF_MAP( IDOUT, 'Data', DTYPE, 'WRITE', IPDOUT, EL,
      :                    STATUS )
+            IPVOUT = 0
             IF ( HAVDV ) CALL NDF_MAP( IDOUT, 'Variance', DTYPE, 
      :                                 'WRITE', IPVOUT, EL, STATUS )
 

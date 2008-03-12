@@ -505,7 +505,9 @@
 *        released when exiting in error.
 *     11-MAR-2008 (PWD):
 *        Don't release memory allocated for output lists. That's done
-*        automatically.
+*        automatically. Releasing that memory (some of which was already
+*        freed), had a side effect of releasing memory allocated
+*        elsewhere on rare occasions.
 *     {enter_further_changes_here}
 
 *  Bugs:

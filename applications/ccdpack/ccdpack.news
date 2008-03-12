@@ -1,5 +1,7 @@
 1 CCDPACK_bugfix_update
 
+  Release v4.0-22 fixes a bug in the memory handling in FINDOFF.
+
   Release v4.0-20 updates the Tcl/Tk/Itcl core used by CCDPACK. Extensive
   changes to the xreduce command.
 

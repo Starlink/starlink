@@ -646,6 +646,7 @@
             IF ( REMAP ) THEN
                CALL NDF_MAP( IDCTMP, 'Data', CTYPE, 'READ', IPDCAL, EL,
      :                       STATUS )
+               IPVCAL = 0
                IF ( HAVCV2 ) CALL NDF_MAP( IDCTMP, 'Variance', CTYPE,
      :                                     'READ', IPVCAL, EL, STATUS )
             END IF
@@ -653,6 +654,7 @@
 *  Map in the input data. (Volatile)
             CALL NDF_MAP( IDIN, 'Data', DTYPE, 'READ', IPDIN, EL,
      :                    STATUS )
+            IPVIN = 0
             IF ( HAVDV ) CALL NDF_MAP( IDIN, 'Variance', DTYPE, 'READ',
      :                                 IPVIN, EL, STATUS )
 
@@ -660,6 +662,7 @@
 *  does not exist. (Volatile)
             CALL NDF_MAP( IDOUT, 'Data', DTYPE, 'WRITE', IPDOUT, EL,
      :                    STATUS )
+            IPVOUT = 0
             IF ( HAVDV ) CALL NDF_MAP( IDOUT, 'Variance', DTYPE,
      :                                 'WRITE', IPVOUT, EL, STATUS )
 

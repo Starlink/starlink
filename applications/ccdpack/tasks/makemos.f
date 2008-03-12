@@ -1079,6 +1079,9 @@
 *  See if any inter-comparisons to be made between the input NDFs may
 *  involve iteration. If so, then obtain the required accuracy
 *  tolerances and the maximum number of iterations to allow.
+      TOLS = 0.0D0
+      TOLZ = 0.0D0
+      MAXIT = 1
       DOITER = ( ADJUST .AND. GETS .AND. ( GETZ .OR. CMPVAR ) )
       IF ( DOITER ) THEN
          IF ( GETS ) CALL PAR_GDR0R( 'TOLS', 0.001, 0.0, NUM__MAXR,
@@ -1437,6 +1440,10 @@
          ELSE
             NMAX = 1
             CALL PSX_CALLOC( 2 * ( NNDF + 1 ), '_DOUBLE', WRK1, STATUS )
+            WRK2 = 0
+            WRK3 = 0
+            WRK4 = 0
+            WRK5 = 0
          END IF
 
 *  Solve to find globally optimised corrections for each NDF consistent
