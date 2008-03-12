@@ -90,6 +90,9 @@ gaia_headers=`cd ${srcdir}; echo generic/*.h generic/*.icc`
 gaia_includes="-I. -I${srcdir}/generic -I${srcdir}/bitmaps -I${prefix}/include/skycat -I${prefix}/include/rtd -I${prefix}/include/cat -I${prefix}/include/astrotcl -I${prefix}/include/tclutil"
 tclsources=`cd ${srcdir}; echo library/*.tcl library/*.itk library/*.xpm library/skycat2.0.cfg`
 
+#  Size of long, used for FITS.
+AC_CHECK_SIZEOF(long,4)
+
 ]) 
 #  GAIA_CONFIG
 

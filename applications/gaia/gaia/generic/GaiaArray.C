@@ -59,16 +59,6 @@
 #define MIN(a,b) ( (a) < (b) ? (a) : (b) )
 #define MAX(a,b) ( (a) > (b) ? (a) : (b) )
 
-/* The type "long" may have 64 bits, need to know this for byte-swapping
- * macros */
-#if SIZEOF_LONG == 8
-#define FITS_ULONG unsigned long
-#define FITS_UINT unsigned int
-#else
-#define FITS_ULONG unsigned long long
-#define FITS_UINT unsigned long
-#endif
-
 /* Local types as HDS type strings, static for simple export */
 static char *hdstypes[] = {
     "_UBYTE", "_BYTE", "_UWORD", "_WORD", "_INTEGER", "_REAL", "_DOUBLE"

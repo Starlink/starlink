@@ -52,6 +52,10 @@
     of all overlapping windows. This requirement is now reported as
     a warning rather than a generic "too many colors" error messages.
 
+    A bug handling integer images has been fixed. Previously contouring, 
+    XY extraction and region stats was broken for this data type 
+    (since version 4.0).
+
     The blink toolbox should now handle the case when RA and Dec
     are not axes aligned more effectively.
 
