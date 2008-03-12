@@ -15,7 +15,7 @@
 
 *  Copyright:
 *     Copyright (C) 1996-2006 Council for the Central Laboratory of the
-*     Research Councils. Copyright (C) 2007 Science and Technology
+*     Research Councils. Copyright (C) 2007-2008 Science and Technology
 *     Facilities Council. All Rights Reserved.
 
 *  Licence:
@@ -76,6 +76,9 @@
 *        Add SLA_DR2TF
 *     14-DEC-2007 (TIMJ):
 *        Add slaDafin, Add slaMap
+*     12-MAR-2008 (TIMJ):
+*        Add slaOap, slaDr2af, slaAmp, slaPertel, slaPlanet, slaCldj
+*        to enable elements test.
 *-
 */
 
@@ -477,6 +480,32 @@ slaDr2tf( int ndp, double angle, char * sign, int ihmsf[4] )  {
   sign[0] = SIGN[0];
   sign[1] = 0;
   for ( i = 0; i < 4; i++ ) ihmsf[ i ] = IHMSF[ i ];
+}
+
+F77_SUBROUTINE(sla_dr2af)( INTEGER(NDP),
+                           DOUBLE(ANGLE),
+                           CHARACTER(SIGN),
+                           INTEGER_ARRAY(IDMSF)
+                           TRAIL(SIGN) );
+
+void
+slaDr2af( int ndp, double angle, char * sign, int idmsf[4] )  {
+  DECLARE_INTEGER(NDP);
+  DECLARE_DOUBLE(ANGLE);
+  DECLARE_CHARACTER(SIGN,2);
+  DECLARE_INTEGER_ARRAY(IDMSF,4);
+  int i;
+
+  NDP = ndp;   
+  ANGLE = angle;
+  F77_CALL(sla_dr2af)( INTEGER_ARG(&NDP),
+		       DOUBLE_ARG(&ANGLE),
+		       CHARACTER_ARG(SIGN),
+		       INTEGER_ARRAY_ARG(IDMSF) 
+		       TRAIL_ARG(SIGN) );
+  sign[0] = SIGN[0];
+  sign[1] = 0;
+  for ( i = 0; i < 4; i++ ) idmsf[ i ] = IDMSF[ i ];
 }
 
 F77_SUBROUTINE(sla_dimxv)( DOUBLE_ARRAY(DM),
@@ -1780,3 +1809,304 @@ slaDafin( char * string, int * iptr, double *a, int *j ) {
   F77_FREE_CHARACTER(STRING);
 
 }
+
+F77_SUBROUTINE(sla_oap)( CHARACTER(TYPE),
+                         DOUBLE(OB1),
+                         DOUBLE(OB2),
+                         DOUBLE(DATE),
+                         DOUBLE(DUT),
+                         DOUBLE(ELONGM),
+                         DOUBLE(PHIM),
+                         DOUBLE(HM),
+                         DOUBLE(XP),
+                         DOUBLE(YP),
+                         DOUBLE(TDK),
+                         DOUBLE(PMB),
+                         DOUBLE(RH),
+                         DOUBLE(WL),
+                         DOUBLE(TLR),
+                         DOUBLE(RAP),
+                         DOUBLE(DAP)
+                         TRAIL(TYPE) );
+
+void slaOap ( char *type, double ob1, double ob2, double date,
+              double dut, double elongm, double phim, double hm,
+              double xp, double yp, double tdk, double pmb,
+              double rh, double wl, double tlr,
+              double *rap, double *dap ) {
+  DECLARE_CHARACTER(TYPE,1);
+  DECLARE_DOUBLE(OB1);
+  DECLARE_DOUBLE(OB2);
+  DECLARE_DOUBLE(DATE);
+  DECLARE_DOUBLE(DUT);
+  DECLARE_DOUBLE(ELONGM);
+  DECLARE_DOUBLE(PHIM);
+  DECLARE_DOUBLE(HM);
+  DECLARE_DOUBLE(XP);
+  DECLARE_DOUBLE(YP);
+  DECLARE_DOUBLE(TDK);
+  DECLARE_DOUBLE(PMB);
+  DECLARE_DOUBLE(RH);
+  DECLARE_DOUBLE(WL);
+  DECLARE_DOUBLE(TLR);
+  DECLARE_DOUBLE(RAP);
+  DECLARE_DOUBLE(DAP);
+
+  slaStringExport( type, TYPE, 1 );
+  OB1 = ob1;
+  OB2 = ob2;
+  DATE = date;
+  DUT  = dut;
+  ELONGM = elongm;
+  PHIM = phim;
+  HM = hm;
+  XP = xp;
+  YP = yp;
+  TDK = tdk;
+  PMB = pmb;
+  RH = rh;
+  WL = wl;
+  TLR = tlr;
+  
+  F77_CALL(sla_oap)( CHARACTER_ARG(TYPE),
+                     DOUBLE_ARG(&OB1), DOUBLE_ARG(&OB2),
+                     DOUBLE_ARG(&DATE), DOUBLE_ARG(&DUT),
+                     DOUBLE_ARG(&ELONGM), DOUBLE_ARG(&PHIM),
+                     DOUBLE_ARG(&HM), DOUBLE_ARG(&XP),
+                     DOUBLE_ARG(&YP), DOUBLE_ARG(&TDK),
+                     DOUBLE_ARG(&PMB), DOUBLE_ARG(&RH),
+                     DOUBLE_ARG(&WL), DOUBLE_ARG(&TLR),
+                     DOUBLE_ARG(&RAP), DOUBLE_ARG(&DAP)
+                     TRAIL_ARG(TYPE) );
+
+  *rap = RAP;
+  *dap = DAP;
+
+}
+
+F77_SUBROUTINE(sla_amp)( DOUBLE(RA),
+                         DOUBLE(DA),
+                         DOUBLE(DATE),
+                         DOUBLE(EQ),
+                         DOUBLE(RM),
+                         DOUBLE(DM)
+                         );
+
+void slaAmp( double ra, double da, double date, double eq,
+             double *rm, double *dm) {
+
+  DECLARE_DOUBLE(RA);
+  DECLARE_DOUBLE(DA);
+  DECLARE_DOUBLE(DATE);
+  DECLARE_DOUBLE(EQ);
+  DECLARE_DOUBLE(RM);
+  DECLARE_DOUBLE(DM);
+
+  RA = ra;
+  DA = da;
+  DATE = date;
+  EQ = eq;
+
+  F77_CALL(sla_amp)( DOUBLE_ARG(&RA),
+                     DOUBLE_ARG(&DA),
+                     DOUBLE_ARG(&DATE),
+                     DOUBLE_ARG(&EQ),
+                     DOUBLE_ARG(&RM),
+                     DOUBLE_ARG(&DM));
+
+  *rm = RM;
+  *dm = DM;
+
+}
+
+F77_SUBROUTINE(sla_cldj)( INTEGER(IY),
+                          INTEGER(IM),
+                          INTEGER(ID),
+                          DOUBLE(DJM),
+                          INTEGER(I) );
+
+void
+slaCldj( int iy, int im, int id, double * djm, int *i ) {
+  DECLARE_INTEGER(IY);
+  DECLARE_INTEGER(IM);
+  DECLARE_INTEGER(ID);
+  DECLARE_DOUBLE(DJM);
+  DECLARE_INTEGER(I);
+
+  IY = iy;
+  IM = im;
+  ID = id;
+
+  F77_CALL(sla_cldj)( INTEGER_ARG(&IY),
+                      INTEGER_ARG(&IM),
+                      INTEGER_ARG(&ID),
+                      DOUBLE_ARG(&DJM),
+                      INTEGER_ARG(&I) );
+
+  *djm = DJM;
+  *i = I;
+
+}
+
+F77_SUBROUTINE(sla_pertel)( INTEGER(JFORM),
+                            DOUBLE(DATE0),
+                            DOUBLE(DATE1),
+                            DOUBLE(EPOCH0),
+                            DOUBLE(ORBI0),
+                            DOUBLE(ANODE0),
+                            DOUBLE(PERIH0),
+                            DOUBLE(AORQ0),
+                            DOUBLE(E0),
+                            DOUBLE(AM0),
+                            DOUBLE(EPOCH1),
+                            DOUBLE(ORBI1),
+                            DOUBLE(ANODE1),
+                            DOUBLE(PERIH1),
+                            DOUBLE(AORQ1),
+                            DOUBLE(E1),
+                            DOUBLE(AM1),
+                            INTEGER(JSTAT) );
+
+void slaPertel (int jform, double date0, double date1,
+                double epoch0, double orbi0, double anode0,
+                double perih0, double aorq0, double e0, double am0,
+                double *epoch1, double *orbi1, double *anode1,
+                double *perih1, double *aorq1, double *e1, double *am1,
+                int *jstat ) {
+
+  DECLARE_INTEGER(JFORM);
+  DECLARE_DOUBLE(DATE0);
+  DECLARE_DOUBLE(DATE1);
+  DECLARE_DOUBLE(EPOCH0);
+  DECLARE_DOUBLE(ORBI0);
+  DECLARE_DOUBLE(ANODE0);
+  DECLARE_DOUBLE(PERIH0);
+  DECLARE_DOUBLE(AORQ0);
+  DECLARE_DOUBLE(E0);
+  DECLARE_DOUBLE(AM0);
+  DECLARE_DOUBLE(EPOCH1);
+  DECLARE_DOUBLE(ORBI1);
+  DECLARE_DOUBLE(ANODE1);
+  DECLARE_DOUBLE(PERIH1);
+  DECLARE_DOUBLE(AORQ1);
+  DECLARE_DOUBLE(E1);
+  DECLARE_DOUBLE(AM1);
+  DECLARE_INTEGER(JSTAT);
+
+  JFORM = jform;
+  DATE0 = date0;
+  DATE1 = date1;
+  EPOCH0 = epoch0;
+  ORBI0 = orbi0;
+  ANODE0 = anode0;
+  PERIH0 = perih0;
+  AORQ0 = aorq0;
+  E0 = e0;
+  AM0 = am0;
+
+  F77_CALL(sla_pertel)( INTEGER_ARG(&JFORM),
+                       DOUBLE_ARG(&DATE0),
+                       DOUBLE_ARG(&DATE1),
+                       DOUBLE_ARG(&EPOCH0),
+                       DOUBLE_ARG(&ORBI0),
+                       DOUBLE_ARG(&ANODE0),
+                       DOUBLE_ARG(&PERIH0),
+                       DOUBLE_ARG(&AORQ0),
+                       DOUBLE_ARG(&E0),
+                       DOUBLE_ARG(&AM0),
+                       DOUBLE_ARG(&EPOCH1),
+                       DOUBLE_ARG(&ORBI1),
+                       DOUBLE_ARG(&ANODE1),
+                       DOUBLE_ARG(&PERIH1),
+                       DOUBLE_ARG(&AORQ1),
+                       DOUBLE_ARG(&E1),
+                       DOUBLE_ARG(&AM1),
+                       INTEGER_ARG(&JSTAT) );
+
+  *epoch1 = EPOCH1;
+  *orbi1 = ORBI1;
+  *anode1 = ANODE1;
+  *perih1 = PERIH1;
+  *aorq1 = AORQ1;
+  *e1 = E1;
+  *am1 = AM1;
+  *jstat = JSTAT;
+
+}
+
+F77_SUBROUTINE(sla_plante)(DOUBLE(DATE),
+                           DOUBLE(ELONG),
+                           DOUBLE(PHI),
+                           INTEGER(JFORM),
+                           DOUBLE(EPOCH),
+                           DOUBLE(ORBINC),
+                           DOUBLE(ANODE),
+                           DOUBLE(PERIH),
+                           DOUBLE(AORQ),
+                           DOUBLE(E),
+                           DOUBLE(AORL),
+                           DOUBLE(DM),
+                           DOUBLE(RA),
+                           DOUBLE(DEC),
+                           DOUBLE(R),
+                           INTEGER(JSTAT) );
+
+void slaPlante ( double date, double elong, double phi, int jform,
+                 double epoch, double orbinc, double anode, double perih,
+                 double aorq, double e, double aorl, double dm,
+                 double *ra, double *dec, double *r, int *jstat ) {
+
+  DECLARE_DOUBLE(DATE);
+  DECLARE_DOUBLE(ELONG);
+  DECLARE_DOUBLE(PHI);
+  DECLARE_INTEGER(JFORM);
+  DECLARE_DOUBLE(EPOCH);
+  DECLARE_DOUBLE(ORBINC);
+  DECLARE_DOUBLE(ANODE);
+  DECLARE_DOUBLE(PERIH);
+  DECLARE_DOUBLE(AORQ);
+  DECLARE_DOUBLE(E);
+  DECLARE_DOUBLE(AORL);
+  DECLARE_DOUBLE(DM);
+  DECLARE_DOUBLE(RA);
+  DECLARE_DOUBLE(DEC);
+  DECLARE_DOUBLE(R);
+  DECLARE_INTEGER(JSTAT);
+
+  DATE = date;
+  ELONG = elong;
+  PHI = phi;
+  JFORM = jform;
+  EPOCH = epoch;
+  ORBINC = orbinc;
+  ANODE = anode;
+  PERIH = perih;
+  AORQ = aorq;
+  E = e;
+  AORL = aorl;
+  DM = dm;
+
+  F77_CALL(sla_plante)( DOUBLE_ARG(&EPOCH),
+                       DOUBLE_ARG(&ELONG),
+                       DOUBLE_ARG(&PHI),
+                       INTEGER_ARG(&JFORM),
+                       DOUBLE_ARG(&EPOCH),
+                       DOUBLE_ARG(&ORBINC),
+                       DOUBLE_ARG(&ANODE),
+                       DOUBLE_ARG(&PERIH),
+                       DOUBLE_ARG(&AORQ),
+                       DOUBLE_ARG(&E),
+                       DOUBLE_ARG(&AORL),
+                       DOUBLE_ARG(&DM),
+                       DOUBLE_ARG(&RA),
+                       DOUBLE_ARG(&DEC),
+                       DOUBLE_ARG(&R),
+                       INTEGER_ARG(&JSTAT) );
+
+  *ra = RA;
+  *dec = DEC;
+  *r = R;
+  *jstat = JSTAT;
+
+}
+
