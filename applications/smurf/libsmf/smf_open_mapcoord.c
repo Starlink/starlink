@@ -40,6 +40,8 @@
 *        Added mode to the interface
 *     2007-11-26 (EC):
 *        Return more useful SMF__NOLUT status if no MAPCOORD xtension found.
+*     2008-03-12 (EC):
+*        Check for extension existence before trying to open.
 
 *  Notes:
 *     If no HDS locator can be obtained for a "MAPCOORD" extension then
@@ -93,26 +95,35 @@ void smf_open_mapcoord( smfData *data, const char *mode, int *status ) {
   int nbolo;                    /* Number of bolometers */
   int nmap;                     /* Number of elements mapped */
   HDSLoc *mapcoordloc=NULL;     /* HDS locator to the MAPCOORD extension */
+  int there=0;                  /* Flag for existence of extension */
   int ubnd[1];                  /* Pixel bounds for 1d pointing array */
   
   /* Main routine */
   if (*status != SAI__OK) return;
   
-  /* Get HDS locator for the MAPCOORD extension  */
-  mapcoordloc = smf_get_xloc( data, "MAPCOORD", "MAPCOORD_Calculations",
-                           mode, 0, 0, status );
+  /* Check for existence of extension */
+  if( data->file ) {
+    if( data->file->ndfid != NDF__NOID ) {
+      ndfXstat( data->file->mapcoordid, "MAPCOORD", &there, status );
+    }
+  }
 
   /* Since other things may eventually get put into the MAPCOORD
      extension, and to prevent it from having problems if called multiple
      times, check for NULL states first for the HDS locator / NDF id / LUT
      before trying to get them */
     
-  if( *status == SAI__OK ) {
-    nbolo = (data->dims)[0] * (data->dims)[1];
+  if( (*status == SAI__OK) && there ) {
 
+    nbolo = (data->dims)[0] * (data->dims)[1];
     lbnd[0] = 0;
     ubnd[0] = nbolo*(data->dims)[2]-1;
 
+    /* Get HDS locator for the MAPCOORD extension  */
+    mapcoordloc = smf_get_xloc( data, "MAPCOORD", "MAPCOORD_Calculations",
+				mode, 0, 0, status );
+
+    /* Get NDF identifier if not already opened */
     if( (data->file)->mapcoordid == NDF__NOID ) {
       (data->file)->mapcoordid = smf_get_ndfid( mapcoordloc, 
 						"LUT", mode, "UNKNOWN",
