@@ -1,5 +1,6 @@
 #include "ast.h"
 #include "sae_par.h"
+#include <string.h>
 
 void atlMapPut1S( AstKeyMap *this, const char *key, const char *value,
                   int len, int size, const char *comment, int *status ){
@@ -102,8 +103,9 @@ void atlMapPut1S( AstKeyMap *this, const char *key, const char *value,
 
 /* Allocate memory and store a copy of th efixed length string, adding an
    extra element for a terminating null character. */
-         q = astStore( NULL, p, len + 1 );
+         q = astMalloc( sizeof( char )*( len + 1 ) );
          if( q ) {
+            (void) memcpy( q, p, len );
 
 /* Terminate the copy of the fixed length string, and store a pointer to
    it in the array of string pointers. */
