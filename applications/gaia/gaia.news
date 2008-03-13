@@ -64,6 +64,12 @@
     around pixel-based ones (no reducing this makes the packing of labels
     more condensed).
 
+    When saving a FITS image with a new world coordinate system the old
+    behaviour was to always write the astrometry in the format of the image.
+    This has been changed so that FITS-PC astrometries will now be written
+    in the standards complying FITS-WCS format (see SUN/211 for the details
+    of this terminology).
+
   Humu Release
   ============
 
