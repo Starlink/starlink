@@ -247,6 +247,10 @@
 *        Updated smf_calcmodel* routines to use smfDIMMData
 *     2008-03-10 (AGG):
 *        Add smf_create_qualname
+*     2008-03-12 (EC):
+*        - Updated smf_update_quality interface
+*        - Added smf_correct_steps / smf_simple_stats
+
 
 *     {enter_further_changes_here}
 
@@ -806,6 +810,16 @@ void smf_resampcube_ast( smfData *data, int index, int size, dim_t nchan,
                          float *out_data, int *status );
 
 void smf_update_quality( smfData *data, unsigned char *target, 
-			 unsigned char *badmask, int *status );
+			 unsigned char *badmask, double badfrac,
+			 int *status );
+void smf_correct_steps( smfData *data, unsigned char *quality,
+                     double dcthresh, dim_t dcbox,
+                      int *status );
+
+void smf_simple_stats( double *data, dim_t start, dim_t nsamp,
+                     unsigned char *qual, unsigned char mask, double *mean,
+                     double *sigma, dim_t *ngood, int *status );
+
+
 
 #endif /* SMF_DEFINED */
