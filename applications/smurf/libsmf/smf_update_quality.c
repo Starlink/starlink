@@ -15,17 +15,21 @@
 
 *  Invocation:
 *     smf_update_quality( smfData *data, unsigned char *target, 
-*                         unsigned char *badmask, int *status );
+*                         unsigned char *badmask, double badfrac,
+*                         int *status );
 
 *  Arguments:
 *     data = smfData* (Given)
 *        Pointer to smfData that will contain the updated QUALITY array
 *     target = unsigned char* (Given)
 *        If defined update this buffer instead of the QUALITY in data
-*     badmask = unsigned char* (Given)
+*     badmask = unsigned char* (Given and Returned)
 *        If given, points to byte array with same dimensions as bolometers.
 *        Each position that is non-zero will set SMF__Q_BAD for all data
 *        for that detector. 
+*     badfrac = double (Given)
+*        If nonzero, fraction of samples for entire bolo to be flagged as bad.
+*        If badmask specified, it is updated.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -95,12 +99,15 @@
 #define FUNC_NAME "smf_update_quality"
 
 void smf_update_quality( smfData *data, unsigned char *target, 
-			 unsigned char *badmask, int *status ) {
+			 unsigned char *badmask, double badfrac, 
+			 int *status ) {
 
+  unsigned char *badm=NULL;     /* The bad bolo mask */
   dim_t i;                      /* loop counter */
   dim_t j;                      /* loop counter */
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ndata;                  /* Number of data points */
+  dim_t nbad;                   /* Bad samples counter */
   dim_t ntslice;                /* Number of time slices */
   unsigned char *qual=NULL;     /* Pointer to the QUALITY array */
 
@@ -143,6 +150,13 @@ void smf_update_quality( smfData *data, unsigned char *target,
     return;
   }
 
+  /* Check for valid badfrac */
+  if( (badfrac < 0) || (badfrac > 1) ) {
+    msgSeti( "BADFRAC", badfrac );
+    errRep(FUNC_NAME, 
+	   "Invalid badfrac: ^BADFRAC. Must be in range (0 -- 1).", status);
+  }
+
   /* Calculate data dimensions */
   if( data->isTordered ) {
     nbolo = (data->dims)[0]*(data->dims)[1];
@@ -153,26 +167,62 @@ void smf_update_quality( smfData *data, unsigned char *target,
   }
   ndata = nbolo*ntslice;
 
-  /* Apply badmask if available */
-
+  /* Check for input badmask */
   if( badmask ) {
-    /* Loop over detector */
-    for( i=0; i<nbolo; i++ ) if( badmask[i] ) {
-      /* Loop over time slice */
-      for( j=0; j<ntslice; j++ ) {
-	if( data->isTordered ) {
-	  qual[nbolo*j + i] |= SMF__Q_BADB;
-	} else {
-	  qual[j + i*ntslice] |= SMF__Q_BADB;
+    badm = badmask;
+  } else if( badfrac ) {
+    /* Allocate a badm buffer if using fractional threshold and an external
+       badmask was not specified */
+    badm = smf_malloc( nbolo, sizeof(*badm), 1, status );
+  }
+
+  if( *status == SAI__OK ) {
+    
+    /* Synchronize SMF__Q_BADS quality and VAL__BADD in data array */
+    for( i=0; i<ndata; i++ ) {    /* Loop over all samples */
+      qual[i] |= (SMF__Q_BADS & (((double *)data->pntr[0])[i] == VAL__BADD) );
+    }
+    
+    /* Apply badmask if available */
+    if( badm ) {
+      /* Loop over detector */
+      for( i=0; i<nbolo; i++ ) {
+
+	/* Update badmask if badfrac specified */
+	if( badfrac && !badm[i] ) {
+	  nbad = 0;
+
+	  /* Loop over samples and count the number with SMF__Q_BADS set */
+	  for( j=0; j<ntslice; j++ ) {
+	    if( data->isTordered ) {
+	      if( qual[nbolo*j + i] & SMF__Q_BADS ) nbad ++;
+	    } else {
+	      if( qual[j + i*ntslice] & SMF__Q_BADS ) nbad ++;
+	    }
+	  }
+
+	  if( ((double) nbad / (double) ntslice) > badfrac ) {
+	    badmask[i] = 1;
+	  }
+	}
+
+	/* Now apply the badmask */
+	if( badm[i] ) {
+	  for( j=0; j<ntslice; j++ ) {
+	    if( data->isTordered ) {
+	      qual[nbolo*j + i] |= SMF__Q_BADB;
+	    } else {
+	      qual[j + i*ntslice] |= SMF__Q_BADB;
+	    }
+	  }
 	}
       }
     }
   }
 
-  /* Synchronize SMF__Q_BADS quality and VAL__BADD in data array */
-  for( i=0; i<ndata; i++ ) {    /* Loop over all samples */
-    qual[i] |= (SMF__Q_BADS & (((double *)data->pntr[0])[i] == VAL__BADD) );
+  /* Free badm if local */
+  if( badm && !badmask ) {
+    badm = smf_free( badm, status );
   }
-
 
 }
