@@ -57,7 +57,8 @@ smf_open_related_model.c smf_choosetiles.c smf_freetiles.c smf_reshapendf.c \
 smf_dataOrder.c smf_choosepolbins.c smf_freepolbins.c smf_polext.c \
 smf_fft_filter.c smf_concat_smfGroup.c smf_checkdets.c smf_sortd.c \
 smf_reorder.c smf_updateprov.c smf_fits_setL.c smf_getrefwcs.c \
-smf_update_quality.c smf_get_spread.c smf_create_qualname.c
+smf_update_quality.c smf_get_spread.c smf_create_qualname.c \
+smf_correct_steps.c smf_simple_stats.c
 
 noinst_INCLUDES = smf.h smf_typ.h
 
