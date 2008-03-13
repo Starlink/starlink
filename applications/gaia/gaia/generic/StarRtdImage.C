@@ -568,7 +568,7 @@ ImageData* StarRtdImage::getStarImage( const char* filename,
     //  for a compressed FITS file, or "fts*"
     char* p = (char *) strchr( filename, '.' );
     int isfits = 1;
-    if ( p && strstr( p, ".fit" ) == NULL && strstr( p, ".fts" ) == NULL 
+    if ( p && strstr( p, ".fit" ) == NULL && strstr( p, ".fts" ) == NULL
            && strstr( p, ".FIT" ) == NULL && strstr( p, ".FTS" ) == NULL ) {
         isfits = 0;
     }
@@ -657,7 +657,7 @@ ImageData *StarRtdImage::makeImage( ImageIO imio )
     // The image data is fixed at first.
     volatile_ = 0;
 
-    return ImageData::makeImage( name(), imio, biasimage_->biasInfo(), 
+    return ImageData::makeImage( name(), imio, biasimage_->biasInfo(),
                                  verbose() );
 }
 
@@ -818,15 +818,15 @@ int StarRtdImage::volatileCmd( int argc, char *argv[] )
 //   already) if the original WCS has been overwritten (a sign that at
 //   least some WCS modification has been attempted).
 //
-//   Two encodings of the WCS can be written. The first is uses the
-//   default encoding of a channel that contains the image FITS
-//   headers.  Normally this is a native encoding which is accurate
-//   and can be output to an NDF WCS component, unless the destination
-//   file is FITS, in which case FITS-WCS overrides Native as the
-//   default. A second attempt to encode the WCS is made if a suitable
-//   encoding form passed as an optional argument (normally this will
-//   be FITS-WCS or DSS) and a successful FITS-WCS has not already
-//   been written.
+//   Two encodings of the WCS can be written. The first is uses the default
+//   encoding of a channel that contains the image FITS headers.  Normally
+//   this is a native encoding which is accurate and can be output to an NDF
+//   WCS component, unless the destination file is FITS, in which case
+//   FITS-WCS overrides Native as the default (and also overrides the never a
+//   standard FITS-PC). A second attempt to encode the WCS is made if a
+//   suitable encoding form passed as an optional argument (normally this will
+//   be FITS-WCS or DSS) and a successful FITS-WCS has not already been
+//   written.
 //
 //   The return from this function is either TCL_OK for success
 //   or TCL_ERROR for failure. Either way the return may have
@@ -868,8 +868,15 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
                 tmpset = (AstFrameSet *) astAnnul( tmpset );
 
                 //  A successful initial default encoding is the permanent
-                //  default for writing back.
-                astSet( chan, "Encoding=%s", default_encoding );
+                //  default for writing back. Now that FITS-PC is deprecated
+                //  (and was never part of the standard) always write FITS-WCS.
+                if ( strcmp( "FITS-PC", default_encoding ) == 0 ) {
+                    astSet( chan, "Encoding=FITS-WCS" );
+                    default_encoding = astGetC( chan, "Encoding" );
+                }
+                else {
+                    astSet( chan, "Encoding=%s", default_encoding );
+                }
             }
             else {
                 //  Nothing read from the channel. So default encoding is
@@ -1042,7 +1049,7 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             set_result( message.str().c_str() );
         }
         return result;
-    } 
+    }
     else {
         return TCL_OK;
     }
@@ -4114,10 +4121,10 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
 
         //  Create an AstPlot that incorporates an additional FrameSet
         //  that describes an system we want to add.
-        AstPlot *plot = createPlot( wcs, farwcs, domain, 1, ncoords != 0, 
+        AstPlot *plot = createPlot( wcs, farwcs, domain, 1, ncoords != 0,
                                     region, report );
         inerror = ( inerror || plot == (AstPlot *) NULL );
-        
+
         //  Initialise the interpreter and canvas name for the Tk plotting
         //  routines.
         astTk_Init( interp_, canvasName_ );
@@ -4336,7 +4343,7 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
         gbox[1] = pbox[1] = rh;
         gbox[2] = pbox[2] = rw;
         gbox[3] = pbox[3] = 0.0;
-    } 
+    }
     else {
         //  Just using part of the canvas.
         gbox[0] = pbox[0] = region[0];
@@ -4393,7 +4400,7 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
             }
             return (AstPlot *) NULL;
         }
-        if ( report ) {            
+        if ( report ) {
             AstFrame *base = (AstFrame *) astGetFrame( wcs, AST__BASE );
             cerr << "INFO: coordinates matched using " << astGetC( base, "Domain" );
             if ( presetused ) {
@@ -4441,7 +4448,7 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
             region[2] = xout[3] + xdist * 0.5;
             region[3] = yout[3] + ydist * 0.5;
         }
-    } 
+    }
     else {
 
         //  Just using plain WCS.
@@ -4467,7 +4474,7 @@ AstPlot* StarRtdImage::createPlot( AstFrameSet *wcs,
     }
     if ( astOK ) {
         return plot;
-    } 
+    }
     else {
         return (AstPlot *) NULL;
     }
@@ -4499,7 +4506,7 @@ int StarRtdImage::hduCmd( int argc, char *argv[] )
 
     if ( isfits() ) {
         return fitsHduCmd( imio, argc, argv );
-    } 
+    }
     return ndfHduCmd( imio, argc, argv );
 }
 
@@ -4917,7 +4924,7 @@ int StarRtdImage::hduCmdGet( int argc, char** argv, FitsIO* fits )
             }
 	}
     }
-    
+
     //  Check for the filename arg, needed for compressed image support.
     char* filename = NULL;
     if ( argc >= 2 ) {
