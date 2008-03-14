@@ -364,7 +364,7 @@ AV* ErrBuff;
     code \
     astWatch( old_ast_status ); \
     /* Need to remove the MUTEX before we croak [but must copy the error buffer] */ \
-    My_astCopyErrMsg( &local_err ); \
+    My_astCopyErrMsg( &local_err, *my_xsstatus ); \
     MUTEX_UNLOCK(&AST_mutex); \
     if ( *my_xsstatus != 0 ) { \
       astThrowException( *my_xsstatus, local_err ); \
@@ -403,13 +403,17 @@ void My_astClearErrMsg () {
 
    This is required because astPutErr can only use the static version
    of the array.
+
+   Does not try to do anything if status is 0
  */
 
-void My_astCopyErrMsg ( AV ** newbuff ) {
+void My_astCopyErrMsg ( AV ** newbuff, int status ) {
   int i;
   SV ** elem;
+  if (status == 0) return;
 
   *newbuff = newAV();
+  sv_2mortal((SV*)*newbuff);
   for (i = 0; i <= av_len( ErrBuff ) ; i++ ) {
     elem = av_fetch( ErrBuff, i, 0);
     if (elem != NULL ) {
@@ -1511,7 +1515,7 @@ astDESTROY( obj )
     old_ast_status = astWatch( my_xsstatus );
     astAnnul( this );
     astWatch( old_ast_status );
-    My_astCopyErrMsg( &local_err );
+    My_astCopyErrMsg( &local_err, *my_xsstatus );
     MUTEX_UNLOCK(&AST_mutex);
     if (*my_xsstatus != 0 ) {
       for (i=0; i <= av_len( local_err ); i++ ) {
