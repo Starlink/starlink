@@ -202,7 +202,7 @@ void smf_update_quality( smfData *data, unsigned char *target,
 	  }
 
 	  if( ((double) nbad / (double) ntslice) > badfrac ) {
-	    badmask[i] = 1;
+	    badm[i] = 1;
 	  }
 	}
 
