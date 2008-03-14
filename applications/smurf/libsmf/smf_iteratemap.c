@@ -496,7 +496,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	    /* Synchronize quality flags */
 	    smf_update_quality( res[i]->sdata[idx], 
 				(unsigned char *)qua[i]->sdata[idx]->pntr[0],
-				NULL, status );
+				NULL, 0, status );
 	    /*smf_fft_filter( res[i]->sdata[idx], 200., status );*/
 	  }
 	}
