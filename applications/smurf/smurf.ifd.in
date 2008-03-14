@@ -1503,6 +1503,24 @@ package @PACKAGE@ {
             helpkey *
           }
 
+         parameter limittype {
+            type LITERAL
+            prompt {Type of limit specified by LIMITSIZE}
+            default FILESIZE
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            helpkey *
+          }
+
+         parameter merge {
+            type _LOGICAL
+            prompt {Merge input NDFs?}
+            default FALSE
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            helpkey *
+          }
+
          parameter msg_filter {
             type _CHAR
             prompt {Message level}
@@ -1510,6 +1528,15 @@ package @PACKAGE@ {
             vpath DEFAULT
             helpkey *
           }
+
+         parameter nout {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+
          parameter out {
             position 2
             type NDF
@@ -1519,6 +1546,16 @@ package @PACKAGE@ {
             prompt {Output NDF data structure}
             helpkey *
           }
+
+         parameter sizelimit {
+            type _INTEGER
+            prompt {Size limit for each output NDF}
+            default !
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            helpkey *
+          }
+
      }
 
      action gsd2acsis {

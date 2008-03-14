@@ -250,8 +250,8 @@
 *     2008-03-12 (EC):
 *        - Updated smf_update_quality interface
 *        - Added smf_correct_steps / smf_simple_stats
-
-
+*     2008-03-14 (DSB):
+*        - Added smf_sorti, smf_ext2km and smf_km2ext.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -767,6 +767,9 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 void smf_checkdets( Grp *detgrp, smfData *data, int *status );
 
 int *smf_sortd( size_t nel, double *array, int *sorted, int *status );
+int *smf_sorti( size_t nel, int *array, int *sorted, int *status );
+void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap, int mode, int *status );
+void smf_km2ext( int indf, const char *xname, AstKeyMap *keymap, int *timeout, int *status );
 
 void smf_reorderr( float *in, int ndim, int *dims, int axis, int *index, float *out, int *status );
 void smf_reorderi( int *in, int ndim, int *dims, int axis, int *index, int *out, int *status );
