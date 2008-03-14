@@ -234,7 +234,7 @@ void kpg1Kyhds( AstKeyMap *keymap, int *map, int axis, int mode, HDSLoc *loc,
       }
 
 /* Map the HDS object as a vector using the data type selected above. */
-      datMapV( loc, hdstype, "READ", &pntr, &el, status );
+      datMapV( loc, hdstype, "WRITE", &pntr, &el, status );
 
 /* Assuming the KeyMap and HDS arrays have the same dimensions on all
    axes other than that specified "axis", find the length of the KeyMap
@@ -258,7 +258,7 @@ void kpg1Kyhds( AstKeyMap *keymap, int *map, int axis, int mode, HDSLoc *loc,
       for( i = 0; i < axis - 1; i++ ) step *= dim[ i ];
 
 /* Loop round each slice in the HDS array. */
-      for( hslice = 0; hslice < dim[ axis ]; hslice++ ) {
+      for( hslice = 0; hslice < dim[ axis - 1 ]; hslice++ ) {
 
 /* Get the index of the corresponding slice in the KeyMap array, and pass
    on if it is not within the bounds of the KeyMap array. */
