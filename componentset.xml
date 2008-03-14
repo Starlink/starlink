@@ -138,7 +138,7 @@ system are supported.
 </component>
 
 <component id="convert" support="S">
-  <version>1.5-12</version>
+  <version>1.5-13</version>
   <path>applications/convert</path>
   <description>CONVERT -- format-conversion package</description>
   <abstract><p>
@@ -342,35 +342,6 @@ cube manipulation. </p></abstract>
   </developers>
   <documentation> sun38</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
-</component>
-
-<component id="dvi2bitmap" support="S">
-  <version>0.13b2</version>
-  <path>applications/dvi2bitmap</path>
-  <description>Converts TeX DVI files to bitmaps</description>
-  <abstract><p>This application processes a DVI file produced by TeX,
-      converting each page to a single bitmap.  The conversion is done
-      directly, rather than through a chain of intermediate file formats,
-      making the process extremely fast.  It can produce output as
-      XBM, XPM, GIF and PNG files.
-    </p></abstract>
-  <dependencies >
-    
-  </dependencies>
-  <developers>
-    <person>
-      <name>Norman Gray</name>
-      <uname>nxg</uname>
-      <email>norman@astro.gla.ac.uk</email>
-    </person>
-  </developers>
-  <documentation></documentation>
-  <tests status="yes"/>
-  <bugreports>norman@astro.gla.ac.uk</bugreports>
-  <copyright>
-    <year>1992-2004</year>
-    <name>Council for the Central Laboratory of the Research Councils</name>
-  </copyright>
 </component>
 
 <component id="echomop" support="S">
@@ -687,7 +658,7 @@ JCMT telescope based on Mauna Kea, Hawaii.
 </component>
 
 <component id="gaia" support="S">
-  <version>4.2-1</version>
+  <version>4.2-2</version>
   <path>applications/gaia</path>
   <description>GAIA - Graphical Astronomy and Image Analysis</description>
   <abstract><p>
@@ -895,7 +866,7 @@ Traces an HDS file
 </component>
 
 <component id="kappa" support="S">
-  <version>1.8-8</version>
+  <version>1.9-1</version>
   <path>applications/kappa</path>
   <description>KAPPA - Kernel Application Package</description>
   <abstract><p>
@@ -1016,7 +987,7 @@ them.
 </component>
 
 <component id="observe" support="U">
-  <version>2.3</version>
+  <version>2.3-1</version>
   <path>applications/observe</path>
   <description>OBSERVE --- Check Star Observability</description>
   <abstract><p>
@@ -1282,7 +1253,7 @@ A software package designed to search for periodicities in data.
 </component>
 
 <component id="photom" support="S">
-  <version>1.10-1</version>
+  <version>1.10-2</version>
   <path>applications/photom</path>
   <description>PHOTOM - A Photometry Package</description>
   <abstract><p>PHOTOM is a package for measuring the sky corrected
@@ -1649,7 +1620,7 @@ UNIX).
 </component>
 
 <component id="star2html" support="S">
-  <version>1.4-8</version>
+  <version>1.5-0</version>
   <path>applications/star2html</path>
   <description>Convert Starlink documents to hypertext</description>
   <abstract><p>Star2HTML lets you write (or convert) a Starlink document
@@ -2245,14 +2216,14 @@ to handle data from a variety of different instruments.
   <documentation> sg4</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <copyright>
-    <year>1997, 1998, 2005</year>
+    <year>1990, 1992</year>
     <name>CLRC</name>
   </copyright>
 </component>
 
 <component id="sg6">
   <version>3</version>
-  <path>docs/sg/004</path>
+  <path>docs/sg/006</path>
   <description>Programmer's Facilities &amp; Documentation Guide</description>
   <abstract><p>
 
@@ -2777,7 +2748,7 @@ to handle data from a variety of different instruments.
 
 <component id="sgp42">
   <version>1</version>
-  <path>docs/sgp/007</path>
+  <path>docs/sgp/042</path>
   <description>Starlink Software Strategy</description>
   <abstract><p>
      This document contains the text of a paper presented to the
@@ -2936,7 +2907,6 @@ to handle data from a variety of different instruments.
   <path>docs/sgp/050</path>
   <description>Starlink Document Styles</description>
   <abstract><p>
-
      This document describes the various styles which are recommended
      for Starlink documents. It also explains how to use the templates
      which are provided by Starlink to help authors create documents
@@ -2950,7 +2920,7 @@ to handle data from a variety of different instruments.
      
      The only style that is likely to be used by most Starlink authors
      is the Standard style.
-    </p></abstract>
+  </p></abstract>
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
@@ -3415,7 +3385,7 @@ to handle data from a variety of different instruments.
 
 <component id="ssn37">
   <version>1</version>
-  <path>docs/ssn/003</path>
+  <path>docs/ssn/037</path>
   <description>Starlink Security</description>
   <abstract><p>
   </p></abstract>
@@ -3589,6 +3559,637 @@ to handle data from a variety of different instruments.
   <copyright>
     <year>1997</year>
     <name>PPARC</name>
+  </copyright>
+</component>
+
+<component id="sun1">
+  <version>24</version>
+  <path>docs/sun/001</path>
+  <description>STARLINK Software Collection}</description>
+  <abstract><p>
+    The Starlink Software Collection is a set of software which is
+    managed and distributed by the Starlink Project.  Some of the
+    software was written by members of the Project, but some of it
+    comes from outside the Project.  This note describes the functions
+    of the individual items in the Collection and provides an overview
+    of the software so that readers can identify the items they need.
+
+    The software is classified into four main divisions:
+
+    Packages -- are large collections of programs for people who want
+    to analyse, convert, and display data.  They are subdivided into
+    eleven classes to help you find what you want.
+
+    Utilities -- are small programs devoted to a specific purpose.
+    For example, they help you prepare for observations, write
+    documents, and write programs.
+
+    Subroutine Libraries -- are for programmers writing astronomical
+    software.  They provide facilities such as astronomical
+    calculations, data management and graphics.
+
+    Infrastructure -- are items which are mainly of interest to people
+    writing programs within the Starlink Software Environment.  They
+    are included for completeness.
+
+    Each item is described in sufficient detail for you to decide
+    whether or not to investigate it further. If you want to find out
+    more about an item, follow the document references given opposite
+    the item name. If you are using the hypertext version of this
+    document, the most up-to-date document references can be found by
+    following the link from the software item name.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>ed. S.E. Rankin</name>
+    </person>
+  </developers>
+  <documentation> sun1</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1980--2003</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sun9">
+  <version>7</version>
+  <path>docs/sun/009</path>
+  <description>LaTeX --- A Document Preparation System</description>
+  <abstract><p>
+    This is a guide to the LaTeX facilities available on Starlink. It
+    gives a brief description of how LaTeX works. It also tells how
+    to display or print the document, and how to include a PostScript
+    file.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Anne Charles</name>
+    </person>
+  </developers>
+  <documentation> sun9</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1987--1997</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sun20">
+  <version>4</version>
+  <path>docs/sun/020</path>
+  <description>ULDA/USSP --- Accessing the IUE Uniform Low-Dispersion Archive</description>
+  <abstract><p>
+     This describes how to access the IUE satellite's archive of
+     reduced low-resolution spectra.  These data have been reduced in
+     a fairly homogenous way using the IUE Project's Spectral Image
+     Processing System (IUESIPS) and have been made available in the
+     form of a Uniform Low-Dispersion Archive (ULDA). This
+     comprises absolutely calibrated, extracted, low-dispersion
+     spectra corrected for exposure times and with the appropriate ITF
+     correction.
+
+     In order to facilitate access to the ULDA, the ULDA Software
+     Support Package (USSP) has been developed. The USSP enables
+     astronomers to select interactively any images contained in the
+     ULDA and provides facilities for efficient intercomputer data
+     transfer. The USSP enables the searching of the ULDA data base
+     for various types of images. For example, images can be selected
+     on object class, image number, camera, aperture, homogeneous ID,
+     sky position or any combination of these attributes. Users in the
+     UK will use the USSP on the Starlink database Microvax (STADAT).
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>M J Murray</name>
+      <name>D J Stickland</name>
+    </person>
+  </developers>
+  <documentation> sun20</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1987--1993</year>
+    <name>SERC</name>
+  </copyright>
+</component>
+
+<component id="sun30">
+  <version>2</version>
+  <path>docs/sun/030</path>
+  <description>Using the Starlink Database MicroVAX computer</description>
+  <abstract><p>
+     This paper tells you how to use the Starlink Database microVAX
+     computer. This is installed at the Rutherford Appleton Laboratory
+     and may be used by any registered Starlink user. As its title
+     implies, its principal purpose is to provide access to
+     astronomical databases, in particular: the star and galaxy
+     catalogues and the IRAS catalogues used by the SCAR database
+     management system, the IUE Uniform Low Dispersion Archive (ULDA),
+     and a variety of spectral atlases. It is not a general purpose
+     computer, and users will not have permanent file space or private
+     usernames allocated on it.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Giaretta</name>
+    </person>
+  </developers>
+  <documentation> sun30</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1988,1989</year>
+    <name>SERC</name>
+  </copyright>
+</component>
+
+<component id="sun34">
+  <version>1</version>
+  <path>docs/sun/034</path>
+  <description>GNU EMACS --- Display Editor</description>
+  <abstract><p>
+    This document describes the GNU EMACS editor as distributed by
+    Starlink for UNIX systems. It is intended to provide an
+    introduction for the new user.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>G R Mellor</name>
+    </person>
+  </developers>
+  <documentation> sun34</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1991</year>
+    <name>SERC</name>
+  </copyright>
+</component>
+
+<component id="sun58">
+  <version>7</version>
+  <path>docs/sun/058</path>
+  <description>IUEDA --- Access to the IUE data archive</description>
+  <abstract><p>
+     The International Ultraviolet Explorer satellite (IUE) is one of
+     the most successful, versatile and productive astronomical
+     satellites, providing ultraviolet spectra of a wide range of
+     sources for the whole astronomical community. The UK hosts one of
+     the three full archives of IUE data which is supported and
+     maintained by members of the UK IUE Project in the Space Science
+     Department at RAL. The archive comprises some 100,000 images,
+     and a catalogue which gives details of the exposures. The aim is
+     to provide UK astronomers with quick and painless access to IUE
+     data. This document describes how to interrogate the catalogue
+     and extract data from the archive.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>C. Lloyd</name>
+    </person>
+  </developers>
+  <documentation> sun58</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1986--1995</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sun63">
+  <version>4</version>
+  <path>docs/sun/063</path>
+  <description></description>
+  <abstract><p>
+     SPAG is a program for unscrambling `spaghetti' Fortran code by
+     re-ordering blocks of statements in such a way that the structure
+     of the Fortran is improved, whilst remaining logically equivalent
+     to the original program. The result improves the readability and
+     maintainability of badly-written Fortran.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Paul Rees</name>
+    </person>
+  </developers>
+  <documentation> sun63</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1988,1989,1992</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sun73">
+  <version>1</version>
+  <path>docs/sun/073</path>
+  <description>FORCHECK A Fortran Verifier and Programming Aid</description>
+  <abstract><p>
+     FORCHECK is a Fortran verifier and programming aid which has been
+     purchased from Polyhedron software and installed on the Starlink
+     Database computer (STADAT) for the use of all Starlink users. It
+     is only available on STADAT and is not installed on any other
+     Starlink nodes.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>M D Lawden</name>
+    </person>
+  </developers>
+  <documentation> sun73</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1990</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sun82">
+  <version>4</version>
+  <path>docs/sun/082</path>
+  <description>IRAS --- Data Products Prime</description>
+  <abstract><p>
+     The purpose of this note is to introduce the IRAS data products,
+     describe how to gain access or obtain copies of selected data,
+     and to guide potential users to Starlink software and
+     documentation which can help in the analysis of the data.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>D.C. Parsons</name>
+      <name>H J Walker</name>
+    </person>
+  </developers>
+  <documentation> sun82</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1987,1989,1992,1993</year>
+    <name>SERC</name>
+  </copyright>
+</component>
+
+<component id="sun90">
+  <version>9</version>
+  <path>docs/sun/090</path>
+  <description>SNX --- Starlink Extensions to the NCAR Graphics Utilities</description>
+  <abstract><p>
+     The NCAR graphics suite (SUN/88) consists of a set of subprograms
+     which can be used to produce complete graphs in a variety of
+     formats.  The package has been in wide use for some years; the
+     latest version employs the ISO standard GKS interfaces for its
+     low-level plotting, giving it access to all Starlink graphics
+     devices, present and future.
+
+     The NCAR routines themselves are thoroughly documented, and just
+     a few simple calls will produce graphs of excellent appearance.
+     The package also provides a high level of flexibility, with
+     dozens of different details of the plot independently
+     controllable to give exactly the result required.  However,
+     beginners may be daunted by the mass of features offered, and
+     unless they take the extreme step of reading the manual may give
+     up before they realise what the package can do for them.  This
+     document describes minor extensions which provide more convenient
+     access to certain features without sacrificing flexibility.
+
+     The AUTOGRAPH part of the NCAR suite, used in conjunction with
+     the Starlink NCAR extensions and the Starlink low level plotting
+     package SGS (SUN/85), offers an alternative high level system to
+     PGPLOT (SUN/15) for producing graphs of one variable plotted
+     against another. All of the Starlink extensions provided within
+     SNX enhance the power of the facilities provided by AUTOGRAPH and
+     make it more accessible to the beginner.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P C T Rees</name>
+      <name>M J Bly</name>
+      <name>P T Wallace</name>
+    </person>
+  </developers>
+  <documentation> sun90</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1987,1988,1989,1990,1991,1992,1993,1994,1995</year>
+    <name>PPARC</name>
+  </copyright>
+</component>
+
+<component id="sun91">
+  <version>2</version>
+  <path>docs/sun/091</path>
+  <description>IRAS --- Calibrated Raw Detector Data Analysis User Guide</description>
+  <abstract><p>
+     This guide describes the IRAS Calibrated Raw Detector Data, how
+     to access the data, and the programs available to process it and
+     examine the results.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>D C Parsons</name>
+      <name>P J Richards</name>
+      <name>D L Giaretta</name>
+    </person>
+  </developers>
+  <documentation> sun91</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1987,1989</year>
+    <name>SERC</name>
+  </copyright>
+</component>
+
+<component id="sun93">
+  <version>3</version>
+  <path>docs/sun/093</path>
+  <description>TeX --- A superior document preparation system</description>
+  <abstract><p>
+    TeX is an extremely flexible computer type-setting system designed
+    by Donald Knuth. The full capabilities of TeX are described by
+    its creator in `The TeX book' with the help of which the
+    enthusiastic TeX user can produce elaborate documents of almost
+    limitless complexity. However, unadventurous users can produce
+    ordinary documents with a minimum of effort; simple Runoff
+    files for example can be edited into TeX format very easily.
+
+    This manual is an introduction to the use of TeX on Starlink
+    machines.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Jo Murray</name>
+      <name>Ann Charles</name>
+    </person>
+  </developers>
+  <documentation> sun93</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1989,1990,1995</year>
+    <name>SERC</name>
+  </copyright>
+</component>
+
+<component id="sun101">
+  <version>2</version>
+  <path>docs/sun/101</path>
+  <description>Introduction to ADAM Programming</description>
+  <abstract><p>
+     This document is a tutorial in the art of ADAM programming.  ADAM
+     is the Starlink Software Environment.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Jo Murray</name>
+    </person>
+  </developers>
+  <documentation> sun101</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1990,1991</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sun107">
+  <version>4</version>
+  <path>docs/sun/107</path>
+  <description></description>
+  <abstract><p>
+    MAPLE is a commercial software package for symbolic mathematical
+    calculation developed by the Symbolic Computation Group at the
+    University of Waterloo.  Starlink has a licence to run MAPLE on
+    the central Unix service at RAL. MAPLE has facilities for symbolic
+    algebra mathematical manipulation and provides a powerful facility
+    for solving many types of mathematical problem.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>M J Bly</name>
+    </person>
+  </developers>
+  <documentation> sun107</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1990,1993,1996,1998</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sun119">
+  <version>2</version>
+  <path>docs/sun/119</path>
+  <description>CHI --- Catalogue Handling Interface</description>
+  <abstract><p>
+     The CHI (Catalogue Handling Interface) and CHP (Catalogue
+     Handling Plus) routines provide access to the STARLINK database
+     systems. Applications written using the CHI and CHP routines will
+     run on the current STARLINK database (ADC) and any future
+     STARLINK database systems.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>A R Wood</name>
+    </person>
+  </developers>
+  <documentation> sun119</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1991,1992</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sun120">
+  <version>3</version>
+  <path>docs/sun/120</path>
+  <description>CATPAC --- Catalogue Applications Package on UNIX</description>
+  <abstract><p>
+    CATPAC is the STARLINK Catalogue and Table Package. This document
+    describes the CATPAC applications available on UNIX. These include
+    applications for inputing, processing and reporting tabular data
+    including astronomical catalogues.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>A R Wood</name>
+    </person>
+  </developers>
+  <documentation> sun120</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1991,1993,1994</year>
+    <name>DRAL</name>
+  </copyright>
+</component>
+
+<component id="sun127">
+  <version>1</version>
+  <path>docs/sun/127</path>
+  <description>The EXOSAT Database System</description>
+  <abstract><p>
+     The purpose of this note is to alert users to the existence of
+     the EXOSAT database system, to point them in the direction of the
+     manuals and to provide a very quick guide to accessing the
+     system. It is not intended to be a complete guide to all the
+     facilities available, the on-line and paper documentation fill
+     these needs.
+
+     The EXOSAT database system is a relational database management
+     system originally written by the EXOSAT observatory team and now
+     being developed at the HEASARC in the Goddard Space Flight
+     Centre. The database system has many associated astronomical
+     databases. Some of these databases have data products associated
+     with them, these may be plotted and analysed using software
+     within the EXOSAT database system.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>Julian Osborne</name>
+    </person>
+  </developers>
+  <documentation> sun127</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1991</year>
+    <name>SERC</name>
+  </copyright>
+</component>
+
+<component id="sun145">
+  <version>6</version>
+  <path>docs/sun/145</path>
+  <description>UNIX: An Introduction</description>
+  <abstract><p>
+    This is a brief introduction to the Unix operating system as it is
+    used in the Starlink Project.  It is aimed at users who are new to
+    Unix and to Starlink.  Its purpose is to get you started quickly,
+    so it is simple rather than comprehensive.
+
+    It should be read in conjunction with any local guides provided at
+    your local Starlink Site---these give details of the local
+    facilities available and how to use them.  This is important
+    because Starlink Sites differ in their computer hardware and in
+    their versions of Unix.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>M D Lawden</name>
+      <name>G R Mellor</name>
+      <name>B Smalley</name>
+    </person>
+  </developers>
+  <documentation> sun145</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1992,1993,1994,1995,1996</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sun161">
+  <version>2</version>
+  <path>docs/sun/161</path>
+  <description>IRAS90 Introductory/User Guide to Calibrated Reconstructed Detector Data Analysis}</description>
+  <abstract><p>
+     IRAS90 is a suite of programs for processing IRAS data. It takes advantage
+     of Starlink's ADAM environment, which provides multi-platform availability
+     of both data and the programs to process it, and the user friendly interface of
+     the parameter entry system.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>D C Parsons</name>
+      <name>D S Berry</name>
+      <name>W Gong</name>
+      <name>H J Walker</name>
+    </person>
+  </developers>
+  <documentation> sun161</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1993,1994</year>
+    <name>CLRC</name>
+  </copyright>
+</component>
+
+<component id="sun162">
+  <version>1</version>
+  <path>docs/sun/162</path>
+  <description>A Guide to Astronomical Catalogues, Databases and Archives available through Starlink</description>
+  <abstract><p>
+     This note is a guide to the astronomical catalogues, databases
+     and archives which are either available on Starlink computers or
+     which can be accessed from Starlink computers. It also describes
+     the Starlink software for manipulating catalogues and tables. A
+     brief description is given of each facility or software item.
+  </p></abstract>  
+  <dependencies >
+    <sourceset>star2html</sourceset>
+  </dependencies>
+  <developers>
+    <person>
+      <name>A C Davenhall</name>
+    </person>
+  </developers>
+  <documentation> sun162</documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1993</year>
+    <name>CCLRC</name>
   </copyright>
 </component>
 
@@ -3864,7 +4465,7 @@ to handle data from a variety of different instruments.
   <documentation> sun197</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <copyright>
-    <year>1994,1997</year>
+    <year>1995,1997</year>
     <name>CLRC</name>
   </copyright>
 </component>
@@ -3993,46 +4594,36 @@ to handle data from a variety of different instruments.
   </copyright>
 </component>
 
-<component id="sun243">
-  <version>3</version>
-  <path>docs/sun/243</path>
-  <description>SPLAT - A Spectral Analysis Tool</description>
+<component id="sun247">
+  <version>1</version>
+  <path>docs/sun/247</path>
+  <description>Starlink Standard Data Structures</description>
   <abstract><p>
+    XRT is a package for reducing data acquired with the ROSAT XRT
+    instruments.  The XRT (X-Ray Telescope) was the principal
+    scientific payload of the ROSAT X-ray astronomy satellite.  The
+    XRT had two instruments: the PSPC (Position Sensitive Proportional
+    Counter) and the HRI (High Resolution Imager).  The XRT package
+    operates on data produced by these instruments and can be used to
+    transform them into calibrated images, spectra, time-series etc.
 
-    SPLAT is a graphical tool for displaying, comparing, modifying and
-    analysing astronomical spectra stored in NDF, FITS and TEXT files
-    as well as the new NDX format. It can read in many spectra at the
-    same time and then display these as line plots. Each display
-    window, of which there can be many, can be used to view one or
-    several spectra at the same time. Display windows can be
-    interactively zoomed and scrolled, centred on specific
-    wavelengths, provide continuous coordinate readout, annotated,
-    produce printable hardcopy and be configured in many ways. They
-    also provide the basis for interactive analysis facilities. All of
-    these functions are displayed in a visually rich format, that is
-    intended to appeal especially to casual users of spectral data
-    analysis facilities, as it includes some facilities such as
-    drag-and-drop and undo-able editing.
-
-    The current set of analysis facilities include background
-    estimation line fitting, filtering, and de-noising.  A database of
-    laboratory line positions is available to aid in identification.
-
-    SPLAT also supports a full range of coordinate systems for
-    spectra, using the latest facilities of the Starlink AST library.
-    </p></abstract>  
+   XRT was created by taking the ROSAT XRT-specific functions in the 
+   ASTERIX general X-ray astronomy data reduction system and 
+   re-packaging them as stand-alone applications.
+  </p></abstract>  
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>
-      <name>Peter W. Draper</name>
+      <name>A.C. Davenhall</name>
+      <name>R.T. Platon</name>
     </person>
   </developers>
-  <documentation> sun243</documentation>
+  <documentation> sun247</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <copyright>
-    <year>2003,2004</year>
+    <year>2004</year>
     <name>CLRC</name>
   </copyright>
 </component>
@@ -4973,7 +5564,7 @@ Ultrix and for SunOS and may still work for them.
 </component>
 
 <component id="ndg" support="S">
-  <version>5.3</version>
+  <version>5.4</version>
   <path>libraries/ndg</path>
   <description>NDG - Routines for Accessing Groups of NDFs</description>
   <abstract><p>NDG provides facilities for handling groups of NDFs.
@@ -5844,24 +6435,6 @@ Pence for giving his permission for CFITSIO to be released on Starlink.
   <path>thirdparty/kitware/vtk</path>
   <description>VTK/CMAKE</description>
   <dependencies >
-    
-  </dependencies>
-  <developers>
-    <person>
-      <name>Peter W Draper</name>
-      <uname>pwd</uname>
-      <email>p.w.draper@durham.ac.uk</email>
-      <role>owner</role>
-    </person>
-  </developers>
-  <bugreports>ussc@star.rl.ac.uk</bugreports>
-</component>
-
-<component id="vtk" support="U">
-  <version>5.0.3</version>
-  <path>thirdparty/kitware/vtk</path>
-  <description>VTK/CMAKE</description>
-  <dependencies >
     <build>mesa</build><build>tcl</build><build>tk</build>
   </dependencies>
   <developers>
@@ -5937,6 +6510,35 @@ GKS (SUN/83) should be used.</p></abstract>
     </person>
   </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
+</component>
+
+<component id="dvi2bitmap" support="S">
+  <version>0.14-alpha</version>
+  <path>thirdparty/norman/dvi2bitmap</path>
+  <description>Converts TeX DVI files to bitmaps</description>
+  <abstract><p>This application processes a DVI file produced by TeX,
+      converting each page to a single bitmap.  The conversion is done
+      directly, rather than through a chain of intermediate file formats,
+      making the process extremely fast.  It can produce output as
+      XBM, XPM, GIF and PNG files.
+    </p></abstract>
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+  </developers>
+  <documentation></documentation>
+  <tests status="yes"/>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <copyright>
+    <year>1999-2005</year>
+    <name>Council for the Central Laboratory of the Research Councils</name>
+  </copyright>
 </component>
 
 <component id="match" support="U">

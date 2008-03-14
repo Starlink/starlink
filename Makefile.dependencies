@@ -602,7 +602,7 @@ $(MANIFESTS)/docfind: \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/dvi2bitmap:
-	cd applications/dvi2bitmap \
+	cd thirdparty/norman/dvi2bitmap \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/echomop: \
@@ -2017,7 +2017,7 @@ $(MANIFESTS)/sg4: \
 
 $(MANIFESTS)/sg6: \
 		$(MANIFESTS)/star2html
-	cd docs/sg/004 \
+	cd docs/sg/006 \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/sg8: \
@@ -2092,7 +2092,7 @@ $(MANIFESTS)/sgp41: \
 
 $(MANIFESTS)/sgp42: \
 		$(MANIFESTS)/star2html
-	cd docs/sgp/007 \
+	cd docs/sgp/042 \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/sgp44: \
@@ -2355,7 +2355,7 @@ $(MANIFESTS)/ssn36: \
 
 $(MANIFESTS)/ssn37: \
 		$(MANIFESTS)/star2html
-	cd docs/ssn/003 \
+	cd docs/ssn/037 \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/ssn39: \
@@ -2507,6 +2507,51 @@ $(MANIFESTS)/sug: \
 	cd docs/sug \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/sun1: \
+		$(MANIFESTS)/star2html
+	cd docs/sun/001 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sun101: \
+		$(MANIFESTS)/star2html
+	cd docs/sun/101 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sun107: \
+		$(MANIFESTS)/star2html
+	cd docs/sun/107 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sun119: \
+		$(MANIFESTS)/star2html
+	cd docs/sun/119 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sun120: \
+		$(MANIFESTS)/star2html
+	cd docs/sun/120 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sun127: \
+		$(MANIFESTS)/star2html
+	cd docs/sun/127 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sun145: \
+		$(MANIFESTS)/star2html
+	cd docs/sun/145 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sun161: \
+		$(MANIFESTS)/star2html
+	cd docs/sun/161 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sun162: \
+		$(MANIFESTS)/star2html
+	cd docs/sun/162 \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/sun163: \
 		$(MANIFESTS)/star2html
 	cd docs/sun/163 \
@@ -2557,6 +2602,11 @@ $(MANIFESTS)/sun197: \
 	cd docs/sun/247 \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/sun20: \
+		$(MANIFESTS)/star2html
+	cd docs/sun/020 \
+	  && $(MAKE_CPT)
+
 $(MANIFESTS)/sun201: \
 		$(MANIFESTS)/star2html
 	cd docs/sun/201 \
@@ -2577,9 +2627,9 @@ $(MANIFESTS)/sun207: \
 	cd docs/sun/207 \
 	  && $(MAKE_CPT)
 
-$(MANIFESTS)/sun243: \
+$(MANIFESTS)/sun247: \
 		$(MANIFESTS)/star2html
-	cd docs/sun/243 \
+	cd docs/sun/247 \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/sun248: \
@@ -2591,6 +2641,56 @@ $(MANIFESTS)/sun248: \
 $(MANIFESTS)/sun249: \
 		$(MANIFESTS)/star2html
 	cd docs/sun/249 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sun30: \
+		$(MANIFESTS)/star2html
+	cd docs/sun/030 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sun34: \
+		$(MANIFESTS)/star2html
+	cd docs/sun/034 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sun58: \
+		$(MANIFESTS)/star2html
+	cd docs/sun/058 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sun63: \
+		$(MANIFESTS)/star2html
+	cd docs/sun/063 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sun73: \
+		$(MANIFESTS)/star2html
+	cd docs/sun/073 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sun82: \
+		$(MANIFESTS)/star2html
+	cd docs/sun/082 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sun9: \
+		$(MANIFESTS)/star2html
+	cd docs/sun/009 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sun90: \
+		$(MANIFESTS)/star2html
+	cd docs/sun/090 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sun91: \
+		$(MANIFESTS)/star2html
+	cd docs/sun/091 \
+	  && $(MAKE_CPT)
+
+$(MANIFESTS)/sun93: \
+		$(MANIFESTS)/star2html
+	cd docs/sun/093 \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/surf: \
@@ -2833,6 +2933,15 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/starmem \
 	$(MANIFESTS)/startcl \
 	$(MANIFESTS)/sug \
+	$(MANIFESTS)/sun1 \
+	$(MANIFESTS)/sun101 \
+	$(MANIFESTS)/sun107 \
+	$(MANIFESTS)/sun119 \
+	$(MANIFESTS)/sun120 \
+	$(MANIFESTS)/sun127 \
+	$(MANIFESTS)/sun145 \
+	$(MANIFESTS)/sun161 \
+	$(MANIFESTS)/sun162 \
 	$(MANIFESTS)/sun163 \
 	$(MANIFESTS)/sun165 \
 	$(MANIFESTS)/sun168 \
@@ -2843,12 +2952,23 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/sun189 \
 	$(MANIFESTS)/sun192 \
 	$(MANIFESTS)/sun197 \
+	$(MANIFESTS)/sun20 \
 	$(MANIFESTS)/sun201 \
 	$(MANIFESTS)/sun202 \
 	$(MANIFESTS)/sun205 \
 	$(MANIFESTS)/sun207 \
-	$(MANIFESTS)/sun243 \
+	$(MANIFESTS)/sun247 \
 	$(MANIFESTS)/sun249 \
+	$(MANIFESTS)/sun30 \
+	$(MANIFESTS)/sun34 \
+	$(MANIFESTS)/sun58 \
+	$(MANIFESTS)/sun63 \
+	$(MANIFESTS)/sun73 \
+	$(MANIFESTS)/sun82 \
+	$(MANIFESTS)/sun9 \
+	$(MANIFESTS)/sun90 \
+	$(MANIFESTS)/sun91 \
+	$(MANIFESTS)/sun93 \
 	$(MANIFESTS)/surf \
 	$(MANIFESTS)/trn \
 	$(MANIFESTS)/xdisplay
