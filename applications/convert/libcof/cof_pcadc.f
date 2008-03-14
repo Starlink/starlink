@@ -71,6 +71,9 @@
 *        ANCESTOR as in the specification.
 *     2008 February 5 (MJC):
 *        Modify OBSCNT to reflect number of OBSn headers written.
+*     2008 March 6 (MJC):
+*        Check for existence of PARENTS component.  Remove the limit on
+*        the number of parents.
 *     {enter_further_changes_here}
 
 *-
@@ -83,6 +86,7 @@
       INCLUDE 'DAT_PAR'          ! Data-system public constants      
       INCLUDE 'MSG_PAR'          ! Message-system constants    
       INCLUDE 'AST_PAR'          ! AST constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDF
@@ -107,7 +111,7 @@
       INTEGER FSTAT              ! FITSIO status
       LOGICAL IDPRS              ! Index to root present?
       INTEGER ID                 ! Index to a root ancestor
-      INTEGER IDS( 20 )          ! Indices to parents
+      INTEGER IDP                ! Index to current parent
       INTEGER IREC               ! Loop counter for provenance records
       CHARACTER*( AST__SZCHR ) KEY ! Current key in KeyMap of root anc.
       INTEGER KEYMAP             ! AST KeyMap of root ancestors
@@ -121,6 +125,7 @@
       INTEGER NROOT              ! Number of root ancestors
       CHARACTER*30 OBIDSS        ! MORE.OBSIDSS value
       LOGICAL OBIPRS             ! OBSIDSS present?
+      INTEGER PIPNTR             ! Pointer to indices of the parents
       LOGICAL PRVPRS             ! PROVENANCE present?
       CHARACTER*( DAT__SZLOC ) PARLOC ! Locator to PARENTS component
       CHARACTER*256 PATH         ! Path to ancestor
@@ -143,64 +148,76 @@
 *  Direct parents
 *  ==============
 
-*  Meet the direct parents.
+*  Meet the direct parents.  There may not be any.
          CALL NDG_GTPRV( NDF, 0, PRVLOC, STATUS )
-         CALL DAT_FIND( PRVLOC, 'PARENTS', PARLOC, STATUS )
+         CALL DAT_THERE( PRVLOC, 'PARENTS', THERE, STATUS )
+         IF ( THERE ) THEN
+            CALL DAT_FIND( PRVLOC, 'PARENTS', PARLOC, STATUS )
 
 *  Find the number of parent NDFs.
-         CALL DAT_SIZE( PARLOC, NPAR, STATUS )
+            CALL DAT_SIZE( PARLOC, NPAR, STATUS )
+
+*  Obtain workspace for the indices.
+            CALL PSX_CALLOC( NPAR, '_INTEGER', PIPNTR, STATUS )
 
 *  Obtain the array of parents' indices.
-         CALL DAT_GETVI( PARLOC, 20, IDS, NIDS, STATUS )
-         IF ( STATUS .NE. SAI__OK ) GOTO 999
-
-*  Write a blank header and a title for the block of provenance headers.
-         CARD = ' '
-         CALL FTPREC( FUNIT, CARD, FSTAT )
-
-         CPOS = 31
-         CALL CHR_APPND( '/ Provenance:', CARD, CPOS )
-         CALL FTPREC( FUNIT, CARD, FSTAT )
-
-*  Write the PRVCNT header.
-         CALL FTPKYJ( FUNIT, 'PRVCNT', NPAR, 'Number of parents',
-     :                FSTAT )
-
-         DO IREC = 1, NPAR
-
-*  Obtain the path of the current immediate ancestor.
-            CALL NDG_GTPRV( NDF, IDS( IREC ), ANCLOC, STATUS )
-            CALL CMP_GET0C( ANCLOC, 'PATH', PATH, STATUS )
+            CALL DAT_GETVI( PARLOC, NPAR, %VAL( CNF_PVAL( PIPNTR ) ), 
+     :                      NIDS, STATUS )
             IF ( STATUS .NE. SAI__OK ) GOTO 999
 
+*  Write a blank header and a title for the block of provenance headers.
+            CARD = ' '
+            CALL FTPREC( FUNIT, CARD, FSTAT )
+
+            CPOS = 31
+            CALL CHR_APPND( '/ Provenance:', CARD, CPOS )
+            CALL FTPREC( FUNIT, CARD, FSTAT )
+
+*  Write the PRVCNT header.
+            CALL FTPKYJ( FUNIT, 'PRVCNT', NPAR, 'Number of parents',
+     :                   FSTAT )
+
+            DO IREC = 1, NPAR
+
+*  Extract the next index from the mapped array.
+               CALL KPG1_RETRI( NPAR, IREC, %VAL( CNF_PVAL( PIPNTR ) ),
+     :                          IDP, STATUS )
+
+*  Obtain the path of the current immediate ancestor.
+               CALL NDG_GTPRV( NDF, IDP, ANCLOC, STATUS )
+               CALL CMP_GET0C( ANCLOC, 'PATH', PATH, STATUS )
+               IF ( STATUS .NE. SAI__OK ) GOTO 999
+
 *  Extract the name.  *** Assume UNIX for the moment. ***
-            CALL CHR_LASTO( PATH, '/', CPOS )
-            NAME = PATH( CPOS + 1: )
-            NCNAME = CHR_LEN( NAME )
+               CALL CHR_LASTO( PATH, '/', CPOS )
+               NAME = PATH( CPOS + 1: )
+               NCNAME = CHR_LEN( NAME )
 
 *  Form keyword without leading zeroes (the FITS Standard says it shall
 *  be done this way).
-            KEYWRD = 'PRV'
-            CPOS = 3
-            CALL CHR_PUTI( IREC, KEYWRD, CPOS )
+               KEYWRD = 'PRV'
+               CPOS = 3
+               CALL CHR_PUTI( IREC, KEYWRD, CPOS )
 
 *  Form comment.
-            ANCCOM = 'Name of the '
-            CPOS = 12
-            CALL CHR_PUTI( IREC, ANCCOM, CPOS )
-            CALL CHR_APPND( CHR_NTH( IREC ), ANCCOM, CPOS )
-            CALL CHR_APPND( ' parent', ANCCOM, CPOS )
+               ANCCOM = 'Name of the '
+               CPOS = 12
+               CALL CHR_PUTI( IREC, ANCCOM, CPOS )
+               CALL CHR_APPND( CHR_NTH( IREC ), ANCCOM, CPOS )
+               CALL CHR_APPND( ' parent', ANCCOM, CPOS )
 
 *  Write the PRVnnnnn header.
-            CALL FTPKYS( FUNIT, KEYWRD, NAME( :NCNAME ), 
-     :                   ANCCOM( :CPOS ), FSTAT )
+               CALL FTPKYS( FUNIT, KEYWRD, NAME( :NCNAME ), 
+     :                      ANCCOM( :CPOS ), FSTAT )
 
 *  Free the locator for the current parent.
-            CALL DAT_ANNUL( ANCLOC, STATUS )
-         END DO
+               CALL DAT_ANNUL( ANCLOC, STATUS )
+            END DO
 
 *  Complete the tidying of resources.
-         CALL DAT_ANNUL( PARLOC, STATUS )
+            CALL PSX_FREE( PIPNTR, STATUS )
+            CALL DAT_ANNUL( PARLOC, STATUS )
+         END IF
          CALL DAT_ANNUL( PRVLOC, STATUS )
 
 *  Root ancestors
