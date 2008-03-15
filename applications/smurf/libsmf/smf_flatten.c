@@ -37,6 +37,8 @@
 *     2008-03-10 (AGG):
 *        Add check for bad values on output from flatfield routine and
 *        set quality to SMF__Q_BADS
+*     2008-03-14 (AGG):
+*        Check for quality array after flatfield and set if present
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -103,7 +105,6 @@ void smf_flatten ( smfData *data, int *status ) {
   da = data->da;
   pntr[0] = (data->pntr)[0];
   dataArr = pntr[0];
-  qual = (data->pntr)[2];
 
   if ( da == NULL ) {
     if ( *status == SAI__OK) {
@@ -130,15 +131,24 @@ void smf_flatten ( smfData *data, int *status ) {
     sc2math_flatten( nboll, nframes, da->flatname, da->nflat, da->flatcal,
 		     da->flatpar, dataArr, status);
 
-    /* Check for BAD values from flatfield routine and set QUALITY
-       accordingly. Any bad values at this point means that those
-       samples were flagged as such by the DA system and thus should
-       be assigned a quality value of SMF__Q_BADS */
-    ndat = nboll * nframes;
-    for (i=0; i<ndat; i++) {
-      if ( dataArr[i] == VAL__BADD ) {
-	qual[i] = SMF__Q_BADS;
+    /* Now check for a QUALITY array */
+    qual = (data->pntr)[2];
+    if ( qual != NULL ) {
+      /* Check for BAD values from flatfield routine and set QUALITY
+	 accordingly. Any bad values at this point means that those
+	 samples were flagged as such by the DA system and thus should
+	 be assigned a quality value of SMF__Q_BADS */
+      msgOutif(MSG__VERB, "", 
+	       "smfData has a valid QUALITY array: setting SMF__Q_BADS flags", 
+	       status);
+      ndat = nboll * nframes;
+      for (i=0; i<ndat; i++) {
+	if ( dataArr[i] == VAL__BADD ) {
+	  qual[i] = SMF__Q_BADS; /* quality should not be set here so can be lazy */
+	}
       }
+    } else {
+      msgOutif(MSG__VERB, "", "smfData has no QUALITY array", status);
     }
 
   }
