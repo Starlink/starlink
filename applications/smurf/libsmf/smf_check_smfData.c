@@ -41,11 +41,13 @@
 *        - Add check for presence of history element
 *     2006-05-15 (AGG):
 *        Add check for existence of ncoeff/poly pointer in input smfData
+*     2008-03-14 (AGG):
+*        Allocate memory for quality array, store pointers in output smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2006-2008 University of British Columbia. All
+*     Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -180,20 +182,25 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
 	    memcpy( pntr[i], outdata, npts*nbytes);
 	  }
 	} else {
-	  /* Check if output pntr is null. If so allocate memory and
+	  /* Check if output pntr[] is null. If so allocate memory and
 	     copy over input */
 	  if ( (odata->pntr)[i] == NULL) {
 	    nbytes = smf_dtype_size(idata, status);
 	    pntr[i] = smf_malloc( npts, nbytes, 0, status);
 	    memcpy( pntr[i], (idata->pntr)[i], nbytes*npts);
+	    /* Store pointer to DATA/VARIANCE in output smfData */
+	    (odata->pntr)[i] = pntr[i];
 	  }
 	}
       } else {
-	/* Check if output pntr is null. If so allocate memory and
-	   copy over input */
-	if ( (odata->pntr)[i] == NULL) {
-	  pntr[i] = smf_malloc( npts, 1, 0, status);
-	  memcpy( pntr[i], (idata->pntr)[i], npts );
+	/* Check if output pntr[] is null. If so allocate memory and
+	   copy over input. NOTE: to arrive here, i=2 so this will be
+	   the QUALITY array */
+	if ( (odata->pntr)[2] == NULL) {
+	  pntr[2] = smf_malloc( npts, sizeof(unsigned char), 0, status);
+	  memcpy( pntr[2], (idata->pntr)[2], npts*sizeof(unsigned char) );
+	  /* Store pointer to QUALITY in output smfData */
+	  (odata->pntr)[2] = pntr[2];
 	}
       }
     } else {
@@ -204,6 +211,12 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
 	  *status = SAI__ERROR;
 	  errRep(FUNC_NAME, "Input data pointer is NULL", status);
 	}
+      } else if ( i == 2 && !(flags & SMF__NOCREATE_QUALITY) ) {
+	/* If we are here then create a quality array */
+	msgOutif(MSG__VERB, "", "Allocating memory for QUALITY array", status);
+	pntr[i] = smf_malloc( npts, sizeof(unsigned char), 1, status);
+	/* Store pointer to QUALITY in the output smfData */
+	(odata->pntr)[2] = pntr[2];
       }
     }
   }
