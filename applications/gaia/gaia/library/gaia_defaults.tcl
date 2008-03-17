@@ -44,9 +44,21 @@ proc gaia::setXdefaults {} {
 
     #  Use three main fonts for the UI. One for labels, monospaced text
     #  and the special symbols.
-    set labelFont $::gaia_fonts(labelfont)
-    set textFont $::gaia_fonts(textfont)
-    set wcsFont $::gaia_fonts(wcsfont)
+    if { [info exists gaia_fonts(labelfont)] } {
+       set labelFont $::gaia_fonts(labelfont)
+    } else {
+       set labelFont variable
+    }
+    if { [info exists ::gaia_fonts(textfont)] } {
+       set textFont $::gaia_fonts(textfont)
+    } else {
+       set textFont fixed
+    }
+    if { [info exists ::gaia_fonts(wcsfont)] } {
+       set wcsFont $::gaia_fonts(wcsfont)
+    } else {
+       set wcsFont "-*-symbol-*-*-*-*-*-140-*-*-*-*-*-*"
+    }
 
     option add *Font        $labelFont
     option add *labelFont   $labelFont
