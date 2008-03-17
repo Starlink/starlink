@@ -64,6 +64,9 @@
     around pixel-based ones (no reducing this makes the packing of labels
     more condensed).
 
+    Choosing fonts is now easier using a font chooser dialog available
+    in the startup options.
+
     When saving a FITS image with a new world coordinate system the old
     behaviour was to always write the astrometry in the format of the image.
     This has been changed so that FITS-PC astrometries will now be written
