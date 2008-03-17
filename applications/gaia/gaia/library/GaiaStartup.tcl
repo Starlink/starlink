@@ -253,9 +253,9 @@ itcl::class gaia::GaiaStartup {
       set values_($this,autoscale) 0
       set values_($this,autofit) 0
 
-      set values_($this,labelfont) $::gaia_fonts(labelfont)
-      set values_($this,textfont) $::gaia_fonts(textfont)
-      set values_($this,wcsfont) $::gaia_fonts(wcsfont)
+      set values_($this,labelfont) variable
+      set values_($this,textfont) fixed
+      set values_($this,wcsfont) "-*-symbol-*-*-*-*-*-140-*-*-*-*-*-*"
       set values_($this,font_scale) 0.0
 
       set values_($this,blank_color) black
@@ -750,6 +750,7 @@ itcl::class gaia::GaiaStartup {
       itk_component add labelfont {
          LabelFontChooser $parent.labelfont \
             -text "Label font:" \
+            -chooser_title "Label font" \
             -labelwidth 10 \
             -value $values_($this,labelfont) \
             -textvariable [scope values_($this,labelfont)]
@@ -761,6 +762,8 @@ itcl::class gaia::GaiaStartup {
       itk_component add textfont {
          LabelFontChooser $parent.textfont \
             -text "Text font:" \
+            -chooser_title "Text font" \
+            -chooser_fixed_width 1 \
             -labelwidth 10 \
             -value $values_($this,textfont) \
             -textvariable [scope values_($this,textfont)]
@@ -772,6 +775,7 @@ itcl::class gaia::GaiaStartup {
       itk_component add wcsfont {
          LabelFontChooser $parent.wcsfont \
             -text "WCS font:" \
+            -chooser_title "WCS font" \
             -labelwidth 10 \
             -value $values_($this,wcsfont) \
             -textvariable [scope values_($this,wcsfont)]

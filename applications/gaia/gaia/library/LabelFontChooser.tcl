@@ -120,9 +120,18 @@ itcl::class gaia::LabelFontChooser {
    #  Choose a font and enter it into the entry field.
    protected method choose_font_ {} {
       if { $font_chooser_ == {} } {
-         set font_chooser_ \
-            [FontChooser .\#auto -title $itk_option(-chooser_title)]
+         set font_chooser_ [FontChooser .\#auto \
+                               -title $itk_option(-chooser_title)\
+                               -fixed_width $itk_option(-chooser_fixed_width)\
+                              ]
       }
+
+      #  Set the default font to match the current selection.
+      set font [get]
+      if { $font != {} } {
+         $font_chooser_ set_default_font $font
+      }
+      
       if { [$font_chooser_ activate] } {
          configure -value [$font_chooser_ get]
          if { "$itk_option(-command)" != "" } {
@@ -136,6 +145,9 @@ itcl::class gaia::LabelFontChooser {
 
    #  Title for fontselection window.
    itk_option define -chooser_title chooser_title Chooser_Title "Choose Font"
+
+   #  Whether fontselection window should just display fixed width fonts.
+   itk_option define -chooser_fixed_width chooser_fixed_width Chooser_Fixed_Width 0
 
    #  Protected variables: (available to instance)
    #  --------------------

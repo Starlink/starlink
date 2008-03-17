@@ -13,7 +13,7 @@
 #     of sizes. The window is a dialog so will block other interactions
 #     while in operation if modal is set 1.
 #
-#     FontChooser .fc
+#     FontChooser .fc -title "Font chooser"
 #
 #     if {[.fc activate]} {
 #        puts stdout "OK >>==> [.fc get]"
@@ -91,27 +91,32 @@ itcl::class gaia::FontChooser {
    #  ------------
    constructor {args} {
 
+      #  Default title.
+      configure -title "Font Chooser"
+
       #  Platform fonts.
       set fonts_ [lsort -dictionary [font families]]
 
       #  Pick a default font, style and size based on the current font
       #  for an entry widget.
-      array set default_font [font actual [[entry $w_.test] cget -font]]
-      destroy $w_.test
-      
-      set font_ $default_font(-family)
-      set size_ $default_font(-size)
-      set style_ "Regular"
-      if { $default_font(-weight) == "bold" && $default_font(-slant) == "italic" } {
-         set style_ "Bold Italic"
-      } elseif { $default_font(-weight) == "bold" } {
-         set style_ "Bold"
-      } elseif { $default_font(-slant) == "italic" } {
-         set style_ "Italic"
-      }
+      set_default_font ""
 
       #  Evaluate any options.
       eval itk_initialize $args
+
+      #  If asked restrict font selected to fixed width.
+      if { $itk_option(-fixed_width) } {
+         set fixed_fonts ""
+         foreach f $fonts_ {
+            set fa [font create "$f"]
+            if { [font metrics "$fa" -fixed] } {
+               lappend fixed_fonts $f
+            }
+         }
+         if { $fixed_fonts != {} } {
+            set fonts_ $fixed_fonts
+         }
+      }
    }
 
    #  Destructor:
@@ -124,8 +129,6 @@ itcl::class gaia::FontChooser {
 
    #  Construct the interface.
    public method init {} {
-
-      wm title $w_ "Font Chooser"
 
       #  Close window is like cancel.
       wm protocol $w_ WM_DELETE_WINDOW [code $this done_ 0]
@@ -331,16 +334,7 @@ itcl::class gaia::FontChooser {
       #  Font name can have several words so put into a list.
       set font [list $font_]
       lappend font $size_
-
-      if { $style_ == "Regular" } {
-         lappend font normal
-      } elseif { $style_ == "Italic" } {
-         lappend font italic
-      } elseif { $style_ == "Bold" } {
-         lappend font bold
-      } else {
-         lappend font [list bold italic]
-      }
+      lappend font $style_
 
       return "$font"
    }
@@ -353,11 +347,38 @@ itcl::class gaia::FontChooser {
       set result_ $OK
    }
 
+   #  Set the interface to use a given font. If this is the empty string then
+   #  the default will be set to that displayed in an entry widget.
+   public method set_default_font {font} {
+      if { $font == {} } {
+         set font [[entry $w_.test] cget -font]
+         destroy $w_.test
+      }
+      array set default_font [font actual $font]
+      
+      set font_ $default_font(-family)
+      set size_ $default_font(-size)
+
+      if { $default_font(-weight) == "bold" && $default_font(-slant) == "italic" } {
+         set style_ "bold italic"
+      } elseif { $default_font(-weight) == "bold" } {
+         set style_ "bold"
+      } elseif { $default_font(-slant) == "italic" } {
+         set style_ "italic"
+      } else {
+         set style_ "normal"
+      }
+   }
+
+
    #  Configuration options: (public variables)
    #  ----------------------
 
    #  flag: if true, grab the screen
    itk_option define -modal modal Modal 0
+
+   #  flag: if true then only fixed width fonts will be shown.
+   itk_option define -fixed_width fixed_width Fixed_Width 0
 
    #  Protected variables: (available to instance)
    #  --------------------
@@ -369,7 +390,7 @@ itcl::class gaia::FontChooser {
    protected variable font_ {}
 
    #  Selected style.
-   protected variable style_ Regular
+   protected variable style_ normal
 
    #  Selected size.
    protected variable size_ 12
@@ -378,7 +399,7 @@ itcl::class gaia::FontChooser {
    protected variable fonts_ {}
 
    #  Font styles.
-   protected variable styles_ {Regular Italic Bold "Bold Italic"}
+   protected variable styles_ {normal italic bold "bold italic"}
 
    #  Default sizes.
    protected variable sizes_ {8 9 10 11 12 14 16 18 20 22 24 26 28 36 48}
@@ -395,13 +416,3 @@ itcl::class gaia::FontChooser {
 
 #  End of class definition.
 }
-
-
-#  Quick test. Remove for release.
-#gaia::setXdefaults
-#gaia::FontChooser .f
-#if { [.f activate] } {
-#   puts "exit font = [.f get]"
-#} else {
-#   puts "no font"
-#}
