@@ -96,6 +96,8 @@
 *        Add TIMESORT.
 *     2008-01-25 (DSB):
 *        Add UNMAKECUBE
+*     2008-03-16 (BZ)
+*        Added action SC2FTS
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -234,6 +236,8 @@ void smurf_mon( int * status ) {
     smurf_timesort( status );
   } else if (strcmp( taskname, "GSD2ACSIS" ) == 0 ) {
     smurf_gsd2acsis( status );
+  } else if (strcmp( taskname, "SC2FTS" ) == 0 ) {
+    smurf_sc2fts( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );
