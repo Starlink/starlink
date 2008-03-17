@@ -698,11 +698,11 @@
       GO TO 9999
 
 *  James Clerk Maxwell 15 metre mm telescope, Mauna Kea             JCMT
-*  (IfA website, Richard Wainscoat, height from I.Coulson)
+*  (as used by the JCMT telescope control system; R Kackley)
  570  CONTINUE
       NAME='JCMT 15 metre'
-      W=WEST(155,28,37.20)
-      P=NORTH(19,49,22.11)
+      W=WEST(155,28,47.00)
+      P=NORTH(19,49,33.00)
       H=4111D0
       GO TO 9999
 
