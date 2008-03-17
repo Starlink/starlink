@@ -125,10 +125,17 @@
 *
 *     The following quantifiers are allowed.
 *
-*     "*" -- Matches zero or more of the preceeding atom.
-*     "+" -- Matches one or more of the preceeding atom.
+*     "*" -- Matches zero or more of the preceeding atom, choosing the
+*            largest possible number that gives a match.
+*     "*?"-- Matches zero or more of the preceeding atom, choosing the
+*           smallest possible number that gives a match.
+*     "+" -- Matches one or more of the preceeding atom, choosing the
+*            largest possible number that gives a match.
+*     "+?"-- Matches one or more of the preceeding atom, choosing the
+*            smallest possible number that gives a match.
 *     "?" -- Matches zero or one of the preceeding atom.
-
+*     "{n}" -- Matches exactly "n" occurrences of the preceeding atom.
+*
 *     The following constraints are allowed.
 *
 *     "^" -- Matches the start of the test string.

@@ -125,6 +125,7 @@
 *     "+?"-- Matches one or more of the preceeding atom, choosing the
 *            smallest possible number that gives a match.
 *     "?" -- Matches zero or one of the preceeding atom.
+*     "{n}" -- Matches exactly "n" occurrences of the preceeding atom.
 
 *     The following constraints are allowed.
 *

@@ -39334,6 +39334,9 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          
          \sstitem 
          {\tt "?"} --- Matches zero or one of the preceeding atom.
+
+         \sstitem 
+         {\tt "\{n\}"} --- Matches exactly $n$ occurrences of the preceeding atom.
       }
 
       The following constraints are allowed.
@@ -39587,15 +39590,28 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
 
       The following quantifiers are allowed.
       \ssthitemlist{
-      
-         \sstitem
-         {\tt "*"} --- Matches zero or more of the preceeding atom.
-      
-         \sstitem
-         {\tt "+"} --- Matches one or more of the preceeding atom.
-      
-         \sstitem
+
+         \sstitem 
+         {\tt "*"} --- Matches zero or more of the preceeding atom, choosing the
+             largest possible number that gives a match.
+
+         \sstitem 
+         {\tt "*?"}--- Matches zero or more of the preceeding atom, choosing the
+            smallest possible number that gives a match.
+
+         \sstitem 
+         {\tt "+"} --- Matches one or more of the preceeding atom, choosing the
+             largest possible number that gives a match.
+         
+         \sstitem 
+         {\tt "+?"}--- Matches one or more of the preceeding atom, choosing the
+             smallest possible number that gives a match.
+         
+         \sstitem 
          {\tt "?"} --- Matches zero or one of the preceeding atom.
+
+         \sstitem 
+         {\tt "\{n\}"} --- Matches exactly $n$ occurrences of the preceeding atom.
       }
 
       The following constraints are allowed.
