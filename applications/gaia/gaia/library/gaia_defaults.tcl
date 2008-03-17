@@ -44,7 +44,7 @@ proc gaia::setXdefaults {} {
 
     #  Use three main fonts for the UI. One for labels, monospaced text
     #  and the special symbols.
-    if { [info exists gaia_fonts(labelfont)] } {
+    if { [info exists ::gaia_fonts(labelfont)] } {
        set labelFont $::gaia_fonts(labelfont)
     } else {
        set labelFont variable
@@ -121,6 +121,7 @@ proc gaia::setXdefaults {} {
     option add *LabelEntryMenu.indicatorOn  1
 
     option add *LabelFileChooser.anchor w
+    option add *LabelFontChooser.anchor w
 
     option add *GaiaQueryResult.relief       sunken
     option add *GaiaQueryResult.borderwidth  3

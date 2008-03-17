@@ -129,7 +129,7 @@ itcl::class gaia::GaiaStartup {
       #  Tabbed window for various controls.
       itk_component add tabbedpane {
          iwidgets::tabnotebook $w_.tab -angle 0 -tabpos n \
-            -height 400 -width 400
+            -height 400 -width 500
       }
       pack $itk_component(tabbedpane) -side top -fill both -expand 1
 
@@ -210,6 +210,9 @@ itcl::class gaia::GaiaStartup {
 
    #  Close window without any other action.
    public method close {} {
+      $itk_component(labelfont) withdraw
+      $itk_component(textfont) withdraw
+      $itk_component(wcsfont) withdraw
       wm withdraw $w_
    }
 
@@ -745,9 +748,9 @@ itcl::class gaia::GaiaStartup {
 
       #  Fonts, label, text and WCS.
       itk_component add labelfont {
-         LabelEntry $parent.labelfont \
+         LabelFontChooser $parent.labelfont \
             -text "Label font:" \
-            -labelwidth $lwidth_ \
+            -labelwidth 10 \
             -value $values_($this,labelfont) \
             -textvariable [scope values_($this,labelfont)]
       }
@@ -756,9 +759,9 @@ itcl::class gaia::GaiaStartup {
       pack $itk_component(labelfont) -side top -fill x -expand 0
 
       itk_component add textfont {
-         LabelEntry $parent.textfont \
+         LabelFontChooser $parent.textfont \
             -text "Text font:" \
-            -labelwidth $lwidth_ \
+            -labelwidth 10 \
             -value $values_($this,textfont) \
             -textvariable [scope values_($this,textfont)]
       }
@@ -767,9 +770,9 @@ itcl::class gaia::GaiaStartup {
       pack $itk_component(textfont) -side top -fill x -expand 0
 
       itk_component add wcsfont {
-         LabelEntry $parent.wcsfont \
+         LabelFontChooser $parent.wcsfont \
             -text "WCS font:" \
-            -labelwidth $lwidth_ \
+            -labelwidth 10 \
             -value $values_($this,wcsfont) \
             -textvariable [scope values_($this,wcsfont)]
       }
@@ -781,7 +784,7 @@ itcl::class gaia::GaiaStartup {
       itk_component add fontscale {
          LabelEntryScale $parent.fontscale \
             -text {Font scale:} \
-            -labelwidth $lwidth_ \
+            -labelwidth 10 \
             -valuewidth 4 \
             -from 0.0 \
             -to 4.0 \
