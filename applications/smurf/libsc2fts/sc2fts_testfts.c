@@ -61,7 +61,7 @@
 /* SC2FTS includes */
 #include "sc2fts.h"
 
-void sc2sim_testfts 
+void sc2fts_testfts 
 (
 int *status          /* global status (given and returned) */
 )
