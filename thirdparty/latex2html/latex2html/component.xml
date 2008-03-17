@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="latex2html" support="U">
+  <version>2002.2</version>
+  <path>thirdparty/latex2html/latex2html</path>
+  <description>LaTeX2HTML - convert LaTeX to HTML</description>
+  <abstract><p>
+The well known LaTeX2HTML converter. Used only for converting Starlink
+documents to hypertext.
+</p></abstract>
+  <dependencies >
+    
+  </dependencies>
+  <developers>
+    <person>
+      <name>ussc@star.rl.ac.uk</name>
+    </person>
+  </developers>
+  <documentation></documentation>
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
