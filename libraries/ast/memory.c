@@ -101,8 +101,10 @@
 *        block that has already been freed.
 *     25-OCT-2007 (DSB):
 *        Added astRemoveLeadingBlanks.
-*     28-FEB-2009 (DSB):
+*     28-FEB-2008 (DSB):
 *        Added astChrSub.
+*     17-MAR-2008 (DSB):
+*        Added "{nnn}" quantifier to astChrSub.
 */
 
 /* Configuration results. */
@@ -722,8 +724,34 @@ static char *CheckTempStart( const char *template, const char *temp,
          (*ntemp)++;
 
       } else {
-         *min_nc = 1;
-         *max_nc = 1;
+
+/* See if the remaining string starts with "{nnn}". If so, extract the
+   "nnn" and use it as the minimum and maximum field length. */
+         if( temp[ *ntemp ] == '{' ) {
+
+            start = temp + *ntemp + 1;
+            while( isdigit( (int) *start ) ) {
+               *min_nc = 10*( *min_nc ) + (int )( ( *start ) - '0' );
+               start++;
+            }
+
+            if( *start == '}' ) {
+               *max_nc = *min_nc;
+               *ntemp = start - temp + 1;
+            } else {
+               start = NULL;
+            }
+
+         } else {
+            start = NULL;
+         }
+
+/* If the remaining string does not start with "{nnn}", use a minimum and 
+   maximum field length of 1. */
+         if( !start ) {
+            *min_nc = 1;
+            *max_nc = 1;
+         }
       }
    }
 
@@ -1150,9 +1178,10 @@ f     AST_CHRSUB = LOGICAL
 
 *  Template Syntax:
 *     The template syntax is a minimal form of regular expression, The
-*     only quantifiers allowed are "*", "*?", "+", "+?" and "?" ("*" and
-*     "+" are greedy, "*?" and "+?" are not). The only constraints 
-*     allowed are "^" and "$". The following atoms are allowed:
+*     quantifiers allowed are "*", "?", "+", "{n}", "*?" and "+?" (the
+*     last two are non-greedy - they match the minimum length possible
+*     that still gives an overall match to the template). The only 
+*     constraints allowed are "^" and "$". The following atoms are allowed:
 *
 *     [chars]: Matches any of the specified characters.
 *     [^chars]: Matches anything but the specified characters.
