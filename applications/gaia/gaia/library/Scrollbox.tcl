@@ -121,6 +121,7 @@
 #  Copyright:
 #     Copyright (C) 1996-2005 Central Laboratory of the Research Councils.
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2008 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -166,7 +167,7 @@ itcl::class gaia::Scrollbox {
       itk_component add List {
          listbox $w_.list
       } {
-         keep -height -width -exportselection
+         keep -height -width -exportselection -listvariable
       }
 
       #  Set default configurations.
