@@ -1051,7 +1051,7 @@ if($opt{'have_pstoimg'}) {
 
       while (<GS>) {
         chomp;
-        if($flag == 0 && /Ghostscript\s*(?:Version|(?:PRE-|BETA |TESTER )RELEASE|)\s*(\d+[.]?\d*)/i) {
+        if($flag == 0 && /Ghostscript\s*(?:Version|(?:PRE-|SVN PRE-|BETA |TESTER )RELEASE|)\s*(\d+[.]?\d*)/i) {
           $gs_version = $1;
           $flag = 1;
         }
@@ -2387,12 +2387,12 @@ sub warn_no_images {
 }
 
 sub warn_no_graphics {
-  logit("Warning: You may need to rely on LaTeX to generate images with $_[1] effects.\n");
+  logit("Warning: You may need to rely on LaTeX to generate images with @_ effects.\n");
   1;
 }
 
 sub warn_no_image_type {
-  logit("Warning: You cannot directly translate/modify graphics of $_[1] format.\n");
+  logit("Warning: You cannot directly translate/modify graphics of @_ format.\n");
   1;
 }
 
