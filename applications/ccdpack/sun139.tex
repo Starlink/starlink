@@ -2451,10 +2451,9 @@ Time (seconds) &
      $0.5$ & $2.5$ & $53$ & $535$ & $5800$\\
 \hline
 \end{tabular}
-\caption{
-Maximum time taken to process two lists of $N$ points. The tests were
-run on a DEC Alpha 3000/300 (that's about $70$ SPECint '92). 
-\label{table1}}
+\caption{Maximum time taken to process two lists of $N$ points. 
+The tests were run on a DEC Alpha 3000/300. 
+\label{table1} }
 \end{center}
 \end{table}
 
@@ -12448,18 +12447,16 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       lines which contain the names of CCDPACK extension items and the
       names of the FITS keywords to which they map.
       \begin{myquote}
-      \begin{tabbing}
-xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
-Extension-item \> FITS-keyword
-      \end{tabbing}
+      \begin{tabular}{ll}
+Extension-item & FITS-keyword
+      \end{tabular}
       \end{myquote}
       If the HDS type of the destination Extension-item is known this
       may be included.
       \begin{myquote}
-      \begin{tabbing}
-xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
-Extension-item \> \_HDS-type \> FITS-keyword
-      \end{tabbing}
+      \begin{tabular}{lll}
+Extension-item & \_HDS-type & FITS-keyword
+      \end{tabular}
       \end{myquote}
       Normally this is inferred. This is the format used by the KAPPA
       application \xref{FITSIMP}{sun95}{FITSIMP} (as of KAPPA version
@@ -12471,32 +12468,29 @@ Extension-item \> \_HDS-type \> FITS-keyword
       To allow functions of FITS-keywords to be possible a second
       \qt{declarative} form of statement is necessary.
       \begin{myquote}
-      \begin{tabbing}
-xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
-\_HDS-type \> FITS-keyword
-      \end{tabbing}
+      \begin{tabular}{ll}
+\_HDS-type & FITS-keyword
+      \end{tabular}
       \end{myquote}
      So for instance if you wanted to derive an exposure time for an
      observation which was given in milliseconds and which you wanted
      to convert into seconds you would use this sequence of commands:
       \begin{myquote}
-      \begin{tabbing}
-xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
-\_INTEGER \> EXPOSURE  \\
-TIMES.DARK \> \_DOUBLE \> 1000.0D0$*$EXPOSURE
-      \end{tabbing}
+      \begin{tabular}{lll}
+\_INTEGER & EXPOSURE  & \\
+TIMES.DARK & \_DOUBLE & 1000.0D0$*$EXPOSURE
+      \end{tabular}
       \end{myquote}
       The \qt{\_INTEGER EXPOSURE} tells this application to find a FITS
       keyword of EXPOSURE and extract its value as an integer.  If you
       wanted to estimate the dark time from a knowledge of the start
       and end times (TAI0 and TAI1):
       \begin{myquote}
-      \begin{tabbing}
-xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
-\_DOUBLE  \> TAI0 \\
-\_DOUBLE  \> TAI1 \\
-TIMES.DARK \> \_DOUBLE \> (TAI1-TAI0)
-      \end{tabbing}
+      \begin{tabular}{lll}
+\_DOUBLE  & TAI0 & \\
+\_DOUBLE  & TAI1 & \\
+TIMES.DARK & \_DOUBLE & (TAI1-TAI0)
+      \end{tabular}
       \end{myquote}
    The function may use any of the usual Fortran operators; +, -, *,
    /, ** and many others that are supported by the TRANSFORM package
@@ -12506,11 +12500,10 @@ TIMES.DARK \> \_DOUBLE \> (TAI1-TAI0)
       case the extension item will be assigned to the value, so for
       instance numerical constants may be given:
       \begin{myquote}
-      \begin{tabbing}
-xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
-EXTENT.MINX \> \_INTEGER \> 1\\
-EXTENT.MINY \> \_INTEGER \> 1\\
-      \end{tabbing}
+      \begin{tabular}{lll}
+EXTENT.MINX & \_INTEGER & 1\\
+EXTENT.MINY & \_INTEGER & 1\\
+      \end{tabular}
       \end{myquote}
       In this way import tables could actually be used to set all the
       required values in the CCDPACK extension (but see \xroutine{PRESENT} also).
@@ -12527,12 +12520,11 @@ FITS1 = Ext1 FITS2 = Ext2 FITS3 = Ext3 ... FITSn = Extn
       So for instance if you wanted to translate frame types to those
       recognised by CCDPACK you might use something like:
       \begin{myquote}
-      \begin{tabbing}
-xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
-FTYPE \> \_CHAR \> OBSTYPE  OBJECT=TARGET -\\
-\> \> FF=FLAT -\\
-\> \> ZERO=BIAS
-      \end{tabbing}
+      \begin{tabular}{lll}
+FTYPE & \_CHAR & OBSTYPE  OBJECT=TARGET -\\
+& &  FF=FLAT -\\
+& &  ZERO=BIAS
+      \end{tabular}
       \end{myquote}
       Which would compare the value of the FITS-keyword OBSTYPE with
       the strings \qt{OBJECT}, \qt{FF} and \qt{ZERO} (case insensitive) and
@@ -12552,11 +12544,10 @@ FTYPE \> \_CHAR \> OBSTYPE  OBJECT=TARGET -\\
       '<X1>', '<X2>', '<Y1>' or '<Y2>' respectively to the name of
       the keyword.  Hence:
       \begin{myquote}
-      \begin{tabbing}
-xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
-EXTENT.MINX \> TRIMSEC<X1> \\
-EXTENT.MAXX \> TRIMSEC<X2>
-      \end{tabbing}
+      \begin{tabular}{ll}
+EXTENT.MINX & TRIMSEC<X1> \\
+EXTENT.MAXX & TRIMSEC<X2>
+      \end{tabular}
       \end{myquote}
       would set the extents from the first two fields of a suitably 
       formatted TRIMSEC header.
@@ -12574,38 +12565,27 @@ EXTENT.MAXX \> TRIMSEC<X2>
       import tables. More complete descriptions of the items can be
       found with the applications that use these values.
       \begin{myquote}
-      \begin{tabbing}
-xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxx\= \kill
-Name \> HDS data type \> Description \\
-\\
-ADC \> \_DOUBLE \> The analogue to digital\\
-\> \> conversion factor.\\
-BOUNDS.END1 \> \_INTEGER \>      The end row or column of the\\
-\> \> first bias strip region.\\
-BOUNDS.END2 \> \_INTEGER \> The end row or column of the\\
-\> \> second bias strip region.\\
-BOUNDS.START1 \> \_INTEGER \> The first row or column of the\\
-\> \> first bias strip region.\\
-BOUNDS.START2 \> \_INTEGER \> The first row or column of the\\
-\> \> second bias strip region.\\
-DEFERRED \> \_DOUBLE \> The deferred charge.\\
-DIRECTION \> \_CHAR \> The \qt{readout} direction (X or Y).\\
-EXTENT.MAXX \> \_INTEGER \> Maximum X coordinate of useful\\
-\> \> region.\\
-EXTENT.MAXY \> \_INTEGER \> Maximum Y coordinate of useful\\
-\> \> region.\\
-EXTENT.MINX \> \_INTEGER \> Minimum X coordinate of useful\\
-\> \> region.\\
-EXTENT.MINY \> \_INTEGER \> Minimum Y coordinate of useful\\
-\> \> region.\\
-FILTER \> \_CHAR \> Filter name.\\
-FTYPE \> \_CHAR \> Frame type (TARGET, BIAS, FLAT,\\
-\> \> DARK or FLASH)\\
-RNOISE \> \_DOUBLE \> Readout noise (ADUs)\\
-SATURATION \> \_DOUBLE \> Pixel saturation count.\\
-TIMES.DARK \> \_DOUBLE \> Dark count time.\\
-TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
-      \end{tabbing}
+      \begin{tabular}{l|l|l}
+Name & HDS data type & Description \\
+\hline
+ADC & \_DOUBLE & The analogue to digital conversion factor.\\
+BOUNDS.END1 & \_INTEGER &      The end row or column of the first bias strip region.\\
+BOUNDS.END2 & \_INTEGER & The end row or column of the second bias strip region.\\
+BOUNDS.START1 & \_INTEGER & The first row or column of the first bias strip region.\\
+BOUNDS.START2 & \_INTEGER & The first row or column of the second bias strip region.\\
+DEFERRED & \_DOUBLE & The deferred charge.\\
+DIRECTION & \_CHAR & The \qt{readout} direction (X or Y).\\
+EXTENT.MAXX & \_INTEGER & Maximum X coordinate of useful region.\\
+EXTENT.MAXY & \_INTEGER & Maximum Y coordinate of useful region.\\
+EXTENT.MINX & \_INTEGER & Minimum X coordinate of useful region.\\
+EXTENT.MINY & \_INTEGER & Minimum Y coordinate of useful region.\\
+FILTER & \_CHAR & Filter name.\\
+FTYPE & \_CHAR & Frame type (TARGET, BIAS, FLAT, DARK or FLASH)\\
+RNOISE & \_DOUBLE & Readout noise (ADUs)\\
+SATURATION & \_DOUBLE & Pixel saturation count.\\
+TIMES.DARK & \_DOUBLE & Dark count time.\\
+TIMES.FLASH & \_DOUBLE & Pre-flash time.
+      \end{tabular}
       \end{myquote}
    }
 }
