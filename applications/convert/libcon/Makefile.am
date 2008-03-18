@@ -6,41 +6,39 @@ libcon_la_SOURCES = \
  $(F_ROUTINES) $(C_ROUTINES) $(F_GEN_FILES) $(INCLUDE_FILES)
 
 F_ROUTINES = \
- con_afhir.f con_angdc.f con_bitpx.f con_btypc.f con_caux.f con_caxes.f \
- con_ccpy.f con_cnlim.f con_d2nft.f con_dst2n.f con_faind.f con_fkeyc.f \
- con_ffrmt.f con_fill.f con_fitax.f con_ftype.f con_gexch.f con_gexrm.f \
- con_ghistd.f con_gkeyc.f con_gslic.f con_hstfd.f \
- con_laxis.f con_lnear.f con_mandh.f con_move.f con_ndfcm.f con_mxmnd.f \
- con_pcard.f con_pfith.f con_rgasp.f con_sclof.f con_qsrtr.f \
- con_raux.f con_raxes.f con_rgndf.f con_rccc.f con_rcpy.f con_saxis.f \
- con_sphea.f con_sgdig.f con_spcpy.f con_sphst.f \
- con_trcha.f con_typsz.f con_vaxis.f con_vcorr.f con_wfman.f con_wcspx.f \
- con_wgasp.f con_wgrid.f con_wrpgm.f con_wrtif.f
+ con_afhir.f con_angdc.f con_bitpx.f con_btypc.f con_caux.f \
+ con_caxes.f con_ccpy.f  con_d2nft.f con_dst2n.f con_faind.f \
+ con_fkeyc.f con_ffrmt.f con_fill.f  con_fitax.f con_ftype.f \
+ con_gexch.f con_gexrm.f con_gkeyc.f con_gslic.f con_laxis.f \
+ con_lnear.f con_mandh.f con_move.f  con_ndfcm.f con_pcard.f \
+ con_pfith.f con_rgasp.f con_sclof.f con_raux.f  con_raxes.f \
+ con_rgndf.f con_rccc.f  con_rcpy.f  con_saxis.f con_sphea.f \
+ con_spcpy.f con_sphst.f con_trcha.f con_typsz.f con_vaxis.f \
+ con_vcorr.f con_wfman.f con_wcspx.f con_wgasp.f con_wgrid.f \
+ con_wrpgm.f con_wrtif.f
 
 C_ROUTINES = con_gbl.c con_cclos.c con_copen.c con_cwrit.c con_cwri2.c \
  bit_andub_c.c
 
 GEN_ROUTINES = $(DR_GEN_ROUTINES) $(WR_GEN_ROUTINES) $(DIR_GEN_ROUTINES) \
  $(DRLI_GEN_ROUTINES) $(N_GEN_ROUTINES) $(DLR_GEN_ROUTINES) \
- $(WIR_GEN_ROUTINES) $(I_GEN_ROUTINES) $(D_GEN_ROUTINES)
+ $(I_GEN_ROUTINES) $(D_GEN_ROUTINES)
 
 F_GEN_FILES = $(DR_GEN_ROUTINES:.gen=.f) $(WR_GEN_ROUTINES:.gwr=.f) \
  $(DIR_GEN_ROUTINES:.gdir=.f) $(DRLI_GEN_ROUTINES:.gdrli=.f) \
  $(N_GEN_ROUTINES:.gn=.f) $(DLR_GEN_ROUTINES:.gdlr=.f) \
- $(WIR_GEN_ROUTINES:.gwir=.f) $(I_GEN_ROUTINES:.gi=.f) $(D_GEN_ROUTINES:.gd=.f)
+ $(I_GEN_ROUTINES:.gi=.f) $(D_GEN_ROUTINES:.gd=.f)
 
 INCLUDE_FILES = DTACODES DYNAMIC_MEMORY
 
 ##  Double and real.
-DR_GEN_ROUTINES = con_axbnx.gen con_axcox.gen con_axgvx.gen con_ssazx.gen \
- con_axlix.gen
+DR_GEN_ROUTINES = 
 
 ##  Word and real.
 WR_GEN_ROUTINES = con_cd2ix.gwr con_ci2dx.f
 
 ##  Double integer and real.
-DIR_GEN_ROUTINES = con_iaffx.gdir con_oaffx.gdir con_prsax.gdir \
- con_trndx.gdir con_thrsx.gdir
+DIR_GEN_ROUTINES = con_iaffx.gdir con_oaffx.gdir con_trndx.gdir
 
 ##  Double, real, logical and integer.
 DRLI_GEN_ROUTINES = con_fkeyx.gdrli con_gkeyx.gdrli
@@ -50,9 +48,6 @@ N_GEN_ROUTINES = con_ifufx.gn con_iudax.gn con_ofufx.gn con_oudax.gn
 
 ##  Double, logical and real.
 DLR_GEN_ROUTINES = con_consx.gdlr
-
-##  Word, integer and real.
-WIR_GEN_ROUTINES = con_chvax.gwir
 
 ##  Integer
 I_GEN_ROUTINES = con_ekeyx.gi
@@ -90,11 +85,6 @@ FGENERIC=@FGENERIC@
 	$(LN_S) $< $(<:.gdlr=.gen)
 	$(FGENERIC) -t dlr $(<:.gdlr=.gen)
 	$(RM) $(<:.gdlr=.gen)
-
-.gwir.f:
-	$(LN_S) $< $(<:.gwir=.gen)
-	$(FGENERIC) -t wir $(<:.gwir=.gen)
-	$(RM) $(<:.gwir=.gen)
 
 .gi.f:
 	$(LN_S) $< $(<:.gi=.gen)
