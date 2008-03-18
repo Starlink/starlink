@@ -49,7 +49,6 @@
 *     IMAGE extension.  The routine aborts with an error status if this
 *     requirement is not satisfied.
 
-*  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
@@ -57,7 +56,9 @@
 *  History:
 *     1996 April 25 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     2008 March 15 (MJC):
+*        Use KAPLIBS routines instead of their cloned CON equivalents.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -142,7 +143,7 @@
             END IF
 
 *  Find the number of significant digits in the numerical value.
-            CALL CON_SGDIG( VALUE, SDIGIT, STATUS )
+            CALL KPG1_SGDIG( VALUE, SDIGIT, STATUS )
 
 *  Report the error context if there was a problem reading a numerical
 *  value from the header card.
@@ -172,7 +173,7 @@
             END IF
 
 *  Find the number of significant digits in the numerical value.
-            CALL CON_SGDIG( VALUE, ZDIGIT, STATUS )
+            CALL KPG1_SGDIG( VALUE, ZDIGIT, STATUS )
 
 *  Report the error context if there was a problem reading a numerical
 *  value from the header card.

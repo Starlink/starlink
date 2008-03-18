@@ -66,13 +66,12 @@
 *        Modern style commenting and declarations.  Added support for
 *        CUNITn and axis units.
 *     2001 August 30 (AJC):
-*        Correct CON_GKEYD arguments
+*        Correct CON_GKEYD arguments.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2008 March 15 (MJC):
+*        Use KAPLIBS routines instead of their cloned CON equivalents.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       
@@ -87,7 +86,7 @@
 
 *  Arguments Given:
       INTEGER NCARD
-      CHARACTER * ( 80 ) HEADER( NCARD )
+      CHARACTER * 80 HEADER( NCARD )
       INTEGER NDF
       INTEGER SCARD
 
@@ -219,9 +218,9 @@
 
 *  Test status before accessing the pointer.
                IF ( STATUS .EQ. SAI__OK ) THEN
-                  CALL CON_SSAZR( EL, DELT, OFFSET,
-     :                            %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
-     :                            STATUS )
+                  CALL KPG1_SSAZR( EL, DELT, OFFSET,
+     :                             %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                             STATUS )
                
 *  Unmap the axis array.
                   CALL NDF_AUNMP( NDF, 'Centre', I, STATUS )
@@ -239,9 +238,9 @@
 
 *  Test status before accessing the pointer.
                IF ( STATUS .EQ. SAI__OK ) THEN
-                  CALL CON_SSAZD( EL, DELT, OFFSET,
-     :                            %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
-     :                            STATUS )
+                  CALL KPG1_SSAZD( EL, DELT, OFFSET,
+     :                             %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                             STATUS )
 
 *  Unmap the axis array.
                   CALL NDF_AUNMP( NDF, 'Centre', I, STATUS )

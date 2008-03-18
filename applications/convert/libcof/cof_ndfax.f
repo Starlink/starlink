@@ -56,10 +56,12 @@
 *        There are no defaults for CDELTn and CRPIXn; they must be
 *        present to define the nth axis's axis centres.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     2004 September 10 (TIMJ):
-*        Fix valgrind warning by initialising strings before sending them
-*        to FITSIO
+*        Fix valgrind warning by initialising strings before sending 
+*        them to FITSIO,
+*     2008 March 15 (MJC):
+*        Use KAPLIBS routines instead of their cloned CON equivalents.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -222,7 +224,7 @@
                CALL FTGKEY( FUNIT, KEYWRD, VALUE, COMENT, FSTAT )
 
 *  Find the number of significant digits in the numerical value.
-               CALL CON_SGDIG( VALUE, NSDIG, STATUS )
+               CALL KPG1_SGDIG( VALUE, NSDIG, STATUS )
 
 *  Determine the appropriate type by comparing the number of
 *  significant digits present with the maximum number of significant
@@ -263,9 +265,9 @@
 
 *  Test status before accessing the pointer.
                IF ( STATUS .EQ. SAI__OK ) THEN
-                  CALL CON_SSAZR( EL, DELT, OFFSET, 
-     :                            %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                            STATUS )
+                  CALL KPG1_SSAZR( EL, DELT, OFFSET, 
+     :                             %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                             STATUS )
                
 *  Unmap the axis array.
                   CALL NDF_AUNMP( NDF, 'Centre', I, STATUS )
@@ -283,9 +285,9 @@
 
 *  Test status before accessing the pointer.
                IF ( STATUS .EQ. SAI__OK ) THEN
-                  CALL CON_SSAZD( EL, DELT, OFFSET, 
-     :                            %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                            STATUS )
+                  CALL KPG1_SSAZD( EL, DELT, OFFSET, 
+     :                             %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                             STATUS )
 
 *  Unmap the axis array.
                   CALL NDF_AUNMP( NDF, 'Centre', I, STATUS )

@@ -96,13 +96,12 @@
 *     1993 July 28 (MJC):
 *        Largely rewritten.  Tidied to prologue to the standard style.
 *     11_JUN-1999 (AJC):
-*        Correct NDF to NDF in call to NDF_MSG
+*        Correct NDF to NDF in call to NDF_MSG.
 *     2004 September 9 (TIMJ):
 *        Use CNF_PVAL
-*     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
+*     2008 March 15 (MJC):
+*        Use KAPLIBS routine instead of its cloned CON equivalent.
+*     {enter_further_changes_here}.
 
 *-
       
@@ -134,9 +133,9 @@
       INTEGER DIMS( NDF__MXDIM ) ! Image dimensions
       INTEGER EL                 ! Number of pixels in image
       INTEGER FILBAD             ! Value to replace bad pixels
-      CHARACTER * ( FILLEN ) GASPFI ! Output GASP image name
-      LOGICAL ISBAD              ! True if the mapped data array
-                                 ! contains bad values
+      CHARACTER*( FILLEN ) GASPFI ! Output GASP image name
+      LOGICAL ISBAD              ! Mapped data array contains bad 
+                                 ! values?
       INTEGER LBND( NDIM )       ! Lower bounds array
       INTEGER MDIM               ! Number of dimensions of the NDF
       INTEGER NDF                ! Identifier for input NDF
@@ -145,8 +144,7 @@
       INTEGER PLACE              ! Placeholder to the temporary NDF
       INTEGER PNTR( 1 )          ! Pointer for the input data array
       INTEGER PNTRT( 1 )         ! Pointer for the temporary data array
-      LOGICAL REPBAD             ! True if there are bad values to
-                                 ! replace
+      LOGICAL REPBAD             ! There are bad values to replace?
       INTEGER UBND( NDIM )       ! Upper bounds array
       INTEGER*2 WFILBA           ! Value to replace word-type bad values
 
@@ -234,9 +232,9 @@
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-         CALL CON_CHVAW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
-     :                   VAL__BADW, WFILBA,
-     :                   %VAL( CNF_PVAL( PNTRT( 1 ) ) ), NREP, STATUS )
+         CALL KPG1_CHVAW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                    VAL__BADW, WFILBA,
+     :                    %VAL( CNF_PVAL( PNTRT( 1 ) ) ), NREP, STATUS )
 
 *  To save resources unmap the input NDF data array.
          CALL NDF_UNMAP( NDF, 'Data', STATUS )

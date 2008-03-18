@@ -19,7 +19,7 @@
 
 *  Description:
 *     This routine assigns values from an LWS AN data product into a
-*     4-dimensional NDF's array components and its units.  It uses
+*     four-dimensional NDF's array components and its units.  It uses
 *     supplied pixel indices along each dimension for each of the
 *     observations, and obtains the relevant columns from the binary
 *     table, in order to fill the data, error, and quality arrays.
@@ -90,7 +90,6 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
@@ -273,8 +272,7 @@
 
       DO I = 1, NOBS
 
-*  Find the nearest pixel index for the wavelength.  (The CON_AXCOR
-*  routine returns floating-point indices.)
+*  Find the nearest pixel index for the wavelength.
          WAVI = NINT( WAVEL( I ) )
 
 *  Store the data and error values.  Protect against negative flux

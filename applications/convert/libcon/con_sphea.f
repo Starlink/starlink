@@ -66,7 +66,6 @@
 *  Prior Requirements:
 *     The ASCII file must be open for write access.
 
-*  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -79,7 +78,9 @@
 *        Corrected usage of CTYPEn (was CRTYPEn) and introduced CUNITn
 *        for axis units.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2008 March 15 (MJC):
+*        Use KAPLIBS routines instead of their cloned CON equivalents.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -88,75 +89,72 @@
 *-
       
 *  Type Definitions:
-      IMPLICIT NONE                 ! No implicit typing
+      IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'             ! Standard SAE constants
-      INCLUDE 'NDF_PAR'             ! NDF_ public constants
-      INCLUDE 'CNF_PAR'             ! For CNF_PVAL function
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
-      INTEGER   NDF                 ! NDF identifier
-      INTEGER   FD                  ! ASCII-file identifier
-      CHARACTER * ( * ) DTYPE       ! Data type of the array
-      CHARACTER * ( * ) FORM        ! Format of the file
-      INTEGER   NFLAGS              ! Number of flags to indicate
-                                    ! presence of certain components
+      INTEGER NDF                ! NDF identifier
+      INTEGER FD                 ! ASCII-file identifier
+      CHARACTER*( * ) DTYPE      ! Data type of the array
+      CHARACTER*( * ) FORM       ! Format of the file
+      INTEGER   NFLAGS           ! Number of flags to indicate
+                                 ! presence of certain components
 
 *  Arguments Returned:
       LOGICAL CMPTHE( NFLAGS )
 
 *  Status:
-      INTEGER STATUS                ! Global status
+      INTEGER STATUS             ! Global status
 
 *  External References:
-      INTEGER CHR_LEN               ! Length of a character string
-                                    ! excluding trailing blanks
+      INTEGER CHR_LEN            ! Length of a character string
+                                 ! excluding trailing blanks
 
 *  Local Constants:
-      CHARACTER * 1 APS             ! Apostrophe
+      CHARACTER * 1 APS          ! Apostrophe
       PARAMETER ( APS = '''' )
-      INTEGER   SZFITS              ! Size of FITS card-image
+      INTEGER   SZFITS           ! Size of FITS card-image
       PARAMETER( SZFITS = 80 )
-      INTEGER   SZVAL               ! Size of header values
+      INTEGER   SZVAL            ! Size of header values
       PARAMETER( SZVAL = 20 )
 
 *  Local Variables:
-      INTEGER   APNTR( NDF__MXDIM ) ! Pointers to NDF axis arrays
-      CHARACTER * ( NDF__SZTYP ) ATYPE ! Data type of the axis centres
-      LOGICAL   ASCII               ! True if output file is formatted
-      LOGICAL   AXIFND              ! True if NDF contains a linear axis
-                                    ! comps.
-      LOGICAL   AXLFND              ! True if NDF contains axis label
-      LOGICAL   AXUFND              ! True if NDF contains axis units
-      INTEGER   BITPIX              ! Number of bits per data value
-      CHARACTER C*1                 ! Accommodates character string
-      CHARACTER CVALUE*( SZVAL )    ! Accommodates header value
-      DOUBLE PRECISION DEND         ! End value for an axis-centre array
-      CHARACTER DESCR*( SZFITS )    ! Accommodates header name
-      INTEGER   DIMS( NDF__MXDIM )  ! NDF dimensions (axis length)
-      DOUBLE PRECISION DSTART       ! Start value for an axis-centre
-                                    ! array
-      REAL      END                 ! End value for an axis-centre array
-      INTEGER   FIOSTA              ! Fortran I/O status
-      INTEGER   I                   ! Loop variable
-      REAL      INCREM              ! Incremental value for axis array
-      LOGICAL   LABFND              ! True if NDF LABEL found
-      LOGICAL   LINEAR              ! True if an axis is linear
-      INTEGER   LUN                 ! Logical-unit number for the output
-                                    ! file
-      INTEGER   NCD                 ! Length of a dimension in
-                                    ! characters
-      INTEGER   NCHAR               ! Length of a character string
-      INTEGER   NCT                 ! Length of a NDF character object
-      INTEGER   NDIM                ! Number of dimensions
-      INTEGER   NELM                ! Number of elements
-      REAL      START               ! Start value for an axis-centre
-                                    ! array
-      LOGICAL   THERE               ! True if NDF has FITS extension
-      LOGICAL   TITFND              ! True if NDF TITLE found
-      LOGICAL   UNTFND              ! True if NDF UNITS found
-      CHARACTER * ( SZFITS ) VALUE  ! NDF character value
+      INTEGER APNTR( NDF__MXDIM ) ! Pointers to NDF axis arrays
+      CHARACTER*( NDF__SZTYP ) ATYPE ! Data type of the axis centres
+      LOGICAL ASCII              ! True if output file is formatted
+      LOGICAL AXIFND             ! NDF contains a linear axis comps.?
+      LOGICAL AXLFND             ! NDF contains axis label?
+      LOGICAL AXUFND             ! NDF contains axis units?
+      INTEGER BITPIX             ! Number of bits per data value
+      CHARACTER*1 C              ! Accommodates character string
+      CHARACTER*( SZVAL ) CVALUE ! Accommodates header value
+      DOUBLE PRECISION DEND      ! End value for an axis-centre array
+      CHARACTER*( SZFITS ) DESCR ! Accommodates header name
+      INTEGER DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
+      DOUBLE PRECISION DSTART    ! Start value for an axis-centre
+                                 ! array
+      REAL END                   ! End value for an axis-centre array
+      INTEGER FIOSTA             ! Fortran I/O status
+      INTEGER I                  ! Loop variable
+      REAL INCREM                ! Incremental value for axis array
+      LOGICAL LABFND             ! NDF LABEL found?
+      LOGICAL LINEAR             ! An axis is linear?
+      INTEGER LUN                ! Logical-unit number for the output
+                                 ! file
+      INTEGER NCD                ! Length of a dimension in characters
+      INTEGER NCHAR              ! Length of a character string
+      INTEGER NCT                ! Length of a NDF character object
+      INTEGER NDIM               ! Number of dimensions
+      INTEGER NELM               ! Number of elements
+      REAL START                 ! Start value for an axis-centre array
+      LOGICAL THERE              ! NDF has FITS extension?
+      LOGICAL TITFND             ! NDF TITLE found?
+      LOGICAL UNTFND             ! NDF UNITS found?
+      CHARACTER*( SZFITS ) VALUE ! NDF character value
 
 *.
 
@@ -292,9 +290,8 @@
                CALL NDF_AMAP( NDF, 'Centre', I, '_DOUBLE', 'READ', 
      :                        APNTR( I ), NELM, STATUS )
 
-               CALL CON_AXLID( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
-     :                         DSTART,
-     :                         DEND, LINEAR, STATUS )
+               CALL KPG1_AXLID( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
+     :                          DSTART, DEND, LINEAR, STATUS )
 
                IF ( LINEAR ) THEN
                   INCREM = REAL( DEND - DSTART ) / REAL( NELM - 1 )
@@ -305,9 +302,8 @@
                CALL NDF_AMAP( NDF, 'Centre', I, '_REAL', 'READ', 
      :                        APNTR( I ), NELM, STATUS )
 
-               CALL CON_AXLIR( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
-     :                         START,
-     :                         END, LINEAR, STATUS )
+               CALL KPG1_AXLIR( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
+     :                          START, END, LINEAR, STATUS )
 
                IF ( LINEAR ) THEN
                   INCREM = ( END - START ) / REAL( NELM - 1 )

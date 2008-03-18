@@ -158,7 +158,6 @@
 *     the output NDFs.  This will be removed once the NDF library
 *     supports access to NDFs without recourse to the parameter system.
 
-*  [optional_A_task_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
@@ -168,8 +167,10 @@
 *     1993 August 22 (MJC):
 *        Original version.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
-*     {enter_changes_here}
+*        Use CNF_PVAL.
+*     2008 March 15 (MJC):
+*        Use KAPLIBS routines instead of their cloned CON equivalents.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -603,14 +604,16 @@
 *  the input to the output NDF.  Call the appropriate routine for the
 *  array data type.
             IF ( ITYPE .EQ. '_INTEGER' ) THEN
-               CALL CON_CHVAI( EL, %VAL( CNF_PVAL( IPNTR ) ), 
-     :                         IBLANK, VAL__BADI,
-     :                         %VAL( CNF_PVAL( TPNTR ) ), NREP, STATUS )
+               CALL KPG1_CHVAI( EL, %VAL( CNF_PVAL( IPNTR ) ), 
+     :                          IBLANK, VAL__BADI,
+     :                          %VAL( CNF_PVAL( TPNTR ) ), NREP, 
+     :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-               CALL CON_CHVAR( EL, %VAL( CNF_PVAL( IPNTR ) ), 
-     :                         BLANK, VAL__BADR,
-     :                         %VAL( CNF_PVAL( TPNTR ) ), NREP, STATUS )
+               CALL KPG1_CHVAR( EL, %VAL( CNF_PVAL( IPNTR ) ), 
+     :                          BLANK, VAL__BADR,
+     :                          %VAL( CNF_PVAL( TPNTR ) ), NREP, 
+     :                          STATUS )
 
             END IF
 
@@ -766,9 +769,9 @@
 
 *  Fill the centres' array using the step size (usually in arcseconds)
 *  such that the centre of the axis is 0.
-                  CALL CON_SSAZR( EL, DBLE( PLTSCL ),
-     :                            -DBLE( EL ) * 0.5D0 * DBLE( PLTSCL ),
-     :                            %VAL( CNF_PVAL( AXPNTR ) ), STATUS )
+                  CALL KPG1_SSAZR( EL, DBLE( PLTSCL ),
+     :                             -DBLE( EL ) * 0.5D0 * DBLE( PLTSCL ),
+     :                             %VAL( CNF_PVAL( AXPNTR ) ), STATUS )
 
 *  Unmap the axis-centre array.
                   CALL NDF_AUNMP( NDF, 'Centre', IAXIS, STATUS )

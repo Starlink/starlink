@@ -68,6 +68,8 @@
 *     2003 November 25 (MJC):
 *        Search only the used part of the buffer looking for comment
 *        characters.
+*     2008 March 15 (MJC):
+*        Use KAPLIBS routine instead of its cloned CON equivalent.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -101,7 +103,7 @@
       PARAMETER ( MXVALS = ( MAXLEN + 1 ) / 2 )
 
 *  Local Variables:
-      CHARACTER * ( MAXLEN ) BUFFER ! Buffer to hold a record from the
+      CHARACTER*( MAXLEN ) BUFFER ! Buffer to hold a record from the
                                  ! file
       INTEGER COM                ! Column where a comment starts in the
                                  ! input buffer
@@ -181,8 +183,8 @@
          IF ( COM .GT. 1 ) THEN
 
 *  Trim the input buffer and extract the data values.
-            CALL CON_PRSA<T>( BUFFER( 1:COM-1 ), MXVALS, LIST, NVAL,
-     :                        STATUS )
+            CALL KPG1_PRSA<T>( BUFFER( 1:COM-1 ), MXVALS, LIST, NVAL,
+     :                         STATUS )
 
 *  If values were returned append to the data file.
             IF ( NVAL .GT. 0 ) THEN

@@ -67,8 +67,10 @@
 *     1996 June 17 (MJC):
 *        Original version.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
-*     {enter_changes_here}
+*        Use CNF_PVAL.
+*     2008 March 15 (MJC):
+*        Use KAPLIBS routine instead of its cloned CON equivalent.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -231,9 +233,8 @@
 
 *  Test status before accessing the pointer.
          IF ( STATUS .EQ. SAI__OK ) THEN
-            CALL CON_SSAZR( EL, DELT, OFFSET, 
-     :                      %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                      STATUS )
+            CALL KPG1_SSAZR( EL, DELT, OFFSET, 
+     :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
                
 *  Unmap the axis array.
             CALL NDF_AUNMP( NDF, 'Centre', I, STATUS )

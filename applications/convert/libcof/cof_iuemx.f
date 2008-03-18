@@ -105,6 +105,8 @@
 *        Make "no. of spectra" no more than two.
 *     2004 September 9 (TIMJ):
 *        Use CNF_PVAL.
+*     2008 March 15 (MJC):
+*        Use KAPLIBS routines instead of their cloned CON equivalents.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -433,31 +435,31 @@
             CALL FTGCVJ( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADI,
      :                   %VAL( CNF_PVAL( WPNTR ) ), BAD, FSTAT )
 
-            CALL CON_THRSI( .TRUE., EL, %VAL( CNF_PVAL( WPNTR ) ), 
-     :                      0, VAL__MAXI,
-     :                      VAL__BADI, VAL__MAXI, 
-     :                      %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                      NREP, NREPHI, STATUS )
+            CALL KPG1_THRSI( .TRUE., EL, %VAL( CNF_PVAL( WPNTR ) ), 
+     :                       0, VAL__MAXI,
+     :                       VAL__BADI, VAL__MAXI, 
+     :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                       NREP, NREPHI, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL FTGCVE( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADR,
      :                   %VAL( CNF_PVAL( WPNTR ) ), BAD, FSTAT )
 
-            CALL CON_THRSR( .TRUE., EL, %VAL( CNF_PVAL( WPNTR ) ), 
-     :                      0.0, VAL__MAXR,
-     :                      VAL__BADR, VAL__MAXR, 
-     :                      %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                      NREP, NREPHI, STATUS )
+            CALL KPG1_THRSR( .TRUE., EL, %VAL( CNF_PVAL( WPNTR ) ), 
+     :                       0.0, VAL__MAXR,
+     :                       VAL__BADR, VAL__MAXR, 
+     :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                       NREP, NREPHI, STATUS )
       
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL FTGCVD( FUNIT, COLNUM, IOBS, 1, EL, VAL__BADD,
      :                   %VAL( CNF_PVAL( WPNTR ) ), BAD, FSTAT )
       
-            CALL CON_THRSD( .TRUE., EL, %VAL( CNF_PVAL( WPNTR ) ), 
-     :                      0.0D0, VAL__MAXD,
-     :                      VAL__BADD, VAL__MAXD, 
-     :                      %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                      NREP, NREPHI, STATUS )
+            CALL KPG1_THRSD( .TRUE., EL, %VAL( CNF_PVAL( WPNTR ) ), 
+     :                       0.0D0, VAL__MAXD,
+     :                       VAL__BADD, VAL__MAXD, 
+     :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                       NREP, NREPHI, STATUS )
 
          ELSE
             STATUS = SAI__ERROR
@@ -629,13 +631,12 @@
 
 *  Created the spaced array using the appropriate data type.
          IF ( ATYPE .EQ. '_REAL' ) THEN
-            CALL CON_SSAZR( UBND, DBLE( STEPW ), DBLE( STARTW ),
-     :                      %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
+            CALL KPG1_SSAZR( UBND, DBLE( STEPW ), DBLE( STARTW ),
+     :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
 
          ELSE IF ( ATYPE .EQ. '_DOUBLE' ) THEN
-            CALL CON_SSAZD( UBND, DSTEPW, DSTARW, 
-     :                      %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                      STATUS )
+            CALL KPG1_SSAZD( UBND, DSTEPW, DSTARW, 
+     :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
 
          END IF
 
@@ -770,15 +771,15 @@
 
 *  Created the spaced array using the appropriate data type.
                         IF ( ATYPE .EQ. '_REAL' ) THEN
-                           CALL CON_SSAZR( EL, DBLE( STEPW ),
-     :                                     DBLE( STARTW ),
-     :                                     
-     :   %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
+                           CALL KPG1_SSAZR( EL, DBLE( STEPW ),
+     :                                      DBLE( STARTW ),
+     :                                %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                                      STATUS )
 
                         ELSE IF ( ATYPE .EQ. '_DOUBLE' ) THEN
-                           CALL CON_SSAZD( EL, DSTEPW, DSTARW,
-     :                                     
-     :   %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
+                           CALL KPG1_SSAZD( EL, DSTEPW, DSTARW,
+     :                                %VAL( CNF_PVAL( PNTR( 1 ) ) ),
+     :                                      STATUS )
 
                         END IF
 

@@ -192,8 +192,10 @@
 *        significant in the IRAF headers, and additional headers may be
 *        written following it.  Added examples.
 *     1997 Nov 24 (AJC):
-*        Remove use of CHR_MOVE (obsolete).
-*        Remove unnecessary initialisations of CARD.
+*        Remove use of CHR_MOVE (obsolete).  Remove unnecessary 
+*        initialisations of CARD.
+*     2008 March 15 (MJC):
+*        Use KAPLIBS routines instead of their cloned CON equivalents.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -216,7 +218,7 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      INTEGER * 2 VAL_RTOW       ! Converts real value to word data type
+      INTEGER*2 VAL_RTOW         ! Converts real value to word data type
 
 *  Local Constants:
       INTEGER FITSLN             ! Length of FITS card image
@@ -231,8 +233,8 @@
 *  Local Variables:
       INTEGER ACCESS             ! Access mode for opening IRAF image
                                  ! using imopen()
-      CHARACTER * ( NDF__SZTYP ) ATYPE ! Type of the NDF's data array
-      LOGICAL CHECK              ! True if check for bad values
+      CHARACTER*( NDF__SZTYP ) ATYPE ! Type of the NDF's data array
+      LOGICAL CHECK              ! Check for bad values?
       INTEGER DIMS( NDF__MXDIM ) ! Image dimensions
       INTEGER EL                 ! Number of pixels in image
       INTEGER ERR                ! IMFORT error code
@@ -240,23 +242,23 @@
       LOGICAL HISPRE             ! History records present?
       INTEGER IMDESC             ! The image descriptor returned by
                                  ! IMOPEN()
-      CHARACTER * ( STRLEN ) IMERRM ! IMFORT error message text
+      CHARACTER*( STRLEN ) IMERRM ! IMFORT error message text
       INTEGER IMTYPE             ! Integer describing the IRAF image
                                  ! data type (only REAL and short
                                  ! INTEGER types are supported)
-      CHARACTER * ( STRLEN ) IRAFIL ! Output IRAF image name
+      CHARACTER*( STRLEN ) IRAFIL ! Output IRAF image name
       LOGICAL ISBAD              ! True if the mapped data array
                                  ! contains bad values
-      CHARACTER * ( NDF__SZTYP ) ITYPE ! Type used to map the NDF
+      CHARACTER*( NDF__SZTYP ) ITYPE ! Type used to map the NDF
       INTEGER JUNKIT             ! Integer to absorb unwanted output
                                  ! form PSX_LOCALTIME()
       INTEGER LBND( NDIM )       ! Lower bounds array
-      CHARACTER * ( FITSLN ) LINE  ! FITS format header line
+      CHARACTER*( FITSLN ) LINE  ! FITS format header line
       INTEGER LIPNTR             ! Pointer returned by PSX_CALLOC to
                                  ! contain each line of pixels
       INTEGER MDIM               ! Number of dimensions of the NDF
       INTEGER NAMELN             ! Variable to absorb an unwanted
-                                 ! integer returned by MSG_LOAD.
+                                 ! integer returned by MSG_LOAD
       INTEGER NDF                ! Identifier for input NDF
       INTEGER NREP               ! The number of bad values replaced
       INTEGER NTICKS             ! Integer returned by PSX_TIME()
@@ -266,12 +268,11 @@
       LOGICAL PROHIS             ! Propagate the history records?
       LOGICAL REPBAD             ! True if there are bad values to
                                  ! replace
-      CHARACTER * ( 25 ) TSTRING ! The current time and data as
-                                 ! returned by PSX_ASCTIME()
-      INTEGER TSTRUCT            ! The time structure from
-                                 ! PSX_LOCALTIME()
+      CHARACTER*25 TSTRING       ! Current time and date from 
+                                 ! PSX_ASCTIME()
+      INTEGER TSTRUCT            ! Time structure from PSX_LOCALTIME()
       INTEGER UBND( NDIM )       ! Upper bounds array
-      INTEGER * 2 WFILBA         ! Value to replace word-type bad values
+      INTEGER*2 WFILBA           ! Value to replace word-type bad values
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! Declarations of conversion routines
@@ -423,15 +424,15 @@
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-            CALL CON_CHVAW( EL, %VAL( PNTR( 1 ) ), VAL__BADW, WFILBA,
-     :                      %VAL( PNTRT( 1 ) ), NREP, STATUS )
+            CALL KPG1_CHVAW( EL, %VAL( PNTR( 1 ) ), VAL__BADW, WFILBA,
+     :                       %VAL( PNTRT( 1 ) ), NREP, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-            CALL CON_CHVAR( EL, %VAL( PNTR( 1 ) ), VAL__BADR, FILBAD,
-     :                      %VAL( PNTRT( 1 ) ), NREP, STATUS )
+            CALL KPG1_CHVAR( EL, %VAL( PNTR( 1 ) ), VAL__BADR, FILBAD,
+     :                       %VAL( PNTRT( 1 ) ), NREP, STATUS )
 
          END IF
 

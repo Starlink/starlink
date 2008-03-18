@@ -70,7 +70,6 @@
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
-*  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -99,10 +98,9 @@
 *     2007 October 19 (MJC):
 *        Do not write BUNITS for QUALITY and square the units for
 *        VARIANCE.
+*     2008 March 15 (MJC):
+*        Use KAPLIBS routines instead of their cloned CON equivalents.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       
@@ -274,9 +272,8 @@
      :                        APNTR( I ), NELM, STATUS )
 
                IF ( NELM .GT. 1 ) THEN
-                  CALL CON_AXLID( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
-     :                            DSTART,
-     :                            DEND, LINEAR, STATUS )
+                  CALL KPG1_AXLID( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ),
+     :                             DSTART, DEND, LINEAR, STATUS )
 
 *  We can ignore bad status, but then we assume a non-linear axis.
                   IF ( STATUS .NE. SAI__OK ) THEN
@@ -293,9 +290,8 @@
 *  start value.
                ELSE
                   DINCRE = 1.0D0
-                  CALL CON_AXBND( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
-     :                            DSTART,
-     :                            DEND, STATUS )
+                  CALL KPG1_AXBND( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ),
+     :                             DSTART, DEND, STATUS )
                END IF
 
 *  Repeat for all other axis-centre data types mapped as real.
@@ -304,9 +300,8 @@
      :                        APNTR( I ), NELM, STATUS )
 
                IF ( NELM .GT. 1 ) THEN
-                  CALL CON_AXLIR( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
-     :                            START,
-     :                            END, LINEAR, STATUS )
+                  CALL KPG1_AXLIR( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ),
+     :                             START, END, LINEAR, STATUS )
 
 *  We can ignore bad status, but then we assume a non-linear axis.
                   IF ( STATUS .NE. SAI__OK ) THEN
@@ -323,9 +318,8 @@
 *  start value.
                ELSE
                   INCREM = 1.0
-                  CALL CON_AXBNR( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
-     :                            START, END,
-     :                            STATUS )
+                  CALL KPG1_AXBNR( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ),
+     :                             START, END, STATUS )
                END IF
             END IF
 

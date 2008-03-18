@@ -80,10 +80,9 @@
 *        Use CNF_PVAL.
 *     2006 April 13 (MJC):
 *        Remove unused variables.
+*     2008 March 15 (MJC):
+*        Use KAPLIBS routine instead of its cloned CON equivalent.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       
@@ -192,7 +191,7 @@
          CALL COI_WCWRD( BUFFER( :BUFLEN ), 'label', LABEL,
      :                   THERE, STATUS )
 
-*  If a label is present, write it to the NDF AXIS strucutre for the
+*  If a label is present, write it to the NDF AXIS structure for the
 *  current axis.  Pass only the used length not to waste space in the
 *  NDF.
          IF ( THERE ) THEN
@@ -204,7 +203,7 @@
          CALL COI_WCWRD( BUFFER( :BUFLEN ), 'units', UNITS, THERE,
      :                   STATUS )
 
-*  If units value is present, write it to the NDF AXIS strucutre for
+*  If units value is present, write it to the NDF AXIS structure for
 *  the current axis.  Pass only the used length not to waste space in
 *  the NDF.
          IF ( THERE ) THEN
@@ -272,9 +271,8 @@
 
 *  Test status before accessing the pointer.
          IF ( STATUS .EQ. SAI__OK ) THEN
-            CALL CON_SSAZD( EL, DELT, OFFSET, 
-     :                      %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                      STATUS )
+            CALL KPG1_SSAZD( EL, DELT, OFFSET, 
+     :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
 
 *  Exponentiate a log-linear axis.
             IF ( DTYPE .EQ. 1 )
@@ -335,7 +333,7 @@
 
 *  Determine the data type of the axis centres.  Find the number of
 *  significant digits in the first coefficient.
-            CALL CON_SGDIG( WORDS( 4 ), NSDIG, STATUS )
+            CALL KPG1_SGDIG( WORDS( 4 ), NSDIG, STATUS )
 
 *  Determine the appropriate type by comparing the number of
 *  significant digits present with the maximum number of significant
@@ -452,7 +450,7 @@
 
 *  Determine the data type of the axis centres.  Find the number of
 *  significant digits in the first coefficient.
-            CALL CON_SGDIG( WORDS( 4 ), NSDIG, STATUS )
+            CALL KPG1_SGDIG( WORDS( 4 ), NSDIG, STATUS )
 
 *  Determine the appropriate type by comparing the number of
 *  significant digits present with the maximum number of significant

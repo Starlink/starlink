@@ -89,6 +89,8 @@
 *        Use CNF_PVAL.
 *     2006 April 13 (MJC):
 *        Remove unused variables.
+*     2008 March 15 (MJC):
+*        Use KAPLIBS routines instead of their cloned CON equivalents.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -247,9 +249,9 @@
      :                        APNTR( I ), NELM, STATUS )
 
                IF ( NELM .GT. 1 ) THEN
-                  CALL CON_AXLID( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
-     :                            DSTART( I ),
-     :                            DEND( I ), LINEAR( I ), STATUS )
+                  CALL KPG1_AXLID( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ),
+     :                             DSTART( I ), DEND( I ), LINEAR( I ), 
+     :                             STATUS )
 
 *  We can ignore bad status, but then we assume a non-linear axis.
                   IF ( STATUS .NE. SAI__OK ) THEN
@@ -266,9 +268,8 @@
 *  start value.
                ELSE
                   DINCRE( I ) = 1.0D0
-                  CALL CON_AXBND( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
-     :                            DSTART( I ),
-     :                            DEND( I ), STATUS )
+                  CALL KPG1_AXBND( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ),
+     :                             DSTART( I ), DEND( I ), STATUS )
                END IF
 
 *  Repeat for all other axis-centre data types mapped as real.
@@ -277,9 +278,9 @@
      :                        APNTR( I ), NELM, STATUS )
 
                IF ( NELM .GT. 1 ) THEN
-                  CALL CON_AXLIR( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
-     :                            START( I ),
-     :                            END( I ), LINEAR( I ), STATUS )
+                  CALL KPG1_AXLIR( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ),
+     :                             START( I ), END( I ), LINEAR( I ), 
+     :                             STATUS )
 
 *  We can ignore bad status, but then we assume a non-linear axis.
                   IF ( STATUS .NE. SAI__OK ) THEN
@@ -296,9 +297,8 @@
 *  start value.
                ELSE
                   INCREM( I ) = 1.0
-                  CALL CON_AXBNR( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ), 
-     :                            START( I ),
-     :                            END( I ), STATUS )
+                  CALL KPG1_AXBNR( NELM, %VAL( CNF_PVAL( APNTR( I ) ) ),
+     :                             START( I ), END( I ), STATUS )
                END IF
             END IF
          END IF

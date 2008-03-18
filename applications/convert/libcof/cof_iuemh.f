@@ -99,7 +99,9 @@
 *        Use CNF_PVAL.
 *     2006 April 13 (MJC):
 *        Remove unused variables.
-*     {enter_changes_here}
+*     2008 March 15 (MJC):
+*        Use KAPLIBS routines instead of their cloned CON equivalents.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -543,13 +545,12 @@
 
 *  Created the spaced array using the appropriate data type.
          IF ( ATYPE .EQ. '_REAL' ) THEN
-            CALL CON_SSAZR( EL, DBLE( STEPW ), DBLE( STARTW ),
-     :                      %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
+            CALL KPG1_SSAZR( EL, DBLE( STEPW ), DBLE( STARTW ),
+     :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
 
          ELSE IF ( ATYPE .EQ. '_DOUBLE' ) THEN
-            CALL CON_SSAZD( EL, DSTEPW, DSTARW, 
-     :                      %VAL( CNF_PVAL( PNTR( 1 ) ) ),
-     :                      STATUS )
+            CALL KPG1_SSAZD( EL, DSTEPW, DSTARW, 
+     :                       %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
 
          END IF
 
@@ -697,15 +698,15 @@
 
 *  Created the spaced array using the appropriate data type.
                         IF ( ATYPE .EQ. '_REAL' ) THEN
-                           CALL CON_SSAZR( EL, DBLE( STEPW ),
-     :                                     DBLE( STARTW ),
-     :                                     
-     :   %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
+                           CALL KPG1_SSAZR( EL, DBLE( STEPW ),
+     :                                      DBLE( STARTW ),
+     :                                %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                                      STATUS )
 
                         ELSE IF ( ATYPE .EQ. '_DOUBLE' ) THEN
-                           CALL CON_SSAZD( EL, DSTEPW, DSTARW,
-     :                                     
-     :   %VAL( CNF_PVAL( PNTR( 1 ) ) ), STATUS )
+                           CALL KPG1_SSAZD( EL, DSTEPW, DSTARW,
+     :                                %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                                      STATUS )
 
                         END IF
 
