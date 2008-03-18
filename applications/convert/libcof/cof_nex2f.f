@@ -853,7 +853,8 @@
 *  Unmap the input array.
          CALL NDF_UNMAP( NDF, ARRNAM( ICOMP ), STATUS )
 
-*  Write integrity-check headers.
+*  Write integrity-check headers.  Note any existing values present
+*  derived from the FITS airlock will be replaced.
          IF ( SUMS ) CALL FTPCKS( FUNIT, STATUS )
 
       END DO
