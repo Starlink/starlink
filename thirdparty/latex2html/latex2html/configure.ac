@@ -19,7 +19,8 @@ STAR_DEFAULTS([per-package-dirs])
 dnl    latex2html does not use any autotools, so need to pass on
 dnl    suitable commands.
 (
-   cmd="cd latex2html && ./configure --prefix=$datadir/latex2html";\
+   cmd="cd latex2html && \
+        ./configure --prefix=$datadir/latex2html --with-texpath=$datadir/latex2html";
    echo $cmd; \
    eval $cmd
 )
