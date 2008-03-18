@@ -2255,25 +2255,40 @@ astGetActiveUnit( this )
  OUTPUT:
   RETVAL
 
+# @normalised = $wcs->Norm( @unnormalised );
+
 void
-astNorm( this, value )
+astNorm( this, ... )
   AstFrame * this
-  AV* value
  PREINIT:
+  int argoff = 1; /* number of fixed arguments */
   int naxes;
   double * aa;
- CODE:
+  int i;
+  int ncoord_in;
+  double * inputs;
+ PPCODE:
   /* Create C arrays of the correct dimensions */
   naxes = astGetI( this, "Naxes" );
-
+  ncoord_in = items - argoff;
+  
   /* Copy from the perl array to the C array */
-  if (av_len(value) != naxes-1)
+  if (naxes != ncoord_in )
      Perl_croak(aTHX_ "Number of elements in first coord array must be %d",
                 naxes);
-  aa = pack1D( newRV_noinc((SV*)value), 'd');
+  aa = get_mortalspace( ncoord_in, 'd' );
+  for (i=0; i<ncoord_in; i++) {
+     int argpos = i + argoff;
+     aa[i] = SvNV( ST(argpos) );
+  }
+
   ASTCALL(
    astNorm( this, aa );
   )
+
+  for (i=0; i<naxes; i++) {
+    XPUSHs( sv_2mortal( newSVnv( aa[i] ) ) );
+  }
 
 # Return list
 
