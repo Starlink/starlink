@@ -27,8 +27,8 @@
 *     b) Look for a FITS extension if requested to do so.  If one is
 *     present append the headers contained therein to the FITS header
 *     section, but not replacing any of the headers created in stage a).
-*     c) Creates keywords describing the NDF's WCS component. These
-*     over-write any keywords created in stages a) and b).
+*     c) Creates keywords describing the NDF's WCS component.  These
+*     overwrite any keywords created in stages a) and b).
 
 *  Arguments:
 *     NDFI = INTEGER (Given)
@@ -129,8 +129,12 @@
 *          container file, for example I2.
 *        HDSTYPE is set to "NDF" for a component NDF in a multi-NDF
 *          container file.
+*        DATASUM and CHECKSUM --- are removed to avoid spurious values
+*          being stored.
+*        PRVn and OBSn --- CADC provenance headers are removed.
+*        PRVPn, PRVIn, PRVDn, PRVCn, PRVMn ---  provenance headers are
+*          removed.
 
-*  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -186,10 +190,10 @@
 *        Add EXTNAM argument.
 *     2007 October 26 (MJC):
 *        Add NDFFAI argument.
+*     2008 March 12 (MJC):
+*        Remove CHECKSUM and DATASUM keywords, and CADC provenance
+*        keywords.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       
@@ -249,11 +253,16 @@
       LOGICAL   AXLFND           ! NDF contains axis label?
       REAL      AXROT            ! Rotation angle of an axis
       LOGICAL   AXUFND           ! NDF contains axis units?
-      LOGICAL   BANNER           ! Part of the FITSIO banner header?
+      LOGICAL   BANKEY           ! Part of the FITSIO banner header?
       CHARACTER C*1              ! Accommodates character string
+      LOGICAL   CADCKY           ! Not a CADC provenance header?
+      CHARACTER CARD * ( SZFITS ) ! Header card
+      LOGICAL   CCKEY            ! Not a character-compoent header?
       CHARACTER CDELT * ( SZKEY ) ! Keyword name of CDELTn
+      INTEGER   CHEAD            ! Index number of current header
       LOGICAL   CMPFND( NFLAGS ) ! True if certain special NDF
                                  ! components are present
+      CHARACTER COMENT *( SZFITS ) ! Comment string in header
       CHARACTER CRPIX * ( SZKEY ) ! Keyword name of CRPIXn
       CHARACTER CRVAL * ( SZKEY ) ! Keyword name of CRVALn
       INTEGER   DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
@@ -266,22 +275,31 @@
       CHARACTER FTLOCI * ( DAT__SZLOC ) ! Locator to element of NDF
                                  ! FITS extension
       INTEGER   I                ! Loop variable
+      LOGICAL   ICKEY            ! Not a data-integrity header?
+      INTEGER   IVALUE           ! Indexed header number
+      LOGICAL   ISNUM            ! Sequence number present?
       INTEGER   J                ! Loop variable
       CHARACTER KEYWRD * ( SZKEY ) ! Accommodates keyword name
       LOGICAL   LABFND           ! NDF LABEL found?
       CHARACTER LORIGN * ( SZVAL ) ! Local value of the ORIGIN argument
-      LOGICAL   MANDAT           ! Not a mandatory header?
+      LOGICAL   MNDKEY           ! Not a mandatory header?
       INTEGER   NCHAR            ! Length of a character string
       INTEGER   NCOMP            ! Number of components
       CHARACTER * ( MSG__SZMSG ) NDFNAM ! NDF name for multi-NDF
       INTEGER   NDIM             ! Number of dimensions
+      LOGICAL   NDFKEY           ! Not a NDF structure header?
+      INTEGER   NHEAD            ! Number of headers
       CHARACTER NULL*1           ! ASCII null character
       LOGICAL   PRORIG           ! Use supplied ORIGIN argument
+      LOGICAL   PRVCOM           ! Not the provenance caption comment?
+      LOGICAL   PRVKEY           ! Not a provenance header?
       LOGICAL   ROTAX( DAT__MXDIM ) ! An axis is rotated in the FITS
                                  ! extension?
+      LOGICAL   SCAKEY           ! Not a data sacling header?
       LOGICAL   TITFND           ! NDF TITLE found?
       LOGICAL   UNTFND           ! NDF UNITS found?
       CHARACTER VALUE * ( SZVAL ) ! Accommodates keyword value
+      LOGICAL   WCSKEY           ! Not a AXIS co-ordinate header?
 
 *.
 
@@ -498,15 +516,18 @@
 *  Filter the keywords.
 *  --------------------
 *  Leave out SIMPLE, XTENSION, BITPIX, EXTEND, PCOUNT, GCOUNT, NAXIS,
-*  NAXISn, and possibly LBOUNDn, CDELTn, CRVALn, CRPIXn, CRTYPEn,
-*  CTYPEn, CUNITn, OBJECT, LABEL, BUNIT, DATE, BLANK, HDUCLASn, HDSNAME,
-*  HDSTYPE, and END as described above.  Note CROTAn are also excluded. 
-*  To  avoid duplicate FITSIO banners these are also omitted, as they 
-*  are written when FITSIO creates the primary headers.
+*  NAXISn keywords.  Also possibly remove LBOUNDn, CDELTn, CRVALn, 
+*  CRPIXn, CRTYPEn, CTYPEn, CUNITn, OBJECT, LABEL, BUNIT, DATE, BLANK, 
+*  HDUCLASn, HDSNAME, HDSTYPE, CHECKSUM, DATASUM, and END as described 
+*  above.  Note CROTAn are also excluded.  To avoid duplicate 
+*  FITSIO banners these are also omitted, as they are written when 
+*  FITSIO creates the primary headers.
 *
-*  Use an intermediate variable to reduce the number of continuation
-*  lines in the test.  This combines tests for the mandatory headers.
-            MANDAT = ( KEYWRD .NE. 'SIMPLE' ) .AND.
+*  Use an intermediate variables to reduce the number of continuation
+*  lines in the test.  
+
+*  This combines tests for the absence of mandatory headers.
+            MNDKEY = ( KEYWRD .NE. 'SIMPLE' ) .AND.
      :               ( KEYWRD .NE. 'BITPIX' ) .AND.
      :               ( KEYWRD .NE. 'EXTEND' ) .AND.
      :               ( KEYWRD .NE. 'XTENSION' ) .AND.
@@ -515,9 +536,8 @@
      :               ( KEYWRD( 1:5 ) .NE. 'NAXIS' ) .AND.
      :               ( KEYWRD .NE. 'END' )
 
-*  Use an intermediate variable to reduce the number of continuation
-*  lines in the test.  This combines tests for the FITSIO FITS banner.
-            BANNER = ( KEYWRD .EQ. 'COMMENT' ) .AND. (
+*  This combines tests for the FITSIO FITS banner.
+            BANKEY = ( KEYWRD .EQ. 'COMMENT' ) .AND. (
      :               ( VALUE( 1:14 ) .EQ. 'FITS (Flexible' ) .OR.
      :               ( VALUE( 1:40 ) .EQ. 'Astrophysics Supplement '/
      :                 /'Series v44/p363,' ) .OR.
@@ -525,6 +545,95 @@
      :                 /'Office' ) .OR.
      :               ( VALUE( 1:39 ) .EQ. 'FITS Definition document '/
      :                 /'#100 and other' ) )
+
+*  This tests for the absence of scaling keywords.
+            SCAKEY = KEYWRD .NE. 'BSCALE' .AND. KEYWRD .NE. 'BZERO'
+
+*  This tests for the absence of co-ordinate system keywords when there
+*  NDF AXIS values.  It includes the spurious CRTYPE that was 
+*  incorrectly written for a while.
+            WCSKEY = 
+     :        ( KEYWRD( 1:5 ) .NE. 'CDELT'  .OR. .NOT. AXIFND ) .AND.
+     :        ( KEYWRD( 1:5 ) .NE. 'CRVAL'  .OR. .NOT. AXIFND ) .AND.
+     :        ( KEYWRD( 1:5 ) .NE. 'CRPIX'  .OR. .NOT. AXIFND ) .AND.
+     :        ( KEYWRD( 1:6 ) .NE. 'CRTYPE' .OR. .NOT. AXLFND ) .AND.
+     :        ( KEYWRD( 1:5 ) .NE. 'CTYPE'  .OR. .NOT. AXLFND ) .AND.
+     :        ( KEYWRD( 1:5 ) .NE. 'CUNIT'  .OR. .NOT. AXUFND )
+
+*  This tests for NDF character components.
+            CCKEY = ( KEYWRD .NE. 'LABEL'  .OR. .NOT. LABFND ) .AND.
+     :              ( KEYWRD .NE. 'BUNIT'  .OR. .NOT. UNTFND ) .AND.
+     :              ( KEYWRD .NE. 'OBJECT' .OR. .NOT. TITFND )
+
+*  This tests for inherited NDF information.
+            NDFKEY =  ( KEYWRD( 1:6 ) .NE. 'LBOUND' ) .AND.
+     :                ( KEYWRD( 1:7 ) .NE. 'HDUCLAS' ) .AND.
+     :                ( KEYWRD( 1:7 ) .NE. 'HDSNAME' ) .AND.
+     :                ( KEYWRD( 1:7 ) .NE. 'HDSTYPE' )
+
+*  This tests for integrity-check keywords.
+            ICKEY = ( KEYWRD .NE. 'CHECKSUM' ) .AND.
+     :              ( KEYWRD .NE. 'DATASUM' )
+
+*  Test for CADC provenance keywords.  While these may not be unique, 
+*  it is more likely they are provenance than some other institution's 
+*  keywords.  First test whether or not there is an index number after 
+*  the first three characters of the keyword.
+            CALL ERR_MARK
+            CALL CHR_CTOI( KEYWRD( 4:8 ), IVALUE, STATUS )
+            IF ( STATUS .NE. SAI__OK ) THEN
+               CALL ERR_ANNUL( STATUS )
+               ISNUM = .FALSE.
+            ELSE
+               ISNUM = .TRUE.
+            END IF
+            CALL ERR_RLSE
+
+*  Test for absence of PRVCNT, PRVn, OBSCNT, and OBSn keywords.
+            CADCKY = ( KEYWRD .NE. 'PRVCNT' ) .AND.
+     :               ( KEYWRD .NE. 'OBSCNT' ) .AND.
+     :               ( KEYWRD( 1:3 ) .NE. 'PRV' .OR. .NOT. ISNUM ) .AND.
+     :               ( KEYWRD( 1:3 ) .NE. 'OBS' .OR. .NOT. ISNUM )
+
+*  Test for general provenance keywords.  While these may not be unique,
+*  it is more likely they are provenance than some other institution's 
+*  keywords.  First test whether or not there is an index number after 
+*  the first four characters of the keyword.
+            CALL ERR_MARK
+            CALL CHR_CTOI( KEYWRD( 5:8 ), IVALUE, STATUS )
+            IF ( STATUS .NE. SAI__OK ) THEN
+               CALL ERR_ANNUL( STATUS )
+               ISNUM = .FALSE.
+            ELSE
+               ISNUM = .TRUE.
+            END IF
+            CALL ERR_RLSE
+
+*  Test for absence of PRVPn, PRVIn, PRVDn, PRVCn, PRVMn.
+            PRVKEY = .NOT. ISNUM .OR.
+     :               ( ( KEYWRD( 1:4 ) .NE. 'PRVP' ) .AND.
+     :                 ( KEYWRD( 1:4 ) .NE. 'PRVI' ) .AND. 
+     :                 ( KEYWRD( 1:4 ) .NE. 'PRVD' ) .AND. 
+     :                 ( KEYWRD( 1:4 ) .NE. 'PRVC' ) .AND. 
+     :                 ( KEYWRD( 1:4 ) .NE. 'PRVM' ) ) 
+
+*  Exclude the provenance caption.  
+
+*  First remove leading blanks from the header in case this is the 
+* "Provenance:" comment-only header.
+            COMENT = FITSTR
+            CALL CHR_LDBLK( COMENT )
+
+*  Also remove the the blank line before the caption too otherwise
+*  repeated conversions to and from FITS could generate lots of blank 
+*  lines.  Find the current header position and delete the header
+*  provided it is blank..
+            PRVCOM = COMENT .NE. '/ Provenance:'
+            IF ( .NOT. PRVCOM ) THEN
+               CALL FTGHSP( FUNIT, NHEAD, CHEAD, STATUS )
+               CALL FTGREC( FUNIT, CHEAD, CARD, STATUS )
+               IF ( CARD .EQ. ' ' ) CALL FTDREC( FUNIT, CHEAD, STATUS )
+            END IF
 
 *  Use an intermediate variable to reduce the number of continuation
 *  lines in the test.  This tests for the ORIGIN card.
@@ -538,25 +647,12 @@
 
 *  Do the test whether to copy the FITS extension header into the output
 *  FITS file's header.
-            ELSE IF ( MANDAT .AND. .NOT. BANNER .AND.
-     :        ( KEYWRD .NE. 'DATE' ) .AND.
-     :        ( KEYWRD .NE. 'BLANK' ) .AND.
-     :        ( KEYWRD .NE. 'BSCALE' ) .AND.
-     :        ( KEYWRD .NE. 'BZERO' ) .AND.
-     :        ( KEYWRD .NE. 'EXTNAME' ) .AND.
-     :        ( KEYWRD( 1:6 ) .NE. 'LBOUND' ) .AND.
-     :        ( KEYWRD( 1:7 ) .NE. 'HDUCLAS' ) .AND.
-     :        ( KEYWRD( 1:7 ) .NE. 'HDSNAME' ) .AND.
-     :        ( KEYWRD( 1:7 ) .NE. 'HDSTYPE' ) .AND.
-     :        ( KEYWRD( 1:5 ) .NE. 'CDELT' .OR. .NOT. AXIFND ) .AND.
-     :        ( KEYWRD( 1:5 ) .NE. 'CRVAL' .OR. .NOT. AXIFND ) .AND.
-     :        ( KEYWRD( 1:5 ) .NE. 'CRPIX' .OR. .NOT. AXIFND ) .AND.
-     :        ( KEYWRD( 1:6 ) .NE. 'CRTYPE' .OR. .NOT. AXLFND ) .AND.
-     :        ( KEYWRD( 1:5 ) .NE. 'CTYPE' .OR. .NOT. AXLFND ) .AND.
-     :        ( KEYWRD( 1:5 ) .NE. 'CUNIT' .OR. .NOT. AXUFND ) .AND.
-     :        ( KEYWRD .NE. 'LABEL' .OR. .NOT. LABFND ) .AND.
-     :        ( KEYWRD .NE. 'BUNIT' .OR. .NOT. UNTFND ) .AND.
-     :        ( KEYWRD .NE. 'OBJECT' .OR. .NOT. TITFND ) ) THEN
+            ELSE IF ( MNDKEY .AND. .NOT. BANKEY .AND. SCAKEY .AND.
+     :                WCSKEY .AND. CCKEY .AND. NDFKEY .AND. ICKEY .AND.
+     :                CADCKY .AND. PRVKEY .AND. PRVCOM .AND.
+     :                ( KEYWRD .NE. 'DATE' ) .AND.
+     :                ( KEYWRD .NE. 'EXTNAME' ) .AND.
+     :                ( KEYWRD .NE. 'BLANK' ) ) THEN
 
 *  Look for a rotated axis in the FITS extension (CROTAn is present and
 *  non-zero).  If there is one, the NDF AXIS structure will contain
