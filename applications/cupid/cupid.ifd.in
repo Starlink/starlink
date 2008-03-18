@@ -86,6 +86,16 @@ package cupid {
 
          helplib {$CUPID_HELP}
 
+         parameter backoff {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Remove background when finding clump sizes?}
+            default TRUE
+            helpkey *
+          }
+
          parameter data {
             position 2
             type NDF
@@ -254,6 +264,16 @@ package cupid {
          alias {clumps}
 
          helplib {$CUPID_HELP}
+
+         parameter backoff {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT,DEFAULT
+            prompt {Remove background when finding clump sizes?}
+            default TRUE
+            helpkey *
+          }
 
          parameter config {
             type LITERAL

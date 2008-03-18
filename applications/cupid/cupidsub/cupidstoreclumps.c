@@ -16,7 +16,7 @@
 #define LOGTAB   16   /* Width of one log file column, in characters */
 
 void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
-                       int ndim, int deconv, double beamcorr[ 3 ], 
+                       int ndim, int deconv, int backoff, double beamcorr[ 3 ],
                        const char *ttl, int usewcs, AstFrameSet *iwcs, 
                        int ilevel, const char *dataunits, Grp *hist,
                        FILE *logfile, int *nclumps, int *status ){
@@ -33,9 +33,10 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 
 *  Synopsis:
 *     void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj, 
-*                            int ndim, int deconv, double beamcorr[ 3 ], 
-*                            const char *ttl, int usewcs, AstFrameSet *iwcs, 
-*                            int ilevel, const char *dataunits, Grp *hist,
+*                            int ndim, int deconv, int backoff, 
+*                            double beamcorr[ 3 ], const char *ttl, 
+*                            int usewcs, AstFrameSet *iwcs, int ilevel, 
+*                            const char *dataunits, Grp *hist,
 *                            FILE *logfile, int *nclumps, int *status )
 
 *  Description:
@@ -60,6 +61,12 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *        are stored in the output catalogue and NDF. Note, the filter to 
 *        remove clumps smaller than the beam width is still applied, even
 *        if "deconv" is zero.
+*     backoff
+*        If non-zero, then the background level is subtracted from all
+*        clump data values before calculating the clump sizes and centroid.
+*        The background level is the minimum data value in the clump. If
+*        zero, then the clump sizes and centroid are based on the full data 
+*        values (this is what the IDL version of ClumpFind does).
 *     beamcorr
 *        An array holding the FWHM (in pixels) describing the instrumental 
 *        smoothing along each pixel axis. If "deconv" is non-zero, the clump 
@@ -93,6 +100,7 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -131,6 +139,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
 *        Up MAXCAT to 4096 characters from 50.
 *     14-MAY-2007 (TIMJ):
 *        Prevent log file columns overlapping.
+*     18-MAR-2008 (DSB):
+*        Added argument "backoff" for Jenny Hatchell.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -288,8 +298,8 @@ void cupidStoreClumps( const char *param, HDSLoc *xloc, HDSLoc *obj,
    units, the indices of the parameters holding the clump central position, 
    and the number of parameters). */
          cpars = cupidClumpDesc( indf, deconv, wcsmap, wcsfrm, dataunits, 
-                                 beamcorr, cpars, &names, &units, &ncpar, 
-                                 &ok, status );
+                                 beamcorr, backoff, cpars, &names, &units, 
+                                 &ncpar, &ok, status );
 
 /* If we have not yet done so, allocate memory to hold a table of clump 
    parameters. In this table, all the values for column 1 come first, 

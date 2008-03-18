@@ -16,7 +16,7 @@
 
 double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap, 
                         AstFrame *wcsfrm, const char *dataunits,
-                        double beamcorr[ 3 ], double *cpars, 
+                        double beamcorr[ 3 ], int backoff, double *cpars, 
                         const char ***names, const char ***units, int *ncpar, 
                         int *ok, int *status ){
 /*
@@ -33,7 +33,7 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 *  Synopsis:
 *     double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap, 
 *                             AstFrame *wcsfrm, const char *dataunits,
-*                             double beamcorr[ 3 ], double *cpars, 
+*                             double beamcorr[ 3 ], int backoff, double *cpars,
 *                             const char ***names, const char ***units, 
 *                             int *ncpar, int *ok, int *status ){
 
@@ -91,6 +91,12 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 *        smoothing along each pixel axis. If "deconv" is non-zero, the clump 
 *        widths and peak values stored in the output catalogue are modified
 *        to correct for this smoothing.
+*     backoff
+*        If non-zero, then the background level is subtracted from all
+*        clump data values before calculating the clump sizes and centroid.
+*        The background level is the minimum data value in the clump. If
+*        zero, then the clump sizes and centroid are based on the full data 
+*        values (this is what the IDL version of ClumpFind does).
 *     cpars
 *        Pointer to an array in which to store the clump parameters. If
 *        this is NULL, a new dynamic array is allocated and a pointer to
@@ -127,6 +133,7 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -167,6 +174,8 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 *     27-NOV-2007 (DSB):
 *        If the min and max value in the clump are equal, use uniform
 *        weighting.
+*     18-MAR-2008 (DSB):
+*        Added argument "backoff" for Jenny Hatchell.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -447,10 +456,14 @@ double *cupidClumpDesc( int indf, int deconv, AstMapping *wcsmap,
 /* Use the height of the pixel above the miniumum value as the weight for
    this axis value. If all pixels have the same value use a uniform
    weight of 1.0. */
-                  if( dmax > dmin ) {
-                     d = *pd - dmin;
+                  if( backoff ) {
+                     if( dmax > dmin ) {
+                        d = *pd - dmin;
+                     } else {
+                        d = 1.0;
+                     }
                   } else {
-                     d = 1.0;
+                     d = *pd;
                   }
 
 /* update the weighted sums. */
