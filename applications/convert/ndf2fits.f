@@ -350,6 +350,12 @@
 *        HISTORY headers are propagated from the FITS airlock when
 *          PROFITS is TRUE, and from the NDF history component when
 *          PROHIS is TRUE.
+*        DATASUM and CHECKSUM --- data-integrity keywords are written 
+*          when parameter CHECKSUM is TRUE, replacing any existing
+*          values.  When parameter CHECKSUM is FALSE and PROFITS is
+*          TRUE any existing values inherited from the FITS airlock are 
+*          removed to prevent storage of invalid checksums relating to 
+*          another data file.
 *
 *     See also the sections "Provenance" and "World Co-ordinate Systems"
 *     for details of headers used to describe the PROVENANCE extension 
@@ -470,7 +476,7 @@
 *     except for the PRVMn header, which is omitted if there is no MORE 
 *     information to record.   The index n used in each keyword's name 
 *     is the provenance identifier for the NDF, and starts at 0 for the
-*     NDF being converted to FITS..
+*     NDF being converted to FITS.
 *
 *     The following PROVENANCE headers are written if parameter
 *     PROVENANCE is set to "CADC".
@@ -479,6 +485,9 @@
 *        OBSCNT --- is the number of root ancestor OBSm headers.
 *        OBSm --- is mth root ancestor identifier from its
 *          MORE.OBSIDSS component.
+*
+*     When PROFITS is TRUE any existing provenance keywords in the FITS
+*     airlock are not copied to the FITS file.
 
 *  Special Formats:
 *     In the general case, NDF extensions (excluding the FITS extension)

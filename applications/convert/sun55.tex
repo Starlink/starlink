@@ -4655,6 +4655,14 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
               airlock when PROFITS is \texttt{TRUE}, and from the NDF
               history component when PROHIS is \texttt{TRUE}.
 
+            \sstitem
+            DATASUM and CHECKSUM --- data-integrity keywords are written 
+            when parameter CHECKSUM is \texttt{TRUE}, replacing any existing
+            values.  When parameter CHECKSUM is \texttt{FALSE} and PROFITS is
+            \texttt{TRUE} any existing values inherited from the FITS airlock are 
+            removed to prevent storage of invalid checksums relating to 
+            another data file.
+
          }
          See also the sections
          \htmlref{\texttt{"}Provenance\texttt{"}}{ndf2fits_provenance} and
@@ -4845,6 +4853,9 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          OBS$m$ --- is $m$th root ancestor identifier from its MORE.OBSIDSS
          component.
       }
+
+       When PROFITS is \texttt{TRUE} any existing provenance keywords in the
+       FITS airlock are not copied to the FITS file.
    }
    \sstdiytopic{
       Special Formats
