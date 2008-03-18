@@ -181,13 +181,17 @@
 *        HISTORY cards are propagated from the FITS airlock when
 *          PROFIT is .TRUE., and from the NDF HISTORY component when
 *          PROHIS is .TRUE..
+*        DATASUM and CHECKSUM --- are written afresh when argument
+*          SUMS is TRUE, otherwise any existing values inherited from
+*          the FITS airlock are removed.
 *
 *     -  The following PROVENANCE headers are written if argument PROVEN
 *     is set to "GENERIC".
 *        PRVPn --- is the path of the nth NDF.
 *        PRVIn --- is a comma-separated list of the identifiers of the 
 *          direct parents for the nth ancestor.
-*        PRVDn --- is the creation date in ISO order of the $n$th ancestor.
+*        PRVDn --- is the creation date in ISO order of the $n$th 
+*          ancestor.
 *        PRVCn --- is the software used to create the nth ancestor.
 *        PRVMn --- lists the contents of the MORE structure of the nth 
 *          parent.
@@ -308,9 +312,6 @@
 *     2008 February 6 (MJC):
 *        Invoke and document PROVEN argument's GENERIC option.
 *     {enter_further_changes_here}
-
-*  Bugs:
-*     {note_any_bugs_here}
 
 *-
       
@@ -1069,7 +1070,8 @@
 
          END IF
 
-*  Write integrity-check headers.
+*  Write integrity-check headers.  Note any existing values present
+*  derived from the FITS airlock will be replaced.
          IF ( SUMS ) THEN
             CALL FTPREC( FUNIT, ' ', STATUS )
             CALL FTPCKS( FUNIT, STATUS )
