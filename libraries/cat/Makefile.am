@@ -91,6 +91,25 @@ BLOCK_DATA_FILES = ant_block.f attrbb.f catsb.f ctrlb.f idsb.f
 
 BUILT_SOURCES = $(include_MESSAGES) $(PRIVATE_INCLUDES)
 
+EXAMPLE_FILES = examples/0README.LIS \
+examples/complex.TXT \
+examples/complex.dat \
+examples/details.f \
+examples/details.ifl \
+examples/example_angles.f \
+examples/example_angles.ifl \
+examples/example_read.f \
+examples/example_read.ifl \
+examples/example_write.f \
+examples/example_write.ifl \
+examples/kappa.TXT \
+examples/listout.f \
+examples/listout.ifl \
+examples/poly.TXT \
+examples/scale.TXT \
+examples/simple.TXT \
+examples/simple_radians.TXT
+
 ## Create CAT1_NUL from the processed source. Need to add include of PRM_PAR
 ## by hand to avoid expanding that.
 CAT1_NUL: CAT1_NUL.F
@@ -122,9 +141,9 @@ check-local:
 	@if cmp -s testcat.TXT testcat.TXT.out; then :; else \
 	   echo "*** TEST files DIFFER";\
 	fi
-	@rm -r testcat.TXT
+	@rm -f testcat.TXT
 
 EXTRA_DIST = $(PRIVATE_INCLUDES) CAT1_NUL.F
 
 dist_starnews_DATA = cat.news
-dist_pkgdata_DATA = LICENCE
+dist_pkgdata_DATA = LICENCE $(EXAMPLE_FILES)

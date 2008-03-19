@@ -1,0 +1,20 @@
+!+
+! Simple STL example; stellar photometry catalogue.
+!
+! A.C. Davenhall (Edinburgh) 24/1/97.
+!-
+
+C RA   DOUBLE  1  UNITS='RADIANS{HOURS}'    TBLFMT=HOURS
+C DEC  DOUBLE  2  UNITS='RADIANS{DEGREES}'  TBLFMT=DEGREES
+C V    REAL    3  UNITS='MAG'
+C B_V  REAL    4  UNITS='MAG'
+C U_B  REAL    5  UNITS='MAG'
+
+P EQUINOX  CHAR*10  'J2000.0'
+P EPOCH    CHAR*10  'J1996.35'
+
+BEGINTABLE
+5:09:08.7   -8:45:15   4.27  -0.19  -0.90
+5:07:50.9   -5:05:11   2.79  +0.13  +0.10
+5:01:26.3   -7:10:26   4.81  -0.19  -0.74
+5:17:36.3   -6:50:40   3.60  -0.11  -0.47

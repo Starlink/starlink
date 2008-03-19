@@ -1,0 +1,22 @@
+!+
+! Simple STL example; stellar photometry catalogue.
+!
+! This version of the example has the coordinates stored in radians.
+!
+! A.C. Davenhall (Edinburgh) 24/1/97.
+!-
+
+C RA   DOUBLE  1  UNITS='RADIANS{HOURS}'
+C DEC  DOUBLE  2  UNITS='RADIANS{DEGREES}'
+C V    REAL    3  UNITS='MAG'
+C B_V  REAL    4  UNITS='MAG'
+C U_B  REAL    5  UNITS='MAG'
+
+P EQUINOX  CHAR*10  'J2000.0'
+P EPOCH    CHAR*10  'J1996.35'
+
+BEGINTABLE
+1.3488995  -0.15278903  4.27  -0.19  -0.90
+1.3432418  -0.08877423  2.79  +0.13  +0.10
+1.3152729  -0.12520798  4.81  -0.19  -0.74
+1.3858132  -0.11945809  3.60  -0.11  -0.47

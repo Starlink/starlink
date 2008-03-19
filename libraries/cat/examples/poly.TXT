@@ -1,0 +1,17 @@
+!+
+! Example STL format catalogue of polygon corners.
+!
+! Each row in the catalogue corresponds to a corner of the polygon.
+!
+! A C Davenhall (Edinburgh) 31/1/97.
+!-
+
+C X REAL 1  ! X coordinates of the polygon corners.
+C Y REAL 2  ! Y coordinates of the polygon corners.
+
+BEGINTABLE
+ 35.0   23.0
+ 68.0  122.0
+159.0  143.0
+174.0   76.0
+105.0   68.0

@@ -1,0 +1,25 @@
+!+
+! More complicated example of an STL.
+!
+! A.C. Davenhall (Edinburgh) 24/1/97.
+!-
+
+C RA      DOUBLE    1  UNITS='RADIANS{HOURS}'    TBLFMT=HOURS9
+C DEC     DOUBLE   12  UNITS='RADIANS{DEGREES}'  TBLFMT=DEGREES8
+C NAME    CHAR*10  25  COMMENTS='Star name.'     TBLFMT=A7
+C FLUX[4] REAL     31  UNITS='Jansky'            EXFMT=F6.1
+:           COMMENTS='Flux at 12, 25, 60 and 100 micron.'
+C V       REAL     58  UNITS='MAG'  COMMENTS='V magnitude.' EXFMT=F4.2
+C B_V     REAL     64  UNITS='MAG'  COMMENTS='B-V colour.'  EXFMT=F5.2
+C U_B     REAL     71  UNITS='MAG'  COMMENTS='U-B colour.'  EXFMT=F5.2
+
+P EQUINOX  CHAR*10  'J2000.0'
+P EPOCH    CHAR*10  'J1996.35'
+
+T Catalogue of U,B,V colours and fluxes.
+T
+T UBV photometry from Mount Pumpkin Observatory,
+T IR Fluxes from Sage, Parsley and Thyme (1987).
+
+D FILE='complex.dat'      ! File holding the table.
+D POSITION=CHARACTER      ! Table is fixed-format.

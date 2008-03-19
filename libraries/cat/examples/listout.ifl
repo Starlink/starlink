@@ -1,0 +1,98 @@
+#+
+#  Name:
+#     LISTOUT.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+#
+#  Authors:
+#     ACD: A C Davenhall (Leicester)
+#  History:
+#     14/10/93 (ACD): Original version (constructed from the 
+#       corresponding SCAR interface file).
+#     8/2/94   (ACD): Changed parameter CHOOSE to REPLY.
+#     16/12/96 (ACD): Added default for parameter NUMBER.
+#-
+
+interface CAR_LISTOUT
+
+#   helplib '[help_library_specification]'
+
+   parameter CNAME                   # Catalogue name
+      position 1
+      keyword  CNAME
+      type     _CHAR
+      access   READ
+      prompt   'Catalogue name:'
+      help     'Give the name of the catalogue to be reported.'
+   endparameter
+
+   parameter LISTMODE
+      type '_CHAR'
+      vpath 'PROMPT'
+      ppath 'CURRENT,DEFAULT'
+      default 'S'
+      prompt 'Output to Screen, File or Both'
+      help 'Output to be sent to the terminal screen, a file or both?'
+   endparameter
+
+   parameter SWIDTH
+      type '_INTEGER'
+      vpath 'PROMPT'
+      ppath 'CURRENT,DEFAULT'
+      default 75
+      prompt 'Required width of screen listing'
+      help 'The permitted range is 32 to 75, inclusive'
+   endparameter
+
+   parameter HEADER
+      type '_LOGICAL'
+      vpath 'GLOBAL,PROMPT'
+      ppath 'CURRENT,DEFAULT'
+      default FALSE
+      prompt 'Do you require a header (Y/N)?'
+      help 'Should the output have a header giving column names etc?'
+   endparameter
+
+   parameter WIDTH 
+      type '_INTEGER'
+      vpath 'PROMPT'
+      ppath 'CURRENT,DEFAULT'
+      default 132
+      prompt 'Give required width of printed report'
+      help 'The permitted range is 32 to 160, inclusive'
+   endparameter
+
+   parameter NUMBER
+      type '_LOGICAL'
+      vpath 'PROMPT'
+      ppath 'CURRENT'
+      default true
+      prompt 'Is a running record number required?'
+      help 'Include a running record count in the output?'
+   endparameter
+
+   parameter FILOUT
+      type '_CHAR'
+      vpath 'PROMPT'
+      ppath 'CURRENT'
+      prompt 'Give the name of output listing file'
+      help 'The name of the text file to which output is directed'
+   endparameter
+
+   parameter SPACE
+      type '_INTEGER'
+      vpath 'DEFAULT,PROMPT'
+      ppath 'CURRENT'
+      default 2
+      prompt 'Column spacing'
+      help 'The number of blank spaces inserted between columns'
+   endparameter
+
+   parameter REPLY
+      type '_CHAR'
+      default ' '
+      prompt 'Give column name'
+      help 'Give column name, EXIT to quit or HELP for columns list.'
+   endparameter
+
+endinterface

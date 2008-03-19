@@ -1,0 +1,26 @@
+#+
+#  Name:
+#     EXAMPLE_ANGLES.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ACD: A C Davenhall (Leicester)
+#  History:
+#     19/4/95 (ACD): Original version.
+#-
+
+interface EXAMPLE_ANGLES
+
+#   helplib '[help_library_specification]'
+
+   parameter CNAME                   # Catalogue name
+      position 1
+      keyword  CNAME
+      type     _CHAR
+      access   READ
+      prompt   'Catalogue name:'
+      help     'Give the name of the catalogue.'
+   endparameter
+
+endinterface

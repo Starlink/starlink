@@ -1,0 +1,56 @@
+                           CAT Example Files
+                           =================
+
+
+This directory contains example files for the CAT subroutine library
+for manipulating astronomical catalogues and tables.  CAT is described
+in SUN/181.  The files consist of some example programs which illustrate
+the use of CAT, the corresponding Starlink interface files and some
+example catalogues in the Small text list (STL) format.
+
+The files included are as follows.
+
+
+0README.LIS      - this file.
+
+
+Example Programs
+----------------
+
+example_write.f  - write a catalogue.
+example_read.f   - read a catalogue.
+example_angles.f - illustrate the handling angles.
+details.f        - list details of a catalogue.
+listout.f        - list columns from a catalogue.
+
+
+Starlink Interface Files for the Example Programs
+-------------------------------------------------
+
+example_write.ifl
+example_read.ifl
+example_angles.ifl
+details.ifl
+listout.ifl
+
+
+Small text list (STL) format catalogues
+---------------------------------------
+
+simple.TXT       - a simple STL catalogue; this catalogue is a target list.
+complex.TXT      - } a more complicated STL catalogue.
+complex.dat        }
+kappa.TXT        - a KAPPA variant STL catalogue.
+scale.TXT        - an example of scaled columns.
+simple_radians.TXT  - an example of angles stored in radians.
+poly.TXT         - Example STL catalogue of polygon corners.
+
+
+Clive Davenhall,
+18/7/00.
+
+-----------------------------------------------------------------------------
+Clive Davenhall                                      Institute for Astronomy,
+e-mail (internet, JANET): acd @ roe.ac.uk        Royal Observatory Edinburgh,
+fax from within the UK:   0131-668-8416            Blackford Hill, Edinburgh,
+fax from overseas:     +44-131-668-8416                    EH9 3HJ, Scotland.

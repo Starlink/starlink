@@ -1,0 +1,27 @@
+#+
+#  Name:
+#     DETAILS.IFL
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     ACD: A C Davenhall (Leicester)
+#  History:
+#     16/7/93 (ACD): Original version.
+#     28/1/94 (ACD): Tidied up for release.
+#-
+
+interface DETAILS
+
+#   helplib '[help_library_specification]'
+
+   parameter CNAME                   # Catalogue name
+      position 1
+      keyword  CNAME
+      type     _CHAR
+      access   READ
+      prompt   'Catalogue name:'
+      help     'Give the name of the catalogue.'
+   endparameter
+
+endinterface
