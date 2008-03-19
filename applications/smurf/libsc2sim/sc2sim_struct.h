@@ -95,11 +95,13 @@
  *        Redefine heatnum as an int.
  *     2007-10-31 (TIMJ):
  *        Use size_t following sc2store changes.
+ *     2008-03-19 (AGG):
+ *        Add obstype.
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
 *     Copyright (C) 2003-2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2005-2007 University of British Columbia.
+*     Copyright (C) 2005-2008 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -191,7 +193,8 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
   int nmicstep;               /* number of microsteps */
   int numsamples;             /* number of samples in STARE */
   size_t nvert;               /* Nr of vertices in the Jiggle pattern */
-  char obsmode[80];           /* Type of observation */
+  char obsmode[80];           /* Observation mode (DREAM, STARE, PONG etc) */
+  char obstype[80];           /* Observation type (POINT, FOCUS or SCIENCE) */
   int planetnum;              /* Number corresponding to a planet */
   int platenum;               /* number of waveplate rotations */
   double platerev;            /* waveplate rotation rev/sec */

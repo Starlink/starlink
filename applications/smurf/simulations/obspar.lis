@@ -30,6 +30,9 @@ steptime=5.0e-3
 # or nasmyth. Default is radec.
 #coordframe=radec
 
+# Observation type: can be SCIENCE, FOCUS or POINTING
+#obstype=science
+
 # Distance between bolometers in X & Y directions (arcsec). Default is
 # as given bsed on current knowledge of JCMT and SCUBA-2 optics, but
 # may get updated once the instrument is on the telescope.

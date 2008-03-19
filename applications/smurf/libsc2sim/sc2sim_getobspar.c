@@ -88,11 +88,13 @@
 *        - Introduce flag to denote an 850 or 450 um simulation
 *     2007-10-31 (TIMJ):
 *        astMapGet0I uses int not size_t
+*     2008-03-19 (AGG):
+*        Add obstype
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
-*     Council. Copyright (C) 2005-2007 University of British Columbia.
+*     Council. Copyright (C) 2005-2008 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -494,6 +496,21 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
        thischar++;
       }
       strncpy ( inx->obsmode, convert, 80 );
+   }
+
+   astMapGet0C ( keymap, "OBSTYPE", &temp );
+
+   if ( !astMapGet0C ( keymap, "OBSTYPE", &temp ) )
+      strncpy ( inx->obstype, "SCIENCE", 80 ); 
+   else {
+      /* Convert to uppercase */
+      strncpy ( convert, temp, 80 );
+      thischar = convert;
+      while ( *thischar != '\0' ) {
+       *thischar = toupper (*thischar);
+       thischar++;
+      }
+      strncpy ( inx->obstype, convert, 80 );
    }
 
    /* Check if a planet has been requested */
