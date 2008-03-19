@@ -268,8 +268,8 @@ package cupid {
          parameter backoff {
             type _LOGICAL
             access READ
-            vpath DEFAULT
-            ppath CURRENT,DEFAULT
+            vpath DYNAMIC,DEFAULT
+            ppath DYNAMIC,DEFAULT
             prompt {Remove background when finding clump sizes?}
             default TRUE
             helpkey *

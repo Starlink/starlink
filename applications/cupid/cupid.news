@@ -7,6 +7,12 @@
  data arrays.
 
 
+Changes introduced at V0.0-38:
+
+   - Use a dynamic default of FALSE for parameter "BACKOFF" if METHOD is
+   "ClumpFind" and the Clumpfind.IDLAlg configuration parameter is set 
+   non-zero. Otherwise use a dynamic default of TRUE.
+
 Changes introduced at V0.0-37:
 
    - Add parameter "BACKOFF" to FINDCLUMPS. It controls whether or not 

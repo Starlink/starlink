@@ -9,7 +9,7 @@
 HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
                         double *ipv, double rms, AstKeyMap *config, int velax,
                         int ilevel, int perspectrum, double beamcorr[ 3 ], 
-                        int *status ){
+                        int *backoff, int *status ){
 /*
 *+
 *  Name:
@@ -27,7 +27,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *                             void *ipd, double *ipv, double rms, 
 *                             AstKeyMap *config, int velax, int ilevel,
 *                             int perspectrum, double beamcorr[ 3 ], 
-*                             int *status )
+*                             int *backoff, int *status )
 
 *  Description:
 *     This function identifies clumps within a 1, 2 or 3 dimensional data
@@ -77,6 +77,9 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        instrumental smoothing along each pixel axis. The clump widths
 *        stored in the output catalogue are reduced to correct for this
 *        smoothing.
+*     backoff
+*        Location at which to return the default value to use for the
+*        BACKOFF parameter.
 *     status
 *        Pointer to the inherited status value.
 
@@ -90,6 +93,7 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
 *     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -117,6 +121,8 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        Original version.
 *     17-SEP-2007 (DSB):
 *        Added "perspectrum" parameter.
+*     19-MAR-2008 (DSB):
+*        Added "backoff" parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -219,6 +225,9 @@ HDSLoc *cupidClumpFind( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 /* See if the IDL implementation of ClumpFind should be emulated rather than 
    the algorithm described in the original Williams et al ApJ paper. */
    idl = cupidConfigI( cfconfig, "IDLALG", 0, status );
+
+/* Set the default value for the BACKOFF parameter appropriately. */
+   *backoff = ( idl == 0 );
 
 /* Find the size of each dimension of the data array, and the total number
    of elements in the array, and the skip in 1D vector index needed to
