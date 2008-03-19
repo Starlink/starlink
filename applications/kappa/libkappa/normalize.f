@@ -594,7 +594,7 @@
 
 *  Produce the output data array by applying the inverse of the 
 *  calculated normalisation function to the IN1 data array.
-         CALL KPG1_SCLOF( %VAL( CNF_PVAL( PNT1BD( 1 ) ) ), NEL1B,
+         CALL KPG1_SCLOF( NEL1B, %VAL( CNF_PVAL( PNT1BD( 1 ) ) ), 
      :                    DBLE( 1.0 / SLOPE ), DBLE( -OFFSET / SLOPE ),
      :                    %VAL( CNF_PVAL( PNTOD( 1 ) ) ), BAD, STATUS )
 
@@ -620,7 +620,7 @@
 
             IF ( STATUS .NE. SAI__OK ) GOTO 999
        
-            CALL KPG1_SCLOF( %VAL( CNF_PVAL( PNT1BV( 1 ) ) ), NEL1B,
+            CALL KPG1_SCLOF( NEL1B, %VAL( CNF_PVAL( PNT1BV( 1 ) ) ), 
      :                       DBLE( 1.0 / SLOPE**2 ), 0.0D0, 
      :                       %VAL( CNF_PVAL( PNTOV( 1 ) ) ), 
      :                       BAD, STATUS )

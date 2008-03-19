@@ -205,6 +205,7 @@
 *  Local Variables:
       INTEGER AXPNTR             ! Pointer to the mapped axis centres
       CHARACTER * ( 72 ) AXCHAR  ! Axis character component
+      LOGICAL BAD                ! Bad values found?
       REAL BLANK                 ! Data blank
       LOGICAL BLAPRE             ! True when the data blank is present
       CHARACTER * ( 72 ) CHACMP  ! NDF character component
@@ -592,7 +593,7 @@
                IBLANK = NINT( BLANK )
 
 *  Assume that the data type is integer or real.  Get the bad values to
-*  be replaced by the bad values.  This avoidsdealing with workspace
+*  be replaced by the bad values.  This avoids dealing with workspace
 *  as all the data can be passed through the replace routine.
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                IBLANK = VAL__BADI
@@ -625,9 +626,10 @@
 
 *  Apply the scale and zero to convert the temporary array into the
 *  output NDF's data array.
-               CALL CON_SCLOF( EL, %VAL( CNF_PVAL( TPNTR ) ), 
-     :                         SCALE, ZERO,
-     :                         %VAL( CNF_PVAL( OPNTR( 1 ) ) ), STATUS )
+               CALL KPG1_SCLOF( EL, %VAL( CNF_PVAL( TPNTR ) ), 
+     :                          DBLE( SCALE ), DBLE( ZERO ),
+     :                          %VAL( CNF_PVAL( OPNTR( 1 ) ) ), BAD,
+     :                          STATUS )
 
 *  Release the workspace.
                CALL PSX_FREE( TPNTR, STATUS )

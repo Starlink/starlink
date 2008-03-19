@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_SCLOF( IN, EL, FACTOR, OFFSET, OUT, BAD, STATUS )
+      SUBROUTINE KPG1_SCLOF( EL, IN, FACTOR, OFFSET, OUT, BAD, STATUS )
 *+
 *  Name:
 *     KPG1_SCLOF
@@ -11,17 +11,17 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_SCLOF( IN, EL, FACTOR, OFFSET, OUT, NBAD, STATUS )
+*     CALL KPG1_SCLOF( EL, IN, FACTOR, OFFSET, OUT, NBAD, STATUS )
 
 *  Description:
 *     The input data values are multiplied by the given factor and
 *     the given offset is then added on, to form the output data.
 
 *  Arguments:
-*     IN( EL ) = REAL (Given)
-*        The input data vector.
 *     EL = INTEGER (Given)
 *        The number of elements in the input and output vectors.
+*     IN( EL ) = REAL (Given)
+*        The input data vector.
 *     FACTOR = DOUBLE PRECISION (Given)
 *        The factor by which the input valus are scaled.
 *     OFFSET = DOUBLE PRECISION (Given)
@@ -61,12 +61,16 @@
 *     {enter_new_authors_here}
 
 *  History:
+
 *     25-JUN-1990 (DSB):
 *        Original version.
 *     1990 Sep 27 (MJC):
 *        Renamed from the more generic and common SCALE.
 *     2004 Oct 1 (TIMJ):
-*        NUM_CMN not required
+*        NUM_CMN not required.
+*     2008 March 19 (MJC):
+*        Swap IN and EL arguments to regular order (as part of merging 
+*        of CONVERT's CON_SCLOF).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -85,19 +89,19 @@
 
 *  Arguments Given:
       INTEGER  EL   
-      REAL   IN( EL )
+      REAL IN( EL )
       DOUBLE PRECISION FACTOR
       DOUBLE PRECISION OFFSET
 
 *  Arguments Returned:
-      REAL   OUT( EL )
-      LOGICAL  BAD
+      REAL OUT( EL )
+      LOGICAL BAD
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local variables:
-      INTEGER  ELEM              ! The element counter.
+      INTEGER ELEM               ! The element counter
 
 *.
 
@@ -106,16 +110,13 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 * Initialise BAD to indicate that no bad pixels have yet been found.
-
       BAD = .FALSE.
 
 *  Loop round all the elements of the input vector.
-
       DO ELEM = 1, EL
 
 *  If the data value is good, copy the scaled value to the output.
 *  Otherwise, set the output value bad.
-
          IF ( IN( ELEM ) .NE. VAL__BADR ) THEN
             OUT( ELEM ) = FACTOR * IN( ELEM ) + OFFSET
          ELSE
