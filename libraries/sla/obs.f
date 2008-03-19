@@ -698,12 +698,12 @@
       GO TO 9999
 
 *  James Clerk Maxwell 15 metre mm telescope, Mauna Kea             JCMT
-*  (as used by the JCMT telescope control system; R Kackley)
+*  From GPS measurements on 11Apr2007 for eSMA setup (R. Tilanus)
  570  CONTINUE
       NAME='JCMT 15 metre'
-      W=WEST(155,28,47.00)
-      P=NORTH(19,49,33.00)
-      H=4111D0
+      W=WEST(155,28,37.30)
+      P=NORTH(19,49,22.22)
+      H=4124.75D0
       GO TO 9999
 
 *  ESO 3.5 metre NTT, La Silla (K.Wirenstrand)                    ESONTT
