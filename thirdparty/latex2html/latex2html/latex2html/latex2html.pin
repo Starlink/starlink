@@ -11030,12 +11030,18 @@ sub do_require_package {
 	    print STDOUT "\nPackage: loading $texfilepath$dd${file}.perl";
 	    require("$texfilepath$dd${file}.perl");
 	    $styles_loaded{$file} = 1;
+            if ($file =~ /^graphixx$/) {
+              $styles_loaded{'graphicx'} = 1;
+            }
 	} else {
 	    foreach $dir (split(/$envkey/,$LATEX2HTMLSTYLES)) {
 		if ((-f "$dir$dd${file}.perl") && ! $styles_loaded{$file}){
 		    print STDOUT "\nPackage: loading $dir$dd${file}.perl";
 		    require("$dir$dd${file}.perl");
 	    	    $styles_loaded{$file} = 1;
+                    if ($file =~ /^graphixx$/) {
+                      $styles_loaded{'graphicx'} = 1;
+                    }
 		    last;
 		}
 	    }
