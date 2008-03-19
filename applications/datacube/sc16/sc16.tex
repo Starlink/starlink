@@ -118,9 +118,9 @@ and hints and tips about how to deal with commonly occurring problems.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -155,7 +155,6 @@ and hints and tips about how to deal with commonly occurring problems.}
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -191,6 +190,22 @@ and hints and tips about how to deal with commonly occurring problems.}
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
 
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+
 % Figure environment. Defined for latex2html. #1 is postscript file
 % #2 the qualifiers, #3 the gif file, #4 the label, #5 the caption.
 \newcommand{\myfig} [5] {
@@ -207,19 +222,6 @@ and hints and tips about how to deal with commonly occurring problems.}
     }
 \end{htmlonly}
 
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
@@ -360,7 +362,7 @@ and hints and tips about how to deal with commonly occurring problems.}
 % decimal-arcsecond symbol
 \newcommand{\uarcs}{\hskip-0.27em\arcsec\hskip-0.02em}  
 \begin{htmlonly}
-\renewcommand{\uarcs}{"}}
+\newcommand{\uarcs}{"}}
 \end{htmlonly}
 
 % an environment for references (for the SST sstdiytopic command).
@@ -476,7 +478,7 @@ required tasks, the implementation of the package in easily
 understandable, and modifiable, scripts allows you to make minor (or
 even major) changes to the way they behave, although most of the
 scripts already have \xref{command-line arguments}{sun237}{} which
-can modify their behaviour to some extent\latexonly{ (see SUN/237 for
+can modify their behaviour to some extent\latex{ (see SUN/237 for
 details)}.
 
 It is to be hoped that enough ground work has been done so that the
@@ -529,7 +531,7 @@ spectrograph.  Up to six fibre bundles are available, although only
 three bundles are used in normal operation, with field sizes ranging
 from 10 to 40 arcseconds and different fibre core sizes.  These
 options allow observers to make the most efficient use of the
-prevailing seeing conditions.\latexonly{ More information can be found
+prevailing seeing conditions.\latex{ More information can be found
 at {\tt http://www.iac.es/proyect/integral/}.}
 
 Data-reduction facilities for the instrument are provided by the
@@ -538,7 +540,7 @@ other \IRAF\ packages (such as \ONEDSPEC, \SPECRED, and \CCDRED) and
 some custom tasks designed to deal with INTEGRAL data.  The package
 can be 
 \htmladdnormallink{downloaded}{http://andromeda.roque.ing.iac.es/~astrosw/InstSoft/integral/integral-0.3.tar.gz}
-from \goodbreak\latexonly{{\tt
+from \goodbreak\latex{{\tt
 http://andromeda.roque.ing.iac.es/$\sim$astrosw/InstSoft/integral/\-integral-0.3.tar.gz}}
 \begin{htmlonly}
 the IAC web pages
@@ -546,7 +548,7 @@ the IAC web pages
 along with the package \htmladdnormallink{user
 manual}{http://andromeda.roque.ing.iac.es/~astrosw/InstSoft/integral/manual_de_reducciones.ps.gz},
 which contains installation instructions and a description of the
-available reduction software\latexonly{ (see
+available reduction software\latex{ (see
 Section~\ref{sc16_available})}.  It should be noted that to compile
 the \INTEGRAL\ package requires the Starlink public-domain algorithms
 (PDA) package to be present on your machine (see
@@ -567,7 +569,7 @@ spectroscopic mode offers low-to-medium spectral resolution with a wide
 range of spatial samplings performed by an array of hexagonal
 micro-lenses.  Depending of the configuration employed, the
 spectrographic field diameter varies from 1.5 arcsec to 10
-arcsec.\latexonly{ More information can be found at {\tt
+arcsec.\latex{ More information can be found at {\tt
 http://www.cfht.hawaii.edu/Instruments/Spectroscopy/OASIS/}.}
 
 Data-reduction facilities is provided by the \htmladdnormallink{\XOASIS\
@@ -585,7 +587,7 @@ reduction is via pipeline software ({\footnotesize XSAURON\normalsize}
 and {\footnotesize PALANTIR}\normalsize) especially developed for the
 instrument which was modelled after the
 \htmladdnormallink{\XOASIS}{http://www.cfht.hawaii.edu/Instruments/Spectroscopy/OASIS/Reduc/}
-package.\latexonly{ More information about the instrument can be found
+package.\latex{ More information about the instrument can be found
 at {\tt http://www.strw.leidenuniv.nl/sauron/}.}
 
 \subsection{\xlabel{sc16_gmos}GMOS data\label{sc16_gmos}}
@@ -617,12 +619,12 @@ The \htmladdnormallink{data-reduction and analysis software for
 CIRPASS}{http://www.ast.cam.ac.uk/~optics/cirpass/docs/install_cirp_software.html}
 runs under \IRAFref.  There is a 
 \htmladdnormallink{cookbook}{http://www.ast.cam.ac.uk/~optics/cirpass/datared/cookbook_sn1987a.php}
-available\latexonly{ at
+available\latex{ at
 http://www.ast.cam.ac.uk/$\sim$optics/cirpass/datared/cookbook\_sn1987a.php}.
 
 
 The final data product for the science data is an $x$,$y$,$\lambda$ 
-\htmlref{data cube}{sc16_teifufile}\latexonly{ (see
+\htmlref{data cube}{sc16_teifufile}\latex{ (see
 Section~\ref{sc16_teifufile})}, which can be visualised as a
 cube where the $z$-axis is wavelength and each plane is a picture of
 what the IFU observed at that wavelength.
@@ -635,7 +637,7 @@ observations).  For each type of data there are one or more pipeline
 scripts to reduce the data, with each pipeline script running a series
 of \IRAF\ tasks.
 
-\latexonly{Links to more information on the ongoing development of the
+\latex{Links to more information on the ongoing development of the
 reduction software can be found on the web at {\tt
 http://www.ast.cam.ac.uk/$\sim$optics/cirpass/docs.html}.}
 
@@ -651,10 +653,10 @@ on \htmladdnormallink{UKIRT}{http://www.jach.hawaii.edu/UKIRT/}
 to provide IFS for the near infrared (1--2~$\mu$m in the $J$ and $H$
 bands).  The SMIRFS IFU is available for use in collaboration with the
 SMIRFS-IFU team, please contact \htmladdnormallink{Jeremy
-Allington-Smith}{mailto:J.R.Allington-Smith@durham.ac.uk}\latexonly{
+Allington-Smith}{mailto:J.R.Allington-Smith@durham.ac.uk}\latex{
 ({\tt J.R.Allington-Smith@durham.ac.uk})}.
 
-\latexonly{More information on the technical specifications of the
+\latex{More information on the technical specifications of the
 SMIRFS instrument, and the science that can be done with it, can be
 found at {\tt http://star-www.dur.ac.uk/$\sim$jra/ukirt\_ifu.html}.}
 
@@ -689,7 +691,7 @@ produces a staggered column on slitlets (as shown in
 \begin{htmlonly}
 the figure)
 \end{htmlonly}
-\latexonly{Figure~\ref{sc16_uist_fig})} which is used as the input for the
+\latex{Figure~\ref{sc16_uist_fig})} which is used as the input for the
 spectrometer in place of the long slit.
 
 \myfig{sc16_uist.eps}{height=0.6\textheight}{sc16_uist.gif}{sc16_uist_fig}{The UIST staggered slitlets.} 
@@ -700,7 +702,7 @@ data-reduction part of the system,
 \htmladdnormallink{ORAC-DR}{http://www.oracdr.org},
 is provided by JAC and distributed by Starlink, and consists of a 
 fully automated perl-based \htmladdnormallink{pipelining
-software}{http://monet.astro.uiuc.edu/adass98/Proceedings/economouf/}\latexonly{
+software}{http://monet.astro.uiuc.edu/adass98/Proceedings/economouf/}\latex{
 (Economou\emph{et~al}. 1999)} sitting on top of the Starlink software
 collection.  A general introduction to the ORAC-DR system can be found
 in \xref{SUN/230}{sun230}{}.  The data-reduction recipes are 
@@ -757,10 +759,10 @@ There are two main file format for IFS final data products, and one
 further prospective format.  The \htmlref{first}{sc16_gmosfile} of
 these file formats is a MOS style multi-extension 
 \FITSref\ file, and is
-being put forward by the GEMINI group\latexonly{ (see
+being put forward by the GEMINI group\latex{ (see
 Section~\ref{sc16_gmosfile})}.  The other main format is an
 $xy\lambda$---\htmlref{data cube}{sc16_teifufile} which is used by the
-Durham group (\emph{i.e.}\ for SMIRFS and TEIFU data)\latexonly{ (see
+Durham group (\emph{i.e.}\ for SMIRFS and TEIFU data)\latex{ (see
 Section~\ref{sc16_teifufile})}.
 
 Of these two formats the more natural for data analysis is the TEIFU
@@ -768,14 +770,14 @@ style data cube, it has therefore been adopted as the standard format
 by the major IFS groups in the UK, Durham (SMIRFS and TEIFU),
 Cambridge (CIRPASS) and the ATC (UIST).
 \htmlref{Conversion}{sc16_mef2cub} between the GMOS/CIRPASS MEF and UK
-standard data cube formats\latexonly{ (see
+standard data cube formats\latex{ (see
 Section~\ref{sc16_mef2cub})} will therefore need to be implemented
 before these instruments are brought into general use.  The EOS VIMOS
 instrument will provide its final data product in both MEF and
 data-cube formats.
 
 The final IFS format is still in draft, and is the new \IRAF\ 
-spectroscopic \htmlref{file format}{sc16_iraf}\latexonly{
+spectroscopic \htmlref{file format}{sc16_iraf}\latex{
 (see Section~\ref{sc16_iraf})}.  The specification is intended to
 provide a general description for two-dimensional spectroscopic image
 data, and should be able to represent long-slit, multi-object (MOS),
@@ -789,7 +791,7 @@ Currently the final data product of the \htmlref{GMOS}{sc16_gmos} and
 \htmlref{CIRPASS}{sc16_cirpass} data-reduction software is a
 multi-extension \FITSref\ (MEF) file.  However, this format may be
 replaced by the new \htmlref{\IRAF\ spectral
-format}{sc16_iraf}\latexonly{ (see Section~\ref{sc16_iraf})} which is
+format}{sc16_iraf}\latex{ (see Section~\ref{sc16_iraf})} which is
 currently in development by the IRAF group at NOAO.  The MEF is
 similar to the standard NIRI format now used with GEMINI, and has a
 binary FITS table with separate data, variance and quality planes.
@@ -880,7 +882,7 @@ The aperture identification, {\tt APERTURE}, specifies the IFU.  The
 aperture type {\tt APTYPE}, aperture diameter {\tt APERDIA}, and
 aperture position angle {\tt APERPA} are the same for each spectrum.
 This information can be used to \htmlref{construct a data
-cube}{sc16_mef2cub}\latexonly{ (see Section~\ref{sc16_mef2cub})} or
+cube}{sc16_mef2cub}\latex{ (see Section~\ref{sc16_mef2cub})} or
 spatial/dispersion displays in conjunction with the aperture centres.
 The position angle is for one of the hexagonal edges and would orient
 the hexagons (IFU lenslets) when reconstructing a spatial display or
@@ -938,7 +940,7 @@ $N$-dimensional data.
 A \htmlref{conversion program}{sc16_mef2cub} for GMOS and CIRPASS data
 to a more easily analysed data cube, which will involve re-binning the
 input spectra on to a rectangular array, is therefore
-desirable\latexonly{ (see Section~\ref{sc16_mef2cub})}.
+desirable\latex{ (see Section~\ref{sc16_mef2cub})}.
 
 \begin{table}[h]
 \begin{center}
@@ -1014,7 +1016,7 @@ A full
 \htmladdnormallink{dictionary}{http://iraf.noao.edu/projects/ccdmosaic/imagedef/fitsdic.html}
 defining FITS header keywords which can be generated by the
 data-acquisition system is provided on the web by the National Optical
-Astronomy Observatories (NOAO)\latexonly{ at {\tt
+Astronomy Observatories (NOAO)\latex{ at {\tt
 http://iraf.noao.edu/projects/ccdmosaic/imagedef/fitsdic.html}}.
  
 \subsection{\xlabel{sc16_mef2cub}MEF to data-cube format\label{sc16_mef2cub}}
@@ -1026,7 +1028,7 @@ standard $x$,$y$,$\lambda$ data cube in \FITSref\ format.
 
 \subsection{\xlabel{sc16_converting}Format conversion\label{sc16_converting}}
 
-The Starlink \CONVERTref\ package \latexonly{(see SUN/55)} can be used
+The Starlink \CONVERTref\ package \latex{(see SUN/55)} can be used
 to convert to and from the Starlink \xref{NDF}{sun33}{} format.
 On-the-fly conversion of supported file formats (such as FITS and
 \IRAF) can also be done by most Starlink applications if the \CONVERT\
@@ -1109,7 +1111,7 @@ in the example below.
 
 The \FITSref\ file is be converted it into a three-dimensional
 \xref{NDF}{sun33}{} which, as \htmlref{discussed
-earlier}{sc16_teifufile}\latexonly{ (see
+earlier}{sc16_teifufile}\latex{ (see
 Section~\ref{sc16_teifufile})} can be read by many existing
 applications in the software collection.
 
@@ -1159,7 +1161,7 @@ which is released along with
 \htmladdnormallink{\XANADU}{http://heasarc.gsfc.nasa.gov/docs/software/lheasoft/xanadu/},
 as part of the
 \htmladdnormallink{\HEASOFT}{http://heasarc.gsfc.nasa.gov/docs/software/lheasoft/}
-package from GSFC.\latexonly{ Further information about \HEASOFT, along
+package from GSFC.\latex{ Further information about \HEASOFT, along
 with detailed installation instructions, user manuals and a
 development guide, can be found at {\tt
 http://heasarc.gsfc.nasa.gov/docs/software/lheasoft/}.}
@@ -1181,7 +1183,7 @@ information held in the FITS extension when it is exported.
 The \KAPPAref\ package provides tools that allow you to read from, and
 write to, an NDF FITS extension.  Example code using some of these
 tools is shown later in this
-\htmlref{document}{sc16_fitsheader}\latexonly{ (see
+\htmlref{document}{sc16_fitsheader}\latex{ (see
 Section~\ref{sc16_fitsheader})}, and detailed documentation on these
 tasks is available in \xref{SUN/95}{sun95}{se_fitsairlock}.
 
@@ -1237,7 +1239,7 @@ of TYPE {\tt STRING}, called {\tt HEADER}.
 
 In addition FITS files can be read into IDL using the
 \CONVERTref\normalsize\ package's \xref{on-the-fly file conversion}{sun55}{sect_auto}
-ability\latexonly{ (see SUN/55 for more details)} and the \xref{{\tt
+ability\latex{ (see SUN/55 for more details)} and the \xref{{\tt
 READ\_NDF}}{sun55}{READ_NDF} IDL function.
  
 \subsection{\xlabel{sc16_ndfidl}NDF I/O with IDL\label{sc16_ndfidl}}
@@ -1256,7 +1258,7 @@ package,
 \end{verbatim}\normalsize
 
 and then read into IDL using the \htmladdnormallink{IDL Astronomy
-Library}{http://idlastro.gsfc.nasa.gov/homepage.html}\latexonly{ (as
+Library}{http://idlastro.gsfc.nasa.gov/homepage.html}\latex{ (as
 in Section~\ref{sc16_fitsidl})}.  However, there are several other
 approaches that can be taken.
 
@@ -1393,7 +1395,7 @@ data cube are the arithmetic operations of addition, subtraction,
 multiplication and division, both by scalars and other data cubes.  All
 these basic operations, and additional more complicated ones, can be
 carried out using tasks from the \KAPPAref\ package.
-\latexonly{Detailed documentation for all of these tasks can be found
+\latex{Detailed documentation for all of these tasks can be found
 in SUN/95.}
 
 \begin{itemize}
@@ -1435,10 +1437,10 @@ itself.  The twhree most important utilities available to do this within
 \KAPPA\ are the \xref{{\bf collapse}}{sun95}{COLLAPSE}, 
 \xref{{\bf chanmap}}{sun95}{CHANMAP}, and
 \xref{{\bf ndfcopy}}{sun95}{NDFCOPY} applications.  {\bf collapse} can
-be used to produce \htmlref{white-light and passband}{sc16_vis} images\latexonly{ (see 
+be used to produce \htmlref{white-light and passband}{sc16_vis} images\latex{ (see 
 Section~\ref{sc16_vis})} and velocity maps, {\bf chanmap} creates an
 image of multiple passbands, while {\bf ndfcopy} can extract a single spectrum or 
-\htmlref{arbitrary cube sections}{sc16_vis} \latexonly{ (again see Section~\ref{sc16_vis} for
+\htmlref{arbitrary cube sections}{sc16_vis} \latex{ (again see Section~\ref{sc16_vis} for
 details)}.
 
 \begin{itemize}
@@ -1511,7 +1513,7 @@ Removes pixels with large errors from an NDF
 \item{\xref{{\bf fillbad}}{sun95}{FILLBAD}}\\ 
 Removes regions of bad values from a two-dimensional NDF 
 \item{\xref{{\bf nomagic}}{sun95}{NOMAGIC}}\\ 
-Replaces all occurrences of \xref{magic value}{sun95}{se_masking}\latexonly{(see SUN/95 for details)} 
+Replaces all occurrences of \xref{magic value}{sun95}{se_masking}\latex{(see SUN/95 for details)} 
 pixels in an NDF array with a new value 
 \item{\xref{{\bf numb}}{sun95}{NUMB}}\\ 
 Counts the number of elements of an NDF with values or absolute values above or below a threshold 
@@ -1537,7 +1539,7 @@ Computes simple statistics for an NDF's pixels
 
 In some cases NDF information must be modified after a processing step
 (\emph{e.g.}\ the NDF title) or, in the case of a \htmlref{newly
-created}{sc16_newndf} NDF\latexonly{ (see Section~\ref{sc16_newndf})},
+created}{sc16_newndf} NDF\latex{ (see Section~\ref{sc16_newndf})},
 we must generate inital values.  \KAPPA\ provides various tools to
 manipulate NDF extensions.
 
@@ -1576,7 +1578,7 @@ Sets new values for the variance component of an NDF data structure
   
 \subsubsection{Visualisation}
 
-Combined with the \htmlref{graphics devices commands}{sc16_graphics}\latexonly{ (see
+Combined with the \htmlref{graphics devices commands}{sc16_graphics}\latex{ (see
 Section~\ref{sc16_graphics})} the following applications, especially
 {\bf clinplot}, {\bf display}, {\bf linplot} and {\bf contour} act as the backbone
 for image display, and some complex effects can be generated using
@@ -1603,7 +1605,7 @@ Creates a one-dimensional profile through an $N$-dimensional NDF
 
 Mosaicking multiple IFU data cubes together is something you may well
 wish to consider, unfortuantely there are \htmlref{problems}{sc16_mos}
-involved in doing so\latexonly{ (see Section~\ref{sc16_mos})}, however,
+involved in doing so\latex{ (see Section~\ref{sc16_mos})}, however,
 the following tasks from \KAPPA\ may be useful
 
 \begin{itemize}  
@@ -1674,7 +1676,7 @@ This allows {\bf fitgauss} to go about the fit without further user
 intervention, displaying its resulting fit in an X-display, logging
 the fit characteristics to a file (\verb+${fitfile}+) and saving the
 fit in the \xref{{\tt SPECDRE} extension}{sun86}{extension}
-\latexonly{(see SUN/86 for details)} of the NDF where it is available
+\latex{(see SUN/86 for details)} of the NDF where it is available
 for future reference and manipulation by other \SPECDRE\ applications.
 
 The \xref{{\bf velmap}}{sun237}{velmap} and \xref{{\bf
@@ -1785,7 +1787,7 @@ information.
 \begin{htmlonly}
 See \htmlref{an example}{sc16_wcs2axis}
 \end{htmlonly} 
-\latexonly{See Section~\ref{sc16_wcs2axis} for an example}
+\latex{See Section~\ref{sc16_wcs2axis} for an example}
 of how to overcome this interoperability issue.
 
 This general approach has an underlying effect on how
@@ -1808,7 +1810,7 @@ introducing a linear transformation of pixel co-ordinates in the
 process.  This can be used to add WCS information back into an NDF
 which has been stripped of WCS information by non-WCS aware
 applications.  Further details about \xref{WCS Frames}{sun95}{se_resdoms} 
-are available \latexonly{in SUN/95 {\em Using World Co-ordinate
+are available \latex{in SUN/95 {\em Using World Co-ordinate
 Systems}}.
 
 Why is this important?  Well, for instance, the
@@ -1818,7 +1820,7 @@ WCS frame, so if your data contains a SKY frame it can (and much of
 the time will) be automatically be plotted annotaed with the real sky
 co-ordinates, usyally right ascension and declination, of the
 observation.  It is also critical for mosaicking of data cubes, as
-explained \htmlref{later}{sc16_mos}\latexonly{ in Section~\ref{sc16_mos}}.
+explained \htmlref{later}{sc16_mos}\latex{ in Section~\ref{sc16_mos}}.
 
 Both \KAPPAref\ and \CCDPACKref\ contain commands to handle WCS NDF
 extensions.  In \KAPPA\ we have the following applications.
@@ -1961,7 +1963,7 @@ the cube toolbox appears (see
 \begin{htmlonly}
 the figure below)
 \end{htmlonly}
-\latexonly{Figure~\ref{sc16_gaia_cubetool_fig})} offering a choice of 
+\latex{Figure~\ref{sc16_gaia_cubetool_fig})} offering a choice of 
 axis to step along or collapse, and a selection of methods.  You can
 select a plane by giving its index or adjust the slider.  This could,
 for instance, let you define lower and upper limits of interest that
@@ -1976,7 +1978,7 @@ subsequent steps. If you need to access the Cube toolbox, go to the
 Once an image, be it a plane, passband image or map, you can use
 \GAIA's wide selection of 
 \xref{image-display facilities}{sun214}{image_display_capabilities}
-\latexonly{described in SUN/214} (also see \xref{SC/17}{sc17}{}) to enhance 
+\latex{described in SUN/214} (also see \xref{SC/17}{sc17}{}) to enhance 
 the elements under investigation.  There are also many \xref{analysis
 capabilities}{sun214}{image_analysis_capabilities} mostly through the
 ({\tt Image-Analysis} menu), including masking and flux measurement.
@@ -1994,7 +1996,7 @@ of the spectra with the reference spectrum.   See
 \begin{htmlonly}
 the figure below.
 \end{htmlonly}
-\latexonly{Figure~\ref{sc16_gaia_spectrum_fig}.}
+\latex{Figure~\ref{sc16_gaia_spectrum_fig}.}
 
 \myfig{sc16_gaia_spectrum.eps}{height=0.7\textheight}{sc16_gaia_spectrum.gif}{sc16_gaia_spectrum_fig}{\GAIA\ 
 displays a logarithmically scaled, collapsed cube, from which
@@ -2086,7 +2088,7 @@ the {\tt slicer3} procedure.  The Slicer3 GUI is shown in
 \begin{htmlonly}
 the figures.
 \end{htmlonly}
-\latexonly{Figures~\ref{sc16_slicer3_cut_fig} and
+\latex{Figures~\ref{sc16_slicer3_cut_fig} and
 \ref{sc16_slicer3_probe_fig}.}
 These display a projection of an IFU data cube and
 the user operating on it with the cut and probe tools.
@@ -2113,7 +2115,7 @@ Library}{http://idlastro.gsfc.nasa.gov/}.  This IDL procedure library,
 which is maintained by the GSFC, provides most of the necessary tools
 to handle your data inside IDL.  The library is quite extensive, and
 fairly well
-\htmladdnormallink{documented}{http://idlastro.gsfc.nasa.gov/contents.html}.\latexonly{
+\htmladdnormallink{documented}{http://idlastro.gsfc.nasa.gov/contents.html}.\latex{
 A list of the library routines, broken down by task, can be found at
 {\tt http://idlastro.gsfc.nasa.gov/contents.html}.}
 
@@ -2131,7 +2133,7 @@ so it is simple to add new routines, buttons or menus if additional
 functionality is needed.  The interface, deliberately, resembles
 SAOimage so that users can quickly start using it.  Detailed usage
 \htmladdnormallink{instructions}{http://www.physics.uci.edu/~barth/atv/instructions.html}
-are available online\latexonly{ at {\tt
+are available online\latex{ at {\tt
 http://www.physics.uci.edu/$\sim$barth/atv/instructions.html}}.  However,
 to display an a plane in a data cube you can pass an array directly to
 {\tt atv} as follows.
@@ -2209,7 +2211,7 @@ plotting it in a GWM window (see
 \begin{htmlonly}
 the figure).
 \end{htmlonly}
-\latexonly{Figure~\ref{sc16_squash_fig}).}
+\latex{Figure~\ref{sc16_squash_fig}).}
 Alternatively we can make use of scripts \xref{command-line
 options}{sun237}{squash} and specify the input and output files, along
 with the wavelength bounds, on the command line, as in this example.
@@ -2450,7 +2452,7 @@ to click on a pixel to extract the spectrum, see
 \begin{htmlonly}
 the figure.
 \end{htmlonly}
-\latexonly{Figure~\ref{sc16_ripper_fig}.}
+\latex{Figure~\ref{sc16_ripper_fig}.}
 
 Alternatively we can use \xref{{\bf ndfcopy}}{sun95}{NDFCOPY} directly as
 underneath.
@@ -2473,7 +2475,7 @@ of a white-light image of the cube.  See
 \begin{htmlonly}
 the figure.
 \end{htmlonly}
-\latexonly{Figure~\ref{sc16_compare_fig}.}
+\latex{Figure~\ref{sc16_compare_fig}.}
 
 \myfig{sc16_compare.eps}{height=0.5\textheight}{sc16_compare.gif}{sc16_compare_fig}{The
 {\bf compare} script.} 
@@ -2548,7 +2550,7 @@ script
 \begin{htmlonly}
 (see the figure),
 \end{htmlonly}
-\latexonly{(Figure~\ref{sc16_compare_fig}),} pressing the right-hand mouse
+\latex{(Figure~\ref{sc16_compare_fig}),} pressing the right-hand mouse
 button to terminate.  However, if we carried on and selected a further
 spectrum it would replace our original in the upper-right panel of the
 display window.  Selecting a further spectrum would replace the
@@ -2561,7 +2563,7 @@ the \xref{{\bf stacker}}{sun237}{stacker} (see
 \begin{htmlonly}
 the figure)
 \end{htmlonly}
-\latexonly{Figure~\ref{sc16_stacker_fig})} and \xref{{\bf
+\latex{Figure~\ref{sc16_stacker_fig})} and \xref{{\bf
 multistack}}{sun237}{multistack} shell scripts.
 
 \myfig{sc16_stacker.eps}{height=0.5\textheight}{sc16_stacker_anim.gif}{sc16_stacker_fig}{The
@@ -2682,7 +2684,7 @@ more practical graphics quicker.   See
 \begin{htmlonly}
 the figure.
 \end{htmlonly}
-\latexonly{Figure~\ref{sc16_gridspec_fig}.}  Below is an
+\latex{Figure~\ref{sc16_gridspec_fig}.}  Below is an
 example.  The {\tt -z} option requests that the white-light image be
 shown and a subset of the cube selected with the cursor. The {\tt -b}
 option sets the spatial blocking factor.  Different factors may be
@@ -2750,8 +2752,8 @@ downside is that the results will not be as accurate as line fitting,
 and care must be taken to select regions of the spectra populated by a
 single significant emission line.
 
-\paragraph{\label{sc16_velfit}\latexonly{\vspace*{0.8em}}By
-fitting\latexonly{\newline}\xlabel{sc16_velfit}}
+\paragraph{\label{sc16_velfit}\latex{\vspace*{0.8em}}By
+fitting\latex{\newline}\xlabel{sc16_velfit}}
 
 \hspace*{-2.1ex}\xref{{\bf velmap}}{sun237}{velmap} allows you to select the highest 
 signal-to-noise spectrum from a white-light image.  You can then 
@@ -2763,7 +2765,7 @@ velocity map of that line in the cube.  See
 \begin{htmlonly}
 the figure.
 \end{htmlonly}
-\latexonly{Figure~\ref{sc16_velmap_fig}.}  Below is an
+\latex{Figure~\ref{sc16_velmap_fig}.}  Below is an
 example.
 
 \myfig{sc16_velmap.eps}{height=0.5\textheight}{sc16_velmap_anim.gif}{sc16_velmap_fig}{The
@@ -2880,8 +2882,8 @@ routine.  However, you are not restricted to just refitting those points
 where the script was unable to obtain a fit, you may manually refit
 any data point in the velocity map.
 
-\paragraph{\label{sc16_velmoment}\latexonly{\vspace*{0.8em}}By
-moments\latexonly{\newline}\xlabel{sc16_velmoment}}
+\paragraph{\label{sc16_velmoment}\latex{\vspace*{0.8em}}By
+moments\latex{\newline}\xlabel{sc16_velmoment}}
 
 \hspace*{-2.1ex}The second script for generating a velocity map is \xref{{\bf
 velmoment}}{sun237}{velmoment}.  This first allows you to select a
@@ -2918,7 +2920,7 @@ plot of [O{\sc{III}}] map on the velocity map.  See
 \begin{htmlonly}
 the figure.
 \end{htmlonly}
-\latexonly{Figure~\ref{sc16_velmoment_fig}.}  Below is an
+\latex{Figure~\ref{sc16_velmoment_fig}.}  Below is an
 example.
 
 \myfig{sc16_velmoment.eps}{height=0.5\textheight}{sc16_velmoment.gif}{sc16_velmoment_fig}{The
@@ -2969,7 +2971,7 @@ consisting of the central core of the galaxy.}
 The \DATACUBE\ \xref{{\bf peakmap}}{sun237}{peakmap} script will
 generate a line-strength map.  The interface to this script is very
 similar to that of the \xref{{\bf velmap}}{sun237}{velmap} script
-discussed \latexonly{in Section~\ref{sc16_velmap}, }
+discussed \latex{in Section~\ref{sc16_velmap}, }
 \begin{htmlonly}
 \htmlref{earlier}{sc16_velmap}, 
 \end{htmlonly}
@@ -2977,7 +2979,7 @@ and it also generates final output in a similar form, see
 \begin{htmlonly}
 the figure.
 \end{htmlonly}
-\latexonly{Figure~\ref{sc16_peakmap_fig}.}  Much like the {\bf velmap} script the
+\latex{Figure~\ref{sc16_peakmap_fig}.}  Much like the {\bf velmap} script the
 {\bf peakmap} script allows you to manually refit any spectrum that
 you think may have been poorly fitted by the automatic process.
 
@@ -3045,7 +3047,7 @@ If the data cubes to be combined have valid WCS information,
 you should try the \xref{{\bf wcsmosaic}}{sun95}{WCSMOSAIC} task.
 If your spectral co-ordinates are only present in an AXIS component,
 see the section \xref{{\em Converting an AXIS structure to a
-SpecFrame}}{sun95}{se_wcsuse}{\latexonly{ in SUN/95}}.
+SpecFrame}}{sun95}{se_wcsuse}{\latex{ in SUN/95}}.
 
 Without valid WCS information we offer a possible approach to the
 problem.  If the two data cubes have identical spectral-axis,
@@ -3067,7 +3069,7 @@ we suggest you change the current frame to the PIXEL frame (with
 \begin{htmlonly}
 the figure).
 \end{htmlonly}
-\latexonly{Figure~\ref{sc16_mosaic_fig}).}  It should be noted that {\bf makemos} pays
+\latex{Figure~\ref{sc16_mosaic_fig}).}  It should be noted that {\bf makemos} pays
 {\em no attention} to the WCS information in the third axis (being
 designed for two-dimensional CCD frames) which is why having an
 identical wavelength calibration over the same number of pixels is
@@ -3240,13 +3242,13 @@ header to carry out your data analysis, having converted your data to
 \xref{NDF}{sun33}{} format to make use of the Starlink software the
 FITS header keywords are still accessible as part of an NDF extension.
 \KAPPAref\ has a number of tools specifically written to handle
-\xref{FITS keywords}{sun95}{se_fitsairlock}\latexonly{ (see SUN/95 for
+\xref{FITS keywords}{sun95}{se_fitsairlock}\latex{ (see SUN/95 for
 details)}.
 
 The recommended way to find the value of a FITS header keyword is by
 using the \xref{{\bf fitsval}}{sun95}{FITSVAL} application.  For instance, you
 could obtain the value of the FITS keyword \htmlref{{\tt
-CRVAL3}}{sc16_teifufile}\latexonly{ (see
+CRVAL3}}{sc16_teifufile}\latex{ (see
 Section~\ref{sc16_teifufile})} as follows.
 
 \small\begin{verbatim}
@@ -3407,8 +3409,8 @@ script to use it, see
 \begin{htmlonly}
 the figures.
 \end{htmlonly}
-\latexonly{Figures~\ref{sc16_xvelmap_fig} and \ref{sc16_xvelmap2_fig}.}
-\latexonly{More information about {\bf XDialog} can be found at
+\latex{Figures~\ref{sc16_xvelmap_fig} and \ref{sc16_xvelmap2_fig}.}
+\latex{More information about {\bf XDialog} can be found at
 {\tt http://xdialog.dyns.net/}.}
 
 %\section{\xlabel{sc16_physics}Physics Problems\label{sc16_physics}}

@@ -182,7 +182,7 @@ data arrays.}
 % centre an asterisk
 \newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
 \begin{htmlonly}
-\renewcommand{\lsk}{*} 
+\newcommand{\lsk}{*} 
 \end{htmlonly}
 
 % Environment for indenting and using a small font.
@@ -205,8 +205,8 @@ data arrays.}
 \newcommand{\qt}[1]{{\tt "}#1{\tt "}}
 \newcommand{\qs}[1]{{\tt '}#1{\tt '}}
 \begin{htmlonly}
-   \renewcommand{\qt}[1]{ {\tt{"}}#1{\tt{"}} }
-   \renewcommand{\qs}[1]{ {\tt{'}}#1{\tt{'}} }
+   \newcommand{\qt}[1]{ {\tt{"}}#1{\tt{"}} }
+   \newcommand{\qs}[1]{ {\tt{'}}#1{\tt{'}} }
 \end{htmlonly}
 
 % Routines with descriptions in the appendix.
@@ -227,12 +227,12 @@ data arrays.}
 % degrees symbol
 \newcommand{\dgs}{\hbox{$^\circ$}} 
 \begin{htmlonly}
-\renewcommand{\dgs}{ degrees} 
+\newcommand{\dgs}{ degrees} 
 \end{htmlonly}
 
 \newcommand{\dash}{--}
 \begin{htmlonly}
-\renewcommand{\dash}{-}
+\newcommand{\dash}{-}
 \end{htmlonly}
 \newcommand{\STARURL}{http://www.starlink.rl.ac.uk}
 \newcommand{\TCLURL}{http://www.scriptics.com/}
@@ -1205,13 +1205,13 @@ display the intersection of the tenth pixel plane with clump number 12, do:
 \end{verbatim}
 \normalsize
 
-\item Use the 3D facilities of \xref{GAIA}{sun214}{} \latexonly{(SUN/214)},
+\item Use the 3D facilities of \xref{GAIA}{sun214}{} \latex{(SUN/214)},
 accessed through the \verb+Open cube+ entry in the \verb+File+ menu.
 
 \item Use a complete 3D visualisation such as OpenDX (see 
 \htmladdnormallink{http://www.opendx.org/}{{\tt http://www.opendx.org/}}). The
 facilities of the Starlink DX extension package (known as ``SX'' 
-\xref{SX}{sun203}{} \latexonly{(SUN/203)}) may be useful as it provides
+\xref{SX}{sun203}{} \latex{(SUN/203)}) may be useful as it provides
 a means of converting NDF data files to the DX native format, and also
 provides some demonstration DX ``networks'' that can be used to do simple
 visualisations of a 3D data cube.

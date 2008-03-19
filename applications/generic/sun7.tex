@@ -43,9 +43,9 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -80,7 +80,6 @@
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -127,6 +126,7 @@
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 
 % -----------------------------------------------------------------------------
 % ? Document-specific \newcommand or \newenvironment commands.
@@ -147,7 +147,7 @@
 % conditional text
 \newcommand{\latexelsehtml}[2]{#1}
 \begin{htmlonly}
-  \renewcommand{\latexelsehtml}[2]{#2}
+  \newcommand{\latexelsehtml}[2]{#2}
 \end{htmlonly}
 
 %------------------------------------------------------------------------------
@@ -229,7 +229,7 @@
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
+  \newcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -427,14 +427,17 @@ presented here is just a standardized method tuned for working with Starlink
 libraries.
 
 First create your generic code routines. These actually go into an include
-file that is conventionally named with extension {\tt .cgen}. There are four
+file that is conventionally named with extension {\tt .cgen}. There are several
 macros defined for use when defining generic functions.
 
 \begin{itemize}
-\item {\tt CGEN\_FUNCTION}
-\item {\tt CGEN\_TYPE}
 \item {\tt CGEN\_BAD}
+\item {\tt CGEN\_FUNCTION}
+\item {\tt CGEN\_HDS\_TYPE}
+\item {\tt CGEN\_MAX}
+\item {\tt CGEN\_MIN}
 \item {\tt CGEN\_PRM\_TYPE}
+\item {\tt CGEN\_TYPE}
 \end{itemize}
 
 You need to use {\tt CGEN\_FUNCTION} as part of the normal function
@@ -522,6 +525,7 @@ the {\tt CGEN\_FUNCTION} macro has one of character codes {\tt D}, {\tt F},
 example {\tt kpg1\_bad}, we have the two functions {\tt kpg1\_badD} and
 {\tt kpg1\_badI}.
 
+See the comments in the include files for descriptions of the other macros.
 
 \section{Features of the GENERIC Utility}
 
@@ -950,330 +954,329 @@ If a translation is illegal, the result will be ``?''
 
 To produce the BYTE version of a program, the following substitutions
 are made.
+\begin{quote}
 %bytekernal
-\begin{tabbing}
-xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
-\>{\bf Kernel} tokens (translated by default): \\
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\bf{Kernel} tokens (translated by default):} \\
+\hline
+TOKEN  & SUBSTITUTE  & COMMENT \\
 \\
-\>TOKEN  \>SUBSTITUTE  \>\>COMMENT \\
-\\
-\>$<$T$>$       \>\>{\tt "B"}       \>{\em Subroutine name extension} \\
-\>$<$TYPE$>$    \>\>{\tt "BYTE"}    \>{\em Argument type definition} \\
-\>$<$LTYPE$>$   \>\>{\tt "BYTE"}    \>{\em Local type definition} \\
-\>$<$CONST$>$   \>\>{\tt " "}       \>{\em String to be appended to constant} \\
-\>$<$HTYPE$>$   \>\>{\tt "\_BYTE"}  \>{\em \HDSref\ type} \\
-\>$<$COMM$>$    \>\>{\tt "BYTE"}    \>{\em Comment describing type} \\
-\\
-\>{\bf ASTERIX} tokens (translated when {\tt -a} is specified): \\
+$<$T$>$       & {\tt "B"}       &{\em Subroutine name extension} \\
+$<$TYPE$>$    & {\tt "BYTE"}    &{\em Argument type definition} \\
+$<$LTYPE$>$   & {\tt "BYTE"}    &{\em Local type definition} \\
+$<$CONST$>$   & {\tt " "}       &{\em String to be appended to constant} \\
+$<$HTYPE$>$   & {\tt "\_BYTE"}  &{\em \HDSref\ type} \\
+$<$COMM$>$    & {\tt "BYTE"}    &{\em Comment describing type} \\
+\end{tabular}
+
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when {\tt -a} is specified):} \\
 %byteasterix
+\hline
+TOKEN  &SUBSTITUTE  & COMMENT \\
 \\
-\>TOKEN  \>SUBSTITUTE  \>\>COMMENT \\
-\\
-\>$<$CONV$>$    \>\>{\tt " "} \>{\em BYTE to REAL conversion} \\
-\>$<$EXT$>$     \>\>{\tt " "} \>{\em BYTE to REAL conversion extension} \\
-\>$<$BRAK$>$    \>\>{\tt " "} \>{\em Brackets for BYTE to REAL conversion} \\
-\>$<$ICONV$>$   \>\>{\tt " "} \>{\em BYTE to INTEGER conversion} \\
-\>$<$IEXT$>$    \>\>{\tt " "} \>{\em BYTE to INTEGER conversion extension} \\
-\>$<$IBRAK$>$   \>\>{\tt " "} \>{\em Brackets for BYTE to INTEGER conversion} \\
-\>$<$REV$>$     \>\>{\tt " "} \>{\em REAL to BYTE conversion} \\
-\>$<$RVBRAK$>$  \>\>{\tt " "} \>{\em Brackets for REAL to BYTE conversion} \\
-\>$<$IREV$>$    \>\>{\tt " "} \>{\em INTEGER to BYTE conversion} \\
-\>$<$IRVBRAK$>$ \>\>{\tt " "} \>{\em Brackets for INTEGER to BYTE conversion} \\
-\end{tabbing}
+$<$CONV$>$    & {\tt " "} &{\em BYTE to REAL conversion} \\
+$<$EXT$>$     & {\tt " "} &{\em BYTE to REAL conversion extension} \\
+$<$BRAK$>$    & {\tt " "} &{\em Brackets for BYTE to REAL conversion} \\
+$<$ICONV$>$   & {\tt " "} &{\em BYTE to INTEGER conversion} \\
+$<$IEXT$>$    & {\tt " "} &{\em BYTE to INTEGER conversion extension} \\
+$<$IBRAK$>$   & {\tt " "} &{\em Brackets for BYTE to INTEGER conversion} \\
+$<$REV$>$     & {\tt " "} &{\em REAL to BYTE conversion} \\
+$<$RVBRAK$>$  & {\tt " "} &{\em Brackets for REAL to BYTE conversion} \\
+$<$IREV$>$    & {\tt " "} &{\em INTEGER to BYTE conversion} \\
+$<$IRVBRAK$>$ & {\tt " "} &{\em Brackets for INTEGER to BYTE conversion} \\
+\end{tabular}
+\end{quote}
+
 To produce the UNSIGNED BYTE version of a program, the following
 substitutions are made.
+\begin{quote}
 %usbytekernal
-\begin{tabbing}
-xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
-\>{\bf Kernel} tokens (translated by default): \\
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\bf{Kernel} tokens (translated by default):} \\
+\hline
+TOKEN     &SUBSTITUTE     &COMMENT \\
 \\
-\>TOKEN     \>SUBSTITUTE     \>\>COMMENT \\
-\\
-\>$<$T$>$       \>\>{\tt "UB"}     \>{\em Subroutine name extension} \\
-\>$<$TYPE$>$    \>\>{\tt "BYTE"}   \>{\em Argument type definition} \\
-\>$<$LTYPE$>$   \>\>{\tt "BYTE"}   \>{\em Local type definition} \\
-\>$<$CONST$>$   \>\>{\tt " "}      \>{\em String to be appended to constant}\\
-\>$<$HTYPE$>$   \>\>{\tt "\_UBYTE"}  \>{\em \HDS\ type} \\
-\>$<$COMM$>$    \>\>{\tt "UNSIGNED BYTE"} \>{\em Comment describing type} \\
-\\
-\>{\bf ASTERIX} tokens (translated when {\tt -a} is specified):\\
+$<$T$>$       &{\tt "UB"}     &{\em Subroutine name extension} \\
+$<$TYPE$>$    &{\tt "BYTE"}   &{\em Argument type definition} \\
+$<$LTYPE$>$   &{\tt "BYTE"}   &{\em Local type definition} \\
+$<$CONST$>$   &{\tt " "}      &{\em String to be appended to constant}\\
+$<$HTYPE$>$   &{\tt "\_UBYTE"}  &{\em \HDS\ type} \\
+$<$COMM$>$    &{\tt "UNSIGNED BYTE"} &{\em Comment describing type} \\
+\end{tabular}
+
 %usbyteasterix
-xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when {\tt -a} is specified):} \\
+\hline
+TOKEN     &SUBSTITUTE     &COMMENT \\
 \\
-\>TOKEN     \>SUBSTITUTE     \>\>COMMENT \\
-\\
-\>$<$CONV$>$  \>\>{\tt "REAL("} \>{\em UNSIGNED BYTE to REAL conversion} \\
-\>$<$EXT$>$   \>\>{\tt "ZEXT("} \>{\em UNSIGNED BYTE to REAL conversion
-extension}\\
-\>$<$BRAK$>$  \>\>{\tt "))"} \>{\em Brackets for UNSIGNED BYTE to REAL
-conversion}\\
-\>$<$ICONV$>$ \>\>{\tt "INT("}  \>{\em UNSIGNED BYTE to INTEGER conversion} \\
-\>$<$IEXT$>$  \>\>{\tt "ZEXT("} \>{\em UNSIGNED BYTE to INTEGER conversion
-extension}\\
-\>$<$IBRAK$>$   \>\>{\tt "))"}    \>{\em Brackets for UNSIGNED BYTE to INTEGER
-conversion}\\
-\>$<$REV$>$     \>\>{\tt "NINT("} \>{\em REAL to UNSIGNED BYTE conversion} \\
-\>$<$RVBRAK$>$  \>\>{\tt ")"}     \>{\em Brackets for REAL to UNSIGNED BYTE
-conversion} \\
-\>$<$IREV$>$    \>\>{\tt " "} \>{\em INTEGER to UNSIGNED BYTE conversion} \\
-\>$<$IRVBRAK$>$ \>\>{\tt " "} \>{\em Brackets for INTEGER to UNSIGNED BYTE
-conversion}\\
-\\
-\end{tabbing}
+$<$CONV$>$  &{\tt "REAL("} &{\em UNSIGNED BYTE to REAL conversion} \\
+$<$EXT$>$   &{\tt "ZEXT("} &{\em UNSIGNED BYTE to REAL conversion extension}\\
+$<$BRAK$>$  &{\tt "))"} &{\em Brackets for UNSIGNED BYTE to REAL conversion}\\
+$<$ICONV$>$ &{\tt "INT("}  &{\em UNSIGNED BYTE to INTEGER conversion} \\
+$<$IEXT$>$  &{\tt "ZEXT("} &{\em UNSIGNED BYTE to INTEGER conversion extension}\\
+$<$IBRAK$>$   &{\tt "))"}    &{\em Brackets for UNSIGNED BYTE to INTEGER conversion}\\
+$<$REV$>$     &{\tt "NINT("} &{\em REAL to UNSIGNED BYTE conversion} \\
+$<$RVBRAK$>$  &{\tt ")"}     &{\em Brackets for REAL to UNSIGNED BYTE conversion} \\
+$<$IREV$>$    &{\tt " "} &{\em INTEGER to UNSIGNED BYTE conversion} \\
+$<$IRVBRAK$>$ &{\tt " "} &{\em Brackets for INTEGER to UNSIGNED BYTE conversion}\\
+\end{tabular}
+\end{quote}
+
 To produce the CHARACTER version of a program, the following
 substitutions are made.
+\begin{quote}
 %cHarkernal
-\begin{tabbing}
-xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
-\>{\bf Kernel} tokens (translated by default):\\
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\bf{Kernel} tokens (translated by default):} \\
+\hline
+TOKEN      &SUBSTITUTE     & COMMENT \\
 \\
-\>TOKEN      \>SUBSTITUTE     \>\> COMMENT \\
-\\
-\>$<$T$>$     \>{\tt "C"}             \>\>{\em Subroutine name extension} \\
-\>$<$TYPE$>$  \>{\tt "CHARACTER*(*)"} \>\>{\em Argument type definition} \\
-\>$<$LTYPE$>$ \>{\tt "CHARACTER*$<$CHASIZ$>$"} \>\>{\em Local type definition (CHASIZ = 200 by default)} \\
-\>$<$CONST$>$ \>{\tt "?"}            \>\>{\em String to be appended to
-constant} \\
-\>$<$HTYPE$>$ \>{\tt "\_CHAR"}       \>\>{\em \HDS\ type} \\
-\>$<$COMM$>$  \>{\tt "CHARACTER"}    \>\>{\em Comment describing type} \\
-\\
-\>{\bf ASTERIX} tokens (translated when {\tt -a} is specified): \\
+$<$T$>$     &{\tt "C"}             &{\em Subroutine name extension} \\
+$<$TYPE$>$  &{\tt "CHARACTER*(*)"} &{\em Argument type definition} \\
+$<$LTYPE$>$ &{\tt "CHARACTER*$<$CHASIZ$>$"} &{\em Local type definition (CHASIZ = 200 by default)} \\
+$<$CONST$>$ &{\tt "?"}            &{\em String to be appended to constant} \\
+$<$HTYPE$>$ &{\tt "\_CHAR"}       &{\em \HDS\ type} \\
+$<$COMM$>$  &{\tt "CHARACTER"}    &{\em Comment describing type} \\
+\end{tabular}
+
 %charasterix
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when {\tt -a} is specified):} \\
+\hline
+TOKEN      &SUBSTITUTE     & COMMENT \\
 \\
-\>TOKEN      \>SUBSTITUTE     \>\> COMMENT \\
-\\
-\>$<$CONV$>$  \>\>{\tt "?"} \>{\em CHARACTER to REAL conversion}\\
-\>$<$EXT$>$   \>\>{\tt "?"} \>{\em CHARACTER to REAL conversion extension}\\
-\>$<$BRAK$>$  \>\>{\tt "?"} \>{\em Brackets for CHARACTER to REAL conversion}\\
-\>$<$ICONV$>$ \>\>{\tt "?"} \>{\em CHARACTER to INTEGER conversion}\\
-\>$<$IEXT$>$  \>\>{\tt "?"} \>{\em CHARACTER to INTEGER conversion extension}\\
-\>$<$IBRAK$>$ \>\>{\tt "?"} \>{\em Brackets for CHARACTER to INTEGER
-conversion} \\
-\>$<$REV$>$   \>\>{\tt "?"} \>{\em REAL to CHARACTER conversion} \\
-\>$<$RVBRAK$>$ \>\>{\tt "?"} \>{\em Brackets for REAL to CHARACTER
-conversion}\\
-\>$<$IREV$>$  \>\>{\tt "?"} \>{\em INTEGER to CHARACTER conversion}\\
-\>$<$IRVBRAK$>$ \>\>{\tt "?"} \>{\em Brackets for INTEGER to CHARACTER
-conversion} \\
-\end{tabbing}
+$<$CONV$>$  &{\tt "?"} &{\em CHARACTER to REAL conversion}\\
+$<$EXT$>$   &{\tt "?"} &{\em CHARACTER to REAL conversion extension}\\
+$<$BRAK$>$  &{\tt "?"} &{\em Brackets for CHARACTER to REAL conversion}\\
+$<$ICONV$>$ &{\tt "?"} &{\em CHARACTER to INTEGER conversion}\\
+$<$IEXT$>$  &{\tt "?"} &{\em CHARACTER to INTEGER conversion extension}\\
+$<$IBRAK$>$ &{\tt "?"} &{\em Brackets for CHARACTER to INTEGER conversion} \\
+$<$REV$>$   &{\tt "?"} &{\em REAL to CHARACTER conversion} \\
+$<$RVBRAK$>$ &{\tt "?"} &{\em Brackets for REAL to CHARACTER conversion}\\
+$<$IREV$>$  &{\tt "?"} &{\em INTEGER to CHARACTER conversion}\\
+$<$IRVBRAK$>$ &{\tt "?"} &{\em Brackets for INTEGER to CHARACTER conversion} \\
+\end{tabular}
+\end{quote}
+
 To produce the DOUBLE PRECISION version of a program, the following
 substitutions are made.
+\begin{quote}
 %dpkernal
-\begin{tabbing}
-xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
-\>{\bf Kernel} tokens (translated by default):\\
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\bf{Kernel} tokens (translated by default):} \\
+\hline
+TOKEN     &SUBSTITUTE  &COMMENT \\
 \\
-\>TOKEN     \>SUBSTITUTE  \>\>COMMENT \\
-\\
-\>$<$T$>$     \>{\tt "D"}               \>\>{\em Subroutine name extension}\\
-\>$<$TYPE$>$  \>{\tt "DOUBLE PRECISION"}\>\>{\em Argument type definition}\\
-\>$<$LTYPE$>$ \>{\tt "DOUBLE PRECISION"}\>\>{\em Local type definition}\\
-\>$<$CONST$>$ \>{\tt ".0D0"}            \>\>{\em String to be appended to
-constant} \\
-\>$<$HTYPE$>$ \>{\tt "\_DOUBLE"}        \>\>{\em \HDS\ type}\\
-\>$<$COMM$>$  \>{\tt "DOUBLE PRECISION"}\>\>{\em Comment describing type}\\
-\end{tabbing}
-%\newpage
-\begin{tabbing}
-xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
-\>{\bf ASTERIX} tokens (translated when {\tt -a} is specified):\\
+$<$T$>$     &{\tt "D"}               &{\em Subroutine name extension}\\
+$<$TYPE$>$  &{\tt "DOUBLE PRECISION"}&{\em Argument type definition}\\
+$<$LTYPE$>$ &{\tt "DOUBLE PRECISION"}&{\em Local type definition}\\
+$<$CONST$>$ &{\tt ".0D0"}            &{\em String to be appended to constant} \\
+$<$HTYPE$>$ &{\tt "\_DOUBLE"}        &{\em \HDS\ type}\\
+$<$COMM$>$  &{\tt "DOUBLE PRECISION"}&{\em Comment describing type}\\
+\end{tabular}
+
 %dpasterix
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when {\tt -a} is specified):}\\
+\hline
+TOKEN  &SUBSTITUTE  &COMMENT \\
 \\
-\>TOKEN  \>SUBSTITUTE  \>\>COMMENT \\
-\\
-\>$<$CONV$>$ \>\>{\tt "SNGL("} \>{\em DOUBLE PRECISION to REAL conversion}\\
-\>$<$EXT$>$  \>\>{\tt " "}     \>{\em DOUBLE PRECISION to REAL conversion
-extension}\\
-\>$<$BRAK$>$ \>\>{\tt ")"}     \>{\em Brackets for DOUBLE PRECISION to
-REAL conversion}\\
-\>$<$ICONV$>$ \>\>{\tt "NINT("} \>{\em DOUBLE PRECISION to INTEGER conversion}\\
-\>$<$IEXT$>$  \>\>{\tt " "}   \>{\em DOUBLE PRECISION to INTEGER conversion
-extension}\\
-\>$<$IBRAK$>$ \>\>{\tt ")"} \>{\em Brackets for DOUBLE PRECISION to INTEGER
-conversion}\\
-\>$<$REV$>$   \>\>{\tt "DBLE("} \>{\em REAL to DOUBLE PRECISION conversion}\\
-\>$<$RVBRAK$>$ \>\>{\tt ")"}    \>{\em Brackets for REAL to DOUBLE PRECISION
-conversion}\\
-\>$<$IREV$>$  \>\>{\tt "DBLE("} \>{\em INTEGER to DOUBLE PRECISION
-conversion}\\
-\>$<$IRVBRAK$>$ \>\>{\tt ")"} \>{\em Brackets for INTEGER to DOUBLE
-PRECISION conversion}\\
-\end{tabbing}
+$<$CONV$>$ &{\tt "SNGL("} &{\em DOUBLE PRECISION to REAL conversion}\\
+$<$EXT$>$  &{\tt " "}     &{\em DOUBLE PRECISION to REAL conversion extension}\\
+$<$BRAK$>$ &{\tt ")"}     &{\em Brackets for DOUBLE PRECISION to REAL conversion}\\
+$<$ICONV$>$ &{\tt "NINT("} &{\em DOUBLE PRECISION to INTEGER conversion}\\
+$<$IEXT$>$  &{\tt " "}   &{\em DOUBLE PRECISION to INTEGER conversion extension}\\
+$<$IBRAK$>$ &{\tt ")"} &{\em Brackets for DOUBLE PRECISION to INTEGER conversion}\\
+$<$REV$>$   &{\tt "DBLE("} &{\em REAL to DOUBLE PRECISION conversion}\\
+$<$RVBRAK$>$ &{\tt ")"}    &{\em Brackets for REAL to DOUBLE PRECISION conversion}\\
+$<$IREV$>$  &{\tt "DBLE("} &{\em INTEGER to DOUBLE PRECISION conversion}\\
+$<$IRVBRAK$>$ &{\tt ")"} &{\em Brackets for INTEGER to DOUBLE PRECISION conversion}\\
+\end{tabular}
+\end{quote}
+
 To produce the INTEGER version of a program, the following substitutions
 are made.
+\begin{quote}
 %intkernal
-\begin{tabbing}
-xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
-\>{\bf Kernel} tokens (translated by default):\\
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\bf{Kernel} tokens (translated by default):}\\
+\hline
+TOKEN  &SUBSTITUTE   &COMMENT\\
 \\
-\>TOKEN  \>SUBSTITUTE   \>\>COMMENT\\
-\\
-\>$<$T$>$     \>\>{\tt "I"}         \>{\em Subroutine name extension}\\
-\>$<$TYPE$>$  \>\>{\tt "INTEGER"}   \>{\em Argument type definition}\\
-\>$<$LTYPE$>$ \>\>{\tt "INTEGER"}   \>{\em Local type definition}\\
-\>$<$CONST$>$ \>\>{\tt " "}         \>{\em String to be appended to constant}\\
-\>$<$HTYPE$>$ \>\>{\tt "\_INTEGER"} \>{\em \HDS\ type}\\
-\>$<$COMM$>$  \>\>{\tt "INTEGER"}   \>{\em Comment describing type}\\
-\\
-\>{\bf ASTERIX} tokens (translated when {\tt -a} is specified).\\
+$<$T$>$     &{\tt "I"}         &{\em Subroutine name extension}\\
+$<$TYPE$>$  &{\tt "INTEGER"}   &{\em Argument type definition}\\
+$<$LTYPE$>$ &{\tt "INTEGER"}   &{\em Local type definition}\\
+$<$CONST$>$ &{\tt " "}         &{\em String to be appended to constant}\\
+$<$HTYPE$>$ &{\tt "\_INTEGER"} &{\em \HDS\ type}\\
+$<$COMM$>$  &{\tt "INTEGER"}   &{\em Comment describing type}\\
+\end{tabular}
+
 %intasterix
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when {\tt -a} is specified).}\\
+\hline
+TOKEN  &SUBSTITUTE   &COMMENT\\
 \\
-\>TOKEN  \>SUBSTITUTE   \>\>COMMENT\\
-\\
-\>$<$CONV$>$     \>\>{\tt "REAL("} \>{\em INTEGER to REAL conversion}\\
-\>$<$EXT$>$      \>\>{\tt " "}   \>{\em INTEGER to REAL conversion extension}\\
-\>$<$BRAK$>$     \>\>{\tt ")"}     \>{\em Brackets for INTEGER to REAL
+$<$CONV$>$     &{\tt "REAL("} &{\em INTEGER to REAL conversion}\\
+$<$EXT$>$      &{\tt " "}   &{\em INTEGER to REAL conversion extension}\\
+$<$BRAK$>$     &{\tt ")"}     &{\em Brackets for INTEGER to REAL conversion}\\
+$<$ICONV$>$    &{\tt " "}     &{\em INTEGER to INTEGER conversion}\\
+$<$IEXT$>$     &{\tt " "}     &{\em INTEGER to INTEGER conversion extension}\\
+$<$IBRAK$>$    &{\tt " "}     &{\em Brackets for INTEGER to INTEGER conversion}\\
+$<$REV$>$      &{\tt "NINT("} &{\em REAL to INTEGER conversion}\\
+$<$RVBRAK$>$   &{\tt ")"}     &{\em Brackets for REAL to INTEGER conversion}\\
+$<$IREV$>$     &{\tt " "}     &{\em INTEGER to INTEGER conversion}\\
+$<$IRVBRAK$>$  &{\tt " "}     &{\em Brackets for INTEGER to INTEGER
 conversion}\\
-\>$<$ICONV$>$    \>\>{\tt " "}     \>{\em INTEGER to INTEGER conversion}\\
-\>$<$IEXT$>$     \>\>{\tt " "}     \>{\em INTEGER to INTEGER conversion
-extension}\\
-\>$<$IBRAK$>$    \>\>{\tt " "}     \>{\em Brackets for INTEGER to INTEGER
-conversion}\\
-\>$<$REV$>$      \>\>{\tt "NINT("} \>{\em REAL to INTEGER conversion}\\
-\>$<$RVBRAK$>$   \>\>{\tt ")"}     \>{\em Brackets for REAL to INTEGER
-conversion}\\
-\>$<$IREV$>$     \>\>{\tt " "}     \>{\em INTEGER to INTEGER conversion}\\
-\>$<$IRVBRAK$>$  \>\>{\tt " "}     \>{\em Brackets for INTEGER to INTEGER
-conversion}\\
-\end{tabbing}
+\end{tabular}
+\end{quote}
+
 To produce the LOGICAL version of a program, the following substitutions
 are made.
+\begin{quote}
 %logkernal
-\begin{tabbing}
-xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
-\>{\bf Kernel} tokens (translated by default):\\
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\bf{Kernel} tokens (translated by default):}\\
+\hline
+TOKEN      &SUBSTITUTE      &COMMENT \\
 \\
-\>TOKEN      \>SUBSTITUTE      \>\>COMMENT \\
-\\
-\>$<$T$>$        \>\>{\tt "L"}         \>{\em Subroutine name extension}\\
-\>$<$TYPE$>$     \>\>{\tt "LOGICAL"}   \>{\em Argument type definition}\\
-\>$<$LTYPE$>$    \>\>{\tt "LOGICAL"}   \>{\em Local type definition}\\
-\>$<$CONST$>$    \>\>{\tt " "}         \>{\em String to be appended to
-constant}\\
-\>$<$HTYPE$>$    \>\>{\tt "\_LOGICAL"} \>{\em \HDS\ type}\\
-\>$<$COMM$>$     \>\>{\tt "LOGICAL"}   \>{\em Comment describing type}\\
-\\
-\>{\bf ASTERIX} tokens (translated when {\tt -a} is specified).\\
+$<$T$>$        &{\tt "L"}         &{\em Subroutine name extension}\\
+$<$TYPE$>$     &{\tt "LOGICAL"}   &{\em Argument type definition}\\
+$<$LTYPE$>$    &{\tt "LOGICAL"}   &{\em Local type definition}\\
+$<$CONST$>$    &{\tt " "}         &{\em String to be appended to constant}\\
+$<$HTYPE$>$    &{\tt "\_LOGICAL"} &{\em \HDS\ type}\\
+$<$COMM$>$     &{\tt "LOGICAL"}   &{\em Comment describing type}\\
+\end{tabular}
+
 %logasterix
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when {\tt -a} is specified).}\\
+\hline
+TOKEN      &SUBSTITUTE      &COMMENT\\
 \\
-\>TOKEN      \>SUBSTITUTE      \>\>COMMENT\\
-\\
-\>$<$CONV$>$     \>\>{\tt "?"} \>{\em LOGICAL to REAL conversion}\\
-\>$<$EXT$>$      \>\>{\tt "?"} \>{\em LOGICAL to REAL conversion extension}\\
-\>$<$BRAK$>$     \>\>{\tt "?"} \>{\em Brackets for LOGICAL to REAL conversion}\\
-\>$<$ICONV$>$    \>\>{\tt "?"} \>{\em LOGICAL to INTEGER conversion}\\
-\>$<$IEXT$>$     \>\>{\tt "?"} \>{\em LOGICAL to INTEGER conversion extension}\\
-\>$<$IBRAK$>$    \>\>{\tt "?"} \>{\em Brackets for LOGICAL to INTEGER
-conversion}\\
-\>$<$REV$>$      \>\>{\tt "?"} \>{\em REAL to LOGICAL conversion}\\
-\>$<$RVBRAK$>$   \>\>{\tt "?"} \>{\em Brackets for REAL to LOGICAL conversion}\\
-\>$<$IREV$>$     \>\>{\tt "?"} \>{\em INTEGER to LOGICAL conversion}\\
-\>$<$IRVBRAK$>$  \>\>{\tt "?"} \>{\em Brackets for INTEGER to LOGICAL
-conversion}\\
-\end{tabbing}
+$<$CONV$>$     &{\tt "?"} &{\em LOGICAL to REAL conversion}\\
+$<$EXT$>$      &{\tt "?"} &{\em LOGICAL to REAL conversion extension}\\
+$<$BRAK$>$     &{\tt "?"} &{\em Brackets for LOGICAL to REAL conversion}\\
+$<$ICONV$>$    &{\tt "?"} &{\em LOGICAL to INTEGER conversion}\\
+$<$IEXT$>$     &{\tt "?"} &{\em LOGICAL to INTEGER conversion extension}\\
+$<$IBRAK$>$    &{\tt "?"} &{\em Brackets for LOGICAL to INTEGER conversion}\\
+$<$REV$>$      &{\tt "?"} &{\em REAL to LOGICAL conversion}\\
+$<$RVBRAK$>$   &{\tt "?"} &{\em Brackets for REAL to LOGICAL conversion}\\
+$<$IREV$>$     &{\tt "?"} &{\em INTEGER to LOGICAL conversion}\\
+$<$IRVBRAK$>$  &{\tt "?"} &{\em Brackets for INTEGER to LOGICAL conversion}\\
+\end{tabular}
+\end{quote}
+
 To produce the REAL version of a program, the following substitutions
 are made.
+\begin{quote}
 %realkernal
-\begin{tabbing}
-xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
-\>{\bf Kernel} tokens (translated by default):\\
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\bf{Kernel} tokens (translated by default):}\\
+\hline
+TOKEN      &SUBSTITUTE      &COMMENT\\
 \\
-\>TOKEN      \>SUBSTITUTE      \>\>COMMENT\\
-\\
-\>$<$T$>$     \>\>{\tt "R"}     \>{\em Subroutine name extension}\\
-\>$<$TYPE$>$  \>\>{\tt "REAL"}  \>{\em Argument type definition}\\
-\>$<$LTYPE$>$ \>\>{\tt "REAL"}  \>{\em Local type definition}\\
-\>$<$CONST$>$ \>\>{\tt ".0E0"}  \>{\em String to be appended to constant}\\
-\>$<$HTYPE$>$ \>\>{\tt "\_REAL"} \>{\em \HDS\ type}\\
-\>$<$COMM$>$  \>\>{\tt "REAL"}  \>{\em Comment describing type}\\
-\\
-\>{\bf ASTERIX} tokens (translated when {\tt -a} is specified).\\
+$<$T$>$     &{\tt "R"}     &{\em Subroutine name extension}\\
+$<$TYPE$>$  &{\tt "REAL"}  &{\em Argument type definition}\\
+$<$LTYPE$>$ &{\tt "REAL"}  &{\em Local type definition}\\
+$<$CONST$>$ &{\tt ".0E0"}  &{\em String to be appended to constant}\\
+$<$HTYPE$>$ &{\tt "\_REAL"} &{\em \HDS\ type}\\
+$<$COMM$>$  &{\tt "REAL"}  &{\em Comment describing type}\\
+\end{tabular}
+
+\begin{tabular}{lll}
 %realasterix
+\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when {\tt -a} is specified).}\\
+\hline
+TOKEN      &SUBSTITUTE      &COMMENT\\
 \\
-\>TOKEN      \>SUBSTITUTE      \>\>COMMENT\\
-\\
-\>$<$CONV$>$     \>\>{\tt " "}     \>{\em REAL to REAL conversion}\\
-\>$<$EXT$>$      \>\>{\tt " "}     \>{\em REAL to REAL conversion extension}\\
-\>$<$BRAK$>$     \>\>{\tt " "}  \>{\em Brackets for REAL to REAL conversion}\\
-\>$<$ICONV$>$    \>\>{\tt "NINT("} \>{\em REAL to INTEGER conversion}\\
-\>$<$IEXT$>$     \>\>{\tt " "}  \>{\em REAL to INTEGER conversion extension}\\
-\>$<$IBRAK$>$    \>\>{\tt ")"} \>{\em Brackets for REAL to INTEGER conversion}\\
-\>$<$REV$>$      \>\>{\tt " "}     \>{\em REAL to REAL conversion}\\
-\>$<$RVBRAK$>$   \>\>{\tt " "}   \>{\em Brackets for REAL to REAL conversion}\\
-\>$<$IREV$>$     \>\>{\tt "REAL("} \>{\em INTEGER to REAL conversion}\\
-\>$<$IRVBRAK$>$  \>\>{\tt ")"} \>{\em Brackets for INTEGER to REAL conversion}\\
-\end{tabbing}
+$<$CONV$>$     &{\tt " "}     &{\em REAL to REAL conversion}\\
+$<$EXT$>$      &{\tt " "}     &{\em REAL to REAL conversion extension}\\
+$<$BRAK$>$     &{\tt " "}  &{\em Brackets for REAL to REAL conversion}\\
+$<$ICONV$>$    &{\tt "NINT("} &{\em REAL to INTEGER conversion}\\
+$<$IEXT$>$     &{\tt " "}  &{\em REAL to INTEGER conversion extension}\\
+$<$IBRAK$>$    &{\tt ")"} &{\em Brackets for REAL to INTEGER conversion}\\
+$<$REV$>$      &{\tt " "}     &{\em REAL to REAL conversion}\\
+$<$RVBRAK$>$   &{\tt " "}   &{\em Brackets for REAL to REAL conversion}\\
+$<$IREV$>$     &{\tt "REAL("} &{\em INTEGER to REAL conversion}\\
+$<$IRVBRAK$>$  &{\tt ")"} &{\em Brackets for INTEGER to REAL conversion}\\
+\end{tabular}
+\end{quote}
+
 To produce the WORD version of a program, the following substitutions
 are made.
+\begin{quote}
 %wordkernal
-\begin{tabbing}
-xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
-\>{\bf Kernel} tokens (translated by default):\\
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\bf{Kernel} tokens (translated by default):}\\
+\hline
+TOKEN      &SUBSTITUTE     &COMMENT\\
 \\
-\>TOKEN      \>SUBSTITUTE     \>\>COMMENT\\
-\\
-\>$<$T$>$     \>\>{\tt "W"}         \>{\em Subroutine name extension}\\
-\>$<$TYPE$>$  \>\>{\tt "INTEGER*2"} \>{\em Argument type definition}\\
-\>$<$LTYPE$>$ \>\>{\tt "INTEGER*2"} \>{\em Local type definition}\\
-\>$<$CONST$>$ \>\>{\tt " "}         \>{\em String to be appended to constant}\\
-\>$<$HTYPE$>$ \>\>{\tt "\_WORD"}    \>{\em \HDS\ type}\\
-\>$<$COMM$>$  \>\>{\tt "WORD"}      \>{\em Comment describing type}\\
-\\
-\>{\bf ASTERIX} tokens (translated when {\tt -a} is specified).\\
+$<$T$>$     &{\tt "W"}         &{\em Subroutine name extension}\\
+$<$TYPE$>$  &{\tt "INTEGER*2"} &{\em Argument type definition}\\
+$<$LTYPE$>$ &{\tt "INTEGER*2"} &{\em Local type definition}\\
+$<$CONST$>$ &{\tt " "}         &{\em String to be appended to constant}\\
+$<$HTYPE$>$ &{\tt "\_WORD"}    &{\em \HDS\ type}\\
+$<$COMM$>$  &{\tt "WORD"}      &{\em Comment describing type}\\
+\end{tabular}
+
 %wordasterix
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when {\tt -a} is specified).}\\
+\hline
+TOKEN      &SUBSTITUTE      &COMMENT\\
 \\
-\>TOKEN      \>SUBSTITUTE      \>\>COMMENT\\
-\\
-\>$<$CONV$>$     \>\>{\tt "REAL("} \>{\em WORD to REAL conversion}\\
-\>$<$EXT$>$      \>\>{\tt " "}     \>{\em WORD to REAL conversion extension}\\
-\>$<$BRAK$>$     \>\>{\tt ")"}   \>{\em Brackets for WORD to REAL conversion}\\
-\>$<$ICONV$>$    \>\>{\tt " "}     \>{\em WORD to INTEGER conversion}\\
-\>$<$IEXT$>$     \>\>{\tt " "}   \>{\em WORD to INTEGER conversion extension}\\
-\>$<$IBRAK$>$    \>\>{\tt " "} \>{\em Brackets for WORD to INTEGER conversion}\\
-\>$<$REV$>$      \>\>{\tt "NINT("} \>{\em REAL to WORD conversion}\\
-\>$<$RVBRAK$>$   \>\>{\tt ")"}  \>{\em Brackets for REAL to WORD conversion}\\
-\>$<$IREV$>$     \>\>{\tt " "}     \>{\em INTEGER to WORD conversion}\\
-\>$<$IRVBRAK$>$  \>\>{\tt " "} \>{\em Brackets for INTEGER to WORD conversion}\\
-\end{tabbing}
+$<$CONV$>$     &{\tt "REAL("} &{\em WORD to REAL conversion}\\
+$<$EXT$>$      &{\tt " "}     &{\em WORD to REAL conversion extension}\\
+$<$BRAK$>$     &{\tt ")"}   &{\em Brackets for WORD to REAL conversion}\\
+$<$ICONV$>$    &{\tt " "}     &{\em WORD to INTEGER conversion}\\
+$<$IEXT$>$     &{\tt " "}   &{\em WORD to INTEGER conversion extension}\\
+$<$IBRAK$>$    &{\tt " "} &{\em Brackets for WORD to INTEGER conversion}\\
+$<$REV$>$      &{\tt "NINT("} &{\em REAL to WORD conversion}\\
+$<$RVBRAK$>$   &{\tt ")"}  &{\em Brackets for REAL to WORD conversion}\\
+$<$IREV$>$     &{\tt " "}     &{\em INTEGER to WORD conversion}\\
+$<$IRVBRAK$>$  &{\tt " "} &{\em Brackets for INTEGER to WORD conversion}\\
+\end{tabular}
+\end{quote}
+
 To produce the UNSIGNED WORD version of a program, the following
 substitutions are made.
+\begin{quote}
 %uswordkernal
-\begin{tabbing}
-xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
-\>{\bf Kernel} tokens (translated by default):\\
+\begin{tabular}{lll}
+\multicolumn{3}{l}{\bf{Kernel} tokens (translated by default):}\\
+\hline
+TOKEN      &SUBSTITUTE     &COMMENT\\
 \\
-\>TOKEN      \>SUBSTITUTE     \>\>COMMENT\\
-\\
-\>$<$T$>$     \>\>{\tt "UW"}            \>{\em Subroutine name extension}\\
-\>$<$TYPE$>$  \>\>{\tt "INTEGER*2"}     \>{\em Argument type definition}\\
-\>$<$LTYPE$>$ \>\>{\tt "INTEGER*2"}     \>{\em Local type definition}\\
-\>$<$CONST$>$ \>\>{\tt " "}         \>{\em String to be appended to constant}\\
-\>$<$HTYPE$>$ \>\>{\tt "\_UWORD"}       \>{\em \HDS\ type}\\
-\>$<$COMM$>$  \>\>{\tt "UNSIGNED WORD"} \>{\em Comment describing type}\\
-\\
-\>{\bf ASTERIX} tokens (translated when {\tt -a} is specified).\\
+$<$T$>$     &{\tt "UW"}            &{\em Subroutine name extension}\\
+$<$TYPE$>$  &{\tt "INTEGER*2"}     &{\em Argument type definition}\\
+$<$LTYPE$>$ &{\tt "INTEGER*2"}     &{\em Local type definition}\\
+$<$CONST$>$ &{\tt " "}         &{\em String to be appended to constant}\\
+$<$HTYPE$>$ &{\tt "\_UWORD"}       &{\em \HDS\ type}\\
+$<$COMM$>$  &{\tt "UNSIGNED WORD"} &{\em Comment describing type}\\
+\end{tabular}
+
+\begin{tabular}{lll}
 %uswordasterix
-xxxxxx\=xxxxxxxxxxxxx\=xxx\=xxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxx\kill
+\multicolumn{3}{l}{\bf{ASTERIX} tokens (translated when {\tt -a} is specified).}\\
+\hline
+TOKEN      &SUBSTITUTE      &COMMENT\\
 \\
-\>TOKEN      \>SUBSTITUTE      \>\>COMMENT\\
-\\
-\>$<$CONV$>$     \>\>{\tt "REAL("} \>{\em UNSIGNED WORD to REAL conversion}\\
-\>$<$EXT$>$      \>\>{\tt "ZEXT("} \>{\em UNSIGNED WORD to REAL conversion
-extension}\\
-\>$<$BRAK$>$     \>\>{\tt "))"}    \>{\em Brackets for UNSIGNED WORD to REAL
-conversion}\\
-\>$<$ICONV$>$    \>\>{\tt " "}     \>{\em UNSIGNED WORD to INTEGER conversion}\\
-\>$<$IEXT$>$     \>\>{\tt "ZEXT("} \>{\em UNSIGNED WORD to INTEGER conversion
-extension}\\
-\>$<$IBRAK$>$    \>\>{\tt ")"}     \>{\em Brackets for UNSIGNED WORD to INTEGER
- conversion}\\
-\>$<$REV$>$      \>\>{\tt "NINT("} \>{\em REAL to UNSIGNED WORD conversion}\\
-\>$<$RVBRAK$>$   \>\>{\tt ")"}     \>{\em Brackets for REAL to UNSIGNED WORD
-conversion}\\
-\>$<$IREV$>$     \>\>{\tt " "}     \>{\em INTEGER to UNSIGNED WORD conversion}\\
-\>$<$IRVBRAK$>$  \>\>{\tt " "}     \>{\em Brackets for INTEGER to UNSIGNED WORD
- conversion}\\
-\end{tabbing}
+$<$CONV$>$     &{\tt "REAL("} &{\em UNSIGNED WORD to REAL conversion}\\
+$<$EXT$>$      &{\tt "ZEXT("} &{\em UNSIGNED WORD to REAL conversion extension}\\
+$<$BRAK$>$     &{\tt "))"}    &{\em Brackets for UNSIGNED WORD to REAL conversion}\\
+$<$ICONV$>$    &{\tt " "}     &{\em UNSIGNED WORD to INTEGER conversion}\\
+$<$IEXT$>$     &{\tt "ZEXT("} &{\em UNSIGNED WORD to INTEGER conversion extension}\\
+$<$IBRAK$>$    &{\tt ")"}     &{\em Brackets for UNSIGNED WORD to INTEGER conversion}\\
+$<$REV$>$      &{\tt "NINT("} &{\em REAL to UNSIGNED WORD conversion}\\
+$<$RVBRAK$>$   &{\tt ")"}     &{\em Brackets for REAL to UNSIGNED WORD conversion}\\
+$<$IREV$>$     &{\tt " "}     &{\em INTEGER to UNSIGNED WORD conversion}\\
+$<$IRVBRAK$>$  &{\tt " "}     &{\em Brackets for INTEGER to UNSIGNED WORD conversion}\\
+\end{tabular}
+\end{quote}
+
 \newpage
 
 \section{\xlabel{ap_b}A Full List of Conversion Functions\label{ap_b}}
@@ -1285,37 +1288,38 @@ which ones are external.
 The following conversions are defined as in-line statement functions in
 `DCV\_FUN'. (They are either trivial, or are mentioned in the Fortran
 manual as legal conversions).
+\begin{quote}
+\begin{tabular}{lll}
+{\bf Function name} & \bf {Conversion} \\
+\hline
+DCV\_BTOB   &BYTE to BYTE \\
+DCV\_UBTOUB &UNSIGNED BYTE to UNSIGNED BYTE \\
+DCV\_UBTOD  &UNSIGNED BYTE to DOUBLE PRECISION \\
+DCV\_DTOD   &DOUBLE PRECISION to DOUBLE PRECISION \\
+DCV\_ITOD   &INTEGER to DOUBLE PRECISION \\
+DCV\_RTOD   &REAL to DOUBLE PRECISION \\
+DCV\_WTOD   &WORD to DOUBLE PRECISION \\
+DCV\_UWTOD  &UNSIGNED WORD to DOUBLE PRECISION \\
+DCV\_UBTOI  &UNSIGNED BYTE to INTEGER \\
+DCV\_DTOI   &DOUBLE PRECISION to INTEGER \\
+DCV\_ITOI   &INTEGER to INTEGER \\
+DCV\_RTOI   &REAL to INTEGER \\
+DCV\_UWTOI  &UNSIGNED WORD to INTEGER \\
+DCV\_UBTOR  &UNSIGNED BYTE to REAL \\
+DCV\_DTOR   &DOUBLE PRECISION to REAL \\
+DCV\_ITOR   &INTEGER to REAL \\
+DCV\_RTOR   &REAL to REAL \\
+DCV\_WTOR   &WORD to REAL \\
+DCV\_UWTOR  &UNSIGNED WORD to REAL \\
+DCV\_UBTOW  &UNSIGNED BYTE to WORD \\
+DCV\_DTOW   &DOUBLE PRECISION to WORD       &*** \\
+DCV\_RTOW   &REAL to WORD                   &*** \\
+DCV\_WTOW   &WORD to WORD \\
+DCV\_UBTOUW &UNSIGNED BYTE to UNSIGNED WORD \\
+DCV\_UWTOUW &UNSIGNED WORD to UNSIGNED WORD \\
+\end{tabular}
+\end{quote}
 
-\begin{tabbing}
-xxxx\=xxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\=xxx\kill
-\>{\bf Function name}   \>{\bf Conversion}\\
-\\
-\>DCV\_BTOB   \>BYTE to BYTE \\
-\>DCV\_UBTOUB \>UNSIGNED BYTE to UNSIGNED BYTE \\
-\>DCV\_UBTOD  \>UNSIGNED BYTE to DOUBLE PRECISION \\
-\>DCV\_DTOD   \>DOUBLE PRECISION to DOUBLE PRECISION \\
-\>DCV\_ITOD   \>INTEGER to DOUBLE PRECISION \\
-\>DCV\_RTOD   \>REAL to DOUBLE PRECISION \\
-\>DCV\_WTOD   \>WORD to DOUBLE PRECISION \\
-\>DCV\_UWTOD  \>UNSIGNED WORD to DOUBLE PRECISION \\
-\>DCV\_UBTOI  \>UNSIGNED BYTE to INTEGER \\
-\>DCV\_DTOI   \>DOUBLE PRECISION to INTEGER \\
-\>DCV\_ITOI   \>INTEGER to INTEGER \\
-\>DCV\_RTOI   \>REAL to INTEGER \\
-\>DCV\_UWTOI  \>UNSIGNED WORD to INTEGER \\
-\>DCV\_UBTOR  \>UNSIGNED BYTE to REAL \\
-\>DCV\_DTOR   \>DOUBLE PRECISION to REAL \\
-\>DCV\_ITOR   \>INTEGER to REAL \\
-\>DCV\_RTOR   \>REAL to REAL \\
-\>DCV\_WTOR   \>WORD to REAL \\
-\>DCV\_UWTOR  \>UNSIGNED WORD to REAL \\
-\>DCV\_UBTOW  \>UNSIGNED BYTE to WORD \\
-\>DCV\_DTOW   \>DOUBLE PRECISION to WORD       \>*** \\
-\>DCV\_RTOW   \>REAL to WORD                   \>*** \\
-\>DCV\_WTOW   \>WORD to WORD \\
-\>DCV\_UBTOUW \>UNSIGNED BYTE to UNSIGNED WORD \\
-\>DCV\_UWTOUW \>UNSIGNED WORD to UNSIGNED WORD \\
-\end{tabbing}
 Overflow errors are possible from the conversions marked ``***''
 
 \newpage
@@ -1325,44 +1329,49 @@ The following conversions are also defined as in-line statement functions in
 used with caution. Trial and error has shown that the Fortran compliers on all
 Starlink supported systems will make the conversions successfully :-
 
-\begin{tabbing}
-xxxx\=xxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\=xxx\kill
-\>{\bf Function name}      \>{\bf Conversion}\\
-\\
-\>DCV\_UBTOB \>UNSIGNED BYTE to BYTE          \>*** \\
-\>DCV\_DTOB  \>DOUBLE PRECISION to BYTE       \>*** \\
-\>DCV\_ITOB  \>INTEGER to BYTE                \>*** \\
-\>DCV\_RTOB  \>REAL to BYTE                   \>*** \\
-\>DCV\_WTOB  \>WORD to BYTE                   \>*** \\
-\>DCV\_UWTOB \>UNSIGNED WORD to BYTE          \>*** \\
-\>DCV\_BTOD  \>BYTE to DOUBLE PRECISION \\
-\>DCV\_BTOI  \>BYTE to INTEGER \\
-\>DCV\_WTOI  \>WORD to INTEGER \\
-\>DCV\_BTOR  \>BYTE to REAL \\
-\>DCV\_BTOW  \>BYTE to WORD \\
-\>DCV\_ITOW  \>INTEGER to WORD                \>*** \\
-\end{tabbing}
+\begin{quote}
+\begin{tabular}{lll}
+{\bf Function name}      &{\bf Conversion} \\
+\hline
+DCV\_UBTOB &UNSIGNED BYTE to BYTE          &*** \\
+DCV\_DTOB  &DOUBLE PRECISION to BYTE       &*** \\
+DCV\_ITOB  &INTEGER to BYTE                &*** \\
+DCV\_RTOB  &REAL to BYTE                   &*** \\
+DCV\_WTOB  &WORD to BYTE                   &*** \\
+DCV\_UWTOB &UNSIGNED WORD to BYTE          &*** \\
+DCV\_BTOD  &BYTE to DOUBLE PRECISION \\
+DCV\_BTOI  &BYTE to INTEGER \\
+DCV\_WTOI  &WORD to INTEGER \\
+DCV\_BTOR  &BYTE to REAL \\
+DCV\_BTOW  &BYTE to WORD \\
+DCV\_ITOW  &INTEGER to WORD                &*** \\
+\end{tabular}
+\end{quote}
+
 Overflow errors are possible from the conversions marked ``***''
 
 The following conversions are defined as external
 functions in the DCV object library :-
-\begin{tabbing}
-xxxx\=xxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\=xxx\kill
-\>{\bf Function name}     \>{\bf Conversion}\\
-\\
-\>DCV\_BTOUB  \>BYTE to UNSIGNED BYTE \\
-\>DCV\_DTOUB  \>DOUBLE PRECISION to UNSIGNED BYTE \\
-\>DCV\_ITOUB  \>INTEGER to UNSIGNED BYTE \\
-\>DCV\_RTOUB  \>REAL to UNSIGNED BYTE \\
-\>DCV\_WTOUB  \>WORD to UNSIGNED BYTE \\
-\>DCV\_UWTOUB \>UNSIGNED WORD to UNSIGNED BYTE \\
-\>DCV\_BTOUW  \>BYTE to UNSIGNED WORD \\
-\>DCV\_UBTOUW \>UNSIGNED BYTE to UNSIGNED WORD \\
-\>DCV\_DTOUW  \>DOUBLE PRECISION to UNSIGNED WORD \\
-\>DCV\_ITOUW  \>INTEGER to UNSIGNED WORD \\
-\>DCV\_RTOUW  \>REAL to UNSIGNED WORD \\
-\>DCV\_WTOUW  \>WORD to UNSIGNED WORD \\
-\end{tabbing}
+
+\begin{quote}
+\begin{tabular}{ll}
+{\bf Function name}     &{\bf Conversion}\\
+\hline
+DCV\_BTOUB  &BYTE to UNSIGNED BYTE \\
+DCV\_DTOUB  &DOUBLE PRECISION to UNSIGNED BYTE \\
+DCV\_ITOUB  &INTEGER to UNSIGNED BYTE \\
+DCV\_RTOUB  &REAL to UNSIGNED BYTE \\
+DCV\_WTOUB  &WORD to UNSIGNED BYTE \\
+DCV\_UWTOUB &UNSIGNED WORD to UNSIGNED BYTE \\
+DCV\_BTOUW  &BYTE to UNSIGNED WORD \\
+DCV\_UBTOUW &UNSIGNED BYTE to UNSIGNED WORD \\
+DCV\_DTOUW  &DOUBLE PRECISION to UNSIGNED WORD \\
+DCV\_ITOUW  &INTEGER to UNSIGNED WORD \\
+DCV\_RTOUW  &REAL to UNSIGNED WORD \\
+DCV\_WTOUW  &WORD to UNSIGNED WORD \\
+\end{tabular}
+\end{quote}
+
 Overflow errors are possible in ALL these conversions, so range checking is
 essential.
 
