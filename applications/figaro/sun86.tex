@@ -13,7 +13,7 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {86.21}
+\newcommand{\stardocnumber}    { 86.21}
 \newcommand{\stardocauthors}   {Keith~Shortridge, Horst~Meyerdierks,
                                 Malcolm~Currie, Martin~Clayton, Jon~Lockley, 
                                 Anne~Charles, Clive~Davenhall,
@@ -70,9 +70,9 @@ using the package.  It describes version \Figaroversion of Figaro.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -107,7 +107,6 @@ using the package.  It describes version \Figaroversion of Figaro.
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -154,6 +153,7 @@ using the package.  It describes version \Figaroversion of Figaro.
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 % index pointer: #1 is the label name, #2 is the section title
@@ -163,11 +163,11 @@ using the package.  It describes version \Figaroversion of Figaro.
 % }
 \newcommand{\idxint}[2]{\ref{#1}: \htmlref{#2}{#1}}
 \begin{htmlonly}
-\renewcommand{\idxint}[2]{\htmlref{#2}{#1}}
+\newcommand{\idxint}[2]{\htmlref{#2}{#1}}
 \end{htmlonly}
 \newcommand{\latorhtm}[2]{#1}
 \begin{htmlonly}
-\renewcommand{\latorhtm}[2]{#2}
+\newcommand{\latorhtm}[2]{#2}
 \end{htmlonly}
 
 \setcounter{secnumdepth}{4}
