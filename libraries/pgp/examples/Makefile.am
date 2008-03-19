@@ -38,3 +38,7 @@ pgdemo13_SOURCES = pgdemo13.f
 pgdemo13_LDADD = ../libpgp.la $(EXTRALIBS)
 pgdemo14_SOURCES = pgdemo14.f
 pgdemo14_LDADD = ../libpgp.la $(EXTRALIBS)
+
+dist_pkgdata_DATA = pgdemo1.f pgdemo2.f pgdemo3.f pgdemo4.f pgdemo5.f \
+                    pgdemo6.f pgdemo7.f pgdemo8.f pgdemo9.f pgdemo10.f \
+                    pgdemo11.f pgdemo12.f pgdemo13.f pgdemo14.f
