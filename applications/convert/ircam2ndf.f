@@ -338,7 +338,7 @@
       DO ISPOBS = 1, NUMSPE
 
 *  Calculate the observation-number limits for this set of observations.
-         CALL CON_CNLIM( OBS( ISPOBS ), FIRST, LAST, STATUS )
+         CALL KPG1_CNLIM( OBS( ISPOBS ), FIRST, LAST, STATUS )
 
 *  A wildcard in the first part of a range or a full wildcard indicates
 *  the observations start from beginning, i.e. observation one to the
