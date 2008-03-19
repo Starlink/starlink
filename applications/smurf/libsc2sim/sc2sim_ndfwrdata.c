@@ -206,11 +206,14 @@
 *        SEQSTART/END headers are written for first image
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-03-19 (AGG):
+*        Add calls to new routines to get ORAC-DR recipe and DRGROUP
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Council. Copyright (C) 2005-2008 University of British
+*     Columbia. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -276,8 +279,8 @@ const char filter[],     /* String representing filter (e.g. "850") (given) */
 const char dateobs[],    /* String representing UTC DATE-OBS (given) */
 const char obsid[],      /* unique obsid for this observation (given) */
 const double *posptr,    /* Pointing offsets from map centre (given) */
-size_t jigsamples,          /* Number of jiggle samples (given) */
-double jigptr[][2],/* Array of X, Y jiggle positions (given) */
+size_t jigsamples,       /* Number of jiggle samples (given) */
+double jigptr[][2],      /* Array of X, Y jiggle positions (given) */
 const int obsnum,        /* Observation number (given) */
 const int nsubscan,      /* Sub-scan number (given) */
 const int obsend,        /* Flag to indicate whether this is the last file */
@@ -304,6 +307,7 @@ int *status              /* Global status (given and returned) */
    double coadd[2*DREAM__MXBOL];   /* Coadded values in output image */
    char cosys[JCMT__SZTCS_TR_SYS+1]; /* Tracking coordinate system */
    int dims[2];                    /* Extent of output image */
+   char drgroup[40];               /* Name of ORAC-DR data reduction group */
    AstFitsChan *fitschan;          /* FITS headers */
    int fitsfind;
    char fitsrec[SC2STORE__MAXFITS*80+1]; /* Store for FITS records */
@@ -329,12 +333,13 @@ int *status              /* Global status (given and returned) */
    char obsidss[84];               /* OBSID + wavelength */
    double *poly;                   /* Pointer to polynomial fit solution */
    double *rdata;                  /* Pointer to flatfielded data */
+   char recipe[30];                /* Name of default ORAC-DR recipe */
    int seqend;                     /* RTS index of last frame in output image */
    int seqstart;                   /* RTS index of first frame in output image */
    JCMTState state;                /* Dummy JCMT state structure for creating WCS */
    int subnum;                     /* sub array index */
    AstFrameSet *wcs;               /* WCS frameset for output image */
-   char weightsname[SZFITSCARD] = "\0";           /* Name of weights file for DREAM 
+   char weightsname[SZFITSCARD] = "\0"; /* Name of weights file for DREAM 
 				      reconstruction */
    double x_max = -1.0e38;         /* X extent of pointing centre offsets */
    double x_min =  1.0e38;         /* X extent of pointing centre offsets */
@@ -425,7 +430,7 @@ int *status              /* Global status (given and returned) */
      /* Generic name... */
      strncpy( objectname, "SMURF", 5 );
    }
-   astSetFitsS ( fitschan, "OBJECT", "SMURF", "Object Name", 0 );
+   astSetFitsS ( fitschan, "OBJECT", objectname, "Object Name", 0 );
    astSetFitsL ( fitschan, "STANDARD", 0, "True if source is a calibrator", 0 );
    astSetFitsI ( fitschan, "OBSNUM", obsnum, "Observation Number", 0 );
    astSetFitsI ( fitschan, "NSUBSCAN", nsubscan, "Sub-scan Number", 0 );
@@ -474,8 +479,10 @@ int *status              /* Global status (given and returned) */
    astSetFitsCN ( fitschan, "COMMENT", "", "-- OMP & ORAC-DR parameters --", 0 );
    astSetFitsS ( fitschan, "PROJECT", "M08AC00", 
 		 "The proposal ID for the PROJECT", 0 );
-   astSetFitsS ( fitschan, "RECIPE", "", "The ORAC-DR recipe", 0 );
-   astSetFitsS ( fitschan, "DRGROUP", "", 
+   sc2sim_get_recipe( inx, &recipe, status );
+   astSetFitsS ( fitschan, "RECIPE", recipe, "The ORAC-DR recipe", 0 );
+   sc2sim_get_drgroup( inx, filter, objectname, &drgroup, status );
+   astSetFitsS ( fitschan, "DRGROUP", drgroup, 
 		 "Name of group to combine current observation with", 0 );
    astSetFitsS ( fitschan, "MSBID", "", "ID of min schedulable block", 0 );
    astSetFitsS ( fitschan, "MSBTID", "", "Translation ID of MSB", 0 );
