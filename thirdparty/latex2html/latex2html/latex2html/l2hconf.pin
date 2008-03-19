@@ -157,7 +157,7 @@ $DVIPSOPT = '@DVIPSOPT@';
 # complicated image include commands like \includegraphics, this option
 # will speed up image generation a *lot*.
 #
- $DVIPSOPT .= " -E";
+# $DVIPSOPT .= " -E";
 
 
 # (Note: this here is old, don't worry unless you really run into trouble.)
