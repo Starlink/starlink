@@ -451,7 +451,7 @@ void makeclumps( int *status ) {
    beamcorr[ 0 ] = beamfwhm;
    beamcorr[ 1 ] = beamfwhm;
    beamcorr[ 3 ] = velfwhm;
-   cupidStoreClumps( "OUTCAT", xloc, obj, ndim, deconv, beamcorr,
+   cupidStoreClumps( "OUTCAT", xloc, obj, ndim, deconv, 1, beamcorr,
                      "Output from CUPID:MAKECLUMPS", 0, NULL, 2, "",
                      NULL, NULL, &nclumps, status );
 
