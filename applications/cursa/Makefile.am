@@ -31,7 +31,8 @@ examples/iras_psc.grt examples/kappa.TXT examples/photoprog.TXT examples/simple.
 examples/photostandards.TXT examples/pisaresults.TXT examples/pisasizes.TXT \
 examples/polygon.TXT examples/ppm.grt examples/propmotn.TXT examples/rc3.grt \
 examples/sao.grt examples/scale.TXT examples/scosmosbw.grt examples/scosmoscol.grt \
-examples/simbad.grt examples/simple.grt examples/simple_radians.TXT
+examples/simbad.grt examples/simple.grt examples/simple_radians.TXT catremote-setup.csh \
+xcatviewLib/querycat.tcl xcatviewLib/listavaildb.tcl xcatviewLib/resolvename.tcl
 
 ##  Extra files for CURSA bin directory.
 cursasupportdir = $(bindir)
