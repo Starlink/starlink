@@ -41,6 +41,8 @@ C_ROUTINES =							  \
 	close.c crwin.c dswin.c exist.c getci.c open.c wsetc.c	  \
 	wseti.c wsetl.c xtrap.c gwm_globals.c
 
+EXAMPLE_FILES = background.c clear.c colour.c foreground.c input.c ovclear.c \
+ovcolour.c ovscroll.c scroll.c
 
 PUBLIC_INCLUDES = gwm.h
 ## PUBLIC_INCLUDES = gwm.h gwm_err.h GWM_ERR
@@ -57,7 +59,7 @@ gwm_test_SOURCES = gwm_test.f
 gwm_test_LDADD = libgwm.la $(X_LIBS) $(X_PRE_LIBS) -lX11 `ems_link` `cnf_link`
 
 dist_starnews_DATA = gwm.news
-dist_pkgdata_DATA = LICENCE
+dist_pkgdata_DATA = LICENCE $(EXAMPLE_FILES)
 
 EXTRA_DIST = gwm_err.msg
 
