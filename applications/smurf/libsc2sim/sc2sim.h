@@ -77,12 +77,14 @@
 *        Added mstp (current microstep) to sc2sim_instap_calc        
 *     2007-10-05 (AGG):
 *        Add obsend flag
+*     2008-03-19 (AGG):
+*        Add sc2sim_get_recipe and sc2sim_get_drgroup
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
-*     All Rights Reserved.
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
+*     Council. Copyright (C) 2005-2008 University of British
+*     Columbia. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -131,8 +133,6 @@
    GHz (35 for 850um) to calculate pW */
 
 //#define JY2PW (1.0e-5*AST__DPI*0.25*DIAMETER*DIAMETER)
-
-
 
 void sc2sim_addpnoise( double flux_0, double sig_0, double integ_time,
 		       double *flux, int *status );
@@ -470,7 +470,7 @@ double spacing,       /* grid spacing in arcsec (given) */
 double accel[2],      /* telescope accelerations in arcsec/sec (given) */
 double vmax[2],       /* telescope maximum velocities in arcsec/sec (given) */
 double samptime,      /* sample interval in sec (given) */ 
-int nmaps,           /* number of cycles of the pattern */
+int nmaps,            /* number of cycles of the pattern */
 int *pongcount,       /* number of positions in pattern (returned) */
 double **posptr,      /* list of positions (returned) */
 int *status           /* pointer to global status (given and returned) */
@@ -484,6 +484,12 @@ int nweights,      /* number of values to be returned (given) */
 double weights[],  /* array to hold returned values (returned) */
 int *status        /* global status (given and returned) */
 );
+
+void sc2sim_get_recipe ( const struct sc2sim_obs_struct *inx, char *recipe, 
+			 int *status );
+
+void sc2sim_get_drgroup ( const struct sc2sim_obs_struct *inx, const char *filter, 
+			  const char *object, char *drgroup, int *status );
 
 void sc2sim_heatrun ( struct sc2sim_obs_struct *inx, 
                       struct sc2sim_sim_struct *sinx, 
