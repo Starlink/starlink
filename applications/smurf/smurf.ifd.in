@@ -1517,9 +1517,8 @@ package @PACKAGE@ {
          parameter merge {
             type _LOGICAL
             prompt {Merge input NDFs?}
-            default FALSE
-            vpath DEFAULT
-            ppath CURRENT DEFAULT
+            vpath DYNAMIC
+            ppath CURRENT DYNAMIC
             helpkey *
           }
 

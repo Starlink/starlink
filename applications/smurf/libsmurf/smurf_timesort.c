@@ -21,9 +21,9 @@
 
 *  Description:
 *     This routine accepts as input one or more raw data cubes, spanned
-*     by (frequency, detector number, time) axes. For each one, it sorts 
-*     the time slices into monotonically increasing time value and writes 
-*     the resulting cube to a new output NDF. The ACSIS and JCMTSTATE 
+*     by (frequency, detector number, time) axes. It sorts the time slices 
+*     into monotonically increasing time value and writes the resulting 
+*     data to a one or more new output NDFs. The ACSIS and JCMTSTATE 
 *     extensions and the WCS component are modified along with the main
 *     Data array, so that the resulting cube remains internally consistent.
 *
@@ -34,16 +34,18 @@
 *     is FALSE, then the time slices in each input NDF are sorted
 *     independently of the other NDFs, and each output NDF contains 
 *     data only from the corresponding input NDF. If MERGE is TRUE, then 
-*     the time slices in all input NDFs are sorted into a single list.
-*     This list is then divided up into chunks (in a manner selected by
-*     parameter SIZELIMIT), and the time slices are written out
-*     sequentially to a number of output NDFs. If any time slice is
-*     present in more than one input NDF, then the data values are for
-*     the two or more input time slices are merged into a single time 
-*     slice.
+*     the input NDFs are sorted into groups that contain NDFs from the same 
+*     observation and sub-system (that is, all NDFs in a group have the
+*     same value for the OBSIDSS FITS keyword). For each group, the time 
+*     slices in all NDFs in the group are sorted into a single list. This 
+*     list is then divided up into chunks (in a manner selected by parameter 
+*     SIZELIMIT), and the time slices are written out sequentially to a 
+*     number of output NDFs. If any time slice is present in more than one 
+*     input NDF, then the data values for the two or more input time slices 
+*     are merged into a single time slice.
 *
 *     MERGE = TRUE should be used to sort the time slices contained in a
-*     set of sub-scans from a single sub-system of an observation.
+*     set of sub-scans from a sub-system.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
@@ -67,27 +69,42 @@
 *          information held in NDF extensions. ["FILESIZE"]
 *     MERGE = _LOGICAL (Read)
 *          If FALSE, then each input NDF is sorted independently of the
-*          other input NDFs, and the sorted data is written to a separate 
-*          output NDF. If TRUE, then the time slices for all the input NDFs 
-*          are read into a single list, which is then sorted. The sorted
-*          data can be written out to a single large output file or can be
-*          split up into several smaller output files, as specified by
-*          the SIZELIMIT parameter. In this mode, all input NDFs must
-*          come from the same observation (as indicated by the OBSIDSS
-*          value in the FITS extension). An error is reported if this is
-*          not the case. [FALSE]
+*          other input NDFs, and the sorted data for each input NDF is 
+*          written to a separate output NDF. If TRUE, then the input NDFs 
+*          are divided up into groups relating to different observations. 
+*          Each such group is then further sub-divided up into groups
+*          relating to sub-systems within the observation. Each group
+*          then holds sub-scans from a single observation and sub-system.
+*          All the time slices from every NDF in each such group are read 
+*          into a single list, which is then sorted. The sorted data can 
+*          be written out to a single large output file (one for each
+*          observation sub-system), or can be split up into several 
+*          smaller output files, as specified by the SIZELIMIT parameter. 
+*          The dynamic default for this parameter is TRUE if two or more 
+*          of the input NDFs refer to the same observation and sub-system
+*          number, and FALSE otherwise. []
 *     NOUT = _INTEGER (Write)
-*          An output parameter in which is stored the number of output NDFs 
-*          created.
+*          An output parameter in which is stored the total number of output 
+*          NDFs created.
 *     OUT = NDF (Write)
 *          A group of output NDFs. If parameter MERGE is FALSE, then a
 *          separate output NDF is created for each input NDF and so the
 *          size of the supplied group should equal the number of input NDF.
 *          If parameter MERGE is TRUE, then the number of output NDFs is
-*          determined by the SIZELIMIT parameter. In this case, the
-*          supplied group should contain only a single value, and the
-*          name of each output NDF will be formed by appending "_1",
-*          "_2", etc, to the end of the supplied base name.
+*          determined by the SIZELIMIT parameter. In this case, the number
+*          of values in the supplied group should equal the number of
+*          sub-systems represented in the input data. If a GRP modification 
+*          element is used to specify the names, then the specified
+*          modifiation will be applied to a set of names containing the
+*          first input NDF for each sub-system. If all the input file
+*          names conform to the usual naming convention of ACSIS raw time 
+*          series files ("ayyyymmdd_nnnnn_nn_nnnn" with an optional arbitrary 
+*          trailing suffix that must begin with an underscore) then each 
+*          output NDF for a given sub-system will have an appropriately 
+*          incremented value for the trailing "_nnnn" field. If any of
+*          the input NDFs do not conform to the ACSIS file naming convention, 
+*          the strings "_1", "_2", etc will be appended to the end of the 
+*          supplied group of names to form the output NDF names.
 *     SIZELIMIT = _INTEGER (Read)
 *          Only accessed if parameter MERGE is set TRUE. It is a number that 
 *          specifies the maximum size of each output NDF when merging data
@@ -113,6 +130,11 @@
 *        Store provenance info in the output NDFs.
 *     14-MAR-2008 (DSB):
 *        Added sub-scan merging facility.
+*     19-MAR-2008 (DSB):
+*        Allow merging of sub-scans across sub-systems and observations. 
+*        Change scheme for naming output files so that they conform to
+*        the ACSIS file naming convention, if possible. Update FITS
+*        headers NSUBSCAN and OBSEND in the output NDFs.
 
 *  Copyright:
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
@@ -169,23 +191,26 @@
 void smurf_timesort( int *status ) {
 
 /* Local Variables */
-   AstFitsChan *fc;
+   AstFitsChan *fc = NULL;
    AstFrame *cfrm = NULL;     
    AstFrameSet *wcs = NULL;   
    AstKeyMap *km1;
    AstKeyMap *km2;
+   AstKeyMap *obs_map = NULL;
+   AstKeyMap *subscan_map = NULL;
+   AstKeyMap *subsys_map = NULL;
    AstLutMap *lut = NULL;     
    AstMapping *map = NULL;    
    AstMapping *omap = NULL;   
    AstMapping *tmap = NULL;   
    Grp *igrp1 = NULL;         
    Grp *igrp2 = NULL;         
+   Grp *igrp3 = NULL;         
    HDSLoc *loc1 = NULL;       
    HDSLoc *loc1c = NULL;      
    HDSLoc *loc2 = NULL;       
    HDSLoc *loc2c = NULL;      
-   char *obsidss = NULL;
-   char *obsidss0 = NULL;
+   char *match = NULL;
    char *pname = NULL;
    char *qts_in;
    char *qts_out;
@@ -196,6 +221,7 @@ void smurf_timesort( int *status ) {
    char type[ DAT__SZTYP + 1 ];
    const char *comps = NULL;
    const char *dom;
+   const char *key;
    const char *timeorg;
    const char *timescl;
    const char *timesys;
@@ -215,6 +241,7 @@ void smurf_timesort( int *status ) {
    int *ndfid = NULL;
    int *rts = NULL;
    int axes[ 2 ];             
+   int conform;              
    int dims[ 3 ];             
    int el;                    
    int hasqual;
@@ -227,20 +254,29 @@ void smurf_timesort( int *status ) {
    int indf2;                 
    int indf2s;
    int init;
+   int iobs;
    int iout;
+   int ioutname;
+   int isubscan;
+   int isubsys;
    int j;
    int k;
    int lbnd[ 3 ];
+   int maxsyspop;
    int merge;                 
    int nchan;
    int ncomp;                 
    int ndet;
    int ndim;                  
    int nnout[ NDF__MXDIM ];     
+   int nobs;
    int nout;
    int nrem;
+   int nsubscan;
+   int nsubsys;
    int nts_in;            
    int nts_out;
+   int nullsizelimit;
    int outsize;               
    int place;
    int rts_num0;
@@ -252,6 +288,8 @@ void smurf_timesort( int *status ) {
    int sorted;                 
    int subnd[ 3 ];
    int there;                 
+   int totout;
+   int tslimit;
    int ubnd[ 3 ];
    size_t len;                
    size_t ntai;               
@@ -274,6 +312,21 @@ void smurf_timesort( int *status ) {
 
 /* Get a group of input files */ 
    kpg1Rgndf( "IN", 0, 1, "  Give more NDFs...", &igrp1, &size, status );
+
+/* Group the input NDFs according to OBSID, SUBSYSNR and NSUBSCAN values. 
+   The groups are held in nested AST KeyMaps. Also returns the maximum number 
+   of NDFs relating to any one sub-system, and a flag indicating if all input
+   NDF names conformed to the naming convention for ACSIS raw time series
+   files.  */
+   obs_map = smf_groupscans( igrp1, size, &maxsyspop, &conform, &igrp3, 
+                             status );
+
+/* Initialise the number of output NDFs created. */
+   totout = 0;
+
+/* If two or more input NDFs refer to the same observation and sub-system, 
+   use a default of TRUE for parameter MERGE. */
+   parDef0l( "MERGE", ( maxsyspop > 1 ), status );
 
 /* See if we are sorting each input file individually, or sorting the
    merged input data. */
@@ -418,6 +471,9 @@ void smurf_timesort( int *status ) {
 /* Annul the JCMTSTATE locator for the output NDF. */
             datAnnul( &loc2, status );
          }
+
+/* Increment the number of output NDFs created. */
+         totout++;
    
 /* Annul the JCMTSTATE locator for the input NDF. */
          datAnnul( &loc1, status );
@@ -563,533 +619,607 @@ void smurf_timesort( int *status ) {
 
 /* Now handle cases where the input files are being merged. */
 /* ======================================================== */
-   } else {
+   } else if( *status == SAI__OK ){
+
+/* Get the SIZELIMIT and LIMITTYPE parameters. */
+      parGet0i( "SIZELIMIT", &sizelimit, status );      
+      if( *status == SAI__OK ) {
+         nullsizelimit = 0;
+         if( sizelimit > 0 ) parChoic( "LIMITTYPE", "FILESIZE", 
+                                       "FILESIZE,SPECTRA,SLICES", 0, ltbuf, 
+                                       10, status );
+      } else if( *status == PAR__NULL ) {
+         errAnnul( status );
+         nullsizelimit = 1;
+      }
+      
+/* The "igrp3" group contains the names of NDFs containing the first 
+   subscan in each observation/sub-system. Get a group of output base NDF
+   names based on these files. These base names will be edited to create 
+   the name to be used for each output subscan NDF. */
+      grpGrpsz( igrp3, &outsize, status );
+      kpg1Wgndf( "OUT", igrp3, outsize, outsize, "", &igrp2, &outsize, 
+                 status );
+
+/* Initialise the index of the next output base file name to use. */
+      ioutname = 1;
+
+/* Loop round all observations represented in the input data. */
+      nobs = astMapSize( obs_map );
+      for( iobs = 0; iobs < nobs; iobs++ ) {
+         key = astMapKey( obs_map, iobs );
+         astMapGet0A( obs_map, key, &subsys_map );
+
+         if( nobs > 1 ) {
+            msgSeti( "I", iobs + 1 );
+            msgSeti( "N", nobs );
+            msgSetc( "K", key );
+            msgOutif( MSG__VERB, "", "Doing observation ^K (^I of ^N)...", 
+                      status );
+         }
+
+/* Loop round all sub-systems represented in the current observation. */
+         nsubsys = astMapSize( subsys_map );
+         for( isubsys = 0; isubsys < nsubsys; isubsys++ ) {
+            astBegin;
+            ndfBegin();
+
+            key = astMapKey( subsys_map, isubsys );
+            astMapGet0A( subsys_map, key, &subscan_map );
+
+            if( nsubsys > 1 && *status == SAI__OK ) {
+               msgSeti( "I", isubsys + 1 );
+               msgSeti( "N", nsubsys );
+               msgSetc( "K", key );
+               msgOutif( MSG__VERB, "", "Doing sub-system ^K (^I of ^N)...", 
+                         status );
+            }
+
+/* Find how many scub-scans the current observation/sub-system has. */
+            nsubscan = astMapSize( subscan_map );
 
 /* Lists are created below that concatenate all the time slices from
    every input NDF (these lists are stored in AST KeyMaps, keyed by the
    name of the corresponding JCMTSTATE or ACSIS extension item). Allocate 
    an array to store the index of the first time slice within these lists 
    for each input file. */
-      first = astMalloc( sizeof( int )*size );    
+            first = astMalloc( sizeof( int )*nsubscan );    
 
 /* Allocate an array to store the NDF identifier for each input file. */
-      ndfid = astMalloc( sizeof( int )*size );    
+            ndfid = astMalloc( sizeof( int )*nsubscan );    
 
 /* Create a KeyMap to hold JCMTSTATE data values. */
-      km1 = astKeyMap( "" );
+            km1 = astKeyMap( "" );
 
 /* Create a KeyMap to hold ACSIS data values. */
-      km2 = astKeyMap( "" );
+            km2 = astKeyMap( "" );
 
 /* Initialise a pointer to an array used to hold the index of the
    input NDF from which each time slice in the concatenated list of time
    slices was read. */
-      file_index = NULL;
+            file_index = NULL;
 
 /* Initialise the total number of time slices currently in the lists of
    concatenated time slices. */
-      nts_in = 0;
+            nts_in = 0;
 
-/* Assume for the moment that all input NDFs have Variance and QUality
+/* Assume for the moment that all input NDFs have Variance and Quality
    arrays. */
-      hasvar = 1;
-      hasqual = 1;
+            hasvar = 1;
+            hasqual = 1;
 
-/* Loop round each input NDF. */
-      for( ifile = 0; ifile < size && *status == SAI__OK; ifile++ ) {
-   
-/* Tell the user which NDF is being processed. */
-         msgSeti( "I", ifile + 1 );
-         msgSeti( "N", size );
-         msgOutif( MSG__VERB, "", "Reading header information from NDF ^I "
-                   "of ^N...", status );
-   
+/* Loop round each input NDF in the current sub-system. */
+            for( isubscan = 0; isubscan < nsubscan && *status == SAI__OK; isubscan++ ) {
+               key = astMapKey( subscan_map, isubscan );
+
+/* Get the one-based index of the input NDF within the input GRP group . */
+               astMapGet0I( subscan_map, key, &ifile );
+
 /* Begin an AST context for this input NDF. */
-         astBegin;
+               astBegin;
    
 /* Get an NDF identifier for the input NDF. */
-         ndgNdfas( igrp1, ifile + 1, "READ", &indf1, status );
-         ndfid[ ifile ] = indf1;
+               ndgNdfas( igrp1, ifile, "READ", &indf1, status );
+               ndfid[ isubscan ] = indf1;
+
+/* Tell the user which NDF is being processed. */
+               ndfMsg( "F", indf1 );
+               msgSeti( "I", isubscan + 1 );
+               msgSeti( "N", nsubscan );
+               msgOutif( MSG__VERB, "", "Reading headers from "
+                         "^F (^I/^N)...", status );
    
-/* Get a FitsChan holding the contents of the FITS extension. */
-         kpgGtfts( indf1, &fc, status );
-
-/* Get the value of the OBSIDSS keyword. Report an error if it was not
-   found. */
-         if( !astGetFitsS( fc, "OBSIDSS", &obsidss ) && 
-             *status == SAI__OK ) {
-            *status = SAI__ERROR;
-            ndfMsg( "NDF", indf1 );
-            errRep( "", "The NDF '^NDF' has no OBSIDSS value in its "
-                    "FITS extension.", status );
-         }
-
 /* Get the shape of the data array. */
-         ndfDim( indf1, 3, dims, &ndim, status ); 
-         if( ndim != 3 && *status == SAI__OK ) {
-            *status = SAI__ERROR;
-            ndfMsg( "NDF", indf1 );
-            errRep( "", "Input NDF ^NDF is not 3 dimensional.", status );
-         }        
-
-/* If this is the first input file, take a permanent copy of the OBSIDSS
-   string, and store the number of channels and the number of detectors
-   in the data. */
-         if( ifile == 0 ) {
-            obsidss0 = astStore( NULL, obsidss, strlen( obsidss ) + 1 );
-            nchan = dims[ 0 ];
-            ndet = dims[ 1 ];
-
-/* If this is not the first input file, check that the OBSIDSS string is
-   the same as that from the first input file. Report an error if not. 
-   Also check the number of channels and detectors are the same as in the
-   first input NDF. */
-         } else if( strcmp( obsidss, obsidss0 ) && *status == SAI__OK ) {
-            *status = SAI__ERROR;
-            msgSetc( "O1", obsidss0 );
-            msgSetc( "O2", obsidss );
-            ndfMsg( "NDF", indf1 );
-            errRep( "", "The OBSIDSS value in '^NDF' (^O2) differs from "
-                    "that in the first NDF (^O1).", status );
-
-         } else if( dims[ 0 ] != nchan && *status == SAI__OK ) {
-            *status = SAI__ERROR;
-            ndfMsg( "NDF", indf1 );
-            errRep( "", "The number of spectral channels in '^NDF' differs "
-                    "from the first NDF.", status );
-
-         } else if( dims[ 1 ] != ndet && *status == SAI__OK ) {
-            *status = SAI__ERROR;
-            ndfMsg( "NDF", indf1 );
-            errRep( "", "The number of receptors in '^NDF' differs "
-                    "from the first NDF.", status );
-         }
-
+               ndfDim( indf1, 3, dims, &ndim, status ); 
+               if( ndim != 3 && *status == SAI__OK ) {
+                  *status = SAI__ERROR;
+                  ndfMsg( "NDF", indf1 );
+                  errRep( "", "Input NDF ^NDF is not 3 dimensional.", status );
+               }        
+      
+/* If this is the first input file, store the number of channels and the 
+   number of detectors in the data. */
+               if( isubscan == 0 ) {
+                  nchan = dims[ 0 ];
+                  ndet = dims[ 1 ];
+      
+/* If this is not the first input file, check the number of channels and 
+   detectors are the same as in the first input NDF. */
+               } else if( dims[ 0 ] != nchan && *status == SAI__OK ) {
+                  *status = SAI__ERROR;
+                  ndfMsg( "NDF", indf1 );
+                  errRep( "", "The number of spectral channels in '^NDF' differs "
+                          "from the first NDF.", status );
+      
+               } else if( dims[ 1 ] != ndet && *status == SAI__OK ) {
+                  *status = SAI__ERROR;
+                  ndfMsg( "NDF", indf1 );
+                  errRep( "", "The number of receptors in '^NDF' differs "
+                          "from the first NDF.", status );
+               }
+      
 /* If all input NDFs read so far have a Variance array, see if this one
    does too. */
-         if( hasvar ) ndfState( indf1, "Variance", &hasvar, status );
-
+               if( hasvar ) ndfState( indf1, "Variance", &hasvar, status );
+      
 /* If all input NDFs read so far have a Quality array, see if this one
    does too. */
-         if( hasqual ) ndfState( indf1, "Quality", &hasqual, status );
-
+               if( hasqual ) ndfState( indf1, "Quality", &hasqual, status );
+      
 /* Read all the data in the JCMTSTATE extension of the current input NDF,
    and append it to entries in the appropriate KeyMap. Each entry in the
    KeyMap has a name equal to the name of a component within the JCMTSTATE
    extension. The first NDF defines the components that are expected in a
    JCMTSTATE extension. If any subsequent NDF does not have any of the
    components read form the first NDF, then an error is reported. */
-         smf_ext2km( indf1, "JCMTSTATE", km1, ifile ? 2 : 1, status );
-
+               smf_ext2km( indf1, "JCMTSTATE", km1, isubscan ? 2 : 1, 
+                           status );
+      
 /* Similarly, record all the data in the ACSIS extension. */
-         smf_ext2km( indf1, "ACSIS", km2, ifile ? 2 : 1, status );
-
+               smf_ext2km( indf1, "ACSIS", km2, isubscan ? 2 : 1, status );
+      
 /* Store the index within the "rts" array of the first RTS value for this 
    file. */
-         first[ ifile ] = nts_in;
-
+               first[ isubscan ] = nts_in;
+      
 /* Increment the total number of time slices recorded.· */
-         nts_in += dims[ 2 ];
-
+               nts_in += dims[ 2 ];
+      
 /* Extend the "file_index" array and store the file index in every new 
    element. */
-         file_index = astGrow( file_index, nts_in, sizeof( int ) );
-         if( *status == SAI__OK ) {
-            for( i = nts_in - dims[ 2 ]; i < nts_in; i++ ) {
-               file_index[ i ] = ifile;
-            }
-         }
-
+               file_index = astGrow( file_index, nts_in, sizeof( int ) );
+               if( *status == SAI__OK ) {
+                  for( i = nts_in - dims[ 2 ]; i < nts_in; i++ ) {
+                     file_index[ i ] = isubscan;
+                  }
+               }
+      
 /* Get the WCS FrameSet from the input NDF. */
-         ndfGtwcs( indf1, &wcs, status );
-
+               ndfGtwcs( indf1, &wcs, status );
+      
 /* Get pointers to the current Frame, and the GRID->WCS Mapping. */
-         cfrm = astGetFrame( wcs, AST__CURRENT );
-         map = astGetMapping( wcs, AST__BASE, AST__CURRENT );
-
+               cfrm = astGetFrame( wcs, AST__CURRENT );
+               map = astGetMapping( wcs, AST__BASE, AST__CURRENT );
+      
 /* Report an error if the 3rd WCS axis is not a time axis. */
-         dom = astGetC( cfrm, "Domain(3)" );
-         if( dom && strcmp( dom, "TIME" ) ) {
-            if( *status == SAI__OK ) {
-               *status = SAI__ERROR;
-               ndfMsg( "N", indf1 );
-               errRep( "", "WCS axis 3 is not a time axis in \"^N\".",
-                       status );
-            }
-         }
-
+               dom = astGetC( cfrm, "Domain(3)" );
+               if( dom && strcmp( dom, "TIME" ) ) {
+                  if( *status == SAI__OK ) {
+                     *status = SAI__ERROR;
+                     ndfMsg( "N", indf1 );
+                     errRep( "", "WCS axis 3 is not a time axis in \"^N\".",
+                             status );
+                  }
+               }
+      
 /* If this is the first input NDF, record the main details of the time
    axis. */
-         if( ifile == 0 ) {
-            timesys = astGetC( cfrm, "System(3)" );
-            timescl = astGetC( cfrm, "TimeScale(3)" );
-            timeorg = astGetC( cfrm, "TimeOrigin(3)" );
-            timeunt = astGetC( cfrm, "Unit(3)" );
-   
+               if( isubscan == 0 ) {
+                  timesys = astGetC( cfrm, "System(3)" );
+                  timescl = astGetC( cfrm, "TimeScale(3)" );
+                  timeorg = astGetC( cfrm, "TimeOrigin(3)" );
+                  timeunt = astGetC( cfrm, "Unit(3)" );
+         
 /* For later input NDFs, report an error if any of the details are
    different. */
-         } else if( *status == SAI__OK ) {
-            if( strcmp( timesys, astGetC( cfrm, "System(3)" ) ) ) {
-               ndfMsg( "N", indf1 );
-               msgSetc( "T", astGetC( cfrm, "System(3)" ) );
-               *status = SAI__ERROR;
-               errRep( "", "Unexpected time system (^T) in \"^N\".",
-                       status );
-
-            } else if( strcmp( timescl, astGetC( cfrm, "TimeScale(3)" ) ) ) {
-               ndfMsg( "N", indf1 );
-               msgSetc( "T", astGetC( cfrm, "TimeScale(3)" ) );
-               *status = SAI__ERROR;
-               errRep( "", "Unexpected time scale (^T) in \"^N\".",
-                       status );
-
-            } else if( strcmp( timeorg, astGetC( cfrm, "TimeOrigin(3)" ) ) ) {
-               ndfMsg( "N", indf1 );
-               msgSetc( "T", astGetC( cfrm, "TimeOrigin(3)" ) );
-               *status = SAI__ERROR;
-               errRep( "", "Unexpected time origin (^T) in \"^N\".",
-                       status );
-
-            } else if( strcmp( timeunt, astGetC( cfrm, "Unit(3)" ) ) ) {
-               ndfMsg( "N", indf1 );
-               msgSetc( "T", astGetC( cfrm, "Unit(3)" ) );
-               *status = SAI__ERROR;
-               errRep( "", "Unexpected time unit (^T) in \"^N\".",
-                       status );
-            }
-         }
-
+               } else if( *status == SAI__OK ) {
+                  if( strcmp( timesys, astGetC( cfrm, "System(3)" ) ) ) {
+                     ndfMsg( "N", indf1 );
+                     msgSetc( "T", astGetC( cfrm, "System(3)" ) );
+                     *status = SAI__ERROR;
+                     errRep( "", "Unexpected time system (^T) in \"^N\".",
+                             status );
+      
+                  } else if( strcmp( timescl, astGetC( cfrm, "TimeScale(3)" ) ) ) {
+                     ndfMsg( "N", indf1 );
+                     msgSetc( "T", astGetC( cfrm, "TimeScale(3)" ) );
+                     *status = SAI__ERROR;
+                     errRep( "", "Unexpected time scale (^T) in \"^N\".",
+                             status );
+      
+                  } else if( strcmp( timeorg, astGetC( cfrm, "TimeOrigin(3)" ) ) ) {
+                     ndfMsg( "N", indf1 );
+                     msgSetc( "T", astGetC( cfrm, "TimeOrigin(3)" ) );
+                     *status = SAI__ERROR;
+                     errRep( "", "Unexpected time origin (^T) in \"^N\".",
+                             status );
+      
+                  } else if( strcmp( timeunt, astGetC( cfrm, "Unit(3)" ) ) ) {
+                     ndfMsg( "N", indf1 );
+                     msgSetc( "T", astGetC( cfrm, "Unit(3)" ) );
+                     *status = SAI__ERROR;
+                     errRep( "", "Unexpected time unit (^T) in \"^N\".",
+                             status );
+                  }
+               }
+      
 /* Split off the Mapping for the third (time) axis. */
-         axes[ 0 ] = 3;
-         astMapSplit( map, 1, axes, nnout, &tmap );
-         if( tmap && astGetI( tmap, "Nout" ) == 1 ) {
-   
+               axes[ 0 ] = 3;
+               astMapSplit( map, 1, axes, nnout, &tmap );
+               if( tmap && astGetI( tmap, "Nout" ) == 1 ) {
+         
 /* Get an array holding the time axis grid indices in the current input NDF. */
-            grid = astGrow( grid, dims[ 2 ], sizeof( double ) );
-            for( i = 0; i < dims[ 2 ]; i++ ) grid[ i ] = i + 1;
-
+                  grid = astGrow( grid, dims[ 2 ], sizeof( double ) );
+                  for( i = 0; i < dims[ 2 ]; i++ ) grid[ i ] = i + 1;
+      
 /* Expand the table of time values so that there is room for the time
    values from the current input NDF. */
-            tai = astGrow( tai, nts_in, sizeof( double ) );
-
+                  tai = astGrow( tai, nts_in, sizeof( double ) );
+      
 /* Transform the grid indices to get the time axis values, appending them
    to the end of the "tai" array. */
-            astTran1( tmap, dims[ 2 ], grid, 1, tai + nts_in - dims[ 2 ] );
-
+                  astTran1( tmap, dims[ 2 ], grid, 1, tai + nts_in - dims[ 2 ] );
+      
 /* Report an error if the Mapping could not be split. */
-         } else if( *status == SAI__OK ) {
-            *status = SAI__ERROR;
-            ndfMsg( "N", indf1 );
-            errRep( "", "Unable to extract the time mapping from "
-                    "the WCS FrameSet in \"^N\".", status );
-         }            
-
+               } else if( *status == SAI__OK ) {
+                  *status = SAI__ERROR;
+                  ndfMsg( "N", indf1 );
+                  errRep( "", "Unable to extract the time mapping from "
+                          "the WCS FrameSet in \"^N\".", status );
+               }            
+      
 /* Free resources. */
-         astEnd;
-      }
-
+               astEnd;
+            }
+      
 /* Get an array holding the list of concatenated RTS_NUM values read from
    the input NDFs. */
-      rts = astMalloc( sizeof(int)*nts_in );
-      if( !astMapGet1I( km1, "RTS_NUM", nts_in, &nts_in, rts ) ) {
-         if( *status == SAI__OK ) {
-            *status = SAI__ERROR;
-            errRep( "", "The first input NDF (and maybe others) did not "
-                    "contain a JCMTSTATE.RTS_NUM array.", status );
-         }
-      }
-
-/* Get an array holding an index of the "rts" and "file_index" arrays that 
-   accesses the arrays in order of increasing rts_num value. */
-      index = smf_sorti( nts_in, rts, &sorted, status );
-
-/* Note the number of unique RTS_NUM values. */
-      if( index ) {
-         rts_num_last = -INT_MAX;
-         nts_out = 0;
-         for( j = 0; j < nts_in; j++ ) {
-            i = index[ j ];
-            rts_num = rts[ i ];
-            if( rts_num > rts_num_last ) nts_out++;
-            rts_num_last = rts_num;
-         }
-      }
-
-/* Get the required maximum output file size, and convert to a number of
-   time slices. */
-      nout = 0;
-      if( *status == SAI__OK ) {
-
-         parGet0i( "SIZELIMIT", &sizelimit, status );      
-         if( *status == SAI__OK ) {
-            if( sizelimit <= 0 ) {
-               nout = 1;
-               sizelimit = nts_out;
-
-            } else {
-               parChoic( "LIMITTYPE", "FILESIZE", "FILESIZE,SPECTRA,SLICES", 0, 
-                         ltbuf, 10, status );
-      
-               if( !strcmp( ltbuf, "SPECTRA" ) ) {
-                  sizelimit = sizelimit / ndet;
-         
-               } else if( !strcmp( ltbuf, "FILESIZE" ) ) {
-                  sizelimit = sizelimit / 
-                              ( ndet*nchan*( VAL__NBR*( hasvar ? 2 : 1 ) + 
-                                             ( hasqual ? VAL__NBUB : 0) ) );
+            rts = astMalloc( sizeof(int)*nts_in );
+            if( !astMapGet1I( km1, "RTS_NUM", nts_in, &nts_in, rts ) ) {
+               if( *status == SAI__OK ) {
+                  *status = SAI__ERROR;
+                  errRep( "", "The first input NDF (and maybe others) did not "
+                          "contain a JCMTSTATE.RTS_NUM array.", status );
                }
             }
+      
+/* Get an array holding an index of the "rts" and "file_index" arrays that 
+   accesses the arrays in order of increasing rts_num value. */
+            index = smf_sorti( nts_in, rts, &sorted, status );
+      
+/* Note the number of unique RTS_NUM values. */
+            if( index ) {
+               rts_num_last = -INT_MAX;
+               nts_out = 0;
+               for( j = 0; j < nts_in; j++ ) {
+                  i = index[ j ];
+                  rts_num = rts[ i ];
+                  if( rts_num > rts_num_last ) nts_out++;
+                  rts_num_last = rts_num;
+               }
+            }
+      
+/* Get the required maximum output file size, and convert to a number of
+   time slices. */
+            nout = 0;
+            if( nullsizelimit ) {
+               nout = nsubscan;
+               if( nout > 0 ) tslimit = nts_out/nout;
+               if( nout*tslimit < nts_out ) tslimit++;
+
+            } else {
+               if( sizelimit <= 0 ) {
+                  nout = 1;
+                  tslimit = nts_out;
    
+               } else {
+                  if( !strcmp( ltbuf, "SPECTRA" ) ) {
+                     if( ndet > 0 ) tslimit = sizelimit / ndet;
+            
+                  } else if( *status == SAI__OK && 
+                             !strcmp( ltbuf, "FILESIZE" ) ) {
+                     tslimit = sizelimit / 
+                                 ( ndet*nchan*( VAL__NBR*( hasvar ? 2 : 1 ) + 
+                                                ( hasqual ? VAL__NBUB : 0) ) );
+                  }
+               }
+         
 /*  Find the number of output NDFs needed. */
-            nout = nts_out/sizelimit;
-            if( nout*sizelimit < nts_out ) nout++;
-
-/* If a null value was supplied, the number of output NDFs is the same as
-   the number of input NDFs, and output time slices are divided evenly
-   between them. */
-         } else if( *status == PAR__NULL ) {
-            errAnnul( status );
-            nout = size;
-            sizelimit = nts_out/nout;
-            if( nout*sizelimit < nts_out ) sizelimit++;
-         }
-      }
-
+               if( tslimit > 0 ) nout = nts_out/tslimit;
+               if( nout*tslimit < nts_out ) nout++;
+            }
+      
 /* Store a list of NDF component names to be mapped. */
-      if( hasvar ) {
-         comps = "Data,Variance";
-      } else {
-         comps = "Data";
-      }
-
+            if( hasvar ) {
+               comps = "Data,Variance";
+            } else {
+               comps = "Data";
+            }
+      
 /* Get the WCS FrameSet from the first input NDF. */
-      ndfGtwcs( ndfid[ 0 ], &wcs, status );
-
+            if( ndfid ) ndfGtwcs( ndfid[ 0 ], &wcs, status );
+      
 /* Get pointers to the current Frame, and the GRID->WCS Mapping. */
-      cfrm = astGetFrame( wcs, AST__CURRENT );
-      map = astGetMapping( wcs, AST__BASE, AST__CURRENT );
-
+            cfrm = astGetFrame( wcs, AST__CURRENT );
+            map = astGetMapping( wcs, AST__BASE, AST__CURRENT );
+      
 /* Split off the Mapping for the first and second axes. */
-      axes[ 0 ] = 1;
-      axes[ 1 ] = 2;
-      astMapSplit( map, 2, axes, nnout, &omap );
-      if( !omap || astGetI( omap, "Nout" ) != 2 ) {
-         if( *status == SAI__OK ) {
-            *status = SAI__ERROR;
-            ndfMsg( "N", indf1 );
-            errRep( "", "Unable to extract the non-time mappings from "
-                    "the WCS FrameSet in \"^N\".", status );
-         }            
-      }
-
-/* Get a group of exactly one name upon which to base the names of the output 
-   NDFs. The supplied string is the base name for the output NDFs, to which 
-   "_1", "_2", etc, will be appended. Get the base name, and then delete the 
-   group. */
-      kpg1Wgndf( "OUT", igrp1, 1, 1, "", &igrp2, &outsize, status );
-      pname = basename;
-      grpGet( igrp2, 1, 1, &pname, GRP__SZNAM, status );
-      grpDelet( &igrp2, status);
-      basename[ astChrLen( basename ) ] = 0;
+            axes[ 0 ] = 1;
+            axes[ 1 ] = 2;
+            astMapSplit( map, 2, axes, nnout, &omap );
+            if( !omap || astGetI( omap, "Nout" ) != 2 ) {
+               if( *status == SAI__OK ) {
+                  *status = SAI__ERROR;
+                  ndfMsg( "N", indf1 );
+                  errRep( "", "Unable to extract the non-time mappings from "
+                          "the WCS FrameSet in \"^N\".", status );
+               }            
+            }
+      
+/* Get the base name for the output NDFs created for this subsystem. */
+            pname = basename;
+            grpGet( igrp2, ioutname++, 1, &pname, GRP__SZNAM, status );
+            basename[ astChrLen( basename ) ] = 0;
 
 /* Initialise the bounds of each output NDF. */
-      lbnd[ 0 ] = 1;
-      lbnd[ 1 ] = 1;
-      lbnd[ 2 ] = 1;
-      ubnd[ 0 ] = nchan;
-      ubnd[ 1 ] = ndet;
-      ubnd[ 2 ] = sizelimit;
-
+            lbnd[ 0 ] = 1;
+            lbnd[ 1 ] = 1;
+            lbnd[ 2 ] = 1;
+            ubnd[ 0 ] = nchan;
+            ubnd[ 1 ] = ndet;
+            ubnd[ 2 ] = tslimit;
+      
 /* Initialise the bounds of each section used to represent one time slice
    in the output NDF. */
-      slbnd[ 0 ] = 1;
-      slbnd[ 1 ] = 1;
-      subnd[ 0 ] = nchan;
-      subnd[ 1 ] = ndet;
-
+            slbnd[ 0 ] = 1;
+            slbnd[ 1 ] = 1;
+            subnd[ 0 ] = nchan;
+            subnd[ 1 ] = ndet;
+      
 /* The number of time slices remaining to be written out. */
-      nrem = nts_out;
-
+            nrem = nts_out;
+      
 /* Initialise the index into the "index" array. "j" steps through the
    input time slices, from 0 to ( nts_in - 1 ).  The "index[j]" value
    also steps through the input time slices, but in order of increasing
    RTS_NUM value. */
-      j = 0;
-
+            j = 0;
+      
 /* Loop round each output NDF. */
-      itimeout = NULL;
-      taiout = NULL;
-      for( iout = 0; iout < nout && *status == SAI__OK; iout++ ) {
+            itimeout = NULL;
+            taiout = NULL;
+            for( iout = 0; iout < nout && *status == SAI__OK; iout++ ) {
+      
+/* If all the input NDFs conform to the naming convention for ACSIS time
+   series files, then the output NDF name for this subscan is formed by 
+   replacing the trailing "_nnnn" sub-scan number in the base name with 
+   the correct value for this output NDF. */
+               if( conform ) {
+                  sprintf( fullname, "%.4d", iout + 1 );
+                  pname = fullname;
+                  match = astChrSub( basename,
+                                     "a\\d{8}_\\d{5}_\\d{2}_(\\d{4})_?", 
+                                     (const char **) &pname, 1 );
+                  if( match ) {
+                     strcpy( fullname, match );
+                     match = astFree( match );
+
+                  } else if( *status == SAI__OK ) {
+                     *status = SAI__ERROR;
+                     msgSetc( "N", basename );
+                     errRep( "", "File name \"^N\" has unexpected format " 
+                             "(programming error).", status );
+                  }
+
+/* If any of the input NDFs do not conform to the naming convention for ACSIS 
+   time series files, then the output NDF name for this subscan is formed by 
+   appending "_n" to the end of the base name. */
+               } else {
+                  sprintf( fullname, "%s_%d", basename, iout + 1 );
+               }
 
 /* Create the output NDF by propagation from the first input NDF. */
-         sprintf( fullname, "%s_%d", basename, iout + 1 );
-         msgSetc( "N", fullname );
-         msgOutif( MSG__VERB, "", "Opening output NDF \"^N\".", status );
-         ndfPlace( NULL, fullname, &place, status );
-         ndfScopy( ndfid[ 0 ], "Units,Axis,NoExtension(PROVENANCE)", &place,
-                   &indf2, status );
+               msgSetc( "N", fullname );
+               msgOutif( MSG__VERB, "", "Opening output NDF \"^N\".", status );
 
+               ndfPlace( NULL, fullname, &place, status );
+               ndfScopy( ndfid[ 0 ], "Units,Axis,NoExtension(PROVENANCE)", 
+                         &place, &indf2, status );
+      
+/* Increment the number of output NDFs created. */
+               totout++;
+   
 /* Modify its shape. The last output NDF will probably not need to be the
    full size, so ensure no output NDF is bigger than it needs to be. */
-         if( nrem < sizelimit ) ubnd[ 2 ] = nrem;
-         ndfSbnd( 3, lbnd, ubnd, indf2, status ); 
-
+               if( nrem < tslimit ) ubnd[ 2 ] = nrem;
+               ndfSbnd( 3, lbnd, ubnd, indf2, status ); 
+      
 /* Ensure we have arrays large enough to hold the input time slice
    index and tai for each output time slice. */
-         itimeout = astGrow( itimeout, ubnd[ 2 ], sizeof( int ) );
-         taiout = astGrow( taiout, ubnd[ 2 ], sizeof( double ) );
-
+               itimeout = astGrow( itimeout, ubnd[ 2 ], sizeof( int ) );
+               taiout = astGrow( taiout, ubnd[ 2 ], sizeof( double ) );
+      
 /* Get the RTS_NUM value from the next input time slice. This value is
    also the RTS_NUM value for the next output time slice. */
-         i = index[ j ];
-         rts_num = rts[ i ];
-
+               i = index[ j ];
+               rts_num = rts[ i ];
+      
 /* Loop round each output time slice. */
-         for( k = 0; k < ubnd[ 2 ]  && *status == SAI__OK; k++ ) {
-
+               for( k = 0; k < ubnd[ 2 ]  && *status == SAI__OK; k++ ) {
+      
 /* Get a section of the output NDF covering this time slice. */
-            slbnd[ 2 ] = k + 1;
-            subnd[ 2 ] = k + 1;
-            ndfSect( indf2, 3, slbnd, subnd, &indf2s, status ); 
-
+                  slbnd[ 2 ] = k + 1;
+                  subnd[ 2 ] = k + 1;
+                  ndfSect( indf2, 3, slbnd, subnd, &indf2s, status ); 
+      
 /* Map the required output NDF section array components. */
-            ndfMap( indf2s, comps, "_REAL", "WRITE", ptr, &el, 
-                    status );
-            dts_out = ptr[ 0 ];
-            vts_out = hasvar ? ptr[ 1 ] : NULL;
-   
-            if( hasqual ) {
-               ndfMap( indf2s, "Quality", "_UBYTE", "WRITE", ptr, 
-                       &el, status );
-               qts_out = ptr[ 0 ];
-            } else {
-               qts_out = NULL;
-            }
-
-/* Store the input time slice index for this output time slice. */
-            itimeout[ k ] = i;
-
-/* Store the input time slice tai for this output time slice. */
-            taiout[ k ] = tai[ i ]; 
-
-/* Loop round all input time slices that refer to the same RTS_NUM value. */
-            init = 1;
-            rts_num0 = rts_num;
-            while( rts_num == rts_num0 ) {
-
-/* Get the index of the input NDF from which the current RTS_NUM value was 
-   read. */
-               ifile = file_index[ i ];
-
-/* Get a section of the input NDF covering this time slice. */
-               slbnd[ 2 ] = i  - first[ ifile ] + 1;
-               subnd[ 2 ] = slbnd[ 2 ];
-               ndfSect( ndfid[ ifile ], 3, slbnd, subnd, &indf1s, status ); 
-
-/* Map the required input NDF section array components. */
-               ndfMap( indf1s, comps, "_REAL", "READ",  ptr, &el, status );
-               dts_in = ptr[ 0 ];
-               vts_in = hasvar ? ptr[ 1 ] : NULL;
-   
-               if( hasqual ) {
-                  ndfMap( indf1s, "Quality", "_UBYTE", "READ", ptr, 
-                          &el, status );
-                  qts_in = ptr[ 0 ];
-               } else {
-                  qts_in = NULL;
-               }
-
-/*  Loop round all elements in the time slice. Copy any good array values 
-    from input to output. */
-               for( iel = 0; iel < el; iel++ ) {
-                  if( dts_in[ iel ] != VAL__BADR ) {
-                     dts_out[ iel ] = dts_in[ iel ];
-                     if( hasvar ) vts_out[ iel ] = vts_in[ iel ];
-                     if( hasqual) qts_out[ iel ] = qts_in[ iel ];
-
-                  } else if( init ) {
-                     dts_out[ iel ] = VAL__BADR;
-                     if( hasvar ) vts_out[ iel ] = VAL__BADR;
-                     if( hasqual) qts_out[ iel ] = 0;
+                  ndfMap( indf2s, comps, "_REAL", "WRITE", ptr, &el, 
+                          status );
+                  dts_out = ptr[ 0 ];
+                  vts_out = hasvar ? ptr[ 1 ] : NULL;
+         
+                  if( hasqual ) {
+                     ndfMap( indf2s, "Quality", "_UBYTE", "WRITE", ptr, 
+                             &el, status );
+                     qts_out = ptr[ 0 ];
+                  } else {
+                     qts_out = NULL;
                   }
-               }
-
+      
+/* Store the input time slice index for this output time slice. */
+                  itimeout[ k ] = i;
+      
+/* Store the input time slice tai for this output time slice. */
+                  taiout[ k ] = tai[ i ]; 
+      
+/* Loop round all input time slices that refer to the same RTS_NUM value. */
+                  init = 1;
+                  rts_num0 = rts_num;
+                  while( rts_num == rts_num0 ) {
+      
+/* Get the zero-based index of the input NDF from which the current RTS_NUM 
+   value was read. */
+                     isubscan = file_index[ i ];
+      
+/* Get a section of the input NDF covering this time slice. */
+                     slbnd[ 2 ] = i  - first[ isubscan ] + 1;
+                     subnd[ 2 ] = slbnd[ 2 ];
+                     ndfSect( ndfid[ isubscan ], 3, slbnd, subnd, &indf1s, status ); 
+      
+/* Map the required input NDF section array components. */
+                     ndfMap( indf1s, comps, "_REAL", "READ",  ptr, &el, status );
+                     dts_in = ptr[ 0 ];
+                     vts_in = hasvar ? ptr[ 1 ] : NULL;
+         
+                     if( hasqual ) {
+                        ndfMap( indf1s, "Quality", "_UBYTE", "READ", ptr, 
+                                &el, status );
+                        qts_in = ptr[ 0 ];
+                     } else {
+                        qts_in = NULL;
+                     }
+      
+/* Loop round all elements in the time slice. Copy any good array values 
+   from input to output. */
+                     for( iel = 0; iel < el; iel++ ) {
+                        if( dts_in[ iel ] != VAL__BADR ) {
+                           dts_out[ iel ] = dts_in[ iel ];
+                           if( hasvar ) vts_out[ iel ] = vts_in[ iel ];
+                           if( hasqual) qts_out[ iel ] = qts_in[ iel ];
+      
+                        } else if( init ) {
+                           dts_out[ iel ] = VAL__BADR;
+                           if( hasvar ) vts_out[ iel ] = VAL__BADR;
+                           if( hasqual) qts_out[ iel ] = 0;
+                        }
+                     }
+      
 /* Annul the identifier for the current time slice in the input NDF. */
-               ndfAnnul( &indf1s, status );
-
+                     ndfAnnul( &indf1s, status );
+      
 /* Move on to the next input time slice. */
-               if( ++j < nts_in ) {
-                  i = index[ j ];
-                  rts_num = rts[ i ];
-                  init = 0;
-               } else {
-                  break;
-               }
-            }
-
+                     if( ++j < nts_in ) {
+                        i = index[ j ];
+                        rts_num = rts[ i ];
+                        init = 0;
+                     } else {
+                        break;
+                     }
+                  }
+      
 /* Annul the identifier for the current time slice in the output NDF. */
-            ndfAnnul( &indf2s, status );
-         }
-
+                  ndfAnnul( &indf2s, status );
+               }
+      
 /* Copy input JCMTSTATE values to the current output NDF. */
-         smf_km2ext( indf2, "JCMTSTATE", km1, itimeout, status );
-
+               smf_km2ext( indf2, "JCMTSTATE", km1, itimeout, status );
+      
 /* Copy input ACSIS values to the current output NDF. */
-         smf_km2ext( indf2, "ACSIS", km2, itimeout, status );
-
-/* Create a LutMap to holdthe TAI value for each time slice in the
+               smf_km2ext( indf2, "ACSIS", km2, itimeout, status );
+      
+/* Create a LutMap to hold the TAI value for each time slice in the
    current output NDF. */
-         lut = astLutMap( ubnd[ 2 ], taiout, 1.0, 1.0, "" );
-
+               lut = astLutMap( ubnd[ 2 ], taiout, 1.0, 1.0, "" );
+      
 /* Put this Mapping in parallel with the Mapping for the other axes. */
-         map = (AstMapping *) astCmpMap( omap, lut, 0, "" );
-               
+               map = (AstMapping *) astCmpMap( omap, lut, 0, "" );
+                     
 /* Remove the current Frame from the WCS FrameSet, then add it back in again
    using the above Mapping to connect it to the GRID (base) Frame. */
-         astRemoveFrame( wcs, AST__CURRENT );
-         astAddFrame( wcs, AST__BASE, map, cfrm );
-   
+               astRemoveFrame( wcs, AST__CURRENT );
+               astAddFrame( wcs, AST__BASE, map, cfrm );
+         
 /* Store the modifed WCS FrameSet in the output NDF. */
-         ndfPtwcs( wcs, indf2, status );
-
-/* Reduce the number of time slices remaining to be written out. */
-         nrem -= ubnd[ 2 ];
-
+               ndfPtwcs( wcs, indf2, status );
+      
 /* Record each input NDF as a direct parent of indf2. */
-         for( ifile = 0; ifile < size; ifile++ ) {
-            ndgPtprv( indf2, ndfid[ ifile ], NULL, 0, "SMURF:TIMESORT", 
-                      status );
-         }
-   
+               for( isubscan = 0; isubscan < nsubscan; isubscan++ ) {
+                  ndgPtprv( indf2, ndfid[ isubscan ], NULL, 0, "SMURF:TIMESORT", 
+                            status );
+               }
+         
+/* Reduce the number of time slices remaining to be written out. */
+               nrem -= ubnd[ 2 ];
+      
+/* If this is the last sub-scan set the OBSEND FITS keyword value to "T". 
+   Otherwise set it to "F". Also store the sub-scan number. */
+               kpgGtfts( indf2, &fc, status );
+               atlPtfts( fc, "OBSEND", ( nrem ? "F" : "T" ), "True if file "
+                         "is last in current observation", status );
+               atlPtfti( fc, "NSUBSCAN", iout + 1, "Sub-scan number", status );
+               kpgPtfts( indf2, fc, status );
+               fc = astAnnul( fc );
+               
 /* Delete the output NDF if an error occurred. Otherwise, annul the
    output NDF identifier. */
-         ndfMsg( "N", indf2 );
-         msgOutif( MSG__VERB, "", "Closing output NDF \"^N\".", status );
-         if( *status != SAI__OK ) {
-            ndfDelet( &indf2, status );
-         } else {
-            ndfAnnul( &indf2, status );
+               msgSetc( "N", fullname );
+               msgOutif( MSG__VERB, "", "Closing output NDF \"^N\".", status );
+
+               if( *status != SAI__OK ) {
+                  ndfDelet( &indf2, status );
+               } else {
+                  ndfAnnul( &indf2, status );
+               }
+            }
+      
+/* Free resources. */
+            ndfid = astFree( ndfid );
+            taiout = astFree( taiout );
+            itimeout = astFree( itimeout );
+            first = astFree( first );
+            index = astFree( index );
+            file_index = astFree( file_index );
+            rts = astFree( rts );
+            grid = astFree( grid );
+            tai = astFree( tai );
+
+/* End the AST and NDF context. */
+            ndfEnd( status );
+            astEnd;
          }
       }
 
-/* Write out the number of output NDFs. */
-      parPut0i( "NOUT", nout, status );
+      grpDelet( &igrp2, status);
 
-/* Free resources. */
-      ndfid = astFree( ndfid );
-      taiout = astFree( taiout );
-      itimeout = astFree( itimeout );
-      first = astFree( first );
-      index = astFree( index );
-      file_index = astFree( file_index );
-      rts = astFree( rts );
-      obsidss0 = astFree( obsidss0 );
-      grid = astFree( grid );
-      tai = astFree( tai );
    }
 
+/* Write out the number of output NDFs. */
+   parPut0i( "NOUT", totout, status );
+
 /* Free resources. */
+   obs_map = astAnnul( obs_map );
    grpDelet( &igrp1, status );
+   grpDelet( &igrp3, status );
 
 /* End the NDF context. */
    ndfEnd( status );
