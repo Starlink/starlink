@@ -89,7 +89,8 @@
 *     2007-10-31 (TIMJ):
 *        astMapGet0I uses int not size_t
 *     2008-03-19 (AGG):
-*        Add obstype
+*        Add obstype, limit map size, scan speed & duration for a
+*        pointing or focus observation
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -611,8 +612,29 @@ void sc2sim_getobspar ( AstKeyMap *keymap, struct sc2sim_obs_struct *inx,
    if ( !astMapGet0D ( keymap, "VMAX", &(inx->vmax) ) )
      inx->vmax = 200.0;
 
-   if ( !astMapGet0D ( keymap, "WIDTH", &(inx->width) ) )
+   if ( !astMapGet0D ( keymap, "WIDTH", &(inx->width) ) ) {
      inx->width = 2000.0;
+   }
+
+   /* Check if we have a POINTING or FOCUS SCAN observation and if so
+      reset the map size and limit the length of the observation. Note
+      that these limits are somewhat arbitrary though reasonable based
+      on simulations of making small maps. */
+   if ( ((strncmp( inx->obstype, "POINT", 5) == 0) || 
+	 (strncmp( inx->obstype, "FOCUS", 5) == 0)) && 
+	(strncmp( inx->obsmode, "DREAM", 5) || 
+	 strncmp( inx->obsmode, "STARE", 5)) ) {
+     inx->height = 100.0;
+     inx->width = 100.0;
+     /* Limit number of map repeats to 10 if set to a high number */
+     if ( inx->nmaps > 10 ) {
+       inx->nmaps = 10;
+     }
+     /* Limit scanning speed to < 120 arcsec/s */
+     if ( inx->vmax > 120.0 ) {
+       inx->vmax = 120.0;
+     }
+   }
 
 }
 
