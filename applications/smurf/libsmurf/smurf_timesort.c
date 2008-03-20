@@ -1196,7 +1196,7 @@ void smurf_timesort( int *status ) {
 /* If this is the last sub-scan set the OBSEND FITS keyword value to "T". 
    Otherwise set it to "F". Also store the sub-scan number. */
                kpgGtfts( indf2, &fc, status );
-               atlPtfts( fc, "OBSEND", ( nrem ? "F" : "T" ), "True if file "
+               atlPtftl( fc, "OBSEND", ( nrem == 0 ), "True if file "
                          "is last in current observation", status );
                atlPtfti( fc, "NSUBSCAN", iout + 1, "Sub-scan number", status );
                kpgPtfts( indf2, fc, status );
