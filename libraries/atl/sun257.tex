@@ -1165,6 +1165,62 @@ higher-level utility tasks.
    }
 }
 \sstroutine{
+   ATL\_PTFTL
+}{
+   Store a keyword value in a FitsChan, replacing any existing value
+}{
+   \sstdescription{
+      This routine stores a value for a FITS keyword in a FitsChan. If
+      the keyword already has a value in the FitsChan, the existing value
+      is replaced with the new value. Otherwise, the new keyword is
+      added to the end of the FitsChan. On exit, the current Card in
+      the FitsChan is the card following the new keyword value (or
+      end-of-file if the new card is the last one in the FitsChan).
+   }
+   \sstinvocation{
+      CALL ATL\_PTFTL( THIS, NAME, VALUE, COMMNT, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         THIS = INTEGER (Given)
+      }{
+         Pointer to the FitsChan to use.
+      }
+      \sstsubsection{
+         NAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The FITS keyword name. This may be a complete FITS header card,
+         in which case the keyword to use is extracted from it. No more
+         than 80 characters are read from this string.
+      }
+      \sstsubsection{
+         VALUE = LOGICAL (Given)
+      }{
+         The new keyword value.
+      }
+      \sstsubsection{
+         COMMNT = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         A new comment for the keyword. If this is blank, any comment in
+         the NAME string is used. If the NAME string contains no comment,
+         any existing comment for the keyword in the FitsChan is retained.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine is not processed using GENERIC because the names of
+         the required AST routines do not use standard data type codes.
+      }
+   }
+}
+\sstroutine{
    ATL\_PTFTR
 }{
    Store a keyword value in a FitsChan, replacing any existing value

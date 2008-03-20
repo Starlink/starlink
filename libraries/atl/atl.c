@@ -263,6 +263,51 @@ void atlPtfti( AstFitsChan *this, const char *name, int value,
    return;
 }
 
+F77_SUBROUTINE(atl_ptftl)( INTEGER(THIS),
+                           CHARACTER(NAME),
+                           LOGICAL(VALUE),
+                           CHARACTER(COMMNT),
+                           INTEGER(STATUS) 
+                           TRAIL(NAME)
+                           TRAIL(COMMNT) );
+
+void atlPtftl( AstFitsChan *this, const char *name, int value, 
+               const char *comment, int *status ){
+   DECLARE_INTEGER(THIS);
+   DECLARE_CHARACTER_DYN(NAME);  
+   DECLARE_LOGICAL(VALUE);
+   DECLARE_CHARACTER_DYN(COMMNT);  
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_INTEGER( astP2I( this ), THIS );
+
+   if( !astOK ) return;
+
+   F77_CREATE_CHARACTER( NAME, strlen( name ) );
+   F77_EXPORT_CHARACTER( name, NAME, NAME_length );
+
+   F77_EXPORT_LOGICAL( value, VALUE );
+
+   F77_CREATE_CHARACTER( COMMNT, strlen( comment ) );
+   F77_EXPORT_CHARACTER( comment, COMMNT, COMMNT_length );
+
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(atl_ptftl)( INTEGER_ARG(&THIS),
+                        CHARACTER_ARG(NAME),
+                        LOGICAL_ARG(&VALUE),
+                        CHARACTER_ARG(COMMNT),
+                        INTEGER_ARG(&STATUS)
+                        TRAIL_ARG(NAME)
+                        TRAIL_ARG(COMMNT) );
+
+   F77_FREE_CHARACTER( NAME );
+   F77_FREE_CHARACTER( COMMNT );
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
+
 
 F77_SUBROUTINE(atl_ptftr)( INTEGER(THIS),
                            CHARACTER(NAME),
