@@ -239,7 +239,27 @@ void ndgGtsup( const Grp *grp, int i, char const *fields[6], int len, int *statu
    return;
 }
 
+F77_SUBROUTINE(ndg_cpsup)( INTEGER(IGRP1), INTEGER(I), INTEGER(IGRP2), 
+                           INTEGER(STATUS) );
 
+void ndgCpsup( const Grp *igrp1, int i, Grp *igrp2, int * status ) {
+   DECLARE_INTEGER(IGRP1);
+   DECLARE_INTEGER(I);
+   DECLARE_INTEGER(IGRP2);
+   DECLARE_INTEGER(STATUS);
+
+   IGRP1 = grpC2F( igrp1, status );
+   F77_EXPORT_INTEGER(i, I );
+   IGRP2 = grpC2F( igrp2, status );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(ndg_cpsup)( INTEGER_ARG(&IGRP1), INTEGER_ARG(&I),
+                        INTEGER_ARG(&IGRP2), INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+
+   return;
+}
 
 F77_SUBROUTINE(ndg_endpv)( CHARACTER(CREATR), INTEGER(STATUS) TRAIL(CREATR) );
 

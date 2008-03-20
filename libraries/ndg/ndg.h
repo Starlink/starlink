@@ -79,6 +79,7 @@ void ndgNdfcr( const Grp *igrp, int index, const char ftype[], int ndim,
 	       const hdsdim lbnd[], const hdsdim ubnd[], int *indf, int *status );
 void ndgNdfpr( int indf1, const char clist[], const Grp *igrp, int index, int *indf2, int *status);
 void ndgGtsup( const Grp *grp, int i, char const *fields[6], int len, int *status );
+void ndgCpsup( const Grp *igrp1, int i, Grp *igrp2, int * status );
 void ndgBegpv( int *status );
 void ndgEndpv( const char *creator, int *status );
 void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot, const char *creator, int *status );

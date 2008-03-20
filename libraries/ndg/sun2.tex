@@ -1226,6 +1226,42 @@ to add further members.
 }
 
 \sstroutine{
+   NDG\_CPSUP
+}{
+   Copy supplemental information for an NDF
+}{
+   \sstdescription{
+      Copies an entry with its supplemental information from one group to
+      another, appending it to the end of the output group.
+   }
+   \sstinvocation{
+      CALL NDG\_CPSUP( IGRP1, I, IGRP2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IGRP1 = INTEGER (Given)
+      }{
+         The NDG group as returned by NDG\_ASSOC, etc.
+      }
+      \sstsubsection{
+         I = INTEGER (Given)
+      }{
+         The index, within IGRP1, of the entry to copy.
+      }
+      \sstsubsection{
+         IGRP2 = INTEGER (Given)
+      }{
+         The NDG group to which the copied information should be appended.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+
+\sstroutine{
    NDG\_CREA1
 }{
    Create a single new simple NDF using a specified parameter
