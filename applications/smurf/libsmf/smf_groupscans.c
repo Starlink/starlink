@@ -91,6 +91,7 @@
 #include "ast.h"
 #include "ndf.h"
 #include "grp.h"
+#include "star/ndg.h"
 #include "sae_par.h"
 #include "star/ndg.h"
 #include "star/kaplibs.h"
@@ -213,8 +214,7 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
          key = astMapKey( sysmap, 0 );
          astMapGet0I( sysmap, key, &ifile );
    
-         grpGet( igrp, ifile, 1, &pname, GRP__SZNAM, status );
-         grpPut1( *ogrp, pname, 0, status );
+         ndgCpsup( igrp, ifile, *ogrp, status );
 
 /* Update the largest number of subscans for an observation/sub-system */
          nscan = astMapSize( sysmap );
