@@ -41,6 +41,10 @@
 *        Check dasFlag, get CROSS_CORR and TP data
 *     2008-02-28 (JB):
 *        Replace GSD bad values with Starlink bad values
+*     2008-03-18 (JB):
+*        Add debug statement.
+*     2008-03-19 (JB):
+*        Removed unused variables.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -70,6 +74,7 @@
 /* STARLINK includes */
 #include "sae_par.h"
 #include "prm_par.h"
+#include "mers.h"
 
 /* SMURF includes */
 #include "gsdac.h"
@@ -85,7 +90,6 @@ void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
 
   /* Local variables.*/
   long i;                     /* loop counter */
-  long j;                     /* loop counter */ 
   char tempString[MAXSTRING]; /* temporary string */ 
 
   /* Check inherited status */
@@ -870,6 +874,13 @@ void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
         gsdVars->totPower[i] = VAL__BADR;
     }    
 
-  }  
+  } 
+
+    printf ( "centreAz/El (degrees) : %f %f\n", gsdVars->centreAz, gsdVars->centreEl );
+    printf ( "centreRA/Dec (degrees) : %f %f\n", gsdVars->centreRA, gsdVars->centreDec );
+    printf ( "centreRA1950/Dec1950 (degrees) : %f %f\n", gsdVars->centreRA1950, gsdVars->centreDec1950 );
+    printf ( "centreRA2000/Dec2000 (degrees) : %f %f\n", gsdVars->centreRA2000, gsdVars->centreDec2000 );
+    printf ( "centreGL/GB (degrees) : %f %f\n\n", gsdVars->centreGL, gsdVars->centreGB );
+
 
 }

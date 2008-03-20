@@ -46,6 +46,8 @@
 *        Include math.h
 *     04-MAR-2008 (JB):
 *        Check number of scans actually completed.
+*     19-MAR-2008 (JB):
+*        Include par.h.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -86,6 +88,7 @@
 #include "mers.h"
 #include "gsd.h"
 #include "sae_par.h"
+#include "par.h"
 
 /* SMURF includes */
 #include "smurflib.h"

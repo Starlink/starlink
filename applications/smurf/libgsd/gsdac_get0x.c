@@ -49,6 +49,8 @@
 *  History :
 *     2008-02-04 (JB):
 *        Original
+*     2008-03-19 (JB):
+*        Removed unused variables.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -78,6 +80,7 @@
 /* Starlink includes */
 #include "gsd.h"
 #include "sae_par.h"
+#include "mers.h"
 
 /* SMURF includes */
 #include "gsdac.h"

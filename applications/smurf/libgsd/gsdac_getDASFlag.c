@@ -35,6 +35,8 @@
 *  History:
 *     2008-02-15 (JB):
 *        Original.
+*     2008-03-19 (JB):
+*        Removed unused variables.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -64,6 +66,7 @@
 /* STARLINK includes */
 #include "sae_par.h"
 #include "gsd.h"
+#include "mers.h"
 
 /* SMURF includes */
 #include "gsdac.h"
@@ -84,7 +87,6 @@ void gsdac_getDASFlag ( const struct gsdac_gsd_struct *gsd,
   int dimVals[MAXDIMS];        /* array dimensions */
   int i;                       /* loop counter */
   int itemno;                  /* item number of the GSD header */
-  int nDims;                   /* number of dimensions of the array */
   int nElem;                   /* number of elements in the array */
   char type;                   /* data type of the item */
   int statFlag;                /* indicates if item was found */

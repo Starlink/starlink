@@ -52,6 +52,8 @@
 *  History :
 *     2008-02-04 (JB):
 *        Original
+*     2008-03-19 (JB):
+*        Removed unused variables.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -81,6 +83,7 @@
 /* Starlink includes */
 #include "gsd.h"
 #include "sae_par.h"
+#include "mers.h"
 
 /* SMURF includes */
 #include "gsdac.h"
@@ -99,7 +102,6 @@ void gsdac_get1b ( const gsd *gsd,
   int dimVals[MAXDIMS];        /* array dimensions */
   int i;                       /* loop counter */
   int itemno;                  /* item number of the GSD header */
-  int nDims;                   /* number of dimensions of the array */
   int start;                   /* start index of the array values */
   int size;                    /* number of elements in the array */
   char type;                   /* data type of the item (should always be B) */
@@ -184,7 +186,6 @@ void gsdac_get1c ( const gsd *gsd,
   int dimVals[MAXDIMS];        /* array dimensions */
   int i;                       /* loop counter */
   int itemno;                  /* item number of the GSD header */
-  int nDims;                   /* number of dimensions of the array */
   int start;                   /* start index of the array values */
   int size;                    /* number of elements in the array */
   char type;                   /* data type of the item (should always be B) */
@@ -269,7 +270,6 @@ void gsdac_get1d ( const gsd *gsd,
   int dimVals[MAXDIMS];        /* array dimensions */
   int i;                       /* loop counter */
   int itemno;                  /* item number of the GSD header */
-  int nDims;                   /* number of dimensions of the array */
   int start;                   /* start index of the array values */
   int size;                    /* number of elements in the array */
   char type;                   /* data type of the item (should always be B) */
@@ -354,7 +354,6 @@ void gsdac_get1i ( const gsd *gsd,
   int dimVals[MAXDIMS];        /* array dimensions */
   int i;                       /* loop counter */
   int itemno;                  /* item number of the GSD header */
-  int nDims;                   /* number of dimensions of the array */
   int start;                   /* start index of the array values */
   int size;                    /* number of elements in the array */
   char type;                   /* data type of the item (should always be B) */
@@ -440,7 +439,6 @@ void gsdac_get1l ( const gsd *gsd,
   int dimVals[MAXDIMS];        /* array dimensions */
   int i;                       /* loop counter */
   int itemno;                  /* item number of the GSD header */
-  int nDims;                   /* number of dimensions of the array */
   int start;                   /* start index of the array values */
   int size;                    /* number of elements in the array */
   char type;                   /* data type of the item (should always be B) */
@@ -526,7 +524,6 @@ void gsdac_get1r ( const gsd *gsd,
   int dimVals[MAXDIMS];        /* array dimensions */
   int i;                       /* loop counter */
   int itemno;                  /* item number of the GSD header */
-  int nDims;                   /* number of dimensions of the array */
   int start;                   /* start index of the array values */
   int size;                    /* number of elements in the array */
   char type;                   /* data type of the item (should always be B) */
@@ -612,7 +609,6 @@ void gsdac_get1w ( const gsd *gsd,
   int dimVals[MAXDIMS];        /* array dimensions */
   int i;                       /* loop counter */
   int itemno;                  /* item number of the GSD header */
-  int nDims;                   /* number of dimensions of the array */
   int start;                   /* start index of the array values */
   int size;                    /* number of elements in the array */
   char type;                   /* data type of the item (should always be B) */

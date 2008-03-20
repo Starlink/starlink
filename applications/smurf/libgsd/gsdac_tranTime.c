@@ -39,6 +39,8 @@
 *        Original
 *     2008-03-06 (JB):
 *        Merge with tranDate
+*     2008-03-19 (JB):
+*        Removed unused variables.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -85,7 +87,6 @@ void gsdac_tranTime ( const char *dTime, char *iDate, char *iTime,
   
   int day;                    /* day */
   int hour;                   /* hour */
-  int i;                      /* loop counter */
   int min;                    /* min */
   int month;                  /* month */
   char *months[12] = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL",

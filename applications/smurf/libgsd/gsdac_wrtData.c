@@ -59,6 +59,8 @@
 *        Use number of scans actually completed.
 *     2008-03-07 (JB):
 *        Fix calculation of amStart/End, azStart/End, elStart/End
+*     2008-03-19 (JB):
+*        Removed unused variables.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -93,6 +95,7 @@
 #include "ast.h"
 #include "sae_par.h"
 #include "mers.h"
+#include "par.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
@@ -131,7 +134,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   mapVars mapVars;            /* map/chop/scan variables */
   double mem;                 /* amount of memory for spectrum */
   int nSubsys;                /* number of subsystems */
-  unsigned int obsNum;        /* current observation number */
+  int obsNum;                 /* current observation number */
   char obsType[SZFITSCARD];   /* type of observation */
   char *OCSConfig = NULL;     /* OCS configuration XML */
   JCMTState *record = NULL;   /* JCMT state information for the 

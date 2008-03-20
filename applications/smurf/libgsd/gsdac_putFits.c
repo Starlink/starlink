@@ -81,6 +81,8 @@
 *        all spectra completed.
 *     2008-03-07 (JB):
 *        Use IFFreq of 4.0, and set refChan as offset channel.
+*     2008-03-19 (JB):
+*        Removed unused variables.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -171,7 +173,6 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   char subBands[SZFITSCARD];  /* ACSIS sub-band set-up */
   char tauDatSt[SZFITSCARD];  /* time of tau225St observation in 
                                  format YYYY-MM-DDTHH:MM:SS */
-  char telName[SZFITSCARD];   /* telescope name */
   char transiti[SZFITSCARD];  /* target transition for molecule */
   int year;                   /* year for time conversion. */  
 

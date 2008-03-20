@@ -36,6 +36,8 @@
 *        Original.
 *     2008-02-19 (JB):
 *        Check dasFlag
+*     2008-03-19 (JB):
+*        Include mers.h
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -64,6 +66,7 @@
 
 /* STARLINK includes */
 #include "sae_par.h"
+#include "mers.h"
 
 /* SMURF includes */
 #include "gsdac.h"

@@ -53,6 +53,8 @@
 *        Fill feed and trx, correct tsys for DAS_CONT_CAL
 *     2008-02-28 (JB):
 *        Replace subsysNum with subBandNum
+*     2008-03-19 (JB):
+*        Removed unused variables.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -103,7 +105,6 @@ void gsdac_putSpecHdr ( const gsdVars *gsdVars, const unsigned int nSteps,
 
   /* Local variables. */
   int index;                  /* index into array */
-  long fitsIndex;             /* current FITSchan */
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;

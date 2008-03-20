@@ -39,6 +39,8 @@
 *        Original
 *     2008-02-14 (JB):
 *        Use gsdVars struct to store headers/arrays
+*     2008-03-19 (JB):
+*        Removed unused variables.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -70,6 +72,7 @@
 
 /* Starlink includes */
 #include "sae_par.h"
+#include "mers.h"
 
 /* SMURF includes */
 #include "gsdac.h"
@@ -82,14 +85,6 @@ void gsdac_getStartIdx ( const gsdVars *gsdVars,
 {
 
   /* Local variables */
-  double expectStartX;        /* expected starting x coordinate */
-  double expectStartY;        /* expected starting y coordinate */
-  char mapPositiveX;          /* flag for x-direction increase in first row */
-  char mapPositiveY;          /* flag for y-direction increase in first row */
-  float mapStartX;           /* Start map x index */
-  float mapStartY;           /* Start map y index */
-  int signX = -1;             /* x-direction start sign */
-  int signY = -1;             /* y-direction start sign */
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;

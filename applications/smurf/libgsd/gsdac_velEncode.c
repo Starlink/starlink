@@ -43,6 +43,8 @@
 *  History :
 *     2008-02-26 (JB):
 *        Original
+*     2008-03-19 (JB):
+*        Removed unused variables.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -74,6 +76,7 @@
 
 /* Starlink includes */
 #include "sae_par.h"
+#include "mers.h"
 
 /* SMURF includes */
 #include "gsdac.h"
@@ -87,7 +90,6 @@ void gsdac_velEncode ( const char *vframe, const char *vdef,
 {
 
   /* Local variables */
-  int cmp;                    /* string comparison */
   int i;                      /* index for vdef */
   int j;                      /* index for vframe */
   int k;                      /* loop counter */

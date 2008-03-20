@@ -36,6 +36,20 @@
 *    This routine calculates the pointing, time, and airmass 
 *    values to fill the JCMTState. NOTE: adequate memory for the
 *    arrays must be allocated prior to calling this function.
+*
+*    A note on converting from CELL (in GSD) to GRID (in ATL):
+*    CELL coordinates set 0,0 to the centre of the grid, and other
+*    cells are defined with positive and negative coordinates around
+*    this centre.  GRID coordinates start at 1,1 in the bottom
+*    left hand corner.  Example:
+*
+*    CELL:  -1, 1    0, 1    1, 1
+*           -1, 0    0, 0    1, 0
+*           -1,-1    0,-1    1,-1
+*
+*    GRID:   1, 3    2, 3    3, 3
+*            1, 2    2, 2    3, 2
+*            1, 1    2, 1    3, 1  
 
 *  Authors:
 *     J.Balfour (UBC)
@@ -58,6 +72,10 @@
 *        Use updated version of atlWcspx.
 *     2008-03-07 (JB):
 *        Convert to radians before calling atlWcspx
+*     2008-03-18 (JB):
+*        Add debugging statements
+*     2008-03-19 (JB):
+*        Calculate offsets
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -80,8 +98,6 @@
 *     MA 02111-1307, USA
 
 *  Bugs:
-*     Many of the values are currently kludged with defaults.
-*     These are indicated by //k.
 *-
 */
 
@@ -92,6 +108,9 @@
 /* Starlink includes */
 #include "ast.h"
 #include "sae_par.h"
+#include "star/slalib.h"
+#include "mers.h"
+#include "star/atl.h"
 
 /* SMURF includes */
 #include "gsdac.h"
@@ -108,11 +127,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 {
 
   /* Local variables */
-  int axes[2];                /* axes required from wcs frame */
   AstKeyMap *cellMap;         /* Ast KeyMap for cell description */
-  double cellV2YRad;          /* position angle of cell y axis in radians */
-  double cellX2YRad;          /* angle between cell y axis and x axis
-                                 in radians */
   double coordIn[3];          /* input coordinates to transformation */
   double coordOut[3];         /* output coordinates from transformation */
   int dataDims[3];            /* dimensions of data */
@@ -125,7 +140,6 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   double gapptDec;            /* geocentric apparent declination (radians) */
   double gapptRA;             /* geocentric apparent hour angle (radians) */
   int hour;                   /* hours */
-  int i;                      /* loop counter */
   char iDate[10];             /* date in specx string format */
   long index;                 /* index into array data */
   char iTime[9];              /* time in specx string format */
@@ -136,7 +150,6 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   int month;                  /* months */
   double sec;                 /* seconds */
   double TAIStart;            /* start TAI time */
-  const char *tempString;     /* temporary string */
   AstTimeFrame *tFrame = NULL;  /* AstTimeFrame for retrieving TAI times */
   AstTimeFrame *UTCFrame = NULL; /* AstTimeFrame for retrieving UTC times */
   const char *UTCString;      /* UTC time as a string */
@@ -190,7 +203,6 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   /* Get the LST start. */
   astSet ( LSTFrame, "timescale=LAST" );
 
-
   LSTStart = astGetD ( LSTFrame, "timeOrigin" );
 
   /* Get the LST in hours. */
@@ -199,13 +211,13 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   /* Figure out what coordinates we are tracking in.  Then 
      the base can be copied from the corresponding CENTRE_
      value in the GSD header.  Remember that the GSD file
-     stored RAs in degrees!  Do this check first in case
+     stored RA/Decs in degrees!  Do this check first in case
      we encounter EQ as the centreCode. */
   switch ( gsdVars->centreCode ) {
     
     case COORD_AZ:
-      wcs->baseTr1 = gsdVars->centreAz;
-      wcs->baseTr2 = gsdVars->centreEl;
+      wcs->baseTr1 = gsdVars->centreAz * AST__DD2R;
+      wcs->baseTr2 = gsdVars->centreEl * AST__DD2R;
       break;
     case COORD_EQ:
       *status = SAI__ERROR;
@@ -217,20 +229,20 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
       wcs->baseTr2 = gsdVars->centreEl;*/
       break;
     case COORD_RD:
-      wcs->baseTr1 = gsdVars->centreRA * 24.0 / 360.;
-      wcs->baseTr2 = gsdVars->centreDec;
+      wcs->baseTr1 = gsdVars->centreRA * AST__DD2R;
+      wcs->baseTr2 = gsdVars->centreDec * AST__DD2R;
       break;
     case COORD_RB:
-      wcs->baseTr1 = gsdVars->centreRA1950 * 24.0 / 360.;
-      wcs->baseTr2 = gsdVars->centreDec1950;
+      wcs->baseTr1 = gsdVars->centreRA1950 * AST__DD2R;
+      wcs->baseTr2 = gsdVars->centreDec1950 * AST__DD2R;
       break;
     case COORD_RJ:
-      wcs->baseTr1 = gsdVars->centreRA2000 * 24.0 / 360;
-      wcs->baseTr2 = gsdVars->centreDec2000;
+      wcs->baseTr1 = gsdVars->centreRA2000 * AST__DD2R;
+      wcs->baseTr2 = gsdVars->centreDec2000 * AST__DD2R;
       break;
     case COORD_GA:
-      wcs->baseTr1 = gsdVars->centreGL;
-      wcs->baseTr2 = gsdVars->centreGB;
+      wcs->baseTr1 = gsdVars->centreGL * AST__DD2R;
+      wcs->baseTr2 = gsdVars->centreGB * AST__DD2R;
       break;
     default:
       *status = SAI__ERROR;
@@ -313,51 +325,18 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   datePointing = astKeyMap( "" );
   cellMap = astKeyMap( "" ); 
 
+  if ( subBandNum == 0 ) printf ( "CENTRE (base) RA_DEC (radians) : %f %f\n", wcs->baseTr1, wcs->baseTr2 );
+
   /* Fill the keymaps from the input GSD. */
   astMapPut0I( datePointing, "JFREST(1)", 
                gsdVars->restFreqs[subBandNum]*1000000.0, "" );
-
-  /* Get the centre coordinates in the right coordinate
-     system, and convert to radians. */
-  switch ( gsdVars->centreCode ) {
-    case COORD_AZ:
-      astMapPut0D( datePointing, "RA_DEC(1)", 
-                   gsdVars->centreAz * DD2R, "" );
-      astMapPut0D( datePointing, "RA_DEC(2)", 
-                   gsdVars->centreEl * DD2R, "" ); 
-      break;
-    case COORD_RD:
-      astMapPut0D( datePointing, "RA_DEC(1)", 
-                   gsdVars->centreRA * DD2R, "" );
-      astMapPut0D( datePointing, "RA_DEC(2)", 
-                   gsdVars->centreDec * DD2R, "" ); 
-      break;
-    case COORD_RB:
-      astMapPut0D( datePointing, "RA_DEC(1)", 
-                   gsdVars->centreRA1950 * DD2R, "" );
-      astMapPut0D( datePointing, "RA_DEC(2)", 
-                   gsdVars->centreDec1950 * DD2R, "" ); 
-      break;
-    case COORD_RJ:
-      astMapPut0D( datePointing, "RA_DEC(1)", 
-                   gsdVars->centreRA2000 * DD2R, "" );
-      astMapPut0D( datePointing, "RA_DEC(2)", 
-                   gsdVars->centreDec2000 * DD2R, "" ); 
-      break;
-    case COORD_GA:
-      astMapPut0D( datePointing, "RA_DEC(1)", 
-                   gsdVars->centreGL * DD2R, "" );
-      astMapPut0D( datePointing, "RA_DEC(2)", 
-                   gsdVars->centreGB * DD2R, "" ); 
-      break;
-  }  
-
+  astMapPut0D( datePointing, "RA_DEC(1)", wcs->baseTr1 / AST__DD2R, "" );
+  astMapPut0D( datePointing, "RA_DEC(2)", wcs->baseTr2 / AST__DD2R, "" );
   astMapPut0I( datePointing, "DPOS(1)", 0.0, "" );
   astMapPut0I( datePointing, "DPOS(2)", 0.0, "" );
   astMapPut0C( datePointing, "IDATE", iDate, "" );
   astMapPut0C( datePointing, "ITIME", iTime, "" ); 
   astMapPut0I( datePointing, "LSRFLG", LSRFlg, "" );
-
   if ( dasFlag == DAS_CROSS_CORR || dasFlag == DAS_TP )
     astMapPut0D( datePointing, "V_SETL(4)", 0, "" );
   else
@@ -370,20 +349,40 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
                gsdVars->totIFs[subBandNum], "" );
   astMapPut0I( datePointing, "CENTRECODE", gsdVars->centreCode, "" );
 
+  /* Convert cell sizes to radians. */
   astMapPut0D( cellMap, "CELLSIZE(1)", gsdVars->cellX, "" );
   astMapPut0D( cellMap, "CELLSIZE(2)", gsdVars->cellY, "" );
   astMapPut0D( cellMap, "POSANGLE", gsdVars->cellV2Y, "" );
   astMapPut0I( cellMap, "CELLCODE", gsdVars->cellCode, "" );
 
-  /* Get the dimensions of the data array. */
-  dataDims[0] = gsdVars->nMapPtsX;
-  dataDims[1] = gsdVars->nMapPtsY;
+  /* Get the dimensions of the data array.  If this is a raster, 
+     determine the dimensionality from the number of scans and the
+     scanning direction. */
+  if ( strncmp( gsdVars->obsType, "RASTER", 6 ) == 0 ) {
+  
+    if ( strncmp( gsdVars->obsDirection, "HORIZONTAL", 10 ) == 0 ) {    
+      dataDims[0] = gsdVars->nMapPtsX; 
+      dataDims[1] = gsdVars->noScans;
+    } else {
+      dataDims[0] = gsdVars->noScans; 
+      dataDims[1] = gsdVars->nMapPtsY;
+    }
+
+  } else {
+
+    dataDims[0] = gsdVars->nMapPtsX;
+    dataDims[1] = gsdVars->nMapPtsY;
+
+  }
+
   dataDims[2] = gsdVars->nBEChansOut;
+
+  printf ( "dataDims : %i %i %i\n", dataDims[0], dataDims[1], dataDims[2] );
 
   /* Get a frameset describing the mapping from cell to sky. */
   atlWcspx ( datePointing, cellMap, dataDims, 
-             gsdVars->telLongitude * -1.0 * DD2R, 
-             gsdVars->telLatitude * DD2R, &frame, status );
+             gsdVars->telLongitude * -1.0 * AST__DD2R, 
+             gsdVars->telLatitude * AST__DD2R, &frame, status );
 
   if ( *status != SAI__OK ) {
 
@@ -393,49 +392,85 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
     return; 
   }
 
-  /* Get Az and El of current cell. */
-  wcs->acAz = 0.0;//k
-  wcs->acEl = 0.0;//k
-
-  /* Calculate airmass from El of current cell. */
-  wcs->airmass = 0.0;//k
-
   /* Calculate the centre in tracking. */
-  coordIn[0] = (double)(gsdVars->nMapPtsX) / 2.0;
-  coordIn[1] = (double)(gsdVars->nMapPtsY) / 2.0;
+  coordIn[0] = ( (double)(dataDims[0] - 1) / 2.0 ) + 1.0;
+  coordIn[1] = ( (double)(dataDims[1] - 1) / 2.0 ) + 1.0;
   coordIn[2] = 0.0;
 
   astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
 
-  wcs->acTr1 = coordOut[0];
-  wcs->acTr2 = coordOut[1];
+  if ( subBandNum == 0 ) printf ( "GRID (base) coordinates  : %f %f\n", coordIn[0], coordIn[1] );
 
-  /* Calculate the cell offsets in tracking. */
-  coordIn[0] = gsdVars->mapTable[stepNum*2] + 
-               (double)(gsdVars->nMapPtsX) / 2.0;
-  coordIn[1] = gsdVars->mapTable[stepNum*2+1] + 
-               (double)(gsdVars->nMapPtsY) / 2.0;
-
-  astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
+  if ( subBandNum == 0 ) printf ( "RA/Dec (base) coordinates (radians)  : %f %f\n", coordOut[0], coordOut[1] );  
 
   wcs->baseTr1 = coordOut[0];
   wcs->baseTr2 = coordOut[1];
 
+  /* Calculate the cell offsets in tracking. */
+  coordIn[0] = gsdVars->mapTable[stepNum*2] + 1.0 +
+               (double)(dataDims[0] - 1) / 2.0;
+  coordIn[1] = gsdVars->mapTable[stepNum*2+1] + 1.0 +
+               (double)(dataDims[1] - 1) / 2.0;
+
+  astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
+
+  if ( subBandNum == 0 ) printf ( "GRID (offset) coordinates  : %f %f\n", coordIn[0], coordIn[1] );
+
+  if ( subBandNum == 0 ) printf ( "RA/Dec (offset) coordinates (radians)  : %f %f\n", coordOut[0], coordOut[1] );
+
+  wcs->acTr1 = coordOut[0];
+  wcs->acTr2 = coordOut[1];
+
+  astSetC( frame, "System(1)", "AZEL" );
+
+  /* Get centre in AZEL. */
+  coordIn[0] = ( (double)(dataDims[0] - 1) / 2.0 ) + 1.0;
+  coordIn[1] = ( (double)(dataDims[1] - 1) / 2.0 ) + 1.0;
+
+  astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
+
+  if ( subBandNum == 0 ) printf ( "GRID (base) coordinates  : %f %f\n", coordIn[0], coordIn[1] );
+
+  if ( subBandNum == 0 ) printf ( "AZEL (base) coordinates (radians)  : %f %f\n", coordOut[0], coordOut[1] );
+
+  wcs->baseAz = coordOut[0];
+  wcs->baseEl = coordOut[1];
+
+  /* Calculate the cell offsets in AZEL. */
+  coordIn[0] = gsdVars->mapTable[stepNum*2] + 1.0 +
+               (double)(dataDims[0] - 1) / 2.0;
+  coordIn[1] = gsdVars->mapTable[stepNum*2+1] + 1.0 +
+               (double)(dataDims[1] - 1) / 2.0;
+
+  astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
+
+  if ( subBandNum == 0 ) printf ( "GRID (offset) coordinates  : %f %f\n", coordIn[0], coordIn[1] );
+
+  if ( subBandNum == 0 ) printf ( "AZEL (offset) coordinates (radians)  : %f %f\n\n", coordOut[0], coordOut[1] );
+
+  wcs->acAz = coordOut[0];
+  wcs->acEl = coordOut[1];
+
+  /* Calculate airmass from El of current cell. */
+  wcs->airmass = slaAirmas( AST__DPIBY2 - wcs->acEl );
+
+  printf ( "airmass : %f\n", wcs->airmass );
+
+  /* Focal plane is AZEL so AZ angle is 0. */
   wcs->azAng = 0.0;
-  wcs->baseAz = 0.0;//k
-  wcs->baseEl = 0.0;//k 
-  wcs->trAng = 0.0;
 
   /* The angle between the focal plane and PA=0 and PA=0 in the 
      tracking coordinate frame is determined from the hour angle, 
      the declination, and the latitude. */
   astSet( frame, "System(1)=GAPPT" );
-  astTranN( frame, 1, 3, 3, coordIn, 1, 3, 3, coordOut );
+  astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
   gapptRA = coordOut[0];
   gapptDec = coordOut[1];
   index = (int) ( stepNum / gsdVars->nScanPts );
   gapptRA = ( gsdVars->scanTable1[index] - gapptRA ) * 2 * AST__DPI / 24.0;
-  //wcs->trAng = slaPa( gapptRA, gapptDec, gsdVars->telLatitude );//k
+  wcs->trAng = slaPa( gapptRA, gapptDec, gsdVars->telLatitude );
+
+  printf( "trAng : %f\n", wcs->trAng );
 
   astEnd;
 

@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     gsdac_getDateVars ( const gsdVars *gsdVars, const char *backend, 
-*                         const unsigned int obsNum, dateVars *dateVars, 
+*                         const int obsNum, dateVars *dateVars, 
 *                         int *status )
 
 *  Arguments:
@@ -23,7 +23,7 @@
 *        GSD file access parameters
 *     backend = const char* (Given)
 *        Name of the backend
-*     obsNum = const unsigned int (Given)
+*     obsNum = const int (Given)
 *        Observation number
 *     dateVars = dateVars* (Given and Returned)
 *        Date and time variables
@@ -49,6 +49,8 @@
 *        Use dateVars struct
 *     2008-03-04 (JB):
 *        Use number of scans actually completed.
+*     2008-03-19 (JB):
+*        Removed unused variables.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -81,6 +83,7 @@
 /* Starlink includes */
 #include "ast.h"
 #include "sae_par.h"
+#include "mers.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
@@ -89,18 +92,16 @@
 #define FUNC_NAME "gsdac_getDateVars"
 
 void gsdac_getDateVars ( const gsdVars *gsdVars, const char *backend, 
-                         const unsigned int obsNum, dateVars *dateVars, 
+                         const int obsNum, dateVars *dateVars, 
                          int *status )
 
 {
 
   /* Local variables */
-  char curChar;               /* character pointer */
   char dateString[SZFITSCARD];/* temporary string for date conversions. */
   int day = 0;                /* days */
   double dut1 = 0.0;          /* UT1-UTC correction */
   int hour = 0;               /* hours */
-  int i = 0;                  /* loop counter */
   int min = 0;                /* minutes */
   int month = 0;              /* months */
   float sec = 0.0;            /* seconds */

@@ -41,6 +41,8 @@
 *        Use dateVars and mapVars structs
 *     2008-03-06 (JB):
 *        Removed tranDate, updated tranTime
+*     2008-03-19 (JB):
+*        Change obsNum to signed
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -221,7 +223,7 @@ void gsdac_getDateVars
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 const char *backend, /* name of the backend (given) */
-const unsigned int obsNum, /* observation number (given) */
+const int obsNum,    /* observation number (given) */
 dateVars *dateVars,  /* date and time variables (given and returned) */
 int *status          /* pointer to global status (given and returned) */ 
 );
