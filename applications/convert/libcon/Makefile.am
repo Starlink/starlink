@@ -6,16 +6,15 @@ libcon_la_SOURCES = \
  $(F_ROUTINES) $(C_ROUTINES) $(F_GEN_FILES) $(INCLUDE_FILES)
 
 F_ROUTINES = \
- con_afhir.f con_angdc.f con_bitpx.f con_btypc.f con_caux.f \
+ con_afhir.f con_angdc.f con_bitpx.f con_btypc.f con_caux.f  \
  con_caxes.f con_ccpy.f  con_d2nft.f con_dst2n.f con_faind.f \
- con_fkeyc.f con_ffrmt.f con_fill.f  con_fitax.f con_ftype.f \
- con_gexch.f con_gexrm.f con_gkeyc.f con_gslic.f con_laxis.f \
- con_lnear.f con_mandh.f con_move.f  con_ndfcm.f con_pcard.f \
- con_pfith.f con_rgasp.f con_raux.f  con_raxes.f \
- con_rgndf.f con_rccc.f  con_rcpy.f  con_saxis.f con_sphea.f \
- con_spcpy.f con_sphst.f con_trcha.f con_typsz.f con_vaxis.f \
- con_vcorr.f con_wfman.f con_wcspx.f con_wgasp.f con_wgrid.f \
- con_wrpgm.f con_wrtif.f
+ con_fkeyc.f con_ffrmt.f con_fitax.f con_ftype.f con_gexch.f \
+ con_gexrm.f con_gkeyc.f con_gslic.f con_laxis.f con_lnear.f \
+ con_mandh.f con_move.f  con_ndfcm.f con_pcard.f con_pfith.f \
+ con_rgasp.f con_raux.f  con_raxes.f con_rgndf.f con_rccc.f  \
+ con_rcpy.f  con_saxis.f con_sphea.f con_spcpy.f con_sphst.f \
+ con_trcha.f con_typsz.f con_vaxis.f con_vcorr.f con_wfman.f \
+ con_wcspx.f con_wgasp.f con_wgrid.f con_wrpgm.f con_wrtif.f
 
 C_ROUTINES = con_gbl.c con_cclos.c con_copen.c con_cwrit.c con_cwri2.c \
  bit_andub_c.c
@@ -53,7 +52,7 @@ DLR_GEN_ROUTINES = con_consx.gdlr
 I_GEN_ROUTINES = con_ekeyx.gi
 
 ##  Double
-D_GEN_ROUTINES = con_fillx.gd
+D_GEN_ROUTINES =
 
 # Rules for generating Fortran from generic code.
 FGENERIC=@FGENERIC@
