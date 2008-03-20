@@ -31,14 +31,14 @@
 *     positives and 255 for negatives.
 
 *  Usage:
-*     ndf2gif in out [scale] {high=? low=?
-*                            {percentiles=[?,?], [numbin=?]
-*                            {sigmas=[?,?]
+*     ndf2tiff in out [scale] {high=? low=?
+*                             {percentiles=[?,?], [numbin=?]
+*                             {sigmas=[?,?]
 
 *  Parameters:
 *     HIGH = _DOUBLE (Read)
 *        The array value that scales to 255 in the TIFF file.  It is 
-*        only required if SCALE is "scale".  All larger array values are
+*        only required if SCALE is "Scale".  All larger array values are
 *        set to 255 when HIGH is greater than LOW, otherwise all array 
 *        values less than HIGH are set to 255.  The dynamic default is 
 *        the maximum data value.  There is an efficiency gain when both
@@ -49,7 +49,7 @@
 *        Input NDF data structure containing the image to be displayed.
 *     LOW = _DOUBLE (Read)
 *        The array value that scales to 0 in the TIFF file.  It is only
-*        required if SCALE is "scale".  All smaller array values are
+*        required if SCALE is "Scale".  All smaller array values are
 *        also set to 0 when LOW is less than HIGH, otherwise all array 
 *        values greater than LOW are set to 0.  The dynamic default is 
 *        the minimum data value.  There is an efficiency gain when both 
@@ -76,7 +76,7 @@
 *     SCALE = LITERAL (Read)
 *        The type of scaling to be applied to the array.  [Range]
 *        The options, which may be abbreviated to an unambiguous string
-*        and are case-insensitive, are described below:
+*        and are case-insensitive, are described below.
 *          "Range"       - The image is scaled between the minimum and
 *                          maximum data values. (This is the default.)
 *          "Faint"       - The image is scaled from the mean minus one

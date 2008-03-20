@@ -1176,8 +1176,8 @@ TEXT & in & \htmlref{ASCII2NDF}{ASCII2NDF} & fits=f &  $\surd$ \\
 & out & \htmlref{NDF2ASCII}{ASCII2NDF} & fits=f reclen=80 & \\
 GIF & in & \htmlref{GIF2NDF}{GIF2NDF} & & $\times$ \\
 & out & \htmlref{NDF2GIF}{NDF2GIF} & & $\times$ \\
-TIF & in & \htmlref{TIF2NDF}{TIF2NDF} & & $\times$ \\
-& out & \htmlref{NDF2TIF}{NDF2TIF} & & $\times$ \\
+TIFF & in & \htmlref{TIFF2NDF}{TIFF2NDF} & & $\times$ \\
+& out & \htmlref{NDF2TIFF}{NDF2TIFF} & & $\times$ \\
 GASP & in & \htmlref{GASP2NDF}{GASP2NDF} & & \\
 & out & \htmlref{NDF2GASP}{NDF2GASP} & fillbad=0 & \\
 COMPRESSED & in & {\bf uncompress} & & $\times$ \\
@@ -5528,8 +5528,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       \sstsubsection{
         HIGH = \_DOUBLE (Read)
       }{
-        Only required if SCALE is {\texttt{"Scale"}}.
-        The array value that scales to 255 in the TIFF file.
+        The array value that scales to 255 in the TIFF file.  It is only
+        required if SCALE is {\texttt{"Scale"}}.
         All larger array values are set to 255 when HIGH is greater than
         LOW, otherwise all array values less than HIGH are set to 255.
         The dynamic default is the maximum data value.  There is an
@@ -5547,8 +5547,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       \sstsubsection{
         LOW = \_DOUBLE (Read)
       }{
-        Only required if SCALE is {\texttt{"Scale"}}.
-        The array value that scales to 0 in the TIFF file.
+        The array value that scales to 0 in the TIFF file.  It is only
+        required if SCALE is {\texttt{"Scale"}}.
         All smaller array values are also set to 0 when LOW is less than
         HIGH, otherwise all array values greater than LOW are set to 0.
         The dynamic default is the minimum data value.  There is an
@@ -5561,40 +5561,41 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       }{
         The output message filtering level, \texttt{QUIET}, \texttt{NORMAL} or
         \texttt{VERBOSE}. If set to verbose, the scaling limits used will be
-        displayed. \texttt{[NORMAL]}
+        displayed.  \texttt{[NORMAL]}
       } 
       \sstsubsection{
         NUMBIN  =  \_INTEGER (Read)
       }{
-        Only used if SCALE is {\texttt{"Percentiles"}}.
         The number of histogram bins used to compute percentiles for
-        scaling. (Percentiles mode) \texttt{[2048]}
+        scaling.  It is only used if SCALE is {\texttt{"Percentiles"}}.
+        \texttt{[2048]}
       }
       \sstsubsection{
          OUT = \_CHAR (Read)
       }{
-         The name of the TIFF file to be generated.
-         The \texttt{.tif} name extension is added to any output filename that
-         does not contain it.     
+         The name of the TIFF file to be generated.  
+         A \texttt{.tif} name extension is added to any output filename 
+         that does not contain it.     
          Any existing file with the same name will be overwritten.
       }
       \sstsubsection{
         PERCENTILES( 2 ) = \_REAL (Read)
       }{
-        Only required if SCALE is {\texttt{"Percentiles"}}.
         The percentiles that define the scaling limits. For example,
         {\texttt{[25,75]}} would scale between the quartile values.
+        It is only required if SCALE is {\texttt{"Percentiles"}}.
+
       }
       \sstsubsection{
          SCALE =  \xref{LITERAL}{sun95}{se_parmenu} (Read)
       }{
         The type of scaling to be applied to the array.
         The options, which may be abbreviated to an unambiguous string
-        and are case-insensitive, are described below:
+        and are case-insensitive, are described below.
         \ssthitemlist{
            \sstitem
            {\texttt{"Range"}}  --- The image is scaled between the minimum and
-                          maximum data values. (This is the default.)
+                          maximum data values.  (This is the default.)
            \sstitem
            {\texttt{"Faint"}}  --- The image is scaled from the mean minus one
                           standard deviation to the mean plus seven
