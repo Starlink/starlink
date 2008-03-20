@@ -234,11 +234,13 @@ void smurf_timesort( int *status ) {
    float *dts_out;
    float *vts_in;
    float *vts_out;
+   int **sysrts = NULL;
    int *file_index = NULL;
    int *first = NULL;         
    int *index = NULL;         
    int *itimeout = NULL;
    int *ndfid = NULL;
+   int *nsysrts = NULL;
    int *rts = NULL;
    int axes[ 2 ];             
    int conform;              
@@ -277,6 +279,7 @@ void smurf_timesort( int *status ) {
    int nts_in;            
    int nts_out;
    int nullsizelimit;
+   int ok;
    int outsize;               
    int place;
    int rts_num0;
@@ -658,8 +661,20 @@ void smurf_timesort( int *status ) {
                       status );
          }
 
-/* Loop round all sub-systems represented in the current observation. */
+/* Get the number of sub-systems for this observation. */
          nsubsys = astMapSize( subsys_map );
+
+/* Allocate memory to hold the RTS_NUM values used for this sub-system. */
+         nsysrts = astMalloc( sizeof( int )*nsubsys );
+         sysrts = astMalloc( sizeof( int * )*nsubsys );
+         if( sysrts ) {
+            for( isubsys = 0; isubsys < nsubsys; isubsys++ ) {
+               sysrts[ isubsys ] = NULL;
+               nsysrts[ isubsys ] = 0;
+            }
+         }
+
+/* Loop round all sub-systems represented in the current observation. */
          for( isubsys = 0; isubsys < nsubsys; isubsys++ ) {
             astBegin;
             ndfBegin();
@@ -908,6 +923,10 @@ void smurf_timesort( int *status ) {
                   rts_num_last = rts_num;
                }
             }
+
+/* Allocate an array to hold the output RTS_NUM values. */
+            sysrts[ isubsys ] = astMalloc( sizeof( int )*nts_out );
+            nsysrts[ isubsys ] = nts_out;
       
 /* Get the required maximum output file size, and convert to a number of
    time slices. */
@@ -1082,6 +1101,9 @@ void smurf_timesort( int *status ) {
 /* Store the input time slice tai for this output time slice. */
                   taiout[ k ] = tai[ i ]; 
       
+/* Store the RTS_NUM value for this output time slice. */
+                  sysrts[ isubsys ][ k ] = rts_num;
+      
 /* Loop round all input time slices that refer to the same RTS_NUM value. */
                   init = 1;
                   rts_num0 = rts_num;
@@ -1199,7 +1221,6 @@ void smurf_timesort( int *status ) {
             first = astFree( first );
             index = astFree( index );
             file_index = astFree( file_index );
-            rts = astFree( rts );
             grid = astFree( grid );
             tai = astFree( tai );
 
@@ -1207,6 +1228,40 @@ void smurf_timesort( int *status ) {
             ndfEnd( status );
             astEnd;
          }
+
+/* Check that all output sub-systems for this observation have the same 
+   list of RTS_NUM values. */
+         ok = 1;
+         for( isubsys = 0; ok && isubsys < nsubsys; isubsys++ ) {
+            if( nsysrts[ isubsys ] != nsysrts[ 0 ] ) {
+               ok = 0;
+            } else {
+               for( k = 0; k <  nsysrts[ 0 ]; k++ ) {
+                  if( sysrts[ isubsys ][ k ] != sysrts[ 0 ][ k ] ){
+                     ok = 0;
+                     break;
+                  } 
+               }
+            }
+         }
+
+/* Issue a warning if they do not. */
+         if( !ok && *status == SAI__OK ) {
+            msgSetc( "O", astMapKey( obs_map, iobs ) );
+            msgOut( "", "WARNING: The RTS_NUM values in the output NDFs "
+                    "for observation ^O are not the same in all sub-systems.", 
+                    status );
+         }
+
+/* Free resources. */
+         if( sysrts ) {
+            for( isubsys = 0; isubsys < nsubsys; isubsys++ ) {
+               sysrts[ isubsys ] = astFree( sysrts[ isubsys ] );
+            }
+         }
+         sysrts = astFree( sysrts );   
+         nsysrts = astFree( nsysrts );   
+
       }
 
       grpDelet( &igrp2, status);
