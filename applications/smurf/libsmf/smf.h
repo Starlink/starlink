@@ -825,5 +825,6 @@ void smf_simple_stats( double *data, dim_t start, dim_t nsamp,
 
 
 AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop, int *conform, Grp **ogrp, int *status );
+void smf_reportprogress( int max, int *status );
 
 #endif /* SMF_DEFINED */

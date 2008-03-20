@@ -354,6 +354,17 @@ void smf_rebincube_nn( smfData *data, int first, int last,
 /* Initialise a pointer to the ntex time slice index to be used. */
    nexttime = ptime;
 
+/* Count the number of time slices to be processed. */
+   if( ptime ) {
+      itime = 0;
+      while( ptime[ itime ] != VAL__MAXI ) itime++;
+   } else {
+      itime = nslice;
+   }
+
+/* Initialise the progress meter. */
+   smf_reportprogress( itime, status );
+
 /* Loop round all time slices in the input NDF. */
    for( itime = 0; itime < nslice && *status == SAI__OK; itime++ ) {
 
@@ -476,6 +487,9 @@ void smf_rebincube_nn( smfData *data, int first, int last,
             }
          }
       }
+
+/* Update the progress meter. */
+      smf_reportprogress( 0, status );
 
 /* End the AST context. */
       astEnd;

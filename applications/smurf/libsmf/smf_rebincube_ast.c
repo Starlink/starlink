@@ -376,6 +376,9 @@ void smf_rebincube_ast( smfData *data, int first, int last, int *ptime,
 /* Initialise a pointer to the ntex time slice index to be used. */
    nexttime = ptime;
 
+/* Initialise the progress meter. */
+   smf_reportprogress( nslice, status );
+
 /* Loop round all time slices in the input NDF. */
    for( itime = 0; itime < nslice && *status == SAI__OK; itime++ ) {
 
@@ -477,6 +480,9 @@ void smf_rebincube_ast( smfData *data, int first, int last, int *ptime,
                           udim, ldim, uddim, teff_array, NULL, NULL, NULL );
          }
       }
+
+/* Update the progress meter. */
+      smf_reportprogress( 0, status );
 
 /* End the AST context. */
       astEnd;

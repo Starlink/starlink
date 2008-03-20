@@ -1700,8 +1700,7 @@ void smurf_makecube( int *status ) {
                msgSetc( "FILE", pname );
                msgSeti( "THISFILE", ifile );
                msgSeti( "NUMFILES", tile->size );
-               msgOutif( MSG__VERB, " ", 
-                         "SMURF_MAKECUBE: Processing ^THISFILE/^NUMFILES ^FILE",
+               msgOutif( MSG__VERB, " ", "Processing ^FILE (^THISFILE/^NUMFILES)",
                          status );
 
 /* Store the filename in the keymap for later - the GRP would be fine
@@ -1788,6 +1787,8 @@ void smurf_makecube( int *status ) {
    
 /* If we are creating an output Variance component... */
          if( genvar && *status == SAI__OK) {
+            msgOutif( MSG__VERB, " ", "Creating output variances",
+                      status );
    
 /* Count the number of pixel which have a good data value but a bad
    variance value, and count the number which have a good data value. 
@@ -1951,6 +1952,8 @@ void smurf_makecube( int *status ) {
 /* If we created an output Variance component, store the median system 
    temperature as keyword TSYS in the FitsChan. */
          if( tsys_array ) {
+            msgOutif( MSG__VERB, " ", "Calculating median output Tsys value",
+                      status );
             if( genvar ) {
                work2_array = astStore( work2_array, tsys_array, nxy*sizeof( float ) );
                kpg1Medur( 1, nxy, work2_array, &medtsys, &neluse, status );
@@ -1970,6 +1973,8 @@ void smurf_makecube( int *status ) {
 /* Store the median exposure time as keyword EXP_TIME in the FitsChan.
    Since kpg1Medur partially sorts the array, we need to take a copy of it
    first. */
+         msgOutif( MSG__VERB, " ", "Calculating median output exposure time",
+                   status );
          work2_array = astStore( work2_array, exp_array, nxy*sizeof( float ) );
          kpg1Medur( 1, nxy, work2_array, &medexp, &neluse, status );
          atlPtftr( fchan, "EXP_TIME", medexp, 
@@ -1978,6 +1983,8 @@ void smurf_makecube( int *status ) {
 /* Store the median effective integration time as keyword EFF_TIME in the 
    FitsChan. Since kpg1Medur partially sorts the array, we need to take a 
    copy of it first. */
+         msgOutif( MSG__VERB, " ", "Calculating median output effective exposure time",
+                   status );
          work2_array = astStore( work2_array, eff_array, nxy*sizeof( float ) );
          kpg1Medur( 1, nxy, work2_array, &medeff, &neluse, status );
          atlPtftr( fchan, "EFF_TIME", medeff, 
@@ -2000,17 +2007,17 @@ void smurf_makecube( int *status ) {
 
 /* Store the keywords holding the number of tiles generated and the index
    of the current tile. */
-      atlPtfti( fchan, "NUMTILES", ntile, 
-                   "No. of tiles covering the field", status );
-      atlPtfti( fchan, "TILENUM", itile, 
-                   "Index of this tile (1->NUMTILES)", status );
+         atlPtfti( fchan, "NUMTILES", ntile, 
+                      "No. of tiles covering the field", status );
+         atlPtfti( fchan, "TILENUM", itile, 
+                      "Index of this tile (1->NUMTILES)", status );
    
 /* If the FitsChan is not empty, store it in the FITS extension of the
    output NDF (any existing FITS extension is deleted). */
-      if( fchan ){
-         if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
-         fchan = astAnnul( fchan );
-      }
+         if( fchan ){
+            if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
+            fchan = astAnnul( fchan );
+         }
 
 /* If required ensure that the output NDF has a POLPACK extension holding
    the polarisation angle for the data in the output cube. */
@@ -2020,6 +2027,7 @@ void smurf_makecube( int *status ) {
    first clone the NDF identifier, then close the file (which will unmap
    the NDF arrays), and then reshape the NDF to exclude the boundary 
    that was added to the tile to avoid edge effects. */
+         msgOutif( MSG__VERB, " ", "Reshaping output NDFs", status );
          smf_reshapendf( &expdata, tile, status );
          smf_reshapendf( &expdata, tile, status );
          smf_reshapendf( &effdata, tile, status );
