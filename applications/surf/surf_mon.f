@@ -177,6 +177,13 @@ c
 *     Set application name in history recording
       CALL SURF_SET_APP_NAME( NAME, STATUS )
 
+*     Begin a provenance block. This causes event handlers to be registered
+*     with the NDF library so that a handler routine in NDG is called every
+*     time an NDF is opened. This handler routine keeps a record of all NDFs 
+*     that are opened for input or output, until the block is closed by 
+*     calling NDG_ENDPV.
+      CALL NDG_BEGPV( STATUS )
+
 *     Execute required action
       IF (NAME .EQ. 'ADD_DBM') THEN
 
@@ -312,6 +319,15 @@ c
      :        STATUS)
 
       END IF
+
+*  End the provenance block. This will result in every output NDF being
+*  given a provenance extension containing a record of the input NDFs
+*  that the application accessed in order to create the output NDF. Any
+*  output NDF that already contains a provenance extension is left
+*  unchanged (so individual application can over-ride this automatic
+*  provenance handling by adding a provenance extension to the output NDF
+*  itself).
+      CALL NDG_ENDPV( 'SURF:'//NAME, STATUS )
 
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_SETC('TSK', NAME)
