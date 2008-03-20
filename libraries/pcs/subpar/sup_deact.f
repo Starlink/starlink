@@ -44,6 +44,7 @@
 *  Copyright:
 *     Copyright (C) 1984, 1985, 1987, 1988, 1989, 1990, 1991, 1992, 1993 Science & Engineering Research Council.
 *     Copyright (C) 1996, 1997, 2000 Central Laboratory of the Research Councils.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -65,6 +66,7 @@
 *  Authors:
 *     BDK: B D Kelly (ROE)
 *     AJC: A J Chipperfield (STARLINK)
+*     DSB: David S. Bery (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -142,6 +144,16 @@
 *     11-AUG-2000 (AJC):
 *        Correct action for object names (type GE 20). (Shouldn't assume
 *        locator in PAR tables was the correct thing to copy to GLOBAL.)
+*     20-MAR-2008 (DSB):
+*        When copying a parameter value from the application parameter
+*        file to the global parameter file, check that he application 
+*        parameter exists before accesing it. If a parameter (such as an
+*        output NDF) is specified on the command line, it becomes active. 
+*        But if the application never accesses the parameter (because it
+*        decided not to create the output NDF), no value for it will
+*        exist in the application parameter file. The old system was to
+*        report an error in this situation. The new system just ignores
+*        the parameter.
 *     {enter_further_changes_here}
 
 *  Deficiencies:
@@ -299,20 +311,16 @@
      :                         STATUS )
                            ENDIF
                         ENDIF
-*                     Get locator to parameter store
-                        CALL DAT_FIND ( ACTLOC, PARNAMES(J), LOC,
+*                     If a parameter value is available, copy it to
+*                     global.
+                        CALL DAT_THERE( ACTLOC, PARNAMES(J), THERE,
      :                    STATUS )
-                        IF ( STATUS .EQ. SAI__OK ) THEN
-*                        copy component to GLOBAL
-                            CALL DAT_COPY ( 
+                        IF( THERE ) THEN
+                           CALL DAT_FIND ( ACTLOC, PARNAMES(J), LOC,
+     :                       STATUS )
+                           CALL DAT_COPY ( 
      :                       LOC, GLOBLOC, COMPONENT(2), STATUS )
-                            CALL DAT_ANNUL ( LOC, STATUS )
-
-                        ELSE
-                            CALL EMS_SETC( 'PARAM', PARNAMES(J) )
-                            CALL EMS_REP( 'SUP_DEACT2', 'SUBPAR: '//
-     :                        'Failed to find locator for parameter '//
-     :                        '^PARAM', STATUS )
+                           CALL DAT_ANNUL ( LOC, STATUS )
                         ENDIF
 
                      ELSE IF ( PARTYPE(J) .GE. 10 ) THEN
