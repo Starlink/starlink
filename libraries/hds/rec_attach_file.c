@@ -75,7 +75,7 @@
 /* Authors:								    */
 /*    RFWS: R.F. Warren-Smith (STARLINK)				    */
 /*    BKM:  B.K. McIlwrath    (STARLINK)                                    */
-/*    DSB:  David S Berry (JAC)
+/*    DSB:  David S Berry (JAC)                                             */
 /*    {@enter_new_authors_here@}					    */
 
 /* History:								    */
