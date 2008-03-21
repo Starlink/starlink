@@ -71,6 +71,7 @@
 #include <stdio.h>
 
 /* Starlink includes */
+/*
 #include "ast.h"
 #include "mers.h"
 #include "par.h"
@@ -80,12 +81,14 @@
 #include "star/hds.h"
 #include "star/ndg.h"
 #include "star/grp.h"
-
+*/
 /* SMURF includes */
+/*
 #include "smurf_par.h"
 #include "smurflib.h"
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
+*/
 
 #include "libsc2fts/sc2fts.h"
 
@@ -93,7 +96,8 @@
 #define TASK_NAME "SC2FTS"
 
 void smurf_sc2fts ( int *status ) {
+  
+  /* enter the FTS-2 smurf data reduction */
+  sc2fts_entry( status );
 
-  printf("test: SC2FTS\n");
-  sc2fts_testfts(status);  
 }

@@ -1,36 +1,42 @@
 /*
 *+
 *  Name:
-*     sc2fts.h
+*     sc2fts_specflatfield.c
 
 *  Purpose:
-*     Prototypes for the libsc2fts library
+*     Calibrate the spectra by the detector's responsivity
 
 *  Language:
 *     Starlink ANSI C
 
 *  Type of Module:
-*     Header File
+*     Subroutine
 
 *  Invocation:
-*     #include "sc2fts.h"
+*     sc2fts_specflatfield ( int indf, char* parlist, int *status )
+
+*  Arguments:
+*     indf = int (Given)
+*        the file ID
+*     parlist = char* (Given)
+*        the parameter list for this operation
+*     status = int* (Given and Returned)
+*        Pointer to global status.  
 
 *  Description:
-*     Prototypes used by the libsc2fts functions.
+*
+*
 
 *  Authors:
 *     B.Zhang (UoL)
-*     {enter_new_authors_here}
 
-*  History:
-*     2008-03-14 (BZ):
-*        first draft
-*     {enter_further_changes_here}
+*  History :
+*     2008-03-16 (BZ):
+*        Create a test implementation for FTS-2
 
 *  Copyright:
-*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
-*     All Rights Reserved.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
+*     Council. University of British Columbia. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -53,5 +59,15 @@
 *-
 */
 
-void sc2fts_entry ( int *status );
+/* Standard includes */
+#include <math.h>
 
+void sc2fts_specflatfield 
+(
+int   indf,
+char* parlist,
+int *status          /* global status (given and returned) */
+)
+{
+   printf("SpecFlatfield operation!\n");
+}

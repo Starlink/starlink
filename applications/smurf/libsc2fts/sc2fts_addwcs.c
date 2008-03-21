@@ -1,10 +1,10 @@
 /*
 *+
 *  Name:
-*     sc2fts_testfts.c
+*     sc2fts_addwcs.c
 
 *  Purpose:
-*     used to test FTS-2 implementation
+*     Add WCS information for a spectral cube
 
 *  Language:
 *     Starlink ANSI C
@@ -13,9 +13,13 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2fts_testfts ( int *status )
+*     sc2fts_addwcs ( int indf, char* parlist, int *status )
 
 *  Arguments:
+*     indf = int (Given)
+*        the file ID
+*     parlist = char* (Given)
+*        the parameter list for this operation
 *     status = int* (Given and Returned)
 *        Pointer to global status.  
 
@@ -58,16 +62,13 @@
 /* Standard includes */
 #include <math.h>
 
-/* SC2FTS includes */
-#include "sc2fts.h"
-
-void sc2fts_testfts 
+void sc2fts_addwcs 
 (
-int *status          /* global status (given and returned) */
+int   indf,
+char* parlist,
+int   *status          /* global status (given and returned) */
 )
 
 {
-  
-   printf("Implementation is successful!\n");
-
+   printf("ADDWCS operation!\n");
 }

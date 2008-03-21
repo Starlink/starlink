@@ -1612,7 +1612,6 @@ package @PACKAGE@ {
             access READ
             vpath {PROMPT }
             ppath GLOBAL CURRENT
-            association <-GLOBAL.DATA_ARRAY
             prompt {Input data file}
             helpkey *
           }
@@ -1622,8 +1621,21 @@ package @PACKAGE@ {
             access WRITE
             vpath {PROMPT }
             ppath GLOBAL CURRENT
-            association ->GLOBAL.DATA_ARRAY
             prompt {Output data file}
+            helpkey *
+          }
+          parameter opslist {
+            position 3
+            type _CHAR 
+            vpath {PROMPT }
+            prompt {Operation list: eg. op1, op2, ...}
+            helpkey *
+          }
+          parameter parslist {
+            position 4
+            type _CHAR
+            vpath {PROMPT }
+            prompt {Parameter list: eg. keyword1=value1, keyword2=value2, ...}
             helpkey *
           }
           parameter msg_filter {

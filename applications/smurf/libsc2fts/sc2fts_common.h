@@ -1,10 +1,10 @@
 /*
 *+
 *  Name:
-*     sc2fts.h
+*     sc2fts_common.h
 
 *  Purpose:
-*     Prototypes for the libsc2fts library
+*     Prototypes for sc2fts_common.c
 
 *  Language:
 *     Starlink ANSI C
@@ -13,7 +13,7 @@
 *     Header File
 
 *  Invocation:
-*     #include "sc2fts.h"
+*     #include "sc2fts_common.h"
 
 *  Description:
 *     Prototypes used by the libsc2fts functions.
@@ -53,5 +53,6 @@
 *-
 */
 
-void sc2fts_entry ( int *status );
-
+int issupported(const char *op, const char *opslist);
+char* getvalue(const char* keyword, const char *parslist);
+int getpars(const char *pars_fun, const char *parslist, char *pars);
