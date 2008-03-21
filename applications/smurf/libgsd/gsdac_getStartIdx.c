@@ -41,6 +41,8 @@
 *        Use gsdVars struct to store headers/arrays
 *     2008-03-19 (JB):
 *        Removed unused variables.
+*     2008-03-21 (JB):
+*        Calculate startIdx for grids/rasters
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -79,17 +81,120 @@
 
 #define FUNC_NAME "gsdac_getStartIdx"
 
-void gsdac_getStartIdx ( const gsdVars *gsdVars, 
-                         const char *samMode, int *startIdx, int *status )
+void gsdac_getStartIdx ( const gsdVars *gsdVars, const char *samMode, 
+                         int *startIdx, int *status )
 
 {
 
   /* Local variables */
+  double currentCol;          /* current column map coord */
+  double currentRow;          /* current row map coord */
+  double expStartCol;         /* expected start column coord */
+  double expStartRow;         /* expected start row coord */ 
+  int found;                  /* found index? */
+  int i;                      /* loop counter */
+  int j;                      /* row increment */
+  int k;                      /* column increment */
+  int nCols;                  /* number of columns */
+  int nRows;                  /* number of rows */
+  int posCol;                 /* columns moving in positive direction? */
+  int posRow;                 /* rows moving in positive direction? */
+  double startCol;            /* start column index */ 
+  double startRow;            /* start row index */       
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
 
-/** KLUDGED FOR NOW **/
-  *startIdx = 1;
+  found = 0;
+  i = 1;
+
+  if ( strncmp ( samMode, "sample", 6 ) == 0 ) {
+
+    *startIdx = 1;
+    return;
+
+  }
+
+  /* If we are moving in a vertical direction, swap x and y. */
+  if ( strncmp ( gsdVars->obsDirection, "VERTICAL",8 ) == 0 ) {
+
+    startRow = gsdVars->mapStartY;
+    startCol = gsdVars->mapStartX;
+
+    nRows = gsdVars->nMapPtsX;
+    nCols = gsdVars->nMapPtsY;
+
+    posRow = gsdVars->mapPosY;
+    posCol = gsdVars->mapPosX;
+
+  } else {
+
+    startRow = gsdVars->mapStartX;
+    startCol = gsdVars->mapStartY;
+
+    nRows = gsdVars->nMapPtsY;
+    nCols = gsdVars->nMapPtsX;
+
+    posRow = gsdVars->mapPosX;
+    posCol = gsdVars->mapPosY;
+
+  }
+
+  /* If this is a raster, only increment on each row.  Remember
+     that the index begins at 1, not 0. */
+  if ( strncmp ( samMode, "raster", 6 ) == 0 ) {
+
+    if ( posCol ) 
+      *startIdx = startCol + ( nRows - 1.0 ) / 2.0 + 1.0;
+    else 
+      *startIdx = ( nRows - 1.0 ) / 2.0 - startCol + 1.0;
+    return;
+
+  }
+
+  /* The start coordinates are usually in the bottom left
+     hand corner, but if x and/or y decreases in the first
+     row/column, a different corner is the "start". */
+  if ( posRow  )
+    expStartCol = ( nCols - 1.0 ) / -2.0;
+  else 
+    expStartCol = ( nCols - 1.0 ) / 2.0;
+
+  if ( posCol )
+    expStartRow = ( nRows - 1.0 ) / -2.0;
+  else 
+    expStartRow = ( nRows - 1.0 ) / 2.0;
+
+  for ( j = 0; j < nRows; j++ ) {
+
+    for ( k = 0; k < nCols; k++ ) {
+
+      /* Check to see if we are moving in a positive or 
+         negative direction and get the coordinates of our
+         current position in the map.   Also check for 
+         scan reversal on the column. */
+      if ( posCol ) currentRow = expStartRow + j;
+      else currentRow = expStartRow - j;
+
+      if ( gsdVars->scanRev && j % 2 == 1 ) {      
+        if ( posRow ) currentCol = ( -1.0 * expStartCol ) - k;
+        else currentCol = ( -1.0 * expStartCol ) + k;
+      } else {
+        if ( posRow ) currentCol = expStartCol + k;
+        else currentCol = expStartCol - k;
+      }
+
+      if ( currentCol == startRow && currentRow == startCol ) {
+        j = nRows;
+        k = nCols;
+        found = 1;
+        *startIdx = i;
+      }
+
+      i++;
+
+    }
+
+  }
 
 }

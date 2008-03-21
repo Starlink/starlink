@@ -76,6 +76,8 @@
 *        Add debugging statements
 *     2008-03-19 (JB):
 *        Calculate offsets
+*     2008-03-21 (JB):
+*        Use debug flag
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -117,6 +119,8 @@
 #include "smurf_par.h"
 
 #define SOLSID 1.00273790935
+
+#define DEBUGON 0
 
 #define FUNC_NAME "gsdac_getWCS.c"
 
@@ -325,7 +329,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   datePointing = astKeyMap( "" );
   cellMap = astKeyMap( "" ); 
 
-  if ( subBandNum == 0 ) printf ( "CENTRE (base) RA_DEC (radians) : %f %f\n", wcs->baseTr1, wcs->baseTr2 );
+  if ( subBandNum == 0 && DEBUGON ) printf ( "CENTRE (base) RA_DEC (radians) : %f %f\n", wcs->baseTr1, wcs->baseTr2 );
 
   /* Fill the keymaps from the input GSD. */
   astMapPut0I( datePointing, "JFREST(1)", 
@@ -377,7 +381,8 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   dataDims[2] = gsdVars->nBEChansOut;
 
-  printf ( "dataDims : %i %i %i\n", dataDims[0], dataDims[1], dataDims[2] );
+  if ( DEBUGON ) 
+    printf ( "dataDims : %i %i %i\n", dataDims[0], dataDims[1], dataDims[2] );
 
   /* Get a frameset describing the mapping from cell to sky. */
   atlWcspx ( datePointing, cellMap, dataDims, 
@@ -399,9 +404,13 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
 
-  if ( subBandNum == 0 ) printf ( "GRID (base) coordinates  : %f %f\n", coordIn[0], coordIn[1] );
+  if ( subBandNum == 0 && DEBUGON ) 
+    printf ( "GRID (base) coordinates  : %f %f\n", 
+             coordIn[0], coordIn[1] );
 
-  if ( subBandNum == 0 ) printf ( "RA/Dec (base) coordinates (radians)  : %f %f\n", coordOut[0], coordOut[1] );  
+  if ( subBandNum == 0 && DEBUGON ) 
+    printf ( "RA/Dec (base) coordinates (radians)  : %f %f\n", 
+             coordOut[0], coordOut[1] );
 
   wcs->baseTr1 = coordOut[0];
   wcs->baseTr2 = coordOut[1];
@@ -414,9 +423,13 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
 
-  if ( subBandNum == 0 ) printf ( "GRID (offset) coordinates  : %f %f\n", coordIn[0], coordIn[1] );
+  if ( subBandNum == 0 && DEBUGON ) 
+    printf ( "GRID (offset) coordinates  : %f %f\n", 
+             coordIn[0], coordIn[1] );
 
-  if ( subBandNum == 0 ) printf ( "RA/Dec (offset) coordinates (radians)  : %f %f\n", coordOut[0], coordOut[1] );
+  if ( subBandNum == 0 && DEBUGON ) 
+    printf ( "RA/Dec (offset) coordinates (radians)  : %f %f\n", 
+             coordOut[0], coordOut[1] );
 
   wcs->acTr1 = coordOut[0];
   wcs->acTr2 = coordOut[1];
@@ -429,9 +442,13 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
 
-  if ( subBandNum == 0 ) printf ( "GRID (base) coordinates  : %f %f\n", coordIn[0], coordIn[1] );
+  if ( subBandNum == 0 && DEBUGON ) 
+    printf ( "GRID (base) coordinates  : %f %f\n", 
+             coordIn[0], coordIn[1] );
 
-  if ( subBandNum == 0 ) printf ( "AZEL (base) coordinates (radians)  : %f %f\n", coordOut[0], coordOut[1] );
+  if ( subBandNum == 0 && DEBUGON ) 
+    printf ( "AZEL (base) coordinates (radians)  : %f %f\n", 
+             coordOut[0], coordOut[1] );
 
   wcs->baseAz = coordOut[0];
   wcs->baseEl = coordOut[1];
@@ -444,9 +461,13 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
 
-  if ( subBandNum == 0 ) printf ( "GRID (offset) coordinates  : %f %f\n", coordIn[0], coordIn[1] );
+  if ( subBandNum == 0 && DEBUGON ) 
+    printf ( "GRID (offset) coordinates  : %f %f\n", 
+             coordIn[0], coordIn[1] );
 
-  if ( subBandNum == 0 ) printf ( "AZEL (offset) coordinates (radians)  : %f %f\n\n", coordOut[0], coordOut[1] );
+  if ( subBandNum == 0 && DEBUGON ) 
+    printf ( "AZEL (offset) coordinates (radians)  : %f %f\n", 
+             coordOut[0], coordOut[1] );
 
   wcs->acAz = coordOut[0];
   wcs->acEl = coordOut[1];
@@ -454,7 +475,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   /* Calculate airmass from El of current cell. */
   wcs->airmass = slaAirmas( AST__DPIBY2 - wcs->acEl );
 
-  printf ( "airmass : %f\n", wcs->airmass );
+  if ( DEBUGON ) printf ( "airmass : %f\n", wcs->airmass );
 
   /* Focal plane is AZEL so AZ angle is 0. */
   wcs->azAng = 0.0;
@@ -470,7 +491,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   gapptRA = ( gsdVars->scanTable1[index] - gapptRA ) * 2 * AST__DPI / 24.0;
   wcs->trAng = slaPa( gapptRA, gapptDec, gsdVars->telLatitude );
 
-  printf( "trAng : %f\n", wcs->trAng );
+  if ( DEBUGON ) printf ( "trAng : %f\n", wcs->trAng );
 
   astEnd;
 
