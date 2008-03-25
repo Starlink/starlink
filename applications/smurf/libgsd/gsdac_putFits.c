@@ -14,8 +14,8 @@
 *     Subroutine
 
 *  Invocation:
-*     gsdac_putFits ( const gsdVars *gsdVars, 
-*                     const int subBandNum, const int obsNum, 
+*     gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
+*                     const int nSubsys, const int obsNum, 
 *                     const int utDate, const int nSteps, 
 *                     const char *backend, char *recepNames[],
 *                     const char *samMode, const char *obsType,
@@ -28,6 +28,8 @@
 *        GSD file access parameters
 *     subBandNum = const int (Given)
 *        Subband number
+*     nSubsys = const int (Given)
+*        Number of subsystems
 *     obsNum = const int (Given)
 *        Observation number
 *     utDate = const int (Given)
@@ -63,17 +65,17 @@
 
 *  History :
 *     2008-02-04 (JB):
-*        Original
+*        Original.
 *     2008-02-14 (JB):
-*        Use gsdVars struct to store headers/arrays
+*        Use gsdVars struct to store headers/arrays.
 *     2008-02-19 (JB):
-*        Pass in gsdWCS struct instead of JCMTState
+*        Pass in gsdWCS struct instead of JCMTState.
 *     2008-02-21 (JB):
-*        Fix integration time calculation
+*        Fix integration time calculation.
 *     2008-02-28 (JB):
-*        Replace subsysNum with subBandNum
+*        Replace subsysNum with subBandNum.
 *     2008-02-28 (JB):
-*        Move getDateVars and getMapVars to wrtData
+*        Move getDateVars and getMapVars to wrtData.
 *     2008-03-04 (JB):
 *        Use number of scans actually completed.
 *     2008-03-06 (JB):
@@ -83,6 +85,8 @@
 *        Use IFFreq of 4.0, and set refChan as offset channel.
 *     2008-03-19 (JB):
 *        Removed unused variables.
+*     2008-03-24 (JB):
+*        Calculate intTime and nMix.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -125,8 +129,8 @@
 
 #define FUNC_NAME "gsdac_putFits"
 
-void gsdac_putFits ( const gsdVars *gsdVars, 
-                     const int subBandNum, const int obsNum, 
+void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
+                     const int nSubsys, const int obsNum, 
                      const int utDate, const int nSteps, 
                      const char *backend, char *recepNames[],
                      const char *samMode, const char *obsType,
@@ -201,22 +205,27 @@ void gsdac_putFits ( const gsdVars *gsdVars,
 
   /* Copy the obsID into the obsIDSS and add the subsystem number. */
   sprintf ( obsIDSS, "%s_%i", dateVars->obsID, 
-            subBandNum % ( gsdVars->nBESections / gsdVars->nFEChans ) + 1 );
+            subBandNum % nSubsys );
 
 
   /* Integration time related. */
 
-  /* Get the sum of the integration times. */
-  if ( *status == SAI__OK ) {
+  /* Get the sum of the integration times.  This is either the
+     sum of the elements of the intTimes table for grids, or 
+     the scan time times the number of scans for rasters. */
+  if ( gsdVars->obsContinuous ) {  
+
+    intTime = gsdVars->scanTime * gsdVars->nScan;
+
+  } else {
 
     i = 0;
     intTime = 0.0;
-    while ( i < ( gsdVars->nScanVars2 * gsdVars->nScan ) ) {
-      intTime += gsdVars->scanTable2[i];
-      i += gsdVars->nScanVars2;
+    for ( i = 0; i < gsdVars->nScan; i++ ) {
+      intTime += gsdVars->intTimes[i];
     }
 
-  }//k probably not right for rasters...
+  }
 
 
   /* ACSIS Specific. */
@@ -251,8 +260,13 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   /* Get the IF frequency and make sure it's always positive. */
   IFfreq = 4.0;
 
-  /* Get the number of mixers. */
-  nMix = 1;//k
+  /* Get the number of mixers, 2 for RXB & RXW, 1 for others. */
+  if ( strncmp ( "RXB", gsdVars->frontend, 3 ) == 0 ||
+       strncmp ( "RXW", gsdVars->frontend, 3 ) == 0 ) {
+    nMix = 2;
+  } else {
+    nMix = 1;
+  }
 
   /* Get the observed sideband (-ve value = LSB, +ve value = USB ). */
   if ( gsdVars->sbSigns[subBandNum] > 0 ) strcpy ( obsSB, "USB" );
@@ -534,8 +548,7 @@ void gsdac_putFits ( const gsdVars *gsdVars,
   astSetFitsS ( fitschan, "BWMODE", bwMode,
                 "Bandwidth setup", 0 );
 
-  astSetFitsI ( fitschan, "SUBSYSNR", subBandNum % 
-                ( gsdVars->nBESections / gsdVars->nFEChans ) + 1,
+  astSetFitsI ( fitschan, "SUBSYSNR", subBandNum % nSubsys,
                 "Sub-system number", 0 );
 
   astSetFitsS ( fitschan, "SUBBANDS", bwMode,

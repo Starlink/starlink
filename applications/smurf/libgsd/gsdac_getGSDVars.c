@@ -45,6 +45,8 @@
 *        Add debug statement.
 *     2008-03-19 (JB):
 *        Removed unused variables.
+*     2008-03-24 (JB):
+*        Removed debug statement =0)
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -875,12 +877,5 @@ void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
     }    
 
   } 
-
-    printf ( "centreAz/El (degrees) : %f %f\n", gsdVars->centreAz, gsdVars->centreEl );
-    printf ( "centreRA/Dec (degrees) : %f %f\n", gsdVars->centreRA, gsdVars->centreDec );
-    printf ( "centreRA1950/Dec1950 (degrees) : %f %f\n", gsdVars->centreRA1950, gsdVars->centreDec1950 );
-    printf ( "centreRA2000/Dec2000 (degrees) : %f %f\n", gsdVars->centreRA2000, gsdVars->centreDec2000 );
-    printf ( "centreGL/GB (degrees) : %f %f\n\n", gsdVars->centreGL, gsdVars->centreGB );
-
 
 }

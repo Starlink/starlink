@@ -42,25 +42,27 @@
 *     2008-02-05 (JB):
 *        Original.
 *     2008-02-14 (JB):
-*        Use gsdVars struct to store headers/arrays
+*        Use gsdVars struct to store headers/arrays.
 *     2008-02-19 (JB):
-*        Check dasFlag, fill gsdWCS
+*        Check dasFlag, fill gsdWCS.
 *     2008-02-20 (JB):
-*        Set memory usage for specwrite
+*        Set memory usage for specwrite.
 *     2008-02-21 (JB):
-*        Allocate enough memory for fitschans    
+*        Allocate enough memory for fitschans.  
 *     2008-02-26 (JB):
-*        Make gsdac_getWCS per-subsystem  
+*        Make gsdac_getWCS per-subsystem.
 *     2008-02-28 (JB):
-*        Send each subband's data to correct file
+*        Send each subband's data to correct file.
 *     2008-02-28 (JB):
-*        Move getDateVars and getMapVars out of putFits
+*        Move getDateVars and getMapVars out of putFits.
 *     2008-03-04 (JB):
 *        Use number of scans actually completed.
 *     2008-03-07 (JB):
-*        Fix calculation of amStart/End, azStart/End, elStart/End
+*        Fix calculation of amStart/End, azStart/End, elStart/End.
 *     2008-03-19 (JB):
 *        Removed unused variables.
+*     2008-03-24 (JB):
+*        Check for actual number of used receptors.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -236,18 +238,31 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
      to know how many bytes to allocate. */
   mem = gsdVars->nBEChansOut * gsdVars->noScans * 
         gsdVars->nScanPts * sizeof(float);
-  acsSpecSetMem ( mem, status ); 
 
-  /* Find out how many subsystems there are (number of subbands
-     divided by number of receptors). */
-  nSubsys = gsdVars->nBESections / gsdVars->nFEChans;
+  acsSpecSetMem ( mem, status ); 
 
   msgOutif(MSG__VERB," ", 
 	     "Preparing file writing system", status); 
 
-  acsSpecOpenTS ( directory, utDate, obsNum, gsdVars->nFEChans, 
-                  nSubsys, recepNames, focalStation, 
-                  fPlaneX, fPlaneY, OCSConfig, status );
+  /* Find out how many subsystems there are (number of subbands
+     divided by number of receptors).  First check for instances
+     where one receptor wasn't used. */
+  if ( gsdVars->nBESections < gsdVars->nFEChans ) { 
+
+    nSubsys = 1;
+    acsSpecOpenTS ( directory, utDate, obsNum, 1, 
+                    nSubsys, recepNames, focalStation, 
+                    fPlaneX, fPlaneY, OCSConfig, status );
+
+  } else { 
+
+    nSubsys = gsdVars->nBESections / gsdVars->nFEChans;
+
+    acsSpecOpenTS ( directory, utDate, obsNum, gsdVars->nFEChans, 
+                    nSubsys, recepNames, focalStation, 
+                    fPlaneX, fPlaneY, OCSConfig, status );
+
+  }
 
   /* Truncate the name of the backend. */
   cnfImprt ( gsdVars->backend, 16, backend );
@@ -337,9 +352,9 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
       fitschan[fitsIndex] = astFitsChan ( NULL, NULL, "" );
 
       /* Fill the FITS headers. */
-      gsdac_putFits ( gsdVars, subBandNum, obsNum, utDate, nSteps, backend, 
-                      recepNames, samMode, obsType, &dateVars, &mapVars, wcs, 
-                      fitschan[fitsIndex], status );
+      gsdac_putFits ( gsdVars, subBandNum, nSubsys, obsNum, utDate, nSteps, 
+                      backend, recepNames, samMode, obsType, &dateVars, 
+                      &mapVars, wcs, fitschan[fitsIndex], status );
 
       specIndex = specIndex + gsdVars->BEChans[subBandNum];
 

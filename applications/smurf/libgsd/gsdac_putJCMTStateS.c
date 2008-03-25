@@ -46,17 +46,19 @@
 
 *  History:
 *     2008-01-29 (JB):
-*        Original
+*        Original.
 *     2008-02-14 (JB):
-*        Use gsdVars struct to store headers/arrays
+*        Use gsdVars struct to store headers/arrays.
 *     2008-02-18 (JB):
-*        Check dasFlag
+*        Check dasFlag.
 *     2008-02-22 (JB):
-*        Calculate fe_doppler
+*        Calculate fe_doppler.
 *     2008-02-26 (JB):
-*        Make gsdac_getWCS per-subsystem
+*        Make gsdac_getWCS per-subsystem.
 *     2008-02-28 (JB):
-*        Replace subsysNum with subBandNum
+*        Replace subsysNum with subBandNum.
+*     2008-03-24 (JB):
+*        Fix bug in getting AZ demand coordinates.
 
 
 *  Copyright:
@@ -129,9 +131,9 @@ void gsdac_putJCMTStateS ( const gsdVars *gsdVars,
 
   record->tcs_az_ac2 = wcs->acEl;
 
-  record->tcs_az_ac1 = record->tcs_az_ac1;
+  record->tcs_az_dc1 = record->tcs_az_ac1;
 
-  record->tcs_az_ac2 = record->tcs_az_ac2;
+  record->tcs_az_dc2 = record->tcs_az_ac2;
 
   record->tcs_az_bc1 = wcs->baseAz;
 

@@ -40,13 +40,15 @@
 
 *  History :
 *     2008-02-05 (JB):
-*        Original
+*        Original.
 *     2008-02-14 (JB):
-*        Use gsdVars struct to store headers/arrays
+*        Use gsdVars struct to store headers/arrays.
 *     2008-02-27 (JB):
-*        Check for Equatorial cellCode (unsupported)
+*        Check for Equatorial cellCode (unsupported).
 *     2008-02-28 (JB):
-*        Use mapVars struct
+*        Use mapVars struct.
+*     2008-03-24 (JB):
+*        Get mapPA and scanPA..
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -153,14 +155,16 @@ void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode,
 
     if ( strncmp ( gsdVars->chopCoords, "AZ", 2 ) ) 
       strcpy ( mapVars->chopCrd, "AZEL" );
+    else if ( strncmp ( gsdVars->chopCoords, "EQ", 2 ) ) 
+      strcpy ( mapVars->chopCrd, "HADEC" );
     else if ( strncmp ( gsdVars->chopCoords, "RB", 2 ) ) 
       strcpy ( mapVars->chopCrd, "B1950" );
     else if ( strncmp ( gsdVars->chopCoords, "RJ", 2 ) ) 
       strcpy ( mapVars->chopCrd, "J2000" );
     else if ( strncmp ( gsdVars->chopCoords, "RD", 2 ) ) 
-      strcpy ( mapVars->chopCrd, "RA/Dec" );//k
+      strcpy ( mapVars->chopCrd, "APP" );
     else if ( strncmp ( gsdVars->chopCoords, "GA", 2 ) ) 
-      strcpy ( mapVars->chopCrd, "GA" );//k
+      strcpy ( mapVars->chopCrd, "GAL" );
     else {
       strcpy ( mapVars->chopCrd, "" );
       msgOutif(MSG__VERB," ", 
@@ -179,10 +183,10 @@ void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode,
       *status = SAI__ERROR;
       errRep ( FUNC_NAME, "Equatorial coordinates not supported", status );
       return;
-      /*strcpy ( mapVars->loclCrd, "EQ" );//k */
+      /*strcpy ( mapVars->loclCrd, "HADEC" ); */
       break;
     case COORD_RD:
-      strcpy ( mapVars->loclCrd, "RA/Dec" );//k
+      strcpy ( mapVars->loclCrd, "APP" );
       break;
     case COORD_RB:
       strcpy ( mapVars->loclCrd, "B1950" );
@@ -191,7 +195,7 @@ void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode,
       strcpy ( mapVars->loclCrd, "J2000" );
       break;
     case COORD_GA:
-      strcpy ( mapVars->loclCrd, "GA" );//k
+      strcpy ( mapVars->loclCrd, "GAL" );
       break;
     default:
       strcpy ( mapVars->loclCrd, "" );
@@ -243,8 +247,7 @@ void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode,
 
   } 
 
-  /* Kludged...*/
-  mapVars->mapPA = 0.0;//k
-  mapVars->scanPA = 0.0;//k
+  mapVars->scanPA = gsdVars->cellV2X;
+  mapVars->mapPA = mapVars->scanPA - 90.0;
 
 }

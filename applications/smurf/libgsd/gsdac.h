@@ -24,25 +24,27 @@
 
 *  History:
 *     2008-02-01 (JB):
-*        Original
+*        Original.
 *     2008-02-13 (JB):
-*        Add freeArrays, getGSDVars
+*        Add freeArrays, getGSDVars.
 *     2008-02-14 (JB):
-*        Use gsdVars struct to store headers/arrays 
+*        Use gsdVars struct to store headers/arrays .
 *     2008-02-19 (JB):
 *        Check dasFlag.  Added getDASFlag, removed getArraySize
-*        and getElemx
+*        and getElemx.
 *     2008-02-26 (JB):
 *        Make gsdac_getWCS per-subsystem, add tranDate, tranTime
-*        and velEncode
+*        and velEncode.
 *     2008-02-28 (JB):
-*        Replace subsysNum with subBandNum
+*        Replace subsysNum with subBandNum.
 *     2008-02-28 (JB):
-*        Use dateVars and mapVars structs
+*        Use dateVars and mapVars structs.
 *     2008-03-06 (JB):
-*        Removed tranDate, updated tranTime
+*        Removed tranDate, updated tranTime.
 *     2008-03-19 (JB):
-*        Change obsNum to signed
+*        Change obsNum to signed.
+*     2008-03-24 (JB):
+*        Pass nSubsys to putFits.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -275,6 +277,7 @@ void gsdac_putFits
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 const int subBandNum, /* subband number (given) */
+const int nSubsys,   /* subsystem number (given) */
 const int obsNum,    /* observation number (given) */
 const int utDate,    /* UT date (given) */
 const int nSteps,    /* number of time steps in observation (given) */
