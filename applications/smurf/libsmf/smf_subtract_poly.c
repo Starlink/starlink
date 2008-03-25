@@ -37,11 +37,13 @@
 *     desired for subtracting drifts in the absolute bolometer level.
 
 *  Notes:
+*     - Function will fail and set bad status if QUALITY not present
 *     - It is assumed that the polynomial is a function of the
 *       timeslice index and not of a physical quantity (i.e. time).
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -58,6 +60,9 @@
 *        relative to first time slice
 *     2008-02-27 (AGG):
 *        Don't subtract from bad values
+*     2008-03-17 (EC):
+*        - Use QUALITY in addition to VAL__BADD to ignore bad data
+*        - handle both time- and bolo-ordered data
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -107,7 +112,7 @@ void smf_subtract_poly(smfData *data, int rel, int *status) {
 
   /* Local variables */
   double baseline = 0.0;      /* Baseline level to be subtracted */
-  double *firstframe = NULL;  /* Pointer to array containing first frame data */
+  double *firstframe = NULL;  /* Pointer to array containing first frame data*/
   size_t i;                   /* Bolometer index loop counter */
   size_t j;                   /* Timeslice index loop counter */
   double jay;                 /* Double-precision version of j */
@@ -117,6 +122,7 @@ void smf_subtract_poly(smfData *data, int rel, int *status) {
   size_t nframes;             /* Number of time slices */
   double *outdata = NULL;     /* Pointer to output data array */
   double *poly = NULL;        /* Pointer to polynomial coefficents */
+  unsigned char *qual=NULL;   /* Pointer to QUALITY component */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -137,9 +143,22 @@ void smf_subtract_poly(smfData *data, int rel, int *status) {
   /* Data array */
   outdata = (data->pntr)[0];
 
-  /* Calculate the number of bolometers and retrieve number of coefficients */
-  nbol = (data->dims)[0] * (data->dims)[1];
-  nframes = (data->dims)[2];
+  /* Return with error if there is no QUALITY component */
+  qual = (data->pntr)[2];
+  if( !qual && (*status == SAI__OK) ) {
+    *status = SAI__ERROR;
+    errRep( FUNC_NAME, "Data doesn't have a QUALITY component.", status );
+    return;
+  }
+
+  /* Calculate the number of bolometers and frames */
+  if( data->isTordered ) {
+    nbol = (data->dims)[0]*(data->dims)[1];
+    nframes = (data->dims)[2];
+  } else {
+    nframes = (data->dims)[0];
+    nbol = (data->dims)[1]*(data->dims)[2];
+  }
 
   /* Allocate memory for one frame of data, initialize to zero */
   firstframe = smf_malloc( nbol, sizeof(double), 1, status );
@@ -156,40 +175,84 @@ void smf_subtract_poly(smfData *data, int rel, int *status) {
     }
   }
 
-  /* Loop over the timeslices for this bolometer */
-  for (j=0; j<nframes; j++) {
-    jay = (double)j; /* Cast outside the loop over bolometers */
+  if( data->isTordered ) { /* ICD time-ordered data */
 
-    /* Loop over the number of bolometers */
-    for (i=0; i<nbol; i++) {
-      /* Construct the polynomial for this bolometer - the first two
-	 terms are trivial and are determined manually. This is
-	 quicker than calling pow() unnecessarily. */
-      if ( outdata[i + nbol*j] != VAL__BADD ) {
-	baseline = -firstframe[i];
-	for (k=0; k<ncoeff; k++) {
-	  if ( k==0 ) {
-	    baseline += poly[i];
-	  } else if ( k==1 ) {
-	    baseline +=  jay*poly[i+nbol];
-	  } else {
-	    baseline += poly[i + nbol*k] * pow(jay, (double)k);
+    /* Loop over the timeslices for this bolometer */
+    for (j=0; j<nframes; j++) {
+      jay = (double)j; /* Cast outside the inner loop over bolometers */
+      
+      /* Loop over the number of bolometers */
+      for (i=0; i<nbol; i++) if ( !(qual[i] & SMF__Q_BADB) ) {
+
+	/* Construct the polynomial for this bolometer - the first two
+	   terms are trivial and are determined manually. This is
+	   quicker than calling pow() unnecessarily. */
+
+	if ( (outdata[i + nbol*j] != VAL__BADD) && 
+	     !(qual[i + nbol*j] & SMF__Q_BADS) ) {
+
+	  baseline = -firstframe[i];
+
+	  for (k=0; k<ncoeff; k++) {
+	    if ( k==0 ) {
+	      baseline += poly[i];
+	    } else if ( k==1 ) {
+	      baseline +=  jay*poly[i+nbol];
+	    } else {
+	      baseline += poly[i + nbol*k] * pow(jay, (double)k);
+	    }
 	  }
+	  outdata[i + nbol*j] -= baseline;
 	}
-	outdata[i + nbol*j] -= baseline;
       }
     }
+  } else {                 /* bolo-ordered data */
 
+    /* Loop over the timeslices for this bolometer */
+    for (j=0; j<nframes; j++) {
+      jay = (double)j; /* Cast outside the inner loop over bolometers */
+      
+      /* Loop over the number of bolometers */
+      for (i=0; i<nbol; i++)  if ( !(qual[i*nframes] & SMF__Q_BADB) ) {
+
+	/* Construct the polynomial for this bolometer - the first two
+	   terms are trivial and are determined manually. This is
+	   quicker than calling pow() unnecessarily. */
+
+	if ( (outdata[i*nframes + j] != VAL__BADD) &&
+	     !(qual[i*nframes + j] & SMF__Q_BADS) ) {
+
+	  baseline = -firstframe[i];
+
+	  for (k=0; k<ncoeff; k++) {
+	    if ( k==0 ) {
+	      baseline += poly[i];
+	    } else if ( k==1 ) {
+	      baseline +=  jay*poly[i+nbol];
+	    } else {
+	      baseline += poly[i + nbol*k] * pow(jay, (double)k);
+	    }
+	  }
+	  
+	  /*
+	  if( (i==3) && (j<100) ) {
+	    printf("%i: %f %f -- %f\n", j, poly[i], poly[i+nbol], 
+		   baseline );
+	  }
+	  */
+
+	  outdata[i*nframes + j] -= baseline;
+	}
+      }
+    }
   }
-  /* Store polynomial-subtracted data */
-  (data->pntr)[0] = outdata;
 
  CLEANUP:
   smf_free( firstframe, status );
   /* Write history entry */
   if ( *status == SAI__OK ) {
     smf_history_add( data, FUNC_NAME, 
-		       "Polynomial subtraction successful", status);
+		     "Polynomial subtraction successful", status);
   } else {
     errRep(FUNC_NAME, "Error: status set bad. Possible programming error.", 
 	   status);
