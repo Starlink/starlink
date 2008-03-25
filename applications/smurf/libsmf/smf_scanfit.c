@@ -35,6 +35,7 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -44,6 +45,11 @@
 *     2006-05-15 (AGG):
 *        - Checks for valid values of the polynomial order
 *        - Now calls new smf_fit_poly routine
+*     2008-03-25 (EC):
+*        - Remove history check for extinction
+*        - Handle both time and bolo-ordered data
+*        - If smfData unassociated with file, just malloc poly buffer
+*        - on exit, data->poly contains fitted coeffs
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -104,7 +110,6 @@
 void smf_scanfit ( smfData *data, int order, int *status) {
 
   int cliptype;             /* Type of sigma clipping */
-  double *poly = NULL;      /* Array of polynomial coefficients */
   int i;                    /* Loop counter */
   int lbnd[3];              /* Lower bound for coeff array (poly) */
   int nbol;                 /* Number of bolometers */
@@ -113,6 +118,7 @@ void smf_scanfit ( smfData *data, int order, int *status) {
   int npts;                 /* Number of data points in coefficient array */
   HDSLoc *ploc = NULL;      /* Locator for SCANFIT coeffs */
   int pndf;                 /* NDF identifier for SCANFIT */
+  double *poly = NULL;      /* Array of polynomial coefficients */
   int ubnd[3];              /* Upper bound for coeff array (poly) */
 
   if ( *status != SAI__OK ) return;
@@ -129,17 +135,21 @@ void smf_scanfit ( smfData *data, int order, int *status) {
      makes no sense to carry out a fit to these data */
   if ( smf_history_check( data, "smf_subtract_poly", status) ||
        smf_history_check( data, "smf_subtract_plane", status) ) {
-    msgOutif(MSG__VERB," ", "Data have been sky-subtracted already, will not perform fit", status );
-    return;
-  }
-  if ( smf_history_check( data, "smf_correct_extinction", status) ) {
-    msgOutif(MSG__VERB," ", "Data have been extinction corrected already, will not perform fit", status);
+    msgOutif(MSG__VERB," ", 
+	     "Data have been sky-subtracted already, will not perform fit", 
+	     status );
     return;
   }
 
   /* Check we have 3-d timeseries data */
   if ( data->ndims == 3) {
-    nframes = (data->dims)[2];
+    if( data->isTordered ) {
+      nframes = (data->dims)[2];
+      nbol = (data->dims)[0] * (data->dims)[1];
+    } else {
+      nframes = (data->dims)[0];
+      nbol = (data->dims)[1]*(data->dims)[2];
+    }
   } else {
     if ( *status == SAI__OK ) {
       *status = SAI__ERROR;
@@ -159,64 +169,92 @@ void smf_scanfit ( smfData *data, int order, int *status) {
       return;
     }
   }
+
   /* If order is -ve, something's wrong! */
   if ( order < 0 ) {
     if ( *status == SAI__OK) {
       msgSeti("O",order);
       *status = SAI__ERROR;
-      errRep( FUNC_NAME, "Polynomial order, ^O, is negative. Unable to fit polynomial", status );
+      errRep( FUNC_NAME, 
+	      "Polynomial order, ^O, is negative. Unable to fit polynomial", 
+	      status );
       return;
     }
   }
 
-  nbol = (data->dims)[0] * (data->dims)[1];
   cliptype = 0;
 
-  /* Obtain the HDS locator for the SCU2RED extension */
-  ploc = smf_get_xloc( data, "SCU2RED", "SCUBA2_MAP_ARR", "WRITE", 0, 0, status);
-  if ( ploc == NULL ) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "Unable to obtain an HDS locator", status);
+  /* Regardless of whether the smfData is associated with file or not --
+     on output smfData.poly is always a malloc'd buffer. First free
+     it to remove any old values, and then malloc new space */
+
+  data->poly = smf_free( data->poly, status );
+  data->poly = smf_malloc( nbol*ncoeff, sizeof(*(data->poly)), 1, status );
+  if( *status == SAI__OK ) {
+    data->ncoeff = ncoeff;
   }
 
-  /* Set the lower and upper bounds of the 3-d array for the new
-     SCANFIT NDF if necessary */
-  for (i=0; i<3; i++) {
-    lbnd[i] = 1;
-  }
-  ubnd[0] = (data->dims)[0];
-  ubnd[1] = (data->dims)[1];
-  ubnd[2] = ncoeff;
-    
-  /* Open SCANFIT extension - note if SCANFIT exists, opening it with
-     WRITE access will overwrite the current contents */
-  pndf = smf_get_ndfid( ploc, "SCANFIT", "WRITE", "UNKNOWN", "_DOUBLE", 3, 
-			lbnd, ubnd, status );
+  /* If file associated with NDF, map a poly array */
+  if( data->file && (data->file->ndfid != NDF__NOID) && (*status == SAI__OK)) {
 
-  /* Check the returned NDF identifier */
-  if ( pndf == NDF__NOID ) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, "Unable to obtain an NDF identifier for SCANFIT coefficients", 
-	   status );
-  } else {
-
-    /* Map the pointer for polynomial coefficients */
-    ndfMap( pndf, "DATA", "_DOUBLE", "WRITE", &poly, &npts, status );
-    /* Check status here... */
-
-    /* Carry out fit, check status on return */
-    /*    sc2math_fitsky ( cliptype, nbol, nframes, ncoeff, (data->pntr)[0],
-	  poly, status );*/
-    smf_fit_poly ( data, order, poly, status );    
-    if ( *status != SAI__OK ) {
-      errRep(FUNC_NAME, "Unable to carry out scanfit", status);
+    /* Obtain the HDS locator for the SCU2RED extension */
+    ploc = smf_get_xloc( data, "SCU2RED", "SCUBA2_MAP_ARR", "WRITE", 0, 0, 
+			 status);
+    if ( ploc == NULL ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Unable to obtain an HDS locator", status);
     }
-    /* Store polynomial coefficients in output smfData */
+
+    /* Set the lower and upper bounds of the 3-d array for the new
+       SCANFIT NDF if necessary */
+    for (i=0; i<3; i++) {
+      lbnd[i] = 1;
+    }
+    ubnd[0] = (data->dims)[0];
+    ubnd[1] = (data->dims)[1];
+    ubnd[2] = ncoeff;
+    
+    /* Open SCANFIT extension - note if SCANFIT exists, opening it with
+       WRITE access will overwrite the current contents */
+    pndf = smf_get_ndfid( ploc, "SCANFIT", "WRITE", "UNKNOWN", "_DOUBLE", 3, 
+			  lbnd, ubnd, status );
+
+    /* Check the returned NDF identifier */
+    if ( pndf == NDF__NOID ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, 
+	     "Unable to obtain an NDF identifier for SCANFIT coefficients", 
+	     status );
+    } else {
+      /* Map the pointer for polynomial coefficients */
+      ndfMap( pndf, "DATA", "_DOUBLE", "WRITE", &poly, &npts, status );
+    }
+  } else {
+    /* Otherwise smfData not associated with file. Simply point poly to
+       the malloc'd array */
+
+    poly = data->poly;
   }
 
-  /* Release the NDF resources */
-  ndfAnnul( &pndf, status );
-  datAnnul( &ploc, status );
+
+  /* Carry out fit, check status on return */
+  /*    sc2math_fitsky ( cliptype, nbol, nframes, ncoeff, (data->pntr)[0],
+	poly, status );*/
+  smf_fit_poly ( data, order, poly, status );    
+  if ( *status != SAI__OK ) {
+    errRep(FUNC_NAME, "Unable to carry out scanfit", status);
+  }
+
+
+  /* Release the NDF resources if required, remembering to first memcopy
+     over the fitted coefficients to the malloc'd buffer from the map'd
+     buffer */
+
+  if(data->file && (data->file->ndfid != NDF__NOID) && (*status == SAI__OK)) {
+    memcpy( data->poly, poly, nbol*ncoeff*sizeof(*(data->poly)) );
+    ndfAnnul( &pndf, status );
+    datAnnul( &ploc, status );
+  }
 
   /* Add history entry */
   smf_history_add( data, FUNC_NAME, "Scanfit completed successfuly", status );
