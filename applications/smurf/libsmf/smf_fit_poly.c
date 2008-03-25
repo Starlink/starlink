@@ -32,12 +32,14 @@
 *     smfData.
 
 *  Notes: 
+*     This routine will fail if there is no associated QUALITY component.
 *     No sigma-clipping is carried out to refine the fit. This
 *     accounts for any differences between this method and
 *     sc2math_fitsky (for order = 1).
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -45,6 +47,9 @@
 *        Initial test version
 *     2006-05-15 (AGG):
 *        Add check for non-NULL poly pointer
+*     2008-03-17 (EC):
+*        - Use QUALITY in addition to VAL__BADD to ignore bad data
+*        - handle both time- and bolo-ordered data
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -97,24 +102,27 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_fit_poly"
 
-void smf_fit_poly( const smfData *data, const int order, double *poly, int *status) {
+void smf_fit_poly( const smfData *data, const int order, double *poly, 
+		   int *status) {
 
   /* Local variables */
   double chisq;            /* Chi-squared from the linear regression fit */
+  gsl_vector *coeffs=NULL; /* Solution vector */
   dim_t i;                 /* Loop counter */
+  double *indata=NULL;     /* Pointer to data array */
   dim_t j;                 /* Loop counter */
-  double *indata;          /* Pointer to data array */
   dim_t k;                 /* Loop counter */
-  size_t nframes = 0;      /* Number of frames */
+  gsl_matrix *mcov=NULL;   /* Covariance matrix */
   size_t nbol;             /* Number of bolometers */
+  size_t ncoeff = 2;       /* Number of coefficients to fit for; def. line */
+  size_t nframes = 0;      /* Number of frames */
+  gsl_vector *psky=NULL;   /* Vector containing sky brightness */
+  unsigned char *qual=NULL;/* Pointer to QUALITY component */
   double xik;              /* */
-  gsl_matrix *X;           /* Matrix of input positions */
-  gsl_vector *psky;        /* Vector containing sky brightness */
-  gsl_vector *weight;      /* Weights for sky brightness vector */
-  gsl_vector *coeffs;      /* Solution vector */
-  gsl_matrix *mcov;        /* Covariance matrix */
-  gsl_multifit_linear_workspace *work; /* Workspace */
-  size_t ncoeff = 2;       /* Number of coefficients to fit for; default straight line */
+  gsl_matrix *X=NULL;      /* Matrix of input positions */
+  gsl_multifit_linear_workspace *work=NULL; /* Workspace */
+  gsl_vector *weight=NULL; /* Weights for sky brightness vector */
+
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -122,20 +130,29 @@ void smf_fit_poly( const smfData *data, const int order, double *poly, int *stat
   if ( smf_history_check( data, FUNC_NAME, status) ) {
     msgSetc("F", FUNC_NAME);
     msgOutif(MSG__VERB," ", 
-	      "^F has already been run on these data, returning to caller", status);
+	      "^F has already been run on these data, returning to caller", 
+	     status);
     return;
   }
 
   /* Do we have 2-D image or 3-D timeseries data? */
   if (data->ndims == 3 ) {
-    nframes = (data->dims)[2];
+
+    /* Data dimensions */
+    if( data->isTordered ) {
+      nbol = (data->dims)[0]*(data->dims)[1];
+      nframes = (data->dims)[2];
+    } else {
+      nframes = (data->dims)[0];
+      nbol = (data->dims)[1]*(data->dims)[2];
+    }
   } else {
     /* Abort with an error if the number of dimensions is not  3 */
     if ( *status == SAI__OK) {
       *status = SAI__ERROR;
       msgSeti("ND", data->ndims);
       errRep(FUNC_NAME,
-	     "Number of dimensions of input file is ^ND: should be either 3",
+	     "Number of dimensions of input file is ^ND: should be 3",
 	     status);
     }
   }
@@ -156,7 +173,16 @@ void smf_fit_poly( const smfData *data, const int order, double *poly, int *stat
   /* Assign pointer to input data array */
   /* of course, check status on return... */
   indata = (data->pntr)[0]; 
-  nbol = (data->dims)[0] * (data->dims)[1]; 
+
+
+  /* Return with error if there is no QUALITY component */
+  qual = (data->pntr)[2];
+
+  if( !qual && (*status == SAI__OK) ) {
+    *status = SAI__ERROR;
+    errRep( FUNC_NAME, "Data doesn't have a QUALITY component.", status );
+    return;
+  }
 
   /* Return with error if order is greater than the number of data
      points */
@@ -189,8 +215,11 @@ void smf_fit_poly( const smfData *data, const int order, double *poly, int *stat
   coeffs = gsl_vector_alloc( ncoeff );
   mcov = gsl_matrix_alloc( ncoeff, ncoeff );
 
-  /* Loop over bolometers */
-  for ( j=0; j<nbol; j++) {
+  /* Loop over bolometers. Only fit this bolometer if it is not
+   flagged SMF__Q_BADB */
+  for ( j=0; j<nbol; j++) 
+    if( (data->isTordered && !(qual[j] & SMF__Q_BADB) ) ||
+	(!data->isTordered && !(qual[j*nframes] & SMF__Q_BADB)) ) {
 
     /* Fill the matrix, vectors and weights arrays */
     for ( i=0; i<nframes; i++) {
@@ -199,15 +228,35 @@ void smf_fit_poly( const smfData *data, const int order, double *poly, int *stat
 	xik = (double)pow(i,k);
 	gsl_matrix_set( X, i, k, xik );
       }
-      /* Vector of observations */
-      gsl_vector_set( psky, i, indata[j + nbol*i] );
-      /* Set weights accordingly */
-      if (indata[nbol*i + j] != VAL__BADD) {
-	gsl_vector_set( weight, i, 1.0);
-      } else {
-	gsl_vector_set( weight, i, 0.0);
+
+      /* Fill vectors for fitting */
+
+      if( data->isTordered ) { /* ICD time-ordered data */
+
+	/* data */
+	gsl_vector_set( psky, i, indata[j + nbol*i] );
+
+	/* weights */	
+	if( !qual[nbol*i + j] && (indata[j + nbol*i] != VAL__BADD) ) {
+	  gsl_vector_set( weight, i, 1.0); /* Good QUALITY */
+	} else {
+	  gsl_vector_set( weight, i, 0.0); /* Bad QUALITY */
+	}
+	
+      } else {                 /* bolo-ordered */
+
+	/* data */
+	gsl_vector_set( psky, i, indata[j*nframes + i] );
+
+	/* weights */	
+	if( !qual[j*nframes + i] && (indata[j*nframes + i] != VAL__BADD) ) {
+	  gsl_vector_set( weight, i, 1.0); /* Good QUALITY */
+	} else {
+	  gsl_vector_set( weight, i, 0.0); /* Bad QUALITY */
+	}
       }
     }
+
     /* Carry out fit */
     gsl_multifit_wlinear( X, weight, psky, coeffs, mcov, &chisq, work );
 
