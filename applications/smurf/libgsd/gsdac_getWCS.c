@@ -16,7 +16,7 @@
 *  Invocation:
 *     gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 *                    const int subBandNum, const dasFlag dasFlag
-*                    gsdWCS *wcs, int *status )
+*                    gsdWCS *wcs, AstFrameSet **WCSFrame, int *status )
 
 *  Arguments:
 *     gsdVars = const gsdVars* (Given)
@@ -27,8 +27,10 @@
 *        Number of this subband
 *     dasFlag = const dasFlag (Given)
 *        DAS file structure type
-*     wcs = gsdWCS* (Given and Returned)
+*     wcs = gsdWCS** (Given and Returned)
 *        Time and Pointing values
+*     WCSFrame = AstFrameSet* (Given and Returned)
+*        WCS frameset of RA/Dec and frequency
 *     status = int* (Given and Returned)
 *        Pointer to global status.  
 
@@ -57,27 +59,29 @@
 
 *  History :
 *     2008-02-14 (JB):
-*        Original
+*        Original.
 *     2008-02-20 (JB):
-*        Calculate TAI for each time step
+*        Calculate TAI for each time step.
 *     2008-02-21 (JB):
-*        Fix TAI calculations for rasters
+*        Fix TAI calculations for rasters.
 *     2008-02-26 (JB):
-*        Only calculate values for this time step & subarray
+*        Only calculate values for this time step & subarray.
 *     2008-02-27 (JB):
-*        Fill KeyMaps and call atlWcspx
+*        Fill KeyMaps and call atlWcspx.
 *     2008-02-28 (JB):
-*        Replace subsysNum with subBandNum
+*        Replace subsysNum with subBandNum.
 *     2008-03-04 (JB):
 *        Use updated version of atlWcspx.
 *     2008-03-07 (JB):
-*        Convert to radians before calling atlWcspx
+*        Convert to radians before calling atlWcspx.
 *     2008-03-18 (JB):
-*        Add debugging statements
+*        Add debugging statements.
 *     2008-03-19 (JB):
-*        Calculate offsets
+*        Calculate offsets.
 *     2008-03-21 (JB):
-*        Use debug flag
+*        Use debug flag.
+*     2008-03-25 (JB):
+*        Return WCSFrame.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -126,7 +130,7 @@
 
 void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
                     const int subBandNum, const dasFlag dasFlag, 
-                    gsdWCS *wcs, int *status )
+                    gsdWCS *wcs, AstFrameSet **WCSFrame, int *status )
 
 {
 
@@ -162,9 +166,6 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
-
-  /* Begin a new ast context. */
-  astBegin;
 
   /* To get the TAI times, first retrieve the starting LST, then for
      each time step calculate the difference in the LSTs and add it
@@ -387,7 +388,10 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   /* Get a frameset describing the mapping from cell to sky. */
   atlWcspx ( datePointing, cellMap, dataDims, 
              gsdVars->telLongitude * -1.0 * AST__DD2R, 
-             gsdVars->telLatitude * AST__DD2R, &frame, status );
+             gsdVars->telLatitude * AST__DD2R, WCSFrame, status );
+
+  /* Make a copy of the frameset for local calculations. */
+  frame = astCopy ( *WCSFrame );
 
   if ( *status != SAI__OK ) {
 
@@ -492,7 +496,5 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   wcs->trAng = slaPa( gapptRA, gapptDec, gsdVars->telLatitude );
 
   if ( DEBUGON ) printf ( "trAng : %f\n", wcs->trAng );
-
-  astEnd;
 
 }

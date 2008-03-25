@@ -63,6 +63,8 @@
 *        Removed unused variables.
 *     2008-03-24 (JB):
 *        Check for actual number of used receptors.
+*     2008-03-25 (JB):
+*        Write WCSFrame to the FITSchan.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -150,6 +152,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   int subBandNum;             /* subband number of current spectrum */
   unsigned int utDate;        /* UT date in YYYYMMDD format */
   gsdWCS wcs[nSteps];         /* pointing and time values for JCMTState */
+  AstFrameSet *WCSFrame;      /* WCS frameset */
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
@@ -312,7 +315,8 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
     for ( subBandNum = 0; subBandNum < gsdVars->nBESections; subBandNum++ ) {
 
       /* Get the pointing and time values. */
-      gsdac_getWCS ( gsdVars, stepNum, subBandNum, dasFlag, wcs, status );
+      gsdac_getWCS ( gsdVars, stepNum, subBandNum, dasFlag, wcs, 
+                     &WCSFrame, status );
 
       /* If this is the first spectrum, get the amStart, 
          azStart and elStart. */
@@ -356,7 +360,12 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
                       backend, recepNames, samMode, obsType, &dateVars, 
                       &mapVars, wcs, fitschan[fitsIndex], status );
 
+      /* Write the WCSFrame information to the fitschan. */
+      astWrite ( fitschan[fitsIndex], WCSFrame );
+
       specIndex = specIndex + gsdVars->BEChans[subBandNum];
+
+      astAnnul ( WCSFrame );
 
     }
 

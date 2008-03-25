@@ -43,17 +43,19 @@
 
 *  History:
 *     2008-01-29 (JB):
-*        Original
+*        Original.
 *     2008-02-14 (JB):
-*        Use gsdVars struct to store headers/arrays
+*        Use gsdVars struct to store headers/arrays.
 *     2008-02-18 (JB):
-*        Get values from gsdWCS
+*        Get values from gsdWCS.
 *     2008-02-22 (JB):
-*        Move fe_doppler calc to getJCMTStateS
+*        Move fe_doppler calc to getJCMTStateS.
 *     2008-02-26 (JB):
-*        Make gsdac_getWCS per-subsystem
+*        Make gsdac_getWCS per-subsystem.
 *     2008-02-28 (JB):
-*        Code cleanup
+*        Code cleanup.
+*     2008-03-25 (JB):
+*        Get tracking coordinate frame.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -89,6 +91,7 @@
 #include "ast.h"
 #include "sae_par.h"
 #include "prm_par.h"
+#include "mers.h"
 
 /* SMURF includes */
 #include "gsdac.h"
@@ -150,7 +153,37 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   strncpy( record->tcs_source, "SCIENCE", 8 ); 
 
-  strncpy( record->tcs_tr_sys, "COORDS", 7 );
+  /* Get the local offset coordinate system. */
+  switch ( gsdVars->cellCode ) {
+    
+    case COORD_AZ:
+      strcpy ( record->tcs_tr_sys, "AZEL" );
+      break;
+    case COORD_EQ:
+      *status = SAI__ERROR;
+      errRep ( FUNC_NAME, "Equatorial coordinates not supported", status );
+      return;
+      /*strcpy ( record->tcs_tr_sys, "HADEC" ); */
+      break;
+    case COORD_RD:
+      strcpy ( record->tcs_tr_sys, "APP" );
+      break;
+    case COORD_RB:
+      strcpy ( record->tcs_tr_sys, "B1950" );
+      break;
+    case COORD_RJ:
+      strcpy ( record->tcs_tr_sys, "J2000" );
+      break;
+    case COORD_GA:
+      strcpy ( record->tcs_tr_sys, "GAL" );
+      break;
+    default:
+      strcpy ( record->tcs_tr_sys, "" );
+      msgOutif(MSG__VERB," ", 
+               "Couldn't identify tracking coordinates, continuing anyway", status);   
+      break;
+
+  }
 
   record->jos_drcontrol = 0;
 

@@ -45,6 +45,8 @@
 *        Change obsNum to signed.
 *     2008-03-24 (JB):
 *        Pass nSubsys to putFits.
+*     2008-03-25 (JB):
+*        getWCS returns AstFrameSet.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -270,6 +272,7 @@ const unsigned int stepNum,    /* time step of this spectrum (given) */
 const int subBandNum, /* subband number (given) */
 const dasFlag dasFlag,  /* DAS file structure flag (given) */
 gsdWCS *wcs,         /* pointing and time values (given and returned) */
+AstFrameSet **WCSFrame, /* WCS frameset (given and returned) */
 int *status          /* global status (given and returned) */
 );
 
