@@ -269,8 +269,8 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
       }
     }
 
+    /* Clean up */
     alljump = smf_free( alljump, status );
-
   }
     
 }
