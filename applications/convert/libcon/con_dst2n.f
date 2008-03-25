@@ -208,7 +208,7 @@
 *        FITS structure contains non-standard structures.  Modified the
 *        count of the FITS extension's size accordingly.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -224,14 +224,15 @@
       INCLUDE 'DTACODES'         ! Data structure error codes
       INCLUDE 'DYNAMIC_MEMORY'   ! Dynamic memory support (defines %VAL)
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+      INCLUDE 'DAT_PAR'          ! Data-system constants
 
 *  Arguments Given:
-      character FIGFIL * ( * )   ! Name of input file
-      CHARACTER FORM * ( * )     ! NDF storage format
-      CHARACTER NDFFIL * ( * )   ! Name of output file
+      CHARACTER*( * ) FIGFIL     ! Name of input file
+      CHARACTER*( * ) FORM       ! NDF storage format
+      CHARACTER*( * ) NDFFIL     ! Name of output file
       INTEGER NLEV               ! Number of structure levels in output
                                  ! file
-      CHARACTER PATH * ( * )     ! Internal path to NDF in output file
+      CHARACTER*( * ) PATH       ! Internal path to NDF in output file
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -244,109 +245,104 @@
       PARAMETER ( NDSTAX = 6 )
 
 *  Local Variables:
-      LOGICAL   ANAXIS           ! True if a substructure is an axis
-      LOGICAL   AXTHER(NDSTAX)   ! TRUE if AXIS(1...6).DATA_ARRAY
-                                 ! created
-      LOGICAL   AXMFEX(NDSTAX)   ! TRUE if AXIS(1...6).MORE.FIGARO
-                                 ! exists
-      CHARACTER AXMOR * ( 80 )   ! AXIS.MORE name
-      CHARACTER AXMORF * ( 80 )  ! AXIS.MORE.FIGARO name
-      CHARACTER AXNAME * ( 80 )  ! Axis structure element name
-      CHARACTER AXOUT * ( 80 )   ! Name of output axis 
-      CHARACTER AXOUTD * ( 80 )  ! Name of output axis data array
-      CHARACTER AXOUTV * ( 80 )  ! Name of output axis variance array
-      CHARACTER AXOUTW * ( 80 )  ! Name of output axis width array
-      BYTE      BARRAY(100)      ! Used to read in BYTE type data items
-      INTEGER   CDIMS(7)         ! Dimensions of character objects
-      CHARACTER COMENT * ( 50 )  ! FITS item comment
-      LOGICAL   COMPRE           ! True if a FITS item has an comment
-      INTEGER   CW               ! Length of the output width component
-      INTEGER   DIMS(7)          ! Dimensions of output data
+      LOGICAL ANAXIS             ! Substructure is an axis?
+      LOGICAL AXTHER( NDSTAX )   ! AXIS(1...6).DATA_ARRAY created?
+      LOGICAL AXMFEX( NDSTAX )   ! AXIS(1...6).MORE.FIGARO exists?
+      CHARACTER*256 AXMOR        ! AXIS.MORE name
+      CHARACTER*256 AXMORF       ! AXIS.MORE.FIGARO name
+      CHARACTER*256 AXNAME       ! Axis structure element name
+      CHARACTER*256 AXOUT        ! Name of output axis 
+      CHARACTER*256 AXOUTD       ! Name of output axis data array
+      CHARACTER*256 AXOUTV       ! Name of output axis variance array
+      CHARACTER*256 AXOUTW       ! Name of output axis width array
+      BYTE BARRAY( 100 )         ! Used to read in BYTE type data items
+      INTEGER CDIMS( DAT__MXDIM ) ! Dimensions of character objects
+      CHARACTER*50 COMENT        ! FITS item comment
+      LOGICAL COMPRE             ! FITS item has a comment?
+      INTEGER CW                 ! Length of the output width component
+      INTEGER DIMS( DAT__MXDIM ) ! Dimensions of output data
       DOUBLE PRECISION DWIDTH    ! Scalar width
-      INTEGER   DSTAT            ! DTA_ routine returned status
-      CHARACTER ENVIRN * ( 80 )  ! Environment structure name
-      CHARACTER EPATH * ( 80 )   ! The effective path
-      CHARACTER ERROR * ( 64 )   ! Error description
-      LOGICAL   ERPRES           ! True if .Z.ERRORS is present
-      INTEGER   FDIMS(2)         ! Dimensions of FITS extension
-      CHARACTER FITCOM * ( 80 )  ! Object containing FITS comment
-      CHARACTER FITNAM * ( 132 ) ! Name of FITS item
-      LOGICAL   FITS             ! True is a FITS structure is found
-      LOGICAL   FLAGGD           ! True if .Z.DATA contains flagged
-                                 ! values
-      INTEGER   I                ! Loop variable
-      INTEGER   IAXIS            ! Loop index through axes
-      INTEGER   IERR             ! First element to cause numerical
+      INTEGER DSTAT              ! DTA_ routine returned status
+      CHARACTER*256 ENVIRN       ! Environment structure name
+      CHARACTER*256 EPATH        ! The effective path
+      CHARACTER*64 ERROR         ! Error description
+      LOGICAL ERPRES             ! .Z.ERRORS is present?
+      INTEGER FDIMS( 2 )         ! Dimensions of FITS extension
+      CHARACTER*80 FITCOM        ! Object containing FITS comment
+      CHARACTER*132 FITNAM       ! Name of FITS item
+      LOGICAL FITS               ! A FITS structure is found?
+      LOGICAL FLAGGD             ! .Z.DATA contains flagged values?
+      INTEGER I                  ! Loop variable
+      INTEGER IAXIS              ! Loop index through axes
+      INTEGER IERR               ! First element to cause numerical
                                  ! errors
-      INTEGER   IFLAG            ! Value of .Z.FLAGGED
-      REAL      INCREM           ! Incremental value for creating axes
-      INTEGER   IKOUNT           ! Counter
-      INTEGER   IPOSN            ! Number of object at first level
-      INTEGER   IPOSN1           ! Number of object at second level
-      INTEGER   IPOSN2           ! Number of object at third level
-      INTEGER   IPTR             ! Pointer to mapped data array
-      INTEGER   INQPTR           ! Pointer to output qality array
-      INTEGER   K                ! Loop variable
-      INTEGER   LENAME           ! Length of name
-      CHARACTER LEVEL1 * ( 80 )  ! Full name of environment at 1st level
-      CHARACTER LEVEL2 * ( 80 )  ! Full name of environment at 2nd level
-      LOGICAL   MORE             ! Determine necessity for .MORE
-      LOGICAL   MOREFG           ! Determine necessity for .MORE.FIGARO
-      LOGICAL   MORFGO           ! Determine necessity for
-                                 ! .MORE.FIGARO.OBS
-      LOGICAL   MORFGZ           ! Determine necessity for
-                                 ! .MORE.FIGARO.Z
-      CHARACTER MORNAM * ( 80 )  ! Name of item in .MORE structure
-      INTEGER   N                ! Loop variable
-      CHARACTER NAME * ( 64 )    ! Name of data object
-      CHARACTER NAME1 * ( 80 )   ! 1st level object
-      CHARACTER NAME2 * ( 80 )   ! 2nd level object
-      CHARACTER NAME3 * ( 80 )   ! 3rd level object
-      CHARACTER NAMOUT * ( 132 ) ! Name in output structure
-      INTEGER   NAXIS            ! Axis number
-      INTEGER   NBYTES           ! No. of BYTES
-      INTEGER   NCPC             ! Number of characters in path comp.
-      INTEGER   NDATA            ! No. of data values
-      CHARACTER NDFNAM * ( 15 )  ! Name of the NDF structure
-      CHARACTER NDFPAT * ( 80 )  ! Path to the NDF structure
-      INTEGER   NDIM             ! No of dimensions
-      LOGICAL   NEEDAX           ! True if axis data present
-      INTEGER   NERR             ! Count of numerical errors 
-      INTEGER   NFITS            ! No. of FITS items
-      INTEGER   NMSTAT           ! Status from 1st-level call to
+      INTEGER IFLAG              ! Value of .Z.FLAGGED
+      REAL INCREM                ! Incremental value for creating axes
+      INTEGER IKOUNT             ! Counter
+      INTEGER IPOSN              ! Number of object at first level
+      INTEGER IPOSN1             ! Number of object at second level
+      INTEGER IPOSN2             ! Number of object at third level
+      INTEGER IPTR               ! Pointer to mapped data array
+      INTEGER INQPTR             ! Pointer to output qality array
+      INTEGER K                  ! Loop variable
+      INTEGER LENAME             ! Length of name
+      CHARACTER*256 LEVEL1       ! Full name of environment at 1st level
+      CHARACTER*256 LEVEL2       ! Full name of environment at 2nd level
+      LOGICAL MORE               ! Determine necessity of .MORE
+      LOGICAL MOREFG             ! Determine ecessity for .MORE.FIGARO
+      LOGICAL MORFGO             ! Necessity for .MORE.FIGARO.OBS
+      LOGICAL MORFGZ             ! Necessity for .MORE.FIGARO.Z
+      CHARACTER*256 MORNAM       ! Name of item in .MORE structure
+      INTEGER N                  ! Loop variable
+      CHARACTER*64 NAME          ! Name of data object
+      CHARACTER*256 NAME1        ! 1st level object
+      CHARACTER*256 NAME2        ! 2nd level object
+      CHARACTER*256 NAME3        ! 3rd level object
+      CHARACTER*256 NAMOUT       ! Name in output structure
+      INTEGER NAXIS              ! Axis number
+      INTEGER NBYTES             ! No. of BYTES
+      INTEGER NCPC               ! Number of characters in path comp.
+      INTEGER NDATA              ! Number of data values
+      CHARACTER*( DAT__SZNAM ) NDFNAM ! Name of the NDF structure
+      CHARACTER*256 NDFPAT       ! Path to the NDF structure
+      INTEGER NDIM               ! Number of dimensions
+      LOGICAL NEEDAX             ! Axis data are present?
+      INTEGER NERR               ! Count of numerical errors 
+      INTEGER NFITS              ! Number of FITS items
+      INTEGER NMSTAT             ! Status from 1st-level call to
                                  ! DTA_NMVAR
-      INTEGER   NMSTA1           ! Status from 2nd-level call to
+      INTEGER NMSTA1             ! Status from 2nd-level call to
                                  ! DTA_NMVAR
-      INTEGER   NMSTA2           ! Status from FITS-substructure call to
+      INTEGER NMSTA2             ! Status from FITS-substructure call to
                                  ! DTA_NMVAR
-      INTEGER   NMSTA3           ! Status from call to DTA_NMVAR with
+      INTEGER NMSTA3             ! Status from call to DTA_NMVAR with
                                  ! .MORE
-      INTEGER   NPC              ! Number of characters in output name
-      INTEGER   NSTR             ! Effective length of string
-      LOGICAL   OBOPEN           ! Flags output file as opened
-      LOGICAL   OUOPEN           ! Flags output file as opened
-      CHARACTER OUTNDF * ( 132 ) ! Name of the NDF including the path in
+      INTEGER NPC                ! Number of characters in output name
+      INTEGER NSTR               ! Effective length of string
+      LOGICAL OBOPEN             ! Input file opend?
+      LOGICAL OUOPEN             ! Output file opened?
+      CHARACTER*132 OUTNDF       ! Name of the NDF including the path in
                                  ! the container file
-      INTEGER   OTQPTR           ! Pointer to output quality array
-      INTEGER   PATHHI           ! Character column of the end of a
+      INTEGER OTQPTR             ! Pointer to output quality array
+      INTEGER PATHHI             ! Character column of the end of a
                                  ! structure level in the path
-      INTEGER   PATHLO           ! Character column of the start of a
+      INTEGER PATHLO             ! Character column of the start of a
                                  ! structure level in the path
-      LOGICAL   PRIM             ! True if output data array has
-                                 ! primitive form (as opposed to simple)
-      LOGICAL   QUPRES           ! True if .Z.QUALITY is present
-      REAL      START            ! Start value for creating axes arrays
-      CHARACTER STNAME * ( 16 )  ! Name of a non-standard structure in
+      LOGICAL PRIM               ! Output data array has ! primitive form 
+                                 ! (as opposed to simple)
+      LOGICAL QUPRES             ! .Z.QUALITY is present?
+      REAL START                 ! Start value for creating axes arrays
+      CHARACTER*16 STNAME        ! Name of a non-standard structure in
                                  ! the DST's FITS structure
-      CHARACTER STRING * ( 64 )  ! Used for units and labels
-      LOGICAL   STRUCT           ! True if item is a structure
-      CHARACTER TYPE * ( 16 )    ! Data object type
-      LOGICAL   VALFIT           ! True if a FITS item is valid
-      REAL      WIDTH            ! Scalar width
+      CHARACTER*64 STRING        ! Used for units and labels
+      LOGICAL STRUCT             ! Item is a structure?
+      CHARACTER*16 TYPE          ! Data object type
+      LOGICAL VALFIT             ! A FITS item is valid?
+      REAL  WIDTH                ! Scalar width
 
 *.
 
-*   Return immediately on bad status
+*   Return immediately on bad status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *   Open the files.
@@ -500,10 +496,9 @@
 
 *            If it is not a standard object, set logicals so that
 *            appropriate extensions can be created.
-
-               IF (.NOT. ( NAME1 .EQ. 'Z' .OR. NAME1 .EQ. 'FITS' .OR.
-     :              NAME1 .EQ. 'COMMENTS' .OR. NAME1 .EQ. 'OBS' .OR.
-     :              NAME1 .EQ. 'MORE')) THEN
+               IF ( .NOT. ( NAME1 .EQ. 'Z' .OR. NAME1 .EQ. 'FITS' .OR.
+     :               NAME1 .EQ. 'COMMENTS' .OR. NAME1 .EQ. 'OBS' .OR.
+     :               NAME1 .EQ. 'MORE') ) THEN
                   MORE = .TRUE.
                   MOREFG = .TRUE.
 
@@ -513,8 +508,8 @@
 
 *               Find the number of dimensions and whether or not it is a
 *               structure.
-
-                  CALL DTA_SZVAR( LEVEL1, 7, NDIM, DIMS, DSTAT )
+                  CALL DTA_SZVAR( LEVEL1, DAT__MXDIM, NDIM, DIMS, 
+     :                            DSTAT )
                   CALL DTA_STRUC( LEVEL1, STRUCT, DSTAT )
 
 *               Looking at the name is not good enough.  It must be a
@@ -1347,14 +1342,13 @@
 
 *                       Fill array with the constant.
                            IF ( TYPE .EQ. 'FLOAT' ) THEN
-                              CALL CON_FILL( DIMS( IAXIS ), WIDTH, 0.0,
-     :                                       %VAL( CNF_PVAL( IPTR ) ), 
-     :                                       STATUS )
+                              CALL KPG1_FILLR( WIDTH, DIMS( IAXIS ),
+     :                                         %VAL( CNF_PVAL( IPTR ) ), 
+     :                                         STATUS )
                            ELSE
-                              CALL CON_FILLD( DIMS( IAXIS ), DWIDTH,
-     :                                        0.0D0, 
-     :                                        %VAL( CNF_PVAL( IPTR ) ),
-     :                                        STATUS )
+                              CALL KPG1_FILLD( DWIDTH, DIMS( IAXIS ),
+     :                                         %VAL( CNF_PVAL( IPTR ) ),
+     :                                         STATUS )
                            END IF
 
 *                       Unmap the width array.
@@ -1408,7 +1402,8 @@
      :                         NAME2 .EQ. 'UNITS' ) THEN
 
 *                     Inquire the dimensions of the object.
-                        CALL DTA_SZVAR( LEVEL2, 7, NDIM, CDIMS, DSTAT )
+                        CALL DTA_SZVAR( LEVEL2, DAT__MXDIM, NDIM, CDIMS, 
+     :                                  DSTAT )
 
 *                     Generate the full name of the output component.
                         CALL DTA_CRNAM( AXOUT, NAME2, NDIM, CDIMS, 
@@ -1700,11 +1695,11 @@
                   GOTO 500
                END IF
 
-*            Fill array with 0.5,1.5...
+*            Fill array with 0.5, 1.5...
                START = 0.5
                INCREM = 1.0
-               CALL CON_FILL( DIMS( IAXIS ), START, INCREM,
-     :                        %VAL( CNF_PVAL( IPTR ) ), STATUS )
+               CALL KPG1_SSAZR( DIMS( IAXIS ), INCREM, START, 
+     :                          %VAL( CNF_PVAL( IPTR ) ), STATUS )
 
 *            Unmap the data array.
                CALL DTA_FRVAR( AXOUTD, DSTAT )
