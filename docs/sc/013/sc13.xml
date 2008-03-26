@@ -522,7 +522,7 @@
             know about floating point representation; there is a good
             alternative introduction in <cite>Numerical Recipes</cite>
             <citation>nr</citation>, and an excellent and detailed
-            introduction in chapter 2 of Sun's <cite>Numerical
+            introduction in Chapter 2 of Sun's <cite>Numerical
             Computation Guide</cite> <citation>sunncg</citation>
             (appendix E of the same book claims to be `What every
             computer scientist should know about floating point
@@ -1175,7 +1175,7 @@ C     process array element a(i+3)
             standard way of dynamically allocating memory (as opposed
             to allocating arrays to be a fixed size at compile time).
             The Starlink CNF library, <docxref doc="SUN/209"
-            loc="xref_pointers" >SUN/209</docxref> is intended to make
+            loc="pointers" >SUN/209</docxref> is intended to make
             this reasonably easy, and includes a brief discussion of
             the underlying mechanism.  This is rather a can of worms,
             but the essential technique is to write a bit of C which
