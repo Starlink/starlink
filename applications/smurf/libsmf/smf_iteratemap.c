@@ -214,6 +214,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   smfGroup *resgroup=NULL;      /* smfGroup of model residual files */
   smf_modeltype thismodel;      /* Type of current model */
 
+  unsigned char *q=NULL;
+
   /* Main routine */
   if (*status != SAI__OK) return;
 
@@ -494,9 +496,33 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	  msgOut(" ", "SMF_ITERATEMAP: Pre-conditioning chunk", status);
 	  for( idx=0; idx<res[i]->ndat; idx++ ) {
 	    /* Synchronize quality flags */
+
+	    data = res[i]->sdata[idx];
+	    q = qua[i]->sdata[idx]->pntr[0];
+
+	    msgOut(" ", "  update quality", status);
 	    smf_update_quality( res[i]->sdata[idx], 
 				(unsigned char *)qua[i]->sdata[idx]->pntr[0],
-				NULL, 0, status );
+				1, NULL, 0.05, status );
+	    
+	    /*
+	    for( i=0; i<1280; i++ ) {
+	      if( !(i % 40) ) printf("\n");
+	      printf("%1i ",q[i*(12000)]);
+	    }
+	    */
+
+	    msgOut(" ", "  correct steps", status);
+	    smf_correct_steps( res[i]->sdata[idx],
+			       (unsigned char *)qua[i]->sdata[idx]->pntr[0],
+			       20., 1000, status );
+	    
+	    msgOut(" ", "  fit polynomial baselines", status);
+	    smf_scanfit( res[i]->sdata[idx], 1, status );
+
+	    msgOut(" ", "  remove polynomial baselines", status);
+	    smf_subtract_poly( res[i]->sdata[idx], 0, status );
+
 	    /*smf_fft_filter( res[i]->sdata[idx], 200., status );*/
 	  }
 	}
