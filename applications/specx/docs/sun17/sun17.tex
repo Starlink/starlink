@@ -16,7 +16,7 @@
 
 %  History:
 %     13 Jan 1995 (RMP):
-%        First unix release of specx
+%        First UNIX release of SPECX
 %     9  Jan 2000 (TIMJ):
 %        Try to update document - remove VMS references
 
@@ -310,17 +310,17 @@ SPECX.}
 SPECX is a general mm and sub-mm wavelength data reduction system written by
 Rachael Padman at \htmladdnormallink{MRAO}{http://www.mrao.cam.ac.uk}. At the
 time of writing the latest formally released version on the VAX is 6.2.
-However, pre-release copies of version 6.3 are widely used. Branching off from
-the 6.3 VMS version, SPECX was ported to Unix by Horst Meyerdierks of the
+However, pre-release copies of Version 6.3 are widely used. Branching off from
+the 6.3 VMS version, SPECX was ported to UNIX by Horst Meyerdierks of the
 \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk} and Rachael
 Padman. Remo Tilanus at JACH supplied the core routines to read GSD files and
-Tim Jenness at the JAC took over development for version 6.7. The software
-version count on Unix increased rather rapidly. 6.4 was the initial Unix port
+Tim Jenness at the JAC took over development for Version 6.7. The software
+version count on UNIX increased rather rapidly. 6.4 was the initial UNIX port
 of 6.3, but it existed only in beta-test versions. The first released version
 was 6.5, but it lacked the commands to read \xref{GSD}{sun229}{} files.
 Version 6.6 added support for \xref{GSD}{sun229}{} files. The current version
-on Unix is 6.7 which added support for a new \xref{HDS}{sun92}{} map format
-(v4.2) and routines to aid the reduction of raster maps. Version 6.7 is
+on UNIX is 6.7 which added support for a new \xref{HDS}{sun92}{} map format
+(V4.2) and routines to aid the reduction of raster maps. Version 6.7 is
 currently supported by the Joint Astronomy Centre and distributed by Starlink.
 
 Although SPECX may be used to process spectra obtained from many different
@@ -330,7 +330,7 @@ command line interpreter, and manipulates spectra on a pop-down stack.  The
 package is designed to work on a variety of graphics terminals but is mainly
 used from within an X windows environment. Hardcopy may be output on a number
 of printers for which \xref{GKS}{sun83}{} drivers are provided by Starlink. In
-the Unix version these are mainly different PostScript printers.
+the UNIX version these are mainly different PostScript printers.
 
 Some of the major features of SPECX are:
 \begin{itemize}
@@ -373,8 +373,8 @@ The ability to write indirect command files.
 A thorough description of the package is given in the ``SPECX Users' Manual''
 which has been distributed as a Starlink Miscellaneous User Document
 (MUD/70). At the time of writing this MUD is available from Starlink for
-version 6.3. No document has been prepared yet for the Unix
-version, and the document on 6.3 is the closest approximation for Unix
+Version 6.3. No document has been prepared yet for the UNIX
+version, and the document on 6.3 is the closest approximation for UNIX
 users.
 
 SPECX is intended primarily for the analysis of JCMT data and can read such
@@ -385,8 +385,8 @@ IRAM-FITS, JCMT RxG, NRAO 8-beam (see the SPECX user manual for details).
 Spectra and maps can be output as FITS files, Starlink NDFs, or ASCII files
 for reading into other packages.
 
-This document concerns itself with the unix version of specx and will
-no longer discuss the VMS version 6.2.
+This document concerns itself with the unix version of SPECX and will
+no longer discuss the VMS Version 6.2.
 
 \section {Getting started}
 
@@ -408,7 +408,7 @@ a brief informational message, then the SPECX prompt ({\tt>>}) will appear.
 \begin{myquote}
 \begin{verbatim}
             --------------------------------------------
-              Specx v6.7-6 (Unix) ---- 15 December 1999
+              Specx v6.7-6 (UNIX) ---- 15 December 1999
                    Copyright (C)  R.Padman & PPARC
              Acknowledgements to Horst Meyerdierks (PPARC)
                   Remo Tilanus & Tim Jenness (JACH)
@@ -427,7 +427,7 @@ individually. A full list of all valid SPECX commands
 may be found by entering {\tt show-commands}, with a carriage return
 in response to the resulting prompt. On-line help is available
 using the command {\tt help}. However, the on-line help is mainly a copy
-from the VMS version 6.3. There are some added topics on the Unix version.
+from the VMS VERSION 6.3. There are some added topics on the UNIX version.
 
 A shell command may be executed by preceding it with a {\tt \$}, {\em e.g.}
 
@@ -454,7 +454,7 @@ the shell.  SPECX can also be suspended in the usual way with Control-Z and
 later resumed with the shell command {\tt fg}.
 
 In some situations SPECX has to be given an end-of-file character. On
-VMS this was Control-Z. On Unix it is Control-D. As of V6.7-1 Control-C
+VMS this was Control-Z. On UNIX it is Control-D. As of V6.7-1 Control-C
 can be used to abort a command in progress.
 
 
@@ -553,58 +553,59 @@ whether you have {\tt /star/lib/libhds*}, {\tt /star/include/dat\_par}
 and {\tt /star/figaro/lib/libfit.a}.
 
 
-\section{Data formats in, and data migration to, the Unix version}
+\section{\xlabel{data_formats_in_and_data_migration_to_the_unix_version}Data 
+formats in, and data migration to, the UNIX version}
 
-Unix SPECX introduced yet another version of data formats (4.1 and 4.2) for
-spectra and for maps. It can read and write disk-FITS. From version 6.6
+UNIX SPECX introduced yet another version of data formats (4.1 and 4.2) for
+spectra and for maps. It can read and write disk-FITS. From VERSION 6.6
 onwards it can also read \xref{GSD}{sun229}{} files.
 
 Version 4.1 spectral format is based on Starlink's Hierarchical Data
 Structures (HDS), a binary format that is portable between different
-machine architectures. Thus you can take version 4.1 spectra from a Sun
+machine architectures. Thus you can take VERSION 4.1 spectra from a Sun
 workstation to an Alpha workstation and back, without noticing it.
 
 Versions 4.1 and 4.2 map formats, too, are based on HDS. Thus maps are
 portable as well.
 
-Data currently held on a VMS file system can be carried across to Unix
+Data currently held on a VMS file system can be carried across to UNIX
 as detailed below. Note that the way back may not be possible, or at
 least difficult.
 \begin{itemize}
 \item {\bf GSD files:}
     Data in \xref{GSD}{sun229}{} format can be copied binary. One way is the
-    Unix {\tt cp} command if both disks are mounted by the Unix machine.
+    UNIX {\tt cp} command if both disks are mounted by the UNIX machine.
     Another way is {\tt ftp} in binary mode. Then use {\tt
     READ-GSD-DATA} in the usual way.
 
-    For going back from Unix to VMS similar problems may arise as with
+    For going back from UNIX to VMS similar problems may arise as with
     disk-FITS files (see below).
 
 \item {\bf Disk-FITS files:}
     These must be written with IBM byte order (swap order
     on Digital machines). They can then be copied binary. One way is the
-    Unix {\tt cp} command if both disks are mounted by the Unix machine.
+    UNIX {\tt cp} command if both disks are mounted by the UNIX machine.
     Another way is {\tt ftp} in binary mode.
 
-    This works between Unix machines and from VMS to Unix. If disk-FITS
-    files are moved from Unix to VMS, it may be necessary to make them
+    This works between UNIX machines and from VMS to UNIX. If disk-FITS
+    files are moved from UNIX to VMS, it may be necessary to make them
     files of fixed record length 2880 byte. {\tt cp} is thus unsuitable.
     {\tt ftp} in binary mode will create the right sort of file with the
     wrong record length of 512 byte. You can either rectify this with
     some VMS command, or use a more tolerant disk-FITS reader under VMS.
 
-\item {\bf Spectral data version 2 and 3:}
+\item {\bf Spectral data VERSION 2 and 3:}
     These are VMS binary formats. Take a
-    binary copy to the destination machine. The VMS versions SPECX 6.2
+    binary copy to the destination machine. The VMS Versions SPECX 6.2
     and 6.3 can use it straight away, of course. For SPECX 6.6 the file
-    has to be imported (converted into a version 4.1 file) with the
+    has to be imported (converted into a VERSION 4.1 file) with the
     command {\tt CONVERT-VAX-FILE}. This keeps the existing file (say
     {\tt file.dat}) and creates an new file ({\tt file.sdf}).
 
-\item {\bf Spectral data version 4.0 and 4.1:}
+\item {\bf Spectral data Version 4.0 and 4.1:}
     These are portable binary formats
     based on HDS. Just take a binary copy to the destination machine
-    (Unix {\tt cp} or {\tt ftp} in binary mode). The file can be used straight
+    (UNIX {\tt cp} or {\tt ftp} in binary mode). The file can be used straight
     away. Optionally you can convert it to the native flavour of the HDS
     format on the destination machine. Use the command {\tt native} in the
     Kappa package. This should speed up data access somewhat.
@@ -612,29 +613,29 @@ least difficult.
     Version 4.0 or 4.1 spectral data cannot be imported back into SPECX
     6.2 or 6.3.
 
-\item {\bf Map files version 2 and 3:}
+\item {\bf Map files Version 2 and 3:}
     These are VMS binary formats. Take a binary
-    copy to the destination machine. The VMS versions SPECX 6.2 and 6.3
+    copy to the destination machine. The VMS Versions SPECX 6.2 and 6.3
     can use it straight away, of course. For SPECX 6.6 the file has to
-    be imported (converted into a version 4.1 file) with the command
+    be imported (converted into a Version-4.1 file) with the command
     {\tt CONVERT-VAX-MAP}. This keeps the existing file (say {\tt
     file.map}) and creates an new file ({\tt file\_map.sdf}).
 
-\item {\bf Map files version 4.0:}
+\item {\bf Map files Version 4.0:}
     These are ``local'' binary formats written only by
-    the beta test version of SPECX 6.4. ``Local'' means they can only be
+    the beta-test version of SPECX 6.4. ``Local'' means they can only be
     read by the same type of machine that wrote them, either a Sun4
     workstation or an Alpha workstation. These files can be converted to
-    format version 4.1 with {\tt CONVERT-VAX-MAP}. In spite of the name of the
+    format Version 4.1 with {\tt CONVERT-VAX-MAP}. In spite of the name of the
     command, the file will be assumed to have been written by the same
-    Unix machine that the command is run on. The existing file (say
+    UNIX machine that the command is run on. The existing file (say
     {\tt file.map}) is kept and a new file ({\tt file\_map.sdf}) created.
 
-    Version 4.0 map files cannot be imported back into SPECX 6.2 or 6.3.
+    Version-4.0 map files cannot be imported back into SPECX 6.2 or 6.3.
 
-\item {\bf Map files version 4.1:}
+\item {\bf Map files Version 4.1:}
     This is a portable binary format based on HDS.
-    Just take a binary copy to the destination machine (Unix {\tt cp} or
+    Just take a binary copy to the destination machine (UNIX {\tt cp} or
     {\tt ftp} in binary mode). The file can be used straight away.
     Optionally you can convert it to the native flavour of the HDS
     format on the destination machine. Use the command {\tt native} in the
@@ -642,11 +643,11 @@ least difficult.
 
     Version 4.1 map files cannot be imported back into SPECX 6.2 or 6.3.
 
-\item {\bf Map files version 4.2:}
+\item {\bf Map files Version 4.2:}
     This is also a portable binary format based on HDS. The structures
-have been rearranged somewhat from v4.1 to improve storage efficiency
-and to try to prevent corruption of the file if specx crashes. Version
-4.1 map files are automatically converted to v4.2.
+have been rearranged somewhat from V4.1 to improve storage efficiency
+and to try to prevent corruption of the file if specx crashes. Version-4.1 
+map files are automatically converted to V4.2.
 
 \end{itemize}
 
@@ -667,9 +668,9 @@ and providing the example data.
 \section{Release Notes}
 
 This section includes the release notes for the more recent versions
-of specx. This is especially important for the unix versions since
+of SPECX. This is especially important for the unix versions since
 the main Specx user manual does not include any of the new features
-that were not part of SPECX v6.3.
+that were not part of SPECX V6.3.
 
 \subsection{V6.7-7}
 
@@ -786,7 +787,7 @@ Minor technical changes:
 
 \subsection{V6.7-1}
 
-This is the first full Starlink/JAC release of SPECX for UNIX and includes
+This is the first full Starlink/JAC release of SPECX for  and includes
 significant new functionality added at the JAC.
 
 Changes to include functionality similar to that found in the VMS version:
@@ -1263,12 +1264,12 @@ oft-needed functions, including those such as `map-average' and `fetch' that
 have been described in previous versions of the newsletter.
 
 
-\subsection{SPECX V6.3 for VMS and a UNIX release -- January 1994}
+\subsection{SPECX V6.3 for VMS and a  release -- January 1994}
 
 The good news (for those for whom that sort of news is good) is that, thanks
 largely to the efforts of Horst Meyerdierks at The University of Edinburgh, and
 following an intensive burst of work over Christmas on my part, SPECX should
-shortly be available on Starlink UNIX platforms. Large parts of the port are
+shortly be available on Starlink  platforms. Large parts of the port are
 complete but it is not quite clear when there will be enough of a system to be
 worth releasing it to Starlink. At the date of writing (4th January) neither
 GSD nor FITS i/o has been implemented, so there is still no way to import data
@@ -1276,13 +1277,13 @@ other than by direct conversion of VAX files in SPECX internal format. Horst
 has written a standard SPECX command to do this - for the present anyway it
 produces .SDF files, which use Starlink NDF and HDS libraries. Remo Tilanus has
 been working on a GSD reader, and converting the FITS stuff should not be too
-difficult (although tape i/o will probably not be supported under UNIX), so
+difficult (although tape i/o will probably not be supported under ), so
 with any luck it will not be too difficult to finish off V6.4. 
 
 Unfortunately a number of the nicest features of the VAX version - such as
 CTRL C
 handling and proper support for dual-screen alpha graphics terminals - are
-unlikely to be available in the first UNIX version (6.4), and users may notice
+unlikely to be available in the first  version (6.4), and users may notice
 some "debug" type statements which are unfortunately necessary to circumvent
 bugs in the f77 compiler, but for most purposes SPECX V6.4 should satisfy
 the need. With any luck it will be released to Starlink during February,
@@ -1292,7 +1293,7 @@ available by then is another matter.
 Horst is aware of the need to be able to export SPECX to non-Starlink
 sites without them needing to take on the whole of the Starlink environment,
 and I am assured that this will be possible. However in the first instance
-it is probable that UNIX software will be available only through ROE, or
+it is probable that  software will be available only through ROE, or
 later through the Starlink Librarian --- in any case, probably
 not from me directly.
 
