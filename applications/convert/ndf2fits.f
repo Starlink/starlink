@@ -138,11 +138,11 @@
 *        other called HEADER that stores the global headers of the
 *        dataset. [TRUE]
 *     NATIVE = _LOGICAL (Read)
-*        If a TRUE value is given for parameter NATIVE, then World
+*        If a TRUE value is given for Parameter NATIVE, then World
 *        Co-ordinate System (WCS) information will be written to the 
 *        FITS header in the form of a `native' encoding (see "World
 *        Co-ordinate Systems" below).  This will be in addition to the
-*        encoding specified using parameter ENCODING, and will usually
+*        encoding specified using Parameter ENCODING, and will usually
 *        result in two descriptions of the WCS information being stored
 *        in the FITS header (unless the ENCODING parameter produces a
 *        native encoding in which case only one native encoding is
@@ -274,8 +274,8 @@
 *  Notes:
 *     The rules for the conversion are as follows:
 *     -  The NDF main data array becomes the primary data array of the
-*     FITS file if it is in value of parameter COMP, otherwise the first
-*     array defined by parameter COMP will become the primary data
+*     FITS file if it is in value of Parameter COMP, otherwise the first
+*     array defined by PARAMETER COMP will become the primary data
 *     array.  A conversion from floating point to integer or to a
 *     shorter integer type will cause the output array to be scaled and
 *     offset, the values being recorded in keywords BSCALE and BZERO.
@@ -291,14 +291,14 @@
 *     and data unit, unless that component already appears as the
 *     primary data array.  The quality array will always be written as
 *     an unsigned-byte array in the FITS file, regardless of the value
-*     of the parameter BITPIX.
+*     of the Parameter BITPIX.
 *     -  Here are details of the processing of standard items from the
 *     NDF into the FITS header, listed by FITS keyword.
 *        SIMPLE, EXTEND, PCOUNT, GCOUNT --- all take their default
 *          values.
 *        BITPIX, NAXIS, NAXISn --- are derived directly from the NDF
 *          data array; however the BITPIX in the FITS airlock extension
-*          is transferred when parameter BITPIX is -1.
+*          is transferred when Parameter BITPIX is -1.
 *        CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- are derived from
 *          the NDF WCS component if possible (see "World Co-ordinate
 *          Systems").  If this is not possible, and if PROFITS is TRUE, 
@@ -306,7 +306,7 @@
 *        OBJECT, LABEL, BUNIT --- the values held in the NDF's TITLE,
 *          LABEL, and UNITS components respectively are used if
 *          they are defined; otherwise any values found in the FITS
-*          extension are used (provided parameter PROFITS is TRUE).
+*          extension are used (provided Parameter PROFITS is TRUE).
 *          For a variance array, BUNIT is assigned to "(<unit>)**2", 
 *          where <unit> is the DATA unit; the BUNIT header is absent
 *          for a quality array.
@@ -351,8 +351,8 @@
 *          PROFITS is TRUE, and from the NDF history component when
 *          PROHIS is TRUE.
 *        DATASUM and CHECKSUM --- data-integrity keywords are written 
-*          when parameter CHECKSUM is TRUE, replacing any existing
-*          values.  When parameter CHECKSUM is FALSE and PROFITS is
+*          when Parameter CHECKSUM is TRUE, replacing any existing
+*          values.  When Parameter CHECKSUM is FALSE and PROFITS is
 *          TRUE any existing values inherited from the FITS airlock are 
 *          removed to prevent storage of invalid checksums relating to 
 *          another data file.
@@ -382,9 +382,9 @@
 *     to the binary-table header.
 
 *     There are additional rules if a multi-NDF container file is being
-*     converted (see parameter CONTAINER).  This excludes the case where
+*     converted (see Parameter CONTAINER).  This excludes the case where
 *     there are but two NDFs---one data and the other just 
-*     headers---that have already been merged (see parameter MERGE):
+*     headers---that have already been merged (see Parameter MERGE):
 *     -  For multiple NDFs a header-only HDU may be created followed by
 *     an IMAGE extension containing the data array (or whichever other
 *     array is first specified by COMP).
@@ -492,7 +492,7 @@
 *  Special Formats:
 *     In the general case, NDF extensions (excluding the FITS extension)
 *     may be converted to one-row binary tables in the FITS file when
-*     parameter PROEXTS is TRUE.  This preserves the information, but it
+*     Parameter PROEXTS is TRUE.  This preserves the information, but it
 *     may not be accessible to the recipient's FITS reader.  Therefore,
 *     in some cases it is desirable to understand the meanings of
 *     certain NDF extensions, and create standard FITS products for

@@ -2313,7 +2313,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
          The actual NDF data type for FMTCNV=\texttt{"TRUE"}, and the data 
          type after applying the scale and offset for FMTCNV=\texttt{"NATIVE"}
-         are both specified by parameter TYPE.  However, if TYPE is a
+         are both specified by Parameter TYPE.  However, if TYPE is a
          blank string or null ({\tt{!}}), then the choice of floating-point
          data type depends on the number of significant digits
          in the BSCALE and BZERO keywords.
@@ -2401,7 +2401,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          for details.
 
          It is also ignored if a sub-file is specified as the IN parameter,
-         or parameter CONTAINER is TRUE.  \texttt{[TRUE]}
+         or Parameter CONTAINER is TRUE.  \texttt{[TRUE]}
       }
       \sstsubsection{
          PROFITS = \_LOGICAL (Read)
@@ -2600,13 +2600,13 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
       The general rules for the conversion apply if the FITS file is not
       one of the \texttt{"}Special Formats\texttt{"} (including one defined by an EXTABLE)
-      and parameter CONTAINER is not TRUE.
+      and Parameter CONTAINER is not TRUE.
 
       The general rules are as follows:
       \ssthitemlist{
          \sstitem 
          The primary data array of the FITS file becomes the NDF's data
-         array. There is an option using parameter FMTCNV to convert
+         array. There is an option using Parameter FMTCNV to convert
          integer data to floating point using the values of FITS keywords
          BSCALE and BZERO.
          \sstitem
@@ -2619,14 +2619,14 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          NDF quality and variance arrays are not created.
          \sstitem
          A verbatim copy of the FITS primary header is placed in the
-         NDF's FITS extension when parameter PROFITS is \texttt{TRUE}.
+         NDF's FITS extension when Parameter PROFITS is \texttt{TRUE}.
          \sstitem
          Here are details of the processing of standard items from the
          the FITS header, listed by FITS keyword.
          \ssthitemlist{
             \sstitem
             CRVAL\textit{n}, CDELT\textit{n}, CRPIX\textit{n}, CTYPE\textit{n},
-            CUNIT\textit{n} --- define the NDF's WCS component (see parameter 
+            CUNIT\textit{n} --- define the NDF's WCS component (see Parameter 
             ENCODINGS).
             \sstitem
             OBJECT, LABEL, BUNIT --- if present are equated to the NDF's
@@ -2637,7 +2637,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          }
          \sstitem
          Additional sub-files within the FITS files are converted into
-         extensions within the NDF if parameter PROEXTS is \texttt{TRUE}.
+         extensions within the NDF if Parameter PROEXTS is \texttt{TRUE}.
          These extensions are named FITS\_EXT\_\textit{m} for the 
          $\textit{m}^{\rm th}$ sub-file.
          \sstitem
@@ -2727,7 +2727,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             \ssthitemlist{
                \sstitem
                The primary data array of the FITS file becomes NDF main
-               data array.  The value of parameter FMTCNV controls whether
+               data array.  The value of Parameter FMTCNV controls whether
                keywords BSCALE and BZERO are applied to scale the data;
                FMTCNV along with the number of significant characters in the
                keywords decide the data type of the array.  It is expected
@@ -2752,7 +2752,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
                products.
                \sstitem
                The primary headers may be written to the NDF's FITS
-               extension when parameter PROFITS is \texttt{TRUE}.
+               extension when Parameter PROFITS is \texttt{TRUE}.
             }
          }
          \bigskip
@@ -2794,7 +2794,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          \ssthitemlist{
             \sstitem
             This creates a series of NDFs within a single HDS container
-            file whose name is specified by parameter OUT.  Each NDF
+            file whose name is specified by Parameter OUT.  Each NDF
             corresponds to a spectral order, and may be accessed individually.
             The name of each NDF is ORDER followed by the spectral-order
             number.  For instance, when OUT=\texttt{SWP}, the 85$^{th}$-order
@@ -2805,7 +2805,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             \sstitem
             The primary headers may be written to the standard FITS
             airlock extension when PROFITS is \texttt{TRUE}.  To save space, this
-            appears once in the NDF specified by parameter OUT.
+            appears once in the NDF specified by Parameter OUT.
             \sstitem
             The conversion from binary-table columns and headers to NDF
             objects is as follows:
@@ -2897,7 +2897,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             CUNIT\textit{n}           &   Units for axis \textit{n} \\
             NAXIS              &   Number of dimensions \\
             NAXIS\textit{n}           &   Dimension of axis \textit{n} \\
-            remaining columns  &   keyword in FITS extension \\
+            remaining columns  &   Keyword in FITS extension \\
             \end{tabular}
             \\[\medskipamount]
             Some of these remaining columns overwrite the (global) values
@@ -3005,7 +3005,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
                the FITS file.
                \sstitem
                A FITS extension in the NDF may be written to store the
-               primary data unit's headers when parameter PROFITS is
+               primary data unit's headers when Parameter PROFITS is
                \texttt{TRUE}.  This FITS airlock will not contain any
                NDF-style HISTORY records.
             }
@@ -3519,13 +3519,13 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       \multicolumn{1}{|l}{IRCAM file} & & \multicolumn{1}{l}{NDF} &
       \multicolumn{1}{|c|}{Comments} \\ \hline
       .OBS.PHASEA.DATA\_ARRAY & $\Rightarrow$ &  .DATA\_ARRAY & 
-          when parameter CONFIG=\texttt{"STARE"} \\
+          when Parameter CONFIG=\texttt{"STARE"} \\
       .OBS.PHASEB.DATA\_ARRAY & $\Rightarrow$ &  .DATA\_ARRAY &
-          when parameter CONFIG=\texttt{"CHOP"} \\
+          when Parameter CONFIG=\texttt{"CHOP"} \\
       .OBS.KTCA.DATA\_ARRAY   & $\Rightarrow$ &  .DATA\_ARRAY &
-          when parameter CONFIG=\texttt{"KTCSTARE"} \\
+          when Parameter CONFIG=\texttt{"KTCSTARE"} \\
       .OBS.KTCB.DATA\_ARRAY   & $\Rightarrow$ &  .DATA\_ARRAY &
-          when parameter CONFIG=\texttt{"KTCCHOP"} \\
+          when Parameter CONFIG=\texttt{"KTCCHOP"} \\
       & & & \\
       .OBS.DATA\_LABEL        & $\Rightarrow$ &  .LABEL & \\
       .OBS.DATA\_UNITS        & $\Rightarrow$ &  .UNITS & \\
@@ -3716,7 +3716,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    }{
       \begin{refs}
          \item NASA Office of Standards and Technology, 1997, \textit{A User's Guide
-               for the Flexible Image Transport System (FITS)}, version 4.0.
+               for the Flexible Image Transport System (FITS)}, Version 4.0.
          \item NASA Office of Standards and Technology, 1999, \textit{Definition of
                the Flexible Image Transport System (FITS)}.
       \end{refs}
@@ -3790,7 +3790,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
          When FIXED is \texttt{FALSE}, data values are packed as efficiently
          as possible within each record.  The length of each record is
-         given by parameter RECLEN.  \texttt{[FALSE]}
+         given by Parameter RECLEN.  \texttt{[FALSE]}
       }
       \sstsubsection{
          IN = NDF (Read)
@@ -3805,7 +3805,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          FIXED is \texttt{TRUE}.  It should be positive on UNIX platforms.
          The suggested default is the current value, or 8 when there
          is not one.  The upper limit is given by 512 divided by the
-         number of characters per value plus 1 (see parameter FIXED).
+         number of characters per value plus 1 (see Parameter FIXED).
       }
       \sstsubsection{
          OUT = FILENAME (Write)
@@ -4326,12 +4326,12 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       \sstsubsection{
          NATIVE = \_LOGICAL (Read)
       }{
-         If a \texttt{TRUE} value is given for parameter NATIVE, then World
+         If a \texttt{TRUE} value is given for Parameter NATIVE, then World
          Co-ordinate System (WCS) information will be written to the
          FITS header in the form of a `native' encoding (see 
          \htmlref{\texttt{"}World Co-ordinate Systems\texttt{"}}
          {world_coordinate_systems} below).  This will be in addition to the
-         encoding specified using parameter ENCODING, and will usually result
+         encoding specified using Parameter ENCODING, and will usually result
          in  two descriptions of the WCS information being stored in the FITS 
          header (unless ENCODING parameter produces a native encoding in which
          case only one native encoding is stored in the header). Including a
@@ -4539,8 +4539,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
          \sstitem
          The NDF main data array becomes the primary data array of the
-         FITS file if it is in value of parameter COMP, otherwise the first
-         array defined by parameter COMP will become the primary data
+         FITS file if it is in value of Parameter COMP, otherwise the first
+         array defined by Parameter COMP will become the primary data
          array.  A conversion from floating point to integer or to a
          shorter integer type will cause the output array to be scaled and
          offset, the values being recorded in keywords BSCALE and BZERO.
@@ -4560,7 +4560,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          and data unit, unless that component already appears as the
          primary data array.  The quality array will always be written as
          an unsigned-byte array in the FITS file, regardless of the value
-         of the parameter BITPIX.
+         of the Parameter BITPIX.
 
          \sstitem
          Here are details of the processing of standard items from the
@@ -4574,7 +4574,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             \sstitem
             BITPIX, NAXIS, NAXISn --- are derived directly from the NDF
               data array; however the BITPIX in the FITS airlock extension
-              is transferred when parameter BITPIX=\texttt{-1}.
+              is transferred when Parameter BITPIX=\texttt{-1}.
 
             \sstitem
             CRVAL\textit{n}, CDELT\textit{n}, CRPIX\textit{n}, CTYPE\textit{n},
@@ -4589,7 +4589,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
             OBJECT, LABEL, BUNIT --- the values held in the NDF's TITLE,
               LABEL, and UNITS components respectively are used if
               they are defined; otherwise any values found in the FITS
-              extension are used (provided parameter PROFITS is \texttt{TRUE}).
+              extension are used (provided Parameter PROFITS is \texttt{TRUE}).
               For a variance array, BUNIT is assigned to 
               \texttt{($<unit>$)**2}, where $<unit>$ is the DATA unit; the
               BUNIT header is absent for a quality array.
@@ -4657,8 +4657,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
             \sstitem
             DATASUM and CHECKSUM --- data-integrity keywords are written 
-            when parameter CHECKSUM is \texttt{TRUE}, replacing any existing
-            values.  When parameter CHECKSUM is \texttt{FALSE} and PROFITS is
+            when Parameter CHECKSUM is \texttt{TRUE}, replacing any existing
+            values.  When Parameter CHECKSUM is \texttt{FALSE} and PROFITS is
             \texttt{TRUE} any existing values inherited from the FITS airlock are 
             removed to prevent storage of invalid checksums relating to 
             another data file.
@@ -4695,9 +4695,9 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 
       }
       There are additional rules if a multi-NDF container file is being
-      converted (see parameter CONTAINER).  This excludes the case where
+      converted (see Parameter CONTAINER).  This excludes the case where
       there are but two NDFs---one data and the other just 
-      headers---that have already been merged (see parameter MERGE):
+      headers---that have already been merged (see Parameter MERGE):
       \ssthitemlist{
 
          \sstitem
@@ -4862,7 +4862,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    }{
       In the general case, NDF extensions (excluding the FITS extension)
       may be converted to one-row binary tables in the FITS file when
-      parameter PROEXTS is \texttt{TRUE}.  This preserves the information,
+      Parameter PROEXTS is \texttt{TRUE}.  This preserves the information,
       but it may not be accessible to the recipient's FITS reader.  Therefore,
       in some cases it is desirable to understand the meanings of
       certain NDF extensions, and create standard FITS products for
@@ -5346,7 +5346,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
          The NDF title, label, units are written to the header keywords
          TITLE, OBJECT, and BUNIT respectively if they are defined.
          Otherwise any values for these keywords found in the FITS
-         extension are used (provided parameter PROFITS is \texttt{TRUE}).
+         extension are used (provided Parameter PROFITS is \texttt{TRUE}).
          There is a limit of twenty characters for each.
 
          \sstitem
@@ -5860,7 +5860,7 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
 }{
    \sstdescription{
       This application converts a SPECX map file into a simple data cube
-      formatted  as a standard \NDFref.  It works on map files in version 4.2
+      formatted  as a standard \NDFref.  It works on map files in Version 4.2
       or later of the SPECX format.  It can optionally write a schematic
       of the map grid to a text file.
 
@@ -6000,22 +6000,22 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       is used.  Because of the presence of these bad values the expanded
       cube is usually larger than the original map file.
 
-      The created NDF cube has a WCS component in which axes 1 and 2 are
-      RA and DEC, and axis 3 is frequency in units of GHz. The nature of
+      The created NDF cube has a WCS component in which Axes 1 and 2 are
+      RA and DEC, and Axis 3 is frequency in units of GHz. The nature of
       these axes can be changed if necessary by subsequent use of the
       \xref{WCSATTRIB}{sun95}{WCSATTRIB} application within the \KAPPA\ package.
       For compatibility
       with older applications, AXIS structures are also added to the output
       cube. Axes 1 and 2 are offsets from the central position of the map,
-      with units of seconds of arc, and axis 3 is frequency offset in GHz
+      with units of seconds of arc, and Axis 3 is frequency offset in GHz
       relative to the central frequency.  The pixel origin is placed at the
-      source position on axes 1 and 2, and the central frequency on axis 3.
+      source position on Axes 1 and 2, and the central frequency on Axis 3.
 
-      SPECX2NDF reads map files in version 4.2 or later of the SPECX data 
+      SPECX2NDF reads map files in Version 4.2 or later of the SPECX data 
       format. If it is given a map file in an earlier version of the
       data format it will terminate with an error message.  Note,
       however, that SPECX itself can read map files in earlier versions
-      of the SPECX format and convert them to version 4.2.
+      of the SPECX format and convert them to Version 4.2.
    }
    \sstdiytopic{
       Schematic of the map grid   \label{SCHEMATICMAP}
@@ -6051,8 +6051,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       output container file.  The name of the new NDF is \texttt{SPECTRUM\textit{n}} 
       where \textit{n} is its index within the original array of NDFs. 
       Each new scalar NDF is actually three-dimensional and has the format
-      described above for an output cube (\textit{i.e.}\ axes 1 and 2 are RA and DEC,
-      and axis 3 is frequency).  However, pixel axes 1 and 2 span only a
+      described above for an output cube (\textit{i.e.}\ Axes 1 and 2 are RA and DEC,
+      and Axis 3 is frequency).  However, pixel Axes 1 and 2 span only a
       single pixel (the size of this single spatial pixel is assumed to be
       half the size of the resolution of the JCMT at the central frequency).
       Inclusion of three-dimensional WCS information allows the individual
@@ -7268,13 +7268,13 @@ through the new CONTAINER and MERGE parameters.
 
 \section{Release Notes -- V1.5-8}
 
-\htmlref{FITS2NDF}{FITS2NDF} parameter FMTCNV has a new allowed value
+\htmlref{FITS2NDF}{FITS2NDF} Parameter FMTCNV has a new allowed value
 of \texttt{"Native"} requesting that there is no format conversion, and
 the array of numbers stored in the FITS file are copied to a scaled array
 within the NDF.  This preserves the data compression.  Parameter TYPE
 continues to control the data type of the true unscaled values.
 
-\htmlref{NDF2FITS}{NDF2FITS} parameter BITPIX has a new allowed value
+\htmlref{NDF2FITS}{NDF2FITS} Parameter BITPIX has a new allowed value
 of \texttt{"Native"}.  This requests that should any scaled-form arrays be 
 converted, then the data type of the corresponding output FITS array 
 is set to the scaled-form array's data type, and that the scale and
@@ -7285,7 +7285,7 @@ behaves as if BITPIX=\texttt{-1} were specified.
 
 \section{Release Notes -- V1.5-9}
 
-\htmlref{NDF2FITS}{NDF2FITS} parameter ENCODING has a new allowed
+\htmlref{NDF2FITS}{NDF2FITS} Parameter ENCODING has a new allowed
 value of \texttt{"FITS-WCS(CD)"}.  This is the same as
 \texttt{"FITS-WCS"} except that it uses the old CD matrix formalism 
 to describe the data array's rotation and scaling.
@@ -7296,7 +7296,7 @@ to describe the data array's rotation and scaling.
 FITS files.
 
 \htmlref{NDF2FITS}{NDF2FITS} writes integrity check keywords CHECKSUM
-and DATASUM at the end of each header if new parameter CHECKSUMS is 
+and DATASUM at the end of each header if new Parameter CHECKSUMS is 
 \texttt{TRUE}.
 
 \section{Release Notes -- V1.5-11}

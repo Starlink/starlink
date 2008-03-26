@@ -96,7 +96,7 @@
 *     -  The NDF title, label, units are written to the header keywords
 *     TITLE, OBJECT, and BUNIT respectively if they are defined.
 *     Otherwise any values for these keywords found in the FITS
-*     extension are used (provided parameter PROFITS is TRUE).  There
+*     extension are used (provided Parameter PROFITS is TRUE).  There
 *     is a limit of twenty characters for each.
 *     -  The NDF pixel origins are stored in keywords LBOUNDn for the
 *     nth dimension when any of the pixel origins is not equal to 1.

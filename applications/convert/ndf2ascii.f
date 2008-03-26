@@ -53,7 +53,7 @@
 
 *        When FIXED is FALSE, data values are packed as efficiently as
 *        possible within each record.  The length of each record is
-*        given by parameter RECLEN.  [FALSE]
+*        given by Parameter RECLEN.  [FALSE]
 *     IN = NDF (Read)
 *        Input NDF data structure. The suggested default is the current
 *        NDF if one exists, otherwise it is the current value.
@@ -62,7 +62,7 @@
 *        FIXED is TRUE.  It should be positive on UNIX platforms.
 *        The suggested default is the current value, or 8 when there
 *        is not one.  The upper limit is given by 512 divided by the
-*        number of characters per value plus 1 (see parameter FIXED).
+*        number of characters per value plus 1 (see Parameter FIXED).
 *     OUT = FILENAME (Write)
 *        Name of the output formatted Fortran file.  The file will
 *        normally have variable-length records when there is a header,

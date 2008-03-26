@@ -317,7 +317,7 @@
 *
 *        The actual NDF data type for FMTCNV="TRUE", and the data type
 *        after applying the scale and offset for FMTCNV="NATIVE" are 
-*        both specified by parameter TYPE.  However, if TYPE is a
+*        both specified by Parameter TYPE.  However, if TYPE is a
 *        blank string or null (!), then the choice of floating-point
 *        data type depends on the number of significant digits
 *        in the BSCALE and BZERO keywords.
@@ -393,7 +393,7 @@
 *     PROFITS = _LOGICAL (Read)
 *        If TRUE, the headers of the FITS file are written to the NDF's
 *        FITS extension.  If a specific FITS sub-file has been specified
-*        or parameter CONTAINER is TRUE or an EXTABLE is in use, the 
+*        or Parameter CONTAINER is TRUE or an EXTABLE is in use, the 
 *        FITS extension will appear as a primary header and may include
 *        cards inherited from the primary HDU; otherwise the FITS header
 *        is written verbatim.  [TRUE]
@@ -530,12 +530,12 @@
 *
 *     The general rules for the conversion apply if the FITS file is not
 *     one of the "Special Formats" (including one defined by an EXTABLE)
-*     and parameter CONTAINER is not TRUE.
+*     and Parameter CONTAINER is not TRUE.
 *
 *     The general rules are as follows.
 *
 *     -  The primary data array of the FITS file becomes the NDF's data
-*     array.  There is an option using parameter FMTCNV to convert
+*     array.  There is an option using Parameter FMTCNV to convert
 *     integer data to floating point using the values of FITS keywords
 *     BSCALE and BZERO.
 *     -  Any integer array elements with value equal to the FITS
@@ -545,17 +545,17 @@
 *     set appropriately.
 *     -  NDF quality and variance arrays are not created.
 *     -  A verbatim copy of the FITS primary header is placed in the
-*     NDF's FITS extension when parameter PROFITS is TRUE.
+*     NDF's FITS extension when Parameter PROFITS is TRUE.
 *     -  Here are details of the processing of standard items from the
 *     the FITS header, listed by FITS keyword.
 *        CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- define the NDF's
-*          WCS component (see parameter ENCODINGS).
+*          WCS component (see {Parameter ENCODINGS).
 *        OBJECT, LABEL, BUNIT --- if present are equated to the NDF's
 *          TITLE, LABEL, and UNITS components respectively.
 *        LBOUNDn --- if present, this specifies the pixel origin for
 *          the nth dimension.
 *     -  Additional sub-files within the FITS files are converted into
-*     extensions within the NDF if parameter PROEXTS is TRUE.  These
+*     extensions within the NDF if Parameter PROEXTS is TRUE.  These
 *     extensions are named FITS_EXT_m for the mth sub-file.
 *     -  An IMAGE sub-file is treated like the primary data array, and
 *     follows the rules give above.  However, the resultant NDF is an
@@ -628,7 +628,7 @@
 
 *     -  Details of the conversion are:
 *        -  The primary data array of the FITS file becomes NDF main
-*        data array.  The value of parameter FMTCNV controls whether
+*        data array.  The value of Parameter FMTCNV controls whether
 *        keywords BSCALE and BZERO are applied to scale the data;
 *        FMTCNV along with the number of significant characters in the
 *        keywords decide the data type of the array.  It is expected
@@ -646,7 +646,7 @@
 *        CTYPEn defines the axis labels.  Axis information is only
 *        available for the SILO and SIHI products.
 *        -  The primary headers may be written to the NDF's FITS
-*        extension when parameter PROFITS is TRUE.
+*        extension when Parameter PROFITS is TRUE.
 *     
 *     o  IUE Final Archive MXLO
 *
@@ -675,7 +675,7 @@
 *     o  IUE Final Archive MXHI
 *
 *     -  This creates a series of NDFs within a single HDS container
-*     file whose name is specified by parameter OUT.  Each NDF
+*     file whose name is specified by Parameter OUT.  Each NDF
 *     corresponds to a spectral order, and may be accessed individually.
 *     The name of each NDF is ORDER followed by the spectral-order
 *     number.  For instance, when OUT=SWP, the 85th-order spectrum will
@@ -684,7 +684,7 @@
 *     transferred to the NDF.
 *     -  The primary headers may be written to the standard FITS
 *     airlock extension when PROFITS is TRUE.  To save space, this
-*     appears once in the NDF specified by parameter OUT.
+*     appears once in the NDF specified by Parameter OUT.
 *     -  The conversion from binary-table columns and headers to NDF
 *     objects is as follows:
 *
@@ -744,14 +744,14 @@
 *        BUNIT                  Data units
 *        BSCALE                 Data scale factor
 *        BZERO                  Data offset
-*        CDELTn                 Pixel increment along axis n
+*        CDELTn                 Pixel increment along Axis n
 *        CRPIXn                 Axis n reference pixel
 *        CRVALn                 Axis n co-ordinate of reference pixel
-*        CTYPEn                 Label for axis n
-*        CUNITn                 Units for axis n
+*        CTYPEn                 Label for Axis n
+*        CUNITn                 Units for Axis n
 *        NAXIS                  Number of dimensions
-*        NAXISn                 Dimension of axis n
-*        remaining columns      keyword in FITS extension
+*        NAXISn                 Dimension of Axis n
+*        remaining columns      Keyword in FITS extension
 *
 *        Some of these remaining columns overwrite the (global) values
 *        in the primary headers.  The integration times are stored as
@@ -836,7 +836,7 @@
 *        the EXTNAME and EXTTYPE keywords, or names it FITS_EXT_n for
 *        the nth FITS extension.
 *        -  A FITS extension in the NDF may be written to store the
-*        primary data unit's headers when parameter PROFITS is TRUE.
+*        primary data unit's headers when Parameter PROFITS is TRUE.
 *        This FITS airlock will not contain any NDF-style HISTORY
 *        records.
 

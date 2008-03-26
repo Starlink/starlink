@@ -96,13 +96,13 @@
 *       IRCAM file                 NDF
 *     -----------------------------------------------------------------
 *       .OBS.PHASEA.DATA_ARRAY ->  .DATA_ARRAY
-*                                  when parameter CONFIG="STARE"
+*                                  when Parameter CONFIG="STARE"
 *       .OBS.PHASEB.DATA_ARRAY ->  .DATA_ARRAY
-*                                  when parameter CONFIG="CHOP"
+*                                  when Parameter CONFIG="CHOP"
 *       .OBS.KTCA.DATA_ARRAY   ->  .DATA_ARRAY
-*                                  when parameter CONFIG="KTCSTARE"
+*                                  when Parameter CONFIG="KTCSTARE"
 *       .OBS.KTCB.DATA_ARRAY   ->  .DATA_ARRAY
-*                                  when parameter CONFIG="KTCCHOP"
+*                                  when Parameter CONFIG="KTCCHOP"
 
 *       .OBS.DATA_LABEL        ->  .LABEL                      
 *       .OBS.DATA_UNITS        ->  .UNITS
