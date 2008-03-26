@@ -252,6 +252,8 @@
 *        - Added smf_correct_steps / smf_simple_stats
 *     2008-03-14 (DSB):
 *        - Added smf_sorti, smf_ext2km and smf_km2ext.
+*     2008-03-25 (EC):
+*        - Added syncbad to smf_update_quality interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -812,7 +814,7 @@ void smf_resampcube_ast( smfData *data, int index, int size, dim_t nchan,
                          const double params[], float *in_data, 
                          float *out_data, int *status );
 
-void smf_update_quality( smfData *data, unsigned char *target, 
+void smf_update_quality( smfData *data, unsigned char *target, int syncbad, 
 			 unsigned char *badmask, double badfrac,
 			 int *status );
 void smf_correct_steps( smfData *data, unsigned char *quality,
