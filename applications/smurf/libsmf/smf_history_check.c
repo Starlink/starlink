@@ -40,6 +40,7 @@
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
 *     Andy Gibb (UBC)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -49,6 +50,8 @@
 *        Use history AstKeyMap instead of file history
 *     2006-10-12 (AGG):
 *        Remove refappl variable
+*     2008-03-25 (EC):
+*        Check for history pointer
 
 *  Notes:
 *     - Applications names are compared case sensitively. Uppercase
@@ -119,8 +122,12 @@ int smf_history_check( const smfData* data, const char * appl, int *status) {
     return retval;
   }
 
-  applen = strlen( appl );
+  /* Check that history even exists */
+  if( !data->history ) {
+    return retval;
+  }
 
+  applen = strlen( appl );
   nrec = astMapSize( data->history );
 
   if ( nrec != 0 ) {
