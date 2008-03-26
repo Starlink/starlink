@@ -22,7 +22,7 @@
 
 *  Description:
 *     This application converts a SPECX map file into a simple data cube
-*     formatted as a standard NDF.  It works on map files in version 4.2
+*     formatted as a standard NDF.  It works on map files in Version 4.2
 *     or later of the SPECX format.  It can optionally write a schematic 
 *     of the map grid to a text file.
 *
@@ -131,22 +131,22 @@
 *     is used.  Because of the presence of these bad values the expanded
 *     cube is usually larger than the original map file.
 *
-*     The created NDF cube has a WCS component in which axes 1 and 2 are
-*     RA and DEC, and axis 3 is frequency in units of GHz.  The nature of 
+*     The created NDF cube has a WCS component in which Axes 1 and 2 are
+*     RA and DEC, and Axis 3 is frequency in units of GHz.  The nature of 
 *     these axes can be changed if necessary by subsequent use of the
 *     WCSATTRIB application within the KAPPA package.  For compatibility 
 *     with older applications, AXIS structures are also added to the 
 *     output cube. Axes 1 and 2 are offsets from the central position of 
-*     the map, with units of seconds of arc, and axis 3 is frequency
+*     the map, with units of seconds of arc, and Axis 3 is frequency
 *     offset in GHz relative to the central frequency.  The pixel origin
-*     is placed at the source position on axes 1 and 2, and the central
-*     frequency on axis 3.
+*     is placed at the source position on Axes 1 and 2, and the central
+*     frequency on Axis 3.
 *
-*     SPECX2NDF reads map files in version 4.2 or later of the SPECX
+*     SPECX2NDF reads map files in Version 4.2 or later of the SPECX
 *     data format.  If it is given a map file in an earlier version of
 *     the data format it will terminate with an error message.  Note,
 *     however, that SPECX itself can read map files in earlier versions
-*     of the SPECX format and convert them to version 4.2.
+*     of the SPECX format and convert them to Version 4.2.
 
 *  Schematic of the map grid:
 *     SPECX2NDF has an optional facility to write a crude schematic of
@@ -192,8 +192,8 @@
 *     of the new NDF is "SPECTRUM<n>" where "<n>" is its index within
 *     the original array of NDFs.  Each new scalar NDF is actually
 *     three-dimensional and has the format described above for
-*     an output cube (i.e. axes 1 and 2 are RA and DEC, and axis 3 is
-*     frequency). However, pixel axes 1 and 2 span only a single pixel
+*     an output cube (i.e. Axes 1 and 2 are RA and DEC, and axis 3 is
+*     frequency). However, Pixel Axes 1 and 2 span only a single pixel
 *     (the size of this single spatial pixel is assumed to be half the
 *     size of the resolution of the JCMT at the central frequency). 
 *     Inclusion of three-dimensional WCS information allows the
