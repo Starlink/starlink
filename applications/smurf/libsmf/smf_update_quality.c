@@ -14,7 +14,7 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_update_quality( smfData *data, unsigned char *target, 
+*     smf_update_quality( smfData *data, unsigned char *target, int syncbad,
 *                         unsigned char *badmask, double badfrac,
 *                         int *status );
 
@@ -23,6 +23,8 @@
 *        Pointer to smfData that will contain the updated QUALITY array
 *     target = unsigned char* (Given)
 *        If defined update this buffer instead of the QUALITY in data
+*     syncbad = int (Given)
+*        If set synchronize SMF__Q_BADS quality flag with VAL__BADD in data
 *     badmask = unsigned char* (Given and Returned)
 *        If given, points to byte array with same dimensions as bolometers.
 *        Each position that is non-zero will set SMF__Q_BAD for all data
@@ -55,6 +57,8 @@
 *        Initial version.
 *     2008-03-03 (EC):
 *        Added target to interface
+*     2008-03-25 (EC):
+*        Added syncbad to interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -98,7 +102,7 @@
 
 #define FUNC_NAME "smf_update_quality"
 
-void smf_update_quality( smfData *data, unsigned char *target, 
+void smf_update_quality( smfData *data, unsigned char *target, int syncbad, 
 			 unsigned char *badmask, double badfrac, 
 			 int *status ) {
 
@@ -179,12 +183,16 @@ void smf_update_quality( smfData *data, unsigned char *target,
   if( *status == SAI__OK ) {
     
     /* Synchronize SMF__Q_BADS quality and VAL__BADD in data array */
-    for( i=0; i<ndata; i++ ) {    /* Loop over all samples */
-      qual[i] |= (SMF__Q_BADS & (((double *)data->pntr[0])[i] == VAL__BADD) );
+    if( syncbad ) {
+      for( i=0; i<ndata; i++ ) {    /* Loop over all samples */
+	qual[i] |= 
+	  (SMF__Q_BADS & (((double *)data->pntr[0])[i] == VAL__BADD) );
+      }
     }
     
     /* Apply badmask if available */
     if( badm ) {
+
       /* Loop over detector */
       for( i=0; i<nbolo; i++ ) {
 
