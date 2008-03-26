@@ -40,6 +40,7 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -48,6 +49,8 @@
 *     2006-07-06 (AGG):
 *        Check for presence of HISTORY component in NDF before
 *        attempting to write
+*     2008-03-25 (EC):
+*        Check for valid NDF identifier
 
 *  Notes:
 *     - SMURF subroutines should choose history "application" names
@@ -122,7 +125,7 @@ void smf_history_add(  smfData* data, const char * appl,
   /* If we have a file, write the history entry into the file ONLY if
      the history component already exists.  */
   file = data->file;
-  if ( file !=NULL ) {
+  if ( (file !=NULL) && (file->ndfid != NDF__NOID) ) {
     ndfState( file->ndfid, "HISTORY", &state, status );
     if ( state == 1 ) {
       smf_history_write( data, appl, text, status);
