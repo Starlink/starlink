@@ -1612,7 +1612,7 @@ package @PACKAGE@ {
             access READ
             vpath {PROMPT }
             ppath GLOBAL CURRENT
-            prompt {Input data file}
+            prompt {Input data files}
             helpkey *
           }
           parameter out {
@@ -1624,18 +1624,11 @@ package @PACKAGE@ {
             prompt {Output data file}
             helpkey *
           }
-          parameter opslist {
-            position 3
-            type _CHAR 
-            vpath {PROMPT }
-            prompt {Operation list: eg. op1, op2, ...}
-            helpkey *
-          }
           parameter parslist {
-            position 4
+            position 3
             type _CHAR
             vpath {PROMPT }
-            prompt {Parameter list: eg. keyword1=value1, keyword2=value2, ...}
+            prompt {Parameter list: eg. op1.key1=value1, op2.key2=value2, ...}
             helpkey *
           }
           parameter msg_filter {

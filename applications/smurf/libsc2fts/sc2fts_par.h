@@ -4,7 +4,7 @@
      2008-03-18: original (BZ)
 */
 
-#define SC2FTS__OPSLISTSIZE    100       /* length of operation list */
-#define SC2FTS__PARSLISTSIZE  1024       /* length of parameter list */
+#define SC2FTS__OPSLISTSIZ    200       /* length of operation list */
+#define SC2FTS__PARSLISTSIZ  1024       /* length of parameter list */
 
 

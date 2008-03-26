@@ -13,13 +13,13 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2fts_addwcs ( int indf, char* parlist, int *status )
+*     sc2fts_addwcs ( smfData *idata, AstKeyMap* parKeymap, int *status )
 
 *  Arguments:
-*     indf = int (Given)
-*        the file ID
-*     parlist = char* (Given)
-*        the parameter list for this operation
+*     idata = smfData* (Given)
+*        Pointer to input SCUBA2 data struct
+*     parKeymap = AstKeyMap* (Given)
+*        the parameter Keymap for this operation
 *     status = int* (Given and Returned)
 *        Pointer to global status.  
 
@@ -62,13 +62,19 @@
 /* Standard includes */
 #include <math.h>
 
+/* STARLINK includes */
+#include "ast.h"
+
+/* SMURF includes */
+#include "libsmf/smf_typ.h"
+
 void sc2fts_addwcs 
 (
-int   indf,
-char* parlist,
+smfData*   idata,
+AstKeyMap* parKeymap,
 int   *status          /* global status (given and returned) */
 )
-
 {
-   printf("ADDWCS operation!\n");
+  printf("ADDWCS operation!\n");
+  if(parKeymap != NULL) astShow(parKeymap);
 }

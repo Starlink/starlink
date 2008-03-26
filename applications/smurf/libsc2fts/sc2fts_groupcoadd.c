@@ -13,13 +13,15 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2fts_groupcoadd ( int indf, char* parlist, int *status )
+*     sc2fts_groupcoadd ( Grp* igrp, Grp* ogrp, AstKeyMap * parKeymap, int *status )
 
 *  Arguments:
-*     indf = int (Given)
-*        the file ID
-*     parlist = char* (Given)
-*        the parameter list for this operation
+*     igrp = Grp* (Given)
+*        the group of input files
+*     ogrp = Grp* (Given)
+*        the group of output files
+*     parKeymap = AstKeyMap* (Given)
+*        the parameter Keymap for this operation
 *     status = int* (Given and Returned)
 *        Pointer to global status.  
 
@@ -62,15 +64,18 @@
 /* Standard includes */
 #include <math.h>
 
+/* STARLINK includes */
+#include "ast.h"
+#include "star/grp.h"
+
 void sc2fts_groupcoadd 
 (
-int   indf,
-char* parlist,
+Grp *igrp,
+Grp* ogrp,
+AstKeyMap* parKeymap,
 int *status          /* global status (given and returned) */
 )
-
 {
-  
    printf("GroupCoAdd operation!\n");
-
+   if(parKeymap != NULL) astShow(parKeymap);
 }

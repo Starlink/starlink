@@ -60,44 +60,92 @@
 #include <stdlib.h>
 
 /* STARLINK includes */
+#include "ast.h"
+#include "mers.h"
 #include "par.h"
+#include "par_par.h"
+#include "prm_par.h"
+#include "ndf.h"
+#include "sae_par.h"
+#include "star/hds.h"
+#include "star/ndg.h"
+#include "star/grp.h"
+#include "star/kaplibs.h"
 
 
 /* SC2FTS includes */
 #include "sc2fts_par.h"
 #include "sc2fts_funs.h"
-#include "sc2fts_common.h"
+
+#define FUNC_NAME "sc2fts_entry"
 
 /* the main entry to FTS-2 data reduction operation */
 void sc2fts_entry ( int *status )         /* status: global status (given and returned) */
 {
-   /* local variables */
-   int i;
-   int indf;                              /* file ID of a NDF file */
-   char opslist[SC2FTS__OPSLISTSIZE];     /* store the operation list */
-   char parslist[SC2FTS__PARSLISTSIZE];   /* store the corresponding parameter list */
-   char pars[SC2FTS__PARSLISTSIZE];
-   char *pars_ptr = parslist, *in_pars;
+  /* local variables */
+  int i;
+  int indf;                            /* NDF identifier of input file */
+  Grp *igrp = NULL;                    /* Group of input files */
+  Grp *ogrp = NULL;                    /* Group of output files */
+  Grp *parsgrp = NULL;                 /* Group containing parameters for each operation */
+  int flag;                            /* Flag */
+  AstKeyMap *parsKeymap = NULL;        /* KeyMap of PARSLIST */
+  AstKeyMap *subParsKeymap = NULL;     /* KeyMap for each operation */
+  int ksize = 0;                       /* Number of items in a group */
+  smfData *idata = NULL;               /* Pointer to SCUBA2 data struct */
+  /* Main routine */
+  ndfBegin();
 
-   ndfBegin();  
-   parGet0c("OPSLIST", opslist, SC2FTS__OPSLISTSIZE, status);
-   parGet0c("PARSLIST", parslist, SC2FTS__PARSLISTSIZE, status);
+  /* Get group of input files */
+  ndgAssoc ( "IN", 1, &igrp, &ksize, &flag, status );
 
-      
-   for(i=0; i<sizeof(ops_sc2fts)/sizeof(ops_sc2fts[0]); i++)
-   {
-     if(issupported(ops_sc2fts[i], opslist) == 0)
-     {
-       if(getpars(pars_sc2fts[i], parslist, pars) ==0) 
-       {
-         printf("%si:%s:%s\n", ops_sc2fts[i], pars_sc2fts[i], pars);
-         (*sc2fts_op[i])(indf, pars, status);
-       }
-     } 
-   }
+  /* Get group of input files */
+  ndgCreat( "OUT", igrp, &ogrp, &ksize, &flag, status );
 
-//   parGet0c("OUT", ncfile, 40, status);
-//   ndfAssoc ( "IN", "UPDATE", &indf, status );
-   printf("Implementation is under construction! \n");
-   ndfEnd( status );
+  /* Get the value for PARSLIST */ 
+  kpg1Gtgrp( "PARSLIST", &parsgrp, &ksize, status );
+
+  /* convert the value from Grp into Keymap */
+  kpg1Kymap( parsgrp, &parsKeymap, status );
+
+  /* delete parsgrp */
+  if( parsgrp ) grpDelet( &parsgrp, status );
+
+  /* Calibration Operations for FTS-2 */
+  if(astMapHasKey(parsKeymap, "GROUPCOADD") == 0) /* other operations but GROUPCOADD */
+  {
+    smf_open_file(igrp, 1, "UPDATE", SMF__NOCREATE_DATA, &idata, status);
+    for(i=0; i<sizeof(ops_sc2fts)/sizeof(ops_sc2fts[0]); i++)
+    {
+      /* the key/value pair in parsKeymap: op.key=value 
+       * astMapGet0A will get a Keymap for an operation 
+       */
+      if(astMapHasKey(parsKeymap, ops_sc2fts[i]) !=0)
+      {
+        if(astMapType(parsKeymap, ops_sc2fts[i]) == AST__OBJECTTYPE) /* use user-defined values for parameters */
+        {
+          if(astMapGet0A(parsKeymap, ops_sc2fts[i], &subParsKeymap) != 0)
+          {
+            (*sc2fts_op[i])( NULL, subParsKeymap, status );
+          }
+        }
+        else /* use default values for parameters */
+        {
+          (*sc2fts_op[i])( NULL, NULL, status );
+        }
+      }
+    }   
+  }
+  else       /* GROUPCOADD operation */
+  {
+    if(astMapGet0A(parsKeymap, "GROUPCOADD", &subParsKeymap) != 0)
+    {
+      sc2fts_groupcoadd ( igrp, ogrp, subParsKeymap, status );
+    }
+  }
+   
+  if( igrp != NULL ) grpDelet( &igrp, status);
+  if( ogrp != NULL ) grpDelet( &ogrp, status);
+  printf("Implementation is under construction! \n");
+  ndfEnd( status );
 }

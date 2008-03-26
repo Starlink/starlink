@@ -52,7 +52,3 @@
 *     {note_any_bugs_here}
 *-
 */
-
-int issupported(const char *op, const char *opslist);
-char* getvalue(const char* keyword, const char *parslist);
-int getpars(const char *pars_fun, const char *parslist, char *pars);
