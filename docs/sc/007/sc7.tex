@@ -50,9 +50,9 @@ included, as is a glossary of commonly used terms.  }
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
+%  Do not remove the %\begin{latexonly} and %\end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%\begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -87,7 +87,6 @@ included, as is a glossary of commonly used terms.  }
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -134,13 +133,14 @@ included, as is a glossary of commonly used terms.  }
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%\end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 
 \newcommand{\mlabel}[1]{\xlabel{#1}\label{#1}}
 \newcommand{\scspec}[2]{#1}
 \begin{htmlonly}
-\renewcommand{\scspec}[2]{#2}
+  \newcommand{\scspec}[2]{#2}
 \end{htmlonly}
 \renewcommand{\topfraction}{1.0}
 \renewcommand{\bottomfraction}{1.0}

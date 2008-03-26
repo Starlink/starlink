@@ -51,9 +51,9 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %\begin{htmlonly} and %\end{htmlonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%\begin{htmlonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -88,7 +88,6 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -236,6 +235,7 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%\end{htmlonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 % ? End of document specific commands
@@ -657,7 +657,7 @@ Information on Internet sources of catalogue information may be found in \S{\ref
 One of the perennial problems encountered in astronomy is the need to convert 
 between astronomical co-ordinate systems. The calculation of such transformations is tedious but
 requires care. Probably the simplest way to avoid this problem is to use the 
-{\COCOref} package (see \S{\ref{sec:coco}) which combines 
+{\COCOref} package (see \S{\ref{sec:coco}}) which combines 
 a range of possibilities with a simple-to-use, no-nonsense interface.
 
 Alternatively, you may care to try the ASTUTIL program GALACTIC (see \S{\ref{sec:galactic}}).
