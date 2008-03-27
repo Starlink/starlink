@@ -13836,9 +13836,7 @@ sub do_cmd_label {
     &anchor_label($label,$CURRENT_FILE,$_);
 
     #  PWD: clean up label by removing newlines, spaces and tabs.
-    $label =~ s/\n//g;
-    $label =~ s/ //g;
-    $label =~ s/\t//g;
+    $label =~ s/\s//g;
     &anchor_label($label,$CURRENT_FILE,$_);
 }
 
