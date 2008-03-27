@@ -254,6 +254,8 @@
 *        - Added smf_sorti, smf_ext2km and smf_km2ext.
 *     2008-03-25 (EC):
 *        - Added syncbad to smf_update_quality interface
+*     2008-03-27 (DSB):
+*        - Added smf_getobsidss.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -825,8 +827,11 @@ void smf_simple_stats( double *data, dim_t start, dim_t nsamp,
                      unsigned char *qual, unsigned char mask, double *mean,
                      double *sigma, dim_t *ngood, int *status );
 
+AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop, 
+                           int *conform, Grp **ogrp, int *status );
 
-AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop, int *conform, Grp **ogrp, int *status );
 void smf_reportprogress( int max, int *status );
+
+const char *smf_getobsidss( AstFitsChan *hdr, int *status );
 
 #endif /* SMF_DEFINED */

@@ -60,6 +60,9 @@
 *  History:
 *     17-MAR-2008 (DSB):
 *        Initial version.
+*     27-MAR-2008 (DSB):
+*        Use smf_getobsidss to get the OBSIDSS value, and then split it
+*        up into OBSID and SUBSYSNR.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -91,6 +94,8 @@
 #include "ast.h"
 #include "ndf.h"
 #include "grp.h"
+#include "smf.h"
+#include "mers.h"
 #include "star/ndg.h"
 #include "sae_par.h"
 #include "star/ndg.h"
@@ -104,20 +109,22 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
    AstKeyMap *obsmap = NULL;
    AstKeyMap *result = NULL;
    AstKeyMap *sysmap = NULL;
+   char **parts = NULL;
    char *match = NULL;
    char *nsubscan= NULL;
-   char *obsid = NULL;
    char *pname = NULL;
-   char *subsysnr = NULL;
    char filename[GRP__SZNAM + 1];    
-   const char *key;
+   const char *key = NULL;
+   const char *obsid = NULL;
+   const char *subsysnr = NULL;
    int ifile;
    int indf1;             
    int iobs;
    int isys;
+   int n;
    int nobs;
    int nscan;
-   int nsys;
+   int nsys;                   
 
 /* Initialise returned values. */
    *maxsyspop = 0;
@@ -152,9 +159,22 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
 /* Get a FitsChan holding the contents of the FITS extension. */
       kpgGtfts( indf1, &fc, status );
 
-/* Get the value of the OBSID keyword. Use a null string if it was not
-   found. */
-      if( !astGetFitsS( fc, "OBSID", &obsid ) ) obsid = "";
+/* Get the value of the OBSIDSS keyword, and split it up into OBSID and
+   SUBSYSNR values. */
+      parts = astChrSplitRE( smf_getobsidss( fc, status ),  
+                             "^(.*)_(\\d+)$", &n );
+      if( parts ) {
+         obsid = parts[ 0 ];
+         subsysnr = parts[ 1 ];
+
+      } else if( *status == SAI__OK ) {
+         obsid = NULL;
+         subsysnr = NULL;
+
+         msgSetc( "O", smf_getobsidss( fc, status ) );
+         *status = SAI__ERROR;
+         errRep( "", "Cannot parse the OBSIDSS value \"^O\".", status );
+      }
 
 /* Get a pointer to the KeyMap holding information about this OBSID
    value. Create a new KeyMap and store a pointer for it in the returned
@@ -163,10 +183,6 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
          obsmap = astKeyMap( "" );
          astMapPut0A( result, obsid, obsmap, NULL );
       }
-
-/* Get the value of the SUBSYSNR keyword. Use a null string if it was not
-   found. */
-      if( !astGetFitsS( fc, "SUBSYSNR", &subsysnr ) ) subsysnr = "";
 
 /* Get a pointer to the KeyMap holding information about this SUBSYSNR
    value. Create a new KeyMap and store a pointer for it in the returned
@@ -184,6 +200,9 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
       astMapPut0I( sysmap, nsubscan, ifile, NULL );
 
 /* Free resources */
+      obsid = astFree( (void *) obsid );
+      subsysnr = astFree( (void *) subsysnr );
+      parts = astFree( parts );
       sysmap = astAnnul( sysmap );
       obsmap = astAnnul( obsmap );
       fc = astAnnul( fc );
