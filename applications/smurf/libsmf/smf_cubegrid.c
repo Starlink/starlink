@@ -163,6 +163,10 @@
 *        Correct the way reference WCS is handled.
 *     17-JAN-2008 (DSB):
 *        Added argument alignsys.
+*     27-MAR-2008 (DSB):
+*        Double the pixel size used when all points are deemed to be
+*        co-incident, in order to reduce the risk of points ending up in
+*        adjacent pixels.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -696,13 +700,13 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 /* See if all the points are effectively co-incident (i.e. within a radius 
    of 2.0 arcsec). If so, we use default grid parameters that result in a 
    grid of 1x1 spatial pixels. The grid pixel sizes (par[4] and par[5]) 
-   are made twice the size of the area covered by the points in order to
-   avoid points spanning two pixels. */
+   are made larger than the area covered by the points in order to avoid 
+   points spanning two pixels. */
          if( rdiam < 2.0*AST__DD2R/3600.0 || nallpos < 3 ) {
             if( rdiam < 0.1*AST__DD2R/3600.0 ) rdiam = 0.1*AST__DD2R/3600.0;
             par[ 0 ] = 0.0;
             par[ 1 ] = 0.0;
-            par[ 4 ] = -rdiam*2;
+            par[ 4 ] = -rdiam*4;
             par[ 5 ] = -par[ 4 ];
             par[ 6 ] = 0.0;
    
