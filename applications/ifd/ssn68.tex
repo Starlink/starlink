@@ -81,9 +81,9 @@ Starlink or
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -118,7 +118,6 @@ Starlink or
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -165,6 +164,7 @@ Starlink or
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 \newcommand{\IRAFURL}{http://star-www.rl.ac.uk/iraf/web/iraf-homepage.html}
@@ -178,8 +178,8 @@ Starlink or
 \latex{\setlbrace\setrbrace}
 
 \begin{htmlonly}
-\renewcommand{\dash}{-}
-\renewcommand{\tab}{   }
+  newcommand{\dash}{-}
+  newcommand{\tab}{   }
 \end{htmlonly}
 % +
 %  Name:
@@ -374,7 +374,7 @@ xxx\=xxx\=\kill
    \newcommand{\ssttt}{\tt}
 
 %  \sstroutine.
-   \renewcommand{\sstroutine}[3]{
+   \newcommand{\sstroutine}[3]{
       \subsection{#1\xlabel{#1}-\label{#1}#2}
       \begin{description}
          #3
@@ -382,28 +382,28 @@ xxx\=xxx\=\kill
    }
 
 %  \sstdescription
-   \renewcommand{\sstdescription}[1]{\item[Description:]
+   \newcommand{\sstdescription}[1]{\item[Description:]
       \begin{description}
          #1
       \end{description}
    }
 
 %  \sstusage
-   \renewcommand{\sstusage}[1]{\item[Usage:]
+   \newcommand{\sstusage}[1]{\item[Usage:]
       \begin{description}
          {\ssttt #1}
       \end{description}
    }
 
 %  \sstinvocation
-   \renewcommand{\sstinvocation}[1]{\item[Invocation:]
+   \newcommand{\sstinvocation}[1]{\item[Invocation:]
       \begin{description}
          {\ssttt #1}
       \end{description}
    }
 
 %  \ssteffects
-   \renewcommand{\ssteffects}[1]{
+   \newcommand{\ssteffects}[1]{
       \item[Effects:]
       \begin{description}
          #1
@@ -411,7 +411,7 @@ xxx\=xxx\=\kill
    }
 
 %  \sstarguments
-   \renewcommand{\sstarguments}[1]{
+   \newcommand{\sstarguments}[1]{
       \item[Arguments:]
       \begin{description}
          #1
@@ -419,7 +419,7 @@ xxx\=xxx\=\kill
    }
 
 %  \sstreturnedvalue
-   \renewcommand{\sstreturnedvalue}[1]{
+   \newcommand{\sstreturnedvalue}[1]{
       \item[Returned Value:]
       \begin{description}
          #1
@@ -427,7 +427,7 @@ xxx\=xxx\=\kill
    }
 
 %  \sstparameters
-   \renewcommand{\sstparameters}[1]{
+   \newcommand{\sstparameters}[1]{
       \item[Parameters:]
       \begin{description}
          #1
@@ -435,7 +435,7 @@ xxx\=xxx\=\kill
    }
 
 %  \sstexamples
-   \renewcommand{\sstexamples}[1]{
+   \newcommand{\sstexamples}[1]{
       \item[Examples:]
       \begin{description}
          #1
@@ -443,30 +443,30 @@ xxx\=xxx\=\kill
    }
 
 %  \sstsubsection
-   \renewcommand{\sstsubsection}[1]{\item[{#1}]}
+   \newcommand{\sstsubsection}[1]{\item[{#1}]}
 
 %  Original \sstexamplesubsection
 %   \renewcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
 
 %  SSN/68 special \sstexamplesubsection
-   \renewcommand{\sstexamplesubsection}[2]{\item[] {\ssttt #1} \\ \item[#2]}
+   \newcommand{\sstexamplesubsection}[2]{\item[] {\ssttt #1} \\ \item[#2]}
 
 %  \sstnotes
-   \renewcommand{\sstnotes}[1]{\item[Notes:]
+   \newcommand{\sstnotes}[1]{\item[Notes:]
       \begin{description}
          #1
       \end{description}
    }
 
 %  \sstdiytopic
-   \renewcommand{\sstdiytopic}[2]{\item[{#1}]
+   \newcommand{\sstdiytopic}[2]{\item[{#1}]
       \begin{description}
          #2
       \end{description}
    }
 
 %  \sstimplementationstatus
-   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
+   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
       \begin{description}
          #1
       \end{description}
@@ -746,7 +746,7 @@ monoliths. However:
 \dash\ the 
 \htmlref{conditional inclusion}{conditional_sections}
 syntax
-\latexonly{(see Section \ref{conditional_sections})} should be used for these.
+\latex{(see Section \ref{conditional_sections})} should be used for these.
 \item Any 
 \htmlref{aliases}{alias}
 for the command names should be inserted. This includes the abbreviations
@@ -860,7 +860,7 @@ for the package but it is likely that changes to the text will be required.
 IRAF-specific Interface Files from an IFD}
 It may sometimes be found that the interface file required when running a
 Starlink application from IRAF is different from that required normally.
-\htmlref{Conditional statements}{conditional_sections}\latexonly{ (see Section
+\htmlref{Conditional statements}{conditional_sections}\latex{ (see Section
 \ref{conditional_sections})} for the `\texttt{irafifl}' environment may be 
 included in the IFD and the \textbf{Tcl} script \texttt{ifd2irafifl} used to 
 create the special interface files (no other files are produced).
@@ -899,7 +899,7 @@ The basic keywords in an IFD have already been described but in order to
 produce complete versions of the required environment files automatically, 
 additional syntax and keywords are available.
 This section outlines what is available; see elsewhere
-\latexonly{(Section \ref{keywords}) } for 
+\latex{(Section \ref{keywords}) } for 
 \htmlref{complete descriptions}{keywords} of all the keywords.
 
 \subsection{\xlabel{ifd_initial_keywords}IFD Initial Keywords}
@@ -985,7 +985,7 @@ are
 \htmlref{\texttt{outputpar}}{outputpar_key},
 \htmlref{\texttt{repeated}}{repeated_key}
 and
-\htmlref{\texttt{size}}{size_key}\latexonly{ (see the following sections)}.
+\htmlref{\texttt{size}}{size_key}\latex{ (see the following sections)}.
 
 \subsubsection{\xlabel{the_dynamic_keyword}\label{dynamic_key}The 
 \texttt{dynamic} keyword}
@@ -1612,7 +1612,7 @@ File Keywords}
    \sstdescription{
       Forces the parameter to be classed as dynamic or non-dynamic regardless
       of other considerations. For more information, see
-\htmlref{`The \texttt{dynamic} Keyword'}{dynamic_key}\latexonly{ (Section \ref{dynamic_key})}.
+\htmlref{`The \texttt{dynamic} Keyword'}{dynamic_key}\latex{ (Section \ref{dynamic_key})}.
    }
    \sstinvocation{
       dynamic \textit{switch}
@@ -2047,7 +2047,7 @@ File Keywords}
       Forces the parameter to be treated as an `output' parameter, regardless
       of the specified access mode. For more information, see
 \htmlref{`The outputpar keyword'}
-{outputpar_key}\latexonly{ (Section \ref{outputpar_key})}.
+{outputpar_key}\latex{ (Section \ref{outputpar_key})}.
    }
    \sstinvocation{
       outputpar
