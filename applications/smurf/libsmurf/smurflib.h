@@ -21,6 +21,7 @@
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
 *     Andy Gibb (UBC)
+*     Edward Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -50,6 +51,8 @@
 *        Add TIMESORT.
 *     2008-02-12 (AGG):
 *        Add UNMAKECUBE, RAWUNPRESS
+*     2008-03-27 (EC)
+*        Add SC2CLEAN
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -98,5 +101,6 @@ void smurf_timesort( int * );
 void smurf_gsd2acsis( int * );
 void smurf_unmakecube( int * );
 void smurf_rawunpress( int * );
+void smurf_sc2clean( int * );
 
 #endif /* SMURF_LIB_DEFINED */
