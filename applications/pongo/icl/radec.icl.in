@@ -48,7 +48,7 @@ LABCOLUMN 1
 SYMCOLUMN 2
 
 {  Read the data file.
-READF DATA=@PONGO_EXAMPLES@/ppdot.dat SELCOND='pdot > 0' ~
+READF DATA=(PONGO_EXAMPLES&'')/ppdot.dat SELCOND='pdot > 0' ~
       NOALL NOQUICK RESET
 
 {  Convert the X- and Y-axis data to radians.

@@ -14,7 +14,7 @@
 {  Arguments:
 
 {  Invocation:
-{     LOAD @PONGO_EXAMPLES@/agi
+{     LOAD (PONGO_EXAMPLES&'')/agi
 
 {  Description:
 {     A PONGO ICL example file to plot AGI database demonstration.
@@ -56,7 +56,7 @@ ENDPLOT
 
 {  Go into KAPPA and display the image in the appropriate VIEWPORT.
 PICDATA
-DISPLAY @PONGO_EXAMPLES@/dor MODE=PERC PERCENTILES=[3,99.9]
+DISPLAY (PONGO_EXAMPLES&'')/dor MODE=PERC PERCENTILES=[3,99.9]
 LUTHEAT
 
 {  Go into PONGO and draw a box around the image.
@@ -79,7 +79,7 @@ ENDPLOT
 
 {  Use KAPPA to display part of the image in the new viewport.
 PICDATA
-NDF='@@PONGO_EXAMPLES@/dor(401:600,101:300)'
+NDF='@(PONGO_EXAMPLES&'')/dor(401:600,101:300)'
 DISPLAY (NDF) MODE=PERC PERCENTILES=[3,99.9] ACCEPT
 
 {  Use PONGO to draw a perimeter around the second image.
@@ -99,7 +99,7 @@ VP_TR
 EXPAND 0.7
 
 {  Read the postions of pulsars from the data file.
-READF DATA=@PONGO_EXAMPLES@/ppdot.dat SYMCOL=2 LABCOL=1 ~
+READF DATA=(PONGO_EXAMPLES&'')/ppdot.dat SYMCOL=2 LABCOL=1 ~
       XCOL=RA YCOL=Dec ZCOL=Dist SELCOND='Dist > 0' NOALL NOQUICK
 
 {  Convert the XCOL and YCOL data areas from degrees to radians.

@@ -14,7 +14,7 @@
 {  Arguments:
 
 {  Invocation:
-{     LOAD @PONGO_EXAMPLES@/spectrum
+{     LOAD (PONGO_EXAMPLES&'')/spectrum
 
 {  Description:
 {     Demonstrate plotting simple spectrum data using PONGO.
@@ -49,7 +49,7 @@ EXCOLUMN 0
 EYCOLUMN 0
                               
 {  Read the data file.
-READF @PONGO_EXAMPLES@/swp3196.lap SELCOND="Flux > 0" NOALL
+READF (PONGO_EXAMPLES&'')/swp3196.lap SELCOND="Flux > 0" NOALL
 
 {  Set the plotting limits.
 WORLD DATA

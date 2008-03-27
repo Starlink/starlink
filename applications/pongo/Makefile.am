@@ -41,7 +41,8 @@ data/gridlabels.dat
 ## All examples files need to be edited on installation.
 
 edit = sed \
-        -e 's,@PONGO_EXAMPLES\@,$(pkgdatadir),g'
+        -e 's,@PONGO_EXAMPLES\@,$(pkgdatadir),g' \
+	-e 's,@PACKAGE_VERSION\@,$(PACKAGE_VERSION),g'
 
 %.icl: %.icl.in
 	rm -f $@.tmp $@
@@ -50,7 +51,7 @@ edit = sed \
 	mv $(srcdir)/$@.tmp $(srcdir)/$@
 
 ## The above rule can get confused about pongo.icl and looks for pongo.icl.in.
-pongo.icl: ;
+## pongo.icl: ;
 
 ## File not mentioned elsewhere that we need to distribute.
 EXTRA_DIST = PONGO_PAR PONGO_CMN $(HELP_SOURCES) $(PONGO_EXAMPLES_INFILES) \

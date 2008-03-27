@@ -14,7 +14,7 @@
 {  Arguments:
 
 {  Invocation:
-{     LOAD @PONGO_EXAMPLES@/ellipses
+{     LOAD (PONGO_EXAMPLES&'')/ellipses
 
 {  Description:
 {     A PONGO ICL example file to plot error ellipses.
@@ -69,7 +69,7 @@ ZCOLUMN 8
 VP_BL
 
 {  Read the data file, selecting only lines where COLUMN 3 is equal to 11.
-READF DATA=@PONGO_EXAMPLES@/ellipses.dat NOALL SELCOND='3 = 11'
+READF DATA=(PONGO_EXAMPLES&'')/ellipses.dat NOALL SELCOND='3 = 11'
 
 {  Set up the world coordinate limits from the data including the origin.
 WORLD DATA0

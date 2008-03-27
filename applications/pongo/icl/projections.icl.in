@@ -51,7 +51,7 @@ RESETPONGO
 EXPAND 0.7
 
 {  Read the postions of pulsars from the data file.
-READF DATA=@PONGO_EXAMPLES@/ppdot.dat ~
+READF DATA=(PONGO_EXAMPLES&'')/ppdot.dat ~
   SYMCOL=2 LABCOL=1 XCOL=RA YCOL=Dec ZCOL=Dist SELCOND='Dist > 0' NOALL NOQUICK
 
 {  Convert the XCOL and YCOL data areas from degrees to radians.

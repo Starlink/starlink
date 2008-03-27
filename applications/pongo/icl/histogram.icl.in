@@ -14,7 +14,7 @@
 {  Arguments:
 
 {  Invocation:
-{     LOAD @PONGO_EXAMPLES@/histogram
+{     LOAD (PONGO_EXAMPLES&'')/histogram
 
 {  Description:
 {     A PONGO example command file to plot histograms.
@@ -51,7 +51,7 @@ CHANGE LINEWID=2
 {  Read the unbinned data into the XCOL data area, but only if their values
 {  are greater than zero. Note that the XCOL column has been specified by 
 {  its label which is case-sensitive.
-READF DATA=@PONGO_EXAMPLES@/ppdot.dat ~
+READF DATA=(PONGO_EXAMPLES&'')/ppdot.dat ~
    XCOL='Age' SELCOND='Age > 0' NOALL
 
 {  Take logarithms of the X-axis data.
@@ -80,7 +80,7 @@ MTEXT T 1.0 0.5 0.5 'Pulsar Age Distribution'
 CHANGE CHEIGHT=1.0
 
 {  Read a second data file (the data are already logarithmic).
-READF DATA=@PONGO_EXAMPLES@/cljon.dat XCOL=1 YCOL=0 ZCOL=0 ~
+READF DATA=(PONGO_EXAMPLES&'')/cljon.dat XCOL=1 YCOL=0 ZCOL=0 ~
    EYCOL=0 EXCOL=0 ALL
 
 {  Set up new limits.

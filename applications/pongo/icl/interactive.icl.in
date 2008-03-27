@@ -14,7 +14,7 @@
 {  Arguments:
 
 {  Invocation:
-{     LOAD @PONGO_EXAMPLES@/interactive
+{     LOAD (PONGO_EXAMPLES&'')/interactive
 
 {  Description:
 {     Demonstrate interaction with PONGO plots using the CURSE command.
@@ -57,7 +57,7 @@ SYMCOLUMN 2
 ZCOLUMN Dist
 
 {  Read the data file.
-READF DATA=@PONGO_EXAMPLES@/ppdot.dat SELCOND='pdot > 0' NOALL NOQUICK
+READF DATA=(PONGO_EXAMPLES&'')/ppdot.dat SELCOND='pdot > 0' NOALL NOQUICK
 
 {  Convert the X- and Y-axis data to logarithms.
 XLOGARITHM

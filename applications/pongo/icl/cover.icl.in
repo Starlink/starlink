@@ -14,7 +14,7 @@
 {  Arguments:
 
 {  Invocation:
-{     LOAD @PONGO_EXAMPLES@/cover
+{     LOAD (PONGO_EXAMPLES&'')/cover
 
 {  Description:
 {     A PONGO example command file to generate the cover of SUN/137.
@@ -92,7 +92,7 @@ VIEWPORT NDC 0.6 0.95 0.6 0.95
 {  Read the unbinned data into the XCOL data area, but only if their values
 {  are greater than zero. Note that the XCOL column has been specified by 
 {  its label which is case-sensitive.
-READF DATA=@PONGO_EXAMPLES@/ppdot.dat ~
+READF DATA=(PONGO_EXAMPLES&'')/ppdot.dat ~
    XCOL='Age' SELCOND='Age > 0' NOALL NOQUICK
 
 {  Take logarithms of the X-axis data.
@@ -119,7 +119,7 @@ LABEL 'Log [Characteristic age (yr)]' 'Number of old pulsars (dashed)' ' '
 MTEXT T 0.5 0.5 0.5 'Pulsar Age Distribution'
 
 {  Read a second data file (the data are already logarithmic).
-READF DATA=@PONGO_EXAMPLES@/cljon.dat ~
+READF DATA=(PONGO_EXAMPLES&'')/cljon.dat ~
    XCOL=1 YCOL=0 ZCOL=0 EYCOL=0 EXCOL=0 ALL NOQUICK
 
 {  Set up new limits.
@@ -150,7 +150,7 @@ SYMCOLUMN 0
 LABCOLUMN 0
 
 {  Read the data file.
-READF DATA=@PONGO_EXAMPLES@/tutorial.dat ALL NOQUICK
+READF DATA=(PONGO_EXAMPLES&'')/tutorial.dat ALL NOQUICK
 
 {  Set the plotting limits.
 WORLD DATA
@@ -181,7 +181,7 @@ CHANGE RESET
 VP_BR
 
 {  Read the postions of pulsars from the data file.
-READF DATA=@PONGO_EXAMPLES@/ppdot.dat SYMCOL=2 LABCOL=1 ~
+READF DATA=(PONGO_EXAMPLES&'')/ppdot.dat SYMCOL=2 LABCOL=1 ~
    XCOL=RA YCOL=Dec ZCOL=Dist SELCOND='Dist > 0' NOALL NOQUICK
 
 {  Convert the XCOL and YCOL data areas from degrees to radians.

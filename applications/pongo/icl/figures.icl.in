@@ -88,7 +88,7 @@ EXCOLUMN 0
 EYCOLUMN 0
                               
 {  Read the data file.
-READF @PONGO_EXAMPLES@/swp3196.lap SELCOND="Flux > 0" NOALL
+READF (PONGO_EXAMPLES&'')/swp3196.lap SELCOND="Flux > 0" NOALL
 
 {  Set the plotting limits.
 WORLD DATA
@@ -164,7 +164,7 @@ YCOLUMN 3
 EYCOLUMN 4
                               
 {  Read the data file.
-READF DATA=@PONGO_EXAMPLES@/tutorial.dat ALL
+READF DATA=(PONGO_EXAMPLES&'')/tutorial.dat ALL
 
 {  Set the plotting limits.
 WORLD DATA
@@ -258,7 +258,7 @@ CHANGE LINEWID=2
 {  Read the unbinned data into the XCOL data area, but only if their values
 {  are greater than zero. Note that the XCOL column has been specified by 
 {  its label which is case-sensitive.
-READF DATA=@PONGO_EXAMPLES@/ppdot.dat XCOL='Age' SELCOND='Age > 0' NOALL
+READF DATA=(PONGO_EXAMPLES&'')/ppdot.dat XCOL='Age' SELCOND='Age > 0' NOALL
 
 {  Take logarithms of the X-axis data.
 XLOGARITHM
@@ -286,7 +286,7 @@ MTEXT T 1.0 0.5 0.5 'Pulsar Age Distribution'
 CHANGE CHEIGHT=1.0
 
 {  Read a second data file (the data are already logarithmic).
-READF DATA=@PONGO_EXAMPLES@/cljon.dat XCOL=1 YCOL=0 ZCOL=0 ~
+READF DATA=(PONGO_EXAMPLES&'')/cljon.dat XCOL=1 YCOL=0 ZCOL=0 ~
       EYCOL=0 EXCOL=0 ALL
 
 {  Set up new limits.
@@ -366,7 +366,7 @@ LABCOLUMN 1
 SYMCOLUMN 2
 
 {  Read the data file.
-READF DATA=@PONGO_EXAMPLES@/ppdot.dat SELCOND='pdot > 0' NOALL NOQUICK
+READF DATA=(PONGO_EXAMPLES&'')/ppdot.dat SELCOND='pdot > 0' NOALL NOQUICK
 
 {  Convert the X- and Y-axis data to logarithms.
 XLOGARITHM
@@ -498,7 +498,7 @@ ZCOLUMN 8
 VP_BL
 
 {  Read the data file, selecting only lines where COLUMN 3 is equal to 11.
-READF DATA=@PONGO_EXAMPLES@/ellipses.dat NOALL SELCOND='3 = 11'
+READF DATA=(PONGO_EXAMPLES&'')/ellipses.dat NOALL SELCOND='3 = 11'
 
 {  Set up the world coordinate limits from the data including the origin.
 WORLD DATA0
@@ -640,7 +640,7 @@ PAPER 5.0 1
 EXPAND 0.7
 
 {  Read the postions of pulsars from the data file.
-READF DATA=@PONGO_EXAMPLES@/ppdot.dat SYMCOL=2 LABCOL=1 XCOL=RA YCOL=Dec ~
+READF DATA=(PONGO_EXAMPLES&'')/ppdot.dat SYMCOL=2 LABCOL=1 XCOL=RA YCOL=Dec ~
    ZCOL=Dist SELCOND='Dist > 0' NOALL NOQUICK
 
 {  Convert the XCOL and YCOL data areas from degrees to radians.
@@ -737,7 +737,7 @@ PAPER 5.0 1
 {  Arguments:
 
 {  Invocation:
-{     LOAD @PONGO_EXAMPLES@/radec.icl
+{     LOAD (PONGO_EXAMPLES&'')/radec.icl
 
 {  Description:
 {     Demonstrate RA and DEC labelling of axis.
@@ -762,7 +762,7 @@ LABCOLUMN 1
 SYMCOLUMN 2
 
 {  Read the data file.
-READF DATA=@PONGO_EXAMPLES@/ppdot.dat SELCOND='pdot > 0' ~
+READF DATA=(PONGO_EXAMPLES&'')/ppdot.dat SELCOND='pdot > 0' ~
       NOALL NOQUICK RESET
 
 {  Convert the X- and Y-axis data to radians.
@@ -815,7 +815,7 @@ PAPER 5.0 1
 {     ICL file
 
 {  Invocation:
-{     LOAD @PONGO_EXAMPLES@/vector
+{     LOAD (PONGO_EXAMPLES&'')/vector
 
 {  Description:
 {     A PONGO example file to illustrate different the use
@@ -832,7 +832,7 @@ PAPER 5.0 1
 
 {  Read in the data, selecting objects with proper motions 
 {  greater than 0.5 arcseconds in RA per year.
-READF DATA=@PONGO_EXAMPLES@/highppm.dat XCOL=2 YCOL=3 ~
+READF DATA=(PONGO_EXAMPLES&'')/highppm.dat XCOL=2 YCOL=3 ~
       EXCOL=4 EYCOL=5 NOALL SELCOND="4 > 0.5"
 
 {  Convert the proper motions into radians.
@@ -867,7 +867,7 @@ POINTS SYMBOL=3 PROJECTION=(PROJ)
 PVECT PROJECTION=(PROJ) ERSCALE=1.0E5
 
 {  Now read in and plot the ra and dec labels and their positions.
-READF DATA=@PONGO_EXAMPLES@/gridlabels.dat XCOL=2 YCOL=3 ~
+READF DATA=(PONGO_EXAMPLES&'')/gridlabels.dat XCOL=2 YCOL=3 ~
       LABCOL=1 EXCOL=0 EYCOL=0 ALL
 DEGTOR X
 DEGTOR Y
@@ -875,14 +875,14 @@ LWEIGHT 1
 EXPAND 0.5
 ANNOTATE PROJECTION=(PROJ) YOFF=0.02 XOFF=0.0 JUSTIFICATION=1.0 RACENTRE=12
 
-READF DATA=@PONGO_EXAMPLES@/gridlabels.dat XCOL=5 YCOL=6 ~
+READF DATA=(PONGO_EXAMPLES&'')/gridlabels.dat XCOL=5 YCOL=6 ~
       LABCOL=4 EXCOL=0 EYCOL=0 TO=9 ALL
 DEGTOR X
 DEGTOR Y
 ANNOTATE PROJECTION=(PROJ) YOFF=0.02 XOFF=-0.01 JUSTIFICATION=1.0 
 
 {  Do normal vector plot for bottom half.
-READF DATA=@PONGO_EXAMPLES@/highppm.dat XCOL=2 YCOL=3 ~
+READF DATA=(PONGO_EXAMPLES&'')/highppm.dat XCOL=2 YCOL=3 ~
       EXCOL=4 EYCOL=5 NOALL SELCOND="4 > 0.5"
 CCMATH EX='EX/3600.0' EY='EY/3600.0'
 DEGTOR EX

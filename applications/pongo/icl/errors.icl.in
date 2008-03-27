@@ -14,7 +14,7 @@
 {  Arguments:
 
 {  Invocation:
-{     LOAD @PONGO_EXAMPLES@/spectrum
+{     LOAD (PONGO_EXAMPLES&'')/spectrum
 
 {  Description:
 {     Demonstrate the use of error bars and least squares fitting in PONGO.
@@ -49,7 +49,7 @@ YCOLUMN 3
 EYCOLUMN 4
                               
 {  Read the data file.
-READF DATA=@PONGO_EXAMPLES@/tutorial.dat ALL
+READF DATA=(PONGO_EXAMPLES&'')/tutorial.dat ALL
 
 {  Set the plotting limits.
 WORLD DATA

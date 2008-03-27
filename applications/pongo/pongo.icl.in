@@ -266,16 +266,19 @@ defhelp zscale       $PONGO_HELP zscale
 {  Switch off ICL procedure parameter checking.
 SET NOCHECKPARS
 
+{  Example data.
+PONGO_EXAMPLES=getenv('PONGO_EXAMPLES')
+
 {  Name of the tutorial dataset.
-TUTORIAL_DATA="INSTALL_EXAMPLES/tutorial.dat"
+TUTORIAL_DATA=(PONGO_EXAMPLES&'') & "/tutorial.dat"
 {  Name of the dor.sdf dataset
-DOR_DATA="INSTALL_EXAMPLES/dor"
+DOR_DATA=(PONGO_EXAMPLES&'') & "/pongo/dor"
 {  SWP dataset
-SWP_DATA="INSTALL_EXAMPLES/swp3196.lap"
+SWP_DATA=(PONGO_EXAMPLES&'') & "/swp3196.lap"
 
 {  PONGO login banner.
 PRINT ""
-PRINT "   PONGO version PKG_VERS available."
+PRINT "   PONGO version @PACKAGE_VERSION@ available."
 PRINT ""
 PRINT "   Use HELP PONGO or pongowww for help"
 { $Id$

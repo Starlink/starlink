@@ -1,6 +1,12 @@
-\documentstyle[11pt,twoside,epsfig]{article}
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+\usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
 \pagestyle{myheadings}
-\newcommand{\latexhtml}[2]{#1}
+
 
 % -----------------------------------------------------------------------------
 % ? Document identification
@@ -10,11 +16,11 @@
 \newcommand{\stardocnumber}    {137.7}
 \newcommand{\stardocauthors}   {Paul Harrison, Paul Rees, \\
                                 Peter Draper, Alasdair Allan }
-\newcommand{\stardocdate}      {22 April 2004}
+\newcommand{\stardocdate}      {27 March 2008}
 \newcommand{\stardoctitle}     {PONGO\\[2ex]
    A Set of Applications for Interactive Data Plotting \\[2ex]
    Version 2.0-2}
-\newcommand{\stardocversion}   {2.0-2}
+\newcommand{\stardocversion}   {2.0-3}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {PONGO is a suite of commands for
 interactively plotting data stored in text files.}
@@ -49,9 +55,9 @@ interactively plotting data stored in text files.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -86,7 +92,6 @@ interactively plotting data stored in text files.}
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -102,6 +107,10 @@ interactively plotting data stored in text files.}
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
@@ -113,9 +122,7 @@ interactively plotting data stored in text files.}
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
+\renewcommand{\_}{\texttt{\symbol{95}}}
 
 %  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
@@ -133,6 +140,7 @@ interactively plotting data stored in text files.}
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 
@@ -152,14 +160,14 @@ interactively plotting data stored in text files.}
 \newcommand{\halfpfig} [4] {
   \begin{figure}[htbp]
     \setlength{\unitlength}{1in}
-    \centering\epsfig{file=#1,width=#4,clip=}
+    \centering\includegraphics[clip,width=#4]{#1}
     \typeout{#1 inserted on page \arabic{page}}
     \caption{#2}
     \label{#2}
   \end{figure}
 }
 \begin{htmlonly}
-   \renewcommand{\halfpfig}[4]{
+   \newcommand{\halfpfig}[4]{
       \htmladdimg{#3}\\
       Figure: \label{#2} #2
    }
@@ -183,7 +191,7 @@ interactively plotting data stored in text files.}
 \newcommand{\iref} [1]{\htmlref{#1}{#1}}
 \newcommand{\iiref}[2]{\htmlref{#1}{#2}}
 
-% +
+%+
 %  Name:
 %     SST.TEX
 
@@ -203,11 +211,8 @@ interactively plotting data stored in text files.}
 %     source prior to any statements that make of the sst commnds.
 
 %  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html
-%     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty
-%     on your TEXINPUTS path (and including the name as part of the
-%     documentstyle declaration).
+%     The style file html.sty provided with LaTeX2html needs to be used.
+%     This must be before this file.
 
 %  Authors:
 %     RFWS: R.F. Warren-Smith (STARLINK)
@@ -227,7 +232,7 @@ interactively plotting data stored in text files.}
 %  Bugs:
 %     {note_any_bugs_here}
 
-% -
+%-
 
 %  Define length variables.
 \newlength{\sstbannerlength}
@@ -236,7 +241,8 @@ interactively plotting data stored in text files.}
 \newlength{\sstexampleswidth}
 
 %  Define a \tt font of the required size.
-\newfont{\ssttt}{cmtt10 scaled 1095}
+\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
+\html{\newcommand{\ssttt}{\tt}}
 
 %  Define a command to produce a routine header, including its name,
 %  a purpose description and the rest of the routine's documentation.
@@ -265,8 +271,8 @@ interactively plotting data stored in text files.}
 \newcommand{\sstdescription}[1]{\item[Description:] #1}
 
 %  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
-
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
+\\[1.3ex]{\raggedright \ssttt #1}}
 
 %  Format the invocation section.
 \newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
@@ -312,13 +318,15 @@ interactively plotting data stored in text files.}
 
 %  Define the format of a subsection in the examples section.
 \newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
+\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
+\\ #2 }
 
 %  Format the notes section.
 \newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
 
 %  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
+\mbox{} \\[1.3ex] #2}
 
 %  Format the implementation status section.
 \newcommand{\sstimplementationstatus}[1]{
@@ -339,15 +347,12 @@ interactively plotting data stored in text files.}
 %  Define the format of an item.
 \newcommand{\sstitem}{\item}
 
-%  Now define html equivalents of those already set. These are used by
+%% Now define html equivalents of those already set. These are used by
 %  latex2html and are defined in the html.sty files.
 \begin{htmlonly}
 
-%  Re-define \ssttt.
-   \newcommand{\ssttt}{\tt}
-
 %  sstroutine.
-   \renewcommand{\sstroutine}[3]{
+   \newcommand{\sstroutine}[3]{
       \subsection{#1\xlabel{#1}-\label{#1}#2}
       \begin{description}
          #3
@@ -355,83 +360,80 @@ interactively plotting data stored in text files.}
    }
 
 %  sstdescription
-   \renewcommand{\sstdescription}[1]{\item[Description:]
+   \newcommand{\sstdescription}[1]{\item[Description:]
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstusage
-   \renewcommand{\sstusage}[1]{\item[Usage:]
+   \newcommand{\sstusage}[1]{\item[Usage:]
       \begin{description}
          {\ssttt #1}
       \end{description}
+      \\
    }
 
 %  sstinvocation
-   \renewcommand{\sstinvocation}[1]{\item[Invocation:]
+   \newcommand{\sstinvocation}[1]{\item[Invocation:]
       \begin{description}
          {\ssttt #1}
       \end{description}
+      \\
    }
 
 %  sstarguments
-   \renewcommand{\sstarguments}[1]{
-      \item[Arguments:]
+   \newcommand{\sstarguments}[1]{
+      \item[Arguments:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstreturnedvalue
-   \renewcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:]
+   \newcommand{\sstreturnedvalue}[1]{
+      \item[Returned Value:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstparameters
-   \renewcommand{\sstparameters}[1]{
-      \item[Parameters:]
+   \newcommand{\sstparameters}[1]{
+      \item[Parameters:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstexamples
-   \renewcommand{\sstexamples}[1]{
-      \item[Examples:]
+   \newcommand{\sstexamples}[1]{
+      \item[Examples:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstsubsection
-   \renewcommand{\sstsubsection}[1]{\item[{#1}]}
+   \newcommand{\sstsubsection}[1]{\item[{#1}]}
 
 %  sstexamplesubsection
-   \renewcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
 
 %  sstnotes
-   \renewcommand{\sstnotes}[1]{\item[Notes:]
-      \begin{description}
-         #1
-      \end{description}
-   }
+   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
 
 %  sstdiytopic
-   \renewcommand{\sstdiytopic}[2]{\item[{#1}]
-      \begin{description}
-         #2
-      \end{description}
-   }
+   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
 
 %  sstimplementationstatus
-   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
-      \begin{description}
-         #1
-      \end{description}
+   \newcommand{\sstimplementationstatus}[1]{
+      \item[Implementation Status:] #1
    }
 
 %  sstitemlist
@@ -439,12 +441,17 @@ interactively plotting data stored in text files.}
       \begin{itemize}
          #1
       \end{itemize}
+      \\
    }
+%  sstitem
+   \newcommand{\sstitem}{\item}
+
 \end{htmlonly}
 
 %  End of "sst.tex" layout definitions.
-% .
-% @(#)sst.tex   1.4   95/06/06 11:46:41   95/06/06 11:49:58
+%.
+
+
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
@@ -598,8 +605,10 @@ Some highlights of PONGO are:
 \item Functions defined by Fortran-like statements can be drawn.
 \end{itemize}
 
-PONGO can used from both the Starlink/ICL and IRAF/CL command
-languages and integrates with other Starlink software packages.
+PONGO can used from both the Starlink/ICL and IRAF/CL
+\footnote{at the time of writing IRAF support is no longer available
+in a standard release} command languages and integrates with other Starlink
+software packages.
 
 Because the parameters PONGO uses for its commands are often similar
 to the arguments of the equivalent PGPLOT subroutines, it is useful to
@@ -648,20 +657,22 @@ after \cnam{\iref{BEGPLOT}}.}:
 ICL> begplot xw
 \end{verbatim}
 \end{quote}
+
 Where `\verb+xw+' should be replaced by the name of the plotting device you
 are intending to use.  Note that once you have begun a PONGO session
 with the \cnam{\iref{BEGPLOT}} command, the \verb+ICL>+ prompt changes
-to \verb+PONGO>+.  This is important because the only commands you can
+to \verb+PONGO>+. This is important because the only commands you can
 use with success at the \verb+ICL>+ prompt are \cnam{\iref{BEGPLOT}}
 and \cnam{\iref{DEVICE}}, all other commands should be typed at the
-\verb+PONGO>+ prompt.  The data may then be read using the
-command\footnote{ Note that the data file name is given as
-\verb+(TUTORIAL\_DATA)+, this uses an ICL variable which is set up
-when PONGO is initialised. Normally an `ordinary' file name would be
-used \ie \verb+spectrum.dat+. An ICL variable is used here as it is
+\verb+PONGO>+ prompt. The data may then be read using the
+command \footnote{Note that the data file name is given as
+\texttt{(TUTORIAL\_DATA)}, this uses an ICL variable which is set up
+when PONGO is initialised}. Normally an `ordinary' file name would be
+used \ie \texttt{spectrum.dat}. An ICL variable is used here as it is
 not possible at this time to use an environment variable for accessing
 formatted files. The actual file is
-\verb+\$PONGO\_EXAMPLES/tutorial.dat+}:
+\texttt{\$PONGO\_EXAMPLES/tutorial.dat}:
+
 \begin{quote}
 \begin{verbatim}
 PONGO> readf data=(TUTORIAL_DATA) xcol=1 ycol=3 all
@@ -1023,8 +1034,8 @@ read into \xcol\ is assumed to be a Right Ascension (\ie of the first
 form above) and any data read into \ycol\ is assumed to be a
 Declination (\ie of the second form above).
 
-The \cnam{\iref{BOXFRAME}} command can label axes using a \verb+HH MM
-SS.S+ and \verb+DD MM SS.S+ format providing the data and frame limits
+The \cnam{\iref{BOXFRAME}} command can label axes using a 
+\verb+HH MM SS.S+ and \verb+DD MM SS.S+ format providing the data and frame limits
 are specified in radians.
 
 \section{Internal Data Areas}
@@ -1145,11 +1156,10 @@ only use is when plotting in a particular projection type:
 
 \begin{table}[t]
 \centering
-\begin{tabular}{|l|p{0.7\textwidth}|} \hline
-& \\
-Name     & Description \\
-& \\ \hline
-& \\
+\begin{tabular}{|l|p{0.6\textwidth}|}
+\hline 
+Projection & Description \\
+\hline
 NONE     & No projection is used. \\
 AITOFF   & The Aitoff projection (has an equal area property). \\
 ARC      & Move an equal distance on the tangent plane as a great circle on the
@@ -1161,7 +1171,7 @@ SIN      & Drop a perpendicular onto the tangent plane. \\
 STG      & The Stereographic projection. \\
 TAN      & Projection onto the tangent plane through the centre of the
 celestial sphere. \\
-& \\ \hline
+\hline
 \end{tabular}
 \caption{Projection geometries available in PONGO} \label{proj_tab}
 \end{table}
@@ -1606,8 +1616,8 @@ PONGO> endplot
 \end{quote}
 Then use \xref{KAPPA}{sun95}{DISPLAY} to display the
 image\footnote{The image actually displayed is defined, in this case,
-by the ICL variable \verb+DOR\_DATA+. This is set to the value
-\verb+\$PONGO\_EXAMPLES/dor+ when PONGO is started.}:
+by the ICL variable \texttt{DOR\_DATA}. This is set to the value
+\texttt{\$PONGO\_EXAMPLES/dor} when PONGO is started.}:
 \begin{quote}
 \begin{verbatim}
 ICL> picdata
@@ -2754,7 +2764,7 @@ when they are specified on the command-line).
          DD:MM:SS.SSS formats) and then set the {\tt "}Z{\tt "} character in the
          XOPT and YOPT parameters. A good combination of options are:
          \begin{description}
-            \item \verb+XOPT='BCNSTZHG' YOPT='BCNSTZDG'+
+            \item \texttt{XOPT='BCNSTZHG' YOPT='BCNSTZDG'}
          \end{description}
          For more about this (in particular how the interval options are
          set) see the PGPLOT documentation about PGTBOX. Note that the
