@@ -161,11 +161,7 @@ int ems1Starf( char *envar, char *relpath, char *acmode,
          accno = F_OK;
    }
 /*
- * If 'envar' is not given, use the default search path.
- * $INSTALL:$STARLINK. If $INSTALL is not defined, we attempt to get a value
- * from ~/.star_config, failing that we try $HOME/star: 
- * if $STARLINK is not defined, we attempt to get a value from ~/.star_config,
- * failing that we try /star.
+ * If 'envar' is not given, use an empty search path.
  */
    if ((s = getenv(envar)) != NULL) {	/* user defined search path */
       if ( strspn( s, " " ) == strlen(s) ) {   /* defined but blank */
