@@ -98,6 +98,8 @@
 *        Add UNMAKECUBE
 *     2008-03-16 (BZ)
 *        Added action SC2FTS
+*     2008-03-27 (EC)
+*        Added SC2CLEAN
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -238,6 +240,8 @@ void smurf_mon( int * status ) {
     smurf_gsd2acsis( status );
   } else if (strcmp( taskname, "SC2FTS" ) == 0 ) {
     smurf_sc2fts( status );
+  } else if (strcmp( taskname, "SC2CLEAN" ) == 0 ) {
+    smurf_sc2clean( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );

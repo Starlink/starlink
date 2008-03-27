@@ -168,6 +168,8 @@
 #         Add SPREAD and PARAMS to MAKEMAP and QLMAKEMAP
 #     16-MAR-2008 (BZ)
 #         Added action SC2FTS
+#     27-MAR-2008 (EC)
+#         Add SC2CLEAN
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1629,6 +1631,60 @@ package @PACKAGE@ {
             type _CHAR
             vpath {PROMPT }
             prompt {Parameter list: eg. op1.key1=value1, op2.key2=value2, ...}
+            helpkey *
+          }
+          parameter msg_filter {
+            type _CHAR
+            prompt {Message level}
+            default NORM
+            vpath DEFAULT
+            helpkey *
+          }
+     }
+
+     action sc2clean {
+         helplib {$SMURF_HELP}
+
+          parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input timeseries}
+            helpkey *
+          }
+          parameter out {
+            position 2
+            type NDF
+            access WRITE
+            vpath {PROMPT }
+            association ->GLOBAL.DATA_ARRAY
+            prompt {Cleaned timeseries}
+            helpkey *
+          }
+	  parameter badfrac {
+            type _DOUBLE
+            prompt {Fraction of bad samples to flag entire bolo bad}
+	    default 0.05
+            helpkey *
+	  }
+	  parameter dcthresh {
+            type _DOUBLE
+            prompt {N-sigma threshold for DC step repair}
+	    default 20
+            helpkey *
+	  }
+	  parameter dcbox {
+            type _INTEGER
+            prompt {Size of box (samples) to measure means for DC step-finding}
+	    default 1000
+            helpkey *
+	  }
+          parameter order {
+            type _INTEGER
+            prompt {Polynomial order}
+            default 1
             helpkey *
           }
           parameter msg_filter {
