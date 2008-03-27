@@ -126,16 +126,18 @@ get to know how to use \LaTeX\ effectively.}
 \newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
 \newcommand{\htmladdnormallink}[2]{#1}
 \newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
 \newcommand{\hyperref}[4]{#2\ref{#4}#3}
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
 
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
+% Define commands for HTML-only or LaTeX-only text.
 \newcommand{\html}[1]{}
+\newcommand{\latex}[1]{#1}
+
+% Use latex2html 98.2.
 \newcommand{\latexhtml}[2]{#1}
-\newcommand{\HTMLcode}[2][]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
@@ -147,7 +149,8 @@ get to know how to use \LaTeX\ effectively.}
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\renewcommand{\_}{\texttt{\symbol{95}}}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
 
 % -----------------------------------------------------------------------------
 %  Debugging.
@@ -176,7 +179,7 @@ get to know how to use \LaTeX\ effectively.}
 
 %  Latex document header.
 %  ======================
-\begin{latexonly}
+\begin{latex}
    CCLRC / {\sc Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
@@ -199,7 +202,7 @@ get to know how to use \LaTeX\ effectively.}
       {\Large\bf Abstract}
    \end{center}
 % ? End of heading for abstract.
-\end{latexonly}
+\end{latex}
 
 %  HTML documentation header.
 %  ==========================
@@ -256,23 +259,23 @@ get to know how to use \LaTeX\ effectively.}
 % -----------------------------------------------------------------------------
 % ? Latex Copyright Statement
 %  =========================
-\begin{latexonly}
+\begin{latex}
 \newpage
 \vspace*{\fill}
 \stardoccopyright
-\end{latexonly}
+\end{latex}
 % ? End of Latex copyright statement
 
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
  \newpage
- \begin{latexonly}
+ \begin{latex}
    \setlength{\parskip}{0mm}
     \tableofcontents
    \setlength{\parskip}{\medskipamount}
    \markboth{\stardocname}{\stardocname}
- \end{latexonly}
+ \end{latex}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 \cleardoublepage

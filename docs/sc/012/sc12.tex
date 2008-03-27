@@ -103,6 +103,13 @@ NDF subroutine library for handling data.
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
 
+% Define commands for HTML-only or LaTeX-only text.
+\newcommand{\html}[1]{}
+\newcommand{\latex}[1]{#1}
+
+% Use latex2html 98.2.
+\newcommand{\latexhtml}[2]{#1}
+
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
@@ -113,7 +120,6 @@ NDF subroutine library for handling data.
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\newcommand{\latex}[1]{#1}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
@@ -146,7 +152,7 @@ NDF subroutine library for handling data.
 
 %  Latex document header.
 %  ======================
-\begin{latexonly}
+\begin{latex}
    CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
@@ -169,7 +175,7 @@ NDF subroutine library for handling data.
       {\Large\bf Abstract}
    \end{center}
 % ? End of heading for abstract.
-\end{latexonly}
+\end{latex}
 
 %  HTML documentation header.
 %  ==========================
@@ -207,7 +213,7 @@ NDF subroutine library for handling data.
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
+  \newcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -225,12 +231,12 @@ NDF subroutine library for handling data.
 % ? Latex document Table of Contents (if used).
 %  ===========================================
  \newpage
- \begin{latexonly}
+ \begin{latex}
    \setlength{\parskip}{0mm}
    \latexonlytoc
    \setlength{\parskip}{\medskipamount}
    \markright{\stardocname}
- \end{latexonly}
+ \end{latex}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 \newpage
@@ -704,7 +710,7 @@ right size, in this case {\sf NX} by {\sf NY} pixels. This is not a
 feature of ``standard'' Fortran~77, but unless you hear otherwise, it
 should be OK on your machine. 
 
-You'll see that when the subroutine \latexonly{\sf DOSTAT} inherits the
+You'll see that when the subroutine \latex{\sf DOSTAT} inherits the
 {\sf \%VAL}, it does so with a ready-made array of real values. This way,
 there is no need to pre-define your array sizes. 
 
@@ -1744,7 +1750,7 @@ endinterface
 Note how the interface file now includes a parameter which is a {\em REAL}\,
 number as well as filenames.
 
-The \latexonly{\sf hdstrace} application
+The \latex{\sf hdstrace} application
 reveals that if the input NDF contained a variance array, it does not
 exist in the output NDF. This is because the 
 {\sf NDF\_PROP} call did

@@ -96,6 +96,13 @@
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
 
+% Define commands for HTML-only or LaTeX-only text.
+\newcommand{\html}[1]{}
+\newcommand{\latex}[1]{#1}
+
+% Use latex2html 98.2.
+\newcommand{\latexhtml}[2]{#1}
+
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
@@ -106,7 +113,6 @@
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\newcommand{\latex}[1]{#1}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
@@ -208,40 +214,6 @@
 \end{htmlonly}
 
 \hyphenation{which-ever}
-
-% A kind of list item, like description, but with an easily adjustable
-% item separation.  Note that the paragraph and fount-size change are
-% needed to make the revised \baselinestretch work.
-\newlength{\menuwidth}
-\newlength{\menuindent}
-\newcommand{\menuitem}[2]
-  {{\bf #1} \settowidth{\menuwidth}{{\bf #1} }
-  \setlength{\menuindent}{-0.5em}
-  \addtolength{\menuwidth}{-2\menuwidth}
-  \addtolength{\menuwidth}{\textwidth}
-  \addtolength{\menuwidth}{\menuindent}
-  \hspace{\menuindent}\parbox[t]{\menuwidth}{
-  \renewcommand{\baselinestretch}{0.75}\small
-  #2 \par \vspace{0.6ex}
-  \renewcommand{\baselinestretch}{1.0}\normalsize} \\ }
-\begin{htmlonly}
-\newcommand{\menuitem}[2]
-  {\item [\htmlref{#1}{#1}] #2}
-\end{htmlonly}
-
-\newcommand{\classitem}[1]{\item [\htmlref{#1}{#1}]}
-
-% an environment for references (for the SST sstdiytopic command).
-\newenvironment{refs}{\vspace{-4ex} % normally 3ex
-                      \begin{list}{}{\setlength{\topsep}{0mm}
-                                     \setlength{\partopsep}{0mm}
-                                     \setlength{\itemsep}{0mm}
-                                     \setlength{\parsep}{0mm}
-                                     \setlength{\leftmargin}{1.5em}
-                                     \setlength{\itemindent}{-\leftmargin}
-                                     \setlength{\labelsep}{0mm}
-                                     \setlength{\labelwidth}{0mm}}
-                    }{\end{list}}
 
 % Lines for breaking up Appendices A and B.
 \newcommand{\jrule}{\noindent\rule{\textwidth}{0.45mm}}
@@ -758,7 +730,7 @@
 
 %  Latex document header.
 %  ======================
-\begin{latexonly}
+\begin{latex}
    CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
@@ -783,7 +755,7 @@
       {\Large\bf Abstract}
    \end{center}
 % ? End of heading for abstract.
-\end{latexonly}
+\end{latex}
 
 %  HTML documentation header.
 %  ==========================
@@ -824,7 +796,7 @@
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
+  \newcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -857,13 +829,13 @@ loops.  There is also a glossary.
 % ? Latex document Table of Contents (if used).
 %  ===========================================
  \newpage
- \begin{latexonly}
+ \begin{latex}
    \setlength{\parskip}{0mm}
    \latexonlytoc
    \setlength{\parskip}{\medskipamount}
    \markboth{\stardocname}{\stardocname}
 %  \markright{\stardocname}
- \end{latexonly}
+ \end{latex}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 % \newpage
@@ -1001,7 +973,7 @@ include the \mbox{\tt \#!/bin/csh}.
 \label{sc4_se_executable}}
 
 If you want to run your script by name or with an \htmlref{{\sf
-alias}}{sc4_gl_alias}\latexonly{ (see below)}, you must make your
+alias}}{sc4_gl_alias}\latex{ (see below)}, you must make your
 script executable like this
 
 \small
@@ -1529,7 +1501,7 @@ shorthand for the {\tt accept} keyword.  So we have to tell the shell to
 treat the backslash literally by preceding it with backslash!  
 
 In the last pair of examples an \xref{{\sf NDF section}}{sun95}{se_ndfsect}
-\latexonly{(see SUN/95's chapter called ``NDF Sections'')}
+\latex{(see SUN/95's chapter called ``NDF Sections'')}
 is specified.  As the last contains a variable value to be
 substituted, the {\tt \$} retains its normal special meaning but the
 parentheses are escaped by surrounding the section in double quotes.
@@ -1820,7 +1792,7 @@ with \xref{{\bf parget}}{sun95}{PARGET}.  This is explained in
 \begin{htmlonly}
 \htmlonly{\htmlref{Passing information between Starlink applications}{sc4_se_info_parameter}.}
 \end{htmlonly}
-\latexonly{Section~\ref{sc4_se_passing_info}.}
+\latex{Section~\ref{sc4_se_passing_info}.}
 
 \newpage
 \section{\xlabel{sc4_se_passing_info}Passing information between
@@ -2281,7 +2253,7 @@ the inverse tangent of 35.3 divided by the value of variable
 \newpage
 \begin{center}
 \begin{tabular}{lcl} \hline
-%\latexonly{{\em Function} & \begin{tabular}{c}Number of \\ arguments \end{tabular} & Description \\}
+%\latex{{\em Function} & \begin{tabular}{c}Number of \\ arguments \end{tabular} & Description \\}
 {\em Function} & Number of arguments & Description \\
 \hline
 \\
@@ -2397,7 +2369,7 @@ Here are some other examples of string concatenation.
 \label{sc4_se_string_length}}
 
 This requires either the {\bf wc} command in an
-\htmlref{expression}{sc4_se_csharith}\latexonly{ (see
+\htmlref{expression}{sc4_se_csharith}\latex{ (see
 Section~\ref{sc4_se_csharith})}, or the {\bf awk} function {\bf length}.
 Here we determine the number of characters
 in variable {\tt object} using both recipes.
@@ -3033,7 +3005,7 @@ than one image on the screen or to hardcopy.  The script {\tt
 \subsection{\xlabel{sc4_se_filename_mod}Filename modification
 \label{sc4_se_filename_mod}}
 
-\latexonly{Thus far the examples have not created a new file.} When you
+\latex{Thus far the examples have not created a new file.} When you
 want to create an output file, you need a name for it.  This could be an
 explicit name, one derived from the \htmlref{{\sf process identification
 number}}{sc4_gl_pid}, one
@@ -3918,7 +3890,7 @@ variables\label{sc4_se_NDF_section}}
 
 If you want to define a subset or superset of a dataset, most Starlink
 applications recognise \xref{{\sf NDF sections}}{sun95}{se_ndfsect}
-\latexonly{(see SUN/95's chapter called ``NDF Sections'')}
+\latex{(see SUN/95's chapter called ``NDF Sections'')}
 appended after the name.
 
 A na\"{\i}ve approach might expect the following to work
@@ -3933,7 +3905,7 @@ A na\"{\i}ve approach might expect the following to work
 \normalsize
 however, they generate the ~~{\tt Bad : modifier in \$ (\$).}~ error.
 That's because it is stupidly looking for a \htmlref{filename
-modifier}{sc4_se_filename_ext} {\tt :\$}\latexonly{ (see
+modifier}{sc4_se_filename_ext} {\tt :\$}\latex{ (see
 Section~\ref{sc4_se_filename_ext})}.
 
 Instead here are some recipes that work.
@@ -4084,7 +4056,7 @@ decrements the element indices of an array by one, so that {\tt
 {\tt -a} case.  The arguments are shifted, so that the first argument
 is now the value of the semi-major axis.  This in turn is shifted out
 of the arguments.  The \htmlref{{\tt *} case}{sc4_se_arguments} does
-the equivalent of the earlier {\bf while} loop \latexonly{(see
+the equivalent of the earlier {\bf while} loop \latex{(see
 Section~\ref{sc4_se_arguments})} as it appends the NDF filenames.  The
 {\tt [1-]} means the first element until the last.
 
@@ -4113,7 +4085,7 @@ semi-minor axis at its default of 44 pixels.  It would operate on
 the NDF called myndf and those whose names began with {\tt ccd} and
 ended with {\tt o}.
 
-There is a \htmlref{related example}{sc4_se_long1} \latexonly{in
+There is a \htmlref{related example}{sc4_se_long1} \latex{in
 Section~\ref{sc4_se_long1}} where the ellipse axis lengths and
 orientation are fixed for two galaxies.  The above options code could
 replace that recipe's first two lines, if we wanted to alter the
@@ -4125,13 +4097,13 @@ For a series of NDFs, this produces a grid of displayed images with
 axes and titles, prints them to a nominated device, once each page is
 full.  You can modify it for other operations, where a single page of
 graphics output is produced by running several tasks, and joining them
-together with \PSMERGEref\latexonly{ (SUN/164)}.
+together with \PSMERGEref\latex{ (SUN/164)}.
 
 \newpage
 \section{\xlabel{sc4_se_debugging}Debugging scripts
 \label{sc4_se_debugging}}
 
-\htmlref{Earlier}{sc4_se_running} \latexonly{in
+\htmlref{Earlier}{sc4_se_running} \latex{in
 Section~\ref{sc4_se_running}} a number of ways to run a
 script were presented.  There is yet another, which makes debugging
 easier.  If you invoke the script with the {\bf csh} command you can
@@ -4214,7 +4186,7 @@ seen earlier into lengthier scripts.  So far there is only one.
 The following script fits a surface to the background in a series of
 \NDFref{{\sf NDF}s}. 
 First two bright galaxies are to be excluded from the fitting process by
-being \xref{masked using an ARD region}{sun95}{se_ardwork}\latexonly{ (see
+being \xref{masked using an ARD region}{sun95}{se_ardwork}\latex{ (see
 SUN/95, ``Doing it the ARD way'')}.  It is known that the brighter
 galaxy is the brightest object in the field and the relative
 displacement of the two galaxies is constant.
@@ -4284,7 +4256,7 @@ when some error is encountered.
 
 If you want to make the shape and orientation arguments of the script,
 see the example of \htmlref{UNIX-style options}{sc4_se_unix_options}
-\latexonly{in Section~\ref{sc4_se_unix_options}}.
+\latex{in Section~\ref{sc4_se_unix_options}}.
 
 \newpage
 \section{\xlabel{sc4_se_glossary}Glossary\label{sc4_sc:glossary}}
@@ -4382,7 +4354,7 @@ see the example of \htmlref{UNIX-style options}{sc4_se_unix_options}
       \htmlonly{\htmlref{Passing information between
       Starlink applications}{sc4_se_info_parameter}.}
 \end{htmlonly}
-      \latexonly{Section~\ref{sc4_se_passing_info}.}
+      \latex{Section~\ref{sc4_se_passing_info}.}
 
 \item {\bf\label{sc4_gl_path}Path}\\
       A list of directories which the system searches in turn to
@@ -4439,7 +4411,7 @@ see the example of \htmlref{UNIX-style options}{sc4_se_unix_options}
 \begin{htmlonly}
       \htmlref{Shell Variables}{sc4_se_variables}
 \end{htmlonly}
-      \latexonly{Section~\ref{sc4_se_variables}} for more details.
+      \latex{Section~\ref{sc4_se_variables}} for more details.
 
 \item {\bf\label{sc4_gl_std_inp}Standard input}\\
       The file from which most UNIX programmes read their input data.

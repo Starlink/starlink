@@ -49,9 +49,9 @@ is presented to explain the procedures and techniques used.  The
 treatment is deliberately practical rather than theoretical, in keeping
 with the aim of providing advice on the actual calibration of observations.
 
-\begin{latexonly}
+\begin{latex}
 \vspace{5mm}
-\end{latexonly}
+\end{latex}
 
 \begin{center}
 {\bf Who Should Read this Cookbook?}
@@ -170,6 +170,13 @@ observing programme and photometric system you are using.}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
 
+% Define commands for HTML-only or LaTeX-only text.
+\newcommand{\html}[1]{}
+\newcommand{\latex}[1]{#1}
+
+% Use latex2html 98.2.
+\newcommand{\latexhtml}[2]{#1}
+
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
@@ -180,7 +187,6 @@ observing programme and photometric system you are using.}
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\newcommand{\latex}[1]{#1}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
@@ -213,7 +219,7 @@ observing programme and photometric system you are using.}
 
 %  Latex document header.
 %  ======================
-\begin{latexonly}
+\begin{latex}
    CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
@@ -240,7 +246,7 @@ observing programme and photometric system you are using.}
       {\Large\bf Abstract}
    \end{center}
 % ? End of heading for abstract.
-\end{latexonly}
+\end{latex}
 
 %  HTML documentation header.
 %  ==========================
@@ -281,7 +287,7 @@ observing programme and photometric system you are using.}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
+  \newcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -324,7 +330,7 @@ observing programme and photometric system you are using.}
  \stardoccopyright
 
  \cleardoublepage
- \begin{latexonly}
+ \begin{latex}
    \setlength{\parskip}{0mm}
    \latexonlytoc
 
@@ -334,7 +340,7 @@ observing programme and photometric system you are using.}
 
    \setlength{\parskip}{\medskipamount}
    \markboth{\stardocname}{\stardocname}
- \end{latexonly}
+ \end{latex}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 \cleardoublepage
@@ -1718,7 +1724,7 @@ term compensates for the mismatch between the instrumental and standard
 systems.  For example, for the Johnson-Morgan {\it UBV}\, system the
 calibration formul\ae\ are:
 
-\begin{latexonly}
+\begin{latex}
   \begin{eqnarray}
    U & = & U_{\rm inst} - A_{u} + Z_{u} + C_{u} ( U - B ) + \kappa_{u} X
      \nonumber  \\
@@ -1727,7 +1733,7 @@ calibration formul\ae\ are:
    V & = & V_{\rm inst} - A_{v} + Z_{v} + C_{v} ( B - V ) + \kappa_{v} X
      \nonumber
   \end{eqnarray}
-\end{latexonly}
+\end{latex}
 \begin{htmlonly}
 
   \begin{equation}
@@ -3395,7 +3401,7 @@ reduction.  Hence it is only mentioned here briefly in an appendix.
 %  The next paragraph exists in two version - one for latex and one
 %  for hypertext, so that the maths in the footnote is processed 
 %  correctly for hypertext. 
-\begin{latexonly}
+\begin{latex}
 The main components of the ISM are gas and dust.  Interstellar gas will
 tend to absorb (and re-radiate in a different wave-band) and dust will
 scatter the stellar radiation. These effective losses are known
@@ -3418,7 +3424,7 @@ line of sight. We can define a function:
    {\rm \AA)}}
 \end{equation}
 
-\end{latexonly}
+\end{latex}
 \begin{htmlonly}
 The main components of the ISM are gas and dust.  Interstellar gas will
 tend to absorb (and re-radiate in a different wave-band) and dust will

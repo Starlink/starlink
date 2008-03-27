@@ -103,6 +103,13 @@ included, as is a glossary of commonly used terms.  }
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
 
+% Define commands for HTML-only or LaTeX-only text.
+\newcommand{\html}[1]{}
+\newcommand{\latex}[1]{#1}
+
+% Use latex2html 98.2.
+\newcommand{\latexhtml}[2]{#1}
+
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
@@ -113,7 +120,6 @@ included, as is a glossary of commonly used terms.  }
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\newcommand{\latex}[1]{#1}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
@@ -308,7 +314,7 @@ included, as is a glossary of commonly used terms.  }
 
 %  Latex document header.
 %  ======================
-\begin{latexonly}
+\begin{latex}
    CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
@@ -342,7 +348,7 @@ included, as is a glossary of commonly used terms.  }
       {\Large\bf Abstract}
    \end{center}
 % ? End of heading for abstract.
-\end{latexonly}
+\end{latex}
 
 %  HTML documentation header.
 %  ==========================
@@ -388,7 +394,7 @@ included, as is a glossary of commonly used terms.  }
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
+  \newcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -406,13 +412,13 @@ included, as is a glossary of commonly used terms.  }
 % ? Latex document Table of Contents (if used).
 %  ===========================================
  \newpage
- \begin{latexonly}
+ \begin{latex}
    \setlength{\parskip}{0mm}
 %   \setcounter{tocdepth}{2}
    \latexonlytoc
    \setlength{\parskip}{\medskipamount}
    \markright{\stardocname}
- \end{latexonly}
+ \end{latex}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 \cleardoublepage
@@ -1407,7 +1413,7 @@ To copy the test data type the command
 
 You will then find you have these datafiles in your directory:
 
-\begin{latexonly}
+\begin{latex}
 \begin{center}
 \begin{tabular}{ll}
 File & Description \\ \hline
@@ -1417,7 +1423,7 @@ File & Description \\ \hline
 {\tt object1.sdf} & Frame with a rotated spectrum\\ \hline
 \end{tabular}
 \end{center}
-\end{latexonly}
+\end{latex}
 \begin{htmlonly}
 \begin{verbatim}
    File         Description
@@ -2000,7 +2006,7 @@ You can get a list of things you
 can plot by typing \verb+D+ (for directory).  Here's some of the ones which
 might interest you at this stage:
 
-\begin{latexonly}
+\begin{latex}
 \begin{center}
 \begin{tabular}{llll}
  You type & You see & You type & You see\\ \hline
@@ -2010,7 +2016,7 @@ might interest you at this stage:
  {\tt FFLT} & Fitted flat-field balance factors\\ \hline
 \end{tabular}
 \end{center}
-\end{latexonly}
+\end{latex}
 \begin{htmlonly}
 \begin{verbatim}
    You type  You see
@@ -2519,7 +2525,7 @@ To copy the test data type the command
 
 You will then find you have these data files in your directory:
 
-\begin{latexonly}
+\begin{latex}
 \begin{center}
 \begin{tabular}{ll}
 File & Description \\ \hline
@@ -2528,7 +2534,7 @@ File & Description \\ \hline
 {\tt quartz2dscrun.sdf}    & Frame with a quartz lamp flat field\\
 \end{tabular}
 \end{center}
-\end{latexonly}
+\end{latex}
 \begin{htmlonly}
 \begin{verbatim}
    File         Description
@@ -3272,11 +3278,11 @@ the approximate wavelength range covered:
    wavelength_range = CCDXSIZE x CCDXPIXE x DISPERSI
 \end{verbatim}
 \end{htmlonly}
-\begin{latexonly}
+\begin{latex}
 \begin{displaymath}
 \lambda\lambda = {\tt{CCDXSIZE}} \times {\tt{CCDXPIXE}} \times {\tt{DISPERSI}}
 \end{displaymath}
-\end{latexonly}
+\end{latex}
 
 Appropriate units should be used, for the example above this comes to
 a coverage of about 890\AA , centred at 4499\AA\@.  This information can

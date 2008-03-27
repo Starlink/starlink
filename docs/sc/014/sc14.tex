@@ -36,9 +36,9 @@ instruments available to UK astronomers: the Anglo-Australian Telescope
 the UK Schmidt.  It is not a manual for any particular package, though
 it does contain some worked examples.
 
-\begin{latexonly}
+\begin{latex}
 \vspace{5mm}
-\end{latexonly}
+\end{latex}
 
 \begin{center}
 {\bf Who Should Read this Cookbook?}
@@ -151,6 +151,13 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
 
+% Define commands for HTML-only or LaTeX-only text.
+\newcommand{\html}[1]{}
+\newcommand{\latex}[1]{#1}
+
+% Use latex2html 98.2.
+\newcommand{\latexhtml}[2]{#1}
+
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
@@ -161,7 +168,6 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\newcommand{\latex}[1]{#1}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
@@ -194,7 +200,7 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
 
 %  Latex document header.
 %  ======================
-\begin{latexonly}
+\begin{latex}
    CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
@@ -221,7 +227,7 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
       {\Large\bf Abstract}
    \end{center}
 % ? End of heading for abstract.
-\end{latexonly}
+\end{latex}
 
 %  HTML documentation header.
 %  ==========================
@@ -262,7 +268,7 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
+  \newcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -297,7 +303,7 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
  \copyright \underline{1999} Starlink, CCLRC
 
  \cleardoublepage
- \begin{latexonly}
+ \begin{latex}
    \setlength{\parskip}{0mm}
    \latexonlytoc
 
@@ -307,7 +313,7 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
 
    \setlength{\parskip}{\medskipamount}
    \markright{\stardocname}
- \end{latexonly}
+ \end{latex}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 

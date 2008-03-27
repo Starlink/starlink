@@ -124,6 +124,13 @@
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
 
+% Define commands for HTML-only or LaTeX-only text.
+\newcommand{\html}[1]{}
+\newcommand{\latex}[1]{#1}
+
+% Use latex2html 98.2.
+\newcommand{\latexhtml}[2]{#1}
+
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
@@ -134,7 +141,6 @@
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\newcommand{\latex}[1]{#1}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
@@ -183,7 +189,7 @@
 
 %  Latex document header.
 %  ======================
-\begin{latexonly}
+\begin{latex}
    CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
@@ -213,7 +219,7 @@
       {\Large\bf Abstract}
    \end{center}
 % ? End of heading for abstract.
-\end{latexonly}
+\end{latex}
 
 %  HTML documentation header.
 %  ==========================
@@ -256,7 +262,7 @@
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
+  \newcommand{\latexonlytoc}[0]{}
 %  \htmladdtonavigation{\htmlref{\htmladdimg{sc15_cover.gif}}
 %        {stardoccontents}}
 
@@ -288,7 +294,7 @@
  \copyright \underline{1999-2000} Starlink, CCLRC
 
  \cleardoublepage
- \begin{latexonly}
+ \begin{latex}
    \setlength{\parskip}{0mm}
    \latexonlytoc
 
@@ -298,7 +304,7 @@
 
    \setlength{\parskip}{\medskipamount}
    \markright{\stardocname}
- \end{latexonly}
+ \end{latex}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 
@@ -318,7 +324,7 @@ This cookbook will attempt to address some of the more common problem areas, how
 
 The cookbook is probably best browsed in the HTML version since much of its content is pointers to packages, anonymous FTP sites and further information about the various packages, libraries and applications discussed. All of these are more easily accessed from an online copy than a bound one. I have, however, made an effort to include URLs in the text whereever possible in the \LaTeX version.
 
-Details of where the packages discussed in this cookbook can be obtained, if not explicitly mentioned in the relevant section, can be found \latexonly{ in section~\ref{sc15_available}.}
+Details of where the packages discussed in this cookbook can be obtained, if not explicitly mentioned in the relevant section, can be found \latex{ in section~\ref{sc15_available}.}
 \begin{htmlonly}
 in the section on \htmlref{package availability}{sc15_available}.
 \end{htmlonly}
@@ -333,7 +339,7 @@ As with the \xref{{\em Theory and Modelling Resources Cookbook}}{sc13}{} the {\e
 
 The \htmladdnormallink{PGPLOT}{http://astro.caltech.edu/~tjp/pgplot/index.html} library is {\tt Fortran} or {\tt C} high-level callable graphics library. It has become the de-facto standard for display of astronomical data. Along with the standard primitives to draw lines, write text and annotate plots, there are also high level routines which use these primitives to build up more complicated graphs such as histograms and contour maps. PGPLOT also has the capability for interactive graphics where the user can interact with the plots using the cursor.
 
-While it would be quite possible for me to fill the entire cookbook with PGPLOT information an excellent tutorial style manual already exists for the library written by \htmladdnormallink{Tim Pearson}{mailto:tjp@astro.caltech.edu} of CalTech the package's author. If you work at a Starlink node this manual should be available to you, if not it's available on the web at \latexonly{{\tt http://astro.caltech.edu/$\sim$tjp/pgplot/contents.html}.}
+While it would be quite possible for me to fill the entire cookbook with PGPLOT information an excellent tutorial style manual already exists for the library written by \htmladdnormallink{Tim Pearson}{mailto:tjp@astro.caltech.edu} of CalTech the package's author. If you work at a Starlink node this manual should be available to you, if not it's available on the web at \latex{{\tt http://astro.caltech.edu/$\sim$tjp/pgplot/contents.html}.}
 \begin{htmlonly}
 \htmladdnormallink{{\tt http://astro.caltech.edu/~tjp/pgplot/contents.html}}{http://astro.caltech.edu/~tjp/pgplot/contents.html}.
 \end{htmlonly}
@@ -663,7 +669,7 @@ __DATA__
 
 \myfig{sc15_pgperl.eps}{height=0.45\textheight}{sc15_pgperl.gif}{sc15_pgperl_example}{Ouput from the simple {\tt pgperl} example script.}
 
-For every PGPLOT {\tt Fortran} function the {\tt pgperl} module provides an equivalent Perl function with the same arguments. Thus the user of the module should refer to the PGPLOT \htmladdnormallink{manual}{http://astro.caltech.edu/~tjp/pgplot/contents.html} to learn all about how to use {\tt pgperl} and for the complete list of available functions. \latexonly{More information on {\tt pgperl} can be found at {\tt http://www.aao.gov.au/local/www/kgb/pgperl/}.}
+For every PGPLOT {\tt Fortran} function the {\tt pgperl} module provides an equivalent Perl function with the same arguments. Thus the user of the module should refer to the PGPLOT \htmladdnormallink{manual}{http://astro.caltech.edu/~tjp/pgplot/contents.html} to learn all about how to use {\tt pgperl} and for the complete list of available functions. \latex{More information on {\tt pgperl} can be found at {\tt http://www.aao.gov.au/local/www/kgb/pgperl/}.}
 
 \subsubsection{Argument mapping -- simple numbers and arrays}
 
@@ -805,32 +811,32 @@ This is very efficient as we can be sure the data never gets copied and will alw
 
 Python is one of the new breed of object-orientated programming languages. It is commonly used both for scripting and as a stand alone rapid development language. One of the properties of the language is that it provides facilities for the easy integration of external services. It should therefore come as no surprise that there are currently \htmladdnormallink{several}{http://www.geog.ubc.ca/~phil/ubc_python.html} different Python interfaces to the PGPLOT subroutine libraries. Due to the nature of the language, being a rapid development tool, it should also come as no surprise that the documentation is a bit on the patchy side.
 
-The most well documented seems to be an interface to \htmladdnormallink{PLplot}{http://emma.la.asu.edu/plplot/}. While based on PGPLOT, and having a similar API, PLplot is {\em not} derived from the PGPLOT source and care must be taken when using it if you are used to PGPLOT. More information on PLplot can be found \latexonly{ in section~\ref{sc15_plplot}.}
+The most well documented seems to be an interface to \htmladdnormallink{PLplot}{http://emma.la.asu.edu/plplot/}. While based on PGPLOT, and having a similar API, PLplot is {\em not} derived from the PGPLOT source and care must be taken when using it if you are used to PGPLOT. More information on PLplot can be found \latex{ in section~\ref{sc15_plplot}.}
 \begin{htmlonly}
 \htmlref{later}{sc15_plplot} in the cookbook.
 \end{htmlonly}
 
 Both of the other interfaces require the installation of the \htmladdnormallink{NumPy}{http://www.python.org/topics/scicomp/numpy.html}
-libraries. NumPy is a collection of C extension modules to the Python programming language which add  multi-dimensional array objects. These new objects give Python the number crunching power of numeric languages like Matlab and IDL while maintaining all of the advantages of the general-purpose programming language Python. If you are running Linux it is possible that NumPy may already be installed, else or otherwise, it can be found at \latexonly{{\tt http://andrich.net/python/}.}
+libraries. NumPy is a collection of C extension modules to the Python programming language which add  multi-dimensional array objects. These new objects give Python the number crunching power of numeric languages like Matlab and IDL while maintaining all of the advantages of the general-purpose programming language Python. If you are running Linux it is possible that NumPy may already be installed, else or otherwise, it can be found at \latex{{\tt http://andrich.net/python/}.}
 \begin{htmlonly} \htmladdnormallink{{\tt http://andrich.net/python/}}{http://andrich.net/python/}.
 \end{htmlonly} 
 
 One interface also requires you to install \htmladdnormallink{SWIG}{http://www.swig.org/}. The Simplified Wrapper and Interface Generator (SWIG) is is a software development tool that connects programs written in C, C++, and Objective-C with a variety of high-level programming languages. SWIG is primarily used with common scripting languages such as Perl, Python, and Tcl/Tk but has been extended to include languages such as Java.
 
-More details of the interfaces available, including some basic usage and installation instructions, can be found on the UBC Python Page at \latexonly{{\tt http://www.geog.ubc.ca/$\sim$phil/ubc\_python.html}.}
+More details of the interfaces available, including some basic usage and installation instructions, can be found on the UBC Python Page at \latex{{\tt http://www.geog.ubc.ca/$\sim$phil/ubc\_python.html}.}
 \begin{htmlonly} \htmladdnormallink{{\tt http://www.geog.ubc.ca/~phil/ubc_python.html}}{http://www.geog.ubc.ca/~phil/ubc_python.html}.
 \end{htmlonly}
 
 \subsection{\xlabel{sc15_pgglish}GLISH PGPLOT\label{sc15_pgglish}}
 
 For users of aips++ a PGPLOT binding for \htmladdnormallink{GLISH}{http://www.cv.nrao.edu/glish/} has been developed. While the PGPLOT library itself has a large number of device drivers,
-only the Tk and PostScript drivers are available from GLISH. More information on the PGPLOT bindings in GLISH can be found at \latexonly{{\tt http://aips2.nrao.edu/released/docs/reference/Glish/node97.html}.}
+only the Tk and PostScript drivers are available from GLISH. More information on the PGPLOT bindings in GLISH can be found at \latex{{\tt http://aips2.nrao.edu/released/docs/reference/Glish/node97.html}.}
 \begin{htmlonly} \htmladdnormallink{{\tt http://aips2.nrao.edu/released/docs/reference/Glish/node97.html}}{http://aips2.nrao.edu/released/docs/reference/Glish/node97.html}.
 \end{htmlonly} 
 
 \subsection{\xlabel{sc15_pgtcl}{\tt ptcl} Tk/Tcl and PGPLOT\label{sc15_pgtcl}}
 
-\htmladdnormallink{{\tt ptcl}}{http://www.InfoMagic.com/~nme2/ptcl/ptcl.html} registers PGPLOT functions as {\tt tcl} commands.  It allows you to create plots from the command line or from scripts. If the {\tt tk} extensions are installed it is simple to create graphical user interfaces (GUIs) allowing you to directly interact with the plots. \latexonly{ More information on {\tt ptcsl} can be found at {\tt http://www.InfoMagic.com/$\sim$nme2/ptcl/ptcl.html}.}
+\htmladdnormallink{{\tt ptcl}}{http://www.InfoMagic.com/~nme2/ptcl/ptcl.html} registers PGPLOT functions as {\tt tcl} commands.  It allows you to create plots from the command line or from scripts. If the {\tt tk} extensions are installed it is simple to create graphical user interfaces (GUIs) allowing you to directly interact with the plots. \latex{ More information on {\tt ptcsl} can be found at {\tt http://www.InfoMagic.com/$\sim$nme2/ptcl/ptcl.html}.}
 
 \subsection{\xlabel{sc15_pgstar}Starlink/Native PGPLOT\label{sc15_pgstar}}
 
@@ -885,7 +891,7 @@ More information on the GKS system can be found in the Starlink GKS document \xr
 \subsubsection{Enquiring about the display}
 
 With the current movement away from pseudo to true colour XWindow displays, a common problem when writing software is trying to find what sort of X display
-the person running your package has available. A good indicator as to the type of X display available is whether the colour table is writable. If it is, then your user is probably sitting in front of a pseudo colour display. If it's not, then it is more likely that the display is True Colour \latexonly{ (see section \ref{sc15_display}).}
+the person running your package has available. A good indicator as to the type of X display available is whether the colour table is writable. If it is, then your user is probably sitting in front of a pseudo colour display. If it's not, then it is more likely that the display is True Colour \latex{ (see section \ref{sc15_display}).}
 \begin{htmlonly}
 (see the section on \htmlref{X displays}{sc15_display}).
 \end{htmlonly}
@@ -915,7 +921,7 @@ Where the variables are defined as:
 \item {\tt WKTR = \_INTEGER} (Returned)\newline workstation transformation changeable
 \end{description}
 
-If the colour table is writable, {\tt COLREP} will be returned as 1. More information on other useful GKS functions can be found in the \htmladdnormallink{RAL GKS Reference Manual}{http://www.itd.clrc.ac.uk/Publications/RAL-GKS/gks_cat.html}\latexonly{, which can be found online at {\tt http://www.itd.clrc.ac.uk/Publications/RAL-GKS/gks\_cat.html}}.
+If the colour table is writable, {\tt COLREP} will be returned as 1. More information on other useful GKS functions can be found in the \htmladdnormallink{RAL GKS Reference Manual}{http://www.itd.clrc.ac.uk/Publications/RAL-GKS/gks_cat.html}\latex{, which can be found online at {\tt http://www.itd.clrc.ac.uk/Publications/RAL-GKS/gks\_cat.html}}.
 
 \subsubsection{Compiling and Linking GKS programs}
 
@@ -950,7 +956,7 @@ to create standard x-y plots, semilog plots, log-log plots, contour plots, 3D pl
 or different sizes) may be placed on a single page with multiple lines in each graph. Different line styles, widths and colors are supported. A virtually
 infinite number of distinct area fill patterns may be used. There are almost 1000 characters in the extended character set. This includes four different
 fonts, the Greek alphabet and a host of mathematical, musical, and other symbols. The fonts can be scaled to any desired size. A variety of output
-devices are supported. \latexonly{More information on PLplot can be found at {\tt http://emma.la.asu.edu/plplot/}.}
+devices are supported. \latex{More information on PLplot can be found at {\tt http://emma.la.asu.edu/plplot/}.}
 
 \subsubsection{PLplot and 3D Surface Plots}
 
@@ -1031,7 +1037,7 @@ If you are using a Linux system it is likely that the library, and associated ap
 
 \subsection{\xlabel{sc15_libgif}The {\tt giflib} Library\label{sc15_libgif}}
 
-GIF files use Lempel-Ziv-Welsh (LZW) compression algorithm to encode the image data to save space, however there is a great deal of controversy over the GIF \htmlref{legal position}{sc15_giflegal} \latexonly{(see section \ref{sc15_giflegal})} due to the Unisys patent issue. 
+GIF files use Lempel-Ziv-Welsh (LZW) compression algorithm to encode the image data to save space, however there is a great deal of controversy over the GIF \htmlref{legal position}{sc15_giflegal} \latex{(see section \ref{sc15_giflegal})} due to the Unisys patent issue. 
 
 Eric S.\ Raymond, the maintainer of {\tt giflib} has this to say about Unisys's licensing: ``Due to Unisys's increasingly aggressive interpretation of its \htmlref{patent claims}{sc15_giflegal} on the LZW compression format, I can no longer recommend the use of the {\tt giflib} library or utilities. {\tt giflib} may be withdrawn in the near future''.
 
@@ -1049,7 +1055,7 @@ RedHat 6.0 for instance ships with both {\tt libgif.so} and {\tt libungif.so} sh
 
 \htmladdnormallink{ANGIF}{http://phil.ipal.org/freeware/angif/} is a C library to generate GIF format output. It can generate animated or, a bit of a standard breaker here, true colour (24bpp) GIFs. Due to the \htmlref{legal problems}{sc15_giflegal} surrounding the format ANGIF is LZW free. Command line test programs are included with the distribution.
 
-It should be noted that ANGIF is in pre-beta release, the only documentation available is the source code comments. \latexonly{Although there doesn't appear to be a home page for the library yet, it can be downloaded via HTTP from {\tt http://phil.ipal.org/freeware/angif/}.}
+It should be noted that ANGIF is in pre-beta release, the only documentation available is the source code comments. \latex{Although there doesn't appear to be a home page for the library yet, it can be downloaded via HTTP from {\tt http://phil.ipal.org/freeware/angif/}.}
 
 \subsection{\xlabel{sc15_libpng}The PNG Format\label{sc15_libpng}}
 
@@ -1067,15 +1073,15 @@ More information on the PNG format, programming resources and supporting applica
 
 The \htmladdnormallink{Multiple-image Network Graphics}{http://www.libpng.org/pub/mng/} (MNG) format has been implemented by the same people that brought you PNG, and it therefore shares the same modular philosophy. The idea behind the format is to provide a home for all of the multi-image capabilities that have no place in PNG. While it has fairly extensive animation and image-manipulation capabilities, there is no serious expectation that it will ever integrate audio or video. In other words this format it intended to replace multi-image GIF animations.
 
-Though the MNG specification itself has not yet been promoted to release status, as of 11 May 1999 it was officially frozen by a vote of the MNG developers. Although relatively mature, MNG is still a draft proposal. There is therefore no general use MNG reference library (along the same lines as {\tt libjpeg} for example). However, there are already several applications with partial MNG support, the main UNIX application being  \htmlref{ImageMagick}{sc15_magick}\latexonly{ (see section~\ref{sc15_magick})}.
+Though the MNG specification itself has not yet been promoted to release status, as of 11 May 1999 it was officially frozen by a vote of the MNG developers. Although relatively mature, MNG is still a draft proposal. There is therefore no general use MNG reference library (along the same lines as {\tt libjpeg} for example). However, there are already several applications with partial MNG support, the main UNIX application being  \htmlref{ImageMagick}{sc15_magick}\latex{ (see section~\ref{sc15_magick})}.
 
 \subsection{\xlabel{sc15_pythonimg}The Python Imaging Library\label{sc15_pythonimg}}
 
-The \htmladdnormallink{Python Imaging Library}{http://www.python.org/sigs/image-sig/Imaging.html} (PIL) adds an image object to your Python interpreter. You can load image objects from a variety of file formats, including BMP, EPS, GIF, JPEG, PNG, PPM, TIFF and XBM, and apply a rich set of image operations to them. See the \htmladdnormallink{feature sheet}{http://www.python.org/sigs/image-sig/Features.html} \latexonly{{\tt at http://www.python.org/sigs/image-sig/Imaging.html}} for more details. 
+The \htmladdnormallink{Python Imaging Library}{http://www.python.org/sigs/image-sig/Imaging.html} (PIL) adds an image object to your Python interpreter. You can load image objects from a variety of file formats, including BMP, EPS, GIF, JPEG, PNG, PPM, TIFF and XBM, and apply a rich set of image operations to them. See the \htmladdnormallink{feature sheet}{http://www.python.org/sigs/image-sig/Features.html} \latex{{\tt at http://www.python.org/sigs/image-sig/Imaging.html}} for more details. 
 
 \subsection{\xlabel{sc15_gd}The {\tt gd} Library\label{sc15_gd}}
 
-\htmladdnormallink{{\tt gd}}{http://www.boutell.com/gd/gd.html} is a C graphics library that allows you to quickly draw images with lines, arcs, text, multiple colors, cut and paste from other images, and flood fills, and write out the result as a \htmlref{PNG}{sc15_libpng} file.\latexonly{ more information can be found at {\tt http://www.boutell.com/gd/gd.html}.}
+\htmladdnormallink{{\tt gd}}{http://www.boutell.com/gd/gd.html} is a C graphics library that allows you to quickly draw images with lines, arcs, text, multiple colors, cut and paste from other images, and flood fills, and write out the result as a \htmlref{PNG}{sc15_libpng} file.\latex{ more information can be found at {\tt http://www.boutell.com/gd/gd.html}.}
 
 A simple example of the {\tt gd} library in use, taken from the documentation, is shown below:
 
@@ -1134,7 +1140,7 @@ When run, this program creates an image, allocates two colours (the first colour
 
 \subsubsection{{\tt gd} from other languages}
 
-The {\tt gd} library can also be accessed from languages other than C. There is an API for both the \htmladdnormallink{Perl}{http://stein.cshl.org/WWW/software/GD/GD.html}\latexonly{, see {\tt http://stein.cshl.org/WWW/software/GD/GD.html},} and \htmladdnormallink{Tcl}{http://www.tcltk.com/ftp/ellson/} scripting languages\latexonly{, see {\tt http://www.tcltk.com/ftp/ellson/}}.
+The {\tt gd} library can also be accessed from languages other than C. There is an API for both the \htmladdnormallink{Perl}{http://stein.cshl.org/WWW/software/GD/GD.html}\latex{, see {\tt http://stein.cshl.org/WWW/software/GD/GD.html},} and \htmladdnormallink{Tcl}{http://www.tcltk.com/ftp/ellson/} scripting languages\latex{, see {\tt http://www.tcltk.com/ftp/ellson/}}.
 
 \section{\xlabel{sc15_packages}Plotting Packages\label{sc15_packages}}
 
@@ -1142,7 +1148,7 @@ The {\tt gd} library can also be accessed from languages other than C. There is 
 
 \htmladdnormallink{QDP}{http://heasarc.gsfc.nasa.gov/docs/software/ftools/others/qdp/node3.html} is an interactive graphics plotting package that began life in the late seventies on a PDP 11/70 at the Goddard Space Flight Center, it doesn't seem that likely that any of code has survived from that first version. 
 
-QDP is now an interactive front end to Tim Pearson's \htmlref{PGPLOT}{sc15_pgplot} package, and is distributed by \htmladdnormallink{HEASARC}{http://heasarc.gsfc.nasa.gov/} as a stand alone segment of their \htmladdnormallink{XANADU}{http://heasarc.gsfc.nasa.gov/docs/xanadu/xanadu.html} X-ray analysis package. Most Starlink sites should have XANADU, and hence QDP, already installed. Ask your site manager, or any random X-ray astronomer if you have one to hand, for site specific instructions on how to setup the package for use. The QDP manual is available \htmladdnormallink{on the web}{http://heasarc.gsfc.nasa.gov/docs/software/ftools/others/qdp/node3.html}\latexonly{ at {\tt http://heasarc.gsfc.nasa.gov/docs/software/ftools/others/qdp/node3.html}}.
+QDP is now an interactive front end to Tim Pearson's \htmlref{PGPLOT}{sc15_pgplot} package, and is distributed by \htmladdnormallink{HEASARC}{http://heasarc.gsfc.nasa.gov/} as a stand alone segment of their \htmladdnormallink{XANADU}{http://heasarc.gsfc.nasa.gov/docs/xanadu/xanadu.html} X-ray analysis package. Most Starlink sites should have XANADU, and hence QDP, already installed. Ask your site manager, or any random X-ray astronomer if you have one to hand, for site specific instructions on how to setup the package for use. The QDP manual is available \htmladdnormallink{on the web}{http://heasarc.gsfc.nasa.gov/docs/software/ftools/others/qdp/node3.html}\latex{ at {\tt http://heasarc.gsfc.nasa.gov/docs/software/ftools/others/qdp/node3.html}}.
 
 \subsubsection{QDP Basic Stuff}
 
@@ -1543,7 +1549,7 @@ or
 \end{quote}
 \normalsize
 
-the application is therefore very suitable for batch processing of data files. Extensive documentation on GNUplot is available on the \htmladdnormallink{web}{http://www.cs.dartmouth.edu/gnuplot_info.html}\latexonly{ at {\tt http://www.cs.dartmouth.edu/gnuplot\_info.html}}, and while the application can be used as at the simplest level as a plotting tool for 2D data, GNUplot has many powerful features including plotting of 3D parametric functions (see Figure~\ref{sc15_gnuplot_demo_para}) and \htmlref{data}{sc15_gnuplot_3d}, and the ability to integrate functions and show the result graphically.
+the application is therefore very suitable for batch processing of data files. Extensive documentation on GNUplot is available on the \htmladdnormallink{web}{http://www.cs.dartmouth.edu/gnuplot_info.html}\latex{ at {\tt http://www.cs.dartmouth.edu/gnuplot\_info.html}}, and while the application can be used as at the simplest level as a plotting tool for 2D data, GNUplot has many powerful features including plotting of 3D parametric functions (see Figure~\ref{sc15_gnuplot_demo_para}) and \htmlref{data}{sc15_gnuplot_3d}, and the ability to integrate functions and show the result graphically.
 
 \myfig{sc15_gnuplot_demo_para.eps}{height=0.4\textheight}{sc15_gnuplot_demo_para.gif}{sc15_gnuplot_demo_para}{A plot of the function $(1-0.1\cos(v))\cos(u),(1-0.1\cos(v))\sin(u),0.1(\sin(v)+u/1.7-10)$, a parametric helix, using GNUplot} 
 
@@ -1610,7 +1616,7 @@ SAOimage provides a large selection of options for zooming, panning, scaling, co
 
 The SAOimage desktop includes, a main image display window, a button menu panel, a display magnifier, a pan and zoom reference image, and a color bar. A color table graph window can be brought up by clicking on the color bar at the bottom of the SAOimage desktop.
 
-A quick introduction to SAOimage can be found in \xref{SUN/166}{sun166}{}. Further information can then be found in the {\em SAOimage User Manual} (MUD/140) which is distributed in LaTeX form with the SAOimage source code in the `doc' subdirectory. Further information is also available on the web on the \htmladdnormallink{SAOimage Home Page}{http://tdc-www.harvard.edu/software/saoimage.html}\latexonly{ at {\tt http://tdc-www.harvard.edu/software/saoimage.html}}.
+A quick introduction to SAOimage can be found in \xref{SUN/166}{sun166}{}. Further information can then be found in the {\em SAOimage User Manual} (MUD/140) which is distributed in LaTeX form with the SAOimage source code in the `doc' subdirectory. Further information is also available on the web on the \htmladdnormallink{SAOimage Home Page}{http://tdc-www.harvard.edu/software/saoimage.html}\latex{ at {\tt http://tdc-www.harvard.edu/software/saoimage.html}}.
 
 \subsubsection{Printing in SAOimage}
 
@@ -1646,7 +1652,7 @@ vector data. The package is covered in detail in \xref{{\em The DX Cookbook} (SC
 
 The \htmladdnormallink{Interactive Data Language}{http://www.rsinc.com/idl/index.cfm} (IDL) is designed to be used for data analysis, visualization, and cross-platform application development. IDL may be available at your site, see your Starlink system administrator for details.
 
-\xref{{\em An Introduction to Visualisation Software for Astronomy}}{sg8}{}, SG/8, provides a general overview of visualisation software for astronomers and includes details of a number of packages. The author of SG/8, \htmladdnormallink{Clive Davenhall}{mailto:acd@roe.ac.uk},  also maintains a \htmladdnormallink{web page}{http://www.roe.ac.uk/~acd/vissys/index.html} covering visualisation software\latexonly{ at {\tt http://www.roe.ac.uk/$\sim$acd/vissys/index.html}}.
+\xref{{\em An Introduction to Visualisation Software for Astronomy}}{sg8}{}, SG/8, provides a general overview of visualisation software for astronomers and includes details of a number of packages. The author of SG/8, \htmladdnormallink{Clive Davenhall}{mailto:acd@roe.ac.uk},  also maintains a \htmladdnormallink{web page}{http://www.roe.ac.uk/~acd/vissys/index.html} covering visualisation software\latex{ at {\tt http://www.roe.ac.uk/$\sim$acd/vissys/index.html}}.
 
 \section{\xlabel{sc15_applications}Other Applications\label{sc15_applications}}
 
@@ -1656,7 +1662,7 @@ There is so much graphics and image manipulation software available, usually und
 
 \htmladdnormallink{ImageMagick}{http://www.wizards.dupont.com/cristy/ImageMagick.html}, is a collection of GUI and command line tools along with callable  libraries allows you to read, write, and manipulate images in any of the more popular image formats including GIF, JPEG, TIFF, PNG and PDF.  
 
-There are two methods for accessing the capabilities of ImageMagick. Firstly you can incorporate its functionality directly into your own code by linking to the ImageMagick libraries, you can do this from several languages, including Perl, C, C++, Java and Python. More information can be found in the \htmladdnormallink{ImageMagick Users Guide}{http://www.wizards.dupont.com/cristy/ImageMagick.pdf} \latexonly{at {\tt http://www.wizards.dupont.com/cristy/ImageMagick.pdf}}.
+There are two methods for accessing the capabilities of ImageMagick. Firstly you can incorporate its functionality directly into your own code by linking to the ImageMagick libraries, you can do this from several languages, including Perl, C, C++, Java and Python. More information can be found in the \htmladdnormallink{ImageMagick Users Guide}{http://www.wizards.dupont.com/cristy/ImageMagick.pdf} \latex{at {\tt http://www.wizards.dupont.com/cristy/ImageMagick.pdf}}.
 
 You can also access ImageMagick functions directly from the command line using the {\tt display}, {\tt import}, {\tt animate}, {\tt montage}, {\tt convert}, {\tt mogrify}, {\tt identify}, and {\tt combine} tools. These tools allow powerful manipulations to be carried out on images in a manner understandable to anyone familiar with the UNIX way of doing things, for instance:
 
@@ -1963,7 +1969,7 @@ XV is primarily a graphics display and manipulation package, you can see an exam
 
 \myfig{sc15_xv.eps}{height=0.8\textheight}{sc15_xv.gif}{sc15_xv_interface}{The {\tt xv} interface along with the Color Editor Dialog (accessed from the Windows pull down menu).} 
 
-While the interface is usually fairly self explanatory, the package has a very good online \htmladdnormallink{manual}{http://www.trilon.com/xv/manual/xv-3.10a/cover.html}\latexonly{ available at {\tt http://www.trilon.com/xv/manual/xv-3.10a/cover.html}}.
+While the interface is usually fairly self explanatory, the package has a very good online \htmladdnormallink{manual}{http://www.trilon.com/xv/manual/xv-3.10a/cover.html}\latex{ available at {\tt http://www.trilon.com/xv/manual/xv-3.10a/cover.html}}.
 
 \subsubsection{Screen Capture}
 
@@ -1979,7 +1985,7 @@ XV has a problem displaying images which are less than 100 pixels wide, it will 
 
 The current version of XV is 3.10a, there probably won't be a version 3.2 (or the long awaited version 4.0) until the author is successful in sorting out a \htmlref{licence}{sc15_giflegal} to use the LZW compression algorithm with UniSys.
 
-Both source code and binary distributions are available for \htmladdnormallink{download}{http://www.trilon.com/xv/downloads.html}, along with a selection of patches and enhancements\latexonly{, from {\tt http://www.trilon.com/xv/downloads.html}}. The patches provided at the site are {\bf not} pre-applied to the standard distributions. Enhancements include patches to read/write PNG and PDF files, so it is worth applying them if you are going to the trouble to compile the source.
+Both source code and binary distributions are available for \htmladdnormallink{download}{http://www.trilon.com/xv/downloads.html}, along with a selection of patches and enhancements\latex{, from {\tt http://www.trilon.com/xv/downloads.html}}. The patches provided at the site are {\bf not} pre-applied to the standard distributions. Enhancements include patches to read/write PNG and PDF files, so it is worth applying them if you are going to the trouble to compile the source.
 
 \subsubsection{Compiling XV on RedHat 6.0}
 
@@ -2008,7 +2014,7 @@ XPaint is divided into a toolbox area, for selecting the current paint operation
 
 \myfig{sc15_xpaint.eps}{height=0.4\textheight}{sc15_xpaint.gif}{sc15_xpaint_interface}{The {\tt xpaint} interface.} 
 
-\latexonly{More information on {\tt xpaint} can be found at {\tt http://home.worldonline.dk/$\sim$torsten/xpaint/}.}
+\latex{More information on {\tt xpaint} can be found at {\tt http://home.worldonline.dk/$\sim$torsten/xpaint/}.}
 
 \subsection{\xlabel{sc15_xfig}Xfig\label{sc15_xfig}}
 
@@ -2018,15 +2024,15 @@ Unlike \htmlref{{\tt xpaint}}{sc15_xpaint}, \htmladdnormallink{{\tt xfig}}{http:
 
 {\tt xfig} saves figures in its native format, Fig format, but they may be converted into various formats such as PostScript, GIF or JPEG. There are other applications that are capable of producing output in Fig format that can subsequently be read into {\tt xfig}. For example, {\tt xfig} doesn't have a facility to create graphs, but tools such as \htmlref{GNUPLOT}{sc15_gnuplot} can create graphs and output them in Fig format. 
 
-\latexonly{More information on {\tt xfig} can be found at {\tt http://epb1.lbl.gov/xfig/}.}
+\latex{More information on {\tt xfig} can be found at {\tt http://epb1.lbl.gov/xfig/}.}
 
 \subsubsection{{\tt pstoedit}}
 
-The \htmladdnormallink{{\tt pstoedit}}{http://www.geocities.com/SiliconValley/Network/1958/pstoedit/} application can convert PostScript and PDF graphic files into a variety of vector formats, including the \htmlref{{\tt xfig}}{sc15_xfig} Fig format and the \htmlref{Sketch}{sc15_sketch} internal format.\latexonly{ {\tt pstoedit} can be found at http://www.geocities.com/SiliconValley/Network/1958/pstoedit/.}
+The \htmladdnormallink{{\tt pstoedit}}{http://www.geocities.com/SiliconValley/Network/1958/pstoedit/} application can convert PostScript and PDF graphic files into a variety of vector formats, including the \htmlref{{\tt xfig}}{sc15_xfig} Fig format and the \htmlref{Sketch}{sc15_sketch} internal format.\latex{ {\tt pstoedit} can be found at http://www.geocities.com/SiliconValley/Network/1958/pstoedit/.}
 
 \subsection{\xlabel{sc15_sketch}Sketch\label{sc15_sketch}}
 
-\htmladdnormallink{Sketch}{http://sketch.sourceforge.net/} is another interactive drawing program which somewhat resembles Corel Draw or Adobe Illustrator. Unusually for such a beast Sketch has been implemented entirely in Python, and to use it you must have Python installed along with the \htmlref{Python Imaging Library}{sc15_pythonimg}. In addition the application also requires Tk/Tcl to be present.\latexonly{ More information can be found on the Sketch home page at {\tt http://sketch.sourceforge.net/}.}
+\htmladdnormallink{Sketch}{http://sketch.sourceforge.net/} is another interactive drawing program which somewhat resembles Corel Draw or Adobe Illustrator. Unusually for such a beast Sketch has been implemented entirely in Python, and to use it you must have Python installed along with the \htmlref{Python Imaging Library}{sc15_pythonimg}. In addition the application also requires Tk/Tcl to be present.\latex{ More information can be found on the Sketch home page at {\tt http://sketch.sourceforge.net/}.}
 
 Sketch also has a scripting function (using Python) to automate tasks and add new functionality. Since Sketch was been developed in Python,  scripts have access to all areas of the application (including internal data structures) which allows user written scripts to be very powerful tools.
 
@@ -2038,7 +2044,7 @@ The \htmladdnormallink{GNU Image Manipulation Program}{http://www.gimp.org/} (GI
 
 It requires the presence of the \htmladdnormallink{GTK+}{http://www.gtk.org/} library. If you are working on a Linux machine it is likely that both GTK+ and the GIMP will already be installed. The latest stable version of the GIMP available before going to press is 1.1.13 (released 29th Nov 1999).
 
-Likened to Adobe Photoshop by its supporters, the GIMP is a complex tool in the right hands, it is a professional quality graphics package. Unfortunately this doesn't mean that anything coming out of the GIMP will be of professional quality, it means that if a professional graphics artist goes to use it they'll find all the tools they're used to or need to get the job done. I don't claim to be a professional graphics or layout artist, and am therefore in no position to try and teach anyone how to use the GIMP. However I still make use of the program quite extensively when dealing with graphics, because the truth is you don't have to be a professional to make use of the GIMP at a basic level. In fact, due to the plugin nature of {\tt Script-Fu} some highly advance graphics manipulation techniques are available very easily to the novice user. A good start is the \htmladdnormallink{GIMP User Manual}{http://manual.gimp.org/} (GUM) \latexonly{which you can find at {\tt http://manual.gimp.org/}}, however I'd also like point you towards the following books:
+Likened to Adobe Photoshop by its supporters, the GIMP is a complex tool in the right hands, it is a professional quality graphics package. Unfortunately this doesn't mean that anything coming out of the GIMP will be of professional quality, it means that if a professional graphics artist goes to use it they'll find all the tools they're used to or need to get the job done. I don't claim to be a professional graphics or layout artist, and am therefore in no position to try and teach anyone how to use the GIMP. However I still make use of the program quite extensively when dealing with graphics, because the truth is you don't have to be a professional to make use of the GIMP at a basic level. In fact, due to the plugin nature of {\tt Script-Fu} some highly advance graphics manipulation techniques are available very easily to the novice user. A good start is the \htmladdnormallink{GIMP User Manual}{http://manual.gimp.org/} (GUM) \latex{which you can find at {\tt http://manual.gimp.org/}}, however I'd also like point you towards the following books:
 
 \begin{itemize}
 \item {\em GIMP: The Official Handbook}\\
@@ -2059,7 +2065,7 @@ Specialized Systems Consultants; ISBN: 1578310113
 
 {\em GIMP: The Official Handbook} appears to be a bound copy of the \htmladdnormallink{GIMP User Manual}{http://manual.gimp.org/} (GUM), while {\em The Artists Guide to the GIMP} is a tutorial style book that seems to be well thought of by the Open Source community.
 
-A good series of introductory articles can be found on \htmladdnormallink{{\em The Graphics Muse}}{http://graphics-muse.com/} web site which is maintained by the author of {\em The Artists' Guide to the GIMP}\latexonly{, see {\tt http://graphics-muse.com/}}.
+A good series of introductory articles can be found on \htmladdnormallink{{\em The Graphics Muse}}{http://graphics-muse.com/} web site which is maintained by the author of {\em The Artists' Guide to the GIMP}\latex{, see {\tt http://graphics-muse.com/}}.
 
 \begin{itemize}
 \item {\bf Mastering GIMP - Part I (5th Nov 1999)}\\
@@ -2086,7 +2092,7 @@ Another good article, also on \htmladdnormallink{{\em The Graphics Muse}}{http:/
 
 There seems to be some confusion between GIMP Plug-ins and {\tt Script-Fu}.  Plug-ins are external modules that do the graphics transformations, while  {\tt Script-Fu} is the name of the Scheme based scripting interface in the GIMP.  Scripts written in {\tt SIOD}, the Scheme subset that GIMP uses, are known simply as {\tt Script-Fu} scripts.
 
-\htmladdnormallink{GIMP-Perl}{http://www.goof.com/pcg/marc/gimp.html} is the name of the Perl module that interfaces with the GIMP, it is the primary interface between Perl scripts and the GIMP. However, it does not include easy access to the user interface (the GUI), nor does it abstract the Procedural Database. These two aspects are more properly handled by, yet another, Perl module {\tt Gimp::Fu}. Perl scripts that use GIMP-Perl and {\tt Gimp::Fu} are sometimes referred to as {\tt Perl-Fu} scripts. All this can get somewhat confusing at times. The GIMP-Perl extensions have been part of the core GIMP distribution since version 1.1, however if you are using GIMP on even a recent distribution of Linux ({\em e.g.\ }RedHat 6.x) then it is likely that you are using and older version of the GIMP (1.0.x or below). The simplest course if you want to make use of GIMP-Perl interface is to ask your system manager to upgrade your version of the application, alternative you can download the plug-in from the GIMP Plug-In Registry. \latexonly{The official GIMP-Perl web site can be found at {\tt http://www.goof.com/pcg/marc/gimp.html}.}
+\htmladdnormallink{GIMP-Perl}{http://www.goof.com/pcg/marc/gimp.html} is the name of the Perl module that interfaces with the GIMP, it is the primary interface between Perl scripts and the GIMP. However, it does not include easy access to the user interface (the GUI), nor does it abstract the Procedural Database. These two aspects are more properly handled by, yet another, Perl module {\tt Gimp::Fu}. Perl scripts that use GIMP-Perl and {\tt Gimp::Fu} are sometimes referred to as {\tt Perl-Fu} scripts. All this can get somewhat confusing at times. The GIMP-Perl extensions have been part of the core GIMP distribution since version 1.1, however if you are using GIMP on even a recent distribution of Linux ({\em e.g.\ }RedHat 6.x) then it is likely that you are using and older version of the GIMP (1.0.x or below). The simplest course if you want to make use of GIMP-Perl interface is to ask your system manager to upgrade your version of the application, alternative you can download the plug-in from the GIMP Plug-In Registry. \latex{The official GIMP-Perl web site can be found at {\tt http://www.goof.com/pcg/marc/gimp.html}.}
 
 A good introduction to the GIMP-Perl extensions can be found (again) at the \htmladdnormallink{{\em The Graphics Muse}}{http://graphics-muse.com/} site:
 
@@ -2166,7 +2172,7 @@ exit main;
 
 \subsubsection{GIMP-Python}
 
-\htmladdnormallink{GIMP-Python}{http://www.daa.com.au/~james/pygimp/} is a package that allows people to write plug-ins for the GIMP in Python rather than {\tt Script-Fu} (Scheme), Perl or C. GIMP-Python binds to the \htmladdnormallink{GTK+}{http://www.gtk.org} Python extention library \htmladdnormallink{PyGTK}{http://www.daa.com.au/~james/pygtk/}\latexonly{, found at {\tt http://www.daa.com.au/$\sim$james/pygimp/},} rather than the more commonly used (under Python) Tkinter extentions for a more consistent {\em look and feel} interface to the GIMP. The package provides an almost complete wrapper for the {\tt libgimp} plug-in library, and also offers {\tt Script-Fu} capabilities through the {\tt gimpfu} module. 
+\htmladdnormallink{GIMP-Python}{http://www.daa.com.au/~james/pygimp/} is a package that allows people to write plug-ins for the GIMP in Python rather than {\tt Script-Fu} (Scheme), Perl or C. GIMP-Python binds to the \htmladdnormallink{GTK+}{http://www.gtk.org} Python extention library \htmladdnormallink{PyGTK}{http://www.daa.com.au/~james/pygtk/}\latex{, found at {\tt http://www.daa.com.au/$\sim$james/pygimp/},} rather than the more commonly used (under Python) Tkinter extentions for a more consistent {\em look and feel} interface to the GIMP. The package provides an almost complete wrapper for the {\tt libgimp} plug-in library, and also offers {\tt Script-Fu} capabilities through the {\tt gimpfu} module. 
 
 An example of a GIMP-Python plug-in (a translation of the {\tt Script-Fu} clothify plug-in) is shown below, in this example the GUI is generated by the {\tt gimpfu} module.
 
@@ -2245,7 +2251,7 @@ The package can be downloaded via FTP from \htmladdnormallink{{\tt ftp://ftp.daa
 
 \subsubsection{GIMP Plug-In Registry}
 
-The GIMP \htmladdnormallink{Plug-In Registry}{http://registry.gimp.org/} is a central repository for GIMP extentions\latexonly{, and can be found at {\tt http://registry.gimp.org/}}. The available plugins provide everything from support for exotic file format ({\em e.g.\ }Adobe Photoshop) to interfacing with \htmlref{SANE}{sc15_scanners}. If you have a graphics problem that someone else might have faced, and you are considering using the GIMP, maybe you should look here before trying to write your own code to do the job.
+The GIMP \htmladdnormallink{Plug-In Registry}{http://registry.gimp.org/} is a central repository for GIMP extentions\latex{, and can be found at {\tt http://registry.gimp.org/}}. The available plugins provide everything from support for exotic file format ({\em e.g.\ }Adobe Photoshop) to interfacing with \htmlref{SANE}{sc15_scanners}. If you have a graphics problem that someone else might have faced, and you are considering using the GIMP, maybe you should look here before trying to write your own code to do the job.
 
 \subsubsection{The GIMP and layers}
 
@@ -2325,7 +2331,7 @@ Mapping images onto solid objects is just one of the many tools and filters avia
 
 \myfig{sc15_gimp_map_3.eps}{height=0.4\textheight}{sc15_gimp_map_3.gif}{sc15_gimp_map_3}{Star spot image projected on plane.} 
 
-Another interesting thing that you can do with the mapping functions in the GIMP is bump map our image (see Figure~\ref{sc15_gimp_map_4}) by selecting {\sc Filters}$\rightarrow${\sc Map}$\rightarrow${\sc Bump Map} to emphasize the star spots. In this case I've used a bump map followed by a gaussian blur, {\sc  Filters}$\rightarrow${\sc Blur}$\rightarrow${\sc Gaussian Blur (IIR)}, to soften the effect. The bump mapped image can be seen in mapped onto a plane in Figure~\ref{sc15_gimp_map_5}. The {\sc Map Object} dialog can be seen in \latexonly{Figures~\ref{sc15_gimp_map_6}, \ref{sc15_gimp_map_7}, \ref{sc15_gimp_map_8} and \ref{sc15_gimp_map_9}.} 
+Another interesting thing that you can do with the mapping functions in the GIMP is bump map our image (see Figure~\ref{sc15_gimp_map_4}) by selecting {\sc Filters}$\rightarrow${\sc Map}$\rightarrow${\sc Bump Map} to emphasize the star spots. In this case I've used a bump map followed by a gaussian blur, {\sc  Filters}$\rightarrow${\sc Blur}$\rightarrow${\sc Gaussian Blur (IIR)}, to soften the effect. The bump mapped image can be seen in mapped onto a plane in Figure~\ref{sc15_gimp_map_5}. The {\sc Map Object} dialog can be seen in \latex{Figures~\ref{sc15_gimp_map_6}, \ref{sc15_gimp_map_7}, \ref{sc15_gimp_map_8} and \ref{sc15_gimp_map_9}.} 
 \begin{htmlonly}
  Figure~\ref{sc15_gimp_map_anim}.
 \end{htmlonly}
@@ -2334,12 +2340,12 @@ Another interesting thing that you can do with the mapping functions in the GIMP
 
 \myfig{sc15_gimp_map_5.eps}{height=0.4\textheight}{sc15_gimp_map_5.gif}{sc15_gimp_map_5}{Bump mapped star spot image projected on a plane} 
 
-\begin{latexonly}
+\begin{latex}
 \myfig{sc15_gimp_map_6.eps}{height=0.4\textheight}{sc15_gimp_map_6.gif}{sc15_gimp_map_6}{The GIMP Map Object Dialog ``Options''} 
 \myfig{sc15_gimp_map_7.eps}{height=0.4\textheight}{sc15_gimp_map_7.gif}{sc15_gimp_map_7}{The GIMP Map Object Dialog ``Light''} 
 \myfig{sc15_gimp_map_8.eps}{height=0.4\textheight}{sc15_gimp_map_8.gif}{sc15_gimp_map_8}{The GIMP Map Object Dialog ``Material''}
 \myfig{sc15_gimp_map_9.eps}{height=0.4\textheight}{sc15_gimp_map_9.gif}{sc15_gimp_map_9}{The GIMP Map Object Dialog ``Orientation''} 
-\end{latexonly}
+\end{latex}
 \begin{htmlonly}
     \label{sc15_gimp_map_anim} \htmladdimg{sc15_gimp_map_anim.gif}\\
     Figure: The GIMP Map Object Dialog\\
@@ -2353,11 +2359,11 @@ The development of Electric Eyes is bound up along with \htmladdnormallink{GNOME
 
 \myfig{sc15_ee.eps}{height=0.7\textheight}{sc15_ee.gif}{sc15_ee_example}{The Electric Eyes interface.} 
 
-If you have GNOME\latexonly{, for more information see {\tt http://www.gnome.org/},} installed then Electric Eye will likely also be installed. If you are working on a RedHat Linux box this is almost certainly the case.
+If you have GNOME\latex{, for more information see {\tt http://www.gnome.org/},} installed then Electric Eye will likely also be installed. If you are working on a RedHat Linux box this is almost certainly the case.
 
 \subsection{\xlabel{sc15_whirlgif}WhirlGIF\label{sc15_whirlgif}}
 
-\htmladdnormallink{WhirlGIF}{http://www.msg.net/utility/whirlgif/} is a command line utility for generating multi-image GIF animations from a sequence of GIF files.\latexonly{ More information can be found at {\tt http://www.msg.net/utility/whirlgif/}.} For example:
+\htmladdnormallink{WhirlGIF}{http://www.msg.net/utility/whirlgif/} is a command line utility for generating multi-image GIF animations from a sequence of GIF files.\latex{ More information can be found at {\tt http://www.msg.net/utility/whirlgif/}.} For example:
 
 \small
 \begin{quote}
@@ -2389,7 +2395,7 @@ would create an animated GIF (called {\tt out.gif}) from the files {\tt a.gif}, 
 
 The QCad application requires the presence of the Troll Tech \htmladdnormallink{{\tt Qt} Library}{http://www.troll.no/} which underlies the \htmladdnormallink{KDE}{http://www.kde.org/} desktop environment. If you are running Linux it is likely that KDE, and hence the {\tt Qt} library, is already installed. If not, more information about the Troll Tech {\tt Qt} library can be found at \htmladdnormallink{{\tt http://www.kde.org/}}{http://www.kde.org/} and \htmladdnormallink{{\tt http://www.troll.no/}}{http://www.troll.no/}.
 
-\latexonly{Further information on the QCad program can be found at {\tt http://www.qcad.org}.}
+\latex{Further information on the QCad program can be found at {\tt http://www.qcad.org}.}
 
 \subsubsection{XCircuit}
 
@@ -2397,13 +2403,13 @@ The \htmladdnormallink{XCircuit}{http://bach.ece.jhu.edu/~tim/programs/xcircuit/
 
 \myfig{sc15_xcircuit.eps}{height=0.45\textheight}{sc15_xcircuit.gif}{sc15_xcircuit_interface}{The Xcircuit interface.}
 
-\latexonly{Further information on the XCircuit application can be found on the author's web site at {\tt http://bach.ece.jhu.edu/$\sim$tim/programs/xcircuit/}.}
+\latex{Further information on the XCircuit application can be found on the author's web site at {\tt http://bach.ece.jhu.edu/$\sim$tim/programs/xcircuit/}.}
 
 \section{\xlabel{sc15_convert}Format Conversion\label{sc15_convert}}
 
 \subsection{\xlabel{sc15_starlink_convert}CONVERT\label{sc15_starlink_convert}}
 
-The Starlink \xref{CONVERT}{sun55}{} package is used to convert data files between Starlink's Extensible n-dimensional Data Format (\xref{NDF}{sun33}{}), which is used by most Starlink applications, and a number of other common data formats. Using these utilities, astronomers can process their data selecting the best applications from a variety of Starlink or other packages. \latexonly{The package is discussed in depth in SUN/55.}
+The Starlink \xref{CONVERT}{sun55}{} package is used to convert data files between Starlink's Extensible n-dimensional Data Format (\xref{NDF}{sun33}{}), which is used by most Starlink applications, and a number of other common data formats. Using these utilities, astronomers can process their data selecting the best applications from a variety of Starlink or other packages. \latex{The package is discussed in depth in SUN/55.}
 
 Starting up the CONVERT package will also set up defaults for the \xref{automatic NDF conversion}{sun55}{sect_auto} facilities to enable applications which use the \xref{NDF}{sun33}{} library to read and write most of the file formats handled by the CONVERT package. 
 
@@ -2509,7 +2515,7 @@ The output file will be given the same base name as the input file, with its fil
 
 The {\tt prescript} program can be downloaded from \htmladdnormallink{{\tt http://www.nzdl.org/html/prescript.html}}{http://www.nzdl.org/html/prescript.html}.
 
-A possible substitute for {\tt prescript} is the \htmladdnormallink{{\tt pstotext}}{http://www.research.digital.com/SRC/virtualpaper/pstotext.html} utility. \latexonly{ More information can be found at {\tt http://www.research.digital.com/SRC/virtualpaper/pstotext.html}.} 
+A possible substitute for {\tt prescript} is the \htmladdnormallink{{\tt pstotext}}{http://www.research.digital.com/SRC/virtualpaper/pstotext.html} utility. \latex{ More information can be found at {\tt http://www.research.digital.com/SRC/virtualpaper/pstotext.html}.} 
 
 \subsection{\xlabel{sc15_pstopdf}Postscript to PDF\label{sc15_pstopdf}}
 
@@ -2826,7 +2832,7 @@ or if you have more graphics memory (and your X server has been configured to us
 \end{quote}
 \normalsize
 
-There is a down side, since you are now running two X servers you are using twice as much memory, it is inadvisable to try this approach on machines with only a small amount of system memory (RAM). However, yet another additional solution to the problem of Pseudocolor applications and Truecolor desktops is presented\latexonly{ in section~\ref{sc15_vnc}.}
+There is a down side, since you are now running two X servers you are using twice as much memory, it is inadvisable to try this approach on machines with only a small amount of system memory (RAM). However, yet another additional solution to the problem of Pseudocolor applications and Truecolor desktops is presented\latex{ in section~\ref{sc15_vnc}.}
 \begin{htmlonly}
 in the section on the \htmlref{VNC}{sc15_vnc} application.
 \end{htmlonly}
@@ -2930,11 +2936,11 @@ This is not a boot manager; boot managers and VMware are complementary. Boot man
 
 VMWare supports two host operating systems, Linux and Windows NT, and a variety of guest opertaing systems including DOS, Windows, Linux and BSD dervided operating systems. Support for OS/2 and BeOS as guest operating systems is likely to be introduced eventually.
 
-Although it is fairly cheap for academic purchase at US\$99.00 per user licence, \htmladdnormallink{VMWare}{http://www.vmware.com/} is not free. \latexonly{More information about VMWare can be found online at {\tt http://www.vmware.com}.}
+Although it is fairly cheap for academic purchase at US\$99.00 per user licence, \htmladdnormallink{VMWare}{http://www.vmware.com/} is not free. \latex{More information about VMWare can be found online at {\tt http://www.vmware.com}.}
 
 \subsection{\xlabel{sc15_freemwave}plex86 (previously FreeMWare)\label{sc15_freemware}}
 
-There is an open source competitor to \htmlref{VMWare}{sc15_vmware}, called \htmladdnormallink{plex86}{http://www.plex86.org/} (previously called FreeMWare). Since the last edition of this cookbook coding has advanced rapidly and is now actually able to run DOS 6.22 as a guest operating system. However the virtual machine only makes it part way through booting Linux, so for most purposes the application is yet to reach the ``usable'' stage. \latexonly{More information can be found at {\tt http://www.plex86.org/}.}
+There is an open source competitor to \htmlref{VMWare}{sc15_vmware}, called \htmladdnormallink{plex86}{http://www.plex86.org/} (previously called FreeMWare). Since the last edition of this cookbook coding has advanced rapidly and is now actually able to run DOS 6.22 as a guest operating system. However the virtual machine only makes it part way through booting Linux, so for most purposes the application is yet to reach the ``usable'' stage. \latex{More information can be found at {\tt http://www.plex86.org/}.}
 
 \myfig{sc15_plex86_dos.eps}{height=0.42\textheight}{sc15_plex86_dos.gif}{sc15_plex86_example}{plex86 running DOS 6.22 as a ``guest'' operating system.}
 
@@ -2952,7 +2958,7 @@ The \htmladdnormallink{SANE Project}{http://www.mostang.com/sane/} attempts to p
 
 The SANE package is divided into two parts: a selection of {\em backend} hardware drivers which support scanners from different Manufacturers, and a variety of different {\em frontend} GUI applications that sit ontop of the {\em backend} drivers.
 
-SANE has been \htmladdnormallink{ported}{http://www.mostang.com/sane/sane-support.html} to a variety of platforms including Linux, Solaris and Digital UNIX, although the Digital UNIX port is still in need of debugging and is untested. \latexonly{More information on the SANE Project can be found at {\tt http://www.mostang.com/sane/}.}
+SANE has been \htmladdnormallink{ported}{http://www.mostang.com/sane/sane-support.html} to a variety of platforms including Linux, Solaris and Digital UNIX, although the Digital UNIX port is still in need of debugging and is untested. \latex{More information on the SANE Project can be found at {\tt http://www.mostang.com/sane/}.}
 
 \subsection{\xlabel{sc15_camera}Digital Cameras\label{sc15_camera}}
 
@@ -3008,7 +3014,7 @@ The most useful, floodfill changes the matte value of any pixel that matches the
 
 Select your transparent pixel with the pointer and press a button. The image is redisplayed with any transparent pixels recolored to the background color. You can select other pixels or areas to force to transparent. When you are satisfied, press {\tt Return}. 
 
-Alternatively you can do this from the command line using the \htmladdnormallink{{\tt giftrans}}{ftp://ftp.rz.uni-karlsruhe.de/pub/net/www/tools/} program\latexonly{ available via anonymous FTP from \htmladdnormallink{{\tt ftp://ftp.rz.uni-karlsruhe.de/pub/net/www/tools/}}{ftp://ftp.rz.uni-karlsruhe.de/pub/net/www/tools/}}. The {\tt giftrans} program is distributed as part of the {\tt STAR2HTML} Starlink package and should therefore be available on Starlink supported systems.
+Alternatively you can do this from the command line using the \htmladdnormallink{{\tt giftrans}}{ftp://ftp.rz.uni-karlsruhe.de/pub/net/www/tools/} program\latex{ available via anonymous FTP from \htmladdnormallink{{\tt ftp://ftp.rz.uni-karlsruhe.de/pub/net/www/tools/}}{ftp://ftp.rz.uni-karlsruhe.de/pub/net/www/tools/}}. The {\tt giftrans} program is distributed as part of the {\tt STAR2HTML} Starlink package and should therefore be available on Starlink supported systems.
 
 To get a list of the current colourmap for the image use:
 
@@ -3047,7 +3053,7 @@ If you intend to use GIF images on your web pages, you should make yourself awar
 
 \subsection{\xlabel{sc15_animated}Animated GIFs\label{sc15_animated}}
 
-Again there are may perfectly valid ways of going about this, see for instance the \htmlref{WhirlGIF}{sc15_whirlgif} program\latexonly{, discussed in Section~\ref{sc15_whirlgif}}.
+Again there are may perfectly valid ways of going about this, see for instance the \htmlref{WhirlGIF}{sc15_whirlgif} program\latex{, discussed in Section~\ref{sc15_whirlgif}}.
 
 Alternatively we can, make use of the \htmlref{ImageMagick}{sc15_magick} {\tt convert} application with the {\tt -delay} and {\tt -page} options. The {\tt -delay} option is used to specify the delay in $1/100 th$  of a second between the display of each frame of the animation. For example:
 
