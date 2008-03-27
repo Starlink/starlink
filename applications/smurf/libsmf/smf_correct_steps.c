@@ -157,13 +157,21 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
 
 
     /* If data stream too short for box size generate error */
-
     if( (dcbox*2) > ntslice ) {
       *status = SAI__ERROR;
       msgSeti("NTSLICE",ntslice);
       msgSeti("DCBOX",ntslice);
       errRep(FUNC_NAME,
 	     "Can't find jumps: ntslice=^NTSLICE, must be > dcbox(=^DCBOX)*2",
+	     status);
+    }
+
+    /* Check for valid threshold */
+    if( dcthresh <= 0 ) {
+      *status = SAI__ERROR;
+      msgSeti("DCTHRESH",dcthresh);
+      errRep(FUNC_NAME,
+	     "Can't find jumps: dcthresh (^dcthresh) must be > 0",
 	     status);
     }
   }  
