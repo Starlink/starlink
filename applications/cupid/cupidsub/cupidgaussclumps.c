@@ -159,6 +159,9 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
 *        Original version.
 *     7-MAR-2007 (DSB):
 *        Use VELORES instead of FWHMBEAM if the data is 1D.
+*     7-MAR-2007 (DSB):
+*        Guard against segvio caused by use of null pointers that are
+*        returned by astMalloc if an error has occurred.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -324,26 +327,28 @@ HDSLoc *cupidGaussClumps( int type, int ndim, int *slbnd, int *subnd, void *ipd,
       sum_peak = 0.0;
       sum_peak2 = 0.0;
       peaks = astMalloc( sizeof( double )*npeak );
-      for( i = 0; i < npeak; i++ ) peaks[ i ] = 0.0;
+      if( peaks ) {
+         for( i = 0; i < npeak; i++ ) peaks[ i ] = 0.0;
 
 /* More initialisation. */
-      iter = 1;
-      niter = 0;
-      nskip = 0;
-      sumclumps = 0.0;
-      sumdata = VAL__BADD;
+         iter = 1;
+         niter = 0;
+         nskip = 0;
+         sumclumps = 0.0;
+         sumdata = VAL__BADD;
 
 /* Use the setjmp function to define here to be the place to which the
    signal handling function will jump when a signal is detected. Zero is
    returned on the first invocation of setjmp. If a signal is detected,
    a jump is made into setjmp which then returns a positive signal 
    identifier. */
-      if( setjmp( CupidGCHere ) ) {
-         iter = 0;
-         msgBlank( status );
-         msgOut( "", "Interupt detected. Clumps found so far will be saved",
-                 status );
-         msgBlank( status );
+         if( setjmp( CupidGCHere ) ) {
+            iter = 0;
+            msgBlank( status );
+            msgOut( "", "Interupt detected. Clumps found so far will be saved",
+                    status );
+            msgBlank( status );
+         }
       }
 
 /* Set up a signal handler for the SIGINT (interupt) signal. If this

@@ -1,10 +1,12 @@
 #include "sae_par.h"
 #include "ast.h"
+#include "ast_err.h"
+#include "mers.h"
 #include "prm_par.h"
 #include "cupid.h"
 
 int cupidConfigI( AstKeyMap *config, const char *name, int def,
-         int *status ){
+                  int *status ){
 /*
 *+
 *  Name:
@@ -46,6 +48,7 @@ int cupidConfigI( AstKeyMap *config, const char *name, int def,
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -71,6 +74,9 @@ int cupidConfigI( AstKeyMap *config, const char *name, int def,
 *  History:
 *     5-OCT-2005 (DSB):
 *        Original version.
+*     26-MAR-2008 (DSB):
+*        Re-report a more friendly message iof the supplied text could
+*        not be interpreted as a numerical value.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -80,8 +86,8 @@ int cupidConfigI( AstKeyMap *config, const char *name, int def,
 */
 
 /* Local Variables: */
-
    AstObject *sconfig; /* Object pointer obtained from KeyMap */
+   const char *text;   /* Pointer to uninterprted text value */
    int ret;            /* The returned value */
 
 /* Initialise */
@@ -103,6 +109,19 @@ int cupidConfigI( AstKeyMap *config, const char *name, int def,
          if( astMapGet0I( (AstKeyMap *) sconfig, name, &ret ) ) {
             astMapRemove(  (AstKeyMap *) sconfig, name );
 
+/* If the text supplied by the user could not be interpreted as an
+   integer value, re-report the error. */
+         } else if( *status == AST__MPGER ) {
+            ret = def;
+            errAnnul( status );
+            if( astMapGet0C( config, name, &text ) ) {
+               *status = SAI__ERROR;
+               msgSetc( "T", text );
+               msgSetc( "N", name );
+               errRep( "", "Illegal value \"^T\" supplied for configuration "
+                       "parameter ^N.", status );
+            }
+
 /* If the value was not found in either KeyMap, return the default value. */
          } else {
             ret = def;
@@ -118,6 +137,19 @@ int cupidConfigI( AstKeyMap *config, const char *name, int def,
 
 /* Store the returned value in the supplied KeyMap if it is good. */
       if( ret != VAL__BADI ) astMapPut0I( config, name, ret, NULL );
+
+/* If the text supplied by the user could not be interpreted as an
+   integer value, re-report the error. */
+   } else if( *status == AST__MPGER ) {
+      ret = def;
+      errAnnul( status );
+      if( astMapGet0C( config, name, &text ) ) {
+         *status = SAI__ERROR;
+         msgSetc( "T", text );
+         msgSetc( "N", name );
+         errRep( "", "Illegal value \"^T\" supplied for configuration "
+                 "parameter ^N.", status );
+      }
    }
 
 /* Return the result. */

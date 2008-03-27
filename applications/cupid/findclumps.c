@@ -464,7 +464,8 @@ void findclumps( int *status ) {
 *     & Gusten paper). [1.0]
 *     - GaussClumps.Thresh: Gives the minimum peak amplitude of clumps to
 *     be fitted by the GaussClumps algorithm (see also GaussClumps.NPad).
-*     The value should be supplied as a multiple of the RMS noise level. [2.0]
+*     The supplied value is multipled by the RMS noise level before being
+*     used. [2.0]
 *     - GaussClumps.VeloRes: The velocity resolution of the instrument, in
 *     channels. The velocity FWHM of each clump is not allowed to be
 *     smaller than this value. Only used for 3D data. [2.0]
@@ -1407,5 +1408,4 @@ L999:
       errRep( "FINDCLUMPS_ERR5", "FINDCLUMPS: Failed to identify clumps of "
               "emission within a 1, 2 or 3-D NDF.", status );
    }
-
 }
