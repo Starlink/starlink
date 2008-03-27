@@ -13834,6 +13834,12 @@ sub do_cmd_label {
 	(s/$next_pair_pr_rx\n?/$label = $2;''/eo)
 	||(s/$next_pair_rx\n?/$label = $2;''/eo));
     &anchor_label($label,$CURRENT_FILE,$_);
+
+    #  PWD: clean up label by removing newlines, spaces and tabs.
+    $label =~ s/\n//g;
+    $label =~ s/ //g;
+    $label =~ s/\t//g;
+    &anchor_label($label,$CURRENT_FILE,$_);
 }
 
 # This subroutine is also used to process labels in undefined environments
