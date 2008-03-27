@@ -51,9 +51,9 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{htmlonly} and %\end{htmlonly} lines (used by 
+%  Do not remove the %\begin{latexonly} and %\end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{htmlonly}
+%\begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -104,10 +104,46 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
 
+% Define commands for HTML-only or LaTeX-only text.
+\newcommand{\html}[1]{}
+\newcommand{\latex}[1]{#1}
+
+% Use latex2html 98.2.
+\newcommand{\latexhtml}[2]{#1}
+
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
 
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%\end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
 % Shorthands for hypertext links.
 % -------------------------------
 \newcommand{\AIPSref}{\xref{AIPS}{sun207}{}}
@@ -207,37 +243,6 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
 \newcommand{\HTTPBFref}{\htmladdnormallink{\tt http://www.eso.org/online-resources.html}{http://www.eso.org/online-resources.html}} 
 \newcommand{\HTTPBGref}{\htmladdnormallink{\tt http://ecf.hq.eso.org/astro-resources.html}{http://http://ecf.hq.eso.org/astro-resources.html}} 
 
-
-%  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
-
-%  Define command to re-centre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary 
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
-% -----------------------------------------------------------------------------
-%  Debugging.
-%  =========
-
-%  Remove % on the following to debug links in the HTML version using Latex.
-
-% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
-% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
-% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
-% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
-% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%\end{htmlonly}
-% -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
@@ -248,7 +253,7 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
 
 %  Latex document header.
 %  ======================
-\begin{latexonly}
+\begin{latex}
 
    CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
@@ -281,7 +286,7 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
    \end{center}
 
 % ? End of heading for abstract.
-\end{latexonly}
+\end{latex}
 
 %  HTML documentation header.
 %  ==========================
@@ -330,7 +335,7 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
+  \newcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -348,12 +353,12 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
 % ? Latex document Table of Contents (if used).
 %  ===========================================
  \newpage
- \begin{latexonly}
+ \begin{latex}
    \setlength{\parskip}{0mm}
    \latexonlytoc
    \setlength{\parskip}{\medskipamount}
    \markboth{\stardocname}{\stardocname}
- \end{latexonly}
+ \end{latex}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 \cleardoublepage
@@ -492,7 +497,7 @@ including:
 \item Catalogue manipulation - {\CATPACref} and {\CURSAref}.
 \end{itemize}
 \end{htmlonly}
-\begin{latexonly}
+\begin{latex}
 \begin{itemize}
 \item Image processing -- KAPPA (SUN/95), ESP (SUN/180), DAOPHOT (SUN/42), 
       PHOTOM (SUN/45), PISA (SUN/109) and CCDPACK (SUN/139). 
@@ -506,7 +511,7 @@ including:
 \item Graphics -- MONGO (MUD/54), SM, PONGO (SUN/137). 
 \item Catalogue manipulation -- CURSA (SUN/190) and CATPAC (SUN/120).
 \end{itemize}
-\end{latexonly}
+\end{latex}
 
 \subsection{{\STARLINKref} Software Collection -- Documentation} \xlabel{SSC}
 \label{sec:ssc}

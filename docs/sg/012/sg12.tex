@@ -40,9 +40,9 @@ tasks additional packages are loaded to augment the core system.
 Software for processing most sorts of astronomical data is available
 for the IRAF environment.
 
-\begin{latexonly}
+\begin{latex}
 \vspace{5mm}
-\end{latexonly}
+\end{latex}
 
 \begin{center}
 {\bf Who Should Read this Document?}
@@ -102,9 +102,9 @@ to use IRAF or who are using it for the first time.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{htmlonly} and %\end{htmlonly} lines (used by 
+%  Do not remove the %\begin{latexonly} and %\end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{htmlonly}
+%\begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -155,6 +155,13 @@ to use IRAF or who are using it for the first time.}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
 
+% Define commands for HTML-only or LaTeX-only text.
+\newcommand{\html}[1]{}
+\newcommand{\latex}[1]{#1}
+
+% Use latex2html 98.2.
+\newcommand{\latexhtml}[2]{#1}
+
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
@@ -165,7 +172,6 @@ to use IRAF or who are using it for the first time.}
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\newcommand{\latex}[1]{#1}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
@@ -185,7 +191,7 @@ to use IRAF or who are using it for the first time.}
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%\end{htmlonly}
+%\end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 % ? End of document specific commands
@@ -198,7 +204,7 @@ to use IRAF or who are using it for the first time.}
 
 %  Latex document header.
 %  ======================
-\begin{latexonly}
+\begin{latex}
    CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
@@ -225,7 +231,7 @@ to use IRAF or who are using it for the first time.}
       {\Large\bf Abstract}
    \end{center}
 % ? End of heading for abstract.
-\end{latexonly}
+\end{latex}
 
 %  HTML documentation header.
 %  ==========================
@@ -266,7 +272,7 @@ to use IRAF or who are using it for the first time.}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
+  \newcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -304,7 +310,7 @@ to use IRAF or who are using it for the first time.}
   \copyright \underline{1999} Starlink, CCLRC
 
   \cleardoublepage
-  \begin{latexonly}
+  \begin{latex}
     \setlength{\parskip}{0mm}
     \latexonlytoc
 
@@ -316,7 +322,7 @@ to use IRAF or who are using it for the first time.}
 
     \setlength{\parskip}{\medskipamount}
     \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
+  \end{latex}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 

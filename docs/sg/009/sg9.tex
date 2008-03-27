@@ -47,9 +47,9 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{htmlonly} and %\end{htmlonly} lines (used by
+%  Do not remove the %\begin{latexonly} and %\end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{htmlonly}
+%\begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -100,6 +100,13 @@
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
 
+% Define commands for HTML-only or LaTeX-only text.
+\newcommand{\html}[1]{}
+\newcommand{\latex}[1]{#1}
+
+% Use latex2html 98.2.
+\newcommand{\latexhtml}[2]{#1}
+
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
@@ -110,7 +117,6 @@
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\newcommand{\latex}[1]{#1}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
@@ -130,7 +136,7 @@
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%\end{htmlonly}
+%\end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 %
@@ -168,7 +174,7 @@
 
 %  Latex document header.
 %  ======================
-\begin{latexonly}
+\begin{latex}
    CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
@@ -201,7 +207,7 @@
 %     {\Large\bf Abstract}
 %  \end{center}
 % ? End of heading for abstract.
-\end{latexonly}
+\end{latex}
 
 %  HTML documentation header.
 %  ==========================
@@ -246,7 +252,7 @@
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
+  \newcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -264,12 +270,12 @@
 % ? Latex document Table of Contents (if used).
 %  ===========================================
  \newpage
- \begin{latexonly}
+ \begin{latex}
    \setlength{\parskip}{0mm}
    \markboth{Contents}{\stardocname}
    \latexonlytoc
    \setlength{\parskip}{\medskipamount}
- \end{latexonly}
+ \end{latex}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -347,10 +353,10 @@ data taken using the Hamilton Spectrograph:
 Data Reduction  Using the Image Reduction Analysis Facility,}}
 {http://www.star.ucl.ac.uk/\~{}mjc/echelle/misc/LickTech74.ps.gz} which is a
 Lick Observatory Technical report\@.
-\begin{latexonly}
+\begin{latex}
 (A PostScript copy is available from the Starlink Echelle Support
 Pages.)
-\end{latexonly}
+\end{latex}
 This is a complete
 step-by-step run through of \'{e}chelle data reduction using
 IRAF\sgspec{---}{ - }from CCD data to calibrated spectra.
@@ -729,7 +735,7 @@ in the \'{e}chelle data reduction process.}{}
 the natural steps in the reduction process is handled by a task.
 This is the top-level menu presented by ECHMENU:
 
-\begin{latexonly}
+\begin{latex}
 \begin{verbatim}
   0. HELP/HYPER (ASCII or hypertext help).
   1. Start a reduction.                 16. Check trace consistency.
@@ -749,7 +755,7 @@ This is the top-level menu presented by ECHMENU:
  15. Plot order traces.                 30. Output balance-factor frame.
                                         31. EXIT (alias Q/E/QUIT/EXIT/99).
 \end{verbatim}
-\end{latexonly}
+\end{latex}
 \begin{htmlonly}
 \begin{rawhtml}
 <PRE WIDTH=80>
@@ -774,7 +780,7 @@ This is the top-level menu presented by ECHMENU:
 \end{rawhtml}
 \end{htmlonly}
 
-\begin{latexonly}
+\begin{latex}
 \begin{figure}
 \begin{center}
 \setlength{\unitlength}{1cm}
@@ -860,7 +866,7 @@ This is the top-level menu presented by ECHMENU:
 }
 \end{center}
 \end{figure}
-\end{latexonly}
+\end{latex}
 
 In this section each of the major steps is outlined and some of the
 important and perhaps tricky considerations are mentioned.
@@ -1739,7 +1745,7 @@ factors to be considered with basic functionality {\em etc.}
 Here's a table which lists some useful commands for each of the three
 packages mentioned previously:
 
-\begin{latexonly}
+\begin{latex}
 \begin{table}
 \begin{center}
 {\sl
@@ -1787,7 +1793,7 @@ Merge              & {\tt scombine        } & {\tt ech\_mulmrg   } & {\tt MERGRE
 \end{tabular}
 \end{center}
 \end{table}
-\end{latexonly}
+\end{latex}
 \begin{htmlonly}
 {\sl
 IRAF commands are from the {\tt noao.imred.echelle} package unless otherwise
