@@ -32313,8 +32313,8 @@ f     affects the behaviour of the AST_WRITE and AST_READ routines when
 *     - "FITS-CLASS": Encodes coordinate system information in FITS
 *     header cards using the conventions used by the CLASS project.
 *     CLASS is a software package for reducing single-dish radio and
-*     sub-mm spectroscopic data. See 
-*     http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html.
+*     sub-mm spectroscopic data. See the section "CLASS FITS format" at
+*     http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/.
 *
 *     - "NATIVE": Encodes AST Objects in FITS header cards using a
 *     convention which is private to the AST library (but adheres to
