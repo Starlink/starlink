@@ -167,6 +167,10 @@
 *        Double the pixel size used when all points are deemed to be
 *        co-incident, in order to reduce the risk of points ending up in
 *        adjacent pixels.
+*     28-MAR-2008 (DSB):
+*        Use the size of the Airy disk (which is a function of local
+*        oscillator frequency) as the criterion for all points being 
+*        co-incident.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -212,7 +216,7 @@
 
 /* SMURF includes */
 #include "smurf_par.h"
-#include "libsmf/smf.h"
+#include "smf.h"
 #include "sc2da/sc2ast.h"
 
 #define FUNC_NAME "smf_cubegrid"
@@ -267,6 +271,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    double sep;           /* Separation between first and last base positions */
    double skyref[ 2 ];   /* Values for output SkyFrame SkyRef attribute */
    float *pdata;         /* Pointer to next data sample */
+   float telres;         /* Telescope resolution in radians */
    int coin;             /* Are all points effectively co-incident? */
    int found;            /* Was current detector name found in detgrp? */
    int good;             /* Are there any good detector samples? */
@@ -389,6 +394,11 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
          break;
       }
 
+/* Calculate the telescope resolution (in radians) is this has not already 
+   been done. */
+      if( ifile == 1 ) telres = smf_calc_telres( hdr->fitshdr, status )
+                                *AST__DD2R/3600.0; 
+
 /* If the detector positions are to calculated on the basis of FPLANEX/Y
    rather than RECEPPOS, then free the detpos array in the smfHead
    structure. This will cause smf_tslice_ast to use the fplanex/y values. */
@@ -437,9 +447,6 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    set to the epoch of the time slice. */
          smf_tslice_ast( data, itime, 1, status );
          swcsin = hdr->wcs;
-
-
-
 
 /* Get a pointer to the current WCS Frame in the input file. */
          skyin = astGetFrame( swcsin, AST__CURRENT );
@@ -697,12 +704,12 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
          kpg1Opgrd( nallpos, allpos, strcmp( usesys, "AZEL" ), par, &rdiam, 
                     status );
 
-/* See if all the points are effectively co-incident (i.e. within a radius 
-   of 2.0 arcsec). If so, we use default grid parameters that result in a 
-   grid of 1x1 spatial pixels. The grid pixel sizes (par[4] and par[5]) 
-   are made larger than the area covered by the points in order to avoid 
-   points spanning two pixels. */
-         if( rdiam < 2.0*AST__DD2R/3600.0 || nallpos < 3 ) {
+/* See if all the points are effectively co-incident (i.e. within an Airy
+   disk). If so, we use default grid parameters that result in a grid of 
+   1x1 spatial pixels. The grid pixel sizes (par[4] and par[5]) are made 
+   larger than the area covered by the points in order to avoid points 
+   spanning two pixels. */
+         if( rdiam < telres || nallpos < 3 ) {
             if( rdiam < 0.1*AST__DD2R/3600.0 ) rdiam = 0.1*AST__DD2R/3600.0;
             par[ 0 ] = 0.0;
             par[ 1 ] = 0.0;

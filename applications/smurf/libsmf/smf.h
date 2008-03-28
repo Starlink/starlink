@@ -256,6 +256,8 @@
 *        - Added syncbad to smf_update_quality interface
 *     2008-03-27 (DSB):
 *        - Added smf_getobsidss.
+*     2008-03-28 (DSB):
+*        - Added smf_calc_telres.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -833,5 +835,7 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
 void smf_reportprogress( int max, int *status );
 
 const char *smf_getobsidss( AstFitsChan *hdr, int *status );
+
+float smf_calc_telres( AstFitsChan *hdr, int *status );
 
 #endif /* SMF_DEFINED */
