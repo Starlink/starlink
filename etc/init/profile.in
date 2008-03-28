@@ -255,9 +255,10 @@ if test -f ${bindir}/figaro/figaro.csh; then
    export FIGARO_PROG_N=${bindir}/figaro
 fi
 
-#  Fluxes
+#  Fluxes - note that we can run with fluxes.csh
+#           (assuming that csh exists on the system)
 
-if test -f ${bindir}/fluxes/fluxes.sh; then
+if test -f ${bindir}/fluxes/fluxes.csh; then
    export FLUXES_DIR=${bindir}/fluxes
 fi
 
