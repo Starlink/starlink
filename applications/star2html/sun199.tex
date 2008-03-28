@@ -1392,8 +1392,8 @@ whole prologue, then try the following sequence of changes:
       ``debugging'' section (all commands visible in your document now
       override any that \latextohtml\ may know about in any fashion,
       i.e. builtins, from style files etc., so must be hidden). Now
-      rename \verb#%#\verb#\end{rawtex}# to \verb#%#\verb#\end{latexonly}#
-      and \verb#%#\verb#\begin{rawtex}# to \verb#%#\verb#\end{latexonly}#.
+      rename \verb#%#\verb#\end{rawtex}# to \verb#%#\verb#end{latexonly}#
+      and \verb#%#\verb#\begin{rawtex}# to \verb#%#\verb#begin{latexonly}#.
 \item Move your \verb#sst.tex# definitions into the prologue.
 \item Change any \verb#\renewcommands# in \verb#htmlonly# environments
       to \verb#\newcommands# (this includes the SST definitions).
