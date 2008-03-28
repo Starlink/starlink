@@ -1,5 +1,12 @@
-#! @TCLSH@
-#
+#!/bin/sh
+# The next lines are executed by /bin/sh, but not Tcl \
+if test -f @TCLSH@; then \
+   exec @TCLSH@ $0 ${1+"$@"} ; \
+else \
+   exec tclsh $0 ${1+"$@"}; \
+fi
+# Which sees it as an extended comment.
+
 #  This script tries to generate the help files for an Starlink/IRAF
 #  package from the (Starlink) <package>.hlp file.
 #

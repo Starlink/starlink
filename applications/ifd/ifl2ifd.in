@@ -1,4 +1,11 @@
-#! @TCLSH@
+#!/bin/sh
+# The next lines are executed by /bin/sh, but not Tcl \
+if test -f @TCLSH@; then \
+   exec @TCLSH@ $0 ${1+"$@"} ; \
+else \
+   exec tclsh $0 ${1+"$@"}; \
+fi
+# Which sees it as an extended comment.
 
 #  Each keyword in the interface file is defined as a tcl procedure so that
 #  the ifl file can be executed as a tcl script. However, some processing

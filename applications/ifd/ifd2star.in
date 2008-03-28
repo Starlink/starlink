@@ -1,5 +1,12 @@
-#! @STARTCLSH@
-#
+#!/bin/sh
+# The next lines are executed by /bin/sh, but not Tcl \
+if test -f @TCLSH@; then \
+   exec @TCLSH@ $0 ${1+"$@"} ; \
+else \
+   exec tclsh $0 ${1+"$@"}; \
+fi
+# Which sees it as an extended comment.
+
 # This script converts an interface definition (ifd) file to one or more
 #  ADAM interface (ifl) files.
 #
@@ -48,7 +55,7 @@
 #    29-JAN-2007 (TIMJ):
 #       Do not want quotes on "obey" commands in sh
 
-source @bindir@/ifd_front.tcl
+source [file dirname [info script]]/ifd_front.tcl
 
 global Date
 global Ifd
