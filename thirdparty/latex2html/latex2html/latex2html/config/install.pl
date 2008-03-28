@@ -394,10 +394,10 @@ if($cfg{TEXPATH}) {
         }
       }
       closedir(DIR);
-      if($ok && $cfg{MKTEXLSR}) {
-        print "Info: Running $cfg{MKTEXLSR} to rebuild ls-R database...\n";
-        system($cfg{MKTEXLSR});
-      }
+      #if($ok && $cfg{MKTEXLSR}) {
+      #  print "Info: Running $cfg{MKTEXLSR} to rebuild ls-R database...\n";
+      #  system($cfg{MKTEXLSR});
+      #}
     }
   }
 }
