@@ -47,6 +47,8 @@
 *        Pass nSubsys to putFits.
 *     2008-03-25 (JB):
 *        getWCS returns AstFrameSet.
+*     2008-03-28 (JB):
+*        Add getRecepNames and getTransition.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -249,6 +251,15 @@ mapVars *mapVars,    /* map/chop/scan variables (given and returned) */
 int *status          /* global status (given and returned) */
 );
 
+void gsdac_getRecepNames
+(
+const gsdVars *gsdVars, /* GSD headers and arrays (given) */
+char *recepNames[],  /* receptor names (given and returned) */
+int recepFlags[],    /* flags for which receptors were used 
+                        (given and returned) */
+int *status          /* global status (given and returned) */
+);
+
 void gsdac_getSampleMode
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
@@ -262,6 +273,14 @@ void gsdac_getStartIdx
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 const char *samMode, /* sampling mode (given) */
 int *startIdx,       /* start index into pattern (given and returned) */
+int *status          /* global status (given and returned) */
+);
+
+void gsdac_getTransition
+(
+const gsdVars *gsdVars, /* GSD headers and arrays (given) */ 
+char *molecule,      /* name of molecule (given and returned) */
+char *transiti,      /* transition (given and returned) */
 int *status          /* global status (given and returned) */
 );
 
@@ -285,6 +304,7 @@ const int obsNum,    /* observation number (given) */
 const int utDate,    /* UT date (given) */
 const int nSteps,    /* number of time steps in observation (given) */
 const char *backend, /* name of the backend (given) */
+const int recepsUsed,/* number of receptors actually used (given) */
 char *recepNames[],  /* names of receptors (given) */
 const char *samMode, /* sample mode (given) */
 const char *obsType, /* observation type (given) */
@@ -322,6 +342,7 @@ const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 const unsigned int nSteps,    /* number of time steps (given) */
 const unsigned int stepNum,   /* time step of this spectrum (given) */
 const int subBandNum, /* subband number (given) */
+const int recepFlags[], /* flags for which receptors were used (given) */
 const dasFlag dasFlag,  /* DAS file structure flag (given) */
 const JCMTState *record,      /* JCMTState headers (given) */
 struct ACSISSpecHdr *specHdr, /* ACSIS Spec Headers (given and returned ) */

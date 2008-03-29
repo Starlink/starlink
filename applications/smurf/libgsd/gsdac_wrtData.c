@@ -65,6 +65,8 @@
 *        Check for actual number of used receptors.
 *     2008-03-25 (JB):
 *        Write WCSFrame to the FITSchan.
+*     2008-03-28 (JB):
+*        Check for number of receptors used.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -110,7 +112,7 @@
 
 #define FUNC_NAME "gsdac_wrtData"
 
-#define MAXRECEP 8  
+#define MAXRECEP 2  
 #define MAXSUBSYS 16
 
 void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory, 
@@ -143,7 +145,9 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   char *OCSConfig = NULL;     /* OCS configuration XML */
   JCMTState *record = NULL;   /* JCMT state information for the 
                                  current spectrum */
+  int recepFlags[MAXRECEP];   /* flags for which receptors were used */
   char *recepNames[MAXRECEP]; /* names of the receptors */
+  int recepsUsed;             /* number of used receptors */
   char samMode[SZFITSCARD];   /* sampling mode (raster or grid) */
   ACSISSpecHdr *specHdr;      /* ACSIS spectrum-specific information */
   unsigned long specIndex;    /* index into spectral data */
@@ -182,59 +186,10 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
     fPlaneY[i] = 0.0;
   }
 
-  /* Check to make sure we have the right number of receptors for
-     this frontend, and copy the receptor names. */
-  if ( gsdVars->centreFreqs[0] < 290.0 ) {
+  /* Find out which receptors were used. */
+  gsdac_getRecepNames ( gsdVars, recepNames, recepFlags, status );
 
-    if ( gsdVars->nFEChans != 1 ) {
-      *status = SAI__ERROR;
-      errRep ( FUNC_NAME, "Front end is receiver A but has more than 1 receptor", status );
-      return;
-    }
-
-    strncpy ( recepNames[0], "A", 2 );
-
-  } else if ( gsdVars->centreFreqs[0] < 395.0 ) {
-
-    if ( gsdVars->nFEChans != 2 ) {
-      *status = SAI__ERROR;
-      errRep ( FUNC_NAME, "Front end is receiver B but does not have 2 receptors", 
-               status ); 
-      return; 
-    }
-    
-    strncpy ( recepNames[0], "BA", 3 );
-    strncpy ( recepNames[1], "BB", 3 );   
-
-  } else if ( gsdVars->centreFreqs[0] < 600.0 ) {
-
-    if ( gsdVars->nFEChans != 2 ) {
-      *status = SAI__ERROR;
-      errRep ( FUNC_NAME, "Front end is receiver C but does not have 2 receptors", 
-               status ); 
-      return; 
-    }
-    
-    strncpy ( recepNames[0], "CA", 3 );
-    strncpy ( recepNames[1], "CB", 3 ); 
-   
-  } else if ( gsdVars->centreFreqs[0] < 750 ) {
-
-    if ( gsdVars->nFEChans != 2 ) {
-      *status = SAI__ERROR;
-      errRep ( FUNC_NAME, "Front end is receiver D but does not have 2 receptors", 
-               status ); 
-      return; 
-    }
-
-    strncpy ( recepNames[0], "DA", 3 );
-    strncpy ( recepNames[1], "DB", 3 );
-
-  } else {
-    *status = SAI__ERROR;
-    errRep ( FUNC_NAME, "Couldn't obtain receptor names.", status ); 
-    return; 
-  }
+  recepsUsed = recepFlags[0] + recepFlags[1];
 
   /* Determine how much memory we need and set the memory
      allocation in specwrite accordingly.  acsSpecSetMem wants
@@ -248,24 +203,12 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
 	     "Preparing file writing system", status); 
 
   /* Find out how many subsystems there are (number of subbands
-     divided by number of receptors).  First check for instances
-     where one receptor wasn't used. */
-  if ( gsdVars->nBESections < gsdVars->nFEChans ) { 
+     divided by number of receptors). */
+  nSubsys = gsdVars->nBESections / recepsUsed;
 
-    nSubsys = 1;
-    acsSpecOpenTS ( directory, utDate, obsNum, 1, 
-                    nSubsys, recepNames, focalStation, 
-                    fPlaneX, fPlaneY, OCSConfig, status );
-
-  } else { 
-
-    nSubsys = gsdVars->nBESections / gsdVars->nFEChans;
-
-    acsSpecOpenTS ( directory, utDate, obsNum, gsdVars->nFEChans, 
-                    nSubsys, recepNames, focalStation, 
-                    fPlaneX, fPlaneY, OCSConfig, status );
-
-  }
+  acsSpecOpenTS ( directory, utDate, obsNum, recepsUsed, 
+                  nSubsys, recepNames, focalStation, 
+                  fPlaneX, fPlaneY, OCSConfig, status );
 
   /* Truncate the name of the backend. */
   cnfImprt ( gsdVars->backend, 16, backend );
@@ -339,8 +282,8 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
       	                    wcs, record, status );
 
       /* Get the ACSIS SpecHdr. */
-      gsdac_putSpecHdr ( gsdVars, nSteps, stepNum, subBandNum, dasFlag, record, 
-      	                 specHdr, status );
+      gsdac_putSpecHdr ( gsdVars, nSteps, stepNum, subBandNum, recepFlags, 
+                         dasFlag, record, specHdr, status );
 
       msgOutif(MSG__VERB," ", "Writing data", status); 
 
@@ -357,8 +300,8 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
 
       /* Fill the FITS headers. */
       gsdac_putFits ( gsdVars, subBandNum, nSubsys, obsNum, utDate, nSteps, 
-                      backend, recepNames, samMode, obsType, &dateVars, 
-                      &mapVars, wcs, fitschan[fitsIndex], status );
+                      backend, recepsUsed, recepNames, samMode, obsType, 
+                      &dateVars, &mapVars, wcs, fitschan[fitsIndex], status );
 
       /* Write the WCSFrame information to the fitschan. */
       astWrite ( fitschan[fitsIndex], WCSFrame );

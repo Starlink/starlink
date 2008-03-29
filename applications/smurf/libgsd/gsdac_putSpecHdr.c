@@ -15,6 +15,7 @@
 *  Invocation:
 *     gsdac_putSpecHdr ( const gsdVars *gsdVars, const int nSteps,
 *                        const unsigned int stepNum, const int subBandNum,
+*                        const int recepFlags[],
 *                        const dasFlag dasFlag, const JCMTState *record,
 *                        struct ACSISSpecHdr *specHdr, int *status );
 
@@ -27,6 +28,8 @@
 *        Time step of this spectrum
 *     subBandNum = const int (Given)
 *        Subband number
+*     recepFlags = const int[] (Given)
+*        Flags for which receptors were used
 *     dasFlag = const dasFlag (Given)
 *        DAS file structure type
 *     record = const JCMTState* (Given)
@@ -55,6 +58,9 @@
 *        Replace subsysNum with subBandNum
 *     2008-03-19 (JB):
 *        Removed unused variables.
+*     2008-03-28 (JB):
+*        Check which receptors were used.
+
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -99,6 +105,7 @@
 
 void gsdac_putSpecHdr ( const gsdVars *gsdVars, const unsigned int nSteps,
                         const unsigned int stepNum, const int subBandNum,
+                        const int recepFlags[],
                         const dasFlag dasFlag, const JCMTState *record,
                         struct ACSISSpecHdr *specHdr, int *status )
 {
@@ -121,7 +128,13 @@ void gsdac_putSpecHdr ( const gsdVars *gsdVars, const unsigned int nSteps,
   specHdr->rts_endnum = nSteps + 1;
   specHdr->acs_feedx = record->tcs_tr_ac1;
   specHdr->acs_feedy = record->tcs_tr_ac2;
-  specHdr->acs_feed = gsdVars->BESubsys[subBandNum];
+
+  /* Check to see if only the "second" receptor was used. */
+  if ( recepFlags[0] == 0 && recepFlags[1] == 1 ) 
+    specHdr->acs_feed = gsdVars->mixNums[subBandNum] - 2;
+  else
+    specHdr->acs_feed = gsdVars->mixNums[subBandNum] - 1;
+
   specHdr->acs_tsys = gsdVars->sourceSysTemps[index];
   specHdr->acs_trx = gsdVars->recTemps[subBandNum];
 

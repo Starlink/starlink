@@ -17,7 +17,8 @@
 *     gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 *                     const int nSubsys, const int obsNum, 
 *                     const int utDate, const int nSteps, 
-*                     const char *backend, char *recepNames[],
+*                     const char *backend, const int recepsUsed,
+*                     char *recepNames[],
 *                     const char *samMode, const char *obsType,
 *                     const dateVars *dateVars, const mapVars *mapVars,
 *                     const gsdWCS *wcs,
@@ -38,6 +39,8 @@
 *        Number of time steps in observation
 *     backend = const char* (Given)
 *        Name of the backend
+*     recepsUsed = const int (Given)
+*        Number of receptors actually used
 *     recepnames = char*[] (Given)
 *        Names of receptors
 *     samMode = const char* (Given)
@@ -87,6 +90,8 @@
 *        Removed unused variables.
 *     2008-03-24 (JB):
 *        Calculate intTime and nMix.
+*     2008-03-28 (JB):
+*        Find molecule and transition using LUT.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -132,7 +137,8 @@
 void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
                      const int nSubsys, const int obsNum, 
                      const int utDate, const int nSteps, 
-                     const char *backend, char *recepNames[],
+                     const char *backend, const int recepsUsed, 
+                     char *recepNames[],
                      const char *samMode, const char *obsType,
                      const dateVars *dateVars, const mapVars *mapVars,
                      const gsdWCS *wcs, 
@@ -193,15 +199,24 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
  
   /* Truncate the object names and concatenate. */
   cnfImprt ( gsdVars->object1, 16, object );
-  cnfImprt ( gsdVars->object2, 16, object2 );
 
-  if ( strncmp ( object2, " ", 1 ) != 0 ) {
+  if ( strncmp ( gsdVars->object2, " ", 1 ) != 0 ) {
+
+    cnfImprt ( gsdVars->object2, 16, object2 );
     strcat ( object, ", " ); 
     strcat ( object, object2 );
+
   }
 
   /* Determine if this is a spectral line standard. */
-  standard = 0;//k
+  /* Loop through the array of standards and see if the object matches
+     one of them. */
+  standard = 0;
+  for ( i = 0; i < STANDARDS_SIZE; i++ ) {
+    if ( strcmp ( object, standards[i] ) == 0 ) {
+      standard = 1;
+    }
+  }
 
   /* Copy the obsID into the obsIDSS and add the subsystem number. */
   sprintf ( obsIDSS, "%s_%i", dateVars->obsID, 
@@ -230,11 +245,8 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   /* ACSIS Specific. */
 
-  /* Get the molecule. */
-  strcpy ( molecule, "" );//k
-
-  /* Get the transition. */
-  strcpy ( transiti, "" );//k
+  /* Get the molecule and transition. */
+  gsdac_getTransition ( gsdVars, molecule, transiti, status );
 
   /* Get the bandwidth setup. */
 /***** NOTE: may be different for rxb widebands *****/  
@@ -274,7 +286,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   /* Get the names of the receptors. */
   strcpy ( recptors, recepNames[0] );
-  for ( i = 1; i < gsdVars->nFEChans; i++ ) {
+  for ( i = 1; i < recepsUsed; i++ ) {
     strcat ( recptors, " " );
     strcat ( recptors, recepNames[i] );   
   }
@@ -306,7 +318,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   if ( parse == 0 || parse == EOF ) {
 
-    msgOut ( FUNC_NAME, "Couldn't convert CSO tau time.", status );
+    msgOut ( FUNC_NAME, "Couldn't convert CSO tau time, continuing anyway.", status );
     strcpy ( tauDatSt, "" );
 
   } else {
