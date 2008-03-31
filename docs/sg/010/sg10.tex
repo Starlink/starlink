@@ -1,4 +1,11 @@
-\documentstyle[11pt,twoside,epsf]{article}
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+\usepackage{graphicx}        %  Use this one for final production.
+\usepackage{epsfig}          %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
@@ -51,9 +58,9 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{latexonly} and %\end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{latexonly}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -141,7 +148,7 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%\end{latexonly}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 % Shorthands for hypertext links.
@@ -253,8 +260,7 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
 
 %  Latex document header.
 %  ======================
-\begin{latex}
-
+\begin{latexonly}
    CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
@@ -286,7 +292,7 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
    \end{center}
 
 % ? End of heading for abstract.
-\end{latex}
+\end{latexonly}
 
 %  HTML documentation header.
 %  ==========================
@@ -299,14 +305,12 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
    \begin{rawhtml} </H1> \end{rawhtml}
 
 % ? Add picture here if required.
-   \begin{center}
    \vspace{10mm}
    \begin{center}
    \begin{figure}[h]
    \leavevmode
    \centering \epsffile{sg10_front.ps}
    \end{figure}
-   \end{center}
 
 % ? End of picture
 
@@ -353,12 +357,12 @@ WWW URLs are provided for WWW-based resources such a databases, catalogues and o
 % ? Latex document Table of Contents (if used).
 %  ===========================================
  \newpage
- \begin{latex}
+ \begin{latexonly}
    \setlength{\parskip}{0mm}
    \latexonlytoc
    \setlength{\parskip}{\medskipamount}
    \markboth{\stardocname}{\stardocname}
- \end{latex}
+ \end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 \cleardoublepage
@@ -497,7 +501,7 @@ including:
 \item Catalogue manipulation - {\CATPACref} and {\CURSAref}.
 \end{itemize}
 \end{htmlonly}
-\begin{latex}
+\begin{latexonly}
 \begin{itemize}
 \item Image processing -- KAPPA (SUN/95), ESP (SUN/180), DAOPHOT (SUN/42), 
       PHOTOM (SUN/45), PISA (SUN/109) and CCDPACK (SUN/139). 
@@ -511,7 +515,7 @@ including:
 \item Graphics -- MONGO (MUD/54), SM, PONGO (SUN/137). 
 \item Catalogue manipulation -- CURSA (SUN/190) and CATPAC (SUN/120).
 \end{itemize}
-\end{latex}
+\end{latexonly}
 
 \subsection{{\STARLINKref} Software Collection -- Documentation} \xlabel{SSC}
 \label{sec:ssc}
@@ -635,7 +639,7 @@ available by using {\OBSERVEref} (see \S{\ref{sec:observe}}), with SKYCAL and
 PREDICT (see \S{\ref{sec:skycal}} or \S{\ref{sec:predict}} respectively) offering
 other sources of information.
 
-\subsection{Binary star predictions} \xlabel{BINARY}
+\subsection{Binary-star predictions} \xlabel{BINARY}
 \label{sec:binary}
 
 Those of you interested in predictions of the phase of binary stars 
