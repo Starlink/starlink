@@ -1,3 +1,6 @@
+2.1-2
+  * A memory overrun bug storing and retrieving parameter names has been 
+    fixed. Note this only concerned the C interface.
 
 2.1
 
