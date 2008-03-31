@@ -1356,8 +1356,9 @@ The simplest way to upgrade your document is to change it to use the
 appropriate new template (\textit{e.g.} \verb#sun.tex#) and to use the
 new version of \verb#sst.tex#, if appropriate. Another change you must
 make is to modify any \verb#\latexonly{}# commands to use the
-equivalent \verb#\latex{}# command (\verb#\latexonly{}# has been
-reused for a ``better purpose'').
+equivalent \verb#\latex{}# command. Note that \verb#\latexonly# as an
+environment (\verb#\begin{latexonly} \end{latexonly}#) can continue to be
+used, this is just a change to the command form.
 
 Note that if you are using \verb#sst.tex# then it \emph{must} now be
 included in the document prologue, not in the text. Now if you have
@@ -1397,7 +1398,8 @@ whole prologue, then try the following sequence of changes:
 \item Move your \verb#sst.tex# definitions into the prologue.
 \item Change any \verb#\renewcommands# in \verb#htmlonly# environments
       to \verb#\newcommands# (this includes the SST definitions).
-\item Change any \verb#\latexonly{}# commands to \verb#\latex{}#.
+\item Change any \verb#\latexonly{}# commands to \verb#\latex{}# 
+(leave your \verb#latexonly# environments as they are).
 \item Modify the font declaration in the SST definitions to:
 \begin{quote}
 \begin{verbatim}
