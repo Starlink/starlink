@@ -179,6 +179,7 @@
 #include "star/hds.h"
 #include "star/ndg.h"
 #include "star/grp.h"
+#include "star/atl.h"
 #include "star/kaplibs.h"
 #include "par.h"
 
