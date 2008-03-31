@@ -117,9 +117,9 @@ observing programme and photometric system you are using.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{latexonly} and %\end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{latexonly}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -206,7 +206,7 @@ observing programme and photometric system you are using.}
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%\end{latexonly}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 % ? End of document specific commands
@@ -219,7 +219,7 @@ observing programme and photometric system you are using.}
 
 %  Latex document header.
 %  ======================
-\begin{latex}
+\begin{latexonly}
    CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
@@ -246,7 +246,7 @@ observing programme and photometric system you are using.}
       {\Large\bf Abstract}
    \end{center}
 % ? End of heading for abstract.
-\end{latex}
+\end{latexonly}
 
 %  HTML documentation header.
 %  ==========================
@@ -306,7 +306,8 @@ observing programme and photometric system you are using.}
 %  ===========================================
  \newpage
 
- \subsection*{Revision history}
+ \latex{\subsection*{Revision history}}
+ \html{\section*{Revision history}}
 
  \begin{enumerate}
 
@@ -330,7 +331,7 @@ observing programme and photometric system you are using.}
  \stardoccopyright
 
  \cleardoublepage
- \begin{latex}
+ \begin{latexonly}
    \setlength{\parskip}{0mm}
    \latexonlytoc
 
@@ -340,7 +341,7 @@ observing programme and photometric system you are using.}
 
    \setlength{\parskip}{\medskipamount}
    \markboth{\stardocname}{\stardocname}
- \end{latex}
+ \end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 \cleardoublepage
@@ -360,8 +361,14 @@ The difficulty of reducing all these magnitudes to one and the same
 {\it homogeneous}\, and {\it rational}\, scale has however, not been
 altogether overcome. 
 
+\begin{latexonly}
 {\it Plan of Selected Areas},    \raggedleft \\
 J.C.~Kapteyn, 1906.              \raggedleft
+\end{latexonly}
+\begin{htmlonly}
+{\it Plan of Selected Areas}, \\
+J.C.~Kapteyn, 1906.
+\end{htmlonly}
 \end{quote}
 
 Nearly a century has passed since Prof.~Kapteyn made this remark and
@@ -1724,7 +1731,7 @@ term compensates for the mismatch between the instrumental and standard
 systems.  For example, for the Johnson-Morgan {\it UBV}\, system the
 calibration formul\ae\ are:
 
-\begin{latex}
+\begin{latexonly}
   \begin{eqnarray}
    U & = & U_{\rm inst} - A_{u} + Z_{u} + C_{u} ( U - B ) + \kappa_{u} X
      \nonumber  \\
@@ -1733,7 +1740,7 @@ calibration formul\ae\ are:
    V & = & V_{\rm inst} - A_{v} + Z_{v} + C_{v} ( B - V ) + \kappa_{v} X
      \nonumber
   \end{eqnarray}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
 
   \begin{equation}
@@ -3401,7 +3408,7 @@ reduction.  Hence it is only mentioned here briefly in an appendix.
 %  The next paragraph exists in two version - one for latex and one
 %  for hypertext, so that the maths in the footnote is processed 
 %  correctly for hypertext. 
-\begin{latex}
+\begin{latexonly}
 The main components of the ISM are gas and dust.  Interstellar gas will
 tend to absorb (and re-radiate in a different wave-band) and dust will
 scatter the stellar radiation. These effective losses are known
@@ -3424,7 +3431,7 @@ line of sight. We can define a function:
    {\rm \AA)}}
 \end{equation}
 
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
 The main components of the ISM are gas and dust.  Interstellar gas will
 tend to absorb (and re-radiate in a different wave-band) and dust will

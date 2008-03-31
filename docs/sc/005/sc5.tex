@@ -51,9 +51,7 @@ Additional material outlines some of the differences between using
 conventional optical CCDs and the similar arrays used to observe at
 infrared wavelengths.
 
-\begin{latexonly}
-\vspace{5mm}
-\end{latexonly}
+\latex{\vspace{5mm}}
 
 \begin{center}
 {\bf Who Should Read this Cookbook?}
@@ -112,9 +110,9 @@ CCD camera.  No prior knowledge of CCD data reduction is assumed.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{latexonly} and %\end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{latexonly}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -189,6 +187,8 @@ CCD camera.  No prior knowledge of CCD data reduction is assumed.}
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
+\newcommand{\latexonlylof}[0]{\listoffigures}
+\newcommand{\latexonlylot}[0]{\listoftables}
 
 % -----------------------------------------------------------------------------
 %  Debugging.
@@ -201,7 +201,7 @@ CCD camera.  No prior knowledge of CCD data reduction is assumed.}
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%\end{latexonly}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 % ? End of document specific commands
@@ -214,7 +214,7 @@ CCD camera.  No prior knowledge of CCD data reduction is assumed.}
 
 %  Latex document header.
 %  ======================
-\begin{latex}
+\begin{latexonly}
    CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
@@ -241,7 +241,7 @@ CCD camera.  No prior knowledge of CCD data reduction is assumed.}
       {\Large\bf Abstract}
    \end{center}
 % ? End of heading for abstract.
-\end{latex}
+\end{latexonly}
 
 %  HTML documentation header.
 %  ==========================
@@ -281,6 +281,8 @@ CCD camera.  No prior knowledge of CCD data reduction is assumed.}
     <H2>Contents</H2>
   \end{rawhtml}
   \newcommand{\latexonlytoc}[0]{}
+  \newcommand{\latexonlylof}[0]{}
+  \newcommand{\latexonlylot}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -300,6 +302,7 @@ CCD camera.  No prior knowledge of CCD data reduction is assumed.}
   \newpage
   \vspace{3cm}
 
+  \begin{latexonly}
   \subsection*{Revision history}
 
   \begin{enumerate}
@@ -318,20 +321,21 @@ CCD camera.  No prior knowledge of CCD data reduction is assumed.}
  \end{enumerate}
 
  \vspace*{\fill}
+ \end{latexonly}
  \stardoccopyright
 
  \cleardoublepage
- \begin{latex}
+ \begin{latexonly}
    \setlength{\parskip}{0mm}
    \latexonlytoc
 
    \newpage
-   \listoffigures
-   \listoftables
+   \latexonlylot
+   \latexonlylof
 
    \setlength{\parskip}{\medskipamount}
    \markboth{\stardocname}{\stardocname}
- \end{latex}
+ \end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 \cleardoublepage
@@ -350,10 +354,19 @@ A heap of broken images
 \end{minipage}
 \end{center}
 
+\begin{latexonly}
 \begin{quote}
 {\it The Waste Land},  \raggedleft \\
 T.S.~Eliot, 1922.      \raggedleft
 \end{quote}
+\end{latexonly}
+
+\begin{htmlonly}
+\begin{quote}
+{\it The Waste Land}, \\
+T.S.~Eliot, 1922.
+\end{quote}
+\end{htmlonly}
 
 Two-dimensional optical CCDs (Charge-Couple Devices) and the infrared
 arrays which are their close kin are now the type of detectors usually
@@ -580,16 +593,13 @@ Section~\ref{FURTHER} or the \htmladdnormallink{web pages on CCD construction}
 {http://zebu.uoregon.edu/ccd.html} maintained by the University of Oregon.
 The CCD pixel grids are usually square and the number of pixels on each
 side often reflects the computer industry's predilection for powers of two.
-\begin{latex}
-Early CCDs used in the 1970s often had 64$\times$64 elements. 256$\times$256
-or 512$\times$512 element chips were typical in the 1980s and
-1024$\times$1024 or 2048$\times$2048 element chips are common now.
-\end{latex}
-\begin{htmlonly}
-Early CCDs used in the 1970s often had 64x64 elements. 256x256 or 512x512
-element chips were typical in the 1980s and 1024x1024 or 2048x2048 element
-chips are common now.
-\end{htmlonly}
+\latex{Early CCDs used in the 1970s often had 64$\times$64 elements.
+256$\times$256 or 512$\times$512-element chips were typical in the
+1980s and 1024$\times$1024 or 2048$\times$2048-element chips are
+common now.}
+\html{Early CCDs used in the 1970s often had 64x64 elements. 256x256
+or 512x512-element chips were typical in the 1980s and 1024x1024 or
+2048x2048-element chips are common now.}
 
 A CCD in isolation is just a semiconductor chip.  In order to turn it
 into a usable astronomical instrument it needs to be connected to some
@@ -688,21 +698,13 @@ either the angle on the sky subtended by a single pixel or the field of
 view of the CCD respectively.  For example, the sample data used in Part~II
 of the cookbook were obtained with the Jacobus Kapteyn Telescope (JKT) on
 La Palma.  The CCD detector used has pixels which are 
-\begin{latex} 
-24$\times$24 
-\end{latex}
-\begin{htmlonly} 
-24x24 
-\end{htmlonly}
+\latex{24$\times$24}
+\html{24x24}
 micron in size.
 The plate scale of the JKT is 13.8 seconds of arc / mm.  Thus, each
 pixel subtends an angle of 
-\begin{latex} 
-0.331$\times$0.331 
-\end{latex}
-\begin{htmlonly} 
-0.331x0.331 
-\end{htmlonly}
+\latex{0.331$\times$0.331 }
+\html{0.331x0.331 }
 seconds of arc on the sky.
 
 The manual for the instrument or telescope that you are using will usually
@@ -1259,12 +1261,8 @@ CCD images are not small effects.  This section briefly illustrates the
 effects and shows the improvement which careful calibration can yield.
 The images used here were generated by Matthew~Trewhella using the WIRO CCD
 operating in the {\it K}\/ band in the near infrared.  The images are all of
-\begin{latex} 
-128$\times$128 
-\end{latex}
-\begin{htmlonly} 
-128x128 
-\end{htmlonly}
+\latex{128$\times$128}
+\html{128x128}
 pixels and were taken as part of a project to mosaic the M51 galaxy
 and its companion NGC 5194.  Several hundred images were taken and they were
 all reduced, aligned and stacked using CCDPACK.
@@ -2923,12 +2921,8 @@ the computer being used.
 As a very rough indication, images smaller than 1000x1000
 in most cases do not
 count as large, and ones larger than 
-\begin{latex} 
-5000$\times$5000 
-\end{latex}
-\begin{htmlonly} 
-5000x5000 
-\end{htmlonly}
+\latex{5000$\times$5000 }
+\html{5000x5000 }
 in most cases (at the time of writing) do;
 for cases in-between it depends very much on the details.
 
@@ -3022,13 +3016,8 @@ There is currently a fundamental limitation of HDS which will be corrected
 in a future release.
 Until then, there is a problem with HDS files longer than 512\,Mbyte. 
 Such files can result either from a user NDF file which is very long 
-(for example, a 
-\begin{latex} 
-9000$\times$9000 
-\end{latex}
-\begin{htmlonly} 
-9000x9000 
-\end{htmlonly}
+(for example, a \latex{9000$\times$9000}
+\html{9000x9000 }
 type \_REAL frame with variances) or, more likely,
 from a file used as temporary workspace by CCDPACK or other applications.
 
@@ -3141,7 +3130,7 @@ CCDPACK applications scales with frame size.
          & \multicolumn{1}{p{4.5em}|}{\centering Mask}
          & \multicolumn{1}{p{4.5em}|}{\centering No mask} \\
 \hline
- \multicolumn{1}{|l|}{{\tt debias} (with bias frame)}  
+ \multicolumn{1}{|l|}{{\tt debias} (with bias frame)}
     & 8.25     &  6.0\zsp  &  7.25    &  5.0\zsp    \\
  \multicolumn{1}{|l|}{\tt flatcor} 
     & 5.5\zsp  &  5.5\zsp  &  2.75    &  2.75   \\
@@ -3848,9 +3837,7 @@ Any mistakes, of course, are our own.
   \bibitem{JAFFE98} W.~Jaffe, 1998, {\it Astronomical Images}\,
    (Twin Press: Vledder) CD-ROM.  To contact Twin Press send an electronic
    mail message to G.~Kiers ({\tt gkiers@twinpress.nl}).
-% \begin{latex} 
-%  See URL: {\tt http://www.twinpress.nl/index.htm}
-% \end{latex}
+% \latex{See URL: {\tt http://www.twinpress.nl/index.htm}}
 
   \bibitem{KAY95} D.C.~Kay and J.R.~Levine, 1995, {\it Graphics File
    Formats}, second edition

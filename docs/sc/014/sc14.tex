@@ -98,9 +98,9 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{latexonly} and %\end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{latexonly}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -187,7 +187,7 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%\end{latexonly}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 % ? End of document specific commands
@@ -200,7 +200,7 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
 
 %  Latex document header.
 %  ======================
-\begin{latex}
+\begin{latexonly}
    CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
@@ -227,7 +227,7 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
       {\Large\bf Abstract}
    \end{center}
 % ? End of heading for abstract.
-\end{latex}
+\end{latexonly}
 
 %  HTML documentation header.
 %  ==========================
@@ -288,7 +288,8 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
  \newpage
  \vspace{3cm}
 
- \subsection*{Revision history}
+ \latex{\subsection*{Revision history}}
+ \html{\section*{Revision history}}
 
  \begin{enumerate}
 
@@ -303,7 +304,7 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
  \copyright \underline{1999} Starlink, CCLRC
 
  \cleardoublepage
- \begin{latex}
+ \begin{latexonly}
    \setlength{\parskip}{0mm}
    \latexonlytoc
 
@@ -313,7 +314,7 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
 
    \setlength{\parskip}{\medskipamount}
    \markright{\stardocname}
- \end{latex}
+ \end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 
@@ -329,8 +330,14 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
 Now Argus had a hundred eyes in his head and never went to sleep with
 more than two at a time, so that he kept watch of Io constantly.
 
+\begin{latexonly}
 {\it The Age of Fable},    \raggedleft \\
 Thomas~Bulfinch, 1855.     \raggedleft
+\end{latexonly}
+\begin{htmlonly}
+{\it The Age of Fable}, \\
+Thomas~Bulfinch, 1855.
+\end{htmlonly}
 \end{quote}
 
 This cookbook is an introduction to and overview of fibre spectroscopy
@@ -1412,7 +1419,7 @@ wide field of view of the UK Schmidt Telescope, giving it a uniquely wide
 field of view for a fibre-fed spectroscopic system.  Typical dwell-times on
 single fields are one to two hours, though long dwell-times of up to seven
 hours are possible.  FLAIR is suitable for observing moderately faint
-objects ($B \leq 18$) with number densities in the range 1 - 10 per square
+objects ($B \leq 18$) with number densities in the range 1--10 per square
 degree.  The spectrograph is mounted on the dome floor and consequently is
 extremely stable.  Originally the fibres were positioned using a
 technique unique to FLAIR.  They were cemented onto a copy photographic
@@ -1710,14 +1717,14 @@ procedures follows.
 \section{\xlabel{MULTSP}\label{MULTSP}Comparison With Other Techniques}
 
 In addition to fibre spectroscopy there are two other major techniques
-for obtaining multiple spectra simultaneously: objective prism
+for obtaining multiple spectra simultaneously: objective-prism
 spectroscopy and multi-slit spectroscopy.  This final section briefly
 compares fibre spectroscopy with these techniques.  They are discussed
 separately below.
 
-\subsection{Objective prism spectroscopy}
+\subsection{Objective-prism spectroscopy}
 
-Objective prism spectroscopy is rather different to fibre spectroscopy
+Objective-prism spectroscopy is rather different to fibre spectroscopy
 and is not really a direct alternative.  A low dispersion prism (or
 a grating) is placed in front of the telescope objective and produces
 low resolution spectra in the focal surface of all the objects in the
@@ -1727,14 +1734,14 @@ throughout the field of view, which is typically large for Schmidt
 telescopes, the images are usually recorded on photographic plates.
 A good-quality low dispersion prism plate obtained with the UKST might
 typically contain some 60,000 images.  However, it is only possible to
-produce spectra with relatively low dispersion.  Objective prism spectra
+produce spectra with relatively low dispersion.  Objective-prism spectra
 are typically used for classification surveys and searches for `unusual'
 objects such as quasars, blue stars and emission line objects.
 Considerable archives of prism plates have been accumulated at various
 observatories around the world and various programmes are still in
 progress, for example with the UKST.  For recent reviews of objective
 prism work see Parker and Hartley\cite{PARKER97B} and references therein.
-There is a brief introduction to objective prism techniques in
+There is a brief introduction to objective-prism techniques in
 Walker\cite{WALKER87}, pp164-165.
 
 \subsection{Multi-slit spectroscopy}
@@ -1937,7 +1944,7 @@ through the Hydra example before trying the present one.
 The data used in this example are observations of some early-type
 stars in the direction of the Galactic centre.  The stars are in
 the magnitude range 12 to 16 and the spectra cover the wavelength
-range 4000 - 4600\AA.  These data are unusual in that most FLAIR
+range 4000--4600\AA.  These data are unusual in that most FLAIR
 observations are of external galaxies.  Nonetheless they can be used
 to illustrate the reduction procedure, which is as follows.
 

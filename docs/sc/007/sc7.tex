@@ -1,5 +1,10 @@
-\documentstyle[11pt,epsf,twoside]{article}
-\pagestyle{myheadings}
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+\usepackage{graphicx}        %  Use this one for final production.
+\usepackage{epsfig}          %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
 
 % -----------------------------------------------------------------------------
 % ? Document identification
@@ -14,8 +19,8 @@
 
 This Cookbook describes the basic concepts and methods used in optical
 astronomical spectroscopy; it is aimed at those new to the field.
-Complete worked example reductions for both 1-D and 2-D longslit
-spectra, using real datasets, are described.  Common problems and
+Complete worked example reductions for both one- and two-dimensional 
+longslit spectra, using real datasets, are described.  Common problems and
 their solutions are discussed.  A section on related resources is
 included, as is a glossary of commonly used terms.  }
 
@@ -50,9 +55,9 @@ included, as is a glossary of commonly used terms.  }
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{latexonly} and %\end{latexonly} lines (used by
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{latexonly}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -139,7 +144,7 @@ included, as is a glossary of commonly used terms.  }
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%\end{latexonly}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 
@@ -314,7 +319,7 @@ included, as is a glossary of commonly used terms.  }
 
 %  Latex document header.
 %  ======================
-\begin{latex}
+\begin{latexonly}
    CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
@@ -348,7 +353,7 @@ included, as is a glossary of commonly used terms.  }
       {\Large\bf Abstract}
    \end{center}
 % ? End of heading for abstract.
-\end{latex}
+\end{latexonly}
 
 %  HTML documentation header.
 %  ==========================
@@ -412,13 +417,13 @@ included, as is a glossary of commonly used terms.  }
 % ? Latex document Table of Contents (if used).
 %  ===========================================
  \newpage
- \begin{latex}
+ \begin{latexonly}
    \setlength{\parskip}{0mm}
 %   \setcounter{tocdepth}{2}
    \latexonlytoc
    \setlength{\parskip}{\medskipamount}
    \markright{\stardocname}
- \end{latex}
+ \end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 \cleardoublepage
@@ -435,8 +440,8 @@ astronomical spectroscopy; it is aimed at those new to the field.
 The term `spectroscopy' covers quite a few areas, each within itself
 worthy of a Cookbook.
 For the sake of brevity, the scope of this document is limited to
-one dimensional (1-D) and longslit (2-D) spectra, in the optical waveband, recorded with
-\htmlref{CCD}{gl_ccd} detectors. 
+one-dimensional (1-D) and longslit (2-D) spectra, in the optical 
+waveband, recorded with \htmlref{CCD}{gl_ccd} detectors. 
 
 The reductions described in later sections of this document are the
 most-common, simple, and straightforward that you might encounter.
@@ -1350,10 +1355,10 @@ and the commands you must execute are:
 \end{verbatim}
 }
 
-If your Starlink software is installed somewhere else,
-then modify the commands appropriately.
-Most people include these lines in their shell login file
-(\verb+.login+ in your home directory).
+If your Starlink software is installed somewhere other than 
+\verb+/star+---one place to look is {\tt \$STARLINK\_DIR}---then
+modify the commands appropriately.  Most people include these lines in
+their shell login file (\verb+.login+ in your home directory).
 
 Once you have done the Starlink `login' you can initialise for any of the
 major packages simply by typing their names.
@@ -1413,7 +1418,7 @@ To copy the test data type the command
 
 You will then find you have these datafiles in your directory:
 
-\begin{latex}
+\begin{latexonly}
 \begin{center}
 \begin{tabular}{ll}
 File & Description \\ \hline
@@ -1423,7 +1428,7 @@ File & Description \\ \hline
 {\tt object1.sdf} & Frame with a rotated spectrum\\ \hline
 \end{tabular}
 \end{center}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
 \begin{verbatim}
    File         Description
@@ -1439,7 +1444,7 @@ File & Description \\ \hline
 
 The first thing you need to do is ensure that the images are oriented
 correctly.  To do this use \xref{{\sc kappa}}{sun95}{}
-\xref{\verb+display+}{sun95}{DISPLAY} to look at the image:
+\xref{\tt{display}}{sun95}{DISPLAY} to look at the image:
 
 {
 \scspec{\small}{ }
@@ -1452,7 +1457,7 @@ correctly.  To do this use \xref{{\sc kappa}}{sun95}{}
 
 This will display the image \verb+object+ using a false-colour
 look-up table.  You may have to use the
-\xref{\verb+xdisplay+}{sun129}{}\cite{xdisplay} command to ensure
+\xref{\tt{xdisplay}}{sun129}{}\cite{xdisplay} command to ensure
 that the image is sent to the correct ({\it{i.e.}} your) screen.
 \verb+display+ has many
 options, for the moment we just need to check the orientation of the image,
@@ -1474,7 +1479,7 @@ The \verb+clear+ parameter indicates that we want the previous display to
 be erased before \verb+object1+ appears.
 You'll see that this spectrum looks similar to the previous one, but it runs
 from top-to-bottom of the image\scspec{---}{ - }it needs to be rotated.
-To do this, use the {\sc kappa} command \xref{\verb+rotate+}{sun95}{ROTATE}.
+To do this, use the {\sc kappa} command \xref{\tt{rotate}}{sun95}{ROTATE}.
 
 {
 \scspec{\small}{ }
@@ -1510,7 +1515,7 @@ where the strong or large features are.  You might look at the arc as
 well for some familiar pattern in the reference spectrum.
 
 If you do find that you need to reverse the dispersion direction, you can use
-{\sc kappa} \xref{\verb+flip+}{sun95}{FLIP} to do this:
+{\sc kappa} \xref{\tt{flip}}{sun95}{FLIP} to do this:
 
 {
 \scspec{\small}{ }
@@ -1563,7 +1568,7 @@ Each reduction is described by a database file specified by the
 in this case we have chosen \verb+rdf1+, which the program creates.
 The \verb+display+ parameter tells \verb+echmenu+ to overlay trace
 plots  on the image itself so we can see how well the trace is doing.
-The \xref{\verb+soft+}{sun152}{par_SOFT} parameter points output
+The \xref{\tt{soft}}{sun152}{par_SOFT} parameter points output
 graphs to our existing \verb+xwindows+ screen.
 Don't worry about \xref{{\tt tune\_mxskypix}}{sun152}{par_TUNE_MXSKYPIX}
 for now, it is needed (and explained) later on.
@@ -1580,7 +1585,7 @@ For brevity, most of these messages are not included in future screen
 display listings.
 
 The prompt at the end of the above display is suggesting
-\xref{option 1 {\sl Start a reduction}}{sun152}{option1}
+\xref{Option~1 {\sl Start a reduction}}{sun152}{option1}
 which seems like a good place to begin:
 
 {
@@ -1605,13 +1610,13 @@ which seems like a good place to begin:
 }
 
 There are three prompts which appear: first,
-\xref{\verb+tracim+}{sun152}{par_TRACIM} is asking which
+\xref{\tt{tracim}}{sun152}{par_TRACIM} is asking which
 image to use to trace the path of the spectrum\scspec{---}{ - }in this case
 we are able to use the object itself;
-\xref{\verb+inptim+}{sun152}{par_INPTIM} is asking for the name of
+\xref{\tt{inptim}}{sun152}{par_INPTIM} is asking for the name of
 the file from which the spectrum will be extracted, again this is
 \verb+object+; lastly,
-\xref{\verb+arc+}{sun152}{par_ARC} is the name of the wavelength-reference
+\xref{\tt{arc}}{sun152}{par_ARC} is the name of the wavelength-reference
 image, which is called \verb+arc+ in the example data.
 
 \begin{figure}
@@ -1621,7 +1626,7 @@ image, which is called \verb+arc+ in the example data.
 
 \parbox{140mm}{
 \caption{Order location: a cross-dispersion section produced using
-{\tt echmenu} option 1 {\sl Start a reduction.}}
+{\tt echmenu} Option~1 {\sl Start a reduction.}}
 \label{fi_order_locate}
 }
 \end{center}
@@ -1671,7 +1676,7 @@ we only have one order but it works the same way.
 }
 
 The parameters here are:
-\xref{\verb+trcfit+}{sun152}{par_TRCFIT} is the type of fit function to use,
+\xref{\tt{trcfit}}{sun152}{par_TRCFIT} is the type of fit function to use,
 \verb+poly+ is often fine, \verb+spline+ works in most other cases;
 \xref{{\tt trace\_mode}}{sun152}{par_TRACE_MODE} determines which algorithm
 is used to find the spectrum at each X-sample ({\it{i.e.}} along the
@@ -1701,7 +1706,7 @@ page~\pageref{fi_order_trace}.)}{(Similar to the plot above.)}
 This shows the path of the trace as determined by
 \xref{{\tt echmenu}}{sun152}{ECHMENU}\@.
 Usually the trace works well; to inspect the fit we use
-\xref{option 3 {\sl Clip fitted traces}}{sun152}{option3}.
+\xref{Option~3 {\sl Clip fitted traces}}{sun152}{option3}.
 The only parameter you will be prompted for here is
 
 {
@@ -1718,7 +1723,7 @@ The only parameter you will be prompted for here is
 
 \parbox{140mm}{
 \caption{Trace fitting: a display of traced points versus fitted trace,
-produced using {\tt echmenu} option 3 {\sl Clip fitted traces.}
+produced using {\tt echmenu} Option~3 {\sl Clip fitted traces.}
 The plot is labelled `Order 2' as this was the second order of an
 \'{e}chelle spectrum.}
 \label{fi_trace_fit}
@@ -1738,7 +1743,7 @@ Hit \verb+V+ again to return to the `deviations' plot.  Deviant points can
 be clipped in a number of different ways: use the \verb+.+ key to delete
 the point closest to the graphics cursor; \verb+N+ clips points below the
 cursor Y-position; \verb+P+ clips points above the cursor Y-position.
-Option \verb+R+ is often useful if part of the trace has gone wrong;
+Option~\verb+R+ is often useful if part of the trace has gone wrong;
 hit \verb+R+ to mark one end of the bad X-range and then hit the mouse
 (usually left) button to mark the other end.
 As points are clipped the display updates and the points
@@ -1759,8 +1764,8 @@ the spectrum (cross dispersion) and decide which pixels contribute to the
 object signal and which to the background.  The process is split into two
 stages: first, deciding where the edges of the \htmlref{dekker}{gl_dekker}
 are; second, choosing the channels.  Both stages are covered by
-\xref{\verb+echmenu+}{sun152}{ECHMENU}
-\xref{option 4 {\sl Determine dekker/object extent}}{sun152}{option4},
+\xref{\tt{echmenu}}{sun152}{ECHMENU}
+\xref{Option~4 {\sl Determine dekker/object extent}}{sun152}{option4},
 they can be done separately as options 4.1 (dekker setup) and 4.2
 (channel setup).
 
@@ -1772,7 +1777,7 @@ tune\_mxskypix=31}}{sun152}{par_TUNE_MXSKYPIX} when you started this
 {cook_parameter_editor}} for details of how to do this within
 \verb+echmenu+\@.
 
-The first prompts in option 4 are:
+The first prompts in Option~4 are:
 
 {
 \scspec{\small}{ }
@@ -1786,7 +1791,7 @@ You should set
 \xref{{\tt pfl\_interact}}{sun152}{par_PFL_INTERACT} to \verb+yes+
 (or \verb+true+, means the same thing) as you may want to adjust the
 dekker limits interactively.
-\xref{\verb+slitim+}{sun152}{par_SLITIM} is the name of the image you
+\xref{\tt{slitim}}{sun152}{par_SLITIM} is the name of the image you
 are going to use to find the edges of the slit; the object image will
 do, but the flat-field image is often better as the flat-field has
 steeper, and so clearer, edges.
@@ -1808,7 +1813,7 @@ strong absorption feature.
 
 \parbox{140mm}{
 \caption{Finding the dekker-limits of the slit: a plot of a section through
-a flat field, produced using {\tt echmenu} option 4.1 {\sl Determine dekker
+a flat field, produced using {\tt echmenu} Option~4.1 {\sl Determine dekker
 extent.}}
 \label{fi_dekker_limits}
 }
@@ -1839,7 +1844,7 @@ the dekker hit the \verb+E+ key.
 
 \parbox{140mm}{
 \caption{Selecting object and background channels: a plot of a section
-through an object spectrum, produced using {\tt echmenu} option 4.2
+through an object spectrum, produced using {\tt echmenu} Option~4.2
 {\sl Determine object limits.}
 }
 \label{fi_channel_select_again}
@@ -1894,7 +1899,7 @@ and background channels.
 
 \xref{{\tt echmenu}}{sun152}{ECHMENU}
 provides many options for flat fielding, these are handled by
-\xref{option 5 {\sl Model flat field}}{sun152}{option5}.
+\xref{Option~5 {\sl Model flat field}}{sun152}{option5}.
 
 {
 \scspec{\small}{ }
@@ -1905,10 +1910,10 @@ provides many options for flat fielding, these are handled by
 }
 
 There are only two prompts which appear at this point.
-\xref{\verb+ffield+}{sun152}{par_FFIELD} is the name of our flat-field
+\xref{\tt{ffield}}{sun152}{par_FFIELD} is the name of our flat-field
 image (in this case \verb+flat+) you can specify
 \verb+none+ if you don't need flat fielding or have no image to use.
-\xref{\verb+fltfit+}{sun152}{par_FLTFIT} is the type of model to fit
+\xref{\tt{fltfit}}{sun152}{par_FLTFIT} is the type of model to fit
 to the flat field.
 We have selected \verb+median+ as this gives better rejection of deviant
 data than \verb+mean+, which simply uses the average value over nearby
@@ -1921,14 +1926,14 @@ A simple model is usually fine.
 
 The next stage in spectrum extraction is to model the background.
 \xref{{\tt echmenu}}{sun152}{ECHMENU}
-\xref{option 6 {\sl Model sky}}{sun152}{option6}
+\xref{Option~6 {\sl Model sky}}{sun152}{option6}
 performs the modelling and you can accept the default values for
 the parameter prompts and get a reasonable model.
 If you intend to perform optimal extraction you will need to find the
 \xref{{\tt photon\_to\_adu}}{sun152}{par_PHOTON_TO_ADU} (gain) value and
 \xref{{\tt readout\_noise}}{sun152}{par_READOUT_NOISE}\@.
 You can do this using \xref{{\sc kappa}}{sun95}{}
-\xref{\verb+fitslist+}{sun95}{FITSLIST}
+\xref{\tt{fitslist}}{sun95}{FITSLIST}
 to list the FITS extension in the input dataset, {\it{e.g.,}}
 for the \verb+object+ in the example data:
 
@@ -1949,13 +1954,13 @@ headers you will have to consult the observatory's CCD manual.
 
 The only other data required prior to extraction is the profile model,
 and this is only needed for optimal extractions.
-\verb+echmenu+ \xref{option 7 {\sl Model object profile}}{sun152}{option7}
+\verb+echmenu+ \xref{Option~7 {\sl Model object profile}}{sun152}{option7}
 will generate a suitable model.
 If you have been working through the example reduction data in a
 single session, \verb+echmenu+ will not prompt you for any further parameters
-when you run option 7.
+when you run Option~7.
 
-And so to \xref{option 8, {\sl Extract orders 1-D}}{sun152}{option8}.
+And so to \xref{Option~8, {\sl Extract orders 1-D}}{sun152}{option8}.
 The only new parameter for this option is
 
 {
@@ -1973,7 +1978,7 @@ profile-weighted extraction.
 \subsection{Looking at the Extracted Spectrum}
 
 \xref{{\tt echmenu}}{sun152}{ECHMENU} has an
-\xref{option (number 27)}{sun152}{option27}
+\xref{Option (number 27)}{sun152}{option27}
 for inspecting the contents of the current reduction database file.
 You can start the option by typing \verb+P+ (for `plot') at the
 main-menu prompt.
@@ -2006,7 +2011,7 @@ You can get a list of things you
 can plot by typing \verb+D+ (for directory).  Here's some of the ones which
 might interest you at this stage:
 
-\begin{latex}
+\begin{latexonly}
 \begin{center}
 \begin{tabular}{llll}
  You type & You see & You type & You see\\ \hline
@@ -2016,7 +2021,7 @@ might interest you at this stage:
  {\tt FFLT} & Fitted flat-field balance factors\\ \hline
 \end{tabular}
 \end{center}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
 \begin{verbatim}
    You type  You see
@@ -2049,12 +2054,12 @@ There are two stages to \xref{{\tt echmenu}}{sun152}{ECHMENU}
 wavelength calibration; the first stage is simple; the second stage may
 be more complex.
 The first step is to run
-\xref{option 9 {\sl Locate arc line candidates}}{sun152}{option9}\@.
+\xref{Option~9 {\sl Locate arc line candidates}}{sun152}{option9}\@.
 This searches the arc spectrum for features which look like arc lines.
 The result is a small list of potential features which can be used in
 the second stage, wavelength calibration.
 
-\verb+echmenu+ \xref{option 10 {\sl Identify features}}{sun152}{option10}
+\verb+echmenu+ \xref{Option~10 {\sl Identify features}}{sun152}{option10}
 performs wavelength calibration.
 There are a number of prompts:
 
@@ -2081,7 +2086,7 @@ so you can should set
 \xref{{\tt ech\_ftrdb=\$ARCDIRS/CUAR}}{sun152}{par_ECH_FTRDB} and
 \xref{{\tt arc\_type=\$ARCDIRS/CUAR.ARC}}{sun152}{par_ARC_TYPE}\@.
 Note that the names of these files are case-sensitive.
-\xref{\verb+wavfit+}{sun152}{par_WAVFIT} is the type of fit to use,
+\xref{\tt{wavfit}}{sun152}{par_WAVFIT} is the type of fit to use,
 \verb+poly+ should be fine.
 
 If you select
@@ -2133,7 +2138,7 @@ made if the value is unusable.
 \end{figure}
 \end{htmlonly}
 
-Once you have worked through all the prompts for option 10 another mini-menu
+Once you have worked through all the prompts for Option~10 another mini-menu
 will appear offering a default of \verb+I+ (identify features manually).
 Accept the default by pressing return and (yet) another menu appears.  The
 graphics display will also update showing the arc spectrum.  Each potential
@@ -2221,7 +2226,7 @@ Once you have got the extracted, wavelength-calibrated spectrum you have
 two options: you can output the data from {\sc echomop}; or, you can normalise
 the spectrum to give a more-or-less flat continuum.  The next section
 explains how to output data from {\sc echomop}.  This section outlines using
-\xref{option 11 {\sl Flatten order shape}}{sun152}{option11} to normalise
+\xref{Option~11 {\sl Flatten order shape}}{sun152}{option11} to normalise
 the data.
 
 Enter \verb+11+ at the main \xref{{\tt echmenu}}{sun152}{ECHMENU} prompt
@@ -2237,7 +2242,7 @@ and the following parameter prompts will appear:
 \end{verbatim}
 }
 
-\xref{\verb+ffield+}{sun152}{par_FFIELD} is the name of the image to be
+\xref{\tt{ffield}}{sun152}{par_FFIELD} is the name of the image to be
 used to model the instrument profile, if you have been working through the
 example data in one session you won't be prompted for this parameter
 again.
@@ -2248,7 +2253,7 @@ image \verb+flat+\@.
 For modelling the instrument response a \verb+spline+ curve is often
 better than a \verb+poly+, this is simply because it is unusual
 for the response to be well represented by a simple polynomial, hence we
-have chosen \xref{\verb+blzfit=spline+}{sun152}{par_BLZFIT}\@.
+have chosen \xref{\tt{blzfit=spline}}{sun152}{par_BLZFIT}\@.
 \xref{{\tt blz\_interact=y}}{sun152}{par_BLZ_INTERACT} selects
 interactive adjustment of the fit.
 \xref{{\tt blz\_npoly}}{sun152}{par_BLZ_NPOLY} sets the number of
@@ -2265,7 +2270,7 @@ to clip points further from the X-axis than the current graphics cursor
 position.  Once you are happy with the fit, hit \verb+E+ to accept it.
 
 At this point you can re-run
-\xref{option 27 (or \verb+P+, the plotter)}{sun152}{option27}
+\xref{Option~27 (or \tt{P}, the plotter)}{sun152}{option27}
 and view the flattened spectrum:
 
 {
@@ -2281,7 +2286,7 @@ and view the flattened spectrum:
 \subsection{Output the Spectrum}
 
 \xref{{\tt echmenu}}{sun152}{ECHMENU}
-\xref{option 14 {\sl Save reduced data}}{sun152}{option14}
+\xref{Option~14 {\sl Save reduced data}}{sun152}{option14}
 handles the output of data.
 You can produce NDFs which \xref{{\sc dipso}}{sun50}{}\cite{dipso},
 \xref{{\sc kappa}}{sun95}{} and \xref{{\sc figaro}}{sun86}{} can read,
@@ -2525,7 +2530,7 @@ To copy the test data type the command
 
 You will then find you have these data files in your directory:
 
-\begin{latex}
+\begin{latexonly}
 \begin{center}
 \begin{tabular}{ll}
 File & Description \\ \hline
@@ -2534,7 +2539,7 @@ File & Description \\ \hline
 {\tt quartz2dscrun.sdf}    & Frame with a quartz lamp flat field\\
 \end{tabular}
 \end{center}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
 \begin{verbatim}
    File         Description
@@ -2551,7 +2556,7 @@ cosmic ray cleaned.
 
 The first thing to do is to put the image frames on display for inspection.
 This can be done using \xref{{\sc kappa}}{sun95}{}
-\xref{\verb+display+}{sun95}{DISPLAY}:
+\xref{\tt{display}}{sun95}{DISPLAY}:
 
 {
 \scspec{\small}{ }
@@ -2596,7 +2601,7 @@ These frames are correctly rotated (i.e. have the wavelength axis parallel to th
 {\htmlref{Inspecting the Image}{inspecting_the_images}}.
 
 With the arc line image displayed we can carry out the third item mentioned above, noting the range of y-axis values the arc lines extend over. To do this we can use the \xref{{\sc kappa}}{sun95}{}
-\xref{\verb+cursor+}{sun95}{CURSOR} command:
+\xref{\tt{cursor}}{sun95}{CURSOR} command:
 
 
 {
@@ -2934,7 +2939,7 @@ maximum degree polynomial used =   3
 \subsection{Scrunching}
 
 The .iar file can be used by the \xref{{\sc figaro}}{sun86}{}
-\xref{\verb+iscrunch+}{sun86}{ISCRUNCH} program in order to correct and calibrate your data files:
+\xref{\tt{iscrunch}}{sun86}{ISCRUNCH} program in order to correct and calibrate your data files:
 
 {\scspec{\small}{ }
 \begin{verbatim}
@@ -3036,7 +3041,7 @@ This generates a spectrum quartzspec.sdf which we can view with
 \end{figure}
 
 As can be seen in \scspec{Figure~\ref{quartzfit},
-page~\pageref{quartzfit},}{the figure below,} this spectrum has zero values at each end and the ghost line appears superimposed on the quartz lamp continuum. In order to remove these effects and obtain just the continuum we fit a polynomial curve to the data. We use the  \xref{{\sc figaro}}{sun86}{} \xref{\verb+cfit+}{sun86}{CFIT} command:
+page~\pageref{quartzfit},}{the figure below,} this spectrum has zero values at each end and the ghost line appears superimposed on the quartz lamp continuum. In order to remove these effects and obtain just the continuum we fit a polynomial curve to the data. We use the  \xref{{\sc figaro}}{sun86}{} \xref{\tt{cfit}}{sun86}{CFIT} command:
 
 {\scspec{\small}{ }
 \begin{verbatim}
@@ -3097,7 +3102,7 @@ The key number is the pixel mean value of 1663793, which we will divide the spec
 \end{verbatim}
 }
 
-We can now finally use this normalised spectrum to correct our observed data using the  \xref{{\sc figaro}}{sun86}{} \xref{\verb+isxdiv+}{sun86}{ISXDIV} command:
+We can now finally use this normalised spectrum to correct our observed data using the  \xref{{\sc figaro}}{sun86}{} \xref{\tt{isxdiv}}{sun86}{ISXDIV} command:
 
 {\scspec{\small}{ }
 \begin{verbatim}
@@ -3159,7 +3164,7 @@ value (21) without ever prompting.
 Another method for checking and setting parameter values is to use the
 parameter editor built in to \verb+echmenu+\@.  If, for example, you want
 to inspect the parameters for
-\xref{option 4 {\sl Determine dekker/object extent}}{sun152}{option4},
+\xref{Option~4 {\sl Determine dekker/object extent}}{sun152}{option4},
 you type \verb+-4+ at the main \verb+echmenu+ prompt:
 
 {
@@ -3278,11 +3283,11 @@ the approximate wavelength range covered:
    wavelength_range = CCDXSIZE x CCDXPIXE x DISPERSI
 \end{verbatim}
 \end{htmlonly}
-\begin{latex}
+\begin{latexonly}
 \begin{displaymath}
 \lambda\lambda = {\tt{CCDXSIZE}} \times {\tt{CCDXPIXE}} \times {\tt{DISPERSI}}
 \end{displaymath}
-\end{latex}
+\end{latexonly}
 
 Appropriate units should be used, for the example above this comes to
 a coverage of about 890\AA , centred at 4499\AA\@.  This information can
@@ -3325,8 +3330,8 @@ headers you will have to consult the observatory's CCD manual.
 \subsection{\mlabel{cook_finding_the_spectrum}Problems Finding the Spectrum}
 
 The first thing to check if you can't see the spectrum clearly when
-running \xref{\verb+echmenu+}{sun152}{ECHMENU}
-\xref{option 1}{sun152}{option1}, as in
+running \xref{\tt{echmenu}}{sun152}{ECHMENU}
+\xref{Option~1}{sun152}{option1}, as in
 \scspec{Figure~\ref{fi_order_locate} (see page~\pageref{fi_order_locate})}
 {the figure below,} is that the
 image is correctly oriented with the spectrum dispersed from left-to-right.
@@ -3338,7 +3343,7 @@ image is correctly oriented with the spectrum dispersed from left-to-right.
 
 \parbox{140mm}{
 \caption{Order location: a cross-dispersion section produced using
-{\tt echmenu} option 1 {\sl Start a reduction.}}
+{\tt echmenu} Option~1 {\sl Start a reduction.}}
 \label{fi_order_locate_again}
 }
 \end{center}
@@ -3349,9 +3354,9 @@ See \scspec{\S\ref{inspecting_the_images}}
 {\htmlref{Inspecting the Images}{inspecting_the_images}} for details of how
 to check the orientation.  Perhaps the `zeroth' thing to check is that you
 have chosen the correct image for the parameter
-\xref{\verb+tracim+}{sun152}{par_TRACIM}\@.
+\xref{\tt{tracim}}{sun152}{par_TRACIM}\@.
 
-If you find that \verb+echmenu+ option 1 does not automatically find the
+If you find that \verb+echmenu+ Option~1 does not automatically find the
 spectrum, and you can't see it in the displayed plot, the next thing to
 try is a simple plot of a sum of all the columns of the image.  This can
 be done with a series of \xref{{\sc figaro}}{sun86}{} commands:
@@ -3378,14 +3383,14 @@ X-axis and redisplay the section, but this time zoom-in on the spectrum
 }
 
 It should now be possible to decide where the centre of the spectrum is
-by eye, or using the {\sc figaro} command \xref{\verb+icur+}{sun86}{ICUR}
+by eye, or using the {\sc figaro} command \xref{\tt{icur}}{sun86}{ICUR}
 to measure the display.
 
 Once you have decided where the spectrum is, you can write this into the
 {\sc echomop}
 \xref{reduction structure file}{sun152}{reduction_file} using {\sc figaro}
-\xref{\verb+creobj+}{sun86}{CREOBJ} and
-\xref{\verb+setobj+}{sun86}{SETOBJ}:
+\xref{\tt{creobj}}{sun86}{CREOBJ} and
+\xref{\tt{setobj}}{sun86}{SETOBJ}:
 
 {
 \scspec{\small}{ }
@@ -3399,15 +3404,15 @@ Once you have decided where the spectrum is, you can write this into the
 This above assumes the reduction structure file is called \verb+rdf1+\@.
 Notice that you have to mark the fact that one `order' ({\it{i.e.}} spectrum)
 has been found.  Once you have added this information you can proceed to
-try \xref{\verb+echmenu+ option 2}{sun152}{option2}\@.
+try \xref{\tt{echmenu} Option~2}{sun152}{option2}\@.
 
 
 \subsection{\mlabel{cook_tracing}Tracing Strategies}
 
 Usually the default value \verb+C+, `centroid' for \xref{{\tt
 trace\_mode}}{sun152}{par_TRACE_MODE} works reasonably well.
-Running \xref{\verb+echmenu+}{sun152}{ECHMENU}
-\xref{option 3 {\sl Clip fitted traces}}{sun152}{option3},
+Running \xref{\tt{echmenu}}{sun152}{ECHMENU}
+\xref{Option~3 {\sl Clip fitted traces}}{sun152}{option3},
 and performing some small interactive adjustments, results in a good,
 clean spectrum trace.  Sometimes, however, the object spectrum cannot
 be used for tracing\scspec{---}{ - }there may be significant absorption
@@ -3480,8 +3485,8 @@ See \scspec{\S\ref{cook_parameter_editor}}
 \subsection{\mlabel{cook_better_flat_fields}Better Flat-Field Models}
 
 Using a median filter for the flat-field model, by setting
-\xref{\verb+fltfit=median+}{sun152}{par_FLTFIT} in
-\xref{\verb+echmenu+}{sun152}{ECHMENU} is generally fine, however,
+\xref{\tt{fltfit=median}}{sun152}{par_FLTFIT} in
+\xref{\tt{echmenu}}{sun152}{ECHMENU} is generally fine, however,
 sometimes this may not give the best result.
 For example, if the flat-field lamp has some a feature in its spectrum in an
 area which you want to use (not the best situation in the first place\ldots
@@ -3498,11 +3503,11 @@ The order of fit can then be adjusted interactively.
 \subsection{\mlabel{cook_reviewing_flat}Reviewing the Flat Field}
 
 Although you can use the
-\xref{\verb+echmenu+}{sun152}{ECHMENU}
+\xref{\tt{echmenu}}{sun152}{ECHMENU}
 \xref{plotter}{sun152}{option27} to inspect the flat-field model for
 your spectrum, it is not always the easiest, or best, way to find
 problems.  Another way is to output the model to an image file and then
-use \xref{{\sc kappa}}{sun95}{} \xref{\verb+display+}{sun95}{DISPLAY}
+use \xref{{\sc kappa}}{sun95}{} \xref{\tt{display}}{sun95}{DISPLAY}
 to inspect that image.  Within the \xref{{\sc echomop}}{sun152}{}
 package there is a stand-alone task for extracting the `flattened' field
 \xref{{\tt ech\_genflat}}{sun152}{option30}\@.
@@ -3527,7 +3532,7 @@ on-line version of this document.
 
 What do you do if the
 \xref{automatic wavelength calibration}{sun152}{option10} in
-\xref{\verb+echmenu+}{sun152}{ECHMENU} doesn't work, and you haven't been
+\xref{\tt{echmenu}}{sun152}{ECHMENU} doesn't work, and you haven't been
 able to recognise any arc features?
 
 The first thing you might try is to check for a reversed
@@ -3545,7 +3550,7 @@ To try this, set the parameter \xref{{\tt tune\_revchk=true}}
 }
 
 or using the \verb+echmenu+ \htmlref{parameter editor}
-{cook_parameter_editor} to change the parameters for option 10:
+{cook_parameter_editor} to change the parameters for Option~10:
 
 {
 \scspec{\small}{ }

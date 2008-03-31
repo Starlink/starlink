@@ -18,6 +18,22 @@
 \newcommand{\stardoctitle}     {C-shell Cookbook}
 \newcommand{\stardocversion}   {Version 1.3}
 \newcommand{\stardocmanual}    {}
+\newcommand{\stardocabstract}  {
+This cookbook describes the fundamentals of writing scripts using
+the UNIX C shell.  It shows how to combine Starlink and private applications
+with shell commands and constructs to create powerful and time-saving
+tools for performing repetitive jobs, creating data-processing
+pipelines, and encapsulating useful recipes.  The cookbook aims to give
+practical and reassuring examples to at least get you started without
+having to consult a UNIX manual.  However, it does not offer a
+comprehensive description of C-shell syntax to prevent you from
+being overwhelmed or intimidated.  The topics covered are: how to run a
+script, defining shell variables, prompting, arithmetic and string
+processing, passing information between Starlink applications, obtaining
+dataset attributes and FITS header information, processing multiple
+files and filename modification, command-line arguments and options, and
+loops.  There is also a glossary.}
+
 % ? End of document identification
 % -----------------------------------------------------------------------------
 
@@ -286,6 +302,8 @@
 \newcommand{\TSPref}{\xref{{\footnotesize TSP}}{sun66}{}}
 \newcommand{\TWODSPECref}{\xref{{\footnotesize TWODSPEC}}{sun16}{}}
 
+% ? End of document specific commands
+%------------------------------------------------------------------------------
 
 % SST definitions
 % ---------------
@@ -605,154 +623,9 @@
 
 %  End of sst.tex layout definitions.
 %.
-
 % End of SST definitions
 % ----------------------
 
-%    Starlink definitions for \LaTeX\ macros used in MAN output
-%
-%  Description:
-%    As much as possible of the output from the MAN automatic manual generator
-%    uses calls to user-alterable macros rather than direct calls to built-in
-%    \LaTeX\ macros. This file is a version of the MAN default definitions for
-%    these macros modified for Starlink preferences.
-%
-%  Language:
-%    \LaTeX
-%
-%  Support:
-%    William Lupton, {AAO}
-%    Alan Chipperfield (RAL)
-%-
-%  History:
-%    16-Nov-88 - WFL - Add definitions to permit hyphenation to work on
-%		 words containing special characters and in teletype fonts.
-%    27-Feb-89 - AJC - Redefine \manroutine
-%                      Added \manheadstyle
-%                      Switch order of argument descriptors
-%    07-Mar-89 - AJC - Narrower box for parameter description
-%                      Remove Intro section and other unused bits
-%
-% permit hyphenation when in teletype font (support 9,10,11,12 point only -
-% could extend), define lccodes for special characters so that the hyphen-
-% ation algorithm is not switched off. Define underscore character to be
-% explicit underscore rather than lots of kerns etc.
-
-\typeout{Starlink MAN macros. Released 27th February 1989}
-
-%\hyphenchar\nintt=`-\hyphenchar\tentt=`-\hyphenchar\elvtt=`-\hyphenchar\twltt=`-
-
-\lccode`_=`_\lccode`$=`$
-
-%    Macros used in the .TEX_SUMMARY file
-%
-%  Description:
-%    There is a command to introduce a new section (mansection) and a list-like
-%    environment (mansectionroutines) that handles the list of routines in the
-%    current section. In addition a mansectionitem command can be used instead
-%    of the item command to introduce a new routine in the current section.
-%-
-
-\newcommand {\mansection}[2]{\subsection{#1 --- #2}}
-
-\newenvironment {mansectionroutines}{\begin{description}\begin{description}}%
-{\end{description}\end{description}}
-
-\newcommand {\mansectionitem}[1]{\item [#1:] \mbox{}}
-
-%    Macros used in the .TEX_DESCR file
-%
-%  Description:
-%    There is a command to introduce a new routine (manroutine) and a list-like
-%    environment (manroutinedescription) that handles the list of paragraphs
-%    describing the current routine. In addition a manroutineitem command can
-%    be used instead of the item command to introduce a new paragraph for the
-%    current routine.
-%
-%    Two-column tables (the ones that can occur anywhere and which are
-%    triggered by "=>" as the second token on a line) are bracketed by a
-%    new environment (mantwocolumntable). Other sorts of table are introduced
-%    by relevant  environments (manparametertable, manfunctiontable and
-%    manvaluetable). The definitions of these environments call various other
-%    user-alterable commands, thus allowing considerable user control over such
-%    tables... (to be filled in when the commands have been written)
-%-
-
-\newcommand {\manrule}{\rule{\textwidth}{0.5mm}}
-
-%\newcommand {\manroutine}[2]{\subsection{#1 --- #2}}
-\newlength{\speccaption}
-\newlength{\specname}
-\newcommand{\manroutine}[2]{\goodbreak
-                          \markboth{{\stardocname}~ --- #1}{{\stardocname}~ --- #1}
-                          \rule{\textwidth}{0.5mm}  % draw thick line
-                          \settowidth{\specname}{{\Large {\bf #1}}}
-                        % left and right box width is text width plus gap
-                          \addtolength{\specname}{4ex}
-                        % caption width is width of page less the two names
-                        % less than empirical fudge factor
-                          \setlength{\speccaption}{\textwidth}
-                          \addtolength{\speccaption}{-2.0\specname}
-                          \addtolength{\speccaption}{-4.9pt}
-                        % move text up the page because \flushleft environ-
-                        % ment creates a paragraph
-                          \vspace{-7mm}
-                          \newline
-                          \parbox[t]{\specname}{\flushleft{\Large {\bf #1}}}
-                          \parbox[t]{\speccaption}{\flushleft{\Large #2}}
-                          \parbox[t]{\specname}{\flushright{\Large {\bf #1}}}
-                          }
-
-\newenvironment {manroutinedescription}{\begin{description}}{\end{description}}
-
-\newcommand {\manroutineitem}[2]{\pagebreak[3]\item [#1:] #2\mbox{}}
-
-
-% parameter tables
-
-\newcommand {\manparametercols}{lllp{90mm}}
-
-\newcommand {\manparameterorder}[3]{#2 & #3 & #1 &}
-
-\newcommand {\manparametertop}{}
-
-\newcommand {\manparameterblank}{\gdef\manparameterzhl{}\gdef\manparameterzss{}}
-
-\newcommand {\manparameterbottom}{}
-
-\newenvironment {manparametertable}{\gdef\manparameterzss{}%
-\gdef\manparameterzhl{}\hspace*{\fill}\vspace*{-\partopsep}\begin{trivlist}%
-\item[]\begin{tabular}{\manparametercols}\manparametertop}{\manparameterbottom%
-\end{tabular}\end{trivlist}}
-
-\newcommand {\manparameterentry}[3]{\manparameterzss\gdef\manparameterzss{\\}%
-\gdef\manparameterzhl{\hline}\manparameterorder{#1}{#2}{#3}}
-
-
-% list environments
-
-\newenvironment {manenumerate}{\begin{enumerate}}{\end{enumerate}}
-
-\newcommand {\manenumerateitem}[1]{\item [#1]}
-
-\newenvironment {manitemize}{\begin{itemize}}{\end{itemize}}
-
-\newcommand {\manitemizeitem}{\item}
-
-\newenvironment {mandescription}{\begin{description}\begin{description}}%
-{\end{description}\end{description}}
-
-\newcommand {\mandescriptionitem}[1]{\item [#1]}
-
-\newcommand {\mantt}{\tt}
-
-% manheadstyle for Starlink
-\newcommand {\manheadstyle}{}
-
-%\catcode`\_=12
-
-% ? End of document specific commands
-%------------------------------------------------------------------------------
 %  Title Page.
 %  ===========
 \renewcommand{\thepage}{\roman{page}}
@@ -761,7 +634,7 @@
 
 %  Latex document header.
 %  ======================
-\begin{latex}
+\begin{latexonly}
    CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
@@ -786,7 +659,7 @@
       {\Large\bf Abstract}
    \end{center}
 % ? End of heading for abstract.
-\end{latex}
+\end{latexonly}
 
 %  HTML documentation header.
 %  ==========================
@@ -799,7 +672,7 @@
    \begin{rawhtml} </H1> \end{rawhtml}
 
 % ? Add picture here if required.
-%  \htmladdimg{sun95_cover.gif}
+%  \htmladdimg{sc4_cover.gif}
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
@@ -839,34 +712,20 @@
 % -----------------------------------------------------------------------------
 % ? Document Abstract. (if used)
 %   ==================
-
-This cookbook describes the fundamentals of writing scripts using
-the UNIX C shell.  It shows how to combine Starlink and private applications
-with shell commands and constructs to create powerful and time-saving
-tools for performing repetitive jobs, creating data-processing
-pipelines, and encapsulating useful recipes.  The cookbook aims to give
-practical and reassuring examples to at least get you started without
-having to consult a UNIX manual.  However, it does not offer a
-comprehensive description of C-shell syntax to prevent you from
-being overwhelmed or intimidated.  The topics covered are: how to run a
-script, defining shell variables, prompting, arithmetic and string
-processing, passing information between Starlink applications, obtaining
-dataset attributes and FITS header information, processing multiple
-files and filename modification, command-line arguments and options, and
-loops.  There is also a glossary.
+\stardocabstract
 
 % ? End of document abstract
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
- \newpage
- \begin{latex}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
-   \markboth{\stardocname}{\stardocname}
+  \newpage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \latexonlytoc
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
 %  \markright{\stardocname}
- \end{latex}
+ \end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 % \newpage
