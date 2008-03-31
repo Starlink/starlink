@@ -1,4 +1,8 @@
-\documentstyle[11pt]{article} 
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+% ? End of specify used packages
+
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
@@ -11,6 +15,21 @@
                                 Programmer's\\
                                 Facilities \& Documentation\\
                                 Guide}
+\newcommand{\stardocabstract}  {
+This document contains a directory of the facilities available to the ADAM
+programmer. All documented aspects of ADAM programming are covered, ranging from
+introductory documentation, through applications programming to real-time and
+system programming. Each facility is briefly described along with the type of
+work for which it might be used. Most importantly, this guide shows at a glance
+where to obtain the relevant documentation.
+
+It is hoped to update this document relatively frequently, so that it serves as
+a guide to the latest ADAM developments. Its format, which includes an overall
+index, is designed to allow its use as a table of contents for a personal file
+of programming documentation.
+}
+
+
 %------------------------------------------------------------------------------
 \newcommand{\previousdate}     {7th August 1992}
 
@@ -25,14 +44,117 @@
 \setlength{\parskip}{\medskipamount}
 \setlength{\unitlength}{1mm}
 
-\renewcommand{\_}{{\tt\char'137}}
-\renewcommand{\thepage}{\roman{page}}
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
 
-%------------------------------------------------------------------------------
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%begin{latexonly}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+% Define commands for HTML-only or LaTeX-only text.
+\newcommand{\html}[1]{}
+\newcommand{\latex}[1]{#1}
+
+% Use latex2html 98.2.
+\newcommand{\latexhtml}[2]{#1}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
+% -----------------------------------------------------------------------------
 % Add any \newcommand or \newenvironment commands here
 
-\renewcommand{\thefootnote}{\fnsymbol{footnote}}
-\newcommand{\changed}{{\bf $^*$}}
+%\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+\newcommand{\changed}{\bf $^*$}
 \newcommand{\change}[1]{{\bf #1}}
 \newcommand{\newfac}{{\bf \footnotemark[2]}}
 
@@ -46,6 +168,14 @@
    \vspace{7mm}
 
 }
+\begin{htmlonly}
+   \newcommand{\bighead}[1]{
+      \stepcounter{headcount}
+
+      \section{#1}
+   }
+\end{htmlonly}
+
 \newcommand{\docitem}[4]{
    \stepcounter{doccount}
    \vbox{
@@ -61,52 +191,126 @@
 
 }
 
+\begin{htmlonly}
+\newcommand{\docitem}[4]{
+   \stepcounter{doccount}
+   \vbox{
+      \begin{tabular}{p{18mm}p{112mm}p{70mm}} \hline\hline
+      \multicolumn{1}{l}{\large \theheadcount -\thedoccount} &
+      {\large \bf #1} & 
+      \multicolumn{1}{r}{\large \bf #3} \\
+      & {\large #2}\\ \hline
+      & \multicolumn{2}{p90mm}{#4}
+      \end{tabular}
+      \vspace{2mm}
+   }
+
+}
+\end{htmlonly}
+
 %------------------------------------------------------------------------------
+\renewcommand{\thepage}{\roman{page}}
 \begin{document}
 
 \thispagestyle{empty}
-SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
-RUTHERFORD APPLETON LABORATORY\\
-{\large\bf Starlink Project\\}
-{\large\bf \stardoccategory\ \stardocnumber}
-\begin{flushright}
-\stardocauthors\\
-\stardocdate
-\end{flushright}
-\vspace{-4mm}
-\rule{\textwidth}{0.5mm}
-\vspace{5mm}
-\begin{center}
-{\Huge\bf  \stardoctitle \\ [3.5ex]}
-{\Large \bf  \stardocdate}
-\end{center}
-\vspace{20mm}
 
+%  Latex document header.
+%  ======================
+
+\begin{latexonly}
+   SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+   RUTHERFORD APPLETON LABORATORY\\
+   {\large\bf Starlink Project\\}
+   {\large\bf \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle \\ [3.5ex]}
+   {\Large \bf  \stardocdate}
+   \end{center}
+   \vspace{20mm}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
+
+% ? Add picture here if required.
+%  \htmladdimg{sg6_cover.gif}
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Science \& Engineering Research Council}
+                        {http://www.stfc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \newcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%   ==================
+\stardocabstract
+
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+% ? End of Latex document table of contents
 %------------------------------------------------------------------------------
-%  Package Description
-\begin{center}
-{\Large\bf Description}
-\end{center}
-
-This document contains a directory of the facilities available to the ADAM
-programmer. All documented aspects of ADAM programming are covered, ranging from
-introductory documentation, through applications programming to real-time and
-system programming. Each facility is briefly described along with the type of
-work for which it might be used. Most importantly, this guide shows at a glance
-where to obtain the relevant documentation.
-
-It is hoped to update this document relatively frequently, so that it serves as
-a guide to the latest ADAM developments. Its format, which includes an overall
-index, is designed to allow its use as a table of contents for a personal file
-of programming documentation.
-
 \newpage
 \thispagestyle{empty}
+\begin{latexonly}
 \vspace*{\fill}
 \begin{center}
 {\Large This page deliberately left blank}
 \end{center}
 \vspace*{\fill}
+\end{latexonly}
 
 % Start of Index.
 % ==============
@@ -115,6 +319,7 @@ of programming documentation.
 \renewcommand{\thepage}{\roman{page}}
 \setcounter{page}{1}
 
+\begin{latexonly}
 \null\vspace {5mm}
 \begin {center}
 \rule{80mm}{0.5mm} \\ [1ex]
@@ -126,103 +331,110 @@ of programming documentation.
 \rule{80mm}{0.5mm}
 \end{center}
 \vspace{30mm}
+\end{latexonly}
 
+\html{\section{Documentation Index}}
 {\Large \bf 1 Introductory Documentation}
 
-\footnotetext[1]{The documentation for these facilities has changed since the
-previous version of this guide (dated \previousdate). Please ensure that you
-have a copy of the most recent documents.}
+\latex{\footnotetext[1]{The documentation for these facilities has
+changed since the previous version of this guide (dated
+\previousdate). Please ensure that you have a copy of the most recent
+documents.}} 
+\html{An asterisk indicates that the documentation for
+these facilities has changed since the previous version of this guide
+(dated \previousdate). Please ensure that you have a copy of the most
+recent documents.}
+
 \begin{tabular}{p{8mm}p{27mm}p{90mm}l}
-1-1 & INTRO & {\em Introduction to ADAM Programming} & SUN/101\\
-1-2\changed & ADAM & {\em The Starlink Software Environment} & SG/4\\
+1-1 & INTRO & {\em Introduction to ADAM Programming} & \xref{SUN/101}{sun101}{}\\
+1-2\changed & ADAM & {\em The Starlink Software Environment} & \xref{SG/4}{sg4}{}\\
 \end{tabular}
 
-\vspace{2ex}
+\latex{\vspace{2ex}}
 {\Large \bf 2 General Applications Programming}
 
 \begin{tabular}{p{8mm}p{27mm}p{90mm}l}
-2-1\changed & PAR & {\em ADAM Parameter System Routines} & SUN/114\\
-2-2 & NDF & {\em Extensible N-Dimensional Data Format} & SUN/33\\
-2-3\changed & MSG \& ERR & {\em Message and Error Reporting} & SUN/104\\
-2-4 & CHR & {\em Character Handling} & SUN/40\\
-2-5\changed & PGPLOT & {\em Graphics Library} & SUN/15\\
-2-6 & SGS & {\em Simple Graphics System} & SUN/85\\
-2-7\changed & FIO \& RIO & {\em File Input/Output} & SUN/143\\
-2-8 & MAG & {\em Magnetic Tape Handling} & APN/1\\
-2-9 & PRIMDAT & {\em Primitive Numerical Data Processing} & SUN/39\\
-2-10 & ICL & {\em ADAM Command Language} & SG/5\\
-2-11 & IFL & {\em ADAM Interface Module Reference Manual} & SUN/115\\
+2-1\changed & PAR & {\em ADAM Parameter System Routines} & \xref{SUN/114}{sun114}{}\\
+2-2 & NDF & {\em Extensible N-Dimensional Data Format} & \xref{SUN/33}{sun33}{}\\
+2-3\changed & MSG \& ERR & {\em Message and Error Reporting} & \xref{SUN/104}{sun104}{}\\
+2-4 & CHR & {\em Character Handling} & \xref{SUN/40}{sun40}{}\\
+2-5\changed & PGPLOT & {\em Graphics Library} & \xref{SUN/15}{sun15}{}\\
+2-6 & SGS & {\em Simple Graphics System} & \xref{SUN/85}{sun85}{}\\
+2-7\changed & FIO \& RIO & {\em File Input/Output} & \xref{SUN/143}{sun143}{}\\
+2-8 & MAG & {\em Magnetic Tape Handling} & \xref{SUN/2}{sun2}{}\\
+2-9 & PRIMDAT & {\em Primitive Numerical Data Processing} & \xref{SUN/39}{sun39}{}\\
+2-10 & ICL & {\em ADAM Command Language} & \xref{SG/5}{sg5}{}\\
+2-11 & IFL & {\em ADAM Interface Module Reference Manual} & \xref{SUN/115}{sun115}{}\\
 \end{tabular}
 
-\newpage
-\vspace{2ex}
-{\Large \bf 3 More Specialised Facilities}
+\latex{\newpage}
+\latex{\vspace{2ex}}
+{\Large \bf 3 More-specialised Facilities}
 
 \footnotetext[1]{The documentation for these facilities has changed since the
 previous version of this guide (dated \previousdate). Please ensure that you
 have a copy of the most recent documents.}
 \footnotetext[2]{New facility.}
 \begin{tabular}{p{8mm}p{27mm}p{90mm}l}
-3-1 & SLALIB & {\em Positional Astronomy and Time} & SUN/67\\
-3-2 & NCAR & {\em Graphics Utilities} & SUN/88\\
-3-3 & SNX & {\em Starlink Extensions to NCAR} & SUN/90\\
-3-4\changed & AGI & {\em Applications Graphics Interface} & SUN/48\\
-3-5 & PSX & {\em POSIX Interface Routines} & SUN/121\\
-3-6\changed & REF & {\em References to HDS Objects} & SUN/31\\
-3-7 & TRANSFORM & {\em Coordinate Transformation Facility} & SUN/61\\
-3-8\changed & HELP & {\em Help Text Retrieval System} & SUN/124\\
+3-1 & SLALIB & {\em Positional Astronomy and Time} & \xref{SUN/67}{sun67}{}\\
+3-2 & NCAR & {\em Graphics Utilities} & \xref{SUN/88}{sun88}{}\\
+3-3 & SNX & {\em Starlink Extensions to NCAR} & \xref{SUN/90}{sun90}{}\\
+3-4\changed & AGI & {\em Applications Graphics Interface} & \xref{SUN/48}{sun48}{}\\
+3-5 & PSX & {\em POSIX Interface Routines} & \xref{SUN/121}{sun121}{}\\
+3-6\changed & REF & {\em References to HDS Objects} & \xref{SUN/31}{sun31}{}\\
+3-7 & TRANSFORM & {\em Coordinate Transformation Facility} & \xref{SUN/61}{sun61}{}\\
+3-8\changed & HELP & {\em Help Text Retrieval System} & \xref{SUN/124}{sun124}{}\\
 \end{tabular}
 
-\vspace{2ex}
-{\Large \bf 4 Lower-Level Facilities}
+\latex{\vspace{2ex}}
+{\Large \bf 4 Lower-level Facilities}
 
 \begin{tabular}{p{8mm}p{27mm}p{90mm}l}
-4-1 & ARY & {\em Access to ARRAY Data Structures} & SUN/11\\
-4-2 & HDS & {\em Hierarchical Data System} & SUN/92\\
-4-3\changed & IDI & {\em Image Display Interface} & SUN/65\\
-4-4 & GKS & {\em Graphical Kernel System} & SUN/83\\
-4-5\newfac & GRP & {\em Routines for Managing Groups of Objects} & SUN/150\\
-4-6 & GWM & {\em X Graphics Window Manager} & SUN/130\\
-4-7\changed & GNS & {\em Graphics Workstation Name Service} & SUN/57\\
+4-1 & ARY & {\em Access to ARRAY Data Structures} & \xref{SUN/11}{sun11}{}\\
+4-2 & HDS & {\em Hierarchical Data System} & \xref{SUN/92}{sun92}{}\\
+4-3\changed & IDI & {\em Image Display Interface} & \xref{SUN/65}{sun65}{}\\
+4-4 & GKS & {\em Graphical Kernel System} & \xref{SUN/83}{sun83}{}\\
+4-5\newfac & GRP & {\em Routines for Managing Groups of Objects} & \xref{SUN/150}{sun150}{}\\
+4-6 & GWM & {\em X Graphics Window Manager} & \xref{SUN/130}{sun130}{}\\
+4-7\changed & GNS & {\em Graphics Workstation Name Service} & \xref{SUN/57}{sun57}{}\\
 \end{tabular}
 
-\vspace{2ex}
+\latex{\vspace{2ex}}
 {\Large \bf 5 Programming Tools}
 
 \begin{tabular}{p{8mm}p{27mm}p{90mm}l}
-5-1 & STARLSE & {\em Starlink Language Sensitive Editor} & SUN/105\\
-5-2 & SST & {\em Simple Software Tools} & SUN/110\\
-5-3\changed & GENERIC & {\em Utility for Compiling Generic Fortran} & SUN/7\\
-5-4\changed & SPT & {\em Software Porting Tools} & SUN/111\\
+5-1 & STARLSE & {\em Starlink Language Sensitive Editor} & \xref{SUN/105}{sun105}{}\\
+5-2 & SST & {\em Simple Software Tools} & \xref{SUN/110}{sun110}{}\\
+5-3\changed & GENERIC & {\em Utility for Compiling Generic Fortran} & \xref{SUN/7}{sun7}{}\\
 \end{tabular}
 
-\vspace{2ex}
+\latex{\vspace{2ex}}
 {\Large \bf 6 Instrumentation Programming}
 
 \begin{tabular}{p{8mm}p{27mm}p{90mm}l}
-6-1 & TASK & {\em Guide to Writing ADAM Instrumentation Tasks} & SUN/134\\
-6-2\changed & NBS & {\em Noticeboard System} & SUN/77\\
-6-3 & MSP & {\em Message System Primitive Routines} & SSN/2\\
+6-1 & TASK & {\em Guide to Writing ADAM Instrumentation Tasks} & \xref{SUN/134}{sun134}{}\\
+6-2\changed & NBS & {\em Noticeboard System} & \xref{SUN/77}{sun77}{}\\
+6-3 & MSP & {\em Message System Primitive Routines} & \xref{SSN/2}{ssn2}{}\\
 \end{tabular}
 
-\vspace{2ex}
+\latex{\vspace{2ex}}
 {\Large \bf 7 System Programming}
 
 \begin{tabular}{p{8mm}p{27mm}p{90mm}l}
-7-1 & EMS & {\em Error Message Service} & SSN/4\\
-7-2 & CNF \& F77 & {\em Mixed Language Programming} & SGP/5\\
+7-1 & EMS & {\em Error Message Service} & \xref{SSN/4}{ssn4}{}\\
+7-2 & CNF \& F77 & {\em Mixed Language Programming} & \xref{SGP/5}{sgp5}{}\\
 \end{tabular}
 
-\vspace{2ex}
+\latex{\vspace{2ex}}
 {\Large \bf 8 Standards and Conventions}
 
 \begin{tabular}{p{8mm}p{27mm}p{90mm}l}
-8-1 & FORTRAN & {\em Application Programming Standard} & SGP/16\\
-8-2 & C & {\em Starlink C Programming Standard} & SGP/4\\
-8-3 & DATA & {\em Starlink Standard Data Structures} & SGP/38\\
-8-4 & PACKAGES & {\em Organisation of ADAM Applications Packages} & SSN/64\\
-8-5 & LIBRARIES & {\em Conventions for Accessing Starlink Libraries} & SSN/8\\
-8-6 & UNIX & {\em Starlink Software Organisation on UNIX} & SSN/66\\
+8-1 & FORTRAN & {\em Application Programming Standard} & \xref{SGP/16}{sgp16}{}\\
+8-2 & C & {\em Starlink C Programming Standard} & \xref{SGP/4}{sgp4}{}\\
+8-3 & DATA & {\em Starlink Standard Data Structures} & \xref{SGP/38}{sgp38}{}\\
+8-4 & PACKAGES & {\em Organisation of ADAM Applications Packages} & \xref{SSN/64}{ssn64}{}\\
+8-5 & LIBRARIES & {\em Conventions for Accessing Starlink Libraries} & \xref{SSN/8}{ssn8}{}\\
+8-6 & UNIX & {\em Starlink Software Organisation on UNIX} & \xref{SSN/66}{ssn66}{}\\
 \end{tabular}
 
 % Start of Guide.
@@ -232,6 +444,7 @@ have a copy of the most recent documents.}
 \setcounter{page}{1}
 \markright{ADAM Programmer's Guide, \stardocdate}
 
+\begin{latexonly}
 \null\vspace {5mm}
 \begin {center}
 \rule{80mm}{0.5mm} \\ [1ex]
@@ -243,10 +456,11 @@ have a copy of the most recent documents.}
 \rule{80mm}{0.5mm}
 \end{center}
 \vspace{25mm}
+\end{latexonly}
 
 \bighead{Introductory Documentation}
 
-\docitem{INTRO}{Introduction to ADAM Programming}{SUN/101.2}{
+\docitem{INTRO}{Introduction to ADAM Programming}{\xref{SUN/101.2}{sun101}{}}{ 
 A tutorial introduction to writing ADAM programs. This document is intended for
 newcomers to ADAM who already have a basic understanding of Fortran programming
 but are unfamiliar with ADAM conventions. The use of the most important
@@ -254,7 +468,7 @@ facilities listed in this guide is illustrated, and a set of
 example programs is provided.
 }
 
-\docitem{ADAM}{The Starlink Software Environment}{SG/4.2}{
+\docitem{ADAM}{The Starlink Software Environment}{\xref{SG/4.2}{sgp4}{}}{
 This document provides the most comprehensive overview of ADAM from the
 perspective of a typical Starlink user, covering both the running of existing
 applications and the writing of new ones. It contains essential introductory
@@ -268,7 +482,7 @@ guide if up-to-the-minute information is needed on a particular topic.
 \newpage
 \bighead{General Applications Programming}
 
-\docitem{PAR}{ADAM Parameter System Routines}{SUN/114.1}{
+\docitem{PAR}{ADAM Parameter System Routines}{\xref{SUN/114.1}{sun114}{}}{
 Provides access to ``{\em parameters\/}'' from within applications. These are
 the values which provide external control over an application (broadly similar
 to command line switches in UNIX, or command qualifiers in VMS). The PAR library
@@ -278,19 +492,19 @@ a complete revision of the documentation and the addition of a new set of
 routines which permit parameter values to be obtained subject to various
 constraints.}
 }
-\docitem{NDF}{Extensible N-Dimensional Data Format}{SUN/33.3}{
+\docitem{NDF}{Extensible N-Dimensional Data Format}{\xref{SUN/33.3}{sun33}{}}{
 The Extensible N-Dimensional Data Format (NDF) is the Starlink format for
-storing bulk data in the form of N-dimensional arrays of numbers. It is
+storing bulk data in the form of $N$-dimensional arrays of numbers. It is
 typically used for storing spectra, images and similar datasets with higher
 dimensionality. The NDF format is based on the {\em Hierarchical Data System},
-HDS (see SUN/92), and is extensible; not only does it provide a comprehensive
+HDS (see \xref{SUN/92}{sun92}{}), and is extensible; not only does it provide a comprehensive
 set of standard ancillary items to describe the data, it can also be extended
 indefinitely to handle additional user-defined information of any type. SUN/33
 describes the routines provided for accessing NDF data objects. It also
 discusses all the important NDF concepts and includes a selection of simple
 example applications.
 }
-\docitem{MSG \& ERR}{Message and Error Reporting}{SUN/104.5}{
+\docitem{MSG \& ERR}{Message and Error Reporting}{\xref{SUN/104.5}{sun104}{}}{
 These provide a means for sending simple messages to the user of an application,
 together with a mechanism for reporting errors. They address many of the common
 problems encountered when formatting and displaying text through their use of
@@ -299,29 +513,58 @@ other ADAM libraries. Most importantly, SUN/104 explains the ideas underlying
 the error handling scheme and ``{\em inherited status checking\/}'' used by the
 bulk of Starlink software.
 }
-\docitem{CHR}{Character Handling}{SUN/40.3}{
+\docitem{CHR}{Character Handling}{\xref{SUN/40.3}{sun40}{}}{
 This library provides a simple way to perform many commonly required operations
 on Fortran character variables. These include: formatting and decoding numerical
 values, case conversion, analysing lists, string searching and character
 testing. This library is currently being upgraded to include a substantial
 number of new routines.
 }
-\docitem{PGPLOT}{Graphics Library \hfill {\large \bf SUN/15.5}\\
-                          \mbox{} \hfill {\large \bf SUN113.2}}
+
+% 2008 March 30 (MJC)
+% Cannot think of a way to achieve the original paper documentation
+% appearance when there is more than one document associated with the
+% software item, and obtain the desired effect in the hypertext too.
+% So the paragraph description is repeated in latex and html versions.
+% Any modifications to the description must be made in both versions.
+% It's not possible to wrap up just the differing \docitem lines.
+
+\begin{latexonly}
+\docitem{PGPLOT}{Graphics Library \hfill \xref{\large \bf SUN/15.5}{sun15}{}\\
+                          \mbox{} \hfill \xref{\large \bf SUN113.2}{sun113}{}}
         {\em PGPLOT Manual\/}{
 If you are unsure which high-level graphics library to use, then this is
 probably the one for you. It caters for most simple graph-plotting needs in a
 straightforward way (although it may not satisfy the more demanding user, for
-whom NCAR may be preferable -- see SUN/88). The PGPLOT manual, entitled ``{\em
+whom NCAR may be preferable -- see \xref{SUN/88}{sun88}{}). The PGPLOT manual, entitled ``{\em
 PGPLOT -- Graphics Subroutine Library\/}'', is available from Starlink site
 managers in the {\em Miscellaneous User Documents\/} (MUD) series. SUN/15
 describes the PGPLOT implementation on Starlink and shows how it integrates with
 SGS (see SUN/85). Note that the {\em Applications Graphics Interface} AGI also
-provides special routines for ease of use with PGPLOT (see SUN/48).
+provides special routines for ease of use with PGPLOT (see
+\xref{SUN/48}{sun48}{}).
 }
-\docitem{SGS}{Simple Graphics System \hfill {\large\bf SUN/113.2}}{SUN/85.5}{
+\end{latexonly}
+\begin{htmlonly}
+\docitem{PGPLOT}{Graphics Library}{{\em PGPLOT Manual\/}\\
+                                   \xref{SUN/15.5}{sun15}{}\\
+                                   \xref{SUN113.2}{sun113}{}}{
+If you are unsure which high-level graphics library to use, then this is
+probably the one for you. It caters for most simple graph-plotting needs in a
+straightforward way (although it may not satisfy the more demanding user, for
+whom NCAR may be preferable -- see \xref{SUN/88}{sun88}{}). The PGPLOT manual, entitled ``{\em
+PGPLOT -- Graphics Subroutine Library\/}'', is available from Starlink site
+managers in the {\em Miscellaneous User Documents\/} (MUD) series. SUN/15
+describes the PGPLOT implementation on Starlink and shows how it integrates with
+SGS (see SUN/85). Note that the {\em Applications Graphics Interface} AGI also
+provides special routines for ease of use with PGPLOT (see
+\xref{SUN/48}{sun48}{}).
+}
+\end{htmlonly}
+\begin{latexonly}
+\docitem{SGS}{Simple Graphics System \hfill \xref{\large\bf SUN/113.2}{sun113}{}}{\xref{SUN/85.5}{sun85}{}}{
 SGS provides an easy-to-use interface to the {\em Graphical Kernel System}, GKS
-(see SUN/83). GKS is the underlying system which provides graphics ``{\em
+(see \xref{SUN/83}{sun83}{}). GKS is the underlying system which provides graphics ``{\em
 device-independence\/}'' but it is too low-level for general use, so calls to
 SGS routines may be used instead to perform simple plotting operations which do
 not amount to complete graph drawing. SGS is particularly useful for managing
@@ -331,7 +574,23 @@ SGS, while SUN/113  describes additional routines which connect SGS to ADAM. The
 {\em Applications Graphics Interface} AGI also provides special routines for
 ease of use with SGS (see SUN/48).
 }
-\docitem{FIO \& RIO}{File Input/Output}{SUN/143}{
+\end{latexonly}
+\begin{htmlonly}
+\docitem{SGS}{Simple Graphics System}{\xref{SUN/85.5}{sun85}{}\\
+                                      \xref{SUN/113.2}{sun113}{}}{
+SGS provides an easy-to-use interface to the {\em Graphical Kernel System}, GKS
+(see \xref{SUN/83}{sun83}{}). GKS is the underlying system which provides graphics ``{\em
+device-independence\/}'' but it is too low-level for general use, so calls to
+SGS routines may be used instead to perform simple plotting operations which do
+not amount to complete graph drawing. SGS is particularly useful for managing
+the layout of plotting surfaces which are to be filled with graphs drawn by
+higher-level routines. SUN/85 describes the ``{\em stand-alone\/}'' version of
+SGS, while SUN/113  describes additional routines which connect SGS to ADAM. The
+{\em Applications Graphics Interface} AGI also provides special routines for
+ease of use with SGS (see SUN/48).
+}
+\end{htmlonly}
+\docitem{FIO \& RIO}{File Input/Output}{\xref{SUN/143}{sun143}{}}{
 Provides a set of routines to facilitate the reading and writing of Fortran
 files. These routines are not intended to replace the portable features of
 standard Fortran~77, but to help integrate these features with ADAM. They also
@@ -341,15 +600,13 @@ revision of the documentation and new facilities to assist with error reporting
 and the portable classification of I/O error status values. Some rationalisation
 of routine naming has also occurred.}
 }
-\docitem{MAG}{Magnetic Tape Handling}{APN/1.3}{
+\docitem{MAG}{Magnetic Tape Handling}{\xref{SUN/2}{sun2}{}}{
 Provides routines for accessing magnetic tapes and controlling tape drive
 operations {\em via\/} the ADAM parameter system. A feature is incorporated to
 minimise tape movement between applications by keeping track of the absolute
-tape position. The present documentation is in the old {\em ADAM Programmer's
-Note\/} (APN) series, but will be upgraded to a {\em Starlink User Note\/} (SUN)
-in due course.
+tape position.
 }
-\docitem{PRIMDAT}{Primitive Numerical Data Processing}{SUN/39.1}{
+\docitem{PRIMDAT}{Primitive Numerical Data Processing}{\xref{SUN/39.1}{sun39}{}}{
 Provides arithmetic and mathematical functions for processing primitive
 numerical data (real, integer \& double precision values, {\em etc.}) including
 the non-standard data types ({\em e.g.}\ unsigned byte) which are used in ADAM
@@ -359,18 +616,18 @@ data and methods for handling numerical errors such as overflow. A set of
 include files is also provided to define machine-dependent constants, including
 the important ``{\em bad\/}'' values used to flag undefined data. The systematic
 naming of files and routines in this library is designed to integrate with the
-GENERIC pre-processor (see SUN/7).
+GENERIC pre-processor (see \xref{SUN/7}{sun7}{}).
 }
-\docitem{ICL}{ADAM Command Language}{SG/5.1}{
+\docitem{ICL}{ADAM Command Language}{\xref{SG/5.1}{sg5}{}}{
 Although ICL is really a command language from which applications are run, the
 writer of ADAM applications will still find it useful to refer to this 
 document. It describes the ICL language, which includes a number of special
 features for controlling and communicating with ADAM tasks.
 }
-\docitem{IFL}{ADAM Interface Module Reference Manual}{SUN/115.1}{
+\docitem{IFL}{ADAM Interface Module Reference Manual}{\xref{SUN/115.1}{sun115}{}}{
 An ``{\em interface module\/}'' (or ``{\em interface file\/}'') acts as an
 interface between an application and its user. It describes to the ADAM
-parameter system (see SUN/114) how to obtain values and other information ({\em
+parameter system (see \xref{SUN/114}{sun114}{}) how to obtain values and other information ({\em
 e.g.}\ help text) for an application's parameters, and hence influences, in
 broad terms, how the application behaves. This document provides reference
 information describing in detail how to write an interface module.
@@ -379,9 +636,9 @@ information describing in detail how to write an interface module.
 
 
 \newpage
-\bighead{More Specialised Facilities}
+\bighead{More-specialised Facilities}
 
-\docitem{SLALIB}{Positional Astronomy and Time}{SUN/67.17}{
+\docitem{SLALIB}{Positional Astronomy and Time}{\xref{SUN/67.17}{sun67}{}}{
 SLALIB (the name just stands for ``{\em Subprogram Library A\/}'') contains a
 large number of routines mainly concerned with positional astronomy and time.
 Some also have wider trigonometrical, numerical or general significance, while
@@ -390,7 +647,8 @@ sexagesimal conversions; handling of angles, vectors and rotation matrices;
 calendar and timescale calculations; precession, nutation and proper-motion
 calculations; celestial coordinate conversions and astrometric transformations.
 }
-\docitem{NCAR}{Graphics Utilities \hfill {\large\bf SUN/88.4}}
+\begin{latexonly}
+\docitem{NCAR}{Graphics Utilities \hfill \xref{\large\bf SUN/88.4}{sun88}{}}
               {NCAR Manual}{
 NCAR is a large and sophisticated set of high-level plotting routines developed
 at the National Centre for Atmospheric Research at Boulder, Colorado. It can do
@@ -400,7 +658,20 @@ Miscellaneous User Documents\/} (MUD) series, available from Starlink site
 managers. SUN/88 provides a concise summary of the NCAR facilities and describes
 the Starlink release of this system.
 }
-\docitem{SNX}{Starlink Extensions to NCAR}{SUN/90.8}{
+\end{latexonly}
+\begin{htmlonly}
+\docitem{NCAR}{Graphics Utilities}{NCAR Manual\\
+                                   \xref{SUN/88.4}{sun88}{}}{
+NCAR is a large and sophisticated set of high-level plotting routines developed
+at the National Centre for Atmospheric Research at Boulder, Colorado. It can do
+more things than most other plotting packages and is reasonably straightforward
+to use. The ``{\em NCAR Manual\/}'' is a large document in the {\em
+Miscellaneous User Documents\/} (MUD) series, available from Starlink site
+managers. SUN/88 provides a concise summary of the NCAR facilities and describes
+the Starlink release of this system.
+}
+\end{htmlonly}
+\docitem{SNX}{Starlink Extensions to NCAR}{\xref{SUN/90.8}{sun90}{}}{
 Since NCAR uses GKS, calls to its routines may be interspersed with calls to
 other GKS-based graphics libraries. To do this effectively, however, it is
 usually necessary to know about such things as the NCAR coordinate system, or to
@@ -408,7 +679,7 @@ arrange for an NCAR plot to appear within a specified region of the display
 surface. The SNX routines provide a bridge between NCAR and SGS which allows
 this type of interaction.
 }
-\docitem{AGI}{Applications Graphics Interface}{SUN/48.5}{
+\docitem{AGI}{Applications Graphics Interface}{\xref{SUN/48.5}{sun48}{}}{
 AGI is a Graphics Database system which allows graphics applications to record
 information about the plots they produce so that subsequent applications can
 make use of it. For example, information about the coordinate system of a graph
@@ -420,7 +691,7 @@ separate ``{\em pictures\/}'' so that multiple plots may appear, each with their
 own graphics information. AGI has special interfaces for ease of use with the
 PGPLOT, SGS and IDI graphics libraries.
 }
-\docitem{PSX}{POSIX Interface Routines}{SUN/121.1}{
+\docitem{PSX}{POSIX Interface Routines}{\xref{SUN/121.1}{sun121}{}}{
 POSIX is an IEEE standard defining an interface to a ``{\em virtual operating
 system\/}'' which applications may use to interact with their host machine in a
 portable manner. For example, POSIX could be used to determine the current
@@ -431,16 +702,16 @@ the PSX library provides a solution by making some of the more useful POSIX
 functions available in Fortran-callable form. It provides an ADAM-style
 interface to POSIX, including inherited status checking and error reporting.
 }
-\docitem{REF}{References to HDS Objects}{SUN/31.4}{
+\docitem{REF}{References to HDS Objects}{\xref{SUN/31.4}{sun31}{}}{
 It is sometimes useful to use HDS to store pointers to other HDS objects. For
 instance, the {\em Applications Graphics Interface}, AGI, depends on this
 ability in order to associate HDS data objects with graphical displays (see
-SUN/48), without having to make a separate copy of the data object. The REF
+\xref{SUN/48}{sun48}{}), without having to make a separate copy of the data object. The REF
 library is provided to facilitate this data-object ``{\em referencing\/}'' 
 process and the subsequent accessing of objects which have been referenced in
 this way.
 }
-\docitem{TRANSFORM}{Coordinate Transformation Facility}{SUN/61.2}{
+\docitem{TRANSFORM}{Coordinate Transformation Facility}{\xref{SUN/61.2}{sun61}{}}{
 A specialised facility which allows mappings (or coordinate transformations) to
 be formulated and stored as HDS objects. These transformations may later be
 recovered and evaluated. This facility is used by the {\em Applications Graphics
@@ -449,7 +720,7 @@ SUN/48). TRANSFORM also incorporates a facility for parsing and evaluating
 Fortran-like arithmetic expressions, a feature which can sometimes be used to
 good effect in applications software.
 }
-\docitem{HELP}{Help Text Retrieval System}{SUN/124.6}{
+\docitem{HELP}{Help Text Retrieval System}{\xref{SUN/124.6}{sun124}{}}{
 A subroutine library designed for implementing interactive hierarchical help
 systems. It is modelled on the VAX/VMS help system but has a number of
 additional features, including the ability for ``{\em help files\/}'' to refer
@@ -461,9 +732,9 @@ wish to handle their own help information explicitly.
 
 
 \newpage
-\bighead{Lower-Level Facilities}
+\bighead{Lower-level Facilities}
 
-\docitem{ARY}{Access to Array Data Structures}{SUN/11.2}{
+\docitem{ARY}{Access to Array Data Structures}{\xref{SUN/11.2}{sun11}{}}{
 The HDS-based ARRAY data structure is one of the building blocks from which the
 Extensible N-Dimensional Data Format, or NDF (see SUN/33), is constructed. The
 ARY library provides access to these structures and is used extensively by the
@@ -472,7 +743,8 @@ more sophisticated alternative to primitive HDS arrays for storing data. They
 can be particularly valuable when used in NDF ``{\em extensions\/}'' to extend
 the NDF definition by adding arrays of additional information.
 }
-\docitem{HDS}{Hierarchical Data System \hfill {\large\bf APN/7}}{SUN/92.8}{
+\begin{latexonly}
+\docitem{HDS}{Hierarchical Data System \hfill {\large\bf SUN/224.2}}{\xref{SUN/92.8}{sun92}{}}{
 HDS is the low-level data system upon which other important data structures,
 such as the NDF (see SUN/33), are built. This document describes routines for
 accessing these structures at the lowest level. Calls to HDS routines may be
@@ -480,13 +752,27 @@ intermixed with those to other higher-level data access routines, and are also
 invaluable for creating and accessing data structures of your own design (such
 as NDF extensions). All data structures created by HDS are portable between the
 machines on which HDS is implemented. SUN/92 describes the ``{\em
-stand-alone\/}'' version of HDS, while APN/7 describes additional routines which
-connect HDS to ADAM. This latter document is in the old {\em ADAM Programmer
-Note\/} (APN) series, but its information may eventually be incorporated into
-SUN/92.
+stand-alone\/}'' version of HDS, while SUN/227 describes additional routines which
+connect HDS to ADAM.
 }
-\docitem{IDI}{Image Display Interface \hfill {\large\bf SUN/65.7}}
-{\em Astron. Astrophys. article\/}{
+\end{latexonly}
+\begin{htmlonly}
+\docitem{HDS}{Hierarchical Data System}{\xref{SUN/92.8}{sun92}{}\\
+                                        \xref{SUN/224.2}{sun224}{}}{
+HDS is the low-level data system upon which other important data structures,
+such as the NDF (see SUN/33), are built. This document describes routines for
+accessing these structures at the lowest level. Calls to HDS routines may be
+intermixed with those to other higher-level data access routines, and are also
+invaluable for creating and accessing data structures of your own design (such
+as NDF extensions). All data structures created by HDS are portable between the
+machines on which HDS is implemented. SUN/92 describes the ``{\em
+stand-alone\/}'' version of HDS, while SUN/227 describes additional routines which
+connect HDS to ADAM.
+}
+\end{htmlonly}
+\begin{latexonly}
+\docitem{IDI}{Image Display Interface \hfill \xref{\large\bf SUN/65.7}{sun65}{}}
+{\em Astron. Astrophys. paper\/}{
 IDI is a standard for the display and manipulation of data on image displays in
 astronomy. Unlike the other graphics packages, IDI is not based on GKS, so calls
 to IDI cannot be intermixed with other graphics calls. However, IDI has the
@@ -498,10 +784,29 @@ processing\/}'' by Terrett {\em et al.}\ (1988), Astron. Astrophys. Suppl. Ser.,
 reference to a specific implementation. SUN/65 describes the Starlink
 implementation of IDI, which includes some additional routines to connect it
 with ADAM. The {\em Applications Graphics Interface} AGI also contains special
-routines for ease of use with IDI (see SUN/48).
+routines for ease of use with IDI (see \xref{SUN/48}{sun48}{}).
 }
-\docitem{GKS}{Graphical Kernel System \hfill {\large\bf SUN/83.12}\\
-                              \mbox{} \hfill {\large\bf SUN/113.2}}
+\end{latexonly}
+\begin{htmlonly}
+\docitem{IDI}{Image Display Interface}{{\em Astron. Astrophys. paper\/}\\
+                                       \xref{SUN/65.7}{sun65}{}}{
+IDI is a standard for the display and manipulation of data on image displays in
+astronomy. Unlike the other graphics packages, IDI is not based on GKS, so calls
+to IDI cannot be intermixed with other graphics calls. However, IDI has the
+advantage of providing facilities for interactive manipulation of image displays
+({\em e.g.}\ panning, zooming and blinking) which GKS lacks. The definitive
+document on IDI is ``{\em An image display interface for astronomical image
+processing\/}'' by Terrett {\em et al.}\ (1988), Astron. Astrophys. Suppl. Ser.,
+{\bf 76,} 263-304. This paper describes the IDI routines in detail but without
+reference to a specific implementation. SUN/65 describes the Starlink
+implementation of IDI, which includes some additional routines to connect it
+with ADAM. The {\em Applications Graphics Interface} AGI also contains special
+routines for ease of use with IDI (see \xref{SUN/48}{sun48}{}).
+}
+\end{htmlonly}
+\begin{latexonly}
+\docitem{GKS}{Graphical Kernel System \hfill \xref{\large\bf SUN/83.12}{sun83}{}\\
+                              \mbox{} \hfill \xref{\large\bf SUN/113.2}{sun113}{}}
              {\em RAL GKS Manual\/}{
 This is the low-level graphics system which underlies all the other ADAM
 graphics libraries (except IDI) and which provides ``{\em device
@@ -516,7 +821,26 @@ addition, SUN/83 gives details of the Starlink GKS release and hardware
 implementations, while SUN/113 describes additional routines which connect GKS
 (and SGS) with ADAM.
 }
-\docitem{GRP}{Routines for Managing Groups of Objects}{SUN/150.3}{
+\end{latexonly}
+\begin{htmlonly}
+\docitem{GKS}{Graphical Kernel System}{{\em RAL GKS Manual\/}\\
+                                        \xref{SUN/83.12}{sun83}{}\\
+                                        \xref{SUN/113.2}{sun113}{}}{
+This is the low-level graphics system which underlies all the other ADAM
+graphics libraries (except IDI) and which provides ``{\em device
+independence\/}'', allowing these libraries to access a large range of graphics
+devices. GKS is an international standard, but its concepts are rather abstract
+and inconveniently low-level for most simple graphical work. SGS (see SUN/85)
+provides a simpler interface to GKS, but direct GKS calls are often useful and
+can, with care, be intermixed with calls to other graphics routines. The primary
+document on GKS is the ``{\em RAL GKS Manual\/}'', available in the {\em
+Miscellaneous User Documents\/} (MUD) series from Starlink site managers. In
+addition, SUN/83 gives details of the Starlink GKS release and hardware
+implementations, while SUN/113 describes additional routines which connect GKS
+(and SGS) with ADAM.
+}
+\end{htmlonly}
+\docitem{GRP}{Routines for Managing Groups of Objects}{\xref{SUN/150.3}{sun150}{}}{
 GRP provides facilities for managing groups of character strings which are the
 ``names'' of objects such as data files, galaxies, or even sets of coordinates.
 A typical use might be within a package of co-operating applications which are
@@ -528,7 +852,7 @@ between separate applications. GRP is a configurable low-level facility and it
 is expected that higher-level interfaces specialised to particular types of
 object will be provided in future.
 }
-\docitem{GWM}{X Graphics Window Manager}{SUN/130.2}{
+\docitem{GWM}{X Graphics Window Manager}{\xref{SUN/130.2}{sun130}{}}{
 GWM provides facilities for creating and controlling ``{\em persistent\/}''
 graphics windows in an X windows environment. The windows it creates are
 intended for use as ``{\em virtual displays\/}'' for GKS- and IDI-based
@@ -539,7 +863,7 @@ line and {\em via\/} a Fortran programming interface, so that applications may
 create and destroy graphics windows for use both by themselves and by other
 applications.
 }
-\docitem{GNS}{Graphics Workstation Name Service}{SUN/57.7}{
+\docitem{GNS}{Graphics Workstation Name Service}{\xref{SUN/57.7}{sun157}{}}{
 An important feature of ADAM graphics is its ``{\em device independence\/}'',
 which means that graphical applications can generally be used with a wide range
 of graphics devices. GNS provides the services needed for managing the names
@@ -553,7 +877,7 @@ graphics libraries, so direct calls to GNS routines will seldom be necessary.
 \newpage
 \bighead{Programming Tools}
 
-\docitem{STARLSE}{Starlink Language Sensitive Editor}{SUN/105.5}{
+\docitem{STARLSE}{Starlink Language Sensitive Editor}{\xref{SUN/105.5}{sun105}{}}{
 STARLSE is based on the VAX Language Sensitive Editor LSE. It exploits the
 extensibility of LSE to provide a Language Sensitive Editor with special
 facilities for the ADAM programmer. These include definitions of the calling
@@ -561,9 +885,9 @@ sequences for most of the libraries which appear in this guide, together with
 on-line help information. Standard prologue templates are also provided, with
 information being filled in automatically by the editor in many cases. These
 prologues may be processed into various forms of documentation using
-applications from the SST package (see SUN/110).
+applications from the SST package (see \xref{SUN/110}{sun110}{}).
 }
-\docitem{SST}{Simple Software Tools}{SUN/110.1}{
+\docitem{SST}{Simple Software Tools}{\xref{SUN/110.1}{sun110}{}}{
 Simple tools for performing common operations on software, implemented as a
 package of ADAM applications. The most important feature of this package is the
 ability to process prologue information formatted using STARLSE (see SUN/105)
@@ -571,15 +895,15 @@ into documentation in the form of \LaTeX\ documents, help libraries, or LSE
 subroutine-library definitions. The resulting subroutine-library definitions may
 then be used with STARLSE.
 }
-\docitem{GENERIC}{Utility for Compiling Generic Fortran}{SUN/7.4}{
+\docitem{GENERIC}{Utility for Compiling Generic Fortran}{\xref{SUN/7.4}{sun7}{}}{
 GENERIC is a utility which pre-processes ``{\em generic\/}'' Fortran code into
 multiple versions which are capable of processing different data types (all the
 primitive numeric types are supported together with character and logical
 values). It works by detecting special tokens embedded in the input file.
-GENERIC integrates with the PRIMDAT package (see SUN/39) which provides
+GENERIC integrates with the PRIMDAT package (see \xref{SUN/39}{sun39}{}) which provides
 consistently named routines for performing operations on primitive data.
 }
-\docitem{SPT}{Software Porting Tools}{SUN/111.2}{
+\docitem{SPT}{Software Porting Tools}{\xref{SUN/111.2}{sun111}{}}{
 A package of tools to assist when moving software between different hardware
 platforms. At present there are two SPT tools available; a utility for moving
 Fortran~77 software between VAX/VMS and UNIX systems (it performs those
@@ -592,23 +916,23 @@ standard Starlink include files on UNIX systems.
 \newpage
 \bighead{Instrumentation Programming}
 
-\docitem{TASK}{Guide to Writing ADAM Instrumentation Tasks}{SUN/134.2}{
+\docitem{TASK}{Guide to Writing ADAM Instrumentation Tasks}{\xref{SUN/134.2}{sun134}{}}{
 An introductory guide to writing ADAM ``{\em real-time\/}'' instrumentation
 tasks. This document includes a description of the ADAM tasking model and
 develops real-time concepts through a series of examples. It also describes the
 library of ADAM TASK routines.
 }
-\docitem{NBS}{Noticeboard System}{SUN/77.2}{
+\docitem{NBS}{Noticeboard System}{\xref{SUN/77.2}{sun77}{}}{
 NBS provides a mechanism for the rapid transfer of large quantities of data
 between processes running on the same processor. It utilises shared memory in
 which a hierarchical data structure (a ``{\em noticeboard\/}'') may be built and
 subsequently written and read by co-operating processes. Noticeboards are
 typically used in data-acquisition environments, but this does not preclude
 their use for other purposes. The data-structuring facilities of NBS are broadly
-similar to those of HDS (see SUN/92), although noticeboards have a static
+similar to those of HDS (see \xref{SUN/92}{sun92}{}), although noticeboards have a static
 structure and are volatile.
 }
-\docitem{MSP}{Message System Primitive Routines}{SSN/2.1}{
+\docitem{MSP}{Message System Primitive Routines}{\xref{SSN/2.1}{ssn2}{}}{
 These routines provide the low-level message-passing services upon which
 inter-task communication within ADAM depends. They will normally only be of use
 to ADAM system programmers or those developing real-time ADAM software.
@@ -618,15 +942,15 @@ to ADAM system programmers or those developing real-time ADAM software.
 \newpage
 \bighead{System Programming}
 
-\docitem{EMS}{Error Message Service}{SSN/4.4}{
+\docitem{EMS}{Error Message Service}{\xref{SSN/4.4}{ssn4}{}}{
 EMS is a set of low-level routines which implement the facilities required by
-the ERR and MSG routines (see SUN/104). This separate interface to the lower
+the ERR and MSG routines (see \xref{SUN/104}{sun104}{}). This separate interface to the lower
 levels is provided for those writing system software which does not require the
 ability to interact with a user, but simply needs to report and manage error
 messages. In particular, EMS should be used in preference to ERR/MSG by those
 developing ADAM system software residing in, or beneath, the parameter system.
 }
-\docitem{CNF \& F77}{Mixed Language Programming}{SGP/5.1}{
+\docitem{CNF \& F77}{Mixed Language Programming}{\xref{SGP/5.1}{sgp5}{}}{
 Provides advice, routines and macros to help you pass information between code
 written in Fortran~77 and C (in both directions) in a machine-independent way.
 }\mbox{}\\
@@ -636,14 +960,14 @@ written in Fortran~77 and C (in both directions) in a machine-independent way.
 \newpage
 \bighead{Standards and Conventions}
 
-\docitem{FORTRAN}{Application Programming Standard}{SGP/16.10}{
+\docitem{FORTRAN}{Application Programming Standard}{\xref{SGP/16.10}{sgp16}{}}{
 Describes the Starlink Fortran programming standard, which exists to promote
 portability and maintainability in Fortran~77 software. It specifies use of the
 Fortran~77 language standard plus a small number of approved extensions. It also
 contains a wealth of advice on good programming style and how to avoid common
 pitfalls.
 }
-\docitem{C}{Starlink C Programming Standard}{SGP/4.1}{
+\docitem{C}{Starlink C Programming Standard}{\xref{SGP/4.1}{sgp4}{}}{
 Written in a similar style to the Fortran standard (SGP/16), this programming
 standard for the C language also exists to promote portability and
 maintainability. Although C is not recommended as an applications language, it
@@ -652,7 +976,7 @@ far greater potential for danger than Fortran, especially given the variety of
 compilers available. This document guides you through the C minefield to help
 you produce good software which will run on a wide range of computer systems.
 }
-\docitem{DATA}{Starlink Standard Data Structures}{SGP/38.2}{
+\docitem{DATA}{Starlink Standard Data Structures}{\xref{SGP/38.2}{sgp38}{}}{
 An extensive document describing the philosophy behind the use of HDS for
 building general-purpose data structures. It also gives a full (and gory)
 description of the {\em Extensible N-Dimensional Data Format}, or NDF. The
@@ -661,7 +985,7 @@ related data-access software. However, the general sections covering the use and
 design of data structures would be valuable reading for anyone planning
 extensive use of HDS.
 }
-\docitem{PACKAGES}{Organisation of ADAM Applications Packages}{SSN/64.2}{
+\docitem{PACKAGES}{Organisation of ADAM Applications Packages}{\xref{SSN/64.2}{ssn64}{}}{
 Describes how separate ADAM applications packages are organised for release. It
 covers such things as the provision of standard ``{\em startup\/}'' files, the
 structure of help libraries, introductory help information, {\em etc.} This is
@@ -676,7 +1000,7 @@ shareable libraries on VMS, and the naming scheme through which callers of the
 library should be able to access it. This document also describes the
 distinction between the ADAM and ``{\em stand-alone\/}'' versions of a library.
 }
-\docitem{UNIX}{Starlink Software Organisation on UNIX}{SSN/66.2}{
+\docitem{UNIX}{Starlink Software Organisation on UNIX}{\xref{SSN/66.2}{ssn62}{}}{
 Describes how Starlink software is distributed and installed on UNIX machines.
 This also covers access to subroutine libraries and their ``{\em include
 files\/}'' on UNIX systems. The final part of the document covers ``{\em make
