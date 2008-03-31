@@ -61,6 +61,7 @@
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
 *     RTP: R.T. Platon (STARLINK)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -70,6 +71,11 @@
 *        Rewritten in C based on the Fortran routine EMS1_ESTOR
 *     13-AUG-2001 (AJC):
 *        #include ems1.h
+*     31-MAR0-2008 (PWD):
+*        Do not copy more than EMS__SZPAR and EMS__SZMSG characters
+*        to the error tables. Always null terminate these strings
+*        (previously the null could be missing if the given strings
+*        had a length greater than could be stored, and they overran).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -115,11 +121,13 @@ void ems1Estor( const char *param, int plen, const char *msg,
 
 /*     Store the error message name in the error table. */
          msgpln[ index ] = MIN( plen, EMS__SZPAR );
-         strcpy( msgpar[ index ], param );
+         strncpy( msgpar[ index ], param, EMS__SZPAR );
+         msgpar[ index ][ EMS__SZPAR ] = '\0';
 
 /*     Store the error message text in the error table. */
          msglen[ index ] = MIN( mlen, EMS__SZMSG );
-         strcpy( msgstr[ index ], msg );
+         strncpy( msgstr[ index ], msg, EMS__SZMSG );
+         msgstr[ index ][ EMS__SZMSG ] = '\0';
       }
 
 /*  Check the error context and flush the error table if it is at the base 
