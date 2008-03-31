@@ -85,6 +85,7 @@ void sc2fts_entry ( int *status )         /* status: global status (given and re
   /* local variables */
   int i;
   int indf;                            /* NDF identifier of input file */
+  int outndf;                            /* NDF identifier of output file */
   Grp *igrp = NULL;                    /* Group of input files */
   Grp *ogrp = NULL;                    /* Group of output files */
   Grp *parsgrp = NULL;                 /* Group containing parameters for each operation */
@@ -92,7 +93,11 @@ void sc2fts_entry ( int *status )         /* status: global status (given and re
   AstKeyMap *parsKeymap = NULL;        /* KeyMap of PARSLIST */
   AstKeyMap *subParsKeymap = NULL;     /* KeyMap for each operation */
   int ksize = 0;                       /* Number of items in a group */
-  smfData *idata = NULL;               /* Pointer to SCUBA2 data struct */
+//  smfData *idata = NULL;               /* Pointer to SCUBA2 data struct */
+  smfData *odata = NULL;
+  int nout;                            /* Number of data points in output daa file */
+  void *outdata[1];                    /* Pointer to array of output mapped pointers */
+
   /* Main routine */
   ndfBegin();
 
@@ -100,7 +105,7 @@ void sc2fts_entry ( int *status )         /* status: global status (given and re
   ndgAssoc ( "IN", 1, &igrp, &ksize, &flag, status );
 
   /* Get group of input files */
-  ndgCreat( "OUT", igrp, &ogrp, &ksize, &flag, status );
+  ndgCreat( "OUT", NULL, &ogrp, &ksize, &flag, status );
 
   /* Get the value for PARSLIST */ 
   kpg1Gtgrp( "PARSLIST", &parsgrp, &ksize, status );
@@ -114,7 +119,23 @@ void sc2fts_entry ( int *status )         /* status: global status (given and re
   /* Calibration Operations for FTS-2 */
   if(astMapHasKey(parsKeymap, "GROUPCOADD") == 0) /* other operations but GROUPCOADD */
   {
-    smf_open_file(igrp, 1, "UPDATE", SMF__NOCREATE_DATA, &idata, status);
+    if( ogrp != NULL) /* when output file is provided, hardcopy input file to output file */
+    {
+      /* Open the input file solely to propagate it to the output file */
+      ndgNdfas( igrp, 1, "READ", &indf, status );
+      /* We want QUALITY too if it's available */
+      ndgNdfpr( indf, "DATA,WCS,QUALITY", ogrp, 1, &outndf, status );
+      ndfAnnul( &indf, status);
+
+      /* Close output file */
+      ndfAnnul( &outndf, status);
+      smf_open_file(ogrp, 1, "UPDATE", SMF__NOCREATE_DATA, &odata, status);
+    }
+    else   /* when output file is not provided, input file will be used as output */
+    {
+      smf_open_file(igrp, 1, "UPDATE", SMF__NOCREATE_DATA, &odata, status);
+    }
+
     for(i=0; i<sizeof(ops_sc2fts)/sizeof(ops_sc2fts[0]); i++)
     {
       /* the key/value pair in parsKeymap: op.key=value 
@@ -126,15 +147,16 @@ void sc2fts_entry ( int *status )         /* status: global status (given and re
         {
           if(astMapGet0A(parsKeymap, ops_sc2fts[i], &subParsKeymap) != 0)
           {
-            (*sc2fts_op[i])( NULL, subParsKeymap, status );
+            (*sc2fts_op[i])( odata, subParsKeymap, status );
           }
         }
         else /* use default values for parameters */
         {
-          (*sc2fts_op[i])( NULL, NULL, status );
+          (*sc2fts_op[i])( odata, NULL, status );
         }
       }
     }   
+    smf_close_file(&odata, status);
   }
   else       /* GROUPCOADD operation */
   {
