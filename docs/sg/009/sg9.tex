@@ -1,4 +1,11 @@
-\documentstyle[11pt,epsf,twoside]{article}
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+\usepackage{graphicx}        %  Use this one for final production.
+\usepackage{epsfig}          %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
@@ -47,9 +54,9 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{latexonly} and %\end{latexonly} lines (used by
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{latexonly}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -136,7 +143,7 @@
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%\end{latexonly}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 %
@@ -174,7 +181,7 @@
 
 %  Latex document header.
 %  ======================
-\begin{latex}
+\begin{latexonly}
    CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
@@ -207,7 +214,7 @@
 %     {\Large\bf Abstract}
 %  \end{center}
 % ? End of heading for abstract.
-\end{latex}
+\end{latexonly}
 
 %  HTML documentation header.
 %  ==========================
@@ -224,7 +231,10 @@
    \epsfysize=120mm\epsfbox{sg9_cover.eps}
    \end{figure}
 
+   \begin{center}
    An Echelle spectrum
+   \end{center}
+
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
@@ -270,12 +280,12 @@
 % ? Latex document Table of Contents (if used).
 %  ===========================================
  \newpage
- \begin{latex}
+ \begin{latexonly}
    \setlength{\parskip}{0mm}
    \markboth{Contents}{\stardocname}
    \latexonlytoc
    \setlength{\parskip}{\medskipamount}
- \end{latex}
+ \end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -353,10 +363,10 @@ data taken using the Hamilton Spectrograph:
 Data Reduction  Using the Image Reduction Analysis Facility,}}
 {http://www.star.ucl.ac.uk/\~{}mjc/echelle/misc/LickTech74.ps.gz} which is a
 Lick Observatory Technical report\@.
-\begin{latex}
+\begin{latexonly}
 (A PostScript copy is available from the Starlink Echelle Support
 Pages.)
-\end{latex}
+\end{latexonly}
 This is a complete
 step-by-step run through of \'{e}chelle data reduction using
 IRAF\sgspec{---}{ - }from CCD data to calibrated spectra.
@@ -735,7 +745,7 @@ in the \'{e}chelle data reduction process.}{}
 the natural steps in the reduction process is handled by a task.
 This is the top-level menu presented by ECHMENU:
 
-\begin{latex}
+\begin{latexonly}
 \begin{verbatim}
   0. HELP/HYPER (ASCII or hypertext help).
   1. Start a reduction.                 16. Check trace consistency.
@@ -755,7 +765,7 @@ This is the top-level menu presented by ECHMENU:
  15. Plot order traces.                 30. Output balance-factor frame.
                                         31. EXIT (alias Q/E/QUIT/EXIT/99).
 \end{verbatim}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
 \begin{rawhtml}
 <PRE WIDTH=80>
@@ -780,7 +790,7 @@ This is the top-level menu presented by ECHMENU:
 \end{rawhtml}
 \end{htmlonly}
 
-\begin{latex}
+\begin{latexonly}
 \begin{figure}
 \begin{center}
 \setlength{\unitlength}{1cm}
@@ -866,7 +876,7 @@ This is the top-level menu presented by ECHMENU:
 }
 \end{center}
 \end{figure}
-\end{latex}
+\end{latexonly}
 
 In this section each of the major steps is outlined and some of the
 important and perhaps tricky considerations are mentioned.
@@ -1745,7 +1755,7 @@ factors to be considered with basic functionality {\em etc.}
 Here's a table which lists some useful commands for each of the three
 packages mentioned previously:
 
-\begin{latex}
+\begin{latexonly}
 \begin{table}
 \begin{center}
 {\sl
@@ -1793,7 +1803,7 @@ Merge              & {\tt scombine        } & {\tt ech\_mulmrg   } & {\tt MERGRE
 \end{tabular}
 \end{center}
 \end{table}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
 {\sl
 IRAF commands are from the {\tt noao.imred.echelle} package unless otherwise
