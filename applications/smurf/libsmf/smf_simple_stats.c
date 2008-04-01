@@ -45,7 +45,8 @@
 *        Pointer to global status.
 
 *  Description:
-*     Calculate mean and standard deviation.
+*     Calculate mean and standard deviation. If less than 2 good samples,
+*     exists with status set to SMF__INSMP.
 
 *  Notes: 
 
@@ -97,6 +98,7 @@
 #include "smf.h"
 #include "smurf_par.h"
 #include "smurf_typ.h"
+#include "libsmf/smf_err.h"
 
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_simple_stats"
@@ -161,7 +163,7 @@ void smf_simple_stats( double *data, dim_t start, dim_t nsamp,
 
   /* Enough samples? */
   if( count < 2 ) {
-    *status = SAI__ERROR;
+    *status = SMF__INSMP;
     errRep( FUNC_NAME, "Insufficient samples (<2) for statistics", status );
     return;
   }
