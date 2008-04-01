@@ -34,7 +34,8 @@
 *     First estimate white-noise level as r.m.s. in box of length dcbox.
 *     Then calculate running averages in two adjacent intervals of
 *     length dcbox. Jumps are flagged and corrected at peak values of
-*     difference between the averages in two intervals.
+*     difference between the averages in two intervals. Data stream is
+*     assumed to be periodic (routine wraps-around).
 
 *  Notes:
 
@@ -45,7 +46,9 @@
 *  History:
 *     2008-03-05 (EC):
 *        Initial Version
-
+*     2009-04-01 (EC):
+*        - Use smf_quick_noise to estimate signal r.m.s.
+*        - wrap-around at ends of the bolometer data
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -113,8 +116,6 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
   dim_t nmean2;                 /* Number of samples in mean1 */
   dim_t ntslice;                /* Number of time slices */
   unsigned char *qua=NULL;      /* Pointer to quality flags */
-  double sigma1;                /* r.m.s. estimate 1 */
-  double sigma2;                /* r.m.s. estimate 1 */
   unsigned char mask;           /* bitmask for quality */
 
   /* Main routine */
@@ -194,38 +195,40 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
       if( !(qua[base] & SMF__Q_BADB) && (*status == SAI__OK) ) {
 	
 	/* initial conditions for jump detection */
-	smf_simple_stats( dat, base, dcbox, qua, mask, &mean1, &sigma1, 
+	smf_simple_stats( dat, base, dcbox, qua, mask, &mean1, NULL, 
 			  &nmean1, status );
 	
-	smf_simple_stats( dat, base+dcbox, dcbox, qua, mask, &mean2, &sigma2, 
+	smf_simple_stats( dat, base+dcbox, dcbox, qua, mask, &mean2, NULL, 
 			  &nmean2, status );
 	
+	/* Estimate rms in a box as the bolo rms divided by sqrt(dcbox) */
+	dcstep = smf_quick_noise( data, i, dcbox, 10, qua, mask, status ) *
+	  dcthresh / sqrt(dcbox);
+
 	if( *status == SAI__OK ) {
-
-	  /* Choose the step size relative to smallest r.m.s. estimate */
-	  if( sigma1 < sigma2 ) dcstep = dcthresh*sigma1/sqrt(nmean1);
-	  else dcstep = dcthresh*sigma2/sqrt(nmean2);
-
 	  memset( alljump, 0, ntslice*sizeof(*alljump) );
 	  injump = 0;  /* jump occured somewhere in boxes */
 	  maxdiff = 0; /* max difference between mean1 and mean2 for jump */
 	  maxind = 0;  /* index to location of maxdiff */
 	  
-	  /* counter is at mean1/mean2 boundary -- location potential jumps */
-	  for( j=dcbox; j<(ntslice-dcbox-1); j++ ) {
-	    
+	  /* counter is at mean1/mean2 boundary -- location potential jumps.
+	     Counter runs from dcbox --> ntslice+dcbox-1, and the ends of
+             the bolometer array are assumed to wrap-around */
+
+	  for( j=dcbox; j<(ntslice+dcbox); j++ ) {
+
 	    if( fabs(mean2 - mean1) >= dcstep ) {
 	      /* is the difference between the two boxes significant? */
 	      
 	      if( !injump ) {
 		/* Starting new jump, initialize search */
 		maxdiff = mean2 - mean1;
-		maxind = j;
+		maxind = j%ntslice;
 		injump = 1;
 	      } else if( fabs(mean2 - mean1) > fabs(maxdiff) ) {
 		/* Update the search for the maximum step size */
 		maxdiff = mean2 - mean1;
-		maxind = j;
+		maxind = j%ntslice;
 	      }
 	    } else {
 	      /* If difference is small, but injump is set, that means we've
@@ -237,23 +240,24 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
 	    }
 	    
 	    /* Move along the boxes and update the mean estimates */
-	    if( !(qua[base+j-dcbox] & mask) ) {
+	    if( !(qua[base+(j-dcbox)] & mask) ) {
 	      /* Drop sample at j-dcbox from mean1 */
-	      mean1 = (nmean1*mean1 - dat[base+j-dcbox]) / (nmean1-1);
+	      mean1 = (nmean1*mean1 - dat[base+(j-dcbox)]) / (nmean1-1);
 	      nmean1 --;
 	    }
-	    if( !(qua[base+j] & mask) ) {
+	    if( !(qua[base+(j%ntslice)] & mask) ) {
 	      /* Move sample at j from mean2 to mean1 */
-	      mean1 = (nmean1*mean1 + dat[base+j]) / (nmean1+1);
+	      mean1 = (nmean1*mean1 + dat[base+(j%ntslice)]) / (nmean1+1);
 	      nmean1 ++;
 	      
-	      mean2 = (nmean2*mean2 - dat[base+j]) / (nmean2-1);
+	      mean2 = (nmean2*mean2 - dat[base+(j%ntslice)]) / (nmean2-1);
 	      nmean2 --;
 	      
 	    }
-	    if( !(qua[base+j+1] & mask) ) {
+	    if( !(qua[base+((j+dcbox+1)%ntslice)] & mask) ) {
 	      /* Add sample at j+dcbox+1 to mean1 */
-	      mean2 = (nmean2*mean2 + dat[base+j+dcbox+1]) / (nmean2+1);
+	      mean2 = (nmean2*mean2 + dat[base+((j+dcbox+1)%ntslice)]) / 
+		(nmean2+1);
 	      nmean2 ++;
 	    }
 	  }
