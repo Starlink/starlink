@@ -260,6 +260,8 @@
 *        - Added smf_calc_telres.
 *     2008-03-31 (JB):
 *        - Added smf_get_moltrans.
+*     2008-03-31 (EC):
+*        - Added smf_quick_noise
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -842,5 +844,9 @@ float smf_calc_telres( AstFitsChan *hdr, int *status );
 
 void smf_get_moltrans ( double restFreq, const char **molecule, 
                         const char **transition, int *status );
+
+double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk, 
+			unsigned char *quality, unsigned char mask, 
+			int *status );
 
 #endif /* SMF_DEFINED */
