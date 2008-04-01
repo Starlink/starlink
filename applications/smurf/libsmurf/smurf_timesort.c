@@ -135,6 +135,8 @@
 *        Change scheme for naming output files so that they conform to
 *        the ACSIS file naming convention, if possible. Update FITS
 *        headers NSUBSCAN and OBSEND in the output NDFs.
+*     01-APR-2008 (DSB):
+*        Clear up compiler warnings.
 
 *  Copyright:
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
@@ -204,6 +206,7 @@ void smurf_timesort( int *status ) {
    AstMapping *map = NULL;    
    AstMapping *omap = NULL;   
    AstMapping *tmap = NULL;   
+   AstObject *obj = NULL;
    Grp *igrp1 = NULL;         
    Grp *igrp2 = NULL;         
    Grp *igrp3 = NULL;         
@@ -221,12 +224,12 @@ void smurf_timesort( int *status ) {
    char name[ DAT__SZNAM + 1 ];
    char type[ DAT__SZTYP + 1 ];
    const char *comps = NULL;
-   const char *dom;
-   const char *key;
-   const char *timeorg;
-   const char *timescl;
-   const char *timesys;
-   const char *timeunt;
+   const char *dom = NULL;
+   const char *key = NULL;
+   const char *timeorg = NULL;
+   const char *timescl = NULL;
+   const char *timesys = NULL;
+   const char *timeunt = NULL;
    double *grid = NULL;       
    double *tai = NULL;        
    double *tai_ptr = NULL;    
@@ -366,7 +369,7 @@ void smurf_timesort( int *status ) {
    
 /* Map the TCS_TAI array in the JCMTSTATE extension. */
          datFind( loc1, "TCS_TAI", &loc1c, status );
-         datMapV( loc1c, "_DOUBLE", "READ", (void **) &tai_ptr, &ntai, status );
+         datMapV( loc1c, "_DOUBLE", "READ", (void *) &tai_ptr, &ntai, status );
    
 /* Obtain a sorted index for the TCS_TAI values in the JCMTSTATE
    extension. */
@@ -429,7 +432,7 @@ void smurf_timesort( int *status ) {
    
 /* Pass on if the component is scalar, or if the last dimension is not of
    the same length as the TCS_TAI array. */
-               if( ndim > 0 && dims[ ndim - 1 ] == ntai ) {
+               if( ndim > 0 && dims[ ndim - 1 ] == (int) ntai ) {
    
 /* Map the input and output arrays. */
                   datMap( loc1c, type, "READ", ndim, dims, &ipin, status );
@@ -564,7 +567,7 @@ void smurf_timesort( int *status ) {
    time value. */
             grid = astMalloc( sizeof( double )*ntai );
             tai = astMalloc( sizeof( double )*ntai );
-            for( i = 0; i < ntai; i++ ) grid[ i ] = index[ i ] + 1.0;
+            for( i = 0; i < (int) ntai; i++ ) grid[ i ] = index[ i ] + 1.0;
             astTran1( tmap, ntai, grid, 1, tai );
    
 /* Create a LutMap holding these sorted time values. */
@@ -627,8 +630,9 @@ void smurf_timesort( int *status ) {
 
 /* Get the SIZELIMIT and LIMITTYPE parameters. */
       parGet0i( "SIZELIMIT", &sizelimit, status );      
+
+      nullsizelimit = 0;
       if( *status == SAI__OK ) {
-         nullsizelimit = 0;
          if( sizelimit > 0 ) parChoic( "LIMITTYPE", "FILESIZE", 
                                        "FILESIZE,SPECTRA,SLICES", 0, ltbuf, 
                                        10, status );
@@ -652,7 +656,11 @@ void smurf_timesort( int *status ) {
       nobs = astMapSize( obs_map );
       for( iobs = 0; iobs < nobs; iobs++ ) {
          key = astMapKey( obs_map, iobs );
-         astMapGet0A( obs_map, key, &subsys_map );
+         astMapGet0A( obs_map, key, &obj );
+
+/* We use a temporary "AstObject *" pointer in calls to astMapGet0A to
+   avoid compiler warnings about "dereferencing type-punned pointers". */
+         subsys_map = (AstKeyMap *) obj;
 
          if( nobs > 1 ) {
             msgSeti( "I", iobs + 1 );
@@ -681,7 +689,8 @@ void smurf_timesort( int *status ) {
             ndfBegin();
 
             key = astMapKey( subsys_map, isubsys );
-            astMapGet0A( subsys_map, key, &subscan_map );
+            astMapGet0A( subsys_map, key, &obj );
+            subscan_map = (AstKeyMap *) obj;
 
             if( nsubsys > 1 && *status == SAI__OK ) {
                msgSeti( "I", isubsys + 1 );
@@ -718,6 +727,10 @@ void smurf_timesort( int *status ) {
 /* Initialise the total number of time slices currently in the lists of
    concatenated time slices. */
             nts_in = 0;
+
+/* Further initialisations to avoid compiler warnings. */
+            nchan = 0;
+            ndet = 0;
 
 /* Assume for the moment that all input NDFs have Variance and Quality
    arrays. */
@@ -914,9 +927,9 @@ void smurf_timesort( int *status ) {
             index = smf_sorti( nts_in, rts, &sorted, status );
       
 /* Note the number of unique RTS_NUM values. */
+            nts_out = 0;
             if( index ) {
                rts_num_last = -INT_MAX;
-               nts_out = 0;
                for( j = 0; j < nts_in; j++ ) {
                   i = index[ j ];
                   rts_num = rts[ i ];
@@ -932,6 +945,7 @@ void smurf_timesort( int *status ) {
 /* Get the required maximum output file size, and convert to a number of
    time slices. */
             nout = 0;
+            tslimit = 1;
             if( nullsizelimit ) {
                nout = nsubscan;
                if( nout > 0 ) tslimit = nts_out/nout;
