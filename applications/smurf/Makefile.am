@@ -36,8 +36,9 @@ WVM_FILES = wvm/wvmOpt.c wvm/wvmTau.c wvm/wvmCal.c
 # Linking
 
 smurf_mon_LDADD = libsmurf/libsmurf.la libsc2sim/libsc2sim.la \
+                  libgsd/libgsd.la \
                   libsmf/libsmf.la libaztec/libaztec.la \
-                  libgsd/libgsd.la libacsis/libacsis.la \
+                  libacsis/libacsis.la \
                   libsc2fts/libsc2fts.la                \
                   `$(srcdir)/smurf_link_adam`
 

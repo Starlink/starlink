@@ -27,8 +27,8 @@
 *        Pointer to global status.
 
 *  Description:
-*     Checks the frequency of this observation, and also checks to see which
-*     receptors were actually being used.
+*     Determines which receiver and receptors were in use during this
+*     observation.
 
 *  Authors:
 *     Jen Balfour (JAC, UBC)
@@ -37,6 +37,8 @@
 *  History:
 *     2008-03-27 (JB):
 *        Original.
+*     2008-03-31 (JB):
+*        Check for how many receptors for each receiver. 
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -82,6 +84,7 @@ void gsdac_getRecepNames ( const gsdVars *gsdVars, char *recepNames[],
 
   /* Local variables */
   int i = 0;
+  char frontendLetter;
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
@@ -102,158 +105,36 @@ void gsdac_getRecepNames ( const gsdVars *gsdVars, char *recepNames[],
     }
   }
 
-  /* Check to make sure we have the right number of receptors for
-     this frontend, and copy the receptor names. */
-  if ( gsdVars->centreFreqs[0] < 290.0 ) {
+  /* First get the letter of the frontend. */
+  frontendLetter = gsdVars->frontend[2];
 
-    if ( gsdVars->nFEChans != 1 ) {
-      *status = SAI__ERROR;
-      errRep ( FUNC_NAME, "Front end is receiver A but does not have 1 receptor", status );
-      return;
-    }
+  /* If this is receiver W, check if this is C band or
+     D band. */
+  if ( frontendLetter == 'W' ) {
 
-    strncpy ( recepNames[0], "A", 2 );
+    if ( gsdVars->centreFreqs[0] < 600.0 )
+      frontendLetter = 'C';
+    else
+      frontendLetter = 'D';
 
-  } else if ( gsdVars->centreFreqs[0] < 395.0 ) {
+  }
 
-    if ( gsdVars->nFEChans != 2 ) {
-      *status = SAI__ERROR;
-      errRep ( FUNC_NAME, "Front end is receiver B but does not have 2 receptors", 
-               status ); 
-      return; 
-    }
+  /* Get the names of the receptors for this frontend. */
+  if ( recepFlags[0] == 1 ) {
 
-    /* Check to see which receptors were actually being used. */
-    if ( recepFlags[0] == 1 ) {
+    sprintf ( recepNames[0], "%cA", frontendLetter );
 
-      strncpy ( recepNames[0], "BA", 3 );
- 
-      if ( recepFlags[1] == 1 ) {
-
-        strncpy ( recepNames[1], "BB", 3 ); 
-
-      } else {
-
-        msgOutif(MSG__VERB," ", 
-	         "Only receptor BA used", status);
-
-      }
-
-    } else {
-
-      if ( recepFlags[1] = 1 ) {
-
-        strncpy ( recepNames[0], "BB", 3 ); 
-
-        msgOutif(MSG__VERB," ", 
-	         "Only receptor BB used", status);
-
-      } else {
-
-        *status = SAI__ERROR;
-        errRep ( FUNC_NAME, "Couldn't obtain receptor names.", 
-                 status ); 
-        return; 
-
-      }
-
-    }
-
-  } else if ( gsdVars->centreFreqs[0] < 600.0 ) {
-
-    if ( gsdVars->nFEChans != 2 ) {
-      *status = SAI__ERROR;
-      errRep ( FUNC_NAME, "Front end is receiver C but does not have 2 receptors", 
-               status ); 
-      return; 
-    }
-
-    /* Check to see which receptors were actually being used. */
-    if ( recepFlags[0] == 1 ) {
-
-      strncpy ( recepNames[0], "CA", 3 );
- 
-      if ( recepFlags[1] == 1 ) {
-
-        strncpy ( recepNames[1], "CB", 3 ); 
-
-      } else {
-
-        msgOutif(MSG__VERB," ", 
-	         "Only receptor CA used", status);
-
-      }
-
-    } else {
-
-      if ( recepFlags[1] == 1 ) {
-
-        strncpy ( recepNames[0], "CB", 3 ); 
-
-        msgOutif(MSG__VERB," ", 
-	         "Only receptor CB used", status);
-
-      } else {
-
-        *status = SAI__ERROR;
-        errRep ( FUNC_NAME, "Couldn't obtain receptor names.", 
-                 status ); 
-        return; 
-
-      }
-
-    }
-   
-  } else if ( gsdVars->centreFreqs[0] < 750 ) {
-
-    if ( gsdVars->nFEChans != 2 ) {
-      *status = SAI__ERROR;
-      errRep ( FUNC_NAME, "Front end is receiver D but does not have 2 receptors", 
-               status ); 
-      return; 
-    }
-
-    /* Check to see which receptors were actually being used. */
-    if ( recepFlags[0] == 1 ) {
-
-      strncpy ( recepNames[0], "DA", 3 );
- 
-      if ( recepFlags[1] == 1 ) {
-
-        strncpy ( recepNames[1], "DB", 3 ); 
-
-      } else {
-
-        msgOutif(MSG__VERB," ", 
-	         "Only receptor DA used", status);
-
-      }
-
-    } else {
-
-      if ( recepFlags[1] == 1 ) {
-
-        strncpy ( recepNames[0], "DB", 3 ); 
-
-        msgOutif(MSG__VERB," ", 
-	         "Only receptor DB used", status);
-
-      } else {
-
-        *status = SAI__ERROR;
-        errRep ( FUNC_NAME, "Couldn't obtain receptor names.", 
-                 status ); 
-        return; 
-
-      }
-
-    }
-
+    if ( recepFlags[1] == 1 )
+      sprintf ( recepNames[1], "%cB", frontendLetter );
+    
   } else {
 
-    *status = SAI__ERROR;
-    errRep ( FUNC_NAME, "Couldn't obtain receptor names.", status ); 
-    return; 
+    if ( recepFlags[1] = 1 ) {
+
+      sprintf ( recepNames[0], "%cB", frontendLetter );
+
+    }
+
   }
 
 }

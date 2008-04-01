@@ -258,6 +258,8 @@
 *        - Added smf_getobsidss.
 *     2008-03-28 (DSB):
 *        - Added smf_calc_telres.
+*     2008-03-31 (JB):
+*        - Added smf_get_moltrans.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -837,5 +839,8 @@ void smf_reportprogress( int max, int *status );
 const char *smf_getobsidss( AstFitsChan *hdr, int *status );
 
 float smf_calc_telres( AstFitsChan *hdr, int *status );
+
+void smf_get_moltrans ( double restFreq, const char **molecule, 
+                        const char **transition, int *status );
 
 #endif /* SMF_DEFINED */

@@ -92,6 +92,8 @@
 *        Calculate intTime and nMix.
 *     2008-03-28 (JB):
 *        Find molecule and transition using LUT.
+*     2008-03-31 (HB):
+*        Call smf_get_moltrans to get transition info.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -130,6 +132,7 @@
 
 /* SMURF includes */
 #include "smurf_par.h"
+#include "libsmf/smf.h"
 #include "gsdac.h"
 
 #define FUNC_NAME "gsdac_putFits"
@@ -161,7 +164,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   double intTime;             /* total time spent integrating (s) */
   int josMin;                 /* ?? */
   int min;                    /* minutes for time conversion. */
-  char molecule[SZFITSCARD];  /* target molecular species */
+  char *molecule;  /* target molecular species */
   int month;                  /* months for time conversion. */
   int nMix;                   /* number of mixers */
   double nRefStep;            /* number of nod sets repeated */
@@ -183,7 +186,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   char subBands[SZFITSCARD];  /* ACSIS sub-band set-up */
   char tauDatSt[SZFITSCARD];  /* time of tau225St observation in 
                                  format YYYY-MM-DDTHH:MM:SS */
-  char transiti[SZFITSCARD];  /* target transition for molecule */
+  char *transiti;  /* target transition for molecule */
   int year;                   /* year for time conversion. */  
 
   /* Check inherited status */
@@ -246,7 +249,8 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   /* ACSIS Specific. */
 
   /* Get the molecule and transition. */
-  gsdac_getTransition ( gsdVars, molecule, transiti, status );
+  smf_get_moltrans ( gsdVars->restFreqs[0] * 1000.0, &molecule, 
+                     &transiti, status );
 
   /* Get the bandwidth setup. */
 /***** NOTE: may be different for rxb widebands *****/  
