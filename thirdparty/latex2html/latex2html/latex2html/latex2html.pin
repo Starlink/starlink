@@ -1286,7 +1286,7 @@ sub deal_with_texinputs {
     };
     if ($ROOTED) {$TEXINPUTS .= "$envkey$FIXEDDIR"}
     $TEXINPUTS = &absolutize_path($TEXINPUTS);
-    $ENV{'TEXINPUTS'} = join($envkey,".",@_,$TEXINPUTS,$ENV{'TEXINPUTS'});
+    $TEXINPUTS = join($envkey,".",@_,$TEXINPUTS,$ENV{'TEXINPUTS'});
 }
 
 # provided by Fred Drake
