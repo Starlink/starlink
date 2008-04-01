@@ -939,33 +939,34 @@
                         COMP ='DATA'
                      END IF
 
-                     IF ( COMP .EQ. 'DATA' .AND. .NOT. EXNDF ) THEN
+                     IF ( COMP .EQ. 'DATA' ) THEN 
+                        IF ( .NOT. EXNDF ) THEN
 
 *  Generate the name of the extension.  NPOS is updated so cannot be
 *  defined outside the FITS_extension loop.
-                        EXTNAM = 'FITS_EXT_'
-                        NPOS = 9
-                        CALL CHR_PUTI( NHDU, EXTNAM, NPOS )
+                           EXTNAM = 'FITS_EXT_'
+                           NPOS = 9
+                           CALL CHR_PUTI( NHDU, EXTNAM, NPOS )
 
 *  Create an extension of type NDF.
-                        CALL NDF_XNEW( NDF, EXTNAM, 'NDF', 0, 0, XLOC,
-     :                                 STATUS )
+                           CALL NDF_XNEW( NDF, EXTNAM, 'NDF', 0, 0,
+     :                                    XLOC, STATUS )
 
 *  Find the parent structure (i.e. .MORE).
-                        CALL DAT_PAREN( XLOC, ELOC, STATUS )
+                           CALL DAT_PAREN( XLOC, ELOC, STATUS )
 
 *  Create a new NDF in the extension via an NDF placeholder.  The data
 *  type and bounds will be changed below once they are known.
-                        CALL NDF_PLACE( ELOC, EXTNAM, PLACE, STATUS )
-                        CALL NDF_NEW( '_UBYTE', 1, 1, 1, PLACE, NDFE,
-     :                                STATUS )
+                           CALL NDF_PLACE( ELOC, EXTNAM, PLACE, STATUS )
+                           CALL NDF_NEW( '_UBYTE', 1, 1, 1, PLACE, NDFE,
+     :                                   STATUS )
 
 *  Want to recreate the path if this IMAGE sub-file originally was an
 *  NDF within an NDF extension.
-                     ELSE IF ( EXNDF ) THEN
-                        CALL COF_FI2NE( FUNITD, NDF, NDFE, STATUS )
-                     END IF  ! COMP eq DATA +/- EXNDF
-
+                        ELSE
+                           CALL COF_FI2NE( FUNITD, NDF, NDFE, STATUS )
+                        END IF  ! COMP eq DATA +/- EXNDF
+                     END IF
                   END IF  ! Not FIRST and XTENS eq IMAGE
 
                END IF  ! Not MULTIP
