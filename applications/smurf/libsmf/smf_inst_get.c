@@ -34,6 +34,7 @@
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     JB: Jen Balfour (JAC, Hawaii)
 
 *  History:
 *     31-JUL-2006 (TIMJ):
@@ -42,6 +43,8 @@
 *        INSTRUME keyword is not mandatory.
 *     02-AUG-2006 (TIMJ):
 *        Add verbose messaging. (at least for now)
+*     31-MAR-2008 (JB):
+*        Check for DAS backend and treat as ACSIS.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
@@ -130,6 +133,10 @@ smf_inst_get( const smfHead * hdr, int * status ) {
     if (*status == SAI__OK) {
       if (strncmp( backend, "ACSIS", SZFITSCARD) == 0) {
 	msgOutif( MSG__VERB, " ", "Data file contains ACSIS data",
+		  status );
+	return INST__ACSIS;
+      } else if (strncmp( backend, "DAS", SZFITSCARD) == 0) {
+	msgOutif( MSG__VERB, " ", "Data file contains DAS data, treating as ACSIS",
 		  status );
 	return INST__ACSIS;
       }
