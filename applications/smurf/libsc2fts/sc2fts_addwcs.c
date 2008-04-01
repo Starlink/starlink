@@ -13,18 +13,25 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2fts_addwcs ( smfData *idata, AstKeyMap* parKeymap, int *status )
+*     sc2fts_addwcs ( smfData *data, AstKeyMap* parKeymap, int *status )
 
 *  Arguments:
-*     idata = smfData* (Given)
-*        Pointer to input SCUBA2 data struct
+*     data = smfData* (Given)
+*        Pointer to a SCUBA2 data struct
 *     parKeymap = AstKeyMap* (Given)
 *        the parameter Keymap for this operation
 *     status = int* (Given and Returned)
 *        Pointer to global status.  
 
 *  Description:
-*
+*     ADDWCS operation creates a WCS for 3-D spectrum cube and stores it
+*     into a NDF file pointed by data (smfData*). The WCS includes a
+*     2-D Grid frameset for the first two dimensions from sc2ast_createwcs
+*     and 1-D WinMap frameset for the third dimension, which is the wavenumber.
+*     The scaling factor of the wavenumber is obtained from 
+*     MORE.FTS2DR.FTS_WN_FACTOR of the NDF file. The real wavenumber will be
+*     i  x  scaling factor (i is the index number of the third dimension,
+*     starting from 0).
 *
 
 *  Authors:
@@ -35,6 +42,9 @@
 *        Create a test implementation for FTS-2
 *     2008-03-31 (BZ):
 *        Try to finalize ADDWCS operation for FTS-2
+*     2008-04-01 (BZ):
+*        With the advice from Tim (TJ) and David (DB), 
+*        fix momery leak and do other minor modifications.    
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -75,7 +85,7 @@
 
 void sc2fts_addwcs 
 (
-smfData*   idata,
+smfData*   data,
 AstKeyMap* parKeymap,
 int   *status          /* global status (given and returned) */
 )
@@ -85,44 +95,69 @@ int   *status          /* global status (given and returned) */
   
   AstFrameSet *gridfset;        /* FrameSet by sc2ast_createwcs */
   AstMapping *gridmapping;      /* mapping from sc2ast_createwcs */
-  AstZoomMap *specmapping;      /* mapping between index number and real wavenumber */
+  AstWinMap *specmapping;       /* mapping between index number and real wavenumber */
   AstCmpMap  *speccubemapping;  /* combined mapping of gridmapping and specmapping */
-  AstCmpFrame *basefrm;         /* Base Frame for 3-D spectrum cube */
+  AstFrame *basefrm;            /* Base Frame for 3-D spectrum cube */
   AstCmpFrame *currentfrm;      /* Current Frame for 3-D spectrum cube */
   AstFrameSet *speccubewcs;     /* WCS for 3-D spectrum cube */
-  double ftswn_unit;            /* unit for FTS spectrum */
-  char subname[SZFITSCARD+1];      /* Subarray name */
-  int subnum;                      /* Subarray index number */
+  double ftswn_factor;          /* Factor for FTS spectrum */
+  char subname[SZFITSCARD+1];   /* Subarray name */
+  int subnum;                   /* Subarray index number */
+  double ina, inb, outa, outb;  /* cornors of 1-D AstWinMap */
 
   /* get the locator to More.FTS2DR */
-  fts2drloc = smf_get_xloc( idata, "FTS2DR", "EXT", "READ", 0, 0, status );
+  fts2drloc = smf_get_xloc( data, "FTS2DR", "EXT", "READ", 0, 0, status );
   /* get the locator to More.FTS2DR.FTS_WN */
-  datFind( fts2drloc, "FTS_WN", &ftswnloc, status );
-  /* get the spectrum unit of FTS */
-  datGet( ftswnloc, "_DOUBLE", 0, 0, &ftswn_unit, status );
+  datFind( fts2drloc, "FTS_WN_FACTOR", &ftswnloc, status );
+  /* get the scaling factor of spectrum of FTS. The scaling factor is 
+   * 1/L (L is the double-sided scan length with unit millimeter) 
+  */
+  datGet0D( ftswnloc, &ftswn_factor, status );
+  /* Annual HDSLoc */
+  datAnnul( &ftswnloc, status );
+  datAnnul( &fts2drloc, status );
 
-  
+  /* AST begin */
+  astBegin;
+
   /* create 2-D WCS from sc2ast_createwcs */
-  smf_fits_getS( idata->hdr, "SUBARRAY", subname, SZFITSCARD+1, status );
+  smf_fits_getS( data->hdr, "SUBARRAY", subname, SZFITSCARD+1, status );
   sc2ast_name2num ( subname, &subnum, status );
-  sc2ast_createwcs( subnum, idata->hdr->state, idata->hdr->instap, idata->hdr->telpos, &gridfset, status );
+  sc2ast_createwcs( subnum, data->hdr->state, data->hdr->instap, data->hdr->telpos, &gridfset, status );
 
-  /* get the mapping of 2-D WCS */
+  /* get mapping of 2-D WCS */
   gridmapping = astGetMapping( gridfset, AST__BASE, AST__CURRENT );
-  /* create the zoommap for 1-D spectrum */
-  specmapping = astZoomMap( 1, ftswn_unit, "" );
+
+  /* create WinMap for 1-D spectrum */
+  ina = -1; 
+  inb = -ina; 
+  outa = -ftswn_factor; 
+  outb = -outa;
+  specmapping = astWinMap(1, &ina, &inb, &outa, &outb, "");
+
   /* create 3-D mapping for spectrum cube */
   speccubemapping = astCmpMap( gridmapping, specmapping, 0, "" );
    
   /* create Base Frame for 3-D spectrum cube */
-  basefrm = astCmpFrame( astGetFrame(gridfset, AST__BASE), astSpecFrame("Unit=AU"), "DOMAIN=GRID" );
+  basefrm = astFrame( 3, "DOMAIN=GRID");
+
   /* create Current Frame for 3-D spectrum cube */
-  currentfrm = astCmpFrame( astGetFrame(gridfset, AST__CURRENT), astSpecFrame("Unit=1/cm"), "DOMAIN=GRID" );
- 
+  currentfrm = astCmpFrame( astGetFrame(gridfset, AST__CURRENT), astSpecFrame("System=wavenum,Unit=1/mm"), "" );
   /* create WCS for 3-D spectrum cube */
   speccubewcs = astFrameSet( basefrm, "" );
   astAddFrame( speccubewcs, AST__BASE, speccubemapping, currentfrm );
-  
   /* write WCS into the NDF file */
-  ndfPtwcs( speccubewcs, idata->file->ndfid, status );
+  ndfPtwcs( speccubewcs, data->file->ndfid, status );
+
+  /* delete AST objects */
+  speccubewcs = astAnnul( speccubewcs );
+  speccubemapping = astAnnul( speccubemapping );
+  basefrm = astAnnul( basefrm );        
+  currentfrm = astAnnul( currentfrm );
+  gridfset = astAnnul( gridfset );
+  gridmapping  = astAnnul( gridmapping );   
+  specmapping = astAnnul( specmapping );     
+ 
+  /* AST end */
+  astEnd;
 }

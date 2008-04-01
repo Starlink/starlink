@@ -93,8 +93,7 @@ void sc2fts_entry ( int *status )         /* status: global status (given and re
   AstKeyMap *parsKeymap = NULL;        /* KeyMap of PARSLIST */
   AstKeyMap *subParsKeymap = NULL;     /* KeyMap for each operation */
   int ksize = 0;                       /* Number of items in a group */
-//  smfData *idata = NULL;               /* Pointer to SCUBA2 data struct */
-  smfData *odata = NULL;
+  smfData *odata = NULL;               /* Pointer to SCUBA2 data struct */
   int nout;                            /* Number of data points in output daa file */
   void *outdata[1];                    /* Pointer to array of output mapped pointers */
 
@@ -125,27 +124,30 @@ void sc2fts_entry ( int *status )         /* status: global status (given and re
       ndgNdfas( igrp, 1, "READ", &indf, status );
       /* We want QUALITY too if it's available */
       ndgNdfpr( indf, "DATA,WCS,QUALITY", ogrp, 1, &outndf, status );
-      ndfAnnul( &indf, status);
+      ndfAnnul( &indf, status );
 
       /* Close output file */
-      ndfAnnul( &outndf, status);
-      smf_open_file(ogrp, 1, "UPDATE", SMF__NOCREATE_DATA, &odata, status);
+      ndfAnnul( &outndf, status );
     }
     else   /* when output file is not provided, input file will be used as output */
     {
-      smf_open_file(igrp, 1, "UPDATE", SMF__NOCREATE_DATA, &odata, status);
+      /* copy igrp to ogrp. */
+      ogrp = grpCopy( igrp, 0, 0, 0, status );
     }
 
-    for(i=0; i<sizeof(ops_sc2fts)/sizeof(ops_sc2fts[0]); i++)
+    /* open ogrp for further processing */
+    smf_open_file( ogrp, 1, "UPDATE", SMF__NOCREATE_DATA, &odata, status );
+
+    for( i=0; i<sizeof(ops_sc2fts)/sizeof(ops_sc2fts[0]); i++ )
     {
       /* the key/value pair in parsKeymap: op.key=value 
        * astMapGet0A will get a Keymap for an operation 
        */
-      if(astMapHasKey(parsKeymap, ops_sc2fts[i]) !=0)
+      if( astMapHasKey( parsKeymap, ops_sc2fts[i] ) !=0 )
       {
-        if(astMapType(parsKeymap, ops_sc2fts[i]) == AST__OBJECTTYPE) /* use user-defined values for parameters */
+        if( astMapType( parsKeymap, ops_sc2fts[i] ) == AST__OBJECTTYPE ) /* use user-defined values for parameters */
         {
-          if(astMapGet0A(parsKeymap, ops_sc2fts[i], &subParsKeymap) != 0)
+          if( astMapGet0A( parsKeymap, ops_sc2fts[i], &subParsKeymap ) != 0)
           {
             (*sc2fts_op[i])( odata, subParsKeymap, status );
           }
