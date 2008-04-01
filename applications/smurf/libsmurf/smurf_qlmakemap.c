@@ -163,6 +163,8 @@
 *        Calculate median exposure time and write FITS entry
 *     2008-03-11 (AGG):
 *        Update call to smf_rebinmap
+*     2008-04-01 (AGG):
+*        Write WCS to EXP_TIME component in output file
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -391,8 +393,9 @@ void smurf_qlmakemap( int *status ) {
     }
   }
 
-  /* Write WCS FrameSet to output file */
+  /* Write WCS FrameSet to output file and to EXP_TIME */
   ndfPtwcs( outframeset, ondf, status );
+  ndfPtwcs( outframeset, tdata->file->ndfid, status );
 
   /* Calculate unweighted median exposure time - work_array is needed
      because kpg1Medur optimizes the order of the input array */
