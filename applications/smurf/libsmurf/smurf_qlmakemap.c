@@ -165,6 +165,9 @@
 *        Update call to smf_rebinmap
 *     2008-04-01 (AGG):
 *        Write WCS to EXP_TIME component in output file
+*     2008-04-02 (AGG):
+*        Write 2-D WEIGHTS component + WCS in output file, protect
+*        against attempting to access NULL smfFile pointer
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -233,7 +236,6 @@ void smurf_qlmakemap( int *status ) {
   dim_t i;                   /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
-  int lbnd_wgt[3];           /* Lower pixel bounds for weight array */
   double *map = NULL;        /* Pointer to the rebinned map data */
   size_t mapsize;            /* Number of pixels in output image */
   float medtexp = 0.0;       /* Median exposure time */
@@ -258,11 +260,13 @@ void smurf_qlmakemap( int *status ) {
   char system[10];           /* Celestial coordinate system for output image */
   double tau;                /* 225 GHz optical depth */
   smfData *tdata = NULL;     /* Exposure time data */
+  int tndf = 0;              /* NDF identifier for EXP_TIME */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
-  int ubnd_wgt[3];           /* Upper pixel bounds for weight array */
   void *variance = NULL;     /* Pointer to the variance map */
   smfData *wdata = NULL;     /* Pointer to SCUBA2 data struct for weights */
   double *weights = NULL;    /* Pointer to the weights map */
+  double *weights3d = NULL;  /* Pointer to 3-D weights array */
+  int wndf = 0;              /* NDF identifier for WEIGHTS */
   float *work_array = NULL;  /* Temporary work space */
 
   /* Main routine */
@@ -321,23 +325,25 @@ void smurf_qlmakemap( int *status ) {
   /* Compute number of pixels in output map */
   mapsize = (ubnd_out[0] - lbnd_out[0] + 1) * (ubnd_out[1] - lbnd_out[1] + 1);
 
-  /* Determine bounds of weights array - QLMAKEMAP always uses the
-     REBIN method so the weights bounds array is 3-D to ensure
-     variances are calculated */
-  lbnd_wgt[0] = lbnd_out[0];
-  ubnd_wgt[0] = ubnd_out[0];
-  lbnd_wgt[1] = lbnd_out[1];
-  ubnd_wgt[1] = ubnd_out[1];
-  lbnd_wgt[2] = 0;
-  ubnd_wgt[2] = 1;
   /* Create WEIGHTS component in output file */
   smf_open_ndfname ( smurfloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
-                     3, lbnd_wgt, ubnd_wgt, &wdata, status );
-  if ( wdata ) weights = (wdata->pntr)[0];
+                     2, lbnd_out, ubnd_out, &wdata, status );
+  if ( wdata ) {
+    weights = (wdata->pntr)[0];
+    wndf = wdata->file->ndfid;
+  }
+  /* Now allocate memory for 3-d work array used by smf_rebinmap -
+     plane 2 of this 3-D array is stored in the weights component
+     later. Initialize to zero. */
+  weights3d = smf_malloc( 2*mapsize, sizeof(double), 1, status);
+
   /* Create EXP_TIME component in output file */
   smf_open_ndfname ( smurfloc, "WRITE", NULL, "EXP_TIME", "NEW", "_REAL",
 		     2, lbnd_out, ubnd_out, &tdata, status );
-  if ( tdata ) exp_time = (tdata->pntr)[0];
+  if ( tdata ) {
+    exp_time = (tdata->pntr)[0];
+    tndf = tdata->file->ndfid;
+  }
 
   /* Create provenance keymap */
   prvkeymap = astKeyMap( "" );
@@ -377,25 +383,26 @@ void smurf_qlmakemap( int *status ) {
     msgOutif(MSG__VERB, " ", "SMURF_QLMAKEMAP: Beginning the REBIN step", status);
     /* Rebin the data onto the output grid */
     smf_rebinmap(data, i, size, outframeset, spread, params, moving, 
-		 lbnd_out, ubnd_out, map, variance, weights, status );
+		 lbnd_out, ubnd_out, map, variance, weights3d, status );
 
     smf_close_file( &data, status );
   }
 
   /* Calculate exposure time per output pixel from weights array -
      note even if weights is a 3-D array we only use the first mapsize
-     number of values which represent the `hits' per pixel */
+     number of values which represent the `hits' per pixel. Also store
+     the sum of the squares of the pixel weights (i.e. plane 2 of the
+     3-D weights array) */
   for (i=0; (i<mapsize) && (*status == SAI__OK); i++) {
-    if ( map[i] == VAL__BADD ) {
-      exp_time[i] = VAL__BADR;
-    } else {
-      exp_time[i] = steptime * weights[i];
-    }
+    exp_time[i] = steptime * weights3d[i];
+    weights[i] = weights3d[i+mapsize];
   }
+  weights3d = smf_free( weights3d, status );
 
   /* Write WCS FrameSet to output file and to EXP_TIME */
   ndfPtwcs( outframeset, ondf, status );
-  ndfPtwcs( outframeset, tdata->file->ndfid, status );
+  ndfPtwcs( outframeset, tndf, status );
+  ndfPtwcs( outframeset, wndf, status );
 
   /* Calculate unweighted median exposure time - work_array is needed
      because kpg1Medur optimizes the order of the input array */

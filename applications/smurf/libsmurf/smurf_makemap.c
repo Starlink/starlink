@@ -264,6 +264,9 @@
 *        Update call to smf_rebinmap
 *     2008-04-01 (AGG):
 *        Write WCS to EXP_TIME component in output file
+*     2008-04-02 (AGG):
+*        Write 2-D WEIGHTS component + WCS in output file, protect
+*        against attempting to access NULL smfFile pointer
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -347,7 +350,6 @@ void smurf_makemap( int *status ) {
   AstKeyMap *keymap=NULL;    /* Pointer to keymap of config settings */
   int ksize=0;               /* Size of group containing CONFIG file */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
-  int lbnd_wgt[3];           /* Lower pixel bounds for weight array */
   double *map=NULL;          /* Pointer to the rebinned map data */
   size_t mapsize;            /* Number of pixels in output image */
   float medtexp = 0.0;       /* Median exposure time */
@@ -355,7 +357,6 @@ void smurf_makemap( int *status ) {
   int moving = 0;            /* Is the telescope base position changing? */
   int neluse;                /* Number of pixels with a non-zero exposure time */
   int nparam = 0;            /* Number of extra parameters for pixel spreading scheme*/
-  int nwgtdim=2;             /* No. of axes in the weights array */
   AstKeyMap * obsidmap = NULL; /* Map of OBSIDs from input data */
   smfData *odata=NULL;       /* Pointer to output SCUBA2 data struct */
   Grp *ogrp = NULL;          /* Group containing output file */
@@ -375,13 +376,15 @@ void smurf_makemap( int *status ) {
   double steptime;           /* Integration time per sample, from FITS header */
   char system[10];           /* Celestial coordinate system for output image */
   smfData *tdata=NULL;       /* Exposure time data */
+  int tndf = 0;              /* NDF identifier for EXP_TIME */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
-  int ubnd_wgt[3];           /* Upper pixel bounds for weight array */
   int uselonlat = 0;         /* Flag for whether to use given lon_0 and
 				lat_0 for output frameset */
   void *variance=NULL;       /* Pointer to the variance map */
   smfData *wdata=NULL;       /* Pointer to SCUBA2 data struct for weights */
   double *weights=NULL;      /* Pointer to the weights map */
+  double *weights3d = NULL;  /* Pointer to 3-D weights array */
+  int wndf = 0;              /* NDF identifier for WEIGHTS */
   float *work_array = NULL;  /* Temporary work space */
 
   /* Main routine */
@@ -444,9 +447,6 @@ void smurf_makemap( int *status ) {
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Determine map bounds", status);
   smf_mapbounds( igrp, size, system, 0.0, 0.0, uselonlat, pixsize, 
 		 lbnd_out, ubnd_out, &outfset, &moving, status );
-  if (*status != SAI__OK) {
-    errRep(FUNC_NAME, "Unable to determine map bounds", status);
-  }
 
   if ( moving ) {
     msgOutif(MSG__VERB, " ", "Tracking a moving object", status);
@@ -479,28 +479,28 @@ void smurf_makemap( int *status ) {
   /* Create SMURF extension in the output file and map pointers to
      WEIGHTS and EXP_TIME arrays */
   smurfloc = smf_get_xloc ( odata, "SMURF", "SMURF", "WRITE", 0, 0, status );
-  /* Determine bounds of weights array */
-  lbnd_wgt[0] = lbnd_out[0];
-  ubnd_wgt[0] = ubnd_out[0];
-  lbnd_wgt[1] = lbnd_out[1];
-  ubnd_wgt[1] = ubnd_out[1];
-  /* Allocate extra work space for calculating variances for the REBIN
-     method - perhaps the ITERATE method should be brought into line
-     with rebin? */
-  if ( rebin ) {
-    lbnd_wgt[2] = 0;
-    ubnd_wgt[2] = 1;
-    nwgtdim = 3;
-  }
+
   /* Create WEIGHTS component in output file */
   smf_open_ndfname ( smurfloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
-                     nwgtdim, lbnd_wgt, ubnd_wgt, &wdata, status );
-  if ( wdata ) weights = (wdata->pntr)[0];
+                     2, lbnd_out, ubnd_out, &wdata, status );
+  if ( wdata ) {
+    weights = (wdata->pntr)[0];
+    wndf = wdata->file->ndfid;
+  }
+  /* Now allocate memory for 3-d work array used by smf_rebinmap -
+     plane 2 of this 3-D array is stored in the weights component
+     later. Initialize to zero. */
+  if ( rebin ) {
+    weights3d = smf_malloc( 2*mapsize, sizeof(double), 1, status);
+  }
 
   /* Create EXP_TIME component in output file */
   smf_open_ndfname ( smurfloc, "WRITE", NULL, "EXP_TIME", "NEW", "_REAL",
 		     2, lbnd_out, ubnd_out, &tdata, status );
-  if ( tdata ) exp_time = (tdata->pntr)[0];
+  if ( tdata ) {
+    exp_time = (tdata->pntr)[0];
+    tndf = tdata->file->ndfid;
+  }
 
   /* Create the output map using the chosen METHOD */
   if ( rebin ) {
@@ -553,7 +553,7 @@ void smurf_makemap( int *status ) {
       msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Beginning the REBIN step", status);
       /* Rebin the data onto the output grid */
       smf_rebinmap(data, i, size, outfset, spread, params, moving, 
-		   lbnd_out, ubnd_out, map, variance, weights, status );
+		   lbnd_out, ubnd_out, map, variance, weights3d, status );
   
       /* Close the data file */
       smf_close_file( &data, status);
@@ -570,12 +570,10 @@ void smurf_makemap( int *status ) {
        mapsize number of values which represent the `hits' per
        pixel */
     for (i=0; (i<mapsize) && (*status == SAI__OK); i++) {
-      if ( map[i] == VAL__BADD ) {
-	exp_time[i] = VAL__BADR;
-      } else {
-	exp_time[i] = steptime * weights[i];
-      }
+      exp_time[i] = steptime * weights[i];
+      weights[i] = weights3d[i+mapsize];
     }
+    weights3d = smf_free( weights3d, status );
   } else if ( iterate ) {
 
     /* Iterative map-maker */
@@ -625,7 +623,7 @@ void smurf_makemap( int *status ) {
     /* Calculate exposure time per output pixel from hitsmap */
     for (i=0; (i<mapsize) && (*status == SAI__OK); i++) {
       if ( map[i] == VAL__BADD) {
-	exp_time[i] = VAL__BADR;
+	exp_time[i] = 0.0;
       } else {
 	exp_time[i] = steptime * hitsmap[i];
       }
@@ -635,7 +633,8 @@ void smurf_makemap( int *status ) {
 
   /* Write WCS */
   ndfPtwcs( outfset, ondf, status );
-  ndfPtwcs( outfset, tdata->file->ndfid, status );
+  ndfPtwcs( outfset, tndf, status );
+  ndfPtwcs( outfset, wndf, status );
 
   /* Calculate unweighted median exposure time - work_array is needed
      because kpg1Medur optimizes the order of the input array */
