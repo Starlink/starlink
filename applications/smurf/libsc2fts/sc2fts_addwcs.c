@@ -45,6 +45,9 @@
 *     2008-04-01 (BZ):
 *        With the advice from Tim (TJ) and David (DB), 
 *        fix momery leak and do other minor modifications.    
+*     2008-04-02 (BZ):
+*        With the advice from Tim (TJ) and David (DB),
+*        set attributes of WCS.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
@@ -90,24 +93,27 @@ AstKeyMap* parKeymap,
 int   *status          /* global status (given and returned) */
 )
 {
+  /* Local Variables */
   HDSLoc *fts2drloc = NULL;     /* HDSLoc to More.FTS2DR */
   HDSLoc *ftswnloc = NULL;      /* HDSLoc to More.FTS2DR.FTS_WN */
   
   AstFrameSet *gridfset;        /* FrameSet by sc2ast_createwcs */
   AstMapping *gridmapping;      /* mapping from sc2ast_createwcs */
-  AstWinMap *specmapping;       /* mapping between index number and real wavenumber */
+  AstZoomMap *specmapping;       /* mapping between index number and real wavenumber */
   AstCmpMap  *speccubemapping;  /* combined mapping of gridmapping and specmapping */
-  AstFrame *basefrm;            /* Base Frame for 3-D spectrum cube */
-  AstCmpFrame *currentfrm;      /* Current Frame for 3-D spectrum cube */
+  AstFrame *basefrm3d;          /* Base Frame for 3-D spectrum cube */
+  AstSpecFrame *specframe;      /* Current Frame of 1-D spectrum */
+  AstCmpFrame *currentfrm3d;    /* Current Frame for 3-D spectrum cube */
+  AstSkyFrame *gridframe;       /* Current Frame for 2-D sky */
   AstFrameSet *speccubewcs;     /* WCS for 3-D spectrum cube */
   double ftswn_factor;          /* Factor for FTS spectrum */
   char subname[SZFITSCARD+1];   /* Subarray name */
   int subnum;                   /* Subarray index number */
-  double ina, inb, outa, outb;  /* cornors of 1-D AstWinMap */
+  double refra, refdec;         /* Attributes: RefRA, RefDec */
 
   /* get the locator to More.FTS2DR */
   fts2drloc = smf_get_xloc( data, "FTS2DR", "EXT", "READ", 0, 0, status );
-  /* get the locator to More.FTS2DR.FTS_WN */
+  /* get the locator to More.FTS2DR.FTS_WN_FACTOR */
   datFind( fts2drloc, "FTS_WN_FACTOR", &ftswnloc, status );
   /* get the scaling factor of spectrum of FTS. The scaling factor is 
    * 1/L (L is the double-sided scan length with unit millimeter) 
@@ -125,39 +131,55 @@ int   *status          /* global status (given and returned) */
   sc2ast_name2num ( subname, &subnum, status );
   sc2ast_createwcs( subnum, data->hdr->state, data->hdr->instap, data->hdr->telpos, &gridfset, status );
 
-  /* get mapping of 2-D WCS */
+  /* get frame of 2-D grid WCS */
+  gridframe = astGetFrame( gridfset, AST__CURRENT );
+
+  /* get mapping of 2-D grid WCS */
   gridmapping = astGetMapping( gridfset, AST__BASE, AST__CURRENT );
 
-  /* create WinMap for 1-D spectrum */
-  ina = -1; 
-  inb = -ina; 
-  outa = -ftswn_factor; 
-  outb = -outa;
-  specmapping = astWinMap(1, &ina, &inb, &outa, &outb, "");
+  /* create a 1-D spectrum frame */
+  specframe = astSpecFrame( "System=wavenum,Unit=1/mm,StdOfRest=Topocentric" );
 
-  /* create 3-D mapping for spectrum cube */
+  /* if gridframe is SkyFrame, set attribute: RefRA, RefDec */
+  if( astIsASkyFrame( gridframe ) )
+  {
+    if( astTest( gridframe, "SkyRef" ) )
+    {
+      refra = astGetD( gridframe, "SkyRef(1)" );
+      refdec = astGetD( gridframe, "SkyRef(2)" );
+      astSetRefPos( specframe, gridframe, refra, refdec );
+    }
+  }
+
+  /* create ZoomMap for 1-D spectrum */
+  specmapping = astZoomMap( 1, ftswn_factor, "" );
+
+  /* combine 2-D grid mapping and 1-D spectrum mapping to 
+   * create 3-D mapping for spectrum cube 
+   */
   speccubemapping = astCmpMap( gridmapping, specmapping, 0, "" );
    
   /* create Base Frame for 3-D spectrum cube */
-  basefrm = astFrame( 3, "DOMAIN=GRID");
+  basefrm3d = astFrame( 3, "DOMAIN=GRID");
 
   /* create Current Frame for 3-D spectrum cube */
-  currentfrm = astCmpFrame( astGetFrame(gridfset, AST__CURRENT), astSpecFrame("System=wavenum,Unit=1/mm"), "" );
+  currentfrm3d = astCmpFrame( gridframe, specframe, "" );
+
+  /* set attributes: Epoch, ObsLon, ObsLat */
+  if( astTest( gridframe, "Epoch" ) )
+    astSetD( currentfrm3d, "Epoch", astGetD(gridframe, "Epoch" ) );
+  if( astTest( gridframe, "ObsLon" ) )
+    astSetD( currentfrm3d, "ObsLon", astGetD(gridframe, "ObsLon" ) );
+  if( astTest( gridframe, "ObsLat") )
+    astSetD( currentfrm3d, "ObsLat", astGetD( gridframe, "ObsLat") );
+
   /* create WCS for 3-D spectrum cube */
-  speccubewcs = astFrameSet( basefrm, "" );
-  astAddFrame( speccubewcs, AST__BASE, speccubemapping, currentfrm );
+  speccubewcs = astFrameSet( basefrm3d, "" );
+  astAddFrame( speccubewcs, AST__BASE, speccubemapping, currentfrm3d );
+
   /* write WCS into the NDF file */
   ndfPtwcs( speccubewcs, data->file->ndfid, status );
 
-  /* delete AST objects */
-  speccubewcs = astAnnul( speccubewcs );
-  speccubemapping = astAnnul( speccubemapping );
-  basefrm = astAnnul( basefrm );        
-  currentfrm = astAnnul( currentfrm );
-  gridfset = astAnnul( gridfset );
-  gridmapping  = astAnnul( gridmapping );   
-  specmapping = astAnnul( specmapping );     
- 
   /* AST end */
   astEnd;
 }
