@@ -48,6 +48,8 @@
 *  History:
 *     2008-03-10 (AGG):
 *        Initial version.
+*     2008-04-02 (AGG):
+*        Use bits rather than values in fixing the bits
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -130,10 +132,10 @@ void smf_create_qualname( char *mode, int indf, IRQLocs *qlocs, int *status ) {
 	    status );
 
   /* Now fix the bits to the desired values */
-  irqFxbit( qlocs, "BADSAM", SMF__Q_BADS, &fixed, status );
-  irqFxbit( qlocs, "BADBOL", SMF__Q_BADB, &fixed, status );
-  irqFxbit( qlocs, "SPIKE", SMF__Q_SPIKE, &fixed, status );
-  irqFxbit( qlocs, "DCJUMP", SMF__Q_JUMP, &fixed, status );
+  irqFxbit( qlocs, "BADSAM", 1, &fixed, status );
+  irqFxbit( qlocs, "BADBOL", 2, &fixed, status );
+  irqFxbit( qlocs, "SPIKE",  3, &fixed, status );
+  irqFxbit( qlocs, "DCJUMP", 4, &fixed, status );
 
   /* Set names to read only */
   irqRwqn( qlocs, "BADSAM", 1, 1, &value, status );
