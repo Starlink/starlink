@@ -92,8 +92,10 @@
 *        Calculate intTime and nMix.
 *     2008-03-28 (JB):
 *        Find molecule and transition using LUT.
-*     2008-03-31 (HB):
+*     2008-03-31 (JB):
 *        Call smf_get_moltrans to get transition info.
+*     2008-04-02 (JB):
+*        Fixed typo in OBSIDSS.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -492,7 +494,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsS ( fitschan, "OBSID", dateVars->obsID, 
                 "Unique observation identifier", 0 );
 
-  astSetFitsS ( fitschan, "OBSIDS", obsIDSS, 
+  astSetFitsS ( fitschan, "OBSIDSS", obsIDSS, 
                 "Unique observation + subsystem ID", 0 );
 
 /***** NOTE: possibly same as REFRECEP *****/

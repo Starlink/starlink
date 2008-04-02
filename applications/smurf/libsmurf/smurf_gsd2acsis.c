@@ -48,6 +48,8 @@
 *        Check number of scans actually completed.
 *     19-MAR-2008 (JB):
 *        Include par.h.
+*     02-APR-2008 (JB):
+*        Check that this is DAS/AOSC version 5.3
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -102,9 +104,12 @@
 #define MAXNAME 80
 #define NRECEP 2  
 
+#define CALLGSD( gsdRoutine, status, errMsg ) if ( *status == SAI__OK ) { if ( gsdRoutine() != 0 ) { *status = SAI__ERROR; errRep ( " ", errMsg, status ); } }
+
 void smurf_gsd2acsis( int *status ) {
 
   /* Local variables */
+  char backend[MAXSTRING];    /* name of the backend */
   dasFlag dasFlag;            /* file structure type */
   char directory[MAXNAME];    /* directory to write the file */
   char filename[MAXNAME];     /* name of the GSD file */
@@ -124,27 +129,46 @@ void smurf_gsd2acsis( int *status ) {
 
   parGet0c ( "DIRECTORY", directory, MAXNAME, status );
 
+ if ( *status == PAR__NULL ) {
+   errAnnul ( status );
+   strcpy ( directory, "." );
+ }
+
   msgOutif(MSG__VERB," ", 
 	     "Opening GSD file for reading", status); 
 
   /* Open the GSD file. */
   if ( *status == SAI__OK ) {
-    *status = gsdOpenRead ( filename, &version, label, &nitem, 
+    /*CALLGSD ( */gsdOpenRead ( filename, &version, label, &nitem, 
                             &fptr, &(gsd.fileDsc), &(gsd.itemDsc), 
-                            &(gsd.dataPtr) );
+                            &(gsd.dataPtr) )/*,
+					      status, "Error calling gsdOpenRead()" )*/;
     if ( *status != SAI__OK ) { 
-      *status = SAI__ERROR;
        errRep ( FUNC_NAME, "Could not find input GSD file.", status );
        return;
     }
-  } 
+  }
+
+
+  msgOutif(MSG__VERB," ", 
+	     "Checking backend name", status); 
+
+  /* Check to see if this is DAS or AOSC data. */
+  gsdac_get0c ( &gsd, "C1BKE", gsdVars.backend, status ); 
+
+  if ( strncmp ( gsdVars.backend, "DAS", 3 ) != 0 
+       && strncmp ( gsdVars.backend, "AOSC", 4 ) != 0 ) { 
+    *status = SAI__ERROR;
+    errRep ( FUNC_NAME, "File does not contain DAS or AOSC data", status );
+    return;  
+  }  
 
   msgOutif(MSG__VERB," ", 
 	     "Checking version of GSD file", status); 
 
   /* Check the version of the opened file. */
   if ( *status == SAI__OK ) {
-    if ( ( fabs(version) - 5.300 ) > 0.0001 ) {
+    if ( fabs(version - 5.300 ) > 0.0001 ) {
       *status = SAI__ERROR;
       errRep ( FUNC_NAME, "GSD version is not 5.300.", status );
       return;
@@ -174,7 +198,6 @@ void smurf_gsd2acsis( int *status ) {
   gsdac_getGSDVars ( &gsd, dasFlag, &gsdVars, status );
 
   if ( *status != SAI__OK ) {
-    *status = SAI__ERROR;
     errRep ( FUNC_NAME, "Couldn't get GSD headers and arrays.", status );
     return;
   }
@@ -186,7 +209,6 @@ void smurf_gsd2acsis( int *status ) {
   *status = gsdClose ( fptr, gsd.fileDsc, gsd.itemDsc, gsd.dataPtr );
 
   if ( *status != SAI__OK ) {
-    *status = SAI__ERROR;
     errRep ( FUNC_NAME, "Error closing GSD file.", status );
     return;
   }
@@ -200,7 +222,8 @@ void smurf_gsd2acsis( int *status ) {
   gsdac_freeArrays ( dasFlag, &gsdVars, status );
 
   if ( *status == SAI__OK ) {
-    printf ( "Conversion completed successfully.\n" );
+    msgOutif(MSG__VERB," ", 
+	     "Conversion completed successfully", status); 
   }
 
 }

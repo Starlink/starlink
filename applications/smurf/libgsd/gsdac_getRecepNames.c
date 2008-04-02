@@ -39,6 +39,8 @@
 *        Original.
 *     2008-03-31 (JB):
 *        Check for how many receptors for each receiver. 
+*     2008-04-02 (JB):
+*        Use single letter names for one-receptor frontends.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -119,21 +121,38 @@ void gsdac_getRecepNames ( const gsdVars *gsdVars, char *recepNames[],
 
   }
 
-  /* Get the names of the receptors for this frontend. */
-  if ( recepFlags[0] == 1 ) {
+  /* Get the names of the receptors for this frontend, checking
+     to see if this frontend had only one receptor. */
+  if ( gsdVars->nFEChans == 1 ) {
+  
+    sprintf ( recepNames[0], "%c", frontendLetter );
 
-    sprintf ( recepNames[0], "%cA", frontendLetter );
+  } else if ( gsdVars->nFEChans == 2 ) {
 
-    if ( recepFlags[1] == 1 )
-      sprintf ( recepNames[1], "%cB", frontendLetter );
+    if ( recepFlags[0] == 1 ) {
+
+      sprintf ( recepNames[0], "%cA", frontendLetter );
+
+      if ( recepFlags[1] == 1 )
+        sprintf ( recepNames[1], "%cB", frontendLetter );
     
-  } else {
+    } else {
 
-    if ( recepFlags[1] = 1 ) {
+      if ( recepFlags[1] = 1 ) {
 
-      sprintf ( recepNames[0], "%cB", frontendLetter );
+        sprintf ( recepNames[0], "%cB", frontendLetter );
+
+      }
 
     }
+
+  } else {
+
+    *status = SAI__ERROR;
+    msgSeti( "MODE", gsdVars->nFEChans );    
+    errRep ( FUNC_NAME, "Front end should have 1 or 2 receptors, but has ^RECEP.", 
+             status ); 
+    return; 
 
   }
 

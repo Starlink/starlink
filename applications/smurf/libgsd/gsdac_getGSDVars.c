@@ -46,7 +46,9 @@
 *     2008-03-19 (JB):
 *        Removed unused variables.
 *     2008-03-24 (JB):
-*        Removed debug statement =0)
+*        Removed debug statement.
+*     2008-04-02 (JB):
+*        Continue with defaults if tau/seeing not present.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -332,20 +334,51 @@ void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
   /* ?? */
   gsdac_get0r ( gsd, "C3DASSHFTFRAC", &(gsdVars->shiftFrac), status );
 
-  /* Get the CSO Tau parameters. */
+  /* Get the CSO Tau parameters, if present. */
   gsdac_get0r ( gsd, "C7TAU225", &(gsdVars->tau225), status );
+  if ( *status != SAI__OK ) {
+    gsdVars->tau225 = VAL__BADD;
+    *status = SAI__OK;
+  }
+
   gsdac_get0r ( gsd, "C7TAURMS", &(gsdVars->tauRMS), status );
+  if ( *status != SAI__OK ) {
+    gsdVars->tauRMS = VAL__BADD;
+    *status = SAI__OK;
+  }
+
   gsdac_get0c ( gsd, "C7TAUTIME", gsdVars->tauTime, status );
+  if ( *status != SAI__OK ) {
+    strcpy ( gsdVars->tauTime, "" );
+    *status = SAI__OK;
+  }
 
   /* Get the seeing parameters. */
   gsdac_get0r ( gsd, "C7SEEING", &(gsdVars->seeing), status );
+  if ( *status != SAI__OK ) {
+    gsdVars->seeing = VAL__BADD;
+    *status = SAI__OK;
+  }
+
   gsdac_get0c ( gsd, "C7SEETIME", gsdVars->seeTime, status );
+  if ( *status != SAI__OK ) {
+    strcpy ( gsdVars->seeTime, "" );
+    *status = SAI__OK;
+  }
 
   /* Get the polarity? */
   gsdac_get0c ( gsd, "C3POLARITY", gsdVars->polarity, status );
+  if ( *status != SAI__OK ) {
+    strcpy ( gsdVars->polarity, "" );
+    *status = SAI__OK;
+  }
 
   /* Get the sideband mode. */
   gsdac_get0c ( gsd, "C3SBMODE", gsdVars->sbMode, status );
+  if ( *status != SAI__OK ) {
+    strcpy ( gsdVars->sbMode, "" );
+    *status = SAI__OK;
+  }
 
   if ( dasFlag == DAS_TP || dasFlag == DAS_CROSS_CORR ) {
 
