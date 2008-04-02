@@ -102,9 +102,7 @@
 #define TASK_NAME "GSD2ACSIS"
 
 #define MAXNAME 80
-#define NRECEP 2  
-
-#define CALLGSD( gsdRoutine, status, errMsg ) if ( *status == SAI__OK ) { if ( gsdRoutine() != 0 ) { *status = SAI__ERROR; errRep ( " ", errMsg, status ); } }
+#define NRECEP 2
 
 void smurf_gsd2acsis( int *status ) {
 
