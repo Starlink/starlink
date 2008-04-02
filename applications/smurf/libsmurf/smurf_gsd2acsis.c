@@ -124,12 +124,16 @@ void smurf_gsd2acsis( int *status ) {
   /* Get the user defined input and output file names */
   parGet0c ( "IN", filename, MAXNAME, status );
 
-  parGet0c ( "DIRECTORY", directory, MAXNAME, status );
+  if ( *status == SAI__OK ) { 
+   
+    parGet0c ( "DIRECTORY", directory, MAXNAME, status );
 
- if ( *status == PAR__NULL ) {
-   errAnnul ( status );
-   strcpy ( directory, "." );
- }
+    if ( *status == PAR__NULL ) {
+      errAnnul ( status );
+      strcpy ( directory, "." );
+    }
+
+  }
 
   msgOutif(MSG__VERB," ", 
 	     "Opening GSD file for reading", status); 

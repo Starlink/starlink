@@ -56,7 +56,8 @@
 *        Code cleanup.
 *     2008-03-25 (JB):
 *        Get tracking coordinate frame.
-
+*     2008-04-02 (JB):
+*        Get TCS_TR_SYS.
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
@@ -78,7 +79,6 @@
 *     MA 02111-1307, USA
 
 *  Bugs:
-*     Currently kludged with default values.
 *-
 */
 
@@ -153,8 +153,8 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   strncpy( record->tcs_source, "SCIENCE", 8 ); 
 
-  /* Get the local offset coordinate system. */
-  switch ( gsdVars->cellCode ) {
+  /* Get the tracking coordinate system. */
+  switch ( gsdVars->centreCode ) {
     
     case COORD_AZ:
       strcpy ( record->tcs_tr_sys, "AZEL" );
