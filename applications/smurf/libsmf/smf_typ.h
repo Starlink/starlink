@@ -195,7 +195,7 @@ typedef enum smf_modeltype {
 #define SMF__NOCREATE_QUALITY 32 /* If !SMF__NOCREATE_DATA don't map QUALITY */
 #define SMF__NOCREATE_LUT 64     /* Don't open pointing LUT */
 
-/* Data quality bit flags (single byte for QUALITY arrays */
+/* Data quality bit mask (single byte for QUALITY arrays */
 #define SMF__Q_BADS 1     /* Bad sample (VAL__BADD) flagged by DA system  */
 #define SMF__Q_BADB 2     /* All samples from this bolo should be ignored */
 #define SMF__Q_SPIKE 4    /* Location of a spike */ 
