@@ -196,16 +196,13 @@ void smf_flag_spikes( smfData *data, unsigned char *quality, double thresh,
       if( *status == SMF__INSMP ) {
 	/* Insufficient samples for this bolometer. Annul the error. */
 	errAnnul( status );
-      }
-
-      /* Only continue with good status and positive sigma */
-      if( (*status == SAI__OK) && (sigma > 0) ) {
+      } else if( (*status == SAI__OK) && (sigma > 0) ) {
 	/* Size of excursion for significant event */
 	dist = thresh*sigma;
 	
 	/* Loop over all samples and flag outliers */
 	for( j=0; j<ntslice; j++ ) if( !(qua[base+j] & mask) ) {
-
+	  
 	  /* Significant excursion */
 	  if( fabs(dat[base+j]-mean) > dist ) {
 	    
