@@ -48,6 +48,11 @@
 *          signal level for DC step detection
 *     ORDER = INTEGER (Read)
 *          Fit and remove polynomial baselines of this order
+*     SPIKETHRESH
+*          Flag spikes SPIKETHRESH-sigma away from mean
+*     SPIKEITER
+*          If 0 iteratively find spikes until convergence. Otherwise 
+*          execute precisely this many iterations.
 
 *  Authors:
 *     Edward Chapin (UBC)
