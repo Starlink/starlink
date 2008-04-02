@@ -116,7 +116,7 @@
 
    Tcl_AsyncProc ccdEndinterp;
    void ccdSigtcl( int sig );
-   void ccdPipestcl( int ifd, int ofd );
+   void ccdPipestcl( char *path, int ifd, int ofd );
 
 /* Fortran functions for querying the command line */
 extern F77_INTEGER_FUNCTION(ccd1_iargc)();
@@ -200,13 +200,13 @@ extern F77_SUBROUTINE(ccd1_getarg)
       last_arg = F77_CALL(ccd1_iargc)();
       my_argc = last_arg + 1;
 
-      if (( my_argv = (char**) malloc ( my_argc+1 ) ) == NULL ) {
+      if (( my_argv = (char**) malloc(sizeof(void *)*(my_argc+1)) ) == NULL ) {
           fprintf( stderr, "Can't allocate memory for argv\n");
           return 1;
       }
       for ( k=0; k<my_argc; k++ ) {
           F77_CALL(ccd1_getarg)(INTEGER_ARG(&k),
-                           CHARACTER_ARG(argstr) TRAIL_ARG(argstr));
+                                CHARACTER_ARG(argstr) TRAIL_ARG(argstr));
           if (( my_argv[k] = (char*) malloc( MAX_ARG_LEN + 1 )) == NULL ) {
               fprintf( stderr, "Can't allocate (%d bytes) for arg %d\n", 
                        MAX_ARG_LEN, k );
@@ -236,7 +236,7 @@ extern F77_SUBROUTINE(ccd1_getarg)
 
 /* We have values for both file descriptors.  Start up a Tcl interpreter
    and loop indefinitely. */
-         ccdPipestcl( ifd, ofd );
+         ccdPipestcl( my_argv[0], ifd, ofd );
 
 /* If the previous call returns then the wish did not run properly. */
          fprintf( stderr, "%s failed.\n", my_argv[ 0 ] );
@@ -256,7 +256,7 @@ extern F77_SUBROUTINE(ccd1_getarg)
    }
 
 
-   void ccdPipestcl( int ifd, int ofd ) {
+   void ccdPipestcl( char *path, int ifd, int ofd ) {
 /*
 *+
 *  Name:
@@ -345,6 +345,9 @@ extern F77_SUBROUTINE(ccd1_getarg)
 
 /* Tweak floating point behaviour on linux. */
       F77_CALL(ccd1_linflt)();
+
+/* Find the executable. Also locates the basic libraries. */
+      Tcl_FindExecutable( path );
 
 /* Create a new Tcl interpreter structure. */
       interp = Tcl_CreateInterp();
