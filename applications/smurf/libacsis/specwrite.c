@@ -3763,6 +3763,14 @@ void acsSpecSetBackend ( backend_type type, int *status ) {
 
   if (*status != SAI__OK) return;
 
+  /* Check to see if we've already been called */
+  if (INPROGRESS != 0) {
+    *status = SAI__ERROR;
+    emsRep("HDS_SPEC_SETBACKEND_ERR",
+	   "acsSpecSetBackend called, yet an observation is already in progress", status);
+    return;
+  }
+
   backendFlag = type;
 
 }
@@ -3771,6 +3779,14 @@ void acsSpecSetBackend ( backend_type type, int *status ) {
 void acsSpecSetMem ( const int nBytes, int *status ) {
 
   if (*status != SAI__OK) return;
+
+  /* Check to see if we've already been called */
+  if (INPROGRESS != 0) {
+    *status = SAI__ERROR;
+    emsRep("HDS_SPEC_SETMEM_ERR",
+	   "acsSpecSetMem called, yet an observation is already in progress", status);
+    return;
+  }
 
   maxbytes = nBytes;
   maxsequence = maxbytes / ( 1024.0 * 4.0 );
