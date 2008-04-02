@@ -13,15 +13,15 @@
 *     C function
 
 *  Invocation:
-*     smf_get_moltrans( double restFreq, const char **molecule, 
-*                       const char **transition, int * status);
+*     smf_get_moltrans( double restFreq, char **molecule, 
+*                       char **transition, int * status);
 
 *  Arguments:
 *     restFreq = double (Given)
 *        Rest frequency in MHz.
-*     molecule = const char** (Given and Returned)
+*     molecule = char** (Given and Returned)
 *        Pointer to the name of the molecular species.
-*     transition = const char** (Given and Returned)
+*     transition = char** (Given and Returned)
 *        Pointer to the name of the transition.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -82,8 +82,8 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_get_moltrans"
 
-void smf_get_moltrans( double restFreq, const char **molecule, 
-                       const char **transition, int *status ) {
+void smf_get_moltrans( double restFreq, char **molecule, 
+                       char **transition, int *status ) {
 
   /* Local variables. */
   int i;                      /* Loop counter */

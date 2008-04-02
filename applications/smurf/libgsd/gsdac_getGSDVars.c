@@ -335,49 +335,63 @@ void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
   gsdac_get0r ( gsd, "C3DASSHFTFRAC", &(gsdVars->shiftFrac), status );
 
   /* Get the CSO Tau parameters, if present. */
-  gsdac_get0r ( gsd, "C7TAU225", &(gsdVars->tau225), status );
-  if ( *status != SAI__OK ) {
-    gsdVars->tau225 = VAL__BADD;
-    *status = SAI__OK;
+  if ( *status == SAI__OK ) {
+    gsdac_get0r ( gsd, "C7TAU225", &(gsdVars->tau225), status );
+    if ( *status != SAI__OK ) {
+      errAnnul ( status );
+      gsdVars->tau225 = VAL__BADR;
+    }
   }
 
-  gsdac_get0r ( gsd, "C7TAURMS", &(gsdVars->tauRMS), status );
-  if ( *status != SAI__OK ) {
-    gsdVars->tauRMS = VAL__BADD;
-    *status = SAI__OK;
+  if ( *status == SAI__OK ) {
+    gsdac_get0r ( gsd, "C7TAURMS", &(gsdVars->tauRMS), status );
+    if ( *status != SAI__OK ) {
+      errAnnul ( status );
+      gsdVars->tauRMS = VAL__BADR;
+    }
   }
 
-  gsdac_get0c ( gsd, "C7TAUTIME", gsdVars->tauTime, status );
-  if ( *status != SAI__OK ) {
-    strcpy ( gsdVars->tauTime, "" );
-    *status = SAI__OK;
+  if ( *status == SAI__OK ) {
+    gsdac_get0c ( gsd, "C7TAUTIME", gsdVars->tauTime, status );
+    if ( *status != SAI__OK ) {
+      errAnnul ( status );
+      strcpy ( gsdVars->tauTime, "" );
+    }
   }
 
-  /* Get the seeing parameters. */
-  gsdac_get0r ( gsd, "C7SEEING", &(gsdVars->seeing), status );
-  if ( *status != SAI__OK ) {
-    gsdVars->seeing = VAL__BADD;
-    *status = SAI__OK;
+  /* Get the seeing parameters, if present. */
+  if ( *status == SAI__OK ) {
+    gsdac_get0r ( gsd, "C7SEEING", &(gsdVars->seeing), status );
+    if ( *status != SAI__OK ) {
+      errAnnul ( status );
+      gsdVars->seeing = VAL__BADR;
+    }
   }
 
-  gsdac_get0c ( gsd, "C7SEETIME", gsdVars->seeTime, status );
-  if ( *status != SAI__OK ) {
-    strcpy ( gsdVars->seeTime, "" );
-    *status = SAI__OK;
+  if ( *status == SAI__OK ) {
+    gsdac_get0c ( gsd, "C7SEETIME", gsdVars->seeTime, status );
+    if ( *status != SAI__OK ) {
+      errAnnul ( status );
+      strcpy ( gsdVars->seeTime, "" );
+    }
   }
 
   /* Get the polarity? */
-  gsdac_get0c ( gsd, "C3POLARITY", gsdVars->polarity, status );
-  if ( *status != SAI__OK ) {
-    strcpy ( gsdVars->polarity, "" );
-    *status = SAI__OK;
+  if ( *status == SAI__OK ) {
+    gsdac_get0c ( gsd, "C3POLARITY", gsdVars->polarity, status );
+    if ( *status != SAI__OK ) {
+      errAnnul ( status );
+      strcpy ( gsdVars->polarity, "" );
+    }
   }
 
   /* Get the sideband mode. */
-  gsdac_get0c ( gsd, "C3SBMODE", gsdVars->sbMode, status );
-  if ( *status != SAI__OK ) {
-    strcpy ( gsdVars->sbMode, "" );
-    *status = SAI__OK;
+  if ( *status == SAI__OK ) {
+    gsdac_get0c ( gsd, "C3SBMODE", gsdVars->sbMode, status );
+    if ( *status != SAI__OK ) {
+      errAnnul ( status );
+      strcpy ( gsdVars->sbMode, "" );
+    }
   }
 
   if ( dasFlag == DAS_TP || dasFlag == DAS_CROSS_CORR ) {

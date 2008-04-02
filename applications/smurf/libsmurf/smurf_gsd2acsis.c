@@ -107,7 +107,6 @@
 void smurf_gsd2acsis( int *status ) {
 
   /* Local variables */
-  char backend[MAXSTRING];    /* name of the backend */
   dasFlag dasFlag;            /* file structure type */
   char directory[MAXNAME];    /* directory to write the file */
   char filename[MAXNAME];     /* name of the GSD file */

@@ -136,6 +136,7 @@
 #include "smurf_par.h"
 #include "libsmf/smf.h"
 #include "gsdac.h"
+#include "gsdac_standard_sources.h"
 
 #define FUNC_NAME "gsdac_putFits"
 
@@ -217,10 +218,12 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   /* Loop through the array of standards and see if the object matches
      one of them. */
   standard = 0;
-  for ( i = 0; i < STANDARDS_SIZE; i++ ) {
+  i = 0;
+  while ( strcmp ( standards[i], "" ) != 0 ) {
     if ( strcmp ( object, standards[i] ) == 0 ) {
       standard = 1;
     }
+    i++;
   }
 
   /* Copy the obsID into the obsIDSS and add the subsystem number. */
