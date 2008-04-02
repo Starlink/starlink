@@ -56,6 +56,8 @@
 *  History:
 *     2008-03-27 (EC):
 *        Initial version - based on flatfield task
+*     2008-04-02 (EC):
+*        Added spike flagging
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -109,6 +111,7 @@
 
 void smurf_sc2clean( int *status ) {
 
+  int aiter;                /* Number of iterations in sigma-clipper */
   double badfrac=0;         /* Fraction of bad samples to flag bad bolo */
   dim_t dcbox=0;            /* width of box for measuring DC steps */
   double dcthresh=0;        /* n-sigma threshold for DC steps */
@@ -120,6 +123,8 @@ void smurf_sc2clean( int *status ) {
   int order;                /* Order of polynomial for baseline fitting */
   int outsize;              /* Total number of NDF names in the output group */
   int size;                 /* Number of files in input group */
+  double spikethresh;       /* Threshold for finding spikes */
+  unsigned int spikeiter;   /* Number of iterations for spike finder */
 
   /* Main routine */
   ndfBegin();
@@ -139,6 +144,10 @@ void smurf_sc2clean( int *status ) {
 
   /* Order of polynomial for baseline fits */
   parGet0i( "ORDER", &order, status );
+
+  /* Spike flagging */
+  parGet0d( "SPIKETHRESH", &spikethresh, status );
+  parGet0i( "SPIKEITER", &spikeiter, status );
 
   /* Loop over input files */
   for( i=1; i<=size; i++ ) {
@@ -165,16 +174,6 @@ void smurf_sc2clean( int *status ) {
     /* Update quality flags to match bad samples, and to apply badfrac */
     smf_update_quality( ffdata, NULL, 1, NULL, badfrac, status );
 
-    /* Fix large DC steps */
-    if( dcthresh && dcbox ) {
-      msgSetd("DCTHRESH",dcthresh);
-      msgSeti("DCBOX",dcbox);
-      msgOutif(MSG__VERB," ",
-	       "Fixing DC steps of size ^DCTHRESH-sigma in ^DCBOX samples", 
-	       status);  
-      smf_correct_steps( ffdata, NULL, dcthresh, dcbox, status );
-    }
-
     /* Remove baselines */
     msgSeti("ORDER",order);
     msgOutif(MSG__VERB," ",
@@ -182,6 +181,41 @@ void smurf_sc2clean( int *status ) {
 	     status);  
     smf_scanfit( ffdata, order, status );
     smf_subtract_poly( ffdata, 0, status );
+
+    /* Fix large DC steps */
+    if( dcthresh && dcbox ) {
+      msgSetd("DCTHRESH",dcthresh);
+      msgSeti("DCBOX",dcbox);
+      msgOutif(MSG__VERB," ",
+	       "Fixing DC steps of size ^DCTHRESH-sigma in ^DCBOX samples", 
+	       status); 
+      smf_correct_steps( ffdata, NULL, dcthresh, dcbox, status );
+    }
+    
+    /* Flag spikes */
+    if( spikethresh && (spikeiter>=0) ) {
+      msgSetd("SPIKETHRESH",spikethresh);
+      msgSeti("SPIKEITER",spikeiter);
+
+      if( !spikeiter ) {
+	msgOutif(MSG__VERB," ",
+		 "Flagging ^spikethresh-sigma spikes iteratively to convergence.",
+		 status);
+	
+      } else {
+	msgOutif(MSG__VERB," ",
+		 "Flagging ^spikethresh-sigma spikes with ^spikeiter iterations",
+		 status);
+      }
+
+      smf_flag_spikes( ffdata, NULL, spikethresh, spikeiter, 100, &aiter,
+		       status );
+      if( *status == SAI__OK ) {
+	msgSeti("AITER",aiter);
+	msgOutif(MSG__VERB," ", "Finished in ^AITER iterations",
+		 status); 
+      }
+    }
 
     /* Ensure that the data is ICD ordered before closing */
     smf_dataOrder( ffdata, 1, status );

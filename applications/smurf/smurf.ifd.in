@@ -1683,10 +1683,22 @@ package @PACKAGE@ {
 	  }
           parameter order {
             type _INTEGER
-            prompt {Polynomial order}
+            prompt {Remove baseline polynomial of order}
             default 1
             helpkey *
           }
+	  parameter spikethresh {
+            type _DOUBLE
+            prompt {N-sigma threshold for spike-flagger}
+	    default 5
+            helpkey *
+	  }
+	  parameter spikeiter {
+            type _INTEGER
+            prompt {Number of iterations for spike-finder (0=until converge)}
+	    default 0
+            helpkey *
+	  }
           parameter msg_filter {
             type _CHAR
             prompt {Message level}

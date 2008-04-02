@@ -262,6 +262,8 @@
 *        - Added smf_get_moltrans.
 *     2008-03-31 (EC):
 *        - Added smf_quick_noise
+*     2008-04-02 (EC):
+*        - Added smf_flag_spikes
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -848,5 +850,9 @@ void smf_get_moltrans ( double restFreq, char **molecule,
 double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk, 
 			unsigned char *quality, unsigned char mask, 
 			int *status );
+
+void smf_flag_spikes( smfData *data, unsigned char *quality, double thresh, 
+		      unsigned int niter, unsigned int maxiter, 
+		      unsigned int *aiter, int *status );
 
 #endif /* SMF_DEFINED */
