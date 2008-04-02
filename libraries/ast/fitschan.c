@@ -806,6 +806,9 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        coords before writing it out in any non-native encoding.
 *     28-FEB-2008 (DSB):
 *        Test for existing of SkyRefIs attribute before accessing it.
+*     2-APR-2008 (DSB):
+*        In CLASSFromStore, adjust the spatial CRVAL and CRPIX values to be 
+*        the centre of the first pixel if the spatial axes are degenerate.
 *class--
 */
 
@@ -1255,7 +1258,7 @@ static int AIPSFromStore( AstFitsChan *, FitsStore *, const char *, const char *
 static int AIPSPPFromStore( AstFitsChan *, FitsStore *, const char *, const char * );
 static int AddEncodingFrame( AstFitsChan *, AstFrameSet *, int, const char *, const char * );
 static int AddVersion( AstFitsChan *, AstFrameSet *, int, int, FitsStore *, double *, char, const char *, const char * );
-static int CLASSFromStore( AstFitsChan *, FitsStore *, AstFrameSet *, const char *, const char * );
+static int CLASSFromStore( AstFitsChan *, FitsStore *, AstFrameSet *, double *, const char *, const char * );
 static int CardType( AstFitsChan * );
 static int CheckFitsName( const char *, const char *, const char * );
 static int ChrLen( const char * );
@@ -1273,7 +1276,7 @@ static int FindLonLatSpecAxes( FitsStore *, char, int *, int *, int *, const cha
 static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
 static int FitOK( int, double *, double *, double );
 static int FitsEof( AstFitsChan * );
-static int FitsFromStore( AstFitsChan *, FitsStore *, int, AstFrameSet *, const char *, const char * );
+static int FitsFromStore( AstFitsChan *, FitsStore *, int, double *, AstFrameSet *, const char *, const char * );
 static int FitsGetCom( AstFitsChan *, const char *, char ** );
 static int FullForm( const char *, const char *, int );
 static int GetFiducialWCS( AstWcsMap *, AstMapping *, int, int, double *, double * );
@@ -4273,7 +4276,7 @@ static int ChrLen( const char *string ){
 }
 
 static int CLASSFromStore( AstFitsChan *this, FitsStore *store, 
-                           AstFrameSet *fs, const char *method, 
+                           AstFrameSet *fs, double *dim, const char *method, 
                            const char *class ){
 /*
 *  Name:
@@ -4287,7 +4290,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
 
 *  Synopsis:
 *     int CLASSFromStore( AstFitsChan *this, FitsStore *store, 
-*                         AstFrameSet *fs, const char *method, 
+*                         AstFrameSet *fs, double *dim, const char *method, 
 *                         const char *class )
 
 *  Class Membership:
@@ -4312,6 +4315,9 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
 *     fs
 *        Pointer to the FrameSet from which the values in the FitsStore
 *        were derived.
+*     dim
+*        Pointer to an array holding the main array dimensions (AST__BAD
+*        if a dimension is not known).
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -4327,10 +4333,10 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
 
 /* Local Variables: */
    AstFrame *azelfrm;  /* (az,el) frame */
-   AstFrame *velofrm;  /* Frame for reference velocity value */
-   AstFrame *freqfrm;  /* Frame for reference frequency value */
    AstFrame *curfrm;   /* Current Frame in supplied FrameSet */
+   AstFrame *freqfrm;  /* Frame for reference frequency value */
    AstFrame *radecfrm; /* Spatial frame for CRVAL values */
+   AstFrame *velofrm;  /* Frame for reference velocity value */
    AstFrameSet *fsconv1;/* FrameSet connecting "curfrm" & "radecfrm" */
    AstFrameSet *fsconv2;/* FrameSet connecting "curfrm" & "azelfrm" */
    AstMapping *map1;   /* Axis permutation to get (lonaxis,lataxis) = (0,1) */
@@ -4346,6 +4352,7 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
    char spectype[MXCTYPELEN];/* Spectral axis CTYPE */
    const char *srcsys; /* Pointer to rest frame string for source velocity */
    double *cdelt;      /* Pointer to CDELT array */
+   double aval[ 2 ];   /* General purpose array */
    double azel[ 2 ];   /* Reference (az,el) values */
    double cdl;         /* CDELT term */
    double cdlat_lon;   /* Off-diagonal CD element */
@@ -4363,7 +4370,8 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
    double rf;          /* Rest freq (Hz) */
    double specfactor;  /* Factor for converting internal spectral units */
    double val;         /* General purpose value */
-   double aval[ 2 ];   /* General purpose array */
+   double xin[ 3 ];    /* Grid coords at centre of first pixel */
+   double xout[ 3 ];   /* WCS coords at centre of first pixel */
    int axlat;          /* Index of latitude FITS WCS axis */
    int axlon;          /* Index of longitude FITS WCS axis */
    int axspec;         /* Index of spectral FITS WCS axis */
@@ -4400,6 +4408,29 @@ static int CLASSFromStore( AstFitsChan *this, FitsStore *store,
        axlon >= 0 && axlon < 3 &&
        axlat >= 0 && axlat < 3 ) {
       ok = 1;
+
+/* If the spatial pixel axes are degenerate (i.e. span only a single
+   pixel), modify the CRPIX and CRVAL values in the FitsStore to put
+   the reference point at the centre of the one and only spatial pixel. */
+      if( dim[ axlon ] == 1.0 && dim[ axlat ] == 1.0 ){
+
+         xin[ 0 ] = 1.0;
+         xin[ 1 ] = 1.0;
+         xin[ 2 ] = 1.0;
+         astTranN( fs, 1, 3, 1, xin, 1, 3, 1, xout );
+
+         if( xout[ axlon ] != AST__BAD && xout[ axlat ] != AST__BAD ) {
+
+            SetItem( &(store->crval), axlon, 0, ' ', xout[ axlon ]*AST__DR2D );
+            SetItem( &(store->crval), axlat, 0, ' ', xout[ axlat ]*AST__DR2D );
+
+/* This assumes that the indices of the pixel axes that correspond to
+   WCS axes "axlon" and "axlat" are also "axlon" and "axlat". */
+            SetItem( &(store->crpix), 0, axlon, ' ', 1.0 );
+            SetItem( &(store->crpix), 0, axlat, ' ', 1.0 );
+
+         }
+      }
 
 /* Get the CRVAL values for both spatial axes. */
       latval = GetItem( &( store->crval ), axlat, 0, s, NULL, method, class );
@@ -8918,7 +8949,8 @@ static int FitOK( int n, double *act, double *est, double tol ) {
 }
 
 static int FitsFromStore( AstFitsChan *this, FitsStore *store, int encoding, 
-                          AstFrameSet *fs, const char *method, const char *class ){
+                          double *dim, AstFrameSet *fs, const char *method, 
+                          const char *class ){
 /*
 *  Name:
 *     FitsFromStore
@@ -8931,7 +8963,8 @@ static int FitsFromStore( AstFitsChan *this, FitsStore *store, int encoding,
 
 *  Synopsis:
 *     int FitsFromStore( AstFitsChan *this, FitsStore *store, int encoding, 
-*                        AstFrameSet *fs, const char *method, const char *class )
+*                        double *dim, AstFrameSet *fs, const char *method, 
+*                        const char *class )
 
 *  Class Membership:
 *     FitsChan
@@ -8954,8 +8987,9 @@ static int FitsFromStore( AstFitsChan *this, FitsStore *store, int encoding,
 *        Pointer to the FitsStore.
 *     encoding
 *        The encoding to use.
-*     fs 
-*        The FrameSet from which the values in the FitsStore were derived.
+*     dim
+*        Pointer to an array holding the array dimensions (AST__BAD
+*        indicates that the dimenson is not known).
 *     method
 *        Pointer to a string holding the name of the calling method.
 *        This is only for use in constructing error messages.
@@ -9002,7 +9036,7 @@ static int FitsFromStore( AstFitsChan *this, FitsStore *store, int encoding,
       ret = AIPSPPFromStore( this, store, method, class );
 
    } else if( encoding == FITSCLASS_ENCODING ){
-      ret = CLASSFromStore( this, store, fs, method, class );
+      ret = CLASSFromStore( this, store, fs, dim, method, class );
 
 /* Standard FITS-WCS encoding */
    } else {
@@ -31210,7 +31244,7 @@ static int Write( AstChannel *this_channel, AstObject *object ) {
 /* Now put header cards describing the contents of the FitsStore into the 
    supplied FitsChan, using the requested encoding. Zero or one is
    returned depending on whether the information could be encoded. */
-               ret = FitsFromStore( this, store, encoding, 
+               ret = FitsFromStore( this, store, encoding, dim,
                                     (AstFrameSet *) object, method, class );
 
 /* Release the resources used by the FitsStore. */
