@@ -24,8 +24,9 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 
 AC_CHECK_FUNCS(round)
 
+dnl    Just check we have the JPEG headers for sanity. This is a build
+dnl    dependency, so should be guaranteed.
 AC_CHECK_HEADERS([jpeglib.h])
-AC_CHECK_LIB(jpeg,jpeg_start_compress)
 
 STAR_DECLARE_DEPENDENCIES(build, [ems gwm jpeg mers nbs pcs sae starx tcl tk])
 STAR_DECLARE_DEPENDENCIES(configure, [jpeg tcl tk])

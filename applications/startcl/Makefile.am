@@ -69,6 +69,7 @@ AM_CFLAGS = $(X_CFLAGS) @TCL_CFLAGS@ @TK_CFLAGS@
 libtclAdam_la_SOURCES = $(ADAM_ROUTINES)
 
 libtkGwm_la_SOURCES = $(GWM_ROUTINES)
+libtkGwm_la_LIBADD = -ljpeg
 
 atclsh_SOURCES = tclAppInit.c $(NBS_ROUTINES)
 #  Note C_FC_FCLINK_MAGIC needed under OS X to work around restFP.
@@ -80,7 +81,7 @@ awish_SOURCES = tkAppInit.c $(NBS_ROUTINES)
 awish_LDADD = libtclAdam.la libtkGwm.la `nbs_link` `chr_link_adam` \
         `gwm_link_adam` `ems_link_adam` `ams_link_adam` `cnfrtl_link` \
 	@TCL_LD_SEARCH_FLAGS@ @TCL_LIBS@ @TK_LIBS@ @FCLIBS@ \
-        `starX_link`
+        -ljpeg `starX_link`
 
 # Define what is to be done with which sets of files.
 

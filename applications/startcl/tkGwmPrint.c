@@ -19,9 +19,7 @@
 
 static void DoPs(ClientData clientData);
 static void DoInkjet(ClientData clientData);
-#if HAVE_LIBJPEG
 static void DoJpeg(ClientData clientData);
-#endif
 static void init_printer(FILE*);
 static void reset_printer(FILE*);
 static void get_mask(int [NINKS][NPLANES][NBITS]);
@@ -220,7 +218,7 @@ int tkgwmStartPrint(Tcl_Interp *interp, Gwm *gwmPtr, char *filename)
 	Tcl_DoWhenIdle(DoInkjet, gwmPtr);
     }
     else if ( strncmp(gwmPtr->printformat, "JPEG", length) == 0 ) {
-#if HAVE_LIBJPEG && HAVE_JPEGLIB_H
+#if HAVE_JPEGLIB_H
     
     /*
     **  Allocate and initialise compression structures
@@ -266,7 +264,7 @@ int tkgwmStartPrint(Tcl_Interp *interp, Gwm *gwmPtr, char *filename)
     */
 	Tcl_DoWhenIdle(DoJpeg, gwmPtr);
 
-#else /* !(HAVE_LIBJPEG && HAVE_JPEGLIB_H) */
+#else /* !(HAVE_JPEGLIB_H) */
         /* what's the best thing to do here?  Just jump out? */
 	Tcl_AppendResult(interp,
                          "Can't produce JPEGs -- unavailable at build time",
@@ -943,7 +941,7 @@ void send_plane (FILE *out, int change, int is_rle, int nBytes,
 	}
     }
 }
-#if HAVE_LIBJPEG && HAVE_JPEGLIB_H
+#if HAVE_JPEGLIB_H
 static void DoJpeg(ClientData clientData)
 {
 /*
