@@ -206,10 +206,6 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
      divided by number of receptors). */
   nSubsys = gsdVars->nBESections / recepsUsed;
 
-  acsSpecOpenTS ( directory, utDate, obsNum, recepsUsed, 
-                  nSubsys, recepNames, focalStation, 
-                  fPlaneX, fPlaneY, OCSConfig, status );
-
   /* Truncate the name of the backend. */
   cnfImprt ( gsdVars->backend, 16, backend );
 
@@ -223,8 +219,11 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
     msgSetc ( "BACKEND", backend );
     errRep ( FUNC_NAME, "Backend ^BACKEND not supported", status );
     return;
-  } 
+  }
 
+  acsSpecOpenTS ( directory, utDate, obsNum, recepsUsed, 
+                  nSubsys, recepNames, focalStation, 
+                  fPlaneX, fPlaneY, OCSConfig, status );
   /* Allocate memory for JCMTState, and SpecHdr. */
   record = smf_malloc ( 1, sizeof ( *record ), 0, status );
   specHdr = smf_malloc ( 1, sizeof ( *specHdr ), 0, status );
