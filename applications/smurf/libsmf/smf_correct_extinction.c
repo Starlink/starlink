@@ -87,6 +87,8 @@
 *        Check for incompatible combinations of data and parameters
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-04-03 (EC):
+*        Assert time-ordered (ICD compliant) data
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -232,6 +234,9 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
     smf_fits_getS( hdr, "FILTER", filter, 81, status);
     tau = smf_scale_tau( tau, filter, status);
   }
+
+  /* Asset time-ordered (ICD compliant) data order */
+  smf_dataOrder( data, 1, status );
 
   /* Assign pointer to input data array */
   /* of course, check status on return... */
