@@ -1413,7 +1413,19 @@ Removing any other such definitions and adding a command:
   \newcommand{\html}[1]{}
 \end{verbatim}
 \end{quote}
-To the standard part of the prologue.
+To the standard part of the prologue. 
+\item An additional space issue means you also need to change:
+\begin{quote}
+\begin{verbatim}
+  \stardoccategory \stardocnumber \\
+\end{verbatim}
+\end{quote}
+to:
+\begin{quote}
+\begin{verbatim}
+  \stardoccategory\ \stardocnumber \\
+\end{verbatim}
+\end{quote}
 \item And finally add the following definition to the standard part of 
       the prologue.
 \begin{quote}
