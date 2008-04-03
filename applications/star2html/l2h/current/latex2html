@@ -1265,12 +1265,13 @@ sub process_ext_file {
     }
 
     # check in other directories on the $TEXINPUTS paths
-    if (!$found) {
-	foreach $texpath (split /$envkey/, $TEXINPUTS ) {
-	    $file = "$texpath$dd$extfile.$ext";
-	    last if ($found = (-f $file));
-	}
-    }
+    # PWD: don't do this we control the aux file usage in star2html.
+    #if (!$found) {
+    #    foreach $texpath (split /$envkey/, $TEXINPUTS ) {
+    #        $file = "$texpath$dd$extfile.$ext";
+    #        last if ($found = (-f $file));
+    #    }
+    #}
     if ( $found ) {
 	print "\nReading $file ...";
 	# must allow @ within control-sequence names

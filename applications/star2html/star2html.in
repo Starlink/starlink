@@ -407,8 +407,20 @@ if ( ( -T $TEXFILE ) && ( -r $TEXFILE ) ) {
    &edit_main;
    $have_texfile = 1;
 
-#  Copy aux file if it exists and we've been asked to.
+#  Copy aux, lot and lof files if they exist and we've been asked to.
    $file = $TEXDIR . '/'. $TEXNAME . '.aux';
+   if ( -e $file && $AUXCOPY ) {
+      system("cp $file $DESTDIR") and
+	 &clear_up( "Star2HTML fatal: cannot copy $file into $DESTDIR\n" );
+      $have_auxfile = 1;
+   }
+   $file = $TEXDIR . '/'. $TEXNAME . '.lot';
+   if ( -e $file && $AUXCOPY ) {
+      system("cp $file $DESTDIR") and
+	 &clear_up( "Star2HTML fatal: cannot copy $file into $DESTDIR\n" );
+      $have_auxfile = 1;
+   }
+   $file = $TEXDIR . '/'. $TEXNAME . '.lof';
    if ( -e $file && $AUXCOPY ) {
       system("cp $file $DESTDIR") and
 	 &clear_up( "Star2HTML fatal: cannot copy $file into $DESTDIR\n" );
@@ -990,7 +1002,11 @@ sub clear_up {
    }
    if ( $have_auxfile ) {
       $file = $DESTDIR . $TEXNAME . '.aux';
-      unlink( $file );
+      unlink( $file ) if ( -f $file );
+      $file = $DESTDIR . $TEXNAME . '.lof';
+      unlink( $file ) if ( -f $file );
+      $file = $DESTDIR . $TEXNAME . '.lot';
+      unlink( $file ) if ( -f $file );
    }
 
 #  Remove the style files if we've created them.
