@@ -1,4 +1,8 @@
-\documentstyle[11pt]{book}
+\documentclass[twoside,11pt]{book}
+
+% ? Specify used packages
+% ? End of specify used packages
+
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
@@ -45,9 +49,9 @@ the Starlink Software Environment.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{latexonly} and %\end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{latexonly}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -134,7 +138,7 @@ the Starlink Software Environment.}
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%\end{latexonly}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 \newcommand{\radec}     {$[\alpha,\delta\,]$}
@@ -162,7 +166,7 @@ the Starlink Software Environment.}
 
 %  Latex document header.
 %  ======================
-\begin{latex}
+\begin{latexonly}
    CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
@@ -185,7 +189,7 @@ the Starlink Software Environment.}
       {\Large\bf Abstract}
    \end{center}
 % ? End of heading for abstract.
-\end{latex}
+\end{latexonly}
 
 %  HTML documentation header.
 %  ==========================
@@ -199,7 +203,7 @@ the Starlink Software Environment.}
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -241,12 +245,12 @@ the Starlink Software Environment.}
 % ? Latex document Table of Contents (if used).
 %  ===========================================
  \newpage
- \begin{latex}
+ \begin{latexonly}
    \setlength{\parskip}{0mm}
    \latexonlytoc
    \setlength{\parskip}{\medskipamount}
    \markright{\stardocname}
- \end{latex}
+ \end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 \include {sg4p0}
