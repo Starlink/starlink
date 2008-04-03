@@ -28,7 +28,8 @@ static void GetRVar( Tcl_Interp *, const char *, float *, int * );
 static void sink( const char * );
 
 F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
-                            INTEGER(FULL), INTEGER(STATUS) TRAIL(TITLE) ){
+                            INTEGER(FULL), CHARACTER(PNAME), INTEGER(STATUS) 
+                            TRAIL(TITLE) TRAIL(PNAME) ){
 /*
 *+
 *  Name:
@@ -52,12 +53,16 @@ F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
 *     FULL = INTEGER (Given)
 *        The value to use for the AST "Full" attribute when displaying
 *        the Object.
+*     PNAME = CHARACTER * ( * ) (Given)
+*        The file name of the executable program currently running. 
+*        Required for Tcl initialisation.
 *     STATUS = INTEGER (Given and Returned)
 *        The inherited global status.
 
 *  Copyright:
-*     Copyright (C) 1997, 2002, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Copyright (C) 1997, 2002, 2004 Central Laboratory of the Research Councils. 
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -78,6 +83,7 @@ F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -92,6 +98,9 @@ F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
 *        kappa.
 *     4-OCT-2004 (TIMJ):
 *        Fix compiler warnings
+*     3-APR-2008 (PWD):
+*        Added PNAME argument and call to Tcl_FindExecutable. 
+*        Removed dead support for Tk 4.0.
 *     {enter_further_changes_here}
 
 *-
@@ -100,6 +109,7 @@ F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
    GENPTR_INTEGER(IAST)
    GENPTR_CHARACTER(TITLE)
    GENPTR_INTEGER(FULL)
+   GENPTR_CHARACTER(PNAME)
    GENPTR_INTEGER(STATUS)
 
    AstChannel *chan;
@@ -108,12 +118,14 @@ F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
    char script[1024];
    int ifd;
 
-#if ( (TK_MAJOR_VERSION == 4) && (TK_MINOR_VERSION == 0) )
-   Tk_Window main;
-#endif
-
 /* Check the global status. */
    if( *STATUS != SAI__OK ) return;
+
+/* Set the executable name. Required if we want Tcl to locate itself
+   without a TCL_LIBRARY definition. Usually argv[0]. */
+   if ( strlen( PNAME ) > 0 ) {
+       Tcl_FindExecutable( PNAME );
+   }
 
 /* Get a unique temporary file name. This file is used to store the object 
    dumps. All this complication is needed
@@ -154,7 +166,7 @@ F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
 
 /* Otherwise, create a TCL interpreter. */
       } else {   
-         interp = Tcl_CreateInterp ();
+         interp = Tcl_CreateInterp();
       }
 
 /* Store the name of the temprary file in Tcl variable "FILE". */
@@ -162,20 +174,6 @@ F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
 
 /* Store the supplied title string in Tcl variable TITLE. */
       SetSVar( interp, "TITLE", TITLE, TITLE_length, STATUS );
-
-#if ( (TK_MAJOR_VERSION == 4) && (TK_MINOR_VERSION == 0) )
-
-/* Create the main window, and report an error if it fails. */
-      if( *STATUS == SAI__OK ) {
-         main = Tk_CreateMainWindow(interp, NULL, "Tkast", "TKAST" );
-         if( !main ) {
-            *STATUS = SAI__ERROR;
-            Error( "Unable to create main Tk window.", STATUS );
-            Error( interp->result, STATUS );
-         }
-      }
-
-#endif
 
 /* Initialise Tcl and Tk commands. */
       if( *STATUS == SAI__OK ) {
@@ -212,14 +210,6 @@ F77_SUBROUTINE(kps1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
             Tk_MainLoop(); 
          }
       }
-
-#if ( (TK_MAJOR_VERSION == 4) && (TK_MINOR_VERSION == 0) )
-
-/* If an error has occurred, ensure that the main Tk window has been
-   destroyed. */
-      if( *STATUS != SAI__OK && main ) Tk_DestroyWindow( main );
-
-#endif
 
 /* Delete the TCL interpreter. */
       if( interp && *STATUS == SAI__OK ) Tcl_DeleteInterp( interp );

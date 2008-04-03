@@ -106,9 +106,10 @@
 *        picture number 4.
 
 *  Copyright:
-*     Copyright (C) 1998-1999, 2004 Central Laboratory of the Research
-*     Councils. Copyright (C) 2006 Particle Physics & Astronomy
-*     Research Council. All Rights Reserved.
+*     Copyright (C) 1998-1999, 2004 Central Laboratory of the Research Councils. 
+*     Copyright (C) 2006 Particle Physics & Astronomy Research Council. 
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -129,6 +130,7 @@
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -144,6 +146,9 @@
 *        Use kps1_tkast instead of kpg1_tkast.
 *     27-JAN-2006 (DSB):
 *        Delete dangling GRP identifiers.
+*     3-APR-2008 (PWD):
+*        Pass program filename to KPS1_TKAST. Needed so that the
+*        self-locating mechanisms of Tcl can be activated.
 *     {enter_further_changes_here}
 
 *-
@@ -171,6 +176,7 @@
 *  Local Variables:
       CHARACTER ACCESS*6
       CHARACTER CNAME*128        
+      CHARACTER FNAME*512
       CHARACTER LOC*(DAT__SZLOC)
       CHARACTER LOGFNM*(GRP__SZFNM)
       CHARACTER TITLE*255
@@ -393,8 +399,9 @@
 
 *  Display the AST Object in a TK window.
          CALL MSG_SETC( 'OBJ', AST_GETC( IAST, 'CLASS', STATUS ) )
-         CALL MSG_LOAD( ' ', '^OBJ', TITLE, TLEN, STATUS )       
-         CALL KPS1_TKAST( IAST, TITLE( : TLEN ), FULL, STATUS )
+         CALL MSG_LOAD( ' ', '^OBJ', TITLE, TLEN, STATUS )
+         CALL GETARG( 0, FNAME )
+         CALL KPS1_TKAST( IAST, TITLE( : TLEN ), FULL, FNAME, STATUS )
 
       END IF
 
