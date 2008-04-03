@@ -1066,10 +1066,8 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
 #endif
 	flushResources( &OBSINFO, subsys, status );
 
-#if USE_MEMORY_CACHE
 	/* always want to make sure we allocate the max amount of memory */
 	ngrow = subsys->maxsize;
-#endif
 
 #if SPW_DEBUG_LEVEL > 1
 	printf("------- alloc after unexpected grow\n");
@@ -1222,13 +1220,7 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
 
 #if SPW_DEBUG_LEVEL > 1
     if (seqinc && *status == SAI__OK) {
-      printf(">>> Wrote first spectrum "
-#  if USE_MEMORY_CACHE
-	     "to memory cache "
-#  else
-	     "to disk "
-#  endif  /* USE_MEMORY_CACHE */
-	     "at this position %u (curpos = %u)\n", tindex, subsys->curpos );
+      printf(">>> Wrote first spectrum to memory cache at this position %u (curpos = %u)\n", tindex, subsys->curpos );
     }
 #endif  /* SPW_DEBUG_LEVEL */
 
@@ -2566,8 +2558,6 @@ allocResources( const obsData * obsinfo, subSystem * subsys, unsigned int nseq, 
 
   seq = ( nseq == 0 ? subsys->maxsize : nseq );
 
-#if USE_MEMORY_CACHE
-
   if (subsys->cursize != seq) {
     nbytes = seq * obsinfo->nrecep * subsys->nchans * SIZEOF_FLOAT;
     myRealloc( (void**)&(subsys->tdata.spectra), nbytes, status );
@@ -2576,10 +2566,6 @@ allocResources( const obsData * obsinfo, subSystem * subsys, unsigned int nseq, 
     allocPosData(obsinfo, subsys, seq, status );
     allocTsysTrxData(obsinfo, subsys, seq, status );
   }
-
-#else
-  openNDF( obsinfo, subsys, subsys, nseq, status );
-#endif
 
   /* count arrays are always in memory */
   nbytes = obsinfo->nrecep * seq * sizeof( unsigned char );
@@ -2618,7 +2604,6 @@ static void
 resizeResources( const obsData *obsinfo, subSystem * subsys, unsigned int newsize, int * status ) {
   if (*status != SAI__OK) return;
 
-#if USE_MEMORY_CACHE
   /* Currently a bug since the memory should not be realloced */
   *status = SAI__ERROR;
   emsSetu("SZ", newsize);
@@ -2628,9 +2613,6 @@ resizeResources( const obsData *obsinfo, subSystem * subsys, unsigned int newsiz
 	 " (subsys ^N, obs ^OBS)."
 	 " Internal programming error",
 	 status );
-#else
-  resizeNDF( obsinfo, subsys, newsize, status );
-#endif
 
 }
 
@@ -2644,12 +2626,8 @@ flushResources( const obsData * obsinfo, subSystem * subsys, int * status ) {
 #if SPW_DEBUG_LEVEL > 0
   double percent = 0.0;
 #endif
-#if USE_MEMORY_CACHE
   subSystem output;  /* Some where to store file information */
-#endif
   if (*status != SAI__OK) return;
-
-#if USE_MEMORY_CACHE
 
 #if SPW_DEBUG_LEVEL > 0
   if (subsys->cursize > 0) {
@@ -2679,10 +2657,6 @@ flushResources( const obsData * obsinfo, subSystem * subsys, int * status ) {
 
   /* make sure we close the correct subsystem */
   toclose = &output;
-#else
-  toclose = &subsys;
-
-#endif  /* USE_MEMORY_CACHE */
 
   closeNDF( toclose, status );
 
