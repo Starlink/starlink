@@ -115,6 +115,9 @@
 *     2008-03-04 (EC):
 *        -Modified model calculation to use smfDIMMData in interface
 *        -Added QUAlity component
+*     2008-04-03 (EC):
+*        - Use QUALITY in map-maker
+*        - Added data cleaning options to CONFIG file
 
 *  Notes:
 
@@ -171,12 +174,17 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 		     double *weights, int *status ) {
 
   /* Local Variables */
+  unsigned int aiter;           /* Actual iterations of sigma clipper */
   smfArray **ast=NULL;          /* Astronomical signal */
   double *ast_data=NULL;        /* Pointer to DATA component of ast */
   smfGroup *astgroup=NULL;      /* smfGroup of ast model files */
   const char *asttemp=NULL;     /* Pointer to static strings created by ast */
+  double badfrac;               /* Bad bolo fraction for flagging */
+  int baseorder;                /* Order of poly for baseline fitting */
   smfDIMMData dat;              /* Struct passed around to model components */
   smfData *data=NULL;           /* Temporary smfData pointer */
+  int dcbox;                    /* Box size for fixing DC steps */
+  double dcthresh;              /* Threshold for fixing DC steps */
   int dimmflags;                /* Control flags for DIMM model components */
   dim_t dsize;                  /* Size of data arrays in containers */
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
@@ -193,6 +201,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   smfArray **lut=NULL;          /* Pointing LUT for each file */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
   smfGroup *lutgroup=NULL;      /* smfGroup of lut model files */
+  unsigned char mask;           /* Bitmask for QUALITY flags */
   int memiter=0;                /* If set iterate completely in memory */
   smfArray ***model=NULL;       /* Array of pointers smfArrays for ea. model */
   smfGroup **modelgroups=NULL;  /* Array of group ptrs/ each model component */
@@ -207,11 +216,14 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   int numiter;                  /* Total number iterations */
   int pass;                     /* Two pass parsing of MODELORDER */
   smfArray **qua=NULL;          /* Quality flags for each file */
+  unsigned char *qua_data=NULL; /* Pointer to DATA component of qua */
   smfGroup *quagroup=NULL;      /* smfGroup of quality model files */
   int rebinflags;               /* Flags to control rebinning */
   smfArray **res=NULL;          /* Residual signal */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   smfGroup *resgroup=NULL;      /* smfGroup of model residual files */
+  unsigned int spikeiter;       /* Number of iterations for spike detection */
+  double spikethresh;           /* Threshold for spike detection */
   smf_modeltype thismodel;      /* Type of current model */
 
   unsigned char *q=NULL;
@@ -253,6 +265,32 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     if( !astMapGet0I( keymap, "EXPORTNDF", &exportNDF ) ) {
       exportNDF = 0;
     } 
+
+    /* Data-cleaning parameters (should match SC2CLEAN) */
+    
+    if( !astMapGet0D( keymap, "BADFRAC", &badfrac ) ) {
+      badfrac = 0;
+    }
+
+    if( !astMapGet0D( keymap, "DCTHRESH", &dcthresh ) ) {
+      dcthresh = 0;
+    }
+
+    if( !astMapGet0I( keymap, "DCBOX", &dcbox ) ) {
+      dcbox = 0;
+    }
+
+    if( !astMapGet0I( keymap, "ORDER", &baseorder ) ) {
+      baseorder = -1;
+    }
+
+    if( !astMapGet0D( keymap, "SPIKETHRESH", &spikethresh ) ) {
+      spikethresh = 0;
+    }
+
+    if( !astMapGet0I( keymap, "SPIKEITER", &spikeiter ) ) {
+      spikeiter = 0;
+    }
 
     /* Type and order of models to fit from MODELORDER keyword */
     if( astMapGet0C( keymap, "MODELORDER", &asttemp ) ) {
@@ -471,8 +509,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	msgSeti("CHUNK", i+1);
 	msgSeti("NUMCHUNK", nchunks);
 	msgOut(" ", "SMF_ITERATEMAP: Chunk ^CHUNK / ^NUMCHUNK", status);
-	msgOut(" ", "SMF_ITERATEMAP: Calculate time-stream model components", 
-	       status);
 
         /* Open model files here if looping on-disk. Otherwise everything
            is already open from the smf_model_create calls */
@@ -501,32 +537,34 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	    q = qua[i]->sdata[idx]->pntr[0];
 
 	    msgOut(" ", "  update quality", status);
-	    smf_update_quality( res[i]->sdata[idx], 
-				(unsigned char *)qua[i]->sdata[idx]->pntr[0],
-				1, NULL, 0.05, status );
-	    
-	    /*
-	    for( i=0; i<1280; i++ ) {
-	      if( !(i % 40) ) printf("\n");
-	      printf("%1i ",q[i*(12000)]);
+	    smf_update_quality( data, q, 1, NULL, badfrac, status );
+
+	    if( baseorder >= 0 ) {
+	      msgOut(" ", "  fit polynomial baselines", status);
+	      smf_scanfit( data, q, baseorder, status );
+
+	      msgOut(" ", "  remove polynomial baselines", status);
+	      smf_subtract_poly( data, q, 0, status );
 	    }
-	    */
 
-	    msgOut(" ", "  correct steps", status);
-	    smf_correct_steps( res[i]->sdata[idx],
-			       (unsigned char *)qua[i]->sdata[idx]->pntr[0],
-			       20., 1000, status );
-	    
-	    msgOut(" ", "  fit polynomial baselines", status);
-	    smf_scanfit( res[i]->sdata[idx], 1, status );
+	    if( dcthresh && dcbox ) {
+	      msgOut(" ", "  correct steps", status);
+	      smf_correct_steps( data, q, 20., 1000, status );
+	    }
 
-	    msgOut(" ", "  remove polynomial baselines", status);
-	    smf_subtract_poly( res[i]->sdata[idx], 0, status );
-
-	    /*smf_fft_filter( res[i]->sdata[idx], 200., status );*/
+	    if( spikethresh ) {
+	      msgOut(" ", "  flag spikes...", status);
+	      smf_flag_spikes( data, q, spikethresh, spikeiter, 100, &aiter, 
+			       status );
+	      msgSeti("AITER",aiter);
+	      msgOut(" ", "  ...finished in ^AITER iterations",
+		       status); 
+	    }
 	  }
 	}
 
+	msgOut(" ", "SMF_ITERATEMAP: Calculate time-stream model components", 
+	       status);
 
 	/* Call the model calculations in the desired order. */
 	if( *status == SAI__OK ) {
@@ -567,14 +605,21 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	    ast_data = (double *)(ast[i]->sdata[idx]->pntr)[0];
 	    res_data = (double *)(res[i]->sdata[idx]->pntr)[0];
 	    lut_data = (int *)(lut[i]->sdata[idx]->pntr)[0];
-	    
+	    qua_data = (unsigned char *)(qua[i]->sdata[idx]->pntr)[0];
+
 	    dsize = (ast[i]->sdata[idx]->dims)[0] *
 	      (ast[i]->sdata[idx]->dims)[1] * (ast[i]->sdata[idx]->dims)[2];
 
+	    /* Ignore data with these QUALITY flags */
+	    mask = 255 - SMF__Q_JUMP;
+
 	    for( k=0; k<dsize; k++ ) {	  
-	      res_data[k] += ast_data[k];
-	      
-	      /* Set ast_data back to 0 since we've moved all of the signal
+	      if( !(qua_data[k]&mask) ) {
+		res_data[k] += ast_data[k];
+	      }
+
+	      /* Not really necessary.
+                 Set ast_data back to 0 since we've moved all of the signal
 		 into the residual, and then it will get re-estimated by
 		 calcmodel_ast after we finish estimating the map. */
 	      
@@ -594,9 +639,9 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	    }
 	    
 	    /* Rebin the residual + astronomical signal into a map */
-	    smf_simplerebinmap( res_data, NULL, lut_data, dsize,
-				rebinflags, map, weights, hitsmap, mapvar,
-				msize, status );
+	    smf_simplerebinmap( res_data, NULL, lut_data, qua_data, mask,
+				dsize, rebinflags, map, weights, hitsmap, 
+				mapvar, msize, status );
 	  }
 	}
 
@@ -626,7 +671,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	  /* Open files if memiter not set - otherwise they are still open
              from earlier call */
 	  if( !memiter ) {
-
 	    smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
 	    smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
 	    smf_open_related_model( lutgroup, i, "UPDATE", &lut[i], status );  
