@@ -36,10 +36,12 @@
 *        Initial version
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-04-03 (AGG):
+*        Free resources even if status is bad
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia.  All Rights
-*     Reserved.
+*     Copyright (C) 2006-2008 University of British Columbia.  All
+*     Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -94,7 +96,8 @@ void smf_close_smfGroup ( smfGroup **group, int *status ) {
   int **subgroups = NULL;     /* Array of pointers to arrays of Grp indices */
   int *indices = NULL;        /* Pointer to array of Grp indices */
 
-  if ( *status != SAI__OK ) return;
+  /* We need to be able to clean up even if input status is bad - this
+     requires some defensive programming. */
 
   if ( *group == NULL ) {
     if ( *status == SAI__OK ) {
@@ -109,11 +112,26 @@ void smf_close_smfGroup ( smfGroup **group, int *status ) {
 
     /* Free subgroups */
     subgroups = (*group)->subgroups;
-    for ( i=0; i<(*group)->ngroups; i++) {
-      /* Retrieve pointer to array of indices */
-      indices = subgroups[i];
-      /* Free memory associated with current array of indices */
-      indices = smf_free( indices, status );
+    if ( subgroups == NULL ) {
+      if ( *status == SAI__OK ) {
+	*status = SAI__ERROR;
+	errRep( FUNC_NAME, "Input smfGroup has no subgroups (possible programming error)", status );
+      }
+    } else {
+      for ( i=0; i<(*group)->ngroups; i++) {
+	/* Retrieve pointer to array of indices */
+	if ( subgroups[i] == NULL ) {
+	  if ( *status == SAI__OK ) {
+	    msgSeti("I",i);
+	    *status = SAI__ERROR;
+	    errRep( FUNC_NAME, "Subgroup ^I is NULL (possible programming error)", status );
+	  }
+	} else {
+	  indices = subgroups[i];
+	  /* Free memory associated with current array of indices */
+	  indices = smf_free( indices, status );
+	}
+      }
     }
     /* Free pointer to subgroups */
     subgroups = smf_free( subgroups, status );
