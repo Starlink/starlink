@@ -262,10 +262,12 @@
 *        Set obscounter to 1 at the beginning of the simulation and
 *        increment as necessary rather than resetting to 1 (then
 *        incrementing as necessary) for each file.
+*     2008-04-02 (TIMJ):
+*        Fix strncpy usage.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
 *     Council. 
 *     Copyright (C) 2006-2008 University of British Columbia. All
@@ -455,7 +457,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int obsend = 0;                 /* Flag to indicate whether current file is last in 
 				     observation */
   char obsid[80];                 /* OBSID for each observation */
-  char obstype[SZFITSCARD+1] = "\0";       /* Observation type, e.g. SCIENCE */
+  char obstype[SZFITSCARD+1];     /* Observation type, e.g. SCIENCE */
   FILE *ofile = NULL;             /* File pointer to check for existing files*/
   double phi;                     /* latitude (radians) */
   int planet = 0;                 /* Flag to indicate planet observation */
@@ -466,7 +468,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double raapp;                   /* Apparent RA */
   double raapp1;                  /* Recalculated apparent RA */
   size_t rowsize;                 /* row size for flatfield */
-  char scancrd[SZFITSCARD+1] = "\0";       /* SCAN coordinate frame */
+  char scancrd[SZFITSCARD+1];     /* SCAN coordinate frame */
   double sigma;                   /* instrumental white noise */
   char sign[2];                   /* Sign of angle (+/-) */
   Grp *skygrp = NULL;             /* Group of input files */
@@ -635,7 +637,9 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   }/* if not hits-only */
 
   /* Set some static FITS headers */
-  strncpy( obstype, "SCIENCE", 7);
+  strncpy( obstype, "SCIENCE", sizeof(obstype) );
+  obstype[SZFITSCARD] = '\0'; /* pedant */
+
   /* KLUDGE !!! */
   exptime = 200.0 * inx->steptime;
 
@@ -1326,9 +1330,15 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
           head[j].smu_az_jig_y = jig_y_hor[j];
            
 	  /* Other headers - more to be added as necessary */
-	  strncpy( head[j].smu_chop_phase, "M", 1 );
-	  strncpy( head[j].tcs_beam, "M", 1 );
-	  strncpy( head[j].tcs_source, "SCIENCE", 7 );
+          strncpy( head[j].smu_chop_phase, "M", 
+                   sizeof(head[j].smu_chop_phase) );
+          (head[j].smu_chop_phase)[JCMT__SZSMU_CHOP_PHASE] = '\0';
+          strncpy( head[j].tcs_beam, "M",
+                   sizeof(head[j].tcs_beam) );
+          (head[j].tcs_beam)[JCMT__SZTCS_BEAM] = '\0';
+          strncpy( head[j].tcs_source, "SCIENCE",
+                   sizeof(head[j].tcs_source));
+          (head[j].tcs_source)[JCMT__SZTCS_SOURCE] = '\0';
 
           if ( !hitsonly ) {
 
@@ -1472,7 +1482,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	      nimage = maxwrite / 200;
 	    }
 	    /* LST start/end */
-	    strncpy(sign, "+", 1);
+	    strncpy(sign, "+", sizeof(sign));
 	    slaDr2tf(4, lst[0], sign, ihmsf);
 	    sprintf( lststart, "%02d:%02d:%02d.%04d", 
 		     ihmsf[0], ihmsf[1], ihmsf[2], ihmsf[3]);
