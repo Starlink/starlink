@@ -1,4 +1,5 @@
-%
+\documentclass[twoside,11pt]{article}
+
 % An Introduction to Visualisation Software for Astronomy.
 
 % Copyright 1997  Starlink, CCLRC.
@@ -11,7 +12,12 @@
 % A.C. Davenhall,
 % 4th March 1997.
 
-\documentstyle[twoside,11pt,epsf]{article}
+% ? Specify used packages
+\usepackage{graphicx}        %  Use this one for final production.
+\usepackage{epsfig}          %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
@@ -24,6 +30,14 @@
 \newcommand{\stardocdate}      {4th March 1997}
 \newcommand{\stardoctitle}     {An Introduction to \\ Visualisation
 Software for Astronomy}
+\newcommand{\stardocabstract}  {
+This document is an introduction to various common visualisation 
+techniques and packages which might be used on Starlink systems. It is
+aimed at astronomers with complex datasets to display and explore but
+no prior knowledge of visualisation techniques. Its purpose is to
+assist such an astronomer to find visualisation software suitable for his
+problem. It is not a manual for any particular package.}
+
 % ? End of document identification
 % -----------------------------------------------------------------------------
 
@@ -54,7 +68,7 @@ Software for Astronomy}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
 %begin{latexonly}
 \makeatletter
@@ -173,6 +187,10 @@ Software for Astronomy}
    \end{center}
    \vspace{5mm}
 
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+% ? End of picture
+
 % ? Heading for abstract if used.
    \vspace{10mm}
    \begin{center}
@@ -186,12 +204,13 @@ Software for Astronomy}
 \begin{htmlonly}
    \xlabel{}
    \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
+      \stardoctitle
+%      \stardocversion\\
+%      \stardocmanual
    \begin{rawhtml} </H1> \end{rawhtml}
 
 % ? Add picture here if required.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
@@ -223,23 +242,39 @@ Software for Astronomy}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
 \end{htmlonly}
 
 % -----------------------------------------------------------------------------
 % ? Document Abstract. (if used)
 %   ==================
-
-This document is an introduction to various common visualisation 
-techniques and packages which might be used on Starlink systems. It is
-aimed at astronomers with complex datasets to display and explore but
-no prior knowledge of visualisation techniques. Its purpose is to
-assist such an astronomer to find visualisation software suitable for his
-problem. It is not a manual for any particular package.
+\stardocabstract
 % ? End of document abstract
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
-%  ===========================================
- \begin{latexonly}
+%  ============================================
+\newpage
+\vspace{3cm}
+
+\begin{latexonly}
+  \subsection*{Revision history}
+
+  \begin{enumerate}
+
+    \item 9th February 1996: Version 1 (ACD).
+
+    \item 4th March 1997: Version 2.  Minor changes (ACD).
+
+   \end{enumerate}
+
+   \vspace*{\fill}
+\end{latexonly}
+
+\copyright \underline{1997} Starlink, CCLRC
+
+\begin{latexonly}
    \pagenumbering{roman}
    \newpage
    \setlength{\parskip}{0mm}
@@ -251,27 +286,14 @@ problem. It is not a manual for any particular package.
 
    \setlength{\parskip}{\medskipamount}
    \markboth{\stardocname}{\stardocname}
- \end{latexonly}
+\end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 
 \newpage
-\subsection*{Revision history}
-
-\begin{enumerate}
-
-  \item 9th February 1996: Version 1 (ACD).
-
-  \item 4th March 1997: Version 2.  Minor changes (ACD).
-
-\end{enumerate}
-
-\vspace{5cm}
-\copyright \underline{1997} Starlink, CCLRC
-
 
 % Section 1 begins ...
-\cleardoublepage
+\latex{\cleardoublepage}
 \renewcommand{\thepage}{\arabic{page}}
 \setcounter{page}{1}
 
@@ -280,14 +302,21 @@ problem. It is not a manual for any particular package.
 
 \section{Introduction \xlabel{INTRO} }
 
-\begin{quote} 
-%\raggedright
+\begin{latexonly}
+\begin{quote} \raggedright
 \begin{center}
 {\it The purpose of computing is insight, not numbers.} \\
 \end{center}
-Richard Hamming 
-%\raggedleft
+Richard Hamming \raggedleft
 \end{quote}
+\end{latexonly}
+
+\begin{htmlonly}
+\begin{quote}
+{\it The purpose of computing is insight, not numbers.} \\
+Richard Hamming
+\end{quote}
+\end{htmlonly}
 
 This document is an introduction to various common visualisation 
 techniques and packages which might be used on Starlink systems. It is
@@ -308,7 +337,7 @@ have been plotting graphs and using other visual techniques to
 understand their data for many years (see Robin\cite{ROBIN} for some
 striking examples). An early example often quoted in visualisation texts
 is the identification of a contaminated water pump as the source of a
-cholera outbreak in central London in 1853-54. Dr.~John Snow plotted the
+cholera outbreak in central London in 1853--54. Dr.~John Snow plotted the
 positions of the homes of the first five hundred victims on a street map.
 The concentration of the points immediately suggested the likely source of
 contamination (see Figure~\ref{CHOLERA}). Classical astronomical examples
@@ -593,12 +622,17 @@ necessary to save every time step as a frame for display.
 
 The diagrams reproduced in the paper version of this document do not
 adequately reproduce visualisations displayed on a high-quality
-graphical output device such as an X-terminal. For example colour
-is not reproduced. On Starlink systems versions of most of the
+graphical output device such as an X-terminal. For example, colour
+is not reproduced. On Starlink systems, versions of most of the
 diagrams in this section are available as colour GIF files in directory:
 
 \begin{quote}
 {\tt /star/examples/sg8}
+\end{quote}
+
+and non-Starlink systems in directory:
+\begin{quote}
+{\tt \$STARLINK\_DIR/examples/sg8}
 \end{quote}
 
 The hypertext version of the document includes colour versions of the
@@ -640,7 +674,7 @@ The Cyan-Magenta-Yellow ($CMG$) system is a variant of the $RGB$\,
 system which is widely used in the printing industry. It still
 represents a colour as three independent components defining a cube,
 but the components are Cyan ($C$), Magenta ($M$) and yellow ($Y$). The
-relation between the $RGB$\, and $CMY$\, systems (for normalised
+relationship between the $RGB$\, and $CMY$\, systems (for normalised
 components) is trivially:
 
 \begin{eqnarray}
@@ -1362,7 +1396,7 @@ one-, two- or three-dimensional subsets from the data and display them in
 the normal fashion. Animations give a usable representation of a fourth
 dimension.
 
-A carpet plot (in two-dimensions) or iso-surface (in three-dimensions)
+A carpet plot (in two dimensions) or iso-surface (in three dimensions)
 can be coloured to represent the variation of a second dependent
 quantity. For example an iso-surface might be computed along a constant
 gas pressure within a data cube and it could be coloured to show the
@@ -1451,7 +1485,7 @@ mentioned in these figures.
 If the data are one- or two-dimensional then
    XGobi, IDL, PV-WAVE, PONGO, SM, etc.
    PGPLOT (subroutine library)
-else if the data three-dimensional
+else if the data are three-dimensional
    If speed of display is important then
       TIPSY
    else
@@ -1513,8 +1547,7 @@ data.]{Decision tree to find a package for visualising pixel data.
 
 \begin{center}
 \begin{tabular}{llc}
-Package      & Starlink Document &  Reference \\ 
-\hline
+Package      & Starlink Document &  Reference \\ \hline
 Figaro       & SUN/86   & \cite{FIGARO}   \\
 KAPPA        & SUN/95   & \cite{KAPPA}    \\
 PGPLOT       & SUN/15   & \cite{PGPLOT}   \\
@@ -1544,7 +1577,7 @@ is as follows:
   \item \xref{KAPPA}{sun95}{}:     SUN/95\cite{KAPPA},
   \item \xref{PGPLOT}{sun15}{}:    SUN/15\cite{PGPLOT},
   \item \xref{PONGO}{sun137}{}:    SUN/137\cite{PONGO},
-  \item SAOIMAGE:                  SUN/166\cite{SAOIMAGE},
+  \item \xref{SAOIMAGE}{sun166}{}: SUN/166\cite{SAOIMAGE},
   \item SM: MUD/160\cite{MUD160},  MUD/159\cite{MUD159}.
 
 \end{itemize}
@@ -1749,8 +1782,8 @@ advanced applications than IDL, for example the {\it Point \& Click}\,
 GUI-based applications for data exploration and image and signal
 processing.
 
-The following extract from the IDL and PV-WAVE FAQ explains the relation
-between the two packages.
+The following extract from the IDL and PV-WAVE FAQ explains the
+relationship between the two packages.
 
 \begin{quote}
 `Around the time that the Unix version of IDL first became
@@ -1862,7 +1895,7 @@ Division at the NASA Ames Research Center, Moffett Field, California
 94035-1000, United States of America. FAST is sold commercially, but is
 offered to academic users at a much reduced price. Previously it was
 available only to users in the United States, though now it is available
-world-wide.
+worldwide.
 
 \begin{latexonly}
 Further details can be obtained via the Web at URL:
@@ -1951,7 +1984,7 @@ the document.
 
   \bibitem{GILBERT} E.W.~Gilbert, 1958, `Pioneer Maps of Health and
    Disease in England', {\it Geographical Journal}, {\bf 124},
-   pp172-183.
+   pp172--183.
 
   \bibitem{HAMMING} R.W.~Hamming, 1962, {\it Numerical Methods for
    Scientists and Engineers}\, (McGraw-Hill: New York).
@@ -1976,7 +2009,7 @@ the document.
    (The Guilford Press: New York).
 
   \bibitem{CLOUDS} H.~Meyerdierks, 1992, {\it Astron. \& Astrophys},
-   {\bf 253}, pp515-520.
+   {\bf 253}, pp515--520.
 
   \bibitem{SKYMAP} D.~Mink. Details of {\bf skymap} can be obtained
    via the Web from URL:
@@ -1992,17 +2025,17 @@ the document.
 
   \bibitem{NING} P. Ning and J. Bloomenthal, 1993, `An Evaluation of
    Implicit Surface Tilers', {\it IEEE Computer Graphics and
-   Applications}, {\bf 13}, No. 6, pp33-41.
+   Applications}, {\bf 13}, No. 6, pp33--41.
 
   \bibitem{POST} F.H.~Post and T.~van~Walsum, 1993, {\it Fluid Flow
    Visualization}, in {\it Focus on Scientific Visualization}, eds.
    H.~Hagen, H.~M\"{u}ller and G.M.~Nielson (Springer-Verlag: Berlin),
-   pp1-40.
+   pp1--40.
 
   \bibitem{RASURE} J.~Rasure and S.~Kubica, 1994, {\it The Khoros Application
    Development Environment} in {\it Experimental Environments for
    Computer Vision and Image Processing}, eds H.I.~Christensen and
-   J.L.~Crowley (World Scientific: Singapore)  pp1-32.
+   J.L.~Crowley (World Scientific: Singapore)  pp1--32.
 
   \bibitem{ROBIN} H.~Robin, 1992, {\it The Scientific Image From Cave
    to Computer}\, (Harry~N.~Abrams Inc: New York).
@@ -2021,7 +2054,7 @@ the document.
   \bibitem{UPSON} C.~Upson, 1991, {\it Volumetric Visualization
    Techniques}\, in {\it State of the Art in Computer Graphics},
    eds. D.F.~Rogers and R.A.~Earnshaw (Springer-Verlag: Berlin)
-   pp313-350.
+   pp313--350.
 
 \end{thebibliography}
 
