@@ -3611,10 +3611,10 @@ AstFrameSet *specWcs( const AstFrameSet *fs, const char veldef[], int ntime, con
    timefrm = astTimeFrame( "" );
    malloced = 0;
    if (ntime == 1) {
-     /* a LutMap needs to numbers in its mapping so double up the
+     /* a LutMap needs two numbers in its mapping so double up the
 	first time if we only have one value. */
      tcopy[0] = times[0];
-     tcopy[1] = times[1];
+     tcopy[1] = times[0];
      ltimes = tcopy;
      ntime = 2;
    } else {
