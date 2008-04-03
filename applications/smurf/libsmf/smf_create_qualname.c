@@ -49,7 +49,8 @@
 *     2008-03-10 (AGG):
 *        Initial version.
 *     2008-04-02 (AGG):
-*        Use bits rather than values in fixing the bits
+*        Use bit numbers rather than values in fixing the bits,
+*        determine numbers from values with private function
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -88,12 +89,34 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
 
-/* Other includes */
+/* Private static function to return a quality bit number based on the
+   quality bit flag value */
+static int smf_get_fixbit ( int myqual, int *status ) {
+
+  int mybit = 1;
+
+  if ( *status != SAI__OK ) return -1;
+
+  /* Until irqFxbit returns an out-of-range indicator, we sanitize the
+     input ourselves */
+  if ( myqual < mybit || myqual > 128 ) {
+    msgSeti("M",myqual);
+    *status = SAI__ERROR;
+    errRep("", "Integer out of range, ^M - must be 2**N where N is in the range (0,7). Possible programming error?", status);
+    return -1;
+  } else {
+    while ( myqual >> mybit) {
+      mybit++;
+    }
+  }
+  return mybit;
+}
 
 #define FUNC_NAME "smf_create_qualname"
 
 void smf_create_qualname( char *mode, int indf, IRQLocs *qlocs, int *status ) {
 
+  int fixbit;                /* Value of bit to be fixed in named quality */
   int fixed;                 /* Flag to denote whether quality bit is fixed */
   int value;                 /* Value of current quality bit */
   int there = 0;             /* Flag to denote presence of NDF extension */
@@ -132,10 +155,14 @@ void smf_create_qualname( char *mode, int indf, IRQLocs *qlocs, int *status ) {
 	    status );
 
   /* Now fix the bits to the desired values */
-  irqFxbit( qlocs, "BADSAM", 1, &fixed, status );
-  irqFxbit( qlocs, "BADBOL", 2, &fixed, status );
-  irqFxbit( qlocs, "SPIKE",  3, &fixed, status );
-  irqFxbit( qlocs, "DCJUMP", 4, &fixed, status );
+  fixbit = smf_get_fixbit(SMF__Q_BADS, status);
+  irqFxbit( qlocs, "BADSAM", fixbit, &fixed, status );
+  fixbit = smf_get_fixbit(SMF__Q_BADB, status);
+  irqFxbit( qlocs, "BADBOL", fixbit, &fixed, status );
+  fixbit = smf_get_fixbit(SMF__Q_SPIKE, status);
+  irqFxbit( qlocs, "SPIKE",  fixbit, &fixed, status );
+  fixbit = smf_get_fixbit(SMF__Q_JUMP, status);
+  irqFxbit( qlocs, "DCJUMP", fixbit, &fixed, status );
 
   /* Set names to read only */
   irqRwqn( qlocs, "BADSAM", 1, 1, &value, status );
@@ -144,6 +171,5 @@ void smf_create_qualname( char *mode, int indf, IRQLocs *qlocs, int *status ) {
   irqRwqn( qlocs, "DCJUMP", 1, 1, &value, status );
 
   if ( smurfloc ) datAnnul( &smurfloc, status);
-
 
 }
