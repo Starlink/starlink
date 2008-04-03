@@ -37,8 +37,6 @@
 
 *  Notes:
 *     -The model pointer is ignored and should be set to NULL.
-*     -Rather than blindly asserting everything as bolo-ordered, in this
-*      case just ensure that RES has the same order as LUT
 
 *  Authors:
 *     Edward Chapin (UBC)
@@ -62,6 +60,8 @@
 *        Added assertions to ensure different data orders will work.
 *     2008-03-04 (EC)
 *        Modified interface to use smfDIMMData
+*     2008-04-02 (EC)
+*        Use QUALITY
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -111,6 +111,7 @@ void smf_calcmodel_ast( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   int idx=0;                    /* Index within subgroup */
   smfArray *lut=NULL;           /* Pointer to LUT at chunk */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
+  unsigned char mask;           /* Bitmask for quality */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t ndata;                  /* Number of data points */
@@ -132,8 +133,9 @@ void smf_calcmodel_ast( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   /* Loop over index in subgrp (subarray) */
   for( idx=0; idx<res->ndat; idx++ ) {
 
-    /* Ensure that RES has the same data order as LUT */
+    /* Ensure everything is in the same data order */
     smf_dataOrder( res->sdata[idx], lut->sdata[idx]->isTordered, status );
+    smf_dataOrder( qua->sdata[idx], lut->sdata[idx]->isTordered, status );
 
     /* Get pointers to DATA components */
     res_data = (double *)(res->sdata[idx]->pntr)[0];
@@ -151,17 +153,23 @@ void smf_calcmodel_ast( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
       ndata = (res->sdata[idx]->dims)[0] * (res->sdata[idx]->dims)[1] * 
 	(res->sdata[idx]->dims)[2];
 	
+      /* Which QUALITY bits should be considered for ignoring data */
+      mask = 255 - SMF__Q_JUMP;
+
       /* Loop over data points */ 
       for( i=0; i<ndata; i++ ) {
 	if( lut_data[i] != VAL__BADI ) {
+
 	  /* Add previous iteration of the model back into the residual */
-	  res_data[i] += model_data[i];
+	  if( !(qua_data[i]&mask) )
+	    res_data[i] += model_data[i];
 	    
 	  /* calculate new model using the map/LUT */
 	  model_data[i] = dat->map[lut_data[i]];
 	    
 	  /* update the residual model */
-	  res_data[i] -= model_data[i];
+	  if( !(qua_data[i]&mask) )
+	    res_data[i] -= model_data[i];
 	}
       } 
     }

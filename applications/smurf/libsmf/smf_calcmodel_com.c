@@ -67,6 +67,8 @@
 *        Update to use new smf_free behaviour
 *     2008-03-04 (EC)
 *        Modified interface to use smfDIMMData
+*     2008-04-03 (EC)
+*        Use QUALITY
 *     {enter_further_changes_here}
 
 
@@ -120,6 +122,7 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   int idx=0;                    /* Index within subgroup */
   dim_t j;                      /* Loop counter */
   double lastmean;              /* Mean from previous iteration */
+  unsigned char mask;           /* Bitmask for quality */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   double *model_data_copy=NULL; /* Copy of model_data */
@@ -150,9 +153,10 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     do_boxcar = 1;
   }
 
-  /* Assert bolo-ordered data for the residual */
+  /* Assert bolo-ordered data */
   for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
     smf_dataOrder( res->sdata[idx], 0, status );
+    smf_dataOrder( qua->sdata[idx], 0, status );
   }
 
   /* The common mode signal is stored as a single 1d vector for all 4
@@ -217,6 +221,9 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     /* Geta pointer to the QUAlity array */
     qua_data = (unsigned char *)(qua->sdata[idx]->pntr)[0];
 
+    /* Which QUALITY bits should be considered for ignoring data */
+    mask = 255 - SMF__Q_JUMP;
+
     if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Null data in inputs", status);      
@@ -233,7 +240,7 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 	sum = 0;
 	base = 0; /* Offset to the start of the j'th bolometer in the buffer */
 
-	for( j=0; j<nbolo; j++ ) if( !qua_data[base+i] ) {
+	for( j=0; j<nbolo; j++ ) if( !(qua_data[base+i]&mask) ) {
 	  res_data[base+i] += lastmean;
 	  model_data[i] += res_data[base+i];
 	  weight[i]++;
@@ -262,6 +269,9 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     /* Get pointer to DATA component of residual */
     res_data = (double *)(res->sdata[idx]->pntr)[0];
 
+    /* Geta pointer to the QUAlity array */
+    qua_data = (unsigned char *)(qua->sdata[idx]->pntr)[0];
+
     /* Remove common mode from the residual */
     for( i=0; i<ntslice; i++ ) {
       
@@ -269,8 +279,10 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 
       /* Loop over bolometer */
       for( j=0; j<nbolo; j++ ) {
-	/* update the residual model */
-	res_data[base + i] -= model_data[i];
+	/* update the residual */
+	if( !(qua_data[base+i]&mask) ) {
+	  res_data[base + i] -= model_data[i];
+	}
 	base += ntslice;
       }
     }    
