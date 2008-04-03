@@ -13,10 +13,11 @@
 *     C function
 
 *  Invocation:
-*     smf_simplerebinmap( double *data, double *variance, int *lut, int dsize, 
-			 int flags, double *map, double *mapweight, 
-			 unsigned int *hitsmap, double *mapvar, int msize, 
-			 int *status ) {
+*     smf_simplerebinmap( double *data, double *variance, int *lut, 
+*                         unsigned char *qual, unsigned char mask, int dsize, 
+*                         int flags, double *map, double *mapweight, 
+*                         unsigned int *hitsmap, double *mapvar, int msize, 
+*                         int *status ) {
 
 *  Arguments:
 *     data = double* (Given)
@@ -25,6 +26,13 @@
 *        Pointer to array giving data variance (ignore if NULL pointer)
 *     lut = int* (Given)
 *        1-d LUT for indices of data points in map
+*     qual = usigned char* (Given)
+*        If specified, use this QUALITY array to decide which samples
+*        to use (provided mask). Otherwise data are only ignored if set
+*        to VAL__BADD.
+*     mask = unsigned char (Given)
+*        Use with qual to define which bits in quality are relevant to
+*        ignore data in the calculation.
 *     dsize = int (Given)
 *        Number of elements in data stream
 *     int flags (Given)
@@ -58,6 +66,8 @@
 *        Rebin the case that no variance array is given
 *     2008-01-22 (EC):
 *        Added hitsmap calculation
+*     2008-04-03 (EC):
+*        - Added QUALITY to interface
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -103,7 +113,8 @@
 
 #define FUNC_NAME "smf_simplerebin"
 
-void smf_simplerebinmap( double *data, double *variance, int *lut, int dsize, 
+void smf_simplerebinmap( double *data, double *variance, int *lut, 
+			 unsigned char *qual, unsigned char mask, int dsize, 
 			 int flags, double *map, double *mapweight, 
 			 unsigned int *hitsmap, double *mapvar, int msize, 
 			 int *status ) {
@@ -115,7 +126,7 @@ void smf_simplerebinmap( double *data, double *variance, int *lut, int dsize,
   if (*status != SAI__OK) return;
 
   /* If this is the first data to be accumulated zero the arrays */
-  if( (flags & AST__REBININIT) == AST__REBININIT ) { 
+  if( flags & AST__REBININIT ) { 
     memset( map, 0, msize*sizeof(*map) );
     memset( mapweight, 0, msize*sizeof(*mapweight) );
     memset( mapvar, 0, msize*sizeof(*mapvar) );
@@ -125,33 +136,62 @@ void smf_simplerebinmap( double *data, double *variance, int *lut, int dsize,
 
   if( variance ) {
     /* Accumulate data and weights in the case that variances are given*/
-    for( i=0; i<dsize; i++ ) {
-      /* Check that the LUT, data and variance values are valid */
-      if( (lut[i] != VAL__BADI) && (data[i] != VAL__BADD) && 
-          (variance[i] != VAL__BADD) && (variance[i] != 0) ) {        
-        map[lut[i]] += data[i]/variance[i];
-        mapweight[lut[i]] += 1/variance[i];  
 
-	/* If hitsmap array provided, accumulate hits */
-	if( hitsmap ) hitsmap[lut[i]] ++;
+    if( qual ) {       /* QUALITY checking version */
+      for( i=0; i<dsize; i++ ) {
+	/* Check that the LUT, data and variance values are valid */
+	if( (lut[i] != VAL__BADI) && !(qual[i]&mask) && (variance[i] != 0) ) {
+	  map[lut[i]] += data[i]/variance[i];
+	  mapweight[lut[i]] += 1/variance[i];  
+	  
+	  /* If hitsmap array provided, accumulate hits */
+	  if( hitsmap ) hitsmap[lut[i]] ++;
+	}
+      }
+    } else {           /* VAL__BADD checking version */
+	
+      for( i=0; i<dsize; i++ ) {
+	/* Check that the LUT, data and variance values are valid */
+	if( (lut[i] != VAL__BADI) && (data[i] != VAL__BADD) && 
+	    (variance[i] != VAL__BADD) && (variance[i] != 0) ) {        
+	  map[lut[i]] += data[i]/variance[i];
+	  mapweight[lut[i]] += 1/variance[i];  
+	  
+	  /* If hitsmap array provided, accumulate hits */
+	  if( hitsmap ) hitsmap[lut[i]] ++;
+	}
       }
     }
   } else {
     /* Accumulate data and weights when no variances are given */
-    for( i=0; i<dsize; i++ ) {
-      /* Check that the LUT, data and variance values are valid */
-      if( (lut[i] != VAL__BADI) && (data[i] != VAL__BADD) ) {
-        map[lut[i]] += data[i];
-        mapweight[lut[i]] ++;
 
-	/* If hitsmap array provided, accumulate hits */
-	if( hitsmap ) hitsmap[lut[i]] ++;
+    if( qual ) {       /* QUALITY checking version */
+      for( i=0; i<dsize; i++ ) {
+	/* Check that the LUT, data and variance values are valid */
+	if( (lut[i] != VAL__BADI) && !(qual[i]&mask) ) {
+	  map[lut[i]] += data[i];
+	  mapweight[lut[i]] ++;
+	  
+	  /* If hitsmap array provided, accumulate hits */
+	  if( hitsmap ) hitsmap[lut[i]] ++;
+	}
+      }
+    } else {           /* VAL__BADD checking version */
+      for( i=0; i<dsize; i++ ) {
+	/* Check that the LUT, data and variance values are valid */
+	if( (lut[i] != VAL__BADI) && (data[i] != VAL__BADD) ) {
+	  map[lut[i]] += data[i];
+	  mapweight[lut[i]] ++;
+	  
+	  /* If hitsmap array provided, accumulate hits */
+	  if( hitsmap ) hitsmap[lut[i]] ++;
+	}
       }
     }
   }
 
   /* If this is the last data to be accumulated re-normalize */
-  if( (flags & AST__REBINEND) == AST__REBINEND ) { 
+  if( flags & AST__REBINEND ) { 
     for( i=0; i<msize; i++ ) {      
       if( mapweight[i] == 0 ) {
 	/* If 0 weight set pixels to bad */
