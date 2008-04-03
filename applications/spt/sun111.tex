@@ -9,8 +9,7 @@
 \newcommand{\stardocnumber}    {111.2}
 \newcommand{\stardocauthors}   {D L Terrett\\P M Allan}
 \newcommand{\stardocdate}      {1 February 1993}
-\newcommand{\stardoctitle}     {SPT\\[2ex]
-                               Software Porting Tools}
+\newcommand{\stardoctitle}     {SPT --- Software Porting Tools}
 \newcommand{\stardocabstract}  {
 SPT is an inhomogeneous set of 
 software tools designed to assist in the
@@ -48,9 +47,9 @@ VMS to UNIX and vice-versa, and between different flavours of UNIX).
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -85,7 +84,6 @@ VMS to UNIX and vice-versa, and between different flavours of UNIX).
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -101,6 +99,8 @@ VMS to UNIX and vice-versa, and between different flavours of UNIX).
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\html}[1]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
@@ -132,6 +132,7 @@ VMS to UNIX and vice-versa, and between different flavours of UNIX).
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 % ? End of document specific commands
@@ -181,7 +182,7 @@ VMS to UNIX and vice-versa, and between different flavours of UNIX).
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -205,7 +206,7 @@ VMS to UNIX and vice-versa, and between different flavours of UNIX).
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
+  \newcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 

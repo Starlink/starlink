@@ -12,6 +12,8 @@ dist_starnews_DATA = period.news
 
 dist_pkgdata_DATA = period_test.dat
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 ##  The on-line help, special PERIOD format.
 HELP_SOURCES = period_chisq.hlp period_freq.hlp period_output.hlp     \
 period_select.hlp period_clean.hlp period_ft.hlp period_pdm.hlp       \

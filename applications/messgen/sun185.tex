@@ -10,7 +10,7 @@
 \newcommand{\stardocauthors}   {A J Chipperfield \\
                                 B K McIlwrath}
 \newcommand{\stardocdate}      {4 November 1994}
-\newcommand{\stardoctitle}     {MESSGEN\\ [1ex]
+\newcommand{\stardoctitle}     {MESSGEN\\ [\latex{2ex}]
                                 Starlink Facility Error Message Generation}
 \newcommand{\stardocversion}   {Version 1.2}
 \newcommand{\stardocmanual}    {}
@@ -54,9 +54,9 @@ source files for MESSGEN.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -91,7 +91,6 @@ source files for MESSGEN.}
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -107,6 +106,7 @@ source files for MESSGEN.}
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+\newcommand{\latexhtml}[2]{#1}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
@@ -138,6 +138,7 @@ source files for MESSGEN.}
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 % ? End of document specific commands

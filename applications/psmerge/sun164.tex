@@ -18,7 +18,7 @@
 \newcommand{\stardocnumber}    {164.2}
 \newcommand{\stardocauthors}   {D L Terrett}
 \newcommand{\stardocdate}      {24 April 1998}
-\newcommand{\stardoctitle}     {PSMERGE \\[2ex]
+\newcommand{\stardoctitle}     {PSMERGE \\
                                 Encapsulated PostScript Handling Utility}
 \newcommand{\stardocversion}   {[software-version]}
 \newcommand{\stardocmanual}    {[manual-type]}
@@ -79,9 +79,9 @@ independently to form the composite.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -116,7 +116,6 @@ independently to form the composite.}
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -132,6 +131,8 @@ independently to form the composite.}
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\html}[1]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
@@ -163,6 +164,7 @@ independently to form the composite.}
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 % ? End of document specific commands
@@ -210,8 +212,8 @@ independently to form the composite.}
 %  ==========================
 \begin{htmlonly}
    \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
+   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
+      \stardoctitle
 %     \stardocversion\\
 %     \stardocmanual
    \begin{rawhtml} </H1> \end{rawhtml}
@@ -221,7 +223,7 @@ independently to form the composite.}
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}

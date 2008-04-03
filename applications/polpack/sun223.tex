@@ -183,7 +183,7 @@ display of vector maps.}
 % centre an asterisk
 \newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
 \begin{htmlonly}
-\renewcommand{\lsk}{*} 
+\newcommand{\lsk}{*} 
 \end{htmlonly}
 
 % Environment for indenting and using a small font.
@@ -206,8 +206,8 @@ display of vector maps.}
 \newcommand{\qt}[1]{{\tt "}#1{\tt "}}
 \newcommand{\qs}[1]{{\tt '}#1{\tt '}}
 \begin{htmlonly}
-   \renewcommand{\qt}[1]{ {\tt{"}}#1{\tt{"}} }
-   \renewcommand{\qs}[1]{ {\tt{'}}#1{\tt{'}} }
+   \newcommand{\qt}[1]{ {\tt{"}}#1{\tt{"}} }
+   \newcommand{\qs}[1]{ {\tt{'}}#1{\tt{'}} }
 \end{htmlonly}
 
 % Routines with descriptions in the appendix.
@@ -228,12 +228,12 @@ display of vector maps.}
 % degrees symbol
 \newcommand{\dgs}{\hbox{$^\circ$}} 
 \begin{htmlonly}
-\renewcommand{\dgs}{ degrees} 
+   \newcommand{\dgs}{ degrees} 
 \end{htmlonly}
 
 \newcommand{\dash}{--}
 \begin{htmlonly}
-\renewcommand{\dash}{-}
+   \newcommand{\dash}{-}
 \end{htmlonly}
 \newcommand{\STARURL}{http://www.starlink.rl.ac.uk}
 \newcommand{\TCLURL}{http://www.scriptics.com/}
@@ -1294,7 +1294,7 @@ you have two options:
 
 \item You can convert your data files into NDF format explicitly at the
 beginning, and use the NDF versions there-after. The \xref{CONVERT}{sun55}{} 
-package \latexonly{(see SUN/55)} provides facilities for converting to and
+package \latex{(see SUN/55)} provides facilities for converting to and
 from most common astronomical data formats. For instance, if your data is
 in the form of a set of FITS files, you could use commands similar to the
 following to convert them into NDFs:
@@ -1367,7 +1367,7 @@ data for any known instrumental effects such as non-linearity, variation
 of sensitivity across the detector, zero point offsets, \emph{etc.}, before
 proceeding to use POLPACK. The details will obviously depend on your
 detector, but if you are using a CCD camera, then the \xref{CCDPACK}{sun139}{} 
-package \latexonly{(see SUN/139)} will usually be able to perform these corrections.
+package \latex{(see SUN/139)} will usually be able to perform these corrections.
 
 If you are using dual-beam data, and target exposures are available at 
 half-wave plate positions of
@@ -1443,7 +1443,7 @@ command:
 
 This command must be issued before attempting to use any POLPACK
 applications. POLPACK is also available from the \xref{ICL}{sg5}{}
-\latexonly{(see SG/5)} command language, and the IRAF cl.
+\latex{(see SG/5)} command language, and the IRAF cl.
 
 \subsection{\label{SEC:IMPORT}Importing Header Information}
 POLPACK needs to know certain items of header information about each of
@@ -1798,10 +1798,10 @@ previously displayed picture.
 
 In addition, the catalogues produced by POLBIN and POLVEC can be examined
 and interactively edited using the polarimetry toolbox within 
-\xref{GAIA}{sun214}{} \latexonly{(SUN/214)}.
+\xref{GAIA}{sun214}{} \latex{(SUN/214)}.
 
 Since the polarization parameters are stored in a catalogue, the
-\xref{CURSA}{sun190}{} package \latexonly{(see SUN/190)} can be used to
+\xref{CURSA}{sun190}{} package \latex{(see SUN/190)} can be used to
 examine and manipulate them. One particularly useful facility within
 CURSA is the \xref{CATSELECT}{sun190}{SELECT} application, which
 allows rows within a catalogue to be selected on the basis of an
@@ -2151,7 +2151,7 @@ parameters later.
 created by POLKA (it doesn't really matter which one). This will usually 
 require you to know the RA and DEC of at least two features in the image. 
 See \hyperref{here}{appendix }{}{APP:GAIA} for a simple description of how 
-to use \xref{GAIA}{sun214}{} \latexonly{(SUN/214)} to do this.
+to use \xref{GAIA}{sun214}{} \latex{(SUN/214)} to do this.
 
 \item Create a cube of Stokes vectors using \htmlref{POLCAL}{POLCAL}. Any
 WCS information is copied from the first input image (given for parameter IN)
@@ -2288,11 +2288,11 @@ installation of Starlink software.
 
 More details on this, including how to obtain and install the software are in
 \xref{SUN/217}{sun217}{installing_the_starlink_software}
-\latexonly{ Appendix A}.
+\latex{ Appendix A}.
 
 \section{\label{SEC:GRPEXP}\xlabel{groupexpressions}Group Expressions}
 Several of the POLPACK applications have parameters which are described
-\latexonly{in appendix \ref{APP:DESCRIPTION}} as being associated with
+\latex{in appendix \ref{APP:DESCRIPTION}} as being associated with
 \emph{groups} (or \emph{lists}) of objects. For instance, the 
 \htmlref{POLKA}{POLKA} parameter ``IN'' specifies a group of input data 
 files, and the \htmlref{POLPLOT}{POLPLOT} parameter ``STYLE'' specifies a
@@ -6192,7 +6192,7 @@ their exposure factors, and another estimate of the F factor.
 
 \section{\label{APP:GAIA}\xlabel{gaia}Using GAIA to Create an RA/DEC Calibration}
 This section gives a very brief and simple outline of how to add an RA/DEC
-calibration to a 2-dimensional image using \xref{GAIA}{sun214}{} \latexonly{(see 
+calibration to a 2-dimensional image using \xref{GAIA}{sun214}{} \latex{(see 
 SUN/214)}. 
 
 \begin{enumerate}
@@ -6763,7 +6763,7 @@ interactive use.
 
 \item Two new hidden commands POLWRTCL and POLRDCL have been added to 
 transfer catalogue data to and from the polarimetry toolbox within
-\xref{GAIA}{sun214}{} \latexonly{(SUN/214)}. These commands are not
+\xref{GAIA}{sun214}{} \latex{(SUN/214)}. These commands are not
 designed for interactive use.
 
 \item POLIMP has a new parameter called ABORT which can be set TRUE
@@ -6782,7 +6782,7 @@ vectors for a grid of bins determined by the BOX parameter, as before.
 
 \item Two new hidden commands POLWRTCL and POLRDTCL have been added to 
 transfer catalogue data to and from the polarimetry toolbox within
-\xref{GAIA}{sun214}{} \latexonly{(SUN/214)}. These commands are not
+\xref{GAIA}{sun214}{} \latex{(SUN/214)}. These commands are not
 designed for interactive use.
 \end{itemize}
 
