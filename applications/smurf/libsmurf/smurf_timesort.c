@@ -29,6 +29,8 @@
 *
 *     The main reason for using this routine is to ensure that data has a
 *     defined transformation from WCS coordinates to pixel coordinates.
+*     It can also be used to reduce the size of data files by excluding dead
+*     detectors (see parameter DETPURGE).
 *
 *     There are two main modes, selected by parameter MERGE. If MERGE 
 *     is FALSE, then the time slices in each input NDF are sorted
@@ -48,6 +50,11 @@
 *     set of sub-scans from a sub-system.
 
 *  ADAM Parameters:
+*     DETPURGE = _LOGICAL (Read)
+*          If TRUE, then any detectors that have no good data values in
+*          the input NDFs will be excluded from the output NDFs. The
+*          information in the ACSIS extension that is associated with 
+*          such detectors is also excluded from the outptu NDFs. [FALSE]
 *     IN = NDF (Read)
 *          A group of input NDFs, each holding raw time series data.
 *     LIMITTYPE = LITERAL (Read)
@@ -135,8 +142,6 @@
 *        Change scheme for naming output files so that they conform to
 *        the ACSIS file naming convention, if possible. Update FITS
 *        headers NSUBSCAN and OBSEND in the output NDFs.
-*     01-APR-2008 (DSB):
-*        Clear up compiler warnings.
 
 *  Copyright:
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
@@ -221,7 +226,6 @@ void smurf_timesort( int *status ) {
    char basename[ GRP__SZNAM + 1 ];
    char fullname[ GRP__SZNAM + 10 ];
    char ltbuf[ 11 ];                
-   char name[ DAT__SZNAM + 1 ];
    char type[ DAT__SZTYP + 1 ];
    const char *comps = NULL;
    const char *dom = NULL;
@@ -243,16 +247,20 @@ void smurf_timesort( int *status ) {
    int *first = NULL;         
    int *index = NULL;         
    int *itimeout = NULL;
+   int *mask = NULL;
    int *ndfid = NULL;
    int *nsysrts = NULL;
    int *rts = NULL;
    int axes[ 2 ];             
    int conform;              
+   int detpurge;
    int dims[ 3 ];             
    int el;                    
    int hasqual;
    int hasvar;
    int i;                     
+   int idet;
+   int ichan;
    int iel;
    int ifile;                 
    int indf1;                 
@@ -266,13 +274,16 @@ void smurf_timesort( int *status ) {
    int isubscan;
    int isubsys;
    int j;
+   int jel;
    int k;
    int lbnd[ 3 ];
    int maxsyspop;
    int merge;                 
+   int nbaddet;
    int nchan;
    int ncomp;                 
    int ndet;
+   int ndet_out;
    int ndim;                  
    int nnout[ NDF__MXDIM ];     
    int nobs;
@@ -307,8 +318,8 @@ void smurf_timesort( int *status ) {
 /* NDF array component names */
    static char *comp[2] = {"DATA", "VARIANCE"}; 
 
-/* ACSIS arrays to be re-ordered */
-   static char *acsis[NACSIS] = {"RECEPPOS", "TSYS", "TRX" };
+/* ACSIS arrays to be masked and re-ordered */
+   static char *acsis[NACSIS] = { "RECEPPOS", "TSYS", "TRX" };
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;
@@ -327,6 +338,17 @@ void smurf_timesort( int *status ) {
    files.  */
    obs_map = smf_groupscans( igrp1, size, &maxsyspop, &conform, &igrp3, 
                              status );
+
+/* See if any dead detectors are to be removed. If so, identify the
+   detectors for which no good data has been supplied. */
+   parGet0l( "DETPURGE", &detpurge, status );
+   if( detpurge ){
+      mask = smf_find_bad_dets( igrp1, size, &nbaddet, status );
+      if( nbaddet == 0 ) mask = astFree( mask );
+   } else {
+      mask = NULL;
+      nbaddet = 0;
+   }
 
 /* Initialise the number of output NDFs created. */
    totout = 0;
@@ -381,10 +403,11 @@ void smurf_timesort( int *status ) {
          datAnnul( &loc1c, status );
    
 /* Create the output NDF from the input NDF. If the input NDF TCS_TAI
-   values are already sorted, propagate everything and pass on to the the
-   next input NDF. Otherwise propagate everything except the data arrays
-   and then go on to copy the re-ordered arrays into the output. */
-         if( sorted ) {
+   values are already sorted and no masking is being performed, propagate
+   everything and pass on to the the next input NDF. Otherwise propagate 
+   everything except the data arrays and then go on to copy the re-ordered 
+   arrays into the output. */
+         if( sorted && nbaddet == 0 ) {
             ndgNdfpr( indf1, "Data,Variance,Quality,Units,Axis,WCS,"
                       "NoExtension(Provenance)", igrp2, ifile, &indf2, status );
          } else {
@@ -399,14 +422,25 @@ void smurf_timesort( int *status ) {
                ndfMsg( "NDF", indf1 );
                errRep( "", "Input NDF ^NDF is not 3 dimensional.", status );
             }        
-   
+
+/* If bad detectors are being removed, modify the size of the output NDF. */   
+            if( nbaddet > 0 ) {
+               lbnd[ 0 ] = 1;
+               lbnd[ 1 ] = 1;
+               lbnd[ 2 ] = 1;
+               ubnd[ 0 ] = dims[ 0 ];
+               ubnd[ 1 ] = dims[ 1 ] - nbaddet;
+               ubnd[ 2 ] = dims[ 2 ];
+               ndfSbnd( 3, lbnd, ubnd, indf2, status ); 
+            }
+
 /* Re-order the Data and Variance arrays (if they exist). */
             for( i = 0; i < 2 && *status == SAI__OK; i++ ) {
                ndfState( indf1, comp[ i ], &there, status ); 
                if( there ) {
                   ndfMap( indf1, comp[ i ], "_REAL", "READ", &ipin, &el, status );
                   ndfMap( indf2, comp[ i ], "_REAL", "WRITE", &ipout, &el, status );
-                  smf_reorderr( (float *) ipin, ndim, dims, 2, index,
+                  smf_reorderr( (float *) ipin, ndim, dims, 2, index, 1, mask, 
                                 (float *) ipout, status );
                }
             }
@@ -438,32 +472,11 @@ void smurf_timesort( int *status ) {
                   datMap( loc1c, type, "READ", ndim, dims, &ipin, status );
                   datMap( loc2c, type, "WRITE", ndim, dims, &ipout, status );
    
-/* Re-order the array. */
-                  if( !strcmp( type, "_REAL" ) ) {
-                     smf_reorderr( (float *) ipin, ndim, dims, ndim - 1, index,
-                                   (float *) ipout, status );
-   
-                  } else if( !strcmp( type, "_DOUBLE" ) ) {
-                     smf_reorderd( (double *) ipin, ndim, dims, ndim - 1, index,
-                                   (double *) ipout, status );
-   
-                  } else if( !strcmp( type, "_INTEGER" ) ) {
-                     smf_reorderi( (int *) ipin, ndim, dims, ndim - 1, index,
-                                   (int *) ipout, status );
-   
-                  } else if( !strncmp( type, "_CHAR", 5 ) ) {
-                     datLen( loc1c, &len, status );
-                     smf_reorderc( (char *) ipin, len, ndim, dims, ndim - 1, 
-                                   index, (char *) ipout, status );
-   
-                  } else if( *status == SAI__OK ) {
-                     datName( loc1c, name, status );
-                     *status = SAI__ERROR;
-                     msgSetc( "COMP", name );
-                     msgSetc( "TYPE", type );
-                     errRep( "", "TIMESORT: Cannot re-order JCMTSTATE.^COMP."
-                                 "^TYPE data type not yet supported.", status );
-                  }
+/* Re-order the array (no masking since the JCMTSTATE extension does not
+   - currently - contain any arrays that are indexed by detector number. */
+                  datLen( loc1c, &len, status );
+                  smf_reorder( type, ipin, len, ndim, dims, ndim - 1, index,
+                               0, NULL, ipout, status );
    
 /* Unmap the mapped arrays. */
                   datUnmap( loc1c, status );
@@ -489,53 +502,32 @@ void smurf_timesort( int *status ) {
          ndfXstat( indf1, "ACSIS", &there, status );     
          if( there ) {
    
-/* We now re-order selected components of the ACSIS extension. First get a
-   locator for the extension in both input and output NDFs. */
+/* We now re-order components of the ACSIS extension that have a time axis. 
+   First get a locator for the extension in both input and output NDFs. */
             ndfXloc( indf1, "ACSIS", "READ", &loc1, status );
             ndfXloc( indf2, "ACSIS", "UPDATE", &loc2, status );
    
 /* Loop round each component to be re-ordered. */
             for( i = 0; i < NACSIS && *status == SAI__OK; i++ ) {
    
-/* Get locators for the current ACSIS component in both input and
-   output NDF. */
+/* Get a locator for the current ACSIS component in the input NDF. */
                datFind( loc1, acsis[ i ], &loc1c, status );
-               datFind( loc2, acsis[ i ], &loc2c, status );
-   
+
 /* Determine the shape and type of the array component. */
                datShape( loc1c, 3, dims, &ndim, status );
                datType( loc1c, type, status );
+
+/* Get a locator for the current ACSIS component in the output NDF. */
+               datFind( loc2, acsis[ i ], &loc2c, status );
    
 /* Map the input and output arrays. */
                datMap( loc1c, type, "READ", ndim, dims, &ipin, status );
                datMap( loc2c, type, "WRITE", ndim, dims, &ipout, status );
    
 /* Re-order the array. */
-               if( !strcmp( type, "_REAL" ) ) {
-                  smf_reorderr( (float *) ipin, ndim, dims, ndim - 1, index,
-                                (float *) ipout, status );
-   
-               } else if( !strcmp( type, "_DOUBLE" ) ) {
-                  smf_reorderd( (double *) ipin, ndim, dims, ndim - 1, index,
-                                (double *) ipout, status );
-   
-               } else if( !strcmp( type, "_INTEGER" ) ) {
-                  smf_reorderi( (int *) ipin, ndim, dims, ndim - 1, index,
-                                (int *) ipout, status );
-   
-               } else if( !strncmp( type, "_CHAR", 5 ) ) {
-                  datLen( loc1c, &len, status );
-                  smf_reorderc( (char *) ipin, len, ndim, dims, ndim - 1, 
-                                index, (char *) ipout, status );
-   
-               } else if( *status == SAI__OK ) {
-                  datName( loc1, name, status );
-                  *status = SAI__ERROR;
-                  msgSetc( "COMP", name );
-                  msgSetc( "TYPE", type );
-                  errRep( "", "TIMESORT: Cannot re-order ACSIS.^COMP."
-                              "^TYPE data type not yet supported.", status );
-               }
+               datLen( loc1c, &len, status );
+               smf_reorder( type, ipin, len, ndim, dims, ndim - 1, 
+                            index, 0, NULL, ipout, status );
    
 /* Unmap the mapped arrays. */
                datUnmap( loc1c, status );
@@ -545,11 +537,14 @@ void smurf_timesort( int *status ) {
                datAnnul( &loc1c, status );
                datAnnul( &loc2c, status );
             }
-   
+
 /* Annul the ACSIS locator for the output NDF. */
             datAnnul( &loc2, status );
          }
    
+/* If required, remove information for dead detectors from the ACSIS extension. */
+         if( mask ) smf_maskacsis( indf2, mask, status );
+
 /* Now modify the WCS in the output NDF. First get the existing WCS
    FrameSet from the output NDF. */
          ndfGtwcs( indf2, &wcs, status );
@@ -629,9 +624,8 @@ void smurf_timesort( int *status ) {
    } else if( *status == SAI__OK ){
 
 /* Get the SIZELIMIT and LIMITTYPE parameters. */
-      parGet0i( "SIZELIMIT", &sizelimit, status );      
-
       nullsizelimit = 0;
+      parGet0i( "SIZELIMIT", &sizelimit, status );      
       if( *status == SAI__OK ) {
          if( sizelimit > 0 ) parChoic( "LIMITTYPE", "FILESIZE", 
                                        "FILESIZE,SPECTRA,SLICES", 0, ltbuf, 
@@ -942,10 +936,14 @@ void smurf_timesort( int *status ) {
             sysrts[ isubsys ] = astMalloc( sizeof( int )*nts_out );
             nsysrts[ isubsys ] = nts_out;
       
+/* Note the number of detectors in each outptu NDF. The output NDFs will have 
+   fewer detectors if any bad detectors are being purged. */
+            ndet_out = ndet - nbaddet;
+
 /* Get the required maximum output file size, and convert to a number of
    time slices. */
+            tslimit = 0;
             nout = 0;
-            tslimit = 1;
             if( nullsizelimit ) {
                nout = nsubscan;
                if( nout > 0 ) tslimit = nts_out/nout;
@@ -958,12 +956,12 @@ void smurf_timesort( int *status ) {
    
                } else {
                   if( !strcmp( ltbuf, "SPECTRA" ) ) {
-                     if( ndet > 0 ) tslimit = sizelimit / ndet;
+                     if( ndet_out > 0 ) tslimit = sizelimit / ndet_out;
             
                   } else if( *status == SAI__OK && 
                              !strcmp( ltbuf, "FILESIZE" ) ) {
                      tslimit = sizelimit / 
-                                 ( ndet*nchan*( VAL__NBR*( hasvar ? 2 : 1 ) + 
+                                 ( ndet_out*nchan*( VAL__NBR*( hasvar ? 2 : 1 ) + 
                                                 ( hasqual ? VAL__NBUB : 0) ) );
                   }
                }
@@ -1010,7 +1008,7 @@ void smurf_timesort( int *status ) {
             lbnd[ 1 ] = 1;
             lbnd[ 2 ] = 1;
             ubnd[ 0 ] = nchan;
-            ubnd[ 1 ] = ndet;
+            ubnd[ 1 ] = ndet_out;
             ubnd[ 2 ] = tslimit;
       
 /* Initialise the bounds of each section used to represent one time slice
@@ -1018,7 +1016,7 @@ void smurf_timesort( int *status ) {
             slbnd[ 0 ] = 1;
             slbnd[ 1 ] = 1;
             subnd[ 0 ] = nchan;
-            subnd[ 1 ] = ndet;
+            subnd[ 1 ] = ndet_out;
       
 /* The number of time slices remaining to be written out. */
             nrem = nts_out;
@@ -1129,9 +1127,12 @@ void smurf_timesort( int *status ) {
                      isubscan = file_index[ i ];
       
 /* Get a section of the input NDF covering this time slice. */
+                     slbnd[ 1 ] = 1;
+                     subnd[ 1 ] = ndet;
                      slbnd[ 2 ] = i  - first[ isubscan ] + 1;
                      subnd[ 2 ] = slbnd[ 2 ];
-                     ndfSect( ndfid[ isubscan ], 3, slbnd, subnd, &indf1s, status ); 
+                     ndfSect( ndfid[ isubscan ], 3, slbnd, subnd, &indf1s, 
+                              status ); 
       
 /* Map the required input NDF section array components. */
                      ndfMap( indf1s, comps, "_REAL", "READ",  ptr, &el, status );
@@ -1146,20 +1147,44 @@ void smurf_timesort( int *status ) {
                         qts_in = NULL;
                      }
       
-/* Loop round all elements in the time slice. Copy any good array values 
-   from input to output. */
-                     for( iel = 0; iel < el; iel++ ) {
-                        if( dts_in[ iel ] != VAL__BADR ) {
-                           dts_out[ iel ] = dts_in[ iel ];
-                           if( hasvar ) vts_out[ iel ] = vts_in[ iel ];
-                           if( hasqual) qts_out[ iel ] = qts_in[ iel ];
-      
-                        } else if( init ) {
-                           dts_out[ iel ] = VAL__BADR;
-                           if( hasvar ) vts_out[ iel ] = VAL__BADR;
-                           if( hasqual) qts_out[ iel ] = 0;
+/* Initialise the vector index of the next output element */
+                     jel = 0;
+
+/* Loop round all detectors in the input NDF. */
+                     for( idet = 0; idet < ndet; idet++ ) {
+
+/* Only copy this detector if we are not masking, or if the mask value
+   for this detector is non-zero. */
+                        if( !mask || mask[ idet ] ) {
+
+/* Get the vector index of the first element of this spectrum in the
+   input NDF. */
+                           iel = idet*nchan;
+
+/* Loop round all channels in the spectrum, incrementing the vector
+   indicies of the next input and output elements. */
+                           for( ichan = 0; ichan < nchan; 
+                                ichan++, iel++, jel++ ) {
+
+/* If the input data value is good, copy it to the output, plus any
+   associated quality and variance values. */
+                              if( dts_in[ iel ] != VAL__BADR ) {
+                                 dts_out[ jel ] = dts_in[ iel ];
+                                 if( hasvar ) vts_out[ jel ] = vts_in[ iel ];
+                                 if( hasqual) qts_out[ jel ] = qts_in[ iel ];
+        
+/* If the input data value is bad, only copy it to the output if this is
+   the first input time slice that contributes to the current output time
+   slice. This prevents later bad values being pasted over the top of
+   earlier good values. */
+                              } else if( init ) {
+                                 dts_out[ jel ] = VAL__BADR;
+                                 if( hasvar ) vts_out[ jel ] = VAL__BADR;
+                                 if( hasqual) qts_out[ jel ] = 0;
+                              }
+                           }
                         }
-                     }
+                     } 
       
 /* Annul the identifier for the current time slice in the input NDF. */
                      ndfAnnul( &indf1s, status );
@@ -1183,6 +1208,9 @@ void smurf_timesort( int *status ) {
       
 /* Copy input ACSIS values to the current output NDF. */
                smf_km2ext( indf2, "ACSIS", km2, itimeout, status );
+      
+/* If required, remove information for dead detectors from the ACSIS extension. */
+               if( mask ) smf_maskacsis( indf2, mask, status );
       
 /* Create a LutMap to hold the TAI value for each time slice in the
    current output NDF. */
@@ -1287,6 +1315,7 @@ void smurf_timesort( int *status ) {
    parPut0i( "NOUT", totout, status );
 
 /* Free resources. */
+   mask = astFree( mask );
    obs_map = astAnnul( obs_map );
    grpDelet( &igrp1, status );
    grpDelet( &igrp3, status );

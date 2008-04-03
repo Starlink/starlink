@@ -783,10 +783,11 @@ int *smf_sorti( size_t nel, int *array, int *sorted, int *status );
 void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap, int mode, int *status );
 void smf_km2ext( int indf, const char *xname, AstKeyMap *keymap, int *timeout, int *status );
 
-void smf_reorderr( float *in, int ndim, int *dims, int axis, int *index, float *out, int *status );
-void smf_reorderi( int *in, int ndim, int *dims, int axis, int *index, int *out, int *status );
-void smf_reorderd( double *in, int ndim, int *dims, int axis, int *index, double *out, int *status );
-void smf_reorderc( char *in, int len, int ndim, int *dims, int axis, int *index, char *out, int *status );
+void smf_reorder( const char *type, void *in, int len, int ndim, int *dims, int axis, int *index, int maxis, int *mask, void *out, int *status );
+void smf_reorderr( float *in, int ndim, int *dims, int axis, int *index, int maxis, int *mask, float *out, int *status );
+void smf_reorderi( int *in, int ndim, int *dims, int axis, int *index, int maxis, int *mask, int *out, int *status );
+void smf_reorderd( double *in, int ndim, int *dims, int axis, int *index, int maxis, int *mask, double *out, int *status );
+void smf_reorderc( char *in, int len, int ndim, int *dims, int axis, int *index, int maxis, int *mask, char *out, int *status );
 void smf_updateprov( int ondf, smfData *data, int *status );
 
 void smf_fits_setL( const smfHead *hdr, const char *name, int value, 
@@ -854,5 +855,15 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
 void smf_flag_spikes( smfData *data, unsigned char *quality, double thresh, 
 		      unsigned int niter, unsigned int maxiter, 
 		      unsigned int *aiter, int *status );
+
+int *smf_find_bad_dets( Grp *igrp,  int size, int *nbaddet, int *status );
+void smf_maskacsis( int indf, int *mask, int *status );
+
+void smf_detmask( const char *type, void *in, int len, int ndim, int *dims_in, int maxis, int *mask, void *out, int *status );
+void smf_detmaskr( float *in, int ndim, int *dims_in, int maxis, int *mask, float *out, int *status );
+void smf_detmaskd( double *in, int ndim, int *dims_in, int maxis, int *mask, double *out, int *status );
+void smf_detmaski( int *in, int ndim, int *dims_in, int maxis, int *mask, int *out, int *status );
+void smf_detmaskc( char *in, int len, int ndim, int *dims_in, int maxis, int *mask, char *out, int *status );
+
 
 #endif /* SMF_DEFINED */
