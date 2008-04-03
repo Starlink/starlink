@@ -67,6 +67,8 @@
 *        Write WCSFrame to the FITSchan.
 *     2008-03-28 (JB):
 *        Check for number of receptors used.
+*     2008-04-03 (JB):
+*        Convert AZEL start/end to degrees.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -264,16 +266,16 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
          azStart and elStart. */
       if ( stepNum == 0 && subBandNum == 0 ) {
         amStart = wcs->airmass;
-        azStart = wcs->acAz;
-        elStart = wcs->acEl;
+        azStart = wcs->acAz / AST__DD2R;
+        elStart = wcs->acEl / AST__DD2R;
       }
 
       /* For each step, update the amEnd, azEnd, and elEnd, so that the 
          final values are those for the last time step. */
       if ( stepNum == nSteps-1 && subBandNum == 0 ) {
         amEnd = wcs->airmass;
-        azEnd = wcs->acAz;
-        elEnd = wcs->acEl;
+        azEnd = wcs->acAz / AST__DD2R;
+        elEnd = wcs->acEl / AST__DD2R;
       }      
 
       /* Get the subsystem-dependent JCMTState values. */
