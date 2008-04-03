@@ -13,11 +13,15 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_subtract_poly( smfData **data, int rel, int *status ) 
+*     smf_subtract_poly( smfData *data, unsigned char *quality, int rel, 
+*                        int *status ) 
 
 *  Arguments:
 *     data = smfData** (Given and Returned)
 *        Pointer to input data struct
+*     quality = unsigned char * (Given)
+*        If set, use this buffer instead of QUALITY associated with data.
+*        If NULL, use the QUALITY associated with data. 
 *     rel = int (Given)
 *        Integer flag to denote whether the polynomial is subtracted
 *        relative to the first value (as for 1/f drifts)
@@ -63,6 +67,8 @@
 *     2008-03-17 (EC):
 *        - Use QUALITY in addition to VAL__BADD to ignore bad data
 *        - handle both time- and bolo-ordered data
+*     2008-04-03 (EC):
+*        - Added quality to interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -108,7 +114,8 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_subtract_poly"
 
-void smf_subtract_poly(smfData *data, int rel, int *status) {
+void smf_subtract_poly(smfData *data, unsigned char *quality, int rel, 
+		       int *status) {
 
   /* Local variables */
   double baseline = 0.0;      /* Baseline level to be subtracted */
@@ -144,7 +151,12 @@ void smf_subtract_poly(smfData *data, int rel, int *status) {
   outdata = (data->pntr)[0];
 
   /* Return with error if there is no QUALITY component */
-  qual = (data->pntr)[2];
+  if( quality ) {
+    qual = quality;
+  } else {
+    qual = (data->pntr)[2];
+  }
+
   if( !qual && (*status == SAI__OK) ) {
     *status = SAI__ERROR;
     errRep( FUNC_NAME, "Data doesn't have a QUALITY component.", status );

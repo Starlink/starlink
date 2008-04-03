@@ -134,7 +134,7 @@ void smurf_scanfit( int * status ) {
       errRep(FUNC_NAME, "Unable to flatfield data from file ^I of ^N", status);
     }
 
-    smf_scanfit( ffdata, order, status );
+    smf_scanfit( ffdata, NULL, order, status );
 
     /* Free resources for output data */
     smf_close_file( &ffdata, status );

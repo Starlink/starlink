@@ -13,12 +13,16 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_scanfit( smfData *data, int order, int *status );
+*     smf_scanfit( smfData *data, unsigned char *quality, int order, 
+*                  int *status );
 
 *  Arguments:
 *     data = smfData* (Given and Returned)
 *        Pointer to a pointer to smfData struct containing flatfielded data.
 *        Will be created by this routine, or NULL on error.
+*     quality = unsigned char * (Given)
+*        If set, use this buffer instead of QUALITY associated with data.
+*        If NULL, use the QUALITY associated with data. 
 *     order = int (Given)
 *        Order of polynomial to be fitted
 *     status = int* (Given and Returned)
@@ -49,7 +53,9 @@
 *        - Remove history check for extinction
 *        - Handle both time and bolo-ordered data
 *        - If smfData unassociated with file, just malloc poly buffer
-*        - on exit, data->poly contains fitted coeffs
+*        - on exit, data->poly contains fitted coeff
+*     2008-04-03 (EC):
+*        - Added quality to interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -107,7 +113,8 @@
 
 #define FUNC_NAME "smf_scanfit"
 
-void smf_scanfit ( smfData *data, int order, int *status) {
+void smf_scanfit( smfData *data, unsigned char *quality, int order, 
+		  int *status) {
 
   int cliptype;             /* Type of sigma clipping */
   int i;                    /* Loop counter */
@@ -240,7 +247,8 @@ void smf_scanfit ( smfData *data, int order, int *status) {
   /* Carry out fit, check status on return */
   /*    sc2math_fitsky ( cliptype, nbol, nframes, ncoeff, (data->pntr)[0],
 	poly, status );*/
-  smf_fit_poly ( data, order, poly, status );    
+
+  smf_fit_poly ( data, quality, order, poly, status );    
   if ( *status != SAI__OK ) {
     errRep(FUNC_NAME, "Unable to carry out scanfit", status);
   }

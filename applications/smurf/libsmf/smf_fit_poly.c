@@ -13,11 +13,15 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_fit_poly( const smfData *data, const int order, int *status ) 
+*     smf_fit_poly( const smfData *data, unsigned char *quality, 
+*                   const int order, int *status ) 
 
 *  Arguments:
 *     data = smfData* (Given and Returned)
 *        Pointer to input data struct
+*     quality = unsigned char * (Given)
+*        If set, use this buffer instead of QUALITY associated with data.
+*        If NULL, use the QUALITY associated with data. 
 *     order = int (Given)
 *        Order of polynomial fit
 *     status = int* (Given and Returned)
@@ -50,6 +54,8 @@
 *     2008-03-17 (EC):
 *        - Use QUALITY in addition to VAL__BADD to ignore bad data
 *        - handle both time- and bolo-ordered data
+*     2008-04-03 (EC):
+*        - Added quality to interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -102,8 +108,8 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_fit_poly"
 
-void smf_fit_poly( const smfData *data, const int order, double *poly, 
-		   int *status) {
+void smf_fit_poly( const smfData *data, unsigned char *quality, 
+		   const int order, double *poly, int *status) {
 
   /* Local variables */
   double chisq;            /* Chi-squared from the linear regression fit */
@@ -112,6 +118,7 @@ void smf_fit_poly( const smfData *data, const int order, double *poly,
   double *indata=NULL;     /* Pointer to data array */
   dim_t j;                 /* Loop counter */
   dim_t k;                 /* Loop counter */
+  unsigned char mask;      /* QUALITY bit mask */
   gsl_matrix *mcov=NULL;   /* Covariance matrix */
   size_t nbol;             /* Number of bolometers */
   size_t ncoeff = 2;       /* Number of coefficients to fit for; def. line */
@@ -174,9 +181,12 @@ void smf_fit_poly( const smfData *data, const int order, double *poly,
   /* of course, check status on return... */
   indata = (data->pntr)[0]; 
 
-
   /* Return with error if there is no QUALITY component */
-  qual = (data->pntr)[2];
+  if( quality ) {
+    qual = quality;
+  } else {
+    qual = (data->pntr)[2];
+  }
 
   if( !qual && (*status == SAI__OK) ) {
     *status = SAI__ERROR;
@@ -215,6 +225,9 @@ void smf_fit_poly( const smfData *data, const int order, double *poly,
   coeffs = gsl_vector_alloc( ncoeff );
   mcov = gsl_matrix_alloc( ncoeff, ncoeff );
 
+  /* QUALITY bitmask for samples to ignore */
+  mask = 255 - SMF__Q_JUMP;
+
   /* Loop over bolometers. Only fit this bolometer if it is not
    flagged SMF__Q_BADB */
   for ( j=0; j<nbol; j++) 
@@ -237,7 +250,7 @@ void smf_fit_poly( const smfData *data, const int order, double *poly,
 	gsl_vector_set( psky, i, indata[j + nbol*i] );
 
 	/* weights */	
-	if( !qual[nbol*i + j] && (indata[j + nbol*i] != VAL__BADD) ) {
+	if( !(qual[nbol*i + j]&mask) && (indata[j + nbol*i] != VAL__BADD) ) {
 	  gsl_vector_set( weight, i, 1.0); /* Good QUALITY */
 	} else {
 	  gsl_vector_set( weight, i, 0.0); /* Bad QUALITY */
@@ -249,7 +262,8 @@ void smf_fit_poly( const smfData *data, const int order, double *poly,
 	gsl_vector_set( psky, i, indata[j*nframes + i] );
 
 	/* weights */	
-	if( !qual[j*nframes + i] && (indata[j*nframes + i] != VAL__BADD) ) {
+	if( !(qual[j*nframes + i]&mask) && (indata[j*nframes + i] != 
+					    VAL__BADD) ) {
 	  gsl_vector_set( weight, i, 1.0); /* Good QUALITY */
 	} else {
 	  gsl_vector_set( weight, i, 0.0); /* Bad QUALITY */

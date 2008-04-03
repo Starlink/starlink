@@ -264,6 +264,9 @@
 *        - Added smf_quick_noise
 *     2008-04-02 (EC):
 *        - Added smf_flag_spikes
+*     2008-04-03 (EC):
+*        - Added QUALITY to smf_simplerebinmap
+*        - Added QUALITY to smf_scanfit, smf_fit_poly, smf_subtract_poly, 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -446,8 +449,8 @@ char *smf_dtype_string( const smfData* data, int * status );
 
 size_t smf_dtype_size( const smfData* data, int * status );
 
-void smf_fit_poly(const smfData *data, const int order, double *poly,  
-                  int *status);
+void smf_fit_poly(const smfData *data, unsigned char *quality, 
+		  const int order, double *poly, int *status);
 
 void smf_fits_add_prov( AstFitsChan * hdr, const char * keyroot,
 			const AstKeyMap * idmap,
@@ -583,9 +586,11 @@ void smf_rebinmap( smfData *data, int index, int size,
 
 double smf_scale_tau ( const double tauwvm, const char *filter, int *status);
 
-void smf_scanfit( smfData *data, int order, int *status );
+void smf_scanfit( smfData *data, unsigned char *quality, int order, 
+		  int *status );
 
-void smf_simplerebinmap( double *data, double *variance, int *lut, int dsize, 
+void smf_simplerebinmap( double *data, double *variance, int *lut, 
+			 unsigned char *qual, unsigned char mask, int dsize, 
 			 int flags, double *map, double *mapweight, 
 			 unsigned int *hitsmap, double *mapvar, int msize, 
 			 int *status );
@@ -603,12 +608,10 @@ void smf_subtract_plane1( smfData *data, const char *fittype, int *status);
 
 void smf_subtract_plane2( smfArray *array, const char *fittype, int *status);
 
-void smf_subtract_poly( smfData *data, int rel, int *status );
+void smf_subtract_poly( smfData *data, unsigned char *quality, int rel, 
+			int *status );
 
 void smf_telpos_get( const smfHead * hdr, int * status );
-
-/*void smf_tslice ( const smfData *idata, smfData **tdata, int index, 
-  int *status );*/
 
 void smf_tslice_ast (smfData * data, int index, int needwcs, int * status );
 

@@ -194,8 +194,8 @@ void smurf_sc2clean( int *status ) {
     msgOutif(MSG__VERB," ",
 	     "Fitting and removing ^ORDER-order polynomial baselines", 
 	     status);  
-    smf_scanfit( ffdata, order, status );
-    smf_subtract_poly( ffdata, 0, status );
+    smf_scanfit( ffdata, NULL, order, status );
+    smf_subtract_poly( ffdata, NULL, 0, status );
 
     /* Fix large DC steps */
     if( dcthresh && dcbox ) {

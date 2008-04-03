@@ -199,7 +199,7 @@ void smurf_remsky( int * status ) {
       if ( *status == SAI__OK ) {
 	if ( strncmp( method, "POLY", 4 ) == 0 ) {
 	  /* Bolometer-based sky removal */
-	  smf_subtract_poly( odata, 0, status );
+	  smf_subtract_poly( odata, NULL, 0, status );
 	  /* Check status */
 	} else if ( strncmp( method, "PLAN", 4 ) == 0 ) {
 	  /* Timeslice-based sky removal */

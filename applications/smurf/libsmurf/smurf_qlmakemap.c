@@ -370,7 +370,7 @@ void smurf_qlmakemap( int *status ) {
     smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
 
     /* Remove bolometer drifts if a fit is present */
-    smf_subtract_poly( data, 1, status );
+    smf_subtract_poly( data, NULL, 1, status );
 
     /* Remove a mean sky level - call low-level 1-D routine */
     smf_subtract_plane1( data, "MEAN", status );
