@@ -97,9 +97,8 @@ static int smf_get_fixbit ( int myqual, int *status ) {
 
   if ( *status != SAI__OK ) return -1;
 
-  /* Until irqFxbit returns an out-of-range indicator, we sanitize the
-     input ourselves */
-  if ( myqual < mybit || myqual > 128 ) {
+  /* Make sure the given integer is in range */
+  if ( myqual < 1 || myqual > 128 ) {
     msgSeti("M",myqual);
     *status = SAI__ERROR;
     errRep("", "Integer out of range, ^M - must be 2**N where N is in the range (0,7). Possible programming error?", status);
