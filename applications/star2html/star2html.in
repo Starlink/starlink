@@ -1061,7 +1061,7 @@ sub create_initfile{
    &print_value( MATH_SCALE_FACTOR, 1.5 );
    &print_value( FIGURE_SCALE_FACTOR, 1.0 );
    &print_value( TRANSPARENT_FIGURES, 1 );
-   &print_value( PAPERSIZE, 'a4' );
+   &print_value( PAPERSIZE, 'a3' );
    &print_value( ICONSERVER, "\'.\'" );
 
 #  Add navigation panel changes. These add extra words for each
