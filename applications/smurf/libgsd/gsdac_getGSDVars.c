@@ -49,6 +49,8 @@
 *        Removed debug statement.
 *     2008-04-02 (JB):
 *        Continue with defaults if tau/seeing not present.
+*     2008-04-03 (JB):
+*        Don't set status to SAI__ERROR if already bad.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -449,7 +451,6 @@ void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
   }
 
   if ( *status != SAI__OK ) {
-    *status = SAI__ERROR;
     errRep ( FUNC_NAME, "Error getting scalar GSD headers", status );
     return;
   }
@@ -720,7 +721,6 @@ void gsdac_getGSDVars ( const struct gsdac_gsd_struct *gsd,
   }
 
   if ( *status != SAI__OK ) {
-    *status = SAI__ERROR;
     errRep ( FUNC_NAME, "Error getting GSD arrays", status );
     return;
   }
