@@ -60,6 +60,8 @@
 *        Removed unused variables.
 *     2008-03-28 (JB):
 *        Check which receptors were used.
+*     2008-04-03 (JB):
+*        Convert acs_feedx and acs_feedy to degrees. 
 
 
 *  Copyright:
@@ -92,6 +94,7 @@
 #include <stdio.h>
 
 /* STARLINK includes */
+#include "ast.h"
 #include "sae_par.h"
 
 /* SMURF includes */
@@ -126,8 +129,8 @@ void gsdac_putSpecHdr ( const gsdVars *gsdVars, const unsigned int nSteps,
 
   /* Fill the specHdr. */
   specHdr->rts_endnum = nSteps + 1;
-  specHdr->acs_feedx = record->tcs_tr_ac1;
-  specHdr->acs_feedy = record->tcs_tr_ac2;
+  specHdr->acs_feedx = record->tcs_tr_ac1 / AST__DD2R;
+  specHdr->acs_feedy = record->tcs_tr_ac2 / AST__DD2R;
 
   /* Check to see if only the "second" receptor was used. */
   if ( recepFlags[0] == 0 && recepFlags[1] == 1 ) 
