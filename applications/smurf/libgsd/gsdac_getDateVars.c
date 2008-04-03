@@ -51,6 +51,8 @@
 *        Use number of scans actually completed.
 *     2008-03-19 (JB):
 *        Removed unused variables.
+*     2008-04-03 (JB):
+*        Accept AOSC as backend.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -158,7 +160,8 @@ void gsdac_getDateVars ( const gsdVars *gsdVars, const char *backend,
   /* Get the OBSID. */
 
   /* Check to see that the backend is DAS. */
-  if ( strncmp ( backend, "DAS", 3 ) != 0 ) {
+  if ( strncmp ( backend, "DAS", 3 ) != 0 &&
+       strncmp ( backend, "AOSC", 4 ) != 0 ) {
     *status = SAI__ERROR;
     msgSetc ( "BACKEND", backend );
     errRep ( "gsdac_getDateVars", "Backend ^BACKEND not supported", status );
