@@ -82,6 +82,8 @@
 *        Use debug flag.
 *     2008-03-25 (JB):
 *        Return WCSFrame.
+*     2008-04-03 (JB):
+*        Correct LST offsets for rasters.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -123,6 +125,7 @@
 #include "smurf_par.h"
 
 #define SOLSID 1.00273790935
+#define SPD 86400.0
 
 #define DEBUGON 0
 
@@ -271,13 +274,14 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
      and the number of map points in each scan. */
   if ( gsdVars->obsContinuous ) {
 
-   /* Get the dLST of the start of this row. */
-    index = stepNum / gsdVars->nScanPts;
+    /* Get the dLST of the start of this row. */
+    index = ( stepNum / gsdVars->nScanPts ) * gsdVars->nScanVars1;
     dLST = ( gsdVars->scanTable1[index] - LSTStart ) / 24.0;
 
     /* Add the integration times up to this scan point. */
     dLST = dLST + ( ( stepNum % gsdVars->nScanPts ) *
-                    ( gsdVars->scanTime / gsdVars->nScanPts ) );
+                    ( gsdVars->scanTime / gsdVars->nScanPts ) / 
+                    SPD );
 
   } else {
 
