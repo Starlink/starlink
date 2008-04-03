@@ -39,6 +39,8 @@
 *  History:
 *     2007-06-15 (EC):
 *        Initial version.
+*     2008-04-03 (EC):
+*        Asset ICD data-order before writing file.
 
 *  Notes:
 *
@@ -77,6 +79,7 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
+#include "libsmf/smf_err.h"
 
 #define FUNC_NAME "smf_model_NDFexport"
 
@@ -98,18 +101,23 @@ void smf_model_NDFexport( const smfData *data, const char *name, int *status ){
   char ndfname[GRP__SZNAM+1];  /* Input NDF name, derived from GRP */
   char *pname=NULL;
 
-
   if (*status != SAI__OK ) return;
 
+  /* Assert ICD-compliant data order */
+  smf_dataOrder( data, 1, status );
+  if( *status = SMF__WDIM ) {
+    /* fails if not 3-dimensional data. Just annul and write out data
+       with other dimensions as-is */
+    errAnnul(status);
+  }
+
   /* Make a 1-element group containing the name of the new file */
-  
   inname = grpNew( "GRP", status );
   outname = grpNew( "GRP", status );
   grpPut1( inname, name, 1, status );
   grpGrpex( "*|dimm|sdf|", inname, outname, &msize, &added, &flag, status );
 
   /* Create lbnd and ubnd arrays, and calculate buffer size */
-
   if( *status == SAI__OK ) {
     ndata = 1;
     for( i=0; i<data->ndims; i++ ) {
@@ -122,7 +130,6 @@ void smf_model_NDFexport( const smfData *data, const char *name, int *status ){
   }
 
   /* Make a new empty container with associated smfData struct */
-
   smf_open_newfile( outname, 1, data->dtype, data->ndims, lbnd, ubnd, 
 		    0, &tempdata, status );
 
