@@ -15,4 +15,5 @@ NOKWRD     <Requested keyword is not present in header>
 NOLUT      <Object does not contain a MAPCOORD extension>
 INSMP      <Insufficient samples for statistics>
 TORDB      <Time-ordered bolometer data>
+WDIM       <Wrong data dimensions>
 .END

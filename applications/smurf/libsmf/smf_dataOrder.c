@@ -151,7 +151,7 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
   
   /* Make sure we're looking at 3-dimensions of bolo data */
   if( data->ndims != 3 ) {
-    *status = SAI__ERROR;
+    *status = SMF__WDIM;
     msgSeti("NDIMS",data->ndims);
     errRep(FUNC_NAME, 
 	   "Don't know how to handle ^NDIMS dimensions, should be 3.", status);
