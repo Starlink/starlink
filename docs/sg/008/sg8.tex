@@ -54,9 +54,9 @@ Software for Astronomy}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{latexonly} and %\end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{latexonly}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -143,7 +143,7 @@ Software for Astronomy}
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%\end{latexonly}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 % ? End of document specific commands
@@ -156,7 +156,7 @@ Software for Astronomy}
 
 %  Latex document header.
 %  ======================
-\begin{latex}
+\begin{latexonly}
    CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
@@ -179,7 +179,7 @@ Software for Astronomy}
       {\Large\bf Abstract}
    \end{center}
 % ? End of heading for abstract.
-\end{latex}
+\end{latexonly}
 
 %  HTML documentation header.
 %  ==========================
@@ -195,7 +195,7 @@ Software for Astronomy}
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -239,7 +239,7 @@ problem. It is not a manual for any particular package.
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
- \begin{latex}
+ \begin{latexonly}
    \pagenumbering{roman}
    \newpage
    \setlength{\parskip}{0mm}
@@ -251,7 +251,7 @@ problem. It is not a manual for any particular package.
 
    \setlength{\parskip}{\medskipamount}
    \markboth{\stardocname}{\stardocname}
- \end{latex}
+ \end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 
@@ -280,11 +280,13 @@ problem. It is not a manual for any particular package.
 
 \section{Introduction \xlabel{INTRO} }
 
-\begin{quote} \raggedright
+\begin{quote} 
+%\raggedright
 \begin{center}
 {\it The purpose of computing is insight, not numbers.} \\
 \end{center}
-Richard Hamming \raggedleft
+Richard Hamming 
+%\raggedleft
 \end{quote}
 
 This document is an introduction to various common visualisation 
@@ -731,7 +733,7 @@ with hidden line removal to improve the appearance (see
 Figure~\ref{CARPET}). The name comes from the resemblance to a carpet
 draped over an assemblage of bulky objects.
 
-\begin{latex}
+\begin{latexonly}
 \begin{figure}[htbp]
 
 \begin{center}
@@ -748,7 +750,7 @@ Observatory Edinburgh. The plot was generated with IDL (see
 Section~\ref{IDL}). \label{CARPET} }
 
 \end{figure}
-\end{latex}
+\end{latexonly}
 
 \begin{htmlonly}
 \begin{figure}[htbp]
@@ -781,7 +783,7 @@ datasets where the display can become cluttered because the arrows overlap.
 Additional variations on the technique are possible (see Figure~\ref{NSCAT}).
 
 
-\begin{latex}
+\begin{latexonly}
 \begin{figure}[htbp]
 
 \begin{center}
@@ -799,7 +801,7 @@ with the NASA Scatterometer (NSCAT) on-board the Japanese Advanced Earth
 Observing Satellite (ADEOS). \label{NSCAT} }
 
 \end{figure}
-\end{latex}
+\end{latexonly}
 
 \begin{htmlonly}
 \begin{figure}[htbp]
@@ -855,7 +857,7 @@ animation, select individual frames for inspection, change the colour
 table etc. An animation of this sort is the simplest method of displaying
 an entire data cube, but nonetheless can give surprisingly good results.
 
-\begin{latex}
+\begin{latexonly}
 \begin{figure}[htbp]
 
 \begin{center}
@@ -875,7 +877,7 @@ are described by Meyerdierks\cite{CLOUDS}. The visualisation was generated
 with Data Explorer (see Section~\ref{IBMDX}). \label{SLICE} }
 
 \end{figure}
-\end{latex}
+\end{latexonly}
 
 \begin{htmlonly}
 \begin{figure}[htbp]
@@ -909,7 +911,7 @@ iso-surface will be displayed in perspective from a view point some
 small distance outside the data cube, and thus usually only one side
 of it will be visible (see Figure~\ref{ISOSURFACE}).
 
-\begin{latex}
+\begin{latexonly}
 \begin{figure}[htbp]
 
 \begin{center}
@@ -925,7 +927,7 @@ It was generated with Data Explorer (see Section~\ref{IBMDX}).
 \label{ISOSURFACE} }
 
 \end{figure}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
 \begin{figure}[htbp]
 
@@ -981,7 +983,7 @@ see Foley {\it et al}\cite{FOLEY2} for further details. Splatting
 is similar to ray casting, though the details are more involved. It
 is quicker but produces less accurate results.
 
-\begin{latex}
+\begin{latexonly}
 \begin{figure}[htbp]
 
 \begin{center}
@@ -997,7 +999,7 @@ It was generated with Data Explorer (see Section~\ref{IBMDX}).
 \label{VREND} }
 
 \end{figure}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
 
 \begin{figure}[htbp]
@@ -1394,13 +1396,13 @@ find a system which though not mentioned here is extremely useful for
 your purposes. Subsequent sections give brief details of individual
 packages, including a summary of the package and, where appropriate,
 details of how to obtain it and information about it.
-\begin{latex}
+\begin{latexonly}
 A longer list of visualisation systems and related information can
 be accessed on-line via the Web at URL:
 \begin{quote}
 {\tt http://www.roe.ac.uk/acdwww/vissys/index.html}
 \end{quote}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
 A longer list of 
 \htmladdnormallink{visualisation systems and related information}
@@ -1438,10 +1440,10 @@ fall into the following broad categories:
 To find a package suitable for your needs you should use the decision
 tree in Figure~\ref{DECPART} for particle data and in
 Figure~\ref{DECPIX} for pixel data. 
-\begin{latex}
+\begin{latexonly}
 Table~\ref{STARDOC} lists the Starlink documentation for the packages
 mentioned in these figures.
-\end{latex}
+\end{latexonly}
 
 \begin{figure}[htbp]
 
@@ -1506,16 +1508,17 @@ data.]{Decision tree to find a package for visualising pixel data.
 
 % ---------------------
 
-\begin{latex}
+\begin{latexonly}
 \begin{table}[htbp]
 
 \begin{center}
 \begin{tabular}{llc}
-Package      & Starlink Document &  Reference \\ \hline
+Package      & Starlink Document &  Reference \\ 
+\hline
 Figaro       & SUN/86   & \cite{FIGARO}   \\
 KAPPA        & SUN/95   & \cite{KAPPA}    \\
 PGPLOT       & SUN/15   & \cite{PGPLOT}   \\
-PONGO        & SUN/137  &  \cite{PONGO}   \\
+PONGO        & SUN/137  & \cite{PONGO}    \\
 SAOIMAGE     & SUN/166  & \cite{SAOIMAGE} \\
 SM           & MUD/160  & \cite{MUD160}   \\
              & MUD/159  & \cite{MUD159}   \\
@@ -1527,7 +1530,7 @@ trees.]{Starlink documentation for packages mentioned in the decision
 trees. \label{STARDOC} }
 
 \end{table}
-\end{latex}
+\end{latexonly}
 
 \begin{htmlonly}
 
@@ -1541,8 +1544,8 @@ is as follows:
   \item \xref{KAPPA}{sun95}{}:     SUN/95\cite{KAPPA},
   \item \xref{PGPLOT}{sun15}{}:    SUN/15\cite{PGPLOT},
   \item \xref{PONGO}{sun137}{}:    SUN/137\cite{PONGO},
-  \item {SAOIMAGE:              SUN/166\cite{SAOIMAGE},
-  \item SM: MUD/160\cite{MUD160}, MUD/159\cite{MUD159}.
+  \item SAOIMAGE:                  SUN/166\cite{SAOIMAGE},
+  \item SM: MUD/160\cite{MUD160},  MUD/159\cite{MUD159}.
 
 \end{itemize}
 
@@ -1607,13 +1610,13 @@ visualisation package recommended by Starlink there are special
 arrangements for obtaining a copy at Starlink sites. Appendix~A of
 \xref{SUN/203}{sun203}{}\cite{SUN203} gives the details.
 
-\begin{latex}
+\begin{latexonly}
 Further details can be obtained via the Web at URL:
 
 \begin{quote}
 {\tt http://www.roe.ac.uk/acdwww/vissys/dx.html}
 \end{quote}
-\end{latex}
+\end{latexonly}
 
 \begin{htmlonly}
 \htmladdnormallink{Further details}
@@ -1639,13 +1642,13 @@ Systems has a subsidiary in the United Kingdom. Its address is:
 AVS/UNIRAS Ltd, Montrose House, Chertsey Boulevard, Hanworth Lane, 
 Chertsey, Surrey, KT16 9JX.
 
-\begin{latex}
+\begin{latexonly}
 Further details can be obtained via the Web at URL:
 
 \begin{quote}
 {\tt http://www.roe.ac.uk/acdwww/vissys/avs.html}
 \end{quote}
-\end{latex}
+\end{latexonly}
 
 \begin{htmlonly}
 \htmladdnormallink{Further details}
@@ -1675,13 +1678,13 @@ School Road NE, Suite 200, Albuquerque, New Mexico 87110-4139, United
 States of America. Copies of Khoros can be obtained from various anonymous 
 ftp sites.
 
-\begin{latex}
+\begin{latexonly}
 Further details can be obtained via the Web at URL:
 
 \begin{quote}
 {\tt http://www.roe.ac.uk/acdwww/vissys/khoros.html}
 \end{quote}
-\end{latex}
+\end{latexonly}
 
 \begin{htmlonly}
 \htmladdnormallink{Further details}
@@ -1722,13 +1725,13 @@ Street, Wokingham, Berkshire, RG11 1XS. For academic users in the
 United Kingdom an educational discount is available under a CHEST
 agreement.
 
-\begin{latex}
+\begin{latexonly}
 Further details can be obtained via the Web at URL:
 
 \begin{quote}
 {\tt http://www.roe.ac.uk/acdwww/vissys/idl.html}
 \end{quote}
-\end{latex}
+\end{latexonly}
 
 \begin{htmlonly}
 \htmladdnormallink{Further details}
@@ -1779,13 +1782,13 @@ United Kingdom an educational discount is available under a CHEST
 agreement.
 
 PV-WAVE seems to be little used in astronomy.
-\begin{latex}
+\begin{latexonly}
 Further details can be obtained via the Web at URL:
 
 \begin{quote}
 {\tt http://www.roe.ac.uk/acdwww/vissys/pvwave.html}
 \end{quote}
-\end{latex}
+\end{latexonly}
 
 \begin{htmlonly}
 
@@ -1803,13 +1806,13 @@ scatterplots and the three-dimensional plots can be rotated in real time.
 All the plots can be zoomed, panned etc. Data are read from ASCII text
 files which makes importing data very easy.
 
-\begin{latex}
+\begin{latexonly}
 Further details can be obtained via the Web at URL:
 
 \begin{quote}
 {\tt http://www.roe.ac.uk/acdwww/vissys/xgobi.html}
 \end{quote}
-\end{latex}
+\end{latexonly}
 
 \begin{htmlonly}
 \htmladdnormallink{Further details}
@@ -1827,13 +1830,13 @@ use it if this display speed was important to you. TIPSY was designed
 for displaying the results of $n$-body cosmological simulations and it
 contains some specialised functionality for use with such data.
 
-\begin{latex}
+\begin{latexonly}
 Further details can be obtained via the Web at URL:
 
 \begin{quote}
 {\tt http://www.roe.ac.uk/acdwww/vissys/tipsy.html}
 \end{quote}
-\end{latex}
+\end{latexonly}
 
 \begin{htmlonly}
 \htmladdnormallink{Further details}
@@ -1861,13 +1864,13 @@ offered to academic users at a much reduced price. Previously it was
 available only to users in the United States, though now it is available
 world-wide.
 
-\begin{latex}
+\begin{latexonly}
 Further details can be obtained via the Web at URL:
 
 \begin{quote}
 {\tt http://www.roe.ac.uk/acdwww/vissys/fast.html}
 \end{quote}
-\end{latex}
+\end{latexonly}
 
 \begin{htmlonly}
 \htmladdnormallink{Further details}
