@@ -48,7 +48,9 @@
 *     2008-02-28 (JB):
 *        Use mapVars struct.
 *     2008-03-24 (JB):
-*        Get mapPA and scanPA..
+*        Get mapPA and scanPA.
+*     2008-04-03 (JB):
+*        Correct scanVel calculation.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -147,12 +149,6 @@ void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode,
          strcmp ( mapVars->swMode, "chop" ) == 0 ) ||
        strcmp ( samMode, "sample" ) == 0 ) {
 
-    if ( *status != SAI__OK ) {
-      *status = SAI__ERROR;
-      errRep ( "gsdac_getMapVars", "Error getting chop parameters", status );
-      return; 
-    }
-
     if ( strncmp ( gsdVars->chopCoords, "AZ", 2 ) ) 
       strcpy ( mapVars->chopCrd, "AZEL" );
     else if ( strncmp ( gsdVars->chopCoords, "EQ", 2 ) ) 
@@ -218,22 +214,18 @@ void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode,
   if ( strcmp ( samMode, "raster" ) == 0
        && strcmp ( mapVars->swMode, "pssw" ) == 0 ) {
 
-    if ( *status != SAI__OK ) {
-      *status = SAI__ERROR;
-      errRep ( "gsdac_getMapVars", "Error getting map & scan parameters", status );
-      return; 
-    }
-
     /* Get the map height and width. */
     mapVars->mapHght = gsdVars->nMapPtsX * gsdVars->cellX;
     mapVars->mapWdth = gsdVars->nMapPtsY * gsdVars->cellY;
 
     /* Get the scan velocity and spacing. */
     if ( strncmp ( gsdVars->obsDirection, "HORIZONTAL", 10 ) == 0 ) {          
-      mapVars->scanVel = gsdVars->cellX / gsdVars->scanTime;
+      mapVars->scanVel = gsdVars->cellX * gsdVars->nMapPtsX / 
+                          gsdVars->scanTime;
       mapVars->scanDy = gsdVars->cellY;
     } else if ( strncmp ( gsdVars->obsDirection, "VERTICAL", 8 ) == 0 ) {
-      mapVars->scanVel = gsdVars->cellY / gsdVars->scanTime;
+      mapVars->scanVel = gsdVars->cellY * gsdVars->nMapPtsY / 
+                          gsdVars->scanTime;
       mapVars->scanDy = gsdVars->cellX;
     } else {
       *status = SAI__ERROR;
