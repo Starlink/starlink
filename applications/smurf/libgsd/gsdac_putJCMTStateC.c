@@ -129,7 +129,7 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   record->smu_z = 0.0; 
 
-  strncpy( record->smu_chop_phase, "M", 1 );
+  strncpy( record->smu_chop_phase, "M", 2 );
 
   record->smu_jig_index = VAL__BADI;
 
@@ -149,7 +149,7 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   record->smu_tr_chop_y = 0.0;
 
-  strncpy( record->tcs_beam, "M", 1 );    
+  strncpy( record->tcs_beam, "M", 2 );    
 
   strncpy( record->tcs_source, "SCIENCE", 8 ); 
 
