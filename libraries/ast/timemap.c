@@ -81,6 +81,9 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 *        Override astEqual.
 *     15-OCT-2006 (DSB):
 *        Add conversions between UT1 and UTC (UTTOUTC and UTCTOUT).
+*     3-APR-2008 (DSB):
+*        Only call memcpy if the source and destination pointers are
+*        different.
 *class--
 */
 
@@ -3638,7 +3641,9 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
       time = ptr_out[ 0 ];
 
 /* Initialise the output coordinate values by copying the input ones. */
-      (void) memcpy( time, ptr_in[ 0 ], sizeof( double ) * (size_t) npoint );
+      if( time != ptr_in[ 0 ] ) {
+         (void) memcpy( time, ptr_in[ 0 ], sizeof( double ) * (size_t) npoint );
+      }
 
 /* We will loop to apply each time coordinate conversion in turn to the
    (time) array. However, if the inverse transformation was requested,
