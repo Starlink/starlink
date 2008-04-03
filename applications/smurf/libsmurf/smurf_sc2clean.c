@@ -101,6 +101,7 @@
 #include "star/grp.h"
 #include "ndf.h"
 #include "mers.h"
+#include "par.h"
 #include "prm_par.h"
 #include "sae_par.h"
 #include "msg_par.h"
@@ -116,9 +117,10 @@
 
 void smurf_sc2clean( int *status ) {
 
-  int aiter;                /* Number of iterations in sigma-clipper */
+  unsigned int aiter;       /* Number of iterations in sigma-clipper */
   double badfrac=0;         /* Fraction of bad samples to flag bad bolo */
   dim_t dcbox=0;            /* width of box for measuring DC steps */
+  int dcbox_s=0;            /* signed int version of dcbox */
   double dcthresh=0;        /* n-sigma threshold for DC steps */
   smfData *ffdata = NULL;   /* Pointer to output data struct */
   int flag;                 /* Flag for how group is terminated */
@@ -130,6 +132,7 @@ void smurf_sc2clean( int *status ) {
   int size;                 /* Number of files in input group */
   double spikethresh;       /* Threshold for finding spikes */
   unsigned int spikeiter;   /* Number of iterations for spike finder */
+  int spikeiter_s;          /* Signed int version of spikeiter_s */
 
   /* Main routine */
   ndfBegin();
@@ -145,17 +148,24 @@ void smurf_sc2clean( int *status ) {
 
   /* Check for DC step correction paramaters */
   parGet0d( "DCTHRESH", &dcthresh, status );
-  parGet0i( "DCBOX", &dcbox, status );
+  parGdr0i( "DCBOX", 1000, 0, 32767, 1, &dcbox_s, status );
+  if( *status == SAI__OK ) {
+    dcbox = (dim_t) dcbox_s;
+  }
+
 
   /* Order of polynomial for baseline fits */
   parGet0i( "ORDER", &order, status );
 
   /* Spike flagging */
   parGet0d( "SPIKETHRESH", &spikethresh, status );
-  parGet0i( "SPIKEITER", &spikeiter, status );
+  parGdr0i( "SPIKEITER", 0, 0, 32767, 1, &spikeiter_s, status );
+  if( *status == SAI__OK ) {
+    spikeiter = (unsigned int) spikeiter_s;
+  }
 
   /* Loop over input files */
-  for( i=1; i<=size; i++ ) {
+  if( *status == SAI__OK ) for( i=1; i<=size; i++ ) {
 
     /* Open and flatfield in case we're using raw data */
     smf_open_and_flatfield(igrp, ogrp, i, &ffdata, status);
