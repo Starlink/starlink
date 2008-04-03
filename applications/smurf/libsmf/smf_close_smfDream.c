@@ -36,11 +36,13 @@
 *        Initial version
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-04-03 (AGG):
+*        Free resources even if status is bad
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2006-2008 University of British Columbia. All
+*     Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -81,8 +83,7 @@
 
 void smf_close_smfDream( smfDream **dream, int * status ) {
 
-  if (*status != SAI__OK) return;
-
+  /* Always attempt to free resources regardless of status */
   if ( *dream != NULL ) {
     /* Free the pointers associated with the smfDream */
     (*dream)->gridwts = smf_free( (*dream)->gridwts, status );

@@ -39,9 +39,11 @@
 *        Initial version
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-04-03 (AGG):
+*        Free resources even if status is bad
 
 *  Copyright:
-*     Copyright (C) 2006-2007 University of British Columbia.  All
+*     Copyright (C) 2006-2008 University of British Columbia.  All
 *     Rights Reserved.
 
 *  Licence:
@@ -93,12 +95,12 @@ void smf_close_related ( smfArray **relfiles, int *status ) {
 
   /* Local variables */
   int i;                    /* Loop counter */
-  int nrelated;
-  smfData *data;
+  int nrelated;             /* Number of related files */
+  smfData *data;            /* Current smfData */
 
-  if ( *status != SAI__OK ) return;
+  /* Always attempt to free resources regardless of status */
 
-  /* Number of data files */
+  /* Retrieve number of data files */
   nrelated = (*relfiles)->ndat;
 
   /* Loop over the number of files and close each smfData */
