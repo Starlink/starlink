@@ -223,6 +223,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   double *res_data=NULL;        /* Pointer to DATA component of res */
   smfGroup *resgroup=NULL;      /* smfGroup of model residual files */
   unsigned int spikeiter;       /* Number of iterations for spike detection */
+  int spikeiter_s;              /* signed version of spikeiter */
   double spikethresh;           /* Threshold for spike detection */
   smf_modeltype thismodel;      /* Type of current model */
 
@@ -288,8 +289,15 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       spikethresh = 0;
     }
 
-    if( !astMapGet0I( keymap, "SPIKEITER", &spikeiter ) ) {
+    if( !astMapGet0I( keymap, "SPIKEITER", &spikeiter_s ) ) {
       spikeiter = 0;
+    } else {
+      if( spikeiter_s < 0 ) {
+	*status = SAI__ERROR;
+	errRep(FUNC_NAME, "spikeiter cannot be < 0.", status );
+      } else {
+	spikeiter = (unsigned int) spikeiter_s;
+      }
     }
 
     /* Type and order of models to fit from MODELORDER keyword */
