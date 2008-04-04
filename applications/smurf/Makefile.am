@@ -33,6 +33,28 @@ sc2da/sc2ast.c
 
 WVM_FILES = wvm/wvmOpt.c wvm/wvmTau.c wvm/wvmCal.c
 
+EXAMPLE_FILES = \
+examples/README \
+examples/atm.sdf \
+examples/candycanes.sdf \
+examples/heatrunobs.lis \
+examples/heatrunsim.lis \
+examples/obspar.lis \
+examples/obspar_dream.lis \
+examples/obspar_heatrun.lis \
+examples/obspar_pong.lis \
+examples/obspar_stare.lis \
+examples/pongobs.lis \
+examples/pongsim.lis \
+examples/simpar.lis \
+examples/simpar_dream.lis \
+examples/simpar_heatrun.lis \
+examples/simpar_pong.lis \
+examples/simpar_stare.lis \
+examples/stareobs.lis \
+examples/staresim.lis
+
+
 # Linking
 
 smurf_mon_LDADD = libsmurf/libsmurf.la libsc2sim/libsc2sim.la \
@@ -44,7 +66,7 @@ smurf_mon_LDADD = libsmurf/libsmurf.la libsc2sim/libsc2sim.la \
 
 ##  Any misc files that have no where else.
 dist_starnews_DATA = smurf.news
-dist_pkgdata_DATA = LICENCE
+dist_pkgdata_DATA = LICENCE $(EXAMPLE_FILES)
 
 # Dynamically generated scripts
 DYNSCRIPTS = smurf.sh smurf.csh smurf.icl
