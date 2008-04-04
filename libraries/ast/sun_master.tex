@@ -104,9 +104,9 @@ environment-independent.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -141,7 +141,6 @@ environment-independent.
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -157,6 +156,8 @@ environment-independent.
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\html}[1]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
@@ -188,14 +189,15 @@ environment-independent.
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 
 \newcommand{\appref}[1]{Appendix~\ref{#1}}
 \newcommand{\secref}[1]{\S\ref{#1}}
 \begin{htmlonly}
-   \renewcommand{\appref}[1]{\ref{#1}}
-   \renewcommand{\secref}[1]{\ref{#1}}
+   \newcommand{\appref}[1]{\ref{#1}}
+   \newcommand{\secref}[1]{\ref{#1}}
 \end{htmlonly}
 
 \newcommand{\fitsurl}[0]{http://fits.gsfc.nasa.gov/}
@@ -205,7 +207,7 @@ environment-independent.
 % in an attempt to stop spurious behaviour form latex2html.
 
 \begin{htmlonly}
-  \renewcommand{\latexonlytoc}[0]{}
+  \newcommand{\latexonlytoc}[0]{}
 \end{htmlonly}
 \renewcommand{\thepage}{\arabic{page}}
 
@@ -262,7 +264,8 @@ environment-independent.
 \newlength{\sstexampleswidth}
 
 %  Define a \tt font of the required size.
-\newfont{\ssttt}{cmtt10 scaled 1095}
+\latex{\newfont{\ssttt}{cmtt10 scaled1095}}
+\html{\newcommand{\ssttt}{\tt}}
 
 %  Define a command to produce a routine header, including its name,
 %  a purpose description and the rest of the routine's documentation.
@@ -395,14 +398,14 @@ environment-independent.
    \newcommand{\ssttt}{\tt}
 
 %  sstroutine.
-%   \renewcommand{\sstroutine}[3]{
+%   \newcommand{\sstroutine}[3]{
 %      \subsection{#1\xlabel{#1}-\label{#1}#2}
 %      \begin{description}
 %         #3
 %      \end{description}
 %   }
-   \renewcommand{\sstlabel}[1]{\label{#1}\xlabel{#1}}
-   \renewcommand{\sstroutine}[3]{
+   \newcommand{\sstlabel}[1]{\label{#1}\xlabel{#1}}
+   \newcommand{\sstroutine}[3]{
       \subsection{#1 - #2}
       \begin{description}
          #3
@@ -410,45 +413,45 @@ environment-independent.
    }
 
 %  sstdescription
-   \renewcommand{\sstdescription}[1]{\item[Description:]
+   \newcommand{\sstdescription}[1]{\item[Description:]
       \begin{description}
          #1
       \end{description}
    }
 
 %  sstusage
-   \renewcommand{\sstusage}[1]{\item[Usage:]
+   \newcommand{\sstusage}[1]{\item[Usage:]
       \begin{description}
          {\ssttt #1}
       \end{description}
    }
 
 %  sstinvocation
-   \renewcommand{\sstinvocation}[1]{\item[Invocation:]
+   \newcommand{\sstinvocation}[1]{\item[Invocation:]
       \begin{description}
          {\ssttt #1}
       \end{description}
    }
 
 %  sstsynopsis
-   \renewcommand{\sstsynopsis}[1]{\item[Synopsis:]
+   \newcommand{\sstsynopsis}[1]{\item[Synopsis:]
       \begin{description}
          {\ssttt #1}
       \end{description}
    }
 
 %  sstattributetype
-   \renewcommand{\sstattributetype}[1]{\item[Type:]
+   \newcommand{\sstattributetype}[1]{\item[Type:]
          #1
    }
 
 %  sstconstructor
-   \renewcommand{\sstconstructor}[1]{\item[Constructor Function:]
+   \newcommand{\sstconstructor}[1]{\item[Constructor Function:]
          #1
    }
 
 %  sstarguments
-   \renewcommand{\sstarguments}[1]{
+   \newcommand{\sstarguments}[1]{
       \item[Arguments:]
       \begin{description}
          #1
@@ -456,7 +459,7 @@ environment-independent.
    }
 
 %  sstreturnedvalue
-   \renewcommand{\sstreturnedvalue}[1]{
+   \newcommand{\sstreturnedvalue}[1]{
       \item[Returned Value:]
       \begin{description}
          #1
@@ -464,7 +467,7 @@ environment-independent.
    }
 
 %  sstparameters
-   \renewcommand{\sstparameters}[1]{
+   \newcommand{\sstparameters}[1]{
       \item[Parameters:]
       \begin{description}
          #1
@@ -472,7 +475,7 @@ environment-independent.
    }
 
 %  sstapplicability
-   \renewcommand{\sstapplicability}[1]{
+   \newcommand{\sstapplicability}[1]{
       \item[Clas\mbox{}s Applicability:]
       \begin{description}
          #1
@@ -480,7 +483,7 @@ environment-independent.
    }
 
 %  sstexamples
-   \renewcommand{\sstexamples}[1]{
+   \newcommand{\sstexamples}[1]{
       \item[Examples:]
       \begin{description}
          #1
@@ -488,27 +491,27 @@ environment-independent.
    }
 
 %  sstsubsection
-   \renewcommand{\sstsubsection}[1]{\item[{#1}]}
+   \newcommand{\sstsubsection}[1]{\item[{#1}]}
 
 %  sstexamplesubsection
-   \renewcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
 
 %  sstnotes
-   \renewcommand{\sstnotes}[1]{\item[Notes:]
+   \newcommand{\sstnotes}[1]{\item[Notes:]
       \begin{description}
          #1
       \end{description}
    }
 
 %  sstdiytopic
-   \renewcommand{\sstdiytopic}[2]{\item[{#1}]
+   \newcommand{\sstdiytopic}[2]{\item[{#1}]
       \begin{description}
          #2
       \end{description}
    }
 
 %  sstimplementationstatus
-   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
+   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
       \begin{description}
          #1
       \end{description}
@@ -18631,7 +18634,7 @@ See the ``ast\_link'' command description in
 \subsection{Building ADAM Applications that Use AST}
 
 Users of Starlink's \xref{ADAM}{sg4}{} programming environment
-\latexonly{(SG/4)} on UNIX should use the
+\latex{(SG/4)} on UNIX should use the
 ``\xref{alink}{sun144}{ADAM_link_scripts}'' command
 (\xref{SUN/144}{sun144}{}) to compile and link applications and can
 access the AST library by including execution of the command
