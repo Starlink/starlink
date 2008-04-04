@@ -81,9 +81,9 @@ This document tells you how to get started and points to further information.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -118,7 +118,6 @@ This document tells you how to get started and points to further information.}
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -134,6 +133,8 @@ This document tells you how to get started and points to further information.}
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\html}[1]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
@@ -165,15 +166,18 @@ This document tells you how to get started and points to further information.}
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 \newcommand{\dash}{--}
 \begin{htmlonly}
-\renewcommand{\dash}{-}
+  \newcommand{\dash}{-}
 \end{htmlonly}
 \newcommand{\STARURL}{http://www.starlink.rl.ac.uk}
 \newcommand{\IRAFURL}{http://www.starlink.rl.ac.uk/iraf/web/iraf-homepage.html}
 \newcommand{\STORE}{http://www.starlink.rl.ac.uk/cgi-bin/storetop}
+\newcommand{\TCLURL}{http://www.tcl.tk}
+
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
@@ -230,7 +234,7 @@ This document tells you how to get started and points to further information.}
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -342,5 +346,5 @@ automatic data-conversion facilities are to be used.
 installation of Starlink software.
 \end{description}
 More details on this, and full instructions for obtaining the software are in
-\xref{SUN/217}{sun217}{installing_the_starlink_software}\latexonly{ Appendix A}.
+\xref{SUN/217}{sun217}{installing_the_starlink_software}\latex{ Appendix A}.
 \end{document}
