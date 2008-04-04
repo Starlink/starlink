@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.34}
 \newcommand{\stardocnumber}    {95.34}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2008 March 3}
+\newcommand{\stardocdate}      {2008 April 4th}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.9-1}
+\newcommand{\stardocversion}   {1.9-2}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -42425,6 +42425,10 @@ KAPPA: \htmlref{NOMAGIC}{NOMAGIC},
       bits is set to 1.  Effectively, the bad-bits mask therefore allows
       selective activation of any of the eight 1-bit masks which can be
       stored in the quality array.
+
+      The bit mask can be given either numerically (in decimal, binary,
+      octal or hexadecimal format), or as a set of quality names (see 
+      \htmlref{SETQUAL}{SETQUAL}).
    }
    \sstusage{
       setbb ndf bb
@@ -42460,6 +42464,11 @@ KAPPA: \htmlref{NOMAGIC}{NOMAGIC},
          then an appropriate bit-wise `AND' or `OR' operation with the
          old mask value will first be performed.
 
+         It may also be specified as a comma-separated list of quality
+	 names. A quality name is a symbolic name that identifies a
+	 specific quality bit (quality names can be defined using
+	 SETQUAL, and displayed using SHOWQUAL).
+
          The default value suggested when prompting for this value is
          chosen so as to leave the original mask value unchanged.
       }
@@ -42488,6 +42497,16 @@ KAPPA: \htmlref{NOMAGIC}{NOMAGIC},
          NDF called myframe to the value 3.  This means that bits 1 and
          2 of the associated quality array will be used to generate bad
          pixels.
+      }
+      \sstexamplesubsection{
+         setbb myframe "'SKY,BACK'"
+      }{
+         Sets the bad-bits mask value for the quality component of the
+         NDF called myframe so that any pixel that is flagged with either
+         of the two qualities ``SKY'' or ``BACK'' will be set bad. The NDF
+         should contain information that associates each of these quality
+         names with a specific bit in the quality array. Such information
+         can for instance be created using the SETQUAL command.
       }
       \sstexamplesubsection{
          setbb ndf=myframe bb=b11
@@ -54313,6 +54332,12 @@ The following applications have been modified:
 
 \begin{description}
 
+   \item [\htmlref{SETBB}{SETBB}] \mbox{}
+      \begin{itemize}
+          \item A comma-separated list of quality names (such as created by 
+          SETQUAL) can now be used to define the bit mask instead of a 
+          numerical value.
+       \end{itemize}
    \item [\htmlref{FFCLEAN}{FFCLEAN}] \mbox{}
       \begin{itemize}
          \item This has been extended to operate on cubes, either by

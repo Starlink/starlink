@@ -17,6 +17,9 @@
 
 2 Modified_applications
 
+   o  SETBB can now use a comma-separated list of quality names (such as
+   created by SETQUAL) to define the bit mask instead of a numerical value.
+
    o  FFCLEAN has been extended to operate on cubes, either by
    processing the cubes as a set of independent one-dimensional
    spectra, or as a set of independent two-dimensional images

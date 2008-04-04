@@ -57,6 +57,11 @@
 *        The value supplied should lie in the range 0 to 255 decimal (or
 *        8 bits of binary).
 *
+*        It may also be specified as a comma-separated list of quality
+*        names. A quality name is a symbolic name that identifies a
+*        specific quality bit (quality names can be defined using
+*        SETQUAL, and displayed using SHOWQUAL).
+*
 *        If the AND and OR parameters are both FALSE, then the value
 *        supplied will be used directly as the new mask value.
 *        However, if either of these logical parameters is set to TRUE,
@@ -82,6 +87,13 @@
 *        NDF called myframe to the value 3.  This means that bits 1 and
 *        2 of the associated quality array will be used to generate bad
 *        pixels.
+*     setbb myframe "'SKY,BACK'"
+*        Sets the bad-bits mask value for the quality component of the
+*        NDF called myframe so that any pixel that is flagged with either
+*        of the two qualities "SKY" or "BACK" will be set bad. The NDF
+*        should contain information that associates each of these quality
+*        names with a specific bit in the quality array. Such information
+*        can for instance be created using the SETQUAL command.
 *     setbb ndf=myframe bb=b11
 *        This example performs the same operation as above, but in this
 *        case the new mask value has been specified using binary
@@ -109,6 +121,7 @@
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 1995 Central Laboratory of the Research Councils.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -130,6 +143,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -140,6 +154,8 @@
 *        octal and hexadecimal notation.
 *     1995 April 24 (MJC):
 *        Made usage and examples lowercase.  Added Related Applications.
+*     4-APR-2008 (DSB):
+*        Add facility for specifying the mask using quality names.
 *     {enter_further_changes_here}
 
 *-
@@ -149,21 +165,30 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! HDS constants
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       BYTE BB                    ! Old bad-bits value (unsigned byte)
-      CHARACTER * ( 9 ) BBC      ! Bad-bits value as characters
-      CHARACTER * ( 9 ) BBD      ! Default bad-bits value
+      CHARACTER BBC*150          ! Bad-bits value as characters
+      CHARACTER BBD*9            ! Default bad-bits value
+      CHARACTER COMMNT*200       ! Comment associated with quality name
+      CHARACTER LOCS(5)*(DAT__SZLOC)! Locators to the quality name info
+      CHARACTER XNAME*(DAT__SZNAM)! NDF enstension holding quality names
       INTEGER BBI                ! Bad-bits value as an integer
+      INTEGER BIT                ! The bit number
+      INTEGER COMMA              ! Index of comma at end of quality name
       INTEGER DIGVAL             ! Value of binary digit
       INTEGER IDIG               ! Loop counter for binary digits
       INTEGER NDF                ! NDF identifier
+      INTEGER START              ! Index of 1st character in quality name
       LOGICAL AND                ! Perform a bit-wise AND operation?
+      LOGICAL FIXED              ! Is the quality value constant?
       LOGICAL OR                 ! Perform a bit-wise OR operation?
       LOGICAL THERE              ! Quality component present?
+      LOGICAL VALUE              ! The constant quality value
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM_ type conversion functions
@@ -239,7 +264,57 @@
             CALL CHR_CTOI( BBC, BBI, STATUS )
          END IF
 
-*  If the number could not be decoded, then report an error.
+*  If the number could not be decoded, then see if it is a list
+*  of quality names.
+         IF ( STATUS .NE. SAI__OK ) THEN
+            CALL ERR_ANNUL( STATUS )
+
+*  Attempt to locate any existing quality name information in the input
+*  NDF. If such information is found, LOC is returned holding a set of
+*  5 HDS locators which identify the NDF and the various components of
+*  the quality information. XNAME is returned holding the name of the
+*  NDF extension in which the information was found. If no quality name
+*  information is found, then an error is reported.
+            CALL IRQ_FIND( NDF, LOCS, XNAME, STATUS )
+
+*  Clear all bits in the bad bits mask.
+            BBI = 0
+
+*  Loop round every word in the BB parameter value that ends with a comma
+            START = 1
+            COMMA = INDEX( BBC, ',' ) 
+            DO WHILE( COMMA .GT. 0 .AND. STATUS == SAI__OK )              
+               COMMA = COMMA + START - 1
+
+*  If the word has non-zero length, see if it is a defined quality name.
+*  If so, get the 1-based bit number corresponding to the quality name.
+               IF( COMMA .GT. START ) THEN 
+                  CALL IRQ_GETQN( LOCS, BBC( START : COMMA - 1 ), FIXED, 
+     :                            VALUE, BIT, COMMNT, STATUS )
+
+*  Set the corresponding bit in the bad bits mask.
+                  BBI = BBI + 2**( BIT - 1 )
+
+               END IF
+
+*  Find the comma at the end of the next word.
+               START = COMMA + 1
+               COMMA = INDEX( BBC( START: ), ',' ) 
+            END DO
+
+*  Handle any quality name following the final comma.
+            IF( START .LE. LEN( BBC ) ) THEN 
+               CALL IRQ_GETQN( LOCS, BBC( START : ), FIXED, VALUE, BIT, 
+     :                         COMMNT, STATUS )
+               BBI = BBI + 2**( BIT - 1 )
+            END IF
+
+*  Release the quality name information.
+            CALL IRQ_RLSE( LOCS, STATUS )
+         END IF
+
+*  If the number could not be decoded, and it was not a list of quality
+*  names, then report an error.
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL MSG_SETC( 'BB', BBC )
             CALL ERR_REP( 'SETBB_SYNTAX',
