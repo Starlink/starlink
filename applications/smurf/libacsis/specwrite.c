@@ -1691,10 +1691,12 @@ openNDF( const obsData * obsinfo, const subSystem * template, subSystem * file,
   /* Update the cursize[] array and the nchans array */
   file->cursize = ubnd[TDIM] - lbnd[TDIM] + 1;
 
-  /* History component */
+  /* History component - inside SMURF we want ADAM to write the history */
   ndfHcre( file->file.indf, status );
+#ifndef PACKAGE_UPCASE
   ndfHput("NORMAL",APPNAME, 1, 1, history,
 	  0, 0, 0, file->file.indf, status );
+#endif
 
   /* Map the data array */
   ndfMap(file->file.indf, "DATA", "_REAL", "WRITE", datapntrs, &itemp, status );
@@ -3290,8 +3292,10 @@ void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
       /* easiest to write a second piece of history information for header collation.
 	 Stops having to worry about only getting a single HISTORY entry when NDF
 	 wants to write a new entry every time the file is opened for UPDATE. */
+#ifndef PACKAGE_UPCASE
       ndfHput("NORMAL",APPNAME, 1, 1, history,
 	      0, 0, 0, indf, status );
+#endif
 
       /* Need ACSIS extension for hack */
       ndfXpt0c( receppos_sys, indf, ACSISEXT, "RECEPPOS_SYS", status );
