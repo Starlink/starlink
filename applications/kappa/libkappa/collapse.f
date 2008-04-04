@@ -84,36 +84,36 @@
 *          "Sum"    -- The total value.
 *        ["Mean"]
 *     HIGH = LITERAL (Read)
-*        A formatted value for the axis specified by parameter AXIS.  For 
-*        example, if AXIS is 3 and the current Frame of the input NDF has 
-*        axes RA/DEC/Wavelength, then a wavelength value should be supplied.
-*        If, on the other hand, the current Frame in the NDF was the
-*        PIXEL Frame, then a pixel co-ordinate value would be required 
-*        for the third axis (note, the pixel with index I covers a range
-*        of pixel co-ordinates from (I-1) to I).  Together with 
-*        parameter LOW, this parameter gives the range of axis values to
-*        be compressed.  Note, HIGH and LOW should not be equal.  If a
-*        null value (!) is supplied for either HIGH or LOW, the entire
-*        range of the axis is collapsed. [!]
+*        A formatted value for the axis specified by parameter AXIS.  
+*        For example, if AXIS is 3 and the current Frame of the input 
+*        NDF has axes RA/DEC/Wavelength, then a wavelength value should 
+*        be supplied.  If, on the other hand, the current Frame in the 
+*        NDF was the PIXEL Frame, then a pixel co-ordinate value would 
+*        be required for the third axis (note, the pixel with index I 
+*        covers a range of pixel co-ordinates from (I-1) to I).  
+*        Together with parameter LOW, this parameter gives the range of
+*        axis values to be compressed.  Note, HIGH and LOW should not be
+*        equal.  If a null value (!) is supplied for either HIGH or LOW,
+*        the entire range of the axis is collapsed.  [!]
 *     IN  = NDF (Read)
 *        The input NDF. 
 *     LOW = LITERAL (Read)
 *        A formatted value for the axis specified by parameter AXIS.  
-*        For example, if AXIS is 3 and the current Frame of the input NDF 
-*        has axes RA/DEC/Wavelength, then a wavelength value should be 
-*        supplied. If, on the other hand, the current Frame in the NDF was 
-*        the PIXEL Frame, then a pixel co-ordinate value would be required
-*        for the third axis (note, the pixel with index I covers a range
-*        of pixel co-ordinates from (I-1) to I).  Together with 
-*        parameter HIGH, this parameter gives the range of axis values
-*        to be compressed.  Note, LOW and HIGH should not be equal.
-*        If a null value (!) is supplied for either LOW or HIGH, the
-*        entire range of the axis is collapsed. [!]
+*        For example, if AXIS is 3 and the current Frame of the input 
+*        NDF has axes RA/DEC/Wavelength, then a wavelength value should 
+*        be supplied.  If, on the other hand, the current Frame in the 
+*        NDF was the PIXEL Frame, then a pixel co-ordinate value would 
+*        be required for the third axis (note, the pixel with index I 
+*        covers a range of pixel co-ordinates from (I-1) to I).  
+*        Together with parameter HIGH, this parameter gives the range of
+*        axis values to be compressed.  Note, LOW and HIGH should not be
+*        equal.  If a null value (!) is supplied for either LOW or HIGH,
+*        the entire range of the axis is collapsed.  [!]
 *     OUT = NDF (Write)
 *        The output NDF.
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF structure.  A null value (!)
-*        propagates the title from the input NDF to the output NDF. [!]
+*        propagates the title from the input NDF to the output NDF.  [!]
 *     TRIM = _LOGICAL (Read)
 *        This parameter controls whether the collapsed axis should be
 *        removed from the co-ordinate syatems describing the output NDF.
@@ -159,10 +159,11 @@
 *           <name>=<value>
 *
 *        where <name> is the name of a Frame attribute, and <value>
-*        is the value to assign to the attribute. Any unspecified attributes
-*        will retain the value they have in the supplied NDF.  No attribute
-*        values will be changed if a null value (!) is supplied.  Any 
-*        unrecognised attributes are ignored  (no error is reported). [!]
+*        is the value to assign to the attribute.  Any unspecified 
+*        attributes will retain the value they have in the supplied NDF.
+*        No attribute values will be changed if a null value (!) is 
+*        supplied.  Any unrecognised attributes are ignored (no error is
+*        reported).  [!]
 *     WLIM = _REAL (Read)
 *        If the input NDF contains bad pixels, then this parameter
 *        may be used to determine the number of good pixels which must
@@ -182,9 +183,9 @@
 
 *  Examples:
 *     collapse m31 profile axis=RA low="0:36:01" high="0:48:00"
-*        Collapses the 2D NDF called m31 along the Right Ascension axis,
-*        from "0:36:01" to "0:48:00", and puts the result in an output
-*        NDF called profile.
+*        Collapses the two-dimensional NDF called m31 along the 
+*        right-ascension axis, from "0:36:01" to "0:48:00", and puts the
+*        result in an output NDF called profile.
 *     collapse cube slab lambda 4500 4550 
 *        The current Frame in the input three-dimensional NDF called 
 *        cube has axes with labels "RA", "DEC" and "Lambda", with the 
@@ -195,10 +196,10 @@
 *        Each pixel in the output NDF is the mean of the corresponding 
 *        input pixels with wavelengths between 4500 and 4550 Angstroms.
 *     collapse cube slab 3 4500 4550 
-*        The same as above except the axis to collapse along is
-*        specified by index (3) rather than label (lambda).
+*        The same as the previous example except the axis to collapse 
+*        along is specified by index (3) rather than label (lambda).
 *     collapse cube slab 3 101.0 134.0
-*        This is the same as the above examples, except that the current
+*        This is the same as the second example, except that the current
 *        Frame in the input NDF has been set to the PIXEL Frame (using
 *        WCSFRAME), and so the high and low axis values are specified in
 *        pixel co-ordinates instead of Angstroms.  Note the difference 
@@ -206,7 +207,7 @@
 *        indices (for instance the pixel with index 10 extends from 
 *        pixel co-ordinate 9.0 to pixel co-ordinate 10.0).
 *     collapse cube slab 3 low=99.0 high=100.0
-*        This is the same as the above examples, except that a single
+*        This is the same as the second example, except that a single
 *        pixel plane in the cube (pixel 100) is used to create the
 *        output NDF.  Following the usual definition of pixel 
 *        co-ordinates, pixel 100 extends from pixel co-ordinate 99.0 to

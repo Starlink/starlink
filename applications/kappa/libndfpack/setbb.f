@@ -87,13 +87,14 @@
 *        NDF called myframe to the value 3.  This means that bits 1 and
 *        2 of the associated quality array will be used to generate bad
 *        pixels.
-*     setbb myframe "'SKY,BACK'"
+*     setbb myframe "SKY,BACK"
 *        Sets the bad-bits mask value for the quality component of the
-*        NDF called myframe so that any pixel that is flagged with either
-*        of the two qualities "SKY" or "BACK" will be set bad. The NDF
-*        should contain information that associates each of these quality
-*        names with a specific bit in the quality array. Such information
-*        can for instance be created using the SETQUAL command.
+*        NDF called myframe so that any pixel that is flagged with 
+*        either of the two qualities "SKY" or "BACK" will be set bad. 
+*        The NDF should contain information that associates each of 
+*        these quality names with a specific bit in the quality array.
+*        Such information can for instance be created using the SETQUAL
+*        command.
 *     setbb ndf=myframe bb=b11
 *        This example performs the same operation as above, but in this
 *        case the new mask value has been specified using binary
@@ -127,7 +128,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -137,8 +138,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
@@ -183,7 +184,7 @@
       INTEGER DIGVAL             ! Value of binary digit
       INTEGER IDIG               ! Loop counter for binary digits
       INTEGER NDF                ! NDF identifier
-      INTEGER START              ! Index of 1st character in quality name
+      INTEGER START              ! Index 1st character in quality name
       LOGICAL AND                ! Perform a bit-wise AND operation?
       LOGICAL FIXED              ! Is the quality value constant?
       LOGICAL OR                 ! Perform a bit-wise OR operation?
@@ -271,8 +272,8 @@
 
 *  Attempt to locate any existing quality name information in the input
 *  NDF. If such information is found, LOC is returned holding a set of
-*  5 HDS locators which identify the NDF and the various components of
-*  the quality information. XNAME is returned holding the name of the
+*  five HDS locators which identify the NDF and the various components
+*  of the quality information. XNAME is returned holding the name of the
 *  NDF extension in which the information was found. If no quality name
 *  information is found, then an error is reported.
             CALL IRQ_FIND( NDF, LOCS, XNAME, STATUS )
@@ -280,16 +281,17 @@
 *  Clear all bits in the bad bits mask.
             BBI = 0
 
-*  Loop round every word in the BB parameter value that ends with a comma
+*  Loop round every word in the BB parameter value that ends with a 
+*  comma.
             START = 1
             COMMA = INDEX( BBC, ',' ) 
-            DO WHILE( COMMA .GT. 0 .AND. STATUS == SAI__OK )              
+            DO WHILE ( COMMA .GT. 0 .AND. STATUS == SAI__OK )
                COMMA = COMMA + START - 1
 
 *  If the word has non-zero length, see if it is a defined quality name.
 *  If so, get the 1-based bit number corresponding to the quality name.
-               IF( COMMA .GT. START ) THEN 
-                  CALL IRQ_GETQN( LOCS, BBC( START : COMMA - 1 ), FIXED, 
+               IF ( COMMA .GT. START ) THEN
+                  CALL IRQ_GETQN( LOCS, BBC( START : COMMA - 1 ), FIXED,
      :                            VALUE, BIT, COMMNT, STATUS )
 
 *  Set the corresponding bit in the bad bits mask.
@@ -303,7 +305,7 @@
             END DO
 
 *  Handle any quality name following the final comma.
-            IF( START .LE. LEN( BBC ) ) THEN 
+            IF ( START .LE. LEN( BBC ) ) THEN 
                CALL IRQ_GETQN( LOCS, BBC( START : ), FIXED, VALUE, BIT, 
      :                         COMMNT, STATUS )
                BBI = BBI + 2**( BIT - 1 )
