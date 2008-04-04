@@ -18,7 +18,7 @@
 \newcommand{\stardocnumber}    {11.4}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith}
 \newcommand{\stardocdate}      {4th July 2006}
-\newcommand{\stardoctitle}     {ARY\\[2.5ex]
+\newcommand{\stardoctitle}     {ARY\\[\latex{2.5ex}]
                                 A Subroutine Library for Accessing\\
                                 ARRAY Data Structures}
 \newcommand{\stardocversion}   {Version 1.2}
@@ -79,9 +79,9 @@ structures built using the Hierarchical Data System (HDS).
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -116,7 +116,6 @@ structures built using the Hierarchical Data System (HDS).
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -132,6 +131,8 @@ structures built using the Hierarchical Data System (HDS).
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\html}[1]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
@@ -163,6 +164,7 @@ structures built using the Hierarchical Data System (HDS).
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 
@@ -222,7 +224,8 @@ structures built using the Hierarchical Data System (HDS).
 \newlength{\sstexampleswidth}
 
 %  Define a \tt font of the required size.
-\newfont{\ssttt}{cmtt10 scaled 1095}
+\latex{\newfont{\ssttt}{cmtt10 scaled1095}}
+\html{\newcommand{\ssttt}{\tt}}
 
 %  Define a command to produce a routine header, including its name,
 %  a purpose description and the rest of the routine's documentation.
@@ -333,7 +336,7 @@ structures built using the Hierarchical Data System (HDS).
    \newcommand{\ssttt}{\tt}
 
 %  \sstroutine.
-   \renewcommand{\sstroutine}[3]{
+   \newcommand{\sstroutine}[3]{
       \subsection{#1\xlabel{#1}-\label{#1}#2}
       \begin{description}
          #3
@@ -341,28 +344,28 @@ structures built using the Hierarchical Data System (HDS).
    }
 
 %  \sstdescription
-   \renewcommand{\sstdescription}[1]{\item[Description:]
+   \newcommand{\sstdescription}[1]{\item[Description:]
       \begin{description}
          #1
       \end{description}
    }
 
 %  \sstusage
-   \renewcommand{\sstusage}[1]{\item[Usage:]
+   \newcommand{\sstusage}[1]{\item[Usage:]
       \begin{description}
          {\ssttt #1}
       \end{description}
    }
 
 %  \sstinvocation
-   \renewcommand{\sstinvocation}[1]{\item[Invocation:]
+   \newcommand{\sstinvocation}[1]{\item[Invocation:]
       \begin{description}
          {\ssttt #1}
       \end{description}
    }
 
 %  \sstarguments
-   \renewcommand{\sstarguments}[1]{
+   \newcommand{\sstarguments}[1]{
       \item[Arguments:]
       \begin{description}
          #1
@@ -370,7 +373,7 @@ structures built using the Hierarchical Data System (HDS).
    }
 
 %  \sstreturnedvalue
-   \renewcommand{\sstreturnedvalue}[1]{
+   \newcommand{\sstreturnedvalue}[1]{
       \item[Returned Value:]
       \begin{description}
          #1
@@ -378,7 +381,7 @@ structures built using the Hierarchical Data System (HDS).
    }
 
 %  \sstparameters
-   \renewcommand{\sstparameters}[1]{
+   \newcommand{\sstparameters}[1]{
       \item[Parameters:]
       \begin{description}
          #1
@@ -386,7 +389,7 @@ structures built using the Hierarchical Data System (HDS).
    }
 
 %  \sstexamples
-   \renewcommand{\sstexamples}[1]{
+   \newcommand{\sstexamples}[1]{
       \item[Examples:]
       \begin{description}
          #1
@@ -394,27 +397,27 @@ structures built using the Hierarchical Data System (HDS).
    }
 
 %  \sstsubsection
-   \renewcommand{\sstsubsection}[1]{\item[{#1}]}
+   \newcommand{\sstsubsection}[1]{\item[{#1}]}
 
 %  \sstexamplesubsection
-   \renewcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
 
 %  \sstnotes
-   \renewcommand{\sstnotes}[1]{\item[Notes:]
+   \newcommand{\sstnotes}[1]{\item[Notes:]
       \begin{description}
          #1
       \end{description}
    }
 
 %  \sstdiytopic
-   \renewcommand{\sstdiytopic}[2]{\item[{#1}]
+   \newcommand{\sstdiytopic}[2]{\item[{#1}]
       \begin{description}
          #2
       \end{description}
    }
 
 %  \sstimplementationstatus
-   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
+   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
       \begin{description}
          #1
       \end{description}
