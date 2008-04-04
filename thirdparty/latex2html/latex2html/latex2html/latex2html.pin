@@ -10083,7 +10083,7 @@ sub find_unique { # clean
         $imagedata = <IMG1>;
         close(IMG1);
     } else {
-        print "\nError: Cannot read '$image1': $!\n"
+        print "\nWarning: Cannot read '$image1': $!\n"
 	    unless ($image1 =~ /^\s*$HTTP_start/i);
         return $image1;
     }
