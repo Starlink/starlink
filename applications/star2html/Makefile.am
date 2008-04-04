@@ -74,7 +74,7 @@ star2html: Makefile $(srcdir)/star2html.in
 	chmod +x star2html.tmp
 	mv star2html.tmp star2html
 
-CLEANFILES = latex2html star2html xlabel
+CLEANFILES = latex2html star2html xlabel l2h_source.tar
 
 dist_starnews_DATA = star2html.news
 
