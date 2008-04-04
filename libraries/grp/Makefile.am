@@ -15,7 +15,7 @@ libgrp_adam_la_SOURCES = \
         $(PUBLIC_INCLUDES) \
 	$(include_MESSAGES) \
         $(BASIC_C_ROUTINES) \
-        $(BASIC_F_ROUTINES) $(ADAM_F_ROUTINES) $(BLOCKDATA)
+        $(BASIC_F_ROUTINES) $(ADAM_F_ROUTINES) $(ADAM_C_ROUTINES) $(BLOCKDATA)
 
 include_HEADERS = $(PUBLIC_F_INCLUDES)
 cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
@@ -58,6 +58,9 @@ STANDALONE_F_ROUTINES =
 
 #  Additional Fortran routines required for the ADAM library.
 ADAM_F_ROUTINES = grp_group.f grp_list.f grp1_gtfil.f
+
+#  Additional C routines required for the ADAM library.
+ADAM_C_ROUTINES = grp_adam.c
 
 #  List of Fortran BLOCK DATA routines.
 BLOCKDATA = grp1_init.f

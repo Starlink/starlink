@@ -64,8 +64,6 @@
 *     6-NOV-2007 (TIMJ):
 *        Fix compiler error from confusion of C GRP__NOID with Fortran
 *        GRP__NOID.
-*     4-APR-2008 (DSB):
-*        Add grpList.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -103,7 +101,7 @@
 
 /* Prototypes for local static functions */
 /* ===================================== */
-static int grpSlot( int, int * );
+int grpSlot( int, int * );
 
 
 /* Wrapper function implementations. */
@@ -113,7 +111,7 @@ static int grpSlot( int, int * );
    group. The elements in this array correspond to the common arrays 
    used to store group information within the fortran implementation 
    (see GRP_COM). */
-static Grp *Grp_Pointers[ GRP__MAXG ];
+Grp *Grp_Pointers[ GRP__MAXG ];
 
 /* A flag indicating if the Grp_Pointers array has been initialised. */
 static int Grp_Init = 0;
@@ -200,7 +198,7 @@ F77_INTEGER_TYPE grpC2F( const Grp *grp, int *status ){
 /* ------------------------------------------------------------------- */
 F77_SUBROUTINE(grp1_id2sl)( INTEGER(IGRP), INTEGER(SLOT) );
 
-static int grpSlot( int igrp, int *status ){
+int grpSlot( int igrp, int *status ){
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(SLOT);
    int ret;
@@ -623,51 +621,5 @@ void grpSetcs( Grp *grp, int sensit, int *status ){
 }
 
 
-
-F77_SUBROUTINE(grp_list)( CHARACTER(PARAM), 
-                          INTEGER(INDXLO), 
-                          INTEGER(INDXHI), 
-                          CHARACTER(COMNT), 
-                          INTEGER(IGRP), 
-                          INTEGER(STATUS)
-                          TRAIL(PARAM)
-                          TRAIL(COMMNT) );
-
-void grpList( const char *param, int indxlo, int indxhi, const char *comnt, 
-              Grp *grp, int *status ){
-   DECLARE_CHARACTER_DYN(PARAM);
-   DECLARE_INTEGER(INDXLO);
-   DECLARE_INTEGER(INDXHI);
-   DECLARE_CHARACTER_DYN(COMNT);
-   DECLARE_INTEGER(IGRP);
-   DECLARE_INTEGER(STATUS);
-
-   F77_CREATE_CHARACTER( PARAM, strlen( param ) );
-   F77_EXPORT_CHARACTER( param, PARAM, PARAM_length );
-
-   F77_EXPORT_INTEGER( indxlo, INDXLO );
-   F77_EXPORT_INTEGER( indxhi, INDXHI );
-
-   F77_CREATE_CHARACTER( COMNT, comnt ? strlen( comnt ) : 1 );
-   F77_EXPORT_CHARACTER( comnt ? comnt : " ", COMNT, COMNT_length );
-
-   IGRP = grpC2F( grp, status );
-
-   F77_EXPORT_INTEGER( *status, STATUS );
-
-   F77_CALL(grp_list)( CHARACTER_ARG(PARAM),
-                       INTEGER_ARG(&INDXLO),
-                       INTEGER_ARG(&INDXHI),
-                       CHARACTER_ARG(COMNT),
-                       INTEGER_ARG(&IGRP),
-                       INTEGER_ARG(&STATUS) 
-                       TRAIL_ARG(PARAM) 
-                       TRAIL_ARG(COMNT) );
-
-   F77_FREE_CHARACTER( PARAM );
-   F77_FREE_CHARACTER( COMNT );
-
-   F77_IMPORT_INTEGER( STATUS, *status );
-}
 
 
