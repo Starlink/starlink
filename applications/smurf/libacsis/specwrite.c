@@ -44,7 +44,7 @@
    0 - disabled
    1 - standard debug 
    2 - verbose debug
- */
+*/
 #define SPW_DEBUG_LEVEL 0
 
 /* Largest file name allowed (including path) */
@@ -96,7 +96,7 @@ typedef struct specData {
                                else 0. Can be used to indicate when all spectra received
                                or if overwriting a spectrum. */
   unsigned char * fullSlots; /* Array of size nseq indicating when all spectra received for slot (1) or not (0)
-			      Related to count() */
+                                Related to count() */
   unsigned int firstFreeSlot;  /* position in fillSeq where first 0 appears */
 } specData;
 
@@ -122,8 +122,8 @@ typedef struct subSystem {
   unsigned int cursize; /* Number of sequence steps available */
   unsigned int curseq;  /* current RTS sequence number */
   unsigned int curpos;  /* current index position in the cube (water mark level) (1-based)
-			   0 indicates that nothing has been stored.
-			   Alternatively can think of this as the next slot position */
+                           0 indicates that nothing has been stored.
+                           Alternatively can think of this as the next slot position */
   unsigned int nchans;  /* number of spectral channels in this subsystem */
   int          inseq;   /* We are in a sequence */
   unsigned int seqlen;  /* Expected length of this sequence */
@@ -144,20 +144,20 @@ unsigned int COUNTER = 0;    /* Number of spectra sent since Open */
 
 /* internal prototypes */
 static char * getFileName( const char * dir, unsigned int yyyymmdd, unsigned int subsys,
-			   unsigned int obsnum, unsigned int subscan, int * status );
+                           unsigned int obsnum, unsigned int subscan, int * status );
 static char * getOkFileName( const char * dir, unsigned int yyyymmdd,
-			   unsigned int obsnum, int * status );
+                             unsigned int obsnum, int * status );
 static char * getDirName( const char * dir, unsigned int yyyymmdd, 
-			   unsigned int obsnum, int * status );
+                          unsigned int obsnum, int * status );
 static char * getFileRoot( unsigned int yyyymmdd, unsigned int subsys,
-			   unsigned int obsnum, unsigned int subscan, int * status );
+                           unsigned int obsnum, unsigned int subscan, int * status );
 
 static char * createSubScanDir( const char * dir, unsigned int yyyymmdd, unsigned int obsnum,
-				int *status);
+                                int *status);
 
 static void
 openNDF( const obsData * obsinfo, const subSystem * template, subSystem * file,
-	 unsigned int nseq, int * status );
+         unsigned int nseq, int * status );
 
 static void
 closeNDF( subSystem * subsys, int * status );
@@ -169,27 +169,27 @@ static void
 createACSISExtensions( const obsData * obsinfo, subSystem * subsys, unsigned int size, int * status );
 
 static void resizeExtensions( subSystem * subsys, unsigned int newsize, int remap, 
-			      int * status );
+                              int * status );
 static void resizeACSISExtensions( subSystem * subsys, unsigned int newsize, int remap, 
-			      int * status );
+                                   int * status );
 static void closeExtensions( subSystem * subsys, int * status );
 static void closeACSISExtensions( subSystem * subsys, int * status );
 
 static void mapThisExtension( HDSLoc * loc, size_t ndim, unsigned int oldtsize, unsigned int newtsize,
-		       const char type[], void ** mapped, int * status );
+                              const char type[], void ** mapped, int * status );
 
 static void resizeThisExtension ( HDSLoc * loc, size_t ndim, unsigned int newtsize,
-				  int ismapped, unsigned int * oldtsize, int * status );
+                                  int ismapped, unsigned int * oldtsize, int * status );
 
 static void writeRecord( void * basepntr[], unsigned int tindex,
-			 const JCMTState * record,
-			 int * status );
+                         const JCMTState * record,
+                         int * status );
 static void writeRecepPos( const obsData * obsinfo, double * posdata, unsigned int tindex,
-			   const ACSISSpecHdr * record, int * status );
+                           const ACSISSpecHdr * record, int * status );
 static void writeTSysTRx( const obsData * obsinfo, float * tsysdata, float * trxdata,
-			  unsigned int frame, const ACSISSpecHdr * record, int * status );
+                          unsigned int frame, const ACSISSpecHdr * record, int * status );
 static unsigned int calcOffset( unsigned int nchans, unsigned int maxreceps, unsigned int nrecep, 
-				unsigned int tindex, int *status );
+                                unsigned int tindex, int *status );
 
 static void allocHeaders( subSystem *subsys, unsigned int size, int * status );
 
@@ -197,34 +197,34 @@ static void
 resizeResources( const obsData * obsinfo, subSystem * subsys, unsigned int newsize, int * status );
 static void
 allocResources( const obsData * obsinfo, subSystem *subsys, unsigned int nseq,
-		int * status );
+                int * status );
 
 static void freeResources ( obsData * obsinfo, subSystem * subsys, int * status);
 static void allocPosData( const obsData *obsinfo, subSystem *subsys, unsigned int nseq, int * status );
 static void allocTsysTrxData( const obsData * obsinfo, subSystem * subsys, unsigned int nseq, 
-			   int * status );
+                              int * status );
 static void
 flushResources( const obsData * obsinfo, subSystem * subsys, int * status );
 
 static void copyCache( const obsData * obsinfo, const subSystem * input,
-		       subSystem * output, unsigned int nseq, int * status);
+                       subSystem * output, unsigned int nseq, int * status);
 
 static size_t sizeofHDSType( const char * type, int * status );
 
 static void myRealloc( void **pntr, size_t nbytes, int * status );
 
 static int hasAllSpectra( const obsData * obsinfo, const subSystem * subsys,
-			  int * status );
+                          int * status );
 static int hasAllSpectraCareful( const obsData * obsinfo, const subSystem * subsys,
-			  int * status );
+                                 int * status );
 static int hasSeqSpectra( const obsData * obsinfo, subSystem * subsys,
-			  unsigned int tindex, int * status );
+                          unsigned int tindex, int * status );
 
 void writeFlagFile (const obsData * obsinfo, const subSystem subsystems[],
-		    int * status);
+                    int * status);
 
 void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
-		      const AstFitsChan * fits[], int badfits[], char errbuff[], int * status);
+                      const AstFitsChan * fits[], int badfits[], char errbuff[], int * status);
 
 AstFrameSet *specWcs( const AstFrameSet *fs, const char veldef[], int ntime, const double times[], int * status );
 
@@ -249,10 +249,10 @@ static int acs_kpgPtfts( int indf, const AstFitsChan * fchan, int * status );
 /* Macro to time an event */
 #if SPW_DEBUG_LEVEL > 0
 #define TIMEME(label,func) { struct timeval tp1; struct timeval tp2; double tpdiff; \
-    gettimeofday( &tp1, NULL ); \
-    func;			\
-    gettimeofday( &tp2, NULL ); \
-    tpdiff = duration( &tp1, &tp2 ); \
+    gettimeofday( &tp1, NULL );                                         \
+    func;                                                               \
+    gettimeofday( &tp2, NULL );                                         \
+    tpdiff = duration( &tp1, &tp2 );                                    \
     if (tpdiff > LONGTIME) printf( ">>>>>>>>>>>>>>>>>" label " took %.3f seconds <<<<<<<<<<<<<<<\n", tpdiff); \
   }
 #else
@@ -261,10 +261,10 @@ static int acs_kpgPtfts( int indf, const AstFitsChan * fchan, int * status );
 
 /* Macro to check subsys range */
 #define CHECKSUBSYS( sub, st ) if ( st == SAI__OK && sub > (MAXSUBSYS -1 )) { \
-				      *st = SAI__ERROR; \
-				      emsSetu( "SB", sub ); \
-				      emsSetu( "MX", (MAXSUBSYS-1) ); \
-				      emsRep( " ", "Subsystem out of range. ^SB > ^MX", st ); }
+    *st = SAI__ERROR;                                                   \
+    emsSetu( "SB", sub );                                               \
+    emsSetu( "MX", (MAXSUBSYS-1) );                                     \
+    emsRep( " ", "Subsystem out of range. ^SB > ^MX", st ); }
 
 /* Number of dimensions in output NDF */
 #define NDIMS 3
@@ -318,60 +318,60 @@ static double maxbytes = 536870912;
    associated with MAXBYTES above. Therefore limit the number of 
    sequence steps we can actual get.
    Peak rate is 10 MB/s which would be maxseq of 
-          MAXBYTES / (4 * 8192 * MAXRECEP) = 1024 sequences
+   MAXBYTES / (4 * 8192 * MAXRECEP) = 1024 sequences
    whereas min rate gives
-          MAXBYTES / (4 *    1 * 1       ) = 134 million sequences
+   MAXBYTES / (4 *    1 * 1       ) = 134 million sequences
    or more feasibly
-          MAXBYTES / (4 * 1024 * 1       ) = 130,000 sequences
- */
+   MAXBYTES / (4 * 1024 * 1       ) = 130,000 sequences
+*/
 /*#define MAXSEQ ( ( 512 * 1024 * 1024 ) / ( 4 * 1024 * 1 ) )*/
 static double maxsequence = 131072;
 
 /*
-*+
-*  Name:
-*     acsSpecWriterVersion
+ *+
+ *  Name:
+ *     acsSpecWriterVersion
 
-*  Purpose:
-*     Retrieve the library version number
+ *  Purpose:
+ *     Retrieve the library version number
 
-*  Language:
-*     Starlink ANSI C
+ *  Language:
+ *     Starlink ANSI C
 
-*  Description:
-*     Return the library version number as an integer in the form major*1e6 + minor*1e3 + release.
-*     Can be used to trap behavioural changes in the library (especially when switching between
-*     versions of the ACSIS acquisition software whilst leaving the specwriter library in place).
+ *  Description:
+ *     Return the library version number as an integer in the form major*1e6 + minor*1e3 + release.
+ *     Can be used to trap behavioural changes in the library (especially when switching between
+ *     versions of the ACSIS acquisition software whilst leaving the specwriter library in place).
 
-*  Arguments:
-*     None
+ *  Arguments:
+ *     None
 
-*  Returned Value:
-*     acsSpecWriterVersion = int
-*        The version number as an integer.
+ *  Returned Value:
+ *     acsSpecWriterVersion = int
+ *        The version number as an integer.
 
-*  Copyright:
-*     Copyright (C) 2007 Particle Physics and Astronomy Research Council.
-*     All Rights Reserved.
+ *  Copyright:
+ *     Copyright (C) 2007 Particle Physics and Astronomy Research Council.
+ *     All Rights Reserved.
 
-*  Licence:
-*     This program is free software; you can redistribute it and/or
-*     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
-*     the License, or (at your option) any later version.
-*
-*     This program is distributed in the hope that it will be
-*     useful, but WITHOUT ANY WARRANTY; without even the implied
-*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
-*
-*     You should have received a copy of the GNU General Public
-*     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of
+ *     the License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied
+ *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *     PURPOSE. See the GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public
+ *     License along with this program; if not, write to the Free
+ *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ *     MA 02111-1307, USA
 
-*-
-*/
+ *-
+ */
 
 int
 acsSpecWriterVersion() {
@@ -379,114 +379,114 @@ acsSpecWriterVersion() {
 }
 
 /*
-*+
-*  Name:
-*     acsSpecOpenTS
+ *+
+ *  Name:
+ *     acsSpecOpenTS
 
-*  Purpose:
-*     Prepare the file writing system for a new observation
+ *  Purpose:
+ *     Prepare the file writing system for a new observation
 
-*  Invocation:
-*     acsSpecOpenTS( const char * dir, unsigned int yyyymmdd, 
-*                    unsigned int obsnum, unsigned int nrecep,
-*                    unsigned int nsubsys, const char *recepnames[],
-*                    const char * focal_station,
-*                    const float fplanex[], const float fplaney[], const char * ocsconfig,
-*                    int * status );
+ *  Invocation:
+ *     acsSpecOpenTS( const char * dir, unsigned int yyyymmdd, 
+ *                    unsigned int obsnum, unsigned int nrecep,
+ *                    unsigned int nsubsys, const char *recepnames[],
+ *                    const char * focal_station,
+ *                    const float fplanex[], const float fplaney[], const char * ocsconfig,
+ *                    int * status );
 
-*  Language:
-*     Starlink ANSI C
+ *  Language:
+ *     Starlink ANSI C
 
-*  Description:
-*     This function must be used to prepare the data writing system.
-*     It must be called before calling acsSpecWriteTS. The subscan
-*     directory will be created.
+ *  Description:
+ *     This function must be used to prepare the data writing system.
+ *     It must be called before calling acsSpecWriteTS. The subscan
+ *     directory will be created.
 
-*  Arguments:
-*     dir = const char * (Given)
-*        Directory to write the file.
-*     yyyymmdd = unsigned int (Given)
-*        UT date in YYYYMMDD format. Used to construct the file name.
-*     obsnum = unsigned int (Given)
-*        Current observation number. Used to construct the file name.
-*        There is no check to make sure that the observation number is new.
-*     nrecep = unsigned int (Given)
-*        Number of receptors participating in this observation.
-*     nsubsys = unsigned int (Given)
-*        Number of subsystems present in this observation.
-*     recepnames[] = const char*[] (Given)
-*        Names of each receptor in feed order.
-*     focal_station = const char* (Given)
-*        Focal station for the instrument. [DIRECT, NASMYTH_L, NASMYTH_R]
-*     fplanex[] = const float[] (Given)
-*        X offsets of each receptor in the focal plane (arcsec).
-*     fplaney[] = const float[] (Given)
-*        Y offsets of each receptor in the focal plane (arcsec).
-*     ocsconfig = const char* (Given)
-*        OCS Configuration XML
-*     status = int * (Given & Returned)
-*        Inherited status.
+ *  Arguments:
+ *     dir = const char * (Given)
+ *        Directory to write the file.
+ *     yyyymmdd = unsigned int (Given)
+ *        UT date in YYYYMMDD format. Used to construct the file name.
+ *     obsnum = unsigned int (Given)
+ *        Current observation number. Used to construct the file name.
+ *        There is no check to make sure that the observation number is new.
+ *     nrecep = unsigned int (Given)
+ *        Number of receptors participating in this observation.
+ *     nsubsys = unsigned int (Given)
+ *        Number of subsystems present in this observation.
+ *     recepnames[] = const char*[] (Given)
+ *        Names of each receptor in feed order.
+ *     focal_station = const char* (Given)
+ *        Focal station for the instrument. [DIRECT, NASMYTH_L, NASMYTH_R]
+ *     fplanex[] = const float[] (Given)
+ *        X offsets of each receptor in the focal plane (arcsec).
+ *     fplaney[] = const float[] (Given)
+ *        Y offsets of each receptor in the focal plane (arcsec).
+ *     ocsconfig = const char* (Given)
+ *        OCS Configuration XML
+ *     status = int * (Given & Returned)
+ *        Inherited status.
 
-*  Authors:
-*     TIMJ: Tim Jenness (JAC, Hawaii)
+ *  Authors:
+ *     TIMJ: Tim Jenness (JAC, Hawaii)
 
-*  History:
-*     27-FEB-2006 (TIMJ):
-*        Original version.
-*     05-APR-2006 (TIMJ):
-*        Use structured globals
-*     21-APR-2006 (TIMJ):
-*        Defer resource allocation until the first spectrum arrives.
-*     26-JUL-2006 (TIMJ):
-*        Add FPLANE arguments.
-*     09-MAY-2007 (TIMJ):
-*        Add ocsconfig
+ *  History:
+ *     27-FEB-2006 (TIMJ):
+ *        Original version.
+ *     05-APR-2006 (TIMJ):
+ *        Use structured globals
+ *     21-APR-2006 (TIMJ):
+ *        Defer resource allocation until the first spectrum arrives.
+ *     26-JUL-2006 (TIMJ):
+ *        Add FPLANE arguments.
+ *     09-MAY-2007 (TIMJ):
+ *        Add ocsconfig
 
-*  Notes:
-*     - Currently only one observation can be active at any time
-*       (some global variables are used internally for state)
-*     - It is an error for this routine to be called if an observation
-*       is in progress. Please call acsSpecCloseTS() before calling
-*       acsSpecOpenTS().
-*     - The files created by this routine conform to the ICD (OCS/ICD/022)
+ *  Notes:
+ *     - Currently only one observation can be active at any time
+ *       (some global variables are used internally for state)
+ *     - It is an error for this routine to be called if an observation
+ *       is in progress. Please call acsSpecCloseTS() before calling
+ *       acsSpecOpenTS().
+ *     - The files created by this routine conform to the ICD (OCS/ICD/022)
 
-*  Copyright:
-*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2007 Science and Technology Facilities Council.
-*     All Rights Reserved.
+ *  Copyright:
+ *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+ *     Copyright (C) 2007 Science and Technology Facilities Council.
+ *     All Rights Reserved.
 
-*  Licence:
-*     This program is free software; you can redistribute it and/or
-*     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
-*     the License, or (at your option) any later version.
-*
-*     This program is distributed in the hope that it will be
-*     useful, but WITHOUT ANY WARRANTY; without even the implied
-*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
-*
-*     You should have received a copy of the GNU General Public
-*     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of
+ *     the License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied
+ *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *     PURPOSE. See the GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public
+ *     License along with this program; if not, write to the Free
+ *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ *     MA 02111-1307, USA
 
-*  Global Variables:
-*     OBSINFO
-*     SUBSYS
-*     hdsRecords         (readonly)
-*     JCMT_COMP_NUM        (readonly)
+ *  Global Variables:
+ *     OBSINFO
+ *     SUBSYS
+ *     hdsRecords         (readonly)
+ *     JCMT_COMP_NUM        (readonly)
 
-*-
-*/
+ *-
+ */
 
 void
 acsSpecOpenTS( const char * dir, unsigned int yyyymmdd, unsigned int obsnum,
-	       unsigned int nrecep, unsigned int nsubsys, 
-	       const char *recepnames[],
-	       const char * focal_station,
-	       const float fplanex[], const float fplaney[], const char *ocsconfig,
-	       int * status ) {
+               unsigned int nrecep, unsigned int nsubsys, 
+               const char *recepnames[],
+               const char * focal_station,
+               const float fplanex[], const float fplaney[], const char *ocsconfig,
+               int * status ) {
 
   char * cpos = NULL;          /* offset into string */
   unsigned int i;              /* Loop counter */
@@ -505,13 +505,13 @@ acsSpecOpenTS( const char * dir, unsigned int yyyymmdd, unsigned int obsnum,
     emsSetu("NIN", nsubsys);
     emsSetu("MAX", maxsubsys);
     emsRep("HDS_SPEC_OPENTS_ERR0",
-	   "acsSpecOpenTS: number of subsystems supplied (^NIN) exceeds expected maximum of ^MAX", status);
+           "acsSpecOpenTS: number of subsystems supplied (^NIN) exceeds expected maximum of ^MAX", status);
     return;
   }
   if (nsubsys == 0) {
     *status = SAI__ERROR;
     emsRep("HDS_SPEC_OPENTS_ERR0x",
-	   "acsSpecOpenTS: number of subsystems must be greater than 0", status );
+           "acsSpecOpenTS: number of subsystems must be greater than 0", status );
     return;
   }
 
@@ -519,7 +519,7 @@ acsSpecOpenTS( const char * dir, unsigned int yyyymmdd, unsigned int obsnum,
   if (INPROGRESS != 0) {
     *status = SAI__ERROR;
     emsRep("HDS_SPEC_OPENTS_ERR1",
-	   "acsSpecOpenTS called, yet an observation is already in progress", status);
+           "acsSpecOpenTS called, yet an observation is already in progress", status);
     return;
   }
 
@@ -567,8 +567,8 @@ acsSpecOpenTS( const char * dir, unsigned int yyyymmdd, unsigned int obsnum,
     receplen = 0;
     if (recepnames != NULL) {
       for (i=0; i < nrecep; i++) {
-	len = strlen( recepnames[i] );
-	if (receplen < len ) receplen = len;
+        len = strlen( recepnames[i] );
+        if (receplen < len ) receplen = len;
       }
     }
 
@@ -578,11 +578,11 @@ acsSpecOpenTS( const char * dir, unsigned int yyyymmdd, unsigned int obsnum,
 
       /* copy characters into buffer */
       if (recep_name_buff != NULL) {
-	cpos = recep_name_buff;
-	for (i=0; i<nrecep; i++) {
-	  cnfExprt( recepnames[i], cpos, receplen);
-	  cpos += receplen;
-	}
+        cpos = recep_name_buff;
+        for (i=0; i<nrecep; i++) {
+          cnfExprt( recepnames[i], cpos, receplen);
+          cpos += receplen;
+        }
       }
     }
 
@@ -635,97 +635,97 @@ acsSpecOpenTS( const char * dir, unsigned int yyyymmdd, unsigned int obsnum,
 }
 
 /*
-*+
-*  Name:
-*     acsSpecWriteTS
+ *+
+ *  Name:
+ *     acsSpecWriteTS
 
-*  Purpose:
-*     Write a spectrum to an HDS time-series file.
+ *  Purpose:
+ *     Write a spectrum to an HDS time-series file.
 
-*  Invocation:
-*     result = acsSpecWriteTS( unsigned int subsys, unsigned int nchans, 
-*                     const float spectrum[], const JCMTState * record, 
-*                     const ACSISSpecHdr * spechdr, int * status);
+ *  Invocation:
+ *     result = acsSpecWriteTS( unsigned int subsys, unsigned int nchans, 
+ *                     const float spectrum[], const JCMTState * record, 
+ *                     const ACSISSpecHdr * spechdr, int * status);
 
-*  Language:
-*     Starlink ANSI C
+ *  Language:
+ *     Starlink ANSI C
 
-*  Description:
-*     This function must be used to write a spectrum to an HDS container
-*     that had previously been opened using acsSpecOpen.
+ *  Description:
+ *     This function must be used to write a spectrum to an HDS container
+ *     that had previously been opened using acsSpecOpen.
 
-*  Arguments:
-*     subsys = unsigned int (Given)
-*        Subsystem used for this spectrum (start counting at 1).
-*     nchans = unsigned int (Given)
-*        Number of channels in the spectrum. The number of channels
-*        must be identical for all spectra supplied for the identical
-*        subsystem.
-*     spectrum = float[nchan] (Given)
-*        Spectrum itself.
-*     record = const JCMTState * (Given)
-*        JCMT state information associated with this spectrum
-*     spechdr = const ACSISSpecHdr * (Given)
-*        ACSIS spectrum-specific information.
-*     status = int * (Given & Returned)
-*        Inherited status.
+ *  Arguments:
+ *     subsys = unsigned int (Given)
+ *        Subsystem used for this spectrum (start counting at 1).
+ *     nchans = unsigned int (Given)
+ *        Number of channels in the spectrum. The number of channels
+ *        must be identical for all spectra supplied for the identical
+ *        subsystem.
+ *     spectrum = float[nchan] (Given)
+ *        Spectrum itself.
+ *     record = const JCMTState * (Given)
+ *        JCMT state information associated with this spectrum
+ *     spechdr = const ACSISSpecHdr * (Given)
+ *        ACSIS spectrum-specific information.
+ *     status = int * (Given & Returned)
+ *        Inherited status.
 
-*  Authors:
-*     TIMJ: Tim Jenness (JAC, Hawaii)
+ *  Authors:
+ *     TIMJ: Tim Jenness (JAC, Hawaii)
 
-*  Returned Value:
-*     acsSpecWriteTS = int
-*        Returns 1 if the spectrum was accepted as a science
-*        spectrum. Returns -1 if the spectrum was processed as
-*        a calibration. Value is undefined if bad status is returned.
+ *  Returned Value:
+ *     acsSpecWriteTS = int
+ *        Returns 1 if the spectrum was accepted as a science
+ *        spectrum. Returns -1 if the spectrum was processed as
+ *        a calibration. Value is undefined if bad status is returned.
 
-*  History:
-*     27-FEB-2006 (TIMJ):
-*        Original version.
-*     05-APR-2006 (TIMJ):
-*        Use structured globals
-*     21-APR-2006 (TIMJ):
-*        Dynamically allocate memory based on first spectrum arriving.
-*     09-MAY-2006 (TIMJ):
-*        Keep track of all spectra arriving so we can determine
-*        when all spectra for a sequence have arrived.
-*     11-MAY-2006 (TIMJ):
-*        Remove Freq argument.
-*     09-OCT-2006 (TIMJ):
-*        Do need chop information
-*     04-JAN-2006 (TIMJ):
-*        Use generic SCUBA-2 JCMTSTATE interface
+ *  History:
+ *     27-FEB-2006 (TIMJ):
+ *        Original version.
+ *     05-APR-2006 (TIMJ):
+ *        Use structured globals
+ *     21-APR-2006 (TIMJ):
+ *        Dynamically allocate memory based on first spectrum arriving.
+ *     09-MAY-2006 (TIMJ):
+ *        Keep track of all spectra arriving so we can determine
+ *        when all spectra for a sequence have arrived.
+ *     11-MAY-2006 (TIMJ):
+ *        Remove Freq argument.
+ *     09-OCT-2006 (TIMJ):
+ *        Do need chop information
+ *     04-JAN-2006 (TIMJ):
+ *        Use generic SCUBA-2 JCMTSTATE interface
 
-*  Notes:
-*     - Must have previously called acsSpecOpenTS.
+ *  Notes:
+ *     - Must have previously called acsSpecOpenTS.
 
-*  Copyright:
-*     Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
-*     All Rights Reserved.
+ *  Copyright:
+ *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
+ *     All Rights Reserved.
 
-*  Licence:
-*     This program is free software; you can redistribute it and/or
-*     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
-*     the License, or (at your option) any later version.
-*
-*     This program is distributed in the hope that it will be
-*     useful, but WITHOUT ANY WARRANTY; without even the implied
-*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
-*
-*     You should have received a copy of the GNU General Public
-*     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of
+ *     the License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied
+ *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *     PURPOSE. See the GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public
+ *     License along with this program; if not, write to the Free
+ *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ *     MA 02111-1307, USA
 
-*-
-*/
+ *-
+ */
 
 int
 acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectrum[], 
-		const JCMTState * record, const ACSISSpecHdr * spechdr,
-	        int * status ) {
+                const JCMTState * record, const ACSISSpecHdr * spechdr,
+                int * status ) {
 
   float * data; /* local copy of mapped pointer to spectrum */
   unsigned int offset;         /* offset into data array */
@@ -759,7 +759,7 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
   if (!INPROGRESS) {
     *status = SAI__ERROR;
     emsRep("HDS_SPEC_WRITETS_ERR1",
-	   "acsSpecWriteTS called, yet an observation has not been initialised", status);
+           "acsSpecWriteTS called, yet an observation has not been initialised", status);
     return 0;
   }
 
@@ -779,7 +779,7 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
   if (OBSINFO.nsubsys == 0) {
     *status = SAI__ERROR;
     emsRep(" ","acsSpecWriteTS: Number of subsystems is zero. This can not happen. Has acsSpecOpenTS been called?",
-          status);
+           status);
     return 0;
   }
   if (subsysnum > OBSINFO.nsubsys) {
@@ -787,7 +787,7 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
     emsSetu( "IN", subsysnum );
     emsSetu( "MAX", OBSINFO.nsubsys );
     emsRep( " ", "acsSpecWriteTS: Supplied subsystem number (^IN) exceeds number supplied to "
-	    "acsSpecOpenTS (^MAX)", status);
+            "acsSpecOpenTS (^MAX)", status);
     return 0;
   }
 
@@ -797,16 +797,16 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
     emsSetu( "NR", OBSINFO.nrecep - 1 );
     emsSetu( "FEED", spechdr->acs_feed );
     emsRep( " ", "acsSpecWriteTS called, yet the feed number (^FEED) exceeds the expected number (^NR)",
-	    status );
+            status );
   }
 
   /* check that we are SPECTRUM_RESULT or SOURCE. In the future this
      will trigger the use of a CALDATA extension for calibrations but
      that is not yet implemented. */
   if ( (strncmp( record->acs_source_ro, "SPECTRUM_RESULT", JCMT__SZACS_SOURCE_RO )
-	!= 0) &&
+        != 0) &&
        (strncmp( record->acs_source_ro, "SOURCE", JCMT__SZACS_SOURCE_RO )
-	!= 0) ) {
+        != 0) ) {
     printf("Can not accept source of '%s'\n", record->acs_source_ro );
     return -1;
   }
@@ -853,12 +853,12 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
     subsys->tdata.bad = starMalloc( nperseq * SIZEOF_FLOAT );
     if (subsys->tdata.bad == NULL) {
       if (*status == SAI__OK) {
-	*status = SAI__ERROR;
-	emsRep(" ","Unable to allocate memory for bad value cache", status );
+        *status = SAI__ERROR;
+        emsRep(" ","Unable to allocate memory for bad value cache", status );
       }
     } else {
       for (i=0; i<nperseq; i++) {
-	(subsys->tdata.bad)[i] = VAL__BADR;
+        (subsys->tdata.bad)[i] = VAL__BADR;
       }
     }
 
@@ -866,8 +866,8 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
     subsys->tdata.count = starMalloc( OBSINFO.nrecep * subsys->maxsize * sizeof(unsigned char) );
     if (subsys->tdata.count == NULL) {
       if (*status == SAI__OK) {
-	*status = SAI__ERROR;
-	emsRep(" ","Unable to allocate memory for count array", status );
+        *status = SAI__ERROR;
+        emsRep(" ","Unable to allocate memory for count array", status );
       }
     } else {
       memset( subsys->tdata.count, 0, OBSINFO.nrecep * subsys->maxsize * sizeof(unsigned char) );
@@ -877,8 +877,8 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
     subsys->tdata.fullSlots = starMalloc( subsys->maxsize * sizeof(unsigned char) );
     if (subsys->tdata.fullSlots == NULL) {
       if (*status == SAI__OK) {
-	*status = SAI__ERROR;
-	emsRep(" ","Unable to allocate memory for fullSlots array", status );
+        *status = SAI__ERROR;
+        emsRep(" ","Unable to allocate memory for fullSlots array", status );
       }
     } else {
       memset( subsys->tdata.fullSlots, 0, subsys->maxsize * sizeof(unsigned char) );
@@ -893,7 +893,7 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
     emsSetu( "REF", subsys->nchans );
     emsSetu( "SS", subsysnum );
     emsRep( " ", "acsSpecWriteTS: Number of channels in subsystem ^SS has changed "
-	    "from ^REF to ^IN", status );
+            "from ^REF to ^IN", status );
     return 0;
   }
 
@@ -901,7 +901,7 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
   if (!subsys->alloced) {
 #if SPW_DEBUG_LEVEL > 0
     printf("+++++++ Need to allocate resources on entry to WriteTS for subsystem %d\n",
-	   (subsysnum));
+           (subsysnum));
 #endif
     allocResources( &OBSINFO, subsys, subsys->maxsize, status );
   }
@@ -927,7 +927,7 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
     rtsseqs = (subsys->tdata.jcmtstate)[RTS_NUM];
 
     if ((state.rts_num == subsys->curseq) &&
-	(state.rts_num == rtsseqs[subsys->curpos-1])) {
+        (state.rts_num == rtsseqs[subsys->curpos-1])) {
       /* may as well do the actual for search and stop immediately */
       tindex = subsys->curpos - 1;
 #if SPW_DEBUG_LEVEL > 1      
@@ -936,47 +936,47 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
     } else {
 
       /* search back through the list up to the firstFreeSlot position (we know that
-       before that point all spectra for all sequences have arrived). Be careful to 
-      use i++ since the obvious test and decrementing to firstFreeSlot fails when
-      the index goes negative and is treated as a positive number. */
+         before that point all spectra for all sequences have arrived). Be careful to 
+         use i++ since the obvious test and decrementing to firstFreeSlot fails when
+         the index goes negative and is treated as a positive number. */
       max_behind = subsys->curpos - subsys->tdata.firstFreeSlot;
       startind = subsys->curpos;
       found = 0;
 
       /* sanity check for bad firstFreeSlot */
       if (*status == SAI__OK) {
-	if (max_behind <= startind) {
-	  for (i = 1; i <= max_behind; i++) {
-	    if (state.rts_num == rtsseqs[startind-i]) {
-	      /* found the sequence */
-	      tindex = startind - i;
-	      found = 1;
-	      break;
-	    }
-	  }
-	} else {
-	  *status = SAI__ERROR;
-	  emsSetu("FS", subsys->tdata.firstFreeSlot);
-	  emsSetu("CP", subsys->curpos);
-	  emsRep( " ", "acsSpecWriteTS: Internal integrity failure. First free slot"
-		  " (^FS) is greater than current buffer size (^CP)!", status );
-	}
+        if (max_behind <= startind) {
+          for (i = 1; i <= max_behind; i++) {
+            if (state.rts_num == rtsseqs[startind-i]) {
+              /* found the sequence */
+              tindex = startind - i;
+              found = 1;
+              break;
+            }
+          }
+        } else {
+          *status = SAI__ERROR;
+          emsSetu("FS", subsys->tdata.firstFreeSlot);
+          emsSetu("CP", subsys->curpos);
+          emsRep( " ", "acsSpecWriteTS: Internal integrity failure. First free slot"
+                  " (^FS) is greater than current buffer size (^CP)!", status );
+        }
       }
 
       if (found == 0) {
 #if SPW_DEBUG_LEVEL > 1
-	printf("Did not find sequence %u\n", state.rts_num);
+        printf("Did not find sequence %u\n", state.rts_num);
 #endif
-	/* did not find this sequence number so it is a new one */
-	tindex = subsys->curpos; /* curpos will be incremented */
-	seqinc = 1;
+        /* did not find this sequence number so it is a new one */
+        tindex = subsys->curpos; /* curpos will be incremented */
+        seqinc = 1;
       } else {
-	/* found it earlier in the file */
+        /* found it earlier in the file */
 #if SPW_DEBUG_LEVEL > 1
-	printf("Sequence %u matches index %d. Previous seq num=%u\n", 
-	       state.rts_num, (int)tindex, subsys->curseq);
+        printf("Sequence %u matches index %d. Previous seq num=%u\n", 
+               state.rts_num, (int)tindex, subsys->curseq);
 #endif
-	subsys->curseq = state.rts_num;
+        subsys->curseq = state.rts_num;
 
       }
     }
@@ -1011,7 +1011,7 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
     if (!subsys->inseq) {
 #if SPW_DEBUG_LEVEL > 1
       printf("+++++++++++++++++++++SEQLEN set to %u (start=%u, end=%u)\n",
-	     reqnum, state.rts_num, acshdr.rts_endnum);
+             reqnum, state.rts_num, acshdr.rts_endnum);
 #endif
       subsys->seqlen = reqnum;
       subsys->inseq = 1; /* we are now in a sequence */
@@ -1024,11 +1024,11 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
        set it to one more than the current size (we just need to prevent
        the file from being flushed when empty) but if resizing is required,
        we may as well give a good hint rather than resize each time around.
-     */
+    */
     if ( reqnum > (subsys->maxsize - subsys->curpos) ) {
 #if SPW_DEBUG_LEVEL > 1
       printf("Length of sequence = %u Maxspace = %u Currently=%u\n",
-	      reqnum, subsys->maxsize, subsys->curpos);
+             reqnum, subsys->maxsize, subsys->curpos);
 #endif
       reqnum = subsys->maxsize - subsys->curpos;
     }
@@ -1037,55 +1037,55 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
       /* resize NDF and all data arrays */
 
       /* work out how much to grow:
-	 - use requested size if given and more than 1
-	 - else use NGROW
-	 - make sure we grow by at least subsys->curpos-cursize[subsys]
+         - use requested size if given and more than 1
+         - else use NGROW
+         - make sure we grow by at least subsys->curpos-cursize[subsys]
       */
 
       if (reqnum > 1) {
-	ngrow = reqnum + subsys->curpos - subsys->cursize - 1;
+        ngrow = reqnum + subsys->curpos - subsys->cursize - 1;
       } else {
-	ngrow = NGROW;
+        ngrow = NGROW;
       }
 
       /* if this will put us over the limit, close the NDF and reopen a new
-	 one */
+         one */
       if ( (subsys->cursize + ngrow ) > subsys->maxsize ) {
 
-	/* this will clear cursize but we need to make sure that it reflects the
-	   actual number of elements written so far, not the position we were
-	   going to write to.*/
-	subsys->curpos--;
+        /* this will clear cursize but we need to make sure that it reflects the
+           actual number of elements written so far, not the position we were
+           going to write to.*/
+        subsys->curpos--;
 
-	/* flush what we have to disk */
+        /* flush what we have to disk */
 #if SPW_DEBUG_LEVEL > 1
-	printf("--------flush after unexpected grow\n");
+        printf("--------flush after unexpected grow\n");
 #endif
-	flushResources( &OBSINFO, subsys, status );
+        flushResources( &OBSINFO, subsys, status );
 
-	/* always want to make sure we allocate the max amount of memory */
-	ngrow = subsys->maxsize;
+        /* always want to make sure we allocate the max amount of memory */
+        ngrow = subsys->maxsize;
 
 #if SPW_DEBUG_LEVEL > 1
-	printf("------- alloc after unexpected grow\n");
+        printf("------- alloc after unexpected grow\n");
 #endif
-	allocResources( &OBSINFO, subsys, ngrow, status );
+        allocResources( &OBSINFO, subsys, ngrow, status );
 
-	/* indicate that we are starting at the beginning with the next spectrum */
-	tindex = 0;
+        /* indicate that we are starting at the beginning with the next spectrum */
+        tindex = 0;
 
-	/* current position must be 1 now since we still have to write the
-	   spectrum, so force it to that.
-	    - allocResources does not set this, but flushResources resets to 0 */
-	subsys->curpos = 1;
+        /* current position must be 1 now since we still have to write the
+           spectrum, so force it to that.
+           - allocResources does not set this, but flushResources resets to 0 */
+        subsys->curpos = 1;
 
       } else {
 #if SPW_DEBUG_LEVEL > 0
-	printf("Cursize: %u Curpos: %u ngrow: %u maxsize: %u ; Need to resize.\n",
-	       subsys->cursize, subsys->curpos, ngrow, subsys->maxsize); 
+        printf("Cursize: %u Curpos: %u ngrow: %u maxsize: %u ; Need to resize.\n",
+               subsys->cursize, subsys->curpos, ngrow, subsys->maxsize); 
 #endif
-	/* Resize the NDF */
-	resizeResources( &OBSINFO, subsys, ngrow, status );
+        /* Resize the NDF */
+        resizeResources( &OBSINFO, subsys, ngrow, status );
       }
     }
   }
@@ -1096,13 +1096,13 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
 #if SPW_DEBUG_LEVEL > 0
     if (seqinc) {
       printf(">>> About to write first spectrum at position %u for sequence %u (feed=%d)\n", tindex,
-	     subsys->curseq, acshdr.acs_feed);
+             subsys->curseq, acshdr.acs_feed);
     }
 #endif
     /* Calculate offset into array - number of spectra into the array times number of
        channels per spectrum. */
     offset = calcOffset( subsys->nchans, OBSINFO.nrecep,
-			 acshdr.acs_feed, tindex, status );
+                         acshdr.acs_feed, tindex, status );
 
     /* Get local copies of pointers */
     data = (subsys->tdata.spectra);
@@ -1122,21 +1122,21 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
     /* check to make sure this slot is free */
     if ( (subsys->tdata.count)[coff] != 0) {
       if (*status == SAI__OK) {
-	*status = SAI__ERROR;
-	emsSetu("CURSEQ", subsys->curseq );
-	emsSetu("PREVSEQ", last_seqnum);
-	emsSetu("FEED", acshdr.acs_feed );
-	emsSetu("T", tindex);
-	if ( (subsys->tdata.count)[coff] == 1 ) {
-	  emsRep(" ", "acsSpecWriteTS: Error. Overwriting a slot that already contains a spectrum"
-		 " (current sequence number = ^CURSEQ, previous sequence was ^PREVSEQ,"
-		 " feed number = ^FEED)", status );
-	} else {
-	  emsSetu("NWRITE", (unsigned int)(subsys->tdata.count)[coff]);
-	  emsRep( " ","acsSpecWriteTS: Error. Bizarrely have already written ^NWRITE"
-		  " spectra to slot ^T (current sequence number = ^CURSEQ, feed = ^FEED)",
-		  status);
-	}
+        *status = SAI__ERROR;
+        emsSetu("CURSEQ", subsys->curseq );
+        emsSetu("PREVSEQ", last_seqnum);
+        emsSetu("FEED", acshdr.acs_feed );
+        emsSetu("T", tindex);
+        if ( (subsys->tdata.count)[coff] == 1 ) {
+          emsRep(" ", "acsSpecWriteTS: Error. Overwriting a slot that already contains a spectrum"
+                 " (current sequence number = ^CURSEQ, previous sequence was ^PREVSEQ,"
+                 " feed number = ^FEED)", status );
+        } else {
+          emsSetu("NWRITE", (unsigned int)(subsys->tdata.count)[coff]);
+          emsRep( " ","acsSpecWriteTS: Error. Bizarrely have already written ^NWRITE"
+                  " spectra to slot ^T (current sequence number = ^CURSEQ, feed = ^FEED)",
+                  status);
+        }
       }
     }
 
@@ -1144,19 +1144,19 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
        if we have not just started a new sequence */
     if ( !seqinc && subsys->curseq != last_seqnum) {
       if (*status == SAI__OK) {
-	*status = SAI__ERROR;
-	emsSetu( "LAST", last_seqnum );
-	emsSetu( "CUR", subsys->curseq);
-	emsSetu( "T", tindex);
-	emsSetu("FEED", acshdr.acs_feed);
-	emsRep(" ","Last time slot ^T was used it had sequence number ^LAST"
-	       " but now it has value ^CUR (current feed ^FEED).", status);
+        *status = SAI__ERROR;
+        emsSetu( "LAST", last_seqnum );
+        emsSetu( "CUR", subsys->curseq);
+        emsSetu( "T", tindex);
+        emsSetu("FEED", acshdr.acs_feed);
+        emsRep(" ","Last time slot ^T was used it had sequence number ^LAST"
+               " but now it has value ^CUR (current feed ^FEED).", status);
       }
     }
 
 #if SPW_DEBUG_LEVEL > 1
     printf(">><<>> Writing spectrum from feed %u to tindex %u curpos %u offset %u\n",
-	   acshdr.acs_feed, tindex, subsys->curpos, offset);
+           acshdr.acs_feed, tindex, subsys->curpos, offset);
 #endif
 
     if (*status == SAI__OK)
@@ -1177,41 +1177,41 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
 
 #if SPW_DEBUG_LEVEL > 0
       printf("<<< Sequence step %u (tindex=%u) completed with this spectrum for feed %u\n",
-	     subsys->curseq, tindex, acshdr.acs_feed);
+             subsys->curseq, tindex, acshdr.acs_feed);
 #endif
       /* We *could* flush to disk at this point if we do not think the next sequence
-	 will fit. This may alleviate network contention if we end up dumping the
-	 file at the start of a sequence. This will only trigger if the current
-	 sequence is complete. We may need to check that the previous few are
-	 also complete if we get them in random order.
+         will fit. This may alleviate network contention if we end up dumping the
+         file at the start of a sequence. This will only trigger if the current
+         sequence is complete. We may need to check that the previous few are
+         also complete if we get them in random order.
       */
       if ( subsys->curseq == acshdr.rts_endnum ) {
 
 #if SPW_DEBUG_LEVEL > 0
-	printf("Sequence ending in %u complete\n", acshdr.rts_endnum);
+        printf("Sequence ending in %u complete\n", acshdr.rts_endnum);
 #endif
 
-	/* Sequence complete so no longer in a sequence */
-	subsys->inseq = 0;
+        /* Sequence complete so no longer in a sequence */
+        subsys->inseq = 0;
 
-	/* are we now complete for all sequences so far? */
-	if (hasAllSpectra( &OBSINFO, subsys, status) ) {
+        /* are we now complete for all sequences so far? */
+        if (hasAllSpectra( &OBSINFO, subsys, status) ) {
 
-	  /* will we have space for the next sequence? */
-	  if ( (subsys->maxsize - subsys->curpos) < subsys->seqlen ) {
-	    /* write what we have pre-emptively even if the next sequence
-	       turns out to be shorter */
+          /* will we have space for the next sequence? */
+          if ( (subsys->maxsize - subsys->curpos) < subsys->seqlen ) {
+            /* write what we have pre-emptively even if the next sequence
+               turns out to be shorter */
 #if SPW_DEBUG_LEVEL > 0
-	    printf("!!!!!!! COMPLETE SEQUENCE & BUFFER TOO FULL TO ACCEPT"
-		   " %u sequence steps <<<<<<<<\n", subsys->seqlen);
+            printf("!!!!!!! COMPLETE SEQUENCE & BUFFER TOO FULL TO ACCEPT"
+                   " %u sequence steps <<<<<<<<\n", subsys->seqlen);
 #endif
-	    flushResources( &OBSINFO, subsys, status );
+            flushResources( &OBSINFO, subsys, status );
 
-	    /* Do not call allocResources() since we might not get
-	       another spectrum */
+            /* Do not call allocResources() since we might not get
+               another spectrum */
 
-	  }
-	}
+          }
+        }
       }
     }
 
@@ -1227,11 +1227,11 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
     */
     if (*status == SAI__OK && seqinc) {
       if (subsys->curpos != 1 && subsys->curpos != (inpos + 1) ) {
-	*status = SAI__ERROR;
-	emsSetu( "IN", inpos);
-	emsSetu( "OUT", subsys->curpos);
-	emsRep(" ", "acsSpecWriteTS: Needed to write new sequence but seemingly overwote:"
-	       " (input position was ^IN, output was ^OUT)", status);
+        *status = SAI__ERROR;
+        emsSetu( "IN", inpos);
+        emsSetu( "OUT", subsys->curpos);
+        emsRep(" ", "acsSpecWriteTS: Needed to write new sequence but seemingly overwote:"
+               " (input position was ^IN, output was ^OUT)", status);
       }
     }
 
@@ -1244,73 +1244,73 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
 }
 
 /*
-*+
-*  Name:
-*     acsSpecCloseTS
+ *+
+ *  Name:
+ *     acsSpecCloseTS
 
-*  Purpose:
-*     Write FITS header and close HDS file.
+ *  Purpose:
+ *     Write FITS header and close HDS file.
 
-*  Invocation:
-*     acsSpecCloseTS( const AstFitsChan * fits[], int incArchiveBounds, int *status );
+ *  Invocation:
+ *     acsSpecCloseTS( const AstFitsChan * fits[], int incArchiveBounds, int *status );
 
-*  Language:
-*     Starlink ANSI C
+ *  Language:
+ *     Starlink ANSI C
 
-*  Description:
-*     This function must be used to close the file after all spectra have been
-*     written. The FITS header is written.
+ *  Description:
+ *     This function must be used to close the file after all spectra have been
+ *     written. The FITS header is written.
 
-*  Arguments:
-*     fits[] = const AstFitsChan * (Given)
-*        Array of FITS headers. One per subsystem.
-*     incArchiveBounds = int (Given)
-*        If true, bounds FITS keywords will be calculated.
-*     status = int * (Given & Returned)
-*        Inherited status.
+ *  Arguments:
+ *     fits[] = const AstFitsChan * (Given)
+ *        Array of FITS headers. One per subsystem.
+ *     incArchiveBounds = int (Given)
+ *        If true, bounds FITS keywords will be calculated.
+ *     status = int * (Given & Returned)
+ *        Inherited status.
 
-*  Authors:
-*     TIMJ: Tim Jenness (JAC, Hawaii)
+ *  Authors:
+ *     TIMJ: Tim Jenness (JAC, Hawaii)
 
-*  History:
-*     27-FEB-2006 (TIMJ):
-*        Original version.
-*     20-APR-2006 (TIMJ):
-*        Use structured globals.
-*     09-MAY-2006 (TIMJ):
-*        Attempt to run even if status is bad on entry.
-*     11-MAY-2006 (TIMJ):
-*        Add flag for adding archive bounds to FITS header.
+ *  History:
+ *     27-FEB-2006 (TIMJ):
+ *        Original version.
+ *     20-APR-2006 (TIMJ):
+ *        Use structured globals.
+ *     09-MAY-2006 (TIMJ):
+ *        Attempt to run even if status is bad on entry.
+ *     11-MAY-2006 (TIMJ):
+ *        Add flag for adding archive bounds to FITS header.
 
-*  Notes:
-*     - Must have previously called acsSpecOpenTS.
-*     - File is resized to the actual number of spectra written.
-*     - If status is bad on entry this routine will attempt to execute
-*       so that spectra will be written rather than deleted from internal
-*       memory.
+ *  Notes:
+ *     - Must have previously called acsSpecOpenTS.
+ *     - File is resized to the actual number of spectra written.
+ *     - If status is bad on entry this routine will attempt to execute
+ *       so that spectra will be written rather than deleted from internal
+ *       memory.
 
-*  Copyright:
-*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
-*     All Rights Reserved.
+ *  Copyright:
+ *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+ *     All Rights Reserved.
 
-*  Licence:
-*     This program is free software; you can redistribute it and/or
-*     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
-*     the License, or (at your option) any later version.
-*
-*     This program is distributed in the hope that it will be
-*     useful, but WITHOUT ANY WARRANTY; without even the implied
-*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
-*
-*     You should have received a copy of the GNU General Public
-*     License along with this program; if not, write to the Free
-*     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-*     MA 02111-1307, USA
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of
+ *     the License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied
+ *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *     PURPOSE. See the GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public
+ *     License along with this program; if not, write to the Free
+ *     Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+ *     MA 02111-1307, USA
 
-*-
-*/
+ *-
+ */
 
 void
 acsSpecCloseTS( const AstFitsChan * fits[], int incArchiveBounds, int * status ) {
@@ -1336,8 +1336,8 @@ acsSpecCloseTS( const AstFitsChan * fits[], int incArchiveBounds, int * status )
     if (*status == SAI__OK) {
       *status = SAI__ERROR;
       emsRep("HDS_SPEC_CLOSETS_ERR1",
-	     "acsSpecCloseTS called, yet an observation has not been initialised",
-	     status);
+             "acsSpecCloseTS called, yet an observation has not been initialised",
+             status);
     }
     return;
   }
@@ -1388,10 +1388,10 @@ acsSpecCloseTS( const AstFitsChan * fits[], int incArchiveBounds, int * status )
   if (lstat == SAI__OK) {
     for (i = 0; i < OBSINFO.nsubsys; i++) {
       if ( badfits[i] ) {
-	if (lstat == SAI__OK) lstat = SAI__ERROR;
-	emsRep( " ", errbuff, &lstat ); /* internal AST message */
-	emsSetu( "SUB", i);
-	emsRep( " ", "FITS header for subsystem ^SUB contained incorrect WCS.", &lstat);
+        if (lstat == SAI__OK) lstat = SAI__ERROR;
+        emsRep( " ", errbuff, &lstat ); /* internal AST message */
+        emsSetu( "SUB", i);
+        emsRep( " ", "FITS header for subsystem ^SUB contained incorrect WCS.", &lstat);
       }
     }
   }
@@ -1429,10 +1429,10 @@ acsSpecCloseTS( const AstFitsChan * fits[], int incArchiveBounds, int * status )
 
 /* Form the file name
    - returns a pointer to static memory.
- */
+*/
 
 static char * getFileName( const char * dir, unsigned int yyyymmdd, unsigned int subsys,
-			   unsigned int obsnum, unsigned int subscan, int * status ) {
+                           unsigned int obsnum, unsigned int subscan, int * status ) {
 
   static char filename[MAXFILE]; /* buffer for filename - will be returned */
   int flen;                        /* Length of string */
@@ -1452,7 +1452,7 @@ static char * getFileName( const char * dir, unsigned int yyyymmdd, unsigned int
     emsSetu("UT", yyyymmdd );
     emsSetu("SS", subscan );
     emsRep("HDS_SPEC_OPEN_ERR1",
-	   "Error forming filename. Exceeded buffer size of ^SZ chars for scan ^N subscan ^SS on UT ^UT", status );
+           "Error forming filename. Exceeded buffer size of ^SZ chars for scan ^N subscan ^SS on UT ^UT", status );
     return NULL;
   }
 
@@ -1461,10 +1461,10 @@ static char * getFileName( const char * dir, unsigned int yyyymmdd, unsigned int
 
 /* Form the OK file name
    - returns a pointer to static memory.
- */
+*/
 
 static char * getOkFileName( const char * dir, unsigned int yyyymmdd,
-			     unsigned int obsnum, int * status ) {
+                             unsigned int obsnum, int * status ) {
 
   static char filename[MAXFILE]; /* buffer for filename - will be returned */
   int flen;                        /* Length of string */
@@ -1483,7 +1483,7 @@ static char * getOkFileName( const char * dir, unsigned int yyyymmdd,
     emsSetu("N", obsnum );
     emsSetu("UT", yyyymmdd );
     emsRep("HDS_SPEC_OPEN_ERR1",
-	   "Error forming Ok filename. Exceeded buffer size of ^SZ chars for scan ^N on UT ^UT", status );
+           "Error forming Ok filename. Exceeded buffer size of ^SZ chars for scan ^N on UT ^UT", status );
     return NULL;
   }
 
@@ -1493,10 +1493,10 @@ static char * getOkFileName( const char * dir, unsigned int yyyymmdd,
 /* Get the root of the name. No directory and no suffix.
    If subscan is zero, the subscan is not included (useful for building directory name).
    Returns static memory.
- */
+*/
 
 static char * getFileRoot( unsigned int yyyymmdd, unsigned int subsys,
-			   unsigned int obsnum, unsigned int subscan, int * status ) {
+                           unsigned int obsnum, unsigned int subscan, int * status ) {
 
   static char btype;             /* character for backend */
   static char rootname[MAXFILE]; /* buffer for filename - will be returned */
@@ -1527,7 +1527,7 @@ static char * getFileRoot( unsigned int yyyymmdd, unsigned int subsys,
     emsSetu("N", obsnum );
     emsSetu("UT", yyyymmdd );
     emsRep("HDS_SPEC_OPEN_ERR1",
-	   "Error forming filename. Exceeded buffer size of ^SZ chars for scan ^N on UT ^UT", status );
+           "Error forming filename. Exceeded buffer size of ^SZ chars for scan ^N on UT ^UT", status );
     return NULL;
   }
 
@@ -1539,10 +1539,10 @@ static char * getFileRoot( unsigned int yyyymmdd, unsigned int subsys,
    constructing the directory name.
    - if "dir" is NULL or zero length  no directory is prefixed
    - returns a pointer to static memory.
- */
+*/
 
 static char * getDirName( const char * dir, unsigned int yyyymmdd,
-			  unsigned int obsnum, int * status ) {
+                          unsigned int obsnum, int * status ) {
 
   static char dirname[MAXFILE]; /* buffer for dirname - will be returned */
   int flen;                        /* Length of string */
@@ -1564,7 +1564,7 @@ static char * getDirName( const char * dir, unsigned int yyyymmdd,
     emsSetu("N", obsnum );
     emsSetu("UT", yyyymmdd );
     emsRep("HDS_SPEC_OPEN_ERR1",
-	   "Error forming directory name. Exceeded buffer size of ^SZ chars for scan ^N on UT ^UT", status );
+           "Error forming directory name. Exceeded buffer size of ^SZ chars for scan ^N on UT ^UT", status );
     return NULL;
   }
 
@@ -1578,7 +1578,7 @@ static char * getDirName( const char * dir, unsigned int yyyymmdd,
 
 static char *
 createSubScanDir( const char * rootdir, unsigned int yyyymmdd, unsigned int obsnum,
-		  int * status ) {
+                  int * status ) {
 
   char * dir;
   int st;      /* mkdir status */
@@ -1597,11 +1597,11 @@ createSubScanDir( const char * rootdir, unsigned int yyyymmdd, unsigned int obsn
     if (st == -1) {
       /* already existing is okay (for now) */
       if (errno != EEXIST) {
-	*status = SAI__ERROR;
-	emsSyser( "MESSAGE", errno );
-	emsSetc( "DIR", rootdir );
-	emsRep( " ",
-		"Error opening subscan directory '^DIR' : ^MESSAGE", status );
+        *status = SAI__ERROR;
+        emsSyser( "MESSAGE", errno );
+        emsSetc( "DIR", rootdir );
+        emsRep( " ",
+                "Error opening subscan directory '^DIR' : ^MESSAGE", status );
       }
     }
   }
@@ -1616,17 +1616,17 @@ createSubScanDir( const char * rootdir, unsigned int yyyymmdd, unsigned int obsn
 
 /* Open an NDF file for that subsystem
    - note that we pass in a subsystem struct for the template
-     and populate a subsystem struct corresponding to the file on disk
-     The "file" struct should have been initialised since subscan number
-     is extracted from it. "template" can be the same struct as "file"
-     so you can still use a file as memory cache.
+   and populate a subsystem struct corresponding to the file on disk
+   The "file" struct should have been initialised since subscan number
+   is extracted from it. "template" can be the same struct as "file"
+   so you can still use a file as memory cache.
    - The template is simply used to work out how big the output file should
-     be.
+   be.
 */
 
 static void
 openNDF( const obsData * obsinfo, const subSystem * template, subSystem * file,
-	 unsigned int nseq, int * status ) {
+         unsigned int nseq, int * status ) {
 
   void *datapntrs[] = { NULL };/* Array of mapped pointers for ndfMap */
   int itemp;                   /* Temp integer */
@@ -1657,7 +1657,7 @@ openNDF( const obsData * obsinfo, const subSystem * template, subSystem * file,
 #endif
   /* Name the NDF component */
   ndfname = getFileName(obsinfo->datadir, obsinfo->yyyymmdd, template->index, obsinfo->obsnum,
-			file->file.subscan, status);
+                        file->file.subscan, status);
 
   /* Calculate bounds */
   ngrow = (nseq > 0 ? nseq : NGROW );
@@ -1695,7 +1695,7 @@ openNDF( const obsData * obsinfo, const subSystem * template, subSystem * file,
   ndfHcre( file->file.indf, status );
 #ifndef PACKAGE_UPCASE
   ndfHput("NORMAL",APPNAME, 1, 1, history,
-	  0, 0, 0, file->file.indf, status );
+          0, 0, 0, file->file.indf, status );
 #endif
 
   /* Map the data array */
@@ -1796,20 +1796,20 @@ createExtensions( subSystem * subsys, unsigned int size, int * status ) {
     if ( hdsRecords[j].instrument & INST__ACSIS ) {
 
       datNew( subsys->file.extloc, hdsRecords[j].name, hdsRecords[j].type,
-	      ndim, dim, status );
+              ndim, dim, status );
 
       datFind( subsys->file.extloc, hdsRecords[j].name, &((subsys->file.extlocators)[pos]), status );
 
       datMap( (subsys->file.extlocators)[pos], hdsRecords[j].type, "WRITE",
-	      ndim, dim, &((subsys->tdata.jcmtstate)[pos]), status );
+              ndim, dim, &((subsys->tdata.jcmtstate)[pos]), status );
 
       /* if this is a string component then we can fill it with
-	 blanks. Other components will not be initialised but they
-	 will always be filled later on. */
+         blanks. Other components will not be initialised but they
+         will always be filled later on. */
       if (strncmp( "_CHAR", hdsRecords[j].type, 5) == 0) {
-	size_t len;
-	datLen( (subsys->file.extlocators)[pos], &len, status );
-	if (*status == SAI__OK) memset( (subsys->tdata.jcmtstate)[pos], ' ', dim[0] * len );
+        size_t len;
+        datLen( (subsys->file.extlocators)[pos], &len, status );
+        if (*status == SAI__OK) memset( (subsys->tdata.jcmtstate)[pos], ' ', dim[0] * len );
       }
     }
     if ( *status != SAI__OK ) break;
@@ -1830,7 +1830,7 @@ createExtensions( subSystem * subsys, unsigned int size, int * status ) {
 
 static void
 resizeExtensions( subSystem * subsys, unsigned int newsize, 
-		  int remap, int * status ) {
+                  int remap, int * status ) {
 
   int pos;
   int j;
@@ -1865,19 +1865,19 @@ resizeExtensions( subSystem * subsys, unsigned int newsize,
       /* see if component is required for this instrument or not */
       if ( hdsRecords[j].instrument & INST__ACSIS ) {
 
-	/* remap - assume this should be done after resizing all */
-	datMap( (subsys->file.extlocators)[pos], hdsRecords[j].type, "WRITE",
-		ndim, dim, &((subsys->tdata.jcmtstate)[pos]), status );
-	if ( *status != SAI__OK ) break;
+        /* remap - assume this should be done after resizing all */
+        datMap( (subsys->file.extlocators)[pos], hdsRecords[j].type, "WRITE",
+                ndim, dim, &((subsys->tdata.jcmtstate)[pos]), status );
+        if ( *status != SAI__OK ) break;
 
-	/* if this is a string component then we can fill it with
-	   blanks. Other components will not be initialised but they
-	   will always be filled later on. */
-	if (strncmp( "_CHAR", hdsRecords[j].type, 5) == 0) {
-	  size_t len;
-	  datLen( (subsys->file.extlocators)[pos], &len, status );
-	  memset( (subsys->tdata.jcmtstate)[pos], ' ', dim[0] * len );
-	}
+        /* if this is a string component then we can fill it with
+           blanks. Other components will not be initialised but they
+           will always be filled later on. */
+        if (strncmp( "_CHAR", hdsRecords[j].type, 5) == 0) {
+          size_t len;
+          datLen( (subsys->file.extlocators)[pos], &len, status );
+          memset( (subsys->tdata.jcmtstate)[pos], ' ', dim[0] * len );
+        }
       }
 
     }
@@ -1926,16 +1926,16 @@ static void closeExtensions( subSystem * subsys, int * status ) {
 /* Write ACSISRtsState to file */
 
 static void writeRecord( void * basepntr[], unsigned int frame,
-			 const JCMTState * record,
-			 int * status ) {
+                         const JCMTState * record,
+                         int * status ) {
   /* Can not think of anything clever to do */
   if ( *status != SAI__OK ) return;
 
   /* Use a macro to make the code a bit more readable */
-#define STORE_STATE( state, index, type ) \
+#define STORE_STATE( state, index, type )                               \
   if (basepntr[index]) ((type *)basepntr[index])[frame] = record->state
 
-#define STORE_CHAR( state, index, len ) \
+#define STORE_CHAR( state, index, len )                                 \
   if (basepntr[index]) cnfExprt( record->state, (char *)basepntr[index]+len*frame, len );
 
 
@@ -2014,7 +2014,7 @@ static void writeRecord( void * basepntr[], unsigned int frame,
 
 static void
 createACSISExtensions( const obsData * obsinfo, subSystem * subsys, unsigned int size,
-		       int * status ) {
+                       int * status ) {
   char type[DAT__SZTYP+1];   /* constructed type string */
   HDSLoc * temploc = NULL;
   hdsdim dim[3];
@@ -2033,10 +2033,10 @@ createACSISExtensions( const obsData * obsinfo, subSystem * subsys, unsigned int
 
   /* Need to create the following components:
      - RECEPTORS  _CHAR* array for each of the nrecep elements and their names. This fixed
-       once written.
+     once written.
      - RECEPPOS   _DOUBLE (2 * nrecep * size)   x and y positions 
-       (in tracking coordinates) for each
-       receptor. This array grows in the same way as JCMTSTATE.
+     (in tracking coordinates) for each
+     receptor. This array grows in the same way as JCMTSTATE.
      - TSYS       _REAL (nrecep * size) Grows as JCMTSTATE grows.
      - TRX        _REAL (nrecep * size) Grows as JCMTSTATE grows.
   */
@@ -2054,7 +2054,7 @@ createACSISExtensions( const obsData * obsinfo, subSystem * subsys, unsigned int
   /* Create the FOCAL_STATION component and store it */
   if (obsinfo->nrecep > 0 && strlen(obsinfo->focal_station) > 0 ) {
     datNew0C( (subsys->file.acsisloc), "FOCAL_STATION", strlen(obsinfo->focal_station),
-	      status);
+              status);
     datFind( (subsys->file.acsisloc), "FOCAL_STATION", &temploc, status );
     datPut0C( temploc, obsinfo->focal_station, status);
     datAnnul( &temploc, status );
@@ -2081,7 +2081,7 @@ createACSISExtensions( const obsData * obsinfo, subSystem * subsys, unsigned int
   datNew( subsys->file.acsisloc, "RECEPPOS", "_DOUBLE", 3, dim, status );
   datFind( subsys->file.acsisloc, "RECEPPOS", &(subsys->file.receppos_loc), status );
   mapThisExtension( subsys->file.receppos_loc, 3, 0, size, "_DOUBLE",
-		    &tpntr, status);
+                    &tpntr, status);
   subsys->tdata.receppos = tpntr;
   tpntr = NULL;
 
@@ -2094,7 +2094,7 @@ createACSISExtensions( const obsData * obsinfo, subSystem * subsys, unsigned int
   datNew( subsys->file.acsisloc, "TSYS", "_REAL", 2, dim, status );
   datFind( subsys->file.acsisloc, "TSYS", &(subsys->file.tsys_loc), status);
   mapThisExtension( subsys->file.tsys_loc, 2, 0, size, "_REAL",
-		    &tpntr, status );
+                    &tpntr, status );
   subsys->tdata.tsys = tpntr;
   tpntr = NULL;
 
@@ -2102,7 +2102,7 @@ createACSISExtensions( const obsData * obsinfo, subSystem * subsys, unsigned int
   datNew( subsys->file.acsisloc, "TRX", "_REAL", 2, dim, status );
   datFind( subsys->file.acsisloc, "TRX", &(subsys->file.trx_loc), status);
   mapThisExtension( subsys->file.trx_loc, 2, 0, size, "_REAL",
-		    &tpntr, status );
+                    &tpntr, status );
   subsys->tdata.trx = tpntr;
 
   if (*status != SAI__OK) {
@@ -2128,7 +2128,7 @@ createACSISExtensions( const obsData * obsinfo, subSystem * subsys, unsigned int
 
 static void
 resizeACSISExtensions( subSystem * subsys, unsigned int newsize, 
-		       int remap, int * status ) {
+                       int remap, int * status ) {
 
   unsigned int old_rpos_size;
   unsigned int old_tsys_size;
@@ -2139,15 +2139,15 @@ resizeACSISExtensions( subSystem * subsys, unsigned int newsize,
 
   /* RECEPPOS */
   resizeThisExtension( subsys->file.receppos_loc, 3, newsize,
-		       subsys->file.acsismapped, &old_rpos_size, status );
+                       subsys->file.acsismapped, &old_rpos_size, status );
 
   /* TSYS */
   resizeThisExtension( subsys->file.tsys_loc, 2, newsize,
-		       subsys->file.acsismapped, &old_tsys_size, status );
+                       subsys->file.acsismapped, &old_tsys_size, status );
 
   /* TRX */
   resizeThisExtension( subsys->file.trx_loc, 2, newsize,
-		       subsys->file.acsismapped, &old_trx_size, status );
+                       subsys->file.acsismapped, &old_trx_size, status );
 
 
   /* update mapped status */
@@ -2157,15 +2157,15 @@ resizeACSISExtensions( subSystem * subsys, unsigned int newsize,
   if (remap && *status == SAI__OK) {
     /* in principal old_rpos_size should equal old_tsys_size */
     mapThisExtension( subsys->file.receppos_loc, 3, old_rpos_size, newsize, "_DOUBLE",
-		      &tpntr, status );
+                      &tpntr, status );
     subsys->tdata.receppos = tpntr;
     tpntr = NULL;
     mapThisExtension( subsys->file.tsys_loc, 2, old_tsys_size, newsize, "_REAL",
-		      &tpntr, status );
+                      &tpntr, status );
     subsys->tdata.tsys = tpntr;
     tpntr = NULL;
     mapThisExtension( subsys->file.trx_loc, 2, old_trx_size, newsize, "_REAL",
-		      &tpntr, status );
+                      &tpntr, status );
     subsys->tdata.trx = tpntr;
     subsys->file.acsismapped = ( *status == SAI__OK ? 1 : 0 );
   }
@@ -2178,7 +2178,7 @@ resizeACSISExtensions( subSystem * subsys, unsigned int newsize,
 /* resize the extension - unmapping first if necessary */
 
 static void resizeThisExtension ( HDSLoc * loc, size_t ndim, unsigned int newtsize,
-				  int ismapped, unsigned int * oldtsize, int * status ) {
+                                  int ismapped, unsigned int * oldtsize, int * status ) {
 
   hdsdim dim[DAT__MXDIM];
   int actdim;
@@ -2212,7 +2212,7 @@ static void resizeThisExtension ( HDSLoc * loc, size_t ndim, unsigned int newtsi
 /* Map the extension but also fills with bad values */
 
 static void mapThisExtension( HDSLoc * loc, size_t ndim, unsigned int oldtsize, unsigned int newtsize,
-		       const char type[], void ** mapped, int * status ) {
+                              const char type[], void ** mapped, int * status ) {
 
   hdsdim dim[DAT__MXDIM];
   int actdim;
@@ -2248,7 +2248,7 @@ static void mapThisExtension( HDSLoc * loc, size_t ndim, unsigned int oldtsize, 
       *status = SAI__ERROR;
       emsSetu( "ND",  ndim);
       emsRep( " ", "Extension mapping routine can only handle 2 and 3 dimensions not ^ND - internal programming error. ",
-	      status );
+              status );
     }
   }
 
@@ -2261,18 +2261,18 @@ static void mapThisExtension( HDSLoc * loc, size_t ndim, unsigned int oldtsize, 
 
       /* need to switch on type */
       if ( strcmp( type, "_DOUBLE") == 0 ) {
-	for (j=0; j < nelems; j++) {
-	  ((double *)*mapped)[start+j] = VAL__BADD;
-	}
+        for (j=0; j < nelems; j++) {
+          ((double *)*mapped)[start+j] = VAL__BADD;
+        }
       } else if ( strcmp( type, "_REAL" ) == 0 ) {
-	for (j=0; j < nelems; j++) {
-	  ((float *)*mapped)[start+j] = VAL__BADR;
-	}
+        for (j=0; j < nelems; j++) {
+          ((float *)*mapped)[start+j] = VAL__BADR;
+        }
       } else {
-	*status = SAI__ERROR;
-	emsSetc( "TYP", type );
-	emsRep(" ", "Unrecognized data type: ^TYP - internal programming error",
-	       status);
+        *status = SAI__ERROR;
+        emsSetc( "TYP", type );
+        emsRep(" ", "Unrecognized data type: ^TYP - internal programming error",
+               status);
       }
     }
 
@@ -2321,7 +2321,7 @@ static void closeACSISExtensions( subSystem * subsys, int * status ) {
 
 /* Write coordinate positions to ACSIS extension */
 static void writeRecepPos( const obsData * obsinfo, double * posdata, unsigned int frame, 
-			   const ACSISSpecHdr * spechdr, int * status ) {
+                           const ACSISSpecHdr * spechdr, int * status ) {
   unsigned int offset;
 
   if (*status != SAI__OK) return;
@@ -2335,15 +2335,15 @@ static void writeRecepPos( const obsData * obsinfo, double * posdata, unsigned i
   } else {
     *status = SAI__ERROR;
     emsRep( " ", "Attempted to write receptor positions but no data array available",
-	    status );
+            status );
   }
 
 }
 
 /* Write Tsys and Trx to ACSIS extension */
 static void writeTSysTRx( const obsData * obsinfo, float * tsys_data,
-			 float * trx_data, unsigned int frame, 
-			 const ACSISSpecHdr * spechdr, int * status ) {
+                          float * trx_data, unsigned int frame, 
+                          const ACSISSpecHdr * spechdr, int * status ) {
   unsigned int offset;
 
   if (*status != SAI__OK) return;
@@ -2358,7 +2358,7 @@ static void writeTSysTRx( const obsData * obsinfo, float * tsys_data,
     if (*status == SAI__OK) {
       *status = SAI__ERROR;
       emsRep( " ", "Attempted to write Tsys/Trx information but no data array available",
-	      status );
+              status );
     }
   }
 
@@ -2384,7 +2384,7 @@ closeNDF( subSystem * subsys, int * status ) {
   if (file->indf == NDF__NOID) {
     *status = SAI__ERROR;
     emsRep("closeNDF", "attempt to close an NDF that is not actually open",
-	   status);
+           status);
     return;
   }
 
@@ -2416,7 +2416,7 @@ closeNDF( subSystem * subsys, int * status ) {
 
 #if SPW_DEBUG_LEVEL > 0
   printf("Wrote %d sequence steps to subsystem %d (max was %d)\n", subsys->curpos, subsys->index,
-	 subsys->cursize);
+         subsys->cursize);
 #endif
 
   /* Force globals to be reset */
@@ -2436,7 +2436,7 @@ closeNDF( subSystem * subsys, int * status ) {
 
 static unsigned int
 calcOffset( unsigned int nchans, unsigned int maxreceps, unsigned int nrecep, unsigned int tindex,
-	    int *status ) {
+            int *status ) {
 
   if (*status != SAI__OK) return 0;
 
@@ -2513,9 +2513,9 @@ resizeResources( const obsData *obsinfo, subSystem * subsys, unsigned int newsiz
   emsSetu("N", subsys->index);
   emsSetu("OBS", obsinfo->obsnum);
   emsRep(" ", "Should never be requested to realloc global buffer by ^SZ sequences"
-	 " (subsys ^N, obs ^OBS)."
-	 " Internal programming error",
-	 status );
+         " (subsys ^N, obs ^OBS)."
+         " Internal programming error",
+         status );
 
 }
 
@@ -2537,8 +2537,8 @@ flushResources( const obsData * obsinfo, subSystem * subsys, int * status ) {
     percent = 100.0 * (double)subsys->curpos / (double)subsys->cursize;
   }
   printf("Flushing with memory cache = %u/%u (%.1f%% capacity) <<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n",
-	 subsys->curpos,
-	 subsys->cursize, percent);
+         subsys->curpos,
+         subsys->cursize, percent);
 #endif /* SPW_DEBUG_LEVEL */
 
   /* if we have no spectra we have nothing to write so do not want
@@ -2585,27 +2585,27 @@ static void freeResources ( obsData * obsinfo, subSystem * subsys, int * status)
     if ( subsys->file.indf == NDF__NOID) {
 
       if ( subsys->tdata.spectra != NULL) {
-	starFree( subsys->tdata.spectra);
-	subsys->tdata.spectra = NULL;
+        starFree( subsys->tdata.spectra);
+        subsys->tdata.spectra = NULL;
       }
       for (i=0; i<JCMT_COMP_NUM; i++) {
-	pos = hdsRecords[i].position;
-	if ((subsys->tdata.jcmtstate)[pos] != NULL) {
-	  starFree( (subsys->tdata.jcmtstate)[pos] );
-	  (subsys->tdata.jcmtstate)[pos] = NULL;
-	}
+        pos = hdsRecords[i].position;
+        if ((subsys->tdata.jcmtstate)[pos] != NULL) {
+          starFree( (subsys->tdata.jcmtstate)[pos] );
+          (subsys->tdata.jcmtstate)[pos] = NULL;
+        }
       }
       if (subsys->tdata.receppos != NULL) {
-	starFree( subsys->tdata.receppos );
-	subsys->tdata.receppos = NULL;
+        starFree( subsys->tdata.receppos );
+        subsys->tdata.receppos = NULL;
       }
       if (subsys->tdata.tsys != NULL) {
-	starFree( subsys->tdata.tsys );
-	subsys->tdata.tsys = NULL;
+        starFree( subsys->tdata.tsys );
+        subsys->tdata.tsys = NULL;
       }
       if (subsys->tdata.trx != NULL) {
-	starFree( subsys->tdata.trx );
-	subsys->tdata.trx = NULL;
+        starFree( subsys->tdata.trx );
+        subsys->tdata.trx = NULL;
       }
 
     }
@@ -2715,7 +2715,7 @@ static void allocPosData( const obsData * obsinfo, subSystem * subsys, unsigned 
 /* Allocate memory for the Tsys and Trx data */
 
 static void allocTsysTrxData( const obsData * obsinfo, subSystem * subsys,
-			      unsigned int nseq, int * status ) {
+                              unsigned int nseq, int * status ) {
   size_t nbytes;
   unsigned int nelems;
   unsigned int i;
@@ -2792,8 +2792,8 @@ static size_t sizeofHDSType( const char * type, int * status ) {
 
 /* Copy from malloced buffers to mapped buffers */
 
- static void copyCache( const obsData * obsinfo, const subSystem * input, subSystem * output, 
-		       unsigned int nseq, int * status) {
+static void copyCache( const obsData * obsinfo, const subSystem * input, subSystem * output, 
+                       unsigned int nseq, int * status) {
   unsigned int i;
 
   if (*status != SAI__OK) return;
@@ -2804,7 +2804,7 @@ static size_t sizeofHDSType( const char * type, int * status ) {
     emsSetu( "IN", input->nchans);
     emsSetu( "OUT", output->nchans);
     emsRep( "copyCache", "Number of channels in input subsystem (^IN) differs from"
-	    " number in output subsystem (^OUT)", status);
+            " number in output subsystem (^OUT)", status);
     return;
   }
 
@@ -2813,7 +2813,7 @@ static size_t sizeofHDSType( const char * type, int * status ) {
     emsSetu( "NSEQ", nseq);
     emsSetu( "MAX", output->maxsize);
     emsRep("copyCache2", "Number of sequence steps to copy (^NSEQ) exceeds available"
-	   " space in output (^MAX)", status);
+           " space in output (^MAX)", status);
     return;
   }
 
@@ -2838,12 +2838,12 @@ static size_t sizeofHDSType( const char * type, int * status ) {
 
 }
 
- /* See whether the "count" array has all slots filled for this time slice.
-    If it does, set the fullSlots flag to 1 and work out the new highest fill mark.
- */
+/* See whether the "count" array has all slots filled for this time slice.
+   If it does, set the fullSlots flag to 1 and work out the new highest fill mark.
+*/
 
 static int hasSeqSpectra( const obsData * obsinfo, subSystem * subsys,
-			  unsigned int tindex, int * status ) {
+                          unsigned int tindex, int * status ) {
 
   unsigned int offset; /* offset into count data array */
   unsigned int i;    /* loop counter */
@@ -2858,8 +2858,8 @@ static int hasSeqSpectra( const obsData * obsinfo, subSystem * subsys,
   if (*status == SAI__OK) {
     for (i=0; i < obsinfo->nrecep; i++) {
       if ( (subsys->tdata.count)[offset+i] == 0 ) {
-	missing = 1;
-	break;
+        missing = 1;
+        break;
       }
     }
   }
@@ -2876,17 +2876,17 @@ static int hasSeqSpectra( const obsData * obsinfo, subSystem * subsys,
     curslot = subsys->tdata.firstFreeSlot;
     for (i = subsys->tdata.firstFreeSlot; i < subsys->cursize; i++) {
       if ( (subsys->tdata.fullSlots)[i] == 0 ) {
-	/* empty slot so update firstFreeSlot and break from loop. This could be
-	   the same empty slot as we had already.*/
-	subsys->tdata.firstFreeSlot = i;
-	found = 1;
+        /* empty slot so update firstFreeSlot and break from loop. This could be
+           the same empty slot as we had already.*/
+        subsys->tdata.firstFreeSlot = i;
+        found = 1;
 #if SPW_DEBUG_LEVEL > 0
-	if (curslot != i)
-	  printf("Update free slot number to %u\n", subsys->tdata.firstFreeSlot);
+        if (curslot != i)
+          printf("Update free slot number to %u\n", subsys->tdata.firstFreeSlot);
 #endif
-	break;
+        break;
       } else {
-	/* full slot so keep looking */
+        /* full slot so keep looking */
       }      
     }
     if (!found) {
@@ -2910,7 +2910,7 @@ static int hasSeqSpectra( const obsData * obsinfo, subSystem * subsys,
 */
 
 static int hasAllSpectra( const obsData * obsinfo, const subSystem * subsys,
-			  int * status ) {
+                          int * status ) {
 
   /* Note that curpos is 1-based and firstFreeSlot is 0-based so we can compare
      directly */
@@ -2928,7 +2928,7 @@ static int hasAllSpectra( const obsData * obsinfo, const subSystem * subsys,
 */
 
 static int hasAllSpectraCareful( const obsData * obsinfo, const subSystem * subsys,
-			  int * status ) {
+                                 int * status ) {
   unsigned int last; /* end position into count data array */
   unsigned int i;    /* loop counter */
   int missing = 0; /* true if we found a missing spectrum */
@@ -2937,12 +2937,12 @@ static int hasAllSpectraCareful( const obsData * obsinfo, const subSystem * subs
 
   /* get last valid offset in array */
   last = calcOffset( 1, obsinfo->nrecep, obsinfo->nrecep - 1, 
-		     subsys->curpos - 1, status );
+                     subsys->curpos - 1, status );
   if (*status == SAI__OK) {
     for (i=0; i < last; i++) {
       if ( (subsys->tdata.count)[i] == 0 ) {
-	missing = 1;
-	break;
+        missing = 1;
+        break;
       }
     }
   }
@@ -2954,7 +2954,7 @@ static int hasAllSpectraCareful( const obsData * obsinfo, const subSystem * subs
 /* Write the OK flag file and content */
 
 void writeFlagFile (const obsData * obsinfo, const subSystem subsystems[],
-		    int * status) {
+                    int * status) {
 
   int fd;                   /* file descriptor of temp ok file */
   FILE * fstream = NULL;    /* Stream associated with temp ok file */
@@ -2975,15 +2975,15 @@ void writeFlagFile (const obsData * obsinfo, const subSystem subsystems[],
 
   flen = snprintf(tmpok, MAXFILE,
 #if HAVE_MKSTEMPS
-		  "%s/tempXXXXXX.ok",
+                  "%s/tempXXXXXX.ok",
 #elif HAVE_MKSTEMP
-		  "%s/tempXXXXXX",
+                  "%s/tempXXXXXX",
 #endif
-		  obsinfo->rootdir );
+                  obsinfo->rootdir );
   if (flen >= MAXFILE && status == SAI__OK) {
     *status = SAI__ERROR;
     emsRep(" ","Error forming temporary 'ok' filename. Exceeded buffer",
-	   status );
+           status );
   }
 
   /* get a temporary file */
@@ -2995,24 +2995,24 @@ void writeFlagFile (const obsData * obsinfo, const subSystem subsystems[],
 #else
     UNABLE TO CREATE A TEMPORARY FILE
 #endif
-    if (fd == -1) {
-      *status = SAI__ERROR;
-      emsSyser( "ERRNO", errno );
-      emsSetc( "DIR", obsinfo->rootdir );
-      emsSetc( "TMP", tmpok );
-      emsRep(" ","acsSpecCloseTS: Failed to open temporary 'ok' file ^TMP in dir ^DIR:"
-	     " ^ERRNO", status );
-    }
+      if (fd == -1) {
+        *status = SAI__ERROR;
+        emsSyser( "ERRNO", errno );
+        emsSetc( "DIR", obsinfo->rootdir );
+        emsSetc( "TMP", tmpok );
+        emsRep(" ","acsSpecCloseTS: Failed to open temporary 'ok' file ^TMP in dir ^DIR:"
+               " ^ERRNO", status );
+      }
   }
 
   /* Force permissions on the temp file so that the pipeline can read it */
   if (*status == SAI__OK) {
     sysstat = fchmod(fd, S_IRUSR|S_IWUSR|S_IRGRP|S_IROTH);
     if (sysstat == -1) {
-	*status = SAI__ERROR;
-	emsSyser( "ERRNO", errno );
-	emsRep(" ","acsSpecCloseTS: Error setting permissions on 'ok' file: ^ERRNO",
-	       status );
+      *status = SAI__ERROR;
+      emsSyser( "ERRNO", errno );
+      emsRep(" ","acsSpecCloseTS: Error setting permissions on 'ok' file: ^ERRNO",
+             status );
     }
   }
 
@@ -3023,7 +3023,7 @@ void writeFlagFile (const obsData * obsinfo, const subSystem subsystems[],
       *status = SAI__ERROR;
       emsSyser( "ERRNO", errno );
       emsRep(" ","acsSpecCloseTS: Failed to open stream on 'ok' file descriptor:"
-	     " ^ERRNO", status);
+             " ^ERRNO", status);
     }
   }
 
@@ -3037,12 +3037,12 @@ void writeFlagFile (const obsData * obsinfo, const subSystem subsystems[],
 
       /* subscans start counting at 1 */
       for (j = 1; j <= subsys->file.subscan ; j++ ) {
-	/* contents of okay file are relative to data dir but should
-	   not include datadir itself */
-	ldir = getDirName( NULL, obsinfo->yyyymmdd, obsinfo->obsnum, status );
-	fname = getFileName( ldir, obsinfo->yyyymmdd, i+1,
-			     obsinfo->obsnum, j, status );
-	fprintf( fstream, "%s\n", fname );
+        /* contents of okay file are relative to data dir but should
+           not include datadir itself */
+        ldir = getDirName( NULL, obsinfo->yyyymmdd, obsinfo->obsnum, status );
+        fname = getFileName( ldir, obsinfo->yyyymmdd, i+1,
+                             obsinfo->obsnum, j, status );
+        fprintf( fstream, "%s\n", fname );
       }
 
     }
@@ -3050,7 +3050,7 @@ void writeFlagFile (const obsData * obsinfo, const subSystem subsystems[],
 
   /* rename temp file to okfile and close temp file */
   okfile = getOkFileName( obsinfo->rootdir, obsinfo->yyyymmdd,
-			  obsinfo->obsnum, status );
+                          obsinfo->obsnum, status );
 
   /* Sanity check - want to make sure that we do not open a file that
      is already there. There could be a race condition between the
@@ -3062,12 +3062,12 @@ void writeFlagFile (const obsData * obsinfo, const subSystem subsystems[],
   if (*status == SAI__OK) {
     sysstat = rename(tmpok, okfile);
     if (sysstat == -1) {
-	*status = SAI__ERROR;
-	emsSyser( "ERRNO", errno );
-	emsSetc( "F", tmpok);
-	emsSetc( "T", okfile );
-	emsRep(" ","acsSpecCloseTS: Error renaming okay file from '^F'"
-	       " to ^T: ^ERRNO", status);
+      *status = SAI__ERROR;
+      emsSyser( "ERRNO", errno );
+      emsSetc( "F", tmpok);
+      emsSetc( "T", okfile );
+      emsRep(" ","acsSpecCloseTS: Error renaming okay file from '^F'"
+             " to ^T: ^ERRNO", status);
     }
   }
   /* close temporary file descriptor and stream (even if bad status) */
@@ -3077,8 +3077,8 @@ void writeFlagFile (const obsData * obsinfo, const subSystem subsystems[],
 }
 
 void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
-		      const AstFitsChan * fits[], int badfits[], 
-		      char errbuff[], int * status) {
+                      const AstFitsChan * fits[], int badfits[], 
+                      char errbuff[], int * status) {
 
   char * fname;             /* file name of a given subscan */
   unsigned int i;           /* Loop counter */
@@ -3121,7 +3121,7 @@ void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
   oldstat = astWatch( status );
 
   /* Start an AST context so we do not need to annul AST pointers explicitly. */
-   astBegin;
+  astBegin;
 
   /* loop over each sub system and open each subscan */
 
@@ -3153,7 +3153,7 @@ void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
       j = 0;
       while ( retainfits[j] != NULL ) {
         /* clearing each time is not very efficient but I don't want
-	   to burn in the ordering */
+           to burn in the ordering */
         astClear( lfits, "Card" );
         if (astFindFits( lfits, retainfits[j], NULL, 0 ) ) {
           astRetainFits( lfits );
@@ -3165,14 +3165,14 @@ void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
       astClear(lfits,"Card");
       wcs = astRead( lfits );
       if (*status != SAI__OK) {
-	/* copy the second (! - since we do not want the linenumber)
-	   AST message from stack into buffer */
-	emsEload( param, &parlen, errbuff, &oplen, status );
-	emsEload( param, &parlen, errbuff, &oplen, status );
-	emsAnnul( status );
-	/* get new copy to write full unmodified header */
-	lfits = astCopy( fits[i] );
-	badfits[i] = 1;
+        /* copy the second (! - since we do not want the linenumber)
+           AST message from stack into buffer */
+        emsEload( param, &parlen, errbuff, &oplen, status );
+        emsEload( param, &parlen, errbuff, &oplen, status );
+        emsAnnul( status );
+        /* get new copy to write full unmodified header */
+        lfits = astCopy( fits[i] );
+        badfits[i] = 1;
       }
     }
 
@@ -3186,12 +3186,12 @@ void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
       astDelFits( lfits );
 
       /* and look for a TEMPSCAL fits header  - which should be undef by default and
-	 so can stay undef if we are uncalibrated. If it is missing do not fill it in. */
+         so can stay undef if we are uncalibrated. If it is missing do not fill it in. */
       if (tempscal) {
-	astClear( lfits, "Card" );
-	if ( astFindFits( lfits, FITS_TEMPSCAL, NULL, 0 ) ) {
-	  astSetFitsS(lfits, FITS_TEMPSCAL, "TA*", "Temperature scale in use", 1);
-	}
+        astClear( lfits, "Card" );
+        if ( astFindFits( lfits, FITS_TEMPSCAL, NULL, 0 ) ) {
+          astSetFitsS(lfits, FITS_TEMPSCAL, "TA*", "Temperature scale in use", 1);
+        }
       }
     } else {
       /* not calibrated */
@@ -3211,7 +3211,7 @@ void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
     if (wcs) {
       skysys = astGetC( wcs, "SYSTEM(1)");
       if (strcmp(skysys, "AZEL") == 0) {
-	strcpy(receppos_sys, "AZEL");
+        strcpy(receppos_sys, "AZEL");
       }
     }
 
@@ -3219,14 +3219,14 @@ void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
     for (j = 1; j <= subsys->file.subscan ; j++ ) {
       /* need full path of file */
       fname = getFileName( obsinfo->datadir, obsinfo->yyyymmdd, i+1,
-			   obsinfo->obsnum, j, status );
+                           obsinfo->obsnum, j, status );
 
       /* open the NDF */
 #if SPW_DEBUG_LEVEL > 0
       printf("Writing file FITS header %s\n", fname );
 #endif
       if (fname != NULL) 
-	ndfOpen( NULL, fname, "UPDATE", "OLD", &indf, &place, status );
+        ndfOpen( NULL, fname, "UPDATE", "OLD", &indf, &place, status );
 
       /* add the SUBSCAN number to the header - forcing one if not present */
       astClear( lfits, "Card" );
@@ -3234,22 +3234,22 @@ void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
       astSetFitsI( lfits, FITS_NSUBSCAN, (int)j, "Sub-scan number", 1);
 
       /* need to add a OBSEND number to the header. True if
-	 this is the last file */
+         this is the last file */
       astClear( lfits, "Card" );
       astFindFits( lfits, FITS_OBSEND, NULL, 0 );
       astSetFitsL( lfits, FITS_OBSEND,
-		   ( j == subsys->file.subscan ? 1 : 0 ),
-		   "True if file is last in current observation", 1);
+                   ( j == subsys->file.subscan ? 1 : 0 ),
+                   "True if file is last in current observation", 1);
 
       /* Attach units to NDF */
       ndfCput( units, indf, "UNITS", status );
 
       /* attach a data label */
       if (tempscal) {
-	/* Note the use of AST control codes for subscript/superscript */
-	ndfCput( "T%s60+%v30+A%^50+%<20+*%+   corrected antenna temperature", indf, "LABEL", status );
+        /* Note the use of AST control codes for subscript/superscript */
+        ndfCput( "T%s60+%v30+A%^50+%<20+*%+   corrected antenna temperature", indf, "LABEL", status );
       } else {
-	ndfCput( "Power", indf, "LABEL", status );
+        ndfCput( "Power", indf, "LABEL", status );
       }
 
       /* Bounds associated with this file */
@@ -3265,11 +3265,11 @@ void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
       tdata = tpntr;
 
       /* when we get the spectral WCS we would like to make sure that it defaults to a velocity
-	 frame rather than frequency frame. We therefore need the DOPPLER fits header (bad name) */
+         frame rather than frequency frame. We therefore need the DOPPLER fits header (bad name) */
       astClear( lfits, "Card");
       veldef[0] = '\0';
       if ( astGetFitsS( lfits, "DOPPLER", &stemp ) ) {
-	strcpy( veldef, stemp );
+        strcpy( veldef, stemp );
       }
 
       /* calculate the frameset */
@@ -3290,11 +3290,11 @@ void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
       acs_kpgPtfts( indf, lfits, status );
 
       /* easiest to write a second piece of history information for header collation.
-	 Stops having to worry about only getting a single HISTORY entry when NDF
-	 wants to write a new entry every time the file is opened for UPDATE. */
+         Stops having to worry about only getting a single HISTORY entry when NDF
+         wants to write a new entry every time the file is opened for UPDATE. */
 #ifndef PACKAGE_UPCASE
       ndfHput("NORMAL",APPNAME, 1, 1, history,
-	      0, 0, 0, indf, status );
+              0, 0, 0, indf, status );
 #endif
 
       /* Need ACSIS extension for hack */
@@ -3304,16 +3304,16 @@ void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
       ndfAnnul( &indf, status );
 
       /* we may want to set permissions on the file to stop unwary people overwriting it
-	 or even the acquisition system itself. */
+         or even the acquisition system itself. */
       if (*status == SAI__OK) {
-	sysstat = chmod( fname, S_IRUSR | S_IWUSR| S_IRGRP | S_IROTH );
-	if (sysstat == -1) {
-	  *status = SAI__ERROR;
-	  emsSyser( "ERRNO", errno );
-	  emsSetc( "FILE", fname );
-	  emsRep(" ","acsSpecCloseTS: Error setting permissions on file ^FILE: ^ERRNO",
-		 status );
-	}
+        sysstat = chmod( fname, S_IRUSR | S_IWUSR| S_IRGRP | S_IROTH );
+        if (sysstat == -1) {
+          *status = SAI__ERROR;
+          emsSyser( "ERRNO", errno );
+          emsSetc( "FILE", fname );
+          emsRep(" ","acsSpecCloseTS: Error setting permissions on file ^FILE: ^ERRNO",
+                 status );
+        }
       }
 
     }
@@ -3326,10 +3326,10 @@ void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
 
   }
 
-/* End the AST context. This annuls all AST Objects pointers created since
-   the matching call to astBegin, except for any which have been exempted
-   or exported. */
-   astEnd;
+  /* End the AST context. This annuls all AST Objects pointers created since
+     the matching call to astBegin, except for any which have been exempted
+     or exported. */
+  astEnd;
 
   /* Reset AST status */
   astWatch( oldstat );
@@ -3354,262 +3354,262 @@ static double duration ( struct timeval * tp1, struct timeval * tp2 ) {
 
 AstFrameSet *specWcs( const AstFrameSet *fs, const char veldef[], int ntime, const double times[], int * status ){
 
-/*
-*+
-*  Name:
-*     specWcs
+  /*
+   *+
+   *  Name:
+   *     specWcs
 
-*  Purpose:
-*     Calculate frameset for spectrum time series.
+   *  Purpose:
+   *     Calculate frameset for spectrum time series.
 
-*  Prototype:
-*     AstFrameSet *specWcs( const AstFrameSet *fs, const char veldef[], int ntime, const double times[],
-*                int * status );
+   *  Prototype:
+   *     AstFrameSet *specWcs( const AstFrameSet *fs, const char veldef[], int ntime, const double times[],
+   *                int * status );
 
-*  Description:
-*     Returns a FrameSet in which the base Frame is a 3D GRID Frame, and
-*     the current Frame has 3 axes in the order (spectrum,space,time).
-*     The SpecFrame representing the spectral axis and its relationship
-*     to GRID coords is read from the supplied FITS FrameSet. The time
-*     axis is described using a MJD(TAI) TimeFrame, and its relationship
-*     to GRID coords is specified by the supplied look-up table of time
-*     values. The spatial axis is described by a simple 1D Frame with
-*     Domain "SPACEINDEX" and is connected to the GRID coords via a
-*     UnitMap.
+   *  Description:
+   *     Returns a FrameSet in which the base Frame is a 3D GRID Frame, and
+   *     the current Frame has 3 axes in the order (spectrum,space,time).
+   *     The SpecFrame representing the spectral axis and its relationship
+   *     to GRID coords is read from the supplied FITS FrameSet. The time
+   *     axis is described using a MJD(TAI) TimeFrame, and its relationship
+   *     to GRID coords is specified by the supplied look-up table of time
+   *     values. The spatial axis is described by a simple 1D Frame with
+   *     Domain "SPACEINDEX" and is connected to the GRID coords via a
+   *     UnitMap.
 
-*  Parameters:
-*     fs = const AstFrameSet * (Given)
-*        A pointer to the FrameSet read from the unmodified FITS headers
-*        which define the spectral axis. If NULL pointer, a simple channel number
-*        frame will be used for the spectral axis.
-*     veldef = const char[] (Given)
-*        Velocity definition to which the specFrame will be converted after extraction.
-*        Can be resdhift, radio or optical. If undefined system will remain FREQ but
-*        units will be set to GHz.
-*     ntime = int (Given)
-*        The number of time values supplied in "times".
-*     times = const double [] (Given)
-*        An array of "ntime" MJD values (in the TAI timescale), one for
-*        each pixel along the time axis.
-*     status = int * (Given & Returned)
-*        Inherited status.
+   *  Parameters:
+   *     fs = const AstFrameSet * (Given)
+   *        A pointer to the FrameSet read from the unmodified FITS headers
+   *        which define the spectral axis. If NULL pointer, a simple channel number
+   *        frame will be used for the spectral axis.
+   *     veldef = const char[] (Given)
+   *        Velocity definition to which the specFrame will be converted after extraction.
+   *        Can be resdhift, radio or optical. If undefined system will remain FREQ but
+   *        units will be set to GHz.
+   *     ntime = int (Given)
+   *        The number of time values supplied in "times".
+   *     times = const double [] (Given)
+   *        An array of "ntime" MJD values (in the TAI timescale), one for
+   *        each pixel along the time axis.
+   *     status = int * (Given & Returned)
+   *        Inherited status.
 
-*  Returned Value:
-*     specWcs = AstFrameSet *
-*        3-D frameset.
+   *  Returned Value:
+   *     specWcs = AstFrameSet *
+   *        3-D frameset.
 
-*  Notes:
-*     - The SpecFrame does not use the times in the time dimension
+   *  Notes:
+   *     - The SpecFrame does not use the times in the time dimension
 
-*  Authors:
-*     DSB: David Berry (UCLan)
-*     TIMJ: Tim Jenness (JAC, Hawaii)
+   *  Authors:
+   *     DSB: David Berry (UCLan)
+   *     TIMJ: Tim Jenness (JAC, Hawaii)
 
-*  History:
-*     10-MAR-2006 (DSB):
-*        Initial version (untested)
-*     01-JUN-2006 (TIMJ):
-*        Integrated into specwriter.
+   *  History:
+   *     10-MAR-2006 (DSB):
+   *        Initial version (untested)
+   *     01-JUN-2006 (TIMJ):
+   *        Integrated into specwriter.
 
-*-
-*/
+   *-
+   */
 
-/* Local Variables: */
-   AstCmpFrame *totfrm;
-   AstCmpMap *totmap;
-   AstFrame *axis, *specfrm, *spacefrm, *gridfrm;
-   AstFrameSet *result;
-   AstLutMap *timemap;
-   AstMapping *specmap;
-   AstTimeFrame *timefrm;
-   AstUnitMap *spacemap;
-   double tcopy[2];  /* local copy of time lut for when only 1 number present */
-   double *ltimes;  /* pointer to a time array */
-   int nax, iax, iax_spec, ax_out[ NDF__MXDIM ];
-   int malloced = 0; /* did we malloc a ltimes array */
+  /* Local Variables: */
+  AstCmpFrame *totfrm;
+  AstCmpMap *totmap;
+  AstFrame *axis, *specfrm, *spacefrm, *gridfrm;
+  AstFrameSet *result;
+  AstLutMap *timemap;
+  AstMapping *specmap;
+  AstTimeFrame *timefrm;
+  AstUnitMap *spacemap;
+  double tcopy[2];  /* local copy of time lut for when only 1 number present */
+  double *ltimes;  /* pointer to a time array */
+  int nax, iax, iax_spec, ax_out[ NDF__MXDIM ];
+  int malloced = 0; /* did we malloc a ltimes array */
 
-/* Initialise. */
-   result = NULL;
+  /* Initialise. */
+  result = NULL;
 
-/* Check the global error status. */
-   if( *status != SAI__OK ) return result;
+  /* Check the global error status. */
+  if( *status != SAI__OK ) return result;
 
-/* Start an AST context so we do not need to annul AST pointers explicitly. */
-   astBegin;
+  /* Start an AST context so we do not need to annul AST pointers explicitly. */
+  astBegin;
 
-/* Check each axis of the current Frame in the FrameSet read from
-   the FITS headers, looking for a spectral axis. We do this using
-   astIsASpecFrame since this will pick up both SpecFrames and DSBSpecFrames
-   (since a DSBSpecFrame "is a" SpecFrame). If we have not got an input frameset
-   we need to fudge a unitmap.
-*/
-   if (fs) {
-     specfrm = NULL;
-     nax = astGetI( fs, "Naxes" );
-     for( iax = 1; iax <= nax; iax++ ) {
-       axis = astPickAxes( fs, 1, &iax, NULL );
-       if( astIsASpecFrame( axis ) ) {
-         specfrm = axis;
-         iax_spec = iax;
-         break;
-       }
-     }
+  /* Check each axis of the current Frame in the FrameSet read from
+     the FITS headers, looking for a spectral axis. We do this using
+     astIsASpecFrame since this will pick up both SpecFrames and DSBSpecFrames
+     (since a DSBSpecFrame "is a" SpecFrame). If we have not got an input frameset
+     we need to fudge a unitmap.
+  */
+  if (fs) {
+    specfrm = NULL;
+    nax = astGetI( fs, "Naxes" );
+    for( iax = 1; iax <= nax; iax++ ) {
+      axis = astPickAxes( fs, 1, &iax, NULL );
+      if( astIsASpecFrame( axis ) ) {
+        specfrm = axis;
+        iax_spec = iax;
+        break;
+      }
+    }
 
-/* Report an error if no spectral axis was found in the FITS header. */
-     if( !specfrm ) {
-       if( *status == SAI__OK ) {
-         *status = SAI__ERROR;
-         emsRep( "", "No spectral axis found in FITS header", status );
-         goto L999;
-       }
-     }
+    /* Report an error if no spectral axis was found in the FITS header. */
+    if( !specfrm ) {
+      if( *status == SAI__OK ) {
+        *status = SAI__ERROR;
+        emsRep( "", "No spectral axis found in FITS header", status );
+        goto L999;
+      }
+    }
 
-/* We now assume that the spectral axis is connected to one and only one
-   of the grid axes in the FITS header. We use astMapSplit to determine
-   which grid axis this is, and to get the Mapping from the grid axis
-   to the SpecFrame axis. We first invert the FrameSet (i.e. swap base
-   and current Frames) since astMapSplit picks specified *inputs", but
-   the SpecFrame is an "output" of the Mapping represented by the FrameSet.
-   After inversion of the FrameSet, the SpecFrame will be one of the
-   inputs, and can therefore be picked by astMapSplit. */
-     astInvert( fs );
-     astMapSplit( fs, 1, &iax_spec, ax_out, &specmap );
+    /* We now assume that the spectral axis is connected to one and only one
+       of the grid axes in the FITS header. We use astMapSplit to determine
+       which grid axis this is, and to get the Mapping from the grid axis
+       to the SpecFrame axis. We first invert the FrameSet (i.e. swap base
+       and current Frames) since astMapSplit picks specified *inputs", but
+       the SpecFrame is an "output" of the Mapping represented by the FrameSet.
+       After inversion of the FrameSet, the SpecFrame will be one of the
+       inputs, and can therefore be picked by astMapSplit. */
+    astInvert( fs );
+    astMapSplit( fs, 1, &iax_spec, ax_out, &specmap );
 
-/* Invert the FrameSet again to return it to its original state */
-     astInvert( fs );
+    /* Invert the FrameSet again to return it to its original state */
+    astInvert( fs );
 
-/* Report an error if the assumption made above turned out not to be
-   right. */
-     if( !specmap ){
-       if( *status == SAI__OK ) {
-         *status = SAI__ERROR;
-         emsRep( "", "The spectral axis depends on more than one pixel axis",
-                 status );
-         goto L999;
-       }
-     }
+    /* Report an error if the assumption made above turned out not to be
+       right. */
+    if( !specmap ){
+      if( *status == SAI__OK ) {
+        *status = SAI__ERROR;
+        emsRep( "", "The spectral axis depends on more than one pixel axis",
+                status );
+        goto L999;
+      }
+    }
 
-/* Invert "specmap" so that the forward transformation goes from grid
-   coord to spectral coord. */
-     astInvert( specmap );
+    /* Invert "specmap" so that the forward transformation goes from grid
+       coord to spectral coord. */
+    astInvert( specmap );
 
-   } else {
-     /* create simple channel number */
-     specfrm = astFrame( 1, "Domain=CHANNEL,Unit(1)=pixel,Label(1)=Channel Number" );
-     specmap = (AstMapping*)astUnitMap( 1, "" );
-   }
+  } else {
+    /* create simple channel number */
+    specfrm = astFrame( 1, "Domain=CHANNEL,Unit(1)=pixel,Label(1)=Channel Number" );
+    specmap = (AstMapping*)astUnitMap( 1, "" );
+  }
 
-/* We will use a simple Frame to describe the spatial axis, giving it the
-   Domain name SPACEINDEX in order to distinguish it from the GRID Frame.
-   The values on the spatial axis are just copies fo the grid coordinate,
-   so create a UnitMap to connect the GRID Frame to the SPACEINDEX Frame. */
-   spacefrm = astFrame( 1, "Domain=SPACEINDEX,Unit(1)=pixel,Label(1)=Receptor Number" );
-   spacemap = astUnitMap( 1, "" );
+  /* We will use a simple Frame to describe the spatial axis, giving it the
+     Domain name SPACEINDEX in order to distinguish it from the GRID Frame.
+     The values on the spatial axis are just copies fo the grid coordinate,
+     so create a UnitMap to connect the GRID Frame to the SPACEINDEX Frame. */
+  spacefrm = astFrame( 1, "Domain=SPACEINDEX,Unit(1)=pixel,Label(1)=Receptor Number" );
+  spacemap = astUnitMap( 1, "" );
 
-/* We now have the SpecFrame, and the Mapping from grid coord to spectral
-   coord. Now create a TimeFrame to describe MJD in the TAI timescale, and
-   a LutMap which transforms grid coord into MJD (in days). The default
-   TimeFrame attribute values give us what we want. 
-   Work out the duration of the observation to decide on formatting.
-   To give AST some help with formatting axes we use a TimeOrigin.
-*/
-   timefrm = astTimeFrame( "" );
-   malloced = 0;
-   if (ntime == 1) {
-     /* a LutMap needs two numbers in its mapping so double up the
-	first time if we only have one value. */
-     tcopy[0] = times[0];
-     tcopy[1] = times[0];
-     ltimes = tcopy;
-     ntime = 2;
-   } else {
-     double origin = 0.0; /* reference time */
-     int i;
-     /* copy values and remove integer part of day */
-     ltimes = starMalloc( sizeof(*ltimes) * ntime );
-     if (ltimes) malloced = 1;
-     origin = floor( times[0] );
-     for (i = 0; i < ntime; i++ ) {
-       ltimes[i] = times[i] - origin;
-     }
-     astSetD(timefrm, "TimeOrigin", origin);
+  /* We now have the SpecFrame, and the Mapping from grid coord to spectral
+     coord. Now create a TimeFrame to describe MJD in the TAI timescale, and
+     a LutMap which transforms grid coord into MJD (in days). The default
+     TimeFrame attribute values give us what we want. 
+     Work out the duration of the observation to decide on formatting.
+     To give AST some help with formatting axes we use a TimeOrigin.
+  */
+  timefrm = astTimeFrame( "" );
+  malloced = 0;
+  if (ntime == 1) {
+    /* a LutMap needs two numbers in its mapping so double up the
+       first time if we only have one value. */
+    tcopy[0] = times[0];
+    tcopy[1] = times[0];
+    ltimes = tcopy;
+    ntime = 2;
+  } else {
+    double origin = 0.0; /* reference time */
+    int i;
+    /* copy values and remove integer part of day */
+    ltimes = starMalloc( sizeof(*ltimes) * ntime );
+    if (ltimes) malloced = 1;
+    origin = floor( times[0] );
+    for (i = 0; i < ntime; i++ ) {
+      ltimes[i] = times[i] - origin;
+    }
+    astSetD(timefrm, "TimeOrigin", origin);
 
-     /* We would like to use iso.0 for anything that is longer than 10 seconds (say)
+    /* We would like to use iso.0 for anything that is longer than 10 seconds (say)
        else use iso.2 because ACSIS can not take spectra faster than 0.05 second. */
-     if ( (ltimes[ntime-1] - ltimes[0]) < (10.0 / SPD) ) {
-       astSet(timefrm, "format=iso.2");
-     } else {
-       astSet(timefrm, "format=iso.0");
-     }
+    if ( (ltimes[ntime-1] - ltimes[0]) < (10.0 / SPD) ) {
+      astSet(timefrm, "format=iso.2");
+    } else {
+      astSet(timefrm, "format=iso.0");
+    }
 
-   }
-   timemap = astLutMap( ntime, ltimes, 1.0, 1.0, "" );
+  }
+  timemap = astLutMap( ntime, ltimes, 1.0, 1.0, "" );
 
-   /* if we have ObsLon and ObsLat available in the SpecFrame
-      we store those in the time frame so that we can calculate
-      LAST easily */
-   if (astTest( specfrm, "ObsLon") && astTest( specfrm, "ObsLat" ) )
-     astSet( timefrm, "ObsLon=%s,ObsLat=%s", astGetC( specfrm, "ObsLon" ),
-             astGetC( specfrm, "ObsLat") );
+  /* if we have ObsLon and ObsLat available in the SpecFrame
+     we store those in the time frame so that we can calculate
+     LAST easily */
+  if (astTest( specfrm, "ObsLon") && astTest( specfrm, "ObsLat" ) )
+    astSet( timefrm, "ObsLon=%s,ObsLat=%s", astGetC( specfrm, "ObsLon" ),
+            astGetC( specfrm, "ObsLat") );
 
-   if (malloced) starFree( ltimes );
+  if (malloced) starFree( ltimes );
 
-/* We now have the Frames and Mappings describing all the individual
-   axes. Join all the Frames together into a CmpFrame (in the order spectral,
-   spatial, time), and join all the Mappings together into a parallel
-   CmpMap. */
-   totfrm = astCmpFrame( astCmpFrame( specfrm, spacefrm, "" ), timefrm, "" );
-   totmap = astCmpMap( astCmpMap( specmap, spacemap, 0, "" ), timemap, 0, "" );
+  /* We now have the Frames and Mappings describing all the individual
+     axes. Join all the Frames together into a CmpFrame (in the order spectral,
+     spatial, time), and join all the Mappings together into a parallel
+     CmpMap. */
+  totfrm = astCmpFrame( astCmpFrame( specfrm, spacefrm, "" ), timefrm, "" );
+  totmap = astCmpMap( astCmpMap( specmap, spacemap, 0, "" ), timemap, 0, "" );
 
-/* Create a 3D GRID Frame. */
-   gridfrm = astFrame( 3, "Domain=GRID,Title=FITS pixel coordinates" );
-   astSet( gridfrm, "Unit(1)=pixel,Label(1)=FITS pixel axis 1" );
-   astSet( gridfrm, "Unit(2)=pixel,Label(2)=FITS pixel axis 2" );
-   astSet( gridfrm, "Unit(3)=pixel,Label(2)=FITS pixel axis 3" );
+  /* Create a 3D GRID Frame. */
+  gridfrm = astFrame( 3, "Domain=GRID,Title=FITS pixel coordinates" );
+  astSet( gridfrm, "Unit(1)=pixel,Label(1)=FITS pixel axis 1" );
+  astSet( gridfrm, "Unit(2)=pixel,Label(2)=FITS pixel axis 2" );
+  astSet( gridfrm, "Unit(3)=pixel,Label(2)=FITS pixel axis 3" );
 
-/* Create the FrameSet to return, initially containing just the above
-   GRID Frame. */
-   result = astFrameSet( gridfrm, "" );
+  /* Create the FrameSet to return, initially containing just the above
+     GRID Frame. */
+  result = astFrameSet( gridfrm, "" );
 
-/* Add the total Frame into the FrameSet using the total Mapping to
-   connect it to the base (i.e. GRID) Frame. */
-   astAddFrame( result, AST__BASE, totmap, totfrm );
+  /* Add the total Frame into the FrameSet using the total Mapping to
+     connect it to the base (i.e. GRID) Frame. */
+  astAddFrame( result, AST__BASE, totmap, totfrm );
 
-   /* Adjust the system on the basis of the requested velocity definition 
-      (if we had a spec frame). Force GHz initially so that if we change
-      back to FREQ the units will be remembered. */
-   if (specfrm && astIsASpecFrame( specfrm )) {
-     astSet(result, "system(1)=FREQ,unit(1)=GHz");
-     if (strcmp(veldef, "radio") == 0) {
-       astSet(result, "system(1)=vrad");
-     } else if (strcmp(veldef, "optical") == 0) {
-       astSet(result, "system(1)=vopt");
-     } else if (strcmp(veldef, "redshift") == 0) {
-       astSet(result, "system(1)=redshift");
-     }
-   }
+  /* Adjust the system on the basis of the requested velocity definition 
+     (if we had a spec frame). Force GHz initially so that if we change
+     back to FREQ the units will be remembered. */
+  if (specfrm && astIsASpecFrame( specfrm )) {
+    astSet(result, "system(1)=FREQ,unit(1)=GHz");
+    if (strcmp(veldef, "radio") == 0) {
+      astSet(result, "system(1)=vrad");
+    } else if (strcmp(veldef, "optical") == 0) {
+      astSet(result, "system(1)=vopt");
+    } else if (strcmp(veldef, "redshift") == 0) {
+      astSet(result, "system(1)=redshift");
+    }
+  }
 
-/* Arrive here if an error occurs. Note, this is still inside the AST context
-   delimited by astBegin/astEnd. */
-L999:
+  /* Arrive here if an error occurs. Note, this is still inside the AST context
+     delimited by astBegin/astEnd. */
+ L999:
 
-/* If no error has occurred, export the resulting FrameSet pointer
-   from the current AST context so that it will not be annulled by the
-   following call to astEnd. If an error has occurred, annul it explicitly,
-   in order to ensure we are returning a NULL pointer. */
-   if( *status == SAI__OK ) {
-      astExport( result );
-   } else {
-      result = astAnnul( result );
-   }
+  /* If no error has occurred, export the resulting FrameSet pointer
+     from the current AST context so that it will not be annulled by the
+     following call to astEnd. If an error has occurred, annul it explicitly,
+     in order to ensure we are returning a NULL pointer. */
+  if( *status == SAI__OK ) {
+    astExport( result );
+  } else {
+    result = astAnnul( result );
+  }
 
-/* End the AST context. This annuls all AST Objects pointers created since
-   the matching call to astBegin, except for any which have been exempted
-   or exported. */
-   astEnd;
+  /* End the AST context. This annuls all AST Objects pointers created since
+     the matching call to astBegin, except for any which have been exempted
+     or exported. */
+  astEnd;
 
-/* Return the resulting FrameSet. */
-   return result;
+  /* Return the resulting FrameSet. */
+  return result;
 
 }
 
@@ -3637,9 +3637,9 @@ static void checkNoFileExists( const char * file, int * status ) {
     }
     emsSetc("F", file );
     emsRep(" ","^T ^F already exists. Not allowed to overwrite. "
-	   "The data acquisition system is misconfigured - "
-	   "please check your observation number is correct.",
-	   status);
+           "The data acquisition system is misconfigured - "
+           "please check your observation number is correct.",
+           status);
   }
 
 }
@@ -3653,7 +3653,7 @@ void acsSpecSetBackend ( backend_type type, int *status ) {
   if (INPROGRESS != 0) {
     *status = SAI__ERROR;
     emsRep("HDS_SPEC_SETBACKEND_ERR",
-	   "acsSpecSetBackend called, yet an observation is already in progress", status);
+           "acsSpecSetBackend called, yet an observation is already in progress", status);
     return;
   }
 
@@ -3670,7 +3670,7 @@ void acsSpecSetMem ( const int nBytes, int *status ) {
   if (INPROGRESS != 0) {
     *status = SAI__ERROR;
     emsRep("HDS_SPEC_SETMEM_ERR",
-	   "acsSpecSetMem called, yet an observation is already in progress", status);
+           "acsSpecSetMem called, yet an observation is already in progress", status);
     return;
   }
 
@@ -3691,76 +3691,76 @@ void acsSpecSetMem ( const int nBytes, int *status ) {
 
 
 /*
-*+
-*  Name:
-*     acs_kpgPtfts
+ *+
+ *  Name:
+ *     acs_kpgPtfts
 
-*  Purpose:
-*     Store FITS header information into an NDF
+ *  Purpose:
+ *     Store FITS header information into an NDF
 
-*  Language:
-*     Starlink ANSI C
+ *  Language:
+ *     Starlink ANSI C
 
-*  Invocation:
-*     CALL KPG_PTFTS( INDF, FCHAN, STATUS )
-*     kpgPtfts( int indf, AstFitsChan * fchan, int * status );
+ *  Invocation:
+ *     CALL KPG_PTFTS( INDF, FCHAN, STATUS )
+ *     kpgPtfts( int indf, AstFitsChan * fchan, int * status );
 
-*  Description:
-*     The routine stores the contents of an AST FitsChan into an
-*     NDF by creating (or replacing) the FITS extension in the NDF.
+ *  Description:
+ *     The routine stores the contents of an AST FitsChan into an
+ *     NDF by creating (or replacing) the FITS extension in the NDF.
 
-*  Arguments:
-*     indf = int (Given)
-*        Identifier of NDF to receive the .FITS extension.
-*     fchan = const AstFitsChan * (Given)
-*        An AST pointer to a FitsChan which contains information about
-*        the FITS header to be associated with the NDF.
-*     status = int * (Given and Returned)
-*        The global status.
+ *  Arguments:
+ *     indf = int (Given)
+ *        Identifier of NDF to receive the .FITS extension.
+ *     fchan = const AstFitsChan * (Given)
+ *        An AST pointer to a FitsChan which contains information about
+ *        the FITS header to be associated with the NDF.
+ *     status = int * (Given and Returned)
+ *        The global status.
 
-*  Return Value:
-*     Returns the status.
+ *  Return Value:
+ *     Returns the status.
 
-*  Notes:
-*     - If a .MORE.FITS extension already exists it will be completely
-*     replaced by this routine.
+ *  Notes:
+ *     - If a .MORE.FITS extension already exists it will be completely
+ *     replaced by this routine.
 
-*  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     All Rights Reserved.
+ *  Copyright:
+ *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+ *     All Rights Reserved.
 
-*  Licence:
-*    This program is free software; you can redistribute it and/or modify
-*    it under the terms of the GNU General Public License as published by
-*    the Free Software Foundation; either version 2 of the License, or
-*    (at your option) any later version.
-*
-*    This program is distributed in the hope that it will be useful,
-*    but WITHOUT ANY WARRANTY; without even the implied warranty of
-*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*    GNU General Public License for more details.
-*
-*    You should have received a copy of the GNU General Public License
-*    along with this program (see SLA_CONDITIONS); if not, write to the 
-*    Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
-*    Boston, MA  02111-1307  USA
+ *  Licence:
+ *    This program is free software; you can redistribute it and/or modify
+ *    it under the terms of the GNU General Public License as published by
+ *    the Free Software Foundation; either version 2 of the License, or
+ *    (at your option) any later version.
+ *
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU General Public License for more details.
+ *
+ *    You should have received a copy of the GNU General Public License
+ *    along with this program (see SLA_CONDITIONS); if not, write to the 
+ *    Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+ *    Boston, MA  02111-1307  USA
 
-*  Authors:
-*     TIMJ: Tim Jenness (JAC, Hawaii)
-*     {enter_new_authors_here}
+ *  Authors:
+ *     TIMJ: Tim Jenness (JAC, Hawaii)
+ *     {enter_new_authors_here}
 
-*  History:
-*     25-NOV-2005 (TIMJ):
-*        Original version.
-*     25-APR-2006 (TIMJ):
-*        Finish.
-*     {enter_changes_here}
+ *  History:
+ *     25-NOV-2005 (TIMJ):
+ *        Original version.
+ *     25-APR-2006 (TIMJ):
+ *        Finish.
+ *     {enter_changes_here}
 
-*  Bugs:
-*     {note_any_bugs_here}
+ *  Bugs:
+ *     {note_any_bugs_here}
 
-*-
-*/
+ *-
+ */
 
 static int acs_kpgPtfts( int indf, const AstFitsChan * fchan, int * status ) {
 
@@ -3816,7 +3816,7 @@ static int acs_kpgPtfts( int indf, const AstFitsChan * fchan, int * status ) {
       emsSetu( "DM", nchars );
       emsSetu( "SZ",  ncards );
       emsRep("KPG_PTFTS_ERR",
-	     "Bizarre error whereby number of cards in mapped FITS header (^DM) differs from number requested (^SZ)", status );
+             "Bizarre error whereby number of cards in mapped FITS header (^DM) differs from number requested (^SZ)", status );
     }
   }
 
@@ -3824,10 +3824,10 @@ static int acs_kpgPtfts( int indf, const AstFitsChan * fchan, int * status ) {
     for (i = 1; i <= ncards; i++) {
       result = astFindFits( lchan, "%f", card, 1 );
       if (result) {
-	strncpy( fpntr, card, SZFITSCARD );
-	fpntr += SZFITSCARD;
+        strncpy( fpntr, card, SZFITSCARD );
+        fpntr += SZFITSCARD;
       } else {
-	break;
+        break;
       }
     }
   }
