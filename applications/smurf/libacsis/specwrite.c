@@ -3640,6 +3640,13 @@ AstFrameSet *specWcs( const AstFrameSet *fs, const char veldef[], int ntime, con
    }
    timemap = astLutMap( ntime, ltimes, 1.0, 1.0, "" );
 
+   /* if we have ObsLon and ObsLat available in the SpecFrame
+      we store those in the time frame so that we can calculate
+      LAST easily */
+   if (astTest( specfrm, "ObsLon") && astTest( specfrm, "ObsLat" ) )
+     astSet( timefrm, "ObsLon=%s,ObsLat=%s", astGetC( specfrm, "ObsLon" ),
+             astGetC( specfrm, "ObsLat") );
+
    if (malloced) starFree( ltimes );
 
 /* We now have the Frames and Mappings describing all the individual
