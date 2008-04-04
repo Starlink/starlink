@@ -54,6 +54,8 @@
 *        changed by the changed by the called function.
 *     25-OCT-2006 (DSB):
 *        Add grpSetsz
+*     4-APR-2008 (DSB):
+*        Add grpList.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -133,6 +135,7 @@ void grpValid( const Grp *, int *, int * );
 void grpIndex( const char *, const Grp *, int, int *, int * );
 void grpSetcs( Grp *, int, int * );
 void grpSetsz( Grp *, int, int * );
+void grpList( const char *, int, int, const char *, Grp *, int * );
 
 /* Semi-Public function prototypes: For Fortran interface wrappers only */
 /* -------------------------------------------------------------------- */
