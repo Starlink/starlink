@@ -265,9 +265,9 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
      the row number (incremented on new rows) and for grids it is
      the grid offset. */
   if ( gsdVars->obsContinuous ) {
-    wcs->index = stepNum / gsdVars->nScanPts;
+    wcs->index = stepNum / gsdVars->nScanPts + 1;
   } else {
-    wcs->index = stepNum;
+    wcs->index = stepNum + 1;
   }
 
   /* If this is a raster, work out the LST from the scan_time
