@@ -163,9 +163,6 @@ static void
 closeNDF( subSystem * subsys, int * status );
 
 static void
-resizeNDF( const obsData * obsinfo, subSystem * subsys, unsigned int newsize, int * status );
-
-static void
 createExtensions( subSystem * subsys, unsigned int size, int * status );
 
 static void
@@ -238,7 +235,7 @@ static double duration ( struct timeval * tp1, struct timeval * tp2 );
 #endif
 
 /* Stolen code */
-static int kpgPtfts( int indf, const AstFitsChan * fchan, int * status );
+static int acs_kpgPtfts( int indf, const AstFitsChan * fchan, int * status );
 
 /* Function to put quotes around a symbol so that we can do
    CPP string concatenation */
@@ -2432,102 +2429,6 @@ closeNDF( subSystem * subsys, int * status ) {
 
 }
 
-
-/* Resize a specific NDF */
-
-static void
-resizeNDF( const obsData * obsinfo, subSystem * subsys, unsigned int newsize, int * status ) {
-
-  int ubnd[NDIMS];
-  int lbnd[NDIMS];
-  unsigned int nchans;
-  unsigned int nreceps;
-  unsigned int newt;
-  int itemp;
-  void *datapntrs[] = { NULL };/* Array of mapped pointers for ndfMap */
-  size_t nbytes;
-  unsigned int ncells;
-  unsigned int offset;
-  float * pos;
-  unsigned int i;
-
-  /* Unmap the data array */
-#if SPW_DEBUG_LEVEL > 0
-  printf("Unmap data array in preparation for resize\n");
-#endif
-  TIMEME( "ndfUnmap", ndfUnmap(subsys->file.indf, "DATA", status ););
-
-  /* Get the existing bounds */
-  ndfBound(subsys->file.indf, NDIMS, lbnd, ubnd, &itemp, status );
-
-  if (*status == SAI__OK && itemp != NDIMS) {
-    *status = SAI__ERROR;
-    emsSeti("N", itemp);
-    emsSeti("ND", NDIMS);
-    emsRep(" ", "acsSpecWriteTS: Bizarre internal error. Ndims is ^N not ^ND",
-	   status);
-  }
-    
-  nchans = ubnd[CHANDIM] - lbnd[CHANDIM] + 1;
-  if (*status == SAI__OK && nchans != subsys->nchans) {
-    *status = SAI__ERROR;
-    emsSetu("UB", nchans);
-    emsSetu("NC", subsys->nchans );
-    emsRep(" ", "acsSpecWriteTS: Bizzare internal error. Nchans is ^UB not ^NC",
-	   status);
-  }
-
-  nreceps = ubnd[RECDIM] - lbnd[RECDIM] + 1;
-  if (*status == SAI__OK && nreceps != obsinfo->nrecep) {
-    *status = SAI__ERROR;
-    emsSetu("UB", nreceps);
-    emsSetu("NR", obsinfo->nrecep);
-    emsRep(" ", "acsSpecWriteTS: Bizzare internal error. Nreceptors is ^UB not ^NR",
-	   status);
-  }
-
-  /* increment */
-  ubnd[TDIM] += newsize;
-  newt = ubnd[TDIM] - lbnd[TDIM] + 1;
-
-  /* set new bounds */
-#if SPW_DEBUG_LEVEL > 0
-  printf("Setting new bounds. Grow to %lld sequence steps (from %lld)\n", (unsigned long long)newt,
-	 (unsigned long long)(newt-newsize));
-#endif
-  TIMEME("Set NDF bounds", ndfSbnd( NDIMS, lbnd, ubnd, subsys->file.indf, status ););
-
-  /* map data array again */
-#if SPW_DEBUG_LEVEL > 0
-  printf("Remap the data array\n");
-#endif
-  TIMEME("Remp NDF", ndfMap( subsys->file.indf, "DATA", "_REAL", "WRITE", datapntrs, &itemp, status ););
-  subsys->tdata.spectra = datapntrs[0];
-
-  /* Initialise the new memory to bad */
-  ncells = ( ubnd[RECDIM] - lbnd[RECDIM] + 1 ) *
-    (ubnd[CHANDIM] - lbnd[CHANDIM] + 1);
-  nbytes = ncells * SIZEOF_FLOAT;
-  offset = calcOffset( (ubnd[CHANDIM]-lbnd[CHANDIM]+1),
-		       (ubnd[RECDIM]-lbnd[RECDIM]+1),
-		       0, (newt-newsize), status); 
-  if (*status == SAI__OK) {
-    pos = &((subsys->tdata.spectra)[offset]);
-    for (i = 0; i < newsize; i++) {
-      memcpy( pos, subsys->tdata.bad, nbytes);
-      pos += ncells;
-    }
-  }
-
-  /* Resize the extensions */
-  TIMEME("Resize extensions", resizeExtensions( subsys, newt, 1, status  ););
-  TIMEME("Resize coords", resizeACSISExtensions( subsys, newt, 1, status  ););
-  
-  /* Update cursize */
-  subsys->cursize = newt;
-
-}
-
 /* Calculate the offset into the 3d data array */
 /* Can be used for nchan * nrecep * t data array. Use zero indexing for nrecep and tindex. */
 
@@ -3381,10 +3282,10 @@ void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
       ndfPtwcs( specwcs, indf, status );
 
       /* free the new WCS object */
-      astAnnul( specwcs );
+      specwcs = astAnnul( specwcs );
 
       /* write FITS header */
-      kpgPtfts( indf, lfits, status );
+      acs_kpgPtfts( indf, lfits, status );
 
       /* easiest to write a second piece of history information for header collation.
 	 Stops having to worry about only getting a single HISTORY entry when NDF
@@ -3414,10 +3315,10 @@ void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
     }
 
     /* free the copy of the FITS header */
-    astAnnul( lfits );
+    lfits = astAnnul( lfits );
 
     /* free the FITS header wcs */
-    if (wcs) astAnnul(wcs);
+    if (wcs) wcs = astAnnul(wcs);
 
   }
 
@@ -3591,7 +3492,7 @@ AstFrameSet *specWcs( const AstFrameSet *fs, const char veldef[], int ntime, con
    } else {
      /* create simple channel number */
      specfrm = astFrame( 1, "Domain=CHANNEL,Unit(1)=pixel,Label(1)=Channel Number" );
-     specmap = astUnitMap( 1, "" );
+     specmap = (AstMapping*)astUnitMap( 1, "" );
    }
 
 /* We will use a simple Frame to describe the spatial axis, giving it the
@@ -3788,7 +3689,7 @@ void acsSpecSetMem ( const int nBytes, int *status ) {
 /*
 *+
 *  Name:
-*     kpgPtfts
+*     acs_kpgPtfts
 
 *  Purpose:
 *     Store FITS header information into an NDF
@@ -3857,7 +3758,7 @@ void acsSpecSetMem ( const int nBytes, int *status ) {
 *-
 */
 
-static int kpgPtfts( int indf, const AstFitsChan * fchan, int * status ) {
+static int acs_kpgPtfts( int indf, const AstFitsChan * fchan, int * status ) {
 
   char card[SZFITSCARD+1];            /* A single FITS header card */
   int  fitsdim[1];  /* dimensions of FITS extension */
@@ -3932,7 +3833,7 @@ static int kpgPtfts( int indf, const AstFitsChan * fchan, int * status ) {
   datAnnul( &fitsloc, status );
 
   /* Annul the local copy */
-  astAnnul( lchan );
+  lchan = astAnnul( lchan );
 
   /* Reset AST status */
   astWatch( oldstat );
