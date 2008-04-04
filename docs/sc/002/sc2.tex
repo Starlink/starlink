@@ -6,7 +6,14 @@
 % Copyright 1997  Starlink, CCLRC.
 %-
 
-\documentstyle[twoside,11pt,epsf]{article}
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+\usepackage{graphicx}        %  Use this one for final production.
+\usepackage{epsfig}          %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
 \pagestyle{myheadings}
 \newcounter{swapfoot}
 
@@ -24,6 +31,21 @@
 \newcommand{\stardocauthors}   {A.C.~Davenhall}
 \newcommand{\stardocdate}      {1st October 1997}
 \newcommand{\stardoctitle}     {The DX Cookbook}
+\newcommand{\stardocabstract}  {IBM DX (Data Explorer) is the 
+data-visualisation package recommended by Starlink, particularly for
+the visualisation of three-dimensional scalar and vector data. This
+cookbook provides a set of simple recipes for performing common
+operations using DX. No prior knowledge of DX is required. You can use
+the recipes as they are provided, if they are suitable for your
+purposes, or alternatively you can use them as a starting point for
+generating your own visualisations.
+
+The cookbook also contains a brief summary of the DX data model. It is
+useful to have at least some understanding of this data model in order
+to use DX effectively.
+
+This edition of the cookbook applies to Version \DXversion of DX.}
+
 % ? End of document identification
 % -----------------------------------------------------------------------------
 
@@ -63,9 +85,9 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{latexonly} and %\end{latexonly} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{latexonly}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -152,7 +174,7 @@
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
-%\end{latexonly}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 % ? End of document specific commands
@@ -165,7 +187,7 @@
 
 %  Latex document header.
 %  ======================
-\begin{latex}
+\begin{latexonly}
    CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
@@ -188,21 +210,23 @@
       {\Large\bf Abstract}
    \end{center}
 % ? End of heading for abstract.
-\end{latex}
+\end{latexonly}
 
 %  HTML documentation header.
 %  ==========================
 \begin{htmlonly}
    \xlabel{}
    \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
+      \stardoctitle
+%      \stardocversion\\
+%      \stardocmanual
    \begin{rawhtml} </H1> \end{rawhtml}
 
 % ? Add picture here if required.
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -212,10 +236,10 @@
       \htmladdnormallink{Particle Physics \& Astronomy Research Council}
                         {http://www.pparc.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
    \begin{rawhtml} </H2> \end{rawhtml}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
 %  HTML document table of contents. 
 %  ================================
@@ -226,39 +250,28 @@
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \newcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
+  \newcommand{\latexonlytoc}[0]{}
 
-% ? New section for abstract if used.
-%  \section{\xlabel{abstract}Abstract}
+% ? New part for abstract if used.  
+
+%  Note this is different from most documents where a section is used.
+  \section{\xlabel{abstract}Abstract}
 % ? End of new section for abstract
 \end{htmlonly}
 
 % -----------------------------------------------------------------------------
 % ? Document Abstract. (if used)
 %   ==================
-
-IBM DX (Data Explorer) is the data visualisation package recommended by
-Starlink, particularly for the visualisation of three-dimensional scalar
-and vector data. This cookbook provides a set of simple recipes for
-performing common operations using DX. No prior knowledge of DX is
-required. You can use the recipes as they are provided, if they are
-suitable for your purposes, or alternatively you can use them as a
-starting point for generating your own visualisations.
-
-The cookbook also contains a brief summary of the DX data model. It is
-useful to have at least some understanding of this data model in order
-to use DX effectively.
-
-This edition of the cookbook applies to version \DXversion of DX.
+\stardocabstract
 
 % ? End of document abstract
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
- \newpage
- \begin{latex}
+\newpage
+\begin{latexonly}
    \setlength{\parskip}{0mm}
    \latexonlytoc
 
@@ -268,13 +281,14 @@ This edition of the cookbook applies to version \DXversion of DX.
 
    \setlength{\parskip}{\medskipamount}
    \markboth{\stardocname}{\stardocname}
- \end{latex}
+\end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 
 \vspace{2.5cm}
 
-\subsection*{Revision history}
+\latex{\subsection*{Revision history}}
+\html{\section*{Revision history}}
 
 \begin{enumerate}
 
@@ -307,7 +321,7 @@ is not a user's guide or a tutorial, but rather provides a set of
 `recipes' for performing simple visualisations of the sort which
 you may require. You can either use the recipes `as is' if they do
 exactly what you want, or (more likely) vary them slightly to meet
-your requirements. This edition of the cookbook applies to version
+your requirements. This edition of the cookbook applies to Version
 \DXversion of DX.
 
 Like any technical subject, scientific visualisation has its own
@@ -340,7 +354,7 @@ Figure~\ref{SIMPLE}. Though DX networks superficially resemble flow
 charts, it is important to realise that they are quite different. The
 lines in a DX network show the flow of {\it data}\, through the system,
 {\it not}\, the flow of {\it control}\, as the network
-executes\footnote{If you are familiar with the Yourdon - de Marco
+executes\footnote{If you are familiar with the Yourdon-de Marco
 Structured Systems Analysis technique, or other similar methods, you
 will recognise that DX networks are very similar to the data flow
 diagrams used in these techniques.}. Obviously, once you have created a
@@ -495,10 +509,16 @@ using DX.
 \subsection{Copies of the recipe networks}
 
 Copies of the recipe networks, data files, example programs and other
-files referred to in this section can be found in directory:
+files referred to in this section can be found on Starlink systems
+in directory:
 
 \begin{quote}
 {\tt /star/examples/sc2}
+\end{quote}
+
+and on non-Starlink systems in directory:
+\begin{quote}
+{\tt \$STARLINK\_DIR/examples/sc2}
 \end{quote}
 
 The most convenient way to access these files is probably to copy them
@@ -822,7 +842,7 @@ on the leftmost mouse button.}
      selection. Click on this box and enter:
 
     \begin{quote}
-     {\tt /star/examples/sc2}
+     {\tt \$STARLINK\_DIR/examples/sc2}
     \end{quote}
 
      A list of networks should appear in the `Files' box on the right
@@ -877,7 +897,7 @@ term.
 
   \begin{enumerate}
 
-    \item Set input `name' to: {\tt /star/examples/sc2/field.general}
+    \item Set input `name' to: {\tt \$STARLINK\_DIR/examples/sc2/field.general}
 
      This file is the DX `header' file describing the data file.
      Files written by an external program and imported into DX are
@@ -921,7 +941,7 @@ term.
      or too small) select the `Reset' option from the `Options' menu.
 
     \item By default DX generates a view perpendicular to one of the 
-     axes, which gives an un-naturally `flat' appearance to the image.
+     axes, which gives an unnaturally `flat' appearance to the image.
      For a better perspective view select the `View Control' option
      from the `Options' menu. The `View Control' window appears. Set the
      `Set View' toggle to `Diagonal' or one of the `Off\ldots' options.
@@ -1072,7 +1092,7 @@ The program to generate the data file is listed in Figure~\ref{FIELD.F}.
    Section 4.4 {\it Data Prompter}, of the {\it QuickStart
    Guide}\cite{QUICKS} gives details.
 
-  \newpage
+  \latex{\newpage}
   \item Unformatted binary files can also be imported using the same
    header file mechanism. The {\tt format} keyword should be set to
    `{\tt binary}'. Binary files written with a C program can be
@@ -1090,7 +1110,7 @@ The program to generate the data file is listed in Figure~\ref{FIELD.F}.
    unformatted file written in IEEE floating point format, irrespective
    of the type of machine that it was written on. Note, however, that
    Digital VAXen and IBM mainframes do not use IEEE floating point format.}.
-   See section~4.3 {\it Header File Syntax: Keyword Statements}\, of the
+   See Section~4.3 {\it Header File Syntax: Keyword Statements}\, of the
    IBM {\it QuickStart Guide}\cite{QUICKS} for details.
 
   \item It is also possible to import files in the Starlink NDF format
@@ -1636,10 +1656,15 @@ follow the `Basic Use of DX' recipe (see Section~\ref{BASIC}).
 \subsection{Copies of the recipe networks}
 
 Like the simple networks in Part I, the networks and data files referred
-to in this section can be found in directory:
+to in this section can be found on Starlink systems in directory:
 
 \begin{quote}
 {\tt /star/examples/sc2}
+\end{quote}
+
+and on non-Starlink systems in directory:
+\begin{quote}
+{\tt \$STARLINK\_DIR/examples/sc2}
 \end{quote}
 
 The most convenient way to access these files is probably to copy them
@@ -1934,7 +1959,7 @@ described in Section~\ref{JCMT}.
 
    It is also worth noting that an Asterix binned dataset is itself
    almost a standard Starlink NDF.  {\tt ast2ndf} merely makes the
-   data format completely standard and re-arranges the order of the
+   data format completely standard and rearranges the order of the
    axes.
 
   \item Once the Asterix binned dataset has been converted to a simple
