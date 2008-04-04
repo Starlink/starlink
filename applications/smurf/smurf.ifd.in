@@ -1559,6 +1559,15 @@ package @PACKAGE@ {
             helpkey *
           }
 
+         parameter outfiles {
+            type LITERAL
+            prompt {Text file in which to put the output NDF names}
+            default !
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            helpkey *
+          }
+
          parameter sizelimit {
             type _INTEGER
             prompt {Size limit for each output NDF}

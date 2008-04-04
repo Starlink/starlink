@@ -112,6 +112,10 @@
 *          the input NDFs do not conform to the ACSIS file naming convention, 
 *          the strings "_1", "_2", etc will be appended to the end of the 
 *          supplied group of names to form the output NDF names.
+*     OUTFILES = LITERAL (Write)
+*          The name of text file to create, in which to put the names of
+*          all the output NDFs created by this application (one per
+*          line). If a null (!) value is supplied no file is created. [!]
 *     SIZELIMIT = _INTEGER (Read)
 *          Only accessed if parameter MERGE is set TRUE. It is a number that 
 *          specifies the maximum size of each output NDF when merging data
@@ -142,6 +146,8 @@
 *        Change scheme for naming output files so that they conform to
 *        the ACSIS file naming convention, if possible. Update FITS
 *        headers NSUBSCAN and OBSEND in the output NDFs.
+*     4-APR-2008 (DSB):
+*        Add parameter OUTFILES.
 
 *  Copyright:
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
@@ -215,6 +221,7 @@ void smurf_timesort( int *status ) {
    Grp *igrp1 = NULL;         
    Grp *igrp2 = NULL;         
    Grp *igrp3 = NULL;         
+   Grp *igrp4 = NULL;         
    HDSLoc *loc1 = NULL;       
    HDSLoc *loc1c = NULL;      
    HDSLoc *loc2 = NULL;       
@@ -368,7 +375,7 @@ void smurf_timesort( int *status ) {
 /* Get a group of exactly "size" names for the output NDFs.  Base 
    modification elements on the group containing the input NDFs. */
       kpg1Wgndf( "OUT", igrp1, size, size, "  Give more NDFs...",
-                 &igrp2, &outsize, status );
+                 &igrp4, &outsize, status );
 
 /* Loop round each input NDF. */
       for( ifile = 1; ifile <= size && *status == SAI__OK; ifile++ ) {
@@ -409,9 +416,9 @@ void smurf_timesort( int *status ) {
    arrays into the output. */
          if( sorted && nbaddet == 0 ) {
             ndgNdfpr( indf1, "Data,Variance,Quality,Units,Axis,WCS,"
-                      "NoExtension(Provenance)", igrp2, ifile, &indf2, status );
+                      "NoExtension(Provenance)", igrp4, ifile, &indf2, status );
          } else {
-            ndgNdfpr( indf1, "Units,Axis,WCS,NoExtension(Provenance)", igrp2, 
+            ndgNdfpr( indf1, "Units,Axis,WCS,NoExtension(Provenance)", igrp4, 
                       ifile, &indf2, status );
    
 /* Get the pixel dimensions of the input NDF. Report an error if not
@@ -614,14 +621,13 @@ void smurf_timesort( int *status ) {
          }
       }
 
-/* Free resources. */
-      grpDelet( &igrp2, status );
-
-
 
 /* Now handle cases where the input files are being merged. */
 /* ======================================================== */
    } else if( *status == SAI__OK ){
+
+/* Create a new group to hold the names of the output NDFs. */
+      igrp4 = grpNew( "", status );
 
 /* Get the SIZELIMIT and LIMITTYPE parameters. */
       nullsizelimit = 0;
@@ -1067,6 +1073,9 @@ void smurf_timesort( int *status ) {
                ndfPlace( NULL, fullname, &place, status );
                ndfScopy( ndfid[ 0 ], "Units,Axis,NoExtension(PROVENANCE)", 
                          &place, &indf2, status );
+
+/* Store the output NDF name in the group of output NDF names. */
+               grpPut1( igrp4, fullname, 0, status );
       
 /* Increment the number of output NDFs created. */
                totout++;
@@ -1314,11 +1323,19 @@ void smurf_timesort( int *status ) {
 /* Write out the number of output NDFs. */
    parPut0i( "NOUT", totout, status );
 
+/* Write out the list of output NDF names, annulling the error if a null
+   parameter value is supplied. */
+   if( *status == SAI__OK ) {
+      grpList( "OUTFILES", 0, 0, NULL, igrp4, status );
+      if( *status == PAR__NULL ) errAnnul( status );
+   }
+
 /* Free resources. */
    mask = astFree( mask );
    obs_map = astAnnul( obs_map );
    grpDelet( &igrp1, status );
    grpDelet( &igrp3, status );
+   grpDelet( &igrp4, status );
 
 /* End the NDF context. */
    ndfEnd( status );
