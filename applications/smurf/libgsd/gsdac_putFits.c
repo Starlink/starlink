@@ -96,6 +96,8 @@
 *        Call smf_get_moltrans to get transition info.
 *     2008-04-02 (JB):
 *        Fixed typo in OBSIDSS.
+*     2008-04-03 (JB):
+*        Fix pressure and steptime.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -153,7 +155,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 {
 
   /* Local variables */
-  double bp;                  /* pressure (mbar) */
+
   char bwMode[SZFITSCARD];    /* ACSIS total bandwidth setup */
   char curChar;               /* character pointer */
   int day;                    /* days for time conversion. */
@@ -186,6 +188,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   int standard;               /* true for spectral line standards */
   int startIdx;               /* index in pattern at start of observation */
   int stBetRef;               /* max number of steps between refs */
+  double stepTime;            /* RTS step time */
   char subBands[SZFITSCARD];  /* ACSIS sub-band set-up */
   char tauDatSt[SZFITSCARD];  /* time of tau225St observation in 
                                  format YYYY-MM-DDTHH:MM:SS */
@@ -317,9 +320,6 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   /* Environmental data. */
 
-  /* Convert pressure from mmHg to mbar. */
-  bp = gsdVars->pamb * 1.33322;
-
   /* Convert dates from YYMMDDHHMMSS to 
      YYYY-MM-DDTHH:MM:SS. */
   parse = sscanf ( gsdVars->tauTime, "%02d%02d%02d%02d%02d", &year, 
@@ -363,6 +363,22 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   }
 
   /* JOS parameters */
+
+  /* STEPTIME is SCAN_TIME for grids, and SCAN_TIME divided by the
+     number of points in a scan for rasters. */
+  if ( strncmp ( samMode, "raster", 6 ) == 0 ) {
+  
+    if ( strncmp ( gsdVars->obsDirection, "HORIZONTAL", 10 ) == 0 )
+      stepTime = gsdVars->scanTime / gsdVars->nMapPtsX;
+    else
+      stepTime = gsdVars->scanTime / gsdVars->nMapPtsY;
+
+  } else {
+
+    stepTime = gsdVars->scanTime;
+
+  }
+
 
   /* Get the JOS_MIN (1 for raster, for sample this is the number
      of STEPTIME integrations coadded into a single spectrum. */
@@ -569,7 +585,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsS ( fitschan, "BWMODE", bwMode,
                 "Bandwidth setup", 0 );
 
-  astSetFitsI ( fitschan, "SUBSYSNR", subBandNum % nSubsys,
+  astSetFitsI ( fitschan, "SUBSYSNR", ( subBandNum % nSubsys ) + 1,
                 "Sub-system number", 0 );
 
   astSetFitsS ( fitschan, "SUBBANDS", bwMode,
@@ -666,10 +682,10 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsF ( fitschan, "HUMEND", gsdVars->hamb, 
                 "Rel Humidity observation end", 0 );
 
-  astSetFitsF ( fitschan, "BPSTART", bp, 
+  astSetFitsF ( fitschan, "BPSTART", gsdVars->pamb, 
                 "[mbar] Pressure at observation start", 0 );
 
-  astSetFitsF ( fitschan, "BPEND", bp, 
+  astSetFitsF ( fitschan, "BPEND", gsdVars->pamb, 
                 "[mbar] Pressure at observation end", 0 );
 
   astSetFitsF ( fitschan, "WNDSPDST", AST__UNDEFF, 
@@ -897,7 +913,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsCN ( fitschan, "COMMENT", "", 
                  "---- JOS parameters ----", 0 );
 
-  astSetFitsF ( fitschan, "STEPTIME", gsdVars->cycleTime, 
+  astSetFitsF ( fitschan, "STEPTIME", stepTime, 
                 "RTS step time during an RTS sequence", 0 ); 
 
   astSetFitsI ( fitschan, "NUM_CYC", gsdVars->nCycle, 
