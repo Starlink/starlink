@@ -55,6 +55,7 @@
 
 *  Authors:
 *     J.Balfour (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History :
@@ -84,6 +85,8 @@
 *        Return WCSFrame.
 *     2008-04-03 (JB):
 *        Correct LST offsets for rasters.
+*     2008-04-04 (TIMJ):
+*        Store DUT1 in WCS frameset for later use by specwrite
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -125,7 +128,6 @@
 #include "smurf_par.h"
 
 #define SOLSID 1.00273790935
-#define SPD 86400.0
 
 #define DEBUGON 0
 
@@ -190,7 +192,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
            year, month, day, hour, min, sec );
 
   /* Apply the UT1-UTC correction. */
-  dut1 = gsdVars->obsUT1C * 86400.0;
+  dut1 = gsdVars->obsUT1C * SPD;
   astSet ( tFrame, "DUT1=%f", dut1 );
 
   /* Set the telescope location. */
@@ -393,6 +395,10 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   atlWcspx ( datePointing, cellMap, dataDims, 
              gsdVars->telLongitude * -1.0 * AST__DD2R, 
              gsdVars->telLatitude * AST__DD2R, WCSFrame, status );
+
+  /* Set DUT1 attribute (which will not have been set in the ATL call
+     since it is not needed there but specwrite uses it) */
+  astSet ( *WCSFrame, "DUT1(1)=%f,DUT1(3)=%f", dut1, dut1 );
 
   /* Make a copy of the frameset for local calculations. */
   frame = astCopy ( *WCSFrame );

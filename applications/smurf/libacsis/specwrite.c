@@ -3552,6 +3552,9 @@ AstFrameSet *specWcs( const AstFrameSet *fs, const char veldef[], int ntime, con
     astSet( timefrm, "ObsLon=%s,ObsLat=%s", astGetC( specfrm, "ObsLon" ),
             astGetC( specfrm, "ObsLat") );
 
+  /* similarly if DUT1 is defined */
+  if (astTest( fs, "dut1" )) astSet( timefrm, "dut1=%s", astGetC(fs, "dut1"));
+
   if (malloced) starFree( ltimes );
 
   /* We now have the Frames and Mappings describing all the individual
