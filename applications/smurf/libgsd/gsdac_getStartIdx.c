@@ -42,7 +42,9 @@
 *     2008-03-19 (JB):
 *        Removed unused variables.
 *     2008-03-21 (JB):
-*        Calculate startIdx for grids/rasters
+*        Calculate startIdx for grids/rasters.
+*     2008-04-03 (JB):
+*        startidx = 1 for rasters. 
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -142,7 +144,7 @@ void gsdac_getStartIdx ( const gsdVars *gsdVars, const char *samMode,
 
   /* If this is a raster, only increment on each row.  Remember
      that the index begins at 1, not 0. */
-  if ( strncmp ( samMode, "raster", 6 ) == 0 ) {
+  /*if ( strncmp ( samMode, "raster", 6 ) == 0 ) {
 
     if ( posCol ) 
       *startIdx = startCol + ( nRows - 1.0 ) / 2.0 + 1.0;
@@ -150,51 +152,55 @@ void gsdac_getStartIdx ( const gsdVars *gsdVars, const char *samMode,
       *startIdx = ( nRows - 1.0 ) / 2.0 - startCol + 1.0;
     return;
 
-  }
+    }*/
 
   /* The start coordinates are usually in the bottom left
      hand corner, but if x and/or y decreases in the first
      row/column, a different corner is the "start". */
-  if ( posRow  )
-    expStartCol = ( nCols - 1.0 ) / -2.0;
-  else 
-    expStartCol = ( nCols - 1.0 ) / 2.0;
+  if ( strncmp ( samMode, "grid", 4 ) == 0 ) {
+    if ( posRow  )
+      expStartCol = ( nCols - 1.0 ) / -2.0;
+    else 
+      expStartCol = ( nCols - 1.0 ) / 2.0;
 
-  if ( posCol )
-    expStartRow = ( nRows - 1.0 ) / -2.0;
-  else 
-    expStartRow = ( nRows - 1.0 ) / 2.0;
+    if ( posCol )
+      expStartRow = ( nRows - 1.0 ) / -2.0;
+    else 
+      expStartRow = ( nRows - 1.0 ) / 2.0;
 
-  for ( j = 0; j < nRows; j++ ) {
+    for ( j = 0; j < nRows; j++ ) {
 
-    for ( k = 0; k < nCols; k++ ) {
+      for ( k = 0; k < nCols; k++ ) {
 
-      /* Check to see if we are moving in a positive or 
-         negative direction and get the coordinates of our
-         current position in the map.   Also check for 
-         scan reversal on the column. */
-      if ( posCol ) currentRow = expStartRow + j;
-      else currentRow = expStartRow - j;
+        /* Check to see if we are moving in a positive or 
+           negative direction and get the coordinates of our
+           current position in the map.   Also check for 
+           scan reversal on the column. */
+        if ( posCol ) currentRow = expStartRow + j;
+        else currentRow = expStartRow - j;
 
-      if ( gsdVars->scanRev && j % 2 == 1 ) {      
-        if ( posRow ) currentCol = ( -1.0 * expStartCol ) - k;
-        else currentCol = ( -1.0 * expStartCol ) + k;
-      } else {
-        if ( posRow ) currentCol = expStartCol + k;
-        else currentCol = expStartCol - k;
+        if ( gsdVars->scanRev && j % 2 == 1 ) {      
+          if ( posRow ) currentCol = ( -1.0 * expStartCol ) - k;
+          else currentCol = ( -1.0 * expStartCol ) + k;
+        } else {
+          if ( posRow ) currentCol = expStartCol + k;
+          else currentCol = expStartCol - k;
+        }
+
+        if ( currentCol == startRow && currentRow == startCol ) {
+          j = nRows;
+          k = nCols;
+          found = 1;
+          *startIdx = i;
+        }
+
+        i++;
+
       }
-
-      if ( currentCol == startRow && currentRow == startCol ) {
-        j = nRows;
-        k = nCols;
-        found = 1;
-        *startIdx = i;
-      }
-
-      i++;
 
     }
-
+  } else {
+    *startIdx = 1;
   }
 
 }
