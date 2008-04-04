@@ -84,9 +84,9 @@
 *          "Sum"    -- The total value.
 *        ["Mean"]
 *     HIGH = LITERAL (Read)
-*        A value for the axis specified by parameter AXIS.  For example,
-*        if AXIS is 3 and the current Frame of the input NDF has axes
-*        RA/DEC/Wavelength, then a wavelength value should be supplied.
+*        A formatted value for the axis specified by parameter AXIS.  For 
+*        example, if AXIS is 3 and the current Frame of the input NDF has 
+*        axes RA/DEC/Wavelength, then a wavelength value should be supplied.
 *        If, on the other hand, the current Frame in the NDF was the
 *        PIXEL Frame, then a pixel co-ordinate value would be required 
 *        for the third axis (note, the pixel with index I covers a range
@@ -98,11 +98,11 @@
 *     IN  = NDF (Read)
 *        The input NDF. 
 *     LOW = LITERAL (Read)
-*        A value for the axis specified by parameter AXIS.  For example,
-*        if AXIS is 3 and the current Frame of the input NDF has axes
-*        RA/DEC/Wavelength, then a wavelength value should be supplied.
-*        If, on the other hand, the current Frame in the NDF was the
-*        PIXEL Frame, then a pixel co-ordinate value would be required
+*        A formatted value for the axis specified by parameter AXIS.  
+*        For example, if AXIS is 3 and the current Frame of the input NDF 
+*        has axes RA/DEC/Wavelength, then a wavelength value should be 
+*        supplied. If, on the other hand, the current Frame in the NDF was 
+*        the PIXEL Frame, then a pixel co-ordinate value would be required
 *        for the third axis (note, the pixel with index I covers a range
 *        of pixel co-ordinates from (I-1) to I).  Together with 
 *        parameter HIGH, this parameter gives the range of axis values
@@ -181,6 +181,10 @@
 *        up if necessary to correspond to at least one pixel). [0.3]
 
 *  Examples:
+*     collapse m31 profile axis=RA low="0:36:01" high="0:48:00"
+*        Collapses the 2D NDF called m31 along the Right Ascension axis,
+*        from "0:36:01" to "0:48:00", and puts the result in an output
+*        NDF called profile.
 *     collapse cube slab lambda 4500 4550 
 *        The current Frame in the input three-dimensional NDF called 
 *        cube has axes with labels "RA", "DEC" and "Lambda", with the 
@@ -374,6 +378,9 @@
 *        Add warning for non-zero WLIM when its threshold introduces bad
 *        values into the output and the corresponding input data 
 *        contain some good values.
+*     4-APR-2008 (DSB):
+*        Change prologue to emphasise the fact that HIGH and LOW are
+*        formatted axis values.
 *     {enter_further_changes_here}
 
 *-

@@ -17619,9 +17619,9 @@ XV; PBMPLUS; NETPBM.
       \sstsubsection{
          HIGH = LITERAL (Read)
       }{
-         A value for the axis specified by parameter AXIS.  For example,
-         if AXIS is 3 and the current Frame of the input NDF has axes
-         RA/DEC/Wavelength, then a wavelength value should be supplied.
+         A formatted value for the axis specified by parameter AXIS.  For 
+         example, if AXIS is 3 and the current Frame of the input NDF has 
+         axes RA/DEC/Wavelength, then a wavelength value should be supplied.
          If, on the other hand, the current Frame in the NDF was the PIXEL
          Frame, then a pixel co-ordinate value would be required for the
          third axis (note, the pixel with index I covers a range of pixel
@@ -17639,9 +17639,9 @@ XV; PBMPLUS; NETPBM.
       \sstsubsection{
          LOW = LITERAL (Read)
       }{
-         A value for the axis specified by parameter AXIS.  For example,
-         if AXIS is 3 and the current Frame of the input NDF has axes
-         RA/DEC/Wavelength, then a wavelength value should be supplied.
+         A formatted value for the axis specified by parameter AXIS.  For 
+         example, if AXIS is 3 and the current Frame of the input NDF has 
+         axes RA/DEC/Wavelength, then a wavelength value should be supplied.
          If, on the other hand, the current Frame in the NDF was the PIXEL
          Frame, then a pixel co-ordinate value would be required for the
          third axis (note, the pixel with index $I$ covers a range of pixel
@@ -17743,16 +17743,11 @@ XV; PBMPLUS; NETPBM.
    }
    \sstexamples{
       \sstexamplesubsection{
-         collapse cube slab lambda 4500 4550
+         collapse m31 profile axis=RA low="0:36:01" high="0:48:00"
       }{
-         The current Frame in the input three-dimensional NDF called cube has
-         axes with labels {\tt "RA"}, {\tt "DEC"} and {\tt "Lambda"}, with the 
-         lambda axis being parallel to the third pixel axis.  The above command
-         extracts a slab of the input cube between wavelengths 4500 and
-         4550 {\AA}ngstroms, and collapses this slab into a single
-         two-dimensional output NDF called slab with RA and DEC axes.  Each
-         pixel in the output NDF is the mean of the corresponding input
-         pixels with wavelengths between 4500 and 4550 {\AA}ngstroms.
+         Collapses the 2D NDF called m31 along the Right Ascension axis,
+	 from "0:36:01" to "0:48:00", and puts the result in an output
+	 NDF called profile.
       }
       \sstexamplesubsection{
          collapse cube slab 3 4500 4550
