@@ -49,6 +49,8 @@
 *        getWCS returns AstFrameSet.
 *     2008-03-28 (JB):
 *        Add getRecepNames and getTransition.
+*     2008-04-04 (JB):
+*        Add CALLGSD macro.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -83,6 +85,17 @@
 
 #ifndef GSDAC_DEFINED
 #define GSDAC_DEFINED
+
+#define CALLGSD( routine, status, errmsg )\
+  if ( *status == SAI__OK ) {\
+    int gsdstat;\
+    gsdstat = routine;\
+    if ( gsdstat != 0 ){\
+       *status = SAI__ERROR;\
+       errmsg;\
+    }\
+  }
+
 
 void gsdac_freeArrays
 (

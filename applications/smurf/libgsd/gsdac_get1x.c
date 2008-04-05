@@ -54,6 +54,8 @@
 *        Original
 *     2008-03-19 (JB):
 *        Removed unused variables.
+*     2008-04-04 (JB):
+*        Wrap gsd calls in macro for error checking.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -113,14 +115,12 @@ void gsdac_get1b ( const gsd *gsd,
   if ( *status != SAI__OK ) return;
 
   /* Get the item number. */
-  *status = gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
-                      unit, &type, &array );
+  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
+		     unit, &type, &array ), 
+           status, 
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get1b", "gsdFind : Could not find element ^NAME in file", status ); );
 
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_get0b", "Could not find element ^NAME in file", status );
-    return;
-  }   
+  if ( *status != SAI__OK ) return;
 
   /* Check that the array flag is true and the data type is B. */
   if ( !array ) {
@@ -147,30 +147,22 @@ void gsdac_get1b ( const gsd *gsd,
     unitNames[i] = unitMem[i];
 
   /* Get the dimensionality. */
-  *status = gsdInqSize ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
+  CALLGSD( gsdInqSize ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
                          itemno, MAXDIMS, dimNames, unitNames, 
-                         dimVals, &actDims, &size );
+                         dimVals, &actDims, &size ), 
+           status, 
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get1b", "gsdinqSize : Error retrieving array dimensionality for ^NAME", status ); );
 
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_get1b", "Error retrieving array dimensionality for ^NAME", 
-             status );
-    return;
-  }
+  if ( *status != SAI__OK ) return;
 
   start = 1;
 
   /* Get the array data. */
-  *status = gsdGet1b ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
-                       itemno, 1, &size, &start, &size, 
-                       values, &actVals );
-
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_get1b", "Error retrieving array values for ^NAME", 
-             status );
-    return;
-  }
+  CALLGSD( gsdGet1b ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
+		      itemno, 1, &size, &start, &size, 
+                      values, &actVals ), 
+           status, 
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get1b", "gsdGet1b : Could not get ^NAME from GSD file", status ); );
 
 }
 
@@ -197,14 +189,12 @@ void gsdac_get1c ( const gsd *gsd,
   if ( *status != SAI__OK ) return;
 
   /* Get the item number. */
-  *status = gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
-                      unit, &type, &array );
+  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
+		     unit, &type, &array ), 
+           status, 
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get1c", "gsdFind : Could not find element ^NAME in file", status ); );
 
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_get1c", "Could not find element ^NAME in file", status );
-    return;
-  }   
+  if ( *status != SAI__OK ) return;
 
   /* Check that the array flag is true and the data type is C. */
   if ( !array ) {
@@ -231,30 +221,22 @@ void gsdac_get1c ( const gsd *gsd,
     unitNames[i] = unitMem[i];
 
   /* Get the dimensionality. */
-  *status = gsdInqSize ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
+  CALLGSD( gsdInqSize ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
                          itemno, MAXDIMS, dimNames, unitNames, 
-                         dimVals, &actDims, &size );
+                         dimVals, &actDims, &size ), 
+           status, 
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get1c", "gsdinqSize : Error retrieving array dimensionality for ^NAME", status ); );
 
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_get1c", "Error retrieving array dimensionality for ^NAME", 
-             status );
-    return;
-  }
+  if ( *status != SAI__OK ) return;
 
   start = 1;
 
   /* Get the array data. */
-  *status = gsdGet1c ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
-                       itemno, 1, &size, &start, &size, 
-                       values, &actVals );
-
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_get1c", "Error retrieving array values for ^NAME", 
-             status );
-    return;
-  }
+  CALLGSD( gsdGet1c ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
+		      itemno, 1, &size, &start, &size, 
+                      values, &actVals ), 
+           status, 
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get1c", "gsdGet1c : Could not get ^NAME from GSD file", status ); );
 
 }
 
@@ -281,14 +263,12 @@ void gsdac_get1d ( const gsd *gsd,
   if ( *status != SAI__OK ) return;
 
   /* Get the item number. */
-  *status = gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
-                      unit, &type, &array );
+  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
+		     unit, &type, &array ), 
+           status, 
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get1d", "gsdFind : Could not find element ^NAME in file", status ); );
 
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_get1d", "Could not find element ^NAME in file", status );
-    return;
-  }   
+  if ( *status != SAI__OK ) return;
 
   /* Check that the array flag is true and the data type is D. */
   if ( !array ) {
@@ -315,30 +295,22 @@ void gsdac_get1d ( const gsd *gsd,
     unitNames[i] = unitMem[i];
 
   /* Get the dimensionality. */
-  *status = gsdInqSize ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
+  CALLGSD( gsdInqSize ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
                          itemno, MAXDIMS, dimNames, unitNames, 
-                         dimVals, &actDims, &size );
+                         dimVals, &actDims, &size ), 
+           status, 
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get1d", "gsdinqSize : Error retrieving array dimensionality for ^NAME", status ); );
 
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_get1d", "Error retrieving array dimensionality for ^NAME", 
-             status );
-    return;
-  }
+  if ( *status != SAI__OK ) return;
 
   start = 1;
 
   /* Get the array data. */
-  *status = gsdGet1d ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
-                       itemno, 1, &size, &start, &size, 
-                       values, &actVals );
-
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_get1d", "Error retrieving array values for ^NAME", 
-             status );
-    return;
-  }
+  CALLGSD( gsdGet1d ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
+		      itemno, 1, &size, &start, &size, 
+                      values, &actVals ), 
+           status, 
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get1d", "gsdGet1d : Could not get ^NAME from GSD file", status ); );
 
 }
 
@@ -365,14 +337,12 @@ void gsdac_get1i ( const gsd *gsd,
   if ( *status != SAI__OK ) return;
 
   /* Get the item number. */
-  *status = gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
-                      unit, &type, &array );
+  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
+		     unit, &type, &array ), 
+           status, 
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get1i", "gsdFind : Could not find element ^NAME in file", status ); );
 
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_get1i", "Could not find element ^NAME in file", status );
-    return;
-  }   
+  if ( *status != SAI__OK ) return;
 
   /* Check that the array flag is true and the data type is I. */
   if ( !array ) {
@@ -399,30 +369,22 @@ void gsdac_get1i ( const gsd *gsd,
     unitNames[i] = unitMem[i];
 
   /* Get the dimensionality. */
-  *status = gsdInqSize ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
+  CALLGSD( gsdInqSize ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
                          itemno, MAXDIMS, dimNames, unitNames, 
-                         dimVals, &actDims, &size );
+                         dimVals, &actDims, &size ), 
+           status, 
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get1i", "gsdinqSize : Error retrieving array dimensionality for ^NAME", status ); );
 
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_get1i", "Error retrieving array dimensionality for ^NAME", 
-             status );
-    return;
-  }
+  if ( *status != SAI__OK ) return;
 
   start = 1;
 
   /* Get the array data. */
-  *status = gsdGet1i ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
-                       itemno, 1, &size, &start, &size, 
-                       values, &actVals );
-
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_get1i", "Error retrieving array values for ^NAME", 
-             status );
-    return;
-  }
+  CALLGSD( gsdGet1i ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
+		      itemno, 1, &size, &start, &size, 
+                      values, &actVals ), 
+           status, 
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get1i", "gsdGet1i : Could not get ^NAME from GSD file", status ); );
 
 }
 
@@ -450,15 +412,12 @@ void gsdac_get1l ( const gsd *gsd,
   if ( *status != SAI__OK ) return;
 
   /* Get the item number. */
-  *status = gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
-                      unit, &type, &array );
+  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
+		     unit, &type, &array ), 
+           status, 
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get1l", "gsdFind : Could not find element ^NAME in file", status ); );
 
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_get1l", "Could not find element ^NAME in file", 
-             status );
-    return;
-  }   
+  if ( *status != SAI__OK ) return;
 
   /* Check that the array flag is true and the data type is L. */
   if ( !array ) {
@@ -485,30 +444,22 @@ void gsdac_get1l ( const gsd *gsd,
     unitNames[i] = unitMem[i];
 
   /* Get the dimensionality. */
-  *status = gsdInqSize ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
+  CALLGSD( gsdInqSize ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
                          itemno, MAXDIMS, dimNames, unitNames, 
-                         dimVals, &actDims, &size );
+                         dimVals, &actDims, &size ), 
+           status, 
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get1l", "gsdinqSize : Error retrieving array dimensionality for ^NAME", status ); );
 
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_get1l", "Error retrieving array dimensionality for ^NAME", 
-             status );
-    return;
-  }
+  if ( *status != SAI__OK ) return;
 
   start = 1;
 
   /* Get the array data. */
-  *status = gsdGet1l ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
-                       itemno, 1, &size, &start, &size, 
-                       values, &actVals );
-
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_get1l", "Error retrieving array values for ^NAME", 
-             status );
-    return;
-  }
+  CALLGSD( gsdGet1l ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
+		      itemno, 1, &size, &start, &size, 
+                      values, &actVals ), 
+           status, 
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get1l", "gsdGet1l : Could not get ^NAME from GSD file", status ); );
 
 }
 
@@ -535,14 +486,12 @@ void gsdac_get1r ( const gsd *gsd,
   if ( *status != SAI__OK ) return;
 
   /* Get the item number. */
-  *status = gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
-                      unit, &type, &array );
+  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
+		     unit, &type, &array ), 
+           status, 
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get1r", "gsdFind : Could not find element ^NAME in file", status ); );
 
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_get1r", "Could not find element ^NAME in file", status );
-    return;
-  }   
+  if ( *status != SAI__OK ) return;
 
   /* Check that the array flag is true and the data type is R. */
   if ( !array ) {
@@ -569,31 +518,22 @@ void gsdac_get1r ( const gsd *gsd,
     unitNames[i] = unitMem[i];
 
   /* Get the dimensionality. */
-  if ( *status == SAI__OK ) { 
-    *status = gsdInqSize ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
-                           itemno, MAXDIMS, dimNames, unitNames, 
-                           dimVals, &actDims, &size );
-  }
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_get1r", "Error retrieving array dimensionality for ^NAME", 
-             status );
-    return;
-  }
+  CALLGSD( gsdInqSize ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
+                         itemno, MAXDIMS, dimNames, unitNames, 
+                         dimVals, &actDims, &size ), 
+           status, 
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get1r", "gsdinqSize : Error retrieving array dimensionality for ^NAME", status ); );
+
+  if ( *status != SAI__OK ) return;
 
   start = 1;
 
   /* Get the array data. */
-  *status = gsdGet1r ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
-                       itemno, 1, &size, &start, &size, 
-                       values, &actVals );
-
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_get1r", "Error retrieving array values for ^NAME", 
-             status );
-    return;
-  }
+  CALLGSD( gsdGet1r ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
+		      itemno, 1, &size, &start, &size, 
+                      values, &actVals ), 
+           status, 
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get1r", "gsdGet1r : Could not get ^NAME from GSD file", status ); );
 
 }
 
@@ -620,14 +560,12 @@ void gsdac_get1w ( const gsd *gsd,
   if ( *status != SAI__OK ) return;
 
   /* Get the item number. */
-  *status = gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
-                      unit, &type, &array );
+  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, name, &itemno, 
+		     unit, &type, &array ), 
+           status, 
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get1w", "gsdFind : Could not find element ^NAME in file", status ); );
 
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_get1w", "Could not find element ^NAME in file", status );
-    return;
-  }   
+  if ( *status != SAI__OK ) return;
 
   /* Check that the array flag is true and the data type is W. */
   if ( !array ) {
@@ -653,29 +591,21 @@ void gsdac_get1w ( const gsd *gsd,
     unitNames[i] = unitMem[i];
 
   /* Get the dimensionality. */
-  *status = gsdInqSize ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
+  CALLGSD( gsdInqSize ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
                          itemno, MAXDIMS, dimNames, unitNames, 
-                         dimVals, &actDims, &size );
+                         dimVals, &actDims, &size ), 
+           status, 
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get1w", "gsdinqSize : Error retrieving array dimensionality for ^NAME", status ); );
 
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_get1w", "Error retrieving array dimensionality for ^NAME", 
-             status );
-    return;
-  }
+  if ( *status != SAI__OK ) return;
 
   start = 1;
 
   /* Get the array data. */
-  *status = gsdGet1w ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
-                       itemno, 1, &size, &start, &size, 
-                       values, &actVals );
-
-  if ( *status != SAI__OK ) {
-    msgSetc ( "NAME", name );
-    errRep ( "gsdac_get1w", "Error retrieving array values for ^NAME", 
-             status );
-    return;
-  }
+  CALLGSD( gsdGet1w ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
+		      itemno, 1, &size, &start, &size, 
+                      values, &actVals ), 
+           status, 
+           msgSetc ( "NAME", name ); errRep ( "gsdac_get1w", "gsdGet1w : Could not get ^NAME from GSD file", status ); );
 
 }

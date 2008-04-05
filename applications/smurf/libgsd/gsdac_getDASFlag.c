@@ -37,6 +37,8 @@
 *        Original.
 *     2008-03-19 (JB):
 *        Removed unused variables.
+*     2008-04-04 (JB):
+*        Wrap gsd calls in macro for error checking.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -87,8 +89,8 @@ void gsdac_getDASFlag ( const struct gsdac_gsd_struct *gsd,
   int dimVals[MAXDIMS];        /* array dimensions */
   int i;                       /* loop counter */
   int itemno;                  /* item number of the GSD header */
-  int nElem;                   /* number of elements in the array */
   char type;                   /* data type of the item */
+  int size;                    /* number of elements in the array */
   int statFlag;                /* indicates if item was found */
   char unit[11];               /* unit of the GSD header */
   char unitMem[MAXDIMS][11];   /* actual memory for dimension units */
@@ -101,7 +103,7 @@ void gsdac_getDASFlag ( const struct gsdac_gsd_struct *gsd,
   statFlag = gsdFind ( gsd->fileDsc, gsd->itemDsc, "C55NCYC", &itemno, 
                        unit, &type, &array );
 
-  if ( statFlag == SAI__OK ) {
+  if ( statFlag == 0 ) {
     *dasFlag = DAS_CROSS_CORR;
     return;
   }
@@ -110,7 +112,7 @@ void gsdac_getDASFlag ( const struct gsdac_gsd_struct *gsd,
   statFlag = gsdFind ( gsd->fileDsc, gsd->itemDsc, "C55NPH", &itemno, 
                        unit, &type, &array );
 
-  if ( statFlag == SAI__OK ) {
+  if ( statFlag == 0 ) {
     *dasFlag = DAS_TP;
     return;
   }
@@ -128,21 +130,23 @@ void gsdac_getDASFlag ( const struct gsdac_gsd_struct *gsd,
   for ( i = 0; i < MAXDIMS; i++ ) 
     unitNames[i] = unitMem[i];
 
-  *status = gsdFind ( gsd->fileDsc, gsd->itemDsc, "C12SST", &itemno, 
-                      unit, &type, &array );
+  CALLGSD( gsdFind ( gsd->fileDsc, gsd->itemDsc, "C12SST", &itemno, 
+		     unit, &type, &array ), 
+           status, 
+           errRep ( "gsdac_getDASFlag", "gsdFind : Could not find element C12SST in file", status ); );
 
-  if ( *status != SAI__OK ) {
-    errRep ( FUNC_NAME, "Error getting DAS file structure", status );
-    return;
-  }
+  if ( *status != SAI__OK ) return;
 
   /* Get the dimensionality. */
-  statFlag = gsdInqSize ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
-                          itemno, MAXDIMS, dimNames, unitNames, 
-                          dimVals, &actDims, &nElem );
+  CALLGSD( gsdInqSize ( gsd->fileDsc, gsd->itemDsc, gsd->dataPtr, 
+                        itemno, MAXDIMS, dimNames, unitNames, 
+                        dimVals, &actDims, &size ), 
+           status, 
+           errRep ( "gsdac_getDASFlag", "gsdInqSize : Error retrieving array dimensionality for C12SST", status ); );
+
+  if ( *status != SAI__OK ) return;
 
   if ( actDims > 1 ) *dasFlag = DAS_CONT_CAL;
-  else *dasFlag = DAS_NONE;  
-    
+  else *dasFlag = DAS_NONE;      
 
 }
