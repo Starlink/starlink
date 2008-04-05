@@ -20,12 +20,12 @@
 *        The global status.
 
 *  Description:
-*     This routine produces a copy of an input NDF in which selected pixels 
-*     are set bad. The selection is based on the values in the Quality 
-*     component of the input NDF; any pixel which holds a set of qualities 
-*     satisfying the quality expression given for parameter QEXP is set bad 
-*     in the output NDF. Named qualities can be associated with specified
-*     pixels using the SETQUAL task.
+*     This routine produces a copy of an input NDF in which selected 
+*     pixels are set bad. The selection is based on the values in the 
+*     QUALITY  component of the input NDF; any pixel which holds a set 
+*     of qualities  satisfying the quality expression given for 
+*     parameter QEXP is set bad in the output NDF. Named qualities can 
+*     be associated with specified pixels using the SETQUAL task.
 
 *  Usage:
 *     qualtobad in out qexp
@@ -39,7 +39,7 @@
 *        The quality expression. 
 *     TITLE = LITERAL (Read)
 *        Title for the output NDF. A null (!) value will cause the input
-*        title to be used. [!]
+*        title to be used.  [!]
 
 *  Examples:
 *     qualtobad m51* *_clean saturated.or.glitch
@@ -51,17 +51,19 @@
 *        NDFs.
 
 *  Related Applications:
-*     KAPPA: REMQUAL, SETQUAL, SHOWQUAL.
+*     KAPPA: REMQUAL, SETBB, SETQUAL, SHOWQUAL.
 
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 2002, 2004 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -71,8 +73,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -85,7 +87,7 @@
 *     17-JAN-2002 (DSB):
 *        Brought into KAPPA.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     {enter_further_changes_here}
 
 *-
@@ -109,22 +111,23 @@
       CHARACTER ITYPE * ( NDF__SZTYP ) ! HDS Data type name
       CHARACTER LOCS(5)*(DAT__SZLOC)! Locators to quality information
       CHARACTER QEXP*(IRQ__SZQEX)! Quality expression
-      CHARACTER UNDEF(IRQ__QNREF)*(IRQ__SZQNM)! List of undefined quality 
-                                 ! names referenced in the quality expression
-      CHARACTER XNAME*(DAT__SZNAM)! Name of NDF extension containing quality 
-                                 ! name information
-      INTEGER ERRPNT             ! Offset to error within quality expression
-      INTEGER IDQ                ! Identifier for compiled quality expression
-      INTEGER IPNT               ! Pointer to a mapped array in the output NDF
-      INTEGER J                  ! Index into list of undefined quality names
+      CHARACTER UNDEF(IRQ__QNREF)*(IRQ__SZQNM)! List of undefined 
+                                 ! quality names referenced in the 
+                                 ! quality expression
+      CHARACTER XNAME*(DAT__SZNAM)! Name of NDF extension containing 
+                                 ! quality name information
+      INTEGER ERRPNT             ! Offset to error within quality exprs.
+      INTEGER IDQ                ! Identifier for compiled quality exprs
+      INTEGER IPNT               ! Pointer: mapped array in the o/p NDF
+      INTEGER J                  ! Index to list of undef quality names
       INTEGER NDFIN              ! Identifier for the input NDF
       INTEGER NDFOUT             ! Identifier for the output NDF
       INTEGER NEL                ! No. of mapped elements
-      INTEGER NUNDEF             ! Number of undefined quality names referenced
-                                 ! in the quality expression
-      LOGICAL ALLBAD             ! True if all output data pixels are bad
-      LOGICAL NOBAD              ! True if no output data pixels are bad
-      LOGICAL THERE              ! True if VARIANCE is in a defined state
+      INTEGER NUNDEF             ! Number of undefined quality names 
+                                 ! referenced in the quality expression
+      LOGICAL ALLBAD             ! All output data pixels are bad?
+      LOGICAL NOBAD              ! No output data pixels are bad?
+      LOGICAL THERE              ! VARIANCE is in a defined state?
 
 *.
 
@@ -138,15 +141,15 @@
       CALL LPG_ASSOC( 'IN', 'UPDATE', NDFIN, STATUS )
 
 *  Get the output NDF, propagating all components from the input to the 
-*  output (the HISTORY, LABEL, TITLE and all extensions are propagated by 
-*  default).
+*  output (the HISTORY, LABEL, TITLE and all extensions are propagated 
+*  by default).
       CALL LPG_PROP( NDFIN, 'UNITS,DATA,VARIANCE,QUALITY,AXIS,WCS',
      :               'OUT', NDFOUT, STATUS )
 
 *  Attempt to locate any existing quality name information in the input
 *  NDF. If such information is found, LOCS is returned holding a set of
-*  5 HDS locators which identify the NDF and the various components of
-*  the quality information. XNAME is returned holding the name of the
+*  five HDS locators which identify the NDF and the various components
+*  of the quality information. XNAME is returned holding the name of the
 *  NDF extension in which the information was found. If no quality name
 *  information is found, then an error is reported.
       CALL IRQ_FIND( NDFIN, LOCS, XNAME, STATUS )
@@ -239,7 +242,7 @@
      :                      NOBAD, STATUS )
    
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-            CALL IRQ_SBADUB( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+            CALL IRQ_SBADUB( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ),
      :                       ALLBAD,
      :                       NOBAD, STATUS )
    
@@ -249,7 +252,7 @@
      :                      NOBAD, STATUS )
    
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-            CALL IRQ_SBADUW( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ), 
+            CALL IRQ_SBADUW( IDQ, .TRUE., NEL, %VAL( CNF_PVAL( IPNT ) ),
      :                       ALLBAD,
      :                       NOBAD, STATUS )
    
@@ -293,7 +296,7 @@
 *  Get a title for the new NDF from the parameter system.
       CALL NDF_CINP( 'TITLE', NDFOUT, 'TITLE', STATUS )
 
-*  Annul the error and give a more friendly report if some quality names 
+*  Annul the error and give a more friendly report if some quality names
 *  were not defined.
       IF( STATUS .EQ. IRQ__NOQNM ) THEN
          CALL ERR_ANNUL( STATUS )
