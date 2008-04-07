@@ -76,7 +76,7 @@
 *        retained in the current WCS Frame of the output NDF.  Using the 
 *        example in the description of the TRIM parameter, if the input 
 *        NDF "stokes" has a three-dimensional current WCS Frame with 
-*        axes (Ra,Dec,Stokes) and TRIMWSC=TRUE, then an axis will be
+*        axes (RA,Dec,Stokes) and TRIMWSC=TRUE, then an axis will be
 *        removed from the current Frame to make it two-dimensional (that
 *        is, to match the number of pixel axes remaining after the
 *        removal of insignificant pixel axes).  The choice of which two
