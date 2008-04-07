@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun95.34}
 \newcommand{\stardocnumber}    {95.34}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2008 April 4}
+\newcommand{\stardocdate}      {2008 April 6}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
 \newcommand{\stardocversion}   {1.9-2}
 \newcommand{\stardocmanual}    {User's Guide}
@@ -5007,7 +5007,7 @@ of that dimension to be used.  Thus,
 \latex{\small}
 \begin{quote}
 \begin{center}
-{\tt IMAGE(,64)}
+{\tt image(,64)}
 \end{center}
 \end{quote}
 \latex{\normalsize}
@@ -5017,7 +5017,7 @@ could be used to specify row 64 of a two-dimensional image, while
 \latex{\small}
 \begin{quote}
 \begin{center}
-{\tt CUBE( 1, 257:, 100 )}
+{\tt cube( 1, 257:, 100 )}
 \end{center}
 \end{quote}
 \latex{\normalsize}
@@ -5035,7 +5035,7 @@ follows
 \latex{\small}
 \begin{quote}
 \begin{center}
-{\tt NAME( p}$\sim${\tt q, r}$\sim${\tt s, ... )}
+{\tt name( p}$\sim${\tt q, r}$\sim${\tt s, ... )}
 \end{center}
 \end{quote}
 \latex{\normalsize}
@@ -5046,7 +5046,7 @@ specify the centre and extent.  Thus,
 \latex{\small}
 \begin{quote}
 \begin{center}
-{\tt NAME(100}$\sim${\tt 11,200}$\sim${\tt 5)}
+{\tt name(100}$\sim${\tt 11,200}$\sim${\tt 5)}
 \end{center}
 \end{quote}
 \latex{\normalsize}
@@ -5063,7 +5063,7 @@ dimension.  Thus,
 \latex{\small}
 \begin{quote}
 \begin{center}
-{\tt IMAGE( }$\sim${\tt 100, }$\sim${\tt 100)}
+{\tt image( }$\sim${\tt 100, }$\sim${\tt 100)}
 \end{center}
 \end{quote}
 \latex{\normalsize}
@@ -5074,7 +5074,7 @@ centrally within an image, while
 \latex{\small}
 \begin{quote}
 \begin{center}
-{\tt IMAGE( 10}$\sim${\tt , 20}$\sim$ {\tt )}
+{\tt image( 10}$\sim${\tt , 20}$\sim$ {\tt )}
 \end{center}
 \end{quote}
 \latex{\normalsize}
@@ -5082,19 +5082,130 @@ centrally within an image, while
 would specify a section which is the same size as the original image, but
 displaced so that it is centred on pixel (10,~20).
 
-\subsection{\xlabel{se_ndfsec-axis}Using Axis Co-ordinates to Specify Sections
-\label{se:ndfsec-axis}}
+\subsection{\xlabel{se_ndfsec-wcs}Using World or Axis Co-ordinates to Specify
+Sections\label{se:ndfsec-wcs}}
 
-A further variation is that numerical values in subscript expressions
-may be specified either as integers, in which case they refer to pixel
-indices, or as floating-point numbers, in which case they refer to
-{\em axis\/} co-ordinates 
+Not only can you specify sections in terms of pixel indices but also
+in terms of more-tangible co-ordinates such as right ascension and
+declination, wavelength, frequency, and time.  Section locations in
+such \hyperref{world co-ordinate systems (WCS)}{world co-ordinate
+systems (WCS) (see Section~}{)}{se:wcsuse} are indicated by
+non-integer values; whereas integer values in an NDF section are
+intepreted as pixel indices.  Here an integer value is defined as one
+neither containing a decimal point nor an exponent.  The WCS bounds of
+each section are converted to the nearest pixel indices in order to
+specify the included data elements.
+
+Since there may be many co-ordinate systems that could represent your
+desired section, some rules are necessary to decide how to interpret
+the section limits.  First, to retain backwards compatibility (with
+pre-V1.8 \KAPPA), if your NDF has \htmlref{AXIS components}{apndf:axis}
+then non-integer values will refer to {\em axis\/} co-ordinates
 \latexhtml{(for a description of {\em AXIS\/} co-ordinates, see
-Section~\ref{se:domains}).}{(see \htmlref{``Co-ordinate Frames, Axes and
-Domains''}{se:domains} for a description).}  Here a
-`floating-point' number is one containing a decimal point and/or an
-exponent.  Double-precision arithmetic is used to process these
-values, but either double- or single-precision notation may be used
+Section~\ref{se:domains}).}{(see \htmlref{``Co-ordinate Frames, Axes
+and Domains''}{se:domains} for a description).} Otherwise the values
+are specified within the co-ordinate system represented by the
+\htmlref{current Frame in the NDF's FrameSet}{se:curframe}
+\latexhtml{(see Section~\ref{se:curframe}).}{.} Command
+\htmlref{NDFTRACE}{NDFTRACE} will show whether or not an NDF has AXIS
+components, and if so, it reports their extents, labels, and units.  
+NDFTRACE also summarises the properties of the current WCS Frame (or
+optionally all the WCS Frames present), if the NDF has a \htmlref{WCS
+component}{apndf:wcs}.  You can change the current Frame
+with \htmlref{WCSFRAME}{WCSFRAME}.
+
+{\bf World co-ordinates:}\\
+The standard formats used to specify WCS co-ordinates apply.\latex{See 
+SUN/210 AST\_UNFORMAT}\html{See \xref{AST\_UNFORMAT}{sun210}{AST_UNFORMAT}}
+sections ``Frame Input Format'' and``SkyFrame Input Format''
+for details and examples.
+
+Here are some examples of WCS co-ordinates defining NDF sections.
+
+\latex{\small}
+\begin{quote}
+\begin{center}
+{\tt spectrum(9000:2E4)}
+\end{center}
+\end{quote}
+\latex{\normalsize}
+This could specify a region of a spectrum between 9000 and 20000
+{\AA}ngstrom.\smallskip
+
+\latex{\small}
+\begin{quote}
+\begin{center}
+{\tt image(12h59m49s}$\sim${\tt 4.5m,27.5d:28d29.8m)}
+\end{center}
+\end{quote}
+\latex{\normalsize}
+This could refer to a region approximately one degree on each side
+centred the Coma Cluster.  The section is 4.5 minutes of time along
+the right-ascension axis centred at $12{\hr}59{\mn}49{\scn}$, and
+extends from $+27{\dgs}30{\arcm}$ to $+28{\dgs}29{\arcm}48{\arcsec}$
+in declination.\smallskip
+
+\latex{\small}
+\begin{quote}
+\begin{center}
+{\tt ifu(1h34m10.1s:1h34m12.4s,-2d35m:-2d35.5m,6563)}
+\end{center}
+\end{quote}
+\latex{\normalsize}
+This might specify a region of sky 2.3 seconds of time by 0.5 arcminutes 
+in $H_\alpha$ light from an integral-field unit.\smallskip
+
+It is possible to use a colon to separate the fields in sexagesimal
+celestial and time co-ordinates, as in the following example that
+defines the equivalent section as the preceding Coma Cluster example.
+\latex{\small}
+\begin{quote}
+\begin{center}
+{\tt image(12:57:34;13:02:04,27:30:00;28:29:48)}
+\end{center}
+\end{quote}
+\latex{\normalsize}
+\smallskip
+
+There is a cost; you must use a semicolon to demarcate lower and upper
+bounds.  This is to enable differentiation of the two uses of the 
+colon. 
+
+Using the colon as co-ordinate field separator can leave some degree
+of ambiguity. For instance, a subscript expression of ``12:34'' could
+mean ``use pixel indices 12 to 34'', or could mean ``use the single
+declination value 12:34''.  It is also harder to read, is an extra
+rule to remember, and could be error prone.  For these reasons, the
+strong recommendation is to use the {\em dms} and {\em hms} notation
+for celestial and time co-ordinates.
+
+Even given no sky co-ordinate range as in this example,
+\latex{\small}
+\begin{quote}
+\begin{center}
+{\tt cube(12:34:56.7,-41:52:09,-100.0;250.0)}
+\end{center}
+\end{quote}
+\latex{\normalsize}
+do not mix colons for the two uses in the same expression.  Hence
+there is a semicolon to define the range in the third co-ordinate.
+The semicolon expression delimiter works with all classes of
+co-ordinate system.  This example might extract a spectrum from a cube
+at the right ascension $12{\hr}34{\mn}56.{\us}7$ declination
+$-41{\dgs}52{\arcm}09{\arcsec}$ between $-100$ and 250 km~s$^{-1}$
+velocity.
+
+You should also be aware that the non-integer co-ordinates within an
+NDF section apply to \emph{WCS} axes, in contrast to integer bounds
+that define pixel indices along \emph{pixel} axes.  These are not
+necessarily the same.  For example, the WCS axes may be rotated or
+permuted.  If the WCS axes are rotated, the NDF section actually used 
+will be a box just large enough to hold the requested range of 
+WCS-axis values.   Be careful.
+
+{\bf Axis co-ordinates:}\\
+For axis co-ordinates double-precision arithmetic is used to process the
+section values, but either double- or single-precision notation may be used
 when supplying them.  Both linear and non-linear {\em axis\/}
 co-ordinates are supported, the values supplied being automatically
 converted into the corresponding pixel indices before use.  For
@@ -5103,7 +5214,7 @@ instance,
 \latex{\small}
 \begin{quote}
 \begin{center}
-{\tt SPECTRUM(6500.0:7250.0)}
+{\tt spectrum(6500.0:7250.0)}
 \end{center}
 \end{quote}
 \latex{\normalsize}
@@ -5114,7 +5225,7 @@ in {\AA}ngstroms, while
 \latex{\small}
 \begin{quote}
 \begin{center}
-{\tt SPECTRUM(6000.0}$\sim${\tt 500.0)}
+{\tt spectrum(6000.0}$\sim${\tt 500.0)}
 \end{center}
 \end{quote}
 \latex{\normalsize}
@@ -5126,7 +5237,7 @@ axis co-ordinates), and
 \latex{\small}
 \begin{quote}
 \begin{center}
-{\tt SPECTRUM(5500.0}$\sim${\tt 21)}
+{\tt spectrum(5500.0}$\sim${\tt 21)}
 \end{center}
 \end{quote}
 \latex{\normalsize}
@@ -5134,8 +5245,6 @@ axis co-ordinates), and
 would select a 21-pixel-wide region of the spectrum centred on
 5500~{\AA}ngstroms.
 
-Command \htmlref{NDFTRACE}{NDFTRACE} will show whether or not an NDF
-has axis co-ordinates, and if so, it reports their extents.
 
 \subsection{\xlabel{se_ndfsec-dim}Changing Dimensionality
 \label{se:ndfsec-dim}}
@@ -5164,34 +5273,56 @@ planes of a datacube.
 \subsection{\xlabel{se_ndfsec-mixing}Mixing Bounds Expressions
 \label{se:ndfsec-mixing}}
 
-In the \htmlref{last example}{se:ndfsec-axis}
-\latex{ (in Section~\ref{se:ndfsec-axis})} both {\em axis\/}
+In the \htmlref{last example}{se:ndfsec-wcs}
+\latex{ (in Section~\ref{se:ndfsec-wcs})} both {\em axis\/}
 co-ordinates and pixel indices were mixed in the same subscript
 expression.  In fact, any of the features described earlier may be
-combined when specifying an NDF section, the only restriction being that
-when the shape of the resulting section is expressed in pixel indices,
-the lower bound must not exceed the upper bound in any dimension.  Thus,
-all the following might be used as valid specifications for NDF
+combined when specifying an NDF section, the only restrictions are as
+follows.
+
+\begin{enumerate}
+\item 
+When the shape of the resulting section is expressed in pixel 
+indices, the lower bound must not exceed the upper bound in any dimension.
+ 
+\item 
+If the bounds for an axis are specified by centre and width values
+(rather than as lower and upper bounds), then a WCS value should not be
+used with a pixel index.  That is, the centre and width values must both
+refer to the same co-ordinate system.
+\end{enumerate}
+
+Thus, all the following might be used as valid specifications for NDF
 sections 
 
 \latex{\small}
 \begin{quote}
 \begin{center}
 \begin{tabular}{l}
-\texttt{NDF(3.7)}\\
-\texttt{NDF(,5:)}\\
-\texttt{NDF(-77:13.8,,4)}\\
-\texttt{NDF(66}$\sim$\texttt{9,4:17)}\\
-\texttt{NDF(}$\sim$\texttt{5,6}$\sim$\texttt{)}\\
-\texttt{NDF(}$\sim$\texttt{,:)}\\
-\texttt{NDF(5500.0}$\sim$\texttt{150,)}\\
-\texttt{NDF(3.0}$\sim$\texttt{1.5,-78.06D-3:13.0545,,,,)}\\
+\texttt{ndf(3.7)}\\
+\texttt{ndf(,5:)}\\
+\texttt{ndf(-77:01h23m45s,,4)}\\
+\texttt{ndf(66}$\sim$\texttt{9,4:17)}\\
+\texttt{ndf(}$\sim$\texttt{5,6}$\sim$\texttt{)}\\
+\texttt{ndf(}$\sim$\texttt{,:)}\\
+\texttt{ndf(5500.0}$\sim$\texttt{150,)}\\
+\texttt{ndf(3.0}$\sim$\texttt{1.5,-78.06D-3:13.0545,,,,)}\\
 \end{tabular}
 \end{center}
 \end{quote}
 \latex{\normalsize}
 
-Many other combinations are obviously possible.
+Many other combinations are obviously possible. In cases where some
+bounds are given in pixel indices and some in WCS co-ordinates, two
+boxes will be formed; one representing the pixel-index bounds and one
+representing the WCS bounds.  The actual NDF section used will be the
+overlap of the two boxes.  The pixel box will inherit any pixel index
+limits supplied in the bounds expression, and will use default values
+for any missing limits.  These default pixel-index bounds are just the
+bounds of the full NDF.  Likewise, the WCS box will inherit any WCS
+limits supplied in the bounds expression, and will use default values
+for any missing limits.  The default WCS limits are the bounds of a
+box that just includes the whole pixel box.
 
 \newpage
 \section{\xlabel{se_ndfhistory}NDF History\label{se:ndfhistory}}
@@ -13222,7 +13353,7 @@ KAPPA: \htmlref{CADD}{CADD},
          {\tt "COFRAME(SKY,System=FK5)"} would indicate that positions are
          specified in RA/DEC (FK5,J2000).  The statement {\tt "COFRAME(PIXEL)"}
          indicates explicitly that positions are specified in pixel
-         co-ordinates. {\tt [!]}
+         co-ordinates.  {\tt [!]}
       }
       \sstsubsection{
          CENTRE = LITERAL (Read)
@@ -13240,15 +13371,15 @@ KAPPA: \htmlref{CADD}{CADD},
          DIAM = LITERAL (Read)
       }{
          The diameter of the circular aperture.  Only used if parameter
-         ARDFILE is set to null.  If the current co-ordinate Frame of the
-         NDF is a SKY Frame (\emph{e.g.} RA and DEC), then the value should be
-         supplied as an increment of celestial latitude (\emph{e.g.} DEC).  Thus,
-         {\tt "10.2"} means 10.2 arcseconds, {\tt "30:0"} would mean 30 arcminutes,
-         and {\tt "1:0:0"} would mean 1 degree.  If the current co-ordinate
-         Frame is not a SKY Frame, then the diameter should be specified
-         as an increment along axis 1 of the current co-ordinate Frame.
-         Thus, if the current Frame is PIXEL, the value should be given
-         simply as a number of pixels.
+         ARDFILE is set to null.  If the \htmlref{current co-ordinate 
+         Frame}{se:curframe}~ of the NDF is a SKY Frame (\emph{e.g.} RA and 
+         DEC), then the value should be supplied as an increment of celestial 
+         latitude (\emph{e.g.} DEC).  Thus, {\tt "10.2"} means 10.2 arcseconds,
+         {\tt "30:0"} would mean 30 arcminutes, and {\tt "1:0:0"} would mean 
+         1 degree.  If the current co-ordinate Frame is not a SKY Frame, then 
+         the diameter should be specified as an increment along Axis~1 of 
+         the current co-ordinate Frame.  Thus, if the current Frame is 
+         PIXEL, the value should be given simply as a number of pixels.
       }
       \sstsubsection{
          LOGFILE = FILENAME (Read)
@@ -13281,7 +13412,7 @@ KAPPA: \htmlref{CADD}{CADD},
          QUIET = LOGICAL (Read)
       }{
          If {\tt TRUE} then the statistics are not displayed on the screen.
-         Output parameters and log files are still created. {\tt [FALSE]}
+         Output parameters and log files are still created.  {\tt [FALSE]}
       }
       \sstsubsection{
          SIGMA = \_DOUBLE (Write)
@@ -13326,7 +13457,7 @@ KAPPA: \htmlref{CADD}{CADD},
          its symbol string.  A list of acceptable values is displayed if an
          illegal value is supplied.  If a null ({\tt{!}}) value is supplied, the
          axes with the same indices as the 2 used pixel axes within the
-         NDF are used. {\tt [!]}
+         NDF are used.  {\tt [!]}
       }
       \sstsubsection{
          WEIGHT = \_LOGICAL (Read)
@@ -13339,7 +13470,7 @@ KAPPA: \htmlref{CADD}{CADD},
          is unity.  The pixel value and pixel variance are multiplied by
          the pixels weight before being used to calculate the statistics.
          The calculation of the statistics remains unchanged in all other
-         respects. {\tt [FALSE]}
+         respects.  {\tt [FALSE]}
       }
    }
    \sstexamples{
@@ -13808,7 +13939,7 @@ KAPPA: \htmlref{ARDPLOT}{ARDPLOT},
          system in which positions within this file are given should be
          indicated by including suitable COFRAME or WCS statements within
          the file (see SUN/183), but will default to pixel co-ordinates or 
-         \htmlref{current WCS Frame}{se:curframe} co-ordinates in the absence of 
+         \htmlref{current WCS Frame}{se:curframe}~ co-ordinates in the absence of 
          any such statements (see parameter DEFPIX).  For instance, starting the
          file with a line containing the text {\tt "COFRAME(SKY,System=FK5)"} would
          indicate that positions are specified in RA/DEC (FK5,J2000).  The
@@ -14332,10 +14463,10 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          Name of a text file containing the initial guesses at the
          co-ordinates of beams to be fitted.  It is only accessed if
          parameter MODE is given the value {\tt "File"}.  Each line should
-         contain the formatted axis values for a single position, in the
-         current Frame of the NDF.  Axis values can be separated by
-         spaces, tabs or commas.  The file may contain comment lines
-         with the first character \# or !.
+         contain the \xref{formatted axis values}{sun210}{AST_UNFORMAT} for a single position, in the
+         \htmlref{current Frame}{se:curframe}~ of the NDF.  Axis values 
+         can be separated by spaces, tabs or commas.  The file may 
+         contain comment lines with the first character \# or !.
       }
       \sstsubsection{
          DESCRIBE = LOGICAL (Read)
@@ -15744,8 +15875,9 @@ KAPPA: \htmlref{ADD}{ADD},
          Name of a text file containing the initial guesses at the
          co-ordinates of features to be centroided.  Only accessed if
          parameter MODE is given the value {\tt "File"}.  Each line should
-         contain the formatted axis values for a single position, in the
-         current Frame of the NDF.  Axis values can be separated by
+         contain the \xref{formatted axis values}{sun210}{AST_UNFORMAT}
+         for a single position, in the \htmlref{current Frame}{se:curframe}~ of
+         the NDF.  Axis values can be separated by
          spaces, tabs or commas.  The file may contain comment lines
          with the first character {\tt \#} or {\tt !}.
       }
@@ -16232,7 +16364,8 @@ KAPPA: \htmlref{PASTE}{PASTE},
          AXIS = LITERAL (Read)
       }{
          The axis along which to collapse the NDF.  This can be
-         specified by its integer index within the current Frame of the
+         specified by its integer index within the 
+         \htmlref{current Frame}{se:curframe}~ of the
          input NDF (in the range 1 to the number of axes in the current
          Frame), or by its symbol string.  A list of acceptable values
          is displayed if an illegal value is supplied.  If the axes of
@@ -16467,19 +16600,18 @@ KAPPA: \htmlref{PASTE}{PASTE},
          \sstitem
          The collapse is always performed along one of the pixel axes,
          even if the current Frame in the input NDF is not the PIXEL Frame.
-         Special care should be taken if the current Frame axes are not
+         Special care should be taken if the current-Frame axes are not
          parallel to the pixel axes.  The algorithm used to choose the
          pixel axis and the range of values to collapse along this pixel
          axis proceeds as follows.
 
-      
-         The current Frame co-ordinates of the central pixel in the
+         The current-Frame co-ordinates of the central pixel in the
 	 input NDF are determined (or some other point if the
 	 co-ordinates of the central pixel are undefined).  Two
-	 current Frame positions are then generated by substituting in
+	 current-Frame positions are then generated by substituting in
 	 turn into this central position each of the HIGH and LOW
-	 values for the current Frame axis specified by parameter
-	 AXIS.  These two current Frame positions are transformed into
+	 values for the current-Frame axis specified by parameter
+	 AXIS.  These two current-Frame positions are transformed into
 	 pixel co-ordinates, and the projections of the vector joining
 	 these two pixel positions on to the pixel axes are found.
 	 The pixel axis with the largest projection is selected as the
@@ -17035,9 +17167,9 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          The WCS axis that will appear along the horizontal axis of
          each line plot (the other two axes will be used as the spatial
          axes).  The axis can be specified by its integer index within
-         the current Frame of the NDF (in the range 1 to 3 in the
-         current Frame), or by its symbol string.  A list of
-         acceptable values is displayed if an illegal value is
+         the \htmlref{current Frame}{se:curframe}~ of the NDF (in the 
+         range 1 to 3 in the current Frame), or by its symbol string.  A 
+         list of acceptable values is displayed if an illegal value is
          supplied.  The dynamic default is the index of any spectral
          axis found in the current Frame of the NDF.  {\tt []}
       }
@@ -17557,13 +17689,13 @@ XV; PBMPLUS; NETPBM.
          AXIS = LITERAL (Read)
       }{
          The axis along which to collapse the NDF.  This can be specified
-         by its integer index within the current Frame of the input
-         NDF (in the range 1 to the number of axes in the current Frame),
-         or by its symbol string.  A list of acceptable values is displayed
-         if an illegal value is supplied.  If the axes of the current Frame
-         are not parallel to the NDF pixel axes, then the pixel axis which
-         is most nearly parallel to the specified current Frame axis will
-         be used.
+         by its integer index within the \htmlref{current Frame}{se:curframe}~ 
+         of the input NDF (in the range 1 to the number of axes in the current 
+         Frame), or by its symbol string.  A list of acceptable values is 
+         displayed if an illegal value is supplied.  If the axes of the 
+         current Frame are not parallel to the NDF pixel axes, then the pixel 
+         axis which is most nearly parallel to the specified current-Frame 
+         axis will be used.
       }
       \sstsubsection{
          ESTIMATOR = \htmlref{LITERAL}{se:parmenu} (Read)
@@ -17810,18 +17942,18 @@ XV; PBMPLUS; NETPBM.
          \sstitem
          The collapse is always performed along one of the pixel axes,
          even if the current Frame in the input NDF is not the PIXEL
-         Frame. Special care should be taken if the current Frame axes
+         Frame.  Special care should be taken if the current-Frame axes
          are not parallel to the pixel axes.  The algorithm used to
          choose the pixel axis and the range of values to collapse
          along this pixel axis proceeds as follows.
 
-         The current Frame co-ordinates of the central pixel in the
+         The current-Frame co-ordinates of the central pixel in the
          input NDF are determined (or some other point if the
          co-ordinates of the central pixel are undefined).  Two
-         current Frame positions are then generated by substituting in
+         current-Frame positions are then generated by substituting in
          turn into this central position each of the HIGH and LOW
-         values for the current Frame axis specified by parameter
-         AXIS.  These two current Frame positions are transformed into
+         values for the current-Frame axis specified by parameter
+         AXIS.  These two current-Frame positions are transformed into
          pixel co-ordinates, and the projections of the vector joining
          these two pixel positions on to the pixel axes are found.  The
          pixel axis with the largest projection is selected as the
@@ -20380,7 +20512,8 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          The co-ordinates of the data pixel to be placed at the centre of
          the image, in the current co-ordinate Frame of the NDF (supplying
          a colon {\tt ":"} will display details of the current co-ordinate Frame).
-         The position should be supplied as a list of formatted axis values
+         The position should be supplied as a list of 
+         \xref{formatted axis values}{sun210}{AST_UNFORMAT}
          separated by spaces or commas.  See also parameter USEAXIS.  A
          null ({\tt{!}}) value causes the centre of the image to be used.  {\tt[!]}
       }
@@ -20717,8 +20850,8 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          area on the screen.  If SQRPIX is {\tt FALSE}, then the default 
          value for YMAGN is chosen so that each pixel occupies a rectangular 
          area on the screen matching the pixel aspect ratio at the centre of 
-         the image, determined  within the \htmlref{current WCS 
-         Frame}{se:curframe}~ {\tt[!]}
+         the image, determined within the \htmlref{current WCS 
+         Frame.}{se:curframe}~ {\tt[!]}
 
          The vertical magnification for the image.  The default
          value of 1.0 corresponds to 'normal' magnification in which the
@@ -28830,7 +28963,8 @@ plot (10k).
          FILE = FILENAME (Read)
       }{
          A text file containing the positions to be stored in the output
-         positions list.  Each line should contain the formatted axis values
+         positions list.  Each line should contain the 
+         \xref{formatted axis values}{sun210}{AST_UNFORMAT}
          for a single position, separated by white space.  It is only 
          accessed  if parameter MODE is given the value {\tt "File"}.
       }
@@ -28915,10 +29049,10 @@ plot (10k).
 	 output positions list.  Supplying {\tt ":"} will display
 	 details of the co-ordinate Frame in which the position is
 	 required.  The position should be given as a list of
-	 formatted axis values separated by white space. You are
-	 prompted for new values for this parameter until a null value
-	 is entered.  It is only accessed if parameter MODE is given
-	 the value {\tt "Interface"}.
+	 \xref{formatted axis values}{sun210}{AST_UNFORMAT} separated 
+         by white space. You are prompted for new values for this
+	 parameter until a null value is entered.  It is only accessed
+	 if parameter MODE is given the value {\tt "Interface"}.
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -29803,7 +29937,8 @@ KAPPA: \htmlref{LOG10}{LOG10},
          The co-ordinates of the data pixel at the centre of the area to
          be displayed, in the current co-ordinate Frame of the NDF (supplying
          a colon {\tt ":"} will display details of the current co-ordinate Frame).
-         The position should be supplied as a list of formatted axis values
+         The position should be supplied as a list of 
+         \xref{formatted axis values}{sun210}{AST_UNFORMAT}
          separated by spaces or commas.  See also parameter USEAXIS.  Only
          acessed if MODE is {\tt "Centre"}.
       }
@@ -29981,7 +30116,8 @@ KAPPA: \htmlref{LOG10}{LOG10},
          supplied specifying the two axes which are to be used when supplying
          positions for parameters CENTRE, LBOUND and UBOUND.  Each axis can
          be specified either by its integer index within the current Frame
-         (in the range 1 to the number of axes in the current Frame), or by
+         (in the range 1 to the number of axes in the 
+         \htmlref{current Frame}{se:curframe}), or by
          its symbol string.  A list of acceptable values is displayed
          if you supply an illegal value.  If a null ({\tt{!}}) value is
          supplied, the axes with the same indices as the two used pixel
@@ -31222,7 +31358,8 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
 
          }
          There may be additional Frames available, describing previously
-         displayed data.  If a null value is supplied, the current Frame
+         displayed data.  If a null value is supplied, the 
+         \htmlref{current Frame}{se:curframe}
          associated with the displayed data (if any) is used.  This parameter
          is only accessed if parameter MODE is set to {\tt "XY"}. {\tt ["BASEPIC"]}
       }
@@ -31242,7 +31379,8 @@ KAPPA: \htmlref{LUTEDIT}{LUTEDIT},
          containing the colour ramp and annotation, in the co-ordinate
          Frame specified by parameter FRAME (supplying a colon {\tt ":"} will
          display details of the selected co-ordinate Frame).  The position
-         should be supplied as a list of formatted axis values separated
+         should be supplied as a list of 
+         \xref{formatted axis values}{sun210}{AST_UNFORMAT} separated
          by spaces or commas.  A null ({\tt{!}}) value causes the lower-left corner
          of the BASE or (if CURPIC is {\tt TRUE}) current picture to be used.
       }
@@ -31838,7 +31976,8 @@ KAPPA: \htmlref{FITSURFACE}{FITSURFACE},
          This transposes the two-dimensional NDF image so that its \textit{x} pixel
          co-ordinates are in the \textit{y} direction and vice versa.  The ordering
          of the axes within the \htmlref{current WCS Frame}{se:curframe}~ will only 
-         be changed if the Domain of the current Frame is PIXEL or AXES.  For instance,
+         be changed if the \htmlref{Domain}{se:domains} of the 
+         \htmlref{current Frame}{se:curframe}~ is PIXEL or AXES.  For instance,
          if the current Frame has Domain {\tt "SKY"}, with axis 1 being RA and
          axis 2 being DEC, then these will be unchanged in the output NDF.
          However, the Mapping which is used to relate (RA,DEC) positions
@@ -33150,13 +33289,14 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
       }{
          The axis of the current co-ordinate system that defines the
          direction of the trends.  This is specified by its integer
-         index within the current Frame of the input NDF (in the range
+         index within the \htmlref{current Frame}{se:curframe}~ of the 
+         input NDF (in the range
          1 to the number of axes in the current Frame), or by its symbol
          string.  A list of acceptable values is displayed if an illegal
          value is supplied.  If the axes of the current Frame are not
          parallel to the NDF pixel axes, then the pixel axis which is
          most nearly parallel to the specified current Frame axis will
-         be used.  AXIS defaults to the last axis. {\tt [!]}
+         be used.  AXIS defaults to the last axis.  {\tt [!]}
       }
       \sstsubsection{
          CLIP() = \_REAL (Read)
@@ -34131,7 +34271,8 @@ plot (9k).
          position in the current co-ordinate Frame at which the
          statistics should be calculated (supplying a colon {\tt ":"} will
          display details of the required co-ordinate Frame).  The
-         position should be supplied as a list of formatted axis values
+         position should be supplied as a list of 
+         \xref{formatted axis values}{sun210}{AST_UNFORMAT}
          separated by spaces or commas.  The pixel covering this point
          in each input array, if any, will be used.
       }
@@ -34592,24 +34733,24 @@ KAPPA: \htmlref{ADD}{ADD},
          This parameter is only accessed if parameter TRIM is {\tt TRUE}.  It
 	 controls the number of axes in the current WCS \htmlref{co-ordinate
 	 Frame}{se:domains}~ of the output NDF. If TRIMWCS={\tt YES}, then the
-	 current Frame in the output NDF will have the same number of axes as
+	 \htmlref{current Frame}{se:curframe}~ in the output NDF will have the same number of axes as
 	 there are pixel axes in the output NDF.  If this involves removing
 	 axes, then the axes to retain are specified by parameter USEAXIS.  If
 	 TRIMWCS={\tt NO} then all axes are retained in the \htmlref{current
 	 WCS Frame}{se:curframe}~ of the output NDF. Using the example in the
 	 description of the TRIM parameter, if the input NDF {\tt stokes} has
-	 a three-dimensional current WCS Frame with axes (Ra,Dec,Stokes) and
+	 a three-dimensional current WCS Frame with axes (RA,Dec,Stokes) and
 	 TRIMWSC=YES, then an axis will be removed from the current Frame to
 	 make it 2 dimensional (that is, to match the number of pixel axes
 	 remaining after the removal of insignificant pixel axes). The choice
 	 of which two axes to retain is controlled by parameter USEAXIS.  If,
 	 on the other hand, TRIMWCS was set to {\tt FALSE}, then the output
 	 NDF would still have two pixel axes, but the current WCS Frame would
-	 retain all three axes from the input NDF.  If one or more current
-	 Frame axes are removed, the transformation from the current Frame to
-	 pixel Frame may become undefined resulting in some WCS operations
-	 being unusable.  The inverse of this transformation (from pixel Frame
-	 to current Frame) is unchanged however. {\tt [TRUE]}
+	 retain all three axes from the input NDF.  If one or more 
+         current-Frame axes are removed, the transformation from the current 
+         Frame to pixel Frame may become undefined resulting in some WCS 
+         operations being unusable.  The inverse of this transformation (from 
+         pixel Frame to current Frame) is unchanged however.  {\tt [TRUE]}
       }
       \sstsubsection{
          USEAXIS = LITERAL (Read)
@@ -35935,8 +36076,8 @@ KAPPA: \htmlref{WCSFRAME}{WCSFRAME},
          a colon {\tt ":"} will display details of the current co-ordinate
          Frame).  The position should be supplied as a list of formatted
          axis values separated by spaces or commas.  See also parameter
-         USEAXIS.  The current co-ordinate Frame can be changed using
-         task \htmlref{WCSFRAME}{WCSFRAME}.
+         USEAXIS.  The \htmlref{current co-ordinate Frame}{se:curframe}~ can be 
+         changed using task \htmlref{WCSFRAME}{WCSFRAME}.
       }
       \sstsubsection{
          COMP = \htmlref{LITERAL}{se:parmenu} (Read)
@@ -37904,7 +38045,7 @@ KAPPA: \htmlref{PICDATA}{PICDATA},
 \sstroutine{
    PICTRANS
 }{
-   Transform a graphics position from one picture co-ordinate Frame to
+   Transforms a graphics position from one picture co-ordinate Frame to
    another
 }{
    \sstdescription{
@@ -37951,7 +38092,7 @@ KAPPA: \htmlref{PICDATA}{PICDATA},
       }{
          A string specifying the co-ordinate Frame in which the input
          position is supplied (see parameter POSIN).  The string can be
-         one of the following:
+         one of the following options.
 
          \ssthitemlist{
 
@@ -37967,7 +38108,8 @@ KAPPA: \htmlref{PICDATA}{PICDATA},
             {\tt "EQUAT(J2000)"} (see \xref{SUN/163}{sun163}{}).
 
          }
-         If a null parameter value is supplied, then the current Frame in
+         If a null parameter value is supplied, then the 
+         \htmlref{current Frame}{se:curframe}~ in
          the current picture is used. {\tt [!]}
       }
       \sstsubsection{
@@ -37975,8 +38117,8 @@ KAPPA: \htmlref{PICDATA}{PICDATA},
       }{
          A string specifying the co-ordinate Frame in which the transformed
          position is required.  If a null parameter value is supplied, then
-         the current Frame in the picture is used.  The string can be one of the
-         following:
+         the current Frame in the picture is used.  The string can be one of
+         the following options.
 
          \ssthitemlist{
 
@@ -38002,7 +38144,8 @@ KAPPA: \htmlref{PICDATA}{PICDATA},
          The co-ordinates of the position to be transformed, in the
          co-ordinate Frame specified by parameter FRAMEIN (supplying
          a colon {\tt ":"} will display details of the required co-ordinate Frame).
-         The position should be supplied as a list of formatted axis values
+         The position should be supplied as a list of 
+         \xref{formatted axis values}{sun210}{AST_UNFORMAT}
          separated by spaces or commas.
       }
       \sstsubsection{
@@ -38049,7 +38192,7 @@ KAPPA: \htmlref{PICDATA}{PICDATA},
       }{
          This converts the position (10,~10), in graphics co-ordinates
          (\emph{i.e.} the point which is 10mm above and to the right of the
-         lower left corner of the graphics device), into BASEPIC
+         lower-left corner of the graphics device), into BASEPIC
          co-ordinates.
       }
       \sstnotes{
@@ -38425,7 +38568,7 @@ KAPPA: \htmlref{COMPADD}{COMPADD},
          than the number of WCS axes in the NDF.
 
          Each axis can be specified by its integer index within the
-         current Frame of the input NDF (in the range 1 to the number
+         current Frame of the input NDF (in the range 1 to the number 
          of axes in the current Frame), or by its symbol string.  A list
          of acceptable values is displayed if an illegal value is
          supplied.  If the axes of the current Frame are not parallel to
@@ -38600,7 +38743,8 @@ KAPPA: \htmlref{COMPADD}{COMPADD},
          An the co-ordinates of the next slice to be extracted, in the
          current co-ordinate Frame of the NDF (supplying a colon {\tt ":"}
          will display details of the current co-ordinate Frame).  The
-         position should be supplied as a list of formatted axis values
+         position should be supplied as a list of 
+         \xref{formatted axis values}{sun210}{AST_UNFORMAT}
          separated by spaces or commas.  POS is only accessed if
          parameter MODE is given the value {\tt "Interface"}.  If the
          co-ordinates are supplied on the command line only one
@@ -38878,15 +39022,17 @@ KAPPA: \htmlref{ADD}{ADD},
       \sstsubsection{
          FINISH = LITERAL (Read)
       }{
-         The co-ordinates of the last sample in the profile, in the current
-         co-ordinate Frame of the NDF (supplying {\tt ":"} will display details of
-         the required co-ordinate Frame).  The position should be supplied as
-         a list of formatted axis values separated by spaces.  This parameter
-         is only accessed if parameter MODE is set to {\tt "Curve"} and a null
-         ({\tt{!}}) value is given for INCAT.  If the last (top-right) pixel in the
-         NDF has valid co-ordinates in the current co-ordinate Frame of the
-         NDF, then these co-ordinates will be used as the suggested default.
-         Otherwise there will be no suggested default.
+         The co-ordinates of the last sample in the profile, in the
+	 current co-ordinate Frame of the NDF (supplying {\tt ":"}
+	 will display details of the required co-ordinate Frame).  The
+	 position should be supplied as a list of \xref{formatted axis
+	 values}{sun210}{AST_UNFORMAT} separated by spaces.  This
+	 parameter is only accessed if parameter MODE is set to {\tt
+	 "Curve"} and a null ({\tt{!}}) value is given for INCAT.  If
+	 the last (top-right) pixel in the NDF has valid co-ordinates
+	 in the current co-ordinate Frame of the NDF, then these
+	 co-ordinates will be used as the suggested default. Otherwise
+	 there will be no suggested default.
       }
       \sstsubsection{
          GEODESIC = \_LOGICAL (Read)
@@ -38981,7 +39127,8 @@ KAPPA: \htmlref{ADD}{ADD},
          The co-ordinates of the first sample in the profile, in the current
          co-ordinate Frame of the NDF (supplying {\tt ":"} will display details of
          the required co-ordinate Frame).  The position should be supplied as
-         a list of formatted axis values separated by spaces.  This parameter
+         a list of \xref{formatted axis values}{sun210}{AST_UNFORMAT}
+         separated by spaces.  This parameter
          is only accessed if parameter MODE is set to {\tt "Curve"} and a null
          ({\tt{!}}) value is given for INCAT.  If the first (bottom-left) pixel in
          the NDF has valid co-ordinates in the current co-ordinate Frame of
@@ -39826,9 +39973,11 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
       }{
          Name of a text file containing the co-ordinates of the stars
          to be used.  It is only accessed if parameter INCAT is given a null ({\tt{!}})
-         value.  Each line should contain the formatted axis values for a
-         single position, in the current Frame of the NDF.  Columns can be
-         separated by spaces, tabs or commas.  The file may contain
+         value.  Each line should contain the 
+         \xref{formatted axis values}{sun210}{AST_UNFORMAT} for a
+         single position, in the \htmlref{current Frame}{se:curframe}~ of 
+         the NDF.  Columns can be separated by spaces, tabs or commas.  The 
+         file may contain
          comment lines with the first character \# or {\tt{!}}.  Other columns may
          be included in the file, in which case the columns holding the
          required co-ordinates should be specified using parameter POSCOLS.
@@ -41129,7 +41278,7 @@ KAPPA: \htmlref{CADD}{CADD},
          then the rotation angle is chosen to make north vertical.  If the
          current \htmlref{co-ordinate Frame}{se:domains}~  in the input NDF is not a celestial co-ordinate
          frame, then the rotation angle is chosen to make the second axis
-         of the current Frame vertical.
+         of the \htmlref{current Frame}{se:curframe}~ vertical.
       }
       \sstsubsection{
          AXES(2) = \_INTEGER (Read)
@@ -41615,7 +41764,8 @@ KAPPA: \htmlref{NORMALIZE}{NORMALIZE}.
          been specified.  Each position should be supplied within the current
          \htmlref{co-ordinate Frame}{se:domains}~  of the output NDF (see parameter OUT).  Supplying
          a colon {\tt ":"} will display details of the required co-ordinate Frame.
-         No more than two formatted axis values (separated by a comma or space)
+         No more than two \xref{formatted axis values}{sun210}{AST_UNFORMAT}
+         (separated by a comma or space)
          may be supplied.  If the co-ordinate Frame being used has more than
          two axes, then the two axes to use must be specified using parameter
          USEAXIS.
@@ -41757,8 +41907,8 @@ KAPPA: \htmlref{NORMALIZE}{NORMALIZE}.
          inherited from the input NDF.  If two input NDFs are supplied,
          then the shape and size of the output NDF corresponds to the
          area of overlap between the two input NDFs (in pixel space), and
-         the WCS information and current Frame are inherited from
-         the NDF associated with parameter IN1.
+         the WCS information and \htmlref{current Frame}{se:curframe}~ 
+         are inherited from the NDF associated with parameter IN1.
       }
       \sstsubsection{
          PLOT = LITERAL (Read)
@@ -46379,7 +46529,7 @@ KAPPA: \htmlref{ADD}{ADD},
          \htmlattref{Colour(Curves)}{Colour(element)}, 
          \htmlattref{Width(Curves)}{Width(element)}, \emph{etc.} (the 
          synonym {\att Vectors} may be
-         used in place of {\att Curves}). {\tt [}current value{\tt{]}}
+         used in place of {\att Curves}).  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          VSCALE = \_REAL (Read)
@@ -46387,7 +46537,7 @@ KAPPA: \htmlref{ADD}{ADD},
          The scale to be used for the vectors.  The supplied value
          should give the data value corresponding to a vector length of
          one centimetre.  If a null ({\tt{!}}) value is supplied, a default value
-         is used. {\tt [!]}
+         is used.  {\tt [!]}
       }
       \sstsubsection{
          USEAXIS = GROUP (Read)
@@ -46396,12 +46546,13 @@ KAPPA: \htmlref{ADD}{ADD},
          NDF has more than two axes.  A group of two strings should be
          supplied specifying the two axes which are to be used when annotating
          and aligning the vector map.  Each axis can be specified either by
-         its integer index within the current Frame (in the range 1 to the
+         its integer index within the 
+         \htmlref{current Frame}{se:curframe}~ (in the range 1 to the
          number of axes in the current Frame), or by its 
          \htmlattref{Symbol}{Symbol(axis)}~ attribute.  A
          list of acceptable values is displayed if an illegal value is
          supplied.  If a null ({\tt{!}}) value is supplied, the axes with the same
-         indices as the two significant NDF pixel axes are used. {\tt [!]}
+         indices as the two significant NDF pixel axes are used.  {\tt [!]}
       }
    }
    \sstexamples{
@@ -47067,7 +47218,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       }{
          A value which specifies an initial scale size in pixels for the
          adaptive algorithm which approximates non-linear 
-         \htmlref{Mappings}{se:curframe} with
+         \htmlref{Mappings}{se:curframe}~ with
          piece-wise linear transformations.  If MAXPIX is larger than any
          dimension of the region of the output grid being used, a first
          attempt will be made to approximate the Mapping by a linear
@@ -48680,7 +48831,8 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          The co-ordinates of the position to be transformed, in the
          co-ordinate Frame specified by parameter FRAMEIN (supplying
          a colon {\tt ":"} will display details of the required co-ordinate Frame).
-         The position should be supplied as a list of formatted axis values
+         The position should be supplied as a list of 
+         \xref{formatted axis values}{sun210}{AST_UNFORMAT}
          separated by spaces or commas.
       }
       \sstsubsection{
@@ -49171,7 +49323,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          equal to the variance of the data value being replaced.  If the
          data variance is bad, no noise is added.  If the input NDF has
          no \htmlref{VARIANCE}{apndf:variance}~ component, variances equal to the absolute data
-         value are used.  This facility is provided for cosmetic use. {\tt [FALSE]}
+         value are used.  This facility is provided for cosmetic use.  {\tt [FALSE]}
       }
       \sstsubsection{
          OUT  =  NDF (Write)
@@ -49252,13 +49404,13 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          \htmlattref{Size(Border)}{Size(element)}, \emph{etc.}
          (the synonym {\att Box} may be used in place of Border).  The appearance
          of markers is controlled by attributes {\att Colour(Markers)},
-         {\att Size(Markers)}, \emph{etc}. {\tt [}current value{\tt{]}}
+         {\att Size(Markers)}, \emph{etc}.  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
          Title for the output image.  A null value ({\tt{!}}) propagates the
-         title from the input image to the output image. {\tt [!]}
+         title from the input image to the output image.  {\tt [!]}
       }
       \sstsubsection{
          USEAXIS = \htmlref{GROUP}{se:groups} (Read)
@@ -49267,12 +49419,13 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          input NDF has more than two axes.  A group of two strings should be
          supplied specifying the two axes spanning the plane containing the
          areas to be replaced.  Each axis can be specified either
-         by its integer index within the current Frame of the output NDF
+         by its integer index within the \htmlref{current Frame}{se:curframe}~ 
+         of the output NDF
          (in the range 1 to the number of axes in the current Frame), or
          by its \htmlattref{Symbol}{Symbol(axis)}~ attribute.  A list of acceptable values is displayed
          if an illegal value is supplied.  If a null ({\tt{!}}) value is supplied,
          the axes with the same indices as the first two significant NDF pixel
-         axes are used. {\tt [!]}
+         axes are used.  {\tt [!]}
       }
       \sstsubsection{
          ZAPTYPE = LITERAL (Read)
@@ -49358,7 +49511,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          usually better to switch to the PIXEL Frame (using \htmlref{WCSFRAME}{WCSFRAME}) prior to
          using ZAPLIN.  Roughly speaking, the range of pixel lines and/or
          columns which are replaced will include any which intersect the
-         specified range on the current Frame axis.
+         specified range on the current-Frame axis.
 
          \sstitem
          When using input files care should be taken to ensure that
