@@ -10,7 +10,7 @@
 \newcommand{\stardocauthors}   {P.M. Allan \\
                                 A.J. Chipperfield}
 \newcommand{\stardocdate}      {12 November 1996}
-\newcommand{\stardoctitle}     {MAG \\ [1ex]
+\newcommand{\stardoctitle}     {MAG \\ [\latex{1ex}]
                                 Access to magnetic tapes}
 \newcommand{\stardocversion}   {Version 2.0}
 \newcommand{\stardocmanual}    {Programmer's Manual}
@@ -45,9 +45,9 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -82,7 +82,6 @@
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -98,6 +97,8 @@
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\html}[1]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
@@ -113,11 +114,6 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
 % -----------------------------------------------------------------------------
 %  Debugging.
 %  =========
@@ -129,14 +125,21 @@
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 \newcommand{\dash}{--}
 \begin{htmlonly}
-\renewcommand{\dash}{-}
+  \newcommand{\dash}{-}
 \end{htmlonly}
 
-% +
+% Latex only section.
+\newcommand{\latexonlysection}[1]{\section{#1}}
+\begin{htmlonly}
+   \newcommand{\latexonlysection}[1]{#1}
+\end{htmlonly}
+
+%+
 %  Name:
 %     SST.TEX
 
@@ -152,15 +155,12 @@
 %  Description:
 %     This file defines LaTeX commands which allow routine documentation
 %     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2HTML. The contents of this file should be included in the
-%     source prior to any statements that make use of the SST commands.
+%     by LaTeX2html. The contents of this file should be included in the
+%     source prior to any statements that make of the sst commnds.
 
 %  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html 
-%     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty 
-%     on your TEXINPUTS path (and including the name as part of the  
-%     documentstyle declaration).
+%     The style file html.sty provided with LaTeX2html needs to be used.
+%     This must be before this file.
 
 %  Authors:
 %     RFWS: R.F. Warren-Smith (STARLINK)
@@ -180,7 +180,7 @@
 %  Bugs:
 %     {note_any_bugs_here}
 
-% -
+%-
 
 %  Define length variables.
 \newlength{\sstbannerlength}
@@ -189,7 +189,8 @@
 \newlength{\sstexampleswidth}
 
 %  Define a \tt font of the required size.
-\newfont{\ssttt}{cmtt10 scaled 1095}
+\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
+\html{\newcommand{\ssttt}{\tt}}
 
 %  Define a command to produce a routine header, including its name,
 %  a purpose description and the rest of the routine's documentation.
@@ -218,8 +219,8 @@
 \newcommand{\sstdescription}[1]{\item[Description:] #1}
 
 %  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
-
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
+\\[1.3ex]{\raggedright \ssttt #1}}
 
 %  Format the invocation section.
 \newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
@@ -265,13 +266,15 @@
 
 %  Define the format of a subsection in the examples section.
 \newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
+\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
+\\ #2 }
 
 %  Format the notes section.
 \newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
 
 %  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
+\mbox{} \\[1.3ex] #2}
 
 %  Format the implementation status section.
 \newcommand{\sstimplementationstatus}[1]{
@@ -292,112 +295,112 @@
 %  Define the format of an item.
 \newcommand{\sstitem}{\item}
 
-%  Now define html equivalents of those already set. These are used by
+%% Now define html equivalents of those already set. These are used by
 %  latex2html and are defined in the html.sty files.
 \begin{htmlonly}
 
-%  Re-define \ssttt.
-   \newcommand{\ssttt}{\tt}
-
-%  \sstroutine.
-   \renewcommand{\sstroutine}[3]{
+%  sstroutine.
+   \newcommand{\sstroutine}[3]{
       \subsection{#1\xlabel{#1}-\label{#1}#2}
       \begin{description}
          #3
       \end{description}
    }
 
-%  \sstdescription
-   \renewcommand{\sstdescription}[1]{\item[Description:]
+%  sstdescription
+   \newcommand{\sstdescription}[1]{\item[Description:]
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
-%  \sstusage
-   \renewcommand{\sstusage}[1]{\item[Usage:]
+%  sstusage
+   \newcommand{\sstusage}[1]{\item[Usage:]
       \begin{description}
          {\ssttt #1}
       \end{description}
+      \\
    }
 
-%  \sstinvocation
-   \renewcommand{\sstinvocation}[1]{\item[Invocation:]
+%  sstinvocation
+   \newcommand{\sstinvocation}[1]{\item[Invocation:]
       \begin{description}
          {\ssttt #1}
       \end{description}
+      \\
    }
 
-%  \sstarguments
-   \renewcommand{\sstarguments}[1]{
-      \item[Arguments:]
+%  sstarguments
+   \newcommand{\sstarguments}[1]{
+      \item[Arguments:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
-%  \sstreturnedvalue
-   \renewcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:]
+%  sstreturnedvalue
+   \newcommand{\sstreturnedvalue}[1]{
+      \item[Returned Value:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
-%  \sstparameters
-   \renewcommand{\sstparameters}[1]{
-      \item[Parameters:]
+%  sstparameters
+   \newcommand{\sstparameters}[1]{
+      \item[Parameters:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
-%  \sstexamples
-   \renewcommand{\sstexamples}[1]{
-      \item[Examples:]
+%  sstexamples
+   \newcommand{\sstexamples}[1]{
+      \item[Examples:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
-%  \sstsubsection
-   \renewcommand{\sstsubsection}[1]{\item[{#1}]}
+%  sstsubsection
+   \newcommand{\sstsubsection}[1]{\item[{#1}]}
 
-%  \sstexamplesubsection
-   \renewcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
+%  sstexamplesubsection
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
 
-%  \sstnotes
-   \renewcommand{\sstnotes}[1]{\item[Notes:]
-      \begin{description}
-         #1
-      \end{description}
+%  sstnotes
+   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
+
+%  sstdiytopic
+   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
+
+%  sstimplementationstatus
+   \newcommand{\sstimplementationstatus}[1]{
+      \item[Implementation Status:] #1
    }
 
-%  \sstdiytopic
-   \renewcommand{\sstdiytopic}[2]{\item[{#1}]
-      \begin{description}
-         #2
-      \end{description}
-   }
-
-%  \sstimplementationstatus
-   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstitemlist
+%  sstitemlist
    \newcommand{\sstitemlist}[1]{
       \begin{itemize}
          #1
       \end{itemize}
+      \\
    }
+%  sstitem
+   \newcommand{\sstitem}{\item}
+
 \end{htmlonly}
 
 %  End of "sst.tex" layout definitions.
-% .
-% @(#)sst.tex   1.4   95/06/06 11:46:41   95/06/06 11:49:58
+%.
+
+
+
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
@@ -449,7 +452,7 @@
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -473,7 +476,6 @@
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -505,7 +507,7 @@ The library is also available for VAX/VMS systems.
  \newpage
  \begin{latexonly}
    \setlength{\parskip}{0mm}
-   \latexonlytoc
+   \tableofcontents
    \setlength{\parskip}{\medskipamount}
    \markright{\stardocname}
  \end{latexonly}
@@ -546,7 +548,7 @@ when using the MAG package.
 This document describes mainly the version of MAG available on Unix machines
 but differences for the earlier 
 \htmlref{MAG on VAX/VMS}{vax}
-are also described\latexonly{ (in Appendix \ref{vax})}.
+are also described\latex{ (in Appendix \ref{vax})}.
 
 The operations which can be performed on tapes using the MAG package
 include:
@@ -594,7 +596,7 @@ file known as the
 The device dataset is also used to preserve 
 \htmlref{position information}{positions}
 for the tape between application
-invocations\latexonly{ (see Sections \ref{positions} and \ref{dataset_intro})}.
+invocations\latex{ (see Sections \ref{positions} and \ref{dataset_intro})}.
 
 We can see how the association is made by looking at the basic structure of 
 an application which reads from a tape: 
@@ -812,11 +814,11 @@ reposition the tape on opening or closing are used.
 MAG\_ASSOC and the other environment-level subroutines which have a
 parameter name as an argument, look for information about each of the user's 
 tape devices in an 
-\xref{HDS}{sun92}{abstract}\latexonly{\footnote{Hierarchical Data System 
+\xref{HDS}{sun92}{abstract}\latex{\footnote{Hierarchical Data System 
 (see SUN/92)}} file, known as the {\bf user's device dataset} or USRDEVDATA, 
 which is normally file {\tt USRDEVDATA.sdf} in the user's 
 \xref{ADAM\_USER}{sun144}{ADAM_USER_directory}
-directory\latexonly{ (see SUN/144)}. 
+directory\latex{ (see SUN/144)}. 
 This may be overridden by setting the required filename in environment 
 variable USRDEVDATA. If the file does not exist, it will be created.
 
@@ -960,7 +962,7 @@ by its system name.
 Note that {\tt /star/etc/devdataset.sdf} will still be required by programs 
 linked with versions of MAG earlier than 2.0 if an appropriate structure does
 not exist in the user's device dataset. Furthermore, filenames will be 
-\htmlref{different on VAX/VMS}{vax}\latexonly{ (see Appendix \ref{vax})}.
+\htmlref{different on VAX/VMS}{vax}\latex{ (see Appendix \ref{vax})}.
 
 \subsection{\xlabel{saving_the_absolute_tape_position}Saving the Absolute Tape Position}
 MAG\_ASSOC will read USRDEVDATA to determine which physical device to use, and 
@@ -985,7 +987,7 @@ to execute whatever the import status.
 
 If an error is detected during execution, an error message may be reported
 (but not output) using the \xref{ERR}{sun104}{err_error_reporting_system} 
-system \latexonly{ (see SUN/104)}, and an appropriate STATUS value set. 
+system \latex{ (see SUN/104)}, and an appropriate STATUS value set. 
 Exceptions to this are the routines like MAG\_ASSOC which obtain a device name 
 via a parameter value. Errors in specifying the device name are reported 
 immediately and the user prompted for another value.
@@ -1065,33 +1067,34 @@ System}, \xref{Starlink User Note 92}{sun92}{}.
 \end{thebibliography}
 
 \appendix
+
 \begin{latexonly}
-\section{\xlabel{alphabetical_list_of_routines}Alphabetical List of Routines}
-\htmlref{MAG\_ALOC}{MAG_ALOC} --   Allocate tape device \\
-\htmlref{MAG\_ANNUL}{MAG_ANNUL} --   Annul tape descriptor, releasing any associated tape drive \\
-\htmlref{MAG\_ASSOC}{MAG_ASSOC} --   Open a tape device defined by a
-parameter and return a descriptor \\
-\htmlref{MAG\_CANCL}{MAG_CANCL} --   Close a tape device defined by a parameter\\
-\htmlref{MAG\_CLOSE}{MAG_CLOSE} --   Close a tape device, given a descriptor \\
-\htmlref{MAG\_DEACT}{MAG_DEACT} --   Annul all tape descriptors \\
-\htmlref{MAG\_DEAL}{MAG_DEAL} --   De-allocate a tape device \\
-\htmlref{MAG\_DISM}{MAG_DISM} --   Dismount tape from drive \\
-\htmlref{MAG\_JEOV}{MAG_JEOV} --   Jump over an EOV condition (2 consecutive tape marks) \\
-\htmlref{MAG\_JUMP}{MAG_JUMP} --   Skip a specified number of physical blocks \\
-\htmlref{MAG\_MOVE}{MAG_MOVE} --   Move to a specified file and block on tape \\
-\htmlref{MAG\_OPEN}{MAG_OPEN} --   Open a tape device \\
-\htmlref{MAG\_POS}{MAG_POS} --   Enquire current tape file/block positions \\
-\htmlref{MAG\_READ}{MAG_READ} --   Read a block from tape \\
-\htmlref{MAG\_REW}{MAG_REW} --   Rewind tape \\
-\htmlref{MAG\_SET}{MAG_SET} --   Set current tape file/block positions \\
-\htmlref{MAG\_SKIP}{MAG_SKIP} --   Skip a specified number of tape marks \\
-\htmlref{MAG\_STOP}{MAG_STOP} --   Cancel all tape devices \\
-\htmlref{MAG\_WRITE}{MAG_WRITE} --   Write a block to tape \\
-\htmlref{MAG\_WTM}{MAG_WTM} --   Write tape mark
+\latexonlysection{\xlabel{alphabetical_list_of_routines}Alphabetical List of Routines}
+MAG\_ALOC --   Allocate tape device \\
+MAG\_ANNUL --   Annul tape descriptor, releasing any associated tape drive \\
+MAG\_ASSOC --   Open a tape device defined by a parameter and return a descriptor \\
+MAG\_CANCL --   Close a tape device defined by a parameter\\
+MAG\_CLOSE --   Close a tape device, given a descriptor \\
+MAG\_DEACT --   Annul all tape descriptors \\
+MAG\_DEAL --   De-allocate a tape device \\
+MAG\_DISM --   Dismount tape from drive \\
+MAG\_JEOV --   Jump over an EOV condition (2 consecutive tape marks) \\
+MAG\_JUMP --   Skip a specified number of physical blocks \\
+MAG\_MOVE --   Move to a specified file and block on tape \\
+MAG\_OPEN --   Open a tape device \\
+MAG\_POS --   Enquire current tape file/block positions \\
+MAG\_READ --   Read a block from tape \\
+MAG\_REW --   Rewind tape \\
+MAG\_SET --   Set current tape file/block positions \\
+MAG\_SKIP --   Skip a specified number of tape marks \\
+MAG\_STOP --   Cancel all tape devices \\
+MAG\_WRITE --   Write a block to tape \\
+MAG\_WTM --   Write tape mark
 \end{latexonly}
 
 \newpage
 \section{\xlabel{routine_descriptions}Routine Descriptions}
+
 \sstroutine{
    MAG\_ALOC
 }{
@@ -2015,7 +2018,7 @@ to be {\tt /star/etc/devdataset.sdf}.
 
 The users device dataset may now be defined by environment variable USRDEVDATA
 and will default to {\tt USRDEVDATA.sdf} in the user's 
-\xref{ADAM\_USER directory}{sun144}{ADAM_USER_directory}\latexonly{ (see SUN/144)}.
+\xref{ADAM\_USER directory}{sun144}{ADAM_USER_directory}\latex{ (see SUN/144)}.
 
 System-wide device datasets are not necessary for Version 2.0 onwards but 
 should be retained until all programs using MAG have been re-linked.
@@ -2026,7 +2029,7 @@ The system will now assume that user and system names for devices are the
 same if no appropriate device dataset entry can be found.
 
 For more details on the above, see the description of
-\htmlref{device datasets}{device_datasets}\latexonly{ (Section \ref{device_datasets})}.
+\htmlref{device datasets}{device_datasets}\latex{ (Section \ref{device_datasets})}.
 
 \subsection{\xlabel{update_mode}UPDATE Mode}
 Tape devices can now be opened with access mode `UPDATE' (read and write),
