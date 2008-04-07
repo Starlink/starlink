@@ -6,9 +6,9 @@
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
-\newcommand{\stardocnumber}    {191.1}
-\newcommand{\stardocauthors}   {M. J. Bly}
-\newcommand{\stardocdate}      {2 May 1995}
+\newcommand{\stardocnumber}    {191.2}
+\newcommand{\stardocauthors}   {M. J. Bly \& P. W. Draper}
+\newcommand{\stardocdate}      {7 April 2008}
 \newcommand{\stardoctitle}     {SAE --- Starlink Applications Environment
                                 special files}
 \newcommand{\stardocversion}   {[software-version]}
@@ -45,9 +45,9 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -82,7 +82,6 @@
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -98,6 +97,8 @@
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\html}[1]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
@@ -113,11 +114,6 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
 % -----------------------------------------------------------------------------
 %  Debugging.
 %  =========
@@ -129,6 +125,7 @@
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 % ? End of document specific commands
@@ -182,7 +179,7 @@
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -206,7 +203,6 @@
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -226,7 +222,7 @@
 %  \newpage
 %  \begin{latexonly}
 %    \setlength{\parskip}{0mm}
-%    \latexonlytoc
+%    \tableofcontents
 %    \setlength{\parskip}{\medskipamount}
 %    \markright{\stardocname}
 %  \end{latexonly}
@@ -248,7 +244,7 @@ SAE contains the following elements:
 
 \begin{itemize}
 
-\item {\tt sae\_par} --- Fortran include defining the {\tt SAI\_\_OK},
+\item {\tt SAE\_PAR} --- Fortran include defining the {\tt SAI\_\_OK},
 {\tt SAI\_\_WARN} and {\tt SAI\_\_ERROR} parameters. 
 
 \item {\tt sae\_par.h} --- C header file defining the {\tt SAI\_\_OK}, 
@@ -257,18 +253,11 @@ SAE contains the following elements:
 \item {\tt fac\_210\_err} --- The facility error code file for the SAI
 parameters.
 
-\item {\tt star\_dev} --- A script to define the {\tt SAE\_PAR} soft link,
-and optionally remove it, used for software development.
-
 \end{itemize}
 
 \section{Use of SAE}
 
-The part of SAE the users may need to use while developing software is the 
-{\tt star\_dev} command.  This creates a soft link {\tt SAE\_PAR} in the 
-current directory which points to the installed {\tt sae\_par} include 
-file, and allows Fortran programs to use the following {\tt INCLUDE} 
-statement to locate the SAE parameter file:
+Use the following INCLUDE statement:
 
 \begin{verbatim}
       *
@@ -276,10 +265,11 @@ statement to locate the SAE parameter file:
       *
 \end{verbatim}
 
-To remove the soft link, use:
-
+at the top of any Fortran routines, and when compiling any code, locate the
+\texttt{SAE\_PAR} include file using the compiler \texttt{-I} flag, as in:
 \begin{verbatim}
-      % star_dev remove
+      f77 -c -I$STARLINK_DIR/include routine.f
 \end{verbatim}
+
 
 \end{document}
