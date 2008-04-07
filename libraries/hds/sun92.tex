@@ -574,7 +574,15 @@ Starlink software.
 %  ===========================================
   \newpage
   \begin{latexonly}
-    \setlength{\parskip}{0mm}
+   \markright{\stardocname}
+   \null\vspace{5mm}
+   \begin {center}
+   \rule{80mm}{0.5mm} \\ [1ex]
+   {\Large\bf \stardoctitle \\ [2.5ex]
+              \stardocversion} \\ [2ex]
+   \rule{80mm}{0.5mm}
+   \end{center}
+   \setlength{\parskip}{0mm}
     \tableofcontents
     \setlength{\parskip}{\medskipamount}
     \markboth{\stardocname}{\stardocname}
@@ -583,8 +591,20 @@ Starlink software.
 % -----------------------------------------------------------------------------
 
 \cleardoublepage
-\renewcommand{\thepage}{\arabic{page}}
-\setcounter{page}{1}
+\begin{latexonly}
+   \newpage
+   \markright{\stardocname}
+   \renewcommand{\thepage}{\arabic{page}}
+   \setcounter{page}{1}
+   \null\vspace{5mm}
+   \begin{center}
+   \rule{80mm}{0.5mm}\\[1ex]
+   {\Large\bf \stardoctitle\\[2.5ex]
+              \stardocversion}\\[2ex]
+   \rule{80mm}{0.5mm}
+   \end{center}
+   \vspace{30mm}
+\end{latexonly}
 \section {\xlabel{introduction}INTRODUCTION}
 
 This document is intended for those people who intend to write
