@@ -10,11 +10,11 @@
 \newcommand{\stardocauthors}   {D.S. Berry}
 \newcommand{\stardocdate}      {30th June 2006}
 \newcommand{\stardoctitle}     {KAPLIBS \\ [1ex]
-                                Internal subroutines used within\\
+                                Internal subroutines used within
                                 the KAPPA package.}
 \newcommand{\stardocversion}   {Version 2.8-2}
 \newcommand{\stardocmanual}    {Programmer's Reference}
-\newcommand{\stardocabstract}  {KAPLIBS is a package of Fortran subroutine 
+\newcommand{\stardocabstract}  {KAPLIBS is a package of Fortran subroutine
 libraries which were originally written as part of the KAPPA package (a
 package of general purpose image processing and visualization tools).
 KAPLIBS provides software developers with access to many of the internal
@@ -52,9 +52,9 @@ independently of KAPPA.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -89,7 +89,6 @@ independently of KAPPA.}
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -105,6 +104,8 @@ independently of KAPPA.}
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\html}[1]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
@@ -120,7 +121,7 @@ independently of KAPPA.}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  Redefine the \tableofcontents command. This procrastination is necessary
 %  to stop the automatic creation of a second table of contents page
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
@@ -136,6 +137,7 @@ independently of KAPPA.}
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 \newcommand{\latexonlysection}[1]{\section{#1}}
@@ -150,8 +152,280 @@ independently of KAPPA.}
 \newcommand{\hi}[1]{{\tt{#1}}}
 \newcommand{\latexelsehtml}[2]{#1}
 \begin{htmlonly}
-  \renewcommand{\latexelsehtml}[2]{#2}
+  \newcommand{\latexelsehtml}[2]{#2}
 \end{htmlonly}
+
+% Command for displaying routines in routine lists:
+% =================================================
+
+\newcommand{\noteroutine}[2]{{\small{\bf{#1}}}\nopagebreak\\
+                             \hspace*{3em}\st{#2}\\[1.5ex]}
+\begin{htmlonly}
+   \newcommand{\noteroutine}[2]{{\small{\bf{#1}}}\\
+                                  --- \st{#2}\\[1.0ex]}
+\end{htmlonly}
+
+%+
+%  Name:
+%     SST.TEX
+
+%  Purpose:
+%     Define LaTeX commands for laying out Starlink routine descriptions.
+
+%  Language:
+%     LaTeX
+
+%  Type of Module:
+%     LaTeX data file.
+
+%  Description:
+%     This file defines LaTeX commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by LaTeX and
+%     by LaTeX2html. The contents of this file should be included in the
+%     source prior to any statements that make of the sst commnds.
+
+%  Notes:
+%     The style file html.sty provided with LaTeX2html needs to be used.
+%     This must be before this file.
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+%     PDRAPER: P.W. Draper (Starlink - Durham University)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     8-DEC-1994 (PDRAPER):
+%        Added support for simplified formatting using LaTeX2html.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+\newlength{\sstexampleslength}
+\newlength{\sstexampleswidth}
+
+%  Define a \tt font of the required size.
+\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
+\html{\newcommand{\ssttt}{\tt}}
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \setlength{\sstexampleslength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-5.0pt}
+   \settowidth{\sstexampleswidth}{{\bf Examples:}}
+   \addtolength{\sstexampleslength}{-\sstexampleswidth}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
+\\[1.3ex]{\raggedright \ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[2]{\sloppy
+\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
+\\ #2 }
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
+\mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%% Now define html equivalents of those already set. These are used by
+%  latex2html and are defined in the html.sty files.
+\begin{htmlonly}
+
+%  sstroutine.
+   \newcommand{\sstroutine}[3]{
+      \subsection{#1\xlabel{#1}-\label{#1}#2}
+      \begin{description}
+         #3
+      \end{description}
+   }
+
+%  sstdescription
+   \newcommand{\sstdescription}[1]{\item[Description:]
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstusage
+   \newcommand{\sstusage}[1]{\item[Usage:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+      \\
+   }
+
+%  sstinvocation
+   \newcommand{\sstinvocation}[1]{\item[Invocation:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+      \\
+   }
+
+%  sstarguments
+   \newcommand{\sstarguments}[1]{
+      \item[Arguments:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstreturnedvalue
+   \newcommand{\sstreturnedvalue}[1]{
+      \item[Returned Value:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstparameters
+   \newcommand{\sstparameters}[1]{
+      \item[Parameters:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstexamples
+   \newcommand{\sstexamples}[1]{
+      \item[Examples:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstsubsection
+   \newcommand{\sstsubsection}[1]{\item[{#1}]}
+
+%  sstexamplesubsection
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
+
+%  sstnotes
+   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
+
+%  sstdiytopic
+   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
+
+%  sstimplementationstatus
+   \newcommand{\sstimplementationstatus}[1]{
+      \item[Implementation Status:] #1
+   }
+
+%  sstitemlist
+   \newcommand{\sstitemlist}[1]{
+      \begin{itemize}
+         #1
+      \end{itemize}
+      \\
+   }
+%  sstitem
+   \newcommand{\sstitem}{\item}
+
+\end{htmlonly}
+
+%  End of "sst.tex" layout definitions.
+%.
+
+
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
@@ -204,7 +478,7 @@ independently of KAPPA.}
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -219,12 +493,12 @@ independently of KAPPA.}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
       {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents. 
+%  HTML document table of contents.
 %  ================================
-%  Add table of contents header and a navigation button to return to this 
-%  point in the document (this should always go before the abstract \section). 
+%  Add table of contents header and a navigation button to return to this
+%  point in the document (this should always go before the abstract \section).
   \label{stardoccontents}
-  \begin{rawhtml} 
+  \begin{rawhtml}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
@@ -292,13 +566,13 @@ searched (see \hyperref{here}{section }{}{SEC:SEARCH}).
 KAPLIBS was created as a pragmatic solution to the problem of
 proliferation of KAPPA source code in several other packages. One of the
 reasons for previously keeping these routines hidden away within KAPPA was
-so that changes could be made to the argument lists or functionality 
+so that changes could be made to the argument lists or functionality
 of these routines without breaking software within other packages. In
 practice, it has hardly ever been necessary to change the interface to
 routines after an initial development period, but the possibility still
 exists that this may be necessary. For this reason, users of KAPLIBS
 should be aware that \emph{it may occasionally be necessary to change the
-interface to KAPLIBS routines}. Such changes will be listed within 
+interface to KAPLIBS routines}. Such changes will be listed within
 this document at each release. To aid developers decisions over which
 routines to use, routines which are deemed to have a significant chance
 of being changed within the foreseeable future are highlighted later in
@@ -337,7 +611,7 @@ within KAPLIBS:
 
 \item [CTG\_] These are routines for accessing groups of catalogues through
 a single parameter using wild-cards, \emph{etc.}. This is analogous to
-the way the NDG library (see \xref{SUN/95}{sun95}{}) accesses groups 
+the way the NDG library (see \xref{SUN/95}{sun95}{}) accesses groups
 of NDFs using a single parameter.
 
 \item [LPG\_] These are routines which are used to implement looping
@@ -352,7 +626,7 @@ if this looping behaviour is required.
 values or temporary work space. They are gradually being replaced within
 KAPPA by more modern routines provided by the PAR and PSX libraries.
 
-\item [FTS1\_] These are routines used to access FITS files and headers - 
+\item [FTS1\_] These are routines used to access FITS files and headers -
 KAPPA's own {\tt fitsio}.
 
 \item [IRA\_] These routines were initially part of the IRAS90 Astrometry
@@ -377,7 +651,7 @@ associations:
 have names which start ``{\tt KPG1\_PG}''.
 \item Routines associated with use of the AGI graphics database usually
 have names which start ``{\tt KPG1\_GD}''.
-\item Routines associated with accessing or using WCS information usually 
+\item Routines associated with accessing or using WCS information usually
 have names which start ``{\tt KPG1\_AS}''.
 \end{itemize}
 
@@ -398,7 +672,7 @@ codes are:
 \item [uw] - Unsigned word (usually 2 bytes unsigned integers)
 \item [bw] - Byte (usually 1 byte integers)
 \item [ub] - Unsigned byte (usually 1 byte unsigned integers)
-\item [l] - Logical 
+\item [l] - Logical
 \end{description}
 
 Sometimes, routine names are documented as ending with a lower case
@@ -411,9 +685,11 @@ To compile and link an application with the KAPLIBS package, the following
 commands should be used (see \xref{SUN/144}{sun144}{}):
 
 \small
-\verb#      % kaplibs_dev#
-\verb#      % alink adamprog.f# `\verb#kaplibs_link_adam#`
-\verb#      % kaplibs_dev remove#
+\begin{verbatim}
+      % kaplibs_dev
+      % alink adamprog.f `kaplibs_link_adam`
+      % kaplibs_dev remove
+\end{verbatim}
 \normalsize
 
 Note the use of {\em opening} apostrophes (`) rather than the more common
@@ -433,19 +709,21 @@ GKS version of the PGPLOT graphics library. If you wish to link with the
 {\em native} version of PGPLOT, then include the switch ``-nogks'' as follows:
 
 \small
-\verb#      % kaplibs_dev#
-\verb#      % alink adamprog.f# `\verb#kaplibs_link_adam -nogks#`
-\verb#      % kaplibs_dev remove#
+\begin{verbatim}
+      % kaplibs_dev
+      % alink adamprog.f `kaplibs_link_adam -nogks`
+      % kaplibs_dev remove
+\end{verbatim}
 \normalsize
 
-This will include native PGPLOT in the link list, and cause all GKS and IDI 
+This will include native PGPLOT in the link list, and cause all GKS and IDI
 related items to be removed.
 
 
 
 \section{Changes in Version 2.8}
 \begin{itemize}
-\item Added KPG1\_CGET, which returns the value of an NDF character 
+\item Added KPG1\_CGET, which returns the value of an NDF character
      component removing any AST or PGPLOT escape sequences.
 \item Added KPG1\_MXMNX, which provides a single interface to the
       existing generic KPG1\_MXMN$<$T$>$ routines.
@@ -457,7 +735,7 @@ related items to be removed.
 \section{Changes in Version 2.7}
 \begin{itemize}
 \item A new routine LPG\_REPLA has been added. It controls a new option
-   which allows a single NDF to be used as both input and output for an adam task. 
+   which allows a single NDF to be used as both input and output for an adam task.
    The default is for this option to be disabled.
 \end{itemize}
 
@@ -487,11 +765,11 @@ AST\_NORM) before writing them to the output catalogue.
 
 \section{Changes in Version 2.2}
 \begin{itemize}
-\item Script \verb+kaplibs_link+ has been added to enable linking of standalone 
+\item Script \verb+kaplibs_link+ has been added to enable linking of standalone
 applications.
-\item The routine KPG1\_DSFRM has been modified to include details of AST 
+\item The routine KPG1\_DSFRM has been modified to include details of AST
 SpecFrames. \emph{The argument list has also been changed.}
-\item The routine KPG1\_ASMRG has been modified to attempt alignment in 
+\item The routine KPG1\_ASMRG has been modified to attempt alignment in
 Domain SPECTRAL.
 \end{itemize}
 
@@ -508,7 +786,7 @@ conformity). Consequently, applications which use this routine should add
 definitions for these two parameters to their IFL files.
 \item The routine KPG1\_RDLST can now read positions from catalogues which
 do not contain a WCS FrameSet, in certain special cases. That is, if the
-catalogue contains columsn called RA and DEC, or X and Y. 
+catalogue contains columsn called RA and DEC, or X and Y.
 \item The IRAS90 IRQ library has been included. IRQ is used to manage
 textual representations of NDF Quality bits.
 \end{itemize}
@@ -520,16 +798,6 @@ from one graphical element to another.
 \end{itemize}
 
 \appendix
-
-% Command for displaying routines in routine lists:
-% =================================================
-
-\newcommand{\noteroutine}[2]{{\small{\bf{#1}}}\nopagebreak\\
-                             \hspace*{3em}\st{#2}\\[1.5ex]}
-\begin{htmlonly}
-   \renewcommand{\noteroutine}[2]{{\small{\bf{#1}}}\\
-                                  --- \st{#2}\\[1.0ex]}
-\end{htmlonly}
 
 \begin{latexonly}
   \newpage
@@ -546,269 +814,6 @@ from one graphical element to another.
 
 \newpage
 \section{\xlabel{ro_full}Routine Descriptions\label{ro:full}}
-
-% +
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commands.
-
-%  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html 
-%     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty 
-%     on your TEXINPUTS path (and including the name as part of the  
-%     documentstyle declaration).
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-% -
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\newfont{\ssttt}{cmtt10 scaled 1095}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
-
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%  Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  Re-define \ssttt.
-   \newcommand{\ssttt}{\tt}
-
-%  sstroutine.
-   \renewcommand{\sstroutine}[3]{
-      \subsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \renewcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstusage
-   \renewcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-   }
-
-%  sstinvocation
-   \renewcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-   }
-
-%  sstarguments
-   \renewcommand{\sstarguments}[1]{
-      \item[Arguments:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstreturnedvalue
-   \renewcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstparameters
-   \renewcommand{\sstparameters}[1]{
-      \item[Parameters:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstexamples
-   \renewcommand{\sstexamples}[1]{
-      \item[Examples:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstsubsection
-   \renewcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \renewcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
-
-%  sstnotes
-   \renewcommand{\sstnotes}[1]{\item[Notes:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstdiytopic
-   \renewcommand{\sstdiytopic}[2]{\item[{#1}]
-      \begin{description}
-         #2
-      \end{description}
-   }
-
-%  sstimplementationstatus
-   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-   }
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-% .
-% @(#)sst.tex   1.4   95/06/06 11:46:41   96/07/05 10:28:17
 
 \small
 
@@ -23020,18 +23025,18 @@ from one graphical element to another.
       the given offset is then added on, to form the output data.
    }
    \sstinvocation{
-      CALL KPG1\_SCLOF( IN, EL, FACTOR, OFFSET, OUT, NBAD, STATUS )
+      CALL KPG1\_SCLOF( EL, IN, FACTOR, OFFSET, OUT, NBAD, STATUS )
    }
    \sstarguments{
-      \sstsubsection{
-         IN( EL ) = REAL (Given)
-      }{
-         The input data vector.
-      }
       \sstsubsection{
          EL = INTEGER (Given)
       }{
          The number of elements in the input and output vectors.
+      }
+      \sstsubsection{
+         IN( EL ) = REAL (Given)
+      }{
+         The input data vector.
       }
       \sstsubsection{
          FACTOR = DOUBLE PRECISION (Given)
