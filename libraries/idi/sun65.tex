@@ -8,8 +8,8 @@
 \newcommand{\stardocsource}    {sun65.8}
 \newcommand{\stardocauthors}   {Nicholas Eaton}
 \newcommand{\stardocdate}      {20 July 1995}
-\newcommand{\stardoctitle}     {IDI \\[1.0ex]
-                                Image Display Interface\\[2.5ex]
+\newcommand{\stardoctitle}     {IDI \\[\latex{1.0ex}]
+                                Image Display Interface\\[\latex{2.5ex}]
                                 Programmer's Guide}
 % -----------------------------------------------------------------------------
 
@@ -39,9 +39,9 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -76,7 +76,6 @@
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -92,6 +91,8 @@
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\html}[1]{}
 
 % Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
@@ -118,6 +119,7 @@
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % Add any document specific \newcommand or \newenvironment commands here
 
@@ -128,9 +130,9 @@
 \newcommand{\lroutine}[2]{\item\hspace{-1cm}#1#2\\}
 
 \begin{htmlonly}
-\renewcommand{\lroutine}[2]{\item \htmlref{#1}{#1}#2\\}
-\renewcommand{\routinehead}[1]{\subsection{#1}}
-\renewcommand{\routine}[2]{\item #1#2\\}
+  \newcommand{\lroutine}[2]{\item \htmlref{#1}{#1}#2\\}
+  \newcommand{\routinehead}[1]{\subsection{#1}}
+  \newcommand{\routine}[2]{\item #1#2\\}
 \end{htmlonly}
 
 % -----------------------------------------------------------------------------
@@ -174,7 +176,7 @@
 %  Add picture here if required.
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -218,9 +220,7 @@ subroutine calls.
 %  behaviour you require remove the htmlonly environment (and its
 %  contents) and the \begin{latexonly} and \end{latexonly}.
 %
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
 \begin{htmlonly}
-   \renewcommand{\latexonlytoc}[0]{}
    \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
                                             {stardoccontents}}
   \label{stardoccontents}
@@ -231,7 +231,7 @@ subroutine calls.
 \end{htmlonly}
 \begin{latexonly}
    \setlength{\parskip}{0mm}
-   \latexonlytoc
+   \tableofcontents
    \setlength{\parskip}{\medskipamount}
    \markright{\stardocname}
 \end{latexonly}
@@ -442,9 +442,7 @@ end the IDI sections with calls to {\bf Open Display} and {\bf Close Display}.
 If the program is an ADAM task then these two calls have to be replaced by
 appropriate calls to \htmlref{IDI\_ASSOC}{IDI_ASSOC} and 
 \htmlref{IDI\_CANCL}{IDI_CANCL} or \htmlref{IDI\_ANNUL}{IDI_ANNUL}
-\begin{latexonly}(see Appendix~\ref{se:apg} for more details on these 
-functions)
-\end{latexonly}.
+\latex{(see Appendix~\ref{se:apg} for more details on these functions)}.
 
 More than one device can be open at a time, each needing separate calls
 to {\bf Open Display} and {\bf Close Display}. The devices are selected
@@ -962,9 +960,7 @@ The interactions are defined by two components, the first defines the
 action to be done, such as move or zoom, and the second defines the object
 that this action is to be done to, such as cursor or memory.
 The \htmlref{interaction cross reference table}{interaction-cross-ref}
-\begin{latexonly}
-(see Appendix~\ref{se:xin}) 
-\end{latexonly}
+\latex{(see Appendix~\ref{se:xin})}
 shows which actions on which objects are possible for a given
 device. Clearly some of the possibilities are meaningless, such as rotate
 display or zoom look-up table, and any attempt to perform such interactions
@@ -1283,7 +1279,8 @@ and any other value meaning 'true'.
 The global constant IDI\_\_MAXCP can be used to dimension the arrays passed
 to the query routines; this is defined in the file 'IDI\_PAR'.
 
-\[\begin{tabular}{llll}
+\begin{quote}
+\begin{tabular}{llll}
 Capability & Integer Code & Mnemonic & Output array \\
 \\
 implementation level & 1 & IIMPLE & n \\
@@ -1315,9 +1312,11 @@ transfer window y sizes & 33 & ITWSIY & n() \\
 transfer window x offsets & 34 & ITWOFX & n() \\
 transfer window y offsets & 35 & ITWOFY & n() \\
 depth of transfer windows (in bits) & 36 & ITWDE & n() \\
-\end{tabular}\]
+\end{tabular}
+\end{quote}
 
-\[\begin{tabular}{llll}
+\begin{quote}
+\begin{tabular}{llll}
 Capability & Integer Code & Mnemonic & Output array \\
 \\
 number of available device cursors & 40 & INCUR & n \\
@@ -1360,7 +1359,8 @@ snapshot implemented & 100 & ISSNAP & l \\
 escape function implemented & 101 & ISESC & l \\
 diagnostic routine implemented & 102 & ISDIAG & l \\
 dynamic configuration implemented & 103 & ISDYNC & l \\
-\end{tabular}\]
+\end{tabular}
+\end{quote}
 
 \newpage
 \section{ADAM Programmer's Guide to the IDI package}
@@ -1540,9 +1540,9 @@ is IDI\_\_OK and this routine fails, then the value is changed to an
 appropriate error number.}
 
 \rule{160mm}{0.5mm}
-}
+%}
 
-\parbox{160mm}{
+%\parbox{160mm}{
 
 \rule{160mm}{0.5mm}
 
@@ -1589,9 +1589,9 @@ then the routine will return without action. If this routine fails to
 complete, this variable will be set to an appropriate error number.}
 
 \rule{160mm}{0.5mm}
-}
+%}
 
-\parbox{160mm}{
+%\parbox{160mm}{
 
 \rule{160mm}{0.5mm}
 
