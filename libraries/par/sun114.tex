@@ -19,8 +19,8 @@
 \newcommand{\stardocauthors}   {Malcolm J. Currie\\
                                 Alan J. Chipperfield}
 \newcommand{\stardocdate}      {1999 September 24}
-\newcommand{\stardoctitle}     {PAR \\ [1ex]
-                                Interface to the ADAM \\
+\newcommand{\stardoctitle}     {PAR \\ [\latex{1ex}]
+                                Interface to the ADAM
                                 Parameter System}
 \newcommand{\stardocversion}   {Version 2.3}
 \newcommand{\stardocmanual}    {Programmer's Manual}
@@ -93,9 +93,9 @@ This document also introduces a preliminary C interface for the PAR library
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -130,7 +130,6 @@ This document also introduces a preliminary C interface for the PAR library
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -146,6 +145,8 @@ This document also introduces a preliminary C interface for the PAR library
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\html}[1]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
@@ -161,11 +162,6 @@ This document also introduces a preliminary C interface for the PAR library
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
 % -----------------------------------------------------------------------------
 %  Debugging.
 %  =========
@@ -177,6 +173,7 @@ This document also introduces a preliminary C interface for the PAR library
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 \newcommand{\dash}{--}
@@ -184,20 +181,13 @@ This document also introduces a preliminary C interface for the PAR library
 \newcommand{\listova}[1]{}
 \newcommand{\listovb}[1]{\textbf{#1}\\}
 \begin{htmlonly}
-\renewcommand{\dash}{-}
-\renewcommand{\listline}{}
-\renewcommand{\listova}[1]{#1}
-\renewcommand{\listovb}[1]{}
+  \newcommand{\dash}{-}
+  \newcommand{\listline}{}
+  \newcommand{\listova}[1]{#1}
+  \newcommand{\listovb}[1]{}
 \end{htmlonly}
 
-% Command for displaying routines in routine lists
-%\newcommand{\noteroutine}[2]{{\small \textbf{#1} \nopagebreak \\ \hspace*{3em}
-%                             {\parbox{113mm}{\textit{#2}} \\[1.5ex]}
-%\begin{htmlonly}
-%\renewcommand{\noteroutine}[2]{\textbf{#1} \nopagebreak \\ \textit{#2} \\}
-%\end{htmlonly}
-
-% +
+%+
 %  Name:
 %     SST.TEX
 
@@ -213,15 +203,12 @@ This document also introduces a preliminary C interface for the PAR library
 %  Description:
 %     This file defines LaTeX commands which allow routine documentation
 %     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2HTML. The contents of this file should be included in the
-%     source prior to any statements that make use of the SST commands.
+%     by LaTeX2html. The contents of this file should be included in the
+%     source prior to any statements that make of the sst commnds.
 
 %  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html 
-%     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty 
-%     on your TEXINPUTS path (and including the name as part of the  
-%     documentstyle declaration).
+%     The style file html.sty provided with LaTeX2html needs to be used.
+%     This must be before this file.
 
 %  Authors:
 %     RFWS: R.F. Warren-Smith (STARLINK)
@@ -241,7 +228,7 @@ This document also introduces a preliminary C interface for the PAR library
 %  Bugs:
 %     {note_any_bugs_here}
 
-% -
+%-
 
 %  Define length variables.
 \newlength{\sstbannerlength}
@@ -250,7 +237,8 @@ This document also introduces a preliminary C interface for the PAR library
 \newlength{\sstexampleswidth}
 
 %  Define a \tt font of the required size.
-\newfont{\ssttt}{cmtt10 scaled 1095}
+\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
+\html{\newcommand{\ssttt}{\tt}}
 
 %  Define a command to produce a routine header, including its name,
 %  a purpose description and the rest of the routine's documentation.
@@ -279,8 +267,8 @@ This document also introduces a preliminary C interface for the PAR library
 \newcommand{\sstdescription}[1]{\item[Description:] #1}
 
 %  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
-
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
+\\[1.3ex]{\raggedright \ssttt #1}}
 
 %  Format the invocation section.
 \newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
@@ -326,13 +314,15 @@ This document also introduces a preliminary C interface for the PAR library
 
 %  Define the format of a subsection in the examples section.
 \newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
+\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
+\\ #2 }
 
 %  Format the notes section.
 \newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
 
 %  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
+\mbox{} \\[1.3ex] #2}
 
 %  Format the implementation status section.
 \newcommand{\sstimplementationstatus}[1]{
@@ -344,7 +334,7 @@ This document also introduces a preliminary C interface for the PAR library
 %  Format a list of items while in paragraph mode.
 \newcommand{\sstitemlist}[1]{
   \mbox{} \\
-  \vspace{-7ex}
+  \vspace{-3.5ex}
   \begin{itemize}
      #1
   \end{itemize}
@@ -353,112 +343,112 @@ This document also introduces a preliminary C interface for the PAR library
 %  Define the format of an item.
 \newcommand{\sstitem}{\item}
 
-%  Now define html equivalents of those already set. These are used by
+%% Now define html equivalents of those already set. These are used by
 %  latex2html and are defined in the html.sty files.
 \begin{htmlonly}
 
-%  Re-define \ssttt.
-   \newcommand{\ssttt}{\tt}
-
-%  \sstroutine.
-   \renewcommand{\sstroutine}[3]{
-      \subsection{\xlabel{12}#1\xlabel{#1}-\label{#1}#2}
+%  sstroutine.
+   \newcommand{\sstroutine}[3]{
+      \subsection{#1\xlabel{#1}-\label{#1}#2}
       \begin{description}
          #3
       \end{description}
    }
 
-%  \sstdescription
-   \renewcommand{\sstdescription}[1]{\item[Description:]
+%  sstdescription
+   \newcommand{\sstdescription}[1]{\item[Description:]
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
-%  \sstusage
-   \renewcommand{\sstusage}[1]{\item[Usage:]
+%  sstusage
+   \newcommand{\sstusage}[1]{\item[Usage:]
       \begin{description}
          {\ssttt #1}
       \end{description}
+      \\
    }
 
-%  \sstinvocation
-   \renewcommand{\sstinvocation}[1]{\item[Invocation:]
+%  sstinvocation
+   \newcommand{\sstinvocation}[1]{\item[Invocation:]
       \begin{description}
          {\ssttt #1}
       \end{description}
+      \\
    }
 
-%  \sstarguments
-   \renewcommand{\sstarguments}[1]{
-      \item[Arguments:]
+%  sstarguments
+   \newcommand{\sstarguments}[1]{
+      \item[Arguments:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
-%  \sstreturnedvalue
-   \renewcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:]
+%  sstreturnedvalue
+   \newcommand{\sstreturnedvalue}[1]{
+      \item[Returned Value:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
-%  \sstparameters
-   \renewcommand{\sstparameters}[1]{
-      \item[Parameters:]
+%  sstparameters
+   \newcommand{\sstparameters}[1]{
+      \item[Parameters:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
-%  \sstexamples
-   \renewcommand{\sstexamples}[1]{
-      \item[Examples:]
+%  sstexamples
+   \newcommand{\sstexamples}[1]{
+      \item[Examples:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
-%  \sstsubsection
-   \renewcommand{\sstsubsection}[1]{\item[{#1}]}
+%  sstsubsection
+   \newcommand{\sstsubsection}[1]{\item[{#1}]}
 
-%  \sstexamplesubsection
-   \renewcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
+%  sstexamplesubsection
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
 
-%  \sstnotes
-   \renewcommand{\sstnotes}[1]{\item[Notes:]
-      \begin{description}
-         #1
-      \end{description}
+%  sstnotes
+   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
+
+%  sstdiytopic
+   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
+
+%  sstimplementationstatus
+   \newcommand{\sstimplementationstatus}[1]{
+      \item[Implementation Status:] #1
    }
 
-%  \sstdiytopic
-   \renewcommand{\sstdiytopic}[2]{\item[{#1}]
-      \begin{description}
-         #2
-      \end{description}
-   }
-
-%  \sstimplementationstatus
-   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  \sstitemlist
+%  sstitemlist
    \newcommand{\sstitemlist}[1]{
       \begin{itemize}
          #1
       \end{itemize}
+      \\
    }
+%  sstitem
+   \newcommand{\sstitem}{\item}
+
 \end{htmlonly}
 
 %  End of "sst.tex" layout definitions.
-% .
-% @(#)sst.tex   1.4   95/06/06 11:46:41   95/06/06 11:49:58
+%.
+
+
+
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
@@ -515,7 +505,7 @@ This document also introduces a preliminary C interface for the PAR library
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -539,7 +529,6 @@ This document also introduces a preliminary C interface for the PAR library
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -559,7 +548,7 @@ This document also introduces a preliminary C interface for the PAR library
   \newpage
   \begin{latexonly}
     \setlength{\parskip}{0mm}
-    \latexonlytoc
+    \tableofcontents
     \setlength{\parskip}{\medskipamount}
     \markboth{\stardocname}{\stardocname}
   \end{latexonly}
@@ -922,7 +911,7 @@ values.
 
 See 
 \xref{SUN/115}{sun115}{parameter_specification_for_output_parameters} 
-\latexonly{Appendix~C} for details of the specifications needed within
+\latex{Appendix~C} for details of the specifications needed within
 the interface file to deal with scalar and array output parameters. 
 
 \subsection{\xlabel{cancelling_a_parameter}Cancelling a Parameter}
@@ -2195,7 +2184,8 @@ Where \textit{T} is one of d, i, l, r and \textit{TYPE} is the corresponding C
 type, the function prototypes are:
 \begin{flushleft}
 \begin{description}
-\item[void parCancl ( const~char~\texttt{*}param, int~\texttt{*}status );] \listline
+\item[void parCancl] 
+\textbf{( const~char~\texttt{*}param, int~\texttt{*}status );}\\
 \textit{Cancel a parameter}
 \item[void parChoic]
 \textbf{( const~char~\texttt{*}param, const~char~\texttt{*}defaul,
@@ -2209,19 +2199,22 @@ type, the function prototypes are:
                int~\texttt{*}actval, int~\texttt{*}status );} \\
 \textit{Obtain from a parameter a list of character values selected from
             a menu of options}
-\item[void parDef0c ( const~char~\texttt{*}param, const~char~\texttt{*}value,
-int~\texttt{*}status );] \listline
+\item[void parDef0c]
+\textbf{( const~char~\texttt{*}param, const~char~\texttt{*}value,
+          int~\texttt{*}status );}\\
 \textit{Set a scalar character dynamic default parameter value}
-\item[void parDef0\textit{T} ( const~char~\texttt{*}param, \textit{TYPE}~value,
-int~\texttt{*}status );] \listline
+\item[void parDef0\textit{T}]
+\textbf{( const~char~\texttt{*}param, \textit{TYPE}~value,
+          int~\texttt{*}status );}\\
 \textit{Set a scalar dynamic default parameter value}
 \item[void parDef1c]
 \textbf{( const~char~\texttt{*}param, int~nval,
-char~\texttt{*}const~\texttt{*}values, int~values\_length,
-int~\texttt{*}status );} \\
+          char~\texttt{*}const~\texttt{*}values, int~values\_length,
+          int~\texttt{*}status );} \\
 \textit{Set a vector of character values as the dynamic default for a parameter}
-\item[void parDef1\textit{T} ( const~char~\texttt{*}param, int~nval,
-const~\textit{TYPE}~\texttt{*}values, int~\texttt{*}status );] \listline
+\item[void parDef1\textit{T}]
+\textbf{( const~char~\texttt{*}param, int~nval,
+          const~\textit{TYPE}~\texttt{*}values, int~\texttt{*}status );}\\
 \textit{Set a vector of values as the dynamic default for a parameter}
 \item[void parDefnc]
 \textbf{( const~char~\texttt{*}param, int~ndim, const~int~\texttt{*}maxd,
@@ -2237,7 +2230,8 @@ const~\textit{TYPE}~\texttt{*}values, int~\texttt{*}status );] \listline
 \textbf{( const~char~\texttt{*}param, int~nvals, char~\texttt{*}const~\texttt{*}values, 
                int~values\_length, int~\texttt{*}status );} \\
 \textit{Obtain an exact number of character values from a parameter}
-\item[void parExac\textit{T} ( const~char~\texttt{*}param, int~nvals, \textit{TYPE}~\texttt{*}values, int~\texttt{*}status );] \listline
+\item[void parExac\textit{T}]
+\textbf{( const~char~\texttt{*}param, int~nvals, \textit{TYPE}~\texttt{*}values, int~\texttt{*}status );}\\
 \textit{Obtain an exact number of values from a parameter}
 \item[void parGdr0\textit{T}]
 \textbf{( const~char~\texttt{*}param, \textit{TYPE}~defaul, \textit{TYPE}~vmin,
@@ -2255,11 +2249,13 @@ const~\textit{TYPE}~\texttt{*}values, int~\texttt{*}status );] \listline
                \textit{TYPE}~vmax, \textit{TYPE}~\texttt{*}values,
                int~\texttt{*}actval, int~\texttt{*}status );} \\
 \textit{Obtain a vector of values within a given range from a parameter}
-\item[void parGet0c ( const~char~\texttt{*}param, char~\texttt{*}value,
-  int~value\_length, int~\texttt{*}status );] \listline
+\item[void parGet0c]
+\textbf{( const~char~\texttt{*}param, char~\texttt{*}value,
+          int~value\_length, int~\texttt{*}status );}\\
 \textit{Obtain a scalar character value from a parameter}
-\item[void parGet0\textit{T} ( const~char~\texttt{*}param, 
-  \textit{TYPE}~\texttt{*}value, int~\texttt{*}status );] \listline
+\item[void parGet0\textit{T}]
+\textbf{( const~char~\texttt{*}param, 
+          \textit{TYPE}~\texttt{*}value, int~\texttt{*}status );}\\
 \textit{Obtain a scalar value from a parameter}
 \item[void parGet1c]
 \textbf{( const~char~\texttt{*}param, int~maxval, 
@@ -2316,20 +2312,25 @@ const~\textit{TYPE}~\texttt{*}values, int~\texttt{*}status );] \listline
                int~\texttt{*}status );} \\
 \textit{Obtain from a parameter a vector of values each within a given
             range}
-\item[void parGtd0l ( const~char~\texttt{*}param, int~defaul, int~null,
-  int~\texttt{*}value, int~\texttt{*}status );] \listline
+\item[void parGtd0l]
+\textbf{( const~char~\texttt{*}param, int~defaul, int~null,
+          int~\texttt{*}value, int~\texttt{*}status );}\\
 \textit{Obtain a logical value from a parameter with a dynamic default}
-\item[void parMaxc ( const~char~\texttt{*}param, const~char~\texttt{*}value,
-  int~\texttt{*}status );] \listline
+\item[void parMaxc]
+\textbf{( const~char~\texttt{*}param, const~char~\texttt{*}value,
+          int~\texttt{*}status );}\\
 \textit{Set a maximum character value for a parameter}
-\item[void parMax\textit{T} ( const~char~\texttt{*}param, \textit{TYPE}~value,
-  int~\texttt{*}status );] \listline
+\item[void parMax\textit{T}]
+\textbf{( const~char~\texttt{*}param, \textit{TYPE}~value,
+          int~\texttt{*}status );}\\
 \textit{Set a maximum value for a parameter}
-\item[void parMinc ( const~char~\texttt{*}param, const~char~\texttt{*}value,
-  int~\texttt{*}status );] \listline
+\item[void parMinc]
+\textbf{( const~char~\texttt{*}param, const~char~\texttt{*}value,
+          int~\texttt{*}status );}\\
 \textit{Set a minimum character value for a parameter}
-\item[void parMin\textit{T} ( const~char~\texttt{*}param, \textit{TYPE}~value,
-  int~\texttt{*}status );] \listline
+\item[void parMin\textit{T}]
+\textbf{( const~char~\texttt{*}param, \textit{TYPE}~value,
+          int~\texttt{*}status );}\\
 \textit{Set a minimum value for a parameter}
 \item[void parMix0\textit{T}]
 \textbf{( const~char~\texttt{*}param, const~char~\texttt{*}defaul,
@@ -2345,22 +2346,26 @@ const~\textit{TYPE}~\texttt{*}values, int~\texttt{*}status );] \listline
                int~\texttt{*}actval, int~\texttt{*}status );} \\
 \textit{Obtain from a parameter, character values either selected from a
             menu of options or as numeric values within a given range}
-\item[void parPromt ( const~char~\texttt{*}param, const~char~\texttt{*}prompt,
-  int~\texttt{*}status );] \listline
+\item[void parPromt]
+\textbf{( const~char~\texttt{*}param, const~char~\texttt{*}prompt,
+          int~\texttt{*}status );}\\
 \textit{Set a new prompt string for a parameter}
-\item[void parPut0c ( const~char~\texttt{*}param, const~char~\texttt{*}value,
-  int~\texttt{*}status );] \listline
+\item[void parPut0c]
+\textbf{( const~char~\texttt{*}param, const~char~\texttt{*}value,
+          int~\texttt{*}status );}\\
 \textit{Put a scalar character value into a parameter}
-\item[void parPut0\textit{T} ( const~char~\texttt{*}param, \textit{TYPE}~value,
-  int~\texttt{*}status );] \listline
+\item[void parPut0\textit{T}]
+\textbf{( const~char~\texttt{*}param, \textit{TYPE}~value,
+          int~\texttt{*}status );}\\
 \textit{Put a scalar value into a parameter}
 \item[void parPut1c]
 \textbf{( const~char~\texttt{*}param, int~nval, 
                char~\texttt{*}const~\texttt{*}values,  int~values\_length,
                int~\texttt{*}status );} \\
 \textit{Put a vector of character values into a parameter}
-\item[void parPut1\textit{T}( const~char~\texttt{*}param, int~nval, 
-  const~\textit{TYPE}~\texttt{*}values, int~\texttt{*}status );] \listline
+\item[void parPut1\textit{T}]
+\textbf{( const~char~\texttt{*}param, int~nval, 
+          const~\textit{TYPE}~\texttt{*}values, int~\texttt{*}status );}\\
 \textit{Put a vector of values into a parameter}
 \item[void parPutnc]
 \textbf{( const~char~\texttt{*}param, int~ndim, const~int~\texttt{*}maxd, 
@@ -2378,15 +2383,18 @@ const~\textit{TYPE}~\texttt{*}values, int~\texttt{*}status );] \listline
                int~\texttt{*}status );} \\
 \textit{Put an array of character values into a parameter as if the parameter
             were a vector}
-\item[void parPutv\textit{T} ( const~char~\texttt{*}param, int~nval, 
-  const~\textit{TYPE}~\texttt{*}values, int~\texttt{*}status );] \listline
+\item[void parPutv\textit{T}]
+\textbf{( const~char~\texttt{*}param, int~nval, 
+          const~\textit{TYPE}~\texttt{*}values, int~\texttt{*}status );}\\
 \textit{Put an array of values into a parameter as if the parameter were a 
             vector}
-\item[void parState ( const~char~\texttt{*}param, int~\texttt{*}state,
-  int~\texttt{*}status );] \listline
+\item[void parState]
+\textbf{( const~char~\texttt{*}param, int~\texttt{*}state,
+          int~\texttt{*}status );}\\
 \textit{Inquire the state of a parameter}
-\item[void parUnset ( const~char~\texttt{*}param, const~char~\texttt{*}which,
-  int~\texttt{*}status );] \listline
+\item[void parUnset]
+\textbf{( const~char~\texttt{*}param, const~char~\texttt{*}which,
+          int~\texttt{*}status );}\\
 \textit{Cancel various parameter control values.}
 \end{description}
 \end{flushleft}
