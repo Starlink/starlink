@@ -42,9 +42,9 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -79,7 +79,6 @@
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -95,6 +94,8 @@
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\html}[1]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
@@ -126,22 +127,16 @@
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
-%\newenvironment{tabs}{\goodbreak\begin{tabbing}}{\end{tabbing}}
-%\newenvironment{cmnds}{\begin{tabs}
-%XXX \= XX \= XXXXXXXXXXXXXXXXXXXX \= \kill}{\end{tabs}}
-%\newenvironment{cmd}{\begin{tabbing}
-%XXXXXX \= XX \= XXXXXXXXXXXX \= \kill}{\end{tabbing}}
 
 \newcommand{\qt}[1]{``{\tt{#1}}''}
 \begin{htmlonly}
-   \renewcommand{\qt}[1]{{\tt{"#1"}}}
+   \newcommand{\qt}[1]{{\tt{"#1"}}}
 \end{htmlonly}
 
 \newcommand{\fstring}[1]{\hbox{\hspace{0.05em}{\qt{#1}}\hspace{0.05em}}}
-
-%\renewcommand{\_}{{\tt\char'137}}
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
@@ -425,7 +420,6 @@ shows a typical help session.
 Type the following command:
 
 \begin{tabular}{ll}
-\htmlimage{scale=1.2}
 \\
 {\it VAX/VMS} & {\it UNIX} \\ \\
 {\tt \$ RUN HLP\_DIR:TSTHLP} &{\tt \% /star/bin/tsthlp} \\ \\
@@ -438,7 +432,6 @@ This will produce an announcement, followed by the question:
 Give the reply:
 
 \begin{tabular}{ll}
-\htmlimage{scale=1.2}
 \\
 {\it VAX/VMS} & {\it UNIX} \\ \\
 {\tt HLP\_DIR:DEMO.SHL} & {\tt /star/bin/examples/hlp/demo.shl} \\ \\
@@ -683,7 +676,6 @@ To translate one or more files of help source into a library which can be
 read by an application program, execute the {\tt hlib} command script:
 
 \begin{tabular}{ll}
-\htmlimage{scale=1.2}
 \\
 {\it VAX/VMS} & {\it UNIX} \\ \\
 {\tt \$ @HLP\_DIR:HLIB}~~{\it source~~library} &
@@ -743,7 +735,6 @@ application packages may use the HLP\_CREH subprogram:
 where the arguments are as follows:
 
 \begin{tabular}{llll}
-\htmlimage{scale=1.2}
 \\
 Given: \\
 & {\tt NAMETR} & {\tt EXTERNAL} &
@@ -812,7 +803,6 @@ range of negative integers to indicate various error conditions
 where the arguments are:
 
 \begin{tabular}{llll}
-\htmlimage{scale=1.2}
 \\
 Given: \\
 & {\tt OUTSUB} & {\tt EXTERNAL} &
@@ -929,7 +919,6 @@ The call is as follows:
 where the arguments are:
 
 \begin{tabular}{llll}
-\htmlimage{scale=1.2}
 \\
 Given: \\
 & {\tt KMD} & {\tt CHARACTER*(*)} & function number (see below) \\
@@ -958,7 +947,6 @@ suffix are originally spaces, which HLP\_NAMETR treats as meaning
 HLP\_NAMETR is as follows:
 
 \begin{tabular}{llll}
-\htmlimage{scale=1.2}
 \\
 {\it KMD} & {\it INSTR} & {\it OUTSTR} & {\it action} \\ \\
 ~~0 & library name & filename & translate library name to filename \\
@@ -1023,7 +1011,6 @@ return status information through an integer argument using the
 following codes:
 
 \begin{tabular}{rl}
-\htmlimage{scale=1.2}
 \\
    $0=$ & OK \\
   $-1=$ & Help system in wrong state \\
@@ -1090,7 +1077,6 @@ is stored in a single VAX/VMS directory.
 The following files are included:
 
 \begin{tabular}{ll}
-\htmlimage{scale=1.2}
 \\
  *.FOR & Fortran source (machine-independent) \\
  *.BAT & various PC MS/DOS command procedures (PC only)\\
@@ -1553,7 +1539,6 @@ On VAX/VMS, in order to run applications using HLP the following
 logical names must be assigned:
 
 \begin{tabular}{lll}
-\htmlimage{scale=1.2}
 \\
  {\it logical name} & {\it points to} & {\it typical assignment} \\ \\
  HLP\_DIR & HLP software & {\tt STARDISK:[STARLINK.LIB.HELP]} \\
@@ -1567,7 +1552,6 @@ In order to link a non-ADAM application with the shared library, the
 following additional assignment is required:
 
 \begin{tabular}{lll}
-\htmlimage{scale=1.2}
 \\
  HLP\_LINK & link options file & {\tt HLP\_DIR:HLP\_LINK.OPT} \\ \\
 \end{tabular}
