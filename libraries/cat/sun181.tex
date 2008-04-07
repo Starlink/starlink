@@ -49,7 +49,7 @@
 \newcommand{\stardocnumber}    {181.10}
 \newcommand{\stardocauthors}   {A.C.~Davenhall}
 \newcommand{\stardocdate}      {4th April 2001}
-\newcommand{\stardoctitle}     {CAT \\ [1ex]
+\newcommand{\stardoctitle}     {CAT \\ [\latex{1ex}]
                               Catalogue and Table Manipulation Library}
 \newcommand{\stardocversion}   {Version \CATversion}
 \newcommand{\stardocmanual}    {Programmer's Manual}
@@ -84,9 +84,9 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -121,7 +121,6 @@
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -137,6 +136,8 @@
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\html}[1]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
@@ -168,6 +169,7 @@
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 %-------------------------------------------------------------------
@@ -224,7 +226,8 @@
 \newlength{\sstexampleswidth}
 
 %  Define a \tt font of the required size.
-\newfont{\ssttt}{cmtt10 scaled 1095}
+\latex{\newfont{\ssttt}{cmtt10 scaled1095}}
+\html{\newcommand{\ssttt}{\tt}}
 
 %  Define a command to produce a routine header, including its name,
 %  a purpose description and the rest of the routine's documentation.
@@ -331,11 +334,8 @@
 %  latex2html and are defined in the html.sty files.
 \begin{htmlonly}
 
-%  Re-define \ssttt.
-   \newcommand{\ssttt}{\tt}
-
 %  \sstroutine.
-   \renewcommand{\sstroutine}[3]{
+   \newcommand{\sstroutine}[3]{
       \subsection{#1\xlabel{#1}-\label{#1}#2}
       \begin{description}
          #3
@@ -343,28 +343,28 @@
    }
 
 %  \sstdescription
-   \renewcommand{\sstdescription}[1]{\item[Description:]
+   \newcommand{\sstdescription}[1]{\item[Description:]
       \begin{description}
          #1
       \end{description}
    }
 
 %  \sstusage
-   \renewcommand{\sstusage}[1]{\item[Usage:]
+   \newcommand{\sstusage}[1]{\item[Usage:]
       \begin{description}
          {\ssttt #1}
       \end{description}
    }
 
 %  \sstinvocation
-   \renewcommand{\sstinvocation}[1]{\item[Invocation:]
+   \newcommand{\sstinvocation}[1]{\item[Invocation:]
       \begin{description}
          {\ssttt #1}
       \end{description}
    }
 
 %  \sstarguments
-   \renewcommand{\sstarguments}[1]{
+   \newcommand{\sstarguments}[1]{
       \item[Arguments:]
       \begin{description}
          #1
@@ -372,7 +372,7 @@
    }
 
 %  \sstreturnedvalue
-   \renewcommand{\sstreturnedvalue}[1]{
+   \newcommand{\sstreturnedvalue}[1]{
       \item[Returned Value:]
       \begin{description}
          #1
@@ -380,7 +380,7 @@
    }
 
 %  \sstparameters
-   \renewcommand{\sstparameters}[1]{
+   \newcommand{\sstparameters}[1]{
       \item[Parameters:]
       \begin{description}
          #1
@@ -388,7 +388,7 @@
    }
 
 %  \sstexamples
-   \renewcommand{\sstexamples}[1]{
+   \newcommand{\sstexamples}[1]{
       \item[Examples:]
       \begin{description}
          #1
@@ -396,27 +396,27 @@
    }
 
 %  \sstsubsection
-   \renewcommand{\sstsubsection}[1]{\item[{#1}]}
+   \newcommand{\sstsubsection}[1]{\item[{#1}]}
 
 %  \sstexamplesubsection
-   \renewcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
 
 %  \sstnotes
-   \renewcommand{\sstnotes}[1]{\item[Notes:]
+   \newcommand{\sstnotes}[1]{\item[Notes:]
       \begin{description}
          #1
       \end{description}
    }
 
 %  \sstdiytopic
-   \renewcommand{\sstdiytopic}[2]{\item[{#1}]
+   \newcommand{\sstdiytopic}[2]{\item[{#1}]
       \begin{description}
          #2
       \end{description}
    }
 
 %  \sstimplementationstatus
-   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
+   \newcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
       \begin{description}
          #1
       \end{description}
@@ -486,7 +486,7 @@
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -629,7 +629,7 @@ and suggested several useful improvements.
 I am grateful to all these people for sharing their time and expertise.
 \begin{flushright}
 Clive Davenhall \\
-\raggedright {\it Department of Physics and Astronomy, University of 
+\latex{\raggedright} {\it Department of Physics and Astronomy, University of 
 Leicester \\
 Saint Edmund's Day 1994}
 \end{flushright} 
@@ -750,7 +750,7 @@ Saint Edmund's Day 1994}
 \begin{center}
 A harmless necessary cat.
 \end{center}
-{\it The Merchant of Venice} \raggedleft
+{\it The Merchant of Venice} \latex{\raggedleft}
 \end{quote}
 % Dictionary of Quotations: p202:4
 
@@ -798,11 +798,11 @@ formats and they are described in Appendix~\ref{FORMAT}.
 
 \section{\label{TERM}\xlabel{TERM}Terminology}
 
-\begin{quote} \raggedright
+\begin{quote} \latex{\raggedright}
 `When {\it I}\, use a word,' Humpty Dumpty said, in a rather scornful
 tone, `it means just what I choose it to mean --- neither more nor 
 less.' \\
-{\it Through the Looking-Glass and What Alice Found There} \raggedleft
+{\it Through the Looking-Glass and What Alice Found There} \latex{\raggedleft}
 \\ Lewis Carroll
 \end{quote}
 
@@ -1039,7 +1039,7 @@ self-explanatory.
 \begin{center}
 Example is always more efficacious than precept.
 \end{center}
-{\it Lives of the English Poets} vol. ii \raggedleft
+{\it Lives of the English Poets} vol. ii \latex{\raggedleft}
 \\ Samuel Johnson
 \end{quote}
 % Dictionary of Quotations: p116:25
