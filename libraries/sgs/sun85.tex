@@ -38,9 +38,9 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -75,7 +75,6 @@
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -91,6 +90,8 @@
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\html}[1]{}
 
 % Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
@@ -117,8 +118,32 @@
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}{}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % Add any document specific \newcommand or \newenvironment commands here
+\newcommand{\routinehead}[1]{\vspace{\bigskipamount}{\large\bf#1}}
+\newenvironment{routinelist}{\begin{list}{}{\setlength{\leftmargin}{2cm}
+                             \setlength{\parsep}{\smallskipamount}}}{\end{list}}
+\newcommand{\routine}[2]{\item\hspace{-1cm}#1#2\\}
+
+\begin{htmlonly}
+  \newcommand{\routinehead}[1]{\subsection{#1}}
+  \newcommand{\routine}[2]{\item \htmlref{#1}{#1}#2\\}
+\end{htmlonly}
+
+\newcommand{\rthead}[2]{\rule{\textwidth}{0.3mm}
+{\Large {\bf #1} \hfill #2 \hfill {\bf #1}}}
+\newenvironment{params}%
+{\[\begin{tabular}{p{0.14\textwidth}p{0.05\textwidth}p{0.66\textwidth}}}%
+{\end{tabular}\]}
+\newcommand{\rparams}[3]{{\em #1} &#2 &#3\\}
+
+\begin{htmlonly}
+  \newcommand{\rthead}[2]{\subsection{\label{#1}\xlabel{#1}#1 - #2}}
+  \newenvironment{params}{\begin{description}}{\end{description}}
+  \newcommand{\rparams}[3]{\item{{\em #1}} (#2) #3}
+\end{htmlonly}
+
 
 % -----------------------------------------------------------------------------
 %  Title Page.
@@ -161,7 +186,7 @@
 %  Add picture here if required.
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -192,9 +217,7 @@
 %  behaviour you require remove the htmlonly environment (and its
 %  contents) and the \begin{latexonly} and \end{latexonly}.
 %
-% \newcommand{\latexonlytoc}[0]{\tableofcontents}
 % \begin{htmlonly}
-%    \renewcommand{\latexonlytoc}[0]{}
 %    \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
 %                                             {stardoccontents}}
 %   \label{stardoccontents}
@@ -205,21 +228,11 @@
 % \end{htmlonly}
 % \begin{latexonly}
 %    \setlength{\parskip}{0mm}
-%    \latexonlytoc
+%    \tableofcontents
 %    \setlength{\parskip}{\medskipamount}
 %    \markright{\stardocname}
 % \end{latexonly}
 % -----------------------------------------------------------------------------
-
-\newcommand{\routinehead}[1]{\vspace{\bigskipamount}{\large\bf#1}}
-\newenvironment{routinelist}{\begin{list}{}{\setlength{\leftmargin}{2cm}
-                             \setlength{\parsep}{\smallskipamount}}}{\end{list}}
-\newcommand{\routine}[2]{\item\hspace{-1cm}#1#2\\}
-
-\begin{htmlonly}
-\renewcommand{\routinehead}[1]{\subsection{#1}}
-\renewcommand{\routine}[2]{\item \htmlref{#1}{#1}#2\\}
-\end{htmlonly}
 
 \section{INTRODUCTION}
 
@@ -1617,7 +1630,7 @@ returned, if the second a 2 will be returned,
 and so on.  If the key is not included in the string 
 a zero will be returned.  There is no restriction on which characters can be 
 specified but upper and lower case characters are not distinguished and you 
-are advised only to use the FORTRAN character set (\verb%A-Z 0-9 =+-*'/(),.:$%
+are advised only to use the FORTRAN character set (\verb#A-Z 0-9 =+-*'/(),.:$#
 and blank) as other characters cannot be guaranteed to be present on a
 terminal.  For this reason, if
 the number of choices on device 0 is inquired 49 is 
@@ -1755,8 +1768,10 @@ other path name.}.
 \section {LINKING AND RUNNING SGS}\label{app-linking}
 
 A program can be linked with SGS by:
-\begin{quote}\tt
+\begin{quote}
+\begin{verbatim}
     f77 {\em{prog}}.f -L/star/lib `sgs\_link`
+\end{verbatim}
 \end{quote}
 Adam application are linked with SGS by putting {\tt `sgs\_link\_adam`} on
 the alink command line.
@@ -1778,7 +1793,7 @@ Examples of valid strings are:
     "103 0"
 \end{verbatim}
 SGS can be opened without further ado by supplying 
-\htmlref{SGS\_OPEN}{SGS_OPNE} with such a string,
+\htmlref{SGS\_OPEN}{SGS_OPEN} with such a string,
 but more friendly names can be created with environment variables.  For example after
 executing the C shell command:
 \begin{verbatim}
@@ -2003,19 +2018,6 @@ C&CHARACTER$\ast$($\ast$)&I&INTEGER&R&REAL\\
 Cn&CHARACTER$\ast$n&L&LOGICAL
 \end{tabular}\]
 \end{latexonly}
-
-\newcommand{\rthead}[2]{\rule{\textwidth}{0.3mm}
-{\Large {\bf #1} \hfill #2 \hfill {\bf #1}}}
-\newenvironment{params}%
-{\[\begin{tabular}{p{0.14\textwidth}p{0.05\textwidth}p{0.66\textwidth}}}%
-{\end{tabular}\]}
-\newcommand{\rparams}[3]{{\em #1} &#2 &#3\\}
-
-\begin{htmlonly}
-\renewcommand{\rthead}[2]{\subsection{\label{#1}\xlabel{#1}#1 - #2}}
-\renewenvironment{params}{\begin{description}}{\end{description}}
-\renewcommand{\rparams}[3]{\item{{\em #1}} (#2) #3}
-\end{htmlonly}
 
 \rthead{SGS\_APOLY}{Append new line to polyline}
 \begin{description}
