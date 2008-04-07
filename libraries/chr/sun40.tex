@@ -1,37 +1,92 @@
-\documentstyle[11pt]{article}
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+% \usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun40.6}
+\newcommand{\stardocsource}    {sun\stardocnumber}
+\newcommand{\stardoccopyright} 
+{Copyright \copyright\ 2005 Council for the Central Laboratory of the Research Councils}
+
+% Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {40.6}
-\newcommand{\stardocauthors}   {A C Charles\\P C T Rees\\A J Chipperfield}
-\newcommand{\stardocdate}      {27 December 250}
-\newcommand{\stardoctitle}     {CHR \\ [1ex]
+\newcommand{\stardocauthors}   {A C Charles\\P C T Rees\\A J Chipperfield }
+\newcommand{\stardocdate}      {27 December 2005}
+\newcommand{\stardoctitle}     {CHR \\ [\latex{1ex}]
                                 Character Handling Routines}
-\newcommand{\stardocversion}   {Version 2.0}
+\newcommand{\stardocversion}   {2.0}
 \newcommand{\stardocmanual}    {Programmer's Manual}
+\newcommand{\stardocabstract}  {
+This document describes the Character Handling Routine library, CHR, 
+and its use.
+The CHR library augments the limited character handling facilities
+provided by the Fortran 77 standard.
+It offers a range of character handling facilities: from formatting
+Fortran data types into text strings and the reverse, to higher level
+functions such as wild card matching, string sorting, paragraph
+reformatting and justification. 
+The library may be used simply for building text strings for interactive
+applications or as a basis for more complex text processing applications.
+}
+% ? End of document identification
 % -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sun.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%      1-FEB-2000 (AJC):
+%        Add Copyright statement in LaTeX
+%     {Add further history here}
+%
+% -
+
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\markright{\stardocname}
+\markboth{\stardocname}{\stardocname}
 \setlength{\textwidth}{160mm}
 \setlength{\textheight}{230mm}
 \setlength{\topmargin}{-2mm}
 \setlength{\oddsidemargin}{0mm}
 \setlength{\evensidemargin}{0mm}
-\setlength{\parskip}{\medskipamount}
 \setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
 \setlength{\unitlength}{1mm}
 
 % -----------------------------------------------------------------------------
-% Hypertext definitions.
-% These are used by the LaTeX2HTML translator in conjunction with star2html.
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
 
-% Comment.sty: version 2.0, 19 June 1992
-% Selectively in/exclude pieces of text.
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
 %
-% Author
+%  Author
 %    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
 %    Department of Computer Science
 %    University Tennessee at Knoxville
@@ -39,9 +94,9 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -76,33 +131,43 @@
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
 %  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
 %  should be consulted about all commands (and the environments defined above)
 %  except \xref and \xlabel which are Starlink specific.
+
 \newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
 \newcommand{\htmladdnormallink}[2]{#1}
 \newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
 \newcommand{\hyperref}[4]{#2\ref{#4}#3}
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
 
-% Starlink cross-references and labels.
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
+
+%  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
 
 %  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\renewcommand{\_}{\texttt{\symbol{95}}}
 
 % -----------------------------------------------------------------------------
 %  Debugging.
 %  =========
-%  Un-comment the following to debug links in the HTML version using Latex.
+%  Remove % on the following to debug links in the HTML version using Latex.
 
 % \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
 % \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
@@ -110,16 +175,16 @@
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
-% Add any document specific \newcommand or \newenvironment commands here
-\renewcommand{\thepage}{\roman{page}}
+% ? Document specific \newcommand or \newenvironment commands.
 
 \newcommand{\qt}[1]{'#1'}
 \begin{htmlonly}
-  \renewcommand{\qt}[1]{{\tt{'}}#1{\tt{'}}}
+  \newcommand{\qt}[1]{{\tt{'}}#1{\tt{'}}}
 \end{htmlonly}
 
-% +
+%+
 %  Name:
 %     SST.TEX
 
@@ -136,14 +201,11 @@
 %     This file defines LaTeX commands which allow routine documentation
 %     produced by the SST application PROLAT to be processed by LaTeX and
 %     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commands.
+%     source prior to any statements that make of the sst commnds.
 
 %  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html 
-%     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty 
-%     on your TEXINPUTS path (and including the name as part of the  
-%     documentstyle declaration).
+%     The style file html.sty provided with LaTeX2html needs to be used.
+%     This must be before this file.
 
 %  Authors:
 %     RFWS: R.F. Warren-Smith (STARLINK)
@@ -163,7 +225,7 @@
 %  Bugs:
 %     {note_any_bugs_here}
 
-% -
+%-
 
 %  Define length variables.
 \newlength{\sstbannerlength}
@@ -172,7 +234,8 @@
 \newlength{\sstexampleswidth}
 
 %  Define a \tt font of the required size.
-\newfont{\ssttt}{cmtt10 scaled 1095}
+\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
+\html{\newcommand{\ssttt}{\tt}}
 
 %  Define a command to produce a routine header, including its name,
 %  a purpose description and the rest of the routine's documentation.
@@ -201,8 +264,8 @@
 \newcommand{\sstdescription}[1]{\item[Description:] #1}
 
 %  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
-
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
+\\[1.3ex]{\raggedright \ssttt #1}}
 
 %  Format the invocation section.
 \newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
@@ -248,13 +311,15 @@
 
 %  Define the format of a subsection in the examples section.
 \newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
+\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
+\\ #2 }
 
 %  Format the notes section.
 \newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
 
 %  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
+\mbox{} \\[1.3ex] #2}
 
 %  Format the implementation status section.
 \newcommand{\sstimplementationstatus}[1]{
@@ -275,15 +340,12 @@
 %  Define the format of an item.
 \newcommand{\sstitem}{\item}
 
-%  Now define html equivalents of those already set. These are used by
+%% Now define html equivalents of those already set. These are used by
 %  latex2html and are defined in the html.sty files.
 \begin{htmlonly}
 
-%  Re-define \ssttt.
-   \newcommand{\ssttt}{\tt}
-
 %  sstroutine.
-   \renewcommand{\sstroutine}[3]{
+   \newcommand{\sstroutine}[3]{
       \subsection{#1\xlabel{#1}-\label{#1}#2}
       \begin{description}
          #3
@@ -291,83 +353,80 @@
    }
 
 %  sstdescription
-   \renewcommand{\sstdescription}[1]{\item[Description:]
+   \newcommand{\sstdescription}[1]{\item[Description:]
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstusage
-   \renewcommand{\sstusage}[1]{\item[Usage:]
+   \newcommand{\sstusage}[1]{\item[Usage:]
       \begin{description}
          {\ssttt #1}
       \end{description}
+      \\
    }
 
 %  sstinvocation
-   \renewcommand{\sstinvocation}[1]{\item[Invocation:]
+   \newcommand{\sstinvocation}[1]{\item[Invocation:]
       \begin{description}
          {\ssttt #1}
       \end{description}
+      \\
    }
 
 %  sstarguments
-   \renewcommand{\sstarguments}[1]{
-      \item[Arguments:]
+   \newcommand{\sstarguments}[1]{
+      \item[Arguments:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstreturnedvalue
-   \renewcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:]
+   \newcommand{\sstreturnedvalue}[1]{
+      \item[Returned Value:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstparameters
-   \renewcommand{\sstparameters}[1]{
-      \item[Parameters:]
+   \newcommand{\sstparameters}[1]{
+      \item[Parameters:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstexamples
-   \renewcommand{\sstexamples}[1]{
-      \item[Examples:]
+   \newcommand{\sstexamples}[1]{
+      \item[Examples:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstsubsection
-   \renewcommand{\sstsubsection}[1]{\item[{#1}]}
+   \newcommand{\sstsubsection}[1]{\item[{#1}]}
 
 %  sstexamplesubsection
-   \renewcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
 
 %  sstnotes
-   \renewcommand{\sstnotes}[1]{\item[Notes:]
-      \begin{description}
-         #1
-      \end{description}
-   }
+   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
 
 %  sstdiytopic
-   \renewcommand{\sstdiytopic}[2]{\item[{#1}]
-      \begin{description}
-         #2
-      \end{description}
-   }
+   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
 
 %  sstimplementationstatus
-   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
-      \begin{description}
-         #1
-      \end{description}
+   \newcommand{\sstimplementationstatus}[1]{
+      \item[Implementation Status:] #1
    }
 
 %  sstitemlist
@@ -375,35 +434,30 @@
       \begin{itemize}
          #1
       \end{itemize}
+      \\
    }
+%  sstitem
+   \newcommand{\sstitem}{\item}
 
 \end{htmlonly}
 
 %  End of "sst.tex" layout definitions.
-% .
-% @(#)sst.tex   1.4   95/06/06 11:46:41   95/06/06 11:49:58
+%.
 
-% Internal cross-reference to labels.
-\newcommand{\iref} [1]{\htmlref{#1}{#1}}
-\newcommand{\iiref}[2]{\htmlref{#1}{#2}}
 
-%------------------------------------------------------------------------------
+
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
+\renewcommand{\thepage}{\roman{page}}
 \begin{document}
 \thispagestyle{empty}
 
-%  Define command to recentre underscore for Latex and leave as normal
-%  for HTML (severe problems with \_ in tabbing environments and \_\_
-%  generally otherwise). This is done here intentionally.
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\begin{latexonly}
-  \setunderscore
-\end{latexonly}
-
 %  Latex document header.
+%  ======================
 \begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
    {\large \stardoccategory\ \stardocnumber}
@@ -415,97 +469,100 @@
    \rule{\textwidth}{0.5mm}
    \vspace{5mm}
    \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
+   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
+   {\LARGE\textbf{\stardocversion \\ [4ex]}}
+   {\Huge\textbf{\stardocmanual}}
    \end{center}
    \vspace{5mm}
 
-%  Add heading for abstract if used.
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+% ? End of picture
+
+% ? Heading for abstract if used.
    \vspace{10mm}
    \begin{center}
-      {\Large\bf Description}
+      {\Large\textbf{Abstract}}
    \end{center}
-
+% ? End of heading for abstract.
 \end{latexonly}
 
 %  HTML documentation header.
+%  ==========================
 \begin{htmlonly}
    \xlabel{}
    \begin{rawhtml} <H1> \end{rawhtml}
       \stardoctitle\\
       \stardocversion\\
       \stardocmanual
-   \begin{rawhtml} </H1> \end{rawhtml}
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
 
-%  Add picture here if required.
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
+% ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
-      Particle Physics \& Astronomy Research Council \\
+      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
-   \begin{rawhtml} </H2> </P> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  Header for Contents (if used).
-   \label{stardoccontents}
-   \begin{rawhtml}
-      <HR>
-      <H2>Contents</H2>
-   \end{rawhtml}
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
 
-%  Start new section for abstract if used.
+% ? New section for abstract if used.
   \section{\xlabel{abstract}Abstract}
-
+% ? End of new section for abstract
 \end{htmlonly}
 
 % -----------------------------------------------------------------------------
-%  Document Abstract. (if used)
+% ? Document Abstract. (if used)
 %  ==================
-This document describes the Character Handling Routine library, CHR, 
-and its use.
-The CHR library augments the limited character handling facilities
-provided by the Fortran 77 standard.
-It offers a range of character handling facilities: from formatting
-Fortran data types into text strings and the reverse, to higher level
-functions such as wild card matching, string sorting, paragraph
-reformatting and justification. 
-The library may be used simply for building text strings for interactive
-applications or as a basis for more complex text processing applications.
-\newpage
+\stardocabstract
+% ? End of document abstract
+
 % -----------------------------------------------------------------------------
-%  Table of Contents.
-%  ==================
-%  The commands used here disable the creation of a "second" table of
-%  contents and create a button in the navigation panel to get to the
-%  postion of the \label{stardoccontents} command. If this isn't the
-%  behaviour you require remove the htmlonly environment (and its
-%  contents) and the \begin{latexonly} and \end{latexonly}.
-%
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-\begin{htmlonly}
-   \renewcommand{\latexonlytoc}[0]{}
-   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
-                                            {stardoccontents}}
-\end{htmlonly}
+% ? Latex Copyright Statement
+%  =========================
 \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \latexonlytoc
-   \setlength{\parskip}{\medskipamount}
-   \markright{\stardocname}
+\newpage
+\vspace*{\fill}
+\stardoccopyright
 \end{latexonly}
+% ? End of Latex copyright statement
+
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+  \newpage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \tableofcontents
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
+% ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 
-%  Introduction page
-\newpage
+\cleardoublepage
 \renewcommand{\thepage}{\arabic{page}}
 \setcounter{page}{1}
 
@@ -554,10 +611,10 @@ A classified list of of these routines is given in Appendix \ref{class_sect}.
 
 None of the CHR routines report error messages; {\em i.e.}\ they do not use 
 \xref{the Starlink Error Reporting System}{sun104}{}
-\latexonly{, ERR (see SUN/104)}.
+\latex{, ERR (see SUN/104)}.
 However, some routines do use the 
 \xref{inherited status conventions}{sun104}{inherited_status}
-\latexonly{(described in SUN/104) }to indicate success or failure.
+\latex{(described in SUN/104) }to indicate success or failure.
 Those CHR routines which do not have a status argument handle any errors
 internally and have a specified behaviour on error.
 Those CHR routines which do have a status argument fall into two categories:
@@ -3597,4 +3654,4 @@ from the previous versions.
 This document has been modified to remove references to the use of CHR on VMS.
 
 \end{document}
-% @(#)sun109.tex   1.8   95/07/03 15:32:32   95/07/13 14:23:26
+
