@@ -182,11 +182,11 @@ software for use on Starlink.
 % Add any document specific \newcommand or \newenvironment commands here
 \newcommand{\dash}{--}
 \begin{htmlonly}
-\renewcommand{\dash}{-}
+  \newcommand{\dash}{-}
 \end{htmlonly}
 \newcommand{\listline}{\hspace{1pt}\\}
 \begin{htmlonly}
-\renewcommand{\listline}{}
+  \newcommand{\listline}{}
 \end{htmlonly}
 %+
 %  Name:
@@ -598,7 +598,7 @@ messages.
 
 This document is aimed at all programmers who are writing applications software
 on Starlink, either for use within the 
-\xref{ADAM environment}{sg4}{}\latexonly{ (see SG/4)}
+\xref{ADAM environment}{sg4}{}\latex{ (see SG/4)}
 or stand-alone.
 The major part of this document concerns the use of the stand-alone version of
 the Message and Error Reporting System subroutines.
