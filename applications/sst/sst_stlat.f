@@ -16,10 +16,7 @@
 *     The routine writes the commands necessary to start a Latex
 *     document to the output file. If a full Latex document is being
 *     produced, then this routine should be called before processing any
-*     input prologues. It uses the standard Latex preamble
-*     $SST_DIR/sun.tex then transfers the contents of the file
-*     $SST_DIR/sst.tex to the output file. This contains definitions of
-*     the SST layout commands.
+*     input prologues.
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -99,47 +96,10 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Open the Latex preamble.
+*  Now open the SST version of the template SUN file. This
+*  includes the SST latex macros.
       CALL PSX_GETENV( 'SST_DIR', FILE, STATUS )
-      CALL CHR_APPND( '/sun.tex', FILE, CHR_LEN( FILE ) )
-      CALL FIO_OPEN( FILE, 'READ', 'list', 0, FD, STATUS )
-      CALL FIO_UNIT( FD, DEFNS, STATUS )
-      
-*  If an error occurred, then construct a message and report it.
-      IF ( STATUS .NE. SAI__OK ) THEN
-         CALL MSG_SETI( 'UNIT', DEFNS )
-         CALL ERR_REP( 'SST_STLAT_OPEN',
-     :   'Error opening file $SST_DIR/sun.tex for reading on ' //
-     :   'Fortran unit ^UNIT.', STATUS )
-         GO TO 99
-      END IF
-
-*  Loop to read the definitions file.
-      CALL ERR_MARK
- 1    CONTINUE                  ! Start of 'DO WHILE' loop
-      IF ( STATUS .EQ. SAI__OK ) THEN
-         CALL SST_GET( DEFNS, LINE, STATUS )
-         CALL CHR_FANDL( LINE, F, L )
-
-*  If the line is blank, then output a blank line. Otherwise, send the
-*  input line to the output file, preserving its indentation.
-         IF ( F .GT. L ) THEN
-            CALL SST_PUT( 0, ' ', STATUS )
-         ELSE
-            CALL SST_PUT( F - 1, LINE( F : L ), STATUS )
-         END IF
-         GO TO 1
-      END IF
-
-*  Annul the end-of-file error and close the file.
-      IF ( STATUS .EQ. FIO__EOF .OR.
-     :     STATUS .EQ. FIO__ENDFL ) CALL ERR_ANNUL( STATUS )
-      CALL ERR_RLSE
-      CALL FIO_CLOSE( FD, STATUS )
-
-*  Now open the layout definitions file.
-      CALL PSX_GETENV( 'SST_DIR', FILE, STATUS )
-      CALL CHR_APPND( '/sst.tex', FILE, CHR_LEN( FILE ) )
+      CALL CHR_APPND( '/sst_preamble.tex', FILE, CHR_LEN( FILE ) )
       CALL FIO_OPEN( FILE, 'READ', 'list', 0, FD, STATUS )
       CALL FIO_UNIT( FD, DEFNS, STATUS )
 
@@ -147,12 +107,12 @@
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL MSG_SETI( 'UNIT', DEFNS )
          CALL ERR_REP( 'SST_STLAT_OPEN',
-     :   'Error opening file $SST_DIR/sst.tex for reading on ' //
-     :   'Fortran unit ^UNIT.', STATUS )
+     :   'Error opening file $SST_DIR/sst_preamble.tex for'//
+     :   ' reading on Fortran unit ^UNIT.', STATUS )
          GO TO 99
       END IF
 
-*  Loop to read the definitions file.
+*  Loop to read the file.
       CALL ERR_MARK
  2    CONTINUE                  ! Start of 'DO WHILE' loop
       IF ( STATUS .EQ. SAI__OK ) THEN

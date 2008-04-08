@@ -58,7 +58,7 @@
 *        prologues which may be held in each input file.
 *     OUT = FILE (Write)
 *        The output file to which the Latex documentation will be
-*        written. [PROLAT.TEX]
+*        written. [prolat.tex]
 *     PAGE = _LOGICAL (Read)
 *        If PAGE is set to TRUE, then a new output page will be started
 *        to hold the information extracted from each input prologue.
@@ -92,7 +92,7 @@
 *     PROLAT IN=SOURCE.FOR NOATASK NODOCUMENT NOSINGLE
 *        Extracts prologue information from a sequence of subroutines
 *        or functions which are all held in the file SOURCE.FOR and
-*        produces Latex output in the default output file PROLAT.TEX.
+*        produces Latex output in the default output file prolat.tex.
 *        This output file contains only the routine descriptions (no
 *        Latex definitions) and is therefore suitable for inclusion in
 *        a larger document.
@@ -100,7 +100,7 @@
 *        In this example, a sequence of input file specifications is
 *        given. Each will be processed in turn to generate Latex
 *        documentation from the first prologue encountered in each
-*        file.  Output is written to the file PROLAT.TEX with the
+*        file.  Output is written to the file prolat.tex with the
 *        description of each routine starting on a new page.
 
 *  Notes:
@@ -124,18 +124,17 @@
 *     If the DOCUMENT=FALSE option is chosen, then the output file will
 *     contain none of the Latex command definitions needed to produce
 *     the final document. To define these commands, the contents of the
-*     file $SST_DIR/sst.tex must be included in the Latex input file
-*     in front of the output from PROLAT (the usual Latex preamble and
-*     \begin{document} ... \end{document} commands will also be needed,
-*     of course). The layout definitions in this file are designed to
-*     operate correctly within the Latex environment normally used in a
-*     Starlink User Note (see the file DOCSDIR:SUN.TEX for example).
+*     file $STARLINK_DIR/share/sst.tex must be included in the Latex 
+*     input file in the preamble (in the standard SUN template). The 
+*     layout definitions in this file are designed to operate correctly 
+*     within the Latex environment normally used in a Starlink User Note
+*     (see the file $STARLINK_DIR/share/sun.tex).
 *
 *     It is recommended that you include the contents of the file
-*     $SST_DIR/sst.tex in your final document explicitly rather than
-*     by using the Latex \include directive, otherwise it may not be
-*     possible to process the document in future if changes have to be
-*     made to the Latex definitions in this file.
+*     $STARLINK_DIR/share/sst.tex in your final document explicitly 
+*     rather than by using the Latex \include directive, otherwise it 
+*     may not be possible to process the document in future if changes 
+*     have to be made to the Latex definitions in this file.
 
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
