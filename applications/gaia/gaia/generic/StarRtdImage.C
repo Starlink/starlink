@@ -197,6 +197,8 @@
  *        Added objectCmd and volatileCmd.
  *     08-JAN-2008 (PWD):
  *        Removed astaddcolour & astfontresize (moved into gaiautils::).
+ *     08-APR-2008 (PWD):
+ *        Add -pixel_indices support.
  *-
  */
 #if HAVE_CONFIG_H
@@ -6531,29 +6533,33 @@ void StarRtdImage::processMotionEvent()
     //  Report NDF integer pixel indices rather than GRID coordinates.
     if ( pixel_indices() ) {
         
-        //  Get the NDF origin information.
+        //  Get the NDF origin information. Values default to 1. Note we
+        //  always do this, once requested we need the PX and PY values to be
+        //  set.
         char *xori = image_->image().get("LBOUND1");
-        char *yori = image_->image().get("LBOUND2");
-        if ( xori && yori ) {
-            int xo = atoi( xori );
-            int yo = atoi( yori );
-
-            //  The global variables var(X) and var(Y) have already been set
-            //  to the GRID coordinates. Use those values to set related
-            //  globals. Note do not reuse the var(X) and var(Y) these 
-            //  values are used to also pick values.
-            char *var = ( viewMaster_ ? viewMaster_->name() : instname_ );
-            char buf[100];
-            
-            if ( xo != 1 ) {
-                sprintf(buf,"set %s(PX) [expr round($%s(X))+%d-1]",var,var,xo);
-                Tcl_EvalEx( interp_, buf, -1, TCL_EVAL_GLOBAL );
-            }
-            if ( yo != 1 ) {
-                sprintf(buf,"set %s(PY) [expr round($%s(Y))+%d-1]",var,var,yo);
-                Tcl_EvalEx( interp_, buf, -1, TCL_EVAL_GLOBAL );
-            }
+        int xo = 1;
+        if ( xori ) {
+            xo = atoi( xori );
         }
+        char *yori = image_->image().get("LBOUND2");
+        int yo = 1;
+        if ( yori ) {
+            yo = atoi( yori );
+        }
+
+        //  The global variables var(X) and var(Y) have already been set
+        //  to the GRID coordinates. Use those values to set related
+        //  globals. Note do not reuse the var(X) and var(Y) these 
+        //  values are used to also pick values.
+        char *var = ( viewMaster_ ? viewMaster_->name() : instname_ );
+        char buf[100];
+        int nb;
+        nb = sprintf( buf, "set %s(PX) [expr round($%s(X))+(%d)-1]",
+                      var, var, xo );
+        Tcl_EvalEx( interp_, buf, nb, TCL_EVAL_GLOBAL );
+        nb = sprintf( buf, "set %s(PY) [expr round($%s(Y))+(%d)-1]",
+                      var, var, yo );
+        Tcl_EvalEx( interp_, buf, nb, TCL_EVAL_GLOBAL );
     }
 
     //  Need the UKIRT quick look statistics box updates. These are originally
