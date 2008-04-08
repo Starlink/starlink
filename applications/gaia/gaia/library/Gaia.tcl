@@ -1506,7 +1506,7 @@ itcl::class gaia::Gaia {
    
    #  Get a file using a suitably configured dialog for images. Also
    #  provides browsing of NDFs and FITS MEFS for HDUs.
-   protected method get_file_ {{dir "."} {pattern "*."}} {
+   protected method get_file_ {{dir "."} {pattern "*"}} {
       if { ! [info exists itk_component(fileselect)] || 
            ! [winfo exists $itk_component(fileselect)] } {
          itk_component add fileselect {
