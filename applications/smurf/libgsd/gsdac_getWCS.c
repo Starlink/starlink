@@ -42,16 +42,16 @@
 *    A note on converting from CELL (in GSD) to GRID (in ATL):
 *    CELL coordinates set 0,0 to the centre of the grid, and other
 *    cells are defined with positive and negative coordinates around
-*    this centre.  GRID coordinates start at 1,1 in the bottom
-*    left hand corner.  Example:
+*    this centre.  GRID coordinates use 1,1 as the centre of the 
+*    grid, so cell offsets must be adjusted accordingly.  Example:
 *
 *    CELL:  -1, 1    0, 1    1, 1
 *           -1, 0    0, 0    1, 0
 *           -1,-1    0,-1    1,-1
 *
-*    GRID:   1, 3    2, 3    3, 3
-*            1, 2    2, 2    3, 2
-*            1, 1    2, 1    3, 1  
+*    GRID:   0, 2    1, 2    2, 2
+*            0, 1    1, 1    2, 1
+*            0, 0    1, 0    2, 0  
 
 *  Authors:
 *     J.Balfour (UBC)
@@ -86,7 +86,9 @@
 *     2008-04-03 (JB):
 *        Correct LST offsets for rasters.
 *     2008-04-04 (TIMJ):
-*        Store DUT1 in WCS frameset for later use by specwrite
+*        Store DUT1 in WCS frameset for later use by specwrite.
+*     2008-04-08 (JB):
+*        Use 1,1 as centre of grid, adjust CELL offsets accordingly.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -143,7 +145,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   AstKeyMap *cellMap;         /* Ast KeyMap for cell description */
   double coordIn[3];          /* input coordinates to transformation */
   double coordOut[3];         /* output coordinates from transformation */
-  int dataDims[3];            /* dimensions of data */
+  int dataDims[3];            /* dimensions of data*/
   AstKeyMap *datePointing;    /* Ast KeyMap for pointing and times */
   char dateString[SZFITSCARD];/* temporary string for date conversions. */
   int day;                    /* days */
@@ -366,30 +368,14 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   astMapPut0D( cellMap, "POSANGLE", gsdVars->cellV2Y, "" );
   astMapPut0I( cellMap, "CELLCODE", gsdVars->cellCode, "" );
 
-  /* Get the dimensions of the data array.  If this is a raster, 
-     determine the dimensionality from the number of scans and the
-     scanning direction. */
-  if ( strncmp( gsdVars->obsType, "RASTER", 6 ) == 0 ) {
-  
-    if ( strncmp( gsdVars->obsDirection, "HORIZONTAL", 10 ) == 0 ) {    
-      dataDims[0] = gsdVars->nMapPtsX; 
-      dataDims[1] = gsdVars->noScans;
-    } else {
-      dataDims[0] = gsdVars->noScans; 
-      dataDims[1] = gsdVars->nMapPtsY;
-    }
-
-  } else {
-
-    dataDims[0] = gsdVars->nMapPtsX;
-    dataDims[1] = gsdVars->nMapPtsY;
-
-  }
-
+  /* Set the centre of the grid to 1,1, and set the dimensions
+     of the third axis to the number of channels. */
+  dataDims[0] = 1;
+  dataDims[1] = 1;
   dataDims[2] = gsdVars->nBEChansOut;
 
   if ( DEBUGON ) 
-    printf ( "dataDims : %i %i %i\n", dataDims[0], dataDims[1], dataDims[2] );
+    printf ( "!dataDims : %i %i %i\n", dataDims[0], dataDims[1], dataDims[2] );
 
   /* Get a frameset describing the mapping from cell to sky. */
   atlWcspx ( datePointing, cellMap, dataDims, 
@@ -412,11 +398,13 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   }
 
   /* Calculate the centre in tracking. */
-  coordIn[0] = ( (double)(dataDims[0] - 1) / 2.0 ) + 1.0;
-  coordIn[1] = ( (double)(dataDims[1] - 1) / 2.0 ) + 1.0;
+  coordIn[0] = 1.0;
+  coordIn[1] = 1.0;
   coordIn[2] = 0.0;
 
   astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
+
+  astNorm ( frame, coordOut );
 
   if ( subBandNum == 0 && DEBUGON ) 
     printf ( "GRID (base) coordinates  : %f %f\n", 
@@ -430,12 +418,12 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   wcs->baseTr2 = coordOut[1];
 
   /* Calculate the cell offsets in tracking. */
-  coordIn[0] = gsdVars->mapTable[stepNum*2] + 1.0 +
-               (double)(dataDims[0] - 1) / 2.0;
-  coordIn[1] = gsdVars->mapTable[stepNum*2+1] + 1.0 +
-               (double)(dataDims[1] - 1) / 2.0;
+  coordIn[0] = gsdVars->mapTable[stepNum*2] + 1.0;
+  coordIn[1] = gsdVars->mapTable[stepNum*2+1] + 1.0;
 
   astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
+
+  astNorm ( frame, coordOut );
 
   if ( subBandNum == 0 && DEBUGON ) 
     printf ( "GRID (offset) coordinates  : %f %f\n", 
@@ -451,10 +439,12 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   astSetC( frame, "System(1)", "AZEL" );
 
   /* Get centre in AZEL. */
-  coordIn[0] = ( (double)(dataDims[0] - 1) / 2.0 ) + 1.0;
-  coordIn[1] = ( (double)(dataDims[1] - 1) / 2.0 ) + 1.0;
+  coordIn[0] = 1.0;
+  coordIn[1] = 1.0;
 
   astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
+
+  astNorm ( frame, coordOut );
 
   if ( subBandNum == 0 && DEBUGON ) 
     printf ( "GRID (base) coordinates  : %f %f\n", 
@@ -468,12 +458,12 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   wcs->baseEl = coordOut[1];
 
   /* Calculate the cell offsets in AZEL. */
-  coordIn[0] = gsdVars->mapTable[stepNum*2] + 1.0 +
-               (double)(dataDims[0] - 1) / 2.0;
-  coordIn[1] = gsdVars->mapTable[stepNum*2+1] + 1.0 +
-               (double)(dataDims[1] - 1) / 2.0;
+  coordIn[0] = gsdVars->mapTable[stepNum*2] + 1.0;
+  coordIn[1] = gsdVars->mapTable[stepNum*2+1] + 1.0;
 
   astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
+
+  astNorm ( frame, coordOut );
 
   if ( subBandNum == 0 && DEBUGON ) 
     printf ( "GRID (offset) coordinates  : %f %f\n", 
@@ -499,6 +489,9 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
      the declination, and the latitude. */
   astSet( frame, "System(1)=GAPPT" );
   astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
+
+  astNorm ( frame, coordOut );
+
   gapptRA = coordOut[0];
   gapptDec = coordOut[1];
   index = (int) ( stepNum / gsdVars->nScanPts );
