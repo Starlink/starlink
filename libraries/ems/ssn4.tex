@@ -186,7 +186,7 @@ ignored by applications programmers and users.}
 % ? Document specific \newcommand or \newenvironment commands.
 \newcommand{\listline}{\hspace{1pt}\\}
 \begin{htmlonly}
-\renewcommand{\listline}{}
+  \newcommand{\listline}{}
 \end{htmlonly}
 %+
 %  Name:
@@ -1363,7 +1363,7 @@ They may also produce differing results on different platforms.
 associated with a Starlink status value to a \textit{token.}
 
 On UNIX this is implemented using the \xref{MESSGEN}{sun185}{} system
-\latexonly{(see SUN/185)}
+\latex{(see SUN/185)}
 and thus relies on the required Starlink facility message files
 having been entered into the system.
 
