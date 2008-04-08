@@ -256,7 +256,8 @@ Starlink software.
 \newlength{\sstexampleswidth}
 
 %  Define a \tt font of the required size.
-\newfont{\ssttt}{cmtt10 scaled 1095}
+\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
+\html{\newcommand{\ssttt}{\tt}}
 
 %  Define a command to produce a routine header, including its name,
 %  a purpose description and the rest of the routine's documentation.
@@ -642,7 +643,6 @@ helpful in what follows.
 
 \begin{figure}
 \label{fig:hierarchy}
-\xlabel{hierarchy_picture}
 \caption{The relationship between a computer's filing system and HDS.}
 \begin{center}
 \begin{picture}(150,90)
