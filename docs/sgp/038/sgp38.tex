@@ -1,11 +1,12 @@
-%\documentclass[twoside,11pt]{article}
-\documentstyle[11pt,twoside]{article}
+\documentclass[twoside,11pt]{article}
+%\documentstyle[11pt,twoside]{article}
 \pagestyle{myheadings}
 
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {Starlink General Paper}
 \newcommand{\stardocinitials}  {SGP}
 \newcommand{\stardocnumber}    {38.2}
+\newcommand{\stardocsource}    {sgp\stardocnumber}
 \newcommand{\stardocauthors}   {Malcolm J Currie, P T Wallace \&
                                 R F Warren-Smith}
 \newcommand{\stardocdate}      {1989 January 20}
@@ -39,9 +40,9 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -76,7 +77,6 @@
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -93,6 +93,13 @@
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
 
+% Define commands for HTML-only or LaTeX-only text.
+\newcommand{\html}[1]{}
+\newcommand{\latex}[1]{#1}
+
+% Use latex2html 98.2.
+\newcommand{\latexhtml}[2]{#1}
+
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
@@ -103,7 +110,6 @@
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\newcommand{\latex}[1]{#1}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
@@ -112,44 +118,124 @@
 %  by latex2html.
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
 
-% conditional text
-\newcommand{\latexelsehtml}[2]{#1}
-\begin{htmlonly}
-  \renewcommand{\latexelsehtml}[2]{#2}
-\end{htmlonly}
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 
 % -----------------------------------------------------------------------------
 
 \newcommand{\numcir}[1]{\mbox{\hspace{3ex}$\bigcirc$\hspace{-1.7ex}{\small #1}}}
 \begin{htmlonly}
-\renewcommand{\numcir}[1]{~~~~~~ #1} 
+   \newcommand{\numcir}[1]{~~~~~~ \htmlref{{#1}}{se:expnote{#1}}} 
 \end{htmlonly}
 
 \newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
 
 % -----------------------------------------------------------------------------
+
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
 \begin{document}
 \thispagestyle{empty}
-SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
-RUTHERFORD APPLETON LABORATORY\\
-{\large\bf Starlink Project\\}
-{\large\bf \stardoccategory\ \stardocnumber}
-\begin{flushright}
-\stardocauthors\\
-\stardocdate
-\end{flushright}
-\vspace{-4mm}
-\rule{\textwidth}{0.5mm}
-\vspace{5mm}
-\begin{center}
-{\Large\bf \stardoctitle}
-\end{center}
-\vspace{5mm}
 
-\setlength{\parskip}{0mm}
-\tableofcontents
-\setlength{\parskip}{\medskipamount}
-\markright{\stardocname}
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+   RUTHERFORD APPLETON LABORATORY\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Large\bf \stardoctitle}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+%   \vspace{10mm}
+%   \begin{center}
+%      {\Large\bf Abstract}
+%   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory\ \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      SCIENCE \& ENGINEERING RESEARCH COUNCIL /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \newcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+%  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+%\stardocabstract
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+% \newpage
+\begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+\end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
 
 \section{Introduction}
 \label{se:intro}
@@ -330,14 +416,12 @@ been rejected (for reasons already presented), even for
 astronomical data, a number of composite data formats will be
 defined for various classes or forms of data as required. 
 
-The only current example of a composite data format,
-the NDF, is presented in
-Table~\ref{ta:example1}.  (NDF is
-short for {\it Extensible n-Dimensional-Data Format} and will
-be described fully
-\latexelsehtml{in Section~\ref{se:ndf}).}{\htmlref{here.)}{se:ndf}}  The NDF
-is based on the $n$-dimensional data array, which is the most natural
-way to express many sorts of astronomical data set---notably
+The only current example of a composite data format, the NDF, is
+presented in Table~\ref{ta:example1}.  (NDF is short for {\it
+Extensible n-Dimensional-Data Format} and will be described fully
+\latex{in Section~\ref{se:ndf}.)}\html{\htmlref{here.)}{se:ndf}}  The
+NDF is based on the $n$-dimensional data array, which is the most
+natural way to express many sorts of astronomical data set---notably
 spectra, pictures and time series.
 
 Within an HDS container file, the NDF structure resides usually,
@@ -397,14 +481,13 @@ general processing.  They comprise:
                   {[}{\bf QUALITY}{]}. \\
                   \end{tabular}\end{minipage}
 \end{itemize}
-Only the {[}{\bf DATA\_ARRAY}{]} is
-mandatory---so a primitive HDS object containing
-a 2-D array of numbers (for example) is
-valid as the only component of an NDF.
-A full description of the components is given
-\latexelsehtml{in Section~\ref{se:ndf}}{\htmlref{here}{se:ndf}}
-and the meaning of the TYPEs in
-\latexelsehtml{Section~\ref{se:natyvar}.}{\htmlref{Naming, Types and Variants.}{se:natyvar}} 
+
+Only the {[}{\bf DATA\_ARRAY}{]} is mandatory---so a primitive HDS
+object containing a 2-D array of numbers (for example) is valid as the
+only component of an NDF. A full description of the components is
+given \latex{in Section~\ref{se:ndf}}\html{\htmlref{here}{se:ndf}} and
+the meaning of the TYPEs in \latex{Section~\ref{se:natyvar}.}\html{\htmlref{Naming, Types and
+Variants.}{se:natyvar}}
 
 The omission from the NDF of the maximum and minimum
 values of the data array, and other quantities which can be
@@ -631,8 +714,8 @@ records are brief and are only intended to assist the user.  Their
 contents must {\bf not} be used by applications to
 control processing.
 
-The rules for designing new structures are presented in
-\latexelsehtml{Section~\ref{se:newdesign}.}{\htmlref{Creating New
+The rules for designing new structures are presented 
+in \latex{Section~\ref{se:newdesign}.}\html{\htmlref{Creating New
 Structures.}{se:newdesign}}
 
 \paragraph{Extensibility}
@@ -745,8 +828,8 @@ invoked, in order to save time.  Note that in this document the term
 an {\em array element} or {\em bin}, and therefore, {\em pixel}
 does not imply membership of a two-dimensional array.
 
-Full details of bad-pixel methods are presented
-\latexelsehtml{in Section~\ref{se:badpixel}.}{\htmlref{here.}{se:badpixel}}
+Full details of bad-pixel methods are presented \latex{in 
+Section~\ref{se:badpixel}.}\html{\htmlref{here.}{se:badpixel}}
 
 \section{\xlabel{se_natyvar}Naming, Types and
 Variants\label{se:natyvar}}
@@ -910,14 +993,14 @@ $<${\bf s\_array}$>$ & a $<${\bf numeric}$>$ scalar or $<${\bf p\_array}$>$ \\ \
 \end{tabular}
 \end{table}
 
-The $<${\bf various}$>$ notation is used where the options do not neatly 
-fit into one of the categories in Table~\ref{ta:pseudotypes}.
-\latexelsehtml{Sections~\ref{se:basic}}{\htmlref{Low-Level Structures}{se:basic}} and 
-\latexelsehtml{\ref{se:ndf}}{\htmlref{The Extensible n-dimensional Format}{se:ndf}} 
-contain tables of the contents of standard structures, followed by
-descriptions of the individual items. The possible options for each
-$<${\bf various}$>$ can be found within the description of the
-associated data object.
+The $<${\bf various}$>$ notation is used where the options do not
+neatly fit into one of the categories in Table~\ref{ta:pseudotypes}.
+\latex{Sections~\ref{se:basic}}\html{\htmlref{Low-Level
+Structures}{se:basic}} and \latex{\ref{se:ndf}}\html{\htmlref{The
+Extensible n-dimensional Format}{se:ndf}} contain tables of the
+contents of standard structures, followed by descriptions of the
+individual items. The possible options for each $<${\bf various}$>$
+can be found within the description of the associated data object.
 
 There is problem for the notation.
 Certain data objects are arrays. The number and sizes of each dimension
@@ -1083,7 +1166,7 @@ includes the standard prefixes used to
 scale values by factor multiples of 1000.  There is one problem here:
 micro- is abbreviated to $\mu$, which is not a character available
 within HDS strings (see 
-\latexelsehtml{Section~\ref{se:charset};}{\htmlref{Character Set;}{se:charset}}
+\latex{Section~\ref{se:charset};}\html{\htmlref{Character Set;}{se:charset}}
 the character {\tt u} should be
 used instead.  Also, the SI units include an
 $\Omega$ abbreviation; here, the full unit name,
@@ -1258,9 +1341,8 @@ a processing sequence.  They are present to assist the user:
 
 History records should be brief.
 
-Details are given in 
-\latexelsehtml{Section~\ref{se:shistory}.}{\htmlref{$<${\bf
-HISTORY}$>$ Structure.}{se:history}}
+Details are given in \latex{Section~\ref{se:shistory}.}\html{\htmlref{$<${\bf HISTORY}$>$
+Structure.}{se:history}}
 
 \section{\xlabel{se_badpixel}Bad-Pixel Methods\label{se:badpixel}}
 
@@ -1476,23 +1558,20 @@ value and quality or (2) to propagate an undefined pixel.
 \end{itemize}
 \item [Conventions] ---
 \begin{itemize}
-\item When there is more than one
-input data array ({\it cf.}\ 
-\latexelsehtml{Section~\ref{se:Propag}}{\htmlref{Propagation}{se:propag}}),
+\item When there is more than one input data array 
+({\it cf.}\ \latex{Section~\ref{se:propag}}\html{\htmlref{Propagation}{se:propag}}),
 the {\it input} or {\it original} data quality is deemed to be that
 associated with the {\it principal} data array.
-However,
-in some cases it is hard to identify a
+
+However, in some cases it is hard to identify a
 principal data array, or the principal data array does not have
 quality and one or more of the others does.
 Therefore, what is best depends on the
 nature of the application.
-For example, in the computation
-of the statistics of corresponding
+For example, in the computation of the statistics of corresponding
 pixels from each of a series of pictures, to produce mean or
 standard-deviation arrays, it is vital to exclude {\bf all}
-bad values from the
-calculations.  A related problem is
+bad values from the calculations.  A related problem is
 what the quality of output data arrays should be, and
 here again programmers must make case-by-case judgements.
 \item If an undefined pixel is generated during the processing, the data
@@ -1692,10 +1771,9 @@ avoided in case they are needed later for
 Starlink general-purpose packages, {\it e.g.}
 \mbox{{[}{\bf HEADERS}{]}}, {[}{\bf PHOTOMETRY}{]}.
 
-Starlink will, in due course,
-define standard representations of time and celestial
-positions (using the rules of 
-\latexelsehtml{Section~\ref{se:newdesign}).}{\htmlref{Creating New
+Starlink will, in due course, define standard representations 
+of time and celestial positions (using the rules 
+of \latex{Section~\ref{se:newdesign}).}\html{\htmlref{Creating New
 Structures).}{se:newdesign}}
 They will be implemented as extensions, not additions to the
 standard structures.  It has not yet been decided
@@ -1713,12 +1791,11 @@ objects are to be propagated to the outputs, guided by the
 following rules:
 \begin{itemize}
 \item
-General-purpose applications will copy extensions ({\it cf.} 
-\latexelsehtml{Section~\ref{se:exten}}{\htmlref{Extensions}{se:exten}})
+General-purpose applications will copy extensions 
+({\it cf.} \latex{Section~\ref{se:exten}}\html{\htmlref{Extensions}{se:exten}})
 to the same location within an output structure provided their
-parent structure has
-been propagated; specialist applications are, of course,
-allowed to process individual items within the extensions
+parent structure has been propagated; specialist applications are,
+of course, allowed to process individual items within the extensions
 they understand.
 \item
 Items whose properties are well understood in the context of a given
@@ -1864,10 +1941,9 @@ co-ordinate range.  Only processed if
 
 \subsection{\xlabel{se_array}$<${\bf ARRAY}$>$Structure\label{se:sarray}}
 
-We will now describe the various structures for arrays
-of numbers introduced in 
-\latexelsehtml{Section~\ref{se:notation}.}{\htmlref{Notation and
-Pseudo-types.}{se:notation}}
+We will now describe the various structures for arrays of numbers 
+introduced in \latex{Section~\ref{se:notation}.}\html{\htmlref{Notation 
+and Pseudo-types.}{se:notation}}
 An \mbox{$<${\bf ARRAY}$>$} structure has a number of variants.
 
 \subsubsection{{[}{\bf VARIANT}{]} = `SIMPLE'}
@@ -2447,11 +2523,8 @@ NDFs may be structured recursively---see the
 polarimetry example below, for example.
 
 It was not, in fact, possible to keep strictly to
-the rules in 
-\latexelsehtml{Section~\ref{se:newdesign}}{\htmlref{Creating New
-Structures}{se:newdesign}} when
-designing
-the NDF structure;
+the rules in \latex{Section~\ref{se:newdesign}}\html{\htmlref{Creating
+New Structures}{se:newdesign}} when designing the NDF structure;
 compromises were necessary in order to
 allow old Asterix and Wright-Giddings-formatted data,
 of which there is a great deal,
@@ -2589,7 +2662,7 @@ to specific applications packages.
 Each extension must have a unique NAME, by which it is recognised.
 Its TYPE may be any one of the Starlink-defined standard TYPEs, or
 may a new one defined according to rules in 
-\latexelsehtml{Section~\ref{se:newdesign}.}{\htmlref{Creating New
+\latex{Section~\ref{se:newdesign}.}\html{\htmlref{Creating New
 Structures.}{se:newdesign}}
 Each extension (with the NAME, TYPE and variants)
 must be registered with the Starlink Head of Applications.
@@ -2673,12 +2746,14 @@ for example),
 the application should display to the user the
 axis labels (if present) to assist identification.
 
-\item Higher level structures
+\item Higher-level structures
 
 Various specialised data objects and structures may be packaged around
 the NDF structure, using the NDF as a building block.  One common
 requirement is for a series of related spectra or pictures;  this
 could be implemented simply as a sequence of NDFs as follows:
+
+\begin{latexonly}
 \begin{tabbing}
 
 na\=me\=~~~~~~sp\=eci\=al\_ty\=pe\+ \\
@@ -2690,14 +2765,29 @@ na\=me\=~~~~~~sp\=eci\=al\_ty\=pe\+ \\
     $\vdots$ \> \>$\vdots$\- \\
 
 \end{tabbing}
+\end{latexonly}
+
+\begin{htmlonly}
+\begin{quote}
+
+name~~~~~~~~~~special\_type\\
+~~~{[}{\bf name1}{]}~~~~~~$<${\bf NDF}$>$ \\
+~~~~~~~$\vdots$~~~~~~~~~~~~~~~~~~$\vdots$\- \\
+~~~{[}{\bf name2}{]}~~~~~~$<${\bf NDF}$>$ \\
+~~~~~~~$\vdots$~~~~~~~~~~~~~~~~~~$\vdots$\- \\
+~~~{[}{\bf name3}{]}~~~~~~$<${\bf NDF}$>$ \\
+~~~~~~~$\vdots$~~~~~~~~~~~~~~~~~~$\vdots$\- \\
+
+\end{quote}
+\end{htmlonly}
 
 Another approach would be to use an HDS array, each
 element of which is an NDF.
 
 \item Merging two or more $<${\bf NDF}$>$ structures
 
-The merging of history records has been discussed in
-\latexelsehtml{Section~\ref{se:shistory},}{\htmlref{$<${\bf
+The merging of history records has been discussed 
+in \latex{Section~\ref{se:shistory},}\html{\htmlref{$<${\bf
 HISTORY}$>$ Structure,}{se:shistory}} and the same approach
 is followed for other data objects within an $<${\bf NDF}$>$.
 Thus, cases are divided into (i)
@@ -2941,9 +3031,8 @@ which shadows the main {[}{\bf AXIS}{]} structures.
 
 \xlabel{se_newdesign}\section{Creating new structures\label{se:newdesign}}
 
-The methods presented in this section are intended to ensure that the
-rules given in 
-\latexelsehtml{Section~\ref{se:overview}}{\htmlref{Overview}{se:overview}}
+The methods presented in this section are intended to ensure that the rules 
+given in \latex{Section~\ref{se:overview}}\html{\htmlref{Overview}{se:overview}}
 are adhered to. Particularly, it
 makes sure that standard structures are used wherever possible, and
 therefore encourages the building of new structures (when needed) by
@@ -2970,8 +3059,10 @@ Often a dataset will consist simply of a single structure.
 \xlabel{se_newalg}\subsection{Algorithm\label{se:newalg}}
 
 A summary of the algorithm to be used when creating a new dataset is 
-given below.  The circled numbering refers to expanded notes in the next 
-subsection.
+given below.  The \latex{circled} numbering refers to expanded notes
+in the next subsection.
+
+\begin{latexonly}
 \begin{tabbing}
 xxx\=xxx\=xxx\=xxx\=xxx\=xxx\=xx\kill
 Define what the software is going to do and not going to do \numcir{1}\\
@@ -3000,10 +3091,40 @@ Start at the most deeply nested level of the hierarchy\\
    {\bf endif}\- \\
 {\bf endfor} \\
 \end{tabbing}
+\end{latexonly}
+
+\begin{htmlonly}
+\begin{quote}
+Define what the software is going to do and not going to do \numcir{1} \\
+Identify, in concept, the datasets required \\
+Determine their interrelations, perhaps via a tree diagram \numcir{2}\\
+Start at the most deeply nested level of the hierarchy\\
+{\bf for} each structure \\
+~~~~Identify the data components\numcir{3}\\
+~~~~{\bf if} an existing standard structure can be used {\bf then} \\
+~~~~~~~~Use it \\
+~~~~~~~~Place remaining associated items in a new structure or in an extension \\
+~~~~{\bf else} \\
+~~~~~~~~Assign a unique HDS TYPE to the new structure \numcir{4}\\
+~~~~~~~~Assign a NAME to each component \numcir{5}\\
+~~~~~~~~Determine the rules and restrictions governing the way the data will be stored in the various components\\
+~~~~~~~~Assign a TYPE to each component \numcir{6}\\
+~~~~~~~~Identify the sorts of operation to be performed on the structure and ensure they are meaningfully defined \numcir{7}\\
+~~~~~~~~{\bf if} the processing of a component cannot be defined in some cases {\bf then} remove the component from the structure\\
+~~~~~~~~Implement and document the software needed to process the new structure \numcir{8}\\
+~~~~~~~~{\bf if} the new structure is to become a standard type {\bf then} \\
+~~~~~~~~~~~~Submit it and its software to Starlink for approval \numcir{9}\\
+~~~~~~~~{\bf endif} \\
+~~~~{\bf endif} \\
+{\bf endfor} \\
+\end{quote}
+\end{htmlonly}
+
 
 \xlabel{se_newexn}\subsection{Explanatory Notes\label{se:newexn}}
 
 \begin{enumerate}
+\html{\label{se:expnote1}}
 \item
 \begin{itemize}
 \item
@@ -3016,6 +3137,7 @@ During the following stages of the design process, the original outline of
 the dataset may prove to be incorrect or inadequate, especially in
 more-complex hierarchies.  In such cases you have to start again.
 \end{itemize}
+\html{\label{se:expnote2}}
 \item
 \begin{itemize}
 \item
@@ -3027,6 +3149,7 @@ Multiple-level datasets are built up from from the lowest (most deeply
 nested) level of the hierarchy.  Design each and every structure at
 the current HDS level before going to the next higher level.
 \end{itemize}
+\html{\label{se:expnote3}}
 \item
 \begin{itemize}
 \item
@@ -3054,6 +3177,7 @@ standard structures and their conventions.)  The standards and
 conventions associated with standard structures must be observed by all
 new software which uses them.
 \end{itemize}
+\html{\label{se:expnote4}}
 \item
 \begin{itemize}
 \item
@@ -3061,6 +3185,7 @@ The TYPE should reflect the sort of data to be held in the structure, but
 must not conflict with the TYPE of any other standard data structure. 
 Starlink management should be consulted when defining TYPEs.
 \end{itemize}
+\html{\label{se:expnote5}}
 \item
 \begin{itemize}
 \item
@@ -3077,6 +3202,7 @@ software which uses the structure.  If this software is likely to be
 written by many different people, then the rules should obviously be
 kept simple.
 \end{itemize}
+\html{\label{se:expnote6}}
 \item
 \begin{itemize}
 \item
@@ -3093,6 +3219,7 @@ processing the data components
 from which the new structure is being built, and these can therefore be
 used to process the components of the new structure. 
 \end{itemize}
+\html{\label{se:expnote7}}
 \item
 \begin{itemize}
 \item
@@ -3110,6 +3237,7 @@ classes, such as [image display, arithmetic, spatial smoothing$\ldots$], or
 It may be necessary to reject some components if you cannot meaningfully
 define what will happen to them in all circumstances.
 \end{itemize}
+\html{\label{se:expnote8}}
 \item
 \begin{itemize}
 \item
@@ -3124,6 +3252,7 @@ lead implementors and users into inserting extra components into a
 structure, but these are illegal and will be ignored.  This is {\bf not}
 a valid way of defining a new structure.
 \end{itemize}
+\html{\label{se:expnote9}}
 \item
 \begin{itemize}
 \item
