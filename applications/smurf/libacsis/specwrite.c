@@ -3425,6 +3425,7 @@ AstFrameSet *specWcs( const AstFrameSet *fs, const char veldef[], int ntime, con
   AstUnitMap *spacemap;
   double tcopy[2];  /* local copy of time lut for when only 1 number present */
   double *ltimes;  /* pointer to a time array */
+  double origin = 0.0; /* reference time for timeFrame */
   int nax, iax, iax_spec, ax_out[ NDF__MXDIM ];
   int malloced = 0; /* did we malloc a ltimes array */
 
@@ -3513,17 +3514,17 @@ AstFrameSet *specWcs( const AstFrameSet *fs, const char veldef[], int ntime, con
      Work out the duration of the observation to decide on formatting.
      To give AST some help with formatting axes we use a TimeOrigin.
   */
-  timefrm = astTimeFrame( "" );
+  origin = floor(times[0]);
+  timefrm = astTimeFrame( "TimeOrigin=%d", (int)origin );
   malloced = 0;
   if (ntime == 1) {
     /* a LutMap needs two numbers in its mapping so double up the
        first time if we only have one value. */
-    tcopy[0] = times[0];
-    tcopy[1] = times[0];
+    tcopy[0] = times[0] - origin;
+    tcopy[1] = tcopy[0];
     ltimes = tcopy;
     ntime = 2;
   } else {
-    double origin = 0.0; /* reference time */
     int i;
     /* copy values and remove integer part of day */
     ltimes = starMalloc( sizeof(*ltimes) * ntime );
@@ -3532,17 +3533,16 @@ AstFrameSet *specWcs( const AstFrameSet *fs, const char veldef[], int ntime, con
     for (i = 0; i < ntime; i++ ) {
       ltimes[i] = times[i] - origin;
     }
-    astSetD(timefrm, "TimeOrigin", origin);
-
-    /* We would like to use iso.0 for anything that is longer than 10 seconds (say)
-       else use iso.2 because ACSIS can not take spectra faster than 0.05 second. */
-    if ( (ltimes[ntime-1] - ltimes[0]) < (10.0 / SPD) ) {
-      astSet(timefrm, "format=iso.2");
-    } else {
-      astSet(timefrm, "format=iso.0");
-    }
-
   }
+
+  /* We would like to use iso.0 for anything that is longer than 10 seconds (say)
+     else use iso.2 because ACSIS can not take spectra faster than 0.05 second. */
+  if ( (ltimes[ntime-1] - ltimes[0]) < (10.0 / SPD) ) {
+    astSet(timefrm, "format=iso.2");
+  } else {
+    astSet(timefrm, "format=iso.0");
+  }
+
   timemap = astLutMap( ntime, ltimes, 1.0, 1.0, "" );
 
   /* if we have ObsLon and ObsLat available in the SpecFrame
