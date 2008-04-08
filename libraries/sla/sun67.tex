@@ -61,9 +61,9 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -98,7 +98,6 @@
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -114,6 +113,8 @@
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\html}[1]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
@@ -129,11 +130,6 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
 % -----------------------------------------------------------------------------
 %  Debugging.
 %  =========
@@ -145,6 +141,7 @@
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 %------------------------------------------------------------------------------
@@ -173,24 +170,24 @@
 \newcommand{\arcseci}[1] {$#1\hspace{-0.05em}$\raisebox{-0.5ex}
                          {$^{'\hspace{-0.1em}'}$}}
 \begin{htmlonly}
-   \renewcommand{\arcseci}[1] {$#1\hspace{-0.05em}^{'\hspace{-0.1em}'}$}
+   \newcommand{\arcseci}[1] {$#1\hspace{-0.05em}^{'\hspace{-0.1em}'}$}
 \end{htmlonly}
 
 \newcommand{\dms}[4]    {$#1^{\circ}\,#2\raisebox{-0.5ex}
                         {$^{'}$}\,$\arcsec{#3}{#4}}
 \begin{htmlonly}
-   \renewcommand{\dms}[4]{$#1^{\circ}\,#2^{'}\,#3^{''}.#4$}
+   \newcommand{\dms}[4]{$#1^{\circ}\,#2^{'}\,#3^{''}.#4$}
 \end{htmlonly}
 
 \newcommand{\tseci}[1]   {$#1$\mbox{$^{\rm s}$}}
 \newcommand{\tsec}[2]    {\tseci{#1}$\hspace{-0.3em}.#2$}
 \begin{htmlonly}
-   \renewcommand{\tsec}[2] {$#1^{\rm s}\hspace{-0.3em}.#2$}
+   \newcommand{\tsec}[2] {$#1^{\rm s}\hspace{-0.3em}.#2$}
 \end{htmlonly}
 
 \newcommand{\hms}[4]    {$#1^{\rm h}\,#2^{\rm m}\,$\tsec{#3}{#4}}
 \begin{htmlonly}
-   \renewcommand{\hms}[4] {$#1^{h}\,#2^{m}\,#3^{s}.#4$}
+   \newcommand{\hms}[4] {$#1^{h}\,#2^{m}\,#3^{s}.#4$}
 \end{htmlonly}
 
 \newcommand{\callhead}[1]{\goodbreak\vspace{\bigskipamount}{\large\bf{#1}}}
@@ -218,7 +215,7 @@
 
 %  Replacement for HTML version (each routine in own subsection).
 \begin{htmlonly}
-   \renewcommand{\routine}[3]
+   \newcommand{\routine}[3]
    {
       \subsection{#1\xlabel{#1} - #2\label{#1}}
        \begin{description}
@@ -240,7 +237,7 @@
 \newlength{\oldspacing}
 
 \begin{htmlonly}
-   \renewcommand{\call}[1]
+   \newcommand{\call}[1]
    {
     \item[CALL:] {\tt #1}
    }
@@ -260,7 +257,7 @@
   \setlength{\topsep}{\oldspacing}
 }
 \begin{htmlonly}
-   \renewcommand{\args}[2]
+   \newcommand{\args}[2]
    {
      \begin{description}
         \item[#1:]\\
@@ -294,7 +291,7 @@
 }
 
 \begin{htmlonly}
-   \renewcommand{\anote}[1]
+   \newcommand{\anote}[1]
    {
       \begin{description}
       \item[NOTE:]
@@ -316,7 +313,7 @@
 }
 
 \begin{htmlonly}
-   \renewcommand{\notes}[1]
+   \newcommand{\notes}[1]
    {
       \begin{description}
          \item[NOTES:]
@@ -370,7 +367,7 @@
 
 \newcommand{\exampleitem}{\item [EXAMPLE]:}
 \begin{htmlonly}
-   \renewcommand{\exampleitem}{\item [EXAMPLE:]}
+   \newcommand{\exampleitem}{\item [EXAMPLE:]}
 \end{htmlonly}
 
 %------------------------------------------------------------------------------
@@ -425,7 +422,7 @@
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -449,7 +446,6 @@
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -472,7 +468,7 @@ but a number have wider trigonometrical, numerical or general applications.
  \newpage
  \begin{latexonly}
    \setlength{\parskip}{0mm}
-   \latexonlytoc
+   \tableofcontents
    \setlength{\parskip}{\medskipamount}
    \markright{\stardocname}
  \end{latexonly}
@@ -835,9 +831,9 @@ as described in SUN/202.)
 \setlength{\topsep}{0.3ex}
 \begin{description}
  \exampleitem \\ [1.5ex]
-  \begin{tabular}{p{7em}p{15em}p{12em}}
+  \begin{tabular}{lll}
    {\it argument} & {\it before} & {\it after} \\ \\
-   STRING & $'$\verb*}-57 17 44.806  12 34 56.7}$'$ & unchanged \\
+   STRING & $'$\verb*#-57 17 44.806  12 34 56.7#$'$ & unchanged \\
    NSTRT & 1 & 16 ({\it i.e.}\ pointing to 12...) \\
    RESLT & - & $-1.00000$ \\
    JF & - & 0
@@ -878,7 +874,7 @@ decode the second angle, \dms{12}{34}{56}{7}.
     degrees {\it etc},
     or if the required units are turns (or days) instead of radians,
     the result RESLT should be multiplied as follows: \\ [1.5ex]
-    \begin{tabular}{p{6em}p{5em}p{15em}}
+    \begin{tabular}{lll}
     {\it for STRING} & {\it to obtain} & {\it multiply RESLT by} \\ \\
     ${\circ}$~~\raisebox{-0.7ex}{$'$}~~\raisebox{-0.7ex}{$''$}
      & radians & $1.0$ \\
@@ -2145,7 +2141,7 @@ decode the second angle, \dms{12}{34}{56}{7}.
 \setlength{\topsep}{0.3ex}
 \begin{description}
  \item [EXAMPLE]: \\ [1.5ex]
-  \begin{tabular}{p{7em}p{15em}p{12em}}
+  \begin{tabular}{lll}
    {\it argument} & {\it before} & {\it after} \\ \\
    STRING & $'$\verb*}-57 17 44.806  12 34 56.7}$'$ & unchanged \\
    NSTRT & 1 & 16 ({\it i.e.}\ pointing to 12...) \\
@@ -2188,14 +2184,14 @@ decode the second angle, \dms{12}{34}{56}{7}.
     degrees {\it etc},
     or if the required units are turns (or days) instead of radians,
     the result DRESLT should be multiplied as follows: \\ [1.5ex]
-    \begin{tabular}{p{6em}p{5em}p{18em}}
+    \begin{tabular}{lll}
     {\it for STRING} & {\it to obtain} & {\it multiply DRESLT by} \\ \\
     ${\circ}$~~\raisebox{-0.7ex}{$'$}~~\raisebox{-0.7ex}{$''$}
-     & radians & $1.0${\tt D0} \\
+     & radians & $1.0D0$ \\
     ${\circ}$~~\raisebox{-0.7ex}{$'$}~~\raisebox{-0.7ex}{$''$}
-     & turns & $1/{2 \pi} = 0.1591549430918953358${\tt D0} \\
-    h m s & radians & $15.0${\tt D0} \\
-    h m s & days & $15/{2\pi} = 2.3873241463784300365${\tt D0}
+     & turns & $1/{2 \pi} = 0.1591549430918953358D0$ \\
+    h m s & radians & $15.0D0$ \\
+    h m s & days & $15/{2\pi} = 2.3873241463784300365D0$
    \end{tabular}
  \end{enumerate}
 }
@@ -3250,12 +3246,13 @@ decode the second angle, \dms{12}{34}{56}{7}.
  \begin{enumerate}
   \item Depending on the epoch, one of three parabolic approximations
         is used:
-\begin{tabbing}
-xx \= xxxxxxxxxxxxxxxxxx \= \kill
-\> before AD 979 \> Stephenson \& Morrison's 390 BC to AD 948 model \\
-\> AD 979 to AD 1708 \> Stephenson \& Morrison's AD 948 to AD 1600 model \\
-\> after AD 1708 \> McCarthy \& Babcock's post-1650 model
-\end{tabbing}
+
+\begin{tabular}{lll}
+& before AD 979 & Stephenson \& Morrison's 390 BC to AD 948 model \\
+& AD 979 to AD 1708 & Stephenson \& Morrison's AD 948 to AD 1600 model \\
+& after AD 1708 & McCarthy \& Babcock's post-1650 model
+\end{tabular}
+
         The breakpoints are chosen to ensure continuity:  they occur
         at places where the adjacent models give the same answer as
         each other.
@@ -3885,42 +3882,40 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
 
         JFORM=1, suitable for the major planets:
 
-        \begin{tabbing}
-        xxx \= xxxxxxxx \= xx \= \kill
-        \> EPOCH  \> = \> epoch of elements $t_0$ (TT MJD) \\
-        \> ORBINC \> = \> inclination $i$ (radians) \\
-        \> ANODE  \> = \> longitude of the ascending node $\Omega$ (radians) \\
-        \> PERIH  \> = \> longitude of perihelion $\varpi$ (radians) \\
-        \> AORQ   \> = \> mean distance $a$ (AU) \\
-        \> E      \> = \> eccentricity $e$ $( 0 \leq e < 1 )$ \\
-        \> AORL   \> = \> mean longitude $L$ (radians) \\
-        \> DM     \> = \> daily motion $n$ (radians)
-        \end{tabbing}
+        \begin{tabular}{llll}
+        & EPOCH  & = & epoch of elements $t_0$ (TT MJD) \\
+        & ORBINC & = & inclination $i$ (radians) \\
+        & ANODE  & = & longitude of the ascending node $\Omega$ (radians) \\
+        & PERIH  & = & longitude of perihelion $\varpi$ (radians) \\
+        & AORQ   & = & mean distance $a$ (AU) \\
+        & E      & = & eccentricity $e$ $( 0 \leq e < 1 )$ \\
+        & AORL   & = & mean longitude $L$ (radians) \\
+        & DM     & = & daily motion $n$ (radians)
+        \end{tabular}
 
         JFORM=2, suitable for minor planets:
 
-        \begin{tabbing}
-        xxx \= xxxxxxxx \= xx \= \kill
-        \> EPOCH  \> = \> epoch of elements $t_0$ (TT MJD) \\
-        \> ORBINC \> = \> inclination $i$ (radians) \\
-        \> ANODE  \> = \> longitude of the ascending node $\Omega$ (radians) \\
-        \> PERIH  \> = \> argument of perihelion $\omega$ (radians) \\
-        \> AORQ   \> = \> mean distance $a$ (AU) \\
-        \> E      \> = \> eccentricity $e$ $( 0 \leq e < 1 )$ \\
-        \> AORL   \> = \> mean anomaly $M$ (radians)
-        \end{tabbing}
+        \begin{tabular}{llll}
+        & EPOCH  & = & epoch of elements $t_0$ (TT MJD) \\
+        & ORBINC & = & inclination $i$ (radians) \\
+        & ANODE  & = & longitude of the ascending node $\Omega$ (radians) \\
+        & PERIH  & = & argument of perihelion $\omega$ (radians) \\
+        & AORQ   & = & mean distance $a$ (AU) \\
+        & E      & = & eccentricity $e$ $( 0 \leq e < 1 )$ \\
+        & AORL   & = & mean anomaly $M$ (radians)
+        \end{tabular}
 
         JFORM=3, suitable for comets:
 
-        \begin{tabbing}
-        xxx \= xxxxxxxx \= xx \= \kill
-        \> EPOCH  \> = \> epoch of perihelion $T$ (TT MJD) \\
-        \> ORBINC \> = \> inclination $i$ (radians) \\
-        \> ANODE  \> = \> longitude of the ascending node $\Omega$ (radians) \\
-        \> PERIH  \> = \> argument of perihelion $\omega$ (radians) \\
-        \> AORQ   \> = \> perihelion distance $q$ (AU) \\
-        \> E      \> = \> eccentricity $e$ $( 0 \leq e \leq 10 )$
-        \end{tabbing}
+        \begin{tabular}{llll}
+        & EPOCH  & = & epoch of perihelion $T$ (TT MJD) \\
+        & ORBINC & = & inclination $i$ (radians) \\
+        & ANODE  & = & longitude of the ascending node $\Omega$ (radians) \\
+        & PERIH  & = & argument of perihelion $\omega$ (radians) \\
+        & AORQ   & = & perihelion distance $q$ (AU) \\
+        & E      & = & eccentricity $e$ $( 0 \leq e \leq 10 )$
+        \end{tabular}
+
   \item Unused elements (DM for JFORM=2, AORL and DM for JFORM=3) are
         not accessed.
   \item The algorithm was originally adapted from the EPHSLA program of
@@ -4054,16 +4049,17 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
         communication, 2000).
   \item Comparisons over the time span 1900-2100 with this simplified
         solution and the JPL DE405 ephemeris give the following results:
-        \begin{tabbing}
-        xxx \= xxxxxxxxxxxxxxxxxxx \= xxxxxx \= xxxxxxx \= \kill
-        \>               \> RMS \> max \\
-        \> Heliocentric: \\
-        \> ~~~~~position error \> 3.7 \> 11.2 \> km \\
-        \> ~~~~~velocity error \> 1.4 \> ~5.0 \> mm/s \\
-        \> Barycentric: \\
-        \> ~~~~~position error \> 4.6 \> 13.4 \> km \\
-        \> ~~~~~velocity error \> 1.4 \> ~4.9 \> mm/s
-        \end{tabbing}
+
+        \begin{tabular}{lllll}
+        &               & RMS & max \\
+        & Heliocentric: \\
+        & ~~~~~position error & 3.7 & 11.2 & km \\
+        & ~~~~~velocity error & 1.4 & ~5.0 & mm/s \\
+        & Barycentric: \\
+        & ~~~~~position error & 4.6 & 13.4 & km \\
+        & ~~~~~velocity error & 1.4 & ~4.9 & mm/s
+        \end{tabular}
+
         The results deteriorate outside this time span.
   \item The routine sla\_EVP is faster but less accurate.
         The present routine targets the case where high
@@ -6138,6 +6134,7 @@ xx \= xxxxxxxxxxxxxxxxxx \= \kill
         \end{itemize}
  \end{enumerate}
 Stations supported by sla\_OBS at the time of writing:
+
 \begin{tabbing}
 xxxxxxxxxxxxxxxxx \= \kill
 {\it ID} \> {\it NAME} \\ \\
@@ -6483,28 +6480,27 @@ VLT4 \> ESO VLT 8m, UT4
 
         JFORM=2, suitable for minor planets:
 
-        \begin{tabbing}
-        xxx \= xxxxxxxx \= xx \= \kill
-        \> EPOCH  \> = \> epoch of elements $t_0$ (TT MJD) \\
-        \> ORBINC \> = \> inclination $i$ (radians) \\
-        \> ANODE  \> = \> longitude of the ascending node $\Omega$ (radians) \\
-        \> PERIH  \> = \> argument of perihelion $\omega$ (radians) \\
-        \> AORQ   \> = \> mean distance $a$ (AU) \\
-        \> E      \> = \> eccentricity $e$ $( 0 \leq e < 1 )$ \\
-        \> AORL   \> = \> mean anomaly $M$ (radians)
-        \end{tabbing}
+        \begin{tabular}{llll}
+        & EPOCH  & = & epoch of elements $t_0$ (TT MJD) \\
+        & ORBINC & = & inclination $i$ (radians) \\
+        & ANODE  & = & longitude of the ascending node $\Omega$ (radians) \\
+        & PERIH  & = & argument of perihelion $\omega$ (radians) \\
+        & AORQ   & = & mean distance $a$ (AU) \\
+        & E      & = & eccentricity $e$ $( 0 \leq e < 1 )$ \\
+        & AORL   & = & mean anomaly $M$ (radians)
+        \end{tabular}
 
         JFORM=3, suitable for comets:
 
-        \begin{tabbing}
-        xxx \= xxxxxxxx \= xx \= \kill
-        \> EPOCH  \> = \> epoch of perihelion $T$ (TT MJD) \\
-        \> ORBINC \> = \> inclination $i$ (radians) \\
-        \> ANODE  \> = \> longitude of the ascending node $\Omega$ (radians) \\
-        \> PERIH  \> = \> argument of perihelion $\omega$ (radians) \\
-        \> AORQ   \> = \> perihelion distance $q$ (AU) \\
-        \> E      \> = \> eccentricity $e$ $( 0 \leq e \leq 10 )$
-        \end{tabbing}
+        \begin{tabular}{llll}
+        & EPOCH  & = & epoch of perihelion $T$ (TT MJD) \\
+        & ORBINC & = & inclination $i$ (radians) \\
+        & ANODE  & = & longitude of the ascending node $\Omega$ (radians) \\
+        & PERIH  & = & argument of perihelion $\omega$ (radians) \\
+        & AORQ   & = & perihelion distance $q$ (AU) \\
+        & E      & = & eccentricity $e$ $( 0 \leq e \leq 10 )$
+        \end{tabular}
+
  \item DATE0, DATE1, EPOCH0 and EPOCH1 are all instants of time in
        the TT time scale (formerly Ephemeris Time, ET), expressed
        as Modified Julian Dates (JD$-$2400000.5).
@@ -6738,42 +6734,40 @@ VLT4 \> ESO VLT 8m, UT4
 
         JFORM=1, suitable for the major planets:
 
-        \begin{tabbing}
-        xxx \= xxxxxxx \= xx \= \kill
-        \> EPOCH  \> = \> epoch of elements $t_0$ (TT MJD) \\
-        \> ORBINC \> = \> inclination $i$ (radians) \\
-        \> ANODE  \> = \> longitude of the ascending node $\Omega$ (radians) \\
-        \> PERIH  \> = \> longitude of perihelion $\varpi$ (radians) \\
-        \> AORQ   \> = \> mean distance $a$ (AU) \\
-        \> E      \> = \> eccentricity $e$ \\
-        \> AORL   \> = \> mean longitude $L$ (radians) \\
-        \> DM     \> = \> daily motion $n$ (radians)
-        \end{tabbing}
+        \begin{tabular}{llll}
+        & EPOCH  & = & epoch of elements $t_0$ (TT MJD) \\
+        & ORBINC & = & inclination $i$ (radians) \\
+        & ANODE  & = & longitude of the ascending node $\Omega$ (radians) \\
+        & PERIH  & = & longitude of perihelion $\varpi$ (radians) \\
+        & AORQ   & = & mean distance $a$ (AU) \\
+        & E      & = & eccentricity $e$ \\
+        & AORL   & = & mean longitude $L$ (radians) \\
+        & DM     & = & daily motion $n$ (radians)
+        \end{tabular}
 
         JFORM=2, suitable for minor planets:
 
-        \begin{tabbing}
-        xxx \= xxxxxxx \= xx \= \kill
-        \> EPOCH  \> = \> epoch of elements $t_0$ (TT MJD) \\
-        \> ORBINC \> = \> inclination $i$ (radians) \\
-        \> ANODE  \> = \> longitude of the ascending node $\Omega$ (radians) \\
-        \> PERIH  \> = \> argument of perihelion $\omega$ (radians) \\
-        \> AORQ   \> = \> mean distance $a$ (AU) \\
-        \> E      \> = \> eccentricity $e$ \\
-        \> AORL   \> = \> mean anomaly $M$ (radians)
-        \end{tabbing}
+        \begin{tabular}{llll}
+        & EPOCH  & = & epoch of elements $t_0$ (TT MJD) \\
+        & ORBINC & = & inclination $i$ (radians) \\
+        & ANODE  & = & longitude of the ascending node $\Omega$ (radians) \\
+        & PERIH  & = & argument of perihelion $\omega$ (radians) \\
+        & AORQ   & = & mean distance $a$ (AU) \\
+        & E      & = & eccentricity $e$ \\
+        & AORL   & = & mean anomaly $M$ (radians)
+        \end{tabular}
 
         JFORM=3, suitable for comets:
 
-        \begin{tabbing}
-        xxx \= xxxxxxx \= xx \= \kill
-        \> EPOCH  \> = \> epoch of perihelion $T$ (TT MJD) \\
-        \> ORBINC \> = \> inclination $i$ (radians) \\
-        \> ANODE  \> = \> longitude of the ascending node $\Omega$ (radians) \\
-        \> PERIH  \> = \> argument of perihelion $\omega$ (radians) \\
-        \> AORQ   \> = \> perihelion distance $q$ (AU) \\
-        \> E      \> = \> eccentricity $e$
-        \end{tabbing}
+        \begin{tabular}{llll}
+        & EPOCH  & = & epoch of perihelion $T$ (TT MJD) \\
+        & ORBINC & = & inclination $i$ (radians) \\
+        & ANODE  & = & longitude of the ascending node $\Omega$ (radians) \\
+        & PERIH  & = & argument of perihelion $\omega$ (radians) \\
+        & AORQ   & = & perihelion distance $q$ (AU) \\
+        & E      & = & eccentricity $e$
+        \end{tabular}
+
         Unused elements (DM for JFORM=2, AORL and DM for JFORM=3) are
         not accessed.
 
@@ -6886,32 +6880,34 @@ VLT4 \> ESO VLT 8m, UT4
         Pluto is by Meeus.
   \item Comparisons of the present routine with the JPL DE200 ephemeris
         give the following RMS errors over the interval 1960-2025:
-        \begin{tabbing}
-         xxxxx \= xxxxxxxxxxxxxxxxx \= xxxxxxxxxxxxxx \= \kill
-         \> \> {\it position (km)} \> {\it speed (metre/sec)} \\ \\
-         \> Mercury \> \hspace{2em}334 \> \hspace{2.5em}0.437 \\
-         \> Venus   \> \hspace{1.5em}1060 \> \hspace{2.5em}0.855 \\
-         \> EMB     \> \hspace{1.5em}2010 \> \hspace{2.5em}0.815 \\
-         \> Mars    \> \hspace{1.5em}7690 \> \hspace{2.5em}1.98 \\
-         \> Jupiter \> \hspace{1em}71700 \> \hspace{2.5em}7.70 \\
-         \> Saturn  \> \hspace{0.5em}199000 \> \hspace{2em}19.4 \\
-         \> Uranus  \> \hspace{0.5em}564000 \> \hspace{2em}16.4 \\
-         \> Neptune \> \hspace{0.5em}158000 \> \hspace{2em}14.4 \\
-         \> Pluto \> \hspace{1em}36400 \> \hspace{2.5em}0.137
-        \end{tabbing}
+
+        \begin{tabular}{llll}
+         & & {\it position (km)} & {\it speed (metre/sec)} \\ \\
+         & Mercury & \hspace{2em}334 & \hspace{2.5em}0.437 \\
+         & Venus   & \hspace{1.5em}1060 & \hspace{2.5em}0.855 \\
+         & EMB     & \hspace{1.5em}2010 & \hspace{2.5em}0.815 \\
+         & Mars    & \hspace{1.5em}7690 & \hspace{2.5em}1.98 \\
+         & Jupiter & \hspace{1em}71700 & \hspace{2.5em}7.70 \\
+         & Saturn  & \hspace{0.5em}199000 & \hspace{2em}19.4 \\
+         & Uranus  & \hspace{0.5em}564000 & \hspace{2em}16.4 \\
+         & Neptune & \hspace{0.5em}158000 & \hspace{2em}14.4 \\
+         & Pluto & \hspace{1em}36400 & \hspace{2.5em}0.137
+        \end{tabular}
+
         From comparisons with DE102, Simon {\it et al.}\/ quote the following
         longitude accuracies over the interval 1800-2200:
-        \begin{tabbing}
-         xxxxx \= xxxxxxxxxxxxxxxxxxxx \= \kill
-         \> Mercury \> \hspace{0.5em}\arcseci{4} \\
-         \> Venus   \> \hspace{0.5em}\arcseci{5} \\
-         \> EMB     \> \hspace{0.5em}\arcseci{6} \\
-         \> Mars    \> \arcseci{17} \\
-         \> Jupiter \> \arcseci{71} \\
-         \> Saturn  \> \arcseci{81} \\
-         \> Uranus  \> \arcseci{86} \\
-         \> Neptune \> \arcseci{11}
-        \end{tabbing}
+
+        \begin{tabular}{lll}
+         & Mercury & \hspace{0.5em}\arcseci{4} \\
+         & Venus   & \hspace{0.5em}\arcseci{5} \\
+         & EMB     & \hspace{0.5em}\arcseci{6} \\
+         & Mars    & \arcseci{17} \\
+         & Jupiter & \arcseci{71} \\
+         & Saturn  & \arcseci{81} \\
+         & Uranus  & \arcseci{86} \\
+         & Neptune & \arcseci{11}
+        \end{tabular}
+
         In the case of Pluto, Meeus quotes an accuracy of \arcsec{0}{6}
         in longitude and \arcsec{0}{2} in latitude for the period
         1885-2099.
@@ -7022,42 +7018,40 @@ VLT4 \> ESO VLT 8m, UT4
 
         JFORM=1, suitable for the major planets:
 
-        \begin{tabbing}
-        xxx \= xxxxxxx \= xx \= \kill
-        \> EPOCH  \> = \> epoch of elements $t_0$ (TT MJD) \\
-        \> ORBINC \> = \> inclination $i$ (radians) \\
-        \> ANODE  \> = \> longitude of the ascending node $\Omega$ (radians) \\
-        \> PERIH  \> = \> longitude of perihelion $\varpi$ (radians) \\
-        \> AORQ   \> = \> mean distance $a$ (AU) \\
-        \> E      \> = \> eccentricity $e$ \\
-        \> AORL   \> = \> mean longitude $L$ (radians) \\
-        \> DM     \> = \> daily motion $n$ (radians)
-        \end{tabbing}
+        \begin{tabular}{llll}
+        & EPOCH  & = & epoch of elements $t_0$ (TT MJD) \\
+        & ORBINC & = & inclination $i$ (radians) \\
+        & ANODE  & = & longitude of the ascending node $\Omega$ (radians) \\
+        & PERIH  & = & longitude of perihelion $\varpi$ (radians) \\
+        & AORQ   & = & mean distance $a$ (AU) \\
+        & E      & = & eccentricity $e$ \\
+        & AORL   & = & mean longitude $L$ (radians) \\
+        & DM     & = & daily motion $n$ (radians)
+        \end{tabular}
 
         JFORM=2, suitable for minor planets:
 
-        \begin{tabbing}
-        xxx \= xxxxxxx \= xx \= \kill
-        \> EPOCH  \> = \> epoch of elements $t_0$ (TT MJD) \\
-        \> ORBINC \> = \> inclination $i$ (radians) \\
-        \> ANODE  \> = \> longitude of the ascending node $\Omega$ (radians) \\
-        \> PERIH  \> = \> argument of perihelion $\omega$ (radians) \\
-        \> AORQ   \> = \> mean distance $a$ (AU) \\
-        \> E      \> = \> eccentricity $e$ \\
-        \> AORL   \> = \> mean anomaly $M$ (radians)
-        \end{tabbing}
+        \begin{tabular}{llll}
+        & EPOCH  & = & epoch of elements $t_0$ (TT MJD) \\
+        & ORBINC & = & inclination $i$ (radians) \\
+        & ANODE  & = & longitude of the ascending node $\Omega$ (radians) \\
+        & PERIH  & = & argument of perihelion $\omega$ (radians) \\
+        & AORQ   & = & mean distance $a$ (AU) \\
+        & E      & = & eccentricity $e$ \\
+        & AORL   & = & mean anomaly $M$ (radians)
+        \end{tabular}
 
         JFORM=3, suitable for comets:
 
-        \begin{tabbing}
-        xxx \= xxxxxxx \= xx \= \kill
-        \> EPOCH  \> = \> epoch of perihelion $T$ (TT MJD) \\
-        \> ORBINC \> = \> inclination $i$ (radians) \\
-        \> ANODE  \> = \> longitude of the ascending node $\Omega$ (radians) \\
-        \> PERIH  \> = \> argument of perihelion $\omega$ (radians) \\
-        \> AORQ   \> = \> perihelion distance $q$ (AU) \\
-        \> E      \> = \> eccentricity $e$
-        \end{tabbing}
+        \begin{tabular}{llll}
+        & EPOCH  & = & epoch of perihelion $T$ (TT MJD) \\
+        & ORBINC & = & inclination $i$ (radians) \\
+        & ANODE  & = & longitude of the ascending node $\Omega$ (radians) \\
+        & PERIH  & = & argument of perihelion $\omega$ (radians) \\
+        & AORQ   & = & perihelion distance $q$ (AU) \\
+        & E      & = & eccentricity $e$
+        \end{tabular}
+
         Unused elements (DM for JFORM=2, AORL and DM for JFORM=3) are
         not accessed.
 
@@ -7544,92 +7538,90 @@ VLT4 \> ESO VLT 8m, UT4
 
         JFORM=1, suitable for the major planets:
 
-        \begin{tabbing}
-        xxx \= xxxxxxxx \= xx \= \kill
-        \> EPOCH  \> = \> epoch of elements $t_0$ (TT MJD) \\
-        \> ORBINC \> = \> inclination $i$ (radians) \\
-        \> ANODE  \> = \> longitude of the ascending node $\Omega$ (radians) \\
-        \> PERIH  \> = \> longitude of perihelion $\varpi$ (radians) \\
-        \> AORQ   \> = \> mean distance $a$ (AU) \\
-        \> E      \> = \> eccentricity $e$ $( 0 \leq e < 1 )$ \\
-        \> AORL   \> = \> mean longitude $L$ (radians) \\
-        \> DM     \> = \> daily motion $n$ (radians)
-        \end{tabbing}
+        \begin{tabular}{llll}
+        & EPOCH  & = & epoch of elements $t_0$ (TT MJD) \\
+        & ORBINC & = & inclination $i$ (radians) \\
+        & ANODE  & = & longitude of the ascending node $\Omega$ (radians) \\
+        & PERIH  & = & longitude of perihelion $\varpi$ (radians) \\
+        & AORQ   & = & mean distance $a$ (AU) \\
+        & E      & = & eccentricity $e$ $( 0 \leq e < 1 )$ \\
+        & AORL   & = & mean longitude $L$ (radians) \\
+        & DM     & = & daily motion $n$ (radians)
+        \end{tabular}
 
         JFORM=2, suitable for minor planets:
 
-        \begin{tabbing}
-        xxx \= xxxxxxxx \= xx \= \kill
-        \> EPOCH  \> = \> epoch of elements $t_0$ (TT MJD) \\
-        \> ORBINC \> = \> inclination $i$ (radians) \\
-        \> ANODE  \> = \> longitude of the ascending node $\Omega$ (radians) \\
-        \> PERIH  \> = \> argument of perihelion $\omega$ (radians) \\
-        \> AORQ   \> = \> mean distance $a$ (AU) \\
-        \> E      \> = \> eccentricity $e$ $( 0 \leq e < 1 )$ \\
-        \> AORL   \> = \> mean anomaly $M$ (radians)
-        \end{tabbing}
+        \begin{tabular}{llll}
+        & EPOCH  & = & epoch of elements $t_0$ (TT MJD) \\
+        & ORBINC & = & inclination $i$ (radians) \\
+        & ANODE  & = & longitude of the ascending node $\Omega$ (radians) \\
+        & PERIH  & = & argument of perihelion $\omega$ (radians) \\
+        & AORQ   & = & mean distance $a$ (AU) \\
+        & E      & = & eccentricity $e$ $( 0 \leq e < 1 )$ \\
+        & AORL   & = & mean anomaly $M$ (radians)
+        \end{tabular}
 
         JFORM=3, suitable for comets:
 
-        \begin{tabbing}
-        xxx \= xxxxxxxx \= xx \= \kill
-        \> EPOCH  \> = \> epoch of perihelion $T$ (TT MJD) \\
-        \> ORBINC \> = \> inclination $i$ (radians) \\
-        \> ANODE  \> = \> longitude of the ascending node $\Omega$ (radians) \\
-        \> PERIH  \> = \> argument of perihelion $\omega$ (radians) \\
-        \> AORQ   \> = \> perihelion distance $q$ (AU) \\
-        \> E      \> = \> eccentricity $e$ $( 0 \leq e \leq 10 )$
-        \end{tabbing}
+        \begin{tabular}{llll}
+        & EPOCH  & = & epoch of perihelion $T$ (TT MJD) \\
+        & ORBINC & = & inclination $i$ (radians) \\
+        & ANODE  & = & longitude of the ascending node $\Omega$ (radians) \\
+        & PERIH  & = & argument of perihelion $\omega$ (radians) \\
+        & AORQ   & = & perihelion distance $q$ (AU) \\
+        & E      & = & eccentricity $e$ $( 0 \leq e \leq 10 )$
+        \end{tabular}
+
   \item It may not be possible to generate elements in the form
         requested through JFORMR.  The caller is notified of the form
         of elements actually returned by means of the JFORM argument:
 
-        \begin{tabbing}
-        xx \= xxxxxxxxxx \= xxxxxxxxxxx \= \kill
-        \> JFORMR   \> JFORM   \> meaning \\ \\
-        \> ~~~~~1   \> ~~~~~1  \> OK: elements are in the requested format \\
-        \> ~~~~~1   \> ~~~~~2  \> never happens \\
-        \> ~~~~~1   \> ~~~~~3  \> orbit not elliptical \\
-        \> ~~~~~2   \> ~~~~~1  \> never happens \\
-        \> ~~~~~2   \> ~~~~~2  \> OK: elements are in the requested format \\
-        \> ~~~~~2   \> ~~~~~3  \> orbit not elliptical \\
-        \> ~~~~~3   \> ~~~~~1  \> never happens \\
-        \> ~~~~~3   \> ~~~~~2  \> never happens \\
-        \> ~~~~~3   \> ~~~~~3  \> OK: elements are in the requested format
-        \end{tabbing}
+        \begin{tabular}{llll}
+        & JFORMR   & JFORM   & meaning \\ \\
+        & ~~~~~1   & ~~~~~1  & OK: elements are in the requested format \\
+        & ~~~~~1   & ~~~~~2  & never happens \\
+        & ~~~~~1   & ~~~~~3  & orbit not elliptical \\
+        & ~~~~~2   & ~~~~~1  & never happens \\
+        & ~~~~~2   & ~~~~~2  & OK: elements are in the requested format \\
+        & ~~~~~2   & ~~~~~3  & orbit not elliptical \\
+        & ~~~~~3   & ~~~~~1  & never happens \\
+        & ~~~~~3   & ~~~~~2  & never happens \\
+        & ~~~~~3   & ~~~~~3  & OK: elements are in the requested format
+        \end{tabular}
+
   \item The arguments returned for each value of JFORM ({\it cf.}\/ Note~5:
         JFORM may not be the same as JFORMR) are as follows:
 
-        \begin{tabbing}
-        xxx \= xxxxxxxxxxxx \= xxxxxx \= xxxxxx \= \kill
-        \> JFORM  \> 1        \> 2        \> 3 \\ \\
-        \> EPOCH  \> $t_0$    \> $t_0$    \> $T$ \\
-        \> ORBINC \> $i$      \> $i$      \> $i$ \\
-        \> ANODE  \> $\Omega$ \> $\Omega$ \> $\Omega$ \\
-        \> PERIH  \> $\varpi$ \> $\omega$ \> $\omega$ \\
-        \> AORQ   \> $a$      \> $a$      \> $q$ \\
-        \> E      \> $e$      \> $e$      \> $e$ \\
-        \> AORL   \> $L$      \> $M$      \> - \\
-        \> DM     \> $n$      \> -        \> -
-        \end{tabbing}
+        \begin{tabular}{lllll}
+        & JFORM  & 1        & 2        & 3 \\ \\
+        & EPOCH  & $t_0$    & $t_0$    & $T$ \\
+        & ORBINC & $i$      & $i$      & $i$ \\
+        & ANODE  & $\Omega$ & $\Omega$ & $\Omega$ \\
+        & PERIH  & $\varpi$ & $\omega$ & $\omega$ \\
+        & AORQ   & $a$      & $a$      & $q$ \\
+        & E      & $e$      & $e$      & $e$ \\
+        & AORL   & $L$      & $M$      & - \\
+        & DM     & $n$      & -        & -
+        \end{tabular}
 
         where:
-        \begin{tabbing}
-        xxx \= xxxxxxxx \= xxx \= \kill
-        \> $t_0$    \> is the epoch of the elements (MJD, TT) \\
-        \> $T$      \> is the epoch of perihelion (MJD, TT) \\
-        \> $i$      \> is the inclination (radians) \\
-        \> $\Omega$ \> is the longitude of the ascending node (radians) \\
-        \> $\varpi$ \> is the longitude of perihelion (radians) \\
-        \> $\omega$ \> is the argument of perihelion (radians) \\
-        \> $a$      \> is the mean distance (AU) \\
-        \> $q$      \> is the perihelion distance (AU) \\
-        \> $e$      \> is the eccentricity \\
-        \> $L$      \> is the longitude (radians, $0-2\pi$) \\
-        \> $M$      \> is the mean anomaly (radians, $0-2\pi$) \\
-        \> $n$      \> is the daily motion (radians) \\
-        \> - \> means no value is set
-        \end{tabbing}
+
+        \begin{tabular}{lll}
+        & $t_0$    & is the epoch of the elements (MJD, TT) \\
+        & $T$      & is the epoch of perihelion (MJD, TT) \\
+        & $i$      & is the inclination (radians) \\
+        & $\Omega$ & is the longitude of the ascending node (radians) \\
+        & $\varpi$ & is the longitude of perihelion (radians) \\
+        & $\omega$ & is the argument of perihelion (radians) \\
+        & $a$      & is the mean distance (AU) \\
+        & $q$      & is the perihelion distance (AU) \\
+        & $e$      & is the eccentricity \\
+        & $L$      & is the longitude (radians, $0-2\pi$) \\
+        & $M$      & is the mean anomaly (radians, $0-2\pi$) \\
+        & $n$      & is the daily motion (radians) \\
+        & - & means no value is set
+        \end{tabular}
+
   \item At very small inclinations, the longitude of the ascending node
         ANODE becomes indeterminate and under some circumstances may be
         set arbitrarily to zero.  Similarly, if the orbit is close to
@@ -7939,19 +7931,20 @@ VLT4 \> ESO VLT 8m, UT4
         outer planets).  Geocentric positions can be generated by
         appropriate use of the routines sla\_DMOON and sla\_PLANET.
   \item The direction accuracy (arcsec, 1000-3000\,AD) is of order:
-        \begin{tabbing}
-         xxxxxxx \= xxxxxxxxxxxxxxxxxx \= \kill
-         \> Sun     \>  \hspace{0.5em}5 \\
-         \> Mercury \>  \hspace{0.5em}2 \\
-         \> Venus   \> 10 \\
-         \> Moon    \> 30 \\
-         \> Mars    \> 50 \\
-         \> Jupiter \> 90 \\
-         \> Saturn  \> 90 \\
-         \> Uranus  \> 90 \\
-         \> Neptune \> 10 \\
-         \> Pluto \> \hspace{0.5em}1~~~(1885-2099\,AD only)
-        \end{tabbing}
+
+        \begin{tabular}{lll}
+         & Sun     &  \hspace{0.5em}5 \\
+         & Mercury &  \hspace{0.5em}2 \\
+         & Venus   & 10 \\
+         & Moon    & 30 \\
+         & Mars    & 50 \\
+         & Jupiter & 90 \\
+         & Saturn  & 90 \\
+         & Uranus  & 90 \\
+         & Neptune & 10 \\
+         & Pluto & \hspace{0.5em}1~~~(1885-2099\,AD only)
+        \end{tabular}
+
         The angular diameter accuracy is about 0.4\% for the Moon,
         and 0.01\% or better for the Sun and planets.
         For more information on accuracy,
@@ -8829,21 +8822,22 @@ VLT4 \> ESO VLT 8m, UT4
  \action{Singular value decomposition.
          This routine expresses a given matrix {\bf A} as the product of
          three matrices {\bf U}, {\bf W}, {\bf V}$^{T}$:
-         \begin{tabbing}
-         XXXXXX \= \kill
-         \> {\bf A} = {\bf U} $\cdot$ {\bf W} $\cdot$ {\bf V}$^{T}$
-         \end{tabbing}
+
+         \begin{tabular}{ll}
+         & {\bf A} = {\bf U} $\cdot$ {\bf W} $\cdot$ {\bf V}$^{T}$
+         \end{tabular}
+
          where:
-         \begin{tabbing}
-         XXXXXX \= XXXX \= \kill
-         \> {\bf A} \> is any $m$ (rows) $\times n$ (columns) matrix,
+
+         \begin{tabular}{lll}
+         & {\bf A} & is any $m$ (rows) $\times n$ (columns) matrix,
                        where $m \geq n$ \\
-         \> {\bf U} \> is an $m \times n$ column-orthogonal matrix \\
-         \> {\bf W} \> is an $n \times n$ diagonal matrix with
+         & {\bf U} & is an $m \times n$ column-orthogonal matrix \\
+         & {\bf W} & is an $n \times n$ diagonal matrix with
                        $w_{ii} \geq 0$ \\
-         \> {\bf V}$^{T}$ \> is the transpose of an $n \times n$
+         & {\bf V}$^{T}$ & is the transpose of an $n \times n$
                              orthogonal matrix
-\end{tabbing}
+         \end{tabular}
 }
  \call{CALL sla\_SVD (M, N, MP, NP, A, W, V, WORK, JSTAT)}
 }
@@ -8925,18 +8919,20 @@ VLT4 \> ESO VLT 8m, UT4
  \action{From a given vector and the SVD of a matrix (as obtained from
          the sla\_SVD routine), obtain the solution vector.
          This routine solves the equation:
-         \begin{tabbing}
-         XXXXXX \= \kill
-         \> {\bf A} $\cdot$ {\bf x} = {\bf b}
-         \end{tabbing}
+
+         \begin{tabular}{ll}
+         & {\bf A} $\cdot$ {\bf x} = {\bf b}
+         \end{tabular}
+
          where:
-         \begin{tabbing}
-         XXXXXX \= XXXX \= \kill
-         \> {\bf A} \> is a given $m$ (rows) $\times n$ (columns)
+
+         \begin{tabular}{lll}
+         & {\bf A} & is a given $m$ (rows) $\times n$ (columns)
                        matrix, where $m \geq n$ \\
-         \> {\bf x} \> is the $n$-vector we wish to find, and \\
-         \> {\bf b} \> is a given $m$-vector
-         \end{tabbing}
+         & {\bf x} & is the $n$-vector we wish to find, and \\
+         & {\bf b} & is a given $m$-vector
+         \end{tabular}
+
          by means of the {\it Singular Value Decomposition}\/ method (SVD).}
  \call{CALL sla\_SVDSOL (M, N, MP, NP, B, U, W, V, WORK, X)}
 }
@@ -8961,30 +8957,33 @@ VLT4 \> ESO VLT 8m, UT4
   \item In the Singular Value Decomposition method (SVD),
         the matrix {\bf A} is first factorized (for example by
         the routine sla\_SVD) into the following components:
-        \begin{tabbing}
-        XXXXXX \= \kill
-        \> {\bf A} = {\bf U} $\cdot$ {\bf W} $\cdot$ {\bf V}$^{T}$
-        \end{tabbing}
+
+        \begin{tabular}{ll}
+        & {\bf A} = {\bf U} $\cdot$ {\bf W} $\cdot$ {\bf V}$^{T}$
+        \end{tabular}
+
         where:
-        \begin{tabbing}
-        XXXXXX \= XXXX \= \kill
-        \> {\bf A} \> is any $m$ (rows) $\times n$ (columns) matrix,
+
+        \begin{tabular}{lll}
+        & {\bf A} & is any $m$ (rows) $\times n$ (columns) matrix,
                       where $m > n$ \\
-        \> {\bf U} \> is an $m \times n$ column-orthogonal matrix \\
-        \> {\bf W} \> is an $n \times n$ diagonal matrix with
+        & {\bf U} & is an $m \times n$ column-orthogonal matrix \\
+        & {\bf W} & is an $n \times n$ diagonal matrix with
                       $w_{ii} \geq 0$ \\
-        \> {\bf V}$^{T}$ \> is the transpose of an $n \times n$
+        & {\bf V}$^{T}$ & is the transpose of an $n \times n$
                             orthogonal matrix
-        \end{tabbing}
+        \end{tabular}
+
         Note that $m$ and $n$ are the {\it logical}\/ dimensions of the
         matrices and vectors concerned, which can be located in
         arrays of larger {\it physical}\/ dimensions MP and NP.
         The solution is then found from the expression:
-        \begin{tabbing}
-        XXXXXX \= \kill
-        \> {\bf x} = {\bf V} $\cdot~[diag(1/${\bf W}$_{j})]
+ 
+        \begin{tabular}{ll}
+        & {\bf x} = {\bf V} $\cdot~[diag(1/${\bf W}$_{j})]
            \cdot (${\bf U}$^{T} \cdot${\bf b})
-        \end{tabbing}
+        \end{tabular}
+
   \item If matrix {\bf A} is square, and if the diagonal matrix {\bf W} is not
         altered, the method is equivalent to conventional solution
         of simultaneous equations.
@@ -9228,92 +9227,90 @@ VLT4 \> ESO VLT 8m, UT4
 
         JFORM=1, suitable for the major planets:
 
-        \begin{tabbing}
-        xxx \= xxxxxxxx \= xx \= \kill
-        \> EPOCH  \> = \> epoch of elements $t_0$ (TT MJD) \\
-        \> ORBINC \> = \> inclination $i$ (radians) \\
-        \> ANODE  \> = \> longitude of the ascending node $\Omega$ (radians) \\
-        \> PERIH  \> = \> longitude of perihelion $\varpi$ (radians) \\
-        \> AORQ   \> = \> mean distance $a$ (AU) \\
-        \> E      \> = \> eccentricity $e$ $( 0 \leq e < 1 )$ \\
-        \> AORL   \> = \> mean longitude $L$ (radians) \\
-        \> DM     \> = \> daily motion $n$ (radians)
-        \end{tabbing}
+        \begin{tabular}{llll}
+        & EPOCH  & = & epoch of elements $t_0$ (TT MJD) \\
+        & ORBINC & = & inclination $i$ (radians) \\
+        & ANODE  & = & longitude of the ascending node $\Omega$ (radians) \\
+        & PERIH  & = & longitude of perihelion $\varpi$ (radians) \\
+        & AORQ   & = & mean distance $a$ (AU) \\
+        & E      & = & eccentricity $e$ $( 0 \leq e < 1 )$ \\
+        & AORL   & = & mean longitude $L$ (radians) \\
+        & DM     & = & daily motion $n$ (radians)
+        \end{tabular}
 
         JFORM=2, suitable for minor planets:
 
-        \begin{tabbing}
-        xxx \= xxxxxxxx \= xx \= \kill
-        \> EPOCH  \> = \> epoch of elements $t_0$ (TT MJD) \\
-        \> ORBINC \> = \> inclination $i$ (radians) \\
-        \> ANODE  \> = \> longitude of the ascending node $\Omega$ (radians) \\
-        \> PERIH  \> = \> argument of perihelion $\omega$ (radians) \\
-        \> AORQ   \> = \> mean distance $a$ (AU) \\
-        \> E      \> = \> eccentricity $e$ $( 0 \leq e < 1 )$ \\
-        \> AORL   \> = \> mean anomaly $M$ (radians)
-        \end{tabbing}
+        \begin{tabular}{llll}
+        & EPOCH  & = & epoch of elements $t_0$ (TT MJD) \\
+        & ORBINC & = & inclination $i$ (radians) \\
+        & ANODE  & = & longitude of the ascending node $\Omega$ (radians) \\
+        & PERIH  & = & argument of perihelion $\omega$ (radians) \\
+        & AORQ   & = & mean distance $a$ (AU) \\
+        & E      & = & eccentricity $e$ $( 0 \leq e < 1 )$ \\
+        & AORL   & = & mean anomaly $M$ (radians)
+        \end{tabular}
 
         JFORM=3, suitable for comets:
 
-        \begin{tabbing}
-        xxx \= xxxxxxxx \= xx \= \kill
-        \> EPOCH  \> = \> epoch of perihelion $T$ (TT MJD) \\
-        \> ORBINC \> = \> inclination $i$ (radians) \\
-        \> ANODE  \> = \> longitude of the ascending node $\Omega$ (radians) \\
-        \> PERIH  \> = \> argument of perihelion $\omega$ (radians) \\
-        \> AORQ   \> = \> perihelion distance $q$ (AU) \\
-        \> E      \> = \> eccentricity $e$ $( 0 \leq e \leq 10 )$
-        \end{tabbing}
+        \begin{tabular}{llll}
+        & EPOCH  & = & epoch of perihelion $T$ (TT MJD) \\
+        & ORBINC & = & inclination $i$ (radians) \\
+        & ANODE  & = & longitude of the ascending node $\Omega$ (radians) \\
+        & PERIH  & = & argument of perihelion $\omega$ (radians) \\
+        & AORQ   & = & perihelion distance $q$ (AU) \\
+        & E      & = & eccentricity $e$ $( 0 \leq e \leq 10 )$
+        \end{tabular}
+
   \item It may not be possible to generate elements in the form
         requested through JFORMR.  The caller is notified of the form
         of elements actually returned by means of the JFORM argument:
 
-        \begin{tabbing}
-        xx \= xxxxxxxxxx \= xxxxxxxxxxx \= \kill
-        \> JFORMR   \> JFORM   \> meaning \\ \\
-        \> ~~~~~1   \> ~~~~~1  \> OK: elements are in the requested format \\
-        \> ~~~~~1   \> ~~~~~2  \> never happens \\
-        \> ~~~~~1   \> ~~~~~3  \> orbit not elliptical \\
-        \> ~~~~~2   \> ~~~~~1  \> never happens \\
-        \> ~~~~~2   \> ~~~~~2  \> OK: elements are in the requested format \\
-        \> ~~~~~2   \> ~~~~~3  \> orbit not elliptical \\
-        \> ~~~~~3   \> ~~~~~1  \> never happens \\
-        \> ~~~~~3   \> ~~~~~2  \> never happens \\
-        \> ~~~~~3   \> ~~~~~3  \> OK: elements are in the requested format
-        \end{tabbing}
+        \begin{tabular}{llll}
+        & JFORMR   & JFORM   & meaning \\ \\
+        & ~~~~~1   & ~~~~~1  & OK: elements are in the requested format \\
+        & ~~~~~1   & ~~~~~2  & never happens \\
+        & ~~~~~1   & ~~~~~3  & orbit not elliptical \\
+        & ~~~~~2   & ~~~~~1  & never happens \\
+        & ~~~~~2   & ~~~~~2  & OK: elements are in the requested format \\
+        & ~~~~~2   & ~~~~~3  & orbit not elliptical \\
+        & ~~~~~3   & ~~~~~1  & never happens \\
+        & ~~~~~3   & ~~~~~2  & never happens \\
+        & ~~~~~3   & ~~~~~3  & OK: elements are in the requested format
+        \end{tabular}
+
   \item The arguments returned for each value of JFORM ({\it cf.}\/ Note~5:
         JFORM may not be the same as JFORMR) are as follows:
 
-        \begin{tabbing}
-        xxx \= xxxxxxxxxxxx \= xxxxxx \= xxxxxx \= \kill
-        \> JFORM  \> 1        \> 2        \> 3 \\ \\
-        \> EPOCH  \> $t_0$    \> $t_0$    \> $T$ \\
-        \> ORBINC \> $i$      \> $i$      \> $i$ \\
-        \> ANODE  \> $\Omega$ \> $\Omega$ \> $\Omega$ \\
-        \> PERIH  \> $\varpi$ \> $\omega$ \> $\omega$ \\
-        \> AORQ   \> $a$      \> $a$      \> $q$ \\
-        \> E      \> $e$      \> $e$      \> $e$ \\
-        \> AORL   \> $L$      \> $M$      \> - \\
-        \> DM     \> $n$      \> -        \> -
-        \end{tabbing}
+        \begin{tabular}{lllll}
+        & JFORM  & 1        & 2        & 3 \\ \\
+        & EPOCH  & $t_0$    & $t_0$    & $T$ \\
+        & ORBINC & $i$      & $i$      & $i$ \\
+        & ANODE  & $\Omega$ & $\Omega$ & $\Omega$ \\
+        & PERIH  & $\varpi$ & $\omega$ & $\omega$ \\
+        & AORQ   & $a$      & $a$      & $q$ \\
+        & E      & $e$      & $e$      & $e$ \\
+        & AORL   & $L$      & $M$      & - \\
+        & DM     & $n$      & -        & -
+        \end{tabular}
 
         where:
-        \begin{tabbing}
-        xxx \= xxxxxxxx \= xxx \= \kill
-        \> $t_0$    \> is the epoch of the elements (MJD, TT) \\
-        \> $T$      \> is the epoch of perihelion (MJD, TT) \\
-        \> $i$      \> is the inclination (radians) \\
-        \> $\Omega$ \> is the longitude of the ascending node (radians) \\
-        \> $\varpi$ \> is the longitude of perihelion (radians) \\
-        \> $\omega$ \> is the argument of perihelion (radians) \\
-        \> $a$      \> is the mean distance (AU) \\
-        \> $q$      \> is the perihelion distance (AU) \\
-        \> $e$      \> is the eccentricity \\
-        \> $L$      \> is the longitude (radians, $0-2\pi$) \\
-        \> $M$      \> is the mean anomaly (radians, $0-2\pi$) \\
-        \> $n$      \> is the daily motion (radians) \\
-        \> - \> means no value is set
-        \end{tabbing}
+
+        \begin{tabular}{lll}
+        & $t_0$    & is the epoch of the elements (MJD, TT) \\
+        & $T$      & is the epoch of perihelion (MJD, TT) \\
+        & $i$      & is the inclination (radians) \\
+        & $\Omega$ & is the longitude of the ascending node (radians) \\
+        & $\varpi$ & is the longitude of perihelion (radians) \\
+        & $\omega$ & is the argument of perihelion (radians) \\
+        & $a$      & is the mean distance (AU) \\
+        & $q$      & is the perihelion distance (AU) \\
+        & $e$      & is the eccentricity \\
+        & $L$      & is the longitude (radians, $0-2\pi$) \\
+        & $M$      & is the mean anomaly (radians, $0-2\pi$) \\
+        & $n$      & is the daily motion (radians) \\
+        & - & means no value is set
+        \end{tabular}
+
   \item At very small inclinations, the longitude of the ascending node
         ANODE becomes indeterminate and under some circumstances may be
         set arbitrarily to zero.  Similarly, if the orbit is close to
@@ -12176,21 +12173,21 @@ $n$ & & \\
 The symbols have the following meanings:
 
 \vspace{-1ex}
-\begin{tabbing}
-xxxxxxx \= xxxx \= \kill
-\> $t_0$ \> epoch of osculation \\
-\> $T$ \> epoch of perihelion passage \\
-\> $i$ \> inclination of the orbit \\
-\> $\Omega$ \> longitude of the ascending node \\
-\> $\varpi$ \> longitude of perihelion ($\varpi = \Omega + \omega$) \\
-\> $\omega$ \> argument of perihelion \\
-\> $a$ \> semi-major axis of the orbital ellipse \\
-\> $q$ \> perihelion distance \\
-\> $e$ \> orbital eccentricity \\
-\> $L$ \> mean longitude ($L = \varpi + M$) \\
-\> $M$ \> mean anomaly \\
-\> $n$ \> mean motion \\
-\end{tabbing}
+
+\begin{tabular}{lll}
+& $t_0$ & epoch of osculation \\
+& $T$ & epoch of perihelion passage \\
+& $i$ & inclination of the orbit \\
+& $\Omega$ & longitude of the ascending node \\
+& $\varpi$ & longitude of perihelion ($\varpi = \Omega + \omega$) \\
+& $\omega$ & argument of perihelion \\
+& $a$ & semi-major axis of the orbital ellipse \\
+& $q$ & perihelion distance \\
+& $e$ & orbital eccentricity \\
+& $L$ & mean longitude ($L = \varpi + M$) \\
+& $M$ & mean anomaly \\
+& $n$ & mean motion \\
+\end{tabular}
 
 The mean motion, $n$, tells
 sla\_PLANEL the mass of the planet.
