@@ -92,6 +92,7 @@ typedef struct Gaia_Options : Rtd_Options
     char *component;    // NDF component to display
     int plot_wcs;       // Scale and orient plot symbols using WCS system if available
     int ukirt_ql;       // Whether ukirt quick look stats are enabled.
+    int pixel_indices;  // Whether X,Y coordinates are pixel indices.
 } Gaia_Options;
 
 class StarRtdImageOptions : public RtdImageOptions
@@ -117,6 +118,7 @@ class StarRtdImageOptions : public RtdImageOptions
         gaia_options_.component= NULL;
         gaia_options_.plot_wcs = 1;
         gaia_options_.ukirt_ql = 0;
+        gaia_options_.pixel_indices = 0;
     }
 };
 
@@ -140,25 +142,30 @@ static int Gaia_Options_Offset( const char* member )
     if ( member[0] == 'u' && member[1] == 'k' ) {
         return (char *)&ptr->ukirt_ql - (char *)ptr;
     }
+    if ( member[0] == 'p' && member[1] == 'i' ) {
+        return (char *)&ptr->pixel_indices - (char *)ptr;
+    }
     return 0;
 }
 
 //  Define the Tk config options specific to GAIA.
 #define GAIA_OPTION(x) (Gaia_Options_Offset(x))
 #define GAIA_OPTIONS \
-{TK_CONFIG_STRING, "-ast_tag",   NULL, NULL, "ast_element", GAIA_OPTION("ast_tag"),   0, NULL}, \
-{TK_CONFIG_STRING, "-component", NULL, NULL, "data",        GAIA_OPTION("component"), 0, NULL}, \
-{TK_CONFIG_INT,    "-plot_wcs",  NULL, NULL, "1",           GAIA_OPTION("plot_wcs"),  0, NULL}, \
-{TK_CONFIG_INT,    "-ukirt_ql",  NULL, NULL, "0",           GAIA_OPTION("ukirt_ql"),  0, NULL}
+{TK_CONFIG_STRING, "-ast_tag",        NULL, NULL, "ast_element", GAIA_OPTION("ast_tag"),       0, NULL}, \
+{TK_CONFIG_STRING, "-component",      NULL, NULL, "data",        GAIA_OPTION("component"),     0, NULL}, \
+{TK_CONFIG_INT,    "-plot_wcs",       NULL, NULL, "1",           GAIA_OPTION("plot_wcs"),      0, NULL}, \
+{TK_CONFIG_INT,    "-ukirt_ql",       NULL, NULL, "0",           GAIA_OPTION("ukirt_ql"),      0, NULL}, \
+{TK_CONFIG_INT,    "-pixel_indices",  NULL, NULL, "0",           GAIA_OPTION("pixel_indices"), 0, NULL}
 #else
 
 //  Above only known to work with GCC, let other compilers complain (Solaris CC doesn't work).
 #define GAIA_OPTION(x) Tk_Offset(Gaia_Options,x)
 #define GAIA_OPTIONS \
-{TK_CONFIG_STRING, "-ast_tag",   NULL, NULL, "ast_element", GAIA_OPTION(ast_tag),   0, NULL}, \
-{TK_CONFIG_STRING, "-component", NULL, NULL, "data",        GAIA_OPTION(component), 0, NULL}, \
-{TK_CONFIG_INT,    "-plot_wcs",  NULL, NULL, "1",           GAIA_OPTION(plot_wcs),  0, NULL}, \
-{TK_CONFIG_INT,    "-ukirt_ql",  NULL, NULL, "0",           GAIA_OPTION(ukirt_ql),  0, NULL}
+{TK_CONFIG_STRING, "-ast_tag",        NULL, NULL, "ast_element", GAIA_OPTION(ast_tag),       0, NULL}, \
+{TK_CONFIG_STRING, "-component",      NULL, NULL, "data",        GAIA_OPTION(component),     0, NULL}, \
+{TK_CONFIG_INT,    "-plot_wcs",       NULL, NULL, "1",           GAIA_OPTION(plot_wcs),      0, NULL}, \
+{TK_CONFIG_INT,    "-ukirt_ql",       NULL, NULL, "0",           GAIA_OPTION(ukirt_ql),      0, NULL}, \
+{TK_CONFIG_INT,    "-pixel_indices",  NULL, NULL, "0",           GAIA_OPTION(pixel_indices), 0, NULL}
 #endif
 
 class StarRtdImage : public Skycat
@@ -396,6 +403,11 @@ class StarRtdImage : public Skycat
    //  Return whether UKIRT quick look statistics are available.
    int ukirt_ql() const {
        return ((StarRtdImageOptions* )options_)->gaia_options_.ukirt_ql;
+   }
+
+   //  Return whether pixel indices are calculated by processMotionEvent.
+   int pixel_indices() const {
+       return ((StarRtdImageOptions* )options_)->gaia_options_.pixel_indices;
    }
 
    //  Test if file extension is known to NDF.

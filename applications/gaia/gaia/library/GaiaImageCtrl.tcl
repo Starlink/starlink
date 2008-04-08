@@ -166,6 +166,9 @@ itcl::class gaia::GaiaImageCtrl {
 
       #  Pass on UKIRT quick look config.
       $image_ configure -ukirt_ql $itk_option(-ukirt_ql)
+
+      #  Same for pixel indices request.
+      $image_ configure -pixel_indices $itk_option(-pixel_indices)
    }
 
    #  Test for buttons 4, 5 6 and 7 and scroll the main window.
@@ -219,7 +222,8 @@ itcl::class gaia::GaiaImageCtrl {
             -max_scale $itk_option(-max_scale) \
             -shorthelpwin $itk_option(-shorthelpwin) \
             -borderwidth 3 -relief groove \
-            -ukirt_ql $itk_option(-ukirt_ql)
+            -ukirt_ql $itk_option(-ukirt_ql) \
+            -showpxy $itk_option(-pixel_indices)
       }
       if { "$itk_option(-panel_orient)" == "vertical" } {
          pack $itk_component(info) -side top -fill both -expand 1
@@ -1194,6 +1198,9 @@ itcl::class gaia::GaiaImageCtrl {
 
    #  Whether to enable the UKIRT quick look parts of the interface.
    itk_option define -ukirt_ql ukirt_ql UKIRT_QL 0
+
+   #  Whether to enable display of pixel indices in preference to grid indices.
+   itk_option define -pixel_indices pixel_indices Pixel_Indices 0
 
    #  The application name as used in window titles (can be changed
    #  for UKIRT mods).

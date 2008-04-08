@@ -2,6 +2,12 @@
     Version 4.2-2
     =============
 
+    A new command-line and startup option -pixel_indices is available.
+    This changes the X and Y continuous readout displays to show NDF
+    pixel indices, not grid coordinates. NDF pixel indices are like 
+    grid coordinates, but they include the NDF origin and are integer
+    values.
+
     Contour and grid overlay lines can now be drawn in dotted and 
     dashed styles.
 

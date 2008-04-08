@@ -117,29 +117,55 @@ itcl::class gaia::GaiaImagePanel {
          add_short_help $itk_component(object) {Filename or Object name (filename )}
       }
 
-      # X and Y
+      # X and Y, could be grid or pixel indices, if showpxy is true.
       if {$itk_option(-showxy)} {
-         itk_component add x {
-            util::LabelValue $w_.x \
-               -text "X:" \
-               -textvariable ${var}(X) \
-               -labelfont $itk_option(-labelfont) \
-               -valuefont $itk_option(-valuefont) \
-               -labelwidth $itk_option(-labelwidth) \
-               -valuewidth $itk_option(-valuewidth) \
-               -relief groove \
-               -anchor e
-         }
-         itk_component add y {
-            util::LabelValue $w_.y \
-               -text "Y:" \
-               -textvariable ${var}(Y) \
-               -labelfont $itk_option(-labelfont) \
-               -valuefont $itk_option(-valuefont) \
-               -labelwidth $itk_option(-labelwidth) \
-               -valuewidth $itk_option(-valuewidth) \
-               -relief groove \
-               -anchor e
+         if { $itk_option(-showpxy) } {
+            itk_component add x {
+               util::LabelValue $w_.x \
+                  -text "PX:" \
+                  -textvariable ${var}(PX) \
+                  -labelfont $itk_option(-labelfont) \
+                  -valuefont $itk_option(-valuefont) \
+                  -labelwidth $itk_option(-labelwidth) \
+                  -valuewidth $itk_option(-valuewidth) \
+                  -relief groove \
+                  -anchor e
+            }
+            itk_component add y {
+               util::LabelValue $w_.y \
+                  -text "PY:" \
+                  -textvariable ${var}(PY) \
+                  -labelfont $itk_option(-labelfont) \
+                  -valuefont $itk_option(-valuefont) \
+                  -labelwidth $itk_option(-labelwidth) \
+                  -valuewidth $itk_option(-valuewidth) \
+                  -relief groove \
+                  -anchor e
+            }
+
+         } else {
+            itk_component add x {
+               util::LabelValue $w_.x \
+                  -text "X:" \
+                  -textvariable ${var}(X) \
+                  -labelfont $itk_option(-labelfont) \
+                  -valuefont $itk_option(-valuefont) \
+                  -labelwidth $itk_option(-labelwidth) \
+                  -valuewidth $itk_option(-valuewidth) \
+                  -relief groove \
+                  -anchor e
+            }
+            itk_component add y {
+               util::LabelValue $w_.y \
+                  -text "Y:" \
+                  -textvariable ${var}(Y) \
+                  -labelfont $itk_option(-labelfont) \
+                  -valuefont $itk_option(-valuefont) \
+                  -labelwidth $itk_option(-labelwidth) \
+                  -valuewidth $itk_option(-valuewidth) \
+                  -relief groove \
+                  -anchor e
+            }
          }
 
          itk_component add value {
@@ -164,11 +190,6 @@ itcl::class gaia::GaiaImagePanel {
                $itk_component(y)       $row,1 -fill x -anchor w \
                $itk_component(value)   $row,2 -fill x -anchor w
          }
-
-         #  Workaround for bug in itcl2.0.
-         $itk_component(x) config -textvariable ${var}(X)
-         $itk_component(y) config -textvariable ${var}(Y)
-         $itk_component(value) config -textvariable ${var}(VALUE)
 
          add_short_help $itk_component(x) {X image coordinates at mouse pointer}
          add_short_help $itk_component(y) {Y image coordinates at mouse pointer}
@@ -688,6 +709,9 @@ itcl::class gaia::GaiaImagePanel {
    #  Define whether we need to show the UKIRT quick look part of the
    #  panel.
    itk_option define -ukirt_ql ukirt_ql UKIRT_QL 0
+
+   #  Wether to show pixel indices as well.
+   itk_option define -showpxy showpxy Showpxy 0
 
    #   Protected variable.
    protected variable make_now_ 0

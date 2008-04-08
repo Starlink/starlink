@@ -5729,7 +5729,8 @@ int StarRtdImage::isfits()
     if ( strcmp( imio.rep()->classname(), "StarFitsIO" ) == 0 ||
          strcmp( imio.rep()->classname(), "FitsIO" ) == 0 ) {
         isfits = 1;
-    } else {
+    } 
+    else {
         isfits = 0;
     }
     return isfits;
@@ -6526,16 +6527,45 @@ int StarRtdImage::displayImageEvent( const rtdIMAGE_INFO& info,
 void StarRtdImage::processMotionEvent()
 {
     RtdImage::processMotionEvent();
+
+    //  Report NDF integer pixel indices rather than GRID coordinates.
+    if ( pixel_indices() ) {
+        
+        //  Get the NDF origin information.
+        char *xori = image_->image().get("LBOUND1");
+        char *yori = image_->image().get("LBOUND2");
+        if ( xori && yori ) {
+            int xo = atoi( xori );
+            int yo = atoi( yori );
+
+            //  The global variables var(X) and var(Y) have already been set
+            //  to the GRID coordinates. Use those values to set related
+            //  globals. Note do not reuse the var(X) and var(Y) these 
+            //  values are used to also pick values.
+            char *var = ( viewMaster_ ? viewMaster_->name() : instname_ );
+            char buf[100];
+            
+            if ( xo != 1 ) {
+                sprintf(buf,"set %s(PX) [expr round($%s(X))+%d-1]",var,var,xo);
+                Tcl_EvalEx( interp_, buf, -1, TCL_EVAL_GLOBAL );
+            }
+            if ( yo != 1 ) {
+                sprintf(buf,"set %s(PY) [expr round($%s(Y))+%d-1]",var,var,yo);
+                Tcl_EvalEx( interp_, buf, -1, TCL_EVAL_GLOBAL );
+            }
+        }
+    }
+
+    //  Need the UKIRT quick look statistics box updates. These are originally
+    //  by Min Tan (mt@roe.ac.uk).
     if ( ukirt_ql() ) {
-        //  Need the UKIRT quick look statistics box updates. These
-        //  are originally by Min Tan (mt@roe.ac.uk).
         if( ( ql_x1 - ql_x0 ) > 1024 || ( ql_y1 - ql_x0 ) > 1024 ||
             ( ql_x1 - ql_x0 ) < 0 || ( ql_y1 - ql_y0 ) < 0 ) {
             //  Do nothing, if out of bounds?
         }
         else {
             //  Write out the data limits.
-            char *var = ( viewMaster_ ? viewMaster_->name() : instname_ );//XXX change here
+            char *var = ( viewMaster_ ? viewMaster_->name() : instname_ );
             char buffer[36];
             sprintf( buffer, "%d, %d", ql_x0, ql_y0 );
             Tcl_SetVar2( interp_, var, "XY1", buffer, TCL_GLOBAL_ONLY );

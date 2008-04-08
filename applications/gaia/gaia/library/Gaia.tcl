@@ -185,6 +185,7 @@ Options:
  -panel_orient <orient>   - panel orientation, one of: "horizontal", "vertical"
  -pickobjectorient <v>    - orientation for pick object win: "horizontal", "vertical"
  -pick_zoom_factor <n>    - scale factor used in pick object zoom window.
+ -pixel_indices <bool>    - show NDF pixel indices as X,Y readout values (default: 0).
  -port <port>             - listen for remote cmds on port (default: 0 = choose port).
  -remote <bool>           - use existing skycat process, if available, with Tk send.
  -rtd <bool>              - include ESO/VLT Real-Time Features.
@@ -555,6 +556,7 @@ itcl::class gaia::Gaia {
             -pick_zoom_factor $itk_option(-pick_zoom_factor) \
             -hdu $itk_option(-hdu) \
             -ukirt_ql $itk_option(-ukirt_ql) \
+            -pixel_indices $itk_option(-pixel_indices) \
             -appname $appname_ \
             -extended_precision $itk_option(-extended_precision) \
             -linear_cartesian $itk_option(-linear_cartesian) \
@@ -2296,6 +2298,9 @@ window gives you access to this."
          set appname_ "UKIRT::Quick Look"
       }
    }
+
+   #  Whether to display pixel indices as the readout X,Y values.
+   itk_option define -pixel_indices pixel_indices Pixel_Indices 0
 
    #  Whether to display coordinates using extended precision. This
    #  displays at milli arc-second resolution.
