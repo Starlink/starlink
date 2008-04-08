@@ -1,4 +1,4 @@
-% +
+%+
 %  Name:
 %     SST.TEX
 
@@ -18,11 +18,8 @@
 %     source prior to any statements that make of the sst commnds.
 
 %  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html 
-%     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty 
-%     on your TEXINPUTS path (and including the name as part of the  
-%     documentstyle declaration).
+%     The style file html.sty provided with LaTeX2html needs to be used.
+%     This must be before this file.
 
 %  Authors:
 %     RFWS: R.F. Warren-Smith (STARLINK)
@@ -42,7 +39,7 @@
 %  Bugs:
 %     {note_any_bugs_here}
 
-% -
+%-
 
 %  Define length variables.
 \newlength{\sstbannerlength}
@@ -51,7 +48,8 @@
 \newlength{\sstexampleswidth}
 
 %  Define a \tt font of the required size.
-\newfont{\ssttt}{cmtt10 scaled 1095}
+\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
+\html{\newcommand{\ssttt}{\tt}}
 
 %  Define a command to produce a routine header, including its name,
 %  a purpose description and the rest of the routine's documentation.
@@ -80,8 +78,8 @@
 \newcommand{\sstdescription}[1]{\item[Description:] #1}
 
 %  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
-
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
+\\[1.3ex]{\raggedright \ssttt #1}}
 
 %  Format the invocation section.
 \newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
@@ -127,13 +125,15 @@
 
 %  Define the format of a subsection in the examples section.
 \newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
+\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
+\\ #2 }
 
 %  Format the notes section.
 \newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
 
 %  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
+\mbox{} \\[1.3ex] #2}
 
 %  Format the implementation status section.
 \newcommand{\sstimplementationstatus}[1]{
@@ -154,15 +154,12 @@
 %  Define the format of an item.
 \newcommand{\sstitem}{\item}
 
-%  Now define html equivalents of those already set. These are used by
+%% Now define html equivalents of those already set. These are used by
 %  latex2html and are defined in the html.sty files.
 \begin{htmlonly}
 
-%  Re-define \ssttt.
-   \newcommand{\ssttt}{\tt}
-
 %  sstroutine.
-   \renewcommand{\sstroutine}[3]{
+   \newcommand{\sstroutine}[3]{
       \subsection{#1\xlabel{#1}-\label{#1}#2}
       \begin{description}
          #3
@@ -170,83 +167,80 @@
    }
 
 %  sstdescription
-   \renewcommand{\sstdescription}[1]{\item[Description:]
+   \newcommand{\sstdescription}[1]{\item[Description:]
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstusage
-   \renewcommand{\sstusage}[1]{\item[Usage:]
+   \newcommand{\sstusage}[1]{\item[Usage:]
       \begin{description}
          {\ssttt #1}
       \end{description}
+      \\
    }
 
 %  sstinvocation
-   \renewcommand{\sstinvocation}[1]{\item[Invocation:]
+   \newcommand{\sstinvocation}[1]{\item[Invocation:]
       \begin{description}
          {\ssttt #1}
       \end{description}
+      \\
    }
 
 %  sstarguments
-   \renewcommand{\sstarguments}[1]{
-      \item[Arguments:]
+   \newcommand{\sstarguments}[1]{
+      \item[Arguments:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstreturnedvalue
-   \renewcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:]
+   \newcommand{\sstreturnedvalue}[1]{
+      \item[Returned Value:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstparameters
-   \renewcommand{\sstparameters}[1]{
-      \item[Parameters:]
+   \newcommand{\sstparameters}[1]{
+      \item[Parameters:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstexamples
-   \renewcommand{\sstexamples}[1]{
-      \item[Examples:]
+   \newcommand{\sstexamples}[1]{
+      \item[Examples:] \\
       \begin{description}
          #1
       \end{description}
+      \\
    }
 
 %  sstsubsection
-   \renewcommand{\sstsubsection}[1]{\item[{#1}]}
+   \newcommand{\sstsubsection}[1]{\item[{#1}]}
 
 %  sstexamplesubsection
-   \renewcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
 
 %  sstnotes
-   \renewcommand{\sstnotes}[1]{\item[Notes:]
-      \begin{description}
-         #1
-      \end{description}
-   }
+   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
 
 %  sstdiytopic
-   \renewcommand{\sstdiytopic}[2]{\item[{#1}]
-      \begin{description}
-         #2
-      \end{description}
-   }
+   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
 
 %  sstimplementationstatus
-   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
-      \begin{description}
-         #1
-      \end{description}
+   \newcommand{\sstimplementationstatus}[1]{
+      \item[Implementation Status:] #1
    }
 
 %  sstitemlist
@@ -254,9 +248,13 @@
       \begin{itemize}
          #1
       \end{itemize}
+      \\
    }
+%  sstitem
+   \newcommand{\sstitem}{\item}
+
 \end{htmlonly}
 
 %  End of "sst.tex" layout definitions.
-% .
-% @(#)sst.tex   1.4   95/06/06 11:46:41   96/07/05 10:28:17
+%.
+
