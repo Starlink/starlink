@@ -124,7 +124,7 @@
 *     If the DOCUMENT=FALSE option is chosen, then the output file will
 *     contain none of the Latex command definitions needed to produce
 *     the final document. To define these commands, the contents of the
-*     file SST_DIR:LAYOUT.TEX must be included in the Latex input file
+*     file $SST_DIR/sst.tex must be included in the Latex input file
 *     in front of the output from PROLAT (the usual Latex preamble and
 *     \begin{document} ... \end{document} commands will also be needed,
 *     of course). The layout definitions in this file are designed to
@@ -132,7 +132,7 @@
 *     Starlink User Note (see the file DOCSDIR:SUN.TEX for example).
 *
 *     It is recommended that you include the contents of the file
-*     SST_DIR:LAYOUT.TEX in your final document explicitly rather than
+*     $SST_DIR/sst.tex in your final document explicitly rather than
 *     by using the Latex \include directive, otherwise it may not be
 *     possible to process the document in future if changes have to be
 *     made to the Latex definitions in this file.
