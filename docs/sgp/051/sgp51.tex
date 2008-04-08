@@ -1,4 +1,4 @@
-\documentstyle[twoside,11pt]{article}
+\documentclass[twoside,11pt]{article}
 \pagestyle{myheadings}
 
 \setcounter{tocdepth}{2}
@@ -66,9 +66,9 @@ procedures, which evolve with operational demands.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -103,7 +103,6 @@ procedures, which evolve with operational demands.
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -150,6 +149,7 @@ procedures, which evolve with operational demands.
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 % ? End of document specific commands
@@ -199,7 +199,7 @@ procedures, which evolve with operational demands.
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -223,7 +223,7 @@ procedures, which evolve with operational demands.
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
+  \newcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -241,13 +241,13 @@ procedures, which evolve with operational demands.
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
-  \newpage
- \begin{latexonly}
+\newpage
+\begin{latexonly}
    \setlength{\parskip}{0mm}
    \latexonlytoc
    \setlength{\parskip}{\medskipamount}
    \markboth{\stardocname}{\stardocname}
- \end{latexonly}
+\end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 
@@ -1225,16 +1225,16 @@ assigned to one programmer.
 
 The method is to start at the lowest level of the infrastructure and
 work up the dependencies till the whole infrastructure is ported.
-This must be done using steps 1 and 2 of the Software Cycle applied
+This must be done using Steps 1 and 2 of the Software Cycle applied
 to each separate package in the infrastructure.  
 
 Notes must be kept of modifications require to each package, and these
 should be fed back to the package support programmers so that they may
-carry out integration and testing for steps 1 and 2 of the Software
+carry out integration and testing for Steps 1 and 2 of the Software
 Cycle.
 
 Once the infrastructure is ported, applications and utilities can be
-ported, again by using steps 1 and 2 of the Software Cycle, and
+ported, again by using Steps 1 and 2 of the Software Cycle, and
 treating each port as a development update.
 
 \subsection{\label{adpopting_a_new_port}\xlabel{adpopting_a_new_port}Adopting a new port}

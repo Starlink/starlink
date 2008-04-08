@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article}
+\documentclass[twoside,11pt]{article}
 \pagestyle{myheadings}
 
 % ----------------------------------------------------
@@ -58,9 +58,9 @@ The only style that is likely to be used by most Starlink authors is the
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -95,7 +95,6 @@ The only style that is likely to be used by most Starlink authors is the
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -142,6 +141,7 @@ The only style that is likely to be used by most Starlink authors is the
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 
 
 % ? Document specific commands ***********************************************
@@ -210,9 +210,7 @@ The only style that is likely to be used by most Starlink authors is the
 \begin{htmlonly}
    \xlabel{}
    \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      \stardocversion\\
-      \stardocmanual
+      \stardoctitle
    \begin{rawhtml} </H1> \end{rawhtml}
 
 % ? Picture ******************************************************************
@@ -226,7 +224,7 @@ The only style that is likely to be used by most Starlink authors is the
 % ? End of Picture ***********************************************************
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -250,7 +248,7 @@ The only style that is likely to be used by most Starlink authors is the
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
+  \newcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -283,13 +281,13 @@ The only style that is likely to be used by most Starlink authors is the
 % version of your document.
 % (The HTML version of your document will always have a Table of Contents.)
 
- \newpage
- \begin{latexonly}
+\newpage
+\begin{latexonly}
    \setlength{\parskip}{0mm}
    \latexonlytoc
    \setlength{\parskip}{\medskipamount}
    \markright{\stardocname}
- \end{latexonly}
+\end{latexonly}
 
 %                                                            Section 8 - End *
 % ? End of Latex document Table of Contents **********************************
@@ -372,7 +370,7 @@ The {\em Standard}\, style is based on \LaTeX\ document templates stored in
 directory {\tt /star/docs}.
 The names of the files which hold the templates are based on the codes
 used to describe Starlink's document series (see
-\xref{SUG}{sug}{} section 6.1).
+\xref{SUG}{sug}{} Section 6.1).
 For example, the file holding the template for Starlink User Notes (SUNs)
 is called {\tt sun.tex}.
 

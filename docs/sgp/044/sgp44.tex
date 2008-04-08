@@ -1,11 +1,11 @@
-\documentclass[11pt]{article}
+\documentclass[twoside,11pt]{article}
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {Starlink General Paper}
 \newcommand{\stardocinitials}  {SGP}
-\newcommand{\stardocsource}    {sgp44.1}
 \newcommand{\stardocnumber}    {44.1}
+\newcommand{\stardocsource}    {sgp\stardocsource}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith}
 \newcommand{\stardocdate}      {7th June 1995}
 \newcommand{\stardoctitle}     {Guidelines for Starlink\\
@@ -38,9 +38,9 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %\begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -75,7 +75,6 @@
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -92,6 +91,13 @@
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
 
+% Define commands for HTML-only or LaTeX-only text.
+\newcommand{\html}[1]{}
+\newcommand{\latex}[1]{#1}
+
+% Use latex2html 98.2.
+\newcommand{\latexhtml}[2]{#1}
+
 % Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
@@ -100,9 +106,7 @@
 %  for HTML (problems with _ in tabbing environments and __ generally 
 %  otherwise).
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\begin{latexonly}
-  \setunderscore
-\end{latexonly}
+\latex{\setunderscore}
 
 %  LaTeX2HTML symbol.
 \newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
@@ -118,6 +122,7 @@
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % Add any document specific \newcommand or \newenvironment commands here
 
@@ -132,7 +137,7 @@
 \newcommand{\st}[1]{{\em{#1}}}
 \newcommand{\qt}[1]{``#1''}
 \begin{htmlonly}
-   \renewcommand{\qt}[1]{{\tt{"}}#1{\tt{"}}}
+   \newcommand{\qt}[1]{{\tt{"}}#1{\tt{"}}}
 \end{htmlonly}
 % -----------------------------------------------------------------------------
 %  Title Page.
@@ -176,7 +181,7 @@
 %  Add picture here if required.
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -203,7 +208,7 @@
 %  ==================
 \newcommand{\latexonlytoc}[0]{\tableofcontents}
 \begin{htmlonly}
-   \renewcommand{\latexonlytoc}[0]{}
+   \newcommand{\latexonlytoc}[0]{}
    \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
                                             {stardoctoppage}}
 \end{htmlonly}

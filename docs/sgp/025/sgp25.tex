@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article}
+\documentclass[twoside,11pt]{article}
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
@@ -50,9 +50,9 @@ Finally, it describes the management of Starlink users.}
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -87,7 +87,6 @@ Finally, it describes the management of Starlink users.}
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -104,6 +103,13 @@ Finally, it describes the management of Starlink users.}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
 
+% Define commands for HTML-only or LaTeX-only text.
+\newcommand{\html}[1]{}
+\newcommand{\latex}[1]{#1}
+
+% Use latex2html 98.2.
+\newcommand{\latexhtml}[2]{#1}
+
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
@@ -114,7 +120,6 @@ Finally, it describes the management of Starlink users.}
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\newcommand{\latex}[1]{#1}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
@@ -134,6 +139,7 @@ Finally, it describes the management of Starlink users.}
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 % ? End of document specific commands
@@ -183,7 +189,7 @@ Finally, it describes the management of Starlink users.}
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -193,10 +199,10 @@ Finally, it describes the management of Starlink users.}
       \htmladdnormallink{Particle Physics \& Astronomy Research Council}
                         {http://www.pparc.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
    \begin{rawhtml} </H2> \end{rawhtml}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
 %  HTML document table of contents. 
 %  ================================
@@ -207,7 +213,7 @@ Finally, it describes the management of Starlink users.}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
+  \newcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -226,12 +232,12 @@ Finally, it describes the management of Starlink users.}
 % ? Latex document Table of Contents (if used).
 %  ===========================================
 \newpage
- \begin{latexonly}
+\begin{latexonly}
    \setlength{\parskip}{0mm}
    \latexonlytoc
    \setlength{\parskip}{\medskipamount}
    \markright{\stardocname}
- \end{latexonly}
+\end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 \newpage
@@ -253,8 +259,8 @@ It assumes you are aware of the documentation that vendors provide for managers
 of their computers and associated hardware, and so it contains only the extra
 information you need for Starlink purposes.
 It makes many references to other Starlink documents (indicated by a code
-number, such as SGP/41); you need to become familiar with these in order to do
-your job properly.
+number, such as \xref{SGP/41}{sgp41}{}); you need to become familiar with these 
+in order to do your job properly.
 
 There are many people you can turn to for help.
 These include other Site Managers and Project Staff with particular areas
