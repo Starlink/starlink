@@ -13,14 +13,14 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_create_qualname( char *mode, int indf, IRQLocs *qlocs, int *status );
+*     smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs, int *status );
 
 *  Arguments:
-*     mode = char* (Given)
+*     mode = const char* (Given)
 *        Access mode for file
 *     indf = int (Given)
 *        NDF identifier for file
-*     qlocs = IRQLocs* (Given and Returned)
+*     qlocs = IRQLocs** (Given and Returned)
 *        Pointer to array of IRQ locators for quality names
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -37,7 +37,7 @@
 *     extension will be created. This is not considered to be an error.
 
 *  Notes:
-*     qlocs should be a null pointer on entry but there are no checks
+*     *qlocs should be a null pointer on entry but there are no checks
 *     so if called after a successful call to irqFind, this routine
 *     will overwrite that pointer.
 
@@ -51,10 +51,15 @@
 *     2008-04-02 (AGG):
 *        Use bit numbers rather than values in fixing the bits,
 *        determine numbers from values with private function
+*     2008-04-09 (TIMJ):
+*        Use const in input args where appropriate.
+*        Fix pointer warning - we need a pointer to IRQLocs*
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2008 University of British Columbia.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -113,7 +118,7 @@ static int smf_get_fixbit ( int myqual, int *status ) {
 
 #define FUNC_NAME "smf_create_qualname"
 
-void smf_create_qualname( char *mode, int indf, IRQLocs *qlocs, int *status ) {
+void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs, int *status ) {
 
   int fixbit;                /* Value of bit to be fixed in named quality */
   int fixed;                 /* Flag to denote whether quality bit is fixed */
@@ -139,35 +144,35 @@ void smf_create_qualname( char *mode, int indf, IRQLocs *qlocs, int *status ) {
   }
 
   /* Create new quality names extension */
-  irqNew( indf, "SMURF", &qlocs, status );
+  irqNew( indf, "SMURF", qlocs, status );
 
   /* Add SMURF quality names */
   msgOutif(MSG__VERB, "", "Adding SMURF quality names", status);
-  irqAddqn( qlocs, "BADSAM", 0, 
+  irqAddqn( *qlocs, "BADSAM", 0, 
 	    "Set iff a bolometer is flagged by the DA", status );
-  irqAddqn( qlocs, "BADBOL", 0, 
+  irqAddqn( *qlocs, "BADBOL", 0, 
 	    "Set iff all data from a bolometer is to be ignored", 
 	    status );
-  irqAddqn( qlocs, "SPIKE", 0, "Set iff a spike is detected", 
+  irqAddqn( *qlocs, "SPIKE", 0, "Set iff a spike is detected", 
 	    status );
-  irqAddqn( qlocs, "DCJUMP", 0, "Set iff a DC jump is present", 
+  irqAddqn( *qlocs, "DCJUMP", 0, "Set iff a DC jump is present", 
 	    status );
 
   /* Now fix the bits to the desired values */
   fixbit = smf_get_fixbit(SMF__Q_BADS, status);
-  irqFxbit( qlocs, "BADSAM", fixbit, &fixed, status );
+  irqFxbit( *qlocs, "BADSAM", fixbit, &fixed, status );
   fixbit = smf_get_fixbit(SMF__Q_BADB, status);
-  irqFxbit( qlocs, "BADBOL", fixbit, &fixed, status );
+  irqFxbit( *qlocs, "BADBOL", fixbit, &fixed, status );
   fixbit = smf_get_fixbit(SMF__Q_SPIKE, status);
-  irqFxbit( qlocs, "SPIKE",  fixbit, &fixed, status );
+  irqFxbit( *qlocs, "SPIKE",  fixbit, &fixed, status );
   fixbit = smf_get_fixbit(SMF__Q_JUMP, status);
-  irqFxbit( qlocs, "DCJUMP", fixbit, &fixed, status );
+  irqFxbit( *qlocs, "DCJUMP", fixbit, &fixed, status );
 
   /* Set names to read only */
-  irqRwqn( qlocs, "BADSAM", 1, 1, &value, status );
-  irqRwqn( qlocs, "BADBOL", 1, 1, &value, status );
-  irqRwqn( qlocs, "SPIKE",  1, 1, &value, status );
-  irqRwqn( qlocs, "DCJUMP", 1, 1, &value, status );
+  irqRwqn( *qlocs, "BADSAM", 1, 1, &value, status );
+  irqRwqn( *qlocs, "BADBOL", 1, 1, &value, status );
+  irqRwqn( *qlocs, "SPIKE",  1, 1, &value, status );
+  irqRwqn( *qlocs, "DCJUMP", 1, 1, &value, status );
 
   if ( smurfloc ) datAnnul( &smurfloc, status);
 

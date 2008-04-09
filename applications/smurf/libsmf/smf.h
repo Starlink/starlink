@@ -267,6 +267,8 @@
 *     2008-04-03 (EC):
 *        - Added QUALITY to smf_simplerebinmap
 *        - Added QUALITY to smf_scanfit, smf_fit_poly, smf_subtract_poly, 
+*     2008-04-09 (TIMJ):
+*        fix smf_created_qualname.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -412,7 +414,7 @@ smfFile* smf_create_smfFile( int * status );
 
 smfHead* smf_create_smfHead( int * status );
 
-void smf_create_qualname( char *mode, int indf, IRQLocs *qlocs, int *status);
+void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs, int *status);
 
 smfHead * smf_deepcopy_smfHead ( const smfHead *old, int * status);
 
