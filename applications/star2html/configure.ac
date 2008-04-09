@@ -19,7 +19,8 @@ STAR_DEFAULTS
 
 STAR_CHECK_PROGS([perl])
 
-dnl    This package has no dependencies
+dnl    This package has one dependency, l2h in thirdparty.
+STAR_DECLARE_DEPENDENCIES([build], [latex2html])
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
