@@ -369,6 +369,8 @@ $(MANIFESTS)/convert: \
 		$(MANIFESTS)/agi \
 		$(MANIFESTS)/ary \
 		$(MANIFESTS)/ast \
+		$(MANIFESTS)/atl \
+		$(MANIFESTS)/cat \
 		$(MANIFESTS)/cfitsio \
 		$(MANIFESTS)/chr \
 		$(MANIFESTS)/cnf \
@@ -384,7 +386,10 @@ $(MANIFESTS)/convert: \
 		$(MANIFESTS)/hds \
 		$(MANIFESTS)/hlp \
 		$(MANIFESTS)/idi \
+		$(MANIFESTS)/kaplibs \
+		$(MANIFESTS)/mag \
 		$(MANIFESTS)/mers \
+		$(MANIFESTS)/ncar \
 		$(MANIFESTS)/ndf \
 		$(MANIFESTS)/ndg \
 		$(MANIFESTS)/one \
@@ -400,6 +405,7 @@ $(MANIFESTS)/convert: \
 		$(MANIFESTS)/sgs \
 		$(MANIFESTS)/shl \
 		$(MANIFESTS)/sla \
+		$(MANIFESTS)/snx \
 		$(MANIFESTS)/star2html \
 		$(MANIFESTS)/starmem \
 		$(MANIFESTS)/starx \
@@ -1454,6 +1460,10 @@ $(MANIFESTS)/kaprh: \
 	cd applications/kaprh \
 	  && $(MAKE_CPT)
 
+$(MANIFESTS)/latex2html:
+	cd thirdparty/latex2html/latex2html \
+	  && $(MAKE_CPT)
+
 # Component libtool is a buildsupport component
 $(MANIFESTS)/libtool:
 	cd thirdparty/fsf/libtool \
@@ -2418,7 +2428,8 @@ $(MANIFESTS)/sst: \
 	cd applications/sst \
 	  && $(MAKE_CPT)
 
-$(MANIFESTS)/star2html:
+$(MANIFESTS)/star2html: \
+		$(MANIFESTS)/latex2html
 	cd applications/star2html \
 	  && $(MAKE_CPT)
 
