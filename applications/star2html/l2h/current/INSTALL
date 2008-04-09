@@ -1,9 +1,0 @@
-         Installation of Starlink version of LaTeX2HMTL 98.2
-         ===================================================
-
-The installation of this package is controlled by the "mk" script. 
-Read the prologue in this file.
-
-The Starlink changes are described in the file Starlink-Changes.
-
-Peter W. Draper 19 August 1998.

@@ -14,19 +14,19 @@
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardoccopyright} 
-{Copyright \copyright\ 2000-2004 Council for the Central Laboratory of the Research Councils
-<br>
+{Copyright \copyright\ 2000-2004 Council for the Central Laboratory of the
+Research Councils <br>
 Copyright \copyright\ 2008 Science and Technology Facilities Council}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {199.10}
+\newcommand{\stardocnumber}    {199.11}
 \newcommand{\stardocauthors}   {P W Draper\\
                                 A J Chipperfield\\
                                 M D Lawden}
-\newcommand{\stardocdate}      {15 January 2008}
+\newcommand{\stardocdate}      {4 April 2008}
 \newcommand{\stardoctitle}     {Star2HTML\\[1ex]
                                 Converting Starlink Documents to Hypertext}
-\newcommand{\stardocversion}   {Version 1.5}
+\newcommand{\stardocversion}   {Version 1.6}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}{
 Star2HTML lets you write (or convert) a
@@ -196,15 +196,10 @@ You are assumed to be familiar with \LaTeX.
 \begin{htmlonly}
   \newcommand{\dash}{-}
 \end{htmlonly}
-\newcommand{\StarlinkURL}{http://www.starlink.rl.ac.uk/}
-\newcommand{\StoreURL}{http://www.starlink.rl.ac.uk/cgi-store/storetop}
-\newcommand{\StarURL}{http://www.starlink.rl.ac.uk/}
-\newcommand{\PerlURL}{http://pubweb.nexor.co.uk/public/perl/man/html/perl.html}
-\newcommand{\WWWURL}{http://www.w3.org/hypertext/WWW/}
 \newcommand{\HTMLURL}{http://www.w3.org/hypertext/WWW/MarkUp/MarkUp.html}
 \newcommand{\LtoHURL}{http://www.tex.ac.uk/tex-archive/support/latex2html/}
-\newcommand{\LtoHManURL}{http://star-www.dur.ac.uk/~{}pdraper/latex2html/manual/}
-\newcommand{\supportURL}{http://star-www.dur.ac.uk/\~{}pdraper/star2html/star2html.html}
+\newcommand{\LtoHManURL}{http://astro.dur.ac.uk/~{}pdraper/latex2html/manual2002/}
+\newcommand{\supportURL}{http://astro.dur.ac.uk/\~{}pdraper/star2html/star2html.html}
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
@@ -344,7 +339,7 @@ Copy one of the Starlink template documents into a working directory:
 
 \begin{quote}
 \begin{verbatim}
-# cp /star/share/sun.tex .
+# cp $STARLINK_DIR/share/sun.tex .
 \end{verbatim}
 \end{quote}
 
@@ -1273,7 +1268,114 @@ Lamport, Leslie : A Document Preparation System.
 
 \newpage
 \appendix
-\section{\xlabel{changes_in_this_release}\label{changes}Changes in release 1.4}
+\section{\xlabel{changes_in_this_release}\label{changes}Changes in release 1.5}
+In this release Star2HTML has been upgraded to use \latextohtml\ version
+2000.2 exclusively (this is also part of the Starlink release).  The old
+compatibility version of \latextohtml\ has been removed as has version
+98.2. Tests have shown that the new system is largely compatible with 98.2, so
+documents updated to work with that should continue to work, \textbf{however},
+all documents that used the compatibility version of \latextohtml\
+\textit{will now need to be updated}, so you must follow one of the routes
+described in the next subsection.
+
+\subsection{Incompatibilities with previous documents}
+
+Unfortunately changes in \latextohtml\ version 98.2 and 2002.2 
+mean that several major incompatibilities with previous versions
+of Star2HTML documents continue. 
+
+To correct old documents you and take full advantage of the new facilities
+you'll need to modify your documents so that they use the current templates
+provided. You may also need to slightly modify any media sensitive commands
+that you have added.
+
+The simplest way to update your document is to change it to use the
+appropriate new template (\textit{e.g.} \verb#sun.tex#) and to use the
+new version of \verb#sst.tex#, if appropriate. Another change you must
+make is to modify any \verb#\latexonly{}# commands to use the
+equivalent \verb#\latex{}# command. Note that \verb#\latexonly# as an
+environment (\verb#\begin{latexonly} \end{latexonly}#) can continue to be
+used, this is just a change to the command form.
+
+Note that if you are using \verb#sst.tex# then it \emph{must} now be
+included in the document prologue, not in the text. Now if you have
+not made any other changes to differentiate your on-line and paper
+documents, then you should be able to convert it.
+
+If you have added customized \verb#\newcommands# to your document then
+you will also need to change any commands that look like:
+\begin{quote}
+\verb!\newcommand{\mycommand}{this version is only for LaTeX}!\\
+\verb!\begin!\verb!{htmlonly}!\\
+\enspace\enspace\hspace*{2em}\verb!\renewcommand{\mycommand}{this version is only for LaTeX2HTML}!\\
+\verb!\end!\verb!{htmlonly}!
+\end{quote}
+to:
+\begin{quote}
+\verb!\newcommand{\mycommand}{this version is only for LaTeX}!\\
+\verb!\begin!\verb!{htmlonly}!\\
+\enspace\enspace\hspace*{2em}\verb!\newcommand{\mycommand}{this version is only for LaTeX2HTML}!\\
+\verb!\end!\verb!{htmlonly}!
+\end{quote}
+This is especially important if you have any section control commands
+in the redefinitions (\verb#\newcommand# and \verb#\renewcommand# are
+now dealt with at different stages in the conversion process). In
+general if your \verb#\renewcommand# is just a replacement command then
+you should now use \verb#\newcommand#.
+
+If your document is very customized and you do not want to change the whole
+prologue, or the effort seems too great, then try the following sequence of
+changes:
+\begin{itemize}
+\item Move the \verb#%#\verb#\end{rawtex}# line to the end of the
+      ``debugging'' section (all commands visible in your document now
+      override any that \latextohtml\ may know about in any fashion,
+      i.e. builtins, from style files etc., so must be hidden). Now
+      rename \verb#%#\verb#\end{rawtex}# to \verb#%#\verb#end{latexonly}#
+      and \verb#%#\verb#\begin{rawtex}# to \verb#%#\verb#begin{latexonly}#.
+\item Move your \verb#sst.tex# definitions into the prologue.
+\item Change any \verb#\renewcommands# in \verb#htmlonly# environments
+      to \verb#\newcommands# (this includes the SST definitions).
+\item Change any \verb#\latexonly{}# commands to \verb#\latex{}# 
+(leave your \verb#latexonly# environments as they are).
+\item Modify the font declaration in the SST definitions to:
+\begin{quote}
+\begin{verbatim}
+  \latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
+  \html{\newcommand{\ssttt}{\tt}}
+\end{verbatim}
+\end{quote}
+Removing any other such definitions and adding a command:
+\begin{quote}
+\begin{verbatim}
+  \newcommand{\html}[1]{}
+\end{verbatim}
+\end{quote}
+To the standard part of the prologue. 
+\item An additional space issue means you also need to change:
+\begin{quote}
+\begin{verbatim}
+  \stardoccategory \stardocnumber \\
+\end{verbatim}
+\end{quote}
+to:
+\begin{quote}
+\begin{verbatim}
+  \stardoccategory\ \stardocnumber \\
+\end{verbatim}
+\end{quote}
+\item And finally add the following definition to the standard part of 
+      the prologue.
+\begin{quote}
+\begin{verbatim}
+ \newcommand{\latexhtml}[2]{#1}
+\end{verbatim}
+\end{quote}
+\end{itemize}
+If all this doesn't work then you'll have to do the conversion properly.
+
+
+\section{\xlabel{changes14}\label{changes14}Changes in release 1.4}
 The document templates have been updated to correct an error that centered
 the HTML document title, type and version and also to remove the Rutherford
 Appleton Laboratory URL, which is now invalid. The string ``CCLRC /
@@ -1320,7 +1422,7 @@ features of these changes are:
 \end{itemize}
 
 Changes in Star2HTML, other than to support \latextohtml, are the
-addition of the ``\verb#-s#'', ``\verb#-c#'' and ``\verb#-old#'' flags 
+addition of the ``\verb#-s#'' and ``\verb#-c#'' flags 
 and a new command \verb#latex2html#.
 
 The ``\verb#-s#'' flag (which is on by default) greatly speeds up
@@ -1328,115 +1430,7 @@ document conversion by splitting it up into smaller parts.
 The ``\verb#-c#'' flag (which has no effect by default) adds a
 copyright statement to the document footer (this can be set
 permanently by the \verb#HTX_COPYRIGHT# environment variable).
-The ``\verb#-old#'' flag forces the use of \latextohtml\ version
-97.1. The \verb#latex2html# command invokes one of the builtin
-versions of \latextohtml.
 
-\subsection{Incompatibilities with previous version of Star2HTML}
-
-Unfortunately changes in \latextohtml\ version 98.2 mean that several
-major incompatibilities with previous versions of Star2HTML documents
-have been introduced. 
-
-To ease the transition process -- so that you can still process your
-existing documents -- Star2HTML is accompanied by two versions of
-\latextohtml\ (which are now also builtin into the package) -- 97.1
-and 98.2. 97.1 offers many of the the facilities of 98.2 (in fact all
-except those marked with an asterisk in the previous
-\htmlref{list}{changes13}) and will also process
-existing documents. To make use of this facility just invoke the
-\verb#star2html# command as usual.
-
-However, if you want to take full advantage of the new facilities
-you'll need to modify your documents so that they use the new
-templates provided in this release. You may also need to slightly
-modify any media sensitive commands that you have added.
-
-The simplest way to upgrade your document is to change it to use the
-appropriate new template (\textit{e.g.} \verb#sun.tex#) and to use the
-new version of \verb#sst.tex#, if appropriate. Another change you must
-make is to modify any \verb#\latexonly{}# commands to use the
-equivalent \verb#\latex{}# command. Note that \verb#\latexonly# as an
-environment (\verb#\begin{latexonly} \end{latexonly}#) can continue to be
-used, this is just a change to the command form.
-
-Note that if you are using \verb#sst.tex# then it \emph{must} now be
-included in the document prologue, not in the text. Now if you have
-not made any other changes to differentiate your on-line and paper
-documents, then you should be able to convert it..
-
-If you have added customized \verb#\newcommands# to your document then
-you will also need to change any commands that look like:
-\begin{quote}
-\verb!\newcommand{\mycommand}{this version is only for LaTeX}!\\
-\verb!\begin!\verb!{htmlonly}!\\
-\enspace\enspace\hspace*{2em}\verb!\renewcommand{\mycommand}{this version is only for LaTeX2HTML}!\\
-\verb!\end!\verb!{htmlonly}!
-\end{quote}
-to:
-\begin{quote}
-\verb!\newcommand{\mycommand}{this version is only for LaTeX}!\\
-\verb!\begin!\verb!{htmlonly}!\\
-\enspace\enspace\hspace*{2em}\verb!\newcommand{\mycommand}{this version is only for LaTeX2HTML}!\\
-\verb!\end!\verb!{htmlonly}!
-\end{quote}
-This is especially important if you have any section control commands
-in the redefinitions (\verb#\newcommand# and \verb#\renewcommand# are
-now dealt with at different stages in the conversion process). In
-general if your \verb#\renewcommand# is just a replacement command then
-you should now use \verb#\newcommand#.
-
-If your document is very customized and you do not want to change the
-whole prologue, then try the following sequence of changes:
-\begin{itemize}
-\item Move the \verb#%#\verb#\end{rawtex}# line to the end of the
-      ``debugging'' section (all commands visible in your document now
-      override any that \latextohtml\ may know about in any fashion,
-      i.e. builtins, from style files etc., so must be hidden). Now
-      rename \verb#%#\verb#\end{rawtex}# to \verb#%#\verb#end{latexonly}#
-      and \verb#%#\verb#\begin{rawtex}# to \verb#%#\verb#begin{latexonly}#.
-\item Move your \verb#sst.tex# definitions into the prologue.
-\item Change any \verb#\renewcommands# in \verb#htmlonly# environments
-      to \verb#\newcommands# (this includes the SST definitions).
-\item Change any \verb#\latexonly{}# commands to \verb#\latex{}# 
-(leave your \verb#latexonly# environments as they are).
-\item Modify the font declaration in the SST definitions to:
-\begin{quote}
-\begin{verbatim}
-  \latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
-  \html{\newcommand{\ssttt}{\tt}}
-\end{verbatim}
-\end{quote}
-Removing any other such definitions and adding a command:
-\begin{quote}
-\begin{verbatim}
-  \newcommand{\html}[1]{}
-\end{verbatim}
-\end{quote}
-To the standard part of the prologue. 
-\item An additional space issue means you also need to change:
-\begin{quote}
-\begin{verbatim}
-  \stardoccategory \stardocnumber \\
-\end{verbatim}
-\end{quote}
-to:
-\begin{quote}
-\begin{verbatim}
-  \stardoccategory\ \stardocnumber \\
-\end{verbatim}
-\end{quote}
-\item And finally add the following definition to the standard part of 
-      the prologue.
-\begin{quote}
-\begin{verbatim}
- \newcommand{\latexhtml}[2]{#1}
-\end{verbatim}
-\end{quote}
-If you don't do this then your document will be converted using
-\latextohtml\ version 97.1.
-\end{itemize}
-If all this doesn't work then you'll have to do the conversion properly.
 
 \newpage
 \section{\xlabel{the_star2html_command}The \texttt{star2html} command\label{star2html}}
@@ -1456,7 +1450,7 @@ The full format of the command is:
 \begin{verbatim}
 # star2html [-a author(s)] [-aux] [-c copyright_statement] 
             [-d document_date] [-m email_address] [-s 0|1] 
-            [-old] [-obsolete] [-t title] [arguments for LaTeX2HTML] document
+            [-obsolete] [-t title] [arguments for LaTeX2HTML] document
 \end{verbatim}
 \end{quote}
 
@@ -1509,13 +1503,6 @@ The switches (all of which are optional) have the following meanings:
    This flag indicates you want to mark the document as obsolete. This is
    done by displaying an image with the word OBSOLETE written into it as
    the background.
-\item[\texttt{-old}] \dash\
-   This flag indicates that you want to use the ``old''
-   compatibility version of \latextohtml. Normally the \verb#star2html#
-   command decides which version to use by looking for unique
-   signatures in your document prologue. At this time the
-   presence of the \verb#\latexhtml# command signifies a document that
-   complies with the current standard.
 \item[\texttt{-s 1|0}] \dash\
    This switch controls whether the input file will be split
    into parts, or not, before being processed by \latextohtml.
@@ -1580,16 +1567,6 @@ a different label.
 
 When you are happy with the result, copy \texttt{new}\textit{document} back to
 \textit{document}.
-
-\section{\xlabel{the_latex2html_command}\label{latex2html_command}
-         The \texttt{latex2html} command} 
-The \verb#latex2html# command runs the current version of
-\latextohtml\ using the command-line options supplied (see the
-\latextohtml\ \htmladdnormallinkfoot{manual}{\LtoHManURL}
-\latex{(MUD/152)}  for a complete list of these). If you want to run
-\latextohtml\ version 97.1, then add the extra parameter: \verb#-vers old#.
-
-
 
 \newpage
 

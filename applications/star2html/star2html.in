@@ -27,7 +27,7 @@
 
 #  Invocation:
 #     star2html [-a author(s)] [-aux] [-c copyright_statement]
-#               [-d document_date] [-m email_address] [-old]
+#               [-d document_date] [-m email_address]
 #               [-obsolete] [-s 0|1] [-t title]
 #               [arguments for LaTeX2HTML] document
 
@@ -71,13 +71,6 @@
 #        This flag indicates that the document is obsolete (out of date
 #        or no longer maintained) and should be marked as such with a
 #        background image.
-#     -old
-#        This flag indicates that you want to use the "old"
-#        compatibility version of LaTeX2HTML. Normally the star2html
-#        command decides which version to use by looking for unique
-#        signatures in your document prologue. At this time the
-#        presence of the \latexhtml command signifies a document that
-#        complies with the current standard.
 #     -s 1|0
 #        This switch controls whether the input file will be split
 #        into parts, or not, before being processed by LaTeX2HTML. The
@@ -123,9 +116,9 @@
 #     for these from time to time.
 #
 #     It is expected that the icons associated with LaTeX2HTML are
-#     stored in a subdirectory icons.gif/ of the directory in which the
-#     latex2html script is located. These are copied into the
-#     document directory.
+#     stored in a subdirectory icons/ of the directory in which the
+#     latex2html script is rooted. Some of these are copied into the
+#     document directory (contents_motif.gif).
 #
 #     You can override the initialisation defaults set by this routine by
 #     including a ".latex2html-init" file in the ".htx" directory
@@ -231,6 +224,9 @@
 #        remove dependency on external uudecode and gunzip.
 #     16-JAN-2008 (PDRAPER):
 #        Add obsolete document handling.
+#     17-MAR-2008 (PDRAPER):
+#        Moved back to a single version of latex2html, 2002.2, and
+#        made associated changes.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -263,9 +259,6 @@ $DEFAULT_COPYRIGHT = 'Copyright &copy ' . $year .
 #  Do split file into parts by default.
 $SPLIT = 1;
 $NSECTIONS = 0;
-
-#  Version of latex2html should be decided using document content.
-$GUESS_VERSION = 1;
 
 #  The clear_up routine may exit.
 $CANEXIT = 1;
@@ -316,10 +309,6 @@ while (@ARGV) {
    }
    elsif ( $next_element =~ /^-obsolete$/ ) {
      $OBSOLETE = 1;
-   }
-   elsif ( $next_element =~ /^-old$/ ) {
-     $GUESS_VERSION = 0;
-     $VERSION = 'old';
    }
    elsif ( $next_element =~ /^-c$/ ) {
      $COPYRIGHT = shift;
@@ -548,19 +537,6 @@ if ( ! $COPYRIGHT ) {
                     . '</I>';
 }
 
-#  If requested look for the string "\newcommand{\latexhtml}" this
-#  defines whether the document is compatible with the current or old
-#  version of LaTeX2HTML.
-if ( $GUESS_VERSION ) {
-  $VERSION = 'old';
-  while( <FILE> ) {
-    if ( /\\newcommand\{\\latexhtml\}/ ) {
-      $VERSION = 'current';
-      last;
-    }
-  }
-}
-
 #  Close the main file.
 close(FILE);
 
@@ -574,34 +550,27 @@ close(FILE);
 #------------------------------------------------------------------------------
 #  Invoke latex2html on the temporary file. Note we inhibit index file
 #  production.
-if ( $VERSION eq 'current' ) {
-  print( "Preparations finished - now starting LaTeX2HTML\n\n");
-  system( "$LATEX2HTML -vers current " .
-          "-init_file .star2html-init -no_subdir -tmp . " .
-          "-no_auto_link @EXTRAS $DESTFILE" );
-} else {
-  print( "Preparations finished - now starting LaTeX2HTML (compatibility mode)\n\n");
-  system( "$LATEX2HTML -vers old " .
-          "-init_file .star2html-init -no_subdir " .
-          "-no_auto_link @EXTRAS $DESTFILE" );
-}
+print( "Preparations finished - now starting LaTeX2HTML\n\n");
+system( "$LATEX2HTML " .
+        "-init_file .star2html-init -no_subdir -tmp `pwd` " .
+        "-no_auto_link -local_icons @EXTRAS $DESTFILE" );
 if ( $? ) {
-   print( "Star2HTML fatal: Translation of document $TEXFILE failed.\n" );
+  print( "Star2HTML fatal: Translation of document $TEXFILE failed.\n" );
 } elsif ( $COPYRIGHT ) {
    $COPYRIGHT =~ s/&copy/(C)/;
    print("Document copyrighted:\n$COPYRIGHT\n");
 }
 
-#  Try to copy icons from @l2hdir@ to this directory.
-$CURRENT_L2H = $ENV{'CURRENT_L2H'} || "@l2hdir@/current";
-$OLD_L2H = $ENV{'OLD_L2H'} || "@l2hdir@/old";
-$ICONDIR = ($VERSION eq 'current' ? $CURRENT_L2H : $OLD_L2H) . '/icons.gif';
+#  Try to copy some special icons from @l2hdir@ to this directory.
+$LATEX2HTML_DIR = "$ENV{'STARLINK_DIR'}/share/latex2html/bin" || "@l2hdir@";
+$ICONDIR = $LATEX2HTML_DIR . '/../icons';
 if ( -d $ICONDIR ) {
-  system( "cp $ICONDIR/* .") &&
-    warn "Failed to copy icons from $ICONDIR to output directory\n";
+  system( "cp $ICONDIR/contents_motif.gif .") &&
+    warn "Failed to copy contents_motif.gif from $ICONDIR to output directory\n";
 }
 
-#  Extract the retrieve source icon.
+#  Extract the retrieve source icon. Could avoid the above if this can
+#  be extended for two icons.
 &source_icon;
 
 #  If obsolete do the marking.
@@ -1079,6 +1048,13 @@ sub create_initfile{
    &print_value( TRANSPARENT_FIGURES, 1 );
    &print_value( PAPERSIZE, 'a3' );
    &print_value( ICONSERVER, "\'.\'" );
+#  PNGs sometimes have gray backgrounds, supposed to be removed and
+#  give better antialised edges, but that's not always true (netpbm
+#  version?), so make the background white.
+   &print_value( WHITE_BACKGROUND, 1 );
+   &print_value( LATEX_COLOR, "'\\pagecolor{white}'" );
+#  Alternatively remove above and uncomment this to get GIFs.
+#   &print_value( IMAGE_TYPE, 'gif' );
 
 #  Add navigation panel changes. These add extra words for each
 #  description and a line-break between each description.
