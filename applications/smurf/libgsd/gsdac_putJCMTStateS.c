@@ -98,8 +98,7 @@
 /* SMURF includes */
 #include "gsdac.h"
 #include "jcmt/state.h"
-
-#define SPD 86400.0
+#include "smurf_par.h"
 
 void gsdac_putJCMTStateS ( const gsdVars *gsdVars, 
                            const unsigned int stepNum, const int subBandNum,
