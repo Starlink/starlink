@@ -806,7 +806,6 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
         msgOut( " ","Could not determine step time when correcting TCS_TAI from RTS_END", status );
         steptime = 0.0;
       }
-      printf("Modifying tcs_tai by %f\n",steptime);
       /* correct TCS_TAI by half step time corrected to days */
       steptime = 0.5 * steptime / SPD; 
       if (*status == SAI__OK) {
