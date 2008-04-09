@@ -87,6 +87,8 @@
 *     2006-11-1 (DSB):
 *        - Pass STEPTIME to smf_detpos_wcs and smf_create_lutwcs.
 *        - Set the DUT1 value in the returned current Frame.
+*     2008-04-09 (TIMJ):
+*        - STEPTIME handled elsewhere.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -95,6 +97,7 @@
 *     smfHead).
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -146,7 +149,6 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
   smfHead *hdr;              /* Local copy of the header structure */
   const JCMTState *tmpState; /* Local pointer to STATE */
   double dut1;               /* UT1-UTC correction, in days */ 
-  double steptime;           /* Exposure time */ 
   int subsysnum;             /* Subsystem numeric id. 0 - 8 */
   char subarray[81];         /* Subarray name */
 
@@ -234,26 +236,21 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
       
     case INST__AZTEC:
 
-      /* Need to get the exposure time. */
-      smf_fits_getD( hdr, "STEPTIME", &steptime, status );
-
       smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney, hdr->ndet, 
-			 tmpState, hdr->instap, hdr->telpos, steptime,
+			 tmpState, hdr->instap, hdr->telpos,
 			 &(hdr->wcs), status );
       break;
       
 /* For ACSIS data, use the .MORE.ACSIS.RECEPPOS values if they are
    still available in the smfHead. Otherwise, use the FPLANEX/Y values. */
     case INST__ACSIS:
-      smf_fits_getD( hdr, "STEPTIME", &steptime, status );
-
       if( hdr->detpos ) {
-         smf_detpos_wcs( hdr, index, hdr->telpos, steptime, &(hdr->wcs), 
+         smf_detpos_wcs( hdr, index, hdr->telpos, &(hdr->wcs), 
                          status );
 
       } else {
          smf_create_lutwcs( 0, hdr->fplanex, hdr->fplaney, hdr->ndet, 
-     			    tmpState, hdr->instap, hdr->telpos, steptime,
+     			    tmpState, hdr->instap, hdr->telpos,
 			    &(hdr->wcs), status );
       }
 

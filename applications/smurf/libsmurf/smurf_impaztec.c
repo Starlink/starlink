@@ -92,6 +92,8 @@
 *        - Fix JCMT telescope position
 *        - Calculate base positions in AZEL (except for planets)
 *        - Attempt to calculate the time error
+*     2008-04-09 (TIMJ):
+*        API change to create_lutwcs
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -682,7 +684,7 @@ void smurf_impaztec( int *status ) {
 	/* Create frameset */
 
 	smf_create_lutwcs( 0, hdr.fplanex, hdr.fplaney, hdr.ndet, 
-			   &(head[i_good]), hdr.instap, telpos, steptime,
+			   &(head[i_good]), hdr.instap, telpos,
 			   &(hdr.wcs), status );
 
 	if (i_good == 0) {

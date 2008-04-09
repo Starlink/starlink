@@ -269,6 +269,7 @@
 *        - Added QUALITY to smf_scanfit, smf_fit_poly, smf_subtract_poly, 
 *     2008-04-09 (TIMJ):
 *        fix smf_created_qualname.
+*        smf_create_lutwcs and smf_detpos_wcs no longer needs steptime argument.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -399,7 +400,7 @@ smf_construct_smfGroup( Grp *igrp, int **subgroups, const int ngroups,
 void smf_create_lutwcs( int clearcache, const double *fplane_x, 
 			const double *fplane_y, const int n_pix, 
 			const JCMTState *state, const double instap[2], 
-                        const double telpos[3], double steptime, 
+                        const double telpos[3],
                         AstFrameSet **fset, int *status );
 
 smfArray *smf_create_smfArray( int *status );
@@ -706,7 +707,7 @@ void smf_makefitschan( const char *system, double crval[2], double cdelt[2],
                        double crota2, AstFitsChan *fc, int *status );
 
 void smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3],
-                     double steptime, AstFrameSet **fset, int *status );
+                     AstFrameSet **fset, int *status );
 
 void smf_geod( double pos[3], double *phi, double *h, double *lambda );
 

@@ -200,6 +200,7 @@
 #include "star/kaplibs.h"
 #include "kpg_err.h"
 #include "irq_err.h"
+#include "prm_par.h"
 
 /* SC2DA includes */
 #include "sc2da/sc2store.h"
@@ -279,6 +280,7 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
 
   IRQLocs *qlocs = NULL;     /* Named quality resources */
   char xname[DAT__SZNAM+1];  /* Name of extension holding quality names */
+  double steptime = 0.0;     /* Step time for this file */
 
   if ( *status != SAI__OK ) return;
 
@@ -790,6 +792,30 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
   }
   /* Read and store history */
   smf_history_read( *data, status );
+
+  /* Fix up JCMTState if there are any compatibility problems */
+  if (*status == SAI__OK && hdr && hdr->allState) {
+    /* TCS_TAI can be missing with old data files */
+    tmpState = hdr->allState;
+    if (tmpState[0].tcs_tai == VAL__BADD) {
+      /* need the step time - if we do not have it set
+       tcs_tai to rts_end */
+      smf_fits_getD( hdr, "STEPTIME", &steptime, status );
+      if (*status == SMF__NOKWRD) {
+        errAnnul( status );
+        msgOut( " ","Could not determine step time when correcting TCS_TAI from RTS_END", status );
+        steptime = 0.0;
+      }
+      printf("Modifying tcs_tai by %f\n",steptime);
+      /* correct TCS_TAI by half step time corrected to days */
+      steptime = 0.5 * steptime / SPD; 
+      if (*status == SAI__OK) {
+        for (i=0; i < hdr->nframes; i++) {
+          tmpState[i].tcs_tai = tmpState[i].rts_end - steptime;
+        }
+      }
+    }
+  }
 
 }
 

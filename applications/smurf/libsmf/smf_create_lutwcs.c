@@ -17,7 +17,7 @@
 *     smf_create_lutwcs( int clearcache, const double *fplane_x, 
 *                        const double *fplane_y, const int n_pix, 
 *        		 const JCMTState *state, const double instap[2], 
-*                   	 const double telpos[3], double steptime,
+*                   	 const double telpos[3],
 *                        AstFrameSet **fset, int *status )
 
 *  Arguments:
@@ -38,9 +38,6 @@
 *        Additional focal plane offsets that may be applied (arc-seconds).
 *     telpos = double[3] (Given)
 *        LON / Lat / altitude of the telscope (deg/deg/metres)
-*     steptime = double (Given)
-*        The value of the STEPTIME FITS header holding the exposure time,
-*        in seconds.
 *     fset = AstFrameSet** (Returned)
 *        Constructed frameset.
 *     status = int* (Given and Returned)
@@ -100,13 +97,16 @@
 *        Added steptime.
 *     2007-02-20 (DSB):
 *        Clear the cache if the INSTAP values change.
+*     2008-04-09 (TIMJ):
+*        No longer need steptime (tcs_tai vs rts_end handled elsewhere)
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2006 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -153,12 +153,10 @@
 
 #define FUNC_NAME "smf_create_lutwcs"
 
-#define SPD 86400.0                    /* Seconds per day */
-
 void smf_create_lutwcs( int clearcache, const double *fplane_x, 
 			const double *fplane_y, const int n_pix, 
 			const JCMTState *state, const double instap[2], 
-                        const double telpos[3], double steptime, 
+                        const double telpos[3],
                         AstFrameSet **fset, int *status ) {
 
   /* Local Variables */
@@ -436,17 +434,11 @@ void smf_create_lutwcs( int clearcache, const double *fplane_x,
     }
 
     /* Set the date and time at the middle of the observation. Use TCS_TAI 
-       values if available, otherwise use RTS_END. Note RTS_END values
-       refer to the end of the observation, so subtact half the exposure 
-       time from the end time. Remember to convert from TAI to TDB (as
+       values corresponding to the centre of the integration and corresponding
+       to the astrometry calculation. Remember to convert from TAI to TDB (as
        required by the Epoch attribute). */
-    if( state->tcs_tai != VAL__BADD ) {
-       astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, state->tcs_tai + 
-                                               32.184/SPD ); 
-    } else {
-       astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, state->rts_end +
-                                               ( 32.184 - 0.5*steptime)/SPD ); 
-    }
+    astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, state->tcs_tai + 
+                                            32.184/SPD ); 
 
     /* Now modify the cached FrameSet to use the new Mapping and SkyFrame.
        First remove the existing current Frame and then add in the new one.

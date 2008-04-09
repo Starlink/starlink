@@ -171,6 +171,8 @@
 *        Use the size of the Airy disk (which is a function of local
 *        oscillator frequency) as the criterion for all points being 
 *        co-incident.
+*     08-APR-2008 (TIMJ):
+*        Use tcs_tai instead of rts_end for position calculations.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -505,9 +507,9 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    convert the telescope base pointing position for the first time slices 
    from (az,el) to the output system. */
                astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
-                       (hdr->allState)[ 0 ].rts_end + 32.184/86400.0 );
+                       (hdr->allState)[ 0 ].tcs_tai + 32.184/86400.0 );
                astSet( sf2, "Epoch=MJD %.*g", DBL_DIG, 
-                       (hdr->allState)[ 0 ].rts_end + 32.184/86400.0 );
+                       (hdr->allState)[ 0 ].tcs_tai + 32.184/86400.0 );
                az[ 0 ] = (hdr->allState)[ 0 ].tcs_az_bc1;
                el[ 0 ] = (hdr->allState)[ 0 ].tcs_az_bc2;
                astTran2( astConvert( sf1, sf2, "" ), 1, az, el, 1, ra, dec );
@@ -517,9 +519,9 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    convert the telescope base pointing position for the last time slices 
    from (az,el) to the output system. */
                astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
-                       (hdr->allState)[ hdr->nframes - 1 ].rts_end + 32.184/86400.0 );
+                       (hdr->allState)[ hdr->nframes - 1 ].tcs_tai + 32.184/86400.0 );
                astSet( sf2, "Epoch=MJD %.*g", DBL_DIG, 
-                       (hdr->allState)[ hdr->nframes - 1 ].rts_end + 32.184/86400.0 );
+                       (hdr->allState)[ hdr->nframes - 1 ].tcs_tai + 32.184/86400.0 );
                az[ 1 ] = (hdr->allState)[ hdr->nframes - 1 ].tcs_az_bc1;
                el[ 1 ] = (hdr->allState)[ hdr->nframes - 1 ].tcs_az_bc2;
                astTran2( astConvert( sf1, sf2, "" ), 1, az + 1, el + 1, 1, 

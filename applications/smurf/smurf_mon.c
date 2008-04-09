@@ -100,6 +100,8 @@
 *        Added action SC2FTS
 *     2008-03-27 (EC)
 *        Added SC2CLEAN
+*     2008-04-09 (TIMJ):
+*        API change to create_lutwcs and detpos_wcs
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -250,8 +252,8 @@ void smurf_mon( int * status ) {
 
   /* Clear all possible cached info from the different createwcs routines */
   sc2ast_createwcs(-1, NULL, NULL, NULL, NULL, status);
-  smf_create_lutwcs(1, NULL, NULL, 0, NULL, NULL, NULL, 0.0, NULL, status );
-  smf_detpos_wcs( NULL, -1, NULL, 0.0, NULL, status );
+  smf_create_lutwcs(1, NULL, NULL, 0, NULL, NULL, NULL, NULL, status );
+  smf_detpos_wcs( NULL, -1, NULL, NULL, status );
 
   /* Free AST resources */
   astEnd;
