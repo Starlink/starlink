@@ -57,9 +57,9 @@ Starlink Panel at their meeting in March 1996.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -94,7 +94,6 @@ Starlink Panel at their meeting in March 1996.
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -125,11 +124,6 @@ Starlink Panel at their meeting in March 1996.
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
 % -----------------------------------------------------------------------------
 %  Debugging.
 %  =========
@@ -141,6 +135,7 @@ Starlink Panel at their meeting in March 1996.
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 % ? End of document specific commands
@@ -190,7 +185,7 @@ Starlink Panel at their meeting in March 1996.
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -214,7 +209,6 @@ Starlink Panel at their meeting in March 1996.
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -235,7 +229,7 @@ Starlink Panel at their meeting in March 1996.
 % \newpage
  \begin{latexonly}
    \setlength{\parskip}{0mm}
-   \latexonlytoc
+   \tableofcontents
    \setlength{\parskip}{\medskipamount}
    \markright{\stardocname}
  \end{latexonly}
@@ -668,18 +662,17 @@ software will be similar to those of IRAF and AIPS.  An ethernet
 interface will also be required. The following notes come from the
 software providers themselves (IRAF and IDL) or from Jodrell Bank (AIPS).
  
-\begin{tabbing}
-xxxxxxxxxxxxxxxxxxxxxxxx\=xxxxxxxxxxxxxxxx\kill
-{\bf IRAF minimum}  \> 486-33DX CPU with 16 Mb memory, 500 Mb disc\\
-                    \> and 15" monitor;\\
-{\bf IRAF recommended} \> Pentium 90 CPU with PCI bus, 32 Mb memory,\\
-                       \> 2 Gb disc and 17" monitor;\\
-{\bf AIPS minimum}  \> 486-66DX2 CPU with 20 Mb memory, 1Gb disc\\
-                    \> and 15" monitor;\\
-{\bf AIPS recommended} \> Pentium 90 CPU with PCI bus, 32 Mb memory,\\
-                       \> 2 Gb disc and 17" monitor;\\
-{\bf IDL minimum}   \> 486-66DX2 CPU with 8 Mb memory.
-\end{tabbing}
+\begin{tabular}{ll}
+{\bf IRAF minimum}  & 486-33DX CPU with 16 Mb memory, 500 Mb disc\\
+                    & and 15" monitor;\\
+{\bf IRAF recommended} & Pentium 90 CPU with PCI bus, 32 Mb memory,\\
+                       & 2 Gb disc and 17" monitor;\\
+{\bf AIPS minimum}  & 486-66DX2 CPU with 20 Mb memory, 1Gb disc\\
+                    & and 15" monitor;\\
+{\bf AIPS recommended} & Pentium 90 CPU with PCI bus, 32 Mb memory,\\
+                       & 2 Gb disc and 17" monitor;\\
+{\bf IDL minimum}   & 486-66DX2 CPU with 8 Mb memory.
+\end{tabular}
  
 \newpage
  
