@@ -59,6 +59,8 @@
 *        Replace subsysNum with subBandNum.
 *     2008-03-24 (JB):
 *        Fix bug in getting AZ demand coordinates.
+*     2008-04-08 (JB):
+*        Convert sample time to days before adding to TAI.
 
 
 *  Copyright:
@@ -97,6 +99,8 @@
 #include "gsdac.h"
 #include "jcmt/state.h"
 
+#define SPD 86400.0
+
 void gsdac_putJCMTStateS ( const gsdVars *gsdVars, 
                            const unsigned int stepNum, const int subBandNum,
                            const dasFlag dasFlag, const gsdWCS *wcs, 
@@ -116,9 +120,9 @@ void gsdac_putJCMTStateS ( const gsdVars *gsdVars,
      on-source integration time is given by the scan_time. */
   if ( gsdVars->obsContinuous ) {
     record->rts_end = wcs->tai + 
-                      ( gsdVars->scanTime / ( gsdVars->nScanPts * 2.0 ) );
+                      ( gsdVars->scanTime / ( gsdVars->nScanPts * 2.0 * SPD ) );
   } else {
-    record->rts_end = wcs->tai + ( gsdVars->scanTime / 2.0 );
+    record->rts_end = wcs->tai + ( gsdVars->scanTime / ( 2.0 * SPD ) );
   }
 
   record->tcs_tai = wcs->tai;

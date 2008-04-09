@@ -130,6 +130,7 @@
 #include "smurf_par.h"
 
 #define SOLSID 1.00273790935
+#define SPD 86400.0
 
 #define DEBUGON 0
 
@@ -373,9 +374,6 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   dataDims[0] = 1;
   dataDims[1] = 1;
   dataDims[2] = gsdVars->nBEChansOut;
-
-  if ( DEBUGON ) 
-    printf ( "!dataDims : %i %i %i\n", dataDims[0], dataDims[1], dataDims[2] );
 
   /* Get a frameset describing the mapping from cell to sky. */
   atlWcspx ( datePointing, cellMap, dataDims, 
