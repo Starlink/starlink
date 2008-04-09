@@ -167,9 +167,12 @@
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 
+%begin{latexonly}
 \newcommand{\scspec}[2]{#1}
+%end{latexonly}
+
 \begin{htmlonly}
-  \newcommand{\scspec}[2]{#2}
+\newcommand{\scspec}[2]{#2}
 \end{htmlonly}
 
 % Location of echelle help pages
@@ -187,7 +190,7 @@
 
 %  Latex document header.
 %  ======================
-\begin{latexonly}
+\latex{
    CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
@@ -221,7 +224,7 @@
 %      {\Large\textbf{Abstract}}
 %   \end{center}
 %% ? End of heading for abstract.
-\end{latexonly}
+}
 
 %  HTML documentation header.
 %  ==========================
@@ -279,22 +282,22 @@
 % ? Latex Copyright Statement
 %  =========================
 \begin{latexonly}
-\newpage
-\vspace*{\fill}
-\stardoccopyright
+   \newpage
+   \vspace*{\fill}
+   \stardoccopyright
 \end{latexonly}
 % ? End of Latex copyright statement
 
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
-  \newpage
-  \begin{latexonly}
+\newpage
+\begin{latexonly}
     \setlength{\parskip}{0mm}
     \tableofcontents
     \setlength{\parskip}{\medskipamount}
     \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
+\end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 
