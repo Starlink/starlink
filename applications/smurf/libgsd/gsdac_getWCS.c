@@ -130,7 +130,6 @@
 #include "smurf_par.h"
 
 #define SOLSID 1.00273790935
-#define SPD 86400.0
 
 #define DEBUGON 0
 
