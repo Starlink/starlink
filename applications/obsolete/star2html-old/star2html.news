@@ -1,7 +1,6 @@
-1 Star2HTML_update
+1 Star2HTML_obsolete
 
- Star2HTML, the Starlink internal document hypertext support package,
- has been updated so that the default copyright is now assigned to 
- the Science and Technology Facilities Council. A new option -obsolete
- has also been introduced to display an background image with the word
- OBSOLETE displayed.
+ This is the version of Star2HTML used until April 2008. It should work
+ with older documentation that has not been updated to work with 
+ LaTeX2HTML 98.2 or later. Consider updating any documentation that
+ you encounter that requires this package.
