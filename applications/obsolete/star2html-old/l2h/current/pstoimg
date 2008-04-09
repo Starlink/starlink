@@ -1,0 +1,1156 @@
+: # *-*-perl-*-*
+  eval 'exec perl -S  $0 "$@"'
+  if $running_under_some_shell;
+#!/usr/local/bin/perl
+
+# This variable can be set manually or by the installation script
+# to point to the DIRECTORY where the latex2html files can be found.
+$LATEX2HTMLDIR=$ENV{'L2HMODULE'};
+
+if ($] >= 5 ) {# we have Perl 5.0 or later...
+
+# All operating system depended stuff should be defined in
+# Override.pm before being used in the code.
+# See export.pm on how to do this
+# This path is set to where the Override module can be found.
+use lib $ENV{'L2HMODULE'};
+
+use Cwd;
+
+use Override qw($DEBUG getpwuid link setenv getenv symlink rename
+               getcwd syswait find_executable
+               substitute_var_val $LATEX2HTMLDIR
+               make_directory_absolute unlink $dd $envkey $image_pre);
+
+} else {
+    print "\n*** could not configure automatically using Override.pm ***";
+    print "\n*** so assuming standard Unix conventions apply ***\n";
+
+# With Perl 5 these should have been set already, within  Override.pm
+
+# The key, which delimts expressions defined in the environment
+# depends on the operating system.
+    $envkey=':' unless ($envkey);
+
+# $dd is the directory delimiter character
+    $dd = '/' unless ($dd);
+}
+
+# $Id$
+#
+# pstoimg V99.1
+#
+# originally by Nikos Drakos <nikos@cbl.leeds.ac.uk>
+# Computer Based Learning Unit, University of Leeds.
+#
+# Accompanies LaTeX2HTML Version 99.1
+#
+# Script to convert an arbitrary PostScript image to a cropped GIF or PNG
+# image suitable for incorporation into HTML documents as inlined images
+# to be viewed with WWW browsers.
+#
+# This is based on the pstoepsi script
+# by Doug Crabill dgc@cs.purdue.edu
+#
+# Please note the following:
+# - The -density argument has no effect unless the
+#   color depth (set with the -depth argument) is equal to 1.
+# - Valid arguments for -depth are 1,8, or 24.
+#
+# This software is provided as is without any guarantee.
+#
+# Nikos Drakos (ND), nikos@cbl.leeds.ac.uk
+# Computer Based Learning Unit, University of Leeds.
+#
+# $Log$
+# Revision 1.1  2004/02/20 13:13:26  nxg
+# Initial import
+#
+# Revision 1.50  1999/03/24 00:57:52  RRM
+#  --  version 99.1
+#  --  allow shaving of 2 rows from images that sit on the baseline.
+#
+# Revision 1.49  1998/12/06 02:13:33  RRM
+#  --  the extra $TMP was wrong; revert to previous state
+#     need to check whether multiple files convert correctly
+#
+# Revision 1.48  1998/12/02 10:17:33  RRM
+#  --  handles multiple files,  thanks Fei Liu <feiliu@ekman.eps.jhu.edu>
+#  --  uses $TMP correctly
+#  --  cosmetic edits
+#  --  messages updated for  V98.2
+#
+# Revision 1.47  1998/06/21 17:28:13  MRO
+# -- Changes to make l2h run smoothly on Win95: shave.msg in pstoimg and
+#    some minor things in install-test and Override.pm
+#
+# Revision 1.46  1998/06/20 10:53:54  RRM
+#  --  removed inappropriate $TMP prefixes
+#  --  updated the help-message to say V98.2
+#  --  many cosmetic edits
+#
+# Revision 1.45  1998/06/19 10:38:47  RRM
+#  --  inhibit the GS> prompt and a "\n"
+#  --  small cosmetic change
+#
+# Revision 1.44  1998/06/18 08:54:23  RRM
+#  --  fixed the $TMP mechanism when called from the command-line
+#  --  looks for  /home/tmp  /usr/tmp  /tmp  in that order
+#  --  only removes  $TMP$outfile  when  $DESTDIR isn't $TMP
+#
+# Revision 1.43  1998/06/05 00:41:34  latex2html
+# -- added changes to achieve compatibility with Win95. Major change:
+#    $dd is now '\' in Override.pm for MsWin32
+#
+# Revision 1.42  1998/05/04 12:53:06  latex2html
+#  --  renumbered to V98.2
+#  --  use  &getcwd() not  &getcwd  --- thanks Uli Wortmann
+#
+# Revision 1.41  1998/05/03 09:21:26  latex2html
+#  --  remove some unnecessary cdirectory checks
+#  --  use anti-aliasing of text, whenever Ghostscript supports it
+#  --  fix the 'bop' substitution with  -white
+# 	formerly it only worked on the 1st page
+#
+# Revision 1.40  1998/04/28 10:20:18  latex2html
+#	implemented Fabrice Popineau's suggested changes, for Win32
+#
+#  --  more things are done from  Override.pm
+#  --  uses $white_color and $bg_color
+#  --  Win32 sets the GS_LIB environment variable
+#
+# Revision 1.39  1998/04/21 03:44:10  latex2html
+#  --  fixed error: $GIFTOOL -rgb  (Thanks Louis Emery <emery@aps.anl.gov>)
+#  --  fixed the return values from  &cp
+#  --  changed STDERR messages to STDOUT
+#
+# Revision 1.38  1998/04/20 18:51:39  latex2html
+# added small patch by Luc Maisonobe <Luc.Maisonobe@cnes.fr>
+#
+# Revision 1.37  1998/02/26 10:41:55  latex2html
+#  --  implemented a  -white  switch, to make gray backgrounds into white
+#     otherwise transparent backgrounds need not work
+#
+# Revision 1.36  1998/02/26 02:47:21  latex2html
+#  --  removed the use of full pathnames with GS
+#  --  some small cleaning-up
+#
+# Revision 1.35  1998/02/19 11:08:35  latex2html
+#  --  some messages are only printed with $DEBUG
+#
+# Revision 1.34  1998/02/13 13:05:56  latex2html
+#  --  defined &cp to making copying file platform-independent
+#
+# Revision 1.33  1998/02/12 06:43:41  latex2html
+#  --  fixed the error when $TMP is a relative directory
+#
+# Revision 1.32  1998/02/10 02:51:02  latex2html
+#  --  allow $DEBUG to be predefined, via Override.pm
+#  --  cosmetic changes to reduce the diffs with  pstoimg_nopipes
+#
+# Revision 1.31  1998/02/10 01:47:54  latex2html
+# 	adapted for LaTeX2HTML v98.1
+#  --  implements a  -tmp  switch, to use LaTeX2HTML's $TEMPDIR
+#  --  dies if the initial cropping fails
+#  --  doesn't try to interlace images with less than 8 rows of pixels
+#  --  minor cosmetic changes
+#
+# Revision 1.30  1998/02/09 22:42:31  latex2html
+# handles absolute file names and temp dirs; -> tmp dir is dirname(file) if not empty,
+# else some /tmp thing. Should better read l2h.config to get it...
+#
+# Revision 1.29  1997/12/12 18:33:38  JCL
+# fixed bug in $LATEX2HTMLDIR=... line
+#
+# Revision 1.28  1997/12/04 10:55:03  RRM
+#  --  adjusted to use the  Override.pm  module with Perl5
+#
+# Revision 1.27  1997/11/05 11:23:29  RRM
+#  --  changed the way Override.pm is called; this should work better.
+#
+# Revision 1.26  1997/10/09 07:09:57  RRM
+#  --  temporary fix to the Override problem
+#
+# Revision 1.25  1997/10/06 16:03:03  UW
+# override.pm contains now unlink() too. Adapted the call to override.pm
+# accordingly
+#
+# Revision 1.24  1997/10/06 14:46:24  UW
+# Added support for override.pm.  Furthermore, all references to
+# the path-delimiter ':' should now be made via $envkey
+#
+# Revision 1.23  1997/10/04 08:07:07  RRM
+#  --  removed the PaperSize bug
+#
+# Revision 1.22  1997/07/03 07:27:14  RRM
+#      Fixed up the $/ for the  %%Papersize  search;  thanks Axel
+#
+# Revision 1.21  1997/06/19 02:49:25  RRM
+#  -  Fixed bug which killed cropping in most cases; thanks Fabrice & Axel.
+#  -  multi-line matching for PaperSize search, to work with Perl 4
+#
+# Revision 1.20  1997/06/15 08:08:17  RRM
+#      Remove %%..PaperSize  commands from PostScript files, else  -g  fails
+#      Thanks to  Axel Ramge <axel@ramge.de>  for identifying the problem
+#
+# Revision 1.19  1997/06/13 14:07:36  RRM
+#  -  Directory delimiter character customisable for non-unix platforms
+#  -  fixed incorrect option-error message
+#  -  added  ppmraw  to list of drivers that support anti-aliasing
+#
+# Revision 1.18  1997/06/06 14:08:08  RRM
+# This is the V97.1 version of pstoimg .
+# New Features include...
+#   -antialias   uses anti-aliasing in Ghostscript
+#   -depth <num>  vary color-depth, so 24-bit colour images are possible.
+#   -color <num>  same as  -depth
+#   -discard     discards PostScript file when finished with it
+#
+#   also, now looks for a /tmp directory, in which to do the various
+#   image-processing steps. Define  $TMP  in local.pm  if needed.
+#
+#  - cosmetic changes to the script, for consistency with  latex2html
+#
+# Revision 1.17  1997/04/09 13:45:10  RRM
+#  -  Changed the version to 97.1
+#  -  fixed small bug on the `die' --- thanks Marcus Hennecke
+#  -  fixed the naming for multiple images from a single .ps file
+#  -  implemented a switch  -multipage  to signify multiple pages
+#  -  added `shaving' option for -extra_crop ; allows shaving to baseline
+#     from below; to prevent cropping of characters just below baseline.
+#
+# Revision 1.16  1997/03/24 13:34:36  RRM
+#  - Fixed bug whereby fractional widths/height was causing PBMMAKE to fail.
+#  - Improvements to the  -shoreup  mechanism.
+#
+# Revision 1.15  1997/03/15 10:43:45  RRM
+# Implemented Marcus Henneck's code for the -margins  switch, and how
+# to use the margins. Dropped the  DVIPS_  from variable names.
+#
+# Revision 1.14  1997/02/25 11:36:51  RRM
+# Extended the options to -crop to accept any sequence of crops along
+# any sides.
+#
+# Revision 1.13  1997/02/21 10:59:03  MRO
+# Cosmetic change.
+#
+# Revision 1.12  1997/02/17 02:20:36  RRM
+# small fixes
+#
+# Revision 1.11  1997/01/03 13:16:48  MRO
+# Fixed (?) bug reported by Herb Swan, added code that extracts page dimensions
+# from postscript file if geometry is given.
+#
+# Revision 1.10  1996/12/22 10:19:56  MRO
+# Oops! Fixed bugs introduced few minutes before... Removed perl -w switch.
+#
+# Revision 1.9  1996/12/22 10:10:22  MRO
+# Added code for shore_up and bottom_crop:
+#   -shoreup <pixel>: make image dimensions multiples of <pixel>
+#   -crop [vhb]: v,h as before, b crop image at the bottom
+#
+# Revision 1.8  1996/12/20 20:28:32  JCL
+# the -w switch for perl is somehow nerving.
+# It always want to indicate typo cause of variables used only once.
+#
+# Revision 1.7  1996/12/18 14:36:29  MRO
+# Included Ross Moore's latest patches, streamlined some code.
+#
+# Revision 1.6  1996/12/16 14:01:28  MRO
+# Hacked in Ross' enhancements for pstoimg, modified these a little.
+# Papersize selection and landscape rotation are disabled, but ready to be
+# included.
+#
+# Revision 1.5  1996/12/16 08:27:29  MRO
+# Fixed minor things pstoimg and configure-pstoimg (extensions, switches).
+#
+# Revision 1.4  1996/12/15 18:36:02  MRO
+# Changed pstoimg etc to enable runtime selection of output image format.
+#
+# Revision 1.3  1996/12/14 16:42:02  JCL
+# o  adapted for use with 'local.pm' system configuration
+# o  removed spurious "-black" option
+#
+# (end CVS log)
+#
+# Oct 25 1996 Marek Rouchal: Introduced PNG image format and fine-tuned
+#      image processing. Renamed pstogif to pstoimg. Added -debug
+#
+# Aug 25 1996 Marek Rouchal <marek@saftsack.fs.uni-bayreuth.de>
+#      Extensive patch to move all bitmap stuff out of l2h to pstogif
+#      Added automatic configuration script
+#
+# 5 JUN 96 RRM  Allow Ghostscript 3.3+  to quit without a prompt.
+#		Also, removed unused variable names.
+#
+# 15 Jan 96 HS Call ppmquant only if needed.  Fixed bug relative to
+#    V 95.3 .
+#
+# 15 Dec 95 HS (Herbert Swan <dprhws.edp.Arco.com> Added support for
+#    the flip=option.  This allows images to be oriented differently
+#    in the paper versus the electronic media
+#
+# 1 Nov 95 jmn - modified for use with gs ppm driver - from jhrg's patches
+#    note that ppmtops.ps and ppmtops3.ps are no longer needed
+#
+# 20 JUL 94 ND Converted to Perl and made several changes eg it now accepts
+#    parameters from environment variables or from command line or will use
+#    default ones.
+#
+# 1  APR 94 ND Changed the suffixes of multi-page files from xbm to gif (oops!)
+#
+
+###############################################################################
+$| =1;
+
+$prompt = "pstoimg:";
+
+### pstoimg is now automatically configured by configure-pstoimg
+### there should be no need to change any settings by hand,
+### nevertheless you may do it at your own risk :-)
+
+require "$LATEX2HTMLDIR${dd}local.pm" || die <<"_EOM_";
+$prompt: no configuration!
+_EOM_
+
+# Some lengths used by dvips
+# MRO: Is this true for all runs of dvips?
+$PAGE_HEIGHT = 841.889;   # dvips page height, in pts.
+$PAGE_WIDTH  = 595.275;   # dvips page width, in pts.
+$PAGE_HMARGIN = 72;       # dvips margin: 1 inch = 72pt
+$PAGE_VMARGIN = 72;       # dvips margin: 1 inch = 72pt
+
+# Netpbm/Pbmplus stuff
+$REDUCE_COLOR=$PPMQUANT . ' 256' if ($PPMQUANT);
+
+# This gives the location of the file landscap.ps
+# only needed for &choose_paper
+# $GSLANDSCAPE = "$GS_LIB${dd}landscap.ps";
+if ($^O =~ MSWin32) {
+    $ENV{'GS_LIB'} = $GS_LIB;
+}
+
+###############################################################################
+# Default settings
+# Environment overrides defaults, command line options override everything
+$OUTFILE = $ENV{'OUTFILE'};
+
+$MULTIPLEPAGES = '';
+
+# Valid choices for $DEPTH are 1, 8 or 24.
+$DEPTH = $ENV{'DEPTH'} || 8;
+
+#Default density is 72
+$DENSITY = $ENV{'DENSITY'} || 72;
+
+# Valid choices are any numbers greater than zero
+# Useful choices are numbers between 0.1 - 5
+# Large numbers may generate very large intermediate files
+# and will take longer to process
+$SCALE = $ENV{'SCALE'}; # No default value
+
+$PAPERSIZE = $ENV{'PAPERSIZE'}; # No default value;
+
+$DEBUG = $ENV{'DEBUG'} || 0 unless $DEBUG;
+
+$DISCARD = $ENV{'DISCARD_PS'} || 0;
+
+$FLIP=''; # no environment, no flipping by default
+
+$GSROTATE = ''; # no rotation by default
+
+$GS_UNROTATE = "cw"; # pnmflip switch to undo landscape
+
+$GEOMETRY = ''; # no specified geometry by default
+
+$EXTRA_CROP = ''; # no extra crop, by default
+
+$TRANSPARENT=0; # Do not make make images transparent by default
+
+$INTERLACE=0; # Do not make interlaced images by default
+
+$RIGHT_JUSTIFY=0; # No right justifying by default
+
+$CENTER=0; # No centering
+
+$TOP_JUSTIFY=0; # No right justifying by default
+
+$SHORE_UP=0; # No pixel alignment by default
+
+$WHITE=0; # Don't change the background to white
+
+$BASE = $FILE = undef;
+
+######################################################################
+
+# Read command line arguments
+
+do { &usage; exit 0; } if ($#ARGV == -1);
+
+while ($ARGV[0] =~ /^-/o) {
+    ($_ = shift @ARGV);
+    if ("-help" =~ /^$_/) {
+	&usage; exit 0;
+    }
+    elsif ("-debug" =~ /^$_/) {
+	$DEBUG=1;
+    }
+    elsif ("-discard" =~ /^$_/) {
+	$DISCARD=1;
+    }
+    elsif ("-antialias" =~ /^$_/) {
+	$AALIAS=1;
+    }
+    elsif ("-white" =~ /^$_/) {
+	$WHITE=1;
+    }
+    elsif ("-multipage" =~ /^$_/) {
+	$MULTIPLEPAGES=1;
+    }
+    elsif ("-gif" =~ /^$_/) {
+	$IMAGE_TYPE="gif";
+	die <<"EOF" unless $PPMTOGIF;
+$prompt Fatal Error: This version of pstoimg does not support GIF format.
+EOF
+    }
+    elsif ("-png" =~ /^$_/) {
+	$IMAGE_TYPE="png";
+	die <<"EOF" unless $PNMTOPNG;
+$prompt Fatal Error: This version of pstoimg does not support PNG format.
+EOF
+    }
+    elsif ("-out" =~ /^$_/) {
+	$OUTFILE = shift @ARGV;
+	die <<"EOF" if $OUTFILE =~ /^-/;
+$prompt Fatal Error: Outfile musn't begin with a `-'
+EOF
+    }
+    elsif ("-tmp" =~ /^$_/) {
+	$TMP = shift @ARGV;
+    }
+    elsif ("-depth" =~ /^$_/) {
+	$DEPTH = shift @ARGV;
+	die <<"EOF" unless $DEPTH =~ /^(1|8|24)$/;
+$prompt Fatal Error: Illegal color depth specified: \"$DEPTH\"
+	Depth must be either 1, 8 or 24.
+EOF
+    }
+    elsif ("-color" =~ /^$_/) {
+	$DEPTH = shift @ARGV;
+	die <<"EOF" unless $DEPTH =~ /^(1|8|24)$/;
+$prompt Fatal Error: Illegal color depth specified: \"$DEPTH\"
+	Depth must be either 1, 8 or 24.
+EOF
+    }
+    elsif ("-flip" =~ /^$_/) {
+	$FLIP = shift @ARGV;
+	die <<"EOF" unless $FLIP =~ /^\w+$/;
+$prompt Fatal Error: Illegal flip option specified: \"$FLIP\"
+	Flip must be one of: lr tb xy r90 ccw r270 cw r180
+EOF
+	do {
+	    $FLIP='';
+	    warn <<"EOF";
+$prompt Warning: Cannot flip image because of missing external
+	program. Run configure-pstoimg again and follow the hints.
+EOF
+	} unless ($PNMFLIP);
+    }
+    elsif ("-density" =~ /^$_/) {
+	$DENSITY = shift @ARGV;
+	die <<"EOF" unless $DENSITY =~ /^\d+$/;
+$prompt Fatal Error: Illegal density specified: \"$DENSITY\"
+	Density must be an integer value. Default is 72.
+EOF
+    }
+    elsif ("-scale" =~ /^$_/) {
+	$SCALE = shift @ARGV;
+	die <<"EOF" unless (($SCALE =~ /^[0-9.]+$/) && ($SCALE > 0));
+$prompt Fatal Error: Illegal scale specified: \"$SCALE\"
+	Scale must be > 0
+EOF
+    }
+    elsif ("-geometry" =~ /^$_/) {
+	$GEOMETRY = shift @ARGV;
+	if ($GEOMETRY =~ s/-//o ) { $EXTRA_CROP = "bl"; }
+	    die <<"EOF" unless (($GEOMETRY =~ /^[0-9.]+x[0-9.]+$/));
+$prompt Fatal Error: Illegal geometry specified: \"$GEOMETRY\"
+	Geometry must be <width>x<height>
+EOF
+    }
+    elsif ("-margins" =~ /^$_/) {
+	local($MARGINS) = shift @ARGV;
+	die <<"EOF" unless (($MARGINS =~ /^([0-9.]+),([0-9.]+)$/));
+$prompt Fatal Error: Illegal margins specified: \"$MARGINS\"
+	Margins must be <hmargin>,<vmargin>
+EOF
+	$PAGE_HMARGIN = $1;
+	$PAGE_VMARGIN = $2;
+    }
+    elsif ("-crop" =~ /^$_/) {
+	$EXTRA_CROP = shift @ARGV;
+	die <<"EOF" unless ( $EXTRA_CROP =~ /^([vhtblras]*)$/i );
+$prompt Fatal Error: Illegal crop specified: \"$EXTRA_CROP\"
+	Crop must be  h, v, t, b, l, r, a, s  or combination
+EOF
+    }
+    elsif ("-transparent" =~ /^$_/) {
+	if($IMAGE_TYPE eq "gif" && ! $HOWTO_TRANSPARENT_GIF) {
+	    warn <<"EOF";
+$prompt Warning: Cannot make GIF transparent.
+	Run the configure-pstoimg program again and follow the hints.
+EOF
+	} else {
+	    $TRANSPARENT=1;
+	}
+    }
+    elsif ("-interlaced" =~ /^$_/) {
+	if($IMAGE_TYPE eq "gif" && ! $HOWTO_INTERLACE_GIF) {
+	    warn <<"EOF";
+$prompt Warning: Cannot make image interlaced.
+	Run the configure-pstoimg program again and follow the hints.
+EOF
+	} else {
+	    $INTERLACE=1;
+	}
+    }
+    elsif ("-rightjustify" =~ /^$_/) {
+	$RIGHT_JUSTIFY = shift @ARGV;
+	die <<"EOF" unless $RIGHT_JUSTIFY =~ /^\d+$/o;
+$prompt Fatal Error: Illegal width for -rightjustify specified: \"$RIGHT_JUSTIFY\"
+	Value must be an integer.
+EOF
+	do {
+	    $RIGHT_JUSTIFY=0;
+	    warn <<"EOF";
+$prompt Warning: Cannot right-justify because of missing external
+	programs. Run configure-pstoimg again and follow the hints.
+EOF
+	} unless ($PNMFILE && $PBMMAKE && $PNMCAT);
+    }
+    elsif ("-center" =~ /^$_/) {
+	$CENTER = shift @ARGV;
+	die <<"EOF" unless $CENTER =~ /^\d+$/o;
+$prompt Fatal Error: Illegal width for -center specified: \"$CENTER\"
+	Value must be an integer.
+EOF
+	do {
+	    $CENTER=0;
+	    warn <<"EOF";
+$prompt Warning: Cannot center image because of missing external
+	programs. Run configure-pstoimg again and follow the hints.
+EOF
+	} unless ($PNMFILE && $PBMMAKE && $PNMCAT);
+    }
+    elsif ("-topjustify" =~ /^$_/) {
+	$TOP_JUSTIFY = shift @ARGV;
+	die <<"EOF" unless $TOP_JUSTIFY =~ /^x?[0-9.]+$/io;
+$prompt Fatal Error: Illegal align specified: \"$TOP_JUSTIFY\"
+	Value must be numeric, optionally preceded by `x'
+EOF
+	do {
+	    $TOP_JUSTIFY=0;
+	    warn <<"EOF";
+$prompt Warning: Cannot top-justify because of missing external
+	programs. Run configure-pstoimg again and follow the hints.
+EOF
+	} unless ($PNMFILE && $PBMMAKE && $PNMCAT);
+    }
+    elsif ("-shoreup" =~ /^$_/) {
+	$SHORE_UP = shift @ARGV;
+	die <<"EOF" unless $SHORE_UP =~ /^[0-9.]+d?$/;
+$prompt Fatal Error: Illegal shore-up specified: \"$SHORE_UP\"
+	Value must be numeric, or <num>d
+EOF
+	do {
+	    $SHORE_UP=0;
+	    warn <<"EOF";
+$prompt Warning: Cannot shore up image because of missing external
+	programs. Run configure-pstoimg again and follow the hints.
+EOF
+	} unless ($PNMFILE && $PBMMAKE && $PNMCAT);
+    }
+    else {
+	die "$prompt Illegal Argument \"$_\" specified\n";
+    }
+}
+$FILE = $ARGV[0];
+die "$prompt Error: No input file specified\n" unless ($FILE);
+$BASE = $FILE;
+# remove a trailing suffix and a leading path in shell-like way
+$BASE =~ s/\.[^.]*$//;
+$BASE =~ s/.*\Q$dd\E([^$dd$dd]*)$/$1/;
+die "$prompt Cannot find file $FILE: $!\n" unless (-f "$FILE");
+die "$prompt Error: No output image type specified\n" unless ($IMAGE_TYPE);
+
+if (defined $SCALE) {
+    $DENSITY = int($SCALE * $DENSITY + .5)
+    } else { $SCALE = 1; }
+
+# anti-alias text, if possible...
+if ($GS_LIB =~ /(ghostscript|gs).*(\d\.\d+)\b/i) {
+    $aalias = '-dTextAlphaBits=4 ' if ($2 > 4.01)
+} else {
+    $aalias = '';
+}
+
+# ...but anti-alias graphics only upon request
+if (($AALIAS)&&($GS_DEVICE =~ /p(p|n|g)+mraw/io)) {
+    $GS_DEVICE = 'ppmraw';
+    if ($DEPTH == 1) {
+        $REDUCE_COLOR= $PPMQUANT . " -floyd 256";
+        $aalias = '-dTextAlphaBits=4 ';
+    } elsif ($DEPTH == 8) {
+        $aalias = '-dTextAlphaBits=4  -dGraphicsAlphaBits=4 ';
+    } elsif ($DEPTH == 24) {
+        $REDUCE_COLOR="";
+        $aalias = '-dTextAlphaBits=4 -dGraphicsAlphaBits=4 ';
+    }
+} elsif ((!$AALIAS)&&($GS_DEVICE =~ /p(p|n|g)+mraw/io)) {
+    if ($DEPTH == 1) {
+	$aalias = '';
+        $REDUCE_COLOR=$PPMQUANT ." 2 " if ($PPMQUANT);
+    } elsif ($DEPTH == 24) {
+        $REDUCE_COLOR="";
+    }
+}
+
+local($DESTDIR);
+
+# LaTeX2HTML may supply a directory: .../tmp/<pid>/
+if ($TMP =~ /\Q$dd\E\w*\d+\Q$dd\E$/) {
+    $BASE =~ s/\Q$TMP//;
+    $DESTDIR = &getcwd();
+    $DESTDIR .= $dd;
+    print STDOUT "\ncurrent directory is $DESTDIR ...\n" if $DEBUG;
+    print STDOUT "\ntemp directory is $TMP ...\n" if $DEBUG;
+} else { $BASE =~ s/^(\Q$dd\Etmp)\Q$dd\E/$TMP=$1;''/e }
+
+# If l2h already uses a temp dir, the input file is located within it.
+$FILE =~ /()/;# clears $`
+$FILE =~ /\Q$dd\E[^$dd$dd]*$/o;
+$TMP = $` unless $TMP; # get leading path or empty
+
+
+if (!($TMP)) {
+    # l2h uses no temp dir, let's see if we can find one.
+    if (( -d "${dd}home${dd}tmp")&&( -w "${dd}home${dd}tmp")) {
+	$TMP = "${dd}home${dd}tmp${dd}"
+    } elsif ((-d "${dd}usr${dd}tmp")&&(-w "${dd}usr${dd}tmp")) {
+	$TMP = "${dd}usr${dd}tmp$dd"
+    } elsif (( -d "${dd}tmp")&&( -w "${dd}tmp")) {
+	$TMP = "${dd}tmp${dd}"
+    } else {
+	print "\nCannot find a ${dd}tmp directory, using current..."
+    }
+} elsif ($TMP =~ /\Q$dd\E$/) {
+} else { $TMP .= $dd; }
+
+
+#RRM: The checks commented below should be unnecessary using LaTeX2HTML.
+# They were intended for using  pstoimg  as stand-alone.
+if ($TMP && !($DESTDIR)) {
+#   open(SO, ">&STDOUT");
+#   open(STDOUT, ">${TMP}foo$$");
+#   select(STDOUT); $| = 1;
+#   system("pwd");
+#   close(STDOUT);
+#   open(STDOUT, ">&SO");
+#   open(FOO,"<${TMP}foo$$");
+#   $DESTDIR = <FOO>;
+#   close(FOO);
+#   unlink "${TMP}foo$$";
+#   chop $DESTDIR;
+#   $DESTDIR .= $dd;
+    $DESTDIR = &getcwd() . $dd;
+    print STDOUT "\ncurrent directory is $DESTDIR ..." if $DEBUG;
+    print STDOUT "\ntemp directory is $TMP ...\n" if $DEBUG;
+}
+if (!(($TMP)&&($DESTDIR))) { $TMP = '' }
+
+
+#sub cp {                        # Marcus Hennecke  6/3/96
+#    local($src, $dest) = @_;
+#    return 1 unless (-f $src);
+#    if ( -d $dest ) {
+#        $src =~ /[^$dd$dd]*$/;
+#        $dest .= $dd . $&;
+#        $dest =~ s|(\Q$dd\E){2,}|$dd|g;
+#    }
+#    open(IN, $src) || return(); binmode(IN);
+#    open(OUT, ">$dest") || return(); binmode(OUT);
+#    local($/) = undef;
+#    print OUT <IN>;
+#    close(OUT); close(IN); 1;
+#}
+
+
+# Main program
+
+$outfile = $OUTFILE || "$BASE.$IMAGE_TYPE";
+open(STDERR, ">${dd}dev${dd}null") unless $DEBUG;
+
+$gs_input = $FILE;
+if (($TMP)&&($DESTDIR)&&(-f "$TMP/$BASE.ps")) {
+    print STDOUT "...switching to $TMP\n" unless  chdir("$TMP");
+    local($extn); if ($FILE =~ /\.(\w+)$/) {$extn = $1};
+    $gs_input = "$BASE.$extn";
+    undef $extn;
+}
+
+# Invoke Ghostscript
+&convert;
+
+if($DEBUG){
+    print "file basename : $TMP$BASE \n";
+}
+
+# PWD: use File::Copy move rather than old cp as this doesn't overwrite
+# when file resolves to same name really, just end up with empty file.
+use File::Copy;
+
+if ((-f "$BASE.ppm")||(-f "$TMP$BASE.ppm")) {
+    # switch to a /tmp directory, if there is one and it's not current
+    if (($TMP)&&($DESTDIR)) {
+#	$TMP = '' if (-f "$BASE.ppm");
+	print STDOUT "...switching to $TMP\n"
+	    unless ((-f "$BASE.ppm")||! chdir("$TMP"));
+    } else { $TMP = '' }
+
+    if ($DEBUG){
+	print "Converting $BASE.ppm to $outfile\n";
+    }
+    &crop_scale_etc("$BASE.ppm", $outfile);
+    ++$done if(-s $outfile);
+    if (!($TMP =~ /^\s*$/)&&($DESTDIR)&& !($TMP eq $DESTDIR)) {
+	if ( move("$outfile", "$DESTDIR$outfile") ) {
+	    print STDOUT "\nOutput image is in file: $DESTDIR$outfile\n";
+	}
+    }
+} else {
+    @list = <$TMP$BASE.[1-9]*.ppm>;
+    if($#list >= 0) {
+	$done = 1;
+	foreach $i (@list) {
+	    $j = $i;
+#	    $j =~ s/\.(.*)\.ppm/$1.$IMAGE_TYPE/;
+	    $j =~ s/(.*)\.ppm/$1.$IMAGE_TYPE/;
+	    if ($DEBUG) {
+		print "Converting file $i to $j\n";
+	    }
+	    &crop_scale_etc($i, $j);
+	    $done = $done && -s $j;
+	    unlink $i unless ($DEBUG);
+	    unlink $i.'.tmp' unless ($DEBUG);
+	}
+    } else {
+	print STDERR "$prompt Couldn't find ppm output of $FILE\n";
+    }
+}
+&cleanup($BASE);
+
+exit(($done) ? 0 : 1 );
+
+sub crop_scale_etc {
+    local($in, $out) = @_;
+    local($tmp) = $in . ".tmp";
+    local($_,$cmd,$type,$width,$height,$just);
+    open(STDERR, ">${dd}dev${dd}null") unless $DEBUG;
+    if($DEBUG){
+	print "Input file: $in Output file: $out\n";
+    }
+
+    # PWD: newer versions need this...
+    $PNMCROPOPTS = "-sides";
+
+    if ($RIGHT_JUSTIFY || $TOP_JUSTIFY || $CENTER || $EXTRA_CROP || $SHORE_UP) {
+	# Crop the image right away
+	$cmd = "$PNMCROP $PNMCROPOPTS < $in ";
+	# RRM: Remove justification bars
+	$EXTRA_CROP =~ s/h/bt/g;
+	$EXTRA_CROP =~ s/v/rl/g;
+	while ($EXTRA_CROP) {
+	    $cmd = "$PNMCROP $PNMCROPOPTS < $in " unless ($cmd);
+	    $EXTRA_CROP =~ s/^(.)/$edge=$1;''/e;
+	    if ($edge =~ /[tblra]/) {
+		if ($edge =~ /b/) {
+                  $cmd .= "| $PNMCROP $PNMCROPOPTS -bot ";
+                }
+		elsif ($edge =~ /a/) {
+                  $cmd .= "| $PNMCROP $PNMCROPOPTS ";
+                }
+		else {
+                  $cmd .= "| $PNMCROP $PNMCROPOPTS -$edge ";
+                }
+	    } elsif ($edge =~ /s/) {
+		print "Running $cmd > $tmp\n" if $DEBUG;
+		rename ($tmp,$in) unless system("$cmd > $tmp");
+
+		#RRM: shave at most 2 rows of white from the bottom
+		$cmd = "$PNMCROP $PNMCROPOPTS -bot < $in ";
+		# MRO: This STDERR handling is portable on Win95
+		open(SAVEERR,'>&STDERR'); # remember STDERR handle
+		open(STDERR,'>shave.msg'); # redirect STDERR to file
+		print "Running $cmd > $tmp (STDERR redirected)\n" if $DEBUG;
+		local($shave) = system("$cmd > $tmp");
+		close(STDERR); # close file
+		open(STDERR,'>&SAVEERR'); # restore previous setting of STDERR
+		if (!$shave) {
+		    local $/ = undef; # clear record separator
+		    open (MSG,'<shave.msg');
+		    local $msg = <MSG>;
+		    close(MSG);
+		    print "Message on STDERR was: $msg" if ($DEBUG);
+#		    rename ($tmp,$in) unless ($msg =~ /rows off the bottom/);
+		    rename ($tmp,$in) if ($msg =~ /cropping [12] row/);
+		}
+		unlink ('shave.msg');
+		$cmd = '';
+	    }
+	}
+	if (!$cmd) {
+	    $cmd = "$PNMFLIP -$GS_UNROTATE < $in " if($GS_ROTATE);
+	} else { $cmd .= "| $PNMFLIP -$GS_UNROTATE " if($GS_ROTATE)}
+	if (!$cmd) {
+	    $cmd = "$PNMFLIP -$FLIP < $in" if $FLIP;
+	} else { $cmd .= "| $PNMFLIP -$FLIP " if $FLIP }
+	if ($cmd) {
+	    print "Running $cmd > $tmp\n" if $DEBUG;
+	    if (system("$cmd > $tmp")) {
+		&cleanup($BASE);
+		die ("Cropping failed; image too large?")
+	    }
+	    rename ($tmp,$in);
+	    $cmd="";
+	}
+    } else {
+	# Start command pipe
+	$cmd = "$PNMCROP $PNMCROPOPTS < $in ";
+	$cmd .= "| $PNMFLIP -$GS_UNROTATE " if($GS_ROTATE);
+	$cmd .= "| $PNMFLIP -$FLIP " if($FLIP);
+    }
+    # Get bitmap type and dimensions
+    $_ = `$PNMFILE $in`;
+    s/(P[BGP]M)[^0-9]*(\d+)\s*by\s*(\d+)/$type=$1;$width=$2;$height=$3/eo;
+    print "Image is $type, ${width}x$height\n" if $DEBUG;
+
+    if ($RIGHT_JUSTIFY || $CENTER) {
+	if ($RIGHT_JUSTIFY) {
+	    $just=int(($RIGHT_JUSTIFY-$width));
+	} else { # CENTER
+	    $just=int(($CENTER-$width) / 2);
+	}
+	# Start new command pipe
+	$cmd = "$PBMMAKE -white $just 1 | $PNMCAT -white -lr - $in " if ($just > 0);
+	$width += $just;
+    }
+
+    if ($TOP_JUSTIFY) {
+	if ($TOP_JUSTIFY =~ /^x([0-9.]+)/io) {
+	    $just = $1 * $height;
+	} else { $just = $TOP_JUSTIFY - $height }
+	$just = int($just + 0.99); # Assumes $adjust is positive!
+	if ($just > 0) {
+	    if ($cmd) {
+		# only if also right-justify is active
+		print "Running $cmd > $tmp\n" if $DEBUG;
+		rename ($tmp,$in) unless system("$cmd > $tmp");
+	    }
+	    $cmd="$PBMMAKE -white 1 $just | $PNMCAT -white -tb $in - ";
+	}
+	$height += $just;
+    }
+    if ($SHORE_UP) { # RRM: make height and width an exact multiple of $SHORE_UP
+	if ($cmd) {
+	    print "Running $cmd > $tmp\n" if $DEBUG;
+	    rename ($tmp,$in) unless system("$cmd > $tmp");
+	}
+	# We have a correct SHORE_UP value
+	local($hextra) = 0;
+	$hextra = 1 if ($SHORE_UP =~ s/d//);  # when image needs `depth'
+	local($extra) = int(int($height/$SHORE_UP + 0.9)*$SHORE_UP) - $height;
+	local($cnt)=0;
+	while (int(($height+$extra)/$SHORE_UP) - ($height+$extra)/$SHORE_UP < 0)
+	    { $extra++; $cnt++; last if ($cnt>5) }
+	if ($extra) {
+	    if ($hextra) {     # place half the extra space underneath
+		$hextra = int($extra/2);
+		$extra -= $hextra;
+		$cmd="$PBMMAKE -white 1 $hextra | $PNMCAT -white -tb $in - ";
+		print "Running $cmd > $tmp\n" if $DEBUG;
+		rename ($tmp,$in) unless system("$cmd > $tmp");
+	    }
+	    $cmd="$PBMMAKE -white 1 $extra | $PNMCAT -white -tb - $in ";
+	    print "Running $cmd > $tmp\n" if $DEBUG;
+	    rename ($tmp,$in) unless system("$cmd > $tmp");
+	}
+	$extra = int(int($width/$SHORE_UP+0.9)*$SHORE_UP) - $width;
+	local($cnt)=0;
+	while (int(($width+$extra)/$SHORE_UP) - ($width+$extra)/$SHORE_UP < 0)
+	    { $extra++; $cnt++; last if ($cnt>5) }
+	if ($extra) {
+	    local($rextra) = int($extra/2);
+	    $extra -= $rextra;
+	    if ($extra) {
+		$cmd="$PBMMAKE -white $extra 1 | $PNMCAT -white -lr - $in ";
+		print "Running $cmd > $tmp\n" if $DEBUG;
+		rename ($tmp,$in) unless system("$cmd > $tmp");
+	    }
+	    if ($rextra) {
+		$cmd="$PBMMAKE -white $rextra 1 | $PNMCAT -white -lr $in - ";
+		print "Running $cmd > $tmp\n" if $DEBUG;
+		rename ($tmp,$in) unless system("$cmd > $tmp");
+	    }
+	}
+	$cmd = '';
+    }
+
+    if ($IMAGE_TYPE eq "gif") { $PNMTOIMG = $PPMTOGIF; }
+    if ($IMAGE_TYPE eq "png") { $PNMTOIMG = $PNMTOPNG; }
+
+    if ($INTERLACE) { # use netpbm if possible
+	do {
+	    $PNMTOIMG .= " -interlace" unless ($height < 8);
+	    $INTERLACE=0;
+	} unless ($IMAGE_TYPE eq "gif" &&
+	    $HOWTO_INTERLACE_GIF !~ /netpbm/io);
+    }
+    if ($TRANSPARENT) { # use netpbm if possible
+	do {
+#	    $PNMTOIMG .= " -trans '#ffffff'";
+	    $PNMTOIMG .= " -trans $white_color";
+	    $TRANSPARENT=0;
+	} unless ($IMAGE_TYPE eq "gif" &&
+	    $HOWTO_TRANSPARENT_GIF !~ /netpbm/io);
+    }
+    # run ppmquant only on color/gray images
+    if ($cmd) {
+	$cmd .= "| $REDUCE_COLOR "
+	    if(($type =~ /(ppm|pgm)/io)&&($REDUCE_COLOR));
+	$cmd .= "| $PNMTOIMG ";
+    } elsif (($type =~ /(ppm|pgm)/io)&&($REDUCE_COLOR)) {
+	$cmd = "$REDUCE_COLOR < $in | $PNMTOIMG ";
+    } else {
+	$cmd = "$PNMTOIMG < $in ";
+    }
+    print "Running $cmd > $out\n" if $DEBUG;
+    if (system("$cmd > $out")) {
+	print "$prompt Conversion failed: $!\n";
+	unlink $out unless $DEBUG;
+    } else {
+	print "Writing $out\n";
+	if ($IMAGE_TYPE =~ /^gif/ &&
+	    $INTERLACE && $HOWTO_INTERLACE_GIF =~ /giftool/i) {
+	    $cmd = "$GIFTOOL -B -i ";
+	    if ($TRANSPARENT) {
+		$cmd .= "-rgb ff,ff,ff ";
+		$TRANSPARENT = 0;
+	    }
+	    print "Running $cmd $out\n" if $DEBUG;
+	    system("$cmd $out");
+	}
+	if ($IMAGE_TYPE =~ /^gif/ && $TRANSPARENT) {
+	    if ($HOWTO_TRANSPARENT_GIF =~ /giftrans/i) {
+#		print "Running $GIFTRANS -t '#ffffff' -B '#bfbfbf' $out > $tmp\n" if $DEBUG;
+		print "Running $GIFTRANS -t $white_color -B $bg_color $out > $tmp\n" if $DEBUG;
+		rename($tmp,$out) unless system("$GIFTRANS -t $white_color -B $bg_color $out > $tmp");
+#		rename($tmp,$out) unless system("$GIFTRANS -t '#ffffff' -B '#bfbfbf' $out > $tmp");
+	    } elsif ($HOWTO_TRANSPARENT_GIF =~ /giftool/i) {
+		print "Running $GIFTOOL -B -rgb ff,ff,ff $out > $tmp\n" if $DEBUG;
+		rename($tmp,$out) unless system("$GIFTOOL -B -rgb ff,ff,ff $out > $tmp");
+	    }
+	}
+    }
+    unlink $tmp unless $DEBUG;
+}
+
+sub convert {
+    local($size) = ($PAPERSIZE) ? "-sPAPERSIZE=$PAPERSIZE" : "";
+    local($density) = ($DENSITY != 72) ? "-r$DENSITY" : "";
+    local($bbx, $bby, $bbw, $bbh) = (0,0,0,0);
+    local($max_lines) = 30;
+    local($epsf,$have_geometry) = (0,0);
+
+    # Parse postscript file for information
+    open (PS, "$gs_input");
+    $_ = <PS>;
+    if ( /^%!.*EPSF/ ) {
+	# we're in a EPSF file
+	$epsf = 1;
+    }
+    if ($GEOMETRY || $epsf) {
+	while (<PS>) {
+	    # Look for bounding box comment
+	    if ($epsf == 1 &&
+		/^%%BoundingBox:\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)\s+(-?\d+)/) {
+		$bbx = 0 - $1;    $bby = 0 - $2;
+		$bbw = $3 + $bbx; $bbh = $4 + $bby;
+		if(($bbw > 0) && ($bbh > 0)) { # we have a valid bounding box
+		    print "$prompt EPSF dimensions are ${bbw}x$bbh\n" if $DEBUG;
+		    # this overrides the -geometry switch
+		    if ( $DENSITY ) { # scale the output
+			local($scale) = $DENSITY/72;
+			$bbw = int($bbw * $scale + 0.99);
+			$bbh = int($bbh * $scale + 0.99);
+		    }
+		    $size = "-g${bbw}x${bbh}";
+		    $have_geometry = 1;
+		    last;
+		} else {  # i.e. when dvips gives an empty box
+		    $epsf = 2; # don't look for EPSF stuff any further
+		}
+	    }
+	    # Look for page size information
+	    elsif ($GEOMETRY && /TeXDict\s+begin\s+(\d+)\s+(\d+)\s+/) {
+		$PAGE_WIDTH  = int($1 / 65536*72/72.27 +.5);
+		$PAGE_HEIGHT = int($2 / 65536*72/72.27 +.5);
+		print "$prompt Page dimensions are ${PAGE_WIDTH}x$PAGE_HEIGHT\n" if $DEBUG;
+		# we don't have to look further for EPSF stuff at this point
+		last;
+	    } elsif (!$GEOMETRY && (/^%%EndComments/ || --$max_lines == 0)) {
+		last;
+	    }
+	}
+    }
+    close PS;
+    if ($GEOMETRY && !$have_geometry) { # RRM: overrides  $PAPERSIZE
+	$have_geometry = 1;
+	$bbx = $PAGE_HMARGIN;
+	$bby = $PAGE_HEIGHT - $PAGE_VMARGIN;
+	$GEOMETRY =~ /\s*([0-9.]+)x([0-9.]+)/;
+	$bbw = $1 + 10;  # allow for the side-bars
+	$bbh = $2;
+	$bby = int($bbh - $bby + 8); # allow small margin for error
+	$bbx = int(-$bbx + 5);       # allow small margin for error
+	if ( $DENSITY ) {
+	    local($scale) = $DENSITY/72;
+	    $bbw = int($scale * $bbw + .99);
+	    $bbh = int($scale * $bbh + .99);
+	}
+	$bbw += 10;  # add a 5pt margin for safety
+	$bbh += 40;  # add a 20pt margin for safety
+	$GEOMETRY = $bbw . "x" . $bbh;
+	# use this if -g option works properly...
+	$size = "-g$GEOMETRY ";
+	# RRM: use these next lines if -g option is broken
+	# $size = "-sPAPERSIZE=". &choose_paper($GEOMETRY);
+	# $have_geometry = 0;
+    }
+    if ($have_geometry) {
+	# Remove any Postscript commands concerning Papersize if -g switch is used
+	# thanks to  Axel Ramge for identifying the problem and for this code
+	$* = 1;    # Multiline matching ON
+	$saveRS = $/; undef $/;
+	open(PS,"<$gs_input");
+	$_ = <PS>;
+	local($change) = s/\n%%BeginPaperSize.*%%EndPaperSize.*?\n//s;
+	close(PS);
+	if ($change) {
+	    open(PS,">$gs_input");
+	    do {
+		close(PS); $* = 0; $/ = $saveRS;
+		die "\n\n***file $gs_input  contains %%Papersize comments"
+		    . "\nany contents of these must be removed else GS will fail.\n";
+	    } unless print PS;
+	    close(PS);
+	}
+	$/ = $saveRS; $* = 0;    # Multiline matching OFF
+    }
+    if ($WHITE) {
+	$* = 1;    # Multiline matching ON
+	$saveRS = $/; undef $/;
+	open(PS,"<$gs_input");
+	$_ = <PS>;
+	# change the color-setting command just after the  bop  operator
+	local($bop_str) = " TeXcolorgray clippath fill grestore";
+	local($change)=s/(\n\d+ \d+ bop gsave) \d*\.\d+$bop_str/$1 1$bop_str/s;
+
+	close(PS);
+	if ($change) {
+	    open(PS,">$gs_input");
+	    do {
+		close(PS); $* = 0; $/ = $saveRS;
+		die "\n\n*** image $outfile may have gray background, change to white failed\n"
+	    } unless print PS;
+	    close(PS);
+	}
+	$/ = $saveRS; $* = 0;    # Multiline matching OFF
+    }
+
+    local($basename) = $BASE . ($MULTIPLEPAGES ? ".%d" : '');
+    local($quiet) = "-q -dNOPAUSE -dNO_PAUSE ";
+    local($outfile) = "-sOutputFile=$basename.ppm";
+    local($no_out) = '> /dev/null';
+    if ($^O =~ /Win|DOS/i) { $no_out = '> nul:' }
+
+    if ( $DEBUG ) {
+	print "Running $GS $quiet -sDEVICE=$GS_DEVICE $size $density $aalias $outfile $no_out\n";
+	print "GS>$GSROTATE " if ($GSROTATE);
+	print "GS>$bbx $bby translate\n" if ($have_geometry);
+	print "GS>($gs_input) run\n";
+	print "GS>showpage\n" if ($epsf);
+	print "GS>quit\n";
+    }
+    open (GS, "|$GS $quiet -sDEVICE=$GS_DEVICE $size $density $aalias $outfile $no_out");
+    print GS "$GSROTATE " if ($GSROTATE);
+    print GS "$bbx $bby translate " if ($have_geometry);
+    print GS "($gs_input) run ";
+    print GS "showpage " if ($epsf);
+    print GS "quit\n";
+    close GS;
+}
+
+sub choose_paper {
+    local($_) = @_;
+    local($size, $height, $width) = ('','','');
+    s/^(\d*)\s*x\s*(\d*)$/$width=$1;$height=$2/eo;
+    if ($width > $height) {
+	$GSROTATE= "($GSLANDSCAPE) run ";
+	($width, $height) = ($height, $width);
+    } else { $GSROTATE=''; }
+    if (($width < 74)&&($height < 105)) { $size = "a10" }
+    elsif (($width < 105)&&($height < 148)) { $size = "a9" }
+    elsif (($width < 148)&&($height < 210)) { $size = "a8" }
+    elsif (($width < 210)&&($height < 297)) { $size = "a7" }
+    elsif (($width < 297)&&($height < 421)) { $size = "a6" }
+    elsif (($width < 421)&&($height < 595)) { $size = "a5" }
+    elsif (($width < 501)&&($height < 709)) { $size = "b5" }
+    elsif (($width < 595)&&($height < 842)) { $size = "a4" }
+    elsif (($width < 709)&&($height < 1002)) { $size = "b4" }
+    elsif (($width < 842)&&($height < 1190)) { $size = "a3" }
+    elsif (($width < 1002)&&($height < 1418)) { $size = "b3" }
+    elsif (($width < 1190)&&($height < 1684)) { $size = "a2" }
+    elsif (($width < 1418)&&($height < 2004)) { $size = "b2" }
+    elsif (($width < 1684)&&($height < 2380)) { $size = "a1" }
+    elsif (($width < 2004)&&($height < 2836)) { $size = "b1" }
+    elsif (($width < 2380)&&($height < 3368)) { $size = "a0" }
+    else { $size = "b0" }
+    $size;
+}
+
+sub cleanup {
+    unlink <$BASE[0-9.]*ppm> unless $DEBUG;
+    unlink <$BASE[0-9.]*ppm.tmp> unless $DEBUG;
+    chdir("$DESTDIR") if ($TMP);
+    unlink "$FILE" if ($DISCARD && (!$DEBUG));
+}
+
+sub usage {
+    print <<"EOF";
+This is pstoimg V98.2. Accompanies LaTeX2HTML V98.2.
+
+Usage: pstoimg [-help] [-debug] [-gif|-png] [-out <output file>] [-multipage]
+               [-color <color depth 1, 8 or 24>] [-depth <color depth 1, 8 or 24>]
+	      [-density <pixel density>] [-geometry <width>x<height>]
+               [-discard] [-transparent] [-interlaced] [-antialias]
+               [-rightjustify <width>] [-topjustify <align>] [-center <width>]
+               [-flip <Flip_code>] [-crop <code>] [-shoreup <pixel>]
+               <file.(e)ps>
+       The options may be abbreviated to the shortest unique prefix.
+EOF
+    print "       This version can create the following image format(s): ";
+    print "GIF " if( $PPMTOGIF );
+    print "PNG " if( $PNMTOPNG );
+    print "\n";
+    }
+

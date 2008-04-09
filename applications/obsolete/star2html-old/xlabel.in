@@ -1,0 +1,161 @@
+#! @PERL@
+#  Edit the line above if this isn't the location of perl on your system.
+#+
+#  Name:
+#     xlabel
+
+#  Purpose:
+#     Adds \xlabel commands to a LaTeX document.
+
+#  Type of Module:
+#     Perl script
+
+#  Description:
+#     xlabel will modify a Latex
+#     document by adding \xlabel commands to each section and subsection 
+#     heading. This makes the heading usable as a target for a \xref 
+#     cross-reference from another hypertext document.
+#
+#     The label names generated are produced from the LaTeX section heading
+#     by removing common font changing commands or emphasis such as \tt,
+#     \texttt, \ttfamily, \em and \emph, then folding to lower case, turning
+#     spaces into underscores, and eliminating non-alphanumeric characters. 
+#     If the generated name matches an existing xlabel name for the same 
+#     section, it is not repeated.
+#
+#     You may need to edit the resulting file a little for specific cases.
+#     The inserted names are displayed to assist in spotting peculiarities,
+#     and warnings are issued if there are duplicated names or if the
+#     generated name does not match an existing name for the same section.
+#     See also Notes below.
+
+#  Invocation:
+#     xlabel document
+
+#  Parameters:
+#      document
+#         The name of the document to be processed.
+
+#  Examples:
+
+#  Notes:
+#     Possible problems with the automatically generated \xlabels are:
+#     1. Duplicated names. Note that name clashes with automatically 
+#        generated \xlabels, such as those produced by the SST macros,
+#        will not be reported by xlabel.
+#     2. Null or gibberish names because of LaTeX commands included in 
+#        the heading, or removal of non-alphanumeric characters.
+#     3. Possible need for xlabels on subsubsection etc. in addition to
+#        those on sections and subsections.
+
+#  Authors:
+#     RFWS: R.F.Warren-Smith (Starlink - RAL)
+#     AJC: A.J.Chipperfield (Starlink - RAL)
+#     PDRAPER: Peter W. Draper (Starlink - Durham University)
+#     {enter_new_authors_here}
+
+#  History:
+#     24-FEB-1995 (RFWS):
+#        Original version.
+#     17-JUN-1997 (AJC):
+#        Switch from pipeline to file in/out.
+#        Add report and warnings etc.
+#        Added \xlabels in \sections
+#        Remove font changes and emphasis 2.09 and 2e-style.
+#     31-OCT-2000
+#        Changed default Perl to Starlink installed version.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Announce
+      $announce = "INSLABELS V1.0";
+      $underline = $announce;
+      $underline =~ s/./=/g;
+      print( "\n$announce\n$underline\n" );
+
+#  Process the command line parameters.
+      if( ! @ARGV ){
+         print( "Usage: inslabels latex_file \n");
+         exit(0);
+      }
+
+      while (@ARGV) {
+         $next_element = shift;
+
+         if ( $next_element =~ /^-.*/ ){
+            print( "Usage: fcwrap latex_file \n");
+            exit(0);
+
+         } else {
+            $ffile = $next_element;
+            if ( $ffile !~ /.tex$/ ) { $ffile .= ".tex" }
+#  We now have the name of a file to process
+
+#  Open the input file.
+            open( IN, $ffile )|| die " Can't open input file \"$ffile\" ";
+            print " Reading $ffile...\n";
+
+#  Open the output file.
+            open( OUT, ">new".$ffile )
+               || die "Can't open output file \"$ffile.new\"";
+            print " Producing new$ffile\n";
+            print "\nInserted xlabels\n----------------\n";
+
+#  Read each line of the input file.
+            while ( <IN> ) {
+#     Find lines starting \section or \subsection ignoring leading spaces
+               if ( /^(\s*\\)(|sub)section\s*{(.*)/ ) {
+                  $t = $3;
+#        Find any existing xlabel
+                  ($currlabel) = /\\xlabel{([^}]*)}/;
+                  chop($t);
+#        Remove any label or xlabel
+                  $t =~ s/\\(|x)label\{[^}]*\}//g;
+#        Remove common font changes or emphasis
+                  $t =~ s/\\(text|)(tt|emph|em|bf|it)(shape|series|family|)//;
+#        Save the basic heading
+                  $t1 = $t;
+#        Convert to lower case
+                  $t =~ y/A-Z/a-z/;
+#        Replace space with _
+                  $t =~ s/ /_/g;
+#        Remove all non-(alphanumeric or _)
+                  $t =~ s/\W//g;
+#        Collapse multiple _
+                  $t =~ s/_+/_/g;
+                    if ( $t ne $currlabel ) {
+#           If generated xlabel doesn't match existing xlabel
+#           insert a new xlabel
+                      s/section\{/section\{\\xlabel\{$t\}/;
+                      print "$t\n";
+#              Check for blank label generated
+                      if ( !$t =~ /\w/ ) {
+                        print("WARNING: heading '$t1' reduced to no xlabel\n");
+                      }
+#              If there was an existing xlabel check it is the same
+                      if ( $currlabel ) {
+                        print(
+                         "WARNING: xlabel '$t' does not match existing xlabel ",
+                         "'$currlabel'\n");
+                      }
+                    } else {
+                      $t = $currlabel;
+                    }
+
+#              Check for repeated label
+                  if ( $labels{$t} ) {
+                    print("WARNING: duplicated xlabel '$t'\n");
+                  }
+#              Record this label
+                  $labels{$t} = 'true';
+               }
+               print ( OUT );
+           }
+      }
+}
+
+

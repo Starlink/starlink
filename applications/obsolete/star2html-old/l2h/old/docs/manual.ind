@@ -1,0 +1,925 @@
+
+ \addcontentsline{toc}{section}{\protect\numberline{}Index}
+ \begin{theindex} 
+ {\bfseries\hfil A\hfil}\nopagebreak
+
+  \item \emph{About this document...}, 62
+  \item accents, 3
+    \subitem foreign, ii
+  \item address
+    \subitem signature, 62
+    \subitem using a subroutine, 62
+  \item \env{alltt} environment, 25
+  \item \AmS-\LaTeX
+    \subitem \env{amsfonts} package, 25
+    \subitem \env{amsmath} package, 25
+    \subitem \env{amssymb} package, 25
+    \subitem \env{amstex} package, 25
+  \item \AmS-style environments
+    \subitem listed, 35
+    \subitem old, use discouraged, 35
+  \item anchor tag
+    \subitem \texttt{NAME} attribute, 35
+  \item anti-aliasing
+    \subitem blurred printing, 63
+    \subitem comparison, 17
+    \subitem in figures, 63
+    \subitem in math and text, 63
+    \subitem override defaults, 20
+    \subitem turned off, 63
+  \item arbitrary environments, 2, 23
+  \item \textsl{Arena}
+    \subitem math mark-up, 14
+  \item ascii-mode, 62
+  \item auxiliary file, 57
+    \subitem which to read, 61
+  \item Axel Ramge, v, vii
+
+  \indexspace
+{\bfseries\hfil B\hfil}\nopagebreak
+
+  \item \env{babel} package, 25
+  \item backdrop
+    \subitem tiled with an image, 3
+  \item \texttt{\%{}begin\char123latexonly\char125}, 41
+  \item bibliography, 3, 44--45, 57
+    \subitem bibliographic database, 44
+    \subitem example using URLs, 44
+    \subitem Harvard style, 44
+    \subitem \env{natbib} package, 44
+    \subitem \texttt{\char64 string} commands, 44
+    \subitem \texttt{\char64string} commands, 44
+    \subitem using \texttt{.bib} file, 44
+  \item \Lc{bodytext}, 48
+    \subitem no checking for valid attributes, 48
+  \item browser
+    \subitem \textsl{NCSA Mosaic}, 8
+    \subitem \textsl{Netscape Navigator}, 8
+    \subitem \textsl{Arena}, 14
+    \subitem character-based, 3, 9, 62
+    \subitem \textsl{lynx}, 9
+    \subitem \textsl{NCSA Mosaic}, 56
+    \subitem \textsl{Netscape Navigator}, 56
+    \subitem supports images, 8
+  \item browser\label{IIIbrowser}, 56
+    \subitem supports images, 3
+  \item bugs, 75
+    \subitem bug reports, 12
+
+  \indexspace
+{\bfseries\hfil C\hfil}\nopagebreak
+
+  \item CERN, ii
+    \subitem \textsl{Arena}, 14
+    \subitem image-map server, 10, 50
+    \subitem Michel Goossens, iii
+    \subitem World-Wide Web Project, ii, iii
+  \item change-bars, iii, 27
+    \subitem different versions, 27
+  \item \env{changebar} package, 25
+  \item character
+    \subitem tilde in URLs, 36
+  \item character set, 68
+    \subitem ISO--10646 (Unicode), 3, 13
+    \subitem ISO--8879 (ISO--Latin--1), 3, 13
+    \subitem \texttt{\char34iso\_8859\_1\char34}, 68
+  \item character set\label{IIIcharset}, 3
+  \item chemical
+    \subitem markup, CML, vii
+  \item child-links table, 59
+    \subitem at bottom of page, 59
+    \subitem at top of page, 59
+    \subitem \texttt{tableofchildlinks}, 59
+  \item citations
+    \subitem \env{harvard} package, 25
+    \subitem Harvard style, 44
+      \subsubitem handled by \env{natbib}, 44
+    \subitem \env{natbib} package, 26, 44
+    \subitem \env{nharvard} package, 26
+    \subitem within external bibliographies, 46
+  \item CML
+    \subitem chemical markup, vii
+  \item color
+    \subitem \env{colordvi} package, 25
+    \subitem coloured background, 3
+    \subitem coloured text, 3
+  \item \env{color} package, 25
+  \item columns
+    \subitem \env{multicol} package, 26
+  \item \env{comment} environment, 37
+  \item Common \LaTeX{} Commands
+    \subitem \LaTeX{} blue book, 3
+  \item Companion, \see{\emph{The \LaTeX{} Companion}}{83}
+  \item components
+    \subitem specify depth, 2, 59
+  \item Computer Based Learning Unit
+    \subitem Ana Maria Paiva, ii
+    \subitem Andrew Cole, ii
+    \subitem CBLU, ii
+    \subitem Jamil Sawar, ii
+    \subitem Roderick Williams, ii
+  \item Computer Science Education Project
+    \subitem CSEP, ii
+  \item Computer~Based~Learning~Unit
+    \subitem University of Leeds, i, ii
+  \item Computer~Science~Education~Project
+    \subitem CSEP, 21
+  \item conditional text, 3, 42
+    \subitem avoid using counters, 41
+    \subitem example, 41
+    \subitem \texttt{HTML} or \LaTeX{} version, 32
+    \subitem scoped variant, 40
+    \subitem shorthand notation, 41
+    \subitem without scope, 41
+  \item contents
+    \subitem from other segments, 52
+  \item copyright
+    \subitem Leeds, viii
+    \subitem Macquarie, viii
+  \item counter
+    \subitem automatic, 3
+    \subitem dependency, 3
+  \item cross-references, \see{\htmlref{references}{IIIrefs}}{42}, 75
+  \item CTAN, 6
+  \item current version of \latextohtml, 65
+  \item customised layout, ix, 56
+
+  \indexspace
+{\bfseries\hfil D\hfil}\nopagebreak
+
+  \item DANTE, vi
+    \subitem Praesidium, vi
+  \item Darmstadt
+    \subitem Fachbereich Informatik, vi
+  \item debugging, 65, 76
+    \subitem \Perl{} debugger, 65
+  \item depth
+    \subitem child nodes revealed, 59
+  \item diagnostic information, 65
+  \item directory delimiter, 66
+  \item discussion group, 12
+  \item document
+    \subitem illustrative examples, 3
+    \subitem segments, 51
+    \subitem title, 58
+  \item document segmentation, 57
+  \item documentation
+    \subitem auxiliaries, 12
+    \subitem Changes section, 12
+    \subitem \texttt{.dvi} version, 11
+    \subitem filename data, 12
+    \subitem graphics, 12
+    \subitem images, 12
+    \subitem index and glossary, 11
+    \subitem input files, 12
+    \subitem requirements, 12
+    \subitem style-files, 12
+    \subitem test of installation, 11
+    \subitem using \texttt{makeindex}, 11
+    \subitem without \texttt{makeindex}, 11
+  \item draft mode, 62
+  \item \texttt{dvips} version, 8
+
+  \indexspace
+{\bfseries\hfil E\hfil}\nopagebreak
+
+  \item efficiency, 75
+  \item electronic forms, 36
+  \item \texttt{\%{}end\char123latexonly\char125}, 41
+  \item \env{enumerate} package, 25
+  \item environment
+    \subitem \env{equation}, 21
+    \subitem \env{alltt}, 25
+    \subitem arbitrary, 23
+    \subitem \env{comment}, 37
+    \subitem \env{eqnarray}, 21
+    \subitem \env{figure}, 21
+    \subitem \env{floatingfigure}, 27
+    \subitem \env{htmllist}, 26
+    \subitem \env{htmlonly}, 40
+    \subitem \env{imagesonly}, 41
+    \subitem \env{latexonly}, 40
+    \subitem \env{makeimage}, 42
+    \subitem \env{minipage}, 24
+    \subitem \env{rawhtml}, 36
+    \subitem \env{table}, 23
+    \subitem {\upshape  \sffamily  table}, 24
+    \subitem theorem-like, 3
+    \subitem \env{wrapfigure}, 27
+  \item environments, ix, 13
+    \subitem old \AmS-style, use discouraged, 35
+  \item \env{epsbox} package, 25
+  \item \env{epsfig} package, 25
+  \item \env{eqnarray} environment, 18, 21
+    \subitem example, 16
+  \item \env{equation} environment, 18
+  \item equations
+    \subitem alignment, 2, 20
+    \subitem array, 16, 21
+    \subitem inlined, 2
+    \subitem numbered, 2, 16
+    \subitem right-justified, 2, 16
+  \item error checking
+    \subitem missing braces, 57
+    \subitem unmatched brace, 57
+    \subitem using \LaTeX, 56
+  \item extended markup
+    \subitem XML, vii
+  \item extensions, 74
+    \subitem definitions, 75
+    \subitem disabled, 60
+    \subitem examples, 25
+    \subitem hypertext, 32
+    \subitem in initialisation file, 71
+    \subitem in style-files, 3
+    \subitem languages, 14
+    \subitem new environments, 3
+    \subitem new theorems, 3
+    \subitem require understanding of \Perl{}, 26
+    \subitem \TeX definitions, 60
+  \item extensions\label{IIIexts}
+    \subitem new commands, 3
+  \item external references, 45--46
+  \item \Lc{externalcite}, 46
+  \item \Lc{externallabels}, 45
+  \item \Lc{externalref}, 45, 46
+  \item extra scaling of images, 19
+
+  \indexspace
+{\bfseries\hfil F\hfil}\nopagebreak
+
+  \item Fabrice Popineau, v, 6
+  \item Fachbereich Informatik, Darmstadt, vi
+  \item features
+    \subitem listing, 2
+  \item \env{figure} environment, 21
+  \item figures, 2, 21
+    \subitem arbitrarily scaled, 2, 19
+    \subitem captions, 22
+    \subitem fine control, 19
+    \subitem from other segments, 52
+    \subitem oriented, 2, 20
+    \subitem \env{wrapfig} package, 26
+  \item file suffix
+    \subitem \texttt{.tex}or\texttt{.doc}, 56
+    \subitem optional, 56
+  \item filenames
+    \subitem \texttt{.htm} extension, 58
+    \subitem auto-prefix, 59
+    \subitem automatic link to directory name, 59
+    \subitem \texttt{custom\_title\_hook}, 58
+    \subitem customised, 58
+    \subitem \fn{index.html}, 59
+    \subitem long names, 58
+    \subitem prefix, 58
+  \item fixes, 76
+  \item \env{floatfig} package, 25
+  \item \env{floatingfigure} environment, 27
+  \item \env{floatflt} package, 25
+  \item font size
+    \subitem for image generation, 61
+    \subitem scalable, 61
+  \item font-size
+    \subitem in environments, 61
+    \subitem magnification, 61
+  \item fonts
+    \subitem non-standard encodings, vii
+  \item footnotes, 3
+    \subitem marker style, 62
+    \subitem on same page, 62
+    \subitem on separate page, 62
+  \item \env{frames} package, 25
+  \item french
+    \subitem \env{francais} package, 25
+  \item \env{french} package, 25
+
+  \indexspace
+{\bfseries\hfil G\hfil}\nopagebreak
+
+  \item german
+    \subitem \env{germanb} package, 25
+  \item \env{german} package, 25
+  \item getting started, 56
+  \item \textsl{Ghostscript} version, 8
+  \item GIF, \see{\htmlref{images}{IIIimages}}{3}
+    \subitem image conversion, 8
+  \item Glossary
+    \subitem \texttt{HTML} version, 29
+    \subitem integrated with Index, 29
+    \subitem printed version, 29
+  \item graphics
+    \subitem \env{graphicx} package, 25
+    \subitem \protect\Xy-pic package, 26
+  \item \env{graphics} package, 25
+  \item Graphics Companion, 
+		\see{\hfil\emph{\hfil The \LaTeX{} Graphics Companion}}{83}
+
+  \indexspace
+{\bfseries\hfil H\hfil}\nopagebreak
+
+  \item \env{heqn} package, 18, 26
+  \item \texttt{heqn.sty} style-file, 18
+  \item \texttt{HTML}
+    \subitem an evolving standard, 13
+    \subitem arbitrary markup, 36
+    \subitem basic version, 2.0 , 13
+    \subitem current version, 3.2 , 13
+    \subitem \texttt{HTML3} Table Model , 14
+    \subitem image-maps, 13
+    \subitem interactive forms, 3, 13
+    \subitem new \texttt{HTML} tags, 36
+    \subitem non-standard extensions, 60
+    \subitem raw \texttt{HTML} commands, 3, 36
+    \subitem \texttt{SGML}-like markup, 36
+    \subitem Version 2.0, 13
+    \subitem Version 2.1, 3
+    \subitem Version 2.1, now `i18n' extension, 13
+    \subitem Version 2.2, now `table' extension, 14
+    \subitem Version 3.0, 3, 14, 20
+    \subitem Version 3.0, \texttt{HTML-Math} model, 14
+    \subitem Version 3.1, now `math' extension, 14
+    \subitem Version 3.2, 49
+  \item \Lc{html}, 41
+  \item \env{html} package, 18
+  \item \texttt{HTML} version, 60
+  \item \texttt{html.sty}
+    \subitem new commands defined, 33
+    \subitem new environments defined, 32
+  \item \texttt{html.sty} package
+    \subitem how to load it, 32
+  \item \texttt{html.sty} style-file, 12, 19, 32, 43, 47
+    \subitem location, 10
+    \subitem needed for special features, 8
+    \subitem symbolic link, 10
+  \item \Lc{htmladdimg}, 35
+  \item \Lc{htmladdnormallink}, 35
+  \item \Lc{htmladdnormallinkfoot}, 36
+  \item \Lc{htmladdtonavigation}, 73
+  \item \Lc{htmlbase}, 49
+  \item \Lc{htmlbody}, 49
+  \item \Lc{htmlcite}, 45
+    \subitem example, 45
+  \item \Lc{htmlhead}, 52
+  \item \Lc{htmlimage}, 19
+    \subitem overrides configuration, 21
+  \item \Lc{htmlinfo}, 48
+  \item \Lc{htmlitemmark}, 26
+  \item \env{htmllist}
+    \subitem example, 26
+    \subitem item-marks, 26
+    \subitem prints as \env{description}, 26
+  \item \env{htmllist} environment, 26
+  \item \Lc{htmlnohead}, 52
+  \item \Lc{htmlonly}, 40
+  \item \env{htmlonly} environment, 40
+  \item \Lc{htmlref}, 43
+    \subitem easy to make links, 43
+  \item htmlrule
+    \subitem attributes to the \HTMLtag{HR} tag, 47
+    \subitem \Lc{htmlrule*}, 47
+    \subitem variants, 47
+  \item \Lc{htmlrule}, 47
+  \item \Lc{HTMLsetenv}
+    \subitem alters a \Perl{} variable, 49
+  \item \Lc{HTMLset}
+    \subitem alters a \Perl{} variable, 49
+  \item hyper-links, 35
+  \item \Lc{hypercite}, 44
+    \subitem example, 45
+  \item \Lc{hyperref}, 42
+    \subitem \Lc{pageref} example, 43
+  \item hypertext
+    \subitem active link, 35
+    \subitem arbitrary references, 35
+    \subitem extensions, 32
+    \subitem URL as footnote, 36
+  \item hypertext links, 3
+    \subitem commands to create, 33
+    \subitem Internet services, 3
+    \subitem multi-media resources, 3
+    \subitem news/sound/video, 3
+
+  \indexspace
+{\bfseries\hfil I\hfil}\nopagebreak
+
+  \item \texttt  {i18n}, 60
+  \item icons, vii
+    \subitem copied to local directory, 61
+  \item image
+    \subitem backdrop, 3
+  \item image conversion
+    \subitem \PS\ to GIF, 8
+  \item image files
+    \subitem not recycled, 63
+    \subitem not reused, 63
+    \subitem recycled, 63
+    \subitem reuse option, 63
+    \subitem shared by default, 63
+  \item image generation
+    \subitem using \Lc{htmlimage}, 17
+  \item image-map
+    \subitem CERN server, 50
+    \subitem example, 50
+    \subitem map-file, 49
+    \subitem NCSA server, 50
+    \subitem user-map file, 50
+  \item image-reuse
+    \subitem interactive, 63
+  \item images
+    \subitem alignment, 20
+    \subitem anti-alias, 20
+    \subitem anti-aliasing, 63
+    \subitem attributes for the \Meta{IMG} tag, 36
+    \subitem client-side image-map, 20
+    \subitem disabled, 63
+    \subitem discard \PS\ files, 63
+    \subitem display scale-factor, 19
+    \subitem embedded image, 21
+    \subitem equations, 8
+    \subitem external, 19
+    \subitem extra scaling, 19, 20
+    \subitem figure scale-factor, 19
+    \subitem figures, 8, 19
+    \subitem flip option, 20
+    \subitem generated off-line, 63
+    \subitem hypertext link, 19
+    \subitem image-map, 19
+    \subitem image-maps, 21, 49--51
+    \subitem improved print quality, 19
+    \subitem inlined by default, 19
+    \subitem links to \PS, 63
+    \subitem math scale-factor, 19
+    \subitem no anti-aliasing, 63
+    \subitem options, 19
+    \subitem order-insensitive, 21
+    \subitem order-sensitive, 21
+    \subitem recycling, 21
+    \subitem scale, 19
+    \subitem scale-factor, default 1.6, 19
+    \subitem server-side image-map, 19
+    \subitem sharing, 21
+    \subitem small images, 19, 21
+    \subitem specified width or height, 20
+    \subitem strange accents, 68
+    \subitem tables, 3, 8
+    \subitem thumbnail, 19, 21
+    \subitem transparent, 8, 20
+    \subitem via hypertext links, 62
+  \item images\label {IIIimages}, 18
+  \item images\label{IIIimages}
+    \subitem equations, 3
+  \item \env{imagesonly} environment, 41
+  \item index, 3, 27--29, 75
+    \subitem alphabetization, 28
+    \subitem blank lines, 28
+    \subitem codified links, 29, 62
+      \subsubitem for easier browsing, 29
+      \subsubitem top-most node, 29
+    \subitem cross-link, 27, 28
+    \subitem cross-link incorrect, 28
+    \subitem cumbersome, 28, 52
+    \subitem data from other segments, 52
+    \subitem \texttt{\char124emph}, 28
+    \subitem hierarchical, 27
+    \subitem integrated with Glossary, 29
+    \subitem labelled entries, 28
+    \subitem page-ranges, 27
+    \subitem quoted delimiters, 28
+    \subitem section-names, 27, 28
+    \subitem \texttt{\char124see}, 27
+    \subitem short prefixes preferred, 52
+    \subitem \texttt{\char124}\Meta{style}, 28
+    \subitem styled entries, 27
+    \subitem with \Meta{prefix}, 29
+  \item initialisation
+    \subitem \texttt{-init\_file}, 61
+  \item initialisation file
+    \subitem specified, 61
+  \item initialization file
+    \subitem incompatible with early versions, 11
+    \subitem per directory, 11
+    \subitem per user, 11
+  \item install, ix, 6
+  \item installation, 9
+    \subitem change defaults, 9
+    \subitem check path-names, 9
+    \subitem create manual, 11
+    \subitem environment variable, 10
+    \subitem external utilities, 9
+    \subitem filename-prefix, 10
+    \subitem fonts-path variable, 10
+    \subitem graphics utilities, 9
+    \subitem \texttt{icons/ } subdirectory, 11
+    \subitem initialization files, 11
+    \subitem input-path variable, 10
+    \subitem \textsl{Linux} systems, 10
+    \subitem local icons, 11
+    \subitem \texttt{makemap} script, 10
+    \subitem manually, 9
+    \subitem without \Perl{} shell scripts, 9
+  \item installation variables
+    \subitem checked by \fn{install-test}, 67
+    \subitem inserted by \fn{install-test}, 66
+  \item \Lc{internal}, 51
+  \item internals
+    \subitem labels from other segments, 52
+  \item ISO--10646, \see{\htmlref{character set}{IIIcharset}}{13}
+    \subitem bidirectional languages, 13
+    \subitem Unicode, 13
+  \item ISO--8859--1
+    \subitem no longer used, 13
+  \item ISO--8879, \see{\htmlref{character set}{IIIcharset}}{13}
+  \item ISO--Latin--1, \see{\htmlref{character set}{IIIcharset}}{13}
+
+  \indexspace
+{\bfseries\hfil J\hfil}\nopagebreak
+
+  \item Jens Lippman, iii, iv, vi, 6
+  \item \env{justify} package, 26
+
+  \indexspace
+{\bfseries\hfil K\hfil}\nopagebreak
+
+  \item Kristoffer Rose, vi
+
+  \indexspace
+{\bfseries\hfil L\hfil}\nopagebreak
+
+  \item labels
+    \subitem external, 46
+    \subitem internal, 46
+    \subitem symbolic, 45
+  \item languages, 14
+    \subitem english, 14
+    \subitem french, 14
+    \subitem german, 14
+  \item LaTeX
+    \subitem \LaTeX  {3}, vi
+  \item \Lc{latex}, 41
+  \item \LaTeX{} blue book, 3, 44
+    \subitem Leslie Lamport, 83
+  \item \LaTeX{} commands, 3
+    \subitem embedded, 3
+    \subitem not syntactically legal, 3
+  \item LaTeX Companion, \see{\emph{The \LaTeX{} Companion}}{83}
+  \item LaTeX Graphics Companion, 
+		\see{\hfil\emph{\hfil The \LaTeX{} Graphics Companion}}{83}
+  \item \latextohtml{}
+    \subitem command for its name, 49
+  \item latex2html-NG, v
+  \item \Lc{latexhtml}, 41
+  \item \Lc{latexonly}, 37, 40
+  \item \env{latexonly} environment, 40
+  \item \env{latexsym} package, 26
+  \item \Lc{latextohtml}
+    \subitem gives \latextohtml{}, 49
+  \item levels
+    \subitem sectioning, 60
+  \item link validation
+    \subitem done by hand, 46
+    \subitem symbolic labels, 47
+  \item LiPS Design Team, vi
+  \item list of figures, 3, 52
+  \item list of tables, 3, 52
+  \item Livermore, California , 11
+  \item looping endlessly, 76
+
+  \indexspace
+{\bfseries\hfil M\hfil}\nopagebreak
+
+  \item mailing list
+    \subitem Argonne National Labs, ii, 12
+    \subitem subscribe, 12
+    \subitem unsubscribe, 12
+  \item \env{makeidx} package, 26
+  \item \env{makeimage} environment, 42
+    \subitem empty sub-environment, 42
+    \subitem inside a \env{figure}, 42
+  \item \texttt{makemap}, 50
+  \item manual
+    \subitem short on-line, 56
+  \item Marcus Hennecke, iii, v, vii
+  \item Marek Rouchal, v, vi
+  \item Mark Noworolski, iii
+  \item Martin Wilck, iii, 44, 49
+  \item \texttt  {math}, 60, 61
+  \item mathematics
+    \subitem markup, MathML, vii
+    \subitem MathML, 14
+  \item MathML
+    \subitem mathematics markup, vii
+  \item \Lc{mbox} command with math
+    \subitem generates an image, 18
+  \item Michel Goossens, i, iii, vi, vii
+  \item \env{minipage} environment, 24
+  \item \textsl{Mosaic}, \see{\htmlref{browser}{IIIbrowser}}{8}
+
+  \indexspace
+{\bfseries\hfil N\hfil}\nopagebreak
+
+  \item names of important packages, 49
+  \item navigation panel, 73--74
+    \subitem according to number of words, 64
+    \subitem at bottom of page, 64
+    \subitem at top of page, 64
+    \subitem buttons, 73
+    \subitem customisable, 2, 73
+    \subitem customised buttons, 73
+    \subitem disabled, 64
+    \subitem example, 74
+    \subitem iconic links, 73
+    \subitem link to index, 64
+    \subitem link to table-of-contents, 64
+    \subitem next logical page, 64
+    \subitem number of words, 74
+    \subitem optional, 2
+    \subitem order of buttons, 73
+    \subitem \Perl{} subroutines, 73
+    \subitem previous logical page, 64
+    \subitem section titles, 73
+    \subitem textual links, 73
+  \item NCSA
+    \subitem image-map server, 10, 50
+  \item \textsl{NCSA Mosaic}, \see{\htmlref{browser}{IIIbrowser}}{8}
+  \item \textsl{Netscape Navigator}, 
+		\see{\htmlref{browser}{IIIbrowser}}{8}
+    \subitem \texttt{HTML3} Tables, 14
+  \item new commands
+    \subitem arguments remain, 71, 72
+    \subitem command ignored, 72
+    \subitem ignore arguments, 71
+    \subitem order-sensitive, 72
+      \subsubitem processed in \LaTeX, 72
+    \subitem processed in \LaTeX, 72
+      \subsubitem order-sensitive, 72
+  \item Nikos Drakos, vi
+  \item \Lc{nonumber}, 18
+  \item numbered equations, 16
+
+  \indexspace
+{\bfseries\hfil O\hfil}\nopagebreak
+
+  \item options, 57--66
+    \subitem command-line options, 56
+    \subitem environment variables, 57
+    \subitem extensions, 60
+    \subitem file-names, 58
+    \subitem print option listing, 65
+    \subitem sectioning, 58
+    \subitem set in initialisation file, 57
+    \subitem special features, 60
+    \subitem titles, 58
+  \item options\label{IIIoptions}, 57
+  \item order-sensitive
+    \subitem setting parameters, 72
+    \subitem wrap-deferred, 73
+  \item output
+    \subitem default directory, 58
+    \subitem in current directory, 58
+    \subitem redirect to directory, 58
+  \item overview, ix, 1
+
+  \indexspace
+{\bfseries\hfil P\hfil}\nopagebreak
+
+  \item package
+    \subitem \env{amsfonts}, 25
+    \subitem \env{amsmath}, 25
+    \subitem \env{amssymb}, 25
+    \subitem \env{amstex}, 25
+    \subitem \env{babel}, 25
+    \subitem \env{changebar}, 25
+    \subitem \env{color}, 25
+    \subitem \env{colordvi}, 25
+    \subitem \env{enumerate}, 25
+    \subitem \env{epsbox}, 25
+    \subitem \env{epsfig}, 25
+    \subitem \env{floatfig}, 25
+    \subitem \env{floatflt}, 25
+    \subitem \env{frames}, 25
+    \subitem \env{francais}, 25
+    \subitem \env{french}, 25
+    \subitem \env{german}, 25
+    \subitem \env{germanb}, 25
+    \subitem \env{graphics}, 25
+    \subitem \env{graphicx}, 25
+    \subitem \env{harvard}, 25
+    \subitem \env{heqn}, 18, 26
+    \subitem \env{html}, 18
+    \subitem \env{justify}, 26
+    \subitem \env{latexsym}, 26
+    \subitem \env{longtable}, 26
+    \subitem \env{makeidx}, 26
+    \subitem \env{multicol}, 26
+    \subitem \env{natbib}, 26
+    \subitem \env{nharvard}, 26
+    \subitem \env{supertabular}, 26
+    \subitem \env{texdefs}, 26
+    \subitem \env{verbatim}, 26
+    \subitem \env{verbatimfiles}, 26
+    \subitem \env{wrapfig}, 26
+    \subitem \env{xspace}, 26
+    \subitem \protect\Xy-pic, 26
+  \item packages, 25
+  \item \Lc{parbox} command
+    \subitem generates an image, 18
+  \item Patrick Daly, iii, 44
+  \item portability
+    \subitem Unix systems, v
+  \item printing, 57
+    \subitem hyperlink to typeset version, 57
+  \item problems, x, 75--83
+
+  \indexspace
+{\bfseries\hfil R\hfil}\nopagebreak
+
+  \item \Lc{rawhtml}, 37
+  \item \env{rawhtml} environment, 36
+  \item \textsf{rawhtml} environment
+    \subitem example, 36
+  \item references
+    \subitem between documents, 3
+    \subitem bibliographic, 44
+    \subitem collaboration required, 47
+    \subitem document segments, 3
+    \subitem highlighted text, 42
+    \subitem iconic, 42
+    \subitem numeric, 42
+    \subitem symbolic, 3, 45
+    \subitem symbolic\label{IIIsymref}, 42
+    \subitem to external documents, 45, 46
+    \subitem without indirection, 42
+  \item references\label {IIIrefs}, 42
+  \item references\label{IIIrefs}
+    \subitem hyper-links, 3
+  \item requirements, 7--9
+    \subitem DataBase Management system, 8
+    \subitem for full graphics, 8
+    \subitem for segmentation feature, 8
+    \subitem for special features, 8
+    \subitem for transparent images, 8
+    \subitem minimal, 8
+    \subitem special packages, 8
+    \subitem Unix shell, 8
+    \subitem without images, 8
+  \item Robert S. Thau, 6
+  \item Ross Moore, i, iii, v, vi, 44, 49
+
+  \indexspace
+{\bfseries\hfil S\hfil}\nopagebreak
+
+  \item scale-factors
+    \subitem for math images, 17
+  \item sectioning levels, 60
+  \item sections
+    \subitem from other segments, 52
+    \subitem in separate files, 59
+    \subitem numbers not shown, 59
+    \subitem show section numbers, 59
+  \item \Lc{segment}, 51
+  \item segmentation, 51--55
+    \subitem child segments, 51, 53, 54
+    \subitem child-links, 29
+    \subitem circular dependency, 54
+    \subitem codified index, 29
+    \subitem data about contents, 52
+    \subitem data about figures, 52
+    \subitem data about labels, 52
+    \subitem data about sections, 52
+    \subitem data about tables, 52
+    \subitem data for the index, 52
+    \subitem different sub-directories, 55
+    \subitem document segments, 51
+    \subitem example, 53
+    \subitem internal labels, 54
+    \subitem list of commands, 33
+    \subitem needs \LaTeXe, 8
+    \subitem parent segment, 51, 53
+    \subitem relative path, 55
+    \subitem requires book-keeping, 51
+    \subitem same sub-directory, 55
+    \subitem shared references, 51
+    \subitem starting a segment, 52
+    \subitem symbolic links, 51
+    \subitem time-stamps, 54
+    \subitem use of \fn{Makefile}, 54
+  \item \Lc{segmentcolor}, 52
+  \item \Lc{segmentpagecolor}, 52
+  \item Sidik Isani, iii
+  \item simple math
+    \subitem cancelled, 61
+  \item source code, 6
+    \subitem compressed, 6
+    \subitem developer's repository, 6
+    \subitem for Windows NT platform, 6
+    \subitem from CTAN, 6
+    \subitem home site, 6
+    \subitem listing, 6
+    \subitem patches, 6
+    \subitem using \textsl{Archie}, 6
+    \subitem using \textsl{FTP search}, 6
+  \item special, ix, 32
+    \subitem characters, \see{\htmlref{character set}{IIIcharset}}{3}
+    \subitem features, 8
+  \item special considerations, 13
+  \item special features, ix, 13
+  \item \Lc{startdocument}, 52
+  \item \Lc{strikeout}, 48
+  \item style sheets
+    \subitem CSS, vii
+    \subitem DSSSL, vii
+  \item style-files, 25
+  \item support, 12
+    \subitem for german language, 25
+    \subitem for specific style-files, 25
+    \subitem mailing list, 12
+  \item switches, \see{\htmlref{options}{IIIoptions}}{57}
+  \item symbolic labels, 42--47, 50
+    \subitem \emph{see also}  \htmlref{references, symbolic}{IIIsymref}, 
+		45
+
+  \indexspace
+{\bfseries\hfil T\hfil}\nopagebreak
+
+  \item \env{table} environment, 23
+  \item {\upshape  \sffamily  table} environment, 24
+  \item table of contents, 3
+    \subitem depth, 59
+    \subitem star-sections not listed, 59
+    \subitem star-sections shown, 59
+  \item \Lc{tableofchildlinks}, 48
+  \item tables, 2, 23
+    \subitem arbitrarily scaled, 2
+    \subitem as \texttt{HTML} mark-up, 3
+    \subitem as \texttt{HTML} mark-up, 14
+    \subitem as images, 3, 8
+    \subitem captions, 22
+    \subitem from other segments, 52
+    \subitem longtable\env{longtable} package, 26
+    \subitem oriented, 2, 20
+    \subitem \env{supertabular} package, 26
+  \item \texttt  {tables}, 60
+  \item temporary files, 58
+  \item \env{texdefs} package, 26
+  \item \emph{The \LaTeX{} Companion}\label{IIIlatcomp}
+    \subitem Goossens--Mittelbach--Samarin, 83
+  \item \emph{The \LaTeX{} Graphics Companion}\label{IIIlatgraph}
+    \subitem Goossens--Rahtz--Mittelbach, 83
+  \item theorems
+    \subitem theorem-like environments, 3
+  \item thumbnail, 2, 19, 21, 49
+    \subitem ignores scale-factors, 19
+    \subitem implies external, 19
+  \item tilde in URL, 36
+  \item time-stamp
+    \subitem used with segmentation, 54
+  \item transparent images
+    \subitem override defaults, 20
+
+  \indexspace
+{\bfseries\hfil U\hfil}\nopagebreak
+
+  \item Uffe Engberg, 46
+  \item Uli Wortmann, v, 5
+  \item unending loop, 76
+  \item Unicode, \see{\htmlref{character set}{IIIcharset}}{13}
+  \item unrecognised commands, 75
+  \item URL
+    \subitem for \textsl{CONTENTS} button, 65
+    \subitem for external Bibliography, 65
+    \subitem for \textsl{INDEX} button, 65
+    \subitem for \textsl{NEXT} button, 65
+    \subitem for \textsl{PREVIOUS} button, 65
+    \subitem for \textsl{UP} button, 64
+    \subitem universal resource locator, 64
+    \subitem \env{url} package, iii
+  \item \texttt{usemap}, 49
+
+  \indexspace
+{\bfseries\hfil V\hfil}\nopagebreak
+
+  \item verbatim
+    \subitem \env{verbatimfiles} package, 26
+  \item \env{verbatim} package, 26
+  \item verbosity level, 65
+  \item viewer, \see{\htmlref{browser}{IIIbrowser}}{56}
+  \item visual separation
+    \subitem using \Lc{htmlrule}, 47
+
+  \indexspace
+{\bfseries\hfil W\hfil}\nopagebreak
+
+  \item \env{wrapfigure} environment, 27
+
+  \indexspace
+{\bfseries\hfil X\hfil}\nopagebreak
+
+  \item XML
+    \subitem extended markup, vii
+  \item \env{xspace} package, 26
+  \item \Xy -pic graphics package, vi
+    \subitem home page, vi
+    \subitem home page, down under, vi
+  \item \protect\Xy-pic package, 26
+
+\end{theindex}

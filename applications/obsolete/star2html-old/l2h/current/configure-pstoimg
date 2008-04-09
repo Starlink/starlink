@@ -1,0 +1,969 @@
+: # *-*-perl-*-*
+  eval 'exec perl -S  $0 "$@"'
+  if $running_under_some_shell;
+
+#!/usr/local/bin/perl -w
+#use diagnostics;
+
+#$LATEX2HTMLDIR="$ENV{'L2HMODULE'}/user"; # Inserted by installation script
+$LATEX2HTMLDIR="$ENV{'L2HMODULE'}/user"; # Inserted by installation script
+
+###############################################################################
+# $Id$
+#
+# Configure-Pstoimg
+#
+# Configuration Script for pstoimg
+#
+# Version V96.2
+#
+# Author: Marek Rouchal <marek@saftsack.fs.uni-bayreuth.de>
+#
+# This software is part of Latex2HTML, originally by Nikos Drakos
+# It is published under the Gnu Public License and comes without any
+# warranty.
+#
+# You aren't supposed to edit this script. You can specify command line
+# options to customize it to your local setup.
+
+###############################################################################
+# Changes History
+#
+# $Log$
+# Revision 1.1  2004/02/20 13:13:26  nxg
+# Initial import
+#
+# Revision 1.18  1998/05/06 22:33:14  latex2html
+# -- fixed bug in parsing of output of "gs -h". Thanks Christoph Wutzke.
+#
+# Revision 1.17  1998/05/03 08:20:56  latex2html
+#  --  added name of Ghostscript executable for OS/2 (thanks Uli Wortmann)
+#  --  change use of &substitute_var_val  by Fabrice Popineau
+#
+# Revision 1.16  1998/04/28 10:41:25  latex2html
+#  --  removed some debugging messages, sorry
+#
+# Revision 1.15  1998/04/28 10:39:02  latex2html
+# 	implemented Fabrice Popineau's changes, for Win32 compatibility
+#
+#  --  uses a function &find_executable  defined in Override.pm
+#  --  allows different name for the Ghostscript executable
+#  --  defines $white_color and $bg_color for use with transparent images
+#  --  opens scripts to be altered, before renaming for the backup
+#  --  records both $GS_LIB and $GSLANDSCAPE into local.pm
+#
+# Revision 1.12  1997/09/27 10:37:47  JCL
+# small change regarding EOF tag
+#
+# Revision 1.11  1997/08/13 15:27:33  JCL
+# dies with message unless initialized via install-test
+#
+# Revision 1.10  1997/07/20 20:26:02  JCL
+# .
+#
+# Revision 1.9  1997/07/20 20:13:38  JCL
+# changed p/g (PNG/GIF) query
+#
+# Revision 1.8  1997/07/07 00:39:01  JCL
+# smoothed the installation procedure:
+#
+#  - configure-pstoimg asks for the image type if invoked without args.
+#  - configure-pstoimg now sets IMAGE_TYPE (gif|png) in latex2html.config
+#    after it knows the image type.
+#    Therefore, it needs the LATEX2HTMLDIR variable, which is substituted
+#    by install-test.
+#  - install-test checks for valid globbing
+#  - install-test looks if LATEX2HTMLDIR is undefined, in this case it
+#    prompts the user to get the directory and sets up latex2html.config.
+#  - install-test substitutes LATEX2HTMLDIR also in configure-pstoimg
+#    and prompts the user if to run configure-pstoimg finally.
+#  - removed unused entries PBMPLUSDIR and USENETPBM from latex2html.config,
+#    small changes to comments
+#
+# The installation scheme is now:
+#   o unpack LaTeX2HTML
+#   o copy the sources to the LaTeX2HTML directory
+#
+#   o run install-test and edit latex2html.config, or
+#   o edit latex2html.config and run install-test
+#
+#   o translate manual
+#
+# Revision 1.7  1997/06/06 14:16:21  RRM
+#  -   changed order of desirability among the Ghostscript devices,
+#      so that anti-aliasing can be used, when possible
+#
+# Revision 1.6  1997/02/17 02:04:42  RRM
+# small change regarding "_EOM_"
+#
+# Revision 1.5  1996/12/16 08:27:27  MRO
+# Fixed minor things pstoimg and configure-pstoimg (extensions, switches).
+#
+# Revision 1.4  1996/12/15 18:35:53  MRO
+# Changed pstoimg etc to enable runtime selection of output image format.
+#
+# Revision 1.3  1996/12/14 16:43:50  JCL
+# changed the face substantially:
+#  o chunked the code into functions
+#  o creates or updates "local.pm" instead of pstoimg
+#
+# (end CVS log)
+#
+#---- patchlevel 3
+# Fri Oct 25 1996: Eliminated some bugs and typos, introduced new option
+#                  -center <width> to replace the awkward construction
+#                  with -rightjustify -<witdth>
+#                  Introduced PNG support and renamed pstogif to pstoimg
+#---- patchlevel 2
+#Thu Sep 19 1996: Removed some silly mistakes, changed &get_stdout_stderr,
+#                 added a "\s*" in the parsing of command line options.
+#                 Thanks to Ross Moore for the hints.
+#---- patchlevel 1
+#Tue Sep 17 1996: Adjusted some things to make this run under Perl4.036. It's
+#                 now tested on perl5.003/Linux and perl4.036/IRIX.
+
+###############################################################################
+# Default names
+# You may specify alternative names via the command line, too
+if ($^O =~ MSWin32) {
+    $Default{'GS'}='gswin32c';
+} elsif ($^O =~ os2) {
+    $Default{'GS'}='gsos2.exe';
+} else {
+    $Default{'GS'}='gs';
+}
+$Default{'PNMCROP'}='pnmcrop';
+$Default{'PNMFLIP'}='pnmflip';
+$Default{'PPMTOGIF'}='ppmtogif';
+$Default{'PNMTOPNG'}='pnmtopng';
+$Default{'PPMQUANT'}='ppmquant';
+$Default{'PNMCAT'}='pnmcat';
+$Default{'PNMFILE'}='pnmfile';
+$Default{'PBMMAKE'}='pbmmake';
+# $Default{'BLANKPBM'}='icons/blank.pbm'; # obsolete, we now use PBMMAKE
+# $Default{'PNMTILE'}='pnmtile';          # obsolete, we now use PBMMAKE
+$Default{'GIFTRANS'}='giftrans';
+$Default{'GIFTOOL'}='giftool';
+
+@PATH = ".";
+$dd = '/';
+
+use Override qw($DEBUG getpwuid link setenv getenv symlink rename
+               getcwd syswait find_executable
+               substitute_var_val $LATEX2HTMLDIR
+               make_directory_absolute unlink $dd $envkey $image_pre);
+
+###############################################################################
+# Parse the command line
+
+die "Please run install-test, it will start this script automatically.\n"
+    unless $LATEX2HTMLDIR;
+
+if(@ARGV) {
+   foreach(@ARGV) {
+      if(/^(-h|--help)$/) {
+         &usage;
+         exit 0;
+         }
+      elsif(/^-gif$/) {
+         $configure_gif = 1;
+         }
+      elsif(/^-png$/) {
+         $configure_png = 1;
+         }
+      elsif(/^(\w+)=(\S+)\s*$/) { # variable=value
+         $user_settings{$1}=$2;
+         # print "Got option \$$1=$2\n";
+         }
+      else {
+         &usage;
+         die("Error: Illegal Argument \"$_\"\n");
+         }
+      }
+   }
+
+###############################################################################
+
+&main;
+
+sub main {
+    &greetings;
+    &next_step;
+    &read_config_file;
+    &check_image_extension;
+    &next_step if $configure_gif;
+    &setup_search_path;
+    &configure_ghostscript;
+    &next_step;
+    &configure_pbmtools;
+    &next_step;
+    &configure_trans_n_inter;
+    &next_step;
+    &create_configuration;
+    &mission_complete;
+}
+
+
+sub read_config_file {
+    &deal_with_forward_references;
+    require("latex2html.config") if
+	((-f "latex2html.config") ||
+	 die "Could not find file latex2html.config\n");
+}
+
+# Changes lines of the form:
+# $IMAGE_TYPE=... to
+# $IMAGE_TYPE='GIF' (or 'PNG', repsectively)
+#
+sub substitute_img_var {
+    local($file) = @_;
+    local($type) = ($configure_gif ? "gif" : "png");
+    local($SUCCESS) = 0;
+
+    if ( (-f "$LATEX2HTMLDIR${dd}$file") ||
+	die "\nCannot find $LATEX2HTMLDIR${dd}$file\nPlease check the value of \$LATEX2HTMLDIR in latex2html.config\n") {
+	open(IN, "<$LATEX2HTMLDIR${dd}$file")
+	    || die "Cannot open $LATEX2HTMLDIR${dd}$file";
+	rename("$LATEX2HTMLDIR${dd}$file","$LATEX2HTMLDIR${dd}$file.bak");
+	open(OUT, ">$LATEX2HTMLDIR${dd}$file")
+	    || die "Cannot open $LATEX2HTMLDIR${dd}$file";
+	chmod(0755, "$LATEX2HTMLDIR${dd}$file")
+	    unless $file =~ /.config$/;
+	while (<IN>) {
+	    s/\$IMAGE_TYPE\s*=.*$/
+		do {$SUCCESS = 1;
+		    "\$IMAGE_TYPE='$type';" .
+			"# Inserted by installation script"}/eo;
+	    print OUT;
+	}
+	close IN;
+	close OUT;
+    }
+    $SUCCESS;
+}
+
+
+sub deal_with_forward_references {
+    foreach ("ignore_commands", "process_commands_in_tex") {
+	eval "sub $_ {}"}
+}
+
+
+###############################################################################
+# Preamble
+###############################################################################
+sub greetings {
+
+    print <<"_EOM_";
+
+This is configure-pstoimg V96.2 by Marek Rouchal
+
+Welcome to the Configuration of pstoimg!
+
+You will be guided in few steps through the setup of pstoimg, the part of
+latex2html that produces bitmap images from the LaTeX source.
+Type `configure-pstoimg -h' for a brief usage information and a list of
+user-definable options.
+
+_EOM_
+}
+
+
+###############################################################################
+# Legal notice for GIF format
+###############################################################################
+sub check_image_extension {
+
+    if(!$configure_gif && !$configure_png) {
+        print <<"_EOM_";
+
+Pstoimg can support both GIF and PNG format.
+Please note that there are certain legal limitations on the use of the GIF
+image format.
+
+If you go on, pstoimg will be configured for GIF or PNG format.
+You may reconfigure pstoimg at any time by saying configure-pstoimg.
+Which format do you want to have supported?
+Answer g (GIF) or p (PNG).
+
+_EOM_
+      while (!$configure_gif && !$configure_png) {
+	$_=<STDIN>;
+	if (/^\s*g/) {
+	    $configure_gif=1;
+	}
+	if (/^\s*p/) {
+	    $configure_png=1;
+	}
+      }
+    }
+    print "Configuring for ",($configure_gif?"GIF":"PNG")," format.\n";
+    print "Changing \$IMAGE_TYPE in latex2html.config...",
+#	(&substitute_img_var("latex2html.config")?"succeeded\n":"\n*failed*\n");
+        (&substitute_var_val("latex2html.config", "^\\\$IMAGE_TYPE\\\s*=.*"
+		, "\$IMAGE_TYPE = '" .($configure_gif ? "gif":"png")
+		    . "';")? "succeeded\n":"\n*failed*\n");
+}
+
+
+###############################################################################
+# Search Path
+###############################################################################
+sub setup_search_path {
+
+    $_ = (defined $user_settings{'PATH'})
+         ? join(":",$user_settings{'PATH'},$ENV{'PATH'}) : $ENV{'PATH'};
+    foreach(split(/:/)) {
+        s+/$++;
+        push(@PATH,$_);
+    }
+}
+
+
+###############################################################################
+# Ghostscript Configuration
+###############################################################################
+sub configure_ghostscript {
+
+    print <<"_EOM_";
+
+Ghostscript Configuration
+=========================
+
+_EOM_
+
+# Try to determine path
+    $gs=$user_settings{'GS'} || $Default{'GS'};
+    $GS=&find_executable($gs,@PATH);
+
+    die <<"_EOM_" unless(defined $GS);
+Fatal Error: \"$gs\" not found. Pstoimg won't work.
+             You must have Ghostscript installed on your system. You can find
+             Ghostscript as source code or precompiled binary on every major
+             ftp site. If you decide to build your own gs do not forget to
+             include the pnmraw device for best latex2html performance.
+             Current version of Aladdin Ghostscript is 4.03.
+_EOM_
+# Get gs devices
+    $gs_devs="";
+    $flag=0;
+    open(GS,"$GS -h |") || die <<"_EOM_";
+Fatal Error: Execution of \"$gs -h\" failed:
+             $!
+_EOM_
+    while (<GS>) {
+        if(/Ghostscript\s*(Version|)\s*([\d\.]+)/i) {
+            $gs_version=$2;
+        }
+        if(/Available devices/i) {
+            $flag=1; # Now look for the devices
+        }
+        elsif(/^\s*Search path/i) {
+            $flag=2; # Now look for the gs lib path
+        }
+        elsif ($flag == 1) {
+# if line starts with whitespace, then we're in the devices list
+            if(/^\s+/) {
+                chop;
+                $gs_devs .= $_;
+            }
+            else { $flag=0; } # no more devices
+        }
+        elsif ($flag == 2) {
+# if line starts with whitespace, then we're in the search path list
+            if(/^\s+/) {
+                chop;
+                push(@gs_lib_path,split(${envkey},$_));
+            }
+            else { $flag=0; } # no more path entries
+        }
+    }
+    close(GS);
+
+    print "Ghostscript is \"$GS\"";
+    if(defined $gs_version) {
+        print ", Version $gs_version\n"; 
+    }
+    else {
+        print "\n";
+    }
+    $Configuration{'GS'}=$GS;                                       
+
+# GS Devices needed for pstoimg in order of descending preference
+    $gs_desired_devs="ppmraw pgnmraw pgmraw pnmraw pbmraw ppm pgnm pgm pnm pbm";
+
+    $gs_desired_devs=join(" ",$user_settings{'GS_DEVICE'},$gs_desired_devs)
+        if(defined $user_settings{'GS_DEVICE'});
+
+    foreach(split(" ",$gs_desired_devs)) {
+        if($gs_devs =~ /\b$_\b/) {
+    	    $GS_DEVICE=$_;
+    	    last;
+        }
+    }
+    die <<"_EOM_" unless defined $GS_DEVICE;
+Fatal Error: No appropriate Ghostscript device found.
+             Pstoimg needs one of the following devices:
+             \"$gs_desired_devs\"
+_EOM_
+
+    if (defined $user_settings{'GS_DEVICE'} &&
+        "$user_settings{'GS_DEVICE'}" ne "$GS_DEVICE") {
+        print <<"_EOM_";
+Warning: This version of Ghostscript doesn't support a \"$user_settings{'GS_DEVICE'}\" device.
+         Pstoimg will use the $GS_DEVICE device instead.
+_EOM_
+    }
+    else {
+        print "Pstoimg will use the $GS_DEVICE device.\n";
+    }
+    $Configuration{'GS_DEVICE'}=$GS_DEVICE;
+
+#    if(!@gs_lib_path) {
+#        print "Trying to guess the Ghostscript library path...\n";
+#        @gs_lib_path = ('/usr/share/ghostscript','/usr/lib/ghostscript/',
+#            '/usr/local/ghostscript','/usr/local/share/ghostscript',
+#            '/usr/local/lib/ghostscript');
+    if ($^O =~ MSWin32) {
+        local($gs_dir);
+        $gs_dir = $GS;
+        $gs_dir =~ s/\\/${dd}/g;
+        $gs_dir =~ s!/[^/]*$!!;
+        @gs_lib_path = ("$gs_dir", "$gs_dir/fonts", "$gs_dir/../fonts");
+        $GS_LIB = join(";", @gs_lib_path);
+    } else {
+        if(!@gs_lib_path) {
+            print "Trying to guess the Ghostscript library path...\n";
+            @gs_lib_path = ('/usr/share/ghostscript','/usr/lib/ghostscript/',
+                '/usr/local/ghostscript','/usr/local/share/ghostscript',
+                '/usr/local/lib/ghostscript');
+        }
+        $GS_LIB = join(";", @gs_lib_path);
+    }
+    foreach $path (@gs_lib_path) {
+        $path =~ s/^\s*(\S*)\s*$/$1/; # strip whitespace
+        if(-d "$path" && -f "$path/landscap.ps") {
+            $GSLANDSCAPE = "$path/landscap.ps";
+            print "Ghostscript library path is $path\n";
+        }
+    }
+    if(!$GS_LIB) {
+        $GS_LIB = "";
+        print <<"_EOM_";
+Warning: Couldn't determine Ghostscript library path (the path where e.g.
+         landscap.ps resides). You have to include \$GS_LIB_PATH = <path>
+         by hand in local.pm
+
+_EOM_
+    }
+    $Configuration{'GS_LIB'} = $GS_LIB;
+    $Configuration{'GSLANDSCAPE'} = $GSLANDSCAPE;
+}
+
+
+###############################################################################
+# Netpbm/Pbmplus Configuration
+###############################################################################
+sub configure_pbmtools {
+
+    print <<"_EOM_";
+
+Netpbm/Pbmplus Configuration
+============================
+
+_EOM_
+    if($configure_gif) {
+        $ppmtogif=$user_settings{'PPMTOGIF'} || $Default{'PPMTOGIF'};
+        $PPMTOGIF=&find_executable($ppmtogif,@PATH);
+        die <<"_EOM_" unless defined $PPMTOGIF;
+Fatal Error: \"$ppmtogif\" not found.
+             Pstoimg won't be able to produce GIF images.
+      Clues: Is Netpbm/Pbmplus installed on your system?
+             Are the executables in the search path?
+             Do You have execute permissions?
+             If none of the above apply, get the netpbm package
+             (source code or binary) from any major ftp site and
+             install it on your system.
+_EOM_
+
+# -h is an invalid option. Nevertheless it forces ppmtogif to output a
+# usage information to stderr
+        print "$ppmtogif is $PPMTOGIF\n";
+        $Configuration{'PPMTOGIF'}=$PPMTOGIF;
+        # $Configuration{'EXTENSION'}='gif'; # is now runtime setting
+        $_=join(" ",&get_stdout_stderr("$PPMTOGIF -h"));
+        if(/-transparent/) {
+            $HOWTO_TRANSPARENT_GIF="netpbm";
+            print "    $ppmtogif understands -transparent. Good!\n";
+        }
+        if(/-interlace/) {
+            $HOWTO_INTERLACE_GIF="netpbm";
+            print "    $ppmtogif understands -interlace. Good!\n";
+        }
+    }
+    if($configure_png) {
+        $pnmtopng=$user_settings{'PNMTOPNG'} || $Default{'PNMTOPNG'};
+        $PNMTOPNG=&find_executable($pnmtopng,@PATH);
+        die <<"_EOM_" unless defined $PNMTOPNG;
+Fatal Error: \"$pnmtopng\" not found.
+             Pstoimg won't be able to produce png images.
+      Clues: Is pnmtopng installed on your system? Do you have the
+             libpng/libz libraries?  Are the executables in the search path?
+             Do you have execute permissions?
+             If none of the above apply, get pnmtopng (it may require
+             libpng and libz) - either source code or binary - from any major
+             ftp site and install it on your system.
+_EOM_
+        print "$pnmtopng is $PNMTOPNG\n";
+        $Configuration{'PNMTOPNG'}=$PNMTOPNG;
+        # $Configuration{'EXTENSION'}='png'; # is now runtime setting
+# MRO: pnmtopng is capable to do these jobs. period.
+#        $_ = join(" ",&get_stdout_stderr("$PNMTOPNG -help"));
+#        if(/-transparent/) {
+#            $HOWTO_TRANSPARENT="netpbm";
+#            print "    $pnmtopng understands -transparent. Good!\n";
+#        }
+#        if(/-interlace/) {
+#            $HOWTO_INTERLACE="netpbm";
+#            print "    $pnmtopng understands -interlace. Good!\n";
+#        }
+    }
+    $pnmcrop=$user_settings{'PNMCROP'} || $Default{'PNMCROP'};
+    $PNMCROP=&find_executable($pnmcrop,@PATH);
+    die <<"_EOM_" unless defined $PNMCROP;
+Fatal Error: \"$pnmcrop\" not found.
+             pstoimg won't be able to crop images.
+      Clues: Is Netpbm/Pbmplus installed correctly on your system?
+             Are the executables in the search path?
+             Do You have execute permissions?
+_EOM_
+    print "$pnmcrop is $PNMCROP\n";
+    $Configuration{'PNMCROP'}=$PNMCROP;
+
+    $warnings=0;
+
+    $pnmflip=$user_settings{'PNMFLIP'} || $Default{'PNMFLIP'};
+    $PNMFLIP=&find_executable($pnmflip,@PATH);
+    if(defined $PNMFLIP) {
+        print "$pnmflip is $PNMFLIP\n";
+    }
+    else {
+        warn <<"_EOM_";
+Warning:     \"$pnmflip\" not found.
+             pstoimg won't be able to flip images.
+_EOM_
+       $warnings=1;
+       $PNMFLIP="";
+    }
+    $Configuration{'PNMFLIP'}=$PNMFLIP;
+
+    $ppmquant=$user_settings{'PPMQUANT'} || $Default{'PPMQUANT'};
+    $PPMQUANT=&find_executable($ppmquant,@PATH);
+    if(defined $PPMQUANT) {
+        print "$ppmquant is $PPMQUANT\n";
+    }
+    else {
+        warn <<"_EOM_";
+Warning:     \"$ppmquant\" not found.
+             pstoimg won't be able to reduce colors of images. You may run 
+             into problems if you include color images in your LaTeX source.
+_EOM_
+        $warnings=1;
+        $PPMQUANT="";
+    }
+    $Configuration{'PPMQUANT'}=$PPMQUANT;
+
+    $pnmfile=$user_settings{'PNMFILE'} || $Default{'PNMFILE'};
+    $PNMFILE=&find_executable($pnmfile,@PATH);
+
+    if(defined $PNMFILE) {
+        print "$pnmfile is $PNMFILE\n";
+    }
+    else {
+        warn <<"_EOM_";
+Warning:     \"$pnmfile\" not found.
+             pstoimg won't be able to right/top justify equations.
+_EOM_
+        $warnings=1;
+        $PNMFILE="";
+    }
+    $Configuration{'PNMFILE'}=$PNMFILE;
+
+# Not needed any more, we now use pbmmake
+# $pnmtile=$user_settings{'PNMTILE'} || $Default{'PNMTILE'};
+# $PNMTILE=&find_executable($pnmtile);
+# if(defined $PNMTILE) {
+#    print "$pnmtile is $PNMTILE\n";
+#    }
+# else {
+#    warn <<"_EOM_";
+# Warning:     \"$pnmtile\" not found.
+#              pstoimg won't be able to right/top justify equations.
+# _EOM_
+#    $warnings=1;
+#    $PNMTILE="";
+#    }
+# $Configuration{'PNMTILE'}=$PNMTILE;
+
+    $pnmcat=$user_settings{'PNMCAT'} || $Default{'PNMCAT'};
+    $PNMCAT=&find_executable($pnmcat,@PATH);
+
+    if(defined $PNMCAT) {
+        print "$pnmcat is $PNMCAT\n";
+    }
+    else {
+        warn <<"_EOM_";
+Warning:     \"$pnmcat\" not found.
+             pstoimg won't be able to right/top justify equations.
+_EOM_
+        $warnings=1;
+        $PNMCAT="";
+    }
+    $Configuration{'PNMCAT'}=$PNMCAT;
+
+    $pbmmake=$user_settings{'PBMMAKE'} || $Default{'PBMMAKE'};
+    $PBMMAKE=&find_executable($pbmmake,@PATH);
+    if(defined $PBMMAKE) {
+        print "$pbmmake is $PBMMAKE\n";
+    }
+    else {
+        warn <<"_EOM_";
+Warning:     \"$pbmmake\" not found.
+             pstoimg won't be able to right/top justify equations.
+_EOM_
+        $warnings=1;
+        $PBMMAKE="";
+    }
+    $Configuration{'PBMMAKE'}=$PBMMAKE;
+
+    if($warnings == 1) {
+        print <<"_EOM_";
+      Clues: Is Netpbm/Pbmplus installed correctly on your system?
+             Are the executables in the search path?
+             Do You have execute permissions?
+_EOM_
+    }
+}
+
+
+###############################################################################
+# Transparent/Interlaced Configuration
+###############################################################################
+sub configure_trans_n_inter {
+
+    print <<"_EOM_";
+
+Transparent/Interlaced Image Configuration
+==========================================
+
+_EOM_
+    if ($configure_png) {
+        print "Using $PNMTOPNG to make transparent/interlaced PNGs.\n";
+    }
+    if(defined $HOWTO_TRANSPARENT_GIF) {
+        print "Using $HOWTO_TRANSPARENT_GIF to make transparent GIFs.\n";
+    }
+    if(defined $HOWTO_INTERLACE_GIF) {
+        print "Using $HOWTO_INTERLACE_GIF to make interlaced GIFs.\n";
+    }
+    if ($configure_gif &&
+        (!defined $HOWTO_TRANSPARENT_GIF || !defined $HOWTO_INTERLACE_GIF)) {
+
+        $giftool=$user_settings{'GIFTOOL'} || $Default{'GIFTOOL'};
+        $GIFTOOL=&find_executable($giftool,@PATH);
+        if(defined $GIFTOOL) {
+            $_=join(" ",&get_stdout_stderr("$GIFTOOL -h"));
+            if(/-rgb/ && !defined $HOWTO_TRANSPARENT_GIF) {
+                $HOWTO_TRANSPARENT_GIF="giftool";
+                print "Will use $GIFTOOL to make images transparent\n";
+                $Configuration{'GIFTOOL'}=$GIFTOOL;
+            }
+            if(/-i/ && !defined $HOWTO_INTERLACE_GIF) {
+                $HOWTO_INTERLACE_GIF="giftool";
+                print "Will use $GIFTOOL to make images interlaced\n";
+                $Configuration{'GIFTOOL'}=$GIFTOOL;
+            }
+        }
+    }
+    if($configure_gif && !defined $HOWTO_TRANSPARENT_GIF) {
+        $giftrans=$user_settings{'GIFTRANS'} || $Default{'GIFTRANS'};
+        $GIFTRANS=&find_executable($giftrans,@PATH);
+
+        if(defined $GIFTRANS) {
+            $_=(&get_stdout_stderr($GIFTRANS))[0];
+            if(/-t/) {
+                $HOWTO_TRANSPARENT_GIF="giftrans";
+                print "Will use $GIFTRANS to make images transparent\n";
+                $Configuration{'GIFTRANS'}=$GIFTRANS;
+            }
+        }
+    }
+    if($configure_gif && !defined $HOWTO_TRANSPARENT_GIF) {
+        $HOWTO_TRANSPARENT_GIF="";
+        warn <<"_EOM_";
+Warning: Pstoimg won't be able to create transparent GIFs, i.e. the
+         images will have an ugly white background when viewed with the
+         browser. You may want to get one of the following packages from
+         any major ftp site, each of them capable of creating transparent
+         GIF images: Netpbm, giftool, giftrans.
+_EOM_
+    }
+    if($configure_gif && !defined $HOWTO_INTERLACE_GIF) {
+        $HOWTO_INTERLACE_GIF="";
+        warn <<"_EOM_";
+Warning: Pstoimg won't be able to create interlaced images. Interlaced
+         images build up very quickly while downloading starting from a
+         coarse grid and becoming sharper with the process of downloading.
+         You can easily do without this, but it is a convenient thing. You
+         may want to get one of the following packages from any major ftp
+         site to make interlaced images: Netpbm, giftool
+_EOM_
+    }
+   
+    if($configure_gif) {
+        $Configuration{'HOWTO_TRANSPARENT_GIF'}=$HOWTO_TRANSPARENT_GIF;
+        $Configuration{'HOWTO_INTERLACE_GIF'}=$HOWTO_INTERLACE_GIF;
+    }
+    if ($^O =~ MSWin32) {
+        $Configuration{'white_color'} = "#ffffff";
+        $Configuration{'bg_color'} = "#bfbfbf";
+    } else {
+        $Configuration{'white_color'} = "\\#ffffff";
+        $Configuration{'bg_color'} = "\\#bfbfbf";
+    }
+}
+
+
+###############################################################################
+# Modification of pstoimg
+###############################################################################
+sub create_configuration {
+
+    print <<"_EOM_";
+Setup pstoimg
+=============
+_EOM_
+
+    if ( -f "local.pm") {
+	&update_local_pm;
+    }
+    else {
+	&create_local_pm;
+    }
+}
+
+
+sub create_local_pm {
+
+    print <<"_EOM_";
+
+Creating local configuration file...
+
+_EOM_
+
+    open(OUT, ">local.pm");
+    local($vars) = "";
+    foreach(keys %Configuration) {
+        $vars .= "\$$_ = '$Configuration{$_}'; # Inserted by configure-pstoimg\n";
+    }
+    print OUT <<"_EOF_";
+#################################################################
+# local.pm
+#
+# Local Configuration for LaTeX2HTML
+#
+# This file is created automatically. Do not edit!
+#
+#################################################################
+
+package main;
+
+### start pstoimg configuration ###
+$vars
+### end pstoimg configuration ###
+
+1;
+_EOF_
+    close OUT;
+}
+
+
+sub update_local_pm {
+
+    print <<"_EOM_";
+
+Updating local configuration file...
+
+_EOM_
+
+    # $config_vars=join("|",keys %Configuration);
+
+    rename("local.pm","local.bak");
+    open(IN, "<local.bak");
+    open(OUT, ">local.pm");
+
+    local($vars) = "";
+    foreach(keys %Configuration) {
+        $vars .= "\$$_ = '$Configuration{$_}'; # Inserted by configure-pstoimg\n";
+    }
+
+    local($on) = 0;
+    while (<IN>) {
+	if (/end pstoimg configuration/) {
+	    print OUT $vars;
+	    $on = 0;
+	}
+	print OUT unless $on;
+	$on++ if /start pstoimg configuration/;
+    }
+    close IN;
+    close OUT;
+}
+
+#$pwd = cwd;
+#$BLANKPBM=(defined $user_settings{'BLANKPBM'}) ? $user_settings{'BLANKPBM'} :
+#   $pwd . "/icons/blank.pbm";
+#die <<"_EOM_" unless (-r $BLANKPBM);
+#Fatal Error: Can't read $BLANKPBM: $!
+#             blank.pbm is required for justifying equations and is part of
+#             the latex2html distribution. Chdir to the latex2html directory.
+#_EOM_
+#print "Using $BLANKPBM as blank.pbm\n";
+#$Configuration{'BLANKPBM'}=$BLANKPBM;
+
+
+
+###############################################################################
+# The end
+###############################################################################
+sub mission_complete {
+    print <<"_EOM_";
+
+Well done!
+Pstoimg is now hopefully configured to run on your system.
+Type `pstoimg -h' for a brief usage information.
+Please specify the desired image format in the file latex2html.config.
+
+_EOM_
+    exit 0;
+}
+
+
+###############################################################################
+
+#RRM: moved to Override.pm (thanks, Fabrice Popineau)
+#
+#sub find_executable {
+#    local($name) = $_[0];
+#    if($name =~ m+^/+) {
+#        if(-e "$name" && -x _ ) {
+#            return "$name";
+#        }
+#    }
+#    if($name =~ s+.*/++o) {
+#        warn "Warning: Stripping invalid path from $name\n";
+#    }
+#    foreach(@PATH) {
+#        if(-e "$_/$name") {
+#            if( -x _ ) {
+#                return "$_/$name";
+#            }
+#            else {
+#                warn "Warning: $_/$name exists, but is not executable.\n";
+#            }
+#        }
+#    }
+#    return(undef);
+#}
+
+
+###############################################################################
+sub get_stdout_stderr {
+    local($prog) = $_[0];
+    local(@stack);
+
+    open(SO, ">&STDOUT");
+    stat(SO); # to suppress warnings...
+    open(SE, ">&STDERR");
+    stat(SE); # to suppress warnings...
+
+    open(FOO, ">foo$$") || die "Can't open foo$$\n";
+    open(STDOUT, ">&FOO") || die "Can't redirect stdout\n";
+    open(STDERR,">&FOO") || die "Can't dup stdout\n";
+
+    select(STDERR); $| = 1;
+    select(STDOUT); $| = 1;
+
+    system("$prog");
+#    `$prog >& foo$$`; # This was a hack...
+
+    open(STDOUT, ">&SO");
+    open(STDERR, ">&SE");
+
+    close(FOO);
+    close(SO);
+    close(SE);
+
+    open(FOO,"<foo$$");
+    while(<FOO>) {
+        push(@stack,$_);
+        }
+    close(FOO);
+    unlink "foo$$";
+    return @stack;
+}
+
+
+###############################################################################
+sub next_step {
+   print "\nHit return to proceed to the next configuration step.\n";
+   $_=<STDIN>;
+}
+
+
+###############################################################################
+sub usage {
+   print <<'_EOM_';
+
+This is configure-pstoimg V96.2 by Marek Rouchal
+       - configures pstoimg for your system
+
+This software is part of LaTeX2HTML by Nikos Drakos
+
+Usage: configure-pstoimg [-gif] [-png] [OPT=VAL [OPT2=VAL2 [...]]]
+       configure-pstoimg -h
+
+Options: -gif     Configure pstoimg for GIF image format
+         -png     Configure pstoimg for PNG image format
+         -h       Show this message
+         OPT=VAL  Set configuration preferences:
+
+   General options:
+     PATH      A colon-separated list of directories where to look for
+               executables. Your environment PATH is searched automatically.
+   Ghostscript options:
+     GS        Name (not path) of the Ghostscript executable
+     GS_DEVICE Ghostscript output device (pnmraw recommended)
+   Netpbm/Pbmplus Options:
+     PNGTOPNM  Name (not path) of the pnmtopng executable (default: pnmtopng)
+     PPMTOGIF  Name (not path) of the ppmtogif executable (default: ppmtogif)
+     PPMQUANT  Name (not path) of the pnmquant executable (default: ppmquant)
+     PNMCROP   Name (not path) of the pnmcrop executable (default: pnmcrop)
+     PNMFLIP   Name (not path) of the pnmflip executable (default: pnmflip)
+     PNMFILE   Name (not path) of the pnmfile executable (default: pnmfile)
+     PBMMAKE   Name (not path) of the pbmmake executable (default: pbmmake)
+     PNMCAT    Name (not path) of the pnmcat executable (default: pnmcat)
+     GIFTOOL   Name (not path) of the giftool executable (default: giftool)
+     GIFTRANS  Name (not path) of the giftrans executable (default: giftrans)
+   Required Packages:
+     For best performance, your system should have the following packages:
+           Ghostscript-4.03, netpbm-1mar1994, pnmtopng-2.31
+     These packages are freely available from any major ftp site.
+_EOM_
+## These are obsolete:
+#     PNMTILE   Name (not path) of the pnmtile executable (default: pnmtile)
+#   Alignment Image
+#     BLANKPBM  Path (and name) to the blank.pbm file supplied with latex2html
+   return 0;
+   }
+

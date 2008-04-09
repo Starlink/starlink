@@ -1,0 +1,46 @@
+#  Add all changes to standard distribution to this file.
+
+ - latex2html: undef(item1,item2...) expanded to undef item1; undef
+               item2; etc. whereever it occurs.
+
+ - latex2html: kill added to write_string_out to stop forked process
+               problems on Linux.
+
+ - latex2html: removal of newlines spaces and tabs in labels added to 
+               anchor_label. This is needed for "sst_routine" xlabels
+               to work.
+ 
+ - latex2html, texexpand, pstoimg, install-test, makemap & 
+   configure-pstoimg:
+                     added:
+                        : # *-*-perl-*-*
+                          eval 'exec perl -S  $0 "$@"'
+                          if $running_under_some_shell;
+                     to avoid need for #!/path/perl statement.
+
+ - mk: created to control install/deinstall process.
+
+ - latex2html: problem with renewcommand substitution in 
+               "sub process_cmd" fixed. 
+
+ - latex2html: error message in "sub wrap_raw_arg_cmds" suppressed.
+               This is caused by missing wrap command (which is
+               defined in a forked process).
+
+ - latex2html: Removed trailing space\tab slurp in pre_process for
+               comments. This eats into next line unsetting formatting
+               to next comments, i.e.: 
+
+    # begin{verbatim}
+    #   % lpr
+    #   % lpq
+    # end{verbatim}
+
+    Looks like:
+
+    #   % lpr
+    # % lpq
+
+    Instead of:
+    #   % lpr
+    #   % lpq
