@@ -1,0 +1,109 @@
+#!/usr/local/bin/perl
+#+
+#  Name:
+#    bch_imark.prl
+#
+#  Purpose:
+#    Calculate an IRAFmark rating using the calibrations in the calibration 
+#    file and the scaling constant.
+#
+#  Language:
+#    perl
+#
+#  Invocation:
+#    echo stats-string | bch_imark.prl
+#
+#  Description:
+#    Given the tcpu figures for the 3 IRAF benchmarks (CCDRED, DAOPHOT,
+#    IMAGES), calculate an IRAFmark rating and error. 
+#
+#    Each benchmark is weighted with a tcpu figure for that b/m from a
+#    machine which is used as a standard. This gives a 'speed' figure 
+#    (i.e. how much faster the machine is than the standard). The b/m
+#    speeds are then averaged and a further 'adjusting' constant can be 
+#    applied to give the final IRAFmark figure. Errors from the tcpu on
+#    each b/m are propagated through to give an error on the IRAFmark
+#    estimate.
+#
+#  Notes:
+#    The IRAFmark is calculated as follows, A is the 'adjustment constant':
+#
+#    IRAFmark = ( (CCDRED_std/CCDRED) + 
+#                           (DAOPHOT_std/DAOPHOT)   +
+#                           (IMAGES_std/IMAGES) ) / 3.0
+#
+#    The error on the IRAFmark is then:
+#
+#    dIRAFmark = SQRT( (dCCDRED * CCDRED_std / CCDRED**2)**2 +
+#                                 (dDAOPHOT * DAOPHOT_std / DAOPHOT**2)**2 +
+#                                 (dIMAGES * IMAGES_std / IMAGES**2)**2) / 3.0
+#
+#  Authors:
+#    Tim Gledhill (tmg), University of Hertfordshire
+#
+#  History:
+#    18-JUL-1996 (tmg):
+#       Original version.
+#    19-JAN-1998 (tmg):
+#       New IRAF2.11 timings. Renamed to IRAFmark211.
+#    24-NOV-1998 (tmg)
+#       V1.2 Convert from awk to perl
+#       Read the calibrations from a file
+#-
+#
+# Check for the existence of a BENCH_CALFILE variable giving the name of
+# the calibration file to use. If this is not defined then use the file
+# starbench.cal in the current directory.
+#
+      $calfile = $ENV{"BENCH_CALFILE"};
+      if ( $calfile eq "" ) {
+        $calfile = $ENV{"BENCH_DIR"}."/starbench.cal";
+      }
+#
+# Open the calibration file and read in the benchmark speed ratings. The
+# calibration file must be in the expected format (see NOTES above) as,
+# for example, written by the 'scan -f' command.
+#
+      open(CALFILE,$calfile) ||
+         die "\nERROR! Could not open calibration file $calfile\n\n";
+#
+# Read in the tcpi figures for the benchmarks.
+#
+      while (<CALFILE>) {
+        ($bench) = split;
+        if ($bench eq "CCDRED") {
+          ($f1,$f2,$f3,$ccd_cal) = split;
+        } elsif ($bench eq "DAOPHOT") {
+          ($f1,$f2,$f3,$dao_cal) = split;
+        } elsif ($bench eq "IMAGES") {
+          ($f1,$f2,$f3,$ima_cal) = split;
+        }
+      }
+      close (CALFILE);
+#
+# Read the incoming string and parse to get the tcpu figures.
+#
+      while (<>) {
+        ($ccd,$dccd,$dao,$ddao,$ima,$dima) = split;
+      }
+#
+# Calculate the STARmark rating and error.
+#
+      if ( $ccd > 0.0 ) {
+        $xccd = $ccd_cal / $ccd;
+        $dc = ($dccd * $ccd_cal) / ($ccd * $ccd);
+      }
+      if ( $dao > 0.0 ) {
+        $xdao = $dao_cal / $dao;
+        $dd = ($ddao * $dao_cal) / ($dao * $dao);
+      }
+      if ( $ima > 0.0 ) {
+        $xima = $ima_cal / $ima;
+        $di = ($dima * $ima_cal) / ($ima * $ima);
+      }
+      $imark = ( $xccd + $xdao + $xima ) / 3.0;
+      $dimark = sqrt( $dc*$dc + $dd*$dd + $di*$di ) / 3.0;
+      printf( "\n    IRAFmark : %4.2f +/- %3.2f\n", $imark,$dimark);
+#
+# End of script.
+#

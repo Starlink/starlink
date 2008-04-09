@@ -1,0 +1,84 @@
+#!/usr/local/bin/perl
+#+
+#  Name:
+#    bch_full.prl
+#
+#  Purpose:
+#    Calculate the 'speed' ratings and elapsed times with errors to give
+#    the full output .
+#
+#  Language:
+#    perl
+#
+#  Invocation:
+#    echo stats-string | bch_full.prl
+#
+#  Description:
+#    Given the tcpu figures for the benchmarks, calculate the 'speed` rating
+#    (the ratio of the tcpu for the benchmark on the 'standard' machine to
+#    that for the machine in question). The calibration figures are read 
+#    in from a calibration file. Output the elapsed times with errors.
+#
+#  Authors:
+#    Tim Gledhill (tmg), University of Hertfordshire
+#
+#  History:
+#    13-FEB-1994 (tmg):
+#       Original version.
+#    22-MAY-1996 (tmg):
+#       Output the elapsed times with errors. v0.9
+#    18-JUL-1996 (tmg):
+#       v1.0 incorporating IRAF benchmarks.
+#    25-NOV-1977 (tmg)
+#       V1.1: Updated with the revised benchmark timings from DJR.
+#       NB: IRAF timings remain the same as in V1.0.
+#    19-JAN-1998 (tmg)
+#       New IRAF 2.11 timings.
+#    04-DEC-1998 (tmg)
+#       V1.2: Convert from awk to perl and read the calibration figures in
+#       from a file. The file format is that output by scan -f.
+#-
+#
+# Check for the existence of a BENCH_CALFILE variable giving the name of
+# the calibration file to use. If this is not defined then use the file
+# starbench.cal in the current directory.
+#
+      $calfile = $ENV{"BENCH_CALFILE"};
+      if ( $calfile eq "" ) {
+        $calfile = $ENV{"BENCH_DIR"}."/starbench.cal";
+      }
+#
+# Read the incoming string and parse to get the name of the benchmark
+# and the timing figures.
+#
+      while (<>) {
+        ($name,$ucpu,$kcpu,$tcpu,$dtcpu,$etim,$detim) = split;
+      }
+#
+# Open the calibration file. The calibration file must be in the
+# expected format (see NOTES above) as, for example, written by the
+# 'scan -f' command.
+#
+      open(CALFILE,$calfile) ||
+         die "\nERROR! Could not open calibration file $calfile\n\n";
+#
+# Read in the tcpu calibration figure for the benchmark.
+#
+      while (<CALFILE>) {
+        ($bench) = split;
+        if ($bench eq $name) {
+          ($f1,$f2,$f3,$cal) = split;
+        }
+      }
+      close (CALFILE);
+#
+# Calculate the benchmark speeds and print the results.
+#
+      $speed = $cal / $tcpu;
+      $dspeed = ( $dtcpu * $cal ) / ( $tcpu * $tcpu );
+      printf( 
+      "\n%10s%7.2f%7.2f%7.2f +/- %4.2f %7.2f +/- %4.2f %7.2f +/- %4.2f\n", 
+      $name,$ucpu,$kcpu,$tcpu,$dtcpu,$speed,$dspeed,$etim,$detim);
+#
+# End of script bch_full.prl
+#

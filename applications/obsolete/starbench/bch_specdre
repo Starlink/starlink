@@ -1,0 +1,351 @@
+#!/bin/csh -f
+#+
+#  Name:
+#     bch_specdre
+
+#  Purpose:
+#     Demonstration procedure for Specdre modified for benchmark purposes.
+
+#  Type of Module:
+#     Unix C shell list of commands
+
+#  Invocation:
+#     source bch_specdre
+
+#  Arguments:
+#     none.
+
+#  Description:
+#     This list of C shell commands performs a representative test of version
+#     1.1 of the Specdre package of applications (no plotting though).
+
+#  Imported Environment Variables:
+#
+#     BENCH_DIR  :  Benchmark installation directory.
+
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     tmg: Tim Gledhill (tmg@star.herts.ac.uk)
+#     {enter_new_authors_here}
+
+#  History:
+#     10 Jul 1992 (hme):
+#        Original version.
+#     30 Jun 1993 (hme):
+#        Include arc* applications; echo comments.
+#     21 Oct 1994 (tmg):
+#        Modified for use with the benchmarking package. 
+#        All display sections removed.
+#        run specdre startup
+#     15 Feb 1996 (tmg)
+#        Complete re-write. Using version 1.1 of SPECDRE.
+#        Check for completion of each command as best we can. 
+#        Need to specify device=! to arclocat due to changes in routine.
+#        arcdisp and the tasks following it have been commented out due 
+#        to changes that have made arcdisp interactive.
+#     13 Mar 1998 (tmg)
+#        SPECDRE is now part of FIGARO.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+#. 
+      onintr abort_script
+#
+# Check that the specdre startup command is defined and if not source the
+# Starlink cshrc file to define it.
+#
+      set startup_com = `alias figaro`
+      if ( "$startup_com" == "" ) source /star/etc/cshrc
+#
+# Start SPECDRE.
+#
+      figaro
+#
+#  Establish the current directory as ADAM_USER.
+#
+      setenv ADAM_USER $cwd
+#
+# Make a list of all the files in the current directory before we start.
+#
+      ls -1 > dir_index_before
+
+
+echo DEMO:
+echo DEMO: Creating model black body for 1000 K, double logarithmic ...
+bbody 1000 logar=true xstart=12 xstep=0.05 xend=17 \
+   xlabel=frequency xunit=log10\(Hz\) out=bb1000 accept
+echo DEMO: Same for  2000 K ...
+bbody  2000 logar=true in=bb1000  out=bb2000 accept
+echo DEMO: Same for  3000 K ...
+bbody  3000 logar=true in=bb1000  out=bb3000 accept
+echo DEMO: Same for  4000 K ...
+bbody  4000 logar=true in=bb1000  out=bb4000 accept
+echo DEMO: Same for  5000 K ...
+bbody  5000 logar=true in=bb1000  out=bb5000 accept
+echo DEMO: Same for  6000 K ...
+bbody  6000 logar=true in=bb1000  out=bb6000 accept
+echo DEMO: Same for  7000 K ...
+bbody  7000 logar=true in=bb1000  out=bb7000 accept
+echo DEMO: Same for  8000 K ...
+bbody  8000 logar=true in=bb1000  out=bb8000 accept
+echo DEMO: Same for  9000 K ...
+bbody  9000 logar=true in=bb1000  out=bb9000 accept
+echo DEMO: Same for 10000 K ...
+bbody 10000 logar=true in=bb1000 out=bb10000 accept
+
+
+echo DEMO: 
+echo DEMO: Looking for a Specdre Extension ...
+editext list bb1000 accept
+echo DEMO: Creating an empty one and looking at it ...
+editext create bb1000
+editext list bb1000 accept
+echo DEMO: Adding spectroscopic values to the Specdre Extension ...
+editext \"set specvals\" bb1000
+editext list bb1000 accept
+echo DEMO: Adding a results structure to the Specdre Extension ...
+editext \"create results _REAL _DOUBLE default 1 2\" bb1000
+editext list bb1000 accept
+
+echo DEMO: 
+echo DEMO: Resampling the 1000 K spectrum slightly ...
+resamp s bb1000 bb1000_2 12.025 0.05 17.025 varuse=no accept
+'mv' bb1000_2.sdf bb1000.sdf
+
+echo DEMO: Looking at the Specdre Extension again ...
+editext list bb1000 accept
+
+#!!!!!MODIFICATION
+#-----------------
+#echo DEMO:
+#echo DEMO: Plotting the 10000 K spectrum in bin-style ...
+#specplot in=bb10000 colour=1 overlay=n clear=y world=\[12,16,0,20\] \
+#   lin=n bin=t northo=2 device=xw reset accept
+#echo DEMO: Overlaying the 1000 K spectrum in line-style and orange ...
+#specplot in=bb1000  colour=8 overlay=y clear=n \
+#   lin=y bin=f axes=0000 tick=0000 numl=0000 text=0000 accept
+#echo DEMO: Overlaying the 2000 K spectrum in yellow ...
+#specplot in=bb2000  colour=7 overlay=y accept
+#echo DEMO: Overlaying the 4000 K spectrum in green ...
+#specplot in=bb4000  colour=3 overlay=y accept
+#echo DEMO: Overlaying the 8000 K spectrum in blue ...
+#specplot in=bb8000  colour=4 overlay=y accept
+#!!!!!END-MODIFICATION
+#---------------------
+
+echo DEMO:
+echo DEMO: Growing the 2000 K spectrum into the second row of an image ...
+grow new=true in=bb2000 out=bball stapix=\[0,2\] endpix=\[0,2\] \
+   size=\[0,10\] expand=\[0,1\]
+echo DEMO: Looking at the Specdre Extension of that image ...
+editext list bball accept
+
+echo DEMO:
+echo DEMO: Growing the resampled 1000 K spectrum into first row of same
+echo DEMO:    image\; due to the different frequency grid an array of
+echo DEMO:    spectroscopic values is forced in the image ...
+grow new=false in=bb1000 out=bball stapix=\[0,1\] endpix=\[0,1\] expand=\[0,1\]
+editext list bball accept
+
+echo DEMO:
+echo DEMO: Growing the other spectra into rows 3 through 10 ...
+grow new=false in=bb3000 out=bball stapix=\[0,3\] endpix=\[0,3\] expand=\[0,1\]
+grow new=false in=bb4000 out=bball stapix=\[0,4\] endpix=\[0,4\] expand=\[0,1\]
+grow new=false in=bb5000 out=bball stapix=\[0,5\] endpix=\[0,5\] expand=\[0,1\]
+grow new=false in=bb6000 out=bball stapix=\[0,6\] endpix=\[0,6\] expand=\[0,1\]
+grow new=false in=bb7000 out=bball stapix=\[0,7\] endpix=\[0,7\] expand=\[0,1\]
+grow new=false in=bb8000 out=bball stapix=\[0,8\] endpix=\[0,8\] expand=\[0,1\]
+grow new=false in=bb9000 out=bball stapix=\[0,9\] endpix=\[0,9\] expand=\[0,1\]
+grow new=false in=bb10000 out=bball stapix=\[0,10\] endpix=\[0,10\] \
+   expand=\[0,1\]
+
+echo DEMO:
+echo DEMO: Before xtract-ing rows 2 through 10, we must delete the
+echo DEMO:    spectroscopic values again, so first subset to copy these
+echo DEMO:    rows from the image into a new one, then delete the
+echo DEMO:    subset-ed spectroscopic values, then xtract the rows into
+echo DEMO:    row ...
+subset bball\(,2:\) rows2toend
+editext \"delete specvals\" rows2toend
+xtract varuse=no in=rows2toend colaps=\[0,1\] out=extracted
+
+echo DEMO:
+echo DEMO: Alternatively resample-and-average the rows in question, this
+echo DEMO:    takes account of the spectroscopic values, ...
+resamp s\
+   \"bball\(,2\),bball\(,3\),bball\(,4\),bball\(,5\),bball\(,6\),bball\(,7\),bball\(,8\),bball\(,9\),bball\(,10\)\" \
+   out=resampled varuse=no accept
+
+#!!!!!MODIFICATION
+#-----------------
+#echo DEMO:
+#echo DEMO: Compare the two methods by plotting the extracted row ...
+#specplot error=yes in=extracted overlay=n clear=y device=xw reset accept
+#specplot in=resampled clear=n overlay=y device=xw colour=3 mark=1 accept
+#!!!!!END-MODIFICATION
+#---------------------
+
+echo DEMO:
+echo DEMO: Delete the unused results structure from the image Specdre
+echo DEMO:    Extension, look at the Extension again ...
+editext \"delete results\" bball
+editext list bball accept
+
+echo DEMO:
+echo DEMO: Write the first column from the image into an ASCII table,
+echo DEMO:    then re-read the ASCII table into a spectrum ...
+ascout in=bball\(1,\) out=column1.dat
+ascin in=column1.dat out=column1 colaxes=1 coldata=2 accept
+'rm' column1.dat
+
+echo DEMO:
+echo DEMO: Alternatively subset \(1,3:9\) from the image into another
+echo DEMO:    spectrum ...
+subset bball\(1,3:9\) subsetcol1
+
+#!!!!!MODIFICATION
+#-----------------
+#echo DEMO:
+#echo DEMO: Plot in different colours, the ASCII-transferred spectrum,
+#echo DEMO:    the first column direct from the image, the subset-ed
+#echo DEMO:    spectrum ...
+#specplot in=column1 overlay=n clear=y device=xw reset accept
+#specplot in=bball\(1,\) overlay=y clear=n colour=7 accept
+#specplot in=subsetcol1 overlay=y clear=n colour=4 accept
+
+
+#echo DEMO:
+#echo DEMO: Do polynomial fits to all the black body spectra gathered as
+#echo DEMO:     rows of the image ...
+#fitcheby varuse=no order=0 dialog=n comp=1 \
+#   device=xw in=bball\(,1\) accept
+#fitcheby varuse=no order=1 comp=1 device=xw in=bball\(,2\) accept
+#fitcheby varuse=no order=2 comp=1 device=xw in=bball\(,3\) accept
+#fitcheby varuse=no order=3 comp=1 device=xw in=bball\(,4\) accept
+#fitcheby varuse=no order=4 comp=1 device=xw in=bball\(,5\) accept
+#fitcheby varuse=no order=5 comp=1 device=xw in=bball\(,6\) accept
+#fitcheby varuse=no order=6 comp=1 device=xw in=bball\(,7\) accept
+#fitcheby varuse=no order=7 comp=1 device=xw in=bball\(,8\) accept
+#fitcheby varuse=no order=7 comp=1 device=xw in=bball\(,9\) accept
+#fitcheby varuse=no order=7 comp=1 device=xw in=bball\(,10\) accept
+
+#echo DEMO:
+#echo DEMO: The fit results have been stored in the results structure of
+#echo DEMO:    the Specdre Extension, we can plot any fit parameter as a
+#echo DEMO:    function of the row number ...
+#specplot in=bball.more.specdre.results\(4,1,\) clear=y colour=1 \
+#   height=1.2 roman=true northo=4 \
+#   bottom=\"Temperature axis pixel count\" \
+#   left=\"0-th coefficient of Chebyshev series\" accept
+
+echo DEMO: And we look again at the Extension ...
+editext list bball accept
+
+#echo DEMO:
+#echo DEMO: The Gauss fit routine is stable enough to find a solution for
+#echo DEMO:    a black body spectrum ...
+#fitgauss varuse=no in=bball\(,5\) device=xw \
+#   ncomp=1 cont=-500 centre=15 peak=540 fwhm=10 cf=0 pf=0 wf=0 \
+#   comp=2 accept
+#!!!!!END-MODIFICATION
+#---------------------
+
+echo DEMO:
+echo DEMO: Correlate rows 2 and 6 from the image ...
+correl varuse=false inlist=\"bball\(,2\),bball\(,6\)\" out=correl.dat \
+   logfil=/dev/null accept
+echo DEMO: Now read the ASCII table of data from row 2 versus data from
+echo DEMO:    row 6 as a spectrum, the 2000 K intensity becomes the x
+echo DEMO:    coordinate, the 6000 K intensity becomes the y coordinate\;
+echo DEMO:    that \"spectrum\" can now be plotted ...
+ascin in=correl.dat out=correl colaxes=1 coldata=2 accept
+'rm' correl.dat
+#!!!!!MODIFICATION
+#-----------------
+#specplot in=correl clear=y colour=1 \
+#   bin=false lin=false mark=3 \
+#   height=1 roman=false text=++0+ \
+#   bottom=\"B\\d\\gn\\u\(2000 K\) \[log10\(Jy/sr\)\]\" \
+#   left=\"B\\d\\gn\\u\(6000 K\) \[log10\(Jy/sr\)\]\" \
+#   right=\"Two Planck curves compared\" accept
+#!!!!!END-MODIFICATION
+#---------------------
+
+echo DEMO:
+echo DEMO: Wavelength calibration in four steps:
+echo DEMO:    - generate a feature data base
+echo DEMO:    - locate features in arc spectrum
+echo DEMO:    - identify the located feature by comparing with data base
+echo DEMO:    - apply dispersion curve
+echo DEMO: This works on spectra or rows in an image or cube.
+echo DEMO:
+echo DEMO: Step 1: Convert a line list into a feature data base ...
+'cp' $FIG_DIR/demo.arc $FIG_DIR/demo.sdf .
+arcgendb demo.arc demo_arc
+
+echo DEMO:
+echo DEMO: Step 2: Locate narrow unblended emission features in arc
+echo DEMO:    spectrum\; here automatically without graphical dialogue ...
+arclocat demo 2 50 mode=Gauss dialog=n device=xw device=\!
+
+echo DEMO:
+echo DEMO: Step 3: Identify the located feature with wavelengths from
+echo DEMO:    the data base\; automatically ...
+arcident demo demo2 demo_arc wrange=\[3900,4000\]
+
+echo DEMO:
+echo DEMO: Step 4: Fit polynomial dispersion curve to feature
+echo DEMO:    identifications and use the fit to create spectroscopic
+echo DEMO:    values from pixel coordinates\; \(in graphical dialogue you
+echo DEMO:    could add or delete identifications\) ...
+#arcdisp demo2 2 dialog=n ************CAN'T DO THIS UNTIL HME FIXES FDB
+
+#!!!!!MODIFICATION
+#-----------------
+#echo DEMO:
+#echo DEMO: Plot the original arc spectrum and the one with calibrated
+#echo DEMO:    wavelengths ...
+#specplot demo axes=++00 tick=--00 text=++00 bottom=pixel left=counts \
+#   labspc=\[4,6,4,6\] world=\[0.5,2039.5,-10,800\] reset accept
+#specplot demo2 clear=f colour=3 axes=00++ tick=00-- text=00++ numl=00++ \
+#   top=\"wavelength \[\\A\]\" right=\"Specdre demonstration\" \
+#   labspc=\[4,6,4,6\] world=\[3921.9,3988.33,-110,700\] accept
+#!!!!!END-MODIFICATION
+#---------------------
+
+echo DEMO:
+echo DEMO: To plot the dispersion curve use a trick: write the
+echo DEMO:    spectroscopic values \(an NDF in the Specdre Extension\) to
+echo DEMO:    an ASCII file \(which will be lambda versus x\), read it
+echo DEMO:    back into a spectrum and plot it ...
+#ascout in=demo2.more.specdre.specvals out=dispcurv.dat
+#ascin in=dispcurv.dat out=dispcurv colaxes=1 coldata=2 accept
+#************CAN'T DO THIS UNTIL HME FIXES FDB ^
+#!!!!!MODIFICATION
+#-----------------
+#specplot dispcurv bottom=pixel left=\"wavelength \[\\A\]\" northo=3 \
+#   reset accept
+#!!!!!END-MODIFICATION
+#---------------------
+# Interrupts jump to here
+abort_script:
+
+
+# End of script
+end_script:
+
+echo DEMO:
+echo DEMO: Deleting all demo files.
+      if ($?LC_COLLATE != 0 ) unsetenv LC_COLLATE
+      ls -1 > dir_index_after
+      diff dir_index_before dir_index_after | awk '/>/{print $2}' > newfiles
+      set check = `diff newfiles $BENCH_DIR/bch_specdre.chk`
+      if ( "$check" != "" ) then
+        echo "`date` : SPECDRE benchmark failed" >> status_file
+      endif
+     'rm' `cat newfiles` dir_index_before newfiles
+
+#  End of demo.csh

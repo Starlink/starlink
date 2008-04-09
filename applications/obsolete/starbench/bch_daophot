@@ -1,0 +1,113 @@
+#!/bin/csh -f
+#+
+# Name:
+#    bch_daophot 
+#
+# Purpose:
+#    Execute a sequence of IRAF commands associated with the DAOPHOT
+#    crowded field photometry package.
+#
+# Description:
+#    Run the IRAF CL from this script and feed it commands to simulate
+#    photometry of a galaxy cluster. The cluster is created artificially
+#    with the artdata package. It is intended that this script be timed 
+#    by the calling script; it does not do any internal timing.
+#
+# Language:
+#    C shell
+#
+# Authors:
+#    Tim Gledhill, tmg@star.herts.ac.uk
+#
+# Imported Variables:
+#    BENCH_DIR  Benchmark installation directory.
+#
+# History:
+#     28-MAY-1996 (tmg)
+#       Original Version.
+#-
+#
+# Check the files present in the current directory.
+#
+ls -1a > dir_index_before
+#
+# Copy the rewuired parameter files to the current directory.
+#
+cp $BENCH_DIR/datdataps.par .
+cp $BENCH_DIR/datcentes.par .
+cp $BENCH_DIR/datfitsks.par .
+cp $BENCH_DIR/datphotps.par .
+#
+# Create a local login.cl (any existing file is renamed to login.cl.OLD. 
+# Start CL.
+#
+$BENCH_DIR/mkiraf
+cl <<END 
+#
+# Load packages needed for this test.
+#
+artdata
+digiphot
+daophot
+#
+# Initialise tasks.
+#
+unlearn artdata
+unlearn digiphot
+unlearn daophot
+#
+# Create the galaxy image. A 512x512 array of 500 objects.
+#
+gallist gals.dat 500 spatial=hubble lum=schecter egal=0.8
+mkobjects gals objects=gals.dat gain=3 rdnoise=10 poisson+
+#
+# Run daofind to locate some objects. Use a ready-made parameter file
+# to set up the datapars parameters.
+#
+daofind image=gals output=gals.coo datapars=datdataps.par verify-
+#
+# Run PHOT to get sky backgrounds and initial magnitudes.
+#
+phot image=gals coords=gals.coo output=gals.mag \
+      datapars=datdataps.par centerpars=datcentes.par \
+      fitskypars=datfitsks.par photpars=datphotps.par verify-
+#
+# Go through the output from PHOT and select objects suitable for profile
+# fitting, then fit them.
+#
+pstselect image=gals photfile=gals.mag pstfile=gals.pst \
+          datapars=datdataps.par verify- maxnpsf=50
+psf image=gals photfile=gals.mag pstfile=gals.pst \
+    psfimage=gals.psf opstfile=gals.sta groupfile=gals.psg \
+    datapars=datdataps.par interactive- verify-
+nstar image=gals groupfile=gals.psg psfimage=gals.psf \
+      nstarfile=gals.nst rejfile=gals.nrj datapar=datdataps.par \
+      verify-
+#
+# Delete the observations.
+#
+imdelete gals
+imdelete gals.psf
+#
+# Exit CL
+#
+logout
+END
+#
+# Check the output files against the expected list and flag any problems.
+# Remove all created files.
+#
+if ($?LC_COLLATE != 0 ) unsetenv LC_COLLATE
+ls -1a > dir_index_after
+diff dir_index_before dir_index_after | awk '/>/{print $2}' > newfiles
+set check = `diff newfiles $BENCH_DIR/bch_daophot.chk`
+if ( "$check" != "" ) then
+   echo "`date` : DAOPHOT benchmark failed" >> status_file
+endif
+'rm' -rf `cat newfiles` dir_index_before 
+'rm' newfiles
+#
+# End of script.
+#
+exit
+

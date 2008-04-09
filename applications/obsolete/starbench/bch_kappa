@@ -1,0 +1,168 @@
+#!/bin/csh -f
+#+
+# Name:
+#    bch_kappa 
+#
+# Purpose:
+#    Execute a sequence of KAPPA commands as part of the benchmark
+#    package.
+#
+# Language:
+#    C shell
+#
+# Authors:
+#    Tim Gledhill, tmg@star.herts.ac.uk
+#    Brian McIlwrath bkm@star.rl.ac.uk
+#
+# Imported Variables:
+#    BENCH_DIR  Benchmark installation directory.
+#
+# History:
+#     1-AUG-1994 (tmg)
+#       Original Version.
+#     6-FEB-1995 (tmg)
+#       New commands added.
+#    15-FEB-1996 (tmg)
+#       Check for completion of applications by looking for output files.
+#    20-MAR-1996 (tmg)
+#       Handle changes to Kappa v0.9:
+#          INPIC and OUTPIC have changed to IN and OUT in several routines.
+#          PICK2D removed - use SLIDE. 
+#          NUMBA removed - use NUMB
+#          COMPAVE no longer has a NUMVAL parameter
+#          GAUSS renamed GAUSMOOTH
+#          change the bch_kappa.chk file.
+#    25-JUN-1997 (bkm)
+#          Revise for KAPPA V1.0
+#          Copy ccdframec from $KAPPA_DIR
+#-
+#
+      onintr abort_script
+#
+# See whether the kappa alias is defined, if not then source the 
+# Starlink cshrc file to define it.
+#
+      set kappa_startup_com = `alias kappa`
+      if ( "$kappa_startup_com" == "" ) source /star/etc/cshrc
+#
+# Start KAPPA package. Check the version number to make sure it is not
+# earlier than V0.10. This scripts is script is only compatible with
+# V0.10 and later.
+#
+      kappa
+      set version = `grep "(Version" $KAPPA_DIR/kappa.csh | awk '{print $10}' | sed -e 's/)"//'`
+      set keys = `echo $version | awk -f $BENCH_DIR/bch_ckver.awk`
+      set major = $keys[1]
+      set minor = $keys[2]
+      if( $major == 0 && $minor < 10 ) then
+	echo "***** Found KAPPA Version $version - expected Version 0.10 or later"
+        goto abort_script 
+      endif
+#
+#  Establish the current directory as ADAM_USER.
+# 
+      setenv ADAM_USER $cwd
+#
+# Define the number of times to execute the loop.
+#
+      set ntimes = 1
+#
+# Copy the CCD image.
+#
+      'cp' ${KAPPA_DIR}/ccdframec.sdf .
+#
+# Define some temporary files
+#
+      set temp1 = `$BENCH_DIR/tmpfile`
+      set temp2 = `$BENCH_DIR/tmpfile`
+      set temp3 = `$BENCH_DIR/tmpfile`
+      set temp4 = `$BENCH_DIR/tmpfile`
+#
+# Loop.
+#
+      set n = 0
+      while ( $n < $ntimes )
+#
+# Detail enhancement.
+#
+        histeq in=ccdframec out=$temp1 \\
+        laplace inpic=ccdframec number=3 outpic=$temp2
+        shadow in=ccdframec out=$temp3
+        if ( ! -e ${temp1}.sdf || ! -e ${temp2}.sdf || ! -e ${temp3}.sdf ) then
+          goto abort_script
+        endif
+        'rm' ${temp1}.sdf ${temp2}.sdf ${temp3}.sdf
+#
+# Arithmetic.
+#
+        pow inpic=ccdframec outpic=$temp1 power=2.5
+        maths exp='2.5*log10(ia/ib)' ia=ccdframec ib=$temp1 out=$temp2
+        cdiv in=$temp2 scalar=3.75 out=$temp3
+        exp10 inpic=$temp3 outpic=$temp4
+        if ( ! -e ${temp1}.sdf || ! -e ${temp2}.sdf || ! -e ${temp3}.sdf || \
+             ! -e ${temp4}.sdf ) then
+          goto abort_script
+        endif
+        'rm' ${temp1}.sdf ${temp2}.sdf ${temp3}.sdf ${temp4}.sdf
+#
+# Configuration change
+#
+        rotate in=ccdframec out=$temp1 angle=30 
+        flip in=$temp1 out=$temp2 dim=2
+        slide inpic=$temp2 outpic=$temp3 absx=100 absy=100 \\      
+        if ( ! -e ${temp1}.sdf || ! -e ${temp2}.sdf || ! -e ${temp3}.sdf ) then
+          goto abort_script
+        endif
+        'rm' ${temp1}.sdf ${temp2}.sdf ${temp3}.sdf
+#
+# Compression and expansion.
+#
+        compave in=ccdframec out=$temp1 compress=3
+        compick in=ccdframec out=$temp2 compress=2
+        pixdupe in=$temp1 out=$temp3 expand=2
+        sqorst inpic=$temp2 outpic=$temp4 xdim=465 ydim=543
+        if ( ! -e ${temp1}.sdf || ! -e ${temp2}.sdf || ! -e ${temp3}.sdf || \
+             ! -e ${temp4}.sdf ) then
+          goto abort_script
+        endif
+        'rm' ${temp1}.sdf ${temp2}.sdf ${temp3}.sdf ${temp4}.sdf
+#
+# Filtering.
+#
+        block in=ccdframec out=$temp1 box=3
+        gausmooth in=ccdframec out=$temp2 fwhm=5.0 box=8
+        median in=ccdframec out=$temp3 mode=6 numit=3
+        surfit in=ccdframec out=$temp4 knots=6
+        if ( ! -e ${temp1}.sdf || ! -e ${temp2}.sdf || ! -e ${temp3}.sdf || \
+             ! -e ${temp4}.sdf ) then
+          goto abort_script
+        endif
+        'rm' ${temp1}.sdf ${temp2}.sdf ${temp3}.sdf ${temp4}.sdf
+#
+# Statistics.
+#
+        stats ccdframec clip='[3.0,2.8,2.5]'
+        numb in=ccdframec value=0
+        histat ndf=ccdframec \\  
+        histogram in=ccdframec device=\! \\    
+        if ( ! -e stats.sdf || ! -e numb.sdf || ! -e histat.sdf || \
+             ! -e histogram.sdf ) then 
+          goto abort_script
+        endif
+#
+# End of loop.
+#  
+        @ n = ( $n + 1 )
+      end
+      goto end_script
+#
+# An application has failed, flag an error and abort the script.
+#
+abort_script:
+      echo "`date` : KAPPA benchmark failed" > status_file
+#
+# Remove the input file and the application .sdf files.
+#
+end_script:
+      rm ccdframec.sdf `cat $BENCH_DIR/bch_kappa.chk`
+      exit

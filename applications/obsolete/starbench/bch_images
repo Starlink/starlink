@@ -1,0 +1,99 @@
+#!/bin/csh -f
+#+
+# Name:
+#    bch_images
+#
+# Purpose:
+#    Execute a sequence of IRAF commands associated with the images
+#    package.
+#
+# Description:
+#    Run the IRAF CL from this script and feed it commands from the images
+#    package to perform image processing tasks on a test image.
+#    It is intended that this script be timed by the calling script; it does 
+#    not do any internal timing.
+#
+# Language:
+#    C shell
+#
+# Authors:
+#    Tim Gledhill, tmg@star.herts.ac.uk
+#
+# Imported Variables:
+#    BENCH_DIR  Benchmark installation directory.
+#
+# History:
+#     28-MAY-1996 (tmg)
+#       Original Version.
+#-
+#
+# Check the files present in the current directory.
+#
+ls -1a > dir_index_before
+#
+# Create a local login.cl (any existing file is renamed to login.cl.OLD. 
+# Start CL.
+#
+$BENCH_DIR/mkiraf
+cl <<END
+#
+# Load packages needed for this test.
+#
+unlearn images
+images
+#
+# Copy the test image to local filespace.
+#
+imcopy dev\$pix test verbose-
+#
+# Convolutions and filters:
+#
+convolve test conv1 "-1. -1. -1.; 0. 0. 0.; 1. 1. 1." bound=wrap
+gauss test conv2 2.0 ratio=0.75 theta=45.0 bound=wrap bilinear-
+gradient test conv3 gradient=180 bound=nearest
+boxcar test conv4 3 3 bound=wrap
+laplace test conv5
+#
+# Configuration change.
+#
+rotate test conf1 90.0
+imtranspose conf1 conf2
+magnify conf2 conf3 0.3 0.3
+imshift test conf4 11.3 -4.2
+#
+# Image combination.
+#
+imsum "conv1,conv2,conv3,conv4" comb1 option=average
+imstack "conv1,conv2,conv3,conv4" comb2
+imcombine "conv1,conv2,conv3,conv4" comb3 combine=median reject=sigclip
+#
+# Statistics.
+#
+imstatistics "conv1,conv2,conv3,conv4,conv5,conf1,conf2,conf3,comb1,comb2,comb3"
+imhistogram test listout+
+#
+# Fitting.
+#
+imsurfit test testf 11 11
+#
+# Exit CL
+#
+logout
+END
+#
+# Check the output files against the expected list and flag any problems.
+# Remove all created files.
+#
+if ($?LC_COLLATE != 0 ) unsetenv LC_COLLATE
+ls -1a > dir_index_after
+diff dir_index_before dir_index_after | awk '/>/{print $2}' > newfiles
+set check = `diff newfiles $BENCH_DIR/bch_images.chk`
+if ( "$check" != "" ) then
+   echo "`date` : IMAGES benchmark failed" >> status_file
+endif
+'rm' -rf `cat newfiles` dir_index_before 
+'rm' newfiles
+#
+# End of script.
+#
+exit

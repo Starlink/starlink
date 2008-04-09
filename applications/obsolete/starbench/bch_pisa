@@ -1,0 +1,140 @@
+#!/bin/csh -f
+#+
+#  Name:
+#     bch_pisa
+
+#  Purpose:
+#     Script to demonstrate PISA functions. Modified for benchmarking 
+#     purposes.
+
+#  Language:
+#     C shell
+
+#  Invocation:
+#     bch_pisa
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     Tim Gledhill (tmg@star.herts.ac.uk)
+#     {enter_new_authors_here}
+
+#  History:
+#     7-MAY-1992 (PDRAPER):
+#        Original version.
+#    21-OCT-1994 (tmg):
+#        Modified for use with benchmarking package.
+#        Remove all image display sections so that the script can be run
+#        in the background.
+#    15-FEB-1996 (tmg):
+#        Check for completion of applications by checking for output files.
+#     {enter_changes_here}
+
+#-
+# 
+      onintr abort_script
+#
+# Define the Pisa startup command if necessary.
+#
+      set startup_com=`alias pisa`
+      if ( "$startup_com" == "" ) source /star/etc/cshrc
+#
+#  Establish the current directory as ADAM_USER.
+#
+      setenv ADAM_USER $cwd
+#
+#!!!MODIFICATION
+#---------------
+#  Find out which graphics device we're using.
+#echo -n "Device (image display):"
+#set device = $<
+#if ( $device == "" ) then
+#   exit
+#endif
+#
+# Use a 'non-interactive' device
+#
+      set device = "ps_p"
+
+#+++MODIFICATION---Make a list of all the files in the current directory.
+#
+      ls -1 > dir_index_before
+#+++ENDMODIFICATION
+#
+#!!!END-MODIFICATION
+#-------------------
+
+#
+pisa
+
+#
+# Loop to perform the next section three times.
+#
+set ntime = 1
+while ( $ntime <= 3 )
+  @ ntime = ( $ntime + 1 )
+
+echo " "
+echo "......Finding objects using PISAFIND......"
+if ( -e pisafind.dat ) 'rm' pisafind.dat
+if ( -e pisasize.dat ) 'rm' pisasize.dat
+pisafind in=/star/bin/pisa/frame minpix=8 method=1 \
+ results=pisafind.dat sizes=pisasize.dat reset accept
+
+
+echo " "
+echo "......Fitting stars using PISAFIT and PISA profiling function......"
+pisafit in=/star/bin/pisa/frame positions=/star/bin/pisa/frame_stars.acc \
+        minmode=n radius=9 again=f weighted=f background=492.2 \
+       device=$device reset accept
+#
+echo " "
+echo "......Generating model frame using PISAGEN and profile fit......"
+pisagen input=/star/bin/pisa/frame positions=pisafind.dat \
+ output=model background=0 noise=g sigma=30 reset accept
+#
+
+
+# object classification
+echo " "
+echo "......Modifying PISA parameters using PISAPEAK......"
+if ( -e pisapeak.dat ) 'rm' pisapeak.dat
+pisapeak in=/star/bin/pisa/frame finddata=pisafind.dat \
+ results=pisapeak.dat reset accept
+#
+# apply a cut to the data in peakedness 
+echo " "
+echo "......Applying cut to peakedness parameter using PISACUT......"
+if ( -e stars1 ) 'rm' stars1
+if ( -e gals1 ) 'rm' gals1
+pisacut input=pisapeak.dat column=2 thresh=0.85 lower=stars1 \
+ higher=gals1 reset accept
+#
+# separate pisafind results
+echo " "
+echo "......Matching PISACUT classes with pisafind data using PISAMATCH......"
+if ( -e stars11 ) 'rm' stars11
+if ( -e gals11 ) 'rm' gals11
+pisamatch one=stars1 two=pisafind.dat out=stars11 reset accept
+pisamatch one=gals1 two=pisafind.dat out=gals11 reset accept
+
+# end of loop.
+end
+
+# Interrupts jump to here
+abort_script:
+
+# Clean up data files.
+#
+      if ($?LC_COLLATE != 0 ) unsetenv LC_COLLATE
+      ls -1 > dir_index_after
+      diff dir_index_before dir_index_after | awk '/>/{print $2}' > newfiles
+      set check = `diff newfiles $BENCH_DIR/bch_pisa.chk`
+      if ( "$check" != "" ) then
+        echo "`date` : PISA benchmark failed" >> status_file
+      endif
+     'rm' `cat newfiles` dir_index_before newfiles
+ 
+
+
+
+# @(#)pisa_demo	1.1     10/7/93     1

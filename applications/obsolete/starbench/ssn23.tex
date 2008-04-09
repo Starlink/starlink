@@ -1,0 +1,1235 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocsource}    {ssn\stardocnumber}
+\newcommand{\stardocnumber}    {23.5}
+\newcommand{\stardocauthors}   {T.M.Gledhill \\
+                                C.A.Clayton}
+\newcommand{\stardocdate}      {22 Jan 1999}
+\newcommand{\stardoctitle}     {Starlink Benchmarking Utility}
+\newcommand{\stardocabstract}  {The Starlink Benchmarking Utility provides a
+set of tools for investigating the performance of computer systems running
+astronomy data reduction software. This manual is intended for Starlink Site Managers and describes how to install and use the package.}
+\newcommand{\stardocversion}   {Version \pkgver}
+\newcommand{\stardocmanual}    {User's Manual}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+\renewcommand{\thepage}{\roman{page}}
+
+%  Package Version.
+\newcommand{\pkgver}     {v1.2}
+
+% Package FTP directory.
+\newcommand{\pkgftpdir}  {/pub/tools}
+
+% Package FTP server.
+\newcommand{\pkgftpsrv} {starlink-ftp.rl.ac.uk}
+
+% Package URL.
+\newcommand{\pkgurl} {ftp://\pkgftpsrv\pkgftpdir}
+
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+%   \begin{center}
+%   {\Large\bf \stardoctitle}
+%   \end{center}
+   \vspace{5mm}
+    \begin{center}
+      {\Huge\bf  \stardoctitle \\ [2.5ex]}
+      {\LARGE\bf \stardocversion \\ [4ex]}
+      {\Huge\bf  \stardocmanual}
+    \end{center}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+ \newpage
+ \begin{latexonly}
+   \begin {center}
+     \rule{80mm}{0.5mm} \\ [1ex]
+     {\Large\bf \stardoctitle \\ [2.5ex]
+           \stardocversion} \\ [2ex]
+      \rule{80mm}{0.5mm}
+   \end{center}
+   \vspace{20mm}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+
+%------------------------------------------------------------------------------
+%  Introduction.
+%------------------------------------------------------------------------------
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+\vspace{30mm}
+\section{Introduction}
+
+System benchmarking is important not only in deciding what line to take
+in future hardware purchases, but also to check whether current systems are
+set up correctly, whether software is executing properly and as a tool to
+investigate configuration changes and tuning operations. Although there is
+no shortage of available benchmarks, many of them are unfortunately either 
+very simplistic, perhaps running a piece of floating point Fortran code in a loop, or test a very specific area of system performance. In both cases the
+result is unlikely to give a true indication of how a real piece of software
+will perform.
+
+The Starlink Benchmarking Utility is an easy--to--use set of
+tools for investigating the performance of computer systems when
+running astronomy data reduction software and currently includes
+benchmarks from the Starlink Software Collection and IRAF. The
+intention is to benchmark the sort of applications that are likely to
+be used by astronomers and hopefully to produce a performance estimate
+which is of more relevance to astronomers.
+
+The three main aims of the Utility are:
+
+\begin{itemize}
+\item To provide an indication of how well a machine performs when
+carrying out tasks typical of astronomical data analysis.
+
+\item To check that all Starlink machines show consistent performance
+figures and that those figures are within expectations.
+
+\item To act as a performance diagnostic in system tuning operations, allowing
+the effects of hardware changes, such as adding extra memory or changing
+disk configurations, to be investigated.
+\end{itemize}
+
+The principal result produced by the Starlink Benchmarking Utility is
+the STARmark rating, which is described in Section~\ref{starmark}. In
+addition, as of V1.0, an IRAFmark, based on the IRAF benchmarks, can
+also be produced. These ratings should provide convenient benchmarks
+for comparing the performance of different host systems. More detailed
+benchmarking results can also be produced and this is discussed in
+Section~\ref{results}.
+
+
+%------------------------------------------------------------------------------
+%   Installation.
+%------------------------------------------------------------------------------
+
+\section{Installation}
+
+The package is currently supported on {\bf Solaris}, {\bf Digital Unix}
+and {\bf Red Hat Linux} platforms at version \pkgver.  Compressed tar
+files for each platform are available from the Starlink anonymous ftp
+account.
+
+\vspace{3mm}
+\htmladdnormallinkfoot{starbench\_sun4\_Solaris\_\pkgver.tar.Z}{\pkgurl/starbench\_sun4\_Solaris\_\pkgver.tar.Z} ~~~~~~~~~~~~~~~~~(Solaris systems) 
+
+\htmladdnormallinkfoot{starbench\_alpha\_OSF1\_\pkgver.tar.Z}{\pkgurl/starbench\_alpha\_OSF1\_\pkgver.tar.Z} ~~~~~~~~~~~~~ (Digital Unix systems) 
+
+\htmladdnormallinkfoot{starbench\_ix86\_Linux\_\pkgver.tar.Z}{\pkgurl/starbench\_ix86\_Linux\_\pkgver.tar.Z} ~~~~~~~~~~~~~ (Red Hat Linux systems) 
+
+
+%\> starbench\_sun4\_Solaris\_\pkgver.tar.Z \> (Solaris systems) \\
+%\> starbench\_alpha\_OSF1\_\pkgver.tar.Z \> (Digital Unix systems)    \\
+%\end{tabbing}
+
+\pagebreak
+The package is supplied ready-built for each platform (although it can
+be rebuilt easily if necessary). Installation is straightforward and
+proceeds as follows:
+
+\begin{enumerate}
+\item Move to the empty directory in which you wish to install the package.
+A suitable place would be in the {\tt /star/local} tree, {\em e.g.} 
+{\tt /star/local/starbench}. Space requirements are approximately 2MB for
+the compressed tar archive and 5.5MB for the installed package.
+
+\item Obtain the compressed tar file, appropriate to your platform, from
+the Starlink ftp server either {\em via} the URLs given above or
+directly {\em via} FTP as shown below. Replace the '***' field with the 
+platform abrieviation appropriate to your system (see step 3).
+
+{\tt    \% ftp \pkgftpsrv            \\
+        (login as 'anonymous')                 \\
+        ftp$>$ cd \pkgftpdir                   \\
+        ftp$>$ bin                             \\
+        ftp$>$ get starbench\_***\_\pkgver.tar.Z   \\
+        ftp$>$ quit }
+
+\item Set the SYSTEM environment variable to identify your system. 
+
+For Digital Unix systems: \\
+{\tt \% setenv SYSTEM alpha\_OSF1}
+
+For Solaris systems: \\
+{\tt \% setenv SYSTEM sun4\_Solaris}
+
+For Linux systems: \\
+{\tt \% setenv SYSTEM ix86\_Linux}
+
+\item Unpack the {\tt tar} archive:
+
+{\tt \% zcat starbench\_\$SYSTEM\_\pkgver.tar.Z | tar xvf - }
+
+\item Execute the {\tt mk} script. {\em Note that the package will
+install into the current directory.}
+
+{\tt \% ./mk install}
+\end{enumerate}
+
+%------------------------------------------------------------------------------
+% Running the benchmarks.
+%------------------------------------------------------------------------------
+
+\section{Running the Benchmarks}
+
+The benchmarks are designed to be set up for automatic execution by the
+Unix {\tt cron} daemon. This method of execution is preferred since,
+not only does it involve a lesser degree of user interaction, but it
+allows the benchmarks to be executed a number of times, at regular
+intervals, so as to build up a statistical base of results from which
+more reliable conclusions can be drawn.
+
+\subsection{Prior Requirements}
+
+{\bf The following setup is required in order to run the benchmarks.}
+
+\begin{itemize}
+\item Starbench \pkgver will only run with Starlink Software Distribution
+USSC207 or later (the Autumn 97 CD release). {\bf It will not work
+with earlier Starlink releases.} 
+
+\item To run the benchmarks in the recommended fashion the user must
+have permission to run jobs using {\tt cron} and {\tt at}. This may
+necessitate placing the username in the files {\tt /etc/cron.d/cron.allow}
+and {\tt /etc/cron.d/at.allow}.
+
+\item The benchmarks themselves create large temporary files so that a 
+minimum of 11MB of free space is recommended in the working directory
+(different from the installation directory).
+
+\item It is assumed that the {\bf ussc} is installed under {\tt /star} and
+that the user has access to it. 
+
+\item If IRAF benchmarks are to be run, it is
+assumed that IRAF software is installed under {\tt /iraf/iraf}. However,
+the environment variable {\tt iraf} can be set to point to ``non-standard''
+locations. For example, if IRAF is installed in {\tt /star/iraf/iraf} then...
+
+{\tt > setenv iraf /star/iraf/iraf}
+
+...before starting up the benchmark package. 
+
+
+\item The {\tt tcsh} and {\tt perl} executables are assumed to be in
+{\tt /usr/local/bin}.
+
+\item The following packages are used by the benchmark suite and must be 
+installed for the benchmarks to function properly:
+
+  \begin{itemize}
+    \item {\bf USSC: } kappa, pisa, specdre, ccdpack
+    \item {\bf IRAF: } ccdred, daophot, images
+  \end{itemize}
+\end{itemize}
+
+\subsection{Automatic Benchmarking -- Recommended Procedure}
+
+The procedure for cron execution of the benchmarks will now be described, along
+with some guidelines intended to promote consistency in the results. 
+
+\begin{enumerate}
+
+\item {\bf Move to a suitable directory}
+
+During execution, the benchmarks create a number of temporary files,
+some of which can be quite large. These files are created in the
+current directory. The best policy is to move to a directory with a
+large amount of free space before issuing any benchmark commands; a
+minimum of 11MB is recommended. {\em In any case, the benchmarks
+cannot be executed whilst the current directory is the installation
+directory}.
+
+The location of the filesystems containing the current working
+directory, the benchmarking package, the Starlink software (ussc), and
+the iraf installation can all be expected to influence the benchmark
+results (this will be discussed later).  It is suggested that, whenever
+possible, the current working directory should be on a filesystem which
+is {\bf local to the machine being tested}. In addition, the filesystem
+should not be close to capacity, since full filesystems often
+experience reduced I/O efficiency. For more information on how disk I/O
+may affect the benchmark results, see Section~\ref{diskeffects}.
+
+
+\item {\bf Source the startup script}
+
+To make the package available, source the startup script ({\tt starbench.csh})
+in the installation directory. For example, if the package was installed in
+{\tt /star/local/starbench} then...
+
+{\tt host\% source /star/local/starbench/starbench.csh}
+
+An alias for this command could be defined in your {\tt .tcshrc} script. This
+command sets up various environment variables, checks the software installation
+and also checks which packages ({\tt ussc} and {\tt iraf}) are installed
+on the system. 
+ 
+
+\item {\bf Submitting the benchmarks for execution}
+
+The benchmarks are submitted for execution by the cron using a single
+interactive script, {\tt submit}, which prompts for the necessary
+information. Here is a transcript of an example session:
+
+\begin{verbatim}
+host% cd /data/user/results
+host% source /star/local/starbench/starbench.csh
+host% submit
+
+ Submit
+ ------
+
+ This is an  interactive script to submit benchmarks for execution
+ by the cron at regular intervals. In this way a benchmark profile
+ of the host machine can be built up.
+
+ The benchmarks will be run every hour. Give the number of minutes
+ past the hour to start each job. If you are running benchmarks on
+ several machines then it is a good idea to space them out.       
+
+ Number of minutes past the hour [0] : 30
+
+ How many times should the benchmarks be run? The default is to run
+ them over a twenty-four hour period.
+
+ Number of times to run benchmarks [24] : 12
+
+ Give the name of a directory to hold the log files generated by
+ the benchmarks. The default is to  put them in the current work
+ directory.
+
+ Give a directory for the log files [.] : 
+
+ The default is to just run the USSC benchmarks [ussc]. If you wish
+ you may run the IRAF  benchmarks instead  [iraf] or both  USSC and
+ IRAF benchmarks [both].
+
+ Specify which benchmarks to run [ussc] : both
+
+
+ ...cron jobs started
+
+warning: commands will be executed using /usr/local/bin/tcsh
+job 793688940.a at Sat Feb 25 05:09:00 1995
+
+ ...cron termination procedure queued
+
+host%
+\end{verbatim} 
+
+The user is given the choice of when to execute the benchmarks (minutes
+past the hour) and how many times to execute them. When making this
+choice you should obviously avoid times when other heavy system
+processes, such as disk dumps or scratch disk purges, are executing. In
+addition, if benchmarks are being executed on more than one host, but
+are using the same disk space, then they should be spaced out in time
+so that they cannot interfere with one another. A reasonable option
+would be to benchmark 3 hosts at a time with executions separated by 20
+minutes ({\em i.e.} 0, 20 and 40 minutes past the hour).
+
+The user is given the choice of running the {\tt ussc} benchmarks or the
+{\tt iraf} benchmarks, or running both. {\em The default is to just run 
+the ussc benchmarks}.
+
+The {\tt submit} script makes an entry in the user's crontab file
+causing the benchmarks to be executed every hour at the requested time.
+In addition, a script to terminate execution of the benchmarks, after
+the required number of runs, and return the user's crontab file to its
+previous state is queued for future execution using the Unix {\tt at}
+command.
+
+Each time the benchmark suite is executed, the results are recorded in
+a log file (filetype {\tt .log}) in the directory specified by the
+user. These log files contain the benchmark timings along with
+information on the host system characteristics. They are simple ASCII
+files and can be examined at any time.
+
+
+\end{enumerate}
+
+\subsection{Interactive Benchmarking}
+
+Although {\tt submit} is the preferred command for running the benchmarks,
+it is also possible to run them on an interactive one-off basis 
+using the command {\tt bench}. Simply type {\tt bench}, after sourcing the
+package startup script (previous section), and this will run the benchmarks
+and print the results out to the screen. 
+
+If the {\tt bench} command line switch {\tt -l} is used and the name of
+a log file given then the results will be sent to a log file rather
+than to the screen. If this option is used then the procedure could be
+backgrounded. This direct method of running the software will only
+produce a snapshot of the system and the results may not be as reliable
+as the multiple executions generated by {\tt submit}.  However, it is
+useful for getting quick results or when troubleshooting.  For
+example:
+
+{\tt host\% bench -l quick-bench.log}
+
+Note that log files should have {\tt .log} as their file type so that they
+can be recognised as such by the {\tt scan} command.
+
+The packages to benchmark can be selected using the {\tt -p} command line
+switch, which takes the value {\tt iraf}, {\tt ussc} or {\tt both}. For
+example, to only use the iraf packages:
+
+{\tt host\% bench -l quick-bench.log -p iraf}
+
+To use both ussc and iraf packages:
+
+{\tt host\% bench -l quick-bench.log -p both}
+
+The default is to just use the {\tt ussc} packages.
+
+%\newpage
+\subsection{Processing the Log Files}
+
+The log files produced by each execution of the benchmarks can all be
+processed together using the {\tt scan} command. This command accesses
+all of the log files in a given directory and sorts them according to
+host. Benchmarks executed on different hosts may log their results to a
+common directory and {\tt scan} will sort them out, producing a results
+file for each host. For each host, average benchmark timings are
+computed and written to a file {\tt <host>.bch}.  These files are
+formatted lists of numbers and are largely for internal use within the
+package. If a {\tt .bch} file already exists for a host, then {\tt scan}
+will rename it and produce a new one.
+
+The {\tt scan} command then reads the {\tt <host.bch>} files (one for
+each host) and calculates mean execution times and errors for each
+benchmark. These results are then compared with `standard' measurements
+and a STARmark rating is calculated. If the IRAF benchmarks have
+been run, then an IRAFmark rating is produced. An example transcript
+follows:
+
+
+\begin{verbatim}
+host% cd /data/user/results
+host% scan
+
+ Scan
+ ----
+
+ This utility will scan through the benchmark logfiles created by
+ the 'submit' or 'bench -l' commands to extract statistics and to
+ calculate a  mean value and error for each benchmark.
+
+ The performance is then compared with 'standard' results and the
+ STARmark  benchmark rating is  calculated. If IRAF  benchmarking
+ was selected, then an IRAFmark rating will also be calculated.
+
+
+ Give the directory path for the log files. The default assumes
+ that they are in the current directory.                       
+
+ Log files directory [.] : 
+
+ Benchmark Results
+ =================
+
+ Starlink Benchmark Utilities v1.2
+
+ Benchmarks calibrated against rlsul1
+
+ Hostname           : uhsul2
+ User               : star
+ Opsys              : SunOS 5.6
+ Platform           : SUNW,Ultra-2
+ Physical Memory    : 256.00Mb
+ Online Processors  : 2
+ Processor Speed    : 168MHz
+ USSC version       : USSC212
+ IRAF version       : "NOAO/IRAF V2.11EXPORT"
+
+ STARmark : 1.22 +/- 0.01  (based on 20 measurements)
+ IRAFmark : 1.16 +/- 0.01  (based on 20 measurements)
+
+host%
+\end{verbatim} 
+
+The results produced by the {\tt scan} command can be sent to a log file
+{\em as well as} to the screen using the {\tt -l} command line switch:
+
+{\tt host\% scan -l results.lis}
+
+The {\tt scan} command can also produce extended results enabling a
+more detailed investigation of a system's performance. This facility is
+also very useful for checking that the benchmarks have executed correctly
+and that the results are not unduly influenced by any one application.
+Using these extended results is described in section~\ref{results}. 
+
+In the example given above, the benchmark timings were calibrated
+against the RAL machine {\tt rlsul1} (an UltrSPARC 1/140 with 143MHz
+processor). The {\tt scan} command will also use user-supplied
+calibrations (described in section~\ref{calfile}). 
+
+\newpage
+\section{The STARmark and IRAFmark Ratings}
+\label{starmark}
+
+The STARmark and IRAFmark ratings are intended as estimates of how well a
+machine performs a sequence of astronomical data reduction tasks using
+Starlink and IRAF software. However, the applications that go to make up
+these two rating are totally different, including different mixes of CPU
+activity and disk I/O. It is therefore {\em not possible} to use STARmark
+and IRAFmark ratings to compare the performance of Starlink and IRAF
+software on a particular machine.  They are, simply, measuring different
+things. The IRAF benchmarks have been included to provide another
+performance estimate for a particular hardware configuration, which will
+be more appropriate for sites running predominantly IRAF software. 
+
+Neither are the STARmark and IRAFmark ratings intended as definitive
+performance ratings for a machine. Indeed, they cannot be since they
+only test a limited subset of a machine's capability.  Rather than
+trying to separate out and measure specific aspects of performance
+(such as CPU power, I/O efficiency, caching ability {\em etc.}) the
+current philosophy behind this package is to fold all of these factors
+into global performance estimates which, hopefully, will be of more
+relevance to the astronomer sitting in front of the screen.  The
+STARmark and IRAFmark figures simply provide a convenient single-figure
+handle on these estimates.
+
+Each benchmark is timed (using the shell {\tt time} command) to give
+the ``total CPU execution time'' or {\bf tcpu} for the benchmark. This
+is the sum of the user and kernel mode CPU times. In order to calculate
+the STARmark and IRAFmark ratings, the {\bf tcpu} figures for each
+benchmark must be calibrated against a `standard' result.  In the case
+of the current package (\pkgver) the standard is a 224Mb SPARC Ultra 1/140
+(RAL machine rlsul1). Comparison of the benchmark tcpu times on the
+machine being tested with those on the standard machine gives a {\bf
+speed} rating for each benchmark ({\em i.e.} how much faster the
+benchmark runs on the machine being tested than on the standard
+machine), so that, for any particular benchmark:
+
+\vspace{5mm}
+\begin{large}
+~~~~~~~~speed = $\frac{{\sf tcpu_{rlssp0}}}{{\sf tcpu_{machine}}}$
+\end{large}
+\vspace{5mm}
+
+Four benchmarks are currently incorporated in the STARmark rating,
+based on the KAPPA, PISA, SPECDRE and CCDPACK Starlink packages. The
+{\bf speed} ratings for these benchmarks are averaged to form the 
+STARmark rating.
+
+\begin{tabbing}
+~~~~~~~~STARmark = 0.25(speed(KAPPA) + speed(PISA) \=+ speed(SPECDRE)  \\
+                                                     \>+ speed(CCDPACK))
+\end{tabbing}
+
+The error quoted on the STARmark figure is derived from the spread in
+the results from multiple executions of the benchmark package using the
+{\tt submit} command.  This spread in results is likely to reflect
+variations in load and activity on the system throughout the timespan
+of the benchmark executions. The quoted error therefore represents a
+lower limit on the real uncertainty which will include systematic
+effects ({\em e.g.} whether the working directory is on a local or
+remote filesystem) which may well dominate.
+
+In a similar way, the IRAFmark rating is based on three IRAF
+packages: CCDRED, DAOPHOT and IMAGES.
+
+\begin{tabbing}
+~~~~~~~~IRAFmark = (speed(CCDRED) + speed(DAOPHOT) \=+ speed(IMAGES))/3.0  \\
+\end{tabbing}
+
+
+{\bf The current list of expected STARmark and IRAFmark figures for various
+machines and configurations is available to Site Managers through the
+Starlink Forum System Managers' Conference, \htmladdnormallinkfoot{Note 4.0}{http://rlsaxps.bnsc.rl.ac.uk/Forum/Systems-Management/4}}.
+
+
+%\newpage
+\section{Extended Results}
+\label{results}
+
+The {\tt scan} command will print out more detailed results if given
+the {\tt -f} command line switch. An example transcript is given below.
+ 
+
+\begin{verbatim}
+host% cd /data/user/results
+host% scan -f
+
+ Scan
+ ----
+
+ This utility will scan through the benchmark logfiles created by
+ the 'submit' or 'bench -l' commands to extract statistics and to
+ calculate a  mean value and error for each benchmark.
+
+ The performance is then compared with 'standard' results and the
+ STARmark  benchmark rating is  calculated. If IRAF  benchmarking
+ was selected, then an IRAFmark rating will also be calculated.
+
+
+ Give the directory path for the log files. The default assumes
+ that they are in the current directory.                       
+
+ Log files directory [.] : 
+
+ Benchmark Results
+ =================
+
+ Starlink Benchmark Utilities v1.2
+
+ Benchmarks calibrated against rlsul1
+
+ Hostname           : uhsul2
+ User               : star
+ Opsys              : SunOS 5.6
+ Platform           : SUNW,Ultra-2
+ Physical Memory    : 256.00Mb
+ Online Processors  : 2
+ Processor Speed    : 168MHz
+ USSC version       : USSC212
+ IRAF version       : "NOAO/IRAF V2.11EXPORT"
+
+ STARmark : 1.22 +/- 0.01  (based on 20 measurements)
+ IRAFmark : 1.16 +/- 0.01  (based on 20 measurements)
+
+ Average Load : 0.436 +/- 0.510
+
+ Benchmark  ucpu    kcpu       tpcu            Speed          Elapsed
+ ---------  ----    ----       ----            -----          -------
+
+       FFT  18.08   0.39  18.47 +/- 0.04    1.16 +/- 0.00   18.90 +/- 0.30
+
+       SLA   8.20   0.01   8.21 +/- 0.10    1.19 +/- 0.02    8.24 +/- 0.11
+
+     KAPPA   7.58   2.20   9.77 +/- 0.13    1.20 +/- 0.02   19.03 +/- 0.95
+
+      PISA   6.55   1.67   8.23 +/- 0.13    1.21 +/- 0.02   16.04 +/- 0.46
+
+   SPECDRE   5.30   2.48   7.78 +/- 0.12    1.23 +/- 0.02   15.19 +/- 0.47
+
+   CCDPACK   8.43   4.09  12.51 +/- 0.13    1.23 +/- 0.01   27.10 +/- 1.47
+
+    CCDRED  10.65   2.82  13.48 +/- 0.20    1.13 +/- 0.02   30.43 +/- 1.14
+
+   DAOPHOT  12.02   2.59  14.61 +/- 0.12    1.18 +/- 0.01   22.90 +/- 1.10
+
+    IMAGES   9.51   1.22  10.73 +/- 0.10    1.17 +/- 0.01   16.69 +/- 0.72
+
+\end{verbatim}
+
+The full output shows the CPU execution times recorded for individual 
+benchmarks, the {\bf speed} ratings and the elapsed times.
+The nomenclature is as follows:
+
+\begin{tabbing}
+~~~~~~\=~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\=~~~~~~~\=         \\
+\> ucpu   \>:  \> Average CPU time (secs.) in user mode for each benchmark. \\
+\>        \>   \> This is the time the CPU spends executing the user's code.\\
+\> kcpu   \>:  \> Average CPU time (secs.) in kernel mode for each benchmark. \\
+\>        \>   \> This is the time the CPU spends executing system instructions.        \\
+\> tcpu   \>:  \> Average Total CPU time (ucpu + kcpu) for each benchmark. \\
+\>        \>   \> The error on tcpu (secs.) is the standard deviation. \\
+\> speed  \>:  \> The ratio of tcpu on the standard machine to tcpu on the \\ 
+\>        \>   \> machine being benchmarked. The errors on the `speed' \\
+\>        \>   \> figures are simply the propagated tcpu errors. \\
+\> elapsed \>: \> Average elapsed time (secs.) for each benchmark. The error \\
+\>        \>   \> is the standard deviation.
+\end{tabbing}
+
+Since it is the four `speed' figures for the KAPPA, PISA, SPECDRE and
+CCDPACK benchmarks that are averaged to give the STARmark rating, a
+full output can be used to check whether the computed STARmark is being
+biased by any particular benchmark. The same applies for the IRAFmark.
+The benchmark scripts do check for successful completion and flag log
+files with problems so that {\tt scan} will not use them. However, it
+is also a good idea to check the errors on the {\bf tcpu} and {\bf
+speed} figures to make sure that the results have not been influenced
+by a spurious result. If the errors appear high then the log files
+should be examined.
+
+In addition to the `astronomy' benchmarks, the full output also shows
+results for the FFT and SLA benchmarks. These benchmarks are purely CPU
+thrashers and do not do any disk I/O (although the FFT benchmark can
+page heavily on systems with less than 32MB physical memory). They can
+be useful in assessing to what degree the other benchmarks are likely
+to be influenced by disk I/O considerations but they are not
+incorporated in the STARmark or IRAFmark figures.
+
+The individual benchmarks are described in Appendix A.
+
+
+\section{Disk I/O Effects}
+\label{diskeffects}
+
+The package does not, at present, contain a disk I/O benchmark, although the
+inclusion of one has been considered at some length. The effects of disk I/O efficiency on overall performance are obviously important, especially in
+astronomy where large data files are routinely accessed. This section 
+documents some of the problems inherent in producing a meaningful `disk
+benchmark'. 
+
+First of all, one has to decide what to measure. The processes of disk
+reading and writing can be split into two parts. The first part, which
+we will call the `internal' part, incorporates the calls to system I/O
+routines and the transfer of data to or from internal buffers and
+caches. The second part, which we will call the `external' part,
+incorporates the actual transfer of information to or from a physical
+location on the disk. The efficiency of the internal part of disk I/O
+depends on the machine and operating system whereas the efficiency of
+the external part of disk I/O depends on the disk hardware and bus
+technology. These two aspects of disk I/O should really be benchmarked
+separately, however, there are too many possible hardware combinations
+here to produce a `standard' benchmark result.  Yet it is precisely the
+combined internal and external efficiencies which influence the overall
+disk I/O performance of the system.
+
+The benchmarks in this package measure the {\bf tcpu} (total CPU)
+times. In disk I/O processes it is only the internal (system) part of
+the I/O that is clocked by the CPU and hence appears in the {\bf tcpu}
+figure. The external part of the I/O operation (physically reading and
+writing) only appears in elapsed time. The elapsed time that it takes a
+process to execute depends directly on what is going on on the rest of
+the system, in other words on the system load.  Without knowing in
+advance how elapsed time on a particular machine scales with system
+load, the external portion of disk I/O cannot be benchmarked. One
+possible solution is to run a disk benchmark on a completely empty
+system where load is not a factor. However, even in this case the
+effects of system daemons and processes may need to be considered.
+Most background system daemon activity can legitimately be considered
+as part of the operating system, however sporadic activity caused, for
+example, by remote ftp connections or tftp requests from booting
+hardware, could influence the benchmarks.
+
+In cases where a disk is not local to the system running the benchmarks
+then things are even more complicated, since the load on the machine
+serving the disk must be taken into consideration.
+
+Whenever possible the benchmarks should be executed from a disk
+which is local to the machine being tested so as to minimise the effects
+of load on the file server on the benchmark results. In addition, filesystems
+which are close to capacity  or which are heavily fragmented should be avoided
+since they may suffer from reduced I/O performance. If it is suspected that
+the choice of disk is unduly influencing the benchmark results then the
+benchmarks should be run from several different disks and the results
+compared.
+
+Finally, disk I/O benchmarks are heavily influenced by the effects of a
+disk cache. I/O to often-accessed small files can often be fulfilled
+from the cache and thus a benchmark involving such files would really
+be testing the speed at which your CPU can read blocks out of the cache
+and not the speed of your disk I/O subsystem.  However, if your
+application actually does do a lot of reading and writing of small
+files, then the inclusion of the effects of the cache in your benchmark
+is valid. Also, the record length size plays a major role in
+performance measurements. Hence, the most reliable disk benchmark is
+your actual application. This is the approach taken in the present
+benchmarking suite. Real astronomical applications are used and thus
+they naturally include disk I/O elements of the relevant types and in the
+appropriate proportions.
+
+\section{Elapsed Time}
+The STARmark and IRAFmark ratings (Section~\ref{starmark}) only
+consider the performance of a machine in terms of CPU time consumed and
+make no use of elapsed time.  This is simply because elapsed time is
+highly dependant on machine load and it is not possible to produce
+reliable benchmarks even if one measures the machine load and attempts
+to account for it. Furthermore, it is usually not possible to measure
+elapsed time on an ``unloaded'' system since a networked Unix system is
+never idle.
+
+
+Measurements of CPU usage, on the other hand, are highly repeatable and
+thus are suitable as a benchmark. They are also useful for identifying
+small changes in performance resulting from changes to system
+configuration.
+ 
+Although elapsed time is difficult to interpret, it is of great
+interest to the interactive user who experiences elapsed rather than
+CPU time. The elapsed time is available in the individual log files
+produced by {\tt submit} and {\tt bench -l} and is output by the {\tt
+scan -f} command. It can be particularly important when exploring the
+effects of disk location. For example, trials have shown that elapsed
+time for a benchmark run can increase by up to 500\% when a remote disk
+is used rather than a local one whereas the increase in CPU time,
+although measurable, was small in comparison.  Bearing in mind the
+difficulties inherent in benchmarking disk I/O, it is still often
+possible to extract useful information from the elapsed times and we
+suggest some guidelines for doing so:
+
+\begin{itemize}
+\item As described in Section~\ref{diskeffects} and above, elapsed time is
+highly dependent on system load in a way which is hard to quantify. Pick
+a period when the system should be relatively quiescent, {\em e.g.} overnight.
+Avoid other cron procedures such as disk dumps or scratch disk purges. Beware
+of http or ftp connections. When disk space (working directory, benchmark 
+software or ussc) are on remote disks then activity on the disk server needs
+to be considered also.
+\item Run the benchmarks over an extended period of time using the {\tt
+submit} command. For example, from midnight to 6am on several days of
+the week.  Elapsed times are especially susceptible to sporadic system
+activity. Establishing a large base of measurements spread over time
+will smooth out these effects.
+\item Use the mean elapsed times produced by {\tt scan -f} and check
+their standard deviations. If the standard deviation on a measurement
+appears large then check the benchmark log
+({\tt .log}) files for anomalous results. If you suspect that one
+particular measurement is unduly influencing the result then try
+removing the log file ({\em e.g.} by renaming the {\tt .log} extension)
+and then run {\tt scan -f} again.
+\end{itemize}
+
+ 
+
+\section{Other Benchmarks}
+
+The benchmarks in this package are specifically intended to evaluate
+performance on systems principally running Starlink and IRAF software.
+On systems where other packages ({\em e.g.} AIPS) are heavily used then
+a benchmark specific to that package may be more appropriate.  Such
+benchmarks may have been provided by the suppliers of the software.
+
+A number of benchmarks based on IRAF tasks are included in this package
+at V1.0. However, a suite of more specialized IRAF benchmarks, which
+test the installation and performance of IRAF software, exists and was
+produced by NOAO. These benchmarks are described in the document {\em A
+set of Benchmarks for Measuring IRAF System Performance} written by
+Doug Tody which is available from the Starlink IRAF mirror as
+\htmladdnormallinkfoot{bench.ps.Z}{ftp://star-www.rl.ac.uk/pub/iraf/iraf/docs/bench.ps.Z}.
+
+
+\subsection{Systems running AIPS}
+
+A suite of benchmarks for systems running AIPS is available (the ``Dirty Dozen
+Test'' or DDT) which will produce an AIPSmark rating. 
+The DDT suite is a reliable way of determining two things: 
+firstly that a given AIPS installation gives accurate results, and 
+secondly it is a measure of the performance of AIPS on the given system. 
+
+Full details of the AIPS DDT, including latest results, can be found  \htmladdnormallinkfoot{at this URL}{http://info.cv.nrao.edu/aips/ddt.html}
+
+\section{Miscellaneous Issues}
+
+\subsection{Changes to the ussc}
+\label{ussc-changes}
+
+The {\bf ussc} is continually being updated and since the benchmarks use the 
+installed copy of the collection, the tests being run will gradually
+change over time. Hence, it will be necessary to re-run the benchmarks
+every so often to measure the performance of machines with the current
+version of the {\bf ussc}. 
+
+
+It might seem odd to use the everchanging installed copy of the 
+software for the benchmarks rather than a self contained, static copy.
+However, the size of the benchmarking package would be enormous if
+it had to carry a private copy of the applications around with it.
+Moreover, we are interested in how fast new machines run our current
+release of the software, not a frozen copy, and hence despite the
+obvious drawback, we have elected to use the installed {\bf ussc} for
+benchmarking.
+
+\subsection{New Versions of IRAF}
+
+Similar arguments to those in Section~\ref{ussc-changes} apply with
+regard to IRAF software. The current v\pkgver release of this package has
+been tested and calibrated with IRAF V2.11. As new versions of IRAF appear, 
+modifications to this package will no doubt be required. In addition, sites
+running older version of IRAF (for example V2.10-4) can expect different
+speed and IRAFmark ratings from those running V2.11. 
+
+\subsection{Alternative Calibrations}
+\label{calfile}
+
+The {\tt scan} command will, by default, calibrate the benchmark timings 
+against the RAL standard machine, using the calibration file {\tt
+starbench.cal} in the package installation directory. This results in
+the STARmark and/or IRAFmark ratings.
+
+If required, an alternative user-supplied calibration file can be
+supplied. This may be useful if the user wishes to calibrate a 
+number of machines against a local machine (rather than the RAL
+machine). 
+
+The calibration files are in fact results files generated by the {\tt
+scan -f} command. For example, to generate a calibration based on
+machine A and then to benchmark machines B and C with this calibration
+(rather than using the default RAL machine), you could follow these
+steps:
+
+\begin{enumerate}
+\item Run the benchmarks on machine A using the {\tt submit} command.
+\item Generate a results file for these benchmarks using:
+
+{\tt > scan -f -l my-calfile.cal}
+
+This is your new calibration file.
+
+\item Run benchmarks on machines B and C.
+\item Calibrate using the new calibration file and the {\tt -c} switch.
+
+{\tt > scan -f -c my-calfile.cal}
+\end{enumerate}
+
+\subsection{Multiprocessor Machines}
+
+The benchmarks in this package do not test the benefit of multiprocessor
+machines. Since benchmark tasks all execute sequentially it is unlikely 
+that they would take advantage of multiple processors.
+
+\subsection{Manufacturers' SPECmark Ratings}
+
+While the results from this package should be in broad agreement with manufacturers' SPECmark ratings, they will provide a more realistic performance
+estimate for Starlink machines. SPECmark ratings tend to indicate the 
+{\em potential} that it is possible to realise with a machine rather than
+the performance that will actually be returned when running `real' applications.
+
+\section{Acknowledgements}
+
+The production of this IRAF benchmarking software has been undertaken
+after discussions with Doug Tody, NOAO, the developer of IRAF.  However,
+the benchmarking package has been developed completely independently of
+the IRAF team so that any errors in the package or spurious results that
+it might produce are wholly the responsibility of Starlink.
+ 
+\newpage
+\appendix
+\section{Benchmark Descriptions}
+
+This appendix describes each benchmark and the operations it performs.
+
+{\bf FFT:}
+
+A fortran program which runs a Fast Fourier Transform algorithm on a
+1024x1024 element double precision array using KAPPA subroutines. This
+benchmark should test CPU floating point speed and the ability of the
+machine to handle large arrays. A considerable amount of virtual memory
+is allocated (approximately 32MB) which may result in substantial
+paging activity, depending on installed physical memory and other
+system processes. Fortran compiler optimisation flag -O is used.
+
+{\bf SLA:}
+
+The SLA benchmark exercises each of the subroutines in the C implementation of the SLALIB Starlink subroutine package. This benchmark performs a substantial amount of floating point arithmetic with no disk I/O. C compiler flag -O is
+used.
+
+{\bf KAPPA:}
+
+This benchmark runs a total of 22 KAPPA tasks sequentially (detail enhancement,
+image arithmetic, configuration change, compression and expansion, filtering 
+and image statistics). Most of the image processing tasks use a 319x503 pixel
+real image. A substantial amount of disk I/O is done.
+
+{\bf PISA:}
+
+This benchmark runs a modified version of the PISA demo script which locates
+and classifies objects on a test image and fits them with profiling functions.
+Again, a substantial amount of disk I/O is done.
+
+{\bf SPECDRE:}
+
+This benchmark runs a modified version of the SPECDRE demo script which processes spectral data and performs several fits. Some disk I/O.
+
+{\bf CCDPACK:}
+
+This benchmark runs a modified version of the CCDPACK demo which performs
+inter-image alignment, normalisation and mosaicing on test data. Disk I/O
+is quite intensive.
+
+{\bf CCDRED:}
+
+This benchmark uses the CCDRED package in IRAF to create and process
+test CCD images. A substantial amount of disk I/O is done, and at least
+10MB of free disk space is required.
+
+{\bf DAOPHOT:}
+
+The IRAF DAOPHOT package is used to perform crowded field photometry of
+a simulated galaxy cluster image. 
+
+{\bf IMAGES:}
+
+The IRAF IMAGES package is used to perform image processing tasks on
+a test 512x512 CCD image. 
+
+\section{Changes}
+
+\subsection{V0.8}
+
+The package was released at v0.8 in March 1995
+
+\subsection{V0.9}
+
+The following changes were made at v0.9:
+
+\begin{enumerate}
+\item All benchmark scripts now check for successful completion. Any anomalies
+are reported.
+\item The output from the {\tt scan} command has been improved. A new {\tt -l}
+command line flag allows results to be logged to a file.
+\item Benchmark scripts have been fixed to work with recent changes to the
+{\tt ussc}.
+\item The FFT benchmark has been re-written to use the PDA library.
+\item The startup script now checks for the presence of benchmarked
+packages. Any absences are noted.
+\item More system information produced as part of the benchmark headers.
+\item Package startup is now achieved by sourcing a startup script 
+{\tt starbench.csh}.
+\item Makefile updated to Starlink standard.
+\end{enumerate}
+
+\subsection{V1.0}
+
+The following changes were made at v1.0:
+
+\begin{enumerate}
+\item Three IRAF benchmarks based on the CCDRED, DAOPHOT and IMAGES package
+are included. These benchmarks use the locally installed version of IRAF
+except for modified login.cl and mkiraf scripts, which are included with
+this package.
+\item The package startup script (starbench.csh) has been enhanced to check
+for the presence of {\tt ussc} and {\tt iraf} packages. It now prints out
+package availability.
+\item A -p command line switch is added to the {\tt bench} command, to
+facilitate running {\tt ussc} and {\tt iraf} packages. This is also used
+by the {\tt submit} command.
+\item The {\tt scan} command now checks the benchmark version numbers in the
+log files before using them. It now calculates an IRAFmark where appropriate.
+\item The SLALIB C benchmark uses customized comment-stripped code.
+\end{enumerate} 
+
+\subsection{V1.1}
+
+The following changes were made at v1.1:
+
+\begin{enumerate}
+\item The Linux port was released
+\item The whole package was updated to run with the Starlink Software
+Distribution at USSC207 (Autumn 97 Release), and in particular with KAPPA
+v0.10 and later.
+\item The {\tt ussc} benchmark standard figures have been recalibrated 
+against the latest Starlink Software Distribution (USSC207). This is 
+indicated by the STARmark207 format.
+\item The IRAF benchmark standard figures have been recalibrated using V2.11.
+This is indicated by the IRAFmark211 format.
+\item Documentation updated.
+\end{enumerate}
+
+\subsection{V1.2}
+
+The following changes were made at v1.2:
+
+\begin{enumerate}
+\item Benchmarks are now calibrated using a calibration file. This
+allows the calibrations to be updated easily. The calibration file to
+use can be supplied using the {\tt -c} switch to {\tt scan}. 
+\item Output from scan includes the ussc and IRAF versions used by the
+benchmarks and the name of the calibration machine used.
+\end{enumerate}
+
+\end{document}

@@ -1,0 +1,12 @@
+calgorithm,s,h,"none",|centroid|gauss|none|ofilter|,,"Centering algorithm"
+cbox,r,h,5.,,,"Centering box width in scale units"
+cthreshold,r,h,0.,,,"Centering threshold in sigma above background"
+minsnratio,r,h,1.,0.,,"Minimum signal-to-noise ratio for centering algorithim"
+cmaxiter,i,h,10,,,"Maximum iterations for centering algorithm"
+maxshift,r,h,1.,,,"Maximum center shift in scale units"
+clean,b,h,no,,,"Symmetry clean before centering"
+rclean,r,h,1.,,,"Cleaning radius in scale units"
+rclip,r,h,2.,,,"Clipping radius in scale units"
+kclean,r,h,3.,,,"K-sigma rejection criterion in skysigma"
+mkcenter,b,h,no,,,"Mark the computed center"
+mode,s,h,"ql",,,

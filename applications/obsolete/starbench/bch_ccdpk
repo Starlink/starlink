@@ -1,0 +1,604 @@
+#!/bin/csh -f
+#+
+#  Name:
+#     bch_ccdpk
+
+#  Purpose:
+#     Tests CCDPACK functionality.
+
+#  Language:
+#     C shell
+
+#  Description:
+#     The script creates a series of test frames using CCDGENERATE. It
+#     then executes various of the CCDPACK Atasks simulating a
+#     reduction sequence. Intermediary results are displayed (if requested)
+
+#  Imported Environment Variables:
+#     CCDPACK_DIR   CCDPACK installation directory
+#     BENCH_DIR Benchmark installation directory
+
+#  Authors:
+#     PDRAPER: Peter Draper (STARLINK)
+#     TMG: Tim Gledhill (tmg@star.herts.ac.uk)
+#     {enter_new_authors_here}
+
+#  History:
+#     4-APR-1992 (PDRAPER):
+#        Original version.
+#     29-JUN-1993 (PDRAPER):
+#     	 Changed to include automated alignment.
+#     29-AUG-1994 (TMG)
+#        Modified for use within a benchmarking package. 
+#        Renamed to bch_ccdpk from (ccdexercise).
+#        There is no interaction with the user since want to run backgrounded.
+#        Clean up any created files. Change
+#        name from ccdexercise to bch_ccdpk.
+#        Use the default shell - tcsh or csh.
+#      25-FEB-1996 (tmg)
+#        Add error checking. Check for test completions by looking for
+#           output files. Log anomalies to a "status_file"
+#     {enter_further_changes_here}
+#-
+#
+      onintr EXIT
+
+#+++MODIFICATION---Make a list of all the files in the current directory.
+#
+      ls -1 > dir_index_before
+#+++ENDMODIFICATION
+
+#  Initialise CCDPACK within this shell.
+#
+#  See if the ccdpack startup command exists
+      set startup_com=`alias ccdpack`
+      if ( "$startup_com" == "" ) then
+	 source /star/etc/cshrc
+      endif
+
+#  Ensure CCDPACK commands are available
+      ccdpack
+
+#  Establish the current directory as ADAM_USER and clear 
+#  any global values already existing 
+      setenv ADAM_USER $cwd
+      if ( -e ${ADAM_USER}/GLOBAL.sdf ) then
+	 ccdclear accept 
+      endif
+
+#+++MODIFICATION---No interactive display required.
+#
+#  Does the user want to see image display activity?
+#      echo -n "DISPLAY - Display device (! for none) > "
+#      set device = $<
+#      if ( "$device" == "\!\!" || "$device" == "" ) then
+#         goto EXIT
+#      else
+#         if ( "$device" == "\!" ) then
+#            set device = "NONE"
+#        endif
+#      endif
+#
+      set device = "NONE"
+#+++ENDMODIFICATION
+
+#  If we're going to use a device we need KAPPA.
+      if ( "$device" != "NONE" ) then
+         kappa
+         idset $device \\
+         gdset $device \\
+         gdclear \\
+         paldef \\
+         palentry colour=white palnum=0 \\
+      endif
+
+#  Try to locate the ARD file which goes with the test. If this is 
+#  not found then proceed without it.
+      echo " "
+      echo "  Setting the characteristics of the CCD device using the "
+      echo "  CCDSETUP routine."
+      echo " "
+      if ( -e ccdtest_ard.dat ) then
+        'rm' ccdtest_ard.dat
+      endif
+      if ( -e $CCDPACK_DIR/ccdtest_ard.dat ) then
+         'cp' $CCDPACK_DIR/ccdtest_ard.dat ./
+
+#  Found the ARD file setup CCDPACK appropriately.
+         ccdsetup \
+	    bounds='[1,5,120,128]' \
+	    extent='[6,119,1,128]' \
+	    adc=1 \
+	    rnoise=9.95 \
+            logto=both \
+	    logfile=ccdtest.log \
+	    preserve=true \
+	    direction=x \
+            mask=ccdtest_ard.dat \
+	    reset accept
+#        end ccdsetup
+      else
+         echo "Cannot locate ARD file; mask not applied"
+
+#  Do the "device" setup without an ARD file.
+         ccdsetup \
+	    bounds='[1,4,120,128]' \
+	    extent='[6,119,1,128]' \
+	    adc=1 \
+	    rnoise=10.0 \
+            logto=both \
+	    logfile=ccdtest.log \
+	    preserve=true \
+	    direction=x \
+            reset accept
+#        end ccdsetup
+      endif
+
+#  Try to locate the object specification file. If this does not exists
+#  then exit.
+      if ( -e ccdtest_obj.dat ) then
+	 'rm' ccdtest_obj.dat
+      endif
+      if ( -e $CCDPACK_DIR/ccdtest_obj.dat ) then
+	 'cp' $CCDPACK_DIR/ccdtest_obj.dat ./
+      else
+	 echo "Cannot locate file $CCDPACK_DIR/ccdtest_obj.dat"
+	 echo "- test terminated."
+	 exit
+      endif
+
+#  Create the test frames
+      echo " "
+      echo "  Creating the test data. "
+      echo " "
+      echo "  The test data consists of :-"
+      echo "     4 bias frames    "
+      echo "     4 flatfields     "
+      echo "     4 object fields. "
+      echo " "
+      echo "  The target data is a simulated galaxy cluster in which the"
+      echo "  telescope position has been moved between exposures."
+      echo " "
+      ccdgenerate \
+         nseq=4 \
+	 file=ccdtest_obj.dat \
+         ubnds='[128,128,166,128,128,201,166,201]' \
+	 lbnds='[1,1,39,1,1,74,39,74]' \
+	 accept
+#     end ccdgenerate
+
+#  If display capability is enabled then display the DATA frames.
+      if ( "$device" != "NONE" ) then
+         echo " "
+         echo "  Displaying raw target frames."
+         echo " "
+         picdef \
+            mode=array \
+            xpic=2 \
+            ypic=2 \
+            prefix=a \
+            accept
+#       end picdef
+        lutheat \
+           accept
+#       end lutheat
+        picsel \
+           label=a1 \
+           accept
+#       end picsel
+        display \
+           in=DATA1 \
+           mode=percentiles \
+           percentiles='[2,98]' \
+           accept
+#       end display
+        picsel \
+           label=a2 \
+           accept
+#       end picsel
+        display \
+           in=DATA2 \
+           mode=percentiles \
+           percentiles='[2,98]' \
+           accept
+#       end display
+        picsel \
+           label=a3 \
+           accept
+#       end picsel
+        display \
+           in=DATA3 \
+           mode=percentiles \
+           percentiles='[2,98]' \
+           accept
+#       end display
+        picsel \
+           label=a4 \
+           accept
+#       end picsel
+        display \
+           in=DATA4 \
+           mode=percentiles \
+           percentiles='[2,98]' \
+           accept
+#       end display
+      endif
+	 
+#  Add note to logfile.
+      echo " "
+      echo "  Adding a note to the logfile. "
+      echo " "
+      set name = `who am i`
+      ccdnote \
+         '"'$name : exercising CCDPACK'"' \
+         accept
+#     end ccdnote
+
+#  Make a BIAS frame.
+      echo " "
+      echo "  Producing a master bias calibration frame. This is produced"
+      echo "  by median stacking the ordinary bias frames. This process"
+      echo "  reduces the noise introduced in debiassing."
+      echo " "
+      makebias \
+         in='bias*' \
+	 out=master_bias \
+	 accept
+#     end makebias
+
+#  DEBIAS all frames (including flatfields)
+      debias \
+         in='"data?,ff?"' \
+	 out='debias_*' \
+	 accept
+#     end debias
+
+#  Display all the debiassed frames.
+      if ( "$device" != "NONE" ) then
+         echo " "
+         echo "  Displaying debiassed target frames. Note the absence of the"
+         echo "  bias strips (which were along the Y edges) and the removal"
+         echo "  of defective regions. The flatfields have also been debiassed"
+         echo "  but are not displayed."
+         echo " "
+         gdclear \\
+         picdef \
+            mode=array \
+            xpic=2 \
+            ypic=2 \
+            prefix=a \
+            accept
+#        end picdef
+         picsel \
+            label=a1 \
+            accept
+#        end picsel
+         display \
+            in=debias_DATA1 \
+            mode=percentiles \
+            percentiles='[2,98]' \
+            accept
+#        end display
+         picsel \
+            label=a2 \
+            accept
+#        end picsel
+         display \
+            in=debias_DATA2 \
+            mode=percentiles \
+            percentiles='[2,98]' \
+            accept
+#        end display
+         picsel \
+            label=a3 \
+            accept
+#        end picsel
+         display \
+            in=debias_DATA3 \
+            mode=percentiles \
+            percentiles='[2,98]' \
+            accept
+#        end display
+         picsel \
+            label=a4 \
+            accept
+#        end picsel
+         display \
+            in=debias_DATA4 \
+            mode=percentiles \
+            percentiles='[2,98]' \
+            accept
+#        end display
+      endif
+
+#  Create a flat field master
+      echo " "
+      echo "   Producing a master flatfield. This frame will be used to correct"
+      echo "   for the sensitivity variations in the detector response and"
+      echo "   any variations in the optical throughput (vignetting)."
+      echo "   As in the creation of the master bias frame median stacking is"
+      echo "   used to combine a series of flatfields."
+      echo " "
+      makeflat \
+         in='debias_ff?' \
+	 out=master_flat \
+	 accept
+#     end makeflat
+
+#  Display the master flatfield.
+      if ( "$device" != "NONE" ) then 
+         echo " "
+         echo "  Displaying master flatfield (the flatfield used in this case"
+         echo "  is a ramp, normal flatfields are not like this). "
+         echo " "
+         gdclear \\
+         display \
+           in=master_flat \
+           mode=percentiles \
+           percentiles='[2,98]' \
+           accept
+#        end display
+      endif
+
+#  Flatfield all the DATA frames
+      echo " "
+      echo "  Flatfielding all the target frames."
+      echo " "
+      flatcor \
+         in='debias_data?' \
+	 out='*|debias|reduced|' \
+	 accept
+#     end flatcor
+      if ( "$device" != "NONE" ) then
+         echo " "
+         echo "  Displaying flatfielded target frames."
+         echo " "
+         gdclear \\
+         picdef \
+            mode=array \
+            xpic=2 \
+            ypic=2 \
+            prefix=a \
+            accept
+#       end picdef
+        lutheat \
+           accept
+#       end lutheat
+        picsel \
+           label=a1 \
+           accept
+#       end picsel
+        display \
+           in=reduced_DATA1 \
+           mode=percentiles \
+           percentiles='[2,98]' \
+           accept
+#       end display
+        picsel \
+           label=a2 \
+           accept
+#       end picsel
+        display \
+           in=reduced_DATA2 \
+           mode=percentiles \
+           percentiles='[2,98]' \
+           accept
+#       end display
+        picsel \
+           label=a3 \
+           accept
+#       end picsel
+        display \
+           in=reduced_DATA3 \
+           mode=percentiles \
+           percentiles='[2,98]' \
+           accept
+#       end display
+        picsel \
+           label=a4 \
+           accept
+#       end picsel
+        display \
+           in=reduced_DATA4 \
+           mode=percentiles \
+           percentiles='[2,98]' \
+           accept
+#       end display
+      endif
+
+#  Now proceed to test out some alignment functionality.
+      echo " "
+      echo "  CCDPACK will now attempt to realign the target frames to"
+      echo "  produce a complete mosaic of whole of the target region."
+      echo " "
+
+#  Locate all the objects on the frames
+      echo " " 
+      echo "  The first stage of the automated registration process is"
+      echo "  to detect the positions of objects (stars and galaxies)."
+      echo "  "
+      findobj \
+        in='reduced_data?' \
+	outlist='*.find' \
+        percentile=95 \
+	accept
+#     end findobj
+      if ( "$device" != "NONE" ) then
+
+#  Display the objects located.
+         echo " "
+         echo "  Displaying the positions of the object which have been"
+         echo "  detected."
+         echo " "
+         picsel \
+            label=a1 \
+            accept
+#        end picsel
+         plotlist \
+            inlist='reduced_DATA1' \
+            palnum=4 \
+            mtype=23 \
+            accept
+#        end plotlist
+         picsel \
+            label=a2 \
+            accept
+#        end picsel
+         plotlist \
+            inlist='reduced_DATA2' \
+            accept
+#        end plotlist
+         picsel \
+            label=a3 \
+            accept
+#        end picsel
+         plotlist \
+            inlist='reduced_DATA3' \
+            accept
+#        end plotlist
+         picsel \
+            label=a4 \
+            accept
+#        end picsel
+         plotlist \
+            inlist='reduced_DATA4' \
+            accept
+#        end plotlist
+      endif
+	
+#  Determine matches between the positions.
+      echo " "
+      echo "  After locating the objects it is now necessary to determine"
+      echo "  which objects correspond."
+      echo " "
+      findoff \
+         inlist='reduced_data?' \
+	 ndfnames=true \
+	 outlist='*.off' \
+	 accept
+#     end findoff
+      if ( "$device" != "NONE" ) then
+
+#  Display the objects located.
+         echo " "
+         echo "  Displaying the labels of objects which have been matched."
+         echo " "
+         picsel \
+            label=a1 \
+            accept
+#        end picsel
+         plotlist \
+            inlist='reduced_DATA1' \
+            palnum=3 \
+            mtype=-1 \
+            thick=2 \
+            msize=1.5 \
+            accept
+#        end plotlist
+         picsel \
+            label=a2 \
+            accept
+#        end picsel
+         plotlist \
+            inlist='reduced_DATA2' \
+            accept
+#        end plotlist
+         picsel \
+            label=a3 \
+            accept
+#        end picsel
+         plotlist \
+            inlist='reduced_DATA3' \
+            accept
+#        end plotlist
+         picsel \
+            label=a4 \
+            accept
+#        end picsel
+         plotlist \
+            inlist='reduced_DATA4' \
+            accept
+#        end plotlist
+      endif
+
+#  Set the registration structures.
+      echo " "
+      echo "  Now that the object-object correspondence is known it is"
+      echo "  possible to work out the inter-NDF transformations."
+      echo "  The next routine does this for a range of different"
+      echo "  transformation types. It also writes the information into the"
+      echo "  NDFs so that other routines may use it."
+      echo " "
+      register \
+         inlist='reduced_data?' \
+	 fittype=1 \
+	 accept
+#     end register
+
+#  Resample the data.
+      echo " "
+      echo "  The reduced NDFs will now be resampled to the same coordinate"
+      echo "  system. After this is performed they can then be combined"
+      echo "  (after determining normalising scale and zero points which "
+      echo "  take into account any variations in sky transparency and "
+      echo "  exposure time) into a single frame which shows the complete"
+      echo "  data coverage for the target area."
+      echo " "
+      tranndf \
+         in='reduced_data?' \
+	 out='*|reduced|resamp|' \
+	 accept
+#     end tranndf
+
+#  Normalise it.
+      echo " "
+      echo "  Normalising and combining the aligned datasets."
+      echo " "
+      makemos \
+         in='resamp_data?' \
+	 scale=true \
+	 zero=true \
+	 out=mosaic \
+	 accept
+#     end makemos
+
+#  Display the final mosaic.
+      if ( "$device" != "NONE" ) then 
+         echo " "
+         echo "  Displaying the final mosaic."
+         echo " "
+         gdclear \\
+         display \
+           in=mosaic \
+           mode=percentiles \
+           percentiles='[2,98]' \
+           accept
+#        end display
+      endif
+
+#  Exercise is completed.
+      ccdnote \
+         '"Exercise completed"' \
+	 accept
+#     end ccdnote
+
+#  Exit label
+EXIT:
+
+#+++MODIFICATION---Clean up data files.
+#
+# Check the output files against the expected list and flag any problems.
+# Remove all created files.
+#
+      if ($?LC_COLLATE != 0 ) unsetenv LC_COLLATE
+      ls -1 > dir_index_after
+      diff dir_index_before dir_index_after | awk '/>/{print $2}' > newfiles
+      set check = `diff newfiles $BENCH_DIR/bch_ccdpk.chk`
+      if ( "$check" != "" ) then
+        echo "`date` : CCDPACK benchmark failed" >> status_file
+      endif
+      'rm' `cat newfiles` dir_index_before newfiles
+#+++ENDMODIFICATION
+
+      exit
+# @(#)ccdexercise	1.1     11/5/93     1

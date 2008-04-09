@@ -1,0 +1,121 @@
+#!/usr/local/bin/perl
+#+
+#  Name:
+#    bch_smark.prl
+#
+#  Purpose:
+#    Calculate a STARmark rating using the calibrations in the calibration file.
+#    and the scaling constant.
+#
+#  Language:
+#    perl
+#
+#  Invocation:
+#    echo stats-string | bch_scan.prl
+#
+#  Description:
+#    Given the tcpu figures for the four image processing benchmarks (PISA,
+#    KAPPA, SPECDRE, CCDPACK), calculate a STARmark rating and error. 
+#
+#    Each benchmark is weighted with a tcpu figure for that b/m from a
+#    machine which is used as a standard. This gives a 'speed' figure 
+#    (i.e. how much faster the machine is than the standard). The b/m
+#    speeds are then averaged and a further 'adjusting' constant can be 
+#    applied to give the final STARmark figure. Errors from the tcpu on
+#    each b/m are propagated through to give an error on the STARmark
+#    estimate.
+#
+#  Notes:
+#    The STARmark is calculated as follows, A is the 'adjustment constant':
+#
+#    STARmark = 0.25 * A *( (KAPPA_std/KAPPA) + 
+#                           (PISA_std/PISA)   +
+#                           (SPECDRE_std/SPECDRE) +
+#                           (CCDPACK_std/CCDPACK) )
+#
+#    The error on the STARmark is then:
+#
+#    dSTARmark = 0.25 * A * SQRT( (dKAPPA * KAPPA_std / KAPPA**2)**2 +
+#                                 (dPISA * PISA_std / PISA**2)**2    +
+#                                 (dSPECDRE * SPECDRE_std / SPECDRE**2)**2 +
+#                                 (dCCDPACK * CCDPACK_std / CCDPACK**2)**2)
+#
+#  Authors:
+#    Tim Gledhill (tmg), University of Hertfordshire
+#
+#  History:
+#    13-FEB-1994 (tmg):
+#       Original version.
+#    12-MAR-1996 (tmg):
+#       Change to STARmark96
+#    25-NOV-1997 (bkm):
+#       Update calibration timings for Starlink benchmarks. These are now
+#       calculated with ussc207 on rlssp0 with Solaris 2.5. Change name of
+#       the STARmark to reflect this (STARmark96 -> STARmark207).
+#    24-NOV-1998 (tmg)
+#       V1.2 Convert from awk to perl
+#       Read the calibrations from a file
+#-
+#
+# Check for the existence of a BENCH_CALFILE variable giving the name of
+# the calibration file to use. If this is not defined then use the file
+# starbench.cal in the current directory.
+#
+      $calfile = $ENV{"BENCH_CALFILE"};
+      if ( $calfile eq "" ) {
+        $calfile = $ENV{"BENCH_DIR"}."/starbench.cal";
+      }
+#
+# Open the calibration file and read in the benchmark speed ratings. The
+# calibration file must be in the expected format (see NOTES above) as,
+# for example, written by the 'scan -f' command.
+#
+      open(CALFILE,$calfile) ||
+         die "\nERROR! Could not open calibration file $calfile\n\n";
+#
+# Read in the tcpi figures for the benchmarks.
+#
+      while (<CALFILE>) {
+        ($bench) = split;
+        if ($bench eq "KAPPA") {
+          ($f1,$f2,$f3,$kap_cal) = split;
+        } elsif ($bench eq "PISA") {
+          ($f1,$f2,$f3,$pis_cal) = split;
+        } elsif ($bench eq "SPECDRE") {
+          ($f1,$f2,$f3,$spe_cal) = split;
+        } elsif ($bench eq "CCDPACK") {
+          ($f1,$f2,$f3,$cdp_cal) = split;
+        }
+      }
+      close (CALFILE);
+#
+# Read the incoming string and parse to get the tcpu figures.
+#
+      while (<>) {
+        ($kap,$dkap,$pis,$dpis,$spe,$dspe,$cdp,$dcdp) = split;
+      }
+#
+# Calculate the STARmark rating and error.
+#
+      if ( $kap > 0.0 ) {
+        $xkapp = $kap_cal / $kap;
+        $dk = ($dkapp * $kap_cal) / ($kap * $kap);
+      }
+      if ( $pis > 0.0 ) {
+        $xpisa = $pis_cal / $pis;
+        $dp = ($dpis * $pis_cal) / ($pis * $pis);
+      }
+      if ( $spe > 0.0 ) {
+        $xspec = $spe_cal / $spe;
+        $ds = ($dspe * $spe_cal) / ($spe * $spe);
+      }
+      if ( $cdp > 0.0 ) {
+        $xccdp = $cdp_cal / $cdp;
+        $dc = ($dcdp * $cdp_cal) / ($cdp * $cdp);
+      }
+      $smark = ( $xkapp + $xpisa + $xspec + $xccdp ) / 4.0;
+      $dsmark = 0.25 * sqrt( $dk*$dk + $dp*$dp + $ds*$ds + $dc*$dc );
+      printf( "\n    STARmark : %4.2f +/- %3.2f\n", $smark,$dsmark);
+#
+# End of script.
+#

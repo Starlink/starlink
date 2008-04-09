@@ -1,0 +1,137 @@
+#!/bin/csh -f
+#+
+# Name:
+#    bch_ccdred 
+#
+# Purpose:
+#    Execute a sequence of IRAF commands associated with the CCD data
+#    reduction package CCDRED, as part of a benchmarking package.
+#
+# Description:
+#    Run the IRAF CL from this script and feed it commands to simulate
+#    a CCD data reduction sequence using the CCDRED and CCDTEST packages.
+#    The task sequence is modelled on that of the DEMO task in CCDTEST.
+#    Data files are created, processed and then deleted. It is intended
+#    that this script be timed by the calling script; it does not do
+#    any internal timing.
+#
+# Language:
+#    C shell
+#
+# Authors:
+#    Tim Gledhill, tmg@star.herts.ac.uk
+#
+# Imported Variables:
+#    BENCH_DIR  Benchmark installation directory.
+#
+# History:
+#     28-MAY-1996 (tmg)
+#       Original Version.
+#-
+#
+# Check the files present in the current directory.
+#
+ls -1a > dir_index_before
+#
+# Create a local login.cl (any existing file is renamed to login.cl.OLD. 
+# Start CL.
+#
+$BENCH_DIR/mkiraf
+cl <<END
+#
+# Load packages needed for this test. noao is loaded by cl.
+#
+imred
+ccdred
+ccdtest
+#
+# Initialize parameters.
+#
+unlearn ccdred
+setinstrument demo review-
+#
+# Set observing parameters.
+#
+artobs.ncols=256
+artobs.nlines=256
+artobs.datasec="[1:256,1:256]"
+artobs.trimsec="[3:254,3:254]"
+artobs.biassec="[1:2,1:256]"
+lpar artobs
+#
+# Create some zero level images.
+#
+artobs obs001 0.0 zero 
+artobs obs002 0.0 zero
+artobs obs003 0.0 zero
+artobs obs004 0.0 zero
+artobs obs005 0.0 zero
+#
+# Create a dark count.
+#
+artobs.skyrate=0
+artobs obs006 1000.0 dark
+#
+# Create some flatfields.
+#
+artobs.filter="V"
+artobs.skyrate=2000
+artobs obs007 1.0 flat
+artobs obs008 1.0 flat
+artobs obs009 1.0 flat
+artobs obs010 1.0 flat
+artobs obs011 2.0 flat
+artobs obs012 2.0 flat
+artobs.filter="B"
+artobs.skyrate=1000
+artobs obs013 1.0 flat
+artobs obs014 2.0 flat
+artobs obs015 3.0 flat
+artobs obs016 3.0 flat
+artobs obs017 3.0 flat
+artobs obs018 3.0 flat
+#
+# Now create the objects. Use the M51 test image.
+#
+artobs.filter="V"
+artobs.skyrate=100
+artobs obs019 10.0 object imdata="dev\$pix"
+artobs obs020 20.0 object imdata="dev\$pix"
+artobs.filter="B"
+artobs obs021 30.0 object imdata="dev\$pix"
+artobs obs022 40.0 object imdata="dev\$pix"
+#
+# Combine the zero level images.
+#
+zerocombine obs*.??h
+#
+# Combine the flatfield images.
+#
+flatcombine obs*.??h
+#
+# Process the CCD images.
+#
+ccdproc obs*.??h interactive-
+#
+# Exit CL
+#
+logout
+END
+#
+# Check the output files against the expected list and flag any problems.
+# Remove all created files.
+#
+if ($?LC_COLLATE != 0 ) unsetenv LC_COLLATE
+ls -1a > dir_index_after
+diff dir_index_before dir_index_after | awk '/>/{print $2}' > newfiles
+set check = `diff newfiles $BENCH_DIR/bch_ccdred.chk`
+if ( "$check" != "" ) then
+   echo "`date` : CCDRED benchmark failed" >> status_file
+endif
+'rm' -rf `cat newfiles` dir_index_before 
+'rm' newfiles
+#
+# End of script.
+#
+exit
+

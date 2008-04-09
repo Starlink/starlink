@@ -1,0 +1,46 @@
+
+ Benchmark Results
+ =================
+
+ Starlink Benchmark Utilities v1.2
+
+ Benchmarks calibrated against rlsul1
+
+ Hostname           : rlsul1
+ User               : djr
+ Opsys              : SunOS 5.6
+ Platform           : SUNW,Ultra-1
+ Physical Memory    : 224.00Mb
+ Online Processors  : 1
+ Processor Speed    : 143MHz
+ USSC version       : USSC212
+ IRAF version       : "NOAO/IRAF V2.11EXPORT"
+
+ STARmark : 1.00 +/- 0.01  (based on 13 measurements)
+ IRAFmark : 1.00 +/- 0.01  (based on 13 measurements)
+
+ Average Load : 0.075 +/- 0.144
+
+ Benchmark  ucpu    kcpu       tpcu            Speed          Elapsed
+ ---------  ----    ----       ----            -----          -------
+
+       FFT  21.09   0.40  21.48 +/- 0.14    1.00 +/- 0.01   22.41 +/- 0.35
+
+       SLA   9.76   0.02   9.78 +/- 0.07    1.00 +/- 0.01   10.18 +/- 0.20
+
+     KAPPA   9.22   2.52  11.74 +/- 0.11    1.00 +/- 0.01   14.87 +/- 0.83
+
+      PISA   7.85   2.09   9.94 +/- 0.12    1.00 +/- 0.01   12.97 +/- 0.47
+
+   SPECDRE   6.68   2.92   9.60 +/- 0.15    1.00 +/- 0.02   12.44 +/- 0.49
+
+   CCDPACK  10.89   4.47  15.37 +/- 0.16    1.00 +/- 0.01   20.13 +/- 0.53
+
+    CCDRED  12.25   3.04  15.29 +/- 0.15    1.00 +/- 0.01   28.90 +/- 1.40
+
+   DAOPHOT  14.30   2.88  17.19 +/- 0.08    1.00 +/- 0.00   25.16 +/- 0.80
+
+    IMAGES  11.18   1.42  12.60 +/- 0.14    1.00 +/- 0.01   17.70 +/- 0.70
+
+
+

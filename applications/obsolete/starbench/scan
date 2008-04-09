@@ -1,0 +1,344 @@
+#!/bin/csh -f
+#+
+#  Name:
+#    scan
+#
+#  Purpose:
+#    Scan the benchmark log files to get the results.
+#
+#  Language:
+#    C shell
+#
+#  Invocation:
+#    $BENCH_DIR/scan [-f] [-l <logfile>] [-d] [-c <calfile>]
+#
+#  Description:
+#    This script will scan the log files produced by the benchmarking 
+#    software to extract results. A results file is produced for each
+#    machine (called <host>.bch). The results comprise the mean and S.D.
+#    for each benchmark statistic. These are output to the screen as 
+#    well as to the results file. The format of the results file is
+#    suitable for use with plotting packages such as mongo or pongo.
+#
+#  Command Line Options:
+#    -f: Give full output with timings for individual benchmarks.
+#    -l: Log the results to a given file, as well as to the screen.
+#    -d: Turn on some debugging.
+#    -c: The calibration file to use (defaults to starbench.cal in the
+#        installtion directory).
+#
+#  Imported Variables:
+#    BENCH_DIR
+#
+#  Authors:
+#    Tim Gledhill, University of Hertfordshire (tmg@star.herts.ac.uk)
+#
+#  History:
+#    15-SEP-1994 (tmg):
+#       Original version.
+#    31-OCT-1994 (tmg):
+#       Print out benchmark version number.
+#    23-NOV-1994 (tmg):
+#       Include C benchmark.
+#    06-FEB-1995 (tmg):
+#       v0.6
+#       Remove LaTeX b/m
+#       Insert STARmark calculations
+#       Use the default shell - tcsh or csh
+#    22-FEB-1995 (tmg):
+#       v0.7
+#    22-FEB-1996 (tmg):
+#       v0.9: STARmark96
+#         Reformatted output. Include completion checks. Check for presence
+#         of benchmarked packages. Allow results to be written to file.
+#    18-JUL-1996 (tmg)
+#       v1.0 incorporating IRAF benchmarks.
+#    20-JUL-1998 (tmg)
+#       V1.1: Change prologue to refer to just IRAFmark and STARmark (i.e.
+#       no appended version information).
+#    04-DEC-1998 (tmg)
+#       V1.2: Use perl scripts to output full benchmark results and STARmark
+#       and IRAFmark ratings using a starbench.cal file. Add -c switch to
+#       specify the calfile to use.
+#-
+#
+# Set interrupt handling.
+#
+      onintr end_scan
+#
+# Check that the startup script has been run.
+#
+      if ( ! $?BENCH_DIR ) then
+        echo ""
+        echo " Please source starbench.csh in the benchmark installation"
+        echo " directory to start up the Benchmark Utility"
+        echo ""
+        goto end_scan
+      endif
+#
+# Print an introduction.
+#
+      echo ""
+      echo " Scan"
+      echo " ----"
+      echo ""
+      echo " This utility will scan through the benchmark logfiles created by"
+      echo " the 'submit' or 'bench -l' commands to extract statistics and to"
+      echo " calculate a  mean value and error for each benchmark."
+      echo ""
+      echo " The performance is then compared with 'standard' results and the"
+      echo " STARmark  benchmark rating is  calculated. If IRAF  benchmarking"
+      echo " was selected, then an IRAFmark rating will also be calculated."
+      echo ""
+#
+# Default normal output.
+#
+      set mode = "normal"
+      set output = ""
+      set debug = "no"
+#
+# Check for command line options.
+# 
+      set cmdlin = `echo $*`
+      set narg = $#cmdlin
+      if ( $narg > 0 ) then
+#
+#  If command line options are given then process them.
+# 
+        set n = 1
+        while ( $n <= $narg )
+          @ m = ( $n + 1 )
+#
+# Check for full/diagnostic output switch.
+#
+          if ( "$cmdlin[$n]" == "-f" ) then
+            set mode =  "full"
+          endif
+#
+# Check for a log file to write results to.
+#
+          if ( "$cmdlin[$n]" == "-l" ) then
+            set output =  "$cmdlin[$m]"
+            if ( ! -e $output ) then
+              touch $output
+            endif
+          endif
+#
+# Check for altenative calibration file switch.
+#
+          if ( "$cmdlin[$n]" == "-c" ) then
+            setenv BENCH_CALFILE "$cmdlin[$m]"
+          endif
+#
+# Check for debugging.
+#
+          if ( "$cmdlin[$n]" == "-d" ) then
+            set debug = "yes"
+          endif
+          set n = $m
+        end
+      endif
+#
+# Get the directory containing the log files.
+#
+      echo ""
+      echo " Give the directory path for the log files. The default assumes"
+      echo " that they are in the current directory.                       "
+      echo ""
+      echo -n " Log files directory [.] : "
+      set logdir = $<
+      if ( $logdir == "" ) then
+        set logdir = $cwd
+      endif
+#
+# Loop through the files in the logs directory. The log files are identified
+# by their .log file extension. Count them as we go. Also initialise a list
+# of machine names so that we can keep track of which machines are being
+# processed.
+#
+      set n = 0
+      set host_list = ""
+      foreach i ( ${logdir}/*.log )
+#
+# First check that this is a valid benchmark file (i.e. the benchmarks 
+# completed successfully and the version numbers match).
+#
+        if ( $debug == "yes" ) echo -n " Processing file $i ..."
+        set message = `tail -1 $i`
+        if ( $message[2] == "v$BENCH_VERSION" ) then
+          if ( $debug == "yes" ) echo " OK"
+          @ n = ( $n + 1 )
+#
+# Get the formatted statistics into a shell variable and note which host we're
+# dealing with. Construct the machine's summary file name.
+#
+          set stats = `awk -f $BENCH_DIR/bch_scan.awk $i`
+          set log = "${logdir}/$stats[1].bch"
+#
+# Check to see if this is the first log file for this machine. If so a 
+# summary file will need to be created.
+#
+          echo "$host_list" | grep -c $stats[1] > /dev/null
+          if ( $status != 0 ) then
+            set host_list = "$host_list $stats[1]"
+#
+# If the summary for this machine already exists then scan has already been
+# run on the logfiles in this directory. The safest thing to do is to move the
+# existing summary file and create a new one.
+#
+            if ( -e $log ) then
+              echo ""
+              echo " *** The benchmark summary file $log:t already exists " \
+                   "probably from"
+              echo " *** a previous run of scan on the log files in this " \
+                   "directory."
+              echo " *** It will be moved to ${log:t}_$$ and a new one created."
+              echo ""
+              'mv' $log ${log}_$$
+            endif
+#
+# Create the summary file and print a list of the machine details to the 
+# summary file.
+#
+            touch $log
+            sed -n 1,5p $i >> $log
+            sed -n 7,11p $i >> $log
+            sed -n 14,15p $i >> $log
+            echo "" >> $log
+          endif
+#
+# Send the benchmark statistics to the log file.
+#
+          echo $stats[2-38] >> $log
+        else
+          if ( $debug == "yes" ) echo " BAD - not used"
+        endif
+      end
+#
+# If there are no valid log files then there's no point going any further.
+#
+      if ( $n == 0 ) then
+        echo ""
+        echo "*** There are no valid benchmark log files in this directory."
+        echo ""
+        goto end_scan
+      endif
+#
+# Write a heading.
+#
+      echo ""                                                      > buffer
+      echo " Benchmark Results"                                   >> buffer
+      echo " ================="                                   >> buffer
+                
+      echo ""                                                     >> buffer
+      echo " Starlink Benchmark Utilities v$BENCH_VERSION"        >> buffer
+      echo ""                                                     >> buffer
+#
+# Show which host the results were calibrated against.
+#
+      if ($?BENCH_CALFILE == 0 ) then
+        set calfile = "$BENCH_DIR/starbench.cal"
+      else
+        set calfile = $BENCH_CALFILE
+      endif
+      set calhost = `cat $calfile | grep Hostname`
+      echo " Benchmarks calibrated against $calhost[3]"          >> buffer
+      echo ""                                                    >> buffer
+      if ( $output != "" ) then
+        cat buffer >> $output
+      endif
+      cat buffer ; 'rm' buffer
+#
+# Loop through the node files to process and display results for each node.
+#
+      foreach i ( ${logdir}/*.bch )
+#
+# Print out the header.
+#
+        sed -n 4,13p $i                                            > buffer
+        if ( $output != "" ) then
+          cat buffer >> $output
+        endif
+        cat buffer ; 'rm' buffer
+#
+# Process the results for the current machine. Trap errors from the awk
+# routine and add context.
+#
+        set res = `awk -f $BENCH_DIR/bch_result.awk $i`
+        if ( $status != 0 ) then
+          echo ""
+          echo " *** Error processing file $i ... "
+          echo " *** $res"
+          echo " *** Check the benchmark log files for this machine."
+          goto end_foreach
+        endif
+#
+# If ussc benchmarks were run then calculate a STARmark and print the
+# number of measurements that it was based on.
+#
+        touch buffer
+        if ( $res[57] > 0 ) then
+          echo "$res[15] $res[16] $res[21] $res[22] $res[27] $res[28]" \
+               "$res[33] $res[34]" | $BENCH_DIR/bch_smark.prl > tmpbuf
+          set smark = `cat tmpbuf`; 'rm' tmpbuf
+          echo " $smark  (based on $res[57] measurements)"         >> buffer
+        endif
+#
+# If the iraf benchmarks were run then calcuate an IRAFmark and print the
+# number of measurements that it was based on.
+#
+        if ( $res[58] > 0 ) then
+          echo "$res[39] $res[40] $res[45] $res[46] $res[51] $res[52]" \
+              | $BENCH_DIR/bch_imark.prl > tmpbuf
+          set imark = `cat tmpbuf`; 'rm' tmpbuf
+          echo " $imark  (based on $res[58] measurements)"        >> buffer
+        endif
+        echo ""                                                   >> buffer
+        if ( $output != "" ) then
+          cat buffer >> $output
+        endif
+        cat buffer ; 'rm' buffer
+#
+# The following output is only generated with the -f command line switch.
+# Print out the benchmark timings with errors.
+#
+        if ( $mode == "full" ) then
+          echo " Average Load : $res[55] +/- $res[56]"              > buffer
+          echo ""                                                  >> buffer
+          echo " Benchmark  ucpu    kcpu       tpcu          " \
+               " Speed          Elapsed"                           >> buffer
+          echo " ---------  ----    ----       ----          " \
+               " -----          -------"                           >> buffer
+          echo "FFT $res[1-6]" | $BENCH_DIR/bch_full.prl    >> buffer
+          echo "SLA $res[7-12]" | $BENCH_DIR/bch_full.prl   >> buffer
+          if ( $res[57] > 0 ) then
+            echo "KAPPA $res[13-18]" |  $BENCH_DIR/bch_full.prl \
+                                                                   >> buffer
+            echo "PISA  $res[19-24]" |  $BENCH_DIR/bch_full.prl \
+                                                                   >> buffer
+            echo "SPECDRE $res[25-30]" | $BENCH_DIR/bch_full.prl \
+                                                                   >> buffer
+            echo "CCDPACK $res[31-36]" | $BENCH_DIR/bch_full.prl \
+                                                                   >> buffer
+          endif
+          if ( $res[58] > 0 ) then
+            echo "CCDRED $res[37-42]" |  $BENCH_DIR/bch_full.prl \
+                                                                   >> buffer
+            echo "DAOPHOT  $res[43-48]" |  $BENCH_DIR/bch_full.prl \
+                                                                   >> buffer
+            echo "IMAGES $res[49-54]" | $BENCH_DIR/bch_full.prl  \
+                                                                   >> buffer
+          endif
+          echo ""                                                  >> buffer
+          if ( $output != "" ) then
+            cat buffer >> $output
+          endif
+          cat buffer ; 'rm' buffer
+        endif
+end_foreach:  
+      end
+#
+# End of script scan
+#
+      end_scan:
+      exit

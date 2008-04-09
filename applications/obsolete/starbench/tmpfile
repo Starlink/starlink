@@ -1,0 +1,51 @@
+#!/bin/csh -f
+#+
+#  Name:
+#     tmpfile
+#
+#  Purpose:
+#     Generate a temporary file name
+#
+#  Language:
+#     C Shell
+#
+#  Type of Module:
+#     UNIX C shell script
+#
+#  Invocation:
+#     set temp_file = `tmpfile`
+#
+#  Description:
+#     The output from date is parsed with awk to give a unique file 
+#     name based on the current time which is then echoed to standard
+#     output. The current process number is appended to increase the
+#     resolution of the name.
+#
+#  Arguments:
+#     None.
+#
+#  Authors:
+#     (TMG): Tim Gledhill, University of Hertfordshire (Starlink).
+#
+#  History:
+#     12-FEB-1994 (TMG):
+#        Original version. 
+#
+#-
+#
+#
+# Parse the output from date.
+#
+      set tmp = ` date | awk '{split($4,t,":");print t[1]t[2]t[3]}' `
+# 
+# Add a preceding letter (since the ADAM parameter system doesn't like
+# file names beginning with a number) and prepend the process number to
+# increase the resolution. Echo to standard output.
+#
+     set tmp = "t$$"$tmp
+     echo $tmp
+#
+# End of procedure tmpfile.
+#    
+     end_TMPFILE:
+     exit

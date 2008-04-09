@@ -1,0 +1,272 @@
+#!/usr/local/bin/tcsh -f
+#+
+# Name:
+#    bench
+#
+# Purpose:
+#    Execute a series of system benchmarks using the shell time command 
+#    to produce the statistics. Output can be directed either to the 
+#    screen or to a log file.
+#
+# Language:
+#    C shell
+#
+# Invocation:
+#    $BENCH_DIR/bench [-l <logfile>] [-p ussc|iraf|both] [-d]
+#
+# Imported Environment Variables:
+#    BENCH_DIR        Benchmark installation directory.
+#
+# Command Line Options:
+#    -l : Direct output to the given file, rather than to the screen.
+#    -p : Run benchmarks using the specified packages. Values are "ussc"
+#         to run the Starlink benchmarks, "iraf" to run the IRAF benchmarks
+#         or "both" to run both sets of benchmarks. The default is both.
+#    -d : Debug option. Output from the individual benchmarks will be
+#         written to stdout rather than thrown away.
+#
+# Authors:
+#    Tim Gledhill (tmg@star.herts.ac.uk)
+#
+# History:
+#     1-AUG-1994 (tmg)
+#       Original Version.
+#     21-OCT-1994 (tmg)
+#       Print a key to the benchmark columns
+#       check for (and create if necessary) ~/adam
+#       Include new PISA and SPECDRE benchmarks.
+#     31-OCT-1994 (tmg)
+#       Include a check on the current directory. The benchmarks cannot
+#       be run from the installation directory anymore (caused problems).
+#       Print out version number (0.4).
+#     21-NOV-1994 (tmg)
+#       Add floating-point C benchmark.
+#       Re-order execution of benchmarks.
+#       Change to use C shell timing.
+#       Change version to 0.5
+#     06-FEB-1995 (tmg)
+#       Version 0.6
+#       Remove LaTeX benchmark.
+#       Use the default shell - tcsh or csh
+#     22-FEB-1995 (tmg)
+#       Version 0.7
+#       Remove the disk b/m. This needs more work before it can be used
+#         with confidence.
+#       Change the info output to reference SSN.
+#     15-FEB-1996 (tmg)
+#        V0.9. Solaris 2.5, SparcCompilers v4.0.
+#        Check that benchmarked packages are installed before running the
+#        associated benchmark. Check for benchmark completions and
+#        maintain a status file.
+#        Use tcsh time built-in since csh version is only accurate to whole
+#         seconds on Solaris systems.
+#     12-JUL-1996 (tmg)
+#        Version 1.0, incorporating IRAF benchmarks.
+#        Add -d and -p switches.
+#     14-AUG-1997 (bkm)
+#        Write error message to user as well as to log file.
+#     24-NOV-1998 (tmg)
+#        V1.2 Write out USSC and IRAF version information. Use an alias 
+#        to redirect
+#        output to screen or file.
+#
+# Set interrupt handling. 
+#
+      onintr end_bench
+#
+# Check that the startup script has been run.
+#
+      if ( ! $?BENCH_DIR ) then
+        echo ""
+        echo " Please source starbench.csh in the benchmark installation"
+        echo " directory to start up the Benchmark Utility"
+        echo ""
+        goto end_bench
+      endif
+#
+# Set default behaviour.
+#
+      set output = ""                      #send output to screen
+      set packs = "ussc"                   #benchmark using ussc
+      set dispose = "/dev/null"         #dispose of benchmark output
+#
+# Check for command line options.
+# 
+      set cmdlin = `echo $*`
+      set narg = $#cmdlin
+      if ( $narg > 0 ) then
+#
+#  If command line options are given then process them.
+# 
+        set n = 1
+        while ( $n <= $narg )
+          @ m = ( $n + 1 )
+#
+# Check for a log file to write results to.
+#
+          if ( "$cmdlin[$n]" == "-l" ) then
+            set output =  "$cmdlin[$m]"
+            if ( ! -e $output ) then
+              touch $output
+            endif
+          endif
+#
+# Check which packages are to be run.
+#
+          if ( "$cmdlin[$n]" == "-p" ) then
+            set packs = "$cmdlin[$m]"
+            if ( $packs != "ussc" && $packs != "iraf" \
+                                  && $packs != "both" ) then
+              echo ""
+              echo " Cannot recognise -p value. Should be ussc, iraf or both."
+              echo ""
+              goto end_bench
+            endif
+          endif
+#
+# Check for debug option.
+#
+          if ( "$cmdlin[$n]" == "-d" ) then
+            set dispose = "bch-debug.log"
+            if ( ! -e $dispose ) touch $dispose
+          endif
+          set n = $m
+        end
+      endif
+#
+# Check that the packages that the user wants to benchmark are all there.
+# This is in case bench is called directly, otherwise this check is done
+# by submit.
+#
+      if ( $packs == "both" ) then
+        if ( $?BENCH_USSC == 0 ) set packs = "iraf"
+        if ( $?BENCH_IRAF == 0 ) set packs = "ussc"
+      endif
+      if ( $packs == "ussc" && $?BENCH_USSC == 0 || \
+           $packs == "iraf" && $?BENCH_IRAF == 0 ) then
+        echo ""
+        echo " Cannot run the benchmarks, the selected package is not installed"
+        echo ""
+        goto end_bench
+      endif      
+#
+# Clear out any old status file and create a new one.
+#
+      if ( -e status_file ) 'rm' status_file
+      touch status_file
+#
+# Print the system information to the log file. If the log file is not given
+# then output goes to the screen.
+#
+      ${BENCH_DIR}/bch_info $output
+      if ( $output == "" ) then
+        set redirect = ""
+      else 
+        set redirect = ">> $output"
+      endif
+      alias cmd "\!* $redirect"
+#
+# Print out the software versions.
+#
+      if ( $packs == "both" ) then
+        cmd echo " USSC version       : $BENCH_USSC_VER"
+        cmd echo " IRAF version       : $BENCH_IRAF_VER"
+      else if ( $packs == "ussc" ) then
+        cmd echo " USSC version       : $BENCH_USSC_VER"
+        cmd echo ""
+      else if ( $packs == "iraf" ) then
+        cmd echo " IRAF version       : $BENCH_IRAF_VER"
+        cmd echo ""
+      endif
+#
+# Print some headings.
+#
+      cmd (echo /dev/null | awk -f ${BENCH_DIR}/bch_head.awk)
+#
+# Fortran floating-point (CPU-thrasher) benchmark. Uses FFT algorithm.
+# This is part of the benchmark package and so should always be present.
+#
+      set stats = `time ${BENCH_DIR}/bch_fft >& bch_fft.tmp`
+      cat bch_fft.tmp | awk '! /Doing forward/ && NF != 0 {print $0}' \
+          >> status_file
+      'rm' bch_fft.tmp
+      cmd (echo "FFT $stats" | awk -f ${BENCH_DIR}/bch_print.awk)
+#
+# C floating-point (CPU-thrasher) benchmark. Uses SLA library.
+# This is part of the benchmark package and so should always be present.
+#
+      set stats = `time ${BENCH_DIR}/bch_cfp >>& $dispose`
+      cmd (echo "SLA $stats" | awk -f ${BENCH_DIR}/bch_print.awk)
+#
+# Run the ussc benchmarks if required.
+#
+      if ( $packs == "ussc" || $packs == "both" ) then
+#
+# Kappa benchmark.
+#
+        set stats = `time ${BENCH_DIR}/bch_kappa >>& $dispose`
+        cmd (echo "KAPPA $stats" | awk -f ${BENCH_DIR}/bch_print.awk)
+#
+# PISA demo script.
+#  
+        set stats = `time ${BENCH_DIR}/bch_pisa >>& $dispose`
+        cmd (echo "PISA $stats" | awk -f ${BENCH_DIR}/bch_print.awk)
+#
+# SPECDRE demo script.
+#  
+        set stats = `time ${BENCH_DIR}/bch_specdre >>& $dispose`
+        cmd (echo "SPECDRE $stats" | awk -f ${BENCH_DIR}/bch_print.awk)
+#
+# CCDPACK exercise script.
+#
+
+        set stats = `time ${BENCH_DIR}/bch_ccdpk >>& $dispose`
+        cmd (echo "CCDPACK $stats" | awk -f ${BENCH_DIR}/bch_print.awk)
+      endif
+#
+# Run the IRAF benchmarks if required.
+#
+      if ( $packs == "iraf" || $packs == "both" ) then
+#
+# CCDRED package exercise script.
+#
+        set stats = `time ${BENCH_DIR}/bch_ccdred >>& $dispose` 
+        cmd (echo "CCDRED $stats" | awk -f ${BENCH_DIR}/bch_print.awk)
+#
+# DAOPHOT package exercise script.
+#
+        set stats = `time ${BENCH_DIR}/bch_daophot >>& $dispose` 
+        cmd (echo "DAOPHOT $stats" | awk -f ${BENCH_DIR}/bch_print.awk)
+#
+# IMAGES package exercise script.
+#
+        set stats = `time ${BENCH_DIR}/bch_images >>& $dispose` 
+        cmd (echo "IMAGES $stats" | awk -f ${BENCH_DIR}/bch_print.awk)
+      endif
+    endif
+#
+# Check for successful completion. 
+#
+      set nlines = `wc status_file`
+      if ( $nlines[1] != 0 ) then
+        if ( $output == "" ) then
+          echo ""
+          echo "WARNING - A problem occurred whilst running the benchmarks"
+          cat status_file
+        else
+          echo "" >> $output
+          echo "WARNING - A problem occurred whilst running the benchmarks" \
+               >> $output
+          cat status_file >> $output
+          echo "WARNING - A problem occurred whilst running the benchmarks"
+          cat status_file
+        endif
+      else
+        cmd echo ""
+        cmd echo "Benchmarks v$BENCH_VERSION completed successfully"
+      endif
+#
+# End of script bench
+#
+end_bench:
+      exit

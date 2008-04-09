@@ -1,0 +1,85 @@
+#!/bin/csh -f
+#
+#
+# MKIRAF -- Setup the IRAF environment for a user.  Should be called from the
+# directory from which the user will thereafter type "cl" to start a session.
+#
+#===============================NOTE!!!======================================
+#
+# This version of MKIRAF is distributed with the Starlink Benchmarking
+# Utilities STARBENCH V1.0 and onwards for use with that package and may
+# not be at all appropriate for general IRAF use at any site..
+#
+#=============================================================================
+
+# The following definitions are site dependent. [SITEDEP]
+# 
+# STARBENCH MODIFICATION: Set the imdir directory to the local directory. 
+#
+
+set	iraf	= "/iraf/iraf"
+set	imdir	= 'HDR$'
+set	ttymsg  =\
+"Terminal types: xgterm,xterm,gterm,vt640,vt100,etc."
+
+# ------------- (end of site dependent definitions) ------------------------
+# Make an empty "uparm" (user parameter) directory.
+
+unalias rm mkdir pwd echo mkdir sed whoami pushd popd
+
+# The following kludge is for Solaris, which doesn't have whomai.
+if (! $?USER) then
+    setenv USER `whoami`
+endif
+alias whoami "(echo $USER)"
+
+# Protect against running mkiraf in an iraf system directory.
+pushd $iraf >& /dev/null;  set irafdir = `pwd`;  popd >& /dev/null
+if ("`pwd | grep $irafdir`" != "") then
+    if ("`pwd | grep iraf/local`" == "") then
+	echo "Error: current directory is not an iraf user login directory"
+	exit 1
+    endif
+endif
+
+# STARBENCH MODIFICATION: Always initialize the uparm directory.
+
+#if (! -e uparm) then
+#    echo '-- creating a new uparm directory'
+#    mkdir uparm
+#else
+#    echo -n 'Initialize uparm? (y|n): '
+#    set yesno = $<
+#    if ($yesno == 'y' || $yesno == 'yes') then
+#	echo '-- initializing uparm'
+	rm -rf uparm; mkdir uparm
+#    endif
+#endif
+
+if (-e login.cl) then
+    mv -f login.cl login.cl.OLD
+endif
+
+
+# Edit the login.cl file, setting the user's home directory, default image
+# directory, and terminal.
+
+# STARBENCH MODIFICATION: Always use xgterm.
+#echo $ttymsg
+#echo -n 'Enter terminal type: '
+
+echo xgterm | sed -e "s;.*;s+U_TERM+&+;"		>  _sed
+pwd	| sed -e "s;.*;s+U_HOME+&/+;"		>> _sed
+pwd	| sed -e "s;.*;s+U_UPARM+&/uparm/+;"	>> _sed
+echo ""	| sed -e "s;.*;s+U_IMDIR+$imdir+;"	>> _sed
+whoami	| sed -e "s;.*;s+U_USER+&+;"		>> _sed
+
+# STARBENCH MODIFICATION: Use our own login.cl in case the iraf one
+# has been hacked for this system.
+#
+sed -f _sed < $BENCH_DIR/login.cl > login.cl
+rm _sed
+whoami	| sed -e "s;.*;mkdir $imdir/& 2> /dev/null;" | sh
+
+echo 'A new LOGIN.CL file has been created in the current directory.'
+echo 'You may wish to review and edit this file to change the defaults.'
