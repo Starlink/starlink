@@ -158,11 +158,6 @@ This edition of the cookbook applies to Version \DXversion of DX.}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
 % -----------------------------------------------------------------------------
 %  Debugging.
 %  =========
@@ -273,7 +268,7 @@ This edition of the cookbook applies to Version \DXversion of DX.}
 \newpage
 \begin{latexonly}
    \setlength{\parskip}{0mm}
-   \latexonlytoc
+   \tableofcontents
 
    \newpage
    \listoftables
