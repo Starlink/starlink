@@ -546,6 +546,7 @@ package hdstools {
      HDSTOOLS commands are now available -- (Version @PACKAGE_VERSION@)
 
      Type hhelp for help on HDSTOOLS commands.
+     Type "showme sun245" to browse the hypertext documentation.
 
    }
 
