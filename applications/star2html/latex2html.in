@@ -41,7 +41,10 @@
 $DEBUG = 0;
 
 #  Look for the real latex2html script.
-$LATEX2HTML_DIR = "$ENV{'STARLINK_DIR'}/share/latex2html/bin" || "@l2hdir@";
+$LATEX2HTML_DIR = "$ENV{'STARLINK_DIR'}/share/latex2html/bin";
+if ( ! -d $LATEX2HTML_DIR ) {
+   $LATEX2HTML_DIR = "@l2hdir@";
+}
 
 #  Installation check.
 if ( $LATEX2HTML_DIR =~ /@/) {
