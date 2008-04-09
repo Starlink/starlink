@@ -167,12 +167,9 @@
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
 
-%begin{latex}
 \newcommand{\scspec}[2]{#1}
-%end{latex}
-
 \begin{htmlonly}
-\newcommand{\scspec}[2]{#2}
+  \newcommand{\scspec}[2]{#2}
 \end{htmlonly}
 
 % Location of echelle help pages
@@ -190,7 +187,7 @@
 
 %  Latex document header.
 %  ======================
-\latex{
+\begin{latexonly}
    CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
@@ -224,7 +221,7 @@
 %      {\Large\textbf{Abstract}}
 %   \end{center}
 %% ? End of heading for abstract.
-}
+\end{latexonly}
 
 %  HTML documentation header.
 %  ==========================
@@ -281,23 +278,23 @@
 % -----------------------------------------------------------------------------
 % ? Latex Copyright Statement
 %  =========================
-\begin{latex}
+\begin{latexonly}
 \newpage
 \vspace*{\fill}
 \stardoccopyright
-\end{latex}
+\end{latexonly}
 % ? End of Latex copyright statement
 
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
   \newpage
-  \begin{latex}
+  \begin{latexonly}
     \setlength{\parskip}{0mm}
     \tableofcontents
     \setlength{\parskip}{\medskipamount}
     \markboth{\stardocname}{\stardocname}
-  \end{latex}
+  \end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 
@@ -479,10 +476,10 @@ Data Reduction  Using the Image Reduction Analysis Facility,}}
 %{http://www.star.ucl.ac.uk/~mjc/echelle/misc/LickTech74.ps.gz}
 which is a
 Lick Observatory Technical report\@.
-\begin{latex}
+\begin{latexonly}
 (A PostScript copy is available from the Starlink Echelle Support
 Pages.)
-\end{latex}
+\end{latexonly}
 This is a complete
 step-by-step run through of \'{e}chelle data reduction using IRAF
 \scspec{--}{-} from CCD data to calibrated spectra.
@@ -649,13 +646,13 @@ and apply the scaling to the object spectra.}
      Missing command-line arguments are prompted for.
 
 \item [{\bf Source code:}] \mbox{} \\
-\begin{latex}
+\begin{latexonly}
 In a standard Starlink installation the source code for MEANARC can be found
 in the file:
 \begin{verbatim}
    /star/examples/sc3/meanarc
 \end{verbatim}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
       The script source code is available
       \htmlref{{\bf here}}{se_meanarc_source}.
@@ -816,7 +813,7 @@ some cosmic-ray contamination.}
      Missing command-line arguments are prompted for.
 
 \item [{\bf Source code:}] \mbox{} \\
-\begin{latex}
+\begin{latexonly}
 In a standard Starlink installation the source code for ECHTRACT can be found
 in the:
 \begin{itemize}
@@ -826,7 +823,7 @@ in the:
 \item {\tt /star/examples/sc3/echtract\_echarc} for FIGARO ECHARC data.
 
 \end{itemize}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
       Script source code available:
 \begin{itemize}
@@ -1015,7 +1012,7 @@ signal level with increasing wavelength.}
      Missing command-line arguments are prompted for.
 
 \item [{\bf Source code:}] \mbox{} \\
-\begin{latex}
+\begin{latexonly}
 In a standard Starlink installation the source code for STACKGEN can be found
 in the:
 \begin{itemize}
@@ -1025,7 +1022,7 @@ in the:
 \item {\tt /star/examples/sc3/stackgen\_echarc} for FIGARO ECHARC data.
 
 \end{itemize}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
       Script source code available:
 \begin{itemize}
@@ -1164,7 +1161,7 @@ could be listed using the TRACEPOLY script.}
      Argument  3   defaults to the value 8 if not given on the command line.
 
 \item [{\bf Source code:}] \mbox{} \\
-\begin{latex}
+\begin{latexonly}
 In a standard Starlink installation the source codes for TRACEPOLY and
 ARCPOLY can be found in the files:
 \begin{verbatim}
@@ -1176,7 +1173,7 @@ and
 \begin{verbatim}
    /star/examples/sc3/arcpoly
 \end{verbatim}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
       The TRACEPOLY script source code is available
       \htmlref{{\bf here}}{se_tracepoly_source}.
@@ -1433,7 +1430,7 @@ Here is the prologue for PREPRUN2:
      have been given for some of these items.
 
 \item [{\bf Source code:}] \mbox{} \\
-\begin{latex}
+\begin{latexonly}
 In a standard Starlink installation the source code for the PREPRUN scripts
 can be found in these files:
 \begin{itemize}
@@ -1443,7 +1440,7 @@ can be found in these files:
 \item {\tt /star/examples/sc3/preprun2}.
 
 \end{itemize}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
       The script source codes for
       \htmlref{{\bf preprun1}}{se_preprun1_source} and
@@ -1495,13 +1492,13 @@ can be found in these files:
      script prompts for a list of input images.
 
 \item [{\bf Source code:}] \mbox{} \\
-\begin{latex}
+\begin{latexonly}
 In a standard Starlink installation the source code for PREPBIAS can be found
 in the file:
 \begin{verbatim}
    /star/examples/sc3/prepbias
 \end{verbatim}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
       The script source code is available
       \htmlref{{\bf here}}{se_prepbias_source}.
@@ -1605,13 +1602,13 @@ in the file:
      summarised below.
 
 \item [{\bf Source code:}] \mbox{} \\
-\begin{latex}
+\begin{latexonly}
 In a standard Starlink installation the source code for PREPFLAT can be found
 in the file:
 \begin{verbatim}
    /star/examples/sc3/prepflat
 \end{verbatim}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
       The script source code is available
       \htmlref{{\bf here}}{se_prepflat_source}.
@@ -1754,13 +1751,13 @@ in the file:
      summarised below.
 
 \item [{\bf Source code:}] \mbox{} \\
-\begin{latex}
+\begin{latexonly}
 In a standard Starlink installation the source code for PREPARCS can be found
 in the file:
 \begin{verbatim}
    /star/examples/sc3/preparcs
 \end{verbatim}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
       The script source code is available
       \htmlref{{\bf here}}{se_preparcs_source}.
@@ -1901,13 +1898,13 @@ in the file:
      summarised below.
 
 \item [{\bf Source code:}] \mbox{} \\
-\begin{latex}
+\begin{latexonly}
 In a standard Starlink installation the source code for PREPOBJS can be found
 in the file:
 \begin{verbatim}
    /star/examples/sc3/prepobjs
 \end{verbatim}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
       The script source code is available
       \htmlref{{\bf here}}{se_prepobjs_source}.
@@ -2047,13 +2044,13 @@ in the file:
      Missing command-line arguments are prompted for.
 
 \item [{\bf Source code:}] \mbox{} \\
-\begin{latex}
+\begin{latexonly}
 In a standard Starlink installation the source code for ECHRDARC can be found
 in the file:
 \begin{verbatim}
    /star/examples/sc3/echrdarc
 \end{verbatim}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
       The script source code is available
       \htmlref{{\bf here}}{se_echrdarc_source}.
@@ -2174,13 +2171,13 @@ in the file:
      Missing command-line arguments are prompted for.
 
 \item [{\bf Source code:}] \mbox{} \\
-\begin{latex}
+\begin{latexonly}
 In a standard Starlink installation the source code for ECHRDUCE can be found
 in the file:
 \begin{verbatim}
    /star/examples/sc3/echrduce
 \end{verbatim}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
       The script source code is available
       \htmlref{{\bf here}}{se_echrduce_source}.
@@ -2319,13 +2316,13 @@ for other actions.
 \end{enumerate}
 
 \item [{\bf Source code:}] \mbox{} \\
-\begin{latex}
+\begin{latexonly}
 In a standard Starlink installation the source code for ECHIMDIVIDE can be
 found in the file:
 \begin{verbatim}
    /star/examples/sc3/echimdivide.cl
 \end{verbatim}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
       The script source code is available
       \htmlref{{\bf here}}{se_echimdivide_source}.
@@ -2403,13 +2400,13 @@ found in the file:
 \end{enumerate}
 
 \item [{\bf Source code:}] \mbox{} \\
-\begin{latex}
+\begin{latexonly}
 In a standard Starlink installation the source code for ECHMKV can be found
 in the file:
 \begin{verbatim}
    /star/examples/sc3/echmkv.cl
 \end{verbatim}
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
       The script source code is available
       \htmlref{{\bf here}}{se_echmkv_source}.
@@ -2528,10 +2525,10 @@ spectrum.
 \end{enumerate}
 
 \item [{\bf Source code:}] \mbox{} \\
-\begin{latex}
+\begin{latexonly}
 In a standard Starlink installation the source code for ECHTRIM can be found
 in the file \texttt{/star/examples/sc3/echtrim.cl}.
-\end{latex}
+\end{latexonly}
 \begin{htmlonly}
       The script source code is available
       \htmlref{{\bf here}}{se_echtrim_source}.
