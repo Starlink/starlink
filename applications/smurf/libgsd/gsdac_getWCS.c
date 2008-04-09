@@ -131,7 +131,7 @@
 
 #define SOLSID 1.00273790935
 
-#define DEBUGON 0
+#define DEBUGON 1
 
 #define FUNC_NAME "gsdac_getWCS.c"
 
@@ -170,6 +170,12 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   const char *UTCString;      /* UTC time as a string */
   double UTCTime;             /* UTC time */
   int year;                   /* year */
+
+  AstTimeFrame *tempFrame;
+  const char *tempString1;
+  const char *tempString2;
+  double tempTime1;
+  double tempTime2;
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
@@ -309,12 +315,25 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   /* Get the idate and itime.  We need to convert the time for this
      step to UTC and get the correct formatting. */
-
   astSetD ( tFrame, "TimeOrigin", wcs->tai );
+
+tempTime1 = astGetD ( tFrame, "timeOrigin" );
+tempFrame = astCopy ( tFrame );
+astClear ( tempFrame, "timeOrigin" );
+astSet ( tempFrame, "format(1)=iso.2" );
+tempString1 = astFormat ( tempFrame, 1, tempTime1 );
 
   astSet ( tFrame, "timescale=UTC" );
 
   UTCTime = astGetD ( tFrame, "TimeOrigin" );
+
+tempTime2 = astGetD ( tFrame, "timeOrigin" );
+tempFrame = astCopy ( tFrame );
+astClear ( tempFrame, "timeOrigin" );
+astSet ( tempFrame, "format(1)=iso.2" );
+tempString2 = astFormat ( tempFrame, 1, tempTime2 );
+
+  if ( subBandNum == 0 && DEBUGON ) printf ( "TAI: %f (%s), UTC: %f (%s)\n", tempTime1, tempString1, tempTime2, tempString2 );
 
   UTCFrame = astCopy ( tFrame );
   astClear ( UTCFrame, "timeOrigin" );
@@ -338,7 +357,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   datePointing = astKeyMap( "" );
   cellMap = astKeyMap( "" ); 
 
-  if ( subBandNum == 0 && DEBUGON ) printf ( "CENTRE (base) RA_DEC (radians) : %f %f\n", wcs->baseTr1, wcs->baseTr2 );
+  /*if ( subBandNum == 0 && DEBUGON ) printf ( "CENTRE (base) RA_DEC (radians) : %f %f\n", wcs->baseTr1, wcs->baseTr2 );*/
 
   /* Fill the keymaps from the input GSD. */
   astMapPut0I( datePointing, "JFREST(1)", 
@@ -383,6 +402,10 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
      since it is not needed there but specwrite uses it) */
   astSet ( *WCSFrame, "DUT1(1)=%f,DUT1(3)=%f", dut1, dut1 );
 
+  if ( subBandNum == 0 && DEBUGON ) 
+   printf("Epoch = %s MJD=%f\n",astGetC(*WCSFrame,"Epoch"),
+           slaEpj2d(astGetD(*WCSFrame,"Epoch")));
+
   /* Make a copy of the frameset for local calculations. */
   frame = astCopy ( *WCSFrame );
 
@@ -403,13 +426,13 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   astNorm ( frame, coordOut );
 
-  if ( subBandNum == 0 && DEBUGON ) 
+  /*if ( subBandNum == 0 && DEBUGON ) 
     printf ( "GRID (base) coordinates  : %f %f\n", 
              coordIn[0], coordIn[1] );
 
   if ( subBandNum == 0 && DEBUGON ) 
     printf ( "RA/Dec (base) coordinates (radians)  : %f %f\n", 
-             coordOut[0], coordOut[1] );
+    coordOut[0], coordOut[1] );*/
 
   wcs->baseTr1 = coordOut[0];
   wcs->baseTr2 = coordOut[1];
@@ -422,13 +445,13 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   astNorm ( frame, coordOut );
 
-  if ( subBandNum == 0 && DEBUGON ) 
+  /*if ( subBandNum == 0 && DEBUGON ) 
     printf ( "GRID (offset) coordinates  : %f %f\n", 
              coordIn[0], coordIn[1] );
 
   if ( subBandNum == 0 && DEBUGON ) 
     printf ( "RA/Dec (offset) coordinates (radians)  : %f %f\n", 
-             coordOut[0], coordOut[1] );
+    coordOut[0], coordOut[1] );*/
 
   wcs->acTr1 = coordOut[0];
   wcs->acTr2 = coordOut[1];
@@ -443,13 +466,13 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   astNorm ( frame, coordOut );
 
-  if ( subBandNum == 0 && DEBUGON ) 
+  /*if ( subBandNum == 0 && DEBUGON ) 
     printf ( "GRID (base) coordinates  : %f %f\n", 
              coordIn[0], coordIn[1] );
 
   if ( subBandNum == 0 && DEBUGON ) 
     printf ( "AZEL (base) coordinates (radians)  : %f %f\n", 
-             coordOut[0], coordOut[1] );
+    coordOut[0], coordOut[1] );*/
 
   wcs->baseAz = coordOut[0];
   wcs->baseEl = coordOut[1];
@@ -462,21 +485,19 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   astNorm ( frame, coordOut );
 
-  if ( subBandNum == 0 && DEBUGON ) 
+  /*if ( subBandNum == 0 && DEBUGON ) 
     printf ( "GRID (offset) coordinates  : %f %f\n", 
              coordIn[0], coordIn[1] );
 
   if ( subBandNum == 0 && DEBUGON ) 
     printf ( "AZEL (offset) coordinates (radians)  : %f %f\n", 
-             coordOut[0], coordOut[1] );
+    coordOut[0], coordOut[1] );*/
 
   wcs->acAz = coordOut[0];
   wcs->acEl = coordOut[1];
 
   /* Calculate airmass from El of current cell. */
   wcs->airmass = slaAirmas( AST__DPIBY2 - wcs->acEl );
-
-  if ( DEBUGON ) printf ( "airmass : %f\n", wcs->airmass );
 
   /* Focal plane is AZEL so AZ angle is 0. */
   wcs->azAng = 0.0;
@@ -494,7 +515,5 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   index = (int) ( stepNum / gsdVars->nScanPts );
   gapptRA = ( gsdVars->scanTable1[index] - gapptRA ) * 2 * AST__DPI / 24.0;
   wcs->trAng = slaPa( gapptRA, gapptDec, gsdVars->telLatitude );
-
-  if ( DEBUGON ) printf ( "trAng : %f\n", wcs->trAng );
 
 }
