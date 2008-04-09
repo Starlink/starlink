@@ -113,7 +113,7 @@ itcl::class gaia::GaiaCubeBaseline {
                -variable [scope enable_range_($i)] \
                -command [code $this toggle_enable_ranges_]
          }
-         pack $itk_component(enable$i) -side top -fill x -ipadx 1m -ipady 2m
+         pack $itk_component(enable$i) -side top -fill x -ipadx 1m -ipady 1m
          add_short_help $itk_component(enable$i) {Enable this range}
 
          itk_component add bounds$i {
@@ -127,7 +127,7 @@ itcl::class gaia::GaiaCubeBaseline {
                -valuewidth $itk_option(-valuewidth) \
                -coord_update_cmd [code $this set_limits_ $i]
          }
-         pack $itk_component(bounds$i) -side top -fill x -ipadx 1m -ipady 2m
+         pack $itk_component(bounds$i) -side top -fill x -ipadx 1m -ipady 1m
          add_short_help $itk_component(bounds$i) \
             {Lower and upper indices of the range}
       }
@@ -154,7 +154,7 @@ itcl::class gaia::GaiaCubeBaseline {
             -delay 100 \
             -command [code $this set_order_]
       }
-      pack $itk_component(order) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(order) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(order) \
          {Order of polynomials to use in fits}
 

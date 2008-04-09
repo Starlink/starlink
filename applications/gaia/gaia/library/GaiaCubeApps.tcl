@@ -99,7 +99,7 @@ itcl::class gaia::GaiaCubeApps {
             -variable [scope itk_option(-show_ref_range)] \
             -command [code $this toggle_show_ref_range_]
       }
-      pack $itk_component(showrange) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(showrange) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(showrange) \
          {Show reference range figure(s) on plot}
 
@@ -160,7 +160,7 @@ itcl::class gaia::GaiaCubeApps {
             -valuewidth $itk_option(-valuewidth) \
             -coord_update_cmd [code $this set_limits_]
       }
-      pack $itk_component(bounds1) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(bounds1) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(bounds1) \
          {Lower and upper indices of the range}
 

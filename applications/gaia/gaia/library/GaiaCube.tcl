@@ -223,7 +223,7 @@ itcl::class gaia::GaiaCube {
             -filter_types $itk_option(-filter_types) \
             -chooser_title "Select cube"
       }
-      pack $itk_component(cube) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(cube) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(cube) \
          {Name of the input data file, must be a cube}
 
@@ -241,7 +241,7 @@ itcl::class gaia::GaiaCube {
       }
       $itk_component(axis) configure -value 3
 
-      pack $itk_component(axis) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(axis) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(axis) \
          {Axis to step along}
 
@@ -261,14 +261,14 @@ itcl::class gaia::GaiaCube {
             -drag_update_cmd [code $this update_wcs]
       }
       set ref_line_controls_(1) $itk_component(index)
-      pack $itk_component(index) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(index) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(index) \
          {Index of the image plane to display (along current axis)}
 
       #  Add tab window for choosing either the helper controls.
       itk_component add tabnotebook {
          iwidgets::tabnotebook $w_.tab -equaltabs 0 \
-            -angle 0 -tabpos n -width 420 -height 550
+            -angle 0 -tabpos n -width 420 -height 500
       }
       pack $itk_component(tabnotebook) -fill both -expand 1
 
@@ -316,7 +316,7 @@ itcl::class gaia::GaiaCube {
             -notify_cmd [code $this spectrum_moved_]
       }
       set ref_range_controls_($ref_ids) $itk_component(spectrum)
-      pack $itk_component(spectrum) -side top -fill both -ipadx 1m -ipady 2m
+      pack $itk_component(spectrum) -side top -fill both -ipadx 1m -ipady 1m
 
       #  Animation section.
 
@@ -337,7 +337,7 @@ itcl::class gaia::GaiaCube {
             -valuewidth $vwidth
       }
       set ref_range_controls_($ref_ids) $itk_component(animation)
-      pack $itk_component(animation) -side top -fill both -ipadx 1m -ipady 2m
+      pack $itk_component(animation) -side top -fill both -ipadx 1m -ipady 1m
 
       #  Collapse section.
 
@@ -359,7 +359,7 @@ itcl::class gaia::GaiaCube {
             -spec_coords [code $spec_coords_]
       }
       set ref_range_controls_($ref_ids) $itk_component(collapse)
-      pack $itk_component(collapse) -side top -fill both -ipadx 1m -ipady 2m
+      pack $itk_component(collapse) -side top -fill both -ipadx 1m -ipady 1m
 
       #  Chanmap section.
 
@@ -381,7 +381,7 @@ itcl::class gaia::GaiaCube {
             -spec_coords [code $spec_coords_]
       }
       set ref_range_controls_($ref_ids) $itk_component(chanmap)
-      pack $itk_component(chanmap) -side top -fill both -ipadx 1m -ipady 2m
+      pack $itk_component(chanmap) -side top -fill both -ipadx 1m -ipady 1m
 
       #  Rebin section.
 
@@ -397,7 +397,7 @@ itcl::class gaia::GaiaCube {
             -valuewidth $vwidth \
             -spec_coords [code $spec_coords_]
       }
-      pack $itk_component(rebin) -side top -fill both -ipadx 1m -ipady 2m
+      pack $itk_component(rebin) -side top -fill both -ipadx 1m -ipady 1m
 
       #  Filter section.
 
@@ -413,7 +413,7 @@ itcl::class gaia::GaiaCube {
             -valuewidth $vwidth \
             -spec_coords [code $spec_coords_]
       }
-      pack $itk_component(filter) -side top -fill both -ipadx 1m -ipady 2m
+      pack $itk_component(filter) -side top -fill both -ipadx 1m -ipady 1m
 
       #  Baseline subtraction section. Must be the last.
 
@@ -437,7 +437,7 @@ itcl::class gaia::GaiaCube {
       }
       set ref_range_controls_($baseline_id_) $itk_component(baseline)
       pack $itk_component(baseline) -side top -fill both -expand 1 \
-         -ipadx 1m -ipady 2m
+         -ipadx 1m -ipady 1m
 
       #  Close window.
       itk_component add close {

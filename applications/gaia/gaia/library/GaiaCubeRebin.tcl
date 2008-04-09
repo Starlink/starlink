@@ -122,7 +122,7 @@ itcl::class gaia::GaiaCubeRebin {
                -delay 25 \
                -command [code $this set_bin_factor_ $n]
          }
-         pack $itk_component(bin$n) -side top -fill x -ipadx 1m -ipady 2m
+         pack $itk_component(bin$n) -side top -fill x -ipadx 1m -ipady 1m
          add_short_help $itk_component(bin$n) \
             {Binning factor for the n axis, integer 1 to size of cube}
       }
@@ -135,7 +135,7 @@ itcl::class gaia::GaiaCubeRebin {
             -labelwidth $itk_option(-labelwidth) \
             -valuewidth $itk_option(-valuewidth)
       }
-      pack $itk_component(prefix) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(prefix) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(prefix) \
          {Prefix for names of output cubes, will be appended by an integer}
 
@@ -146,7 +146,7 @@ itcl::class gaia::GaiaCubeRebin {
             -labelwidth $itk_option(-labelwidth) \
             -valuewidth $itk_option(-valuewidth)
       }
-      pack $itk_component(outputfile) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(outputfile) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(outputfile) \
          {Name used for the last rebinned cube}
 

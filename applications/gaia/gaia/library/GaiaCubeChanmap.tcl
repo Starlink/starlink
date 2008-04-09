@@ -127,7 +127,7 @@ itcl::class gaia::GaiaCubeChanmap {
             -delay 25 \
             -command [code $this set_nchan_]
       }
-      pack $itk_component(nchan) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(nchan) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(nchan) \
          {Number of channels to appear in the channel map}
 
@@ -147,7 +147,7 @@ itcl::class gaia::GaiaCubeChanmap {
             -delay 25 \
             -command [code $this set_shape_]
       }
-      pack $itk_component(shape) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(shape) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(shape) \
          {Number of channels along the X-axis of the output image}
 
@@ -158,7 +158,7 @@ itcl::class gaia::GaiaCubeChanmap {
             -labelwidth $itk_option(-labelwidth) \
             -valuewidth $itk_option(-valuewidth)
       }
-      pack $itk_component(selected) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(selected) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(selected) \
          {Coordinate of selected image panel, click to update}
    }

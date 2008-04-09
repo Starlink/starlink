@@ -98,7 +98,7 @@ itcl::class gaia::GaiaCubeAnimation {
             -variable [scope itk_option(-show_ref_range)] \
             -command [code $this toggle_show_ref_range_]
       }
-      pack $itk_component(showrange) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(showrange) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(showrange) \
          {Show extent of animation on plot with a reference range figure}
 
@@ -115,7 +115,7 @@ itcl::class gaia::GaiaCubeAnimation {
             -valuewidth $itk_option(-valuewidth) \
             -coord_update_cmd [code $this set_limits_]
       }
-      pack $itk_component(bounds) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(bounds) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(bounds) \
          {Lower and upper indices used during animation}
 
@@ -135,7 +135,7 @@ itcl::class gaia::GaiaCubeAnimation {
             -delay 25 \
             -command [code $this set_delay_]
       }
-      pack $itk_component(delay) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(delay) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(delay) \
          {Delay used during animation in milliseconds}
 
@@ -155,7 +155,7 @@ itcl::class gaia::GaiaCubeAnimation {
             -delay 25 \
             -command [code $this set_step_]
       }
-      pack $itk_component(step) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(step) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(step) \
          {Step between frames of animation}
 
@@ -201,7 +201,7 @@ itcl::class gaia::GaiaCubeAnimation {
       add_short_help $itk_component(looprocknroll) \
          {Looping on, goes into reverse when at end}
 
-      pack $itk_component(loopframe) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(loopframe) -side top -fill x -ipadx 1m -ipady 1m
 
       #  Capture to animated GIF, exclusive with looping so shares
       #  same radiobutton state.
@@ -226,13 +226,13 @@ itcl::class gaia::GaiaCubeAnimation {
       add_short_help $itk_component(captureon) \
          {Capture to an animated gif (GaiaAnimation.gif)}
 
-      pack $itk_component(captureframe) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(captureframe) -side top -fill x -ipadx 1m -ipady 1m
 
       #  Animation stop and start.
       itk_component add animation {
          frame $w_.animation
       }
-      pack $itk_component(animation) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(animation) -side top -fill x -ipadx 1m -ipady 1m
 
       itk_component add stop {
          button $itk_component(animation).stop -text Stop \

@@ -112,7 +112,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       add_short_help $itk_component(reextract) \
          {Re-extract spectrum using new limits}
 
-      pack $itk_component(tframe) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(tframe) -side top -fill x -ipadx 1m -ipady 1m
       pack $itk_component(extraction) -side left -expand 0 -anchor w
       pack $itk_component(reextract) -side left -expand 0 -anchor c
 
@@ -126,7 +126,7 @@ itcl::class gaia::GaiaCubeSpectrum {
             -variable [scope itk_option(-show_ref_range)] \
             -command [code $this toggle_show_ref_range_]
       }
-      pack $itk_component(showrange) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(showrange) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(showrange) \
          {Show extent of spectral extraction on plot with a reference range
             figure}
@@ -144,7 +144,7 @@ itcl::class gaia::GaiaCubeSpectrum {
             -valuewidth $itk_option(-valuewidth) \
             -coord_update_cmd [code $this set_limits_]
       }
-      pack $itk_component(bounds) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(bounds) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(bounds) \
          {Lower and upper indices used for extraction}
 
@@ -158,7 +158,7 @@ itcl::class gaia::GaiaCubeSpectrum {
             -command [code $this toggle_fix_data_range_]
       }
       pack $itk_component(fixdatarange) \
-         -side top -fill x -ipadx 1m -ipady 2m
+         -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(fixdatarange) \
          {Fix data range to the values given, otherwise use min/max}
 
@@ -175,7 +175,7 @@ itcl::class gaia::GaiaCubeSpectrum {
             -command [code $this set_lower_data_limit_]
       }
       pack $itk_component(datalow) \
-         -side top -fill x -ipadx 1m -ipady 2m
+         -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(datalow) \
          {Lower data limit for spectral plot, press return to apply}
 
@@ -189,7 +189,7 @@ itcl::class gaia::GaiaCubeSpectrum {
             -command [code $this set_upper_data_limit_]
       }
       pack $itk_component(datahigh) \
-         -side top -fill x -ipadx 1m -ipady 2m
+         -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(datahigh) \
          {Upper data limit for spectral plot, press return to apply}
 
@@ -206,7 +206,7 @@ itcl::class gaia::GaiaCubeSpectrum {
             -command [code $this toggle_point_tracking_]
       }
       pack $itk_component(pointtracking) \
-         -side top -fill x -ipadx 1m -ipady 2m
+         -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(pointtracking) \
          {Do point extraction of spectrum, otherwise not}
 
@@ -230,7 +230,7 @@ itcl::class gaia::GaiaCubeSpectrum {
             -command [code $this clear_reference]
       }
 
-      pack $itk_component(rframe) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(rframe) -side top -fill x -ipadx 1m -ipady 1m
       pack $itk_component(reflabel) -side left -expand 0 -ipadx 1m
       pack $itk_component(setref) $itk_component(clearref) \
          -side left -expand 0 -anchor w -ipadx 1m -padx 1m
@@ -257,7 +257,7 @@ itcl::class gaia::GaiaCubeSpectrum {
             -command [code $this send_to_splat_ 1]
       }
 
-      pack $itk_component(sframe) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(sframe) -side top -fill x -ipadx 1m -ipady 1m
       pack $itk_component(splatlabel) -side left -expand 0 -ipadx 1m
       pack $itk_component(splatreplace) -side left -expand 0 -anchor w \
          -ipadx 1m -padx 1m

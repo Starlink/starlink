@@ -121,7 +121,7 @@ itcl::class gaia::GaiaCubeFilter {
             -delay 25 \
             -command [code $this set_boxsize_ 1]
       }
-      pack $itk_component(boxsize1) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(boxsize1) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(boxsize1) \
          {Size of box for block filtering or gaussian evaluation}
 
@@ -140,7 +140,7 @@ itcl::class gaia::GaiaCubeFilter {
             -delay 25 \
             -command [code $this set_boxsize_ 2]
       }
-      pack $itk_component(boxsize2) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(boxsize2) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(boxsize2) \
          {Size of box for block filtering or gaussian evaluation}
 
@@ -178,7 +178,7 @@ itcl::class gaia::GaiaCubeFilter {
             -delay 25 \
             -command [code $this set_orient_]
       }
-      pack $itk_component(orient) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(orient) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(orient) \
          {Orientation of major axis, degrees X through Y}
 
@@ -198,7 +198,7 @@ itcl::class gaia::GaiaCubeFilter {
             -delay 25 \
             -command [code $this set_fwhm_ 1]
       }
-      pack $itk_component(fwhm1) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(fwhm1) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(fwhm1) \
          {FWHM of gaussian, major axis}
 
@@ -217,7 +217,7 @@ itcl::class gaia::GaiaCubeFilter {
             -delay 25 \
             -command [code $this set_fwhm_ 2]
       }
-      pack $itk_component(fwhm2) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(fwhm2) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(fwhm2) \
          {FWHM of gaussian, minor axis}
 
@@ -229,7 +229,7 @@ itcl::class gaia::GaiaCubeFilter {
             -labelwidth $itk_option(-labelwidth) \
             -valuewidth $itk_option(-valuewidth)
       }
-      pack $itk_component(prefix) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(prefix) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(prefix) \
          {Prefix for names of output cubes, will be appended by an integer}
 
@@ -240,7 +240,7 @@ itcl::class gaia::GaiaCubeFilter {
             -labelwidth $itk_option(-labelwidth) \
             -valuewidth $itk_option(-valuewidth)
       }
-      pack $itk_component(outputfile) -side top -fill x -ipadx 1m -ipady 2m
+      pack $itk_component(outputfile) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(outputfile) \
          {Name used for the last rebinned cube}
 
