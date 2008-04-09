@@ -58,6 +58,9 @@
 *        Get tracking coordinate frame.
 *     2008-04-02 (JB):
 *        Get TCS_TR_SYS.
+*     2008-04-08 (JB):
+*        Don't convert PAMB, it is already in mbar. 
+
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
@@ -189,7 +192,7 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   record->enviro_rel_hum = gsdVars->hamb;
 
-  record->enviro_pressure = gsdVars->pamb * 1.33322;
+  record->enviro_pressure = gsdVars->pamb;
 
   /* If this is a raster, the on-source integration time is
      the scan time divided by the number of points in the scan,
