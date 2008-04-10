@@ -135,16 +135,19 @@ Librarian and Site Managers.
 \newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
 \newcommand{\htmladdnormallink}[2]{#1}
 \newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
 \newcommand{\hyperref}[4]{#2\ref{#4}#3}
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
 \newcommand{\HTMLcode}[2][]{}
+
+% Define commands for HTML-only or LaTeX-only text.
+\newcommand{\html}[1]{}
+\newcommand{\latex}[1]{#1}
+
+% Use latex2html 98.2.
+\newcommand{\latexhtml}[2]{#1}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
@@ -161,7 +164,7 @@ Librarian and Site Managers.
 % -----------------------------------------------------------------------------
 %  Debugging.
 %  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
+%  Remove % from the following to debug links in the HTML version using Latex.
 
 % \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
 % \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
@@ -171,12 +174,12 @@ Librarian and Site Managers.
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
 %end{latexonly}
 % -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+% ? Document-specific \newcommand or \newenvironment commands.
 \newcommand{\dash}{--}
 \begin{htmlonly}
 \renewcommand{\dash}{-}
 \end{htmlonly}
-% ? End of document specific commands
+% ? End of document-specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
@@ -262,22 +265,22 @@ Librarian and Site Managers.
 % ? Latex Copyright Statement
 %  =========================
 \begin{latexonly}
-\newpage
-\vspace*{\fill}
-\stardoccopyright
+  \newpage
+  \vspace*{\fill}
+  \stardoccopyright
 \end{latexonly}
 % ? End of Latex copyright statement
 
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
-  \newpage
-  \begin{latexonly}
-    \setlength{\parskip}{0mm}
-    \tableofcontents
-    \setlength{\parskip}{\medskipamount}
-    \markboth{\stardocname}{\stardocname}
-  \end{latexonly}
+\newpage
+\begin{latexonly}
+  \setlength{\parskip}{0mm}
+  \tableofcontents
+  \setlength{\parskip}{\medskipamount}
+  \markboth{\stardocname}{\stardocname}
+\end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 \cleardoublepage

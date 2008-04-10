@@ -15,23 +15,6 @@
 
 \pagestyle{myheadings}
 
-%------------------------------------------------------------------------------
-
-% Define commands for displaying angles as sexagesimal hours and minutes
-% or degrees and minutes.
-
-\newcommand{\tmin}   {\mbox{$^{\rm m}\!\!.$}}
-\newcommand{\hm}[3] {$#1^{\rm h}\,#2\tmin#3$}
-\newcommand{\dm}[2] {$#1^{\circ}\,#2\raisebox{-0.5ex}{$^{'}$}$}
-\newcommand{\arcmin} {\raisebox{-0.5ex}{$^{'}$} }
-
-\newcommand{\arcsec} {$\hspace{-0.05em}\raisebox{-0.5ex}
-                     {$^{'\hspace{-0.1em}'}$}
-                     \hspace{-0.7em}.\hspace{-0.05em}$}
-\newcommand{\tsec}   {\mbox{$^{\rm s}\!\!.$}}
-\newcommand{\hms}[4] {$#1^{\rm h}\,#2^{\rm m}\,#3\tsec#4$}
-\newcommand{\dms}[4] {$#1^{\circ}\,#2\raisebox{-0.5ex}{$^{'}$}\,#3\arcsec#4$}
-
 % -----------------------------------------------------------------------------
 % ? Document identification
 % Fixed part
@@ -174,16 +157,19 @@ will provide catalogue and image data for GAIA \emph{etc}.}
 \newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
 \newcommand{\htmladdnormallink}[2]{#1}
 \newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
 \newcommand{\hyperref}[4]{#2\ref{#4}#3}
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
-
-\newenvironment{latexonly}{}{}
-\newcommand{\latex}[1]{#1}
-\newcommand{\html}[1]{}
-\newcommand{\latexhtml}[2]{#1}
 \newcommand{\HTMLcode}[2][]{}
+
+% Define commands for HTML-only or LaTeX-only text.
+\newcommand{\html}[1]{}
+\newcommand{\latex}[1]{#1}
+
+% Use latex2html 98.2.
+\newcommand{\latexhtml}[2]{#1}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
@@ -200,7 +186,7 @@ will provide catalogue and image data for GAIA \emph{etc}.}
 % -----------------------------------------------------------------------------
 %  Debugging.
 %  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
+%  Remove % from the following to debug links in the HTML version using Latex.
 
 % \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
 % \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
@@ -210,8 +196,24 @@ will provide catalogue and image data for GAIA \emph{etc}.}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
 %end{latexonly}
 % -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-% ? End of document specific commands
+% ? Document-specific \newcommand or \newenvironment commands.
+
+% Define commands for displaying angles as sexagesimal hours and minutes
+% or degrees and minutes.
+
+\newcommand{\tmin}   {\mbox{$^{\rm m}\!\!.$}}
+\newcommand{\hm}[3] {$#1^{\rm h}\,#2\tmin#3$}
+\newcommand{\dm}[2] {$#1^{\circ}\,#2\raisebox{-0.5ex}{$^{'}$}$}
+\newcommand{\arcmin} {\raisebox{-0.5ex}{$^{'}$} }
+
+\newcommand{\arcsec} {$\hspace{-0.05em}\raisebox{-0.5ex}
+                     {$^{'\hspace{-0.1em}'}$}
+                     \hspace{-0.7em}.\hspace{-0.05em}$}
+\newcommand{\tsec}   {\mbox{$^{\rm s}\!\!.$}}
+\newcommand{\hms}[4] {$#1^{\rm h}\,#2^{\rm m}\,#3\tsec#4$}
+\newcommand{\dms}[4] {$#1^{\circ}\,#2\raisebox{-0.5ex}{$^{'}$}\,#3\arcsec#4$}
+
+% ? End of document-specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
@@ -370,21 +372,21 @@ from overseas:                  & +44-131-668-8416 \\
 
 % ? Latex Copyright Statement
 
- \vspace*{\fill}
- \stardoccopyright
+\vspace*{\fill}
+\stardoccopyright
 
- \cleardoublepage
- \begin{latexonly}
-   \setlength{\parskip}{0mm}
-   \tableofcontents
+\cleardoublepage
+\begin{latexonly}
+  \setlength{\parskip}{0mm}
+  \tableofcontents
 
 %   \newpage
-   \listoffigures
-   \listoftables
+  \listoffigures
+  \listoftables
 
-   \setlength{\parskip}{\medskipamount}
-   \markboth{\stardocname}{\stardocname}
- \end{latexonly}
+  \setlength{\parskip}{\medskipamount}
+  \markboth{\stardocname}{\stardocname}
+\end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 \cleardoublepage
