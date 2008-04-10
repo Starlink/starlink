@@ -62,6 +62,7 @@
 *     hme: Horst Meyerdierks (UoE, Starlink)
 *     MJC: Malcolm J. Currie (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -71,6 +72,9 @@
 *        Use CNF_PVAL for pointers to mapped data.
 *     2006 Oct 19 (TIMJ):
 *        Fix CNF_PVAL pointer offsetting
+*     2008 April 10 (PWD):
+*        Map IAXIS axes component, not first (we now have cubes
+*        longer in spectral dimension than spatial).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -217,7 +221,7 @@
      :                 WNDF, STATUS )
          CALL NDF_MAP( WNDF, 'DATA', '_INTEGER', 'WRITE',
      :                 WPTR, I, STATUS )
-         CALL NDF_AMAP( WNDF, 'CENTRE', 1, '_INTEGER', 'WRITE',
+         CALL NDF_AMAP( WNDF, 'CENTRE', AXIS, '_INTEGER', 'WRITE',
      :                  FPTR, I, STATUS )
          CALL SPD_UAAFI( 1, I, %VAL( CNF_PVAL( FPTR ) ), 0, STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 500
