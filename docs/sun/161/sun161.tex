@@ -1,4 +1,4 @@
-\documentstyle[11pt]{article}
+\documentclass[twoside,11pt]{article}
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
@@ -50,9 +50,9 @@ the parameter entry system.
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
 %  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -87,7 +87,6 @@ the parameter entry system.
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -104,6 +103,13 @@ the parameter entry system.
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
 
+% Define commands for HTML-only or LaTeX-only text.
+\newcommand{\html}[1]{}
+\newcommand{\latex}[1]{#1}
+
+% Use latex2html 98.2.
+\newcommand{\latexhtml}[2]{#1}
+
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
@@ -114,14 +120,8 @@ the parameter entry system.
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\newcommand{\latex}[1]{#1}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary 
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
 
 % -----------------------------------------------------------------------------
 %  Debugging.
@@ -134,9 +134,10 @@ the parameter entry system.
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
-% ? End of document specific commands
+% ? Document-specific \newcommand or \newenvironment commands.
+% ? End of document-specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
@@ -183,7 +184,7 @@ the parameter entry system.
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -207,7 +208,6 @@ the parameter entry system.
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -224,13 +224,13 @@ the parameter entry system.
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
- \newpage
- \begin{latexonly}
+\newpage
+\begin{latexonly}
    \setlength{\parskip}{0mm}
-   \latexonlytoc
+   \tableofcontents
    \setlength{\parskip}{\medskipamount}
    \markright{\stardocname}
- \end{latexonly}
+\end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 \newpage
@@ -2246,7 +2246,7 @@ Then all the values within the region are saved to a file for later inspection,
 using INSPECT's list option. Finally statistics for the region are obtained
 using the stat option.
 
-NB INSPECT will clear anything that is on the overlay plane.
+N.B. INSPECT will clear anything that is on the overlay plane.
 
 \begin{small}
 \begin{verbatim}
@@ -2494,6 +2494,7 @@ coordinates.
 \newpage
 \appendix
 
+\begin{latexonly}
 \section{Graphical output
 \xlabel{graphical_output}\label{a:a}}
 
@@ -2518,6 +2519,8 @@ source positions.}
  
 \newpage
 \addtocounter{page}{+9}
+
+\end{latexonly}
 
 \newpage
 
