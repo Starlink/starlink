@@ -2085,6 +2085,7 @@ L998:;
 
 /* Free remaining resources. */  
    if( detgrp != NULL) grpDelet( &detgrp, status);
+   if( igrp4 != NULL) grpDelet( &igrp4, status);
    if( igrp != NULL) grpDelet( &igrp, status);
    if( ogrp != NULL) grpDelet( &ogrp, status);
    if( boxes ) boxes = astFree( boxes );
