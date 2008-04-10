@@ -981,47 +981,46 @@ are simply removed, although error handling will not then occur.
 The technique is best explained by an example:
 
 \begin{quote}
-\begin{tabbing} % Not clear why this is needed, since tabs are not used,
-                % but the leading spaces get lost otherwise.
-\verb#      SUBROUTINE EXAMPL( N, DATA )                #\\
-\verb#                                                  #\\
-\verb#*   Declare constants and variables.              #\\
-\verb#      INCLUDE 'SAE_PAR'                           #\\
-\verb#      INCLUDE 'PRM_PAR'                           #\\
-\verb#      INTEGER N, I                                #\\
-\verb#      REAL DATA( N )                              #\\
-\verb#                                                  #\\
-\verb#*   Declare the condition handler.                #\\
-\verb#      INTEGER NUM_TRAP                            #\numcir{1}\\
-\verb#      EXTERNAL NUM_TRAP                           #\\
-\verb#                                                  #\\
-\verb#*   Include the NUM_CMN common block definition, which defines#\\
-\verb#*   the variable NUM_ERROR.                       #\\
-\verb#      INCLUDE 'NUM_CMN'                           #\numcir{2}\\
-\verb#                                                  #\\
-\verb#*   Establish the condition handler.              #\\
-\verb#      CALL LIB$ESTABLISH( NUM_TRAP )              #\numcir{3}\\
-\verb#                                                  #\\
-\verb#*   Initialise.                                   #\\
-\verb#      NUM_ERROR = SAI__OK                         #\numcir{4}\\
-\verb#                                                  #\\
-\verb#*   Perform the calculations.                     #\\
-\verb#      DO 1 I = 1, N                               #\\
-\verb#         DATA( I ) = 1.0 / ( DATA( I ) ** 2 )     #\numcir{5}\\
-\verb#                                                  #\\
-\verb#*   Check if an error occurred.                   #\\
-\verb#         IF( NUM_ERROR .NE. SAI__OK ) THEN        #\numcir{6}\\
-\verb#                                                  #\\
-\verb#*   If so, reset the NUM_ERROR flag and define the result.#\\
-\verb#            NUM_ERROR = SAI__OK                   #\numcir{7}\\
-\verb#            DATA( I ) = VAL__BADR                 #\\
-\verb#         ENDIF                                    #\\
-\verb#    1 CONTINUE                                    #\\
-\verb#                                                  #\\
-\verb#*   Remove the condition handler and exit the routine.#\\
-\verb#      CALL LIB$REVERT                             #\numcir{8}\\
-\verb#      END                                         #\\
-\end{tabbing}
+\begin{verbatim}
+      SUBROUTINE EXAMPL( N, DATA )                
+                                                  
+*   Declare constants and variables.              
+      INCLUDE 'SAE_PAR'                           
+      INCLUDE 'PRM_PAR'                           
+      INTEGER N, I                                
+      REAL DATA( N )                              
+                                                  
+*   Declare the condition handler.                
+      INTEGER NUM_TRAP                            [1]
+      EXTERNAL NUM_TRAP                           
+                                                  
+*   Include the NUM_CMN common block definition, which defines
+*   the variable NUM_ERROR.                       
+      INCLUDE 'NUM_CMN'                           [2]
+                                                  
+*   Establish the condition handler.              
+      CALL LIB$ESTABLISH( NUM_TRAP )              [3]
+                                                  
+*   Initialise.                                   
+      NUM_ERROR = SAI__OK                         [4]
+                                                  
+*   Perform the calculations.                     
+      DO 1 I = 1, N                               
+         DATA( I ) = 1.0 / ( DATA( I ) ** 2 )     [5]
+                                                  
+*   Check if an error occurred.                   
+         IF( NUM_ERROR .NE. SAI__OK ) THEN        [6]
+                                                  
+*   If so, reset the NUM_ERROR flag and define the result.
+            NUM_ERROR = SAI__OK                   [7]
+            DATA( I ) = VAL__BADR                 
+         ENDIF                                    
+    1 CONTINUE                                    
+                                                  
+*   Remove the condition handler and exit the routine.
+      CALL LIB$REVERT                             [8]
+      END                                         
+\end{verbatim}
 \end{quote}
 
 Programming notes:
