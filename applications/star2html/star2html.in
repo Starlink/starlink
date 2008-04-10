@@ -562,11 +562,15 @@ if ( $? ) {
 }
 
 #  Try to copy some special icons from @l2hdir@ to this directory.
-$LATEX2HTML_DIR = "$ENV{'STARLINK_DIR'}/share/latex2html/bin" || "@l2hdir@";
+$LATEX2HTML_DIR = "$ENV{'STARLINK_DIR'}/share/latex2html/bin";
+if ( ! -d $LATEX2HTML_DIR ) {
+  $LATEX2HTML_DIR = "@l2hdir@";
+}
+
 $ICONDIR = $LATEX2HTML_DIR . '/../icons';
 if ( -d $ICONDIR ) {
   system( "cp $ICONDIR/contents_motif.gif .") &&
-    warn "Failed to copy contents_motif.gif from $ICONDIR to output directory\n";
+    warn("Failed to copy contents_motif.gif from $ICONDIR to output directory\n");
 }
 
 #  Extract the retrieve source icon. Could avoid the above if this can
