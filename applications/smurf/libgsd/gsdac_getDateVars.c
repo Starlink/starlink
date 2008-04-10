@@ -53,6 +53,8 @@
 *        Removed unused variables.
 *     2008-04-03 (JB):
 *        Accept AOSC as backend.
+*     2008-04-10 (JB):
+*        Correct for difference in solar and sidereal times.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -91,6 +93,8 @@
 #include "smurf_par.h"
 #include "gsdac.h"
 
+#define SOLSID 1.00273790935
+
 #define FUNC_NAME "gsdac_getDateVars"
 
 void gsdac_getDateVars ( const gsdVars *gsdVars, const char *backend, 
@@ -101,22 +105,23 @@ void gsdac_getDateVars ( const gsdVars *gsdVars, const char *backend,
 
   /* Local variables */
   char dateString[SZFITSCARD];/* temporary string for date conversions. */
-  int day = 0;                /* days */
-  double dut1 = 0.0;          /* UT1-UTC correction */
-  int hour = 0;               /* hours */
-  int min = 0;                /* minutes */
-  int month = 0;              /* months */
-  float sec = 0.0;            /* seconds */
-  int tableDims = 0;          /* dimensionality of data table */
+  int day;                    /* days */
+  double dLST;                /* difference in LST */   
+  double dut1;                /* UT1-UTC correction */
+  int hour;                   /* hours */
+  int min;                    /* minutes */
+  int month;                  /* months */
+  float sec;                  /* seconds */
+  int tableDims;              /* dimensionality of data table */
   unsigned int tableSize;     /* number of elements of data table */
   AstTimeFrame *tempFrame = NULL; /* AstTimeFrame for UT1-UTC conversion */
   const char *tempString;     /* temporary string */
   AstTimeFrame *tFrame = NULL;  /* AstTimeFrame for UT1-UTC conversion */
-  double utcEnd = 0.0;        /* end UTC time */
-  double utcHSTend = 0.0;     /* end HST time */
-  double utcHSTstart = 0.0;   /* start HST time */
-  double utcStart = 0.0;      /* start UTC time */
-  int year = 0;               /* years */
+  double utcEnd;              /* end UTC time */
+  double HSTend;              /* end HST time */
+  double HSTstart;            /* start HST time */
+  double utcStart;            /* start UTC time */
+  int year;                   /* years */
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
@@ -175,9 +180,11 @@ void gsdac_getDateVars ( const gsdVars *gsdVars, const char *backend,
   tableSize = gsdVars->nScanVars1 * gsdVars->nScan;
   tableDims = gsdVars->nScanVars1;
 
-  utcEnd = utcStart + ( gsdVars->scanTable1[tableSize-tableDims] - 
-                        gsdVars->scanTable1[0] ) 
-                         / 24.0;
+  dLST = ( gsdVars->scanTable1[tableSize-tableDims] - 
+           gsdVars->scanTable1[0] ) / 24.0;
+
+  /* Correct for difference between solar and sidereal time. */
+  utcEnd = utcStart + ( dLST / SOLSID );
 
   tempString = astFormat ( tempFrame, 1, utcEnd );
 
@@ -202,17 +209,17 @@ void gsdac_getDateVars ( const gsdVars *gsdVars, const char *backend,
   sprintf ( dateVars->LSTend, "%02d:%02d:%6.4f", hour, min, sec );
 
   /* Get the HSTstart and HSTend. */
-  utcHSTstart = utcStart - 10.0 / 24.0;
-  utcHSTend = utcEnd - 10.0 / 24.0;
+  HSTstart = utcStart - 10.0 / 24.0;
+  HSTend = utcEnd - 10.0 / 24.0;
 
-  tempString = astFormat ( tempFrame, 1, utcHSTstart ); 
+  tempString = astFormat ( tempFrame, 1, HSTstart ); 
 
   /* Copy the HST date string. */    
   strncpy ( dateVars->HSTstart, tempString, 10 );
   dateVars->HSTstart[10] =  'T';
   strcpy ( &(dateVars->HSTstart[11]), &(tempString[11]) ); 
 
-  tempString = astFormat ( tempFrame, 1, utcHSTend ); 
+  tempString = astFormat ( tempFrame, 1, HSTend ); 
 
   /* Copy the HST date string. */    
   strncpy ( dateVars->HSTend, tempString, 10 );
