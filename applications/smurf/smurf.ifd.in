@@ -1080,6 +1080,15 @@ package @PACKAGE@ {
 	    helpkey *
 	  }
 
+         parameter outfiles {
+            type LITERAL
+            prompt {Text file in which to put the output NDF names}
+            default !
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            helpkey *
+          }
+
 	 parameter polbinsize {
 	    type _REAL
 	    prompt {Angular size of analyser angle bins (degs)}

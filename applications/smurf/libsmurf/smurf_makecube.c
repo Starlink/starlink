@@ -243,7 +243,10 @@
 *          for parameter OUT.
 *     NTILE = _INTEGER (Write)
 *          The number of output tiles used to hold the entire output
-*          array (see parameter TILEDIMS).
+*          array (see parameter TILEDIMS). If no input data falls within
+*          a specified tile, then no output NDF will be created for the
+*          tile, but the tile will still be included in the tile numbering 
+*          scheme.
 *     NPOLBIN = _INTEGER (Write)
 *          The number of polarisation angle bins used to hold the entire 
 *          output data (see parameter POLBINSIZE).
@@ -272,6 +275,11 @@
 *          first, followed by the positions for the second time slice, etc.
 *          If a null value (!) is supplied, no output catalogue is produced. 
 *          See also parameter CATFRAME. [!]
+*     OUTFILES = LITERAL (Write)
+*          The name of text file to create, in which to put the names of
+*          all the output NDFs created by this application via parameter
+*          OUT (one per line). If a null (!) value is supplied no file is 
+*          created. [!]
 *     PARAMS( 2 ) = _DOUBLE (Read)
 *          An optional array which consists of additional parameters
 *          required by the Sinc, SincSinc, SincCos, SincGauss, Somb,
@@ -499,12 +507,15 @@
 *          the spatial extent. The NDF file name specified by "out" is
 *          modified for each tile by appending "_<N>" to the end of it, 
 *          where <N> is the integer tile index (starting at 1). The
-*          number of tiles created is written to output parameter NTILES.
-*          The tiles all share the same projection and so can be simply 
-*          pasted together in pixel coordinates to reconstruct the full 
-*          size output array. The tiles are centred so that the reference
-*          position (given by REFLON and REFLAT) falls at the centre of a
-*          tile. If a null (!) value is supplied for TILEDIMS, then the 
+*          number of tiles used to cover the entire output cube is written 
+*          to output parameter NTILES. The tiles all share the same 
+*          projection and so can be simply pasted together in pixel 
+*          coordinates to reconstruct the full size output array. The tiles 
+*          are centred so that the reference position (given by REFLON and 
+*          REFLAT) falls at the centre of a tile. If a tile receives no
+*          input data, then no corresponding output NDF is created, but 
+*          the tile is still included in the tile numbering scheme. If a 
+*          null (!) value is supplied for TILEDIMS, then the 
 *          entire output array is created as a single tile and stored in 
 *          a single output NDF with the name given by parameter OUT 
 *          (without any "_<N>" appendix). [!]
@@ -745,6 +756,8 @@
 *     15-FEB-2008 (DSB):
 *        - Expand the GENVAR documentation.
 *        - Display the bin angle for each polarisation bin.
+*     10-APR-2008 (DSB):
+*        Add parameter OUTFILES.
 
 *  Copyright:
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
@@ -830,6 +843,7 @@ void smurf_makecube( int *status ) {
    Grp *igrp = NULL;          /* Group of input files */
    Grp *ogrp = NULL;          /* Group containing output file */
    Grp *tgrp = NULL;          /* Temporary Group pointer */
+   Grp *igrp4 = NULL;         /* Group holding output NDF names */
    HDSLoc *smurf_xloc = NULL; /* HDS locator for output SMURF extension */
    HDSLoc *weightsloc = NULL; /* HDS locator of weights array */
    char *pname = NULL;        /* Name of currently opened data file */
@@ -1366,6 +1380,11 @@ void smurf_makecube( int *status ) {
    parameter. */
    parPut0i( "NPOLBIN", npbin, status );
 
+/* Create a new group to hold the names of the output NDFs that have been
+   created. This group does not include any NDFs that correspond to tiles
+   that contain no input data. */
+   igrp4 = grpNew( "", status );
+
 /* Create a group holding the names of the output NDFs. Abort without error 
    if a null value is supplied. We first get the base name. If only 1
    tile is being created, we just use the base name as the output NDF name.
@@ -1505,6 +1524,12 @@ void smurf_makecube( int *status ) {
             msgBlank( status );
             blank = 1;
          }
+
+/* Add the name of this output NDF to the group holding the names of the
+   output NDFs that have actually been created. */
+         pname = basename;
+         grpGet( ogrp, iout, 1, &pname, GRP__SZNAM, status );
+         grpPut1( igrp4, basename, 0, status );
 
 /* Create the output NDF to hold the tile data relating to the current
    polarisation angle bin. */
@@ -1846,7 +1871,7 @@ void smurf_makecube( int *status ) {
    "var_array" used above will be a 2D array holding a single slice of the 3D
    Variance array. In this case we now copy this slice to the output cube. */
             } else if( is2d ) {
-               ndfMap( ondf, "Variance", "_REAL", "WRITE", (void **) &var_out, &nel, 
+               ndfMap( ondf, "Variance", "_REAL", "WRITE", (void *) &var_out, &nel, 
                        status );
                if( var_out && *status == SAI__OK ) {
                   ipd = (float *) data_array;
@@ -2046,6 +2071,13 @@ void smurf_makecube( int *status ) {
 
 /* End the tile's AST context. */
       astEnd;
+   }
+
+/* Write out the list of output NDF names, annulling the error if a null
+   parameter value is supplied. */
+   if( *status == SAI__OK ) {
+      grpList( "OUTFILES", 0, 0, NULL, igrp4, status );
+      if( *status == PAR__NULL ) errAnnul( status );
    }
 
 /* Arrive here if no output NDF is being created. */
