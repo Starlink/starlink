@@ -148,15 +148,10 @@ how to deal with commonly occurring graphics problems.}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
 % -----------------------------------------------------------------------------
 %  Debugging.
 %  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
+%  Remove % from the following to debug links in the HTML version using Latex.
 
 % \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
 % \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
@@ -166,7 +161,7 @@ how to deal with commonly occurring graphics problems.}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
 %end{latexonly}
 % -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+% ? Document-specific \newcommand or \newenvironment commands.
 
 % Figure environment. Defined for latex2html. #1 is postscript file
 % #2 the qualifiers, #3 the gif file, #4 the label, #5 the caption.
@@ -184,7 +179,7 @@ how to deal with commonly occurring graphics problems.}
   }
 \end{htmlonly}
 
-% ? End of document specific commands
+% ? End of document-specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
@@ -267,7 +262,6 @@ how to deal with commonly occurring graphics problems.}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \newcommand{\latexonlytoc}[0]{}
 %  \htmladdtonavigation{\htmlref{\htmladdimg{sc15_cover.gif}}
 %        {stardoccontents}}
 
@@ -284,25 +278,25 @@ how to deal with commonly occurring graphics problems.}
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
- \newpage
- \vspace{3cm}
+\newpage
+\vspace{3cm}
 
- \latex{\subsection*{Revision history}}
- \html{\section*{Revision history}}
+\latex{\subsection*{Revision history}}
+\html{\section*{Revision history}}
 
- \begin{enumerate}
-   \item 2nd February 2000; Version 1. Release version (AA) 
-   \item 22nd August 2000; Version 2. Checked URLs + minor updates (AA)
+\begin{enumerate}
+  \item 2nd February 2000; Version 1. Release version (AA) 
+  \item 22nd August 2000; Version 2. Checked URLs + minor updates (AA)
 
- \end{enumerate}
+\end{enumerate}
 
- \vspace{10cm}
- \copyright \underline{1999-2000} Starlink, CCLRC
+\vspace{10cm}
+\copyright \underline{1999-2000} Starlink, CCLRC
 
- \cleardoublepage
- \begin{latexonly}
+\cleardoublepage
+\begin{latexonly}
    \setlength{\parskip}{0mm}
-   \latexonlytoc
+   \tableofcontents
 
    \newpage
    \listoffigures
@@ -310,7 +304,7 @@ how to deal with commonly occurring graphics problems.}
 
    \setlength{\parskip}{\medskipamount}
    \markright{\stardocname}
- \end{latexonly}
+\end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 

@@ -169,11 +169,6 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
 % -----------------------------------------------------------------------------
 %  Debugging.
 %  =========
@@ -266,7 +261,6 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \newcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -283,28 +277,28 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
- \newpage
- \vspace{3cm}
+\newpage
+\vspace{3cm}
 
- \latex{\subsection*{Revision history}}
- \html{\section*{Revision history}}
+\latex{\subsection*{Revision history}}
+\html{\section*{Revision history}}
 
- \begin{enumerate}
+\begin{enumerate}
 
    \item 21st December 1998: Version 1. Original version (ACD).
 
    \item 11th June 1999: Version 2.  Removed the example of reducing
-    FLAIR data with Figaro and also made various minor changes (ACD).
+   FLAIR data with Figaro and also made various minor changes (ACD).
 
- \end{enumerate}
+\end{enumerate}
 
- \vspace{10cm}
- \copyright \underline{1999} Starlink, CCLRC
+\vspace{10cm}
+\copyright \underline{1999} Starlink, CCLRC
 
- \cleardoublepage
- \begin{latexonly}
+\cleardoublepage
+\begin{latexonly}
    \setlength{\parskip}{0mm}
-   \latexonlytoc
+   \tableofcontents
 
    \newpage
    \listoffigures
@@ -312,7 +306,7 @@ by a colleague).  No prior knowledge of fibre spectroscopy is assumed.}
 
    \setlength{\parskip}{\medskipamount}
    \markright{\stardocname}
- \end{latexonly}
+\end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 
