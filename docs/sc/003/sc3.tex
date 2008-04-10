@@ -155,7 +155,7 @@
 % -----------------------------------------------------------------------------
 %  Debugging.
 %  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
+%  Remove % from the following to debug links in the HTML version using Latex.
 
 % \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
 % \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
@@ -165,12 +165,9 @@
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
 %end{latexonly}
 % -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+% ? Document-specific \newcommand or \newenvironment commands.
 
-%begin{latexonly}
 \newcommand{\scspec}[2]{#1}
-%end{latexonly}
-
 \begin{htmlonly}
 \newcommand{\scspec}[2]{#2}
 \end{htmlonly}
@@ -179,8 +176,7 @@
 %{\catcode`\~=12 \gdef\EchelleHomePage{http://www.star.ucl.ac.uk/~mjc/echelle}}
 \newcommand{\EchelleHomePage}{http://www.starlink.ac.uk/echomop/echelle/}
 
-
-% ? End of document specific commands
+% ? End of document-specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
@@ -231,9 +227,7 @@
 \begin{htmlonly}
    \xlabel{}
    \begin{rawhtml} <H1> \end{rawhtml}
-      \stardoctitle\\
-      %\stardocversion\\
-      %\stardocmanual
+      \stardoctitle
    \begin{rawhtml} </H1> <HR> \end{rawhtml}
 
 % ? Add picture here if required for the hypertext version.
