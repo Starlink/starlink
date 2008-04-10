@@ -3,7 +3,6 @@
 % ? Specify used packages
 % \usepackage{graphicx}        %  Use this one for final production.
 % \usepackage[draft]{graphicx} %  Use this one for drafting.
-\usepackage{xtab}
 % ? End of specify used packages
 
 \pagestyle{myheadings}
@@ -2615,8 +2614,7 @@ Note that references to error classes in programs are case insensitive.
 DEC FORTRAN (OSF/1, Ultrix and VMS) specific FIO status values:
 \footnotetext[1]{See note about multiple use of this error code}
 
-\latex{\begin{xtabular}{ll}}
-\html{\begin{tabular}{ll}}
+\begin{tabular}{ll}
 FIO\_\_ALOPN & File already open \\
 FIO\_\_BACER & BACKSPACE error \\
 FIO\_\_CLSER & File close error \\
@@ -2662,6 +2660,9 @@ FIO\_\_REQSA & Requires seek ability (Ultrix only) \\
 FIO\_\_REWER & REWIND error \\
 FIO\_\_REWRT & REWRITE error \\
 FIO\_\_SEGRC & Segmented record format error \\
+\end{tabular}
+
+\begin{tabular}{ll}
 FIO\_\_SPLOC & Specified record locked \\
 FIO\_\_SYNAM & Syntax error in NAMELIST input \\
 FIO\_\_SYNER & Syntax error in format \\
@@ -2671,8 +2672,7 @@ FIO\_\_UNLER & UNLOCK error \\
 FIO\_\_UNTNC & Unit not connected (Ultrix only) \\
 FIO\_\_VFVAL & Variable format expression value error \\
 FIO\_\_WRTER & File write error \\
-\latex{\end{xtabular}}
-\html{\end{tabular}}
+\end{tabular}
 
 Sun FORTRAN specific FIO status values:
 
