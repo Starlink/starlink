@@ -130,11 +130,6 @@
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
 % -----------------------------------------------------------------------------
 %  Debugging.
 %  =========
@@ -220,7 +215,6 @@
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \newcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -240,7 +234,7 @@
 \newpage
 \begin{latexonly}
    \setlength{\parskip}{0mm}
-   \latexonlytoc
+   \tableofcontents
    \setlength{\parskip}{\medskipamount}
    \markright{\stardocname}
 \end{latexonly}

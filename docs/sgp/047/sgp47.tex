@@ -127,15 +127,10 @@ on selecting software.}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
 % -----------------------------------------------------------------------------
 %  Debugging.
 %  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
+%  Remove % from the following to debug links in the HTML version using Latex.
 
 % \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
 % \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
@@ -145,7 +140,7 @@ on selecting software.}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
 %end{latexonly}
 % -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+% ? Document-specific \newcommand or \newenvironment commands.
 
 \newcommand{\sgspec}[2]{#1}
 \begin{htmlonly}
@@ -291,7 +286,7 @@ on selecting software.}
 %%S2HPOST
 %%S2HPOSTexit
 
-% ? End of document specific commands
+% ? End of document-specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
@@ -362,7 +357,6 @@ on selecting software.}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \newcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -384,7 +378,7 @@ on selecting software.}
 \begin{latexonly}
    \setlength{\parskip}{0mm}
    \setcounter{tocdepth}{2}
-   \latexonlytoc
+   \tableofcontents
    \setlength{\parskip}{\medskipamount}
 %   \markright{\stardocname}{\stardocname}
 \end{latexonly}

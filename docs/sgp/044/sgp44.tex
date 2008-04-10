@@ -124,7 +124,7 @@
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
 %end{latexonly}
 % -----------------------------------------------------------------------------
-% Add any document specific \newcommand or \newenvironment commands here
+% Add any document-specific \newcommand or \newenvironment commands here
 
 \newcommand{\planref}[1]{\htmladdnormallink{#1}{http://star-www.rl.ac.uk/\~{}rfws/projects/planitems.html}}
 \newcommand{\projectsref}[1]{\htmladdnormallink{#1}{http://star-www.rl.ac.uk/\~{}rfws/projects/index.html}}
@@ -206,15 +206,13 @@
 % -----------------------------------------------------------------------------
 %  Table of Contents. (if used)
 %  ==================
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
 \begin{htmlonly}
-   \newcommand{\latexonlytoc}[0]{}
    \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
                                             {stardoctoppage}}
 \end{htmlonly}
 % \begin{latexonly}
 %    \setlength{\parskip}{0mm}
-%    \latexonlytoc
+%    \tableofcontents
 %    \setlength{\parskip}{\medskipamount}
 %    \markright{\stardocname}
 % \end{latexonly}

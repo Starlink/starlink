@@ -130,11 +130,6 @@ Starlink Panel at their meeting in March 1996.
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
-%  Redefine the \tableofcontents command. This procrastination is necessary 
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
-
 %------------------------------------------------------------------------------
 %  Debugging.
 %  =========
@@ -148,7 +143,7 @@ Starlink Panel at their meeting in March 1996.
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
 %end{latexonly}
 %------------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+% ? Document-specific \newcommand or \newenvironment commands.
 \newcommand{\CATPAC}{{\small CATPAC}\normalsize}
 \newcommand{\DIPSO}{{\small DIPSO}\normalsize}
 \newcommand{\FIGARO}{{\small FIGARO}\normalsize}
@@ -170,7 +165,7 @@ Starlink Panel at their meeting in March 1996.
 \newcommand{\IRAFref}{\htmladdnormallink{\IRAF}{http://iraf.noao.edu/iraf-homepage.html}}
 \newcommand{\MIDAS}{\small{IRAF}\normalsize}
 \newcommand{\MIDASref}{\htmladdnormallink{\MIDAS}{http://www.eso.org/sci/data-processing/software/esomidas/}}
-% ? End of document specific commands
+% ? End of document-specific commands
 %------------------------------------------------------------------------------
 %  Title Page.
 %  ===========
@@ -242,7 +237,6 @@ Starlink Panel at their meeting in March 1996.
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \newcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
@@ -263,7 +257,7 @@ Starlink Panel at their meeting in March 1996.
 % \newpage
 \begin{latexonly}
    \setlength{\parskip}{0mm}
-   \latexonlytoc
+   \tableofcontents
    \setlength{\parskip}{\medskipamount}
    \markright{\stardocname}
 \end{latexonly}
