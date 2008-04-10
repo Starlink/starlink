@@ -3,6 +3,7 @@
 % ? Specify used packages
 % \usepackage{graphicx}        %  Use this one for final production.
 % \usepackage[draft]{graphicx} %  Use this one for drafting.
+\usepackage{xtab}
 % ? End of specify used packages
 
 \pagestyle{myheadings}
@@ -2570,157 +2571,158 @@ FORTRAN I/O operations with FIO calls that perform actual I/O.
 
 Internal (machine independent) FIO status values:
 
-\begin{tabbing}
-XXXXXXXXXXXXXXX \= \kill
-FIO\_\_EOF   \> End of file \\
-FIO\_\_ERROR \> Error \\
-FIO\_\_FDNFP \> File descriptor does not have an associated file parameter
+\begin{tabular}{ll}
+FIO\_\_EOF   & End of file \\
+FIO\_\_ERROR & Error \\
+FIO\_\_FDNFP & File descriptor does not have an associated file parameter
 descriptor \\
-FIO\_\_ILLAC \footnotemark[1] \> Illegal access mode \\
-FIO\_\_ILLFD \> Illegal file descriptor \\
-FIO\_\_INVRL \> Invalid record length \\
-FIO\_\_IVUNT \footnotemark[1] \> Invalid unit number \\
-FIO\_\_ISACT \> File parameter is active \\
-FIO\_\_IVACM \> Invalid access mode \\
-FIO\_\_IVFMT \> Invalid format \\
-FIO\_\_NOUNT \> No more unit numbers available \\
-FIO\_\_NTOPN \> File not open \\
-FIO\_\_OSERR \> General operating system error code \\
-FIO\_\_TOOFD \> No more available file descriptors \\
-FIO\_\_TOOFP \> Too many file parameters \\
-FIO\_\_UNKPA \> Parameter is not a file parameter \\
-\end{tabbing}
+FIO\_\_ILLAC \footnotemark[1] & Illegal access mode \\
+FIO\_\_ILLFD & Illegal file descriptor \\
+FIO\_\_INVRL & Invalid record length \\
+FIO\_\_IVUNT \footnotemark[1] & Invalid unit number \\
+FIO\_\_ISACT & File parameter is active \\
+FIO\_\_IVACM & Invalid access mode \\
+FIO\_\_IVFMT & Invalid format \\
+FIO\_\_NOUNT & No more unit numbers available \\
+FIO\_\_NTOPN & File not open \\
+FIO\_\_OSERR & General operating system error code \\
+FIO\_\_TOOFD & No more available file descriptors \\
+FIO\_\_TOOFP & Too many file parameters \\
+FIO\_\_UNKPA & Parameter is not a file parameter \\
+\end{tabular}
+
 \footnotetext[1]{See note about multiple use of this error code}
+
 Error classes:
-\begin{tabbing}
-XXXXXXXXXXXXXXX \= \kill
-\underline{Class name} \> \underline{STATUS values that match the class} \\
-OPEN error \> FIO\_\_FILNF, FIO\_\_CFOLF, FIO\_\_COEXI, FIO\_\_NFEXI, \\
-           \> FIO\_\_NAMER, FIO\_\_NODEV, FIO\_\_OPNER, FIO\_\_PTAFD, \\
-           \> FIO\_\_PERMD, FIO\_\_ILLOP, FIO\_\_ALOPN, FIO\_\_TOOMF \\
-CLOSE error \> FIO\_\_CLSER, FIO\_\_ILLCL, FIO\_\_INCOC \\
-READ error  \> FIO\_\_RDER, FIO\_\_INPCN, FIO\_\_INREQ, FIO\_\_SYNAM, \\
-            \> FIO\_\_TOOMV, FIO\_\_RUNCH, FIO\_\_BLINP, FIO\_\_ILSTI, \\
-            \> FIO\_\_IINAM \\
-WRITE error \> FIO\_\_WRT, FIO\_\_REWRT, FIO\_\_OUTCN, FIO\_\_OUTOV \\
-REWIND error \> FIO\_\_REWER \\
-BACKSPACE error \> FIO\_\_BACER, FIO\_\_CNTBF \\
-\end{tabbing}
+
+\begin{tabular}{ll}
+\underline{Class name} & \underline{STATUS values that match the class} \\
+OPEN error & FIO\_\_FILNF, FIO\_\_CFOLF, FIO\_\_COEXI, FIO\_\_NFEXI, \\
+           & FIO\_\_NAMER, FIO\_\_NODEV, FIO\_\_OPNER, FIO\_\_PTAFD, \\
+           & FIO\_\_PERMD, FIO\_\_ILLOP, FIO\_\_ALOPN, FIO\_\_TOOMF \\
+CLOSE error & FIO\_\_CLSER, FIO\_\_ILLCL, FIO\_\_INCOC \\
+READ error  & FIO\_\_RDER, FIO\_\_INPCN, FIO\_\_INREQ, FIO\_\_SYNAM, \\
+            & FIO\_\_TOOMV, FIO\_\_RUNCH, FIO\_\_BLINP, FIO\_\_ILSTI, \\
+            & FIO\_\_IINAM \\
+WRITE error & FIO\_\_WRT, FIO\_\_REWRT, FIO\_\_OUTCN, FIO\_\_OUTOV \\
+REWIND error & FIO\_\_REWER \\
+BACKSPACE error & FIO\_\_BACER, FIO\_\_CNTBF \\
+\end{tabular}
+
 Note that references to error classes in programs are case insensitive.
 
 \newpage
 DEC FORTRAN (OSF/1, Ultrix and VMS) specific FIO status values:
 \footnotetext[1]{See note about multiple use of this error code}
 
-\begin{tabbing}
-XXXXXXXXXXXXXXX \= \kill
-FIO\_\_ALOPN \> File already open \\
-FIO\_\_BACER \> BACKSPACE error \\
-FIO\_\_CLSER \> File close error \\
-FIO\_\_CNTSF \> Cannot stat file (Ultrix only) \\
-FIO\_\_COEXI \> Cannot overwrite existing file (Ultrix only) \\
-FIO\_\_DLTER \> File delete error \\
-FIO\_\_DUPFL \> Duplicate file \\
-FIO\_\_ENDFL \> ENDFILE error \\
-FIO\_\_FILNF \> File not found \\
-FIO\_\_FINER \> FIND error \\
-FIO\_\_FORVR \> Format/variable-type mismatch \\
-FIO\_\_ILLAC \footnotemark[1] \> Illegal access mode \\
-FIO\_\_INCKC \> Inconsistent key change or duplicate key \\
-FIO\_\_INCOC \> Inconsistent OPEN/CLOSE parameters \\
-FIO\_\_INCRC \> Inconsistent record length \\
-FIO\_\_INCRG \> Inconsistent file organization \\
-FIO\_\_INCRT \> Inconsistent record type \\
-FIO\_\_INFOR \> Infinite format loop \\
-FIO\_\_INPCN \> Input conversion error \\
-FIO\_\_INREQ \> Input statement requires too much data \\
-FIO\_\_INSVR \> Insufficient virtual memory \\
-FIO\_\_INVMK \> Invalid key match specifier for key direction \\
-FIO\_\_INVKY \> Invalid key specification \\
-FIO\_\_INVRG \> Invalid argument to FORTRAN Run-Time Library \\
-FIO\_\_INVRV \> Invalid reference to variable \\
-FIO\_\_IVUNT \footnotemark[1] \> Invalid unit number \\
-FIO\_\_KEYVL \> Keyword value error in OPEN statement \\
-FIO\_\_LISYN \> List-directed I/O syntax error \\
-FIO\_\_MIXFL \> Mixed file access modes \\
-FIO\_\_NAMER \> File name error \\
-FIO\_\_NOCRC \> No current record \\
-FIO\_\_NODEV \> No such device \\
-FIO\_\_OPNER \> File open error \\
-FIO\_\_OPREQ \> OPEN or DEFINE FILE required \\
-FIO\_\_OUTCN \> Output conversion error \\
-FIO\_\_OUTFL \> Outside file \\
-FIO\_\_OUTOV \> Output statement overflows record \\
-FIO\_\_PTAFD \> Permission to access file denied (Ultrix only) \\
-FIO\_\_RDER  \> File read error \\
-FIO\_\_RECIO \> Recursive I/O operation \\
-FIO\_\_RECTL \> Record too long \\
-FIO\_\_REQSA \> Requires seek ability (Ultrix only) \\
-FIO\_\_REWER \> REWIND error \\
-FIO\_\_REWRT \> REWRITE error \\
-FIO\_\_SEGRC \> Segmented record format error \\
-FIO\_\_SPLOC \> Specified record locked \\
-FIO\_\_SYNAM \> Syntax error in NAMELIST input \\
-FIO\_\_SYNER \> Syntax error in format \\
-FIO\_\_TOOMV \> Too many values for NAMELIST variable \\
-FIO\_\_TOORC \> Too many records in I/O statement \\
-FIO\_\_UNLER \> UNLOCK error \\
-FIO\_\_UNTNC \> Unit not connected (Ultrix only) \\
-FIO\_\_VFVAL \> Variable format expression value error \\
-FIO\_\_WRTER \> File write error \\
-\end{tabbing}
+\latex{\begin{xtabular}{ll}}
+\html{\begin{tabular}{ll}}
+FIO\_\_ALOPN & File already open \\
+FIO\_\_BACER & BACKSPACE error \\
+FIO\_\_CLSER & File close error \\
+FIO\_\_CNTSF & Cannot stat file (Ultrix only) \\
+FIO\_\_COEXI & Cannot overwrite existing file (Ultrix only) \\
+FIO\_\_DLTER & File delete error \\
+FIO\_\_DUPFL & Duplicate file \\
+FIO\_\_ENDFL & ENDFILE error \\
+FIO\_\_FILNF & File not found \\
+FIO\_\_FINER & FIND error \\
+FIO\_\_FORVR & Format/variable-type mismatch \\
+FIO\_\_ILLAC \footnotemark[1] & Illegal access mode \\
+FIO\_\_INCKC & Inconsistent key change or duplicate key \\
+FIO\_\_INCOC & Inconsistent OPEN/CLOSE parameters \\
+FIO\_\_INCRC & Inconsistent record length \\
+FIO\_\_INCRG & Inconsistent file organization \\
+FIO\_\_INCRT & Inconsistent record type \\
+FIO\_\_INFOR & Infinite format loop \\
+FIO\_\_INPCN & Input conversion error \\
+FIO\_\_INREQ & Input statement requires too much data \\
+FIO\_\_INSVR & Insufficient virtual memory \\
+FIO\_\_INVMK & Invalid key match specifier for key direction \\
+FIO\_\_INVKY & Invalid key specification \\
+FIO\_\_INVRG & Invalid argument to FORTRAN Run-Time Library \\
+FIO\_\_INVRV & Invalid reference to variable \\
+FIO\_\_IVUNT \footnotemark[1] & Invalid unit number \\
+FIO\_\_KEYVL & Keyword value error in OPEN statement \\
+FIO\_\_LISYN & List-directed I/O syntax error \\
+FIO\_\_MIXFL & Mixed file access modes \\
+FIO\_\_NAMER & File name error \\
+FIO\_\_NOCRC & No current record \\
+FIO\_\_NODEV & No such device \\
+FIO\_\_OPNER & File open error \\
+FIO\_\_OPREQ & OPEN or DEFINE FILE required \\
+FIO\_\_OUTCN & Output conversion error \\
+FIO\_\_OUTFL & Outside file \\
+FIO\_\_OUTOV & Output statement overflows record \\
+FIO\_\_PTAFD & Permission to access file denied (Ultrix only) \\
+FIO\_\_RDER  & File read error \\
+FIO\_\_RECIO & Recursive I/O operation \\
+FIO\_\_RECTL & Record too long \\
+FIO\_\_REQSA & Requires seek ability (Ultrix only) \\
+FIO\_\_REWER & REWIND error \\
+FIO\_\_REWRT & REWRITE error \\
+FIO\_\_SEGRC & Segmented record format error \\
+FIO\_\_SPLOC & Specified record locked \\
+FIO\_\_SYNAM & Syntax error in NAMELIST input \\
+FIO\_\_SYNER & Syntax error in format \\
+FIO\_\_TOOMV & Too many values for NAMELIST variable \\
+FIO\_\_TOORC & Too many records in I/O statement \\
+FIO\_\_UNLER & UNLOCK error \\
+FIO\_\_UNTNC & Unit not connected (Ultrix only) \\
+FIO\_\_VFVAL & Variable format expression value error \\
+FIO\_\_WRTER & File write error \\
+\latex{\end{xtabular}}
+\html{\end{tabular}}
 
 Sun FORTRAN specific FIO status values:
 
-\begin{tabbing}
-XXXXXXXXXXXXXXX \= \kill
-FIO\_\_BLINP \> Blank logical input field (Sun Fortran 1.x only) \\
-FIO\_\_CFOLF \> Cannot find `OLD' file \\
-FIO\_\_CNTBF \> Cannot backspace file \\
-FIO\_\_CNTSF \> Can't stat file \\
-FIO\_\_DIONA \> Direct I/O not allowed \\
-FIO\_\_ERFMT \> Error in format \\
-FIO\_\_FILEO \> Error in FILEOPT parameter \\
-FIO\_\_FIONA \> Formatted I/O not allowed \\
-FIO\_\_IINAM \> Illegal input for namelist \\
-FIO\_\_ILARG \> Illegal argument \\
-FIO\_\_ILINP \> Illegal logical input field (Sun Fortran 2.x only) \\
-FIO\_\_ILLUN \> Illegal unit number \\
-FIO\_\_ILOPU \> Illegal operation for unit \\
-FIO\_\_ILSTI \> Incomprehensible list input \\
-FIO\_\_INSPE \> Incompatible specifiers in open (Sun Fortran 2.x only) \\
-FIO\_\_NAARC \> No $*$ after repeat count \\
-FIO\_\_NEGRC \> Negative repeat count \\
-FIO\_\_NFEXI \> `NEW' file exists \\
-FIO\_\_OFBOR \> Off beginning of record \\
-FIO\_\_OFEOR \> Off end of record \\
-FIO\_\_OOFSP \> Out of free space \\
-FIO\_\_REQSA \> Requires seek ability \\
-FIO\_\_RUNCH \> Read unexpected character \\
-FIO\_\_SIONA \> Sequential I/O not allowed \\
-FIO\_\_TOOMF \> Too many file opens -- no free descriptors (Sun Fortran 1.x
+\begin{tabular}{ll}
+FIO\_\_BLINP & Blank logical input field (Sun Fortran 1.x only) \\
+FIO\_\_CFOLF & Cannot find `OLD' file \\
+FIO\_\_CNTBF & Cannot backspace file \\
+FIO\_\_CNTSF & Can't stat file \\
+FIO\_\_DIONA & Direct I/O not allowed \\
+FIO\_\_ERFMT & Error in format \\
+FIO\_\_FILEO & Error in FILEOPT parameter \\
+FIO\_\_FIONA & Formatted I/O not allowed \\
+FIO\_\_IINAM & Illegal input for namelist \\
+FIO\_\_ILARG & Illegal argument \\
+FIO\_\_ILINP & Illegal logical input field (Sun Fortran 2.x only) \\
+FIO\_\_ILLUN & Illegal unit number \\
+FIO\_\_ILOPU & Illegal operation for unit \\
+FIO\_\_ILSTI & Incomprehensible list input \\
+FIO\_\_INSPE & Incompatible specifiers in open (Sun Fortran 2.x only) \\
+FIO\_\_NAARC & No $*$ after repeat count \\
+FIO\_\_NEGRC & Negative repeat count \\
+FIO\_\_NFEXI & `NEW' file exists \\
+FIO\_\_OFBOR & Off beginning of record \\
+FIO\_\_OFEOR & Off end of record \\
+FIO\_\_OOFSP & Out of free space \\
+FIO\_\_REQSA & Requires seek ability \\
+FIO\_\_RUNCH & Read unexpected character \\
+FIO\_\_SIONA & Sequential I/O not allowed \\
+FIO\_\_TOOMF & Too many file opens -- no free descriptors (Sun Fortran 1.x
 only) \\
-FIO\_\_TRUNF \> Truncation failed (Sun Fortran 1.x only) \\
-FIO\_\_UIONA \> Unformatted I/O not allowed \\
-FIO\_\_UNKNO \> Unknown system error \\
-FIO\_\_UNTNC \> Unit not connected \\
-FIO\_\_UNTNO \> Attempted operation on unit that is not open (Sun Fortran 1.x
+FIO\_\_TRUNF & Truncation failed (Sun Fortran 1.x only) \\
+FIO\_\_UIONA & Unformatted I/O not allowed \\
+FIO\_\_UNKNO & Unknown system error \\
+FIO\_\_UNTNC & Unit not connected \\
+FIO\_\_UNTNO & Attempted operation on unit that is not open (Sun Fortran 1.x
 only) \\
-\end{tabbing}
+\end{tabular}
 
 The following FIO error status codes may be returned on machines running SunOS
 or Solaris. They correspond to operating system error rather than Fortran
 errors. This is not an exhaustive list of all possible errors. Rather they are
 those errors that it seemed to the author of the package to be worth detecting.
 
-\begin{tabbing}
-XXXXXXXXXXXXXXX \= \kill
-FIO\_\_PERMD \> Permission denied \\
-FIO\_\_FTOOL \> File to large \\
-FIO\_\_NSLOD \> No space left of device \\
-FIO\_\_FNTL  \> File name too long \\
-FIO\_\_DQEXC \> Disk quota exceeded \\
-\end{tabbing}
+\begin{tabular}{ll}
+FIO\_\_PERMD & Permission denied \\
+FIO\_\_FTOOL & File to large \\
+FIO\_\_NSLOD & No space left of device \\
+FIO\_\_FNTL  & File name too long \\
+FIO\_\_DQEXC & Disk quota exceeded \\
+\end{tabular}
 
 Redundant FIO status values:
 
@@ -2729,18 +2731,17 @@ retained so that old code that may refer to them will still compile. However,
 any code that tests for them as a returned status value will never find these
 values.
 
-\begin{tabbing}
-XXXXXXXXXXXXXXX \= \kill
-FIO\_\_CRTER \> File create error \\
-FIO\_\_EREXH \> Error establishing exit handler \\
-FIO\_\_ILLCL \> Illegal close request \\
-FIO\_\_ILLOP \> Illegal open request \\
-FIO\_\_NOTFD \> File not found (superseded by FIO\_\_FILNF) \\
-FIO\_\_NTSUP \> Option not supported yet \\
-FIO\_\_OLORG \> Illegal origin \\
-FIO\_\_REDON \> File is readonly \\
-FIO\_\_TOMNY \> Too many open files \\
-\end{tabbing}
+\begin{tabular}{ll}
+FIO\_\_CRTER & File create error \\
+FIO\_\_EREXH & Error establishing exit handler \\
+FIO\_\_ILLCL & Illegal close request \\
+FIO\_\_ILLOP & Illegal open request \\
+FIO\_\_NOTFD & File not found (superseded by FIO\_\_FILNF) \\
+FIO\_\_NTSUP & Option not supported yet \\
+FIO\_\_OLORG & Illegal origin \\
+FIO\_\_REDON & File is readonly \\
+FIO\_\_TOMNY & Too many open files \\
+\end{tabular}
 
 \section{Implementation details}
 
