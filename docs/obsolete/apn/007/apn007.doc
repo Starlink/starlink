@@ -1,0 +1,627 @@
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                       APN/7.1
+ROYAL OBSERVATORY EDINBURGH
+and UNIVERSITY OF EDINBURGH
+
+ADAM Project                                                 Issued by
+ADAM Programmers' Note 7.1
+
+                                                             B D Kelly
+                                                       5 November 1986
+
+----------------------------------------------------------------------
+
+                      The DAT Parameter Routines
+                      --------------------------
+
+
+
+
+
+1  INTRODUCTION
+
+This document lists the routines with facility name DAT which  perform
+parameter system functions.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 1 -
+APN/7.1                                                         Page 2
+
+
++-----------------------------------------------------------------------------+
+|  DAT_ASSOC  |  return a locator associated with a parameter                 |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  Given the name of a program parameter, an HDS locator is returned          |
+|  corresponding to the associated data structure.                            |
+|  This is a simulation of the SSE routine, implemented for ADAM.             |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL DAT_ASSOC ( PARAM, ACCESS; LOC, STATUS )                              |
+|                                                                             |
+|                                                                             |
+|  PARAM=CHARACTER*(*) (given)                                                |
+|        Name of program parameter                                            |
+|                                                                             |
+|  ACCESS=CHARACTER*(*) (given)                                               |
+|        Access mode, 'READ', 'WRITE' or 'UPDATE'                             |
+|                                                                             |
+|  LOC=CHARACTER*DAT__SZLOC (returned)                                        |
+|        Locator to data structure                                            |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        Status return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|  B.D.Kelly (REVAD::BDK)                                                     |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 2 -
+APN/7.1                                                         Page 3
+
+
++-----------------------------------------------------------------------------+
+|  DAT_CANCL  |  cancel association between a parameter and a data object     |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  An existing association between the named parameter and a data             |
+|  system object is cancelled, and the container file for it closed.          |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL DAT_CANCL ( PARAM; STATUS )                                           |
+|                                                                             |
+|                                                                             |
+|  PARAM=CHARACTER*(*) (given)                                                |
+|        Name of program parameter                                            |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        <no parameter description>                                           |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|  B.D.Kelly (REVAD::BDK)                                                     |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 3 -
+APN/7.1                                                         Page 4
+
+
++-----------------------------------------------------------------------------+
+|  DAT_CREAT  |  create a data structure component                            |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  Given the name of a program parameter, an HDS data structure               |
+|  component is created, as specified by the associated character             |
+|  string and the given type and dimensionality.                              |
+|  This is a simulation of the SSE routine, implemented for ADAM.             |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL DAT_CREAT ( PARAM, TYPE, NDIMS, DIMS; STATUS )                        |
+|  PARAM=CHARACTER*(*) (given)                                                |
+|        Name of program parameter                                            |
+|  TYPE=CHARACTER*(*) (given)                                                 |
+|        Type of HDS component. This may be a primitive type or a             |
+|        structure                                                            |
+|  NDIMS=INTEGER (given)                                                      |
+|        Number of dimensions of the component                                |
+|  DIMS(*)=INTEGER (given)                                                    |
+|        Dimensions of the component                                          |
+|  STATUS=INTEGER                                                             |
+|        Status return                                                        |
+|                                                                             |
+|                                                                             |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|  B.D.Kelly (REVAD::BDK)                                                     |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 4 -
+APN/7.1                                                         Page 5
+
+
++-----------------------------------------------------------------------------+
+|  DAT_DEF  |  suggest values for parameter                                   |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  Associate a data-system object with the dynamic default for a              |
+|  parameter.                                                                 |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL DAT_DEF ( PNAME, LOC; STATUS)                                         |
+|                                                                             |
+|                                                                             |
+|  PNAME=CHARACTER*(*)                                                        |
+|        Expression specifying the name of a Parameter.                       |
+|                                                                             |
+|  LOC=CHARACTER*(DAT__SZLOC)                                                 |
+|        Variable containing the locator which is to associated with          |
+|        the parameter.                                                       |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        <no parameter description>                                           |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|  B.D.Kelly (REVAD::BDK)                                                     |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 5 -
+APN/7.1                                                         Page 6
+
+
++-----------------------------------------------------------------------------+
+|  DAT_DELET  |  delete an object associated with a parameter name.           |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  Get an object name and delete a data_system object.                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL DAT_DELET ( PARAM, STATUS )                                           |
+|                                                                             |
+|                                                                             |
+|  PARAM=CHARACTER*(*) (given)                                                |
+|        Name of the Parameter whose associated object is                     |
+|        to be deleted.                                                       |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        <no parameter description>                                           |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|  B.D.Kelly (REVAD::BDK)                                                     |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 6 -
+APN/7.1                                                         Page 7
+
+
++-----------------------------------------------------------------------------+
+|  DAT_ERDSC  |  Report error concerning data object                          |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  This routine reports an error of the form:                                 |
+|                                                                             |
+|     "$^LOC : ^STATUS"                                                       |
+|                                                                             |
+|  where "$^LOC" represents the name of the data object with locator,         |
+|  LOC, and "^STATUS" represents the text associated with the error           |
+|  number contained in STATUS.                                                |
+|                                                                             |
+|  Note that this routine only "reports" the error, and that in order         |
+|  to force the message to be output or ignored, an appropriate call          |
+|  ERR_FLUSH or ERR_ANNUL (respectively) would be required.                   |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL DAT_ERDSC(LOC, STATUS)                                                |
+|                                                                             |
+|                                                                             |
+|  LOC=CHARACTER*(DAT__SZLOC)                                                 |
+|        Locator associated with the data object to be represented            |
+|        in the reported error message.                                       |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        Variable holding the status value.   The text associated             |
+|        with this value will be encorporated into the Message.               |
+|        This variable is always left unchanged.                              |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|  Sid Wright (UCL::SLW)                                                      |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 7 -
+APN/7.1                                                         Page 8
+
+
++-----------------------------------------------------------------------------+
+|  DAT_ERDSN  |  Report error concerning data object and component name       |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  This routine reports an error of the form:                                 |
+|                                                                             |
+|     "$^LOC.^NAME : ^STATUS"                                                 |
+|                                                                             |
+|  where "$^LOC" represents the name of the data object with locator,         |
+|  LOC, ^NAME represents the name of a structure component,                   |
+|  and "^STATUS" represents the text associated with the error                |
+|  number contained in STATUS.                                                |
+|                                                                             |
+|  Note that this routine only "reports" the error, and that in order         |
+|  to force the message to be output or ignored, an appropriate call          |
+|  ERR_FLUSH or ERR_ANNUL (respectively) would be required.                   |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL DAT_ERDSN(LOC, NAME, STATUS)                                          |
+|                                                                             |
+|                                                                             |
+|  LOC=CHARACTER*(DAT__SZLOC)                                                 |
+|        Locator associated with the data object to be represented            |
+|        in the reported error message.                                       |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        Variable holding the status value.   The text associated             |
+|        with this value will be encorpated into the Message.                 |
+|        This variable is always left unchanged.                              |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|  Jack Giddings (UCL::JRG)                                                   |
+|  Sid Wright  (UCL::SLW)                                                     |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 8 -
+APN/7.1                                                         Page 9
+
+
++-----------------------------------------------------------------------------+
+|  DAT_ERTXT  |  report DAT error message to STARLINK environment             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  This routine reports an error of the form:                                 |
+|                                                                             |
+|     "^TEXT : ^STATUS"                                                       |
+|                                                                             |
+|  where "^TEXT" represents an arbitrary character string                     |
+|  and "^STATUS" represents the text associated with the error                |
+|  number contained in STATUS.                                                |
+|                                                                             |
+|  Note that this routine only "reports" the error, and that in order         |
+|  to force the message to be output or ignored, an appropriate call          |
+|  ERR_FLUSH or ERR_ANNUL (respectively) would be required.                   |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL DAT_ERTXT(TEXT, STATUS)                                               |
+|                                                                             |
+|                                                                             |
+|  TEXT=CHARACTER*(*)                                                         |
+|        Variable containing the character string to be output                |
+|        in the reported error message.                                       |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        Variable holding the status value.   The text associated             |
+|        with this value will be encorporated into the Message.               |
+|        This variable is always left unchanged.                              |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|  Sid Wright (UCL::SLW)                                                      |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 9 -
+APN/7.1                                                        Page 10
+
+
++-----------------------------------------------------------------------------+
+|  DAT_EXIST  |  return a locator associated with a parameter                 |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  Given the name of a program parameter, an HDS locator is returned          |
+|  corresponding to the associated data structure. Under error                |
+|  conditions the relevant status is returned.                                |
+|  This operation is identical with DAT_ASSOC except under error              |
+|  conditions. When there is an error DAT_EXIST returns the status            |
+|  value, whereas DAT_ASSOC repeatedly attempts to get a valid                |
+|  locator.                                                                   |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL DAT_EXIST ( NAMECODE, ACCESS; LOC, STATUS )                           |
+|                                                                             |
+|                                                                             |
+|  PARAM=CHARACTER*(*) (given)                                                |
+|        program parameter name                                               |
+|                                                                             |
+|  ACCESS=CHARACTER*(*) (given)                                               |
+|        Access mode, 'READ', 'WRITE' or 'UPDATE'                             |
+|                                                                             |
+|  LOC=CHARACTER*DAT__SZLOC (returned)                                        |
+|        Locator to data structure                                            |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        Status return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|  B.D.Kelly (REVAD::BDK)                                                     |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 10 -
+APN/7.1                                                        Page 11
+
+
++-----------------------------------------------------------------------------+
+|  DAT_UPDAT  |  Force HDS update                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  Force the HDS file associated with the named parameter to be               |
+|  updated, so that its memory cache coincides with the data on disk.         |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL DAT_UPDAT ( PARAM, STATUS )                                           |
+|                                                                             |
+|                                                                             |
+|  PARAM=CHARACTER*(*) (given)                                                |
+|        name of parameter associated with an HDS structure                   |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        <no parameter description>                                           |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|  B.D.Kelly (REVAD::BDK)                                                     |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 11 -

@@ -1,0 +1,2941 @@
+                                                                 
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      AON/1.4
+ROYAL OBSERVATORY EDINBURGH 
+and UNIVERSITY OF EDINBURGH 
+
+ADAM Project                                                Issued by
+ADAM Observer Note 1.4 
+
+                                        Dennis Kelly & William Lupton
+                                                           13.08.1987
+
+---------------------------------------------------------------------
+
+                      The ADAM command language                       _________________________ 
+
+
+
+
+
+
+
+1. SUMMARY 
+
+
+This document describes the VAX ADAM command language from the  point
+of  view  of  observers  and  those wishing to write command language
+procedures.  The  main  part  of  this  document  is  a  'dictionary'
+containing  the same information as the on-line help available within
+ADAMCL. It is prefixed by some introductory material. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 AON/1.4                           2                           AON/1.4
+
+
+
+
+
+
+2. CONTENTS 
+
+
+          3. INTRODUCTION 
+          4. STARTING-UP ADAMCL 
+          5. COMMAND SUMMARY 
+          6. COMMAND LANGUAGE VARIABLES 
+               6.1 VARIABLE NAMES 
+               6.2 SCOPE OF VARIABLES 
+               6.3 VARIABLE TYPES 
+               6.4 ARRAYS 
+               6.5 USING VARIABLES 
+               6.6 STRING OPERATIONS 
+               6.7 NUMERIC OPERATIONS 
+               6.8 LOGICAL OPERATIONS 
+          7. COMMAND LANGUAGE EXPRESSIONS 
+          8. WRITING PROCEDURES 
+               8.1 PARAMETER PASSING 
+               8.2 CONTROL STRUCTURES 
+               8.3 ADAMCL COMMENTS 
+          9. LOADING AND CONTROLLING TASKS 
+         10. USING DCL COMMANDS 
+         11. DATA ANALYSIS AND MONOLITHS 
+         12. INCONSISTENCIES IN SYNTAX 
+         13. DICTIONARY OF TOPICS AND COMMANDS 
+
+
+
+3. INTRODUCTION 
+
+
+The ADAM command language as implemented under VAX/VMS can be  viewed
+in  two  ways.  Firstly, it provides a command-driven user interface.
+This simply means that it puts a prompt on the terminal  and  accepts
+anything  typed-in  as a command which it attempts to obey. Secondly,
+it provides a programming language geared  to  the  needs  of  coding
+simple  observing  sequences  as procedures which can be called. This
+second function of the command language is  callable  by  other  user
+interfaces (eg SMS). 
+
+ADAMCL has a number of built-in commands which it always  recognises.
+These  can  be  supplemented  by commands which the user specifies as
+ADAMCL procedures, or as meaning "send a command to  an  ADAM  task".
+ADAMCL  can  also be instructed to take specific action when it fails
+to recognise a command. 
+
+It is also possible to declare ADAMCL  variables  and  to  manipulate
+their values or pass their values as program parameters to tasks. 
+
+
+
+
+
+                                                                 AON/1.4                           3                           AON/1.4
+
+
+
+ADAMCL commands can be read from a file,  using  the  BATCH  command.
+This is the recommended method for defining procedures. 
+
+
+
+4. STARTING-UP ADAMCL 
+
+
+To start-up the standard version of ADAMCL it is necessary  to  issue
+the commands 
+
+$ ADAMSTART 
+$ ADAMCL 
+
+ADAMSTART sets-up the various VAX logical names and symbols needed to
+run ADAM tasks. ADAMCL causes the user interface to start running. 
+
+On startup, ADAMCL automatically attempts to take its input from  two
+'batch'   files.   The   first   is   the   system-wide   batch  file
+ADAMDIR:GOD.PRC. The second is whatever the user may have attached to
+the  logical  name USER_GOD. Typically, these batch files are used to
+configure  the  command-language  by  defining  various  commands  or
+procedures needed by the user. 
+
+Having completed this, the user is prompted for commands  and  ADAMCL
+waits for input. 
+
+ADAMCL can also be  run  in  VMS  BATCH.  See  the  dictionary  entry
+VAXBATCH. 
+
+
+
+5. COMMAND SUMMARY 
+
+
+The commands built into ADAMCL are as follows. 
+
+$ command - send a DCL command to the permanent subprocess 
+? - give help information or switch help files 
+?? - give full help on the named item 
+ABORT - user-definable PROC called on ctrl-C 
+ADDQUOTES - add single quotes to a string in variable 
+ASKCHAR - prompt for a string and store in a variable 
+ASKCHOICE - present user with a set of alternatives 
+ASKDEC - prompt for a declination and store in a variable 
+ASKLOG - prompt for a logical and store in a variable 
+ASKNAME - prompt for an HDS name and store in a variable 
+ASKNUM - prompt for a number and store in a variable 
+ASKRA - prompt for an RA and store in a variable 
+BATCH - take input commands from a file 
+BELL - ring bell N times with M seconds interval 
+CHECKTASK - check whether a process/task exists in the system 
+COMPARE - compare character strings 
+
+
+
+                                                                 AON/1.4                           4                           AON/1.4
+
+
+
+CONCAT - concatenate character strings 
+CONTASK - switches a task from cached to non-cached or vice-versa 
+CREATESUB - create the permanent subprocess 
+DCL - declare an ADAMCL variable 
+DECLARE - declare an ADAMCL variable 
+DEFINE - Define a command to run an A-task 
+DO - start of a DO loop 
+DUMP - diagnostic - dump dictionary to a text file 
+DUMPTASK - ask a task to produce a stack dump 
+ELSE - start of ELSE in IF-ELSE-ENDIF 
+END - end procedure or DO or IF 
+ENDOBEY - wait for a task to complete an action 
+ERASE - clears the screen of a VT terminal 
+EXIT - leave ADAMCL 
+FULLHELP - give full help on the named item 
+GET - get a parameter from a task and store in a variable 
+HELP - give help information or switch help files 
+IF - start of an IF block 
+INIT_TIMER - initiate VMS timer 
+KILLALL - kill ALL tasks known to ADAMCL 
+KILL - kill a task 
+KILLW - kill a task and wait for it to vanish 
+LET - assign a value to a variable 
+LOAD - create a subprocess and load the named task into it 
+LOADD - load-with-wait a task into a detached process 
+LOADDICT - load the ADAMCL dictionary from a file 
+LOADW - load a task and wait for load completion 
+MONOLITH - change prompt and select a monolith 
+NOREP - switch reporting off and close log file 
+OBEYW - obey an action and wait for completion 
+ON ERROR - control ADAMCL action if an error occurs 
+PRINT - type the value of a character string or numeric expression 
+PR - type the value of a character string or numeric expression 
+PROC - start defining/compiling a procedure 
+PROCEDURE - start defining/compiling a procedure 
+QUIT - leave ADAMCL 
+REMQUOTES - remove single quotes from string in variable 
+REPFILE - list a log file to the screen 
+REPORT - switch reporting on 
+RETURN - unstack procedures and return to interactive 
+SAVEDICT - save the ADAMCL dictionary to a file 
+SEND - send a GET/SET/OBEY/CANCEL to a task 
+SETDEC - set a declination into DEC_INPUT 
+SETLOGICAL - DEFINE/JOB a DCL logical name 
+SETPROMPT - set the ADAMCL prompt to a given string 
+SETRA - set a right-ascension into RA_INPUT 
+SHOWDICT - list the commands in the dictionary 
+SHOWTASK - list the known cached/non-cached tasks 
+SHOW_TIMER - show VMS timer 
+SHOWVARS - show currently declared ADAMCL variables 
+SPAWN - spawn a DCL command or command processor 
+STARTOBEY - start an action in a task 
+STOP - leave ADAMCL 
+
+
+
+                                                                 AON/1.4                           5                           AON/1.4
+
+
+
+TASKPRE - switch taskname display on/off 
+TESTER - test routine 
+TOCHAR - convert a number and store in a character variable 
+WAIT - wait for n seconds 
+WAITCR - wait until <CR> is typed 
+
+
+
+6. COMMAND LANGUAGE VARIABLES 
+
+
+Variables can be declared in ADAMCL. A variable  has  a  name,  type,
+scope and dimensions. A variable is declared by using the command 
+
+DECLARE name [global or local] [char n] [array n] 
+
+Variables can be assigned values and can  be  used  in  funcions  and
+expressions  and  have  their values interpreted and passed to tasks.
+See the dictionary entries for VARIABLES, FUNCTIONS and EXPRESSIONS. 
+
+
+
+7. WRITING PROCEDURES 
+
+
+It is possible to write procedures in ADAMCL. When the  code  of  the
+procedure  is given to ADAMCL, the name of the procedure is stored in
+the command dictionary. Thereafter, whenever that name is typed as  a
+command, the procedure is executed. 
+
+See the dictionary entires  for  PROCEDURES  and  for  the  PROCEDURE
+command. 
+
+
+
+8. LOADING AND CONTROLLING TASKS 
+
+
+ADAM tasks can be  loaded  into  subprocesses  by  using  the  ADAMCL
+commands  LOAD  or LOADW, or into detached processes by LOADD. Once a
+task is loaded, it remains loaded until removed by the ADAMCL command
+KILL. Such a task is termed 'non-cached'. ADAMCL can also arrange for
+tasks to be loaded  and  killed  automatically.  This  occurs  if  an
+attempt  is  made  to  communicate  with  a task which is not already
+loaded.  A  task  which  has  been  loaded  automatically  is  termed
+'cached'. ADAMCL kills cached tasks when necessary. 
+
+When a task has been loaded, if it is a D-task  (ie  responsible  for
+the   low-level   driving   of  some  instrument)  it  performs  some
+initialization  of  its  associated  hardware  and  then  waits   for
+instructions. An A-task (ie data analysis task) behaves the same, but
+has no initialization to carry out. 
+
+
+
+
+                                                                 AON/1.4                           6                           AON/1.4
+
+
+
+The instructions to tasks have to be sent through the ADAM  intertask
+communication system, also known as the Message System. The tasks can
+reply  through  the  message  system,  either  simply   acknowledging
+messages or returning information. 
+
+ADAMCL can send instructions to a number of tasks without waiting for
+one  to  complete  its operation prior to sending instructions to the
+next one. This means that the running of tasks can be  overlapped  in
+real-time. 
+
+Tasks typically have 'program parameters' which are values  the  task
+needs in order to run. By convention, D-tasks always insist on having
+values for  their  parameters  before  they  start  carrying  out  an
+operation.  Other  ADAM tasks, however, are allowed to prompt for the
+values of their parameters. They do this  by  sending  a  message  to
+ADAMCL  containing  the  prompting  information.  ADAMCL displays the
+prompt, and returns the typed-in value to the task. The prompt string
+contains  a  default  value  if  there  is one. Possible replies to a
+prompt are 
+
+a value - this can be one or more numbers or quoted strings separated
+by commas or spaces, or a single HDS structure name. 
+
+a <CR> - this causes the default to be taken as the value.  If  there
+is no default, the prompt is repeated. 
+
+a ! - this returns a 'null value' to the task. 
+
+a !! - this returns an 'abort' to the task. 
+
+a ? - this causes the one-line help from the IFL to be displayed. 
+
+
+
+9. USING DCL COMMANDS 
+
+
+VAX DCL commands can be issued from ADAMCL  in  two  ways,  by  using
+SPAWN or by prefixing the command with $. 
+
+
+9.1 SPAWN     _____ 
+
+The SPAWN command spawns a subprocess temporarily. 
+
+SPAWN 
+
+spawns a subprocess and attaches the terminal to it. DCL commands can
+then  be  typed-in.  LOGOUT  causes  the subprocess to be deleted and
+control returns to ADAMCL. 
+
+SPAWN command 
+
+
+
+
+                                                                 AON/1.4                           7                           AON/1.4
+
+
+
+causes a subprocess to  be  spawned  and  the  given  command  to  be
+executed.  When DCL finishes executing the command, the subprocess is
+deleted and control returns to ADAMCL. 
+
+
+9.2 $command     ________ 
+
+Any command with a $ as its first character  is  passed  to  the  DCL
+subprocess.  The  subprocess  is created automatically on the first $
+command and remains in existence until ADAMCL exits. This provides  a
+fast  access  to  DCL commands from ADAMCL as the subprocess does not
+have to be created for each individual command. However, this is done
+at the cost of having the subprocess 'permanently' there. 
+
+
+
+10. DATA ANALYSIS AND MONOLITHS 
+
+
+A monolith is an ADAM task containing a set of "A-tasks" linked  into
+a single .EXE. 
+
+The intention is that this facility will be used primarily  when  the
+monolith  is  a  data reduction package, which has been built to give
+access to a  number  of  A-tasks  without  the  overheads  of  either
+continually  killing  and  loading them, or having them loaded into a
+large number of subprocesses. 
+
+The names of the various commands known to a monolith can be "taught"
+to  ADAMCL  using the DEFINE command. For example, suppose there is a
+monolith called RAPID.EXE which includes A-tasks called ADD and PLOT.
+
+Adamcl:> DEFINE ADD RAPID 
+Adamcl:> DEFINE PLOT RAPID 
+Adamcl:> ADD 
+{ADAMCL automatically loads RAPID as cached } 
+{and sends the command to it} 
+Adamcl:> PLOT 
+{ADAMCL sends the command to RAPID} 
+
+This mechanism  is  intended  for  "standard"  monoliths,  where  the
+DEFINEs will have been done by some startup operation. 
+
+For software development  an  alternative  approach  is  useful.  The
+ADAMCL  command  MONOLITH  causes the named task to be designated the
+current monolith  and  changes  the  prompt  to  the  monolith  name.
+Thereafter,  any  command  not  recognised  by  ADAMCL is sent to the
+monolith. 
+
+However, a D-task is, in fact, a simplified type of monolith, and  so
+the  monolith facility can be useful if an individual D-task is being
+tested. The commands typed correspond to the D-task actions. 
+
+
+
+
+                                                                 AON/1.4                           8                           AON/1.4
+
+
+
+The commands are passed to a monolith in the style of OBEYW, that is,
+ADAMCL waits for the monolith to complete the command. 
+
+For example, 
+
+Adamcl:> LOADW RAPID 
+Adamcl:> MONOLITH RAPID 
+RAPID:> ADD 
+RAPID:> PLOT 
+RAPID:> MONOLITH 
+Adamcl:> 
+
+The command MONOLITH without  a  name  specified  reverts  ADAMCL  to
+non-monolith  operation.  The  prompt  for  the monolith is forced to
+uppercase unless the monolith name was surrounded by double quotes in
+the MONOLITH command. 
+
+
+
+11. INCONSISTENCIES IN SYNTAX 
+
+
+There are some inconsistencies in the syntax of some ADAMCL commands.
+These  are  pointed out here, and the reasons for the inconsistencies
+are enumerated. Given the inconvenience in remembering  'exceptions',
+it  may  eventually  be  decided  that these cures are worse than the
+diseases. 
+
+
+11.1 Expressions in PRINT and elsewhere      __________________________________ 
+
+Numeric expressions, such as  2+2,  can  generally  include  embedded
+spaces. 
+
+For example 
+
+Adamcl:> J = 3 + 5 
+and 
+Adamcl:> J=3+5 
+
+are the same. 
+
+However, in PRINT, spaces are delimiting, so 
+
+Adamcl:> PRINT 3+5 
+causes 8 to be printed, whereas 
+Adamcl:> PRINT 3 + 5 
+causes 3 and 5 to be printed. 
+
+This is to allow multiple values to be output with a single statement
+such as 
+
+
+
+
+
+                                                                 AON/1.4                           9                           AON/1.4
+
+
+
+Adamcl:> PRINT 3+5 7+9 8+11 
+
+which will output 8, 16 and 19. 
+
+
+
+12. COMMAND DESCRIPTIONS 
+
+
+[square brackets means the parameter is optional] 
+
+
+
+
+
+
+
+
+ABORT - user-definable PROC called on ctrl-C 
+
+This does nothing. It is automatically called when ctrl-C is typed. 
+The intention is that the observer should define a procedure called 
+ABORT which responds to ctrl_C. 
+
+                                -***- 
+
+
+ADDQUOTES - add single quotes to a string in variable 
+
+ADDQUOTES variable_name 
+Takes a character string input ADAMCL variable and adds single quotes 
+to it. It returns the string with quotes in the same ADAMCL variable. 
+
+                                -***- 
+
+
+ASKCHAR - prompt for a string and store in a variable 
+
+ASKCHAR variable_name [prompt_string /default/] 
+Prompt the user for input using the given prompt string. If 
+prompt_string is not specified, use variable_name as the prompt. If 
+the user enters CR then take the default if one has been declared in 
+the prompt string (i.e. between / symbols). If the user's reply is 
+not inside single quotes, add them. Store the result in the ADAMCL 
+variable variable_name. Note that variable_name must have been 
+previously declared. 
+
+                                -***- 
+
+
+ASKCHOICE - present user with a set of alternatives 
+
+
+
+
+
+                                                                 AON/1.4                           10                          AON/1.4
+
+
+
+ASKCHOICE variable_name prompt_string 
+
+Present the user with a list of alternatives and return the index 
+number of the one chosen. 
+
+variable_name is the name of an ADAMCL numeric variable. 
+
+prompt_string is the string presented to the user. It must contain a 
+list of values surrounded by parentheses. It may also contain 
+informative text and a default value. If prompt_string does not 
+contain any informative text, variable_name is put into the prompt 
+string. 
+
+If the user's reply is not in the valid list then repeat the prompt. 
+If it is in the valid list then store the position of the input entry 
+in the list in the output ADAMCL variable variable_name. Note that 
+variable_name must have been previously declared. 
+
+
+   EXAMPLE 
+
+   ADAMCL Input line may be : 
+
+   Adamcl:> ASKCHOICE my_value "Input ONE of (DENNIS,JOHN,COLIN) /COL 
+
+   If for example the user enters JOHN then the value of the ADAMCL 
+   real variable my_value is set to 2. Likewise my_value would be set 
+   to 1 for DENNIS and 3 for COLIN. If the user enters CR then the 
+   default (between /s) is selected i.e. COLIN, and my_value will be 
+   equal to three. 
+
+                                -***- 
+
+
+ASKDEC - prompt for a declination and store in a variable 
+
+ASKDEC variable_name [prompt_string /default/] 
+Prompt the user for input using the given prompt string. If 
+prompt_string is not specified, use variable_name as the prompt. If 
+the user enters CR then take the default if one has been declared in 
+the prompt string (i.e. between / symbols). Interpret the response as 
+DD MM SS.S, convert it to a real number and store it in the ADAMCL 
+variable variable_name. If the variable hasn't been declared already, 
+it will be created. 
+
+                                -***- 
+
+
+ASKLOG - prompt for a logical and store in a variable 
+
+ASKLOG variable_name [prompt_string /default/] 
+Prompt the user for logical input using the given prompt string. If 
+prompt_string is not specified, use variable_name as the prompt. If 
+
+
+
+                                                                 AON/1.4                           11                          AON/1.4
+
+
+
+the user enters CR then take the default if one has been declared in 
+the prompt string (i.e. between / symbols). Interpret the response 
+from a logical input list containing Y/N, YES/NO, T/F, TRUE/FALSE, 
+0/1, .TRUE./.FALSE. and stores either 0 (FALSE) or 1 (TRUE) in the 
+real output variable. If the variable hasn't been declared already, 
+it will be created. If the user enters anything other than the 
+logical type input then he is re-prompted. 
+
+
+   USER_INPUT 
+
+   Valid inputs when prompted from ASKLOG are : 
+   Y/N, YES/NO, TRUE/FALSE, .TRUE./.FALSE. 0/1 
+
+
+   OUTPUT_VALUE 
+
+   The output variable in the ASKLOG command is a real ADAMCL 
+   variable which will contain either a 1 or a 0 depending on whether 
+   the logical input was TRUE or FALSE. 
+
+
+   EXAMPLE 
+
+   The ADAMCL command line may be : 
+
+   Adamcl :> ASKLOG my_value "Do you play cricket /Y/" 
+
+   If the user enters CR then the ADAMCL real variable my_value will 
+   contain the default (i.e. Y) 1. 
+
+   If the user enters Y, YES, T, TRUE, .TRUE. or 1 then the ADAMCL 
+   real variable my_value will contain 1 on exit. 
+
+   If the user enters N, NO, F, FALSE, .FALSE. or 0 then the ADAMCL 
+   real variable my_value will contain 0 on exit. 
+
+                                -***- 
+
+
+ASKNAME - prompt for an HDS name and store in a variable 
+
+ASKNAME variable_name [prompt_string /default/] 
+As ASKCHAR, but doesn't add surrounding quotes. 
+
+                                -***- 
+
+
+ASKNUM - prompt for a number and store in a variable 
+
+ASKNUM variable_name [prompt_string /default/] 
+Prompt the user for input using the given prompt string. If 
+prompt_string is not specified, use variable_name as the prompt. If 
+
+
+
+                                                                 AON/1.4                           12                          AON/1.4
+
+
+
+the user enters CR then take the default value if one has been 
+declared in the prompt string (i.e. between / symbols). Interpret the 
+response as a number and store it in the ADAMCL variable 
+variable_name. If the variable hasn't been declared already, it will 
+be created. 
+
+                                -***- 
+
+
+ASKRA - prompt for an RA and store in a variable 
+
+ASKRA variable_name [prompt_string /default/] 
+Prompt the user for input using the given prompt string. If 
+prompt_string is not specified, use variable_name as the prompt. If 
+the user enters CR then take the default value if one has been 
+declared in the prompt string (i.e. between / symbols). Interpret the 
+response as HH MM SS.S, convert it to a real number and store it in 
+the ADAMCL variable variable_name. If the variable hasn't been 
+declared already, it will be created. 
+
+                                -***- 
+
+
+BATCH - take input commands from a file 
+
+BATCH filename 
+Take commands from the named disk file containing ADAMCL commands. 
+When end of file is encountered, control reverts to the original 
+command source. If the file extension is omitted, ".PRC" is assumed. 
+
+For running ADAMCL in VMS batch, see VMSBATCH. 
+
+Example 
+
+Adamcl:> BATCH SPEC 
+
+Execute the commands in the file SPEC.PRC. 
+BATCH is often used to compile procedure definitions, in which case 
+the file which is BATCHed will consist solely of such definitions and 
+not of immediately executable commands. However, using BATCH is often 
+an alternative to using a procedure. One can put a list of commands 
+into a file (using the editor) and then BATCH it, thus saving space 
+in the dictionary (the catch is that there is no way of passing 
+arguments to a BATCH file and that DO and IF cannot be used).  BATCH 
+commands can be nested up to a depth of sixteen.  On initial startup, 
+ADAMCL automatically executes the commands 
+BATCH ADAMDIR:GOD.PRC 
+BATCH GOD_USER 
+The file ADAMDIR:GOD.PRC simply contains the welcome message. The 
+logical name USER_GOD can be defined to point to a batch file 
+belonging to the user. This can contain instructions which carry out 
+various initialization operations. 
+
+
+
+
+                                                                 AON/1.4                           13                          AON/1.4
+
+
+
+                                -***- 
+
+
+BELL - ring bell N times with M seconds interval 
+
+BELL number_of_rings delay_between_rings 
+This command rings the terminal bell N times with a delay of M 
+seconds between each successive ring. The number_of_rings, N is 
+constrained to be between 0 and 20 while the delay between successive 
+rings should be between 0.0 seconds and 5.0 seconds, but can be a 
+fraction of a second e.g. 0.15 seconds. 
+
+                                -***- 
+
+
+CHECKTASK - Checks whether a process/task exists in the system 
+
+This command checks whether a task exists as a Vax process and 
+returns a flag to indicate this. The command has the form CHECKTASK 
+PLT2D X where PLT2D is the name of the task to be checked and X is 
+the name of an ADAMCL variable to contain the output flag. The 
+process name can be a ADAMCL character variable. The output in the 
+real ADAMCL variable (X above) is 0 if the task does not exist in the 
+system or 1 if the task exists. 
+
+
+   USAGE 
+
+   For example, a procedure may want to check whether a task is 
+   loaded before trying to send something to it. Thus, 
+   PROCEDURE SEND_IT 
+     CHECKTASK TASK_NAME VARIABLE 
+     IF VARIABLE = 1 
+       SEND TASK_NAME OBEY DO_SOMETHING 
+     ELSE 
+       PRINT "Your task is NOT present in the system ..." 
+     END IF 
+   END 
+
+
+                                -***- 
+
+
+COMPARE - compare character strings 
+
+COMPARE string1 string2 numeric_variable 
+string1 and string2 are evaluated, meaning they may be names of 
+character variables or literal strings, leading and trailing spaces 
+are removed from them, they are forced to uppercase and then 
+compared. If they are equal, the named numeric_variable is set to 
+1.0. Otherwise it is set to 0.0. 
+eg 
+Adamcl:> PROC JUNK 
+
+
+
+                                                                 AON/1.4                           14                          AON/1.4
+
+
+
+Proc:> DECLARE EQUAL         {equal is a numeric variable} 
+Proc:> COMPARE "HI" "hi" EQUAL 
+Proc:> IF EQUAL 
+Proc:> PRINT "strings equal" 
+Proc:> ELSE 
+Proc:> PRINT "strings different" 
+Proc:> END IF 
+Proc:> END PROC 
+Adamcl:> JUNK 
+  strings equal 
+Adamcl:> 
+
+                                -***- 
+
+
+CONCAT - concatenate character strings 
+
+CONCAT string1 string2 string_name 
+string1 and string2 are evaluated, meaning they may be names of 
+character variables or literal strings, leading and trailing spaces 
+are removed from them, they are forced to uppercase and then 
+concatenated. The result is stored in the character variable 
+string_name, which must have been previously declared. 
+eg 
+Adamcl:> PROC JUNK 
+Proc:> DECLARE RESULT CHAR 20 
+Proc:> DECLARE LETTERS CHAR 1 ARRAY 3 
+Proc:> LETTERS(1) = "A" 
+Proc:> LETTERS(2) = "B" 
+Proc:> LETTERS(3) = "C" 
+Proc:> DO J = 1 TO 3 
+Proc:> CONCAT "VAL" LETTERS(J) RESULT 
+Proc:> PRINT RESULT 
+Proc:> END DO 
+Proc:> END PROC 
+Adamcl:> JUNK 
+  VALA 
+  VALB 
+  VALC 
+Adamcl:> 
+
+                                -***- 
+
+
+CONTASK - switches a task from cached to non-cached or vice-versa 
+
+CONTASK name 
+Converts the named task from its current state of cached/non-cached 
+to the alternative. If the conversion is from non-cached to cached, 
+and the cache is full, then one of the cached tasks will be killed. 
+
+                                -***- 
+
+
+
+
+                                                                 AON/1.4                           15                          AON/1.4
+
+
+
+
+CREATESUB - create the permanent subprocess 
+
+A DCL subprocess is spawned and left waiting for commands to be 
+directed to it using the $ prefix. The name of the subprocess is 
+generated from the name of the process running ADAMCL. The subprocess 
+is not an ADAM task, although A-tasks can be run in it. For example, 
+suppose that no monolith has been declared, but that CREATESUB has 
+been executed, and that JUNK is an unknown command to ADAMCL. 
+Adamcl:> JUNK 
+will cause ADAMCL to look for JUNK.EXE. If it is found, it will be 
+assumed to be an A-task. It will be loaded into the subprocess, sent 
+the command to RUN, and when it has completed it will be KILLed. The 
+subprocess will still be there after the task has exited. 
+
+                                -***- 
+
+
+DCL - declare an ADAMCL variable 
+
+A synonym for DECLARE. (Do not confuse with DCL, the VAX/VMS command 
+language). 
+
+                                -***- 
+
+
+DECLARE - declare an ADAMCL variable 
+
+DECLARE variable [GLOBAL] [LOCAL] [CHAR n] [ARRAY n] 
+
+variable - The name of a new ADAMCL variable. 
+GLOBAL - indicates that the variable is to be GLOBAL. 
+LOCAL - indicates that the variable is to be procedure local. 
+CHAR n - indicates that the variable is a character variable of 
+         maximum length n. 
+ARRAY n - indicates that the variable is an array with one 
+          dimension of range 1:n. 
+
+Examples 
+Adamcl:> DECLARE STRING CHAR 5 
+Adamcl:> STRING="ABCDE" 
+Adamcl:> PRINT STRING 
+
+will print "ABCDE". 
+
+Adamcl:> PROC DEMO S1 S2 
+Proc:>  DECLARE S1 CHAR 5 
+Proc:>  DECLARE S2 CHAR 5 
+Proc:>  PRINT S1,S2 
+Proc:> END PROC 
+
+Adamcl:> DEMO STRING " abcd" 
+
+
+
+
+                                                                 AON/1.4                           16                          AON/1.4
+
+
+
+will print "ABCDE abcd". (The two DECLARE statements in the procedure 
+are executed as the procedure is input, since S1 and S2 are not, and 
+could not be, local variables - they cannot be because they are 
+parameters of the procedure.) 
+
+Adamcl:> NUMBER=6 
+Adamcl:> PROC P1 
+Proc:>  DECLARE NUMBER LOCAL 
+Proc:>  NUMBER=7 
+Proc:>  PRINT "P1" NUMBER 
+Proc:> END PROC 
+Adamcl:> PROC P2 
+Proc:>  DECLARE NUMBER LOCAL 
+Proc:>  NUMBER=8 
+Proc:>  P1 
+Proc:>  PRINT "P2" NUMBER 
+Adamcl:> END PROC 
+Adamcl:> PRINT NUMBER; P2; PRINT NUMBER 
+
+will print the lines :- 
+
+ 6 
+P1 7 
+P2 8 
+ 6 
+
+
+
+   NOTES 
+
+   The defaults for a variable are scalar, global and numeric.  The 
+   only forbidden combination is LOCAL and GLOBAL.  If the 
+   declaration specifies LOCAL and appears in a procedure definition, 
+   its execution is deferred, it gets compiled into the procedure 
+   definition and is executed like any other statement in that 
+   procedure when the procedure is called. If LOCAL is not specified, 
+   the declaration has immediate effect. 
+
+                                -***- 
+
+
+DEFINE - Define a command to run an A-task 
+
+DEFINE command taskname 
+
+DEFINE command %n [(PRIO)] 
+Define a new command which is to be serviced either by running a task 
+or else by calling an internal subroutine. 
+
+
+   TASKS 
+
+
+
+
+
+                                                                 AON/1.4                           17                          AON/1.4
+
+
+
+   DEFINE command taskname 
+
+   command (position=1, or keyword=COMM(AND)) 
+   This is the name of the new command. The command definition is 
+   entered into the dictionary. If the command is to be abbreviable, 
+   the optional part should be in parentheses (commands are never 
+   abbreviable in procedure definitions). 
+   taskname (position=2, or keyword=ACT(ION)) 
+   This is the name of the task which is to be executed when the 
+   command is issued. If ADAMCL fails to communicate with the named 
+   task, then it attempts to load ADAM_EXE:taskname.EXE, where 
+   ADAM_EXE is a VMS logical name which may be a search-path (eg. 
+   [adamroe.adamexe],[adam.adamexe]). The task is loaded as 'cached'. 
+
+   /DTASK 
+    This indicates that the task is a d-task. 
+   Examples 
+   Adamcl:> LOADW IPCS 
+   Adamcl:> DEFINE IPCS IPCS/DTASK 
+   Adamcl:> IPCS OBEY SS 0 
+   will cause the IPCS D-task to obey the action SS with parameter 0. 
+   ADAMCL will not wait for the action to complete. 
+   /ATASK 
+   This indicates that the task is an A-task, and is the default if a 
+   task is being defined. 
+   Adamcl:> DEFINE TRACE TRACE 
+   Adamcl:> TRACE ADAM_USER:GLOBAL 
+   will cause the A-task TRACE to be loaded into the cache, and then 
+   to run with parameter ADAM_USER:GLOBAL, and then wait for it to 
+   complete. 
+
+
+   INTERNAL 
+
+   DEFINE command %n [(PRIO)] 
+
+   command (position=1, or keyword=COMM(AND)) 
+   This is the name of the new command. The command definition is 
+   entered into the dictionary. If the command is to be abbreviable, 
+   the optional part should be in parentheses (commands are never 
+   abbreviable in procedure definitions). 
+   %n (position=2, or keyword=ACT(ION)) 
+   This indicates that the n'th internal command is to be executed 
+   (0<n<256). Normally, such DEFINE commands will automatically be 
+   executed at startup time. 
+   (PRIO) (position=3, or keyword=IMM(EDIATE)) 
+   This indicates that this command is to be executed immediately if 
+   encountered in a procedure definition. Normally, only some of the 
+   internal commands will use this parameter. The same effect can be 
+   achieved using the /IMM(EDIATE) qualifier. 
+   /IMMEDIATE 
+   This indicates that this command is to be executed immediately if 
+   encountered in a procedure definition. Normally, only some of the 
+
+
+
+                                                                 AON/1.4                           18                          AON/1.4
+
+
+
+   internal commands will use this parameter. The same effect can be 
+   achieved using the IMM(EDIATE) parameter. 
+   Adamcl:> DEFINE GE(T) %15/IMMED 
+   The command "GET" is defined as being the 15th internal command. 
+   If encountered in a procedure definition, it is to be executed 
+   immediately. It may be abbreviated to "GE". 
+
+
+   NOTES 
+
+   The DEFINE command is itself implicitly defined as:- 
+   DEFINE DEFINE %1 
+
+
+                                -***- 
+
+
+DO - start of a DO loop 
+
+The DO...END DO construct, within a procedure, allows the intervening 
+statements to be executed repetitively, either with a variable taking 
+a series of specified values or until a specified condition is met, 
+or a combination of both.  The DO statement may take any one of a 
+number of forms. Most of the allowed forms specify that the 
+statements between the DO and the corresponding END DO are to be 
+executed repetitively with a variable (the "loop variable") taking a 
+series of values, being changed at the start of each pass through the 
+loop until all specified values have been used. The simplest way to 
+specify these values is as a list of either constants or defined 
+variables such as :- 
+ DO VALUE=1,3,-5,N,1,0.5,7 
+Here on the first pass through the statements delimited by the DO and 
+END DO (usually termed the "DO loop") the loop variable (VALUE) will 
+take the value 1. On the next pass it will be 3, on the next -5, on 
+the next N (assuming N to be a defined variable) and so on. Note that 
+fractions and negative numbers are quite acceptable in the list, but 
+expressions are not allowed (yet).  An alternative specification 
+allows a regular series of values to be specified in terms of a start 
+value, an end value, and an optional increment value, eg :- 
+  DO INDEX=1 to 10 by 2 
+ or DO VALUE=5 TO 15 
+ or DO X=1.5 TO -2.5 BY .5 
+If the increment is not specified it defaults to +1.0. Note that if 
+the final value is less than the start value the increment must be 
+negative and so must be specified. The first time through the loop 
+the index variable takes the initial value. At the start of each 
+subsequent pass round the loop it is incremented by the increment 
+value and the loop is executed so long as it has not yet exceeded the 
+final value specified (if the increment is -ve, the loop is executed 
+so long as the index variable is not less than the final value). 
+Again, the initial, final and increment values may be given as 
+constants or as defined variables, but not as expressions. 
+Alternatively, loop control may be through the use of a "WHILE 
+
+
+
+                                                                 AON/1.4                           19                          AON/1.4
+
+
+
+clause". The DO statement may have the form 
+DO WHILE expression 
+where "expression" is any valid ADAMCL expression. In this case, the 
+expression is evaluated and the loop is executed if the expression 
+had the value "true" (or non-zero if it produced an arithmetic 
+result). At the end of the loop execution of the END DO statement 
+passes control back to the DO statement and the expression is 
+re-evaluated. Loop execution continues in this manner until the 
+expression becomes false (or zero).  The two forms (index variable 
+and WHILE clause) may be combined to produce more complex forms of 
+the DO statement, such as :- 
+ DO INDEX = -1 -2 -3 10 11 12 WHILE A>B+C 
+ or DO VALUE = 5 TO 55 BY 3 WHILE MAX(I,J)=I 
+Note that the WHILE clause must follow the index variable 
+specifications. In this combined form both conditions must be 
+satisfied for the loop statements to be executed. 
+
+
+   EXAMPLES 
+
+   Adamcl:> PROCEDURE SHOWDO 
+   Proc:>  DO I=1 TO 3 
+   Proc:>   J=1 
+   Proc:>   DO WHILE J <= I 
+   Proc:>     PRINT J 
+   Proc:>     J=J+1 
+   Proc:>   END DO 
+   Proc:>  END DO 
+   Proc:> END PROCEDURE 
+   will print the numbers 1 1 2 1 2 3. 
+
+
+   NOTES 
+
+   If a loop is not executed and control passes on to the statements 
+   following the END DO, the index variable will have the last value 
+   it took during loop execution. 
+   DO I=1 TO 10 BY 2; END DO; PRINT I 
+   will print the number 9.  A loop variable is not set until all 
+   evaluation of the DO statement is complete, so its old value may 
+   be used in that evaluation (NOT a desirable technique!) 
+   I=-5; DO I=1 TO 4 WHILE I=-5; END DO; 
+   will execute once, with I=1.  If a DO statement has no 
+   specifications at all the loop it heads will be executed once. 
+   DO ; PRINT "HELLO"; END DO; 
+   is exactly equivalent to PRINT "HELLO".  Very little syntax 
+   checking is possible when the DO statement is compiled. Most 
+   syntax or other errors will not be detected until execution is 
+   attempted. 
+
+
+   PITFALLS 
+
+
+
+
+                                                                 AON/1.4                           20                          AON/1.4
+
+
+
+   Confusing the syntax with that of FORTRAN. In particular, remember 
+   that 
+   DO I=1,5,2; PRINT I; END DO 
+   will print the 3 values 1,5 and 2, NOT 1,3 and 5! 
+
+                                -***- 
+
+
+$ command - send a DCL command to the permanent subprocess 
+
+$command 
+Sends the command to the permanent DCL subprocess. The DCL subprocess 
+is created the first time $ is used, and remains in existence until 
+ADAMCL exits. eg. 
+Adamcl:> $DIRECTORY 
+Directory DISK$SCRATCH:[IMAGES] 
+
+JUNK1.BDF;1     JUNK1.BDF;2 
+
+Adamcl:> 
+
+                                -***- 
+
+
+DUMP - diagnostic - dump dictionary to a text file 
+
+The contents of the ADAMCL dictionary are dumped to a text file 
+byte-by-byte. Nonprintables are shown as #.  This command is only of 
+use in debugging the implementation of ADAMCL. 
+
+                                -***- 
+
+
+DUMPTASK - ask a task to produce a stack dump 
+
+DUMPTASK taskname 
+Request the named task to produce a stack dump. The request will only 
+succeed if the code of the task has been set up to obey this command. 
+After producing the dump, the task continues executing. DUMPTASK will 
+fail if the task is caught in an infinite loop within an AST routine. 
+
+                                -***- 
+
+
+ELSE - start of ELSE in IF-ELSE-ENDIF 
+
+Introduce an "ELSE clause" in an IF...ELSE...END IF construct within 
+a procedure. 
+
+Note: there is no ELSE IF statement. 
+
+                                -***- 
+
+
+
+
+                                                                 AON/1.4                           21                          AON/1.4
+
+
+
+
+END - end procedure or DO or IF 
+
+END [qualifier] 
+Terminate a procedure definition, a DO loop, an IF..ELSE.. construct 
+or an IF clause.  The qualifier may be omitted but, if given, 
+describes the function of the END statement. It must be one of 
+PROCEDURE (which may be abbreviated to PROC), DO or IF.  Examples of 
+the use of END may be found in the descriptions of PROCEDURE, DO, IF 
+and ELSE. 
+
+
+   NOTES 
+
+   Note that, since multiple termination of structures is not 
+   permitted, the function of any END statement may be determined 
+   contextually by the system and the qualifier is therefore, 
+   strictly, redundant. However, if it is given the system may check 
+   that it and the user agree upon the function of the END statement 
+   in question. This is a useful test of the correctness of the 
+   structure of a procedure and the use of the qualifier is therefore 
+   strongly recommended. 
+
+                                -***- 
+
+
+ENDOBEY - wait for a task to complete an action 
+
+ENDOBEY pathvar messidvar 
+
+Waits for the final completion message from the given PATH and 
+MESSID. See STARTOBEY. 
+
+                                -***- 
+
+
+ERASE - clears the screen of a VT terminal 
+
+This routine calls the Vax library function LIB$ERASE_PAGE to clear 
+the screen of a VT compatible terminal. It is useful in procedures 
+for cosmetic purposes and has no real effect on terminals other than 
+VTs. 
+
+                                -***- 
+
+
+EXIT - leave ADAMCL 
+
+ADAMCL stops running. All procedure definitions and variable 
+declarations vanish. However, loaded non-cached tasks remain loaded, 
+and are 'unaffected' except if they try to send a message to the now 
+non-existent ADAMCL. Cached tasks are automatically killed. 
+
+
+
+
+                                                                 AON/1.4                           22                          AON/1.4
+
+
+
+                                -***- 
+
+
+EXPRESSIONS - Help information on ADAMCL expressions 
+
+At present, there are 4 cases where an expression may be used instead 
+of a simple constant or variable. 
+ 1) In an assignment 
+ 2) In the WHILE clause of a DO statement 
+ 3) In an IF statement e.g. IF A > B + C 
+ 4) In some ADAMCL commands (PRINT, OBEYW etc) 
+ The syntax of ADAMCL expressions is summarised as follows. 
+
+a) The arithmetic operators recognised are +,-,*,/ and **, all with 
+the usual FORTRAN or PL/I meanings. 
+
+b) The logical operators recognised are ^ (NOT) & (AND), \ (OR), <, 
+>, <=, >=, ^= (NOT EQUAL), =, and <> (also NOT EQUAL). 
+
+c) The logical operators ^, & and \ operate on arithmetic quantities 
+(like PL/I) rather than on actual logical quantities (like  FORTRAN), 
+taking zero as false and non-zero as true. 
+
+d) Similarly, the logical operators >, < etc. all produce an 
+arithmetic result, either 1 (true) or 0 (false). 
+
+e) The precedence rules for the arithmetic operators are exactly the 
+same as in FORTRAN (i.e. quantities in parentheses are evaluated 
+first, then functions, then the operators **, * or /, + or -, with 
+left to right order for operators of equal precedence such as *  and 
+/). 
+
+f) Logical operations all have a lower precedence than arithmetic 
+operators. The order for evaluation of logical operations is - 
+comparisions (<,>, etc.), then ^ (NOT), then connectors (& and  \). 
+Note that in FORTRAN .AND.  has precedence over .OR. but in an ADAMCL 
+expression & and \ have  equal precedence and are evaluated left to 
+right. 
+
+g) Arithmetic operators may not appear consecutively ie I**-J is  not 
+valid and I**(-J) must be used instead. This is the same as in 
+FORTRAN. 
+
+h) Logical operators may not appear consecutively, the equivalent 
+A>B&(^B>C) must be used instead. Note that this is not the same as 
+for FORTRAN, where .AND..NOT. would be allowed. 
+
+i) Functions currently supported are MAX, MIN (both with up to 20 
+arguments), SQRT, SIN, COS, and TAN (trig. functions expect 
+arguments in radians), BTEST, BSET, AND, OR, EOR, NOT, SHIFT,  ATAN, 
+ASIN, ACOS, LOG, EXP, INT, FRAC, MOD and ABS. Arguments are as in 
+FORTRAN. 
+
+
+
+
+                                                                 AON/1.4                           23                          AON/1.4
+
+
+
+Bearing these rules in mind, the following recommendations are made 
+
+a) Don't mix logical and arithmetic values :- 
+
+e.g. 5 + ( 4 > 3 ) has the value 6, since 4 > 3 is true, ie. has 
+value 1, but this is very confusing, and not really useful. 
+
+There may be a slight case for using DO WHILE K which is  equivalent 
+to DO WHILE K^=0 
+
+b) If you rely on the precedence rules instead of using parentheses 
+you'll A) get them wrong, and B) confuse everyone including 
+yourself. Use parentheses liberally - the syntax analyser can  handle 
+up to 19 levels of nested parentheses, which ought to be  enough for 
+anybody. 
+
+
+   EXAMPLES 
+
+   If I1=1.0 and I2=2.0 and I3=3.0 :- 
+
+   a) I1*I2>6 is equivalent to (I1*I2)>6 and is false. 
+
+   b) I3+I2^=I2-I1*I3 is equivalent to (I3+I2) ^= (I2-(I1*I3)) and is 
+   true. 
+
+   c) I1*(I2-I3*(I1+6)/I2)*I3   is   equivalent   to 
+   (I1*(I2-((I3*(I1+6))/I2)))*I3 and is -25.5. 
+
+   d) MAX(MIN(4,8+I2),I3+2,SQRT(I3+I1)+1) is equivalent to MAX(4,5,3) 
+   and is therefore 5. 
+
+                                -***- 
+
+
+FULLHELP - give full help on the named item 
+
+FULLHELP [name] 
+Give full help on the named item in the current help file. If name is 
+absent, give one-line help on all the entries in the current help 
+file. 
+
+                                -***- 
+
+
+?? - give full help on the named item 
+
+?? [name] 
+Give full help on the named item in the current help file. If name is 
+absent, give one-line help on all the entries in the current help 
+file. 
+
+
+
+
+
+                                                                 AON/1.4                           24                          AON/1.4
+
+
+
+                                -***- 
+
+
+FUNCTIONS - Help information on ADAMCL numeric functions 
+
+There are the following numeric functions. These can be used in any 
+numeric expression, eg 
+Adamcl:> J = -1 
+Adamcl:> K = ABS(J) + 5 
+Adamcl:> PRINT K+SQRT(42) 
+
+MIN(val1,val2,...) minimum of up to 20 values 
+MAX(val1,val2,...) maximum of up to 20 values 
+SQRT(val) square-root 
+SIN(val) sine, argument in radians 
+COS(val) cosine, argument in radians 
+TAN(val) tangent, argument in radians 
+BTEST(val1,val2) returns TRUE if the val2th bit of INT(val1) is 1 
+BSET(val1,val2) returns the value of val1 after its val2th bit is set 
+AND(val1,val2) returns bitwise AND of INT(val1) and INT(val2) 
+OR(val1,val2) returns bitwise OR of INT(val1) and INT(val2) 
+EOR(val1,val2) bitwise exclusive OR of INT(val1) and INT(val2) 
+NOT(value) return the bitwise complement of INT(value) 
+SHIFT(val1,val2) return INT(val1) after left-shift by val2 bits 
+ATAN(value) return arctan of value 
+ASIN(value) return arcsine of value 
+ACOS(value) return arc cosine of value 
+LOG(value) return log (base E) of value 
+EXP(value) return EXP(value) 
+INT(value) return REAL(INT(value)) 
+FRAC(value) return value-INT(value) 
+MOD(val1,val2) return remainder of val1/val2 
+ABS(value) return the absolute value of value 
+
+                                -***- 
+
+
+GET - get a parameter from a task and store in a variable 
+
+GET taskname parameter_name [variable_name] 
+Get the value of the named parameter from the named task and put it 
+into the ADAMCL variable called variable_name. If variable_name is 
+missing from the command, it defaults to parameter_name. If an ADAMCL 
+variable of the correct name does not exist, then if the value got 
+has the syntax of a number, a real variable will be created to store 
+it. 
+
+                                -***- 
+
+
+HELP - give help information or switch help files 
+
+
+
+
+
+                                                                 AON/1.4                           25                          AON/1.4
+
+
+
+HELP [name] - give one-line help on the named item. 
+              If name is missing, list entries in the current 
+              help file 
+
+HELP @[name] - set the current helpfile to name. 
+               If name is absent, select the ADAMCL help file 
+
+
+                                -***- 
+
+
+? - give help information or switch help files 
+
+? [name] - give one-line help on the named item. 
+              If name is missing, list entries in the current 
+              help file 
+
+? @[name] - set the current helpfile to name. 
+               If name is absent, select the ADAMCL help file 
+
+
+                                -***- 
+
+
+IF - start of an IF block 
+
+IF expression 
+  set of ADAMCL commands 
+END IF 
+
+or 
+
+IF expression 
+  set of ADAMCL commands 
+ELSE 
+  another set of ADAMCL commands 
+END IF 
+
+Allows conditional execution of a set of statements in a procedure. 
+
+expression 
+May be any valid ADAMCL expression - see the section "Expressions" 
+for details. Note that an arithmetic result can, in context, have a 
+"true" or "false" meaning - true if non-zero, false if zero - so that 
+if N=1, then "IF N" and "IF 2>N" both contain expressions that are 
+valid and true. 
+
+
+   EXAMPLES 
+
+   Adamcl:> PROC ROOTS N 
+   Proc:> IF N<=0 
+   Proc:>  IF N   {true if N is -ve, ie non-zero} 
+
+
+
+                                                                 AON/1.4                           26                          AON/1.4
+
+
+
+   Proc:>   PRINT "Parameter is negative" 
+   Proc:>  ELSE 
+   Proc:>   PRINT "Parameter is zero" 
+   Proc:>  END IF 
+   Proc:> ELSE 
+   Proc:>  PRINT "Square roots from 1 to" N 
+   Proc:>  DO I=1 TO N 
+   Proc:>   PRINT SQRT(I) 
+   Proc:>  END DO 
+   Proc:> END IF 
+   Proc:> END PROC 
+   Print the square roots of the integers from 1 to N, where N is 
+   passed as a parameter. 
+
+
+   NOTES 
+
+   All statements between an IF statement and its terminating "ELSE" 
+   or "END" statement form the "IF clause". If the "IF clause" is 
+   terminated by an "ELSE" then the statements between the "ELSE" and 
+   "END" statements form the "ELSE clause".  When the "IF" statement 
+   is executed the expression in the statement is evaluated. Note 
+   that since the expression may contain named variables that are 
+   undefined when the statement is compiled it is not possible to 
+   check the syntax of the expression at compile time. Therefore any 
+   errors will probably not be detected until the first time the 
+   statement is executed. If the expression is "true" (or non-zero) 
+   the "IF clause" statements will be executed and the "ELSE clause" 
+   statements (if any) will not. If the expression is "false" (or 
+   zero) the "ELSE clause" (if any) is executed and the "IF clause" 
+   is ignored.  The "IF" and "ELSE" clauses may themselves contain 
+   IF...ELSE...END or DO...END constructions, but these must be 
+   contained entirely within the clause in question. 
+
+
+   PITFALLS 
+
+   Attempting some sort of illegal nesting such as DO...IF...END 
+   DO...ELSE...END IF. Note that IF cannot be used to exit from a 
+   DO...END DO construction. A DO WHILE construct must be used 
+   instead. 
+
+                                -***- 
+
+
+INIT_TIMER - initiate VMS timer 
+
+INIT_TIMER  Initialise the VMS timer. This calls the VMS runtime 
+library routine LIB$INIT_TIMER. 
+
+                                -***- 
+
+
+
+
+
+                                                                 AON/1.4                           27                          AON/1.4
+
+
+
+
+KILLALL - kill ALL tasks known to ADAMCL 
+
+KILLALL 
+This command kills all task currently known to ADAMCL. It scans the 
+internal list of task, both cached and non-cached, and kills them, 
+waiting until the process disappears before continuing. 
+
+                                -***- 
+
+
+KILL - kill a task 
+
+KILL taskname 
+Terminate the named task. Remove it from the list of 
+cached/non-cached tasks. If a task has, for example, crashed, it may 
+be necessary to issue the KILL command to bring the cached/non-cached 
+lists up to date. 
+Example 
+
+Adamcl:> KILL IPCS 
+Kill the IPCS d-task. 
+
+                                -***- 
+
+
+KILLW - kill a task and wait for it to vanish 
+
+KILLW taskname 
+Terminate the named task. Remove it from the list of 
+cached/non-cached tasks. If a task has, for example, crashed, it may 
+be necessary to issue the KILL command to bring the cached/non-cached 
+lists up to date. This command differs from the KILL command in that 
+it waits until the process has disappeared before returning to 
+ADAMCL. 
+
+                                -***- 
+
+
+LET - assign a value to a variable 
+
+Variable = Expression 
+
+or 
+
+LET Variable = Expression 
+ Examples 
+Adamcl:> X = 5 ; Y = 7 + X ; MAXOFXY = MAX ( X , Y ) ; 
+
+will give X=5.0, Y=9.0, and MAXOFXY=9.0 
+Note that spaces may not appear within names, but are ignored 
+otherwise. 
+
+
+
+
+                                                                 AON/1.4                           28                          AON/1.4
+
+
+
+
+   NOTES 
+
+   The character string on the left of the equals sign is taken as 
+   the name of a variable. The expression on the right of the equals 
+   sign is evaluated and the variable is set to the result of the 
+   evaluation.  Details of precisely what constitutes a valid 
+   expression may be found in the section on expressions. Generally 
+   speaking if an expression is valid in FORTRAN it stands a good 
+   chance of being accepted by ADAMCL. 
+
+                                -***- 
+
+
+LOAD - create a subprocess and load the named task into it 
+
+LOAD exename [taskname] 
+Load the named task as non-cached without waiting for loading to be 
+complete. 
+
+exename is the name of the task's execution module. taskname is the 
+name of the task which is created. If taskname is not specified, it 
+is taken to be the same as exename.  If exename is, for example, 
+TRACE, ADAMCL looks for TRACE.EXE in the current directory. If it 
+fails to find it, then it tries ADAM_EXE:TRACE.EXE. 
+
+
+   PITFALLS 
+
+   If taskname is omitted and exename contains a directory 
+   specification or file-type, then the load will fail due to an 
+   invalid taskname. If the LOAD is initiated successfully, but the 
+   task crashes during loading, its name will have been entered on 
+   the non-cached list. It will then be necessary to KILL the task to 
+   update the list. 
+
+                                -***- 
+
+
+LOADD - load-with-wait a task into a detached process 
+
+LOADD exename [taskname [priority]] 
+Load the named task as non-cached into a detached process and wait 
+for loading to be complete. 
+
+exename is the name of the task's execution module. taskname is the 
+name of the task which is created. If taskname is not specified, it 
+is taken to be the same as exename. priority is the VMS base priority 
+of the detached process. If it is not specified, it defaults to the 
+same value as the user interface.  If exename is, for example, TRACE, 
+ADAMCL looks for TRACE.EXE in the current directory. If it fails to 
+find it, then it tries ADAM_EXE:TRACE.EXE. 
+
+
+
+
+                                                                 AON/1.4                           29                          AON/1.4
+
+
+
+
+   PITFALLS 
+
+   If taskname is omitted and exename contains a directory 
+   specification or file-type, then the load will fail due to an 
+   invalid taskname.  If the task crashes in the middle of loading, 
+   ADAMCL will be left waiting for it to appear. It is sometimes 
+   possible to escape from this with control-C. If this fails, the 
+   LOADD will time-out after 100secs. If the control-C succeeded but 
+   the task actually crashed, then the non-cached task list will 
+   still contain the task. This has to be rectified by killing the 
+   task explicitly.  If the taskname is omitted but the priority is 
+   provided, the priority will be taken as the taskname, resulting in 
+   a process with a name which is a number. 
+
+                                -***- 
+
+
+LOADDICT - load the ADAMCL dictionary from a file 
+
+LOADDICT filename 
+The ADAMCL dictionary and global variable store are loaded from the 
+named file. The file must have been created by the SAVEDICT command. 
+LOADDICT provides a mechanism for loading a set of precompiled 
+procedures. 
+
+                                -***- 
+
+
+LOADW - load a task and wait for load completion 
+
+LOADW exename [taskname] 
+Load the named task as non-cached and wait for loading to be 
+complete. 
+
+exename is the name of the task's execution module. taskname is the 
+name of the task which is created. If taskname is not specified, it 
+is taken to be the same as exename.  If exename is, for example, 
+TRACE, ADAMCL looks for TRACE.EXE in the current directory. If it 
+fails to find it, then it tries ADAM_EXE:TRACE.EXE. 
+
+
+   PITFALLS 
+
+   If taskname is omitted and exename contains a directory 
+   specification or file-type, then the load will fail due to an 
+   invalid taskname.  If the task crashes in the middle of loading, 
+   ADAMCL will be left waiting for it to appear. It is sometimes 
+   possible to escape from this with control-C. If this fails, the 
+   LOADW will time-out after 100secs. If the control-C succeeded but 
+   the task actually crashed, then the non-cached task list will 
+   still contain the task. This has to be rectified by killing the 
+   task explicitly. 
+
+
+
+                                                                 AON/1.4                           30                          AON/1.4
+
+
+
+                                -***- 
+
+
+MONOLITH - change prompt and select a monolith 
+
+MONOLITH [taskname] 
+taskname is the name of the task selected as the current monolith. If 
+taskname is not specified, ADAMCL reverts to non-monolith operation. 
+When a monolith has been selected, the ADAMCL prompt changes to the 
+name of the monolith, and any commands which ADAMCL does not 
+recognise are assumed to be actions in the monolith. 
+
+
+   EXAMPLES 
+
+   Adamcl:> monolith rapid 
+   RAPID:> print 3 
+         3 
+   RAPID:> monolith "rapid" 
+   rapid:> 
+
+   This demonstrates that the normal ADAMCL commands are still 
+   available, and that control over the case of the prompt string is 
+   achieved by using double quotes. 
+
+   Adamcl:> monolith rapid 
+   RAPID:> JUNK 
+
+   Assuming that JUNK is not the name of a procedure, and has not 
+   been specified in a DEFINE statement, the effect of this is 
+   SEND RAPID OBEY JUNK 
+   and ADAMCL then waits for the action JUNK to complete.  If RAPID 
+   is a D-task, JUNK is a normal action. If RAPID is actually an 
+   A-task monolith, then JUNK the name of one of the A-tasks linked 
+   into the monolith.  Any parameters following the command are 
+   evaluated by the command language (in case they are ADAMCL 
+   variable names) and then passed to the monolith. 
+
+
+   PITFALLS 
+
+   Trying to control a monolith (or Dtask) one of whose Atasks 
+   (actions) has the same name as an ADAMCL command. In this case, 
+   ADAMCL attempts to execute the command itself. 
+
+                                -***- 
+
+
+NOREP - switch reporting off and close log file 
+
+Switches all categories of reporting off and closes log file. 
+
+
+
+
+
+                                                                 AON/1.4                           31                          AON/1.4
+
+
+
+                                -***- 
+
+
+OBEYW - obey an action and wait for completion 
+
+OBEYW string  Interpret string as a possible list of ADAMCL variables 
+or expressions. After any relevant translations, interpret the result 
+as 
+task_name action_name [parameters] 
+If the named task doesn't exist, attempt to load it as 'cached'. Then 
+perform 
+SEND task_name OBEY action_name parameters 
+and wait for the final acknowledgement. If parameter requests come 
+from the task, handle them by prompting the user, then return to 
+waiting for the final acknowledgement.  In the list of parameters, 
+the parameters have the syntax required by the ADAM intertask 
+communications system. This requires that the parameters be separated 
+by spaces or commas, that character strings should be contained in 
+single quotes and that HDS names should begin with an alphabetic 
+character.  Valid parameter lists are 
+
+7.2,3,45.7 
+'hi there' adam_user:global.ls 95.3 
+
+                                -***- 
+
+
+ON ERROR - control ADAMCL action if an error occurs 
+
+ON ERROR command 
+
+***WARNING this command is dangerous. 
+This specifies the behaviour of ADAMCL if an error is detected during 
+the execution of a procedure.  If command is CONTINUE, then ADAMCL 
+just outputs the relevant error message and continues executing the 
+procedure.  If command is RETURN (the default), ADAMCL outputs the 
+error message and then returns from all nested procedure calls to the 
+interactive level.  If command is anything else (eg. the name of a 
+procedure) ADAMCL outputs the error message, returns from all nested 
+procedure calls, then executes the specified command.  ON ERROR 
+should only be used in conjunction with fully debugged procedures. A 
+sensible use might be a command which tidies-up by killing a certain 
+set of tasks after any one of them has crashed. In this case, the 
+attempt to kill the crashed task would be an error, but could be 
+safely ignored, and so ON ERROR CONTINUE would be reasonable. 
+
+
+   PITFALLS 
+
+   Suppose there is a procedure called RECOVER which has an error in 
+   an IF statement. 
+   Adamcl:> ON ERROR RECOVER 
+   followed by executing a procedure in which an error occurs, will 
+
+
+
+                                                                 AON/1.4                           32                          AON/1.4
+
+
+
+   put ADAMCL into an infinite loop which can only be escaped by 
+   crashing it with ctrl-Y. 
+
+                                -***- 
+
+
+OPERATORS - Help information on ADAMCL numeric and logical operators 
+
+There are the usual numeric operators +,-,*,/,**. There are also a 
+set of numeric functions. (see FUNCTIONS). 
+
+The following logical operations are available. They all actually 
+operate on numeric values and give a result such that 1.0 is .TRUE. 
+and 0.0 is .FALSE. 
+
+ADAMCL           FORTRAN equivalent 
+^                     .NOT. 
+\                     .OR. 
+&                     .AND. 
+<                     .LT. 
+>                     .GT. 
+^=                    .NE. 
+=                     .EQ. 
+>=                    .GE. 
+<=                    .LE. 
+<>                    .NE. 
+
+                                -***- 
+
+
+PRINT - type the value of a character string or numeric expression 
+
+PRINT item1,item2,item3,...,itemn 
+Write expressions or character strings on the current output device. 
+Each item may be :- 
+
+a) An expression. Any valid expression may be used, but note that it 
+should not contain any spaces, since in this case they will be taken 
+as item delimiters. The expression is evaluated and the  result will 
+be output as an integer if possible, otherwise as a floating point 
+number with 8 significant figures printed. "E" format  will be used 
+if necessary. 
+
+b) A character string, enclosed in quotes (a quote being the single 
+character "). If the string contains two successive quotes ""  then 
+these are treated as a single quote which is to be printed  rather 
+than as a terminator. 
+
+c) The line terminating character "/" (a single slash). This causes 
+PRINT to begin a new line - the function is the same as that of a 
+"/" in a FORTRAN FORMAT statement. 
+
+
+
+
+
+                                                                 AON/1.4                           33                          AON/1.4
+
+
+
+Items may be delimited by spaces or commas. 
+
+
+   EXAMPLES 
+
+   Adamcl:> X=3; Y=5; 
+   Adamcl:> PRINT "LARGER OF",X," AND",Y,/,"IS",MAX(X,Y) 
+    will print 
+   LARGER OF 3 AND 5 
+   IS 5 
+
+   Adamcl:> PRINT "Adamcl:> PR ""X="" 4"/"WILL PRINT ""X= 3""" 
+    (think carefully!) will print 
+   Adamcl:> PR "X=" 4 
+   WILL PRINT "X= 3" 
+   NOTE that the "example" within this example is NOT true! A 
+   computer can be made to lie. Actually :- 
+   Adamcl:> PR "X=" 4 
+    will print 
+   X= 4 
+
+
+
+   PITFALLS 
+
+   PRINT with no arguments will give an error message. To print a 
+   blank line use PRINT " ". PRINT / prints two blank lines.  It is 
+   possible to overflow the buffer used by PRINT. The buffer can only 
+   hold 80 characters. If this happens, the message "PRINT BUFFER 
+   OVERFILLED" will be output.  Getting confused by examples like the 
+   second example. 
+
+                                -***- 
+
+
+PR - type the value of a character string or numeric expression 
+
+PR item1,item2,item3,...,itemn 
+A synonym for PRINT. 
+
+                                -***- 
+
+
+PROC - start defining/compiling a procedure 
+
+ PROC name var1,var2,var3...varn 
+  Set of ADAMCL commands 
+ END PROC 
+A synonym for PROCEDURE. 
+
+                                -***- 
+
+
+
+
+
+                                                                 AON/1.4                           34                          AON/1.4
+
+
+
+
+PROCEDURE - start defining/compiling a procedure 
+
+ PROCEDURE name var1,var2,var3...varn 
+  Set of ADAMCL commands 
+ END PROCEDURE 
+where "PROCEDURE" can be abbreviated to "PROC" and the optional part 
+of <name> can be placed in parentheses. 
+
+Defines a named sequence of commands as a "procedure", to be executed 
+when the command "name" is given. The procedure may have parameters 
+and may contain loops and conditionally executed statements (see "DO" 
+and "IF"). 
+
+name 
+is the name by which the procedure may be referenced. If this is to 
+be abbreviable the optional part should be put in parentheses. 
+
+var1 .. varn 
+are a number (between 0 and 20) of names of variables (the 
+"parameters" of the procedure) separated by spaces or commas. 
+
+
+   EXAMPLES 
+
+   Adamcl:> PROC FR(ED) A,B,C,D 
+   Proc:> PRINT A,B,C,D 
+   Proc:> END PROC 
+   Adamcl:> 
+   defines a procedure called FRED with parameters A,B,C and D. 
+   "FRED" can be abbreviated to "FR" or "FRE". Subsequently the 
+   command 
+   Adamcl:> FRED 1,2,3,4 
+   will cause FRED to be executed with A,B,C and D set to 1,2,3 and 4 
+   respectively. FRED will therefore print the numbers 1,2,3 and 4. 
+   "FRED D=4,C=3,B=2,A=1" is exactly equivalent. The command "FRED 
+   5,6,7" starts FRED executing with A,B, and C set to 5,6, and 7, 
+   and with D unchanged (possibly undefined). Note that neither 
+   keywords nor default values for parameters may be specified. 
+
+
+   NOTES 
+
+   If one needs to pass parameters or to use DO or IF statements, 
+   then using a procedure is the only course open. However, if one 
+   merely wants a shorthand way of issuing a whole list of commands 
+   one should consider using a BATCH file (see the section on BATCH). 
+
+   Execution of "PROC" sets the system into "compile" mode. The 
+   sequence of commands entered between the "PROC" and "END PROC" 
+   commands are not executed immediately. Instead they are remembered 
+   and will be executed in sequence when the command "name" is given. 
+   The sequence may contain conditional sequences 
+
+
+
+                                                                 AON/1.4                           35                          AON/1.4
+
+
+
+   ("IF"..."ELSE"..."END IF") or repetitive sequences ("DO"..."END 
+   DO"). The parameters ("var1...varn") are not evaluated when the 
+   PROC command is executed; they become the command variables of the 
+   procedure "name" and when "name" is executed any numeric 
+   parameters given with the name command are used to set the 
+   variables "var1" etc. 
+
+   A procedure cannot reference itself, but it may reference a 
+   previous definition of the same name, in which case that name 
+   becomes redefined. 
+   Adamcl:> PROC BOB CAROL,TED,ALICE 
+   Proc:>     PRINT CAROL; PRINT TED; 
+   Proc:>   END PROC 
+   looks as though it forgot to print a parameter. If it is then 
+   redefined as 
+   Adamcl:> PROC BOB CAROL,TED,ALICE 
+   Proc:>     BOB; PRINT ALICE; 
+   Proc:>   END PROC 
+   then "BOB 1,2,3" will print out the numbers 1,2 AND 3. Note that 
+   the reference to the first BOB within the second BOB leaves 
+   CAROL,TED and ALICE unchanged. 
+
+                                -***- 
+
+
+PROCEDURES - General information about ADAMCL procedures 
+
+It is possible to write procedures in ADAMCL. When the code of the 
+procedure is given to ADAMCL, the name of the procedure is stored in 
+the command dictionary. Thereafter, whenever that name is typed as a 
+command, the procedure is executed.  For example, suppose that a text 
+file called JUNK.PRC has been created using the VAX editor, 
+containing the following. 
+PROCEDURE TRYIT 
+  PRINT "hello" 
+END PROCEDURE 
+
+Running ADAMCL and using the BATCH command to read the procedure 
+definition:- 
+Adamcl:> BATCH JUNK 
+Adamcl:> TRYIT 
+   hello 
+Adamcl:> 
+Procedures can call other procedures. For example, suppose that there 
+is a second file, JUNK2.PRC containing 
+PROCEDURE TEST 
+  TRYIT 
+END PROCEDURE 
+one can then 
+Adamcl:> BATCH JUNK 
+Adamcl:> BATCH JUNK2 
+Adamcl:> TEST 
+   hello 
+
+
+
+                                                                 AON/1.4                           36                          AON/1.4
+
+
+
+Adamcl:> 
+Note that TRYIT has to be already known to ADAMCL before the code of 
+TEST is input. 
+
+Procedures can be typed directly into ADAMCL, but there is then no 
+facility for editing them. The typed-in procedure is not 
+automatically copied to a file unless the reporting facility is 
+switched-on using the ADAMCL command REPORT. 
+
+
+   PARAMETERS 
+
+   Up to twenty parameters can be passed in a procedure call. In 
+   addition, any procedure has access to global variables. Note that 
+   parameters passed in the call are 'input' only. The updated value 
+   of a parameter is not returned. This means that global variables 
+   provide the only mechanism for returning values from a procedure. 
+   For examples of parameter passing, see the PROCEDURE command. 
+
+
+   CONTROL 
+
+   ADAMCL has IF-ELSE-END and DO-END for controlling command 
+   execution. For example 
+   IF JUNKR <= 0 
+     PRINT "less than one" 
+   ELSE 
+     DO J = 1 TO JUNKR 
+       PRINT "value is", J 
+     END DO 
+   END IF 
+
+
+   COMMENTS 
+
+   Comments in ADAMCL procedures are delimited by {}. 
+   eg 
+   PROC TEST     {try it out} 
+      MANGLE     {issue the MANGLE command} 
+   END PROC 
+
+                                -***- 
+
+
+QUIT - leave ADAMCL 
+
+ADAMCL stops running. All procedure definitions and variable 
+declarations vanish. However, loaded non-cached tasks remain loaded, 
+and are 'unaffected' except if they try to send a message to the now 
+non-existent ADAMCL. Cached tasks are automatically killed. 
+
+                                -***- 
+
+
+
+
+                                                                 AON/1.4                           37                          AON/1.4
+
+
+
+
+REMQUOTES - remove single quotes from string in variable 
+
+REMQUOTES variable_name 
+The specified character variable is stripped of quotes and passed 
+back to the user in the same ADAMCL variable as the input string. 
+
+                                -***- 
+
+
+REPFILE - list a logfile to the screen 
+
+REPFILE [filename] [DTNS] 
+
+Read the ADAM system logfile (which is non-printable) and write it to 
+the terminal. 
+
+filename is the name of the log file. If it is omitted, the filename 
+defaults to that defined by the logical name ADAM_LOGFILE. 
+
+DTNS specifies which of the items Date, Time, taskName or String 
+which constitute each logfile entry are to be displayed. If DTNS has 
+the value 'DTNS' then all of these elements are listed. If any 
+character is replaced by anything else (except a space) the 
+corresponding component is omitted. Thus if DTNS='xTxS' only the time 
+and string are listed. 
+
+It is possible to list the logfile which is currently open for 
+reporting without writing the output back to the logfile. 
+
+                                -***- 
+
+
+REPORT - switch reporting on 
+
+REPORT [filename] [category] 
+
+Cause the indicated categories of information to be logged to a 
+logfile. 
+
+filename is the name of the logfile to be used for output. If omitted 
+it defaults to the translation of the logical name ADAM_LOGFILE. The 
+latter can also be specified explicitly by the abbreviation A_L. It 
+is not possible to report to more than one logfile at a time. If the 
+logfile already exists the date and time when it was created is 
+reported to the screen. If it does not already exist a message 
+'opening a logfile' is given. 
+
+category can be ALL or omitted. If omitted, the default logging 
+categories are set up. 
+
+The default categories are 
+ADAMCL prompts and replies 
+
+
+
+                                                                 AON/1.4                           38                          AON/1.4
+
+
+
+parameter prompts and replies 
+messages from tasks 
+output from the ADAMCL PRINT command 
+output of error messages 
+
+ALL includes all categories of information loggable. These are the 
+default categories plus 
+echo of input from BATCH files 
+copy of HELP output 
+commands executed within procedures 
+
+The log file is non-printable as described in AED10. The REPFILE 
+command allows the file to be listed to the screen. The separate ADAM 
+task LISTLOG may be used to list a logfile to either the screen or a 
+printable file with more control over the output. 
+
+                                -***- 
+
+
+RETURN - unstack procedures and return to interactive 
+
+RETURN 
+This command tells ADAMCL to return from the current procedure stack 
+to ADAMCL. This command exits from the procedure regardless of the 
+state of the ON ERROR flag. 
+
+                                -***- 
+
+
+SAVEDICT - save the ADAMCL dictionary to a file 
+
+SAVEDICT filename 
+The ADAMCL dictionary and global variable storage are written to the 
+named file. After leaving ADAMCL, it is then possible to restore the 
+dictionary and global variables by using the command LOADDICT.  This 
+provides a mechanism for loading precompiled procedures. 
+
+                                -***- 
+
+
+SEND - send a GET/SET/OBEY/CANCEL to a task 
+
+SEND string 
+Send a message requesting a task to perform a GET/SET/OBEY/CANCEL. In 
+the cases of OBEY/CANCEL, final completion by the task is NOT 
+awaited. 
+
+Interpret string as a possible list of ADAMCL variables or 
+expressions. After any relevant translations, interpret the result as 
+
+SEND task context name [parameter_list] 
+task is the name of the task which is to perform the command. If this 
+task is not already loaded, it is loaded as 'cached'. 
+
+
+
+                                                                 AON/1.4                           39                          AON/1.4
+
+
+
+context - this must be SET, GET, OBEY or CANCEL. 
+
+name is the name of the task parameter which is to be SET or GOT, or 
+else the name of the task action to be OBEYed or CANCELled. It may 
+contain a maximum of 16 characters, except for SET to a monolith 
+where the name is of the form <action>.<parameter>. 
+
+parameter_list - in the list of parameters, the parameters have the 
+syntax required by the ADAM intertask communications system. See the 
+section on SYNTAX. 
+
+Valid parameter lists are 
+
+7.2,3,45.7 
+'hi there' adam_user:global.ls 95.3 
+[[6,3],[1,5]],42 
+
+The various 'contexts' (GET,SET,OBEY,CANCEL) are considered 
+individually. 
+
+
+   PITFALLS 
+
+   Giving an illegal action name (whether an action name is legal or 
+   not depends entirely on which d-task you are talking to). 
+
+
+   SET 
+
+   SET is used to give a value to a task parameter. The value can be 
+   a scalar (number or quoted string), or the name of an HDS 
+   structure, or an array of scalars with up to seven dimensions. 
+
+   Examples 
+
+   Adamcl:> SEND IPCS SET BCNDAT 826 
+   Give the IPCS d-task parameter called BCNDAT the value 826 
+
+   Adamcl:> SEND CCD SET TSKWORK WORK+4 
+   Give the CCD d-task parameter called TSKWORK the value of WORK+4, 
+   where WORK must be an ADAMCL numeric variable. 
+
+   Adamcl:> SEND FIGARO SET SPLOT.XSTART 3000 
+   Set the value of the parameter XSTART belonging to the SPLOT 
+   application within the FIGARO monolith. 
+
+
+   GET 
+
+   GET is used to read the value of a d-task parameter and display it 
+   on the terminal. 
+   Examples 
+
+
+
+
+                                                                 AON/1.4                           40                          AON/1.4
+
+
+
+   Adamcl:> SEND IPCS GET BCNDAT 
+   Display the value of the IPCS d-task parameter BCNDAT. 
+
+   For non-Dtasks, the values of parameters should be viewed by using 
+   LS or TRACE to look at the relevant SDF file in directory 
+   ADAM_USER. 
+
+
+   OBEY 
+
+   OBEY is used to instruct a d-task to perform some device-dependent 
+   action. 
+   Examples 
+
+   Adamcl:> SEND IPCS OBEY SS 0 
+   Obey IPCS action SS (Sense Status), reading the 0th status set. 
+   Adamcl:> SEND IPCS OBEY OC 0 10 
+   Obey IPCS action OC (Output action), giving arguments 0 and 10. 
+   Pitfalls 
+   Forgetting to define all the d-task variables which are required 
+   by the OBEY. 
+
+   Attempting to OBEY an action which is already active. 
+
+   Performing an OBEY inside a DO loop. ADAMCL does not wait for OBEY 
+   to complete. See the ADAMCL command OBEYW. 
+
+
+   CANCEL 
+
+   CANCEL is used to instruct a d-task to abort a currently-active 
+   OBEY.  The task can only cancel the action if it is in some 
+   reschedule state. An action which is never rescheduled cannot be 
+   cancelled. 
+   Examples 
+
+   Adamcl:> SEND IPCS CANCEL RUN 
+
+   Cancel the IPCS action RUN 
+
+   Pitfalls 
+   Forgetting to define all the d-task variables which are required 
+   by the CANCEL. 
+
+   Attempting to CANCEL an action which is not active. 
+
+   Attempting to CANCEL an action which is never rescheduled. 
+
+                                -***- 
+
+
+SETDEC - set a declination into DEC_INPUT 
+
+
+
+
+                                                                 AON/1.4                           41                          AON/1.4
+
+
+
+SETDEC [declination] 
+Convert DD MM SS.S into a real number and store it in the ADAMCL 
+variable DEC_INPUT. If the value is not given on the command line, 
+prompt for it.  The detailed format of the declination is quite 
+flexible. However, the degrees part must be specified, and the 
+individual DMS sections must be separated by spaces. 
+Adamcl:> SETDEC 30.5          {means 30deg 30min 0sec} 
+Adamcl:> SETDEC 30 30         {means 30deg 30min 0sec} 
+Adamcl:> SETDEC 30 30.5       {means 30deg 30min 30sec} 
+Adamcl:> SETDEC 30 30 30      {means 30deg 30min 30 sec} 
+
+                                -***- 
+
+
+SETLOGICAL - DEFINE/JOB a DCL logical name 
+
+SETLOGICAL dcl_logical_name variable_name/value string 
+This command allows the user to set a DCL JOB logical name to be 
+either the specified string (quoted) or the value of the ADAMCL 
+character (unquoted) variable supplied. 
+
+                                -***- 
+
+
+SETPROMPT - set the ADAMCL prompt to a given string 
+
+SETPROMPT string or variable_name 
+Sets the prompt in ADAMCL to user defined string. The new pormpt can 
+be a string surrounded by double quotes " or in an ADAMCL variable. 
+
+                                -***- 
+
+
+SETRA - set a right-ascension into RA_INPUT 
+
+SETRA [right_ascension] 
+Convert HH MM SS.S into a real number and store it in the ADAMCL 
+variable RA_INPUT. If the value is not given on the command line, 
+prompt for it.  The format rules are similar to those for SETDEC. 
+
+                                -***- 
+
+
+SHOWDICT - list the commands in the dictionary 
+
+The names of all the commands in the dictionary, including internal 
+commands, are listed. 
+
+                                -***- 
+
+
+SHOWTASK - list the known cached/non-cached tasks 
+
+
+
+
+                                                                 AON/1.4                           42                          AON/1.4
+
+
+
+Display the names of all the cached and non-cached tasks currently 
+known to ADAMCL. In the list of cached tasks, the one with the lowest 
+queue number is the first candidate for automatic killing. 
+
+                                -***- 
+
+
+SHOW_TIMER - show VMS timer 
+
+Display the VMS timer. This calls the VMS runtime library routine 
+LIB$SHOW_TIMER. 
+
+                                -***- 
+
+
+SHOWVARS - show currently declared ADAMCL variables 
+
+Show the currently declared ADAMCL global variables and their types. 
+
+                                -***- 
+
+
+SPAWN - spawn a DCL command or command processor 
+
+SPAWN [command] 
+If command is present, a DCL subprocess is spawned, executes the 
+command, and then the subprocess is deleted and control returns to 
+ADAMCL. 
+
+If command is not present, a DCL subprocess is spawned, and any 
+further terminal input goes to it. The command LOGOUT deletes the 
+subprocess and causes a return to ADAMCL. 
+
+                                -***- 
+
+
+STARTOBEY - start an action in a task 
+
+STARTOBEY pathvar messidvar taskname actname parameters 
+pathvar - name of ADAMCL numeric variable 
+messidvar - name of ADAMCL numeric variable 
+taskname - name of task 
+actname - action to be obeyed 
+parameters - command-line parameter values 
+
+STARTOBEY sends a message to the named task telling it to obey the 
+named action. It returns in pathvar and messidvar the numbers which 
+uniquely identify this operation. The ENDOBEY command can be used to 
+wait for completion of the action. This facility allows concurrent 
+control of operations in tasks from an ADAMCL procedure. 
+
+
+
+
+
+
+                                                                 AON/1.4                           43                          AON/1.4
+
+
+
+   EXAMPLE 
+
+   The following procedure overlaps the real-time operation of two 
+   tasks and then waits for them both to complete. 
+
+   PROC PARAL 
+     STARTOBEY PATH1 MESSID1 TCC SLEW 
+     STARTOBEY PATH2 MESSID2 TRACE RUN ADAM_USER:GLOBAL 
+     ENDOBEY PATH2 MESSID2 
+     ENDOBEY PATH1 MESSID1 
+   END PROC 
+
+
+                                -***- 
+
+
+STOP - leave ADAMCL 
+
+ADAMCL stops running. All procedure definitions and variable 
+declarations vanish. However, loaded non-cached tasks remain loaded, 
+and are 'unaffected' except if they try to send a message to the now 
+non-existent ADAMCL. Cached tasks are automatically killed. 
+
+                                -***- 
+
+
+SYNTAX - description of parameter system syntax 
+
+The parameter system syntax controls how command-lines passed to 
+tasks are interpreted, as well as how responses to prompts are 
+interpreted. 
+
+The list of command-line parameters consists of a set of values 
+separated by commas or spaces. The values may optionally be preceded 
+by keywords (eg. DOIT name=value, name=value). 
+
+Each value can be 
+ - a scalar of primitive type 
+ - an array of scalars, maximum seven dimensions 
+ - an HDS name 
+
+The most complex part of the scalar syntax concerns character 
+strings. If the task is expecting a value of type '_CHAR', then the 
+string does not need to be surrounded by quotes unless it is 
+ambiguous, for example, if it contains commas or spaces or starts 
+with '@'. 
+
+An example of a 2-D array of scalars is 
+[[52,93],[94,16]] 
+
+The parameter system allows indirection via HDS to be forced by 
+prefixing the HDS name by '@'. For example, suppose JUNK is a 
+parameter to be declared of type '_CHAR', then 
+
+
+
+                                                                 AON/1.4                           44                          AON/1.4
+
+
+
+Adamcl:> DOIT JUNK=VALUE 
+will cause JUNK to be set to the string 'VALUE'. 
+
+Adamcl:> DOIT JUNK=@VALUE 
+will cause JUNK to take the character string contained in the HDS 
+
+An HDS name has to be sufficient to identify the relevant HDS 
+container file and the level of structure within that container file. 
+For example, JUNK is interpreted as the top-level object within the 
+file JUNK.SDF in the current directory. [BDK]JUNK.VALUE means the 
+object VALUE below the top-level object in the file [BDK]JUNK.SDF on 
+the current disk. 
+
+Note that '.' is used as the separator for levels in HDS structures. 
+This means that a more complex syntax has to be used if the container 
+file is of type other than '.SDF'. This is achieved by surrounding 
+the container file name by double quotes. 
+"DISK$USER1:[BDK.DATA]JUNK.DAT"JUNK.DATA 
+
+Elements of data structure arrays are specified by JUNK(3,5).DATA, 
+for example. Slices of data arrays can be specified - eg 
+JUNK(3,5).DATA.DATA_ARRAY(97:152,60:103) 
+is a 2-D subarea of a 2-D array. structure VALUE. 
+
+                                -***- 
+
+
+TASKPRE - switch taskname display on/off 
+
+TASKPRE sets whether ADAMCL prefixes output and prompts from tasks by 
+the task name. 
+
+TASKPRE ON switches prefixing on. The ON is optional. 
+
+TASKPRE OFF switches prefixing off. The default is OFF 
+
+                                -***- 
+
+
+TASKS - Help information about ADAMCL task handling 
+
+ADAM tasks can be loaded into subprocesses by using the ADAMCL 
+commands LOAD or LOADW, or into detached processes by LOADD. Once a 
+task is loaded, it remains loaded until removed by the ADAMCL command 
+KILL. Such a task is termed 'non-cached'. ADAMCL can also arrange for 
+tasks to be loaded and killed automatically. This occurs if an 
+attempt is made to communicate with a task which is not already 
+loaded. A task which has been loaded automatically is termed 
+'cached'. ADAMCL kills cached tasks when necessary. 
+
+When a task has been loaded, if it is a D-task (ie responsible for 
+the low-level driving of some instrument) it performs some 
+initialization of its associated hardware and then waits for 
+
+
+
+                                                                 AON/1.4                           45                          AON/1.4
+
+
+
+instructions. An A-task (ie data analysis task) behaves the same, but 
+has no initialization to carry out. 
+
+The instructions to tasks have to be sent through the ADAM intertask 
+communication system, also known as the Message System. The tasks can 
+reply through the message system, either simply acknowledging 
+messages or returning information. 
+
+ADAMCL can send instructions to a number of tasks without waiting for 
+one to complete its operation prior to sending instructions to the 
+next one. This means that the running of tasks can be overlapped in 
+real-time. 
+
+Tasks typically have 'program parameters' which are values the task 
+needs in order to run. By convention, D-tasks always insist on having 
+values for their parameters before they start carrying out an 
+operation. Other ADAM tasks, however, are allowed to prompt for the 
+values of their parameters. They do this by sending a message to 
+ADAMCL containing the prompting information. ADAMCL displays the 
+prompt, and returns the typed-in value to the task. The prompt string 
+contains a default value if there is one. Possible replies to a 
+prompt are 
+
+a value - this can be one or more numbers or quoted strings separated 
+by commas or spaces, or a single HDS structure name. 
+
+a <CR> - this causes the default to be taken as the value. If there 
+is no default, the prompt is repeated. 
+
+a ! - this returns a 'null value' to the task. 
+
+a !! - this returns an 'abort' to the task. 
+
+a ? - this causes the one-line help to be displayed. 
+
+                                -***- 
+
+
+TESTER - test routine 
+
+TESTER name number 
+Read the value of the named ADAMCL variable from the variable store 
+the indicated number of times, and report the cpu time taken.  This 
+is purely a development tool. 
+
+                                -***- 
+
+
+TOCHAR - convert a number and store in a character variable 
+
+TOCHAR real_variable/value character_variable 
+This routine allows the user to convert a real number to a character 
+string. The real number can be input directly as the first argument 
+
+
+
+                                                                 AON/1.4                           46                          AON/1.4
+
+
+
+of the call to TOCHAR or can be in the form of an ADAMCL real 
+variable. The second argument to the call to TOCHAR is a pre-defined 
+character variable to receive the character representation of the 
+real number. 
+
+
+   EXAMPLE 
+
+   The input line to TOCHAR can be either :  TOCHAR 5 STRING  where 
+   STRING has been declared CHAR n earlier, or  TOCHAR NUM STRING 
+   where both NUM, a real variable, and STRING must have been 
+   declared earlier. 
+
+                                -***- 
+
+
+VARIABLES - Help information on ADAMCL variables 
+
+Variables can be declared in ADAMCL. A variable has a name, type, 
+scope and dimensions. A variable is declared by using the command 
+
+DECLARE name [global or local] [char n] [array n] 
+
+Variable names 
+
+A variable name consists of up to 15 characters. The first character 
+of the name must be alphabetic or underscore. The remaining 
+characters must be alphanumeric or underscore. 
+
+Scope of variables - GLOBAL and LOCAL 
+
+Local variables only exist within the procedure where they are 
+declared. Global variables are accessible to all procedures, and also 
+accessible to any commands which are typed at the terminal. The 
+default is GLOBAL. 
+
+Variable types 
+
+ADAMCL knows only two types of variable, numbers and character 
+strings. If a variable is not explicitly declared as CHAR, then it is 
+a number. All numbers are real (floating point). The length of a 
+character variable has to be declared. 
+
+Arrays 
+
+By default, ADAMCL variables are scalars. For arrays, only 1-D is 
+allowed. The maximum number of elements in an array is limited by the 
+total storage available for ADAMCL variables (eg 32K). 
+
+Using variables 
+
+Variables can be given values using an equals sign. 
+DECLARE JUNK CHAR 20 
+
+
+
+                                                                 AON/1.4                           47                          AON/1.4
+
+
+
+JUNK = "HI THERE" 
+DECLARE JUNKR 
+JUNKR = 42 
+DECLARE JUNKARR ARRAY 10 
+JUNKARR(1) = 23.5 
+Variables can be typed-out using the PRINT command. 
+PRINT JUNK 
+The values of variables can be passed to tasks (ie programs). Suppose 
+that a task called ADDUP has been loaded. 
+LOADW ADDUP 
+DEFINE ADDUP ADDUP 
+ADDUP JUNK JUNKR 
+will send a command to ADDUP telling it to RUN, and providing the 
+values of JUNK and JUNKR as two command-line parameters. 
+
+String operations 
+
+Strings can be assigned to a variable. They can also be compared and 
+concatenated using the commands COMPARE and CONCAT. The variables are 
+evaluated by the PRINT command and by SEND, LOAD, LOADW, LOADD, KILL, 
+GET and OBEYW. 
+
+Numeric operations 
+
+There are the usual operators +,-,*,/,**. There are also a set of 
+numeric functions. (see FUNCTIONS). 
+
+                                -***- 
+
+
+VAX - Help information about access to VAX DCL commands 
+
+VAX DCL commands can be issued from ADAMCL in two ways, by using 
+SPAWN or by prefixing the command with $. 
+
+SPAWN 
+
+spawns a subprocess and attaches the terminal to it. DCL commands can 
+then be typed-in. LOGOUT causes the subprocess to be deleted and 
+control returns to ADAMCL. 
+
+SPAWN command 
+
+causes a subprocess to be spawned and the given command to be 
+executed. When DCL finishes executing the command, the subprocess is 
+deleted and control returns to ADAMCL. 
+
+$command 
+
+Any command with a $ as its first character is passed to the DCL 
+subprocess. The subprocess is created automatically on the first $ 
+command and remains in existence until ADAMCL exits. This provides a 
+fast access to DCL commands from ADAMCL as the subprocess does not 
+
+
+
+                                                                 AON/1.4                           48                          AON/1.4
+
+
+
+have to be created for each individual command. However, this is done 
+at the cost of having the subprocess 'permanently' there. 
+
+                                -***- 
+
+
+VAXBATCH - Help information about running ADAMCL in batch 
+
+It is possible to run ADAMCL in a VMS batch queue rather than 
+interactively. The basic technique to do this involves creating a DCL 
+command file which defines USER_GOD to be an ADAMCL batch file which 
+directs the ADAMCL input to be the DCL file. The rest of the DCL file 
+then consists of the instruction to run ADAMCL followed by the 
+relevant ADAMCL commands. 
+
+
+   EXAMPLE 
+
+   The following, if put into a DCL command file and submitted to 
+   batch will cause TRACE to run. 
+
+   $! BATCHCL - test for running ADAMCL in VMS BATCH 
+   $! 
+   $! 15.09.1986:  Original (REVAD::BDK) 
+   $!    USAGE:-   This shows an example of a DCL command file which, 
+   $!              submitted to BATCH runs ADAMCL and causes it to 
+   $!              execute commands. 
+   $! 
+   $!- 
+   $! 
+   $!  set up ADAM names 
+   $! 
+   $ ADAMSTART 
+   $ ADAMDEV 
+   $! 
+   $!  provide ADAMCL with a startup file which will switch the 
+   $!  ADAMCL input to SYS$INPUT, and exit when end-of-file is 
+   $!  reached on SYS$INPUT. 
+   $! 
+   $ DEFINE USER_GOD ADAM_DIR:BATCH.PRC 
+   $! 
+   $!  Now run ADAMCL, giving it a set of commands. 
+   $!  The output generated will be written to the batch job's .LOG 
+   $!  file. Hitting the end of this file will cause ADAMCL to revert 
+   $!  to taking input from ADAM_TEST:BATCH.PRC, where it will find 
+   $!  the EXIT command and terminate. 
+   $! 
+   $ ADAMCL 
+   PRINT "BATCH STARTED" 
+   DEFINE TRACE TRACE 
+   TRACE ADAM_USER:GLOBAL 
+   PRINT "BATCH ENDING" 
+
+
+
+
+                                                                 AON/1.4                           49                          AON/1.4
+
+
+
+
+                                -***- 
+
+
+WAIT - wait for n seconds 
+
+WAIT variable_name 
+The variable (or value) indicated the length of time (in seconds) 
+that ADAMCL waits before continuing 
+
+                                -***- 
+
+
+WAITCR - wait until <CR> is typed 
+
+WAITCR 
+ADAMCL command to wait until a carriage return (CR) is entered by the 
+user. If the user enters anything other that a CR WAITCR will 
+disregard it until 5 such inputs have been made, then it will 
+continue. 
+
+                                -***- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 

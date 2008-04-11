@@ -1,0 +1,241 @@
+                                                                 
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      AON/7.1
+ROYAL OBSERVATORY EDINBURGH 
+and UNIVERSITY OF EDINBURGH 
+
+ADAM Project                                                Issued by
+ADAM Observer Note 7.1 
+
+                                                        K. Krisciunas
+                                                           25.06.1986
+
+---------------------------------------------------------------------
+
+                     Using the LOGBOOK facility                      __________________________ 
+
+
+
+
+
+
+
+1. INTRODUCTION 
+
+
+LOGBOOK is a program  which  analyses  the  contents  of  data  files
+generated during observing runs at UKIRT using ADAM. 
+
+
+
+2. Using LOGBOOK 
+
+
+At the end of a night's observing one can obtain a logbook listing of
+the observations made by typing: 
+
+Adamcl:> BATCH LOG      ("Adamcl:>" is your prompt. You type "BATCH LOG") 
+
+Then you type "LOG", specify the name of the file containing the data
+(e.g.,  "AD:JUN25",  remembering to specify the place "AD:" where the
+data file exists), and then you specify  the  desired  output.  Three
+types of logbook output can be produced: 
+
+     1) Option 10 in LOGBOOK:         Verbose logbook  output,  which
+could conceiveably run to 
+      1000 blocks for one night's data, so beware of 100 page 
+      listings.  The verbose listings are made according to the 
+      Y/N switches set via options 2 through 7, giving: 
+        Header (RA, DEC, UT, object name, filter, aperture, etc.) 
+        Sampling information 
+        All coadded spectra 
+        All spectral scans 
+        Ratioed spectra (for files generated before 2-Jun-1986) 
+        All right-minus left values for photometry 
+        All fluxes for map points 
+
+
+
+                                                                 AON/7.1                           2                           AON/7.1
+
+
+
+        (IF data were saved at the telescope in NON-BRIEF archiving 
+        mode, it would be possible to give right+left photometry 
+        values for investigating baseline drifts.  At present 
+        this option is not available.) 
+
+     2)  Option  15:          Brief  summary,  with  one   line   per
+observation set.  This 
+      gives the object name, mean UT, observation type (PHOT, MAP, 
+      FP, CVF, etc.), , chop type (SKY, DC, FP), right ascension, 
+      declination, aperture, filter (or wavelength of CVF blocking 
+      filter), and # of sky positions (for mapping). 
+
+     3) Option 20:         Brief photometry summary with one line per
+observation set 
+      times number of channels (e.g. 2 for 2-Banger).  This gives 
+      the object name (first 14 characters), aperture, value of 
+      NSIDES (1 or 2), the feedback resistor value (for UKT 9 and 6),
+      the mean UT, the air mass, total integration time 
+      in seconds, raw mean count, error in mean count, 
+      raw magnitude, error in raw magnitude, and preliminary 
+      standardized magnitude.  If the raw mean count is negative, 
+      the magnitude columns are left blank. 
+
+      Both types of brief listings have a header at the top giving 
+      the date, list of observers, and the instrument name. 
+      If one had changed instruments in the middle of the night, 
+      the name of the new instrument is put on the listing. 
+
+     To get at the LOGBOOK facility from scratch, log on as  ADAMUSER
+then, given the VMS prompt ("$") you would have the following: 
+
+$ SET DEF [.INST]       (This gets you to [ADAMUSER.INST]) 
+$ ADAMDEV               (Set up for Adam development) 
+$ ADAMCL                (Gets you to Adam level) Adamcl:>  BATCH  LOG
+                        Adamcl:> LOG 
+
+Then specify your options as in the above.  Whether or  not  you  ask
+for a hardcopy printout on the nearest printer, the program creates a
+file called "LOGBOOK.LOG" at directory [ADAMUSER.INST].  You may wish
+to  rename  it (i.e., JUN25.LOG or JUN25_SOMETHING.LOG).  In any case
+you may then get out of ADAMCL ("QUIT") and edit  or  print  out  the
+logbook file.  There may be multiple versions (";<n>") of LOGBOOK.LOG
+on the [ADAMUSER.INST] directory.  Yours would be the most recent one
+(the one with the highest version number). 
+
+     If you have the UKIRT list  of  photometric  standards  you  can
+calculate  the photometric offset for a particular observation set as
+follows: 
+
+offset = -1 * [ raw  magnitude  -  (air  mass  *  extinction)  -  std
+magnitude ] 
+
+
+
+
+
+                                                                 AON/7.1                           3                           AON/7.1
+
+
+
+The nominal extinction values are J = 0.13, H = 0.07, and  K  =  0.10
+mag/air  mass.   You  also  need  to  know if observing was done with
+NSIDES = 2 or 1, and which feedback resistor was being used. This can
+usually  be  determined  from  the first pass at the offset.  Nominal
+offsets for the 12.4 arcsec aperture on UKT9  are  J  =  14.66,  H  =
+13.97, and K = 13.85.  Those are calculated for NSIDES = 2 and the Hi
+feedback resistor.  The factor of 2 difference  if  doing  single  or
+double sided photometry corresponds to 0.753 mag. 
+
+
+     An example of the Option 15 and Option 20 output of  LOGBOOK  is
+given below: 
+
+     25-Jun-1986                 Observers      =       GSW       DMW
+Inst = UKT9         Brief logbook summary: 
+
+ Obs  Object name               <UT>       Obs  type       Chop  type
+RA            DEC        Aper    Filter   # sky posns 
+
+   1    HD129653                   4:59:14.4     PHOT             SKY
+14:40:38.2       36:58:16.1       7.8          K       2     HD129653
+5: 0:31.5  PHOT          SKY                14:40:38.2     36:58:16.4
+7.8         K      3    HD129653                  5:   2:14.5    PHOT
+SKY                14:40:38.2     36:58:16.4     7.8         K      4
+HD129653                     5:     6:34.7      PHOT              SKY
+14:40:38.3       36:58:16.4       7.8          K       5     HD129653
+5:  7:28.3   PHOT          SKY               14:40:38.2    36:58:16.4
+7.8       K 
+
+   6    BS5447                     5:41:36.5     CVF              SKY
+14:32:30.7       29:57:45.6       12.4       1.2994       7    BS5447
+5:49:58.8  CVF           SKY                14:32:30.8     29:57:45.6
+12.4       1.2994      8    N6210                     6:18:32.5    FP
+SKY               16:42:24.5     23:53:23.3     12.4     2.1660     9
+N6210                         6:21:48.0        FP                 SKY
+16:42:24.5       23:53:23.6       12.4       2.1660      10     N6210
+6:28:24.5   FP             SKY               16:42:24.4    23:53:23.6
+12.4    2.1660 
+
+  11    N6210                      6:38:18.7     CVF              SKY
+16:42:24.5       23:53:23.6       12.4       2.1299      12     N6210
+6:45:24.7  FP            SKY                16:42:24.5     23:53:23.9
+12.4      2.1680     13    N6210                     7:   3:16.7   FP
+SKY               16:42:24.2     23:53:31.4     12.4     2.1680    14
+N6210                         7:31:18.5        FP                 SKY
+16:42:24.1       23:53:30.1       No_d       2.1680      15     N6210
+7:37:  7.8   FP            SKY               16:42:24.1    23:53:29.8
+19.6    2.1680 
+
+  16     N6210                      7:46:26.5     FP               DC
+18:17:34.6      -16:13:23.8       19.6       2.1680      17     N6210
+7:52:46.1  FP            DC                 18:17:34.6    -16:13:23.8
+19.6       2.1680     18    M17                       8:24:17.2    FP
+
+
+
+                                                                 AON/7.1                           4                           AON/7.1
+
+
+
+DC                18:17:34.5    -16:13:25.3     19.6     2.1680    19
+M17                           8:28:57.3        FP                  DC
+18:17:34.5    -16:13:25.3     19.6     2.1680    20   M17   600W   0N
+8:32:  5.8   FP            DC                18:16:52.9   -16:13:22.8
+19.6    2.1680 
+
+  21     M17                        9:46:45.7     MAP              FP
+18:17:34.5    -16:13:24.1     19.6     2.1684       1012    22  M17NW
+12: 7: 0.5  MAP           FP                18:17:34.2    -16:13:13.0
+19.6    2.1684      1009   23  M17SWSW                13:28: 4.8  MAP
+FP                  18:17:34.2     -16:13:12.0      19.6       2.1684
+269     24    NGC7027                  13:48:15.5   PHOT           FP
+21:  5:  9.0     42:   2:52.8      19.6      2.1684     25    NGC7027
+13:53:35.4   FP            DC                21: 5: 9.0    42: 2:52.8
+19.6    2.1218 
+
+  26     SKY                       13:56:20.0     FP               DC
+21:    5:13.2      42:   2:52.7      19.6      2.1218     27    N7027
+14: 2:59.6  PHOT          FP                21: 5: 9.1    42:  2:52.8
+19.6      2.1221     28    DUMBBELL                 14:54:  8.6   MAP
+FP                  19:57:24.0      22:34:11.5      7.8        2.1221
+180 
+
+
+     25-Jun-1986                 Observers      =       GSW       DMW
+Inst = UKT9         Brief photometry summary: 
+
+ Obs  Object name    Aper  Filter NS FB    <UT>      Airmass   Integr
+Count         Error      Raw mag    Error  Reduced mag 
+
+   1  HD129653       7.8     K     1 HI   4:59:14.4   1.1548    11.44
+242.43         3.5289        -5.961     0.016    2.008    2  HD129653
+7.8      K      1  LO    5:  0:31.5     1.1517      11.44      3.3568
+0.26149E-01   -1.315    0.008    6.655    3  HD129653       7.8     K
+1  LO    5:  2:14.5     1.1487      11.44      2.9873         0.11228
+-1.188    0.040    7.047    4  HD129653       7.8     K     1 LO   5:
+6:34.7    1.1399     11.44      3.2872         0.12683E-01     -1.292
+0.004     6.679     5   HD129653       7.8     K     1 LO   5: 7:28.3
+1.1380     11.44     3.1339         0.76598E-01     -1.240      0.026
+6.972 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 

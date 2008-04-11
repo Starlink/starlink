@@ -1,0 +1,421 @@
+                                                                 
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      AED/4.3
+ROYAL OBSERVATORY EDINBURGH 
+and UNIVERSITY OF EDINBURGH 
+
+ADAM Project                                                Issued by
+ADAM Environment Description 4.3 
+
+                                                J.A.Cooke & B.D.Kelly
+                                                           04.03.1986
+
+---------------------------------------------------------------------
+
+                     Adam Help System Interface                      __________________________ 
+
+
+
+
+
+
+
+1. Introduction 
+
+
+This document describes the subroutine calls which interface into the
+ADAM  help  system.   The implementation is not quite complete but is
+now usable;  these calls should not change. 
+
+
+
+
+2. Getting help out of the system 
+
+
+In a user interface, the help system calls need to be used to get the
+help  information in the form of character strings.  It is the job of
+the user interface to format these strings as  required.   There  are
+three  subroutines to get information out of the system, although one
+additional subroutine is provided to split  the  help  text  up  into
+lines  of  a given width.  Two additional subroutines are provided to
+aid practical use of the help system. It is also necessary  to  start
+up  and  shut down the help system cleanly;  there are two subroutine
+calls to do this. Finally, there is a subroutine to enable  switching
+between help files. 
+
+The help information is obtained from  an  HDS  container  file  (see
+AED/5  for details of how to generate this). It has default file type
+'.AHF' (Adam Help File) and is assumed to  lie  on  the  search  path
+defined by the logical name ADAM_HELP. 
+
+
+
+
+
+
+
+
+                                                                 AED/4.3                           2                           AED/4.3
+
+
+
+
+
+2.1 Starting up and shutting down     _____________________________ 
+
+HELPSYS uses  HDS  for  storing  its  information.  This  means  that
+HDS_START  must  have  been  called at some time prior to any HELPSYS
+calls. HDS_STOP should be called at sometime after HELPSYS  has  been
+used.  Writers  of  user interfaces must handle this. However, if the
+HELPSYS is being called from  within  an  ADAM  task,  HDS_START  and
+HDS_STOP   must   NOT  be  called,  as  the  ADAM  system  does  this
+automatically. 
+
+The two subroutines for starting up and shutting down the system are:
+
+    helpsys_startup - start up the ADAM help system 
+
+    Description : 
+     Start up the ADAM help system, initialising any global variables 
+     needed. Open the initial helpfile. 
+    Invocation : 
+     call helpsys_startup ( helpfile, status ) 
+    Parameters : 
+     helpfile = character*(*) (READ) 
+          The name of the initial help file. This is searched for 
+          following the search-path of directories specified by the 
+          logical name ADAM_HELP. It has a default file type of .AHF. 
+     status = integer (UPDATE) 
+          Global status, if this has an error value on entry then an 
+          immediate return will occur. If an error occurs during the 
+          execution of this routine then STATUS will be returned 
+          containing the appropriate error value. 
+
+
+    helpsys_shutdown - shut down the ADAM help system 
+
+    Description : 
+     Shut down the ADAM help system. Close the current helpfile. 
+    Invocation : 
+     call helpsys_shutdown ( status ) 
+    Parameters : 
+     status = integer (UPDATE) 
+          Global status, if this has an error value on entry then an 
+          immediate return will occur. If an error occurs during the 
+          execution of this routine then STATUS will be returned 
+          containing the appropriate error value. 
+
+
+
+
+2.2 Selecting the help file     _______________________ 
+
+The current help  file  can  be  changed  by  calling  the  following
+routine. 
+
+
+
+                                                                 AED/4.3                           3                           AED/4.3
+
+
+
+    helpsys_setfile - change the current ADAM help file 
+
+    Description : 
+     Check the requested helpfile exists. If it does, close the 
+     current helpfile and open the new one. 
+    Invocation : 
+     call helpsys_setfile ( helpfile, status ) 
+    Parameters : 
+     helpfile = character*(*) (READ) 
+          The name of the new help file. This is searched for 
+          following the search-path of directories specified by the 
+          logical name ADAM_HELP. It has a default file type of .AHF. 
+     status = integer (UPDATE) 
+          Global status, if this has an error value on entry then an 
+          immediate return will occur. If an error occurs during the 
+          execution of this routine then STATUS will be returned 
+          containing the appropriate error value. 
+
+
+
+
+2.3 Getting the help information     ____________________________ 
+
+The help information is obtained using three subroutines.  These are:
+
+    helpsys_briefget - get brief help information 
+
+    Description : 
+     The brief help information available on the topic with name 
+     "publicname" is returned in "helpline".  The number of valid 
+     characters is given in "numchars". 
+    Invocation : 
+     call helpsys_briefget ( publicname, numchars, helpline, status ) 
+    Parameters : 
+     publicname = character*(*) (READ) 
+          Public name for the topic. 
+     numchars = integer (WRITE) 
+          Number of valid characters returned. 
+     helpline = character*(*) (WRITE) 
+          String containing brief help information. 
+     status = integer (UPDATE) 
+          Global status, if this has an error value on entry then an 
+          immediate return will occur. If an error occurs during the 
+          execution of this routine then STATUS will be returned 
+          containing the appropriate error value. 
+
+          The status "HELPSYS__NOHELP" means that there is no brief 
+          help information held on that topic, or that there is no 
+          entry for that topic. 
+
+
+    helpsys_fullget - get full help information 
+
+
+
+
+                                                                 AED/4.3                           4                           AED/4.3
+
+
+
+    Description : 
+     The full help information available on the topic with name 
+     "publicname" is returned in "helptext".  The number of valid 
+     characters is given in "numchars". 
+    Invocation : 
+     call helpsys_fullget ( publicname, numchars, helptext, status ) 
+    Parameters : 
+     publicname = character*(*) (READ) 
+          Public name for the topic. 
+     numchars = integer (WRITE) 
+          Number of valid characters returned. 
+     helptext = character*(*) (WRITE) 
+          String containing the full help information. 
+     status = integer (UPDATE) 
+          Global status, if this has an error value on entry then an 
+          immediate return will occur. If an error occurs during the 
+          execution of this routine then STATUS will be returned 
+          containing the appropriate error value. 
+
+          The status "HELPSYS__NOHELP" means that there is no full 
+          help information, or there is no entry for that topic. 
+
+
+    helpsys_subtget - get subtopic help information 
+
+    Description : 
+     The subtopic information available on the subtopic with name 
+     "subtopicname" held under the topic with name "publicname" is 
+     returned in "helptext".  The number of valid characters is given 
+     in "numchars". 
+    Invocation : 
+     call helpsys_subtget ( publicname, subtopicname, numchars, 
+    :                       helptext, status ) 
+    Parameters : 
+     publicname = character*(*) (READ) 
+           The public name for the topic. 
+     subtopicname = character*(*) (READ) 
+           The associated subtopic name. 
+     numchars = integer (WRITE) 
+           Number of valid characters in the subtopic help 
+           information. 
+     helptext = character*(*) (WRITE) 
+           The subtopic help information. 
+     status = integer (UPDATE) 
+           Global status, if this has an error value on entry then an 
+           immediate return will occur. If an error occurs during the 
+           execution of this routine then STATUS will be returned 
+           containing the appropriate error value. 
+
+           The status "HELPSYS__NOHELP" means that there is no help 
+           information on the subtopic specified, or there is no 
+           entry for that topic. 
+
+
+
+
+                                                                 AED/4.3                           5                           AED/4.3
+
+
+
+
+
+
+2.4 Additional routines     ___________________ 
+
+These allow the user to get a list of available help topics,  a  list
+of  available  help subtopics for a given topic, and to split full or
+subtopic help information up into lines of a given length. 
+
+    helpsys_topics - get list of available help topics 
+
+    Description : 
+     Gives a list of the available help topics in the top level of 
+          help structure.  The number of topics and their names 
+          (if any) are returned in "numtopics" and "topicnames". 
+    Invocation : 
+     call helpsys_topics ( numtopics, topicnames, status ) 
+    Parameters : 
+     numtopics = integer (UPDATE) 
+           entry:  Dimension of 'topicnames' array. 
+           exit:   Number of help topics stored. 
+     topicnames (numtopics) = character*(*) (WRITE) 
+           Array of topic names held in the help structure. 
+     status = integer (UPDATE) 
+           Global status, if this has an error value on entry then an 
+           immediate return will occur. If an error occurs during the 
+           execution of this routine then STATUS will be returned 
+           containing the appropriate error value. 
+    Deficiencies : 
+     At present the names are not sorted alphanumerically. 
+
+
+    helpsys_subtopics - get list of available help subtopics 
+
+    Description : 
+     The number of subtopics (if any) and their names for the help 
+     topic name "publicname" are returned in "numsubtopics" and 
+     "subtopicnames". 
+    Invocation : 
+     call helpsys_subtopics ( publicname, numsubtopics, 
+    :                         subtopicnames, status ) 
+    Parameters : 
+     publicname = character*(*) (READ) 
+           Public name for the main topic. 
+     numsubtopics = integer (UPDATE) 
+           entry:  Dimension of 'subtopicnames' array. 
+           exit:   Number of help subtopics stored. 
+     subtopicnames (numsubtopics) = character*(*) (WRITE) 
+           Array of topic names held in the help structure. 
+     status = integer (UPDATE) 
+           Global status, if this has an error value on entry then an 
+           immediate return will occur. If an error occurs during the 
+           execution of this routine then STATUS will be returned 
+
+
+
+                                                                 AED/4.3                           6                           AED/4.3
+
+
+
+           containing the appropriate error value. 
+
+           The status "HELPSYS__NOHELP" means that there is no 
+           subtopic help information, or no entry for this topic. 
+    Deficiencies : 
+     The subtopic names are not yet sorted alphanumerically. 
+
+
+    helpsys_fullsplit - split full help text into lines 
+
+    Description : 
+     Splits up the "helptext" into lines of maximum length "maxlen" 
+     without splitting words.  The lines are put into array elements 
+     of "outarray". 
+    Invocation : 
+     call helpsys_fullsplit ( helptext, numchars, maxlen, 
+    :                  maxlines, outarray, numlines, status ) 
+    Parameters : 
+     helptext = character*(*) (READ) 
+           A string of words (help information).  Tabular information 
+           may be escaped by the sequence 
+              <escape character> <text and spaces> <escape character> 
+           This is passed as a whole to the output string, as a new 
+           line.  The escape character is defined in "helpsys_par". 
+     numchars = integer (READ) 
+           Number of valid characters in "helptext". 
+     maxlen = integer (READ) 
+           Maximum length of a line of output text put into 
+           "outarray" (Usually the size of the "outarray" elements). 
+     maxlines = integer (READ) 
+           Maximum number of lines to be returned.  (Usually the size 
+           of the output array "outarray"). 
+     outarray = character*(*) array (WRITE) 
+           The output array, with one line per array element, and 
+           escape characters removed. 
+     numlines = integer (WRITE) 
+           Number of valid lines returned in "outarray". 
+     status = integer (UPDATE) 
+           Global status, if this has an error value on entry then an 
+           immediate return will occur. If an error occurs during the 
+           execution of this routine then STATUS will be returned 
+           containing the appropriate error value. 
+
+
+
+
+
+3. Status Information 
+
+
+The help system status returns may be signalled in the usual  manner;
+the    object    module    containing    the    VMS    messages    is
+"helpsys_dir:helpmsg.obj".  The status values are also available as a
+
+
+
+                                                                 AED/4.3                           7                           AED/4.3
+
+
+
+FORTRAN include file in "helpsys_dir:helpmsg.for". 
+
+
+
+
+4. Name Translation 
+
+
+A feature of the ADAM help system is  that  a  translation  from  the
+internal names of entries in the help file to "public names" is made.
+Currently this feature is not implented, but when  it  has  been  the
+effects  are  invisble  as  far  as  the  interface  subroutines  are
+concerned.  The only difference is that a mechanism will be needed to
+indicate the translation table to be used, if any. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 

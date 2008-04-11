@@ -1,0 +1,1710 @@
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                       AON/4.8
+ROYAL OBSERVATORY EDINBURGH
+and UNIVERSITY OF EDINBURGH
+
+ADAM Project                                                 Issued by
+ADAM Observer Note 4.8
+
+                                                             J A Cooke
+                                                       25 January 1989
+
+----------------------------------------------------------------------
+
+               Using the ADAM Screen Management System
+               ---------------------------------------
+
+
+
+The Screen Management System (SMS) is a user interface for ADAM.  This
+document describes SMS in outline, how to use it, and how to write the
+control tables which configure it.
+
+Intended  readership:   observers;  programmers  writing  SMS  control
+tables
+
+This document has been revised for SMS version 1.2.
+
+
+
+Contents                                                   page
+
+   Recent enhancements                                       2
+
+1. Introduction                                              3
+
+2. An outline of SMS                                         3
+
+3. How to use SMS                                            5
+
+4. How to write control tables for SMS                       9
+
+5. Stand-alone table compiler                               11
+
+6. Features of the system which may change                  11
+
+Appendices
+
+A: Specification of the control table entry types           12
+
+B: An example control table                                 27
+
+
+
+
+                                - 1 -
+AON/4.8                                                         Page 2
+
+
+
+
+RECENT ENHANCEMENTS
+
+
+Enhancements to SMS made in 1988 to date are:
+
+ o  The CLI prompt is now configurable using "cli_prompt"
+
+ o  Prompts and "information" output are now logged
+
+ o  The stand-alone table compiler now produces formatted
+    printouts of menus and parameter lists which provide
+    hardcopy for previews or documentation.
+
+ o  Inline editing of parameter list items has been added
+
+ o  An "expert user" facility has been added
+
+ o  SMS may now be configured to provide one-line help
+    automatically as the cursor is moved around menu items
+    or parameter list entries
+
+ o  Bugs in the routine which handles SMS parameter 
+    substitution causing integer overflow errors have been 
+    fixed; errors in parameter substitution are now reported.
+
+ o  The internal mechanism for SMS system configuration 
+    changes made using the keypad "COMMA" key facility has
+    been changed.  To make use of this facility, new 
+    "+config+" entries are needed in the system part of the
+    control table.  See the example in Appendix B.
+
+ o  Equivalences have been set up for those using SMS on a
+    VT220 terminal as follows (by JHF@JACH):
+
+             VT100 key          VT220 key
+
+             ENTER              NEXT_SCREEN 
+             PF1                DO
+             PF2                INSERT_HERE
+             PF3                FIND
+             PF4                PREV_SCREEN
+             keypad "." key     SELECT 
+             "?" key            HELP 
+             "ctrl-U"           REMOVE 
+
+ o  Help entries can include the help file name (by JHF@JACH).
+
+ o  Continuation lines can be used within action entries.
+
+ o  A file "include" facility has been added.
+
+                                - 2 -
+AON/4.8                                                         Page 3
+
+
+1  INTRODUCTION
+
+SMS is a part of the ADAM system.  It is one of the user interfaces on
+the  system,  and  is intended to be a general purpose user interface.
+It is general purpose because the same program (SMS) can be configured
+to  give different views of the ADAM system to the user at a terminal.
+For example, there could be  an  SMS  configuration  set  up  for  one
+particular  instrument.   Note  that  SMS  was originally designed for
+VT100 or VT100 compatible terminals, but is now implemented on top  of
+the DEC screen management facility.
+
+SMS can be used for instrument  control,  data  acquisition  and  data
+analysis.   In the ADAM system these functions are accomplished in the
+command language (e.g.  ADAMCL) by issuing commands.  SMS can be  used
+to  package  these  commands  in more complex ways than is possible in
+command language procedures, so that,  for  example,  by  selecting  a
+single  menu  item  from several displayed on the screen, a particular
+set of command language commands would be issued.
+
+
+
+2  AN OUTLINE OF SMS
+
+SMS provides a menu-driven control system  which  has  a  user-defined
+structure;  it  can  be  set  up  to  be  hierarchical but this is not
+essential.  The structure is  defined  in  a  "control  table".   Menu
+entries may select other menus, or parameter lists, or actions.  Menus
+and parameter lists are "pasted" on the terminal screen, with the most
+recently  used  item  on  top.   The  layout  is determined by the SMS
+control table, so these may or may not overlap.
+
+SMS is mostly single keystroke driven; for example, the arrow keys  to
+move  the  cursor,  or the keypad keys for a whole range of functions.
+Note in particular the use of the "PF" keys of the VT100 terminal; the
+current function of these keys is always shown in status fields at the
+bottom of the screen (in the default control table).
+
+The user can be prompted for information  as  a  result  of  some  SMS
+operations  or  in response to requests from tasks.  During prompting,
+the "current position" of the cursor  on  a  menu  or  parameter  list
+display is marked by a reversed video block.  This enables the user to
+see where he has got to in the menu or parameter list.
+
+
+
+2.1  Definitions
+
+A "menu" is simply a list of items which are displayed on  the  screen
+in  any  rectangular  format, with or without a box drawn around them.
+The screen cursor points at menu items; by using the "arrow"  keys  on
+the  terminal  the  cursor  can be made to jump around the menu items.
+Pressing the "ENTER" key selects a menu item; pressing the  "PF1"  key
+
+                                - 3 -
+AON/4.8                                                         Page 4
+
+
+escapes from the menu.
+
+A "parameter list" has one or more parameter entries whose values  may
+be  set  either to one of a set of predefined constants or to a single
+typed value as required.
+
+An "action" can be one or many command language commands;  the  actual
+commands are defined in the SMS control table being used.  Values from
+parameter list entries may be  substituted  in  the  command  language
+commands before they are executed.
+
+Both menus and parameter lists can have actions set up which  will  be
+executed  on  entry  or  on  exit,  so  that,  for  example, after SMS
+parameters have been set  up  in  a  parameter  list  the  appropriate
+command  language  commands  can be executed to change the state of an
+instrument according to the parameter values  selected.   On  pressing
+"PF1" to exit, these actions are executed; on pressing "PF4", the menu
+or parameter list is left but the actions are not executed.
+
+
+
+2.2  Macros
+
+SMS is a macro system; in fact, a "keystroke" macro system,  something
+like  a  programmable calculator.  At any time the system can be asked
+to "learn" a macro as a set of keystrokes;  this  macro  can  then  be
+assigned  to  one  of  the keypad numeric keys.  The macro can then be
+"called" at any time by pressing the  appropriate  keypad  key.   This
+allows,  for  example,  a  particular place in the SMS menu tree to be
+"remembered" as a macro keystroke, and subsequently returned to at any
+time  by  pressing  the  correct  keypad  key.  It also allows a whole
+instrument configuration to be "remembered" as a macro and re-used  on
+the  following night.  (Macro definitions can, of course, be stored in
+files).  Note that macros can be called from within other macros,  but
+users defining macros should be careful about possible recursion.
+
+For some applications, macros may be unnecessary and  the  possibility
+of  using them inappropriate.  The macro function of SMS can be turned
+off by an entry in the control table.
+
+
+
+2.3  Online Help
+
+SMS uses the ADAM "help" system.  At any time help may be requested by
+typing  the "?" key.  The help given is controlled from entries in the
+control table for each menu item  and  each  SMS  parameter,  and  two
+levels  of  help  information  may be accessed as required.  This help
+information is extracted from the ADAM help structure.  More  detailed
+help  on  the use of SMS itself may be obtained by pressing the keypad
+"-" key, unless this help information has been removed or replaced  by
+the person who constructed the control table being used.
+
+                                - 4 -
+AON/4.8                                                         Page 5
+
+
+It is possible to configure SMS to give "one-line" help automatically,
+through  an  entry  in  the  system  part  of the control table.  This
+facility can also be turned on or off whilst SMS  is  running  through
+the configuration menu (see 2.5).
+
+
+
+2.4  Direct Command Language Commands
+
+SMS allows single command language commands to be issued at  any  time
+by  pressing  the keypad "." key; this gives a prompt for the command.
+This of course may also allow  access  to  DCL  commands  through  the
+command  language.   Commands  prefixed  by  "$"  are  sent to DCL for
+interpretation.
+
+
+
+2.5  SMS System Configuration
+
+SMS allows some interactive configuration of its behaviour by pressing
+the  keypad "," key; this enters a parameter list which allows the SMS
+"beep" to be turned on and off, allows  the  automatic  one-line  help
+facility  to be turned on or off, allows the SMS "scroll region" to be
+made temporary or permanent (in which case it is  not  erased  on  new
+keyboard  input),  and also allows redirection of scroll region output
+to other terminals (this feature is disabled  at  present;  redirected
+output will not be displayed).  The current ADAM help file may also be
+selected here (but note that "exit" and not "quit" must be used to set
+it up).
+
+
+
+3  HOW TO USE SMS
+
+The bare essentials needed to run SMS are:
+
+   - a VT100 compatible terminal to run it on (or a terminal
+     set up with appropriate features specified in an SMG
+     'TERMTABLE'
+
+   - SMS itself on a full or partial ADAM system
+
+   - a "control table", pointed to by the logical name "SMSTABLE"
+
+   - an associated ADAM help file (which is an HDS structure),
+     pointed to by the logical name "ADAM_HELPFILE"
+
+The logical names must be set up before starting up.  SMS  is  started
+by  typing  the  ADAM-defined  symbol "SMS" in response to the VAX DCL
+prompt:
+
+$ ADAMSTART
+
+                                - 5 -
+AON/4.8                                                         Page 6
+
+
+$ SMS
+
+This starts up the system,  displays  the  "welcome"  page,  and  then
+compiles  the control table.  Once the table is compiled (large tables
+take several seconds) the top level (or root) menu  of  the  table  is
+displayed on the terminal screen.
+
+You are now ready to start using SMS.  The  terminal  cursor  will  be
+positioned  on  the  first item in the top-level menu.  By positioning
+the cursor using the terminal's "arrow" keys, you  can  point  at  the
+various  items in the SMS displays; by using the terminal's keypad you
+can execute functions of the SMS system.  Most of the  time,  ordinary
+alphanumeric  keys  have  no  effect  on the system, apart from simply
+counting as a keystroke; any keystroke which is not recognised can  be
+made  to  sound  the  terminal  bell (or, more usually, beep); this is
+normally the default setting.
+
+
+
+3.1  Obtaining Online Help
+
+Help information must be provided along with the control table by  the
+author  of the control table in use.  Normally, there is existing help
+available about how to use SMS, obtained by pressing the "MINUS"  key,
+but  help  for  any  application must be written and set up in an ADAM
+help file.  "One-line" help information on the item indicated  by  the
+cursor  is  given  if  the  "?" key is pressed; if this key is pressed
+again,  any  "full"  help  information  is  written  into  the  screen
+scrolling region.
+
+"One-line" help is given  for  EVERY  menu  or  parameter  list  entry
+automatically  if the automatic help feature is enabled.  This feature
+is disabled by default; it may be enabled or  disabled  explicitly  in
+the  "fields"  entry  of the control table, and may also be enabled or
+disabled whilst SMS is  running  (section  2.5).   The  help  line  is
+removed  by  pressing  keys  other  than  the  "arrow"  keys  and  the
+entry/exit control keys; this is simply a feature of SMS.
+
+
+
+3.2  The Terminal Keypad
+
+The VT100 keypad contains the following:  four "programmable function"
+or  "PF"  keys;  ten digit keys; an "ENTER" key; and three punctuation
+keys, "MINUS", "COMMA" and "DOT".  The use of these keys in SMS is  as
+follows:
+
+
+
+3.2.1  The ENTER Key - The ENTER key is used to select  a  menu  item.
+In  a menu display, the cursor will be lying on one of the menu items;
+pressing ENTER will cause one of three things to happen.  If the  menu
+
+                                - 6 -
+AON/4.8                                                         Page 7
+
+
+item points to another menu, then this new menu will be displayed.  If
+the menu item points to a parameter list,  then  this  parameter  list
+will  be  displayed.   If  the menu item corresponds to an SMS action,
+then this action (a series  of  command  language  commands)  will  be
+executed.   In  each  case,  the  menu  item will be highlighted until
+either exit from the new display or termination of the action.
+
+
+
+3.2.2  The PF Keys - The function of these keys varies, but is  always
+indicated on the screen (at the bottom of the screen, by default).
+
+
+
+3.2.3  The DOT Key - Pressing the DOT key makes SMS give  the  command
+language prompt which allows any single command language command to be
+given.
+
+
+
+3.2.4  The COMMA Key - allows the user to configure  some  SMS  system
+parameters, described in 2.5.
+
+
+
+3.2.5  The MINUS Key - Pressing the MINUS key normally enters  a  help
+menu  which  gives  help  on  the  SMS  system.   This  should be self
+explanatory.  Press "exit" (PF1) to leave this menu, as  "quit"  (PF4)
+will not restore the help file needed for the control table in use.
+
+Note that the author of the control table in use may have supplied  an
+alternative to the default SMS help menu.
+
+
+
+3.2.6  The Digit Keys - These keys are used to run pre-defined macros.
+See 2.2, "Macros".
+
+
+
+3.3  Refreshing The Screen
+
+The SMS screen display may be refreshed at any  time  (e.g.   after  a
+system broadcast message) by pressing "ctrl-R".
+
+
+
+3.4  Parameter Lists
+
+If you enter a parameter list, then the parameters there  are  set  in
+one  of  two  ways.   If the control table specifies a set of possible
+values for the parameter, then the value required is  selected  simply
+
+                                - 7 -
+AON/4.8                                                         Page 8
+
+
+by  using  the "arrow" keys:  up or down to select the parameter, left
+or right to select a particular value.  If the control table specifies
+just  one  value,  then  this  value  may be altered as follows:  "LF"
+(ctrl-J) or "ctrl-U" will delete the current value,  characters  typed
+will  appear  at  the  cursor  position,  and the "DEL" key allows the
+character to the left of the cursor to be deleted.  The left and right
+"arrow"   keys   may  be  used  to  perform  "in-line"  editing,  with
+insert/overstrike modes toggled using "ctrl-A".
+
+The parameter values given in the parameter list may be set  up  by  a
+mechanism  which  interrogates  named  tasks  for  the values of named
+parameters or from a command language variable; for examples  of  this
+see  the  "switch"  field  specification in Appendix A.  The syntax is
+simply to  specify  "from  taskname  parametername"  or  "from  adamcl
+variablename"  on  the  line following the parameter definition in the
+list.
+
+
+
+3.5  Control-C Behaviour
+
+Pressing "control-C" on the keyboard can be used to interrupt the user
+interface.  The effects of this are as follows:
+
+Macros:  the macro is aborted at the present point; the screen display
+is not changed
+
+Parameter requests:  this is equivalent to "!!" (cancel)
+
+The command language is also interrupted, and will  interrupt  command
+language procedures
+
+The message "Cancel" is echoed on the terminal  screen;  this  can  be
+removed by typing "ctrl-R" ("refresh").
+
+
+
+3.6  Expert User Facility
+
+WARNING:  control tables intended for use with this facility  must  be
+designed very carefully!
+
+It is possible to configure SMS to enable an "expert" user  who  knows
+the  control table names for menus and parameter lists used internally
+by SMS to "jump" to a named menu or parameter list.  This is  done  by
+pressing  the DOT key (section 2.4) and using the escape character "@"
+to prefix a menu or parameter list name.  SMS will then paste  up  the
+named  menu  or  parameter  list,  just  as  a  normal  entry to such.
+Pressing "exit" will unpaste the new display and return to  where  SMS
+was  before;  stacking  operates  as  normal.  A well-designed control
+table should not normally need to use this  feature,  but  it  may  be
+useful  to  an  expert  using a particularly complicated system.  This
+
+                                - 8 -
+AON/4.8                                                         Page 9
+
+
+facility is disabled  by  default;  it  may  be  enabled  or  disabled
+explicitly in the "fields" section of the control table.
+
+
+
+4  HOW TO WRITE CONTROL TABLES FOR SMS
+
+The format of menus displayed on the screen, the switchable parameters
+used  in SMS, the ADAM commands sent by SMS, and the definition of the
+function of parts of the screen are all defined in an ASCII text  file
+called  the "control table".  This file is read by SMS at run-time and
+compiled into  an  internal,  quickly  accessed  form.   (It  will  be
+possible eventually to save the compiled form of the table so that SMS
+will start up faster.)
+
+To create a control table you use a text editor.  The best plan is  to
+take  the  useful parts from an existing table to save re-typing them.
+The control table syntax is fairly straightforward but it is  best  to
+look  at  an  example  to  see  what  a  control table looks like; for
+example, the table in appendix B.
+
+At present all the SMS configuration is in one control table.   It  is
+likely that in some future release the first part of the configuration
+will be removed to a separate control table, as the first part relates
+to  the screen positions of essential parts of the SMS system, such as
+the position of the text describing the "PF" key functions.  The  rest
+of the configuration relates to the menus, parameter lists and actions
+for a particular application.
+
+Thus there are currently four types  of  entry  in  a  control  table.
+These are introduced by the following keywords:
+
+  fields  -  the definitions for the location of SMS system 
+             information on the screen.  There will only be
+             one "fields" entry.
+
+  menu    -  a menu definition entry
+
+  switch  -  a "parameter list" entry
+
+  action  -  an entry with containing one or more 
+             command language commands
+
+These keywords MUST be in lower case starting in the  first  character
+position on the line.
+
+Comments may appear in the control table, identified  by  "*"  in  the
+leftmost character position.
+
+Items on the lines in the table may be separated by spaces or tabs  or
+both.
+
+
+                                - 9 -
+AON/4.8                                                        Page 10
+
+
+Lines in the table within an action entry may be  continued  with  the
+continuation character "-" in the usual DCL manner.
+
+An "include file" facility is provided, so that  sections  of  control
+tables  can be brought together from different sources.  Include files
+can be nested to a maximum depth of 16.  The syntax is simply
+
+include filespec
+
+where the keyword "include" MUST be in lower case and  MUST  start  in
+column  1,  as  for the other keywords.  Note that there are no quotes
+around the file specification.
+
+Detailed specifications of the types  of  table  entry  are  given  in
+Appendix A.
+
+There are internal limits set on the size of control tables, which can
+only be changed by re-compiling SMS.  These limits are:
+
+maximum number of menus                         200
+maximum number of parameter lists               200
+maximum number of actions                       400
+maximum number of list entries (names etc.)    1500
+
+The table compiler has explicit checks for these limits being reached,
+and reports when this occurs.
+
+The  table  compiler  also  identifies  references  in  the  table  to
+undefined  menus,  actions or parameter lists, and outputs messages to
+inform the user of these.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 10 -
+AON/4.8                                                        Page 11
+
+
+5  STAND-ALONE TABLE COMPILER
+
+A stand-alone version of the table compiler is available, which allows
+control  tables  to  be compiled for checking purposes without running
+SMS.
+
+This produces listings of the data stored in the  internal  structures
+of  SMS, a listing of the control table (with error messages inserted,
+if any!) and listings of the formats  of  menus  and  parameter  lists
+which  give  a  "hard-copy" preview of what will appear on the screen.
+Note that in the "action table" the lines are truncated in the listing
+to  80  characters;  these  lines  may in fact be up to 132 characters
+long.
+
+This is invoked by obeying the commands:
+
+   $ ADAMSTART                          ! Start up ADAM
+   $ ADAMDEV                            ! Define symbol COMPSCT
+   $ DEFINE SMSTABLE file_description   ! Define control table
+   $ COMPSCT                            ! Run the compiler
+
+Output from the compiler will be into a file  in  the  user's  current
+directory  with  the  same  filename as the control table and filetype
+.LIS.
+
+
+
+6  FEATURES OF THE SYSTEM WHICH MAY CHANGE
+
+Storing compiled tables so that start-up is quicker.
+
+Saving the whole of a "current configuration".
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 11 -
+
+
+
+
+
+
+
+
+
+
+
+
+                              APPENDIX A
+
+            SPECIFICATION OF THE CONTROL TABLE ENTRY TYPES
+
+
+
+There are four types of entry in an SMS control table.  One  of  these
+describes  the  configuration  of  the  SMS  system  components on the
+screen, and will not usually be changed much from one  application  to
+another.  This entry is introduced by the keyword "fields", and is put
+at the beginning of the control table file.  (It  is  likely  that  at
+some  time  in  the  future  this  entry  in the table may be moved to
+another file, since it is not part of the application.)
+
+The other three entry types describe what appears on the  screen  when
+running a particular application.  They are introduced by the keywords
+"menu", "switch"  and  "action".   The  "menu"  and  "switch"  entries
+describe  displays  which  are  pasted  on  the  terminal  screen when
+required.  The "switch" entry consists of a list of  parameters  which
+can  have  switched or manually entered values; it is thus referred to
+as a parameter list.  The "action" entries  consist  of  one  or  more
+command  language  commands  which can be executed as a consequence of
+the user's keystrokes at the terminal.  These "action" entries may  be
+called up in three ways:
+
+   - on entry to a menu or parameter list
+     from a higher level menu
+
+   - on exit from a menu or parameter list
+     back to a higher level menu
+
+   - by selecting a menu option which is explicitly
+     associated with a particular action
+
+Mechanisms are provided to:
+
+   o  Take the values of parameters from SMS parameter lists and 
+      substitute them in command language command lines.  This 
+      allows communication of parameter values from SMS to the 
+      command language.
+
+   o  On entry to a parameter list from a menu, take the value of
+      any SMS parameter from the current value of a named
+
+                                - 12 -
+SPECIFICATION OF THE CONTROL TABLE ENTRY TYPES                Page A-2
+
+
+      parameter in any ADAM task.  This allows communication of
+      parameter values back from the ADAM system to SMS.
+
+   o  On entry to a parameter list from a menu, take the value of
+      any SMS parameter from the current value of a named command
+      language variable.  This allows communication of the values 
+      of variables back from ADAMCL to SMS.
+
+
+
+Names used within the table  entries  are  allowed  to  be  up  to  60
+characters long, with the exception of help keywords; these are of the
+form  helpname  or  @helpname  or  @helpfile.helpname  where  each  of
+helpfile and helpname can be up to 15 characters long (an HDS limit).
+
+If the help keyword is not prefixed by @,  then  help  information  is
+taken from the current ADAM help file, using the help keyword given in
+the menu item or parameter entry.  If this keyword cannot  be  located
+in  the  current help file, then SMS will inform the user that no help
+is available.
+
+If the help keyword is of the form @helpname, then  the  current  help
+file  is  set  to  the  default  (the  logical  name SMS_HELPFILE) and
+searched for helpname.
+
+If the help keyword  is  of  the  form  @helpfile.helpname,  then  the
+current help file is set to helpfile and searched for helpname.
+
+A detailed specification of the four entry types follows.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 13 -
+SPECIFICATION OF THE CONTROL TABLE ENTRY TYPES                Page A-3
+
+
+A.1  The "fields" entry.
+
+This entry consists of a list of instructions which configure the  SMS
+                        _   _system.   Some of these must be present, others have defaults and need
+not be given.
+
+
+
+A.1.1  Required entries:
+
+pf<n> <line> <column>
+
+   specifies where on the screen the descriptive text for  the  keypad
+   "PF" keys appears; <n> takes the values 1 to 4, <line> and <column>
+   specify the screen position
+
+
+
+pf_width <n>
+
+   <n> is the number of characters allowed for descriptive text in the
+   PF key display
+
+
+
+scroll_top <n>
+
+   <n> is the top line on the screen to be allocated  to  a  scrolling
+   region
+
+
+
+scroll_bot <m>
+
+   <m> is the bottom line on the screen to be allocated to a scrolling
+   region
+
+
+
+prompt_line <line>
+
+   <line> specifies the screen line where  parameter  prompts  are  to
+   appear
+
+
+
+err_line <line>
+
+   <line> specifies the screen line where error messages are to appear
+
+
+
+
+                                - 14 -
+SPECIFICATION OF THE CONTROL TABLE ENTRY TYPES                Page A-4
+
+
+msg_line <line>
+
+   <line> specifies the screen  line  where  one-line  messages  (e.g.
+   from the message system) are to appear
+
+
+
+cmd_line <line>
+
+   <line> specifies the screen line where the command language  prompt
+   is to appear
+
+
+
+help_line <line>
+
+   <line> specifies the screen line where one-line help is to appear
+
+
+
+A.1.2  Optional entries:
+
+txt_<type> <text required>
+
+   These entries allow the default text for the PF key  labels  to  be
+   over-ridden.   If  no  entries  are  present,  the internal default
+   values will be used.  One or more of the defaults may be changed by
+   appropriate entries.
+
+   There are four sets of the PF key labels:
+
+        - the "base" set, used for menus
+
+        - the "switch" set, used for parameter lists
+
+        - the "macro definition" set;  replaces the base set 
+          when defining macros
+
+        - the "macro display" set, used for the macro display function
+
+   The names for these text entries (as used in  SMS  control  tables)
+   and their default values are as follows:
+
+          txt_base_pf1  =  PF1: exit
+          txt_base_pf2  =  PF2: learn macro
+          txt_base_pf3  =  PF3: show macros
+          txt_base_pf4  =  PF4: quit
+
+          txt_swit_pf1  =  PF1: exit
+          txt_swit_pf2  =  PF2: defaults
+          txt_swit_pf3  =  PF3: 
+          txt_swit_pf4  =  PF4: quit
+
+                                - 15 -
+SPECIFICATION OF THE CONTROL TABLE ENTRY TYPES                Page A-5
+
+
+          txt_mdef_pf1  =  PF1: exit
+          txt_mdef_pf2  =  PF2: end macro
+          txt_mdef_pf3  =  PF3: show macros
+          txt_mdef_pf4  =  PF4: quit
+
+          txt_mdis_pf1  =  PF1: 
+          txt_mdis_pf2  =  PF2: 
+          txt_mdis_pf3  =  PF3: load macro
+          txt_mdis_pf4  =  PF4: 
+
+
+
+macros <enabled/disabled>
+
+   This entry enables the macro facility to be disabled.  The entry
+
+   macros disabled
+
+   will disable the PF2 and PF3  keys  (in  a  menu)  and  the  keypad
+   numeric  keys so that macros cannot be used.  Macros can be enabled
+   explicitly by the entry
+
+        macros enabled
+
+   but this is also the system default, so  no  "macros"  entry  means
+   that macros will be enabled.
+
+   If use is made of this facility to disable macros, then the PF2 and
+   PF3 key labels for menus should also be altered, e.g.  with entries
+
+        txt_base_pf2 PF2: 
+        txt_base_pf3 PF3: 
+
+   to leave these blank.
+
+
+
+scroll_switch <on/off>
+
+   The SMS system sets up the scroll region as "permanent" by default,
+   i.e.   it  does not go away if the user presses a key when it is on
+   the screen.  This can be changed in the SMS configuration parameter
+   list  (accessed  from  the  keypad "comma" key), to make the scroll
+   region "temporary", i.e.  it  is  only  displayed  until  the  next
+   keystroke.
+
+   The system default can be over-ridden by this entry, e.g.
+
+        scroll_switch on
+
+   sets up SMS with the scroll fields "permanent" once text is written
+   to  it.   It  can  be  set up to be "temporary" with "scroll_switch
+
+                                - 16 -
+SPECIFICATION OF THE CONTROL TABLE ENTRY TYPES                Page A-6
+
+
+   off".
+
+
+
+cli_prompt <prompt>
+
+   The SMS system sets up the command language prompt to be  "Command:
+   "  by  default.   This can be changed to reflect the actual command
+   language which SMS is linked with.
+
+   The system default can be over-ridden by this entry, e.g.
+
+        cli_prompt Adamcl:
+
+   sets up SMS with the command language  prompt  "Adamcl:   ".   Note
+   that this used to be the default.
+
+
+
+show_task <on/off>
+
+   determines whether the task name is displayed along  with  incoming
+   messages.  This is "off" by default, so that only the value part of
+   an incoming message is displayed.
+
+
+
+auto_help <on/off>
+
+   This sets up the initial  state  of  the  automatic  one-line  help
+   facility, which is disabled by default.  This can be changed in the
+   SMS configuration parameter list (accessed from the keypad  "comma"
+   key).
+
+
+
+expert_user <on/off>
+
+   See section 3.6.  This enables or disables the expert user facility
+   (on to enable, off to disable).
+
+
+
+A.1.3  An example of the "fields" entry:
+
+
+
+fields
+*  definition of field locations ...
+*    keypad "pf" keys ...
+*    (specifies where on the screen the descriptive text appears)
+*    i.e. <key> <line> <column>
+
+                                - 17 -
+SPECIFICATION OF THE CONTROL TABLE ENTRY TYPES                Page A-7
+
+
+        pf1 24 1
+        pf2 24 21
+        pf3 24 41
+        pf4 24 61
+*    no of characters allowed for descriptive text
+        pf_width 19
+*    pf key text replacement ...
+        txt_base_pf1 PF1: go back one
+        txt_base_pf4 PF4: go away entirely
+        txt_swit_pf3 PF3: no function
+*    scroll field ...
+        scroll_top 5
+        scroll_bot 15
+        scroll_switch on
+*    parameter prompt field ...
+        prompt_line 19
+*    error message line ...
+        err_line 20
+*    one-line message display ...
+        msg_line 21
+*    prompted command field ...
+        cmd_line 22
+        cli_prompt ICL:
+*    one-line help ...
+        help_line 23
+*    macro operation ...
+        macros disabled
+*    "expert user" facility ...
+        expert_user off
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 18 -
+SPECIFICATION OF THE CONTROL TABLE ENTRY TYPES                Page A-8
+
+
+A.2  The "menu" entry.
+
+The "menu" entry is introduced by
+
+menu <name> <title if any>
+
+where <name> is the name of the menu to be referenced in the  "option"
+entries  of other menus in the control table.  The title, if given, is
+displayed at the top left border of the menu.
+
+
+
+A.2.1  Required entries:
+
+format <box/nobox>
+
+   determines whether or not a box is drawn around the menu
+
+
+
+position <line> <column>
+
+   gives the position of the top left corner of the menu on the screen
+   (N.B.  the box goes OUTSIDE this if present)
+
+
+
+field_width <number of characters>
+
+   gives the width of the field for each menu item
+
+
+
+columns <number of columns in the menu>
+
+   note the number of columns could be one, giving a tall thin menu!
+
+
+
+option <option name> <action/menu/switch> <name> <help key>
+
+   There must be at least one "option" entry; these are the "items" in
+   the  menu.   They  can  point to actions, parameter lists, or other
+   menus.
+
+   <option name> appears on the screen as the menu item
+
+   "action", "menu" or "switch" specifies the entry type
+
+   <name> specifies which action, menu or parameter list is selected
+
+
+
+                                - 19 -
+SPECIFICATION OF THE CONTROL TABLE ENTRY TYPES                Page A-9
+
+
+   <help key> specifies the help keyword to be  used  in  the  current
+   help  file  when  the  user  requests help by pressing "?" with the
+   cursor on this menu entry
+
+
+
+A.2.2  Optional entries:
+
+entry <action name for action on entry>
+
+   allows one or more command  language  commands  (specified  in  the
+   given "action" entry) to be obeyed on entry to an SMS menu.
+
+
+
+exit <action name for action on exit>
+
+   allows one or more command  language  commands  (specified  in  the
+   given "action" entry) to be obeyed on exit from an SMS menu.
+
+
+
+pre_entry <action name for action before entry>
+
+pre_exit <action name for action before exit>
+
+   In ADAMCL, these entries are like "entry" and "exit", but allow the
+   control  of  access  to  menus and parameter lists by using command
+   language variables as flags.   The  control  variables  are  called
+   "ENTER_SCREEN" and "EXIT_SCREEN"; they are "real" ADAMCL variables.
+   For normal entry or exit, they are set to  1.0;  to  bar  entry  or
+   exit, set the required variable to 0 in the appropriate "pre_entry"
+   or "pre_exit" action.
+
+   Note that, in parameter lists, the "from" mechanism for setting SMS
+   parameters  from  external  values is called before the "pre_entry"
+   action, and thus is called even if entry to the display is  barred.
+   This may well be the required action in many cases.
+
+
+
+A.2.3  An example of the "menu" entry
+
+
+
+menu main_node This is the title
+*  whether or not a box is drawn around the menu ...
+      format box
+*  position of top left corner of the menu on the screen ...
+      position 5 10
+*  width of field on screen of each menu item ...
+      field_width 10
+
+                                - 20 -
+SPECIFICATION OF THE CONTROL TABLE ENTRY TYPES               Page A-10
+
+
+*  the number of columns could be one, giving a tall thin menu!
+      columns 4
+*  the next four need not be present ...
+      pre_entry check_permit
+      entry setup1
+      pre_exit check_exit
+      exit save1
+*  the menu items which can point to actions, parameter
+*  lists, or other menus ... 
+      option observe action do_it obs_help
+      option ... and so on ...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 21 -
+SPECIFICATION OF THE CONTROL TABLE ENTRY TYPES               Page A-11
+
+
+A.3  The "switch" entry.
+
+The "switch" entry is introduced by
+
+switch <name> <title if any>
+
+where <name> is the name of the parameter list to be referenced in the
+"option"  entries of menus in the control table.  The title, if given,
+is displayed at the top left border of the parameter list.
+
+
+
+A.3.1  Required entries:
+
+position <line> <column>
+
+   gives the position of the top left corner of the parameter list  on
+   the screen
+
+
+
+field_width <number of characters>
+
+   gives the width of the field to hold the parameter name
+
+
+
+parameter <parameter name> <help key> [<default>] <another> <next>
+
+   a "switched value" parameter (default indicated by [ ]);
+
+   <parameter name> appears on the screen as the list item name,
+
+   <help-key> is the help keyword for the parameter,
+
+   the 'default' value has square braces around it,
+
+   <another> and <next> are other possible 'switched' values  for  the
+   parameter
+
+
+
+parameter <parameter name> <help key> <single value>
+
+   A "single valued" parameter; the value is a string  with  no  white
+   space   included.    If   data   is  typed  for  a  parameter  list
+   single-valued entry such that the data typed would  go  beyond  the
+   rhs  of  the  pasted display, then the data typed is stored, and on
+   exit from the display its width is updated so that on next entry it
+   will   be  wider  and  will  show  what  was  typed.   At  present,
+   "shrinking" of the display if smaller length items are typed is not
+   implemented !  (It's a bit more difficult, though not much)
+
+                                - 22 -
+SPECIFICATION OF THE CONTROL TABLE ENTRY TYPES               Page A-12
+
+
+   There must be at least one  'parameter'  entry,  which  can  be  of
+   either type.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 23 -
+SPECIFICATION OF THE CONTROL TABLE ENTRY TYPES               Page A-13
+
+
+A.3.2  Optional entries:
+
+from <task> <parameter>
+
+   After a parameter list parameter definition, the "from"  entry  can
+   be used to set the parameter value from the value of a parameter in
+   an external task, e.g.
+
+         parameter myparm help_key 0 [1] 2 3
+           from <task_name> <parameter_name>
+
+
+
+from adamcl <variable_name>
+
+   will pick up the value  of  any  command  language  variable  as  a
+   character  string.   In  fact,  <variable_name>  can  be  any valid
+   command language expression (provided it does  not  include  "white
+   space", i.e.  spaces or tabs).
+
+
+
+maxchars <parameter_value_length>
+
+   The SMS system  maximum  for  name  lengths  (and  parameter  value
+   lengths)  is  set up at 60 characters (changing this needs a system
+   recompile).   Additionally,  the  maximum  length   of   individual
+   parameter  values  can  be  specified by this 'maxchars' mechanism.
+   After the parameter entry in the  table,  a  line  is  added  which
+   specifies the maximum value length the user can type (this applies,
+   of course, only to single-valued parameters), e.g.
+
+         parameter object_name help_key The_Moon
+           maxchars 25
+
+   sets up a parameter with initial  value  "The_Moon"  and  will  not
+   allow  the  user  to  change  this value to anything longer than 25
+   characters.  If  a  "maxchars"  entry  is  not  present,  then  the
+   parameter  value  will  be  allowed to "grow" to the system maximum
+   (i.e.  60 at present).
+
+
+
+entry <action name>
+
+exit <action name>
+
+
+
+
+
+
+
+                                - 24 -
+SPECIFICATION OF THE CONTROL TABLE ENTRY TYPES               Page A-14
+
+
+pre_entry <action name>
+
+pre_exit <action name>
+
+   These behave in an identical way to the corresponding  entries  for
+   menus.
+
+
+
+A.3.3  An example of the "switch" entry:
+
+switch sw_1 Title on screen
+*  this is a "parameter list"
+*  position on the screen ...
+      position 10 10
+*  width of field to hold parameter name ...
+      field_width 15
+*  parameters: note that "help-key" is the help keyword for that
+*  parameter;  it may, of course, be the same as the parameter
+*  name.  
+*
+*  a "switched value" parameter (default indicated by [ ] at
+*  present) 
+    parameter <parameter name> <help key> [<default>] <another> <next>
+*  a "single valued" parameter with size limit ...
+    parameter heading head_help Observation
+        maxchars 32
+*  this next parameter gets its value from a named task ...
+    parameter ...
+        from mytask filter_name
+*  this next parameter gets its value from the command language ...
+    parameter ...
+        from adamcl myvariable
+*  note these next two are not present if not required ...
+*  if any action is to be called on entry to this field
+    entry enter_sw1
+*  and if any action to be called on exit
+    exit exit_allsw
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 25 -
+SPECIFICATION OF THE CONTROL TABLE ENTRY TYPES               Page A-15
+
+
+A.4  The "action" entry.
+
+An action entry is introduced by
+
+action <name>
+
+where <name> is the name used inside the SMS control table to refer to
+this  action  from  a  menu  item or in 'entry' and 'exit' directives.
+This is followed by a list of command language  command  lines,  which
+SMS  sends  to  the command language for execution.  This is basically
+what SMS is:  a means of packaging command language commands  so  that
+they  can  be  executed by a single keystroke rather than by having to
+type them all in.  Note that DCL commands can be placed here, just  as
+at  the  "DOT key" prompt, if the underlying command language supports
+the "$" escape.
+
+There is a special escape pattern, "+config+", which when used as  the
+first  word  in  an  action line attempts to configure an internal SMS
+parameter.  This should normally only be used in the  exit  action  of
+the  SMS  system  configuration  parameter  list  (see  the example in
+Appendix B).  This pattern must not be used as the first word  on  the
+line for any other action lines.
+
+
+
+A.4.1  An example of the "action" entry:
+
+
+action doit
+*  an action definition may contain one or more command language 
+*  commands:
+      load atasks:junktask junk
+      send junk obey something
+      etc ...
+*  and SMS parameter substitution is done to allow variables in
+*  these ADAMCL lines as follows ... 
+      send junk set something <<switch_name:parameter_name>>
+*  where "switch name" is the name of a parameter list,
+*  and "parameter name" is the name of a parameter in that
+*  list.  The characters held in SMS representing the current
+*  value of the parameter are simply substituted in the ADAMCL
+*  command line. 
+
+
+
+
+
+
+
+
+
+
+
+                                - 26 -
+
+
+
+
+
+
+
+
+
+
+
+
+                              APPENDIX B
+
+                      EXAMPLE OF A CONTROL TABLE
+
+
+
+What follows is a simple example of a control table for SMS.   It  can
+be  edited out and used as a base from which to experiment!  The basic
+structure of this example is
+
+                        "home_menu"
+                             |
+             +---------------+-----------------+
+             |                                 |
+           a_menu                         a_param_list
+       "some_actions"                   parameters:
+             |                            choice_letter
+     +-------+-+---------+                choice_number
+     |         |         |                choice_value
+  hi_there  choices  directory
+
+
+Actions:
+  hi_there - print "Hi there"
+  choices - print choices in 'a_parm_list'
+  directory - do DCL "directory" command
+
+
+Note that there is an include file containing  directives  needed  for
+SMS system operation.
+.page
+*    Example control table to go with the document AON004.
+*
+*    John Cooke  (REVAD::JAC)  30Sep88
+
+
+*   include the system part of the table ...
+
+include smssystab.inc
+
+
+*  This is where the "application part" of the control table 
+*  starts.  The first menu becomes the SMS "top level" menu,
+
+                                - 27 -
+EXAMPLE OF A CONTROL TABLE                                    Page B-2
+
+
+*  i.e. the one displayed first on the screen ...
+
+menu home home_menu
+        position 2 2
+        field_width 15
+        columns 2
+        format box
+        option a_menu menu action_menu action_help
+        option a_param_list switch a_parm_list param_help
+*     entry action to set up the help file ...
+        entry start_action
+
+action start_action
+        help @aon004
+
+menu action_menu some_actions
+        position 8 2
+        field_width 15
+        columns 1
+        format box
+        option hi_there action hi_there hi_there
+        option choices action choices choices
+        option directory action directory directory
+
+switch a_parm_list
+        position 9 12
+        field_width 15
+        parameter choice_letter help_letter A [B] C D E F
+        parameter choice_number help_number 1 2 3 [5] 7 11 1986
+        parameter choice_value help_value 42.0
+
+
+* Actions:
+action hi_there
+        print "Hi there"
+action choices
+        print "Letter: <<a_parm_list:choice_letter>>"
+        print "Number: <<a_parm_list:choice_number>>"
+        print "Value: <<a_parm_list:choice_value>>"
+action directory
+        $directory
+.page
+This next section is the file "smssystab.inc" included at the top 
+of the main control table:
+
+*=================================================================
+*    Note that this section determines where SMS system components 
+*    appear on the screen;  it should probably appear in a 
+*    separate file as it is not really part of the "application".
+
+fields
+*  definition of field locations ...
+
+                                - 28 -
+EXAMPLE OF A CONTROL TABLE                                    Page B-3
+
+
+*    keypad "pf" keys ...
+        pf1 24 1
+        pf2 24 21
+        pf3 24 41
+        pf4 24 61
+        pf_width 19
+*    scroll field ...
+        scroll_top 5
+        scroll_bot 15
+*    parameter prompt field ...
+        prompt_line 19
+*    error message line ...
+        err_line 20
+*    one-line message display ...
+        msg_line 21
+*    prompted command field ...
+        cmd_line 22
+        cmd_column 1
+*    one-line help ...
+        help_line 23
+*    automatic one-line help ...
+        auto_help on
+
+switch sms_sys_config SMS configuration
+        position 4 10
+        field_width 15
+        entry sms_config_entry
+        exit sms_config_exit
+*    do not alter these parameters without making corresponding 
+*    alterations inside SMS routine "sysconfig" ...
+        parameter beep term_beep [on] off
+*     note that the next must match the "auto_help" switch ...
+        parameter auto_help auto_help [on] off
+*     and this must match the "scroll_switch" (default permanent) ...
+        parameter scroll_region scroll_region temporary [permanent]
+        parameter scroll_device scroll_device TT
+*    you can change the next line to change the system default help 
+*    file; you will also need an entry action "help @<your file>" 
+*    to get it initialised as the code itself uses "sms_helpfile"
+*    e.g. change this to
+*       parameter help_file sms_help_file your_file
+        parameter help_file sms_help_file aon004
+.page
+
+action sms_config_entry
+        help @sms_helpfile
+action sms_config_exit
+        help @<<sms_sys_config:help_file>>
+*     these lines must be present otherwise the SMS internal
+*     parameters are not configured ...
+        +config+ beep <<sms_sys_config:beep>>
+        +config+ auto_help <<sms_sys_config:auto_help>>
+
+                                - 29 -
+EXAMPLE OF A CONTROL TABLE                                    Page B-4
+
+
+        +config+ scroll_region <<sms_sys_config:scroll_region>>
+        +config+ scroll_device <<sms_sys_config:scroll_device>>
+
+
+menu sms_help_menu SMS help topics - press ENTER to get help
+        position 2 2
+        field_width 14
+        columns 5
+*    on entry, select SMS helpfile ...  
+        entry sms_help_select
+*    on exit, restore current help file ...
+        exit sms_help_restore
+*    help topics ...
+        option keypad action sms_h_keypad sms_keypad
+        option menus action sms_h_menu sms_menu
+        option param_lists action sms_h_param sms_param
+        option macros action sms_h_macro sms_macro
+        option cursor action sms_h_cursor sms_cursor
+        option helpfile action sms_h_hfile sms_hfile
+        option actions action sms_h_action sms_action
+
+action sms_help_select
+        help @sms_helpfile
+action sms_help_restore
+        help @<<sms_sys_config:help_file>>
+
+action sms_h_keypad
+        fullhelp sms_keypad
+action sms_h_menu
+        fullhelp sms_menu
+action sms_h_param
+        fullhelp sms_param
+action sms_h_macro 
+        fullhelp sms_macro
+action sms_h_cursor
+        fullhelp sms_cursor
+action sms_h_hfile
+        fullhelp sms_hfile
+action sms_h_action
+        fullhelp sms_action
+
+*=================================================================
+
+
+
+
+
+
+
+
+
+
+
+                                - 30 -
