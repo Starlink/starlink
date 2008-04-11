@@ -27,8 +27,8 @@ extern "C" {
     /* Query the coordinate of a base pixel along the equivalent world
      * coordinate axis */
     int gaiaUtilsQueryCoord( AstFrameSet *frameset, int axis, double *coords,
-                             int trailed, int formatted, int ncoords,
-                             char **coord, char **error_mess );
+                             int trailed, int readable, int formatted, 
+                             int ncoords, char **coord, char **error_mess );
 
     /* Get Plots for each ROI in a Plot */
     int gaiaUtilsAtlPlROI( AstPlot *plot, AstKeyMap **rplots,

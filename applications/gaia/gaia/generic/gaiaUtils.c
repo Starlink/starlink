@@ -239,8 +239,11 @@ int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, int offset,
  * Query the equivalent current coordinate of a base coordinate along the
  * given axis.
  *
- * Returns a coordinate value in *coord that may be formatted and trailed by
- * the axis units and label. The position along the axis is identified using
+ * Returns a coordinate value in *coord that may be formatted and "trailed" by
+ * the axis units and label (this can be done two ways depending on whether
+ * the result is for reading or parsing, for parsing the label and units
+ * really trail as coord label (units), for reading they are mixed together as
+ * label: coord units).  The position along the axis is identified using
  * ncoords pixel coordinates, where ncoords must match the dimensionality of
  * the FrameSet (at least up to ncoords axes, axes beyond that are handled as
  * dummies). The coordinate returned is matched to the requested axis by being
@@ -250,8 +253,8 @@ int gaiaUtilsGtAxisWcs( AstFrameSet *fullwcs, int axis, int offset,
  * returned by the coord argument should be immediately copied.
  */
 int gaiaUtilsQueryCoord( AstFrameSet *frameset, int axis, double *coords,
-                         int trailed, int formatted, int ncoords, char **coord,
-                         char **error_mess )
+                         int trailed, int readable, int formatted,
+                         int ncoords, char **coord, char **error_mess )
 {
     char *label;
     char *units;
@@ -334,7 +337,12 @@ int gaiaUtilsQueryCoord( AstFrameSet *frameset, int axis, double *coords,
         units = (char *) astGetC( frameset, buf );
         sprintf( buf, "label(%d)", caxis );
         label = (char *) astGetC( frameset, buf );
-        sprintf( buf, "%s %s (%s)", *coord, label, units );
+        if ( readable ) {
+            sprintf( buf, "%s:  %s  %s", label, *coord, units );
+        }
+        else {
+            sprintf( buf, "%s %s (%s)", *coord, label, units );
+        }
         *coord = buf;
     }
     if ( ! astOK ) {

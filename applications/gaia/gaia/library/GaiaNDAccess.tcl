@@ -234,9 +234,9 @@ itcl::class gaia::GaiaNDAccess {
    #  The arguments are the index of the axis, a list of all the pixel indices
    #  needed to identify the coordinate, and an optional boolean argument that
    #  determines whether to format the value (using astFormat) and if to add
-   #  trailing label and units strings.
-   public method getcoord {axis indices {formatted 1} {trail 0} } {
-      return [${type_}::getcoord $handle_ $axis $indices $formatted $trail]
+   #  label and units strings (trail) which can be formatted for reading.
+   public method getcoord {axis indices {formatted 1} {trail 0} {readable 0}} {
+      return [${type_}::getcoord $handle_ $axis $indices $formatted $trail $readable]
    }
 
    #  Map in a component of the dataset. Returns a structure that can be

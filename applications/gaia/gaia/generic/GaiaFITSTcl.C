@@ -641,8 +641,9 @@ static int GetFITSDimsOrBounds( Tcl_Interp *interp, int objc,
  * axis, and the fourth a list of all the pixel indices needed to identify the
  * coordinate (so the list must have a number for each dimension).  The fifth
  * argument defines whether to format the result (using astFormat), otherwise
- * it is returned as a double. The final is a boolean used to switch on the
- * addition of trailing label and units strings.
+ * it is returned as a double. The two arguments are booleans used to switch
+ * on the addition of label and units strings, either as simple trailing
+ * values, or as a more readable string.
  */
 static int GaiaFITSTclCoord( ClientData clientData, Tcl_Interp *interp,
                              int objc, Tcl_Obj *CONST objv[] )
@@ -656,13 +657,14 @@ static int GaiaFITSTclCoord( ClientData clientData, Tcl_Interp *interp,
     int axis;
     int format;
     int ncoords;
+    int readable;
     int result;
     int trailed;
 
     /* Check arguments */
-    if ( objc != 6 ) {
+    if ( objc != 7 ) {
         Tcl_WrongNumArgs( interp, 1, objv, "fits_identifier axis \
-                          {c1 c2 .. cn} ?trail_units? ?format?" );
+                          {c1 c2 .. cn} ?format? ?trail_units? ?readable?" );
         return TCL_ERROR;
     }
 
@@ -698,9 +700,16 @@ static int GaiaFITSTclCoord( ClientData clientData, Tcl_Interp *interp,
                     result = TCL_ERROR;
                 }
 
-                /* Final element is whether to append the label and units. */
+                /* Whether to include the label and units. */
                 trailed = 0;
                 if ( Tcl_GetBooleanFromObj( interp, objv[5], &trailed )
+                     != TCL_OK ) {
+                    result = TCL_ERROR;
+                }
+
+                /* Whether to format inclusion of label and units. */
+                readable = 0;
+                if ( Tcl_GetBooleanFromObj( interp, objv[6], &readable )
                      != TCL_OK ) {
                     result = TCL_ERROR;
                 }
@@ -713,8 +722,9 @@ static int GaiaFITSTclCoord( ClientData clientData, Tcl_Interp *interp,
                     }
                     /* Do the transformation */
                     result = gaiaUtilsQueryCoord( info->wcs, axis, coords,
-                                                  trailed, format, ncoords,
-                                                  &coord, &error_mess );
+                                                  trailed, readable, format, 
+                                                  ncoords, &coord, 
+                                                  &error_mess );
                     if ( result == TCL_OK ) {
                         Tcl_SetStringObj( resultObj, coord, -1 );
                     }

@@ -86,6 +86,9 @@ itcl::class gaia::GaiaCube {
       set lwidth 18
       set vwidth 10
 
+      #  Unique tag for coordinate label.
+      set coord_label_tag_ $w_
+
       #  Object to manage temporary cubes.
       set tmpfiles_ [gaia::GaiaTempName \#auto]
 
@@ -192,6 +195,31 @@ itcl::class gaia::GaiaCube {
       $Options add cascade -label "Slaves" -menu $submenu
       $submenu config -postcommand [code $this update_slave_menu_ $submenu]
 
+
+      #  Submenus to offer font + colour controls for label in main window.
+      $Options add cascade -label "Label colour" -menu [menu $Options.labelcolor]
+      foreach i $colours_ {
+         $Options.labelcolor add radiobutton \
+            -value $i \
+            -command [code $this configure -labelcolor $i] \
+            -variable [scope itk_option(-labelcolor)] \
+            -background $i
+      }
+      add_menu_short_help $Options "Label colour" \
+         {Set colour for coordinate label in main window}
+
+      $Options add cascade -label "Label font" -menu [menu $Options.font]
+      foreach i $fonts_ {
+         $Options.font add radiobutton \
+            -value $i \
+            -label {abc} \
+            -command [code $this configure -labelfont $i] \
+            -variable [scope itk_option(-labelfont)] \
+            -font $i
+      }
+      add_menu_short_help $Options "Label font" \
+         {Set font for coordinate label in main window}
+
       #  Add the coordinate selection menu (use global variable so we can
       #  share this).
       set SpectralCoords [add_menubutton "Coords" left]
@@ -216,7 +244,6 @@ itcl::class gaia::GaiaCube {
       #  Name of input dataset.
       itk_component add cube {
          LabelFileChooser $w_.cube \
-            -labelwidth $lwidth \
             -text "Input cube:" \
             -textvariable [scope itk_option(-cube)] \
             -command [code $this configure -cube] \
@@ -264,6 +291,20 @@ itcl::class gaia::GaiaCube {
       pack $itk_component(index) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(index) \
          {Index of the image plane to display (along current axis)}
+
+      #  Whether to show a label with the coordinate in the main window.
+      itk_component add showcoordlabel {
+         StarLabelCheck $w_.showcoordlabel \
+            -text "Show coordinate label:" \
+            -onvalue 1 -offvalue 0 \
+            -labelwidth $lwidth \
+            -variable [scope itk_option(-show_coord_label)] \
+            -command [code $this toggle_show_coord_label_]
+      }
+      pack $itk_component(showcoordlabel) \
+         -side top -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(showcoordlabel) \
+         {Display a label showing the coordinate in the main window}
 
       #  Add tab window for choosing either the helper controls.
       itk_component add tabnotebook {
@@ -507,6 +548,10 @@ itcl::class gaia::GaiaCube {
 
       #  If displaying a channel map remove the markers.
       $itk_component(chanmap) close
+      
+      #  Permanently remove the coordinate label.
+      delete_coord_label_
+      configure -show_coord_label 0
 
       #  Destroy FITS headers window.
       if { $fitsheaders_ != {} } {
@@ -859,6 +904,9 @@ itcl::class gaia::GaiaCube {
 
       #  Send event to any slave toolboxes.
       slave_set_display_plane_
+
+      #  Update the coordinate label, if needed.
+      update_coord_label_
    }
 
    #  Set the position of a reference line shown in the plot.
@@ -961,12 +1009,12 @@ itcl::class gaia::GaiaCube {
    }
 
    #  Get the coordinate of the current plane along the current axis.
-   public method get_plane_coord {{formatted 1} {trail 0} } {
-      return [get_coord $plane_ $formatted $trail]
+   public method get_plane_coord {{formatted 1} {trail 0} {readable 0}} {
+      return [get_coord $plane_ $formatted $trail $readable]
    }
 
    #  Get the coordinate of an index along the current axis.
-   public method get_coord {index {formatted 1} {trail 0}} {
+   public method get_coord {index {formatted 1} {trail 0} {readable 0}} {
       #  Need index as a pixel coordinate.
       set pcoord [expr $index - 0.5]
       if { $axis_ == 1 } {
@@ -978,7 +1026,8 @@ itcl::class gaia::GaiaCube {
       }
       set coord {}
       catch {
-         set coord [$cubeaccessor_ getcoord $axis_ $section $formatted $trail]
+         set coord [$cubeaccessor_ getcoord \
+                       $axis_ $section $formatted $trail $readable]
       }
       return $coord
    }
@@ -1095,6 +1144,92 @@ itcl::class gaia::GaiaCube {
          $itk_component(spectrum) read_ard_file [$w_.ardselect get]
       }
    }
+
+   #  Add or remove the coordinate label in the main window.
+   protected method toggle_show_coord_label_ {args} {
+
+      #  Delete the current label.
+      delete_coord_label_
+
+      #  Stop now if not drawing.
+      if { ! $itk_option(-show_coord_label) } {
+	  return
+      }
+
+      #  Determine a position inside the view, if we don't already have a 
+      #  reference position.
+      if { $xref_ == {} } {
+         lassign [calc_label_pos_] xref_ yref_
+      }
+
+      #  Create the text item.
+      set id [$itk_option(-canvas) create text $xref_ $yref_ \
+                 -text "" \
+                 -anchor center \
+                 -justify left \
+                 -fill $itk_option(-labelcolor) \
+                 -font $itk_option(-labelfont) \
+                 -tags $coord_label_tag_ \
+                 -width 0]
+
+      #  Add bindings to move this about.
+      $itk_option(-canvas) bind $id <1> [code eval $this record_mark_ %x %y]
+      $itk_option(-canvas) bind $id <B1-Motion> [code eval $this move_label_ %x %y]
+
+      #  Set label value.
+      update_coord_label_
+   }
+
+   #  Update the coordinate label shown in the main window, if enabled.
+   protected method update_coord_label_ {} {
+      if { $itk_option(-show_coord_label) } {
+         $itk_option(-canvas) itemconfigure $coord_label_tag_ \
+            -text [get_plane_coord 1 1 1]
+      }
+   }
+
+   #  Delete the coordinate label, but first record position, if available 
+   #  (used to restore).
+   protected method delete_coord_label_ {} {
+      lassign [$itk_option(-canvas) coords $coord_label_tag_] x y
+      if { $x != {} } {
+         set xref_ $x
+         set yref_ $y
+      }
+      $itk_option(-canvas) delete $coord_label_tag_
+   }
+
+   #  Record the position when <1> is pressed.
+   protected method record_mark_ {x y} {
+      set xref_ [$itk_option(-canvas) canvasx $x]
+      set yref_ [$itk_option(-canvas) canvasy $y]
+   }
+
+   #  Move the label relative to the marked position (need this method as
+   #  coords positions relative to the anchor).
+   protected method move_label_ {x y} {
+      set x [$itk_option(-canvas) canvasx $x]
+      set y [$itk_option(-canvas) canvasy $y]
+      set dx [expr $x-$xref_]
+      set dy [expr $y-$yref_]
+      $itk_option(-canvas) move $coord_label_tag_ $dx $dy
+      set xref_ $x
+      set yref_ $y
+   }
+
+   #  Get a position to anchor coordinate label. Middle of X near top of Y.
+   protected method calc_label_pos_ {} {
+      set w [winfo width $itk_option(-canvas)]
+      set h [winfo height $itk_option(-canvas)]
+      set x0 [$itk_option(-canvas) canvasx 0]
+      set y0 [$itk_option(-canvas) canvasy 0]
+      set dw [expr $w*0.5]
+      set dh [expr $h*0.05]
+      set x [expr $x0+$dw]
+      set y [expr $y0+$dh]
+      return [list $x $y]
+   }
+
 
    #  ==========================================
    #  Utility methods for various helper classes
@@ -1260,7 +1395,6 @@ itcl::class gaia::GaiaCube {
             }
          }
       }
-
    }
 
    #  Get the coordinates of an index along the current axis. Returns
@@ -1295,7 +1429,7 @@ itcl::class gaia::GaiaCube {
    }
 
    #  Deal with movement of the spectrum. Listeners in the 3D and other slave
-   #  toolboxes may need updating, init should be set when the data limits 
+   #  toolboxes may need updating, init should be set when the data limits
    #  should be autoranged (initial click).
    protected method spectrum_moved_ {type init desc} {
       renderers_spectrum_moved_ $type $desc
@@ -1332,7 +1466,7 @@ itcl::class gaia::GaiaCube {
          }
       }
    }
-   
+
    #  =============
    #  HDU selection
    #  =============
@@ -1645,6 +1779,20 @@ itcl::class gaia::GaiaCube {
    itk_option define -transient_spectralplot transient_spectralplot \
       Transient_Spectralplot 1
 
+   #  Whether to show a label in the main window.
+   itk_option define -show_coord_label show_coord_label Show_Coord_Label 0
+   
+   #  Colour of coordinate label in main window.
+   itk_option define -labelcolor labelcolor LabelColor white {
+      toggle_show_coord_label_
+   }
+
+   #  Font of the coordinate label in the main window.
+   itk_option define -labelfont labelfont LabelFont \
+      {-adobe-courier-bold-r-*-*-*-120-*-*-*-*-*-*} {
+         toggle_show_coord_label_
+      }
+
    #  Protected variables: (available to instance)
    #  --------------------
 
@@ -1740,6 +1888,37 @@ itcl::class gaia::GaiaCube {
 
    #  Name handling object.
    protected variable namer_ {}
+
+   #  Tag for the coordinate label.
+   protected variable coord_label_tag_ ""
+
+   #  Reference positions for the coord label in main window.
+   protected variable xref_ {}
+   protected variable yref_ {}
+
+   #  Possible colours.
+   protected variable colours_ {
+      white
+      grey90 grey80 grey70 grey60 grey50 grey40 grey30 grey20 grey10
+      black
+      red green blue cyan magenta yellow
+   }
+
+   #  Possible fonts for drawing label.
+   protected variable fonts_ {
+      -adobe-courier-medium-r-*-*-*-120-*-*-*-*-*-*
+      -adobe-courier-medium-o-*-*-*-120-*-*-*-*-*-*
+      -adobe-courier-bold-r-*-*-*-120-*-*-*-*-*-*
+      -adobe-courier-medium-r-*-*-*-140-*-*-*-*-*-*
+      -adobe-courier-medium-o-*-*-*-140-*-*-*-*-*-*
+      -adobe-courier-bold-r-*-*-*-140-*-*-*-*-*-*
+      -adobe-courier-medium-r-*-*-*-180-*-*-*-*-*-*
+      -adobe-courier-medium-o-*-*-*-180-*-*-*-*-*-*
+      -adobe-courier-bold-r-*-*-*-180-*-*-*-*-*-*
+      -adobe-courier-medium-r-*-*-*-240-*-*-*-*-*-*
+      -adobe-courier-medium-o-*-*-*-240-*-*-*-*-*-*
+      -adobe-courier-bold-r-*-*-*-240-*-*-*-*-*-*
+   }
 
    #  Common variables: (shared by all instances)
    #  -----------------

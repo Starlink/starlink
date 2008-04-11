@@ -2,6 +2,10 @@
     Version 4.2-2
     =============
 
+    The coordinate of the slice extracted from a cube can now be displayed
+    as a label in the main window (and will be captured when creating an
+    animation).
+
     A new command-line and startup option -pixel_indices is available.
     This changes the X and Y continuous readout displays to show NDF
     pixel indices, not grid coordinates. NDF pixel indices are like 

@@ -118,8 +118,8 @@ static int gaiaNDFTclUnMap( ClientData clientData, Tcl_Interp *interp,
 static int importNdfHandle( Tcl_Interp *interp, Tcl_Obj *obj, NDFinfo **info );
 static long exportNdfHandle( int ndfid, AstFrameSet *wcs );
 static int queryNdfCoord( AstFrameSet *frameSet, int axis, double *coords,
-                          int trailed, int formatted, int ncoords,
-                          char **coord, char **error_mess );
+                          int trailed, int readable, int formatted, 
+                          int ncoords, char **coord, char **error_mess );
 static void storeCard( AstFitsChan *channel, const char *keyword,
                        const char *value, const char *comment,
                        const char *type, int overwrite );
@@ -951,8 +951,10 @@ static int gaiaNDFTclBounds( ClientData clientData, Tcl_Interp *interp,
  * coordinate (so the list must have a number for each dimension of the NDF if
  * that isn'r true then any extra dimensions will be given the coordinate
  * AST__BAD).  The fifth argument defines whether to format the result (using
- * astFormat), otherwise it is returned as a double. The final is a boolean
- * used to switch on the addition of trailing label and units strings.
+ * astFormat), otherwise it is returned as a double. The final two arguments 
+ * are booleans to switch on the addition of trailing label and units strings
+ * and whether to make the whole result more readable (need trail plus this
+ * for readable).
  */
 static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
                             int objc, Tcl_Obj *CONST objv[] )
@@ -966,13 +968,14 @@ static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
     int format;
     int i;
     int ncoords;
+    int readable;
     int result;
     int trailed;
 
     /* Check arguments */
-    if ( objc != 6 ) {
+    if ( objc != 7 ) {
         Tcl_WrongNumArgs( interp, 1, objv, "ndf_handle axis \
-                          {c1 c2 .. cn} ?trail_units? ?format?" );
+                          {c1 c2 .. cn} ?format? ?trail? ?readable?" );
         return TCL_ERROR;
     }
 
@@ -1003,9 +1006,16 @@ static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
                     result = TCL_ERROR;
                 }
 
-                /* Final element is whether to append the label and units. */
+                /* Whether to append the label and units. */
                 trailed = 0;
                 if ( Tcl_GetBooleanFromObj( interp, objv[5], &trailed )
+                     != TCL_OK ) {
+                    result = TCL_ERROR;
+                }
+
+                /* Whether to make more readable. */
+                readable = 0;
+                if ( Tcl_GetBooleanFromObj( interp, objv[6], &readable )
                      != TCL_OK ) {
                     result = TCL_ERROR;
                 }
@@ -1018,7 +1028,7 @@ static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
 
                     /* Do the transformation */
                     result = queryNdfCoord( info->wcs, axis, coords,
-                                            trailed, format, ncoords,
+                                            trailed, readable, format, ncoords,
                                             &coord, &error_mess );
 
                     if ( result == TCL_OK ) {
@@ -1047,8 +1057,8 @@ static int gaiaNDFTclCoord( ClientData clientData, Tcl_Interp *interp,
  * from an NDF) and works with that as the BASE domain.
  */
 static int queryNdfCoord( AstFrameSet *frameSet, int axis, double *coords,
-                          int trailed, int formatted, int ncoords,
-                          char **coord, char **error_mess )
+                          int trailed, int readable, int formatted, 
+                          int ncoords, char **coord, char **error_mess )
 {
     char *domain;
     int current;
@@ -1083,8 +1093,9 @@ static int queryNdfCoord( AstFrameSet *frameSet, int axis, double *coords,
     astSetI( frameSet, "Base", pixel );
 
     /* Do the transformation */
-    result = gaiaUtilsQueryCoord( frameSet, axis, coords, trailed, formatted,
-                                  ncoords, coord, error_mess );
+    result = gaiaUtilsQueryCoord( frameSet, axis, coords, trailed, 
+                                  readable, formatted, ncoords, coord, 
+                                  error_mess );
 
     /*  Restore the base frame. */
     astSetI( frameSet, "Base", base );
