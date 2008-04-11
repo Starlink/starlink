@@ -681,37 +681,30 @@ static int GaiaFITSTclCoord( ClientData clientData, Tcl_Interp *interp,
                 for ( int i = 0; i < ncoords; i++ ) {
                     if ( Tcl_GetDoubleFromObj( interp, listObjv[i],
                                                &coords[i] ) != TCL_OK ) {
-                        Tcl_SetStringObj( resultObj,
-                                          "is not a valid number", -1 );
-                        result = TCL_ERROR;
-                        break;
+                        return TCL_ERROR;
                     }
+
                     /* These are "pixel indices", so we need to convert to
                      * FITS grid values. */
                     coords[i] += 0.5;
                 }
 
-
-
                 /* Whether to format value. */
                 format = 1;
-                if ( Tcl_GetBooleanFromObj( interp, objv[4], &format )
-                     != TCL_OK ) {
-                    result = TCL_ERROR;
+                if ( Tcl_GetBooleanFromObj( interp, objv[4], &format ) != TCL_OK ) {
+                    return TCL_ERROR;
                 }
 
                 /* Whether to include the label and units. */
                 trailed = 0;
-                if ( Tcl_GetBooleanFromObj( interp, objv[5], &trailed )
-                     != TCL_OK ) {
-                    result = TCL_ERROR;
+                if ( Tcl_GetBooleanFromObj( interp, objv[5], &trailed ) != TCL_OK ) {
+                    return TCL_ERROR;
                 }
 
                 /* Whether to format inclusion of label and units. */
                 readable = 0;
-                if ( Tcl_GetBooleanFromObj( interp, objv[6], &readable )
-                     != TCL_OK ) {
-                    result = TCL_ERROR;
+                if ( Tcl_GetBooleanFromObj( interp, objv[6], &readable ) != TCL_OK ) {
+                    return TCL_ERROR;
                 }
 
                 resultObj = Tcl_GetObjResult( interp );
@@ -745,7 +738,6 @@ static int GaiaFITSTclCoord( ClientData clientData, Tcl_Interp *interp,
     }
     return result;
 }
-
 
 /**
  * Create a FITS file and write to the primary extension. The result is a FITS
