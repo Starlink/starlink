@@ -202,8 +202,8 @@
 #
             touch $log
             sed -n 1,5p $i >> $log
-            sed -n 7,11p $i >> $log
-            sed -n 14,15p $i >> $log
+            sed -n /Opsys/,/Current/p $i >> $log
+            sed -n /USSC/,/IRAF/p $i >> $log
             echo "" >> $log
           endif
 #
@@ -281,6 +281,7 @@
           echo "$res[15] $res[16] $res[21] $res[22] $res[27] $res[28]" \
                "$res[33] $res[34]" | $BENCH_DIR/bch_smark.prl > tmpbuf
           set smark = `cat tmpbuf`; 'rm' tmpbuf
+          echo "" >> buffer
           echo " $smark  (based on $res[57] measurements)"         >> buffer
         endif
 #

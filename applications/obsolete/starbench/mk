@@ -44,6 +44,9 @@
 #        alpha_OSF1
 #           DEC Alpha machines running OSF1
 #
+#        ix86_Linux
+#           PC running Linux
+#
 #        sun4_Solaris
 #           SUN Sparcstations running SunOS 5.x (Solaris)
 #
@@ -156,19 +159,11 @@
 #           as a null command).  On systems which require it, this
 #           should typically be set to 'ranlib'.
 #
-#        TAR_IN (pax -w -v -x ustar -f)
+#        TAR_IN (tar -cvhf)
 #           Command to use to insert a file into a .tar archive file.
-#           The default uses the POSIX.2 pax command, which is not
-#           available on traditional UNIX systems.  These typically use
-#           a tar command such as 'tar -cvhf' instead (if symbolic
-#           links are supported, then an option to follow these must be
-#           included in this command).
 #
-#        TAR_OUT (pax -r -f)
+#        TAR_OUT (tar -xf)
 #           Command to use to extract a file from a .tar archive file.
-#           The default uses the POSIX.2 pax command, which is not
-#           available on traditional UNIX systems.  These typically use
-#           a tar command such as 'tar -xf' instead.
 #
 #  Implementation Deficiencies:
 #     -  The implementation of shareable libraries on the alpha_OSF1
@@ -205,6 +200,10 @@
 #        Remove references to /star in CFLAGS.
 #     30-MAR-1996 (TMG)
 #        Adapted for STARBENCH
+#     18-MAR-1998 (TMG)
+#        Add -Wno-globals to g77 command in ix86_Linux definitions.
+#     28-JAN-2003 (BLY):
+#        Modifications co-incident with changes to makefile.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -240,15 +239,12 @@
 #  DEC Alpha machines running OSF1.
 #  -------------------------------
             alpha_OSF1)
-               AR_IN='ar -r'
                CC='cc'
                CFLAGS='-I$(STAR_INC) -O'
                FC='f77'
                FFLAGS='-O -w'
                LINK='ln -s'
                RANLIB='ranlib'
-               TAR_IN='tar -cvhf'
-               TAR_OUT='tar -xf'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
 
@@ -257,27 +253,25 @@
 #  SUN Sparcstations running SunOS 5.x (Solaris).
 #  ---------------------------------------------
             sun4_Solaris)
-               AR_IN='ar -r'
                CC='cc'
                CFLAGS='-I$(STAR_INC) -O'
                FC='f77'
                FFLAGS='-O -w'
                LINK='ln -s'
-               TAR_IN='tar -cvhf'
-               TAR_OUT='tar -xf'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
 
+# PC Systems
+# ==========
+# AMD/Intel hardware running Linux
+# --------------------------------
             ix86_Linux)
-               AR_IN='ar -r'
                CC='gcc'
-               CFLAGS='-I$(STAR_INC) -O2'
+               CFLAGS='-I. -I$(STAR_INC) -O2'
                FC='g77'
-               FFLAGS='-O2 -fno-second-underscore'
+               FFLAGS='-O2 -fno-second-underscore -Wno-globals'
                LINK='ln -s'
                RANLIB='ranlib'
-               TAR_IN='tar -cvhf'
-               TAR_OUT='tar -xf'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
 

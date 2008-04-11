@@ -1,0 +1,56 @@
+/*
+*+
+*  Name:
+*    sysinfo
+*
+*  Purpose:
+*    Call the system service getsysinfo to get the installed physical memory 
+*    on the system. Print out the result.
+*
+*  Language:
+*    ANSI C
+*
+*  Deficiencies:
+*    This version is specific to OSF1.
+*
+*  Authors:
+*    Tim Gledhill, University of Hertfordshire (tmg)
+*
+*  History:
+*    31-OCT-1994: (tmg)
+*      Original Version.
+*-
+*/
+
+/* Include Files.                                                 */
+
+#include <stdio.h>
+#include <sys/sysinfo.h>
+#include <machine/hal_sysinfo.h>
+
+main()
+{
+
+
+/* Returned Value.                                                */
+
+      int   phys_mem;
+      int   nproc;
+      float max_mem;
+
+/* Get the installed physical memory size in MB and print it out  */
+
+      getsysinfo( GSI_PHYSMEM, &phys_mem, sizeof(phys_mem), NULL, NULL );
+      max_mem =  (float) phys_mem / 1024;
+
+/* Get the number of processors in the box.                       */
+
+      getsysinfo( GSI_CPUS_IN_BOX, &nproc, sizeof(nproc), NULL, NULL );
+
+/* Print the information.                                         */
+
+      printf( "%.2f %2d", max_mem, nproc );             
+
+/* End of routine.                                                */
+
+}         

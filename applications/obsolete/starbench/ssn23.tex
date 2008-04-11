@@ -6,14 +6,17 @@
 \newcommand{\stardoccategory}  {Starlink System Note}
 \newcommand{\stardocinitials}  {SSN}
 \newcommand{\stardocsource}    {ssn\stardocnumber}
-\newcommand{\stardocnumber}    {23.5}
-\newcommand{\stardocauthors}   {T.M.Gledhill \\
+\newcommand{\stardocnumber}    {23.6}
+\newcommand{\stardocauthors}   {S.E.RAnkin \\
+                                M.J.Bly\\
+                                T.M.Gledhill \\
                                 C.A.Clayton}
-\newcommand{\stardocdate}      {22 Jan 1999}
+\newcommand{\stardocdate}      {29 Jan 2003}
 \newcommand{\stardoctitle}     {Starlink Benchmarking Utility}
 \newcommand{\stardocabstract}  {The Starlink Benchmarking Utility provides a
 set of tools for investigating the performance of computer systems running
-astronomy data reduction software. This manual is intended for Starlink Site Managers and describes how to install and use the package.}
+astronomy data reduction software. This manual is intended for Starlink Site 
+Managers and describes how to install and use the package.}
 \newcommand{\stardocversion}   {Version \pkgver}
 \newcommand{\stardocmanual}    {User's Manual}
 % ? End of document identification
@@ -135,13 +138,13 @@ astronomy data reduction software. This manual is intended for Starlink Site Man
 \renewcommand{\thepage}{\roman{page}}
 
 %  Package Version.
-\newcommand{\pkgver}     {v1.2}
+\newcommand{\pkgver}     {v1.4}
 
 % Package FTP directory.
 \newcommand{\pkgftpdir}  {/pub/tools}
 
 % Package FTP server.
-\newcommand{\pkgftpsrv} {starlink-ftp.rl.ac.uk}
+\newcommand{\pkgftpsrv} {ftp.starlink.rl.ac.uk}
 
 % Package URL.
 \newcommand{\pkgurl} {ftp://\pkgftpsrv\pkgftpdir}
@@ -205,14 +208,14 @@ astronomy data reduction software. This manual is intended for Starlink Site Man
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
       \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
       \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
+                        {http://www.cclrc.ac.uk} \\
       \htmladdnormallink{Particle Physics \& Astronomy Research Council}
                         {http://www.pparc.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
    \begin{rawhtml} </H2> \end{rawhtml}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
 %  HTML document table of contents. 
 %  ================================
@@ -241,8 +244,8 @@ astronomy data reduction software. This manual is intended for Starlink Site Man
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
- \newpage
  \begin{latexonly}
+ \newpage
    \begin {center}
      \rule{80mm}{0.5mm} \\ [1ex]
      {\Large\bf \stardoctitle \\ [2.5ex]
@@ -251,6 +254,7 @@ astronomy data reduction software. This manual is intended for Starlink Site Man
    \end{center}
    \vspace{20mm}
    \setlength{\parskip}{0mm}
+ \newpage
    \latexonlytoc
    \setlength{\parskip}{\medskipamount}
    \markright{\stardocname}
@@ -317,17 +321,20 @@ Section~\ref{results}.
 
 \section{Installation}
 
-The package is currently supported on {\bf Solaris}, {\bf Digital Unix}
-and {\bf Red Hat Linux} platforms at version \pkgver.  Compressed tar
+The package is currently supported on {\textbf{Solaris}}, {\textbf{Tru64 Unix}}
+and {\textbf{PC Linux}} platforms at version \pkgver.  Compressed tar
 files for each platform are available from the Starlink anonymous ftp
-account.
+server.
 
-\vspace{3mm}
-\htmladdnormallinkfoot{starbench\_sun4\_Solaris\_\pkgver.tar.Z}{\pkgurl/starbench\_sun4\_Solaris\_\pkgver.tar.Z} ~~~~~~~~~~~~~~~~~(Solaris systems) 
+\begin{itemize}
 
-\htmladdnormallinkfoot{starbench\_alpha\_OSF1\_\pkgver.tar.Z}{\pkgurl/starbench\_alpha\_OSF1\_\pkgver.tar.Z} ~~~~~~~~~~~~~ (Digital Unix systems) 
+\item Alpha/Tru64 Unix --- \htmladdnormallinkfoot{starbench\_alpha\_OSF1\_\pkgver.tar.Z}{\pkgurl/starbench\_alpha\_OSF1\_\pkgver.tar.Z}
 
-\htmladdnormallinkfoot{starbench\_ix86\_Linux\_\pkgver.tar.Z}{\pkgurl/starbench\_ix86\_Linux\_\pkgver.tar.Z} ~~~~~~~~~~~~~ (Red Hat Linux systems) 
+\item PC/Linux --- \htmladdnormallinkfoot{starbench\_ix86\_Linux\_\pkgver.tar.Z}{\pkgurl/starbench\_ix86\_Linux\_\pkgver.tar.Z}
+
+\item SPARC/Solaris --- \htmladdnormallinkfoot{starbench\_sun4\_Solaris\_\pkgver.tar.Z}{\pkgurl/starbench\_sun4\_Solaris\_\pkgver.tar.Z}
+
+\end{itemize}
 
 
 %\> starbench\_sun4\_Solaris\_\pkgver.tar.Z \> (Solaris systems) \\
@@ -397,7 +404,7 @@ more reliable conclusions can be drawn.
 
 \begin{itemize}
 \item Starbench \pkgver will only run with Starlink Software Distribution
-USSC207 or later (the Autumn 97 CD release). {\bf It will not work
+USSC217 or later (the Autumn 2002 CD release). {\bf It will not work
 with earlier Starlink releases.} 
 
 \item To run the benchmarks in the recommended fashion the user must
@@ -638,22 +645,24 @@ host% scan
  Benchmark Results
  =================
 
- Starlink Benchmark Utilities v1.2
+ Starlink Benchmark Utilities v1.4
 
- Benchmarks calibrated against rlsul1
+ Benchmarks calibrated against rlsul2
 
- Hostname           : uhsul2
- User               : star
- Opsys              : SunOS 5.6
- Platform           : SUNW,Ultra-2
- Physical Memory    : 256.00Mb
- Online Processors  : 2
- Processor Speed    : 168MHz
- USSC version       : USSC212
- IRAF version       : "NOAO/IRAF V2.11EXPORT"
+ Hostname           : rlspc1
+ User               : bly
+ Opsys              : Linux 2.4.18-19.7.x
+ Platform           : i686
+ User Memory        : 772644kB
+ Processor Speed    : 1980.12bogomips
+ Current load       : 0.03
 
- STARmark : 1.22 +/- 0.01  (based on 20 measurements)
- IRAFmark : 1.16 +/- 0.01  (based on 20 measurements)
+ USSC version	    : USSC217
+ IRAF version	    : "NOAO/IRAF V2.11.3
+
+ STARmark : 3.40 +/- 0.01  (based on 4 measurements)
+ IRAFmark : 1.96 +/- 0.01  (based on 4 measurements)
+
 
 host%
 \end{verbatim} 
@@ -670,8 +679,8 @@ and that the results are not unduly influenced by any one application.
 Using these extended results is described in section~\ref{results}. 
 
 In the example given above, the benchmark timings were calibrated
-against the RAL machine {\tt rlsul1} (an UltrSPARC 1/140 with 143MHz
-processor). The {\tt scan} command will also use user-supplied
+against the RAL machine {\tt rlsul2} (an Ultra10 with a 360MHz
+processor and 1Gb RAM). The {\tt scan} command will also use user-supplied
 calibrations (described in section~\ref{calfile}). 
 
 \newpage
@@ -782,45 +791,46 @@ host% scan -f
  Benchmark Results
  =================
 
- Starlink Benchmark Utilities v1.2
+ Starlink Benchmark Utilities v1.4
 
- Benchmarks calibrated against rlsul1
+ Benchmarks calibrated against rlsul2
 
- Hostname           : uhsul2
- User               : star
- Opsys              : SunOS 5.6
- Platform           : SUNW,Ultra-2
- Physical Memory    : 256.00Mb
- Online Processors  : 2
- Processor Speed    : 168MHz
- USSC version       : USSC212
- IRAF version       : "NOAO/IRAF V2.11EXPORT"
+ Hostname           : rlspc1
+ User               : bly
+ Opsys              : Linux 2.4.18-19.7.x
+ Platform           : i686
+ User Memory        : 772644kB
+ Processor Speed    : 1980.12bogomips
+ Current load       : 0.33
+ USSC version       : USSC217
+ IRAF version       : "NOAO/IRAF V2.11.3
 
- STARmark : 1.22 +/- 0.01  (based on 20 measurements)
- IRAFmark : 1.16 +/- 0.01  (based on 20 measurements)
 
- Average Load : 0.436 +/- 0.510
+ STARmark : 3.37 +/- 0.01  (based on 3 measurements)
+ IRAFmark : 1.96 +/- 0.00  (based on 3 measurements)
+
+ Average Load : 0.287 +/- 0.178
 
  Benchmark  ucpu    kcpu       tpcu            Speed          Elapsed
  ---------  ----    ----       ----            -----          -------
 
-       FFT  18.08   0.39  18.47 +/- 0.04    1.16 +/- 0.00   18.90 +/- 0.30
+       FFT   3.44   0.06   3.49 +/- 0.01    2.89 +/- 0.00    3.52 +/- 0.05
 
-       SLA   8.20   0.01   8.21 +/- 0.10    1.19 +/- 0.02    8.24 +/- 0.11
+       SLA   0.84   0.00   0.84 +/- 0.01    4.76 +/- 0.07    0.85 +/- 0.02
 
-     KAPPA   7.58   2.20   9.77 +/- 0.13    1.20 +/- 0.02   19.03 +/- 0.95
+     KAPPA   2.01   0.37   2.38 +/- 0.01    3.12 +/- 0.01    2.45 +/- 0.02
 
-      PISA   6.55   1.67   8.23 +/- 0.13    1.21 +/- 0.02   16.04 +/- 0.46
+      PISA   1.28   0.20   1.48 +/- 0.01    2.80 +/- 0.02    1.53 +/- 0.02
 
-   SPECDRE   5.30   2.48   7.78 +/- 0.12    1.23 +/- 0.02   15.19 +/- 0.47
+   SPECDRE   0.82   0.34   1.16 +/- 0.01    4.03 +/- 0.03    1.18 +/- 0.02
 
-   CCDPACK   8.43   4.09  12.51 +/- 0.13    1.23 +/- 0.01   27.10 +/- 1.47
+   CCDPACK   1.97   0.24   2.21 +/- 0.02    3.53 +/- 0.03    2.27 +/- 0.09
 
-    CCDRED  10.65   2.82  13.48 +/- 0.20    1.13 +/- 0.02   30.43 +/- 1.14
+    CCDRED   2.34   0.71   3.06 +/- 0.01    2.26 +/- 0.01    6.45 +/- 0.13
 
-   DAOPHOT  12.02   2.59  14.61 +/- 0.12    1.18 +/- 0.01   22.90 +/- 1.10
+   DAOPHOT   3.11   1.52   4.63 +/- 0.01    1.81 +/- 0.00    5.21 +/- 0.32
 
-    IMAGES   9.51   1.22  10.73 +/- 0.10    1.17 +/- 0.01   16.69 +/- 0.72
+    IMAGES   2.67   0.34   3.01 +/- 0.01    1.82 +/- 0.00    3.35 +/- 0.03
 
 \end{verbatim}
 
@@ -862,17 +872,18 @@ be useful in assessing to what degree the other benchmarks are likely
 to be influenced by disk I/O considerations but they are not
 incorporated in the STARmark or IRAFmark figures.
 
-The individual benchmarks are described in Appendix A.
+The individual benchmarks are described in Appendix~\ref{benchmark_descriptions}.
 
 
 \section{Disk I/O Effects}
 \label{diskeffects}
 
-The package does not, at present, contain a disk I/O benchmark, although the
-inclusion of one has been considered at some length. The effects of disk I/O efficiency on overall performance are obviously important, especially in
-astronomy where large data files are routinely accessed. This section 
-documents some of the problems inherent in producing a meaningful `disk
-benchmark'. 
+The package does not, at present, contain a disk I/O benchmark,
+although the inclusion of one has been considered at some length. The
+effects of disk I/O efficiency on overall performance are obviously
+important, especially in astronomy where large data files are routinely
+accessed. This section documents some of the problems inherent in
+producing a meaningful `disk benchmark'.
 
 First of all, one has to decide what to measure. The processes of disk
 reading and writing can be split into two parts. The first part, which
@@ -1005,13 +1016,15 @@ Doug Tody which is available from the Starlink IRAF mirror as
 
 \subsection{Systems running AIPS}
 
-A suite of benchmarks for systems running AIPS is available (the ``Dirty Dozen
-Test'' or DDT) which will produce an AIPSmark rating. 
-The DDT suite is a reliable way of determining two things: 
-firstly that a given AIPS installation gives accurate results, and 
-secondly it is a measure of the performance of AIPS on the given system. 
+A suite of benchmarks for systems running AIPS is available (the
+``Dirty Dozen Test'' or DDT) which will produce an AIPSmark rating.
+The DDT suite is a reliable way of determining two things:  firstly
+that a given AIPS installation gives accurate results, and secondly it
+is a measure of the performance of AIPS on the given system.
 
-Full details of the AIPS DDT, including latest results, can be found  \htmladdnormallinkfoot{at this URL}{http://info.cv.nrao.edu/aips/ddt.html}
+Full details of the AIPS DDT, including latest results, can be found
+\htmladdnormallinkfoot{at this
+URL}{http://info.cv.nrao.edu/aips/ddt.html}
 
 \section{Miscellaneous Issues}
 
@@ -1084,10 +1097,20 @@ that they would take advantage of multiple processors.
 
 \subsection{Manufacturers' SPECmark Ratings}
 
-While the results from this package should be in broad agreement with manufacturers' SPECmark ratings, they will provide a more realistic performance
-estimate for Starlink machines. SPECmark ratings tend to indicate the 
-{\em potential} that it is possible to realise with a machine rather than
-the performance that will actually be returned when running `real' applications.
+While the results from this package should be in broad agreement with
+manufacturers' SPECmark ratings, they will provide a more realistic
+performance estimate for Starlink machines. SPECmark ratings tend to
+indicate the {\em potential} that it is possible to realise with a
+machine rather than the performance that will actually be returned when
+running `real' applications.
+
+\subsection{Comparisons with earlier versions of Starbench}
+
+One thing to remember about the STARmark ratings is that not only the
+version of the USSC that is used for the benchmarks changes with each
+release, but the calibration machine at RAL often changes too.  Therefore it
+is not useful to compare STARMARK ratings from previous versions without
+extreme caution.
 
 \section{Acknowledgements}
 
@@ -1099,7 +1122,8 @@ it might produce are wholly the responsibility of Starlink.
  
 \newpage
 \appendix
-\section{Benchmark Descriptions}
+\section{\xlabel{benchmark_descriptions}Benchmark Descriptions}
+\label{benchmark_descriptions}
 
 This appendix describes each benchmark and the operations it performs.
 
@@ -1115,8 +1139,10 @@ system processes. Fortran compiler optimisation flag -O is used.
 
 {\bf SLA:}
 
-The SLA benchmark exercises each of the subroutines in the C implementation of the SLALIB Starlink subroutine package. This benchmark performs a substantial amount of floating point arithmetic with no disk I/O. C compiler flag -O is
-used.
+The SLA benchmark exercises each of the subroutines in the C
+implementation of the SLALIB Starlink subroutine package. This
+benchmark performs a substantial amount of floating point arithmetic
+with no disk I/O. C compiler flag -O is used.
 
 {\bf KAPPA:}
 
@@ -1133,7 +1159,8 @@ Again, a substantial amount of disk I/O is done.
 
 {\bf SPECDRE:}
 
-This benchmark runs a modified version of the SPECDRE demo script which processes spectral data and performs several fits. Some disk I/O.
+This benchmark runs a modified version of the SPECDRE demo script which
+processes spectral data and performs several fits. Some disk I/O.
 
 {\bf CCDPACK:}
 
@@ -1230,6 +1257,17 @@ allows the calibrations to be updated easily. The calibration file to
 use can be supplied using the {\tt -c} switch to {\tt scan}. 
 \item Output from scan includes the ussc and IRAF versions used by the
 benchmarks and the name of the calibration machine used.
+\end{enumerate}
+
+\subsection{V1.4}
+
+The following changes were made at v1.4:
+
+\begin{enumerate}
+\item The makefle and build system has been reworked to streamline maintenance.
+\item The KAPPA benchmark has been updated to reflect task option changes for KAPPA v1.0.
+\item The callibration machine at RAL is now rlsul2, a SPARC Ultra10 with a 
+360MHz processor and 1Gb RAM
 \end{enumerate}
 
 \end{document}

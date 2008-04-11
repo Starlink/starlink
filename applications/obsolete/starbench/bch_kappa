@@ -54,7 +54,7 @@
       set keys = `echo $version | awk -f $BENCH_DIR/bch_ckver.awk`
       set major = $keys[1]
       set minor = $keys[2]
-      if( $major == 0 && $minor < 10 ) then
+      if( $major == 1 && $minor > 0 ) then
 	echo "***** Found KAPPA Version $version - expected Version 0.10 or later"
         goto abort_script 
       endif
@@ -86,7 +86,7 @@
 # Detail enhancement.
 #
         histeq in=ccdframec out=$temp1 \\
-        laplace inpic=ccdframec number=3 outpic=$temp2
+        laplace in=ccdframec number=3 out=$temp2
         shadow in=ccdframec out=$temp3
         if ( ! -e ${temp1}.sdf || ! -e ${temp2}.sdf || ! -e ${temp3}.sdf ) then
           goto abort_script
@@ -95,10 +95,10 @@
 #
 # Arithmetic.
 #
-        pow inpic=ccdframec outpic=$temp1 power=2.5
+        pow in=ccdframec out=$temp1 power=2.5
         maths exp='2.5*log10(ia/ib)' ia=ccdframec ib=$temp1 out=$temp2
         cdiv in=$temp2 scalar=3.75 out=$temp3
-        exp10 inpic=$temp3 outpic=$temp4
+        exp10 in=$temp3 out=$temp4
         if ( ! -e ${temp1}.sdf || ! -e ${temp2}.sdf || ! -e ${temp3}.sdf || \
              ! -e ${temp4}.sdf ) then
           goto abort_script
@@ -109,7 +109,7 @@
 #
         rotate in=ccdframec out=$temp1 angle=30 
         flip in=$temp1 out=$temp2 dim=2
-        slide inpic=$temp2 outpic=$temp3 absx=100 absy=100 \\      
+        slide in=$temp2 out=$temp3 abs=\[100,100\] \\      
         if ( ! -e ${temp1}.sdf || ! -e ${temp2}.sdf || ! -e ${temp3}.sdf ) then
           goto abort_script
         endif
@@ -120,7 +120,7 @@
         compave in=ccdframec out=$temp1 compress=3
         compick in=ccdframec out=$temp2 compress=2
         pixdupe in=$temp1 out=$temp3 expand=2
-        sqorst inpic=$temp2 outpic=$temp4 xdim=465 ydim=543
+        sqorst in=$temp2 out=$temp4 mode="bounds" lbound=\[1,1\] ubound=\[465,543\]
         if ( ! -e ${temp1}.sdf || ! -e ${temp2}.sdf || ! -e ${temp3}.sdf || \
              ! -e ${temp4}.sdf ) then
           goto abort_script

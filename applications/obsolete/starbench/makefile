@@ -6,7 +6,7 @@
 #     Application makefile Mk V
 #
 #  Purpose:
-#     Build and install the StarBench package.
+#     Build and install the STARBENCH package.
 #
 #  Type of Module:
 #     Description file for the make utility.
@@ -233,6 +233,10 @@
 #        Update for new Starlink software distribution (USSC207).
 #     07-DEC-1998 (tmg)
 #        Updated for v1.2. Add Perl scripts.
+#     29-OCT-1999 (tmg)
+#        Version 1.2B built on rlspc4 with patched USSC213 
+#     28-JAN-2003 (BLY)
+#        Severe re-engineering!
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -369,8 +373,8 @@ RANLIB = :
 
 #  Commands for adding to and extracting from an archive file (.tar).
 
-TAR_IN = pax -w -v -x ustar -f
-TAR_OUT = pax -r -f
+TAR_IN = tar -cvhf
+TAR_OUT = tar -xf
 
 #  Command for adding a file to an object archive (.a).
 
@@ -410,7 +414,7 @@ PKG_LINK = STARBENCH
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.2
+PKG_VERS = 1.4
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -434,10 +438,14 @@ PUBLIC_SCRIPTS = bench scan submit
 #  permission set.
 
 PRIVATE_SCRIPTS = bch_ccdpk bch_ccdred bch_daophot bch_full.prl bch_head.awk \
-bch_images bch_imark.prl bch_info bch_kappa bch_load.awk bch_pisa \
+bch_images bch_imark.prl bch_kappa bch_load.awk bch_pisa \
 bch_print.awk bch_result.awk bch_scan.awk bch_smark.prl bch_specdre \
 login.cl mkiraf bch_ckver.awk \
 tmpfile
+
+#  System specific private scripts.
+
+PRIVATE_PLATFORM_SCRIPTS = bch_info 
 
 #  Startup script.  This is the file that must be executed (sourced)
 #  by a user of this package in order to define appropriate aliases 
@@ -446,23 +454,13 @@ tmpfile
 
 STARTUP_SCRIPT = $(PKG_NAME).csh
 
-#  Startup ICL script.  This is the file that must be loaded by ICL
-#  for a user of this package,  in order to define the package command
-#  set within ICL.  It is listed separately from the public scripts as 
-#  it is edited by the installation procedure.
-
-ICL_SCRIPT = 
-#$(PKG_NAME).icl
-
 #  List of private include files.  These are include files
 #  which form part of the package and are required in order to build
 #  it, but which are not required by users of it.
 
-PRIVATE_INCLUDES = smblib.h smbmac.h 
-$(PRIVATE_INCLUDES): $(SLA_SOURCE_LIBRARY)
-	$(TAR_OUT) $(SLA_SOURCE_LIBRARY) $@
-	@ if test -f $@; then :;\
-           else echo $@ is not in the tar file; exit 1; fi
+PRIVATE_INCLUDES = $(SLA_INCLUDES)
+
+SLA_INCLUDES = smblib.h smbmac.h 
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -492,89 +490,39 @@ PLATFORM_F =
 #  C routines required for building the package.  This is just a list of
 #  all the C source files.
 
-C_ROUTINES = sysinfo.c bch_cfp.c
+C_ROUTINES = bch_cfp.c
+
+PLATFORM_C = sysinfo.c
 
 # SLALIB source files.
 
-SLA_SOURCE = addet.c  cs2c6.c    dmat.c     ecor.c     geoc.c     pcd.c \
-rvlsrd.c              dmoon.c \
-afin.c     ctf2d.c    dmxm.c     eg50.c     gmst.c     pda2h.c    rvlsrk.c \
-                                            gmsta.c \
-airmas.c   ctf2r.c    dmxv.c     epb.c      gresid.c   pdq2h.c    s2tp.c \
-                                                       planet.c \
-altaz.c    daf2r.c    dr2af.c    epb2d.c    h2e.c      pm.c       sep.c \
-                                                       polmo.c \
-amp.c      dafin.c    dr2tf.c    epco.c     imxv.c     prebn.c    \
-ampqk.c    dat.c      drange.c   epj.c      intin.c    prec.c     \
-aop.c      dav2m.c    dranrm.c   epj2d.c    invf.c     preces.c   slatest.c \
-aoppa.c    dbear.c    ds2c6.c    eqecl.c    kbj.c      precl.c    smat.c \
-aoppat.c   dbjin.c    ds2tp.c    eqeqx.c    m2av.c     prenut.c   subet.c \
-aopqk.c    dc62s.c    dsep.c     eqgal.c    map.c      pvobs.c    supgal.c \
-atmdsp.c \
-av2m.c     dcc2s.c    dtf2d.c    etrms.c    mappa.c    pxy.c      svd.c \
-bear.c     dcmpf.c    dtf2r.c    euler.c    mapqk.c    random.c   svdcov.c \
-caf2r.c    dcs2c.c    dtp2s.c    evp.c      mapqkz.c   range.c    svdsol.c \
-caldj.c    dd2tf.c    dtprd.c    fitxy.c    moon.c     ranorm.c   tp2s.c \
-                      dt.c                                        tp2v.c \
-                      dtp2v.c \
-                      dtps2c.c \
-                      dtpv2c.c \
-calyd.c    de2h.c     dtt.c      fk425.c    mxm.c      rcc.c      tprd.c \
-                      dv2tp.c                          rdplan.c   tps2c.c \
-                                                                  tpv2c.c \
-cc2s.c     deuler.c   dvdv.c     fk45z.c    mxv.c      refco.c    unpcd.c \
-cc62s.c    dfltin.c   dvn.c      fk524.c    nut.c      refro.c    vdv.c \
-cd2tf.c    dh2e.c     dvxv.c     fk54z.c    nutc.c     refv.c     vn.c \
-cldj.c     dimxv.c    e2h.c      flotin.c   oap.c      refz.c     vxv.c \
-clyd.c                                                            v2tp.c \
-cr2af.c    djcal.c    earth.c    galeq.c    oapqk.c    rverot.c   wait.c \
-cr2tf.c    djcl.c     ecleq.c    galsup.c   obs.c      rvgalc.c   xy2xy.c \
-cs2c.c     dm2av.c    ecmat.c    ge50.c     pa.c       rvlg.c     zd.c
-
-# SLALIB object routines. Source file dependencies are at the end of the 
-# makefile.
-SLA_OBS = sbmaddet.o sbmafin.o sbmairmas.o sbmaltaz.o sbmamp.o \
-sbmampqk.o sbmaop.o sbmaoppa.o sbmaoppat.o sbmaopqk.o sbmatmdsp.o \
-sbmav2m.o sbmbear.o sbmcaf2r.o sbmcaldj.o sbmcalyd.o sbmcc2s.o \
-sbmcc62s.o sbmcd2tf.o sbmcldj.o sbmclyd.o sbmcr2af.o sbmcr2tf.o \
-sbmcs2c.o sbmcs2c6.o sbmctf2d.o sbmctf2r.o sbmdaf2r.o \
-sbmdafin.o sbmdat.o sbmdav2m.o sbmdbear.o sbmdbjin.o \
-sbmdc62s.o sbmdcc2s.o sbmdcmpf.o sbmdcs2c.o sbmdd2tf.o sbmde2h.o \
-sbmdeuler.o sbmdfltin.o sbmdh2e.o sbmdimxv.o sbmdjcal.o sbmdjcl.o \
-sbmdm2av.o sbmdmat.o sbmdmoon.o sbmdmxm.o sbmdmxv.o sbmdr2af.o \
-sbmdr2tf.o sbmdrange.o sbmdranrm.o sbmds2c6.o \
-sbmds2tp.o sbmdsep.o sbmdt.o sbmdtf2d.o sbmdtf2r.o sbmdtp2s.o sbmdtp2v.o \
-sbmdtps2c.o sbmdtpv2c.o sbmdtt.o sbmdv2tp.o sbmdvdv.o \
-sbmdvn.o sbmdvxv.o sbme2h.o \
-sbmearth.o sbmecleq.o sbmecmat.o sbmecor.o sbmeg50.o sbmepb.o \
-sbmepb2d.o sbmepco.o sbmepj.o sbmepj2d.o sbmeqecl.o \
-sbmeqeqx.o sbmeqgal.o sbmetrms.o sbmeuler.o sbmevp.o \
-sbmfitxy.o sbmfk425.o sbmfk45z.o sbmfk524.o sbmfk54z.o \
-sbmflotin.o sbmgaleq.o sbmgalsup.o sbmge50.o sbmgeoc.o \
-sbmgmst.o sbmgmsta.o sbmh2e.o sbmimxv.o sbmintin.o sbminvf.o \
-sbmkbj.o sbmm2av.o sbmmap.o sbmmappa.o sbmmapqk.o \
-sbmmapqkz.o sbmmoon.o sbmmxm.o sbmmxv.o sbmnut.o \
-sbmnutc.o sbmoap.o sbmoapqk.o sbmobs.o sbmpa.o \
-sbmpcd.o sbmpda2h.o sbmpdq2h.o sbmplanet.o sbmpm.o sbmpolmo.o \
-sbmprebn.o sbmprec.o sbmprecl.o sbmpreces.o \
-sbmprenut.o sbmpvobs.o sbmpxy.o sbmrange.o \
-sbmranorm.o sbmrcc.o sbmrdplan.o sbmrefco.o sbmrefro.o sbmrefv.o \
-sbmrefz.o sbmrverot.o sbmrvgalc.o sbmrvlg.o sbmrvlsrd.o sbmrvlsrk.o \
-sbms2tp.o sbmsep.o sbmsmat.o sbmsubet.o sbmsupgal.o \
-sbmsvd.o sbmsvdcov.o sbmsvdsol.o sbmtp2s.o sbmtp2v.o sbmtps2c.o sbmtpv2c.o \
-sbmunpcd.o sbmv2tp.o sbmvdv.o sbmvn.o sbmvxv.o sbmxy2xy.o sbmzd.o
-
-
 SLA_SOURCE_LIBRARY = slalib_c.tar
-$(SLA_SOURCE_LIBRARY):
-	$(TAR_OUT) $(PKG_NAME)_source.tar $@
-	@ if test -f $@; then :;\
-           else echo $@ is not in the tar file; exit 1; fi
 
-$(SLA_SOURCE): $(SLA_SOURCE_LIBRARY)
-	$(TAR_OUT) $(SLA_SOURCE_LIBRARY) $@
-	@ if test -f $@; then :;\
-           else echo $@ is not in the tar file; exit 1; fi
+SLA_SOURCE = sbmaddet.c sbmcs2c6.c sbmdmat.c sbmecor.c sbmgeoc.c sbmpcd.c \
+sbmrvlsrd.c sbmdmoon.c sbmafin.c sbmctf2d.c sbmdmxm.c sbmeg50.c sbmgmst.c \
+sbmpda2h.c sbmrvlsrk.c sbmgmsta.c sbmairmas.c sbmctf2r.c sbmdmxv.c \
+sbmepb.c sbmpdq2h.c sbms2tp.c sbmplanet.c sbmaltaz.c sbmdaf2r.c sbmdr2af.c \
+sbmepb2d.c sbmh2e.c sbmpm.c sbmsep.c sbmpolmo.c sbmamp.c sbmdafin.c \
+sbmdr2tf.c sbmepco.c sbmimxv.c sbmprebn.c sbmampqk.c sbmdat.c sbmdrange.c \
+sbmepj.c sbmintin.c sbmprec.c sbmaop.c sbmdav2m.c sbmdranrm.c sbmepj2d.c \
+sbminvf.c sbmpreces.c sbmaoppa.c sbmdbear.c sbmds2c6.c sbmeqecl.c \
+sbmkbj.c sbmprecl.c sbmsmat.c sbmaoppat.c sbmdbjin.c sbmds2tp.c \
+sbmeqeqx.c sbmm2av.c sbmprenut.c sbmsubet.c sbmaopqk.c sbmdc62s.c \
+sbmdsep.c sbmeqgal.c sbmmap.c sbmpvobs.c sbmsupgal.c sbmatmdsp.c sbmav2m.c \
+sbmdcc2s.c sbmdtf2d.c sbmetrms.c sbmmappa.c sbmpxy.c sbmsvd.c sbmbear.c \
+sbmdcmpf.c sbmdtf2r.c sbmeuler.c sbmmapqk.c sbmsvdcov.c sbmcaf2r.c \
+sbmdcs2c.c sbmdtp2s.c sbmevp.c sbmmapqkz.c sbmrange.c sbmsvdsol.c \
+sbmcaldj.c sbmdd2tf.c sbmfitxy.c sbmmoon.c  sbmranorm.c sbmtp2s.c sbmdt.c \
+sbmtp2v.c sbmdtp2v.c sbmdtps2c.c sbmdtpv2c.c sbmcalyd.c sbmde2h.c sbmdtt.c \
+sbmfk425.c sbmmxm.c sbmrcc.c sbmdv2tp.c sbmrdplan.c sbmtps2c.c sbmtpv2c.c \
+sbmcc2s.c sbmdeuler.c sbmdvdv.c sbmfk45z.c sbmmxv.c sbmrefco.c sbmunpcd.c \
+sbmcc62s.c sbmdfltin.c sbmdvn.c sbmfk524.c sbmnut.c sbmrefro.c sbmvdv.c \
+sbmcd2tf.c sbmdh2e.c sbmdvxv.c sbmfk54z.c sbmnutc.c sbmrefv.c sbmvn.c \
+sbmcldj.c sbmdimxv.c sbme2h.c sbmflotin.c sbmoap.c sbmrefz.c sbmvxv.c \
+sbmclyd.c sbmv2tp.c sbmcr2af.c sbmdjcal.c sbmearth.c sbmgaleq.c sbmoapqk.c \
+sbmrverot.c sbmcr2tf.c sbmdjcl.c sbmecleq.c sbmgalsup.c sbmobs.c \
+sbmrvgalc.c sbmxy2xy.c sbmcs2c.c sbmdm2av.c sbmecmat.c sbmge50.c sbmpa.c \
+sbmrvlg.c sbmzd.c
 
 # The A-task Fortran routines.
 
@@ -582,16 +530,19 @@ A_TASKS_F = bch_fft.f
 
 # Non-A-tasks
 
-NON_A_TASKS = bch_cfp_built bch_sysinfo_built
+NON_A_TASKS = bch_cfp bch_sysinfo
 
 #  List all the built A-tasks
 
-A_TASKS = bch_fft_built
+A_TASKS = bch_fft
+
+#  Binaries.
+
 TASKS = $(NON_A_TASKS) $(A_TASKS)
 
 # List of pre-built files used by the install target.
 
-PRE_BUILT_FILES = bch_fft bch_cfp bch_sysinfo
+PRE_BUILT_FILES = $(TASKS)
 
 #  List of task interface files.
 
@@ -606,10 +557,6 @@ HELP_SOURCES =
 DATA_FILES = bch_ccdpk.chk bch_ccdred.chk bch_daophot.chk bch_images.chk \
 bch_kappa.chk bch_pisa.chk bch_specdre.chk datcentes.par \
 datdataps.par datfitsks.par datphotps.par starbench.cal
-
-#  Files needed to test the installation.
-
-TEST_FILES =
 
 #  Lists of Latex and hypertext documents.
 
@@ -639,7 +586,7 @@ DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar)
 #  that are required to use the package (but excluding the date stamp
 #  file).
 
-BUILT_FILES = $(TASKS) $(IFC_FILES) $(HELP_FILES) $(ICL_SCRIPT)
+BUILT_FILES = $(TASKS) $(IFC_FILES)
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
@@ -654,14 +601,24 @@ SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
-$(STARTUP_SCRIPT) $(ICL_SCRIPT) \
-$(PUBLIC_SCRIPTS) $(PRIVATE_SCRIPTS) $(PRE_BUILT_FILES) $(DATA_FILES) \
-$(LINK_SCRIPT) \
-$(F_ROUTINES) $(BLOCK_DATA) $(C_ROUTINES) \
-$(A_TASKS_F) $(IFL_FILES) \
-$(HELP_SOURCES) \
-$(TEST_FILES):
+$(STARTUP_SCRIPT) $(PUBLIC_SCRIPTS) $(PRIVATE_SCRIPTS) $(DATA_FILES) $(F_ROUTINES) $(BLOCK_DATA) $(C_ROUTINES) $(A_TASKS_F) $(IFL_FILES) $(TEST_FILES) $(SLA_SOURCE_LIBRARY):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in the tar file; exit 1; fi
+
+#  Rules for extracting platform specific files from the source
+#  archives.
+
+$(PLATFORM_F) $(PLATFORM_C) $(PRIVATE_PLATFORM_SCRIPTS):
+	$(TAR_OUT) $(PKG_NAME)_source.tar $@_$(SOURCE_VARIANT)
+	@ if test -f $@_$(SOURCE_VARIANT); then :;\
+           else echo $@_$(SOURCE_VARIANT) is not in the tar file; exit 1; fi
+	mv $@_$(SOURCE_VARIANT) $@
+
+#  Source extraction rukes for SLA sources and include files.
+
+$(SLA_SOURCE) $(SLA_INCLUDES): $(SLA_SOURCE_LIBRARY)
+	$(TAR_OUT) $(SLA_SOURCE_LIBRARY) $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
@@ -669,12 +626,17 @@ $(TEST_FILES):
 #  for performing the compilations.
 
 OBJECT_FILES = $(ROUTINE_OBJECT_FILES) \
-               $(A_TASKS_OBJECT_FILES)
+               $(A_TASKS_OBJECT_FILES) \
+               $(SLA_OBJECTS)
+
+SLA_OBJECTS = $(SLA_SOURCE:.c=.o)
+
 ROUTINE_OBJECT_FILES = $(F_ROUTINES:.f=.o) \
                        $(PLATFORM_F:.f=.o) \
+                       $(PLATFORM_C:.c=.o) \
                        $(BLOCK_DATA:.f=.o) \
-                       $(C_ROUTINES:.c=.o) \
-                       $(SLA_ROUTINES:.c=.o)
+                       $(C_ROUTINES:.c=.o)
+
 A_TASKS_OBJECT_FILES = $(A_TASKS_F:.f=.o)
 
 .c.o:
@@ -682,41 +644,19 @@ A_TASKS_OBJECT_FILES = $(A_TASKS_F:.f=.o)
 .f.o:
 	$(FC) $(FFLAGS) -c $<
 
-#  List of object library files to be built and rules for building
-#  them.
-
-OBJECT_LIBRARY = libsla.a
-
-#
-libsla.a: $(SLA_OBS)
-	$(AR_IN) $@ $?
-	$(RANLIB) $@
-
-#  Rules for extracting platform specific files from the source
-#  archives.
-
-$(PLATFORM_F) $(IRAF_LIBRARIES):
-	$(TAR_OUT) $(PKG_NAME)_source.tar $@_$(SOURCE_VARIANT)
-	@ if test -f $@_$(SOURCE_VARIANT); then :;\
-           else echo $@_$(SOURCE_VARIANT) is not in the tar file; exit 1; fi
-	mv $@_$(SOURCE_VARIANT) $@
-
 #  Rules and dependencies for building the A-tasks.
 
-bch_fft_built: $(EXTERNAL_INCLUDES) bch_fft.o 
-#	$(TAR_OUT) $(KAPPA_SOURCE)/kappa_source.tar kappa_link_adam
+bch_fft: $(EXTERNAL_INCLUDES) bch_fft.o 
 	$(ALINK) bch_fft.o -L$(STAR_SOURCES)/kappa -lkapsub -lkapgen \
         `pda_link`
-#	rm -f kappa_link_adam
-#	strip bch_fft
 
-bch_sysinfo_built: sysinfo.c
-	$(CC)  $(CFLAGS) -o bch_sysinfo sysinfo.c
+#  Rules for Non-ATASK binaries
 
-bch_cfp_built: $(SLA_SOURCE_LIBRARY) $(PRIVATE_INCLUDES) $(EXTERNAL_INCLUDES) \
-               $(OBJECT_LIBRARY) bch_cfp.c
-	$(CC)  $(CFLAGS) bch_cfp.c -o bch_cfp -L/usr/lib -lm -L. -I. -lsla
-#	strip bch_cfp
+bch_sysinfo: sysinfo.c
+	$(CC) $(CFLAGS) -o bch_sysinfo sysinfo.c
+
+bch_cfp: $(SLA_OBJECTS) bch_cfp.c
+	$(CC) $(CFLAGS) bch_cfp.c -I. $(SLA_OBJECTS) -o bch_cfp -L/usr/lib -lm
 
 #  Rules for building the help libraries.
 
@@ -879,17 +819,8 @@ build:
 #
 #  Record completion of the build.
 	@ echo '$(SYSTEM)' > .BUILT
-#
-# Remove intermediate files.
-#
-	- for f in $(IFL_FILES) $(A_TASKS_F) $(SLA_SOURCE) $(SLA_OBS) \
-                   $(SLA_SOURCE_LIBRARY) $(C_ROUTINES) $(EXTERNAL_INCLUDES) \
-                   $(PRIVATE_INCLUDES); do \
-           if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
-              rm -f $(INSTALL_BIN)/$$f;\
-           else :; fi;\
-        done
 
+#
 #  install: Install the package for use.
 #  ------------------------------------
 #
@@ -948,14 +879,14 @@ install:
 #  original file by a link to the installed copy.
 
 .INSTALLED_$(SYSTEM): $(INSTALL_DIRS) $(PUBLIC_SCRIPTS) $(PRIVATE_SCRIPTS) \
-$(PRE_BUILT_FILES) $(DATA_FILES) $(STARTUP_SCRIPT) $(IFC_FILES) 
+$(PRIVATE_PLATFORM_SCRIPTS) $(DATA_FILES) $(STARTUP_SCRIPT)
 #
 #  Create .INSTALLED_$(SYSTEM), containing $INSTALL, to record that the 
 #  package is installed (at least in part).
 	@ echo $(INSTALL) > .INSTALLED_$(SYSTEM)
 #
 #  Install the public scripts, giving them world execute permission.
-	for f in $(PUBLIC_SCRIPTS) $(PRIVATE_SCRIPTS) ""; do \
+	for f in $(PUBLIC_SCRIPTS) $(PRIVATE_SCRIPTS) $(PRIVATE_PLATFORM_SCRIPTS)""; do \
            if test -n "$$f"; then \
               chmod 755 $(INSTALL_BIN)/$$f;\
            else :; fi;\
@@ -989,13 +920,6 @@ $(PRE_BUILT_FILES) $(DATA_FILES) $(STARTUP_SCRIPT) $(IFC_FILES)
            else :; fi;\
         done
 #
-#  Create the application/task name soft links.
-#	for f in $(TASKS) ""; do \
-#           if test -n "$$f"; then \
-#              $(LINK) ./$(MONOLITH) $(INSTALL_BIN)/$$f ;\
-#           else :; fi;\
-#        done
-#
 #  Install the package startup script.  The package version number,
 #  the name of the directory containing the installed binaries and 
 #  interface files, and the name of the directory containing the help
@@ -1012,18 +936,6 @@ $(PRE_BUILT_FILES) $(DATA_FILES) $(STARTUP_SCRIPT) $(IFC_FILES)
            mv $(INSTALL_BIN)/STARTUP_SCRIPT_TEMP \
                  $(INSTALL_BIN)/$(STARTUP_SCRIPT);\
            chmod 644 $(INSTALL_BIN)/$(STARTUP_SCRIPT) ;\
-        else :; fi
-#
-#  Install the package ICL script.  The package version number,
-#  the name of the directory containing the installed binaries and 
-#  interface files, and the name of the directory containing the help
-#  libraries must be edited into this, and read permission given.
-	if test -n "$(ICL_SCRIPT)"; then \
-           sed -e s#INSTALL_BIN#$(INSTALL_BIN)# \
-               -e s#INSTALL_HELP#$(INSTALL_HELP)# \
-               -e s#PKG_VERS#"$(PKG_VERS)"# \
-              $(ICL_SCRIPT) >$(INSTALL_BIN)/$(ICL_SCRIPT) ;\
-           chmod 644 $(INSTALL_BIN)/$(ICL_SCRIPT) ;\
         else :; fi
 #
 #  Install the Latex documentation, giving it world read permission,
@@ -1059,13 +971,6 @@ $(PRE_BUILT_FILES) $(DATA_FILES) $(STARTUP_SCRIPT) $(IFC_FILES)
 #	chmod 644 $(DATE_STAMP)
 #	rm $(DATE_STAMP)
 #	$(LINK) $(INSTALL_DATES)/$(DATE_STAMP) $(DATE_STAMP)
-#
-# Remove any intermediate files.
-	for f in $(A_TASKS_F) $(C_ROUTINES) $(IFL_FILES) ""; do \
-           if test -n "$$f"; then \
-              rm -f $$f;\
-           else :; fi;\
-        done
 
 #
 #  deinstall: Deinstall the package.
@@ -1124,25 +1029,25 @@ do_deinstall:
 	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); else :; fi
 #
 #  Deinstall the public script files, if installed versions exist.
-	- for f in $(PUBLIC_SCRIPTS) $(PRIVATE_SCRIPTS)  ""; do \
+	- for f in $(PUBLIC_SCRIPTS) $(PRIVATE_SCRIPTS) $(PRIVATE_PLATFORM_SCRIPTS) ""; do \
            if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
               rm -f $(INSTALL_BIN)/$$f;\
            else :; fi;\
         done
 #
 #  Deinstall the tasks, if an installed version exists.
-	- for f in $(PRE_BUILT_FILES) ""; do \
-           if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
-              rm -f $(INSTALL_BIN)/$$f;\
-           else :; fi;\
-        done
+#	- for f in $(PRE_BUILT_FILES) ""; do \
+#           if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
+#              rm -f $(INSTALL_BIN)/$$f;\
+#           else :; fi;\
+#        done
 #
 #  Deinstall the interface files, if installed versions exist.
-	- for f in $(IFC_FILES) ""; do \
-           if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
-              rm -f $(INSTALL_BIN)/$$f;\
-           else :; fi;\
-        done
+#	- for f in $(IFC_FILES) ""; do \
+#           if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
+#              rm -f $(INSTALL_BIN)/$$f;\
+#           else :; fi;\
+#        done
 #
 #  Deinstall the data files, if installed versions exist.
 	- for f in $(DATA_FILES) ""; do \
@@ -1252,15 +1157,15 @@ test:
 do_test: $(TEST_FILES)
 #
 #  Note the test has not yet succeeded.
-	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); else :; fi
-
+#	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); else :; fi
+#
 #  Execute the test.  Remove the test data when done. 
-	$(INSTALL_BIN)/dst2ndf $(TEST_FILES:.dst=) $(TEST_FILES:.dst=)
-	$(STAR_BIN)/hdstrace $(TEST_FILES:.dst=)
-	rm $(TEST_FILES) $(TEST_FILES:.dst=.sdf)
+#	$(INSTALL_BIN)/dst2ndf $(TEST_FILES:.dst=) $(TEST_FILES:.dst=)
+#	$(STAR_BIN)/hdstrace $(TEST_FILES:.dst=)
+#	rm $(TEST_FILES) $(TEST_FILES:.dst=.sdf)
 #
 #  Note the test has been run.
-	@ touch .TESTED_$(SYSTEM)
+#	@ touch .TESTED_$(SYSTEM)
 
 #  export: Export the installed system.
 #  -----------------------------------
@@ -1270,19 +1175,19 @@ do_test: $(TEST_FILES)
 #  The export target depends on the resulting compressed tar file being
 #  up to date.
 
-export: $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
+export: $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_v$(PKG_VERS).tar.Z
 	@ echo
 	@ echo \
 '*** Export copy of the built $(PACK_NAME) v$(PKG_VERS) package is in the'
 	@ echo \
-'    compressed tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z'
+'    compressed tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_v$(PKG_VERS).tar.Z'
 	@ echo
 
 #  The compressed tar file is up to date if it exists and is more
 #  recent than all the source files and the date stamp file (which
 #  records the time of the last build which modified any files).
 
-$(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
+$(EXPORT)/$(PKG_NAME)_$(SYSTEM)_v$(PKG_VERS).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 #
 #  Issue a warning if the package has not been tested.
 	@ if test ! -f .TESTED_$(SYSTEM); then \
@@ -1292,10 +1197,10 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
         else :; fi
 #
 #  Remove any pre-existing tar files before creating new ones.
-	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; else :; fi
-	$(TAR_IN) - $(SOURCE_FILES) $(DATE_STAMP) .BUILT \
-           | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
+	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_v$(PKG_VERS).tar.Z; then \
+           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_v$(PKG_VERS).tar.Z; else :; fi
+	$(TAR_IN) - $(BUILT_FILES) $(SOURCE_FILES) $(DATE_STAMP) .BUILT \
+           | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_v$(PKG_VERS).tar.Z
 
 #  export_run: Export the built system (without source).
 #  -----------------------------------------------------
@@ -1305,19 +1210,19 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 #  The export_run target depends on the resulting compressed tar file being
 #  up to date.
 
-export_run: $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
+export_run: $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_v$(PKG_VERS)_run.tar.Z
 	@ echo
 	@ echo \
 '*** Export copy of the "runtime" $(PACK_NAME) package is in the compressed'
 	@ echo \
-'    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z'
+'    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_v$(PKG_VERS)_run.tar.Z'
 	@ echo
 
 #  The compressed tar file is up to date if it exists and is more
 #  recent than all the source files and the date stamp file (which
 #  records the time of the last build which modified any files).
 
-$(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
+$(EXPORT)/$(PKG_NAME)_$(SYSTEM)_v$(PKG_VERS)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 #
 #  Issue a warning if the package has not been tested.
 	@ if test ! -f .TESTED_$(SYSTEM); then \
@@ -1327,11 +1232,11 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
         else :; fi
 #
 #  Remove any pre-existing tar files before creating new ones.
-	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; else :; fi
+	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_v$(PKG_VERS)_run.tar.Z; then \
+           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_v$(PKG_VERS)_run.tar.Z; else :; fi
 	$(TAR_IN) - mk makefile $(DOCUMENTATION) $(BUILT_FILES) \
            $(DATE_STAMP) .BUILT \
-           | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
+           | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_v$(PKG_VERS)_run.tar.Z
 
 #  export_source: Export the source.
 #  --------------------------------
@@ -1341,24 +1246,24 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 #  This target depends on the resulting compressed tar file being up to
 #  date.
 
-export_source: $(EXPORT)/$(PKG_NAME).tar.Z
+export_source: $(EXPORT)/$(PKG_NAME)_v$(PKG_VERS).tar.Z
 	@ echo
 	@ echo \
 '*** Export copy of the $(PACK_NAME) package source is in the compressed'
 	@ echo \
-'    tar file $(EXPORT)/$(PKG_NAME).tar.Z'
+'    tar file $(EXPORT)/$(PKG_NAME)_v$(PKG_VERS).tar.Z'
 	@ echo
 
 #  The compressed tar file is up to date if it exists and is more
 #  recent than all the source files.
 
-$(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
+$(EXPORT)/$(PKG_NAME)_v$(PKG_VERS).tar.Z: $(SOURCE_FILES)
 #
 #  Remove any pre-existing tar files before creating new ones.
-	if test -f $(EXPORT)/$(PKG_NAME).tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME).tar.Z; else :; fi
+	if test -f $(EXPORT)/$(PKG_NAME)_v$(PKG_VERS).tar.Z; then \
+           rm -f $(EXPORT)/$(PKG_NAME)_v$(PKG_VERS).tar.Z; else :; fi
 	$(TAR_IN) - $(SOURCE_FILES) \
-           | compress -v > $(EXPORT)/$(PKG_NAME).tar.Z
+           | compress -v > $(EXPORT)/$(PKG_NAME)_v$(PKG_VERS).tar.Z
 
 #  clean: Clean up the source directory.
 #  ------------------------------------
@@ -1366,13 +1271,10 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 #  Remove all intermediate files.  Do not remove built files.
 
 clean:
-	- for f in $(IFL_FILES) $(A_TASKS_F) $(SLA_SOURCE) $(SLA_OBS) \
-                   $(SLA_SOURCE_LIBRARY) $(C_ROUTINES) $(EXTERNAL_INCLUDES) \
-                   $(PRIVATE_INCLUDES); do \
-           if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
-              rm -f $(INSTALL_BIN)/$$f;\
-           else :; fi;\
-        done
+	@- rm -f  $(IFL_FILES) $(A_TASKS_F) $(SLA_SOURCE) \
+                   $(SLA_SOURCE_LIBRARY) $(C_ROUTINES) $(PLATFORM_C) \
+                   $(EXTERNAL_INCLUDES) $(OBJECT_FILES) \
+                   $(PRIVATE_INCLUDES)
 	@ echo
 	@ echo '*** Intermediate files removed'
 	@ echo
@@ -1384,7 +1286,7 @@ clean:
 #  package is no longer built or tested.
 
 unbuild: clean
-	@- rm -f $(BUILT_FILES) $(DATE_STAMP) $(OBJECT_LIBRARY) \
+	@- rm -f $(BUILT_FILES) $(DATE_STAMP) \
           .BUILT 1>/dev/null 2>/dev/null
 	@ echo '*** Built files removed'
 	@ echo
@@ -1401,6 +1303,9 @@ strip:
 #
 #  This is for development use.  It enables the source tar file to be
 #  created and updated(?).
+
+
+#  DEPRICATED!
 
 archive:
 	$(TAR_OUT) $(PKG_NAME)_source.tar $(PUBLIC_SCRIPTS) $(PRIVATE_SCRIPTS) \
@@ -1424,330 +1329,8 @@ archive:
 #-------------------------------------------------------------------------------
 
 # SLALIB object-source file dependencies.
-sbmaddet.o  : addet.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ addet.c
-sbmafin.o   : afin.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ afin.c
-sbmairmas.o : airmas.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ airmas.c
-sbmaltaz.o  : altaz.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ altaz.c
-sbmamp.o    : amp.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ amp.c
-sbmampqk.o  : ampqk.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ ampqk.c
-sbmaop.o    : aop.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ aop.c
-sbmaoppa.o  : aoppa.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ aoppa.c
-sbmaoppat.o : aoppat.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ aoppat.c
-sbmaopqk.o  : aopqk.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ aopqk.c
-sbmatmdsp.o   : atmdsp.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ atmdsp.c
-sbmav2m.o   : av2m.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ av2m.c
-sbmbear.o   : bear.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ bear.c
-sbmcaf2r.o  : caf2r.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ caf2r.c
-sbmcaldj.o  : caldj.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ caldj.c
-sbmcalyd.o  : calyd.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ calyd.c
-sbmcc2s.o   : cc2s.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ cc2s.c
-sbmcc62s.o  : cc62s.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ cc62s.c
-sbmcd2tf.o  : cd2tf.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ cd2tf.c
-sbmcldj.o   : cldj.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ cldj.c
-sbmclyd.o   : clyd.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ clyd.c
-sbmcr2af.o  : cr2af.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ cr2af.c
-sbmcr2tf.o  : cr2tf.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ cr2tf.c
-sbmcs2c.o   : cs2c.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ cs2c.c
-sbmcs2c6.o  : cs2c6.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ cs2c6.c
-sbmctf2d.o  : ctf2d.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ ctf2d.c
-sbmctf2r.o  : ctf2r.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ ctf2r.c
-sbmdaf2r.o  : daf2r.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ daf2r.c
-sbmdafin.o  : dafin.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dafin.c
-sbmdat.o    : dat.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dat.c
-sbmdav2m.o  : dav2m.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dav2m.c
-sbmdbear.o  : dbear.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dbear.c
-sbmdbjin.o  : dbjin.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dbjin.c
-sbmdc62s.o  : dc62s.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dc62s.c
-sbmdcc2s.o  : dcc2s.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dcc2s.c
-sbmdcmpf.o  : dcmpf.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dcmpf.c
-sbmdcs2c.o  : dcs2c.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dcs2c.c
-sbmdd2tf.o  : dd2tf.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dd2tf.c
-sbmde2h.o   : de2h.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ de2h.c
-sbmdeuler.o : deuler.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ deuler.c
-sbmdfltin.o : dfltin.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dfltin.c
-sbmdh2e.o   : dh2e.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dh2e.c
-sbmdimxv.o  : dimxv.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dimxv.c
-sbmdjcal.o  : djcal.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ djcal.c
-sbmdjcl.o   : djcl.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ djcl.c
-sbmdm2av.o  : dm2av.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dm2av.c
-sbmdmat.o   : dmat.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dmat.c
-sbmdmoon.o   : dmoon.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dmoon.c
-sbmdmxm.o   : dmxm.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dmxm.c
-sbmdmxv.o   : dmxv.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dmxv.c
-sbmdr2af.o  : dr2af.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dr2af.c
-sbmdr2tf.o  : dr2tf.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dr2tf.c
-sbmdrange.o : drange.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ drange.c
-sbmdranrm.o : dranrm.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dranrm.c
-sbmds2c6.o  : ds2c6.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ ds2c6.c
-sbmds2tp.o  : ds2tp.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ ds2tp.c
-sbmdsep.o   : dsep.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dsep.c
-sbmdt.o  : dt.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dt.c
-sbmdtf2d.o  : dtf2d.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dtf2d.c
-sbmdtf2r.o  : dtf2r.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dtf2r.c
-sbmdtp2s.o  : dtp2s.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dtp2s.c
-sbmdtp2v.o  : dtp2v.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dtp2v.c
-sbmdtps2c.o  : dtps2c.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dtps2c.c
-sbmdtpv2c.o : dtpv2c.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dtpv2c.c
-sbmdtt.o    : dtt.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dtt.c
-sbmdv2tp.o  : dv2tp.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dv2tp.c
-sbmdvdv.o   : dvdv.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dvdv.c
-sbmdvn.o    : dvn.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dvn.c
-sbmdvxv.o   : dvxv.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ dvxv.c
-sbme2h.o    : e2h.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ e2h.c
-sbmearth.o  : earth.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ earth.c
-sbmecleq.o  : ecleq.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ ecleq.c
-sbmecmat.o  : ecmat.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ ecmat.c
-sbmecor.o   : ecor.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ ecor.c
-sbmeg50.o   : eg50.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ eg50.c
-sbmepb.o    : epb.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ epb.c
-sbmepb2d.o  : epb2d.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ epb2d.c
-sbmepco.o   : epco.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ epco.c
-sbmepj.o    : epj.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ epj.c
-sbmepj2d.o  : epj2d.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ epj2d.c
-sbmeqecl.o  : eqecl.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ eqecl.c
-sbmeqeqx.o  : eqeqx.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ eqeqx.c
-sbmeqgal.o  : eqgal.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ eqgal.c
-sbmetrms.o  : etrms.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ etrms.c
-sbmeuler.o  : euler.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ euler.c
-sbmevp.o    : evp.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ evp.c
-sbmfitxy.o  : fitxy.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ fitxy.c
-sbmfk425.o  : fk425.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ fk425.c
-sbmfk45z.o  : fk45z.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ fk45z.c
-sbmfk524.o  : fk524.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ fk524.c
-sbmfk54z.o  : fk54z.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ fk54z.c
-sbmflotin.o : flotin.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ flotin.c
-sbmh2e.o    : h2e.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ h2e.c
-sbmgaleq.o  : galeq.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ galeq.c
-sbmgalsup.o : galsup.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ galsup.c
-sbmge50.o   : ge50.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ ge50.c
-sbmgeoc.o   : geoc.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ geoc.c
-sbmgmst.o   : gmst.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ gmst.c
-sbmgmsta.o  : gmsta.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ gmsta.c
-sbmimxv.o   : imxv.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ imxv.c
-sbmintin.o  : intin.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ intin.c
-sbminvf.o   : invf.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ invf.c
-sbmkbj.o    : kbj.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ kbj.c
-sbmm2av.o   : m2av.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ m2av.c
-sbmmap.o    : map.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ map.c
-sbmmappa.o  : mappa.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ mappa.c
-sbmmapqk.o  : mapqk.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ mapqk.c
-sbmmapqkz.o : mapqkz.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ mapqkz.c
-sbmmoon.o   : moon.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ moon.c
-sbmmxm.o    : mxm.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ mxm.c
-sbmmxv.o    : mxv.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ mxv.c
-sbmnut.o    : nut.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ nut.c
-sbmnutc.o   : nutc.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ nutc.c
-sbmoap.o    : oap.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ oap.c
-sbmoapqk.o  : oapqk.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ oapqk.c
-sbmobs.o    : obs.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ obs.c
-sbmpa.o     : pa.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ pa.c
-sbmpcd.o    : pcd.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ pcd.c
-sbmpm.o     : pm.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ pm.c
-sbmpda2h.o  : pda2h.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ pda2h.c
-sbmpdq2h.o  : pdq2h.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ pdq2h.c
-sbmplanet.o  : planet.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ planet.c
-sbmpolmo.o  : polmo.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ polmo.c
-sbmprebn.o  : prebn.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ prebn.c
-sbmprec.o   : prec.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ prec.c
-sbmprecl.o  : precl.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ precl.c
-sbmpreces.o : preces.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ preces.c
-sbmprenut.o : prenut.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ prenut.c
-sbmpvobs.o  : pvobs.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ pvobs.c
-sbmpxy.o    : pxy.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ pxy.c
-sbmrange.o  : range.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ range.c
-sbmranorm.o : ranorm.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ ranorm.c
-sbmrcc.o    : rcc.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ rcc.c
-sbmrdplan.o    : rdplan.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ rdplan.c
-sbmrefco.o  : refco.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ refco.c
-sbmrefro.o  : refro.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ refro.c
-sbmrefv.o   : refv.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ refv.c
-sbmrefz.o   : refz.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ refz.c
-sbmrverot.o : rverot.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ rverot.c
-sbmrvgalc.o : rvgalc.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ rvgalc.c
-sbmrvlg.o   : rvlg.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ rvlg.c
-sbmrvlsrd.o : rvlsrd.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ rvlsrd.c
-sbmrvlsrk.o : rvlsrk.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ rvlsrk.c
-sbms2tp.o   : s2tp.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ s2tp.c
-sbmsep.o    : sep.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ sep.c
-sbmsmat.o   : smat.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ smat.c
-sbmsubet.o  : subet.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ subet.c
-sbmsupgal.o : supgal.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ supgal.c
-sbmsvd.o    : svd.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ svd.c
-sbmsvdcov.o : svdcov.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ svdcov.c
-sbmsvdsol.o : svdsol.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ svdsol.c
-sbmtp2s.o   : tp2s.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ tp2s.c
-sbmtp2v.o   : tp2v.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ tp2v.c
-sbmtps2c.o   : tps2c.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ tps2c.c
-sbmtpv2c.o  : tpv2c.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ tpv2c.c
-sbmunpcd.o  : unpcd.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ unpcd.c
-sbmv2tp.o   : v2tp.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ v2tp.c
-sbmvdv.o    : vdv.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ vdv.c
-sbmvn.o     : vn.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ vn.c
-sbmvxv.o    : vxv.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ vxv.c
-sbmxy2xy.o  : xy2xy.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ xy2xy.c
-sbmzd.o     : zd.c smblib.h smbmac.h
-	$(CC) $(CFLAGS) -c -o $@ zd.c
+
+$(SLA_OBJECTS): $(SLA_INCLUDES)
 
 
 #-------------------------------------------------------------------------------

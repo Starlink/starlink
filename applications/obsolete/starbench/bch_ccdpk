@@ -161,10 +161,14 @@
       echo " "
       ccdgenerate \
          nseq=4 \
-	 file=ccdtest_obj.dat \
-         ubnds='[128,128,166,128,128,201,166,201]' \
-	 lbnds='[1,1,39,1,1,74,39,74]' \
-	 accept
+         file=ccdtest_obj.dat \
+         #type=$exten \
+         type=.sdf \
+         pixels='[128,128]' \
+         origins='[-1,-1,-40,15,-10,-74,-35,-70]' \
+         angles='[0,30,0,0]' \
+         accept
+
 #     end ccdgenerate
 
 #  If display capability is enabled then display the DATA frames.
@@ -590,8 +594,10 @@ EXIT:
 # Check the output files against the expected list and flag any problems.
 # Remove all created files.
 #
-      if ($?LC_COLLATE != 0 ) unsetenv LC_COLLATE
+#      if ($?LC_COLLATE != 0 ) unsetenv LC_COLLATE
+      setenv LC_COLLATE C
       ls -1 > dir_index_after
+      unsetenv LC_COLLATE
       diff dir_index_before dir_index_after | awk '/>/{print $2}' > newfiles
       set check = `diff newfiles $BENCH_DIR/bch_ccdpk.chk`
       if ( "$check" != "" ) then

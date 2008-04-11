@@ -121,7 +121,8 @@ END
 # Check the output files against the expected list and flag any problems.
 # Remove all created files.
 #
-if ($?LC_COLLATE != 0 ) unsetenv LC_COLLATE
+#if ($?LC_COLLATE != 0 ) unsetenv LC_COLLATE
+setenv LC_COLLATE C
 ls -1a > dir_index_after
 diff dir_index_before dir_index_after | awk '/>/{print $2}' > newfiles
 set check = `diff newfiles $BENCH_DIR/bch_ccdred.chk`
@@ -130,6 +131,7 @@ if ( "$check" != "" ) then
 endif
 'rm' -rf `cat newfiles` dir_index_before 
 'rm' newfiles
+unsetenv LC_COLLATE
 #
 # End of script.
 #

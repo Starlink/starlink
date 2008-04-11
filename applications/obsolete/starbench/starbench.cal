@@ -2,45 +2,43 @@
  Benchmark Results
  =================
 
- Starlink Benchmark Utilities v1.2
+ Starlink Benchmark Utilities v1.4
 
- Benchmarks calibrated against rlsul1
+ Benchmarks calibrated against rlsul2
 
- Hostname           : rlsul1
- User               : djr
- Opsys              : SunOS 5.6
- Platform           : SUNW,Ultra-1
- Physical Memory    : 224.00Mb
+ Hostname           : rlsul2
+ User               : bly
+ Opsys              : SunOS 5.8
+ Platform           : SUNW,Ultra-5_10
+ Physical Memory    : 1024.00Mb
  Online Processors  : 1
- Processor Speed    : 143MHz
- USSC version       : USSC212
- IRAF version       : "NOAO/IRAF V2.11EXPORT"
+ Processor Speed    : 360MHz
+ USSC version       : USSC217
+ IRAF version       : "NOAO/IRAF V2.11.3
 
- STARmark : 1.00 +/- 0.01  (based on 13 measurements)
- IRAFmark : 1.00 +/- 0.01  (based on 13 measurements)
+ STARmark : 1.00 +/- 0.00  (based on 4 measurements)
+ IRAFmark : 1.00 +/- 0.01  (based on 4 measurements)
 
- Average Load : 0.075 +/- 0.144
+ Average Load : 0.135 +/- 0.146
 
  Benchmark  ucpu    kcpu       tpcu            Speed          Elapsed
  ---------  ----    ----       ----            -----          -------
 
-       FFT  21.09   0.40  21.48 +/- 0.14    1.00 +/- 0.01   22.41 +/- 0.35
+       FFT   9.84   0.27  10.11 +/- 0.02    1.00 +/- 0.00   10.27 +/- 0.03
 
-       SLA   9.76   0.02   9.78 +/- 0.07    1.00 +/- 0.01   10.18 +/- 0.20
+       SLA   4.01   0.01   4.01 +/- 0.01    1.00 +/- 0.00    4.05 +/- 0.01
 
-     KAPPA   9.22   2.52  11.74 +/- 0.11    1.00 +/- 0.01   14.87 +/- 0.83
+     KAPPA   5.18   2.25   7.44 +/- 0.04    1.00 +/- 0.01    7.94 +/- 0.07
 
-      PISA   7.85   2.09   9.94 +/- 0.12    1.00 +/- 0.01   12.97 +/- 0.47
+      PISA   3.23   0.91   4.14 +/- 0.02    1.00 +/- 0.01    4.40 +/- 0.05
 
-   SPECDRE   6.68   2.92   9.60 +/- 0.15    1.00 +/- 0.02   12.44 +/- 0.49
+   SPECDRE   2.92   1.76   4.68 +/- 0.03    1.00 +/- 0.01    5.08 +/- 0.05
 
-   CCDPACK  10.89   4.47  15.37 +/- 0.16    1.00 +/- 0.01   20.13 +/- 0.53
+   CCDPACK   5.70   2.09   7.79 +/- 0.04    1.00 +/- 0.00    8.12 +/- 0.05
 
-    CCDRED  12.25   3.04  15.29 +/- 0.15    1.00 +/- 0.01   28.90 +/- 1.40
+    CCDRED   5.29   1.61   6.90 +/- 0.08    1.00 +/- 0.01    8.10 +/- 0.67
 
-   DAOPHOT  14.30   2.88  17.19 +/- 0.08    1.00 +/- 0.00   25.16 +/- 0.80
+   DAOPHOT   6.12   2.27   8.39 +/- 0.08    1.00 +/- 0.01    9.03 +/- 0.25
 
-    IMAGES  11.18   1.42  12.60 +/- 0.14    1.00 +/- 0.01   17.70 +/- 0.70
-
-
+    IMAGES   4.66   0.81   5.47 +/- 0.06    1.00 +/- 0.01    6.19 +/- 0.34
 

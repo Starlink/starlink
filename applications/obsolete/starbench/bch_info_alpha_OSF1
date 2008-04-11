@@ -1,0 +1,113 @@
+#!/bin/csh -f
+#+
+# Name:
+#    bch_info 
+#
+# Purpose:
+#    Return information relevant to the benchmarks.
+#
+# Language:
+#    C shell
+#
+# Invocation:
+#    /star/local/bench/bch_info
+#
+#
+# Imported Variables:
+#    BENCH_DIR  Benchmark installation directory.
+#
+# Notes:
+#    This script is slightly platform specific in that it uses uname. The
+#    options available to uname differ between DU and Solaris. This is
+#    the DU version. Note that the number of lines output must not be
+#    changed since they are counted by some of the benchmark scripts.
+#
+# Authors:
+#    Tim Gledhill (tmg@star.herts.ac.uk)
+#
+# History:
+#     1-AUG-1994 (tmg)
+#       Original Version.
+#    13-FEB-1996 (tmg)
+#       Version 0.9 implementation.
+#    08-JAN-1996 (tmg)
+#       Version 1.0 implementation. This version obtains the processor speed
+#       on DU systems.
+#    04-DEC-1998 (tmg)
+#       V1.2 - uusc revision level is now written by bench.
+#-
+#
+# Set interrupt handling.
+#
+      onintr end_script
+#
+# Check for a command line output file.
+#
+      set output = ""
+      if ( $1 != "" ) set output = $1
+#
+# Get the name of a temporary file to hold the output buffer.
+#
+      set buffer = `${BENCH_DIR}/tmpfile`
+#
+# Get initial system information.
+#
+      set ininfo = `uname -a`
+      set now = `date`
+#
+# Print the information to the output buffer.
+#
+      echo ""                                             >> $buffer
+      echo " Starlink Benchmark Utility v$BENCH_VERSION"  >> $buffer
+      echo ""                                             >> $buffer
+      echo " Hostname           : `hostname -s`"          >> $buffer
+      echo " User               : $LOGNAME"               >> $buffer
+      echo " Time               : $now[4-5] on $now[1-3]" >> $buffer
+      echo " Opsys              : $ininfo[1] $ininfo[3]"  >> $buffer
+      echo " Platform           : $ininfo[5]"             >> $buffer
+#
+# Get the system processor information and print out.
+#
+      set sysinfo = `${BENCH_DIR}/bch_sysinfo`
+      set maxmem = $sysinfo[1]
+      echo " Physical Memory    : ${maxmem}Mb"            >> $buffer
+      set np_on = $sysinfo[2]
+      echo " Online Processors  : $np_on"                 >> $buffer
+#
+# Get the processor speed - only works on DU4.0 and up - so check.
+#
+      echo $ininfo[3] | grep "V3" > /dev/null
+      if ( $status == 0 ) then
+        set proc_speed = "?"
+      else
+        set spd = `/usr/sbin/psrinfo -v | grep "processor operates" | head -1` 
+        set spd = `echo $spd | awk '{split($0,a," at ");print(a[2])}'`
+        set proc_speed = $spd[1]
+      endif
+      echo " Processor Speed    : ${proc_speed}MHz"       >> $buffer
+# 
+# Get the ussc revision level.
+#
+#      set ussc_ver = `tail -1 /star/admin/status`
+#      echo " USSC version       : $ussc_ver[1]"           >> $buffer
+#
+# Get the current system load.
+#
+      set load = `w -u`
+      set load = `echo $load | awk -f ${BENCH_DIR}/bch_load.awk`
+      echo " Current load       : $load"                  >> $buffer
+      echo ""                                               >> $buffer
+#
+# Print the output buffer.
+#
+      if ( $output == "" ) then
+        cat $buffer
+      else
+        cat $buffer >> $output
+      endif
+      'rm' $buffer
+#
+# End of script bch_info
+#
+end_script:
+      exit
