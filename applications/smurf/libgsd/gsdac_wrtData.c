@@ -69,6 +69,8 @@
 *        Check for number of receptors used.
 *     2008-04-03 (JB):
 *        Convert AZEL start/end to degrees.
+*     2008-04-11 (JB):
+*        Don't rewrite FITS headers unnecessarily.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -132,9 +134,8 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   dateVars dateVars;          /* date/time variables */
   double elEnd;               /* elevation at observation end (deg) */
   double elStart;             /* elevation at observation start (deg) */
-  const AstFitsChan *fitschan[nSteps * gsdVars->nBESections];  
+  const AstFitsChan *fitschan[gsdVars->nBESections];  
                               /* Array of FITS headers */
-  long fitsIndex;             /* current FITSchan */
   char *focalStation = NULL;  /* focal station of the instrument */
   float fPlaneX[MAXRECEP]; 
   float fPlaneY[MAXRECEP];
@@ -226,6 +227,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   acsSpecOpenTS ( directory, utDate, obsNum, recepsUsed, 
                   nSubsys, recepNames, focalStation, 
                   fPlaneX, fPlaneY, OCSConfig, status );
+
   /* Allocate memory for JCMTState, and SpecHdr. */
   record = smf_malloc ( 1, sizeof ( *record ), 0, status );
   specHdr = smf_malloc ( 1, sizeof ( *specHdr ), 0, status );
@@ -294,18 +296,22 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
       	              &(gsdVars->data[specIndex]), record, 
                       specHdr, status );
 
-      /* Initialize the astFitsChan for this file. */
-      fitsIndex = ( stepNum * gsdVars->nBESections ) + subBandNum;
+      /* Have we written a fitschan for this output file yet? */
+      if ( stepNum == 0 && subBandNum < nSubsys ) {
 
-      fitschan[fitsIndex] = astFitsChan ( NULL, NULL, "" );
+        /* Initialize the astFitsChan for this file. */
+        fitschan[subBandNum % nSubsys] = astFitsChan ( NULL, NULL, "" );
 
-      /* Fill the FITS headers. */
-      gsdac_putFits ( gsdVars, subBandNum, nSubsys, obsNum, utDate, nSteps, 
-                      backend, recepsUsed, recepNames, samMode, obsType, 
-                      &dateVars, &mapVars, wcs, fitschan[fitsIndex], status );
+        /* Fill the FITS headers. */
+        gsdac_putFits ( gsdVars, subBandNum, nSubsys, obsNum, utDate, nSteps, 
+                        backend, recepsUsed, recepNames, samMode, obsType, 
+                        &dateVars, &mapVars, fitschan[subBandNum % nSubsys], 
+                        status );
 
-      /* Write the WCSFrame information to the fitschan. */
-      astWrite ( fitschan[fitsIndex], WCSFrame );
+        /* Write the WCSFrame information to the fitschan. */
+        astWrite ( fitschan[subBandNum % nSubsys], WCSFrame );
+
+      }
 
       specIndex = specIndex + gsdVars->BEChans[subBandNum];
 
@@ -317,7 +323,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
 
   /* Update the FITS headers for amStart, amEnd, azStart, azEnd, 
      elStart, and elEnd. */
-  for ( i = 0; i < nSteps * gsdVars->nBESections; i++ ) {
+  for ( i = 0; i < nSubsys; i++ ) {
 
     astClear( fitschan[i], "Card" );
    
