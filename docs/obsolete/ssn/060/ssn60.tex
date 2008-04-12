@@ -1,0 +1,392 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocnumber}    {60.1}
+\newcommand{\stardocauthors}   {D S Berry}
+\newcommand{\stardocdate}      {25 November 1988}
+\newcommand{\stardoctitle}     {ASPIC --- Release notes for EDRS and EDRSX}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\section{EDRS}
+
+This section describes an update to EDRS to support GKS graphics and image
+handling on Digisolve IKON displays, submitted for release on 12 September 1988.
+An update to this was submitted on 26 October; this included an extra program
+called IRESET for clearing the ARGS.
+
+The documentation for this update is mainly in the on-line help library
+[ASPIC.EDRS]HELPLIB.HLB, but some new information on EDRS has been included
+in new versions of SUN/23 and SUN/24.
+
+\subsection{Changes}
+The programs in EDRS which produce graphics or handle images have been modified
+so that all GKS graphics devices can be used, and so that equivalent image
+handling operations can be performed on an IKON.
+Their default behaviour is as it was before (with the exception of plotting
+style).
+If the user wants to use any of the new features, parameter assignments must be
+made on the command line.
+
+The following programs have been modified and the corresponding help modules
+updated:
+ARGPIC, CONT, ITFPLOT, NORMALIZE, PROFILE, STARFIT, TRIM, XYCUR.
+
+The following non-graphics programs have been modified:
+CUT, MATHS, XYKEY, XYJOIN.
+
+The following program has been added:
+IRESET.
+
+The following routines from EDRSLIB have been modified:
+ARGPIC, CONT, CUTIT, IMCONT, ITFPLO, MATHS, NMPLOT, NORMAL, PLTCUT, PROFIL,
+RADPRF, SPARAM, STARFI, TABPLT, TRIM, XYCUR, XYINCR, XYINKY, XYJOIN.
+
+The following new routines have been added to EDRSLIB:
+AGCHAX, AGCHIL, ARGSCL, ARGSOP, DREBAR, GETDEV, GTFONT, GTINAM, I2TOI4, IKONCL,
+IKONOP, IKON\_CLS, IKON\_OVCL, IKON\_OVOP, LENSTR, NCRBCK, NCRCOL, NCROPN,
+OVCLOS, OVCROS, OVOPEN, OVPOLY, UPPERC, WRUSER, XYIKON, XYSCRN.
+
+The following files declaring common blocks have been added to EDRSLIB.TLB:
+ARGSCOM, GRCOM, NCCOM.
+
+\subsection{General points}
+\begin{description}
+
+\item [AGI]:
+
+Programs ARGPIC, XYCUR, PROFILE, TRIM and CONT use either the ARGS database,
+or the AGI database (produced by Nick Eaton at Durham), depending on whether
+the ARGS or IKON is being used.
+AGI was installed in SSC373.
+The logical name AGI\_USER must be defined before using any of the new programs.
+It should point to the directory holding the AGI database (AGI\_DAT.SDF).
+
+\item [Pan and zoom]:
+
+At the moment, none of the programs which provide a panning and zooming facility
+on the ARGS (e.g.\ XYCUR, PROFILE, TRIM) do so on the IKON.
+A normal cross-hair cursor which moves over the displayed image (in fact a GKS
+locator) is used instead.
+
+\item [Overlays on IKON]:
+
+The new version of EDRSLIB contains three routines IKON\_OVOP, IKON\_CLS and
+IKON\_OVCL which handle overlays on the IKON in the same way that ARGS\_OVOP,
+ARGS\_CLS and ARGS\_OVCL do for the ARGS.
+The IKON overlay device should be opened using SGS before any of the above
+IKON routines are used.
+Polylines can then be drawn using GKS routine GPL.
+The routines give 8 overlay planes which can each have a different colour, and
+can be written to and cleared independently.
+N.B.\ IKON\_OVOP does not clear the opened plane as ARGS\_OVOP does.
+The plane can be cleared with IKON\_CLS if required.
+
+\item [EXE file sizes]:
+
+The new .EXE files for the modified programs are considerably bigger than the
+old ones.
+This is due mainly to NCAR.
+
+\item [Linking]:
+
+The DCL command procedure EDRSLINK.COM has been modified to include the
+required extra libraries, etc.
+The AGI software is in three libraries which should be in a directory pointed
+to by the logical name AGI\_DIR.
+AGI requires the ADAM development system to be started up.
+This is done automatically by EDRSLINK if it has not already been done.
+The current version of AGI produces linker warning messages because routine
+TRN\_ANNUL is referenced but not satisfied.
+However this routine is never actually called and so the messages do not
+matter.
+There also several ``conflicting attributes for psect xxxx" messages from the
+linker, which again don't matter.
+
+\item [Graphics]:
+
+The NCAR graphics package is used to produce most of the graphics, although
+some SGS and GKS calls are also made.
+
+\item [Default graphics device]:
+
+For programs which previously were ARGS specific (e.g.\ ARGPIC,  XYCUR), and
+for other line graphics programs which had a connection file default of ARGS,
+there is a new way of determining the run-time default device.
+The connection files for these programs now contain a null value so that the
+run time defaults are automatically accepted.
+The default device is chosen  as follows.
+First, an attempt is made to translate the logical name EDRS\_DEVICE.
+If this produces a valid SGS device name, then that device is used.
+If it doesn't, then the local SGS workstation table is searched for an ARGS 
+which if found is used as the default device.
+If no ARGS is found, a search is made for an IKON and is used as the default if
+found.
+Otherwise, the value INFO is used as default.
+This means that sites which have an ARGS will continue to use the ARGS as
+default, but sites which only have an IKON will use the IKON by default and so
+avoid the need for specifying DEVICE=IKON1 on every command line.
+It also allows for sites with both ARGS and IKON to set up the IKON as default
+by assigning the device name to the logical name EDRS\_DEVICE.
+
+\end{description}
+
+\subsection{New and modified parameters}
+Parameter changes have been made to the following programs:
+\begin{description}
+
+\item [ARGPIC]:
+
+\begin{itemize}
+\item New parameters (all with defaults in ARGPIC.CON):
+\begin{description}
+\item [DEVICE](see general note on default device)\\
+ The GKS device on which to display the image.
+ This can be given the name of any SGS workstation identifier which is valid at
+ the users node.
+ In addition the value INFO can be given which produces site-specific
+ information on the available devices (such as plotfile names, etc). 
+ Not all devices are capable of displaying images.
+ A check is made to ensure that the device has a raster display and the program
+ quits with an error if it isn't.
+\item [BOX](F)\\
+ A logical parameter determining whether to draw a coloured box round the image
+ in an overlay plane.
+ This can be useful if the image background is low and the edge of the image is
+ thus difficult to see.
+\item [COLOUR](RED)\\
+ The colour in which to draw an outline box if BOX is true.
+ Can be red, blue, green, cyan, magenta, yellow, black or white.
+\item [URANGE]()\\
+ This is an output parameter written to by ARGPIC.
+ It holds the value of parameter DRANGE actually used by the program.
+ It is useful when several images need to be displayed with the same grey scale,
+ because ARGPIC\_URANGE can be given as the value for DRANGE instead of having
+ to copy the numbers from the previous run by eye.
+\item [BRIGHT](null)\\
+ This parameter specifies the brightness corresponding to the upper DRANGE data
+ value.
+ By default, the program uses the maximum brightness available on the selected
+ device (on an ARGS for instance it is 255).
+ Reducing the brightness to less than maximum can be useful for increasing the
+ contrast between the image and overlaying graphics, especially when the overlay
+ contains contours.
+\end{description}
+\end{itemize}
+
+\item [CONT]:
+
+\begin{itemize}
+\item New parameters (all with default in ARGPIC.CON):
+\begin{description}
+\item [COLOUR](RED)\\
+ The colour in which to draw the contours when plotting in an overlay
+ (currently ARGS or IKON).
+ On other devices the contours are always drawn with the default GKS pen.
+ Can be red, green, blue, magenta, cyan, yellow, black or white.
+\item [OVERLAY](3)\\
+ The overlay plane to use when plotting on an overlay device.
+ Currently can be 1 to 8.
+\end{description}
+\item Modified parameters:
+\begin{description}
+\item [DEVICE](see general note on default device)\\
+ The GKS device on which to display the contours.
+ This can be given as the name of any SGS workstation identifier which is valid
+ at the users node.
+ In addition, the value INFO can be given which produces site-specific
+ information on the available devices (such as plotfile names etc).
+ The old OVERLAY value has been done away with.
+ Instead the SGS names for the ARGS or Ikon overlays can be used (161, 3201,
+ ARGSOV1, IKONOV1, etc) in which case the contours are correctly registered
+ with the previously displayed image.
+\end{description}
+\end{itemize}
+
+\item [CUT]:
+
+A bug has been fixed.
+If the input image had no INVAL descriptor, any invalid pixels in the output
+were assigned the value -100000 which caused an integer overflow due to the
+output being stored in I*2 format.
+
+\item [ITFPLOT]:
+
+\begin{itemize}
+\item Modified parameters:
+\begin{description}
+\item [DEVICE](see general note on default device)\\
+ The GKS device on which to display the plot.
+ This can be given as the name of any SGS workstation identifier which is valid
+ at the users node.
+ In addition the value INFO can be given which produces site-specific
+ information on the available devices (such as plotfile names etc). 
+\end{description}
+\end{itemize}
+
+\item [MATHS]:
+
+An extra parameter called VALUE has been added.
+This is an output parameter and holds the value of pixel (1,1) of the output
+image.
+The idea is that MATHS can then be used for doing arithmetic between real
+parameter values, producing the answer as another parameter which can then be
+used as input for another program.
+If the formula given by the user does not reference any input images, and if
+the size of the output image is given as 1 by 1, then the user is allowed to
+enter a null for the output image, in which case no output image is produced.
+The value of the single pixel calculated is still written to the new parameter
+however.
+
+\item [NORMALIZE]:
+
+\begin{itemize}
+\item New parameters:
+\begin{description}
+\item [HEADING](see description)\\
+ A heading for the plot.
+ Run time default is `NORMALIZATION PLOT'
+\item [XHEAD](see description)\\
+ A heading for the X axis.
+ Default is of the form ``INTENSITY IN IMAGE A ($<$file name$>$)" where
+ $<$file name$>$ is the file name associated with AIMAGE.
+\item [YHEAD](see description)\\
+ A heading for the Y axis.
+ Default is of the form ``INTENSITY IN IMAGE B ($<$file name$>$)" where 
+ $<$file name$>$ is the file name associated with BIMAGE.
+\end{description}
+\item Modified parameters:
+\begin{description}
+\item [DEVICE](NONE)\\
+ The GKS device on which to display the plot.
+ This can be given as the name of any SGS workstation identifier which is valid
+ at the users node.
+ In addition, the value INFO can be given which produces site-specific
+ information on the available devices (such as plotfile names etc).
+ The value NONE still suppresses graphical output as it used to.
+\end{description}
+\end{itemize}
+
+\item [PROFILE]:
+
+\begin{itemize}
+\item New parameters (all with default in ARGPIC.CON):
+\begin{description}
+\item [FONT](101)\\
+ The GKS font number to use for the titles.
+ Default is Roman, medium, sans serif.
+\end{description}
+\item Modified parameters:
+\begin{description}
+\item [XYS](PARAMETER)\\
+ The coordinates of the profile end points can now also come from the IKON.
+ XYS can take values PARAMETER, ARGS or IKON.
+\item [DEVICE](see general note on default device)\\
+ The GKS device on which to display the trace.
+ This can be given as the name of any SGS workstation identifier which is valid
+ at the users node.
+ In addition the value INFO can be given which produces site-specific
+ information on the available devices (such as plotfile names etc). 
+\end{description}
+\end{itemize}
+
+\item [STARFIT]:
+
+\begin{itemize}
+\item Modified parameters:
+\begin{description}
+\item [DEVICE](NONE)\\
+ The GKS device on which to display the plot.
+ This can be given as the name of any SGS workstation identifier which is valid
+ at the users node.
+ In addition the value INFO can be given which produces site-specific
+ information on the available devices (such as plotfile names etc).
+ The value NONE still suppresses graphical output as it used to.
+\end{description}
+\end{itemize}
+
+\item [TRIM]:
+
+\begin{itemize}
+\item Modified parameters:
+\begin{description}
+\item [XYSOURCE](see general note on default device)\\
+ The coordinates of the corners of the trimmed image can now also come from the
+ Ikon.
+ XYSOURCE can take values PARAMETER, ARGS or IKON.
+\end{description}
+\end{itemize}
+
+\item [XYCUR]:
+
+\begin{itemize}
+\item New parameters (all with default in ARGPIC.CON):
+\begin{description}
+\item [DEVICE](see general note on default device)\\
+ The device on which the image is displayed from which coordinates are required.
+ The device must be specified as an SGS workstation identifier.
+ At the moment only IKONs and ARGSs are supported, any other device causes the
+ program to quit with an error.
+\end{description}
+\end{itemize}
+
+\item [XYJOIN]:
+
+The defaults for APREFIX and BPREFIX have been changed from both being null,
+to APREFIX being ``A" and BPREFIX being ``B".
+
+\item [XYKEY]:
+
+A bug has been fixed.
+If an input xy list was given to XYKEY, any new values entered at the keyboard
+overwrote the input values.
+
+\end{description}
+
+\section{EDRSX}
+
+This section describes an update to EDRSX submitted for release on 13 September
+1988.
+
+The documentation for this update is contained in the on-line help
+library [ASPIC.EDRSX]EDSRXHELP.HLB.
+A new version of SUN/40 on EDRSX was also submitted, but this has been
+incorporated into revised versions of SUN/23 and SUN/24.
+
+\subsection{Changes}
+The update contains new programs BDFGEN and IRASBACK, and enhancements
+to programs CRDDTRACE, DATARANGE, DRAWSCAN, HISTOGRAM, IRASDSCR,
+IRASSTACK, SIMCRDD and SKYSUB.
+
+\end{document}

@@ -1,0 +1,425 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocnumber}    {14.1}
+\newcommand{\stardocauthors}   {P N Daly}
+\newcommand{\stardocdate}      {27 October, 1992}
+\newcommand{\stardoctitle}     {Installing the CGS4DR V1.6--0 Software}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\footnote{{\em Present Address:} 
+ {\sf Joint Astronomy Centre, 660 N A`oh\={o}k\={u} Place, University Park,
+  Hilo HI 96720, USA.}}\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+  \setlength{\parskip}{0mm}
+  \tableofcontents
+  \setlength{\parskip}{\medskipamount}
+  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Requirements}
+
+\subsection{Software Revision Levels}
+
+CGS4DR relies heavily upon ADAM and Figaro. The release described in this
+document requires, as a minimum, {\tt ADAM v2.0-1}, {\tt FIGARO v3.0-5} and 
+{\tt VMS v5.5-1.} If your software revision levels are below these, you 
+{\em must} upgrade before installing CGS4DR. 
+
+Note also that CGS4DR comes shipped with a private version of SMSICL and 
+{\em will not} work with the {\sl Starlink} released version. Manager's
+need not take any action on this, the system will choose the correct version.
+It is hoped that {\sl Starlink} will make this version of ICL the default
+in the near future.
+
+\subsection{Preferred Hardware}
+
+Ideally, the software should run on a single user VAXstation having
+at least 24Mb of main memory and a colour display but it will run on a 
+VT100-compatible terminal and display to any supported PGPLOT graphics device.
+
+\subsection{Disk Space}
+
+Once installed, the software will occupy $\sim$ 9500 blocks of disk space
+(without the source code and libraries as distributed by default).
+
+\subsection{Required Process Quotas}
+
+CGS4DR runs as four (or more) subprocesses and may require
+some hefty quotas. A typical UAF entry might look like this:
+
+\begin{center}
+\begin{tabular}{|l r|l r|l r|}
+\hline
+\multicolumn{6}{|c|}{\sl UAF Quotas for CGS4DR} \\
+\hline
+Maxjobs     & 0      & Fillm    & 200  & Bytlm    & 50000 \\
+Maxacctjobs & 0      & Shrfillm & 0    & Pbytlm   & 0 \\
+Maxdetach   & 0      & BIOlm    & 100  & JTquota  & 4096 \\
+Prclm       & 100    & DIOlm    & 100  & WSdef    & 1024 \\
+Prio        & 4      & ASTlm    & 500  & WSquo    & 2048 \\
+Queprio     & 0      & TQElm    & 10   & WSextent & 4096 \\
+CPU         & (none) & Enqlm    & 100  & Pgflquo  & 75000 \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Reserved Nodenames}
+
+Note that any nodenames beginning with the characters {\tt IRT} are assumed 
+to be part of the UKIRT cluster and will invoke CGS4DR in `online' mode. 
+In general, users do not want to do this so you should rename any offending 
+nodes before installing the software. This may be the first time a software 
+product has necessitated a DECnet change!
+
+\section{Installing the Software}
+
+\subsection{Unpacking the Software}
+The software will usually be distributed via a `Starlink Software Change' 
+notice. The top-level directory of the software must be called 
+{\tt [CGS4DR\_DEV]} to maintain compatability with the Hawai`i version.
+
+{\bf NB: Delete all previous copies of the CGS4DR system}.
+
+Unpack the software into a suitable directory:
+
+\begin{verbatim}
+  $  BACKUP/LOG CGS4DR_V160.BCK/SAVE DISK$STAR:[*...]*.*.*/OWNER=ORIGINAL
+\end{verbatim}
+
+Then, define some system-wide logical names (and put them in 
+{\tt LSSC:STARTUP.COM}):
+
+\begin{verbatim}
+  $  DEFINE/SYSTEM/TRANSLATION=(T,C)   CGS4DR_ROOT     DISK$STAR:[CGS4DR_DEV.]
+  $  DEFINE/SYSTEM/TRANSLATION=(T,C)   CGS4DR_DEVROOT  DISK$STAR:[CGS4DR_DEV.]
+  $  DEFINE/SYSTEM                     CGS4DR_COM      CGS4DR_ROOT:[000000]
+\end{verbatim}
+
+If {\tt DISK\$STAR} is a concealed device remember to translate it first as VMS
+does not like logical names defining concealed devices on concealed devices.
+You will also need to place CGS4DR definitions in {\tt LSSC:LOGIN.COM}:
+
+\begin{verbatim}
+  $ @CGS4DR_COM:SYLOGIN
+\end{verbatim}
+
+\subsection{PostScript, Canon, LN03 and Inkjet Hardcopy}
+
+All hardcopy printing is enabled via the {\tt PRINT\_HARDCOPY} item (with the
+exception of the inkjet harcopy facility).
+This option requires a print command, a graphics file and a queue name.
+For PostScript, Canon and LN03 laser printers the system will set defaults
+as follows:
+
+\begin{center}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\ \ \ &  {\bf Print Command} & {\bf Graphics File} & {\bf Queue Name} \\
+\hline
+{\bf Canon} & {\sf print/delete/nonotify/noflag/passall} & {\sf canon.dat} & {\sf sys\$laser} \\
+\hline
+{\bf LN03} & {\sf print/delete/nonotify/noflag/passall} & {\sf ln03.plt} & {\sf sys\$laser} \\
+\hline
+{\bf PostScript } & {\sf print/delete/nonotify} & {\sf gks\_72.ps} & {\sf sys\$postscript} \\
+\hline
+\end{tabular}
+\end{center}
+
+These defaults can be altered to suit your site by two methods:
+
+\begin{itemize}
+\item If you know a little about ICL you can add further defaults or modify the
+above queues. The file to edit is {\tt CGS4DR\_ROOT:[PRC]CGS4\_REDUCTION.ICL} 
+and the procedure to edit is called {\sf hardcopy\_entry}. If you don't feel 
+comfortable doing this, send me an e-mail and I'll include further options in 
+a future release.
+\item If your generic postscript queue is called {\tt SYS\_POSTSCRIPT},
+you can {\tt \$ DEFINE/SYSTEM SYS\$POSTSCRIPT SYS\_POSTSCRIPT} and leave the
+defaults in the software alone. This applies to {\tt SYS\$LASER}, too.
+\end{itemize}
+
+If you have an inkjet hardcopy printer and have installed Clive Page's
+IKONPAINT software (SUN/71) this is another option you can enable in the
+menus. The file to edit is called {\tt CGS4DR\_ROOT:[SCT]CGS4\_REDUCTION.SCT}
+and, note that, comments begin with an {\tt *} character so just un-comment 
+the line (by removing the asterisk):
+
+\begin{verbatim}
+  * option hardcopy_inkjet   switch  hardcopy_inkjet  hardcopy_inkjet
+\end{verbatim}
+
+Note that this facility is {\em not} guaranteed as the Joint Astronomy Centre 
+has no such plotter with which to test the software.
+
+\subsection{Old Noticeboard Files}
+
+Prior to testing the installation, delete any files called
+{\tt CRED4\_NOTICEBOARD.NBD} in your (current) default directory.
+Do {\em not} delete that file from within the CGS4DR tree!
+
+The reason for deleting the file is that a new one will be created which
+is backwards compatible with previous versions of the system. If there is 
+such a file already in your (current) default directory and you do {\em not} 
+delete it, the software will fail
+to load properly and you will not be able to run CGS4DR.
+
+\subsection{Testing the Installation}
+
+No astronomical data is distributed with the software but it can be tested 
+with the following keystrokes. First, fire up the software using:
+
+\begin{verbatim}
+  $ CGS4DR  OFFLINE  SYS$SCRATCH:[SYSTEM]  POSTSCRIPT_L
+\end{verbatim}
+
+where {\tt SYS\$SCRATCH:[SYSTEM]} is a scratch directory. If you have a colour 
+workstation, you can replace {\tt POSTSCRIPT\_L} with {\tt XWINDOWS} or 
+something similar\footnote{The benefit of using {\tt XWINDOWS} or {\tt VWS} 
+is that the software will load a colour test image upon completion of the 
+startup. This test image is a simple colour table ramp.}.
+If the CGS4DR software starts without error the display will show:
+
+\begin{verbatim}
++ SMS CGS4 Data Reduction System V1.6-0 ------+
+|setup           reduce          engineer     |
++---------------------------------------------+
+
+
+
+
+-------------------------------------------------------------------------------
+               WELCOME TO THE CGS4 DATA REDUCTION SYSTEM V1.6-0
+
+                     Please wait while the system loads
+
+
+
+Loading CGS4_EXE:CRED4 into CRED4
+Loading CGS4_EXE:RED4 into RED4
+Loading CGS4_EXE:ENG4 into ENG4
+Loading CGS4_EXE:P4 into P4
+Enter the  `setup'  menu to set data reduction parameters
+Enter the  `reduce' menu to start automatic data reduction
+-------------------------------------------------------------------------------
+
+
+Use ENTER to select or PF1 to return to previous menu.      (Do not press PF4!)
+\end{verbatim}
+
+Enter any menu by using the {\tt ENTER} key on the auxiliary keypad.
+Instructions on how to get out of the menu are given in reverse video at the
+bottom of the screen. As a general rule, if you are in a menu containing
+further menus you  can use PF1 whereas for an action, use PF4 (abort). Scanning
+through menus in  this way should produce no errors.
+
+Enter the {\tt REDUCE} menu. The following text will appear:
+
+\begin{verbatim}
+* Automatic data reduction will NOT be started *
+
+To start automatic data reduction, use pause_continue_reduction
+from within the `reduce' menu or set PAUSE_ON_ENTRY to FALSE
+Data reduction is currently STOPPED.
+The data reduction queue is empty.
+\end{verbatim}
+
+This tells you that the DR system is not running (sic) and that the queue is
+empty (as it should be). Now position the cursor over the 
+{\tt CANCEL\_ALL\_QENTRIES} item using the (down) arrow 
+key and press {\tt ENTER}. The queue will be deleted; it should report that it 
+was already empty.
+
+Using the arrow keys position the cursor over {\tt PAUSE\_CONTINUE\_REDUCTION}
+and press {\tt ENTER}. The message is:
+
+\begin{verbatim}
+* Automatic data reduction started *
+* The bad pixel mask # will be used *
+* No linearisation will be carried out *
+\end{verbatim}
+
+Exit the {\tt REDUCE} menu (using PF1)  and enter the {\tt ENGINEER} menu. 
+Enter the {\tt SOFTWARE\_TESTS} menu and select {\tt TASK\_STATUS}. Select 
+{\tt ALL} (for all tasks) and PF1 out of this menu thus setting the action 
+going. The software will report on the status of four tasks: CRED4, RED4, 
+ENG4 and P4. The output will be similar to (for each task):
+
+\begin{verbatim}
+The CRED4 task is idle
+CRED4 Task : CGS4 Data Reduction Software V1.6-0
+Created on : 16 September 1992
+Created by : Phil Daly, JACH::PND
+CRED4 Task : The uncached CRED4 task is OK
+\end{verbatim}
+
+All four tasks shoule be {\tt IDLE} and {\tt OK}. Enter the {\tt TASK\_RESET} 
+menu and select {\tt ALL} and PF1 out to start the action going. The software 
+will reset all tasks and produce a display (for each task) of the form:
+
+\begin{verbatim}
+Resetting CRED4 task
+\end{verbatim}
+
+Finally, select the {\tt LIST\_NOTICEBOARD} item and press {\tt ENTER}. The 
+action will start straight away and report the contents of the DR noticeboard.
+It is important that no error is reported during this phase as that might 
+imply a corrupt noticeboard. Many items are output to the scrolling region
+of the SMS screen.
+
+To exit the software use PF1 until asked :
+
+\begin{verbatim}
+Kill tasks and exit from SMS? /N/
+\end{verbatim}
+
+Answer {\tt Y} and wait. The system will respond with:
+
+\begin{verbatim}
+Do you mean to exit from SMS? (y/n)
+\end{verbatim}
+
+Stroking just the {\tt Y} key is enough to exit at this stage.
+
+If there were no errors reported during the above, you have successfully
+installed CGS4DR.
+
+\subsection{Post the CGS4DR News Item}
+
+Once the installation has been completed sucessfully, you should post the
+news item contained in {\tt CGS4DR\_COM:CGS4DR\_V160.NEWS.}
+
+\section{Running CGS4DR from a Sun Workstation}
+
+CGS4DR does {\em not} run under the Unix environment at the present time 
+({\em i.e.} \stardocdate). That fact will not deter users from saying
+something like, `... but I have seen Joe Bloggs running it on a Sun'.
+
+CGS4DR {\em can} run on a Sun workstation when that workstation acts {\em 
+purely as an X-terminal}. The following is the JACH recipe to enable such a
+facility --- it probably will not work in the UK if TCP/IP names cannot  be
+resolved (but I have no way of telling!). It also relies on the DEC and  Sun
+keyboard mapping utilities provided by AAO which should have been  distributed
+by {\sl Starlink}. Your Sun {\em must} be running OpenWindows. In the  example
+that follows, the Sun workstation has a name of kaua.jach.hawaii.edu and a
+prompt of {\sf \%} whereas the VAX has a nodename of KAMAKA and a prompt of
+{\sf \$}.
+
+First, login to the Sun and let OpenWindows fire up.
+Before starting a session, you will need to allow security access to
+your Sun from a VAXen server. This is done by placing a suitable entry
+into the .rhosts file in your home directory such as:
+
+\begin{verbatim}
+kamaka.jach.hawaii.edu pnd
+\end{verbatim}
+
+You may require similar security options on your VAXen.
+
+Now create a SunOS window on the Sun using MB3 and the {\tt PROGRAMS} option.
+The item to look for is {\tt SHELL ...} or similar.
+
+Mapping a Sun keyboard to a DECterm is performed using the distributed
+{\sf dk} and {\sf sk} images. If you do not have these, consult your 
+system manager. The definitions should be something like:
+
+\begin{quote}
+{\scriptsize \tt
+  alias dk 'xmodmap /usr/bin/deckeymap;xset  r 28;xset  r 29;xset  r 30;xset  r 105'
+
+  alias sk 'xmodmap /usr/bin/Sunkeymap;xset -r 28;xset -r 29;xset -r 30;xset -r 105'
+}
+\end{quote}
+
+Clearly, the command {\tt dk} is designed to map a DECterm keyboard and 
+{\tt sk} will unmap it back to a Sun keyboard. For a Sun keyboard mapped as a 
+DECterm, the top row of keys on the auxiliary keypad become the arrow
+keys required by SMS. The mapping is:
+
+\begin{center}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\multicolumn{5}{|c|}{\sl DECterm / Sun Keyboard Mapping} \\
+\hline
+{\bf Sun } & {\sf Pause}   & {\sf PrSc}      & {\sf Scroll}    & {\sf NumLock} \\
+\hline
+{\bf DEC } & {\sf UpArrow} & {\sf DownArrow} & {\sf LeftArrow} & {\sf RightArrow} \\
+\hline
+\end{tabular}
+\end{center}
+
+Click on the window you have just created and do the following:
+
+\begin{verbatim}
+  %  xhost  kamaka.jach.hawaii.edu
+  %  dk
+  %  telnet  kamaka
+\end{verbatim}
+
+Login to the VAX as usual and set the display back to your Sun workstation:
+
+\begin{verbatim}
+  $  set  display/create/node=kaua.jach.hawaii.edu/transport=tcpip
+  $  create/terminal/detach
+  $  logout
+\end{verbatim}
+
+A terminal window should have appeared on your Sun before logging out. You
+do not need the original Sun login window now, either, so you can logout
+of that if you so desire. Give the new DECterm input focus and type:
+
+\begin{verbatim}
+  $  set display/create/node=kaua.jach.hawaii.edu/transport=tcpip
+  $  define/job  decw$display  'f$trnlnm("DECW$DISPLAY","LNM$PROCESS_TABLE")'
+  $  xmake  xwindows -title "CGS4 Data Reduction"  -geometry 1024x768 -col 240
+  $  cgs4dr  offline  disk$ukirtdata:[cgs4_data.19920420]  xwindows
+  .
+  . (do reduction on data in directory disk$ukirtdata:[cgs4_data.19920420])
+  .
+  $  xdestroy  xwindows
+  $  set  display/delete
+  $  deassign/job  decw$display
+  $  logout
+\end{verbatim}
+
+Note that the DECterm and X-window need not be destroyed if you require them
+at some point in the future.
+
+\end{document}

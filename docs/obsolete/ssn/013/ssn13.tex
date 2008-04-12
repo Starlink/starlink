@@ -1,0 +1,179 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocnumber}    {13.1}
+\newcommand{\stardocauthors}   {D J Rawlinson}
+\newcommand{\stardocdate}      {11 August 1992}
+\newcommand{\stardoctitle}     {COLDMON --- Cold File Analysis Package}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+
+The COLDMON package has been written to allow system managers to identify those
+items of software that are not used (or used infrequently) on their systems. It 
+consists of a few command procedures and a Fortran program to analyze the
+results. It makes use of the AUDIT facility and security ACLs in VMS.
+
+\section{Installation}
+
+The package consists of the following files:
+
+\begin{description}
+\begin{description}
+\item [ANAL\_AUDIT.COM]  -- Command procedure to analyze the audit file
+\item [ANAL\_BUILD.COM]  -- Command procedure to build executable
+\item [ANAL\_DATES.DAT]  -- File to contain the start/stop dates
+\item [ANAL\_FILES.DAT] -- List of files to analyze
+\item [ANAL\_RESULTS.DAT]  -- Results file written by ANAL\_AUDIT.COM
+\item [ANAL\_SETUP.COM]  -- Setup script to set ACLs and enable Auditing
+\item [ANAL\_STATS.DAT]  -- Final statistics file written by $\ldots$
+\item [ANAL\_STATS.EXE]  -- Program to search the results file and produce 
+statistics.
+\item [ANAL\_STATS.FOR]  -- Source
+\end{description}
+\end{description}
+
+Simply install these files in a directory.
+
+\section{Starting the analysis}
+
+A file {\bf ANAL\_FILES.DAT} should be created to contain the full pathname of
+the files to be tested, one per line, {\em e.g.}
+
+\begin{verbatim}
+      DISK$SOFTDEV:[DJR.COLD.RELEASE]TEST1.COM
+      DISK$SOFTDEV:[DJR.COLD.RELEASE]TEST2.COM
+\end{verbatim}
+
+The analysis can be carried out using executable files, command procedures or
+object libraries.
+
+The next step is to enable ACL security auditing and set ACLs on the files
+specified. This requires {\bf OPER} \& {\bf SECURITY} privileges. The command
+file {\bf ANAL\_SETUP.COM} will do this all for you. The procedure will first
+check whether you currently have ACL auditing switched on and will ask you if
+you would like to turn it on. An example of the output is given below:
+
+\begin{verbatim}
+          You do not appear to have ACL auditing switched on.
+          Do you want to turn it on now (Y/N) : y
+        
+        
+          Setting up the ACLs on the files specified in ANAL_FILES.DAT
+        
+          Please wait.....
+        
+      DISK$SOFTDEV:[DJR.COLD.RELEASE]TEST1.COM........acl done
+      DISK$SOFTDEV:[DJR.COLD.RELEASE]TEST2.COM........acl done
+      DISK$SOFTDEV:[DJR.COLD.RELEASE]TEST3.COM........acl done
+          Enabling ACL Auditing...                    
+        
+          Finished.
+\end{verbatim}
+ 
+The date/time that analysis was started will be written to the file {\bf
+ANAL\_DATES.DAT}.
+
+\subsection{IMPORTANT}
+
+From now on, everytime any of the files specified are accessed, an entry will
+be placed in the audit journal file.  You should also note that the console
+will log each access and so this software should only be used to gather
+statistics of files believed to be infrequently accessed otherwise the security
+audit file will get very large and you will waste a lot of paper.
+
+Care should also be taken with system backups. If the number of files involved
+in the analysis is large, then it may be wise to turn off security auditing
+during backups using the command:
+
+\begin{verbatim}
+       SET AUDIT/ALARM/DISABLE=ACL
+\end{verbatim}
+and on again afterwards with:
+\begin{verbatim}
+       SET AUDIT/ALARM/ENABLE=ACL
+\end{verbatim}
+
+\section{Extracting results from the audit file}
+
+After the required period of analysis, the command procedure {\bf
+ANAL\_AUDIT.COM} will extract the ACL accesses from the audit file and produce
+a raw results file. Please edit this command procedure  and change the name of
+the security audit file if it is different from the default:
+
+\begin{verbatim}
+      SYS$MANAGER:SECURITY_AUDIT.AUDIT$JOURNAL
+\end{verbatim}
+
+The command procedure will ignore accesses by the {\bf BACKUP} and {\bf
+DIRECTORY} commands. The date/time that analysis was stopped will be appended
+to the file {\bf ANAL\_DATES.DAT}.
+
+This command procedure will also stop ACL security auditing and then remove the
+ACLs from the files.
+
+\section{Producing file usage statistics}
+
+The programme {\bf ANAL\_STATS} will read the results file to produce a file
+{\bf ANAL\_STATS\-.DAT} containing the start/stop times and a usage statistic
+for each file in {\bf ANAL\_FILES\-.DAT}. The programme will ignore accesses by
+users {\bf SYSTEM}, {\bf OPER} and {\bf STAR}. You may wish to alter this by
+editing the source and rebuilding using {\bf ANAL\_BUILD.COM}.
+
+An example output is:
+\begin{verbatim}
+      ANAL_STATS.DAT   Cold file access statistics
+      --------------------------------------------
+      31-MAR-1992 09:53:42.32 -- Date/time analysis started       
+      31-MAR-1992 09:53:50.95 -- Date/time analysis stopped       
+      TEST1.COM            Number of accesses=            3
+      TEST2.COM            Number of accesses=            2
+      TEST3.COM            Number of accesses=            1
+\end{verbatim}
+    
+\end{document}

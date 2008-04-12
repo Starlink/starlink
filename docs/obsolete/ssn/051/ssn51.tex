@@ -1,0 +1,96 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+\markright{SSN/51.1}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill SSN/51.1\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf Starlink System Note 51.1}
+\begin{flushright}
+D L Terrett\\
+8 February 1988
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf VAXnotes}
+\end{center}
+\vspace{5mm}
+
+VAXnotes is a computer conferencing system that lets people conduct on-line
+conferences or meetings. Each conference has a subject and is hosted by
+a particular node on DECnet and has a `moderator' who has the job of keeping
+the discussion in order.
+
+VAXnotes has been purchased to facilitate the exchange of information between
+the Starlink project and its users, and between Starlink users. For this to
+happen it must be possible to find out easily what conferences exist, and
+conference topics must not overlap excessively. To ensure the orderly growth of
+the use of VAXnotes, the following rules will be adhered to, at least until the
+project has more experience with the product. 
+
+\begin{itemize}
+
+\item All conferences will reside in the standard directory {\tt
+NOTES\$LIBRARY:}.
+
+\item Conferences will be created by the site manager, although often at
+the instigation of a user. The task of moderating a conference can be
+delegated.
+
+\item Before agreeing to create a conference, the site manager must
+satisfy him or herself that
+\begin{itemize}
+\item The proposed topic is not already covered by an existing conference
+elsewhere on the network.
+\item The topic is compatible with the aims of the Starlink project; i.e.\
+has some connection with either astronomy or the running of Starlink.
+\end{itemize}
+
+\item The conference name and title  will be chosen to be as sensible and
+meaningful as possible. 
+
+\item The first topic in the conference will be a description of the
+subject matter and aims of the conference. Any restrictions on the
+participants in the conference must also be explained, and the name and
+network address of the moderator included.
+
+\item A copy of this topic will be inserted by the site manager in a
+conference on {\tt RLVAD} called {\tt CONFERENCES} and linked with the new
+conference with the {\tt SET NOTE/CONFERENCE} command. This applies to all
+conferences even where the conference is of only local interest or has
+restricted participation.  `Replies' can also be added to other topics in the
+{\tt CONFERENCES} conference to act as cross references to other conferences on
+related topics. To avoid confusion, no other conference on the network will be
+called {\tt CONFERENCES}. 
+
+\item Each node should have a conference called {\tt LOCAL\_CONFERENCES}
+containing the topics of conferences of particular interest to the local
+users.         
+
+\item Site managers should periodically review the conferences on their
+system and close any that have become inactive.
+
+\item The project management has the right to order the closure of any
+conference if it is considered unseemly or excessively boring. 
+
+\end{itemize}
+
+The {\tt CONFERENCES} conference which lists all conferences on the network
+will be moderated by the Starlink Software Librarian and all site managers will
+be active participants (i.e.\ able to contribute topics and replies); all
+Starlink users will be passive participants (i.e. able to read but not
+contribute). 
+
+\end{document}

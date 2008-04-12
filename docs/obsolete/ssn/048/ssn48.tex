@@ -1,0 +1,273 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+\markright{SSN/48.1}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill SSN/48.1\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf Starlink System Note 48.1}
+\begin{flushright}
+P M Allan\\
+6th October 1987
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf BACKUP --- Recovering from incremental tape backups}
+\end{center}
+\vspace{5mm}
+
+The importance of making regular backups of your disks in well known, but
+it can be very frustrating to have a head crash and then discover that you
+cannot recover from your backups because the manuals do not tell you what
+to do.
+The DEC documentation covers most possibilities, but not the case where a
+removable pack is copied to a new pack, the new pack is then used as the
+current pack, and incremental backups to tape are then made.
+This situation is a fairly common one when you have two or more removable
+disk drives.
+This note covers backup and recovery in general terms, and details
+exactly what to do in the above mentioned case.
+                        
+When you do a full backup of a disk there are two possibilities: you can
+do a disk copy or backup the contents of the disk to a saveset.
+In the second case, the saveset can be on disk or tape, the only difference is
+speed.
+For example, to do a disk copy from DRA0: to DRA1: you must type:
+\begin{verbatim}
+    $ MOUNT/FOREIGN DRA1: 
+    $ BACKUP/IMAGE/RECORD/verify/trunc DRA0: DRA1:
+    $ DISMOUNT DRA1:
+\end{verbatim} 
+for a disk to disk copy, or:
+\begin{verbatim}
+    $ BACKUP/IMAGE/RECORD/verify DRA0: DRA1:saveset_name/SAVE_SET
+\end{verbatim} 
+to make a saveset on disk. 
+
+The qualifiers in lower case are optional, but are recommended.
+You must not write protect the old disk (DRA0:), since the date of this
+backup must be recorded on it.
+
+To make incremental backups to tape, one then does:
+\begin{verbatim}
+    $ MOUNT/FOREIGN MTA0: 
+    $ BACKUP/RECORD/SINCE=BACKUP/JOURNAL=journal_file/VERIFY DRA0: -
+       MTA0:incremental_saveset_name
+    $ DISMOUNT MTA0:
+\end{verbatim} 
+This much is well known.
+The important part is recovering from a disk crash.
+If you are recovering from a full saveset plus incremental savesets, then
+the VMS manual tells you what to do.
+It stresses that when recovering from the full saveset, you must use /RECORD
+so that the date that this backup was done is written to the new disk.
+If you are recovering from an exact copy of a disk then you must NOT use
+/RECORD as it will write today's date in the backup date field, and the 
+recovery from the incremental backups will then not proceed correctly.
+It is this point that is vital and is very well hidden in the manuals.
+The sequence of operations to recover from a crash is:
+\begin{enumerate}
+\item Copy the old disk pack to a new one (after all you might get another
+crash while you are recovering).
+\item Bring the new disk up to date from the incremental backup tapes.
+The DEC manuals suggest that it is quicker to go through the tapes in reverse
+\end{enumerate}
+Let us consider a concrete example.
+
+A full backup copy of the disk USER1 is made on 2 March (first Monday in the
+month). 
+\begin{verbatim}
+    $ BACKUP/IMAGE/VERIFY/RECORD/TRUNC DRA0: DRA1:
+\end{verbatim}
+I do this with stand alone backup, so there is no mounting of disks.
+
+I then do daily incremental backups, cycling through the tapes once per week:
+\begin{verbatim}
+    $ MOUNT/FOREIGN MT: TAPE
+    $ BACKUP/RECORD/REWIND/FAST/JOURNAL=3MAR87/SINCE=BACKUP -
+      DISK$USER1:[*...] -
+      TAPE:3MAR87.BCK/PROTECTION=(S:REWD,O:REWD,G,W)
+\end{verbatim}
+and weekly incremental backups:
+\begin{verbatim}
+    $ MOUNT/FOREIGN MT: TAPE
+    $ BACKUP/RECORD/REWIND/FAST/JOURNAL=9MAR87/SINCE=2-MAR-1987:09:13:23 -
+      DISK$USER1:[*...] -
+      TAPE:9MAR87.BCK/PROTECTION=(S:REWD,O:REWD,G,W)
+\end{verbatim}
+The dates, command qualifiers etc.\ are looked after by a command procedure
+so that I do not have to remember what goes where.
+This is added as an appendix to this document for those who are interested.
+
+When the dreaded crash happens (on 18 March, for example), the recovery
+procedure is as follows:
+\begin{verbatim}
+    $ BACKUP/VERIFY/IMAGE DRA0: DRA1:
+
+    $ MOUNT/FOREIGN MT: TAPE
+    $ BACKUP/INCREMENT TAPE:18MAR87.BCK DRA1:
+    $ DISMOUNT TAPE
+    $ MOUNT/FOREIGN MT: TAPE
+    $ BACKUP/INCREMENT TAPE:17MAR87.BCK DRA1:
+    $ DISMOUNT TAPE
+    $ MOUNT/FOREIGN MT: TAPE
+    $ BACKUP/INCREMENT TAPE:16MAR87.BCK DRA1:
+    $ DISMOUNT TAPE
+    $ MOUNT/FOREIGN MT: TAPE
+    $ BACKUP/INCREMENT TAPE:9MAR87.BCK DRA1:
+    $ DISMOUNT TAPE
+\end{verbatim}
+The disk is now restored.
+\appendix
+\newpage
+\section{INCREMENT --- A command procedure to backup disks}
+\begin{verbatim}
+$! Do an incremental backup of a disk.		[OPER.BACKUP]INCREMENT.COM
+$!                                              31.03.87
+$!
+$! Prevent any interference so that this can be left running safely.
+$!
+$ ON CONTROL_Y THEN LOGOUT
+$ ON ERROR THEN CONTINUE
+$!
+$! Set up logical names
+$!
+$ ASSIGN 'F$TRNLNM("SYS$DISK","LNM$SYSTEM_TABLE")[OPER.BACKUP] BACKUPDIR
+$!
+$! Get the time, date and day of the week.
+$!
+$ TIME = F$TIME()
+$ DATE = F$EXTRACT(0,2,TIME) + F$EXTRACT(3,3,TIME) + F$EXTRACT(9,2,TIME)
+$ IF F$EXTRACT(0,1,DATE) .EQS. " " THEN DATE = F$EXTRACT(1,6,DATE)
+$ DATE_OF_MONTH = F$EXTRACT(0,2,TIME)
+$ DAY_OF_WEEK = F$CVTIME(TIME,,"WEEKDAY")
+$!
+$! Ask which area is to be backed up
+$!
+$10:
+$ INQUIRE AREA -
+     "Is the backup of USER1 [U1] or the system disk [S0] ?"
+$ IF AREA .EQS. "U1" THEN GOTO U1
+$ IF AREA .EQS. "S0" THEN GOTO S0
+$ GOTO 10
+$!
+$! Set up for backing up USER1
+$!
+$U1:
+$ FROM = "DISK$USER1:[*...]"
+$ TO = "TAPE:''DATE'.BCK"
+$ OPTIONS = "/RECORD/REWIND/FAST"
+$ PROT = "/PROTECTION=(S:REWD,O:REWD,G,W)"
+$!
+$! Ask for the type of incremental backup.
+$!
+$U10:
+$ INQUIRE TYPE "Is this a weekly [W] or daily [D] backup?"
+$ IF F$EXTRACT(0,1,TYPE) .NES. "W" THEN GOTO U11
+$!
+$! Weekly backup
+$!
+$ ROOT = "BACKUPDIR:USER1_WEEKLY"
+$ IF DATE_OF_MONTH .LE. 14 THEN -
+    RENAME 'ROOT'.BJL 'ROOT'_OLD.BJL
+$ OPEN/READ SAVE_DATE 'ROOT'.DATE
+$ READ SAVE_DATE SINCE
+$ CLOSE SAVE_DATE
+$ GOTO PROCESS_TAPE
+$!
+$U11:
+$ IF F$EXTRACT(0,1,TYPE) .NES. "D" THEN GOTO U12
+$!
+$!  Daily backup
+$!
+$ ROOT = "BACKUPDIR:USER1_''DAY_OF_WEEK'"
+$ RENAME 'ROOT'.BJL 'ROOT'_OLD.BJL
+$ SINCE="BACKUP"
+$ GOTO PROCESS_TAPE
+$!
+$U12:
+$ GOTO U10
+$!
+$! Set up for backing up SYSTEM
+$!
+$S0:
+$ FROM = "SYS$SYSDEVICE:[*...]/EXCLUDE=([SYS0.001001...],[SYS0.001002...],"+-
+    "[SYS0.001054...])"
+$ OPTIONS = "/RECORD/REWIND/FAST"
+$ PROT = "/PROTECTION=(S:REWD,O:REWD,G,W)"
+$!
+$! Ask for the type of incremental backup.
+$!
+$S10:
+$ INQUIRE TYPE "Is this a weekly [W] or daily [D] backup?"
+$ IF F$EXTRACT(0,1,TYPE) .NES. "W" THEN GOTO S11
+$!
+$!  Weekly backup
+$!
+$ TO = "TAPE:''DATE'.BCK"
+$ ROOT = "BACKUPDIR:SYSTEM_WEEKLY"
+$ IF DATE_OF_MONTH .LE. 14 THEN -
+   RENAME 'ROOT'.BJL 'ROOT'_OLD.BJL
+$ OPEN/READ SAVE_DATE 'ROOT'.DATE
+$ READ SAVE_DATE SINCE
+$ CLOSE SAVE_DATE
+$ GOTO PROCESS_TAPE
+$!
+$S11:
+$ IF F$EXTRACT(0,1,TYPE) .NES. "D" THEN GOTO S12
+$!
+$!  Daily backup
+$!
+$ TO = "DISK$USER3:[BACKUP.SYSTEM]''DATE'.BCK"
+$ ROOT = "BACKUPDIR:SYSTEM_''DAY_OF_WEEK'"
+$ SINCE="BACKUP"
+$ GOTO PROCESS_TAPE
+$!
+$S12:
+$ GOTO S10
+$!
+$! Allocate the tape, mount it and do the backup.
+$!
+$PROCESS_TAPE:
+$ SET VERIFY
+$ DRIVE:=MT:
+$ IF P1 .NES. "" THEN DRIVE=P1
+$ ALL 'DRIVE' TAPE
+$ MOU/FOR TAPE
+$ SET PROC/PRIV=READALL
+$ BACKUP'OPTIONS'/SINCE='SINCE'/JOURNAL='ROOT' 'FROM' 'TO''PROT'
+$ SET PROC/PRIV=NOREADALL
+$ DISMOUNT TAPE
+$ DEAL TAPE
+$ SET NOVERIFY
+$!
+$! Save the date and time if this is a weekly backup
+$!
+$ IF TYPE .NES. "W" THEN GOTO TIDY1
+$ BACKUP_TIME = TIME
+$ BACKUP_TIME[11,1]:=:
+$ OPEN/WRITE SAVE_DATE 'ROOT'.DATE
+$ WRITE SAVE_DATE BACKUP_TIME
+$ CLOSE SAVE_DATE
+$ PURGE 'ROOT'.DATE
+$ GOTO END
+$!
+$TIDY1:
+$ PURGE 'ROOT'_OLD.BJL
+$!
+$END:
+$ LOGOUT
+\end{verbatim}
+\end{document}

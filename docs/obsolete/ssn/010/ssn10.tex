@@ -1,0 +1,245 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocnumber}    {10.1}
+\newcommand{\stardocauthors}   {Martin Bly}
+\newcommand{\stardocdate}      {14 April 1992}
+\newcommand{\stardoctitle}     {GENSTAT~5 --- Installation Instructions}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\LARGE \bf \stardoctitle}
+\end{center}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+
+The GENSTAT~5 package is a general statistical analysis package. It is
+commercial software for which Starlink has a licence agreement with Numerical
+Algorithms Group (NAG) Ltd. Starlink is currently licenced to install it on any
+five Starlink VAX clusters within the Starlink network, in the UK only. The
+agreement with NAG allows the installations to be `mobile', that is, for it to
+be de-installed at a site that no-longer requires it, and installed at one that
+does. Provided the number of cluster installations does not exceed five,
+Starlink is within the agreement.
+
+If your site wants to install GENSTAT~5, you should contact the Starlink
+Software Librarian (RLVAD::STAR), who will provide a copy of the standard
+installation. Your site will be assigned one of the `mobile' licences, and you
+may proceed to install it. 
+
+For users who require only infrequent access, one of the `mobile' licences is
+used for the RLVAD cluster which includes the STADAT machine. Users  may use
+their sites' username to access it on STADAT. 
+
+This document provides the installation (and de-installation) instructions for
+GENSTAT~5 on Starlink VAX machines. It is intended for Starlink Site Mangers
+who need to install or de-install it. Various tasks within these instructions
+require OPER or SYSPRV privileges.
+
+Starlink does not provide GENSTAT~5 on UNIX machines. 
+
+\section{Installation}
+
+This section tells you how to install GENSTAT~5 from the save set which will be
+provided by the Starlink Software Librarian. 
+
+\subsection{Copying the Software}
+
+You should first copy the save set to your own node, and decompress it if need
+be. GENSTAT~5 takes up about 23600 blocks (version 5.2-2), the save set is
+about 26650 blocks. You can request that the save set be compressed before you
+copy it.
+
+The save set will be protected on RLVAD by ACLs, to prevent unauthorised
+copying. Access to the GENSTAT save set will be granted by ACL only to the
+username at RLVAD of the site manager authorised to copy the save set.
+
+This means you will need to use COPY or TRANSFER with your RLVAD username
+and password to copy the save set. For example:
+\begin{verbatim}
+      $ COPY RLVAD"rlvad_username rlvad_password"::location:GENSTAT.BCK *.*
+\end{verbatim}
+where {\tt location} is the location of the save set at RLVAD.
+
+\subsection{Installing the software}
+
+GENSTAT~5 needs just over 23600 blocks of diskspace. Select a disk with
+sufficient free space to hold it, and create an empty top-level
+directory called {\tt [GENSTAT]} to hold it:
+\begin{verbatim}
+      $ SET DEFAULT <disk$name>:[000000]
+      $ CREATE/DIRECTORY/OWN=STAR/PROTECTION=W:RE [GENSTAT]
+\end{verbatim}
+Ownership should be assigned to the Starlink Software manager's username at 
+your node (usually STAR), and the protection set so that all users have READ 
+and EXECUTE access to the {\tt [GENSTAT]} directory.
+
+Next, you need to unpack the software from the save set:
+\begin{verbatim}
+      $	SET DEFAULT <disk$name>:[GENSTAT]
+      $ BACKUP <where-ever>:GENSTAT.BCK/SAVE/SEL=[GENSTAT...]*.* [...]*.*
+\end{verbatim}
+
+You should now have a directory tree containing the GENSTAT~5 software.
+
+\subsection{Local STARTUP and LOGIN}
+
+You now need to modify your {\tt LSSC:STARTUP.COM} file to contain an entry to
+set up  the necessary logical names for GENSTAT~5, and to modify your {\tt
+LSSC:LOGIN.COM} file to contain the symbol definitions.
+
+\subsubsection{Logical names}
+
+The {\tt [GENSTAT]} directory contains several files for setting up GENSTAT~5.
+The first of these is {\tt GENSTAT\_LSSC\_STARTUP.COM}. 
+\begin{enumerate}
+\item Edit {\tt GENSTAT\_LSSC\_STARTUP.COM} to alter \verb+<disk>+ to
+be the name of the disk on which you installed GENSTAT~5.
+\item Run {\tt GENSTAT\_LSSC\_STARTUP.COM} on all nodes in your cluster.
+\item Add the section shown below to your {\tt LSSC:STARTUP.COM} file, ensuring
+you have the correct disk specified. 
+\begin{small}
+\begin{verbatim}
+      $! GENSTAT
+      $       DEFINE/SYSTEM   GENSTAT_DISK    <disk>
+      $       DEFINE/SYSTEM   GENSTAT_DIR     GENSTAT_DISK:[GENSTAT]
+      $       @GENSTAT_DIR:GENSTAT_STARTUP
+\end{verbatim}
+\end{small}
+The command procedure {\tt GENSTAT\_STARTUP.COM} will define the many system
+logical names necessary for GENSTAT~5 when your node is booted.
+\end{enumerate}
+
+\subsubsection{Symbols}
+
+Another file in {\tt [GENSTAT]} is {\tt GENSTAT\_LSSC\_LOGIN.COM}. This 
+contains an insert for your {\tt LSSC:LOGIN.COM} file. The two symbols defined 
+override the standard Starlink definition which causes the ``Package Not
+Installed'' message to be displayed if GENSTAT~5 is not installed.  The section
+shown below should be added to your {\tt LSSC:LOGIN.COM}.
+\begin{small}
+\begin{verbatim}
+      $! GENSTAT
+      $       GENSTAT     == "$G22SUP:GENSTPHR"
+      $       GENSTATHELP == "HELP/LIBRARY=GENSTAT_DIR:GENSTAT/NOINST/NOLIBL GENSTAT"
+\end{verbatim}
+\end{small}
+
+\subsection{Ready to go}
+
+If you have got this far, you are now ready to run GENSTAT~5. You need to logon
+to your node, and execute the {\tt @SSC:LOGIN} procedure to make GENSTAT~5
+available. 
+
+To run GENSTAT~5, merely type:
+\begin{verbatim}
+      $ GENSTAT
+\end{verbatim}
+There is a comprehensive help facility available within GENSTAT~5, and also a
+help facility available from DCL, without needing to invoke GENSTAT first:
+\begin{verbatim}
+      $ GENSTATHELP
+\end{verbatim}
+
+\subsection{Documentation}
+
+There are various guides available for GENSTAT~5, which should be obtainable
+from Site Managers. If not, contact the Starlink Documentation Librarian
+(RLVAD::MDL).
+\begin{itemize}
+\item SUN/54 --- {\em GENSTAT --- Statistical Data Analysis}.
+\item {\em GENSTAT~5 --- An Introduction} (book).
+\item {\em GENSTAT~5 --- A Second Course}.
+\item {\em GENSTAT~5 --- Reference Manual} (book).
+\item {\em GENSTAT~5 --- Release 2 reference Manual Supplement}
+\item {\em GENSTAT~5 --- Procedure Library Manual, Release 2.2}.
+\end{itemize}
+
+\section{De-installation}
+
+The de-installation of GENSTAT~5 is rather easier. The process involves removing
+all the GENSTAT logical names from all nodes in your cluster, deleting the
+software and the {\tt [GENSTAT]} directory tree, and amending the
+Local Startup and Login files to remove the GENSTAT~5 entries.
+
+\begin{enumerate}
+\item Remove most of the logical name definitions. A command procedure is
+provided to do this, and should be run on all nodes in the cluster:
+\begin{verbatim}
+      $ MCR SYSMAN
+      SYSMAN> SET ENV/CLUSTER
+      SYSMAN> DO @GENSTAT_DIR:GENSTAT_REMOVE
+      SYSMAN> EXIT
+      $
+\end{verbatim}
+\item Delete the software and directory tree:
+\begin{verbatim}
+      $ SET DEFAULT GENSTAT_DIR
+      $ DELETE/EXCLUDE=*.DIR;* [...]*.*;*
+      $ SET PROTECTION=(O:RWED) *.DIR
+      $ DELETE *.DIR;*
+      $ SET DEFAULT [-]
+      $ SET PROTECTION=(O:RWED) GENSTAT.DIR
+      $ DELETE GENSTAT.DIR;*
+\end{verbatim}
+You can leave the top level {\tt [GENSTAT]} directory itself, if you wish, for
+future re-installation of GENSTAT.
+
+\item Remove the remaining GENSTAT~5 logical names on all nodes in your
+cluster:
+\begin{verbatim}
+      $ MCR SYSMAN
+      SYSMAN> SET ENV/CLUSTER
+      SYSMAN> DO DEASSIGN/SYS GENSTAT_DIR
+      SYSMAN> DO DEASSIGN/SYS GENSTAT_DISK
+      SYSMAN> EXIT
+      $
+\end{verbatim}
+\item Remove the entries for GENSTAT~5 in your {\tt LSSC:STARTUP.COM} and
+{\tt LSSC:LOGIN.COM} files.
+\end{enumerate}
+
+You should now have no trace left of GENSTAT~5. Inform the Starlink Software
+Librarian (RLVAD::STAR) that you no-longer have GENSTAT~5 installed. Your
+`mobile' licence will then be free to assign to another node. 
+\end{document}

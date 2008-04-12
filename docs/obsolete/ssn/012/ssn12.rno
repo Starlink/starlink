@@ -1,0 +1,610 @@
+.title SSN/12.5
+.set date 10,05,1989
+.autoparagraph
+.set paragraph 0,1,2
+.layout 3,2
+.page size 57,70
+.flags substitute
+.nofill
+.keep
+.justify
+SCIENCE#AND#ENGINEERING#RESEARCH#COUNCIL SSN/12.5
+RUTHERFORD#APPLETON#LABORATORY
+SPACE#_&#ASTROPHYSICS#DIVISION
+
+Starlink#Project Issued#by
+Starlink#System#Note#12.5
+
+.right;D L Terrett
+.right;$$date
+
+.fill
+.repeat 70,"-"
+.blank
+.centre;ARGSMAC - Programming the ARGS
+.centre;------------------------------
+.hl1 Introduction
+This note describes the tools available for writing programs to be executed by
+the ARGS graphics processor and suggests some conventions for such programs in
+order to encourage uniformity for the benefit of both the users and those who
+have to develop and maintain the programs.
+Any suggestions for changes or further developments will be welcome.
+It is assumed that the reader is familiar with the ARGS architecture and manual,
+and is familiar with assembly level programming in general and the VAX MACRO
+assembler in particular.
+An example of using the new library appears in ARGSMAC__DIR:TBC.MAR
+.hl1 Assembling a Program
+A large number of macros have been written so that an ARGS program can be
+written in what looks like its own assembly language.
+For example
+.lt
+
+	XCL	0,255		;move system cursor to centre of
+	YCL	0,255		;display
+	ZOM	0,8,1,1		;zoom display about cursor
+
+.el
+The macros are stored in the library ARGSMAC__DIR:ARGSMAC.MLB and so the program must
+be assembled with the command:
+.lt
+
+	$ MACRO filename+ARGSMAC_DIR:ARGSMAC/LIBRARY
+
+The program itself must begin:
+
+	ARGSDEF	name,base_address
+
+.el
+ARGSDEF is a macro which causes all the ARGS instructions to be defined as
+macros and initialises various symbols which enable the correct calculation of
+addresses in ARGS graphics store memory.
+
+"name" is a name chosen for the program, and will also be a part of the names of
+the VAX subroutines which load the program into the ARGS, and start its
+execution.
+It should therefore conform to any conventions that may exist for the naming of
+Starlink subroutines and functions and must of course be a name acceptable to
+the FORTRAN compiler.
+
+"base__address" is the address in graphics store at which the program is to be
+loaded.
+Programs are not relocatable in the ARGS memory and must be reassembled if the
+base address is to be changed, but the value of this argument is the only change
+that needs to be made to the program.
+If the address contains a radix operator, it must be enclosed in angle brackets
+(eg <_^X400>), because "^" is a valid argument delimiter in macro calls.
+This also applies to instruction operands as all the opcodes are in fact macros.
+The lowest base address that should be used is <_^X3C1>, otherwise the text
+symbol matrices will be overwritten.
+(As our ARGS do not have keyboards, free memory actually starts at <_^X341>, but
+it is possible that keyboards might be fitted sometime in the future.)
+If this argument is omitted <_^X3C1> will be used.
+
+The program must finish with:
+.lt
+
+	ARGSEND	name
+	.END
+
+.el
+where "name" must be the same name as used when calling ARGSDEF.
+
+The object module produced by assembling such a program, contains a VAX routine
+which, when called by a VAX program, will load the ARGS code into the ARGS
+graphics store, and a routine which will start execution of the program.
+If the execution of the ARGS program should not begin at the base address, the
+starting point should be indicated by calling the macro ARGSENTRY (no
+parameters).
+Eg:
+.lt
+
+		ARGSDEF	PROG,<_^X400>
+		  .
+		  .
+		  .
+		data area
+		  .
+		  .
+		  .
+		ARGSENTRY
+		  .
+		  .
+		  .
+		executable code
+		  .
+		  .
+		ARGSEND	PROG
+		.END
+
+.el
+These ARGS macros define a large number of symbols with names that start with
+the characters "__" and ".", and the use of such names should be avoided.
+.hl1 Passing parameters between the VAX and the ARGS
+An ARGS program may require information that is only available at the time it is
+to be executed (eg the number of the cursor to be used or a VLUT to be
+manipulated).
+This can be done by having the VAX program load additional data into the
+graphics store after the program has been loaded but before it has been
+executed.
+This is preferable to patching the ARGS code before loading as it allows a
+program to be run more than once without reloading each time, and it is then
+possible for the ARGS program to retain information such as the state of
+internal ARGS registers from one run to the next.
+It is unfortunate that the internal state of many of the ARGS registers cannot
+be determined by a program except by resetting everything to their defaults.
+A limited number can be read indirectly using the Save Register Context (SRC)
+instruction.
+
+If required, a data area should be reserved within the ARGS program for
+receiving parameters from the VAX by preceding the area with the macro
+ARGSINPUT, and following it by ARGSINEND.
+This will result in the assembler creating a routine which will load data
+provided by its caller into the correct area of the ARGS graphics store.
+This mechanism restricts the parameter area to a contiguous chunk of graphics
+store, but the increased complexity of the ARGS program that this may cause is
+more than offset by the uniform way in which VAX programs then interact with the
+ARGS.
+
+Results returned by an ARGS program (eg the final position of a cursor) are
+treated in an analogous manner.
+The data region is delimited by ARGSOUTPUT and ARGSOUTEND, and the assembler
+will create a routine which reads data from the graphics store into a user
+supplied buffer.
+The two data areas can overlap if desired.
+.hl1 Running the Program
+The ARGS program is loaded into graphics store by calling a subroutine with the
+same name as the ARGS program (given as arguments to the ARGSDEF and ARGSEND
+macros), preceded by "LOAD__" ie:
+.lt
+
+	CALL LOAD_name
+
+.el
+Input parameters (if needed) are loaded into the graphics store by:
+.lt
+
+	CALL WRITE_name(DATA)
+
+.el
+where DATA is a variable or array (usually INTEGER*2) containing the input data.
+
+Execution is started by:
+.lt
+
+	CALL RUN_name
+
+.el
+Results can be read back after execution has finished by:
+.lt
+
+	CALL READ_name(RESULTS)
+
+.el
+The program can be rerun any number of times by calling WRITE__name, RUN__name
+and READ__name as appropriate, without the program having to be reloaded.
+.hl1 Object Module Structure
+The object module produced by assembling an ARGS program consists of three
+program sections (PSECTS)
+
+i) CODE__name
+
+Contains the ARGS code. Can be mapped as a common block if desired. This
+provides an alternative method of modifying a program before execution.
+
+ii) HEAD__name
+
+7 longwords containing the following information as signed integers:
+.ls "o"
+.le;Base address of program in graphics store.
+.le;Length of program in words. This is also the length of CODE__name.
+.le;Address in graphics store of the program entry point.
+If ARGSENTRY was not called this will be the same as the program base address.
+.le;Address of input data area.
+If ARGSENTRY was not called, this will be equal to the address of the first
+word following the end of the program.
+.le;Length in words of input data area.
+Equal to zero if no input area was defined.
+If ARGSINPUT was called but not ARGSINEND, the area is assumed to extend to the
+end of the program.
+.le;Address of output data area. Defaults in the same way as input area.
+.le;Length in words of output data area.
+.els
+
+iii) EXE__name
+
+Executable (VAX) code which consists of the routine which loads the ARGS
+program into graphics store and the routine that starts program execution, and
+optionally, the routines which read and write to and from the data areas in
+graphics store.
+The entry points of these routines are:
+.lt
+
+		LOAD_name
+		RUN_name
+		READ_name
+		WRITE_name
+.el
+.hl1 Coding ARGS instructions
+The opcodes are the mnemonics used in the ARGS manual, with the exception that
+the suffixes '+' and '*' must be replaced by '_$' and '.' respectively.
+The computational opcodes (pg.#3-42) are followed by two letters (V, I, X or L)
+indicating the addressing modes; eg SETVV, ADDLV etc.
+The required number of operands follow, but as mentioned earlier any operand
+containing a radix operator must be enclosed in angle brackets.
+.hl1 Symbolic Addresses
+When normal VAX code is being assembled, any line of code can be labelled and
+this label subsequently used anywhere in the program in order to refer to this
+memory location.
+The value of the symbol defined in this way is a byte address relative to the
+beginning of the program section.
+All values derived from such relative addresses are converted to absolute
+addresses by the linker.
+Unfortunately the same process does not work for ARGS programs for two reasons.
+Firstly, the ARGS graphics store is word addressable not byte addressable, and
+secondly there is no equivalent to the linking process, and the assembler has
+to generate absolute addresses.
+
+Those macros which assemble instructions which expect an address as one of their
+operands (eg JMA) perform the necessary conversion to absolute word addresses.
+Similarly, relative displacements are converted from byte displacements to word
+displacements.
+
+This means that it is not possible to specify  a literal address or displacement
+for such instructions as the value given will be taken to be a byte offset from
+the base address of the program.
+More importantly, an offset from a label must be given in bytes, not words.
+For example, if a program were to contain the following:
+.lt
+
+	DATA:	.WORD	2
+		.WORD	4
+		.WORD	6
+
+.el
+The location containing the 4 must be referred to as DATA+2 and the location
+containing the 6 as DATA+4.
+In this case, it is simpler just to label every location, but this is not
+always possible.
+For example, if we wish to load a single video look-up table entry, into some
+previously calculated position in the VLUT, (perhaps derived from the
+trackerball position), we must label the LVT instruction and then replace the
+second operand by the desired position.
+This operand occupies the word immediately following the instruction itself and
+must be referred to as "label+2" as in the following example.
+.lt
+
+	SETVV	POS,LABEL+2
+	LABEL:	LVT 0,0
+
+.el
+where POS is the label of the location containing the desired VLUT position.
+Note that the LVT opcode occupies 1 byte as does the first operand (number of
+table entries to be loaded -1).
+This technique is used several times in the complete example to be found later
+in this note.
+
+If we wish to set a memory location to its own address,
+.lt
+
+	LABEL:	.WORD	LABEL
+
+.el
+is incorrect.
+Instead the .WAD macro must be used (analogous to .ADDRESS) eg:
+.lt
+
+	LABEL:	.WAD	LABEL
+
+.el
+Due to the limited range of computational instructions available, look-up tables
+assume an important role in the construction of complex programs, and in order
+to use such tables effectively it is necessary to perform arithmetic with
+addresses.
+Because of the enforced distinction between addresses and literal values, the
+instruction:
+.lt
+
+	SETLV	BASE,INDEX
+
+.el
+will not set the location labelled INDEX to the address of the location BASE.
+To enable the desired effect to be achieved, an additional source operand type
+"A" has been defined for the computational instructions so that
+.lt
+
+	SETAV	BASE,INDEX
+
+.el
+can be used instead.
+The assembled instruction is SETLV but the macro expects an address as the first
+operand, and performs the necessary conversion.
+.hl1 The Trackerball
+The only interactive device we have at present is the trackerball and its four
+push buttons and lights.
+The trackerball registers are accessed with the DEV instruction with 4 as its
+first operand.
+It is obviously helpful to users if:
+.ls
+.le;programs which use a push button to indicate the same or a similar function
+use the same button
+.le;all sites arrange the colours of the buttons as follows:
+.b.lm +20
+.lt
+1 (left)   green
+2          white
+3          white
+4 (right)  red
+
+.el.lm -20
+where 'left' and 'right' assume that the trackerball is placed with its cable
+away from the user.
+.els
+To this end it is suggested that the button used to indicate that a program
+should terminate should be the red button at the right hand end.
+A program which returns a value to the VAX and is immediately restarted, for
+example to indicate a series of points with the cursor should use the left hand
+green button.
+The right hand button in this case would be used to indicate that there are no
+more points.
+
+As reading the trackerball is such a common operation, two macros TB__INIT and
+TB__READ have been provided.
+TB__INIT resets the trackerball, puts out the lights and defines a data area
+labelled TB__REG for use by the indirect form of the DEV instruction.
+The first word of this area contains _^X44 and must not be altered by the
+program.
+The remaining three words are labelled TB__DELTAX, TB__DELTAY, and TB__BUTTONS
+and will contain the X and Y offsets and the buttons status data respectively
+after the execution of the instruction
+.lt
+
+		DEV.	TB__REG
+
+.el
+Bits are set in the buttons status word to indicate that a button was pressed
+since the last read, as follows (labelling the least significant bit as 0)
+.lt
+
+	left hand green	bit 6
+	white		bit 5
+	white		bit 4
+	right hand red	bit 3
+
+.el
+TB__READ reads the trackerball data into the data area defined by TB__INIT and
+takes four optional address arguments, to which control is transferred if the
+corresponding button had been pressed.
+The arguments are given in the order listed above, and if more than one button
+was pressed the left hand one takes precedence.
+If an argument is omitted the corresponding button is ignored.
+
+A typical interactive program might have a structure something like this:
+.lt
+
+		ARGSENTRY
+
+		TB_INIT
+
+	LOOP:	TB_READ		GREEN,HIT,,STOP	;ignore button 3
+		ADDVV		TB_DELTAX,X	;just accumulate the
+		ADDVV		TB_DELTAY,Y	;offsets
+		JMR		LOOP
+
+	GREEN:
+
+        - do something with X and Y -
+
+		JMR	LOOP
+
+	HIT:
+
+        - do something else -
+
+		JMR	LOOP
+
+	STOP:	STP
+
+	X:	.WORD	0
+	Y:	.WORD	0
+
+.el
+The trackerball lights operate independently of the buttons and are entirely
+under software control.
+If the state of the lights are to be linked with the operation of the buttons,
+this must be managed by the ARGS program, and unfortunately, without an
+inclusive OR instruction, this is fairly messy.
+The DEV instruction expects two operands, the device number (4) and the mode.
+Therefore, to change the state of the lights, the word containing the lights
+data must be assembled separately, immediately following the instruction.
+For example, to turn on all four lights:
+.lt
+
+	DEV	4,5
+	.WORD	<_^X78>
+or
+	DEV	4,5
+	.WORD	_^B1111@3
+
+.el
+.hl1 Example
+.lt
+	.TITLE	BLOB
+;+
+;    -----------
+;    : B L O B :
+;    -----------
+;
+;  This program illustrates many of the features of the ARGS
+;  programming system described in SSN/12.
+;
+;  A filled circle of user supplied size and colour is drawn
+;  at a point marked by the cursor, and the coordinates
+;  of the position returned to the VAX.
+;
+;  DLT Starlink MAN  Sept 81
+;-
+
+	ARGSDEF	BLOB,<^X3C1>
+
+
+;  Define the area to receive the size and colour
+;  of the required blob.
+
+	ARGSINPUT
+
+SIZE:		.BLKW	1
+COLOUR:	.BLKW	1
+
+	ARGSINEND
+
+
+;  Execution starts here
+
+	ARGSENTRY
+
+	TB_INIT			; select/initialise trackerball
+
+	DEV	4,5		; turn on lights
+	.WORD	^B1001@3
+
+	XCL.	XADDR		; load initial cursor position
+	YCL.	YADDR
+
+	VSR	<^X01F8>,-	; switch on cursor
+		<^X0008>,-
+		<^X0000>
+
+
+;  This loop reads the trackerball register and updates the
+;  cursor position until either the hit or exit button is
+;  pressed. Both buttons have the same effect.
+
+LOOP:
+	TB_READ	END,,,END	; ignore white buttons
+
+	ADDVV	TB_DELTAX,X	; accumulate cursor position.
+	ADDVV	TB_DELTAY,Y
+
+	XCL.	XADDR		; move cursor to new position.
+	YCL.	YADDR
+
+	JMR	LOOP
+
+
+; This section draws the requested blob.
+
+END:
+	ZDI.	COLOUR		; set up requested colour.
+
+	SETVV	X,XOR+2		; move vector space origin to the
+	SETVV	Y,YOR+2		; cursor position.
+XOR:	XOR	0
+YOR:	YOR	0
+
+	SETVV	SIZE,SPC+2	; draw the circle
+SPC:	SPC	1,0
+
+
+; This section cleans up and sets up the cursor position
+; ready to be read by the VAX.
+
+	XOR	0		; reset origin
+	YOR	0
+
+	VSR	<^X01C0>,0,0	; turn off cursor
+
+	SETVV	X,XOUT		; move final position
+	SETVV	Y,YOUT		; to output area
+
+	DEV	4,5		; turn out lights
+	.WORD	0
+
+	STP			; and stop.
+
+
+;  The output data area
+
+	ARGSOUTPUT
+
+XOUT:	.BLKW	1
+YOUT:	.BLKW	1
+
+	ARGSOUTEND
+
+
+;  parameter lists for the indirect cursor load instructions.
+
+XADDR:	.WORD	0		; use system cursor
+X:	.WORD	256		; start at screen centre
+YADDR:	.WORD	0
+Y:	.WORD	256
+
+	ARGSEND	BLOB
+
+	.END
+
+
+      PROGRAM BLOB
+*+
+*  This program runs the "BLOB" ARGS graphics processor program
+*  used as an example in SSN/12.
+*
+*  DLT Starlink MAN  Sept 81
+*-
+
+      INTEGER*2 INPUT(2),POSITION(2)
+
+*  Allocate an ARGS
+
+      CALL SRINIT(1,.FALSE.,IFAIL)
+      IF (IFAIL.NE.0) THEN
+         PRINT *,'Failed to allocate ARGS'
+         GO TO 999
+      END IF
+
+*  Load ARGS program
+
+      CALL LOAD_BLOB
+
+*  Get the size and colour from the user
+
+      WRITE(*,'(''_$'',A)') 'Size: '
+      READ *, INPUT(1)
+      WRITE(*,'(''_$'',A)') 'Colour: '
+      READ *, INPUT(2)
+
+*  Load data into ARGS
+
+      CALL WRITE_BLOB(INPUT)
+
+*  Start program
+
+      CALL RUN_BLOB
+
+*  Read the resulting position
+
+      CALL READ_BLOB(POSITION)
+
+      WRITE(*,'(A,I5,A,I5)')
+     :     ' Circle drawn at ',POSITION(1),' , ',POSITION(2)
+
+  999 STOP
+      END
+.el
+.hl1 Bugs
+This is a list of suspected microcode bugs and known errors in the manual.
+Any additions or corrections to this list will be welcome.
+.hl2 Suspected bugs \in ARGS
+.ls
+.le;PBG - only the on interval can be changed.
+.le;SXR* and SYR* don't work.
+.els
+.hl2 Mistakes \in ARGS manual
+.ls
+.le;JMR, JRE, JSR, JSE, PC#+#displacement should be PC#+#displacement#+#1
+(pg.#3-80,3-81).
+.le;Computation commands.
+Data source V, location in graphics store, not in local store (pg.#3-100).
+.le;Data destination, I, should be the same as source earlier on same page
+(pg.#3-100).
+.els

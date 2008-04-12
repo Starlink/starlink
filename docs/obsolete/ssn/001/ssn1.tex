@@ -1,0 +1,249 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocnumber}    {1.2}
+\newcommand{\stardocauthors}   {P M Allan}
+\newcommand{\stardocdate}      {26 February 1991}
+\newcommand{\stardoctitle}     {NOCBS --- Use of CBS mail on satellites}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+
+% Make $ a character instead of the maths mode delimiter
+\catcode`\$=12 
+
+% Use the real underscore character instead of a box
+\renewcommand{\_}{{\tt\char'137}}
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\section{Introduction}
+
+Since the introduction of version 5 of VMS and the Coloured Books software
+(CBS), it has been possible to send CBS mail from within VMS mail by using an
+address of the form {\tt CBS\%nodename::username}. This only works
+on cluster nodes that have CBS installed. The usual situation at Starlink sites
+that have VAXclusters is that CBS is installed on only one machine in the
+cluster. Throughout this document this node will be referred to as `the boot
+node', although there is no requirement that this is the case and indeed some
+clusters have more than one boot node. Machines that do not have CBS installed
+will be referred to as satellites. Again this need not be the case.
+
+There are two problems with the use of CBS mail as it stands. Firstly it can
+only be used on the systems which have it installed; this can be very annoying
+when trying to reply to mail. Secondly, if an attempt is inadvertently made to
+use CBS mail on a satellite, the error message is not very informative. This
+node describes how to set up a cluster so that CBS mail can be used indirectly
+from satellites and a utility called NOCBS that produces a more helpful error
+message if a user attempts to use CBS mail directly on a satellite. The two
+items are completely separate. They just happen to address different aspects of
+the same problem.
+
+\section{Use of CBS mail on a satellite}
+\label{cbs}
+
+While it is currently not possible to send mail to {\tt CBS\%nodename::username}
+from a satellite, it is possible to use {\tt CBS\%} indirectly. To enable the
+use of CBS mail on a satellite, you must do the following:
+
+\begin{itemize}
+\item Find out which account on your cluster handles incoming mail. This is
+probably either DECNET or MAIL$SERVER. You can do this by typing
+\begin{quote}
+$ MC NCP SHOW OBJECT MAIL CHAR
+\end{quote}
+If the object has a user id associated with it, then that is the username that
+will be used when fielding incoming mail messages. If there is not a user id,
+then type
+\begin{quote}
+$ MC NCP SHOW EXEC CHAR
+\end{quote}
+and look for the non privileged user id. If neither of these are present, then
+mail will not work.
+
+\item Set the system logical name {\tt MAIL$SYSTEM\_FLAGS} to an even number on
+all of the satellites. This enables intra-cluster DECnet for mail messages. It
+can be set to an even number on the boot node as well, although this is neither
+required nor causes problems if not done (but see section~\ref{reply}). The
+effect of {\tt MAIL$SYSTEM\_FLAGS} is described in the VMS Mail Utility Manual
+(pages 14--15 for the VMS 5.0 manual).
+
+\item Make sure that the username that handles mail has a MAIL.MAI file on the
+boot node. If there is not one, send a mail message to
+{\tt <boot node>::<username>} to create one.
+
+\item Ensure that the user that handles incoming DECnet mail (probably
+MAIL\$SERVER or DECNET) is authorized by NRS to send CBS mail to all JANET
+sites. Since this actually allows anyone to send mail to all JANET sites, the
+best way of doing this is to authorize the default user to send mail to all
+JANET sites. To do this, type
+\begin{quote}{\tt
+$ RUN NET$DIR:NETAUTH\\
+ADD USER [] UK.AC.*
+}
+\end{quote}
+
+\end{itemize}
+
+You should now be able to send CBS mail from a satellite by sending mail to
+{\tt <boot node>::CBS\%<NRS node name>::<username>}, e.g.\ to send a mail
+message from a RAL satellite to Manchester, one can send to
+{\tt RLSTAR::CBS\%MAN.AST.STAR::DSB}. 
+
+\subsection{Problems with outgoing mail}
+
+Sending mail to {\tt RLSTAR::CBS\%MAN.AST.STAR::DSB} (for example) will cause a
+network login on RLSTAR and the process will be owned by the username that
+handles incoming mail. The problem is that it is this process that needs to
+forward the mail using CBS. If this account does not have authorization to send
+the CBS mail to the site in question, then the mail cannot be sent. Even worse,
+the user on the satellite is not told that there is a problem, but the process
+just hangs.
+It is quite all right for every user to have access to NRS site names
+beginning with UK.AC as these are on JANET and it costs nothing to access these
+sites. This is set up as described in the section above. The real problem is
+with mailing directly to overseas sites. Authorizing a particular user to
+access a particular site will not allow them to do so from a satellite. To do
+so, it is necessary to authorize the account that handles incoming mail to send
+CBS mail to the remote site. This would give access to anyone, so should not be
+done. The user will have to remember to use the boot node in such cases.
+However, if a user sends mail explicitly through one of the gateways in the UK,
+then there will be no problem.
+
+\subsection{Replying to mail sent from satellites}
+\label{reply}
+
+All things considered, it is better to send a new mail message rather than try
+replying to messages sent from satellites, however, if you want to do this,
+read on.
+
+If user PMA sends a CBS mail message from a satellite of RLSTAR, then the mail
+will appear to come from {\tt
+CBS\%UK.AC.\-RUTHERFORD.\-STARLINK::"RLVAD::PMA"}. This mail message can be
+replied to provided that the originating site has defined the logical name {\tt
+FTP$MAIL\_DECNET} on the boot node. This logical name gives the DECnet nodes
+that CBS will forward mail on to. This should definitely be set to the cluster
+alias and for good measure, it is worth including the individual node names of
+your cluster as well.\\E.g.
+\begin{quote}{\tt
+$ DEFINE/SYSTEM FTP$MAIL\_DECNET RLVAD,RLSTAR,RLSSD1,RLSVS1,RLSVS2
+}
+\end{quote}
+
+If this is not done then although the mail can be replied to, it will be
+bounced back to the user with a message indicating that the DECnet node was not
+accessible from CBS mail. Also, since the mail message has come from {\tt
+CBS\%...} then the reply must be done on the boot node.
+
+When the reply is received by the originating author, it will appear to come
+from somewhere like {\tt RLVAD::CBS\%\-MANCHESTER.\-ASTRONOMY.\-STARLINK::DSB}.
+You will be able to reply to this message if you are on the boot node and have
+set {\tt MAIL$SYSTEM\_FLAGS} to an odd number on the boot node. You may or may
+not be able to reply to this if you are on a satellite or have set {\tt
+MAIL$SYSTEM\_FLAGS} to an even number on the boot node. What is even worse is
+that in this situation, you may be able to reply sometimes and not
+others. This is because this second reply is being sent to the cluster alias.
+If several machines in the cluster field mail then the message may or may not
+get to the boot node.
+
+\section{NOCBS}
+\label{nocbs}
+
+Even though it is now possible to send CBS mail from a satellite, it is still
+not possible to send it directly to {\tt CBS\%<nodename>::<username>}.
+
+If an attempt is made to do this, an error message of the form
+
+\begin{verbatim}
+%MAIL-E-ERRACTRNS, error activating transport CBS
+%LIB-E-ACTIMAGE, error activating image  $1$DUA0:[SYS0.SYSCOMMON.][SYSLIB]CBS_MAILSHR.EXE;
+-RMS-R-FNF, file not found
+\end{verbatim}
+
+is produced. This is not very informative and causes much confusion. The purpose
+of NOCBS is to produce a meaningful error message. Since it is now possible to
+indirectly send CBS mail from a satellite, the error message produced by NOCBS
+tells you how to do this rather than suggesting that you log in to the boot
+node as it did in an earlier version of the software.
+
+\subsection{The files}
+
+The system consists of 5 files in the directory pointed to by the logical name
+{\tt NOCBS\_DIR}.
+
+\begin{tabbing}
+\hspace{5mm}\=BUILD.COM\hspace{35mm}\=A procedure to build the system\\
+\>LOGICALS.COM         \>Defines the logical names used by the system\\
+\>NOCBS\_MAILSHR.EXE   \>The shareable image containing the error routine\\
+\>NOCBS\_MAILSHR.MAR   \>The macro subroutine called from VMS MAIL\\
+\>NOCBS\_MESSAGES.MSG  \>
+The source file for the error message\\
+\end{tabbing}
+
+The file NOCBS\_MESSAGES.MSG contains the error text that is printed.
+The default error message is
+
+\begin{verbatim}
+     To use CBS mail on this system, send mail to 
+     <boot node>::CBS%<NRS node name>::<username>
+\end{verbatim}
+
+If you wish to tailor this message to be more specific to your site, then edit
+the message source file NOCBS\_MESSAGES.MSG and run BUILD.COM to rebuild the
+shareable image NOCBS\_MAILSHR.EXE. 
+
+The file LOGICALS.COM defines the logical names used by this program. They
+should be defined at boot time on the machines on which this is run, i.e.\ those
+machines that {\em do not} have CBS available. The command procedure
+LOGICALS.COM can be executed on all machines in the cluster as it checks if CBS
+is available by testing whether or not the logical name NET$DIR is defined. This
+check will of course not work if you define NET$DIR on machines that do not have
+CBS available. Furthermore, you should of course run LOGICALS.COM after you have
+started CBS on the boot node and not before.
+
+\subsection{How to install the system}
+
+The only things that are required for a functioning system are the shareable
+image NOCBS\_MAILSHR.EXE and logical names of the form xxx\_MAILSHR, where xxx
+is the transport being used. As released, only the logical name CBS\_MAILSHR is
+defined. If you run Philip Taylor's JANET\_MAILSHR you will need to define
+other logical names such as JANET\_MAILSHR and EARN\_MAILSHR.
+
+\section{Acknowledgments}
+
+The NOCBS software was developed with the assistance of Philip Taylor of Royal
+Holloway and Bedford New College.
+
+\end{document}

@@ -1,0 +1,2248 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocnumber}    {40.8}
+\newcommand{\stardocauthors}   {K.\ Shortridge \& H.\ Meyerdierks}
+\newcommand{\stardocdate}      {2 January 1992}
+\newcommand{\stardoctitle}     {Figaro Release Notes\\
+                                \bigskip
+                                Standard and National Figaro 3.0-3}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\newpage
+\section{About this document}
+
+The main body of this document is formed by the release notes as
+issued by Keith Shortridge (AAO) with Figaro 3.0. Some additional
+information on the actual release of (Standard) Figaro within Starlink
+should however be included. Also some release notes relating to the
+Figaro national directory and to National Figaro (updates to Standard
+Figaro) should be given.
+
+\begin{itemize}
+
+\item Section \ref{AAOnotes} contains the original Figaro Release Notes ---
+Version 3.0.
+
+\item Section \ref{Starnotes} describes the actual implementation at Starlink
+sites.
+
+\item Section \ref{natfig} describes National Figaro 3.0-3, which includes the
+ICL monolith for Figaro.
+
+\item Section \ref{develop} contains notes for users who want to develop their
+own Figaro applications, especially if they want to compile their own monolith.
+
+\item Section \ref{update} describes how to update from version 3.0-2 to 3.0-3.
+(3.0-2 means Standard Figaro 3.0 and National Figaro 3.0-2. Standard Figaro
+remained unchanged while National Figaro 3.0-1 and 3.0-2 were released.)
+
+\end{itemize}
+
+\section{Figaro release notes---version 3.0}
+\label{AAOnotes}
+
+\begin{quote}\em
+
+This section was originally in RUNOFF format and was issued as SSN/40.7,  dated
+28 May 1991. It has been converted to \LaTeX\ for this issue of the document. 
+The original format style of SSN/40.7 has been retained within the constraints
+of \LaTeX\ formatting, but no changes have been made to the text within this
+section, except for the removal of the first paragraph concerning `Change
+bars'.
+
+\end{quote}
+
+\subsection{Introduction}
+
+This note describes how to install the Figaro data reduction system. It is
+designed to accompany a release tape containing the various Figaro directories
+in VMS Backup format. The tape contains two save sets. The first is called
+FIGARO3.0, the second is called STARBITS.BCK. FIGARO3.0 contains all the files
+that are specific to Figaro; STARBITS.BCK contains those parts of Starlink
+software that are used by Figaro and can be supplied in this way (that is, it
+does not include anything that is in any proprietary). Starlink sites can
+ignore the second save set, while non-Starlink sites may find they need some
+of the files it contains.
+
+You can choose to install Figaro at one of three levels, depending on the use
+that will be made of the system and the disk space available.
+
+\begin{enumerate}
+
+\item If you only want to run Figaro as it stands, you can copy from tape
+only those files actually needed for the execution of the Figaro commands, 
+together with the various documentation files and help libraries.
+
+\item If you do not need to change any of Figaro, but want users to be able to
+develop their own programs that run as local extensions to Figaro, you need to
+copy the development directory and the various libraries as well as the files
+needed for actual execution.
+
+\item If you want the whole system available in source form, you can copy the
+entire contents of the release tape onto disk.
+\end{enumerate}
+
+The detailed descriptions of how to install each of these levels follow. Each
+level is described separately, in what is intended to be a self-contained way.
+If an old version of Figaro is being replaced by the new version, then the
+simplest thing is just to completely delete the old version before installing
+the new one. Of course, this means that any local changes made to the system
+will be lost, which is one reason that any such changes should be made in a
+local directory, as discussed in more detail later. 
+
+\subsection{Using this installation guide} 
+
+This guide is quite complex. This is because Figaro has tended more and more to
+make use of standard Starlink software, which means that procedures for
+installing it now differ considerably between Starlink and non-Starlink sites.
+The following may help you navigate through it:
+
+Read the introductory section on Version 3.0.
+
+Starlink site considerations:
+\begin{description}
+	\item Are you a Starlink site?
+\end{description}
+If you are then:
+
+Read the section on HDS.
+
+Otherwise (you are not a Starlink site) then:
+\begin{description}
+	\item Do you have the NAG library?
+	\begin{description}
+		\item If not then:
+		\begin{description}
+			\item You will need it to link and develop Figaro 
+programs. Read the section on `NAG'
+		\end{description}
+	\end{description}
+	\item Do you already have Starlink's version of SGS/GKS?
+	\begin{description}
+		\item If not then:
+		\begin{description}
+			\item Do you want to use the old version of PGPLOT 
+instead?
+			\begin{description}
+				\item If so then:
+				\begin{description}
+					\item Think again. The GKS version is 
+the standard one now for Figaro. However, if you must use the old PGPLOT, read 
+the section on `Using the old PGPLOT'.
+				\end{description}
+				\item Otherwise (using GKS):
+                         	\begin{description}
+					\item Get it from Starlink, and 
+install it according to the release notes that come with it. The section in 
+these notes on SGS/GKS may help a little.
+				\end{description}
+			\end{description}
+		\end{description}
+	\end{description}
+	\item Do you already have the latest versions of HDS, PGPLOT/GKS etc?
+	\begin{description}
+		\item If not then:
+		\begin{description}
+			\item Read the section on `Starlink Software at 
+non-Starlink sites', and install the software supplied in the second save set 
+on the tape.
+		\end{description}
+	\end{description}
+\end{description}
+
+End starlink site considerations.
+
+System version considerations:
+\begin{description}
+	\item Do you want to install the minimum (execute only) version of 
+Figaro?
+	\begin{description}          
+		\item If so, then:
+		\begin{description}
+			\item Follow the instructions in the section 
+`Installing the running version'
+		\end{description}
+	\end{description}
+	\item Alternatively, do you want to install a system that will allow 
+Figaro programs to be developed, but does not have all the source files?
+	\begin{description}
+		\item If so then:
+		\begin{description}
+			\item Follow the instructions in the section 
+`Installing a development system'
+		\end{description}
+	\end{description}
+	\item Alternatively, do you want to install the entire system?
+	\begin{description}
+		\item If so then:
+		\begin{description}
+			\item Follow the instructions in the section 
+`Installing the entire system'
+		\end{description}
+	\end{description}
+\end{description}
+End system version considerations.
+
+That covers all the bits you NEED to read to install Figaro. All the other
+sections are for background information, and should only be needed if you have
+trouble with the system. It would be a good idea to read the section on
+logical names used by Figaro, and check that they are all defined properly on
+your system. 
+
+\subsection{Version 3.0} 
+
+All Figaro users should 
+read FIGARO\_PROG\_S:CHANGES.MEM to see what is new in this release. 
+Their system managers should try to encourage them to do so.
+
+Figaro version 3.0 is the first Figaro release in which all the major
+applications have been re-coded to use the DSA subroutine library and so will
+support both the traditional Figaro data file format (known generally as `DST'
+format, and with the usual file extension of `.DST') and Starlink's new NDF
+format (whose files generally have the extension `.SDF'). More details of how
+this works can be found in the documentation supplied with Figaro 3.0, in 
+the file FIGARO\_PROG\_S:FIGARO.DOC under the topic VERSION 3.0.
+
+To the installer of the system, the only question posed by this new facility is
+that of the correct setting for the logical name FIGARO\_FORMATS which controls
+the default file format(s) used. This can be set most conveniently in the file
+FIGARO\_PROG\_L:FIGARO.COM after the installation is completed. Leaving it
+undefined leads to roughly the same behaviour as obtained by earlier versions
+of Figaro.
+
+Generally speaking, you should:
+
+\begin{enumerate}
+
+\item Leave it undefined if you do not expect to have to deal with NDF format 
+files at all. Figaro will still be able to deal with such files if it
+encounters them, but the .SDF extension will always have to be specified
+explicitly. New files will always be produced in DST format. You get the same
+effect by defining FIGARO\_FORMATS as ``DST''.
+
+\item Define it as ``NDF'' if you do not expect to have to deal with DST 
+format files at all. Figaro will still be able to deal with such files if it
+encounters them, but the .DST extension will always have to be specified
+explicitly. New files will always be produced in NDF format.
+
+\item Define it as ``DST,NDF'' if you expect to have to handle a mixture of 
+the two file formats, but expect most use to be made of DST format files. Now
+Figaro will look for files of either extension if no explicit file extension
+is specified, but will give precedence (after a warning message in cases of
+ambiguity) to .DST files. New files will be produced in DST format.
+
+\item Define it as ``NDF,DST'' if you expect to have to handle a mixture of 
+the two file formats, but expect most use to be made of NDF format files. Now
+Figaro will look for files of either extension if no explicit file extension
+is specified, but will give precedence (after a warning message in cases of
+ambiguity) to .SDF files. New files will be produced in NDF format.
+
+\end{enumerate}
+
+Note that users can define FIGARO\_FORMATS for themselves, either directly from
+DCL or in their personal FIGARO\_PROG\_U:FIGARO.COM files.
+
+The only other change that relates directly to installation of Figaro 3.0 is
+the fact that Figaro 3.0 now uses Starlink's GNS library to deal with graphics
+device names for GKS. Sites that are already using this will not have to
+do anything new, but sites that are not will have to install it (there is a
+copy included in the second save set of the release tape), and should note
+that the section on SGS/GKS in these notes has changed significantly (being now
+much simpler) from the Figaro 2.4 version.
+
+Other changes worth noting are the support added to many applications 
+for data quality and error arrays, the new ability to specify parameters as
+lists taken from files using an `@' syntax, which allows an application to
+run repeatedly without the overheads of image activation, and some of the new
+and modified applications; IMAGE has been changed significantly, some 
+optimal spectral extraction routines have been included, etc.
+
+\subsection{Version 2}
+
+This section is repeated from the original version 2.1 release notes. It is
+included mainly for sentimental reasons.
+
+A number of changes have been made to Figaro in the move from version 1 to 
+version 2, and whoever is responsible for Figaro at a particular site should be
+aware of them, in order to be able to fend off the complaints from the users,
+very few of whom can ever be relied on to read documentation for themselves.
+What they ought to be reading is the section in the main Figaro documentation
+(FIGARO.DOC) headed VERSION\_2, or getting the same information by typing HELP
+FIGARO VERSION\_2.
+
+Briefly, the major changes are as follows:
+
+\begin{itemize}
+\item The actual disk format used has changed. The used are unchanged, but the
+actual disk files used are now HDS files, accessed through Starlink's HDS
+(Hierarchical Data System). This means that Version 2 Figaro programs cannot
+read Version 1 files (and vice versa), and so all existing files must be
+converted. Anyone who gets the message `file not created by this data system'
+when trying to read a file is trying to read a file in the wrong format.
+
+Version 1 files may be converted to version 2 format by the utility program
+DTA2HDS. If anybody needs to send version 2 files to a site still running 
+version 1 of Figaro, they should convert them to version 1 format first. The
+utility program HDS2DTA converts version 2 format files to version 1 format.
+Note that sites still on version 1 will NOT have this program available. (In
+emergencies, they could be sent a copy of FIGARO\_PROG\_S:HDS2DTA.EXE, which is
+a self-contained program, but they should not be sent the source and expected
+to be able to re-link it themselves, because its linking is somewhat complex.)
+
+Note that anyone just using the standard Figaro programs should notice no
+difference in the way they run, except for this need to convert data files. 
+People writing their own need to be aware of some other changes.
+
+\item The format of the parameter files (the .PAR files) has changed. Anyone
+who has written their own Figaro programs will have to reprocess their
+connection files using the CREPAR utility.
+
+\item The directory structure used for Figaro development has changed. The
+[FIGARO.PICT] directory has gone, being replaced by [FIGARO.DEV] and its
+assorted sub-directories. The logical name FIGARO\_PROG\_D is being phased out,
+being replaced by FIGARO\_DEV (both should point to [FIGARO.DEV]). The operation
+of the linking procedure FIG.COM has changed very slightly; it now looks at the
+respective dates of source and object files (if any) before deciding whether or
+not to recompile, and its use of the debugger has improved marginally.
+
+\item A new system, Callable Figaro, is now available for use as an alternative 
+to coding sequences of Figaro commands as DCL procedures. Users should be 
+encouraged to try this, and should be pointed towards the command `HELP FIGARO
+CALLABLE'.
+
+\end{itemize}
+
+\subsection{Packages used}
+
+Anyone installing Figaro will probably find it useful to know what 
+external subroutine packages (as opposed to those written specifically
+for it) Figaro uses.
+
+The version of Figaro as supplied uses the NAG mathematical subroutine library.
+An earlier version used the IMSL package, and the source files for the earlier
+versions of the Figaro routines concerned are included---although the IMSL
+package is not. These versions are now rather out of date, and will not be
+included in the next release. NAG and IMSL are both commercial packages that
+have to be obtained separately.
+
+Following the release of version 2.4, Figaro became very heavily dependent on
+the GKS (Graphics Kernel System) package. GKS 7.2, which is what Figaro uses, 
+is an international graphics standard. The version of GKS 7.2 that is intended
+to be used is that produced by Rutherford Appleton Lab in England (the home of
+Starlink). This is not included in the Figaro release tape, and any site that
+does not have it should contact Starlink at RAL directly for it.  Although it
+can be supplied free to academic establishments, it is not supposed to be given
+away freely to just anyone on things like this Figaro  tape. Starlink also
+provide a package called SGS (Simple Graphics System) which provides a simpler
+interface to GKS (which is notoriously difficult to use directly), and a
+package called GNS which is used to simplify the somewhat tortuous way nice
+friendly device names (like IKON1) are  turned into the identifiers needed by
+GKS. These release notes assume that GKS, GNS and SGS are already installed,
+although SGS and GNS are provided  on the release tape in the directories
+[FIGARO.STARLINK.SGS] and [FIGARO.STARLINK.GNS] (second save set), for sites
+that do not have them.
+
+There are other implementations of GKS 7.2, and in principle Figaro  should
+work with them; this has not been tried, so far as is known; the main problem
+is that a system like Figaro that uses separate images tends to have to start
+up GKS afresh for each command, and this normally clears the display screen.
+The RAL version prevents this, but it is using a non-standard extension to do
+so.
+
+Despite the emphasis placed on SGS/GKS in the previous paragraph, very few 
+Figaro applications in fact call SGS/GKS routines directly. The imaging
+routines FINDSP and OVERPF both call GKS directly, and SOFT and HARD  call as
+SGS device name routine. Most Figaro applications do all their line graphics
+through calls to a graphics subroutine package developed at  Caltech, called
+PGPLOT. PGPLOT as used at Caltech was based on the low level  graphics package
+GRPCKG. In 1987, Dave Terrett from Starlink, and Tim Pearson at Caltech (the
+original author of PGPLOT), collaborated to produce  a version of PGPLOT that
+used GKS 7.2 instead of GRPCKG. It is that version of PGPLOT that is now used
+by Figaro, and with which all the  routines have been linked. This GKS version
+of PGPLOT is included on the Figaro release tape, in the directory
+[FIGARO.STARLINK.PGPLOT] (second save  set), for the benefit of non-Starlink
+sites which do not already have it.
+
+A discussion of what is involved in using a non-GKS version of PGPLOT can be
+found in a later section of these notes.
+
+The imaging routines in Figaro use an image display package called  TVPCKG.
+This originated at Caltech, where it only supported a Grinnell GR270.  A new
+version of TVPCKG was produced at AAO, which only supported the  ARGS displays
+available at AAO, and this was distributed first with Figaro 2.3. Figaro 3.0 is
+released with a version of TVPCKG produced at the Australian National
+University, which can handle a number of different  displays, including the
+Grinnell, ARGS and IKON. It also has support for a VaxStation, and for a
+Macintosh II running the MacImager program (available from AAO---but with no
+guarantees---to anyone interested). It can also handle a RAMTEK and an AED
+display, but the routines it uses for this are dummied in the version included
+in this release. The TVPCKG supplied with 3.0 has not yet been tested with a
+Grinnell, so there may be some problems  associated with it on that device. Any
+version of TVPCKG could be linked with the 3.0 applications, except that it
+will have to supply versions of two new routines: TVSIZE and TVCSIZE, which
+return the display size and the character size for the device. The ARGS
+routines use an early  Starlink package (ARGSLIB) for some of their
+communication with the ARGS. This Starlink software is supplied on the Figaro
+release tape in [FIGARO.STARLINK.ARGS] (second save set), for the benefit of
+those sites that do no already have it.
+
+Two Figaro programs, STARIN and STAROUT, use the Starlink interim environment 
+routines. This Starlink software is supplied on the Figaro release  tape in the
+second save set  in [FIGARO.STARLINK.INTERIM].
+
+Many routines use the VMS screen management routines (the SMG\$ package).  If
+these routines are to work properly on a non-DEC terminal, a capabilities file
+for the terminal will be needed. The RTL manual  describes how to prepare such
+a file (section 3.10 of the VMS 4.0 manual), and this is relatively
+straightforward---and worth doing anyway, if you have such terminals. If this
+proves difficult, the SMG usage is controlled by the graphics dialogue routines
+(the GKD routines). It is possible to set them up for any particular terminal
+type so that they do not use SMG. See the GKD package for details.
+
+Access to disk data files by all Figaro programs is through a set of routines 
+called the DTA\_ package. Originally a stand-alone package, for version 2 of
+Figaro this was re-written to use Starlink's HDS (Hierarchical Data System)
+package for the actual disk access. A version of HDS is included on the Figaro
+release tape, for users who do not have this package, in [FIGARO.STARLINK.HDS]
+(second save set). This is a straight copy of the standard Starlink version.
+HDS is the one package used by Figaro where the version used under VMS version
+4 will not work under VMS version 5. For this reason, a second copy of the HDS
+shareable image is included on the release tape. This is a pre-release copy of
+the latest version, and works under VMS 5, but it is a pre-release copy and so
+is something of an interim measure. The source for this version is not
+included. If anyone has trouble with this,  they should contact the AAO for
+help. The old version of the DTA\_ package is still included on the release
+tape and in principle Figaro programs can be linked with either version.
+However, the old version is only supplied for use with the format conversion
+routines and should not normally be used.
+
+Tape I/O is mainly performed using the Caltech tape I/O package MTPCKG. One
+routine, WIFITS, makes use of a subroutine package called FIT---which is
+supplied as part of Figaro---and for version 2.4 this was re-coded to use 
+Starlink's TIO routines; these provide better diagnostics when a tape runs off
+the end of the reel, which has proven a regular occurrence with WIFITS!  Again,
+for non-Starlink sites that do not have this package, it is  supplied with this
+release in [FIGARO.STARLINK.TAPEIO].
+
+\subsection{Starlink software at non-Starlink sites}
+	
+Anyone installing Figaro at a Starlink site need not read this section.  You
+will already have all the files installed and logical names defined.
+
+All the Starlink software needed to run Figaro (with the exception of GKS and
+NAG---see the section on GKS for further details) has been included  in the
+second save set on the release tape (STARBITS.BCK). When the  release was
+prepared, these were put into the directory [FIGARO.STARLINK...].  following
+description assumes that you do not have any of this software already on your
+machine; if you do, you may want to modify the following procedures slightly.
+
+As with the main Figaro system, you can choose to install 1) only those files 
+needed to run Figaro (essentially the shareable images), 2) the files needed to
+run Figaro plus those needed to develop new Figaro programs (the shareable
+images and the linker control files), or 3) all the files provided.
+
+\begin{enumerate}
+
+\item Decide where you want the files to go. If you just want the files  needed
+to run Figaro, or those plus those needed for Figaro development, these few
+files are most easily kept in a single directory, which has been called
+disk:[STARBITS] in this description. If you want all the files, then it is best
+to maintain the original directory structure, and in this description they are
+shown put into a structure disk:[STARBITS...]. If you don't like that, you
+should substitute whatever you prefer. It doesn't really matter where things
+go, so long as the logical names point to them properly. The files will take
+just under  1,000 blocks for the running files, just over 1,200 blocks for the
+running and development files, and just under 5,000 blocks for all the files.
+
+\item Create the base directory to be used and set it as the default directory.
+You will need some privilege to do this, since it involves writing into the
+[000000] directory of the disk.
+
+\begin{verbatim}
+      $ CREATE/DIRECTORY disk:[STARBITS]
+      $ SET DEF disk:[STARBITS]
+\end{verbatim}
+
+\item Select the magnetic tape to be used for the backup. The following 
+description uses the logical name `tape'. You should substitute the  correct
+name. Allocate the drive, physically mount the tape on the drive, then use the
+MOUNT command to mount the tape as a foreign tape:
+
+\begin{verbatim}
+      $ ALLOCATE tape
+      $ MOUNT/FOR tape
+\end{verbatim}
+
+\item Backup the required files from the tape. The details of the backup
+depend on just which files you want.
+
+\begin{enumerate}
+
+\item For the running files only:
+
+\begin{verbatim}
+      $ BACKUP/LOG tape:STARBITS.BCK/SELECT=(-
+              [FIGARO.STARLINK.ARGS]ARGSSHAR.EXE,-
+              [FIGARO.STARLINK.PGPLOT]GRPSHR.EXE,-
+              [FIGARO.STARLINK.INTERIM]INTERIM.EXE) *
+\end{verbatim}
+
+\item For the running files and the development files:
+
+\begin{verbatim}
+      $ BACKUP/LOG tape:STARBITS.BCK/SELECT=(-
+              [FIGARO.STARLINK.ARGS]ARGSSHAR.EXE,-
+              [FIGARO.STARLINK.PGPLOT]GRPSHR.EXE,-
+              [FIGARO.STARLINK.INTERIM]INTERIM.EXE, -
+              [FIGARO.STARLINK.PGPLOT]GRPSHR.OLB,-
+              [FIGARO.STARLINK.INTERIM]INTERIM.OLB,-
+              [FIGARO.STARLINK.SGS]SGSLINK.COM,-
+              [FIGARO.STARLINK.SGS]SGS.OLB,-
+              [FIGARO.STARLINK.TAPEIO]TAPEIO.OLB,-
+              [FIGARO.STARLINK.ARGS]ARGSOPT.OPT) 
+              *
+\end{verbatim}
+
+\item For all the files:
+
+\begin{verbatim}
+      $ BACKUP/LOG tape:STARBITS.BCK/SELECT=[FIGARO.STARLINK...] -
+                                            [STARBITS...]
+\end{verbatim}
+
+\end{enumerate}
+
+\item Now, define the logical names needed. If all users are to be able to use
+this software, these definitions should all have a /SYSTEM added, and should
+also be added to the system startup file. The precise definitions depend on
+which files have been backed up.
+
+\begin{enumerate}
+
+\item For the running files only:
+
+\begin{verbatim}
+      $ DEFINE ARGSSHAR disk:[STARBITS]ARGSSHAR.EXE
+      $ DEFINE GRPSHR   disk:[STARBITS]GRPSHR.EXE
+      $ DEFINE INTERIM  disk:[STARBITS]INTERIM.EXE
+\end{verbatim}      
+
+\item For the running and development files only:
+
+\begin{verbatim}
+      $ DEFINE ARGSSHAR    disk:[STARBITS]ARGSSHAR.EXE
+      $ DEFINE GRPSHR      disk:[STARBITS]GRPSHR.EXE
+      $ DEFINE INTERIM     disk:[STARBITS]INTERIM.EXE
+      $ DEFINE ARGSOPT     disk:[STARBITS]ARGSOPT.OPT
+      $ DEFINE INTERIM_DIR disk:[STARBITS]
+      $ DEFINE LIBDIR      disk:[STARBITS]
+      $ DEFINE SGS_DIR     disk:[STARBITS]
+      $ DEFINE PGPLOT_DIR  disk:[STARBITS]
+\end{verbatim}
+
+\item For the whole system:
+
+\begin{verbatim}
+      $ DEFINE ARGSSHAR    disk:[STARBITS.ARGS]ARGSSHAR.EXE
+      $ DEFINE GRPSHR      disk:[STARBITS.PGPLOT]GRPSHR.EXE
+      $ DEFINE INTERIM     disk:[STARBITS.INTERIM]INTERIM.EXE
+      $ DEFINE ARGSOPT     disk:[STARBITS.ARGS]ARGSOPT.OPT
+      $ DEFINE INTERIM_DIR disk:[STARBITS.INTERIM]
+      $ DEFINE LIBDIR      disk:[STARBITS.TAPEIO]
+      $ DEFINE SGS_DIR     disk:[STARBITS.SGS]
+      $ DEFINE PGPLOT_DIR  disk:[STARBITS.PGPLOT]
+\end{verbatim}
+
+\end{enumerate}
+
+\item Dismount and deallocate the tape:
+
+\begin{verbatim}
+      $ DISM tape
+      $ DEALL tape
+\end{verbatim}
+
+\end{enumerate}
+
+\subsection{HDS}
+
+This note is intended to explain a slight inconsistency between the HDS  used
+by Figaro 3.0 and the Standard Starlink HDS, that has come about because of an
+awkward lack of synchronisation between various releases.
+
+Figaro 3.0 has been linked with a version of HDS that is later than the version
+distributed to Starlink sites at the time this note is being written (April
+91). The main difference is that this later version supports the rather
+obscure HDS routine DAT\_WHERE (which allows a routine to bypass HDS in order
+to get direct access to data array in an HDS file---not something that should
+be done lightly, but which can be useful where efficiency is the only
+consideration). This routine is necessary to support the equally obscure DSA
+routine DSA\_DATA\_LOCATION (to which the same comments apply). None of the
+Figaro applications released with Figaro 3.0 uses either of these routines and
+it is not envisaged that standard Figaro applications will ever use them, but
+DSA\_DATA\_LOCATION is documented in the Figaro Programmer's Guide and is used
+by other (non-Figaro) software that uses DSA (the AAO ADAM Data Recording Task,
+DRT, used at Hawaii and at AAO is the only example I know of), so it was felt
+that it should be supported by the Figaro 3.0 release.
+
+To make it clear which version of HDS is used, AAO has always used the logical 
+name HDS\_SHR to indicate the shareable image built from this later version,
+and so the Figaro 3.0 applications expect this to be defined. The startup 
+command procedure, FIGARO\_PROG\_S:FIGARO.COM defines this to point to the
+image FIGARO\_PROG\_S:HDS\_SHR.EXE released with Figaro 3.0. When this version
+is released by Starlink, this file will no longer be needed, but the  logical
+name can be allowed to remain. Eventually, Starlink will release even later
+version, with bug-fixes that should be used by Figaro. At this point, it may
+become necessary to re-link the Figaro applications, but by then we may well be
+on to Figaro 3.1. Note that HDS\_SHR is `pure' HDS---it  does not include the
+additional CMP\_ routines and the like that are included in the Starlink HDS
+releases.
+
+\subsection{SGS/GKS/GNS}
+
+This section should only be of interest to non-Starlink sites.
+
+Unfortunately, it is not possible to supply Starlink's GKS on the standard 
+Figaro  release  tape. Any  academic  institution  that is involved in
+astronomical research may get a copy  of  Starlink's  GKS, but they have to
+apply to Starlink for this. Usually, Starlink will approve this quite
+straightforwardly, and a copy can then be supplied. The person to contact is
+the Starlink Software Librarian, Mike Lawden, at Starlink, Rutherford Appleton 
+Laboratory,  Chilton,  DIDCOT,  Oxon OX11 0QX, UK. Telephone:   0235-21900 
+X5114;  electronic  mail: UK.AC.RL.STAR::MDL on the JANET network.
+
+When you get GKS, you should get SGS along with it.  SGS is not a proprietary
+package like GKS, but it sits on top of GKS and provides a simpler interface to
+it.  Also you should get GNS,  which  is  another non-proprietary  package
+which provides a simple way of using friendly device names for the devices
+supported by GKS.  Without GNS,  GKS  and SGS  need  a complex set of logical
+names defining in order to get the same effect.  With GNS, a relatively simple
+text file serves the  same purpose.
+
+A standard set of GKS/GNS/SGS logical names need to be defined. These are
+usually defined in terms of the main directories containing the GKS and GNS
+files, which should be be given the logical names GKS\_DIR and GNS\_DIR. The
+full list, as taken from the AAO startup file, is:
+
+\begin{verbatim}
+      $ DEFINE/SYSTEM GKSSHARE   GKS_DIR:GKSSHARE.EXE
+      $ DEFINE/SYSTEM FPLSHARE   GKS_DIR:FPLSHARE.EXE
+      $ DEFINE/SYSTEM GKS_EMF    GKS_DIR:GKSEMF.DAM
+      $ DEFINE/SYSTEM GKS_WDT    GKS_DIR:GKSWDT.DAM
+      $ DEFINE/SYSTEM GKS_FONTS  GKS_DIR:GKSDBS.DAM
+      $ DEFINE/SYSTEM GKS_PAR    GKS_DIR:GKS.PAR
+      $ DEFINE/SYSTEM GKS_EPAR   GKS_DIR:GKSE.PAR
+      $ DEFINE/SYSTEM GNS_GKSNAMES GNS_DIR:GKSNAMES.DAT
+      $ DEFINE/SYSTEM GNS_GKSDEVICES GNS_DIR:GNSDEVICES.DAT
+\end{verbatim}
+
+Normally, any site that has installed GKS properly will not need to worry 
+about these definitions. If you want to check, the files that Figaro needs to
+find in GKS\_DIR are FPLSHARE.EXE, GKSLIBG.OLB and GKSSHARE.EXE, and in
+GNS\_DIR are GKSNAMES.DAT and GNSDEVICES.DAT. The two files GKSNAMES.DAT and
+GNSDEVICES.DAT are supplied by Starlink and include details of all the devices
+supported by the standard Starlink GKS, so can be left unchanged.  However, 
+most sites do edit the GKSNAMES.DAT file to exclude devices that they do not
+have---otherwise they will show up in response to commands such as  `SOFT
+OPTIONS' (which prints out all the available devices) and this  can be
+confusing. The GNS documentation (Starlink's User Note SUN 57) describes the
+format of this file in detail.
+
+\subsection{Using a non-GKS version of PGPLOT}
+
+If necessary, it should be possible to use a non-GKS version of PGPLOT. This is
+discouraged, because it is a deviation from the usual way of doing things, but
+it may be necessary at some sites.  For example, some sites may well have
+devices that their local version of PGPLOT supports and which GKS does not. It
+is probably worth trying to find out if there is a GKS driver for the device
+since new ones are being developed all the time (Starlink will be able to help
+there).
+
+In principle, since PGPLOT is always used through the shareable image GRPSHR 
+(the name comes from GRPCKG, the lower level of the original PGPLOT system), it
+should be possible just to change the definition of the logical name GRPSHR so
+that it points to the non-GKS shareable image, and everything should work
+perfectly.
+
+In practice, there are two problems. It is important that the transfer vectors
+for the two shareable images have the PGPLOT routines in the same  order, and
+that the shareable images are generally compatible.  This  is generally
+controlled by a version ID for the shareable image, which must match that used
+when the program was linked. It seems that the  Starlink shareable image has a
+later version ID than the original PGPLOT version, and for this reason sites
+wanting to use the original PGPLOT will probably have to relink the various
+routines that use line graphics.
+
+The other problem concerns SOFT and HARD. To make things easy for the user,
+these have always intervened slightly and have processed the device
+specification supplied to make sure it conforms to the PGPLOT  requirements. 
+Now, the two versions of PGPLOT use quite different device specifications. For
+example, to specify an ARGS, the old version used the specification `/AR' (and
+the ARGS in question was determined by the ARGS command), while the new version
+uses ARGS1 or ARGS2 (or whatever the SGS logical names are). This means that
+the old version would react to the command ``SOFT AR'' by adding the `/' that 
+it  was sure it needed, which the new one reacts to ``SOFT AR'' by checking
+that AR is a properly defined SGS logical name and  rejecting it because it is
+not.
+
+Since all SOFT and HARD actually do, in the end, is set the Figaro user 
+variables SOFT and HARD respectively, the following options are possible:
+
+\begin{enumerate}
+
+\item Ignore SOFT and HARD entirely, and set the graphics devices using LET. 
+For example:
+
+\begin{verbatim}
+      $ LET SOFT="/AR"
+\end{verbatim}
+
+\item Resurrect the SOFT and HARD versions used by Figaro 2.3. The old .EXE 
+images can be put into the local directory and the local FIGARO.COM used to
+force their use in preference to the new  versions. Most sites using the old
+PGPLOT version will probably already have Figaro 2.3; if not, the code  for 
+SOFT and HARD could be hacked to get the old effect, or the old source could be
+obtained from AAO.
+
+
+\item Use the new SOFT and HARD versions, but use the FORCE and NODRAW  
+keywords to make them accept the old format specifications. For example:
+
+\begin{verbatim}
+      $ SOFT /AR FORCE NODRAW
+\end{verbatim}
+
+\item To get the same effect without the explicit use of the keywords,  a minor
+change to the code is needed to change the defaults for DRAW and FORCE to true
+and false respectively. Such modified versions of SOFT and HARD could be put in
+the local Figaro directory and used instead of the  standard versions.
+
+\end{enumerate}
+
+\subsection{NAG}
+
+Any site that wants to relink Figaro routines, or to write routines  that need
+a numerical subroutine library, should have a copy of the NAG (Numerical
+Algorithms Group) subroutine library.  It's a relatively cheap  package, and
+certainly worth having anyway. NAG is based at NAG Ltd, Mayfield House, 256
+Banbury Road, Oxford OX2 7DE, UK, (Tel 0865-511245, Telex 83354 NAG UK G), but
+have agents in most countries. All that Figaro requires is that the logical
+name NAG\_LIB should point at the NAG.OLB object library. This should be the
+double precision Fortran version of the library. If you don't have NAG, then
+defining NAG\_LIB so that it points at a dummy library will stop the link
+procedure (FIGARO\_DEV:FIG.COM) falling over, but that won't  help if you
+actually want to use the routines.
+
+\subsection{Installing the running version}
+
+The following procedure will install just those files needed to run Figaro ---
+the executable images and those files that they use. All of these are in the
+directory backed up as [FIGARO.FIGARO] on the tape.  This directory  also
+contains the documentation files. The procedure described here creates a top
+level directory called [FIGARO] on a disk that you specify, and puts all the
+Figaro files in that directory. If you do not want that main directory to be at
+top level you will have to modify the procedure accordingly.
+
+\begin{enumerate}
+
+\item What follows assumes that you have a copy of Starlink's SGS and GKS  7.2
+systems. If you do not, these will have to be obtained and installed first. 
+For more details, see the section on SGS/GKS in these notes. It also assumes
+that you have the various other Starlink shareable images needed  by the
+running system.  If you do not, these can be extracted from the second save set
+on the tape.  See the section on `Starlink software at non-Starlink sites' in
+these notes.
+
+\item Decide which disk is to be used for the directory.  The following 
+description uses the logical name `disk'. You should substitute the correct
+name. The files will take just over 29,000 blocks.
+
+\item Create a directory called [FIGARO] on that disk, and set it as the
+default directory. You will need some privilege to do this, since it involves
+writing into the [000000] directory of the disk.
+
+\begin{verbatim}
+      $ CREATE/DIRECTORY disk:[FIGARO]
+      $ SET DEF disk:[FIGARO]
+\end{verbatim}
+
+\item Select the magnetic tape to be used for the backup. The following 
+description uses the logical name `tape'. You should substitute the  correct
+name. Allocate the drive, physically mount the tape on the drive, then use the
+MOUNT command to mount the tape as a foreign tape.
+
+\begin{verbatim}
+      $ ALLOCATE tape
+      $ MOUNT/FOR tape
+\end{verbatim}
+
+\item Backup the files from the [FIGARO.FIGARO] directory on the tape into
+the FIGARO directory on the disk.
+
+\begin{verbatim}
+      $ BACKUP/LOG/SELECT=[FIGARO.FIGARO]*.* tape:FIGARO3.0 *
+\end{verbatim}
+             
+(The last file is ZOOM.EXE---you can hit \verb+^Y+ once that has been copied.)
+
+\item To run Figaro, a number of logical names need defining. Some sites, 
+particularly Starlink sites, will have these defined already. And the command
+FIGARO need defining. You should read the section on `Logical names' in these
+notes and make sure that all those listed as required by the running  system
+are defined suitably. If you are a Starlink site, then you should already have
+the necessary logical names defined---they have not changed from previous
+releases. If you are not a Starlink site, then if you have already installed
+GKS and those Starlink files required as described in the earlier section, then
+all you should need to define is the following logical name:
+
+\begin{verbatim}
+      $ DEFINE FIGARO_PROG_S disk:[FIGARO]
+\end{verbatim}
+and the following symbol:
+\begin{verbatim}
+      $ FIGARO:==@FIGARO_PROG_S:FIGARO
+\end{verbatim}
+             
+If all users are to be able to run Figaro, the logical name definition  should
+be made /SYSTEM and included in the system startup file (SYSTARTUP.COM).  The
+symbol should be defined in the common login file (SYSLOGIN.COM).
+
+Note that if you have only installed the running system, then your main  Figaro
+directory, the one given the logical name FIGARO\_PROG\_S, is disk:[FIGARO] and
+not disk:[FIGARO.FIGARO] as it is for the more comprehensive installations.
+
+\item Dismount and deallocate the tape:
+
+\begin{verbatim}
+      $ DISM tape
+      $ DEALL tape
+\end{verbatim}
+
+\item You may want to edit the file FIGARO.COM in the directory FIGARO\_PROG\_S
+to suit your particular installation, but in principle it should be possible to
+make most local modifications through  a local version,
+FIGARO\_PROG\_L:FIGARO.COM, as described later in the section on `Local Figaro
+directories'.
+
+\item Giving the command FIGARO should now start up Figaro.
+
+\end{enumerate}
+
+\subsection{Producing a minimum system}
+
+Sites that are very short of disk space, and begrudge Figaro all of its  29,000
+blocks, may want to try to reduce the disk usage by deleting some files they
+will not need. The following are candidates:
+
+\begin{enumerate}
+
+\item The printable versions of the documentation can be printed off and then
+deleted. Any of the .MEM and .DOC files can be dispensed with, but the largest
+and probably least needed files are COMMANDS.DOC (about 2,200 blocks) and
+FIGARO.DOC (about 700 blocks). These are just printable versions of the on-line
+help libraries COMMANDS.HLB and FIGARO.HLB.
+
+\item The files for any commands that are not required can be deleted.  If it
+is really certain that nobody will need to use files in, for example, the
+peculiar format handled by RJKM, then all the RJKM.* files may  be deleted
+without affecting the system.  Note, however, that  comparatively little space
+is saved by this sort of surgery.
+
+\item If nobody is going to use the Callable Figaro  system,  then over  9,000 
+blocks  may  be  saved by deleting the shareable image BIGFIG.EXE.  However, it
+is hoped that  users  will  be encouraged to use the Callable Figaro system,
+and it would be a pity to delete it just for a few thousand blocks.  A better
+ploy would be to use the ever-increasing size of systems like Figaro as an 
+argument  with  the  powers  that  be  for  the purchase of more disk space.
+
+\end{enumerate}
+
+\subsection{Installing a development system} 
+
+The following procedure will install a development Figaro system, including 
+the  object  libraries and development procedure files, but excluding the
+source files.  The directory structure  on  tape  has  a main  directory 
+called [FIGARO] and a number of sub-directories.  The procedure described here
+creates a top level directory called [FIGARO] on  a disk that you specify, and
+creates a sub-directory called [.DEV] that contains the necessary development
+procedures, one called [.LIBS] that contains the object libraries, one called
+[.FIGARO] that contains the main system files and one called [.INCLUDES]  that 
+contains  some files  that  may  need to be INCLUDEd by Figaro applications
+code.  If you do not want the main directory to be at top level you will have
+to modify the procedure accordingly.
+
+\begin{enumerate}
+
+\item What follows assumes that you have a copy of  Starlink's  SGS and  GKS 
+7.2  systems.  If you do not, these will have to be obtained and installed
+first. For  more  details,  see  the section  on SGS/GKS in these notes.  It
+also assumes that you have the various other Starlink shareable  images  needed 
+by the  running  system. If you do not, these can be extracted from the second
+save set on the tape. See  the  section  on `Starlink  Software  at 
+non-Starlink  sites' in these notes. You will also need the NAG library and 
+should  already  have the  logical  name NAG\_LIB defined.  See the section on
+`NAG' for more details.
+
+\item Decide which disk is to  be  used  for  the  directory. The following 
+description  uses  the  logical  name `disk'.  You should substitute the
+correct name.  The files will take just over 38,000 blocks.
+
+\item During the backup, a top level directory called [FIGARO] will be  created
+on disk:.  You should make sure that you have the privilege to do this.
+
+\item Select the magnetic tape to be  used  for  the  backup. The following 
+description  uses  the  logical  name `tape'.  You should substitute the 
+correct  name. Allocate  the  drive, physically  mount  the  tape on the
+drive, then use the MOUNT command to mount the tape as a foreign tape.
+
+\begin{verbatim}
+      $ ALLOCATE tape
+      $ MOUNT/FOR tape
+\end{verbatim}
+
+\item Backup all the required directories from the  tape  into  the FIGARO
+directory on the disk.
+
+\begin{verbatim}
+      $ BACKUP/LOG tape:FIGARO3.0/SELECT=([FIGARO.FIGARO]*.*,-
+              [FIGARO.DEV]*.*,[FIGARO.INCLUDES]*.*,[FIGARO.LIBS]*.*, -
+              [FIGARO.OLD.PGPLOT]GRPCKG.OLB)  disk:[*...]
+\end{verbatim}
+             
+(The last file is GRPCKG.OLB---you can hit \verb+^Y+ once it has been copied.)
+
+\item To run Figaro, a number of logical names need defining.  Some sites, 
+particularly  Starlink sites, will have these defined already.  The command
+FIGARO also needs defining.  You should read  the  section on `Logical names'
+in these notes and make sure that all those listed as required by the running 
+system and  for Figaro development are defined suitably.  If you are a Starlink
+site, then you should already have  the  necessary logical  names  defined ---
+they have not changed from previous releases.  If you are not a Starlink site,
+then if  you  have already  installed  GKS, and those Starlink files required
+as described in the earlier section, then all you should need to define is the
+following logical name:
+
+\begin{verbatim}
+      $ DEFINE FIGARO_PROG_S disk:[FIGARO.FIGARO]
+\end{verbatim}
+
+and the following symbol:
+
+\begin{verbatim}
+      $ FIGARO:==@FIGARO_PROG_S:FIGARO
+\end{verbatim}
+     
+If all users are to be able to run Figaro, the  logical  name definition 
+should be made /SYSTEM and included in the system startup file (SYSTARTUP.COM). 
+The symbol should  be  defined in the common login file (SYSLOGIN.COM).
+
+\item The  following  logical  names are used during Figaro development, and
+also need to be defined.  Again, unless only a  select  number  of  users  are 
+going  to  develop  Figaro software,  these  definitions  should  also  be 
+/SYSTEM  and included in the startup file.  In addition, the symbol CREPAR
+needs to be defined.
+
+\begin{verbatim}
+      $ DEFINE DTASRC      disk:[FIGARO.INCLUDES]
+      $ DEFINE DYN_SOURCE  disk:[FIGARO.INCLUDES]
+      $ DEFINE FIGARO_DEV  disk:[FIGARO.DEV]
+      $ DEFINE FIGARO_LIBS disk:[FIGARO.LIBS]
+      $ DEFINE FIGARO_WORK SYS$SCRATCH  ! or any scratch directory
+      $ DEFINE PGPLOTDIR   disk:[FIGARO.OLD.PGPLOT]
+    
+      $ CREPAR:==$FIGARO_DEV:CREPAR
+\end{verbatim}
+
+\item Dismount and deallocate the tape:
+
+\begin{verbatim}
+      $ DISM tape
+      $ DEALL tape
+\end{verbatim}
+
+\item You may want to edit the file  FIGARO.COM  in  the  directory
+FIGARO\_PROG\_S  to  suit  your particular installation, but in principle  it 
+should  be  possible  to make most local modifications   through  
+a   local  version, FIGARO\_PROG\_L:FIGARO.COM, as described later in 
+the  section on `Local Figaro directories'.
+
+\item Giving the command FIGARO should now start up Figaro.
+
+\end{enumerate}
+
+\subsection{Installing the entire system}
+
+The following procedure will install the entire Figaro system, including the
+source files. The directory structure on tape has a main directory called
+[FIGARO] and a number of  sub-directories. The procedure described here creates
+a top level directory called [FIGARO] on a disk that you specify, and puts all
+the Figaro files in that directory and its sub-directories. If you do not want
+that main directory to be at top level you will have to modify the procedure
+accordingly.
+
+\begin{enumerate}
+
+\item What follows assumes that you have a copy of  Starlink's  SGS and  GKS 
+7.2  systems.  If you do not, these will have to be obtained and installed
+first. For  more  details,  see  the section  on SGS/GKS in these notes.  It
+also assumes that you have the various other Starlink shareable  images  needed 
+by the  running  system. If you do not, these can be extracted from the second
+save set on the tape. See  the  section  on `Starlink Software at non-Starlink
+sites' in these notes.
+
+\item Decide which disk is to  be  used  for  the  directory. The following 
+description  uses  the  logical  name `disk'.  You should substitute the
+correct name.  The files will take just under 74,000 blocks.
+
+\item During the backup, a top level directory called [FIGARO] will be  created
+on disk:.  You should make sure that you have the privilege to do this.
+
+\item Select the magnetic tape to be  used  for  the  backup. The following 
+description  uses  the  logical  name `tape'.  You should substitute the 
+correct  name. Allocate  the  drive, physically  mount  the  tape on the drive,
+then use the MOUNT command to mount the tape as a foreign tape.
+
+\begin{verbatim}
+      $ ALLOCATE tape
+      $ MOUNT/FOR tape
+\end{verbatim}
+
+\item Backup all the files from the tape into the FIGARO  directory on the
+disk.
+
+\begin{verbatim}
+      $ BACKUP/LOG tape:FIGARO3.0 disk:[*...]
+
+      $ DISM tape
+      $ DEALL tape
+\end{verbatim}
+
+\item To run Figaro, a number of logical names need defining.  Some sites, 
+particularly  Starlink sites, will have these defined already.  The command
+FIGARO also needs defining.  You should read  the  section on `Logical names'
+in these notes and make sure that all those listed as required by the running 
+system and  for Figaro development are defined suitably.  If you are a Starlink
+site, then you should already have  the  necessary logical  names  defined ---
+they have not changed from previous releases.  If you are not a Starlink site,
+then if  you  have already  installed  GKS, and those Starlink files required
+as described in the earlier section, then all you should need to define is the
+following logical name:
+
+\begin{verbatim}
+      $ DEFINE FIGARO_PROG_S disk:[FIGARO.FIGARO]
+\end{verbatim}
+
+and the following symbol:
+
+\begin{verbatim}
+      $ FIGARO:==@FIGARO_PROG_S:FIGARO
+\end{verbatim}
+       
+If all users are to be able to run Figaro, the  logical  name definition 
+should be made /SYSTEM and included in the system startup file (SYSTARTUP.COM). 
+The symbol should  be  defined in the common login file (SYSLOGIN.COM).
+
+\item The  following  logical  names are used during Figaro
+development, and also need to be defined.  Again, unless only a  select  number 
+of  users  are  going  to  develop  Figaro software,  these  definitions 
+should  also  be  /SYSTEM  and included in the startup file.  In addition, the
+symbol CREPAR needs to be defined.
+
+\begin{verbatim}
+      $ DEFINE DTASRC        disk:[FIGARO.DTA]
+      $ DEFINE DYN_SOURCE    disk:[FIGARO.DYN]
+      $ DEFINE FIGARO_DEV    disk:[FIGARO.DEV]
+      $ DEFINE FIGARO_LIBS   disk:[FIGARO.LIBS]
+      $ DEFINE FIGARO_WORK   SYS$SCRATCH  ! or any scratch directory
+      $ DEFINE FIGARO_SOURCE disk:[DEV.SOURCE]
+      $ DEFINE FIGARO_CALL   disk:[DEV.CALL]
+      $ DEFINE PGPLOTDIR     disk:[FIGARO.OLD.PGPLOT]
+  
+      $ CREPAR:==$FIGARO_DEV:CREPAR
+\end{verbatim}
+
+\item Giving the command FIGARO should now start up Figaro.
+
+\item You may want to edit the file  FIGARO.COM  in  the  directory
+FIGARO\_PROG\_S  to  suit  your particular installation, but in principle  it 
+should  be  possible  to make most local modifications through a local
+version, FIGARO\_PROG\_L:FIGARO.COM, as described later in  the  section on
+`Local Figaro directories'.
+
+\end{enumerate}
+\subsection{Logical names and symbols used by the Figaro running system}
+
+The following list contains all the logical names needed  to  run Figaro
+programs.  These were collected for Figaro 2.4 as the result of an experiment
+in which the system logical name table was disabled,  no process  logical names
+were defined originally, and logical names were then defined one by one until
+all Figaro programs ran.  This seemed  a more  comprehensive  way  of  going 
+about  things than just trying to produce a list of logical names believed to
+be  used  by  the  system. So,  to  run  Figaro,  all  these  logical  names 
+should  be defined. Ideally, they should be defined in the system tables,
+unless Figaro is used  only  by one or two people at a particular site. 
+Unfortunately, it was not possible to find an unused VAX that could be used to
+repeat the  experiment  for  Figaro  3.0, so the list here has been edited to
+reflect the changes to the system but has not been tested as thorough- ly as
+was the list produced for Figaro 2.4.
+
+\begin{description}
+
+\item [FIGARO\_PROG\_S] Directory. The main Figaro directory. Normally, this 
+will be disk:\-[FIGARO.\-FIGARO]. If only the running system has been 
+installed, this should be disk:\-[FIG\-ARO].
+
+\item [ARGSSHAR] Shareable image. The shareable image used by the Starlink 
+ARGS package. See the section on Starlink files.
+
+\item [GKS\_DIR] Directory. The directory holding the GKS files. Not 
+strictly referenced by Figaro, but usually defined as part of the GKS
+installation and a convenient base to define some of the other GKS names
+on.
+
+\item [GKSSHARE] Shareable image. The GKS shareable image. Normally this is
+GKS\_\-DIR:\-GKS\-SHARE.EXE.
+
+\item [GNS\_GKSNAMES] Text file. This is the list of GKS devices 
+available on the system and the names to be used to refer to them.
+
+\item [GNS\_GKSDEVICES] Binary file. This is compiled from other files 
+supplied with GNS (see the GNS documentation), to provide details of 
+the devices supported by GKS.
+
+\item [FPLSHARE] Shareable image. This is another image used by 
+GKS. Normally, this is GKS\_\-DIR:\-FPLSHARE.EXE.
+
+\item [HDS\_SHR] Shareable image. This is the shareable image used 
+by HDS, and should be FIG\-ARO\_\-PROG\_S:HDS\_SHR.EXE. (But see the
+section on HDS in these notes.)
+
+\item [GRPSHR] Shareable image. This is the shareable image for the GKS 
+version of PGPLOT, and should be GRPSHR.EXE in the standard GKS PGPLOT 
+directory. This is normally given the logical name PGPLOT\_DIR, so GRPSHR 
+is usually defined as PGPLOT\_DIR:\-GRPSHR.EXE.
+
+\item [INTERIM] Shareable image. This is the shareable image used by the
+Starlink interim environment, and should be INTERIM.EXE in whatever 
+directory is appropriate.
+
+\item [TVPSHR] Shareable image. This is the shareable image used by TVPCKG, and
+is supplied with Figaro. It should be defined as FIGARO\_PROG\_S:TVPCKG.EXE.
+
+\item [FGRSHR] Shareable image. This is the shareable image containing the main
+Figaro libraries, and should be defined as FIGARO\_PROG\_S:FGRSHR.EXE.
+
+\item [BIGFIG] Shareable image. This is the shareable image used by Callable 
+Figaro. It should be defined as FIGARO\_PROG\_S:BIGFIG.EXE.
+
+\end{description}
+
+Note that of these, any Starlink site should have all bar FIGARO\_PROG\_S,
+TVPCKG, FGRSHR, and BIGFIG defined quite independently of Figaro, and other
+sites should have defined the others in  the process of installing GKS and the
+other Starlink software. In addition, FGRSHR, BIGFIG and TVPSHR are defined by
+the Figaro start-up procedure, FIGARO.COM, so may not need to be defined
+independently for most purposes. However, if anyone is going to use Callable
+Figaro programs without first running FIGARO.COM, they will need all these
+defined if their Callable Figaro programs are to run.
+
+In addition, the assorted SGS/GKS logical names listed in the `SGS/GKS' section
+need to be defined, but this should have happened as part of the SGS/GKS
+installation.
+
+Just for completeness, the logical names SYS\$SYSTEM, SYS\$SHARE, SYS\$LIBRARY 
+and SYS\$SCRATCH were also turned up as being used by Figaro in the experiment
+of running with no system logical names defined. However, any  VAX which does
+not have these defined is a very oddly setup VAX indeed. The only name that
+needs comment is SYS\$SCRATCH. Figaro uses this as the directory in which it
+writes the VARS.DST and BVARS.DST files. Normally, VMS systems define this as
+the user's login directory; this may not be appropriate, and system managers
+may prefer to redefine it to indicate some  less permanent location.
+
+The symbol FIGARO should be defined as
+
+\begin{verbatim} 
+      $ FIGARO :== @FIGARO_PROG_S:FIGARO
+\end{verbatim}
+
+So, in summary, Starlink sites and sites that have already installed the 
+additional Starlink packages, should find that the only logical names and
+symbols needed specifically to run Figaro are the logical name FIGARO\_PROG\_S
+and the symbol FIGARO.
+
+System managers should also read the section on the use of National and Local
+Figaro directories, since most sites will want to define the logical  name
+FIGARO\_PROG\_L to point to a directory containing local Figaro modifications. 
+
+\subsection{Logical names used in Figaro development} 
+
+If users are going to be developing their own programs that interact with
+Figaro at all, then some of the logical names used by the system will have to
+be defined. At the very least, if users are writing the minimal one-off
+programs that just use the DTA\_ package to access Figaro data files, they will
+need to be able to find the DTA.OPT file in the directory [FIGARO.LIBS], and
+since in any case this file refers to that directory as FIGARO\_LIBS, this
+logical name should be defined.
+
+If users are going to use the main linking procedure FIG.COM in the development
+directory, then all the logical names that it uses will have to be defined. A
+full list, excluding those logical names listed as required by the running
+system, almost all of which are also needed for development, is as follows:
+
+\begin{description} 
+
+\item [FIGARO\_DEV] Directory. Contains the files used for Figaro
+development. Should be disk:\-[FIGARO.DEV].
+
+\item [FIGARO\_LIBS] Directory. Contains the various Figaro object libraries. 
+Should be disk:\-[FIGARO.LIBS].
+
+\item [DYN\_SOURCE] Directory. Contains the include file DYNAMIC\_MEMORY.INC
+used by a number of applications. Should be disk:[FIGARO.INCLUDES] if 
+only the development files have been installed. If the full system is
+installed, should be disk:[FIGARO.DYN].
+
+\item [DTASRC] Directory. Contains the include files for the DTA\_ 
+package, used by a number of older applications. Should be 
+disk:[FIGARO.INCLUDES] if only the development files have been installed. If
+the full system is installed, should be disk:[FIGARO.DTA].
+
+\item [SGS\_DIR] Directory. Contains the SGS files, in particular 
+SGSLINK.COM. Should be the standard directory used for SGS.
+
+\item [NAG\_LIB] Object library. This should point to the .OLB file that
+contains a double precision version of the NAG routines.
+
+\item [INTERIM\_DIR] Directory. This should be the directory that contains the
+files used by the Starlink Interim library.
+
+\item [PGPLOT\_DIR] Directory. This should be the directory that contains the
+files used by the GKS version of PGPLOT.
+
+\item [PGPLOTDIR] Directory. This should be the directory that contains the
+files used by the old version of PGPLOT, that is [FIGARO.OLD.PGPLOT].
+
+\item [LIBDIR] Directory. This should be the directory that contains the
+standard Starlink object libraries, in particular TAPEIO.OLB.
+
+\item [GKS\_DIR] Directory. Contains the GKS files.
+
+\item [ARGSOPT] Linker .OPT file. This should point to the file, ARGSOPT.OPT,
+that controls linking with the Starlink ARGS shareable image.
+
+\item [FIGARO\_WORK] Directory. Used by the Callable Figaro linking procedure.
+This should be any scratch directory that the user can write into.
+
+\item [FIGARO\_SOURCE] Directory. The directory containing the source of the
+various Figaro applications. This is not in fact used other than by some  of
+the automatic documentation utilities, but it is often convenient to have it
+defined. It should be defined as disk:[FIGARO.DEV.SOURCE].
+
+\item [FIGARO\_CALL] Directory. The directory used for developing the Callable
+Figaro system. This should not normally be needed by any user, but it is
+sometimes convenient to have it defined. A later version of Figaro is intended
+to have provision for user-written extensions to Callable Figaro, and this will
+be needed then. 
+
+\end{description} 
+
+Most of these will have been defined independently of Figaro by Starlink sites 
+or sites that have installed the various Starlink packages being used. The
+names that are specific to Figaro are DTASRC, PGPLOTDIR, FIGARO\_CALL,
+FIGARO\_DEV, FIGARO\_LIBS, FIGARO\_\-SOURCE, FIGARO\_WORK and  DYN\_SOURCE,
+which can be defined using:
+
+\begin{verbatim}
+      $ DEFINE DTASRC        disk:[FIGARO.INCLUDES] 
+                                     or disk:[FIGARO.DEV]
+      $ DEFINE FIGARO_CALL   disk:[FIGARO.DEV.CALL]
+      $ DEFINE FIGARO_DEV    disk:[FIGARO.DEV]
+      $ DEFINE FIGARO_LIBS   disk:[FIGARO.LIBS]
+      $ DEFINE FIGARO_SOURCE disk:[FIGARO.DEV.SOURCE]
+      $ DEFINE FIGARO_WORK   SYS$SCRATCH or anywhere more suitable.
+      $ DEFINE DYN_SOURCE    disk:[FIGARO.INCLUDES] 
+                                     or disk:[FIGARO.DYN]
+      $ DEFINE PGPLOTDIR     disk:[FIGARO.OLD.PGPLOT]
+\end{verbatim}
+
+In addition, the command CREPAR needs to be defined in order to process .CON
+files. This should be:
+
+\begin{verbatim}
+      $ CREPAR :== $FIGARO_DEV:CREPAR
+\end{verbatim}
+    
+and the command FIGLINK may need defining for use with Callable Figaro. This is
+defined by FIGARO.COM, but should perhaps be defined separately so that users
+do not have to run FIGARO.COM in order to use Callable Figaro.
+
+\begin{verbatim}
+      $ FIGLINK:==@FIGARO_PROG_S:FIGLINK
+\end{verbatim}
+
+\subsection{Figaro directories}
+
+The Figaro sub-directories are used in the following ways:
+
+\begin{description}
+
+\item [CNV] The source of the CNV library. These routines perform fast
+conversion between arrays of different types, and can optionally allow for and
+propagate specified `bad values' used to flag data elements.
+
+\item [DEV] This is the main Figaro development directory. It is usually given
+the logical name FIGARO\_DEV. This directory contains a number of command
+procedures and utility programs connected with the maintenance of Figaro,
+described more fully in the next section. It also contains the following
+sub-directories:
+
+\begin{description}
+
+\item [.CALL] Contains those files that are particular to the Callable Figaro 
+system, including the command procedure FIGBUILD.COM which is used to re-link 
+the shareable image used by Callable Figaro.
+
+\item [.DOCS] Contains the files from which the Figaro documentation is
+created.
+
+\item [.SOURCE] Contains the source files for the Figaro programs, and their
+connection files.
+
+\end{description}
+
+\item [DSA] Contains the source of the DSA\_ Data Structure Access routines.
+
+\item [DSK] Contains the source of the DSK\_ routines. These are versions of
+PGPLOT routines that are used by the Figaro program SPLOT to produce `build'
+files.
+
+\item [DTA] Contains the source for the DTA\_ routines. These are the 
+routines used to access the data structures held in Figaro files. Also 
+contains DTA.RNO, which is the main documentation for these routines. This
+directory contains the version of these routines that uses HDS.
+
+\item [DUT] Contains the source of the DUT\_ routines. These are the 
+routines used by IMAGE to perform the scaling and reshaping of the images.
+
+\item [DYN] Contains the source of the DYN\_ routines. Also includes the 
+file `DYNAMIC\_MEMORY\-.INC' which is included by many of the applications
+that have been rewritten to use DSA. This directory should have the
+logical name DYN\_SOURCE, so that this include file can be picked up.
+
+%***** Marker *****
+
+\item [FIG] Contains the source of the various FIG\_ routines. FIG\_ is
+a general prefix used by routines that are called directly by Figaro
+applications but are specific to Figaro.
+
+\item [FIGARO] Contains the files actually needed to run Figaro. These 
+are the .EXE images, the .PAR parameter files, the .INF on-line help 
+files, the .TAB tabulated data files, and a few other odds and ends. This
+directory should be given the logical name FIGARO\_PROG\_S.
+
+\item [FIT] Contains the source for the FIT\_ routines. This is a package of
+routines designed to facilitate the writing of FITS tapes.
+
+\item [GEN] Contains the source for the GEN\_ routines. These are 
+routines of `general' utility, although some of them may look a trifle
+specialised.
+
+\item [GKD] Contains the source for the GKD routines. These are routines used
+to control dialogues with the user in an interactive graphics environment.
+
+\item [HDS] This contains the version of HDS used to link Figaro 3.0, since
+this is a later version than that released as the standard Starlink version.
+
+\item [ICH] Contains a set of string handling routines---the ICH\_ routines. 
+(There are also some routines called PCH\_, but these are not used by Figaro.)
+
+\item [INCLUDES] Contains include files that may be needed by Figaro 
+applications. These are normally to be found in the directories devoted to 
+the various packages, but are also available in this directory for use if
+just the development system has been installed. This directory can be
+deleted if the full system is installed, but very little space is saved by
+doing so.
+
+\item [JT] Contains the source of the assortment of routines written at 
+Caltech by John Tonry that are used by various Figaro applications.
+
+\item [LIBS] Contains most of the object libraries used by Figaro. It 
+should be given the logical name FIGARO\_LIBS.
+
+\item [MEM] Contains the source of the MEM\_ routines used by the DUT\_ 
+routines to obtain dynamically allocated memory.
+
+\item [NAG\_FIX] Contains the source of routines that emulate discontinued NAG 
+routines still required by some Figaro applications.
+
+\item [OLD] Contains packages that are part of old versions of Figaro, but are
+still required for some purposes.
+
+\begin {description}
+
+\item [.DTA1] Contains the source for the old version of the DTA\_ routines,
+which did not use HDS. These are the source  for  the  object 
+library FIGARO\_LIBS:DTA1.OLB, and are only now used by the format conversion
+routines DTA2HDS and HDS2DTA.
+
+\item [.PGPLOT] Contains the source for the old PGPLOT graphics package. 
+This is a very old version, but contains some routines that are used (for 
+the moment) by VAPLOT, and so is still needed for that program.
+
+\end{description}
+    
+\item [PAR] Contains the source for the PAR routines. These are the routines
+used by Figaro to communicate with the user, and to handle parameter
+evaluation. Note that these have been extensively revised for version 2 of
+Figaro.
+
+\item [STARLINK] Contains packages that are normally available at 
+Starlink sites, but may not be installed at other sites. This directory 
+and its various sub-directories are to be found in the second save set
+on the Figaro release tape, and so should not appear at Starlink sites. 
+Packages that have some proprietary aspects, such as GKS or NAG are not
+included.
+
+\begin{description}
+
+\item [.ARGS] Contains the various files needed by the Starlink ARGS 
+package, such as ARGS\-OPT\-.OPT and ARGSSHAR.EXE.
+
+\item [.GNS] Contains the various files needed by Starlink's GNS
+routines.
+
+\item [.INTERIM] Contains the files used by the Starlink interim library, 
+such as the shareable image INTERIM.EXE.
+
+\item [.PGPLOT...] Contains the source of the GKS version of PGPLOT.
+
+\item [.SGS] Contains the files used by SGS, although these are of little
+use without GKS.
+
+\item [.TAPEIO] Contains the files used by the TIO\_ routines.
+
+\end {description}
+
+\item [TAPES] contains the source of the tape I/O package used by Figaro,
+Caltech's MTPCKG.
+
+\item [TVPCKG] contains the files needed to create the ANU version of the
+image display package, TVPCKG.
+
+\begin{description}
+
+\item [.AED] contains the code specific to the AED display. In the 
+version released with Figaro 3.0 this consists only of dummy subroutines.
+
+\item [.ARGS] contains those additional files, needed by TVPCKG for the ARGS,
+that are not part of the normal Starlink package.
+
+\item [.ANU] contains the basic root code for the package. This
+includes the code for the Grinnell.
+
+\item [.IKON] contains the code specific to the IKON display.
+
+\item [.MAC] contains the code specific to the MAC II display. (The MAC 
+II needs to be running the MacImager program, which is not included, but
+can be obtained from AAO.)
+
+\item [.RAMTEK] contains the code specific to the RAMTEK display. In the 
+version released with Figaro 3.0 this consists only of dummy subroutines.
+
+\item [.TEST] contains the source of a test program TVTEST.
+
+\item [.UIS] contains the code specific to a VaxStation, and also includes
+the code for the separate process that services the TVPCKG display requests.
+
+\end{description}
+
+\item [VARS] contains the source of the VAR\_ routines, used to access the
+Figaro user variables. 
+
+\end{description} 
+
+\subsection{Files in the FIGARO\_DEV directory ([FIGARO.DEV])} 
+
+The following list covers most of the files found in the Figaro development
+directory.
+
+\begin{description} 
+
+\item CABUJY .FOR and .EXE files. This is a utility program that 
+converts a .TAB file for a standard star from AB magnitudes to either 
+milli- or micro-Janskys. Most Figaro standard files are created in AB
+magnitude versions, then converted to Jansky units by CABUJY. CABUJY only
+converts the numbers; the headings and SET commands have to be edited by
+hand.
+
+\item COMCOM .FOR and .EXE files. A utility used for preparing Figaro 
+releases. This reads the COMMANDS.DAT file and generates files 
+containing `@FIG' and `@REL' commands for each Figaro command, enabling the 
+re-compiling and re-linking to be automated.
+
+\item COMDOC .FOR and .EXE files. A utility used to prepare the 
+COMMANDS.DOC file. It reads the COMMANDS.DAT file and generates 
+COMMANDS.DOC from the source and connection files for each command.
+
+\item COMHELP .PAS and .EXE files.  A utility used to prepare the 
+COMMANDS.HLB library.  It reads the COMMANDS.DAT file and generates a help
+file from the source and connection files for each command which can then be
+turned into the help library.
+
+\item COMLIST .FOR and .EXE.  One of the pre-processor programs used to 
+process the basic documentation file FIGARODOCS:FIGARO.RNP by the command
+procedures PHELP and FHELP.
+
+\item COMMANDS.DAT The master file that contains the names of all the Figaro 
+commands, the subroutines that service them, and other assorted information. 
+Many procedures connected with Figaro development make use of this file.
+
+\item COMMENT.FOR and .EXE.  A utility program that produces  crude 
+documentation of a package by extracting the comments from the start 
+of its subroutines.
+
+\item CREPAR.EXE The utility that processes .CON files to produce .PAR and 
+.INF files.  The source is in [FIGARO.PAR].
+
+\item DEVICES.DAT A devices file for use with GKDCREATE. This one is purely
+illustrative; all devices used at AAO can be handled by the GKD routines 
+without any explicit control being needed.
+
+\item DOCUPD.COM The command procedure that performs a full update on the
+Figaro documentation prior to a new release.
+
+\item FGRSHR.COM The command procedure used to generate the FGRSHR shareable
+image that contains most of the Figaro standard libraries - including DSA.
+
+\item FHELP.COM The command procedure that  processes FIGARO.RNP to 
+produce the on-line help library FIGARO.HLB.
+
+\item FIG.COM The command procedure used to relink Figaro application
+programs. This is the main file in this directory that will be used by 
+individual users developing their own Figaro programs.
+
+\item FIGSHR.COM The command procedure used to create a new version of the
+FIGSHR shareable image---the one that contains the common Figaro 
+libraries, GEN\_, PAR\_, VAR\_, DTA\_, and ICH\_. This is now more or
+less replaced by FGRSHR, which also contains DSA\_.
+
+\item GKDCREATE.EXE Utility program that creates the GKD system control file
+in FIGARO\_\-PROG\_S from DEVICES.DAT.
+
+\item GMAIN .FOR and .EXE. Utility program that generates the main program
+for a Figaro application. Run as part of FIG.COM.
+
+\item PHELP.COM Command procedure to create a new version of the printable
+help file FIGARO.DOC from the basic file FIGARO.RNP
+
+\item REL.COM Command procedure used to release---ie copy over to the main
+Figaro directory---the modified files for a Figaro application.
+
+\item RNOMOD .FOR and EXE. One of the pre-processor programs used to 
+process the basic documentation file FIGARODOCS:FIGARO.RNP by the command
+procedures PHELP and FHELP. 
+
+\end{description} 
+
+\subsection{Figaro documentation}
+
+All Figaro documentation files are to be found in the main Figaro 
+directory, FIGARO\_PROG\_S. There is one file that is used as an on-line help
+file (using the VMS `HELP' facility); all the others are text files that 
+may be printed off. The text files can be deleted if necessary, to save
+space. They can all be regenerated from  the  original  files using
+the  command  procedure FIGARO\_DEV:DOCUPD, when required. The files are:
+
+\begin{description} 
+
+\item [BUGS.MEM] Describes any known Figaro bugs and problems (this is, 
+of course, a small subset of all the actual bugs in Figaro).
+
+\item [CHANGES.MEM] A description of the changes made to Figaro routines
+since the last release. This is a list of functional changes rather than a 
+detailed list of every change made to every file. It is aimed at the 
+user rather than  the  support programmer.
+
+\item [COMMANDS.DOC] Contains details of all the Figaro commands, although
+in a rather slap-happy form; it lists the connection file for each 
+command, together with the first set of comments from the program that
+services that command. This file is generated from the list of commands 
+held in COMMANDS.DAT  in  the  development  directory, together with the 
+connection files and program source files, by the utility routine COMDOC.
+
+\item [COMMANDS.HLB] An on-line help library containing details (sketchy, 
+in some cases) of all the individual Figaro commands. It is generated 
+by the COMHELP program in the development directory as part of the 
+DOCUPD.COM documentation update procedure.
+
+\item [DOCINTRO.MEM] This is an introductory page that should precede
+COMMANDS.DOC. It explains why COMMANDS.DOC is such a tatty piece of
+documentation.
+
+\item [DTA.DOC] This is the manual for the DTA\_ routines---the package 
+used to access the Figaro disk data files. It will only be needed by 
+programmers wanting to write Figaro programs. It is produced by the command 
+procedure DTADOC from the file DTA.RNO in the [FIGARO.DTA] directory.
+
+\item [ECH\_RED.MEM] Describes the processing of AAO echelle data.
+
+\item [FIGARO.HLB] The main on-line help library. This is produced by the
+command procedure FHELP.COM from the file FIGARO.RNP, in the development
+directory.
+
+\item [FIGARO.DOC] This is a printable version of the on-line help 
+library, produced by the command procedure PHELP.COM from the file 
+FIGARO.RNP, in the development directory.  This is the main Figaro
+reference document.
+
+\item [FIGBASIC.MEM] This is a beginner's introduction to Figaro.  It 
+concentrates on describing the way parameters are specified in commands.
+
+\item [FIGPROG.MEM] The Figaro Programmer's guide.  This explains how to 
+write simple programs that can read Figaro data files, as well as how to 
+write programs that fit in properly with Figaro in terms of use of parameters,
+user-interface, etc.
+
+\item [FORMAT.MEM] A description of the Figaro data format. This is a
+description of the data objects in Figaro files and of the overall structure 
+of these files, rather than a `what byte goes where' detailed description of 
+the disk file layout. This  is  really  just  an  appendix to the
+Programmer's Guide.
+
+\item [PAR.DOC] This is not a manual, but  a  file containing  a 
+formal description of the PAR\_ routines. As such, it is really an 
+appendix to the programmer's guide.
+
+\item [VAR.DOC] Like PAR.DOC, this is not a manual, but a file containing a
+formal description of the VAR\_ routines.  It too should be regarded as 
+an appendix to the programmer's guide.
+
+\end{description}
+      
+There are also a couple of documents that describe individual applications. 
+GAUSS.MEM describes GAUSS, and ABLINE.MEM describes ABLINE. 
+
+\subsection{Use of national-, local- and user- Figaro directories}
+
+Figaro uses the directory called FIGARO\_PROG\_S as its main directory,
+but it also checks to see if there are directories called FIGARO\_PROG\_N,
+FIGARO\_PROG\_L and FIGARO\_PROG\_U. These are intended to be used as
+national (not strictly specific to a nation, whatever that is, but specific to
+a larger group of machines that just one site; for example to Starlink as a
+whole, or to the AAO systems), as local (ie specific to a particular
+installation) and user (specific to a particular user) directories.  The 
+idea is that if local changes are made to Figaro, these should be done 
+without changing the files in [FIGARO..], but should be made in a local
+directory and new images re-linked into that directory. A file called 
+FIGARO.COM in the local directory can then be used to redefine the Figaro
+command in question.
+
+It is recommended that all Figaro sites have a local directory, and the 
+logical name FIGARO\_\-PROG\_L defined. If nothing else, a NEWS.TXT in the
+local directory will be output in preference to the one in the standard 
+system directory, and this is a file that is often changed by local sites. In
+principle, it should not now be necessary to change any of the files in the
+directories released as part of Figaro, and such changes are strongly
+discouraged; they are very hard to keep track of. Almost all changes needed
+to Figaro can be made by using the local directory to override the standard
+files. In particular, the use of logical name search paths can be used to
+make the linking procedures search local directories first, before the 
+standard directories.  It's usually tempting to change the released files,
+because it's usually much easier in the short term; it's usually regretted
+when the next version comes along. You might even consider write-protecting
+all the Figaro directories, as an aid to self-control.
+
+An example may help. Suppose a local change has to be made to the `SPLOT'
+command. The procedure is as follows:
+
+\begin{enumerate}
+
+\item Assuming a local directory exists, and has been given the logical 
+name FIGARO\_PROG\_L, first copy the source of the Figaro program into it.
+
+\begin{verbatim}
+      $ SET DEF FIGARO_PROG_L
+      $ COPY FIGARO_SOURCE:SPLOT.FOR *
+\end{verbatim}
+
+\item Edit SPLOT.FOR, making the necessary changes, and recompile it.
+
+\item If you are adding a new command, or making changes that require that 
+you modify the entry in COMMANDS.DAT for the command, then you will need a
+modified version in your directory to drive the linking procedure.  The 
+easiest thing is just to copy the one from the development directory:
+
+\begin{verbatim}
+      $ COPY FIGARO_DEV:COMMANDS.DAT *
+\end{verbatim}
+
+and then edit it. The file FIGARO\_DEV:COMMANDS.DAT is used by the linking 
+procedure if it cannot find a suitable entry in a COMMANDS.DAT file in the
+default directory.
+
+\item Link the new version of SPLOT using the FIG.COM file in the
+development directory.
+
+\begin{verbatim}
+      $ @FIGARO_DEV:FIG SPLOT
+\end{verbatim}
+
+This creates a file SPLOT.EXE in the local directory.
+
+\item You now need a FIGARO.COM file in the local directory to redefine 
+the SPLOT command so that it uses the new version. It should contain the line
+
+\begin{verbatim}
+      $ SPLOT:==$FIGARO_PROG_L:SPLOT
+\end{verbatim}
+
+\end{enumerate}
+
+If changes have to be made to routines in one of the subroutine libraries, you 
+can either produce a local version of FIG.COM which uses a new version of the
+library in the local directory, or you can put the new library in the local
+directory and make FIGARO\_LIBS a search path, for example:
+
+\begin{verbatim}
+      $ DEFINE FIGARO_LIBS FIGARO_PROG_L,disk:[FIGARO.LIBS]
+\end{verbatim}
+
+It might be better to use a sub-directory of the local directory, but that 
+depends on how many changes you are making. Earlier versions of these
+notes have mentioned the possibility of changing the standard library, but
+search paths make that unnecessary as well as undesirable. The important thing
+is to be able to tell what changes have been made, since any new Figaro
+release will probably over-write all the files in the [FIGARO...] directories.
+
+\section{Starlink's release---version 3.0-3}
+\label{Starnotes}
+
+\subsection{Standard Figaro}
+
+The ``entire system'' no longer includes the source files for the non-HDS
+version of DTA, {\em i.e.\/} the contents of the directory {\tt
+[FIGARO.\-OLD.DTA]}. But the library {\tt [FIGARO.LIBS]DTA1.OLB} remains.
+
+The entire system also no longer includes the non-GKS version of PGPLOT, {\em
+i.e.\/} the contents of the directory {\tt [FIGARO.\-OLD.PGPLOT]}. Thus the
+non-GKS {\tt GRPCKG} and {\tt GRPSHR} are no longer available.
+
+The entire system no longer includes the source files of HDS, ({\em i.e.\/}
+contents of {\tt [FIGARO.HDS]} since this has been superseded by Starlink's HDS
+4.0. However, the shareable image remains in {\tt
+FIGARO\_\-PROG\_S:\-HDS\_SHR.EXE}, if only for sentimental reasons.
+
+Standard Figaro no longer contains the ICL monolith ({\em i.e.\/} files {\tt
+[FIGARO.\-MONOLITH.\-FIGARO]\-FIGARO.*}. Instead National Figaro contains a
+complete monolith with all the updates to applications included.
+
+The entire system is about 65000 VAX blocks in size. It is recommended only for
+the nodes where major software development in the Figaro software environment
+is going on ({\em e.g.\/} CAVAD, REVAD and the associated overseas
+observatories) and for RLVAD as the central Starlink Software Library. Other
+Starlink sites have either the ``development system'' or the ``extended
+development system''.
+
+Compared to the entire system, the extended development system lacks the source
+code of the Figaro subroutine libraries. This should cause no trouble since
+only in very rare circumstances would the libraries be modified locally. All
+applications source code is available in the extended development system. When
+bits of library source code are needed for reference, this can always be
+accessed at RLVAD. The size of the extended development system is about 50000
+VAX blocks.
+
+The development system lacks also the applications' source code. Its size is
+40000 VAX blocks. This is intended for nodes where little or no Figaro
+programming is going on. Programme development is still possible, since all
+object libraries are available. But the occasional need for a template
+application source must be satisfied by referring to RLVAD.
+
+When linking Figaro applications it is advisable to include a linker option
+which increases the linker parameter ISD\_MAX. Otherwise executable files may
+become excessively large in certain circumstances. For this reason the link
+procedure {\tt [FIGARO.\-DEV]\-FIG.COM} is superseded by a corresponding
+procedure in National Figaro.
+
+The HDS package as delivered with Figaro from AAO is obsolete. It is superseded
+by Starlink's HDS 4.0, which also introduces a new data format. The pre-3.0-3
+Figaro routines would be unable to read the new data format.
+
+The linker options file {\tt DTA.OPT} had to be changed so that HDS\_IMAGE
+would be used instead of HDS\_SHR. The updated options file is in National
+Figaro.
+
+The subtle interplay between DTA, HDS and EMS made changes to 24 DTA-routines
+necessary, because DTA quite happily mixed DTA and HDS error status variables.
+Also DAT\_GET currently fails when a string is to be got and the memory storage
+supplied is too short for the HDS object. DTA has to take care of this problem
+now in the routine DTA\_RDVAR. {\tt [FIGARO.\-LIBS]\-DTA.OLB} is superseded by
+a corresponding file in National Figaro.
+
+HDS 4.0 produces a plethora of error messages. Before, these errors were not
+reported by HDS but only indicated through the status variable. DTA then took
+care of reporting when necessary. In order to suppress HDS' messages, the
+Figaro fixed part {\tt MAIN.FOR} must call ERR\_MARK, ERR\_ANNUL and ERR\_RLSE.
+To this end {\tt [FIGARO.DEV]GMAIN.FOR} and {\tt .EXE} are superseded by
+corresponding files in National Figaro.
+
+This works fine as long as an application is not linked with {\tt FGRSHR} {\it
+and} PGPLOT (shareable GKS version). In order to suppress HDS' messages also
+for PGPLOTting routines, {\tt [FIGARO.\-DEV]\-FIG.COM} needs a further change.
+Before, if an application had to be linked with shareable GKS-PGPLOT, SGS was
+included in the {\tt LINK} command via {\tt @SGS\_DIR:SGSLINK}. This has been
+replaced by the actual contents of that file, but excluding EMSSHARE/SHARE.
+
+The shareable images {\tt FIGSHR, FGRSHR, BIGFIG} (in that order) have been
+relinked with the HDS 4.0 shareable image. The new {\tt .EXE} files supersede
+the old ones in {\tt FIGARO\_\-PROG\_S}.
+
+The corresponding libraries are {\tt BIGFIG.OLB} (superseded in {\tt
+FIGARO\_\-PROG\_S}), {\tt FIGSHR.OLB} and {\tt FGRSHR.OLB}. The latter two are
+stored in the National Figaro directory tree, but the old files remain in
+Standard Figaro for simplicity.
+
+The Callable Figaro shareable image {\tt BIGFIG} had to be rebuilt after GRPSHR
+no longer allowed calls to GRETEXT and GRSETCOL, which are called by the Figaro
+applications TIPPEX and ABLINE respectively. These calls were replaced by calls
+to PGETXT and PGSCI respectively. However, these changes enter only into a
+transient version of {\tt FIGARO.OLB}, which was used only to build {\tt
+BIGFIG}. The released application sources remain unfixed.
+
+{\tt BIGFIG} also had to be linked with PSX.
+
+In order for Callable Figaro to supress error reports by HDS and other
+packages, the routine FIGARO\_CALL (source file {\tt FIGAROCALL.FOR}) was
+changed to call ERR\_MARK, ERR\_ANNUL, ERR\_RLSE in a similar manner to {\tt
+MAIN.FOR}. However, these changes enter only into a transient version of {\tt
+CALL.OLB}, shich was used only to build {\tt BIGFIG}. The released source
+remains unchanged.
+
+Users will have to relink their Callable Figaro applications. {\tt
+[FIGARO.\-DEV.\-CALL]\-FIGCALL} would need relinking, but was not relinked. It
+is regarded as a template source rather than an executable provided
+ready-to-use.
+
+Subsequently all Figaro applications were relinked with FGRSHR and the new
+versions supersede the old ones in {\tt FIGARO\_\-PROG\_S}. This includes those
+Standard Figaro applications which are actually superseded by updates ({\em
+e.g.\/} bug fixes) in National Figaro. Users also will have to relink their
+Figaro applications.
+
+{\tt DTA2HDS, DTAORHDS, HDS2DTA} are not Figaro applications in the usual
+sense. They form links between the HDS data format and the---largely unused---
+non-HDS data format. These have also been relinked and superseded in {\tt
+FIGARO\_\-PROG\_S}. However, they have not been tested.
+
+In the entire system a small number of executables are spread over source code
+directories. These have not been checked for the necessity of relinking them.
+Thus they may not run any more. Since the file names are typically {\tt
+TEST.EXE} or {\tt SCRAP.EXE}, they are considered as irrelevant.
+
+\subsection{National Figaro}
+\label{natfig}
+
+Mostly, National Figaro provides a (small) number of debugged applications and
+some additional applications. This includes an updated (complete) {\tt
+FIGARO\_DEV:COMMANDS.DAT}. The updated set of applications (from National and
+Standard Figaro) are also available as an ICL monolith.
+
+The logical name and symbol definitions for Figaro are described in Section
+\ref{names}.
+
+National Figaro is stored in the {\tt [FIGPACK.\-NFIGARO]} directory tree. It
+is currently on equal terms with three other Starlink-released Figaro-based
+packages: NDPROGS, TAURUS and TWODSPEC. Consequently there are four
+sub-directories {\tt [FIGPACK]\-NFIGARO.DIR, NDPROGS.DIR,\linebreak TAURUS.DIR,
+TWODSPEC.DIR}. Since each package has its own startup file {\tt FIGARO.COM} and
+all have to be executed when the command FIGARO is given, the logical name {\tt
+FIGARO\_\-PROG\_N} is a search list of five directories. The first {\tt
+FIGARO.COM} found therein is {\tt [FIGPACK]\-FIGARO.COM}. It is the ``master''
+file and executes the other four explicitly.
+
+The directory structure {\tt [FIGPACK.NFIGARO...]} is the same as {\tt
+[FIGARO...]}, except that empty directories are not present. Standard Figaro's
+{\tt [FIGARO.MONOLITH...]} contain only a \LaTeX\ document on ICL Figaro. ICL
+Figaro itself is in {\tt [FIGPACK.\-NFIGARO.\-MONOLITH.\-FIGARO]}, and a number
+of files used for generating the monolith are in {\tt
+[FIGPACK.\-NFIGARO.\-MONOLITH]}.
+
+To install ICL Figaro, {\tt SSC:ADAM\_PACKAGES.ICL} must include the following
+package startup definition:
+
+\begin{verbatim}
+      HIDDEN PROC FIGARO
+         LOAD FIG_DIR:FIGARO.PRC
+         LOAD FIG_DIR:NFIGARO
+      END PROC
+\end{verbatim}
+
+The second {\tt LOAD} was introduced with National Figaro 3.0-1, when
+application updates were compiled into a separate monolith. It is obsolete now,
+but might prove useful for future releases. To avoid any error messages at ICL
+Figaro startup, National Figaro provides an empty {\tt NFIGARO.ICL}.
+
+Callable Figaro exists only in Standard Figaro, thus National Figaro's updates
+are not included in Callable Figaro.
+
+Irrespective of the Standard Figaro system (development, extended development,
+or entire), National Figaro includes all its source files.
+
+Some added applications are not Figaro proper: NDFBAD is an A-task in the DCL
+version of National Figaro. It is included in the ICL version. VWSOPEN,
+VWSCLOSE, XOPEN, XCLOSE are DCL command procedures rather than programmes
+written in Fortran.
+
+When DCL Figaro is started up, the help libraries are sorted such that {\tt
+NFIGARO.HLB} is searched before {\tt FIGARO.HLB} and {\tt COMMANDS.HLB} and
+that all these are searched before any other libraries. This is achieved in
+National Figaro's {\tt FIGARO.COM} with Malcolm Currie's ADD\-HELP\-TO\-VMS.
+
+National Figaro provides server processes to run TVPCKG on a VAXstation which
+may be either a VWS or an Xwindows workstation. The server is started with the
+Figaro command VWSOPEN or XOPEN. It must be stopped before log off with
+VWSCLOSE or XCLOSE. When running ICL Figaro, a premature call of VWSCLOSE or
+XCLOSE may cause a TVPCKG-based application to enter an endless loop. This can
+be avoided by calling VWSOPEN or XOPEN again before calling the TVPCKG-based
+application. Once an application has entered the endless loop, {\tt <CTRL-C>}
+forces an interrupt and one can {\tt KILL FIG\_DIR:FIGARO} once the {\tt ICL>}
+prompt appears. Then call VWSOPEN or XOPEN and call the application again.
+
+The FIGARO command does not define any logical names or symbols for Figaro
+programme development, except that it defines the symbol FIGDEV. FIGDEV defines
+the logical names necessary for programme development.
+
+
+\subsection{Figaro software development}
+\label{develop}
+
+After Figaro has been started up with the command FIGARO, the command FIGDEV
+defines a number of logical names and symbols used for programme development in
+the Figaro software environment. See Section \ref{names} for details.
+
+Most notable is the symbol FIG, i.e. the command procedure {\tt
+FIGARO\_DEV:FIG.COM}, which is used to compile and link a Figaro application
+into a stand-alone image ({\em i.e.\/} a DCL Figaro application). The original
+{\tt FIG.COM} from Standard Figaro has been superseded by National Figaro. This
+is necessary to link with the correct version of HDS. Also the linker parameter
+ISD\_MAX is doubled to 192 in order to avoid excessively large executables.
+
+A users' documentation on writing Figaro applications is the ``FIGARO
+Programmer's Guide'', dated January 1990, by Keith Shortridge. Once the source
+files {\tt <source>.FOR, <applic>.CON} exist in the working directory, they can
+be compiled with the commands FIG and CREPAR respectively. If {\tt <source>}
+differs from {\tt <applic>}, a file {\tt COMMANDS.DAT} is necessary to relate
+the two. This file may also contain Figaro link qualifiers which signal special
+requirements to the link procedure FIG.
+
+It is also possible to turn a number of private Figaro applications into a
+monolith to be run from ICL. Since some of the utilities one would use for
+this, make specific assumptions, you have to rename files from {\tt FIGARO.*}
+to something else. There exists no ready-to-use procedure like FIG for the
+assembly of a private Figaro-ish monolith. The following description may,
+however, be helpful.
+
+Proceed as follows:
+
+\begin{itemize}
+
+\item Set your working directory (default directory) to where your monolith
+will be stored ({\tt <mono\_dir>}).
+
+\item Compile all your applications and subroutines needed for the monolith and
+put them into an object library ({\tt <mono\_lib>.OLB}) in the working
+directory.
+
+\item Compile all the application connections files into {\tt <applic>.PAR}
+files in the working directory.
+
+\item You also need a file {\tt COMMANDS.DAT} that lists all the applications
+you want the monolith to include and recognise as commands. Ideally this should
+be a proper {\tt COMMANDS.DAT}, {\em i.e.\/} list application name, Fortran
+source file name, and Figaro link qualifiers. The link qualifiers denote
+special link requirements for the FIG link procedure. But {\em e.g.\/} a PARQ
+qualifier---if necessary at all---would also be necessary to produce a
+correct monolith interface file.
+
+\item You need a Fortran source file for the monolith routine itself. You can
+copy {\tt FIGPACK\_\-DISK:\-[FIGPACK.\-NFIGARO.\-MONOLITH.\-FIGARO]\-FIGARO.FOR}
+to {\tt <monolith>.FOR}, but you\linebreak have to change the {\tt SUBROUTINE}
+statement according to your monolith's name. It is necessary that your monolith
+have a name different from ``FIGARO'' and that the subroutine has that very 
+name.
+
+\item Set up for Figaro and ADAM software development and modify two logical
+names according to present needs.
+
+\begin{verbatim}
+      $ FIGARO
+      $ FIGDEV
+      $ ADAMSTART
+      $ ADAMDEV
+      $ DEFINE FIGARO_PARS SYS$DISK:[]
+      $ DEFINE FIGARO_DEV SYS$DISK:[]
+\end{verbatim}
+
+\item With the command list {\tt COMMANDS.DAT}, look for the binary interface
+files {\tt <applic>.PAR} and convert these into one monolith interface file.
+Once renamed to {\tt <monolith>}, compile it. 
+
+\begin{verbatim}
+      $ RUN FIGPACK_DISK:[FIGPACK.NFIGARO.MONOLITH]CREIFL.EXE 
+      $ RENAME FIGARO.IFL <monolith>.IFL 
+      $ COMPIFL <monolith> 
+\end{verbatim} 
+
+\item With the command list {\tt COMMANDS.DAT}, create an IF-THEN-ELSE-IF block
+with subroutine calls, which is to be included when the monolith routine is
+compiled. At the same time an ICL procedure to start up the monolith is
+created. Once this is renamed to {\tt <monolith>} it will have to be edited. It
+contains numerous references to FIGARO rather than {\tt <monolith>}. For each
+application there are two lines. The DEFINE command is vital, but the directory
+specification {\tt FIG\_DIR} is wrong and has to be changed to {\tt
+<mono\_dir>} so that your {\tt <monolith>.EXE} will be found. The DEFHELP 
+command may indicate a help library that should be consulted when you type
+``HELP {\tt <applic>}'' at the {\tt ICL>} prompt. If you have no such help
+library, the DEFHELP commands should be removed from {\tt <monolith>.PRC} 
+
+\begin{verbatim} 
+      $ RUN FIGPACK_DISK:[FIGPACK.NFIGARO.MONOLITH]GFIGMON.EXE 
+      $ RENAME FIGARO.PRC <monolith>.PRC 
+      $ EDIT <monolith>.PRC 
+\end{verbatim} 
+
+\item The crucial link
+command may seem trivial now, but you have put considerable work into
+assembling {\tt <mono\_lib>}. And a lot of clever linker arrangements were put
+into the options file. 
+
+\begin{verbatim} 
+      $ FORTRAN <monolith>
+      $ MLINK <monolith>,<mono_lib>/LIB,- 
+          FIGPACK_DISK:[FIGPACK.NFIGARO.MONOLITH]LINKMONO/OPT
+\end{verbatim}
+ 
+\item Now test the result: 
+
+\begin{verbatim} 
+      $ ADAMSTART
+      $ ICL
+      ICL> LOAD <mono_dir><monolith>.PRC 
+      ICL> <applic>
+\end{verbatim}
+
+\item For regular use, it is convenient to have an abbreviation for the {\tt
+LOAD} command. That could be defined in your ICL-login file: In your login
+file you would define the logial name ICL\_LOGIN:
+
+\begin{verbatim} 
+      $ DEFINE/JOB ICL_LOGIN <disk><directory><my_ICL_login>.ICL
+\end{verbatim}
+
+This ICL procedure is executed each time you start ICL. In that ICL procedure
+you would include a DEFSTRING command:
+
+\begin{verbatim} 
+      DEFSTRING <monolith> LOAD <mono_dir><monolith>.PRC 
+\end{verbatim}
+
+Once you started ICL, you just type {\tt <monolith>} to initialise your monoith
+and {\tt <applic>} to run the application. You may also want to include the
+ADAMSTART in your (DCL-) login file.
+
+\end{itemize} 
+
+Obviously, this procedure is too complicated to perform in the testing and
+debugging phase of programme development. But the same source code can be
+debugged with the DCL Figaro software environment.
+
+\subsection{Logical names and symbols}
+\label{names}
+
+The way in which logical names are set up, especially for development of Figaro
+applications, has been changed. This is because linking Figaro applications has
+now to take care of modifications made to shareable images, object libraries
+and options files.
+
+The following logical names should be in the system table:
+
+\begin{verbatim}
+      FIGARO_DISK    (device with [FIGARO] directory)
+      FIGPACK_DISK   (device with [FIGPACK] directory)
+      FIG_DIR        FIGARO_DISK:[FIGARO.MONOLITH.FIGARO],-
+                     FIGPACK_DISK:[FIGPACK.NFIGARO.MONOLITH.FIGARO]
+      FIGARO_PROG_S  FIGARO_DISK:[FIGARO]
+      FIGARO_PROG_N  FIGPACK_DISK:[FIGPACK],-
+                     FIGPACK_DISK:[FIGPACK.NFIGARO.FIGARO],-
+                     FIGPACK_DISK:[FIGPACK.NDPROGS.NDPROGS],-
+                     FIGPACK_DISK:[FIGPACK.TAURUS.TAURUS],-
+                     FIGPACK_DISK:[FIGPACK.TWODSPEC.TWODSPEC]
+      FIGARO_PROG_L  (the local Figaro directory)
+      BIGFIG         FIGARO_PROG_S:BIGFIG.EXE
+      FIGSHR         FIGARO_PROG_S:FIGSHR.EXE
+      FGRSHR         FIGARO_PROG_S:FGRSHR.EXE
+      TVPSHR         FIGARO_PROG_S:TVPSHR.EXE
+\end{verbatim}
+
+The following symbols should be defined in {\tt SSC:LOGIN.COM}:
+
+\begin{verbatim}
+      FIGARO  :== @FIGARO_PROG_S:FIGARO.COM
+      FIGLINK :== @FIGARO_PROG_S:FIGLINK.COM
+\end{verbatim}
+
+The command FIGARO defines two logical names:
+
+\begin{verbatim}
+      PLT$UPDATE  IMMEDIATE
+      SYS$INPUT   TT/USER_MODE
+\end{verbatim}
+
+Apart from some 240 applications, the command FIGARO defines the following
+symbols:
+  
+\begin{verbatim}
+      FIGLINK     :== @FIGARO_PROG_S:FIGLINK.COM
+      FIGDEV      :== @FIGARO_PROG_N:FIGDEV.COM
+      FIGARO_MODE :== 'F$MODE()'
+      PPRINT      :== PRINT/NOFEED/NOHEAD
+\end{verbatim}
+
+The command FIGDEV defines the following logical names in the process table:
+
+\begin{verbatim} 
+      FIGARO_DEV    FIGPACK_DISK:[FIGPACK.NFIGARO.DEV],-
+                    FIGARO_DISK:[FIGARO.DEV] 
+      FIGARO_LIBS   FIGPACK_DISK:[FIGPACK.NFIGARO.LIBS],-
+                    FIGARO_DISK:[FIGARO.LIBS] 
+      FIGARO_SOURCE FIGPACK_DISK:[FIGPACK.NFIGARO.DEV.SOURCE],- 
+                    FIGARO_DISK:[FIGARO.DEV.SOURCE]
+      FIGARO_PARS   SYS$DISK:[],-
+                    FIGARO_PROG_U,FIGARO_PROG_L,-
+                    FIGARO_PROG_N,FIGARO_PROG_S
+      FIGARO_WORK   SYS$DISK:[]
+      FIGARO_CALL   FIGARO_DISK:[FIGARO.DEV.CALL] 
+      DTASRC        FIGARO_DISK:[FIGARO.DTA],- 
+                    FIGARO_DISK:[FIGARO.INCLUDES] 
+      DYN_SOURCE    FIGARO_DISK:[FIGARO.DYN],- 
+                    FIGARO_DISK:[FIGARO.INCLUDES] 
+\end{verbatim}
+
+The command FIGDEV defines the following symbols:
+
+\begin{verbatim}
+      GMAIN   :== $FIGARO_DEV:GMAIN.EXE
+      FIG     :== @FIGARO_DEV:FIG.COM
+      FIGLINK :== @FIGARO_PROG_S:FIGLINK.COM
+      CREPAR  :== $FIGARO_DEV:CREPAR.EXE
+\end{verbatim}
+
+\section{Update from 3.0-2 to 3.0-3}
+\label{update}
+
+This section describes how to proceed from an existing Standard
+Figaro 3.0 and National Figaro 3.0-2 to Figaro 3.0-3.
+
+\begin{itemize}
+
+\item Make sure that the logical names in the system table are defined (see
+Section \ref{names}).
+
+\item Reduce your Standard Figaro installation to the ``entire system'':
+
+\begin{verbatim}
+      $ DELETE FIGARO_DISK:[FIGARO.MONOLITH.FIGARO]FIGARO.*;*,-
+         [FIGARO.OLD.PGPLOT]*.*;*,-
+         [FIGARO.OLD.DTA1]*.*;*,-
+         [FIGARO.HDS]*.*;*
+\end{verbatim}
+
+\item If you do not need the sources of the Figaro libraries, reduce your
+Standard Figaro installation to the ``extended development system'' (NOTE: do
+{\it not} delete the contents of directories {\tt [FIGARO.\-DEV],
+[FIGARO.\-FIGARO], [FIGARO.\-INCLUDES], [FIGARO.\-LIBS],
+[FI\-GARO.\-MONOLITH]}):
+
+\begin{verbatim}
+      $ DELETE FIGARO_DISK:[FIGARO.CNV]*.*;*,-
+         [FIGARO.DSA]*.*;*,[FIGARO.DSK]*.*;*,-
+         [FIGARO.DTA]*.*;*,[FIGARO.DUT]*.*;*,-
+         [FIGARO.DYN]*.*;*,[FIGARO.FIG]*.*;*,-
+         [FIGARO.FIT]*.*;*,[FIGARO.GEN]*.*;*,-
+         [FIGARO.GKD]*.*;*,[FIGARO.ICH]*.*;*,-
+         [FIGARO.JT]*.*;*,[FIGARO.MEM]*.*;*,-
+         [FIGARO.NAG_FIX]*.*;*,[FIGARO.PAR]*.*;*,-
+         [FIGARO.TAPES]*.*;*,[FIGARO.VARS]*.*;*
+      $ DELETE FIGARO_DISK:[FIGARO.TVPCKG...]*.*;*/EXCLUDE=.DIR
+\end{verbatim}
+
+\item If you do not need the sources of the Figaro applications, reduce your
+Standard Figaro installation to the ``development system'' (NOTE: do {\it not}
+delete the contents of the directory {\tt [FIGARO.\-DEV]} itself):
+
+\begin{verbatim}
+      $ DELETE FIGARO_DISK:[FIGARO.DEV.*]*.*;*
+\end{verbatim}
+
+\item Update the Standard Figaro files in {\tt FIGARO\_DISK:[FIGARO.FIGARO]}:
+
+\begin{verbatim}
+      $ DELETE FIGARO_DISK:[FIGARO.FIGARO]*.OLB;*,*.COM;*,*.EXE;*
+      $ BACKUP <save_set_1> FIGARO_DISK:[FIGARO.FIGARO]
+\end{verbatim}
+
+\item Update National Figaro:
+
+\begin{verbatim}
+      $ DELETE FIGPACK_DISK:[FIGPACK.NFIGARO...]*.*;*/EXCLUDE=.DIR
+      $ BACKUP <save_set_2> FIGPACK_DISK:[FIGPACK...]
+\end{verbatim}
+
+\end{itemize}
+
+\end{document}

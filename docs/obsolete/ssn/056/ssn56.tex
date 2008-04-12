@@ -1,0 +1,135 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+\markright{SSN/56.1}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill SSN/56.1\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf Starlink System Note 56.1}
+\begin{flushright}
+M D Lawden\\
+17th February 1988
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf Updating Starlink Software over a Network}
+\end{center}
+\vspace{5mm}
+The best way to keep a copy of the Starlink Software Collection up to date
+is to receive and implement the Starlink Software Change (SSC) notices
+issued by the Starlink Software Librarian from Rutherford Appleton Laboratory.
+About 50 SSC's are issued every year.
+For you to receive updates in this way, it must be possible for RAL to send you
+a text file and for you to read a BACKUP save set from the Starlink computer
+RLVAD at RAL.
+
+You must supply the following information to the Starlink Software Librarian.
+\begin{itemize}
+\item The name of a contact at your site who is responsible for reading and
+implementing the SSC's issued by Starlink.
+\item A full network address to be used by Starlink to send you SSC's.
+This should include an appropriate username.
+\item The full postal address, telephone and telex numbers of your site.
+\end{itemize}
+The corresponding RAL details are as follows:
+\begin{itemize}
+\item Starlink Software Librarian (currently Mr M D Lawden or Mr S E Black)
+\item DECNET --- RLVAD::STAR\\
+JANET --- STAR@UK.AC.RL.STAR
+\item Starlink Software Librarian, Building R68, Rutherford Appleton Laboratory,
+Chilton, DIDCOT, Oxon, OX11 0QX, UK.
+Tel: Abingdon (0235) 21900 X5114.
+Tx: 83159 RUTHLB G
+\end{itemize}
+The updating process is as follows:
+\begin{itemize}
+\item The Starlink Software Librarian will send you an SSC each time one is
+released.
+This is a text file which tells you how to implement the update.
+It will tell you what new documentation is available, and will include notes
+about the release (what has changed, verification tests, \ldots).
+It will also tell you which information summaries have been updated.
+It will be sent by electronic mail to the username and site you have specified.
+\item You must copy the backup save set mentioned in the SSC. 
+This is stored at RAL in directory STARDISK:[STAR.TEMP].
+The file name will be SSCnnn.BCK where `nnn' is the release number.
+This save set will only be stored at RAL for one month before being deleted
+without notice.
+This is necessary because of disk space limitations.
+
+{\bf YOU MUST COPY THE SAVE SET WITHIN A MONTH OF RELEASE!}
+
+If you don't copy the save set in time, it may be necessary to send you a
+complete copy of the Starlink Software and this could take a long time.
+\item The copying method depends on whether you use the TRANSFER command on
+JANET, or the COPY command on DECNET.
+The JANET command is:
+\begin{verbatim}
+    $ TRANSFER/CODE=FAST/USERNAME=NETUSR,NETUSR -
+        UK.AC.RL.STAR::STARDISK:[STAR.TEMP]SSCnnn.BCK  *.*
+\end{verbatim}
+The DECNET command is:
+\begin{verbatim}
+    $ COPY RLVAD::STARDISK:[STAR.TEMP]SSCnnn.BCK  *.*
+\end{verbatim}
+\item Starlink recommends that you set up a username STAR to be used for
+managing the Starlink software.
+Set up a directory [STAR.TEMP] to be used for storing the release files and
+for carrying out the updating procedures.
+\item Assuming you have copied SSCnnn.BCK into [STAR.TEMP], your next step is
+to decompress it and recreate the directory structure holding the update.
+Do this as follows:
+\begin{verbatim}
+    $ SET DEF [STAR.TEMP]
+    $ LZDCM SSCnnn.BCK	
+    $ BACKUP SSCnnn.BCK/SAVE [*...]
+\end{verbatim}
+You can qualify the BACKUP command with /LOG if you want to see what is going
+on, and with /VERIFY if you are a perfectionist; in practice, these qualifiers
+just slow you down.
+This will create a directory structure [STAR.TEMP.SSCnnn...] containing the
+files being released.
+\item Follow the instructions in the SSC note. 
+Normally, this will be a quick and simple operation; in most cases all you do is
+give the directory [STAR.TEMP.SSCnnn] the logical name SSCTEMP and execute the
+command procedure SSCTEMP:SSCnnn.COM.
+\end{itemize}
+You should also be aware of the following general notes:
+\begin{itemize}
+\item Most releases are less than 1000 blocks in size. 
+It has proved possible to copy releases occupying many thousand blocks without
+difficulty at rates of up to 4000 blocks an hour.
+However, if you want a release to be sent to you on tape, send a message to
+STAR at RAL.
+This will be much slower than a network release.
+\item We will normally send you paper copies of any documentation released since
+this may not be easily accessible on-line.
+\item Be sure to implement the SSC's in the order they are released, even if
+you are not interested in a particular release.
+SSC's update documentation and index files which may have nothing to do with the
+software being released.
+\item If it is inconvenient to implement updates when they are released,
+store the backup save sets until you are ready to use them.
+Remember, they are only stored at RAL for a month and cannot be recovered after
+that.
+\item The initial installation of the Starlink Software Collection is
+described in SSN/15.
+The updating process described above assumes that your Starlink software has
+been implemented as described there.
+\item The preparation and release of Starlink Software Change notices is
+described in SSN/41.
+\item A description of how Starlink sites are run can be found in SGP/25.
+\end{itemize}
+\end{document}

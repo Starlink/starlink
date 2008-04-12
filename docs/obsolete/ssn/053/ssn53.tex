@@ -1,0 +1,549 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocnumber}    {53.1}
+\newcommand{\stardocauthors}   {A P Lotts}
+\newcommand{\stardocdate}      {10 June 1989}
+\newcommand{\stardoctitle}     {UNIBUS and Q-BUS Configuration}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{INTRODUCTION}
+
+This note is intended to assist managers with Q-BUS and UNIBUS  configuration.
+It is not a complete description.
+Please send any corrections or suggested additions to the Starlink Librarian.
+
+{\bf WARNING} Make sure that the current  configuration 
+both in terms of addresses and vectors and physical placement
+ of all boards are carefully noted before any changes are made.
+Also note carefully any changes that are made so that there is a reasonable
+chance of getting back to the starting position without mistakes.
+ Read all the relevant sections of this and any other information
+ sources well before starting any configuration changes.
+
+Also note that permission should be obtained from whoever is maintaining
+the system (and any boards if maintained by third parties) before attempting
+configuration changes.
+Failure to do this may invalidate warranty or maintenance agreements.
+
+
+\section{PHYSICAL PLACEMENT}
+This section will only deal with bus integrity and cabling
+ problems and {\bf not} with placement to avoid bus interaction problems and
+ efficiency.
+
+	
+\subsection{UNIBUS}
+\subsubsection{Cabling}
+Problems can arise with some boards when connecting and routing the
+ cables from the board out of the UNIBUS enclosure to the user device.
+ Beware especially of boards that require top entry.
+These can conflict with  enclosure itself and with cables already in place.
+Take a good look at the cable routing of any slots to be changed.
+
+\subsubsection{Backplane Integrity}
+This section is mainly concerned with the bus grant cards and the
+ problems of NPG.
+The Non Processor Grant is a signal used for DMA transfers.
+DMA stands for Direct Memory Access and means that the device communicate
+directly with memory without CPU intervention.
+Common DMA devices are disc and tape drives, Image display systems and some
+others.
+
+A UNIBUS expects to see all of its backplane lines connected all
+ the way to the terminator.
+All the address and data lines are `shared' by every board and are no problem.
+The problems arise with the bus grant lines.
+These are the BR and NPG lines and control the bus arbitration -- i.e. which
+ device gets to talk to the CPU next.
+Because of the way the grant lines are
+ used they all enter each board on one backplane connector and leave by another.
+ Thus a `board' is needed in every UNIBUS backplane slot.
+
+The backplane is divided up into 6 areas per slot.
+The area which is
+ third from the bottom has the BR grants while the next one up has the NPG.
+ A `new' UNIBUS slot has a wire wrap to jumper the NPG and if no board is
+ inserted will only need a simple `bus grant' card (e.g.\ G727A).
+If the slot
+ is used by a NON DMA device the wire wrap jumper is normally left in place.
+ However if a DMA board is to be used the wire wrap must be removed.
+If the device is later removed and either the slot is to be left empty or
+a non DMA board is to be inserted, problems can arise.
+If left empty, the simple G727A is not enough and either the wire wrap jumper
+must be replaced or a `double grant' card such as the G7273 will be needed.
+The G7273 is much  preferred because it can be removed or inserted
+without removing surrounding boards and also does not entail wire wraps.
+Try to get at least one from your DEC engineer whenever you get the chance!
+
+It is believed some of the modern non DMA boards will pass the NPG but
+some will not.
+
+UNIBUS boards come in two sizes, quad and hex.
+Quad boards are placed in the bottom 4 areas while a hex fills the slot.
+No jumpers or changes are required in the top two areas nor in the bottom two.
+
+\subsubsection{Choosing a slot}
+
+Clearly if removing one board and inserting another the
+first  choice will be a simple replacement.
+However, ignoring any other considerations, the boards must be checked to 
+see if both are DMA or not.
+If both are DMA there is no problem.
+If both not DMA you will also be alright if both  pass or do not pass the NPG.
+ Problems may arise if mixed DMA and non DMA or both non DMA but mixed NPG 
+jumpering.
+Suppliers should be able to help with this information.
+Failing that you could (with care) simply see what happens when you access
+the bus.
+All devices will configure properly  but DMA devices may not work if the 
+NPG is not contiguous in the correct way.
+Be especially  careful if disc drives are involved.
+It is always a good idea to set {\bf \it all}  drives to write protected when
+you are not sure about a configuration.
+Note that VMS will run in a limited way with even the system disc write
+protected.
+Also remember to check all devices on the bus after configuration changes.
+
+Another possible solution will be use use a different spare slot 
+or in some other way re-arrange things -- remembering that the idea is to 
+get contiguous grant lines.
+Major changes are {\bf \it not} recommended without an engineer since
+machines should really only be re-configured by DEC (or whoever is maintaining
+the system)
+
+
+\subsection{Q-BUS}
+
+\subsubsection{Cabling}
+
+Other than the cramped working space it is believed that there are few
+ significant problems with cables and cable routing with Q-BUS machines.
+On 3000 series machines however, problems may arise because of the 
+requirement for the baffles on the front of the boards.
+These can interfere with cables unless the correct baffles are available.
+
+\subsubsection{Backplane Integrity}
+
+The Q-BUS is much better than a UNIBUS from this point of view.
+ The only restriction is that there should be no empty areas between the
+ CPU and the last board or grant board.
+There is no need for grant boards after the last board (although note that
+some Q-BUSes are serpentine and the way the signals are routed is not
+obvious).
+
+The only complications arise because the backplane is divided into areas
+AB and CD for each slot.
+Each normal slot will take either 1 quad size board or two `dual' height
+boards.
+The word normal has been used because in some Q-BUSes the first slots 
+(on the right ?) are used for the CPU.
+In fact the first slot normally {\bf is} the CPU, 2 and possibly 3 are
+normally memory.
+ DEC in fact recommend that slot 3 is reserved for memory and although 
+ it is possible to use the AB position for a normal board it should, if
+ not used for memory, have a standard M9047 grant card in the AB position.
+ 
+ After these first 3 slots, the remaining are sometimes connected
+ in a serpentine fashion.
+ This in practice means that unless you can work 
+ out the pattern (see the CPU hardware manual), the safest thing is to
+make sure that the last quad slot is
+ completely filled by including a grant card if necessary.
+
+\subsubsection{Choosing a slot}
+
+The only rule that seems important (other than those detailed above)
+ is to have an Ethernet interface (Deqna or Delqa) as close to the CPU
+as possible.
+This seems to be over-ridden by a DZQ11 in at least one DEC configuration
+guideline.
+
+There will be other rules but they seem to change as new devices are used 
+and will not be dealt with in this section.
+
+\section{ADDRESSING}
+
+Addressing can be a very confusing on both UNIBUS and Q-BUS.
+As far as is known, these notes will apply to both, although the actual values 
+of some addresses and vectors differ from the UNIBUS tables supplied for 
+VMS when using a Q-BUS -- despite the appearance of Q-BUS devices in the 
+tables.
+
+Please note that the address of a device is totally independent of its
+physical placement within any given Q-BUS or UNIBUS.
+
+A list of terms used in addressing appears in Appendix B
+
+\subsection{Background}
+
+Each time VMS boots, it needs to locate the devices available on the system,
+load the appropriate device driver, and then associate (CONNECT) the device
+with the driver.
+This is done at boot time using the SYSGEN utility.
+Note that the boot device is made available very early in the boot.
+
+The rest of the devices are made available by either an automatic method
+or by commands entered into startup files by the system manager.
+
+It may be useful to describe what happens, when during the boot it occurs
+and how the manager can control the actions.
+
+\begin{sloppypar}
+The intended place for a manager to control the device configuration is the 
+file SYS\$MANAGER:SYCONFIG.COM.
+Here a manager can configure devices explicitly and, as may be useful for
+debugging configurations, switch off the normal automatic configuration
+of devices by the use of the following command.
+\end{sloppypar}
+\begin{quote}
+\begin{verbatim}
+$ STARTUP$AUTOCONFIGURE_ALL == 0
+\end{verbatim}
+\end{quote}
+
+\begin{sloppypar}
+However, it is sometimes necessary to place device configuration commands
+in either SYS\$SPECIFIC:[SYSEXE]SATELLITE\_PAGE.COM or SYPAGSWPFILES.COM.
+These are called before SYCONFIG.COM and so if page and swap files are to
+be installed on discs that are not yet available, configuration and mount
+commands will be needed in these files.
+\end{sloppypar}
+
+Note that discs that are served {\bf\it to} this machine are available without
+configuration but would need to be mounted.
+
+The automatic configuration that occurs after any SYCONFIG.COM has been 
+executed is achieved by the command SYSGEN AUTOCONFIGURE ALL.
+This causes the SYSGEN programme to search through the bus address space,
+looking for addresses that respond.
+If an address responds, assumptions are made depending on the actual address
+involved and an attempt is made to load the driver and connect the device.
+
+The assumptions are controlled by tables used by SYSGEN.
+DEC documents these tables in the SYSGEN UTILITY manual and sometimes in
+VMS Release Notes.
+
+Please also note that every documented table in recent years had errors
+--  the only table that really counts is the one used by the current version
+of the operating system!
+
+Full details of how is is believed SYSGEN AUTOCONFIGURE actually works
+  are contained in Appendix A -- hopefully it will not need to be consulted.
+
+\subsection{Addressing details}
+
+Before you start to change anything, you need to obtain your
+ current configuration. The basic command for this is:-
+\begin{quote}
+\begin{verbatim}
+$ RUN SYS$SYSTEM:SYSGEN
+SHOW /CONFIG
+\end{verbatim}
+\end{quote}
+
+This should be done when your system is fully configured -- i.e.
+when ready for normal use (or even during normal use).
+
+{\bf WARNING} -- all the SYSGEN SHOW commands are safe during normal
+ operations EXCEPT for SHOW/UNIBUS (is also used for Q-BUS) which should
+ never be used on a system during normal processing.
+While in general even this does no damage, the possibility is quite real.
+
+Two variations of SHOW /CONFIG could be useful -- a /OUTPUT=file-name
+ will put the output into a file for later reference and /ADAP=UB0 or UB1
+ will show just 1 UNIBUS.
+
+Below is an example of the output for a 750.
+\begin{quote}
+\begin{verbatim}
+
+	System CSR and Vectors on 17-JUL-1987 10:47:28.95
+ Name: DRA  Units: 1  Nexus:4  (MBA) 
+ Name: IDA  Units: 1  Nexus:8  (UBA) CSR: 764064  Vector1: 274  Vector2: 000
+ Name: MMA  Units: 1  Nexus:8  (UBA) CSR: 772440  Vector1: 224  Vector2: 000
+ Name: MTA  Units: 1  Nexus:5  (MBA) 
+ Name: DRC  Units: 4  Nexus:6  (MBA) 
+ Name: LPA  Units: 1  Nexus:8  (UBA) CSR: 777514  Vector1: 200  Vector2: 000
+ Name: TTA  Units: 8  Nexus:8  (UBA) CSR: 760100  Vector1: 300  Vector2: 304
+ Name: TTB  Units: 8  Nexus:8  (UBA) CSR: 760110  Vector1: 310  Vector2: 314
+ Name: XGA  Units: 1  Nexus:8  (UBA) CSR: 760404  Vector1: 320  Vector2: 324
+ Name: TXA  Units: 8  Nexus:8  (UBA) CSR: 760414  Vector1: 340  Vector2: 344
+
+\end{verbatim}
+\end{quote}
+
+It is necessary to identify which are DEC devices and which are 3rd party.
+Your  site management guide should help (the configuration section).
+Once it is known what devices there are and what there will be, SYSGEN can 
+be used give the expected configuration.
+
+
+If there are problems associating the physical devices with the addresses
+in use, look at the SHOW /CONFIG output for the current
+ system and find the name: field (without the trailing A B C) under the
+ DEVICE NAME column in a SYSGEN DEVICE table.
+ This should provide the full  device name in the Controller name column 
+ (e.g.\ an LPA --$>$ LP --$>$ LP11).
+These controller names are the ones that will be needed.
+
+\subsection{New Configuration}
+
+Having found all the names of DEC devices on the new configuration, it may be 
+necessary to consult the SYSGEN  CONFIGURE documentation in the VMS
+documentation of the utility.
+This shows how to enter multiple devices on the same controller and
+how to handle multiple UNIBUSes.
+
+To investigate new configurations, run SYSGEN, enter CONFIGURE and 
+then enter the {\bf current} set to see if it agrees with the current
+configuration.
+Then start again with a new CONFIGURE and enter the devices in the new
+configuration.
+Floating vectors or addresses are indicated with an *.
+
+If this is a pure DEC system, it should have been completely described
+and the rest of this section can be ignored.
+
+If this is not a pure DEC or DEC compatible system you need to 
+check that there are no conflicts between your new DEC addresses and the 
+non DEC ones.
+This may not be quite as simple as it sounds.
+Check all the devices in the sysgen tables for the number of vectors and
+number of registers since you need to leave 4 bytes of space for each
+vector and probably 4 bytes for each register with an extra 8 bytes at
+the end of each device.
+The worst case is probably a DMF 32 which has 8 vectors and 16
+registers.
+Also remember that you are working in {\bf OCTAL} !
+If there are conflicts then  something will have to be moved -- probably
+the non DEC things are safest.
+Note that the vectors and addresses are not tied
+together and for fixed ones  can be changed without problems. 
+
+Be {\bf very} careful about non DEC devices that are said to be 
+DEC compatible.
+For example the UNIBUS MBS DR-11W equivalent would be
+expected  to have addresses of a DR-11W -- however, when the actual
+addresses it uses are those of a DR-11B.
+The Q-BUS version actually does use the addresses of a DEC DR-11W !
+
+
+\subsection{Preparing to Set addresses and vectors}
+
+If addresses on boards need to be changed, the manuals must be found for them. 
+It is probably wise to find all such manuals in any case just in
+ case they are needed. Make sure that all the tools that may be needed
+are available -- e.g.\  anti static wrist strap, wire wrap tools, soldering
+iron etc. 
+
+\subsection{Check software}
+
+The drivers for DEC or DEC compatible devices that say SUPPORTED YES
+ in the sysgen tables are loaded automatically when the machine autoconfigures.
+ If the driver is absent from SYS\$SYSTEM (VMS 4) or SYS\$LOADABLE\_IMAGES 
+(VMS 5) there will be an error reported.
+ If SUPPORTED  NO then
+ the address and vector space is allocated but no driver loaded and no error
+ reported.
+
+ Ensure that all the correct drivers in the correct places
+ and that it is known which files are used to configure any that are not loaded
+ by sysgen. Inspect to SYS\$MANAGER:SYCONFIG.COM and your startup files -- not
+ forgetting things like PSIxxxLOAD that also may have addresses.
+
+ Remember that all the logical names above are normally search lists.
+
+\subsection{Re-configuring}
+
+Should now be ready to re-configure the machine.
+The notes in SSN 47 about memory replacement give a guide to how to handle
+boards using  grounding wrist straps etc..
+Also note that if using a currently  empty UNIBUS slot there will be a grant
+card in it. It will need to be removed which may well entail removing other
+boards to get enough working space. 
+
+Always allow plenty of time for these operations and do not rush !
+
+Once any addresses have been reset and the boards inserted,
+try to boot the machine again but you want to write protect disks and 
+generally do a `no users' type of boot.
+Remember that even the normal autoconfigure can be prevented either as 
+described above or by invoking a minimum startup -- that is setting 
+STARTUP\_P1 to ``MIN".
+Useful things  to do in these conditions include using
+SYSGEN SHOW /UNIBUS to see what  bus addresses respond.
+Note the output shows all the addresses that respond not just device CSR
+addresses.
+Try autoconfiguring  by hand using SYSGEN AUTOCONFIG  with perhaps ALL or for
+selected devices.
+See  the SYSGEN manual.
+All of this will just check that the addresses are correct.
+It will NOT check that you have all the grants properly installed.
+The  only way to fully check is to actually use all the
+devices.
+Note that  incorrect jumpers can affect devices other than the one
+or slot in error. 
+
+\appendix
+\section{Sysgen Autoconfigure}
+
+Or how SYSGEN AUTOCONFIGURE is believed to work.
+
+\begin{itemize}
+
+\item ignores some addresses completely - the so called NON-Digital or USER
+addresses.
+
+\item It works purely on the Table order given in the SYSGEN manual
+but often updated by VMS release notes but remember that the only table
+that really counts is the one inside SYSGEN. Also the printed tables are
+sometimes in error.
+
+\item When it finds a device at an address, looks for the
+corresponding driver in SYS\$SYSTEM (VMS 4) or SYS\$LOADABLE\_IMAGES (VMS 5)
+-- both logical names are usually search lists.
+If driver is not there and
+and device is {\bf supported}, it gives an error.
+If device is {\bf\it not} supported, allocates CSR and vector space and
+gives no error.
+
+\item Each device has a known first try address - even the `floating'
+ones. The ones that float will have changing addresses. If there
+is a preceding `floating' device seen, any floating device will
+use its second address as first try unless the previous floating
+address defined is too close when it will move on to the next etc.
+
+\item The floating addresses start at 760010 (a DJ11) and continue to
+about 761000 (multiple AAV11D s !)
+
+\item Floating vectors are assigned in order in which floating vectors
+are seen starting at 300. Note that some devices with fixed csr can
+have floating vectors.
+
+\item Some devices have multiple entries in the SYSGEN tables with
+the first line with fixed CSR and a float entry (s) afterwards.
+As one would guess, the first device of this type is at the fixed
+address but a second would take a corresponding float address.
+\end{itemize}
+
+\subsection{Notes}
+
+\begin{itemize}
+\item Some devices appear {\bf\it twice} in the table at widely spaced
+intervals - e.g.\ UDA occurs early as a fixed device and then
+a couple of pages on as a float. Presumably this means that
+the first is fixed but a second is FLOAT and is separated because
+of floating address ordering. Moral - make sure you start looking
+for a device {\it starting at the beginning of the sysgen tables} !
+
+Also note that `first' and `second' mean, for these purposes, the order
+in which SYSGEN locates devices as it searches the address space in its
+pre-defined fashion.
+It has nothing to do with physical placement and not necessarily anything
+to do with order in address space.
+Suppose it is possible for some of the very clever controllers whose address
+and vectors are loaded dynamically may break this rule but it is thought 
+that the identity problem this may produce is resolved by straps on the board 
+which define the device order.
+
+\item Some devices (for example UDA) actually work in an even more
+complicated way.
+Their addresses and vectors can be set by AUTOGEN itself!
+These would usually have no physical way to set the address and vector 
+although they may have straps to define if it is the first or second
+similar device.
+Under some circumstances, it may appear that the device has not actually 
+configured but it will do later.
+(I believe this can occur when autoconfigure has been suppressed and a
+SHOW/UNIBUS is performed but this is open to correction).
+
+\item The UNIBUS MBS DR11-Ws for the Digisolve IKON in fact have addresses
+that correspond to a DR11-B !
+
+\item Full details can be found in the Guide to Device drivers starting
+at section 14.3 (VMS 4) or in Device Support Manual section 15.4 (VMS 5).
+Other related sections may also be useful.
+    
+\end{itemize}
+
+\section{Terms in addressing}
+
+\begin{itemize}
+\item{CSR} is the device Control and Status Register and is what is
+ normally called the device address.
+ Note however that multifunction devices like the DMF-32 can actually appear
+ to have more than one CSR.
+ In the example above, XGA and TXA are actually two of the DMF-32
+ devices.
+ The actual base address of the DMF-32 in the case above is 760400
+ which does not appear in the list !
+
+\item{FIXED address} This is an address that does not change because of
+ other devices currently configured in the machine.
+They are addresses outside the ranges described below.
+
+\item{FLOATING address} This is an address that depends on what other
+ floating address devices have been configured when SYSGEN first sees them.
+ Floating addresses start at 760010 and continue until approximately
+ 761000.
+
+\item{USER address} These are addresses that SYSGEN totally ignores when it
+ configures the machine automatically.
+They are approximately 764100 through to 767776.
+These are often used by third party devices and, provided the device has
+fixed address and vector and these are well seperated from other 
+addresses and vectors, they should take no part in autoconfiguration.
+
+\item{FIXED vector} These are vectors that do not depend on other devices.
+
+\item{FLOATING vector} These are vectors that depend on what other floating
+vectors have already been seen.
+\end{itemize}
+\end{document}
+

@@ -1,0 +1,324 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocnumber}    {5.1}
+\newcommand{\stardocauthors}   {A C Davenhall}
+\newcommand{\stardocdate}      {13 May 1990}
+\newcommand{\stardoctitle}     {APIG --- Installation Guide \footnote{Document version number 1.                 
+This document applies to APIG version 1.0.}}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+%------------------------------------------------------------------------------
+
+
+
+\section{Readership}
+
+You should read this document if you are a system manager of other 
+person intending to install the APIG software for analysing high
+resolution spectra of interstellar absorption lines on a VAX running 
+VMS.
+
+\section{Introduction}
+
+APIG is a Starlink associated software item. It is distributed by the
+Starlink project from the Rutherford Appleton Laboratory and this note
+describes how to install it. It is assumed that you will be installing
+it on either a Starlink node or at least a VAX where Starlink software
+is available.
+
+If you are attempting to install it on a VAX which does not have any 
+other Starlink software then some additional items are required (see
+`Starlink software required' below). Note that some of these items are
+not available in the public domain and a license may be required. If you
+are attempting to install it on anything except a VAX running the VMS
+operating system then forget it!
+
+\section{Starlink software required}
+
+APIG requires the following items of either Starlink software or 
+proprietary software distributed with the Starlink software collection:
+
+\begin{enumerate}
+
+  \item RAL GKS 7 (see SUN 83, SSN 39).
+
+  \item The NCAR graphics system (see SUN 88).
+
+  \item The CHR library of character handling subroutines (see SUN 40).
+
+\end{enumerate}
+
+Note that the various command procedures used by APIG assume the 
+standard Starlink logical names, locations and filenames for these 
+items. The CHR and NCAR libraries should only be required if the APIG
+execution modules have to be regenerated. However, the execution 
+modules supplied with the release assume that a RAL GKS shareable
+image is available in the standard Starlink form.
+
+\section{Directory structure}
+
+A `root' directory or subdirectory to hold APIG should be created at 
+some convenient point in your directory structure. This directory or
+subdirectory should be called APIG. The save set containing APIG can 
+then be re-constructed in this directory. The following directory
+structure will be created;
+
+\nopagebreak
+\begin{verbatim}
+
+  APIG --+-- .COM     Command procedures.
+         |
+         +-- .DATA    Data files.
+         |
+         +-- .DOCS    Documentation.
+         |
+         +-- .HELP    On-line help library.
+         |
+         +-- .RUN     Execution modules.
+         |
+         +-- .SOURCE -+-- .INCLUDE  Include files.
+                      |
+                      +-- .LIBS     Libraries.
+                      |
+                      +-- .MPROG    Main programs.
+
+\end{verbatim}
+
+\section{Logical names and symbols}
+
+A number of logical names and symbols have to be set up in order to make
+APIG available to users. You should carry out the following steps:
+
+\begin{enumerate}
+
+  \item First define the following logical name in the system logical
+   name table:
+
+   \begin{verse}
+
+DEFINE/SYSTEM  APIGDIR (APIG\_root) -- set up in LSSC:STARTUP.COM
+
+   \end{verse}
+
+   where (APIG\_root) is wherever you have chosen to place the APIG root
+   directory.
+
+  \item Arrange for users to run command procedure 
+
+   \begin{verse}
+
+APIG*SETUP :== APIGDIR:SETUPAPIG.COM  -- set up in SSC:LOGIN.COM
+
+   \end{verse}
+
+   prior to their attempting to use APIG.
+
+
+   The logical names and symbols set up by SETUPAPIG.COM are as 
+   follows:
+
+   \begin{description}
+
+     \item[APIGDOCS] (logical name) Directory containing documentation.
+
+     \item[APIGDATA] (logical name) Directory containing data files.
+
+     \item[START\_APIG] (symbol) Runs a command procedure to set up for
+      using APIG.
+
+     \item[RUN\_APIG] (symbol) A command procedure to use APIG in its
+      simplest form.
+
+     \item[PROGAM\_APIG] (symbol) A command procedure to set up further
+      logical names and symbols only necessary for maintenance and
+      development of APIG.
+
+   \end{description}
+\end{enumerate}
+
+APIG should now be available for use (but see `customising the graphics
+devices' below, if you have any graphics devices other than the usual
+Starlink ones).
+
+\section{Check that APIG is working}
+
+As a quick check that APIG is working type
+
+\begin{verse}
+
+START\_APIG
+
+\end{verse}
+
+followed by
+
+\begin{verse}
+
+CONTROL\_APIG
+
+\end{verse}
+
+and a prompt should appear. If it does all is ok and you can type 
+control\_Y to break out. If it does not something is awry.
+
+\section{Customising the graphics devices}
+
+APIG has two text files which describe the various GKS workstations
+that it knows about: 
+
+\begin{description}
+
+  \item[APIGDATA:MONITORS.DAT] for interactive devices.
+
+  \item[APIGDATA:PLOTTERS.DAT] for hard-copy devices.
+
+\end{description}
+
+These files contain most of the standard Starlink graphics devices
+current when they were created. Devices are available to APIG {\em
+only} if they are included in one of these files. Thus you may wish to
+edit them to reflect the devices available at your site. Each line of
+the files refers to a separate device. The various columns of the
+files are (reading left to right):
+
+\begin{enumerate}
+
+  \item The RAL GKS workstation type number for the device.
+
+  \item The GKS connection identifier to be used (usually = 0).
+
+  \item A brief description of the device which will be presented to
+   the user. It should be enclosed in single quotes.
+
+\end{enumerate}
+
+\section{Resources required by users}
+
+Users should not require any special resources, quotas or privileges
+to use APIG, just a few hundred blocks of file space for data files,
+log files, plotter files etc.
+
+\section{Further information}
+
+Further information on the use of APIG can be found in the APIG user 
+guide. The Latex source for this document is available in file
+
+\begin{center}
+
+APIGDOCS:USERGUIDE.TEX
+
+\end{center}
+
+\section{Relinking}
+
+If you need to relink APIG the following procedure should be followed
+
+\begin{enumerate}
+
+  \item Issue the command
+
+   \begin{verse}
+
+PROGRAM\_APIG
+
+   \end{verse}
+
+   which sets up the logical names and symbols necessary for program
+   development and maintenance, including those for relinking.
+
+  \item To generate new execution modules type
+
+   \begin{verse}
+
+LINK\_APIG CONTROL
+
+LINK\_APIG APIG
+
+   \end{verse}
+
+  \item Check that the new execution modules are working satisfactorily
+   (see above).
+
+  \item To purge the old execution modules
+
+   \begin{verse}
+
+PURGE APIGRUN:*.EXE
+
+   \end{verse}
+
+\end{enumerate}
+
+\vspace{15 ex}
+
+\begin{verse}
+
+A C Davenhall.
+
+Royal Observatory,  \\
+Blackford Hill,     \\
+Edinburgh.          \\
+EH9 3HJ.            \\
+UK.
+
+ACD @ UK.AC.ROE.STAR (Janet)
+
+\end{verse}
+
+\typeout{  }
+\typeout{***********************************************}
+\typeout{  }
+\typeout{Reminder: run this document through Latex twice}
+\typeout{to resolve the entries in the table of contents.}
+\typeout{  }
+\typeout{***********************************************}
+\typeout{  }
+
+\end{document}
+
+
+\end{document}

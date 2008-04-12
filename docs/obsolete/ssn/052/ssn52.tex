@@ -1,0 +1,957 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+\markright{SSN/52.1}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+\renewcommand{\_}{{\tt\char'137}}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill SSN/52.1\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf Starlink System Note 52.1}
+\begin{flushright}
+A P Lotts\\
+28 March 1988
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf Clustering and Installing Satellite Nodes}
+\end{center}
+\vspace{5mm}
+
+{\setlength{\parskip}{0mm}
+\tableofcontents}
+\markright{SSN/52.1}
+\newpage
+
+\section {Introduction}
+
+This note describes basic clustering and the installation of a MicroVax or
+VaxStation as a Satellite node of an LAVC (Local Area VaxCluster).
+It will NOT describe Dual Porting of a MicroVax.
+It assumes that VMS 4.6 is running on the Boot node, that the LAVC key
+has been applied and that BOOT\_CONFIG has been run as described in the LAVC
+manual.
+
+The first sections will provide information and comments on the procedures
+described in the LAVC and Guide to VAXclusters manuals while the installation
+of the Windows software for use with a VaxStation is described in
+section~\ref{windows}.
+
+\section {Preparation}
+
+\subsection {Disc space}
+
+Part of the main advantage of clustering is that there is only one copy needed
+of almost all the software --- both system and user.
+However, all the CPUs in the cluster still need certain system files that are
+private or perhaps are not used by all the CPUs within the cluster.
+These are files that in general reside in each node's SYS\$SPECIFIC directory
+structure.
+Obvious examples are the PAGE, SWAP and DUMP files.
+These are the only files of significant size and so represent the only major
+disc space penalty for clustering.
+It is worth making several comments about them here since some planning
+will be required --- especially if adding multiuser satellites.
+
+First how and when are they created?
+
+Page 3-7 in the VMS 4.6 version in the LAVC manual has an example session of
+SATELLITE\_CONFIG.
+This actually shows what happens when a {\em local} disc is used for paging
+and swapping.
+Note that in this case a temporary pagefile of 10000 blocks is created by the
+procedure on the system disc and then, on first boot of the satellite, the
+{\em real } ones are created on the local disc by SATELLITE\_CONFIG which has
+waited for the boot.
+The temporary pagefile is later deleted.
+
+For most of our systems there is no local disc in which case things occur
+differently.
+SATELLITE\_CONFIG creates the SWAP and PAGE files that are specified as it
+runs and does not wait for the satellite to boot.
+
+It is important to note that for both cases the default sizes are in fact the
+{\em minima} that the command procedure allows so that even it is intended to
+provide secondary page and swap files later, this space will be needed.
+Even if it is intended to use smaller primary files later, the space to have
+both the old and new primary files on the system disc together may be required.
+
+Next consider carefully what size of PAGE and SWAP files are required for 
+the satellite.
+The UAF file is {\em common} and so a single user with a pagefile quota of even
+18000 could completely fill a 20000 block pagefile.
+Even a so called single user machine like a VaxStation allows multiple processes
+by a user and each process may have (and need) the UAF quota of pagefile.
+For example, the LSE of VaxSet recommends a {\em minimum} quota of 20000!
+And if {\em normal} batch jobs may be used as well, there will be trouble with
+small pagefile and swap files.
+
+Finally while discussing PAGE and SWAP files, Section 3.1.1 of the LAVC manual
+mentions using SATELLITE\_CONFIG to {\em remove} and then {\em add} a node in
+order to change the PAGE and SWAP file positions.
+If this is done, remember that it deletes {\em all} the files in the
+SYS\$SPECIFIC directories and so there is a need to save and restore any
+important files (being careful about any existing SATELLITE\_PAGE.COM).
+
+The DUMP file (SYSDUMP.DMP) has not been mentioned yet.
+This file is normally created by AUTOGEN when the satellite first boots.
+It is slightly larger than the memory size so for a 6 Mbyte machine it uses
+12000 blocks.
+As a temporary (or even a permanent) measure its creation can be prevented
+by modifying the SYS\$SYSDEVICE:[SYSn.SYSEXE]MODPARAMS.DAT file that 
+SATELLITE\_CONFIG creates before the AUTOGEN run of the satellite's first boot.
+(If using {\em local} page and swap files it can be edited
+using another terminal before telling SATELLITE\_CONFIG which disc to use.)
+
+If space is tight on the system disc and you are busy creating and changing
+sizes of pagefiles etc, you will probably hit disc fragmentation problems
+since page, swap and dump files can only use a limited number of physical
+file fragments.
+One solution is to do a standalone BACKUP save and restore of the system
+disc. Note that with VMS 4.6, {\em both} of these can be done when the
+standalone BACKUP has been booted {\em from} the system disc --- provided there
+is at least 2 MBytes of good memory.
+However, if you do a BACKUP save and restore before you start you could
+use the procedures for manipulating page and swap files that are included
+in section~\ref{manip_ps} to good effect.
+
+\subsection {Initial file placement}
+
+It is important to correct file placements before adding satellites to avoid
+later confusion.
+Some placements are arguable but in general all standard software and common
+data files should be in the SYS\$COMMON area while files specific to a processor
+should be in the SYS\$SPECIFIC directories.
+Sometimes there are corresponding files in both directory trees.
+The standard version would normally be in SYS\$COMMON while other versions
+may exist in some SYS\$SPECIFIC directories.
+
+Try to sort out common and specific files before adding the first satellite.
+Note that software specific to nodes that are not the boot node resides
+in the COMMON directories although files that control the software may be
+in SPECIFIC directories.
+Also note that some initial files should be left in the common directories
+to act as defaults for satellites.
+
+If it is discovered that permanently open files like ACCOUNTNG.DAT are in the
+COMMON directory tree a useful trick is to create a temporary file of the
+same name (and appropriate version number) in the correct directory tree
+and then force VMS to create a new version.
+For example, for ACCOUNTNG.DAT use the SET ACCOUNT /NEW.
+Then simply delete the temporary file and RENAME old versions using commands
+like:
+\begin{verbatim}
+    $ RENAME /CONFIRM SYS$COMMON:[SYSMGR]ACCOUNTNG.DAT;*  SYS$SPECIFIC:
+\end{verbatim}
+The lists in Appendix A are divided up into COMMON and SPECIFIC and show file
+placements {\em after} satellites have been added. 
+
+The list below identifies some of the more important the files that should be
+moved  to the boot node specific directories {\em before} adding any satellites.
+\begin {itemize}
+\item {ACCOUNTNG.DAT :}
+\item {OPERATOR.LOG :}
+\item {[SYSERR]*.*;* :} All errorlog files {\em except } ERRSNAP.COM --- needed
+ for 8000 series machines (?).
+\end {itemize}
+
+It is also necessary to make sure that SYSTARTUP.COM is correctly placed
+and understands what to do with any new satellites.
+See the section on system startup.
+
+\section {Using SATELLITE\_CONFIG}
+
+It is recommended but not essential that the WorkStation software (VWS) be
+installed on the boot node before adding a WorkStation.
+See later for details if using VaxStation 2000 or any other VaxStation in the
+cluster.
+
+\subsection {Adding a satellite}
+
+This section will attempt to explain what SATELLITE\_CONFIG actually does when
+{\em ADDING } a new satellite.
+
+Adding a satellite is best performed when running in a standalone mode with
+no users or batch jobs and with any X25 network lines switched off.
+However it is necessary that the Ethernet is running.
+The reason for this requirement is that the procedure actually switches off the
+Ethernet for a while and if the boot node is running slowly there will be
+some very upset users!
+
+Follow though the procedures described in the LAVC manual, noting that it is
+possible to intervene to prevent DUMPFILE creation as described above.
+
+A file called NETNODE\_UPDATE.COM is created (or modified) on the boot node
+in directory SYS\$SPECIFIC:[SYSMGR].
+This contains the information required to update the DECnet databases to allow
+the satellites to boot and should be used whenever the NCP command
+PURGE KNOWN NODES ALL has been used.
+(e.g.\ AREA.COM may contain this command).
+
+Apart from the obvious directory tree structures, the procedure creates and
+copies various files into the new SPECIFIC structure for use in the initial
+boot of the satellite.
+Some of these files are described below.
+
+\begin {description}
+
+\item {\bf MODPARAMS.DAT} This file is created and placed in [SYSEXE].
+
+\item {\bf VMSIMAGES.DAT} This is copied from SYS\$COMMON:[SYSMGR] and should be
+the initial file from VMS installation.
+It is normally 6 blocks rather that the full sized 9 block file.
+It probably does not matter if the initial version has been lost due to
+purges but a version should exist in this directory.
+
+\item {\bf VAXVMSSYS.PAR} This is created in [SYSEXE] as an initial set of system
+parameters.
+It actually uses as a seed a file called VAXVMSSYS.EVC if it exists in
+SYS\$MANAGER:.
+
+\item {\bf STARTUP1.COM} This is the startup file for the initial boot and is
+created by SATELLITE\_CONFIG.
+It does a couple of things, the most devious is to execute @NETCONFIG with a
+a set of defaults that mean that it uses an account DECNET for the default
+DECnet account, creating one if it does not exist.
+It has been decided to leave this default account with the intention of
+changing over all the DECnet default accounts (currently NETUSR) to DECNET
+at some time in the future.
+It does not matter if nodes in a cluster have different DECnet default accounts.
+NETUSR will in future only be used for the Coloured Books Software.
+
+\begin{sloppypar}
+The other major function is to run AUTOGEN with option REBOOT.
+When the satellite reboots it will use the standard startup procedures --- 
+SYS\$SYSTEM:STARTUP.COM call\-ing SYS\$MANAGER:SYSTARTUP.COM.
+\end{sloppypar}
+
+\end {description}
+
+\subsection {Removing a satellite}
+
+If there is a need to REMOVE a satellite, please consider the following.
+\begin {itemize}
+
+\item The whole specific directory structure is deleted.
+\item The DECnet databases are tidied and NETNODE\_UPDATE.COM is corrected.
+\item Normally there are files that should be saved before the directory tree is
+deleted.
+For example, accounting, node startup files and perhaps the errorlog files.
+\item If it is intended to restore the files after re-adding the node, be very
+careful {\em which} files are replaced and {\em when} they are replaced.
+Do not replace {\em any} files before the first boot and re-boot of the new
+node without considerable thought.
+Even after this, care needs to be used with any AUTOGEN files and also
+any log type files which will have been re-created by the installation.
+\end {itemize}
+
+\section {After Installation}
+
+This section is divided into two subsections.
+First, comments and hints on system startup and second, some general comments
+on Cluster operations.
+
+\subsection {System startup}
+
+It is assumed that the comments and procedures described in the LAVC and
+Guide to VAXclusters manuals have been {\em read}.
+The following is purely some comments on these.
+
+The startup procedures described in the Guide to VAXclusters are relevant
+but overly complicated for an LAVC cluster.
+They are for a full CI cluster where, in general, nodes boot and shutdown
+almost independently.
+An LAVC is different in that the boot node must be running before any other
+satellite can boot.
+This simplifies the necessary command procedures considerably.
+After the cluster is running it appears to be possible for the  boot node
+to fail and reboot without the satellites requiring rebooting although
+the full effects of this have not been fully investigated.
+
+
+DEC recommend that the only file called SYSTARTUP.COM that will be found in
+SYS\$MANAGER: is in SYS\$COMMON:[SYSMGR].
+Indeed the installation of the Workstation software will fail if this file does
+not exist.
+
+From this point there are two basic ways in which the startup files may be
+constructed.
+The most obvious and perhaps the easiest initially is so simply branch from
+the common SYSTARTUP.COM to node specific startup files using commands like:
+\begin{verbatim}
+    $ @SYS$MANAGER:<node>_SYSTARTUP.COM
+\end{verbatim}
+These node specific files could then use common files for some operations.
+
+However, as the number of nodes increases this gets rather out of hand and
+leads to duplication and some confusion.
+
+The better technique, currently being developed by David Terrett at RAL, is
+to make the common SYSTARTUP genuinely common.
+The idea is to have node specific files that define, using symbols, the
+characteristics of the booting node.
+These characteristics are then used to control the common startup file.
+By the use of commands like @SYS\$MANAGER:filename it is possible to
+branch either to a node specific file or to a cluster common default file
+residing in the SYS\$COMMON version of the [SYSMGR] directory.
+
+If carefully constructed this opens up many possibilities including things
+like easy interactive boots on any node and good error handling.
+One could even consider of a Starlink wide standard startup file which would
+be of considerable to use new managers.
+
+Getting the startup correct for nodes with different characteristics can be
+quite complicated.
+An example of node specific items that might be forgotten is the setting up
+of SGS devices by LSSC:STARTUP.COM.
+It is {\em very} annoying and confusing for a user to be given the choice of
+plotting on a device which is in fact not available.
+
+Below are some comments on specific areas of startup procedures.
+
+\subsubsection {Mounting discs}
+
+Any node in a cluster can provide the rest of the cluster with access to the
+discs that are directly connected to it --- i.e. local.
+This is done using the MSCP server software.
+By default the boot node of a cluster will set SERVED all the discs that can be
+seen as the node begins booting.
+This occurs very early in the boot sequence, before any SYCONFIG has been
+executed to configure devices that will not AUTOCONFIGURE.
+Thus, if there are discs that are configured by the startup procedures and
+it is intended to serve them to the cluster, then SET DEVICE/SERVED commands
+will be required.
+Note that a disc still has to be mounted on a remote node for it to be used by
+that node.
+It does not need to be mounted on its local node for it to be used by others.
+
+Once a disc has been set served, it is made available to any other nodes
+{\em currently} in the cluster using the /CLUSTER modifier of the MOUNT command.
+If /CLUSTER is used the default is also /SYSTEM.
+Only /GROUP or /SYSTEM types of mount are possible with /CLUSTER.
+
+It is important to realize that the /CLUSTER really means that {\em this} node
+is attempting to provide the disc as a service to others.
+In fact is is believed that it can be used without effect for discs that are
+already being served and are not local to the node although this is not
+recommended.
+
+If a node wishes to mount a disc that is not local, it should use commands like:
+\begin{verbatim}
+    $ MOUNT/SYSTEM/NOASSIST ZZ750$DRC5 SCRATCH
+\end{verbatim}
+were ZZ750 is the name of the remote node.
+The /NOASSIST is important since it will abort the mount request if the node or
+disc happens to be not available at the time.
+
+The other point that may be worth mentioning is that if a satellite is using
+a local disc for its primary page and swap files and the disc is to be served
+to the cluster, appropriate modifications may be necessary to
+SATELLITE\_PAGE.COM.
+
+One point of confusion is whether the boot node should attempt to mount discs
+on its satellites.
+At first sight this seems stupid since the boot node always boots first.
+However, it seems to be possible for a boot node to crash and restart without
+the satellites rebooting (and hence issuing the MOUNT/CLUSTER commands for
+their local disc).
+What happens then?
+
+To summarise, a node should set SERVED all its local discs and then mount them
+using /CLUSTER .
+It should also mount using /SYSTEM/NOASSIST all discs on remote nodes.
+
+\subsubsection {Queues}
+
+The batch and print queues on a cluster are common to the cluster for both users
+and management since the common file SYS\$COMMON:[SYSEXE]JBCSYSQUE.DAT is used.
+
+It would appear that the DEC recommended method of for initializing and
+starting queues is time consuming and perhaps not appropriate in our type of
+LAVC environment.
+
+Our recommended method is to define (i.e. INITIALIZE but not START) all the
+queues in the cluster in a file independent of any startup procedures.
+Then each node should simply START the queues that are local to it.
+The boot node should also start any GENERIC queues.
+
+Remember to define any logical names relating to queues on {\em all} nodes
+during node startup.
+
+A couple of problems have arisen related to GENERIC batch queues, although
+any node that allows multiple jobs in an execution queue may have already
+encountered the major problem.
+
+The major problem is that concurrent execution of jobs can cause file access
+conflicts.
+If a user queues several jobs they may be expecting that they are run in order.
+In the case of generic queues, or if multiple jobs per execution queue are
+allowed, this would probably not happen.
+Sometimes even if the user thinks that concurrent execution is possible, it
+may not be true.
+An example of this latter case is running ADAM in batch.
+
+One solution is to only use single job execution queues and to tell users
+about the possible problems so that they can queue such jobs to execution
+queues rather than generic queues.
+The other solution is to provide techniques that allow users to submit jobs
+in a HOLD state to queues and then to release the next job as the preceding
+job completes.
+Problems can arise in deciding which is the next job of a sequence.
+
+The other problem is that it seems to be impossible to {\em force} users to
+use generic queues.
+It appears that for a job to execute in an execution queue, the user must have
+normal access to that queue as well as to the generic queue that feeds it.
+
+\subsection {Cluster operations}
+
+One of the most important and confusing things about managing a cluster is that
+when logged in under usernames like SYSTEM there is a logical name search list
+in operation when logical names like SYS\$MANAGER and SYS\$SYSTEM are used ---
+SYS\$MANAGER is the default directory when logged in as SYSTEM.
+The actual logical name search list in use is SYS\$SYSROOT translating to 
+SYS\$SPECIFIC: followed by SYS\$COMMON: where the SYS\$SPECIFIC refers to
+the login node.
+Apart from the dangers of accessing both sets of files with commands like PURGE
+and BACKUP, strange effects occur when a DIRECTORY command is performed on
+devices like tapes --- the command is essentially performed twice!
+If the manipulation of files in only the COMMON or SPECIFIC areas is required,
+using SET DEFAULT SYS\$COMMON or SET DEFAULT SYS\$SPECIFIC is very useful both
+to avoid incorrect actions and to speed the work.
+The use of /CONFIRM is recommended on interactive DCL commands that are
+manipulate files in these directories.
+
+\subsubsection {Network}
+
+Several points about clusters and the network.
+
+\begin {itemize}
+\item {\bf Alias} 
+~~~Ensure that all nodes are set up to have the correct DECnet node
+name as the alias.
+
+\item {\bf Incoming Connections}
+~~~By default satellites are set up with Alias Incoming Disabled.
+This means that connections directed to the cluster alias will all be handled
+by the boot node.
+
+It may be suggested that these calls should be shared around the cluster nodes
+by setting Alias Incoming Enabled.
+This has two problems.
+First, several of the DECnet objects are explicitly disabled from handling
+alias calls --- e.g.\ PHONE and TALK (which should be defined like PHONE).
+This is because the intention is to communicate with a particular process and
+so with a particular machine.
+When an incoming alias call is received by the boot node, if any other node has
+Alias Incoming enabled, it may be passed on to it.
+If that object cannot receive alias calls then the call is canceled with a
+`network object not known' message.
+This causes considerable confusion since if handled by the boot node it works
+and so the remote user finds sometimes a command works and sometimes it does
+not!
+
+Secondly, the calls are shared out with a `round robin' technique --- there is
+no load sharing or any other type of intelligence involved.
+Thus a SET HOST command can send the remote user to a machine which has its
+maximum user limit exceeded (among other problems).
+
+Please note that these comments only apply to DECnet connections --- LAT
+connections from DECservers can have some load sharing effects.
+
+\item {\bf Databases}
+~~~It is important to remember that the remote node database is (or should be)
+shared.
+This means that a command like MC NCP PURGE KNOWN NODE ALL on {\em any} machine
+in the cluster will purge all knowledge of any other nodes other than the
+local node on {\em all machines in the cluster}. 
+In this particular case it would mean that the satellites would not boot again
+once the volatile database on the boot node is cleared.
+This could take quite a long time to discover and be very puzzling!
+
+Another point to remember is that if the remote node databases are updated
+using DEFINE commands to change the permanent database, the NCP command
+SET KNOWN NODE ALL needs to be executed on all nodes to update the volatile
+databases.
+If this is not done, the new definitions will not take effect until each of
+the nodes has rebooted.
+
+Finally it is perfectly safe to use files like STARLINK\_NODES.COM to update
+the databases even when they contain the definitions of the local nodes 
+(as long as these are correct of course!).
+
+\end {itemize}
+
+\subsubsection {Mail}
+On each machine in the cluster the following logical name should be defined.
+\begin{verbatim}
+    $ DEFINE/SYSTEM/EXEC MAIL$SYSTEM_FLAGS  7
+\end{verbatim}
+See page 14 of the MAIL manual since some off its actions may not be required.
+It is essential however that the bit that defines cluster operation is retained.
+This means that outgoing mail is stamped with the cluster alias so that REPLY
+will work even if the node that originally sent the message is not available.
+
+Another item is incoming mail for usernames with search list login directories
+like SYSTEM.
+It has been noted that incoming CBS mail is lost if a) it is of more than 3
+blocks,  b) if a mail subdirectory is in use and c) if the mail subdirectory
+is in SYS\$COMMON:~.
+The problem is due to the way that CBS hooks into VMS MAIL and certain features
+of the way logical name search lists are used by VMS.
+
+The best cure for this (suggested by David Terrett) is to make sure that
+any mail subdirectory {\em is} in the common directory tree and then to
+enter the command:
+\begin{verbatim}
+    $ SET FILE/ENTER=SYS$SPECIFIC:[SYSMGR]MAIL.DIR  SYS$COMMON:[SYSMGR]MAIL.DIR
+\end{verbatim}
+where it is assumed the subdirectory has been called MAIL.
+
+It is probable that this need only be performed on the node running CBS.
+
+\subsubsection {Logical names}
+Logical name tables are node specific so that if there is a need to change a
+logical name (for example when installing an SSC) the logical name definition
+must be repeated on all nodes to which it applies.
+
+\subsubsection {User quotas}
+As already previously mentioned, the User Authorisation File is (or should
+be) common within the cluster.
+When machines have very different characteristics this causes a problem.
+The previous example concerned the Page File Quota and node Pagefile sizes
+but another problem is that the memory on different machines may be vastly
+different.
+Normally on a memory rich machine the user quotas like WSQUOTA and WSEXTENT
+would be set larger than on a machine where memory is restricted.
+
+\subsubsection {Dismounting discs}
+
+The command to dismount a served disc in the cluster environment is:
+\begin{verbatim}
+    $ DISMOUNT/CLUSTER
+\end{verbatim}
+There are several comments that need to be made regarding dismounting discs
+since this command is powerful.
+In the examples below a logical name could be used in place of the node\$device.
+
+\begin {itemize}
+\item Only use DISMOUNT/CLUSTER for a disc that is {\em local} to the node
+on which the command is executed.
+If the disc is a remote disk {\em it will be dismounted on all nodes in the
+cluster!}.
+
+\item The full command should be of the form:
+\begin{verbatim}
+    $ DISMOUNT/CLUSTER/ABORT node$device
+\end{verbatim}
+The /ABORT will close any current remote access to the disc.
+
+\item The command to dismount discs remote to a node is thought to be:
+\begin{verbatim}
+    $ DISMOUNT/ABORT node$device 
+\end{verbatim}
+\item These commands could be placed in the SYS\$MANAGER:SYSHUTDWN.COM
+with perhaps both COMMON and SPECIFIC versions.
+\end {itemize}
+
+\subsubsection {Shutdowns}
+\begin {itemize}
+\item Never use REMOVE\_NODE --- it makes no sense in an LAVC
+\item To shut down a single satellite, use NONE
+\item To shut down the entire cluster, use CLUSTER\_SHUTDOWN on all nodes.
+It actually causes all nodes to wait until the rest are at the same shutdown
+point before completing the shutdown.
+\item It is possible to shut down a satellite using a remote connection ---
+i.e.\ using SET HOST from another node.
+The only problem is that this prevents the shutdown of DECnet until a very
+late stage of the shutdown.
+\item The network normally shuts down up to 6 minutes before the target
+shutdown time.
+This means that LAT connections are lost well before the time announced
+causing considerable annoyance to users desperately trying to finished off
+what they are doing.
+\item By default, all users on all nodes are send {\em all} the shutdown
+messages from {\em all} nodes.
+If three or four nodes are shutting down, this leads to a flood of messages,
+especially in the later stages of shutdown, again stopping users doing anything
+useful.
+
+For nodes that do not serve local discs to the cluster, it may well be 
+appropriate to alter the shutdown so that only local users are informed.
+This can be achieved by defining the logical name SHUTDOWN\$INFORM\_NODES
+to be just the name of the local node.
+\end {itemize}
+
+\subsubsection {Backups}
+Note that in the cluster environment the remote connections to a served
+disc are completely invisible on its local node.
+Thus even if a disc has no open files when viewed locally, there may be
+activity from remote nodes.
+This has repercussions for both incremental and image backups which will
+rarely be as useful as would would have expected if the backup is performed
+when the disc is being served --- especially as there is no notification
+of the problem from backup.
+
+\subsubsection {System parameters}
+
+The VMS 4.6 version of AUTOGEN can sometimes do a pretty poor job for the memory
+requirements for LAVC.
+Once the is cluster running, on each node execute a SHOW MEMORY/POOL/FULL.
+Pool expansion (where current sizes are larger than initial sizes) will
+probably be seen.
+
+When this is severe and happens soon after the system has booted take remedial
+action as soon as possible.
+If it occurs only after a few days then a more considered approach is possible.
+
+In both cases it is important to run AUTOGEN at the correct time --- i.e. 
+when the whole cluster is running and all devices and page and swap files
+are available.
+It can be run during normal operations as long as the REBOOT option is not used.
+The best command seems to be:
+\begin{verbatim}
+    $ @SYS$UPDATE:AUTOGEN  GETDATA  TESTFILES
+\end{verbatim}
+This creates SETPARAMS.DAT in SYS\$SYSTEM:~ and DIFFERENCES can be run on it
+so see what actual changes have occurred.
+If necessary, MODPARAMS.DAT can then be modified and  AUTOGEN run again ---
+making sure that the correct file versions are compared.
+When reasonable values are obtained, and assuming any page and swap file
+alterations are acceptable, the full run of AUTOGEN can be performed ending
+using SETPARAMS instead of TESTFILES.
+These values will then be used at the next boot of the node.
+
+\subsubsection {Manipulating page and swap files}
+\label{manip_ps}
+
+AUTOGEN has some useful new capabilities for defining swap and page file
+placement and sizes.
+However the following techniques may be useful in addition.
+
+The system utility SYSGEN can be used to CREATE page and swap files directly
+using the CREATE command.
+This is in fact what AUTOGEN uses to create or modify them.
+If used directly however, the extra qualifier /CONTIGUOUS can be used to
+attempt to create contiguous files.
+When this is not used, very fragmented page and swap files may result which
+will require an extra backup and restore of the system disc.
+Provided that there is enough space, it is possible to use this technique to
+create contiguous page and swap files in advance of running SATELLITE\_CONFIG.
+One creates files anywhere on the disc of appropriate sizes and then, when the
+satellite is not running, deleting the probably fragmented ones and renaming
+the contiguous files into the new system root [SYSEXE] directory.
+
+If SYSGEN cannot find enough contiguous space the file is not created and
+a device full message appears.
+
+It is probably a good idea to install secondary page and swap files on
+discs other than the system disc.
+This may save some space on the system disc but also helps to distribute the
+IO load of the cluster.
+If this is done, it is a good idea to keep the SYSGEN parameters PAGFILCNT
+and SWPFILCNT one greater than the normal number of page and swap files.
+This will enable the installation of extra files in an emergency.
+
+\subsubsection {Licences}
+
+Due mostly to cost considerations, some software is only licensed for
+specific machines in the clusters.
+To remain legal, it is important that the software is correctly protected
+to prevent illegal use.
+In some cases, (e.g.\ Coloured Books) no action need be taken as long as
+the startup procedures are only executed for the licensed node.
+However, for the majority of the software, the correct method to prevent
+illegal access is to use Access Control Lists (ACLs).
+This is described in the VMS release notes for versions 4.4 and 4.7.
+A command procedure will be available to assist with this.
+
+One licence which cannot be handled in this way is the VMS user licence which
+controls the number of concurrent interactive users on a node.
+This licence is normally controlled by LOGINOUT.EXE in SYS\$SYSTEM.
+The actions of LOGINOUT.EXE are also affected by various system parameters.
+In a common system disc cluster, the LOGINOUT.EXE would, by default, be the
+version for the boot node which will normally be inappropriate for the
+satellites.
+
+For satellites that are not VaxStations this causes no problems.
+Assuming that the satellite is not licensed for more users than the boot node,
+then the normal methods for limiting the number of interactive users should
+suffice.
+Indeed, for system management there is an advantage in this simple technique
+in that a suitably privileged user is still allowed to login even when this
+would exceed the maximum allowed number of users.
+
+VaxStations are a different problem since they are normally have 1-2 user
+licences.
+Some experiments have been performed using a 1-2 user version of LOGINOUT.EXE
+in the specific [SYSEXE] of a VaxStation with the following results.
+\begin{itemize}
+\item A user of the actual workstation screen can login multiple times without
+exceeding the licence limit.
+\item Local and remote connections are handled differently.
+A local connection is assumed to be from the workstation itself when in
+fact LAT connections are also considered to be local.
+\item It is possible to set the system parameter IJOBLIM to be greater than
+2, in which case the number of users can exceed the license limit because of the
+note above.
+\item It is possible for the actual workstation screen to be `locked out'
+due to a maximum users exceeded condition.
+\item It is possible that the licence imposed limit will prevent the cluster
+manager from logging in using SET HOST.
+\end{itemize}
+
+Since it is sensible to allow some sort of remote usage of a VaxStation,
+the following seems to be the best solution to these problems so far discovered.
+\begin{enumerate}
+\item Use the boot node version of LOGINOUT.EXE.
+This still understands the idea of multiple logins from local sources being
+immune to login limits.
+\item Use a IJOBLIM of perhaps 2
+\item Use a forced system wide login procedure to limit the number of
+concurrent SET HOST and LAT connections to 1 so that the real workstation is
+always available.
+\end{enumerate}
+
+\section {VaxStation Windows}
+
+\label{windows}
+This section provides comments on the installation and use of the VWS software.
+
+\subsection {Warning}
+
+When VWS is installed (and for all subsequent invocations of AUTOGEN), an
+attempt is made to configure the devices VA and VC assuming the DEC standard
+addresses for these devices.
+Ensure that there are no foreign devices at these addresses on the boot node,
+and preferably not on any other node in the cluster.
+If, as has already happened, a foreign device is at one of these addresses,
+the system will bugcheck and will be hard to re-boot.
+
+A prior indication is that if an AUTOCONFIGURE ALL command is issued
+using SYSGEN there is a complaint that VADRIVER.EXE (and/or VCDRIVER.EXE)
+does not exist.
+
+\subsection {Installation}
+
+The software should be installed on the Boot node following the instructions
+for installation on a cluster.
+The files will all be placed in the common directory structure.
+
+As detailed in the installation guide, it is essential that a file called
+SYSTARTUP.COM resides in the common area of SYS\$MANAGER:~.
+This file is edited by the installation.
+
+After following the installation guide and before initially booting (or
+rebooting) the VaxStation, the following is recommended.
+\begin {itemize}
+\item Delete the new version of SYSTARTUP.COM in the common area of
+SYS\$MANAGER or in some other way undo the edits performed by the installation.
+\item If the VaxStation is already running, edit its startup procedures
+so that the command removed above is executed.
+({\tt \$ @SYS\$MANAGER:STARTVWS}).
+\item If SATELLITE\_CONFIG has not been executed for the satellite, remember
+to include the above command when its startup procedures are created.
+Continue to install the VaxStation now, stopping before the first boot.
+\item {\em COPY} the file  UISBG.DAT from the common area of SYS\$MANAGER to the
+specific area in the workstation directory tree.
+\item If the VaxStation is already running then logon to it as SYSTEM and
+execute:
+\begin{verbatim}
+    $ @AUTOGEN GETDATA REBOOT INITIAL
+\end{verbatim}
+\item If initial boot of the VaxStation then continue.
+\end {itemize}
+
+The reasons for these operations are as follows.
+Firstly it is best to start the windows software in a node specific manner
+because it will probably be necessary to modify the parameters of windows
+system. 
+This is done by defining logical names {\em before} executing STARTVWS.
+It also stops all other nodes from trying to start the software every time
+they boot. The attempt does no harm but is just a waste of time.
+
+Secondly, when more than one VaxStation is in use on the system it is probable
+that they will need different menus as described below.
+
+Next note that the actions of AUTOGEN are changed by the installation of
+VWS (and perhaps other products) via a file called VMSPARAMS.DAT.
+This file contains various defaults and minima for be applied when particular
+devices are found on the node running AUTOGEN.
+
+Finally, when a reboot that actually starts the windows software occurs, be
+patient ! It may take {\em several} minutes after the startup has completed
+for the windows software to complete its initialization.
+
+\subsection {After installation}
+
+When the windows software first starts it will create log files and a file
+called UISSETUP.DAT in SYS\$SPECIFIC:[SYSEXE].
+Although this file is in the system root it is manipulated by the workstation
+software running under a system UIC.
+By default, any windows user can change this file by selecting the WorkStation
+Setup from the default menu.
+It is recommended that if the workstation is for general use, this menu item
+is removed by editing UISBG.DAT in the specific directory structure.
+The edits are fairly obvious.
+An alternative is is disable just parts of the setup as described on page
+2-30 of the updated VWS User Guide (i.e. VWS 3.2 version).
+
+If the workstation hangs when the windows appear to die,
+try increasing the POOL\_SIZE as documented on pages 4-3 to 4-5 of the
+VWS installation Guide.
+
+\appendix
+
+\section {Appendix}
+
+\begin{itemize}
+\item {SYS\$COMMON:[SYSERR]}
+\begin{description}
+\item [ERRSNAP.COM : ] Thought to be the only file that should reside here.
+\end{description}
+\item {SYS\$COMMON:[SYSEXE]}
+\begin{description}
+\item [GKSSMB.EXE : ] Example of a file that should be in COMMON
+\item [JBCSYSQUE.DAT : ] Cluster wide job queue file
+\item [LOGINOUT.EXE : ] Standard version
+\item [NETNODE\_REMOTE.DAT : ] DECnet remote node database --- Cluster wide
+\item [NETOBJECT.DAT : ] Decnet Object database
+\item [NETUAF.DAT : ] Network UAF file
+\item [RIGHTSLIST.DAT : ] Cluster wide rightslist
+\item [SHUTDOWN.COM : ] Standard system shutdown
+\item [STARTUP.COM : ] DEC common Cluster startup file
+\item [SYSUAF.DAT : ] Cluster wide user authorization file
+\end{description}
+The following files will exist only after VaxStation Windows software has been
+installed
+\begin{description}
+\item [UIS*.EXE : ] various images and also some drivers (e.g.\ VADRIVER.EXE)
+\item [VMSPARAMS.DAT : ] A parameter file used by AUTOGEN
+\end{description}
+\item {SYS\$COMMON:[SYSMGR]}
+\begin{description}
+\item [BOOT\_CONFIG.COM : ] Cluster Boot node configuration procedure
+\item [DUVAD\_SHUTDOWN.COM : ] Example of local variation of shutdown procedure
+\item [LOADNET.COM : ] Part of cluster common network startup
+\item [LOAD\_PSI.COM : ] Part of cluster common network startup
+\item [LOGIN.COM : ] Possible system manager LOGIN file 
+\item [MAIL.DIR : ] Possible system manager MAIL directory
+\item [MAKEROOT.COM : ] CI cluster version of BOOT\_CONFIG
+\item [NETCONFIG.COM : ] Network configuration procedure
+\item [PCS750.COM : ] Only if there are 750s in the cluster. Loads PCS750
+\item [PSI* : ] Various PSI files. Although normally only used by one node,
+should be in COMMON area.
+\item [RTTLOAD.COM : ] Part of Network startup
+\item [SATELLITE\_CONFIG.COM : ] LAVC Satellite configuration procedure
+\item [STARTNET.COM : ] Main network startup file.
+\item [STARTPSI.COM : ] Part of Network startup
+\item [SYLOGIN.COM : ] Possible system wide login procedure
+\item [SYSHUTDWN.COM : ] Possible default version of part of shutdown procedure
+\item [SYSTARTUP.COM : ] Cluster common initial (user) systartup file.
+ {\em RECOMMENDED}
+\item [VAXVMSSYS.EVC : ] Used by SATELLITE\_CONFIG to obtain an initial set of
+satellite parameters. Not essential.
+\item [VMSIMAGES.COM : ] Part of system startup
+\item [VMSIMAGES.DAT : ] Initial version of file. Copied to SPECIFIC by 
+SATELLITE\_CONFIG
+\end{description}
+The following files would be seen if the Workstation software has been
+installed on the system.
+\begin{description}
+\item [STARTVWS.COM : ] Starts the windows software for a VaxStation
+\item [UISBG.DAT : ] The default menu for VaxStation window creation
+\end{description}
+\item {SYS\$SPECIFIC:[SYSERR]}
+\begin{description}
+\item [ERRLOG.SYS : ] Current errlog file of node
+\item [ERRLOG.OLD : ] Previous errlog files
+\item [ERRLOG.VERY\_OLD : ] Name that RHM uses to exclude very old files from
+searches
+\end{description}
+
+\item {SYS\$SPECIFIC:[SYSEXE]} ---
+These files will normally be seen on any type of node in a cluster.
+\begin{description}
+\item [AUTOGEN.PAR : ]  part of AUTOGEN system
+\item [LOGINOUT.EXE : ] Possible node specific --- n user licence version.
+See main text.
+\item [MODPARAMS.DAT : ] part of AUTOGEN system
+\item [NETCIRC.DAT : ] Network circuits
+\item [NETCONF.DAT : ] Network configurator --- may not exist --- no problem
+\item [NETLINE.DAT : ] Network lines
+\item [NETLOGING.DAT : ] Network Logging
+\item [NETNODE\_LOCAL.DAT : ] Network local node data
+\item [NETOBJECT.DAT : ] Network objects (if a node specific version required)
+\item [OLDSITE2.DAT : ] part of AUTOGEN system
+\item [OLDSITE3.DAT : ] part of AUTOGEN system
+\item [OLDSITE4.DAT : ] part of AUTOGEN system
+\item [PAGEFILE.SYS : ] This system's primary pagefile (assuming no LOCAL
+page/swap)
+\item [PARAMS.DAT : ] part of AUTOGEN system
+\item [SETPARAMS.DAT : ] part of AUTOGEN system
+\item [SWAPFILE.SYS : ] This system's primary swap file (assuming no LOCAL
+page/swap)
+\item [SYSDUMP.DMP : ] This system's DUMP file
+\item [VAXVMSSYS.OLD : ] part of AUTOGEN system
+\item [VAXVMSSYS.PAR : ] part of AUTOGEN system (actually the CURRENT database)
+\end{description}
+The following files would be seen on a node running PSI
+\begin{description}
+\item [NETX25.DAT : ] Network X25 data 
+\item [NETX29.DAT : ] Network X29 data 
+\item [PSI\$041.DAT : ] Flag saying running PSI041 
+\end{description}
+The following files would be seen on a running VaxStation with VWS
+\begin{description}
+\item [UISSETUP.DAT : ] Workstation setup file
+\item [UISVTSETUP.ERROR : ] A log file of some type!
+\end{description}
+
+\item {SYS\$SPECIFIC:[SYSMGR]} ---
+These files will normally be seen on any type of node in a cluster
+\begin{description}
+\item [ACCOUNTNG.DAT : ] this system's accounting file
+\item [ANNOUNCE.TXT : ] this system's ANNOUNCE file (SYS\$ANNOUNCE)
+\item [DU750\_SYSTARTUP.COM : ] this node's systartup file
+\item [LTLOAD.COM : ] this node's LAT startup file (assuming DecServers in use)
+\item [OPERATOR.LOG : ] this node's current operator log file
+\item [SYCONFIG.COM : ] this node's system configuration file
+\item [SYLOGIN.COM : ] Possible node specific login file
+\item [SYSHUTDWN.COM :] Possible node specific part of shutdown procedure
+\item [VMSIMAGES.DAT : ] AUTOGEN node specific file
+\item [WELCOME.TXT : ] this node's Welcome file (SYS\$WELCOME)
+\end{description}
+
+This file would only be seen on the Boot node of a cluster.
+
+\begin{description}
+\item [NETNODE\_UPDATE.COM : ] cluster network definition file
+\end{description}
+
+These files would normally only be seen on the node running PSI --- normally the
+boot node.
+
+\begin{description}
+\item [CBS\_LOAD.COM : ] CBS load file (for node with PSI etc)
+\item [PSI\_SECURITY.COM : ] for node with PSI, security setup file
+\end{description}
+The following files would be seen if the Workstation software has been
+installed on the system.
+\begin{description}
+\item [UISBG.DAT : ] Possible modified menu for a VaxStation window creation
+\end{description}
+\end{itemize}
+
+\end{document}

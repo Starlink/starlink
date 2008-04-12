@@ -1,0 +1,3122 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink System Note}
+\newcommand{\stardocinitials}  {SSN}
+\newcommand{\stardocnumber}    {19.1}
+\newcommand{\stardocauthors}   {Paul Rees}
+\newcommand{\stardocdate}      {1993 October 29}
+\newcommand{\stardoctitle}     {Software Requirements for the Move to UNIX}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{216mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+\newcommand{\starsitename}{Starlink Site Name}
+\newcommand{\starnodename}{Starlink Node Name}
+\newcommand{\starunixdate}{UNIX Migration Deadline}
+\newcommand{\starupdate}{Information Last Updated}
+\newcommand{\starsitetelephone}{Site Manager Telephone Number}
+\newcommand{\starsitefax}{Site Manager Fax Number}
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\vspace{30mm}
+
+\begin{center}
+{\bf Overview}
+\end{center}
+
+\vspace{5mm}
+
+This document provides information concerning the software requirements 
+of each STARLINK site to move entirely to UNIX.
+It provides a list of proposed UNIX migration deadlines for all sites and 
+lists of software requirements, both STARLINK and non-STARLINK software, 
+which must be met before the existing VMS hardware can be switched off.
+The information presented in this document is used for the planning 
+of software porting and distribution activities and also for setting 
+realistic migration deadlines for STARLINK sites.
+The information on software requirements has been provided by STARLINK Site
+Managers.
+
+
+\newpage
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+%------------------------------------------------------------------------------
+
+\newpage
+%\setlength{\parskip}{0mm}
+\listoftables
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+\sloppypar
+\newpage
+\section{List of sites}
+
+{\em Table \ref{t_sites}} presents an alphabetical list of STARLINK sites with
+UNIX migration deadline and the date on which the information for that site 
+was last updated.
+Those sites marked with an asterisk have completed their migration to UNIX.
+Where a specific migration deadline is not yet known, the final migration date
+recommended by the STARLINK Review Panel ({\em i.e.} 1995 April 1) has been
+inserted.
+
+\begin{table}
+\begin{center}
+\caption{Migration deadlines for each STARLINK site.
+Those sites marked with an asterisk have completed their migration to UNIX.
+Where a specific migration deadline is not yet known, the final migration date
+recommended by the STARLINK Review Panel ({\em i.e.} 1995 April 1) has been
+inserted.}
+\vspace{5mm}
+\begin{tabular}{|l|l|l|} \hline \label{t_sites}
+& & \\
+Site name             & Migration deadline & Last updated \\
+& & \\ \hline
+& & \\
+Armagh                & 1995 Apr. 1  & 1993 Oct. 27 \\
+Belfast               & 1995 Apr. 1  & 1993 Oct. 27 \\
+Birmingham            & 1995 Apr. 1  & 1993 Oct. 27 \\
+Cambridge             & 1995 Apr. 1  & 1993 Oct. 29 \\
+Cardiff               & 1993 Oct. 1  & 1993 Oct. 26 \\
+Durham                & 1995 Apr. 1  & 1993 Oct. 26 \\
+Edinburgh             & 1995 Apr. 1  & 1993 Oct. 26 \\
+Glasgow$^{\ast}$      & 1993 Sep. 1  & 1993 Oct. 26 \\
+Hatfield              & 1995 Apr. 1  & 1993 Oct. 26 \\
+ICSTM                 & 1995 Apr. 1  & 1993 Oct. 26 \\
+Jodrell Bank$^{\ast}$ & 1993 June 1  & 1993 Oct. 26 \\
+Keele                 & 1993 June 1  & 1993 Oct. 26 \\
+Kent                  & 1995 Apr. 1  & 1993 Oct. 26 \\
+Leicester             & 1995 Apr. 1  & 1993 Oct. 29 \\
+Liverpool John Moores & 1995 Apr. 1  & 1993 Oct. 27 \\
+Manchester            & 1994 Jan. 7  & 1993 Oct. 27 \\
+Oxford                & 1995 Apr. 1  & 1993 Oct. 26 \\
+Preston               & 1995 Apr. 1  & 1993 Oct. 26 \\
+QMW                   & 1995 Apr. 1  & 1993 Oct. 26 \\
+RAL Astrophysics      & 1993 Oct. 1  & 1993 Oct. 26 \\
+RAL Project           & 1995 Apr. 1  & 1993 Oct. 26 \\
+Southampton           & 1994 Apr. 1  & 1993 Oct. 26 \\
+St Andrews            & 1995 Apr. 1  & 1993 Oct. 27 \\
+Sussex                & 1995 Apr. 1  & 1993 Oct. 27 \\
+UCL                   & 1995 Apr. 1  & 1993 Oct. 26 \\
+& & \\ \hline                   
+\end{tabular}
+\end{center}
+\end{table}
+
+
+\newpage
+\section{UK software}
+
+This section presents the requirements for software originating in the UK.
+This software may have been developed by the STARLINK Project, by STARLINK 
+contractors at HEIs, by staff at SERC institutions, or by staff at HEIs.
+{\em Table \ref{t_UKpack}} presents the UK software required by sites in 
+order of package.
+{\em Table \ref{t_UKdead}} presents the UK software required by sites in 
+order of deadline.
+Note that packages already available in the UNIX STARLINK Software Collection
+are not included in these tables.
+
+
+\begin{table}
+\caption{UK software by package.
+Packages already available in the UNIX STARLINK Software Collection
+are not listed.
+Packages not distributed by STARLINK are italicized.}
+\vspace{5mm}
+\begin{center}
+\begin{tabular}{|p{36mm}|p{50mm}|p{30mm}|} \hline \label{t_UKpack}
+& & \\
+Package & Required by & Deadline \\
+& & \\ \hline
+& & \\
+ACCANAL                 & Cardiff          & 1993 Oct. 1 \\
+{\em APM data handling} & {\em Southampton} & {\em 1994 Apr. 1} \\
+APIG                    & Cambridge        & 1995 Apr. 1 \\
+ASTERIX                 & Armagh           & 1995 Apr. 1 \\
+                        & Belfast          & 1995 Apr. 1 \\
+                        & Birmingham       & 1995 Apr. 1 \\
+                        & Cambridge        & 1995 Apr. 1 \\
+                        & Cardiff          & 1993 Oct. 1 \\
+                        & Glasgow          & 1993 Sep. 1 \\
+                        & ICSTM            & 1995 Apr. 1 \\
+                        & Jodrell Bank     & 1993 June 1 \\
+                        & Keele            & 1993 June 1 \\
+                        & Leicester        & 1995 Apr. 1 \\
+                        & Liverpool John Moores & 1995 Apr. 1 \\
+                        & Oxford           & 1995 Apr. 1 \\
+                        & Preston          & 1995 Apr. 1 \\
+                        & RAL Astrophysics & 1993 Oct. 1 \\
+                        & Southampton      & 1994 Apr. 1 \\
+                        & Sussex           & 1995 Apr. 1 \\
+CATPAC                  & Sussex           & 1995 Apr. 1 \\
+CDCOPY                  & Southampton      & 1994 Apr. 1 \\
+CGS4DR                  & Cambridge        & 1995 Apr. 1 \\
+                        & Edinburgh        & 1995 Apr. 1 \\
+                        & Kent             & 1995 Apr. 1 \\
+                        & Liverpool John Moores & 1995 Apr. 1 \\
+                        & Oxford           & 1995 Apr. 1 \\
+                        & Preston          & 1995 Apr. 1 \\
+                        & QMW              & 1995 Apr. 1 \\
+                        & Southampton      & 1994 Apr. 1 \\
+                        & Sussex           & 1995 Apr. 1 \\
+& & \\ \hline                   
+\end{tabular}
+\end{center}
+\end{table}
+
+
+\addtocounter{table}{-1}
+\begin{table}
+\caption{Continued ...}
+\vspace{5mm}
+\begin{center}
+\begin{tabular}{|p{36mm}|p{50mm}|p{30mm}|} \hline
+& & \\
+Package & Required by & Deadline \\
+& & \\ \hline
+& & \\
+CHART                   & Armagh           & 1995 Apr. 1 \\
+                        & Belfast          & 1995 Apr. 1 \\
+                        & Birmingham       & 1995 Apr. 1 \\
+                        & Cardiff          & 1993 Oct. 1 \\
+                        & Durham           & 1995 Apr. 1 \\
+                        & Manchester       & 1994 Jan. 7 \\
+                        & RAL Astrophysics & 1993 Oct. 1 \\
+                        & Southampton      & 1994 Apr. 1 \\
+                        & St Andrews       & 1995 Apr. 1 \\
+                        & Sussex           & 1995 Apr. 1 \\
+CHI                     & Glasgow          & 1993 Sep. 1 \\
+                        & Sussex           & 1995 Apr. 1 \\
+CONVERT                 & Armagh           & 1995 Apr. 1 \\
+                        & Belfast          & 1995 Apr. 1 \\
+                        & Edinburgh        & 1995 Apr. 1 \\
+                        & Southampton      & 1994 Apr. 1 \\
+                        & Sussex           & 1995 Apr. 1 \\
+DOCFIND                 & Belfast          & 1995 Apr. 1 \\
+                        & Birmingham       & 1995 Apr. 1 \\
+                        & Edinburgh        & 1995 Apr. 1 \\
+                        & Glasgow          & 1993 Sep. 1 \\
+                        & Southampton      & 1994 Apr. 1 \\
+                        & Sussex           & 1995 Apr. 1 \\
+ECHOMOP                 & Armagh           & 1995 Apr. 1 \\
+                        & Belfast          & 1995 Apr. 1 \\
+                        & Cardiff          & 1993 Oct. 1 \\
+                        & Oxford           & 1995 Apr. 1 \\
+                        & Sussex           & 1995 Apr. 1 \\
+                        & UCL              & 1995 Apr. 1 \\
+ECHWIND                 & Armagh           & 1995 Apr. 1 \\
+                        & Belfast          & 1995 Apr. 1 \\
+                        & Sussex           & 1995 Apr. 1 \\
+                        & UCL              & 1995 Apr. 1 \\
+EDFITS                  & Sussex           & 1995 Apr. 1 \\
+& & \\ \hline                   
+\end{tabular}
+\end{center}
+\end{table}
+
+\addtocounter{table}{-1}
+\begin{table}
+\caption{Continued ...}
+\vspace{5mm}
+\begin{center}
+\begin{tabular}{|p{36mm}|p{50mm}|p{30mm}|} \hline
+& & \\
+Package & Required by & Deadline \\
+& & \\ \hline
+& & \\
+EMAIL                   & Armagh           & 1995 Apr. 1 \\
+                        & Belfast          & 1995 Apr. 1 \\
+                        & Edinburgh        & 1995 Apr. 1 \\
+                        & Sussex           & 1995 Apr. 1 \\
+FORMCON                 & Sussex           & 1995 Apr. 1 \\
+{\em GINGA}             & {\em Leicester}        & {\em 1995 Apr. 1} \\
+                        & {\em RAL Astrophysics} & {\em 1993 Oct. 1} \\
+                        & {\em Southampton}      & {\em 1994 Apr. 1} \\
+ICL                     & Birmingham       & 1995 Apr. 1 \\
+                        & Cardiff          & 1993 Oct. 1 \\
+                        & Edinburgh        & 1995 Apr. 1 \\
+                        & ICSTM            & 1995 Apr. 1 \\
+                        & Leicester        & 1995 Apr. 1 \\
+                        & Sussex           & 1995 Apr. 1 \\
+IKONPAINT               & Birmingham       & 1995 Apr. 1 \\
+                        & Edinburgh        & 1995 Apr. 1 \\
+                        & ICSTM            & 1995 Apr. 1 \\
+                        & Southampton      & 1994 Apr. 1 \\
+IRAS90                  & Armagh           & 1995 Apr. 1 \\
+                        & Belfast          & 1995 Apr. 1 \\
+                        & Edinburgh        & 1995 Apr. 1 \\
+                        & Keele            & 1993 June 1 \\
+                        & Sussex           & 1995 Apr. 1 \\
+IRCAM polarization      & Edinburgh        & 1995 Apr. 1 \\
+applications            & Hatfield         & 1995 Apr. 1 \\
+                        & ICSTM            & 1995 Apr. 1 \\
+                        & Kent             & 1995 Apr. 1 \\
+                        & Oxford           & 1995 Apr. 1 \\
+                        & Preston          & 1995 Apr. 1 \\
+                        & QMW              & 1995 Apr. 1 \\
+& & \\ \hline                   
+\end{tabular}
+\end{center}
+\end{table}
+
+\addtocounter{table}{-1}
+\begin{table}
+\caption{Continued ...}
+\vspace{5mm}
+\begin{center}
+\begin{tabular}{|p{36mm}|p{50mm}|p{30mm}|} \hline
+& & \\
+Package & Required by & Deadline \\
+& & \\ \hline
+& & \\
+IUEDEARCH               & Armagh           & 1995 Apr. 1 \\
+                        & Belfast          & 1995 Apr. 1 \\
+                        & Hatfield         & 1995 Apr. 1 \\
+                        & Keele            & 1993 June 1 \\
+                        & Kent             & 1995 Apr. 1 \\
+                        & Oxford           & 1995 Apr. 1 \\
+                        & Preston          & 1995 Apr. 1 \\
+                        & RAL Astrophysics & 1993 Oct. 1 \\
+                        & UCL              & 1995 Apr. 1 \\
+JCMTDR                  & Edinburgh        & 1995 Apr. 1 \\
+                        & Kent             & 1995 Apr. 1 \\
+                        & Oxford           & 1995 Apr. 1 \\
+                        & QMW              & 1995 Apr. 1 \\
+LIBX                    & Glasgow          & 1993 Sep. 1 \\
+NCAR STRMLN             & Cardiff          & 1993 Oct. 1 \\
+                        & Preston          & 1995 Apr. 1 \\
+NDPROGS                 & Belfast          & 1995 Apr. 1 \\
+                        & Sussex           & 1995 Apr. 1 \\
+NETWORK                 & Birmingham       & 1995 Apr. 1 \\
+                        & Edinburgh        & 1995 Apr. 1 \\
+                        & Glasgow          & 1993 Sep. 1 \\
+OBSERVE                 & Cardiff          & 1993 Oct. 1 \\
+                        & Sussex           & 1995 Apr. 1 \\
+PONGO                   & Belfast          & 1995 Apr. 1 \\
+                        & Cardiff          & 1993 Oct. 1 \\
+                        & Edinburgh        & 1995 Apr. 1 \\
+                        & ICSTM            & 1995 Apr. 1 \\
+                        & Kent             & 1995 Apr. 1 \\
+                        & Sussex           & 1995 Apr. 1 \\
+                        & UCL              & 1995 Apr. 1 \\
+REXEC                   & Sussex           & 1995 Apr. 1 \\
+RGASP                   & Belfast          & 1995 Apr. 1 \\
+                        & Cardiff          & 1993 Oct. 1 \\
+                        & Glasgow          & 1993 Sep. 1 \\
+RPS                     & Sussex           & 1995 Apr. 1 \\
+& & \\ \hline                   
+\end{tabular}
+\end{center}
+\end{table}
+
+\addtocounter{table}{-1}
+\begin{table}
+\caption{Continued ...}
+\vspace{5mm}
+\begin{center}
+\begin{tabular}{|p{36mm}|p{50mm}|p{30mm}|} \hline
+& & \\
+Package & Required by & Deadline \\
+& & \\ \hline
+& & \\
+SAM                     & Southampton      & 1994 Apr. 1 \\
+SCAR                    & Birmingham       & 1995 Apr. 1 \\
+                        & ICSTM            & 1995 Apr. 1 \\
+                        & Leicester        & 1995 Apr. 1 \\
+                        & Oxford           & 1995 Apr. 1 \\
+                        & Preston          & 1995 Apr. 1 \\
+SCP                     & Birmingham       & 1995 Apr. 1 \\
+                        & Sussex           & 1995 Apr. 1 \\
+SMS                     & Edinburgh        & 1995 Apr. 1 \\
+SPECX                   & Edinburgh        & 1995 Apr. 1 \\
+                        & Keele            & 1993 June 1 \\
+                        & Kent             & 1995 Apr. 1 \\
+                        & QMW              & 1995 Apr. 1 \\
+SST                     & Durham           & 1995 Apr. 1 \\
+                        & Edinburgh        & 1995 Apr. 1 \\
+                        & Glasgow          & 1993 Sep. 1 \\
+                        & Sussex           & 1995 Apr. 1 \\
+STARMAN                 & Sussex           & 1995 Apr. 1 \\
+STEVE                   & Armagh           & 1995 Apr. 1 \\
+                        & Belfast          & 1995 Apr. 1 \\
+                        & Edinburgh        & 1995 Apr. 1 \\
+                        & ICSTM            & 1995 Apr. 1 \\
+                        & Sussex           & 1995 Apr. 1 \\
+                        & UCL              & 1995 Apr. 1 \\
+TAPEIO                  & Sussex           & 1995 Apr. 1 \\
+TPU                     & Birmingham       & 1995 Apr. 1 \\
+TRACE                   & Birmingham       & 1995 Apr. 1 \\
+                        & Cardiff          & 1993 Oct. 1 \\
+                        & Edinburgh        & 1995 Apr. 1 \\
+                        & Sussex           & 1995 Apr. 1 \\
+TSP                     & Glasgow          & 1993 Sep. 1 \\
+                        & Hatfield         & 1995 Apr. 1 \\
+                        & Preston          & 1995 Apr. 1 \\
+                        & Sussex           & 1995 Apr. 1 \\
+& & \\ \hline                   
+\end{tabular}
+\end{center}
+\end{table}
+
+
+\addtocounter{table}{-1}
+\begin{table}
+\caption{Continued ...}
+\vspace{5mm}
+\begin{center}
+\begin{tabular}{|p{36mm}|p{50mm}|p{30mm}|} \hline
+& & \\
+Package & Required by & Deadline \\
+& & \\ \hline
+& & \\
+TWODSPEC                & Belfast          & 1995 Apr. 1 \\
+                        & Hatfield         & 1995 Apr. 1 \\
+                        & Manchester       & 1994 Jan. 7 \\
+                        & Sussex           & 1995 Apr. 1 \\
+WCFSORT                 & Birmingham       & 1995 Apr. 1 \\
+                        & Sussex           & 1995 Apr. 1 \\
+XRP                     & Belfast          & 1995 Apr. 1 \\
+                        & RAL Astrophysics & 1993 Oct. 1 \\
+& & \\ \hline                   
+\end{tabular}
+\end{center}
+\end{table}
+
+
+\begin{table}
+\begin{center}
+\caption{UK software by migration deadline.
+Packages already available in the UNIX STARLINK Software Collection
+are not listed.
+Those packages marked with an asterisk are overdue.
+Packages not distributed by STARLINK have been omitted.}
+\vspace{5mm}
+\begin{tabular}{|p{36mm}|p{30mm}|p{60mm}|} \hline \label{t_UKdead}
+& & \\
+Package & Deadline & Status \\
+& & \\ \hline
+& & \\
+ASTERIX$^{\ast}$                & 1993 June 1  & Release awaiting ICL. \\
+ICL$^{\ast}$                    & 1993 Oct. 1  & Port in progress. \\
+IRAS90$^{\ast}$                 & 1993 June 1  & Release submitted. \\
+IUEDEARCH$^{\ast}$              & 1993 June 1  & Available on STADAT. A
+   UNIX-friendly on-line replacement is being developed.\\
+SPECX$^{\ast}$                  & 1993 June 1  & Port in progress. \\
+CHI$^{\ast}$                    & 1993 Sep. 1  & Under review. \\
+DOCFIND$^{\ast}$                & 1993 Sep. 1  & Release submitted. \\
+RGASP$^{\ast}$                  & 1993 Sep. 1  & Port in progress. \\
+LIBX$^{\ast}$                   & 1993 Sep. 1  & Not being ported. \\
+NETWORK$^{\ast}$                & 1993 Sep. 1  & Not being ported. \\
+SST$^{\ast}$                    & 1993 Sep. 1  & Port in progress. \\
+TSP$^{\ast}$                    & 1993 Sep. 1  & Port intended. \\
+ACCANAL$^{\ast}$                & 1993 Oct. 1  & Replacement being 
+   investigated. \\
+CHART$^{\ast}$                  & 1993 Oct. 1  & Port in progress. \\
+ECHOMOP$^{\ast}$                & 1993 Oct. 1  & Beta release available. \\
+NCAR STRMLN$^{\ast}$            & 1993 Oct. 1  & Port intended. \\
+OBSERVE$^{\ast}$                & 1993 Oct. 1  & Port in progress. \\
+PONGO$^{\ast}$                  & 1993 Oct. 1  & Port intended, awaiting ICL. \\
+TRACE$^{\ast}$                  & 1993 Oct. 1  & Release awaiting ADAM PAR 
+   library reorganisation.\\
+XRP$^{\ast}$                    & 1993 Oct. 1  & Port in progress. \\
+TWODSPEC                        & 1994 Jan. 7  & Release submitted. \\
+CDCOPY                          & 1994 Apr. 1  & Not being ported, not
+   necessary on UNIX. \\
+CGS4DR                          & 1994 Apr. 1  & Port intended. \\
+CONVERT                         & 1994 Apr. 1  & Port in progress. \\
+IKONPAINT                       & 1994 Apr. 1  & Not being ported. \\
+SAM                             & 1994 Apr. 1  & Port intended. \\
+APIG                            & 1995 Apr. 1  & Port intended. \\
+CATPAC                          & 1995 Apr. 1  & Port intended. \\
+ECHWIND                         & 1995 Apr. 1  & Port in progress. \\
+EDFITS                          & 1995 Apr. 1  & Port intended. \\
+EMAIL                           & 1995 Apr. 1  & Port intended. \\
+& & \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\addtocounter{table}{-1}
+\begin{table}
+\caption{Continued ...}
+\vspace{5mm}
+\begin{center}
+\begin{tabular}{|p{36mm}|p{30mm}|p{60mm}|} \hline 
+& & \\
+Package & Deadline & Status \\
+& & \\ \hline
+& & \\
+EMAIL                           & 1995 Apr. 1  & Port intended. \\
+FORMCON                         & 1995 Apr. 1  & Not being ported. \\
+IRCAM polarization applications & 1995 Apr. 1  & To be replaced by
+   KAPPA, CCDPACK and IRCAMPACK applications. \\
+JCMTDR                          & 1995 Apr. 1  & Port intended. \\
+NDPROGS                         & 1995 Apr. 1  & Port in progress. \\
+REXEC                           & 1995 Apr. 1  & Port intended. \\
+RPS                             & 1995 Apr. 1  & Not being ported. \\
+SCAR                            & 1995 Apr. 1  & Not being ported. \\
+SCP                             & 1995 Apr. 1  & Port intended. \\
+SMS                             & 1995 Apr. 1  & Replacement under 
+   development. \\
+STARMAN                         & 1995 Apr. 1  & Port in progress. \\
+STEVE                           & 1995 Apr. 1  & Port in progress. \\
+TAPEIO                          & 1995 Apr. 1  & Port intended. \\
+TPU                             & 1995 Apr. 1  & Not being ported. \\
+WFCSORT                         & 1995 Apr. 1  & Port intended. \\
+& & \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\newpage
+\section{Public domain software}
+
+This section presents the requirements for public-domain software.
+{\em Table \ref{t_PDpack}} presents the public-domain software required by 
+sites in order of package.
+{\em Table \ref{t_PDdead}} presents the public-domain software required by 
+sites in order of deadline.
+
+\begin{table}
+\begin{center}
+\caption{Public domain software by package.
+Packages not distributed by STARLINK are italicized.}
+\vspace{5mm}
+\begin{tabular}{|p{36mm}|p{50mm}|p{30mm}|} \hline \label{t_PDpack}
+& & \\
+Package & Required by & Deadline \\
+& & \\ \hline
+& & \\
+EMACS            & Sussex           & 1995 Apr. 1 \\
+GCC              & Sussex           & 1995 Apr. 1 \\
+{\em KERMIT}     & {\em Birmingham} & {\em 1995 Apr. 1} \\
+                 & {\em Edinburgh}  & {\em 1995 Apr. 1} \\
+LATEX/TEX        & Belfast          & 1995 Apr. 1 \\
+                 & Birmingham       & 1995 Apr. 1 \\
+                 & Edinburgh        & 1995 Apr. 1 \\
+                 & Glasgow          & 1993 Sep. 1 \\
+                 & ICSTM            & 1995 Apr. 1 \\
+                 & Southampton      & 1994 Apr. 1 \\
+                 & Sussex           & 1995 Apr. 1 \\
+Spelling checker & Armagh           & 1995 Apr. 1 \\
+                 & Belfast          & 1995 Apr. 1 \\
+                 & Birmingham       & 1995 Apr. 1 \\
+                 & Cardiff          & 1993 Oct. 1 \\
+& & \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+
+\begin{table}
+\begin{center}
+\caption{Public domain software by migration deadline.
+Those packages marked with an asterisk are overdue.
+Packages not distributed by STARLINK are italicized.}
+\vspace{5mm}
+\begin{tabular}{|p{36mm}|p{30mm}|p{60mm}|} \hline \label{t_PDdead}
+& & \\
+Package & Deadline & Status \\
+& & \\ \hline
+& & \\
+LATEX/TEX                 & 1993 Sep. 1      & Available in the USSC. \\
+Spelling checker$^{\ast}$ & 1994 Oct. 1      & GNU ispell awaiting release. \\
+EMACS                     & 1995 Apr. 1      & Available in the USSC. \\
+GCC                       & 1995 Apr. 1      & Available in the USSC. \\
+{\em KERMIT}              & {\em 1995 Apr. 1} & {\em Available for UNIX.} \\
+& & \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\newpage
+\section{Overseas and commercial software}
+
+This section presents the requirements for software originating from overseas
+institutions or commercial software.
+{\em Table \ref{t_OCpack}} presents the software required by sites in 
+order of package.
+{\em Table \ref{t_OCdead}} presents the software required by sites in 
+order of deadline.
+
+\begin{table}
+\begin{center}
+\caption{Overseas and commercial software by package.
+Packages not distributed by STARLINK are italicized.}
+\vspace{5mm}
+\begin{tabular}{|p{36mm}|p{50mm}|p{30mm}|} \hline \label{t_OCpack}
+& & \\
+Package & Required by & Deadline \\
+& & \\ \hline
+& & \\
+AIPS                  & Armagh           & 1995 Apr. 1 \\
+                      & Belfast          & 1995 Apr. 1 \\
+                      & Cambridge        & 1995 Apr. 1 \\
+                      & Glasgow          & 1993 Sep. 1 \\
+                      & Kent             & 1995 Apr. 1 \\
+                      & Liverpool John Moores & 1995 Apr. 1 \\
+                      & Oxford           & 1995 Apr. 1 \\
+                      & Preston          & 1995 Apr. 1 \\
+                      & QMW              & 1995 Apr. 1 \\
+{\em AOSRED}          & {\em Edinburgh}  & {\em 1995 Apr. 1} \\
+{\em BROWSE}          & {\em Leicester}  & {\em 1995 Apr. 1} \\
+{\em CLOUDY}          & {\em Liverpool John Moores} & {\em 1995 Apr. 1} \\
+                      & {\em Southampton} & {\em 1994 Apr. 1} \\
+CLUSTAN               & Birmingham       & 1995 Apr. 1 \\
+                      & Sussex           & 1995 Apr. 1 \\
+{\em DAOPHOT}         & {\em Keele}      & {\em 1993 June 1} \\
+{\em (old version)}   &                  & \\
+DECSET/STARLSE        & Birmingham       & 1995 Apr. 1 \\
+                      & Edinburgh        & 1995 Apr. 1 \\
+                      & Sussex           & 1995 Apr. 1 \\
+{\em DOPHOT}          & {\em Cambridge}  & {\em 1995 Apr. 1} \\
+                      & {\em Liverpool John Moores} & {\em 1995 Apr. 1} \\
+                      & {\em St Andrews} & {\em 1995 Apr. 1} \\
+{\em GEANT}           & {\em Southampton} & {\em 1994 Apr. 1} \\
+GENSTAT               & Birmingham       & 1995 Apr. 1 \\
+                      & Glasgow          & 1993 Sep. 1 \\
+IDL                   & Armagh           & 1995 Apr. 1 \\
+                      & Belfast          & 1995 Apr. 1 \\
+                      & Birmingham       & 1995 Apr. 1 \\
+                      & Glasgow          & 1993 Sep. 1 \\
+                      & ICSTM            & 1995 Apr. 1 \\
+                      & QMW              & 1995 Apr. 1 \\
+                      & RAL Astrophysics & 1993 Oct. 1 \\
+                      & Sussex           & 1995 Apr. 1 \\
+& & \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\addtocounter{table}{-1}
+\begin{table}
+\caption{Continued ...}
+\vspace{5mm}
+\begin{center}
+\begin{tabular}{|p{36mm}|p{50mm}|p{30mm}|} \hline
+& & \\
+Package & Required by & Deadline \\
+& & \\ \hline
+& & \\
+IRAF                  & Armagh           & 1995 Apr. 1 \\
+                      & Belfast          & 1995 Apr. 1 \\
+                      & Cambridge        & 1995 Apr. 1 \\
+                      & Durham           & 1995 Apr. 1 \\
+                      & Manchester       & 1994 Jan. 7 \\
+                      & Oxford           & 1995 Apr. 1 \\
+                      & Preston          & 1995 Apr. 1 \\
+                      & Sussex           & 1995 Apr. 1 \\
+MEMSYS                & Birmingham       & 1995 Apr. 1 \\
+                      & Glasgow          & 1993 Sep. 1 \\
+MIDAS                 & Armagh           & 1995 Apr. 1 \\
+                      & Sussex           & 1995 Apr. 1 \\
+MONGO                 & Armagh           & 1995 Apr. 1 \\
+                      & Birmingham       & 1995 Apr. 1 \\
+                      & Durham           & 1995 Apr. 1 \\
+                      & Edinburgh        & 1995 Apr. 1 \\
+                      & Hatfield         & 1995 Apr. 1 \\
+                      & ICSTM            & 1995 Apr. 1 \\
+                      & Oxford           & 1995 Apr. 1 \\
+                      & QMW              & 1995 Apr. 1 \\
+                      & Southampton      & 1994 Apr. 1 \\
+                      & Sussex           & 1995 Apr. 1 \\
+                      & UCL              & 1995 Apr. 1 \\
+NAG                   & Belfast          & 1995 Apr. 1 \\
+                      & Birmingham       & 1995 Apr. 1 \\
+                      & Edinburgh        & 1995 Apr. 1 \\
+                      & Glasgow          & 1993 Sep. 1 \\
+                      & Liverpool John Moores & 1995 Apr. 1 \\
+                      & Manchester       & 1994 Jan. 7 \\
+                      & UCL              & 1995 Apr. 1 \\
+QDP                   & Belfast          & 1995 Apr. 1 \\
+                      & Birmingham       & 1995 Apr. 1 \\
+                      & Sussex           & 1995 Apr. 1 \\
+RUNOFF                & Birmingham       & 1995 Apr. 1 \\
+& & \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\addtocounter{table}{-1}
+\begin{table}
+\caption{Continued ...}
+\vspace{5mm}
+\begin{center}
+\begin{tabular}{|p{36mm}|p{50mm}|p{30mm}|} \hline
+& & \\
+Package & Required by & Deadline \\
+& & \\ \hline
+& & \\
+TOOLPACK              & Glasgow          & 1993 Sep. 1 \\
+                      & Sussex           & 1995 Apr. 1 \\
+USSP                  & Armagh           & 1995 Apr. 1 \\
+                      & Belfast          & 1995 Apr. 1 \\
+                      & Hatfield         & 1995 Apr. 1 \\
+                      & Keele            & 1993 June 1 \\
+                      & Kent             & 1995 Apr. 1 \\
+                      & Oxford           & 1995 Apr. 1 \\
+                      & Preston          & 1995 Apr. 1 \\
+                      & RAL Astrophysics & 1993 Oct. 1 \\
+                      & UCL              & 1995 Apr. 1 \\
+{\em XCOM}            & {\em Birmingham} & {\em 1995 Apr. 1} \\
+{\em XSPEC}           & {\em Birmingham} & {\em 1995 Apr. 1} \\
+                      & {\em Oxford}     & {\em 1995 Apr. 1} \\
+                      & {\em Southampton} & {\em 1994 Apr. 1} \\
+& & \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+
+\begin{table}
+\begin{center}
+\caption{Overseas and commercial software by migration deadline.
+Those packages marked with an asterisk are overdue.
+Packages not distributed by STARLINK are italicized.}
+\vspace{5mm}
+\begin{tabular}{|p{36mm}|p{30mm}|p{60mm}|} \hline \label{t_OCdead}
+& & \\
+Package & Deadline & Status \\
+& & \\ \hline
+& & \\
+{\em DAOPHOT}         & {\em 1993 June 1} & {\em Keele will provide port.} \\
+{\em (old version)}$^{\ast}$ &             & \\
+AIPS                  & 1993 Sep. 1 & Available for UNIX, not distributed in 
+   the USSC. \\
+GENSTAT               & 1993 Sep. 1 & Available for UNIX, not distributed in 
+   the USSC. \\
+IDL                   & 1993 Sep. 1 & Available for UNIX, not distributed in 
+   the USSC. \\
+MEMSYS                & 1993 Sep. 1 & Available in the USSC. \\
+NAG                   & 1993 Sep. 1 & Available in the USSC. \\
+TOOLPACK              & 1993 Sep. 1 & Available for UNIX, not distributed in 
+   the USSC. \\
+IRAF                  & 1995 Apr. 1 & Available in the USSC. \\
+{\em CLOUDY}          & {\em 1994 Apr. 1} & {\em Unknown.} \\
+{\em GEANT}           & {\em 1994 Apr. 1} & {\em Unknown.} \\
+MONGO                 & 1994 Apr. 1 & Available for UNIX, not distributed in 
+   the USSC. \\
+{\em XSPEC}           & {\em 1994 Apr. 1} & {\em Unknown.} \\
+{\em AOSRED}          & {\em 1995 Apr. 1} & {\em Unknown.} \\
+{\em BROWSE}          & {\em 1995 Apr. 1} & {\em Unknown.} \\
+CLUSTAN               & 1995 Apr. 1 & Available for UNIX, not distributed in 
+   the USSC. \\
+DECSET/STARLSE        & 1995 Apr. 1 & Available for DECstations only. \\
+{\em DOPHOT}          & {\em 1995 Apr. 1} & {\em Port intended.} \\
+MIDAS                 & 1995 Apr. 1 & Available for UNIX, not distributed in 
+   the USSC. \\
+QDP                   & 1995 Apr. 1 & Available in the USSC. \\
+RUNOFF                & 1995 Apr. 1 & Not available on UNIX. \\
+{\em XCOM}            & {\em 1995 Apr. 1} & {\em Unknown.} \\
+& & \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\appendix
+\newpage
+\section{Site Requirements}
+
+The software requirements for the migration to UNIX are presented by STARLINK
+site in this Appendix.
+The software requirements are divided into two broad categories; software 
+originating in the UK (developed by the STARLINK Project, by STARLINK 
+contractors at HEIs, by staff at SERC institutions, or by staff at HEIs), and
+software originating from the public domain, from overseas institutions or 
+commercial software.
+In the case of UK software, the names of the originators or support contacts
+are cited, where known.
+If the package is not distributed by STARLINK the name is italicized.
+For public domain, overseas and commercial software, only the category of the 
+package is identified.
+If the package is not distributed by STARLINK the entry is italicized.
+
+
+\newpage
+\subsection{Armagh}
+
+\renewcommand{\starsitename}{Armagh}
+\renewcommand{\starnodename}{ARVAD}
+
+\renewcommand{\starunixdate}{Unknown}
+\renewcommand{\starupdate}{1993 October 27}
+
+\renewcommand{\starsitetelephone}{0861 522928}
+\renewcommand{\starsitefax}{0861 527174}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Martin Murphy \\
+{\sc Applications Programmer(s):} & None \\
+{\sc Postal Address:}             & Armagh Observatory \\
+                                  & College Hill \\
+                                  & ARMAGH \\
+                                  & BT61 9DG \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[ASTERIX] X-ray data processing system (Bob Vallance, Birmingham; 
+David Allan, Birmingham).
+\item[CHART] Finding chart and stellar data system (Peter Allan, RAL).
+\item[CONVERT] Format-conversion package (Malcolm Currie, RAL).
+\item[DAOPHOT] Stellar photometry package (Nick Eaton, ICSTM).
+\item[DIPSO] Display and plotting package (Ian Howarth, UCL).
+\item[ECHOMOP] Echelle data reduction system (Dave Mills, UCL).
+\item[ECHWIND] UCL echelle spectrograph observation planning (Adrian Fish,
+UCL).
+\item[EMAIL] Email help utility (Adrian Fish, UCL).
+\item[FIGARO 3] General data reduction system (Keith Shortridge, AAO; Horst
+Meyerdierks, Edinburgh).
+\item[IRAS90] IRAS data analysis package (Dave Berry, Manchester).
+\item[IUEDEARCH] Access to IUE archive data (Chris Lloyd, RAL).
+\item[IUEDR] IUE data reduction package (Dave Mills, UCL).
+\item[KAPPA] Kernel application package (Malcolm Currie, RAL).
+\item[PHOTOM] Aperture photometry routines (Nick Eaton, ICSTM).
+\item[STEVE] Starlink EVE editor (Adrian Fish, UCL).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[AIPS] Astronomical image processing system (Overseas).
+\item[IDL] Interactive data language (Commercial)
+\item[IRAF] Image reduction and analysis facility (Overseas).
+\item[MIDAS] Munich image data analysis system (Overseas).
+\item[MONGO] Interactive plotting program (Overseas).
+\item[Spelling checker] UNIX equivalent to SPELL (Public Domain).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+{\bf None}
+
+
+\newpage
+\subsection{Belfast}
+
+\renewcommand{\starsitename}{Belfast}
+\renewcommand{\starnodename}{QUVAD}
+
+\renewcommand{\starunixdate}{Unknown}
+\renewcommand{\starupdate}{1993 October 27}
+
+\renewcommand{\starsitetelephone}{0232 245133 Ext. 3648}
+\renewcommand{\starsitefax}{0232 438918}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Paul Brown \\
+{\sc Applications Programmer(s):} & Mike McSherry \\
+{\sc Postal Address:}             & Department of Pure and Applied Physics \\
+                                  & University of Belfast \\
+                                  & BELFAST \\
+                                  & BT7 1NN \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[ASTERIX] X-ray data processing system (Bob Vallance, Birmingham; 
+David Allan, Birmingham).
+\item[CHART] Finding chart and stellar data system (Peter Allan, RAL).
+\item[CONVERT] Format-conversion package (Malcolm Currie, RAL).
+\item[DAOPHOT] Stellar photometry package (Nick Eaton, ICSTM).
+\item[DIPSO] Display and plotting package (Ian Howarth, UCL).
+\item[DOCFIND] Starlink document search (Peter Allan, RAL).
+\item[ECHOMOP] Echelle data reduction system (Dave Mills, UCL).
+\item[ECHWIND] UCL echelle spectrograph observation planning (Adrian Fish,
+UCL).
+\item[EMAIL] Email help utility (Adrian Fish, UCL).
+\item[FIGARO 3] General data reduction system (Keith Shortridge, AAO; Horst
+Meyerdierks, Edinburgh).
+\item[IRAS90] IRAS data analysis package (Dave Berry, Manchester).
+\item[IUEDEARCH] Access to IUE archive data (Chris Lloyd, RAL).
+\item[IUEDR] IUE data reduction package (Dave Mills, UCL).
+\item[KAPPA] Kernel application package (Malcolm Currie, RAL).
+\item[NDPROGS] n-D analysis.
+\item[PHOTOM] Aperture photometry routines (Nick Eaton, ICSTM).
+\item[PONGO] Interactive data plotting (Paul Rees, RAL).
+\item[RGASP] Reduced galaxy surface photometry package (Jonathan Davies, 
+Cardiff).
+\item[STEVE] Starlink EVE editor (Adrian Fish, UCL).
+\item[TWODSPEC] Longslit spectroscopy (Tim Wilkins, Durham).
+\item[XRP] SMM X-ray polychromator (Michael McSherry, Belfast).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[AIPS] Astronomical image processing system (Overseas).
+\item[IDL] Interactive data language (Commercial)
+\item[IRAF] Image reduction and analysis facility (Overseas).
+\item[LATEX/TEX] Superior document preparation system (Public Domain).
+\item[NAG] Mathematical subroutine library (Commercial).
+\item[Spelling checker] UNIX equivalent to SPELL (Public Domain).
+\item[QDP] Quick and dandy plotter (Overseas).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+{\bf None}
+
+
+\newpage
+\subsection{Birmingham}
+
+\renewcommand{\starsitename}{Birmingham}
+\renewcommand{\starnodename}{BHVAD}
+
+\renewcommand{\starunixdate}{Unknown}
+\renewcommand{\starupdate}{1993 October 27}
+
+\renewcommand{\starsitetelephone}{021 414 6447}
+\renewcommand{\starsitefax}{021 414 3722}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Bill Wilson \\
+{\sc Applications Programmer(s):} & None \\
+{\sc Postal Address:}             & G6 \\
+                                  & School of Physics and Space Research \\
+                                  & University of Birmingham \\
+                                  & Edgbaston Park Road \\
+                                  & BIRMINGHAM \\
+                                  & B15 2TT \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[ADAM] Starlink software environment (Alan Chipperfield, RAL; ADAM Support
+Group, RAL).
+\item[ASTERIX] X-ray data processing system (Bob Vallance, Birmingham; 
+David Allan, Birmingham).
+\item[ASURV] Astronomical survival statistics (Peter Allan, RAL).
+\item[CCDPACK] CCD data reduction (Peter Draper, Durham).
+\item[CHART] Finding chart and stellar data system (Peter Allan, RAL).
+\item[CHR] Character handling routines (Paul Rees, RAL).
+\item[COCO] Conversion of celestial coordinates (Patrick Wallace, RAL).
+\item[DIPSO] Display and plotting package (Ian Howarth, UCL).
+\item[DOCFIND] Starlink document search (Peter Allan, RAL).
+\item[FIGARO 3] General data reduction system (Keith Shortridge, AAO; Horst
+Meyerdierks, Edinburgh).
+\item[FORMLOAD] \LaTeX\ form generator (Alan Penny, RAL).
+\item[ICL] ADAM command language (Brian McIlwrath, RAL).
+\item[IKONPAINT] Ikon and GWM window to inkjet hard-copy (Clive Page,
+Leicester; Geoff Mellor, Leicester).
+\item[KAPPA] Kernel application package (Malcolm Currie, RAL).
+\item[NETWORK] DECNET utilities (Alan Lotts, Durham).
+\item[PGPLOT] Graphics subroutine library (Dave Terrett, RAL).
+\item[PRIMDAT] Processing primitive numerical data (Rodney Warren-Smith, RAL).
+\item[REF] HDS reference handling (Alan Chipperfield, RAL; Rodney Warren-Smith, 
+RAL).
+\item[RV] Radial components of observer's velocity (Patrick Wallace, RAL).
+\item[SCAR] Starlink catalogue access and reporting (Alan Wood, RAL).
+\item[SCP] Simple CCD processing package ({\em Jim Lewis, RGO}).
+\item[SLALIB] Starlink library of subroutines (Patrick Wallace, RAL).
+\item[TPOINT] Telescope pointing analysis system (Patrick Wallace, RAL).
+\item[TPU] Tape processing utility (Dave Terrett, RAL; Chris Clayton, RAL).
+\item[TRACE] HDS data set listing (Malcolm Currie, RAL).
+\item[WFCSORT] Sort ROSAT wide field camera data ({\em Mike Denby, Leicester;
+Julian Osborne, Leicester}).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[CLUSTAN] Cluster-analysis package (Commercial).
+\item[GENSTAT] Statistical data analysis (Commercial).
+\item[IDL] Interactive data language (Commercial)
+\item[{\em KERMIT}] {\em File transfer program (Public Domain).}
+\item[LATEX/TEX] Superior document preparation system (Public Domain).
+\item[MAPLE] Mathematical manipulation package (Commercial).
+\item[MEMSYS] Maximum entropy image processing (Commercial).
+\item[MONGO] Interactive plotting program (Overseas).
+\item[NAG] Mathematical subroutine library (Commercial).
+\item[DEC PCA or equivalent] Performance and Coverage Analyzer (Commercial).
+\item[QDP] Quick and dandy plotter (Overseas).
+\item[RUNOFF replacement] Text formatter (Commercial).
+\item[Spelling checker] UNIX equivalent to SPELL (Public Domain).
+\item[Spread sheet] Not available on VMS.
+\item[{\em XCOM}] {\em X-ray cross-section data (Overseas).}
+\item[{\em XSPEC}] {\em X-ray spectral fitting package (Overseas).}
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+{\em Require ICL as soon as possible (now) for ASTERIX porting.}
+
+XCOM is an X-ray Cross Section Data program got from MSFC and NBS.
+I've had a quick look at what's installed here and it implies that the
+distribution contains the code and states it can be built on any machine.
+Whether in fact this can be done with little effort is a different matter!
+
+Spacelab software -- there is a lot of locally developed software which was 
+used for our experiment on board Spacelab (a shuttle flight). 
+The problem is that this software is still used occasionally but we have no
+effort to put into porting it.
+I think we mentioned this problem in our bid in relation to how long we need
+to keep a VMS machine available.
+
+
+\newpage
+\subsection{Cambridge}
+
+\renewcommand{\starsitename}{Cambridge}
+\renewcommand{\starnodename}{CAVAD}
+
+\renewcommand{\starunixdate}{Unknown}
+\renewcommand{\starupdate}{1993 October 29}
+
+\renewcommand{\starsitetelephone}{0223 337528}
+\renewcommand{\starsitefax}{0223 374700}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Peter Bunclark \\
+                                  & Phil Herridge \\
+                                  & Steve Percival \\
+                                  & Geraint Lewis \\
+{\sc Applications Programmer(s):} & None \\
+{\sc Postal Address:}             & Institute of Astronomy \\
+                                  & University of Cambridge \\
+                                  & Madingley Road \\
+                                  & CAMBRIDGE \\
+                                  & CA3 0HA \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[APIG] Absorption profiles in the interstellar gas (Clive Davenhall,
+Leicester; Max Pettini, Cambridge).
+\item[ASTERIX] X-ray data processing system (Bob Vallance, Birmingham; 
+David Allan, Birmingham).
+\item[CGS4DR] CGS4 data reduction (Phil Daly, JACH).
+\item[FIGARO 3] General data reduction system (Keith Shortridge, AAO; Horst
+Meyerdierks, Edinburgh).
+\end{description}
+
+
+\newpage
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[AIPS] Astronomical image processing system (Overseas).
+\item[{\em DOPHOT}] {\em Automated CCD photometry using profile fitting 
+(Overseas).}
+\item[IRAF] Image reduction and analysis facility (Overseas).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+{\bf None}
+
+
+\newpage
+\subsection{Cardiff}
+
+\renewcommand{\starsitename}{Cardiff}
+\renewcommand{\starnodename}{CARDIF}
+
+\renewcommand{\starunixdate}{1993 October 1}
+\renewcommand{\starupdate}{1993 October 26}
+
+\renewcommand{\starsitetelephone}{0222 874000 Ext. 5282}
+\renewcommand{\starsitefax}{0222 874056}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Rodney Smith \\
+{\sc Applications Programmer(s):} & Rhys Morris \\
+                                  & Grant Privett \\
+{\sc Postal Address:}             & Department of Physics and Astronomy \\
+                                  & University of Wales College of Cardiff \\
+                                  & PO Box 913 \\
+                                  & CARDIFF \\
+                                  & CF2 3YB \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[ASTERIX] X-ray data processing system (Bob Vallance, Birmingham; 
+David Allan, Birmingham).
+\item[CHART] Finding chart and stellar data system (Peter Allan, RAL).
+\item[ECHOMOP] Echelle data reduction system (Dave Mills, UCL).
+\item[FIGARO 3] General data reduction system (Keith Shortridge, AAO; Horst
+Meyerdierks, Edinburgh).
+\item[ICL] ADAM command language (Brian McIlwrath, RAL).
+\item[OBSERVE] Check star observability (Julian Osborne, Leicester).
+\item[PONGO] Interactive data plotting (Paul Rees, RAL).
+\item[RGASP] Reduced galaxy surface photometry package (Jonathan Davies, 
+Cardiff).
+\item[NCAR STRMLN] Graphics utilities (Dave Terrett, RAL; Pat Wallace, RAL;
+Paul Rees, RAL).
+\item[TRACE] HDS data set listing (Malcolm Currie, RAL).
+\item[UNIX equivalent of ACCANAL] Resource accounting analysis.
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[Text editor] A nice text editor.
+\item[Spelling checker] UNIX equivalent to SPELL (Public Domain).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+The lack of some of the programmes on the SUNs is not crucial to the move
+over to UNIX. 
+Some of the RGASP routines are already available under UNIX.
+We also have the beginnings of an ACCANAL3 replacement for the SUNs too.
+
+Our other, non-Starlink SUNs, are currently at a lower version of SUNOS than
+those of Starlink.
+It is hoped that they will all be ready to go to Solaris at the same time.
+
+
+\newpage
+\subsection{Durham}
+
+\renewcommand{\starsitename}{Durham}
+\renewcommand{\starnodename}{DUVAD}
+
+\renewcommand{\starunixdate}{Unknown}
+\renewcommand{\starupdate}{1993 October 26}
+
+\renewcommand{\starsitetelephone}{091 374 2131}
+\renewcommand{\starsitefax}{091 374 3749}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Alan Lotts \\
+{\sc Applications Programmer(s):} & Peter Draper \\
+{\sc Postal Address:}             & Department of Physics \\
+                                  & University of Durham \\
+                                  & South Road \\
+                                  & DURHAM \\
+                                  & DH1 3LE \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[CHART] Finding chart and stellar data system (Peter Allan, RAL).
+\item[SST] Simple software tools package (Rodney Warren-Smith, RAL).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[IRAF] Image reduction and analysis facility (Overseas).
+\item[MONGO] Interactive plotting program (Overseas).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+This is just a result of first inquiry and sure to be extended.
+I have not included s/w already supplied, of course.
+
+We hope to use AVS soon (on a local license).
+
+
+\newpage
+\subsection{Edinburgh}
+
+\renewcommand{\starsitename}{Edinburgh}
+\renewcommand{\starnodename}{REVAD}
+
+\renewcommand{\starunixdate}{Unknown}
+\renewcommand{\starupdate}{1993 October 26}
+
+\renewcommand{\starsitetelephone}{031 668 8377}
+\renewcommand{\starsitefax}{031 668 8264}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & John Barrow \\
+{\sc Applications Programmer(s):} & Horst Meyerdierks \\
+{\sc Postal Address:}             & Royal Observatory Edinburgh \\
+                                  & Blackford Hill \\
+                                  & EDINBURGH \\
+                                  & EH9 3HJ \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[ADAM] Starlink software environment (Alan Chipperfield, RAL; ASG, RAL).
+\item[CCDPACK] CCD data reduction (Peter Draper, Durham).
+\item[CGS4DR] CGS4 data reduction (Phil Daly, JACH).
+\item[CHR] Character handling routines (Paul Rees, RAL).
+\item[CONVERT] Format-conversion package (Malcolm Currie, RAL).
+\item[DAOPHOT] Stellar photometry package (Nick Eaton, ICSTM).
+\item[DOCFIND] Starlink document search (Peter Allan, RAL).
+\item[EMAIL] Email help utility (Adrian Fish, UCL).
+\item[EMS] Error message service (Paul Rees, RAL).
+\item[FIGARO 3] General data reduction system (Keith Shortridge, AAO; Horst
+Meyerdierks, Edinburgh).
+\item[FIO] Fortran I/O routines (Peter Allan, RAL).
+\item[GENERIC] Compiling generic Fortran subroutines (Malcolm Currie, RAL;
+Steven Beard, Edinburgh).
+\item[GWM] X graphics window manager (Dave Terrett, RAL).
+\item[HDS] Hierarchical data system (Rodney Warren-Smith, RAL).
+\item[ICL] ADAM command language (Brian McIlwrath, RAL).
+\item[IKONPAINT] Ikon and GWM window to inkjet hard-copy (Clive Page,
+Leicester; Geoff Mellor, Leicester).
+\item[IRAS90] IRAS data analysis package (Dave Berry, Manchester).
+\item[IRCAM] Infra-red data reduction package (Colin Aspin, JACH).
+\item[JCMTDR] JCMT data reduction (John Lightfoot, ROE).
+\item[KAPPA] Kernel application package (Malcolm Currie, RAL).
+\item[MERS] Message and error reporting (Paul Rees, RAL).
+\item[NDF] NDF data structures routines (Rodney Warren-Smith, RAL).
+\item[NETWORK] DECNET utilities (Alan Lotts, Durham).
+\item[NEWS] Starlink news system.
+\item[PGPLOT] Graphics subroutine library (Dave Terrett, RAL).
+\item[PHOTOM] Aperture photometry routines (Nick Eaton, ICSTM).
+\item[PONGO] Interactive data plotting (Paul Rees, RAL).
+\item[PRIMDAT] Processing primitive numerical data (Rodney Warren-Smith, RAL).
+\item[PSX] POSIX interface routines (Peter Allan, RAL).
+\item[SMS] Screen management system (Jeff Cooke, Edinburgh).
+\item[SPECDRE] Spectroscopy data reduction (Horst Meyerdierks, Edinburgh).
+\item[SPECX] Millimetre wave spectral reduction system (Rachel Padman, MRAO).
+\item[SST] Simple software tools package (Rodney Warren-Smith, RAL).
+\item[STARLSE] Starlink extensions to the VAX LSE (Rodney Warren-Smith, RAL).
+\item[STEVE] Starlink EVE editor (Adrian Fish, UCL).
+\item[TRACE] HDS data set listing (Malcolm Currie, RAL).
+\end{description}
+
+
+\newpage
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[{\em AOSRED}] {\em JCMT data reduction (Overseas).}
+\item[{\em KERMIT}] {\em File transfer program (Public Domain).}
+\item[LATEX/TEX] Superior document preparation system (Public Domain).
+\item[MONGO] Interactive plotting program (Overseas).
+\item[NAG] Mathematical subroutine library (Commercial).
+\item[VAXNOTES] Network conferencing (Commercial).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+I circulated my users in early June regarding the transition to UNIX, and
+asked them to reply with details of what software they currently use on VMS,
+and therefore what equivalent facilities they would expect to find on a UNIX
+system.
+I have only just returned from holiday, so I've been unable to
+distill the comments before now.
+
+I had replies from eight users (plus one rather garbled reply from one other).
+This, as far as I am concerned, is about par for the course, and confirms my 
+view that it is almost impossible to get an informed opinion about what our 
+users feel about any matter whatsoever (without going round to each one in 
+turn and cross-questioning them; needless to say, this is a practical 
+impossibility, and just a waste of my time). 
+A summary of the users' comments is appended.
+I should mention that these comments were solicited at about the same time
+that nuTPU, jed, and Pine were installed, and since then Bernard McNally has
+carried out more work in rationalizing our e-mail access from Internet.
+Hence the comments about e-mail and editors should be treated with a little
+less emphasis.
+
+I suspect one solution is to present the users with a fait-accompli, and
+then, when they turn round and ask what happened to their favourite package,
+we have the perfect answer.
+However, being (I hope) a conscientious Site Manager, I would not be 
+satisfied that the majority of my users' views (even if they are not 
+officially expressed) were being properly respected if the transition to 
+UNIX went ahead in such a fashion, regardless of the poor response to my 
+request for information in electronic form.
+
+As far as this Site is concerned, I am anxious that any plans for the shut-down
+of VMS facilities are not laid purely at RAL. 
+The Observatory (which has a significant fraction of the Starlink users here) 
+has a continuing commitment to VMS because of the links with the JAC, and a 
+VMS facility will still be required here well after the April (or even 
+October) 1995 deadline.
+It may be that we will need some of the Starlink VMS hardware/software to 
+maintain ROE's VMS functionality.
+Hence any decision to turn off the VMS systems must be made in full 
+consultation with ROE T \& C management.
+
+
+\newpage
+\subsection{Glasgow}
+
+\renewcommand{\starsitename}{Glasgow}
+\renewcommand{\starnodename}{uk.ac.gla.astro}
+
+\renewcommand{\starunixdate}{1993 September 1}
+\renewcommand{\starupdate}{1993 October 26}
+
+\renewcommand{\starsitetelephone}{041 339 8855 Ext. 4268}
+\renewcommand{\starsitefax}{041 334 9029}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Shashi Kanbur \\
+{\sc Applications Programmer(s):} & None \\
+{\sc Postal Address:}             & Department of Physics and Astronomy \\
+                                  & University of Glasgow \\
+                                  & Glasgow \\
+                                  & G12 8QQ \\
+                                  & Scotland \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[ASTERIX] X-ray data processing system (Bob Vallance, Birmingham; 
+David Allan, Birmingham).
+\item[CHI] Catalogue handling interface (Alan Wood, RAL).
+\item[CNF] C and Fortran mixed programming (Peter Allan, RAL).
+\item[DOCFIND] Starlink document search (Peter Allan, RAL).
+\item[EMS] Error message service (Paul Rees, RAL).
+\item[RGASP] Reduced galaxy surface photometry package (Jonathan Davies, 
+Cardiff).
+\item[FIGARO 3] General data reduction system (Keith Shortridge, AAO; Horst
+Meyerdierks, Edinburgh).
+\item[GKS] Graphical kernel system (version 7.4) (Dave Terrett, RAL).
+\item[HELP] Interactive help system (Patrick Wallace, RAL).
+\item[HXIS] Hard X-ray imaging spectrometer (James Tappin, Birmingham).
+\item[IUEDR] IUE data reduction package (Dave Mills, UCL).
+\item[KAPPA] Kernel application package (Malcolm Currie, RAL).
+\item[LIBX] Simple tools for use with libraries (Pat Wallace, RAL).
+\item[NCAR] Graphics utilities (Pat Wallace, RAL; Dave Terrett, RAL; 
+Paul Rees, RAL).
+\item[NETWORK] DECNET utilities (Alan Lotts, Durham).
+\item[SNX] Starlink extensions to NCAR graphics utilities (Patrick Wallace,
+RAL).
+\item[SST] Simple software tools package (Rodney Warren-Smith, RAL).
+\item[TSP] Time series/polarimetry package (Jeremy Bailey, AAO).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[AIPS] Astronomical image processing system (Overseas).
+\item[GENSTAT] Statistical data analysis (Commercial).
+\item[IDL] Interactive data language (Commercial)
+\item[LATEX/TEX] Superior document preparation system (Public Domain).
+\item[MAPLE] Mathematical manipulation package (Commercial).
+\item[MEMSYS] Maximum entropy image processing (Commercial).
+\item[NAG] Mathematical subroutine library (Commercial).
+\item[SPAG] Fortran source code unscrambler (Commercial).
+\item[TOOLPACK] Fortran 77 software tools (Commercial).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+{\bf None}
+
+
+\newpage
+\subsection{Hatfield}
+
+\renewcommand{\starsitename}{Hatfield}
+\renewcommand{\starnodename}{HATVAD}
+
+\renewcommand{\starunixdate}{Unknown}
+\renewcommand{\starupdate}{1993 October 26}
+
+\renewcommand{\starsitetelephone}{0707 279607}
+\renewcommand{\starsitefax}{0707284514}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Tim Gledhill \\
+{\sc Applications Programmer(s):} & None \\
+{\sc Postal Address:}             & Department of Physics and Astronomy \\
+                                  & University of Hertfordshire \\
+                                  & College Lane \\
+                                  & HATFIELD \\
+                                  & AL10 9AB \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[FIGARO 3] General data reduction system (Keith Shortridge, AAO; Horst
+Meyerdierks, Edinburgh).
+\item[KAPPA] Kernel application package (Malcolm Currie, RAL).
+\item[IRCAM] Infra-red data reduction package (Colin Aspin, JACH).
+\item[IUEDEARCH] Access to IUE archive data (Chris Lloyd, RAL).
+\item[NCAR] Graphics utilities (Pat Wallace, RAL; Dave Terrett, RAL; 
+Paul Rees, RAL).
+\item[TSP] Time series/polarimetry package (Jeremy Bailey, AAO).
+\item[TWODSPEC] Longslit spectroscopy (Tim Wilkins, Durham).
+\end{description}
+
+
+\newpage
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[MONGO] Interactive plotting program (Overseas).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+One of their most used packages is IRCAM, which is used mainly for the
+reduction of polarimetry data.
+Since IRCAM is not going to be ported to UNIX, they will need some other
+software to do the same job.
+It is intended for a new package, called IRCAMPACK, with several new 
+polarization applications to provided by KAPPA, to be used for reducing
+IRCAM images.
+
+RGASP might have been useful for some new areas of research beginning at
+Hatfield ({\em e.g.} J, H and K mapping of galaxies). 
+ESP is planned to replace RGASP on VMS and UNIX.
+
+
+\newpage
+\subsection{ICSTM}
+
+\renewcommand{\starsitename}{ICSTM}
+\renewcommand{\starnodename}{ICVAD}
+
+\renewcommand{\starunixdate}{Unknown}
+\renewcommand{\starupdate}{1993 October 26}
+
+\renewcommand{\starsitetelephone}{071 589 5111 Ext. 6658}
+\renewcommand{\starsitefax}{071 589 9463}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Nicholas Eaton \\
+{\sc Applications Programmer(s):} & None \\
+{\sc Postal Address:}             & Astrophysics Group \\
+                                  & Department of Physics \\
+                                  & Blackett Laboratory \\
+                                  & ICSTM \\
+                                  & Prince Consort Road \\
+                                  & LONDON \\
+                                  & SW7 2BZ \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[ASTERIX] X-ray data processing system (Bob Vallance, Birmingham; 
+David Allan, Birmingham).
+\item[COCO] Conversion of celestial coordinates (Patrick Wallace, RAL).
+\item[FIGARO 3] General data reduction system (Keith Shortridge, AAO; Horst
+Meyerdierks, Edinburgh).
+\item[ICL] ADAM command language (Brian McIlwrath, RAL).
+\item[IKONPAINT] Ikon and GWM window to inkjet hard-copy (Clive Page,
+Leicester; Geoff Mellor, Leicester).
+\item[IRCAM] Infra-red data reduction package (Colin Aspin, JACH).
+\item[KAPPA] Kernel application package (Malcolm Currie, RAL).
+\item[PGPLOT] Graphics subroutine library (Dave Terrett, RAL).
+\item[PONGO] Interactive data plotting (Paul Rees, RAL).
+\item[SCAR] Starlink catalogue access and reporting (Alan Wood, RAL).
+\item[SLALIB] Starlink library of subroutines (Patrick Wallace, RAL).
+\item[STEVE] Starlink EVE editor (Adrian Fish, UCL).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[IDL] Interactive data language (Commercial)
+\item[LATEX/TEX] Superior document preparation system (Public Domain).
+\item[MONGO] Interactive plotting program (Overseas).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+{\bf None}
+
+
+\newpage
+\subsection{Jodrell Bank}
+
+\renewcommand{\starsitename}{Jodrell Bank}
+\renewcommand{\starnodename}{JBVAD}
+
+\renewcommand{\starunixdate}{1993 June 1}
+\renewcommand{\starupdate}{1993 October 26}
+
+\renewcommand{\starsitetelephone}{0477 71321 Ext. 293}
+\renewcommand{\starsitefax}{0477 71618}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Richard Nicholson \\
+{\sc Applications Programmer(s):} & None \\
+{\sc Postal Address:}             & Nuffield Radio Astronomy Laboratory \\
+                                  & University of Manchester \\
+                                  & Jodrell Bank \\
+                                  & MACCLESFIELD \\
+                                  & Cheshire \\
+                                  & SK11 9DL \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[ASTERIX] X-ray data processing system (Bob Vallance, Birmingham; 
+David Allan, Birmingham).
+\item[CHART] Finding chart and stellar data system (Peter Allan, RAL).
+\item[DIPSO] Display and plotting package (Ian Howarth, UCL).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+{\bf None}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+{\bf None}
+
+
+\newpage
+\subsection{Keele}
+
+\renewcommand{\starsitename}{Keele}
+\renewcommand{\starnodename}{KLVAD}
+
+\renewcommand{\starunixdate}{1993 June 1}
+\renewcommand{\starupdate}{1993 October 26}
+
+\renewcommand{\starsitetelephone}{0782 583889}
+\renewcommand{\starsitefax}{0782 711093}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & James Albinson \\
+{\sc Applications Programmer(s):} & None \\
+{\sc Postal Address:}             & Department of Physics \\
+                                  & University of Keele \\
+                                  & KEELE \\
+                                  & Staffordshire \\
+                                  & ST5 5BG \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[ASTERIX] X-ray data processing system (Bob Vallance, Birmingham; 
+David Allan, Birmingham).
+\item[DIPSO] Display and plotting package (Ian Howarth, UCL).
+\item[IRAS90] IRAS data analysis package (Dave Berry, Manchester).
+\item[IUEDEARCH] Access to IUE archive data (Chris Lloyd, RAL).
+\item[IUEDR] IUE data reduction package (Dave Mills, UCL).
+\item[MAG] Magnetic tape handling routines (Peter Allan, RAL).
+\item[SPECX] Millimetre wave spectral reduction system (John Lightfoot, ROE).
+\end{description}
+
+
+\newpage
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[{\em DAOPHOT}] {\em Stellar photometry package, old version (Nick 
+Eaton, ICSTM).}
+\item  Several utility items from Internet sources under preparation.
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+Along with the UNIX version of DIPSO, Keele also require DIPSO stack conversion
+utilities to convert old DIPSO stack files to NDF files on VMS.
+Some trouble with Canon LPB8AII native GKS graphics driver with DIPSO?
+
+The new Alpha workstations may obviate all the Ultrix related moans. The 
+Alphas are not yet in a state to start running Starlink s/w due to lack of 
+system s/w. This problem is being attacked.  It is {\em highly likely} that 
+more memory will have to be bid for in the next round of Starlink funding.
+
+Progress in software migration, from the point of what the System Manager 
+can do, is being held up due to extreme pressure of other duties at the 
+start of the new Semester. Not to mention the new alphas needing to be 
+brought up to operating configuration...
+
+The new alphas will, paradoxically, slow the overall plunge towards total
+unixness.
+
+
+\newpage
+\subsection{Kent}
+
+\renewcommand{\starsitename}{Kent}
+\renewcommand{\starnodename}{KENVAD}
+
+\renewcommand{\starunixdate}{Unknown}
+\renewcommand{\starupdate}{1993 October 26}
+
+\renewcommand{\starsitetelephone}{0227 475406}
+\renewcommand{\starsitefax}{0227 456084}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Subhash Rehan \\
+{\sc Applications Programmer(s):} & None \\
+{\sc Postal Address:}             & Electronic Engineering Laboratory \\
+                                  & University of Kent \\
+                                  & CANTERBURY \\
+                                  & Kent \\
+                                  & CT2 7NT \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[CCDPACK] CCD data reduction (Peter Draper, Durham).
+\item[CGS4DR] CGS4 data reduction (Phil Daly, JACH).
+\item[DAOPHOT] Stellar photometry package (Nick Eaton, ICSTM).
+\item[DIPSO] Display and plotting package (Ian Howarth, UCL).
+\item[FIGARO 3] General data reduction system (Keith Shortridge, AAO; Horst
+Meyerdierks, Edinburgh).
+\item[IRCAM] Infra-red data reduction package (Colin Aspin, JACH).
+\item[IUEDEARCH] Access to IUE archive data (Chris Lloyd, RAL).
+\item[IUEDR] IUE data reduction package (Dave Mills, UCL).
+\item[JCMTDR] JCMT data reduction (John Lightfoot, ROE).
+\item[KAPPA] Kernel application package (Malcolm Currie, RAL).
+\item[PGPLOT] Graphics subroutine library (Dave Terrett, RAL).
+\item[PONGO] Interactive data plotting (Paul Rees, RAL).
+\item[RV] Radial components of observer's velocity (Patrick Wallace, RAL).
+\item[SPECX] Millimetre wave spectral reduction system (Rachel Padman, MRAO).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[AIPS] Astronomical image processing system (Overseas).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+Kent are now running Solaris 2.1 on their SUNs.
+
+
+\newpage
+\subsection{Leicester}
+
+\renewcommand{\starsitename}{Leicester}
+\renewcommand{\starnodename}{LTVAD}
+
+\renewcommand{\starunixdate}{Unknown}
+\renewcommand{\starupdate}{1993 October 29}
+
+\renewcommand{\starsitetelephone}{0533 523599}
+\renewcommand{\starsitefax}{0533 550182}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Geoff Mellor \\
+{\sc Applications Programmer(s):} & Clive Davenhall \\
+{\sc Postal Address:}             & Department of Physics and Astronomy \\
+                                  & University of Leicester \\
+                                  & University Road \\
+                                  & LEICESTER \\
+                                  & LE1 7RH \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[ASTERIX] X-ray data processing system (Bob Vallance, Birmingham; 
+David Allan, Birmingham).
+\item[{\em BROWSE}] {\em EXOSAT Database software system (Andy Pollock, 
+Leicester; software team, GSFC).}
+\item[{\em GINGA}] {\em Data reduction and analysis software (Jackie 
+Butcher, Leicester; Barry Kellett, RAL).}
+\item[ICL] ADAM command language (Brian McIlwrath, RAL).
+\item[SCAR] Starlink catalogue access and reporting (Alan Wood, RAL).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+{\bf None}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+Leicester's move to UNIX is being delayed primarily by lack of hardware 
+funding.
+
+
+\newpage
+\subsection{Liverpool John Moores}
+
+\renewcommand{\starsitename}{Liverpool John Moores}
+\renewcommand{\starnodename}{uk.ac.livjm.star}
+
+\renewcommand{\starunixdate}{Unknown}
+\renewcommand{\starupdate}{1993 October 27}
+
+\renewcommand{\starsitetelephone}{051 231 2337}
+\renewcommand{\starsitefax}{051 298 1014}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Alan Scott \\
+{\sc Applications Programmer(s):} & None \\
+{\sc Postal Address:}             & School of Chemical and Physical Sciences \\
+                                  & Byrom Street \\
+                                  & Liverpool \\
+                                  & L3 3AF \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[ASTERIX] X-ray data processing system (Bob Vallance, Birmingham; 
+\item[CCDPACK] CCD data reduction (Peter Draper, Durham).
+\item[CGS4DR] CGS4 data reduction (Phil Daly, JACH).
+\item[DIPSO] Display and plotting package (Ian Howarth, UCL).
+\item[FIGARO 3] General data reduction system (Keith Shortridge, AAO; Horst
+Meyerdierks, Edinburgh).
+\item[IUEDR] IUE data reduction package (Dave Mills, UCL).
+\item[KAPPA] Kernel application package (Malcolm Currie, RAL).
+\item[NDF] NDF data structures routines (Rodney Warren-Smith, RAL).
+\item[PGPLOT] Graphics subroutine library (Dave Terrett, RAL).
+\end{description}
+
+
+\newpage
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[AIPS] Astronomical image processing system (Overseas).
+\item[{\em CLOUDY}] {\em Photo-ionization code (Overseas).}
+\item[{\em DOPHOT}] {\em Automated CCD photometry using profile fitting 
+(Overseas).}
+\item[NAG] Mathematical subroutine library (Commercial).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+{\bf None}
+
+
+\newpage
+\subsection{Manchester}
+
+\renewcommand{\starsitename}{Manchester}
+\renewcommand{\starnodename}{MAVAD}
+
+\renewcommand{\starunixdate}{1994 January 1}
+\renewcommand{\starupdate}{1993 October 27}
+
+\renewcommand{\starsitetelephone}{061 275 4236}
+\renewcommand{\starsitefax}{061 273 4223}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Vassilis Laspias \\
+{\sc Applications Programmer(s):} & Dave Berry \\
+{\sc Postal Address:}             & Department of Astronomy \\
+                                  & University of Manchester \\
+                                  & Oxford Road \\
+                                  & MANCHESTER \\
+                                  & M13 9PL \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[CHART] Finding chart and stellar data system (Peter Allan, RAL).
+\item[FIGARO 3] General data reduction system (Keith Shortridge, AAO; Horst
+Meyerdierks, Edinburgh).
+\item[TWODSPEC] Longslit spectroscopy (Tim Wilkins, Durham).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[IRAF] Image reduction and analysis facility (Overseas).
+\item[NAG] Mathematical subroutine library (Commercial).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+{\bf None}
+
+
+\newpage
+\subsection{Oxford}
+
+\renewcommand{\starsitename}{Oxford}
+\renewcommand{\starnodename}{OXVAD}
+
+\renewcommand{\starunixdate}{Unknown}
+\renewcommand{\starupdate}{1993 October 26}
+
+\renewcommand{\starsitetelephone}{0865 273311}
+\renewcommand{\starsitefax}{0865 273418}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Paul Collinson \\
+{\sc Applications Programmer(s):} & None \\
+{\sc Postal Address:}             & Department of Astrophysics \\
+                                  & Nuclear Physics Building \\
+                                  & Keble Road \\
+                                  & OXFORD \\
+                                  & OX1 3RH \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[ASTERIX] X-ray data processing system (Bob Vallance, Birmingham; 
+David Allan, Birmingham).
+\item[CCDPACK] CCD data reduction (Peter Draper, Durham).
+\item[CGS4DR] CGS4 data reduction (Phil Daly, JACH).
+\item[DAOPHOT] Stellar photometry package (Nick Eaton, ICSTM).
+\item[DIPSO] Display and plotting package (Ian Howarth, UCL).
+\item[ECHOMOP] Echelle data reduction system (Dave Mills, UCL).
+\item[FIGARO 3] General data reduction system (Keith Shortridge, AAO; Horst
+Meyerdierks, Edinburgh).
+\item[IRCAM] Infra-red data reduction package (Colin Aspin, JACH).
+\item[IUEDEARCH] Access to IUE archive data (Chris Lloyd, RAL).
+\item[IUEDR] IUE data reduction package (Dave Mills, UCL).
+\item[JCMTDR] JCMT data reduction (John Lightfoot, ROE).
+\item[KAPPA] Kernel application package (Malcolm Currie, RAL).
+\item[SCAR] Starlink catalogue access and reporting (Alan Wood, RAL).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[AIPS] Astronomical image processing system (Overseas).
+\item[IRAF] Image reduction and analysis facility (Overseas).
+\item[MONGO] Interactive plotting program (Overseas).
+\item[{\em XSPEC}] {\em X-ray spectral fitting package (Overseas).}
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+\begin{description}
+\item[YOGI FIGARO] or equivalent is required for the reduction of
+data taken with IRIS on the AAT.
+\item[IUE ARCHIVE ACCESS] is required and so a replacement for
+IUEDEARCH and USSP is needed.
+\end{description}
+
+
+\newpage
+\subsection{Preston}
+
+\renewcommand{\starsitename}{Preston}
+\renewcommand{\starnodename}{LPVAD}
+
+\renewcommand{\starunixdate}{Unknown}
+\renewcommand{\starupdate}{1993 October 26}
+
+\renewcommand{\starsitetelephone}{0772 893564}
+\renewcommand{\starsitefax}{0772 892903}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Andy Adamson \\
+{\sc Applications Programmer(s):} & None \\
+{\sc Postal Address:}             & Department of Physics and Astronomy \\
+                                  & University of Central Lancashire \\
+                                  & PRESTON \\
+                                  & PR1 2HE \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[ASTERIX] X-ray data processing system (Bob Vallance, Birmingham; 
+David Allan, Birmingham).
+\item[CGS4DR] CGS4 data reduction (Phil Daly, JACH).
+\item[DIPSO] Display and plotting package (Ian Howarth, UCL).
+\item[IRCAM\_CLRED] Infra-red data reduction package -- BOX, CIRCLE, ELLIPSE 
+applications (Colin Aspin, JACH).
+\item[IUEDEARCH] Access to IUE archive data (Chris Lloyd, RAL).
+\item[IUEDR] IUE data reduction package (Dave Mills, UCL).
+\item[NCAR STRMLN] Graphics utilities (Dave Terrett, RAL; Pat Wallace, RAL;
+Paul Rees, RAL).
+\item[SCAR] Starlink catalogue access and reporting (Alan Wood, RAL).
+\item[TSP] Time series/polarimetry package (Jeremy Bailey, AAO).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[AIPS] Astronomical image processing system (Overseas).
+\item[IRAF] Image reduction and analysis facility (Overseas).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+Users' own software includes some heavy reliance upon dynamic memory access
+(using LIB\$GETVM {\em etc.}) and the SMG routines.
+Some tutoring is probably required to inform them of portable substitutes:
+{\em e.g.} PSX\_MALLOC instead of LIB\$GET\_VM, and using the CURSES C library
+instead of the VAX/VMS SMG library.
+
+Software from Brandeis University is also used.
+This is in the process of being tested on Alpha machines (OSF/1 or OpenVMS?).
+
+
+\newpage
+\subsection{QMW}
+
+\renewcommand{\starsitename}{QMW}
+\renewcommand{\starnodename}{QMCMV}
+
+\renewcommand{\starunixdate}{Unknown}
+\renewcommand{\starupdate}{1993 October 26}
+
+\renewcommand{\starsitetelephone}{071 975 5053}
+\renewcommand{\starsitefax}{081 981 9465}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Kevin Richardson \\
+{\sc Applications Programmer(s):} & None \\
+{\sc Postal Address:}             & Department of Physics \\
+                                  & Queen Mary and Westfield College \\
+                                  & Mile End Road \\
+                                  & LONDON \\
+                                  & E1 4NS \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[CGS4DR] CGS4 data reduction (Phil Daly, JACH).
+\item[FIGARO 3] General data reduction system (Keith Shortridge, AAO; Horst
+Meyerdierks, Edinburgh).
+\item[IRCAM] Infra-red data reduction package (Colin Aspin, JACH).
+\item[JCMTDR] JCMT data reduction (John Lightfoot, ROE).
+\item[PGPLOT] Graphics subroutine library (Dave Terrett, RAL).
+\item[SPECX] Millimetre wave spectral reduction system (Rachel Padman, MRAO).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[AIPS] Astronomical image processing system (Overseas).
+\item[IDL] Interactive data language (Commercial)
+\item[MONGO] Interactive plotting program (Overseas).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+{\bf None}
+
+
+\newpage
+\subsection{RAL Astrophysics}
+
+\renewcommand{\starsitename}{RAL Astrophysics}
+\renewcommand{\starnodename}{RLSAC}
+
+\renewcommand{\starunixdate}{1993 October 1}
+\renewcommand{\starupdate}{1993 October 26}
+
+\renewcommand{\starsitetelephone}{0235 821900 Ext. 6497}
+\renewcommand{\starsitefax}{0235 445848}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Barry Kellett \\
+{\sc Applications Programmer(s):} & None \\
+{\sc Postal Address:}             & Rutherford Appleton Laboratory \\
+                                  & Chilton \\
+                                  & DIDCOT \\
+                                  & OXON \\
+                                  & OX11 0QX \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[ASTERIX] X-ray data processing system (Bob Vallance, Birmingham; 
+David Allan, Birmingham).
+\item[CHART] Finding chart and stellar data system (Peter Allan, RAL).
+\item[DIPSO] Display and plotting package (Ian Howarth, UCL).
+\item[FIGARO 3] General data reduction system (Keith Shortridge, AAO; Horst
+Meyerdierks, Edinburgh).
+\item[{\em GINGA}] {\em Data reduction and analysis software (Jackie 
+Butcher, Leicester; Barry Kellett, RAL).}
+\item[IUEDEARCH] Access to IUE archive data (Chris Lloyd, RAL).
+\item[IUEDR] IUE data reduction package (Dave Mills, UCL).
+\item[XRP] SMM X-ray polychromator (Michael McSherry, Belfast).
+\end{description}
+
+
+\newpage
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[IDL] Interactive data language (Commercial)
+\item[QDP] Quick and dandy plotter (Overseas).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+I expect there may be further third-party items which occur to people as they 
+start to use the UNIX system.
+
+Access to the Guide Star Catalogue CDs via CHART is also required.
+
+Malcolm Currie has several galaxy photometry and database applications which
+require porting, as well as a number of large Bulk Data Frames that require
+conversion to NDF data files.
+
+
+\newpage
+\subsection{RAL Project}
+
+\renewcommand{\starsitename}{RAL Project}
+\renewcommand{\starnodename}{RLVAD}
+
+\renewcommand{\starunixdate}{Unknown}
+\renewcommand{\starupdate}{1993 October 26}
+
+\renewcommand{\starsitetelephone}{0235 821900}
+\renewcommand{\starsitefax}{0235 445848}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Dave Rawlinson \\
+{\sc Applications Programmer(s):} & None \\
+{\sc Postal Address:}             & Rutherford Appleton Laboratory \\
+                                  & Chilton \\
+                                  & DIDCOT \\
+                                  & OXON \\
+                                  & OX11 0QX \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+{\bf None}
+
+
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+{\bf None}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+{\bf None}
+
+
+\newpage
+\subsection{Southampton}
+
+\renewcommand{\starsitename}{Southampton}
+\renewcommand{\starnodename}{SOTON}
+
+\renewcommand{\starunixdate}{1994 April 1}
+\renewcommand{\starupdate}{1993 October 26}
+
+\renewcommand{\starsitetelephone}{0703 592112}
+\renewcommand{\starsitefax}{0703 585813}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+\vspace{5mm}
+
+%{\bf\large  THIS IS IMPORTANT. CONSIDER CAREFULLY THE IMPLICATIONS OF
+%HAVING NO VAX}.
+
+%{\bf This is a questionnaire to determine exactly what software needs to 
+%be available on the SUNs before the Vaxes are taken away, which will
+%happen next April. Thus all your analysis programs/models/command 
+%procedures/data files/etc need to be running on SUNs by the Autumn.
+%The purpose of this questionnaire is to help you to be ready.
+%Please make your own list of all the software you use, and compare it 
+%with this list. Think about what software you will need to analyse the 
+%results of your next few observing runs/sets of lab data. I can only
+%guess what you'll need. Its up to you to check.
+%If necessary, add any software items to the the bottom of this list.
+%Please include ALL SOFTWARE, not just analysis software. This questionnaire
+%covers everything eg. editors, mail, the ORDER  program and that program
+%you wrote years ago to add two columns of numbers together!
+%If in doubt, add it to the list. This does not imply that Starlink or I
+%will port your software for you - that responsibility 
+%lies with you, I'm afraid. If anyone thinks they have insufficient time
+%to make the transition to UNIX, please tell me now!
+
+%\underline{Please give all the software items that
+%you use a rating as follows:}
+%
+% 2 ticks for `Don't consider moving the Vax until this works on the SUNs'\\
+% 1 tick for  `I could do without this between April 94 and April 95
+%but I'll need it sometime'\\
+% blank for ` I don't care about this'}\\
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[{\em APM software}] {\em APM-specific data handling (Mike Irwin, 
+Cambridge).}
+\item[ASTERIX] X-ray data processing system (Bob Vallance, Birmingham; 
+David Allan, Birmingham).
+\item[CDCOPY] CDROM reading utility (Clive Page, Leicester).
+\item[CGS4DR] CGS4 data reduction (Phil Daly, JACH).
+\item[CHART] Finding chart and stellar data system (Peter Allan, RAL).
+\item[COCO] Conversion of celestial coordinates (Patrick Wallace, RAL).
+\item[CONVERT] Format-conversion package (Malcolm Currie, RAL).
+\item[DIPSO] Display and plotting package (Ian Howarth, UCL).
+\item[DOCFIND] Starlink document search (Peter Allan, RAL).
+\item[FIGARO 3] General data reduction system (Keith Shortridge, AAO; Horst
+Meyerdierks, Edinburgh).
+\item[{\em GINGA}] {\em Data reduction and analysis software (Jackie 
+Butcher, Leicester; Barry Kellett, RAL).}
+\item[IKONPAINT] Ikon and GWM window to inkjet hard-copy (Clive Page,
+Leicester; Geoff Mellor, Leicester).
+\item[KAPPA] Kernel application package (Malcolm Currie, RAL).
+\item[PGPLOT] Graphics subroutine library (Dave Terrett, RAL).
+\item[PHOTOM] Aperture photometry routines (Nick Eaton, ICSTM).
+\item[PISA] Position intensity and shape analysis (Peter Draper, Durham).
+\item[SAM] Spectral extraction package (Jim Lewis, Cambridge).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[{\em CLOUDY}] {\em Photo-ionization code (Overseas).}
+\item[{\em GEANT}] {\em Nuclear physics library for detector Monte Carlos 
+(Overseas).}
+\item[LATEX/TEX] Superior document preparation system (Public Domain).
+\item[MONGO] Interactive plotting program (Overseas).
+\item[{\em XSPEC}] {\em X-ray spectral fitting package (Overseas).}
+\end{description}
+
+
+\begin{center}
+{\bf Local Software:}
+\end{center}
+
+\begin{description}
+\item[ORDER] Order form software (Lawrence Jones, Southampton).
+\item[LGSC] HST Guide star catalogue plots/lists (Lawrence Jones,
+Southampton).
+\end{description}
+
+
+\begin{center}
+{\bf System Software:}
+\end{center}
+\begin{description}
+\item[EDT] Editor.
+\item[VAXNOTES] Network conferencing (Commercial).
+\end{description}
+
+
+\newpage
+\subsection{St Andrews}
+
+\renewcommand{\starsitename}{St Andrews}
+\renewcommand{\starnodename}{SASTAR}
+
+\renewcommand{\starunixdate}{Unknown}
+\renewcommand{\starupdate}{1993 October 27}
+
+\renewcommand{\starsitetelephone}{0334 76161 Ext. 8323}
+\renewcommand{\starsitefax}{0334 74487}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{10mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Roger Stapleton \\
+{\sc Applications Programmer(s):} & None \\
+{\sc Postal Address:}             & Department of Physics and Astronomy \\
+                                  & University of St Andrews \\
+                                  & North Haugh \\
+                                  & St Andrews \\
+                                  & Fife \\
+                                  & KY16 9SS \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[CHART] Finding chart and stellar data system (Peter Allan, RAL).
+\item[DIPSO] Display and plotting package (Ian Howarth, UCL).
+\item[FIGARO 3] General data reduction system (Keith Shortridge, AAO; Horst
+Meyerdierks, Edinburgh).
+\item[KAPPA FITSIN] KAPPA FITS tape reading application (Malcolm Currie, RAL).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[{\em DOPHOT}] {\em Automated CCD photometry using profile fitting 
+(Overseas).}
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+Require CHART access to the HST Guide Star Catalogue to produce charts.
+
+\newpage
+\subsection{Sussex}
+
+\renewcommand{\starsitename}{Sussex}
+\renewcommand{\starnodename}{SUSTAR}
+
+\renewcommand{\starunixdate}{Unknown}
+\renewcommand{\starupdate}{1993 October 27}
+
+\renewcommand{\starsitetelephone}{0273 678478}
+\renewcommand{\starsitefax}{Fax number}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Stuart Keir \\
+{\sc Applications Programmer(s):} & None \\
+{\sc Postal Address:}             & Astronomy Centre \\
+                                  & Division of Physics and Astronomy \\
+                                  & University of Sussex \\
+                                  & BRIGHTON \\
+                                  & East Sussex \\
+                                  & BN1 9QH \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[ADAM] Starlink software environment (Alan Chipperfield, RAL; ASG, RAL).
+\item[AGI] Applications graphics interface (Dave Terrett, RAL).
+\item[ASTERIX] X-ray data processing system (Bob Vallance, Birmingham; 
+David Allan, Birmingham).
+\item[ASTROM] Basic astrometry (Patrick Wallace, RAL).
+\item[ASURV] Astronomical survival statistics (Peter Allan, RAL).
+\item[CATPAC] Catalogue applications package (Alan Wood, RAL).
+\item[CCDPACK] CCD data reduction (Peter Draper, Durham).
+\item[CGS4DR] CGS4 data reduction (Phil Daly, JACH).
+\item[CHART] Finding chart and stellar data system (Peter Allan, RAL).
+\item[CHI] Catalogue handling interface (Alan Wood, RAL).
+\item[CHR] Character handling routines (Paul Rees, RAL).
+\item[CNF] C and Fortran mixed programming (Peter Allan, RAL).
+\item[COCO] Conversion of celestial coordinates (Patrick Wallace, RAL).
+\item[CONVERT] Format-conversion package (Malcolm Currie, RAL).
+\item[DAOPHOT] Stellar photometry package (Nick Eaton, ICSTM).
+\item[DIPSO] Display and plotting package (Ian Howarth, UCL).
+\item[DOCFIND] Starlink document search (Peter Allan, RAL).
+\item[ECHOMOP] Echelle data reduction system (Dave Mills, UCL).
+\item[ECHWIND] UCL echelle spectrograph observation planning (Adrian Fish,
+UCL).
+\item[EDFITS] Copy FITS tapes (Keith Shortridge, AAO).
+\item[EMAIL] Email help utility (Adrian Fish, UCL).
+\item[EMS] Error message service (Paul Rees, RAL).
+\item[FIGARO 3] General data reduction system (Keith Shortridge, AAO; Horst
+Meyerdierks, Edinburgh).
+\item[FIO] Fortran I/O routines (Peter Allan, RAL).
+\item[FITSIO] Disk FITS I/O routines (Julian Osborne, Leicester).
+\item[FORMCON] Data format conversion.
+\item[FORMLOAD] \LaTeX\ form generator (Alan Penny, RAL).
+\item[GENERIC] Compiling generic Fortran subroutines (Malcolm Currie, RAL;
+Steven Beard, Edinburgh).
+\item[GKS] Graphical kernel system (version 7.4) (Dave Terrett, RAL).
+\item[GNS] Graphics workstation name service (Dave Terrett, RAL).
+\item[GRAPHPAR] Adam graphics subroutines (Dave Terrett, RAL).
+\item[GRP] Manipulation of groups of objects (Dave Berry, Manchester).
+\item[GWM] X graphics window manager (Dave Terrett, RAL).
+\item[HDS] Hierarchical data system (Rodney Warren-Smith, RAL).
+\item[HELP] Interactive help system (Patrick Wallace, RAL).
+\item[ICL] ADAM command language (Brian McIlwrath, RAL).
+\item[IDI] Image display interface (Dave Terrett, RAL).
+\item[IRAS90] IRAS data analysis package (Dave Berry, Manchester).
+\item[IUEDR] IUE data reduction package (Dave Mills, UCL).
+\item[KAPPA] Kernel application package (Malcolm Currie, RAL).
+\item[LTEX] Additions to TEX (Vassilis Laspias, Manchester).
+\item[MAG] Mag tape handling routines (Peter Allan, RAL).
+\item[MEMSYS] Maximum entropy image reconstruction (Commercial).
+\item[MERS] Message and error reporting (Paul Rees, RAL).
+\item[NCAR] Graphics utilities (Dave Terrett, RAL; Patrick Wallace, RAL; Paul
+Rees, RAL).
+\item[NDF] NDF data structures routines (Rodney Warren-Smith, RAL).
+\item[NDPROGS] n-D analysis.
+\item[NEWS] Starlink news system.
+\item[OBSERVE] Check star observability (Julian Osborne, Leicester).
+\item[PGPLOT] Graphics subroutine library (Dave Terrett, RAL).
+\item[PHOTOM] Aperture photometry routines (Nick Eaton, ICSTM).
+\item[PONGO] Interactive data plotting (Paul Rees, RAL).
+\item[PSMERGE] PostScript file manipulation (Dave Terrett, RAL).
+\item[PSX] POSIX interface routines (Peter Allan, RAL).
+\item[REF] HDS referencing handling (Alan Chipperfield, RAL; Rodney 
+Warren-Smith, RAL).
+\item[REXEC] Relational database management system (Brian Read, RAL).
+\item[RPS] ROSAT proposal submission (Martin Ricketts, RAL).
+\item[RV] Radial components of observer's velocity (Patrick Wallace, RAL).
+\item[SCP] Simple CCD processing package ({\em Jim Lewis, RGO}).
+\item[SGS] Simple graphics system (version 7.2) (Dave Terrett, RAL).
+\item[SLALIB] Starlink library of subroutines (Patrick Wallace, RAL).
+\item[SNX] Starlink extensions to NCAR graphics utilities (Patrick Wallace,
+RAL).
+\item[SOFTLINK] Softlinking utility (Peter Allan, RAL).
+\item[SPECDRE] Spectroscopy data reduction (Horst Meyerdierks, Edinburgh).
+\item[SPT] Software porting tools (Dave Terrett, RAL).
+\item[SST] Simple software tools package (Rodney Warren-Smith, RAL).
+\item[STARLSE] Starlink extensions to the VAX LSE (Rodney Warren-Smith, RAL).
+\item[STARMAN] Stellar photometry (Alan Penny, RAL).
+\item[STEVE] Starlink EVE editor (Adrian Fish, UCL).
+\item[TAPEIO] Magnetic tape routines (Keith Shortridge, AAO).
+\item[TPOINT] Telescope pointing analysis system (Patrick Wallace, RAL).
+\item[TRACE] HDS data set listing (Malcolm Currie, RAL).
+\item[TRANSFORM] Coordinate transformation facility (Rodney Warren-Smith, RAL).
+\item[TSP] Time series/polarimetry package (Jeremy Bailey, AAO).
+\item[TWODSPEC] Longslit spectroscopy (Tim Wilkins, Durham).
+\item[VMSBACKUP] VMS BACKUP tape reader.
+\item[XDISPLAY] Xwindows display setup (Peter Allan, RAL).
+\item[WFCSORT] Sort ROSAT wide field camera data ({\em Mike Denby, Leicester;
+Julian Osborne, Leicester}).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[CLUSTAN] Cluster-analysis package (Commercial).
+\item[EMACS] GNU emacs text editor (Public Domain).
+\item[FORCHECK] Fortran verifier and programming aid (Commercial).
+\item[GCC] GNU C compiler (SUN variant only) (Public Domain).
+\item[IDL] Interactive data language (Commercial)
+\item[IRAF] Image reduction and analysis facility (Overseas).
+\item[LATEX/TEX] Superior document preparation system (Public Domain).
+\item[MIDAS] Munich image data analysis system (Overseas).
+\item[MONGO] Interactive plotting program (Overseas).
+\item[NAG] Mathematical subroutine library (Commercial).
+\item[QDP] Quick and dandy plotter (Overseas).
+\item[SPAG] Fortran source code unscrambler (Commercial).
+\item[TOOLPACK] Fortran 77 software tools (Commercial).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+{\bf None}
+
+
+\newpage
+\subsection{UCL}
+
+\renewcommand{\starsitename}{University College London}
+\renewcommand{\starnodename}{ZUVAD}
+
+\renewcommand{\starunixdate}{Unknown}
+\renewcommand{\starupdate}{1993 October 26}
+
+\renewcommand{\starsitetelephone}{071 380 7147}
+\renewcommand{\starsitefax}{071 380 7145}
+
+\begin{center}
+{\Large\sc \starsitename \\ [2ex]
+           Requirements for the Move to UNIX}
+
+\vspace{3mm}
+{\large\sc Deadline: \starunixdate \\ [1ex]
+           Updated: \starupdate}
+\end{center}
+
+\vspace{5mm}
+
+\begin{center}
+\begin{tabular}{rl}
+{\sc Node name:}                  & \starnodename \\
+{\sc Site Manager(s):}            & Adrian Fish \\
+                                  & John Deacon \\
+{\sc Applications Programmer(s):} & Dave Mills \\
+{\sc Postal Address:}             & Department of Physics and Astronomy \\
+                                  & University College London \\
+                                  & Gower Street \\
+                                  & LONDON \\
+                                  & WC1E 6BT \\
+{\sc Telephone:}                  & \starsitetelephone \\
+{\sc Fax:}                        & \starsitefax \\
+\end{tabular}
+\end{center}
+
+\vspace{5mm}
+\begin{center}
+{\large\sc UNIX Software Required}
+\end{center}
+
+\begin{center}
+{\bf UK Software:}
+\end{center}
+
+\begin{description}
+\item[DIPSO] Display and plotting package (Ian Howarth, UCL).
+\item[ECHOMOP] Echelle data reduction system (Dave Mills, UCL).
+\item[ECHWIND] UCL echelle spectrograph observation planning ().
+\item[FIGARO 3] General data reduction system (Keith Shortridge, AAO; Horst
+Meyerdierks, Edinburgh).
+\item[IUEDEARCH] Access to IUE archive data (Chris Lloyd, RAL).
+\item[IUEDR] IUE data reduction package (Dave Mills, UCL).
+\item[PGPLOT] Graphics subroutine library (Dave Terrett, RAL).
+\item[PONGO] Interactive data plotting (Paul Rees, RAL).
+\item[STEVE] Starlink EVE editor (Adrian Fish, UCL).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\bf Public Domain, Overseas and Commercial Software:}
+\end{center}
+
+\begin{description}
+\item[MONGO] Interactive plotting program (Overseas).
+\item[NAG] Mathematical subroutine library (Commercial).
+\end{description}
+
+
+\vspace{5mm}
+\begin{center}
+{\large\sc Notes}
+\end{center}
+
+MONGO listed as it is not clear what alternative is available.
+PONGO, SuperMongo and SM all spring to mind, but it's not clear what's best.
+
+ECHWIND is to be ported to UNIX (and X11) by Adrian Fish when he gets the
+chance.
+
+STEVE depends on TPU for all platforms. 
+Currently there is a version mismatch between VMS and Ultrix (no documentation 
+for nuTPU available), but within the next few months it may be possible for a 
+single copy of STEVE that will compile on all TPU implementations.
+
+\end{document}
