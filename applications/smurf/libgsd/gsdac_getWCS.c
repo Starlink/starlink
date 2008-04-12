@@ -131,7 +131,7 @@
 
 #define SOLSID 1.00273790935
 
-#define DEBUGON 1
+#define DEBUGON 0
 
 #define FUNC_NAME "gsdac_getWCS.c"
 
@@ -317,21 +317,21 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
      step to UTC and get the correct formatting. */
   astSetD ( tFrame, "TimeOrigin", wcs->tai );
 
-tempTime1 = astGetD ( tFrame, "timeOrigin" );
-tempFrame = astCopy ( tFrame );
-astClear ( tempFrame, "timeOrigin" );
-astSet ( tempFrame, "format(1)=iso.2" );
-tempString1 = astFormat ( tempFrame, 1, tempTime1 );
+  tempTime1 = astGetD ( tFrame, "timeOrigin" );
+  tempFrame = astCopy ( tFrame );
+  astClear ( tempFrame, "timeOrigin" );
+  astSet ( tempFrame, "format(1)=iso.2" );
+  tempString1 = astFormat ( tempFrame, 1, tempTime1 );
 
   astSet ( tFrame, "timescale=UTC" );
 
   UTCTime = astGetD ( tFrame, "TimeOrigin" );
 
-tempTime2 = astGetD ( tFrame, "timeOrigin" );
-tempFrame = astCopy ( tFrame );
-astClear ( tempFrame, "timeOrigin" );
-astSet ( tempFrame, "format(1)=iso.2" );
-tempString2 = astFormat ( tempFrame, 1, tempTime2 );
+  tempTime2 = astGetD ( tFrame, "timeOrigin" );
+  tempFrame = astCopy ( tFrame );
+  astClear ( tempFrame, "timeOrigin" );
+  astSet ( tempFrame, "format(1)=iso.2" );
+  tempString2 = astFormat ( tempFrame, 1, tempTime2 );
 
   if ( subBandNum == 0 && DEBUGON ) printf ( "TAI: %f (%s), UTC: %f (%s)\n", tempTime1, tempString1, tempTime2, tempString2 );
 
