@@ -1783,7 +1783,7 @@ itcl::class gaia::GaiaCube {
    itk_option define -show_coord_label show_coord_label Show_Coord_Label 0
    
    #  Colour of coordinate label in main window.
-   itk_option define -labelcolor labelcolor LabelColor white {
+   itk_option define -labelcolor labelcolor LabelColor blue {
       toggle_show_coord_label_
    }
 
