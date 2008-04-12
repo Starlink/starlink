@@ -1,0 +1,3631 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+\markright{SG/1.2}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill SG/1.2\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf Starlink Guide 1.2}
+\begin{flushright}
+C R Benn\\
+1 April 1988
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf ASPIC}
+\end{center}
+\vspace{5mm}
+
+{\setlength{\parskip}{0mm}
+\tableofcontents}
+
+\markright{SG/1.2}
+\newpage
+
+\section {INTRODUCTION}
+
+ASPIC is a collection of about 400 image-processing programs.
+This guide is a summary of useful information about them, with particular
+reference to simple interactive display and analysis of 2-D images.
+A complete list of programs is given in Appendix A.
+Detailed information is given for 53 of the most commonly-used
+programs in Appendix B.
+
+Send information about bugs in ASPIC programs or documentation to the
+Starlink Software Librarian (RLVAD::STAR).
+These will be recorded in DOCSDIR:BUGS,
+and may or may not get fixed.
+Software support for ASPIC is in the future likely to
+be very limited (see Section 7).
+
+This guide was originally produced at the Royal Greenwich Observatory
+in May 1986, and
+has been prepared for release in its present form by M D Lawden
+at the Rutherford Appleton Laboratory.
+
+\subsection {Documentation}
+
+Starlink User Note 23 (SUN/23)
+introduces ASPIC and gives classified lists of programs.
+SUN/24 and SUN/27 contain more detailed information on some of the programs.
+The most detailed source of information is the on-line help library
+- see Section 1.5.
+For information on the DSCL command language,
+under which ASPIC programs are usually run,
+see SUN/74.
+
+For documentation on other Starlink subjects, try typing
+{\tt @SSC:LOGIN}
+then {\tt FIND subject-name}.
+Print file DOCSDIR:SUBJECT.LIS
+for a full list of subjects.
+For further pointers to documentation,
+see section 4 of the Starlink User Guide.
+
+\subsection {ASPIC}
+
+ASPIC stands for AStronomical PICtures.
+The programs are written by many different authors, but have in common that they all use the Starlink INTERIM
+routines for data handling (SUN/4).
+
+The programs are grouped into the following classes (sometimes referred to
+as `packages'):
+
+\begin{description}
+\begin{description}
+\item[ARGS] :
+Image display and manipulation programs for the ARGS device.
+May be suitable for other image displays such as the IKON.
+See also {\bf LUT}.
+\item[ARITHMETIC] :
+Scalar and array operations.
+\item[ASTROMETRY] :
+Programs to input and manipulate r.a., dec.\ lists.
+\item[COMPRESS] :
+Programs to pack images into as few bits as possible.
+\item[DETAILS] :
+ Extraction of summary information from images.
+\item[DISPLAY] :
+Miscellaneous programs,
+not covered by the ARGS `package',
+for displaying images.
+\item[DOCS] :
+Creation and printing of ASPIC documents.
+\item[EDRS] :
+An Electronography Data Reduction System; see SUN/24.
+Type `GO EDRS' before using this package.
+A full manual (90 pages) resides in [STARLINK.PACK.ASPIC.EDRS]\-MANUAL.\-LIS;
+a copy may be available at your site.
+\item[FC] :
+Combination of up to 3 images into a single false-colour picture.
+\item[FILTER] :
+Non-Fourier noise filtering.
+\item[FOURIER] :
+Basic Fourier-transform programs.
+\item[GALPHOT] :
+Bright-galaxy photometry; see SUN/24.
+\item[GEOMETRY] :
+Geometrical transformations.
+\item[GRASP] :
+Giant Raster And Stellar Photometry system; an extension of EDRS.
+\item[INPUT] :
+Creation of Starlink images (.BDF files).
+\item[LUT] :
+Programs to load or change the lookup table for the ARGS display.
+\item[MISCELLANEOUS] :
+$\approx$ 50 miscellaneous programs; see SUN/24 and SUN/27.
+\item[PERIODS] :
+Programs to search for periods in unequally-spaced photometric data; see SUN/24.
+Type `GO PER' before using this package.
+\item[PHOTOMETRY] :
+Photometry programs from ROE; see SUN/24.
+\item[POLARIMETRY] :
+Polarimetry programs; see SUN/24.
+\item[SIZE] :
+Programs to expand, contract or select part of an image.
+\end{description}
+\end{description}
+
+The main photometry programs are in the EDRS, GRASP and PHOTOMETRY classes.
+
+Many sites have also installed local ASPIC programs and packages; ask your
+Site Manager about these.
+
+\subsection{ARGS}
+
+The ARGS displays 16 512x512 pixel planes.
+Planes 0-7 are picture, 8-15 are overlay.
+The least significant 8 bits of any pixel are used as an index (value 0-255)
+to the ARGS lookup table, each entry of which consists of a triad of values
+in the range 0-255, representing intensities for red, green and blue guns.
+The overlay planes are used for vector graphics, labels, etc.
+To clear the overlay planes use program {\bf ADISOV}.
+
+For information on ARGSLIB subroutines see SUN/10, LSN/11 (RGO) and
+LSN/12 (RGO).
+
+Individual Starlink sites may operate online or offline
+booking systems for the ARGS
+(e.g. at the RGO, there is an online {\bf BOOK} command).
+
+\subsection{INTERIM}
+
+The INTERIM Starlink software environment is described in SUN/4.
+It comprises 36 user-callable routines which interface programs with:
+\begin{itemize}
+\item the user
+\item default parameter settings in the connection file (program.CON) which
+accompanies every program file (program.EXE).
+\item images, which are stored in Starlink bulk data frames (.BDF files).
+\end{itemize}
+.BDF files cannot be read via normal Fortran I/O.
+If you attempt to type a .BDF file at a terminal, unrelated files may be read out
+and the terminal will probably go catatonic.
+You will have to power the terminal OFF/ON to recover.
+Don't try printing a .BDF file either; it screws up the printer.
+
+Two different command languages are available: RUNSTAR and DSCL.
+RUNSTAR is adequate for development work, but DSCL is normally selected for
+running INTERIM programs such as those in ASPIC
+(but see Section 3).
+
+\subsection {DSCL}
+DSCL was written primarily as a command environment for ASPIC but can be used
+to run any program.
+SUN/23 includes a brief introduction to DSCL; it is  described fully in SUN/74.
+
+DSCL provides on-line help for ASPIC, a stack for intermediate storage of
+images, and a convenient way of handling parameters.
+The price paid by the user for this flexibility is slowness.
+See Section 3 for details of the faster ZAP command environment
+available at some sites.
+
+To set parameter values, type `parameter-name = value', e.g.\ ADISP PVHI=3000
+PVLO=100.
+
+DSCL is activated by typing {\tt DSCL}.
+Here are some examples of DSCL commands:
+\begin{description}
+\begin{description}
+\item[DEMO/ECHO]:
+runs a demonstration program using a 256x256 PDS scan of the Horsehead Nebula
+on an UKSTU plate.
+\item[FILEDOC ARGS ADISP]:
+sends a copy of the help information on program ADISP in class ARGS to file
+ADISP.DOC.
+\item[GO EDRS]:
+allows you to access commands (including the help library) of the EDRS package.
+The GO command is unnecessary for most ASPIC packages (except PER and CHART).
+\item[HELP ARGS]:
+gives help on the ARGS class.
+\item[HELP ARGS AFLASH]:
+gives help on program AFLASH in class ARGS.
+\item[HELP ASPIC]:
+gives brief information on ASPIC.
+\item[HELP DOCS]:
+gives information on printing documents.
+\item[HELP DSCL]:
+gives brief information on DSCL.
+\item[HELP * STARFIT]:
+locates the class containing STARFIT and gives help.
+\item[LOOK TBXY]:
+looks at the parameter settings for program TBXY.
+\item[STOP]:
+exits from DSCL in an orderly fashion.
+\item[WHERE]:
+types a list of ASPIC program titles (without specifications).
+\item[WHERE CONTOUR]:
+types the name of the class containing the CONTOUR program.
+\end{description}
+\end{description}
+
+\subsection{Batch jobs}
+
+Create a command file (BATCH.COM say) containing the commands to be
+executed, for example:
+\begin{verbatim}
+     $ @SSC:LOGIN
+     $ RUNSTAR GREYSCALE/DEVICE=PRINTRONIX/DEFAULT=T/INPUT=5C12.101/LABEL=5C12.101
+\end{verbatim}
+and submit it for execution:
+\begin{verbatim}
+     $ SUBMIT BATCH
+\end{verbatim}
+Your site may run a fast queue which you can use for short jobs, for example
+at RGO type:
+\begin{verbatim}
+     $ SUBMIT/Q=SYS_SHORT BATCH
+\end{verbatim}
+WARNING --- {\em Don't} use the command `DSCL' in a command procedure, and
+{\em Do} specify all the parameters for which the user would normally be prompted.
+Otherwise, the job may enter an infinite loop.
+
+\section {Using ASPIC}
+
+To use ASPIC, login to the Starlink VAX and type {\tt @SSC:LOGIN} (unless
+you have sensibly put this into your LOGIN.COM file), then type
+{\tt DSCL} which sets up the DSCL command environment.
+The prompt {\tt DSCL$>$} is an invitation to enter the name of an
+application program (e.g.\ PICK), the name of a DSCL procedure (e.g.\
+LUTGREY), a DSCL command (e.g.\ HELP LUT), or a DCL command (e.g. DIR).
+
+\subsection {Copying images to/from tape,
+and conversion to/from other formats}
+
+To read FITS images from a tape, {\tt MOUNT/FOR MTA0} (or {\tt MTA1}, etc.)
+and use {\bf FITSIN} (LUN/48 (RGO)).
+{\bf FITSHEAD} may be used to read the frame-headers.
+{\bf FITSINDEX} (LUN/70 (RGO)) produces a summary listing of files on the tape.
+It was designed to summarise parameters on the tape generated at the La Palma
+telescopes but may work (and can easily be modified to do so) for tapes from
+other telescopes.
+See SUN/3 for details of {\bf IPCSIN} and {\bf VICARIN}, and LUN/9 (MAN)
+for {\bf PDSIN}.
+
+To convert Starlink .BDF files to FITS format, use {\bf FITSOUT}
+(LUN/49 (RGO)).
+To copy .BDF files to and from tape, use e.g.\ {\tt MOUNT MTA0}, followed by
+{\tt COPY *.BDF MTA0}.
+
+To rewind a tape without unloading, {\tt DISMOUNT/NOUNLOAD MTA0}.
+
+To convert .BDF files to KAPPA HDS image format (.SDF files), use the KAPPA program {\bf STARIN} (SUN/96).
+At the time of writing, there is no program for the inverse
+conversion KAPPA HDS 
+$\rightarrow$
+Starlink .BDF.
+
+To convert to and from FIGARO (SUN/86) HDS format (.DST files),
+use the FIGARO programs {\bf STARIN} and {\bf STAROUT}.
+To convert a KAPPA HDS data structure to a
+FIGARO HDS structure, use
+the FIGARO program {\bf RENOBJ}.
+
+\subsection {Displaying images and image information}
+
+Use {\bf DESCR} to look at image headers, {\bf WRDSCR} and {\bf CYDSCR} to
+alter them.
+
+The quickest image-display program is {\bf AFLASH}, which does not do any
+rescaling.
+Use of {\bf AFLASH} before programs like {\bf SLICE} and {\bf APERASP} should be
+avoided because {\bf AFLASH} interferes with the overlay planes and strange
+colours may result (use {\bf ADISOV}or {\bf LUTGREY} to clean them up).
+{\bf APIC} is also fast, and allows interactive manipulation of scale and zero
+point.
+{\bf ADISP} is preferred, although it is slower --- it requests low
+and high pixel values between which to load a greyscale.
+Use {\bf STATS} after setting {\tt STATS RMS=TRUE} for a formal estimate of
+mean and rms.
+{\bf SLICE} and {\bf PEEP} allow a more direct inspection of the mean and rms
+levels.
+{\bf ADHC} generates a high-contrast display of an image.
+
+To clear the screen, or reset the ARGS completely, use {\bf ACLEAR} or
+{\bf ARESET}.
+
+{\bf APAN} pans and zooms the image.
+
+{\bf ABLINK} displays and blinks two superimposed images.
+{\bf ALIGN} may be used to align two images under trackerball control.
+{\bf ADD} adds two images.
+There is a program inside ZAP (Section 3) to add together more than two images.
+
+{\bf ATEXT} places text on the ARGS display.
+{\bf AHARDCOPY} generates a Printronix copy of the current ARGS display; the
+parameter THRESH determines the boundary between black and white.
+{\bf VERGREY} and {\bf GREYSCALE} generate pseudo-greyscale output for the
+Versatec and Printronix respectively --- both take about a minute to process a
+512x512 image, and both print automatically (see figure~\ref{greyscale}).
+{\bf VIEW} may also be used to generate hardcopy.
+Note that the Versatec is obsolete.
+
+{\bf PEEP} types a 9x9 rectangle of an image at your terminal.
+{\bf LIST} sends a complete listing of an image to a file.
+To list part of an image, try {\bf PICK} (which creates a new image from part
+of an existing one), then {\bf LIST}.
+
+{\bf LUTGREY} loads the default greyscale lookup table.
+{\bf LUTCOL} loads a colour lookup table (in {\tt ASPDIR:\-CLUT.\-BDF}).
+{\bf LUTREAD} loads any lookup table.
+{\bf LUTROT} cycles the lookup table using the trackerball.
+The LUT class contains several commands for manipulating the lookup table.
+
+{\bf CONTOUR} produces a contour map of an image on one of several devices,
+from which it can be printed using {\bf AHARDCOPY} (see figure~\ref{contour1}
+and figure~\ref{contour2}).
+
+{\bf ASAVE} saves the current ARGS pixel store in a .BDF file.
+
+The figures in this section show examples of output from some of these
+programs.
+Figure~\ref{greyscale} shows a 150x150 section of a CCD image output on
+a Printronix by program {\bf GREYSCALE}.
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(118,88)
+\put (0,0){\line(1,0){118}}
+\put (118,0){\line(0,1){88}}
+\put (118,88){\line(-1,0){118}}
+\put (0,88){\line(0,-1){88}}
+\end {picture}
+\caption {{\bf GREYSCALE} --- Sample output}
+\label {greyscale}
+\end {center}
+\end {figure}
+Figure~\ref{contour1} shows the same image as in figure~\ref{greyscale},
+but produced by displaying the image on the ARGS using {\bf CONTOUR},
+and then outputting it on the Printronix using {\bf AHARDCOPY}.
+The bottom contour is about 2 sigma above the mean level.
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(160,150)
+\put (0,0){\line(1,0){160}}
+\put (160,0){\line(0,1){150}}
+\put (160,150,){\line(-1,0){160}}
+\put (0,150){\line(0,-1){150}}
+\end {picture}
+\caption {{\bf CONTOUR/AHARDCOPY} --- Sample output}
+\label {contour1}
+\end {center}
+\end {figure}
+Figure~\ref{contour2} was produced in the same way as figure~\ref{contour1},
+except that it shows the central part of the same image.
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(160,130)
+\put (0,0){\line(1,0){160}}
+\put (160,0){\line(0,1){130}}
+\put (160,130,){\line(-1,0){160}}
+\put (0,130){\line(0,-1){130}}
+\end {picture}
+\caption {{\bf CONTOUR/AHARDCOPY} --- Sample output (detail)}
+\label {contour2}
+\end {center}
+\end {figure}
+Figure~\ref{inspect} shows the same image as that shown in
+figure~\ref{contour2}, except that it was produced using {\bf INSPECT} (with
+the SOLID option) instead of {\bf CONTOUR}.
+\begin {figure}[htbp]
+\begin {center}
+\begin {picture}(160,100)
+\put (0,0){\line(1,0){160}}
+\put (160,0){\line(0,1){100}}
+\put (160,100){\line(-1,0){160}}
+\put (0,100){\line(0,-1){100}}
+\end {picture}
+\caption {{\bf INSPECT/AHARDCOPY} --- Sample output (SOLID option)}
+\label {inspect}
+\end {center}
+\end {figure}
+
+\subsection {Calibrating and cleaning images}
+
+{\bf ADD}, {\bf DIV}, {\bf MULT} and {\bf SUB} are useful for operating on
+every pixel of an image with a constant value (e.g.\ for subtracting a bias
+level from a CCD frame).
+{\bf CADD}, {\bf CDIV}, {\bf CMULT} and {\bf CSUB} are useful for operating
+on every pixel of an image with the value of the corresponding pixel in
+another image (e.g.\ to divide a CCD image by a flat field).
+
+There is a simple CCD-reduction routine in the ZAP monolith (see Section 3).
+
+\subsection {Obtaining x,y positions}
+
+To obtain the x,y position of the cursor, use {\bf TBXY}, followed by {\tt
+LOOK TBXY} (the position is returned as the X,Y pair of parameters).
+{\bf TBXY} running inside ZAP (Section 3) types x,y on the screen; the IKON version (Section 6) gives
+pixel values as well.
+
+To create a file of x,y positions using the cursor, e.g.\ as input to
+{\bf STARFIT}, type {\tt GO EDRS} to enter the EDRS package, then use
+{\bf XYCURA}.
+
+x,y lists can be created, edited, displayed, etc., using about 25 programs
+in the EDRS and GRASP classes, all with names beginning `XY'.
+The lists are stored as .BDF files in the default directory.
+For example:
+{\bf XYKEY} allows entry and storage of a list of x,y values from the
+keyboard.
+{\bf XYLIST} lists an x,y list.
+{\bf XYDRAW} plots a graph of the first two parameters in the list (usually
+x,y) on any device (use {\bf AHARDCOPY} to send the plot on the ARGS to the
+Printronix).
+{\bf XYPRINT} sends a neat listing of an x,y list to file XYPRINT.LIS.
+{\bf XYEDIT} changes a .BDF x,y list to ASCII format (or vice versa), which
+allows editing of the list using the VAX editors.
+
+\subsection {Simple photometry}
+
+There are several different programs for carrying out profile-fitting and
+aperture photometry in the EDRS, GRASP and PHOTOMETRY classes.
+Examples:
+{\bf APERASP} is a fast, interactive aperture-photometry program which
+integrates pixels within a cursor of arbitrary size.
+The default cursor is circular, but it can also be square or elliptical.
+{\bf APERCUR} is a similar program.
+{\bf APERFOT} is another interactive aperture-photometry program,
+which estimates the sky contribution from an annulus around the 
+area to be integrated.
+{\bf APERMAG} carries out aperture photometry for a series of objects
+in an x,y list.
+
+Gaussian profiles may be fitted using programs in the EDRS class.
+Programs {\bf STARFIT} and {\bf STARMAG} both require input x,y lists
+(see previous section).
+{\bf STARFIT} determines the mean seeing for objects at a series of specified
+x,y positions.
+{\bf STARMAG} fits assumed Gaussian profiles at a series of specified x,y
+positions.
+
+\section {ZAP --- an ASPIC monolith}
+
+ZAP is a monolith --- a pile of ASPIC Fortran with a menu at the top.
+It is intended primarily for rapid interactive inspection and analysis of
+images.
+To use ZAP, type {\tt ZAP} where {\tt DSCL}
+would normally be typed.
+For a command menu, press return in response to the {\tt ZAP>} prompt.
+
+When the VAX is busy, DSCL may take up to 60 seconds to interpret a command,
+yet only a few seconds to execute the compiled program.
+With the monolith, the user may call up ASPIC routines immediately.
+The monolith at present incorporates the following ASPIC commands:
+{\bf ADHC, ADISOV, ADISP, AFLASH, AHARDCOPY, APAN, APERASP, APERCUR, ARESET,
+ASAVE, ATEXT, CONTOUR, DESCR, GREYSCALE, INCARN, INSPECT, LIST, LUTCOL, LUTE,
+LUTGREY, LUTLIN, LUTROT, PEEP, PICK, SLICE, STARFIT, STARMAG, STATS, TBXY,
+XYCURA, XYCURB, XYDRAWA, XYEDIT, XYLIST}.
+A few minor modifications have been made to the original code, e.g.\
+{\bf TBXY} now sends the x,y coordinates to the screen; {\bf APERCUR}
+incorporates an {\bf APMEANSKY} command which allows you to average the counts
+from several areas of sky before measuring the flux from the star.
+
+To obtain DCL commands inside ZAP, type {\tt \$ command} (e.g. {\tt \$ DIR}).
+
+ZAP uses by default the ARGS image-display device.
+Malcolm Yallop has relinked a version of ZAP to display on the IKON (see
+LUN/72 (RGO)).
+
+ZAP incorporates a {\em current-image} facility.
+To use it, type {\tt CURRENT} in response to the {\tt ZAP>} prompt.
+Subsequent commands will not result in a prompt for image-name.
+To change the current image, type {\tt IMAGE}.
+
+ZAP includes some new commands:
+\begin{description}
+\begin{description}
+\item [ADD10] :
+allows 10 frames to be added simultaneously (useful for averaging a number of
+exposures).
+To add less than 10, give zero weights to the unwanted frames.
+\item [BLANK] :
+creates a flat frame (all pixels have value = 1).
+It is sometimes used in conjunction with the CCD routine.
+\item [CCD] :
+is based on a program written by Bill Sparkes for reducing AAT CCD data.
+The program has been modified for use with data collected by the La Palma RCA
+and GEC CCD cameras.
+The program reads INPUT, BIAS and FLAT-FIELD frames, and calculates
+\begin{verbatim}
+       OUTPUT = (INPUT - BIAS) / FLAT-FIELD
+\end{verbatim}
+The spectroscopic mode allows subtraction of pre-flash frames.
+For the La Palma RCA chip, the program establishes the bias level from the
+mean value of pixels in the rectangle (X--20,10) to (X--5,Y--10), where the
+dimensions of the chip are XxY pixels.
+For the La Palma GEC chip, the mean bias level is measured in the rectangle
+(2,25) to (8,Y--25).
+\item [IAMFILE] :
+generates an ASCII (printable) version of the output from the {\bf IAMANAL}
+program.
+\item [RGO] :
+gives access to the RGO local help library.
+\item [SEARCHPIX] :
+lists the x,y coordinates of all pixels in the frame having values between
+specified limits.
+\end{description}
+\end{description}
+
+ZAP stands for Zero-delay ASPIC Processor.
+
+\section {Gobbling up disc space --- and how not to}
+
+Most ASPIC routines demand {\em real} data.
+If the image is {\em integer}, a {\em real} `incarnation' will be created
+automatically and added on to the existing image, tripling consumption of
+disc space.
+For example, a 320x512 CCD frame might load from tape into 700 blocks
+(1 block = 512 bytes) of 2-byte pixels.
+Use of {\bf AFLASH}, which requires {\em signed-word integer} (SW; 2-byte) data,
+will leave the file unchanged.
+But use of {\bf ADISP}, which requires {\em real} (R; 4-byte) data, will
+increase the size of the file to 2100 (700 + 1400) blocks.
+
+Here are some ways to cope with ASPIC's thirst for disc space:
+\begin{itemize}
+\item Use scratch space; if your site supports this facility.
+Ask your site manager how to do this.
+Your files are likely to be deleted automatically after lying unused for
+12 hours or so.
+\item Use {\bf PICK} to select an area of interest from the image and discard
+the larger image.
+\item Use {\tt SET PROTECT=OWNER:R}, (undo with {\tt SET PROTECT=OWNER:RWED}).
+This will prevent incarnations being created, but will not affect execution
+of programs that do not seek to create files.
+To prevent writing to an individual file, use {\tt SET PROTECT
+file/PROT=OWNER:R}.
+Program {\bf REALFR} may be used to delete all but the {\em real} incarnation
+of an image.
+{\bf INCARN} will create a new frame from an old one, changing the format
+(e.g.\ from SW to R).
+\end{itemize}
+
+\section {ASPIC source code --- where is it?}
+
+ASPIC source code may be found in text library files (type .TLB) in directory
+ASPDIR and its sub-directories; .OLB files contain the corresponding object
+modules.
+Code for the main programs is held in ASPICSOURCE:SOURCE.TLB.
+ASPIC programs make calls to GKS, NAG, and SGS, and also to about 2000 routines
+in 12 libraries in the LIBDIR, STARDIR and [STARLINK.PACK.ASPIC.LIB]
+directories.
+A list of the libraries linked may be found in ASPDIR:SLINK.COM.
+
+Use the DCL command LIBRARY to access these files.
+For example, {\tt LIBRARY/LIST} lists the routines stored in a given .TLB file, 
+while {\tt LIBRARY/EXTRACT=(routine1,routine2,...)} will copy the source code
+for the specified routines into a file library-name.TXT.
+
+\section{Using ASPIC with the IKON image-display device}
+
+Starlink plans to phase out the ARGS image-display devices and replace them
+with Digisolve IKON pixel engines.
+Ralph Martin and Malcolm Yallop at RGO have written a rudimentary library
+of display routines, substitutes for ARGSLIB with which ASPIC programs may
+be relinked.
+
+At present, the following commands are available in a relinked form:
+{\bf ACLEAR, ADHC, ADISP, AFLASH, AHARDCOPY, APAN, APERCUR, ARESET, ASAVE, 
+LUTCOL, LUTCONT, LUTGREY, SLICE, TBXY}.
+They are discussed in LUN/61 (RGO).
+
+\newpage
+\section{Alternatives to ASPIC}
+
+ASPIC, running under the INTERIM environment, will at some stage be replaced by a
+suite of programs running under the new ADAM environment (SUN/94), and using
+the HDS data structures (SUN/92) instead of .BDF files.
+The most-used functions in ASPIC are already available in the KAPPA package
+(SUN/95), which uses HDS and is able to display to either ARGS or IKON devices.
+BDF frames may be converted to HDS data structures using STARIN (SUN/96).
+The advantages of using KAPPA are that  it is likely to be well supported and
+that it will attract a growing number of users and programmers.
+The main disadvantage, at the time of writing, is that there exist no
+equivalents of many of the ASPIC routines (KAPPA includes about 60).
+For example, there is no
+equivalent of FITSIN for reading FITS files from tape, and there are
+no programs for obtaining x,y positions from the display.
+
+The FIGARO package (SUN/86) also includes some 2-D image handling routines.
+FIGARO uses HDS data structures, but these are not compatible with KAPPA HDS
+structures.
+
+See Section 2.1 for advice on converting images between
+ASPIC/INTERIM, FITS, KAPPA and FIGARO formats.
+
+\appendix
+
+\section{List of ASPIC commands in alphabetical order}
+
+This appendix lists every documented ASPIC program and procedure.
+These correspond to topics in the HELP library and are arranged in alphabetical
+order.
+
+Some programs can be run either directly (by specifying the program name) or
+indirectly (by specifying a procedure which runs the program).
+In such cases the name of the program is made by following the name of the
+procedure by the character `P'.
+For example, {\bf INDPIX} is a procedure which runs program {\bf INDPIXP}.
+In the list below, such procedure/program combinations are indicated by
+following the procedure name by the character `*', eg.\ {\bf INDPIX*}.
+\begin{description}
+\item [ABLINK]: Display two images on the ARGS and allow them to be registered
+and blinked under trackerball control.
+\item [ABLOCK]: Display a ramp on the ARGS.
+\item [ABOXASP]: Define and save a series of rectangular boxes drawn round
+selected features in an image.
+\item [ACLEAR]: Clear the ARGS display.
+\item [ADD]: Add two frames.
+\item [ADDMSK]: Combine two images where effect is defined by 2 masks
+created by POLIFILLA.
+\item [ADHC]: Automatic high-contrast display of an image.
+\item [ADISOV]: Disable (thereby making the data invisible) an overlay plane in
+the ARGS.
+\item [ADISP]: Display an image on the ARGS with automatic scaling of intensity
+values if required.
+\item [ADISP3]: Variation of ADISP which displays in turn the z-planes in a
+3D image.
+\item [AEROV]: Erase ARGS overlays in a specified bit plane.
+\item [AFLASH]: Faster version of ADISP because it does not do any intensity
+scaling.
+\item [AFRAME]: Display a frame and graticule round the latest image displayed
+on the ARGS.
+\item [AGBLINK]: Display two images on the ARGS; just like ABLINK except two
+distinct lookup tables may be used, one with each image.
+\item [AHARDCOPY]: Copy the current ARGS pixel store onto the Printronix
+lineprinter.
+\item [ALIGN]: Align an image with a reference image.
+\item [ALIST]: List parameters for all images held in the ARGS database and
+hence displayed on the ARGS by ASPIC programs.
+\item [ANNOTASP]: Annotate an image displayed on the ARGS with text strings,
+arrows or scale-length bars.
+\item [APAN]: Pan and zoom the ARGS display; return final position of cursor.
+\item [APANG]: Pan and zoom the ARGS display with independent scaling in X and
+Y; return final position of cursor.
+\item [APERASP]: Perform all the tasks related to aperture photometry.
+\item [APERCUR]: Aperture photometry using a circular aperture positioned on an
+ARGS image by the cursor.
+\item [APERFOT]: Simple aperture photometry.
+\item [APERMAG]: Aperture photometry of all the stars in a list of positions.
+\item [APIC]: Display an I*2 image on the ARGS and allow the scale and zero
+point to be changed interactively to produce the best looking image.
+It is faster than other display programs and allows quick investigation of the
+range of intensity values.
+Can pan and zoom.
+\item [APLOT*]: Plot an image on the ARGS with suitable scaling so that the whole
+image fits onto the whole screen.
+\item [APLOTQ]: Similar to APLOT but fits the image into one quadrant of the
+ARGS screen.
+\item [APLOTRNG]: Plot an intensity wedge on the ARGS with a scale.
+\item [ARESET]: Reset all ARGS functions.
+\item [ARGPIC]: Display images on the ARGS with autoscaling and choice of
+screen position.
+\item [ARGSCIR]: Display a circular cursor on the ARGS and return its position
+in array units and size.
+\item [ARGSCUR]: Display an ARGS cursor and return its position in array units.
+\item [ARITH]: Scalar arithmetic.
+\item [ASAVE]: Save the current ARGS pixel store in a BDF file.
+\item [ASXY]: Calculate mean, standard deviation, normalized standard deviation
+and number of valid pixels in a selected area of an image.
+\item [ATEXT]: Place text on the ARGS display.
+\item [AUCUR]: Allow use of a variable size and shape cursor.
+\item [AVERAGE]: Average all valid regions of an image.
+\item [AZOOM]: Zoom the ARGS about a defined position.
+\item [BATFLAT]: A procedure which runs FLAT as a batch job.
+\item [BATIMSTAC]: A procedure which runs IMSTACK as a batch job.
+\item [BATLORMUL]: A procedure which runs LORMUL as a batch job.
+\item [BATLORSIM]: A procedure which runs LORSIM as a batch job.
+\item [BATPDSIM]: A procedure which runs PDSIM as a batch job.
+\item [BDFKEY]: Read image data from a terminal.
+\item [BIN]: Average an image using rectangular bins.
+\item [BITMASK]: Logical AND of a frame with a scalar.
+\item [BLANK]: Blank out a range of lines or columns in an image.
+\item [BLINKER]: Use after ABLINK to continue blinking with new zoom
+factors and centre.
+\item [BLURR]: Generate a 5x5 frame containing a Gaussian profile.
+\item [BONW]: Set the ARGS background to white with black lines when using the
+ARGS in vector rather than image mode.
+\item [BOXASP]: Define a single rectangular box round a selected feature in an
+image.
+\item [BOXFILTER]: Local averaging of an image.
+\item [CADD]: Add a scalar to a frame.
+\item [CALHELP]: Short help program for {\em CALIBRATION} package.
+\item [CALIB]: Convert an image using calibrations in table LOOKUP generated
+by programs in {\em CALIBRATION} package.
+\item [CATCOPY]: Copy part of the Solar Atlas from tape to disc.
+\item [CCDCON]: Change the dimensions of an image by resetting the values of
+the NAXIS1 and NAXIS2 descriptors.
+\item [CCIRD]: Set the transformation coefficients calculated by CINVERT to the
+input for RDTOXY.
+\item [CDEMO]: Demonstration of a square cursor; allows zoom of an ARGS image
+so that a selected region fills the screen.
+\item [CDIV]: Divide a frame by a scalar.
+\item [CENTROID]: Find the centre of fiducial marks.
+\item [CFICI]: Set the transformation coefficients calculated by XYFIT to the
+input for CINVERT.
+\item [CFITR]: Set the transformation coefficients calculated by XYFIT to the
+input for XYTRAN.
+\item [CFIXY]: Set the transformation coefficients calculated by XYFIT to the
+input for XYTORD.
+\item [CINVERT]: Invert a bi-linear transformation.
+\item [CLRLIM]: Clear histogram limits in IAMHIS, SETLIM and GETLIM.
+\item [CLRQUAD]: Clear a given quadrant on the ARGS.
+\item [CMPRS]: Compress an image by integer factors in X and Y.
+\item [CMULT]: Multiply a frame by a scalar.
+\item [CNTEXT*]: Store details of contours found in a predefined region of an
+image.
+They can then be used for fitting ellipses.
+\item [COG]: Show the centre of gravity in (X,Y) of an image.
+\item [COLCYCLE]: Generate a colour table consisting of cyclic replicas of an
+original colour table.
+\item [COLDIF]: Generate a colour difference profile from two profiles
+extracted along the same axis of a nebular image in different colours.
+\item [COLFIX*]: Change a specified column of an image to a given value.
+\item [COLLAPSE]: Produce a 1D image by collapsing a polygonal section of an
+image along the x or y axis.
+\item [COLSEL]: Select colours from a pre-defined palette; a standard palette
+is supplied by default.
+\item [COLSLICE]: Generate a monochromatic ramp colour table.
+\item [COMPAVE]: Compress an image by averaging adjacent elements.
+\item [COMPICK]: Compress an image by selecting elements in a regular grid.
+\item [CONCAT]: Concatenate two or more input datasets.
+\item [CONFLEV]: Rescale an image using the background level and noise variance.
+\item [CONT]: Plot contour map of an image leaving areas containing invalid
+pixels blank.
+\item [CONTOUR]: Draw a contour map of an image on one of several devices.
+\item [CONV]: Convolve an image with a second (smaller) one as may have been
+generated by BLURR or PSFEST.
+\item [COORDS]: Allow up to 500 points in the current image displayed on the
+ARGS to be identified using the cursor and stored as an output image.
+\item [COSBELL]: Apply a cosine-bell function to a 1D or 2D image.
+\item [COSFIT]: Produce COSMOS intensity conversion lookup table LOOKUP from
+known conversions in LEVELS.
+\item [CPOW]: Raise each element of a frame to a power.
+\item [CREDOC]: Guide user through the creation of program documentation
+(calls the program DOCIT).
+\item [CSUB]: Subtract a scalar from a frame.
+\item [CURFIT]: Calculate the astrometric position and photometric parameters
+for a stellar image identified using the box-cursor on the ARGS.
+\item [CURVAL]: Display the coordinates and value of a cursor selected pixel
+within an image.
+\item [CUT]: Apply upper and lower intensity cuts to an image.
+\item [CVPLOT]: Produce annotated contour map of an image with corresponding
+polarization vectors overlayed.
+\item [DATIM]: Display current date and time as characters on the ARGS if
+needed for recording.
+\item [DESCR]: Show one or all of the descriptors of a frame.
+\item [DESCRIPT]: Make image descriptor items available as program parameters.
+\item [DETREND]: Fit a polynomial to the raw observations to remove any trends;
+reduce the mean value to zero.
+\item [DFFTASP]: Efficient 2D FFT program.
+\item [DISKFIL*]: Remove a disc-shaped area from an FFT modes image.
+\item [DIV]: Divide a frame by a second frame.
+\item [DIVFF]: Divide a frame by a frame, preserving the scaling.
+\item [DOODLE]: Create images on the ARGS suitable for photographing to make
+slides.
+Allows images, text, lines and arrows to be displayed in a flexible way to
+convert a {\em picture} into a {\em diagram}.
+\item [E2DCOL]: Generate the default E2D colour table.
+\item [EDDOC]: Allow user to edit program documentation before it is put into a
+program.
+\item [EDITLEV]: Edit existing LEVELS file interactively.
+\item [EDITTAB]: Edit existing TABLE file interactively.
+\item [ELLPLTP]: Plot previously found contours with superimposed ellipses
+which have been fitted using FITELLP.
+\item [ELLPRTP]: Print details of fitted ellipses.
+\item [ENTERTAB]: Enter 2D table of reals from keyboard.
+\item [EQPROFASP]: Compute equivalent profile, with associated photometric
+parameters, of a bright galaxy within an image in the system of de Vaucouleurs.
+\item [EXP]: Exponentiate each element of a frame.
+\item [EXPAND]: Expand part of an image by a {\em sinc} interpolation.
+\item [EXTEND]: Unconstrained extrapolation from known data into the unknown
+(dangerous).
+\item [EXTRACT]: Select part of a dataset by extracting all samples whose epochs
+lie between two given values.
+\item [FC]: Perform the `standard' false colour and colour enhancement
+operations in sequence.
+\item [FCDISP]: Display a false colour image with the correct LUT and zoom.
+\item [FCPACK]: Form a single false colour image from three (R,G,B) input
+images.
+\item [FCSAT]: Perform enhancement on the `saturation' image.
+\item [FCSCALE]: Allow rescaling of three input images to a common background
+and exposure.
+\item [FCTHSI]: Convert a set of R,G,B images to a set of H,S,I (Hue,
+Saturation, Intensity) images.
+\item [FCTRGB]: Convert a set of H,S,I images back to R,G,B.
+\item [FFCLEAN]: Remove blemishes from a flat image.
+\item [FFT]: Apply a fast Fourier transform to a 1D or 2D image.
+\item [FFTPOW]: Compute the power spectrum of data sampled at equal intervals.
+\item [FILDEF]: Create a 1D or axi-symmetric 2D filter.
+\item [FILEDOC]: Generate the HELP available on any topic in a form
+suitable for printing.
+\item [FILLGAP]: Fill gaps between datasets which are themselves regularly
+sampled and with gaps which are an integral number of samples wide using an
+auto-regressive model based on the whole of the data.
+\item [FILTSPEC]: Calculate resultant spectral energy distribution when a source
+with a known continuum spectrum is observed through combinations of optical
+components each of which has its own spectral transmission function.
+\item [FINULS]: Filter image noise using local statistics.
+\item [FITBAKASP]: Fit a polynomial to the background and divide it into the
+original image giving normalized intensities.
+\item [FITELLP]: Fit an ellipse to a set of extracted contours and store them
+for input to ELLPLTP and ELLPRTP.
+\item [FITSHEAD]: Extract header from standard FITS format tape.
+\item [FITSIN]: Convert FITS data on magnetic tape into Starlink frames.
+\item [FITSOUT]: Write standard FITS format tape.
+\item [FLAG]: Flag points which are to be removed from a dataset using a graphics
+cursor.
+\item [FLAT]: A procedure which runs FLATTEN.
+\item [FLATTEN]: Flat fields an image using an un-aligned flat field and a
+co-ordinate transformation file to allow for the misalignment.
+\item [FLIP]: Invert an image with respect to a horizontal or vertical axis.
+\item [FLIPMSK]: Interchange 0's and 1's in a mask image.
+\item [FOLD]: Fold the data at a given period, find a mean curve and subtract
+it from the data.
+\item [FREQ]: Set parameter GLOBAL\_FREQ to mean frequency.
+\item [FRINGE]: Remove the fringe pattern which is characteristic of some CCD
+images.
+\item [FTCONJ]: Complex conjugation of a Hermitian transform.
+\item [GAUFIT]: Estimate the Gaussian profile that best fits the stars in an
+image.
+\item [GAUMAG]: Estimate the magnitudes of stars in an image by reading an
+(X,Y) list of positions and fitting a full 2D Gaussian profile to each star.
+\item [GAUSFIT]:  Produce astrometric positions and photometric parameters for
+a number of stars for which approximate positions are known using a Gaussian
+fit.
+\item [GBLINKER]: More general version of BLINKER which allows different
+lookup tables to be used with the two images being blinked.
+\item [GETLEV]: Enter known calibration levels by ARGS box cursor on a
+stepwedge frame.
+\item [GETLIM*]: Return results to IAMHISP and SETLIMP.
+\item [GETPAR]: Set IAM parameter PAR using the cursor.
+\item [GETSKY]: Set IAM parameter SKY in master connection file IAMANALP.CON.
+\item [GETTHR]: Set IAM parameter THRLD in master connection file IAMANAL.CON.
+\item [GREYLASER]: Produce a grey-scale representation of an image file on
+a Canon LBP-8 A2 laser printer (see SUN/24).
+\item [GREYSCALE]: Extended version of VERGREY which also produces greyscale
+pictures on the Printronix printers.
+\item [GRID]: Incorporate a black and white grid into an image.
+\item [HEATCOL]: Generate a stepped pseudo {\em heat sequence} colour table.
+\item [HEATCON]: Generate a continous pseudo {\em heat sequence} colour table.
+\item [HIDE]: Draw various forms of hidden-line plot.
+\item [HIFREQ*]: Eliminate high frequency components from an FFT mode image
+produced by DFFTASP.
+\item [HIST*]: Histogram a patch of an array.
+\item [HISTMATCH]: Rescale an image so that its histogram has a prescribed form.
+\item [HISTPLOT]: 1D histogram plot of a Starlink image.
+\item [HSICOL]: User definition of a palette for input to COLSEL if the default
+is not acceptable.
+\item [IAMANAL]: Analyse image and find all objects and their parameters, given
+various thresholds.
+\item [IAMEDRS]: Convert a file of IAM parameterised data to EDRS (X,Y) list
+format.
+\item [IAMHELP]: Short help listing for IAM suite of programs.
+\item [IAMHIS*]: Compute intensity histogram of image and plot on given ARGS
+quadrant.
+\item [IAMPR]: Output image parameters from IAM.
+\item [ICBLINK]: A variation on BLINK which blinks between two 16-bit images.
+The contrast may be altered at any time.
+\item [ICDISP]: Variation on ADISP which specifically displays 16-bit images.
+It also allows compression of an image so that it will fit on the ARGS screen.
+\item [ICFLASH]: Display an image on the ARGS, scaling it around sky level to
+show faint features.
+Compresses the image if a side is $>$ 512.
+\item [IFLASH]: Display an image on the ARGS.
+Does't do any intensity scaling so is much faster than ADISP.
+If the image is $>$ 512 it is sampled down to less.
+\item [IGJOB]: Produce Versatec plot file of IAM images.
+\item [IGPLOT]: Plot IAM image on ARGS quadrant.
+\item [IJOIN]: Join up to 25 2D images.
+\item [IMANIC]: Select part of a 2D 16-bit image.
+\item [IMERGE]: Merge up to 25 16-bit images.
+\item [IMGARITH]: Image arithmetic.
+\item [IMSIZE]: Determine the dimensionality and size of a frame.
+\item [IMSTACK]: Stack images together which need not be aligned; it should be
+used before PSTACK and IMGARITH are run, wherever possible.
+\item [INCARN]: Extract a specified incarnation from an image.
+\item [INDPIX*]: Change an indicated pixel to a defined value.
+\item [INSPECT]: Perform similar functions to PEEP, WRHIST and STATS on several
+selected regions of an image.
+\item [INVARG]: Invert current colour table on the ARGS.
+\item [INVCOL]: Invert colour table held as a {\em BDF} file.
+\item [IPCSIN]: Convert IPCS data on magnetic tape into Starlink frames.
+(see SUN/3).
+\item [IPOLYGON]: A 16 bit integer version of POLYFILLA.
+\item [ISLICE]: Version of SLICE which works on 16-bit images.
+\item [ITFCORR]: Apply intensity transfer function correction to an image.
+\item [ITFGEN]: Generate an intensity transfer function.
+\item [ITFGENA]: Generate a conversion table to correct for PDS and emulsion
+non-linearity.
+\item [ITFPLOT]: Plot an intensity transfer function.
+\item [ITOR]: Convert an I*2 format image containing a scale factor and zero
+level in its descriptor into a R*4 image.
+\item [JONESASP]: Smoothing program which uses different degrees of smoothing
+for the central parts of a galaxy and the fainter outer parts.
+\item [LAPLACE]: Form the difference between an image and some multiple of its
+Laplacian.
+\item [LIMITS]: Draw a graph of a 1D frame and ask for cursor selection of two
+points.
+\item [LIN]: Estimate amplitude and phase of up to 20 sine-waves using a
+{\em linear} least squares fit.
+\item [LINCONU]: Read a Starlink image (as unsigned 16 bit integers) together
+with the descriptor items BSCALE and BZERO and convert the data into REAL
+values using: \newline OUTPUT=INPUT*BSCALE+BZERO. 
+\item [LINCONV]: Read a Starlink image (as 16 bit integers) together with the
+descriptor items BSCALE and BZERO and convert the data into REAL values
+using:\newline OUTPUT=INPUT*BSCALE+BZERO.
+\item [LINEFIT]: Fit linear functions to each line in an image.
+\item [LINFIX*]: Change an indicated row of an image to a defined value
+(cf.\ COLFIX).
+\item [LINPLOT]: Draw the graph of a 1D frame on one of several devices.
+\item [LIST]: List part of a frame.
+\item [LISTLEV]: List LEVELS file on lineprinter.
+\item [LISTPAR]: Display a formatted version of a parameter file on the
+terminal.
+\item [LOFREQ*]: Eliminate low frequencies from an FFT mode image produced by
+DFFTASP.
+\item [LOG]: Natural logarithm of each element of a frame.
+\item [LORCUR]: Measure cursor-selected stars by fitting full 2D Lorentz
+profiles, including an option to handle overlapping stars.
+\item [LORFIT]: Estimate the Lorentzian profile that best fits the stars in an
+image.
+\item [LORMUL]: Measure magnitudes of all stars in an (X,Y) list, including
+possible overlapping stars, using a full 2D Lorentz profile.
+\item [LORSIM]: Measure magnitudes of stars by fitting full 2D Lorentz profiles
+to isolated stars whose positions are given in an (X,Y) list.
+\item [LSEE]: Simple to use image display package (now almost never used).
+\item [LUTCOL]: Write a standard colour LUT to the ARGS.
+\item [LUTCONT]: Fill the ARGS colour table with discrete values to give a
+contour-like display.
+\item [LUTE]: Interactive tuning of a LUT using the push-buttons.
+\item [LUTFC]: Load the `false-colour' LUT (as used in the opening
+demonstration at RAL).
+\item [LUTGREY]: Load the standard grey LUT.
+\item [LUTLIN]: Interactive manipulation of a linear (or logarithmic) LUT using
+the ARGS cursor.
+\item [LUTREAD]: Read any pre-defined LUT and write it to the ARGS.
+\item [LUTROT]: Cycle a LUT using a trackerball.
+\item [LUTSET]: Fill part of the ARGS colour table with values linearly
+interpolated between two RGB sets.
+\item [LUTSTORE]: Store the look-up-table currently held in the ARGS as a
+Starlink frame.
+It can subsequently be read back into the ARGS using LUTREAD.
+\item [LUTTWEAK]: Interactive manipulation of a LUT; three different LUTs are
+available.
+\item [MAGAV]: Average the magnitudes found by any of the GRASP programs,
+rejecting stars which have poor fit parameters.
+\item [MAGCNTASP]: Produce absolutely calibrated contours in magnitudes per
+square arcsec.
+\item [MAGCOR]: Correct the magnitudes found by any of the GRASP programs for
+the effects of measuring machine aperture density averaging.
+\item [MAGDIAG]: Combine several magnitude lists, apply colour equations and
+zero points, then plot and store colour-magnitude or colour-colour diagrams.
+\item [MAGRMS]: Plot the run of RMS error with magnitude for the results from
+any of these photometric programs.
+\item [MANIC]: M and N image conversion --- pick part of a 1D, 2D or 3D frame
+and convert it into a 1D, 2D or 3D frame.
+\item [MANYG]: Create a 2D test image containing a background, as many Gaussian
+images as required, and some noise.
+\item [MASK]: Mask one image with another so that the first image shows where
+it is valid but the second image shows through in the regions where the first
+is invalid.
+\item [MATHS]: Apply arithmetic and mathematical functions to input images and
+constants.
+\item [MEAN*]: Calculate the mean from a patch of an array.
+\item [MEDBOX*]: Calculate the median from a patch of an array.
+\item [MEDIAN]: Apply a median filter at each point in an image.
+\item [MEM]: Maximum entropy deconvolution program for 2D images.
+\item [MEMPOW]: Compute the maximum entropy estimate of the {\em true} power
+spectrum of up to 50 datasets.
+\item [MERGE]: Combine two or more images with weighting to form a mosaic.
+\item [MODAL]: Apply a modal filter to discrete boxes in an image and then use
+linear interpolation for intermediate values.
+\item [MODE]: Apply a modal filter at each point of an image.
+\item [MODHELP]: Summarize the functions of the pixel modification programs
+in E2D (formerly known as MODPIXASP).
+\item [MOVE]: Move an image by a non-integral shift in X and Y.
+\item [MOVIE]: Display a movie made up of 1D plots of successive rows of a
+2D frame.
+Plot up to 500 pixels in the X-direction with a delay between each row
+controlled by the trackerball.
+\item [MSLICE]: Variant of SLICE which allows multiple slices to be obtained 
+but which stores none of them.
+\item [MULCON]: Produce a contour map of a frame, or a series of contour maps
+of selected regions of a frame.
+Output files produced are suitable for a Versatec.
+\item [MULT]: Multiply two frames, element by element.
+\item [NITPIK]: Remove small defects from an image.
+\item [NON]: Non-linear least squares fit of a set of sine waves starting with
+good initial extimates.
+\item [NOPROMPT]: Cancel automatic prompting mode set by PROMPT.
+\item [NORMALIZE]: Calculate the scaling required between two images of the
+same object with different exposure times so that they have (on average) the
+same data values.
+\item [NORMFILT]: Apply a convolution and normalization to an image as an aid to
+star detection when using a matched filter.
+\item [NSTACK]: Stack images to improve signal/noise and remove blemishes.
+\item [ODDHDC1]: Apply an odd-order hierarchical convolution to a 1D image.
+\item [ODDHDC2]: Apply an odd-order hierarchical convolution to a 2D image.
+\item [OUTSET*]: Set all pixels in an image outside a circle to a defined value.
+\item [PACK]: Pack an image which has been scaled from 0 to 1 (thresholded) or
+0 to 3 (confidence levels) by CONFLEV.
+\item [PARDIF]: Crude estimate of the partial derivative of an image.
+\item [PARPLTP]: Extract any two parameters from the ellipses which have been
+fitted by FITELLP and plot one against the other.
+\item [PATCH]: Replace selected regions of an ARGS displayed image with a
+smooth or noisy patch.
+\item [PCT]: Generate the principle component transformation on a set of up to 4
+frames.
+\item [PDM]: {\em Phase Dispersion Methods} --- several variations on the
+{\em string} method for estimating the possible frequencies present on a
+dataset are available.
+\item [PDSCOR]: Get clear areas measured by a segmented PDS raster and work
+out PDS drift.
+Fill 1D array with a {\em clear} value for each line of the main raster.
+Display the levels of the reference scans and the fit and run of the mode of
+the main scan values which are near the central scan values image.
+\item [PDSIM]: Take the PDS main image and reference area scans from PDSMULTI,
+estimate the variable zero level, subtract it and correct for PDS and emulsion
+non-linearities.
+\item [PDSIN]: Convert PDS data on magnetic tape into Starlink frames.
+\item [PDSMULTI]: Take a PDS tape created by the MULTI-mode and produce Starlink
+images.
+\item [PDSRASTER]: Read a nine track PDS tape of rasters written in the
+Scansalot format from the Forth system and create a Starlink image.
+\item [PDSRIPPLE]: Eliminate the zero-point ripple on PDS produced images.
+\item [PECALBASP]: Absolute photometric calibration of a 2D image which is held
+as intensity normalized to a sky background of 1.0.
+\item [PEEP]: Type a 9x9 section of an image.
+\item [PERIOD]: Set parameter GLOBAL\_FREQ to mean period.
+\item [PICK]: Pick a 2D subset from a 2D image using the ARGS cursor {\em or} a
+keyboard.
+MANIC handles much more general cases.
+\item [PIXDUPE]: Expand an image by pixel duplication.
+\item [PIXFILL]: Replace invalid regions of an image with a smooth function.
+\item [PIXMAP]: Move the pixels in an image to new positions so as to put them
+in a 2D set of bins.
+\item [PIXUNMAP]: Generalized resampling of a 1D or 2D image at a set of points
+defined by specified coordinate images.
+\item [PLOTDAT]: Plot datasets.
+\item [PLOTFIT]: Plot data created from a parameter file to be plotted over a
+dataset.
+\item [PLOTPS]: Plot the power spectrum computed by POWER.
+\item [PLOTQTH]: Threshold an image and plot it on an ARGS quadrant.
+\item [POLAR]: Generate total polarization and polarization angle from sky
+subtracted Q and U polarization frames.
+\item [POLFIT]: Produce intensity conversion table LOOKUP from known conversions
+in LEVELS using a polynomial fit.
+\item [POLYFILLA]: Cursor definition on the ARGS of a new image made up from
+one or more polygons.
+The interiors are set to 1, the exteriors to 0.
+\item [POWER]: Compute (optionally) the power spectrum and/or the window
+function of the photometric data.
+\item [PRAPERCUR]: Format output from APERCUR for printing.
+\item [PRAPERMAG]: Format output from APERMAG for printing.
+\item [PRFDECASP]: Determine the parameters of the bulge and disc components in
+the observed profile of a galaxy.
+\item [PRFLOGASP]: Convert a profile held as normalized intensities into log of
+intensity above the sky.
+\item [PRFPLTASP]: Plot an extracted galaxy profile.
+\item [PRFPRTASP]: Produce a printed listing of a fitted profile and its
+associated parameters.
+\item [PRFVISASP]: Visual comparison of an extracted profile with profiles
+computed from a model with fixed parameters.
+\item [PRGAUMAG]: Format output from GAUMAG for printing.
+\item [PRIAXEASP]: Extract the profiles along two orthogonal axes centred on a
+galaxy.
+\item [PRINTTAB]: Print 2D table on lineprinter.
+\item [PRLORCUR]: Format output from LORCUR for printing.
+\item [PRLORMUL]: Format output from LORMUL for printing.
+\item [PRLORSIM]: Format output from LORSIM for printing.
+\item [PRMAGS]: Format an EDRS-type list of positions and magnitudes for
+printing.
+\item [PROFILE]: Extract and plot sections through images.
+\item [PROMPT]: Activate automatic prompting.
+\item [PRPLOT]: Produce plot of polarization vectors from total polarization
+and polarization angle data.
+\item [PSFEST]: Point-spread-function (star profile) from an image.
+\item [PSPEC]: Power spectrum from the Fourier transform.
+\item [PSTACK]: Add images which are mutually aligned and normalized; it is a
+variation of NSTACK.
+\item [PUTDOC]: Put a documentation file created by CREDOC into the source of
+the program in the form of `C+' comments (calls program STUFF and the command
+procedure EDITIT).
+\item [PUTSTAR]: Create a realistic artificial star and galaxy field containing
+profiles and noise which emulate electronic or photographic detectors.
+\item [PW]: {\em Pre-Whitening} --- Remove the variation specified by a set of
+parameters from an existing dataset.
+\item [RDKEY]: Keyboard input of a list of right ascensions and declinations.
+\item [RDLIST]: Type/print a stored list of right ascensions and declinations.
+\item [RDTOXY]: Convert a list of right ascensions and declinations into crosses
+superimposed on an image displayed on the ARGS.
+\item [REALFR]: Tidy up an image so that only the REAL incarnation is left (it
+needs some work space within your quota).
+\item [RECFIL*]: Set pixels inside a selected rectangle to a defined value.
+\item [RESAMPLE]: Resample an image according to a bi-linear position
+transformation.
+\item [RESCALE]: Alter the scale and zero descriptors and reset the invalid
+pixel flag.
+\item [RESTORE]: Write an unformatted BDF file as a formatted DAT file.
+\item [RHDC1]: Apply a reduced odd-order hierarchical convolution to a 1D
+image.
+\item [RHDC2]: Apply a reduced odd-order hierarchical convolution to a 2D
+image.
+\item [RINGCOL]: Generate a continuous purple, blue, green, red, purple colour
+table.
+\item [ROT3D]: Rotate the axes of a 3D image from (X,Y,Z) to (Z,Y,X).
+Designed for use in conjunction with STK23 to convert a set of 2 spectra (such
+as long slit IPCS) into a TAURUS-compatible cube.
+\item [RTOI]: Tiny procedure which may be of use within procedures to
+convert parameters from REAL (as written by WRKEY) into INTEGER.
+It also sets a global parameter.
+\item [SATCOR]: Apply the electronograph saturation law to an image or
+de-saturate an image.
+\item [SECTOR]: Define, display and store the radial profile in a cursor-defined
+sector of an image displayed on the ARGS.
+\item [SEGMENT]: Copy polygonal segments of one image to another.
+\item [SELECT]: Select one or more subsets from a given dataset and store as
+separate datasets.
+\item [SETALL*]:  Change IAM parameters.
+\item [SETAREA*]: Set IAM area cut.
+\item [SETLEV]: Produce calibration LEVELS file by keyboard entry.
+\item [SETLIM*]: Set zero point and highest histogram bin value.
+\item [SETMAG*]: Set IAM sky background.
+\item [SETPER*]: Set threshold parameter of histogram.
+\item [SIMPAR]: Generate control parameter file for STARSIMP.
+\item [SINCFIL*]: Multiply an FFT image by a {\em sinc} function.
+\item [SLAFIT]: Generate intensity conversion table LOOKUP from LEVELS using
+a slalom fit devised by John Cooke.
+\item [SLICE]: Define, display and store a 1D cursor-defined slice through an
+image displayed on the ARGS.
+\item [SMOOTH]: Smooth an image by a Gaussian or top hat convolution.
+\item [SPECOL]: Generate a continuous blue, green, red colour table.
+\item [SPLEQ]: Resample a dataset at equal time intervals.
+\item [SPLFIT]: Generate intensity conversion table LOOKUP from LEVELS using a
+spline fit.
+\item [SQORST]: Either squashes or expands an `unknown' image into a defined
+shape by performing bi-linear interpolation.
+\item [SQRT]: Replace each element by its square root.
+\item [STAR]: Find location, size and intensity of a star assumed to occupy
+most of an image.
+\item [STAREMASP]: Interactively remove stars and blemishes from an image.
+\item [STARFIT]: Determine the best profile parameters for the stars in an
+image.
+\item [STARMAG]: Perform stellar photometry by fitting a model star profile.
+\item [STARSIM*]: Generate a frame containing  an artificial star field with
+user defined parameters.
+\item [STARXY]: Measure astrometric (X,Y) positions of user selected stars in an
+image and save them in a file.
+\item [STATS]: Show dimensions, range of values and so on of a frame.
+\item [STK23]: Combine a set of 2D images into a 3-D cube.
+\item [STOKES]: Generate Stokes parameters Q and U from total polarization
+and polarization angle.
+\item [STORE]: Convert part of a formatted DAT file into an unformatted BDF
+file.
+\item [SUB]: Subtract the second frame from the first.
+\item [SURFIT]: Produce image defined by a polynomial or bi-cubic spline surface
+which is a least-squares fit to an input image.
+\item [SWEEP]: Rotate the current ARGS colour table.
+\item [SYMDIS*]: Remove 4 symmetrically placed disc-shaped areas from an FFT
+image.
+\item [SYNTH]: Generate sinusoidal data with user-defined periods and noise
+levels at the same epochs as an input data set.
+\item [TARGET]: Overlay markers showing the brightest stars in an artificial
+image on top of the image displayed on the ARGS.
+\item [TBXY]: Return the location of a cursor-defined point in an image
+displayed on the ARGS.
+\item [TBXY2]: Return the location of a pair of cursor-defined points in an
+image displayed on the ARGS.
+\item [TESTFIT]: Calculate the astrometric position and photometric parameters
+of a stellar image for which approximate coordinates are input by the user.
+\item [THRESH]: Define a threshold value using the ARGS trackerball; the effect
+is visible on the ARGS.
+\item [THRESHOLD]: Zeroise values of an image which lie outside specified
+lower and upper limits.
+\item [TOSTAR]: Convert RGODR-format images into Starlink frames.
+\item [TRCONCAT]: Calculate the combined effect of applying two successive
+6-parameter linear position transformations to a set of (X,Y) coordinates.
+\item [TRIM]: Change the size of an image by selecting a square or rectangular
+region to copy into another image.
+\item [TWOTONE]: Take two 2D Starlink images and form a single coded
+`pseudo-colour' image.
+\item [TYPEIN]: Keyboard input to a 1D frame.
+\item [TYPETAB]: Display 2D table on terminal.
+\item [UNDOC]: Remove the documentation from the start of a program if major
+changes are required (calls the program STRIP).
+\item [UNPACK]: Unpack images created by PACK (PACK and UNPACK may be used to
+compress images for transmission over the network).
+\item [UNZOOM]: Set the ARGS zoom factors to 1 and 1 on the centre of the
+screen.
+\item [USMASK]: Form an `un-sharp' masked image by subtracting a smoothed
+version of an image from the original.
+\item [VARGREY]: Generate a grey colour table with user defined end points.
+\item [VELINT]: Form a composite image from a velocity and an intensity image.
+\item [VERGREY]: Generate pseudo-greyscale output for the Versatec.
+\item [VIDISP]: Display an image created by VELINT as a colour coded velocity
+map but with intensities represented as well.
+\item [VIEW]: Produce a file suitable for printing containing an array of the
+integers stored in a square section of an image.
+\item [WAVEGET]: Copy part of the Solar Spectrum Atlas into a Starlink image.
+\item [WONB]: Set the ARGS to white lines on a black background when it is used
+in vector mode.
+\item [WRDSCR]: Write new items as descriptors into an existing frame.
+\item [WRHIST]: Form, store and/or write out the histogram of a frame.
+\item [XYARITH]: Make a new (X,Y) list by performing linear arithmetic
+operations on any of the parameters stored in two existing (X,Y) lists.
+\item [XYCHART]: Plot a realistic looking star map; star identifications may be
+put by the stars.
+\item [XYCOEFF]: Generate a set of position transformation coefficients from a
+specified shift, rotation and magnification.
+\item [XYCUR]: Create a file of (X,Y) positions.
+\item [XYCURA]: Create a new list of (X,Y) positions from part or all of an
+existing list using the ARGS cursor.
+\item [XYCURB]: Create a new list of (X,Y) positions by using the ARGS cursor to
+correct the positions in an existing list.
+\item [XYCUT]: Extract a portion of an (X,Y) list and write it to a new file.
+You select the section of columns to be extracted.
+Identifiers and headers are copied over correctly.
+\item [XYDRAW]: Draw a graph of the first two parameters (usually X and Y) in
+any (X,Y) list.
+\item [XYDRAWA]: Draw from (X,Y) lists.
+The graph is a smooth curve (using a cubic spline) joining the points.
+\item [XYEDIT]: Convert the normal (binary) version of an (X,Y) list into an
+ASCII version, and vice versa, so that (X,Y) lists may be created or edited
+using one of the standard editors.
+\item [XYFIT]: Fit a bi-linear transformation between two sets of positions.
+\item [XYFITA]: Generate the coefficients for a linear transformation between
+one set of (X,Y) positions and another.
+\item [XYJOIN]: Join together two EDRS (X,Y) files.
+\item [XYKEY]: Enter and store a list of (X,Y) positions from a keyboard.
+\item [XYKEYA]: Extended version of XYKEY allowing keyboard entry of items to an
+(X,Y) list.
+\item [XYLIST]: Type a set of (X,Y) positions.
+\item [XYLISTA]: Create a printable listing of any (X,Y) list in F12.4 format.
+\item [XYMATCH]: Take two (X,Y) lists and create two new files containing
+either the stars from each list which have corresponding identifiers, sorted
+in the same order, or the entries which have no corresponding identifier.
+\item [XYMULTA]: Take two (X,Y) lists and makes a third by copying the first
+one, replacing the second parameter with the multiple of the second parameter
+of the first and second files.
+Suitable for multiplying two response functions.
+\item [XYPMATCH]: Take two (X,Y) lists and make two new ones which are copies
+of the old ones but only contain entries which match in (X,Y) position.
+\item [XYPRNT]: Make a neat listing of an (X,Y) file.
+\item [XYRENUM]: Take an (X,Y) file and renumber the identifiers from 1 to N.
+\item [XYSORT]: Sort an (X,Y) list into ascending or descending order of one of
+the parameters contained in it.
+\item [XYSTAT]: Find statistics for 1 or 2 sets of numbers taken from (X,Y)
+lists.
+\item [XYTORD]: Convert cursor defined positions on the ARGS into a list of
+right ascensions and declinations.
+\item [XYTRAN]: Apply a linear transformation to a set of (X,Y) positions.
+\item [XYWEED]: Take an (X,Y) list and extract those entries which have values
+for one of the parameters present inside or outside a defined range.
+\item [XYWEEDA]: Take an (X,Y) list and extract those entries whose (X,Y) lie
+in a pixel of the reference image which has a non-zero value.
+\item [ZAPLIN]: Replace a vertical or horizontal strip in an image to remove
+defects.
+\item [ZEBRA]: Generate a {\em pseudo contour} colour table.
+\end{description}
+
+\newpage
+\section {Specifications of commonly used programs}
+This section gives details of the following 53 commonly used ASPIC programs:
+
+\begin{tabbing}
+MMMM\=MMMMMMMMMMMM\=MMMMMMMMMMMM\=MMMMMMMMMMMM\=\kill
+\>ABLINK\>ATEXT\>INCARN\>SLICE\\
+\>ACLEAR\>CADD\>INSPECT\>STARFIT\\
+\>ADD\>CONTOUR\>LIST\>STARMAG\\
+\>ADHC\>CSUB\>LUTCOL\>STATS\\
+\>ADISOV\>CYDSCR\>LUTCONT\>SUB\\
+\>ADISP\>DESCR\>LUTE\>TBXY\\
+\>AFLASH\>DIV\>LUTGREY\>VERGREY\\
+\>AHARDCOPY\>FC\>LUTLIN\>WRDSCR\\
+\>ALIST\>FILEDOC\>LUTREAD\>XYCURA\\
+\>APAN\>GAUSFIT\>LUTROT\>XYCURB\\
+\>APERASP\>GREYSCALE\>PEEP\>XYDRAWA\\
+\>APERCUR\>HISTPLOT\>PICK\>XYEDIT\\
+\>ARESET\>IAMANAL\>REALFR\>XYLIST\\
+\>ASAVE
+\end{tabbing}
+The text is based on their on-line help files.\\
+
+The parameter descriptions have three columns which contain the following
+information:
+\begin{itemize}
+\item Parameter name.
+\item Default value (if any)
+\item Description
+\end{itemize}
+Parameters which are normally defaulted are listed after other parameters.\\
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf ABLINK} \hfill {\bf ABLINK}}
+\begin{description}
+\item [FUNCTION]:
+Displays two images, one in the bottom 8 bits of ARGS memory, the other in the
+top 8 bits.
+\item [COMMAND]:
+\begin{quote}
+{\tt ABLINK}
+\end{quote}
+\item [NOTES]:
+After running this program, run the BLINKER program which allows the use of the
+trackerball buttons to flip between the two images, both manually and
+automatically.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf ACLEAR} \hfill {\bf ACLEAR}}
+\begin{description}
+\item [FUNCTION]:
+Writes zeros into the ARGS picture memory.
+\item [COMMAND]:
+\begin{quote}
+{\tt ACLEAR}
+\end{quote}
+\item [NOTES]:
+It clears the ARGS, leaving the LUT and zoom factors unchanged.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf ADD} \hfill {\bf ADD}}
+\begin{description}
+\item [FUNCTION]:
+The sum IMAGEIN1+IMAGEIN2 is stored in IMAGEOUT.
+\item [COMMAND]:
+\begin{quote}
+{\tt ADD  IMAGEIN1  IMAGEIN2  IMAGEOUT}
+\end{quote}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf ADHC} \hfill {\bf ADHC}}
+\begin{description}
+\item [FUNCTION]:
+Displays an image on the ARGS at a specified center after automatic scaling.
+A nonlinear scaling function is computed from a histogram of image pixel values
+to produce a very high contrast display on the ARGS.
+(ADHC = Args Display High Contrast)
+\item [COMMAND]:
+\begin{quote}
+{\tt ADHC  [SHADE=1.]}
+\end{quote}
+\item [PARAMETERS]:
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+IMAGE\>\>\begin{minipage}[t]{100mm}
+The 2-D Starlink image to be displayed. It may be of any size, but no more than
+512*512 pixels will be visible.
+\end{minipage}\\
+XC\>256\>\begin{minipage}[t]{100mm}
+The x co-ordinate on the ARGS where the {\em center} of the image will be
+located.
+\end{minipage}\\
+YC\>256\>\begin{minipage}[t]{100mm}
+The y co-ordinate on the ARGS where the {\em center} of the image will be
+located.
+\end{minipage}\\
+SHADE\>0.5\>\begin{minipage}[t]{100mm}
+Controls the overall brightness of the ARGS image.
+A smaller value makes the image brighter.
+Legal range is from 0.0 to 1.0.
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+Useful for a first look at the image and to examine the faint image structure
+near the background level.
+The SHADE parameter allows the overall brightness of the ARGS image to be
+adjusted.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf ADISOV} \hfill {\bf ADISOV}}
+\begin{description}
+\item [FUNCTION]:
+Disables ARGS overlays for a specified bit plane.
+\item [COMMAND]:
+\begin{quote}
+{\tt ADISOV [PLANE]}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+(normally defaulted) :\\
+\\
+PLANE\>8\>\begin{minipage}[t]{100mm}
+The bit plane to be disabled (it is actually 8+MOD(PLANE,8) which is used).
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+It may be used to erase any graphics or text written to any one of the ARGS
+overlay planes.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf ADISP} \hfill {\bf ADISP}}
+\begin{description}
+\item [FUNCTION]:
+Displays an image on the ARGS at a specified center after suitable scaling.
+\item [COMMAND]:
+\begin{quote}
+{\tt ADISP [TRIM=FALSE] [LOG=TRUE]}
+\end{quote}
+\item [PARAMETERS]:
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+IMAGE\>\>\begin{minipage}[t]{100mm}
+The 2-D Starlink image to be displayed. It may be of any size, but no more than
+512*512 pixels will be visible.
+\end{minipage}\\
+XC\>256\>\begin{minipage}[t]{100mm}
+The x co-ordinate on the ARGS where the {\em center} of the image will be
+located.
+\end{minipage}\\
+YC\>256\>\begin{minipage}[t]{100mm}
+The y co-ordinate on the ARGS where the {\em center} of the image will be
+located.
+\end{minipage}\\
+PVLO\>Min value\>Data with this value are scaled to zero.\\
+PVHI\>Max value\>\begin{minipage}[t]{100mm}
+Data with this value are scaled to 255, which is the largest value to be
+displayed by the ARGS.
+\end{minipage}\\
+\\
+(normally defaulted) :\\
+\\
+TRIM\>TRUE\>\begin{minipage}[t]{100mm}
+If TRUE, values outside the range PVLO to PVHI are set to those values.
+If FALSE, PVLO and PVHI are ignored and the values reduced to 16 bits.
+This may cause them to wrap around on the ARGS.
+\end{minipage}\\
+LOG\>FALSE\>\begin{minipage}[t]{100mm}
+If TRUE, logarithmic scaling is used between the defined limits, otherwise
+linear scaling is used.
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+This is the major routine used to look at data.
+Note the use of the LOG parameter, and remember that by choosing suitable values
+for PVLO and PVHI a negative display is generated.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf AFLASH} \hfill {\bf AFLASH}}
+\begin{description}
+\item [FUNCTION]:
+Displays an image on the ARGS by simply copying a 2-D Starlink image to the
+ARGS memory.
+AFLASH does not do any intensity scaling, thus it is much faster than the
+similar program ADISP.
+\item [COMMAND]:
+\begin{quote}
+{\tt AFLASH}
+\end{quote}
+\item [PARAMETERS]:
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+IMAGE\>\>\begin{minipage}[t]{100mm}
+The 2-D Starlink image (I*2) to  be displayed.
+It may be of any size, but no more than 512*512 pixels will be visible.
+\end{minipage}\\
+XC\>256\>\begin{minipage}[t]{100mm}
+The x co-ordinate on the ARGS where the {\em center} of the image will be
+located.
+\end{minipage}\\
+YC\>256\>\begin{minipage}[t]{100mm}
+The y co-ordinate on the ARGS where the {\em center} of the image will be
+located.
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+Mainly useful for displaying INTEGER*2 arrays which have pixels in the range
+0 $<$ N $<$ 255, which is the extent of the ARGS look up table.
+Values outside this range will be displayed with a LUT value of MOD(N,256).
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf AHARDCOPY} \hfill {\bf AHARDCOPY}}
+\begin{description}
+\item [FUNCTION]:
+Copies the current ARGS display onto the Printronix lineprinter.
+\item [COMMAND]:
+\begin{quote}
+{\tt AHARDCOPY [XLIMITS=I1,I2] [YLIMITS=J1,J2] [SQUARE=logical] [THRESH=value]}
+\end{quote}
+\item [PARAMETERS]:
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+LABEL\>\>Optional label for the lineprinter plot.\\
+\\
+(normally defaulted) :\\
+\\
+XLIMITS\>0,511\>Minimum and maximum columns on the ARGS to be plotted.\\
+YLIMITS\>0,511\>Minimum and maximum rows on the ARGS to be plotted.\\
+SQUARE\>FALSE\>\begin{minipage}[t]{100mm}
+If true, every 5th row is printed twice so that the overall image has the
+correct proportions in X and Y.
+\end{minipage}\\
+THRESH\>0\>\begin{minipage}[t]{100mm}
+Defines the threshold level at which black becomes white or vice versa
+depending on the sign of the threshold value.
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+By default the entire 512x512 pixel area is copied from the ARGS memory and
+plotted on the printer as any array of 512x512 dots.
+The sign of the value THRESH determines if pixel values above/below this value
+are represented as blank/black dots on the printer.
+If the sign is positive then pixel values below THRESH will be blank while
+pixel values equal to or above THRESH will be black.
+The converse applies if the sign of the value THRESH is negative.
+Optionally, any rectangular region of the ARGS screen may be plotted by
+specifying XLIMITS and YLIMITS on the command line.
+The plot is automatically sent to the line printer queue.
+Note that since the line printer pixels do not have equal spacing in the X and
+Y directions, the plot is not square unless the SQUARE option is specified on
+the command line.
+
+It is useful for getting a hard copy of any graphics currently displayed on the
+ARGS. 
+Since the lineprinter can only display a pixel as either white or black, this
+routine does not work well on grey scale images unless the program THRESH has
+been run to define a threshold value, in which case set THRESH=THRESH\_OFFSET
+on the command line.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf ALIST} \hfill {\bf ALIST}}
+\begin{description}
+\item [FUNCTION]:
+Lists details of the size and location of all images held in the ARGS database..
+\item [COMMAND]:
+\begin{quote}
+{\tt ALIST}
+\end{quote}
+\item [NOTES]:
+It should tell you what images are actually displayed on the ARGS.
+If any non-ASPIC programs have been used, it is likely that no entry was made
+in the ARGS database.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf APAN} \hfill {\bf APAN}}
+\begin{description}
+\item [FUNCTION]:
+ARGS trackerball/cursor pan and zoom package.
+\item [COMMAND]:
+\begin{quote}
+{\tt APAN}
+\end{quote}
+\item [NOTES]:
+The trackerball buttons are used as follows:
+\begin{quote}
+\begin{tabbing}
+XXXXXX\=XXXX\=\kill
+GREEN\>1\>\begin{minipage}[t]{100mm}
+resets the zoom factors and image position.
+Zoom factors allowed are 1,2,4,8,16.
+\end{minipage}\\
+WHITE\>2\>decreases the x and y zoom factors.\\
+WHITE\>3\>increases the x and y zoom factors.\\
+RED\>4\>causes an exit from the program.
+\end{tabbing}
+\end{quote}
+The value of the IX,IY position of the cursor on the image is returned.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf APERASP} \hfill {\bf APERASP}}
+\begin{description}
+\item [FUNCTION]:
+The ASPIC aperture photometer is a set of routines designed for aperture
+photometry of images selected interactively by the cursor.
+Before using the photometer, the image frame to be measured is displayed on an
+ARGS, for example by using ADISP.
+The aperture photometer contains several functions, which are obtained by the
+commands described below.
+\item [COMMAND]:
+\begin{quote}
+{\tt APERASP}
+\end{quote}
+\item [OPTIONS]:
+\begin{tabbing}
+XXXXXXXX\=\kill
+SHAPE\>\begin{minipage}[t]{120mm}
+Select the shape of the cursor.
+The available options are square or ellipse (circular cursors are included as
+a special case of an ellipse).
+\end{minipage}\\
+SIZE\>\begin{minipage}[t]{120mm}
+Enter a new aperture size.
+In order to keep the magnitudes on the same scale throughout a measuring run,
+the size should be kept constant for all the stars measured.
+\end{minipage}\\
+STAR\>\begin{minipage}[t]{120mm}
+Measure the signal from a star in the frame.
+The cursor is positioned over the star to be measured.
+If a square cursor is selected, the trackerball buttons can be used to increase
+or decrease the size of the aperture.
+If an elliptical cursor has been selected, the trackerball buttons can be used
+to change the ellipticity and orientation of the cursor as well as its size.
+\end{minipage}\\
+SKY\>\begin{minipage}[t]{120mm}
+This is used to measure the signal from a patch of sky neighbouring the star
+measured.
+The procedure and options are the same as for STAR, however the aperture used
+need not be the same size as that used in the STAR measurement.
+\end{minipage}\\
+MAG\>\begin{minipage}[t]{120mm}
+This is used to derive a stellar magnitude from the stellar and sky measures
+according to the formula:
+\[mag = zero - 2.5 \log_{10}  (star - sky)\]
+where zero is a zero point.
+\end{minipage}\\
+ZERO\>Enter a value for the zero point from the environment.\\
+E\>Exit the aperture photometer and return to DSCL.
+\end{tabbing}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf APERCUR} \hfill {\bf APERCUR}}
+\begin{description}
+\item [FUNCTION]:
+Aperture photometry using a circular aperture positioned on an ARGS image by
+the cursor.
+\item [COMMAND]:
+\begin{quote}
+{\tt APERCUR}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXXX\=XXXXXXXX\=\kill
+NEWIMAGE\>Yes\>\begin{minipage}[t]{100mm}
+Flag for displaying new image or using image already on ARGS.
+Choices are YES/NO.
+\end{minipage}\\
+IMAGE\>\>\begin{minipage}[t]{100mm}
+This is the name of the image.
+The program likes I*2 files with BSCALE,BZERO headers as in FITS, but deals with
+others OK.
+\end{minipage}\\
+CLEAR\>Yes\>\begin{minipage}[t]{100mm}
+Clear any prevoius aperture marks left on image.
+Choices are YES,NO.
+\end{minipage}\\
+OPTION\>APERTURE\>\begin{minipage}[t]{100mm}
+Flag for choice of action.
+Choices are APERTURE, RMS, MAGNITUDE, ZEROMAG, ZEROTIME, STORE, HELP, IMAGE,
+EXIT; defined above.
+\end{minipage}\\
+ZEROM\>0.00\>\begin{minipage}[t]{100mm}
+The zeropoint to be applied to the magnitudes.
+\end{minipage}\\
+EXPTIME\>1.0\>\begin{minipage}[t]{100mm}
+The exposure time which can be used for calculating the zeropoint to be
+applied.
+\end{minipage}\\
+RMSCUR\>1.0\>\begin{minipage}[t]{100mm}
+The correction factor to apply to the RMS result which can correct for a
+non-Poisson character (see above).
+\end{minipage}\\
+XYWOUT\>\>\begin{minipage}[t]{100mm}
+This is the name of the .BDF file used to store the results.
+\end{minipage}\\
+XYWTIT\>Output\>\begin{minipage}[t]{100mm}
+This is the title to be associated with the output file.
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+Input the image name to acquire ARGS image, or to display a new image on the
+ARGS.
+If the first, decide if clearing previous aperture marks, then repeatedly
+choose option:
+\begin{tabbing}
+XXXXXXXXXXXX\=\kill
+OPTION\>FUNCTION\\
+Aperture (A)\>\begin{minipage}[t]{114mm}
+Enables cursor to choose a position, aperture size and star/sky choice.
+Star flux in aperture found, or sky level in aperture found, and typed.
+If star, then the star and last sky level is taken and calculations done for
+the Mag calc:
+\[Mag = 30 + Z - 2.5 \log_{10} (star-sky level)\]
+N.B. The magnitude is {\em not} stored.
+\end{minipage}\\
+Magnitude (M)\>Recalc the mag of the last star and sky\\
+Store (ST)\>Store the last star magnitude result\\
+Zeromag (ZEROM)\>Change the zero point, Z to be used\\
+Zerotime (ZEROT)\>\begin{minipage}[t]{120mm}
+Change zeropoint by using exposure time, so $Z = 2.5 \log exptime$.
+\end{minipage}\\
+Rms  (R)\>Change the Poisson scaling factor for RMS\\
+Help (H)\>List options\\
+Image (I)\>Display a new image for use\\
+Exit (E)\>End program
+\end{tabbing}
+The starting aperture diameter is 20, the starting zero point is 0.00.
+The cursor is moved by the trackerball and the size of the aperture is diplayed
+as a circle.
+
+The trackerball buttons are used as follows:
+\begin{quote}
+\begin{tabbing}
+XXXXXX\=XXXX\=\kill
+GREEN\>1\>Sky here and return\\
+WHITE\>2\>Shrink aperture a bit\\
+WHITE\>3\>Swell aperture a bit\\
+RED\>4\>Star here and return
+\end{tabbing}
+\end{quote}
+A Green or Red circle is left painted at the position chosen.
+
+As well as the magnitude, an estimate of the error is made by taking the sky
+estimate and the number of pixels in the sky estimate and then:
+\[RMS = \frac {\sqrt{star + \frac{sky * starpixno}{skypixno}}}{star}\]
+This assumes that the pixel values are Poisson distributed, but there is an
+option to set a correction factor if the values are actually counts divided 
+by some constant.
+The RMS is then divided by the square root of this constant.
+This constant is also estimated with each sky level estimate from the scatter
+of pixel values inside the sky ap.
+It is set to 1 at the start and is changed by keyboard entry only.
+
+At the end of the program all the stored magnitudes with information on
+position, sky, etc.\ are stored away in an output file in the EDRS XY format
+so they can be used by the GRASP mag handling programs.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf ARESET} \hfill {\bf ARESET}}
+\begin{description}
+\item [FUNCTION]:
+Resets the ARGS currently assigned to ARGS\_DEVICE.
+\item [COMMAND]:
+\begin{quote}
+{\tt ARESET}
+\end{quote}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf ASAVE} \hfill {\bf ASAVE}}
+\begin{description}
+\item [FUNCTION]:
+Saves the currently displayed ARGS image by copying it into a file on disc.
+By default the entire 16 bit image is read from the ARGS memory store into an
+INTEGER*2 file.
+Optionally, any rectangular region of the ARGS screen may be saved by
+specifying the X and Y limits of the region.
+\item [COMMAND]:
+\begin{quote}
+{\tt ASAVE [XLIMITS=I1,I2] [YLIMITS=J1,J2]}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXXX\=XXXXXXXX\=\kill
+IMAGE\>\>\begin{minipage}[t]{100mm}
+Name of Starlink 2-D disc file to be created by ASAVE, containing the ARGS image.
+\end{minipage}\\
+\\
+(normally defaulted) :\\
+\\
+XLIMITS\>0,511\>Minimum and maximum columns on the ARGS to be saved.\\
+YLIMITS\>0,511\>Minimum and maximum rows on the ARGS to be saved.
+\end{tabbing}
+\item [NOTES]:
+Useful for storing an ARGS image for later display.
+The image can be redisplayed most simply with the program AFLASH, which simply
+copies the array back into the ARGS without any scaling.
+Alternatively, the program ADISP may be used if scaling limits of 0 to 255 are
+specified.
+However, ADISP will not re-display any overlays properly.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf ATEXT} \hfill {\bf ATEXT}}
+\begin{description}
+\item [FUNCTION]:
+Displays text on the ARGS screen.
+\item [COMMAND]:
+\begin{quote}
+{\tt ATEXT}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=XXXXXX\=\kill
+FCOL\>\>The colour of the text (W,R,G,B,Y,M,C) where:\\
+\>\>\>W  =  WHITE\\
+\>\>\>R  =  RED\\
+\>\>\>G  =  GREEN\\
+\>\>\>B  =  BLUE\\
+\>\>\>Y  =  YELLOW\\
+\>\>\>M  =  MAGENTA\\
+\>\>\>C  =  CYAN\\
+SIZE\>\>The size of the characters. Valid range is 0-31.\\
+\>\>\>0 draws text approx  10 ARGS units high.\\
+\>\>\>31 draws text approx 250 ARGS units high.\\
+CENTRE\>\>The position on the ARGS which will be the centre of the text
+string.\\
+DIR\>\>The direction of the text (help at run time):\\
+\>\>\>TEXT: The characters to be displayed.\\
+\>\>\>QUIET: LOGICAL Iff true no user prompts given.
+\end{tabbing}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf CADD} \hfill {\bf CADD}}
+\begin{description}
+\item [FUNCTION]:
+Add SCALAR to every element of IMAGEIN giving IMAGEOUT.
+\item [COMMAND]:
+\begin{quote}
+{\tt CADD  SCALAR  IMAGEIN  IMAGEOUT}
+\end{quote}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf CONTOUR} \hfill {\bf CONTOUR}}
+\begin{description}
+\item [FUNCTION]:
+It draws contours of a 2-D Starlink image on one of several graphics devices.
+Options are available to select part of the image only, and to smooth the data
+before contouring is done.
+\item [COMMAND]:
+\begin{quote}
+{\tt CONTOUR}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+DEVICE\>\>\begin{minipage}[t]{100mm}
+This is the graphics device to be used.
+It is specified by a character string which is the GKS device number or a
+workstation name as described in SGP/26.
+\end{minipage}\\
+IN\>\>This is the 2-D Starlink input image.\\
+BLOCK\>1\>\begin{minipage}[t]{100mm}
+This is the factor to be used for blocking the data before contouring.
+\end{minipage}\\
+SIZE\>\>\begin{minipage}[t]{100mm}
+Only used for workstations 5, 7, 9, 10 (hardcopy devices) and defines the plot
+size in centimeters.
+\end{minipage}\\
+WHOLE\>Yes\>\begin{minipage}[t]{100mm}
+Decides if the whole or part of the picture is to be plotted.
+\end{minipage}\\
+SAMPLES\>\>\begin{minipage}[t]{100mm}
+If WHOLE=NO, this defines the range of pixels to be used --- 4 values in the
+order Xstart, Xend, Ystart, Yend.
+\end{minipage}\\
+HEIGHTS\>\>\begin{minipage}[t]{100mm}
+Up to 30 contour heights may be entered, separated by commas or spaces.
+\end{minipage}\\
+\\
+(normally defaulted) :\\
+\\
+PENS\>TRUE\>\begin{minipage}[t]{100mm}
+If PENS is true then each contour level will be drawn using a different GKS pen.
+The result will depend on the device, i.e.\ the ARGS will produce different
+colours but a GOC will produce different line types.
+If PENS is false, the default pen will be used for all contour levels.
+\end{minipage}\\
+BATCH\>FALSE\>\begin{minipage}[t]{100mm}
+In interactive mode the program will allow a user to type CONTROL\_C to
+terminate plotting of the current contour level.
+If CONTOUR is run in BATCH mode then since CONTROL\_C is not valid the program
+will fail unless BATCH is set to true.
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+It is most useful for generating hard copy as an alternative to VERGREY.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf CSUB} \hfill {\bf CSUB}}
+\begin{description}
+\item [FUNCTION]:
+Subtracts SCALAR from every element of IMAGEIN giving IMAGEOUT.
+\item [COMMAND]:
+\begin{quote}
+{\tt CSUB  SCALAR  IMAGEIN  IMAGEOUT}
+\end{quote}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf CYDSCR} \hfill {\bf CYDSCR}}
+\begin{description}
+\item [FUNCTION]:
+Copies the whole of the descriptor part of one frame into another frame.
+\item [COMMAND]:
+\begin{quote}
+{\tt CYDSCR}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+FROM\>\>\begin{minipage}[t]{100mm}
+The name of the Starlink frame whose descriptor is to be copied.
+\end{minipage}\\
+TO\>\>\begin{minipage}[t]{100mm}
+The name of the Starlink frame which is to have its descriptor overwritten by
+that from FROM.
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+It may be used to transfer specialized information from frame to frame without
+changing the data values.
+Note that it is only permitted if the total number of pixels in the two images
+are the same.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf DESCR} \hfill {\bf DESCR}}
+\begin{description}
+\item [FUNCTION]:
+Accesses the descriptors of a BDF file.
+\item [COMMAND]:
+\begin{quote}
+{\tt DESCR}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+DESNAME\>\>\begin{minipage}[t]{100mm}
+Descriptor name (if response is null then all descriptors will be output).
+\end{minipage}\\
+IMAGE\>\>The BDF file name.
+\end{tabbing}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf DIV} \hfill {\bf DIV}}
+\begin{description}
+\item [FUNCTION]:
+The quotient IMAGEIN1/IMAGEIN2 is stored in IMAGEOUT.
+An unacceptably small divisor pixel forces a zero result.
+\item [COMMAND]:
+\begin{quote}
+{\tt DIV  IMAGEIN1  IMAGEIN2  IMAGEOUT}
+\end{quote}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf FC} \hfill {\bf FC}}
+\begin{description}
+\item [FUNCTION]:
+This is the standard sequence of false colour calculations; it may be used as a
+black box, or as a guide to the rest of the false colour package.
+Each of the programs starts with the letters {\bf FC}.
+These notes describe how the package fits together.
+\item [COMMAND]:
+\begin{quote}
+{\tt FC}
+\end{quote}
+\item [PROGRAMS]:
+\begin{tabbing}
+XXXXXXXXXX\=\kill
+FCSCALE\>\begin{minipage}[t]{110mm}
+allows rescaling of the intensities of 3 Starlink 2-D images so that their
+histograms agree (approximately).
+More more details, see below.
+\end{minipage}\\
+FCPACK\>\begin{minipage}[t]{110mm}
+takes 3 Starlink images (R G B) and forms a single false colour image which,
+when displayed with the APE lut, gives a coloured display.
+\end{minipage}\\
+FCTHSI\>\begin{minipage}[t]{110mm}
+takes 3 Starlink images (R G B) and converts them into 3 new (H S I) images.
+\end{minipage}\\
+FCTRGB\>takes 3 (H S I) images and converts them back into 3 (R G B) images.\\
+FCSAT\>\begin{minipage}[t]{110mm}
+applies saturation enhancement to the ``S" image generated by FCTHSI.
+NB.\ It can also be useful to replace the ``I" image generated by FCTHSI with
+its logarithm, as computed by the ASPIC program LOG.
+After any of these transformations, FCTRGB should be used, followed by FCPACK.
+\end{minipage}\\
+LUTFC\>\begin{minipage}[t]{110mm}
+this is a convenient procedure for loading a suitable look-up-table into the
+ARGS when displaying a false colour image.
+The lut used is the old `KAPE' lut, renamed FCLUT in
+SYS:\-[STARPACK.\-LOCAL.\-ASPIC.\-BDF].
+\end{minipage}\\
+FCDISP\>\begin{minipage}[t]{110mm}
+displays a falsecolour image with the above look-up-table and the most natural
+zoom factor.
+Its parameters are IMAGE, X0, Y0.
+\end{minipage}
+\end{tabbing}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf FCSCALE} \hfill {\bf FCSCALE}}
+\begin{description}
+\item [FUNCTION]:
+Reads in three Starlink images, computes and plots their histograms, and
+allows the user to define six points, which must consist of two sets of three
+points.
+These will normally be the location of the peak of each histogram, going from
+bottom of the screen to the top, and likewise a sensible upper limit to the
+signal in each histogram.
+The data are rescaled and the new histograms plotted.
+Interaction is via the cursor on any GKS device.
+\item [COMMAND]:
+\begin{quote}
+{\tt FCSCALE}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+INA\>\>First input 2-D Starlink image.\\
+INB\>\>Second input image.\\
+INC\>\>Third input image.\\
+OUTA\>\>Output Starlink image corresponding to INA.\\
+OUTB\>\>Second output image.\\
+OUTC\>\>Third output image.\\
+DEVICE\>\>The GKS device, which must have a cursor.
+\end{tabbing}
+\item [NOTES]:
+It was originally designed to allow data which had not been properly calibrated
+and reduced to a common scale, to be used to create a False Colour display.
+It may also be used before mosaicing images, and so on.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf FILEDOC} \hfill {\bf FILEDOC}}
+\begin{description}
+\item [FUNCTION]:
+Creates a permanent copy of ASPIC documentation in your own directory.
+\item [COMMAND]:
+\begin{quote}
+{\tt FILEDOC}
+\end{quote}
+\item [NOTES]:
+The command can be used in various ways:
+\begin{verbatim}
+    FILEDOC
+\end{verbatim}
+a classified list of all current ASPIC programs is created in your directory.
+\begin{verbatim}
+    FILEDOC *...
+\end{verbatim}
+a complete list of {\em all} the ASPIC documentation will be stored in your
+directory (more than 1400 blocks!).
+\begin{verbatim}
+    FILEDOC par1 [par2 [par3 [par4]]]
+\end{verbatim}
+the information requested will be written to a file with a suitable name.
+Note that the full list of parameters must be entered --- it has no memory.
+\begin{verbatim}
+    FILEDOC * program
+\end{verbatim}
+type if you cannot remember the class of a particular program.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf GAUSFIT} \hfill {\bf GAUSFIT}}
+\begin{description}
+\item [FUNCTION]:
+Produces astrometric positions and photometric parameters, determined from a
+gaussian fit, for a number of stars for which  approximate positions, in the
+input Starlink data frame, are given in a second Starlink frame.
+This frame could be created by program COORDS, for example.
+\item [COMMAND]:
+\begin{quote}
+{\tt GAUSFIT}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+MODE\>\>\begin{minipage}[t]{100mm}
+the number of parameters to be fitted.
+The range is from 3 to 5 with a default of 3.
+\end{minipage}\\
+IAREA\>\>\begin{minipage}[t]{100mm}
+gives the size of the area over which the fit will be performed for each star.
+The range is from 20 to 512 pixels with a default of 40.
+\end{minipage}\\
+EXP\>\>\begin{minipage}[t]{100mm}
+the saturation exponent; if MODE is 5, this value will be the initial value
+used by the fitting routine, otherwise it will remain fixed.
+\end{minipage}\\
+DSAT\>\>\begin{minipage}[t]{100mm}
+the saturation density; if MODE is 3, this value will be fixed, otherwise it
+will be the starting value used by the fitting routine.
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+For each image the X and Y positions, and errors on the positions, will be
+calculated.
+The number of photometric parameters which are fitted to the image is decided
+by the user.
+Three parameters, the magnitude index, background level and 1 sigma image width
+will always be calculated.
+The remaining two parameters, the saturation density and saturation exponent,
+which determine the shape of the profile as the image saturates, can either be
+calculated or used as  constants.
+This allows these last two parameters to be determined from a number of bright
+images and then applied as constants to all images to be measured.
+
+When GAUSFIT is run the above parameters will be prompted for.
+The user will be asked to supply a Starlink frame containing the image data,
+followed by a Starlink frame containing the approximate positions for the
+objects for which the fit is to be performed.
+The results will be output to the terminal and also written to the file
+OBJECTS.LIS.
+If such a file already exists then a new version will be created.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf GREYSCALE} \hfill {\bf GREYSCALE}}
+\begin{description}
+\item [FUNCTION]:
+Generates output which, when plotted on the Printronix or Versatec printers,
+gives a greyscale representation of the input image. 
+The technique used generates a density of dots in the output which is
+proportional to the input data value.
+The pattern of dots is random.
+\item [COMMAND]:
+\begin{quote}
+{\tt GREYSCALE}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXXXX\=\kill
+INPUT\>\>\begin{minipage}[t]{100mm}
+This is the 2-D Starlink image which is to be plotted.
+\end{minipage}\\
+DEVICE\>PRINTRONIX\>\begin{minipage}[t]{100mm}
+Output device.
+Default is the Printronix, otherwise the Versatec printer.
+\end{minipage}\\
+DEFAULT\>T\>\begin{minipage}[t]{100mm}
+If TRUE, will assume default values for rotation, window size, pixel size,
+grid lines, and intensity scaling.
+\end{minipage}\\
+ROTATE\>F\>\begin{minipage}[t]{100mm}
+If TRUE, will rotate image 90 degrees on the printer page.
+\end{minipage}\\
+CHANGE\>F\>\begin{minipage}[t]{100mm}
+If TRUE, will change the default window size which defines the area of the 2-D
+array to be printed.
+\end{minipage}\\
+IVALUES\>1,MAXCOLS\>\begin{minipage}[t]{100mm}
+The first and last column of the 2-D Starlink image to be included in the
+window.
+\end{minipage}\\
+JVALUES\>1,MAXROWS\>\begin{minipage}[t]{100mm}
+The first and last row of the 2-D Starlink image to be included in the window.
+\end{minipage}\\
+GRID\>0\>\begin{minipage}[t]{100mm}
+Specifies the spacing (in pixel units) between grid lines to be superposed on
+the output plot.
+If 0, no grid lines will be generated.
+\end{minipage}\\
+PIXEL\>WIDTH\>\begin{minipage}[t]{100mm}
+Specifies the height of each image pixel.
+The maximum width output is always produced (within the constraint that each
+image pixel must be an integer number of printer dots wide) and by default
+square image pixels are produced.
+(Actually the image height is compressed by a factor of 60/72 due to the
+spacing of the rows on the Printronix).
+\end{minipage}\\
+MAXINF\>T\>\begin{minipage}[t]{100mm}
+If TRUE, will automatically scale the image, using a histogram equalization
+technique, to convey the maximum amount of information in the output image.
+\end{minipage}\\
+WHITE\>MIN\>\begin{minipage}[t]{100mm}
+If MAXINF = FALSE, this defines the array value to correspond to pure white on
+the output plot.
+\end{minipage}\\
+BLACK\>MAX\>\begin{minipage}[t]{100mm}
+IF MAXINF = FALSE, this defines the array value to correspond to pure black on
+the output plot.
+\end{minipage}\\
+LOG\>F\>\begin{minipage}[t]{100mm}
+If MAXINF = FALSE, this defines whether or not logarithmic intensity scaling is
+to be used.
+\end{minipage}\\
+LABEL\>\>A title, up to 80 characters, to be added at the bottom of the plot.
+\end{tabbing}
+\item [NOTES]:
+It gives a hard copy of image data.
+When the hard copy is for the Printronix, it is written to a file called
+GREYPLT.LIS which is automatically queued to the printer when the program
+finishes.
+Additional copies may be obtained by typing the command:
+\begin{verbatim}
+    $ PRINT/QUEUE=SYS_PRINTRONIX/PASSALL/NOFEED GREYPLT
+\end{verbatim}
+When the hard copy is for the Versatec, it is written to a file called
+DIT.DAT which is automatically queued to the Versatec when the program finishes.
+A file called DIT.LIS is also queued to the Versatec and this contains
+information on the image.
+Additional copies may be obtained by typing the command:
+\begin{verbatim} 
+    $ PRINT/QUEUE=SYS_VERSATEC/PASSALL/NOFEED DIT.DAT,DIT.LIS
+\end{verbatim}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf HISTPLOT} \hfill {\bf HISTPLOT}}
+\begin{description}
+\item [FUNCTION]:
+Produces a 1-D plot from a Starlink image using descriptor items HMIN and
+HMAX, if present, to convert the array subscript into physical units.
+\item [COMMAND]:
+\begin{quote}
+{\tt HISTPLOT}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+INPUT\>\>This is the Starlink image used for input. It should be 1-D.\\
+DEVICE\>GKS\_1\>\begin{minipage}[t]{100mm}
+This is the graphics device to be used.
+It may be any GKS device as specified in SGP/26.
+\end{minipage}\\
+YRANGE\>Min, Max\>This defines the vertical limits for plotting.\\
+XRANGE\>Min, Max\>\begin{minipage}[t]{100mm}
+This allows selection of part of the horizontal range to be plotted.
+\end{minipage}\\
+AXES\>Lin,Lin\>\begin{minipage}[t]{100mm}
+This allows definition of linear or logarithmic axes in both X (first) and Y.
+Note that logs and zeros do not go well together!
+\end{minipage}\\
+SIZE\>\>\begin{minipage}[t]{100mm}
+This is the size of the plot, but is only used if the selected device does
+not have a cursor.
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+It was written to plot meaningful histograms from the file created by WRHIST
+(qv).
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf IAMANAL} \hfill {\bf IAMANAL}}
+\begin{description}
+\item [FUNCTION]:
+COSMOS ANALYSER --- part of IAM suite.
+Given an input image and various thresholds, it analyses the image and finds all
+objects and their parameters.
+\item [COMMAND]:
+\begin{quote}
+{\tt IAMANAL}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+INPUTIMG\>(RA)\>input image to be analysed --- 2d picture array.\\
+SKY\>(R)\>sky background level.\\
+THRLD\>(R)\>threshold setting.\\
+AREA\>(I)\>area cut --- smallest number of pixels accepted in an image.\\
+SKYMAG\>(R)\>sky background magnitude in one pixel (default 0).\\
+\\
+returned --- (program parameters) :\\
+\\
+PARAMS\>(RA)\>\begin{minipage}[t]{100mm}
+list of parameters for each object --- iyext = number of objects found.
+\end{minipage}\\
+\\
+returned --- (descriptors in PARAMS) :\\
+\\
+SKY\>(R)\>sky background level.\\
+THRLD\>(R)\>threshold setting.\\
+AREA\>(I)\>area cut --- smallest number of pixels accepted in an image.\\
+SKYMAG\>(R)\>sky background magnitude in one pixel (default 0).\\
+MAXDIM\>(R)\>\begin{minipage}[t]{100mm}
+the larger dimension of INPUTIMG, (IGJOB needs it later for Versatec).
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+The 14 parameters calculated in this version are:
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+1\>X-CENTROID UNWEIGHTED\\
+2\>Y-CENTROID UNWEIGHTED\\
+3\>SEMI-MAJOR AXIS UNWEIGHTED\\
+4\>SEMI-MINOR AXIS UNWEIGHTED\\
+5\>ORIENTATION UNWEIGHTED\\
+6\>X-CENTROID WEIGHTED\\
+7\>Y-CENTROID WEIGHTED\\
+8\>SEMI-MAJOR AXIS WEIGHTED\\
+9\>SEMI-MINOR AXIS WEIGHTED\\
+10\>ORIENTATION WEIGHTED\\
+11\>AREA\\
+12\>TOTAL INTENSITY\\
+13\>MAXIMUM INTENSITY\\
+18\>ELLIPTICITY UNWEIGHTED\\
+19\>ELLIPTICITY WEIGHTED
+\end{tabbing}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf INCARN} \hfill {\bf INCARN}}
+\begin{description}
+\item [FUNCTION]:
+Copies an incarnation from an existing bulk data frame into a new frame.
+\item [COMMAND]:
+\begin{quote}
+{\tt INCARN}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=XXXXXX\=\kill
+INPUT\>\>Bulk data frame for input.\\
+OUTPUT\>\>Bulk data frame for output.\\
+FORMAT\>\>Character string denoting data format of incarnation to be copied.\\
+\>\>\>'SB' = Signed Byte\\
+\>\>\>'SW' = Signed Word\\
+\>\>\>'SL' = Signed Longword\\
+\>\>\>'R ' = Real\\
+\>\>\>'DP' = Double Precision\\
+\>\>\>'UB' = Unsigned Byte\\
+\>\>\>'UW' = Unsigned Word
+\end{tabbing}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf INSPECT} \hfill {\bf INSPECT}}
+\begin{description}
+\item [FUNCTION]:
+Can be used for inspecting areas of an image.
+It is designed for INTEGER*2 images.
+\item [COMMAND]:
+\begin{quote}
+{\tt INSPECT}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+IMAGE\>\>The input image.\\
+CURSOR\>Yes\>\begin{minipage}[t]{100mm}
+Flag for defining area by cursor or keyboard.
+Choices are YES,NO.
+\end{minipage}\\
+XAREA\>All\>X limits of area to be chosen.\\
+YAREA\>All\>Y limits of area to be chosen.\\
+OPTION\>Histogram\>\begin{minipage}[t]{100mm}
+Flag for next course of action.
+Choices are as described above.
+\end{minipage}\\
+HIGH\>Top\>Generally top of range to be treated.\\
+LOW\>Bottom\>Generally bottom of range to be treated.\\
+STEP\>Appropriate\>\begin{minipage}[t]{100mm}
+Size of grouping of points in histogram.
+Default gives 1000 across output device.
+\end{minipage}\\
+DEVICE\>ARGS\>\begin{minipage}[t]{100mm}
+If the data are plotted out this is the flag for which device to
+plot out on.
+Choices are ARGS, TEKTRONIX, GOC, VERSATEC, CALCOMP, CC81.
+\end{minipage}\\
+DEVSIZE\>Various\>The size of the output plot.\\
+DEVLIM\>Min,Max\>The minimum and maximum values to be plotted out.
+\end{tabbing}
+\item [NOTES]:
+You choose an image and are then asked to define an area by Cursor or Keyboard
+definition.
+You can then choose an option from this list:
+\begin{quote}
+\begin{tabbing}
+XXX\=HISTOGRAMXX\=Do 2) for points within 3sigma of the meanXX\=\kill
+\>Command\>Function\>Short Command\\
+\\
+1)\>HISTOGRAM\>Display its histogram\>HI\\
+2)\>MEAN\>Calculate its mean and std dev\>M\\
+3)\>3MEAN\>Do 2) for points within 3sigma of the mean\>3\\
+4)\>VALUES\>Type out a 5x5 grid of values in the area\>V\\
+5)\>SOLID\>Display the area as a solid body plot\>S\\
+6)\>AREA\>Choose a new area\>A\\
+7)\>HELP\>List the options\>HE\\
+8)\>EXIT\>Exit from the program\>E
+\end{tabbing}
+\end{quote}
+After an option is completed the choice is repeated.
+
+The trackerball buttons are used as follows:
+\begin{quote}
+\begin{tabbing}
+XXXXXX\=XXXX\=\kill
+GREEN\>1\>\begin{minipage}[t]{100mm}
+This causes the screen magnification to revert to 1 and the cursor to go to
+the centre of the image.
+\end{minipage}\\
+WHITE\>2\>\begin{minipage}[t]{100mm}
+This causes the screen magnification to be divided by two.
+If this would cause it to be less than 1, there is no effect.
+\end{minipage}\\
+WHITE\>3\>\begin{minipage}[t]{100mm}
+This causes the screen magnification to be multiplied by two.
+If this would make it too large, there is no effect.
+\end{minipage}\\
+RED\>4\>\begin{minipage}[t]{100mm}
+This is used to define a corner of the area, and then define the opposing
+corner.
+A rectangle is then painted round the area.
+\end{minipage}
+\end{tabbing}
+\end{quote}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf LIST} \hfill {\bf LIST}}
+\begin{description}
+\item [FUNCTION]:
+Generates a formatted listing of a 1 or 2-D Starlink image.
+The resulting file may be printed/typed in the normal way.
+\item [COMMAND]:
+\begin{quote}
+{\tt LIST}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXX\=XXXXXXXXXXXX\=\kill
+IMAGE\>\>The 1 or 2-D  Starlink image which is to be listed.\\
+FILE\>[IMAGELIS].LIS\>\begin{minipage}[t]{100mm}
+This is the name of the file to which output is written.
+If omitted completely the name IMAGELIS.LIS is used.
+If a name only is entered then a default type of .LIS is used.
+\end{minipage}\\          
+FACTOR\>1\>\begin{minipage}[t]{100mm}
+The pixel values are multiplied by FACTOR before being printed.
+It should be chosen so that a 3-digit representation of data*factor is
+meaningful.
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+This lets you look at your data.
+To have a look at a small section of data, program PEEP may be used.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf LUTCOL} \hfill {\bf LUTCOL}}
+\begin{description}
+\item [FUNCTION]:
+Reads the standard coloured lookup table using program LUTREAD.
+The second and third parameters of LUTREAD may be given as the first and
+second of this procedure --- see documentation of LUTREAD.
+\item [COMMAND]:
+\begin{quote}
+{\tt LUTCOL}
+\end{quote}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf LUTCONT} \hfill {\bf LUTCONT}}
+\begin{description}
+\item [FUNCTION]:
+Fills a look-up-table for the ARGS with the 7 basic colours in turn
+(red ,green, blue, yellow, cyan, magenta, white).
+The results are seen on the ARGS at once, and may be modified by erasing or
+overwriting part of the table.
+The resulting LUT may be stored for future use.
+\item [COMMAND]:
+\begin{quote}
+{\tt LUTCONT}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXXX\=XXXXXXXX\=\kill
+CONTOURS\>prev value\>\begin{minipage}[t]{100mm}
+1, 2 or 3 values may be input.
+If the first is positive then LUT entries are set-up, but if negative entries
+are set to zero, thereby erasing them.
+If only one value is input, that entry is set to the next colour.
+If two values are input, then all entries between the first and second are
+filled with the next colour.
+If three values are input then blocks of LUT from first to first+last, and so on
+up to second are filled with the colours in succession.
+{\em Exit is by entering no values.}
+\end{minipage}\\
+OUTPUT\>\>\begin{minipage}[t]{100mm}
+This is an optional parameter.
+If present, the LUT which has been created will be stored for later use by
+LUTREAD.
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+It was originally designed to set up individual entries in a LUT to generate
+contour-like displays, but has now been generalized as an alternative to
+LUTSET and LUTE as a means of setting up a LUT.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf LUTE} \hfill {\bf LUTE}}
+\begin{description}
+\item [FUNCTION]:
+Uses the trackerball buttons to allow interactive mapping of a predefined
+colour table on to an ARGS image.
+The image should be displayed, preferably with a set of blocks.
+\item [COMMAND]:
+\begin{quote}
+{\tt LUTE}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+LUT\>\>input lookup table.\\
+OUTPUT\>\>output lookup table (optional).\\
+STEP\>3\>increment in boundary.
+\end{tabbing}
+\item [NOTES]:
+The trackerball buttons are used as follows:
+\begin{quote}
+\begin{tabbing}
+XXXXXX\=XXXX\=\kill
+GREEN\>1\>change to next colour.\\
+WHITE\>2\>move the boundary to the left.\\
+WHITE\>3\>move the boundary to the right.\\
+RED\>4\>fill the lut and exit.
+\end{tabbing}
+\end{quote}
+N.B. {\em Ignore the cursor itself.}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf LUTGREY} \hfill {\bf LUTGREY}}
+\begin{description}
+\item [FUNCTION]:
+Reads standard grey lookup table using program LUTREAD.
+The second and third parameters to LUTREAD may be given as the first and
+second to this procedure --- see documentation to LUTREAD.
+\item [COMMAND]:
+\begin{quote}
+{\tt LUTGREY}
+\end{quote}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf LUTLIN} \hfill {\bf LUTLIN}}
+\begin{description}
+\item [FUNCTION]:
+Uses the ARGS cursor/trackerball to allow interactive modification of the
+look-up-table in the ARGS.
+Normally a greyscale LUT is used, but any other may be read in.
+Values below a lower limit are set to the limit, and those above an upper limit
+are set to that limit.
+The cursor is used to move these limits, on the assumption that the scale from 0
+to 255 is spread out across the full width of the displayed image.
+An option is available to replace the (default) linear LUT with a logarithmic
+one, between the same limits.
+Note that only the x position of the cursor is used, but the cursor must be
+within the image currently displayed.
+\item [COMMAND]:
+\begin{quote}
+{\tt LUTLIN [LUT=name] [QUIET=false]}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXX\=XXXXXXXXXX\=\kill
+PVLO\>0\>\begin{minipage}[t]{100mm}
+This is only used if QUIET=FALSE, and is the data value corresponding to the
+ARGS value of 0, as used when the image was displayed.
+\end{minipage}\\
+PVHI\>255\>\begin{minipage}[t]{100mm}
+This is only used if QUIET=FALSE, and is the data value corresponding to the
+ARGS value of 255, as used when the image was displayed.
+\end{minipage}\\
+OUTPUT\>\>\begin{minipage}[t]{100mm}
+If present it is the name of the .BDF file used to store the LUT which has been
+produced.
+\end{minipage}\\
+\\
+(normally defaulted) :\\
+\\
+LUT\>ASPDIR:GLUT\>\begin{minipage}[t]{100mm}
+This is the LUT which is used --- the default is the normal greyscale one.
+\end{minipage}\\
+QUIET\>TRUE\>\begin{minipage}[t]{100mm}
+If FALSE, it permits output to the VDU of the current position of the lower and
+upper cut-off points both in terms of LUT entries (0 to 255) and data values
+(PVLO to PVHI).
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+It is designed to allow the user to create the ideal display of an image, and
+to store the resulting look-up-table for later use.
+
+The trackerball buttons are used as follows:
+\begin{quote}
+\begin{tabbing}
+XXXXXX\=XXXX\=\kill
+GREEN\>1\>\begin{minipage}[t]{100mm}
+Changes the mode of the display from linear to logarithmic, and back again.
+\end{minipage}\\
+WHITE\>2\>\begin{minipage}[t]{100mm}
+Reads the current cursor (x) position as the LOWER cutoff (i.e.\ black,
+normally).
+\end{minipage}\\
+WHITE\>3\>\begin{minipage}[t]{100mm}
+Reads the current cursor (x) position as the UPPER cutoff (i.e.\ white,
+normally).
+\end{minipage}\\
+RED\>4\>Exits from the program.
+\end{tabbing}
+\end{quote}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf LUTREAD} \hfill {\bf LUTREAD}}
+\begin{description}
+\item [FUNCTION]:
+Sends a colour lookup table to the ARGS.
+Optional threshholds and logging of the scale.
+\item [COMMAND]:
+\begin{quote}
+{\tt LUTREAD}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+LUT\>\>Colour lookup table.\\
+LIMITS\>0,255\>Range in ARGS lookup table onto which lut is to be mapped.\\
+LOG\>FALSE\>TRUE iff a log scale is to be used.
+\end{tabbing}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf LUTROT} \hfill {\bf LUTROT}}
+\begin{description}
+\item [FUNCTION]:
+Rotates entries 1-255 in the LUT by means of the tracker ball.
+\item [COMMAND]:
+\begin{quote}
+{\tt LUTROT}
+\end{quote}
+\item [NOTES]:
+The trackerball buttons are used as follows:
+\begin{quote}
+\begin{tabbing}
+XXXXXX\=XXXX\=\kill
+GREEN\>1\>Reset LUT.\\
+RED\>4\>Exit.
+\end{tabbing}
+\end{quote}
+The table offset is returned to DSCL.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf PEEP} \hfill {\bf PEEP}}
+\begin{description}
+\item [FUNCTION]:
+Displays a  9x9 area of image, centred on (X0,Y0), on terminal.
+\item [COMMAND]:
+\begin{quote}
+{\tt PEEP  IMAGE  X0  Y0  [FACTOR]}
+\end{quote}
+\item [NOTES]:
+(0,0) is the bottom left-hand corner.
+
+Integer representation of up to 7 characters (including minus sign if
+appropriate) is used for each displayed pixel.
+
+The pixel values are multiplied by FACTOR before display.
+FACTOR defaults to 1.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf PICK} \hfill {\bf PICK}}
+\begin{description}
+\item [FUNCTION]:
+May be used to define a rectangular sub-set of a 2-D Starlink image for
+storage as a new image.
+\item [COMMAND]:
+\begin{quote}
+{\tt PICK}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+INPUT\>\>This is the input 2-D Starlink image.\\
+OUTPUT\>\>This is the name of the new image picked out of INPUT.\\
+XYPOS1\>\>\begin{minipage}[t]{100mm}
+By default the program tries to read the ARGS cursor.
+If this is not possible, or the cursor is not moved within 5 secs of appearing,
+the user is prompted for keyboard input.
+In this case, XYPOS1 is a pair of (x,y) co-ordinates defining one corner of the
+sub-image.
+\end{minipage}\\
+XYPOS2\>\>\begin{minipage}[t]{100mm}
+If keyboard input is required (see above), then XYPOS2 are the (x,y)
+co-ordinates of a second corner.
+The two pairs are sorted out, and printed on the terminal with bottom-left-hand
+first.
+\end{minipage}\\
+XYOUT1\>\>\begin{minipage}[t]{100mm}
+Output parameter used to return the (x,y) position of the BLH point of the
+selected region.
+\end{minipage}\\
+XYOUT2\>\>\begin{minipage}[t]{100mm}
+Output parameter used to store the (x,y) position of the TRH point of the
+selected region.
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+It may be used with or without the ARGS cursor.
+For a more general extraction program use MANIC, which works on 1, 2, and 3-D
+images.
+
+The trackerball buttons are used as follows:
+\begin{quote}
+\begin{tabbing}
+XXXXXX\=XXXX\=\kill
+GREEN\>1\>\begin{minipage}[t]{100mm}
+Read the cursor position --- only valid if the  cursor was moved within 5
+seconds, but then there is no time limit.
+\end{minipage}\\
+WHITE\>2\>As 1.\\
+WHITE\>3\>As 1.\\
+RED\>4\>As 1.
+\end{tabbing}
+\end{quote}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf REALFR} \hfill {\bf REALFR}}
+\begin{description}
+\item [FUNCTION]:
+Extracts the REAL incarnation from a Starlink bulk data frame, copies it into a
+dummy frame, deletes the original, and renames the dummy to the original name.
+\item [COMMAND]:
+\begin{quote}
+{\tt REALFR [frame]}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+FRAME\>\>The name of the original (and final) .BDF frame.
+\end{tabbing}
+\item [NOTES]:
+It may be used to delete all but the REALincarnation of a frame, as a way of
+saving space when using ASPIC.
+Note that space is required for the dummy frame; errors can lose your original
+data frame.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf SLICE} \hfill {\bf SLICE}}
+\begin{description}
+\item [FUNCTION]:
+Allows cursor definition of two points in an image displayed on the ARGS and
+display of the slice through the image with the two points as end points.
+Interpolation is used to ensure that the spacing of samples in the slice is
+always at the pixel spacing, irrespective of the angle.
+\item [COMMAND]:
+\begin{quote}
+{\tt SLICE}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+INPUT\>\>This is the input image ---  it ought to be visible on the ARGS.\\
+OUTPUT\>\>This is used, if present, as the name for the stored slice.
+\end{tabbing}
+\item [NOTES]:
+Use to look at sections in any direction through an image.
+The resulting slice may be stored as a 1-D Starlink image.
+
+The trackerball buttons are used as follows:
+\begin{quote}
+\begin{tabbing}
+XXXXXX\=XXXX\=\kill
+GREEN\>1\>\begin{minipage}[t]{100mm}
+This may be used to pick two points from one of the images displayed on the
+ARGS.
+Both points must be from the same image, and there must be at least one image
+displayed.
+\end{minipage}\\
+WHITE\>2\>\begin{minipage}[t]{100mm}
+If this button is pressed after the first point has been entered, the sampling
+line that would result from these two points is displayed.
+To accept that line, press button 1 again otherwise move the cursor and hit
+button 2 to try again.
+\end{minipage}\\
+WHITE\>3\>Same as 2.\\
+RED\>4\>This forces unconditional exit from the program.
+\end{tabbing}
+\end{quote}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf STARFIT} \hfill {\bf STARFIT}}
+\begin{description}
+\item [FUNCTION]:
+Finds a set of parameters describing a model star image, which can be used
+when performing stellar photometry using STARMAG.
+The model has a radial profile:
+\[D = A \exp (-0.5 \frac{r^{\prime}}{sigma} \exp (GAMMA))\]
+where $r^{\prime}$ is calculated from the true radial distance from the star
+centre, r, allowing for image ellipticity.
+The program combines a number of star images specified by the user and
+determines a mean seeing disc size (SEEING), radial fall-off parameter (GAMMA),
+axis ratio (AXISR) and axis inclination (THETA) of a model star image.
+\item [COMMAND]:
+\begin{quote}
+{\tt STARFIT   (Precede with GO EDRS, to enter EDRS package)}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+ILEVEL\>2\>\begin{minipage}[t]{100mm}
+An integer from 1 to 3 controlling the printing of results:\\
+1: Printing is supressed.\\
+2: Results are printed, giving the number of stars used and the mean profile
+parameters.\\
+3: A table, giving details of the seeing and ellipticity of each star image
+used is also printed.
+This table indicates if any star could not be used.
+\end{minipage}\\
+IMAGE\>\>The input image containing the stars to be fitted.\\
+INPUT\>\>\begin{minipage}[t]{100mm}
+An input list of X,Y positions for the stars to be used in the fit.
+\end{minipage}\\
+ISIZE\>15\>\begin{minipage}[t]{100mm}
+An integer from 3 to 101 specifying the side of the square area to be used when
+forming the marginal profiles for a star image.
+This should be sufficiently large to contain the entire star image.
+If an even value is given, the next largest odd number is used instead.
+\end{minipage}\\
+RANGE\>4.0\>\begin{minipage}[t]{100mm}
+The number of image profile widths (`sigma' in the equation above) out to which
+the radial star profile is to be fitted.
+(There is an upper limit of 50 pixels to the radius at which data is actually
+used.)
+\end{minipage}\\
+DEVICE\>NONE\>\begin{minipage}[t]{100mm}
+A parameter specifying a graphical output device on which to produce a plot of
+the mean radial profile of the stars and the fitted function.
+Any GKS supported plotting device may be specified.
+Abbreviations are acceptable.
+The default (NONE) produces no plot.
+\end{minipage}\\
+SEEING\>\>\begin{minipage}[t]{100mm}
+An output parameter giving the seeing disc size: the full width at half
+maximum across the minor axis of a star image.
+\end{minipage}\\
+AXISR\>\>\begin{minipage}[t]{100mm}
+An output parameter giving the axis ratio of the star images: the ratio of the
+major axis length to that of the minor axis.
+\end{minipage}\\
+THETA\>\>\begin{minipage}[t]{100mm}
+An output parameter giving the inclination of the major axis of the star images
+to the X axis (increasing pixel number direction). 
+This value is in degrees, X through Y being considered positive.
+\end{minipage}\\
+GAMMA\>\>\begin{minipage}[t]{100mm}
+An output parameter giving the radial fall-off parameter in the equation above.
+\end{minipage}
+\end{tabbing}
+\item [METHOD]:
+Marginal profiles of each star image are formed in 4 directions, inclined at
+45 degree intervals.
+A gaussian curve and background is fitted to each profile.
+Using the resulting 4 gaussian centres, a mean centre is found for each star.
+
+The 4 gaussian widths of all the stars are combined, using a weighted average
+with rejection of erroneous data, and from the 4 average widths the seeing disc
+size, axis ratio and axis inclination are calculated.
+
+The data surrounding each star is then binned into isophotal zones which are
+elliptical annuli centred on the star --- the ellipse parameters being those
+just calculated.
+The data in each zone is processed to remove erroneous points and to find an
+average value.
+A gaussian profile is fitted to these average values and the derived amplitude
+is used to normalise the values to an amplitude of unity.
+The normalised values are put into bins together with the corresponding data
+from all other stars and this binned data represents a weighted average radial
+profile for the set of stars, with the image ellipticity removed.
+Finally a radial profile is fitted to this data, giving the radial profile
+parameter GAMMA and a final re-estimate of the seeing disc size.
+\item [NOTES]:
+The values of the parameters SEEING, AXISR, THETA and GAMMA are in a form for
+direct use with the program STARMAG.
+
+The stars used to determine the mean image parameters should be chosen to
+represent those whose magnitudes are to be found using STARMAG, and to be
+sufficiently bright, uncrowded and noise-free to allow an accurate fit to be
+made.
+
+The execution time is approximately proportional to the number of stars used
+and the image area which each occupies.
+\item [ERRORS]:
+The program may access the following error parameter(s) to indicate error
+conditions:
+\begin{verbatim}
+    NOSTARS
+          ***NO STAR IMAGES FOUND
+\end{verbatim}
+No image features at the positions given resembled star images sufficiently
+closely to allow their centres and widths to be determined.
+There is thus no data on which to base a fit.
+\begin{verbatim}
+    NOFIT
+           ***RADIAL PROFILE FIT COULD NOT BE OBTAINED
+\end{verbatim}
+There is insufficient data in the final average radial profile or the profile
+differs too much from the form expected (a gaussian) for a fit to be obtained.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf STARMAG} \hfill {\bf STARMAG}}
+\begin{description}
+\item [FUNCTION]:
+Determines the integrated brightness and magnitude of star images by fitting
+a 2 dimensional surface to the data.
+The program is intended for images which have been previously linearised and
+spatially calibrated, although it is not necessary for the background to have
+been subtracted.
+The method assumes that all star images have the same shape, and some
+inaccuracy will result if this is not the case.
+\item [COMMAND]:
+\begin{quote}
+{\tt STARMAG  (Precede with GO EDRS, to enter EDRS package)}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+ILEVEL\>2\>\begin{minipage}[t]{100mm}
+An integer from 1 to 3 to control the printing of results:\\
+1: Printing is supressed.\\
+2: Results are printed for each star successfully fitted.\\
+3: The table also includes stars not successfully fitted, together with
+appropriate error messages.
+\end{minipage}\\
+IMAGE\>\>The input image containing the stars.\\
+INPUT\>\>An X,Y list of approximate positions of stars to be fitted.\\
+SEEING\>\>\begin{minipage}[t]{100mm}
+The seeing disc size: the full width at half maximum across the minor axis of
+a star image.
+\end{minipage}\\
+AXISR\>1.0\>\begin{minipage}[t]{100mm}
+The axis ratio of the star images: the ratio of the major axis length to that
+of the minor axis.
+This value should lie in the range 1.0 to 2.0.
+\end{minipage}\\
+THETA\>0.0\>\begin{minipage}[t]{100mm}
+The angle by which the major axis of a star image is inclined to the X axis
+(increasing pixel number direction).
+The value should be in the range  -180.0 to +180.0 degrees, X through Y being
+considered positive.
+\end{minipage}\\
+GAMMA\>2.0\>\begin{minipage}[t]{100mm}
+The radial profile parameter which determines the rapidity of the radial
+fall-off in a star's brightness.
+The value 2.0 corresponds to a gaussian profile.
+The value should lie in the range 1.0 to 5.0.
+\end{minipage}\\
+RANGE\>3.5\>\begin{minipage}[t]{100mm}
+The number of image profie widths (`sigma' in the equation above) out to which
+the radial star profile is fitted, after binning into iso-photal zones.
+(There is an upper limit of 50 pixels to the radius at which data is actually
+used.)
+\end{minipage}\\
+ZEROMAG\>0.0\>\begin{minipage}[t]{100mm}
+The zero point of the magnitude scale.
+The calculated magnitude of a star image is:
+\[MAG = -2.5 \log _{10} brightness + ZEROMAG\]
+where {\em brightness} is the integrated brightness of the star.
+\end{minipage}\\
+OUTPUT\>\>\begin{minipage}[t]{100mm}
+The output X,Y list containing the accurate centre positions of the stars which
+were successfully fitted and their magnitudes.
+These results may be listed using XYLIST.
+\end{minipage}\\
+TITLE\>\>\begin{minipage}[t]{100mm}
+A title (30 characters) for the output list.
+The run-time default is the title of the input list.
+\end{minipage}
+\end{tabbing}
+\item [METHOD] :
+Each star image is located by forming marginal profiles in the X and Y
+directions, subtracting a background estimate and fitting a gaussian of a
+specified width.
+Having thus located the centre of each star image, the surrounding data is
+binned into iso-photal zones, which are circular or elliptical annuli centred
+on the star.
+The data in each zone is processed to remove aberrant values and a radial star
+profile and background is then fitted to the binned data.
+The integrated brightness is obtained from the integral of the fitted function.
+The full form of the fitted star surface is:
+\[D = A \exp (-0.5 \frac{r^{\prime}}{sigma} \exp(GAMMA)) + B\]
+A is the star central amplitude, B the background and sigma the profile width.
+The parameter GAMMA determines the rate of radial fall-off in the star profile
+and is normally set around 2, corresponding to a gaussian profile.
+The effective radial distance $r^{\prime}$ is derived from the true distance
+from the star centre r, allowing for ellipticity in the star image.
+
+The user must supply the axis ratio of the ellipse, the inclination of the major
+axis to the X axis, the FWHM seeing across the minor ellipse axis and the
+radial profile parameter GAMMA.
+These parameters remain constant throughout a run.
+The program calculates the centre, the central amplitude, the background and the
+integrated magnitude for each star.
+\item [NOTES]:
+Values for the parameters SEEING, AXISR, THETA and GAMMA may be determined
+using the program STARFIT.
+
+Although the program will handle invalid pixels, the results may be unreliable
+if there is a significant number of these within a star image.
+The program also makes an attempt to reject blemishes during the radial
+binning process, but this process will not be efficient if many blemishes occur
+close to a star centre.
+
+The execution time is approximately proportional to the number of stars fitted
+and the area of image which each star occupies.
+\item [ERRORS]:
+The program may access the following error parameter(s) to indicate error
+conditions:
+\begin{verbatim}
+    NOLIST
+          ***OUTPUT LIST CONTAINS NO DATA
+\end{verbatim}
+No stars were successfully fited, so there are no results in the output list.
+\item [MESSAGES]:
+In addition to Starlink error parameters, the list of results may contain (if
+ILEVEL=3) the following error messages, indicating why stars could not be
+fitted:
+\begin{verbatim}
+    STAR CENTRE NOT FOUND
+\end{verbatim}
+The star centre was not found because the attempt to fit a gaussian to its
+marginal profiles did not converge.
+The image feature does not resemble a gaussian sufficiently closely.
+\begin{verbatim}
+    TOO LITTLE DATA TO FIND STAR
+\end{verbatim}
+There is insufficient valid data at the initial position given to allow the
+star centre to be found.
+\begin{verbatim}
+    TOO LITTLE DATA TO FIT STAR
+\end{verbatim}
+Having binned the star data into isophotal zones, there are insufficient zones
+containing valid data to fit the radial profile successfully.
+\begin{verbatim}
+    FIT GIVES NEGATIVE BRIGHTNESS
+\end{verbatim}
+After fitting the radial profile, the integrated intensity of the star appears
+to be negative.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf STATS} \hfill {\bf STATS}}
+\begin{description}
+\item [FUNCTION]:
+Computes and returns to the environment some key statistical parameters for a
+Starlink frame.
+The basic information is also displayed on the terminal; the rest may be
+inspected (within DSCL) by typing LOOK STATS.
+\item [COMMAND]:
+\begin{quote}
+{\tt STATS  [RMS=true]  [QUIET=true]}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+IMAGE\>\>The input Starlink frame (any dimension).\\
+NAXIS\>\>Returned as the number of dimensions of the image.\\
+NAXIS1\>\>Returned as the size of the first dimension.\\
+NAXIS2\>\>Returned as the size of the second dimension.\\
+NAXIS3\>\>Returned as the size of the third dimension.\\
+TOTAL\>\>Returned as the sum of all the data values in the frame.\\
+MEAN\>\>Returned as the average data value.\\
+MIN\>\>Returned as the smallest data value found.\\
+MAX\>\>Returned as the largest data value found.\\
+SIGM1\>\>Returned as MEAN - SIGMA.\\
+SIGP7\>\>Returned as MEAN + 7*SIGMA.\\
+STDEV\>\>\begin{minipage}[t]{100mm}
+If RMS=TRUE (not the default) this is returned as the RMS deviation from the
+mean.
+This is usually a more meaningful value than the SIGMA used in SIGM1, SIGP7
+{\em which is the square root of the average value}.
+\end{minipage}\\
+\\
+(normally defaulted) :\\
+\\
+QUIET\>FALSE\>\begin{minipage}[t]{100mm}
+By default some of the parameter values are displayed on the terminal.
+If QUIET=TRUE then nothing is typed.
+\end{minipage}\\
+RMS\>FALSE\>\begin{minipage}[t]{100mm}
+If RMS=TRUE then a value is returned in STDEV.
+The default is false to save time computing its value when not needed.
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+It is an easy way of getting the basic information about an image as a check on
+its state, or prior to display.
+In particular the SIGM1 and SIGP7 were designed to give good low and high values
+for image display to show data close to the sky limit.
+In fact the sigma used is simply the square root of the mean so if there is a
+large offset the limits will not be as good as possible.
+STDEV gives a much  better estimate of the image noise.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf SUB} \hfill {\bf SUB}}
+\begin{description}
+\item [FUNCTION]:
+The difference IMAGEIN1-IMAGEIN2 is stored in IMAGEOUT.
+\item [COMMAND]:
+\begin{quote}
+{\tt SUB  IMAGEIN1  IMAGEIN2  IMAGEOUT}
+\end{quote}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf TBXY} \hfill {\bf TBXY}}
+\begin{description}
+\item [FUNCTION]:
+Uses the ARGS cursor to pick a single point and return to the environment an
+identification number for the image selected and the co-ordinates of the point
+selected in user units (which are not necessarily the same as array units, but
+usually will be).
+\item [COMMAND]:
+\begin{quote}
+{\tt TBXY}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+AX\>\>The returned x co-ordinate of the point selected in ARGS units.\\
+AY\>\>The returned y co-ordinate of the point selected in ARGS units.\\
+ID\>\>\begin{minipage}[t]{100mm}
+The identification number of the image (or whatever) selected, as stored in the
+ARGS database.
+\end{minipage}\\
+X\>\>\begin{minipage}[t]{100mm}
+The returned x co-ordinate of the selected point in user units (usually array
+units, but need not be).
+\end{minipage}\\
+Y\>\>\begin{minipage}[t]{100mm}
+The returned y co-ordinate of the selected point in user units (usually array
+units, but need not be).
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+It is really a test program, not for serious use.
+
+The trackerball buttons are used as follows:
+\begin{quote}
+\begin{tabbing}
+XXXXXX\=XXXX\=\kill
+GREEN\>1\>Pick the point --- must lie within one of the visible images.\\
+WHITE\>2\>Same as 1.\\
+WHITE\>3\>Same as 1.\\
+RED\>4\>Same as 1.
+\end{tabbing}
+\end{quote}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf VERGREY} \hfill {\bf VERGREY}}
+\begin{description}
+\item [FUNCTION]:
+Generates output which, when plotted on the Versatec, gives a greyscale
+representation of the input image.
+The technique used generates a density of dots in the output which is
+proportional to the input data value.
+The pattern of dots is random.
+\item [COMMAND]:
+\begin{quote}
+{\tt VERGREY  [RATIO=r]}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXX\=XXXXXXXXXXXX\=\kill
+INPUT\>\>This is the 2-D Starlink image which is to be plotted.\\
+LIMITS\>Min,max\>\begin{minipage}[t]{100mm}
+These are the low and high limits for scaling before output.
+\end{minipage}\\
+TITLE\>VERGREY output\>\begin{minipage}[t]{100mm}
+This is a title which is plotted after the image, up to 80 characters.
+\end{minipage}\\
+TYPE\>1\>\begin{minipage}[t]{100mm}
+This defines the scaling to be used.
+The default sets LIMIT(1) to `white' and LIMIT(2) to `black' and uses linear
+scaling; 2 gives the same limits but logarithmic scaling between them.
+The corresponding -ve values reverse black and white.
+\end{minipage}\\
+WIDTH\>4.0\>\begin{minipage}[t]{100mm}
+This is the width of the plot on the Versatec.
+It may be between 1.0 and 10.5 inches, but note that the time to generate the
+output is proportional to the square of the width.
+The actual plot will be as close to this value as possible, as each pixel must
+contain an integral number of dots.
+\end{minipage}\\
+\\
+(normally defaulted) :\\
+\\
+RATIO\>1.0\>\begin{minipage}[t]{100mm}
+This is the ratio of the height (y) of the pixels to their width (x).
+A the nearest value is used given the discrete nature of the medium.
+\end{minipage}\\
+KEEP\>DELETE\>\begin{minipage}[t]{100mm}
+This determines if the DIT.DAT file is to be deleted when the output has been
+produced.
+By default it will be deleted.
+If the file is to be kept then this parameter must be set to KEEP.
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+It gives a satisfactory form of hard copy of image data, but it is rather slow
+and sometimes disappointing.
+The data are written to a file called DIT.DAT which is printed on the Versatec
+automatically when VERGREY terminates.
+Additional copies may be obtained by typing the following command:
+\begin{verbatim}
+    $ PRINT/QUEUE=SYS_VERSATEC/PASSALL/NOFEED DIT.DAT
+\end{verbatim}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf WRDSCR} \hfill {\bf WRDSCR}}
+\begin{description}
+\item [FUNCTION]:
+It allows descriptor items (specified by NAME) to be overwritten with new
+information (VALUE) or inserted if they were not present.
+\item [COMMAND]:
+\begin{quote}
+{\tt WRDSCR   [LOOP=false]}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+FRAME\>\>\begin{minipage}[t]{100mm}
+The name of the (existing) frame to which the descriptors are to be added.
+\end{minipage}\\
+NAME\>\>\begin{minipage}[t]{100mm}
+The name of the descriptor (up to 20 characters, null response to exit).
+\end{minipage}\\
+VALUE\>\>\begin{minipage}[t]{100mm}
+A character string containing the `value' of the descriptor.
+May be up to 72 characters.
+\end{minipage}\\
+\\
+(normally defaulted) :\\
+\\
+LOOP\>TRUE\>\begin{minipage}[t]{100mm}
+If TRUE it allows many items to be inserted; if FALSE then only one is allowed.
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+It may used to store useful information with image data.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf XYCURA} \hfill {\bf XYCURA}}
+\begin{description}
+\item [FUNCTION]:
+Make a list of X,Y positions by using a cursor to define the positions on an
+image displayed on the ARGS.
+The positions can have identifiers given to them.
+Also to display on such an image the X,Y positions of an optional input list.
+If this is done and the cursor is used to define more positions, these are
+added to the input list instead of a new list being made.
+These positions can be displayed as crosses; as ticks displaced alternately by
+(-2,0) and (2,0); as 1 pixel spots.
+Of the input list, only those positions inside the area of the image displayed
+on the ARGS will be put up.
+\item [COMMAND]:
+\begin{quote}
+{\tt XYCURA  [ILEVEL=] [MARKER=] [COLOUR=] [IDENTIFY=] [MAXENTRY=]}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXXX\=XXXXXXXXXXX\=\kill
+OVERCL\>NO\>\begin{minipage}[t]{100mm}
+Flag for clearing the crosses left on the ARGS from any previous XYCURA.
+Choices are NO,YES.
+\end{minipage}\\
+INPUT\>\>The optional input XY list, return null if there is none.\\
+FXOUT\>YES\>\begin{minipage}[t]{100mm}
+Flag for putting up on the ARGS the crosses from any input list.
+Choices are YES,NO.
+\end{minipage}\\
+NUMINP\>NO\>Flag for adding the number of the cross of the input list.\\
+OUTPUT\>\>The output file containing the positions.\\
+TITLE\>XYCURA output\>The Title to be included in the output file.\\
+IDENTITY\>\>If inputting star names, this is the name of the star.\\
+\\
+(normally defaulted) :\\
+\\
+ILEVEL\>2\>\begin{minipage}[t]{100mm}
+Flag for outputting on the terminal the positions from the cursor as you go
+along.
+The default (=2) makes it happen automatically.
+Setting it to 1 on running the program supresses it.
+\end{minipage}\\
+MARKER\>CROSS\>\begin{minipage}[t]{100mm}
+The type of mark made at the positions of the input XYlist.
+Choices are crosses; ticks at (-2,0) and (2,0) alternately; spots.
+Choices are CROSS, ATICK, SPOT
+\end{minipage}\\
+COLOUR\>B\>\begin{minipage}[t]{100mm}
+The colour of the cross put on the input list positions.
+Choices are: White, Red, Blue, Yellow, Cyan, Magenta, Green, (use only first
+letter).
+\end{minipage}\\
+MAXENTRY\>2000\>\begin{minipage}[t]{100mm}
+The maximum number of positions that can be input by the cursor --- default
+2000.
+You can change this when running the program.
+\end{minipage}\\
+IDENTIFY\>FALSE\>\begin{minipage}[t]{100mm}
+Flag for choosing whether to put in via keyboard the name of the star at the
+position chosen via the cursor.
+To select this option, put IDENTIFY=TRUE when running XYCURA.
+If not chosen, the stars are labelled as sequential number (\#n).
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+First an image must be on the ARGS (by ICDISP, ADISP, etc.\ (qv)).
+You can clear any existing crosses displayed on the image, and then choose
+whether to have an input XYlist.
+If you do, then you choose whether to display the input positions as blue
+crosses and whether to display their numbers in the list.
+
+Then input the new positions by means of the cursor.
+The positions are then marked with red crosses.
+If you have chosen to add identifiers you enter them on the keyboard after each
+use of the cursor.
+(The choice is made by setting IDENTIFY=TRUE on runnung the program.)
+To exit, input a position at or beyond the bottom left hand corner of the image.
+The positions are then output to the XYlist.
+
+The trackerball buttons are used as follows:
+\begin{quote}
+\begin{tabbing}
+XXXXXX\=XXXX\=\kill
+GREEN\>1\>Reverts centre to image centre and magnification to 1.\\
+WHITE\>2\>Decreases magnification by times 2.\\
+WHITE\>3\>Increases magnification by times 2.\\
+RED\>4\>\begin{minipage}[t]{100mm}
+Inputs present position of cursor as star position.
+If this is the bottom lh of image blh corner, the program finishes.
+\end{minipage}
+\end{tabbing}
+\end{quote}
+Perform all initialisation to allow use of bit plane `n' for overlays.
+Overlays will be in colour `col' (see `args\_decol').
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf XYCURB} \hfill {\bf XYCURB}}
+\begin{description}
+\item [FUNCTION]:
+This program displays a section of an XY list of positions on the ARGS,
+numbered in their order in the list.
+By means of the cursor you can amend the positions of the stars in that section.
+You can then choose whether to store just the amended section or the whole input
+list with the amended section.
+The identifiers of the objects are preserved.
+Optionally,  positions which lie outside the displayed area can not be put up,
+with their positions left unchanged.
+You can choose whether to keep points which lie outside the displayed area.
+A position can be removed from the list by putting the refined position to the
+top l.h. corner of the image.
+\item [COMMAND]:
+\begin{quote}
+{\tt XYCURB  [ILEVEL=]}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+INPUT\>\>The input XY list.\\
+LIMITS\>whole\>The section of the list to be amended.\\
+OVERCL\>N\>\begin{minipage}[t]{100mm}
+Flag for clearing the crosses left on the ARGS from any previous program.
+Choices are N,Y.
+\end{minipage}\\
+NUMINP\>NO\>Flag for adding the number of the cross of the input list.\\
+OUTPUT\>\>The Output file containing the positions.\\
+TITLE\>\>The Title to be included in the Output file.\\
+ALLINP\>YES\>\begin{minipage}[t]{100mm}
+The output list to be the input list with the amended positions, or not, when
+only the amended positions are stored.
+\end{minipage}\\
+OPTION\>INSIDE\>\begin{minipage}[t]{100mm}
+Choice to display only those inside the area on the ARGS or all.
+Choices are INSIDE,ALL.
+\end{minipage}\\
+SAVEOUT\>NO\>\begin{minipage}[t]{100mm}
+Choice whether to save points outside displayed area.
+Choices are YES,NO.
+\end{minipage}\\
+\\
+(normally defaulted) :\\
+\\
+ILEVEL\>\>\begin{minipage}[t]{100mm}
+Flag for outputting on the terminal the positions from the cursor as you go
+along.
+The default (=2) makes it happen automatically.
+Setting it to 1 on running the program supresses it.
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+When the section is put up, the cursor is set to the 1st object.
+You move the cursor to an amended position and press the red button.
+The position is stored and the cursor moves to the next object, until the
+section is finished.
+A position to the top l.h. of the image means that that position is to be
+removed from the list.
+To exit from amending positions, place the cursor at the bottom l.h. corner of
+the image or below and to the left of that corner and press the button.
+The remaining positions will still be copied over.
+
+The trackerball buttons are used as follows:
+\begin{quote}
+\begin{tabbing}
+XXXXXX\=XXXX\=\kill
+GREEN\>1\>Reverts centre to image centre and magnification to 1.\\
+WHITE\>2\>Decreases magnification by times 2.\\
+WHITE\>3\>Increases magnification by times 2.\\
+RED\>4\>\begin{minipage}[t]{100mm}
+Inputs present position of cursor as star position.
+If this is to bottom lh of image blh corner, the program finishes.
+\end{minipage}
+\end{tabbing}
+\end{quote}
+Perform all initialisation to allow use of bit plane `n' for overlays.
+Overlays will be in colour `col' (see `args\_decol').
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf XYDRAWA} \hfill {\bf XYDRAWA}}
+\begin{description}
+\item [FUNCTION]:
+Draws out curves from XYlists.
+Takes two paramters from one or two XY lists and plots out a smooth curve
+joining the points.
+The interpolation is by cubic splines.
+The numbers are taken from file A, parameter no A1 and file B, parameter no B1,
+where A, A1, B, B1 are input by the user.
+More than one line may be drawn on a graph.
+The output can be put out on the ARGS, Tek, Versatec, Calcomp, GOC, or CC81.
+\item [COMMAND]:
+\begin{quote}
+{\tt XYDRAWA}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+INPUTA\>\>The 1st input XY list.\\
+PARNOA\>\>The parameter number in the first file to take the X values from.\\
+INPUTB\>\>The 2nd input file.\\
+PARNOB\>\>The parameter number in the second file to take the Y values from.\\
+DEVICE\>ARGS\>\begin{minipage}[t]{100mm}
+The display device for the graph.
+Choices are ARGS, GOC, TEKTRONIX, VERSATEC, CC81, CALCOMP.
+\end{minipage}\\
+DEVSIZE\>Various\>For graphs,the size of the picture.\\
+DEVLIMX\>Min,Max\>For graphs, the range of Xs to be plotted out.\\
+DEVLIMY\>Min,Max\>For graphs, the range of Ys to be plotted out.\\
+TEXTX\>\>Text to write on X axis.\\
+TEXTY\>Like TEXTX\>Text to write on Y axis.\\
+TEXT\>\>For hard-copy output, this is some text to be put below the diagram.\\
+ANOTHER\>No\>Flag to add another line. Choices are YES/NO.
+\end{tabbing}
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf XYEDIT} \hfill {\bf XYEDIT}}
+\begin{description}
+\item [FUNCTION]:
+Used to enable EDRS XY lists to be edited easily.
+\item [COMMAND]:
+\begin{quote}
+{\tt XYEDIT}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXXX\=XXXXXXXX\=\kill
+OPTION\>TOASCII\>\begin{minipage}[t]{100mm}
+Flag for which way to go --- choices are TOASCII, FROMASCII.
+\end{minipage}\\
+INPUTA\>ASCII.LIS\>\begin{minipage}[t]{100mm}
+The name of the ASCII input file.
+It must be a .LIS file, but the user does not type the .LIS
+\end{minipage}\\
+OUTPUTX\>\>The name of the XY list output file.\\
+INPUTX\>\>The name of the XY list input file.\\
+OUTPUTA\>ASCII.LIS\>\begin{minipage}[t]{100mm}
+The name of the ASCII output file.
+It will be made a .LIS file, but again do not type the .LIS.
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+By choosing the option, an XY list can be turned into an ASCII file, which can
+then be edited normally.
+By choosing the other option, such an appropriately structured ASCII file can be
+turned (back perhaps) into an XY list.
+
+By choosing TOASCII, the XY list is turned into a file of format:
+\begin{tabbing}
+XXXX\=XXXX\=\kill
+\>One header line with Title, No of parameters, No of entries as:\\
+\>\>7X,A30,8X,I5,8X,I10\\
+\>A series of entries with the header descriptors as:\\
+\>\>1X,'HEADER ',A30,' END'\\
+\>A series of the entries with identifier and the parameter values as:\\
+\>\>1X,20A1,5F12.4\\
+\>\>5F12.4\\
+\>\>\ldots
+\end{tabbing}
+By choosing option FROMASCII, such an ASCII file is turned into an XY list.
+\end{description}
+
+\goodbreak
+\rule{\textwidth}{0.3mm}
+{\Large {\bf XYLIST} \hfill {\bf XYLIST}}
+\begin{description}
+\item [FUNCTION]:
+Reads any XY file in the EDRS format and types out the identifiers, XY coords
+and the first of the any parameters, and also makes a .LIS file containing all
+the data.
+The .LIS file can then be output on any printing device.
+\item [COMMAND]:
+\begin{quote}
+{\tt XYLISTA}
+\end{quote}
+\item [PARAMETERS] :
+\begin{tabbing}
+XXXXXXX\=XXXXXXXXXX\=\kill
+INPUT\>\>The name of the .BDF file which you want to list.\\
+OUTPUT\>XYLISTA.LIS\>\begin{minipage}[t]{100mm}
+The name of the formatted file to which the results are written.
+The user supplies the name only; the program adds .LIS.
+XYLISTA is the default name.
+\end{minipage}
+\end{tabbing}
+\item [NOTES]:
+It is complementary to XYLIST and XYLISP, which are parts of the EDRS package.
+It differs from them in printing up to 200 numbers per record.
+\end{description}
+\end{document}
