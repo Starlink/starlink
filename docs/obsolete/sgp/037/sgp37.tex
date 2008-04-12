@@ -1,0 +1,246 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink General Paper}
+\newcommand{\stardocinitials}  {SGP}
+\newcommand{\stardocnumber}    {37.5}
+\newcommand{\stardocauthors}   {M D Lawden, J C Sherman}
+\newcommand{\stardocdate}      {24 May 1990}
+\newcommand{\stardoctitle}     {Starlink Site Manager's Guide --- Minor Nodes}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+\newpage
+
+\section {Introduction}
+
+This paper is for managers of Starlink's Minor Nodes, some of which have a
+Site Contract and a site manager paid 50\% by Starlink.
+Where there is such a contract, managers should make themselves familiar with
+its terms (copies are available from the University or from Starlink).
+Some of the Minor Nodes without Site Contracts at present may agree contracts
+in due course but others may prefer to remain without contracts indefinitely.
+ 
+Minor Nodes were set up with funding from SERC grants and support users who
+previously made up a Starlink Remote User Group (RUG).
+Many of the grants which set up Minor Nodes had special conditions attached
+to them and managers should make themselves familiar with these conditions
+(copies of the announcement letter and the conditions are available from
+the grant holder or from Starlink).
+In particular, managers should note the special conditions that:
+\begin{itemize}
+\item Ownership of the equipment funded by the grant should remain with SERC
+and not transfer to the University.
+\item The Area Management Committee of the appropriate Catchment Area should
+oversee the use of the system.
+\end{itemize}
+ 
+The following recommendations on running a Starlink Minor Node apply fully
+at those sites were there is a Site Contract.
+For other Minor Nodes, however, the recommendations do not apply with the same
+force.
+Nevertheless, these other nodes and especially those which hope to agree
+contracts in due course would be well advised to follow Starlink conventions
+for the following reasons:
+\begin{itemize}
+\item If security and/or usage practices are too different from Starlink's,
+it may become necessary to prohibit use of shared Starlink resources,
+such as the database machine.
+In extreme cases, it may even become necessary to remove the non-standard site
+from Starlink's DECnet.
+\item If the recommendations are to be followed eventually, disruptive changes
+in the future can be avoided by following Starlink practices now.
+\end{itemize}
+The intention of this Guide is to help you understand the Starlink project and
+your role within Starlink.
+It is assumed that you are aware of the documentation DEC provide for managers
+and operators of VAX computers, so the Guide contains only the extra information
+you need for Starlink purposes.
+You should visit the central Starlink site at RAL to see how that site is
+run and to get to know the project staff.
+You can propose such a visit at any time --- don't wait to be asked.
+
+There are a number of people you can turn to for help.
+These include the other site managers, and project staff with particular areas
+of expertise.
+Their names, addresses (network and postal) and functions are specified in
+ADMINDIR:WHOSWHO.LIS.
+In general, use the VMS MAIL utility to communicate with people as your message
+can then be dealt with at a convenient time and you have a printed record.
+VMS MAIL works only if you and the person you are contacting are both on nodes
+of Starlink's DECnet network; otherwise, you should use POST (see SUN/36).
+ 
+The Guide for managers of Starlink's Major Nodes is a separate paper -- SGP/25,
+``Starlink Site Manager's Guide -- Major Nodes''.
+The present Guide refers frequently to SGP/25 and should be read together with
+SGP/25.
+(References within SGP/25 to off-site users, i.e.\ references to Remote User
+Groups, do not apply here since no Minor Nodes support off-site users.)
+
+\section {Site Manager's Responsibilities}
+
+The section on Site Manager's Responsibilities in SGP/25 applies here
+with the following additions and changes.
+\begin{itemize}
+\item Managers at Minor Nodes with contracts, i.e.\ those managers paid partly
+by Starlink, may be called on from time to time to carry out duties at Starlink
+sites within the appropriate Catchment Area but away from their home
+institution.
+For example, if the manager at UCL were absent for a prolonged period, Starlink
+may ask the QMC manager to spend a day a week at UCL.
+\item Acting as secretary to the Area Management Committee does not apply;
+this job is done by the manager of the Major Node.
+\item Helping to manage the finances of the node does not apply since
+Starlink does not fund consumables for Minor Nodes.
+\end{itemize}
+
+\section {Administration}
+
+The section on Administration in SGP/25 applies here, except for the following
+points:
+\begin{itemize}
+\item Your Annual Report will form part of the AMC report for your Catchment
+Area.
+\item If your users need to use a Major Node they can claim travelling expenses,
+just as they did when they were a Remote User Group.
+The claim form should be sent to the manager of the Major Node.
+\item The managers of those Minor Nodes which do not yet have a site contract
+cannot use the mechanism for payment of travel and subsistence expenses
+described in SGP/25.
+Instead, they should complete RAL form N2(S), which can be obtained from
+Andrea Roberts, and return it to Andrea, R68, RAL.
+Please don't send these forms directly to the RAL Claims Office as this will
+delay payment.
+There is no {\it per diem} subsistence rate for non-SERC employees so actual
+expenses must be declared.
+It is important to include all receipts with the claim; a modest mileage rate
+is paid if you use your own car.
+Please contact Andrea Roberts in advance of the visit if the subsequent travel
+and subsistence expenses claim is likely to be unusual.
+
+\end{itemize}
+
+\section {Meetings}
+
+The meetings described in section 4 of SGP/25 are all relevant here but the
+recommendations on attendance at SMM, AGM and AMC/SLUG meetings are different
+from SGP/25.
+ 
+Starlink has 11 Major Nodes, 9 Minor Nodes, and 1 Remotely Managed Node.
+If all site managers were to attend every SMM, the large number of managers
+(more than 20) together with appropriate Starlink staff would make the meetings
+longer and less effective.
+The attendance at SMMs is therefore restricted to:
+\begin{itemize}
+\item All managers of Major Nodes
+\item Appropriate Starlink staff
+\item Managers of those Minor Nodes located within the Catchment Area of the
+site where the meeting is held.
+However, all managers of Minor Nodes are invited to attend the larger AGMs.
+\end{itemize}
+ 
+Starlink expects managers of Minor Nodes with contracts, who are paid partly 
+by Starlink, to attend every AGM and all relevant SMM and AMC/SLUG meetings.
+Starlink cannot insist that managers of other Minor Nodes attend these meetings,
+but nevertheless they are urged to do so since:
+\begin{itemize}
+\item You can discover the latest changes in Starlink policy and can, through
+your comments, influence that policy.
+You will also gain the knowledge which will enable you to answer questions on
+Starlink from your users.
+\item You can represent the interests of your node when important topics
+such as AMC wish-lists are discussed.
+\end{itemize}
+Travelling expenses for attendance at these meetings will be reimbursed by
+Starlink, either directly or via the University.
+
+\section {Operating Standards}
+
+Section 5 of SGP/25, Operating Standards, applies here with a few modifications
+and notes as follows.
+\begin{itemize}
+\item 5.2 Disc backup: Users of Minor Nodes are no more and no less careless
+than users of Major Nodes and the disc hardware in use at Minor Nodes is very
+similar to that at Major Nodes.  Consequently, the risk of accidental file
+loss, per user and per Mbyte, is the same for Minor Nodes as for
+Major Nodes and the recommendations on disc backup in SGP/25 also apply here.
+In particular, backup procedures should be carried out with the same frequency
+as for Major Nodes.
+(Because there are fewer discs at Minor Nodes the time taken for each backup
+run will be less than at a Major Node and because there are fewer discs and
+fewer users the intervals between file losses will be longer.  The time spent
+on backup per file loss will therefore be much the same as at a Major Node.)
+\item 5.3 Special usernames: Managers should have usernames on the Major Node in
+their Catchment Area but do not normally have usernames at other Starlink sites.
+They should also have usernames on the database machine, STADAT.
+\item 5.4 Use of other nodes: Users of Minor Nodes can apply for usernames on
+the Major Node in their Catchment Area.
+This can be done to gain access to a particular peripheral, for example.
+
+The STARLINK captive account should be available on your system.
+\item 5.5 User authorization file: The single letter site codes for Minor
+Nodes are given in SGP/25, Appendix B.
+\end{itemize}
+
+\section {Conferences}
+
+The recommendations in SGP/25 all apply to Minor Nodes as well as Major Nodes.
+
+\section {User Registration}
+
+The section on User Registration in SGP/25 applies here without any major
+changes.
+ 
+The use of your node and the registration of users is a particularly difficult
+policy area for some Minor Nodes so be sure to consult Gordon Bromage if there
+is any doubt at all whether work falls within Starlink's terms of reference
+or not.
+ 
+For those of your users with usernames on the appropriate Major Node, specify
+your own node as the `Primary Node' and the Major Node as the `Secondary Node'.
+If such a user leaves, please inform the manager of the Major Node.  
+
+\section {Starlink Software}
+
+The corresponding section of SGP/25 applies here without change.
+
+\section {On-line Information Summaries}
+
+The corresponding section of SGP/25 applies here.
+The file AMC.LIS should be copied from your Major Node whenever there are
+changes in the AMC membership.
+\end{document}

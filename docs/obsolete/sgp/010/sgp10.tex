@@ -1,0 +1,462 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink General Paper}
+\newcommand{\stardocinitials}  {SGP}
+\newcommand{\stardocnumber}    {10.1}
+\newcommand{\stardocauthors}   {C.S. Jeffery \\
+                                P.C.T. Rees}
+\newcommand{\stardocdate}      {1 October 1991}
+\newcommand{\stardoctitle}     {Theoretical Astrophysics Subroutine Library}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\begin {abstract}
+It is proposed that a well-documented subroutine library be written in the area
+of theoretical astrophysics. 
+A questionnaire has been circulated to the UK astronomical community.
+The response indicated interest in a library of subroutines mainly covering 
+the area of astronomical spectroscopy.
+A preliminary discussion is presented of the intended contents of the 
+library, in terms of its functionality, design and documentation.
+Targets for the development of the initial version of the library are given.
+Comments are invited.
+\end {abstract}
+
+\section {Introduction}
+
+It has been proposed that a library of proven Fortran subroutines might be
+established for theoretical astrophysics calculations used frequently in the
+analysis of astronomical spectra.
+The aim of the library would be to provide an effective and reliable toolkit for
+program development, based on well documented algorithms and coded for a
+high degree of portability ({\em e.g.}\ using the STARLINK coding standard --
+SGP/16).
+Each subroutine in the library would be proven to a documented accuracy for
+a minimum of VAX/VMS and UNICOS operating systems.
+
+To implement a theoretical astrophysics subroutine library involves identifying 
+specific areas of astrophysical computation which can benefit from such a 
+library and for which existing software may already be available.
+Each area may then be looked at in turn by collecting together all the available
+code and evaluating the performance of each algorithm.
+Because of the amount of manpower available this process has to be a
+collaborative one.
+Given the number of suitable public-domain routines within the CCP7
+program library, an approach was made to CCP7 to collaborate on
+such a project and it was agreed by the CCP7 Working Group that Simon
+Jeffery (CCP7 secretary) and Paul Rees (STARLINK Project) should proceed
+with further steps to establish a library.
+A questionnaire was distributed to determine the level and areas of existing
+demand and to determine what initial contributions might be available
+({\em e.g.}\ from CCP7 Working Group members) in addition to the public-domain
+routines within the existing CCP7 program library.
+
+This document discusses the response to the questionnaire and provides an
+outline of the initial implementation of the library.
+
+\section {Questionnaire Response}
+
+\subsection {Circulation}
+The text of the questionnaire distributed to the UK astronomical
+community is given in Appendix \ref{quest_sect}.
+This questionnaire was distributed over the STARLINK network and mailed to
+all members of CCP7: a total of approximately 1300 professional and graduate
+astronomers.
+% From this group, a disappointing ten responses were received by the six week
+% response deadline.
+% and four of these respondents did not fill in the questionnaire.
+% 
+% \subsection {Level of interest}
+All respondents answered that they or other members of their research group
+would be likely to use a theoretical astrophysics subroutine library as a
+programming tool, if such a library were available.
+Most were willing to consider replacing their own subroutines with
+proven third-party software.
+
+\subsection {Area of interest}
+Most respondents listed optical, ultraviolet, infra-red, millimetre and
+radio spectroscopy as areas in which they need subroutines now or
+will need soon.
+X-ray spectroscopy was also identified by several respondents as an area
+in which they will need theoretical astrophysics software soon.
+Other areas mentioned included interstellar chemistry, plasma physics and
+interstellar scattering calculations.
+
+\subsection {Specific applications}
+
+\subsubsection {Calculations}
+In order of decreasing frequency, the list of specific calculations required
+by the questionnaire respondents is as follows:
+
+\begin {itemize}
+\item Voigt function;
+\item Planck function;
+\item Fermi-Dirac integrals, partition functions, continuous opacities,
+equation of state, Rayleigh scattering, particle size integration, Mie
+scattering.
+\end {itemize}
+
+
+\subsubsection {Data}
+Four of the respondents noted that they require atomic data, noticeably in
+the X-ray wavelength region.
+This is clearly a large and important area which requires further
+detailed investigation.
+
+\subsubsection {Performance}
+No clear performance requirements ({\em e.g.}\ speed, accuracy) were
+identified from the questionnaire response.
+
+\subsubsection {Contributions}
+Fortran code has been offered for the following calculations:
+
+\begin {itemize}
+\item Voigt function;
+\item Gaunt factors (free-free and bound-free);
+\item Rayleigh scattering;
+\item dust particle size integration;
+\item Mie scattering.
+\end {itemize}
+
+\subsection {Evaluation}
+
+Although numerically disappointing, the questionnaire response was of the order
+anticipated and established that interest in a theoretical astrophysics 
+library does exist -- at least within those sections of the UK community 
+concerned with astronomical spectroscopy.
+However, the requirements indicated be the questionnaire responses
+are diverse, making the identification of specific areas of demand difficult.
+Previous experience suggests that a higher level of interest is likely to be 
+generated by the existence of a software product, especially over an extended 
+period of time. 
+With this in mind, it was decided to design and code an initial version of 
+the theoretical astrophysics (TAP) subroutine library, with emphasis on 
+low-level and infra-structure facilities which may subsequently be built 
+into larger applications at a later date.
+There follows a discussion of various design aspects of the initial 
+implementation of the TAP library.
+
+\section {Functionality}
+The question of what an initial implementation of the TAP subroutine library 
+should provide is difficult to clarify because of the breadth of astrophysics, 
+even within the field of spectroscopy.
+However, it is considered that a minimum requirement must address the 
+following points:
+
+\begin {description}
+\item [Units] -- From the point of view of the development and
+maintenance of software, a single standard system of units is highly
+attractive.
+However, in astrophysics SI, cgs, atomic and other units peculiar to astronomy
+are in current use.
+Clearly some means of unit conversion is required, preferably with a very
+simple user interface using a single subroutine call.
+
+\item [Constants] -- The standard initialisation of constants is fundamental
+to the repeatability of computational astrophysics.
+Here, three types of constants can be identified:
+
+\begin {itemize}
+\item mathematical constants;
+\item astronomical constants;
+\item physical constants.
+\end {itemize}
+
+In addition to establishing the range of constants required, it is also
+important to identify the precision and accuracy to which these constants
+are initialised.
+Also, standard sources of these data ({\em e.g.}\ CODATA, IAU) need to be
+identified and the data maintained -- {\em i.e.}\ it is reasonable to assume
+that some of these data will require updating as more accurate values are
+adopted.
+
+\item [Atomic and molecular data] -- All but the most trivial theoretical
+astrophysics calculations require atomic and molecular data.
+However, unlike the fundamental constants, there is usually no standard source
+for these data.
+Also, the types of data available vary substantially, from
+lists of wavelengths through compilations of semi-empirical values
+to the results of detailed quantum-mechanical calculations.
+Moreover, the quality of these data also vary substantially.
+
+It is suggested that only the most reliable data are of interest to the 
+average user.
+Maintaining these data in a library requires regular review
+and, ideally, a mechanism for obtaining some measure of quality control 
+(via consensus from the user community).
+Although the continued maintenance overhead for these data must not be 
+underestimated, the benefits of universal access to a standard source of 
+reliable atomic and molecular data are considerable.
+
+The mechanism by which such a database could be constructed and maintained
+needs to be investigated further.
+In this respect, it is noted that this topic is exercising a 
+number of current research programs ({\em e.g.}\ the Opacity Project and CCP2) 
+and it is recognised that substantial collaboration will be necessary.
+
+\item [Elementary functions] -- The more complex astrophysical calculations
+presume the existence of elementary software, {\em e.g.}
+
+\begin {itemize}
+\item Voigt function;
+\item exponential integrals;
+\item Fermi-Dirac integrals;
+\item Planck radiation laws.
+\end {itemize}
+
+Clearly, these calculations have to be provided before more complex
+calculations are encoded.
+
+\item [Mathematical techniques] -- A number of modern numerical procedures
+require specific mathematical techniques ({\em e.g.}\ specific methods for 
+matrix inversion, integration of simultaneous differential equations) 
+which are not provided for in standard mathematical subroutine libraries 
+like NAG.
+Code does exist for many of these techniques, but it is frequently embedded 
+within larger applications.
+Extracting these techniques into a documented library would make the 
+transfer of existing techniques to new applications much more accessible to 
+the theoretician.
+
+\item [Simple applications] -- Types of calculations which are more specific
+than the elementary functions noted previously include:
+
+\begin {itemize}
+\item radiative transfer;
+\item equation of state;
+\item Boltzmann and Saha-Boltzmann distributions;
+\item opacity calculations.
+\end {itemize}
+
+This type of relatively simple application probably represents the current
+limit to which a theoretical astrophysics subroutine library can provide 
+tools for building larger applications. 
+Eventually, the provision of code for higher level algorithms as a general 
+tool is defeated by the law of diminishing returns -- {\em i.e.}\ the 
+limited number of occasions on which code for such an algorithm is required 
+for a new application.
+\end {description}
+
+\section {Design}
+Several issues are important to the design of any subroutine library to 
+ensure a high level of maintainability. 
+In the area considered here, some requirements such as numerical accuracy 
+become increasingly important, whilst others such as interactive 
+graphics may be overlooked. 
+Although many design considerations may be obvious, the following minimum 
+specification is regarded as essential before any coding can begin.
+
+\begin {description}
+\item [Language] -- The language which currently dominates computational
+physical science is Fortran 77, although both Algol and C are also in use.
+Since nearly all existing software relevant to the TAP subroutine library
+is written in Fortran, this language continues to be the only realistic option. 
+Compilers for the new Fortran standard, Fortran 90, will become more widely 
+available within the next two years. 
+Fortran 90 will be adopted when it is appropriate to do so. 
+The STARLINK Fortran coding standard, SGP/16, will be the coding standard used.
+
+\item [Binding] -- The use of third-party software, {\em e.g.}\ the NAG
+subroutine library, and infra-structure software, {\em e.g.}\ the STARLINK
+character handling routines, need to be considered carefully since their
+use has implications for the portability of the TAP subroutine library. 
+Ideally, all infra-structure code should port to a supported operating 
+system as though it forms a self-contained component of the TAP library.
+
+\item [Conventions] -- A subroutine naming convention must be adopted, based
+upon the recommendations  contained in SGP/16.
+
+\item [Precision] -- All floating point subroutine arguments will be
+declared as DOUBLE PRECISION.
+In this context, these arguments may be considered reliable to 14 significant
+figures unless otherwise stated in the documentation.
+All integer subroutine arguments will be assumed four-byte integers, {\em
+i.e.}\ lie in the range -2147483647 to 2147483647.
+This range takes account of the variation in the representation of negative
+integers between machines of different architecture.
+
+\item [Accuracy] -- The accuracy of a calculation is dependent upon the
+algorithm used as well as the precision of the arithmetic.
+The maximum accuracy of an algorithm can never exceed its precision.
+Where necessary, {\em i.e.}\ when returned values may be less accurate than
+14 significant figures, a detailed discussion of the accuracy of a calculation
+will be documented.
+
+\item [Error checking and flagging] --
+The inherited status conventions recommended by STARLINK (SGP/16, SUN/104)
+will be adopted. 
+Use of the STARLINK error reporting software, SUN/104, needs to be investigated.
+\end {description}
+
+\section {Documentation}
+The documentation of the theoretical astrophysics subroutine library will use
+the style adopted by the STARLINK project.
+A full discussion of the algorithm used and including
+references will be presented in the documentation for each routine.
+This aspect of the documentation is regarded of equal importance to the
+software itself.
+
+\section {Development}
+The development programme outlined here is clearly a considerable task.
+However, the emphasis of any development effort must be upon the quality
+of the resulting software; {\em i.e.}\ its reliability, accessibility and
+continued maintainability.
+This emphasis will inevitably result in a slower initial development, but
+it should avoid set-backs resulting from maintenance and redesign as the
+library becomes more mature.
+
+Prerequisites for the implementation of the astrophysical calculations are
+the consistent initialisation of astrophysical constants and the
+conversion of units.
+These two areas require immediate attention; elementary functions may then be
+implemented.
+It is intended to begin development of a preliminary version of the library 
+immediately.
+Comments on any relevant aspects will be welcomed by either author.
+
+\newpage
+\appendix
+\section {Questionnaire} \label{quest_sect}
+
+\small
+\begin{verbatim}
+        THEORETICAL ASTROPHYSICS SUBROUTINE LIBRARY QUESTIONNAIRE
+        =========================================================
+
+        1. NAME AND E-MAIL ADDRESS
+
+
+
+        2. LEVEL OF INTEREST
+
+        Given that the use of well-documented subroutine libraries assists
+        in the long-term maintenance and portability of applications
+        software, would you or other members of your research group be
+        likely to use  an astrophysics subroutine library as a programming
+        tool?
+
+        Would you consider replacing your own (perfect!) FORTRAN
+        subroutines with proven 3rd party software?
+
+
+        3. AREA OF INTEREST
+
+        In which general areas do/might you use/require subroutines?
+
+                                                Use     Need    Might
+                                                now     soon    need
+
+        Optical/UV stellar spectroscopy
+        IR/mm-wave/radio spectroscopy
+        Interstellar chemistry
+        Other (please specify)...............
+
+
+        4. SPECIFIC APPLICATIONS
+
+        If well-documented and proven FORTRAN subroutines were available,
+        which of the following specific task descriptions would you be
+        likely to use. Similarly, would you be prepared to make a
+        contribution in any of the following areas.
+
+                                                Require         Contribute
+
+        Trivial...
+          Planck function                       ........        ........
+
+          Other (specify) .................     ........        ........
+
+        Utilities...
+          Voigt function                        ........        ........
+          Fermi-Dirac integrals                 ........        ........
+          Partition functions                   ........        ........
+          Occupation numbers                    ........        ........
+          Continuous opacities                  ........        ........
+          Atomic data                           ........        ........
+          (photoionisation x-sections, etc)
+
+          Other (specify) .................     ........        ........
+
+        Compound...
+          Equation of state                     ........        ........
+
+          Other (specify) .................     ........        ........
+
+        Performance...
+          Please give a brief account any specific accuracy or other
+          performance requirements you consider necessary from the
+          applications you have specified.
+
+
+
+        5. CONTRIBUTIONS
+
+        Please describe in more detail any subroutines you are prepared
+        to contribute. In particular, we would like to know:
+
+          1. the name by which you know the subroutine
+          2. the general subject area
+          3. the precise function of the routine
+          4. approximate size (lines of FORTRAN) and documentation level
+          5. references
+
+        If the offered contribution is a suite of routines for a single
+        task or set of tasks, the name of the top-level routine and the
+        function of the entire suite need only be supplied.
+
+        Example:
+
+          1. PLANCK
+          2. Radiation laws
+          3. Evaluate Planck function at a single frequency
+          4. 4 lines of FORTRAN, 0 comments
+          5. Planck,M. 1959. The Theory of Heat Radiation, New York: Dover.
+
+
+
+                           Thank you for your response.
+\end{verbatim}
+\end{document}

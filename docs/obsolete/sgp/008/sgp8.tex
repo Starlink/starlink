@@ -1,0 +1,237 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink General Paper}
+\newcommand{\stardocinitials}  {SGP}
+\newcommand{\stardocnumber}    {8.9}
+\newcommand{\stardocauthors}   {G E Bromage}
+\newcommand{\stardocdate}      {11 February 1992}
+\newcommand{\stardoctitle}     {Starlink Local Management}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\section {Area Management Committees}
+
+{\bf Starlink UK Catchment Areas}, each monitored by an {\bf Area Management
+Committee (AMC)}, have been defined to include the nodes and groups shown in the
+table below for the 1991/92 Reporting Year.
+
+New {\bf Remote User Groups (RUGs)} are normally added to an AMC area based on
+geographical proximity, so that, for example, a potential RUG at Newcastle
+would be added to the North East Area.
+Remote users from abroad are registered at a Node and with an AMC area chosen
+to be most appropriate for scientific or administrative reasons, e.g.\ La Palma
+users to the East-Anglia Area because of the RGO connection, and VILSPA Madrid
+users to the South West Area because of the RAL IUE responsibilities.
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|l|l|l|l|l|} \hline
+{\bf Area and AMC name} & {\bf Major nodes} & {\bf Minor nodes} &
+{\bf RUGs (UK)} \\
+\hline
+\hline
+Scotland & Edinburgh/ROE & St Andrews & Glasgow \\
+\hline
+Northern Ireland & QUB/Armagh & - & - \\
+\hline
+North East & Durham & - & - \\
+\hline
+North West & Jodrell Bank & Keele & Leeds \\
+& Manchester & Lancs (Preston) & Bradford \\
+\hline
+Midlands West & Birmingham & - & Aberystwyth \\
+\hline
+Midlands East & Leicester & - & - \\
+\hline
+East Anglia & Cambridge/RGO & Hatfield Poly & - \\
+\hline
+South West & Oxford & Cardiff & Bristol \\
+& RAL & Southampton & - \\
+\hline
+London \& South East & UCL & QMW London & MSSL (Dorking) \\
+& & ICSTM London & - \\
+& & Sussex & - \\
+& & Kent (Canterbury) & - \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+The full current membership of each AMC should be stored in the file
+LADMINDIR:AMC.LIS stored at each Starlink site.
+The names of the current AMC areas and their chairmen are listed in the
+file ADMINDIR:WHOSWHO.LIS.
+
+\section{Terms of Reference of AMCs}
+
+The function of an AMC is to oversee the operation of its respective area
+and report to the Starlink Project.
+The AMC terms of reference are as follows:
+\begin{itemize}
+\item to ensure the implementation of Starlink policies concerning the operation
+of all the sites in its Area, including Minor Nodes and Remote User Groups.
+\item to monitor all aspects of the service to the users, including resources,
+availability, documentation and usage, paying special attention to the needs of
+remote users.
+\item to resolve any conflicting demands on resources and to deal with user
+recommendations or complaints which cannot be dealt with by the Site Managers.
+\item to make recommendations on any relevant matters of policy or operation to
+the Starlink management (e.g.\ provision of hardware is a central
+responsibility, but Starlink will be strongly guided by recommendations from
+the AMC and the user community).
+\end{itemize}
+
+\section{Starlink Local User Groups}
+
+Starlink encourages AMCs to set up Starlink Local User Groups (SLUGs) at each
+Starlink site as a forum for discussion of local Starlink matters.
+Such SLUGs should hold meetings that are open to all registered Starlink users
+at that site, and should encourage the active participation of users in the
+decision making process.
+The SLUG chairmen should attend the AMC meetings and/or send reports to the AMC.
+
+\section {Site Managers}
+
+Site Managers play a very important but difficult role within Starlink.
+They report formally to their respective employers (SERC establishment,
+university or polytechnic), but at the same time have responsibility for the
+implementation of Starlink policies at their site.
+This divided loyalty needs to be recognised by AMCs (and users).
+All day-to-day aspects of the operation of the sites are the responsibility of
+the Site Managers, guided as necessary by their Department Head/AMC/SLUG.
+
+Site Managers must ensure that only accredited users use the system.
+Subject always to subsequent confirmation by the Starlink Project Scientist,
+Site Managers can themselves immediately install new users whose requirements
+clearly fall within the guidelines set out below (section 5).
+Doubtful cases must be referred to the Project Scientist first.
+The duties of Site Managers are described in more detail in the Site
+Manager's Guides (SGP/25 and SGP/37).
+
+\section {Starlink Policies}
+
+Starlink is provided by SERC as a research facility for all accredited UK
+astrophysicists and astronomers, and is primarily intended for the interactive
+reduction and analysis of observational data.
+Other kinds of astronomical work are not excluded, for example theoretical
+computations running in batch mode, but such work is to be run with lower
+priority.
+The use of any Starlink resources for teaching purposes, for computer games, or
+for any commercial activity is expressly forbidden.
+In particular, Starlink software must not be used for commercial gain or passed
+on to third parties without the consent of the Project --- for more details
+on Starlink software distribution policy see SGP/21.
+
+The order of priority for usage of all Starlink resources (equipment, software
+and manpower) is as follows:
+\begin{enumerate}
+\item Astronomical data reduction that can only be done interactively;
+\item Other astronomical data reduction;
+\item Other astronomical research work that can only be done interactively;
+\item Other astronomical research work;
+\item Other APSB research work.
+\end{enumerate}
+In practice, work at the lowest priority, i.e.\ non-astronomical APSB work, is
+very rarely run and has never been run at many sites.
+The word `astronomical' in the context of Starlink usage is interpreted as
+including studies in certain areas of solar system research, namely:
+\begin{itemize}
+\item the study of the sun as a star;
+\item the study of planets, comets, asteroids, and interplanetary space using
+telescopes that also study non-solar-system objects (e.g.\ IUE, IRAS, AAO).
+\end{itemize}
+Other solar system research is only allowed under category (5) above.
+
+Category (3) above includes relevant interactive display and analysis of the
+results of theoretical modelling work.
+It is recognised that data produced by the use of supercomputers are in many
+ways analogous to those obtained from observational facilities.
+Where appropriate and feasible, therefore, the use of Starlink by theoretical
+astronomers interactively analysing such `theory data' is encouraged.
+
+All the Standard Starlink software must be available at all sites on devices
+that are as similar as possible to each other and which present essentially the
+same aspect to users everywhere.
+A selection of appropriate Optional Software Items should also be installed, 
+although what is appropriate will vary from site to site.
+Site Managers may store infrequently used standard software offline at sites
+where disc space is limited.
+Such software must be available at short notice if required.
+
+The majority of Starlink applications software comes from astronomer users
+themselves, and users are strongly encouraged to develop such software to
+Starlink standards and within the Starlink ADAM environment (see SUN/94 and
+SG/4).
+The Starlink programming standards are specified in SGP/16.
+
+\section{AMC Membership and Meetings}
+
+All AMCs must meet at least once a year, and most meet twice yearly.
+The chairman and members of each AMC must be accredited by the Starlink Project
+Scientist.
+The committee should consist of representatives of major user groups, Minor
+Nodes and RUGs, local management, and any relevant local computing committees,
+if appropriate.
+Starlink recommends that representatives of the local user group (SLUG) and/or
+of research students are members of the AMC.
+A Major Node Site Manager will act as the secretary of his or her AMC.
+Broadly speaking, AMCs should represent the most active users and not
+necessarily the most senior personnel in each community.
+
+Starlink management must be informed in advance of each meeting and will
+arrange for a representative to attend.
+Expenses will be paid (UK travel $+$ day subsistence costs) for travelling
+members attending AMC meetings.
+Minutes of AMC meetings must be kept.
+Each AMC must send an Annual Report to the Starlink Project Scientist in August
+each year for consideration by the Starlink Project and the Starlink Users'
+Committee.
+
+\section {References}
+
+\begin{description}
+\begin{description}
+\item [SGP/16]: Starlink applications programming standards.
+\item [SGP/21]: Starlink software distribution policy.
+\item [SGP/25]: Starlink site manager's guide --- Major nodes.
+\item [SGP/37]: Starlink site manager's guide --- Minor nodes.
+\item [SUN/94]: ADAM --- Starlink software environment.
+\item [SG/4]:   ADAM --- The Starlink software environment.
+\end{description}
+\end{description}
+\end{document}
+
+\end{document}
+***
+
+\end{document}

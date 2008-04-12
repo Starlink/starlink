@@ -1,0 +1,183 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink General Paper}
+\newcommand{\stardocinitials}  {SGP}
+\newcommand{\stardocnumber}    {40.1}
+\newcommand{\stardocauthors}   {J C Sherman}
+\newcommand{\stardocdate}      {28 August 1990}
+\newcommand{\stardoctitle}     {The Role of Wish-lists in Starlink's Purchasing}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section  {Introduction}
+
+Wish-lists are the lists of desirable node enhancements drawn
+up by Area Management Committees (AMCs) at each AMC meeting and
+documented as part of the AMC minutes.  The wish-lists include new items
+of hardware and software and also replacements for worn out or obsolete
+hardware and software.  They are usually lists of hardware items, but
+proprietary software, for example, NAG products, Rabbit products or IDL, can
+also be included.  Desirable enhancements to Starlink's applications software
+are best dealt with via the Special Interest Groups (SIGs).
+ 
+Where there are several Minor Nodes in an AMC's catchment area
+and when the wish-list includes replacements as well as new items,
+it is difficult to construct a list in strict priority order.
+Nevertheless, some indication of priorities enhances the value of the list.
+ 
+The purpose of this paper is to clarify the role played by wish-lists
+in Starlink's purchasing procedures, in particular the influence wish-lists
+have on the choice of what to buy next.  It is expected that this paper will
+be of interest to Site Managers, AMC members and those users who attend
+SLUG meetings.
+ 
+The role of wish-lists has not been documented hitherto.  However, it has
+become clear recently that some sites have misunderstood how wish-lists
+are used at present --- hence
+the need for this paper.  This paper documents what has been the situation for
+several years; it does not announce any recent change of policy.  It is of
+historical interest to note that wish-lists were first introduced as contingency
+planning, in preparation for a possible ``windfall'' increase in Starlink's
+funds at the end of a financial year.  Initially, wish-lists did not have any
+role in Starlink's normal purchasing plans but their importance
+has grown with time.
+ 
+\section  {The Present Role of Wish-lists}
+
+One of Starlink's primary aims is to provide a computing service
+which is relevant
+to the needs of Starlink's users.  Consequently, the users' views of
+enhancements
+they would like to see at their node, as formulated in AMC wish-lists,
+is very important information.  However, wish-lists are not the only
+factor which influences or constrains purchasing decisions.
+ 
+Taking these other factors into account will often have the effect that
+wish-list items are not purchased in the same order as the wish-list
+is presented.  They may also, occasionally, have the effect that a
+wish-list item is delayed or not purchased at all.
+ 
+Among the other factors are the following:
+\begin{itemize}
+\item
+Strategic changes, as agreed by the Starlink Users' Committee (SUC), must be
+implemented.  Recent examples of this are (a) the replacement of all
+VAX 780s and VAX 750s and (b) the move towards workstations and X-windows.
+\item
+``Special Offers'' become available from time to time which Starlink
+may wish to exploit.  These cannot be anticipated in wish-lists.
+\item
+Upgrades sometimes result in valuable equipment being displaced and
+Starlink may wish to reuse this equipment at another site.
+In addition, old equipment is replaced from time to time
+to reduce maintenance costs.  Hardware compatibility requirements
+sometimes make it impossible to make these activities completely
+consistent with the wish-lists.
+\item
+Some wish-list items may be for types of equipment which Starlink has
+not previously purchased.  There will then be a delay while a
+suitable product is identified.  A recent example of this is
+A4 colour hardcopy, which has been purchased after the Hardware
+Advisory Group (HAG) considered alternative devices.
+\item
+AMCs may be unaware of the situation at other Starlink nodes and may
+adopt different criteria from others when considering their own requirements.
+For example, a level of disc space provision which one AMC may regard as
+tight but acceptable may be regarded by another AMC as totally
+inadequate.  One consequence of this ``calibration'' difference between AMCs
+is that some wish-list items can be delayed or not purchased at all.
+\end{itemize}
+Wish-lists and minutes of AMC meetings are filed at RAL and are
+referred to when upgrades for a particular node are considered.
+It is important that Site Managers ensure that RAL has an up-to-date
+wish list (and an up-to-date configuration diagram).  Changes
+to the wish-lists can be made at any time but in practice they are usually
+made twice a year, following AMC meetings.  To facilitate rapid reference,
+Starlink has started to store wish-lists on-line at RAL.
+ 
+To guard against wish-lists being out-of-date,
+most proposed purchases are discussed with
+Site Managers before any orders are placed.  Any purchase
+which is not on the wish-list is always discussed with the site concerned.
+ 
+\section {Misconceptions}
+ 
+A common misconception is that Starlink sites have an earmarked share
+of Starlink's budget each year and that Starlink's job is to spend that share
+on the particular site's wish-list, starting at the top and working down
+until all the funds are spent.  This is quite wrong in two respects.  Firstly,
+the share-per-site-each-year approach would make major changes impossible ---
+by dividing the available funds between a large number of sites there would
+not be sufficient at any one site to make the fundamental changes that are
+required from time to time.  To overcome this problem, funds can be
+concentrated on a subset of sites in one year with other sites benefitting
+in subsequent years.
+An example of this approach is the replacement of the VAX 780s and 750s;
+when the first batch of VAX 780 replacements were made, the sites
+concerned absorbed most of the funds available for hardware purchases that
+year with very little left for any other sites.  
+Secondly, the factors noted in section 2 make it impossible
+to start at the top of a wish-list and work down.
+ 
+\section {Timing}
+ 
+AMC meetings and wish-list updates usually take place twice a year.
+However, because SERC finances are arranged on a strict financial year by
+financial year basis, as dictated by Treasury rules, the pattern of Starlink's
+purchasing tends to be year by year.  AMCs should not, therefore, be surprised
+to find that an item added to their wish-list six months previously
+has not been purchased by the time they next review their wish-list.
+A time scale of six months to a year for Starlink enhancements via the
+wish-lists is similar to to the time scale of SERC grant funding, measured
+from application drafting to equipment installation.
+ 
+On the other hand, an item that has been on the wish-list for
+two years or more with no sign of action is either an oversight or suffers
+from a fundamental problem, such as not being consistent with Starlink
+hardware or software policy.  Site Managers, AMCs and users should bring
+such items to Starlink's attention at AMC meetings and in the AMC minutes,
+or, between meetings, via e-mail.
+\end{document}

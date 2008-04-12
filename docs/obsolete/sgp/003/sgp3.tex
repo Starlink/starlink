@@ -1,0 +1,768 @@
+\documentstyle{article}
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink General Paper}
+\newcommand{\stardocinitials}  {SGP}
+\newcommand{\stardocnumber}    {3.1}
+\newcommand{\stardocauthors}   {P M Allan}
+\newcommand{\stardocdate}      {21 June 1990}
+\newcommand{\stardoctitle}     {Network Futures}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\section{Introduction}
+
+Over the history of Starlink, there have been few changes in the way that we
+have provided network access, but the rate of change is likely to increase in
+the near future. The purpose of this document is to outline the directions in
+which things are proceeding so that you can plan for them now.
+
+The intended audience is Starlink node managers. A general familiarity with
+general network concepts and DECnet is assumed.
+
+\section{History}
+
+The original Starlink network consisted of six VAX-11/780 computers that were
+connected via private leased lines in a star topology (hence our name). The hub of the
+network was the VAX at RAL. Each VAX had a single DECnet DDCMP circuit that
+connected it to the VAX at RAL and this provided connections between all six
+machines. There was no Coloured Books software at the time. A disadvantage of
+this arrangement was that if the VAX at RAL went down, the network was dead.
+Around 1982, use of the private lines was discontinued and the physical network
+connections were provided by using SERCnet, the forerunner of our present
+JANET. Unlike the previous point to point connection, this was a packet
+switched network. This required the use of PSI software so that we could run
+DECnet DLM circuits over the network. We also purchased the
+Coloured Books software to provide access to the many computers attached to
+SERCnet that did not use DECnet. The situation between 1983 and 1987 remained
+fairly stable and a typical VAX set up is shown in
+figure~\ref{early-configuration}. 
+
+\begin{figure}[htbp]
+\begin{center}
+\begin{picture}(50,70)
+  \thicklines
+
+  \put(0,20) {\framebox(40,50)}
+  \put(20,75) {\makebox(0,0){VAX-11/780}}
+  \put(0,30) {\line(1,0){40}}
+  \put(0,40) {\line(1,0){40}}
+  \put(0,50) {\line(1,0){40}}
+  \put(20,50) {\line(0,1){20}}
+  \put(0,20) {\makebox(40,10){DUP11}}
+  \put(0,30) {\makebox(40,10){PSI level 2}}
+  \put(0,40) {\makebox(40,10){PSI level 3}}
+  \put(0,50) {\makebox(20,20){DECnet}}
+  \put(20,50) {\makebox(20,20){\shortstack{Coloured\\Books}}}
+  \put(20,10) {\line(0,1){10}}
+  \put(10,0) {\framebox(20,10){Modem}}
+  \put(30,5) {\vector(1,0){10}}
+  \put(41,5) {\makebox(0,0)[l]{JANET}}
+
+\end{picture}
+\caption[]{Network Configuration 1984-1988}
+\label{early-configuration}
+\end{center}
+\end{figure}
+
+In 1987 we began to see VAXclusters being set up, which required the addition
+of ethernet interfaces to our machines. At first these were just to provide a
+connection between the CPUs that formed the cluster, but later on these
+private ethernets were joined to larger site wide ethernets. For example the
+ethernet at RAL has some hundreds of VAXs connected to it and the Manchester
+LAN spreads out as far as Jodrell Bank, although admittedly not at
+10Mbits/sec. The situation was now as shown in figure~\ref{vaxcluster} and
+little had changed as far as off site networking was concerned. 
+
+\begin{figure}[htbp]
+\begin{center}
+
+\begin{picture}(140,80)
+\thicklines
+
+\put(10,10)
+{
+  \begin{picture}(30,70)
+    \put(0,20) {\framebox(30,50)}
+    \put(15,75) {\makebox(0,0){MicroVAX II}}
+    \put(0,30) {\line(1,0){30}}
+    \put(0,40) {\line(1,0){30}}
+    \put(0,20) {\makebox(30,10){DEQNA}}
+    \put(0,30) {\makebox(30,10){Ethernet}}
+    \put(0,40) {\makebox(30,30){DECnet}}
+    \put(15,10) {\line(0,1){10}}
+    \put(5,0) {\framebox(20,10){H4000}}
+  \end{picture}
+}
+
+\put(60,10)
+{
+  \begin{picture}(60,70)
+    \put(0,20) {\framebox(60,50)}
+    \put(30,75) {\makebox(0,0){VAX-11/780}}
+    \put(0,30) {\line(1,0){60}}
+    \put(0,40) {\line(1,0){60}}
+    \put(30,50) {\line(1,0){30}}
+    \put(30,20) {\line(0,1){30}}
+    \put(40,50) {\line(0,1){20}}
+    \put(0,20) {\makebox(30,10){DELUA}}
+    \put(0,30) {\makebox(30,10){Ethernet}}
+    \put(30,20) {\makebox(30,10){DUP11}}
+    \put(30,30) {\makebox(30,10){PSI level 2}}
+    \put(30,40) {\makebox(30,10){PSI level 3}}
+    \put(0,50) {\makebox(40,20){DECnet}}
+    \put(40,50) {\makebox(20,20){\shortstack{Coloured\\Books}}}
+    \put(15,10) {\line(0,1){10}}
+    \put(5,0) {\framebox(20,10){H4000}}
+    \put(45,15) {\line(0,1){5}}
+    \put(35,5) {\framebox(20,10){Modem}}
+    \put(55,10) {\vector(1,0){10}}
+    \put(66,10) {\makebox(0,0)[l]{JANET}}
+  \end{picture}
+}
+
+\put(0,10) {\line(1,0){120}}
+\put(0,8) {\line(1,0){120}}
+\put(121,9) {\makebox(0,0)[l]{Ethernet}}
+
+\end{picture}
+
+\caption[]{VAXcluster Configuration circa 1988}
+\label{vaxcluster}
+
+\end{center}
+\end{figure}
+
+The cluster satellites were DECnet end nodes, so they could communicate with
+all other Starlink machines by routing DECnet traffic through the boot node
+that had the synchronous interface, however, they did not use the Coloured
+Books software, simply due to the cost of providing it on all machines in a
+cluster. This is the stage that most nodes are currently at. They either have a
+single machine configured as shown in figure~\ref{early-configuration} or a
+cluster as shown in figure~\ref{vaxcluster}. 
+
+It is worth noting that until 1989, Starlink was the only project allowed to
+run DECnet over the JANET network. There is an important political point here.
+The Joint Network Team, which is responsible for the running of JANET, do not
+like us running DECnet over JANET. There are two reasons for this. Firstly, it
+is part of their remit to encourage open networking, which they take to mean
+not using manufacturer specific protocols. Secondly, DECnet is less efficient
+in its use of network bandwidth than are the Coloured Books protocols. Against
+this, DECnet provides many functions that we require that Coloured Books do not
+provide. For example, our use of VAXnotes would be severely hampered if we
+could not use DECnet as it would mean logging onto the machine that hosted a
+conference to read anything in that conference. Also utilities such as NETSHOW
+and TALK would be impossible to provide in their current form using Coloured
+Books. It was only because we were already using the functionality of DECnet
+that Coloured Books does not provide that we were allowed to run DECnet over
+JANET at all. We have a long standing commitment to give up using DECnet over
+JANET as soon as Coloured Books provides all the functionality that we require,
+however clearly this will never happen. In fact the JNT seem to have recognised
+this as the HEP community have been allowed to run DECnet over JANET since
+1989. As for the future of networking, this clearly means a migration to the
+use of OSI protocols. Fortunately for us, DECnet will be one of the first
+protocols to move to OSI compliance. This is what DECnet phase~V is all about.
+At present it is not clear when, if ever, Coloured Books will be OSI compliant.
+
+The future involves new hardware such as dedicated X.25 router boxes (DEMSAs
+and the like), Spider gateways, Pink Book software and new acronyms like NSAP.
+For three sites (RAL, Manchester and ROE), the future has already arrived, and
+DECnet/OSI is looming over the horizon. The rest of this document is about the
+new types of hardware and software, when each type is appropriate and how to
+configure it if and when you get it.
+
+\section{PSI and PSI-access}
+
+It is probably best to start off with PSI and PSI-access as we have used PSI
+for many years now. In the beginning, when Starlink used it own private leased
+lines for the physical connection between sites, the connection between sites
+were DDCMP circuits. These provided point to point connections which, as
+mentioned above, suffered from RAL being a single point of failure. It is
+possible to set up redundant circuits, much as we have now with our DLM
+circuits, but with DDCMP this costs a lot of real money in leasing the lines as
+opposed to costing a bit of virtual money in extra network bandwidth. A packet
+switched network such as JANET is much more flexible as it parcels the data up
+into `packets' which are sent out onto the network. The network can dynamically
+route the data packets from source to destination by the best route, so there
+is no single point of failure, nor even a single point of congestion. This is
+rather like the way the telephone network functions. The software that allows
+us to use a packet switched network is PSI. In the figures, PSI is shown as
+being divided into level~2 and level~3. The importance of this division will
+become clearer when Pink Book is considered. Essentially level 3 formats the
+packets and level 2 sends them out onto the network and receives them at the
+other end.
+
+PSI provides a programming interface on top of which other network programs can
+sit. This is what the Coloured Books software does. When used over a PSDN,
+DECnet also uses PSI, although the interaction between the two is more complex
+than figure~\ref{early-configuration} implies. In the simple example shown in
+figure~\ref{early-configuration}, PSI provides the route by which the Coloured
+Books software can send data out onto JANET. This is what is known as native
+mode. It is also possible to set up PSI so that it can pass data between JANET
+and another VAX running the PSI-access software. Note that this is not routing
+in the DECnet sense. The machine running the PSI software is called the
+connector node and the machine running PSI-access is called the access system.
+The machine running the PSI-access software presents the same programming
+interface to software that sits on top of it as does PSI, but it does not have
+the level~2 functions that let it talk to a synchronous interface such as a
+DUP-11. Instead the connection between the access system and the connector node
+is provided by DECnet. A possible two node VAXcluster with Coloured Books on
+each machine is shown in figure~\ref{two-cbs}. Both machines have Coloured
+Books software installed and although one machine accesses the network directly
+whereas the other one accesses the network via the first machine, this is
+transparent to the user. Note that no Starlink cluster has been configured like
+this.
+
+\begin{figure}[htbp]
+\begin{center}
+
+\begin{picture}(140,80)
+\thicklines
+
+\put(0,10)
+{
+  \begin{picture}(60,70)
+    \put(0,20) {\framebox(60,50)}
+    \put(30,75) {\makebox(0,0){MicroVAX II}}
+    \put(0,30) {\line(1,0){30}}
+    \put(0,40) {\line(1,0){60}}
+    \put(30,50) {\line(1,0){30}}
+    \put(30,20) {\line(0,1){30}}
+    \put(40,50) {\line(0,1){20}}
+    \put(0,20) {\makebox(30,10){DELQA}}
+    \put(0,30) {\makebox(30,10){Ethernet}}
+    \put(0,40) {\makebox(30,30){DECnet}}
+    \put(30,40) {\makebox(30,10){PSI level 3}}
+    \put(40,50) {\makebox(20,20){\shortstack{Coloured\\Books}}}
+    \put(15,10) {\line(0,1){10}}
+    \put(5,0) {\framebox(20,10){H4000}}
+  \end{picture}
+}
+
+\put(70,10)
+{
+  \begin{picture}(60,70)
+    \put(0,20) {\framebox(60,50)}
+    \put(30,75) {\makebox(0,0){VAX-11/780}}
+    \put(0,30) {\line(1,0){60}}
+    \put(0,40) {\line(1,0){60}}
+    \put(30,50) {\line(1,0){30}}
+    \put(30,20) {\line(0,1){30}}
+    \put(40,50) {\line(0,1){20}}
+    \put(0,20) {\makebox(30,10){DELUA}}
+    \put(0,30) {\makebox(30,10){Ethernet}}
+    \put(30,20) {\makebox(30,10){DUP11}}
+    \put(30,30) {\makebox(30,10){PSI level 2}}
+    \put(30,40) {\makebox(30,10){PSI level 3}}
+    \put(0,50) {\makebox(40,20){DECnet}}
+    \put(40,50) {\makebox(20,20){\shortstack{Coloured\\Books}}}
+    \put(15,10) {\line(0,1){10}}
+    \put(5,0) {\framebox(20,10){H4000}}
+    \put(45,15) {\line(0,1){5}}
+    \put(35,5) {\framebox(20,10){Modem}}
+    \put(55,10) {\vector(1,0){5}}
+    \put(66,10) {\makebox(0,0)[l]{JANET}}
+  \end{picture}
+}
+
+\put(0,10) {\line(1,0){120}}
+\put(0,8) {\line(1,0){120}}
+\put(121,9) {\makebox(0,0)[l]{Ethernet}}
+
+\end{picture}
+
+\caption[]{VAXcluster with CBS on both nodes}
+\label{two-cbs}
+
+\end{center}
+\end{figure}
+
+To set up PSI-access, an entry is made
+in the X25-ACCESS module of the NCP database to tell the access node which
+machine is the connector node. The connector node knows about the access
+system by defining an appropriate destination in its X25-SERVER module.
+This is fully described in the PSI documentation and is usually performed
+by the PSI{\tt\_}SET{\tt\_}UP.COM command procedure when the software is
+installed.
+
+So to summarize, PSI lets a VAX communicate with a WAN via
+its own synchronous interface whereas PSI-access allows a VAX to
+communicate with a WAN via its DECnet connection to another machine and it
+is this other machine that connects directly to the WAN. While this DECnet
+connection will usually be made via ethernet, this is not necessary. For
+example, we could have evolved to a situation in which we still ran DDCMP
+circuits over our old leased lines and access to JANET and the outside
+world was provided by having PSI on a VAX at RAL and PSI-access on
+machines at other sites. It is left as an exercise to the reader to
+consider the pros and cons of this hypothetical configuration.
+
+To summarize the summary, you use PSI when you have a synchronous interface in
+your microVAX and you use PSI-access when you don't.
+
+\section{Pink Book}
+
+Pink Book is also known as LLC2. I think the name Pink Book is confusing as
+unlike Grey Book, Blue Book and Yellow Book (these are what make up the
+Coloured Books), it does not provide any new types of service at the user
+level. It simply provides the same services, but now over ethernet. LLC2 is
+actually an extra component of PSI, and is best described by looking at
+figure~\ref{llc2}. You will see that LLC2 is an alternative to PSI's normal
+level 2 functionality. Whereas PSI level 2 normally talks to a synchronous
+interface such as a DSV-11, LLC2 talks to the ethernet interface. This lets us
+use X.25 protocols over the ethernet. For example, you can use POST to send
+mail to any machine on the ethernet that uses Coloured Books software. While
+this can be useful, the main use of LLC2 within Starlink is likely to be the
+ability to access JANET via an X.25 {\bf--} ethernet gateway such as the Spider
+gateway 200 which is currently being installed on several campuses. The
+rationale behind this is that most machines need ethernet interfaces for other
+purposes, so using them to provide access to JANET means that individual
+machines no longer need a synchronous interface. Spider gateways need to be
+able to translate NRS names to DTE addresses, but they have a limited memory
+size and can only hold about 200 addresses. In practice, they need to have a
+second machine available with much more storage capacity on disk that can
+provide storage for the whole of the NRS table.
+
+{\bf N.B.} You cannot set up DLM circuits over an LLC2 line. This means that
+you cannot connect to the Starlink DECnet just using PSI and LLC2. There has to
+be a synchronous interface somewhere in your system, even if it is just part of
+a DEMSA.
+
+\begin{figure}[htbp]
+\begin{center}
+
+\begin{picture}(100,70)
+\thicklines
+  \put(20,20) {\dashbox{2.5}(70,40)}
+  \put(55,65) {\makebox(0,0){VAX PSI}}
+  \put(45,45) {\framebox(20,10){Level 3}}
+  \put(30,25) {\framebox(20,10){LLC 2}}
+  \put(40,35) {\line(1,1){10}}
+  \put(60,25) {\framebox(20,10){Level 2}}
+  \put(70,35) {\line(-1,1){10}}
+  \put(40,25) {\line(0,-1){20}}
+  \put(40,5) {\vector(-1,0){10}}
+  \put(29,5) {\makebox(0,0)[r]{Ethernet}}
+  \put(70,25) {\line(0,-1){20}}
+  \put(70,5) {\vector(1,0){10}}
+  \put(81,5) {\makebox(0,0)[l]{PSDN}}
+\end{picture}
+
+\caption[]{VAX PSI and LLC2}
+\label{llc2}
+
+\end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+
+\begin{picture}(140,80)
+\thicklines
+
+\put(30,10)
+{
+  \begin{picture}(60,70)
+    \put(0,20) {\framebox(60,50)}
+    \put(30,75) {\makebox(0,0){VAX-11/780}}
+    \put(0,30) {\line(1,0){60}}
+    \put(0,40) {\line(1,0){60}}
+    \put(20,50) {\line(1,0){40}}
+    \put(40,20) {\line(0,1){10}}
+    \put(20,30) {\line(0,1){20}}
+    \put(40,30) {\line(0,1){10}}
+    \put(40,50) {\line(0,1){20}}
+    \put(0,20) {\makebox(40,10){DELUA}}
+    \put(40,20) {\makebox(20,10){DUP11}}
+    \put(0,30) {\makebox(20,10){Ethernet}}
+    \put(20,30) {\makebox(20,10){LLC2}}
+    \put(40,30) {\makebox(20,10){PSI level 2}}
+    \put(20,40) {\makebox(40,10){PSI level 3}}
+    \put(0,50) {\makebox(40,20){DECnet}}
+    \put(40,50) {\makebox(20,20){\shortstack{Coloured\\Books}}}
+    \put(15,10) {\line(0,1){10}}
+    \put(5,0) {\framebox(20,10){H4000}}
+    \put(45,15) {\line(0,1){5}}
+    \put(35,5) {\framebox(20,10){Modem}}
+    \put(55,10) {\vector(1,0){5}}
+    \put(66,10) {\makebox(0,0)[l]{JANET}}
+  \end{picture}
+}
+
+\put(0,10) {\line(1,0){120}}
+\put(0,8) {\line(1,0){120}}
+\put(121,9) {\makebox(0,0)[l]{Ethernet}}
+
+\end{picture}
+
+\caption[]{VAX with PSI and LLC2}
+\label{everything}
+
+\end{center}
+\end{figure}
+
+\section{PSI-access versus LLC2}
+
+Both PSI-access and LLC2 manage to send data out via an ethernet connection
+rather than a synchronous interface, so there is often some confusion as to how
+the two differ. The most important point is that the two cannot talk to each
+other. PSI-access is a DEC proprietory product and will only work between DEC
+equipment. LLC2 is a more open protocol. If you are running PSI-access, then
+the only thing that you can talk to is a PSI connector node (a VAX or a DEMSA).
+If you are running LLC2, then you can only talk to another machine that is
+running LLC2. In practice, you would use PSI-access to directly connect to
+another part of your own system. The word `system' here is deliberately vague,
+but probably consists of the VAX computers and DEMSAs that you control. LLC2
+would be used to directly connect to a much wider range of computers, not all
+of them made by DEC. By setting up the appropriate routing, both PSI-access and
+LLC2 can be used to contact computers further afield, but as mentioned above,
+you cannot run DECnet circuits over LLC2.
+
+\section{X.25 routers}
+
+An X.25 router is a dedicated machine that provides a connection between an
+ethernet and a WAN. The one currently in use at a few Starlink sites is the
+DEMSA. This machine provides the functionality of a microVAX CPU, some memory,
+an ethernet interface and two DSV-11s. It runs the X25router software, not VMS,
+however, in practice it looks just like a DECnet node and a PSI connector node.
+Most of its operations can be controlled via NCP. For a site where there are
+several machines that require access to JANET via means other than a Spider
+gateway, a DEMSA can be an economical solution as it saves the cost of a
+synchronous interface for each machine. Since LLC2 does not support DECnet DLM
+circuits, it cannot be used to provide a DECnet connection and another  method
+must be found. At Manchester a DEMSA was purchased to be shared jointly between
+Astronomy, Jodrell Bank and High Energy Physics. This choice was made because
+both Astronomy and Jodrell Bank were having unibus based machines replaced with
+Q-bus based machines, meaning that our old DUP-11s were redundant. The cost of
+buying Q-bus synchronous interfaces was about the same as our share of buying a
+DEMSA. A DEMSA has the additional benefit that it takes the level~2  DECnet
+routing off our Vaxs, thereby reducing the load on the CPU slightly. In our
+case, there was also the additional consideration that we wanted to upgrade our
+network line speed from 9.6K baud (or 7.2K baud in the case of Jodrell Bank) to
+64K baud. While we managed to persuade the MCC to give us one fast line, the
+prospect of getting three was distinctly small. By purchasing a DEMSA, we only
+need a single connection point to JANET. DEMSAs have further advantages in that
+they never need to go down for disk backups and since they are inherently
+simple machines, they should very rarely break down. 
+
+There are various hardware and software configurations available. The hardware
+is a DEMSA or a DEMSB. These are also known as DEC microservers. These come
+bundled with either the DECrouter 2000, X25router 2000, X25portal 2000 or
+DECnet/SNA gateway software. Whereas a DEMSA has four synchronous interfaces
+that run at up to 256K baud, a DEMSB has only a single one that runs at up to
+64K baud (19.2K baud over X.25). A DEMSB can not be used as a DECnet level 2
+router and it supports only one DLM circuit. The packaging of the software
+will be changed when DECnet moves to phase~V. Both the DEMSA and DEMSB are
+DECnet phase~V compatible.
+
+\section{DECnet phase V}
+
+This is also known as DECnet/OSI as it will use OSI protocols. This means that
+it will be able to communicate with any other computer that runs network
+software based on OSI protocols, not just those that run DECnet. DECnet/OSI is
+a major change to DECnet and will mean a change in the way that we use it. At
+present a DECnet node (a VAX or a dedicated router) can be an end node, a
+routing node (level 1 router) or an area router (level 2 router). With
+DECnet/OSI there will be end systems or intermediate systems. Initially it will
+not be possible to use a VAX as an area router, and indeed it may never be
+possible. Since area routing will be a much more CPU intensive operation than
+it is now, it should be moved off VAXs in any case. A DEMSA will make a
+perfectly good DECnet area router, but in phase~V, it will not be possible to
+use a DEMSA both as a DECnet node and as a PSI connector node, as can be done
+at present. Essentially, this is due to a DEMSA not having enough memory to
+support both functions, but DEC will also be packaging the software differently.
+If you use a DEMSA to provide both your DECnet connection and your PSI
+connection to JANET at present, then you may need to purchase a second DEMSA
+when we move to DECnet/OSI. Another possibility is to use your current DEMSA to
+provide your DECnet connection and to use a Spider gateway, if your site has
+one, to provide your PSI (and hence Coloured Books) connection.         
+
+\section{What does {\em my} site need?}
+
+If you are at a small
+university site and have the only system that needs a DECnet connection to
+the Starlink/SPAN/HEP network, then a synchronous interface, such as a
+DSV-11, in your VAX is still appropriate. This will allow you to connect to
+both the Starlink/SPAN/HEP DECnet network and to JANET at up 64K baud. If
+there are several machines that require a DECnet connection, then a DEMSA
+may be cost effective, but remember that you will need two DEMSAs (or more
+likely, some equivalent hardware) when we move to DECnet/OSI.
+
+A synchronous interface in your microVAX will always be sufficient to provide
+all of your network connectivity, although it is not necessarily the most
+cost effective solution. LLC2 software plus access to a Spider gateway is
+never sufficient by itself as you cannot run DECnet (phase~IV or phase~V)
+this way.
+
+There are three  main configurations that seem likely to be in
+use in the future. A small site will have a synchronous interface in a
+microVAX. Larger sites will have a DEMSA plus a Spider gateway or two
+DEMSAs. At present, many University sites are getting Spider gateways, so
+as long as your University has a campus wide ethernet, you will be able
+to use this to provide a fast PSI connection on to JANET. While we are
+still at DECnet phase IV, the software required in each of the above
+cases is
+
+\begin{itemize}
+\item PSI on the microVAX
+\item PSI-access and PSI plus LLC2 on the microVAX and X25router on the DEMSA
+\item PSI-access on the microVAX and X25router on the two DEMSAs.
+\end{itemize}
+
+As mentioned above, the packaging of the software will be changed with
+DECnet/OSI. If you have two DEMSA (in preparation for DECnet/OSI), but no
+Spider gateway, then you do not need PSI plus LLC2 to communicate around
+Starlink and the wide world, however, you may still want them to access other
+non-DECnet computers on your ethernet. 
+
+\section{A Case Study}
+
+To try to see how all the components fit together, let us consider an actual
+site, the Department of Astronomy at Manchester University. This site currently
+has one of the more complex arrangements of network software and it may be
+instructive to see how this came about. Prior to the end of 1989, the site was
+as shown in figure~\ref{vaxcluster}. The cluster consisted of a VAX-11/750 and
+several microVAXs. The 750 had a DUP-11 as its synchronous interface. This was
+connected to the MCC CPSE and thence to the JPSE via a pair of 9600 baud
+modems. The software on the 750 consisted of PSI, Coloured Books and Red Book.
+The University purchased LLC2 for the 750 as part of a campus wide movement
+towards using the Spider gateways and away from each system having its own
+connection to the CPSE. It is worth recalling that the University has a
+commitment to provide us with X.25 access for the Coloured Books software, but
+no requirement to provide us with DECnet facilities. When the 750 was replaced
+by a dual host microVAX 3400 system, no new synchronous interface was purchased
+as we had purchased a DEMSA instead. The network software on one of the
+microVAX 3400s now consists of PSI-access, PSI plus LLC2 and Coloured Books.
+The DEMSA plus DECnet provides us with off site access to the Starlink DECnet.
+PSI-access is necessary to provide X.25 access for the microVAX 3400 to JANET
+via the DEMSA and PSI plus LLC2 is necessary to provide X.25 access to machines
+on our local ethernet and to machines on JANET if we go via the Spider gateway.
+At present, nearly all of the network traffic to and from JANET goes through
+the DEMSA and the Spider gateway is only used for test purposes. This is
+because the original configuration of the Spider gateways did not allow the
+registration of more than 200 site names. This restriction has now been
+overcome, however, it is still more convenient to use the DEMSA than the Spider
+gateway. 
+
+When we make the transition to DECnet/OSI, the DEMSA will not be able to
+handle both DECnet and X.25 protocols. The way that this situation will
+probably be handled will be to use the DEMSA for DECnet traffic as at present
+and to use the Spider gateways for X.25 traffic. At that point the PSI-access
+software would be redundant. 
+
+\section{The Colour Books authorization file}
+
+One of the things that causes most difficulty with different network
+configurations is the registering of sites in the CBS network authorization
+database (NAD). The main question is whether you are going through a Spider
+gateway or not. In simplest case of both the local and remote sites having a
+configuration like figure~\ref{early-configuration} or \ref{vaxcluster}, then
+an entry in your NAD will be something like
+
+\begin{verbatim}
+    ADD SITE UK.AC.LEICESTER.STARLINK JANET "" -
+            "FTP=000021213000.FTP", -
+            "JTMP=000021213000.JTMP", -
+            "MAIL=000021213000.FTP.MAIL", -
+            "X29=000021213000"-
+            /ALIAS = (-
+            "UK.AC.LE.STAR"-
+            )-
+            /FAST_SELECT-
+            /NOREV_CHARGE-
+            /NORESTRICTED-
+            /TRUSTED-
+            /AUTO_REVERSE-
+            /WINDOW_SIZE=4-
+            /PACKET_SIZE=256
+\end{verbatim}
+
+This means that the Starlink node at Leicester should be contacted at the JANET
+address (DTE) of 000021213000. In this case, the network name given on the
+first line is JANET, however this name can be anything chosen by the system
+manager. All that is necessary is that it agrees with one of the network names
+defined in the NCP X25-PROTOCOL module on your system.
+
+If the remote system is running PSI-access and does not have a direct network
+connection, then all that is necessary is to add the appropriate subaddress to
+the DTE. In the case of Manchester, the microVAX is accessed through the DEMSA,
+so the NAD entry is this.
+
+\begin{verbatim}
+    ADD SITE UK.AC.MANCHESTER.ASTRONOMY.STARLINK JANET "" -
+            "FTP=00001010900111.FTP", -
+            "JTMP=00001010900111.JTMP", -
+            "MAIL=00001010900111.FTP.MAIL", -
+            "X29=00001010900111"-
+            /ALIAS = (-
+            "UK.AC.MAN.AST.STAR"-
+            )-
+            /FAST_SELECT-
+            /NOREV_CHARGE-
+            /NORESTRICTED-
+            /TRUSTED-
+            /AUTO_REVERSE-
+            /WINDOW_SIZE=4-
+            /PACKET_SIZE=256
+\end{verbatim}
+
+It is not absolutely necessary to have a subaddress when using PSI-access as a
+particular machine may be configured to field calls with no subaddress, but it
+is more usual to have the subaddress present.
+
+Things start to get more complicated when a Spider gateway is involved and it
+depends on whether the gateway is at your site or the remote site. The
+appropriate entry in the NAD to make a call from Manchester to RAL out through
+the Spider gateway at Manchester is  
+
+\begin{verbatim}
+    ADD SITE UK.AC.RUTHERFORD.STARLINK CONS "08003900309D7E" -
+            "FTP=503453431433351450441451523350", -
+            "JTMP=505053431433351450441451523350", -
+            "MAIL=503953431433351450441451523350", -
+            "X29=505653431433351450441451523350"-
+            /ALIAS = (-
+            "UK.AC.RL.STAR"-
+            )-
+            /FAST_SELECT-
+            /NOREV_CHARGE-
+            /NORESTRICTED-
+            /TRUSTED-
+            /AUTO_REVERSE-
+            /WINDOW_SIZE=4-
+            /PACKET_SIZE=256
+\end{verbatim} 
+
+There are several new points here. Firstly the network name is now CONS, not
+JANET. This is the network name at Manchester for making a call using LLC2
+rather than using PSI-access. Secondly the first line now contains an explicit
+primary service, which is the ethernet address of the Spider gateway. This is
+also known as the MAC address. Actually the final two hexadecimal digits are
+not part of the ethernet address, but are the local service access point
+(LSAP). These are usually 7E (decimal 126) by convention. Note that when
+setting up the LLC2 software, it is quite easy to get an LSAP of zero instead
+of 7E. You should watch out for this. Finally the facility expressions have
+become more complicated. These are actually an ASCII like coding of the
+facility and the site name. The codes are the ASCII code for a character, less
+32. The first pair of digits are always 50 and indicate a local NSAP. The next
+pair are the code for the letter B for blue book (FTP), G for grey book (mail),
+R for red book (JTMP) or X for X29. Subsequent pairs of digits are the codes
+for (in this case) UK.AC.RL.STAR. 33 is the code for A, 34 for B, etc. and 14
+is the code for a dot. This local NSAP is sent to the Spider gateway which
+forwards the call onto the appropriate place. Although this seems complicated
+at first, it does have the advantage that you do not need to know the addresses
+of remote sites to be able to call them as the gateway knows the addresses. If
+an address changes, only the gateway has to be updated, not your NAD.
+
+Secondly there is the type of entry needed when you are making a call using
+normal PSI or PSI-access at your end, but there is a Spider gateway at the
+remote end. In this case the entry in the NAD is of the following type. The
+network name is now JANET, since that is how we are sending out the call.
+The first part of the facility expression contains the JANET address of the
+Spider gateway at the remote site and the last part of the facility expression
+is the NSAP of the computer that you are trying to contact.
+
+\begin{verbatim}
+    ADD SITE UK.AC.CAMBRIDGE.WEST.ASTRONOMY JANET "" -
+            "FTP=000008020300.ISO.388261100000829030020277", -
+            "JTMP=000008020300.ISO.388261100000829030020677", -
+            "MAIL=000008020300.ISO.388261100000829030020377", -
+            "TS29=00000802030005.ISO.388261100000829030020077", -
+            "X29=000008020300"-
+            /ALIAS = (-
+            "UK.AC.CAM.WEST.AST"-
+            )-
+            /FAST_SELECT-
+            /NOREV_CHARGE-
+            /NORESTRICTED-
+            /TRUSTED-
+            /AUTO_REVERSE-
+            /WINDOW_SIZE=4-
+            /PACKET_SIZE=256
+\end{verbatim}
+
+Finally there is the case of contacting a machine on your local ethernet.
+Whether or not you are using the Spider gateway to contact sites on JANET, you
+clearly want to keep calls to other local machines on the ethernet and not send
+them out onto JANET, only to have them come back onto the ethernet. An example
+of contacting another machine on the Manchester campus LAN is
+
+\begin{verbatim}
+    ADD SITE UK.AC.MANCHESTER-COMPUTING-CENTRE.VMSFE CONS "AA0004000CE87E" -
+            "FTP=388261100001000003030102", -
+            "JTMP=388261100001000003030104", -
+            "MAIL=388261100001000003030103", -
+            "X29=388261100001000003030101"-
+            /ALIAS = (-
+            "UK.AC.MCC.VMSFE"-
+            )-
+            /FAST_SELECT-
+            /NOREV_CHARGE-
+            /NORESTRICTED-
+            /TRUSTED-
+            /AUTO_REVERSE-
+            /WINDOW_SIZE=4-
+            /PACKET_SIZE=256
+\end{verbatim}
+
+The fact that the other machine is also a VAX is not particularly important.
+This time the primary address is the ethernet address of the machine that you
+are contacting. If the remote machine is a VAX, this can be either the physical
+address (the AA-00- one) or the hardware address (the 08-00- one). The facility
+expression now contains the real NSAP of the remote computer. At Manchester the 
+last two digits are a code to indicate the type of facility, however, this is
+not in use at all sites. Cambridge, at least, has a different suffix to
+indicate the type of facility at present.
+
+
+\appendix
+\section{Acronyms}
+\begin{quote}
+\begin{itemize}
+\item[CPSE] Campus Packet Switch Exchange
+\item[DDCMP] DIGITAL Data Communications Message Protocol
+\item[DLM] Data Link Mapping
+\item[ISO] International Standards Organisation
+\item[JANET] Joint Academic Network
+\item[JPSE] JANET Packet Switch Exchange
+\item[MAC] Medium Access Control
+\item[LAN] Local Area Network (often synonymous with ethernet)
+\item[LLC] Logical Link Control
+\item[LSAP] Local Service Access Point (an ISO address)
+\item[NSAP] Network Service Access Point (an ISO address)
+\item[OSI] Open System Interconnection
+\item[PSDN] Packet Switched Data Network
+\item[PSI] Packetnet System Interface
+\item[WAN] Wide Area Network
+\end{itemize}
+\end{quote}
+
+\end{document}

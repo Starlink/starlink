@@ -1,0 +1,727 @@
+\documentstyle {article} 
+\markright{SGP/13.3}
+\setlength{\textwidth}{153mm}
+\setlength{\textheight}{220mm}
+\setlength{\oddsidemargin}{3mm}
+\setlength{\evensidemargin}{3mm}
+\pagestyle{myheadings}
+
+\begin{document}
+\thispagestyle{plain}
+\noindent
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill SGP/13.3\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf Starlink General Paper 13.3}
+\begin{flushright}
+R J Dickens, R A E Fosbury, P T Wallace\\
+26 March 1987
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{10mm}
+\begin{center}
+{\Large\bf Starlink Applications Software Development}
+\end{center}
+\vspace{10mm}
+\section {INTRODUCTION}
+The purpose of this paper\footnote{This is a minor revision by M D Lawden of a
+paper first issued on 7th November 1980. No attempt has been made to bring it
+fully up-to-date.} is to announce to the astronomical community the
+present plans for the development of applications software within Starlink.
+The paper follows widespread consultation with astronomers---through a survey
+carried out in December 1979, visits to many university departments and
+establishments during the first half of 1980 and a workshop held in June 1980.
+In some areas we can be more specific than others and no doubt plans and
+priorities will undergo major revision as time passes.
+We believe that widespread and up-to-date knowledge of the intentions and
+progress of work on applications is essential if we are effectively to harness
+the effort and expertise available amongst UK astronomers and to maintain
+uniformity of style and high standards everywhere.
+Comments on these proposals and continual feedback as Starlink develops will
+therefore be greatly appreciated.
+
+By `Starlink software' we mean generally useful software, at some
+level or other centrally supported, and conforming to Starlink conventions.
+In most cases (certainly for image processing programs) Starlink software will
+be designed for use in the Starlink software environment; ie.\ using the
+Starlink subroutine interfaces (which have been implemented---see reference
+1), the adopted Starlink graphics package (GKS) and the Starlink Command
+Language (SCL), both yet to be implemented.
+Individual users are, of course, free to adopt whatever procedures they prefer
+in order to achieve their immediate astronomical objectives.
+However, the use of ad hoc techniques in place of recognised Starlink methods
+will seriously compromise ease of use and uniformity, and will preclude
+centralised support.
+It should also be pointed out that the Starlink Command Language will not be
+usable without the subroutine interfaces.
+Use of the latter (which essentially define how programs should handle
+interaction and do much of their bulk input/output) will be straightforward and
+is the first essential step for compatibility with Starlink.
+All prospective programmers are strongly urged to study reference 1 which
+describes the subroutines.
+This may be obtained from any site manager who will also be able to offer
+advice.
+
+It is Starlink's objective to respond to the real needs of the astronomical
+community with well-designed and properly supported applications software,
+presented in a uniform style and with ease of use combined with flexibility.
+\section {THE MATURE SYSTEM}
+\subsection {Overview}
+The main components of the fully-fledged system are illustrated in figure 1.
+The DEC VAX computer system will be run under the standard VMS operating system
+and associated utilities, augmented by extensive subroutine libraries
+(eg.\ NAG), a graphics package (GKS) and the Starlink software environment
+(SSE).
+Other program development tools (for example language preprocessors) may also
+be supported as Starlink standards.
+Operating within this environment will be the ensemble of applications software,
+a central feature of which will be the programs for standard manipulations of
+n-dimensional images, including the instrument-independent components of the
+major data reduction and analysis applications, for example spectroscopy,
+surface and stellar photometry, and polarimetry.
+Data of great variety will be `accepted' from a wide range of astronomical
+instruments and converted into the standard internal image format for access
+via the Starlink subroutines.
+Another group of programs will perform specialised pre-processing of data from
+various instruments (eg.\ echelle spectrographs, CCD cameras, radio telescopes).
+There will be a variety of astronomical utility programs---astrometry,
+starfield overlay plotting, earth velocity corrections, etc.  Many Starlink
+programs will require  standard information---wavelength tables, star
+catalogues, etc.---and this will be provided.
+Access to such information through a centrally maintained and supported database
+might be Starlink's first step in what promises to be a major growth area which
+may eventually encompass very large databases (for example observing archives)
+which would be stored centrally and accessed through the network links.
+\subsection {Progress to maturity}
+In many biological organisms, gaining full maturity occupies a considerable
+fraction of the total lifespan.
+This is also true of many complex computer systems and it it expected that
+Starlink will be no exception.
+We outline below the various stages (which are, in various degrees, overlapped) 
+envisaged in the development of Starlink applications so that the effort to be
+allocated to each area can be seen in perspective.
+However, the timescale is long and strategies will inevitably change in the
+light of experience.
+The various development stages are given below: details of the different
+categories of application may be found in section 3.
+\begin{enumerate}
+\item Initial implementation and development of various existing data reduction
+packages on an ad hoc basis.
+This is necessary while system software (environment, graphics, special drivers,
+etc.) is under development; it provides experience with the VAX and provides
+facilities useful to the astronomer almost immediately.
+We are currently in this first stage of development and many packages are
+productively running on Starlink VAXs.
+Of course, ad hoc development on Starlink will continue indefinitely and
+Starlink-endorsed implementation of stand-alone systems (eg.\ IDL, TVS) will go
+on for another year at least.
+Distribution and support of certain existing ad hoc packages will be undertaken
+by Starlink as an interim measure in especially urgent cases (for example the
+reduction of IPCS data).
+\item Now that the interfaces to parameters and bulk data have been implemented,
+we are entering the second stage of development in producing within Starlink a
+few supported primitive data manipulation programs.
+This will enable us to test the software interfaces, demonstrate how they work
+and gain experience with applications we understand relatively well.
+This phase will last perhaps three months.
+During this period some basic astronomical utilities and subroutines will be
+provided; work has already begun on the suite of Starlink programs that will
+read data tapes in FITS format (reference 2) and various foreign formats
+(IPCS, SDRSYS, etc.), creating images in Starlink internal format.
+\item This may be followed by an implementation of an existing 1D/2D package
+using the Starlink environment, further testing the software interfaces while
+providing a useful facility at low cost.
+\newpage
+\vspace{110mm}
+\begin{center}
+STICK FIGURE 1 HERE
+\end{center}
+\newpage
+\item The Starlink 1D/2D basic data reduction package will be implemented, in
+many cases by adopting or refining an already running program and abandoning
+others which no longer have unique roles.
+As this process (which it is hoped will be underway by early 1981) progresses,
+a Starlink system of uniform appearance to the user will emerge and the scars
+left by the earlier ad hoc phase will fade.
+A similar process will occur within the utility area.
+\item We now enter the long term development stage where facilities tailored to
+particular instruments (including measuring machines), more advanced image
+processing, and specialised data analysis packages appear.
+During this period, continual development, refinement and rationalisation will
+take place.
+This is the longest and most important phase in the development of Starlink
+applications software.
+\item We expect an increasing sophistication in Starlink as effort becomes
+available to take advantage of opportunities provided in a variety of fields.
+For example the need to access standard catalogues should lead to
+experimentation with database techniques.
+More advanced and rapid communications technology may allow access to large
+central databases, as well as to other computers (eg.\ ICF, DAP) and perhaps to
+data gathering facilities (AAT, LPO).
+\end{enumerate}
+There is expected to be increasing international contact during the development
+of Starlink.
+There will be great benefits if a high level of software standardisation is
+achieved between Starlink and other groups.
+\section {CATEGORIES OF APPLICATIONS SOFTWARE}
+In this section we give details of the broad classifications of applications
+software shown in figure 1.
+\subsection {Data acceptance and preliminary reduction}
+The programs for data acceptance into the standard internal image format range
+from simple tape reading programs to difficult and complex preliminary
+reduction tasks such as the extraction of echelle orders from microdensitometer
+scans of a photographic plate.
+The data acceptance programs will in general be specific to an individual
+instrument.
+We expect that Starlink will become less and less directly concerned with these
+special-to-instrument problems since, as telescope instrumentation computers
+become more powerful, a greater proportion of the data leaving the observatory
+will have had its own peculiar instrumental distortions removed, either in real
+time or after local preliminary reduction.
+
+Starlink has already decided to adopt FITS (Flexible Image Transport System ---
+see reference 2) as a standard data format, both on tape and as a model for
+internal representation on disc (reference 1).
+We strongly urge users to adopt a FITS representation of image data whenever
+possible, even if not using Starlink software.
+
+The chief problem in converting non-FITS data into Starlink internal form will
+be the choosing of suitable FITS keywords to identify the various pieces of
+header information associated with the different data sources.
+It will be necessary to liaise with leading FITS users elsewhere in the world
+to try and agree on the form of optional keywords in cases where the
+information is likely to have a wide applicability.
+
+We are aware that not all astronomical data are best expressed as numbers
+regularly distributed throughout an n-dimensional data array.
+Another frequently encountered form is a list of events or objects, each having
+an associated set of parameters.
+An example is an X-ray `image' from the Einstein observatory which consists of
+a list of photon detections, each event being tagged with an x,y position, an
+energy, and an arrival time.
+This {\em can} be represented as a 4096 x 4096 x 32 x t array (where t is the
+experiment duration divided by the time resolution), but this would usually be
+grossly inefficient since the array would be almost empty.
+Another example is the type of output generated by some of the plate-scanning
+machines---a list of objects, each with a position, brightness and shape.
+A simpler case is the string of photon arrival time from the AAT
+ultra-high-speed photometer.
+Although FITS is in principle capable of handling these data, it may not always
+be the most convenient or efficient format to use.
+
+Some important data sources are listed below with remarks on the required
+acceptance programs:
+\begin{description}
+\begin{description}
+\item [IPCS]: Image Photon Counting Systems are currently operating at the AAT
+and SAAO, and the Boksenberg travelling machine also operates in various
+locations.
+Each of these systems has its own slightly different data format evolving
+slowly with time.
+In addition, the AAO also exports IPCS data in FITS or its own SDRSYS format.
+\item [IDS]: Most Image Dissector Scanner data analysed in the UK come from the
+AAO in SDRSYS format.
+In addition, Starlink must be able to accept data from the ESO IDS (in IHAP or
+FITS format) and from Kitt Peak (also presumably in FITS).
+\item [Other spectroscopic detectors]: Examples include the Las Campanas
+intensified reticon (on Tandberg cassette) and the Mount Stromlo PCA (in FITS).
+\end{description}
+\end{description}
+Aside from the relatively simple problem of reading the tapes, the particular
+processes special to these detectors are those of coincidence correction,
+flat-fielding, and correction for geometrical distortion.
+The currently outstanding problem is that of the proper and efficient handling
+of the geometric correction of the large 2D spectroscopic images produced by the
+IPCS.
+This is one of the first tasks of the spectroscopy SIG.
+\begin{description}
+\begin{description}
+\item [IUE]: The reduction of data from the International Ultraviolet Explorer
+satellite poses its own set of problems.
+There are two stages in which Starlink may play a role.
+The first is the geometric and photometric correction of the raw images and the
+assigning of wavelength scales.
+The NASA-supplied software is known to contain errors, making investigators
+suspicious of the pre-calibrated data.
+This software is now being completely rewritten by NASA and it may not be
+necessary for Starlink to consider providing its own software for handling the
+raw data; the IUE SIG will make its own recommendations on this matter.
+The second problem is that of the extraction of the spectra from the corrected
+echelle images.
+Here there are already a number of competing schemes and, although this is a
+problem common to 2D detectors used for spectroscopy, there is no doubt that the
+IUE problem is especially difficult.
+\item [Echelle extraction]: The problem of extracting spectra from the image
+produced by echelle or echelette devices is not restricted to IUE.
+The AAT RGO spectrograph has an echelette mode and the Cassegrain spectrograph
+on the La Palma 2.5m will also include this option.
+Two different approaches to this problem have been tried.
+The first is to assign the extraction problem to the detector (this could in
+principle be done with the IPCS) or the plate measuring machine (eg.\ the PDS)
+and control the scan to read the relevant data directly.
+The second is to accept a complete 2D image and, like IUE, leave the computer
+to do all the work.
+It is likely that the second method will become the norm.
+\item [Plate scanning machines]: The plate scanners in most general use are the
+PDS microdensitometer (at RGO and AAO), the Cosmos machine (ROE) and the APM
+(Cambridge).
+All of these machines have a very large potential data output rate when used to
+digitise plates onto magnetic tape and on Cosmos and APM it is usual instead to
+preprocess the data in special hardware, outputting lists of parameterised
+objects as discussed above.
+If the machines do produce pixel data, there is the relatively minor problem of
+assembling them into a Starlink image, plus the much more difficult problems of
+defect removal and correction for the emulsion characteristics.
+\item [Taurus]: This is a scanning, imaging Fabry-Perot device which, in
+conjunction with a suitable 2D detector (namely the IPCS), produces data cubes
+that can be rearranged into 3D arrays with two spatial coordinates and one
+wavelength coordinate.
+The onerous rearrangement process is already being performed on a Starlink VAX.
+The resulting monochromatic images, as individuals, present no special
+processing difficulties, but there are formidable and unsolved problems of
+storage and display for the 3D arrays themselves.
+\item [Other non-photographic detectors]: The IPCS is already used as an area
+photometer, both as part of Taurus and directly with broad and narrow filters.
+In the near future there are going to be several more 2D electronic detectors
+available to the UK community.
+They will each have their own particular problems of flat-fielding and defect
+removal (eg.\ cosmic ray event removal in CCD pictures).
+Quite soon we expect one of the staple diets of Starlink to be CCD images in
+FITS format.
+\item [Surface polarimetry]: The Durham polarimeter uses the McMullan
+electronographic camera to produce sets of matched pictures which are scanned
+with a PDS.
+The preprocessing is concerned largely with field matching and defect removal.
+\item [Synthesis radio telescopes]: Most operating synthesis telescopes have
+their own tailored systems for handling data in the Fourier plane, calibrating
+and performing the 2D transforms.
+However, once the maps are made Starlink clearly has a role to play in
+interactive analysis.
+If the data are accepted after the map making stage then the problems are
+probably not severe.
+\item [Conventional photometers]: With the exception of the high speed
+photometry strings already discussed, the data output rate from single-object
+instruments is not very high, posing few problems for Starlink.
+\item [X-ray instruments]: We have already mentioned the particular data format
+produced by X-ray imaging instruments; just how Starlink will handle this format
+has yet to be decided.
+It is clear, however, that many non X-ray specialists will want to process data
+from, for example, the Einstein satellite, and no doubt Starlink facilities will
+be developed to allow this to be done.
+\item [The space telescope]: We expect the data from the ST to pose no
+particular problems for Starlink either in terms of quantity or data acceptance
+procedures.
+Because of the extreme astronomical interest of the data, however, ST-specific
+software will have very high priority.
+\end{description}
+\end{description}
+The above list of data sources covers most of the things astronomers think they
+want to do now.
+It is clear, however, that with the rapid development of detectors and
+improvements in observing techniques, these requirements will evolve.
+The organisation of the software development effort must be sufficiently
+flexible to respond to this evolution.
+\subsection {Data reduction, manipulation and analysis}
+We assume that the data are residing on disc in the standard internal image
+format, having perhaps been partially calibrated either by the local instrument
+software or by the Starlink data acceptance facilities.
+The next stage consists of instrument independent data reduction and analysis
+software.
+It is not our intention in this paper to list detailed specifications for a
+complete list of programs, but rather to point out those areas where the
+Starlink applications staff and the special interest groups (SIGs) will have to
+concentrate their early efforts.
+
+There is a set of primitive operations that will be required for almost all
+types of 1-D and 2-D data reduction.
+These are fairly obvious and will be the first application programs to be
+written by Starlink applications staff.
+They will include such operations as:
+\begin{description}
+\begin{description}
+\item [image-image arithmetic]
+\item [image-scalar arithmetic]
+\item [smoothing and other filtering]
+\item [image descriptor editing]
+\item [pixel editing]
+\item [image display and plotting]
+\item [trim, compress, expand]
+\item [background/continuum estimation]
+\item [function fitting]
+\item [coordinate transformations]
+\end{description}
+\end{description}
+Because of their frequent use, these primitives will have to be written to
+operate in a general and efficient manner.
+
+The higher level applications will address specific data reduction and analysis
+problems, frequently identified by the SIGs.
+Many of these programs will be adaptations of existing software (at least for
+the time being) and the documentation Starlink has been furnished with on these
+systems (see Appendix II) will be a rich source of information.
+These existing systems encapsulate an enormous quantity of expertise and
+experience which Starlink intends to exploit.
+Aside from those operations which are commonplace in existing systems, there is
+an urgent need for new approaches to some problems, especially where the power
+of the VAX can offer a quantum jump in performance.
+An example is the problem of the geometric correction and wavelength calibration
+of 2D spectroscopic images.
+At present, the individual spectra in the set are calibrated one by one,
+usually involving an unacceptable amount of interactive terminal time as well
+as producing less than optimum results.
+This approach arose because most of the current spectroscopic data reduction
+systems have grown out of an initial requirement to handle the 1D data produced
+by the first generation of digital detectors.
+Starlink presents the opportunity to handle 2D reductions properly.
+Unfortunately, Starlink has comparatively little documentation on 2D photometry
+packages for the general user; advice on this area will come from the 2D
+photometry SIG and the image processing and enhancement SIG.
+
+The set of software for the astronomical analysis of reduced data is essentially
+open ended and we expect much of it to be written by astronomers with an
+immediate need to extract the scientifically interesting information and write
+papers.
+If the whole data reduction process has been carried through using Starlink,
+there is clearly an incentive for the astronomer to write the analysis programs
+within the Starlink environment.
+Some of the existing packages do offer some data analysis software, but this is
+obviously an area in which Starlink can rapidly accumulate a pool of readily
+available astronomical knowledge.
+With the difficulties of data access, interaction and display largely removed
+by the Starlink environment, the writing of such analysis software will in many
+cases be considerably simplified.
+An example of such an analysis program might be the fitting of a synthetic
+spectrum to observed data.
+We would also like to see experiments with new techniques---for example
+nonlinear restoration---which might eventually be incorporated into Starlink's
+standard repertoire of data reduction processes.
+The reports of the SIGs will be the place to find details of proposed data
+analysis applications.
+\subsection {Utilities}
+Observing astronomers rely heavily on using astronomical utility programs both
+to prepare for observing runs and to interpret the resulting data.
+Again, Starlink offers the first real opportunity for the community to share a
+standard, optimal and completely trustworthy set of programs, fully exploiting
+the Starlink VAX and peripherals.
+Here are some examples:
+\begin{description}
+\begin{description}
+\item [celestial coordinate conversions]
+\item [star overlay plotting]
+\item [topocentric position and velocity corrections]
+\item [time conversions]
+\item [predictions of celestial phenomena]
+\item [various grades of astrometry]
+\item [guide probe and telescope offset predictions]
+\end{description}
+\end{description}
+Aside from these astronomical utilities there will be an extensive set of
+subroutine libraries, offering mathematical (NAG is already available),
+statistical, graphical and astronomical functions.
+\subsection {Database}
+It is clear that the community would benefit greatly through having organised
+access to a large body of astronomical data and catalogue information.
+The Starlink network gives an opportunity to provide centralised maintenance of
+a generally available database.
+However, the magnitude of the task is daunting and it is apparent that the
+existing Starlink organisation is too small on its own to embark on an ambitious
+project in this area.
+We can no doubt start in a small way by offering some star catalogues and
+lists of spectral line wavelengths but anything more demands almost a separate
+organisation working in close collaboration with Starlink.
+Here are some of the things that may be provided without recourse to especially
+expensive techniques:
+\begin{description}
+\begin{description}
+\item [catalogues of stars---positional and photometric]
+\item [catalogues of non-stellar objects]
+\item [catalogues of radio sources]
+\item [catalogues of X-ray sources]
+\item [IRAS catalogue]
+\item [AAT plate log]
+\item [UK Schmidt plate log]
+\item [solar system ephemerides]
+\item [standard star spectra]
+\item [the solar spectrum]
+\item [atomic data---wavelengths, collision strengths, f-values,
+photoionisation cross-sections]
+\end{description}
+\end{description}
+Formal database management techniques would be required to handle the larger
+items:
+\begin{description}
+\begin{description}
+\item [AAT data archives]
+\item [data archives from space experiments---IUE, ST, etc.]
+\item [literature abstracts]
+\end{description}
+\end{description}
+The list could easily be extended and this area could soak up as much effort as
+was made available.
+We think, however, that Starlink cannot give the problem of database very high
+priority until its primary function of data reduction and analysis is well under
+control.
+\section {MANAGEMENT \& DISTRIBUTION OF APPLICATIONS PROGRAMMERS}
+Many application programs will be written by astronomers and research
+assistants at levels ranging from provision of an algorithm (expressed, for
+convenience and precision, in a programming language) to implementation of a
+fully working and documented package.
+To coordinate this varied and extensive effort over the country there is a
+Head of Applications who will lead a group of three of four programmers working
+full time under contract to Starlink.
+The applications programmers, as well as developing Starlink software
+themselves, will also adapt and refine programs and documentation produced by
+Starlink users, and will be responsible for formal support of all Starlink
+applications software.
+The head is based at RAL and the group members will, in the first instance, be
+located at university nodes.
+The Starlink Project Scientist monitors and advises on astronomical
+requirements.
+Additional Starlink effort will be available from site managers.
+\subsection {Starlink-employed programmers}
+It is anticipated that RAL will place extramural development contracts with the
+appropriate university to employ the programmer.
+This means that whilst his work is for Starlink, the programmer has a strong
+duty to the university department, reporting to the department head in the same
+way that a Starlink site manager does.
+This work should therefore be appropriate to the needs of astronomers using the
+node if this is possible.
+At the same time he will be working within an overall programme laid down by the
+head of applications who will be attempting a nationwide coordination.
+Note that it is hoped to allocate work in such a way that the applications
+required by Starlink's plans are also those required by the astronomers close to
+the programmer.
+This will bring about the close and continual programmer-astronomer interaction
+that is essential for producing both relevant and high quality software and
+which might be lacking in a centralised software effort.
+However, local requirements must not be allowed to draw the programmer too far
+away from the needs of the astronomical community at large.
+For example, it is often desirable for a programmer to share in a data reduction
+effort in order more acutely to appreciate the astronomer's needs, but his role
+must not become that of a research assistant.
+\subsection {Site managers}
+In many ways the site manager's role as an applications programmer will be
+similar to the above, except that his primary responsibility lies with the
+management of the node.
+It is, however, hoped that he will be available for some applications
+programming.
+\subsection {Astronomers}
+Most astronomers who write programs need answers to specific problems and would
+normally get on and construct a program to do just what they need and no more.
+In the context of reduction and processing of data from instruments widely used
+by the community this approach is grossly inefficient, giving rise to many
+programs doing essentially similar operations, scattered around the country and
+often unusable by other than the originator.
+Part of Starlink's objective is to avoid this waste of effort by coordinating
+much of the software common to many requirements into a few universal and
+centrally supported packages.
+To this end, astronomers are encouraged to write their new programs in, or
+convert existing ones to, the Starlink environment.
+This process must be sufficiently straightforward to encourage the astronomer
+to take this, rather than the traditional direct approach.
+The latter may in any case give inferior results and involve more effort.
+We are therefore anxious to give every help to the astronomer at whatever level
+he needs it, from implementing an algorithm he suggests to helping him, where
+necessary, to install a complete package within Starlink.  
+
+Astronomers should not hesitate to approach Starlink staff when considering
+writing (or having their own programming assistants write) software for which a
+general demand can clearly be demonstrated.
+Obviously, the level of assistance an astronomer can expect to receive from
+Starlink is a function of his willingness to share his work with other users of
+the network; those who wish to restrict use of their programs are perfectly
+entitled to do so but must expect only limited assistance.
+All astronomers who contribute software to Starlink will be encouraged to
+discuss fully their plans before beginning work, to incorporate generality
+where possible, to work within the Starlink environment, and to conform to
+high standards of coding and documentation (see section 5.2).
+Some will produce work that will be accepted for support by Starlink as it
+stands; they will receive full credit for this (see section 5.1).
+Many will produce work that needs a little tidying up by Starlink applications
+programmers; this will be acceptable although they may receive less credit.
+Really scrappy work will be rewritten by Starlink staff and the astronomer will
+be credited only with the algorithm if it is sufficiently original and
+ingenious.
+\subsection {The role of the special interest groups}
+After the implementation of a kernel of generally required software, the
+priorities for further applications development must be set by the astronomical
+community.
+How is the head of applications, who is responsible for detailed direction of
+the software effort, to be kept aware of current developments and trends?
+It is the role of the project scientist to retain an overview of the needs of
+the community and to identify the currently interesting sources of data.
+It is clear, however, that detailed proposals for new software must come from
+small groups of individuals who are active in fields of special interest.
+Following the experience of the SERC Interactive Computing Facility, a number of
+special interest groups are being set up; their brief is to propose to the
+head of Starlink plans for the development of software within their fields.
+The Starlink management can then coordinate these proposals and, in particular,
+identify the regions of overlap to reduce the overall effort.
+Assessment of the relative priorities of the proposals from the various
+SIGs will be made by Starlink after full consultations with the SIGs concerned.
+Formal ratification of major priority or resource allocation decisions will be
+the responsibility of the SAG---the Scientific Advisory Group (since replaced
+by SUC---the Starlink User Committee).
+The current membership of the SIGs is stored in file ADMINDIR:SIG.LIS.
+\section {DIFFICULTIES}
+During the development of Starlink applications software a wide range of
+difficulties will have to be faced.
+In this section we comment on those which were discussed at the workshop and
+which have not already been touched on.
+\subsection {Incentives}
+What incentives can be given to astronomer/programmers to contribute software to
+Starlink?
+The answer to this question will depend very much on the individual concerned;
+some will be satisfied with the knowledge that they have provided the community
+with reliable, widely used and readily supported software, whereas others will
+demand full acknowledgment and publicity for their efforts.  
+
+Obviously, original software involved in specific projects will receive
+acknowledgment in published work resulting from its use, the originator most
+likely being a co-author.
+It is also feasible to publish software within Starlink for widespread
+distribution, where it is of general interest.
+It should be noted that the Working Group on Coordination of Astronomical
+Software (WGCAS) has written to major astronomical journals with a strong
+recommendation that papers describing new software of general interest be
+treated alike with astronomical papers.
+
+It is hoped that those astronomers who provide consistently good software and
+who take the trouble to document their work conscientiously will become well
+known and respected for this.
+In addition, such individuals will be exceptionally well placed to take
+advantage of any funding Starlink may have at its disposal for Software
+development projects.
+\subsection {Support}
+There are likely to be several levels of software support, depending on the
+source and quality of the software.
+
+At the lowest level, Starlink will advertise and distribute a program and offer
+general guidance to potential users.
+To qualify for even this minimal level of support, a program will have to be
+(supposedly) bug-free, of general use, reasonably well coded (including adequate
+comments), and be provided with user documentation.
+Also, it must not interfere with the normal running of a Starlink node, avoiding
+extravagant or eccentric use of disc space, memory, cpu or peripherals, and must
+be runnable, without special privileges, on standard Starlink equipment.
+The author will be expected to give detailed advice to users, to fix bugs, and
+to maintain compatibility between his programs and the changing environment
+(operating system updates, new peripherals, etc.).
+
+The highest level of support will free the author completely from support
+commitments, all user education, bug fixing and program enhancements being
+handled by Starlink staff.
+This level will require coding of a high standard, full conformity with Starlink
+software conventions, and excellent program documentation as well as complete
+and well written user documentation.
+
+At the lower support levels the author will ultimately be responsible for the
+correctness of his programs.
+At the higher levels Starlink assume this responsibility and this may
+necessitate a commissioning or refereeing process in cases where widespread and
+frequent use will not itself constitute an adequate test.
+\subsection {Direction}
+Who provides direction and how close should it be?
+The SIGs provide input to Starlink, enabling priorities to be set, which then
+become the responsibility of the head of applications to implement.
+(Overall direction must be provided centrally to avoid duplication and to
+ensure uniformity of style.)
+He will then select the best programmer for the job and allocate the work.
+Progress is then monitored periodically at a level adequate for maintaining
+standards and the overall schedule.
+The programmer will be expected to seek advice from the astronomers at his node.
+Frequent reviews of progress will be made within the applications group in
+consultation with users.
+\subsection {Standards}
+Very few astronomers (and not all programmers) have had formal education in
+programming techniques, even fewer in documentation techniques and virtually
+none so far in the Starlink environment.
+In attempting to provide standard software, Starlink has a unique opportunity to
+develop a high standard in its programs and documentation.
+It is therefore hoped to arrange various seminars aimed at providing recommended
+standards to follow and including examples of the use of the Starlink
+environment.
+
+How are the standards of coding and documentation defined and imposed?
+These are exceptionally difficult problems; it will be hard enough to reach
+agreement on standards among, and impose those standards on, Starlink-employed
+programmers, let alone astronomer/programmers not under the direct control of
+Starlink.
+
+The software community has become increasingly aware over the last two decades
+of the crucial importance of high standards of coding and documentation.
+The maintenance phase of a program's lifetime is now known to involve several
+times the labour that was expended on the original implementation.
+Time and time again poorly structured and inadequately documented programs have
+to be rewritten from scratch; a costly exercise and likely to produce a new
+crop of bugs.
+Fortunately, there is a remarkable degree of consensus in the computing
+community on what constitute adequate standards (see for example reference 3).
+Starlink's own standards, which will be set down in a document in due course
+(SGP/16), will be based partly on these commonly accepted standards and partly
+on the recommendations of its own applications programmers who will after all
+be responsible for support.
+Software support is a difficult and tedious job and the astronomical community
+must be willing to make an effort to ease the burden.
+Starlink intends to provide a limited programme of education for
+astronomer/programmers and may implement software aids---questionnaire
+programs to produce pro forma documentation for example.
+
+User documentation is of paramount importance; the authors of user manuals must
+be prepared to accommodate all standards of user, not just the initiated few.
+Written documentation must be consistent with online prompts etc., and must
+conform to some uniform house style.
+Every effort must be made to ensure that new users can begin to operate an
+application suite profitably within a couple of hours and without skilled aid.
+
+Some internal refereeing system will be tried in order to maintain uniform and
+high standards.
+One particular experiment in user documentation that has proved very successful
+elsewhere is strongly recommended; it is to have an astronomer NOT closely
+acquainted with programming in charge of user documentation at each site.
+If there arise several such `tame' astronomers distributed through the network
+they can pool their ideas and produce one common manual of uniform style, to be
+used by everyone (even though some nodes will have different specialities).
+\subsection {Obsolescence}
+Almost all Starlink software will change with time and it will frequently be
+necessary to alter the appearance, to the user, of a facility.
+This will be a constant source of friction between the user community and the
+Starlink management, especially on those rare occasions when an old established
+facility has to be dropped in favour of a new one.
+The magnitude and difficulty of the software support problem are, however, so
+great that it is not practicable to continue supporting superseded programs;
+Starlink will have to take a hard line, simplifying and streamlining the system
+as a whole.
+Naturally, major decisions in this area will only be made after adequate
+discussions between Starlink and the astronomical community (largely through
+the SIGs) have taken place.
+\section {REFERENCES}
+\begin{enumerate}
+\item SGP/7. `Specification of Starlink Primitive Subroutine Interfaces'.
+\item Wells, D.C., \& Greisen, E.W.  `FITS --- A Flexible Image Transport
+System'.
+International workshop on image processing in astronomy, Trieste, Italy, 1979.
+\item Kernighan, B.W., \& Plauger, P.J.  `The Elements of Programming Style'.
+(2nd ed.)  1978, McGraw-Hill.
+\end{enumerate}
+\appendix
+\section {Manuals describing other systems}
+\begin{tabbing}
+Users Guide888\=8\kill
+IHAP\>European Southern Observatory\\
+TVS\>Cerro Tololo / University of Vienna\\
+RICHFLD\>Kitt Peak National Observatory\\
+GIPSY\>Kapteyn Laboratory, Groningen\\
+SDRSYS\>Anglo-Australian Observatory\\
+RGODR\>Royal Greenwich Observatory / University College London\\
+SPICA\>University College London\\
+DUSTERS\>University of Durham\\
+IDL\>Research Systems Inc., Denver\\
+SOL\>Laboratory for Atmospheric \& Space Physics, University of Colorado\\
+CDCA\>Observatoire de Nice\\
+Users Guide\>Mullard Radio Astronomy\\
+ESP\>Royal Observatory, Edinburgh\\
+Users Guide\>NRAO Very Large Array
+\end{tabbing}
+\end{document}
