@@ -97,6 +97,8 @@
 *        Fix pressure and steptime.
 *     2008-04-11 (JB):
 *        Remove wcs argument (not needed).
+*     2008-04-11 (JB):
+*        Add NCHNSUBS FITS header.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -593,6 +595,9 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   astSetFitsF ( fitschan, "SUBREFP2", AST__UNDEFF,
                 "Reference channel for subband2", 0 );
+
+  astSetFitsI ( fitschan, "NCHNSUBS", gsdVars->BEChans[subBandNum], 
+                "Number of subbands", 0 );
 
   astSetFitsI ( fitschan, "REFCHAN", refChan, 
                 "Reference IF channel No.", 0 );
