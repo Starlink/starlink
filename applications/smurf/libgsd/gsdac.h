@@ -51,6 +51,8 @@
 *        Add getRecepNames and getTransition.
 *     2008-04-04 (JB):
 *        Add CALLGSD macro.
+*     2008-04-11 (JB):
+*        Remove wcs argument from putFits (not needed).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -323,7 +325,6 @@ const char *samMode, /* sample mode (given) */
 const char *obsType, /* observation type (given) */
 const dateVars *dateVars, /* date/time variables (given) */
 const mapVars *mapVars, /* map/chop/scan variables (given) */
-const gsdWCS *wcs,      /* pointing and time values (given) */
 const AstFitsChan *fitschan,  /* FITS headers (given and returned) */
 int *status          /* pointer to global status (given and returned) */
 ); 

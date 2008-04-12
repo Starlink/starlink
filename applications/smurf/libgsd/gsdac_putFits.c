@@ -21,7 +21,6 @@
 *                     char *recepNames[],
 *                     const char *samMode, const char *obsType,
 *                     const dateVars *dateVars, const mapVars *mapVars,
-*                     const gsdWCS *wcs,
 *                     const AstFitsChan *fitschan, int *status )
 
 *  Arguments:
@@ -51,8 +50,6 @@
 *        Date and time variables
 *     mapVars = const mapVars* (Given)
 *        Map/Chop/Scan variables
-*     wcs = const *gsdWCS (Given)
-*        pointing and time values
 *     fitschan = const AstFitsChan* (Given and Returned)
 *        FITS headers
 *     status = int* (Given and Returned)
@@ -98,6 +95,8 @@
 *        Fixed typo in OBSIDSS.
 *     2008-04-03 (JB):
 *        Fix pressure and steptime.
+*     2008-04-11 (JB):
+*        Remove wcs argument (not needed).
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -120,8 +119,6 @@
 *     MA 02111-1307, USA
 
 *  Bugs:
-*     Many of the values are currently kludged with defaults.
-*     These are indicated by //k.
 *-
 */
 
@@ -149,7 +146,6 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
                      char *recepNames[],
                      const char *samMode, const char *obsType,
                      const dateVars *dateVars, const mapVars *mapVars,
-                     const gsdWCS *wcs, 
                      const AstFitsChan *fitschan, int *status )
 
 {
@@ -197,8 +193,6 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
-
-/* NOTE!!!!!! Kludged calcs indicated by //k */
 
   /* Get the telescope efficiency and convert from percentage to decimal */
   etal = gsdVars->etal / 100.0; 
