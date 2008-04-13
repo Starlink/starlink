@@ -1,18 +1,30 @@
-
-\documentstyle[11pt]{article}
+\documentclass[twoside,11pt]{article}
 \pagestyle{myheadings}
 
-%------------------------------------------------------------------------------
+% -----------------------------------------------------------------------------
+% ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {165.4}
-\newcommand{\stardocauthors}   {David S. Berry, Diana Parsons}
+\newcommand{\stardocauthors}   {David S Berry, Diana Parsons}
 \newcommand{\stardocdate}      {19 February 1995}
-\newcommand{\stardoctitle}     {IRAS90 --- Programmers Guide}
-%------------------------------------------------------------------------------
+\newcommand{\stardoctitle}     {IRAS90\\[2ex]
+                               Programmer's Guide}
+\newcommand{\stardocabstract}  {
+{\small IRAS90} is a package of applications which provides facilities
+for the reduction and analysis of {\small IRAS} Survey and Pointed
+Observation (PO) data (also known as ``Additional Observation'', or
+``AO'' data). It does not provide facilities for handling Low
+Resolution Spectrometer (LRS) data, or catalogue data.
+This document gives some guide-lines for users who want to produce their own
+{\small IRAS90} applications.
+}
+% ? End of document identification
+
+% -----------------------------------------------------------------------------
 
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
-\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
 \markright{\stardocname}
 \setlength{\textwidth}{160mm}
 \setlength{\textheight}{230mm}
@@ -22,20 +34,123 @@
 \setlength{\parindent}{0mm}
 \setlength{\parskip}{\medskipamount}
 \setlength{\unitlength}{1mm}
-\setlength{\unitlength}{1mm}
 
-%------------------------------------------------------------------------------
-% Add any \newcommand or \newenvironment commands here
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%begin{latexonly}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+% Define commands for HTML-only or LaTeX-only text.
+\newcommand{\html}[1]{}
+\newcommand{\latex}[1]{#1}
+
+% Use latex2html 98.2.
+\newcommand{\latexhtml}[2]{#1}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % from the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document-specific \newcommand or \newenvironment commands.
 
 % degrees symbol
 \newcommand{\dgs}{\hbox{$^\circ$}} 
+
 % centre an asterisk
 \newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
+
 % A kind of list item, like description, but with an easily adjustable
 % item separation.
 \newcommand{\menuitem}[2]
   {{\bf #1}: \addtolength{\baselineskip}{-0.4ex}
   \parbox[t]{128mm}{#2} \addtolength{\baselineskip}{0.4ex} \\ \hspace{-5pt}}
+
 % an environment for references
 \newenvironment{refs}{\goodbreak
                       \vspace{3ex}
@@ -49,37 +164,115 @@
                                      \setlength{\labelwidth}{0mm}}
                     }{\end{list}}
 
+% ? End of document-specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
 \begin{document}
 \thispagestyle{empty}
-DRAL / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
-{\large Particle Physics \& Astronomy Research Council}\\
-{\large Starlink Project\\}
-{\large \stardoccategory\ \stardocnumber}
-\begin{flushright}
-\stardocauthors\\
-\stardocdate
-\end{flushright}
-\vspace{-4mm}
-\rule{\textwidth}{0.5mm}
-\vspace{5mm}
-\begin{center}
-{\Large\bf \stardoctitle}
-\end{center}
-\vspace{5mm}
 
-\setlength{\parskip}{0mm} \tableofcontents
-\setlength{\parskip}{\medskipamount} \markright{\stardocname}
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle}
+   \end{center}
+   \vspace{5mm}
 
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory\ \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
 \newpage
+\begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \tableofcontents
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+\end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
 
-\section{Introduction to IRAS90}
+\section{Introduction to IRAS90\xlabel{introduction_to_iras90}}
 
 {\small IRAS90} is a package of applications which provides facilities
 for the reduction and analysis of {\small IRAS} Survey and Pointed
 Observation (PO) data (also known as ``Additional Observation'', or
 ``AO'' data). It does not provide facilities for handling Low
 Resolution Spectrometer (LRS) data, or catalogue data. For more
-information on existing {\small IRAS90} applications see SUN/163.  This
+information on existing {\small IRAS90} applications see
+\xref{SUN/163}{sun163}{}.  This
 document gives some guide-lines for users who want to produce their own
 {\small IRAS90} applications.
 
@@ -94,15 +287,19 @@ The {\small IRAS90} system is written in {\small FORTRAN} and is
 integrated with the Starlink {\small ADAM} environment. Anyone
 intending to create their own {\small IRAS90} applications should
 therefore be familiar with {\small FORTRAN} and with the {\small ADAM}
-programming interface (see SUN/101). It is recommended that programmers
-conform to the Starlink programming standards described in SGP/16 when
+programming interface
+(see \xref{SUN/101}{sun101}{}). It is recommended that programmers
+conform to the Starlink programming standards described in
+\xref{SGP/16}{sgp16}{} when
 producing {\small IRAS90} code as this will help to produce portable,
 maintainable, reliable code which is consistent with the existing
 {\small IRAS90} code. Adherence to the Starlink programming standards
 is particularly important if you intend to submit your applications for
 inclusion in the {\small IRAS90} package. 
 
-\section{Writing Programs for IRAS90}
+\section{Writing Programs for IRAS90
+\xlabel{writing_programs_for_iras90}}
+
 The {\small IRAS90} Programs try achieve the following aims
 
 \begin{itemize}
@@ -145,7 +342,8 @@ Diana Parsons, and other Starlink programmers.
 
 \end{itemize}
 
-\section{Existing Source Code and Documentation}
+\section{Existing Source Code and Documentation
+\xlabel{existing_source_code_and_documentation}}
 
 Existing source code is stored within the released {\small IRAS90} system. 
 The majority of routines can be classified as follows:
@@ -179,19 +377,19 @@ values, which should be used {\small IRAS90} applications.
 The location of these routines depends on the operating system being
 used see sections \ref{SEC:UNIXS} and \ref{SEC:VMSS} below
 
-\subsection{IRAS90 documentation}
+\subsection{IRAS90 documentation\xlabel{iras90_documentation}}
 
 The main {\small IRAS90} documentation consists of three Sun's: 
 
 \begin{itemize}
 
-\item SUN 161 -- IRAS90 Introductory/User Guide to Calibrated Reconstructed 
-Data Analysis.
+\item \xref{SUN/161}{sun161}{} --
+IRAS90 Introductory/User Guide to Calibrated Reconstructed Data Analysis.
  
-\item SUN 163 -- IRAS90 -- IRAS Survey and PO Data Analysis Package --
-Reference Guide
+\item \xref{SUN/163}{sun163}{} --
+IRAS90 -- IRAS Survey and PO Data Analysis Package -- Reference Guide
 
-\item SUN 165 -- This document
+\item \xref{SUN/165}{sun165}{} -- This document
 
 \end{itemize}
 
@@ -216,14 +414,14 @@ The structure and contents of the CRDD NDF data file is described in the ID
 document associated with IRC. Notes on the Astrometry extension will be found
 in the IRA ID document. Notes on the processing applied to translate other 
 standard forms of IRAS image data into IRAS90 Image NDF format are contained
-in the PREPARE section of SUN 163.
+in the PREPARE section of \xref{SUN/163}{sun163}{}.
 
 Anyone needing copies of the ID documents will first need to process the 
 distributed files using {\small LATEX}, etc. 
 
 
-\subsection{Utility Routines}
-\label{SEC:UTIL}
+\subsection{Utility Routines
+\xlabel{utility_routines}\label{SEC:UTIL}}
 
 Many general purpose utility routines have been written as part of the
 {\small IRAS90} package. Use of these routines can save much effort,
@@ -276,8 +474,9 @@ assortment of data describing the {\small IRAS} satellite and mission,
 and the {\small IRAS90} package. It is documented in file {\small
 ID20.TEX}.
 
-\subsection{Location of code and documentation on UNIX Systems}
-\label{SEC:UNIXS} 
+\subsection{Location of code and documentation on UNIX Systems
+\xlabel{location_of_code_and_documentation_on_unix_systems}\label{SEC:UNIXS}}
+
 All A-task routines, applications specific routines and interface files are
 stored in the 
 \newline
@@ -342,8 +541,8 @@ command:
 \end{verbatim}
 \normalsize
 
-\subsection{Location of code and documentation on VMS Systems}
-\label{SEC:VMSS} 
+\subsection{Location of code and documentation on VMS Systems
+\xlabel{location_of_code_and_documentation_on_vms_systems}\label{SEC:VMSS}}
 
 On {\small VMS} systems the source code is stored in, or in subdirectories of,
 {\small IRAS90\_DIR}. This logical name is set up by running {\small IRAS90}.
@@ -373,7 +572,7 @@ utility subsystem name.
 \item The contents of the VMS equivalent of data\_source.tar and 
 iras90\_source.tar on Unix, are held loose in {\small IRAS90\_DIR}.
 
-\item The released SUN's are available only as a printed copy.
+\item The released SUNs are available only as a printed copy.
 
 \end{itemize}
 
@@ -404,8 +603,8 @@ command:
 \end{verbatim}
 \normalsize
 
-\section{IRAS90 Programming Conventions}
-\label{SEC:CONV}
+\section{IRAS90 Programming Conventions
+\xlabel{iras90_programming_conventions}\label{SEC:CONV}}
 
 This section contains descriptions of {\em some} of the conventions
 which have been adhered to in the production of the released {\small
@@ -416,7 +615,8 @@ to these conventions:
 \begin{enumerate}
 
 \item If an application needs to read or write a list of character
-strings, the facilities of the {\small GRP} package (SUN/150) should be
+strings, the facilities of the {\small GRP} package
+(\xref{SUN/150}{sun150}{}) should be
 used if possible.  {\small GRP} provides the user with a very versatile
 system for specifying the strings, and avoids the use of explicit file
 handling routines. As an example, see the way that {\small REMQUAL}
@@ -589,7 +789,8 @@ mapped character array to the subroutine, the final argument in the
 argument list should be the length of each character string in the
 array. This length should be passed using the {\small \%VAL} construct.
 Particular care is needed if the argument list contains other character
-values as well (see SUN/92, section ``Mapping Character Data'').
+values as well
+(see \xref{SUN/92}{sun92}{}, section ``Mapping Character Data'').
 
 \item If a constant value is used in an argument list for an argument
 which corresponds to a double precision value, then the constant must
@@ -677,7 +878,8 @@ data is being calculated.
 \normalsize
 
 \item The A-task prologue should conform to the style generated by the Language 
-Sensitive Editor {\small STARLSE} (see SUN/105).
+Sensitive Editor {\small STARLSE}
+(see \xref{SUN/105}{sun105}{}).
 
 \item The first two words of the A-task prologue ``Description'' section should be ``This 
 routine''.
@@ -735,8 +937,8 @@ included in the parameter description.
 prologue.
 
 \item Documentation generated from the A-task prologue using {\small PROLAT}
-(see SUN/110) should successfully pass through a spelling checker such as {\small 
-SPELL}.
+(see \xref{SUN/110}{sun110}{}) should successfully pass through a spelling
+checker such as {\small SPELL}.
 
 \item All parameters used within the application should have entries in the 
 interface file.
@@ -778,7 +980,8 @@ IRM\_GTBND} specifying the parameter ``{\small BAND}''.
 \item Status Values Returned by Utility Routines ---
 
 The utility routines (and all other {\small IRAS90} routines) use the 
-``inherited status'' error system described in SUN/104. Utility routines flag 
+``inherited status'' error system described in 
+\xref{SUN/104}{sun104}{}. Utility routines flag 
 errors by reporting an error message and setting the returned status to some 
 specific value indicating the type of error which has occurred. These status 
 values are unique amongst {\em all} status values used by any {\small ADAM} 
@@ -811,9 +1014,10 @@ package has been assigned a range of error numbers as follows:
 
 \end{enumerate}
 
-\section{Compiling, Linking and Running}
+\section{Compiling, Linking and Running
+\xlabel{compiling_linking_and_running}}
 
-\subsection{On UNIX Systems}
+\subsection{On UNIX Systems\xlabel{on_unix_systems}}
 
 Before starting to develop {\small IRAS90} software the following commands 
 should be issued:
@@ -915,7 +1119,7 @@ up for it using the command:
 \end{verbatim}
 \normalsize
 
-\subsection{On VMS Systems}
+\subsection{On VMS Systems\xlabel{on_vms_systems}}
 
 Before starting to develop {\small IRAS90} software the following commands 
 should be issued:
@@ -1005,7 +1209,7 @@ issue the command:
 \normalsize
 
 Again, {\small FRED\_DIR} is a logical name pointing to the directory
-containing {\small FRED.EXE} and {\small FRED.IFL}. Note, this logical
+containing {\small FRED.EXE} and {\small FRED\-.IFL}. Note, this logical
 name must be a {\em job} logical name, set up prior to starting {\small
 ICL} with the command:
 
@@ -1016,8 +1220,8 @@ ICL} with the command:
 \normalsize
 
 \appendix
-\section{The NDG Library}
-\label{APP:NDG}
+\section{The NDG Library
+\xlabel{the_ndg_library}\label{APP:NDG}}
 
 The {\small NDG} library (which is used for accessing multiple {\small NDF}s
 using a single parameter) started life as an {\small IRAS90} utility library
