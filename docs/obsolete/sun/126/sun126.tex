@@ -1,0 +1,1629 @@
+\documentstyle[11pt]{article}     
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {126.2}
+\newcommand{\stardocauthors}   {Adrian Fish}
+\newcommand{\stardocdate}      {6th January 1992}
+\newcommand{\stardoctitle}     {STEVE --- User Guide and Reference Manual}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% here are some extra commands for this document
+\newcommand{\gold}{\mbox{\fbox{\scriptsize GOLD}}}
+\newcommand{\keyname}[1]{\mbox{\fbox{\scriptsize #1}}}
+\newcommand{\STEve}{\mbox{STEVE}}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\newpage
+
+\section{Introduction}
+
+\subsection{Preamble}
+With VAX/VMS Version 4.4 there appeared a utility called the VAX Text
+Processing Utility (TPU). A closer look revealed the presence of EVE, the
+Extensible VAX Editor, a higher level interface to the more basic TPU. Invoking
+the EVE interface by adding an appropriate  qualifier to the {\tt EDIT} command
+(i.e. typing {\tt EDIT/TPU}), revealed a full screen editor with an unfamiliar
+`status line' and an even more unfamiliar keypad. To make the pill easier to
+swallow, DEC provided an EDT keypad emulation within EVE. With TPU (and EVE),
+the VMS user is provided with a powerful and versatile tool for the
+manipulation of text.
+
+It was inevitable that many busy Starlink users would be reluctant to devote
+more than a few moments of their valuable time trying out this new utility.
+Despite the EDT keypad emulation EVE has often been ignored or looked upon as
+something `foreign' by many users in the past. These days, more and more
+Starlink users are discovering the huge advantages available to them through
+the use of EVE. Even in it's vanilla DEC version, EVE is an extremely useful
+and versatile editor and it is particularly easy for existing EDT users thanks
+to the EDT keypad emulation (which is much better then the standard EVE
+keypad!).
+
+Now however, users should be aware that there is an extended version of the EVE
+editor that has been tailored to the general Starlink user's requirements.
+This extended editor is STarlink Eve or \STEve, and this document (along
+with it's introductory companion SUN/125) describes this editor, and offers
+additional help, advice and tips on general EVE usage. Once you've tried
+\STEve, you'll forget all about using native EDT and wonder how you ever managed
+before.
+
+Of course, some of you will be wary of an `all singing, all dancing' editor,
+but even some hardened Software Tools Editor dinosaurs at UCL Starlink now use
+nothing but \STEve. There are one or two features in \STEve\ that it would be
+very tempting to extend further, a prime example being the {\tt COMPILE}
+command which could be adapted (with effort) to search for errors in the buffer
+containing the code just compiled. But other DEC products available on Starlink
+do this job much better. The {\tt COMPILE} command is provided in \STEve\ as a
+useful convenience for quickly checking code you are currently modifying. It is
+not intended for full blown programme development. All the additional features
+in \STEve\ are provided as aids to efficient use of a user's time and machine
+resources.
+
+If you have bothered to read this far, you are obviously interested in trying
+\STEve. In that case the brief, introductory SUN/125 tells you how to get
+started straight away, but for the regular users of EVE and those of you who
+are more thorough, read the following sections describing how to use
+\STEve, and you will find much useful reference material in the appendices.
+For the really particular and those of you who still think EVE was a biblical
+celebrity, you may like to consult the `Guide to Text Processing' and
+`Processing Text - EVE Reference' manuals in the VAX/VMS General User
+Documentation (Volumes 5A and 5B).
+
+So now it's up to you; try it, it really is simple to use and invaluable.
+Remember that you don't have to learn all the key sequences and commands to
+benefit from the new editor. You can get instant help anytime during an editing
+session. All users are encouraged to follow the Tutorial Guide in this
+document, if only to make sure you are aware of the most useful and commonly
+used extra facilities offered.
+
+\subsection{Notes for Users new to EVE}
+
+Users who have never used the EVE editor, or who are new to Starlink should
+start off with SUN/125. This is (deliberately) a two page document that aims to
+get you off the ground with this editor. Users already familiar with EDT will
+have no problem adapting to \STEve. New users are advised to become familiar
+with the EDT keypad as quickly as possible, so they should keep a copy of the
+appendix containing the VT200 Keypad Diagram handy. Both of these classes of
+user will always benefit from having an experienced EVE user around to offer
+quick and speedy advice.
+
+\subsection{Notes for Users who already use EVE}
+
+For those of you who already use EVE as your default editor, you will most
+likely use the EDT keypad, and many of you will have customised your initial
+setup in various ways. It is well worth checking through the reference
+summaries in this document to ensure you are not modifying any attributes that
+\STEve\ takes care of itself. Remember that using an initialization file
+(either an {\tt EVE\$INIT.EVE} or a TPU command file) will make the editor
+startup much slower and setting up things that are already done in \STEve\
+simply wastes your time.
+
+Users should also note that it is highly inadvisable to maintain your own
+personal TPU section file. Not only are these files over a 1000 blocks in size,
+they take a long time to startup, use up memory unnecessarily and can in some
+instances prejudice system performance. It is much better for you and other
+users to make use of the system installed \STEve\ section file, and if you
+want to customize your editing environment further, place EVE and \STEve\
+commands in an {\tt EVE\$INIT.EVE} command file.
+
+\subsection{Features of STarlink Eve}
+
+Here's a list of the main features that are available with \STEve\, in addition
+to the standard EVE features (the standard EVE features being listed in Section
+1.1 of the VMS EVE Reference Manual, VAX/VMS General User Documentation Volume
+5B).
+
+\begin{itemize}
+
+\item Default enhanced EDT keypad emulation.
+\item A constantly visible list of numbered buffers is maintained at the
+       bottom of the screen.
+\item Move between up to nine buffers in the buffer list with a single
+      keystroke combination.
+\item Mouse support for buffer list selection
+\item Box-mode select, cut and paste with insert or overstrike.
+\item Compile FORTRAN or C code from within the editor (will operate on
+      the entire buffer or on a selected range e.g. a subroutine).
+\item Run \LaTeX\ on the contents of the current buffer. Jumps to
+      line where first error occurs.
+\item Run the Starlink SPELL Checker from within the editor.
+\item Automatically insert matching closing brackets, braces, dollars etc.
+      (Very useful in \LaTeX).
+\item Trim trailing spaces from buffers or automatically on exit.
+\item Insert the current date and time into your buffer.
+\item The Fill Paragraph command recognizes \LaTeX\ commands.
+\end{itemize}
+
+\section{Tutorial Guide}
+\label{tutorial_guide}
+
+\subsection{Getting Started}
+
+First of all you will need a terminal. To fully utilise the facilities \STEve\
+offers, a VT200 is ideal and the recommended choice, but a VT100 will do. You
+cannot use EVE on a VT52 terminal. Ensure your terminal has been set to a VT200
+(or VT100) terminal-type with an appropriate DCL command \footnote{ Generally
+{\tt SET TERM/DEV=VT200} or {\tt SET TERM/DEV=VT100} is fine.} (this tutorial
+will generally assume you are using a VT200 terminal). Then all you need
+to do is type:
+
+\begin{verbatim}
+      $ STEVE <filename>
+\end{verbatim}
+
+%where {\tt $<$filename$>$} is a \LaTeX\ file for the purposes of this tutorial.
+Once you are in you will see a buffer status line near the bottom of the screen
+with appropriate buffer information superimposed; below this  your current
+buffer name is listed with a number `1' next to it. The EDT keypad is available
+immediately.
+
+EVE and \STEve\ commands are entered from the keyboard after pressing the
+\keyname{Do} key (or \gold\ \keyname{KP7} on VT100 terminals)\footnote{
+Throughout this document you will see references to keys that are labelled on
+your VT200 terminal in a standard way. KP refers to the numeric keypad to the
+right of your keyboard. PF refers to the top row of four keys of the numeric
+keypad, and F refers to the 18 or so programmable function keys that are
+arranged in a line across the top of the keyboard. So in most cases, the GOLD
+key is PF1 at the top of the numeric keypad. If you are at a VT100 terminal,
+you will not have those clearly labelled extra set of keys between the numeric
+keypad and the QWERTY keyboard, but the EDT keypad emulation provides identical
+functions. Remember that if you are at a VT200 terminal but have it configured
+as a VT100, then these extra keys will not perform as advertised. Just to
+confuse matters, Pericom terminals have the PF and F nomenclature reversed, so
+take care.}; 
+at this point, commands can be entered at the {\tt Command:} prompt that
+appears below the numbered buffer list. Note however that although all EVE and
+\STEve\ commands can be entered on the command line, many commonly used
+commands have been assigned to various quick and easy keystroke combinations.
+When entering commands at the {\tt Command:} prompt, they may be abbreviated 
+to the smallest unique initial string. If an abbreviation is not unique, the
+editor will display the possible choices and prompt for the command name again.
+
+Press the \keyname{HELP} key and a keypad diagram will appear on the screen.
+This is one of several ways to access help information in \STEve\ (see Section
+\ref{getting_help} for further details on accessing on-line help information).
+
+\subsection{A Typical Session}
+
+One of the most useful features that \STEve\ provides is the numbered buffer
+list. As already mentioned, \STEve\ maintains a list of user buffers just below 
+the buffer status line. If you have just entered the editor, your current
+buffer name will be listed here with a number `1' next to it. To get an idea of
+the facility, read in another file. To do this type \gold\ \keyname{G} and
+enter a filename. The new file is displayed on the screen and another entry
+will have appeared in the buffer list (with a number `2' next to it). Moving
+between buffers is now very easy. Simply typing \gold\ \keyname{1} will move
+you back to the first buffer, and typing \gold\ \keyname{2} will move back to
+the second buffer. \STEve\ will maintain a numbered list of up to nine buffers
+and allow you to move between them by typing \gold\ followed by the appropriate
+buffer number. 
+
+If you are editing in a DECterm window or from a VT1200 terminal there is
+additional mouse support for selecting buffers in the buffer list. Simply place
+the mouse pointer over the buffer name you wish to move to and click Mouse
+Button 1 (MB1).
+
+It is often useful to display two different buffers at once on the screen.
+\STEve\ provides quick keystrokes to achieve this. To split the screen into
+two, type \gold\ \keyname{=}. To move between the buffers type \gold\
+\keyname{$\bigtriangleup$} and \gold\ \keyname{$\bigtriangledown$}. To switch
+back to one window type \gold\ \keyname{=} again.
+
+There are a few enhancements provided by \STEve\ that are useful if you are
+writing a \LaTeX\ file. You can invoke \LaTeX\ from within the editor by typing 
+\keyname{CTRL} \keyname{L}. The first time you invoke \LaTeX\ in an editing
+session causes a subprocess to be spawned\footnote{Subsequent invocations use 
+the existing subprocess and so start up much quicker.}  
+and the current buffer contents are written to a temporary file
+and processed by \LaTeX . In the event of an error during this processing,
+\STEve\ will display the line number where it thinks the error is and the
+cursor will move to that line number in the buffer containing the text being
+processed. If the \LaTeX\ processing is completed successfully, the temporary
+files are renamed to the filename associated with the buffer being \LaTeX ed.
+You may turn the renaming feature off by typing
+\gold\ \keyname{F19}. Similarly you can use the spelling checker from within
+\STEve\ by typing \gold\ \keyname{S}. Again a subprocess is spawned the first
+time Spell is invoked within an editing session, and control is passed to the
+Spell program running in this subprocess until you quit and return to \STEve\
+(and your corrected text).
+
+The latest version of standard EVE introduces `box' mode cut and paste where
+columns of text can be inserted and removed. In \STEve\ these facilites are
+made more readily available to the user. The `box' cut and paste mode is
+toggled on and off by the \keyname{F17} key. Pressing this key will make all
+subsequent select, insert and remove operations use `box' mode. Pressing
+\keyname{F17} again will revert back to normal cut and paste mode. Notice that
+the buffer status line includes an appropriate extra field when in `box' mode.
+If you are editing in a DECterm window or from a VT1200 terminal, placing the
+mouse pointer over the `box' field and clicking Mouse Button 1 (MB1). Note also
+that the other fields on the status line respond to a click on MB1, most
+notably the `Insert' field which toggles between Insert and Overstrike mode if
+you place the mouse pointer there and click MB1.
+
+A useful feature for the \LaTeX\ user is the MATCHing facility. You can
+instruct \STEve\ to insert pairs of braces, brackets or dollar signs. To set a
+matching character, type \keyname{F18}; you will be prompted for a character to
+match. For example, type \{. Now type \{ into your current buffer. You will see
+that the \{ character is accompanied by a \} character and the cursor is placed
+between the two. To stop this behaviour type \gold\ \keyname{F18} followed by
+the appropriate character (see Appendix B for a list of valid matchable
+characters).
+
+Another useful key is \keyname{F20} which allows the \STEve\ user to toggle
+between 80 and 132 column screen width. Associated with this are the keys
+\gold\ \keyname{$\rhd$} and \gold\ \keyname{$\lhd$} wich allow you to move
+`horizontally' within a buffer.
+
+Finally (for this tutorial) there is the Compile command (abbreviated to 
+\keyname{CTRL} \keyname{F} which allows you to compile FORTRAN (or VAX C) code
+from within \STEve. The compiler is chosen from the filetype extension of the
+file you are editing. If errors occur during compilation they are displayed in
+an error window. You can compile a selected range of code (for instance a
+subroutine) if you prefer. Remember that this facility does not rename
+temporary files on successful completion, and you must recompile your corrected
+code when you leave the editor. 
+
+Check Section 3.1 for other useful keystroke combinations; it's also worth
+checking out the complete command listings in the Appendices as there may be
+commands or further information there you did not know about and that may prove
+very useful to you.
+
+\subsection{Exiting the Editor}
+
+To exit from the editor, simply press key \keyname{F10} . Alternatively press
+the \keyname{Do} key followed by {\tt EXIT} at the {\tt Command:} prompt. Both
+these actions will write your file and exit from the editor. You can also use
+the EDT equivalents \gold\ \keyname{KP7} or \keyname{CTRL} \keyname{Z} to enter
+command mode, which is equivalent to pressing the \keyname{DO} key. If any of
+your buffers have been modified prior to exiting, then you will be given the
+choice of writing them or not.
+
+To quit the editor without writing your buffer(s), type \gold\ \keyname{Q} or
+\keyname{Do} followed  by {\tt QUIT}. If any of your buffers have been
+modified at all, then you are prompted with a warning and you have the choice
+to continue quitting or abort the quit command.
+
+\subsection{Don't Stop Here \ldots}
+
+Well, that's \STEve\ (or EVE, whichever you prefer). For those of
+you still not entirely familiar with all the available commands and their
+keystrokes, don't worry. Most users will need only a few of the many options
+offered and this document is intended to show the reader what is available.
+
+The next section covers many of the little niceties and features that often
+users do not realise exist. It's well worth a read especially if you are new
+to EVE editors.
+
+\section{Useful Hints/Tips/Commands}
+
+\subsection{Useful Pre-defined Key Definitions and Sequences}
+
+Items in the list below that are specific \STEve\ modifications or additions
+are shown in {\bf bold face}.
+
+\begin{itemize}
+\item Pressing the \keyname{DO} key twice repeats the previous command.
+
+\item {\bf The {\tt FILL PARAGRAPH} command ( \gold\ \keyname{KP8} ) has been
+      modified to recognise {\LaTeX} paragraphs. Will operate on a selected
+      range of text if it is defined.}
+
+\item {\bf When searching for strings, the \keyname{FIND} key will allow the
+      search string to be terminated by FORWARD (\keyname{KP4}) or REVERSE
+      (\keyname{KP5}) with the same effect as in EDT.}
+
+\item \keyname{F14} toggles between INSERT and OVERSTRIKE editing modes
+
+\item \keyname{CTRL} \keyname{V} allows the addition of control characters to 
+      the buffer.
+      Useful for sending escape sequences to printers etc. Equivalent to
+      the {\tt QUOTE} command.
+
+\item {\bf \gold\ \keyname{S} invokes the Starlink Spell Checker from within 
+      the editor.
+      Allows you to check the spelling on the text in the current buffer or a
+      selected range of text.}
+
+\item {\bf \keyname{CTRL} \keyname{L} invokes the \LaTeX\ compiler from within
+      the editor.
+      Operates on the current buffer. If an error is encountered, the cursor is
+      moved to the line where the error occurred. On successful completion the
+      temporary output files are renamed to the buffer's filename.}
+
+\item {\bf \keyname{CTRL} \keyname{F} invokes either the FORTRAN or VAX C
+       Compiler (depending on the buffer filename extension). The current
+       buffer or selected range of code is compiled. Any errors are displayed
+       in an error window and the cursor moved back to the code buffer. On
+       successful compilation the error window is removed. Temporary output
+      files are not renamed or saved.}
+
+\item {\bf \gold\ \keyname{=} toggles between one and two windows on the screen.
+      (c.f. {\tt TWO WINDOWS} and {\tt ONE WINDOW} commands). }
+
+\item {\bf \gold\ \keyname{$\bigtriangleup$} and \gold\ 
+       \keyname{$\bigtriangledown$} switch
+       between two windows on the screen (c.f. {\tt OTHER WINDOW} command).}
+
+\item {\bf \gold\ \keyname{W} writes the current buffer to disk using the 
+       existing filename.}
+
+\item {\bf \gold\ \keyname{G} gets a file and creates a new buffer which 
+       becomes the current buffer.}
+
+\item {\bf \gold\ \keyname{L} displays the current line length in the message 
+       window.}
+
+\item {\bf \gold\ \keyname{C} displays the current column number in the 
+       message window.}
+
+\item {\bf \gold\ \keyname{D} copies a current date string into the current 
+       buffer.}
+
+\item {\bf \gold\ \keyname{T} shows the current time in the message window.}
+
+\item {\bf \gold\ \keyname{/} and \gold\ \keyname{?} execute the WHAT LINE
+      command.}
+
+\item {\bf \keyname{CTRL} \keyname{A} \ sets the left margin to the current
+      cursor position.}
+
+\item {\bf \keyname{F17} toggles between Box insert mode and normal insert 
+       mode.}
+
+\item {\bf \keyname{F18} matches a character (c.f. SET MATCHING command) and 
+       \gold\ \keyname{F18} unmatches a character (c.f. SET NOMATCHING
+       command).}
+
+\item {\bf \keyname{F20} toggles the screen width between 80 and 132 columns.}
+
+\item {\bf \gold\ \keyname{M} moves to the MESSAGES buffer.}
+
+\end{itemize}
+
+\subsection{How to get Help}
+\label{getting_help}
+
+There are several ways to get help in \STEve. One of the more useful help
+procedures is simply to press the \keyname{HELP} key to get a keypad diagram.
+This takes a second or two. Once this is displayed, you are prompted to press
+the key(s) you want help on. Once in help, follow the instructions at the
+prompt.
+
+You can access informational topics on general editor issues as well as
+specific command and key help. Just press \keyname{DO} and enter {\tt HELP} at
+the {\tt Command:} prompt. This displays a list of topics, and gives 
+instructions on how to get specific or informational help.
+
+Don't forget you can get help on any or all keys by pressing
+\gold\ \keyname{HELP} (c.f. {\tt HELP KEYS} command). This will prepare and
+display a complete list of defined keys (a similar, but edited list appears in
+Appendix \ref{key_defs} of this document). You are then prompted to press the 
+key(s) you want help on.
+
+For instant help on any particular key, then press \gold\ \keyname{PF2} , and
+you will be prompted to press the key you want help on. A brief description of
+the particular key function or associated command is displayed in the message
+window without affecting the current windows.
+
+And finally Appendix \ref{deceve} of this document lists all the available 
+help topics in standard EVE.
+
+\subsection{Customizing it Yourself}
+
+There are several ways of further customizing your own editing environment by
+the use of command and/or initialization files. These are the best ways to
+customize the editing environment. There is also the ability for users to
+create their own section files. This is discouraged as it results in users
+having to keep large section files ($>$ 1200 blocks) in their filespace, and
+the use of personal section files is much less efficient than using a common
+system-wide section file. 
+
+For more details. refer to the descriptions of command and initialization file
+usage (and default logical names you can assign to them) in the VMS General
+User Volume 5B, EVE Reference Manual. Section 1.2.1.1 deals with command files
+and section 1.2.1.5 deals with initialization files.
+
+\newpage
+
+\appendix
+
+\section{\STEve\ Command Summary}
+
+For your reference, here are the commands specific to \STEve,
+including some of the standard EVE commands that have been modified in \STEve.
+Further details are given in the \STEve\ command reference (Appendix
+\ref{command_reference}).
+
+\begin{tabbing}
+cccccccccccccccccccccccccc \= cccccccccccccccccccccccccc \= ccccccccccccccccccccc \= \kill
+ EDITING TEXT AND BOX OPERATIONS \\
+ \\
+    Box Cut       \>    Box Paste   \>   Box Select      \> Copy Date        \\
+    Copy Time     \>    Set Box Select  \> Set Box Noselect \> Set Matching \\
+    Set NoMatching \\
+ \\
+ CURSOR MOVEMENT AND SCROLLING \\
+ \\
+    Mess Down    \>     Mess Up  \\
+ \\
+ GENERAL-PURPOSE COMMANDS \\
+ \\
+    Column           \> Compile        \> LaTeX        \>   Length  \\
+    Set Latex Nosave \> Set Latex Save \> Show Time    \>   Spell   \\
+ \\
+ FILE, BUFFER, AND WINDOW COMMANDS \\
+ \\
+    Map Buffer     \>  Set STE Windows \> Set Mapping  \>   Set NoSTE Windows \\
+    Set NoMapping  \>  Set NoTrimming  \> Set Trimming \>   Shift Left  \\
+    Shift Right    \>  Toggle Windows  \> Trim Buffer   \\
+ \\
+\end{tabbing}
+
+\newpage
+
+\section{\STEve\ Command Reference}
+\label{command_reference}
+
+This appendix contains a more detailed reference to all the \STEve\ commands. 
+Almost all of the following information is contained in the on-line \STEve\
+help, accessible from within the editor.
+
+\bigskip
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf BOX CUT} \hfill Cut a Box of Text}
+
+\medskip
+Remove the contents of the selected box range. The range is replaced in one of
+two ways depending on the mode of the current buffer, i.e. whether it is in
+INSERT mode or OVERSTRIKE mode. In the former, the gap is closed by moving any
+text to the right-hand side of the range to the left. In the latter, the space
+is filled with blanks. Identical to the standard EVE command except the Box
+commands maintain a Box field on buffer status line. Care must be taken when
+inserting text in box mode when you place the cursor beyond the end of a line
+(see the EVE commands SET BOX PADDING and SET BOX NOPADDING).
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+ccccccccccccccccc\=cccccccccccccccccccc\=ccccccccccccccccccccccccccccc\=\kill
+BOX PASTE      \> BOX SELECT   \> SET BOX NOSELECT  \>   SET BOX SELECT \\
+\end{tabbing}
+\item[Keys]:
+           \begin{itemize}
+           \item \gold\ \keyname{Remove}
+           \item \keyname{Remove} if in Box Mode (toggled by \keyname{F17} ).
+           \end{itemize}
+
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf BOX PASTE} \hfill Paste a Box of Text}
+
+\medskip
+Insert the contents of the box paste buffer at the current editing position.
+The contents of the paste buffer are inserted in one of two ways depending on
+the mode of the current buffer, i.e. whether it is in INSERT mode or OVERSTRIKE
+mode. In the former, the contents of the paste buffer are inserted and any text
+that is within it's range is moved over to the right. In the latter, the
+contents of the paste buffer overwrite any existing text that is in it's range.
+Identical to the standard EVE command except the Box commands maintain a Box
+field on buffer status line. Care must be taken when inserting text in box mode
+when you place the cursor beyond the end of a line (see the EVE commands SET
+BOX PADDING and SET BOX NOPADDING).
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccc\=ccccccccccccccccccc\=ccccccccccccccccccccccccccccc\=\kill
+BOX CUT        \> BOX SELECT   \> SET BOX NOSELECT  \>  SET BOX SELECT \\
+\end{tabbing}
+\item[Keys]:
+         \begin{itemize}
+         \item \gold\ \keyname{Insert}
+         \item \keyname{Insert} if in Box Mode (toggled by \keyname{F17} ).
+         \end{itemize}
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf BOX SELECT} \hfill Select a Box of Text}
+
+\medskip
+Start selection of a box region which is to be removed and/or inserted.
+Identical to the standard EVE command except the Box commands maintain a Box
+field on buffer status line.
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+ccccccccccccccccc\=ccccccccccccccccccc\=ccccccccccccccccccccccccccccc\=\kill
+BOX CUT \>   BOX PASTE  \>   SET BOX NOSELECT  \>   SET BOX SELECT \\
+\end{tabbing}
+\item[Keys]:
+         \begin{itemize}
+         \item \gold\ \keyname{Select}
+         \item \keyname{Select} if in Box Mode (toggled by \keyname{F17} ).
+         \end{itemize}
+
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf COLUMN} \hfill Display Current Column}
+
+\medskip
+  Displays in the message window the column number that the current cursor
+  position occupies.
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccc\=cccccccccccccccccc\=ccccccccccccccccccccccccccccc\=\kill
+ \> LENGTH \\
+\end{tabbing}
+
+\item[Keys]:
+           \begin{itemize}
+           \item \gold\ \keyname{C}
+           \end{itemize}
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf COMPILE} \hfill Compile a Buffer or Range}
+
+\medskip
+  \STEve\ offers single keystroke compilation of the FORTRAN or C source
+  in the current buffer. Success/Failure is reported on the message
+  line. Any compilation errors will appear in an extra Compiler
+  window. If the compilation is successful, then the Compiler
+  window will be deleted.
+
+  COMPILE will process the currently selected region of code, or the
+  whole buffer if no select is active. Will not compile a selected box
+  of code.
+
+  Users should note that this facility is used only for checking code. The
+  editor will not preserve the compiled code but will delete the temporary
+  files associated with the procedure. The edited code is written
+  on exit (unless the user {\tt QUIT}s the editing session), and the user 
+  must then compile again.
+
+\begin{description}
+\item[Keys]:
+          \begin{itemize}
+          \item \keyname{CTRL}\ \keyname{F}
+          \end{itemize}
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf COPY DATE} \hfill Copy Date String to Buffer}
+
+\medskip
+  Copies today's date in the form `dd-Mmm-yy' at the current editing
+  position. The current text entry mode (insert or overstrike) is used.
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccccccccc\=cccccccccccccccccc\=ccccccccccccccccccccccccccccc\=\kill
+COPY TIME \> SHOW TIME  \\
+\end{tabbing}
+
+\item[Keys]:
+           \begin{itemize}
+           \item \gold\ \keyname{D}
+           \end{itemize}
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf COPY TIME} \hfill Copy Current Time String to Buffer}
+
+\medskip
+  Copies the current time in the form `hh:mm:ss' at the current editing
+  position. The current text entry mode (insert or overstrike) is used.
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccccccccc\=cccccccccccccccccc\=ccccccccccccccccccccccccccccc\=\kill
+COPY DATE \> SHOW TIME \\
+\end{tabbing}
+
+\item[Keys]:
+          \begin{itemize}
+          \item \STEve\ does not define a key for COPY TIME
+          \end{itemize}
+\end{description}
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf MAP BUFFER} \hfill Move to Mapped Buffer}
+
+\medskip
+  Map one of the buffers listed in the buffer map on to the current
+  window. Equivalent to \gold\ \keyname{$<n>$} (where n is one of the numeric
+  keys (1 to 9) across the top of the QWERTY keyboard) used to select buffer n 
+  in the buffer map. Alternatively a mouse can be used to select a buffer for 
+  editing sessions carried out from a DECterm or VT1200 window. Simply place
+  the mouse pointer over the desired buffer name and click Mouse Button 1
+  (MB1).
+  \begin{itemize}
+  \item The buffer map is displayed by default and is just below the status
+        line of the lowest window on the screen.
+  \item If \gold\ \keyname{$<n>$} is typed and buffer n does not exist, the user 
+        is prompted for a file to get.
+  \item Where appropriate, place mouse pointer over desired buffer name and
+        click Mouse Button 1 (MB1).
+  \end{itemize}
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccccccccccccccccc\=ccccccccccccccccccccccccc\=\kill
+SET MAPPING  \> SET NOMAPPING \\
+\end{tabbing}
+
+\item[Keys]:
+          \begin{itemize}
+          \item \gold\ \keyname{$<n>$} where 1 $\leq$ n $\leq$ 9
+          \end{itemize}
+
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf LATEX} \hfill \LaTeX\ the Current Buffer}
+
+\medskip
+  The LATEX command invokes \LaTeX\ and processes the entire contents
+  of the current buffer (ranges are not allowed). If an error occurs,
+  then the cursor is placed in the LaTeX buffer at the line where the
+  error occured (on a best efforts basis!). On success the temporary output
+  files are renamed to the filename associated with the buffer containing the 
+  \LaTeX\ code. This action can be turned off be the command SET LATEX NOSAVE
+  (\gold\ \keyname{F19}).
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccccccccccccccccccccccccc\=cccccccccccccccccccc\=\kill
+SET LATEX NOSAVE    \> SET LATEX SAVE \\
+\end{tabbing}
+
+\item[Keys]:
+          \begin{itemize}
+          \item \keyname{CTRL}\ \keyname{L}
+          \end{itemize}
+
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf LENGTH} \hfill Display Current Line Length}
+
+\medskip
+  Displays the current line length.
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccccccc\=cccccccccccccccccc\=ccccccccccccccccccccccccccccc\=\kill
+COLUMN \\
+\end{tabbing}
+
+\item[Keys]:
+         \begin{itemize}
+         \item \gold\ \keyname{L}
+         \end{itemize}
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf MESS DOWN} \hfill Scroll Message Buffer}
+
+\medskip
+  Scroll the message window down by one line. Useful when that TALK
+  message whizzes off the message line before you can read it.
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccccccccc\=cccccccccccccccccc\=ccccccccccccccccccccccccccccc\=\kill
+MESS UP \\
+\end{tabbing}
+\item[Keys]:
+        \begin{itemize}
+        \item \gold\ \keyname{Next}
+        \item \gold\ \keyname{M} moves to the MESSAGES buffer
+        \end{itemize}
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf MESS UP} \hfill Scroll Message Buffer}
+
+\medskip
+  Scroll the message window up by one line. Useful when that TALK
+  message whizzes off the message line before you can read it.
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccccccccc\=cccccccccccccccccc\=ccccccccccccccccccccccccccccc\=\kill
+MESS DOWN \\
+\end{tabbing}
+
+\item[Keys]:
+        \begin{itemize}
+        \item \gold\ \keyname{Prev}
+        \item \gold\ \keyname{M} moves to the MESSAGES buffer
+        \end{itemize}
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf SET BOX NOSELECT} \hfill Disable Box Select Mode}
+
+\medskip
+  Disables the tying of the box cut and paste commands to the normal
+  cut and paste keys. This does not prevent the appropriate \gold -shifted
+  keys performing box cut and paste operations.
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccc\=cccccccccccccccccc\=ccccccccccccccccccccccccc\=\kill
+BOX CUT   \> BOX PASTE   \> BOX SELECT \> SET BOX SELECT \\
+\end{tabbing}
+
+\item[Keys]:
+          \begin{itemize}
+          \item \keyname{F17} toggles between Box Select mode and Default
+                Select mode
+          \item Mouse support available from a DECterm or VT1200 window.
+                Place mouse pointer over `Box' filed and click Mouse
+                Button 1 (MB1).
+          \end{itemize}
+
+\end{description}
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf SET BOX SELECT} \hfill Enable Box Select Mode}
+
+\medskip
+  Ties the box cut and paste commands to the normal cut and paste keys.
+  Original key definitions are restored by the command SET BOX NOSELECT.
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccc\=cccccccccccccccccc\=ccccccccccccccccccccccccc\=\kill
+BOX CUT   \> BOX PASTE  \> BOX SELECT \> SET BOX NOSELECT \\
+\end{tabbing}
+
+\item[Keys]:
+          \begin{itemize}
+          \item \keyname{F17} toggles between Box Select mode and Default
+                Select mode
+          \end{itemize}
+
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf SET STE WINDOWS} \hfill Enable Extra STE Window Keys}
+
+\medskip
+  Defines keys to perform common buffer manipulations. All of
+  these key definitions, where relevant, maintain the buffer map
+  display.
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+ccccccccccccccccccccccccccccccc\=cccccccccccccccccccc\=cccccccccccccccccccccc\=\kill
+SET NOSTE WINDOWS \> SHIFT LEFT  \> SHIFT RIGHT \> TOGGLE WINDOWS \\
+\end{tabbing}
+
+\item[Keys defined by this command]:
+       \begin{itemize}
+       \item \gold\ \keyname{G} prompts the user for a new file.
+       \item \gold\ \keyname{W} writes the current buffer. The user is
+             prompted for a filename if none already specified.
+       \item \gold\ \keyname{Delete} deletes the current buffer (you are
+             given a chance to change your mind if the buffer has been
+             modified).
+       \item \gold\ \keyname{=} toggles between one and two windows.
+       \item \gold\ \keyname{$\bigtriangleup$} and \gold\
+             \keyname{$\bigtriangledown$} switch to the previous and next
+             windows respectively.
+       \item \gold\ \keyname{$\lhd$} and \gold\ \keyname{$\rhd$} shift the
+             current window left and right by 40 characters to allow easy
+             reading of very long lines.
+       \end{itemize}
+
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf SET LATEX NOSAVE} \hfill Delete \LaTeX\ Temporary Files}
+
+\medskip
+  After this command is issued, all temporary output files from LaTeX
+  processing done with the LATEX command (i.e. .AUX,
+   .LIS and .DVI files) will not be kept.
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccccccccccccccccccccc\=cccccccccccccccccccc\=\kill
+    SET LATEX SAVE  \>     LATEX \\
+\end{tabbing}
+
+\item[Keys]:
+        \begin{itemize}
+        \item \gold\ \keyname{F19}
+        \end{itemize}
+
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf SET LATEX SAVE} \hfill Save and Rename \LaTeX\ Files}
+
+\medskip
+  After this command is issued, all temporary output files from LaTeX
+  processing done with the LATEX command (i.e. .AUX,
+  .LIS and .DVI files) will be saved and renamed to the filename
+  associated with the buffer containing the LaTeX code. However,
+  if the buffer has no filename associated with it, these files will
+  not be saved.
+
+  The default action is to SAVE the LaTeX output files.
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccccccccccccccccccccc\=cccccccccccccccccccc\=\kill
+    SET LATEX NOSAVE  \>   LATEX \\
+\end{tabbing}
+
+\item[Keys]:
+       \begin{itemize}
+       \item \keyname{F19}
+       \end{itemize}
+
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf SET MAPPING} \hfill Enable Mapped Buffer List}
+
+\medskip
+  Mapping in \STEve\ allows the editor to create and maintain a numbered
+  list of user buffers. In addition the \gold\ \keyname{$<n>$} keys as 
+  described below are
+  defined with this command to allow quick and easy movement between
+  multiple buffers. Enabled by default. Mouse support is also provided for
+  editing sessions performed from a DECterm or VT1200 window.
+  \begin{itemize}
+  \item  The buffer map is displayed by default and is just below the status
+         line of the lowest window on the screen.
+  \item  It consists of a list of active user buffers, each preceded
+         by a number which can be used with the \gold\ \keyname{$<n>$} key
+         combination or the MAP BUFFER command.
+  \item  For DECterm and VT1200 sessions, placing the mouse pointer over
+         the desired buffer name and clicking Mouse Button 1 (MB1), selects
+         that buffer.
+  \end{itemize}
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccccccccccccccccccccc\=cccccccccccccccccccc\=\kill
+MAP BUFFER  \> SET NOMAPPING  \\
+\end{tabbing}
+
+\item[Keys]:
+          \begin{itemize}
+          \item \gold\ \keyname{$<n>$} where 1 $\leq$ n $\leq$ 9
+          \end{itemize}
+
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf SET MATCHING} \hfill Match and Insert Characters}
+
+\medskip
+  Defines a set of characters, all of which must be the opening member
+  of a pair. When one of these characters is typed, the matching closing
+  character is inserted as well and the cursor is positioned between the
+  two characters.
+
+  Currently the matchable character list contains the following:
+\begin{verbatim}
+               ( [ { " $     matched to    $ " } ] )
+\end{verbatim}
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccccccccccccccccccccccccc\=cccccccccccccccccccc\=\kill
+    SET NOMATCHING \\
+\end{tabbing}
+
+\item[Keys]:
+       \begin{itemize}
+       \item \keyname{F18}
+       \end{itemize}
+
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf SET NOSTE WINDOWS} \hfill Disable STE Window Keys}
+
+\medskip
+  Undefine keys that perform common buffer manipulations.
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccccccccccccccccccccccccc\=cccccccccccccccccccc\=\kill
+    SET STE WINDOWS \\
+\end{tabbing}
+
+\item[Keys]:
+          \begin{itemize}
+          \item \STEve\ does not define a key for SET NOSTE WINDOWS
+          \end{itemize}
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf SET NOMAPPING} \hfill Disable Mapped Buffers}
+
+\medskip
+  Disables the display of the buffer map window and undefines the buffer
+  map keys. The buffer map window is displayed by default.
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccccccccccccccccccccccccc\=cccccccccccccccccccc\=\kill
+    MAP BUFFER \>   SET MAPPING \\
+\end{tabbing}
+
+\item[Keys]:
+          \begin{itemize}
+          \item \STEve\ does not define a key for SET NOMAPPING
+          \end{itemize}
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf SET NOMATCHING} \hfill Unmatch Characters}
+
+\medskip
+  Removes a character or a string of characters from the list of characters
+  set by previous use of the SET MATCHING command.
+
+  Currently the matchable character list contains the following:
+\begin{verbatim}
+               ( [ { " $     matched to    $ " } ] )
+\end{verbatim}
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccccccccccccccccccccccccc\=cccccccccccccccccccc\=\kill
+    SET MATCHING \\
+\end{tabbing}
+
+\item[Keys]:
+       \begin{itemize}
+       \item \gold\ \keyname{F18}
+       \end{itemize}
+
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf SET NOTRIMMING} \hfill Disable Buffer Auto-Trim}
+
+\medskip
+  Disables automatic trimming of trailing white space from buffers
+  prior to writing them to disk. Trimming is disabled by default.
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccccccccccccccccccccc\=cccccccccccccccccccc\=\kill
+    SET TRIMMING \>   TRIM BUFFER \\
+\end{tabbing}
+
+\item[Keys]:
+          \begin{itemize}
+          \item \STEve\ does not define a key for SET NOTRIMMING
+          \end{itemize}
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf SET TRIMMING} \hfill Enable Buffer Auto-Trim}
+
+\medskip
+  Enables automatic trimming of trailing white space from buffers
+  prior to writing them to disk. This is disabled by default.
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccccccccccccccccccccc\=cccccccccccccccccccc\=\kill
+    SET NOTRIMMING \>   TRIM BUFFER \\
+\end{tabbing}
+
+\item[Keys]:
+          \begin{itemize}
+          \item \STEve\ does not define a key for SET TRIMMING
+          \end{itemize}
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf SHIFT LEFT} \hfill Shift Window Left}
+
+\medskip
+  Shifts the current window 40 characters to the left and indicates
+  where you are via a message in the message buffer.
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+ccccccccccccccccccccccccccccccccccccc\=cccccccccccccccccccc\=\kill
+    SET NOSTE WINDOWS \>   SET STE WINDOWS\\
+\end{tabbing}
+
+\item[Keys]:
+     \begin{itemize}
+     \item \gold\ \keyname{$\lhd$}
+     \end{itemize}
+
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf SHIFT RIGHT} \hfill Shift Window Right}
+
+\medskip
+  Shifts the current window 40 characters to the right and indicates
+  where you are via a message in the message buffer.
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+ccccccccccccccccccccccccccccccccccccc\=cccccccccccccccccccc\=\kill
+    SET NOSTE WINDOWS \>   SET STE WINDOWS\\
+\end{tabbing}
+
+\item[Keys]:
+     \begin{itemize}
+     \item \gold\ \keyname{$\rhd$}
+     \end{itemize}
+
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf SHOW TIME} \hfill Display Current Time}
+
+\medskip
+  Displays the current time in the form `hh:mm:ss' in the message
+  window.
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccccccccc\=cccccccccccccccccccccccc\=ccccccccccccccccccccccccccccc\=\kill
+COPY DATE \> COPY TIME \\
+\end{tabbing}
+
+\item[Keys]:
+    \begin{itemize}
+    \item \gold\ \keyname{T}
+    \end{itemize}
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf TOGGLE WINDOWS} \hfill Switch Windows}
+
+\medskip
+  Switches between one and two windows.
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccccccccccccccccccccccccc\=cccccccccccccccccccc\=\kill
+SET NOSTE WINDOWS \> SET STE WINDOWS\\
+\end{tabbing}
+
+\item[Keys]:
+        \begin{itemize}
+        \item \gold\ \keyname{=}
+        \end{itemize}
+\end{description}
+
+\goodbreak
+
+\rule{\textwidth}{0.3mm}
+
+{\Large {\bf TRIM BUFFER} \hfill Trim Buffer of whitespace}
+
+\medskip
+  Trim trailing white space from the current buffer.
+
+\begin{description}
+\item[Related Topics]:
+\begin{tabbing}
+cccccccccccccccccccccccccccccccccccccc\=cccccccccccccccccccc\=\kill
+SET NOTRIMMING \> SET TRIMMING \\
+\end{tabbing}
+
+\item[Keys]:
+          \begin{itemize}
+          \item \STEve\ does not define a key for TRIM BUFFER
+          \end{itemize}
+\end{description}
+
+\newpage
+
+\section{\STEve\ Key Definitions}
+\label{key_defs}
+
+Below is an edited list of key definitions including those more commonly used
+and provided by default with the current \STEve\ implementation. Help on a key
+is available from within the editor by typing \gold\ \keyname{PF2} followed by
+the key you want help on. Alternatively a complete list of key definitions,
+similar to the one below can be created within the editor by pressing \gold\
+\keyname{HELP} , and more detailed help is available at that point by following
+the prompt instructions.
+\begin{small}
+\begin{verbatim}
+ Key         Function                Gold sequence    Function
+                                      (GOLD = PF1)
+ CTRL/A      Set left margin
+ CTRL/B      Recall                  GOLD-/           What line
+ CTRL/F      Compile                 GOLD-0           Repeat
+ CTRL/K      Learn                   GOLD-1           Map buffer #1
+ CTRL/L      Latex                   GOLD-2           Map buffer #2
+ RETURN      Return                  GOLD-3           Map buffer #3
+ CTRL/R      Remember                GOLD-4           Map buffer #4
+ CTRL/V      Quote                   GOLD-5           Map buffer #5
+ CTRL/W      Refresh                 GOLD-6           Map buffer #6
+ CTRL/Z      Do                      GOLD-7           Map buffer #7
+ FIND        Find                    GOLD-8           Map buffer #8
+ INSERT_HERE Insert here             GOLD-9           Map buffer #9
+ REMOVE      Remove                  GOLD-=           Toggle number of windows
+ SELECT      Select                  GOLD-?           What line
+ PREV_SCREEN Previous screen         GOLD-C           Column
+ NEXT_SCREEN Next screen             GOLD-D           Copy date
+ F10         Exit                    GOLD-G           Get file
+ F11         Forward reverse         GOLD-L           Line length
+ F12         Start of line           GOLD-M           Buffer messages
+ F13         Delete previous word    GOLD-Q           Quit
+ F14         Insert overstrike       GOLD-S           Spell
+ F17         Toggle Box Mode         GOLD-T           Show time
+ F18         Match Character         GOLD-W           Write file
+ F19         Latex File Save         GOLD-X           Exit
+ F20         Toggle Width 80/132     GOLD-DELETE      Delete current buffer
+                                     GOLD-UP          Previous window
+                                     GOLD-DOWN        Next window
+                                     GOLD-RIGHT       Shift right
+                                     GOLD-LEFT        Shift left
+                                     GOLD-INSERT_HERE Box insert
+                                     GOLD-REMOVE      Box cut
+                                     GOLD-SELECT      Box select
+                                     GOLD-PREV_SCREEN Mess up
+                                     GOLD-NEXT_SCREEN Mess dwn
+                                     GOLD-HELP        Help keys
+                                     GOLD-F17         UnMatch Character
+                                     GOLD-F18         Latex File Nosave
+\end{verbatim}
+\end{small}
+
+\newpage
+
+\section{VT200 Keypad Diagram}
+
+A VT200 terminal is the recommended terminal for \STEve\ users. The keypad
+diagram below shows the EDT keypad, the standard ANSI extension keys and the
+\STEve\ function keys \keyname{F17} to \keyname{F20} . Users are advised not to
+define these four function keys to allow for future \STEve\ enhancements. The
+keys \keyname{F7} to \keyname{F9} (and their \gold\ shifted functions) are
+reserved for users to program as they wish.
+
+
+\begin{small}
+\begin{verbatim}
+              GOLD key functions are shown BELOW primary key functions.
+                     _______________________    _______________________________
+   To get help on   | HELP  |      Do       |  |BoxMode| Match |Lat Sav|Scr Wid|
+   commands, type   |KeyDefs|               |  |       |UnMatch|Lat NoS|       |
+   a command or ?   |_______|_______________|  |_______|_______|_______|_______|
+   and press         _______________________    _______________________________
+   RETURN.          | Find  |Ins Her|Remove |  | Gold  | HELP  |FndNxt | Del L |
+                    |Wil Fin|Box Ins|Box Cut|  |  key  |Sho Key| Find  |Res Lin|
+   To list all key  |_______|_______|_______|  |_______|_______|_______|_______|
+   definitions,     |Select |Pre Scr|Nex Scr|  |MovByPa| Sect  |Append | Del W |
+   type Keys and    |Box Sel|Mess Up|Mes Dwn|  |  Do   | Fill  |EDT Rep|Res Wor|
+   press RETURN,    |_______|_______|_______|  |_______|_______|_______|_______|
+   or press GOLD-           |Move up|          |Forward|Reverse|Remove | Del C |
+   HELP.                    |Pre Win|          |Bottom |  Top  |Ins Her|Res Cha|
+                     _______|_______|_______   |_______|_______|_______|_______|
+   To show a key    |Mov Lef|Mov Dow|Mov Rig|  | Word  |  EOL  | Char  |       |
+   definition, use  |Shi Lef|Nex Win|Shi Rig|  |ChngCas|Del EOL|SpecIns|Return |
+   SHOW KEY.        |_______|_______|_______|  |_______|_______|_______| Subs  |
+                                               |   EDT Line    |Select |       |
+                     Use the DO key to enter   |   Open Line   | Reset |       |
+                        advanced commands      |_______________|_______|_______|
+\end{verbatim}
+\end{small}
+
+\newpage
+
+\section{VT100 Keypad Diagram}
+
+A VT100 terminal provides less functionality than a VT200, but the EDT keypad
+is fully configured, and `arrow' keys are provided. Any other commands can be
+entered on the command line, by pressing the \keyname{Do} synonym \gold\
+\keyname{KP7} .
+
+\begin{small}
+\begin{verbatim}
+              GOLD key functions are shown BELOW primary key functions.
+        _______________________________         _______________________________
+       |Move up|Mov Dow|Mov Lef|Mov Rig|       | Gold  | HELP  |FndNxt | Del L |
+       |Pre Win|Nex Win|Shi Lef|Shi Rig|       |  key  |Sho Key| Find  |Res Lin|
+       |_______|_______|_______|_______|       |_______|_______|_______|_______|
+                                               |MovByPa| Sect  |Append | Del W |
+       To get help on commands, type a         |  Do   | Fill  |EDT Rep|Res Wor|
+       command or ? and press RETURN.          |_______|_______|_______|_______|
+                                               |Forward|Reverse|Remove | Del C |
+       To list all key definitions, type       |Bottom |  Top  |Ins Her|Res Cha|
+       Keys and press RETURN, or press         |_______|_______|_______|_______|
+       GOLD-HELP.                              | Word  |  EOL  | Char  |       |
+                                               |ChngCas|Del EOL|SpecIns|Return |
+       To show a key definition, use           |_______|_______|_______| Subs  |
+       SHOW KEY.                               |   EDT Line    |Select |       |
+                                               |   Open Line   | Reset |       |
+       Synonyms for the DO key:                |_______________|_______|_______|
+              GOLD-KP7
+\end{verbatim}
+\end{small}
+
+\newpage
+
+\section{Installation Instructions}
+\subsection{Installation Instructions for System Managers}
+\label{system_install}
+
+This appendix includes instructions for the system manager on how to install
+\STEve\ system-wide. These instructions are identical to those issued in the
+relevant SSC when this software item was originally released, and is included
+here for reference.
+
+The following logical definitions are in {\tt SSC:STARTUP.COM}:
+\begin{small}
+\begin{verbatim}
+      $!
+      $! STEVE - Set up logicals for STEVE TPU editor
+      $!
+      $       DEFINE/SYSTEM STEVE_DIR STARDISK:[STARLINK.SYSTEM.STEVE]
+      $       DEFINE/SYSTEM/EXEC STEVE_SECTION STEVE_DIR:STEVE.TPU$SECTION
+      $       DEFINE/SYSTEM STEVE_HELP STEVE_DIR:STEVE.HLB
+      $!
+\end{verbatim}
+\end{small}
+and the following image installation should be done in
+{\tt LSSC:STARTUP.COM}:
+\begin{small}
+\begin{verbatim}
+      $!
+      $! STEVE - install the STEVE section file
+      $!
+      $ MCR INSTALL
+      ADD STEVE_SECTION  /SHARED/HEADER/OPEN
+      EXIT
+      $!
+\end{verbatim}
+\end{small}
+The following symbol assignments should be done in {\tt SSC:LOGIN.COM}:
+\begin{small}
+\begin{verbatim}
+      $!
+      $! STEVE TPU Editor
+      $!
+      $         EVE    :== EDIT/TPU
+      $         STEV*E :== EDIT/TPU/SECTION=STEVE_SECTION
+\end{verbatim}
+\end{small}
+Note that DEC recommend defining the {\tt EVE} symbol anyway, and this may
+already have been set up on your node.
+
+\subsection{Installation Instructions for Users}
+
+The \STEve\ editor is an optional Starlink Software Item. At some nodes
+therefore, other system-wide editors may be provided. This appendix shows how
+any user can access this valuable editor at nodes where \STEve\ is not
+installed system-wide.
+
+To check if the \STEve\ editor is installed on your system, enter the DCL
+command:
+
+\begin{verbatim}
+      $ SHOW LOGICAL STEVE_SECTION
+\end{verbatim}
+
+If this results in the following text:
+
+\begin{verbatim}
+      "STEVE_SECTION" = "STEVE_DIR:STEVE.TPU$SECTION" (LNM$SYSTEM_TABLE)
+\end{verbatim}
+
+then \STEve\ is installed on your system and you need not read this appendix
+any further. New users should read SUN/125 (intended for the absolute
+beginner), and Section \ref{tutorial_guide} in this document for information on
+how to use the editor.
+
+If this is not the case, or there is no translation for the logical name
+{\tt TPU\$SECTION}, then you should follow the instructions below.
+
+To access \STEve\ you must create a symbol and three logical names, usually by
+placing them in your {\tt LOGIN.COM} file. The symbol {\tt EVE} may already be
+set up on your node, and you can check this with the DCL command  {\tt \$ SHOW
+SYMBOL EVE}. As an example the following  lines should be added to your {\tt
+LOGIN.COM} file:
+
+\begin{verbatim}
+      $ STEV*E :== EDIT/TPU/SECTION=STEVE_SECTION
+      $ DEFINE STEVE_DIR STARDISK:[STARLINK.SYSTEM.STEVE]
+      $ DEFINE STEVE_SECTION STEVE_DIR:STEVE.TPU$SECTION
+      $ DEFINE STEVE_HELP STEVE_DIR:STEVE.HLB
+\end{verbatim}
+
+A user may modify the editing environment further by creating a file in their
+{\tt SYS\$LOGIN} directory, named {\tt EVE\$INIT.EVE} in which any \STEve\ and
+EVE commands may be placed that a user wishes executed each time the editor is
+invoked. Customizing the initial editing environment in this way will make
+editor startup slower. The user is advised to check whether the standard
+\STEve\ editor does not already have the commands and functions set up already.
+
+{\bf Note:} {\em For optimum use of \STEve, the section file should be
+installed system-wide. Users should ask their local system manager to install
+\STEve\ as described in Appendix \ref{system_install}}.
+
+\newpage
+\section{Standard EVE Reference}
+\label{deceve}
+For completeness, here's a list of all the original EVE commands, some of which
+have been modified slightly in \STEve.  This list is intended to help you
+remember an EVE command without having to dig out a copy of the Guide to Text
+Processing on VAX/VMS. This command list is complete for EVE V2.6 (as supplied
+with VAX/VMS 5.4).
+
+\begin{tabbing}
+cccccccccccccccccccccccccc \= ccccccccccccccccccccccccccccc \= ccccccccccccccccccccc \= \kill
+
+ EDITING TEXT \\
+ \\
+    Change Mode           \>  Erase Word       \>    Restore Character   \\
+    Copy                  \>  Insert Here      \>    Restore Line        \\
+    Cut                   \>  Insert Mode      \>    Restore Selection   \\
+    Delete                \>  Overstrike Mode  \>    Restore Sentence    \\
+    Erase Character       \>  Paste            \>    Restore Word        \\
+    Erase Line            \>  Quote            \>    Select              \\
+    Erase Previous Word   \>  Remove           \>    Select All          \\
+    Erase Start Of Line   \>  Restore          \>    Store Text          \\
+ \\
+ BOX OPERATIONS\\
+ \\
+    Box Copy           \> Box Paste             \> Set Box Nopad         \\
+    Box Cut            \> Box Paste Insert      \> Set Box Noselect      \\
+    Box Cut Insert     \> Box Paste Overstrike  \> Set Box Pad           \\
+    Box Cut Overstrike \> Box Select            \> Set Box Select        \\
+                       \> Restore Box Selection \>                       \\
+ \\
+ SEARCHES\\
+\\
+    Find             \>  Set Find Case Exact    \> Set Wildcard Ultrix   \\
+    Find Next        \>  Set Find Case Noexact  \> Set Wildcard VMS      \\
+    Find Selected    \>  Set Find Nowhitespace  \> Show Wildcards        \\
+    Replace          \>  Set Find Whitespace    \> Wildcard Find         \\
+    Spell            \>                         \>                       \\
+ \\
+ CURSOR MOVEMENT AND SCROLLING \\
+cccccccccccccccccccc \= cccccccccccccccccc \= ccccccccccccccccccccc\= \kill
+ \\
+    Bottom          \> Mark         \> Move Right      \> Set Cursor Free    \\
+    Change Direction\> Move By Line \> Move Up         \> Set Scroll Margins \\
+    End Of Line     \> Move By Page \> Next Screen     \> Start Of Line      \\
+    Forward         \> Move By Word \> Previous Screen \> Top                \\
+    Go To           \> Move Down    \> Reverse         \> What Line          \\
+    Line            \> Move Left    \> Set Cursor Bound\>                    \\
+ \\
+ GENERAL-PURPOSE COMMANDS \\
+ \\
+cccccccccccc\=cccccccccccc\=cccccccccccc\=cccccccccccccc\=ccccccccccccc\=ccccccccccccc\= \kill
+    Attach \>  Do   \> Help  \>  Recall  \>   Reset   \>  Show        \\
+    DCL    \>  Exit \> Quit  \>  Repeat  \>   Return  \>  Spawn       \\
+\end{tabbing}
+
+\begin{tabbing}
+ccccccccccccccccccccccc \= cccccccccccccccccccccccc \= cccccccccccccccccc \= \kill
+ FILES AND BUFFERS \\
+ \\
+    Buffer         \>  Open Selected      \>  Set Journaling           \\
+    Delete Buffer  \>  Previous Buffer    \>  Set Journaling All       \\
+    Get File       \>  Recover Buffer     \>  Set Nojournaling         \\
+    Include File   \>  Recover Buffer All \>  Set Nojournaling All     \\
+    New            \>  Save File          \>  Show Buffers             \\
+    Next Buffer    \>  Save File As       \>  Show System Buffers      \\
+    Open           \>  Set Buffer         \>  Write File               \\
+ \\
+ WINDOWS AND DISPLAY\\
+ \\
+    Delete Window  \>  One Window      \>  Set Width   \>   Shrink Window  \\
+    Enlarge Window \>  Previous Window \>  Shift Left  \>   Split Window   \\
+    Next Window    \>  Refresh         \>  Shift Right \>   Two Windows    \\
+ \\
+ FORMATTING AND CASE CHANGES \\
+ \\
+    Capitalize Word  \>   Insert Page Break \>   Set Paragraph Indent      \\
+    Center Line      \>   Lowercase Word    \>   Set Right Margin          \\
+    Convert Tabs     \>   Paginate          \>   Set Tabs                  \\
+    Fill             \>   Set Left Margin   \>   Set Wrap                  \\
+    Fill Paragraph   \>   Set Nowrap        \>   Tab                       \\
+    Fill Range       \>                     \>   Uppercase Word            \\
+ \\
+cccccccccccccccccccccccccccccccccc \= cccccccccccccccccccccccccc \= ccccccccccccccccccccc \= \kill
+ KEY DEFINITIONS \\
+ \\
+    Define Key                \> Set Gold Key       \> Set Keypad VT100    \\
+    Learn                     \> Set Keypad EDT     \> Set Keypad WPS      \\
+    Remember                  \> Set Keypad NoEDT   \> Set Nogold Key      \\
+    Set Func Key DECwindows   \> Set Keypad NoWPS   \> Show Key            \\
+    Set Func Key NoDECwindows \> Set Keypad Numeric \> Undefine Key        \\
+ \\
+ CUSTOMIZING \\
+ccccccccccccccccccccccccccccccccccc \= ccccc \= ccccccccccccccccccccccccccccccc \= \kill
+    @                         \> \>   Set Noclipboard                     \\
+    Define Menu Entry         \> \>   Set Nodefault Command File          \\
+    Extend All                \> \>   Set Nodefault Section File          \\
+    Extend EVE                \> \>   Set Noexit Attribute Check          \\
+    Extend This               \> \>   Set Nopending Delete                \\
+    Save Attributes           \> \>   Set Nosection File Prompting        \\
+    Save Extended EVE         \> \>   Set Pending Delete                  \\
+    Save System Attributes    \> \>   Set Section File Prompting          \\
+    Set Clipboard             \> \>   Show Defaults Buffer                \\
+    Set Default Command File  \> \>   Show Summary                        \\
+    Set Default Section File  \> \>   TPU                                 \\
+    Set Exit Attribute Check  \> \>   Undefine Menu Entry                 \\
+ \\
+ INFORMATIONAL TOPICS \\
+ccccccccccccccccccccccccccccc \= ccccccccccccccccccccccccc \= ccccccccccccccccccccc \= \kill
+ \\
+    Abbreviating         \>  Gold Keys            \> Pending Delete        \\
+    About                \>  Initialization Files \> Position Cursor       \\
+    Attributes           \>  Journal Files        \> Prompts And Responses \\
+    Canceling Commands   \>  Keypad (diagram)     \> Quick Copy            \\
+    Choices Buffer       \>  Keys (list)          \> Ranges And Boxes      \\
+    Command Files        \>  List Of Topics       \> Ruler Keys            \\
+    Control Keys         \>  Mail Editing         \> Scroll Bars           \\
+    DECwindows Differences\> Menus                \> Section Files         \\
+    Defaults             \>  Message Buffer       \> Status Line           \\
+    Dialog Boxes         \>  Mouse                \> Typing Keys           \\
+    Editing Command Lines\>  Names For Keys       \> Windows               \\
+    EDT Conversion       \>  New Features         \> WPS Differences       \\
+    EDT Differences      \>  New User             \>                       \\
+\end{tabbing}
+
+\end{document}

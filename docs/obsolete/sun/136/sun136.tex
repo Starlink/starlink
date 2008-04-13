@@ -1,0 +1,138 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {136.4}
+\newcommand{\stardocauthors}   {M J Bly}
+\newcommand{\stardocdate}      {9 March 1994}
+\newcommand{\stardoctitle}     {FITSIO --- Disk FITS 
+				Input/Output Subroutines\\[2.0ex]
+				Version 3.4}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%
+%  Remove this for final version
+%\special{!userdict begin /bop-hook{gsave 200 30 translate 65 rotate
+%/Times-Roman findfont 216 scalefont setfont 0 0 moveto 0.93 setgray
+%(DRAFT) show grestore} def end}
+%------------------------------------------------------------------------------
+
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+
+The FITSIO package is a series of subroutines for easy Fortran access
+to FITS files on disk. It was written by William D. Pence of HEASARC
+(High Energy Astrophysics Science Archive Research Center) at the
+Goddard Space Flight Center, USA.  FITSIO was submitted for release on
+Starlink by Julian Osborne at the University of Leicester.  Starlink is
+grateful to William Pence for giving his permission for FITSIO to be
+released on Starlink.
+
+\section {Access to FITSIO routines}
+
+FITSIO is a series of subroutines, built into a object library.
+
+\subsection {Unix}
+
+To link a program with the FITSIO library on Unix, include the command
+{\tt `fitsio\_link` } in your list of libraries. For example:
+
+\begin{verbatim}
+      % f77 myprog -o myprog -L/star/lib `fitsio_link`
+\end{verbatim}
+
+\subsection {VMS}
+
+To link a program with the FITSIO library, you should use a LINK
+command such as:
+
+\begin{verbatim}
+      $ LINK myprog,FITSIO_DIR:FITSIO/LIB,...
+\end{verbatim}
+
+adding any other libraries your program requires as necessary.
+
+{\bf NOTE:}~{\em On VMS, FITSIO is an Optional Item in the Starlink
+Software Collection. If it is not installed at your site, please see
+your Site Manager.}
+
+\section{More Information}
+
+This Starlink User Note is a brief introduction to the FITSIO package.
+For more information, please read the document {\em ``FITSIO --- A
+Subroutine Interface to FITS format Files''\/} by William D Pence. The
+document has been issued as a Starlink Miscellaneous User Document
+(MUD/16). The source is also available as the file:
+
+\begin{verse}
+{\tt /star/starlink/lib/fitsio/fitsio.tex} on Unix systems, \\
+{\tt FITSIO\_DIR:FITSIO.TEX} on VMS systems.
+\end{verse}
+
+\section {Release Information}
+
+FITSIO carries a file containing the latest information about the
+release and bug fixes, changes and enhancements. This file is:
+
+\begin{verse}
+{\tt /star/starlink/lib/fitsio/fitsio.news} on Unix systems, \\
+{\tt FITSIO\_DIR:RELEASE.DOC} on VMS systems.
+\end{verse}
+
+Users are advised to read the release information file at each new
+release.
+
+There are versions of FITSIO for VAX/VMS, SUN workstations (SunOS and
+Solaris), DEC Alpha OSF/1 and Open VMS, DEC Ultrix, IBM mainframe, IBM
+PC and compatibles, and various other machine types.
+
+The Starlink Unix release carries only the DEC Alpha OSF/1, Sun Solaris
+and SunOS, and DEC Ultrix version of FITSIO in a form buildable by the
+Starlink makefile system. The sources for other versions can be
+obtained as detailed in MUD/16 (see above).
+
+The Starlink VMS release carries the code for most versions in the text
+library {\tt FITSIO\_DIR:\-FITSIO.TLB}.
+
+\end{document}

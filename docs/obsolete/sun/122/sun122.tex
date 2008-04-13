@@ -1,0 +1,230 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {122.1}
+\newcommand{\stardocauthors}   {C A Clayton}
+\newcommand{\stardocdate}      {11 March 1991}
+\newcommand{\stardoctitle}     {Colour hard-copy from workstation screens}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\section{Introduction}
+
+It is possible to produce a colour print on the DEC LJ250 inkjet printer of
+either the entire screen or a portion of the screen from VAXstations,
+DECstations, SUN workstations and the IKON image display.  This document
+describes how to achieve this with each of the above workstations. The {\tt
+IKONPAINT} software which is used to produce colour hard-copy from the IKON
+screen on the inkjet printer is fully documented in SUN/71 and is not described
+here.
+
+
+\section{VAXstation running DECwindows (VMS 5.4 and after)}
+
+
+DECwindows's Print Screen feature allows you to take a snapshot of all or part
+of your screen and print the file containing the snapshot immediately or later.
+However, first you must set up your personal Print Screen settings.
+
+\begin{itemize}
+
+\item Select the {\tt Print Screen...} option from the Session Manager's
+{\tt Customize} menu.
+
+\item Select {\tt Sixel} as the {\tt Output Format} and {\tt Color} as the 
+{\tt Output Color}. Note that colour PostScript output is not currently 
+supported.
+
+\item Select other options as required, e.g. {\tt Output File name, Prompt for
+File Name}, {\it etc.}
+
+\item Click on {\tt Apply} and {\tt OK} to complete selection of print settings.
+
+\item Select {\tt Save Current Settings} from the Session Manager's 
+{\tt Customize }
+menu.
+
+\end{itemize}
+
+In order to print part of your screen:
+
+\begin{itemize}
+
+\item Select {\tt Capture Portion of Screen} from the Session Manager's
+{\tt Print Screen} menu. This option is recommended over the other three options
+because:
+
+\begin{enumerate} 
+
+\item The screen is frozen while the screen is being captured to file. Hence it
+is quicker to capture just that part of the screen that you require.
+
+\item Capturing the image to a file rather than sending it directly to the 
+inkjet printer has the advantage that you can print further copies later
+if you are happy with the dump.
+
+\end{enumerate}
+
+\item Select file name for the captured Sixel image and click on OK. This step
+will not occur if you have de-selected the {\tt Prompt for File Name} option on
+the Customize Print Screen dialog box.
+
+\item When the pointer changes to a `+' cursor, move the cursor to the upper
+left corner of the area that you wish to capture. 
+
+\item Press and hold down the left-hand mouse button. A box will appear. Drag
+the cursor until the box surrounds the area that you want to capture and 
+then release the mouse button.
+
+\end{itemize}
+
+The captured Sixel image can be printed on your DEC LJ250 Inkjet printer with 
+a normal {\tt PRINT} command. For example:
+
+\begin{quote}
+
+{\tt \$ PRINT/QUE=inkjet-queue-name filename}
+
+\end{quote}
+
+You should first check that the inkjet printer is in DEC mode, i.e. the orange
+light on the control panel should be lit. Your system manager may have set your
+inkjet print queue up so this occurs automatically when you print a job. The
+printer can be placed in DEC mode by pressing the DEC/PCL button until the
+orange light appears. Consult your Site Manager if you are unsure which 
+queue to send your print job to.
+
+\section{DECstation running DECwindows (UWS 4.0 and after)}
+
+The procedure for screen printing from a DECstation is almost exactly the same
+as outlined above for the VAXstation. However, your will have ask your Site
+Manager how to get your Sixel file printed on the LJ250. He/she may have
+set up a queue on the DECstation pointing to the LJ250 or you may have
+first to copy the file containing the captured image to the VAX disks either
+via NFS or using FTP and print it from the VAXcluster as outlined above.
+
+\section{SUN workstation running OpenWindows (Version 2.0 or later)}
+
+Dumping the screen from the SUN to the DEC inkjet printer is rather more
+awkward but the  quality of the output is very high. The procedure is as
+follows:
+
+\begin{itemize}
+
+\item Start up the {\tt snapshot} X-windows-based tool, either via 
+the default OpenWindows
+program menu or via the command line:
+
+\begin{quote}
+
+{\tt \# \$OPENWINHOME/bin/xview/snapshot \&}
+
+\end{quote}
+
+{\tt Snapshot} has several options including snapping the whole screen, a
+single window or a user defined region. {\tt Snapshot} also has an option to view a snapshot image file
+after capture. The {\tt snapshot} tool is self-explanatory but a full
+description of it can be found in the OpenWindows documentation (DeskSet
+Environment Reference Guide).
+    
+\item {\tt Snapshot} produces a SUN
+rasterfile. Convert the SUN rasterfile into a PostScript file using the 
+undocumented command {\tt ras2ps}:
+    
+\begin{quote}
+
+    {\tt \# \$OPENWINHOME/bin/xview/ras2ps -C input-file output-file}
+
+\end{quote}
+    
+the {\tt -C} option donates colour. There are a number of other 
+command line qualifiers available. 
+    
+\begin{quote}
+{\tt 
+
+-x\# -y\#   origin in inches from lower left corner
+
+-X\# -Y\#   scale of image
+
+-w\# -h\#   width/height of image, in inches
+
+-r\#       rotate image
+
+-i        invert image
+
+-C        produce Colour PostScript
+
+-l        landscape mode
+
+-n        don't include showpage
+
+-v        verbose mode
+
+-q        query - gives list of optional qualifiers for ras2ps
+
+}
+\end{quote}
+
+\item Copy the PostScript file to a VAX disk either via NFS  or using FTP. You
+can give {\tt ras2ps} an NFS served VMS file system filename as the output file
+name so that the output goes directly to a VAX disk. In this case you can skip
+this copying stage. Your Site Manager will know the best method at your site 
+of transferring the file to the VAX disks.
+    
+\item Log onto the VAXcluster and print the PostScript file on your inkjet
+printer with the command
+
+\begin{quote}
+    
+    {\tt \$ PSPRINT/QUE=inkjet-queue-name filename}
+    
+\end{quote}
+
+Note that you must use the command {\tt PSPRINT} and not {\tt PRINT} because
+you are printing a PostScript file. Consult your Site Manager if you are unsure 
+which queue to send the print job to.
+
+
+\end{itemize}
+
+This procedure may seem complicated but the quality of the final print is very
+good -- far better than that of the VAXstation Sixel dumps.
+The image capture and {\tt ras2ps} stages 
+are quick and the whole process is dominated by the time taken for {\tt
+PSPRINT} to convert the PostScript file to Sixel format. Temporary disk space
+usage can be high, up to 5000 blocks for single large window and 13000 blocks 
+if you capture the whole screen. 
+    
+\end{document}

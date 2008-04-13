@@ -1,0 +1,1107 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {149.1}
+\newcommand{\stardocauthors}   {J.\ R.\ Lewis}
+\newcommand{\stardocdate}      {11 May 1992}
+\newcommand{\stardoctitle}     {SAM --- A Spectral Extraction Package}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\begin{large}
+\begin{em}
+SAM is an optional item within the Starlink Software Collection. If it is not
+installed at your site, please see your Site Manager.
+\end{em}
+\end{large}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\newpage
+\section{Introduction}
+
+In this note a description is given of SAM, a package written at RGO for the
+extraction of spectra from two dimensional data frames.  The need to extract
+spectra from two dimensional frames in an optimal manner (e.g. one in which the
+signal to noise ratio was maximised) was the primary reason for the writing of
+the package. The programs were originally written with FOS, ISIS and IDS in
+mind, but contain nothing which  is instrument specific and hence should be
+applicable to any two dimensional spectral data frame.
+
+The programs have been written in accordance with the methods and conventions
+of FIGARO (SUN/86) and the Starlink Programming Standard (SGP/16). SAM requires
+FIGARO to be installed in order to run. The applications will accept any two
+dimensional FIGARO image or NDF.  The output files will be recognised by any
+FIGARO or ADAM application.
+
+\section{How to run the programs}
+
+SAM is accessed through its own startup command:
+
+\begin{verbatim}
+      $ SAM
+\end{verbatim}
+
+You will also need to start FIGARO to use the graphics facilities:
+
+\begin{verbatim}
+      $ FIGARO
+\end{verbatim}
+
+All of the relevant logical and symbolic definitions should then be done for
+you.  To run a particular program, just issue the name of the program, much the
+same as if it were a standard FIGARO command. In addition, a help file will
+be set up for you. Help on an individual program may be obtained by
+entering:
+\begin{verbatim}
+      $ HELP prog
+\end{verbatim}
+
+This will give a list of the program's input parameters as well as an option to
+look at the source header comments for the main routine.
+
+\section{Features supported}
+
+SAM can deal with data arrays of any type, but will convert any non-real data
+to real before any processing is done.  Output files will be of the same type
+as the input file with the exceptions of (1) files which may be created which
+contain the optimal extraction profiles and (2) the final output one
+dimensional spectra.  These will both be real.  Both input and output files
+may contain flagged values.  Quality arrays are dealt with by converting to
+flagged values.
+
+SAM expects the input file to contain error (or variance) arrays if spectra
+are to be ``optimally extracted''.  If a file does not contain such an error
+array, then it won't be rejected and a simple tramline extraction will be
+performed by default.  Error arrays must be generated and propagated properly
+during the initial processing of the data frames (e.g. flat fielding). 
+Packages such as CCDPACK and SCP will do this and their use is recommended.
+
+\section{Package overview}
+
+As will hopefully become clear, SAM can be used in two ways.  The first method
+involves running separate applications for each step of the reduction process.
+This has the advantage that it allows the user to examine the data after each
+step in order to see what exactly is happening.  The disadvantages are that it
+(1) is more time consuming and (2) creates extra output files which may be of
+no interest to the user and could take up a lot of valuable space on disk. 
+The second method for running SAM involves using just two routines---one
+which  sets up all of the input parameters and another which combines all the
+repetitive applications into one. Such a system can therefore be run fairly
+automatically or even in batch.
+
+One thing to remember about SAM is that it assumes that the spectral axis of
+the data is parallel to the $y$ axis of the frame.  There are several
+instances where SAM will ask which axis the spectra are parallel to.  The
+answer should be either `1' for the $x$ axis or `2' for the $y$ axis.  Thus if
+the answer is `1' then SAM will flip the data array before doing any
+processing.  If a two dimensional array is output, its orientation will always
+be that of the input array.
+
+Extracting spectra with SAM falls into two stages.  The first is to define a
+DEKKER file and a TRACE file.  The DEKKER file defines the area of interest
+along the spatial axis (in order that only the data region of interest is
+carried around for the sake of efficiency). The TRACE file defines the spatial
+distortion of the spectra (e.g. a FOS spectrum).  The second stage involves
+the actual location, sky subtraction, profile fit and extraction of the of the
+spectra.  Generally for a given run, stage one only needs to be done once
+while stage two is repeated for each spectrum.  The basic data reduction
+procedure is summarised in figure \ref{fig:flow}.  Variations on this
+procedure will hopefully become apparent later.
+
+\begin{figure}[tbp]
+\setlength{\unitlength}{1in}
+\begin{picture}(5.15,7.5)(0,2.5)
+\put(1.0,9.4){\framebox(1.5,0.3){\shortstack{Frames have \\ been pre-processed?}}}
+\put(2.5,9.55){\vector(1,0){1.0}}
+\put(2.625,9.65){\makebox(0,0){No}}
+\put(3.5,9.4){\framebox(1.5,0.3){\shortstack{{\bf SCP} or \\ {\bf CCDPACK}}}}
+\put(4.25,9.4){\line(0,-1){0.15}}
+\put(4.25,9.25){\vector(-1,0){2.0}}
+\put(1.75,9.4){\vector(0,-1){0.3}}
+\put(1.95,9.25){\makebox(0,0){Yes}}
+\put(1.0,8.8){\framebox(1.5,0.3){\shortstack{Distorted \\ spectra?}}}
+\put(1.75,8.8){\vector(0,-1){0.3}}
+\put(1.95,8.65){\makebox(0,0){Yes}}
+\put(1.0,8.2){\framebox(1.5,0.3){\bf SAM\_TRACE}}
+\put(1.75,8.2){\vector(0,-1){0.3}}
+\put(2.625,9.05){\makebox(0,0){No}}
+\put(2.5,8.95){\line(1,0){0.25}}
+\put(2.75,8.95){\line(0,-1){0.9}}
+\put(2.75,8.05){\vector(-1,0){1.0}}
+\put(1.0,7.6){\framebox(1.5,0.3){\bf SAM\_DEKKER}}
+\put(0.5,7.3){\dashbox{0.25}(2.5,2.7){}}
+\put(0,8.65){\makebox(0,0){Stage 1}}
+\put(1.75,7.6){\vector(0,-1){0.6}}
+\put(1.0,6.7){\framebox(1.5,0.3){\shortstack{Use individual \\ applications?}}}
+\put(1.75,6.7){\vector(0,-1){0.3}}
+\put(1.95,6.6){\makebox(0,0){Yes}}
+\put(1.0,6.1){\framebox(1.5,0.3){\bf SAM\_FIND}}
+\put(1.75,6.1){\vector(0,-1){0.3}}
+\put(1.0,5.5){\framebox(1.5,0.3){\bf SAM\_SKY}}
+\put(1.75,5.5){\vector(0,-1){0.3}}
+\put(1.0,4.9){\framebox(1.5,0.3){\shortstack{Optimal \\ extraction?}}}
+\put(1.75,4.9){\vector(0,-1){0.3}}
+\put(1.95,4.75){\makebox(0,0){Yes}}
+\put(1.0,4.3){\framebox(1.5,0.3){\shortstack{{\bf SAM\_PROFILE} \\ Marsh or
+Horne}}}
+\put(1.75,4.3){\vector(0,-1){0.3}}
+\put(1.0,3.7){\framebox(1.5,0.3){\bf SAM\_EXTRACT}}
+\put(1.75,3.7){\vector(0,-1){0.3}}
+\put(1.0,3.1){\framebox(1.5,0.3){More?}}
+\put(1.75,3.1){\line(0,-1){0.15}}
+\put(1.95,3.0){\makebox(0,0){Yes}}
+\put(1.75,2.95){\line(-1,0){1.0}}
+\put(0.75,2.95){\line(0,1){3.60}}
+\put(0.75,6.55){\vector(1,0){0.75}}
+\put(2.5,3.25){\vector(1,0){0.5}}
+\put(2.625,3.35){\makebox(0,0){No}}
+\put(3,3.1){\framebox(1.5,0.3){Done}}
+\put(2.5,5.05){\line(1,0){0.15}}
+\put(2.625,5.15){\makebox(0,0){No}}
+\put(2.65,5.05){\line(0,-1){0.9}}
+\put(2.65,4.15){\vector(-1,0){0.75}}
+\put(2.5,6.85){\line(1,0){1.25}}
+\put(2.625,6.95){\makebox(0,0){No}}
+\put(3.75,6.85){\vector(0,-1){0.3}}
+\put(3.0,6.25){\framebox(1.5,0.3){\bf SAM\_SETUP}}
+\put(3.75,6.25){\vector(0,-1){0.3}}
+\put(3.0,5.65){\framebox(1.5,0.3){\bf SAM\_PROC}}
+\put(3.75,5.65){\vector(0,-1){0.3}}
+\put(3.0,5.05){\framebox(1.5,0.3){More?}}
+\put(3.75,5.05){\line(0,-1){0.15}}
+\put(3.95,4.95){\makebox(0,0){Yes}}
+\put(3.75,4.90){\line(-1,0){1.0}}
+\put(2.75,4.90){\line(0,1){1.2}}
+\put(2.75,6.10){\vector(1,0){0.75}}
+\put(4.5,5.20){\line(1,0){0.15}}
+\put(4.625,5.30){\makebox(0,0){No}}
+\put(4.65,5.2){\line(0,-1){1.95}}
+\put(4.65,3.25){\vector(-1,0){0.15}}
+\put(0.5,2.5){\dashbox{0.25}(4.65,4.7){}}
+\put(0,4.85){\makebox(0,0){Stage 2}}
+\end{picture}
+\caption{A flow diagram for spectral extraction using SAM \label{fig:flow}}
+\end{figure}
+\setlength{\unitlength}{1mm}
+
+\subsection{Stage 1 - setting up}
+
+Here a brief description of stage one of the process is given. Note that this
+is not an attempt to explain the  individual routines comprehensively.  The
+user should refer to section \ref{sec:indiv} for this.
+
+From here onwards the assumption is made that the input data frames have been
+processed (e.g. flat-fielded, bias subtracted, etc.) and contain the necessary
+error arrays.  
+
+The first question to ask is: are the spectra distorted?  The answer 
+obviously depends on the instrument which was used in the observations.   But
+it also depends on what one means by ``distorted''.  SAM offers two  optimal
+extraction algorithms and a tramline extraction algorithm.  One of  the
+optimal extraction routines (based on Horne 1986) deals with spectra  which
+are either straight or mildly distorted.  If the maximum distortion in the
+spatial direction is of the order of the seeing disc width, then for SAM this
+is a `straight' spectrum.  The second optimal extraction algorithm (based on
+Marsh 1989) deals with more severly distorted spectra.  To do  this it needs
+the help of a TRACE file.  If there is any doubt, then a TRACE file should be
+used. The tramline algorithm works both  with or without a TRACE file.
+
+A TRACE file is created with SAM\_TRACE.  With the help of the  user, this
+routine locates and centroids the spectrum.  It then does a  polynomial fit to
+the centroid positions as a function of wavelength.  In  general the shape of
+the distortion will not change substantially over  the course of a night, so 
+it should only be necessary to do this step once for a given night's data.
+
+The second step in this stage is to define the DEKKER file.  SAM doesn't  like
+to carry around any more data than it has to (especially as CCD frames get
+bigger and bigger).  Generally a spectrum is only likely to fall on a 
+particular part of a chip and the rest is pretty much irrelevant.  A  DEKKER
+file is used to define the region of the chip where the data (both  spectrum
+and sky) are going to fall. SAM\_DEKKER displays a given frame and  asks the
+user to indicate with the cursor where the limits of the data  along the
+spatial axes are.  Care should be taken here to ensure that a  large enough
+area is indicated in order to include some pixels for sky  subtraction.
+
+\subsection{Stage 2 - extraction}
+
+As was previously mentioned this stage involves the actual extraction of  the
+spectra and can be done in two different ways.  A description of each method
+is given here.
+
+\subsubsection{Using individual applications} \label{subsec:useind}
+
+It is quite often the case that the user will want to examine the data  after
+each step of the reduction process in order to get an idea of what's  actually
+happening to the data.  For that reason in this section the  reduction process
+is broken down into bite-size chunks.
+
+{\bf Locating the spectra}
+
+The first thing which is required to is to get a proper location for the
+spectrum, a definition of the range of spatial pixels to include as part of
+the spectrum (i.e. this is the `width' of the seeing disk) and some sky bands
+on either side of the spectrum.  This is accomplished with SAM\_FIND.
+SAM\_FIND either allows you to define all these things yourself or will do it
+automatically.  In both methods, the first thing which SAM\_FIND does is to
+use the window defined by the DEKKER file and the curvature defined by  the
+TRACE file (if one exists) in order to sum up the data in the spectral 
+direction.  What is left is a one dimensional array of total flux as a 
+function of `comoving' position on the dekker.  What is done with this  array
+makes the difference between the two methods for defining the  quantities
+listed above.
+
+In the interactive version this array is plotted.  The user is asked to 
+indicate on the plot the location of the spectrum (i.e. the peak of the  flux
+in general) and the limits of the spectrum in the spatial direction  (i.e.
+where the spectral flux has fallen off such that it isn't really much above
+sky).  SAM\_FIND then goes away and finds the median location of the 
+spectrum.  The resulting median is indicated on the plot by an arrow. The user
+is then asked to indicated two points on either side of the spectrum which
+define the range of sky pixels.  Care should be taken here that  none of the
+indicated sky pixels overlaps with the spectral pixels which have  just been
+defined.
+
+In the automatic version SAM\_FIND tries to define these quantities by 
+looking for pixels whose flux is a certain threshold over what it has decided
+is sky.  These pixels are then defined as part of the object.  The user is 
+asked to supply this threshold and a nominal width for the spectrum (used as a
+first guess). A polynomial is fit to the sky pixels in order to define the sky
+values and sigma. The order of this polynomial should  not in general be
+greater than 1 as this is not a proper sky subtraction. The user is also asked
+for a maximum distance for the sky pixels to be from the last object pixel. 
+This is to guard against large scale variations in  the sky value which may be
+a result of bad flat fielding or vignetting by  the dekker.  This routine is
+designed to cope with multiple  objects on the slit.  Thus the user must
+specify how many objects are on the slit and (if there are more than one) the
+number of the spectrum which  is to be `found'.  This is assuming that for
+spectra which are parallel to the $x$ axis, counting is done from the bottom
+upwards and for spectra which are parallel to the $y$ axis, counting from left
+to right.
+
+SAM\_FIND writes the results of all this into the input file header.  The 
+information can be found by doing:
+
+\begin{verbatim}
+      $ EXAM file.MORE.FIGARO.SAM...
+\end{verbatim}
+
+{\bf Sky subtraction}
+
+Sky subtraction is done by SAM\_SKY and is very straight forward.  Most of 
+the information which SAM\_SKY requires is stored in the header of the  input
+file.  If these can't be found there, then the user will be prompted  for
+them. See section \ref{sec:indiv} for more details.  Basically what is  done
+is that the program fits a polynomial to the sky rows defined in the  previous
+section at each wavelength.  The polynomial is then interpolated  over the
+pixels which contain the object spectrum.  It is thus important to be  sure
+that the order of the polynomial is kept low (generally 2 or less) as the
+first derivative of the polynomial may vary wildly in the object  pixels.  In
+addition the fits can be done iteratively. The user is  asked to give a limit
+to the number of pixels to reject in the fitting  procedure.  After each
+iteration the pixel with the largest residual is  rejected.  The output file
+is a copy of the input frame with the sky  subtracted in the region defined by
+the spectrum and in the sky bands.
+
+{\bf Optimal extraction profile fitting}
+
+If the user has decided on optimal extraction, then this is the next step. The
+routine to use is SAM\_PROFILE.  As was previously mentioned, this  routine
+has two optimal extraction profile algorithms on offer.  No attempt will be
+made to explain optimal extraction in any detail as this is far  better
+explained elsewhere (Horne 1986, Marsh 1989 and Mukai 1990) and  the
+interested  reader is strongly advised to consult these sources for more
+information.
+
+Optimal extraction attempts to maximise the signal to noise ratio of the 
+output spectrum by giving lower weights to pixels which have little or no 
+signal from the object.  To do this the seeing disk is modelled with a series
+of polynomials, each fitting the relative fraction of the object flux in  a
+spatial pixel as a function of wavelength. In the case of Horne's method the
+polynomials  run along actual pixels in the wavelength direction. In the case
+of Marsh's method the polynomials run along `pseudo-pixels' which are parallel
+to the distortion defined in the TRACE file.   The output is a frame with
+weights for the extraction routine to use.  SAM\_PROFILE will know which
+optimal extraction algorithm is wanted as the input header will say whether a
+TRACE file is being used or not.
+
+The fits are done iteratively hence the user specifies a threshold (in
+sigma---usually 4 or 5 suffices) above which a pixel will be deleted from the
+fits.  The user is also asked for the order of the polynomials to be fit. 
+High order polynomials are not usually required as, if the distortion is bad,
+then the TRACE file takes out most of that anyway. Since Marsh's method
+involves using rows and columns which have been defined by the TRACE file
+(e.g. not the real things) then it is necessary to interpolate between rows
+and columns to construct the optimal extraction profile.  Hence the user will
+be requested an incremental distance between the polynomials.  This must be
+less than 1 given the linear interpolation scheme used and ideally should be
+less than 0.5.  Finally, the user can block in the spectral direction if it
+looks as though the signal to noise of the original is just too low.  This is
+not recommended though for any other case.
+
+{\bf Spectral extraction}
+
+Finally the extraction routine SAM\_EXTRACT is needed.  This is the routine to
+use whether or not an optimal extraction is being done.  This routine has a
+hidden parameter which tells it whether or not to do an optimal extraction.
+Hence even though optimal extraction profiles have been calculated, the user
+can still opt for an ordinary tramline extraction.  This is explained in more
+detail in section \ref{sec:indiv}.  If an optimal extraction is being done,
+then the user will be asked for a rejection threshold.  SAM\_EXTRACT will
+extract the spectrum iteratively, rejecting pixels with residual values over
+this threshold one at a time until no more have been rejected.  The value of
+this is that things such as cosmic ray hits are rejected from the final
+spectrum.
+
+{\bf Other useful programs}
+
+There are a few more programs which may be of use along the way.  First of all
+SAM\_SHOW will do a two dimensional plot of a frame and will draw tramlines
+to indicate the location of the spectrum, the limits of the spectrum in the
+spatial direction and the limits of the two sky bands.
+
+SAM\_STRT takes a TRACE file and a frame with a distorted spectrum and
+straightens the latter.  This involves linearly interpolating as the shifts
+are not in general integral pixels.  This then violates the independence of
+the error estimates which is crucial for optimal extraction.  Hence if this
+routine is used, it is not advisable to go on to do an optimal extraction of
+the resulting frame.
+
+SAM\_ARC was written specifically with arc frames in mind, but can in theory
+be used for any frame.  If a spectrum is optimally extracted, then very likely
+the user will want the same optimal extraction weights to be applied to the
+corresponding arc exposures.  As most of the information in SAM is passed
+around in the input file headers, SAM\_ARC will copy the necessary header 
+information from one frame (the `basis' frame) to another (the `output'
+frame).  For example, the user can optimally extract a star. Then SAM\_ARC can
+be run specifying the input star frame as the basis and the arc frame as the
+output.  Finally the arc frame can be run through SAM\_EXTRACT and the same
+optimal extraction weights will be used on the arc as were used on the star.
+
+Finally there is SAM\_WHOLE.  This program sets up the tramline extraction
+parameters in the header assuming that the spectrum covers the entire defined
+dekker.  This is useful for things such as arcs which don't need to be
+located, sky subtracted etc.  This only needs a DEKKER file and a TRACE file
+if you are using one. Note that once SAM\_WHOLE has been run, SAM\_EXTRACT
+still is needed to extract the spectrum.
+
+\subsubsection{Using combined routines}
+
+Once the user has established how the data should be reduced, then using the
+procedure outlined in section \ref{subsec:useind} can become a downright bore. 
+In this section a method which combines all the repetitive elements of stage 2
+is discussed.
+
+The following method involves the use of two routines.  The first one,
+SAM\_SETUP, sets up the parameters.  These are basically all of the parameters
+which one would enter for SAM\_FIND, SAM\_SKY, SAM\_PROFILE and SAM\_EXTRACT.
+The second program, SAM\_PROC, does all of the processing of the data and only
+asks for input and output file names.
+
+SAM\_SETUP works by defining all the parameters necessary to process the data
+in a file called SAM\_VARS.DST.  This is very similar to the FIGARO parameter
+file, VARS.DST.  The file will appear in either the user's home directory or
+in the current default directory.  SAM\_SETUP may not prompt for every
+veriable, but makes sure that a sensible value is placed in SAM\_VARS.DST just
+in case.
+
+When it was stated that SAM\_PROC only has two parameters I wasn't telling the
+whole truth.  SAM\_PROC will accept {\em any} of the parameters which is
+accepted in SAM\_SETUP, but only if they are specified on the command line. 
+This allows the user to tweak the reduction procedure without having to go
+through the exercise of re-running SAM\_SETUP.  Thus if a comparison was to be
+made of a spectrum extracted optimally and non-optimally, then SAM\_SETUP only
+needs to be run once, say with the optimal extraction flag set.  Then
+SAM\_PROC is run once with nothing else on the command line and then a second
+time with the optimal extraction parameter unset on the command line.
+
+\section{Individual program descriptions} \label{sec:indiv}
+
+In this section a description of the individual routines and the parameters
+they require is given.  In some routines information is read directly out of
+the input file header.  If for some reason this information doesn't exist then
+the user will be prompted for them.  Such parameters will be flagged with an
+asterisk.
+
+\subsection{SAM\_ARC}
+
+SAM\_ARC copies information from the header of one file (`basis') to the
+header of another (`output').  This was written so that two or more spectra
+can be extracted using exactly the same extraction weights.  The parameters
+are  as follows
+
+\begin{description}
+\begin{description}
+
+\item[BASIS] This is the name of the file whose header is to act as the basis.
+It is important that this file has been run completely through the extraction
+process.  Otherwise some of the necessary information may be missing.
+
+\item[OUTPUT]  This is the name of the file to whose header the information
+will be written.
+
+\item[AXIS*] This is the axis to which the spectra are parallel.  Answer `1'
+for the x axis and `2' for the y axis.
+
+\item[TRACK*] This is TRUE if the a TRACE file is going to be used.
+
+\item[TRACE*] This is the name of the TRACE file as written by SAM\_TRACE.
+
+\item[SPEC\_RNG*] The user can restrict the spectral range of pixels to be
+extracted. These are the lower and upper limits in pixel numbers.  Two values
+are required.
+
+\item[SPEC\_LIMITS*] This is the first and last row/column in the spatial
+direction which are to be considered part of the spectrum.  Note that these
+limits are found by SAM\_FIND. Two values are required.
+
+\item[SPEC\_POS*] This is the median location of the spectrum in the spatial
+direction as found by SAM\_FIND. 
+
+\item[DEKKER*] This is the name of the DEKKER file as written by SAM\_DEKKER.
+
+\item[SKY1*] These are the limits to the first sky band.  Note that these
+limits are found by SAM\_FIND.  Two values are required.
+
+\item[SKY2*] These are the limits to the second sky band.  Note that these
+limits are found by SAM\_FIND.  Two values are required.
+
+\item[PROFILE*] This is the name of the file containing the optimal extraction
+profile weights and obviously only required if an optimal extraction is being
+performed.
+
+\end{description}
+\end{description}
+
+\subsection{SAM\_DEKKER}
+
+SAM\_DEKKER sets up the DEKKER file.  Some sort of two dimensional display is
+required as the user indicates the limits of the dekker with a cursor.  The
+parameters are as follows:
+
+\begin{description}
+\begin{description}
+
+\item[INPUT] This is the name of the data frame which is to be displayed.
+
+\item[AXIS] This is the axis to which the spectra are parallel.  Answer `1' for
+the x axis and `2' for the y axis.
+
+\item[TABLE] This is the colour lookup table for the plot
+
+\item[LOW, HIGH] These are the low and high data values for the greyscale.
+
+\item[TRACK] This is TRUE if the a TRACE file is going to be used.
+
+\item[TRACE] This is the name of the TRACE file as written by SAM\_TRACE.
+
+\item[DEKKER] This is the output file for the dekker coordinates.
+
+\end{description}
+\end{description}
+
+\subsection{SAM\_EXTRACT} 
+
+This program does the actual extraction of the spectra.  It offers two optimal
+extraction algorithms as well as tramline extraction.  If the user wants
+optimal extraction, then the choice of the extraction method to be used will
+be made automatically based on whether a TRACE file has been used in the
+previous reduction procedures.   The parameters are as follows:
+
+\begin{description}
+\begin{description}
+
+\item[INPUT]  This is the name of the input sky-subtracted frame.
+
+\item[EXT\_THR] This is a threshold over which pixels will be rejected from
+the optimal extraction.  This is a way of getting rid of cosmic ray hits and
+other defects.  This is only prompted for when optimal extraction is being
+used.  The units are in number of sigma of the individual pixels.
+
+\item[PROFILE*] This is the name of the file containing the optimal extraction
+profile weights and obviously only required if an optimal extraction is being
+performed.
+
+\item[AXIS*] This is the axis to which the spectra are parallel.  Answer `1'
+for the x axis and `2' for the y axis.
+
+\item[TRACK*] This is TRUE if the a TRACE file is going to be used.
+
+\item[TRACE*] This is the name of the TRACE file as written by SAM\_TRACE.
+
+\item[SPEC\_RNG*] The user can restrict the spectral range of pixels to be
+extracted. These are the lower and upper limits in pixel numbers.  Two values
+are required.
+
+\item[SPEC\_LIMITS*] This is the first and last row/column in the spatial
+direction which are to be considered part of the spectrum.  Note that these
+limits are found by SAM\_FIND. Two values are required.
+
+\item[OUTPUT] This is the name of the output file.
+
+\item[OPTIMAL]  This is TRUE if the user wants optimal extraction.  Note that
+it is not prompted for and it defaults to TRUE.  If tramline extraction is
+wanted, then NOOPTIMAL must be specified on the command line.
+
+\end{description}
+\end{description}
+
+\subsection{SAM\_FIND}
+
+SAM\_FIND locates the spectrum, defines the width of the spectrum (e.g. the
+width of the seeing disc), and defines the bands to be used for sky
+subtraction.  It can be used in either an interactive mode (where the user 
+indicates all these things with a cursor) or an automatic mode (where the
+program locates the spectrum itself with the help of a few parameters). If
+interactive mode is used, then a device for line plotting will be needed.  The
+parameters are as follows:
+
+\begin{description}
+\begin{description}
+
+\item[INPUT]  This is the name of the input frame.
+
+\item[AXIS] This is the axis to which the spectra are parallel.  Answer `1' for
+the x axis and `2' for the y axis.
+
+\item[NITER] SAM\_FIND attempts to locate the centroid of the spectral profile
+by locating the median position.  This is the maximum number iterations allowed
+for this algorithm to converge.
+
+\item[TOL] This is the tolerance in pixels for the convergence of the median
+finding routine.
+
+\item[NOM\_WIDTH] This is the nominal width of the spectrum in the spatial
+domain.  This is used as first guess in automatic mode.
+
+\item[SPEC\_THR] In automatic mode the rows/columns which contain the spectrum
+are defined as begin a certain threshold in sigma over the sky value.  The sigma
+is the dispersion from the sky fit.
+
+\item[QSKY\_ORD] In automatic mode a quickie sky value is estimated from a
+polynomial fit.  This is the order of that polynomial.  This should be kept
+very low.  Note that this is {\em not} the sky fit which will be used for the
+sky subtraction!
+
+\item[NQREJ] In doing the quickie sky fit in automatic mode the routine will
+allow for some pixels to be rejected.  This is the maximum number of pixels
+which the user wants to reject.  Again this should be kept low, otherwise the
+sky value may be badly estimated and this will result in a poor estimate of the
+width of the spectrum.
+
+\item[MAX\_SEP]  In automatic mode when the sky pixels are being chosen, the
+routine needs to know how far away from the spectral pixels the sky pixels are
+allowed to be.  Having sky pixels which are reasonably far from the spectral
+pixels could affect the sky subtraction because of large scale variations in
+the sky data.  This is the maximum distance away from the edge of the defined
+object region which sky pixels are allowed to be.  For example, if MAX\_SEP = 5
+then the most distant sky pixel will be at most 5 pixels away from the nearest
+object pixel on that side.
+
+\item[TRACK] This is TRUE if the a TRACE file is going to be used.
+
+\item[TRACE] This is the name of the TRACE file as written by SAM\_TRACE.
+
+\item[DEKKER] This is the name of the DEKKER file as written by SAM\_DEKKER.
+
+\item[SPEC\_RNG] The user can restrict the spectral range of pixels to be extracted.
+These are the lower and upper limits in pixel numbers.  Two values are
+required.
+
+\item[NOBJ] This is the number of objects on the slit.
+
+\item[IOBJ] This is the object which is to be `found' -- counting from bottom
+to top for spectra parallel to the x axis and left to right for spectra
+parallel to the y axis.  Note that is is only used if $\mbox{NOBJ} > 1$.
+
+\item[AUTOFIND] This is TRUE if the user wants the spectra and sky bands
+located automatically.
+
+\end{description}
+\end{description}
+
+\subsection{SAM\_PROC}
+
+SAM\_PROC is a routine which combines all the functions of routines SAM\_FIND,
+SAM\_SKY,  SAM\_PROFILE and SAM\_EXTRACT into one routine.  It needs SAM\_SETUP
+to have been run first.  If it is to be run in batch, then SAM\_SETUP must also
+be run in batch.  It has many parameters, but only two of them are unhidden. 
+This means that a parameter which has been set by SAM\_SETUP can be overridden
+for one particular run of SAM\_PROC (by specifying it on the command line), 
+but will still remain the default for future runs until it is reset by
+SAM\_SETUP.  In addition to the list below, one should consult section
+\ref{sec:samsetup} for a list of the hidden parameters which can be set.
+
+\begin{description}
+\begin{description}
+
+\item[INPUT] This is the name of the input frame.
+
+\item[OUTPUT] This the output file name.  The output will be in the form of a
+one dimensional spectrum.
+
+\end{description}
+\end{description}
+
+It is worth noting that in the case where a series of spectra are to be
+extracted all in the same way, then one could place the names of all of the
+input frames in a list file and all the output names in another list file. Then
+when INPUT and OUTPUT are requested specifying the filenames with an `@' before
+them (e.g. @filename) will mean that SAM\_PROC will be done repeatedly until it
+runs out of names.  In this event, care should be taken that both list files
+have the same number of names!
+
+\subsection{SAM\_PROFILE}
+
+This is the routine which generates the optimal extraction profile.  If optimal
+extraction isn't wanted, then this routine should be skipped.  There are two
+optimal extraction algorithms on offer.  The choice is made automatically by
+looking in the input file header to see if a TRACE file is being used.  The
+parameters are:
+
+\begin{description}
+\begin{description}
+
+\item[INPUT] This is the name of the input sky-subtracted frame.
+
+\item[AXIS*] This is the axis to which the spectra are parallel.  Answer `1'
+for the x axis and `2' for the y axis.
+
+\item[TRACK*] This is TRUE if the a TRACE file is going to be used.
+
+\item[TRACE*] This is the name of the TRACE file as written by SAM\_TRACE.
+
+\item[SPEC\_RNG*] The user can restrict the spectral range of pixels to be
+extracted. These are the lower and upper limits in pixel numbers. Two values
+are required.
+
+\item[SPEC\_LIMITS*] This is the first and last row/column in the spatial
+direction which are to be considered part of the spectrum.  Note that these
+limits are found by SAM\_FIND. Two values are required.
+
+\item[BLOCK] The user may block the spectra in wavelength in order to increase
+the signal to noise. The value tells how many rows/columns will be added 
+together to make one block. It is recommended that this value be 1 except in
+cases of very bad signal/noise.
+
+\item[POL\_DIST]  If a TRACE file is being used, then the algorithm used will
+be that of Marsh.  In this case there needs to be defined a distance in pixels
+between the polynomials in order for the interpolation scheme to work.  The
+value must be less than 1 and preferably would be less than 0.5.
+
+\item[PORD] This is the order of the polynomials to be fit for the optimal
+extraction profile.
+
+\item[PRO\_THR]  The profile fitting is done iteratively where pixels whose
+residuals are this number of sigma above the predicted profile are rejected.
+The sigma here is the error for the individual pixel.
+
+\item[OUTPUT] This is the name for the output file which will contain the
+optimal extraction profile weights.
+
+\end{description}
+\end{description}
+
+\subsection{SAM\_SETUP} \label{sec:samsetup}
+
+This is the routine which does all the setting up of the parameters for
+SAM\_PROC.  It first checks that entries for each of the parameters exist in
+the parameter file (SAM\_VARS.DST). If they don't then they are created and
+values inserted.  The user is then prompted for a number of parameters.  The
+number prompted for depends upon how the data is to be reduced.  For example,
+if the spectra are going to be located interactively, then there is no point
+asking for parameters which involve the automatic spectrum finding algorithm.
+For this reason, SAM\_SETUP tries to make sure that there is in the parameter
+file either a reasonable value for each parameter or a value which will flag
+an error if it hasn't been set.  The exception is that a prompt will be given
+for optimal extraction parameters even if an optimal extraction isn't to be
+done.  This is because it is sometimes very useful to be able to switch
+between optimal and non-optimal extraction without having to re-run SAM\_SETUP
+and it is essential to have the parameters available. The parameters in the
+following list are divided into categories according to the procedure which
+needs them.
+
+{\bf Parameters from SAM\_FIND}
+
+\begin{description}
+\begin{description}
+
+\item[NITER] SAM\_FIND attempts to locate the centroid of the spectral profile
+by locating the median position.  This is the maximum number iterations
+allowed for this algorithm to converge.
+
+\item[TOL] This is the tolerance in pixels for the convergence of the median
+finding routine.
+
+\item[NOM\_WIDTH] This is the nominal width of the spectrum in the spatial
+domain.  This is used as first guess in automatic mode.
+
+\item[SPEC\_THR] In automatic mode the rows/columns which contain the spectrum
+are defined as a certain threshold in sigma over the sky value.  The sigma is
+the dispersion from the sky fit.
+
+\item[QSKY\_ORD] In automatic mode a quickie sky value is estimated from a
+polynomial fit.  This is the order of that polynomial.  This should be kept
+very low.  Note that this is {\em not} the sky fit which will be used for the
+sky subtraction!
+
+\item[NQREJ] In doing the quickie sky fit in automatic mode the routine will
+allow for some pixels to be rejected.  This is the maximum number of pixels
+which the user wants to reject.  Again this should be kept low, otherwise the
+sky value may be badly estimated and this will result in a poor estimate of
+the width of the spectrum.
+
+\item[MAX\_SEP]  In automatic mode when the sky pixels are being chosen, the
+routine needs to know how far away from the spectral pixels the sky pixels are
+allowed to be.  Having sky pixels which are reasonably far from the spectral
+pixels could affect the sky subtraction because of large scale variations in
+the sky data.  This is the maximum distance away from the edge of the defined
+object region which sky pixels are allowed to be. For example, if MAX\_SEP = 5
+then the most distant sky pixel will be at most 5 pixels away from the nearest
+object pixel on that side.
+
+\item[NOBJ] This is the number of objects on the slit.
+
+\item[IOBJ] This is the object which is to be `found' -- counting from bottom
+to top for spectra parallel to the x axis and left to right for spectra
+parallel to the y axis.  Note that is is only used if $\mbox{NOBJ} > 1$.
+
+\item[AUTOFIND] This is TRUE if the user wants the spectra and sky bands
+located automatically.
+
+\end{description}
+\end{description}
+
+{\bf Parameters from SAM\_SKY}
+
+\begin{description}
+\begin{description}
+
+\item[SKY\_ORD] This is the order of the polynomials to be fit to the sky
+pixels.  One should be extremely careful about using orders higher than about
+1 since the interpolation in the object pixels may involve areas where the
+gradient of the polynomials becomes very large.
+
+\item[NREJECT]  The sky polynomial fits are done iteratively with the worst
+fitting pixel from each fit being rejected in each iteration.  This is the 
+number of pixels which will be rejected.  Again one should be careful to not
+reject too many pixels as it may become impossible to get a good fit.
+
+\end{description}
+\end{description}
+
+{\bf Parameters from SAM\_PROFILE}
+
+\begin{description}
+\begin{description}
+
+\item[BLOCK] The user may block the spectra in wavelength in order to increase
+the signal to noise.  The value tells how many rows/columns will be added 
+together to make one block. It is recommended that this value be 1 except in
+cases of very bad signal/noise.
+
+\item[POL\_DIST]  If a TRACE file is being used, then the algorithm used will
+be that of Marsh.  In this case there needs to be defined a distance in pixels
+between the polynomials in order for the interpolation scheme to work.  The
+value must be less than 1 and preferably would be less than 0.5.
+
+\item[PORD] This is the order of the polynomials to be fit for the optimal
+extraction profile.
+
+\item[PRO\_THR]  The profile fitting is done iteratively where pixels whose
+residuals are this number of sigma above the predicted profile are rejected.
+The sigma here is the error for the individual pixel. 
+
+\end{description}
+\end{description}
+
+{\bf Parameters from SAM\_EXTRACT}
+
+\begin{description}
+\begin{description}
+
+\item[EXT\_THR] This is a threshold over which pixels will be rejected from the
+optimal extraction.  This is a way of getting rid of cosmic ray hits and other
+defects.  This is only prompted for when optimal extraction is being used.  The
+units are in number of sigma of the individual pixels.
+
+\item[OPTIMAL]  This is TRUE if the user wants optimal extraction.  
+
+\end{description}
+\end{description}
+
+{\bf Other parameters}
+
+\begin{description}
+\begin{description}
+
+\item[AXIS] This is the axis to which the spectra are parallel.  Answer `1' for
+the x axis and `2' for the y axis.
+
+\item[TRACK] This is TRUE if the a TRACE file is going to be used.
+
+\item[TRACE] This is the name of the TRACE file as written by SAM\_TRACE.
+
+\item[SPEC\_RNG] The user can restrict the spectral range of pixels to be
+extracted. These are the lower and upper limits in pixel numbers.  Two values
+are required.
+
+\item[DEKKER] This is the name of the DEKKER file as written by SAM\_DEKKER.
+
+\item[USE\_WH] This is TRUE if the spectrum is going to cover the whole of the
+dekker, e.g. an arc spectrum, where sky subtraction etc doesn't matter.  This
+is the same as using SAM\_WHOLE.
+
+\end{description}
+\end{description}
+
+\subsection{SAM\_SHOW}
+
+This routine displays a frame as a two-dimensional colour plot. superimposed
+tramlines show the position of the spectrum, the limits of the spectral
+rows/columns and the positions of the two sky bands.  The parameters are:
+
+\begin{description}
+\begin{description}
+
+\item[INPUT] This is the name of the input frame to be displayed.
+
+\item[AXIS*] This is the axis to which the spectra are parallel.  Answer `1'
+for the x axis and `2' for the y axis.
+
+\item[TRACK*] This is TRUE if the a TRACE file is going to be used.
+
+\item[TRACE*] This is the name of the TRACE file as written by SAM\_TRACE.
+
+\item[DEKKER*] This is the name of the DEKKER file as written by SAM\_DEKKER.
+
+\item[SPEC\_LIMITS*] This is the first and last row/column in the spatial
+direction which are to be considered part of the spectrum.  Note that these
+limits are found by SAM\_FIND. Two values are required.
+
+\item[SKY1*] These are the limits to the first sky band.  Note that these
+limits are found by SAM\_FIND.  Two values are required.
+
+\item[SKY2*] These are the limits to the second sky band.  Note that these
+limits are found by SAM\_FIND.  Two values are required.
+
+\item[TABLE] This is the colour lookup table for the plot
+
+\item[LOW, HIGH] These are the low and high data values for the greyscale.
+
+\end{description}
+\end{description}
+
+\subsection{SAM\_SKY}
+
+SAM\_SKY does the sky subtraction after the sky regions and the object region
+has been defined.  The parameters are:
+
+\begin{description}
+\begin{description}
+
+\item[INPUT] This is the name of the input frame to be displayed.
+
+\item[AXIS*] This is the axis to which the spectra are parallel.  Answer `1'
+for the x axis and `2' for the y axis.
+
+\item[TRACK*] This is TRUE if the a TRACE file is going to be used.
+
+\item[TRACE*] This is the name of the TRACE file as written by SAM\_TRACE.
+
+\item[DEKKER*] This is the name of the DEKKER file as written by SAM\_DEKKER.
+
+\item[SKY1*] These are the limits to the first sky band.  Note that these
+limits are found by SAM\_FIND.  Two values are required.
+
+\item[SKY2*] These are the limits to the second sky band.  Note that these
+limits are found by SAM\_FIND.  Two values are required.
+
+\item[SPEC\_RNG*] The user can restrict the spectral range of pixels to be
+extracted. These are the lower and upper limits in pixel numbers.  Two values
+are required.
+
+\item[SKY\_ORD] This is the order of the polynomials to be fit to the sky
+pixels.  One should be extremely careful about using orders higher than about
+1 since the interpolation in the object pixels may involve areas where the
+gradient of the polynomials becomes very large.
+
+\item[NREJECT]  The sky polynomial fits are done iteratively with the worst
+fitting pixel from each fit being rejected in each iteration.  This is the 
+number of pixels which will be rejected.  Again one should be careful to not
+reject too many pixels as it may be impossible to get a good fit.
+
+\item[OUTPUT] This the output file for the sky subtracted spectral frame.
+
+\end{description}
+\end{description}
+
+\subsection{SAM\_STRT}
+
+This routine will take a frame with a distorted spectrum and straighten it. To
+do this it needs the help of TRACE file.  Note that the interpolation required
+will affect the variance estimates such that they are no longer independent of
+each other.  Thus an optimal extraction should not be  performed on a frame
+which has been straightened with this routine.  Note also that only the data
+within the limits defined by the DEKKER file and by the parameter SPEC\_RNG
+will be processed.  The rest of the input data is discarded. The parameters
+are:
+
+\begin{description}
+\begin{description}
+
+\item[INPUT] This is the name of the input frame with the spectrum to be 
+straightened.
+
+\item[AXIS] This is the axis to which the spectra are parallel.  Answer `1' for
+the x axis and `2' for the y axis.
+
+\item[TRACE] This is the name of the TRACE file as written by SAM\_TRACE.
+
+\item[DEKKER] This is the name of the DEKKER file as written by SAM\_DEKKER.
+
+\item[SPEC\_RNG] The user can restrict the spectral range of pixels to be extracted.
+These are the lower and upper limits in pixel numbers.  Two values are
+required.
+
+\item[OUTPUT] This is the name of the output file for the straightened
+spectrum.
+
+\end{description}
+\end{description}
+
+\subsection{SAM\_TRACE}
+
+This is the routine which creates a TRACE file.  It generally only needs to be
+run once since the distortion should not vary much from night to night.  For
+best results it should be run on a spectrum with reasonably high  signal/noise
+(e.g. a standard star).  The output file not only contains the polynomial
+coefficients, but also information used in later programs to scale the
+coordinates.  The parameters are:
+
+\begin{description}
+\begin{description}
+
+\item[INPUT] This is the name of the input frame with the spectrum to be fit.
+
+\item[AXIS] This is the axis to which the spectra are parallel.  Answer `1' for
+the x axis and `2' for the y axis.
+
+\item[TRACE] This is the name of the TRACE file as written by SAM\_TRACE.
+
+\item[TABLE] This is the colour lookup table for the plot
+
+\item[LOW, HIGH] These are the low and high data values for the greyscale.
+
+\item[BLOCK] The user may block the spectra in wavelength in order to increase
+the signal to noise.  The value tells how many rows/columns will be added 
+together to make one block. It is recommended that this value be 1 except in
+cases of very bad signal/noise.
+
+\item[NITER] SAM\_TRACE attempts to locate the centroid of the spectral profile
+by locating the median position.  This is the maximum number iterations allowed
+for this algorithm to converge.
+
+\item[TOL] This is the tolerance in pixels for the convergence of the median
+finding routine.
+
+\item[CLIP] This is the number of sigma for the clipping threshold.
+
+\item[NCYCLE] This is the number of iterations in the actual polynomial
+fitting.  Once cycle consists of centering, fitting a polynomial to the centres
+and clipping bad points.
+
+\item[SPEC\_RNG] The user can restrict the spectral range of pixels to be extracted.
+These are the lower and upper limits in pixel numbers.  Two values are
+required.
+
+\item[NORD] This is the order of the polynomial to be fit to the centroids.
+
+\end{description}
+\end{description}
+
+\subsection{SAM\_WHOLE}
+
+SAM\_WHOLE is a routine to be used if the spectrum covers the whole of the
+dekker and thus things such as sky-subtraction and profile fitting are
+irrelevant (e.g. arc or flat field spectra).  All this routine does is to set
+up information in the input file header.  SAM\_EXTRACT does the actual
+extraction.  The parameters are:
+
+\begin{description}
+\begin{description}
+
+\item[INPUT] This is the name of the input frame.
+
+\item[AXIS] This is the axis to which the spectra are parallel.  Answer `1' for
+the x axis and `2' for the y axis.
+
+\item[TRACK] This is TRUE if the a TRACE file is going to be used.
+
+\item[TRACE] This is the name of the TRACE file as written by SAM\_TRACE.
+
+\item[DEKKER] This is the name of the DEKKER file as written by SAM\_DEKKER.
+
+\item[SPEC\_RNG] The user can restrict the spectral range of pixels to be
+extracted. These are the lower and upper limits in pixel numbers.  Two values
+are required.
+
+\end{description}
+\end{description}
+
+\section {Acknowledgments and references}
+
+Several of the routines in SAM are based on algorithms stolen from routines
+written by T.R. Marsh.  The author wishes to thank Dr. Marsh publicly for his
+generous permission to ransack his software.
+
+\begin{tabbing}
+\=\kill 
+\>Horne, K, 1986, {\it P.A.S.P.}, {\bf 98}, 609. \\
+\>Marsh, T.R., 1989, {\it P.A.S.P.}, {\bf 101}, 1032. \\
+\>Mukai, K, 1990, {\it P.A.S.P.}, {\bf 102}, 183. \\
+\end{tabbing}
+
+\end{document}

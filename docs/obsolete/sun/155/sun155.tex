@@ -1,0 +1,1998 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {155.1}
+\newcommand{\stardocauthors}   {V. Laspias}
+\newcommand{\stardocdate}      {20 October 1992}
+\newcommand{\stardoctitle}     {TEXLSE --- An LSE Environment for \LaTeX }
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+
+\newcommand{\BibTeX}{{\rm B\kern-0.05em{\sc i\kern-0.025em b}\kern-0.08em
+    T\kern-0.1667em\lower0.7ex\hbox{E}\kern-0.125emX}}
+
+\newcommand{\SLiTeX}{{\rm S\kern-0.06em{\sc l\kern-0.035emi}\kern-0.06em
+    T\kern-0.1667em\lower0.7ex\hbox{E}\kern-0.125emX}}
+
+\hfuzz=5pt
+\newcommand\bs{\char '134 }  % A backslash character for \tt font
+\newcommand{\prompt}{{\tt \$~}}
+\newcommand{\gold}{\fbox{\sc gold} }
+\newcommand{\help}{\fbox{\sc help} }
+\newcommand{\return}{\fbox{\sc return} }
+\newcommand{\ctrl}[1]{\fbox{{\sc ctrl/#1}} }
+\newcommand{\kp}[1]{\fbox{{\sc kp} #1} }
+\newcommand{\us}{\char '137 } % An underscore character for \tt font
+\newcommand\lb{\char '173 }  % A left brace character for \tt font
+\newcommand\rb{\char '175 }  % A right brace character for \tt font
+\newcommand{\vbar}{\char '174 } % A vertical bar character for \tt font
+\newcommand{\tlde}{\char '176 } % A tilde for \tt font
+%
+\def\descriptionlabel#1{\tt #1\ \hfil}
+\makeatletter
+\settowidth{\labelwidth}{\tt another\_bibitem}
+\addtolength{\labelwidth}{\labelsep}
+\def\description{\list{}{\leftmargin\labelwidth \advance\leftmargin\labelsep 
+  \itemindent\z@ \let\makelabel\descriptionlabel}}
+\makeatother
+
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+{\bf NOTE:}~{\em This guide provides a brief summary of the commands and
+functions available with {\sl LSEDIT\/} and the \LaTeX\ environment on
+Starlink. TEXLSE is part of the LTEX software item which an optional addition
+to Starlink \TeX . If LTEX is not installed at your site, see your Site
+Manager.}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\newpage
+
+\section*{Scope and Intent of this Guide}
+
+This guide presents information about the Language-Sensitive Editor ({\sl
+LSEDIT\/}) and the environment defined for \LaTeX.  It is a supplement to the
+{\em ``VAX Language-Sensitive Editor User's Guide''\/} \cite{lse}, the 
+{\em ``\/\LaTeX\, A Document Preparation System, User's Guide \& Reference
+Manual''\/} \cite{latex} and 
+{\em ``\/\LaTeX\ ---A Document Preparation System'' \/} \cite{sun9}.
+
+\bigskip
+
+This guide acts as a summary and memory refresher for the commands and
+functions covered in the manuals mentioned above. It is {\em not\/} intended to
+replace either of these manuals.  It should supplement these documents and
+provide information that is specific to this environment. 
+
+\section*{Conventions}
+
+Various symbols and syntax conventions are used throughout this guide.
+
+\begin{center}
+\begin{tabular}{l@{\hspace{.5in}}p{2.5in}}
+\multicolumn{1}{c}{\bf Symbol} & \multicolumn{1}{c}{\bf Meaning} \\ \hline
+\\
+\prompt & System prompt \\ [5pt]
+\return & Return key \\ [5pt]
+\ctrl{x} & Control key + main keyboard key \\ [5pt]
+\gold & PF1 key \\ [5pt]
+\help & PF2 key \\ [5pt]
+\kp{0} \ldots & Numeric keypad key \\
+\end{tabular}
+\end{center}
+
+\newpage
+\section{Introduction}
+
+The Language-Sensitive Editor, hereafter referred to as {\sl LSEDIT\/}, is an
+interactive text editor designed specifically for software development. It
+assists the user in the quick and accurate development of syntactically correct
+``source'' code in a variety of languages.
+
+In this case, \LaTeX\ or \SLiTeX{} are the ``languages'' being used.
+
+\section{{\sl LSEDIT\/} Definitions}
+
+{\bf Placeholders} are optional or required constructs which are usually
+inserted into the file you are editing as a part of a template. Placeholders
+represent places in the source code where the user must provide additional
+information. In some cases, a placeholder may be expanded to provide a template
+for this additional text.
+
+{\bf Tokens} are keywords that may be typed anywhere into the file you are
+editing and expanded to provide a template for a corresponding construct.
+
+For a complete list of the placeholders and tokens that are defined in the
+\LaTeX\ environment, see Appendices~\ref{place} and~\ref{token},
+respectively. 
+
+\section{{\sl LSEDIT\/} Commands}
+
+The following key commands are the most commonly used. They include:
+
+\begin{center}
+\begin{tabular}{l@{\hspace{.5in}}l}
+\multicolumn{1}{c}{\bf Command} & \multicolumn{1}{c}{\bf Meaning} \\
+\hline
+\ & \  \\ 
+\ctrl{e} & Expand the current placeholder or token \\ [5pt]
+\gold + \ctrl{e} & Un-expand the current placeholder or token \\ [5pt]
+\ctrl{k} & Delete the current placeholder \\ [5pt]
+\gold + \ctrl{k} & Un-delete the current placeholder \\ [5pt]
+\ctrl{n} & Go to the next placeholder \\ [5pt]
+\ctrl{p} & Go to the previous placeholder \\ [5pt]
+\gold + \help & Get help for the current placeholder or token \\
+\end{tabular}
+\end{center}
+
+\section{Conventions within the \LaTeX\ Environment}
+
+There are two types of placeholders; {\sl required\/}, and {\sl
+optional\/}.  They are denoted within the \LaTeX\ environment as follows:
+
+\begin{center}
+\begin{tabular}{l@{\hspace{1in}}l}
+\multicolumn{1}{c}{\bf Symbol(s)} & \multicolumn{1}{c}{\bf Meaning} \\
+\hline
+\ & \   \\
+\verb"< >" & Single required placeholder \\
+\verb"< >..." & List of required placeholders \\
+\verb"<< >>" & Single optional placeholder \\
+\verb"<< >>..." & List of optional placeholders \\
+\end{tabular}
+\end{center}
+
+\section{Invoking {\sl LSEDIT\/}}
+
+\subsection{Accessing the \LaTeX\ Environment} 
+ 
+You can invoke LSEDIT and access the \LaTeX\ environment in one of two ways:
+
+\begin{enumerate}
+\item You can use the {\tt /ENVIRONMENT} qualifier on the command line. For
+example,
+\begin{quote}
+\tt
+\prompt{} LSEDIT/ENVIRONMENT=LTEX\_LSE:LATEX.ENV {\it filename\/}.TEX \hfil
+\end{quote}
+where {\it filename\/} is the name of your input file.  The file type {\bf 
+must} be {\tt .TEX} or {\tt .STY}.
+
+\item You can define a logical name {\tt LSE\$ENVIRONMENT} in your LOGIN.COM:
+\begin{quote}
+\tt
+\prompt{} DEFINE LSE\$ENVIRONMENT LTEX\_LSE:LATEX.ENV \hfil
+\end{quote}
+Then you may omit the {\tt /ENVIRONMENT} qualifier from the command line when
+you invoke LSEDIT. This logical may be a search list.
+\end{enumerate}
+
+Either method will accomplish the same result, although the second method will
+reduce the number of keystrokes and will assure that you don't forget the
+qualifier when you enter LSEDIT.
+
+\subsection{Accessing the LSEKEYS Section File}
+
+In the \verb|LTEX_LSE| directory, there is a file called \verb|LSEKEYS.GBL|. 
+This is an LSEDIT section file. It contains a number a very useful key
+definitions that will make the task of editing files much simpler.
+
+Like the \LaTeX\ environment, this section file can be accessed in one of two
+ways:
+\begin{enumerate}
+\item You can use the {\tt /SECTION} qualifier on the command line. For
+example,
+\begin{quote}
+\tt
+\prompt{} LSEDIT/SECTION=LTEX\_LSE:LSEKEYS.GBL {\it filename\/}.TEX \hfil
+\end{quote}
+
+\item You can define a logical name {\tt LSE\$SECTION} in your LOGIN.COM:
+\begin{quote}
+\tt
+\prompt{} DEFINE LSE\$SECTION LTEX\_LSE:LSEKEYS.GBL \hfil
+\end{quote}
+Then you may omit the {\tt /SECTION} qualifier from the command line when
+you invoke LSEDIT. 
+\end{enumerate}
+
+The two examples above assume that the logical name \verb|LSE$ENVIRONMENT| has
+been defined.  
+
+\subsection{Easier Access to the \LaTeX\ Environment}
+
+To invoke {\sl LSEDIT\/} for use with \LaTeX\ source files, use the 
+following command:
+\begin{quote}
+\tt
+\prompt{} EDLATEX {\it filename\/}.TEX \hfill
+\end{quote}
+
+where {\it file\/} is the name of your input file.  The file type {\bf must} be
+{\tt .TEX} or {\tt .STY}. The command defines the correct environment and
+editing keys for operation with \LaTeX\ source files. 
+The {\tt EDLATEX} command is a {\sl DCL\/} symbol defined as
+
+\begin{quote}
+\tt
+LSEDIT/ENVIRONMENT=LTEX\_LSE:LATEX.ENV/SECTION=LTEX\_LSE:LSEKEYS.GBL \hfill
+\end{quote}
+
+The editing keys for use with {\sl LSEDIT\/} are defined in the
+section file {\tt LTEX\_LSE:LSEKEYS.GBL}. 
+
+\section{Supported \LaTeX\ Document Styles}
+
+When you invoke {\sl LSEDIT\/} to create a new \LaTeX\ file, the screen will
+have the intial placeholder \verb"<Latex>" on the first line of the buffer.
+When you expand this placeholder by pressing \ctrl{e}, a menu will be displayed
+listing the different \LaTeX\ styles that are supported by the environment. 
+The document styles supported are: 
+
+\begin{itemize}
+\item {\tt article} -- standard style 
+\item {\tt report} -- standard style
+\item {\tt letter} -- standard style
+\item {\tt memo} -- Inter-Office Correspondence
+\item {\tt slides} -- \SLiTeX{}
+\item {\tt milstd} -- MIL-STD-490 compatible style
+\item {\tt bookform} -- bookform style
+\item {\tt laa} -- Astronomy and Astrophysics style
+\item {\tt laamt} -- Astronomy and Astrophysics style with Monotype Times fonts
+\item {\tt thesis} -- Thesis document style
+\end{itemize}
+
+The style is chosen by using the arrow keys to select the desired style and
+pressing \mbox{ \return.} See Appendix~\ref{templates} for the style templates 
+created when the desired style is selected. Further styles may be added in the
+future.
+ 
+\section{Running \LaTeX\ from within {\sl LSEDIT\/}}
+
+Your \LaTeX\ source file can be processed through \LaTeX\ {\em without\/}
+leaving {\sl LSEDIT\/} When you have finished editing, press \gold {\tt C}. (If
+you are not using the {\tt LTEX\_LSE:LSEKEYS.GBL} section  file, press \gold +
+\kp{7} In response to the \verb"LSE Command>" prompt, enter ``{\tt COMPILE}'').
+{\sl LSEDIT\/} will write out your buffer and spawn a subprocess to run \LaTeX.
+You needn't wait for that subprocess to complete. You may continue editing the
+file if there is more to do, or you may choose to bring in another file and
+edit it while you wait. You will receive a completion message when the
+subprocess finishes. 
+
+
+If \LaTeX\ detects errors, the subprocess will tell you it completed with
+errors. To view those errors, you can press \gold {\tt I}  and respond ``{\tt
+.LIS}'' to the {\tt \us Input file:} prompt. If the main buffer file is called
+{\tt FILE.TEX}, then the file {\tt FILENAME.LIS} will be read into a buffer
+called FILENAME.LIS (If you are not using the {\tt LTEX\_LSE:LSEKEYS.GBL}
+section file, press \gold + \kp{7} In response to the  \verb"LSE Command>"
+prompt, enter {\tt GOTO FILE/READONLY FILENAME.LIS}).   This file can then be
+examined to determine the cause of the error. To return to the main buffer,
+press \gold {\tt M}  (or press \gold + \kp{7} and enter {\tt GOTO BUFFER
+FILENAME.TEX}). Correct the problem, and repeat the process. 
+
+If no errors occur, the subprocess will report that the ``compilation'' is
+complete. At this point, you can exit {\sl LSEDIT\/} and process the {\tt
+FILE.DVI} file produced by \LaTeX.
+
+\section{Accessing Help for Placeholders and Tokens}
+
+On-line help is available for most of the placeholders and tokens defined
+within the \LaTeX\ environment. 
+
+For placeholders, position the cursor at the next placeholder by pressing 
+\ctrl{n}\nolinebreak. Then press \gold + \help. If there is no help for this
+placeholder, a message will be given stating that fact.
+
+For tokens, type the token and press \gold + \help.
+
+If the placeholder or token is a menu, you can access help for items in the
+menu by pointing at the menu item with the arrow keys and then pressing \gold +
+\help. 
+
+\begin{thebibliography}{99}
+\addcontentsline{toc}{section}{References}
+
+\bibitem{lse} Digital Equipment Corporation, 
+{\em VAX Languase-Sensitive Editor and VAX Source Code Analyser}
+Order \#AA-PAJLA-TK, December 1989.
+
+\bibitem{latex} Leslie Lamport {\em \LaTeX\ A Document Preparation System, 
+User's Guide \& Reference Manual \/} Addison-Wesley Publishing Company,
+ISBN~0-202-15790-X
+
+\bibitem{sun9} V. Laspias \& M. Bly {\em \LaTeX\ --- A Document Preparation
+System} \\
+Starlink User Note 9, Starlink Project.
+
+\end{thebibliography}
+
+\newpage
+\appendix
+\section{\LaTeX\ Placeholders}\label{place}
+
+The following placeholders are defined within the \LaTeX\ environment. A
+placeholder is delimited by a single ``\verb"< >"'' pair (required) or a double
+``\verb"<< >>"'' (optional) pair. 
+\begin{small}
+\begin{description}
+\item[\bf Placeholder] {\bf Description}
+\item[*\lb n\rb \lb \rb ]       Tabular environment repeat command
+\item[0\vbar 1\vbar 2\vbar 3\vbar 4]    0 or 1 or 2 or 3 or 4
+\item[11pt]         Typeset the document in 11 point type
+\item[12pt]         Typeset the document in 12 point type
+\item[@\lb \rb ]          @-expression for tabular preamble
+\item[a]	    System Specification
+\item[accents]      Accents: Non-math and math mode
+\item[address]      Letter recipient address
+\item[addressee]     Name of the letter recipient
+\item[alph]          Alpha counter definitions, capital and lower case
+\item[another\us bibitem]  \mbox{} \\
+thebibliography \verb|\bibitem| command
+\item[another\us item]  Environment \verb|\item| command
+\item[another\us slide] More \SLiTeX{} slide templates
+\item[array\us entry]   Array entry
+\item[array\us pos]     Vertical positioning, center is default
+\item[arrow\us symbols] Arrow symbols, see Table 3.6 of \LaTeX\ manual
+\item[article]       \LaTeX\ article document style
+\item[article\vbar report\vbar memo\vbar letter\vbar slides\vbar %
+milstd\vbar bookform\vbar laa\vbar laamt\vbar thesis] \mbox{} \\ 
+  Valid arguments for the \verb|\documentstyle| command
+\item[b2]            Critical Item Development Spec
+\item[b5]            Computer Program Development Spec
+\item[bib\us files]     First names of the bibliography files, file type .BBL
+\item[binary\us ops]    Binary operations symbols, see Table 3.4 of \LaTeX\ manual
+\item[bookform]      Bookform document style
+\item[box\us name]      \verb|\newsavebox|, \verb|\savebox|, and \verb|\usebox| box name
+\item[c]             Center
+\item[c5]            Computer Program Product Spec
+\item[caption]       Figure and Table caption command
+\item[cc]            Letter copies
+\item[cite\us key]      String used to associate \verb|\bibitem| with \verb|\cite|
+\item[colors]        \SLiTeX{} colors definition
+\item[color\us or\us bw]   Select color slides or black and white slides
+\item[column]        Tabular preamble column specifier
+\item[column\us entry]  Tabular or Array column entry
+\item[col\us pos]       Menu of valid arguments in the tabular preamble
+\item[col\us range]     Column range specifier for the \verb|\cline| command
+\item[commands]      \LaTeX\ command categories
+\item[command\us definition]  \mbox{} \\ 
+  \verb|\newcommand| and \verb|\renewcommand| new command definition
+\item[copies\us list\us one\us column] \mbox{} \\ 
+                    Convert memo `Copies' list to one column
+\item[counter\us name]  Used by \verb|\setcounter|, \verb|\addtocounter|, and 
+  \verb|\newcounter| commands
+\item[dash\us size]     Size of the dashes in the \verb|\dashbox| command
+\item[dedication]    Produce a dedication string in thesis document style
+\item[degree]    Produce a degree string in thesis document style
+\item[delimiters]    Math formula delimiters, see table 3.10 of \LaTeX\ manual
+\item[delta\us x]       Delta x value used by the \verb|\multiput| picture command
+\item[delta\us y]       Delta y value used by the \verb|\multiput| picture command
+\item[denominator]   Fraction denominator
+\item[department]    Department name or portion thereof
+\item[deptlist]      Memo author's department or section
+\item[diameter]      Value entry (no units) for picture commands
+\item[dimension]     Length entry
+\item[document\us type] MIL-STD-490 specification type
+\item[draft]         Mark overfull hboxes
+\item[encl]          Letter enclosures
+\item[environments]  \LaTeX\ paragraph-making structures
+\item[env\us name]      User-supplied environment name
+\item[env\us star]      Star form of environments
+\item[ext\us above\us height]  \mbox{} \\
+The amount the text extends above the bottom of the line
+\item[ext\us below\us height]  \mbox{} \\
+The amount the text extends below the bottom of the line
+\item[faculty]       Produce a faculty string in thesis document style
+\item[file]          Auxiliary file type, {\tt .TOC}, {\tt .LOF}, or {\tt .LOT}
+\item[fleqn]         Displayed math environments flush left
+\item[fn\us number]     \verb|\footnote| and \verb|\footnotetext| optional footnote number argument
+\item[font\us name]     Font name, e.g. \verb|cmr10 scaled\magstep2|
+\item[formula]       Math formula
+\item[framebox\us p\us placement] \mbox{} \\
+                    Text placement within a \verb|\framebox| in a picture
+\item[from\us list\us two\us columns] \mbox{} \\
+                    Convert memo `From' list to two columns
+\item[greek\us letters] Greek letter commands, math mode ONLY
+\item[height]     \verb"\rule" required height parameter
+\item[here\vbar top\vbar bottom\vbar float\us page] \mbox{} \\
+                     Figure/table location: here, top, bottom, float page
+\item[hline]         Tabular horizontal rule.
+\item[institution]   Produce an institution string in thesis document style.
+\item[item\us arg]      \verb|\item| macro with optional argument for list-making environments
+\item[item\us label]    Optional label for \verb|\item| command
+\item[key\us list]      List of citation keys of \verb|\bibitem| commands
+\item[l]             Left justify
+\item[label]         Cross referencing command
+\item[latex]         \LaTeX\ grammar
+\item[length]        Length value
+\item[length\us name]   Length name identifier
+\item[leqno]         Put equation numbers on the left
+\item[letter]        \LaTeX\ letter document style
+\item[linebreak]     Double backslash command
+\item[lined]         Vertical line character for tabular environment
+\item[location]      Figure and Table placement location
+\item[lof]           List of Figures file
+\item[loglike\us functions]  \mbox{} \\
+   Log-like functions, see Table 3.9 of \LaTeX\ manual
+\item[lot]           List of Tables file
+\item[makebox\us p\us placement]  \mbox{} \\
+\verb|\makebox| quadrant specifier for the picture environment
+\item[math\us accents]  \mbox{} \\
+Math mode accents, see table 3.11 of \LaTeX\ manual
+\item[math\us misc]     Math mode miscellaneous
+\item[memo]           \LaTeX\ memo document style
+\item[memo\us signature] Memo signature options
+\item[mil-date]      Military date
+\item[mil-std-number] MIL-STD document number
+\item[milstd]        MIL-STD-490 document style
+\item[minipage\us pos]  Valid minipage positioning options
+\item[misc\us symbols]  Miscellaneous symbols, see Table 3.7 of \LaTeX\ manual
+\item[multicolumn]   Tabular command to span multiple columns
+\item[name]          Memo individual name within the name list
+\item[namelist]      Memo list of names
+\item[newtheorem]    Create a new theorem environment
+\item[non\us math\us accents] \mbox{} \\
+  Non-math mode accents, see table 3.1 of \LaTeX\ manual
+\item[no\us args]       \verb|\newcommand| and \verb|\renewcommand| optional arguments argument
+\item[no\us col]        Number of columns to be spanned by a \verb|\multicolumn| command
+\item[no\us obj]        Integer entry in the \verb|\multiput| command
+\item[nth\us root]      Nth root
+\item[number]        Integer entry
+\item[numbered\us like] Name of a pre-defined theorem-like environment
+\item[numerator]     Fraction numerator
+\item[object\us p]      Picture environment commands
+\item[offset\us height] Picture environment optional offset width
+\item[offset\us width]  Picture environment optional offset width
+\item[onlyslides]    \SLiTeX{} command to produce a subset of your slides
+\item[optional]      Optional parameter for sectioning commands
+\item[optional\us width] \verb|\makebox|, \verb|\framebox|, and 
+  \verb|\savebox| optional width argument
+\item[optionlist]    Optional \LaTeX\ document substyles
+\item[options]       Valid substyle options, 10pt is the default for all styles
+\item[origin\us offset] Optional picture environment offset
+\item[oval\us height]   Height of an oval in the picture environment
+\item[oval\us section]  Oval quadrant specifier for the picture environment
+\item[oval\us width]    Width of an oval in the picture environment
+\item[pagestyle]     Document page style commands
+\item[paragraph\us text] Text followed by a \verb"\\"
+\item[parbox\us pos]    Valid \verb|\parbox| positioning options
+\item[percent\_sign]    Produce \% symbol
+\item[pgno\us options]  Valid options for the \verb|\pagenumbering| command
+\item[picture\us height]Picture environment width
+\item[picture\us width] Picture environment width
+\item[portrait]      \SLiTeX{} portrait optional argument
+\item[position]      \verb|\makebox|, \verb|\framebox|, \verb|\shortstack|
+   optional position argument
+\item[pre\us commands]  Pre \verb|\begin{document}| commands
+\item[pre\us letter\us cmds]Letter style commands
+\item[priority]      \verb|\[no]linebreak| and \verb|\[no]pagebreak| priority
+\item[prompted\us slide\us file] \mbox{} \\
+ \verb|\typein| command for variable slide file input
+\item[ps]	Letter postscript
+\item[put\vbar multiput] Picture environment placement commands
+\item[p\lb \rb ]          p-expression for tabular environment only
+\item[quadrant]      Picture \verb|\makebox| and \verb|\oval| quadrant selection
+\item[r]             Right justify
+\item[raise\us height]  Height a \verb|\rule| will be raised above the line
+\item[recipient]     Name and address of letter recipient
+\item[referee]		Typeset document for referee in Astronomy \& 
+Astrophysics style
+\item[relation\us symbols]  \mbox{} \\
+Relation symbols, see Table 3.5 of \LaTeX\ manual
+\item[report]        \LaTeX\ report document style
+\item[reset\us counter] Optional reset for the \verb|\newcounter| command
+\item[right\vbar center\vbar left] \mbox{} \\
+		     Right or center or left
+\item[roman]         Roman counter definitions, capital and lower case
+\item[root\us file]     \SLiTeX{} root file
+\item[sections]      Valid sectioning commands
+\item[sec\us unit]      Controls the format of the entry
+\item[slidefile]     The name of your \SLiTeX{} slide file
+\item[slides]        \SLiTeX
+\item[slide\us colors]  \SLiTeX{} layer colors
+\item[slide\us file]    \SLiTeX{} slides template
+\item[slide\us fill]    Push the text of the slide to the top of the page
+\item[slide\us number]  Slide number(s) entry for the \verb|\onlyslides| command
+\item[slide\us title]   Slide title options
+\item[star]          *-form of \LaTeX\ commands
+\item[styles]        Predefined \verb|\pagestyle| and \verb|\thispagestyle| arguments
+\item[subject]       Subject of an memo
+\item[symbols]       Symbols: see table 3.2 in the \LaTeX\ manual
+\item[tabbing\us column\us entry]  \mbox{} \\
+                    Text for tabbing environment columns
+\item[tabbing\us entry] Tabbing entry
+\item[table\us entry]   Tabular entry
+\item[tabular\us width]  \mbox{} \\
+Width of a table made with {\tt tabular*} 
+\item[tab\us set]       Set the tabs for the {\tt tabbing} environment
+\item[text]          General text entry
+\item[thesis]        Typeset document in thesis style
+\item[toc]           Table of Contents file
+\item[top\vbar bottom\vbar right\vbar left] \mbox{} \\
+                    Top or bottom or right or left
+\item[top\vbar center\vbar bottom]   \mbox{} \\
+  Top or center or bottom
+\item[to\us list\us two\us columns]  \mbox{} \\
+   Convert memo `To' list to two columns
+\item[twocolumn]     Typeset the document with two columns per page
+\item[twoside]       Define twosided substyle
+\item[type\us sizes]    Valid \LaTeX\ type size declaration
+\item[type\us styles]   Valid \LaTeX\ type styles
+\item[underlined]    Underlined slide title line
+\item[user\us defined]  User defined slide title
+\item[varsize\us symbols] Variable-sized symbols, see Table 3.8 of \LaTeX\ manual
+\item[widest\us label]  Widest text for \verb|\bibitem| label
+\item[width]         \verb|\parbox|, \verb|\rule|, \verb|\minipage| required 
+  width parameter
+\item[within]        Optional counter name, e.g. chapter, section
+\item[x\us coord]       X coordinate for picture command
+\item[y\us coord]       Y coordinate for a picture command
+\item[\bs\bs\us or\us \bs kill]   Tabbing line terminator
+\end{description}
+\end{small}
+
+\newpage
+\section{\LaTeX\ Tokens}\label{token}
+
+The following tokens are defined within the \LaTeX\ environment. Any token can
+be typed on a blank line within the buffer and expanded with 
+\ctrl{e}\nolinebreak. You need not type in the complete token name. For
+example, you can type {\tt \bs set}, press \ctrl{e} and a menu of all tokens
+that begin with {\tt \bs set} will be displayed. Simply select the proper
+command using the arrow keys and press \return.  
+
+\begin{small}
+\begin{description}
+\item[\bf Token] {\bf Description}
+\item[accents]         Accents: Non-math and math mode
+\item[array]           Multi-column array environment
+\item[arrow\us symbols]   Arrow symbols, see Table 3.6 of \LaTeX\ manual
+\item[article]         \LaTeX\ article document style
+\item[begin]           Any other environment
+\item[binary\us ops]      Binary operations symbols, see Table 3.4 of \LaTeX\ manual
+\item[bookform]        Bookform document style
+\item[center]          Paragraph centering environment
+\item[copies\us list\us one\us column]  \mbox{} \\
+                       Convert memo `Copies' list to one column
+\item[delimiters]      Math formula delimiters, see table 3.10 of \LaTeX\ manual
+\item[description]     Description list environment
+\item[documentlist]    Document list environment
+\item[enumerate]       Numbered list environment
+\item[environments]    \LaTeX\ paragraph-making structures
+\item[eqnarray]        Multi-line formula environment
+\item[equation]        Mathematical equation environment
+\item[example]         Example paragraph environment
+\item[figure]          \LaTeX\ figure environment, NOT available in \SLiTeX
+\item[flushleft]       Paragraph flush to the left margin environment
+\item[flushright]      Paragraph flush to the right margin environment
+\item[from\us list\us two\us columns] \mbox{} \\
+                       Convert memo `From' list to two columns
+\item[greek\us letters]   Greek letter commands, math mode ONLY
+\item[itemize]         Bulleted list environment
+\item[laa]      Astronomy \& Astrophysics style
+\item[laamt]    Astronomy \& Astrophysics style with Monotype Times fonts
+\item[letter]          \LaTeX\ letter document style, specific
+\item[list]            Custom list making environment
+\item[loglike\us functions] \mbox{} \\
+   log-like functions, see Table 3.9 of \LaTeX\ manual
+\item[math\us accents]    Math mode accents, see table 3.11 of \LaTeX\ manual
+\item[math\us misc]       Math mode miscellaneous
+\item[memo]             \LaTeX\ memo document style
+\item[memo\us signature]   memo signature options
+\item[milstd]          MIL-STD-490 document style
+\item[minipage]        Minipage environment (box containing paragraph environments)
+\item[misc\us symbols]    Miscellaneous symbols, see Table 3.7 of \LaTeX\ manual
+\item[non\us math\us accents] \mbox{} \\
+Non-math mode accents, see table 3.1 of \LaTeX\ manual
+\item[note]            \SLiTeX{} note environment
+\item[one\us signature]   Single signature for memo
+\item[overlay]         \SLiTeX{} overlay environment
+\item[picture]         Picture environment
+\item[quotation]       Quotation with paragraphs indented environment
+\item[quote]           Quotation without paragraphs indented environment
+\item[relation\us symbols]  \mbox{} \\
+Relation symbols, see Table 3.5 of \LaTeX\ manual
+\item[report]          \LaTeX\ report document style
+\item[root\us file]       \SLiTeX{} root file
+\item[sections]        Valid sectioning commands
+\item[slides]          \SLiTeX
+\item[slide\us file]      \SLiTeX{} slides template
+\item[symbols]         Symbols: see table 3.2 in the \LaTeX\ manual
+\item[tabbing]         Tabbing environment
+\item[table]           Floating table environment, NOT available in \SLiTeX
+\item[tabular]         Table making environment
+\item[thebibliography] Produce a bibliography list
+\item[theorem]         Mathematical theorem environment
+\item[thesis]          Thesis document style
+\item[titlepage]       Titlepage environment
+\item[to\us list\us two\us columns] \mbox{} \\ 
+   Convert memo `To' list to two columns
+\item[two\us signatures]  Double signature for memo
+\item[type\us sizes]      Valid \LaTeX\ type size declaration
+\item[type\us styles]     Valid \LaTeX\ type styles
+\item[underlined]      Underlined slide title line
+\item[varsize\us symbols] Variable-sized symbols, see Table 3.8 of \LaTeX\ manual
+\item[verbatim]        Verbatim paragraph environment
+\item[verse]           Verse environment (Think poetry!)
+\item[\bs addcontentsline] \mbox{} \\
+Adds an entry to the specified list or table
+\item[\bs address]        Return address. If null, business letter is made.
+\item[\bs addtocontents]  Adds text directly to the file that generates the
+table of contents and lists of figures and tables. 
+\item[\bs addtocounter]   Add a specified amount to an existing counter
+\item[\bs addtolength]    Add a specified amount to an existing length command
+\item[\bs addvspace]      Add vertical space between paragraphs
+\item[\bs alph]           Error on /PLACEHOLDER in definition
+\item[\bs alpha]          Greek letter alpha, lowercase
+\item[\bs appendix]       Change the way sectional units are numbered
+\item[\bs arabic]         Arabic counter definitions
+\item[\bs author]         Author used by the \verb|\maketitle| command
+\item[\bs begin]          Any other environment
+\item[\bs beta]           Greek letter beta, lowercase
+\item[\bs bf]             Bold
+\item[\bs bibitem]        thebibliography \verb|\bibitem| command
+\item[\bs bibliography]   Used with BiBTeX to create a bibliography
+\item[\bs bigskip]        Vertical space of \verb|\bigskipamount|
+\item[\bs blackandwhite]  \SLiTeX{} \verb|\blackandwhite| command
+\item[\bs caption]        Figure and Table caption command
+\item[\bs cc]             Letter copies
+\item[\bs cdots]          Horizontal  ellipsis,  center of line, math mode ONLY
+\item[\bs centering]      Declaration equivalent to the center environment
+\item[\bs chapter]        \LaTeX\ sectioning command, report style ONLY
+\item[\bs chi]            Greek letter chi, lowercase
+\item[\bs circle\us p]       Picture environment circle making command
+\item[\bs cite]           Generate an in-text citation
+\item[\bs cleardoublepage] \mbox{} \\
+Break the current page here and output any floats
+\item[\bs clearpage]      Break the current page here and output any floats
+\item[\bs cline]          Draw a horizontal line over the specified column range
+\item[\bs closing]        Letter closing, e.g. `Sincerely,'
+\item[\bs colors]         \SLiTeX{} colors definition
+\item[\bs colorslides]    \verb|\colorslides| command
+\item[\bs copyright]      Copyright symbol
+\item[\bs dashbox\us p]      Picture environment \verb|\dashbox| command
+\item[\bs date]           Declare document date, used by \verb|\maketitle|
+   command
+\item[\bs ddots]          Diagonal ellipsis, math mode ONLY
+\item[\bs delta\us l]        Greek letter delta, lowercase
+\item[\bs delta\us u]        Greek letter delta, uppercase
+\item[\bs documentstyle]  \LaTeX\ document style selection command
+\item[\bs dotfill]         Horizontal fill with dots
+\item[\bs em]             Emphasis: toggle between roman and italics
+\item[\bs encl]           Letter enclosures
+\item[\bs epsilon]        Greek letter epsilon, lowercase
+\item[\bs eta]            Greek letter eta, lowercase
+\item[\bs fbox]           Short form of the \verb|\framebox| command
+\item[\bs flushbottom]    Make all text pages the same height
+\item[\bs fnsymbol]       Produce footnote symbols, math mode, counter $\leq$ 9
+\item[\bs footnote]       Footnote generating command
+\item[\bs footnotemark]   Mark a footnote, used in conjunction with 
+  \verb|\footnotetext|
+\item[\bs footnotesize]   2 sizes smaller than \verb|\normalsize|
+\item[\bs footnotetext]   Footnote generating command, used with 
+  \verb|\footnotemark|
+\item[\bs frac]           Generate a fraction, math mode ONLY
+\item[\bs framebox]       Frame a box as specified containing the text specified
+\item[\bs framebox\us p]     Picture environment \verb|\framebox| command
+\item[\bs frame\us p]        Picture environment framing command, similar to 
+  \verb|\fbox|
+\item[\bs gamma\us l]        Greek letter gamma, lowercase
+\item[\bs gamma\us u]        Greek letter gamma, uppercase
+\item[\bs hfill]          Add infinitely stretchable horizontal space
+\item[\bs hline]          Tabular horizontal rule
+\item[\bs hrulefill]      Horizontal fill with a line
+\item[\bs hspace]         Insert horizontal space
+\item[\bs huge\us 1]         4 sizes larger than \verb|\normalsize|
+\item[\bs huge\us 2]         5 sizes larger than \verb|\normalsize|
+\item[\bs hyphenation]    Hyphenation command
+\item[\bs include]        Read the specified file
+\item[\bs includeonly]    Define the files to be read by the \verb|\include| command
+\item[\bs indent]         Add horizontal space in the amount of normal indentation
+\item[\bs input]          Read the specified file into your document
+\item[\bs invisible]      Produce `invisible' text, \SLiTeX{} ONLY
+\item[\bs iota]           Greek letter iota, lowercase
+\item[\bs it]             Italics
+\item[\bs item]           Environment \verb|\item| command
+\item[\bs kappa]          Greek letter kappa, lowercase
+\item[\bs label]          Cross referencing command
+\item[\bs lambda\us l]       Greek letter lambda, lowercase
+\item[\bs lambda\us u]       Greek letter lambda, uppercase
+\item[\bs large\us 1]        1 size larger than \verb|\normalsize|
+\item[\bs large\us 2]        2 sizes larger than \verb|\normalsize|
+\item[\bs large\us 3]        3 sizes larger than \verb|\normalsize|
+\item[\bs latex]          Produce \LaTeX\ logo
+\item[\bs ldots]          Horizontal ellipsis, bottom of line
+\item[\bs left]           Left delimiter command for math formula
+\item[\bs linebreak]      Break the current line
+\item[\bs linethickness]  Set the thickness of lines drawn in the picture environment
+\item[\bs line\us p]         Picture environment \verb|\line| command
+\item[\bs listoffigures]  Generate a list of figures
+\item[\bs listoftables]   Generate a list of tables
+\item[\bs location]       Letter location (e.g. M/S 121)
+\item[\bs makebox]        Generate a box as specified containing the text specified
+\item[\bs makebox\us p]      Picture environment \verb|\makebox| command
+\item[\bs maketitle]      Generate a title page
+\item[\bs marginpar]      Produce a marginal note
+\item[\bs markboth]       Define the headings for the headings and myheadings page style
+\item[\bs markright]      Define the headings for the headings and myheadings page style
+\item[\bs mbox]           Short form of the \verb|\makebox| command
+\item[\bs medskip]        Vertical space of \verb|\medskipamount|
+\item[\bs mu]             Greek letter mu, lowercase
+\item[\bs multicolumn]    Tabular command to span multiple columns
+\item[\bs multiput\us p]     Object placement command for the picture environment
+\item[\bs newcommand]     Define a new \LaTeX\ command
+\item[\bs newcounter]     Create a new counter
+\item[\bs newenvironment] \mbox{} \\
+			    Define a new environment
+\item[\bs newfont]        Define a new font
+\item[\bs newlength]      Generate a  new length command
+\item[\bs newline]        Break the current line here
+\item[\bs newpage]        Start a new page
+\item[\bs newsavebox]     Create a new box for future use
+\item[\bs newtheorem]     Create a new theorem environment
+\item[\bs newtheorem\us 1]   New theorem numbered within a sectional unit
+\item[\bs newtheorem\us 2]   New theorem numbered like another theorem
+\item[\bs nocite]         Produce no text, but write the key list
+\item[\bs nofiles]        Turn off auxiliary file output
+\item[\bs noindent]       Suppress paragraph indentation
+\item[\bs nolinebreak]    Do not break the current line
+\item[\bs nopagebreak]    Do not break the current page
+\item[\bs normalsize]     Default font size
+\item[\bs nu]             Greek letter nu, lowercase
+\item[\bs omega\us l]        Greek letter omega, lowercase
+\item[\bs omega\us u]        Greek letter omega, uppercase
+\item[\bs onecolumn]      Start one column text
+\item[\bs onlynotes]      \SLiTeX{} command to produce a subset of your notes
+\item[\bs onlyslides]     \SLiTeX{} command to produce a subset of your slides
+\item[\bs opening]        Letter opening, e.g. `Dear Sir:'
+\item[\bs oval\us p]         Picture environment oval making command
+\item[\bs overbrace]      Generate formula with brace above it, math mode ONLY
+\item[\bs overline]       Generate formula with line above it, math mode ONLY
+\item[\bs pagebreak]      Break the current page
+\item[\bs pagenumbering]  Set the style of the page numbers
+\item[\bs pageref]        Reference the page number of a label created with a 
+  \verb|\label| command
+\item[\bs pagestyle]      Set the page style for the entire document
+\item[\bs paragraph]      \LaTeX\ sectioning command
+\item[\bs parbox]         Generate a box in paragraph mode
+\item[\bs part]           \LaTeX\ sectioning command
+\item[\bs phi\us l]          Greek letter phi, lowercase
+\item[\bs phi\us u]          Greek letter phi, uppercase
+\item[\bs pi\us l]           Greek letter pi, lowercase
+\item[\bs pi\us u]           Greek letter pi, uppercase
+\item[\bs ps]                Latter postscript
+\item[\bs psi\us l]          Greek letter psi, lowercase
+\item[\bs psi\us u]          Greek letter psi, uppercase
+\item[\bs put\us p]          Object placement command for the picture environment
+\item[\bs raggedbottom]   Let height of text vary from page to page
+\item[\bs raggedleft]     Declaration equivalent to the flushright environment
+\item[\bs raggedright]    Declaration equivalent to the flushleft environment
+\item[\bs raisebox]       Raise the text as specified
+\item[\bs ref]            Reference a label created with the \verb|\label| command
+\item[\bs renewcommand]   Redefine an existing \LaTeX\ command
+\item[\bs renewenvironment]  \mbox{} \\
+Re-define an existing environment
+\item[\bs rho]            Greek letter rho, lowercase
+\item[\bs right]          Right delimiter command for math formula
+\item[\bs rm]             Roman
+\item[\bs roman]          Roman counter definitions, capital and lower case
+\item[\bs rule]           Draw a horizontal line
+\item[\bs savebox]        Define the contents of the named box
+\item[\bs sc]             Small caps
+\item[\bs scriptsize]     3 sizes smaller than \verb|\normalsize|
+\item[\bs section]        \LaTeX\ sectioning command
+\item[\bs setcounter]     Set an existing counter to a specified value
+\item[\bs setlength]      Set an existing length to a specified value
+\item[\bs settowidth]     Set an existing length command to the width of the specified text
+\item[\bs sf]             Sans serif
+\item[\bs shortstack\us p]   Picture environment \verb|\shortstack| command
+\item[\bs sigma\us l]        Greek letter sigma, lowercase
+\item[\bs sigma\us u]        Greek letter sigma, uppercase
+\item[\bs signature]      Letter signature
+\item[\bs sl]             Slanted
+\item[\bs small]          1 sizes smaller than \verb|\normalsize|
+\item[\bs smallskip]      Vertical space of \verb|\smallskipamount|
+\item[\bs sqrt]           Generate the nth root of the argument, math mode ONLY
+\item[\bs subparagraph]   \LaTeX\ sectioning command
+\item[\bs subsection]     \LaTeX\ sectioning command
+\item[\bs subsubparagraph] \mbox{} \\
+    \LaTeX\ sectioning command, milstd \& bookform styles ONLY
+\item[\bs subsubsection]  \LaTeX\ sectioning command
+\item[\bs subsubsubparagraph] \mbox{} \\
+     \LaTeX\ sectioning command, milstd \& bookform styles ONLY
+\item[\bs tableofcontents] \mbox{} \\
+Generate a table of contents
+\item[\bs tau]            Greek letter tau, lowercase
+\item[\bs telephone]      Letter telephone, only used if \verb|\address| is null
+\item[\bs TeX]            Produce \TeX\ logo
+\item[\bs thanks]         Produce a footnote to the title made by 
+  \verb|\maketitle|
+\item[\bs theta\us l]        Greek letter theta, lowercase
+\item[\bs theta\us u]        Greek letter theta, uppercase
+\item[\bs thicklines]     Thicker lines for picture environment
+\item[\bs thinlines]      Standard thickness of lines in picture environment
+\item[\bs thispagestyle]  Set the page style for this page only
+\item[\bs tiny]           4 sizes smaller than \verb|\normalsize|
+\item[\bs title]          Text used by the \verb|\maketitle| command
+\item[\bs today]          Today's date
+\item[\bs tt]             Typewriter
+\item[\bs twocolumn]      Start two column text
+\item[\bs typein]         Interactive input command
+\item[\bs typeout]        Print a message on your terminal
+\item[\bs underbrace]     Underbrace a formula or text
+\item[\bs underline]      Underline a formula or text
+\item[\bs upsilon\us l]      Greek letter upsilon, lowercase
+\item[\bs upsilon\us u]      Greek letter upsilon, uppercase
+\item[\bs usebox]         `Execute' the saved box
+\item[\bs usecounter]     Enable counter for use in numbered list
+\item[\bs value]          Produce the value of a counter
+\item[\bs varepsilon]     Greek letter varepsilon, lowercase
+\item[\bs varphi]         Greek letter varphi, lowercase
+\item[\bs varpi]          Greek letter varpi, lowercase
+\item[\bs varrho]         Greek letter varrho, lowercase
+\item[\bs varsigma]       Greek letter varsigma, lowercase
+\item[\bs vartheta]       Greek letter vartheta, lowercase
+\item[\bs vdots]          Vertical ellipsis, math mode ONLY
+\item[\bs vector\us p]       Picture environment \verb|\vector| command
+\item[\bs verb]           Produce a literal string
+\item[\bs vfill]          Add infinitely stretchable vertical space
+\item[\bs vline]          Tabular vertical rule
+\item[\bs vspace]         Insert vertical space
+\item[\bs xi\us l]           Greek letter xi, lowercase
+\item[\bs xi\us u]           Greek letter xi, uppercase
+\item[\bs zeta]           Greek letter zeta, lowercase
+\item[\bs \bs]              Start a new line
+\end{description}
+\end{small}
+
+\newpage
+\section{Pre-defined Keys} \label{keydefs}
+
+The following keys are defined within the {\tt LSEKEYS.GBL}
+section file. 
+\def\descriptionlabel#1{\rm #1\ \hfil}
+\renewcommand{\thefootnote}[0]{\fnsymbol{footnote}}
+\begin{small}
+\begin{description}
+\item[\bf Key] {\bf Description}
+\item[\gold {\tt [}] Set the screen width to 132 characters
+\item[\gold {\tt ]}] Set the screen width to 80 characters
+\item[\gold {\tt \bs}] Clear the message buffer
+\item[\gold {\tt `}] Set a mark called ``spot''
+\item[\gold {\tt \tlde}] Go to a mark called ``spot''
+\item[\gold {\tt C}] Compile the current buffer
+\item[\ctrl{d}]   Compile the current buffer for debug \footnotemark[1]
+\item[\gold + \ctrl{d}]  \mbox{} \\
+Compile and review the current buffer for
+debug\footnotemark[1]
+\footnotetext[1]{Do NOT use these with \LaTeX ; our system does not understand
+{\tt LATEX/DEBUG}. } 
+\item[\gold {\tt B}] Go to the specified buffer
+\item[\gold {\tt E}] End review mode
+\item[\gold {\tt F}] Do a GOTO FILE command
+\item[\gold {\tt H}] Display the HELP.KEYS buffer
+\item[\gold {\tt Q}] Leave the editor with the QUIT command (delete new file)
+\item[\gold {\tt R}] Set the specified buffer to READ ONLY status
+\item[\gold + \ctrl{r}]  \mbox{} \\ Set the specified buffer to WRITE status
+\item[\gold {\tt S}] Do a SUBSTITUTE command
+\item[\gold {\tt X}] Leave the editor with the EXIT command (save new file)
+\item[\gold {\tt BKSP}] Toggle the last two characters 
+\item[\gold {\tt M}] Go to LSE main buffer
+\item[\gold {\tt I}] Read in a temporary file
+\item[\gold {\tt P}] Find the next occurence of a paragraph
+\item[\gold {\tt <}] Shrink the current window (2 window mode)
+\item[\gold {\tt >}] Enlarge the current window (2 window mode)
+\item[\gold {\tt \lb}] Balance and highlight braces `{\tt \lb \rb}', brackets
+`{\tt []}', and parentheses `{\tt ()}'
+\item[\gold {\tt \rb}] Turn off highlight generated by \gold {\tt \lb}
+\item[\gold {\tt K}] Define your own key (emulates EDT \ctrl{k} feature)
+\end{description}
+\end{small}
+
+\newpage
+\section{\LaTeX\ Style Templates} 
+\label{templates}
+
+\begin{itemize}
+
+\item article
+
+\begin{small}
+\begin{verbatim}
+\documentstyle<<optionlist>>{article}
+<<pagestyle>>
+<<pre_commands>>...
+\begin{document}
+
+<<commands>>...
+
+\end{document}
+\end{verbatim}
+\end{small}
+
+\item report
+
+\begin{small}
+\begin{verbatim}
+\documentstyle<<optionlist>>{report}
+<<pagestyle>>
+<<pre_commands>>...
+\begin{document}
+
+<<commands>>...
+
+\end{document}
+\end{verbatim}
+\end{small}
+
+\item memo
+
+\begin{small}
+\begin{verbatim}
+\documentstyle<<optionlist>>{memo}
+<<pre_commands>>...
+<<To_list_two_columns>>
+<<From_list_two_columns>>
+<<Copies_list_one_column>>
+\begin{document}
+\memohdr To:<<namelist>>...
+From:<<namelist>>...
+Copies:<<namelist>>...
+Subject:{<<subject>>}
+
+<<commands>>...
+
+<memo_signature>
+
+\end{document}
+\end{verbatim}
+\end{small}
+
+\newpage
+
+\item letter
+
+\begin{small}
+\begin{verbatim}
+\documentstyle<<optionlist>>{letter}
+<<pre_letter_cmds>>...
+\begin{document}
+\begin{letter}{<recipient>}
+\opening{<paragraph_text>...}
+
+<<environments>>...
+
+\closing{<paragraph_text>...}
+<<cc>>
+<<encl>>
+<<ps>>
+\end{letter}
+\end{document}
+\end{verbatim}
+\end{small}
+
+\item slides---slide file
+
+\begin{small}
+\begin{verbatim}
+<<pagestyle>>
+%
+\begin{slide}{<<slide_colors>>...}
+<<slide_title>>
+ 
+<<environments>>...
+<<slide_fill>>
+\end{slide}
+% form feed
+<<another_slide>>
+\end{verbatim}
+\end{small}
+
+\item slides---root file
+
+\begin{small}
+\begin{verbatim}
+\documentstyle{slides}
+%
+% If you only have one slide file, and you would like SLiTeX to prompt
+% you for the name of the file when you run SLiTeX, then expand the
+% next placeholder. Otherwise enter the name of your slide file as
+% the argument to the \colorslides or \blackandwhite command.
+%
+<<prompted_slide_file>>
+%
+\begin{document}
+<<colors>>
+<<onlyslides>>
+<color_or_bw>...
+\end{document}
+\end{verbatim}
+\end{small}
+
+\newpage
+
+\item bookform
+
+\begin{small}
+\begin{verbatim}
+\documentstyle<<optionlist>>{bookform}
+\documentnumber{<text>}
+\documentdate{<text>}
+\title{<paragraph_text>...
+\docnumber \\         % DO NOT DELETE \docnumber or
+\docdate \\           % \docdate.
+Contract XXXXXX \\    % The contract or PO number must be filled in.
+Data Item No. XXX  \\ % The data item number must be filled in.
+}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+\end{titlepage}
+
+\cleardoublepage
+%
+% Page 1 reserved for revision history page
+%
+\setcounter{page}{2}
+\tableofcontents
+\newpage
+
+% Since all bookform documents don't necessarily follow the same
+% section structure, the author must layout the document as desired.
+
+\end{document}
+\end{verbatim}
+\end{small}
+
+\item laa---Astronomy and Astrophysics
+
+\begin{small}
+\begin{verbatim}
+\documentstyle<<optionlist>>{laa}
+<<pre_commands>>...
+\begin{document}
+\thesaurus{<thesaurus_code>
+\title{<title>}
+\subtitle{<subtitle>}
+\{author{<author_name>\inst{<institute_number>\thanks{<text>}} 
+\and <author_name>\inst{<institute_number>}}
+\offprints{<name>}
+\institute{<institute> 
+\and <institute>...}
+\date{Received date: <date>; Accepted date: <date>}
+\maketitle
+
+\begin{abstract}
+<text>
+\keywords{<keyword>}
+\end{abstract}
+
+\section{<text>}
+<text>
+\subsection{<text>}
+<text>
+\subsubsection{<text>}
+<text>
+
+\begin{thebibliography}{}	% DO NOT delete {}
+\bibitem[<year>]{label:name}
+<text>
+\end{thebibliography}
+
+\end{document}
+\end{verbatim}
+\end{small}
+
+\item laamt---Astronomy and Astophysics with Monotype Times fonts 
+
+\begin{small}
+\begin{verbatim}
+\documentstyle<<optionlist>>{laamt}
+<<pre_commands>>...
+\begin{document}
+\thesaurus{<thesaurus_code>
+\title{<title>}
+\subtitle{<subtitle>}
+\{author{<author_name>\inst{<institute_number>\thanks{<text>}} 
+\and <author_name>\inst{<institute_number>}}
+\offprints{<name>}
+\institute{<institute> 
+\and <institute>}
+\date{Received date: <date>; Accepted date: <date>}
+\maketitle
+
+\begin{abstract}
+<text>
+\keywords{<keyword>}
+\end{abstract}
+
+\section{<text>}
+<text>
+\subsection{<text>}
+<text>
+\subsubsection{<text>}
+<text>
+
+\begin{thebibliography}{}	% DO NOT delete {}
+\bibitem[<year>]{label:name}
+<text>
+\end{thebibliography}
+
+\end{document}
+\end{verbatim}
+\end{small}
+
+\item thesis
+
+\begin{small}
+\begin{verbatim}
+\documentstyle[<<optionlist>>,thesis]{report} 
+  
+\setlength{\textwidth}{150mm} 
+\setlength{\textheight}{223mm} 
+\setlength{\oddsidemargin}{15mm} 
+\setlength{\evensidemargin}{15mm} 
+\setlength{\topmargin}{0mm} 
+\setlength{\headheight}{0mm} 
+\setcounter{secnumdepth}{10} 
+\setcounter{tocdepth}{10} 
+ 
+<<pre_commands>>... 
+  
+\title{<text>} 
+\author{<name>} 
+\department{<department>} 
+\submissiondate{<date>} 
+\degree{<degree>} 
+\faculty{<faculty>} 
+\institution{<institution>} 
+\thesis{<thesis>} 
+\ded{<dedication>} 
+  
+\begin{document} 
+
+\maketitle{y}{y}{\input{abstract}}  
+% 
+%You must have the abstract in a file called ABSTRACT.TEX 
+% 
+\chapter{<text>} 
+<text> 
+\section{<text>} 
+<text> 
+\subsection{<text>} 
+<text> 
+\subsubsection{<text>} 
+<text> 
+\end{document} 
+\end{verbatim}
+\end{small}
+
+\item milstd---System Specification
+
+\begin{small}
+\begin{verbatim}
+\documentstyle<<optionlist>>{milstd}
+\A
+\documentnumber{<mil-std-number>}
+\documentdate{<mil-date>}
+\title{System Specification\\
+<paragraph_text>...}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+\end{titlepage}
+
+\pagenumbering{roman}
+
+\tableofcontents
+\newpage
+\listoffigures
+\listoftables
+
+\cleardoublepage
+\pagenumbering{arabic}
+
+\section{SCOPE}
+
+\section{APPLICABLE DOCUMENTS}
+.
+. \subsection's, \subsubsection's, etc. 
+. have been omitted for brevity
+.  
+
+\section{REQUIREMENTS}
+
+\subsection{System definition.}
+
+\subsubsection{General description.}
+
+\subsubsection{Missions.}
+
+\subsubsection{Threat.}
+
+\subsubsection{System diagrams.}
+
+\subsubsection{Interface definition.}
+
+\subsubsection{Government furnished property list.}
+
+\subsubsection{Operational and organizational concepts.}
+
+\subsection{Characteristics.}
+
+\subsubsection{Performance characteristics.}
+
+\subsubsection{Physical characteristics.}
+
+\subsubsection{Reliability.}
+
+\subsubsection{Maintainability.}
+
+\subsubsection{Availability.}
+
+\subsubsection{System effectiveness models.}
+
+\subsubsection{Environmental conditions.}
+
+\subsubsection{Nuclear control requirements.}
+
+\subsubsection{Transportability.}
+
+\subsection{Design and construction.}
+
+\subsubsection{Materials, processes, and parts.}
+
+\subsubsection{Electromagnetic radiation.}
+
+\subsubsection{Nameplates and product marking.}
+
+\subsubsection{Workmanship.}
+
+\subsubsection{Interchangeability.}
+
+\subsubsection{Safety.}
+
+\subsubsection{Human performance/human engineering.}
+
+\subsection{Documentation.}
+
+\subsection{Logistics.}
+
+\subsubsection{Maintenance.}
+
+\subsubsection{Supply.}
+
+\subsubsection{Facilities and facility equipment.}
+
+\subsection{Personnel and training.}
+
+\subsubsection{Personnel.}
+
+\subsubsection{Training.}
+
+\subsection{Functional area characteristics.}
+
+\subsection{Precedence.}
+
+\section{QUALITY ASSURANCE PROVISIONS}
+
+\subsection{General.}
+
+\subsubsection{Responsibility for tests.}
+
+\subsubsection{Special tests and examinations.}
+
+\subsection{Quality conformance inspections.}
+
+\section{PREPARATION FOR DELIVERY}
+
+\section{NOTES}
+
+\appendix
+%
+% \section will now generate appendices starting with section 10, 20, etc.
+%
+\section{<text>} % Section 10, Appendix I
+
+\section{<text>} % Section 20, Appendix II
+
+\end{document}
+\end{verbatim}
+\end{small}
+
+\item milstd---Critical Item Development Specification 
+
+\begin{small}
+\begin{verbatim}
+\documentstyle<<optionlist>>{milstd}
+\Btwo
+\documentnumber{<mil-std-number>}
+\documentdate{<mil-date>}
+\title{Critical Item Development Specification\\
+<paragraph_text>...}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+\end{titlepage}
+
+\pagenumbering{roman}
+\tableofcontents
+\newpage
+\listoffigures
+\listoftables
+
+\cleardoublepage
+\pagenumbering{arabic}
+
+\section{SCOPE}
+
+\section{APPLICABLE DOCUMENTS}
+.
+. \subsection's, \subsubsection's, etc. 
+. have been omitted for brevity
+.  
+
+\section{REQUIREMENTS}
+
+\subsection{Item definition.}
+
+\subsection{Characteristics.}
+
+\subsubsection{Performance.}
+
+\subsubsection{Physical characteristics.}
+
+\subsubsection{Reliability.}
+
+\subsubsection{Maintainability.}
+
+\subsubsection{Environmental conditions.}
+
+\subsubsection{Transportability.}
+
+\subsection{Design and construction.}
+
+\subsubsection{Materials, processes, and parts.}
+
+\subsubsection{Electromagnetic radiation.}
+
+\subsubsection{Nameplates and product marking.}
+
+\subsubsection{Workmanship.}
+
+\subsubsection{Interchangeability.}
+
+\subsubsection{Safety.}
+
+\subsubsection{Human performance/human engineering.}
+
+\subsection{Documentation.}
+
+\subsection{Logistics.}
+
+\subsubsection{Maintenance.}
+
+\subsubsection{Supply.}
+
+\subsection{Precedence.}
+
+\section{QUALITY ASSURANCE PROVISIONS}
+
+\subsection{General.}
+
+\subsubsection{Responsibility for test.}
+
+\subsubsection{Special tests and examinations.}
+
+\subsection{Quality conformance inspections.}
+
+\section{PREPARATION FOR DELIVERY}
+
+\section{NOTES}
+
+\appendix
+%
+% \section will now generate appendices starting with section 10, 20, etc.
+%
+\section{<text>} % Section 10, Appendix I
+
+\section{<text>} % Section 20, Appendix II
+
+\end{document}
+\end{verbatim}
+\end{small}
+
+\item milstd---Computer Program Development Specification 
+
+\begin{small}
+\begin{verbatim}
+\documentstyle<<optionlist>>{milstd}
+\Bfive
+\documentnumber{<mil-std-number>}
+\documentdate{<mil-date>}
+\title{Computer Program Development Specification\\
+<paragraph_text>...}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+\end{titlepage}
+
+\pagenumbering{roman}
+\tableofcontents
+\newpage
+\listoffigures
+\listoftables
+
+\cleardoublepage
+\pagenumbering{arabic}
+
+\section{SCOPE}
+
+\subsection{Identification.}
+
+\subsection{Functional summary.}
+
+\section{APPLICABLE DOCUMENTS}
+.
+. \subsection's, \subsubsection's, etc. 
+. have been omitted for brevity
+.  
+
+\section{REQUIREMENTS}
+
+\subsection{Program definition.}
+
+\subsection{Detailed functional requirements.}
+
+\subsubsection{Inputs.}
+
+\subsubsection{Processing.}
+
+\subsubsection{Outputs.}
+
+\subsubsection{Special requirements.}
+
+\subsection{Adaptation.}
+
+\subsubsection{General environment.}
+
+\subsubsection{System parameters.}
+
+\subsubsection{System capacities.}
+
+\section{QUALITY ASSURANCE PROVISIONS}
+
+\subsection{Introduction.}
+
+\subsection{Test requirements.}
+
+\subsection{Acceptance test requirements.}
+
+\section{PREPARATION FOR DELIVERY}
+
+\section{NOTES}
+
+\appendix
+%
+% \section will now generate appendices starting with section 10, 20, etc.
+%
+\section{<text>} % Section 10, Appendix I
+
+\section{<text>} % Section 20, Appendix II
+
+\end{document}
+\end{verbatim}
+\end{small}
+
+\item milstd---Computer Program Product Specification 
+
+\begin{small}
+\begin{verbatim}
+\documentstyle<<optionlist>>{milstd}
+\Cfive
+\documentnumber{<mil-std-number>}
+\documentdate{<mil-date>}
+\title{Computer Program Product Specification\\
+<paragraph_text>...}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+\end{titlepage}
+
+\pagenumbering{roman}
+\tableofcontents
+\newpage
+\listoffigures
+\listoftables
+
+\cleardoublepage
+\pagenumbering{arabic}
+
+\section{SCOPE}
+
+\section{APPLICABLE DOCUMENTS}
+.
+. \subsection's, \subsubsection's, etc. 
+. have been omitted for brevity
+.  
+
+\section{REQUIREMENTS}
+
+\subsection{Functional allocation description.}
+
+\subsection{Functional description.}
+
+\subsection{Storage allocation.}
+
+\subsection{Computer program functional flow diagram.}
+
+\subsubsection{Program interrupts.}
+
+\subsubsection{Logic of subprogram.}
+
+\subsubsection{Special control features.}
+
+\section{QUALITY ASSURANCE PROVISIONS}
+
+\section{PREPARATION FOR DELIVERY}
+
+\section{NOTES}
+
+\appendix
+%
+% \section will now generate appendices starting with section 10, 20, etc.
+%
+\section{<text>} % Section 10, Appendix I
+
+\section{<text>} % Section 20, Appendix II
+
+\end{document}
+\end{verbatim}
+\end{small}
+
+\item milstd---System Specification
+
+\begin{small}
+\begin{verbatim}
+\documentstyle<<optionlist>>{milstd}
+\A
+\documentnumber{<mil-std-number>}
+\documentdate{<mil-date>}
+\title{System Specification\\
+<paragraph_text>...}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+\end{titlepage}
+
+\pagenumbering{roman}
+
+\tableofcontents
+\newpage
+\listoffigures
+\listoftables
+
+\cleardoublepage
+\pagenumbering{arabic}
+
+\section{SCOPE}
+
+\section{APPLICABLE DOCUMENTS}
+.
+. \subsection's, \subsubsection's, etc. 
+. have been omitted for brevity
+.  
+
+\section{REQUIREMENTS}
+
+\subsection{System definition.}
+
+\subsubsection{General description.}
+
+\subsubsection{Missions.}
+
+\subsubsection{Threat.}
+
+\subsubsection{System diagrams.}
+
+\subsubsection{Interface definition.}
+
+\subsubsection{Government furnished property list.}
+
+\subsubsection{Operational and organizational concepts.}
+
+\subsection{Characteristics.}
+
+\subsubsection{Performance characteristics.}
+
+\subsubsection{Physical characteristics.}
+
+\subsubsection{Reliability.}
+
+\subsubsection{Maintainability.}
+
+\subsubsection{Availability.}
+
+\subsubsection{System effectiveness models.}
+
+\subsubsection{Environmental conditions.}
+
+\subsubsection{Nuclear control requirements.}
+
+\subsubsection{Transportability.}
+
+\subsection{Design and construction.}
+
+\subsubsection{Materials, processes, and parts.}
+
+\subsubsection{Electromagnetic radiation.}
+
+\subsubsection{Nameplates and product marking.}
+
+\subsubsection{Workmanship.}
+
+\subsubsection{Interchangeability.}
+
+\subsubsection{Safety.}
+
+\subsubsection{Human performance/human engineering.}
+
+\subsection{Documentation.}
+
+\subsection{Logistics.}
+
+\subsubsection{Maintenance.}
+
+\subsubsection{Supply.}
+
+\subsubsection{Facilities and facility equipment.}
+
+\subsection{Personnel and training.}
+
+\subsubsection{Personnel.}
+
+\subsubsection{Training.}
+
+\subsection{Functional area characteristics.}
+
+\subsection{Precedence.}
+
+\section{QUALITY ASSURANCE PROVISIONS}
+
+\subsection{General.}
+
+\subsubsection{Responsibility for tests.}
+
+\subsubsection{Special tests and examinations.}
+
+\subsection{Quality conformance inspections.}
+
+\section{PREPARATION FOR DELIVERY}
+
+\section{NOTES}
+
+\appendix
+%
+% \section will now generate appendices starting with section 10, 20, etc.
+%
+\section{<text>} % Section 10, Appendix I
+
+\section{<text>} % Section 20, Appendix II
+
+\end{document}
+\end{verbatim}
+\end{small}
+
+\item milstd---Critical Item Development Specification 
+
+\begin{small}
+\begin{verbatim}
+\documentstyle<<optionlist>>{milstd}
+\Btwo
+\documentnumber{<mil-std-number>}
+\documentdate{<mil-date>}
+\title{Critical Item Development Specification\\
+<paragraph_text>...}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+\end{titlepage}
+
+\pagenumbering{roman}
+\tableofcontents
+\newpage
+\listoffigures
+\listoftables
+
+\cleardoublepage
+\pagenumbering{arabic}
+
+\section{SCOPE}
+
+\section{APPLICABLE DOCUMENTS}
+.
+. \subsection's, \subsubsection's, etc. 
+. have been omitted for brevity
+.  
+
+\section{REQUIREMENTS}
+
+\subsection{Item definition.}
+
+\subsection{Characteristics.}
+
+\subsubsection{Performance.}
+
+\subsubsection{Physical characteristics.}
+
+\subsubsection{Reliability.}
+
+\subsubsection{Maintainability.}
+
+\subsubsection{Environmental conditions.}
+
+\subsubsection{Transportability.}
+
+\subsection{Design and construction.}
+
+\subsubsection{Materials, processes, and parts.}
+
+\subsubsection{Electromagnetic radiation.}
+
+\subsubsection{Nameplates and product marking.}
+
+\subsubsection{Workmanship.}
+
+\subsubsection{Interchangeability.}
+
+\subsubsection{Safety.}
+
+\subsubsection{Human performance/human engineering.}
+
+\subsection{Documentation.}
+
+\subsection{Logistics.}
+
+\subsubsection{Maintenance.}
+
+\subsubsection{Supply.}
+
+\subsection{Precedence.}
+
+\section{QUALITY ASSURANCE PROVISIONS}
+
+\subsection{General.}
+
+\subsubsection{Responsibility for test.}
+
+\subsubsection{Special tests and examinations.}
+
+\subsection{Quality conformance inspections.}
+
+\section{PREPARATION FOR DELIVERY}
+
+\section{NOTES}
+
+\appendix
+%
+% \section will now generate appendices starting with section 10, 20, etc.
+%
+\section{<text>} % Section 10, Appendix I
+
+\section{<text>} % Section 20, Appendix II
+
+\end{document}
+\end{verbatim}
+\end{small}
+
+\item milstd---Computer Program Development Specification 
+
+\begin{small}
+\begin{verbatim}
+\documentstyle<<optionlist>>{milstd}
+\Bfive
+\documentnumber{<mil-std-number>}
+\documentdate{<mil-date>}
+\title{Computer Program Development Specification\\
+<paragraph_text>...}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+\end{titlepage}
+
+\pagenumbering{roman}
+\tableofcontents
+\newpage
+\listoffigures
+\listoftables
+
+\cleardoublepage
+\pagenumbering{arabic}
+
+\section{SCOPE}
+
+\subsection{Identification.}
+
+\subsection{Functional summary.}
+
+\section{APPLICABLE DOCUMENTS}
+.
+. \subsection's, \subsubsection's, etc. 
+. have been omitted for brevity
+.  
+
+\section{REQUIREMENTS}
+
+\subsection{Program definition.}
+
+\subsection{Detailed functional requirements.}
+
+\subsubsection{Inputs.}
+
+\subsubsection{Processing.}
+
+\subsubsection{Outputs.}
+
+\subsubsection{Special requirements.}
+
+\subsection{Adaptation.}
+
+\subsubsection{General environment.}
+
+\subsubsection{System parameters.}
+
+\subsubsection{System capacities.}
+
+\section{QUALITY ASSURANCE PROVISIONS}
+
+\subsection{Introduction.}
+
+\subsection{Test requirements.}
+
+\subsection{Acceptance test requirements.}
+
+\section{PREPARATION FOR DELIVERY}
+
+\section{NOTES}
+
+\appendix
+%
+% \section will now generate appendices starting with section 10, 20, etc.
+%
+\section{<text>} % Section 10, Appendix I
+
+\section{<text>} % Section 20, Appendix II
+
+\end{document}
+\end{verbatim}
+\end{small}
+
+\item milstd---Computer Program Product Specification 
+
+\begin{small}
+\begin{verbatim}
+\documentstyle<<optionlist>>{milstd}
+\Cfive
+\documentnumber{<mil-std-number>}
+\documentdate{<mil-date>}
+\title{Computer Program Product Specification\\
+<paragraph_text>...}
+
+\begin{document}
+
+\begin{titlepage}
+\maketitle
+\end{titlepage}
+
+\pagenumbering{roman}
+\tableofcontents
+\newpage
+\listoffigures
+\listoftables
+
+\cleardoublepage
+\pagenumbering{arabic}
+
+\section{SCOPE}
+
+\section{APPLICABLE DOCUMENTS}
+.
+. \subsection's, \subsubsection's, etc. 
+. have been omitted for brevity
+.  
+
+\section{REQUIREMENTS}
+
+\subsection{Functional allocation description.}
+
+\subsection{Functional description.}
+
+\subsection{Storage allocation.}
+
+\subsection{Computer program functional flow diagram.}
+
+\subsubsection{Program interrupts.}
+
+\subsubsection{Logic of subprogram.}
+
+\subsubsection{Special control features.}
+
+\section{QUALITY ASSURANCE PROVISIONS}
+
+\section{PREPARATION FOR DELIVERY}
+
+\section{NOTES}
+
+\appendix
+%
+% \section will now generate appendices starting with section 10, 20, etc.
+%
+\section{<text>} % Section 10, Appendix I
+
+\section{<text>} % Section 20, Appendix II
+
+\end{document}
+\end{verbatim}
+\end{small}
+
+\end{itemize}
+
+\end{document}

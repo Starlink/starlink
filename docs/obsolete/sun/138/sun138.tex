@@ -1,0 +1,2679 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {138.1}
+\newcommand{\stardocauthors}   {M McSherry}
+\newcommand{\stardocdate}      {9th December 1991}
+\newcommand{\stardoctitle}     {HRTS --- NRL High Resolution Telescope and 
+Spectrograph Package}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+\newpage
+
+\LARGE
+\begin{center}
+{\bf Preface}
+\end{center}
+\normalsize
+
+The Naval Research Laboratory (NRL) High Resolution Telescope and Spectrograph
+(HRTS) recorded high quality ultraviolet spectra of the Sun during 6 rocket 
+flights (21 July 1975, 13 February 1978, 1 March 1979, 11 December 1987 
+and 20 November 1988) and during extended operations on the Space 
+Shuttle Spacelab 2 between 29 July to 6 August 1985. The spectral region 
+covered by the spectrograph was $1170 \ - \ 1700\AA$. This region 
+contains many important chromospheric (C I, O I, Fe II), transition 
+region (Si III, Si IV, O IV, C IV) and coronal (Fe XII, Fe XXI) lines. 
+The spectrograph has a spectral resolution better than $0.1\AA$ and a 
+spatial resolution between 1 and 2 arc sec. Solar features observed 
+during the various missions were (i) sunspot and the quiet solar limb 
+(21 July 1975 \& 13 February 1978), (ii) sequential spatial rasters of 
+an extended solar region roughly centred on C IV (1 March  1979), 
+sunspot and the solar limb inside a polar coronal hole (Spacelab), (iii) 
+a coordinated HRTS and AS\&E X-ray programme --- HRTS performed a large 
+area raster near $1550\AA$ (1 December 1987) and (iv) solar wind studies 
+(20 November 1988). For further information about HRTS and observational 
+data, interested users should contact Dr K. Dere (Naval Research Lab., 
+Washington --- e-mail {\tt 11323::DERE}).
+
+ The guide which follows is intended to be used in conjunction with the 
+ HRTS package, which was originally developed at N.R.L. by {\bf John Ewing}
+ \& {\bf Ken Dere} but has now been modified for general Starlink use.
+ The guide details each program
+ in the package, which has been divided up according to the categories:
+ data analysis, data reduction and miscellaneous. These sections are also
+ further divided according to language, either DCL$+$Fortran or IDL.
+
+
+\newpage
+
+\section{Introduction}
+
+This manual describes the various programs available for HRTS data-reduction
+and data-anal\-ysis.  Some programs are to be run from DCL level, while others
+are to be run from IDL. A short description of HRTS data files and how to
+examine them is given in the following pages.
+
+HRTS-related data files consist of both data and header information. The header
+is usually contained in the first record of the data file, and contains
+information describing the data. These files are created in a manner which
+strives to conserve disk storage, and cannot be edited with EDT or any other
+text editor.
+
+The use of the IDL environment is recommended for examining this data primarily
+for its flexibility and ease of graphics generation. A common practice is to
+enter IDL (by typing IDL) and then to load some data into memory by using the 
+GETDATA  procedure. If one has a two-dimensional array of data in memory one
+may then wish to display it on a colour monitor (by using the TVSTART and TVSCL
+commands), or plot a cross section of the data on a graphics terminal (by using
+the intrinsic PLOT procedure), plot a histogram of the data (by using the
+intrinsic HISTOGRAM and PLOT procedures), print out numerical values, or try
+other options. 
+
+To find out more details about each file one may examine that file's header
+information. There are programs for both the DCL and IDL environments which
+allow one to do this (both programs are named  HDR). Most of the programs used
+for data-reduction are written in FORTRAN since that language is more efficient
+than IDL for that purpose. The data-reduction programs will not be of much
+interest for most users.
+
+Notes concerning the names of arguments for IDL procedures and functions as
+they appear in this guide:
+\begin{enumerate}   
+\item Argument names shown in bold type are required arguments.
+\item An undefined variable must not be passed in as an argument whose name is 
+in italics.
+\end{enumerate}
+\begin{description}
+\item [Example: ] {\tt HRTS\_IDL>}{\bf GETMMT,ARR}{\it FILENAME}
+\end{description}
+
+\newpage
+
+\section{Example Section for New Users}
+
+
+This section gives details regarding how to examine different types of HRTS
+data files.  The files that are mentioned below are permanently stored within
+the DEMO directory, \\(HRTS\_DISK:[HRTS.DATA.DEMO] ) expressly for the purpose
+of allowing this demonstration.  Commands which are to be typed in by the user
+are shown after the `\verb+IDL>+' prompt.
+
+\begin{verbatim}
+
+            <Enter the HRTS Software Package>
+            $ HRTS
+        HRTS$>                       
+            <Activate the image display system>
+        HRTS$> idl                                    ! Enter IDL environment
+
+
+            <1. Examine a .CIS file via the image display>
+
+        HRTS_IDL> getdata,a,`DEMO1'                   ! DEMO1 = E03013548.CIS
+        HRTS_IDL> tvstart
+        HRTS_IDL> tvscl,a(*,0:1023)
+
+
+            <2. Examine a .FSS file via the image display>
+
+        HRTS_IDL> getdata,a,`DEMO2'                   ! DEMO2 = E03013548.FSS
+        HRTS_IDL> tvstart
+        HRTS_IDL> tvscl,a(*,0:1023)
+
+
+            <3. Examine a .MMT file via the image display>
+
+        HRTS_IDL> getmmt,a,`DEMO3'                    !DEMO3 = E03013548.MMT
+        HRTS_IDL> plot,a
+
+
+            <4. Examine a .IMG file via the image display>
+
+        HRTS_IDL> tvimg,`                   
+        HRTS_IDL> Inappropriate or non-existing file: .IMG
+        HRTS_IDL> Re-enter the file-name(`q'-quit): DEMO4
+        HRTS_IDL> Please enter image display device:
+                                                      !DEMO4 = R43S15I2C4OE.IMG
+        HRTS_IDL> exit
+        HRTS$>
+
+\end{verbatim}
+
+\newpage
+
+\section{Description of HRTS Data Files} 
+
+\begin{center}
+\begin{tabular}{||l l l||}
+\hline
+{\bf IMAGE} & {\bf FILE-TYPE} & {\bf DESCRIPTION}\\
+\hline
+{\em 1} & {\em arbitrary} & Any data file which does not fall into one of \\
+        &                 & the categories listed below.\\
+        &                 &                             \\
+
+{\em 2} & {\em .RDS} & {\bf Rectilinear Densitometer Scan ---} A two dimensional 
+\\
+        &            &      array of density values throughout a region of a \\
+        &            &      plate.\\
+        &            &            \\
+  
+{\em 3} & {\em .CDF} & {\bf Curvilinear Densitometer Scan ---} A two dimensional 
+\\
+        &            &      array of density values adjusted for curvature,\\
+        &            &      warping and magnification.\\
+        &            &                                \\
+
+{\em 4} & {\em .CIS} & {\bf Curvilinear Intensity Scan ---} A two dimensional \\
+        &            &      array of intensity values adjusted for curvature,\\
+        &            &      warping and magnification.\\
+        &            &                                \\
+
+{\em 5} & {\em .FSS} & {\bf Flat Stigmatic Spectra ---} A two dimensional array \\
+        &            & array of intensity values in which the dispersion is \\
+        &   & linear and $\lambda$ is a function of column number only,\\
+  &  &    {\it i.e.} the $\lambda$ correction has been applied to the data. \\
+  &    &  \\
+
+{\em 6} & {\em .SSS} & {\bf Summed Stigmatic Spectra ---} A composite spectral 
+line \\    
+  &   &  formed by summing the intensities from various \\
+  &   &    actual spectral lines together.\\
+  &   &  \\
+
+{\em 7} & {\em .MMT} & {\bf Moment Data ---} A series of one dimensional arrays of
+ \\
+
+        &            & intensity, velocity and/or line width as a function \\
+        &            & of position for various ions. \\
+        &            &                               \\     
+
+{\em 8} & {\em .IMG} & {\bf Moment Image ---} a three dimensional array containing 
+\\
+        &            &  various moments as a function of position in an x-y \\
+        &            &  plane. \\
+        &            & \\
+\hline
+\end{tabular}
+\end{center}
+
+\newpage
+
+\section{Description of Header Variables}
+
+    These variables are listed in what may roughly be construed as the order
+    of importance.  Knowledge of these variables is not essential for most
+    applications.  Not all variables are defined for each image.  Variables
+    with a `*' to the left are arrays.
+\begin{description}
+\begin{description}
+\item[NDIM] -- {\em number of dimensions of the data array}
+\item[* ISIZ] -- {\em size of each dimension of the data array}
+\item[DTYPE] -- {\em data type (following the IDL `SIZE' convention)}
+\item[IMAGE] -- {\em image type}
+\item[NINT] -- {\em number of integer variables in the file header}
+\item[NFLT] -- {\em number of floating point variables in the file header}
+\item[NDATSCL] -- {\em type of scaling performed on the data}
+\item[IVARS] -- {\em number of files summed together to make composite image}
+\item[TEXT/HDRTXT] -- {\em title of the scan}
+\item[* ID] -- {\em names of each dimension of the data array}
+\item[* UNIT] -- {\em units of each respective dimension}
+\item[* SCUNIT] -- {\em scaled units of each respective dimension}
+\item[IDDAT] -- {\em the type of quantity which the data represents}
+\item[UNITDAT] -- {\em units of the data}
+\item[HRTS] -- {\em name of the particular HRTS instrument}
+\item[PLATE] -- {\em name of the plate which was digitized}
+\item[SEQ] --  {\em sequence number}
+\item[INST] -- {\em institution at which the plate was digitized}
+\item[DENSIT] -- {\em name of the densitometer employed to scan the plate}
+\item[SCDATE] -- {\em date of the scan}
+\item[IYEAR] -- {\em year of the measurement}
+\item[MONTH] -- {\em month of the measurement}
+\item[IHOUR] -- {\em hour of the measurement}
+\item[MINUT] -- {\em minute of the measurement}
+\item[ISEC] -- {\em second of the measurement}
+\item[MILSEC] -- {\em millisecond of the measurement}
+\item[* ISPOFST] -- {\em spatial series offset for each dimension}
+\item[* ITSOFST] -- {\em time series offset for each dimension}
+\item[* MVOFST] -- {\em movie series offset for each dimension}
+\item[NMMTWVL] -- {\em number of moment lines}
+\item[* IDMMT] -- {\em identification of each line}
+\item[* NMMT] -- {\em number of moments of each line}
+\item[* NELMMT] -- {\em number of elements of each line}
+\item[* IPLATE] -- {\em plate number}
+\item[IOFST] -- {\em offset of each respective plate}
+\item[IDIMG] -- {\em identification of line}
+\item[NMMTIMG] -- {\em number of moments of line}
+\item[NELIMG] -- {\em number of elements of line}
+\item[* W0] -- {\em initial value for each respective dimension}
+\item[* WINC] -- {\em step size for each respective dimension}
+\item[SLITW] -- {\em densitometer slit width}
+\item[SLITH] -- {\em densitometer slit height}
+\item[CPD] -- {\em clear plate density}
+\item[DSS] -- {\em densitometer scan speed (mm/s)}
+\item[BACKLASH] -- {\em densitometer backlash}
+\item[WVLO] -- {\em initial wavelength}
+\item[EXPT] -- {\em plate exposure time (s)}
+\item[FMIN] -- {\em minimum usable data value}
+\item[FMAX] -- {\em maximum usable data value}
+\item[WVLSTP] -- {\em wavelength at which dim\#2 step size is applied}
+\item[WVLCFW] -- {\em wavelength at which CFW position is measured}
+\item[XCFW] -- {\em position of CFW along dim\#1 in pixels}
+\item[YCFW] -- {\em position of CFW along dim\#2 in pixels}
+\item[WVLRE] -- {\em reference wavelength (Angstroms)}
+\item[XREF] -- {\em reference position along dim\#1}
+\item[YREF] -- {\em reference position along dim\#2}
+\item[* DATSCL] -- {\em scaling factor for each respective dimension}
+\item[* NSCL] -- {\em number of scaling factors for each dimension}
+\item[* SCL] -- {\em scaling factors}
+\item[NCRV] -- {\em number of parameters user for curvature correction}
+\item[* CRV] -- {\em curvature correction parameters}
+\item[* NSFF] -- {\em number of spectral filtering factors for each dimension}
+\item[* SFF] -- {\em spectral filtering factors}
+\item[NDNCAL] -- {\em number of density values used for calibration}
+\item[NWVLCAL] -- {\em number of wavelength values used for calibration}
+\item[* DNCAL] -- {\em density values used for calibration}
+\item[* WVLCAL] -- {\em wavelength values used for calibration}
+\item[* CAL] -- {\em calibration coefficients}
+\item[NSUMWVL] -- {\em number of summed lines}
+\item[* SUMWVL] -- {\em wavelength of each summed line}
+\item[* SUMNRM] -- {\em normalization value of each line}
+\item[* SUMMED-FILES] -- {\em names of files summed together to make composite 
+image}
+\end{description}
+\end{description}
+
+\newpage
+
+\section{Quick Program Reference}
+
+\subsection{HRTS data-analysis programs --- DCL level}
+
+\begin{description}
+\begin{description}
+\item[HDATA] --      Examine details concerning processed data.
+\item[HDIR] --       Make a directory listing showing data array sizes.
+\item[HDR] --        Examine and/or change the header information of data files.
+\item[INTPLT] --     Plot intensity/density of a spectral file for a given scan 
+line.
+\item[MMTPLT3] --   Plot intensity, velocity, and line width for a selected ion.
+\item[MMTTYP] --     Type out values of moments on the terminal.
+\item[PLIST] --      Generate a list of processed HRTS data.
+\item[PROFILE] --    Plot intensity vs. ($\lambda$-$\lambda$rest) for various 
+line profiles.
+\item[PRTHEADR] --   Print out all of the header information for a given data 
+file.
+\item[WVLPLT] --     Plot intensity vs.$\lambda$ for one scan line of a spectral 
+file
+\end{description}
+\end{description}
+
+\subsection{HRTS data-analysis programs --- IDL level}
+
+\begin{description}
+\begin{description}
+\item[GETDATA] --    Reads data from a file into an IDL array.
+\item[GETDATAWVL] -- Read data within a specified wavelength range from a file.
+\item[GETMMT] --     Read moment data from an image type \#7 file (.MMT, .MOD, 
+etc).
+\item[HDR] --        Examine and/or change the header information of data files.
+\item[MMTCALC] --    Calculate the first three moments for a single profile.
+\item[MMTPLT] --     Plot intensity, velocity, and line width for a specified 
+ion.
+\item[PLOTPROFILE] --Plot specified profiles vs. ($\lambda$-$\lambda$rest) from 
+a spectral file.
+\item[READCAL] --    Obtain density and log intensity values from a .CAL file
+\item[PUTDATA] --    Write data from an IDL array into a file.
+\item[TVEXTRACT] --  Extract sections of data from a spectral file.
+\item[TVIMG] --      Visually and numerically examine .IMG data.
+\item[TVIMGPROFILE] -- Plot profiles by selecting positions within a .IMG file.
+\item[VARVELCT] --   Obtain a modified colour table for velocity images.
+\item[VELCT] --      Obtain the standard colour table used for velocity images.
+\item[WAVEL] --      Obtain the wavelength scale for data read in by GETDATA.
+\end{description}
+\end{description}
+
+\subsection{HRTS data-reduction programs --- DCL level}
+
+\begin{description}
+\begin{description}
+\item[C4DFAC] --     Make either .CDF or .CIS data from input .RDS data.
+\item[DEN\_INT] --    Create a .CIS file from a .CDF file, or a .FSS from an 
+.FSD.
+\item[FLIPX] --      Flip a 2-D HRTS image in the X-direction.
+\item[FLIPY] --      Flip a 2-D HRTS image in the Y-direction.
+\item[FSS] --        Create a .FSS file from a .CIS file.
+\item[GETCIS] --     Invoke C4DFAC to make .CDF's or .CIS's from .RDS files.
+\item[MMTIMG] --  Create a .IMG file from a series of moment (.MMT or .MOD) 
+files.
+\item[MMTMOD] --  Create a modified moment file (.MOD) from a moment file 
+(.MMT).
+\item[MOMENT] --     Create a moment file (.MMT) from a spectral file (.CIS).
+\item[RESTORECIS] -- Restore the header of a .CDF or .CIS to its original state.
+\item[STNDRD] --     Modify a spectral file's header to improve $\lambda$ 
+associations.
+\item[SUM] --        Create a .SSS-type file from any spectral file.
+\item[SUMCDF\_IG] --  Make a composite intensity image by combining .CDF or .FSD 
+data.
+\end{description}
+\end{description}
+
+\subsection{HRTS data-reduction programs --- IDL level}
+
+\begin{description}
+\begin{description}
+\item[ATODATA] --    Read ato data from a .ATO file into an IDL array.
+\item[SCALIM] --     Generate a .SMG file from a .IMG file.
+\item[SETCRV] --     Adjust a spectral file's header to improve $\lambda$ 
+associations.
+\item[STNDRD] --     Estimate a correction that will improve $\lambda$ 
+associations.
+\item[SUMCDF\_IG] --  Set up a batch job to run SUMCDF\_IG.FOR.
+\end{description}
+\end{description}
+
+\subsection{H\&D curve development programs --- DCL level}
+
+\begin{description}
+\begin{description}
+\item[AMOEBA] --  Produce H\&D curve coefficients, given at least two density 
+histograms.
+\item[MAKEHIST] --   Generate histogram of density values for an image.
+\item[TESTHND] -- Evaluate the appropriateness of a set of H\&D curve 
+coefficients.
+\end{description}
+\end{description}
+
+\subsection{H\&D curve development programs --- IDL level}
+
+\begin{description}
+\begin{description}
+\item[GRHIST] --     Plot a histogram of density values.
+\item[GRHND] --      Plot an H\&D curve.
+\end{description}
+\end{description}
+
+\subsection{Miscellaneous programs --- DCL level}
+
+\begin{description}
+\begin{description}
+\item[CALC] --       Perform a calculator simulation.
+\item[IONEQ] --      Get ion equilibria from the tables of Arnaud et al.
+\item[TMAX] --       Calculate temperature maximum values.
+\end{description}
+\end{description}
+
+\subsection{Miscellaneous programs --- IDL level}
+
+\begin{description}
+\begin{description}
+
+\item[COLSUM] --     Sum the columns of a 2-D array.
+\item[DISPLAY] --    Display an image on a graphics terminal.
+\item[INT] --        Display an image on a graphics screen with 9 brightness 
+levels.
+\item[POLYFIT] --    Fit a polynomial to a weighted set of (x,y) observation 
+points.
+\item[POS] --        Read values off a graph plotted on a graphics terminal
+\item[ROWSUM] --     Sum the rows of a 2-D array.
+\item[TVALIGN] --    Use the image display to align two images.
+\item[TVCOMPARE] --  See the sum and difference of two images.
+\item[TVCUT] --      Read data from an arbitrary area of the image screen.
+\item[TVPOS] --      Print out the current coordinates of the TV cursor.
+\item[TVRESTORE] --  Put an image onto the screen that was saved via TVSAVE.
+\item[TVSAVE] --     Save an image from the screen into a file.
+\item[TVSTART] --    Prepare the image display unit to display images.
+\end{description}
+\end{description}
+
+\clearpage
+
+{\small
+\setlength{\unitlength}{1.0pt}
+
+\begin{figure}
+\begin{center}
+\begin{picture}(150,300)
+\thicklines
+\put (-100,450){\Large \bf  5.9 Flow Chart for Data Reduction Programs}
+\put (-20,370){\framebox(200,45){\Huge GETCIS}}
+\put (-200,270){\framebox(60,25){\Large \it FSS}}
+\put (280,270){\framebox(60,25){\Large \it FSS}}
+\put (40,290){\framebox(90,20){\large \it MOMENT}}
+\put (15,200){\framebox(60,20){\it MMTMOD}}
+\put (40,110){\framebox(90,20){\large \it MMTIMG}}
+\put (240,170){\framebox(60,25){\large \it DEN\_INT}}
+\put (55,25){\framebox(60,20){\large \it SCALIM}}
+\put (-25,-10){\framebox(60,25){\Large \it SUM}}
+\put (128,-10){\framebox(60,25){\Large \it SUM}}
+\put (195,70){\framebox(70,20){\it SUMCDF\_IG}}
+\put (50,370){\vector(0,-1){59}}
+\put (120,370){\vector(0,-1){59}}
+\put (29,345){\circle{25}}
+\put (21,342){CIS}
+\put (141,345){\circle{25}}
+\put (129,342){CDF}
+\put (51,345){\line(-1,0){9}}
+\put (130,345){\line(-1,0){9}}
+\put (8,370){\vector(0,-1){353}}
+\put (160,370){\vector(0,-1){353}}
+\put (-15,155){\circle{25}}
+\put (-23,152){CIS}
+\put (7,155){\line(-1,0){10}}
+\put (183,155){\circle{25}}
+\put (171,152){CDF}
+\put (171,155){\line(-1,0){10}}
+\put (110,290){\vector(0,-1){159}}
+\put (134,220){\circle{30}}
+\put (121,217){MMT}
+\put (119,220){\line(-1,0){8}}
+\put (70,289){\vector(-1,-2){33}}
+\put (35,265){\circle{30}}
+\put (22,262){MMT}
+\put (57,265){\line(-1,0){6}}
+\put (35,198){\vector(2,-3){43}}
+\put (35,160){\circle{30}}
+\put (23,157){MOD}
+\put (59,160){\line(-1,0){9}}
+\put (84,110){\vector(0,-1){63}}
+\put (110,79){\circle{30}
+\put (-10,-2){IMG}}
+\put (94,79){\line(-1,0){9}}
+\put (84,25){\vector(0,-1){100}}
+\put (8,-10){\vector(0,-1){100}}
+\put (160,-10){\vector(0,-1){100}}
+\put (110,-25){\circle{30}}
+\put (-18,-50){\circle{39}}
+\put (187,-50){\circle{39}}
+\put (99,-29){SMG}
+\put (-33,-53){SSS\_c4}
+\put (171,-53){SSS\_c4}
+\put (94,-25){\line(-1,0){9}}
+\put (168,-50){\line(-1,0){7}}
+\put (7,-50){\line(-1,0){8}}
+\put (-12,370){\line(0,-1){40}}
+\put (173,370){\line(0,-1){39}}
+\put (-12,330){\line(-1,0){160}}
+\put (173,330){\line(1,0){140}} 
+\put (225,330){\vector(0,-1){238}}
+\put (-172,330){\vector(0,-1){33}}
+\put (270,330){\vector(0,-1){133}} 
+\put (312,330){\vector(0,-1){33}}
+\put (325,269){\vector(-1,-2){36}}
+\put (-90,350){\circle{25}}
+\put (245,350){\circle{25}} 
+\put (-99,347){CIS}
+\put (233,347){CDF}                    !
+\put (245,338){\line(0,-1){7}}
+\put (-94,338){\line(0,-1){7}}
+\put (290,245){\circle{25}}
+\put (280,242){FSD}
+\put (303,245){\line(1,0){7}}
+\put (250,170){\vector(0,-1){50}}
+\put (290,170){\vector(0,-1){200}}
+\put (225,70){\vector(0,-1){150}}
+\put (255,0){\circle{48}}
+\put (308,90){\circle{25}}
+\put (235,-3){cis\_sum}
+\put (300,86){CIS}
+\put (235,0){\line(-1,0){9}}
+\put (295,88){\line(-1,0){5}}
+\put (270,150){\circle{25}}
+\put (260,147){FSS}
+\put (250,149){\line(1,0){8}}
+\put (-172,270){\vector(0,-1){350}}
+\put (-195,95){\circle{30}}
+\put (-204,91){FSS}
+\put (-172,93){\line(-1,0){8}}
+\put (-100,-130){\em Square boxes refer to command routines; the circles are the 
+resultant files.}
+\end {picture}
+\end{center}
+\end{figure}
+\clearpage
+\setlength{\unitlength}{1mm}}
+
+\section{Data Analysis Programs}
+
+\subsection{DCL level}
+
+\subsubsection{HDATA}
+  
+{\em To run this program type:}
+\begin{verbatim}
+     HRTS$> HDATA
+\end{verbatim}
+   {\em HDATA} may be used to display information about processed HRTS data.
+    When the program is invoked, it starts off by showing a screen which
+    displays identification names of processed HRTS data.  These names have
+    been organized into `pages', of which one page may be shown on the
+    screen at any time.  The user may inspect other pages by hitting the
+    `N' key (this and all other available commands are listed on the bottom
+    of the screen).
+    While a page of processed data is displayed on the screen, a user
+    may examine the header data or processing details for the various data
+    files associated with any identification name displayed on the page.
+    An example is shown below:
+\begin{center}
+\begin{tabular}{|l|l|l|l|l|}     
+\hline
+\multicolumn{4}{|l}{\bf Processed Data List} & \multicolumn{1}{l|}{\bf Page 1 of 
+4} 
+\\ \hline     
+       A00101216 &  A00201640 &  E02802302 &  E18415548 &  E18516548  \\
+       A00101230 &  A00201656 &  E02802335 &  E18416548 &  E18517548  \\
+       A00101302 &  A00401216 &  E02802355 &  E18417548 &  E18518548  \\
+\hline \hline
+\multicolumn{2}{||l}{\bf Processing Details} & 
+\multicolumn{3}{l||}{E18404548.CIS;1} 
+\\  
+\hline \hline
+\multicolumn{2}{||l}{Program Version} & \multicolumn{3}{l||}{\em 
+C4DFAC\_2.0(Oct.86)} \\              
+\multicolumn{2}{||l}{Program File Name} & \multicolumn{3}{l||}{\em 
+C4DFAC.FOR;86} \\                   
+\multicolumn{2}{||l}{Date of Execution} & \multicolumn{3}{l||}{\em 12-JAN-87}    
+ \\                   
+\multicolumn{2}{||l}{ Calibration Data} & \multicolumn{3}{l||}{\em 
+R067F550.CAL;1} \\                   
+\multicolumn{2}{||l}{Curvature Data} & \multicolumn{3}{l||}{\em CURV.DAT;1} \\   
+\multicolumn{2}{||l}{Magnification Data} & \multicolumn{3}{l||}{\em 
+MAGN.DAT;1}\\                      
+\multicolumn{2}{||l}{Dispersion Data} & \multicolumn{3}{l||}{\em DISP.DAT;1} \\                   
+\multicolumn{2}{||l}{Synth. Spectra Data} & \multicolumn{3}{l||}{\em ATO.548;1} 
+\\                       
+\multicolumn{2}{||l}{Carbon IV Treatment} & \multicolumn{3}{l||}{\em YES}  \\                            
+\hline \hline
+       A00201555 &  E02801555 &  E18413540 &  E18514548 &  E18604548 \\
+       A00201613 &  E02802216 &  E18414548 &  E18515548 &  E18605548 \\
+\hline                
+\end{tabular}
+\end{center}                
+    In the example, the user used the arrow keys and the return key to
+    select the identification name `E18404548' and then hit the `P' key in
+    order to request to see processing information.  The user then
+    manipulated the arrow and return keys again to select the specific file
+    `E18404548.CIS;1' which then resulted in the display of processed data
+    as shown.  At this point the program instructs the user to hit any key
+    in order to continue, after which the processing information will      
+    removed from the screen and other commands may be entered.
+    To examine header information, the user would employ the same
+    procedure as illustrated above, only he would hit `H' instead of `P'.
+    The user may exit the program by hitting the `E' key.
+
+\subsubsection{HDIR}                
+
+{\em To run this program type:}    
+\begin{verbatim}
+     HRTS$> HDIR <file_specification>   
+\end{verbatim}
+   {\em HDIR} is used to make directory listings which show file names and
+    data array sizes.  The program begins by asking for a directory and or file
+    (e.g. *.CIS). It then lists all files in the designated directory.
+    A sample usage of HDIR is shown below:
+         
+\begin{verbatim}
+
+           HRTS$> hdir 
+                                            
+              Directory  
+                
+              E03013548.CIS;1        447  1856
+              E03013548.FSS;2        414  1856
+              E03013548.MMT;2       1856     9
+              E03013548.SMT;4         92     3
+              E03013548.STNPLT;1  <not HRTS data>
+              E03013548.STNPRT;4  <not HRTS data>
+              R43S15I2C4OE.IMG;3    1879    10     2
+              R43S15I2C4OE.SMG;2    1879    10     2
+                
+              Total of 8 files.
+
+             HRTS$>              
+
+\end{verbatim}
+
+\subsubsection{HDR}
+
+{\em To run this program type:}
+\begin{verbatim}
+     HRTS$> HDR                  
+\end{verbatim}
+  This program allows the user to examine the header information of
+  HRTS data files.  When the program is run, it will ask the user to type
+  in a file name.  A menu of variable names is then displayed (shown as
+  follows) in which one may select a variable name by using the arrow
+  keys and the return key.
+\begin{center}
+\begin{tabular}{||l l l l l ||}
+\hline
+
+
+           HRTS   &     Inst  &     WvlRef  &    DType  &     DatScl \\    
+           Plate  &    Densit &     HdrTxt  &    IVars  &     NScl   \\   
+           Seq    &    SlitH  &      Image  &      Id   &     Scl    \\   
+           ExpT   &    SlitW  &      NDim   &     Unit  &     NCrv   \\   
+           IYear  &  BackLash &      ISiz   &    ScUnit &     Crv    \\   
+           Month  &     XRef  &       W0    &     FMin  &     NSff   \\   
+           IDay   &     YRef  &      Winc   &     FMax  &     Sff    \\   
+           CPD    &     XCFW  &      IdDat  &    NDnCal &     Cal    \\   
+           ScDate &      YCFW &    UnitDat  &     DnCal &    HndInt  \\   
+\hline
+\end{tabular}                                        
+\end{center}
+   After making a selection, the value of the selected variable is then
+   displayed on the screen.  The user may hit `H' to obtain help
+   information.  The `N' key may be hit if the user wishes to examine the
+   header of another file after he is done examining the current header
+  (the program will then ask for the name of the next file).  The user
+   also has the ability to change values of header variables within the
+   permanent file by hitting `C' instead of carriage return when selecting
+   a variable, and then typing in the new value for that variable.  To
+   exit the program, the user may select the exit box, or else simply hit
+   the `E' key.
+
+\subsubsection{INTPLT}
+
+{\em To run this program type:}
+\begin{verbatim}
+     HRTS$> INTPLT                       
+\end{verbatim}
+  {\em INTPLT} plots intensity/density of a spectral data file vs. position
+   for a given scan-line number.  The program first asks the user to type
+   in the input file name.  The program then asks the user a question
+   to which the user may simply hit $<$return$>$ to use default value.  The
+   question asks if the user wants the data plotted in the reverse
+   direction. The program then displays the number of scan lines of data, and 
+the number
+   of points per scan line.  The program will next display the following
+   request, `TYPE ISCAN,IPT1,IPT2',  and then wait for the user to type in
+   three numbers; separated by commas. The first must be the number of the 
+desired scan line
+  (if the user gives a negative number for this then the program will
+   exit) and the second and third numbers will be interpreted as
+   indicating the range of points along the scan line which will be
+   displayed.  A graph will now be drawn on the graphics terminal, after
+   which the user may type return to get the `TYPE ISCAN,IPT1,IPT2'
+   message again and so either exit the program (by typing a negative
+   number) or else plot other scan lines.
+
+\subsubsection{MMTPLT3}
+
+{\em To run this program type:}   
+\begin{verbatim}
+     HRTS$> MMTPLT3                      
+\end{verbatim}
+  {\em MMTPLT3} will make plots of moment data on the terminal graphics
+   screen.  When run, this program will first ask for the complete name of
+   the moment file to be examined.  After that is typed in, the program
+   will then display information about the moments in a manner similar to
+   that shown below:
+\begin{center}
+\begin{tabular}{||l l l l l ||}
+\hline 
+\multicolumn{5}{||l||}{HRTS, SL-2, AUG 02, 1985, REV 56, SEQ 61, EXPT 5.0S,
+C SCANS} \\
+          {\em 1  C IV}  &      &      1548.202  &   1.000  &  3 \\             
+          {\em 2  C IV}  &      &      1550.774  &   1.000  &  3 \\             
+          {\em 3  Si I}  &      &      1552.209  &   1.000  &  2 \\             
+          {\em 4  CONTINUUM} &  &      0.000     &   1.000  &  1 \\             
+\multicolumn{2}{||l}{NO OF SCANS} & \multicolumn{3}{l||}{2002} \\    
+\multicolumn{5}{||l||}{TYPE ILINE,MMMT,ISCAN1,ISCAN2, NEGATIVE ILINE TO QUIT} \\  
+\hline
+\end{tabular}
+\end{center}                    
+   The first line shows the descriptive 80 character string associated
+   with the moment file.  In the above example moment data is available
+   for three spectral lines.  The number in the rightmost column shows
+   what moment data is available for each line.  A `1' means just
+   intensity data, a `2' means intensity and velocity data, and a `3'
+   means intensity, velocity, and line width data.  The number of scans is
+   shown and a request is made for the user to type in four numbers which
+   will identify:  which spectral line is of interest (ILINE may be
+   1,2,3,or 4 in the above example), what moment data will be shown (MMMT,
+   if given a value of 3 for example, will result in plotting all three
+   moments, if all three are available), and finally what should be the
+   starting and ending scan numbers. When the user enters all four numbers
+  (all on one line, separated by commas), the program will then plot the
+   data.  When the user is finished examining the plot he may hit 
+   $<$return$>$,
+   after which point the screen will be cleared and he will be given
+   another opportunity to plot more data or else to exit the program.
+
+\subsubsection{MMTTYP}     
+
+{\em To run this program type:}
+\begin{verbatim}
+     HRTS$> MMTTYP                       
+\end{verbatim}
+  {\em MMTTYP} will display the numerical data stored in a .MMT file (i.e.
+   values of intensity, velocity and line width).  When run, the program
+   will first ask for the name of the moment file.  It will next print out
+   a list of emission lines for which moment data is available, and the
+   number of scan lines.  The program will then print `TYPE
+   ILINE,ISCAN1,ISCAN2' and then wait for the user to type in three
+   integer values.  The first value designates which emission line is of
+   interest and the second and third values designate the beginning and
+   ending scan lines.  The program will then print out columns of
+   intensity, velocity and line width data (if all three are available)
+   within the specified range of scan lines.  After this the user may type
+   $<$return$>$ to get the `TYPE ILINE,ISCAN1,ISCAN2' message again and then
+   either exit the program (by typing a negative number) or else print out
+   additional data.
+
+\subsubsection{PLIST}           
+
+{\em To run this program type:}
+\begin{verbatim}                
+     HRTS$> PLIST                        
+\end{verbatim}
+{\em PLIST} will generate a list of processed HRTS data and store the list
+   in a file named {\em PLIST.DAT.}  The user will probably like to print out
+   that file when the program is finished.  A section of a generated list
+   is shown below:
+\begin{center}
+\begin{tabular}{||l l l l l l||}
+\hline
+\multicolumn{5}{||l}{\bf Summary of HRTS data processing as of 26-AUG-87}  &
+\multicolumn{1}{l||}{\bf Page 2 of 8} \\ 
+\hline                                                                    
+{\em File no} & {\em .RDS} & {\em .CIS(g)} & {\em .CIS(s)} & {\em .FSS} & {\em 
+.MMT} \\  
+      E18418548    &     *    &     *   &        &           &              \\
+      E18419548    &     *    &     *   &        &           &              \\
+      E18420548    &     *    &     *   &        &           &              \\
+      E18503548    &     *    &     *   &      * &         * &         *    \\
+      E18604548    &     *    &     *   &      * &         * &         *    \\
+      E18605548    &     *    &     *   &      * &         * &         *    \\
+      E18606548    &     *    &     *   &      * &         * &         *    \\
+      E18607548    &     *    &     *   &      * &         * &         *    \\
+      E18643548    &     *    &     *   &      * &         * &         *    \\
+\hline                
+\end{tabular}
+\end{center}
+  An `*' indicates that the specific file has been generated.
+ (Note:{\em `.CIS(g)'} refers to a .CIS file generated by GETCIS and
+{\em `.CIS(s)'} refers to one generated by Fortran STNDRD).
+
+\subsubsection{PROFILE}             
+
+{\em To run this program type:}
+\begin{verbatim}                
+     HRTS$> PROFILE               
+\end{verbatim}
+  This program will make intensity vs.wavelength plots for the
+  spectral lines specified in the  PROFILE.DAT file; (an example of 
+  this file is contained in the DEMO directory-- to look at the file type 
+  HRTS\_DEMO followed by TYPE profile.dat)
+  using data from one row of a spectral data file (e.g. .CIS).  When
+  run, the program will ask the user for the name of the input spectral
+  data file.  It will next ask for a scan line to use.  If the user
+  inputs a valid scan line number, then the appropriate plot will be
+  generated.  When the user hits any key after this, the program will
+  then ask for another scan line value.  The user may enter another
+  another valid value to get another plot, or he may enter a negative
+  number to exit.
+
+\subsubsection{PRTHDR}
+
+{\em To run this program type:}
+\begin{verbatim}                
+     HRTS$> PRTHEADR                       
+\end{verbatim}
+  The user is asked for the name of the file whose header is to be
+  displayed.  A file named {\em PRTHEADR.PRT} will be generated in the user's
+  current directory which may be edited or typed out to reveal a listing
+  of variable names and their respective values.
+
+\subsubsection{WVLPLT}            
+
+{\em To run this program type:}
+\begin{verbatim}                
+     HRTS$> WVLPLT                       
+\end{verbatim}
+{\em WVLPLT} produces a graph of intensity vs.wavelength.  This program
+  is very similar to the {\em INTPLT} program, except that the graphs which are
+  produced by {\em INTPLT} have the abscissa expressed in terms of position
+  instead of wavelength.  When {\em WVLPLT} is run, the program first asks the
+  user for the name of the input file (which will typically be a .CIS
+  type file).   The program will then ask for a scan number after
+  printing the maximum allowable scan number.  If the user types in a
+  negative number here instead of a valid scan number, then the program
+  will exit.  The program will next ask the user for beginning and ending
+  wavelength values, after printing the largest range of wavelength
+  values available from the data.  If the user just hits return at this
+  point, then the program will use the default wavelength range (which is
+  the largest possible range).  The intensity vs. wavelength graph will
+  then be plotted on the graphics terminal.  The user may now type 
+  $<$return$>$ to get the prompt that asks for another
+  scan number, at which point he may either exit the program (by typing a
+  negative number) or else plot other scan lines.
+
+\subsection{IDL level}    
+
+\subsubsection{GETDATA}
+
+{\em To run this program type:}
+\begin{quote}
+{\tt HRTS\_IDL> }{\bf GETDATA,ARR,}{\it FILENAME,ROW1,ROW2,COL1,COL2,NSUM}  
+\end{quote}
+{\em GETDATA} reads data from a file named{\em FILENAME} into an array named       
+{\em ARR.}  What the user should give for the first parameter, {\em ARR,} is any
+ arbitrary variable name by which he wishes to refer to the data.  After
+ successful completion of this procedure, {\em ARR} will have either one, two,
+ or three dimensions and a type of either byte, integer, long integer or
+ floating point depending on the file from which the data was read in.
+{\em FILENAME} must be either a literal file name enclosed in quotes (such as
+ the following: 'e02801548.rds'), or a variable
+ whose value is a literal file name. {\em ROW1} and {\em ROW2} are optional, and 
+if
+ given, they should both have integer values which will be
+ interpreted as the starting and ending rows of the stored image from
+ which data will be read. {\em COL1} and{\em COL2} are also optional, and if 
+given
+ as integer values, they will define the range of columns from
+ which data will be read. {\em NSUM} may be assigned a value in order to sum
+ a number of rows of the data together.  If the number of parameters
+ given is either 3 or 5 (i.e. a value for {\em ROW1} is given without a value
+ for {\em ROW2,} or a value for {\em COL1} is given without a value of {\em
+ COL2),} then
+ the value of last parameter will be ignored, but the program will
+ operate in a `silent' mode (i.e. there will be no message printed out
+ at the end of the program that tells the size of the generated array).
+ This feature allows {\em GETDATA} to be called by other programs without
+ generating unwanted screen output.
+ This procedure reads spectral (.RDS, .CIS, .FSS), moment (.MMT) and
+ image (.IMG) files.  There is an automatic linear scaling of the data
+ from .CIS and .FSS files based on scaling parameters stored in the
+ file's header.  If scaling is performed then the procedure will
+ explicitly say so, else the data is always unscaled.
+ This procedure may take a while to run for large data files.  As the
+ procedure ends, it will inform the user what is the size of the
+ generated array.  When the procedure has ended, the user may type in
+`COMMON WVL,W', if so desired, by which he can access an array named
+`W' which contains wavelength position data associated with the data
+ stored in the array{\em ARR.} (Note: If the array size is particularly large 
+ IDL may be unable to allocate enough core memory to set up such arrays, in
+ order to reduce array size sections of the data would have to be selected, by
+ specifying a range using the row and column arguments.)
+
+\subsubsection{GETMMT}               
+
+{\em To run this program type:}
+\begin{quote}
+{\tt HRTS\_IDL> }{\bf GETMMT,ARR,}{\it FILENAME}          
+\end{quote}
+{\em GETMMT.PRO} is used to read in an array of data from a moment file.
+  The parameters{\em ARR} and{\em FILENAME} are the same as those described in 
+ {\em GETDATA.PRO,} only here{\em FILENAME} must specify a file which is of
+  image type \#7 (i.e. .MMT, .MOD, .GMT, etc.)  As the program runs, it
+  shows the user what moment data is available in the file and asks him
+  to use the arrow and carriage return keys to select a moment.
+  For most moment data files (where the maximum value of NMMT is less
+  than or equal to 3), the following illustration will appear after this
+  program is invoked:
+\begin{verbatim}
+
+                
+        Use arrow keys + <cr> to select a moment 
+\end{verbatim}
+\begin{center}
+\begin{tabular}{|l l l l l|}
+\hline
+                &        & {\em Int.} & {\em Vel.} & {\em L.W} \\    
+\hline
+\multicolumn{2}{|l|}{\em C IV  1548.202} & \multicolumn{3}{l|}{\em CURS} \\
+\cline{3-5}   
+\multicolumn{2}{|l|}{\em C IV  1550.774} & \multicolumn{3}{l|}{} \\                       
+\multicolumn{2}{|l|}{\em Si I  1552.209} & \multicolumn{2}{l}{} &
+\multicolumn{1}{l|}{n.a.} \\
+\multicolumn{2}{|l|}{\em Continuum --} & \multicolumn{1}{l}{} &
+\multicolumn{1}{l}{n.a.} & \multicolumn{1}{l|}{n.a.} \\ \cline{3-5}
+     &  &  &  &  \\ \hline    
+\end{tabular}           
+\end{center}    
+  In the above diagram the symbol `CURS' represents an extended cursor
+  which the user can move (by using the four arrow keys) to various
+  places within the smaller box to select a moment.  The symbol `n.a.'
+  designates moments which are not available.  After the user hits a
+  carriage return, the program will terminate, returning a 
+  dimensional array through the ARR parameter.
+  In the case in which the maximum value of NMMT is equal to 6 (which
+  is the case for .GMT-type files), the program will instead display the
+  following type of figure:
+\begin{verbatim}                
+
+          Use arrow keys + <cr> to make a selection: 
+          (hit A to select all data for a given ion)
+\end{verbatim}                
+\begin{center}          
+\begin{tabular}{|l l l l l l l l|}
+\hline
+   &       & {\em Amp.} & {\em D.L.} & {\em FWHM} & {\em Amp.} & {\em D.L.} &
+{\em FWHM} \\
+\hline
+\multicolumn{2}{|l|}{\em C IV  1548.209} & \multicolumn{6}{l|}{\em CURS} \\
+\cline{3-8}                                      
+\multicolumn{2}{|l|}{\em C IV  1548.774} &  &  &  &  &  
+\multicolumn{2}{l|}{} \\                                        
+\multicolumn{2}{|l|}{\em CONTINUUM --} & &  n.a. &  n.a. &  n.a.&
+\multicolumn{2}{l|}{n.a.} \\ \cline{3-8}
+  & & & & & & &   \\ \hline
+\end{tabular}                
+\end{center}
+   If one hits return, then a 1-D array is returned.  If instead the
+  `A' key is pressed, then a 2-D array is returned which contains all the
+   data available for the selected ion.
+
+\subsubsection{GETADATAWVL}
+
+{\em To run this program type:}
+\begin{quote}
+{\tt HRTS\_IDL> }{\bf GETDATAWVL,ARR,}{\em FILENAME,ROW1,ROW2,WVL1,WVL2,NSUM}  
+\end{quote}
+ This routine is equivalent to {\em GETDATA,} except that wavelength values
+ in Angstroms are to be supplied as the 5th and 6th parameters instead
+ of column numbers.
+  
+\subsubsection{HDR}
+
+{\em To run this program type:}
+\begin{quote}
+{\tt HRTS\_IDL> }{\bf HDR,}{\em FILENAME}                   
+\end{quote}
+{\em HDR.PRO} allows the user to examine file header information in IDL.
+   FILENAME may be the name of any spectral data file. {\em HDR.PRO} operates
+   in a menu-driven environment in which the user can perform the
+   following operations:
+\begin{itemize}                
+\item   obtain a listing of the most important header
+       information all at once
+\item   list the names of all the header variables
+\item   get a description of what each variable represents
+\item   examine the values of individual variables by typing
+       in variable names
+\item   change the stored header information within the file
+
+\end{itemize}                
+   Additional documentation regarding this program is available on-line
+   as the program is running.
+
+\subsubsection{MMTCALC}                
+
+{\em To run this program type:}                                
+\begin{quote}
+{\tt HRTS\_IDL>}{\bf MMTCALC,WV,IN,WVLREF,}{\it CONTFLAG,WVLWIDTH}                
+\end{quote}
+{\em MMTCALC} will calculate the first three moments
+for a single spectral profile.  The parameter WV must be assigned a one
+dimensional array of wavelengths (acquired via {\em WAVEL}), IN must be assigned
+a one dimensional array of profile data (acquired via {\em GETDATA}), WVLREF
+must be assigned a real number which denotes the rest wavelength in Angstroms
+for the spectral line to be processed (e.g. 1552.209).  CONTFLAG is optional
+and is to be assigned a value of 0 if the user wants to use a constant value
+for the continuum, or a value of 1 if he wants the continuum level to be
+defined by a straight line connecting two specified points. The default value
+is 0.  WVLWIDTH is also optional, and may be used to specify the desired width
+of the wavelength scale (x-axis) to be plotted.  The supplied value will be
+interpreted as being in Angstroms. The default value is .6. Regardless of the
+value of CONTFLAG, two points must be selected to determine the continuum and
+the maximum limits of integration.  A plot will be made on the graphics screen
+that shows the spectral line, and the user will then manipulate the graphics
+cursor to mark where he thinks the spectral line begins and ends.  The program
+will then perform various calculations and print out the first three moments as
+well as the full width at half maximum.                                        
+
+\subsubsection{MMTPLT}                                                            
+
+{\em To run this program type:}                                               
+\begin{quote}
+{\tt HRTS\_IDL>}{\bf MMTPLT,}{\it FILENAME}                                        
+\end{quote}
+{\em MMTPLT} is an
+IDL version of the DCL level{\em  MMTPLT3} program.  It plots out intensity,
+velocity and line width data from .MMT files.  The name of a .MMT file must be
+given as an argument.  After being called, the procedure will ask the user if
+he wants to enable the graphics cursor in order to read off numerical data from
+the moment plots at user- defined points.  The user must respond to this
+question by typing either `Y' or `N'.  The procedure will then display a list
+of available ions, the wavelength appropriate for each ion, and the number of
+moments available for each ion.  The user will then be asked to input four
+integer numbers which will identify what plots should be made. The first
+quantity, ILINE, selects the ion, the second, MMMT, selects the number of
+moments to be plotted, and the last two, ISCAN1 and ISCAN2, set the scan number
+range. ILINE is the only required quantity. If the user just enters a value for
+ILINE, then the total number of moments available for that ion will be plotted,
+and the complete range of scan numbers will be used.  The procedure will then
+ask the user to input a value for SMIN (minimum value of intensity).  The user
+may just hit the $<$return$>$ key here to use the default value.  The requested 
+plots
+will then be made on the graphics screen.  If the user had requested to use the
+graphics cursor, then he may use the arrow keys to position the cursor at a
+given place and then hit return in order to have the numerical values of the
+moments for the selected scan number be plotted out on the text screen.  He may
+then hit `C' to re-use the cursor to obtain other numerical values, or else he
+can hit any other key at this point to return to the state in which the
+procedure asks for another value of ILINE.  If the user did not request to use
+the graphics cursor, then when he is through looking at the plots he should hit
+any key in order to return to the text screen.  At this point the user may
+enter in one to four numbers to generate another plot, or may exit by entering
+`E'.                                                                           
+
+\subsubsection{PLOTPROFILE}
+
+{\em To run this program type:}
+\begin{quote}
+{\tt HRTS\_IDL>}{\bf PLOTPROFILE,}{\it FILENAME}             
+\end{quote}
+   This procedure is analogous to the DCL level {\em PROFILE} program.  The
+   information about what profiles are to be plotted is contained within
+   the file PROFILE.LST. (an example of this file is contained in 
+   the DEMO directory)
+   The one required argument, FILENAME, must be the complete name of a
+   spectral data file (usually of type .CIS).  When run, the program will
+   ask the user to enter a scan line number.  A profile plot for that scan
+   line is then made on the graphics screen.  When the user hits any key,
+   the program will revert to the text window and ask for another scan
+   line.  The user may exit the program at this point by entering `-1'.
+
+\subsubsection{PUTDATA}             
+
+{\em To run this program type:}
+\begin{quote}
+{\tt HRTS\_IDL>}{\bf PUTDATA,}{\it ARR,FILENAME,TEXT}
+\end{quote}
+{\em PUTDATA} performs the inverse function of {\em GETDATA} in that it takes
+   data from an IDL array and writes it into a file. The output file will 
+   contain a one-line image-type-1 header, followed by unformatted data on
+   subsequent lines.  Two parameters for this procedure are required.  ARR
+   must reference a one, two, or three dimensional array with a type of
+   either byte, integer, long integer, or floating point.  FILENAME must
+   denote a character string denoting the name of the file to which the
+   data is to be written.  The program will not operate if the output file
+   is of type .RDS, .CIS, or any of the other special file types, since
+   those types of files require a specific kind of header.  If a character
+   string enclosed by quotes is given for the variable TEXT, then that
+   string will be placed in the file's header.  If no value was given for
+   TEXT, then the program will ask the user to type in a one line textual
+   description of the data.  This string, whether given via the variable
+   TEXT or typed in as the program runs, must have a length that is less
+   than or equal to 80 characters.
+
+\subsubsection{READCAL}
+
+{\em To run this program type:}
+\begin{quote}
+{\tt HRTS\_IDL>}{\bf READCAL,LGI,DEN,}{\it FILENAME}          
+\end{quote}
+{\em READCAL} will read log intensity and density values from a .CAL file
+   into two one-dimensional arrays.  LGI and DEN represent the output
+   arrays, and FILENAME must be assigned the full name of the desired .CAL
+   file.
+
+\subsubsection{TVEXTRACT}                
+
+{\em To run this program type:} (NOTE: This routine must be run in WIDL.)
+\begin{quote}
+{\tt HRTS\_IDL>}{\bf TVEXTRACT,}{\it FILENAME,}WAVELN,INTEN       
+\end{quote}
+{\em TVEXTRACT} may be used to make cross-sectional plots of spectral data
+   contained in the file named FILENAME (usually of type .CIS), and/or to
+   extract a section of that data into two output arrays, in which one
+   (WAVELN) contains wavelength data and the other (INTEN) contains
+   intensity data.
+
+      This program will display a reduced resolution image of the input
+   data on the image display. The user will be asked first to specify 
+   the  type of image display and type 0 for the IKON or 1 for a device 
+   operating X-windows. (e.g. Workstations) followed by RETURN. 
+   A menu of options will then be displayed; if the image being 
+   displayed uses X-windows, then the commands are made using the 
+   mouse by pressing one of the mouse buttons over the required 
+   command on the screen. If the display is an IKON, the commands are 
+   entered via the keyboard.
+   The user will then be asked to use the mouse to select
+   an area of interest for which full resolution data will be read in and
+   displayed.  Hitting the first mouse button causes the program to enter a
+   mode in which mouse movements result in moving a box on the graphics
+   screen.  Hitting the second mouse button causes a mode to be entered in
+   which mouse movements change the shape of the box.  When manipulations
+   have been performed so that the box encloses the desired area, then the
+   user should hit the third mouse button.
+
+      After the selected area has been displayed , the program
+   will ask the user to enter a  command.  The program will have
+   previously displayed the following list to define the 
+   commands:
+\begin{verbatim}   
+
+                           Keyboard Commands 
+
+              F : display full image again                       
+              S : select an area for the output arrays           
+              X : make a cross-sectional plot in the X-direction 
+              E : exit                                           
+\end{verbatim}          
+   
+      The S and X commands require some explanation.  If the S command is
+   entered, then a tvroam state will be entered.  The user must hit the
+   first mouse button to zoom in and the third mouse button to exit.  The
+   user is then given an opportunity to use a box on the screen
+   to select an area.  The selection method is equivalent to that
+   described above.  Upon exiting the program, the WAVELN and INTEN arrays
+   will contain data for the last area that was selected in this fashion.
+   If the X command is entered, then a TVROAM state will be entered once
+   again.  When this state is exited via the pressing of the third mouse
+   button, the program will ask the user to press the first mouse button
+   to mark the left-most point of the cross-sectional plot.  Then the
+   program will ask that the right-most point be selected in the same
+   manner.  The cross-sectional plot will then be made on the 
+   screen.  If the user is operating with the IKON display they may then hit 
+   any key to go back into the keyboard command mode. 
+
+\subsubsection{TVIMG}
+
+{\em To run this program type:} (NOTE: This routine must be run in WIDL.)
+\begin{quote}
+{\tt HRTS\_IDL>}{\bf TVIMG,}{\it FILENAME,VMAX}                 
+\end{quote}
+{\em TVIMG} displays intensity, velocity, and line width images (the
+   contents of a .IMG file) on the image display and allows the user to also 
+look at
+   the numerical data.  FILENAME should be a .IMG file. VMAX is an optional 
+parameter
+   and, if assigned a value, then that value will be interpreted as the
+   largest acceptable wavelength shift (in Angstroms).  If no value is
+   given for VMAX, then a default value of 0.13 will be used.  When the
+   program runs, it will first ask for the type of image display  
+   were upon the user should type 0 for IKON or 1 for X-WINDOWS. 
+   A menu will then be displayed on the screen and 
+   the user may select whether he wishes to see intensity, velocity, or
+   line width images.  The user should use the arrow keys to move the
+   cursor to one of the options and then press return in
+   order to select that option if they are using the IKON image 
+   display, if they are using X-windows, selections are made using the mouse by 
+   pressing any mouse button when the cursor is over the required 
+   option on the command board. 
+   When the user selects one of the options, then the
+   current screen is cleared and a second screen is shown which displays
+   sections of what would otherwise be a very long, thin image which
+   represents values of the selected attribute over a two-dimensional area
+   of the sun. The user may then Zoom\_In on a selected part of the 
+   image by using the command `Zoom\_in' and selecting a location from a section 
+of the image
+   (using the mouse), then a third screen will be displayed which shows all 
+three attributes
+   (intensity, velocity, and line width, if all three are available) for
+   an area centered around the selected point.  The user may now select
+   different points of any of the displayed images, and the numerical
+   values of the available attributes of that point will be displayed on
+   the screen.  In order to examine additional data, the program then returns
+   to the initial menu enabling further selections to be made.
+
+\subsubsection{TVIMGPROFILE}
+
+{\em To run this program type:} (NOTE: This routine must be run in WIDL.)
+\begin{quote}
+{\tt HRTS\_IDL>}{\bf TVIMGPROFILE,}{\it IMG\_FILE, FILENAME}              
+\end{quote}
+      This program allows one to plot spectral line profiles by selecting
+   points within .IMG images.  It is assumed that the  associated .IMG\_ALN
+   files, are all stored in the user's current directory.
+   As for {\em PLOTPROFILE.PRO}, there exists a PROFILE.LST file which specifies
+   the spectral lines to be used for profile plots.  The  required
+   arguments to {\em TVIMGPROFILE}, are IMG\_file,which must be the generic name 
+of the .IMG
+   file, for example `REV82CIV' and FILENAME which is the literal name of a
+   .CIS file.  When run, the program behaves exactly
+   like TVIMG, only when points are selected on the zoomed-in data, a
+   profile plot will be generated.
+
+\subsubsection{VARVELCT}
+
+{\em To run this program type:}
+\begin{quote}
+{\tt HRTS\_IDL>}{\bf VARVELCT,}{\it MAX,} R,G,B                
+\end{quote}   
+      This routine will return colour table arrays to be used to display
+   velocity images, as does VELCT, only a parameter MAX is here input
+   which sets a peak intensity for the colour table.  This method is used
+   to produce velocity images which will be slightly dim so as not to
+   dominate an output image.  MAX must be an integer value between 0 and
+   255.
+
+\subsubsection{VELCT}   
+
+{\em To run this program type:}
+\begin{quote}
+{\tt HRTS\_IDL>}{\bf VELCT,R,G,B}                   
+\end{quote}   
+      This procedure will return three one-dimensional arrays of size 256
+   which constitute the colour table generally used to display velocity
+   images.
+
+\subsubsection{WAVEL}
+
+{\em To run this program type:}
+\begin{quote}
+{\tt HRTS\_IDL>}{\bf WAVEL,ARR,}{\it ROW}               
+\end{quote}
+{\em WAVEL} will return a one dimensional array which contains a
+   wavelength scale that is valid for a specified row of the spectral
+   image which has been most recently read in by GETDATA within the
+   current IDL session.  This procedure has two required parameters.  ARR
+   must be an arbitrary variable name which will, upon completion of the
+   procedure, reference the wavelength scale data.  ROW must be a integer
+   number which denotes that row of the data read in by GETDATA at which
+   the wavelength scale will be valid.  A value of ROW equal to 0 refers
+   to the first row of data as stored in the data file.
+\newpage
+
+\section{Data Reduction Programs}
+
+\subsection{DCL level}
+
+\subsubsection{C4DFAC}
+
+{\em To run this program type:}
+\begin{verbatim}
+     HRTS$> C4DFAC             
+\end{verbatim}   
+{\em C4DFAC} performs dewarping of a density image, smooths the image by
+   removing noise, calculates the autocorrelation with a synthetic
+   spectrum, converts density to intensity, and extends the area for C IV
+   (if it is appropriate to do so).  The input for this program is a .RDS
+   file, and the output consists of either a .CDF or .CIS file, plus a
+   .ATO file.  Since this program takes a long time to run, it is best to
+   submit it as a batch job.  The program {\em GETCIS.EXE} has been designed to
+   create and submit .RUN files that execute {\em C4DFAC.}  Because of the
+{\em GETCIS} program, most users will not have to deal with the .RUN files
+   directly if they wish to run this program, nevertheless the structure
+   of a typical .RUN file for {\em C4DFAC} is presented below for the sake of
+   completeness:
+\begin{center}   
+\begin{tabular}{||l l l l l||}
+\hline
+\multicolumn{5}{||l||}{\tt assign userdisk1:[dir]imsl.err for002} \\
+{\tt \$ c4dfac} & & & & \\                                                      
+{\tt Scratchdisk1:[filename]} &  &  &  \multicolumn{2}{l||}{\em Input Directory} 
+ \\
+{\tt Scratchdisk1:[filename]} &  &  &  \multicolumn{2}{l||}{\em Output 
+Directory} \\
+\hline
+{\tt E42101548.RDS} &  &  &  &  \\                                         
+{\tt R082L550.CAL;1} &  &  &  \multicolumn{2}{l||}{\em Calibration Data} \\ 
+{\tt CURV.DAT;1} &  &  &  \multicolumn{2}{l||}{\em Curvature Data} \\ 
+{\tt MAGN.DAT;1} &  &  &  \multicolumn{2}{l||}{\em Magnification Data} \\ 
+{\tt DISP.DAT;1} &  &  &  \multicolumn{2}{l||}{\em Dispersion Data} \\ 
+{\tt ATO.548;1}  &  &  &  \multicolumn{2}{l||}{\em Synthetic Spectra Data} \\  
+{\tt .CIS} &  &  &  \multicolumn{2}{l||}{\em Output File Type} \\ 
+{\tt YES}  &  &  &  \multicolumn{2}{l||}{\em Carbon IV Treatment} \\ 
+{\tt YES}  &  &  &  \multicolumn{2}{l||}{\em Fourier Filtering} \\ 
+\hline
+{\tt E} &  &  &  &  \\
+\hline                                                                      
+\end{tabular}
+\end{center}
+   
+      The first line directs any IMSL error or warning messages (which are
+   sometimes generated as {\em C4DFAC} runs) into a directory where there should
+   be enough space to store them.  The second line starts executing {\em 
+C4DFAC.}
+   The third line specifies the input directory which contains the .RDS
+   file(s) that will be used as input, and the fourth line specifies the
+   directory where the newly-created .CIS files will be stored.
+
+      Now for each .RDS file to be processed (one may process several at a
+   time), there is a group of 9 consecutive lines of information bounded
+   above and below by one line of hyphens (for the sake of readability).
+   The first line contains the name of a .RDS file (as shown above), the second
+   line contains the complete name of the appropriate density to intensity
+   calibration file, the third line the curvature data file name, the fourth
+   line has the magnification data file name, the fifth line has the
+   dispersion data file name, the sixth line has the standard lines data
+   file name, the seventh line shows the file type of the output files (either
+  `.CIS' or `.CDF'), the eighth line contains either `YES' or `NO', which
+   tells if the Carbon IV treatment should be employed for this data, and
+   finally the ninth line contains either `YES' or `NO' to indicate whether
+   or not Fourier filtering should be performed.  A line that consists
+   simply of an `E' designates that there are no more .RDS files to be
+   processed. (examples of the .CAL and .DAT files can be found in the 
+   directory HRTS\_DISK:[HRTS.DATA] )
+
+\subsubsection{DEN\_INT}
+
+{\em To run this program type:}
+\begin{verbatim}
+     HRTS$> DEN_INT                        
+\end{verbatim}   
+{\em DEN\_INT} will create a .CIS file from a .CDF file, or a .FSS file
+   from a .FSD file.  When run, the program will ask for the full name of
+   the input density file (including the `.CDF' or `.FSD').  After the
+   user types that in, then the program will ask for the full name of the
+   output intensity file.  The program will then generate the output file,
+   and next ask the user for the name of another input file to be
+   processed.  The program may be exited if one enters `E' at this point.
+
+\subsubsection{FLIPX}
+
+{\em To run this program type:}
+\begin{verbatim}
+     HRTS$> FLIPX
+\end{verbatim}
+This program will flip two-dimensional HRTS data in the x-direction.
+It is occasionally run to correct a .RDS file which was created from a plate
+scanned in the wrong direction. When run, it will ask the user for the input
+and output file names.
+
+\subsubsection{FLIPY}
+
+{\em To run this program type:}
+\begin{verbatim}
+     HRTS$> FLIPY
+\end{verbatim}
+{\em FLIPY} is similar to {\em FLIPX} except that the data is flipped in the 
+y-direction.
+
+\subsubsection{FSS}
+
+{\em To run this program type:}
+\begin{verbatim}   
+     HRTS$> FSS             
+\end{verbatim}
+{\em FSS} will produce a .FSS file, using a .CIS file as input.  The .FSS
+   file will still contain a spectral image, but now the spatial and
+   spectral coordinates will be rectangular and the dispersion will be
+   constant.  This program is generally run by submitting the following
+   type of file to a batch queue:
+\begin{verbatim}   
+                    
+                      HRTS$> FSS                    
+                      DIRECTORY:[FILENAME] 
+                      DIRECTORY:[FILENAME]  
+                      E02801400.CIS            
+                      E                        
+                    
+\end{verbatim}   
+
+      The first line of the file calls the FSS program.  The second
+   line specifies the input directory and the third line specifies the
+   output directory.  Beginning on the fourth line is a list of file names
+   to be processed, with one file name per line.  An `E' denotes the end
+   of the list.
+
+\subsubsection{GETCIS}
+
+{\em To run this program type:}
+\begin{verbatim}
+     HRTS$> GETCIS                  
+\end{verbatim}
+{\em GETCIS} is used to create .CIS or .CDF files from .RDS files by
+   submitting a batch job which invokes C4DFAC.  The GETCIS program serves
+   as a user interface to the C4DFAC program, so the user need not deal
+   with the complicated .RUN files used to submit C4DFAC.  When a user
+   starts to run GETCIS, he will see a screen that shows default
+   attributes concerning the processing to be performed.
+   The user can use the arrow keys to move the cursor to various parts
+   of the screen, and then press the $<$return$>$ key to change attributes.
+   For instance one can change the default input directory, and then
+   select/highlight the names of various .RDS files from that directory to
+   be used as input files.  The user should select the Submit option when
+   he is ready to submit the job.
+      The user then sees another screen on which he may examine low-level
+   details about the processing.
+   At this point the user may examine and/or change the names of files
+   that will be used to supply accessory information as each input file is
+   processed.  In most instances, the user will simply select Submit as
+   soon as this screen appears.
+   Unless the user selected Abort, the GETCIS program will generate and
+   submit a file names GETCIS.RUN which will invoke the C4DFAC program.
+
+\subsubsection{MMTIMG}
+
+{\em To run this program type:}
+\begin{verbatim}
+     HRTS$> MMTIMG               
+\end{verbatim}
+      This program will create a .IMG file from a series of .MMT or .MOD
+   files.  In order to run this program, the user must first prepare (via
+   the editor) a .IMG\_ALN file which contains the names of the input files
+   and their offsets.  An example of a .IMG\_ALN file is shown below:
+\begin{verbatim}      
+   
+
+            'hrts sl 2   Rev 43   Seq 54   2.0 sec expos.  1555' 
+            1    SPATIAL SERIES                                  
+            0   1  'e00312555.mod                                
+            6   1  'e00401555.mod                                
+            4   1  'e00402555.mod                                
+            -15 1  'e00501555.mod                                
+            -14 1  'e00502555.mod                                
+            -32 1  'e00601555.mod                                
+             3  1  'e00602555.mod                                
+            -32 1  'e00701555.mod                                
+            -29 1  'e00702555.mod                                
+            -43 1  'e00801555.mod                                
+            -36 1  'e00802555.mod                                
+
+\end{verbatim}   
+      The first line of the file contains character data that will be
+   stored in the output file's header.  The second line should contain
+   either the number 1 or 2.  A `1' results in the output file being of
+   type .IMG, and a `2' results in a .TSI type output file.  The remainder
+   of MMTIMG.DAT should consist of one line of data for each input file.
+   There must be three items per line.  The first item is an offset
+   number.  
+   The second item is either the number 0 or 1.  This number is
+   referenced when performing histogram equalizations or velocity
+   corrections to see whether or not the data from a particular file
+   should be included in some aspect of the calculations.  A `0' should be
+   assigned to data that has some problem associated with it, or a `1'
+   otherwise.  The third item on each line should be the name of the input
+   moment data file.
+
+      When the user executes the {\em MMTIMG} program (by tying in `MMTIMG' at
+   the `HRTS\$' prompt), he will first be asked to enter the generic name of
+   the .IMG\_ALN file.  He will then be asked for the number of moments
+   that he wishes the output file to contain.  This number should be
+   either 1, 2, or 3.  The intensity data is always output.  The
+   velocity data will be output if the user enters 2 or 3.  The line-
+   width data will be output if the user enters 3.
+      The program then asks the user to enter a value of GMIN for each
+   moment.  This is interpreted by the program as being the minimum valid
+   input value for that moment.
+      The program then displays a list of available ions on the screen.
+   The ions in the list are contained within each of the .MMT/.MOD files
+   listed in the .IMG\_ALN file.  The user should use the arrow keys to
+   select the ion of interest.
+      The program will then ask the user various questions concerning
+   whether or not he wishes to perform a histogram equalization of the
+   intensity image or to calculate and/or apply velocity correction
+   factors.
+
+      The program will then generate the output file (which will have the
+   same generic name as the .IMG\_ALN file) and then exit.
+
+\subsubsection{MMTMOD}
+
+{\em To run this program type:}
+\begin{verbatim}   
+     HRTS$> MMTMOD          
+\end{verbatim}
+{\em MMTMOD} is used to create .MOD files from .MMT files.  This program
+   is usually run by submitting the following type of file to a batch queue:
+\begin{center}   
+\begin{tabular}{||l||}
+\hline
+                 
+                      {\tt HRTS\$ mmtmod}  \\                  
+                      {\tt DIRECTORY:[FILENAME]} \\    
+                      {\tt DIRECTORY:[FILENAME]} \\    
+                      {\tt E03013548}  \\                 
+                      {\tt 100.}    \\                    
+                      {\tt E03014548} \\                   
+                      {\tt 100.} \\                       
+                      {\tt E}  \\                         
+\hline
+\end{tabular}
+\end{center}
+   
+      The first line invokes the {\em MMTMOD} program.  The second and third
+   lines define the input and output directories.  Then there are two
+   lines of information for each .MMT file to be processed.  The first
+   line contains the nine-character generic name of the .MMT file and the
+   second contains a value for CIVMIN (`100.' is often used).
+   An `E' marks the end of the list of .MMT files to be processed.
+      There is a file named MMTMOD.LST  that lists
+   the ions that should be combined together into a composite form.  A
+   example of the contents of this file is shown below:
+\begin{center}   
+\begin{verbatim}
+
+
+                   20.                                
+                   'C IV OPT THIN'  3 2 1548.202  1.  
+                                        1550.774  0.5 
+
+\end{verbatim}   
+\end{center}
+   The number on the first line represents an SMIN value. For this
+   example there will be one modified ion entry inserted into the output
+   .MOD file.  The `C IV OPT THIN' (IDMOD) is a descriptive character
+   string, the `3' (NMOD) species that intensity, Doppler shift, and line
+   width values will be made available, the `2' (NELMOD) indicates that
+   data from two wavelengths will be combined together, the `1548.202' and
+   the `1550.774' (WVLMOD) are those wavelengths, and the `1' and `0.5'
+   (RMOD) are weights.
+
+\subsubsection{MOMENT} 
+
+{\em To run this program type:}
+\begin{verbatim}   
+     HRTS$> MOMENT                  
+\end{verbatim}
+      {\em MOMENT} will create .MMT files by using spectral files as input.
+   This program is generally run by submitting the following type of 
+   file to a batch queue:
+\begin{center}   
+\begin{verbatim} 
+
+                  HRTS$> Moment                              
+                  E66901555.CIS                      
+                  E                                   
+
+\end{verbatim}  
+\end{center}
+      The first line runs the {\em MOMENT} program, and starting on the second
+   line is a list of names of spectral files (with the file type
+   specified) which will be used as input to create .MMT files to be
+   stored in the same directory.  The list is terminated by an `E'.
+
+\subsubsection{RECTORECIS}
+
+{\em To run this program type:}
+\begin{verbatim}
+     HRTS$> RESTORECIS                      
+\end{verbatim}
+{\em RESTORECIS} restores the header of a .CDF or .CIS file to the state
+   in which it was in prior to running IDL STNDRD and Fortran STNDRD on
+   it.  Specifically, this program modifies the existing header
+   of a .CIS file so that NCRV=0, NSCL(1)=4, and SCL has the same values
+   it had when the .CIS file was originally produced via GETCIS.  This
+   program is commonly run when the results of running the two STNDRD
+   programs has proved unsatisfactory and the operator wishes to restart
+   the reduction process back at the IDL STNDRD stage.  When this program
+   is run, the user must answer three questions regarding the processing.
+   Those questions, along with a sample series of responses, are shown
+   below:
+\begin{verbatim}
+   
+              Enter full name of .CIS file (or `E' to Exit)
+              E18503548.CIS
+              Enter Curvature Data FileName
+              Curv.Dat
+              Enter Dispersion Data FileName
+              Disp.Dat
+              Enter full name of .CIS file (or `E' to Exit)
+              E
+              End RESTORECIS.
+
+\end{verbatim}   
+
+\subsubsection{STNDRD}
+
+{\em To run this program type:}
+\begin{verbatim}   
+     HRTS$> STNDRD      
+\end{verbatim}
+      The goal in running this program is to enable proper wavelength
+   values to be assigned to each pixel of a .CDF or .CIS file.  This
+   program modifies a file's header (specifically the values of the SCL,
+   NCRV, and CRV variables) in such a way as to (hopefully) improve the
+   assignment of wavelength value as a function of pixel coordinates.
+   This program frequently has to be rerun with varying input conditions
+   in order better to attain its desired goal.
+      The input file for this program is assumed to have been previously
+   operated upon by the IDL SETCRV program (after having run IDL ATODATA
+   and IDL STNDRD), so that there is already some guess as to what is the
+   curvature associated with that image (specifically, NCRV should have a
+   value of 1, CRV(1) should be assigned a value, and SCL(1,1) should have
+   a new value which was improved over the original value assigned when
+   GETCIS was run).
+      This program is generally run by submitting the following type of
+    file to a batch queue:
+\begin{center}      
+\begin{tabular}{||l||}   
+\hline   
+
+                   {\tt HRTS\$ Stndrd} \\                            
+                   {\tt E03013548.CIS}\\                        
+                   {\tt E} \\
+\hline
+\end{tabular}
+\end{center}   
+
+      As the program begins to run, it reads values of various parameters
+   from two small data files stored in the directory.
+   The names of the files are STNDRD.DAT and STNDRD.LST ( examples of 
+   these file may be found in the DEMO directory ) 
+   The parameters
+   stored in STNDRD.DAT frequently have to modified for each different
+   .CDF/.CIS file.  An example of possible contents of STNDRD.DAT are
+   shown below:
+\begin{center}
+\begin{tabular}{||l l l l l l ||}   
+\hline
+           ISCAN1  &   ISCAN2 &   NSUM  &     &        &  \\            
+           1       &   2100   &   20    &     &        &  \\           
+           FACT    &   NDTERMS &  NCTERMS &   &        &  \\           
+           .1      &   4       &  2       &   &        &  \\           
+           AVAR & (0.=NO VARIATION) &     &   &        &  \\           
+           1.   &     0.  &      0. &       0.  &      1.   &  1 \\
+           SMIN &      NIT &      IWRITE &  NSIG  &      &  \\         
+           .5   &      4   &      1    &    2.0   &      &  \\         
+           IPREL  &    IPLOTF &   IPOSUM  &       &      &  \\         
+           0    &      20    &    20   &          &      &  \\         
+\hline
+\end{tabular}   
+\end{center}
+      ISCAN1 and ISCAN2 give the range of rows of the .CDF/.CIS data array
+   which will be included in the calculations.  NSUM tells how many rows
+   of data will be averaged together within the program to reduce noise.
+   NDTERMS and NCTERMS give the number of dispersion terms and the number
+   of curvature terms.  The values of these variables should probably not
+   be changed.  AVAR is an array of six elements which specify which
+   header variables will be subject to modification as the program runs.
+   AVAR(1) corresponds to SCL(1,1), AVAR(2) to SCL(2,1), AVAR(3) to
+   SCL(3,1), AVAR(4) to SCL(4,1), AVAR(5) to CRV(1), and AVAR(6) to
+   CRV(2). The sequence {1,0,0,0,1,1} is most commonly used. SMIN gives a
+   low end cutoff for calculated moments which will be used. SMIN
+   frequently has to be set to different values for different .CDF/.CIS
+   files. NIT sets the number of iterations to be used for polynomial
+   fitting calculations.  IWRITE tells whether or not the header of the
+   input data file will be modified (IWRITE=1 : modify file, 0 : don't
+   modify file).  NSIG is such that any points that will be used for a
+   polynomial fit which have a standard deviation associated with them
+   that is greater than NSIG's value, will be assigned a weight of 0.
+      The file STNDRD.LST must contain details regarding the wavelengths
+   which will be used to determine the image curvature.  This file should
+   look something like the one shown below:
+\begin{center}
+\begin{tabular}{||l l l l l l l||}      
+\hline   
+    {\em `Si I'}      &  2 1 & 1548.715 &  1548.62 &  1548.81 &   1.&   1. \\ 
+    {\em `Fe II'}     &  2 1 & 1550.260 &  1550.16 &  1550.36 &   1.&   1. \\ 
+    {\em `Si I'}      &  2 1 & 1551.240 &  1551.14 &  1551.34 &   1.&   1. \\ 
+    {\em `Si I'}      &  2 1 & 1552.209 &  1552.08 &  1552.36 &   1.&   1. \\ 
+    {\em `CONTINUUM'} &  1 1 &    0.    &  1548.9  &  1549.3  &   1.&   0. \\ 
+    {\em `CONTINUUM'} &  1 1 &    0.    &  1549.6  &  1549.8  &   1.&   0. \\ 
+    {\em `CONTINUUM'} &  1 1 &    0.    &  1552.4  &  1552.6  &   1.&   0. \\ 
+    {\em `CONTINUUM'} &  1 1 &    0.    &  1553.6  &  1554.4  &   1.&   0. \\ 
+\hline
+\end{tabular}
+\end{center}
+      This program is usually run for each .CDF/.CIS file a minimum of two
+   times.
+
+\subsubsection{SUM}
+
+{\em To run this program type:}
+\begin{verbatim}
+     HRTS$> SUM               
+\end{verbatim}
+      This program makes summed stigmatic spectra. If a .CIS file is used
+   as input then the output will be a .SSS\_C4 file, else if the input is a
+   .CDF file, then the output will be a .SSD\_C4 file.
+      When the program is run it asks for the complete name of the input
+   file. The output file will be in the same directory that the input file
+   is in. The program will continue to ask for more input files until an
+   `E' is encountered.
+      Below is an example of a batch job that will run this program:   
+\begin{center}
+\begin{tabular}{||l||}
+\hline
+
+                    {\tt HRTS\$  sum} \\                         
+                    {\tt e38501555.cdf} \\                  
+                    {\tt e38502555.cdf} \\                  
+                    {\tt e38503555.cdf} \\                  
+                    {\tt E.} \\                              
+\hline
+\end{tabular}   
+\end{center}   
+
+\subsubsection{SUMCDF\_IG}
+
+{\em To run this program type:}
+\begin{verbatim}
+     HRTS$> SUMCDF_IG              
+\end{verbatim}
+{\em SUMCDF\_IG.FOR} will output a .CIS\_SUM file from a group of up to nine
+   input .CDF or .FSD files.  The input images are aligned together and
+   intensities are generated such as to eliminate problems associated with
+   overexposure.  A detailed description of the algorithm is given in
+   comments at the end of the program's code.
+      There is an IDL program, named {\it SUMCDF\_IG.PRO}, that is commonly used
+   to set up a SUMCDF\_IG.RUN file which is to be used to submit this
+   program as a batch job.  Please refer to the descriptive entry in this
+   manual for that IDL program.
+   {\em SUMCDF\_IG.FOR} will first ask for the number of input files, and then
+   for a list of the complete names of all the input files, with one name
+   listed per line, and next it will ask for the output generic file name.
+   Following this information there should be a list of pairs of {x,y}
+   offsets.  There should be one offset pair per input file, and each pair
+   should be listed on a separate line.  These offsets give an initial
+   guess as to how the files should be aligned relative to the first input
+   file.  This program should be run in batch since it takes a while to
+   run.  Shown below is a sample version of {\em SUMCDF\_IG.RUN:}
+\begin{center}   
+\begin{tabular}{||l l||}   
+\hline   
+
+                  {\tt HRTS\$ sumcdf\_ig} & \\                        
+                  {\tt 4}   &  \\                               
+                  {\tt a00101400.cdf} & \\                      
+                  {\tt a00102400.cdf} & \\                      
+                  {\tt a00201400.cdf} & \\                      
+                  {\tt a00202400.cdf} & \\                      
+                  {\tt a400sum}       & \\                            
+                    {\tt 0}  &    {\tt 0}  \\                         
+                  {\tt -42}  &   {\tt -6}  \\                         
+                  {\tt -31}  &   {\tt -9}  \\                         
+                   {\tt 18} &    {\tt -40} \\                        
+\hline                 
+\end{tabular}   
+\end{center}
+\newpage
+
+\subsection{IDL level}
+
+\subsubsection{ATODATA}
+
+{\em To run this program type:}
+
+\begin{quote}   
+      {\tt HRTS\_IDL>} {\bf ATODATA,ARR,}{\it FILENAME,NAVE}        
+\end{quote}   
+{\em ATODATA.PRO}, {\em STNDRD.PRO}, and {\em SETCRV.PRO} are to be run one 
+after the
+   other in order to apply a curvature correction to .CIS or .CDF files.
+   The purpose of {\em ATODATA.PRO} is to read data from a .ATO file into IDL
+   memory so that that data may be used as the input to the {\em STNDRD.PRO}
+   procedure.  (.ATO files are created whenever GETCIS is run).  The first
+   argument for ATODATA must be an arbitrary name which will used to
+   reference the two-dimensional output array that will be generated.  The
+   second argument is the name of the input (.ATO) file, without the
+   `.ATO'characters (e.g. one may start the program by typing:
+   atodata,a,`e02901400'.) The third argument is
+   optional and, if specified, should be an integer number (such as 2 or
+   4) which will result in averaging the .ATO data over the specified
+   number of lines.  (This averaging is performed in order to make the
+   central spectral line stand out more when {\em STNDRD.PRO} is run).
+   to hit `R' if he wants to remove the most-recently selected point, or
+   else to hit `E' if he wants to exit.  When one exits the program, the
+   collected jet information will be written out into a `.JET\_CI' file
+   which has the same generic name as the input spectral file.
+
+\subsubsection{SCALIM}
+
+{\em To run this program type:}
+\begin{quote}
+     {\tt HRTS\_IDL>}{\bf SCALIM}, OUT           
+\end{quote}   
+{\em SCALIM} will produce a .SMG file from a .IMG file by translating the
+   .IMG file's floating point data to byte-scaled data.  The optional
+   output array, OUT, may be used to obtain within IDL the output .SMG
+   data.
+
+      When run, the program will first ask the user for the full name of
+   the input (.IMG) file.  It will next ask the user what type of
+   intensity scaling should be done (linear, logarithmic or square root).
+   The user will then be asked to give upper and lower intensity limits
+   for the intensity scaling.  The user will want to have looked at the
+   intensity histogram prior to this in order to determine proper limits.
+   The next question asks for an intensity minimum for the velocity image.
+   (A value of 2 times the lower intensity scaling limit is occasionally
+   input here.)  The program then asks for the maximum doppler shift
+   for velocity images.  (A value of .13 may be appropriate).  If ISIZ(3)
+   is greater that 2 for the input .IMG file, then two more questions are
+   asked, namely, what is the intensity minimum for the line-width image
+   and what is the maximum line-width for the line-width image.
+
+\subsubsection{SETCRV}
+
+{\em To run this program type:}
+
+\begin{quote}   
+     {\tt HRTS\_IDL>}{\bf SETCRV},{\it COEF,FILENAME,FILETYPE}         
+\end{quote}   
+{\em SETCRV} is used to alter the header of a .CIS or .CDF file in order
+   to correct for curvature.  The coefficients stored in COEF, which were
+   obtained from {\em STNDRD.PRO}, will be used to modify certain header
+   variables in the .CIS/.CDF file (specifically NCRV, CRV(1) and
+   SCL(1,1)).  COEF must be a one dimensional array with two elements.
+   FILENAME must be a string of characters that denote the name of the
+   .CIS/.CDF file, but without the `.CIS' or `.CDF' part.  The procedure
+   always assumes that the file to be altered is a .CIS file, unless a
+   specific file type is given for the optional FILETYPE parameter.  For
+   instance, if one is working with a .CDF file then he will want to give
+   `.CDF' as the third parameter.
+
+      In addition to changing the header, this procedure also creates a
+   small file which will contain the header information as it was before
+   the curvature correction was performed.  As an example, if one should
+   enter the following statement:
+\begin{verbatim}   
+
+          HRTS_IDL> setcrv,coef,`E2901400'
+  
+\end{verbatim}
+   then the file named `{\tt e02901400.cis}' will have
+   its header altered and the old header will be stored in a file named
+   `{\tt e02901400h.cis}'.
+
+\subsubsection{STNDRD}
+
+{\em To run this program type:}
+
+\begin{quote}   
+     {\tt HRTS\_IDL>}{\bf STNDRD},{\it ARR},{\bf COEF}                
+\end{quote}   
+{\em STNDRD.PRO} displays the data stored in ARR (which was the output of
+{\em ATODATA.PRO)} on the image display screen and puts up vertical lines which 
+may be
+   moved by using the mouse so as to make an alignment with the spectral
+   line in the centre of the image.  When the user makes the alignment, he
+   should press $<$return$>$, which will cause the current curvature
+   correction coefficients to be stored in COEF, and the procedure will
+   then terminate.  SETCRV may then be run to adjust the header of the
+   appropriate .CIS file with those two numbers stored in COEF.
+      Listed below is a complete sequence used to implement a curvature
+   correction:
+\begin{verbatim}
+                  HRTS_IDL> name='E02901400'
+                  HRTS_IDL> atodata,a,name
+                  HRTS_IDL> stndrd,a,coef
+                  HRTS_IDL> setcrv,coef,name
+\end{verbatim}   
+
+\subsubsection{SUMCDF\_IG}
+
+\begin{quote}   
+     {\tt HRTS\_IDL>}{\bf SUMCDF\_IG}            
+\end{quote}   
+{\em SUMCDF\_IG.PRO} is used to set up a file to run {\em SUMCDF\_IG.FOR.}
+   Before running SUMCDF\_IG.PRO, the user must create a file named
+   SUMCDF\_IG.DAT in his current directory.  This file must contain the
+   number of input files listed on its first line.  On each line below
+   that must be listed one input file name.  The last line of the file
+   must specify the generic name of the output file.  An example is shown
+   below:
+\begin{center}
+\begin{verbatim}   
+
+                  4                                    
+                  a00101400.cdf                        
+                  a00102400.cdf                        
+                  a00201400.cdf                        
+                  a00202400.cdf                        
+                  a400sum                              
+               
+\end{verbatim}   
+\end{center}
+
+      When this program is run it will first ask the user to enter
+   starting and stopping rows.  These row numbers specify a region of
+   interest within the data files.  The stopping row must be bigger than
+   the starting row by no more than 1024.  The program will then generate
+   a plot of the input data versus wavelength for a row midway between the
+   starting and stopping rows for each input file.  The user should then
+   move the graphics cursor to select a wavelength of interest.  The
+   program will then place a thin strip of data onto the TV from each
+   input file.  The Y range of the data will be defined by the specified
+   starting and stopping rows, and the X range will have have the selected
+   wavelength at its centre.  The user must then use the TV cursor to mark
+   an equivalent point on each image, starting with the leftmost image.
+   The program will then calculate the X and Y offsets, create the
+   SUMCDF\_IG.RUN file, and then exit.
+\newpage
+
+\section{H\&D Curve Development Programs}
+
+\subsection{DCL level}
+
+\subsubsection{MAKEHIST}
+
+{\em To run this program type:}
+\begin{verbatim}   
+     HRTS$> MAKEHIST                    
+\end{verbatim}
+{\em MAKEHIST} will generate a histogram of density values for a specified
+   image and stores the result in a .HIS file.  After the program is
+   invoked, it first asks for the name of the input density file.  The
+   program will then display a screen which contains the following
+   information:
+\begin{center}
+\begin{verbatim}   
+            
+               Range of input data:   [70 to 1022]           
+                                                             
+               Before making the histogram, the input data   
+                 will be transformed via the equation:      
+                                                            
+                                  input_data -100           
+                 scaled\_data =  -------------------         
+                                         750                
+                                                            
+              Range of scaled data:  [-0.04 to 1.23]        
+                                                            
+              Low value cutoff:      0.00                   
+                                                            
+              Histogram bin width:   0.09    (41 bins)      
+                                                            
+                       Proceed            Abort             
+                                                            
+
+\end{verbatim}
+\end{center}   
+
+      The screen's cursor can be moved via the arrow keys to select any
+   one of the items which are shown in the above illustration in bold
+   print.  If the user hits $<$return$>$, then the program will ask for a new
+   value of the selected variable.  When the scaling equation, low value
+   cutoff, and histogram bin width are appropriate, then the user should
+   select `Proceed'.  At this point the program will construct the
+   histogram and display it in the following manner:
+\begin{center}
+\begin{tabular}{||l l l|l l l||}   
+\hline
+
+             Bin &   Range  &   Count &   Bin &   Range &    Count \\
+              1 &  0.00 - 0.03  &   13 &  23 &  0.66 - 0.69  &   27  \\
+              2 &  0.03 - 0.06  &   16 &  24 &  0.69 - 0.72  &   24  \\
+              3 &  0.06 - 0.09  &   51 &  25 &  0.72 - 0.75  &   29  \\
+              4 &  0.09 - 0.12  &  136 &  26 &  0.75 - 0.78  &   24  \\
+              5 &  0.12 - 0.15  &  271 &  27 &  0.78 - 0.81  &   25  \\
+              6 &  0.15 - 0.18  &  405 &  28 &  0.81 - 0.84  &   45  \\
+              7 &  0.18 - 0.21  &  543 &  29 &  0.84 - 0.87  &   34  \\
+              8 &  0.21 - 0.24  &  641 &  30 &  0.87 - 0.90  &   39  \\
+              9 &  0.24 - 0.27  &  734 &  31 &  0.90 - 0.93  &   52  \\
+             10 &  0.27 - 0.30  &  572 &  32 &  0.93 - 0.96  &   69 \\
+             11 &  0.30 - 0.33  &  460 &  33 &  0.96 - 0.99  &   70 \\
+             12 &  0.33 - 0.36  &  355 &  34 &  0.99 - 1.02  &   75 \\
+             13 &  0.36 - 0.39  &  240 &  35 &  1.02 - 1.05  &   66 \\
+             14 &  0.39 - 0.42  &  144 &  36 &  1.05 - 1.08  &   40 \\
+             15 &  0.42 - 0.45  &   98 &  37 &  1.08 - 1.11  &   37 \\
+             16 &  0.45 - 0.48  &   67 &  38 &  1.11 - 1.14  &   20 \\
+             17 &  0.48 - 0.51  &   52 &  39 &  1.14 - 1.17  &    8 \\
+             18 &  0.51 - 0.54  &   33 &  40 &  1.17 - 1.20  &    3 \\
+             19 &  0.54 - 0.57  &   36 &  41 &  1.20 - 1.23  &    1 \\
+             20 &  0.57 - 0.60  &   33 &     &               &      \\
+             21 &  0.60 - 0.63  &   30 &     &               &      \\
+             22 &  0.63 - 0.66  &   26 &     &               &      \\
+\hline
+\multicolumn{6}{||l||}{Do you want to impose a cutoff for high values?   Yes  
+No} \\ \hline
+\end{tabular}
+\end{center}
+
+      The user is given an opportunity to impose a high value cutoff on
+   the histogram.  If the user selects `Yes' to the question (using the
+   arrow and return keys again), then he will be able to select which bin
+   should be the last bin.  The count values from the higher bins will be
+   added into the chosen final bin.
+      The program will then tell the user the name of the output file,
+   write the histogram data to that file, and terminate.  The output file
+   will be placed in the same directory as the input file, the file title
+   will be the title of the input file concatenated with a two character
+   string which denotes the bin width, and the file type will be 
+   .HIS. These files are the required input for AMOEBA and may themselves be
+   examined in IDL via the GETDATA program.
+
+\subsubsection{AMOEBA}
+
+{\em To run this program type:}
+\begin{verbatim}
+   
+           HRTS$> edit/edt files.dat              
+           HRTS$>edit/edt amoeba.dat
+           HRTS$> AMOEBA
+   
+\end{verbatim}
+{\em AMOEBA} is the most important program in the H\&D curve development
+   process.  This program yields five coefficients for an H\&D curve, given
+   at least two density histograms and some first-guess values for the
+   coefficients.  In order to run the program the user must first see to
+   it that the file named FILES.DAT contains certain information regarding
+   the histograms (.HIS files) to be used, and that the file AMOEBA.DAT
+   contains initial conditions for the coefficients.  Both of these files
+   can be examined and altered via the editor.
+      The format for the FILES.DAT file is shown below:
+\begin{center}
+\begin{verbatim}   
+                
+                    3   | Number of Histograms       
+                    1   | Number of Base-Histograms   
+                    0   | Chi Square Weighting        
+                   .7   | Reference Density           
+                   1.4  | Reference Value of Log E    
+                   BH0601T05.his                      
+                   BH0501T05.his                      
+                   BH0301T05.his                      
+\end{verbatim}
+\end{center}                  
+   
+      The number of histograms to be used can be any number greater than
+   or equal to 2.  That number must be entered on the first line of
+   FILES.DAT.  The number of base-histograms can be any number greater
+   than or equal to 1 and less than or equal to the number of histograms
+   (entered on line \#1).  The number of base-histograms must be entered on
+   line \#2.  The third line contains a number which will be interpreted as
+   W in the following sum which computes the measurement by which the
+   correspondence of actual and predicted histograms is evaluated:
+\begin{center}
+\begin{displaymath}
+ \sum_{i=1}^{NBins} \frac{(Act[i]-Pred[i])^{2}}{[(Act[i]+Pred[i])/2]^{W}}    
+\end{displaymath}                
+\end{center}   
+   where Act[i] is the number of pixels in bin number i for an actual
+   histogram, Pred[i] is the corresponding number for an associated
+   predicted histogram and NBins is the total number of bins for each
+   histogram.
+      The fourth line contains a reference density value and the fifth line
+   contains a reference value of Log E.  The generated H\&D curves will all
+   yield the reference Log E value when evaluated at the reference density
+   value.
+      Starting on line \#6 is a list of the histogram (.HIS) data files,
+   with one filename listed on each line.  The number of filenames must be
+   equal to the number of histograms written on line \#1.  Those histograms
+   which are intended to be used as bases should be listed first.  For
+   instance if the number on line \#2 is `1', then the first listed
+   histogram will be used as a base, if that number is `2', then the first
+   two listed histograms will be used as bases.
+      The file AMOEBA.DAT must also be edited so that it contains an
+   initial simplex.  The simplex consists of five sets of the coefficients
+   a(1), a(2), a(3) and a(4).  An example of how AMOEBA.DAT should appear
+   is shown below.
+\begin{center}
+\begin{verbatim}      
+   
+                         
+                           1.   1.   .1   1.  
+                           1.1  1.   .1   1.  
+                           1.   1.1  .1   1.  
+                           1.   1.   .11  1.  
+                           1.   1.   .1   1.1 
+            
+\end{verbatim}   
+\end{center}
+      Each line of the file contains a set of {a(1),a(2),a(3),a(4)}.
+   Among the five sets there should be a perturbation of each coefficient,
+   or else that coefficient will not be varied when the program runs.  The
+   perturbation for the coefficient a(3) should be relatively small in
+   order to hopefully prevent that coefficient being assigned a value less
+   than 0 as the program runs (if this occurs the program would fail).
+   
+      Note:  the choice of initial coefficient values is somewhat
+          arbitrary, and the program may very well yield a different
+          solution for different initial conditions.
+   
+      When the AMOEBA.FOR program is run, it will read data from FILES.DAT
+   and AMOEBA.DAT and then print out actual and predicted histograms for
+   the first set of coefficients listed in AMOEBA.DAT.  The program then
+   goes through various iterations in which the simplex is moved through
+   four dimensional space.  During each iteration an attempt is made to
+   change one set of coefficients in order to lower the Chi Square
+   difference between actual and predicted histograms.  The following
+   illustration shows the type of information displayed on the terminal
+   screen to the user as this process is going on.
+\begin{center}
+\begin{verbatim}   
+     
+        19        tol: .309                                           
+          a(1)      a(2)      a(3)      a(4)      a(5)      Chi Sq.   
+       -0.11622   0.55758   0.11826   1.53162  -0.88232   0.42345e+08 
+       -0.01432   0.48709   0.12383   1.50887  -1.00033   0.36822e+08 
+       -0.15971   0.28770   0.14706   1.48719  -1.07811   0.33944e+08 
+        0.07918   0.45969   0.12258   1.46260  -1.03279   0.37795e+08 
+       -0.07311   0.27037   0.13193   1.53906  -1.15574   0.31022e+08 
+                                                                      
+       20        tol: .380                                            
+          a(1)      a(2)      a(3)      a(4)      a(5)      Chi Sq.   
+       -0.10645   0.01348   0.15754   1.43505  -1.39138   0.25737e+08 
+       -0.01432   0.48709   0.12383   1.50887  -1.00033   0.36822e+08 
+       -0.15971   0.28770   0.14706   1.48719  -1.07811   0.33944e+08 
+        0.07918   0.45969   0.12258   1.46260  -1.03279   0.37795e+08 
+       -0.07311   0.27037   0.13193   1.53906  -1.15574   0.31022+e08 
+                                                                      
+       21        tol: .354                                            
+          a(1)      a(2)      a(3)      a(4)      a(5)      Chi Sq.   
+        0.10645   0.01348   0.15754   1.43505  -1.39138   0.25737e+08 
+       -0.01432   0.48709   0.12383   1.50887  -1.00033   0.36822e+08 
+       -0.15971   0.28770   0.14706   1.48719  -1.07811   0.33944e+08 
+        0.02200   0.36217   0.13134   1.47757  -1.10147   0.31847e+08 
+       -0.07311   0.27037   0.13193   1.53906  -1.15574   0.31022e+08 
+                                                                      
+\end{verbatim}
+\end{center}                                                                      
+                                                                      
+      There is a table output for each iteration.  The number near the
+   top left corner of each table is the iteration number.  The number
+   identified as `tol' is a tolerance value which the program evaluates as
+   a function of the differences among the five Chi Square values
+   associated with the simplex.  In a sense the tolerance may be looked
+   upon as an indication of the size of a simplex.  If, after successive
+   iterations, the tolerance value gets very small, then the program will
+   assume that the simplex has converged on a point and thus the program
+   will stop.  This is the optimal form of program termination.  The
+   tolerance generally decreases as the iteration number increases, but as
+   shown in the above example that is not always the case between
+   successive iterations.  The table shows five sets of coefficients and
+   the associated measure showing how good those coefficients are when
+   used to create predicted histogram(s) from the base histogram(s) in an
+   attempt to simulate other actual histograms.
+       Listed below are various conditions under which the program either
+   will terminate or be terminated by the user:
+\begin{itemize}   
+         \item  The tolerance goes to a very small number (as described
+                above).  This is normal termination.
+         \item  The simplex gets `stuck' in the sense that the tolerance
+                and all the coefficients become constant for each
+                iteration.  In this case the user should halt the
+                program with cntl-Y and restart it with new starting
+                condition in AMOEBA.DAT which are close to the coefficient
+                values used when the simplex got stuck.
+         \item  The program terminates under an error condition because
+                the value for a(3) has become less than or equal to
+                zero.  In this case the user should restart the program
+                with different values in AMOEBA.DAT.
+         \item  All coefficients in each vertical column of the table
+                are the same to within a desired number of digits of
+                accuracy.  In this case the user may hit cntl-Y and
+                accept the current solution.
+\end{itemize}
+
+       Under normal termination there are five sets of coefficients
+   displayed.  The user should accept the one of those which has the
+   smallest chi square error as being the solution.  It is strongly
+   encouraged that the user rerun the program under different starting
+   conditions to see if other solutions are obtained which may have a
+   lower Chi Square error.
+
+\subsubsection{TESTHND}
+
+{\em To run this program type:}
+\begin{verbatim}
+     HRTS$> TESTHND              
+\end{verbatim}
+{\em TESTHND} prints out actual and predicted histograms in which the
+   predicted histograms were obtained by applying an H\&D curve to one or
+   more base-histograms.  The user can compare the actual and predicted
+   histograms to get a qualitative feel about the appropriateness of the
+   supplied H\&D curve.  This program also prints out values of Log E which
+   are associated by the H\&D curve with certain density values.
+
+       The information regarding details about the histogram files to be
+   used will be read in by the program from the file named FILES.DAT
+   (which was described in the section for AMOEBA.FOR.)  When the user
+   starts to run the program, he will be asked to type in the first four
+   coefficients of the H\&D curve (a[1] through a[4]).  a[5] need not be
+   input.  The program will then output a table of histograms which may
+   look something like the following illustration.
+\begin{center}
+\begin{tabular}{||l|l|l|l|l|l||}
+\hline   
+        Histogram Contents: &  &  &  &  & \\                                        
+             &     1.act  &    2.act  &    2.pf1  &    3.act   &   3.pf1  \\
+          1  &         1  &      488  &      109  &        0 &         0 \\
+          2  &        84 &      2901 &       824 &         0 &         0 \\
+          3  &       159 &       8791 &      4619  &         1 &        28  \\
+          4  &       301 &      18579 &      13054 &          1 &        32  \\
+          5  &       528 &      24395 &      25848 &         10 &         39 \\ 
+          6  &      1131  &    27319   &   27107    &     54    &     53  \\
+          7  &      1695  &    27192   &   26580    &     61    &     53  \\
+          8  &      2421  &    26296   &   22352    &     50    &     72  \\
+          9  &      3744  &    24580   &   20475    &     50    &    105  \\
+         10 &       4744  &    17372   &   14902    &     60    &    105  \\
+         11 &       7414  &    15869   &   13574    &    109    &    168  \\
+         12 &      10717 &     13235   &   13899    &    151    &    231  \\
+\hline
+\end{tabular}                                                             
+\end{center}                                                                    
+       The number of columns in the table will be determined by the total
+   number of histograms and the number of base-histograms as read in from
+   FILES.DAT. For the above table, the number of histograms was 3 and the
+   number of base-histograms was 1.  Each horizontal row of the table
+   represents one density bin, in which the leftmost number is the bin
+   number.  The title `2.act' designates the actual histogram data for
+   histogram \#2 (the second histogram listed in FILES.DAT).  The title
+   `2.pf1' designates a simulated version of histogram \#2, which was
+   predicted from histogram \#1 (histogram \#1 was used as the base).
+       Besides writing the histograms data as shown above to the terminal
+   screen, this program also writes that data to a file as well.  This
+   file is named PRED.HIS.  This is done so that the user has the ability
+   to make plots of the above data in IDL by using the GRHIST.PRO
+   procedure.
+       TESTHND also outputs sets of density and Log E values such as shown
+   in the table below.
+\begin{center}
+\begin{tabular}{||l l l l l l||}
+\hline   
+         Density &  Log(E) &   Density &  Log(E)  &    Density &  Log(E) \\
+\hline
+          0.05 &   0.467   &    0.40  &  1.203    &     1.15  &  1.798  \\ 
+          0.10 &   0.741   &    0.50  &  1.272    &     1.30  &  1.996  \\ 
+          0.15 &   0.890   &    0.60  &  1.336    &     1.45  &  2.241  \\ 
+          0.20 &   0.988   &    0.70  &  1.400    &     1.60  &  2.538  \\ 
+          0.25 &   1.069   &    0.80  &  1.470    &     1.75  &  2.897  \\ 
+          0.30 &   1.116   &    0.90  &  1.548    &     1.90  &  3.325  \\ 
+          0.35 &   1.163   &    1.00  &  1.637    &     2.05  &  3.833  \\ 
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{IDL level}
+
+\subsubsection{GRHIST}
+
+{\em To run this program type:}
+\begin{quote}   
+     {\tt HRTS\_IDL>}{\bf GRHIST},{\it NOLOG,LINETYPE}              
+\end{quote}
+
+{\em GRHIST} will read histogram data from the file PRED.HIS and plot a
+   histogram on a graphics terminal.  The procedure always uses the most
+   recent version of PRED.HIS that is in your current directory (PRED.HIS
+   is generated when the {\em TESTHND.EXE} program is run.)  All arguments to
+   this procedure are optional.  If NOLOG is undefined or has a values of
+   0, then the plotted graph will have its Y-axis on a logarithmic scale,
+   else the Y-axis will be on a linear scale.  
+
+       When {\em GRHIST} runs, it first asks for the number of the histogram
+   that you are interested in (this number will typically be in the range
+   1 to 3).  The histograms are numbered according to the order they
+   were listed in FILES.DAT when the TESTHND program was run.  The
+   program next asks if you want to plot the actual or a predicted
+   histogram.  If you request a predicted histogram, then the program will
+   also ask for the number of the base-histogram from which the predicted
+   histogram was generated.  The graph will then be generated and the
+   program will terminate.
+
+\subsubsection{GRHND}
+
+{\em To run this program type:}
+\begin{quote}   
+      {\tt HRTS\_IDL>}{\bf GRHND},{\it A1,A2,A3,A4,DENMAX,LINETYPE}       
+\end{quote}   
+       This procedure will plot an H\&D curve on a graphics terminal.  The
+   graph will consist of Log E values on the X-axis in the range from -1
+   to 4, and density values on the Y-axis in the range from 0 to DENMAX
+   (if a value for that variable is given, else a default value of 2 will
+   be used).  The first four parameters are required and must specify the
+   coefficients of the H\&D curve.  The curve will be shifted so that a
+   density of .7 corresponds to a Log E value of 1.4.  The sixth
+   parameter, LINETYPE, is optional.  If LINETYPE is assigned a value,
+   then !P.LINESTYLE will be set to that value and the graph will be drawn
+   using OPLOT, otherwise it will be drawn using PLOT.
+\newpage
+
+\section{Miscellaneous Programs}
+
+\subsection{DCL level}
+
+\subsubsection{CALC}
+
+{\em To run this program type:}
+\begin{verbatim}   
+     HRTS$> CALC                    
+\end{verbatim}
+       {\em CALC} performs a calculator simulation that uses the keyboard's 18
+   keypad keys to correspond to the various keys. 
+        The user may hit `H' to get help information or `E' to exit the
+   program.
+
+\subsubsection{IONEQ}
+
+{\em To run this program type:}
+\begin{verbatim}
+     HRTS$> IONEQ                  
+\end{verbatim}
+      This program evaluates ion equilibria by using the tables of Arnaud
+   and Rothenflug: 1985, Astron. Astrophys. Suppl. Ser. 60, 425-457. Cubic
+   splines are used to interpolate between table entries.  The program
+   requires three input values: an element number (e.g. 26 for Fe), an
+   ionization state (e.g. 17 for Fe XVII), and a temperature in degrees K.
+   Below is a example showing how to use this program:
+
+\begin{verbatim}
+
+               HRTS$> IONEQ
+               IONEQ: IZ=element #, IS=ion.state  (Enter 0,0,0 to exit)
+               Enter IZ,IS,TEMP:  26,17,2e6
+                0.4236
+               Enter IZ,IS,TEMP:  0,0,0
+               End IONEQ.
+               HRTS$>
+\end{verbatim}
+            Ion equilibria can also be evaluated within a FORTRAN program by
+   making a call to IONEQ\$. This function has four arguments, of which the
+   first three must be assigned values prior to the call. The arguments
+   are as follows:
+\begin{itemize}   
+\item     1. {\bf IZ}    {\em INTEGER}        element number
+\item     2. {\bf ION}   {\em INTEGER}        ion number
+\item     3. {\bf TEMP}  {\em FLOATING PT}    temperature in K
+\item     4. {\bf IERR}  {\em INTEGER}        output error code (0 = success)
+\end{itemize}   
+        Below is a sample program that calls this function:
+
+\begin{verbatim}   
+                       real ioneq$
+                       ans=ioneq$(1,2,20000,ierr)
+                       if(ierr.eq.0) print*,ans
+                       end
+
+\end{verbatim}
+
+\subsubsection{TMAX}
+
+{\em To run this program type:}
+\begin{verbatim}   
+     HRTS$> TMAX                   
+\end{verbatim}
+This program will calculate and print out temperature maximum values.  When
+run, it will ask the user to enter a set of four numbers. These numbers will be
+interpreted as an element number, (e.g. 26 for Fe.)  an ion, (e.g. 17 for Fe
+XVII.) an actual emitting wavelength (Angstroms), and an excitation wavelength
+(Angstroms).  The use may repeatedly enter in sets of four numbers.  If
+`0,0,0,0' is entered, then the program will exit.
+
+\subsection{IDL level}
+
+\subsubsection{COLSUM}
+
+{\em To run this program type:}
+
+\begin{quote}   
+     {\tt HRTS\_IDL>}{\bf c=COLSUM(ARR)}            
+\end{quote}   
+      This function returns a one dimensional array of which each element
+   contains the average of the pixels along a column of the inputed two-
+   dimensional array.
+
+\subsubsection{DISPLAY}
+
+{\em To run this program type:}
+
+\begin{quote}   
+      {\tt HRTS\_IDL>}{\bf DISPLAY,}{\it ARR,X,Y,FRAC}        
+\end{quote}   
+
+This procedure will display an image on a graphics terminal in which all data
+points with a value greater than a certain level will be shown by a high
+brightness, and all other data points will be shown by a low brightness. The
+maximum image size is 1023 x 791. ARR is the only required parameter and must
+be a two dimensional array of data.  X and Y, if given, will cause the image to
+be placed at the specified location (where 0$<$=X$<$=1023, and 0$<$=Y$<$=791). 
+FRAC specifies what fraction of the data points should be marked by a bright
+points.  FRAC must be a number between 0.0 and 1.0 (the default value is 0.1).  
+
+\subsubsection{INT}
+
+{\em To run this program type:}
+\begin{quote}   
+     {\tt HRTS\_IDL>}{\bf INT,ARR,}{\it GR250,ORIENT,X,Y,NOERAS}        
+\end{quote}   
+
+{\em INT} represents the contents of a two dimensional array by an image on the
+graphics terminal where the brightness of the image at various locations is
+related to the numerical value of an associated pixel of the input array.  The
+only required variable, ARR, must be a two dimensional array.  GR250 should be
+assigned a value of 1 if you are using a GraphOn 250 terminal, else it should
+be assigned a value of 0. If ORIENT is assigned a non-zero value, then the
+image will be displayed with the first row of data on the bottom, else the
+first row of data will be at the top.  If integer values are sent for X and Y,
+then those values will be interpreted as the location on the screen where the
+lower left corner of the graph will be positioned.  If NOERAS is assigned a
+value, then the screen will not be erased before the plot is drawn, otherwise
+it will be erased.  
+
+The largest image which this program can display for a non-GraphOn 250 terminal
+consists of 300 X-direction pixels and 115 Y-direction pixels.  If the input
+array is too big in either dimension, then the program will ask for a starting
+pixel for that dimension, and then proceed to display as much of the image as
+possible.  As a result of the screen resolution for non-GraphOn 250 terminals,
+an image that has the same number of pixels in the X-direction as in the
+Y-direction will appear to be twice as high as it is long.  If the user wants
+the image to appear square on non-GraphOn 250 terminals, then he should use the
+intrinsic CONGRID procedure to stretch out the image by a factor of two in the
+X-direction.
+
+For each element of the array, this procedure will associate a 3x3 array of
+physical screen pixels.  A certain number of the nine screen pixels will be
+bright and the remaining ones will be dark depending on the numerical value of
+the array element.  Hence the resulting image will be drawn using a ten level
+gray scale.  (Note:  for large arrays this procedure takes a long time to run,
+in which case in might be a better idea to use the an image  display unit.)
+
+\subsubsection{POLYFIT}
+
+{\em To run this program type:}   
+   
+\begin{quote}   
+    {\tt HRTS\_IDL>}{\bf POLYFIT,}{\it X,Y,WEIGHT,}YFIT,COEF      
+\end{quote}   
+{\em POLYFIT} fits a polynomial to a set of {x,y} points, which may be
+weighted. If no parameters are given, then the program will ask for the name
+of a file which contains the input data in the following format:
+\begin{verbatim}                  
+
+                       X1       Y1       Weight1 
+                       X2       Y2       Weight2 
+                       .        .           .    
+                       .        .           .    
+                    
+\end{verbatim}   
+
+The user may instead have the X, Y, and WEIGHT data transmitted to the program
+by sending three arrays as the first three arguments when the program is
+invoked.  If an argument is given for X and for Y, but not for WEIGHT, then a
+constant weighting of `1' will be used for each data point.  If an arbitrary
+variable name is given as the fourth parameter, then that name will reference
+(after program termination) an array of predicted y values for each x data
+value.  The predicted y values will be produced from the derived polynomial. 
+If an arbitrary name is given for the fifth parameter, then that name will be
+set to reference an array of the coefficients of the derived polynomial. (Note:
+the predicted y values and the coefficients of the derived polynomial will be
+displayed on the terminal whether or not a fourth and fifth parameter are
+given.)
+
+\subsubsection{POS}
+
+{\em To run this program type:}
+\begin{quote}   
+      {\tt HRTS\_IDL>}{\bf POS}              
+\end{quote}
+
+{\em POS} allows the user to read off values of a graph which has been plotted
+on the graphics terminal.  After plotting a graph and typing POS, the user may
+hit `C' in order to access the graphics cursor.  The cursor may then be moved
+via the arrow keys until it is at a desired location. If the user then hits the
+return key, then the {x,y} position of the cursor will be printed on the text
+screen.  Hitting `C' again will re-display the graphics screen and re-enable
+the graphics cursor so that the process may be repeated.
+
+In addition to this primary application of the program, a number of other
+features are available which are described if the user presses the `H' key. 
+The `D' command allows the user to set the number of significant digits to be
+used in the output data coordinates.  The `F' command may be used to have all
+recorded data coordinates be output to a file in addition to going to the text
+screen.  The `L' command will toggle on or off a point labelling feature that
+allows the point number to be printed on the graphics screen above each newly
+selected point.  The `M' command will toggle on or off a point marking feature
+that can cause a `+' sign to be placed on the graphics screen to mark each
+newly selected point.  The `P' command enables the positioning of the graphics
+cursor at a specific X position which the user supplies, or at a specific X,Y
+position.  The `S' command is used to set the speed at which the graphics
+cursor moves by setting the number of pixels the cursor moves per
+arrow-keystroke. The program may be exited by hitting the `E' key.
+
+\subsubsection{ROWSUM}   
+
+\begin{quote}
+     {\tt HRTS\_IDL>}{\bf r=ROWSUM}{\it (ARR)}            
+\end{quote}   
+This function returns a one dimensional array of which each element contains
+the average of pixels along a row of the input  two-dimensional array.
+
+\subsubsection{TVALIGN}
+
+{\em To run this program type:}
+\begin{quote}   
+     {\tt HRTS\_IDL>} {\bf TVALIGN,}{\it ARR1,ARR2}      
+\end{quote}   
+      
+This procedure is used to align two images.  The two required input arguments,
+ARR1 and ARR2, must be two-dimensional arrays in which the size of each
+dimension is less than or equal to 512. The procedure will begin by putting up
+on the image display screen an  image formed from the data from ARR1 in green
+and an image from ARR2 in blue. The images are shown using a colour table which
+is a two-valued step function.  The user must interact with the procedure at
+this point to redefine the colour table so that an alignment can be made later
+in the second part of the program in which the two images overlap.  Basically,
+one wants both images to appear similar.  The user modifies the colour table by
+hitting either the `1' or `2' keys to work on image 1 or 2, and then hitting
+the up or down arrow keys to adjust the colour table. When the user is
+satisfied, he should hit `E' to exit this part of the program and proceed to
+the second part.
+
+In the second part of the program the green and blue images overlap and the
+user is given the ability to move the blue image until the two images are
+aligned.  The blue image is moved by a vector specified by the user.  The
+direction of the vector is defined by hitting one of the four arrow keys, and
+the magnitude is given (in pixels) by hitting a number key.  The user can
+repeatedly move the blue image until the alignment seems to be good.  The user
+should then hit `E' to exit and the program will then print out the X and Y
+offsets between the two images.
+
+\subsubsection{TVCOMPARE}
+
+{\em To run this program type:}
+\begin{quote}   
+     {\tt HRTS\_IDL>} {\bf TVCOMPARE,}{\it A,B,}X,Y          
+\end{quote}   
+
+{\em TVCOMPARE} compares two images by using the image display to show both the
+images along with their sum and difference, and allows the user to shift image
+\#2 with regards to image \#1. A and B are required parameters and each must
+denote a two dimensional array. The variables X and Y are optional. If a
+variable name is given for each of these arguments, then when the program is
+finished those variable names will reference the x and y shift values.  Image
+\#2 can be shifted by hitting the `M' key and by using the arrow and return
+keys. The user should hit the `E' key to exit the program.
+
+\subsubsection{TVCUT}
+
+{\em To run this program type:}
+\begin{quote}   
+     {\tt HRTS\_IDL>} {\bf TVCUT,OUT}               
+\end{quote}
+
+{\em TVCUT} reads off data from the image display screen for an area defined by 
+the user and stores that data in the array OUT. The user must display whatever
+image he wants to work with on the image display screen prior to making the 
+call to TVCUT.  The one parameter, OUT, is required and must be given an
+arbitrary variable name which will point to a two dimensional array of image
+data after the program exits.  When this program runs, its first asks the user
+to use the mouse to mark a point on the image screen from which the closed loop
+(which will define the area of interest) will begin to be drawn.  After moving
+the mouse to a point and hitting a mouse button, the program will then ask the
+user if he wishes to draw the area by using either the mouse or arrow keys. 
+The user should press `M' to use the mouse or `A' to use the arrow keys.  The
+user should then draw a loop on the  screen which encloses the desired area. 
+This loop must be closed for the program to go on to the next stage.  Since it
+is hard to close the loop at the exact point at which it began, this program
+has a feature that allows the user to force the loop to close by hitting the
+first mouse button if he is using the mouse, or hitting the return key if he is
+using the arrow keys.  (It is best to use this feature when the loop is almost,
+but not quite, closed.) The program will then extract the data within the loop
+and return it in the array OUT.  The array size will be as small as possible
+and still contain all the requested data.  Any pixels in the array which
+correspond to an area outside of the loop will be assigned a value of zero.
+
+\subsubsection{TVPOS}
+
+{\em To run this program type:}   
+\begin{quote}      
+     {\tt HRTS\_IDL>} {\bf TVPOS,}{\it DISPLAY}                
+\end{quote}   
+
+{\em TVPOS} displays the x and y screen coordinates and the intensity for the
+pixel at which the TV cursor is currently located.  While this procedure is
+running the user may change the TV cursor position by moving the mouse.  {\em
+TVPOS} has one optional argument, DISPLAY, which may be used to specify where
+the TV cursor position numbers will be displayed (only in the case in which
+there was no zooming done on the TV image).  If DISPLAY is assigned no value,
+or if it is assigned a value of 0, then the information will be displayed on
+the TV.  If it is assigned a value of 1, then the information will be shown on
+the terminal screen.  An assigned value of 2 will cause the information to be
+displayed on both the TV and the terminal screen.  If there is a zoomed-in
+image on the TV, then the program will place all output on the terminal screen. 
+Also, in addition to the screen coordinates and intensity, the data coordinates
+will be printed out. The user may exit the program by hitting any keyboard key.
+
+\subsubsection{TVRESTORE}
+
+{\em To run this program type:}
+\begin{quote}   
+     {\tt HRTS\_IDL>} {\bf TVRESTORE,}{\it FILENAME}         
+\end{quote}   
+This procedure will display on the  screen an image which was saved via {\em
+TVSAVE.} The input file name is a required argument.
+
+\subsubsection{TVSAVE}
+
+{\em To run this program type:}
+\begin{quote}
+    {\tt HRTS\_IDL>} {\bf TVSAVE,}{\it FILENAME}          
+\end{quote}      
+This procedure will save an image shown on the  screen into a file, from which
+it may be put back onto the image display screen using {\em TVRESTORE.}  The
+procedure will ask the user if there is graphics data to be saved in addition
+to image data (the user must answer by pressing either `Y' or `N'.)  The output
+filename is a required argument.
+
+\subsubsection{TVSTART}
+
+{\em To run this program type:}
+\begin{quote}   
+     {\tt HRTS\_IDL>} {\bf TVSTART}         
+\end{quote}   
+{\em TVSTART} allocates the image display unit and defines a red-temperature 
+colour table to be used for subsequent image displays. The image display must
+be turned  on and be available. {\em TVSTART} requires no arguments.
+
+\typeout{ }
+\typeout{ If you want to print this document on a PostScript printer, you}
+\typeout{ should use the DVIPSA4 translator program to process the .DVI file}
+\typeout{ }
+
+\end{document}

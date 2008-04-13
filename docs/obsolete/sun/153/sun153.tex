@@ -1,0 +1,298 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {153.1}
+\newcommand{\stardocauthors}   {V.~Laspias}
+\newcommand{\stardocdate}      {20 October 1992}
+\newcommand{\stardoctitle}     {RNOTOTEX --- Converting RUNOFF to \LaTeX }
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+
+The program {\bf RNOTOTEX} will read a {\em DEC Standard Runoff} (DSR) format
+text file, translate the {\bf RUNOFF} commands to \LaTeX\ commands and write a
+corresponding TEX file.  The output file may then be processed by \LaTeX\ and
+printed on the local high quality printer.  
+
+\section{Execution}
+
+To set up {\bf RNOTOTEX}, type the command:
+
+\begin{verbatim}
+      $ RNOTOTEX_SETUP
+\end{verbatim}
+
+{\bf RNOTOTEX} requires two files names on the command line---the input {\tt
+.RNO} file and the output {\tt .TEX} file. The command:
+
+\begin{quote}\tt
+\$ RNOTOTEX[/TEX] {\it input-filename}[.RNO] {\it output-filename}[.TEX]
+\end{quote}
+
+reads a {\em Digital Standard Runoff} format file and creates the \LaTeX\ 
+equivalent.
+
+\subsection{Parameters}
+
+\begin{itemize}
+
+\item{\tt input-filename} --- is the name of the input DSR format file.  
+(The default type is {\tt .RNO}.)
+
+\item{\tt output-filename} --- is the name of the output \LaTeX\ format file.  
+(The default type is {\tt .TEX}.)
+
+\item{\tt /TEX} --- The {\tt /TEX} qualifier instructs {\bf RNOTOTEX} to
+preserve embedded \TeX\ and \LaTeX\ commands in the input DSR file.  Any such
+commands found are copied directly to the output {\tt .TEX} file. (The default
+is {\tt /NOTEX}.)
+
+\end{itemize}
+
+\subsection{Example}
+
+The following DCL commands convert the DSR file {\it filename}.{\tt RNO} to 
+{\it filename}.{\tt TEX} and  prints the {\tt .DVI-CAN} file on a Canon laser
+printer. The log of the conversion is also printed and deleted.
+
+\begin{quote}\tt
+\$ RNOTOTEX filename.RNO \\ 
+\$ LATEX filename.TEX \\
+\$ DVICAN filename.DVI \\
+\$ PRCN filename.DVI-CAN \\
+\$ PRINT/DELETE RNOTOTEX.LOG
+\end{quote}
+
+Note that there isn't a one-to-one mapping of DSR commands to \LaTeX\  commands
+and that more \LaTeX\ text fits on a page than a {\bf RUNOFF} file. The  first
+output may be messy!   The output {\tt .TEX} file must be \index{messy RNOTOTEX
+output} edited after examining the first printing.  It may take a few tries to
+get the output that you want.
+
+The program was designed for those familiar with both \LaTeX\ and DSR and would
+like to upgrade older documents to \LaTeX\ format. However, the program does
+not cope very well with the old style Starlink document headers produced with
+{\bf RUNOFF}. For complicated {\bf RUNOFF} styles such as these it is easier to
+convert just the body of the document and use a purpose built \LaTeX\ style
+shell.
+
+\section{Translation Actions}
+
+The program does four tasks.  It will translate {\bf RUNOFF} sectioning
+commands to \LaTeX\ sectioning commands, translate {\bf RUNOFF} flags to
+\LaTeX\ commands, translate {\bf RUNOFF} page directives to \LaTeX\ page
+directives and adjust \LaTeX\ counters by the same amount as {\bf RUNOFF}
+counters are to be adjusted.
+
+\subsection{Conversion of Sectioning Commands}
+
+{\bf RNOTOTEX} converts {\bf RUNOFF} sectioning commands to \LaTeX\ sectioning 
+commands.  The output \LaTeX\ style is always {\tt report} in 10 point font.
+The sectioning commands are converted in Table \ref{section-commands}.
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{ll}
+{\large\bf RUNOFF }	    & {\LaTeX\ \large\bf Command Generated} \\ \hline
+ .HL1 text      & \verb+\chapter{text}+ \\
+ .HL2 text      & \verb+\section{text}+ \\
+ .HL3 text      & \verb+\subsection{text}+ \\
+ .HL4 text      & \verb+\subsubsection{text}+ \\
+ .HL5 text      & \verb+\paragraph{text}+ \\
+ .HL6 text      & \verb+\subparagraph{text}+ \\ \hline
+\end{tabular}
+\caption{Conversion of RUNOFF Sectioning Commands\label{section-commands}}
+\end{center}
+\end{table}
+
+\subsection{Conversion of RUNOFF Flags}
+
+{\bf RUNOFF} flags are converted to \LaTeX\ commands by {\bf RNOTOTEX}.   This
+is a direct conversion process, {\em i.e.} a {\bf RUNOFF} underline command is
+converted to a \LaTeX\ underline command.  This does not always produce the
+prettiest results (as one can use {\bf bold} and {\it italic} fonts in \LaTeX\
+), but it is consistent.  Unfortunately, {\bf RNOTOTEX} does not have the
+esthetic sense to decide when a font is more appropriate than \index{esthetic
+sense} a converted {\bf RUNOFF} command.  The conversion process for {\bf
+RUNOFF} flags is Table \ref{flag-commands}. 
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{lcl}
+{\large\bf RUNOFF Flag } & {\large\bf Flag } & {\LaTeX\ \large\bf Command Generated} \\
+{\large\bf Name        } & {\large\bf Char } &		\\ \hline
+Accept			& \_		   & \verb!\verb+?+! \\
+Bold			& *		   & \verb+{\bf+$\cdots$\verb+}+ \\
+Break			& \verb+|+	   & \verb+\\+ \\
+Capitalize		& \verb+<+	   & (see below) \\
+Comment		        &  !		   & \% \\
+Hyphenate		& =		   & \verb+\hyphenate{+$\cdots$\verb+}+ \\
+Index			& \verb+>+	   & \verb+\index{+$\cdots$\verb+}+ \\
+Lowercase		& $\backslash	$  & (see below) \\
+Overstrike		& \%		   & \verb+{\bf+$\cdots$\verb+}+ \\
+Period		        & +		   & \verb+\frenchspacing+ \\
+Space			& \#		   & \verb*+\ + \\
+Subindex		& \verb+>+         & \verb+\index{+$\cdots$\verb+}+ \\
+Substitute		& \$		   & {\em not translated } \\
+Underline		& \&		   & \verb+\underline{+$\cdots$\verb+}+ \\
+Uppercase               & \verb+^+         & (see below) \\ \hline
+\end{tabular}
+\caption{Conversion of RUNOFF Flags\label{flag-commands}}
+\end{center}
+\end{table}
+
+Characters following CAPITALIZE, LOWERCASE or UPPERCASE flags are converted
+to the appropriate case during the translation process by {\bf RNOTOTEX},
+unless they are paired with other flags.  In these other cases, the flags in
+{\bf RUNOFF} lock another flag on, such as the {\bf bold}ing flag described
+in the DSR manual\cite{dsr-manual} on page 3-6.  {\bf RNOTOTEX} will lock the
+appropriate flag to the state it is in and produce the appropriate 
+\LaTeX\ commands.  
+
+For example, {\bf RNOTOTEX} will convert:
+\begin{verbatim}
+      \^ *These words are in bold face.\*
+\end{verbatim}
+to
+\begin{verbatim}
+      {\bf These words are in bold face.}
+\end{verbatim}
+
+\subsection{Conversion of RUNOFF Directives}
+
+{\bf RNOTOTEX} converts {\bf RUNOFF} directives to \LaTeX\ directives. {\bf
+RUNOFF} allows one to enable or disable flags and change the default flag
+character for a flag.  {\bf RNOTOTEX} will recognize these commands and change
+the internal parsing setup so that the flag is (or is not) recognized by the
+character specified.  See the {\bf RUNOFF} commands ``ENABLE'', ``DISABLE'',
+``FLAGS'' and ``NO FLAGS'' described in the RUNOFF manual.
+
+In addition, {\bf RNOTOTEX} will translate {\bf RUNOFF} commands such as
+``NOFILL'', ``INDENT'' and ``LIST'' in the manner described in Table
+\ref{directive-commands}.
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{ll}
+{\large\bf RUNOFF } 	    & {\LaTeX\ \large\bf Command Generated} \\ \hline
+.APPENDIX		    & \verb+\appendix+ \\
+.BLANK $n$		    & \verb+\vspace{+$n$+\verb+}+ \\
+.BREAK			    & \verb+\linebreak+ \\
+.CENTRE {\it text }         & \verb+\begin{centering}+ \\
+			    &   {\it text } \\
+			    & \verb+\end{centering}+ \\
+.FOOTNOTE {\it text}	    & \verb+\footnote{+{\it text }\} \\
+.INDENT			    & \verb+\indent+ \\
+.JUSTIFY		    & \verb+\obeylines \obeyspaces+ \\
+.LIST $n$,``q''		    & \verb+\begin{enumerate}+ \\
+.LITERAL		    & \verb+\begin{verbatim}+ etc. \\
+.NOFILL			    & \verb+\sloppy+ \\
+.PAGE			    & \verb+\pagebreak[4]+ \\
+.SPACING		    & \verb+\setlength{\baselineskip}{n}+ \\
+.SUBTITLE  {\it text}	    & \verb+\pagestyle{myheadings}+ etc. \\
+.TITLE {\it text}	    & \verb+\pagestyle{myheadings}+ etc. \\ \hline
+\end{tabular}
+\caption{Conversion of RUNOFF Directives\label{directive-commands}}
+\end{center}
+\end{table}
+
+\subsection{Conversion of RUNOFF Counters}
+
+{\bf RNOTOTEX} converts the {\bf RUNOFF} counter changes to \LaTeX\ counter
+adjustment changes.  The conversion process in described in Table
+\ref{counter-commands}.
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{ll}
+{\large\bf RUNOFF}	& {\LaTeX\ \large\bf Command Generated} \\ \hline
+.NUMBER APPENDIX $n$   & \verb+\setcounter{\chapter}{+$n$\verb+}+ \\
+.NUMBER LEVEL    $s,n$ & \verb+\setcounter{s}{n}+ \\
+.NUMBER LIST     $n$   & \verb+\setcounter{\enumi}{n}+ \\
+.NUMBER PAGE     $n$   & \verb+\setcounter{\page}{n}+ \\ \hline
+\end{tabular}
+\caption{Conversion of RUNOFF Numbering\label{counter-commands}}
+\end{center}
+\end{table}
+
+\section{The Conversion LOG File}
+
+Each time {\bf RNOTOTEX} is executed, it generates the file {\tt RNOTOTEX.LOG}.
+It is a record of each conversion used to generate the output \LaTeX\ commands.
+It is useful to users less familiar with \LaTeX\ and wish to learn by trial and
+error rather than by reading the manual.  It may also be useful to experienced
+\LaTeX\ users to quickly identify what \LaTeX\ will produce as output from the
+generated TEX file without going through a complete printing.  
+
+It is recommended that the log file be printed and deleted for each execution. 
+For example, the command sequence:
+
+\begin{quote}\tt
+\$ RNOTOTEX {\it filename} {\it new\_filename}\\
+\$ PRINT/DELETE RNOTOTEX.LOG
+\end{quote}
+
+generates the file {\it new\_filemane}.{\tt TEX} from the file {\it
+filename}.{\tt RNO}  and prints the log of the conversion process.  The user
+can then examine the printed log file and decide upon the editing required to
+produce a ``nice'' \LaTeX\ output.
+
+\begin{thebibliography}{99}
+\addcontentsline{toc}{section}{Bibliography}
+
+
+\bibitem{sun9} SUN/9 --- V. Laspias \& M. Bly {\em \LaTeX\ --- A Document
+Preparation  System} \\ Starlink User Note 9, Starlink Project
+
+
+\bibitem{dsr-manual} Digital Equipment Corporation {\em VAX Digital Standard 
+RUNOFF (DSR) Reference Manual } \\ Order \# AA-LA15A-TE, April 1988
+
+\end{thebibliography}
+
+\end{document}

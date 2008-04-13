@@ -1,0 +1,218 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {131.1}
+\newcommand{\stardocauthors}   {D J Rawlinson, C A Clayton}
+\newcommand{\stardocdate}      {12 August 1991}
+\newcommand{\stardoctitle}     {Printing on a PostScript\footnote{PostScript
+is trademark of Adobe Inc.} laser printer.}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+\section{Introduction}
+
+The document describes how to print text, graphics and \TeX\/ style output on a
+PostScript laser printer using a Starlink-distributed PostScript print
+symbiont. Throughout the document it is assumed that your PostScript laser
+printer queue is called {\tt SYS\_PS}. This may not be the case at your site
+and you should consult your Site Manager it you are in any doubt as to which
+queue to use. 
+
+\section{Printing Text}
+
+To print an ASCII text file on a PostScript printer using the print symbiont
+you need simply issue the command:
+
+\begin{verbatim}
+
+          $ PRINT/QUE=SYS_PS filename
+
+\end{verbatim}
+
+Note that this is precisely the same command you would use to print a text file
+on a line printer, with the exception that you are specifying an alternative
+queue. An ASCII text file that is sent directly to a PostScript printer will be
+interpreted by the printer as a PostScript program that it should execute.
+Hence, to print a text file, it is necessary to first encapsualte it in a piece
+of PostScript code that instructs the printer that the file you have sent is
+data to be printed and not PostScript code to be executed. This is done
+transparently for you by the PostScript print symbiont.
+
+There are a number of optional FORMS available with the print symbiont. These
+print files using different templates. For example, the form HEADERS prints
+the filename/date/page number at the top of the page. Parameters can be passed
+to these forms to specify, for example, the number of copies, font size in
+points etc.
+
+The following forms are defined for text printing. Parameters are passed as
+follows on the print command:
+
+\begin{verbatim}
+          $ PRINT/QUE=SYS_PS/FORM=form_name/PARAM=(parameter=value,...)
+\end{verbatim}
+\begin{tabbing}
+XXXXXX\=XXXXXXXXXXXXXXXXXXXXX\= \kill
+\>{\bf\underline{Form}}            \>{\bf\underline{Parameters}}\\
+\\
+\>HEADERS   \>Print file with filename and page number headers.\\
+            \>\>{\it ncopies:}   Number of copies. (default: 1)\\
+            \>\>{\it fsize:  }   Font size in points. (default: 10)\\
+            \>\>{\it wide:   }   If true set landscape mode. (default: false)\\
+            \>\>{\it title:  }   If false suppress the page headers. (default:
+true)\\
+            \>\>{\it ncolumns:}  Number of columns. (default: 1)\\
+            \>\>{\it linelimit:} Max number of lines per page. (default 66)\\
+\\
+\>NOHEADERS \>  Same as HEADERS except default title to false.\\
+            \>\>(NOHEADERS is the default)\\
+\\
+\>LANDSCAPE \>  Same as HEADERS except default wide to true, fsize to 8.\\
+\\
+\>2UP       \>  Same as LANDSCAPE except default ncolumns to 2.\\
+\\
+\end{tabbing}
+
+For example, 
+
+\begin{verbatim}
+  $ PRINT/QUE=SYS_PS/FORM=HEADERS/PARAM=(NCOPIES=4,FSIZE=14) STUFF.TXT
+\end{verbatim}
+-- Prints 4 copies of the file STUFF.TXT with a font size of 14 (points)
+
+\section{Printing PostScript files}
+
+PostScript files can be printed (executed) using the form POST. For example,
+
+\begin{verbatim}
+  $ PRINT/QUE=SYS_PS/FORM=POST SCREENDUMP.PS
+\end{verbatim}
+
+Those wishing to delve deeper into the workings of PostScript may want to 
+make use of the /NOTE option. In the example below, the first line sent to
+the printer will be ``debug true def''. This will be executed before the
+user's PostScript file.
+
+\begin{verbatim}
+  $ PRINT/QUE=SYS_PS/FORM=POST/NOTE="/debug true def" USER.PS
+\end{verbatim}
+
+\section{Printing Starlink graphics}
+
+To print Starlink graphics on the PostScript printer, you must select 
+one of the GKS devices from the following list when running
+the software that produces the plot.
+
+\begin{itemize}
+\item  POSTSCRIPT\_P    Postscript 300 dpi A4 portrait
+\item  POSTSCRIPT\_L    Postscript 300 dpi A4 landscape
+\item  PSCRIPT\_PTEX    TeX Postscript (portrait)
+\item  PSCRIPT\_LTEX    TeX Postscript (landscape)
+\end{itemize}
+
+The PostScript file produced (GKS\_72.PS) can then either be printed with the
+/FORM=POST qualifier in the case of the POSTSCRIPT\_P and POSTSCRIPT\_L
+options
+
+\begin{verbatim}
+
+   $ PRINT/QUE=SYS_PS/FORM=POST GKS_72.PS
+
+\end{verbatim}
+
+or included in a \TeX\/ document, in the case of the PSCRIPT\_PTEX and
+PSCRIPT\_LTEX options.
+
+
+\section{Printing \TeX\/ and \LaTeX\/ documents}
+
+\TeX\/ and \LaTeX \/ output (.DVI files) are processed ready for printing on a
+Canon LBP II/III laser printer running in native Canon mode  using the command
+DVICAN. This produces files of the form .DVI-CAN. These files cannot be printed
+on a PostScript printer; the .DVI files must instead be processed using the 
+DVIPSA4 command which produces .DVI-PS PostScript files. This type of file can 
+then be sent to the printer with the command:
+
+\begin{verbatim}
+
+   $ PRINT/QUE=SYS_PS/FORM=POST REPORT.DVI-PS
+
+\end{verbatim}
+
+For a list of possible qualifiers to the DVIPSA4 command, please refer to
+SUN/34.
+
+
+\section{Printing other types of file}
+
+The print symbiont has forms that allows several other popular format files to be
+printed on a PostScript laser printer. Note that not all of these forms have 
+been tested by Starlink.
+
+\begin{tabbing}
+XXXXXX\=XXXXXXXXXXXXXXXXXXXXX\= \kill
+\>{\bf\underline{Form}}            \>{\bf\underline{Parameters}}\\
+\\
+\>PAINT     \>  Print a MacPaint image.\\
+            \>\>{\it ncopies:}   Number of copies. (default: 1)\\
+            \>\>{\it scale:}     Scale factor. (default: 4, recommended: 1-4)\\
+\\
+\>BITIMAGE \>  Print an uncompressed image.\\
+       \>\>{\it ncopies:}  Number of copies. (default: 1)\\
+       \>\>{\it scale:  }  Scale factor. (default: 1)\\
+       \>\>{\it xsize:  }  Number of pixels in a row. (default: 512)\\
+       \>\>{\it ysize:  }  Number of pixel columns. (default: 512)\\
+       \>\>{\it pxlwid: }  Number of bits in a pixel, default 1, values: 1,2,4,8\\
+\\
+\>ZETA \>  Print a zeta plot file.\\
+       \>\>{\it ncopies:}  Number of copies. (default: 1)\\
+       \>\>{\it scale:  }  Scale factor. (default: 1)\\
+       \>\>{\it zFont:  }  false - selects Helvetica font for internal character\\
+       \>\>         true -  (default) uses Zeta characters\\
+       \>\>{\it penscale:} Scaling factor for pen point (default: 1)\\
+       \>\>{\it usepens:}  false - (default) ignore alternate pen select\\
+\end{tabbing}
+
+\end{document}

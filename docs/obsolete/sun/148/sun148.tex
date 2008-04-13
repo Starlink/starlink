@@ -1,0 +1,601 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {148.1}
+\newcommand{\stardocauthors}   {J.\ R.\ Lewis}
+\newcommand{\stardocdate}      {6 May 1992}
+\newcommand{\stardoctitle}     {SCP --- A Simple CCD Processing Package}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\begin{large}
+\begin{em}
+SCP is an optional item within the Starlink Software Collection. If it is not
+installed at your site, please see your Site Manager.
+\end{em}
+\end{large}
+
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\newpage
+\section{Introduction}
+
+This note describes a small set of programs, written at RGO, which deal with
+basic CCD frame processing (e.g. bias subtraction, flat fielding, trimming
+etc.).  The need to process large numbers of CCD frames from devices such as
+FOS or ISIS in order to extract spectra has prompted the writing of routines
+which will do the basic hack-work with a minimal amount of interaction from the
+user. Although they were written with spectral data in mind, there are no
+``spectrum-specific'' features in the software which means they can be applied
+to any CCD data.
+
+The programs have been written in accordance with the methods and
+conventions of FIGARO (SUN/86) and the Starlink Programming Standard (SGP/16).
+
+SCP is an optional item within the Starlink Software Collection. The programs
+will run standalone without the need to invoke the FIGARO startup, but require
+that FIGARO itself be installed to ensure the availability of the necessary
+shareable images.
+
+SCP will accept any two dimensional FIGARO image or NDF. The output files will
+be recognised by any FIGARO or KAPPA application which is designed to handle
+them.
+
+\section{How to run the programs}
+
+The SCP programs are made available by running the startup command procedure.
+To access the routines issue the command:
+\begin{verbatim}
+      $ SCP
+\end{verbatim}
+which runs the startup command procedure.
+
+All of the relevant logical and symbolic definitions should be done for
+you. To run a particular program, just issue the name of the program as if
+it were a standard FIGARO command. In addition a help file will also be 
+set up for you. Help on an individual program may be obtained by entering:
+\begin{verbatim}
+      $ HELP prog
+\end{verbatim}
+This will give you a list of the program's input parameters as well as an 
+option to look at the source header comments for the main routine.
+
+\section{Features supported}
+
+The programs can take data of any type including USHORT data which is 
+masquerading as INTEGER*2. All processing however is done with REAL*4
+arithmetic.  Output files will be type REAL*4.
+
+If magic values exist in the data, they are dealt will explicitly. Quality
+information is dealt with in the sense that bad quality data is converted to
+magic values.
+
+Error arrays are supported.  Input error arrays are updated properly if they
+exist and if the user wants error arrays in the output files.  If there are no
+input error arrays and the user still wants them in the output file, then
+SCP\_PROC creates them from the data and the chip noise parameters.
+
+\section{Package description}
+
+There are currently five routines in the package.  These are SCP\_CHIP,
+SCP\_HEAD, SCP\_NOISE, SCP\_PRE and SCP\_PROC. The main routine is SCP\_PROC. 
+This program was designed to do all the actual work in processing the data with
+a minimal number of parameters from the user.  Hence it is very convenient to
+use in batch. It reads three text files for its instructions. These are:
+
+\begin{description}
+
+\item [CHIP file]This is set up by the program SCP\_CHIP and describes the
+various parameters of the chip used in the observations. The file is in
+standard ASCII format and can be edited.  A description of the format and the
+parameters is given in section \ref{sec:chip_pars}.
+
+\item [PROC file] This is set up by the program SCP\_PRE and gives SCP\_PROC
+its list of commands.  The actual PROC file is a standard ASCII file and
+contains both the questions asked and  the answers given in a set format. Again
+this file can be edited if desired as long as the format is roughly maintained.
+The actual parameters will be described in section \ref{sec:proc_pars}.
+
+\item [IMAGES file]This is set up by the user and lists the frames to be
+reduced according to type (bias frame, flat field, etc). The format is quite
+simple and will be discussed in section \ref{sec:imfil}. 
+
+\end{description}
+
+SCP\_PROC generates a log file called SCP\_PROC.LIS.  This gives all the
+information you need regarding the processing of each individual frame.
+
+Because of the current state of affairs with regards to header information in
+LPO data files, it is often very difficult to find useful bits of information
+such as the exposure time.  For this reason the routine SCP\_HEAD has been
+provided.  It looks through a standard list of locations for the exposure time
+and (given that it has been found) puts it somewhere where SCP\_PROC can easily
+find it.  More on this in section \ref{sec:times}.
+
+Finally, in order to get a proper estimate of the variance for an individual
+pixel, it necessary to know the readout noise and a/d conversion for the chip
+used.  SCP\_NOISE does a statistical analysis of a series of frames in an
+attempt to derive these parameters.  This is important in the event that the
+user wishes to do something like optimal extraction where accurate error
+estimates are essential. A more complete description of this program is given
+in section \ref{sec:noise}.
+
+\section{Individual program descriptions}
+
+\subsection{SCP\_CHIP} \label{sec:chip_pars}
+
+This program sets up the CHIP file for use in SCP\_PROC. 
+Eventually there should be a standard set of these files in a standard
+directory.  Until then, the user will have to set them up for the
+individual run. The parameters are:
+
+\begin{description}
+
+\item [CHIPFILE] The name of the output CHIP file. The file extension is
+by default .SCP
+
+\item [COMMENT] A comment for the first line of the CHIP file.
+
+\item [CHIPNAME] This the name of the chip.
+
+\item [DIMS] These are the dimensions of the total data array for the chip.
+(2 values required)
+
+\item [START, END] These are the starting and ending  points in X and Y for 
+the actual data. START and END actually define the area of the chip
+where the `useful' data occurs, {\it e.g.} away from the bias strip.  They
+can also be used for defining a sub-region of the frames to be used if you 
+are not really interested in the whole data area and would like substantially
+smaller output files. (2 values required for each)
+
+\item [BSTART, BEND]  These are the starting and ending points in X and Y  for
+the bias strip.  (2 values required for each)
+
+\item [READOUT, EADU] These are the readout noise for the chip in ADUs and the
+a/d conversion in electrons per ADU.  READOUT and EADU are only really
+necessary if error arrays are ultimately wanted.  If they aren't then dummy
+values should be inserted here.
+
+\item [NUMBADC, NUMBADR, NUMBADP] These are the number of bad columns bad rows
+and bad individual pixels in the data.  The latter should not have been
+included in either of the former.  Once one of these has been entered SCP\_PRE
+will prompt for the actual locations. These are used to flag bad areas on the
+chip which SCP\_PROC will then either flag as bad or interpolate over.
+
+\end{description}
+
+Here is a sample CHIP file:
+
+\begin{verbatim}
+      ******FILE FOR EEV CCD-02-06******  
+      Chip name! EEV CCD-02-06;           
+      Dimensions! [400,590];              
+      Data region! [12:396,1:578];        
+      Bias strip! [2:6,101:500];          
+      Readout noise! 10;                  
+      Electrons per ADU! 0.65;            
+      Bad pixels! C6;300,101;             
+\end{verbatim}
+
+This is the file for a chip which has dimensions $400 \times 590$.  The data
+region runs from $(12,1)$ to $(396,578)$ and the bias strip value is to be
+calculated from $(2,101)$ to $(6,500)$. It has a readout noise and a/d
+conversion of 10 adu and 0.65 electrons/adu respectively.  It as 1 bad column
+(\# 6) and one bad pixel, $(300,101)$.  This file can be edited so long as the
+basic format remains unchanged, especially with regards to the punctuation
+marks and square brackets.
+
+\subsection{SCP\_HEAD} \label{sec:times}
+
+At the time of writing, there is no standard location within the header of an
+LPO file in which to deposit the exposure time.  SCP\_PROC would like to know
+what it is, but doesn't want to spend it's whole life searching for it.  Hence
+SCP\_HEAD was written.  What it does is to read a list of possible header
+locations for the exposure time.  It then tests these locations one by one. If
+it finds a valid value, it is deposited in a `standard' place. If the file is a
+standard FIGARO file then the location is .OBS.TIME and if it is an NDF then
+the location is .MORE.FIGARO.TIME.  The parameters are:
+
+\begin{description}
+
+\item [IMAGEFILE] This is a file with a list of images to be processed. The
+info must be in a standard format which is described in section
+\ref{sec:imfil}.
+
+\item [HEADFILE] This is the name of a file with the possible locations of the
+exposure time information.  There should be a standard file in {\tt SCP\_EXE}
+called HEAD.SCP. If you want to create your own, then this is possible too.
+
+\end{description}
+
+\subsection{SCP\_NOISE}\label{sec:noise}
+
+This program calculates the readout noise, a/d conversion and grain noise for
+the CCD used in the observations.  The frames should be bias subtracted before
+using SCP\_NOISE\footnote{It is worth noting here that the general philosophy
+behind this program is based on T.R. Marsh's program PAMNOISE.}.   A quick
+summary of the idea behind this routine goes as follows.  The error in counts
+in a CCD pixel is governed by Poisson statistics, e.g.
+
+\begin{displaymath}
+\sigma^2_x = \langle x\rangle
+\end{displaymath}
+
+CCD data also suffers from another source of noise which is caused during the
+readout phase, ({\it readout noise}).  This is roughly constant over the whole
+chip.  Finally a source of noise caused by random response variations from
+pixel to pixel ({\it grain noise}) is present in some two dimensional
+detectors.  In the case of a CCD this should be zero.  However, it has been
+included here for the sake of completeness.  To find the true variance these
+latter factors must be added in quadrature.  Thus for a given pixel the
+variance in units of electrons is:
+
+\begin{displaymath}
+\sigma^2_{e^-} = \rho^2_{e^-} + \epsilon x + \eta^2 \epsilon^2 x^2
+\end{displaymath}
+
+where $\rho$ is the readout noise, $\epsilon$ is the number of electrons
+per data number, $x$ is the value of the data at that point and
+$\eta$ is the grain noise contribution expressed as a fraction of the
+value of the data.  SCP\_NOISE uses data numbers as opposed to electrons,
+hence:
+
+\begin{displaymath}
+\sigma^2_d = \rho^2_d + x/\epsilon + \eta^2 x^2
+\end{displaymath}
+
+where $\rho_d = \rho_{e^-}/\epsilon$.
+
+Technically the independent elements in this analysis are $\epsilon$ and
+$\rho_{e^-}$, {\it not} $\rho_d$.  However this program works by fitting a
+least squares quadratic in $x$ to the above equation in order to determine the
+constants. Thus to use $\rho_{e^-}$ would make $\epsilon$ appear in the
+constant term and would therefore couple the constant term to the first order
+term.  This calls for another fitting method.  This change will be made
+sometime in the future.
+
+SCP\_NOISE first divides the area of interest on the frame into a number of
+boxes.  For each pixel in the box, an estimate of the mean and local  variance
+is calculated from the surrounding pixels.  This is then averaged over the box.
+
+Because of the nature of the curve, it is often very difficult to define both
+the readout and the a/d conversion with the same data set.  The readout comes
+from low signal data, whereas the a/d conversion comes from much higher signal
+data.  In addition there is the problem of non-uniform illumination.  If
+SCP\_NOISE is run on a typical astronomical CCD frame (say a star field) the
+smoothing boxes will sometimes contain both low signal regions (say, sky) and
+high signal regions (a star in good seeing).  This clearly will not do.  There
+are a number of ways in which this can be avoided.  One way is to use a series
+of flat field exposures of varying exposure times.  Another would be to have a
+single frame in which you could be reasonably sure of very smooth transitions
+between low and high signal regions.
+
+The parameters are as follows:
+
+\begin{description}
+
+\item [X\_RNG, Y\_RNG] This is the range in X and Y to include in the analysis.
+(2 values required for each)
+
+\item [BOX] This is the size of the smoothing box used to define the `noise'.
+(2 values required)
+
+\item [CHANGE] By default the values of the readout and a/d conversion are
+varied in the fit and the grain noise is held constant at 0. If this isn't what
+is wanted, CHANGE should be set. This parameter isn't prompted for, so this
+must be done on the command line.
+
+\item [VARKEY] These are flag which are prompted for when CHANGE has been  set.
+Answering 1 will cause a parameter to be varied in the fit and answering 0 will
+cause it to be held constant.  The order is READOUT, EADU and GRAIN. (3 values
+required)
+
+\item [READOUT, EADU, GRAIN] These are values input by the user if the
+particular parameter is to be held constant.
+
+\item [PLOT] If this is set, the a log-log plot of the noise vs. the average
+data will be plotted along with the fitted function.
+
+\item [INPUT] This is the name of any number of input files. As the analysis
+happens in a loop, each frame which is to be analysed should be entered in
+turn.  When no more frames are to be included, a single `*' signals this.
+
+\end{description}
+
+\subsection{SCP\_PRE} \label{sec:proc_pars}
+
+This program sets up the PROC file for SCP\_PROC.  The output file is in an
+ordinary ASCII file which is in a set format.  This file can be edited so
+long as that format is maintained.  The parameters are fairly large in
+number.  If not all options have been accepted, then not all of the
+parameters will be prompted for.  Hopefully this should be clear in the
+following list.
+
+\begin{description}
+
+\item [PROCFILE] This is the name of the output PROC file.  The default
+extension is .SCP.
+
+\item [BIAS, DARK, FLAT, PROG] These are flags which tell SCP\_PROC whether
+frames of these types will be processed.
+
+\item [COSMIC] This tells SCP\_PROC to have a go at zapping cosmic rays.
+
+\item [NBINS, CELL\_SIZE, THRESH] If cosmic rays are to be zapped, then these
+are the number of bins for background histogramming, the cell size used for the
+search, and the threshold in sigma for a cosmic ray event.
+
+\item [DUD] This is true if something is to be done about dud pixels, columns
+or rows.
+
+\item [DUD\_FLAG] If something is to be done about dud pixels then they can
+either be (1) replaced with an average of their neighbours or (2) just flagged
+as bad and ignored.
+
+\item [SUB\_BIAS] This indicates that a bias estimate will be subtracted.
+
+\item [SUB\_FRAME] If a bias is being subtracted then it can either be from a
+bias frame or a mean bias from an overscan strip.  SUB\_FRAME is true if  you
+want to subtract a bias frame and false if you want to use the  overscan strip
+estimate by itself.
+
+\item [BIAS\_FRAME] This has a number of uses.  If bias frames are being
+reduced, then this is the name of the output file for the mean bias frame. If a
+bias frame is being subtracted, then this is the name of the input bias frame. 
+
+\item [OVERSCAN] If a bias frame is being subtracted, it can be scaled by the
+estimate in the overscan region in order to take care of any fluctuations in
+the mean bias over the course of the night.
+
+\item [FLAT\_DIV] This is the signal to divide any program fields by a flat
+field.
+
+\item [IMAGE\_FLAT] If a flat field division is being done, then this can
+either be a flat field frame (IMAGE\_FLAT = YES) or a spectral flat field
+(IMAGE\_FLAT=N).
+
+\item [FLAT\_FIELD] This has a number of uses. If flat frames are being
+processed, then this is the output file for the mean flat field frame. If a
+flat field division is being done, then this is the input file.
+
+\item [AXIS, NORD] If a spectral flat field is being done, then  AXIS tells
+SCP\_PROC what axis is parallel to the spectral axis. Answer either  1 or 2 for
+X or Y axis. NORD is the order of the polynomial to be fit to the spectral flat
+field.
+
+\item [DARK\_COR] This is a flag to subtract out dark counts from flat or
+program fields.
+
+\item [DARK\_FRAME] This has a number of uses.  If dark frames are being 
+processed, then this is the name of the output file for the mean dark frame. If
+a dark frame is being subtracted, then this is the input file name.
+
+\item [TRIM] If this is true, then the frame is trimmed before output.
+
+\item [SIXTEEN] This is a flag to do the sixteen bit correction.
+
+\item [WANT\_ERR] If error arrays are wanted, then this should be set true.
+
+\item [SUFFIX] The output files have the same name as the input files, save for
+a suffix which is defined here. (e.g. for an input file named FILE.DST and a
+suffix \_PRO then the output file is FILE\_PRO.DST).
+
+\end{description}
+
+% Newpage command here to make the verbatim bit come out on one page.
+% If document is modified, it may need to be removed.
+
+\newpage
+
+The following is a sample PROC file:
+
+\begin{verbatim}
+          *** Procedure file ***                         
+       Process bias frames?                  ! Y         
+       Process flat frames?                  ! N         
+       Process dark frames?                  ! N         
+       Process program frames?               ! Y         
+       Subtract bias?                        ! Y         
+       Subtract bias frame?                  ! Y         
+       Do overscan correction?               ! Y         
+       Mean bias frame                       ! CCD_MBIAS 
+       Remove cosmic rays?                   ! N         
+       Number of bins for histogramming      ! 0         
+       Cell size for CR search               ! 0         
+       Threshold for CR search               ! 0         
+       Remove dud pixels?                    ! N         
+       Dud pixel replacement scheme          ! 0         
+       Divide by flat field?                 ! N         
+       Mean flat field frame                 !           
+       Image flat field?                     ! N         
+       Order of polynomial                   ! 0         
+       Axis parallel to spectrum             ! 0         
+       Do dark count correction?             ! N         
+       Mean dark count frame                 !           
+       Do 16 bit correction?                 ! N         
+       Trim resultant program frames?        ! Y         
+       Want output error arrays?             ! N         
+       Suffix for output program frames      ! _PRE      
+\end{verbatim}
+
+In this case the user has opted to process bias and program frames. The mean
+bias frame will be called SCP\_MBIAS. Bias subtraction will be done to the
+program frames.  The same mean bias frame which has been scaled to the mean
+bias in the overscan regions will be used for the bias estimate.  No cosmetic
+touch ups (cosmic ray removal, etc) will be done, no 16 bit correction will be
+done and no error arrays will be generated.  The resulting arrays will be
+trimmed before output and the output names will be the input names with the
+suffix \_PRE added.
+
+\subsection {SCP\_PROC} \label{sec:imfil}
+
+SCP\_PROC does all of the real work involved in processing the frames.
+There are only three parameters:
+
+\begin{description}
+
+\item [PROCFILE] This is the procedures file as set up by SCP\_PRE. This
+is described in more detail in section \ref{sec:proc_pars}.
+
+\item [CHIPFILE] This is the chip file as set up by SCP\_CHIP (section
+\ref{sec:chip_pars})
+
+\item [IMAGEFILE] This is a file with a list of images to be processed. The
+info must be in a standard format which is described below.
+
+\end{description}
+
+The format of the IMAGES file is very simple.  There are four types of files
+which SCP\_PROC recognises: BIAS, DARK, FLAT and PROGRAM (abbreviated,
+strangely enough, as B, D, F and P.)  These file types are not so much a
+description of what's in the data, but rather a description of how you want the
+data processed.  It may be that you have a series of flat field exposures which
+you are going to use in SCP\_NOISE. If you identify them as FLAT in the images
+file the SCP\_PROC will try to average them and form a mean flat field out of
+them, whereas what you really want is for SCP\_PROC to just subtract the bias
+and maybe try and zap the cosmic rays.  In this case you would identify these
+frames as PROGRAM.  Ok, having confused the issue, here's a sample IMAGES file.
+
+\begin{verbatim}
+      #B                               
+      BIAS1;BIAS2;BIAS3;BIAS4;BIAS5;   
+      BIAS6;BIAS7;BIAS8;BIAS9;BIAS10;  
+      #F                               
+      VFLAT1;VFLAT2;                   
+      #D                               
+      DARK1;                           
+      #P                               
+      N5929_V;M31_V;3C273_V;           
+\end{verbatim}
+
+In this file the user has ten bias frames, two flat fields, one dark frame and
+three program frames.  Note that a hash mark is used BEFORE each of the type
+designations. Note also that there MUST be a semi-colon after each file name. 
+If an error message comes up moaning about the IMAGES file, it's more than
+likely that it's one of these two things which is missing somewhere. Other than
+that, it's all very simple.
+
+A description of how the non-program frames are processed is given in section
+\ref{sec:proc_flat}.  The processing of the program frames is straight-forward
+and should need no explanation.
+
+\section{Processing Bias, Dark and Flat Frames} \label{sec:proc_flat}
+
+In this section a description is given as to how the non-program files are
+processed.  This is not a description of the things like the cosmic ray
+rejection algorithm, etc., but rather more of a description of the method  used
+in averaging these types of frames.
+
+\subsection{Bias Frames}
+
+The mean bias frame is just a straight forward average over the number of
+frames involved, with one exception; if data has been flagged as bad, it is
+ignored. Thus:
+
+\begin{displaymath}
+\overline{B}_{ij} = \sum_{k=1}^{N_F} {B_{kij} \over N_{Pij}}
+\end{displaymath}
+
+where $N_F$ is the number of frames, $N_{Bij}$ is the number frames with a bad
+data value at pixel $i,j$ and $N_{Pij} = N_F - N_{Bij}$.
+
+\subsection{Dark and Flat Frames}
+
+Both Dark and Flat frames are first divided by their exposure times.  Then they
+are averaged.  If the user has specified that error arrays should be generated,
+then the averaging is done by a weighted sum where the weight for an individual
+pixel is the reciprocal of its variance.  If no error arrays are desired, then
+the weights are uniform.  Thus an output processed dark frame will be in units
+of ADUs per pixel per second.  The flat frames have one more step through which
+to go.  The average (clipped at the $3\sigma$ level) over the data area of the
+mean flat frame is found.  Then the mean frame is normalised by this average. 
+This is to ensure that the number of counts in any program frame which will be
+divided by this flat field is roughly conserved.
+
+\section{A Recipe}
+
+In this section a recipe for using this software is described.  
+
+\begin{enumerate}
+
+\item The first thing is to decide whether the noise parameters for the chip
+are required. If error arrays are wanted and the noise parameters aren't
+already known, then the answer here is clearly `yes'. If not, then skip to
+item \ref{it:noerr}.
+
+\item Use SCP\_CHIP to define all the parameters of the chip except the noise
+parameters --- these can have dummy values.  
+
+\item Create an IMAGES file with the bias frames (if those are  to be used for
+the bias estimates) and the flat frames. However, make sure that the flat
+frames are listed in the IMAGES file as program frames.  
+
+\item Run SCP\_PRE and have it set up a PROC file to subtract the bias and do
+any cosmetic things which might be wanted.  
+
+\item Run SCP\_HEAD to get the exposure times into the headers of the flat
+frames.
+
+\item Run SCP\_PROC to process the flat frames.
+
+\item Run SCP\_NOISE to yield the desired noise parameters.
+
+\item \label{it:noerr} Run SCP\_CHIP. Include the noise parameter estimates if
+they are required or dummy values if they are not.
+
+\item Create an IMAGES file with all the frames which are to be reduced.  
+
+\item Run SCP\_PRE to create a PROC file with the complete procedure as  it is
+wanted.
+
+\item Run SCP\_HEAD to make sure the exposure times are now in all the
+frames' headers.
+
+\item Finally run SCP\_PROC to do the final processing.
+
+\end{enumerate}
+
+\end{document}

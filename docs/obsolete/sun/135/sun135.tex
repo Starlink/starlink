@@ -1,0 +1,146 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {135.2}
+\newcommand{\stardocauthors}   {P M Allan}
+\newcommand{\stardocdate}      {6 February 1992}
+\newcommand{\stardoctitle}     {LOG --- A logical name utility \\ [1ex]Version 1.1}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Overview}
+
+This document describes a utility to add an item to a VMS logical name search
+list. The utility may be joined by others in the future.
+
+\section{Introduction}
+
+Occasionally it is necessary to add an item to a logical name search list.
+Surprisingly, there is no simple way of doing this from DCL. The command
+procedure {\tt ADD\_TO\_SEARCH\_LIST} has been written to perform this task.
+The procedure has four parameters; two mandatory and two optional. These are as
+follows:
+
+\begin{itemize}
+\item The first parameter is the logical name to be created or modified. 
+\item The second parameter is the item to be added to the search list. 
+\item The third (optional) parameter indicates in which logical name table the
+search list should be created.
+\item The fourth (optional) parameter indicates whether the new item should be
+added at the beginning or the end of the current list. The default is to add
+the new item at the end. If the fourth parameter is BEGIN then the new item
+will be added at the beginning of the list. If the fourth parameter is COPY,
+then the search list will be copied from the current logical name table to the
+one specified by the third parameter, without change. In this case the second
+parameter is ignored.
+\end{itemize}
+
+If the logical name does not already exist, then the command procedure will
+create it.
+
+Here is an example of building up a search list.
+
+\begin{verbatim}
+      $ @UTILITYDIR:ADD_TO_SEARCH_LIST C$INCLUDE EMS_DIR
+      $ @UTILITYDIR:ADD_TO_SEARCH_LIST C$INCLUDE CNF_DIR
+      $ @UTILITYDIR:ADD_TO_SEARCH_LIST C$INCLUDE CHR_DIR
+\end{verbatim}
+
+Typing {\tt SHOW LOGICAL C\$INCLUDE}  will now give 
+
+\begin{verbatim}
+      "C$INCLUDE" = "EMS_DIR" (LNM$PROCESS_TABLE)
+           = "CNF_DIR"
+           = "CHR_DIR"
+
+    1  "EMS_DIR" = "STARDISK:[STARLINK.LIB.EMS.STANDALONE]" (LNM$SYSTEM_TABLE)
+    1  "CNF_DIR" = "STARDISK:[STARLINK.LIB.CNF]" (LNM$SYSTEM_TABLE)
+    1  "CHR_DIR" = "STARDISK:[STARLINK.LIB.CHR]" (LNM$SYSTEM_TABLE)
+\end{verbatim}
+
+Note that since the items in the search list are themselves logical names, the
+fully recursive translation of those items is also given. The above example is
+not realistic in the sense that you could define the search list much more
+simply with a single DEFINE command. However, if the individual additions to
+the list are spread around several command procedures, then such a sequence is
+the easiest way to create the search list.
+
+\section{Different Logical Name Tables}
+
+The third parameter of the command procedure can be given as PROCESS, JOB,
+GROUP, SYSTEM or as the name of another logical name table. If this parameter
+is specified, then a new logical name will be created in the table specified.
+If it is not specified, then logical name is created in the table that it is
+already in, if it exists, and in the process table if it does not. This means
+that if you wish to add an item to a system search list, but have the result
+in your process table, then you must specify PROCESS for the third parameter.
+
+There is one exception to the rule that the new item is added to the current
+logical name table or to the one specified by the third parameter. If the user
+does not have the required privilege to create or modify the logical name, then
+the search list is created in the process logical name table. For example, if a
+logical name exists in the system table and you try to modify it without SYSNAM
+privilege, then the logical name search list will be copied to your process
+logical name table where it will have the new item added.
+
+The third parameter does not affect the logical name tables that get searched
+for the translation of the current logical name, if it exists.
+
+\section{Changes from version 1.0}
+
+In version 1.0 of this utility, the function of the fourth parameter was
+slightly different. If it was not specified, then the new item was added at the
+end of the search list (this behaviour has not changed), but if is was anything
+else, then the new item was added to the beginning of the search list. Also,
+you could not copy a search list from one logical name table to another
+unchanged.
+
+The behaviour is now such that if the fourth parameter not specified, or is
+anything other than BEGIN or COPY, then the new item is added at the end of the
+search list.
+
+\end{document}

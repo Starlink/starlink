@@ -1,0 +1,2051 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {159.1}
+\newcommand{\stardocauthors}   {M. McSherry\footnote{Prepared for release
+ by M D Lawden.}}
+\newcommand{\stardocdate}      {19 January 1993}
+\newcommand{\stardoctitle}     {XRP --- SMM XRP Data Analysis \& Reduction
+Package}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+\newpage
+
+\normalsize
+
+\newpage
+
+\section{Overview}
+
+\subsection{Introduction}
+
+This manual describes the various programs that are  available for the
+reduction and analysis of XRP data. These programs have been developed under
+the VAX operating system. The original programs are resident on a
+VaxStation~3100 at the Solar Data Analysis Center (NASA/GSFC Greenbelt MD).
+Further information about these programs can be obtained by contacting
+15833::ZARRO on DECNET (formerly SPAN).
+
+Some programs are to be run from DCL level, while others are to be run from
+IDL.  A short description of XRP data files and how to  access them is given in
+the following pages. XRP data files consist of both header and data
+information. The header is usually contained in the first record of the data
+file, and contains information describing the data.  The header and data are
+generally written as unformatted records and cannot be edited with EDT or any
+other text editor. 
+    
+\subsection{Description of the XRP Instrument}
+
+The primary objective of the X-Ray Polychromator (XRP) on the Solar Maximum
+Mission (SMM) was the study of the physical conditions in the corona for a
+variety of solar phenomena. This was achieved through the use of two
+complementary instruments: the Bent Crystal Spectrometer (BCS) and the Flat
+Crystal Spectrometer (FCS). The XRP acquired data during the peak of solar cycle
+21 (February to November 1980), during its decline (following the in-orbit
+repair of SMM in April 1984), and through the rise phase of cycle 22 (until
+October 1989). 
+
+\subsubsection{The BCS Instrument}
+
+The characteristics of the BCS are listed in Table A. The BCS was designed to:
+\begin{itemize}	
+\item	 monitor the spatially integrated fluxes in 8 high-temperature soft 
+	  X-Ray emission lines produced by the flare plasma;
+
+\item	 Measure line broadening and shifts for flare dynamics;
+
+\item	 Measure temperature, emission measure, abundances, and equilibrium 
+	  states to characterise the physical conditions in the flare plasma.
+
+\end{itemize}
+ 
+The BCS had eight bent Bragg crystal spectrometers with position-sensitive
+detectors. It was collimated to 6 arcmin FWHM and was capable of changing its
+time resolution from 11~s to 0.5~s or less by using dynamic memory and
+sacrificing spectral coverage or resolution. The BCS was sensitive to the 
+high-temperature ($T_e$ $>$ 10 MK) component of the flare plasma. Most of the
+BCS data were taken in the standard flare mode, which recorded spectra every 11
+or 7.6~s (depending on the number of operational channels) until a specified
+threshold was reached. In flare mode, the integration time decreased to
+3.6~s. 
+
+\begin{center}
+                     Table A: BCS Characteristics
+\bigskip
+\begin{tabular}{||l l l l l ||}
+\hline
+{\bf Channel} &  {\bf Ion Stage} &   {\bf Wavelength}  &   {\bf Peak $T_e$} & 
+{\bf Resolution} \\
+{\bf Number}  &                  &         (A)         &   (MK)  &(E/$\delta E$)  \\
+\hline
+   1  &    Ca XIX          &  3.165 - 3.231   &    35     &        5000  \\
+   2  &    Fe (inner shell)&  1.928 - 1.945   &     2     &       14000  \\
+   3  &    Fe (inner shell)&  1.839 - 1.947   &     2     &        4500  \\
+   4  &    Fe XXV          &  1.840 - 1.984   &    50     &        4500  \\
+   5  &    Fe XXV          &  1.866 - 1.879   &    50     &       10000  \\
+   6  &    Fe XXV          &  1.854 - 1.867   &    50     &       10000  \\
+   7  &    Fe XXV          &  1.842 - 1.855   &    50     &       10000  \\
+   8  &    Fe XXVI         &  1.769 - 1.796   &    60     &        8000  \\
+\hline
+\end{tabular}
+\end{center}
+ 
+After 1980, BCS channels 2 and 8 no longer functioned. Most of the BCS analysis
+software has been written for Channels 1 (the Ca XIX channel) and 4 (the
+low-resolution Fe XXV channel). 
+
+\subsubsection{The FCS Instrument}
+
+The FCS characteristics are listed in Table B. The FCS was designed to:
+\begin{itemize}
+\item	 Image soft X-rays emitted over a wide range of coronal 
+	  temperatures (from 2-70~MK, i.e., from coronal active regions to
+	  flares) so as to find the flare site in relation to its parent active
+	  region and follow the evolution of both;
+
+\item	 Obtain high resolution spectra from 1.5-23\AA to determine plasma 
+	  temperatures, emission measure, density, abundances, and dynamics;
+
+\item	 Monitor the evolution of X-ray fluxes with up to 0.256~s time 
+          resolution.
+\end{itemize}
+ 
+The FCS was a seven-channel Bragg crystal spectrometer built on a raster
+mechanism. The FCS contained an optical sensor in channel 8 (with a small known
+offset from the X-ray detectors) which could be used for image co-registration.
+The FCS isolated specific areas in the corona for study through its narrow
+collimation  (12-16~arcsec FWHM response, depending on the detector), 
+producing modest spatial resolution images or well-resolved X-ray spectra. At
+the ``home position'' (HP) of the wavelength drive, each X-ray channel could
+monitor the emission from a prominent soft X-ray line. By scanning its
+wavelength drive, the FCS could access an even wider range of soft X-ray lines.
+The FCS could image an area up to 7 arcmin square in up to six bright spectral
+lines simultaneously, make rapid scans over a wide wavelength range or at high
+resolution across individual line complexes, or combine the two modes to make
+spectroscopic observations over a predetermined area. 
+
+The FCS could interchange time resolution, spatial coverage and sampling,
+and/or spectral coverage and sampling. The FCS was run in a large number of
+operational modes that took advantage of its capabilities.  Most observations
+included imaging an area of several square arcmin at HP or in a bright line in
+a single channel, such as Fe~XVII at 15.01\AA in Channel 1; images were built
+up  from boustrophedonic raster scans (with successive rows in alternate 
+directions), with a typical exposure at each pixel of about 1 second. Thus, 
+for example, a 4 x 4 arcmin image with 10~arcsec pixels took about 10~mins to
+acquire; a 3 x 3 arcmin image with 10~arcsec pixels or a 4 x 4 arcmin image
+with 15 arcsec pixels took about 5~mins.  A standard observing sequence began
+with a survey image to locate the brightest pixel in a given line, then
+centered on a series of (typically smaller) rasters around that pixel, or
+recorded time histories at that pixel, or initiated scans of the wavelength
+drive there or at a set of adjacent pixels. Receipt of a flare flag, generally
+from the BCS, could interrupt the default mode and replace it with one or more
+branching sequences in response to the flare, including maps to update the
+bright pixel and attempts to initiate wavelength scans if specified criteria
+were met. 
+
+About 400 FCS observations using the wavelength drive (``crystal runs'') were
+executed during the mission. These included scans of individual profiles at one
+or more spatial locations, taking 10-30~s each; scans of line complexes
+(such as density-diagnostic triplets), taking on order of 1-2~mins; and long
+spectral scans of all the accessible wavebands, taking on order of 10-20~mins.
+Several sequences combined images in bright lines at several wavelength drive
+positions with scans of the corresponding line profiles at the brightest pixel.
+Some of the FCS sequences (designed to study active regions or quiescent solar
+structures) were run in a ``standalone mode''. Most of the remaining sequences
+(designed to study flares) were triggered by a flare flag from the BCS. 
+
+\begin{center}
+                     Table B: FCS Characteristics
+\medskip
+\begin{tabular}{||l l l l l l l ||}
+\hline
+{\bf Channel} & {\bf HP Ion} & {\bf Wavelength} & {\bf Peak $T_e$} &  {\bf Scan 
+Extent} & {\bf Resolution} &    {\bf  FOV}  \\
+{\bf Number} &  {\bf Stage}  &   (A)   &    (MK)     &   (A)    & ($E/\delta E$) 
+&  (arcsec)\\
+\hline
+   1 &    O VIII & 18.969  &      3  &   13.1 - 22.4  &    1000  &        16  \\
+   2 &    Ne IX  & 13.447  &      4  &   10.5 - 14.9  &    2500  &        15  \\
+   3 &    Mg XI  &  9.169  &      6  &    7.3 - 10.1  &    8000  &        14  \\
+   4 &    Si XIII &  6.649  &     10 &     4.9 -  7.6 &    5500  &        14  \\
+   5 &    S XV   &  5.039  &     16  &    3.6 -  5.8  &   10500  &        13  \\
+   6 &    Ca XIX &  3.173  &     35  &    2.4 -  3.6  &    8000  &        12  \\
+   7 &    Fe XXV &  1.850  &     50  &    1.4 -  2.1  &    25000 &        14  \\
+\hline
+\end{tabular}
+\end{center}
+
+FCS Channel 6 (Ca XIX) was misaligned with respect to the other detectors, so
+that Ca XIX was offset from HP. After 1980, this channel no longer functioned.
+After February 1985, engineering data was output into the telemetry 
+for Channel 6. In early 1985, FCS Channel 2 (Ne~IX) was lost, so that coverage 
+of the Ne~IX complex was available only at the short wavelength end of Channel
+1. Soon thereafter, the Channel 2 telemetry was replaced with telemetry from
+the FCS optical sensor \# 8 to allow higher spatial sampling of its output. By
+1987, the FCS thin-window detectors began to run out of gas, so that they were
+used only intermittently in a ``campaign mode''.  By May 1989, only the 
+high-energy FCS channels remained, so that the FCS became restricted to flare
+studies. After December 1987, the wavelength drive experienced increasing
+problems. No FCS spectroscopic sequences were run successfully after April
+1988. 
+
+For further details of the XRP instrument design and operational capabilities,
+see Acton et al., Solar Physics, 65, 53-71, 1980. Instrumental considerations
+such as calibration, sensitivity, alignment, fluorescence, and background are 
+discussed by Bentley (Ph.D. thesis, Department of Physics and Astronomy,
+University College London, 1986). 
+
+The XRP was built by a consortium of three groups: Lockheed Palo Alto Research
+Laboratory (now Lockheed Solar and Astrophysics Laboratory); Mullard Space
+Science Laboratory; and Rutherford Appleton Laboratory. The research carried
+out with the XRP data has been supported mainly by NASA contracts and grants,
+UK-SERC grants, and the Lockheed Independent Research Programme. 
+
+\newpage
+
+\subsection{Description of XRP Data Files} 
+
+The XRP software described in this manual operates on a variety of
+file types. Different file types contain different levels of processed
+data ranging from raw detector count rates to actual solar physical parameters.
+These file types are listed below.
+
+\begin{center}
+\begin{tabular}{||l l||}
+\hline
+       {\bf File type} & {\bf Description}\\
+\hline
+                   &            \\                            
+
+ {\em BCSDA} & {\bf Bent Crystal Spectrometer Data ---} Detector count rates \\
+                    & for the eight BCS channels. \\
+                    &            \\                            
+  
+ {\em FCSDA} & {\bf Flat Crystal Spectrometer Data ---} Detector count rates \\
+                    & for the eight FCS channels. \\
+                    &            \\                 
+
+ {\em BCSIX} & {\bf Bent Crystal Spectrometer Index  ---} An index file \\
+                   & providing pointers to the data in the BCSDA file.\\
+                   &                                \\
+
+ {\em FCSIX} & {\bf Flat Crystal Spectrometer Index ---} An index file  \\
+                    & providing pointers to the data in the FCSDA file.\\
+                    &  \\                                                     
+
+ {\em ENG} & {\bf Engineering ---} An engineering log file containing detector \\    
+     &   parameters (e.g. FCS crystal temperature, crystal address, etc). \\
+     &  \\
+
+ {\em SPS} & {\bf Spacecraft Pointing Subcom ---} A spacecraft pointing 
+log \\
+                  & containing attitude information (e.g. pitch, yaw, and roll) \\
+                    &                               \\     
+
+ {\em BDA} & {\bf BCS Data ---} The BCSDA and BCSIX files combined. \\
+                   & \\
+
+ {\em FDA} & {\bf FCS Data ---} The FCSDA and FCSIX files combined. \\
+                         &                             \\
+
+ {\em BRR} &    A keyed-access file (VMS only) containing BCS spectra \\
+                         &  selectively extracted from BDA files \\
+                         &  \\
+
+ {\em FIS} & {\bf FCS Images and Spectra ---} An unformatted file containing \\
+                         & image and/or spectra extracted from FDA files.\\
+                         &                             \\
+
+ {\em SPC} & {\bf Spectral Data ---} A keyed-access file consisting of\\
+                         & model Calcium and Iron line spectra fitted to data in\\
+                         & the BRR files. \\
+                         &                             \\
+
+ {\em FIT} & {\bf Fitted parameters ---} An ASCII file containing various \\     
+                        & physical parameters (e.g. $T_e$, $EM$, $v_{turb}$) \\
+                         & derived from spectral fits to the BRR spectra. \\
+                         &                             \\         
+\hline                                                                         
+\end{tabular}
+\end{center}
+
+\newpage
+
+The BCSDA and FCSDA files are considered {\it old format} files in the sense
+that the software to read them is no longer supported. These files (together
+with the ENG and SPS files)  are created by the REFORMAT program, which copies 
+XRP data from exabyte tape to disk.  The naming convention of these files is
+{\bf BCSDAHHMM.DOY}, {\bf FCSDAHHMM.DOY} etc where:
+
+\begin{itemize}
+\item     hh  --- start hour of data
+\item     mm  --- start minute of data (approx)
+\item     doy --- day of year of data
+\end{itemize}   
+
+The BDA and FDA files are considered {\it new format} files and are created  by
+the programs BOTON and FOTON, respectively. The latter programs  combine the 
+index and data information into a single new file and also switch  the naming
+convention to {\bf BDAYYMMDD.HHMM} and {\bf FDAYYMMDD.HHMM} where:
+
+\begin{itemize} 
+\item     yy  --- year of data
+\item     mm  --- month of data
+\item     dd  --- day of data 
+\item     hh  --- start hour of data 
+\item     mm  --- start minute of data (approx)
+\end{itemize}  
+
+FOTON will include the engineering and pointing information in the FDA file. 
+BOTON does not include this information in the BDA file. A set of FDA and BDA
+files has been created  for approximately 400 FCS spectroscopic observations
+and over 700 BCS observations for which the count rate in the Ca~XIX channel
+exceeded  a threshold of 250 counts/sec (equivalent to a GOES mid-class C
+event). These files comprise the XRP Selected Data Archive (SDA) and are
+written onto two sides of a WORM optical disk which is stored at the SDAC.
+
+The FIS and BRR files  are processed files that contain selected spectra (for
+BRR) or images and spectra (for FIS). These files are created from the FDA and
+BDA files using the programs MKFIS and MKBRR, respectively. The bulk of the IDL
+software described in this manual operates on these files. The following
+flowchart illustrates the steps taken in going from the FCSDA and BCSDA files
+to the FIS and BRR files:
+
+\clearpage
+\setlength{\unitlength}{1.0pt}
+\begin{figure}
+\begin{center}
+\begin{picture}(150,300)
+\thicklines
+\put (-16,450){\Large \bf XRP Package Flow Chart}
+\put (-20,370){\framebox(200,45){\Huge REFORMAT \small (F/I)}}
+\put (-180,230){\framebox(190,35){\Large \it BOTON \small (F)}}
+\put (170,230){\framebox(160,35){\Large \it FOTON \small (F)}}
+\put (185,110){\framebox(120,30){\large \it MKFIS \small (F)}}
+\put (-50,110){\framebox(90,25){\large \it PLOTBDA \small (I)}}
+\put (-150,110){\framebox(90,25){\large \it MKBRR \small (F)}}
+\put (55,-10){\framebox(75,20){\large \it LISFIS \small (F)}}
+\put (145,-10){\framebox(75,20){\large \it PLOTFIS \small (I)}}
+\put (255,-10){\framebox(75,20){\large \it FTEMAP \small (I)}}
+\put (255,-70){\framebox(75,20){\large \it PLOTFTE \small (I)}}
+\put (-150,40){\framebox(75,20){\large \it CALBRR \small (F)}}
+\put (-60,40){\framebox(75,20){\large \it PLOTBRR \small (I)}}
+\put (30,40){\framebox(75,20){\large \it LISBRR \small (F)}}
+\put (-150,-10){\framebox(75,20){\large \it SPECFIT \small (F)}}
+\put (-150,-70){\framebox(80,20){\large \it PLOTFIT \small (I)}}
+\put (-200,-120){\framebox(85,25){\large \it BCS \small (I)}}
+\put (140,-120){\framebox(85,25){\large \it FCS \small (I)}}
+\put (-12,370){\line(0,-1){40}}
+\put (173,370){\line(0,-1){39}}
+\put (-12,330){\line(-1,0){148}}
+\put (173,330){\line(1,0){140}}
+\put (190,330){\vector(0,-1){63}}
+\put (165,300){\circle{30}}
+\put (153,297){fcsda}
+\put (190,300){\line(-1,0){9}}
+\put (229,330){\vector(0,-1){63}}
+\put (210,300){\circle{25}}
+\put (203,297){eng}
+\put (229,300){\line(-1,0){7}}
+\put (-40,330){\vector(0,-1){63}}
+\put (-18,300){\circle{30}}
+\put (-32,297){bcsix}
+\put (-40,300){\line(1,0){6}}
+\put (-160,330){\vector(0,-1){63}}
+\put (-180,300){\circle{30}}
+\put (-192,297){bcsda}
+\put (-160,300){\line(-1,0){4}}
+\put (270,330){\vector(0,-1){63}}
+\put (250,300){\circle{25}}
+\put (244,297){sps}
+\put (270,300){\line(-1,0){7}}
+\put (312,330){\vector(0,-1){63}}
+\put (292,300){\circle{28}}
+\put (283,297){fcsix}
+\put (312,300){\line(-1,0){6}}
+\put (-105,230){\line(0,-1){27}}
+\put (-10,230){\vector(0,-1){93}}
+\put (-105,186){\circle{30}}
+\put (-117,183){BDA}
+\put (-169,186){\line(1,0){49}}
+\put (-89,186){\line(1,0){79}}
+\put (-105,170){\vector(0,-1){33}}
+\put (250,230){\vector(0,-1){88}}
+\put (278,186){\circle{30}}
+\put (266,183){FDA}
+\put (250,186){\line(1,0){12}}
+\put (-170,230){\vector(0,-1){322}}
+\put (-140,86){\circle{27}}
+\put (-152,83){BRR}
+\put (-126,86){\line(1,0){20}}
+\put (290,110){\line(0,-1){28}}
+\put (290,50){\vector(0,-1){38}}
+\put (290,-10){\vector(0,-1){38}}
+\put (315,-30){\circle{25}}
+\put (309,-33){fte}
+\put (290,-30){\line(1,0){13}}
+\put (290,110){\vector(-2,-1){191}}
+\put (290,110){\vector(-1,-1){97}}
+\put (290,110){\vector(-1,-2){101}}
+\put (-106,110){\vector(0,-1){48}}
+\put (-106,110){\vector(3,-2){70}}
+\put (-106,110){\vector(4,-1){185}}
+\put (291,66){\circle{30}}
+\put (282,63){FIS}
+\put (-106,40){\vector(0,-1){28}}
+\put (-85,25){\circle{20}}
+\put (-92,22){cal}
+\put (-106,25){\line(1,0){11}}
+\put (-132,-10){\vector(0,-1){38}}
+\put (-153,-30){\circle{25}}
+\put (-160,-33){spc}
+\put (-141,-30){\line(1,0){9}}
+\put (-91,-10){\vector(0,-1){38}}
+\put (-69,-30){\circle{25}}
+\put (-76,-33){fit}
+\put (-82,-30){\line(-1,0){9}}
+\put (-100,-160){\em Square boxes refer to command routines; the circles are the input/output files.}
+\put (-100,-175){\em BCS programs are listed on the left; FCS programs on the right.}
+\put (-100,-190){\em Fortran programs are denoted by (F); IDL programs by (I)}
+\end {picture}
+\end{center}
+\end{figure}
+\clearpage
+\setlength{\unitlength}{1mm}
+\newpage
+
+\subsection{Summary of XRP Software}
+
+\subsubsection{Fortran Data-reduction Programs}
+
+\begin{description}
+\item [BCS Programs:]\hfill
+\begin{description}
+\item[BOTON --- ]          Creates BDA files from BCSDA and BCSIX files.
+\item[MKBRR --- ]          Creates BRR files from BDA files.
+\item[LISTBRR --- ]         Lists the contents of a BRR file.
+\item[CALBRR --- ]         Performs a wavelength calibration for BRR spectra.
+\item[SPCFIT --- ]        Fits BCS channel 1 or 4 with model spectra.
+\item[BCSPRO --- ]         Sets up a command file to run MKBRR, CALBRR, SPCFIT.
+\end{description}
+\item [FCS Programs:]\hfill
+\begin{description}
+\item[FOTON --- ]          Creates FDA files from FCSDA, FCSIX, ENG and SPSub files.
+\item[MKFIS --- ]          Creates FIS files from FDA files.
+\item[LISTFIS --- ]         Lists the contents of a FIS file.
+\end{description}
+\end{description}
+
+\subsubsection{IDL Data-analysis Programs}
+
+\begin{description}
+\item [BCS Programs:]\hfill
+\begin{description}
+\item[PLOTBDA --- ]       Plots lightcurves and spectra from BDA files.
+\item[PLOTBRR --- ]       Plots BRR spectra.
+\item[PLOTFIT --- ]       Plots FIT files from BCSPRO.
+\end{description}
+\item [FCS Programs:]\hfill
+\begin{description}
+\item[PLOTFIS --- ]       Plots FIS spectral data files.
+\item[RDFIS --- ]         Reads FIS image files.
+\item[RUST --- ]         Reads and unpacks data and pixel coordinates arrays
+ for images saved in a structure variable created by RDFIS.
+\item[FLUXCAL --- ]       Calibrates FCS counts/sec to flux 
+ (photons $s^{-1} cm^{-2}$) in a given channel.
+\item[FTEMAP --- ]        Computes the isothermal temperature and column
+ emission from the ratios of the FCS ion Maps.
+\item[PLOTFTE --- ]       Plots temperature and emission measure maps saved in
+ FTE.
+\item[TEMPCAL --- ]       Plots emissivity ratios.
+\item[EMRAT --- ]         Plots emissivity ratios.
+\end{description}
+\end{description}
+
+\subsubsection{IDL X-Windows/Widget Programs}
+
+\begin{description}
+\begin{description}
+\item[FCS --- ]          Creates a widget interface to run FCS software.
+\item[BCS --- ]          Creates a widget interface to run BCS software.
+\item[LISTBCS --- ]      Creates a widget interface to the  BCS catalog of
+ flares.
+\item[SCANPATH --- ]     Reads and extracts procedures within the XRP library.
+\end{description}
+\end{description}
+
+\subsection{Getting started --- some examples for new users}
+
+This section shows you how to get started.
+Logical names are defined which allow you to access one .FIS and one .BDA file
+within the demo directory XRP\_DIR:[XRP.DBASE.DEMO].
+Commands which you should type are shown after the `XRPIDL$>$' prompt.
+\begin{itemize}
+\item Enter the XRP package:
+\begin{verbatim}
+    $ XRP
+    XRP$> idl                                    ! Enter IDL environment
+\end{verbatim}
+\item Examine a .FIS file via an X-Windows image display:
+\begin{verbatim}
+    XRPIDL> FCS                             
+\end{verbatim}
+\item Examine a .FIS file image via a non-X-Windows display:
+\begin{verbatim}
+    XRPIDL> PLOTFIS                        
+\end{verbatim}
+\item Examine a .FIS file spectra via a non-X-Windows display:
+\begin{verbatim}
+    XRPIDL>PLOTFIS
+\end{verbatim}
+\item Examine a .BDA file via an X-windows image display:
+\begin{verbatim}
+    XRPIDL> BCS                             
+\end{verbatim}
+\item Examine a .BDA file via a non-X-Windows display:
+\begin{verbatim}
+    XRPIDL> PLOTBDA
+\end{verbatim}
+\end{itemize}                                       
+
+\subsubsection{REFORMAT}
+
+{\em To run this program type:}
+\begin{verbatim}
+    XRP$> REFORMAT                  
+\end{verbatim}
+ This program consists of a command procedure designed to reformat XRP data.
+ It runs several other programs in sequence namely DUMPEXB, RFTCTL, SORTEXB,
+ and BOTON or FOTON (each step can be skipped if necessary). 
+ The program can be divided up into four Phases:
+\begin{itemize}
+\item	{\bf Phase 1: }
+	The IDL-V2 procedure DUMPEXB extracts the relevant data from a XRP raw data Exabyte tape.	
+	The data are stored in the files assigned to the logicals DMPFL1 and DMPFL2 (in that order).
+	The DUMPEXB actions are registered on a file COPYEXB.TXT
+	If the requested data are already present in existing dump files this phase can be skipped.
+\item	{\bf Phase 2: }
+	The F77 executable RFTCTL is run to define the exact time range and type of data to be 
+	reformatted. This information is stored on the file SCRTNspec, where `spec' stands for some 
+	label specified by the user; usually it will be in the format HHMM.DOY (i.e. Day of Year, Hours 
+	and Minutes of the start time of the requested data period).
+	If the proper SCRTN file is already known to exist, this phase can be skipped.
+\item	{\bf Phase 3: }
+	The actual reformatting is preceded by:
+	1. Selection of the directory where the reformatted files should be put.
+	2. Making sure that the dumpfile with the requested data is assigned to DMPFL1; this may involve 
+	   interchanging the assignments of the logicals DMPFL1 and DMPFL2.
+	The F77 executable SORTEXB is run next; this does the actual reformatting and will produce output
+	files FCSDAspec, FCSIXspec, BCSDAspec, BCSIXspec, SPSUBspec and ENGspec.
+	If these files already exist, this phase can be skipped.
+\item	{\bf Phase 4: }
+	The procedure FOTON is run; this combines the FCSDA,FCSIX,ENG 
+        and SPS files into an FDA file. Or if you require BCS data 
+        BOTON is run combining BCSDA and BCSIX files into a BDA file.
+\end{itemize}
+        As the program is proceeding through its four phases the 
+	user will be prompted for a number of responses (default choices are give between brackets and 
+	are selected by hitting return):
+\begin{itemize}
+\item	{\bf Phase 1: }
+This phase commences with the question:
+\begin{verbatim}
+        Run DUMPEXB to read XRP raw exabyte tape.
+        If DUMPEXB is skipped, reformatting continues
+        using the data currently stored in the dump files
+
+ Run DUMPEXB (YES/NO) [def=NO]?
+\end{verbatim}
+You must enter YES the first time in order to read and copy the data. This copy
+is performed by the IDL procedure DUMPEXB which extracts the relevant data (in
+24 hour blocks) from exabyte to magnetic disk.  The data will be stored in two
+dump files that are assigned automatically to the logicals DMPFL1 and  DMPFL2.
+(The second file is used in case the requested data interval spans midnight.)
+If the requested data are already present in existing dump files, then this
+phase can be skipped by answering NO.
+
+If YES, then you must first load  the exabyte tape corresponding to
+the month containing the required data. You will then be asked to enter the
+number corresponding to the tape drive in which the exabyte is loaded. DUMPEXB
+will mount this drive and then present the following
+menu:
+\begin{verbatim}
+        select option:
+                0 - dump file
+                1 - skip files
+                2 - rewind input tape
+                9 - stop
+        option ?
+\end{verbatim}
+Before copying any data, you must first skip the requisite number of files to
+reach the start record of the required day on tape. Option 1  allows you to
+skip a specified number of files (days) on the tape.  The day of year (DOY)
+currently available for dumping is given on the line  preceding the menu
+(starting with the word LABEL). If  the DOY indicated on the  LABEL line is N,
+then skipping of M files will take you to the start of  DOY N+M. Selection of
+option 1 will be followed by a prompt for the number of  files (days) to be
+skipped. At most five files can be skipped in one go.
+
+Option 0 will dump one or two files (one file contains one day of data)  into
+the dump files.  Selection of option 0 will be followed by a prompt for the
+number of  files (days) to be dumped. One or two files (days) can be dumped;
+the first will be dumped into  DMPFL1, the second into DMPFL2. To conserve
+space, it is recommended that only one file (day) be dumped at a time,
+unless the interval of interest extends into the subsequent day.
+
+Option 2 will rewind the tape and option 9 will exit DUMPEXB. All choices
+(including typing errors) except 9 will eventually return  you to the menu.
+
+\item{\bf Phase 2}:
+
+After DUMPEXB has completed copying data onto disk, you can extract
+the time interval of interest from the created dump files by
+answering YES to the following question:
+\begin{verbatim}
+        Information about the data to be reformatted is stored in
+        a SRTCN* file.  If the required SRTCN* file is available
+        already, answer NO.
+
+  Select new set of reformat times (YES/NO) [def=YES]?
+\end{verbatim}
+The answer NO will take you to phase 3. The answer YES will be
+followed by a number of prompts describing how you would like the data
+reformatted. The first prompt is for a file ID to be used in naming the output
+reformatted files:
+\begin{verbatim}
+        File ID [hhmm.DOY] ?
+\end{verbatim}
+There is no default for this question. You will be prompted until you
+have entered some ID. The most convenient choice is an eight letter ID,  like
+0510.123 for data starting on 05:10 UT on day of year 123. Next, you will be
+asked  whether or not you want BCS and/or FCS data,  and for a start and stop
+time for each data set. This information will be stored in the file
+SRTCNhhmm.doy. It is very important that you do not select a time interval
+that is longer than  two hours as this will cause integer overflows in the
+software. Hence, for time intervals exceeding two hours,  it is recommended to
+partition the intervals into several sub-intervals of less than two hours
+duration.
+
+\item{\bf Phase 3}:
+
+This is the actual reformatting phase. You will be asked:
+\begin{verbatim}
+        If the required reformatted files exist already,
+        you do not have to run the reformatter SORTEXB;
+        Answer NO to skip to the FDA/BDA file production
+
+  Reformat most recent selected times [def=YES]?
+\end{verbatim}
+If the reformatted files already exist, it is possible to skip to
+phase  4 by answering NO here. The answer YES will be followed by a prompt for
+the name of the directory where you want to store the reformatted files (the
+default is the current directory):
+\begin{verbatim}
+        Device and directory (^Z=Exit) ? [def=DIR]
+\end{verbatim}
+REFORMAT will switch to the indicated directory. If the move is
+unsuccessful (e.g. non-existent  directory), a message is displayed and the
+above question appears again. If necessary, pressing Ctrl-Z will abort the
+procedure. If the required data have been written by DUMPEXB into the dumpfile
+assigned to DMPFL2 then it will  be necessary to interchange the assignments of
+DMPFL1 and DMPFL2. You will only need to flip assignments if the start time of
+the data interval occurs after midnight. This  option is given in the next
+question:
+\begin{verbatim}
+        Flip logical assignments FILE1 and FILE2 (YES/NO) ? [NO]
+\end{verbatim}
+Using the time interval and file type information in SRTCNhhmm.DOY,
+program  SORTEXB will  produce FCSDA, FCSIX, BCSDA, BCSIX, ENG, and SPSUB files
+--- each with the hhmm.doy ID incorporated into the filename. The ENG and SPS
+files contain engineering (e.g. FCS crystal address, temperature) and
+spacecraft pointing  (pitch, yaw, and roll) information, respectively.
+
+\item{\bf Phase 4}:
+
+After SORTEXB has completed, the FOTON program will combine newly
+created FCSDA, FCSIX, ENG, and SPS files into an FDA file.  If you requested
+BCS data, then the BOTON program will combine the BCSDA and BCSIX files
+into a BDA file.  In case the REFORMAT procedure was interrupted during any of
+the previous phases, you may be asked to re-enter the file ID in order to
+complete the FDA and BDA file creation. Upon completion, you will be returned
+to your working directory where you will find the reformatted files and the BDA
+and FDA files. You may want to delete the COPYEXB.DAT and SRTCNhhmm.doy files
+which contain information about the times of the reformatted data.
+ 
+\end{itemize}
+
+\newpage
+
+\section{Fortran Data Reduction Programs}
+
+This section describes the XRP Fortran data reduction programs.
+These Fortran programs are used primarily for the conversion of one file type
+to another, or for  the extraction of selected data products from files. In
+general, they are executed by typing a DCL symbol that is defined in the
+LOGIN.COM file for the XRP account. The programs are described in the
+chronological order in which they are likely to be used.
+
+\subsection{BCS Programs}
+
+\subsubsection{BOTON}
+
+{\em To run this program type:}
+\begin{verbatim}
+     XRP$> BOTON `filid'            
+\end{verbatim}   
+{\em BOTON} creates BDA files from BCSDA and BCSIX files. Although
+   BOTON is run automatically during the REFORMAT procedure, it can be
+   executed manually as shown above. 
+   Where `filid' is the hhmm.doy extension of the BCSDA and BCSIX files
+   produced by REFORMAT. If the reformatted files are not in the current
+   directory, then the full directory and filename must be entered on the command
+   line. BOTON will prompt for these inputs if `filid' is not entered. Note that
+   the BDA file id is different from that of the BCSDA file. The BDA file contains
+   spectra (at the original observed time resolution) for all the available BCS
+   channels. These spectra can be examined with the IDL program PLOTBDA.   
+
+\subsubsection{MKBRR}
+
+  {\em MKBRR} will produce a BRR file, using a BDA file as input.
+   The BRR files are keyed-access ISAM files that contain selected spectra that have been
+   accumulated  for a specified time and corrected for crystal curvature effects.
+   These files are the starting point for the derivation of flare parameters
+   (temperature, emission measure, velocity) from the BCS spectral data.
+
+    MKBRR can be run interactively or by using command line switches. 
+    The following is a series of examples of the program running in different
+    modes:
+\begin{center}
+                   ***	Interactive mode    ***
+\newline	(specify no switches, i.e. no "/" symbols should appear)
+\end{center}
+\begin{verbatim}
+    $ MKBRR
+    $ MKBRR 800629.1810
+\end{verbatim}
+  Within the  interactive mode the user will be asked the following questions:
+\begin{verbatim}
+   * Enter BDA File id or name [yymmdd.hhmm]
+
+     In default mode :,
+        -  Channels 1 & 4 are processed,
+        -  20 sec is assumed for data gathering interval,
+        -  Crystal curvature corrections applied.
+
+   * Use default mode ? [def=y]
+\end{verbatim}          
+Answering YES (after entering the file name) will invoke the default
+mode. In this mode, MKBRR extracts spectra for channels 1 (Ca~XIX) and 4
+(Fe~XXV), and accumulates the data into approximately 20~s intervals. Curvature
+corrections are also applied. These corrections essentially straighten the
+spectra, and have been calibrated only for channels 1 and 4. Answering NO
+will allow you to override these defaults.
+ 
+The non-interactive mode allows more control over the BRR output file.
+There are 6 switches available listed in the following table.  
+    They may be included in any order.
+    If the /fil: switch is present, MKBRR will run in non-interactive mode.
+    If the /fil: switch is NOT present, the other switches will have no effect.
+  An example of their usage is as follows:
+\begin{center}
+                   ***	Non-interactive mode    ***
+\end{center}
+\begin{verbatim}
+    $ MKBRR /fil:800629.1810/chn:1/int:15/sta:18,25/end:18,30/cnt:4000,1
+\end{verbatim}
+In this example, channel~1 Ca~XIX  data in the BDA file with file id
+800629.1810 will be accumulated into 15s (or greater)  intervals starting at
+1825~UT and ending at 1830~UT. The accumulation interval for each spectrum
+will be increased until a 4000 total count level is reached in channel 1.  The
+spectra within the BRR file can be examined by using the IDL program PLOTBRR.
+In practice, you would use MKBRR to extract BCS channels 1 and/or 4.
+The remaining Fortran BCS analysis programs that are described in this section
+do not operate on any of the other channels.
+
+\newpage
+
+\begin{center}
+\begin{tabular}{|l l|}
+\hline
+{\bf Optional switches} & {\bf Description}  \\
+\hline
+              &    \\
+
+	/fil: & This switch specifies the file id of the BDA file.\\
+              & \\
+	      &	If this switch is present, MKBRR is will ask no questions \\
+	      &	(appropriate for running in batch mode) and by default, \\
+	      &	the crystal curvature corrections will be applied. \\
+              &    \\
+	      &	In addition, if this switch is NOT present,  \\
+	      &	the /chn:, /int:, /sta:, and /end: switches are ignored. \\
+              &    \\
+	/chn: &	Use this switch to specify which channel to process.  \\
+	      &	If this switch is absent, MKBRR writes channel 1 and 4 data. \\
+              & Can also specify multiple channels as /chn:1,4 (no blanks). \\
+              & This switch is ignored if the /fil: switch is absent. \\
+              &  \\  
+	/int: &	Integration time (integer) in secs.  The default is to  \\
+              &  accumulate spectra with 20s time resolution. \\
+              &  This switch is ignored if the /fil: switch is absent. \\
+              &   \\          
+	/cnt: &	Sets the (total) count level (integer) which must be  \\
+              &  accumulated.  The integration time will be the minimum  \\
+              &  specified with the /int: switch.  If the specified counts  \\
+              &  is not detected, the integration time is increased until  \\
+              &  desired count rate is reached.  The format is /cnt:level,chan \\
+              &  such as /cnt:1000,1 (no blanks allowed).  If the channel  \\
+              &  number is omitted, the lowest selected channel is used.  \\
+              &  If the /cnt: switch is supplied, /int:0 be used.  In this  \\
+              &  case the shortest integration times which supply the desired  \\
+              &  total count rate in the specified channel will be used.  If  \\
+              &  multiple channels are selected, the same integration time will \\
+              &   used for the other channels. \\
+              &  This switch is ignored if the /fil: switch is absent. \\
+              &  \\          
+	/sta: &	The start time in hh,mm,ss,dd,mm,yy format (from minutes  \\
+              &  onward the quantities are optional). The omission of this switch  \\
+              &  will cause MKBRR to begin with the earliest available data. \\
+              &  \\          
+	/end: &	The end time in hh,mm,ss,dd,mm,yy format. The omission of this \\ 
+	      &	switch will cause MKBRR to process until the end of the  \\
+              &  BDA file. \\
+              &  \\         
+\hline
+\end{tabular}
+\end{center}
+
+\newpage
+
+\subsubsection{LISTBRR}
+
+{\em To run this program type:}
+\begin{verbatim}
+     XRP$> LISTBRR                       
+\end{verbatim}
+  {\em Listbrr} lists the contents of a BRR file. The user is asked  
+   only to supply a file name (it is not necessary to type the BRR prefix).
+   After which the program lists the file as shown below:
+\begin{verbatim}
+ Summary of BRR file: SYS$DATA:[XRP.DATA]BRR850123.0657;12              
+
+ Total number of spectra:  292   146   0   0 146   0   0   0   0
+
+ Chan      Mean time          sdgi    num     dw        w0     rate Corrected
+   1    7  5 10  23  1 85   921.600     1  3.05E-04  3.23E+00     4    1 0
+   1    7 19 25  23  1 85   783.360     3  3.05E-04  3.23E+00     4    1 0
+   1    7 26 28  23  1 85    65.280     5  3.02E-04  3.24E+00    64    1 1
+   1    7 27 15  23  1 85    30.720     7  3.11E-04  3.24E+00   141    1 1
+   1    7 27 45  23  1 85    19.200     9  3.01E-04  3.24E+00   221    1 1
+   1    7 28  9  23  1 85    15.360    11  3.02E-04  3.24E+00   279    1 1
+   1    7 28 25  23  1 85    15.360    13  3.02E-04  3.24E+00   329    1 1
+   1    7 28 38  23  1 85    11.520    15  3.00E-04  3.24E+00   379    1 1
+   1    7 28 50  23  1 85    11.520    17  3.05E-04  3.24E+00   405    1 1
+\end{verbatim}
+
+\subsubsection{CALBRR}
+
+{\em To run this program type:}
+\begin{verbatim}
+     XRP$> CALBRR `filid' [/vel] or [/novel]                 
+\end{verbatim}
+This program wavelength calibrates the BCS channel~1 (Ca XVIII-XIX) and/or
+channel~4 (Fe XXII-XXV) spectra contained in a BRR file. Because of the nature
+of a Bragg crystal spectrometer, the relationship between detector bin and
+wavelength scale is not absolute, and depends upon the relative  position of
+the  emitting source within the spectrometer field of view.  CALBRR calibrates
+this scale within the rest frame of the observer by fitting key lines within
+the spectra, and referencing their centroids to known laboratory wavelengths.
+
+The `filid' is the usual file id of the BRR file to be processed.
+The /vel switch will implement the fitting of a secondary blueshifted
+component to the Ca~XIX and Fe~XXV $w$ resonance lines in channels 1 and 4,
+respectively. By default, this switch is on. In cases where a blueshifted
+component is unlikely to be pronounced (such as in a limb flare), it is
+recommended that blueshift fitting be turned off by using the /novel switch.
+CALBRR automatically updates the wavelength scale  of individual spectra in the
+BRR file. If `filid' is not entered, then CALBRR will run interactively and
+prompt for assorted inputs. The results of CALBRR are written in the summary
+ASCII file  CALyymmdd.hhmm, which inherits the file id of the BRR file.   
+
+\subsubsection{SPCFIT}
+
+{\em To run this program type:}
+\begin{verbatim}
+     XRP$> SPCFIT
+\end{verbatim}
+{\em SPCFIT} fits theoretical profiles  to  BCS channel~1 (Ca XVIII-XIX) and/or
+channel~4 (Fe XXII-XXV) spectra contained in a  BRR file. The electron
+temperature, emission measure, nonthermal  broadening, and line-of-sight upflow
+velocity of the soft X-ray source are determined from  these fits.
+This program has three control switches.
+\begin{verbatim}
+             XRP$> SPCFIT /fil:filid /chn:1 /vel:3
+\end{verbatim}
+\begin{center}
+\begin{tabular}{|l l|}
+\hline
+{\bf Optional switches} & {\bf Description}  \\
+\hline
+              &    \\
+        /fil: & Input BRR file id. \\
+              &  \\
+        /chn: & optional switch. If absent, both channels 1 and 4 are fit. \\
+              &  \\
+        /vel: & Optional switch [def $=$ 3]. \\
+              & This controls how SPCFIT will fit a single or a \\
+              & 2-component spectrum. \\
+              &    \\
+\hline
+\end{tabular}
+\end{center}
+It is important that the spectra for the requested channel be extracted first
+by MKBRR and wavelength calibrated by CALBRR before being processed by SPCFIT.
+Note that  SPCFIT (like CALBRR) will process only channels 1 and/or 4. In
+addition, SPCFIT   will fit only spectra with sufficiently good statistics.
+Hence, the program  may skip low count rate spectra observed very early during
+the flare impulsive  phase or late during the decay phase.
+
+The /vel switch is an optional input that controls how  fitting of a secondary
+blueshifted component will be handled. CALBRR will have  already made a first
+approximation at fitting this component if the /vel  switch was used. A
+detailed description of the velocity model used by SPCFIT is  given in Fludra
+{\it et al.} (1989, {\it Ap.J.}, {\bf 344}, 991). Basically, the  model assumes
+that the doppler broadening width of the secondary component is  proportional
+to its blueshift velocity from the primary  $w$ resonance  line of Ca XIX (or
+Fe~XXV).
+This switch can assume the following values:
+\begin{itemize}
+
+\item 0: do not fit a blueshifted component. This is the stationary model.
+
+\item 1: use the blueshift results from CALBRR as final, and do not iterate
+further;
+
+\item 2: use the blueshift results from CALBRR. Iterate further on the
+intensity of the blueshifted component, but keep it's velocity fixed; and
+
+\item 3: use the blueshift velocity and intensity from CALBRR
+as first guesses and iterate further. This is the default option.
+
+\end{itemize}
+The input files are as follows:
+\begin{description}
+\begin{description}
+\item [BRRxxxx.xxx] ---	The BCS data is read from the BRR files.
+The files must have been updated by the CALBRR program before SPCFIT will
+attempt to fit the spectra.
+\item [CALxxxx.xxx] --- The program searches for this file in the current
+directory, and then in the directory of the BRR file if the BRR file is not in
+the current directory.
+\end{description}
+\end{description}
+The output files are as follows:	
+\begin{description}
+\begin{description}
+\item [FITxxxx.xxx] --- Results are written to an Ascii file called
+FITyymmdd.hhmm, which has the same file id as the input BRR file.
+Contains the fitted parameters (temperature, emission measure, doppler
+broadening, and blueshift) derived from the theoretical profiles fitted to the 
+Ca~XIX or Fe~XXV spectra.
+These parameters can be examined by using the IDL program PLOTFIT.
+\item [SPCxxxx.xxx] --- Is a keyed-access isam file called SPCyymmdd.hhmm, which
+has the same file id as the input BRR file created.
+This file contains the final synthesized theory spectra.
+These spectra can be examined using the IDL program PLOTFIT.
+\end{description}
+\end{description}
+
+\subsubsection{BCSPRO}
+
+{\em To run this program type:}
+\begin{verbatim}
+     XRP$> BCSPRO `filid' INT                       
+\end{verbatim}   
+This program facilitates the task of fitting BCS channel 1 and 4 spectra in BDA
+files by creating a command file to run MKBRR, CALBRR, and SPCFIT in batch
+mode. It can be run non-interactively by typing the above command.
+Where `filid' is the file id of the input BDA file, and INT is the
+integration time in seconds. The default integration time is 20~s, which is
+optimum for producing spectra of sufficiently high signal to noise to allow
+good quality fits of theoretical models.  BCSPRO will then submit a batch job
+to run the above three programs in succession. The name of the batch command
+file is: BCSPROhhmm.dmp, where hhmm is the file extension of the input file id.
+
+If the file id is omitted, then the program will run interactively
+and the following prompts will appear:
+\begin{quote}
+\begin{verbatim}
+  *****  XRP BCSPRO PROGRAM  V2.1  Mar 1990        *****
+
+  Three operations may be performed:
+
+  1) MKBRR         - Write BRR file (read BDA file)
+  2) CALBRR        - Calculate DW,W0, write CAL file
+  3) SPCFIT        - Fit Te,Td,EM     write FIT file
+
+  Enter 1 or 1,3 for: 1+2+3
+        2 or 2,3 for: 2+3
+        1,1      for: 1, etc.
+
+           [def=1,3]:
+\end{verbatim}
+\end{quote}
+At this point, you can control which programs to run by entering the
+appropriate number. For example, entering 1 will initiate all three programs in
+succession. You will then be asked the following series of questions:
+\begin{verbatim}
+    * Enter the BDA file id or filename:
+    * Enter the integration time (sec) [def=20]:
+    * Change the start or stop times ? [def=N]:
+
+    The command file = BCSPROhhmm.dmp
+\end{verbatim}
+The submit instruction looks like:
+\begin{verbatim}
+    $ SUBMIT/NOPRINT/ID/NOTIFY/NOLOG/RESTART BCSPROhhmm.DMP
+
+    * Submit BCSPROhhmm.dmp file as a batch job? [def = y]:
+\end{verbatim}
+Accordingly, you enter the BDA file id, the integration time,  and
+whether or not you wish to change the start and end times for processing.  By
+default, BCSPRO will adopt the start and end times of the data in the BDA file.
+The final question asks whether you wish to submit the subsequent program
+execution as a batch job. For both the interactive and non-interactive modes,
+the completion of the batch job will be signalled by an e-mail message sent to
+your login account.
+
+\subsection{FCS Programs}
+
+\subsubsection{FOTON}
+
+{\em To run this program type:}
+\begin{verbatim}
+     XRP$> FOTON `filid'
+\end{verbatim}
+{\em FOTON} creates FDA files by combining the FCS data in FCSDA and FCSIX files,
+together with the engineering ENG files and pointing SPS files. It is run
+automatically at the end of the reformat process. Or it may also be run manually
+by typing the command as shown above.
+Where `filid' is the hhmm.doy extension of the FCSDA and FCSIX files.
+reformatted files are not in the current directory, then the full directory and
+filename must be entered on the command line. FOTON will prompt for these
+inputs if `filid' is not entered.  It is very important that the ENG and SPS
+files exist for FOTON to create a complete and correct FDA file.  Although
+FOTON will create an FDA  file without these ancillary files, the subsequent
+analysis software may  crash if the engineering and pointing data are missing
+from the FDA file. Note that the FDA file id is different from that of the
+input FCSDA file.
+
+\subsubsection{MKFIS}
+
+{\em To run this program type:}
+\begin{verbatim}
+     XRP$> MKFIS `filid'                 
+\end{verbatim}
+{\em MKFIS} creates FIS files from FDA files.  The FIS file contains  the
+available images and spectra observed with the  FCS during the reformatted data
+interval.  The parameter 'filid' is the yymmdd.hhmm extension of  the FDA file.
+If the FDA file is not in the current directory, then the full  directory and
+filename must be entered on the command line. MKFIS will prompt  for these
+inputs if 'filid' is not entered. Note that MKFIS may often not  process
+incomplete image or spectral modes (such as modes interrupted by  spacecraft
+night of South Atlantic Anomaly [SAA]). In addition to creating a FIS  file,
+MKFIS will output a log file: FISyymmdd$\_$E.hhmm. The log file can usually  be
+ignored.
+
+\subsubsection{LISTFIS}             
+
+{\em To run this program type:}
+\begin{verbatim}                
+     XRP>$ LISTFIS               
+\end{verbatim}
+  This program will list the contents of a FIS file. To begin with the user is asked if 
+  the output is to be sent to a file (default is NO). After which the user types
+  1 for a brief listing or 2 for a full listing, The program then prompts for
+  the file name (at this point you may then type the full directory specification of
+  the file, depending on its current location.) you may also type `?' for help or
+  use `*' as a wildcard. The program will then print the contents of the file 
+  for a brief listing as shown below to either the terminal or a file.
+\begin{verbatim}
+ Data    Time    Date   Mode    #Yx#Z(dY)   St. Add.  Exp.         ModeID             
+ Set                                       Add  Step (DGI) Pts. Reg.                      
+   1  14:45:50  14/ 7/86  RAST 16x16( 3)   6353   0     4    1  1 182 1.0.24.0  
+   2  14:50:17  14/ 7/86  RAST  5x 5( 1)   6353   0     4    1  1   2 1.0.24.0     
+   3  14:51:41  14/ 7/86  SS    1x 1( 0)    528   3     1 3325  1   0 3.0.28.1     
+   4  15:06:01  14/ 7/86  SS    1x 1( 0)    528   3     1 3325  1   0 3.0.28.1      
+   5  15:20:20  14/ 7/86  SS    1x 1( 0)    528   3     1 3325  1   0 3.0.28.1       
+   6  15:34:39  14/ 7/86  SS    1x 1( 0)    528   3     1 3325  1   0 3.0.28.1        
+
+
+ Data    Time    Date   Mode     Initial    Spacecraft       #Samp #Bad  %           
+ Set                              Y  Z    Pitch  Yaw  Roll                          
+   1  14:45:50  14/ 7/86  RAST    -23   23  -82 -970     0.0  256   0 100.0
+   2  14:50:17  14/ 7/86  RAST      2   -5  -82 -970     0.0   25   0 100.0
+   3  14:51:41  14/ 7/86  SS        3   -7  -82 -970     0.0 3325   6  99.8
+   4  15:06:01  14/ 7/86  SS        3   -7  -81 -970     0.0 3325   1 100.0
+   5  15:20:20  14/ 7/86  SS        3   -7  -82 -970     0.0 3325   0 100.0
+   6  15:34:39  14/ 7/86  SS        3   -7  -75 -970     0.0 33252386  28.2
+\end{verbatim}
+
+\newpage
+
+\section{IDL Data Analysis Programs}
+
+This section describes IDL (version 2) programs that can be used
+to read, display, and analyze XRP data.
+
+\subsection{BCS Programs}    
+
+\subsubsection{PLOTBDA}
+
+{\em PLOTBDA} plots BCS lightcurves and/or spectra contained in BDA files
+created BOTON.   The program will first prompt for the
+BDA filename and directory location. If you can't remember the full BDA file
+name, you can use wild characters (e.g. BDA*.*) and a menu of all the available
+BDA files on the current (default) disk  will be listed for you.
+
+After selecting the file, you will be asked to enter the channel numbers to
+extract. Because of IDL memory limitations, it is unwise to request more than
+three channels. Typically, you would enter 1,4,7 to read the Ca~XIX, and the
+Fe~XXV low and high resolution channel data (\S~1.2.1 Table 1-1), respectively.
+You will then be asked for the maximum accumulation time over which to sum the
+data. The default is 10~s, which means that the BCS data in the selected
+channels will be summed until the total integration time per spectrum is
+approximately 10~secs. Note that, because the actual BCS integration times are
+usually non-integer (e.g. 3.6~s around the flare peak, and 7.2~s during the
+decay), the final accumulation time will rarely be exactly equal to the
+requested accumulation time.
+
+After reading and accumulating the requested channel data, PLOTBDA will ask you
+to enter a channel number to plot. This question will be skipped if you
+initially extracted only one channel. A lightcurve of the selected channel will
+then appear. You will then be asked whether you wish to plot spectra. Answering
+YES (or Y) will produce a vertical cursor (ignore the horizontal cursor). You
+will be asked to mark the start and end times (on the lightcurve plot) during
+which you would like to extract and accumulate spectra.   Hitting any key will
+automatically select the spectrum nearest the time where the vertical cursor is
+located. Hitting a key once, then moving the cursor to another position on the
+lightcurve, and then hitting a key again will cause PLOTBDA to select all
+spectra in between the start and end cursor positions and  plot an average of
+the selected spectra. Of course, hitting a key twice without moving the cursor
+will cause PLOTBDA to plot a single spectrum nearest the cursor position.
+PLOTBDA will ask next whether you wish to make a hardcopy of the plotted
+lightcurve and/or spectrum. Answering YES (or Y) will generate a Postscript
+plot file (IDL.PS) that will be printed on the available output device.
+Finally, PLOTBDA will ask whether you wish to repeat the whole plot process.
+
+PLOTBDA has several optional command line arguments and keyword parameters that
+provide  access to the plot arrays and more control over the plot. (N.B.
+although command line arguments are optional, they must be entered in the
+correct order. Keywords can be entered in any order).
+
+\noindent {\underbar{Calling sequence:}}
+
+\noindent PLOTBDA,{\it T,Y,W,Z}
+
+\noindent {\underbar{Outputs:}
+
+\noindent{\it T} -- the time array (in seconds since the start of day) for the
+plotted lightcurve.
+
+\noindent{\it Y} -- the count rate array for the plotted lightcurve.
+
+\noindent{\it W} -- the bin (or wavelength) array for
+the spectrum selected using the cursor.
+
+\noindent{\it Z} -- the corresponding spectrum array (counts per sec per bin).
+
+\noindent {\underbar{Keywords:}}
+
+\noindent{\it LOG} -- requests that the lightcurve be plotted on a $log_{10}$
+scale.
+
+\noindent {\it EBAR} -- requests that uncertainties be overplotted on the
+lightcurve.
+
+\noindent {\it WAVE} -- requests that BCS detector addresses be
+converted to their nominal wavelength (\AA) values.
+
+\noindent {\it BIN} -- a value by which to rebin the spectrum array
+                   (e.g. bin=2 will double bin the spectrum).
+
+\subsubsection{PLOTBRR}
+
+PLOTBRR plots BCS lightcurves and/or spectra contained in BRR files
+created by MKBRR. The program is analogous to PLOTBDA
+except that you will not be asked to enter the channels to extract nor the
+accumulation time. The latter processing was performed by MKBRR. The program
+will first prompt for the BRR filename and directory location. After reading
+the file, it will then list the available channels, their associated ions
+(usually Ca~XIX and Fe~XXV),  and the total number of spectra in each channel.
+You will then be asked to select a channel to plot.
+
+PLOTBRR will first plot the lightcurve for the selected channel. It will then
+ask whether you wish to plot spectra. From this point on, the program will
+proceed exactly as PLOTBDA. In addition, PLOTBRR has the same optional command
+line arguments and keyword parameters as PLOTBDA.
+
+\noindent {\underbar {Calling sequence:}}
+
+\noindent {PLOTBRR,{\it T,Y,W,Z}
+
+\subsubsection{PLOTFIT}
+
+{PLOTFIT plots the results of the BCS analysis program SPCFIT. In particular, it
+will read the FIT and SPC files created by SPCFIT and provide time history
+plots of the electron temperature, emission measure, nonthermal broadening, and
+upflow velocity deduced from fits of theoretical profiles to the BCS Ca~XIX
+(ch~1) and Fe~XXV (ch~4) detectors. PLOTFIT commences with the following menu
+of available items to plot:
+\begin{verbatim}
+    * enter:
+         1 : for electron temperature
+         2 : for primary component emission measure
+         3 : for primary component nonthermal broadening
+         4 : for secondary component blueshift velocity
+         5 : for secondary/primary component emission measure ratio
+    ---->
+\end{verbatim}
+After you have entered the item number, you will be prompted for the
+name of the FIT file and it's directory location.  After reading the selected
+FIT file, PLOTFIT will print the start and end times of the file. The default
+action is to plot the time history of the selected parameter between these
+start and end times. You can override these defaults by entering your own start
+and end times explicitly in the format: hhmm:ss.msec, where `hhmm' is the hour
+and minute (e.g. 0750), and `ss.msec' is the second and millisecond (e.g.
+23.123). The latter two time elements are optional. You will then be asked to
+enter the channel number. The default is channel 1. If you enter channel 4 and
+you did not process channel 4 data with SPCFIT, then you will be later asked to
+re-enter the appropriate channel number.
+
+After the selected time plot appears, you will be asked whether you wish to
+examine the fitted spectra that were computed by SPCFIT during the derivation
+of the fitted parameters. Answering YES (or Y) will invoke a cursor that you
+can use to mark the time on the plot  when you wish to view the fitted BCS
+spectrum.  PLOTFIT will read the observed and fitted spectra nearest the time
+of the cursor from the BRR and SPC files, respectively,  associated with the
+FIT file. The BRR and SPC files must be in the same directory as the FIT file
+for this feature to work. A plot of the observed BCS spectrum with the
+corresponding fitted spectrum superposed will appear. The final two questions
+asked by PLOTFIT are whether you desire a hardcopy of the screen plots that you
+have generated, and whether you wish to repeat the program.
+
+\noindent {\underbar{Calling sequence:}}
+
+\noindent PLOTFIT,{\it T,Y,E,W,Z,ZF}
+
+
+\noindent {\underbar{Outputs:}}
+
+\noindent{\it T} -- the time array (in seconds since the start of day) for the
+plotted lightcurve.
+
+\noindent{\it Y} -- the selected fitted parameter.
+
+\noindent{\it E} -- the uncertainty of the fitted parameter.
+
+\noindent{\it W} -- the wavelength array for the spectrum selected using the cursor.
+
+\noindent{\it Z} -- the observed spectrum array nearest the time of the cursor.
+
+\noindent{\it ZF} -- the fitted spectrum array nearest the time of the cursor.
+
+
+\noindent {\underbar{Keywords:}}
+
+\noindent{\it LOG} -- requests that the fitted parameter to
+be plotted on a $log_{10}$ scale.
+
+\subsection{FCS Programs}
+
+\subsubsection{PLOTFIS}
+
+{\em PLOTFIS} plots images and/or spectra from FIS files  created by the program
+MKFIS. The program will first  prompt you to enter I or S according to whether
+you to wish to plot images or spectra. The default is  to plot images. You will
+then be asked to enter the FIS file name and it's directory location. If you
+selected images, then PLOTFIS will read all the image modes from the selected
+FIS file and present a menu of the times of each mode. You can choose a time by
+using a mouse in X-windows, or entering the number of the mode on a regular
+terminal. You will then be presented with a menu of available channels for the
+selected mode time. An image of the selected channel ion will then be plotted.
+The image will be plotted as a contour on a non X-windows terminal. You will
+then be asked whether you wish to make a hard copy plot, and  whether you wish
+to repeat the program. It is not necessary to read the FIS file again if you
+wish to plot a different image --- all the available images are saved in memory
+after the initial read. However, you must read the file again if you wish to
+plot spectra.
+
+If you selected spectra, then (after entering the FIS file name)
+you will be presented with the following menu:
+\begin{itemize}
+\item  Display Data Blocks
+\item  Select ALL Data Blocks
+\item  Enter a List of Blocks to Extract
+\item  Enter a Range of Blocks to Extract
+\item  Enter a Type of Block to Extract
+\item  Quit
+\end{itemize}
+\noindent Because of memory limitations, it is recommended that you do not read
+all the FIS spectral modes at one time.  Hence, you should begin by displaying
+all the available modes and then selecting a particular mode to plot. After
+making a mode selection, PLOTFIS will list the available channels and proceed
+as described earlier for images. If you choose to repeat the program after
+making a hard copy (and you wish to plot a different spectral mode) then you
+must remember to read the FIS file again. Unlike images, all the available
+spectra in the FIS file are not saved in memory -- only the most recent
+spectrum is saved.
+
+\noindent {\underbar{Calling sequence:}}
+
+\noindent PLOTFIS,{\it X,Y,IMG}
+
+\noindent {\underbar{Optional Outputs:}}
+
+\noindent{\it X} -- the wavelength array of the selected FCS spectrum.
+
+\noindent{\it Y} -- the count rate (per bin) array of the selected FCS spectrum.
+
+\noindent{\it IMG} -- a structure (see RDFIS) whose elements contain count
+rate and pointing data for the selected FCS image.
+
+\noindent {\underbar{Keywords:}}
+
+\noindent {\it BIN} -- a value by which to rebin the spectrum or image data.
+
+\noindent {\it NOBKG} -- inhibit automatic background subtraction of FCS image.
+
+\noindent {\it CONT} -- plot image as a contour.
+
+\subsubsection{RDFIS}
+
+{\em RDFIS} reads images FIS files and returns the data in a structure variable that
+can be used by other programs. The program prompts first for the FIS file name
+and it's directory location.  It will then read all the image modes from the
+selected FIS file and present a menu of the times of each mode.  You can choose
+a time by using a mouse in X-windows, or entering the number of the mode on a
+regular terminal. You will then be presented with a menu of available channels
+for the selected mode time.  The selected image will be returned in a structure
+variable  IMG which contains the following tags:
+
+\begin{itemize}
+
+\item  IMG.DATA  = a 1-d float array containing the image count rates
+\item  IMG.NX    = the number of columns in the image
+\item  IMG.NY    = the number of rows in the image
+\item  IMG.XP    = 1-d float array with the x-coordinates of the data pixels
+\item  IMG.YP    = 1-d float array with the y-coordinates of the data pixels
+\item  IMG.ID    = string name identifying the image
+\item  IMG.TIME  = string time of data in UT format (e.g. 87/11/12, 0300:12)
+\item  IMG.EXPS  = exposure time per pixel (secs)
+\item  IMG.PITCH = spacecraft pitch (arcsecs)
+\item  IMG.YAW   = spacecraft yaw (arcsecs)
+\item  IMG.ROLL  = spacecraft roll (degrees clockwise from solar north)
+
+\end{itemize}
+
+The pitch and yaw variables  are the pointing  coordinates of the spacecraft
+boresite. Positive pitch and yaw are measured in arcsecs  south and east,
+respectively,  relative to the center of the solar disk.  The cartesian
+coordinates of the FCS images are also in arcsecs  relative to the solar
+origin, however their sense is reversed such that solar north  and west are
+positive. To avoid structure size conflicts in IDL, it was necessary  to store
+the 2-d images as a 1-d array. To reconstruct the original 2-d data  array, one
+performs the following simple steps in IDL:
+\begin{verbatim}
+   NX=IMAGE.NX & NY=IMAGE.NY & DATA=FLTARR(NX,NY) & DATA(0)=IMG.DATA(0:NX*NY-1)
+\end{verbatim}
+A similar operation is performed to restore the arrays  containing
+the coordinates of each data pixel. The procedure RUST will automatically
+restore the FCS image and pointing data.
+
+\noindent {\underbar{Calling sequence:}}
+
+\noindent RDFIS,{\it IMG, CHNUM, BACK}
+
+\noindent {\underbar{Outputs:}}
+
+\noindent{\it IMG} -- a structure whose elements contain count
+rate and pointing data for the selected FCS image.
+
+\noindent {\underbar{Optional Outputs:}}
+
+\noindent{\it CHNUM} -- the FCS channel number of the selected image.
+
+\noindent{\it BACK} -- a structure whose elements contain background count
+rate and pointing data for the selected FCS image.
+
+\noindent {\underbar{Keywords:}}
+
+\noindent {\it NOBKG} -- inhibit automatic background subtraction of FCS image.
+
+\subsubsection{RUST}
+
+{\em RUST} will read and unpack the data and pixel  coordinate arrays for an  
+image saved in a structure variable created by RDFIS.
+
+\noindent {\underbar{Calling sequence:}}
+
+\noindent RUST,{\it IMG, DATA, XP, YP, DX, DY, XC, YC}
+
+\noindent {\underbar{Outputs}} 
+
+\noindent{\it IMG} -- input structure whose elements contain count
+rate and pointing data for the selected FCS image.
+
+\noindent {\it DATA} -- output 2-d data array.
+
+\noindent {\it XP} -- output cartesian coordinates of image pixels in
+x-direction (+ W).
+
+\noindent {\it YP} -- output cartesian coordinates of image pixels in
+y-direction (+ N).
+
+\noindent {\underbar{Optional Outputs}} 
+
+\noindent {\it DX} -- average spacing between pixels in x-direction.
+
+\noindent {\it DY} -- average spacing between pixels in y-direction.
+
+\noindent {\it XC} -- x-coordinate of center of image.
+
+\noindent {\it YC} -- y-coordinate of center of image.
+
+
+\subsubsection{FLUXCAL}
+
+FLUXCAL converts FCS count rates  to photon number flux
+\hbox{(photons~cm$^{-2}$~s$^{-1}$)}. The procedure approximates the FCS line  profile
+by a symmetric Voigt function and converts the input count rate (which 
+normally corresponds to the intensity at the peak of the line) to a total
+intensity  by integrating the area beneath the Voigt profile.  To compute this
+integral,  the program requires the total (thermal plus nonthermal) line
+doppler width. You will be prompted for this width in velocity units of
+km~s$^{-1}$, or you can enter it via the keyword DOPP (see below). The default
+value is 100~km~s$^{-1}$.  A  typical value is somewhere between 50 and
+100~km~s$^{-1}$ in active regions, and  above 200~km~s$^{-1}$ in flares. In
+some cases, you may already have available  the total integrated line intensity
+(e.g.\/ from actually fitting a line  profile). Under these circumstances, it is
+not necessary to use the Voigt  profile approximation. To inform the program of
+this case, simply use the TOTAL keyword  and the input rate will be treated as
+a total  (wavelength-integrated) intensity -- the DOPP keyword will be ignored
+in this case. Note that the FCS profile often sits on a ``pedestal'' 
+fluorescence background that is dependent upon peak intensities in other FCS 
+detectors. The pedestal correction is {\it not} applied in this program. Except 
+in the case of a strong (high C-level) flare, this background is generally 
+negligible.
+
+The following is a sample session with FLUXCAL:
+\begin{quote}
+\begin{verbatim}
+XRPIDL> fluxcal
+* enter FCS line counts per second: 100
+* enter FCS channel no [1-7]: 1
+* enter FCS XTAL address of observation [def=6563]: 6563
+% FLUXCAL: count rate is assumed to be at line peak
+* enter total line doppler width [def = 50 km/s]: 100
+* line flux (ph cm-2 s-1) =   9.86e+04
+\end{verbatim}
+\end{quote}
+In this example, the program FLUXCAL computes the FCS line flux 
+for an observed count rate of 100~counts~per~sec in channel~1, with
+the crystal positioned at address 6563 (i.e. the home position).
+A doppler velocity of 50~km~s~$^{-1}$ is assumed for the line width.
+
+\noindent{\underbar{Calling Sequence:}}
+
+FLUXCAL, {\it RATE, CHAN, ADD, FLUX, DOPP=DOPP, /TOTAL}
+
+\noindent{\underbar{Inputs:}}
+
+ {\it RATE} -- FCS counts per sec at line peak (i.e. line center).
+
+ {\it CHAN} -- FCS channel (between 1 and 7) of the observed line.
+
+ {\it ADD} -- FCS crystal address (e.g. 6563 for the home position).
+
+\noindent{\underbar{Outputs:}}
+
+{\it FLUX} -- total line flux (photons~cm$^{-2}$~s$^{-1}$).
+
+\noindent{\underbar{Keywords:}}
+
+{\it DOPP} --  total line doppler width (thermal plus nonthermal) in km~s$^{-1}$.
+
+{\it TOTAL} -- informs FLUXCAL that RATE is a total count rate.
+
+\subsubsection{FTEMAP}
+
+FTEMAP computes isothermal temperature and  column emission maps from pairs
+of FCS images. The program begins by  prompting for the FIS file which
+contains the FCS images in different channels. It will read all the available
+images from the FIS file and list their corresponding times, ion
+identifications, and mode characteristics (e.g.\ number of pixels, pixel size,
+exposure time, spacecraft pointing, etc). To compute a temperature map, you
+must choose  images observed in two different ions (e.g. Mg~XI and O~VIII) and
+as close as possible in time (preferably the same time). FTEMAP will use the
+FLUXCAL procedure to compute the flux for each pixel in the two ion maps, and
+derive a temperature (in MK) and column emission measure (cm$^{-5}$) by 
+interpolating the ratios of these fluxes onto the ratio of corresponding ion
+emissivity functions obtained from the Mewe tabulations.
+
+After selecting an ion pair, the following menu will appear:
+\begin{quote}
+\begin{verbatim}
+-------------------------------------------------------------
+* DEFAULT MODE IS TO RUN ASSUMING:
+-------------------------------------------------------------
+1: Meyer coronal abundances
+2: Nonthermal line doppler width = 50 km/s
+3: Range of temperatures searched = 2 - 10 MK
+4: Pixels with count rates below half sigma rejected
+5: Adjacent pixels not averaged
+6: Calculation results saved in XDR SAVE file: FTEyymmdd.hhmm
+--------------------------------------------------------------
+* do you wish to modify any of these assumptions [def=n]?
+\end{verbatim}
+\end{quote}
+These assumptions have the following explanations:
+\begin{itemize}
+\item the Meyer coronal abundances will be used to scale the
+emissivity-temperature functions for the selected ion pair. You can enter your
+own abundances (relative to atomic hydrogen) via this option;
+
+\item a nonthermal doppler velocity width of 50~km~s$^{-1}$ will be 
+assumed to reconstruct the line profile when FLUXCAL computes the total line
+flux. You can enter a different velocity with this option. Note that FTEMAP
+will add (in quadrature) the nonthermal width to the thermal  width (from the
+derived temperature) to produce a total line width;
+
+\item in some cases, the temperature solution obtained from line ratios
+can be multivalued. You can ``window'' single-temperature solutions by varying
+the temperature range with this option;
+
+\item in some cases, the ratio of two noisy low signal-to-noise pixels can
+result in a seemingly valid temperature value. To correct for this effect,
+FTEMAP will compute the standard deviation of the count rates in the two
+selected maps and reject all data values that fall below half a $\sigma$. You
+can change this cutoff threshold via this option;
+
+\item by default, FTEMAP will not smooth or average ion maps. With this
+option, you can choose to rebin the FCS count rates in order to improve
+signal-to-noise at the expense of degraded spatial resolution;
+
+\item the temperature and column emission measure maps (together with the
+corresponding flux maps for the two ions used  to derive them) will be saved as
+structures in a portable XDR IDL save file: FTEyymmdd.hhmm, where the file name
+is inherited from the file id of the original input FIS file. You can choose a
+different output file name with this option.
+\end{itemize}
+
+After FTEMAP has completed its calculations, it will print the following menu:
+\begin{quote}
+\begin{verbatim}
+ENTER:
+
+  1) to QUIT FTEMAP
+  2) to REPEAT calculation
+  3) to PLOT ION1 flux map
+  4) to PLOT ION2 flux map
+  5) to PLOT TEMPERATURE map
+  6) to PLOT COLUMN EMISSION MEASURE map
+  7) to SAVE results in FTExxxxxx.xxxx
+  8) to HARD COPY latest map
+\end{verbatim}
+\end{quote}
+The required responses to these choices are obvious. Note that, if no valid
+temperatures are found for any of the pixels in the selected ion pair, then
+options 5--8 will not appear.
+
+\noindent{\underbar{Calling Sequence:}}
+
+FTEMAP, TEMP, EMISS, FLUX1, FLUX2
+
+\noindent{\underbar{Optional Outputs:}}
+
+{\it TEMP} -- temperature (10$^6$~K) array.
+
+{\it EMISS} -- column emission measure (cm$^{-3}$) array. The column emission
+measure is computed from the volume emission measure (deduced from the total
+line flux) divided by the FCS pixel area size.
+
+{\it FLUX1} -- flux (photons~cm$^{-2}$~s$^{-1}$) array for the first selected
+ion. 
+
+{\it FLUX2} -- flux (photons~cm$^{-2}$~s$^{-1}$) array for the second selected
+ion. 
+
+\subsubsection{PLOTFTE}
+
+PLOTFTE plots maps of temperature, emission measure, and fluxes saved in FTE
+saveset files created by FTEMAP. The program commences by asking for the name
+and directory location of the FTE file. It restores the contents of the file
+and presents the following (sample) menu:
+\begin{quote}
+\begin{verbatim}
+* following images are available in:
+FTE850123.0657
+-----------------------------------------------------
+ 1) TEMP (MK)
+ 2) EM (10^28 CM-5)
+ 3) Mg XI (PH CM-2 S-1)
+ 4) O VIII (PH CM-2 S-1)
+-----------------------------------------------------
+* enter image number to plot [def = 1]: 
+
+* hardcopy [def=n]? 
+* another plot [def=n]? 
+\end{verbatim}
+\end{quote}
+In this example, you have the choice of plotting maps of
+temperature, emission measure,  and Mg~XI and O~VIII fluxes that are saved in
+the file FTE850123.0657. After plotting the selected map, PLOTFTE
+will give you the options of making a hardcopy and returning to the
+above menu for a new plot.
+
+\noindent{\underbar{Calling Sequence:}}
+
+PLOTFTE, TEMP, EMISS, FLUX1, FLUX2, COLOR=COLOR, /CONT
+
+\noindent{\underbar{Optional Outputs:}}
+
+{\it TEMP} -- temperature (10$^6$~K) array.
+
+{\it EMISS} -- column emission measure (cm$^{-3}$) array. The column emission
+measure is computed from the volume emission measure (deduced from the total
+line flux) divided by the FCS pixel area size.
+
+{\it FLUX1} -- flux (photons~cm$^{-2}$~s$^{-1}$) array for the first selected
+ion. 
+
+{\it FLUX2} -- flux (photons~cm$^{-2}$~s$^{-1}$) array for the second selected
+ion. 
+
+\noindent {\underbar{Keywords:}}
+
+{\it COLOR} -- color table value (e.g. 0 for B/W [def], 3 for red-temperature).
+
+{\it CONT} -- plot maps as contours (user is prompted for contour level values).
+
+\subsubsection{TEMCAL}
+
+TEMCAL calculates temperature (isothermal) and emission measure from
+intensity ratios of two FCS lines. The following sample session
+illustrates the usage of this program. 
+\begin{quote}
+\begin{verbatim}
+XRPIDL> temcal
+
+* enter two FCS detector nos [def =  1, 3]
+---> 1, 3
+
+* enter corresponding line IDs from Mewe list [H for help; def = 752, 306]
+---> 752, 306
+
+* ion = O VIII
+* central wavelength =  18.97
+* O VIII MEYER abundance used = 2.47e-04
+* ion = MG XI
+* central wavelength =   9.17
+* MG XI MEYER abundance used = 3.73e-05
+
+* change ion abundances [def=n]? n
+* enter corresponding observed counts/sec: 100,200
+* are these integrated line rates [def = n]? n
+* enter non-thermal Doppler velocity in km/s [def = 50]: 50
+* enter range for temperature solution [def = 2, 10]:
+
+% TEMCAL: -- temperature iterations in progress ---
+
+-----------------------------------------
+          Te       Log10(EM)
+       (10^6 K)     (cm-3)
+-----------------------------------------
+         4.9        47.4
+-----------------------------------------
+
+* do you wish to plot G(T) ratios [def=y]? y
+* enter temperature range (in MK) for plot [def=2,20]: 2,20
+* hardcopy [def=n]?
+\end{verbatim}
+\end{quote}
+In the above example, TEMCAL computes temperature and emission measure using an
+O~VIII count rate of 100 in FCS channel 1, and a Mg~XI count rate of 200 in FCS
+channel 3. The numbers 752 and 306 correspond to the identifications of the
+O~VIII and Mg~XI emissivity functions in the Mewe line tabulations. By default,
+TEMCAL will normalize these functions to the Meyer coronal abundances. You  can
+override this default by answering YES (or Y) to the change ion abundances 
+question. By default, TEMCAL assumes that  the input count rates are peak line
+center values and will use FLUXCAL to compute an integrated line intensity. If
+the input rates are integrated values, then you can skip the integration step
+by answering YES (or Y) to the next question. If the rates are peak values,
+then  TEMCAL needs the nonthermal Doppler width (km~s$^{-1}$)  in order to
+reconstruct the line profiles.  Lastly, TEMCAL requires a temperature range
+within which to  confine its calculation. Such a range is necessary in case of
+multiple solutions.
+
+TEMCAL iterates the line flux ratios until the emission measures deduced from
+the individual line fluxes are identical. If a converged solution is not
+achieved, you will be given the option of varying the temperature range for the
+calculation. After printing the converged solution, TEMCAL provides the option
+of plotting the ratio of the ion emissivity functions to the terminal and a
+hard copy device.
+
+\noindent{\underbar{Calling Sequence:}}
+
+TEMCAL, TEMP, EMISS
+
+\noindent{\underbar{Optional Outputs:}}
+
+{\it TEMP} -- temperature (10$^6$~K).
+
+{\it EMISS} -- volume emission measure (cm$^{-5}$).
+
+\subsubsection{EMRAT}
+
+{\em To run this program type:}
+\begin{verbatim}
+    XRPIDL> EMRAT 
+\end{verbatim}
+{\em EMRAT} plots emissivity ratios. It reads the emissivity functions for a 
+specified line pair from the Mewe et al catalog. The temperature range common to
+the two lines is then plotted.      
+When the program is first run it asks to user if they wish to plot the ratio as
+the abscissa the default is no as this would not be required in most cases.
+The user is then asked to enter the MEWE catalog numbers of the two lines
+they are interested in. (the default lines are 1st 326 and 2nd 756) 
+After this two plots are drawn one contains a plot of Emissivity ratio against 
+temperature for the specified lines the other is a plot of the emissivities of each
+each line against temperature.
+The user then has the option of selecting a point on the plot in order to
+determine its value. If this is not required a further menu will appear as 
+follows:
+\begin{itemize}
+\item  To stop
+\item  Change the temperature range plotted 
+\item  Change the temperature range plotted allow full range available
+\item  Select different lines
+\item  Plot emissivity of a single line
+\item  Change flux values 
+\item  Plot emission function
+\item  Toggle the plotting abscissa
+\item  Toggle whether cursor input is asked for after plotting
+\item  Hard copy to laser (PostScript)
+\item  Start new logging file 
+\item  Replot the screen (return to default)
+\item  Plot emissivity ratio
+\item  Plot emissivities
+\end{itemize}
+and the various options can be selected as required. 
+
+\newpage 
+
+\section{X-Window/Widget Programs}
+
+\subsection{IDL Level}
+
+This chapter describes the IDL/widget programs that 
+enable reading and displaying of BCS and FCS data. These programs
+provide the user with an \hbox{X-Windows/Motif} graphical user interface (GUI) to
+many of the programs described previously.
+
+\subsubsection{BCS}
+
+The IDL/widget interface to BCS lightcurves and spectra is
+invoked by typing:
+\begin{verbatim}
+    XRPIDL> BCS
+\end{verbatim}
+\noindent The program accepts BDA files as input and assumes that the logical
+BCS\_DATA points to the directory  location of the BDA files. If this logical
+is not defined, then you will be asked initially to  enter the directory
+location of the BDA files that you wish to plot. Figure 4-1 
+shows
+the main widget display produced by BCS. A listing of the BDA files in the
+current  working directory appears under the listing: 
+\newline
+\newline
+\centerline{\bf SELECT FROM THE FOLLOWING FILES}
+\newline
+\newline
+\noindent You can select from this list by using the    
+mouse (and hitting the leftmost button). By default, BCS will read channel~1
+spectra, integrating  with 10~s time resolution. These values  can be changed
+at any time by clicking on the desired channels in the 
+\hbox{\bf CHANNEL BUTTONS}
+menu, and sliding the \hbox{\bf ACCUMULATION TIME} slide bar to the desired
+integration time value (where 0 corresponds to the minimum available time
+resolution).  Because of memory limitations, it is not recommended that you
+read more than two channels at a time.
+
+The main widget display contains additional buttons which have the following
+functions:
+\begin{itemize}
+
+\item{\it Spawn To OS} -- will temporarily suspend the main IDL widget
+program and spawn to the current operating system (VMS or UNIX).
+
+\item{\it Change Directory} -- will permit the user to switch
+to another working directory, and also to select files from the BCS 
+Selected Data Archive (\S~1.5) by choosing a date.
+
+\item{\it Help} -- will print some very brief help information.
+
+\item{\it Replot Latest File} -- will replot the lightcurve from
+the latest file that has been read into memory.
+
+\item{\it Quit} -- quit and exit BCS.
+
+\end{itemize}
+Upon reading the selected BDA file, BCS will plot
+lightcurves for each of the selected channels. Recall that the 
+lightcurves are derived by summing individual spectra over address bin.
+The lightcurve plot will appear in a separate widget window.
+
+Figure 4-2 shows a sample BCS lightcurve window with the following application
+buttons:
+\begin{itemize}
+
+\item{\it Log Scale} -- if set, then plot the lightcurve using a 
+log$_{10}$ scale. \
+
+\item{\it Oplot Errors} -- if set, then plot the lightcurve with the square root
+uncertainties.
+
+\item{\it Hard Copy} -- make a hardcopy of the current plot.
+
+\item{\it Integrate Spectra} -- integrate BCS 
+spectra during the time interval defined by the two 
+most recent cursor positions on the lightcurve plot.
+
+\item{\it Write Data} -- write the BCS count rate and universal time arrays
+to a data file (ASCII or IDL/XDR saveset).
+
+\item{\it Zoom Lightcurve} -- zoom in on lightcurve 
+during the time interval defined by the two 
+most recent cursor positions on the lightcurve plot.
+
+\item{\it Done} -- exit the lightcurve application and return to main calling widget.
+              
+\end{itemize}
+After the lightcurve is plotted, the message:
+\newline
+\newline
+\centerline{\bf USE CURSOR TO SELECT TIME OF SPECTRUM}
+\newline
+\newline
+will flash. At this point, you can view a BCS spectrum for a 
+particular time by clicking the mouse button at the corresponding time position
+on the lightcurve. The selected spectrum will be plotted
+in a new widget window.
+Figure 4-3 shows a sample BCS spectrum window with 
+the following application buttons:
+\begin{itemize}
+                              
+\item{\it Double Bin} -- if set, then spectrum will be plotted
+with double binning
+(i.e.\ count rates in two adjacent address bins averaged into a single bin).
+
+\item{\it Wavelength Axis} -- if set, then the spectrum 
+will be plotted using a nominal wavelength (\AA) axis 
+(i.e., uncorrected for position of the source relative to the dispersion axis).
+
+\item{\it Fit Options} -- opens a sub-menu of functions (Gaussian,
+Voigt) to fit to a zoomed portion of the spectrum. (This facility
+is still under development at time of writing). 
+
+\item{\it Write Data} -- write the BCS count rate and address/wavelength
+arrays
+to a data file (ASCII or IDL/XDR saveset).
+
+\item{\it Zoom Spectrum} -- zoom in on a portion of spectrum
+between address/wavelength values defined by the two most recent cursor
+positions on the spectrum plot. Zooming must be performed prior to fitting.
+
+\item{\it Done} -- exit the spectrum application and return to main calling widget.
+\end{itemize}
+
+\subsubsection{FCS}
+
+The IDL/widget interface to FCS images and spectra is a direct analog
+of the BCS widget program.
+It is invoked by typing:
+\begin{verbatim}
+    XRPIDL> FCS
+\end{verbatim}
+The program accepts FIS files as input and assumes that the logical
+FCS\_DATA points to the directory  location of the FIS files. If this logical
+is not defined, then you will be asked initially to  enter the directory
+location of the FIS files that you wish to plot. Figure 4-4 
+shows the main widget display produced by FCS.  The main widget
+contains application buttons (SPAWN, CHANGE, HELP, QUIT) that have the same
+functions as in the BCS widget program. A listing of the FIS files in the
+current working directory appears under the heading: 
+\newline
+\newline
+\centerline{\bf SELECT FROM THE FOLLOWING FILES}  
+\newline
+\newline
+You can select from this list by using the mouse (and hitting the leftmost button).  
+
+The FCS instrument operated in two modes: imaging and spectral. You must first
+select between these two modes by clicking on the corresponding buttons that
+are adjacent to the FIS file selection window. The program will read the header
+of the selected FIS file and list the times of the selected mode, with imaging
+and spectral modes identified by the labels RAST and SS, respectively,  under
+the heading: 
+\newline
+\newline
+\centerline{\bf SELECT FROM THESE FCS TIMES} \noindent
+\newline
+\newline
+(The labels: IS, MSS, and MSSR denote spectral modes  corresponding to integral
+scans, multiple spectroscopic scans, and multiple spectroscopic scans in a
+raster, respectively). After you select a mode time, the program  will list
+the channel information for the FCS detectors that were switched on during the
+time of the mode. This information will appear under the \hbox{\bf CHANNEL
+BUTTONS} menu in the form of channel number and corresponding ion transition.
+Detectors that were off during the selected time are not selectable. Clicking
+on a valid channel will produce an image or spectrum window plot depending on
+the selected mode type. 
+
+Figure 4-5 shows a sample FCS image window. The image is plotted as a contour 
+with
+a solar heliographic grid. The application buttons: HARD COPY, WRITE DATA, and 
+DONE
+have the same functions as in the BCS programs. The remaining buttons have the
+following definitions:
+                              
+\begin{itemize}
+
+\item{\it Double Bin Image } -- if set, then image will be plotted
+with double binning
+(i.e. count rates in two adjacent pixels averaged into a single bin).
+
+\item{\it Contour Image} -- if set, then plot the image as a contour.
+Otherwise, plot as color image.
+
+\item{\it Gang Images} -- if set, then divide the plot window into
+four quadrants and plot successive images in separate quadrants.
+
+\item{\it Heliographic Grid} -- if set, then overplot a solar 
+heliographic grid coordinate system.
+
+\item{\it Log Scale Image} -- if set, then plot the image
+using log$_{10}$ scaling.
+
+\item{\it Overplot Images} -- if set, then successive images will
+be overplotted as contours on the first image.
+
+\item{\it Subtract Background} -- if set, then subtract detector background
+from image.
+
+\item{\it Tools} -- opens a submenu of tools to customize the color table;
+check and correct the spacecraft pointing. (These tools are still under
+development at the time of writing).
+\end{itemize}
+
+Figure 4-6 shows a sample FCS spectrum window. 
+The application
+buttons in the spectrum window have the same functions as those described 
+previously, with the following additional button:
+
+\begin{itemize}
+\item{\it Flux Axis} -- plot spectrum in units of
+photons~cm$^{-2}$~s$^{-1}$~\AA$^{-1}$ at the detector.
+\end{itemize}
+           
+\subsubsection{LISTBCS}
+
+LISTBCS provides a simple widget interface to the BCS catalog of flares in
+which the total count rate in the Ca~XIX channel exceeded 18 counts~per~sec.
+The catalog is approximately 90\% complete at the time of writing.
+The program is invoked by:
+\begin{verbatim}
+    XRPIDL> LISTBCS
+\end{verbatim}
+Figure 4-7 shows a sample display produced by LISTBCS. The events are
+listed by start and stop time (as determined by Ca~XIX count rates), as well as
+peak Ca~XIX and Fe~XXV count rates (and corresponding times).
+The application buttons in this display have the following definitions:
+\begin{itemize}
+\item{\it Select Date} -- permits the user to
+choose the year, month, and day for which to search the BCS catalog.
+\item{\it Print Listing} -- print the listing on a hardcopy device.
+\item{\it Quit} -- exit the program.
+\end{itemize}
+
+\subsubsection{SCANPATH}
+
+SCANPATH is a useful facility for reading and extracting procedures in XRP
+libraries and directories (as well as other procedures) that are present in the
+IDL path. The program works on VMS and UNIX systems and is invoked by typing:
+\begin{verbatim}
+    XRPIDL> SCANPATH
+\end{verbatim}
+Figure 4-8 shows a sample display produced by SCANPATH. A listing of
+available libraries and directories appears under the heading:
+\newline
+\newline
+\centerline{\bf SELECT FROM THE FOLLOWING DIRECTORIES/LIBRARIES}
+\newline
+\newline
+SCANPATH will first list the names of the procedures contained in
+the library/directory that you select from this list. SCANPATH will then list
+the text of the procedure that you select from the list of procedure names.
+
+The application buttons in SCANPATH have the following functions:
+\begin{itemize}
+\item{\it Quit} -- exit the program.
+
+\item{\it Print} -- prints the listed procedure on a hardcopy device.
+\smallskip
+
+\item{\it Extract} -- extract the listed procedure and save it
+in the working directory with a .TXT extension.
+
+\item{\it All} -- lists the entire procedure.
+
+\item{\it Doc Only} -- lists only the documentation header found between
+the ;+ and ;- delimiters in the procedure.
+\end{itemize}
+\end{document}

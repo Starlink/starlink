@@ -1,0 +1,157 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {151.2}
+\newcommand{\stardocauthors}   {C A Clayton\\S.J. Tappin}
+\newcommand{\stardocdate}      {30 September 1992}
+\newcommand{\stardoctitle}     {VMSBACKUP --- VMS backup reader for UNIX}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+
+VMSBACKUP is a utility written by John Douglas Carey and Sven-Ove  Westberg
+(with some local extensions) that allows VMS backup tapes to be read on a Unix
+machine. VMSBACKUP is available on the Sun and DECstation platforms.
+
+\section{Usage}
+
+\begin{quote}
+{\tt
+     vmsbackup -\{tx\}[bcdevw][s setnumber][f tapefile] [ name ... ]
+}
+\end{quote}
+
+Vmsbackup reads a VMS generated backup tape, converting  the files  to  Unix 
+format  and writing the files to disk.  The default operation of the program is
+to go through an  entire tape,  extracting  every  file and writing it to disk. 
+This may be modified by the following options:
+
+\begin{description}
+\begin{description}
+
+\item [b] --- Read files in binary mode. This affects only record formats
+variable and cr-terminated stream. If \verb!-b! is specified then these files
+are read without interpretation of the RMS record terminators into linefeeds
+(equivalent to using binary mode in \verb!ftp!).
+
+\item [c] --- Use  complete  filenames,  including   the   version number. A 
+colon and the octal version number will be appended to all filenames. A colon,
+rather than a semicolon, is used since the Unix Shell uses the semicolon as the
+line separator. Using a colon prevents the user from having to escape the
+semicolon when referencing the filename.  This option is useful  only when
+multiple versions of the same file are on a single tape or when a file of the
+same name already  exists  in  the destination directory.  The default is to
+ignore version numbers.
+
+\item [d] --- Use the directory structure from  VMS,  the  default value is
+off.
+
+\item [e] --- Process all filename extensions.  Since this program is  mainly
+intended to move source code and possibly data from a DEC system to a Unix
+system, the default is  to  ignore  all  files  whose filename extension
+specifies system dependent  data.   The  file  types which will be ignored,
+unless the {\bf e} option is specified, are
+
+\begin{itemize}
+\item               [exe] -- VMS executable file
+\item               [lib] -- VMS object library file
+\item		    [obj] -- RSX object file
+\item               [odl] -- RSX overlay description file
+\item               [olb] -- RSX object library file
+\item               [pmd] -- RSX post mortem dump file
+\item               [stb] -- RSX task symbol table file
+\item               [sys] -- RSX bootable system file
+\item               [tsk] -- RSX executable task file
+\item               [tlb] -- RSX text library file
+\item               [hlb] -- RSX help library file
+\end{itemize}
+
+\item [f] --- Use the next argument in the  command  line  as  the tape device
+to be used, rather than the default. The default is {\tt /dev/rmt0h} (raw
+mode, high density, drive 0).  This must be a raw mode tape device.
+
+\item [s] --- Saveset. Process only the given saveset number.
+
+\item [t] --- Produce a table of contents (a directory listing) on the
+standard output of the files on tape.
+
+\item [v] --- Verbose output.  Normally vmsbackup  does  its  work silently.   
+The   verbose  option  will  cause  the filenames of the files being read from
+tape to  disk to be output on the standard output.
+
+\item [w] --- Vmsbackup prints the action to be taken followed  by file  name, 
+then  wait  for user confirmation. If a word beginning with `y'  is  given, 
+the  action  is done. Any other input means don't do it.
+
+\item [x] --- Extract the named files from the tape.
+
+\end{description}
+\end{description}
+
+The optional name argument specifies one or more filenames to  be searched for
+specifically on the tape and only those files are to be processed.  The name
+may contain the usual shell meta-characters \verb+*?![]+.
+
+When a list of filenames is given, then the matching observes the following
+rules:
+\begin{itemize}
+\item All strings are converted to lower case before comparing.
+\item If the \verb!-d! option is \underline{not} specified, the argument
+strings are compared with just the filename of the file in the save set (i.e.
+the part after the last \verb!]!), if \verb!-d! is given then the directory is
+included in the match (in VMS form).
+\item If the \verb!-c! option is \underline{not} specified then the version
+number is ignored in the match, if \verb!-c! is given then the version number
+is included.
+\item The wildcards \verb!*! and \verb!?! along with choice and range
+constructs (e.g. \verb![a-z]! (all chars between `a' and `z') or \verb![135]!
+(`1', `3' or `5')) may be used. BUT they must be enclosed in single quotes to
+prevent interpretation by the shell.
+\end{itemize}
+
+\end{document}

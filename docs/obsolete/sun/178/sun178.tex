@@ -1,0 +1,300 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {178.1}
+\newcommand{\stardocauthors}   {D L Terrett}
+\newcommand{\stardocdate}      {15 March 1994}
+\newcommand{\stardoctitle}     {XAdam --- a GUI for running ADAM applications}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+Xadam is an X windows Graphical User Interface (GUI) for running ADAM 
+applications. The following applications packages can be run from xadam:
+
+\setlength{\tabcolsep}{0.3in}
+\[\begin{tabular}{llll}
+CCDpack &Figaro &Iras90 &KAPPA \\
+Photom &PISA &Specdre
+\end{tabular}\]
+
+Further ADAM packages will be supported in the future as they become available
+on UNIX and a future release of Xadam will allow users own programs to be
+run as well.
+
+This note does not attempt to give a complete description of Xadam; instead
+it present a ``guided tour'' which should be read while running Xadam. To do
+this you will need a UNIX system with the Starlink Software installed (Xadam 
+is {\em not} available on VMS) and a workstation or X windows terminal,
+preferably with a colour screen.
+
+Xadam is designed to be of most use in two situations:
+
+\begin{enumerate}
+
+\item When finding out what a package or application can do. All the commands
+in a package are displayed and all of an applications parameters and their
+default values can be viewed before attempting to run it.
+
+\item When exploring new data before the details of the reduction process
+have been decided.
+
+\end{enumerate}
+
+It is not intended to replace typing ADAM commands on a terminal. For 
+performing pre-defined sequences of commands, typing at a terminal or writing
+scripts will continue to be the most efficient way to use ADAM.
+
+\newpage
+\section{The Guided Tour}
+\newcounter{step}
+\begin{list}{ 
+\arabic{step}}{\usecounter{step}\setlength{\rightmargin}{\leftmargin}}
+\item To start the tour, change your current directory to a suitable 
+place (you will create several files as
+part of the tour) and type:
+
+\begin{quote}
+\tt xadam \&
+\end{quote}
+
+Two windows should appear on your screen; One is a box telling you what
+version you are running; click on the button labelled ``OK'' with the
+left hand mouse button (from now on all mouse operations will be with
+the left hand button unless stated otherwise) to close the box.
+
+\item Now look at the other window; for the moment, ignore everything
+except the menu bar at the top.  Click on the button labelled {\em
+Packages} and a menu listing all the supported ADAM packages will
+appear.  Click on {\em KAPPA} and another window will appear with a
+column of buttons labelled with application categories on the left and
+alphabetic list of kappa commands on the right.
+
+This is where you select the application you want to run. If you know
+the name of the application you can select it by clicking on the
+command name in the alphabetic list; the list can be scrolled by
+dragging the scrollbar on the right hand side.
+
+If you don't know the name, clicking on one of the category buttons
+will pull down a menu listing the commands in that category. Selecting
+one of the commands will normally make the menu disappear, but if you
+use the middle mouse button instead of the left had button to click on
+the category name the menu can be dragged across the screen by holding
+down the mouse button and moving the mouse. The menu will now remain on
+the screen.
+
+All the menus in the system behave in this way; to remove a menu from the
+screen, click on the bar at the top of the menu.
+
+\item Now Click on {\em block} in the alphabetical list (be careful to
+click the mouse button only once; a double click will cause something
+different to happen) and another window will appear with the names of
+all block's parameters and boxes for entering and displaying their
+values.  Some of the parameter boxes may have values in them (it
+depends on how you have used KAPPA in the past); if so, select {\em
+Clear All} from the {\em QuickSelect} menu so that all the boxes are
+empty.  Type the name of an existing NDF ({\em e.g.}\/ {\tt
+/star/bin/kappa/comwest}) into the box and click on the button labelled
+``Run/Cont''.
+
+The message:
+\begin{quote}\tt
+Smoothing box size (box)
+\end{quote}
+
+will be displayed. In addition a suggested value may appear in the box
+below, this depends on whether or not you have run {\tt block} before
+and whether therefore the parameter ``box'' has a current value or
+not). If a value did appear then just click on ``Run/Cont'' again, if
+not type in something suitable first ({\em e.g.}\/ {\tt 3,3}).  A
+value for ``out'' will then be requested in a similar way; this time
+enter a name in the box labelled ``out'' instead of the box underneath
+the message. Click on {\em Run/Cont} again and the message will change
+to ``Running...'' until block has finished when it will change to
+``Finished...'' (on a fast machine you may not see the ``Running''
+message at all).
+
+\item Run block again. When it request a value for ``box'', click on
+{\em Help} and help for ``box'' will be displayed. Click on {\em Store}
+and value displayed in the box will be copied into the box labelled
+``box''.  Click on {\em Run/Cont} again and ``block'' will run. This
+time there was no request for ``box'' because a value for ``box'' has
+already been supplied.
+
+\item Now look at the panels in the window labelled ``Xadam''; the
+panel on the right lists all the {\tt .sdf} and {\tt .dst} files in the
+current directory (there should be at least the one you have just
+created with {\tt block}).  Click on one of the names and it will be
+highlighted.  Click on the button labelled ``Clear'' next to the box
+for ``in'' in the parameter entry box and then click on the box itself
+with mouse button 2. The full name of the file you selected will be
+copied into the box.
+
+You can move around the directory structure by clicking on the
+directory names in the left hand panel of the ``Xadam'' window or by
+typing a directory name followed by Return into the box at the very
+bottom of the window.
+
+\item Pull down the menu labelled ``Parameters'' at the top of the
+parameter entry window; a menu will appear with a list of block's
+parameters.  This menu is used to select which parameters are displayed
+in the window. Whether or not a parameter is displayed effects the way
+the Xadam responds to prompts from the application; If the parameter
+being prompted for is not visible you will only get a request to enter
+a value as a last resort; {\em i.e.}\/ if there is no value entered in
+the parameter's box and there is no default suggested by the
+application.  If the parameter is visible, you get the opportunity to
+edit or replace any suggested default before proceeding.
+
+The other menu has commands for showing, hiding and clearing all the
+parameters at once and a command for reseting them all back to the
+state that they were in when the application was first selected.
+
+If an application has too many parameters to display at one time they
+are divided up into pages which can be selected with the {\em Prev
+page} and {\em Next page} buttons. You can change the number of
+parameters displayed on each page by selecting {\em Page Size...} from
+the {\em QuickSelect} menu.
+
+\item Try running the ``stats'' program on the file you have just
+created.  The output is written into the window underneath the
+parameters; you can use the scroll bars to view any text that has
+scrolled off the top of the window.
+
+You can use any of the numbers in the output window as input to another
+command by cutting and pasting in the same way as you did with the file
+names in the list of ndfs.
+
+\item Run a few more programs and then pull down the {\em Options} menu
+on the directory browser window and select {\em History}. Another
+window will appear with a list of all the applications you have used so
+far. To re-run an application you can select it, by clicking on it
+once, from this list instead of hunting for on the lists of all
+applications. The list can be edited in various ways by selecting items
+from the {\em Edit} menu; for example you can sort it into order of
+frequency of use so that the most frequently used are at the top.
+
+The list can also be saved to disk and restored next time Xadam is used
+and the list can be frozen ({\em i.e.}\/ the addition of new commands to the
+list disabled); see the {\em File} menu.
+
+\end{list}
+
+To exit from Xadam, select {\em Exit} from the {\em File} menu on the 
+ndf browser window and click on the {\em OK} button in the box that appears
+asking you to confirm that you want to exit.
+
+
+\subsection{Other Features}
+
+The {\em Options} menu in the ``Xadam'' window has the commands for:
+
+\begin{list}{}{\setlength{\rightmargin}{\leftmargin}}
+\item[\bf xmake...] Creating a gwm window. 
+
+\item[\bf Auto Display...] Setting the name of a program that displays
+the new ndf every time an application generates one.
+
+\item[\bf Browser filter...] Changing the filter that selects the files
+to displayed in the browser window.
+
+\item[\bf Change directory] cd'ing to the directory displayed in the 
+``ndf browser''. Applications are normally run in the directory that
+you were in when you started xadam regardless of which directory is 
+displayed by the browser. This option allows you to change the default
+directory for applications.
+
+\end{list}
+
+The {\em File} menu has commands for:
+
+\begin{list}{}{\setlength{\rightmargin}{\leftmargin}}
+
+\item[\bf Logging...] Logging the interaction with ADAM applications to
+either a file and/or the terminal window running Xadam. This can be
+used to record a sequence of data processing operations or to find out
+exactly how an application is being run if it isn't doing what you
+expect.
+
+\end{list}
+
+The {\em Help} menu will starts the Mosaic hypertext browser (SUN/175) 
+where there is more detailed information on how to use Xadam.
+
+\subsection{Using the Keyboard}
+
+As well as using the mouse to move around the interface you can use
+keyboard ``short cuts''. Select {\em Auto display} from the {\em
+Options} menu and a dialog box will appear; move the mouse over it and
+the button labeled ``none'' will appear highlighted - this means that
+this widget has the keyboard focus. Press the down arrow and the
+highlighting will move to ``Kappa display''; press the space bar to
+select it. Press Tab and the focus moves to the list of window names;
+press it again and it moves to the {\em OK} button. The left and right
+arrow keys then move between the {\em OK} and {\em Cancel} buttons.
+Pressing return always activates the default button ({\em OK} in this
+case) which is indicated by the sunken border.
+
+Widgets for entering text indicate that they have focus by displaying
+a vertical bar at the insertion point and have a number of short cuts
+for editing the text:
+
+\begin{itemize}
+\item The left arrow key and Control-d move the insertion point left by
+  one character.
+
+\item The right arrow key and Control-f move the insertion point right
+  by one character.
+
+\item Control-e moves the insertion point to the end of the line.
+
+\item Control-k moves the insertion point to the beginning of the line.
+
+\item Control-u deletes everything from the beginning of the line to the
+  insertion point.
+\end{itemize}
+\end{document}

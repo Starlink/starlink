@@ -1,0 +1,364 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {166.2}
+\newcommand{\stardocauthors}   {Rhys Morris}
+\newcommand{\stardocdate}      {19 January 1994}
+\newcommand{\stardoctitle}     {SAOIMAGE --- Astronomical image display}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\section{Introduction} 
+
+SAOimage is an astronomical image display program which works on
+computers with X-window displays. It allows you to manipulate images
+in a number of ways, see the changes applied, and when you are  happy
+with the result, produce a hard copy on a Postscript
+printer. An example of the output is included with this document.
+
+This document is a quick introduction to SAOimage. More
+information can be found in the manual page using `{\tt sman saoimage}'
+or in the SAOimage manual (MUD/140).
+
+Send bug reports to the software librarian (ussc@star.rl.ac.uk).
+The Starlink version runs under both VMS and
+Unix so you should indicate which machine you are using if a problem
+occurs.  In this document, the program will be referred to as
+`SAOimage', although you would always type `{\tt saoimage}' at your
+computer.
+
+\section{History}
+
+The original author of the program was Michael VanHilst of the
+Smithsonian Astrophysical Observatory (hence the name
+SAOimage). Later, other people contributed work to the project, and it
+is now a sizable piece of C code, well over 30,000 lines in
+all. SAOimage can deal with a number of file formats and can now read
+Starlink NDF image files. The routines required to do this were added
+by Rhys Morris for Starlink.
+
+\section{Documentation} 
+
+There is a comprehensive manual describing SAOimage (MUD/140),
+which is also distributed in \LaTeX\ form with the SAOimage source
+code in the `doc' subdirectory. A Unix `{\tt man}' page is also provided
+which can be examined using {\tt sman saoimage}.
+
+\section{Supported File Formats}
+
+\begin{itemize} 
+\item{Starlink NDF images.}
+\item{IRAF .imh images.} 
+\item{Disk FITS files.} 
+\item{Disk files containing 1/2/4 byte signed/unsigned integers or 4/8~byte 
+floating point numbers.} 
+\end {itemize}
+
+\subsection{Notes on File Formats} 
+
+Both primitive and simple NDFs are supported. The `{\tt -ndf}' flag may
+be used to denote that the image is a Starlink NDF, but SAOimage will
+assume this if the file has a {\tt .sdf} suffix (file extension). 
+STSDAS (Space Telescope Science Data Analysis System) {\tt .hhh} images
+are not supported, but these can be converted into {\tt .imh} files
+within IRAF. As with all disk FITS reading programs --- SAOimage is not
+foolproof, but it works well with non-exotic disk FITS files. When reading a
+file of unformatted data, you must specify the dimensions of the image
+on the command line, it is possible to skip over header bytes at the
+start of the image using the `{\tt -skip}' option. Data from a different
+machine which stores its numbers in a different format can be
+displayed without conversion by instructing SAOimage to swap bytes
+using the `{\tt -bswap}' option.
+
+\section{Using SAOimage} 
+
+Using SAOimage is fairly intuitive. The program is started up by
+typing `{\tt saoimage}' in a window followed by any appropriate flags
+and an image file name. You may need to set the DISPLAY environment
+variable if you are running SAOimage on a remote machine. You can use
+the Starlink utility {\tt xdisplay} to do this. Either devote a window
+to running SAOimage or run it in the background using an {\tt \&} at
+the end of the command line. The latter frees the window, although
+messages from SAOimage may still appear in the parent window unless
+you use the `{\tt -quiet}' switch on the start-up command line. Here
+are some example command lines.
+
+\begin{verbatim}
+      saoimage orion.sdf
+\end{verbatim}
+
+\begin{verbatim}
+      saoimage -i2 650 1125 -bswap -rotate 1 field2.r &
+\end{verbatim}
+
+The first command line simply tells SAOimage to start up and display
+the NDF {\tt orion.sdf}. The second example reads two---byte signed
+integer data from the file {\tt field2.r}, and assembles it into a 650
+by 1125 image. Bytes are swapped using the `{\tt -bswap}' switch, and
+the image is rotated by 90 degrees using the `{\tt -rotate 1}'
+options, (`{\tt -rotate 2}' would rotate by 180 degrees). Putting an
+`{\tt \&}' at the end of the command line runs the program in the
+background. Have a look at the manual page or the SAOimage manual for
+a complete list of command line options.
+
+Once your image is displayed, the mouse is used to `press' SAOimage
+buttons. Moving the mouse around with a mouse button depressed, called
+dragging the mouse, in the biggest window --- the data window ---
+allows you to manipulate your image interactively. Try starting up
+SAOimage with an image now. Use the mouse to press the `{\tt Color}'
+button, then the `{\tt cmap}' button, then the `{\tt B}' button. Now
+drag the mouse around the biggest window with a button depressed. This
+shows you how SAOimage can be used to modify a false colour
+display. Click the mouse once on the colour bar at the bottom of
+SAOimage, and you will see a representation of the colour table
+currently in use, you can now see how dragging the mouse vertically
+and horizontally changes the colour table.
+
+Should you wish to load in another image or change your original command
+line, you press the `{\tt etc}' button until you see a button marked
+`{\tt new}' as the bottom leftmost button. Pressing this button allows
+you to type in a new command line. If you cannot find the `{\tt QUIT}'
+button, then a swift control-c in the controlling window will stop
+SAOimage --- or if running in the background, you will have to find the
+process identifier number for SAOimage using a command such as `{\tt ps
+-aux $|$ grep saoimage}' and then use the `{\tt kill}' command to stop
+the SAOimage process. But this should rarely be necessary.
+
+If your version of SAOimage refuses to display NDFs, then it could be
+because you are using another, non---Starlink, version of SAOimage which
+is present on your system. The Starlink version has a start-up message
+which mentions Starlink. If there is no such message, you may have to
+rearrange your PATH environment variable to put {\tt /star/bin}
+earlier --- or you could define an alias to SAOimage.
+
+This version of SAOimage is based on version 1.07 of SAOimage dating from
+October 1992. An example of the hardcopy produced, which is annotated with
+some text, is included in the file {\tt /star/docs/sun166.ps} which should
+accompany this document.
+
+\section{Image Manipulation}
+
+Once you have your image in SAOimage, there are a large number of ways
+in  which you can enhance (or degrade!) your images --- these are listed
+below. You can:
+
+\begin{itemize}
+
+\item{Scale between limits using `-min $\langle$value$\rangle$' and 
+`-max $\langle$value$\rangle$' switches.}
+
+\item{Magnify, zoom and pan around the image.}
+
+\item{Perform histogram equalisation.}
+
+\item{Display using log and square root scaling.}
+
+\item{Use false colour with in-built or user specified colour tables.
+Clicking on the colour bar at the bottom of SAOimage pops up a
+graphical representation of the RGB (Red, Green, Blue) values making
+up the current colour table. This can be interactively adjusted with
+the mouse or a previously saved colour table can be loaded from a
+file.}
+
+\item{Stretch the contrast.}
+
+\item{Change Gamma ($\gamma$) parameter to give non-linear contrast, so that
+the display assigns more shades of grey to the darker or lighter end of
+the scale. This may suit the eye better that a linear scale.}
+
+\item{Type text on to an image.}
+
+\end {itemize}
+
+\section{Other Features}
+
+\begin{itemize}
+
+\item{Blinking --- several images can be stored in SAOimage and you can blink
+between them. To store an image, press the {\tt Scale} button,
+pressing the {\tt blink} button with the left mouse button associates
+the current image with the left mouse button. Load another image
+using the {\tt new} button, scale it as required, and press blink with
+another mouse button. An image can be associated with each mouse
+button and displayed by pressing the appropriate button. But you cannot
+change the scaling while blinking the images have to be re-loaded in
+order to do that.}
+
+\item{Regions --- a description of a region of the image can be saved to an
+ASCII file. This can be used for flagging regions as bad, or examining only
+the counts within a certain region. This feature is mainly to be used in
+conjunction with the IRAF and PROS (X-ray) packages.}
+
+\item{Tracking --- The pixel coordinates and value under the mouse pointer and
+the region around it can be displayed and constantly updated as your mouse
+wanders around the image. Use  the `{\tt track}' and `{\tt coord}' buttons to
+toggle these on and off.}
+
+\item{IRAF image display --- SAOimage can also be used as a display for IRAF
+--- you need to use the `{\tt -imtool}' flag to put it into the right mode}
+
+\item{Hard copy output can be saved to a file by setting the environment 
+variable R\_DISPOSE to ``mv \%s piccy.ps''. This stores SAOimage's 
+output in the file ``piccy.ps''.}
+
+\end{itemize}
+
+\section{Problems and Limitations}
+
+\begin{itemize}
+
+\item{Colour tables --- Starting SAOimage may affect the colours already
+present on your screen as it tries to reserve some of the available
+colours for its own use. So beware, especially those of you with gaudy
+background images on your workstations.}
+
+\item{Full filenames --- The full filename must be used, so ADAM users must
+type the {\tt .sdf} at the end of  a filename. This is no inconvenience if you
+use the filename completion facilities offered with many shells. In the t-shell
+for example, if you type enough letters to uniquely specify the file, then
+pressing the `tab' key will complete the filename for you.}
+
+\item{Numbers as filenames --- If your filename is a number, then you have to
+use the `{\tt -name}' switch to  inform SAOimage that it is a filename not a 
+parameter.}
+
+\item{Start-up errors --- If you do not have IRAF installed, then the error
+messages ``{\tt ERROR: unable to open /dev/imt1o}'' and ``{\tt Error:
+No remote input possible}'' will appear on starting SAOimage --- this
+is nothing to worry about.}
+
+\item{Portability --- This version of SAOimage requires some Starlink 
+libraries, so there may be problems on a non---Starlink machine. It may
+be necessary to recompile without the {\tt -DNDF} preprocessor directive
+flag to remove all mention of Starlink.}
+
+\item{Filling the image --- SAOimage does not automatically scale your image
+to fill the window, so you will have to zoom in to examine small images.}
+
+\item{False colour --- only false colour is supported, real colour is not
+possible in SAOimage.}
+
+\item{Black and White output --- if you want a hardcopy of your carefully
+coloured image you will have to use another X-window utility to
+produce colour hardcopies.}  
+
+\item{Hardcopies on VMS --- a Postscript file is produced with a name
+of the form {\tt \_PS$\langle$number$\rangle$.TMP} which can be printed on a
+Postscript printer.}
+
+\item{Disk FITS on a DECstation --- A disk FITS file created on a SUN
+containing an image of reals or doubles cannot be read on a DECstation
+as the floating point storage form is different. Other number formats
+such as two-byte unsigned integers are unaffected.}
+
+\item{Missing fonts --- When starting up, especially on VMS, SAOimage may
+complain about missing fonts. If this means that you cannot read the
+pixel values, then get your system manager to install the required
+fonts.}
+
+\item{Scaling --- If a FITS file is loaded in first, then SAOimage
+remembers the zero point offset and scale factors from the FITS
+keywords {\tt BZERO} and {\tt BSCALE} and erroneously uses them
+for all subsequent arrays of whatever format. Quit SAOimage and reload
+the image if this problem occurs.}
+
+\end{itemize} 
+
+\section{Internal Workings}
+
+This section is probably of no interest to the SAOimage user, it is intended
+for people who may have to modify and maintain the package.
+
+A file format is recognized by SAOimage as one of the supported types
+either by the file extension or by a command line flag. For example, a
+{\tt .imh} suffix would suggest an IRAF image and a {\tt -fits} flag
+tells SAOimage to expect a disk FITS file. Once the file type is
+recognized, two routines specific to each file type are required. One
+needs to return the dimensions and storage format of the data, and one
+to return the actual data for display. The routines to do this for NDF
+images are called {\tt init\_ndf()} and {\tt load\_ndf()} respectively
+and are contained in the file {\tt readndf.c}.
+
+These C routines call FORTRAN routines {\tt openndf()} and {\tt mapndf()} 
+via the CnF
+library. The FORTRAN routines use the HDS library to get at the data in the
+NDFs.  NDF routines could not be used at the time of writing as they would
+require going through the ADAM parameter system --- this would make it
+difficult to use SAOimage on other file formats. The FORTRAN routines
+mentioned are in files with the same names as the subroutines. At present,
+{\tt mapndf()} always maps the NDF to an array of 4 byte REALs regardless 
+of the
+the original NDF data type.  This is also true on 64bit machines as this is
+a FORTRAN array.
+
+SAOimage carries information about the image being displayed in a global
+structure called img, the template for which is defined in the file
+hfiles/image.h as imageRec. The routine {\tt init\_ndf()} has the job of
+inserting various values into this structure so that this information can
+be propagated around the program. The file hfiles/constant.h contains an 
+entry for
+each kind of image format supported, the following line was added.
+\begin{quote}
+{\tt \#define SOP\_NDF         0x0100          /* Starlink data format */}
+\end{quote}
+There are similar entries for FITS, IRAF and the array formats. This
+entry and the entries regarding NDFs in imgread.c are not in the original
+source code, so these will have to be added should a superior version of
+SAOimage come along with new source code. Also, the code in {\tt openndf()} 
+and
+{\tt mapndf()} could be greatly simplified using the {\tt ndf\_open()} 
+routine instead of
+the numerous HDS calls.
+
+The routine {\tt parse\_filetype()} in {\tt cmdimage.c} and 
+{\tt check\_image()} in
+{\tt imgcheck.c} were altered so that the {\tt -ndf} flag and the {\tt .sdf} 
+file
+suffix were added to the list of recognized file types. C
+pre---processor ``\#ifdef NDF'' directives surround all the optional file
+format code, so that support for FITS, for example, could be removed
+by compiling without the -DFITS flat which defines FITS for the
+pre---processor. Support for NDF format was added in the same way as
+for FITS and OIF (Old IRAF Format) file types.
+
+The source code is the same on the VMS version as in the Unix
+versions. On VMS the executable is built by typing {\tt @make} while a
+Unix build is performed using the usual {\tt mk build} system.
+
+\end{document}

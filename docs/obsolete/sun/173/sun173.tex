@@ -1,0 +1,78 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {173.1}
+\newcommand{\stardocauthors}   {M D Lawden}
+\newcommand{\stardocdate}      {18 August 1993}
+\newcommand{\stardoctitle}     {LOOKUP --- Looking up commands in applications}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+This is a command procedure written by Andy Adamson of the University of
+Central Lancashire.
+It was prepared for release by Mike Lawden who added commands for several more
+packages to the stored list.
+
+Given a command name, it searches a list for a description of the command.
+It prepares a report in a file called LOOKUP.TMP in your current directory.
+This includes all the lines found in the list which contain the command name
+you specified (some commands may be common to several application packages).
+It also stores the names of all the packages searched.
+
+To run the procedure, type:
+\begin{verbatim}
+    @DOCSDIR:LOOKUP <command name>...
+\end{verbatim}
+where \verb+<command name>+ is the name of the command being searched for.
+You can specify more than one command name if you separate them with commas.
+For example:
+\begin{verbatim}
+    @DOCSDIR:LOOKUP BDF2NDF,NDF2BDF
+\end{verbatim}
+will display descriptions of the commands {\tt BDF2NDF} and {\tt NDF2BDF} in 
+the {\tt CONVERT} package.
+
+At the end of the display you are asked if you want to keep LOOKUP.TMP.
+The default action is to delete it, but you can save it and print it out if
+you want to.
+
+The procedure sets your terminal to a width of 132 characters to accommodate
+the long lines of description.
+
+\end{document}
