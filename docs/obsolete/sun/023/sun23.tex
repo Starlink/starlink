@@ -1,0 +1,2062 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {23.14}
+\newcommand{\stardocauthors}   {M D Lawden \& D S Berry}
+\newcommand{\stardocdate}      {17 September 1991}
+\newcommand{\stardoctitle}     {ASPIC --- Image processing programs (1)}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+\section {INTRODUCTION}
+
+ASPIC is a collection of image processing programs.
+It is not a monolithic package of the usual kind, nor even a tight group of
+interacting programs like SPICA.
+The common link is that they were all written using INTERIM (the first Starlink
+software environment: see SUN/4), are held in a single directory (except for
+the EDRS and PERIODS packages which are stored in subdirectories) and share a
+common HELP library.
+Minimal effort is needed to add new programs to the system.
+A summary of the available ASPIC programs is given in section 2.
+
+The programs may be run using the RUNSTAR command (see SUN/4).
+However, this was found to be very tedious and it offers only primitive
+inter-program communication.
+Consequently, another command language called DSCL has been implemented.
+This provides an on-line HELP facility both for ASPIC programs and DSCL itself,
+a procedure mechanism for creating new applications, an image stack for
+intermediate image storage, and a convenient way of handling parameters by
+position, keyword or default which saves a lot of typing.
+Communication between programs is also improved by having a database of
+information about the images displayed on the ARGS.
+This makes it possible to separate the display function from manipulative
+functions.
+Any program held in any directory may be run by DSCL with no further action
+except that the directory name is required if the program does not reside in
+the current default directory.
+An introduction to DSCL is given in section 3, to the HELP system in section 4
+and to the ARGS database in section 5.
+
+The word `package' is used in two different senses in this paper.
+The first refers to a collection of associated programs which are suited to
+a specific application area or were derived from a previously existing software
+package.
+The second (distinguished from now on by beginning with a capital P) refers to
+a set of programs in a specific directory which is activated by the
+DSCL `GO' command and have their own environment and HELP.
+The only Packages which exist in the currently installed version of ASPIC are
+EDRS, PER and CHART although some sites may also have installed extra local
+packages.
+The EDRS Package corresponds to the {\bf EDRS} program class (see below) and
+the PER Package corresponds to the {\bf Periods} class.
+The CHART Package corresponds to the CHART software item (see SUN/32) which
+is installed separately from the ASPIC programs and is not considered in this
+paper.
+The use of Packages is described in more detail in section 6.
+
+This paper only provides an introduction to ASPIC and DSCL.
+More detailed information on some of the ASPIC programs is contained in SUN/24 
+and on DSCL in SUN/74.
+A lot of information is also stored on-line where it may be accessed using the
+HELP facility or extracted for printing using the ASPIC program FILEDOC.
+A demonstration of ASPIC is shown in section 7.
+A tutorial introduction to ASPIC is contained in SG/1, which also contains
+extensive documentation on some of the more popular programs.
+
+This paper is a major revision of SUN/23.9 and also incorporates the material
+in the old SUN/53 which is now withdrawn.
+The original version of SUN/23 was written by Dave King and Ken Hartley while
+they were working at RGO.
+DSCL was developed by William Lupton at RGO and the ASPIC programs were written
+by many programmers throughout the Starlink network.
+
+ASPIC is in the process of being replaced by a set of application packages
+based on the new Starlink environment called ADAM (see SUN/94) which should
+replace the INTERIM environment.
+This will take a long time and ASPIC should remain available for several years
+to come.
+
+\section {APPLICATION PROGRAMS}
+
+ASPIC was initially created as a set of image processing primitives to handle
+the basic manipulations of images which are an essential part of any
+astronomical processing.
+Early releases concentrated on image arithmetic, standard filters,
+expansion/contraction/selection/combination of images, displaying and
+manipulating images on the ARGS and other devices.
+Later releases added to this sound framework many new astronomy-specific
+applications.
+Note in the following that images are often referred to as {\em frames}.
+A frame (or `BDF file') is the data structure used to store images in the
+INTERIM environment.
+
+ASPIC programs have been grouped into 21 classes.
+These are used in the program list in appendix B and in the on-line HELP system.
+The classes are as follows:
+\begin{description}
+\item [ARGS]:
+These programs either display images on the Sigmex ARGS or modify an existing
+display.
+The ARGS assigned to ARGS\_DEVICE is used.
+They all make use of entries in the ARGS database so that they can
+share information about the size and location of the visible images.
+Look-up-table operations are described under class {\bf LUT}.
+\item [Arithmetic]:
+These programs perform scalar operations on frames (in most cases they
+need not be 2D images) and array operations on a pixel by pixel basis.
+These are not matrix operations.
+\item [Astrometry]:
+These programs are logical extensions of the {\bf EDRS} (X,Y) routines which
+input and manipulate lists of (RA,DEC).
+They allow transformations between an ARGS pixel element and its position
+on the sky.
+They must be used in conjunction with the {\bf EDRS} programs XYKEY, XYCUR,
+XYFIT, XYTRAN and CINVERT.
+Their use is described in more detail in LUN/42 (RGO).
+\item [Compress]:
+These programs allow compression of the intensity range of images so that they
+can be packed into as few bits as possible for rapid transfer over the network.
+They should not be confused with those in class {\bf Size} which actually
+change the dimensions of an image.
+\item [Details]:
+These programs extract various details from images.
+They cover such things as descriptor items, sections, positions of details
+in an image, and the histogram.
+\item [Display]:
+These programs perform various types of display, excluding the `usual' image
+display on the ARGS (see {\bf ARGS} class).
+Nevertheless, many of them use the ARGS in graphics mode.
+Some of the programs in the {\bf Details} class also display graphical
+information.
+See also SUN/24.
+\item [Docs]:
+These programs create program documentation or extract it from the HELP
+library.
+See also FILEDOC (section 4.2).
+\item [EDRS]:
+These programs comprise the Electronography Data Reduction System which is a
+Package designed for the reduction and analysis of large format astronomical
+images written by Rodney Warren-Smith at Durham.
+In its original form it specialised in the reduction of electronographic data
+but was built around a set of utility programs which were widely applicable
+to astronomical images from other sources.
+The programs align and calibrate images, handle lists of (X,Y) positions, apply
+linear geometrical transformations and do some stellar photometry.
+The Package has been extended and no restrictions in its application to other
+areas should arise.
+The {\bf GRASP} class programs offer extended versions of some of these
+programs and others which fit into the same overall scheme.
+To use an {\bf EDRS} program from within DSCL, type `GO EDRS' to enter the
+Package environment or prefix the program name with `EDRS:'.
+Within the Package environment, access the {\bf EDRS} on-line HELP library by
+typing `HELP'.
+A user manual is available from Warren-Smith in Durham; see also SUN/24.
+In 1988, {\bf EDRS} was updated by David Berry to support GKS 7 graphics, and
+image handling on the Digisolve IKON displays.
+\item [EDRSX]:
+This is an extension to the {\bf EDRS} package written by David Berry.
+It was originally produced to make possible more versatile analysis of IRAS
+images than was otherwise available.
+EDRSX provides facilities for converting images into and out of EDRS format,
+accessing RA and DEC information stored with IRAS images, and for doing several
+standard image processing operations such as displaying image histograms and
+statistics, Fourier transforms, etc.
+These enable such operations to be performed as estimation and subtraction of
+non-linear backgrounds, de-striping of IRAS images, modelling of image
+features, easy aligning of separate images, etc.
+\item [FC]:
+These programs allow up to three images to be combined together and displayed as
+a single {\em False Colour} picture.
+They can be applied to B,V,R or intensity/velocity images.
+The techniques used are described in LGP/3 (RGO).
+\item [Filter]:
+These programs perform some of the many types of noise filtering described in
+the literature which do not make use of Fourier techniques.
+Other non-Fourier filter programs are available in the {\bf EDRS} and
+{\bf GALPHOT} classes.
+\item [Fourier]:
+These are basic Fourier transform programs.
+More sophisticated programs are available in the {\bf EDRS} and {\bf GALPHOT}
+classes.
+\item [GALPHOT]:
+These programs perform photometry of bright galaxies and were written by
+Clive Davenhall at ROE.
+They do absolute photometric calibration, axis extraction, background fitting
+and normalization, contour mapping, ellipse fitting, equivalent profiling,
+intensity conversion, object removal, profile analysis, and smoothing.
+See also SUN/24.
+\item [Geometry]:
+These programs define and apply geometrical transformations to images.
+The transformations are non-linear; for linear transformations see the
+{\bf EDRS} class.
+\item [GRASP]:
+These programs comprise the Giant Raster and Stellar Photometry package which
+is an extension of the {\bf EDRS} Package with some more elaborate and varied
+profile fitting, including multiple star fitting, together with some programs to
+manipulate and display the results and to convert PDS scans into calibrated
+images.
+Some of them use 16-bit data to save storage of REAL and INTEGER incarnations.
+This is particularly important for the large images which this package was
+designed to handle (2000x2000 images have been successfully processed).
+The package was prepared by Alan Penny while he was working at RGO.
+\item [Input]:
+These programs allow various forms of data input into images.
+Users who are interested in authentic astronomical data should use PUTSTAR in
+{\bf GRASP}.
+\item [LUT]:
+These programs prepare and load look-up-tables into the ARGS.
+Each is a 3x256 {\em BDF} file and is loaded into the ARGS assigned to
+ARGS\_DEVICE.
+\item [Miscellaneous]:
+These programs do not fit into any of the other classes but perform many
+important functions.
+See also SUN/24.
+\item [Periods]:
+These programs comprise a Package (called PER) designed to search for periods in
+observations which may be spaced at regular or irregular intervals.
+They were built to handle photometric or radial velocity observations but are
+not restricted to these applications.
+They will {\em not} work on very large data sets such as may be produced by
+high speed photometers, and will {\em not} handle aperiodic phenomena which
+cannot be analysed as being composed of a number of periodic components.
+To use any of these programs from within DSCL, type `GO PER' to enter the
+Package environment or prefix the program name with `PER:'.
+Within the Package environment, `HELP' will contain information about these
+programs.
+The Package was put together by Norman Walker and Ken Hartley at RGO.
+See also SUN/24.
+\item [Photometry]:
+These programs extract photometric information from frames of pixel data.
+See also SUN/24.
+\item [Polarimetry]:
+These programs manipulate and reduce frames of polarimetric data.
+See also SUN/24.
+\item [Size]:
+These programs perform expansion and contraction of images, selection of parts
+of an image, and merging of several images.
+\end{description}
+\subsection {Feedback}
+Users are encouraged to send any comments about the performance --- efficiency
+and accuracy --- of these programs to RLVAD::STAR.
+The same should be done with bug reports, suggestions for modifications to
+existing programs, inclusion of new programs and deletion of `useless' programs.
+Authors of individual programs should only be contacted in case of difficulty
+using a program or to find out about the details of a particular algorithm.
+
+\section {DSCL}
+
+\subsection {Basic Facilities}
+DSCL aims to prevent as much redundant program parameter specification as
+possible.
+It provides the following facilities:
+\begin{itemize}
+\item Values of parameters can be set and the definitions remain in force
+until cancelled or until logout.
+\item Frames may be stored on a stack and programs can be instructed to
+read or write their data from or to it.
+A set of stack-handling commands is provided.
+\item Commands are provided to display and delete program parameter definitions
+and stack contents.
+\item Most DCL commands (all except for symbol assignments, labels, IF and
+GOTO) can be used in DSCL.
+The procedure facility allows a file containing any DSCL or DCL command to be
+executed making full use of all DCL symbols, conditional tests, etc.
+If you have a procedure called STARTUP, it is executed automatically when you
+enter DSCL.
+\item Help on DSCL command syntax, DSCL procedures and ASPIC programs etc.\
+can be obtained by the HELP command which operates just like DCL HELP and
+provides, in addition, help on DCL commands.
+\item All commands may be abbreviated to their briefest unambiguous form.
+DSCL commands will prompt for their parameters if these are omitted (DCL ones
+won't).
+\end{itemize}
+\subsection {Restrictions}
+It is a DCL restriction that command procedures cannot be nested more than
+eight deep.
+This will not cause problems unless user procedures are nested more than six
+deep.
+\subsection {Simple Use of DSCL}
+To enter DSCL from DCL type the command:
+\begin{quote}
+{\tt \$ DSCL}
+\end{quote}
+The DSCL prompt is:
+\begin{quote}
+{\tt Dscl$>$}
+\end{quote}
+This is an invitation to input one of the following:
+\begin{enumerate}
+\item The name of an application program,
+\item The name of a DSCL procedure,
+\item A DSCL or DCL command
+\end{enumerate}
+with an optional argument list.
+In cases 1 and 2 a search is carried out for the executable image file or
+procedure file.
+The order of searching is:
+\begin{enumerate}
+\item Current directory,
+\item Local ASPIC directory (defined by logical name DSCL\_LOCDIR),
+\item Package directory (DSCL\_PAKDIR),
+\item ASPIC directory (ASPDIR),
+\item Logical name tables.
+\end{enumerate}
+Thus, it will not normally be necessary to specify a disk or directory name.
+If one is specified, no searching is done.
+Note that only one Package directory is searched and any
+programs or procedures in this directory may be referenced by name only.
+Programs or procedures in other Packages can only be referenced by prefixing the
+name by the full file description of the directory in which they are stored or
+an equivalent logical name.
+
+On receiving a command, DSCL assumes first of all that an application program
+is to be run.
+It is only when the search for an executable image file fails that it looks for
+a DSCL procedure file, and it is only when this second search fails that it
+tries to execute the command as a DSCL or DCL command.
+This means that there is a possible ambiguity where, for example, a
+procedure has the same name as an application program.
+For this reason, it is possible to begin any DSCL command with a special
+character to indicate what sort of command it is.
+These special characters are:
+\begin{verbatim}
+        Application program     -     *
+        DSCL procedure          -     @
+        DSCL or DCL command     -     $
+\end{verbatim}
+Clearly the presence or absence of a `*' makes no difference.
+Note that these special characters affect only the `jump-in' point for the
+search.
+If the command starts `@' and no procedure is found, an attempt is still
+made to execute it as a DSCL or DCL command.
+
+To get out of DSCL type:
+\begin{quote}
+{\tt STOP}
+\end{quote}
+\subsection {Program Parameters}
+Suppose that you have a program ADD which adds together two frames.
+It has three parameters:
+\begin{description}
+\begin{description}
+\item [IN1]: the first input frame.
+\item [IN2]: the second input frame.
+\item [OUT]: the output frame.
+\end{description}
+\end{description}
+The normal way of running this program outside DSCL, perhaps during its
+development, would be to type:
+\begin{quote}
+{\tt \$ RUNSTAR ADD/IN1=SALT/IN2=PEPPER/OUT=CRUET}
+\end{quote}
+(inserting your own values), or:
+\begin{quote}
+{\tt \$ RUNSTAR ADD}
+\end{quote}
+(responding to the prompts issued by the system).
+
+When you communicate with DSCL, these parameters are known as ADD\_IN1, ADD\_IN2
+and ADD\_OUT and their values are of relevance only to program ADD.
+The first time you run ADD none of the parameters are defined, so if you
+merely type:
+\begin{verbatim}
+     ADD
+\end{verbatim}
+the program will prompt you for them:
+\begin{verbatim}
+     IN1:=SALT
+     IN2:=PEPPER
+     OUT:=CRUET
+\end{verbatim}
+Alternatively, you could have typed:
+\begin{verbatim}
+      ADD IN1=SALT IN2=PEPPER OUT=CRUET
+\end{verbatim}
+These both have exactly the same effect, as does:
+\begin{verbatim}
+      ADD SALT PEPPER CRUET
+\end{verbatim}
+You could also type:
+\begin{verbatim}
+      ADD_IN1=SALT
+      ADD_IN2=PEPPER
+      ADD_OUT=CRUET
+      ADD
+\end{verbatim}
+Here we have defined values for all three parameters and DSCL will remember
+them for future use.
+DSCL never remembers parameter values unless you ask it to, thus you can keep
+track of what is going on.
+You can always use the LOOK command in cases of doubt:
+\begin{verbatim}
+      LOOK ADD
+\end{verbatim}
+In this case the following output would result:
+\begin{verbatim}
+      ADD_IN1 = SALT
+      ADD_IN2 = PEPPER
+      ADD_OUT = CRUET
+\end{verbatim}
+Typing `CLEAR ADD' will cancel all the above definitions (they can be cancelled
+individually as well).
+
+All this would be wonderful were ADD the only program in the world.
+This may be the case at present (it isn't in fact), but we can hope for a
+better state of affairs in the future.
+Suppose we also have a program STATS which has a single parameter IMAGE which
+is an input frame whose size, mean data value etc.\ are to be calculated.
+We might want to run ADD and then use the output from it as the input to STATS.
+One way of doing this is:
+\begin{verbatim}
+      ADD_OUT=POWER
+      ADD REALSQ IMAGSQ
+      STATS ADD_OUT
+\end{verbatim}
+In fact we know that the value of ADD\_OUT is POWER so we could just have typed
+`STATS POWER'.
+However, in some circumstances we might know only the parameter name.
+Suppose we have a program LIMITS which takes a 1D image, displays it, and gets
+the user to define a left and right cutoff using the cursor.
+These values go into a parameter LIMS and, if they are ever needed again, can be
+retrieved as in the following example:
+\begin{verbatim}
+      LIMITS INPUT=M57.HIS
+      RESCALE INPUT=M57 INLIMS=LIMITS_LIMS OUTPUT=$ OUTLIMS=0,255
+\end{verbatim}
+For an explanation of the mysterious `\$' read on.
+\subsection {The Image Stack}
+For many applications it is far more convenient to use the stack than
+continually to have to think up new temporary names.
+A `\$' as a parameter value (provided it is a frame) means that
+the frame is to come from or go to the stack.
+Note that because it is DSCL rather than the application program that handles
+the stack, it is {\em not} possible to respond `\$' to a parameter prompt from
+an application program.
+
+ADD is a good example of such an application.
+If we type:
+\begin{verbatim}
+      ADD $ $ $
+\end{verbatim}
+then it is assumed that both input frames are to come from the stack and that
+the output frame is to go back to it.
+DSCL will ensure that the appropriate stack house-keeping is carried out.
+Thus, using the stack, DSCL behaves like an HP calculator.
+
+Here is an example of a procedure which calculates a power spectrum from the
+real and imaginary parts of a Fourier Transform.
+It is self-explanatory and gives a taste of the power afforded through the use
+of DCL in DSCL procedures:
+\begin{verbatim}
+      !      Procedure PSPECT
+      !
+      !      Take real and imaginary format frames from stack
+      !      and evaluate power spectrum on stack
+      !
+            DUPE                  ! duplicate top of stack
+            MULT $ $ $            ! square one image
+            SWAP                  ! bring other to top of stack
+            DUPE                  ! duplicate top of stack
+            MULT $ $ $            ! square other image
+            ADD $ $ $             ! calculate the power spectrum
+\end{verbatim}
+
+\section {ASSISTANCE}
+
+Most of the detailed documentation of ASPIC and DSCL is held on-line and may be
+accessed through a HELP command; the same information may also be printed.
+The appendices to this paper give full lists of DSCL commands and ASPIC
+programs.
+\subsection {HELP}
+The HELP library is grouped into classes which correspond to the sections of
+Appendix B.
+It also contains information on the following topics:
+\begin{description}
+\begin{description}
+\item [ASPIC]: Some brief notes on ASPIC.
+\item [DSCL]: Detailed information about DSCL under various headings.
+\item [HELP]: How to use the HELP system.
+\item [LOCAL]: These are programs which are only available at the local site and
+cannot be accessed by DSCL unless prefaced by a locally-defined directory name.
+Some sites may adopt other strategies such as defining a `local' DSCL command
+LDSCL.
+\end{description}
+\end{description}
+Because of the way HELP libraries work, if a program should be in more than one
+class then a second copy of the documentation must be stored.
+In general this has not been done so be aware that programs documented in one
+class may be of use in other contexts.
+\subsubsection {ASPIC HELP}
+The ASPIC HELP library and the standard VMS library may both be searched by
+using a modified version of the standard VMS HELP.
+Within DSCL, typing `HELP' initiates an interactive session in exactly the same
+way as the standard VMS HELP.
+However, there are three differences from the standard HELP:
+\begin{itemize}
+\item The first library to be searched is the ASPIC HELP library. The structure
+of this means that:
+\begin{description}
+\begin{description}
+\item [Topics]: are the {\em classes} of ASPIC programs.
+\item [Sub-topics]: are the individual programs.
+\item [Sub-sub-topics]: are {\em date}, {\em author} and {\em parameters}.
+\end{description}
+\end{description}
+This means that it is no-longer possible to ask for HELP on an individual
+program; you must either specify a class or use the command:
+\begin{verbatim}
+      HELP * program
+\end{verbatim}
+where the `*' means search all classes.
+For any prompt, a response of $<$CR$>$ will take you up a single
+level in the hierarchy and a response of `?' (with {\em no} $<$CR$>$) will list
+the options available at that stage.
+\item The VMS library is also available at the same time.
+When at the `topic' level, simply prefacing any command with `@VMS' will search
+that library; using `@ASP' will return to the ASPIC library.
+\item It is possible to page output to most terminals.
+It has not been possible to confirm that this procedure works on every terminal
+in Starlink, but it does on all the terminals on which it has been tried.
+Output may be interrupted when a page has been output by responding `?'.
+\item For the effect on HELP of activating Packages, see section 6.5.
+\end{itemize}
+The command WHERE allows you to find out how to find out about an ASPIC
+program.
+It works as follows:
+\begin{verbatim}
+      WHERE program
+\end{verbatim}
+will respond with the string `HELP topic program' where the topic is the one
+appropriate to the selected program (or procedure) name.
+\begin{verbatim}
+      WHERE
+\end{verbatim}
+an alphabetical list of {\em all} ASPIC programs is output.
+\begin{verbatim}
+      WHERE/OUTPUT=LIST
+\end{verbatim}
+the same information is written to the file LIST.LIS.
+\begin{verbatim}
+      WHERE/PRINT
+\end{verbatim}
+the same information will be printed but not stored.
+\subsection {FILEDOC}
+A procedure has been written to create documentation in a form suitable for
+printing.
+The command may be used in several forms:
+\begin{verbatim}
+      FILEDOC
+\end{verbatim}
+will write a classified list of all ASPIC programs into the file INFO.LIS.
+\begin{verbatim}
+      FILEDOC class program [parameters,author,date]
+\end{verbatim}
+will write the requested information into a suitable file and tell you its
+name.
+\begin{verbatim}
+      FILEDOC *...
+\end{verbatim}
+will write the complete ASPIC HELP information into a file.
+The resulting output occupies about 200 pages when printed so this should not be
+done unless it is essential.
+\subsection {FULLDSCL}
+The command:
+\begin{verbatim}
+      $ PRINT ASPDIR:FULLDSCL.LIS
+\end{verbatim}
+will print a much fuller account of DSCL than the one contained here.
+There are also more examples and a description of the mechanism for creating
+and running procedures.
+DSCL is also documented in SUN/74.
+
+\section {ARGS DATABASE}
+
+ASPIC separates the processing and manipulation functions from the display
+function.
+This is possible because each time ADISP is used to display an image, an
+entry is made in a small database.
+AZOOM, for example, can find out where the last image displayed was located on
+the ARGS screen and hence give sensible run-time defaults.
+Likewise, routines which use the ARGS cursor `know' whether the point selected
+was inside an image and can also return the co-ordinates of the selected point
+in `array' co-ordinates, not just in ARGS co-ordinates.
+
+No programs have been implemented which read image data back from the ARGS
+memory.
+Consequently, programs which need to access the data, such as SLICE, must
+prompt for the image name.
+Provided the image whose name is given is of the same size as the one displayed
+it need not be the one displayed.
+Thus, a contrast enhanced or smoothed version may be displayed but a slice may
+be taken out of the raw data.
+However, program LUTSTORE reads a look-up-table back from the ARGS and stores it
+as a BDF file.
+
+\section {APPLICATION PACKAGES}
+
+The Applications Package concept can be used not only as a Starlink-wide or
+local ASPIC facility, but also on an individual user basis.
+The following sub-sections describe the DSCL command to initiate searching of
+the Package directory, defining the Package directory and the effects on the
+HELP facility.
+\subsection {Initiating the Package}
+When DSCL is started, logical name DSCL\_PAKDIR is set to `NULL' and
+therefore the searching of directories defaults to the original structure.
+The new Package will only be used if specifically requested by the user.
+This ensures that DSCL/ASPIC is upwards compatible and no changes are required
+to existing ASPIC programs and procedures.
+The searching of the Package directory is initiated by the following command:
+\begin{quote}
+{\tt GO {\em Package name}}
+\end{quote}
+Where {\em Package name} is a logical name which translates into the directory
+where the Package programs are stored.
+It is possible to GO directly from searching one Package to searching another
+without returning to the normal DSCL state.
+In order to return to the normal DSCL state, ie.\ no searching of a Package
+directory, type:
+\begin{quote}
+{\tt GO DSCL}
+\end{quote}
+Typing `STOP' at any stage will cause an orderly close down of DSCL and a return
+to VMS.
+\subsection {Package names}
+The Package name is a logical name which may be set in one of three places.
+The logical names of any Starlink supported Packages will be set up in file
+ASPDIR:ASPPAK.COM.
+Similarly, for any locally supported Packages they will be set up in the file
+DSCL\_LOCDIR:ASPPAK.COM.
+These two files will be executed when DSCL is started.
+Note that they will not redefine any existing logical names, so you can set
+a logical name in your own LOGIN.COM file to point to a directory which
+contains your own version of a Starlink or locally supported Package.
+This is a very useful facility for modifying and testing an existing Package
+without inconveniencing users of this supported Package.
+You can also define a logical name or redefine an existing logical name once
+DSCL has been started.
+\subsection {Package initialisation}
+A Package may wish to have its own initialisation routine to preset certain
+variables, etc.
+This can be done automatically by including a file INIT.SCL in the Package
+directory.
+When the GO command is executed the Package directory is searched for a file
+INIT.SCL which, if found, is executed.
+\subsection {Package prompts}
+When Package searching is in operation, the normal `DSCL$>$' prompt will be
+replaced by a prompt `{\em Package name}$>$' unless the Package name is longer than
+7 characters, in which case the prompt is formed from the first 7 characters of
+the Package name.
+Therefore, if you issue several GO commands the prompt will always tell you
+which Package directory is currently being searched.
+\subsection {Package HELP}
+In DSCL's default state the searching order for the HELP libraries is the ASPIC
+HELP library, followed by the VMS HELP library.
+When you issue a GO command, a search will be made in the Package
+directory for a file HELPLIB.HLB which, if found, will be made the first HELP
+library to be searched, followed by the ASPIC HELP library and finally the VMS
+HELP library.
+This means that Packages can have their own HELP system which is totally
+independent of the ASPIC HELP system but is only available when the GO command
+has been issued.
+It is not essential for a Package to have a HELP library; if one is
+not present then DSCL's default state HELP system will still be available.
+\subsection {Package closedown}
+When a Package closes down because we are GOing to another Package or returning
+to the normal DSCL level, the Package may wish to execute its own tidying up
+routine.
+This can be done automatically by including a file TIDY.SCL in the Package
+directory.
+Therefore, when GOing to another Package or to DSCL, the current Package
+directory is searched for a file TIDY.SCL which, if found, is executed.
+\subsection {DSCL procedures}
+The GO command may also be used in DSCL procedures, provided the logical names
+for the Packages have been set up when the procedure was compiled.
+\subsection {Example}
+Suppose a user with default directory DISK\$USER1:[USER] has modified some
+ASPIC programs or written his own programs for his particular data reduction
+system and stored them in a subdirectory [USER.\-ASPIC].
+His data consists of a number of observation runs stored in the subdirectories
+[USER.OBS1], [USER.OBS2], etc.
+In order to use the Package facility he could put the following statement in
+his LOGIN.COM file:
+\begin{quote}
+{\tt ASSIGN DISK\$USER1:[USER.ASPIC] MYPAK}
+\end{quote}
+Then, in whichever subdirectory he runs DSCL and wishes to use his ASPIC
+programs (stored in the subdirectory [USER.\-ASPIC]) he only has to type:
+\begin{quote}
+{\tt GO MYPAK}
+\end{quote}
+This will change the DSCL prompt to `MYPAK$>$' and enable searching of the
+subdirectory [USER.\-ASPIC] before searching the main ASPIC directory.
+Since the Package name is a logical name, the user can always refer
+directly to his own programs while running DSCL in its default state, or within
+another Package by prefixing the program name with the logical name (eg.\
+MYPAK:progname).
+This will be useful if the user uses another Package but still wishes to refer
+to a program or procedure in MYPAK.
+
+\section {DEMONSTRATION}
+
+A self-documenting demonstration procedure has been devised which shows some
+application programs in action and illustrates some features of DSCL.
+It also shows how DSCL command procedures can be used for repeated operations.
+To run it, type:
+\begin{verbatim}
+      $ DSCL
+\end{verbatim}
+followed by:
+\begin{verbatim}
+      DEMO/ECHO
+\end{verbatim}
+The /ECHO qualifier ensures that each line of the procedure, including the
+comments, is written to the terminal as it is executed.
+When it has finished, leave DSCL by typing:
+\begin{verbatim}
+      STOP
+\end{verbatim}
+The procedure displays and manipulates a 256x256 image of the Horsehead Nebula
+obtained by scanning a UKSTU plate on the PDS microdensitometer.
+The procedure is held in file ASPDIR:\-DEMO.\-SCL and its `compiled' version
+in file ASPDIR:DEMO.SCC.
+
+\section {IMPLEMENTATION}
+
+If the ASPIC directory is moved or installed at a new site, the logical names
+defined in ASPDIR:ASPAK.COM may need changing, as well as those defined in
+LSSC:STARTUP.COM.
+Also, check that ASPDIR:ASPINST.COM is acceptable.
+
+\section {REFERENCES}
+
+\begin{description}
+\begin{description}
+\item [SG/1]: ASPIC Guide.
+\item [SUN/4]: INTERIM --- Starlink software environment.
+\item [SUN/24]: ASPIC --- Image processing programs (2).
+\item [SUN/32]: CHART --- Finding chart and stellar data system.
+\item [SUN/74]: DSCL --- An interim Starlink command language.
+\item [SUN/94]: ADAM --- Starlink software environment.
+\item [LGP/3 (RGO)]: Some comments on displaying images.
+\item [LUN/42 (RGO)]: A simple interactive astrometry package.
+\end{description}
+\end{description}
+\appendix
+
+\section {DSCL COMMAND SUMMARY}
+
+\begin{quote}
+\begin{verbatim}
+Program        [<commchar>]<progname>[ <parval1>[ <parval2>[...]]]
+                 (<parvaln> is of the form [<param>][=][<value>])
+Procedure      <procname>[/EC[HO]][ <param1>[ <param2>[...]]]
+DSCL command   Behave as DCL commands
+DCL command    As normal
+CLEAR          CL[EAR] [P[ARAM] ]<progparam>
+               CL[EAR] S[TACK]
+                 (<progparam> is of the form <program>[_<param>])
+COMPILE        COM[PILE] <procname>[/NOEC[HO]]
+DUPE           DU[PE]
+HELP           H[ELP][ <item>[ <subitem1>[ <subitem2>[...]]]]
+LASTX          LA[STX]
+LET            [LE[T] ]<progparam1>=<progparam2>
+                 (In most circumstances `LET' can be omitted.)
+LOOK           LOO[K] [P[ARAM] ]<progparam>
+               LOO[K] S[TACK]
+                 (<progparam> is of the form <program>[_<param>])
+POP            PO[P]
+PUSH           PUS[H] <filename>
+RCL            RC[L] <filename>
+STORE          STOR[E] <filename>
+SWAP           SW[AP]
+\end{verbatim}
+\end{quote}
+\newpage
+
+\section {CLASSIFIED LIST OF PROGRAMS}
+
+This appendix lists every documented ASPIC program and procedure grouped into 21
+classes.
+These correspond to topics in the HELP library and are arranged in alphabetical
+order.
+
+Some programs can be run either directly (by specifying the program name) or
+indirectly (by specifying a procedure which runs the program).
+In such cases the name of the program is made by following the name of the
+procedure by the character `P'.
+For example, {\bf INDPIX} is a procedure which runs program {\bf INDPIXP}.
+In the list below, such procedure/program combinations are indicated by
+following the procedure name by the character `*', eg.\ {\bf INDPIX*}.
+\subsection {ARGS}
+\begin{description}
+\begin{description}
+\item [ABLINK]: Display two images on the ARGS and allow them to be registered
+and blinked under trackerball control.
+\item [ABLOCK]: Display a ramp on the ARGS.
+\item [ACLEAR]: Clear the ARGS display.
+\item [ADHC]: Automatic high-contrast display of an image.
+\item [ADISOV]: Disable (thereby making the data invisible) an overlay plane in
+the ARGS.
+\item [ADISP]: Display an image on the ARGS with automatic scaling of intensity
+values if required.
+\item [ADISP3]: Variation of ADISP which displays in turn the z-planes in a
+3D image.
+\item [AEROV]: Erase ARGS overlays in a specified bit plane.
+\item [AFLASH]: Faster version of ADISP because it does not do any intensity
+scaling.
+\item [AFRAME]: Display a frame and graticule round the latest image displayed
+on the ARGS.
+\item [AGBLINK]: Display two images on the ARGS; just like ABLINK except two
+distinct lookup tables may be used, one with each image.
+\item [ALIST]: List parameters for all images held in the ARGS database and
+hence displayed on the ARGS by ASPIC programs.
+\item [APAN]: Pan and zoom the ARGS display; return final position of cursor.
+\item [APANG]: Pan and zoom the ARGS display with independent scaling in X and
+Y; return final position of cursor.
+\item [APIC]: Display an I*2 image on the ARGS and allow the scale and zero
+point to be changed interactively to produce the best looking image.
+It is faster than other display programs and allows quick investigation of the
+range of intensity values.
+Can pan and zoom.
+\item [ARESET]: Reset all ARGS functions.
+\item [ATEXT]: Place text on the ARGS display.
+\item [AUCUR]: Allow use of a variable size and shape cursor.
+\item [AZOOM]: Zoom the ARGS about a defined position.
+\item [BLINKER]: Use after ABLINK to continue blinking with new zoom
+factors and centre.
+\item [CDEMO]: Demonstration of a square cursor; allows zoom of an ARGS image
+so that a selected region fills the screen.
+\item [DATIM]: Display current date and time as characters on the ARGS if
+needed for recording.
+\item [GBLINKER]: More general version of BLINKER which allows different
+lookup tables to be used with the two images being blinked.
+\item [GREYCELL]: Produce a grey scale representation of a Starlink image file
+on raster graphics devices known to GKS 7.2.
+Vector graphics devices, such as Tektronix 4010 emulators, cannot be used.
+\item [ICBLINK]: Allow blinking of images with distinct look-up-tables using
+integer images.
+\item [ICDISP]: Variation on ADISP which specifically displays 16-bit images.
+It also allows compression of an image so that it will fit on the ARGS screen.
+\item [UNZOOM]: Set the ARGS zoom factors to 1 and 1 on the centre of the
+screen.
+\end{description}
+\end{description}
+\subsection {ARITHMETIC}
+\begin{description}
+\begin{description}
+\item [ADD]: Add two frames.
+\item [ADDMSK]: Combine two images where effect is defined by 2 masks
+created by POLIFILLA.
+\item [BITMASK]: Logical AND of a frame with a scalar.
+\item [CADD]: Add a scalar to a frame.
+\item [CDIV]: Divide a frame by a scalar.
+\item [CMULT]: Multiply a frame by a scalar.
+\item [CPOW]: Raise each element of a frame to a power.
+\item [CSUB]: Subtract a scalar from a frame.
+\item [DIV]: Divide a frame by a second frame.
+\item [DIVFF]: Divide a frame by a frame, preserving the scaling.
+\item [EXP]: Exponentiate each element of a frame.
+\item [FLIPMSK]: Interchange 0's and 1's in a mask image.
+\item [LOG]: Natural logarithm of each element of a frame.
+\item [MULT]: Multiply two frames, element by element.
+\item [SQRT]: Replace each element by its square root.
+\item [SUB]: Subtract the second frame from the first.
+\end{description}
+\end{description}
+\subsection {ASTROMETRY}
+\begin{description}
+\begin{description}
+\item [CCIRD]: Set the transformation coefficients calculated by CINVERT to the
+input for RDTOXY.
+\item [CFICI]: Set the transformation coefficients calculated by XYFIT to the
+input for CINVERT.
+\item [CFITR]: Set the transformation coefficients calculated by XYFIT to the
+input for XYTRAN.
+\item [CFIXY]: Set the transformation coefficients calculated by XYFIT to the
+input for XYTORD.
+\item [COORDS]: Allow up to 500 points in the current image displayed on the
+ARGS to be identified using the cursor and stored as an output image.
+\item [CURFIT]: Calculate the astrometric position and photometric parameters
+for a stellar image identified using the box-cursor on the ARGS.
+\item [RDKEY]: Keyboard input of a list of right ascensions and declinations.
+\item [RDLIST]: Type/print a stored list of right ascensions and declinations.
+\item [RDTOXY]: Convert a list of right ascensions and declinations into crosses
+superimposed on an image displayed on the ARGS.
+\item [STARXY]: Measure astrometric (X,Y) positions of user selected stars in an
+image and save them in a file.
+\item [TESTFIT]: Calculate the astrometric position and photometric parameters
+of a stellar image for which approximate coordinates are input by the user.
+\item [XYTORD]: Convert cursor defined positions on the ARGS into a list of
+right ascensions and declinations.
+\end{description}
+\end{description}
+\subsection {COMPRESS}
+\begin{description}
+\begin{description}
+\item [CONFLEV]: Rescale an image using the background level and noise variance.
+\item [PACK]: Pack an image which has been scaled from 0 to 1 (thresholded) or
+0 to 3 (confidence levels) by CONFLEV.
+\item [UNPACK]: Unpack images created by PACK (PACK and UNPACK may be used to
+compress images for transmission over the network).
+\end{description}
+\end{description}
+\subsection {DETAILS}
+\begin{description}
+\begin{description}
+\item [CCDCON]: Change the dimensions of an image by resetting the values of
+the NAXIS1 and NAXIS2 descriptors.
+\item [COG]: Show the centre of gravity in (X,Y) of an image.
+\item [CURVAL]: Display the coordinates and value of a cursor selected pixel
+within an image.
+\item [CYDSCR]: Copy a complete frame descriptor to another frame.
+\item [DESCR]: Show one or all of the descriptors of a frame.
+\item [HIST*]: Histogram a patch of an array.
+\item [HISTPLOT]: 1D histogram plot of a Starlink image.
+\item [IMSIZE]: Determine the dimensionality and size of a frame.
+\item [INSPECT]: Perform similar functions to PEEP, WRHIST and STATS on several
+selected regions of an image.
+\item [ISLICE]: The equivalent of SLICE after use of ICDISP.
+\item [MEAN*]: Calculate the mean from a patch of an array.
+\item [MEDBOX*]: Calculate the median from a patch of an array.
+\item [MSLICE]: Variant of SLICE which allows multiple slices to be obtained 
+but which stores none of them.
+\item [MULCON]: Produce a contour map of a frame, or a series of contour maps
+of selected regions of a frame.
+Output files produced are suitable for a Versatec.
+\item [SECTOR]: Define, display and store the radial profile in a cursor-defined
+sector of an image displayed on the ARGS.
+\item [SLICE]: Define, display and store a 1D cursor-defined slice through an
+image displayed on the ARGS.
+\item [STAR]: Find location, size and intensity of a star assumed to occupy
+most of an image.
+\item [STATS]: Show dimensions, range of values and so on of a frame.
+\item [TBXY]: Return the location of a cursor-defined point in an image
+displayed on the ARGS.
+\item [TBXY2]: Return the location of a pair of cursor-defined points in an
+image displayed on the ARGS.
+\item [WRDSCR]: Write new items as descriptors into an existing frame.
+\item [WRHIST]: Form, store and/or write out the histogram of a frame.
+\end{description}
+\end{description}
+\subsection {DISPLAY}
+\begin{description}
+\begin{description}
+\item [AHARDCOPY]: Copy the current ARGS pixel store onto the Printronix
+lineprinter.
+\item [ANNOTASP]: Annotate an image displayed on the ARGS with text strings,
+arrows or scale-length bars.
+\item [APLOT*]: Plot an image on the ARGS with suitable scaling so that the whole
+image fits onto the whole screen.
+\item [APLOTQ]: Similar to APLOT but fits the image into one quadrant of the
+ARGS screen.
+\item [APLOTRNG]: Plot an intensity wedge on the ARGS with a scale.
+\item [BONW]: Set the ARGS background to white with black lines when using the
+ARGS in vector rather than image mode.
+\item [CLRQUAD]: Clear a given quadrant on the ARGS.
+\item [CONTOUR]: Draw a contour map of an image on one of several devices.
+\item [DOODLE]: Create images on the ARGS suitable for photographing to make
+slides.
+Allows images, text, lines and arrows to be displayed in a flexible way to
+convert a {\em picture} into a {\em diagram}.
+\item [GREYLASER]: Produce a grey-scale representation of an image file on
+a Canon LBP-8 A2 laser printer (see SUN/24).
+\item [GREYSCALE]: Extended version of VERGREY which also produces greyscale
+pictures on the Printronix printers.
+\item [HIDE]: Draw various forms of hidden-line plot.
+\item [LIMITS]: Draw a graph of a 1D frame and ask for cursor selection of two
+points.
+\item [LINPLOT]: Draw the graph of a 1D frame on one of several devices.
+\item [LIST]: List part of a frame.
+\item [MOVIE]: Display a movie made up of 1D plots of successive rows of a
+2D frame.
+Plot up to 500 pixels in the X-direction with a delay between each row
+controlled by the trackerball.
+\item [PEEP]: Type a 9x9 section of an image.
+\item [PLOTQTH]: Threshold an image and plot it on an ARGS quadrant.
+\item [THRESH]: Define a threshold value using the ARGS trackerball; the effect
+is visible on the ARGS.
+\item [VERGREY]: Generate pseudo-greyscale output for the Versatec.
+\item [WONB]: Set the ARGS to white lines on a black background when it is used
+in vector mode.
+\end{description}
+\end{description}
+\subsection {DOCS}
+\begin{description}
+\begin{description}
+\item [CREDOC]: Guide user through the creation of program documentation
+(calls the program DOCIT).
+\item [EDDOC]: Allow user to edit program documentation before it is put into a
+program.
+\item [FILEDOC]: Generate the HELP available on any topic in a form
+suitable for printing.
+\item [PUTDOC]: Put a documentation file created by CREDOC into the source of
+the program in the form of `C+' comments (calls program STUFF and the command
+procedure EDITIT).
+\item [UNDOC]: Remove the documentation from the start of a program if major
+changes are required (calls the program STRIP).
+\end{description}
+\end{description}
+\subsection {EDRS}
+\begin{description}
+\begin{description}
+\item [ARGPIC]: Display images on the ARGS with autoscaling and choice of
+screen position. Can also display images on a Digisolve IKON display.
+\item [ARITH]: Scalar arithmetic.
+\item [AVERAGE]: Average all valid regions of an image.
+\item [BDFKEY]: Read image data from a terminal.
+\item [BIN]: Average an image using rectangular bins.
+\item [BLANK]: Blank out a range of lines or columns in an image.
+\item [BOXFILTER]: Local averaging of an image.
+\item [CENTROID]: Find the centre of fiducial marks.
+\item [CINVERT]: Invert a bi-linear transformation.
+\item [COLLAPSE]: Produce a 1D image by collapsing a polygonal section of an
+image along the x or y axis.
+\item [CONT]: Plot contour map of an image leaving areas containing invalid
+pixels blank.
+\item [CUT]: Apply upper and lower intensity cuts to an image.
+\item [DESCRIPT]: Make image descriptor items available as program parameters.
+\item [FFCLEAN]: Remove blemishes from a flat image.
+\item [FILTSPEC]: Calculate resultant spectral energy distribution when a source
+with a known continuum spectrum is observed through combinations of optical
+components each of which has its own spectral transmission function.
+\item [IMGARITH]: Image arithmetic.
+\item [ITFCORR]: Apply intensity transfer function correction to an image.
+\item [ITFGEN]: Generate an intensity transfer function.
+\item [ITFPLOT]: Plot an intensity transfer function.
+\item [ITOR]: Convert an I*2 format image containing a scale factor and zero
+level in its descriptor into a R*4 image.
+\item [LINEFIT]: Fit linear functions to each line in an image.
+\item [MASK]: Mask one image with another so that the first image shows where
+it is valid but the second image shows through in the regions where the first
+is invalid.
+\item [MATHS]: Apply arithmetic and mathematical functions to input images and
+constants.
+\item [NOPROMPT]: Cancel automatic prompting mode set by PROMPT.
+\item [NORMALIZE]: Calculate the scaling required between two images of the
+same object with different exposure times so that they have (on average) the
+same data values.
+\item [NSTACK]: Stack images to improve signal/noise and remove blemishes.
+\item [PIXFILL]: Replace invalid regions of an image with a smooth function.
+\item [PIXMAP]: Move the pixels in an image to new positions so as to put them
+in a 2D set of bins.
+\item [PIXUNMAP]: Generalized resampling of a 1D or 2D image at a set of points
+defined by specified coordinate images.
+\item [PROFILE]: Extract and plot sections through images.
+\item [PROMPT]: Activate automatic prompting.
+\item [RESAMPLE]: Resample an image according to a bi-linear position
+transformation.
+\item [RESCALE]: Alter the scale and zero descriptors and reset the invalid
+pixel flag.
+\item [SEGMENT]: Copy polygonal segments of one image to another.
+\item [STARFIT]: Determine the best profile parameters for the stars in an
+image.
+\item [STARMAG]: Perform stellar photometry by fitting a model star profile.
+\item [SURFIT]: Produce image defined by a polynomial or bi-cubic spline surface
+which is a least-squares fit to an input image.
+\item [TRCONCAT]: Calculate the combined effect of applying two successive
+6-parameter linear position transformations to a set of (X,Y) coordinates.
+\item [TRIM]: Change the size of an image by selecting a square or rectangular
+region to copy into another image.
+\item [VIEW]: Produce a file suitable for printing containing an array of the
+integers stored in a square section of an image.
+\item [XYCOEFF]: Generate a set of position transformation coefficients from a
+specified shift, rotation and magnification.
+\item [XYCUR]: Create a file of (X,Y) positions from an image displayed
+on an ARGS or IKON.
+\item [XYCURA]: Extended version of XYCUR.
+\item [XYFIT]: Fit a bi-linear transformation between two sets of positions.
+\item [XYKEY]: Enter and store a list of (X,Y) positions from a keyboard.
+\item [XYKEYA]: Like XYKEY with more extended facilities.
+\item [XYLIST]: Type a set of (X,Y) positions.
+\item [XYLISTA]: Type up to 20 parameters in the same format as XYLIST.
+\item [XYTRAN]: Apply a linear transformation to a set of (X,Y) positions.
+\end{description}
+\end{description}
+\subsection {EDRSX}
+\begin{description}
+\begin{description}
+\item[BDFGEN]: Produces a BDF image or XY list from data stored in a text file.
+A wide range of text file formats can be handled.
+\item[CONVOLVE]: Convolves an image with a point spread function defined by
+another image.
+N.B.\ for large images this program is {\em very} slow; use procedure BIGCONV
+for such images.
+\item[CRDDBLUR]: Performs in-scan smoothing of CRDD using the in-scan
+point spread function of a specified IRAS band.
+\item[CRDDSAMPLE]: Subtracts linear baselines from a CRDD file to make the 
+data consistent with a given image.
+\item[CRDDTRACE]: Graphically displays data streams from individual IRAS
+detectors.
+\item[DATARANGE]: Displays various statistics of an image, including cumulative
+histogram points, and makes them available for use by other programs.
+\item[DRAWSCAN]: Draws a coloured box around a single IRAS scan which forms
+part of a mosiaced image displayed on an ARGS or IKON.
+\item[EDRSIN]: Converts a 2d image stored in any BDF data format into an image
+usable by EDRS and EDRSX, and ensures all the descriptors are set up properly. 
+\item[FIXINVAL]: Sets all invalid (or blank) pixels in an image, to a given
+valid value.
+\item[FOURIER]: Produces the Fourier transform of an image.
+\item[HISTOGRAM]: Plots a histogram of image pixel values from an image on any
+GKS 7.2 device.
+\item[IMGEDIT]: Allows inspection and alteration of individual pixels within
+an image, and creation of images containing data typed in by the user.
+\item[IMGSTACK]: Stacks several pre-aligned images together with optional
+weighting.
+Precisely the same as the EDRS program NSTACK except that high data values are
+never saturated.
+\item[IRASBACK]: Produces a ``background'' image onto which IRAS images can be
+automatically ``pasted'', in such a way that the resulting mosaic fits exactly
+onto the background image without any bits being lost over the edge.
+\item[IRASCOEF]: Calculates the linear transformation coefficients required to
+align two IRAS images.
+The coefficients produced can be passed on to program IRASSHIFT to shift one of
+the images into alignment with the other.
+\item[IRASCORR]: Corrects image descriptors to take into account a linear
+transformation of pixel positions.
+\item[IRASDSCR]: Given the RA and DEC of two pixels in a non-IRAS image,
+calculates the descriptors necessary for IRAS programs to position the image on
+the sky.
+Assumes the image pixels are square.
+\item[IRASIN]: Takes an EDRS image with IRAS descriptors and produces an image
+which can be used with I\_PICV or I\_CONTOUR.
+\item[IRASSHIFT]: Resamples an IRAS image so as to move the features to
+different locations within the image.
+The shift is described by 6 coefficients as produced by IRASCOEF for instance.
+Descriptors defining the position of the image on the sky are updated to take
+account of the shift.
+\item[ITFHIST]: Allows an image to be modified so that its histogram of pixel
+values matches that of a reference image as closely as possible.
+\item[MATCHBACK]: Subtracts offsets from overlapping images to minimise
+the difference between mean data value in the overlapp regions.
+\item[MEMCRDD]: Maps multiple CRDD files using a Maximum Entropy Method.
+\item[NDFOUT]: Converts an image from an EDRS .BDF file to an NDF .SDF file.
+\item[RADEC]: Converts a list of pixel co-ordinates to RA and DEC, or
+vice-versa.
+\item[SCATTER]: Produces a scatter plot of pixel values in one image
+against those in another.
+\item[SOURCEFIT]: Fits Gaussian-like sources to a set of merged features in an 
+image.
+\item[XYPLOT]: Plots positions held in an XY list on an image overlay device.
+\end{description}
+\end{description}
+In addition to these, there are several DCSL command procedures which use EDRSX
+and EDRS program, as examples of what can be done with these packages.
+These procedures use the features of DSCL and DCL to run programs automatically
+according to a preset recipe (see SUN/74).
+The user should look at these procedures for examples of how to use EDRS and
+EDRSX.
+They are in files with file extension .SCL and in directory EDRSX (e.g.\
+EDRSX:DESTRIPE.SCL):
+\begin{description}
+\begin{description}
+\item [BIGCONV]: Convolves two images by multiplying their Fourier transforms.
+{\em Much} quicker than program CONVOLVE when using large images.
+\item [BLINK]: Blinks between two images displayed on an ARGS allowing one to
+be moved relative to the other while blinking is in progress.
+\item [DESTRIPE]: For destriping IRAS images (see cookbook help on destriping
+for more information).
+\item [IRASSTACK]: Aligns and stacks separate IRAS scans.
+\item [MASKGEN]: Used to create masks for destriping IRAS images.
+\item [MEMASK]: Creates a mask for use with the ANALYSE facility in program 
+MEMCRDD.
+\item [SKYSUB]: Calculates a polynomial background to an image and subtracts
+it off the image.
+\item [WEIGHTGEN]: Used to create weight images for destriping IRAS images.
+\end{description}
+\end{description}
+The following utilities also exist :
+\begin{description}
+\begin{description}
+\item[BATCH]: Submits a DSCL command to run in batch with ALL currently defined
+logical names and symbols copied over from the current process to the batch job.
+The DSCL command thus runs in batch just as it would at the terminal.
+\item[ZAPTAB]: Removes tabs from a text file replacing them with sufficient
+spaces to maintain the same appearance.
+Any tab positions can be set up but by default EDT tab spacing is assumed.
+This program can be run from DCL using the RUN command as well as from DSCL.
+\end{description}
+\end{description}
+\subsection {FC}
+\begin{description}
+\begin{description}
+\item [FC]: Perform the `standard' false colour and colour enhancement
+operations in sequence.
+\item [FCDISP]: Display a false colour image with the correct LUT and zoom.
+\item [FCPACK]: Form a single false colour image from three (R,G,B) input
+images.
+\item [FCSAT]: Perform enhancement on the `saturation' image.
+\item [FCSCALE]: Allow rescaling of three input images to a common background
+and exposure.
+\item [FCTHSI]: Convert a set of R,G,B images to a set of H,S,I (Hue,
+Saturation, Intensity) images.
+\item [FCTRGB]: Convert a set of H,S,I images back to R,G,B.
+\item [LOG]: Logarithmic intensity enhancement.
+\item [TWOTONE]: Take two 2D Starlink images and form a single coded
+`pseudo-colour' image.
+\item [VELINT]: Form a composite image from a velocity and an intensity image.
+\item [VIDISP]: Display an image created by VELINT as a colour coded velocity
+map but with intensities represented as well.
+\end{description}
+\end{description}
+\subsection {FILTER}
+\begin{description}
+\begin{description}
+\item [BLURR]: Generate a 5x5 frame containing a Gaussian profile.
+\item [CONV]: Convolve an image with a second (smaller) one as may have been
+generated by BLURR or PSFEST.
+\item [FINULS]: Filter image noise using local statistics.
+\item [LAPLACE]: Form the difference between an image and some multiple of its
+Laplacian.
+\item [MEDIAN]: Apply a median filter at each point in an image.
+\item [MEM]: Maximum entropy deconvolution program for 2D images.
+\item [MODAL]: Apply a modal filter to discrete boxes in an image and then use
+linear interpolation for intermediate values.
+\item [MODE]: Apply a modal filter at each point of an image.
+\item [NITPIK]: Remove small defects from an image.
+\item [NORMFILT]: Apply a convolution and normalization to an image as an aid to
+star detection when using a matched filter.
+\item [ODDHDC1]: Apply an odd-order hierarchical convolution to a 1D image.
+\item [ODDHDC2]: Apply an odd-order hierarchical convolution to a 2D image.
+\item [RHDC1]: Apply a reduced odd-order hierarchical convolution to a 1D
+image.
+\item [RHDC2]: Apply a reduced odd-order hierarchical convolution to a 2D
+image.
+\item [SMOOTH]: Smooth an image by a Gaussian or top hat convolution.
+\item [USMASK]: Form an `un-sharp' masked image by subtracting a smoothed
+version of an image from the original.
+\end{description}
+\end{description}
+\subsection {FOURIER}
+\begin{description}
+\begin{description}
+\item [COSBELL]: Apply a cosine-bell function to a 1D or 2D image.
+\item [DFFTASP]: Efficient 2D FFT program.
+\item [FFT]: Apply a fast Fourier transform to a 1D or 2D image.
+\item [FILDEF]: Create a 1D or axi-symmetric 2D filter.
+\item [FTCONJ]: Complex conjugation of a Hermitian transform.
+\item [PSFEST]: Point-spread-function (star profile) from an image.
+\item [PSPEC]: Power spectrum from the Fourier transform.
+\end{description}
+\end{description}
+\subsection {GALPHOT}
+\begin{description}
+\begin{description}
+\item [ABOXASP]: Define and save a series of rectangular boxes drawn round
+selected features in an image.
+\item [BOXASP]: Define a single rectangular box round a selected feature in an
+image.
+\item [CNTEXT*]: Store details of contours found in a predefined region of an
+image.
+They can then be used for fitting ellipses.
+\item [COLDIF]: Generate a colour difference profile from two profiles
+extracted along the same axis of a nebular image in different colours.
+\item [ELLPLTP]: Plot previously found contours with superimposed ellipses
+which have been fitted using FITELLP.
+\item [ELLPRTP]: Print details of fitted ellipses.
+\item [EQPROFASP]: Compute equivalent profile, with associated photometric
+parameters, of a bright galaxy within an image in the system of de Vaucouleurs.
+\item [FITBAKASP]: Fit a polynomial to the background and divide it into the
+original image giving normalized intensities.
+\item [FITELLP]: Fit an ellipse to a set of extracted contours and store them
+for input to ELLPLTP and ELLPRTP.
+\item [JONESASP]: Smoothing program which uses different degrees of smoothing
+for the central parts of a galaxy and the fainter outer parts.
+\item [MAGCNTASP]: Produce absolutely calibrated contours in magnitudes per
+square arcsec.
+\item [PARPLTP]: Extract any two parameters from the ellipses which have been
+fitted by FITELLP and plot one against the other.
+\item [PECALBASP]: Absolute photometric calibration of a 2D image which is held
+as intensity normalized to a sky background of 1.0.
+\item [PRFDECASP]: Determine the parameters of the bulge and disk components in
+the observed profile of a galaxy.
+\item [PRFLOGASP]: Convert a profile held as normalized intensities into log of
+intensity above the sky.
+\item [PRFPLTASP]: Plot an extracted galaxy profile.
+\item [PRFPRTASP]: Produce a printed listing of a fitted profile and its
+associated parameters.
+\item [PRFVISASP]: Visual comparison of an extracted profile with profiles
+computed from a model with fixed parameters.
+\item [PRIAXEASP]: Extract the profiles along two orthogonal axes centred on a
+galaxy.
+\item [STAREMASP]: Interactively remove stars and blemishes from an image.
+\end{description}
+\end{description}
+\subsection {GEOMETRY}
+\begin{description}
+\begin{description}
+\item [FLIP]: Invert an image with respect to a horizontal or vertical axis.
+\item [MOVE]: Move an image by a non-integral shift in X and Y.
+\item [ROT3D]: Rotate the axes of a 3D image from (X,Y,Z) to (Z,Y,X).
+Designed for use in conjunction with STK23 to convert a set of 2 spectra (such
+as long slit IPCS) into a TAURUS-compatible cube.
+\item [STK23]: Combine a set of 2D images into a 3-D cube.
+\end{description}
+\end{description}
+\subsection {GRASP}
+\begin{description}
+\begin{description}
+\item [ALIGN]: Align an image with a reference image.
+\item [APERCUR]: Aperture photometry using a circular aperture positioned on an
+ARGS image by the cursor.
+\item [APERFOT]: Simple aperture photometry.
+\item [APERMAG]: Aperture photometry of all the stars in a list of positions.
+\item [ASXY]: Calculate mean, standard deviation, normalized standard deviation
+and number of valid pixels in a selected area of an image.
+\item [BATFLAT]: A procedure which runs FLAT as a batch job.
+\item [BATIMSTAC]: A procedure which runs IMSTACK as a batch job.
+\item [BATLORMUL]: A procedure which runs LORMUL as a batch job.
+\item [BATLORSIM]: A procedure which runs LORSIM as a batch job.
+\item [BATPDSIM]: A procedure which runs PDSIM as a batch job.
+\item [FLAT]: A procedure which runs FLATTEN.
+\item [FLATTEN]: Flat fields an image using an un-aligned flat field and a
+co-ordinate transformation file to allow for the misalignment.
+\item [GAUFIT]: Estimate the Gaussian profile that best fits the stars in an
+image.
+\item [GAUMAG]: Estimate the magnitudes of stars in an image by reading an
+(X,Y) list of positions and fitting a full 2D Gaussian profile to each star.
+\item [ICBLINK]: A variation on BLINK which blinks between two 16-bit images.
+The contrast may be altered at any time.
+\item [ICDISP]: A variation of ADISP which displays a 16-bit image but also
+allows several optional scalings to be performed.
+\item [ICFLASH]: Display an image on the ARGS, scaling it around sky level to
+show faint features.
+Compresses the image if a side is $>$ 512.
+\item [IFLASH]: Display an image on the ARGS.
+Does't do any intensity scaling so is much faster than ADISP.
+If the image is $>$ 512 it is sampled down to less.
+\item [IJOIN]: Join up to 25 2D images.
+\item [IMANIC]: Select part of a 2D 16-bit image.
+\item [IMERGE]: Merge up to 25 16-bit images.
+\item [IMSTACK]: Stack images together which need not be aligned; it should be
+used before PSTACK and IMGARITH are run, wherever possible.
+\item [INSPECT]: Similar to STATS, but works on a selected region of a 16-bit
+image.
+\item [ISLICE]: Version of SLICE which works on 16-bit images.
+\item [ITFGENA]: Generate a conversion table to correct for PDS and emulsion
+non-linearity.
+\item [LORCUR]: Measure cursor-selected stars by fitting full 2D Lorentz
+profiles, including an option to handle overlapping stars.
+\item [LORFIT]: Estimate the Lorentzian profile that best fits the stars in an
+image.
+\item [LORMUL]: Measure magnitudes of all stars in an (X,Y) list, including
+possible overlapping stars, using a full 2D Lorentz profile.
+\item [LORSIM]: Measure magnitudes of stars by fitting full 2D Lorentz profiles
+to isolated stars whose positions are given in an (X,Y) list.
+\item [MAGAV]: Average the magnitudes found by any of the GRASP programs,
+rejecting stars which have poor fit parameters.
+\item [MAGCOR]: Correct the magnitudes found by any of the GRASP programs for
+the effects of measuring machine aperture density averaging.
+\item [MAGDIAG]: Combine several magnitude lists, apply colour equations and
+zero points, then plot and store colour-magnitude or colour-colour diagrams.
+\item [MAGRMS]: Plot the run of RMS error with magnitude for the results from
+any of these photometric programs.
+\item [PDSCOR]: Get clear areas measured by a segmented PDS raster and work
+out PDS drift.
+Fill 1D array with a {\em clear} value for each line of the main raster.
+Display the levels of the reference scans and the fit and run of the mode of
+the main scan values which are near the central scan values image.
+\item [PDSIM]: Take the PDS main image and reference area scans from PDSMULTI,
+estimate the variable zero level, subtract it and correct for PDS and emulsion
+non-linearities.
+\item [PDSMULTI]: Take a PDS tape created by the MULTI-mode and produce Starlink
+images.
+\item [PDSRASTER]: Read a nine track PDS tape of rasters written in the
+Scansalot format from the Forth system and create a Starlink image.
+\item [PDSRIPPLE]: Eliminate the zero-point ripple on PDS produced images.
+\item [PRAPERCUR]: Format output from APERCUR for printing.
+\item [PRAPERMAG]: Format output from APERMAG for printing.
+\item [PRGAUMAG]: Format output from GAUMAG for printing.
+\item [PRLORCUR]: Format output from LORCUR for printing.
+\item [PRLORMUL]: Format output from LORMUL for printing.
+\item [PRLORSIM]: Format output from LORSIM for printing.
+\item [PRMAGS]: Format an EDRS-type list of positions and magnitudes for
+printing.
+\item [PSTACK]: Add images which are mutually aligned and normalized; it is a
+variation of NSTACK.
+\item [PUTSTAR]: Create a realistic artificial star and galaxy field containing
+profiles and noise which emulate electronic or photographic detectors.
+\item [SATCOR]: Apply the electronograph saturation law to an image or
+de-saturate an image.
+\item [XYARITH]: Make a new (X,Y) list by performing linear arithmetic
+operations on any of the parameters stored in two existing (X,Y) lists.
+\item [XYCHART]: Plot a realistic looking star map; star identifications may be
+put by the stars.
+\item [XYCURA]: Create a new list of (X,Y) positions from part or all of an
+existing list using the ARGS cursor.
+\item [XYCURB]: Create a new list of (X,Y) positions by using the ARGS cursor to
+correct the positions in an existing list.
+\item [XYCUT]: Extract a portion of an (X,Y) list and write it to a new file.
+You select the section of columns to be extracted.
+Identifiers and headers are copied over correctly.
+\item [XYDRAW]: Draw a graph of the first two parameters (usually X and Y) in
+any (X,Y) list.
+\item [XYDRAWA]: Draw from (X,Y) lists.
+The graph is a smooth curve (using a cubic spline) joining the points.
+\item [XYEDIT]: Convert the normal (binary) version of an (X,Y) list into an
+ASCII version, and vice versa, so that (X,Y) lists may be created or edited
+using one of the standard editors.
+\item [XYFITA]: Generate the coefficients for a linear transformation between
+one set of (X,Y) positions and another.
+\item [XYJOIN]: Join together two EDRS (X,Y) files.
+\item [XYKEYA]: Extended version of the EDRS program XYKEY allowing keyboard
+entry of items to an (X,Y) list.
+\item [XYLISTA]: Create a printable listing of any (X,Y) list in F12.4 format.
+\item [XYMATCH]: Take two (X,Y) lists and create two new files containing
+either the stars from each list which have corresponding identifiers, sorted
+in the same order, or the entries which have no corresponding identifier.
+\item [XYMULTA]: Take two (X,Y) lists and makes a third by copying the first
+one, replacing the second parameter with the multiple of the second parameter
+of the first and second files.
+Suitable for multiplying two response functions.
+\item [XYPMATCH]: Take two (X,Y) lists and make two new ones which are copies
+of the old ones but only contain entries which match in (X,Y) position.
+\item [XYPRNT]: Make a neat listing of an (X,Y) file.
+\item [XYRENUM]: Take an (X,Y) file and renumber the identifiers from 1 to N.
+\item [XYSORT]: Sort an (X,Y) list into ascending or descending order of one of
+the parameters contained in it.
+\item [XYSTAT]: Find statistics for 1 or 2 sets of numbers taken from (X,Y)
+lists.
+\item [XYWEED]: Take an (X,Y) list and extract those entries which have values
+for one of the parameters present inside or outside a defined range.
+\item [XYWEEDA]: Take an (X,Y) list and extract those entries whose (X,Y) lie
+in a pixel of the reference image which has a non-zero value.
+\end{description}
+\end{description}
+\subsection {INPUT}
+\begin{description}
+\begin{description}
+\item [FITSIN]: Convert FITS data on magnetic tape into Starlink frames.
+\item [IPCSIN]: Convert IPCS data on magnetic tape into Starlink frames.
+(see SUN/3).
+\item [IPOLYGON]: A 16 bit integer version of POLYFILLA.
+\item [MANYG]: Create a 2D test image containing a background, as many Gaussian
+images as required, and some noise.
+\item [PDSIN]: Convert PDS data on magnetic tape into Starlink frames.
+\item [POLYFILLA]: Cursor definition on the ARGS of a new image made up from
+one or more polygons.
+The interiors are set to 1, the exteriors to 0.
+\item [TOSTAR]: Convert RGODR-format images into Starlink frames.
+\item [TYPEIN]: Keyboard input to a 1D frame.
+\end{description}
+\end{description}
+\subsection {LUT}
+\begin{description}
+\begin{description}
+\item [COLCYCLE]: Generate a colour table consisting of cyclic replicas of an
+original colour table.
+\item [COLSEL]: Select colours from a pre-defined palette; a standard palette
+is supplied by default.
+\item [COLSLICE]: Generate a monochromatic ramp colour table.
+\item [E2DCOL]: Generate the default E2D colour table.
+\item [HEATCOL]: Generate a stepped pseudo {\em heat sequence} colour table.
+\item [HEATCON]: Generate a continous pseudo {\em heat sequence} colour table.
+\item [HSICOL]: User definition of a palette for input to COLSEL if the default
+is not acceptable.
+\item [INVARG]: Invert current colour table on the ARGS.
+\item [INVCOL]: Invert colour table held as a {\em BDF} file.
+\item [LUTCOL]: Write a standard colour LUT to the ARGS.
+\item [LUTCONT]: Fill the ARGS colour table with discrete values to give a
+contour-like display.
+\item [LUTE]: Interactive tuning of a LUT using the push-buttons.
+\item [LUTFC]: Load the `false-colour' LUT (as used in the opening
+demonstration at RAL).
+\item [LUTGREY]: Load the standard grey LUT.
+\item [LUTLIN]: Interactive manipulation of a linear (or logarithmic) LUT using
+the ARGS cursor.
+\item [LUTREAD]: Read any pre-defined LUT and write it to the ARGS.
+\item [LUTROT]: Cycle a LUT using a trackerball.
+\item [LUTSET]: Fill part of the ARGS colour table with values linearly
+interpolated between two RGB sets.
+\item [LUTSTORE]: Store the look-up-table currently held in the ARGS as a
+Starlink frame.
+It can subsequently be read back into the ARGS using LUTREAD.
+\item [LUTTWEAK]: Interactive manipulation of a LUT; three different LUTs are
+available.
+\item [RINGCOL]: Generate a continuous purple, blue, green, red, purple colour
+table.
+\item [SPECOL]: Generate a continuous blue, green, red colour table.
+\item [SWEEP]: Rotate the current ARGS colour table.
+\item [VARGREY]: Generate a grey colour table with user defined end points.
+\item [ZEBRA]: Generate a {\em pseudo contour} colour table.
+\end{description}
+\end{description}
+\subsection {MISCELLANEOUS}
+\begin{description}
+\begin{description}
+\item [ASAVE]: Save the current ARGS pixel store in a BDF file.
+\item [CALHELP]: Short help program for {\em CALIBRATION} package.
+\item [CALIB]: Convert an image using calibrations in table LOOKUP generated
+by programs in {\em CALIBRATION} package.
+\item [CATCOPY]: Copy part of the Solar Atlas from tape to disk.
+\item [COLFIX*]: Change a specified column of an image to a given value.
+\item [COSFIT]: Produce COSMOS intensity conversion lookup table LOOKUP from
+known conversions in LEVELS.
+\item [DISKFIL*]: Remove a disk-shaped area from an FFT modes image.
+\item [EDITLEV]: Edit existing LEVELS file interactively.
+\item [EDITTAB]: Edit existing TABLE file interactively.
+\item [ENTERTAB]: Enter 2D table of reals from keyboard.
+\item [FITSHEAD]: Extract header from standard FITS format tape.
+\item [FITSOUT]: Write standard FITS format tape.
+\item [FRINGE]: Remove the fringe pattern which is characteristic of some CCD
+images.
+\item [GETLEV]: Enter known calibration levels by ARGS box cursor on a
+stepwedge frame.
+\item [GRID]: Incorporate a black and white grid into an image.
+\item [HIFREQ*]: Eliminate high frequency components from an FFT mode image
+produced by DFFTASP.
+\item [HISTMATCH]: Rescale an image so that its histogram has a prescribed form.
+\item [IAMEDRS]: Convert a file of IAM parameterised data to EDRS (X,Y) list
+format.
+\item [INCARN]: Extract a specified incarnation from an image.
+\item [INDPIX*]: Change an indicated pixel to a defined value.
+\item [LINCONU]: Read a Starlink image (as unsigned 16 bit integers) together
+with the descriptor items BSCALE and BZERO and convert the data into REAL
+values using: \newline OUTPUT=INPUT*BSCALE+BZERO. 
+\item [LINCONV]: Read a Starlink image (as 16 bit integers) together with the
+descriptor items BSCALE and BZERO and convert the data into REAL values
+using:\newline OUTPUT=INPUT*BSCALE+BZERO.
+\item [LINFIX*]: Change an indicated row of an image to a defined value
+(cf.\ COLFIX).
+\item [LISTLEV]: List LEVELS file on lineprinter.
+\item [LOFREQ*]: Eliminate low frequencies from an FFT mode image produced by
+DFFTASP.
+\item [LSEE]: Simple to use image display package (now almost never used).
+\item [MERGE]: Patch several images together (with or without overlap) to form
+a mosaic.
+\item [MODHELP]: Summarize the functions of the pixel modification programs
+in E2D (formerly known as MODPIXASP).
+\item [OUTSET*]: Set all pixels in an image outside a circle to a defined value.
+\item [PARDIF]: Crude estimate of the partial derivative of an image.
+\item [PATCH]: Replace selected regions of an ARGS displayed image with a
+smooth or noisy patch.
+\item [PCT]: Generate the principle component transformation on a set of up to 4
+frames.
+\item [POLFIT]: Produce intensity conversion table LOOKUP from known conversions
+in LEVELS using a polynomial fit.
+\item [PRINTTAB]: Print 2D table on lineprinter.
+\item [REALFR]: Tidy up an image so that only the REAL incarnation is left (it
+needs some work space within your quota).
+\item [RECFIL*]: Set pixels inside a selected rectangle to a defined value.
+\item [RTOI]: Tiny procedure which may be of use within procedures to
+convert parameters from REAL (as written by WRKEY) into INTEGER.
+It also sets a global parameter.
+\item [SETLEV]: Produce calibration LEVELS file by keyboard entry.
+\item [SIMPAR]: Generate control parameter file for STARSIMP.
+\item [SINCFIL*]: Multiply an FFT image by a {\em sinc} function.
+\item [SLAFIT]: Generate intensity conversion table LOOKUP from LEVELS using
+a slalom fit devised by John Cooke.
+\item [SPLFIT]: Generate intensity conversion table LOOKUP from LEVELS using a
+spline fit.
+\item [STARSIM*]: Generate a frame containing  an artificial star field with
+user defined parameters.
+\item [SYMDIS*]: Remove 4 symmetrically placed disk-shaped areas from an FFT
+image.
+\item [TARGET]: Overlay markers showing the brightest stars in an artificial
+image on top of the image displayed on the ARGS.
+\item [THRESHOLD]: Zeroise values of an image which lie outside specified
+lower and upper limits.
+\item [TYPETAB]: Display 2D table on terminal.
+\item [WAVEGET]: Copy part of the Solar Spectrum Atlas into a Starlink image.
+\item [ZAPLIN]: Replace a vertical or horizontal strip in an image to remove
+defects.
+\end{description}
+\end{description}
+\subsection {PERIODS}
+\begin{description}
+\begin{description}
+\item [CONCAT]: Concatenate two or more input datasets.
+\item [DETREND]: Fit a polynomial to the raw observations to remove any trends;
+reduce the mean value to zero.
+\item [EXTEND]: Unconstrained extrapolation from known data into the unknown
+(dangerous).
+\item [EXTRACT]: Select part of a dataset by extracting all samples whose epochs
+lie between two given values.
+\item [FFTPOW]: Compute the power spectrum of data sampled at equal intervals.
+\item [FILLGAP]: Fill gaps between datasets which are themselves regularly
+sampled and with gaps which are an integral number of samples wide using an
+auto-regressive model based on the whole of the data.
+\item [FLAG]: Flag points which are to be removed from a dataset using a graphics
+cursor.
+\item [FOLD]: Fold the data at a given period, find a mean curve and subtract
+it from the data.
+\item [FREQ]: Set parameter GLOBAL\_FREQ to mean frequency.
+\item [LIN]: Estimate amplitude and phase of up to 20 sine-waves using a
+{\em linear} least squares fit.
+\item [LISTPAR]: Display a formatted version of a parameter file on the
+terminal.
+\item [MEMPOW]: Compute the maximum entropy estimate of the {\em true} power
+spectrum of up to 50 datasets.
+\item [NON]: Non-linear least squares fit of a set of sine waves starting with
+good initial extimates.
+\item [PDM]: {\em Phase Dispersion Methods} --- several variations on the
+{\em string} method for estimating the possible frequencies present on a
+dataset are available.
+\item [PERIOD]: Set parameter GLOBAL\_FREQ to mean period.
+\item [PLOTDAT]: Plot datasets.
+\item [PLOTFIT]: Plot data created from a parameter file to be plotted over a
+dataset.
+\item [PLOTPS]: Plot the power spectrum computed by POWER.
+\item [POWER]: Compute (optionally) the power spectrum and/or the window
+function of the photometric data.
+\item [PW]: {\em Pre-Whitening} --- Remove the variation specified by a set of
+parameters from an existing dataset.
+\item [RESTORE]: Write an unformatted BDF file as a formatted DAT file.
+\item [SELECT]: Select one or more subsets from a given dataset and store as
+separate datasets.
+\item [SPLEQ]: Resample a dataset at equal time intervals.
+\item [STORE]: Convert part of a formatted DAT file into an unformatted BDF
+file.
+\item [SYNTH]: Generate sinusoidal data with user-defined periods and noise
+levels at the same epochs as an input data set.
+\end{description}
+\end{description}
+\subsection {PHOTOMETRY}
+\begin{description}
+\begin{description}
+\item [APERASP]: Perform all the tasks related to aperture photometry.
+\item [ARGSCIR]: Display a circular cursor on the ARGS and return its position
+in array units and size.
+\item [ARGSCUR]: Display an ARGS cursor and return its position in array units.
+\item [CLRLIM]: Clear histogram limits in IAMHIS, SETLIM and GETLIM.
+\item [GAUSFIT]:  Produce astrometric positions and photometric parameters for
+a number of stars for which approximate positions are known using a Gaussian
+fit.
+\item [GETLIM*]: Return results to IAMHISP and SETLIMP.
+\item [GETPAR]: Set IAM parameter PAR using the cursor.
+\item [GETSKY]: Set IAM parameter SKY in master connection file IAMANALP.CON.
+\item [GETTHR]: Set IAM parameter THRLD in master connection file IAMANAL.CON.
+\item [IAMANAL]: Analyse image and find all objects and their parameters, given
+various thresholds.
+\item [IAMHELP]: Short help listing for IAM suite of programs.
+\item [IAMHIS*]: Compute intensity histogram of image and plot on given ARGS
+quadrant.
+\item [IAMPR]: Output image parameters from IAM.
+\item [IGJOB]: Produce Versatec plot file of IAM images.
+\item [IGPLOT]: Plot IAM image on ARGS quadrant.
+\item [SETALL*]:  Change IAM parameters.
+\item [SETAREA*]: Set IAM area cut.
+\item [SETLIM*]: Set zero point and highest histogram bin value.
+\item [SETMAG*]: Set IAM sky background.
+\item [SETPER*]: Set threshold parameter of histogram.
+\end{description}
+\end{description}
+\subsection {POLARIMETRY}
+\begin{description}
+\begin{description}
+\item [CVPLOT]: Produce annotated contour map of an image with corresponding
+polarization vectors overlayed.
+\item [POLAR]: Generate total polarization and polarization angle from sky
+subtracted Q and U polarization frames.
+\item [PRPLOT]: Produce plot of polarization vectors from total polarization
+and polarization angle data.
+\item [STOKES]: Generate Stokes parameters Q and U from total polarization
+and polarization angle.
+\end{description}
+\end{description}
+\subsection {SIZE}
+\begin{description}
+\begin{description}
+\item [CMPRS]: Compress an image by integer factors in X and Y.
+\item [COMPAVE]: Compress an image by averaging adjacent elements.
+\item [COMPICK]: Compress an image by selecting elements in a regular grid.
+\item [EXPAND]: Expand part of an image by a {\em sinc} interpolation.
+\item [IMANIC]: Integer variant of MANIC.
+\item [MANIC]: M and N image conversion --- pick part of a 1D, 2D or 3D frame
+and convert it into a 1D, 2D or 3D frame.
+\item [MERGE]: Combine two or more images with weighting to form a mosaic.
+\item [PICK]: Pick a 2D subset from a 2D image using the ARGS cursor {\em or} a
+keyboard.
+MANIC handles much more general cases.
+\item [PIXDUPE]: Expand an image by pixel duplication.
+\item [SQORST]: Either squashes or expands an `unknown' image into a defined
+shape by performing bi-linear interpolation.
+\end{description}
+\end{description}
+\newpage
+
+\section {ALPHABETICAL LIST OF PROGRAMS}
+
+Some programs and procedures exist in ASPDIR which are not mentioned in appendix
+B since I can find no documentation for them (in particular they are not
+mentioned in the on-line HELP).
+Of these, the following appear to be programs:\\
+\vspace{20mm}
+{\scriptsize
+\begin{tabbing}
+BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=\kill
+ATAN\>DOCIT\>IDISP\>LUTHIST\>PLOTIT\>STUFF\\
+DEPD\>HEXFILE\>INPD\>MYPD\>STRIP\>TAN
+\end{tabbing}}
+\vspace{20mm}
+and the following appear to be things like tools and tests:\\
+\vspace{20mm}
+{\scriptsize
+\begin{tabbing}
+BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=\kill
+ASPTEST\>COPYDOC\>DEMO\>PROGDOC\>TEMPORARY
+\end{tabbing}}
+\vspace{20mm}
+The 440 documented programs mentioned in appendix B are shown oveleaf in
+alphabetical order together with the number of the subsection in which they are
+described.
+
+\newpage
+\begin{center}
+{\Large\bf ASPIC PROGRAMS}
+\end{center}
+
+{\scriptsize
+\begin{tabbing}
+BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=\kill
+ ABLINK - 1                              \>CNTEXT* - 13                          
+   \>FLAG - 19                               \>
+ LIN - 19                                \>PERIOD - 19                           
+   \>STARFIT - 8                             \\
+ ABLOCK - 1                              \>COG - 5                               
+   \>FLAT - 15                               \>
+ LINCONU - 18                            \>PICK - 22                             
+   \>STARMAG - 8                             \\
+ ABOXASP - 13                            \>COLCYCLE - 17                         
+   \>FLATTEN - 15                            \>
+ LINCONV - 18                            \>PIXDUPE - 22                          
+   \>STARSIM* - 18                           \\
+ ACLEAR - 1                              \>COLDIF - 13                           
+   \>FLIP - 14                               \>
+ LINEFIT - 8                             \>PIXFILL - 8                           
+   \>STARXY - 3                              \\
+ ADD - 2                                 \>COLFIX* - 18                          
+   \>FLIPMSK - 2                             \>
+ LINFIX* - 18                            \>PIXMAP - 8                            
+   \>STATS - 5                               \\
+ ADDMSK - 2                              \>COLLAPSE - 8                          
+   \>FOLD - 19                               \>
+ LINPLOT - 6                             \>PIXUNMAP - 8                          
+   \>STK23 - 14                              \\
+ ADHC - 1                                \>COLSEL - 17                           
+   \>FOURIER - 9                             \>
+ LIST - 6                                \>PLOTDAT - 19                          
+   \>STOKES - 21                             \\
+ ADISOV - 1                              \>COLSLICE - 17                         
+   \>FREQ - 19                               \>
+ LISTLEV - 18                            \>PLOTFIT - 19                          
+   \>STORE - 19                              \\
+ ADISP - 1                               \>COMPAVE - 22                          
+   \>FRINGE - 18                             \>
+ LISTPAR - 19                            \>PLOTPS - 19                           
+   \>SUB - 2                                 \\
+ ADISP3 - 1                              \>COMPICK - 22                          
+   \>FTCONJ - 12                             \>
+ LOFREQ* - 18                            \>PLOTQTH - 6                           
+   \>SURFIT - 8                              \\
+ AEROV - 1                               \>CONCAT - 19                           
+   \>GAUFIT - 15                             \>
+ LOG - 2,10                              \>POLAR - 21                            
+   \>SWEEP - 17                              \\
+ AFLASH - 1                              \>CONFLEV - 4                           
+   \>GAUMAG - 15                             \>
+ LORCUR - 15                             \>POLFIT - 18                           
+   \>SYMDIS* - 18                            \\
+ AFRAME - 1                              \>CONT - 8                              
+   \>GAUSFIT - 20                            \>
+ LORFIT - 15                             \>POLYFILLA - 16                        
+   \>SYNTH - 19                              \\
+ AGBLINK - 1                             \>CONTOUR - 6                           
+   \>GBLINKER - 1                            \>
+ LORMUL - 15                             \>POWER - 19                            
+   \>TARGET - 18                             \\
+ AHARDCOPY - 6                           \>CONV - 11                             
+   \>GETLEV - 18                             \>
+ LORSIM - 15                             \>PRAPERCUR - 15                        
+   \>TBXY - 5                                \\
+ ALIGN - 15                              \>CONVOLVE - 9                          
+   \>GETLIM* - 20                            \>
+ LSEE - 18                               \>PRAPERMAG - 15                        
+   \>TBXY2 - 5                               \\
+ ALIST - 1                               \>COORDS - 3                            
+   \>GETPAR - 20                             \>
+ LUTCOL - 17                             \>PRFDECASP - 13                        
+   \>TESTFIT - 3                             \\
+ ANNOTASP - 6                            \>COSBELL - 12                          
+   \>GETSKY - 20                             \>
+ LUTCONT - 17                            \>PRFLOGASP - 13                        
+   \>THRESH - 6                              \\
+ APAN - 1                                \>COSFIT - 18                           
+   \>GETTHR - 20                             \>
+ LUTE - 17                               \>PRFPLTASP - 13                        
+   \>THRESHOLD - 18                          \\
+ APANG - 1                               \>CPOW - 2                              
+   \>GREYCELL - 1                            \>
+ LUTFC - 17                              \>PRFPRTASP - 13                        
+   \>TOSTAR - 16                             \\
+ APERASP - 20                            \>CRDDTRACE - 9                         
+   \>GREYSCALE - 6                           \>
+ LUTGREY - 17                            \>PRFVISASP - 13                        
+   \>TRCONCAT - 8                            \\
+ APERCUR - 15                            \>CREDOC - 7                            
+   \>GRID - 18                               \>
+ LUTLIN -17                              \>PRGAUMAG - 15                         
+   \>TRIM - 8                                \\
+ APERFOT - 15                            \>CSUB - 2                              
+   \>HEATCOL - 17                            \>
+ LUTREAD - 17                            \>PRIAXEASP - 13                        
+   \>TWOTONE - 10                            \\
+ APERMAG - 15                            \>CURFIT - 3                            
+   \>HEATCON - 17                            \>
+ LUTROT - 17                             \>PRINTTAB - 18                         
+   \>TYPEIN - 16                             \\
+ APIC - 1                                \>CURVAL - 5                            
+   \>HIDE - 6                                \>
+ LUTSET - 17                             \>PRLORCUR - 15                         
+   \>TYPETAB - 18                            \\
+\end{tabbing}
+
+\vspace{-8mm}
+
+\begin{tabbing}
+BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=\kill
+ APLOT* - 6                              \>CUT - 8                               
+   \>HIFREQ* - 18                            \>
+ LUTSTORE - 17                           \>PRLORMUL - 15                         
+   \>UNDOC - 7                               \\
+ APLOTQ - 6                              \>CVPLOT - 21                           
+   \>HIST* - 5                               \>
+ LUTTWEAK - 17                           \>PRLORSIM - 15                         
+   \>UNPACK - 4                              \\
+ APLOTRNG - 6                            \>CYDSCR - 5                            
+   \>HISTMATCH - 18                          \>
+ MAGAV - 15                              \>PRMAGS - 15                           
+   \>UNZOOM - 1                              \\
+ ARESET - 1                              \>DATARANGE - 9                         
+   \>HISTOGRAM - 9                           \>
+ MAGCNTASP - 13                          \>PROFILE - 8                           
+   \>USMASK - 11                             \\
+ ARGPIC - 8                              \>DATIM - 1                             
+   \>HISTPLOT - 5                            \>
+ MAGCOR - 15                             \>PROMPT - 8                            
+   \>VARGREY - 17                            \\
+ ARGSCIR - 20                            \>DESCR - 5                             
+   \>HSICOL - 17                             \>
+ MAGDIAG - 15                            \>PRPLOT - 21                           
+   \>VELINT - 10                             \\
+ ARGSCUR - 20                            \>DESCRIPT - 8                          
+   \>IAMANAL - 20                            \>
+ MAGRMS - 15                             \>PSFEST - 12                           
+   \>VERGREY - 6                             \\
+ ARITH - 8                               \>DESTRIPE - 9                          
+   \>IAMEDRS - 18                            \>
+ MANIC - 22                              \>PSPEC - 12                            
+   \>VIDISP - 10                             \\
+ ASAVE - 18                              \>DETREND - 19                          
+   \>IAMHELP - 20                            \>
+ MANYG - 16                              \>PSTACK - 15                           
+   \>VIEW - 8                                \\
+ ASXY - 15                               \>DFFTASP - 12                          
+   \>IAMHIS* - 20                            \>
+ MASK - 8                                \>PUTDOC - 7                            
+   \>WAVEGET - 18                            \\
+ ATEXT - 1                               \>DISKFIL* - 18                         
+   \>IAMPR - 20                              \>
+ MASKGEN - 9                             \>PUTSTAR - 15                          
+   \>WEIGHTGEN - 9                           \\
+ AUCUR - 1                               \>DIV - 2                               
+   \>ICBLINK - 1,15                          \>
+ MATHS - 8                               \>PW - 19                               
+   \>WONB - 6                                \\
+ AVERAGE - 8                             \>DIVFF - 2                             
+   \>ICDISP - 1,15                           \>
+ MEAN* - 5                               \>RADEC - 9                             
+   \>WRDSCR - 5                              \\
+ AZOOM - 1                               \>DOODLE - 6                            
+   \>ICFLASH - 15                            \>
+ MEDBOX* - 5                             \>RDKEY - 3                             
+   \>WRHIST - 5                              \\
+ BATCH - 9                               \>DRAWSCAN - 9                          
+   \>IFLASH - 15                             \>
+ MEDIAN - 11                             \>RDLIST - 3                            
+   \>XYARITH - 15                            \\
+ BATFLAT - 15                            \>E2DCOL - 17                           
+   \>IGJOB - 20                              \>
+ MEM - 11                                \>RDTOXY - 3                            
+   \>XYCHART - 15                            \\
+ BATIMSTAC - 15                          \>EDDOC - 7                             
+   \>IGPLOT - 20                             \>
+ MEMPOW - 19                             \>REALFR - 18                           
+   \>XYCOEFF - 8                             \\
+ BATLORMUL - 15                          \>EDITLEV - 18                          
+   \>IJOIN - 15                              \>
+ MERGE - 18,22                           \>RECFIL* - 18                          
+   \>XYCUR - 8                               \\
+ BATLORSIM - 15                          \>EDITTAB - 18                          
+   \>IMANIC - 15,22                          \>
+ MODAL - 11                              \>RESAMPLE - 8                          
+   \>XYCURA - 8,15                           \\
+ BATPDSIM - 15                           \>EDRSIN - 9                            
+   \>IMERGE - 15                             \>
+ MODE - 11                               \>RESCALE - 8                           
+   \>XYCURB - 15                             \\
+ BDFGEN - 9                              \>ELLPLTP - 13                          
+   \>IMGARITH - 8                            \>
+ MODHELP - 18                            \>RESTORE - 19                          
+   \>XYCUT - 15                              \\
+ BDFKEY - 8                              \>ELLPRTP - 13                          
+   \>IMGEDIT - 9                             \>
+ MOVE - 14                               \>RHDC1 - 11                            
+   \>XYDRAW - 15                             \\
+ BIGCONV - 9                             \>ENTERTAB - 18                         
+   \>IMGSTACK - 9                            \>
+ MOVIE - 6                               \>RHDC2 - 11                            
+   \>XYDRAWA - 15                            \\
+ BIN - 8                                 \>EQPROFASP - 13                        
+   \>IMSIZE - 5                              \>
+ MSLICE - 5                              \>RINGCOL - 17                          
+   \>XYEDIT - 15                             \\
+ BITMASK - 2                             \>EXP - 2                               
+   \>IMSTACK - 15                            \>
+ MULCON - 5                              \>ROT3D - 14                            
+   \>XYFIT - 8                               \\
+\end{tabbing}
+\vspace{20mm}
+{\em Continued....}
+
+\newpage
+\begin{center}
+{\Large\bf ASPIC PROGRAMS - Continued}
+\end{center}
+
+\begin{tabbing}
+BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=BBBBBBBBB - 88xx\=\kill
+ BLANK - 8                               \>EXPAND - 21                           
+   \>INCARN - 18                             \>
+ MULT - 2                                \>RTOI - 18                             
+   \>XYFITA - 15                             \\
+ BLINK - 9                               \>EXTEND - 19                           
+   \>INDPIX* - 18                            \>
+ NITPIK - 11                             \>SATCOR - 15                           
+   \>XYJOIN - 15                             \\
+ BLINKER - 1                             \>EXTRACT - 19                          
+   \>INSPECT - 5,15                          \>
+ NON - 19                                \>SECTOR - 5                            
+   \>XYKEY - 8                               \\
+ BLURR - 11                              \>FC - 10                               
+   \>INVARG - 17                             \>
+ NOPROMPT - 8                            \>SEGMENT - 8                           
+   \>XYKEYA - 8,15                           \\
+ BONW - 6                                \>FCDISP - 10                           
+   \>INVCOL - 17                             \>
+ NORMALIZE - 8                           \>SELECT - 19                           
+   \>XYLIST - 8                              \\
+ BOXASP - 13                             \>FCPACK - 10                           
+   \>IPCSIN - 16                             \>
+ NORMFILT - 11                           \>SETALL* - 20                          
+   \>XYLISTA - 8,15                          \\
+ BOXFILTER - 8                           \>FCSAT - 10                            
+   \>IPOLYGON - 16                           \>
+ NSTACK - 8                              \>SETAREA* - 20                         
+   \>XYMATCH - 15                            \\
+ CADD - 2                                \>FCSCALE - 10                          
+   \>IRASBACK - 9                            \>
+ ODDHDC1 - 11                            \>SETLEV - 18                           
+   \>XYMULTA - 15                            \\
+ CALHELP - 18                            \>FCTHSI - 10                           
+   \>IRASCOEF - 9                            \>
+ ODDHDC2 - 11                            \>SETLIM* - 20                          
+   \>XYPMATCH - 15                           \\
+ CALIB - 18                              \>FCTRGB - 10                           
+   \>IRASCORR - 9                            \>
+ OUTSET* - 18                            \>SETMAG* - 20                          
+   \>XYPRNT - 15                             \\
+ CATCOPY - 18                            \>FFCLEAN - 8                           
+   \>IRASDSCR - 9                            \>
+ PACK - 4                                \>SETPER* - 20                          
+   \>XYRENUM - 15                            \\
+ CCDCON - 5                              \>FFT - 12                              
+   \>IRASIN - 9                              \>
+ PARDIF - 18                             \>SIMPAR - 18                           
+   \>XYSORT - 15                             \\
+ CCIRD - 3                               \>FFTPOW - 19                           
+   \>IRASSHIFT - 9                           \>
+ PARPLTP - 13                            \>SINCFIL* - 18                         
+   \>XYSTAT - 15                             \\
+ CDEMO - 1                               \>FILDEF - 12                           
+   \>IRASSTACK - 9                           \>
+ PATCH - 18                              \>SKYSUB - 9                            
+   \>XYTORD - 3                              \\
+ CDIV - 2                                \>FILEDOC - 7                           
+   \>ISLICE - 5,15                           \>
+ PCT - 18                                \>SLAFIT - 18                           
+   \>XYTRAN - 8                              \\
+ CENTROID - 8                            \>FILLGAP - 19                          
+   \>ITFCORR - 8                             \>
+ PDM - 19                                \>SLICE - 5                             
+   \>XYWEED - 15                             \\
+ CFICI - 3                               \>FILTSPEC - 8                          
+   \>ITFGEN - 8                              \>
+ PDSCOR - 15                             \>SMOOTH - 11                           
+   \>XYWEEDA - 15                            \\
+ CFITR - 3                               \>FINULS - 11                           
+   \>ITFGENA - 15                            \>
+ PDSIM - 15                              \>SPECOL - 17                           
+   \>ZAPLIN - 18                             \\
+ CFIXY - 3                               \>FITBAKASP - 13                        
+   \>ITFHIST - 9                             \>
+ PDSIN - 16                              \>SPLEQ - 19                            
+   \>ZAPTAB - 9                              \\
+ CINVERT - 8                             \>FITELLP - 13                          
+   \>ITFPLOT - 8                             \>
+ PDSMULTI - 15                           \>SPLFIT - 18                           
+   \>ZEBRA - 17                              \\
+ CLRLIM - 20                             \>FITSHEAD - 18                         
+   \>ITOR - 8                                \>
+ PDSRASTER - 15                          \>SQORST - 22                           
+   \\
+ CLRQUAD - 6                             \>FITSIN - 16                           
+   \>JONESASP - 13                           \>
+ PDSRIPPLE - 15                          \>SQRT - 2                              
+   \\
+ CMPRS - 22                              \>FITSOUT - 18                          
+   \>LAPLACE - 11                            \>
+ PECALBASP - 13                          \>STAR - 5                              
+   \\
+ CMULT - 2                               \>FIXINVAL - 9                          
+   \>LIMITS - 6                              \>
+ PEEP - 6                                \>STAREMASP - 13                        
+   \\
+\end{tabbing}}
+\end{document}

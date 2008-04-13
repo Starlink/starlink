@@ -1,0 +1,109 @@
+
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {103.2}
+\newcommand{\stardocauthors}   {A.C. Davenhall and M. Pettini}
+\newcommand{\stardocdate}      {21 June 1990}
+\newcommand{\stardoctitle}     {APIG --- Absorption Profiles in the Interstellar Gas}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Purpose}
+
+APIG, Absorption Profiles in the Interstellar Gas, is a package to
+perform analysis of the interstellar 
+absorption lines detected in the spectra of Galactic and extragalactic 
+sources. When observed with sufficiently high resolution, these lines 
+often show a complex structure with multiple components formed in 
+absorbing regions at different velocities along the line of sight. The 
+main purpose of the program is to determine the column density of 
+absorbers along the line of sight from an interactive analysis of the 
+equivalent widths and profiles of the observed absorption lines. In 
+cases where the line profiles are resolved the velocity structure
+of the absorbing material is also determined
+
+APIG is not a reduction system for astronomical spectra. It assumes
+that the raw spectra have already been reduced to produce wavelength
+calibrated spectra normalised relative to the background continuum and
+that equivalent widths have been determined.
+
+\section{Further information}
+
+APIG is an optional Starlink software item and may or may not be 
+available at your site. If it is available, then assuming that you have
+followed the normal Starlink login procedure, symbol APIGSETUP
+should have been set up. By typing this command, a number of further logical
+names are set up. The following documents are available in the directory
+APIGDOCS:
+
+\begin{description}
+
+  \item [APIGDOCS:USERGUIDE.TEX] user guide.
+
+  \item [APIGDOCS:QUICKREF.TEX] quick reference guide.
+
+  \item [APIGDOCS:EXAMPLE.LIS] example of an APIG session.
+
+\end{description}
+
+The files for the user guide and the quick reference guide contain
+Latex source, whereas the example session is a simple text file suitable
+for printing directly. Note that the quick reference guide has to be run
+through Latex twice, and the user guide {\em three} times, to correctly
+paginate the final documents. Alternatively your site manager might
+have paper copies of these documents.
+
+The user guide gives full details of how to use APIG and users new to
+the package should work with this document, perhaps using it in 
+conjunction with the example session. The quick reference guide gives
+a concise summary of the package and is intended as an {\it
+aide-memoire} for more experienced users.
+
+If APIG is not available at your site then see your site manager about
+obtaining a copy.
+
+\end{document}

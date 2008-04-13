@@ -1,0 +1,1325 @@
+\documentstyle{article}
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {36.14}
+\newcommand{\stardocauthors}   {P M Allan\\D L Terrett}
+\newcommand{\stardocdate}      {11 October 1990}
+\newcommand{\stardoctitle}     {Starlink Networking}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\section{Introduction}
+
+The Starlink project uses the Joint Academic Network (JANET) to provide
+communications between the Starlink VAXs and to other systems in the academic
+community.
+The main uses of the network are to provide access for remote users (i.e.\ users
+not situated at a Starlink site), communication between users by electronic
+mail, and the transfer of modestly sized files (i.e.\ software and documentation
+rather than data).
+It is not intended that the network should be used for users at one node to
+access facilities at another
+(apart from using the database machine at RAL)
+and it is not normal for a user to have usernames
+on more than one node, although in certain special circumstances this may
+happen.
+
+\section{JANET and the Coloured Books Software}
+
+JANET is an X.25 packet switched network and provides three main facilities:
+\begin{itemize}
+\item File transfer
+\item Electronic mail
+\item Remote login
+\end{itemize}
+File transfer and electronic mail are not defined by the X.25 standard, and are
+implemented according to the `Coloured Books Protocols', a UK standard.
+The name `JANET software' is sometimes used to refer to the Coloured Books
+software, but JANET is really just the hardware component of the network.
+The Coloured Books software provides four main functions:
+\begin{itemize}
+\item TRANSFER (for file transfer)
+\item CBS-MAIL (for sending electronic mail)
+\item PAD (for beginning a remote login)
+\item LIST (for showing the status of TRANSFER and CBS-MAIL jobs)
+\end{itemize}
+An extra component of the Coloured Books software is the Red Book `Job Transfer
+and Manipulation Protocol (JTMP)'. This provides a versatile method of
+submitting jobs to remote computers, however, the software is not available on
+all Starlink machines (see appendix~\ref{who-has-JTMP} for availability). The
+remote computer need not be a VAX, and a common use is to submit large jobs to
+a Cray type computer from a VAX. The JTMP software is not particularly easy to
+use, but the commands to perform a particular task can be packaged up into a
+library for easier use. It is also possible to use the TRANSFER command to
+perform simple remote job submission.
+
+The commands referred to above are for VMS systems; they are documented briefly
+in appendix~\ref{cbs} and more fully in the DEC Coloured Books and Red Book
+manuals.
+
+In order to use any of these facilities, the name of the remote node must be
+provided. These names are the subject of an official (non-Starlink)
+registration scheme and are commonly known as NRS~names. The names are created
+in a hierarchical manner and while they can seem long and unwieldy, it has to
+be possible to specify the name of any computer, anywhere in the world. For
+example, the Rutherford Appleton Laboratory Starlink project VAX has a name of
+UK.AC.\-RUTHERFORD.\-STARLINK, which has a shorter form of UK.AC.RL.STAR. On
+systems which fully support the NRS scheme, only that part of the name which
+differs from the name of the host system need be used. For example, from within
+the UK academic community RL.STAR is all that is required, and within the RAL
+site STAR is sufficient. The NRS names of the Starlink systems are given in
+table~\ref{nrs}.
+
+To make network calls from a VAX you must be authorized to access the site
+you wish to contact; this has already been done for all the Starlink
+systems, but for others you may need to contact your system manager.
+
+\begin{table}[p]
+\caption{NRS names of Starlink sites}\label{nrs}
+\small
+\begin{center}\begin{tabular}{l@{\hspace{1cm}}l}
+Armagh& UK.AC.QUEENS-BELFAST.ARMAGH.STARLINK\\
+& UK.AC.QUB.ARM.STAR\\[\medskipamount]
+Belfast& UK.AC.QUEENS-BELFAST.PHYSICS.STARLINK\\
+& UK.AC.QUB.PHY.STAR\\[\medskipamount]
+Birmingham& UK.AC.BIRMINGHAM.SPACE--RESEARCH.STARLINK\\
+& UK.AC.BHAM.SR.STAR\\[\medskipamount]
+Cambridge& UK.AC.CAMBRIDGE.ASTRONOMY.STARLINK\\
+& UK.AC.CAM.AST--STAR\\[\medskipamount]
+Cardiff& UK.AC.CARDIFF.ASTRONOMY.VAX1\\
+& UK.AC.CF.ASTRO.V1\\[\medskipamount]
+Durham& UK.AC.DURHAM.STARLINK\\
+& UK.AC.DUR.STAR\\[\medskipamount]
+Hatfield Polytechnic & Not yet known \\[\medskipamount]
+Imperial College& UK.AC.IMPERIAL-COLLEGE.PHYSICS.STARLINK\\
+& UK.AC.IC.PH.STAR\\[\medskipamount]
+Jodrell Bank& UK.AC.MANCHESTER.JODRELL--BANK.STARLINK\\
+& UK.AC.MAN.JB.STAR\\[\medskipamount]
+Keele& UK.AC.KEELE.PH.STARLINK\\
+& UK.AC.KL.PH.STAR\\[\medskipamount]
+Kent & UK.AC.UKC.STARLINK \\
+& UK.AC.UKC.STAR \\[\medskipamount]
+Lancashire Polytechnic& UK.AC.LANCASHIRE--POLY.STARLINK\\
+& UK.AC.LANCSP.STAR\\[\medskipamount]
+Leicester& UK.AC.LEICESTER.STARLINK\\
+& UK.AC.LE.STAR\\[\medskipamount]
+Manchester& UK.AC.MANCHESTER.ASTRONOMY.STARLINK\\
+& UK.AC.MAN.AST.STAR\\[\medskipamount]
+Oxford& UK.AC.OXFORD.ASTROPHYSICS\\
+& UK.AC.OX.ASTRO\\[\medskipamount]
+Queen Mary and Westfield College& UK.AC.QMW.STARLINK\\
+& UK.AC.QMW.STAR\\[\medskipamount]
+RAL (Project) & UK.AC.RUTHERFORD.STARLINK\\
+& UK.AC.RL.STAR\\[\medskipamount]
+RAL (Astrophysics) & UK.AC.RUTHERFORD.STARLINK.ASTROPHYSICS\\
+& UK.AC.RL.STAR.AST\\[\medskipamount]
+RAL (Database) & UK.AC.RUTHERFORD.STARLINK-DATABASE\\
+& UK.AC.RL.STADAT\\[\medskipamount]
+ROE& UK.AC.ROE.STARLINK\\
+& UK.AC.ROE.STAR\\[\medskipamount]
+St Andrews& UK.AC.ST--ANDREWS.STAR\\
+& UK.AC.ST--AND.STAR \\[\medskipamount]
+Southampton& UK.AC.SOUTHAMPTON.PHYSICS.ASTRONOMY\\
+& UK.AC.SOTON.PHASTR\\[\medskipamount]
+Sussex & UK.AC.SUSSEX.STARLINK\\
+& UK.AC.SUSX.STAR \\[\medskipamount]
+UCL& UK.AC.UCL.STARLINK\\
+& UK.AC.UCL.STAR
+\end{tabular}\end{center}\end{table}
+
+In order to use the TRANSFER command, you must know a username and password on
+the remote system.
+All Starlink systems have a username NETUSR with password NETUSR that can be
+used for copying files from remote sites.
+This username has the same access to files as normal users but actual logins are
+disabled.
+
+The username of every Starlink user is kept in a file called:
+\begin{quote}
+{\tt ADMINDIR:USERNAMES.LIS}
+\end{quote}
+on every node; this file is updated every month.
+An up-to-date list of all users on a particular node is kept on that node in a
+file called:
+\begin{quote}
+{\tt LADMINDIR:USERNAMES.LIS}
+\end{quote}
+This file is updated every time a new user is put on the system. The site
+manager (or someone temporarily acting on his or her behalf) can always be
+contacted by mail to OPER (not SYSTEM, which may not be looked at for several
+days).
+
+When copying files from one user to another (whether across the network or just
+locally), always `pull' the files rather than `pushing' them, i.e.\ copy the
+files to your own directory, not to the other user's directory as this will
+result in the files having the wrong ownership.
+
+The terminal access provided by X.25 networks is designed for simple `dumb'
+terminal access and is not particularly suitable for full screen editors or
+graphics, especially on a low speed and often congested network such as JANET.
+Screen editors and graphics can be made to work correctly but the response times
+often become unacceptably long.
+However, commands exist for altering the behaviour of your terminal and these
+can be used to get the best service possible from the network.
+A short guide to logging into VAX/VMS systems over an X.25 network can be found
+in appendix~\ref{pad}.
+
+\subsection{Transferring large files}
+Although it is preferable to send large files on magnetic tape, sometimes it
+is necessary to use TRANSFER. In such a case it is very important to send the
+data in as compact a form as possible. Every Starlink site has a file
+compression utility for compressing and decompressing files. The
+compression program is called LZCMP and the decompression program is called
+LZDCM. These utilities can give a spectacular reduction in the size of a
+file. A compression factor of two is not unusual and a factor of five has
+certainly been achieved. These programs are described in SUN/25. If you must
+send large files over the network, calculate how long it will take before you
+do it. Transfers that would take many hours should be sent overnight to avoid
+network congestion.
+
+\section{DECnet}
+
+In addition to offering PAD, CBS-MAIL and TRANSFER, Starlink also runs its
+nodes as a DECnet network, using JANET to provide the communications links.
+Certain other (non-Starlink) VAXs are also part of this DECnet network, some
+using JANET to provide the links and others using ethernet local area networks.
+For the latter, DECnet may be the only network access provided. DECnet provides
+a somewhat richer set of facilities than Coloured Books at the expense of a
+greater load on both the network and the host systems. In particular, not all
+nodes have direct connections to all other nodes and so excessive use of DECnet
+may also impose a load on the routing nodes in the network.
+
+The extra facilities provided are:
+\begin{itemize}
+\item Remote file access
+\item VMS mail
+\item Remote execution of SHOW commands
+\item PHONE and TALK
+\end{itemize}
+Remote file access means that a program running on one node can access a file on
+another node just as if it were on the local system.
+This means that, for example, remote directories can be listed with the
+DIRECTORY command, and remote files can be copied (with COPY) with all the
+normal wild card facilities available.
+It is even possible to `SET DEFAULT' to a directory on a remote system.
+
+In spite of their ease of use, these facilities should be used with discretion
+as the effect on the remote system is similar to having an extra user logging
+in.
+When single files are being copied, the TRANSFER command should always be used
+as it never involves routing traffic through a third node, and it will also
+recover from network failures transparently and without having to restart the
+transfer from the beginning of the file.
+The TRANSFER command can also be issued regardless of whether the remote system
+is reachable at the time.
+
+A SHOW command can be executed on a remote node with the NETSHOW command.
+NETSHOW is described in appendix~\ref{shownet}.
+
+PHONE and TALK allow you to have conversations with other users (local as well
+as remote).
+PHONE is part of VMS and is described in the VMS HELP but requires a VT 
+compatible terminal.
+TALK will work with any sort of terminal and is described in
+appendix~\ref{shownet}.
+Be aware that TALK can be very irritating for other users if their work is
+constantly interrupted by your messages; it is more polite to use MAIL.
+The DECnet node names of the Starlink sites are shown in 
+table~\ref{DECnet-node-names}.
+\begin{table}[htbp]
+\caption{DECnet node names}\label{DECnet-node-names}
+\begin{center}\begin{tabular}{l@{\hspace{1.5cm}}l}
+Armagh & ARVAD\\
+Belfast & QUVAD\\
+Birmingham & BHVAD\\
+Cambridge & CAVAD\\
+Cardiff & CARDIF\\
+Durham & DUVAD\\
+Hatfield Polytechnic & HATVAD\\
+Imperial College & ICVAD\\
+Jodrell Bank & JBVAD\\
+Kent & KENVAD\\
+Keele & KLVAD\\
+Lancashire Polytechnic & LPVAD\\
+Leicester & LTVAD\\
+Manchester & MAVAD\\
+Oxford & OXVAD\\
+QMW & QMCMV\\
+RAL (Project) & RLVAD\\
+RAL (Astrophysics) & RLSAC\\
+RAL (Database) & STADAT\\
+ROE & REVAD\\
+St.\ Andrews & SASTAR\\
+Southampton & SOTON\\
+Sussex & SUSTAR\\
+UCL & ZUVAD
+\end{tabular}\end{center}\end{table}
+
+Remember that these names apply only to DECnet. In general they have no
+meaning outside the Starlink network, although they can be used in connection
+with SPAN (section~\ref{SPAN}), as this is based on DECnet. When giving your
+network address to anyone but a Starlink user, be sure to quote the NRS name
+(for example ME at UK.AC.ROE.STAR).
+
+The command SHOWNET (a Starlink feature distinct from the VMS command SHOW
+NETWORK) gives all the readily available information on the accessibility
+of all the nodes in the DECnet network.
+
+\subsection{VAXclusters}
+Many Starlink sites have more than one VAX configured as a
+VAXcluster. This has implications for network access. When several VAXs are
+configured as a VAXcluster, each VAX has its own node name, but you can also
+refer to the cluster as a whole by means of the `cluster alias'. When you are
+communicating with a cluster in a way that does not require a specific machine
+to perform a task then you should use the cluster alias. Sending a MAIL message
+is the most common example of this.
+
+If you are doing something that requires the cooperation of a particular
+machine, then you must use the particular node name. For example, if you are
+using the TALK command, then you are TALKing to someone who is logged onto a
+particular machine, so you must give the node name of the machine that they are
+using. 
+
+Take note that using the cluster alias when you should use a particular node
+name can cause confusion. For example, if you were to type the command
+\begin{quote}
+{\tt \$ SET HOST MAVAD}
+\end{quote}
+twice, there is no guarantee that you would be logged into the same machine
+each time.
+
+The DECnet node names
+given above are actually cluster aliases for those sites that have clusters.
+If you want to find the node names of the machines in the Manchester VAXcluster
+(for example), type the command
+\begin{quote}
+{\tt \$ NETSHOW MAVAD CLUSTER}
+\end{quote}
+The full list of node names is not given here because the information can
+change on a relatively short timescale.
+\subsection{Proxies}
+If you have an account at more than one Starlink node you will probably
+want to do things like a directory listing of your files on the remote
+node. When you do something like
+\begin{quote}
+{\tt \$ DIR RLVAD::}
+\end{quote}
+you will get a directory listing of the default network account on the
+remote node, which is pretty useless. You can type
+\begin{quote}
+{\tt \$ DIR RLVAD::DISK\$USER1:[ABC]}
+\end{quote}
+(if you are user ABC), but this is more typing and will not work if you
+have protected your files on the remote node. There are two ways around
+this. The first is to type
+\begin{quote}
+{\tt \$ DIR RLVAD"ABC ABCSPASSWORD"::DISK\$USER1:[ABC]}
+\end{quote}
+This requires even more typing and unfortunately requires you to type your
+password on the screen. A method that is generally better is to have a proxy
+login set up at the remote node. If this is done, the remote node knows that
+calls coming from user ABC at a certain node should be logged in as user ABC on
+that node. The usernames do not have to be the same at each end (though they
+usually are), but each proxy is specific to a certain user at a certain site.
+If user PMA at Manchester has a proxy username of PMA at Jodrell Bank, then it
+is not necessarily true that user PMA at Jodrell Bank has a proxy of PMA at
+Manchester.
+
+There are some security implication of having proxy logins. Although you do
+not have to type your password (in fact {\it because} you do not have to
+type your password), if your account is hacked on your local machine, your
+files on the remote machine are immediately accessible to the hacker. On
+account of this, privileged users should not allow proxy logins. This is
+not just paranoia; more than one system disk has been corrupted by such
+means. Proxies have to be set up by the manager of the remote machine. If
+the manager considers the provision of a proxy login to be too much of a
+security loophole then he or she may refuse to set one up.
+
+\section{Comparing DECnet and Coloured Books}
+\label{post-mail}
+
+If you want to communicate with a computer on JANET, then you will generally
+have to use the Coloured Books software (PAD, CBS-MAIL and TRANSFER). The Starlink
+VAXs and computers connected to the SPAN network (see section \ref{SPAN}) can
+be contacted using either Coloured Books software or DECnet, although the
+DECnet access to SPAN is a little restricted. When you have the choice of these
+two methods, it is useful to know the advantages and disadvantages of each
+method. There are essentially two aspects to consider, sending mail and
+transferring files.
+
+The advantage of using VMS MAIL rather than CBS-MAIL is that the connection to the
+remote computer is made immediately so that you {\it know} that the message has
+been delivered successfully. However, if the remote computer is down, then the
+message cannot be delivered. If you use CBS-MAIL, then the message is queued for
+later delivery, so it is generally a more robust method, although occasionally
+messages sent using CBS-MAIL just disappear for no very good reason.
+
+When considering file transfers the choice is between COPY and TRANSFER.
+TRANSFER is nearly always the better solution since, like CBS-MAIL, it will
+recover from network failures. If there is a hiccough in the network connection
+when using COPY, the transfer is aborted. The problem with TRANSFER is that you
+can only copy one file at a time. You cannot use wild cards. If you need to
+transfer many files, a useful way is to put all of the files in a BACKUP
+saveset at the remote computer and then TRANSFER that single file (you need to
+specify TRANSFER/CODE=FAST, and ideally you should compress the saveset with
+LZCMP). However, this presumes that you (or a colleague) are able to log on to
+the remote computer to make the saveset. If this is not possible, then you can
+copy multiple files with wild card facilities using the JTMP software,
+although as noted earlier, not all sites have this available.
+
+
+\section{Network Access Account}
+
+Every Starlink site should have set up a special account with username
+`STARLINK'. This allows a visitor to call another machine using the `SET HOST'
+command but prevents him from using DCL commands. To use the facility, login
+with username STARLINK and reply to the prompt `Node?' with either the DECnet
+node name (e.g.\  RLVAD) or `{\em number}/X' where {\em number} is the DTE
+address of the JANET machine you wish to call.
+
+\section{Dialup lines}
+
+Terminal access to some nodes from the public telephone system is available if
+you have access to a suitable modem. This information tends to change fairly
+often and it is advisable to contact the site manager before using these
+services.
+
+The `V' numbers used below have the following meanings.
+\begin{itemize}
+\item V21 = 300/300 baud, full duplex
+\item V22 = 1200/1200 baud, full duplex
+\item V22bis = 2400/2400 baud, full duplex
+\item V23 = 1200/75 baud, full duplex
+\end{itemize}
+Some modems also provide error correction facilities. At present these all use
+the MNP protocol. 
+
+Some modems have their access controlled by a password. This may be set in the
+modem or in the equipment to which it is connected (e.g.\ terminal server or
+PACX). You should contact the local system manager for details.
+\newlength{\numlen}
+\settowidth{\numlen}{xxxx000--000--0000}
+\settowidth{\labelsep}{000}
+
+\subsection{Birmingham}
+\begin{list}{}{\setlength{\labelwidth}{\numlen}\setlength{\leftmargin}{\numlen}
+\addtolength{\leftmargin}{\labelsep}}
+\item[021--472--7387] V22 connected to BH34A (microVAX 3400).
+\item[021--414--3724] V22 `secure dialback modem' connected to School Gandalf
+PACX. Contact system manager for details.
+\end{list}
+
+\subsection{Durham}
+\begin{list}{}{\setlength{\labelwidth}{\numlen}\setlength{\leftmargin}{\numlen}
+\addtolength{\leftmargin}{\labelsep}}
+\item[091--374--2133] V21/V23 (8 bit, no parity) . Connects to 
+Gandalf PACX. Enter STAR to connect to STarlink DECserver. 
+\end{list}
+
+\subsection{Jodrell Bank}
+\begin{list}{}{\setlength{\labelwidth}{\numlen}\setlength{\leftmargin}{\numlen}
+\addtolength{\leftmargin}{\labelsep}}
+\item[0477--71324] V21/V23/V22/V22bis (autobaud), connected to a DECserver
+200.
+\item[0477--71548] V21/V23/V22/V22bis (autobaud), connected to a Spiderport
+terminal server. Type OPEN JBVAD for the Vax.
+\end{list}
+
+\subsection{Manchester}
+\begin{list}{}{\setlength{\labelwidth}{\numlen}\setlength{\leftmargin}{\numlen}
+\addtolength{\leftmargin}{\labelsep}}
+\item[061--273--5730] V21/V23/V22/V22bis (autobaud), MNP 5, eight bits, 
+no parity, connected to a DECserver 200.
+\end{list}
+
+\subsection{QMW}
+\begin{list}{}{\setlength{\labelwidth}{\numlen}\setlength{\leftmargin}{\numlen}
+\addtolength{\leftmargin}{\labelsep}}
+\item[071--980--7100] V21 (8 lines). Queen Mary and Westfield College Computer
+Centre. This gives access to a PAD and QMW can be called as {\tt QMW.STAR}.
+\item[071--981--7331] V23 (4lines). Ditto.
+\item[071--388--2333] V21/V22/V22bis, UCL Computer Centre (UCLCC). This
+gives access to the UCL `data exchange' or DCX. Starlink may be accessed by
+specifying {\tt STARLINK} when asked {\tt Which Service?} and then in
+response to {\tt Username:} specify {\tt STARLINK} which will then prompt
+for {\tt Node?} to which you reply {\tt QMCMV}.
+\end{list}
+
+\subsection{RAL}
+\begin{list}{}{\setlength{\labelwidth}{\numlen}\setlength{\leftmargin}{\numlen}
+\addtolength{\leftmargin}{\labelsep}}
+\item[0235--44--6951] PAD line V21/V23.
+\item[0235--44--6952] PAD line V22/V22bis.
+\end{list}
+
+\subsection{ROE}
+\begin{list}{}{\setlength{\labelwidth}{\numlen}\setlength{\leftmargin}{\numlen}
+\addtolength{\leftmargin}{\labelsep}}
+\item[031--668--8365] V21/V22/V23, connected to a DECserver 200;
+in response to the {\tt Local} prompt, enter {\tt C RE3500}.
+\item[031--668--8364] V21, connected to a DECserver 200;
+in response to the {\tt Local} prompt, enter {\tt C RE3500}.
+\end{list}
+
+\subsection{UCL}
+\begin{list}{}{\setlength{\labelwidth}{\numlen}\setlength{\leftmargin}{\numlen}
+\addtolength{\leftmargin}{\labelsep}}
+\item[071--388--2333] V21/V22/V22bis, UCL Computer Centre (UCLCC).
+This gives access to the UCL `data exchange' or DCX.
+Starlink may be accessed by specifying {\tt :24} or {\tt STARLINK} when asked
+for {\tt Service}.
+\item[071--831--6181] V22, University of London Computer Centre (ULCC).
+This gives access to a PAD and UCL (or anywhere else) can be called
+by DTE number (2005002 for UCL.STAR).
+\end{list}
+
+\section{Overseas Access}
+
+This section describes facilities which are not under the control of the
+Starlink project and the information presented here may be incorrect, out of
+date or incomplete.
+Futhermore the existence of these facilities does not imply that you are
+entitled to use them.
+
+\subsection{Names and addresses}
+
+If you want to send electronic mail to someone on a remote computer you need
+to know his username and the node name of his computer. The most
+comprehensive list of usernames and node names may be available in the files
+\begin{quote}
+{\tt LDOCSDIR:ASTROPERSONS.LIS\\
+LDOCSDIR:ASTROPLACES.LIS\\
+LDOCSDIR:ASTROPOSTAL.LIS}
+\end{quote}
+These files are provided by the RGO and are regularly updated, but one can
+never hope for perfect accuracy as the information is constantly changing.
+
+You should be aware that a computer might have several possible network
+addresses depending on the route that you use to send a message. For example,
+the RAL (project) Starlink VAXcluster has a DECnet cluster alias of RLVAD,
+whereas the JANET NRS name is UK.AC.RL.STAR. To add to the confusion, foreign
+BITNET sites might need to address this site as STAR.RL.AC.UK. When sending a
+mail message abroad it is very useful if you can include all possible return
+addresses that you know to work.
+
+Extra information, such as how to address users at the end of exotic network
+chains, is stored in the file:
+\begin{quote}
+{\tt RLVAD::LADMINDIR:NET\_HINT.LIS.}
+\end{quote}
+There is also a VAXnotes conference called NETWORKS on the RAL Starlink
+microVAX 3500
+(node name RLSTAR) about network names and addresses.
+
+\subsection{Operator driven Mail services}
+\subsubsection{Australia}
+\label{oper-mail}
+
+Starlink and the Anglo-Australian Observatory run a daily mail service between
+the UK and Australia.
+The AAO operators will distribute mail to:
+\begin{itemize}
+\begin{itemize}
+\item AAO Staff
+\item Visitors to the AAO
+\item CSIRO Radiophysics
+\item Mount Stromlo Observatory
+\end{itemize}
+\end{itemize}
+The UK operators will distribute to:
+\begin{itemize}
+\begin{itemize}
+\item Any Starlink user
+\item People who work at a Starlink site
+\item Visitors from AAO
+\item A user on any JANET system
+\end{itemize}
+\end{itemize}
+Note that (i) when someone from the AAO is visiting the UK, messages from
+the AAO must include a site name as the UK
+operators do not know the itinerary of such visitors, (ii) mail addressed to a
+user on a non-Starlink system must be accompanied by a complete network
+address---the UK operator only has lists of Starlink users.
+Mail will not be forwarded to networks other than JANET.
+
+Users who have to correspond with the AAO on a regular basis should obtain
+the necessary authorization from their site manager to send mail directly
+with CBS-MAIL. CSIRO Radio physics can also be mailed directly
+(AUSTRALIA.CSIRO.RPEPPING) and Mount Stromlo can be mailed via BITNET or NSFnet
+(OZ.ANU.MSO).
+
+Details of how to use this service can be found in appendix~\ref{aao-mail}.
+
+\subsubsection{La Palma Observatory}
+
+The RGO operates a mail service to the Isaac Newton Group of Telescopes on
+La~Palma. Messages should be sent to {\tt CAVAD::LPMAIL} (via VMS MAIL) or
+{\tt LPMAIL} at {\tt UK.AC.CAM.AST-STAR} (via CBS-MAIL)
+with the subject field containing the name of the intended recipient.
+
+\subsection{SPAN/ESPIN}
+
+\label{SPAN}
+The Space Physics Analysis Network is a large DECnet network operated by NASA;
+the European Space Information Network operated by ESA is functionally part of
+the same network.
+
+Terminal access and some limited mail facilities are available from JANET; a
+short guide to what is available and how to use them can be obtained by:
+\begin{quote}
+{\tt \$ TRANSFER/USERNAME="CYM//194" -\\
+\hspace*{30mm}RL.IB::"SPAN GUIDE" -\\
+\hspace*{30mm}SPAN\_GUIDE.LIS}
+\end{quote}
+If you have any problems or queries you should send CBS-MAIL to {\tt CYM}
+at {\tt UK.AC.RL.IB}.
+
+\subsubsection{The ESIS gateway and the database microVAX}
+\label{RLESIS}
+At the beginning of 1988, a microVAX~II was installed at RAL to provide access
+to large catalogues (see SUN/30). The DECnet name of this machine is STADAT
+(for STArlink DATabase). A secondary function of this machine is to provide
+access to SPAN. More recently another machine (RLESIS) has been installed for
+providing network access to the European Space Information System (ESIS). This
+also provides access to SPAN. You may or may not be able to access SPAN
+directly from your own Starlink system. If you are in DECnet area 19 (ask your
+system manager about this), then you will have full access to SPAN. If not, you
+will have to access SPAN via RLESIS and STADAT as described here.
+
+VAXs not in DECnet area 19 have limited access to SPAN nodes via RLESIS. For
+example, from any Starlink node you can send mail to user SHARP on SPAN node
+DRACO (a VAX at NOAO) by the commands
+\begin{quote}
+{\tt \$ \underline{MAIL}\\[\medskipamount]
+MAIL> \underline{SEND RESULTS.TXT}\\
+To:     \underline{RLESIS::DRACO::SHARP}\\
+Subj:   \underline{Here are the results you wanted}\\[\medskipamount]
+MAIL> \underline{EXIT}\\[\medskipamount]
+\$}
+\end{quote}
+Mail can be sent from SPAN to Starlink in a similar way but
+it is quite likely that the name RLESIS has not been defined on many SPAN
+nodes in which case RLESIS should be replaced by the node number 19527.
+
+This form of routing (known as poor man's routing) does not provide all of the
+normal routing functions and consequently not all DECnet operations will work.
+The major thing that does not work is `SET HOST', i.e. you cannot do
+SET~HOST~RLESIS::DRACO. If you want to log onto a SPAN node you should first
+log onto RLESIS and then `SET HOST' to the machine that you want. RLESIS
+provides a menu system for doing this when you log on as user ESIS (no
+password).
+
+To log into a Starlink node that is not in area 19 from SPAN, you have to log
+into STADAT first; however, you cannot use your general node username because
+these usernames can only be used {\em from} a Starlink node. Therefore a
+username called STARLINK (no password) has been created which can be used from
+any SPAN node and can be used to SET~HOST to any Starlink node. If STADAT is
+not defined on the remote SPAN node, you should type SET~HOST~19463 instead.
+Fortunately, Starlink is migrating all of its systems to DECnet area 19 so that
+these routing problems will eventually disappear. 
+
+It should be possible to send mail to computers that are SPAN nodes by using
+CBS-MAIL, although the node name would not be that same as the SPAN node name.
+See section \ref{post-mail} for the merits of each method.
+
+\subsection{EARN/BITNET/NORTHNET}
+\label{bitnet}
+
+EARN (European Academic Research Network) is an IBM based (but with non-IBM
+nodes as well) network with a store and forward mail system.
+EARN and its USA (BITNET) and Canadian (NORTHNET) equivalents are functionally
+the same network.
+The Central Computing Division IBM mainframe at RAL is an EARN node and acts as
+a mail and file transfer gateway between EARN and JANET.
+
+Mail can be sent to a user on an EARN, BITNET or NORTHNET node with CBS-MAIL
+to \\ {\tt CBS\%EARN-RELAY::nodename::username}.
+For example, to send a message stored in a file called MESSAGE.TXT to user
+TINTIN at EARN node FRIAP51 the following command would be used:
+\begin{quote}
+{\tt \$ MAIL MESSAGE.TXT CBS\%EARN-RELAY::FRIAP51::TINTIN}
+\end{quote}
+A guide to using the gateway can be copied from the IBM system at RAL by:
+\begin{quote}
+{\tt \$ TRANSFER/USERNAME="NETSERV//193" -\\
+\hspace*{30mm}RL.IB::"JANET EARNGATE" -\\
+\hspace*{30mm}EARNGATE.LIS}
+\end{quote}
+This guide also describes how to access many other information files including
+a list of all EARN and BITNET nodes.
+If you have any problems or queries you should send CBS-MAIL to {\tt SUPPORT}
+at {\tt UK.AC.RL}.
+
+EARN has gateways to many other networks including NSFNET, UUCP, SUNET and
+UNINET. For a complete list and information on how to access them see the
+gateway user's guide.
+
+EARN is a `store and forward' network and a message may have to be staged on
+several systems before reaching its destination; therefore if a node is down for
+any reason messages can suffer a considerable delay, sometimes measured in days!
+Also, because the network is IBM based, messages are translated from
+ASCII (the character code used on VAX's) to EBCDIC and this can result in
+`exotic' characters, such as \{ ~\} and~$\backslash$ being lost or corrupted.
+
+\subsection{IPSS}
+
+The International Packet Switched Stream is the international public X.25
+network; and there are gateways between JANET and IPSS at RAL, MCC and ULCC.
+Charges are levied and therefore access has to be strictly controlled.
+
+If you are logged in on a computer which is outside JANET (for example if you
+are outside the UK) but which has access to IPSS, you can, if locally
+authorized, use IPSS to log in to any system on JANET for which you have
+authorization.
+The DTE number of the PSS gateway at RAL and MCC is 234223519191 and at ULCC is
+234219200100 and you should make an X.29 call to these numbers with the
+sub-address 69; consult local experts on how to do this.
+The gateway will prompt for your authorization code and the address which you
+want to call.
+For calls from IPSS to JANET no authorization is required and all that is needed
+is the address you want to call, preceded by a point (.).
+The address can either be a DTE number or a site mnemonic, however, the site
+mnemonics that are known to the gateway are the old SERCnet names of computers
+rather than NRS names, and these old names no longer work.
+
+The DTE numbers of all the Starlink systems are listed in
+appendix~\ref{sercnames}.
+For example to call the RAL Starlink VAX the string:
+\begin{quote}
+{\tt .00000000940010}
+\end{quote}
+should be typed in response to the gateway prompt.
+
+To call PSS or IPSS hosts from JANET, authorization is required; if you do not
+have a personal account, your site manager may have an account to which you can
+have temporary access.
+
+A guide to using the gateway can be obtained by:
+\begin{quote}
+{\tt \$ TRANSFER/USERNAME=NEWS -\\
+\hspace*{30mm}JANET.NEWS::"NEWS.GATEWAYS.PSS.GUIDE" -\\
+\hspace*{30mm}PSSGUIDE.LIS}
+\end{quote}
+
+A few overseas institutions (e.g.\ AAO, ESOC) run the Coloured Books Software so
+TRANSFER and CBS-MAIL can also be used, provided you have the appropriate
+authorization.
+Note that for the AAO a daily mail transfer is made which does not require any
+authorization; see section~\ref{oper-mail}.
+
+\subsection{Internet}
+
+The `Internet' is a generic name for the TCP/IP networks which all evolved out
+of the US DOD ARPAnet. The original ARPAnet was divided  into networks such as
+MILNET (for military traffic), NSFnet (for Universities and similar) and others
+but, as the subnetworks are all connected transparently, the Internet still
+appears as a single entity. In fact, as the host name addressing is  allocated
+on a worldwide basis, Internet sites are now common outside the USA and is
+growing rapidly in Europe (outside the UK that is!).
+
+The UK has had a gateway into the Internet for some years. Originally this was
+sited at UCL and subject to very strict `per user' vetting. The gateway
+(UK.AC.NSFNET-RELAY) is now sited at ULCC and has a fast transatlantic line.
+Improvements since moving to ULCC include free and unrestricted transfer of
+mail to and from JANET registered sites and a `guestftp' facility which allows
+transfer of Internet files (via the relay computers disks) to JANET sites.
+Terminal access to Internet sites is still subject to authorisation and 
+intending users should mail for advice to {\tt liaison at UK.AC.NSFNET-RELAY}. 
+The NETWORKS VAXnotes conference has some hints on using the `guestftp'
+facility.
+
+At the time of writing (October 1990) NSFNET-RELAY is being moved from a VAX
+(UK.AC.NSFNET-RELAY.VAX) to a SUN (UK.AC.NSFNET-RELAY.SUN). Mail should still
+be sent to the generic name NSFNET-RELAY while the `guestftp' service runs on
+the SUN only. There are also plans to allow JANET users to transfer files to
+and from the Internet without having to login to the gateway.
+
+\subsection{USENET}
+
+USENET is a world wide network of mostly university computer science UNIX
+systems using the Unix to Unix Communications protocol (UUCP). A gateway
+between USENET and JANET is run by the University of Kent. The network uses
+the public telephone system and therefore authorization is required before
+the gateway can be used. There are standing charges to to paid for using this
+service (roughly \pounds 50 per quarter), so it is not as cheap as using EARN.
+More information about the gateway can be obtained
+by sending an empty CBS-MAIL message to {\tt information} at {\tt UK.AC.UKC}.
+
+On account of the charges involved in using this gateway, many Starlink sites
+do not subscribe to it. Unfortunately the gateway cannot just be ignored. Mail
+that is sent from abroad frequently tries to get into the UK via this gateway.
+If this happens, the intended recipient of the mail message is sent a message
+from Kent saying that a mail message has arrived for him, but that it will not
+be forwarded to him as he does not subscribe to the gateway. The sender of the
+mail message is not informed that the message did not get through, so both
+people are left wondering what is going on. If you get involved in a situation
+like this, suggest to your foreign colleague that they try to explicitly send
+the mail to you via the EARN gateway at RAL. Alternatively, if they can access
+SPAN, then using that should allow the mail to get through.
+
+\appendix
+
+\section{TRANSFER, PAD and POST}
+\label{cbs}
+
+These three commands are an implementation of the `coloured books' protocols;
+a UK standard.
+Before using any of them they must be defined by:
+\begin{quote}
+{\tt \$ @NET\$DIR:NETSYMB}
+\end{quote}
+This command can conveniently be inserted in your login command file
+(LOGIN.COM), although some sites have this as part of the standard login
+sequence.
+\subsection{The TRANSFER and LIST commands}
+The TRANSFER command enables you to transfer a file between computers.
+It uses a software package called FTP (File Transfer Protocol).
+It is best illustrated by some examples.
+\newtheorem{example}{Example}[subsection]
+\begin{example}\rm
+To copy a file from a remote computer to your local computer:
+\begin{quote}
+{\tt \$ TRANSFER/USERNAME=NETUSR,NETUSR -\\
+\hspace*{25mm}RL.STAR::STARDISK:[STARLINK.DOCS]SUN36.LIS -\\
+\hspace*{25mm}SUN36.LIS}
+\end{quote}
+Note the use of the special username/password NETUSR, which avoids knowing
+anyone's password on the remote machine.
+(This is only available when the remote machine is run by Starlink).
+Note that you cannot use wild cards (``$*$'' or ``\%'') in the file names.
+\end{example}
+\begin{example}\rm
+You can also copy a file from your computer to a remote one.
+This would normally only be appropriate where the account on the remote machine
+is your own.
+In general it should never be necessary for the recipient to divulge his
+password to you: he should `pull' the file instead.
+
+To copy the file PROGRAM.FOR from your default directory on your local computer to
+directory DISK\$USER1:[ME] at ROE.
+\begin{quote}
+{\tt \$ TRANSFER\\
+\%\_Input filename ? PROGRAM.FOR\\
+\%\_Output filename ? ROE.STAR::DISK\$USER1:[ME]PROGRAM.FOR\\
+\%\_Remote Username ? ME\\
+\%\_Remote Username password ? WHATEVER\\
+File Transfer 35 has been queued}
+\end{quote}
+The parameter values can be included on the command line as follows:
+\begin{quote}
+{\tt \$ TRANSFER/USERNAME=ME,WHATEVER PROGRAM.FOR -\\
+\hspace*{25mm}ROE.STAR::DISK\$USER1:[ME]PROGRAM.FOR}
+\end{quote}
+\end{example}
+\subsubsection{Qualifiers}
+The above examples show the use of the `/USERNAME' qualifier.
+There are 26 options available which may be selected by qualifiers.
+
+The following are likely to be the most generally useful:
+\begin{description}
+\begin{description}
+\item[/ACCOUNT=``{\em accountname password\/}'']
+\hspace{5mm} This is needed for file transfers with the RAL mainframe computers
+(colloquially referred to as `the IBM').
+You will be prompted for the {\em accountname} and {\em password} to be used if
+they have not been specified.
+You may need to ask an IBM user to disclose his password.
+Do not reciprocate by telling him yours---the Starlink NETUSR username is
+intended to avoid this.
+\item[/CODE=FAST]
+\hspace{5mm} Use this when transferring executable image files or save sets
+between VAX's.
+It may also be needed for other file formats.
+We recommend you always use this qualifier when transferring files between
+two VAXs as it speeds up the transfer.
+\item[/INFORM]
+\hspace{5mm} You will be sent a MAIL message telling you that a transfer attempt
+has finished and whether or not it was successful.
+You will always be told of an unsuccessful completion, even if you do not use
+this qualifier.
+\item[/USERNAME={\em username,password}]
+\hspace{5mm} Specifies the username and password required to login to the
+remote computer.
+\end{description}
+\end{description}
+More information can be found by typing HELP TRANSFER or by consulting the
+Coloured Books User Guide; your site manager will have a copy.
+\subsubsection{LIST}
+The LIST command allows you to monitor requested transfers.
+To obtain a list of your transfers in the queue, type:
+\begin{quote}
+{\tt \$ LIST}
+\end{quote}
+To obtain a list of all the entries in the queue, type:
+\begin{quote}
+{\tt \$ LIST/ALL}
+\end{quote}
+To obtain detailed information on a particular transfer, type:
+\begin{quote}
+{\tt \$ LIST/ENTRY={\em queue\_entry\_number}/FULL}
+\end{quote}
+\subsection{PAD}
+PAD (Packet Assembler Disassembler) is a program that allows you to login to
+remote computers from your local VAX.
+The following example shows how to call ROE.STAR (the ROE Starlink VAX)
+from your local node:
+\begin{quote}
+{\tt \$ \underline{PAD}}
+\end{quote}
+This command invokes the PAD program.
+The program responds with a message and a prompt:
+\begin{quote}
+{\tt PAD>}
+\end{quote}
+You respond with a request for the desired computer:
+\begin{quote}
+{\tt PAD>\underline{CALL ROE.STAR}\\
+Call connected}
+\end{quote}
+You will now receive the usual `username' and `password' prompts as if you were
+logging into your local VAX.
+Once logged in successfully, you can use the remote computer as if you were
+logged into it locally.
+
+You end the session by logging out in the normal way.
+Then you will get the PAD prompt again and can call another node, set a
+parameter, or exit from the PAD program:
+\begin{quote}
+{\tt PAD>\underline{EXIT}}
+\end{quote}
+If you have any difficulty in clearing a call to another node, try the
+following:
+\begin{quote}
+{\tt \underline{<CTRL/P>}\\
+PAD>\underline{CLEAR}}
+\end{quote}
+You can invoke the PAD prompt at any time while running the PAD program
+by typing control P.
+\subsection{POST and CBS-MAIL}
+POST and CBS-MAIL are two different ways of achieving the same end, i.e.\
+sending a Coloured Books mail message.
+Although it is generally more convenient use CBS-MAIL for interactive use
+there is no need to change command procedures that use the POST command.
+The major advantage of Coloured Books mail over VMS mail is that you can reach 
+more computers. VMS mail uses DECnet and so is restricted to machines that are
+logically connected to the Starlink DECnet, although these days that includes
+SPAN and HEPnet. Coloured Books mail will in principle allow you to get to any
+computer that is connected to a network anywhere in the world, although in some
+cases the address that you have to type can be very complicated.
+
+The only difference between CBS-MAIL and the POST command is the user
+interface. The mail is sent out in the same way and in principle, the recipient
+cannot tell which method you used to send it. Like TRANSFER, you can use the
+LIST command to check the progress of your message.
+
+To send a CBS-MAIL message you need to send mail to 
+{\tt CBS\%$<$NRS node name$>$::$<$username$>$}.
+For example,
+\begin{quote}
+{\tt \$ \underline{MAIL}\\[\medskipamount]
+MAIL> \underline{SEND TEST.LIS}\\
+To:     \underline{CBS\%ROE.STAR::OPER}\\
+Subj:   \underline{This is a test of CBS-MAIL}\\[\medskipamount]
+MAIL> \underline{EXIT}\\[\medskipamount]
+\$}
+\end{quote}
+The particularly useful feature of this interface is that you can reply to
+incoming Coloured Book mail as the software works out the return address for
+you. You can even use this to send mail to Bitnet. In this case you should send
+mail to {\tt CBS\%EARN-RELAY::$<$bitnet node name$>$::$<$username$>$}. Again,
+you can reply to incoming Bitnet mail.
+
+If you prefer, you can send Coloured Books mail using the POST command. 
+The following example shows how to send mail to username OPER at ROE using POST,
+where the message is typed in directly on your terminal:
+\begin{quote}
+{\tt \$ \underline{POST}\\
+\$\_ Remote username(s) : \underline{OPER}\\
+\$\_ At which site ?    : \underline{ROE.STAR}\\
+Enter your message below. Press CTRL/Z when complete:\\
+\underline{TESTING POST FROM RL.STAR ME TO ROE.STAR OPER}\\
+\underline{<CTRL/Z>}\\
+Mail request 434 has been queued}
+\end{quote}
+This message could have been stored previously in a file, say TEST.LIS, and sent
+as follows:
+\begin{quote}
+{\tt \$ \underline{POST TEST.LIS}\\
+\$\_ Remote username(s) : \underline{OPER}\\
+\$\_ At which site ?    : \underline{ROE.STAR}\\
+Mail request 435 has been queued}
+\end{quote}
+You can send messages to more than one username by typing a list of usernames,
+separated by commas.
+
+\subsubsection{Using CBS-MAIL on VAXclusters}
+
+The above section assumes that you are logged onto a computer that is licensed
+to run the Coloured Books software. At the present time, most Starlink sites
+consists of a VAXcluster rather than just a single VAX computer. On account of
+the high cost of the software, Coloured Books is only licensed to run on a
+single computer in each cluster. This is usually the boot node (or one of the
+boot nodes if you have a dual microVAX 3400 system), but this need not be the
+case. Having the software licensed for only a single CPU is not a great
+problem, but it can be annoying when reading a mail message that was sent via
+Coloured Books, on a machine that is not licensed to run Coloured Books, to be
+unable to reply to the message without logging into another computer. This is
+sufficiently annoying that many people log into  the machine that has Coloured
+Books when reading mail just in case they need it. In fact this is not
+necessary as you can send Coloured Books mail from any node in a cluster by
+employing a trick of DECnet. Suppose that your cluster consists of two nodes, a
+boot node boot MAV1 and a satellite MAV2, and that it has a cluster alias of
+MAVAD. This is of course part of the Manchester cluster. MAV1 runs the Coloured
+Books software, but you are logged onto MAV2. You can send a Coloured Books
+mail message as follows:
+
+\begin{quote}
+{\tt \$ \underline{MAIL}\\[\medskipamount]
+MAIL> \underline{SEND}\\
+To:     \underline{MAV1::CBS\%ROE.STAR::OPER}\\
+Subj:   \underline{This is a test of CBS-MAIL on a satellite}\\[\medskipamount]
+etc.\\}
+\end{quote}
+
+The point to note is that you send the mail message to node MAV1, which
+forwards the mail to the intended recipient using Coloured Books. This does not
+break the conditions of the software licence, but it does come into the class
+of `nifty tricks', so is prone to breaking when the software is changed.
+However, as something that costs nothing, it is well worth using.
+
+There are some imperfections with this method of using Coloured Books from a
+satellite that you should be aware of. When you receive a normal CBS mail
+message, it says it has come from someone like {\tt
+CBS\%UK.AC.\-MANCHESTER.\-ASTRONOMY.\-STARLINK::PMA} (the computer generates
+the long form of the name). This means that if you read this message on a
+machine that does not run Coloured Books, you cannot simply type {\tt REPLY} to
+reply to the mail message, however, you can send a new message using the
+technique given above. It is of course possible to use the short form of the
+name if you know it.
+
+If you do send a mail message using this technique, it will appear to come from
+{\tt CBS\%UK.AC.\-MANCHESTER.\-ASTRONOMY.\-STARLINK::"MAVAD::PMA"}. The
+recipient of the message (FRED at Leicester, let's say) can reply directly to
+this message if they are reading it on the machine that runs Coloured Books,
+but you will then get a reply that appears to come from {\tt
+MAVAD::CBS\%UK.AC.\-LEICESTER.\-STARLINK::FRED}.  It may or may not be possible
+to {\tt REPLY} to this message. What is even more confusing is that, depending
+on the way that the network is set up at your particular site, it may work at
+sometimes and not at other times. In fact any attempt to bat messages back and
+forth using {\tt REPLY} is likely to be doomed to failure in the end.
+Consequently, if you receive a message that look like it has been sent in this
+fashion, it would be as well to {\tt SEND} a new message rather than try {\tt
+REPLYing} to it. Despite these warnings, if you always send a new message,
+rather than try replying to old ones, you should have no problems. 
+
+\section{Interaction of X.29 terminals protocols with VAX/VMS}
+\label{pad}
+
+X.29 is the CCITT recommendation for the terminal protocol using an X.25
+network.
+When using a screen editor (and this includes command line editing provided by
+VMS) the echoing of characters on the screen has to be under complete control
+of the editor program.
+The only way to achieve this on an X.25 network is for each character to be
+transmitted across the network as it is typed and the echo to be transmitted
+back.
+This results in two packets traversing the network for each key pressed, which is
+extremely inefficient use of the network.
+If the public packet switched system is involved it is also very expensive.
+When editing facilities are not required, it is far more efficient for the
+terminal to provide the echoing and for data to be transmitted only when
+carriage return (and some other special characters) are typed.
+This mode of working is selected by the command:
+\begin{quote}
+{\tt \$ SET TERMINAL/LOCAL\_ECHO}
+\end{quote}
+Before selecting this mode, it is important to ensure that the appropriate set
+of characters causes the current line to be transmitted.
+This is done by:
+\begin{quote}
+{\tt \$ SET TERMINAL/X29/PARAMETER=(FORWARD=126)}
+\end{quote}
+This only needs to be done once during a terminal session; the /X29 qualifier
+must come before /PARAMETER.
+To enable screen editing use the command:
+\begin{quote}
+{\tt \$ SET TERMINAL/NOLOCAL\_ECHO}
+\end{quote}
+If you are connected via a network which does not fully support X.29, such as a
+campus local area network, this may not work correctly.
+If your terminal displays symptoms such as no echo appearing until carriage
+return is pressed, you must work in LOCAL\_ECHO mode.
+The default mode when logging into a VAX running VMS Version 4 is NOLOCAL\_ECHO,
+although this may be changed to LOCAL\_ECHO by the system wide login command
+procedure set up by the system manager.
+
+\section{Additional DECnet facilities}
+\label{shownet}
+
+There are three DECnet commands provided by Starlink as an extension to
+the standard DEC utilities.
+\subsection{SHOWNET}
+The command SHOWNET will list all the DECnet nodes and their current state,
+either reachable or unreachable.
+For nodes which are not Starlink systems this information may not always be
+available.
+\subsection{TALK}
+TALK is a program that allows you to display a message on another user's
+terminal.
+It has two modes of operation:
+\begin{quote}
+{\tt \$ TALK {\em user message}}
+\end{quote}
+which sends a single line, and a conversational mode:
+\begin{quote}
+{\tt \$ TALK {\em user}\\
+<message ......\\
+\hspace{16mm}.......>\\
+<CTRL/Z>}
+\end{quote}
+in which every line typed is sent until control Z is typed.
+{\em user} (which will be prompted for if not given) can be either the
+username of someone who is logged on or the device name of a terminal (e.g.\
+TTA3, RTA3 etc.\ ).
+If a username is used and that person is logged on to more than one terminal,
+only one terminal will receive the message.
+For example:
+\begin{quote}
+{\tt \$ TALK PTW Your meeting is about to start}
+\end{quote}
+will cause a message similar to:
+\begin{quote}
+{\tt From RLSTAR::LTA10: DLT          12:18:13\\
+YOUR MEETING IS ABOUT TO START}
+\end{quote}
+to appear on PTW's terminal.
+The message appears in upper case because it has been processed by DCL.
+To send a message containing lower case or special characters the message must
+be enclosed in quotation marks, eg:
+\begin{quote}
+{\tt \$ TALK PTW "Your meeting has started!"}
+\end{quote}
+In conversational mode the message is read directly by the program and it is
+transmitted without alteration.
+
+The username or device name can include a DECNET node name (e.g.\ MAV1::PMA) in
+which case the message will sent to the user on the remote node. This means
+that it is not necessary to log on to a remote node to talk to someone on that
+node. Note that you must use the specific node name, not the cluster alias.
+
+Many people find TALK annoying---it interrupts whatever they are doing and
+demands an instant reply. TALK messages can also get lost. If the
+screen gets refreshed at just the wrong moment then the message will be
+overwritten. MAIL is preferable for most purposes.
+\subsection{NETSHOW}
+NETSHOW is a command that allows you to execute the equivalent of the DCL SHOW
+command on a remote Starlink node.
+The form of the command is:
+\begin{quote}
+{\tt \$ NETSHOW {\em nodename item}}
+\end{quote}
+where {\em item} is any of the parameters that can be given to the SHOW command.
+For example:
+\begin{quote}
+{\tt \$ NETSHOW RLSTAR USER}
+\end{quote}
+will list all the users logged on to RLSTAR.
+If {\em item} contains a `/' character (as in for example, SHOW MEMORY/POOL)
+the item must be enclosed in quotation marks thus:
+\begin{quote}
+{\tt \$ NETSHOW DUVAD "MEMORY/POOL"}
+\end{quote}
+Commands which involve interaction with the terminal such as SHOW
+PROCESS/CONTINUOUS will not work nor will commands which are executed entirely
+by the command interpreter such as SHOW TIME and SHOW TRANSLATION.
+NETSHOW is a Starlink specific utility and although it makes use of DECnet, it
+will not function on non-Starlink computers.
+
+\section{DTE numbers of Starlink Nodes}
+\label{sercnames}
+
+On rare occasions you may find that you have to use the explicit DTE for a
+Starlink node. These are:
+
+\begin{center}\begin{tabular}{l@{\hspace{1cm}}l}
+Armagh & 000011500001 \\
+Belfast & 000011200401 \\
+Birmingham & 000020013301 \\
+Cardiff & 000060305101 \\
+Cambridge & 000008005001 \\
+Durham & 000014000300 \\
+Hatfield Polytechnic & not yet known \\
+Imperial College & 000005106004 \\
+Keele & 000010302000 \\
+Kent & 000049200300 \\
+Jodrell Bank & 000010124001 \\
+Lancashire Polytechnic & 000014500032 \\
+Leicester & 000021213000 \\
+Manchester & 00001010900111 \\
+Oxford & 000050251100 \\
+QMW & 000005121062 \\
+RAL (Project) & 00000000940010 \\
+RAL (Astrophysics) & 00000000940011 \\
+RAL (Database) & 00000000940012 \\
+ROE &00000700200155 \\
+St.Andrews & 000007007061 \\
+Southampton & 000050315020 \\
+Sussex & not yet known \\
+UCL & 000002005002 
+\end{tabular}\end{center}
+
+\section{AAO/Starlink MAIL service}
+\label{aao-mail}
+
+Starlink and the Anglo-Australian Observatory jointly operate a service which
+allows the exchange of MAIL messages between users of the Starlink and the AAO
+VAXs.
+At each end, messages are sent to a holding account and are later transmitted
+en masse.
+As with the telex service, a daily turnaround is possible, governed mainly by
+the large difference in local time.
+
+The X.25 communication route is Starlink: JANET - PSS - IPSS - MIDAS - AUSTPAC
+- AAO.
+The PAD, CBS-MAIL and TRANSFER software is used in both directions.
+\subsection{How to send messages to the AAO}
+All you have to do is to send your message to account AAOMAIL at RAL, specifying
+to whom the message has to go in the `Subj:'.
+
+For example, here is one way to send a message prepared beforehand in file
+WHINGE.TXT to someone at Epping called Bruce Billabong:
+\begin{quote}
+{\tt \$ \underline{MAIL}\\[\medskipamount]
+MAIL> \underline{SEND WHINGE.TXT}\\
+To:     \underline{RLVAD::AAOMAIL}\\
+Subj:   \underline{for Bruce Billabong}\\[\medskipamount]
+MAIL> \underline{EXIT}\\[\medskipamount]
+\$}
+\end{quote}
+Because the messages are sent to a holding account (and sometimes are for
+individuals without accounts on the VAX), automatic transmission direct to the
+addressee is not possible, and an operator at each end has to handle
+distribution.
+Be specific with names, especially with visiting astronomers---initials or
+first names may not be enough.
+A full character set can be used---but don't use fancy escape sequences and
+non-printable characters.
+\subsection{How to receive messages from the AAO}
+You don't have to do anything---if a reply is sent it will be forwarded to your
+Starlink account by the local operator.
+Note, however, that it is not possible to use the REPLY command in the MAIL
+utility---you will simply send the reply to the operator's account on Starlink
+and it will not go to Australia.
+Use SEND to transmit your reply to AAOMAIL.
+\subsection{How to send messages from the AAO}
+If you are visiting the AAO, ask for current operating instructions for the
+AAO/Starlink MAIL service.
+At present the procedure is simply for you to MAIL your message to the account
+UKMAIL if you are at Epping, or to the account EPPINGMAIL if you are at the AAT.
+\subsection{Reliability}
+Under normal circumstances the service is operated on every working day.
+Occasionally---every few weeks---a day will be missed for one reason or another;
+the VAX either end might be down, there might have been network problems in PSS,
+the gateway might be down, there may be a public holiday, no operator
+may be available.
+If longer lapses occur, node managers are informed.
+The service is very reliable, but really urgent things should be sent by telex,
+or acknowledgment requested.
+Garbling and bad characters do not occur at all.
+\subsection{Cost}
+The AAO pay for the UK:Australia traffic, and Starlink pays for the
+Australia:UK traffic.
+It currently costs the AAO 14 cents per minute they are connected, and
+1.2 cents per segment (64 characters).
+The costs to Starlink are roughly comparable---10p per minute and 0.4p per
+segment.
+Messages should be concise, though telegraphese can be avoided.
+The production of multiple copies should be left to the remote operator.
+Very short papers and programs may be sent whole, though whenever possible it is
+better to send appropriate extracts.
+\subsection{Timing}
+Messages for Australia will arrive on the next working day if sent to UKMAIL by
+about midnight UK time.
+If the recipient in Australia replies the same day (by about 18:00), the reply
+will be picked up by the UK operator and distributed at about 09:00 UK time on
+the same date.
+Messages for Coonabarabran are forwarded the same day and a reply, providing it
+is sent to the EPPINGMAIL account by about 15:00, will be received in the UK on
+the same day.
+These times vary somewhat due to local daylight saving time conventions.
+\subsection{Security}
+Normal unprivileged users cannot read the AAO--Starlink traffic.
+Privileged software staff could access messages but do not in practice do so
+unless there is a problem.
+The operators see the messages.
+
+Hardcopy of the traffic in both directions is kept at the AAO, but access is
+restricted.
+No hardcopy is kept in the UK.
+
+\section{JTMP availability}
+\label{who-has-JTMP}
+
+The JTMP software is available as follows:
+
+\begin{table}[htbp]
+\caption{Availability of JTMP}
+\begin{center}\begin{tabular}{l@{\hspace{1.5cm}}l}
+Armagh & yes\\
+Belfast & yes\\
+Birmingham & yes\\
+Cambridge & yes\\
+Cardiff & no\\
+Durham & yes\\
+Hatfield Polytechnic & no\\
+Imperial College & yes\\
+Jodrell Bank & yes\\
+Kent & no\\
+Keele & no\\
+Lancashire Polytechnic & no\\
+Leicester & yes\\
+Manchester & yes\\
+Oxford & yes\\
+QMW & yes\\
+RAL (Project) & yes\\
+RAL (Astrophysics) & yes\\
+RAL (Database) & no\\
+ROE & yes\\
+St.\ Andrews & yes\\
+Southampton & no\\
+Sussex & no\\
+UCL & yes
+\end{tabular}\end{center}\end{table}
+
+\end{document}

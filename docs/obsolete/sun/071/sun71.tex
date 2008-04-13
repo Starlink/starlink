@@ -1,0 +1,208 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {71.4}
+\newcommand{\stardocauthors}   {C.G.Page \& G.R.Mellor\\University of Leicester}
+\newcommand{\stardocdate}      {7th April 1992}
+\newcommand{\stardoctitle}     {IKONPAINT -- Ikon and GWM window to
+                                             Inkjet Hard-copy}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Purpose} 
+
+IKONPAINT provides ``push-button'' colour hard-copy from the Ikon screen
+or from a GWM window to an inkjet printer.
+The DEC {\it Companion Colour Printer} (LJ250/LJ252) and the Hewlett-Packard
+{\it Paintjet} are both supported.
+These printers normally take 8 $\times$ 11 inch fan-fold paper but
+single transparency sheets can be hand-fed. 
+
+\section{Changes in version 4.0}
+A number of changes have been made in version 4.0:
+\begin{itemize}
+\item IKONPAINT will now work on a GWM window as well as on the Ikon.
+\item On devices with an overlay plane (such as the Ikon) the user is
+asked which plane(s) to send to the output. Choices are the base plane,
+the overlay plane or both.
+\item The resetting of a DEC printer to DEC mode, rather than remaining
+in HP mode, after the program has run, is now under the control of a
+hidden ADAM parameter. The default is to remain in HP mode.
+\end{itemize}
+
+\section{How to use IKONPAINT}
+
+IKONPAINT simply reads the contents of an Ikon screen or GWM window
+left on the display by some other program. It is run with the command 
+%******* poss change here ********
+\begin{verbatim}
+      $ IKONPAINT		    
+\end{verbatim}
+This invokes a short DCL command procedure which ensures that ADAM has
+been started. The program then prompts for the graphics device to be
+used. Acceptable names are listed in the file GNS\_IDINAMES.
+
+If the device has an overlay plane (such as the Ikon) the program then
+prompts for which of the planes are required for output. If the user
+specifies 'BASE', or 'OVERLAY' then only that plane is output. If the
+user specifies 'BOTH' then a composite image is achieved by
+taking the overlay image and substituting base plane pixels where an
+overlay pixel has a zero value (i.e. it is transparent at that point). 
+
+IKONPAINT can copy any rectangular region of the screen: if you enter
+YES (the default) to the first prompt it asks you to use the mouse to
+set the cursor to the two opposite corners of this area\footnote{The GWM
+cursor is moved by bringing the workstation cursor close to it.},
+pressing the right-hand mouse button at each point, otherwise it dumps
+the entire screen area.
+The Ikon screen has about 1024 $\times$ 780 pixels, whereas
+the printer page of 8 inches by 10 corresponds to 1440 $\times$ 1800
+dots. The program computes the maximum magnification that fits the paper
+and prompts you to select this by default or to enter another value. You
+may enter zero to get another chance of choosing the rectangular region.
+The output quality is slightly better for magnification factors which
+are integers, but with a higher magnification than the default you will
+either lose some of the right-hand side of the chosen area or cause the
+printout to use more than one sheet of paper. 
+
+The program then asks you whether to invert white and black.  If selected
+this means that white lines on a dark CRT are printed as black lines on
+the white paper: IKONPAINT actually examines all colour indices in the
+range 0 to 15 (which are used in many packages for line-drawing) and
+inverts any shades found to be close to black or white. This also helps
+to reduce ink consumption.  Note that other shades including
+intermediate shades of grey are not affected. 
+
+If the transparency mode is chosen then a printer control code is
+inserted to make the print-head cover each line twice, as recommended
+for transparencies. 
+
+The conversion to HP printer control codes can take a minute or more for
+a full screen. A temporary file {\tt INKJET.DAT} is written to {\tt
+SYS\$SCRATCH:} which may reach several hundred blocks in length. The
+program also gives you an estimate of the cost of consumables used: the
+ink is rather expensive, often 30 to 50 pence for a highly-coloured
+image on plain paper.  Transparency sheets add at least a pound to this
+figure. 
+
+When processing is finished the output file is automatically sent to the
+queue {\tt SYS\_INKJET} (and deleted on completion).  A printer on a
+serial line will take two to four minutes per plot depending on its
+complexity. Messages are sent to your terminal when the job is queued
+and when output is complete.  Note that if your inkjet printer is on a
+queue with a different name then {\tt SYS\_INKJET} should be redefined
+to point to it.   If the queue cannot be found then the file will be
+left on {\tt SYS\$SCRATCH} and must be printed using the appropriate
+queue with the {\tt /PASSALL} option. 
+
+\section{How it works} 
+
+The program uses IDI routines
+to read the current device colour tables and then the contents
+of the base and overlay planes for the region selected by the cursor (if
+this is under 100 pixels in area it is assumed that the user has made a
+mistake and the output is cancelled).
+
+The conversion to HP/PCL printer codes is based on the ordered-dither
+algorithm described in standard texts (and used in the GKS laser printer
+drivers) but with a specially-invented extension to use chromatic
+information. This method shades areas of constant colour evenly while
+still allowing sharp features to be resolved. IKONPAINT uses a
+4$\times$4 grid of dots with 2-fold redundancy to get a pleasing
+diagonal dot pattern, so that the unit cell consists of 8 dots.  Each
+dot can be white or black or have any of six basic colours: red, yellow,
+green, cyan, blue, or magenta. The RGB coordinates of each of the 256
+entries in the Ikon colour table are converted to the HSV scheme.  The
+{\it hue} is used to select which basic colours to use and what
+proportions of each.  The {\it saturation} and {\it value} determine how
+much white or black to admix. In theory this can generate up to 256
+shades from a palette of 740, but astronomers quite sensibly tend to use
+colour tables in which saturated colours predominate, so that printouts
+do not often contain more than 150 different shades. 
+
+\section{Some limitations} 
+
+If the image displayed on the device just uses a simple grey-scale
+the results are not very impressive because the printer can show no more
+than 9 different grey levels (including black and white).  It is best to
+use a colour table containing a good range of hues. 
+
+The printer mixes its three primary ink colours (cyan, magenta, and
+yellow) to produce red, green, and blue.  Unfortunately the resulting
+blue is very dark, while the yellow is rather pale. This means that some
+shades are are poor approximation to those shown on the screen,
+though different shades can usually be distinguished adequately on the
+hard-copy even if they are not very faithful to the original. 
+
+The DEC version of the printer can be set in either DEC or HP mode by a
+button on the control-panel panel (the default is set by a DIP switch at
+the back). IKONPAINT uses HP mode exclusively: codes are sent to switch
+a DEC printer to HP mode and it is left in this mode unless the hidden
+parameter 'DECMO' is set to true on the command line. In the latter case
+the printer is restored to DEC mode after use but this
+always seems to produce an extra form-feed which wastes paper. If the
+printer is also used to take direct screen dumps from a Vaxstation using
+the VWS then it will be necessary to reset the printer to DEC mode
+manually after using IKONPAINT.  VWS screen dumps are not generally very
+satisfactory as all shades are rounded to one of the six basic colors.
+
+Lines so narrow that they are only one dot wide in the output cannot be
+represented adequately if their shade requires two basic colours to be
+mixed. This must be regarded as an intrinsic limition of the
+ordered-dither technique.  Lines drawn in the six basic colours or in
+black reproduce correctly at all widths, those at least 4 dots wide will
+be reproduced in the correct shade. 
+
+\section{References} 
+
+SUN/57: GNS - Graphics Workstation Name Service.
+
+SUN/65: IDI - Image Display Interface.
+
+SUN/130: GWM - X Graphics Window Manager.
+
+\end{document} 

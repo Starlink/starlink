@@ -1,0 +1,264 @@
+\documentstyle[11pt]{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {13.2}
+\newcommand{\stardocauthors}   {P.M.\ Allan}
+\newcommand{\stardocdate}      {8 April 1992}
+\newcommand{\stardoctitle}     {\Large\bf ASURV --- Astronomical Survival 
+Statistics}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+
+\section{Introduction}
+
+Astronomers often have to contend with data that is incomplete in the sense
+that it contains upper or lower limits. This is known as censored data. The
+term `survival statistics' comes from their use in testing objects to find
+their average lifetime without actually testing all the objects to destruction.
+ASURV is a program that performs statistical calculations on such data. The
+program has been written by Takashi Isobe, Michael LaValley and Eric Feigelson
+from the Department of Astronomy, Pennsylvania State University, and is based
+on methods outlined in two papers in the Astrophysical Journal
+\cite{isobe-1,isobe-2}. Anyone wishing to use the program should read the
+document describing the program and consult these two papers for the
+description of the statistical tests and how they should be applied to
+astronomical data. If you use ASURV, please cite the papers
+\cite{isobe-1,isobe-2} in your publications.
+
+The program is being released exactly as it was received from the authors. The
+user interface is not particularly attractive in that there is a limit of nine
+characters on the length of file names, the amount of introductory information
+is rather verbose and all output is in upper case. Also censored data are
+specified by a flag of -1 or +1 rather than the more obvious $<$ and $>$. 
+
+In the future, there may be an ADAM program that provides statistical analysis
+of data with upper limits, has a friendly user interface, and reads data from
+SCAR or CHI files as well as simple text files. Although the user interface of
+an ADAM program that handles censored data will be radically different from
+ASURV, there are no plans to alter the statistical tests at all. 
+
+Any suggestions for other modifications to the user interface should be send to
+the person maintaining the software for Starlink. Suggestion for other
+modifications, such as providing addition statistical tests, will have to be
+passed on to the authors, or will have to be done yourself. The program is
+currently supported by Peter Allan at RAL. Bug reports should be reported to
+the Starlink Software Librarian (RLVAD::STAR), possibly via your Site Manager. 
+
+\subsection{Other documentation}
+
+The ASURV program is described more thoroughly in the document `ASURV:
+Astronomical SURVival Analysis - A Software Package for Statistical Analysis of
+Astronomical Data containing Nondectections' \cite{mud-1}. A conference paper
+`Censored Data in Astronomy' \cite{mud-2} also contains useful comments on the
+use of survival statistics in astronomy. These are both Starlink miscellaneous
+user documents (MUDs) and should be available at your site.
+
+\subsection{Changes from version 0.0}
+
+The current version of ASURV is version 1.1. The previous version of ASURV that
+was released on Starlink was ASURV version 0.0. Some of the statistical tests
+available in version 1.1 are significantly different from version 0.0. For
+details, see reference \cite{mud-1}.
+
+If you have a copy of ASURV version 1.0, then it should be replaced with
+version 1.1 as version 1.0 contains known bugs. It was never distributed via
+Starlink.
+
+\section {Using the program} 
+
+To run the program, type:                                         
+
+\begin{verbatim} 
+      $ asurv
+\end{verbatim} 
+
+The command must be in lower case on Unix machines. You will be prompted for
+the types of tests that you wish to perform on the data and for the name of the
+file that contains the data. Currently, file names are restricted to nine
+characters.
+
+\subsection {Prompts and Responses}
+
+When you start the program, it will print out two screens of introductory
+messages (type carriage return to get the next screen each time) and it will
+then ask you whether you have univariate or bivariate data. You should reply 1
+for univariate data, 2 for bivariate data or 3 to exit the program. You will
+then be offered several statistical calculation, depending on the type of data
+that you have indicated.
+
+\subsection {Statistical Tests}
+
+The program will perform the following tests.
+\begin{small}
+\begin{verbatim}
+      Univariate data:
+
+         Distribution             Kaplan-Meier estimator
+
+         Two-sample tests         Gehan test
+                                  Logrank test
+                                  Peto and Peto test
+                                  Peto and Prentice test
+      Bivariate data:
+
+         Correlation              Cox proportional hazard model
+                                  Generalized Kendall's Tau (BHK method)
+                                  Generalized Spearman Rho
+
+         Linear regression        EM algorithm with normal distribution
+                                  Buckley-James method
+                                  Schmitt method for dual censored data
+\end{verbatim}
+\end{small}
+
+For further information on these statistical methods, see the references in the
+papers listed at the end of this document.
+
+\section{Examples}
+
+There are three examples of using the ASURV program. These are stored in the
+directory ASURV\_DIR on VMS and in /star\-/bin\-/examples\-/asurv on Unix. To
+run them, you will need to copy the input files to your own directory due to
+the nine character file name limitation. The input commands are stored in the
+files {\bf testN.dat}, when N = 1,2,3 (i.e.\ ASURV\_DIR:\-TESTn.DAT on VMS;
+/star\-/bin\-/examples\-/asurv\-/testN.dat on Unix). The data files are called
+{\bf galN.dat} (ASURV\_DIR:\-GALn.DAT on VMS;
+/star\-/bin\-/examples\-/asurv\-/galN.dat on Unix), and the output from the
+program should be the same as the contents of the files {\bf testN.lis}
+(ASURV\_DIR:\-TESTn.LIS on VMS; /star\-/bin\-/examples\-/asurv\-/testN.lis on
+Unix). Test~1 is an example of calculating the Kaplan-Meier estimator for
+univariate data, test~2 is an example of the two sample test for univariate
+data and test~3 is an example of correlation and regression for bivariate data.
+See \cite{mud-1} for further details of these tests.
+
+\subsection{Test 1}
+
+To run test~1, type the following:
+
+\begin{verbatim}
+         On VMS                                On Unix
+
+$ COPY ASURV_DIR:TEST1.DAT *.*        % cp /star/bin/examples/asurv/test1.dat .
+$ COPY ASURV_DIR:GAL1.DAT *.*         % cp /star/bin/examples/asurv/gal1.dat .
+$ ASURV                               % asurv
+<carriage return>                     <carriage return>
+<carriage return>                     <carriage return>
+1                                     1
+1                                     1
+Y                                     y
+TEST1.DAT                             test1.dat
+N                                     n
+\end{verbatim}
+
+This will create an output file called {\bf gal1.out} which should be identical
+with the file ASURV\-\_DIR:\-TEST1.LIS on VMS and
+/star\-/bin\-/examples\-/asurv\-/test1.lis on Unix.
+
+\subsection{Test 2}
+
+To run test~2, type the following.
+
+\begin{verbatim}
+         On VMS                                On Unix
+
+$ COPY ASURV_DIR:TEST2.DAT *.*        % cp /star/bin/examples/asurv/test2.dat .
+$ COPY ASURV_DIR:GAL2.DAT *.*         % cp /star/bin/examples/asurv/gal2.dat .
+$ ASURV                               % asurv
+<carriage return>                     <carriage control>
+<carriage return>                     <carriage control>
+1                                     1
+2                                     2
+Y                                     y
+TEST2.DAT                             test2.dat
+N                                     n
+\end{verbatim}
+
+This will create an output file called {\bf gal2.out} which should be identical
+with the file ASURV\-\_DIR:\-TEST2.LIS on VMS and
+/star\-/bin\-/examples\-/asurv\-/test2.lis on Unix.
+
+\subsection{Test 3}
+
+To run test~3, type the following.
+
+\begin{verbatim}
+         On VMS                                On Unix
+
+$ COPY ASURV_DIR:TEST3.DAT *.*        % cp /star/bin/examples/asurv/test3.dat .
+$ COPY ASURV_DIR:GAL3.DAT *.*         % cp /star/bin/examples/asurv/gal3.dat .
+$ ASURV                               % asurv
+<carriage return>                     <carriage control>
+<carriage return>                     <carriage control>
+2                                     2
+Y                                     y
+TEST3.DAT                             test3.dat
+N                                     n
+\end{verbatim}
+
+This will create an output file called {\bf gal3.out} which should be identical
+with the file ASURV\-\_DIR:\-TEST3.LIS on VMS and
+/star\-/bin\-/examples\-/asurv\-/test3.lis on Unix.
+
+\begin{thebibliography}{9}
+\bibitem{isobe-1} Isobe, T.\ \& Feigelson, E., 1985.\ Astrophys.J.,{\bf 293},
+192.
+\bibitem{isobe-2} Isobe, T.\ \& Feigelson, E., 1986.\ Astrophys.J.,{\bf 306},
+490.
+\bibitem{mud-1} Isobe, T.,\ LaValley, M.\ \& Feigelson, E., `ASURV:
+Astronomical SURVival Analysis - A Software Package for Statistical Analysis of
+Astronomical Data Containing Nondetections'. This document is available as a
+Starlink Miscellaneous User Document. It supercedes the following document.
+\bibitem{mud-1-old} Isobe, T.\ \& Feigelson, E., `ASURV: A
+Software Package for Statistical Analysis of Astronomical Data with Upper
+Limits'. This document is available as a Starlink Miscellaneous User Document,
+or directly from the Department of Astronomy at Pennsylvania State University.
+\bibitem{mud-2} `Censored Data in Astronomy' -- a Starlink Miscellaneous User
+Document.
+\end{thebibliography}
+
+\end{document}

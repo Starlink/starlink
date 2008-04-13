@@ -1,0 +1,180 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {49.1}
+\newcommand{\stardocauthors}   {A.~P.~Lotts}
+\newcommand{\stardocdate}      {10~October~1989}
+\newcommand{\stardoctitle}     {QUOTAS -- A utility to display VMS disk quotas}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+
+QUOTAS is a utility to display the usage of disk quota on VMS disks.
+On a VMS system the manager usually allocates individual users a quota
+of disk space on one or more VMS disk volumes.
+Normally a user can only examine their own usage on a particular volume.
+
+Under some circumstances it is useful for users to be able to examine the
+usage of all the users\footnote{
+ A user in this document actually refers to a VMS User Identification code
+ or UIC.
+The information about usage is maintained using UICs but Quotas attempts to
+translate these into Identifiers which are usually usernames.
+See the VMS manuals for further explanations of UICs and Identifiers}
+with quotas on a particular disk -- e.g. when a
+disk that is used for scratch space is full, who is using all the space?
+This utility provides a solution.
+A single command will display an ordered list of the top users of a 
+disk.
+
+Qualifiers are available to change the selection criteria, number of entries
+displayed and the display format.
+
+\section{Use}
+
+The basic command {\bf QUOTAS} will display some information about the
+current disk and then list the top users in descending order. By default,
+it will use a slow but accurate method of obtaining the information.
+
+The command has an optional parameter and several optional qualifiers.
+The parameter and qualifiers are parsed using standard VMS techniques.
+
+\begin{quote}
+\begin{description}
+
+\item{\bf format}
+\vspace{3mm}
+
+{\bf QUOTAS}~~~~~{\em [device]}
+\vspace{2mm}
+
+\item{\bf parameter}
+\vspace{3mm}
+
+{\bf device}\\
+Specifies the disk to examine.
+Any logical name (which eventually translates to a specific device), explicit
+device name, or volume label is acceptable.
+The default is SYS\$DISK, the current disk of the process.
+\vspace{3mm}
+
+\item{\bf qualifiers}
+\vspace{4mm}
+
+{\bf /ABOVE}{\em =usage limit}\\
+ Only entries with a usage greater than /ABOVE will be considered for display.
+ Default value is 1000 blocks.
+\vspace{4mm}
+
+{\bf /TOP}{\em =maximum to display}\\
+The maximum number of entries to be displayed.
+Default value is 10.
+\vspace{4mm}
+
+{\bf /FAST}\\
+{\bf /NOFAST(default)}\\
+Controls the technique to be used to obtain the quota information.
+
+If /FAST is specified, a faster technique will be used.
+Note however, this technique is unsupported by VMS.
+Although approximately twice as fast, the results may be inaccurate.
+\vspace{2mm}
+
+{\bf /BRIEF}\\
+{\bf /NOBRIEF(default)}\\
+An abbreviated output display is used if the logical switch /BRIEF is specified.
+\vspace{4mm}
+
+{\bf /OUTPUT}{\em =file-spec}\\
+Re-directs the output to a file or device.
+\end{description}
+\end{quote}
+
+An example command using all the qualifiers could be
+\begin{quote}
+\begin{verbatim}
+$ QUOTAS /BRIEF/TOP=20 /ABOVE=5000 /OUTPUT=NOW.LIS DISK$SCRATCH/FAST  
+\end{verbatim}
+\end{quote}
+
+New features may be added when VMS 5.2 is released.
+
+\section{General Information}
+
+The disk quota usage information kept by VMS is updated whenever a file is
+created, modified or deleted. For various reasons, the values displayed
+by this utility (or by the VMS command SHOW QUOTA) may disagree with the
+space shown by the VMS DIRECTORY command.
+
+\begin{itemize}
+
+\item The DIRECTORY command should be used with the qualifier /SIZE=ALL
+rather than just /SIZE.
+
+\item The file system uses (and charges against the quota) one block for
+every file on the disk.
+This is not in the directory structure and so is not included in the output
+from a DIRECTORY command.
+
+\item A user may own files in other directories.
+
+\item If large numbers of files are placed into the top directory of a
+directory tree, it can itself become quite large.
+
+\item Finally, there is a problem in VMS that appears to be related to
+the way VMS caches quotas in memory.
+In a VAXcluster, this cache appears not to be propagated correctly and so
+even the supported methods of displaying quotas may produce incorrect results.
+\end{itemize}
+
+\section{Acknowledgments}
+
+This utility is based on similar utilities used CALTECH and Cambridge.
+Many thanks to the authors for freely providing the source files.
+
+
+\end{document}

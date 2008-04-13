@@ -1,0 +1,2638 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {24.2}
+\newcommand{\stardocauthors}   {M D Lawden}
+\newcommand{\stardocdate}      {18th October 1988}
+\newcommand{\stardoctitle}     {ASPIC --- Image processing programs (2)}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+\newpage
+
+\section{Introduction}
+
+This paper gathers together material on ASPIC programs which was previously
+distributed amongst many separate SUNs.
+The following documents have been incorporated:
+\begin{itemize}
+\item SUN/27: `ASPIC - Image processing programs (3)'; M D Lawden.
+\item SUN/39: `GALPHOT - Bright galaxy photometry'; A C Davenhall.
+\item SUN/40: `EDRSX - An extension to the EDRS image processing package'; D S
+Berry.
+\item SUN/41: `STARSIM - Generate simulated starfields'; A C Davenhall.
+\item SUN/42: `2D polarization programs'; D W T Baines.
+\item SUN/43: `IAM - Image analysis'; D S Tudhope, B D Kelly, A C Davenhall.
+\item SUN/44: `MODPIX - Picture modification'; D S Tudhope, D R K Brownrigg.
+\item SUN/45: `CALIB - Intensity calibration'; D S Tudhope, J A Cooke.
+\item SUN/46: `Modifying 2D tables of real numbers'; D S Tudhope.
+\item SUN/59: `EDRS - Electronography Data Reduction System'; R F Warren-Smith.
+\item SUN/63: `PERIODS - Analysing periodic phenomena'; K F Hartley.
+\end{itemize}
+These papers are reproduced in the sections that follow.
+They have been ordered according to the classes described in SUN/23:
+\begin{description}
+\item [ARGS]:
+\begin{itemize}
+\item Section 2 GREYCELL.
+\end{itemize}
+\item [EDRS]:
+\begin{itemize}
+\item Section 3: EDRS.
+\end{itemize}
+\item [EDRSX]:
+\begin{itemize}
+\item Section 4: EDRSX.
+\end{itemize}
+\item [GALPHOT]:
+\begin{itemize}
+\item Section 5: GALPHOT.
+\end{itemize}
+\item [Miscellaneous]:
+\begin{itemize}
+\item Section 6: STARSIM.
+\item Section 7: MODPIX.
+\item Section 8: CALIB.
+\item Section 9: Modifying 2D tables of real numbers.
+\end{itemize}
+\item [Periods]:
+\begin{itemize}
+\item Section 10: PERIODS.
+\end{itemize}
+\item [Photometry]:
+\begin{itemize}
+\item Section 11: IAM.
+\end{itemize}
+\item [Polarimetry]:
+\begin{itemize}
+\item Section 12: 2D polarisation programs.
+\end{itemize}
+\end{description}
+Sections 11 and 12 also mention some programs in the Display class.
+EDRS and PERIODS are implemented as ASPIC packages; all the other programs
+are stored in the standard ASPIC application program directory ASPDIR.
+I have not attempted to verify the accuracy of the information contained in this
+paper.
+
+\section {GREYCELL --- An image plotting program}
+
+The GREYCELL program, which runs in the Starlink Interim Environment, is
+designed to produce a grey scale representation of a Starlink image file on
+raster graphics devices known to GKS 7.2, for example the Sigmex ARGS and the 
+Canon laser printer.
+Vector graphics devices such as Tektronix 4010 emulators cannot be used. 
+
+\subsection{Imaging Method}
+
+The program makes use of the imaging capability provided by the cell array 
+plotting facility of GKS, which plots a greyscale or colour image by 
+reference to the GKS colour table for the selected device.
+The image pixel values are therefore scaled by GREYCELL so that they become
+integers within the  range of the colour table.
+The colour table is set up for grey tones only by giving equal values to the
+red, blue, and green parameters.
+
+A feature of GREYCELL is its ability to optimize the grey scale so that contrast
+is improved in nebulous regions of the image.
+This is achieved by constructing a cumulative histogram of the pixel values,
+from which pixels at the black and white extremes are discarded.
+A grey scale curve is then fitted to the remaining histogram of the intermediate
+grey tones.
+The histogram is automatically stretched and rebinned to enable the best curve
+fit over the range of grey tones addressable on the selected device.
+The whole grey scale may be optionally biased towards white or black.
+
+The options of a simple linear or logarithmic grey scale between selected 
+limits are also offered. 
+ 
+The manner in which the grey tones are rendered depends on the device 
+type.
+For example, on the Sigmex ARGS each pixel of the image is mapped to one pixel
+on the display.
+On the Canon laser printer, Versatec plotter, and Printronix printer, each dot
+is on or off, depending on the image pixel value and on a regularly varying
+threshold function.
+The effect is similar to a newspaper photograph.
+
+\subsection {Features}
+\begin{itemize}
+\item A subset of the image may be selected within row and column ranges.
+\item The plot may be fitted to any fraction of the display dimensions.
+\item A frame may be drawn around the plot.
+\item A label of up to 80 characters may be plotted.
+\item Negative plots may be produced.
+\item A high contrast grey scale may be fitted to a cumulative histogram of
+ the image pixel values.
+\item The fitted grey scale may be biased towards white or black.
+\item A linear grey scale may be interpolated between selected image pixel
+ values.
+\item A logarithmic grey scale may be interpolated between selected limits.
+\end{itemize}
+\subsection {Examples}
+To produce a high contrast plot on the Canon, with white and black reversed,
+type in the example below.
+You type the words in lowercase; the program prompts are shown in uppercase.
+Type $<$CR$>$ to accept default values.
+The program displays some extra information which is not shown.
+\begin{verbatim}
+    $ dscl greycell
+    WKSTN/2601/:=
+    INPUT:=aspdir:horse
+    WHOLE/T/:=
+    SIZE/1.000000/:=
+    FRAME/T/:=
+    MAXINF/T/:=
+    REVERSE/F/:=t
+    BIAS/1.0000000/:=
+    $ print/q=sys_laser/passall canon.dat
+\end{verbatim}
+To produce a linear grey scale plot on the Canon, with white and black reversed:
+\begin{verbatim}
+    $ dscl greycell
+    WKSTN/2601/:=
+    INPUT:=aspdir:horse
+    WHOLE/T/:=
+    SIZE/1.000000/:=
+    FRAME/T/:=
+    MAXINF/T/:=f
+    LOG/F/:=
+    WHITE/256.0000/:=0.
+    BLACK/0.0000000E+00/:=256.
+    $ print/q=sys_laser/passall canon.dat
+\end{verbatim}
+\subsection {Running Statistics}
+The above examples gave the following results:
+$$\vbox{
+\tabskip=2em
+\halign to \hsize{#\hfil & #\hfil\cr
+Image dimensions & 256 rows, 256 columns\cr
+Magnification & 1\cr
+CPU time (high contrast method) & 1 min 50 sec\cr
+CPU time (linear method) & 1 min 47 sec\cr
+Canon plot file size & 1524 blocks\cr
+Plotting time on Canon (theoretical) & 11 min\cr
+}}$$ 
+The theoretical plotting time on the Canon is based on a line speed of 9600 
+baud. In practice however, installation-dependent factors can increase the time 
+by as much as 100\%.
+
+\section {EDRS --- Electronography Data Reduction System}
+
+EDRS is a package of programs and procedures designed to facilitate the
+reduction and analysis of large format astronomical images.
+In its original form this package was directed in particular at the reduction
+of electronographic data, but was built around a set of utility programs so as
+to be widely applicable to astronomical images from other sources.
+The package has been extended since its original implementation and in its
+present form the association with electronography is largely historical; no
+restrictions on its application to other areas should arise as a result.
+\subsection {Accessing EDRS}
+EDRS is currently implemented within the Starlink INTERIM environment and should
+normally be run from the DSCL command language.
+The EDRS programs and procedures are stored in the directory with logical name
+EDRS.
+To use an EDRS program, enter the DSCL/ASPIC application package environment by
+typing DSCL followed by GO EDRS and then any EDRS program may be used by just
+typing the program name:
+\begin{verbatim}
+        DSCL
+        GO EDRS
+        CENTROID
+        ARGPIC
+        DESCRIPT
+\end{verbatim}
+or from within DSCL, prefix the program name with EDRS:
+\begin{verbatim}
+        EDRS:CENTROID
+        EDRS:ARGPIC
+        EDRS:DESCRIPT
+\end{verbatim}
+both examples above will execute the EDRS programs {\bf CENTROID}, {\bf ARGPIC}
+and {\bf DESCRIPT}.
+All the facilities of DSCL may be used to run programs, pass parameter values,
+write procedures, etc.
+However, EDRS uses I*2 images rather than the REAL images used by most ASPIC
+programs.
+\subsection {Help}
+EDRS has its own on-line help library which may be accessed by typing GO EDRS to
+enter the EDRS application package and then typing HELP.
+
+In addition, access to help library information may be obtained `in line' when
+running a program.
+This is an extension to the facilities normally available in DSCL.
+To obtain information on a parameter for which you have been prompted, enter a
+single question mark: `?'.
+The program will then search the help library and display a description of the
+parameter.
+After the information has been displayed, the program will continue.
+Alternatively, to obtain fuller information on the program at any stage, enter
+two question marks: `??'.
+This will produce the same information, but will leave you in the help system so
+that more information (eg.\ on program operation) can be obtained.
+The program continues when you exit from the help system (by typing RETURN).
+
+Finally, help information is available as prompts.
+By using the procedures {\bf PROMPT} and {\bf NOPROMPT}, you can switch on and
+off the auto-prompt mode.
+When in this mode, all requests for the user to input a parameter value are
+preceded by information describing its function.
+This is particularly useful when you are completely unfamiliar with a program.
+\subsection {Manual}
+The EDRS manual resides in the file EDRS:MANUAL.LIS and may be printed on the
+lineprinter using the VMS PRINT command (note the manual is of considerable
+length!).
+It contains the same information as the on-line help library, but in a format
+more suited to reference.
+It is likely that the help library will keep somewhat ahead of the manual when
+changes are made, although it is hoped to update the manual at fairly frequent
+intervals.
+\subsection {Graphics devices}
+EDRS was originally written using GKS 6.2 for line graphics, and only supported
+image display and handling on ARGS displays.
+The programs which produce line graphics have been re-written to support all
+GKS 7.2 graphics devices, and the image handling programs have been modified to
+use Digisolve IKON displays as well as ARGS displays.
+The on-line help library has also been updated to describe the new facilities. 
+
+\section {EDRSX --- An extension to EDRS}
+
+EDRS is a general purpose 2d image processing package.
+Its name, the Electronographic Data  Reduction System, is largely historical and
+no restrictions should arise in using data from other detectors.
+EDRSX is a package of programs which extends the facilities available within
+EDRS.
+It was originally produced to make possible more versatile analysis of IRAS
+images than was otherwise available.
+EDRSX provides facilities for converting images into and out of EDRS format,
+accessing RA and DEC information stored with IRAS images, and for doing several
+standard image processing operations such as displaying image histograms and
+statistics, Fourier transforms, etc.
+These enable such operations to be performed as estimation and subtraction of
+non-linear backgrounds, de-striping of IRAS images, modelling of image features,
+easy aligning of separate images, etc.
+\subsection {Why use EDRS and EDRSX?}
+The original software for producing IRAS images described in SUN/91 provides
+an easy to use standard reduction sequence, but does not allow much flexibility.
+Using ASPIC to provide extra flexibility is fraught with difficulties due to the
+fact that most ASPIC programs ignore or delete the extra information stored with
+IRAS images in the form of ``descriptors''.
+
+The use of EDRS has several advantages over equivalent ASPIC programs when
+using IRAS images:
+\begin{itemize}
+\item EDRS images are in standard Starlink Bulk Data File (BDF) format, but
+pixel values are stored as 2 byte integers rather than 4 byte reals.
+This results in EDRS images occupying half the disk space of equivalent ASPIC
+images.
+N.B.\ the restriction on dynamic range implied by the use of 2 byte integer
+values is not a problem when dealing with IRAS images since the raw data from
+the IRAS detectors was itself sampled as 2 byte integer values.
+\item The EDRS user interface is significantly more friendly than ASPIC.
+The HELP is more informative and is available during program execution
+for help on the meaning of parameters and errors.
+Most user inputs are ``safe'' in the sense that if a bad value is given which
+the program cannot handle, the user is given a list of possible alternatives
+and reprompted up to a maximum of 3 times, after which the program exits
+``neatly''.
+Error messages are tidier and more instructive than standard ASPIC programs,
+however the experienced user can turn off all the extra information.
+\item Blank pixels are recognised and excluded from calculations.
+Blank pixels arise for several reasons, for instance they are used as padding
+if the image is rotated, and result in the annoying value of -999999
+cropping up at regular intervals when using ASPIC programs such as ADISP.
+EDRS recognises such pixels (EDRS refers to them as invalid pixels rather than
+blank pixels) and excludes them from calculations.
+\item Any descriptors stored with an image which are unknown to EDRS are
+retained without being modified, unlike ASPIC programs which delete them.
+\item Descriptors BSCALE and BZERO are recognized and used resulting in correct
+data values being displayed, unlike ASPIC programs like STATS which produces
+values which must be scaled before being usable (except for the particular case
+when BSCALE=1.0 and BZERO=0.0).
+\end{itemize}
+\subsection {How to use EDRSX}
+To use EDRS and EDRSX, start up the DSCL command language by typing
+\begin{verbatim}
+    $ DSCL
+\end{verbatim}
+The prompt should then become Dscl$>$ . Now type 
+\begin{verbatim}
+    Dscl>  GO EDRSX
+\end{verbatim}
+A page of introductory information should then be displayed and the prompt
+becomes EDRSX$>$. 
+(The significance of the prompt is purely informational.
+In fact, DSCL is still the current command language.)
+The introductory text should be read at least once, but when a user considers
+himself to be an ``expert'', he can suppress this text, and also the help
+produced automatically while running programs, by defining a logical name
+EDRSX\_EXPERT to have a value TRUE before starting up EDRSX.
+This could usefully be put in the user's LOGIN.COM file.
+Any program from EDRS, EDRSX, other part of ASPIC, or the original IRAS software
+package (e.g.\ I\_COMBINE) can now be run just by typing its name.
+Type
+\begin{verbatim}
+    EDRSX> HELP EDRSX
+\end{verbatim}
+For more general information on using EDRSX, or
+\begin{verbatim}
+    EDRSX> HELP COOKBOOK
+\end{verbatim}
+for descriptions of how to perform commonly required image processing tasks.
+
+There are extensive help facilities available which can be accessed in several
+ways, the main method being the HELP command.
+Help on any EDRSX or EDRS program can be obtained by typing HELP followed by the
+program name.
+Help on ASPIC, VMS and the original IRAS software is also available (just type
+HELP and follow the instructions).
+In addition to the HELP command, help can be obtained while any EDRS or EDRSX
+program is running by entering a single or double question mark in reply to
+any prompt.
+This will give extensive help on the meaning of the current prompt, and if a
+double question mark is entered, will allow the user to browse though the help
+library before returning to the program.
+
+Unless the logical name EDRSX\_EXPERT is defined to be TRUE before starting up
+EDRSX, the user will be put in ``auto-prompt'' mode.
+In this mode all programs prompts and error messages are accompanied by help
+information, explaining the meaning of the prompt or error.
+Two commands PROMPT and NOPROMPT exist for manually switching this facility
+on and off.
+\subsection {Graphics and image handling}
+All programs within EDRSX use GKS 7.2 and IKON image displays (except
+procedure BLINK).
+
+\section {GALPHOT --- Bright Galaxy Photometry}
+
+This section describes routines which perform photometric reductions on images
+of bright galaxies.
+They are part of the ASPIC two dimensional image processing programs and should
+be used in conjunction with other ASPIC programs.
+In bright galaxy photometry it is usual to have relatively few objects that must
+be reduced carefully.
+Thus, these routines are highly interactive and an ARGS is required to display
+the image being reduced.
+The photographic plate is the traditional detector in bright galaxy photometry
+and the routines implicitly assume this data type.
+However, they should be equally applicable to data obtained from
+electronographic cameras or solid state detectors.
+A number of schemes for computer reduction of bright galaxy images have been
+published, starting with Jones et al (1967) and more recently by others, eg.\
+Benacchio (1975), Godwin (1976) and Okamura (1977).
+These routines follow similar precepts.
+\begin{description}
+\item [DATA REDUCTION]:
+\begin{enumerate}
+\item Intensity conversion.
+\item Object removal.
+\item Smoothing.
+\item Polynomial background fitting.
+\item Normalisation relative to the sky intensity.
+\item Absolute calibration using photoelectric photometry.
+\end{enumerate}
+\item [DATA ANALYSIS]:
+\begin{enumerate}
+\setcounter{enumi}{6}
+\item Equivalent profile and integration table.
+\item Major, minor and arbitrary axis extraction.
+\item Contour maps in mag./sq.arcsec.
+\item Profile analysis.
+\end{enumerate}
+\end{description}
+\subsection {General description}
+The first part of the above list specifies the various stages involved in
+transforming raw data to a form suitable for bright galaxy photometry.
+The second part specifies some of the photometric procedures which may be
+attempted on such data.
+
+Routines to perform step (1), the conversion of measured photographic density or
+transmission into the corresponding intensity of light incident upon the plate
+or the corresponding problem of flat fielding for electronic detectors, are
+described elsewhere.
+In the case of data digitised from a photographic plate, the user may prefer to
+perform steps (2) to (4) prior to converting the image to intensity.
+However, it would be inappropriate to perform these steps prior to flat fielding
+data from a solid state detector.
+
+Step (5), the conversion of the image to intensity relative to a sky level of
+1.0 is most important because all subsequent analysis programs assume input data
+of this form.
+Once the frame has been normalised relative to the sky there are in principle
+two possibilities; 1.0 can either be subtracted from all the pixels in the image
+to leave intensity above the sky or not.
+Which choice is made is irrelevant, provided it is consistent with the
+expectations of subsequent programs.
+Here the convention that the sky should {\em not} be subtracted has been
+rigorously adopted throughout.
+
+Absolute photometry is obtained from these frames held normalised relative to
+the sky by determining an absolute value for the sky brightness (in magnitudes
+/sq.arcsec), step (6).
+This is done in the conventional manner by comparing the intensity integrated
+within circular apertures centred on the galaxy with the corresponding
+brightness determined from multi-aperture photoelectric photometry available for
+the galaxy.
+
+The photometric procedures which can be carried out on the reduced image divide
+broadly into two categories; those determining the properties of the entire
+image and the extraction of various types of profiles from the image.
+The individual stages, together with the programs available to perform them,
+are discussed in the next section.
+A quick check list of the routines for each step is given in section 3.3.
+\subsection {Stages in data reduction}
+This section describes the individual stages in detail.
+Prior to attempting to use these routines, the user should be armed with the
+following ancillary information concerning his data; the stepsize used to
+digitize the data in microns and the plate scale of the telescope on which the
+original plates were taken in arcsec/mm.
+In the course of the reductions, the sky brightness in mag./sq.arcsec will be
+determined and should be recorded for use by subsequent programs.
+
+Further information on all the ASPIC commands described below can be obtained
+using the on-line ASPIC help system.
+Within this the bright galaxy photometry routines are gathered under the
+section GALPHOT.
+It works precisely like the VMS help system, thus to obtain help on a given
+command, type:
+\begin{verbatim}
+        $ HELP GALPHOT <command name>
+\end{verbatim}
+It is also possible to produce a printed copy of the help information for given
+commands by:
+\begin{verbatim}
+        $ FILEDOC GALPHOT <command name>
+\end{verbatim}
+which produces a file suitable for printing.
+This is strongly recommended for commands which are to be extensively used.
+\subsubsection {Getting started}
+First, allocate an ARGS:
+\begin{verbatim}
+        $ ALLOCATE IDx0
+        $ ASSIGN   IDx0 ARGS_DEVICE
+\end{verbatim}
+Where `x' is either A or B depending on which ARGS is required.
+
+For users unfamiliar with ASPIC, the following are the minimum set of standard
+ASPIC commands needed in conjunction with the bright galaxy photometry routines.
+For further details see SUN/23.
+To enter ASPIC type `DSCL'.
+To initially plot an image on the ARGS, use the following sequence of commands:
+\begin{verbatim}
+        ARESET  -  Resets the Args.
+        LUTCOL  -  Loads a colour table into the Args.
+        ADISP   -  Plots the required image.
+\end{verbatim}
+For subsequent plotting of images only {\bf ADISP} need be repeated.
+The image can be zoomed using {\bf APAN}, though most of the bright galaxy
+routines are best used on unzoomed images if this is possible.
+To leave DSCL and return to DCL command level type EXIT.
+
+Some of the routines described below generate hard copy graphical output.
+This is not done by plotting directly to the Versatec but rather by generating
+a file of commands suitable for submission to the Versatec.
+To produce the final hardcopy output the user should submit these files to the
+Versatec following the normal procedure at his node (probably the command
+VPLOT).
+In case of difficulty consult the local site manager.
+\subsubsection {Intensity conversion}
+See section 8.
+\subsubsection {Object removal}
+Typically, a galaxy image will be contaminated with foreground stars and plate
+blemishes scattered over both the body of the nebulosity and the surrounding
+sky.
+These must be removed before photometry of the galaxy can proceed.
+Currently, this star removal is done completely interactively: the image is
+displayed on an ARGS and objects selected and deleted by placing a cursor around
+them.
+Two routines are available for this interactive object removal: {\bf STAREMASP}
+written as part of this package and the standard ASPIC function {\bf PATCH}.
+The choice of routine is probably a personal preference; either allows the user
+to remove an arbitrary number of stars, continuing until he is satisfied.
+\subsubsection {Smoothing}
+In order to reduce the noise in the observed image, particularly at low light
+levels close to the sky, it is necessary to smooth the observed data.
+In the case of photographic data there is an argument in favour of smoothing
+the data prior to conversion to intensity because the noise distribution in
+photographic data is Gaussian in density space and the intensity conversion is
+a non-linear process.
+However, in practice this is a minor effect.
+
+A number of standard smoothing algorithms are available in ASPIC, eg.\
+{\bf CONV} or {\bf SMOOTH}.
+However, these are not recommended for images of bright galaxies because a
+simple smoothing applied uniformly to the entire image is inappropriate.
+The nucleus of the galaxy is bright and does not require smoothing, indeed
+smoothing here would degrade the quality of the image.
+A better procedure has been described by Jones et al (1967) and discussed by
+de Vaucouleurs (1976) in which the degree of smoothing to which a pixel is
+subjected depends on its intensity (or density).
+Bright pixels close to the nucleus are unsmoothed; pixels of moderate brightness
+are subjected to nine point smoothing; faint pixels, comprising the faint
+outer regions of the galaxy and the surrounding sky, are twenty five point
+smoothed.
+This procedure is available in the program {\bf JONESASP} which is recommended
+for smoothing this type of data.
+Weighted smoothing with a Gaussian grid is used.
+The grids, taken from Jones et al (1967), are included in the user documentation
+for {\bf JONESASP}.
+\subsubsection {Polynomial background fitting/Normalisation relative to sky}
+The background intensity corresponding to the night sky across a photographic
+plate will often show significant variations over distances of a few cm.
+These intensity variations are usually attributed to variations in the
+sensitivity of the photographic response rather than real variations in the
+night sky brightness.
+Thus, they must be removed and corrected for before the photometry can proceed.
+Following Jones et al (1967), this is usually done by fitting a low order two
+dimensional polynomial to the background and interpolating it across the galaxy.
+Obviously, care must be taken to ensure that too high an order of polynomial is
+not being used with resultant instabilities in the interpolation across the
+galaxy.
+A related problem is to ensure that the faint outer regions of the galactic
+nebulosity are excluded from the fit as these will cause the fitted polynomial
+to `hump' beneath the galaxy, thus underestimating its luminosity.
+
+Operationally, the following procedure should be adopted.
+After displaying the image on an ARGS, {\bf ABOXASP} is used to define a series
+of rectangular regions totally enclosing the galaxy.
+The rest of the image frame is assumed to be sky and will be included in the
+fit.
+As explained above, the region to be excluded should be sufficiently large to
+include the faint outer regions of the galaxy.
+It is better to err on the side of excluding too much background rather than
+including the outer regions of the galaxy.
+
+{\bf FITBAKASP} uses the file of exclusion zone co-ordinates generated by
+{\bf ABOXASP} and fits a polynomial of specified order to the remaining
+background.
+{\bf FITBAKASP} also divides the input image by the fitted polynomial, thus
+automatically generating an image normalised to a sky of 1.0.
+It also outputs the fitted polynomial evaluated over the input image.
+This fitted polynomial has a number of uses.
+It can be displayed and examined to determine whether the fit was satisfactory.
+Also, the user may wish to make the background fit prior to converting his
+raster of density measurements into intensity.
+In this case, after the fit has been made the original image and fitted
+polynomial would be converted to intensity separately and the image then divided
+by the polynomial using the standard ASPIC function {\bf DIV}.
+
+Cases may occasionally arise where the user is certain that there are no overall
+background fluctuations in his data.
+In such cases, polynomial background fitting is unnecessary and the average sky
+level should be determined and divided into the original image using {\bf CDIV}.
+\subsubsection {Absolute photoelectric calibration}
+The final stage of reducing the galaxy image is to determine the absolute sky
+brightness in magnitudes/sq.arcsec corresponding to the normalised sky
+intensity of 1.0.
+This is done using multiaperture photoelectric photometry available for the
+galaxy.
+
+All the available photometry, in the correct passband, for the galaxy being
+studied should be collected and edited into a VMS file.
+Two parameters are required for each measurement: the aperture diameter
+(arcsec) and the magnitude measured inside that aperture.
+The format of the file is as follows: data for each aperture occupy a single
+line and are in the order diameter followed by magnitude separated by one or
+more spaces.
+The order of the measures is not important and the file is free format.
+All available photoelectric measures should be included in the file, though some
+will turn out to be inaccurate.
+The program provides for these to be discarded.
+
+Once the file of measures has been prepared program {\bf PECALBASP} is used to
+determine the mean sky brightness.
+Again, this program is interactive and an ARGS, with the frame to be calibrated
+displayed on it, is required.
+\subsubsection {Equivalent profile}
+The equivalent or areal profile of a galaxy image, introduced by de Vaucouleurs
+(1962), can be calculated using {\bf EQPROFASP}.
+This routine also contains options for computing the integration table, total
+apparent magnitude and standard photometric parameters in the system introduced
+by de Vaucouleurs (1959, 1962).
+
+For a galaxy image on a photographic plate, the contour corresponding to a
+specified light intensity level will bound an area, A, though the contour may be
+of any shape, even having disconnected `islands'.
+The equivalent radius is defined as the radius of the circle whose area is equal
+to the area bounded by the contour being considered.
+The equivalent profile is simply the run of isophotal intensities encountered in
+the image plotted as a function of the equivalent radius.
+This equivalent profile is traditionally computed by counting the number of
+pixels in the image above each of a set of isophotal levels.
+This technique works well for bright levels in the galaxy, but at levels close
+to the sky the profile is distorted (indeed dominated) by counting pixels of
+random sky noise.
+Blackman (1979) has developed a technique for estimating and removing the
+contribution due to sky noise in an equivalent profile.
+
+Options for simply counting the number of pixels at a set of isophotal levels,
+without making the correction for sky noise, and for computing the equivalent
+profile using Blackman's technique are both available in {\bf EQPROFASP}.
+Blackman's technique is strongly recommended for most normal situations because
+it makes the profile (and hence the total apparent magnitude) reliable to a much
+fainter limiting isophote.
+However, a degree of discretion must be used in interpreting its results because
+at very faint light levels it will introduce a spurious cut-off in the profile.
+As a very rough guide, correction for sky noise is necessary for light levels
+below approximately 5\% of the sky and Blackman's technique is reliable to within
+approximately 1\% of the night sky.
+
+The equivalent profile, computed from either method, can be saved as a Starlink
+image for use in subsequent analyses.
+The integration table and photometric parameters are automatically listed on the
+lineprinter.
+The parameters contained in this listing are explained in section 3.5.
+\subsubsection {Extraction of selected axes}
+It is usual in galaxy photometry to wish to examine the light distribution in
+selected axes across a nebular image.
+There are two standard ASPIC routines for doing this: {\bf SLICE} and
+{\bf SECTOR}; both extracting an axis defined using the cursor.
+They differ in that {\bf SLICE} extracts an axis along a single strip one pixel
+wide, whereas {\bf SECTOR} averages pixels in a circular arc along a conical
+`cake-slice'.
+This latter routine is particularly suited to galaxy work because it reduces the
+noise at low light levels, thus making the profile reliable to fainter radii.
+
+Whilst, in principle, these two routines can be used to extract any required
+axes, a special routine {\bf PRIAXEASP} (for PRInciple AXEs) is provided for
+handling the most frequently occurring case of extracting the major and minor
+axes.
+This routine is preferable to {\bf SLICE} or {\bf SECTOR} for this task for two
+reasons:
+\begin{itemize}
+\item The extracted axes are constrained to pass through the predefined centre
+of the galaxy; it can be quite difficult to pick off the exact centre of the
+galaxy using a cursor with the result that the selected axis does not pass
+through the true centre.
+\item The major and minor axes are forced to be mutually perpendicular; again
+this can be quite difficult to achieve using a cursor.
+\end{itemize}
+When {\bf PRIAXEASP} is run, the nucleus is located semi-interactively and a cursor
+representing the two principle axes adjusted using the trackerball buttons to
+lie along the major and minor axes.
+Like {\bf SECTOR}, it extracts points along a `cake-slice', averaging points in a
+circular arc.
+The length of the slices, their orientation and the width of the slice can all
+be controlled using the trackerball buttons.
+
+Any of the extracted axes can be inspected and saved as a Starlink image.
+Though {\bf PRIAXEASP} is intended for extracting major and minor axes, it can
+equally well be used for extracting any profiles centred on the nucleus.
+\subsubsection {Contour maps}
+Contour maps of the galaxy image can be produced using the standard ASPIC
+function {\bf CONTOUR}.
+However, it is also usual to require a hardcopy of the final reduced image
+calibrated in magnitudes/sq.arcsec and a special routine is available to
+produce such a plot directly from the image held as sky normalised intensity.
+Normally. the user will not want to contour the whole image but just the region
+containing the galaxy and excluding the surrounding background.
+Thus {\bf ABOXASP} is used to mark on the ARGS the region (or regions) of the
+image to be contoured and then {\bf MAGCNTASP} is run which automatically
+produces plots in magnitudes/sq.arcsec (with user selected limiting isophote
+and contour increment) on the Versatec.
+If no file of selected areas has been generated with {\bf ABOXASP} the entire
+image is contoured.
+\subsubsection {Profile analysis}
+Several of the preceding routines were concerned with extracting profiles from
+a galaxy image and saving them as files.
+The profiles extracted by {\bf EQPROFASP} and {\bf PRIAXEASP} are basically of
+the same form and the programs described below can be used on profiles from
+either source.
+Note however that the profiles generated by {\bf SLICE} and {\bf SECTOR} are of
+a different form and hence cannot be used as input to the routines below.
+
+However, there is a complication.
+Following normal practice, the profiles from {\bf EQPROFASP} are held as
+$\log _{10}$(intensity above sky) as a function of radius.
+However, in the interests of generality the profiles from {\bf PRIAXEASP} are
+in the same units as the image array that they are extracted from, ie.\ normally
+intensity above a sky of 1.0.
+Thus, to make the major and minor axis profiles compatible with the equivalent
+profiles and of the form required by subsequent programs, a program
+{\bf PRFLOGASP} is available to convert them to Log intensity above the sky.
+
+Because these profiles are held as Starlink images they cannot be examined as
+easily as VMS files.
+Thus, a couple of utilities have been provided to aid examination of these
+profiles.
+{\bf PRFPRTASP} lists all the points in a profile on the lineprinter and
+{\bf PRFPLTASP} plots a profile on one of a variety of graphics devices.
+
+A couple of routines have also been produced as aids to analysing the extracted
+profiles, both primarily intended for use with disk galaxies.
+{\bf PRFVISASP} allows the user to interactively attempt to reproduce the
+extracted profile by representing it as an $r^{1/4}$ law bulge and an
+exponential disk.
+The user adjusts the parameters of the components until a satisfactory fit is
+found.
+{\bf PRFDECASP} also attempts to reproduce the observed profile by representing
+it as a bulge and exponential disk, but it attempts to do it automatically using
+the techniques of Kormendy (1977), which are basically least squares methods.
+Whilst useful results can be obtained from {\bf PRFDECASP}, extreme caution must
+be exercised in interpreting its results; in particular, the solution found may
+not be unique and the bulge fit will be wrong if the nucleus is degraded by
+seeing.
+The on-line documentation for {\bf PRFDECASP} should be consulted for further
+details.
+{\bf PRFVISASP} can be used to check how unique the results of {\bf PRFDECASP}
+are.
+
+It is anticipated that users will want to input the extracted profiles to their
+own programs for purposes specific to their astronomical applications.
+Details of how to read these profiles are given in section 3.6.
+\subsection {Command checklist}
+\begin{itemize}
+\item Getting started
+\begin{description}
+\item [DSCL]: Start running ASPIC.
+\item [EXIT]: Leave ASPIC and return to DCL command level.
+\item [ARESET]: Reset the Args.
+\item [LUTCOL]: Put a colour table in the Args.
+\item [ADISP]: Display an image on the Args.
+\item [APAN]: Pan and zoom the Args.
+\end{description}
+\item Intensity conversion
+\begin{itemize}
+\item See section 8,
+\end{itemize}
+\item Object removal
+\begin{description}
+\item [STAREMASP]: Remove stars and blemishes.
+\item [PATCH]: Replace regions with a smooth or noisy patch.
+\end{description}
+\item Smoothing
+\begin{description}
+\item [JONESASP]: Smoothing program.
+\end{description}
+\item Polynomial background fitting/Normalisation to sky
+\begin{itemize}
+\item Varying sky
+\begin{description}
+\item [ABOXASP]: Define exclusion zone containing galaxy.
+\item [FITBAKASP]: Fit the background.
+\end{description}
+\item Flat background
+\begin{description}
+\item [CDIV]: Divide the background level into the image.
+\end{description}
+\end{itemize}
+\item Absolute photoelectric calibration
+\begin{description}
+\item [PECALBASP]: Absolute photometric calibration of a 2D image.
+\end{description}
+\item Equivalent profile
+\begin{description}
+\item [EQPROFASP]: Compute equivalent of a bright galaxy.
+\end{description}
+\item Axis extraction
+\begin{description}
+\item [SLICE]: Arbitrary slice one pixel wide.
+\item [SECTOR]: Arbitrary positioned `cake-slice'.
+\item [PRIAXEASP]: Major and minor axes.
+\end{description}
+\item Contour maps
+\begin{description}
+\item [ABOXASP]: Define the region to be contoured.
+\item [MAGCNTASP]: Automatically produce the contours in mag/sq.arcsec.
+\end{description}
+\item Profile analysis
+\begin{description}
+\item [PRFLOGASP]: Convert profiles from PRIAXEASP to a form suitable for
+subsequent programs.
+\item [PRFPRTASP]: List a profile on the lineprinter.
+\item [PRFPLTASP]: Plot a profile on one of a variety of graphics devices.
+\item [PRFVISASP]: Visual profile fitting for disk galaxy.
+\item [PRFDECASP]: Least squares profile fitting for disk galaxy.
+\end{description}
+\end{itemize}
+\subsection {Final comments}
+The present set of routines have been tested using both artificially generated
+elliptical galaxies with known photometric properties and using a frame of
+real data for the well studied standard galaxy NGC 3379.
+These routines by no means cater for all the operations which it may be wished
+to perform on bright galaxy images and it is intended that further routines will
+be added.
+Bug reports should normally be made through the existing procedure, starting
+with the user's local site manager.
+However, if a fix is required quickly A C Davenhall may be contacted directly
+(VAX mail to REVAD::ACD) {\em as well as} submitting a proper bug report.
+\subsection {Listing produced by EQPROFASP}
+The equivalent profile program {\bf EQPROFASP} produces a set of photometric
+parameters and an integration table for the nebular image, computed in the
+system of de Vaucouleurs.
+The parameters produced are listed and briefly described below.
+For further details and definitions of the parameters, de Vaucouleurs (1959,
+1962, 1968) should be consulted.
+\subsubsection {Integration table parameters}
+The following parameters are listed for each isophote in the integration table:
+\begin{description}
+\begin{description}
+\item [Log I]: Log intensity above a sky level normalised to 1.0.
+\item [A]: Area bounded by isophote (square arcminutes).
+\item [P]: (mean intensity)x(difference in area of successive isophotes).
+\item [Sum P]: Sum of P over all previous (brighter) isophotes.
+\item [K]: Relative integrated luminosity.
+\item [R*]: Equivalent radius (arcseconds).
+\item [Rho]: Equivalent radius scaled by the effective radius to give a
+dimensionless variable.
+\item [Log J]: Logarithm of intensity scaled by the intensity at the effective
+radius to give a dimensionless variable.
+\item [Mu]: Brightness of isophote (magnitudes per square arcsecond).
+\end{description}
+\end{description}
+\subsubsection {Photometric parameters}
+The following parameters are listed for the entire nebular image:
+\begin{itemize}
+\item Extrapolation correction for light emitted beyond the faintest isophote.
+\item Total luminosity of the image derived by adding the contributions of the
+isophotes (the classical method) and also from Simpson's rule.
+The luminosity is listed both before and after adding the extrapolation
+correction for subthreshold light.
+\item The total magnitude, Bt, of the galaxy corresponding to the total
+luminosity computed by Simpson's rule.
+\item Values of various parameters computed at the quartile points of the
+relative integrated luminosity curve.
+Values of the radius, Log I and surface brightness are printed.
+NB.\ The radius corresponding to the second quartile, K(r)=0.5, is the effective
+radius.
+\item Concentration indices computed from the ratios of the radii of the
+quartiles of the relative integrated luminosity curve.
+\item The equivalent diameter of the 25 mag/sq.arcsec isophote, in arcseconds.
+\end{itemize}
+\subsection {Accessing extracted profiles}
+It is envisaged that the user will require to use profiles extracted with these
+routines as input to his own programs for purposes specific to his own
+astronomical application.
+The purpose of this section is to give the information necessary for him to
+access the profiles.
+The profiles are held as Starlink images and must be accessed using INTERIM
+routines (see SUN/4).
+
+Each profile corresponds to a two dimensional array.
+The first subscript (counting from the left) represents the running count of
+each data point and ranges from one to the number of points in the profile.
+The second subscript can take values one and two.
+The elements with subscript one correspond to the radii for each point and those
+with subscript two the intensity or log intensity, depending on the type of
+profile.
+The arrays are always `full' in the sense that the number of points is equal to
+the array size.
+\subsection {References}
+\begin{itemize}
+\item Benacchio L, 1975, PhD Thesis, Univ of Padua.
+\item Blackman C P, 1979, in `Photometry, kinematics and dynamics of galaxies',
+ed D S Evans, Dept Astr Univ Texas at Austin, Austin, p135.
+\item Godwin J G, 1976, Rep Dept Astrophys Oxford No 1, p168.
+\item Jones W B, Obitts D L, Gallet R M, and de Vaucouleurs G, 1967, Pub Dept
+Astr Univ Texas Ser II, 1, No 8.
+\item Kormendy J, 1977, ApJ 217, p406.
+\item Okamura S, 1977, Ann Tokyo Astron Obs 16 No 3, p111, p122.
+\item de Vaucouleurs G, 1959, Handbuch der Physik 53 p511, Springer-Verlag,
+Berlin-Gottingen.
+\item de Vaucouleurs G, 1962, in IAU Symp.15 `Problems in extragalactic
+research' ed G C McVittie, MacMillan, New-York, p3.
+\item de Vaucouleurs G, 1968, IAU Comm 28, Working Group on Galaxy Photometry,
+Circ No 6, Suppl No 1.
+\item de Vaucouleurs G, 1976, Occ Rep ROE No 2 p16.
+\end{itemize}
+
+\section {STARSIM --- Generate Simulated Starfields}
+
+STARSIM is a program for generating an image frame containing an artificial
+star field, the constituent stars of which having known photometric properties.
+Such artificial image frames provide a powerful method for testing two
+dimensional photometry programs which can be run on the artificial data and the
+results compared with the known properties of the frame.
+
+The present program simulates a star field consisting of a background field on
+which a globular cluster may optionally be superimposed.
+Separate luminosity functions are used to generate the observed magnitudes of
+the field and cluster stars.
+All the stars are assumed to have an intensity profile of the form given by
+Moffat (1969).
+Poisson noise is included in the generated frame so that an electronic type
+detector, such as a CCD, is simulated.
+The star field is assumed to be viewed through a Johnson B broadband filter and
+the effects of interstellar absorption and atmospheric extinction are included.
+\subsection {Construction of the simulated image}
+In order to make sensible and intelligent interpretations of the results
+obtained by the testing of photometry programs on simulated data, the effects
+included in the generation of the simulation must be thoroughly understood.
+The effects involved in STARSIM are:
+\begin{itemize}
+\item Uniform (constant) sky brightness.
+\item Spacially uniform field stars.
+\item Optional globular cluster obeying a King (1962) star density law.
+\item Star profiles obeying a Moffat (1969) law.
+\item A Johnson B passband with a CCD type detector leading to Poisson noise.
+\item Uniform interstellar absorption to the cluster.
+\item Uniform absorption in the terrestrial atmosphere and the detector.
+\end{itemize}
+The stars are generated with their brightness expressed in magnitudes but in
+the final image frame the intensity is expressed in number of photons.
+Thus, a conversion must be made between these two measures.
+The number of photons in the Johnson B band per square cm, per second
+corresponding to a 0th magnitude star at the top of the atmosphere is shown
+below, together with the corresponding numbers for the U and V bands which have
+been included for interest.
+These numbers were computed from Allen (1973).
+\begin{verbatim}
+                         U     5.33E5
+
+                         B     1.434E6
+
+                         V     9.37E5
+\end{verbatim}
+The luminosity functions used to generate the populations of field and cluster
+stars are also taken from Allen (1973) and are listed in section 4.4.
+However, as explained in the following section, these luminosity functions are
+held as files and input to the program.
+Thus, the user who so desires may replace them with luminosity functions of his
+own choosing.
+A Monte-Carlo method is used to generate the populations of stars from the
+luminosity functions, the random numbers being generated by the standard NAG
+random number generators available on the VAX.
+
+The optional globular cluster is generated using a King (1962)
+star density law
+\begin{equation}
+D(r)=k((1+(r/r_{c})^{2})^{-1/2}-(1+(r_{t}/r_{c})^{2})^{-1/2})^{2}
+\end{equation}
+where $D(r)$ is the star surface density a projected distance $r$ from the
+centre of the cluster.
+$k$, $r_{c}$ and $r_{t}$ are constants, $k$ being a scale factor and $r_{c}$
+and $r_{t}$ the core and tidal radii respectively.
+Again, a Monte-Carlo method was used to constrain the generated stars to fall
+within the envelope of the King law.
+Up to several hundred stars are normally permitted in the cluster.
+
+All the stars generated in the field were assumed to have profiles of the form
+given by Moffat (1969).
+The profiles were all the same shape irrespective of position in the frame,
+differing only by a scale factor.
+Moffat's formula gives the intensity I(r) at a radial distance r from the centre
+of the star image as
+\begin{equation}
+I(r)=I_{0}/(1+(\frac{r}{R})^{2})^{\beta}
+\end{equation}
+where $I_{0}$, R and $\beta$ are all constants.
+The total luminosity, Lt, of such a profile is
+\begin{equation}
+Lt=\frac{\pi R^{2}I_{0}}{\beta -1}
+\end{equation}
+so
+\begin{equation}
+I(r)=\frac{Lt(\beta -1)}{\pi^{2}R^{2}}/(1+(\frac{r}{R})^{2})^{\beta}
+\end{equation}
+It will be noted that the intensity of this profile never falls to zero for any
+radius, though it becomes small for radii greater than several times `R'.
+In order to limit the computation time, only parts of the profile brighter than
+a preset threshold were computed.
+This has a number of important consequences for the generated frame with which
+the intending user should be familiar.
+
+Firstly, the generated profile will not be everywhere smooth, but will have a
+definite edge beyond which the intensity will be zero.
+Secondly, because the subthreshold light is not included in the image profile
+generated the image applied to the frame is dimmer than the original star.
+This effect can become quite important for faint stars.
+If the intensity threshold beyond which the profile is truncated is $I_{th}$,
+then the corresponding radius $r_{th}$ is
+\begin{equation}
+r_{th}=((\frac{Lt(\beta -1)}{I_{th}\pi R^{2}})^{1/\beta}-1)^{1/2}R
+\end{equation}
+from this, the fraction of the total light emitted beyond this boundary, f, may
+be calculated
+\begin{equation}
+f=(1+(\frac{r_{th}}{R})^{2})^{1-\beta}
+\end{equation}
+In the present program, the profiles are evaluated to within 1\% of the night
+sky brightness, which is obtained from you (in magnitudes per square arcsec).
+When photometry routines are being tested on frames generated by {\bf STARSIM},
+it is important that the magnitude derived by the photometry routine is compared
+with the appropriate `true' magnitude.
+Most photometry routines fall into one of three classes:
+\begin{enumerate}
+\item Aperture (or total) magnitudes.
+\item Isophotal (or thresholded) magnitudes, eg.\ the COSMOS IAM magnitude.
+\item Profile fitted magnitudes.
+\end{enumerate}
+In case 1, aperture magnitudes, the results of the photometry routine should be
+compared to the luminosity actually applied to the image frame.
+In case 3, profile fitted magnitudes, or case 2, isophotal magnitudes, where the
+isophotal magnitude is to be compared with the `true' total magnitude, the
+determined magnitude should be compared with the intended magnitude of the star,
+ignoring the light truncated in generating the profile.
+Adopting this procedure more nearly simulates the behaviour of the photometry
+routine on real data with the proviso that the threshold in the artificial
+frame must be lower than the threshold in the photometry routine.
+
+A further consequence of only adding regions of profiles brighter than a
+constant threshold to the image frame is that very faint stars are excluded
+completely because their profiles are nowhere brighter than the threshold.
+Such stars are flagged in the output listing generated by {\bf STARSIM} (see
+below) with the message `Not applied to image'.
+
+One final cautionary note must be mentioned about the profiles generated.
+They are produced by evaluating equation (2) for the radii corresponding to the
+middle of each pixel.
+The value I(r) will vary across the area of each pixel and in general its mean
+value is not the same as the value of the centre of the pixel.
+It is, of course, the mean value which would be recorded by a real detector.
+Usually, when I(r) is only slowly varying across each pixel this is a small
+effect, however for small values of R it could become important.
+
+Poisson noise is added to the frame consisting of a uniform background plus the
+star profiles, that is the noise is given a Gaussian distribution with a
+standard deviation equal to the square root of the signal.
+Again the standard NAG random number generators are used.
+\subsection {Usage}
+\subsubsection {Running the program}
+{\bf STARSIM} is available as part of ASPIC (see SUN/23) and within DSCL may be
+obtained by typing:
+\begin{verbatim}
+        STARSIM
+\end{verbatim}
+You then respond to a series of prompts to define the required frame.
+The required values should not be included on the command line in an attempt to
+bypass the prompts because there are too many parameters to do this successfully
+and also it will confuse the mechanism for overriding the default luminosity
+function (see 4.4 below).
+
+In addition to generating an artificial image frame, {\bf STARSIM} produces an
+output listing describing the field and a file holding a `star catalogue'
+containing the positions and magnitudes of all the stars in the frame.
+Firstly, you are prompted for the directory where the star field and `star
+catalogue' files are to be created.
+This directory must be specified in full because it is to be passed to a batch
+job.
+A relatively large amount of disk space, up to several thousand blocks, may be
+required.
+
+{\bf STARSIM} uses a control parameter file to define the details of the image
+frame to be generated and the name of this file is prompted for next.
+Here it is sufficient to give the name only because it will automatically be
+placed in the subdirectory selected above.
+You are now prompted for the values defining the field to be simulated.
+The details of the parameters required are given below.
+Finally, the names required for the image frame and target star file are
+prompted for.
+Again, it is sufficient to give the required filename and the files will be
+placed in the chosen directory.
+A job to generate the required image is then submitted.
+
+Parameters prompted for by {\bf STARSIM}:
+\begin{enumerate}
+\item Select a {\em Standard} or {\em Random} image.
+{\em Standard} produces the same frame each time; {\em Random} a different
+frame.
+\item X size of the image frame (pixels).
+\item Y size of the image frame (pixels).
+\item Plate scale (arcsec/mm); the default corresponds to the UK Schmidt.
+\item Pixel size (micron).
+\item Diameter of the telescope aperture (cm).
+\item Exposure time (sec).
+\item Background sky brightness (mag/square arcsec).
+\item Star density/galactic latitude factor; see text for details.
+\item Moffat's quantity beta.
+\item Moffat's quantity R (arcsec).
+\item Total absorption in the terrestrial atmosphere (magnitudes).
+\item Fraction of the incident light lost in the telescope and detector.
+\item Threshold above which stars are to be plotted on the `finding chart'
+automatically produced for the frame (magnitudes).
+\item Select whether a globular cluster is to be included in the field. If so:
+\begin{enumerate}
+\item Number of stars in the cluster.
+\item Distance to the cluster (pc).
+\item Total interstellar absorption along the line of sight to the cluster.
+\item Core radius in King's formula (pc).
+\item Tidal radius in King's formula (pc).
+\end{enumerate}
+\end{enumerate}
+Defaults for b, d and e correspond to the values for the cluster 47 Tucanae
+taken from King (1962) and Allen (1973).
+
+Technically, the image simulation program normally works in batch mode and
+accepts its parameters from a control file organised as a Starlink frame.
+A separate program prompts you for the required parameters and generates the
+control file from these.
+However, you will normally not be concerned with these details.
+
+Item 9 above, the star density/galactic latitude factor, controls the average
+density of the field stars.
+A value of 1.0 corresponds to the density at the Galactic poles (with the
+default luminosity function) and larger values correspond to denser fields at
+lower galactic latitudes.
+The table below shows the approximate variation of this factor with Galactic
+latitude:
+\begin{tabbing}
+XXXXXXXXXXXXX\=b(o)XXXXXX\=\kill
+\>b(o)\>Star Density Factor\\
+\\
+\>0\>15.1\\
+\>5\>11.6\\
+\>10\>8.5\\
+\>20\>5.2\\
+\>30\>3.4\\
+\>40\>2.3\\
+\>50\>1.7\\
+\>60\>1.3\\
+\>90\>1.0
+\end{tabbing}
+\subsubsection {Hardcopy output}
+In addition to the image frame and star catalogue files, two pieces of hard copy
+output are produced by {\bf STARSIM}; a listing containing details of the frame
+generated and a `finding chart' for the brighter stars in the field.
+
+The listing starts with any error or warning messages that may have been
+generated by the program and then lists all parameters used to generate the
+field.
+Next follows a listing containing entries for all the stars in the field.
+If a globular cluster is included in the field, the cluster and field stars are
+differentiated by subheadings.
+The parameters listed for each star are:
+\begin{enumerate}
+\item Running count.
+\item X position (pixels).
+\item Y position (pixels).
+\item True apparent magnitude as generated from the luminosity function.
+\item The number of detected photons corresponding to the apparent magnitude 4.
+\item The number of detected photons after allowing for the truncation caused by
+the thresholded profile.
+\item The apparent magnitude applied to the image corresponding to the thresholded
+luminosity 6.
+For very faint stars which are nowhere brighter than the luminosity threshold
+the magnitude is replaced by a message saying `Not applied to image'.
+\item The final column contains a row of four hash characters (`\#') if the star
+is brighter than the plotting threshold (and hence appears on the `finding
+chart', below), otherwise it is blank.
+\end{enumerate}
+A `finding chart' is automatically produced on the Versatec.
+It indicates the positions of all stars brighter than the plotting threshold.
+The stars are indicated by circles, the diameter being proportional to
+magnitude.
+\subsubsection {Target star identification from the `star catalogue' file}
+A program is available for using the `star catalogue' file containing the
+positions and magnitudes of all the stars in the frame as an aid in identifying
+particular stars in the field.
+The generated field should be displayed on an ARGS (eg.\ by using {\bf APLOT})
+and then type:
+\begin{verbatim}
+        TARGET
+\end{verbatim}
+You will be prompted for the name of the star catalogue file and the magnitude
+of the faintest star to be plotted.
+A set of `gun sight' markers will then be drawn, centred on the positions of all
+stars brighter than the given threshold.
+\subsubsection {Using non-standard luminosity functions}
+The luminosity function files used by {\bf STARSIM}, one for the field stars and
+the other for the globular cluster stars, are held as Starlink frames.
+Thus, they may be created and edited using any of the programs available for
+editing frames, such as {\bf GETLEV} and {\bf EDITLEV} in the intensity
+conversion suite.
+
+Both types of luminosity function are held as 2D frames.
+The first column of the frame holds the apparent magnitude for the field
+luminosity function and the absolute magnitude for the globular cluster
+luminosity function.
+In both cases the second column holds the number of stars per square degree in
+a one magnitude wide `bin' centred on the brightness given in the first column.
+As an example, the default luminosity functions are listed in section 4.4.
+
+To access non-standard luminosity functions, type:
+\begin{verbatim}
+        STARSIM <lumfile> <globfile>
+\end{verbatim}
+where $<$lumfile$>$ and $<$globfile$>$ are the names of the field luminosity function
+and the globular cluster luminosity function files respectively.
+Because these parameters are passed to a batch program, the directory structure
+must be specified in full.
+\subsection {Command checklist}
+\begin{description}
+\begin{description}
+\item [STARSIM]: Generate an artificial image frame.
+\item [TARGET]: Overlay markers showing the positions of the brighter stars on
+top of the image frame displayed on the ARGS.
+\end{description}
+\end{description}
+\subsection {Default luminosity functions}
+The default luminosity functions used by {\bf STARSIM}, taken from Allen (1973)
+are listed below.
+\begin{verbatim}
+    m   -  Apparent magnitude.
+
+    M   -  Absolute magnitude.
+
+    Am  -  Number of stars per square degree within the brightness range
+               m+0.5 <--> m-0.5.
+
+
+    Field luminosity function   Globular cluster luminosity function
+    -------------------------   ------------------------------------
+
+         m          Am                   M          Am
+
+        4.0         0.0048             -3.0         1.0
+        5.0         0.015              -2.0        25.0
+        6.0         0.044              -1.0        50.0
+        7.0         0.12                0.0       400.0
+        8.0         0.32                1.0       126.0
+        9.0         0.83                2.0       316.0
+       10.0         1.9                 3.0      1000.0
+       11.0         4.3                 4.0      2000.0
+       12.0         9.5                 5.0      3160.0
+       13.0        19.0                 6.0      3160.0
+       14.0        37.0                 7.0      3160.0
+       15.0        63.0                 8.0      3160.0
+       16.0       115.0                 9.0      3980.0
+       17.0       181.0                10.0      6310.0
+       18.0       316.0
+       19.0       501.0
+       20.0       631.0
+       21.0       794.0
+       22.0      1000.0
+       23.0      1259.0
+\end{verbatim}
+\subsection {Acknowledgments}
+I am grateful to R S Stobie for providing the original program from which
+{\bf STARSIM} was developed and also for valuable suggestions during the
+development of the present program.
+Thanks are also due to  S R Heathcote for useful discussions.
+\subsection {References}
+\begin{itemize}
+\item Allen C. W., 1973, in `Astrophysical Quantities' 3rd edn., Athlone Press,
+London.
+\item King I., 1962, A.J., 67, p471.
+\item Moffat A. F. J, 1969, A\&A, 3, p455.
+\end{itemize}
+
+\section {MODPIX --- Picture Modification}
+
+MODPIX is a set of ASPIC programs for picture modification.
+There is a separate program for each modification.
+They may be made in any order and the same modification may be repeatedly
+applied to the same picture.
+
+The programs use the ARGS display.
+Most of them use the ARGS trackerball with either a cross-hair or circular
+cursor.
+Where a cursor is used, the program will display it first and then prompt you
+for any extra information.
+The circular cursor can be set to any size by using buttons 2 and 3.
+When the circle is the correct size and in the correct position, button 1 should
+be hit.
+Button 4 should not be used as it is the abort button.
+
+The programs take an input image frame and produce a modified output image
+frame.
+The input frame is taken from the DSCL stack and the output frame returned to
+the stack.
+So at the beginning of a series of modifications to a picture you should clear
+the stack, push the image frame to be modified on the stack, and then perform
+the modifications.
+When the modifications are complete, the image frame at the top of the stack
+should be popped and stored permanently.
+Values given to the program by you (for example the value of the specified area
+of the picture) can be either given after the MODPIX program name or omitted and
+you will then be prompted for them.
+\subsection {Programs}
+\begin{enumerate}
+\item Help
+\begin{description}
+\item [MODHELP]:
+displays help information on your terminal.
+\end{description}
+\item General Modifications
+\begin{description}
+\item [INDPIX]:
+modifies an individual pixel.
+You select it using the cross-hair cursor and assign a new value to it.
+\item [LINFIX]:
+modifies a horizontal line in the picture.
+You select it with the cursor and provide a value which is assigned to each of
+the pixels in the line.
+\item [COLFIX]:
+modifies a vertical line in the picture.
+You select it with the cursor and provide a value which is assigned to each of
+the pixels in the line.
+\item [RECFIL]:
+fills a rectangle with a given value.
+The cursor is used twice to indicate first the bottom left and then the top
+right corners of the rectangle.
+All the pixels within the rectangle are set equal to the value you provided.
+\item [OUTSET]:
+sets all values outside a defined circle to the given value.
+You specify a circle using the circular cursor and all pixels in the image frame
+outside that circle are set equal to the value you provide.
+\item [DISKFIL]:
+sets all values inside a defined circle to the given value.
+It behaves similarly to {\bf OUTSET}.
+\end{description}
+\item Fourier Transform Modifications:
+Although these programs will work on ordinary image frames, they
+were designed for working on the Fourier Transforms of image frames.
+(The programs in 2 will also work on Fourier Transform images.)
+The transform is assumed to have the (0,0) harmonic at position
+(((IXEXT/2)-1),(IYEXT/2)) with a non-redundant set of both sine and cosine
+harmonics from a real image.
+Positions are in ARGS units: from (0,0) to (511,511).
+ASPIC program {\bf DFFTASP} provides suitable transformed images.
+For more information, type `HELP * DFFTASP' in DSCL.
+\begin{description}
+\item [LOFREQ]:
+eliminates the low frequencies from a transformed image.
+The circular cursor is used to select the diameter of a circle (changing the
+size with buttons 2 and 3).
+The position of the circle is irrelevant.
+All pixels within the circle, centred on (((IXEXT/2)-1),(IYEXT/2) are set to 0.
+\item [HIFREQ]:
+eliminates the high frequencies from a transformed image.
+Similarly to LOFREQ, the diameter of a circle is selected by the circular cursor
+and all pixels outside a circle of that size centred on (((IXEXT/2)-1),(IYEXT/2)
+are set to 0.
+\item [SYMDIS]:
+removes four symmetrically placed disc-shaped areas from an image frame.
+It is designed for removing noise that appears as four symmetric clusters, one
+in each quadrant of an FFT image frame.
+You specify one of these clusters using the circular cursor to specify the size
+and position of the circle.
+The other three mirror image circles are obtained by reflection in the lines
+X=(IXEXT/2)-1 and Y=IYEXT/2.
+You supply a value which is assigned to all the pixels in the four circles.
+\item [SINCFIL]:
+multiplies a FFT image frame by a {\em sinc} function.
+You supply a value A, say, which is used to derive the {\em sinc} function.
+Every pixel (X,Y) in the image frame is multiplied by SIN(B)/B where
+\begin{displaymath}
+B=\frac {\pi( (X-(\frac{IXEXT}{2}-1))^{2} + 
+(Y-\frac{IYEXT}{2})^{2} )^{\frac{1}{2}}} {A}
+\end{displaymath}
+\end{description}
+\end{enumerate}
+
+\section {CALIB --- Intensity Calibration}
+
+CALIB is a set of ASPIC calibration programs which perform the intensity
+conversion of an image frame by means of a look up table.
+From an image frame of observed VALUES derived from a measuring machine, CALIB
+produces an image frame approximating to the true INTENSITIES.
+This process of going from VALUES to INTENSITIES takes three steps:
+\begin{enumerate}
+\item Produce a LEVELS table of a few known VALUE-INTENSITY pairs, either by
+typing in numbers from the keyboard, or by using an ARGS rectangular cursor on
+a STEPWEDGE image frame of a series of photographic calibration spots.
+This stage also includes two utility programs for manipulating the LEVELS table
+once it has been created.
+There is a program to list the levels on the lineprinter and another to edit the
+LEVELS table to correct any mistakes made in creating it or add any new levels
+discovered.
+\item From the LEVELS table, produce a look up table (LOOKUP) by using one of four
+possible fit programs which fit a function to the pairs in LEVELS, and then use
+the function to generate LOOKUP.
+\item Calibrate an input image frame to give an output frame of true intensities.
+This is done by linear interpolation on LOOKUP.
+\end{enumerate}
+The three stages must be performed in the correct order as LEVELS is used to
+generate LOOKUP which is used to calibrate the image frame.
+There is only one program to do the actual calibration, but for stage 1 and 2
+you have a choice of methods.
+The choice of a particular method for stage 1 does not limit the choice for
+stage 2.
+You may wish to try different fit programs to see which gives the best
+results on the LEVELS table being used.
+The fit programs plot a graph of their fit to let you judge how good it is.
+The LEVELS table and the LOOKUP table are stored as Starlink frames
+and you are prompted for their names.
+This means that the calibration process can be prolonged over several sessions
+if you wish as these intermediate results of stage 1 and 2 are stored.
+\subsection {Programs}
+\begin{enumerate}
+\item Help
+\begin{description}
+\item [CALHELP]:
+displays help information on your terminal.
+\end{description}
+\item Stage 1 --- Creating a LEVELS table.
+\begin{description}
+\item [SETLEV]:
+allows you to create a LEVELS table by entering VALUE-INTENSITY pairs from
+the keyboard.
+Each pair should be entered on a separate line in response to the prompt
+NEXTLINE.
+They should be positive ($\geq$0) real numbers separated by a comma, VALUE first
+and then INTENSITY.
+To terminate the program, enter `END' and you will then be prompted for the name of
+the new LEVELS table.
+\item [EDITLEV]:
+edits an existing LEVELS table interactively to produce another modified
+LEVELS table.
+You are prompted for the name of the input table at the start of an editing
+session and the name of the output table at the close of a session.
+{\bf EDITLEV} can be used to correct any mistakes in a table or to add another
+pair of levels.
+
+The basic unit of change is a VALUE-INTENSITY pair, or ROW as {\bf EDITLEV}
+calls it.
+Remember that VALUE,INTENSITY are positive real numbers, separated by a comma.
+They should be typed on the same line, VALUE first.
+You can change a row, delete a row, or insert a row.
+The rows are numbered.
+Every time a row is inserted or deleted the table is renumbered to take account
+of the change and a message is printed to that effect, giving the number of the
+last row in the table.
+
+There are seven possible commands.
+You type a single letter to indicate which one is chosen.
+Depending on the command, {\bf EDITLEV} may prompt for more information, say
+the row number.
+At this stage, when a row number has to be given, typing 0 will abort the
+command returning to {\bf EDITLEV} command level.
+This would be used if the wrong key was pressed accidentally.
+
+At the start of a session, {\bf EDITLEV} displays the whole table on your
+terminal.
+If the table is small you may find it useful to redisplay the table after each
+modification.
+You can choose from seven commands:
+\begin{description}
+\item [C --- CHANGE]:
+changes an existing row by retyping VALUE,INTENSITY.
+You are prompted for the row number; typing 0 here will return to editor
+command level.
+Then you are told to enter a new row as a VALUE,INTENSITY pair (without the
+row number).
+\item [D --- DELETE]:
+deletes a row from the table.
+You are prompted for the row number; typing 0 returns to the editor command
+level.
+Then the row is deleted and the table is renumbered so there are no gaps and
+a message is displayed giving the number of the last row in the table.
+\item [I --- INSERT]:
+inserts a new row (VALUE,INTENSITY pair) into the table.
+You are prompted for the row number; typing 0 here returns to the editor command
+level.
+This row number refers to the row {\em before} which the new row is to be
+inserted.
+Thus, typing `1' would insert the new row at the head of the table and typing
+`N+1' (where N is the last row in the table) would insert it at the end of the
+table.
+Then you are told to enter a new row as a VALUE,INTENSITY pair (without the row
+number).
+\item [L --- LIST]:
+lists a part of the table on your terminal.
+You are prompted for the start and finish rows of the listing (typing 0 is
+inappropriate here).
+This command is more useful than {\bf P} when the whole table is too big to fit
+on the screen at once.
+\item [P --- PRINT]:
+prints the whole table on your terminal.
+It is equivalent to Listing from the first to last rows.
+Use {\bf LISTLEV} to print a LEVELS table on the lineprinter.
+\item [H --- HELP]:
+displays {\bf EDITLEV} help information on your terminal.
+\item [Q --- QUIT]:
+quits the editor.
+You are prompted for the name of the output LEVELS table.
+\end{description}
+\item [GETLEV]:
+allows you to create a LEVELS table by using the ARGS trackerball cursor on a
+STEPWEDGE image frame.
+It is assumed that the STEPWEDGE has been previously plotted on the ARGS.
+You position a rectangular cursor over the desired wedge in the STEPWEDGE, and
+{\bf GETLEV} calculates the VALUE as the mean of the pixels in the rectangle.
+You then type the known INTENSITY for that rectangle.
+
+First you choose the dimensions of the rectangular cursor, typing in a new
+width and height if the default dimensions are unsatisfactory.
+Then you are asked to enter the calibration levels.
+For each pair of levels, position the rectangular cursor over the desired
+area of the STEPWEDGE and press the {\em left} hand button of the trackerball.
+{\bf GETLEV} calculates the mean of the pixels in that rectangle and takes that
+to be the VALUE.
+You are asked to type in the INTENSITY as a real number $\geq$0.
+Then, the pair of levels are displayed on the terminal to give you a chance to
+reject that pair and try again.
+This process is repeated for each level until you indicate that this is to be
+the last pair by pressing not the left hand but the {\em right} hand button,
+when indicating a rectangle on the STEPWEDGE.
+{\bf GETLEV} prompts for the INTENSITY as usual but does not ask for any more
+levels.
+The pair of levels entered when the right hand button was pressed does go into
+the table but is the last pair to do so.
+Finally, {\bf GETLEV} asks you for the name of the LEVELS table.
+\item [LISTLEV]:
+lists a LEVELS table on the lineprinter.
+You are prompted for the name of the table.
+\end{description}
+\item Stage 2 --- Creating a LOOKUP Table:
+There are four different fit programs that fit a function to the pairs in a
+LEVELS table to create a LOOKUP table.
+Each one finishes by plotting a graph of the fit on your terminal, first asking
+you to take whatever steps are necessary to put the terminal in graphics mode
+and to enter the terminal type.
+Possible terminals include the ARGS, GOC, TEKTRONIX and any terminal capable of
+emulating a TEKTRONIX.
+Two of the programs iterate, allowing you to try different variations of the
+same basic fitting method.
+
+Each program prompts you for the name of a LEVELS table, the name for the output
+LOOKUP table, and also for TABS,TABF which are the minimum and maximum of the
+range of observed VALUES output by the measuring machine.
+The LOOKUP table will be valid for this range.
+The defaults given for TABS and TABF are the standard COSMOS ones.
+The fit programs will terminate with an error message if an observed VALUE in
+the LEVELS table is outside the TABS..TABF range.
+\begin{description}
+\item [COSFIT]:
+does a COSMOS-style Baker density fit, assuming that the LOOKUP table will be
+used on COSMOS data.
+In addition to the normal prompts described above you are asked for the COSMOS
+parameters TCLEAR and TBLACK which are given to you with the COSMOS data.
+COSFIT requires a minimum of two calibration levels in the LEVELS table.
+\item [POLFIT]:
+does a polynomial fit to the LEVELS table.
+It is capable of handling fits of different orders.
+You select a particular order and {\bf POLFIT} will fit a polynomial of that
+order and plot the result.
+This goes on until you are satisfied with one of the fits.
+For a given order, {\bf POLFIT} requires a minimum of $<$ORDER+1$>$ calibration
+levels in the LEVELS table.
+It also a requires an absolute minimum of 3 calibration levels; thus it will not
+perform first order fits.
+\item [SPLFIT]:
+does a spline fit to the LEVELS table.
+The algorithm is taken from the NAG routines EO2BAF and EO2BBF.
+A graph of the fit and the spline knots used is plotted.
+If you are not pleased with the fit it is possible to add and delete knots
+interactively with the cross-hair cursor and {\bf SPLFIT} will recalculate the
+fit and plot the new graph and knots.
+There is a limit on the number of knots allowed.
+This continues until you are satisfied.
+{\bf SPLFIT} requires a minimum of four calibration levels in the LEVELS table.
+\item [SLAFIT]:
+does a `slalom' fit devised by J A Cooke on the LEVELS table.
+The slalom fit attempts to give an `eye' fit to a small number of points on a
+smooth curve.
+SLAFIT requires a minimum of three calibration levels in the LEVELS table.
+\end{description}
+\item Stage 3 --- Doing the Calibration.
+\begin{description}
+\item [CALIB]:
+performs the actual calibration of an image frame using a LOOKUP table supplied
+by you.
+You are prompted for the name of the input image frame, the LOOKUP table, and
+the output image frame.
+The input frame of observed VALUES is converted into an output frame of true
+INTENSITIES.
+\end{description}
+\end{enumerate}
+
+\section {Modifying 2D tables of real numbers}
+
+The programs in this set of ASPIC programs allow you to generate, display, and
+modify 2-dimensional tables of real numbers.
+The tables are stored as Starlink frames.
+One dimensional tables can be handled if they are expressed as N*1 two
+dimensional tables.
+The first dimension is the number of rows in the table and the second the
+number of columns.
+The maximum number of columns is 32; the maximum number of rows is 49.
+In order to fit a sensible number of columns onto the screen, table values are
+only displayed accurate to 5 significant figures, although they are stored as
+standard real numbers.
+Tables can be modified by the table editor which can add, delete or change rows
+in a table.
+The number of columns however is fixed.
+A brief description of each of the four programs in the package follows.
+\subsection {Programs}
+\begin{description}
+\item [ENTERTAB]:
+Allows you to generate a table by typing it in at the keyboard.
+You are prompted for the number of columns in the table and then told to type
+it in row by row.
+Each row is composed of free format reals separated by commas.
+If a mistake is made in typing in a row, the whole row has to be retyped.
+To terminate the input type `END' on a line by itself.
+You will then be prompted for the name of the table.
+A frame (of file type .BDF) will be created.
+\item [TYPETAB]:
+Displays a given table on your terminal.
+You are prompted for the table name.
+If there are more than six columns to the table, more than one line is taken
+for each row.
+\item [PRINTTAB]:
+Prints a given table on the lineprinter.
+You are prompted for the table name.
+If there are more than ten columns to the table, more than one line is taken
+for each row.
+\item [EDITTAB]:
+Edits an existing table interactively to produce another modified table.
+You are prompted for the name of the input table at the start of an editing
+session and the name of the output table at its close.
+The number of columns is fixed, but you can change the number of rows.
+You can replace a row, delete a row, insert a row, or change an individual
+table value.
+The rows are numbered.
+Every time a row is inserted or deleted, the table is renumbered to take account
+of the change and a message is printed to that effect, giving the number of the
+last row in the table.
+
+There are eight possible commands.
+You type a single letter to indicate which one is chosen.
+Depending on the command, you may be prompted for more information, say the row
+number.
+At this stage when a row number has to be given, typing 0 will abort the
+command, returning to editor command level.
+This would be used if the wrong key was pressed accidentally.
+
+At the start of a session, the whole table is displayed on your terminal.
+If the table is small you may find it useful to redisplay the table after each
+modification.
+This is the default command if simply $<$CR$>$ is typed.
+You can choose from eight commands:
+\begin{description}
+\item [R --- REPLACE]:
+replaces an existing row by retyping it.
+You are prompted for the row number; typing 0 will return to editor command
+level.
+Then you are told to enter a new row (without the row number).
+\item [C --- CHANGE]:
+changes an individual table value.
+You are prompted first for the row and then for the column number of the value
+to be changed.
+Typing 0 for either of these numbers causes the command to be aborted.
+Finally, you are told to enter the new value as a single real number.
+\item [D --- DELETE]:
+deletes a row from the table.
+You are prompted for the row number; typing 0 returns to the editor command
+level.
+Then the row is deleted and the table is renumbered, so there are no gaps, and
+a message is displayed giving the number of the last row in the table.
+\item [I --- INSERT]:
+inserts a new row into the table.
+You are prompted for the row number; typing 0 returns to the editor command
+level.
+This row number refers to the row {\em before} which the new row is to be
+inserted.
+Thus, typing 1 would insert the new row at the head of the table and typing N+1
+(where N is the last row in the table) would insert it at the end of the table.
+Then you are told to enter a new row (without the row number).
+\item [L --- LIST]:
+lists a part of the table on your terminal.
+You are prompted for the start and finish rows of the listing (typing 0 is
+inappropriate here).
+This command is more useful than {\bf P} when the whole table is too big to fit
+on the screen at once.
+\item [P --- PRINT]:
+prints the whole table on your terminal.
+It is equivalent to Listing from the first to last rows.
+Use {\bf PRINTTAB} to print a table on the lineprinter.
+\item [H --- HELP]:
+displays help information on your terminal.
+\item [Q --- QUIT]:
+quits the editor.
+You are prompted for the name of the output table.
+\end{description}
+\end{description}
+
+\section {PERIODS --- Analysing periodic phenomena}
+
+This ASPIC package is a collection of programs for analysing periodic data.
+In particular, it handles sets of (epoch,observation) pairs, from whatever
+source.
+There is nothing very original about them, but they fit together into a
+self-consistent whole; the output from one program becomes the input to the
+same, or some other, program.
+So far as possible, all the main approaches described in the literature are
+included here.
+They grew out of efforts to convert existing applications, running on the RGO
+ICL 1903T, to work on the VAX.
+They were released to RGO users and described in LUN/25 (RGO).
+Later they were released as a well disguised part of the ASPIC package.
+Since then, other algorithms have been incorporated and improvements made to the
+older ones.
+They all use the Starlink INTERIM environment, the SIMPLEPLOT graphics routines
+over SGS/GKS, and NAG.
+They are most conveniently run as a self contained package within ASPIC, being
+accessed through DSCL, but no knowledge of DSCL is needed to run them.
+The data may be sampled at random epochs, at equal intervals or as continuous
+runs of data separated by relatively long gaps.
+The best algorithm to choose will, of course, depend on the data to be
+processed.
+\subsection {Overview}
+The input data for this package will usually be in a formatted file consisting
+of an arbitrary number of records, each of which consists of an epoch of
+observation and one or more observations.
+This may have been created from some other program or from the keyboard using
+any of the text editors.
+Before doing anything else, the data must be converted into a frame by
+running the program {\bf STORE}.
+This will read the epoch and one of the observations from every record, sort
+them into time order, and store the result as a 3xN double precision array in
+a frame.
+The third column is used to store a weight, though this is not used in any
+significant way and need not be present.
+
+Programs are available to remove any trends and zero-mean the data, re-sample at
+equal intervals in time, edit and concatenate datasets, and re-create a
+formatted file from a frame.
+The whole, or part, of a dataset may be plotted on any GKS device.
+
+Programs are available which compute power spectra from unequally spaced data,
+using an efficient algorithm based on Chebyshev recursion, or from equally
+spaced data using a NAG FFT algorithm.
+It is also possible to use an auto-regressive model of the data to give a
+maximum entropy estimate of the power spectrum for equally spaced data.
+In the case of irregularly spaced data, the window function (the power spectrum
+of constant data at the observed epochs) may also be computed.
+Programs are available to plot power spectra, use a cursor to identify the main
+peaks and to superimpose a window function.
+This makes it possible to define the aliases caused by the data sampling.
+The auto-regressive model may also be used, as described by Ulrych and Fahlman,
+to fill gaps in data, eg.\ between two nights of continuous observation.
+A quite different set of techniques is available for particularly sparse data by
+computing the phase of each sample for each frequency in a given range and
+assessing the `best' period from the resulting set of curves.
+
+Once some likely periods have been obtained it is possible to estimate the
+amplitude and phase of a sine wave for each period by linear least-squares and
+then to refine these estimates by a full non-linear least squares fit.
+The resulting set of parameters may be used to pre-whiten the data (removing
+`known' effects) and to compare the fit with the data used for the fit, or with
+other data.
+When the phenomenon being studied is markedly non-sinusoidal it may be better
+to pre-whiten the data by folding them with a known period, estimating the mean
+curve, and subtracting that from the data.
+A program is available to do this for different periods in succession.
+
+Experience has shown that, no matter which technique is being used, it is
+absolutely vital to investigate the data and the results obtained with the
+greatest possible care.
+The best way of doing this is to create synthetic data at the observed epochs
+with known periods, amplitudes and phases, and with known noise characteristics.
+The same techniques must them be applied to the synthetic data as were applied
+to the real data.
+This is particularly true when handling closely spaced periods, or when the
+window function is very complex, or when deciding on the best length of the
+auto-regressive model.
+In many ways, the program for creating synthetic data is the most important one
+in the whole package.
+
+A one-page summary of the package is available when using it by typing
+\begin{verbatim}
+        HELP OVERVIEW
+\end{verbatim}
+\subsection {Using the package}
+After entering DSCL, type the command:
+\begin{verbatim}
+        GO PER
+\end{verbatim}
+The system should now respond with the prompt:
+\begin{verbatim}
+         PER>
+\end{verbatim}
+Any of the programs described below can now be run simply by typing their name.
+To leave the system type:
+\begin{verbatim}
+        STOP or EXIT
+\end{verbatim}
+which will return you to the normal VMS prompt.
+
+Help is available in the usual way by typing:
+\begin{verbatim}
+        HELP or HELP topic [sub-topic]
+\end{verbatim}
+and so on.
+Two help topics may be of particular use.
+One is:
+\begin{verbatim}
+        HELP HELP
+\end{verbatim}
+which reminds users of some of the topics on which help is available.
+The second is:
+\begin{verbatim}
+        HELP OVERview
+\end{verbatim}
+which displays a diagram showing all the applications and how they are
+inter-related.
+
+There was some discussion when preparing this package as to whether it should
+work in terms of frequency or period.
+The decision was that it should, so far as possible, work in both!
+By default all prompts ask for frequency, but typing the command:
+\begin{verbatim}
+        PERIOD
+\end{verbatim}
+will allow input to be specified as periods.
+If you wish to change back to frequency, type:
+\begin{verbatim}
+        FREQ
+\end{verbatim}
+Appropriate prompts are given, so it should always be clear what information is
+expected.
+
+Incidentally, all periods are in terms of the units used originally to express the
+epochs of the observations.
+Likewise, frequencies are expressed as cycles per that time unit; Julian Days
+are most commonly used.
+No corrections are made for light travel times within the Solar System.
+
+When creating a data set these programs ask for a TITLE.
+A null response is acceptable but you may find it convenient to label your data
+in this way.
+The title, size and other information may be displayed by typing the standard
+ASPIC command:
+\begin{verbatim}
+        DESCR = dataset
+\end{verbatim}
+where `dataset' is the name of any frame.
+NB.\ the `=' is mandatory.
+\subsection {Programs}
+\subsubsection {Data input and output}
+As described above, the data processed by these programs are all held in
+Starlink INTERIM environment frames (.BDF files).
+However, this will not be how most input data are naturally held and it is not
+very convenient for printing or editing.
+Programs are therefore available to convert between formatted .DAT files and
+frames.
+{\bf STORE} will only accept up to 10,000 records in one run but there are no
+such limits on the size of the frames.
+If this restriction causes problems, simply divide the .DAT file into two or
+more files, {\bf STORE} each one and then use {\bf CONCAT} to combine the
+frames.
+The third and vital program is used to create synthetic data.
+Note that {\bf STORE} will also sort the data into order of increasing epoch, so
+using {\bf RESTORE}, followed by {\bf STORE} will sort the data.
+\begin{description}
+\begin{description}
+\item [STORE]: copies data from a .DAT file to a frame.
+\item [RESTORE]: copies data from a frame to a .DAT file.
+\item [SYNTH]: creates synthetic data.
+\end{description}
+\end{description}
+\subsubsection {Data manipulation}
+These programs allow trends to be removed from the data (which should always be
+done before proceeding with the analysis), extract sub-sets of the data in
+terms of epoch, phase or value, and concatenate several datasets into a single
+set.
+It is also possible to re-sample a dataset at equal intervals of time, but this
+is of use only when the data are reasonably well sampled in the first place.
+Eg.\ if photometry of a star is available every few minutes through the night
+with pauses to measure standard stars then it should be possible.
+However, if any gap in the data is significant compared to any likely variation,
+this technique will not produce meaningful results.
+\begin{description}
+\begin{description}
+\item [DETREND]: removes an underlying trend from the data.
+\item [FLAG]: allows deletion of bad points.
+\item [EXTRACT]: allows extraction of a subset between two epochs.
+\item [SELECT]: general-purpose subset selection.
+\item [CONCAT]: concatenates datasets to make one new one.
+\item [SPLEQ]: re-samples data at equal time intervals.
+\end{description}
+\end{description}
+\subsubsection {Computing power spectra}
+The most commonly used program is {\bf POWER}, which computes the power spectrum
+over a defined range of frequencies for any dataset.
+This is quite efficient as it uses Chebyshev recursion to minimize the number of
+trigonometric functions which have to be computed.
+Optionally, it will also compute the window function which gives the power
+spectrum that would have been produced by this data sampling even if the data
+were constant.
+It is of vital importance in understanding the aliases introduced by analysing
+irregularly spaced data.
+However, great caution should be used when two frequencies are present which are
+separated by less than the full width of the window function.
+Care is also needed to ensure that enough frequency steps are computed to sample
+the power spectrum adequately.
+If the data are regularly spaced an FFT algorithm may be used instead.
+The one chosen does not demand that the number of samples be a power of 2, but
+has some less restrictive conditions.
+It will add enough zeros to the end of the data so that it can handle them, but
+will not add more than 19 of them!
+\begin{description}
+\begin{description}
+\item [POWER]: computes power spectrum of any dataset.
+\item [FFTPOW]: computes power spectrum using FFT.
+\end{description}
+\end{description}
+\subsubsection {Auto-regressive models}
+Ulrych and his collaborators have emphasised the relationship between
+auto-regressive models and maximum entropy estimates of the power spectrum of
+time series.
+An AR model is of the form
+\begin{equation}
+X_{i}=\sum_{j=1}^{M} A_{j}X_{i-j}+E_{i}
+\end{equation}
+for equally spaced observations $X_{i}$ and for a set of constants $A_{j}$.
+$E_{i}$ is the error in using this model.
+The method involves choosing the $A_{j}$ to minimize the $E_{i}$.
+M is called the `lag' of the auto-regressive model.
+It is possible to compute the power spectrum from the $A_{j}$ and use them to
+fill in gaps between continuous runs of data and to extend existing datasets.
+\begin{description}
+\begin{description}
+\item [MEMPOW]: computes power spectrum from several datasets, each of which is
+regularly sampled.
+\item [FILLGAP]: fills gaps between several datasets, each of which is
+regularly sampled.
+\item [EXTEND]: extends an existing dataset.
+\end{description}
+\end{description}
+\subsubsection {Phase dispersion methods}
+These methods work best on relatively sparse data.
+They are closest to the methods used by hand; fold the data at a chosen
+frequency and look at the resulting curve.
+Then try a different frequency and try to assess which gives the smoothest
+curve.
+The approach used here is described by Dworetsky.
+\begin{description}
+\begin{description}
+\item [PDM]: finds periods by phase dispersion methods.
+\end{description}
+\end{description}
+\subsubsection {Least squares fitting}
+Once a set of possible frequencies has been identified by using any of the above
+methods, it is usually desirable to obtain a best estimate of the amplitude and
+phase of each sine wave.
+Programs are available to do this in a two-stage process, first estimating the
+amplitude and phase keeping the frequencies fixed, then doing a full non-linear
+least squares fit allowing all the parameters to vary.
+The parameters are stored in a `parameter file' frame and may be used as input
+to these programs, or into {\bf SYNTH}, {\bf PW} or {\bf PLOTFIT}.
+A detailed log of the fitting procedure, and the results obtained, is written to
+LINRES.LIS and NONRES.LIS.
+It is also possible to list a set of parameters.
+\begin{description}
+\begin{description}
+\item [LIN]: linear least squares fit to estimate amplitude and phase.
+\item [NON]: non-linear least squares fit to refine estimates of frequency,
+amplitude and phase.
+\item [LISTPAR]: lists the contents of a parameter file created by {\bf LIN}
+or {\bf NON}.
+\end{description}
+\end{description}
+\subsubsection {Pre-whitening}
+It is usually desirable to remove all `known' effects from a dataset, especially
+when looking for the smaller effects.
+This process is known as pre-whitening and can be done in two ways.
+If the least squares algorithms have been used, the resulting parameter file
+may be used to remove those components from the data.
+This works very well when sinusoidal components are present.
+However, when non-sinusoidal effects are present, it is probably better to
+simply fold the data at the `known' frequency, fit the best mean curve
+numerically (ie.\ without any assumptions about its shape) and simply subtract
+it from the original data.
+\begin{description}
+\begin{description}
+\item [PW]: removes all components obtained by {\bf LIN} or {\bf NON}.
+\item [FOLD]: removes mean curve at selected frequencies.
+\end{description}
+\end{description}
+\subsubsection {Graphics}
+Wherever useful the above programs make use of graphics, but there are also
+three programs specifically to plot datasets.
+One plots one or two datasets and, if the epochs agree, their differences.
+A second plots a power spectrum no matter which program was used to compute it,
+allows the user to locate the most significant peaks and, optionally, to plot a
+symmetric version of the window function centred on one of those peaks.
+For this to be effective the window function must be computed from zero
+frequency and at the same frequencies as the power spectrum being plotted.
+Power spectra may also be plotted as normal datasets, but the axis labelling
+will be misleading.
+Finally, it is possible to plot data created from a `parameter file'
+superimposed on a dataset, though not necessarily the one used to obtain those
+parameters.
+
+All graphics programs work on the full set of GKS-supported devices, which may
+be specified by number (1,2,3,\ldots) or workstation name (GKS\_1\_0,\ldots) or
+by logical names set up by site managers (VERS,ARGS,\ldots).
+The current list of devices may be seen by typing:
+\begin{verbatim}
+        HELP DEVICES
+\end{verbatim}
+when using this package.
+In general, output to terminals fills the whole screen whereas for hard copy
+devices the user is prompted for the size of the plot in centimetres, the
+default size being chosen so that the plot will fit onto A4 paper.
+\begin{description}
+\begin{description}
+\item [PLOTDAT]: plots one or two datasets.
+\item [PLOTPS]: plots power spectrum and/or window function.
+\item [PLOTFIT]: plots data and superimposes results from {\bf LIN} and
+{\bf NON}.
+\end{description}
+\end{description}
+\subsection {Demonstration}
+A simple, though quite typical, demonstration dataset is available called
+PER:DEMO which contains 55 synthetic observations spread at random through a
+year.
+The epochs are typical of the result of night-time observing within observing
+seasons.
+Print the file PER:DEMO for a suggested sequence of operations.
+\subsection {Techniques --- acknowledgments and references}
+As mentioned above, the techniques used here have been obtained from various
+sources. The most important ones are as follows:
+\begin{description}
+\item [POWER]: the method used is described in `Introduction to Fourier Spectroscopy',
+Academic Press (1970), p 234 et seq by Bell.
+\item [PDM]: the techniques used are described by M M Dworetsky in Mon Not R
+astr Soc (1983) 203, 917-924 and the references given in that paper.
+\item [MEMPOW/FILLGAP]: use techniques described by T J Ulrych and T N Bishop in
+Reviews of Geophysics and Space Science (1975), 13, 183-200 and G G Fahlman and
+T D Ulrych in Mon Not R astr Soc (1982), 199, 43-65.
+There is also an exhaustive review of processing Time Series data, including
+some discussion of auto-regressive models, by J D Scargle in Ap J (Supp) (1981),
+45, 1-71.
+The actual algorithms adopted were supplied by L A Balona of SAAO.
+\item [FFTPOW]: the algorithm used is described in the NAG documentation under
+C06FAF.
+\end{description}
+Many of the other applications in this package were first written by C D Pike at
+RGO.
+I have simply combined them into what I hope is a harmonious whole.
+The package has been used extensively by E N Walker at RGO who has made many
+valuable comments and suggestions for improvement.
+
+\section {IAM --- Image Analysis}
+
+The IAM (Image Analysis Mode) set of programs is designed to automatically
+locate and produce parameterised information for all objects in an image frame
+of any size.
+The parameters produced for each object include X and Y positions and
+orientations computed from both unweighted and intensity weighted moments, an
+area, the maximum intensity, magnitude and ellipticity.
+There are programs for plotting image frames, histograms and results on the
+ARGS, but it is possible to run the analyser without doing any graphics.
+
+The algorithm used by IAM is the same as that employed by the COSMOS measuring
+machine working in IAM mode and has been described by Lutz (1979a, 1979b) (for
+further details see the COSMOS users handbook).
+Basically, it is a thresholding procedure and only objects brighter than a
+preset threshold (THRLD) are detected.
+It also requires the sky background level (SKY).
+To avoid detection of spurious noise spikes, objects must also be larger than a
+certain minimum size, the area cut (AREA).
+Should you know the magnitude of the sky background in one pixel (SKYMAG), that
+can be set; the default value is 0.0.
+
+These four user-defined variables (SKY,THRLD,AREA,SKYMAG) control the analysis.
+AREA and SKYMAG have defaults of 10 pixels and 0.0 magnitude, but can be
+changed.
+However, you must assign values to SKY and THRLD {\em before} the analysis takes
+place.
+Do this by entering values from the keyboard with {\bf SET}-commands, or by
+using the ARGS cursor and {\bf GET}-commands.
+The cursor commands work on an intensity histogram of the image previously
+plotted by {\bf IAMHIS}.
+The histogram range can be changed by typing new limits or by using the cursor.
+To draw a histogram of a new image, the limits may either be left alone or
+cleared with {\bf CLRLIM}.
+You may plot on ARGS quadrants both the image and a thresholded version (from
+THRLD).
+
+Having set all the user-defined variables, run the analyser program
+{\bf IAMANAL}.
+You are prompted for the name of the output frame to hold the results (PARAMS
+file).
+Then the results may be plotted on the ARGS (perhaps superimposed over the
+image frame) with {\bf IGPLOT}, or plotted on the Versatec with {\bf IGJOB}, or
+printed with {\bf IAMPR}.
+\subsection {Programs}
+When programs draw or plot on an ARGS quadrant you will be prompted for the
+quadrant from [A,B,C,D] which have the meanings shown.
+\begin{verbatim}
+                                     B A
+                                     C D
+\end{verbatim}
+\begin{enumerate}
+\item Help.
+\begin{description}
+\item [IAMHELP]:
+displays abbreviated help information for IAM.
+The first page is general information, then press $<$CR$>$ and the second page,
+a list of IAM programs, will appear.
+\end{description}
+\item Intensity Histogram
+\begin{description}
+\item [IAMHIS]:
+plots an intensity histogram of a given image frame on an ARGS quadrant using
+the currently defined histogram limits.
+If no limits have been defined, or {\bf CLRLIM} has been run just before,
+{\bf IAMHIS} takes the limits as the minimum and maximum values in the frame.
+You are prompted for the image frame.
+To draw a histogram of a new frame where the current limits are not wanted,
+clear them with {\bf CLRLIM}.
+However, if the two frames are related the same limits may still be used.
+{\bf IAMHIS} should be the first histogram program run.
+The sole purpose of drawing the histogram is to later use {\bf GETSKY} or
+{\bf GETTHR} to set SKY or THRLD graphically.
+If this is not desired the histogram need not be drawn.
+\item [SETLIM]:
+sets new limits for the histogram by allowing you to type in the values.
+The current limits are shown first and also the `default' limits which are the
+minimum and maximum values in the frame.
+No change will be apparent on the screen until {\bf IAMHIS} is run again.
+\item [GETLIM]:
+gets new histogram limits by allowing you to position the ARGS cursor at the
+required place on a histogram previously drawn by {\bf IAMHIS}.
+First the lower limit is obtained, then the upper one.
+Only the X-coordinate of the cursor is relevant.
+\item [CLRLIM]:
+clears any current histogram limits so that the next time {\bf IAMHIS} is run
+it will use the minimum and maximum values in the frame as limits.
+It should be used when you have finished histogramming one frame and wish to go
+onto another with different limits.
+However, if the two frames are related perhaps the same limits will be
+appropriate and {\bf CLRLIM} should not be run.
+\end{description}
+\item Assigning User-Defined Variables
+\begin{description}
+\item [SETAREA]:
+enters from the keyboard a new value for AREA (the area cut).
+The value should be an integer number of pixels greater than 1 (default 10).
+The area cut is the minimum permitted size of an object, to deter the analyser
+taking noise spikes for objects.
+\item [SETMAG]:
+enters from the keyboard a new value for SKYMAG, the magnitude of the sky
+background in one pixel.
+The value should be a real number $\geq0.0$.
+The most generally used value is expected to be the default of 0.0.
+\item [SETPER]:
+enters from the keyboard a new value for the threshold, THRLD, expressed as a
+percentage above the sky background (SKY).
+Thus, entering 20.0 would give THRLD a value of SKY+SKY/5.
+The program will terminate with an error message if SKY has not been set.
+\item [SETALL]:
+changes all four user-defined variables by entering new values from the
+keyboard.
+They are set one after another.
+In case you only want to change some of them it displays the current values as
+defaults and you press $<$CR$>$ to accept them.
+\item [GETSKY]:
+sets a new value of SKY (the sky background level) by allowing you to position
+the ARGS cursor at the desired place on an intensity histogram.
+This must have been drawn previously by {\bf IAMHIS} and can be in any ARGS
+quadrant.
+The value for SKY is the intensity corresponding to the cursor's X-coord (the
+Y-coord is irrelevant).
+\item [GETTHR]:
+assigns a new value to THRLD (the analyser threshold) by using the ARGS cursor
+in the same way as {\bf GETSKY}.
+\end{description}
+\item Plotting Image Frames on the ARGS.
+\begin{description}
+\item [APLOT]:
+plots a frame of any size on the whole ARGS screen, shrinking or padding as
+needed (see LUN/9 (ROE)).
+{\bf APLOT} and {\bf APLOTQ} (below) are not part of IAM but are documented here
+for completeness.
+\item [APLOTQ]:
+same as {\bf APLOT} except it plots to an ARGS quadrant not the whole screen;
+does not clear quadrant first (see LUN/9 (ROE)).
+\item [CLRQUAD]:
+clears the quadrant you specify (prompted for).
+\item [PLOTQTH]:
+same as {\bf APLOTQ} except the image frame is thresholded (using THRLD) and
+then plotted to an ARGS quadrant.
+Thus, only pixels with intensity greater than THRLD are plotted.
+Like {\bf APLOTQ} it can handle image frames of any size.
+It does not clear the quadrant first.
+It can be used before running the analyser to see if a suitable threshold has
+been chosen for this frame.
+THRLD should have been assigned beforehand.
+You are prompted for the frame.
+\end{description}
+\item Analysing the image.
+\begin{description}
+\item [IAMANAL]:
+is the analyser program.
+Before running it, you should at least have assigned SKY and THRLD (AREA and
+SKYMAG have defaults).
+You are prompted for the image frame and also for the name of the output file
+(PARAMS file) to hold all the objects found.
+The four user-defined variables control the analysis.
+When {\bf IAMANAL} has finished it displays on your terminal the number of
+objects found.
+\end{description}
+\item Displaying the Objects found by IAMANAL.
+\begin{description}
+\item [IGPLOT]:
+plots the objects found by the analyser on an ARGS quadrant.
+Each object is represented by an ellipse except that objects with areas less
+than 2 pixels are not plotted.
+If the same quadrant as one that has been used for {\bf APLOTQ} or
+{\bf PLOTQTH} is chosen, the ellipses will be superimposed over the actual
+objects in the image frame.
+Thus, you can easily tell if particular objects have been found by the analyser
+or not.
+You are prompted for the name of the {\bf IAMANAL} output file containing the
+objects.
+\item [IGJOB]:
+plots the same picture of the objects found by {\bf IAMANAL} as {\bf IGPLOT}
+but on a Versatec.
+It creates a standard Versatec output file and after it has finished you must
+issue the local command to send the file to the Versatec (at ROE it is VPLOT).
+The actual name of this Versatec output file need not be given and it is
+deleted after the job has finished.
+\item [IAMPR]:
+prints a list of the objects found by {\bf IAMANAL}.
+You are prompted for the name of the analyser output file containing the
+objects.
+Section 9.2 gives details of this listing.
+\end{description}
+\end{enumerate}
+\subsection {Parameters generated}
+The listing produced by {\bf IAMPR} firstly gives the sky background, threshold,
+area cut (in pixels), and sky magnitude used.
+These are followed by the parameters determined for each object located.
+These can be divided into those produced from unweighted moments, those produced
+from intensity weighted moments, and others.
+They are:
+\begin{description}
+\item [GENERAL]:
+\begin{description}
+\item [NUM]: A running count of the objects.
+\end{description}
+\item [UNWEIGHTED PARAMETERS]:
+\begin{description}
+\item [XCEN]: X coordinate of the centre of the object (pixels).
+\item [YCEN]: Y coordinate of the centre of the object (pixels).
+\item [AU]: Semi major axis of the object (pixels).
+\item [BU]: Semi minor axis of the object (pixels).
+\item [THETAU]: The orientation of the object, measured anticlockwise from a
+y-axis aligned along the y direction pointing in the direction of increasing y.
+The value is returned in degrees and ranges from 0 to 180.
+The value 0 is returned when an orientation could not be assigned to an object.
+\end{description}
+\item [INTENSITY WEIGHTED PARAMETERS]:
+\begin{description}
+\item [XCEN]: X coordinate of the centre of the object (pixels).
+\item [YCEN]: Y coordinate of the centre of the object (pixels).
+\item [AI]: Semi major axis of the object (pixels).
+\item [BI]: Semi minor axis of the object (pixels).
+\item [THETAI]: The orientation of the object, measured anticlockwise from a
+y-axis aligned along the y direction pointing in the direction of increasing y.
+The value is returned in degrees and ranges from 0 to 180.
+The value 0 is returned when an orientation could not be assigned to an object.
+\end{description}
+\item [OTHER PARAMETERS]:
+\begin{description}
+\item [AREA]: Area of the object at the threshold level.
+\item [IMAX]: The maximum intensity found in the object.
+\item [MAG]: The integrated magnitude of the object above the threshold (ie.\ a
+thresholded magnitude).
+If a Sky Magnitude is given this is used to derive the magnitude scale,
+otherwise the magnitudes have an arbitrary zero point.
+\item [ELLIPT]: The ellipticity of the object, given by:
+\begin{verbatim}
+             ellipticity = 1 - (bu/au)
+\end{verbatim}
+computed from the unweighted parameters.
+\end{description}
+\end{description}
+\subsection {Example}
+This section contains a simple example of using IAM.
+Not all the programs are included.
+Input typed by the user is in {\em italics}.
+Responses from the computer are in lower case.
+Comments are in parentheses.
+The analyser is run on a test image frame (TESTIM) with SKY being obtained from
+the cross-hair cursor and THRLD as a percentage above sky.
+Note that no values are given for AREA and SKYMAG so the default values are
+used.
+\begin{quote}
+\begin{tabbing}
+AAA\=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\=\kill
+{\em ARESET}\>\>(Clear ARGS screen)\\
+\\
+{\em APLOTQ}\>\>(Display image frame)\\
+\>give image frame\\
+{\em TESTIM}\>\>(test image)\\
+\>specify quadrant\\
+{\em A}\>\>(top right quadrant)\\
+\\
+{\em IAMHIS}\>\>(Plot histogram)\\
+\>input image frame\\
+{\em TESTIM}\\
+\>specify quadrant\\
+{\em B}\>\>(top left quadrant)\\
+\\
+{\em GETLIM}\>\>(Change limits with cursor)\\
+\>mark minimum of required range\>(user would indicate min and)\\
+\>mark maximum of required range\>(max with cross-hair cursor)\\
+\\
+{\em IAMHIS}\>\>(Draw histogram with new limits)\\
+\>input image frame\\
+{\em TESTIM}\\
+\>specify quadrant\\
+{\em C}\>\>(in bottom left quadrant)\\
+\\
+{\em GETSKY}\>\>(Indicate SKY with cursor)\\
+\>place cursor on required point on histogram\\
+{\em SETPER}\>\>(Set THRLD as \% above SKY)\\
+\>give thrld as a percentage of sky\>(enter number or type)\\
+\>20.0\>($<$CR$>$ for default of 10.0)\\
+\\
+{\em PLOTQTH}\>\>(Threshold and plot image frame)\\
+\>input image frame\\
+{\em TESTIM}\\
+\>specify quadrant\\
+{\em D}\>\>(in bottom right quadrant)\\
+\\
+{\em IAMANAL}\>\>(Analyse image frame)\\
+\>input image frame\\
+{\em TESTIM}\\
+\>enter file for params\\
+{\em TESTIMPAR}\>\>(name of output file)\\
+\>number of objects = 20\>(say 20 objects found this time)\\
+\\
+{\em IGPLOT}\>\>(Plot ellipse for each object)\\
+\>enter params file\\
+{\em TESTIMPAR}\>\>(IAMANAL output file)\\
+\>specify quadrant\\
+{\em D}\>\>(superimpose on threshold plot)\\
+\\
+{\em IGJOB}\>\>(Plot same results on Versatec)\\
+\>enter params file\\
+{\em TESTIMPAR}\\
+\>Versatec plot file created by FINGS\\
+\>now type Versatec plot command at your\\
+\>node for FINGS (VPLOT at ROE)\\
+{\em VPLOT}\>\>(Versatec command at ROE)\\
+\\
+{\em IAMPR}\>\>(Finally print list of objects)\\
+\>enter params file\>(on lineprinter)\\
+{\em TESTIMPAR}
+\end{tabbing}
+\end{quote}
+\subsection {References}
+\begin{itemize}
+\item COSMOS users handbook.
+\item Lutz R K (1979a) `Image Processing in Astronomy',  Eds. G Sedmak, M
+Capaccioli and R J Allen, Osservatorio Astronomico di Trieste. p218.
+\item Lutz R K (1979b) Computer Journal Vol.23 No.3 p262.
+\end{itemize}
+
+\section {2D polarization programs}
+
+This section describes programs for the reduction and display of two-dimensional
+polarimetry data.
+The programs are the following:
+\begin{description}
+\item [POLAR]:
+Given two frames containing the Stokes parameters Q and U, produce
+two frames containing the corresponding values of total polarization and
+polarization angle.
+A plot of the polarization vectors is produced on the specified graphics device.
+\item [STOKES]:
+Given two frames containing values of total polarization and polarization angle,
+two frames containing the corresponding Stokes parameters Q and U are generated.
+\item [PRPLOT]:
+Given two frames containing values of total polarization and polarization angle,
+a plot of the polarization vectors is created on the specified graphics device.
+The user is prompted for the X and Y start and end values for the plot; the
+default values correspond to the whole frame.
+\item [CVPLOT]:
+Given a frame containing an image and two frames containing the corresponding
+values of total polarization and polarization angle, an annotated plot of
+the polarization vectors superimposed on a contour map of the image is produced
+on the specified graphics device.
+The contour map can be produced from either the raw or smoothed image.
+The image can be smoothed using either a box average or a gaussian.
+\item [THRESH]:
+Given an input image plus two user supplied threshold values, an output image is
+generated in which all pixels in the input image having values less than the
+lower threshold value or greater than the upper threshold value have been set
+equal to zero.
+\end{description}
+\subsection {Background}
+These programs were originally written for imaging polarimetry observations made
+with a CCD array detector.
+The raw data from these observations took the form of four image frames, one at
+each of four positions of a rotatable halfwave plate (retarder), plus four
+flatfield frames, one for each image frame.
+The image frame details are given below:
+\begin{verbatim}
+       ANGLE OF THE HALFWAVE PLATE            IMAGE FRAME
+              (degrees)
+                 0.0                                 A
+                45.0                                 B
+                22.5                                 C
+                67.5                                 D
+\end{verbatim}
+Frames A and B are used for calculating the Q frame which contains the Stokes
+parameter Q; frames C and D for calculating the U frame which contains the
+Stokes parameter U; all four are used for calculating the E frame which contains
+the Poissonian error.
+A, B, C, D, Q, U and E are two dimensional `images' with typical elements
+$A_{ij}$, $B_{ij}$,\ldots,$E_{ij}$.
+Before the raw image frames can be combined to form the Q, U and E frames, each
+frame must have the CCD bias removed and be corrected by its flatfield frame.
+The four image frames A, B, C and D have to be correctly aligned with respect to
+each other by using the positions of the stellar images on each frame.
+Finally, each image is sky subtracted and thresholded at a level of at least 15\%
+above the sky background.
+
+The Q, U and E frames can now be calculated as follows:
+\[Q_{ij}=\frac{A_{ij}-B_{ij}}{A_{ij}+B_{ij}}\]
+\[U_{ij}=\frac{C_{ij}-D_{ij}}{C_{ij}+D_{ij}}\]
+\[E_{ij}=\frac{2}{A_{ij}+B_{ij}+C_{ij}+D_{ij}}\]
+The total polarization frame, P, and polarization angle frame, T, are generated
+from Q, U and (if required) E as follows:
+\[P_{ij}=\sqrt{{Q_{ij}}^{2}+{U_{ij}}^{2}}-E_{ij}\]
+\[T_{ij}=0.5\arctan \frac{U_{ij}}{Q_{ij}}\]
+The values of Tij are restricted to the range 0 to +$\pi$ radians.
+\subsection {General}
+Programs {\bf POLAR} and {\bf PRPLOT} can both be used to overlay the
+polarization vector plot on an image displayed on the ARGS.
+Both programs produce a fixed sized plot which occupies a central square of
+320 by 320 pixels on the ARGS.
+If it is desired to overlay the vector plot on an image on the ARGS, the image
+should be displayed such that it occupies the central 320 by 320 pixels.
+The easiest way to do this is to generate a 320 by 320 pixel copy of the image.
+The ASPIC command {\bf SQORST} (which stands for SQuash OR STretch) can be used
+to do this.
+{\bf SQORST} will prompt for the name of the input image and will then request
+the values of the dimensions for the copy and a filename for the new image.
+The ASPIC command {\bf ADISP} can then be used to display the 320 by 320 copy of
+the image.
+{\bf ADISP} will request the X and Y ARGS coordinates (in pixels) for the
+centre of the image, the default value of 256 in X and Y should be used.
+The values of the image between which the 0 to 255 scaling will be performed are
+requested, the default values are the minimum and maximum values in the image.
+
+If {\bf PRPLOT} is being used to plot only a section of the polarization vector
+data, the ASPIC routines {\bf PICK} or {\bf MANIC} can be used to extract the
+corresponding section of the image prior to being scaled to 320 by 320 pixels
+and displayed.
+
+In programs {\bf POLAR}, {\bf PRPLT} and {\bf CVPLOT}, the interval at which
+the polarization vectors will be plotted depends on the extent of the plot in
+pixels as follows:
+\begin{verbatim}
+                   EXTENT             INTERVAL
+
+                 1 to  64 pixels      1 pixel
+                65 to 128   "         2 pixels
+               129 to 256   "         4   "
+                    > 256   "         8   "
+\end{verbatim}
+This is intended to reduce the confusion caused by overlapping vectors in a
+large image.
+The scale factor for the polarization vectors is such that a value of 1.0
+produces 100\% polarization vectors having a length corresponding to 4 pixels in
+the input images.
+Only those vectors for which the total polarization is greater than zero are
+plotted.
+
+The graphics devices that can be specified are the ARGS, VERSATEC, T4014 and
+T4010.
+The annotation for the plots will only appear in its correct form on the T4014
+and the VERSATEC.
+\subsection {Using the programs}
+The programs must be run from within DSCL or by using the RUNSTAR command.
+The filenames of all files needed for input/output will be prompted for, as will
+all other parameters required by the programs.
+Detailed information on the use of each program is given below.
+\begin{description}
+\item [POLAR]:
+The filenames of the Q and U frames are prompted for and then a filename and
+title is requested for each of the total polarization and polarization angle
+output frames.
+An instrumental angle to be added to the polarization angle is required, the
+default is 0 degrees.
+The values of polarization angle calculated by {\bf POLAR} will have values in
+the range 0 to $\pi/2$ radians.
+The option is given to provide an error frame, the default reply is Yes.
+If an error frame is to be provided, its filename will be prompted for.
+The graphics device on which the plot is to be produced is requested, the
+default device is the ARGS.
+A scale factor for the vectors must be provided, the default value is 1.0, see
+section 10.2.
+If the graphics device specified was the ARGS you will be asked if the plot is
+to be overlayed on an image displayed on the ARGS; the default reply is No.
+If no overlaying is to be done, the ARGS is cleared; otherwise, just the overlay
+plane is cleared.
+\item [STOKES]:
+The filenames of the files containing the total polarization and polarization
+angle data are prompted.
+A filename and a title is then requested for each of the files to contain the
+Q and U parameters.
+\item [PRPLOT]:
+The filenames of the total polarization and polarization angle frames will be
+prompted, followed by the X and Y ranges for the plot.
+The default values correspond to the whole frame.
+The graphics device for the vector plot will be prompted; the default device is
+the ARGS.
+A scale factor for the polarization vectors is required; the default value is
+1.0, see section 10.2
+If the device specified was the ARGS, an overlay option is given.
+The default reply is No which causes the ARGS to be cleared.
+If Yes is specified, only the overlay plane is cleared.
+\item [CVPLOT]:
+When CVPLOT is run, three data frames will be requested.
+The first should contain the image from which the contour map is to be produced,
+the second should contain the total polarization at each point in the image and
+the third should contain the angle of polarization corresponding to each value
+of total polarization.
+The parameters which define the layout of the diagram will then be prompted:
+\begin{itemize}
+\item Polarization vector scale factor:
+(Range 0.1 to 10.0, default 1.0; see section 10.2).
+\item Angle to be added to the polarization angle:
+(Range -180.0 degrees to +180.0 degrees, default 0.0 degrees; all the
+polarization vectors will be offset by this angle).
+\item Title for the plot:
+(An 80 character string which will be plotted above the diagram).
+\item Number of contours for the contour plot:
+(Range 1 to 20, default 10).
+\item Base contour level:
+(Range -1E10 to +1E10, default 0.0; this is the value of the first contour
+which will be plotted).
+\item Interval between contours:
+(Range -1E10 to +1E10, default 100.0; this is the separation of successive
+contours).
+\item Type of smoothing:
+(Options are NONE, BOX average or GAUSSIAN, default is NONE; the image used for
+the contour map can be smoothed prior to contouring).
+\item If a BOX average is requested, the size of the smoothing box will be
+prompted:
+(Range 3 pixels to 15 pixels, default 5 pixels; this must be an odd number of
+pixels.
+If an even number is given it is incremented by one).
+\item If a GAUSSIAN is requested, the size of the box over which smoothing is
+performed will be requested in the same way as for the box average and then the
+value of sigma for the smoothing gaussian will be prompted:
+(Range 1.0 pixels to 10.0 pixels, default 2.0 pixels).
+\item Graphics device for the plot:
+(Options are T4014, T4010, ARGS or VERSATEK; the default is the T4014).
+\item If the device requested was the T4014, T4010 or ARGS, after the plot is
+finished the option to produce a copy on the VERSATEK is available:
+(the default is No).
+\item Another plot using the same data is prompted:
+(the default is No; if the reply is Yes, the sequence will start again from
+prompting for the polarization vector scale factor; if it is No, the program
+terminates; any plot files produced for the VERSATEK can now be submitted using
+the appropriate local command eg.\ VPLOT at ROE).
+\end{itemize}
+\item [THRESH]:
+When THRESH is run it will prompt for the following:
+\begin{itemize}
+\item The filename of the image to be thresholded.
+\item The lower threshold value.
+All pixels in the input image having values less than or equal to this lower
+threshold will be set equal to zero in the output image.
+\item The upper threshold value.
+All pixels in the input image having values greater than or equal to this upper
+threshold will be set equal to zero in the output image.
+\item The filename of the file to hold the thresholded image.
+\end{itemize}
+For both of the threshold values the default value is 0.0 with a range of
+possible values from -1.E19 to +1.E19.
+\end{description}
+
+\section {References}
+
+\begin{itemize}
+\item SUN/4: `INTERIM --- Starlink software environment'
+\item SUN/23: `ASPIC --- Image processing programs (1)'
+\item LUN/9 (ROE): `New ARGS commands available in ASPIC'
+\item LUN/25 (RGO): `A set of programs for analysing periodic data'
+\end{itemize}
+\end{document}

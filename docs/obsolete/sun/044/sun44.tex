@@ -1,0 +1,596 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {44.1}
+\newcommand{\stardocauthors}   {C A Clayton}
+\newcommand{\stardocdate}      {28 July 1988}
+\newcommand{\stardoctitle}     {VAXnotes --- An introduction}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+This Starlink User Note has been produced in order to provide a basic 
+guide to the use of the VAXnotes conferencing facility.
+At present, there are two sources of instruction on the use of VAXnotes
+in addition to this document:
+
+\begin{itemize}
+
+\item The VAXnotes on-line help facility is effective once you
+have already had some experience with VAXnotes. In addition to having
+the usual lists of commands along with their qualifiers, there are
+also brief guides to using VAXnotes.
+
+\item Guide to VAXnotes and VAXnotes command dictionary. This DEC
+guide resides in one of the small orange document binders. Unfortunately,
+there is generally only one of these guides per site. In
+addition this guide is almost too detailed and can put off the novice user.
+
+
+\end{itemize}
+
+This user note is intended to fill the gap between the above two sources
+of information by providing a gentle introduction to the main features and
+new terminology.
+In addition, it describes VAXnotes from an astronomer's
+point of view and details the implementation of VAXnotes by Starlink.
+Throughout this document you will see entries such as (4.1.4). 
+This is to tell the reader to look at section 4.1.4 in the ``Guide to
+VAXnotes'' manual for further information on the subject under discussion.
+
+\section{What is VAXnotes?}
+
+VAXnotes is a computer conferencing facility which allows users to create and
+access on-line conferences. VAXnotes allows users to conduct
+what may be regarded as meetings, with people in different geographical locations, so that participants
+can join in a discussion from their own desks at a time of their own choice. It
+also offers the advantage of keeping a detailed record of the proceedings of a
+meeting which can be searched by a variety of criteria, such as name of
+participant, subject or keyword. 
+
+A private meeting to discuss Starlink security, an electronic
+bulletin board to announce astronomical seminars, or a public forum on
+circumstellar dust might all be examples of VAXnotes {\bf Conferences}. 
+
+A conference is organized into any number of {\bf Topics}, each of which can
+have any number of {\bf Replies}.  A topic and its associated replies are
+called a {\bf Discussion}.  Topics are identified as n.0, where n is a
+number assigned sequentially by the system.  Replies to a topic note
+are also sequentially numbered, starting with .1.  If topic 4 has 3
+replies, the replies are numbered 4.1, 4.2, and 4.3.  Topics and
+replies are referred to collectively as {\bf Notes}.
+
+The first time you invoke VAXnotes, a {\bf Notebook} is automatically
+created for you.  In your Notebook, you store the names of conferences
+you are interested in.  This figure shows how a typical Notebook might
+be organized, and how notes are arranged in a conference:
+
+\begin{verbatim}
+
+
+
+    +--------------------------------+     +---------------+     +-------------+
+    |             VAXnotes           |     | Your Notebook |   ->| Conference J|
+    | +-------------+ +------------+ |     |               |  /  |             |
+    | |     All     | |    Your    | | --->|  conference F | /   | Topic 1     |
+    | |             | |  Notebook  | |/    |  conference J _/    |   Reply 1.1 |
+    | |  Available  | |    ****    |_/     |  conference P |     |   Reply 1.2 |
+    | |             | |(conferences| |     +---------------+     | Topic 2     |
+    | | Conferences | |     of     | |                           |   Reply 2.1 |
+    | |             | |  interest) | |                           |   Reply 2.2 |
+    | +-------------+ +------------+ |                           |   Reply 2.3 |
+    +---|----------------------------+                           |      .      |
+        |     +---------------+                                  |      .      |
+        |     | conference  A |                                  +-------------+
+        |---> | conference  B |
+              | conference  C |
+              |     .         |
+              |     .         |
+              |     .         |
+              | conference  Z |
+              +---------------+
+
+\end{verbatim}
+
+In an active conference, you need some way of keeping up with the latest
+conversation. VAXnotes maintains a record of the notes that you have or
+have not read in a conference, and provides convenient ways for you to 
+access only the notes that are new to you. Until you read the note, it
+is marked as {\bf unseen}. VAXnotes marks notes you have read as {\bf seen}.
+
+\section {Basic VAXnotes Commands}
+
+To invoke VAXnotes, type:
+
+\begin{quote}\tt
+\$ NOTES
+\end{quote}
+
+A sample conference exists at every site. You can use this sample
+conference to get hands--on experience with VAXnotes. When you invoke
+VAXnotes for the first time, an entry for this conference is automatically
+added to your Notebook and given the entry name SAMPLE\_CONFERENCE.
+
+You can get online HELP for VAXnotes commands and key definitions
+at any time during a VAXnotes session.  
+To get help on VAXnotes commands, type:
+
+\begin{quote}\tt
+Notes> HELP
+\end{quote}
+
+If an error occurs while in VAXnotes and you need more information
+about the cause of it, type SHOW ERROR.  The full text of the last
+error message is displayed on the screen.
+
+Users are strongly recommended to become familiar with the VAXnotes keypad.
+Most of the keys are used for moving around within and between 
+discussions in a conference with great speed.
+To see the key definitions for the VAXnotes keypad, press PF2.  
+
+Before you can read the notes in a conference, you must first add the
+conference to your Notebook, then open the conference. The first step is
+to find out what conferences are available and to which you are allowed access:
+
+\begin{quote}\tt
+Notes> DIRECTORY/CONFERENCES
+\end{quote}
+
+The name of each conference appears in capital letters.  The title briefly
+describes the subject of the conference.
+
+To see a listing of the conferences at a remote node type: 
+
+\begin{quote}\tt
+Notes> DIRECTORY/CONFERENCE nodename
+\end{quote}
+
+To add a conference to your Notebook, use the ADD ENTRY command.  For
+example, to add the SUPERNOVA conference to your Notebook, type:
+
+\begin{quote}\tt
+Notes> ADD ENTRY SUPERNOVA
+\end{quote}
+
+If the conference is located on a remote node (e.g. QUVAD), then
+you must instead issue the command:
+
+\begin{quote}\tt
+Notes> ADD ENTRY QUVAD::SUPERNOVA
+\end{quote}
+
+To open a conference, use the OPEN command.  For example, to open the
+SUPERNOVA conference, type:
+
+\begin{quote}\tt
+Notes> OPEN SUPERNOVA
+\end{quote}
+
+A conference is organized into discussions.  Each discussion begins with a
+topic, each having any number of replies.  Topics are numbered consecutively,
+starting with 1.  Replies are also numbered consecutively, by topic, starting
+with .1.  
+
+To see a listing of the topics in a conference, type:
+
+\begin{quote}\tt
+Notes> DIRECTORY
+\end{quote}
+
+To include replies, as well as topics, in the listing, type:
+
+\begin{quote}\tt
+Notes> DIRECTORY *.*
+\end{quote}
+
+The DIRECTORY command has many command qualifiers (2.18). For example,
+it is possible to get directory listing of notes by a given author, 
+those created before or after a certain date, or those which contain a given
+character string in the title.
+
+Use NEXT SCREEN (0 on the keypad) and PREVIOUS SCREEN (. on the keypad)
+to scroll through the directory.
+
+To read a specific topic or reply, type the note-ID number at the Notes$>$
+prompt.  For example, to read the third reply to topic 6, type:
+
+\begin{quote}\tt
+Notes> 6.3
+\end{quote}
+
+Use the ENTER or RETURN key to page through the replies in a discussion.
+
+In order to read only new notes use NEXT UNSEEN (, on the keypad).
+
+VAXnotes provides three separate screen-oriented user interfaces for
+editing, allowing users to specify use of EVE, EDT-style keypad
+interface, or WPS-style Gold keypad interface on ANSI-compatible terminals.
+A full line mode editor is also available for non-ANSI terminal devices.
+
+To set up EVE, the VAXnotes editor, with the EDT-style keypad, type the
+following command:
+
+\begin{quote}\tt
+Notes> SET PROFILE/EDITOR=EDT
+\end{quote}
+
+To add a reply to a discussion, use the REPLY command.  You must be reading
+a reply (or the topic) in the discussion before you issue the REPLY command.
+For example, to add a reply to the discussion on topic 10, type:
+
+\begin{quote}\tt
+     Notes> 10
+
+     Notes> REPLY
+\end{quote}
+
+To start a discussion on a new topic, type:
+
+\begin{quote}\tt
+Notes> WRITE
+\end{quote}
+
+To print notes, use the PRINT command.  If you do not specify a range of
+notes to print, VAXnotes assumes you want to print the note you are
+currently reading.  For example, to print topic 3 and all replies to that
+topic, type:
+
+\begin{quote}\tt
+Notes> PRINT 3.*
+\end{quote}
+
+To extract (or save) the note you are currently reading 
+into a file called SPECTRUM.TXT, type:
+
+\begin{quote}\tt
+Notes> EXTRACT SPECTRUM.TXT
+\end{quote}
+
+To leave a conference, use the CLOSE command.  You can also press CTRL/Z
+in place of the CLOSE command.  For example, to close a conference:
+
+\begin{quote}\tt
+Notes> CTRL/Z
+\end{quote}
+
+To update the record of which notes you have or have not read type:
+
+\begin{quote}\tt
+Notes> UPDATE
+\end {quote}
+
+To end your VAXnotes session, use the EXIT command (or press CTRL/Z).
+For example, to exit VAXnotes, type:
+
+\begin{quote}\tt
+Notes> EXIT
+\end{quote}
+
+The following table shows introductory commands and gives a brief
+description of each command.  
+
+\begin{tabular}{ l l }
+& \\
+\hline
+& \\
+{\large \bf Command}  & {\large \bf Description} \\
+& \\
+\hline
+& \\
+ADD ENTRY                &Adds a conference to your Notebook.\\
+CLOSE (or CTRL/Z)        &Leaves a conference and returns you to your Notebook.\\
+DIRECTORY                &Lists notes in a conference.\\
+DIRECTORY/CONFERENCES    &Lists available conferences.\\
+DIRECTORY/NOTEBOOK       &Displays a listing of the entries in your Notebook.\\
+EXIT (or CTRL/Z)         &Ends a VAXnotes session.\\
+EXTRACT (or SAVE)        &Creates a text file containing the notes you specify.\\
+HELP                     &Accesses on--line HELP about VAXnotes commands.\\
+NOTES                    &Invokes VAXnotes from DCL level.\\
+OPEN                     &Opens an existing conference in your Notebook.\\
+PRINT                    &Prints notes.\\
+READ                     &Displays a note.\\
+REPLY                    &Enters a reply to a topic.\\
+SHOW ERROR               &Displays more information after an error.\\
+UPDATE                   &Updates the ``unseen'' count in the Notebook directory.\\
+WRITE                    &Enters a new topic.\\
+
+\end{tabular}
+
+\section {Your Notebook}
+
+Your VAXnotes Notebook defines your VAXnotes working environment. Your Notebook
+contains your personal list of conferences of interest to you ({\bf entries})
+and a {\bf profile} that tailors your VAXnotes sessions. 
+
+An entry is a conference that you have added to your Notebook. When you
+make a conference an entry in your Notebook, VAXnotes keeps track 
+of which notes you have and have not seen in this conference.
+
+A profile is automatically created for you when you first invoke VAXnotes,
+and contains all the information that VAXnotes needs to operate. Your profile
+is useful for simplifying tasks that you perform repeatedly and for 
+personalizing notes that you write. Your current profile settings
+can be displayed by issuing the command:
+
+\begin{quote}\tt
+
+Notes> SHOW PROFILE
+
+\end{quote}
+
+In your profile you can tell VAXnotes:
+
+\begin{itemize}
+
+\item which editor to use by default with commands such as
+SET PROFILE/EDITOR=EDT or SET PROFILE/EDITOR=EVE.
+
+\item which qualifiers to use with PRINT with commands such as
+SET PROFILE/PRINT = ``COPIES=2 /NOTIFY''. 
+
+\item what personal name you wish to appear with your username
+with commands such as SET PROFILE/PERSONAL=``Dr. John Blout''
+
+\item whether you wish to see a directory, the first unseen note,
+or neither when you first access a conference. This can be done 
+using commands such as SET PROFILE/AUTOMATIC=DIRECTORY or 
+SET PROFILE/NOAUTOMATIC.
+
+\end{itemize}
+
+\section {Other VAXnotes commands and features}
+
+The purpose of this section is to alert users to the existence
+of some of the more advanced
+VAXnotes commands and features, but not to describe them in any great
+detail. The interested user is directed to the Guide to VAXnotes manual (to
+which section references are given). 
+
+\begin{itemize}
+
+\item {\bf Markers} (4.18) are user-defined names pointing to special 
+entries in a note file. Markers can be used whenever a user needs to have a 
+special reminder of things to do, or to recall notes that are frequently 
+referenced.
+
+\item {\bf Keywords} (2.5) allow the user to group notes that are concerned
+with a particular subject or do not have other attributes (such as title,
+author or time on entry) in common. Keywords are useful for grouping notes 
+that may not have a keyword in the note text or title, which can be searched
+for, but which do address the subject the keyword represents.
+
+\item A {\bf Class} (4.3) consists of a group of conferences that are related
+in some way. A class works like a tabbed divider in your notebook to keep
+related conferences together. You can also think of a class as something like a
+mail folder in MAIL, or a VAX/VMS subdirectory.  Unlike a mail folder, however,
+a conference can be in more than one class at a time.  You can create as many
+classes as you want in your Notebook. 
+
+\item It is possible to SEARCH (6.3) a conference for a user specified
+string. For example, if you remember reading a note which mentioned
+at some point in it the work of Hubble, you could search for the 
+string ``Hubble'' to locate the note.
+
+\item Once in a while, you may wish to suspend VAXnotes temporarily
+so that you can start a batch job, read a file, etc. VAXnotes
+provides a SPAWN command (6.4) to let you create a subprocess.
+
+\item Using the SET NOTE command (6.2) it is possible to put a conference
+on a ``shopping list'', hide a note you wrote, and prohibit users from 
+replying to your note.
+
+\item VAXnotes allows notes and replies to be created outside of VAXnotes
+and then later imported into the conference (3.3). This is strongly recommended.
+One advantage is that it is then possible to put the file through the spelling checker
+(which most Starlink sites have) before including your note in a conference.
+
+\item  VAXnotes allows both public and private conferences (5.2). In private
+conferences a {\bf moderator} restricts access to a specific group
+of users. An example of a private conference is the SYSTEMS\_MANAGEMENT
+conference at RL780 where sensitive security matters are sometimes
+discussed. Public conferences have no restrictions on who may participate.
+Most conferences on Starlink are of this type.
+
+\item VAXnotes uses VMSmail to allow users to send notes or messages to
+other users from within VAXnotes (3.6). This is equivalent to `whispering'
+or passing notes at a meeting.
+
+\end{itemize}
+
+\section {Starlink implementation of VAXnotes}
+
+Every Starlink site has VAXnotes installed. However, due to licensing 
+restrictions, VAXnotes is generally only available on one CPU per site. 
+On Local Area VAXclusters, this is the boot node.
+
+VAXnotes conferences can exist at any Starlink site. Such a
+conference can be accessed from any other site. It is not necessary
+to have an account on the node on which the conference you wish to
+access is located.
+
+The conference on RL780 entitled CONFERENCES contains a shopping list of 
+conferences available on Starlink which are of general interest to
+the whole astronomical community (i.e.\ not site-specific) along
+with a brief description of the nature of the conference. Each topic
+in CONFERENCES is linked to the conference that it describes
+so that it is possible to add the conference to your Notebook
+by simply issuing the SELECT command (7 on the keypad) whilst
+you are reading the associated topic.
+
+Most sites have a conference called LOCAL\_CONFERENCES which functions as 
+described above but only contains details of conferences of local interest
+(e.g. seminar lists, hardware information).
+
+
+
+\section {VAXnotes for astronomers}
+
+VAXnotes has the potential to be of great benefit to the Starlink community.
+Below are just a few examples of how astronomers might use the facility.
+
+\begin{itemize} 
+
+\item VAXnotes is the ideal tool for maintaining up-to-date seminar lists by
+using a ``Bulletin Board'' style conference. 
+
+\item Conferences on highly topical subjects (e.g. new supernova in Local Group)
+can be set up in  order to keep interested parties informed of the very latest
+facts. 
+
+\item Conferences on topics such as \TeX / \LaTeX { } or a graphics package
+allows users to exchange tips and present (and have answered) questions
+concerning these packages that are not covered clearly by the manuals. 
+
+\item Local conferences on hardware purchases and the future plans of Starlink
+can be set up to allow users to discuss these matters and give site managers
+and Starlink management a better feel for the needs and wishes of their users. 
+
+\item Lists of catalogues available on tape which individual users have
+acquired (or ordered) could be set up in order to avoid duplication and
+minimise the delay in obtaining such data. 
+
+\item Each Special Interest Group (SIG) has an on-going conference to keep
+members up-to-date on any progress that is made. The occasional meetings of
+these groups are seldom sufficient to discuss all aspects of the area of
+interest embraced by the SIG. 
+
+\end{itemize} 
+
+In short, any group of astronomers with a common interest who need to be aware
+the activities of other members can do so, without the need for meetings
+(costly in time and money), from their own offices. The possibilities
+are enormous and the above examples are only a few personal suggestions of how
+VAXnotes may be of use to you. If you feel that there is a need for a
+conference at your site on a particular subject, then simply ask your site
+manager to create and advertise one for you. Topics which are likely to be of
+interest to the whole of Starlink should be set up at RLVAD. In this case you
+should again approach your local manager who will contact the relevant person. 
+
+
+\section {VAXnotes Command Summary}
+
+This section list all VAXnotes commands alphabetically, and gives a brief description of each command. 
+The basic commands listed in Section 2 are also included. This list is provided as a reference and
+not all the commands below are discussed elsewhere in this user note.
+
+\begin{tabular}{ l l }
+& \\
+\hline
+& \\
+{\large \bf Command}  & {\large \bf Description} \\
+& \\
+\hline
+& \\
+ADD ENTRY               &Adds a conference to your Notebook.\\
+ADD KEYWORD		&Adds an existing keyword to a note.\\
+ADD MARKER		&Adds a marker to the specified note.\\
+ADD MEMBER		&Adds a new member to the conference.\\
+ANSWER			&Is a synonym for Reply.\\
+ATTACH			&Attaches to the parent or specified process.\\
+BACK			&Displays the previous reply in the current discussion.\\
+BACK NOTE		& Displays the previous note.\\
+BACK REPLY 		& Displays the previous reply.\\
+BACK TOPIC		& Displays the previous topic.\\
+CLOSE			& Lets you leave a conference.\\
+CREATE CONFERENCE	& Creates a new conference.\\
+CREATE KEYWORD		& Creates a new keyword for the conference.\\
+DELETE ENTRY		& Removes a conference from your Notebook.\\
+DELETE KEYWORD		& Deletes a keyword.\\
+DELETE MARKER		& Deletes a marker from a note.\\
+DELETE MEMBER		& Deletes a member from a conference.\\
+DELETE NOTE		& Deletes a note you entered in the conference.\\
+DIRECTORY		& Lists topics and replies in a conference.\\
+DIRECTORY/CONFERENCES	& Lists available conferences.\\
+DIRECTORY/ENTRIES	& Lists entries in a specified class.\\
+DIRECTORY/NOTEBOOK	& Is a synonym for Directory/entries.\\
+EVE			& Invokes the EVE editor.\\
+EXIT			& Ends a VAXnotes session.\\
+EXTRACT			& Is a synonym for Save.\\
+EXTRACT/BUFFER		& Is a synonym for Save/Buffer.\\
+FORWARD			& Forwards a note by MAIL.\\
+HELP			& Accesses on--line HELP about VAXnotes commands.\\
+LAST			& Displays the last topic in the conference (if outside VAXnotes).\\
+LAST			& Displays the last reply in the current discussion.\\
+\end{tabular}
+
+\begin{tabular}{ l l }
+& \\
+\hline
+& \\
+{\large \bf Command}  & {\large \bf Description} \\
+& \\
+\hline
+& \\
+MARK			& Is a synonym for Add/Marker.\\
+MODIFY ENTRY		& Changes information about an entry.\\
+MODIFY KEYWORD		& Modifies the name of a keyword.\\
+MODIFY MEMBER		& Modifies information about a member.\\
+NEXT			& Displays the next reply or, if none, the next unseen note.\\
+NEXT NOTE		& Displays the next note.\\
+NEXT REPLY		& Displays the next reply.\\
+NEXT TOPIC		& Displays the next topic.\\
+NEXT UNSEEN		& Displays the next note you have not yet seen.\\
+NOTES			& Invokes VAXnotes from the DCL level.\\
+OPEN			& Opens the specified conference in your Notebook.\\
+PRINT			& Prints notes.\\
+READ 			& Displays the specified note.\\
+READ/MARKER		& Displays the note having the specified marker name.\\
+REPLY			& Adds a reply to the current discussion.\\
+SAVE			& Saves notes in the specified VAX/VMS text file.\\
+SAVE/BUFFER		& Saves notes in the specified buffer.\\
+SEARCH			& Searches a range of notes for notes containing a specified string.\\
+SEND			& Sends a message to one or more users by MAIL.\\
+SET CLASS		& Makes the specified class the default class.\\
+SET CONFERENCE		& Sets characteristics for a conference.\\
+SET MODERATOR		& Enables moderator privileges.\\
+SET NOTE		& Sets attributes for the specified note.\\
+SET PROFILE		& Creates or changes settings in your profile.\\
+SHOW CLASSES		& Lists classes in your Notebook.\\
+SHOW CONFERENCES	& Shows information about the current conference.\\
+SHOW ENTRY		& Shows information about a specified conference in your Notebook.\\
+SHOW ERROR		& Shows the full text of the last error.\\
+SHOW KEYWORDS		& Shows information about current keywords.\\
+SHOW MARKER		& Shows the note number associated with the specified marker.\\
+SHOW MEMBER		& Shows information about all or specified members.\\
+SHOW MODERATOR		& Shows the names of current moderators.\\
+SHOW NOTE		& Shows information about the specified note.\\
+SHOW PROFILE		& Shows information about current profile settings.\\
+SHOW VERSION		& Shows information about the current version of VAXnotes.\\
+SPAWN			& Creates a subprocess.\\
+TOPIC			& Displays the topic for the current discussion.\\
+TPU			& Executes the rest of the command line as a VAXTPU command.\\
+UPDATE			& Determines if new notes have been entered into your Notebook.\\
+WRITE			& Adds a new topic in the current conferences.\\
+\end{tabular}
+
+\end{document} 

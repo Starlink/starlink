@@ -1,0 +1,438 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {112.1}
+\newcommand{\stardocauthors}   {P M Allan}
+\newcommand{\stardocdate}      {14 February 1991}
+\newcommand{\stardoctitle}     {JTMP -- Using the Job Transfer Manipulation Protocol}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}     
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+
+The JTMP software is a component of the Coloured Books software in addition to
+PAD, CBS-mail and TRANSFER. It is also  known as Red Book software. It allows
+you to submit batch jobs to run on remote computers (not necessarily VAXs) and
+to copy files between computers. It is very flexible and is very powerful, but
+as with most such things, it can be difficult to get over the first bump of the
+learning curve and make it do anything at all.
+
+The software is documented in the DEC document `JTMP User Guide', however,
+experience has shown that this manual is fairly incomprehensible and some of
+the examples are simply wrong. The purpose of this document is to give a brief
+description of what JTMP can do and to provide some examples that have been
+proven to work. For further information, despite the caveat above, you are
+referred to the DEC documentation.
+
+\section{Submitting remote batch jobs}
+
+Let us begin by considering how to submit a batch job to run on a remote
+computer system. This first example performs a fairly simple operation, but
+serves to illustrate what can be achieved. The task is simple in the JTMP sense
+in that it submits a batch job to run on a remote computer with only a single
+input file and a single output file (the log file from the batch job). The
+contents of the batch job input file could range from the most trivial (just a
+{\tt SHOW SYSTEM} command) to a complex set of VMS commands, but that is not
+particularly important here. 
+
+JTMP tasks are controlled by a JTMP input file (with default file type of {\tt
+.JIN}), of which the following is an example.
+
+\vspace{5mm}
+
+\verb#%TO/SITE=UK.AC.LEICESTER.STARLINK/NODEFAULT                                         # \fbox{1}\\
+\verb#%SINK/NAME=-JOBMILL                                                                 # \fbox{2}\\
+\verb#%URGENCY/VALUE=LOW                                                                  # \fbox{3}\\
+\verb#%AT/SITE=UK.AC.LEICESTER.STARLINK/USERNAME=/PASSWORD=                               # \fbox{4}\\
+\verb#%REPORT/SINK=-MAIL                                                                  # \fbox{5}\\
+\verb#%FILE/NAME=/LOG                                                                     # \fbox{6}\\
+\verb#%BEGIN/TARGET=UK.AC.MANCHESTER.ASTRONOMY.STARLINK/SPAWN=SUCCESS/LOCAL_SINK=-FILE    # \fbox{7}\\
+\verb#%FILE/OUTPUT/FORMAT=FORMATTED/SINK=LEICESTER_OUTPUT.LIS                             # \fbox{8}\\
+\verb#%END                                                                                # \fbox{9}\\
+
+This particular file is called called {\tt LEICESTER\_BATCH.JIN}. To begin a
+JTMP task, you type
+
+\begin{verbatim}
+$ SEND filename
+\end{verbatim}
+
+where filename is the name of the JTMP input file, so the above task would be
+started by typing
+
+\begin{verbatim}
+$ SEND LEICESTER_BATCH
+\end{verbatim}
+
+{\tt Notes:}
+
+\begin{enumerate}
+
+\item The {\tt \%TO} command defines which site the job is being sent to. In
+order to provide examples that have been thoroughly tested, the local site will
+be UK.AC.MANCHESTER.ASTRONOMY.STARLINK throughout this document. The remote site
+will be either UK.AC.LEICESTER.STARLINK when the remote machine is a VAX or 
+UK.AC.MANCHESTER--COMPUTING--CENTRE.CMS for non-VAX examples. The {\tt
+NODEFAULT} qualifier says that the task should not get default input from a
+skeleton file (see section~\ref{skeletons}).
+
+\item The {\tt \%SINK} command defines the device that is to receive your task.
+It might be  a file, a printer or, as in this case, a batch queue.
+
+\item The {\tt \%URGENCY} command defines the priority to be assigned to your
+task at the remote site.
+
+\item The {\tt \%AT} command lets you define the username and password to be
+used at the remote site. While it is possible to give these in the file, it is
+insecure to do so as someone else might read the file. The method used here of
+giving a null string for your username and password will cause the system to
+prompt you for them.
+
+\item The {\tt \%REPORT} command specifies the type of reports that you will
+receive on the progress of the task. In this case you will be sent mail
+messages.
+
+\item This {\tt \%FILE} command defines the input file for the task. This is
+another example of the use of a null string and again the system will prompt
+you for the name of the file. This lets you use the same {\tt .JIN} file to
+send many different tasks, although they would have to be to the same remote
+site. In this case there is only one input file that will be run as a batch job
+on the remote machine. A trivial example would be for this file to just contain
+the line 
+
+\begin{verbatim}
+$ SHOW SYSTEM
+\end{verbatim}
+
+\item This is the beginning of what JTMP calls a proforma. It specifies how to
+handle the output from a task. The {\tt \%BEGIN} command specifies where to
+send the output of the task with the TARGET qualifier. In principle it could go
+to a site other than the one that originated the task. It says that this
+proforma should be spawned (which means generated, rather than a DCL spawn) if
+the task is successful and the output should be returned to a local file. The
+name of the file is specified on the next line.
+
+\item This {\tt \%FILE} command gives the name of the file that will receive the
+output of the task. In this case it is the log file of the batch job.
+
+\item The {\tt \%END} command indicated the end of the definition of the
+proforma, not the end of the task. It is a closing bracket to go with the {\tt
+\%BEGIN} command.
+
+\end{enumerate}
+
+When you start a task, you will receive a message like {\tt Task 12345 has been
+queued}. As the task progresses you will receive several mail messages from the
+JTMP\_Manager saying that the task has arrived at its destination, has been
+accepted for processing, etc. In this example the log file from the batch job
+will be returned as {\tt LEICESTER\_OUTPUT.LIS} in your top level directory.
+
+\subsection{Submitting batch jobs to non-VAX systems}
+
+JTMP is not a VMS specific protocol so any system that has the software
+installed can be accessed with it. Here is an example of submitting a batch job
+to run a simple Fortran program on the Amdahl VP1100 vector processor at the
+Manchester Computing Centre. For those more familiar with Crays, the syntax of
+the input file may not be completely transparent, but it should be fairly
+obvious what is happening. The JTMP input file is called {\tt VP.JIN} and
+contains the following:
+
+\begin{verbatim}
+%TO/SITE=UK.AC.MCC.CMS/NODEFAULT
+%SINK/NAME=-JOBMILL(VP)
+%AT/SITE=UK.AC.MCC.CMS/USER=VMNETWRK
+%REPORT/SINK=-MAIL/SELECT=(NORMAL_TERMINATION,ABNORMAL_TERMINATION)
+%FILE/NAME=VP.JOB/LOG
+%BEGIN/TARGET=UK.AC.MANCHESTER.ASTRONOMY.STARLINK/LOCAL_SINK=-FILE()/SPAWN=SUCCESS
+%FILE/SINK=VP.OUT/OUTPUT/FORMAT=FORMATTED
+%END
+\end{verbatim}
+
+The differences (other than the sites names) between this job input file and
+the previous one are due to the fact that this example is taken directly from a
+standard command procedure on the MCC VAXcluster.
+
+The file that is sent to the VP is called {\tt VP.JOB} and contains the
+following:
+
+\begin{verbatim}
+//jobname JOB account,personal_id,CLASS=A,USER=username,PASSWORD=password
+//*VP1
+//STEP1   EXEC  FMSCLG
+//C.SYSIN DD    *
+      DO 1 I=1,20
+      PRINT *,I
+    1 CONTINUE
+      END
+/*
+\end{verbatim}
+
+The lines beginning with // are JCL commands and cause the Fortran program to be
+compiled, linked and run. The output from the batch job is returned in the file
+{\tt VP.OUT}. In this case the job input file does contain an explicit
+username, but this is only because of the way that the MCC system works. The
+security is provided by the need to specify a username and password on the {\tt
+//~JOB} command in the second of the above files.
+
+\section{Sending files to remote sites}
+
+To send a single file to a remote computer, you can use the {\tt TRANSFER}
+command. Unfortunately this does not accept wild cards so multiple files
+cannot be sent in one transfer. An example of sending a single file using 
+JTMP follows.
+The job input file {\tt SEND\_FILE.JIN} contains the following JTMP commands:
+
+\begin{verbatim}
+%TO/SITE=UK.AC.LEICESTER.STARLINK/NODEFAULT
+%SINK/NAME=-FILE
+%URGENCY/VALUE=LOW
+%AT/SITE=UK.AC.LEICESTER.STARLINK/USERNAME=/PASSWORD=
+%REPORT/SINK=-MAIL
+%FILE/NAME=ARTICLE.TEX/SINK=COPY_OF_ARTICLE.TEX
+\end{verbatim}
+
+The task is executed with the command
+
+\begin{verbatim}
+$ SEND/TASK=DOCUMENT SEND_FILE
+\end{verbatim}
+
+and you will be prompted for your username and password at the remote site. This
+will copy the file {\tt ARTICLE.TEX} from your current directory to a file
+called {\tt COPY\_OF\_ARTICLE.TEX} in your default directory at Leicester. Note
+the {\tt /TASK} qualifier. The task will fail if this is not included as this
+is a document disposition task and the default is to perform an execution task
+(i.e. to submit a batch job). Of course, it would be much simpler in this case
+to use the {\tt TRANSFER} command, however, if you wanted to transfer several
+files, you can do it as follows:
+
+\begin{verbatim}
+%TO/SITE=UK.AC.LEICESTER.STARLINK/NODEF
+%SINK/NAME=-FILE
+%URGENCY/VALUE=LOW
+%AT/SITE=UK.AC.LEICESTER.STARLINK/USERNAME=/PASSWORD=
+%REPORT/SINK=-MAIL
+%FILE/NAME=*.COM/SINK=*.TST
+\end{verbatim}
+
+This will copy all of your {\tt .COM} files to Leicester. The resultant
+filenames at Leicester will be the same as at your local site, but they will
+have an extension of {\tt .TST} instead of {\tt .COM}.
+
+\section{Fetching file from remote sites}
+
+Here is an example of copying a file from a remote site to your local site. The
+remote file being copied is described in the lines 7 -- 9 of the job input
+file.The file name at the remote site is {\tt DOCUMENT.TWO} and the name of the
+file that will be created at the local site is {\tt LEICESTER.LIS}. The file
+will appear in your top level directory by default. The odd thing about this
+file is line 6. We appear to be unnecessarily copying a file to the remote
+site. This line is needed because it is invalid for a JTMP task to have an
+output proforma without an input document. This seems pretty silly in this
+context, but is the way that the system works.
+
+\begin{verbatim}
+%TO/SITE=UK.AC.LEICESTER.STARLINK/NODEFAULT
+%SINK/NAME=-FILE
+%URGENCY/VALUE=LOW
+%AT/SITE=UK.AC.LEICESTER.STARLINK/USERNAME=/PASSWORD=
+%REPORT/SINK=-MAIL
+%FILE/NAME=LOGIN.COM/SINK=RUBBISH.TMP
+%BEGIN/TARGET=UK.AC.MANCHESTER.ASTRONOMY.STARLINK/LOCAL_SINK=-FILE
+%FILE/NAME=DOCUMENT.TWO/SINK=LEICESTER.LIS/LOG
+%END
+\end{verbatim}
+
+The task is executed with the command
+
+\begin{verbatim}
+$ SEND/TASK=DOCUMENT FETCH_FILE
+\end{verbatim}
+
+The effect of this task is to copy the file {\tt LOGIN.COM} from the current
+directory to the remote site and to copy the file {\tt DOCUMENT.TWO} to the
+local file {\tt LEICESTER.LIS}. An example of the mail messages that are
+received when performing this task is given in appendix~\ref{mail}.
+
+A single file can always be fetched from a remote computer, using the  {\tt
+TRANSFER} command. Unfortunately this does not accept wild cards so multiple
+files cannot be fetched in one transfer. Multiple {\tt TRANSFER} commands may
+be typed, but sometimes you do not know all the names of the files to be
+fetched. In such a case you must use JTMP to fetch the files. Here is an
+example of a {\tt .JIN} file that will fetch all of the {\tt .OUT} files from
+the top level directory of your account on the remote computer.
+
+\begin{verbatim}
+%TO/SITE=UK.AC.LEICESTER.STARLINK/NODEFAULT
+%SINK/NAME=-FILE
+%URGENCY/VALUE=LOW
+%AT/SITE=UK.AC.LEICESTER.STARLINK/USERNAME=/PASSWORD=
+%REPORT/SINK=-MAIL
+%FILE/NAME=SYS$LOGIN:LOGIN.COM/SINK=DUMMY.JTMP
+%BEGIN/TARGET=UK.AC.MANCHESTER.ASTRONOMY.STARLINK/LOCAL_SINK=-FILE
+%FILE/NAME=*.OUT/SINK=*.OUT
+%END
+\end{verbatim}
+
+This is something that simply could not in general be achieved without using
+JTMP, although if the remote machine was accessible via DECnet, then it would
+be possible to use the COPY command.
+
+\section{Skeleton files}
+\label{skeletons}
+
+If you find that you are using the same JIN file many times, but with minor
+alterations between each use, then it may be appropriate to set up a skeleton
+file. This is pointed to by the logical name JTP\$CUPBOARD (computer humour). A
+skeleton file is a text library that contains modules which in turn contain the
+commonly used JTMP commands to contact a certain sites. Essentially the modules
+contain copies of the sort of job input files use in the examples with the
+important exception that on the {\tt \%TO} command, the {\tt /NODEFAULT}
+qualifier should be changed to {\tt /DEFAULT}. The module name in the skeleton
+file are made up from the NRS name of the site being called and are something
+like UK.AC.\-LEICESTER.\-STARLINK\_DEFAULT.
+
+\section{Common problems}
+
+There are a few problem that the author has found can easily catch out the
+unwary. 
+
+It is natural to want to use the short form for the NRS names of the sites that
+need to be specified in the JIN file. Unfortunately the target of the output
+proforma (specified on the BEGIN command in the first example) must be given by
+the long form of the NRS name when using the current version (5.2) of the
+software. It is easy to forget this, and if you do remember that a long name is
+needed somewhere, it is even easier to forget exactly where it is. Consequently 
+it is recommended that you always use the long form of names in JIN files.
+
+A related problem with skeleton files is that module names in the skeleton file
+should be made up from long NRS names. Short ones generally will not work as
+the name gets converted to the long form before the skeleton file is opened.
+
+Another problem is one specific to VAXclusters. If you send a batch job to a
+site using JTMP, then the default batch queue for it to run on is {\tt
+SYS\$BATCH}. If the remote node is part of a VAXcluster, then it is common for
+{\tt SYS\$BATCH} to be a generic queue that points to several execution queues.
+However, if the batch job is not run on the CPU that has JTMP installed, then
+there can be problems in returning the output to the person who originated the
+job. Sometimes it works and sometimes it does not. The exact reason for this is
+not clear. The JTMP user guide says that the default execution queue can be
+defined to be a queue other than {\tt SYS\$BATCH}, however, it is the
+experience of the author that this does not work. It is better to specify an
+explicit execution queue when installing the software and when using it.
+
+
+\appendix
+\section{Example mail messages}
+\label{mail}
+
+These are some examples of the sort of mail that is received from the JTMP
+manager. This example concerned the fetching of a file from Leicester to
+Manchester.
+
+\begin{verbatim}
+
+From:   JTMP_Manager 29-AUG-1990 11:53:22.53
+To:     OPER        
+CC:
+Subj:   JTMP Report for Task : 0000018403
+
+Task reference: 0000018403
+
+Report from UK.AC.LEICESTER.STARLINK
+Task type : DOCUMENT DISPOSITION
+Task has been accepted.
+
+Report message : 
+JTMP task analysed and accepted
+
+\end{verbatim}
+\rule{\textwidth}{0.5mm}
+\begin{verbatim}
+
+From:   JTMP_Manager 29-AUG-1990 11:53:29.31
+To:     OPER        
+CC:
+Subj:   JTMP Report for Task : 0000018403
+
+Task reference: 0000018403
+
+Report from UK.AC.LEICESTER.STARLINK
+Task type : DOCUMENT DISPOSITION
+Task successfully created.
+Target site : UK.AC.MANCHESTER.ASTRONOMY.STARLINK
+
+Report message : 
+Task name "UNNAMED" spawned
+
+Report from UK.AC.LEICESTER.STARLINK
+Task type : DOCUMENT DISPOSITION
+Task terminated normally.
+Number of descriptors spawned : 1
+
+Report message : 
+normal successful completion
+
+\end{verbatim}
+\rule{\textwidth}{0.5mm}
+\begin{verbatim}
+
+From:   JTMP_Manager 29-AUG-1990 11:53:44.56
+To:     OPER        
+CC:
+Subj:   JTMP Report for Task : 0000018403
+
+Task reference: 0000018403
+Report from local host
+
+Arrival report message:
+ JTMP task analysed and accepted
+
+\end{verbatim}
+\rule{\textwidth}{0.5mm}
+
+\end{document}

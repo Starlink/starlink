@@ -1,0 +1,672 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {99.4}
+\newcommand{\stardocauthors}   {S M Beard}
+\newcommand{\stardocdate}      {13 May 1991}
+\newcommand{\stardoctitle}     {LIBMAINT --- A tool for library maintenance}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+
+\section{Introduction}
+
+LIBMAINT is a procedure which simplifies the maintenance of software
+which is held as modules in a text/object library pair.
+New libraries can be easily created, and modules inserted, extracted,
+replaced, examined and printed with fairly simple commands.
+Using LIBMAINT for library maintenance also ensures that corresponding
+modules within a text/object library pair do not get out of step with
+one another.
+There are also commands for optimising the disk space used by the
+libraries.
+
+LIBMAINT can also be used to maintain modules held in a help library.
+Modules can be inserted, extracted, replaced and printed, and the
+contents of the library can be examined as if called up from a HELP
+command.
+
+The information in this document refers to LIBMAINT version 2.6.
+Further information is available by typing;
+\begin{verbatim}
+      $ LIBMHELP
+\end{verbatim}
+A hard-copy of the on-line help information may be obtained by typing;
+\begin{verbatim}
+      $ LIBMAINT LIBMAINT_DIR:LIBMAINT\HELPMODE
+      $ LIBPRINT LIBMAINT
+\end{verbatim}
+
+LIBMAINT uses the VAX/VMS librarian, which is described in the VAX/VMS
+librarian utility manual.
+
+\section{Using Libraries}
+
+Software can be made a lot easier to maintain by storing all the
+subroutines used in a text/object library pair.
+Each subroutine is stored individually as a module in the text library,
+and for each of these a corresponding compiled object module is stored
+in the object library.
+Most Starlink software is stored in this way.
+The main advantages of storing software in this way are:
+\begin{itemize}
+\item[o] Any subroutine can be easily extracted and edited
+individually.
+\item[o] When a subroutine is changed, only that particular
+subroutine needs to be recompiled.
+\item[o] A library of generally-useful subroutines can be used by
+more than one program.
+\item[o] Libraries enable subroutines with similar functions to be
+collected together into recognisable packages.
+\end{itemize}
+LIBMAINT can make the maintenance of these libraries easier.
+For example, a library of subroutines can be created by typing
+the following:
+\begin{verbatim}
+      $ LIBMAINT                       ! Start LIBMAINT
+      $ LIBCRE MYLIB                   ! Create a library pair called MYLIB
+      $ EDIT MAINPROG.FOR              ! Create the main program
+      $ EDIT SUB1.FOR                  ! Create subroutine 1
+      $ INSERT SUB1                    ! Insert it into the library
+      $ EDIT SUB2.FOR                  ! Create subroutine 2
+      $ INSERT SUB2                    ! Insert it into the library
+\end{verbatim}
+The program created above can be compiled and linked with
+the following commands:
+\begin{verbatim}
+      $ FORTRAN MAINPROG               ! Compile the main program
+      $ LINK MAINPROG,MYLIB/LIB        ! Link it with the MYLIB library
+\end{verbatim}
+For the small library created above, disk space may be saved
+by typing:
+\begin{verbatim}
+      $ LIBCOMP MYLIB                  ! Compress the MYLIB libraries
+\end{verbatim}
+Subroutine SUB1 can be modified by typing:
+\begin{verbatim}
+      $ EXTRACT SUB1                   ! Extract SUB1 from the MYLIB library
+      $ EDIT SUB1.FOR                  ! Modify it
+      $ REPLACE SUB1                   ! Replace it back into the library
+\end{verbatim}
+Further details on setting up LIBMAINT, and a full list of available
+commands, are described in the rest of this document.
+
+\section{Setting up LIBMAINT}
+
+\subsection{The Basic Set Up}
+
+Before using LIBMAINT in any login session, it needs to be set up
+by typing the command;
+\begin{verbatim}
+      $ LIBMAINT
+\end{verbatim}
+When set up, LIBMAINT will respond with a message;
+\begin{verbatim}
+      + LIBMAINT: version X.Y (date)
+\end{verbatim}
+which will indicate the current version of LIBMAINT.
+
+If frequent use is to be made of LIBMAINT, the set-up command can be
+included in your LOGIN.COM (provided it comes after executing
+SSC:LOGIN.COM). For example :
+\begin{verbatim}
+      $ @SSC:LOGIN
+           "
+           "
+      $ LIBMAINT
+\end{verbatim}
+Once set up, DCL symbols will be defined which make all the LIBMAINT
+commands available.
+
+\subsection{Setting Up an Initial Default Library}
+
+An initial default library can be set up by specifying it
+as a parameter to the LIBMAINT command. {\it i.e.}
+\begin{verbatim}
+      $ LIBMAINT [default-library]
+\end{verbatim}
+If no default library is specified it is initially undefined
+until set up with DEFLIB or some other LIBMAINT command.
+
+\subsection{Initialising LIBMAINT Switches}
+
+{\it Beginners may skip this section.}
+
+LIBMAINT can be run in several different ways by setting various
+switches, which control its action, on or off.
+In this way, the action of LIBMAINT can be tailored to suit any
+particular user.
+The following switches are used:
+
+\newlength{\numlen}
+\settowidth{\numlen}{000000000000}
+\settowidth{\labelsep}{000}
+
+\begin{list}{}{\setlength{\labelwidth}{\numlen}\setlength{\leftmargin}{\numlen}
+\addtolength{\leftmargin}{\labelsep}}
+
+\item[HELPMODE] This controls whether LIBMAINT operates on a help
+library or text/object library pair.
+When this switch is on, all the LIBMAINT commands operate on a help
+library.
+When the switch is off, the commands operate on a text/object library
+pair.
+By default this switch is off, but it may be switched on for maintenance
+of a help library.
+
+\item[COMPILING] This controls whether there is automatic compilation of
+text modules when they are inserted into a library, and automatic
+insertion of the resultant object module into the object library.
+By default this is switched on, and should only be switched off in cases
+where a text library alone is being maintained.
+
+\item[LOGGING] This controls whether there is automatic logging of the
+reasons for the insertion or replacement of each module to a log file.
+By default this is switched off, but may be turned on by conscientious
+users who require a full record of all modifications.
+
+\item[TYPING] This controls whether LIBMAINT appends the file type to the end
+of the name of each module inserted in the text library (except those of
+type {\tt .FOR}).
+By default this is switched on, and file types will be appended to
+module names.
+This switch can be switched off for the maintenance of libraries created
+by tools other than LIBMAINT, which do not have non-Fortran file types
+appended to their module names.
+
+\item[UNDERTAKING] This controls whether underscores are removed from a
+module name before attempting to delete it from the text library
+(using LIBDEL).
+By default this is switched off, and LIBMAINT assumes that module names
+in the text and object libraries are identical.
+Some pre-VMS version 4 libraries may have text module names which
+are the same as the object module names but with underscores removed.
+This switch may be turned on to enable LIBMAINT to maintain these
+libraries.
+\end{list}
+
+The switches can be initialised when LIBMAINT is set up by specifying
+either ``\verb+\+switch-name'' as a parameter to the LIBMAINT command to turn a
+switch on, or ``\verb+\+NOswitch-name'' to turn it off.
+For example;
+\begin{verbatim}
+      $ LIBMAINT \LOGGING       ! Initialise LIBMAINT with logging ON
+      $ LIBMAINT \NOLOGGING     ! Initialise LIBMAINT with logging OFF
+\end{verbatim}
+The backslash character tells LIBMAINT that a switch is being specified,
+and not a default library.
+More than one switch may be specified, and each one should be
+preceded by a backslash.
+It is possible to initialise a default library at the same time
+as initialising the switches. {\it e.g.}
+\begin{verbatim}
+      $ LIBMAINT MYLIB\HELPMODE\LOGGING\NOUNDERTAKING
+\end{verbatim}
+will define MYLIB as the default library, and initialise HELPMODE
+and LOGGING on and UNDERTAKING off.
+
+Full details of the effects of the switches on the function
+of each command are described in the on-line help information.
+It is best initially to leave these switches at their default
+setting.
+
+\section{The LIBMAINT Commands}
+
+LIBMAINT has the following commands.
+Only a brief description of each command will be given here.
+Full details of each command, together with all the possible ways it can
+be modified by qualifiers and the setting of LIBMAINT switches, are
+described in the on-line help information;
+\begin{verbatim}
+      $ LIBMHELP command-name
+\end{verbatim}
+
+
+\settowidth{\numlen}{00000000}
+\settowidth{\labelsep}{0000}
+
+\begin{list}{}{\setlength{\labelwidth}{\numlen}\setlength{\leftmargin}{\numlen}
+\addtolength{\leftmargin}{\labelsep}}
+
+\item[DEFLIB]
+\begin{verbatim}
+$ DEFLIB library-spec
+\end{verbatim}
+Define a default library to be manipulated by the use of
+the LIBMAINT commands.
+
+The library-spec is of the form {\tt library-name[.library-type]}, where the
+library-type is optional and can be ``{\tt .TLB}'' (specifying a text/object
+library pair) or ``{\tt .HLB}'' (specifying a help library).
+If a library-type is specified, the HELPMODE switch is set
+automatically.
+
+\item[EXTRACT (or LIBEXT)]
+\begin{verbatim}
+$ EXTRACT module-spec [library-spec] [file-spec]
+\end{verbatim}
+Extract a specified module from a text (or help) library.
+(Users of FIGARO, where there is a symbol clash, may use
+the command LIBEXT).
+
+The module-spec is of the form ~{\tt module-name[.file-type]}.
+The module name should correspond to the name of the module to be
+extracted from the text library, and should also be a legal Files-11
+format file name, which is the name of the file to receive the output.
+
+The file-type is optional (defaulting to ``{\tt .FOR}'') and if included it
+represents the type of the file to contain the output text module.
+
+The library-spec is optional, and if not specified defaults to the
+currently-specified default library.
+If a new library is specified, it becomes the new default library.
+
+The file-spec is the name of the file to be created.
+It is optional, and if not specified defaults to a file name
+derived either from the name of the module or,
+if a wild card has been specified for the module name, from the name of
+the library. 
+
+{\bf NOTE:}~{\it If the wild card character ``*'' is given instead of a module 
+name, then ALL the modules will be extracted from the text library and appended
+together into ONE file whose name is specified in file-spec. If file-spec is 
+not specified, the file will be called {\tt library-name.file-type}.
+To extract modules into separate files, OLBCRE can be used with
+the COMPILING switch off.}
+
+\item[INSERT]
+\begin{verbatim}
+$ INSERT module-spec [library-spec]
+\end{verbatim}
+Insert a new module into the text and object library
+pair (or help library).
+If the module already exists in the library, an error message
+will be generated.
+(Use REPLACE to replace an existing module).
+
+The module-spec is of the form {\tt module-name[.file-type]}.
+This should be the name of the file containing the module to be inserted
+into the libraries, and will form the module name in the text library.
+
+The file-type is optional (defaulting to {\tt .FOR}) and is used when
+deciding which compiler should be used in inserting the module into the
+object library.
+The following compilers are used;
+\begin{center}
+\begin{tabular}{ll}
+        File-type &      Compiler \\
+\\
+        .BAS      &      BASIC \\
+        .BLI      &      BLISS \\
+        .CC       &      C \\
+        .FOR      &      FORTRAN (default) \\
+        .GEN      &      ``GENERIC'' (optional - see SUN/7) \\
+        .MAR      &      MACRO \\
+        .MSG      &      MESSAGE \\
+        .PAS      &      PASCAL \\
+\end{tabular}
+\end{center}
+The library-spec is optional, and if not specified defaults to the
+currently-specified default library.
+If a new library is specified, it becomes the new default library.
+
+\item[LIBCOMP]
+\begin{verbatim}
+$ LIBCOMP [library-spec]
+\end{verbatim}
+Compress a text/object library pair (or help library) to recover
+any unused blocks of disc space allocated but not used.
+The resultant libraries are written in normal data-expanded format.
+
+The library-spec is optional, and if not specified defaults to the
+currently-specified default library.
+If a new library is specified, it becomes the new default library.
+
+\item[LIBCRE]
+\begin{verbatim}
+$ LIBCRE library-spec
+\end{verbatim}
+Create a new text and object module library pair (or help
+library).
+
+The library-spec is of the form {\tt library-name[.library-type]}, where the
+library-type is optional and can be {\tt .TLB} (specifying a text/object
+library pair) or {\tt .HLB} (specifying a help library).
+If a library-type is specified, the HELPMODE switch is set
+automatically.
+The library specified becomes the default library.
+
+\item[LIBDEL]
+\begin{verbatim}
+$ LIBDEL module-spec(s) [library-spec]
+\end{verbatim}
+Delete the specified module (or modules) from the text and
+object module library pair (or help library).
+Wild cards may be used.
+
+\item[LIBHELP]
+\begin{verbatim}
+$ LIBHELP help-string
+\end{verbatim}
+Display the contents of a help library in the format
+obtained by a user typing:
+\begin{verbatim}
+$ HELP/LIBRARY=help-library  help-string
+\end{verbatim}
+The library-spec cannot be specified with this command, so the
+default help library is used, as specified by DEFLIB.
+
+\item[LIBLIST]
+\begin{verbatim}
+$ LIBLIST [library-spec]
+\end{verbatim}
+Display the contents of the text library (or help library).
+
+The library-spec is optional, and if not specified defaults to the
+currently-specified default library.
+If a new library is specified, it becomes the new default library.
+
+\item[LIBPRINT]
+\begin{verbatim}
+$ LIBPRINT module-spec(s) [library-spec]
+\end{verbatim}
+Print a module or modules from the text library (or help
+library).
+
+The module specification is of the form {\tt module-name[.file-type]}
+and wild cards are allowed.
+The module name should correspond to the
+name of the module to be printed from the library and should
+also be a legal Files-11 format file name [plus file type].
+When more than one module is printed, each is printed on
+a separate page and a unique file type of the form .LP\_xx is
+chosen.
+
+\item[LIBREDUCE]
+\begin{verbatim}
+$ LIBREDUCE [library-spec]
+\end{verbatim}
+Compress a text/object library pair (or help library) and
+convert them into DCX data-reduced format, so as to minimise the disc
+space used.
+
+The library-spec is optional, and if not specified defaults to the
+currently-specified default library.
+If a new library is specified, it becomes the new default library.
+(LIBCOMP can be used to convert libraries back to data-expanded format).
+
+\item[LIBTYPE]
+\begin{verbatim}
+$ LIBTYPE module-spec(s) [library-spec]
+\end{verbatim}
+Type on SYS\$OUTPUT a module or modules from the text
+library (or help library).
+
+The module specification is of the form {\tt module-name[.file-type]}
+and wild cards are allowed.
+The usage is as for LIBPRINT except that no file is created.
+The output may be interrupted by CTRL/O or CTRL/Y at any
+time.
+
+The library-spec is optional, and if not specified defaults to the
+currently-specified default library.
+If a new library is specified, it becomes the new default library.
+
+\item[OBJLIST]
+\begin{verbatim}
+$ OBJLIST [library-spec]
+\end{verbatim}
+Display the contents of the object library.
+
+The library-spec is optional, and if not specified defaults to the
+currently-specified default library.
+If a new library is specified, it becomes the new default library.
+
+\item[OLBCRE]
+\begin{verbatim}
+$ OLBCRE [library-spec] [start-module]
+\end{verbatim}
+Create a new object library from a text library.
+
+OLBCRE extracts all the modules from an existing text library (of the
+same name as the object library), compiles each one with the appropriate
+compiler and inserts each resultant object module into the new object
+library.
+The library-spec is optional, and if not specified defaults to the
+currently-specified default library.
+If a new library is specified, it becomes the new default library.
+The start-module parameter may be used to specify at which module OLBCRE
+starts, which is particularly useful for restarting an OLBCRE which
+failed with a compilation error half way through a library.
+By default, OLBCRE starts at the first module in a library.
+
+{\bf NOTE:}~{\it When the LIBMAINT COMPILING switch is off, OLBCRE can be used
+for extracting all the modules from a text library into individual
+files.}
+
+\item[PREFIX]
+\begin{verbatim}
+$ PREFIX prefix
+\end{verbatim}
+Define a prefix to be inserted at the beginning of every
+subsequent module name.
+
+This can be used to save typing in cases where
+the majority of the modules in a library begin with the
+same sequence of characters.
+
+\item[REPLACE]
+\begin{verbatim}
+$ REPLACE module-spec [library-spec]
+\end{verbatim}
+Replace a specified module in a text and object library
+pair (or help library).
+
+This is exactly the same as the INSERT command, except that if
+the specified module already exists a library it will
+be replaced by the new version.
+
+\item[SHOLIB]
+\begin{verbatim}
+$ SHOLIB
+\end{verbatim}
+Show the library currently set up as the default for the
+LIBMAINT commands, and also the file specifications of the text and
+object libraries (or help library).
+
+\item[SHOPRE]
+\begin{verbatim}
+$ SHOPRE
+\end{verbatim}
+Show the prefix, defined by the PREFIX command, to be added to
+the beginning of all module names.
+
+\item[SHOSWITCH]
+\begin{verbatim}
+$ SHOSWITCH
+\end{verbatim}
+Show the current settings of all the LIBMAINT switches.
+
+\item[SWITCH]
+\begin{verbatim}
+$ SWITCH switch-name ON/OFF
+\end{verbatim}
+Switch the specified LIBMAINT switch on or off.
+Details of the LIBMAINT switches have already been described above.
+\end{list}
+
+\section{Librarian and Compiler Qualifiers}
+
+It is possible to pass DCL command qualifiers through LIBMAINT
+to the VAX/VMS librarian, or the compiler used to compile the
+modules, and hence achieve much greater flexibility.
+Qualifiers for the librarian may simply be appended
+to the ends of the parameters given to LIBMAINT, and begin
+with a slash ``/''.
+Qualifiers for the compiler are given in a similar way,
+but the left-most qualifier should begin with a double slash
+``//''.
+Full details on the qualifiers which may be used with
+each LIBMAINT command may be found in the on-line help
+information, e.g.;
+\begin{verbatim}
+      $ LIBMHELP command-name Library_qualifiers
+\end{verbatim}
+A few examples are given below to illustrate some
+uses for the qualifiers:
+\begin{verbatim}
+      $ LIBPRINT */SINCE=1-JAN-1987
+                  | Librarian     |
+                  | qualifier     |
+\end{verbatim}
+Print all the modules from the current default library which
+have been inserted since 1-JAN-1987.
+\begin{verbatim}
+      $ INSERT MODULE//D_LINES/LIST
+                     | Compiler    |
+                     | qualifiers  |
+\end{verbatim}
+Insert module MODULE into the default text/object library pair,
+compiling the module with FORTRAN/D\_LINES/LIST.
+\begin{verbatim}
+      $ INSERT MODULE/SELECTIVE_SEARCH//D_LINES/LIST
+                     | Librarian      | Compiler    |
+                     | qualifier      | Qualifiers  |
+\end{verbatim}
+Insert module MODULE into the default text/object library pair,
+compiling the module with FORTRAN/D\_LINES/LIST, and defining
+the module as a candidate for a selective search.
+\begin{verbatim}
+      $ OLBCRE MYLIB//DEBUG/NOOPTIMISE/D_LINES/CHECK=ALL/LIST
+                    | Compiler qualifiers                   |
+\end{verbatim}
+Compile all the modules in the library MYLIB, with qualifiers suitable
+for debugging, and insert the object modules produced into a new object
+library.
+
+\section{Using Text Libraries of Include Files} 
+
+VMS allows Fortran INCLUDE files to be held in a text library.
+For instance, a Fortran routine may contain the statement;
+\begin{verbatim}
+      INCLUDE `(TEST.INC)'
+\end{verbatim}
+where the string in brackets is actually the name of a module in
+a text library.
+Suppose the Fortran routine is called ROUTINE.FOR, and the module
+TEST.INC is in the text library TEST.TLB. 
+When compiling the routine, the command;
+\begin{verbatim}
+      $ FORTRAN ROUTINE+TEST/LIB
+\end{verbatim}
+tells the compiler to search the TEST.TLB library for the INCLUDE 
+module.
+It is possible to maintain libraries of routines which include text
+modules in this way with LIBMAINT by clever use of the ``compiler
+qualifier'' mechanism described above. 
+The name of the text library can be appended to a dummy compiler
+qualifier, such as /NOLIST.
+If the above routine is to be inserted in a text/object library pair,
+the following LIBMAINT command will work:
+\begin{verbatim}
+      $ INSERT ROUTINE//NOLIST+TEST/LIB
+\end{verbatim}
+The same also applies to the LIBMAINT commands REPLACE and OLBCRE.
+(I am indebted to Richard Prestage for the above suggestion).
+
+\section{USE OF LIBMAINT WITH THE GENERIC COMPILER}
+LIBMAINT can be used to maintain generic modules transparently
+by means of the GENERIC compiler.
+To make use of this compiler requires than a DCL global symbol
+GENERIC should be set up to execute it.
+LIBMAINT will then use the GENERIC compiler automatically
+upon meeting any module of file type {\tt .GEN}.
+Full details of the GENERIC compiler may be found in SUN/7.
+{\it (N.B. References to SUN/7 in this document refer to versions
+dated February 1987 or later).}
+
+\section{Other Library Maintenance Utilities}
+
+Other library maintenance utilities which may be used in conjunction
+with LIBMAINT are:
+
+
+\settowidth{\numlen}{00000000000}
+\settowidth{\labelsep}{000}
+
+\begin{list}{}{\setlength{\labelwidth}{\numlen}\setlength{\leftmargin}{\numlen}
+\addtolength{\leftmargin}{\labelsep}}
+
+\item[AUTODOC] A utility for automatically editing the ``History'' section
+of modules when they are INSERTed and REPLACEd by LIBMAINT (with
+LOGGING switched on).
+This utility is currently undocumented and unreleased.
+(Contact REVAD::JAC if interested).
+
+\item[CHLIB] A utility for carrying out a global substitution on all the
+modules in a text library.
+This utility is currently undocumented and unreleased, and uses the CH
+utility in the software tools.
+(Contact REVAD::JAC if interested).
+
+\item[LIBIND] A utility for generating a listing of the modules
+within a text library in a format which is guaranteed not
+to change in future releases of VMS.
+(See SUN/8).
+
+\item[LIBPRE] A utility for extracting all the preamble comments from
+all the modules in a text library.
+(See SUN/8).
+
+\item[RNLIB] A utility for renaming all the modules in a text library
+by changing the prefix which all the modules start with.
+This utility is currently undocumented and unreleased.
+(Contact REVAD::SMB if interested).
+
+\end{list}
+
+\end{document}

@@ -1,0 +1,135 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {46.1}
+\newcommand{\stardocauthors}   {R M Prestage}
+\newcommand{\stardocdate}      {28 September 1988}
+\newcommand{\stardoctitle}     {NOD2 --- A mm-wave Continuum Data Reduction
+                                Package}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\section{Introduction}                  
+
+NOD2 (Haslam, 1974) is a subroutine library for the general
+manipulation of radio single-dish observations. The package was
+developed at the Max Planck Institut f\"{u}r Radioastronomie, Bonn. The 
+library also forms the basis of the data reduction
+package developed by NRAO, Tucson, for the 12-m telescope (Salter, 1985).
+A large part of this package, with some extensions, has been adopted for
+use with the James Clerk Maxwell Telescope.
+
+Although the term `NOD2' should in principle be reserved to described
+the subroutine library, it is also commonly used to refer to the NRAO
+data reduction system. In this Note, the term NOD2 is used to refer to
+the implementation of the package released by Starlink for the reduction
+of JCMT data.                    
+                      
+\section {Starting Up NOD2}
+
+The data reduction package consists of a set of stand-alone
+analysis programs that are either implemented as DCL foreign
+commands, or as DCL global symbols. To invoke the package, simply
+type:
+\begin{verbatim}
+    $ NOD2
+\end{verbatim}
+at DCL level. This will cause a command file to be run to set up the 
+DCL command table and the global symbols. NOD2 commands may then
+be freely interspersed with normal DCL commands. For most NOD2 commands
+it is sufficient to simply give the command name, and then answer the
+resulting prompts. For example, type:
+\begin{verbatim}
+    $ MAKMAP
+\end{verbatim}
+to run the program to convert from raw data to a NOD2 map file.
+
+\section {Uses and Deficiencies}
+
+Many parts of the NOD2 system have not been fully implemented for Starlink
+use. These include, for example, facilities for making hard copies of
+images directly using the NOD2 system. The package has been made available
+despite this however, because it contains implementations of certain
+algorithms, essential to the reduction of mm-wave single dish observations,
+which are not available elsewhere. These include the `RESTOR' routine,
+which will reconstruct the equivalent single-beam map from data taken
+in beam-switched mode (Emersion {\it et al.}, 1979), and 
+`CONVERT', which will create an R.A.-dec
+map from Az-El data. The current method for reducing data from the JCMT
+is thus to use NOD2 for the immediate processing required to
+perform the `instrument-specific' part of the data reduction process, 
+and then to convert the resulting maps into another package (such as the
+IRCAM reduction package, or FIGARO) for subsequent analysis. It is
+hoped that in the long term, the capabilities of the NOD2 system will
+be integrated into a more complete Starlink package.
+
+\section {Additional Information}
+
+Some online help about the package can be obtained by typing:
+\begin{verbatim}
+    $ HELP NOD2
+\end{verbatim}
+after the {\tt NOD2} command has been given to invoke the system.
+Unfortunately, a lot of this information is out of date. More
+information on the JCMT implementation of the package is available
+in the document `A NOD2 Primer', written by G\"{o}ran Sandell, at
+the Joint Astronomy Centre, Hilo, Hawaii. This is available on-line
+in the file {\tt util\$disk:[nod2]primer.doc}. This primer should
+be consulted by anyone seriously using the package. Finally, the
+document `Continuum Mapping with the 12-M Telescope' by C.J. Salter
+contains some more general information about reducing mm data.
+This document may be available at your site; consult your site manager
+for details.
+
+\section {Acknowledgements}
+
+Starlink would like to acknowledge Glyn Haslam for allowing the NOD2
+subroutine library to be released by Starlink. Data reduced using this
+package should quote the reference Haslam (1974), given below. We
+would also like to thank Darrel Emerson for making the NRAO Tucson
+package available to us.
+
+\section {References}
+
+Emerson, D.T., Klein, U. \& Haslam, C.G.T., 1979. Astron. Astrophys.,
+{\bf 76}, 92.
+
+Haslam, C.G.T., 1974. Astron. Astrophys. Suppl., {\bf 15}, 333.
+
+Salter, C.J., 1985. `Continuum Mapping with the 12-M Telescope',
+NRAO, Tucson.
+
+\end{document}
+             
+                                                        

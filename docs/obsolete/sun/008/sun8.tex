@@ -1,0 +1,140 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {8.2}
+\newcommand{\stardocauthors}   {P T Wallace}
+\newcommand{\stardocdate}      {10 May 1989}
+\newcommand{\stardoctitle}     {LIBX --- Simple Library Tools}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\section{Introduction}
+
+This document describes two very simple library tools:
+\begin{description}
+\begin{description}
+\item [LIBIND] :
+
+which outputs a list of all the modules in a library and is useful
+for building more elaborate library utility procedures, and
+
+\item [LIBPRE] :
+
+which extracts preamble comments from all the modules
+in a Fortran source library.
+\end{description}
+\end{description}
+LIBIND and LIBPRE each consist of a command procedure which
+runs a executable program.
+
+To some extent they duplicate facilities also available in
+LIBMAINT (see SUN/99).  LIBMAINT is a very powerful system
+but, unavoidably, is vulnerable to changes in the formats
+of the reports which the DEC Librarian utility produces.
+The LIBX facilities, though limited in what they
+do, use only published interfaces and should survive
+VMS releases;  also they are fast.
+
+\section{LIBIND}
+
+The LIBIND procedure
+outputs a list of all the modules in a library and is
+useful for building other command procedures which manipulate
+libraries.  The command is:
+\begin{verbatim}
+    $ @LIBX_DIR:LIBIND  library  output
+\end{verbatim}
+where the two arguments are the names of the library file and the
+output file respectively.
+The library file type defaults to .TLB,
+and the output defaults to SYS\$OUTPUT.
+
+As an example of what can be done with LIBIND, here is a command
+procedure which takes a library of Fortran source modules and
+unpacks it into individual files:
+\begin{verbatim}
+    $!  UNPACK  library_name
+    $!
+    $!  Unpack a text library into Fortran modules
+    $!
+    $!  The file type of library_name defaults to .TLB.
+    $!  
+    $!  Create file UNPACK_SCRATCH.TMP containing list of modules
+    $     P1 = F$PARSE(''P1'',".TLB",,,)
+    $     DEFINE/USER_MODE LIBRARY 'P1'
+    $     INDEX := UNPACK_SCRATCH.TMP
+    $     DEFINE/USER_MODE OUTPUT 'INDEX'
+    $     RUN LIBX_DIR:LIBIND
+    $!  Extract the source
+    $     OPEN FILE 'INDEX'
+    $ NEXT:
+    $     READ/END=DONE FILE STRING
+    $     LIBR/EXTR='STRING'/OUT='STRING'.FOR/TEXT 'P1'
+    $     GOTO NEXT
+    $ DONE:
+    $     CLOSE FILE
+    $     DELETE 'INDEX';*
+    $!
+    $     EXIT
+    $!
+\end{verbatim}
+
+\section{LIBPRE}
+
+LIBPRE extracts the preamble comments from a text library containing
+Fortran source.  The command is:
+\begin{verbatim}
+     $ @LIBX_DIR:LIBPRE  library_name  output_file
+\end{verbatim}
+Both parameters are mandatory, but their file types
+default to .TLB and .LIS respectively.
+
+The output file consists of selected records from each module
+in the text library, with a form-feed character preceding
+each module.
+The selection is made as follows:
+
+Lines of source are copied up to the first flagged line
+(i.e.\ one beginning with
+\verb%"*+", "*-", "C+", "C-", "c+" or "c-"%) and from there only if they
+lie within a section included within two flagged lines.
+Second and subsequent flagged sections are preceded by a blank line.
+
+As an example, a file PROLOG.LIS containing the preamble
+comments from the SLALIB library
+can be obtained by executing the following DCL command:
+\begin{verbatim}
+    $ @LIBX_DIR:LIBPRE SLALIB_DIR:SLALIB PROLOG
+\end{verbatim}
+\end{document}

@@ -1,0 +1,228 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {47.3}
+\newcommand{\stardocauthors}   {D L Terrett}
+\newcommand{\stardocdate}      {14 September 1989}
+\newcommand{\stardoctitle}     {TAPECOPY --- Magnetic tape copying utility}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\renewcommand{\_}{{\tt\char'137}}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\section{Introduction}
+TAPECOPY is a utility for duplicating magnetic tapes. The contents of the
+original tape are copied to a disk file (the container file) which is then
+copied to a new tape to create an exact copy of the original. TAPECOPY can
+therefore make copies on a system with only one tape drive. TAPECOPY can also
+copy selected files from one tape to another.
+
+The Tape Processing
+Utility (TPU, SUN/68) can also copy tapes but requires two tape drives.
+
+Before using TAPECOPY the {\tt TAPECOPY} command must be defined by:
+\begin{verbatim}
+    $ SET COMMAND TAPECOPY_DIR:TAPECOPY
+\end{verbatim}
+
+TAPECOPY recognises three magnetic tape formats:
+\begin{description}
+\item[Foreign] tapes do not have a label and the files on the tape do
+not have names. Files are separated by end-of-file marks and two consecutive
+end-of-file marks marks the end of the volume.
+
+\item[ANSI] tapes have one or more volume header labels which contain  the
+volume name, volume protection etc. Each file consists of two or more file
+header labels, an end-of-file
+mark, the file contents, another end-of-file mark and a set of file trailer
+labels. The header labels contain the file name and other file attributes
+and a sequence number.
+
+The end of-volume is indicated by two consecutive end-of-file marks
+immediately following a file trailer label. A file can be empty and so two
+consecutive file marks immediately following a file header label does not
+indicate the end of volume.
+An ANSI tape that has just been initialised with the {\tt INITIALIZE} command
+has a volume label followed by a dummy empty file with a blank file name.
+
+ANSI tape volumes can occupy more than one reel of tape but TAPECOPY cannot
+handle multi-volume ANSI tapes.
+
+\item[BACKUP] tapes are ANSI format but BACKUP never writes empty files.
+\end{description}
+
+
+\section{Copying a tape}
+
+TAPECOPY is most commonly used to make a copy of a complete tape volume.
+The contents of a magnetic tape are copied to disk by:
+\begin{verbatim}
+    $ MOUNT/FOREIGN/NOWRITE <tape>
+    $ TAPECOPY <tape> <diskfile>
+    $ DISMOUNT <tape>
+\end{verbatim}
+where {\tt <tape>} is the name of a magnetic tape device (eg., {\tt MTA1:,
+MUA0:}) and {\tt <diskfile>} is any valid disk file specification (which can 
+contain a DECnet node specification).
+
+A new tape can then be created by:
+\begin{verbatim}
+    $ MOUNT/FOREIGN <tape>
+    $ TAPECOPY <diskfile> <tape>
+\end{verbatim}
+
+If the tape is an ANSI volume which might contain some empty files then {\tt
+TAPECOPY/ANSI} should be used when copying from tape to disk so that the empty
+file is not mistaken for the end-of-volume.
+
+\section{Command qualifiers}
+\subsection{Tape to disk}
+
+The following qualifiers apply to tape-to-disk copy operations:
+\begin{description}
+
+\item[\tt/ALLOCATION=] Specifies the number of blocks initially allocated
+to the disk container file when it is created.
+
+\item[\tt/ANSI] Enables the correct handling of empty files on ANSI tapes.
+
+\item[\tt/BACKUP] Indicates that the tape is ANSI format but without enabling
+the handling of empty files. When used with the {\tt/START=} qualifier the tape
+is positioned more quickly because the file header labels do not have to be
+checked.
+
+\item[\tt/FILE=(START:m,END:n)] Copies files {\tt m} through {\tt n} only. If
+{\tt START} is omitted, the copy starts at the beginning of the tape; if {\tt
+END} is omitted the copy continues to the end of the tape.
+
+\item[\tt/RECORD\_SIZE=] Sets the maximum size of the records written to the disk
+container file. The default (4096) is the largest record size that can be
+accessed over DECnet with the default setting of the RMS network block count.
+Using larger records may improve performance.
+
+\item[\tt/EXTENDSIZE=] Specifies the number of blocks by which an output disk
+file is extended each time more blocks need to be allocated to the file.
+
+\end{description}
+
+\subsection{Disk to tape}
+
+The following qualifiers apply to disk-to-tape copy operations:
+
+\begin{description}
+\item[\tt/APPEND] Positions the tape at end-of-volume before
+writing. Note that for an ANSI tape this will result in the files have
+incorrect sequence fields unless {\tt/ANSI} or {\tt/BACKUP} is also specified.
+
+\item[\tt/ANSI] Enables the correct handling of empty files and the dummy file
+written by {\tt \$INITIALIZE} when positioning at the end-of-volume when used
+with the {\tt/APPEND}. File header sequence numbers are modified when required.
+
+\item[\tt/BACKUP] As for {\tt/ANSI} except that empty and dummy files are not
+handled correctly enabling the end-of-volume to be found more quickly.
+
+\item[\tt/DENSITY=] Specifies the density of an output tape. This qualifier
+only works if the tape deck being used is capable of having its recording
+density set by software.
+\end{description}
+
+\subsection{All copy operations}
+
+The following qualifiers apply to all copy operations:
+
+\begin{description}
+\item[\tt/BLOCKSIZE=] Specifies the maximum block size that can be handled.
+Using a larger than necessary can result in TAPECOPY failing because
+of insufficient virtual address space.
+
+\item[\tt/BUFFERS=] Specifies the number of buffers to be used for tape
+I/O. Increasing the number of buffers may improve performance, particularly
+for streaming tape drives.
+
+\item[\tt/DOS11] Selects the optimum values for {\tt/BLOCKSIZE} and
+{\tt/BUFFERS} for a DOS format tape.
+
+\item[\tt/NOREWIND] Does not rewind the tape before or after the copy operation.
+The tape is left positioned in between the two end-of-file marks at the end of
+the volume.
+
+\item[\tt/RT11] Selects the optimum values for {\tt/BLOCKSIZE} and {\tt/BUFFERS}
+for an RT11 format tape.
+
+\item[\tt/VERIFY] Rewinds the tape after a copy operation and verifies the
+copy against the original. This qualifier cannot be used with {\tt/APPEND},
+{\tt/START=} or {\tt/END=}.
+
+\end{description}
+
+\subsection{Container file directory}
+
+The qualifier {\tt/DIRECTORY} list the ``contents'' of a disk container file.
+For an ANSI tape the file names and size in blocks of each file is listed; for
+non-ANSI tapes the number of blocks and the size of the longest and shortest
+block in each file  is listed. TAPECOPY attempts to recognize
+the format of the tape by examining the size and format of the first block; it
+can be forced to treat the file as ANSI or DOS format by using the {\tt/ANSI}
+or {\tt/DOS} qualifiers. No other qualifiers are valid with {\tt/DIRECTORY}.
+
+\subsection{Qualifier defaults}
+The default values and limits for the qualifiers that take a numeric value are:
+\[\tt\begin{tabular}{|l|r|r|r|}\hline
+Qualifier    &Default &Minimum &Maximum \\\hline
+ALLOCATION   &2000    &0       &4294967295\\
+BLOCKSIZE    &65535   &512     &65535   \\
+BUFFERS      &6       &1       &30      \\
+DENSITY      &1600    &        &        \\
+EXTENDSIZE   &250     &0       &65535   \\
+RECORD\_SIZE &4069    &512     &32767   \\
+\hline\end{tabular}\]
+
+Valid values for {\tt/DENSITY} are 800, 1600 and 6250.
+
+\section{Selective copying of ANSI tapes}\label{selective}
+
+When copying part of an ANSI or BACKUP tape the volume label is only written to
+the disk container file if {\tt/FILE=(START:1)}. An ANSI tape must have a
+volume label so the container file must  be appended to an already labelled
+tape (using {\tt/APPEND} and {\tt/ANSI} or {\tt/BACKUP}) if a valid ANSI format
+tape is to be created. 
+
+If the tape being appended to contains no files (ie. it has just been
+initialised) then {\tt/ANSI} must be used so that the dummy file is
+overwritten.
+
+If {\tt/NOREWIND} is used with an ANSI or BACKUP tape the file header sequence
+numbers will not be correct and the files will not be accessible with
+{\tt\$COPY} or {\tt\$DIRECTORY}. However, BACKUP ignores the sequence numbers
+and will be able to access save sets. \end{document}

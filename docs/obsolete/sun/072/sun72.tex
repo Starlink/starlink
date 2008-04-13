@@ -1,0 +1,802 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {72.2}
+\newcommand{\stardocauthors}   {C.A. Clayton \& T.N. Wilkins}
+\newcommand{\stardocdate}      {14 June 1991}
+\newcommand{\stardoctitle}     {HONEY --- The Honeywell Camera}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\section{Introduction}
+
+The Honeywell model 3000 colour graphic recorder system (hereafter referred to
+simply as Honeywell) has been bought by Starlink for producing publishable
+quality photographic hardcopy from the IKON image displays. Full colour and
+black \& white images can be recorded on positive or negative 35mm film.
+The Honeywell consists of a built-in high resolution flat-faced monochrome
+video monitor, a red/green/blue colour filter mechanism and a 35mm camera.
+
+The device works on the direct video signals from the IKON. This means that
+changing the brightness or contrast on the IKON monitor will not affect any
+photographs that you take. The video signals from the IKON consist of separate
+red, green and blue signals. When you take a picture, the Honeywell takes the
+red, green and blue signals in turn and displays three pictures consecutively
+on its internal monitor. It takes an exposure through each of three filters
+(red, green and blue) onto the film in the camera. This builds up the complete
+colour picture on the film.
+
+Honeywell systems are installed at nine Starlink sites, namely Belfast
+(locally funded), Birmingham, Cambridge, Durham, Leicester, Manchester,
+Rutherford, ROE and UCL.
+
+\section{Using the Honeywell}
+
+Once the Honeywell has been set up by your system manager, it is very simple
+to use. Users should not touch any of the front panel control buttons, except 
+as described in Section 2.2. Your system may also be set up so that
+you can control the Honeywell entirely via the VAX. Ask your
+system manager if your system has this option. If so, then you
+should read Section 2.3 entitled ``Using the Honeywell via the VAX''.
+
+\subsection{Getting started}
+
+At your site, the 35mm camera may not be permanently attached to the main 
+Honeywell unit
+for security reasons. It is worth pointing out that the 35mm camera back has
+been modified and is completely useless as a conventional camera. Once
+you have obtained the camera back from your site manager (or from wherever it
+is stored), attach the camera to the main body {\bf with the power off}.
+
+Power the unit on via the green button (bottom left). The unit will now
+warm-up for 4 minutes. During this period it is not possible to take
+exposures. The message window indicates how much longer you must wait. For example,
+the message WT3 indicates that you must wait for another 
+3 minutes. At the end of the warm-up sequence, an AUTO-CAL (automatic
+brightness calibration) procedure will commence during which time CAL will
+briefly
+appear in the message window. 
+After the warm-up sequence the number showing in the display is the frame count
+for that particular film setting. 
+It is worth noting that it is possible to skip
+the warm up procedure if you do not intend to take any photos but are simply
+checking parameters etc. This can be done by holding down RESET and pressing
+SHIFT. Do NOT do this if you are intending to photograph the IKON or you
+will get poor quality results.
+
+To load a film, set the On/Off/AEL switch on the 35mm
+camera back to the ``On'' position. Open the back cover of the 35mm camera back
+by sliding the back cover lock release down. Place a roll of 35mm film into the
+cavity at the left of the camera back. Lay the leading end of the film flat
+along the back of the camera so that the holes in the film fit over the
+sprocket at the other side. The leading edge of the film should extend over to
+the roller. It does not have to wrap around the roller. Close the back 
+cover of the camera and the film will automatically advance to the first frame.
+
+When the entire roll of film has been exposed, the End of Film indicator LED
+will light. Push down the film rewind button on the bottom on the 35mm
+camera body. Flip up the film rewind crank and turn it clockwise to
+rewind the film into the film magazine.  When it is completely rewound, 
+the needle in the film advance indicator will stop turning and the rewind crank
+will turn freely. Open the back cover of the 35mm camera back by sliding the
+backing cover release down and remove the film.
+
+\subsection{Using the Honeywell via the front panel}
+
+The Honeywell can remember the settings for 8 different films in non-volatile
+memory. There should be some indication on or near your Honeywell as to which
+films are supported by your unit. This may take the form of a poster with brief
+operating instructions. The four buttons in a vertical line on the left each
+have 2 green LEDs and each button corresponds to 2 settings, as indicated. For
+example, the top button is for settings 1 \& 2. If the left LED is lit then
+film setting 1 is selected and if the right LED is lit, then setting 2 is
+selected. 
+
+To select a film setting, hold down SHIFT and press the appropriate
+button once for the left and twice for the right parameter. For example, if you
+wish to select film setting 4, hold down SHIFT, and press the button marked 3-4
+twice. The right LED on this button will then light. 
+
+Do NOT change any of the settings on either the camera or the main body {\bf under
+any circumstances} without first consulting your site manager. The C/BW
+(colour/black \& white) switch MUST be on C regardless of whether you
+are using colour film or not. This is because the connection to the IKON
+display is via RGB only and there is no input for the B/W mode
+The P/N (positive/negative)
+switch is disabled when in C mode and will be fixed on P.
+The M/A (manual/automatic film wind-on switch) must be on A.
+However, it can be set on M if superposition is required but exposure 
+times must obviously be shortened. Superposition could in theory be used to give
+256$^3$ colours although this has not yet been tried.
+The COMP (composite) must always be selected and NOT red, blue and
+green. The camera shutter should be on B.
+%and aperture set to f/8. The latter is almost impossible to check but should be
+%correct.
+
+After the warm-up sequence the number showing in the display is the frame count
+for that particular film setting. This is useful if you have more than one
+camera back, each  with a different film type in since the Honeywell can
+remember how many exposures have been made on each film. If you have put in a 
+new film and wish to zero the frame counter, simply press the MINUS key until
+the display reads 0.
+
+You are now ready to take an exposure. Display the required image on the
+IKON  attached to the Honeywell and press either the EXP button or the
+footswitch if you have one. The camera will take three exposures of the image
+through a red, blue and a green filter onto the same piece of film. This takes
+about 10 seconds. When you hear the camera automatically wind on you may
+change the display on the IKON ready for the next exposure. 
+
+\subsection{Using the Honeywell via the VAX}
+
+Your system may have been set up so that your Honeywell can be controlled
+entirely via the VAX using the program HONEY. Ask you system manager if this 
+is the case at your site and also the names of the films that it supports. 
+
+You must first startup HONEY and load the parameter set for the film
+you wish to use from VAX disk into the Honeywell via the RESTORE command. The
+parameter set files names that correspond to each type of film are listed in
+Table 1. The following is an example session with HONEY.
+
+\begin{quote}
+\begin{verbatim}
+$ HONEY
+\end{verbatim}
+\end{quote}
+(Details of the currently selected parameter set is listed)
+
+\begin{quote}
+\begin{verbatim}
+HONEY> RESTORE 
+  File to restore from: ED100
+\end{verbatim}
+\end{quote}
+
+(The Ektachrome Daylight 100 parameter set will now be loaded and listed)
+
+\begin{quote}
+\begin{verbatim}
+HONEY> RESET
+\end{verbatim}
+\end{quote}
+
+(Resets film counter to zero - this step is optional)
+
+You are now ready to take an exposure. Display the required image on the
+IKON attached to the Honeywell and type EXPOSE at the HONEY prompt.   
+
+\begin{quote}
+\begin{verbatim}
+HONEY> EXPOSE
+\end{verbatim}
+\end{quote}
+
+(Mechanical sounds emerge from Honeywell as picture is taken)
+
+The
+camera will take three exposures of the image through a red, blue and a green
+filter onto the same piece of film. This takes about 10 seconds. When you hear
+the camera automatically wind on you may change the display on the IKON
+ready for the next exposure. 
+
+More HONEY instructions can be found in Appendix A. Users should only use
+RESTORE, RESET, EXPOSE, BRACKET, CANCEL, FRAME, HELP, PAGE, SAVE \& 
+SHOW. The other
+commands are for system managers to aid them in setting up the Honeywell
+film settings.
+
+Use CTRL-Z to exit from the HONEY program.
+
+\section{Setting up the Honeywell (for system managers only)}
+
+\subsection{Introduction} 
+
+The Honeywell should be connected to the IKON monitor via separate R,G,B \&
+Sync cables to the BNC connectors on the rear panels of each device. The four
+BNC ``out'' connectors on the Honeywell should be terminated at 75 $\Omega$.
+
+Site managers are not expected to attempt the image calibration procedure
+described in the manual. This  includes edge blanking adjustments, image size
+and centring adjustments and should only be carried out by service engineers.
+However, site managers are expected to set film parameters for the films used
+at their site into the eight ``parameter sets''. This procedure is
+described in the manual 2-8 through 2-10 but that
+description contains errors. A corrected version is presented here for
+completeness.
+
+The four parameters to be set are brightness, contrast, ratio and exposure.
+Brightness controls the illumination of the CRT when the video input level is
+black. Contrast controls the illumination of the CRT (relative to the black
+illumination) when the video input level is white. Ratio controls the exposure
+factor for each colour relative to the other two. Overall tint can be
+controlled via ratios. Exposure controls the total
+exposure factor.
+
+The parameters for each type of film are given in Table 1. Please note that
+these values have NOT all been tested by the authors. These are values that have
+been used in anger at Starlink sites, have given satisfactory results and
+have been passed on to the authors by site managers for inclusion in this
+document. Please send any corrections or additions to this table to Chris
+Clayton at RLVAD::CAC.
+     				
+\begin{table}[htb]
+\begin{center}
+\begin{tabular}{|l|l|c|c|c|c|c|c|c|c|c|c|} 
+\hline
+{FILM TYPE} & {VAX file} & 
+\multicolumn{3}{|c|}{{BRIGHTNESS}} & 
+\multicolumn{3}{|c|}{{CONTRAST}} & 
+\multicolumn{3}{|c|}{{RATIO}} & {EXPOSE} \\
+\cline {3-11} 
+& & {\tt R} & {\tt G} & {\tt B} & {\tt R} & {\tt G} & 
+{\tt B}& {\tt R} &  {\tt G} & {\tt B} & \\ 
+\hline
+%{\bf From Manual} &&&&&&&&&&& \\
+%\hline
+%{808} & {\tt 8x10} & {\tt 015} & {\tt 015} & {\tt 015} & {\tt 620} &
+% {\tt 465} & {\tt 360} & {\tt 600} & {\tt 600} & {\tt 500} & {\tt 500} \\
+
+% {809} & {\tt 8x10} & {\tt015} & {\tt 015} & {\tt 015} & {\tt 425} &
+% {\tt 330} & {\tt 400} & {\tt 500} & {\tt 750} & {\tt 650} & {\tt 500} \\
+% 
+% {891} & {\tt 8x10} & {\tt 015} & {\tt 015} & {\tt 015} & {\tt 425} &
+% {\tt 330} & {\tt 400} & {\tt 500} & {\tt 750} & {\tt 650} & {\tt 500} \\
+% 
+% {6118} & {\tt 8x10} & {\tt 015} & {\tt 015} & {\tt 015} & {\tt 620} &
+% {\tt 465} & {\tt 360} & {\tt 600} & {\tt 600} & {\tt 230} & {\tt 500} \\
+% 
+% {508 (558)} & {\tt 4x5} & {\tt 015} & {\tt 015} & {\tt 015} & {\tt 620} &
+% {\tt 465} & {\tt 360} & {\tt 600} & {\tt 600} & {\tt 500} & {\tt 800} \\
+% 
+% {509 (559)} & {\tt 4x5} & {\tt 015} & {\tt 015} & {\tt 015} & {\tt 425} &
+% {\tt 330} & {\tt 400} & {\tt 500} & {\tt 750} & {\tt 650} & {\tt 800} \\
+% 
+% {591} & {\tt 4x5} & {\tt 015} & {\tt 015} & {\tt 015} & {\tt 425} &
+% {\tt 330} & {\tt 400} & {\tt 500} & {\tt 750} & {\tt 650} & {\tt 800} \\
+% 
+% {6118} & {\tt 4x5} & {\tt 015} & {\tt 015} & {\tt 015} & {\tt 620} &
+% {\tt 465} & {\tt 360} & {\tt 600} & {\tt 600} & {\tt 230} & {\tt 800} \\
+% 
+% {708*} & {\tt SX70} & {\tt 015} & {\tt 015} & {\tt 015} & {\tt 210} &
+% {\tt 305} & {\tt 285} & {\tt 300} & {\tt 750} & {\tt 400} & {\tt 300} \\
+% 
+{EKT \scriptsize TUNGSTEN ASA 160} & {\tt ET160} & {\tt 015} & {\tt 015} &
+{\tt 015} & {\tt 620} & {\tt 465} & {\tt 360} & {\tt 600} & {\tt 600} & 
+{\tt 230} & {\tt 120} \\
+
+{EKT \scriptsize DAYLIGHT ASA 64} & {\tt ED64} & {\tt 015} & {\tt 015} &
+{\tt 015} & {\tt 425} & {\tt 330} & {\tt 400} & {\tt 500} & {\tt 750} & 
+{\tt 650} & {\tt 200} \\
+
+% {7240 \scriptsize TUNGSTEN ASA 125} & {\tt 16mm} & {\tt 015} & {\tt 015} &
+% {\tt 015} & {\tt 620} & {\tt 465} 
+% & {\tt 360} & {\tt 600} & {\tt 600} & 
+% {\tt 230} & {\tt 350} \\
+% \hline
+% {\bf From David Malin (AAO)} &&&&&&&&&&& \\
+% \hline
+% {EKT-6117 \scriptsize ASA 64} & {\tt 4x5} & {\tt 010} & {\tt 010} & {\tt 010} &
+% {\tt 400} & {\tt 300} & {\tt 400} & {\tt 600} & {\tt 750} & {\tt 650} &
+% {\tt 800} \\
+% 
+% {Polaroid Colour (559)} & {\tt 4x5} & {\tt 010} & {\tt 010} & {\tt 010} &
+% {\tt 640} & {\tt 500} & {\tt 380} & {\tt 400} & {\tt 400} & {\tt 800} & 
+% {\tt 800} \\
+% 
+% {Polaroid Colour} & {\tt SX70} & {\tt 025} & {\tt 025} & {\tt 025} & 
+% {\tt 200} & {\tt 300} & {\tt 280} & {\tt 350} & {\tt 750} & {\tt 600} & 
+% {\tt 275} \\
+% 
+{EKT \scriptsize DAYLIGHT ASA 100} & {\tt ED100} & {\tt 015} & {\tt 015} & 
+{\tt 015} & {\tt 425} & {\tt 330} & {\tt 400} & {\tt 500} & {\tt 750} &
+{\tt 650} & {\tt 160} \\
+
+{EKT \scriptsize DAYLIGHT ASA 400} & {\tt ED400} & {\tt 015} & {\tt 015} & 
+{\tt 015} & {\tt 425} & {\tt 330} & {\tt 400} & {\tt 500} & {\tt 750} &
+{\tt 650} & {\tt 40} \\
+
+% {(B\&W) Polaroid 55 PN} & {\tt 4x5} & -- & {\tt 035} & -- & -- &
+% {\tt 275} & -- & --& -- & -- & {\tt 950} \\
+% 
+% {(B\&W) Polaroid 52} & {\tt 4x5} & -- & {\tt 035} & -- & -- & {\tt 275} &
+% -- & -- & -- & -- & {\tt 350} \\                       
+% 
+% {(B\&W) Polaroid 57} & {\tt 4x5} & -- & {\tt 010} & -- & -- & {\tt 350} &   
+%  -- & -- & -- & -- & {\tt 020} \\
+% 
+%{(B\&W) Kodak Plus-X} & {\tt 35mm} & -- & {\tt 035} & -- & -- & {\tt 275} & 
+%   -- & -- & -- & -- & {\tt 150} \\
+% \hline
+% {\bf From IoA, Cambridge} &&&&&&&&&&& \\
+% \hline
+%{Polachrome} & {\tt 35mm} & {\tt 015} & {\tt 015} &
+%{\tt 015} & {\tt 620} & {\tt 465} & {\tt 360} & {\tt 600} & {\tt 600} & 
+%{\tt 230} & {\tt 200} \\
+%{Ektachrome 400 (day)} & {\tt 35mm} & {\tt 015} & {\tt 015} &
+%{\tt 015} & {\tt 620} & {\tt 465} & {\tt 360} & {\tt 600} & {\tt 600} & 
+%{\tt 230} & {\tt 50} \\
+{FP4 (B \& W)} & {\tt FP4} & {\tt 015}  & {\tt 015} & {\tt 015}  
+& {\tt 600} & {\tt 450} & {\tt 450} & {\tt 600} & {\tt 600} & {\tt 600} & 
+{\tt 180} \\
+%{(B\&W) Polapan} & {\tt 35mm} & -- & {\tt 015} & -- & -- & {\tt 200} & 
+%   {\tt 500} & {\tt 500} & {\tt 200} & {\tt 200} & {\tt 250} \\
+%{(B\&W) 2415 (Tech. pan)} & {\tt 35mm} & -- & {\tt 015} & -- & -- & {\tt 200} & 
+%   -- & -- & -- & -- & {\tt 300} \\
+\hline
+\end {tabular}
+\end {center}
+\end {table}
+
+\subsection {\bf Brightness parameter adjustment}
+
+When setting the brightness parameters, it is necessary to flick between two
+modes -- brightness parameter mode (BRT) and brightness meter mode (MTR). The
+meter mode is used to monitor the brightness of the CRT screen whilst the
+parameter mode is used to adjust the brightness of the CRT. Please note that it
+is vital that you do NOT adjust the brightness of the CRT (as described below)
+whilst in the meter mode. If you do, then the auto-calibration routine which
+takes place when one changes from MTR to BRT mode and will interpret the
+change in brightness as an error and will compensate by changing the brightness
+drive to the CRT. The end result will be new parameter and meter numbers 
+i.e. it manifests itself to the user as ``drift'' in the meter readings.
+
+\begin{enumerate}
+
+\item Select desired parameter set (film) as described in Section 2.2
+
+\item Select RED video by pressing ``R'' switch on the front panel.
+    
+\item Select the Brightness Parameter function by holding down the SHIFT 
+switch and depressing the BRT-MTR switch once, such that the LED on
+the left hand side of the BRT-MTR switch is illuminated.
+
+\item Display a black screen on the IKON using HONEYWELL\_DIR:BLWH.EXE
+
+\item Set the readout in the message window to approximately 365 using the
+``+'' and ``-''  switches on the front panel.
+In an unadjusted Honeywell,
+an intial brightness parameter number of 365 will yield a brightness meter
+reading of 015 with a black screen on the IKON. Hence, you should use 365 
+as a starting point on the brightness parameter side.          
+
+\item Hold down the SHIFT switch and press the BRT-MTR switch once such
+that the LED on the right hand side of the BRT-MTR switch is 
+illuminated.  Release the SHIFT switch and then press the BRT-MTR switch
+several times until the reading in the message window is constant.
+Always press the meter switch several times to obtain an average reading.
+Do not take the first reading as this is usual low. It will normally
+take three presses to reach the final meter value. This is especially important 
+in the brightness meter mode with a black video display. A reading of
+015 represents a very small light sensor output voltage and even a very 
+slight change in light level caused by ambient or residual light could change
+that number.
+Note this number.  If the reading is 015 go to step 9.
+
+\item Should the reading not be 015 then the number set in step 5 must
+be changed to a higher value if the reading is less than 015 and to a 
+lower value if the reading is greater than 015.
+
+\item 
+NEVER use the ``+'' and ``-'' buttons when in brightness meter mode.
+For example, if the brightness meter reads 005 when it should read 015, shift
+over to the brightness parameter mode and increase the parameter number. Then switch
+back to the brightness meter and note the new meter value -- It should be higher.
+Do this by holding down the SHIFT switch and pressing the BRT-MTR switch
+once such that the LED on the left hand side of the BRT-MTR switch is
+illuminated.  
+Increase or decrease the parameter number from 300 in the message
+window by, say 30, to 330 or 270 as appropriate, and repeat this 
+section until 015 is read consistently. 
+
+\item Hold in the SHIFT switch and press the BRT-MTR switch once such that
+the left hand LED on the BRT-MTR is illuminated. Note the number for
+future reference.
+
+\item Select the GREEN video by pressing the G switch on the panel and repeat
+steps 3 through 9.                                                 
+
+\item Select the BLUE video by pressing the B switch on the panel and repeat
+steps 3 through 9.                                                 
+
+\end{enumerate}
+
+\subsection {\bf Contrast parameter adjustment procedure}
+
+Please note that the contrast meter and parameter modes may be used
+interchangeably to increment the contrast drive voltage. 
+This is
+NOT the case when adjusting the brightness parameter. The difference is
+because the contrast meter (along with providing a readout of the light sensor
+output voltage) parallels the function of the contrast parameter mode 
+in that it {\bf directly} controls the drive voltage to the video amplifier.
+The brightness parameter setting, on the other hand, only {\bf indirectly}
+controls the brightness drive.
+
+\begin{enumerate}
+
+\item Select Red video by pressing the RED switch on the front panel.
+
+\item Select the Contrast Meter function by pressing and holding the 
+SHIFT switch while simultaneously pressing the CNT-MTR switch twice
+such that the right hand LED on the CNT-MTR switch lights.
+
+\item Display a white screen on the IKON using HONEYWELL\_DIR:BLWH.EXE.
+
+\item Using the ``+'' or ``-'' switch, set the display in the message window to
+the value listed in Table 1 under `CONTRAST - R' for the type
+of film to be used.
+
+\item Select green video by pressing the GRN switch on the front panel.
+
+\item Using the ``+'' or ``-'' switch, set the display in the message window
+to the value listed in Table 1 under `CONTRAST - G' for the
+type of film to be used.
+
+\item Select blue video by pressing the BLU switch on the front panel.
+
+\item Using the ``+'' or ``-'' switch, set the display to the value listed in
+Table 1 under `CONTRAST - B' for the type of film to be
+used.
+
+\end {enumerate}
+
+\subsection {\bf Ratio parameter adjustment procedure}
+
+\begin {enumerate}
+
+\item Select Red video by pressing the RED switch on the front panel.
+
+\item Select the Ratio Parameter by pressing and holding the SHIFT switch 
+while simultaneously pressing the RATIO button once, such that it 
+lights.
+
+\item Using the ``+'' or ``-'' switch, set the display in the message window to
+the value listed in Table 1 under `RATIO - R' for the type of film
+to be used.
+
+\item Select Green video by pressing the GRN switch on the front panel.
+
+\item Using the ``+'' or ``-'' switch, set the display in the message window 
+to the value listed in Table 1 under `RATIO - G' for the type 
+of film to be used.
+
+\item Select Blue video by pressing the BLU switch on the front panel.
+
+\item Using the ``+'' or ``-'' switch, set the display in the message window to
+the value listed in Table 1 under `RATIO - B' for the type of film 
+to be used.
+
+\end{enumerate}
+
+\subsection {\bf Exposure parameter adjustment procedure}
+
+\begin{enumerate}
+
+\item Select the Exposure Parameter by pressing and holding the SHIFT switch
+while simultaneously pressing the EXP-NO switch once, such that the
+left hand LED on the EXP-NO switch lights.
+
+\item Using the ``+'' or ``-'' switch, set the display in the message window to
+the value listed in Table 1 under EXPOSE for the type of film to be
+used.           
+             
+\item Select the Exposure Parameter by pressing and holding the SHIFT switch
+while simultaneously pressing the EXP-NO. switch twice, such that the
+right hand LED on the EXP-NO. switch lights.
+
+\item Using the ``+'' or ``-'' switch, set the display in the message window to
+1. This sets up single exposures. Multiple exposures are also possible by
+selecting a higher number.
+           
+\end{enumerate}
+
+
+The Honeywell has one important defect that Site managers should be aware
+of. When the main unit is powered off, parameter settings are stored in
+non-volatile memory. However, the lifetime of this non-volatile memory
+is only about two weeks. Hence it is necessary to power-on your unit
+about once per week in order to revitalize the non-volatile memory. Failure
+to do this will result in the loss of your parameter setting and you will have
+to restore them either by hand or using the HONEY program described below, 
+and also in Appendix A. 
+
+\subsection{Setting up your system for use with the HONEY control program}
+
+To allow users to control the Honeywell entirely from the VAX as described in 
+Section 2.3, system managers must first set up the appropriate hardware and
+software as indicated below. 
+
+Connection of the Honeywell to the VAX is via an RS232 cable. The Honeywell end should be male
+and have pins 4, 5 \& 20 soldered together. Pins 2, 3 \& 7 should 
+run straight through to pins 2,3 \& 7 on the end to be connected 
+to a terminal server port. 
+The port should also have the following characteristics set:
+
+\begin{itemize}
+
+\item SPEED 1200
+
+\item AUTOBAUD DISABLED
+
+\item AUTOPROMPT DISABLED
+
+\item CHARACTER SIZE 8
+
+\item ACCESS REMOTE
+
+\end{itemize}
+
+The port must be set up as an application port using
+a command procedure such as the example from Starlink Project VAXcluster
+shown below. A number of logical names must also be defined. 
+You will have to change the
+node name, port name and device name for your own site and place
+these lines in a startup command procedure that is run at boot time.
+
+\begin{quote}
+\begin{verbatim}
+$	RUN SYS$SYSTEM:LATCP
+CREATE PORT/APPLICATION/NOLOG				LTA106:
+SET PORT/APPLICATION/NODE=RLTS10/PORT=PORT_12/NOLOG	LTA106:
+$	SET TERM/PERM/NOBROADCAST/NOTYPE_AHEAD 		LTA106:
+$ SET PROTECTION=(W:RW) /DEVICE				LTA106:
+$ DEFINE/SYSTEM HONEYWELL LTA106:
+$ DEFINE/SYSTEM HONEYWELL_DIR STARDISK:[STARLINK.UTILITY.HONEY]
+$ DEFINE/SYSTEM HONEY_S_DIR HONEYWELL_DIR
+$ DEFINE/SYSTEM HONEYHELP HONEYWELL_DIR:HONEY.HLB
+\end{verbatim}
+\end{quote}
+
+HONEY can be run via the symbol 
+
+\begin{quote}
+\begin{verbatim}
+$ HONEY
+\end{verbatim}
+\end{quote}
+
+which is set up in a login command procedure with the entry
+
+\begin{quote}
+\begin{verbatim}
+$ HONEY :== $ HONEYWELL_DIR:HONEY
+\end{verbatim}
+\end{quote}
+
+Once system managers have set up their Honeywell cameras as described earlier in
+Section 3, they should use the SAVE option in HONEY to save these settings 
+into VAX files in the system directory HONEY\_S\_DIR. These settings can then 
+easily be reloaded into the Honeywell using the RESTORE option in HONEY.
+Indeed, RESTORE should always be used before taking photographs to ensure that
+the parameter settings currently in the Honeywell
+are correct. For example, the non-volatile memory
+may have failed or an inquisitive user may have disrupted the settings.
+The settings for each type of film should be saved into
+the standard VAX file names listed in Table 1. An example showing the use
+of RESTORE is shown in Section 2.3. All the HONEY commands are described
+in more detail in Appendix~A
+
+\section {Geometric adjustment of Honeywell (for system managers only)}
+
+In order to facilitate the geometrical adjustment of the Honeywell, a
+graticule that sits inside the CRT bevel has been supplied to all sites, marked
+with a cross--hatch which matches the pattern produced by the program
+HONEYWELL\_DIR:GRAT.EXE. This enables the geometry to be set up quite accurately and 
+also ensures that the overall size is right and that all the information 
+lies within the visible region of a mounted slide. Managers should not attempt
+to tweak the Honeywell themselves. Instead, they should use it to diagnose 
+poor geometry and supply the graticule to service engineers when they arrive to
+tune the camera.
+
+By special permission from the service company the Starlink Project Manager
+is empowered to carry out the basic geometry adjustments himself. If you feel
+your unit would benefit from adjustment, ask your site manager to inform
+the Project Manager so that the adjustments can be carried out should the
+opportunity arise.
+
+All the Honeywell cameras around Starlink should now be set up with
+good geometry. Software does exist to illustrate deviations from perfect
+geometry by analysing the deviations of the true positions of dots in an array
+from their expected positions. However, this procedure requires specialist equipment 
+in order to determine the dot positions from photographs of the dot array
+and hence is not described here. Furthermore, it is hoped
+that the Honeywells are stable and that it will not become necessary to 
+use this software again.
+
+For testing purposes, it is necessary to have an image displayed when not
+exposing. This can be done in two ways. The crude method
+is to hold down SHIFT and press BRT-MTR once. This will display the image on 
+the IKON for 
+about 20 seconds. The image can be left up on the CRT permanently on some
+machines. Unlock the
+cross-head screws on the back and remove the cover. On the right of the machine
+are three PCBs. The middle one has at its top-right corner a switch marked S2.
+Flip this switch and the image will stay on. The RGB buttons can select each
+video channel. Alternatively, you can
+remove the top plate just in front of the CRT and look directly onto the screen. 
+This plate is held on by two small allen screws but be {\bf very, very} careful
+when taking them out since they are very easy to drop into the main unit.
+Don't forget to flip switch S2 back again when you have finished. Keep clear of
+the mains input and EHT regions. Starlink accepts no responsibility for
+injuries sustained by users or staff who have gained access to the interior of
+a machine as described.
+
+The position of the interlace switch on the rear on the main unit did not 
+appear to affect the unit tested. This should be left on X1 since this
+does not attempt any line smoothing. 
+
+\section{Testcard programs for IKON}
+
+There are a number of test programs in HONEYWELL\_DIR which can be used to
+aid system managers set-up and check their Honeywell camera. All 
+are self-explanatory when run, and use GKS device names. Each is briefly 
+described below:
+
+\begin{description}
+\item [BLWH] -- Produces black and white screens as required for
+the parameter setting procedures described in Sections 3.2 \&
+3.3.
+\item[GRID] -- Produces a white grid on a black background.
+\item[DOTS] -- Produces an array of dots.
+\item[GRAT] -- Produces a grid identical to the overlay graticule
+distributed to site managers.
+\item[PATTRN] -- Interactive program to produce grids, dot patterns and
+circles.
+\item[TESTCARD] -- Colourful demonstration to check colour fidelity.
+\item[TRIANGLES] -- Colourful demonstration to check colour fidelity.
+\end{description} 
+
+\appendix
+
+\section{HONEY - A Honeywell control program}
+
+\subsection{Introduction}
+
+The program HONEY gives a more user-friendly interface to the Honeywell
+recorder than using it via the front panel. It also allows the user to
+save device settings to disc and restore them at a later date. The
+restore facility uses the directory search path, default directory,
+HONEY\_U\_DIR, HONEY\_S\_DIR so standard settings can easily be
+provided. The directory HONEY\_S\_DIR is designed as a ``system''
+directory, and HONEY\_U\_DIR as a ``user'' directory. Alternatively
+the user can specify the directory in the file name.
+
+\subsection{Basic Use}
+
+On running HONEY, the program will
+tell you the current setup of the device, and return with a prompt.
+For help information enter a the command ``HELP'', and you will get
+a list of commands. The commands may be abbreviated provided that they
+are still unique. The colour names for BRIGHTNESS, CONTRAST and RATIO
+can also be abbreviated. Thus the user could type
+\begin{quote}
+\begin{verbatim}
+HONEY> BRIGHTNESS GREEN 36
+\end{verbatim}
+\end{quote}
+for example, but would get the same result from
+\begin{quote}
+\begin{verbatim}
+HONEY> BRI G 36
+\end{verbatim}
+\end{quote}
+
+The parameter set used may be from 1 to 8, but the program warns if
+7 or 8 is accessed, so as to allow these two to be reserved for testing,
+etc.
+
+During an exposure, apart from CANCEL, only those commands which do not
+communicate with the device (SAVE, SHOW, HELP) can be used. SHOW normally
+communicates with the device to obtain the film position, but does not
+if an exposure is in progress. With the BRACKET command, no commands may
+be entered until the sequence has finished.
+
+After a command to change the setting, the program will show the setting
+of that parameter (or set of parameters), to allow the user to confirm
+that the parameter is changed. Please note that some of the commands
+such as {\bf MONOCHROME, POSITIVE \& NEGATIVE} should not be used with the 
+Starlink Honeywells but are included for completeness.
+
+\subsection{Summary of Commands}
+
+\newcounter{dummy}
+\begin{list}{dummy}{\usecounter{dummy}}
+
+\item[\bf BLUE] - Select blue mode
+\item[\bf BRACKET {\em n1} {\em n2} {\em n3}...] Take a series of
+exposures with exposure time (factor) set to {\em n1} {\em n2} {\em n3}
+etc. The previous settings are then restored.
+\item[\bf BRIGHTNESS {\em (colour) n}] - Set brightness to {\em n}
+\item[\bf CANCEL] - Cancel exposure
+\item[\bf COLOUR] - Select colour mode
+\item[\bf COMPOSITE] - Select composite mode
+\item[\bf CONTRAST {\em (colour) n}] - Set contrast to {\em n}
+\item[\bf EXPOSE] - Make exposure
+\item[\bf FRAME {\em n}] - Set frame counter to {\em n}
+\item[\bf GREEN] - Select green mode
+\item[\bf HELP] - Give help information
+\item[\bf MONOCHROME] - Select black and white mode
+\item[\bf MULTIPLE {\em n}] - Set number of multiple exposures to {\em
+n}.
+\item[\bf NEGATIVE] Select negative video
+\item[\bf PAGE {\em n}] - Select parameter set {\em n} ({\em n} is in
+the range 1 to 8)
+\item[\bf POSITIVE] Select positive video
+\item[\bf RATIO {\em colour n}] - Set exposure ratio  to {\em n}
+(colour only)
+\item[\bf RED] - Select red mode
+\item[\bf RESET] - Reset frame counter
+\item[\bf RESTORE] - Restore parameter set from a file created by the
+SAVE option
+\item[\bf SAVE] - Save parameter set to a file (the file name is
+prompted for).
+\item[\bf SHOW] - Show current settings
+\item[\bf SINGLE] - Set exposures to single per command (this is the
+same as MULTIPLE 1)
+\item[\bf TIME {\em n}] - Set exposure time (factor) to {\em n}
+\item[\bf CTRL-Z] - Leave program
+\end{list}
+
+For BRIGHTNESS, CONTRAST and RATIO the colour (e.g. RED) must be 
+specified if in colour mode, but omitted in monochrome mode (but note
+that RATIO only applies to colour mode). Where {\em n} is given as a
+parameter, it is an integer from 0 to 999, except for PAGE, where it is
+from 1 to 8.
+
+Note that only one of each of the following settings may apply at
+any one time (most are fairly obvious):
+BLUE, GREEN, RED, and COMPOSITE\\
+COLOUR and MONOCHROME\\
+NEGATIVE and POSITIVE\\
+Also note that BLUE, GREEN, RED and COMPOSITE apply only to colour
+mode, and NEGATIVE and POSITIVE only to black and white mode.
+
+When using the BRACKET option for several images, it may be found
+useful to recall the command using up arrow or control b, just
+repeating the command with different images.
+
+Note that, with the MULTIPLE command, problems can arise if the number
+of exposures set is too large (around 20). This seems to be due to some
+limit in the VMS buffering, and will crash the program. If this occurs
+enter the command
+\begin{quote}
+\begin{verbatim}
+$ SET HOST/DTE HONEYWELL
+\end{verbatim}
+\end{quote}
+to allow the Honeywell to write to the terminal. If desired the exposure
+can be cancelled by entering the command ``CT'' (in capitals). Enter
+control backslash to end this connection.
+
+\end {document}

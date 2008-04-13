@@ -1,0 +1,2708 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {4.7}
+\newcommand{\stardocauthors}   {M D Lawden}
+\newcommand{\stardocdate}      {17 May 1989}
+\newcommand{\stardoctitle}     {INTERIM --- Starlink Software Environment}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+\newpage
+
+\section {INTRODUCTION}
+Early versions of this paper were based on a number of other papers produced
+at a very early stage of the Starlink project.
+They contained a description of a specific implementation of a subroutine
+library, speculations on the desirable attributes of a software environment,
+and future development plans.
+They reflected the experimental nature of the Starlink software environment
+at that time.
+Since then, the situation has changed.
+The implemented subroutine library, INTERIM\_DIR:INTERIM.OLB, is now a well
+established and widely used piece of software.
+A completely new Starlink software environment (ADAM) has been developed and
+distributed.
+Thus the library released in 1980 as `STARLINK' and now called `INTERIM' has
+reached the end of its development cycle and is now frozen in its current state,
+apart from bug corrections.
+This paper has, therefore, been completely rewritten and restructured to reflect
+the new situation.
+Its aim is to describe the facilities of the INTERIM subroutine library as
+clearly and concisely as possible.
+It avoids speculation, discussion of design decisions, and announcements of
+future plans.
+
+This paper is a minor revision of SUN/4.5 converted into TEX format and is based
+on papers SUN/4.3 and SUN/15.1 which were written by Dave Pearce and Cliff
+Pavelin.
+SUN/15.1 is now obsolete and has been withdrawn.
+The INTERIM routines were written in 1980/81 by Dave Pearce at the Rutherford
+Appleton Laboratory.
+\section {THE INTERIM ENVIRONMENT}
+The term `software environment' is used to refer to the resources available
+to a person wanting to develop and use application programs.
+The `INTERIM environment' is the result of the initial efforts to create a
+Starlink software environment.
+It is described under the following headings:
+\begin{description}
+\begin{description}
+\item [Programmer Interface]
+\item [Program Development]
+\item [User Interface]
+\end{description}
+\end{description}
+The programmer interface is provided by the routines in the INTERIM library.
+These are described in section 3 and appendices A, B and C.
+In other papers, programs which use these routines are sometimes referred to as
+Starlink Application Programs (SAP).
+However, this term is now ambiguous because a new Starlink environment
+exists, so in this paper they will always be called `INTERIM programs'.
+
+The process by which INTERIM programs are prepared for execution is described
+in section 4.
+An example INTERIM program and its associated connection file are shown in
+appendix D.
+
+Two different user interfaces are available:
+\begin{description}
+\begin{description}
+\item [RUNSTAR]
+\item [DSCL]
+\end{description}
+\end{description}
+RUNSTAR is the simplest of the two and is described in section 5.
+Examples of its use are shown in appendix E.
+DSCL was written independently at RGO and is documented in references [1] and
+[2].
+RUNSTAR should be quite adequate for development work, but DSCL is normally
+selected for running INTERIM programs such as those in the ASPIC package.
+\section {PROGRAMMER INTERFACE}
+The programmer interface is provided by the routines stored in the object
+library INTERIM\_DIR:\-INTERIM.\-OLB.
+There are 36 user callable routines available in this library.
+Their functions can be classified under 2 headings:
+\begin{description}
+\begin{description}
+\item [Parameter access and control] (22)
+\item [Utilities] (14)
+\end{description}
+\end{description}
+This section describes these routines in general terms.
+Section 3.1 describes routines for accessing program parameters.
+Section 3.2 describes routines which access a data structure called a
+{\em frame} which is the main mechanism provided for storing data.
+Section 3.3 describes utility routines.
+Section 3.4 describes error handling facilities.
+Section 3.5 displays a functional classification of the routines.
+\subsection {Parameters}
+The parameter mechanism used by the INTERIM environment is its most
+characteristic feature.
+A program parameter is an object which a program manipulates, but whose
+identity or value is not known until the program is run.
+Examples are names of images to be processed or a threshold value below
+which a count or pixel value is not significant.
+Parameters identify the data on which a program operates.
+
+Each parameter has the following three characteristics:
+\begin{description}
+\begin{description}
+\item [Name]
+\item [Class]
+\item [Value]
+\end{description}
+\end{description}
+These are considered in more detail in the next 3 sub-sections.
+\subsubsection {Name}
+The {\em Name} is a character string used in the program source code to
+identify a parameter.
+For example, a parameter might have the name `IMAGE' or `THRESH'.
+Letters should be in upper case.
+\subsubsection {Class}
+There are 3 classes of parameter:
+\begin{description}
+\begin{description}
+\item [VALUE]
+\item [FRAME]
+\item [ERROR]
+\end{description}
+\end{description}
+Parameters of different classes are accessed by different sets of routines
+and serve different purposes.
+\begin{description}
+\item [VALUE Class]:
+This parameter class is designed for single items or small lists of items.
+Its value is a vector (1-D array).
+The elements of the vector can be character-string, integer, real,
+double-precision or logical.
+
+It is unfortunate that the name `VALUE' was chosen for this class name since
+there exists the possibility of confusion between a `VALUE class parameter' and
+a `parameter value'.
+Furthermore, the routines which access VALUE class parameters use the generic
+term KEY in their names.
+It would have been better to have used the term `KEY class' or `KEYWORD' class.
+However, the class name `VALUE' is used in connection files, so it cannot be
+changed without disrupting existing users.
+The context should make it clear in what sense the word `value' is being used.
+I will use capitals when referring to the class name and lower case when
+referring to parameter values.
+
+There are 10 routines available for accessing VALUE class parameters:
+\begin{tabbing}
+\hspace{31mm}RDKEYCxxxx\=-xx\=\kill
+\hspace{31mm}{\bf RDKEYC} \>- \>Read character value\\
+\hspace{31mm}{\bf RDKEYI} \>- \>Read integer value\\
+\hspace{31mm}{\bf RDKEYR} \>- \>Read real value\\
+\hspace{31mm}{\bf RDKEYD} \>- \>Read double precision value\\
+\hspace{31mm}{\bf RDKEYL} \>- \>Read logical value\\
+\\
+\hspace{31mm}{\bf WRKEYC} \>- \>Write character value\\
+\hspace{31mm}{\bf WRKEYI} \>- \>Write integer value\\
+\hspace{31mm}{\bf WRKEYR} \>- \>Write real value\\
+\hspace{31mm}{\bf WRKEYD} \>- \>Write double precision value\\
+\hspace{31mm}{\bf WRKEYL} \>- \>Write logical value
+\end{tabbing}
+\item [FRAME Class]:
+This parameter class is meant for large amounts of data such as an image.
+The original term used was `Bulk Data Frame' but this is usually shortened to
+`Frame'.
+However, the original term lives on in the file type `.BDF' which is used to
+identify files containing frames.
+Frames are one of the most significant aspects of the design of the INTERIM
+environment and are considered in more depth in section 3.2.
+It is not possible to access frames using FORTRAN I/O; you must use INTERIM
+routines.
+\item [ERROR Class]:
+The ERROR class of parameter enables messages to be sent to a user.
+Once again the class name is unfortunate because it implies that the only
+use for the class is error handling.
+This was the original requirement which led to the creation of the class,
+but the facility can be used to display text strings on a user's terminal
+for any purpose.
+The messages are stored in a connection file and can be changed without
+recompiling the program.
+
+There is 1 routine available for accessing ERROR class parameters:
+\begin{tabbing}
+\hspace{31mm}RDKEYCxxxx\=-xx\=\kill
+\hspace{31mm}{\bf WRERR} \>- \>Display message
+\end{tabbing}
+This is discussed in section 3.4.
+\end{description}
+\subsubsection {Value}
+A parameter has its value set by a call to an appropriate INTERIM routine.
+Default values can be specified before a program is run by setting up a file
+called a `connection file' (section 4.2).
+It is also possible to calculate run-time default values for VALUE class
+parameters (section 5.2.3).
+
+The value of a parameter can be cancelled by the following routine:
+\begin{tabbing}
+\hspace{40mm}RDKEYCxxxx\=-xx\=\kill
+\hspace{40mm}{\bf CNPAR} \>- \>Cancel parameter association
+\end{tabbing}
+This cancels the association between a parameter and its current value.
+Its purpose is to enable you to demand a new value if you wish to reject the
+current one.
+\subsection {Frames}
+A FRAME is the unit of data transfer between the program and external storage.
+The programmer can regard it as a virtual file because the information in a
+real file is accessed by mapping it into a program's virtual address space.
+The data is converted (if necessary) between the data type chosen by the
+programmer and that used to store the data.
+Thus, the added facilities provided by a frame over normal file I/O are
+FILE MAPPING and TYPE CONVERSION.
+
+A frame has the following structure:
+\setlength{\unitlength}{1mm}
+\begin{center}
+\begin{picture}(80,20)
+\thicklines
+\put (0,0){\framebox(30,5){DATA}}
+\put (50,0){\framebox(30,5){DESCRIPTOR}}
+\put (25,15){\framebox(30,5){FRAME}}
+\put (15,10){\line(1,0){50}}
+\put (15,5){\line(0,1){5}}
+\put (65,5){\line(0,1){5}}
+\put (40,10){\line(0,1){5}}
+\end{picture}
+\end{center}
+The DATA component is for holding the data that the program wishes to
+manipulate.
+The DESCRIPTOR component is for holding descriptive information about the data.
+Information in the DATA and DESCRIPTOR components is accessed by different sets
+of routines.
+
+In general, the format and interpretation of information stored in a frame
+is determined solely by the program.
+However, some formats are so common that it is worthwhile to use the concept
+of a frame `type'.
+All frames of a given type obey certain conventions.
+Only one type has been defined as part of the INTERIM environment.
+This is the `IMAGE' type described in section 3.2.3.
+However, a programmer can define his own type and use the type name in routines
+RDDATA and WRDATA that access the data.
+
+A file containing a frame is mapped into a program's virtual address space
+rather than having its contents transferred by conventional I/O statements
+such as a Fortran READ.
+This greatly increases I/O efficiency for large data sets.
+\subsubsection {DATA component}
+There are 2 routines available to access the DATA component of a frame:
+\begin{tabbing}
+\hspace{40mm}RDKEYCxxxx\=-xx\=\kill
+\hspace{40mm}{\bf RDDATA} \>- \>Read the DATA component of a frame\\
+\hspace{40mm}{\bf WRDATA} \>- \>Write the DATA component of a frame
+\end{tabbing}
+RDDATA maps a frame from an already existing .BDF file into a program's
+address space and sets a pointer to the DATA component.
+WRDATA maps a new section of program address space which the program then
+uses as the new DATA component.
+When the program terminates, this component (and a DESCRIPTOR component)
+is written to a new .BDF file.
+
+The DATA component is mapped as a vector.
+A program can address the vector in any appropriate way.
+However, this is specific to the program.
+The routines simply present you with a contiguous array of elements.
+If your data is naturally addressed as an n-dimensional array, the routines
+described in section 3.2.3 should be used instead.
+
+The program can specify that it wants to manipulate the elements of the vector
+as one of the following data types:
+\begin{tabbing}
+\hspace{40mm}RDKEYCxxxx\=-xx\=\kill
+\hspace{40mm}{\bf Signed Byte}\\
+\hspace{40mm}{\bf Signed Word}\\
+\hspace{40mm}{\bf Signed Longword}\\
+\hspace{40mm}{\bf Real}\\
+\hspace{40mm}{\bf Double Precision}\\
+\hspace{40mm}{\bf Unsigned Byte}\\
+\hspace{40mm}{\bf Unsigned Word}
+\end{tabbing}
+If the data has been stored in the .BDF file as a different type from
+the one chosen by the program, the system will automatically convert the
+elements into the desired type (section 5.3).
+\subsubsection {DESCRIPTOR component}
+The structure of the DESCRIPTOR component is based on that of FITS header data
+[7].
+As far as the programmer is concerned, the structure of a descriptor can be
+regarded as that represented by the following tree:
+\setlength{\unitlength}{1mm}
+\begin{center}
+\begin{picture}(90,25)
+\thicklines
+\put (0,20){\makebox(25,5){DESCRIPTOR}}
+\put (42.5,20){\makebox(15,5){ITEM}}
+\put (73,20){\makebox(15,5){NAME}}
+\put (73,15){\makebox(15,5){VALUE}}
+\put (42.5,10){\makebox(15,5){ITEM}}
+\put (73,10){\makebox(15,5){NAME}}
+\put (73,5){\makebox(15,5){VALUE}}
+\put (25,22){\line(1,0){20}}
+\put (55,22){\line(1,0){20}}
+\put (65,17){\line(1,0){10}}
+\put (35,12){\line(1,0){10}}
+\put (55,12){\line(1,0){20}}
+\put (65,7){\line(1,0){10}}
+\put (35,5){\line(0,1){17}}
+\put (65,17){\line(0,1){5}}
+\put (65,7){\line(0,1){5}}
+\end{picture}
+\end{center}
+Thus, a descriptor is a sequence of items, each of which comprises a NAME and a
+VALUE.
+The NAME specifies some characteristic of the data stored in the DATA
+component and the VALUE specifies the value of this characteristic.
+Several values can be specified for the same name.
+This is done by having several items with the same name component but different
+values.
+
+There are 6 routines available for manipulating descriptors:
+\begin{tabbing}
+\hspace{40mm}RDKEYCxxxx\=-xx\=\kill
+\hspace{40mm}{\bf CYDSCR} \>- \>Copy complete descriptor\\
+\hspace{40mm}{\bf RDDSCR} \>- \>Read descriptor item value\\
+\hspace{40mm}{\bf RDDSCN} \>- \>Read descriptor item name\\
+\hspace{40mm}{\bf WRDSCR} \>- \>Write descriptor item\\
+\hspace{40mm}{\bf ADDSCR} \>- \>Add new descriptor item\\
+\hspace{40mm}{\bf DLDSCR} \>- \>Delete descriptor item
+\end{tabbing}
+\subsubsection {IMAGE type frames}
+Much astronomical data consists of rectangular n-dimensional arrays of numbers.
+To handle this, a frame type called `IMAGE' has been defined.
+This is interpreted as a rectangular n-dimensional array of data with a
+descriptor which is a representation of the FITS standard header for image data.
+The mandatory FITS header information (SIMPLE, BITPIX, NAXIS, NAXIS1,\ldots)
+must be present.
+
+There are 2 routines available to manipulate `IMAGE' type frames:
+\begin{tabbing}
+\hspace{40mm}RDKEYCxxxx\=-xx\=\kill
+\hspace{40mm}{\bf RDIMAG} \>- \>Read IMAGE type frame\\
+\hspace{40mm}{\bf WRIMAG} \>- \>Write IMAGE type frame
+\end{tabbing}
+They check that the specified frame is of type `IMAGE' before mapping it into a
+program's address space.
+\subsection {Utility routines}
+The utility routines fall into 4 groups:
+\begin{description}
+\begin{description}
+\item [Data conversion] (9)
+\item [Mapping control] (2)
+\item [Direct terminal I/O] (2)
+\item [Error handling] (1)
+\end{description}
+\end{description}
+There are 9 utility routines which handle {\em data conversion}:
+\begin{tabbing}
+\hspace{40mm}RDKEYCxxxx\=-xx\=\kill
+\hspace{40mm}{\bf CTOD} \>- \>Character to double precision conversion\\
+\hspace{40mm}{\bf CTOI} \>- \>Character to integer conversion\\
+\hspace{40mm}{\bf CTOL} \>- \>Character to logical conversion\\
+\hspace{40mm}{\bf CTOR} \>- \>Character to real conversion\\
+\\
+\hspace{40mm}{\bf DTOC} \>- \>Double precision to character conversion\\
+\hspace{40mm}{\bf HTOC} \>- \>Integer to character conversion (hexadecimal)\\
+\hspace{40mm}{\bf ITOC} \>- \>Integer to character conversion (decimal)\\
+\hspace{40mm}{\bf LTOC} \>- \>Logical to character conversion\\
+\hspace{40mm}{\bf RTOC} \>- \>Real to character conversion
+\end{tabbing}
+These enable values to be converted between internal and external forms
+when doing I/O.
+
+There are 2 utility routines which control the {\em mapping of dynamic memory}:
+\begin{tabbing}
+\hspace{40mm}RDKEYCxxxx\=-xx\=\kill
+\hspace{40mm}{\bf GETDYN} \>- \>Get dynamic memory\\
+\hspace{40mm}{\bf FRDATA} \>- \>Free dynamic memory
+\end{tabbing}
+GETDYN is used to obtain a new section of program address space for any purpose.
+FRDATA can be used to unmap sections of address space mapped by other routines.
+
+There are 2 {\em direct terminal I/O} routines:
+\begin{tabbing}
+\hspace{40mm}RDKEYCxxxx\=-xx\=\kill
+\hspace{40mm}{\bf RDUSER} \>- \>Read user input\\
+\hspace{40mm}{\bf WRUSER} \>- \>Write user output
+\end{tabbing}
+The recommended way of reading from or writing to  a user's terminal is to use
+the parameter system.
+However, some programmers may find this inadequate for their requirements
+because their programs are very interactive in nature.
+The above routines are provided for such people.
+They provide a character string I/O facility.
+More demanding interactive requirements may be satisfied by the facilities
+provided by Starlink graphics packages such as GKS [3], and SGS [4], [5].
+Programs which use these routines may be less portable than programs which
+do all their I/O using the parameter system.
+Fortran I/O statements such as READ are definitely not recommended as these
+are even less portable.
+
+There is 1 utility routine which {\em handles error conditions}:
+\begin{tabbing}
+\hspace{40mm}RDKEYCxxxx\=-xx\=\kill
+\hspace{40mm}{\bf STLERR} \>- \>Starlink error handler
+\end{tabbing}
+This is discussed in section 3.4
+\subsection {Error handling}
+The routine WRERR enables you to send error messages to the terminal.
+Each message is defined as an ERROR class parameter in the connection file
+associated with a program.
+This enables you to change the message without needing to recompile
+the program as it is only necessary to edit the connection file.
+
+Every INTERIM routine except WRERR has an integer variable called {\em status}
+as its last argument.
+If the routine executes normally, it returns with a status value of zero.
+If something abnormal occurs, status is set to a non-zero value called an
+{\em error status code}.
+The meanings of these codes depend on the routine which sets them; they are
+specified in appendix C.
+Status values greater than 2 indicate a severe or fatal condition.
+In general a program should test the status value after calling an INTERIM
+routine and take appropriate action if it is non-zero.
+
+The routine STLERR is not called explicitly by the programmer.
+It is called by other INTERIM routines when they set STATUS to a non-zero value.
+If this is greater than 2, STLERR will display on the users terminal
+the name of the routine which called it and the status value.
+For example, if routine RDKEYI was called with an invalid parameter name,
+your program would display the following message on your terminal:
+\begin{quote}
+{\tt ---RDKEYI STATUS=4}
+\end{quote}
+You may program your own STLERR routine to handle non-zero status values in
+a different way.
+\subsection {Functional classification of INTERIM routines}
+\setlength{\unitlength}{1mm}
+\begin{center}
+\begin{picture}(142,80)
+\thicklines
+\put (0,72){Parameter}
+\put (20,72){Value: {\bf RDKEYx},{\bf WRKEYx}}
+\put (2,69){access}
+\put (20,64){Frame:}
+\put (39,64){Basic}
+\put (55,64){Data: {\bf RDDATA, WRDATA}}
+\put (37,61){routines}
+\put (55,58){Descriptor}
+\put (76,58){complete: {\bf CYDSCR}}
+\put (76,53){items}
+\put (91,53){values: {\bf RDDSCR, WRDSCR}}
+\put (103,50){{\bf ADDSCR, DLDSCR}}
+\put (91,45){names: {\bf RDDSCN}}
+\put (37,40){{\em IMAGE} type: {\bf RDIMAG, WRIMAG}}
+\put (20,32){Error: {\bf WRERR}}
+\put (0,25){Parameter: {\bf CNPAR}}
+\put (2,22){control}
+\put (0,15){Utilities}
+\put (20,15){data conversion: {\bf CTOx, xTOC}}
+\put (20,10){mapping control: {\bf GETDYN, FRDATA}}
+\put (20,5){direct terminal I/O: {\bf RDUSER, WRUSER}}
+\put (20,0){error handler: {\bf STLERR}}
+\put (16,73){\line(1,0){4}}
+\put (18,65){\line(1,0){2}}
+\put (31,65){\line(1,0){8}}
+\put (47,65){\line(1,0){8}}
+\put (51,59){\line(1,0){4}}
+\put (71,59){\line(1,0){5}}
+\put (73.5,54){\line(1,0){2.5}}
+\put (84,54){\line(1,0){7}}
+\put (87.5,46){\line(1,0){3.5}}
+\put (35,41){\line(1,0){2}}
+\put (18,33){\line(1,0){2}}
+\put (12.5,16){\line(1,0){7.5}}
+\put (16,11){\line(1,0){4}}
+\put (16,6){\line(1,0){4}}
+\put (16,1){\line(1,0){4}}
+\put (16,16){\line(0,-1){15}}
+\put (18,73){\line(0,-1){40}}
+\put (35,65){\line(0,-1){24}}
+\put (51,65){\line(0,-1){6}}
+\put (73.5,59){\line(0,-1){5}}
+\put (87.5,54){\line(0,-1){8}}
+\end{picture}
+\end{center}
+\section {PROGRAM DEVELOPMENT}
+We will call programs which use INTERIM routines {\em INTERIM programs}.
+The development of an INTERIM  program has five stages:
+\begin{description}
+\begin{description}
+\item [Coding the program]
+\item [Specifying the connection file]
+\item [Compiling the program]
+\item [Linking the program]
+\item [Running the program]
+\end{description}
+\end{description}
+These stages may need iteration if bugs are found.
+The first four stages are discussed in this section.
+The procedure for running a program is discussed in section 5.
+\subsection {Coding}
+The recommended programming language is the VAX implementation of Fortran 77.
+All the examples and illustrations in this paper use this language.
+Recommended coding standards for Starlink source programs are specified in [6].
+You should only use INTERIM routines for I/O.
+If it is essential to use Fortran I/O statements, please use stream numbers
+1 to 19 to avoid conflict with INTERIM and graphics I/O streams (in particular,
+do not use stream number 37).
+
+A typical structure for an INTERIM program is the following:
+\begin{tabbing}
+XXXXXXXX\=Main rou\=\kill
+\>Main routine:\\
+\>\>Obtain parameter values using INTERIM routines\\
+\>\>Call subroutines to process parameters\\
+\>\>Output results\\
+\\
+\>Subroutines:\\
+\>\>Process program parameters
+\end{tabbing}
+Thus, INTERIM routines are only called from the main routine.
+The manipulative function of the program is carried out in one or more
+subroutines called from the main routine.
+This isolates the coding of the manipulations from the user interaction and
+should lead to improved program portability.
+
+Some INTERIM routines have an argument {\em pointer} which is a pointer to part of
+the program's address space.
+This can be used in Fortran programs by using the `\%VAL' facility of VAX
+Fortran.
+As an example, consider the routine RDDATA.
+Let P be the value of its {\em pointer} argument and S be the value of its
+{\em size} argument.
+The data obtained by RDDATA is accessed as follows:
+\begin{quote}
+{\tt CALL RDDATA( ... , S, P, ... )\\
+CALL APPLIC( \%VAL(P), S, ... )}
+\end{quote}
+where the routine APPLIC is specified as:
+\begin{quote}
+{\tt SUBROUTINE APPLIC( ARRAY, SIZE, ... )\\
+DIMENSION ARRAY(SIZE)\\
+\hspace{10mm}...\\
+access array elements as ARRAY(I)\\
+\hspace{10mm}...}
+\end{quote}
+This example is consistent with the previously suggested program structure.
+The call of the INTERIM routine RDDATA is in the main routine.
+The routine APPLIC is independent of the INTERIM environment and simply
+processes the data in an array.
+This provides a dynamic array facility in FORTRAN.
+The use of the non-standard \%VAL construct is restricted to a single routine
+call in the main routine for each frame that is accessed.
+
+When an existing frame is mapped into memory by RDDATA or RDIMAG, the DATA
+component is protected against write access.
+Any operation which attempts to modify this data will result in a {\em memory
+access violation}.
+In Fortran, this is normally caused by specifying an element of the data array
+on the left hand side of an assignment statement, eg:
+\begin{quote}
+{\tt IMAGE(I,J)=IMAGE(I,J)/16}
+\end{quote}
+Use the standard symbols for error status codes when testing status returns
+from INTERIM routines.
+Use the standard symbols for data type codes when specifying data types.
+These symbols can be defined in a program by including the following statements
+with the specification statements:
+\begin{quote}
+{\tt INCLUDE 'INTERIM(ERRPAR)'\\
+INCLUDE 'INTERIM(FMTPAR)'}
+\end{quote}
+See appendix B for more details.
+\subsection {The Connection File}
+The connection file contains information on the program parameters.
+It must be in the same directory as the file containing the executable
+form of the program.
+It must have the same name but with a type code of `CON'.
+Thus, a program SCALE.EXE should have an associated connection file called
+SCALE.CON.
+The preparation of the connection file should be regarded as part of the
+process of coding an INTERIM program since such a program cannot be run
+without it.
+It also serves as a minimal form of user documentation for the program.
+
+The connection file is an ordinary text file which can be produced with an
+editor.
+Each line of the file specifies the characteristics of a program parameter
+in the following format (you {\em must} start in column 1):
+\begin{quote}
+{\tt Name/Class/Value	! Comment}
+\end{quote}
+\begin{description}
+\item [Name] is the parameter name and must be a character string no greater
+than 8 characters in length.
+\item [Class] is the parameter class and must be one of {\bf VALUE},
+{\bf FRAME}, and {\bf ERROR}.
+For {\bf FRAME} class parameters, a code must be specified within parentheses
+indicating the operation to be performed on the frame.
+The codes and their meanings are:
+\begin{description}
+\begin{description}
+\item [R] - Read
+\item [W] - Write
+\end{description}
+\end{description}
+\item [Value] is the default value for the parameter and is optional.
+The correct syntax for specifying a value is described in section 5.2.2.
+\item [Comment] is optional and is meant for parameter descriptions.
+\end{description}
+As an example, suppose we wish to prepare a connection file containing the
+following information on program parameters:
+\begin{verbatim}
+        Name: INPUT        Class: FRAME        Value: null
+        Name: OUTPUT       Class: FRAME        Value: null
+        Name: COORD        Class: VALUE        Value: 1, 1, 512, 512
+        Name: BSCALE       Class: VALUE        Value: -2.38418E+07
+        Name: COTYPE       Class: VALUE        Value: STOKES
+        Name: PRINT        Class: VALUE        Value: YES
+        Name: BADTHRSH     Class: ERROR        Value: Threshold out of range
+\end{verbatim}
+Suppose INPUT is to be read-only and OUTPUT is to be written to.
+The connection file should contain the following lines of text (starting in
+column 1):
+\begin{verbatim}
+        INPUT/FRAME(R)//                ! Input frame
+        OUTPUT/FRAME(W)//               ! Output frame
+        COORD/VALUE/ 1,1,512,512        ! Coordinates
+        BSCALE/VALUE/ -2.38418E+07      ! Base scale
+        COTYPE/VALUE/STOKES             ! Coordinate type
+        PRINT/VALUE/YES                 ! Print control
+        BADTHRSH/ERROR/ Threshold value out of range
+\end{verbatim}
+Another example of a connection file can be found in appendix D.
+\subsection {Compiling}
+A source program written in Fortran 77 can be compiled in the standard way by
+using the DCL `FORTRAN' command.
+For example, to compile a program $<$prog$>$ stored in file $<$prog$>$.FOR in your
+default directory, enter the command:
+\begin{quote}
+{\tt \$ FORTRAN $<$prog$>$}
+\end{quote}
+\subsection {Linking}
+The object module produced by the compiler may be linked with either the
+INTERIM object library (INTERIM\_DIR:INTERIM.OLB) or its equivalent shareable
+image (INTERIM\_DIR:INTERIM.EXE).
+The shareable image is recommended since this will make your EXE file smaller
+and changes in the INTERIM routines will be incorporated automatically.
+
+To link program $<$prog$>$ with the shareable image, enter the command:
+\begin{quote}
+{\tt \$ LINK $<$prog$>$,INTERIM/OPT}
+\end{quote}
+To link program $<$prog$>$ with the object library, enter the command:
+\begin{quote}
+{\tt \$ LINK $<$prog$>$,INTERIM/LIB/INCLUDE=(STL\_DATA)}
+\end{quote}
+\section {USER INTERFACE --- RUNSTAR}
+The term {\em User Interface} is used to describe the facilities provided for
+the user to run and control programs.
+INTERIM programs cannot be run by the DCL RUN command.
+You can use either the RUNSTAR command documented in this section, or the DSCL
+command documented in [1] and [2].
+RUNSTAR is simpler than DSCL but not so flexible.
+\subsection {The RUNSTAR command}
+Before using the RUNSTAR command, you should execute the procedure
+SSC:LOGIN.COM in your LOGIN.COM file.
+This will define the global symbol RUNSTAR as:
+\begin{quote}
+{\tt \$ RUNSTAR :== @SYSTEMDIR:RUNSTAR}
+\end{quote}
+If this has been done, an INTERIM program $<$prog$>$ can be executed by the command:
+\begin{quote}
+{\tt \$ RUNSTAR $<$prog$>$}
+\end{quote}
+The rest of this section explains the facilities offered by this command and how
+it should be used.
+\subsection {Parameters}
+Most programs start by getting values for their parameters and then
+manipulate them to obtain a result which is communicated to the user.
+Parameter values can be obtained from several sources.
+These are described in section 5.2.1.
+The required syntax for specifying parameter names and values is described
+in section 5.2.2.
+It is possible to specify default values for parameters.
+This can be done before a program is run or during execution.
+Default values are discussed in section 5.2.3.
+Finally, section 5.2.4 describes the processing that the DCL command processor
+does on user input.
+\subsubsection {Search path}
+A program gets values for its parameters by following a {\em search path}.
+A separate search is made for each parameter.
+A search path is an ordered set of possible sources for a value.
+When a program wants a value for a parameter for the first time, the search
+path followed is:
+\begin{description}
+\begin{description}
+\item [RUNSTAR command]
+\item [Connection file]
+\item [Prompt]
+\end{description}
+\end{description}
+The program takes the first value found during the search.
+Thus, a value specified in the RUNSTAR command takes precedence over a value
+specified in the connection file.
+Prompts only occur when no value can be found at the two higher levels.
+Once a parameter value is accepted by a program it remains in force until
+either the program terminates, or it is cancelled by the CNPAR routine.
+
+Sometimes a program will prompt for another value for a parameter after one has
+already been supplied.
+This occurs if a program rejects a supplied value for some reason (eg.\ invalid
+format).
+It also occurs when a program cancels a previously accepted parameter value
+using the CNPAR routine and then calls another routine which requires a value
+for that parameter.
+
+The three levels in the search path will now be considered separately.
+\begin{description}
+\item [RUNSTAR command]:
+Parameters should be specified in the RUNSTAR command as follows:
+\begin{quote}
+{\tt \$ RUNSTAR program/name=value/name=value/...}
+\end{quote}
+Here, {\em program} is the program name, {\em name} is a parameter name and
+{\em value} is the specified value for this parameter.
+The `/' character separates parameter specifications and is not required at the
+end of the parameter list.
+For example, the command:
+\begin{quote}
+{\tt \$ RUNSTAR GEN2D/START=0/VINC=2/HINC=5/OUT=RESULT}
+\end{quote}
+runs the INTERIM program GEN2D and specifies values for the parameters
+START, VINC, HINC and OUT.
+Avoid non-significant spaces in a RUNSTAR command.
+\item [Connection file]:
+The connection file is prepared before the program is executed.
+It specifies the names of the program parameters, their classes and possibly
+their default values.
+See section 4.2 for more details.
+\item [Prompt]:
+A prompt looks like this:
+\begin{quote}
+{\tt name:=}
+\end{quote}
+where {\em name} is the name of the parameter used in the routine call which
+generated the prompt.
+Thus, if a program contains the call:
+\begin{quote}
+{\tt CALL RDKEYI('COORDS', ... )}
+\end{quote}
+a prompt:
+\begin{quote}
+{\tt COORDS:=}
+\end{quote}
+will appear on your terminal if the prompt level in the search path is reached.
+Reply by typing the required value, followed by $<$return$>$, eg.
+\begin{quote}
+{\tt COORDS:=124,168}
+\end{quote}
+\end{description}
+A user will only specify parameters in either the RUNSTAR command, or in
+response to prompts.
+The connection file is initially set up by the programmer, but default values
+can be changed later if required.
+Parameter names and values must be specified in RUNSTAR commands, while only
+parameter values are needed at the Prompt level.
+
+A value specification for a VALUE class parameter should be of the correct
+type and syntax.
+The required type for each program parameter should be specified in the program
+documentation.
+A value, other than a character-string, is checked for syntax on input.
+If it is incorrect, you will be prompted for another value.
+Here is an example of a possible sequence of prompts:
+\begin{quote}
+{\tt COORD:= 1,1,512,78X\\
+COORD:= 1,1,512,786\\
+\\
+PRINT:= AYE\\
+PRINT:= YES - SORRY}
+\end{quote}
+In each case, the initial value specified for a parameter contains a syntax
+error, so the user is re-prompted.
+
+Here is an example of a RUNSTAR command with a syntax error in the value
+specified for BSCALE.
+\begin{quote}
+{\tt \$ RUNSTAR GEOM/INPUT=VELA/OUTPUT=VELAP/BSCALE=1.32478E-0\$\\
+BSCALE:= 1.32478E-04}
+\end{quote}
+Values for INPUT and OUTPUT are accepted.
+The value specified for BSCALE contains a syntax error so the user is prompted
+for another value.
+\subsubsection {Syntax}
+This section describes the syntax rules for specifying parameter names and
+values.
+
+\vspace{5mm}
+{\bf PARAMETER NAMES}\\
+Normally, you should specify a parameter name as it is used in the program
+routine call.
+However, there is an optional facility which enables you to truncate parameter
+names in the RUNSTAR command.
+This is controlled by the VMS logical name, STL\$TRUNCATE.
+To select this option, set STL\$TRUNCATE to any arbitrary string, eg:
+\begin{quote}
+{\tt \$ DEFINE STL\$TRUNCATE "YES"}
+\end{quote}
+To turn off the option, deassign the name:
+\begin{quote}
+{\tt \$ DEASSIGN STL\$TRUNCATE}
+\end{quote}
+It is your responsibility to use unique names.
+To illustrate the dangers, suppose a program contains the following segment:
+\begin{quote}
+{\tt CALL RDKEYI('ABCD',...)\\
+CALL RDKEYI('AB',...)}
+\end{quote}	
+and we issue the command:
+\begin{quote}
+{\tt \$ RUNSTAR PROG/AB=256}
+\end{quote}
+The system will assign 256 to the parameter ABCD and you will be prompted for a
+value for parameter AB.
+The CALL sequence dictates which parameter is assigned the value when there is
+ambiguity.
+
+\vspace{5mm}
+{\bf PARAMETER VALUES}\\
+Parameter values can be expressed in three ways:
+\begin{description}
+\begin{description}
+\item [Explicit]
+\item [DCL symbol]
+\item [DCL logical name]
+\end{description}
+\end{description}
+Each way will be considered separately.
+\begin{description}
+\item [Explicit]:
+The correct syntax in which to express explicit values depends on the parameter
+class.
+The two classes for which the user can specify values are VALUE and FRAME.
+\begin{description}
+\item [VALUE class]:
+A value of a VALUE class parameter is a vector.
+A maximum of 32 elements may be specified.
+If the vector has more than one element, separate the element values with a
+comma.
+For example, in the command:
+\begin{quote}
+{\tt \$ RUNSTAR PLOT/COORDS=124,168}
+\end{quote}
+the value specification for the parameter COORDS is a vector with the two
+elements 124 and 168.
+The syntax of vector element values should obey the rules of ANSI Fortran 77 for
+list directed input [8], except that for character input you may not need to
+enclose text in apostrophes (see below).
+The following data types are recognised:
+\begin{quote}
+\begin{verbatim}
+Integer:        optionally signed integer constant.
+                    Examples: 1, 85, -112
+
+Real, Double precision:
+                optionally signed floating point constant.
+                    Examples: 1.2, -2.3456E-07
+
+Character string:
+                character string constant.
+                    Examples: This is a message
+
+Logical:  TRUE: A character string starting with T or Y;
+                An odd integer constant (single digit).
+         FALSE: A character string starting with F or N;
+                An even integer constant (single digit).
+                    Examples: T, True,  Y, Yes, 1 
+                              F, False, N, No,  0
+\end{verbatim}
+\end{quote}
+Character strings containing spaces must be enclosed in quotation marks (")
+when specified in a RUNSTAR command.
+These are removed by DCL before the string is passed to the program.
+The command:
+\begin{quote}
+{\tt \$ RUNSTAR LIST/INPUT=M87/TITLE="Observed on 28-AUG-76"}
+\end{quote}
+illustrates the use of quotation marks.
+Quotation marks are not required when replying to a prompt for a character
+string.
+The `/' character should only be used to separate parameter specifications.
+It should not be part of a character string value, even if that value is
+enclosed within quotation marks.
+Commas within character strings act as delimiters.
+Leading and trailing spaces are ignored.
+\item [FRAME class]
+The value of a FRAME class parameter should be the name of a file containing a
+frame.
+Only one name is permitted as a value.
+If the file type is omitted, the default `.BDF' is assumed.
+The version number is always set to 1.
+\begin{quote}
+Example: IMAGE
+\end{quote}
+\item [ERROR class]:
+An ERROR class parameter can only be given a value in a connection file.
+The format is a single non-delimited character string of any length.
+\begin{quote}
+Example: Threshold value out of range.
+\end{quote}
+\end{description}
+It is possible to specify a null value for a parameter.
+This is done in a RUNSTAR command as follows:
+\begin{quote}
+{\tt \$ RUNSTAR PROG/NAME=/A=2.7}
+\end{quote}
+Here, the parameter {\em NAME} is given a null value.
+It is done in response to a prompt as follows:
+\begin{quote}
+{\tt NAME:=$<$return$>$}
+\end{quote}
+A null value can be specified in a connection file by placing two
+consecutive slashes `//' after the CLASS field.
+
+A null value generates a {\em null value} status reply.
+The program should respond intelligently to null values if this specification
+is to make any sense.
+\item [DCL symbol]:
+Symbols can only be used in RUNSTAR commands.
+They cannot be used in connection files or in response to prompts.
+A symbol is useful when a specific value is to be used by many programs during
+a login session.
+For example:
+\begin{quote}
+{\tt \$ COORDS:="65,65,256,256"\\
+\$ RUNSTAR EXTRACT/SUBFRAME='COORDS'/IMAGE=ABC\\
+\$ RUNSTAR PLOT/CENTRE='COORDS'/IMAGE=XYZ}
+\end{quote}
+Normally, symbols are only used for VALUE class parameters.
+They can be used for FRAME class parameters, as in:
+\begin{quote}
+{\tt \$ HH:="DBA0:[IMAGES]HORSEHEAD"\\
+\$ RUNSTAR ZOOM/IN='HH'}
+\end{quote}
+but in this case it is more natural to use logical names.
+\item [DCL logical name]:
+Unlike symbols, logical names can be specified in response to a prompt
+or as a default value in a connection-file.
+Only your process logical name table is searched during translation
+of the logical name.
+For safety, always use upper-case letters when typing logical names
+(section 5.2.4).
+
+The two previous examples can be expressed using a logical name as follows:
+\begin{quote}
+{\tt \$ DEFINE COORDS "65,65,256,256"\\
+\$ RUNSTAR EXTRACT/SUBFRAME=COORDS/IMAGE=ABC\\
+\$ RUNSTAR PLOT/CENTRE=COORDS/IMAGE=XYZ\\
+\\
+\$ ASSIGN  DBA0:[IMAGES]HORSEHEAD  HH\\
+\$ RUNSTAR ZOOM/IN=HH}
+\end{quote}
+As HH and COORDS are not symbols, single quotes are not used.
+The DEFINE command has been used to give a value to COORDS, although
+the equivalent ASSIGN command would have had the same effect:
+\begin{quote}
+{\tt \$ ASSIGN "65,65,256,256" COORDS}
+\end{quote}
+However, ASSIGN is really intended for file specifications, whereas DEFINE
+is generally used for other types of values.
+\end{description}
+\subsubsection {Defaults}
+A default value for a parameter can be specified in a connection file or
+calculated during program execution.
+Connection files are described in section 4.2, so this section concentrates
+on run-time defaults.
+
+Run-time defaults can only be used for VALUE class parameters.
+They are a feature of the RDKEYx routines.
+To use run-time defaults successfully, you must obey the following rules:
+\begin{itemize}
+\item Do not specify a value in the RUNSTAR command.
+\item Do not specify a value in the connection file.
+\item Set the {\em default} argument of RDKEYx to `.TRUE.'.
+\end{itemize}
+Assuming these conditions are satisfied,
+suppose a program has calculated the value `1,1,512,512'\ for parameter
+COORD and has stored it in an array called C.
+When the call
+\begin{quote}
+{\tt CALL RDKEYI('COORD',.TRUE.,4,C,N,STATUS)}
+\end{quote}
+is executed for the first time you will be prompted with
+\begin{quote}
+{\tt COORD/1,1,512,512/:=}
+\end{quote}
+The run time default value is displayed between the `/' characters.
+If you are satisfied with this value, hit $<$return$>$ and the program will use it.
+If you want to specify another value, type it in response to the prompt, eg.
+\begin{quote}
+{\tt COORD/1,1,512,512/:= 1,1,287,287}
+\end{quote}
+You will only be prompted once for a parameter value when a run-time default
+is offered.
+Succeeding calls to RDKEYx will take the run-time default without giving the
+user a chance to reject it.
+Thus, consider a program called {\em DYNAMIC}:
+\begin{verbatim}
+        CHARACTER*2 END(2)              ! File name endings
+        CHARACTER*5 NAME                ! Generated file name
+        INTEGER ACTVALS                 ! Actual no of values
+        INTEGER STATUS                  ! Status return
+        DATA END/'01','02'/             ! Alternative name endings
+
+        DO N = 1, 2
+          NAME = 'PIC'//END(N)
+          CALL RDKEYC('OUTPUT',.TRUE.,1,NAME,ACTVALS,STATUS)
+          PRINT *,'Filename = ',NAME
+        ENDDO
+\end{verbatim}
+This generates two filenames during program execution.
+The program may be run as follows:
+\begin{quote}
+{\tt \$ RUNSTAR DYNAMIC\\
+OUTPUT/PIC01/:=$<$return$>$\\
+Filename = PIC01\\
+Filename = PIC02}
+\end{quote}
+Because of the null reply to the prompt for OUTPUT, the program accepts the
+run-time default PIC01.
+The second time round the loop it accepts the new default `PIC02' without
+prompting the user.
+If you specify a value in response to the prompt, the following happens:
+\begin{quote}
+{\tt \$ RUNSTAR DYNAMIC\\
+OUTPUT/PIC01/:=OUT01\\
+Filename = OUT01\\
+Filename = OUT01}
+\end{quote}
+In this case, parameter OUTPUT is set to the value specified in response to
+the prompt; namely `OUT01'.
+It retains this value for all succeeding calls to RDKEYC.
+\subsubsection {DCL processing}
+The processing performed on commands submitted to DCL is described in VAX/VMS
+manuals [9], [10].
+The following two features will be highlighted in this section:
+\begin{description}
+\begin{description}
+\item [Lower to upper case conversion]
+\item [Logical name translation]
+\end{description}
+\end{description}
+\begin{description}
+\item [Lower to upper case conversion]:
+Automatic lower-to-uppercase conversion is performed on the RUNSTAR command by
+the DCL interpreter (except on strings enclosed in quotation marks).
+This does not occur for replies to prompts.
+Thus, in order to ensure the same treatment of parameter values specified in
+RUNSTAR commands and in reply to prompts, you are advised to either set your
+terminal mode to uppercase:
+\begin{quote}
+{\tt \$ SET TERM/UPPER}
+\end{quote}
+or to {\em lock capitals} on the keyboard of those terminals which have this
+facility.
+If you do not do this, problems can occur when the response to a prompt is a
+character string which is assumed to be in uppercase in the program.
+For example, consider the following call to RDKEYC:
+\begin{quote}
+{\tt CALL RDKEYC('INSTRUME',.FALSE.,1,INST,N,STATUS)\\
+IF (INST.EQ.'VLA') .....}
+\end{quote}
+The response to the prompt:
+\begin{quote}
+{\tt INSTRUME:= VLA}
+\end{quote}
+is correct, while the response:
+\begin{quote}
+{\tt INSTRUME:=vla}
+\end{quote}
+is incorrect.
+\item [Logical name translation]:
+The environment treats all specified parameter values as potential logical
+names and attempts a recursive translation.
+If any value cannot be translated it remains unchanged and is assumed to be in
+its explicit form.
+
+Conflicts may arise, particularly between logical and character-string
+values which are normally specified as strings of alphanumeric characters.
+Consider the following example where the name Y is assigned to a directory
+specification and then a program is run which expects a logical type value for
+the parameter, ARGS:
+\begin{verbatim}
+    $ ASSIGN DRC2:[IMAGES] Y
+      .
+      .
+    $ RUNSTAR SHOWY/ARGS=Y
+\end{verbatim}
+The logical type parameter, ARGS, has been given the value Y, meaning TRUE.
+However, as a result of the logical name assignment, Y will be translated to
+DRC2:[IMAGES], which is not a valid logical type constant.
+You will be prompted for a new value for ARGS.
+
+To overcome this problem, you can prevent a logical name translation from being
+performed by prefixing the value with an underscore:
+\begin{quote}
+{\tt \$ RUNSTAR SHOWY/ARGS=\_Y}
+\end{quote}
+Any value specified in this manner, whether in RUNSTAR command, prompt, or
+connection-file, will be interpreted as an explicit value of the type required
+and no translation will be attempted.
+The underscore is removed before the value is passed to the program.
+\end{description}
+\subsection {Frames}
+All the components of a frame are stored in a single VMS file.
+We will call such files {\em frame files}.
+
+If you specify the name of an existing frame file as an output file,
+the existing file will be deleted by the system and a new file will be created
+with the same name.
+
+The data component of a frame can exist in any of seven different data types
+(section 3.2.1).
+When it is stored as a specific type, an {\em incarnation} is said to exist for that
+type.
+A frame file can store up to seven incarnations; one for each possible type.
+When a frame is input to a program by calling a RDDATA or RDIMAG routine, the
+type required will be specified by the {\em dtype} argument.
+If an incarnation for that type exists in the input file it will be mapped into
+the program's address space, ready for use.
+If such an incarnation does not exist a new one will be created in the
+program's address space by translating the data from an existing incarnation
+into the required type.
+Existing incarnations will not be affected.
+
+The effect on the file of the creation of a new incarnation depends on its
+protection:
+\begin{description}
+\item [Files with read/write access]:
+The file is physically extended and the new incarnation is stored in the
+new space when the program terminates.
+
+Advantages:
+\begin{itemize}
+\item The incarnation is available for use in future program runs without the need
+for any further type translation; this saves processor time.
+\end{itemize}
+Disadvantages:
+\begin{itemize}
+\item For frames with large data components, such as typical images, a large
+amount of disc storage will be required to store several incarnations of one
+frame.
+This may be unacceptable.
+\end{itemize}
+\item [Files protected against write access]:
+The new incarnation only exists during the current execution of the program.
+The file is not extended.
+
+Advantages:
+\begin{itemize}
+\item Conserves disc space.
+\end{itemize}
+Disadvantages:
+\begin{itemize}
+\item The new incarnation must be recreated each time it is required in future
+program runs; this costs extra processing time.
+\item Your process must have sufficient {\em page file quota} to store the
+incarnation.
+This is because the incarnation is created within your process address space
+rather being accessed as a disc file section.
+\end{itemize}
+\end{description}
+\subsection {Inter-program communication}
+Values of VALUE class parameters can be passed from one program to another
+using a facility of the WRKEYx routines.
+
+When a WRKEYx routine is called, it assigns the value stored in the {\em value}
+argument to a VMS logical name.
+The name constructed is of the form:
+\begin{quote}
+{\tt $<$program name$>$\_$<$parameter name$>$}
+\end{quote}
+The $<$program name$>$ is that specified in the RUNSTAR command, even when this
+is a logical name.
+For example, all the following commands produce the $<$program name$>$
+`DISPLAY'.
+\begin{verbatim}
+    $ RUNSTAR DISPLAY
+    $ RUNSTAR [USEREXE]DISPLAY
+    $ RUNSTAR LUTILITYDIR:DISPLAY
+    $ ASSIGN  DBB1:[DJP]NEWDISP DISPLAY
+    $ RUNSTAR DISPLAY
+\end{verbatim}
+The $<$parameter name$>$ is that specified in the WRKEYx routine.
+
+Programmers who use this facility should note that VMS logical and equivalence
+names are restricted to a length of 63 characters.
+
+As an example, consider the program segment:
+\begin{verbatim}
+          PROGRAM MINMAX
+    *++
+    *     MINMAX - Find minimum and maximum of image
+    *--
+          IMPLICIT  INTEGER(A-Z)
+          INTEGER   MIN,MAX,RANGE(2)
+          .
+          .
+          CALL RDIMAG('IMAGE',...)
+          .
+           (calculate MIN and MAX)
+          .
+          RANGE(1)=MIN
+          RANGE(2)=MAX
+          CALL WRKEYI('RANGE',RANGE,2,STATUS)
+          .
+          .
+          END
+\end{verbatim}
+The call to routine WRKEYI will create the logical name MINMAX\_RANGE.
+If a run of program MINMAX produces values of MIN and MAX of 17 and 254, say,
+then the {\em equivalence name} assigned to MINMAX\_RANGE would be ``17,254".
+The comma is used as a delimiter if the value has more than one element.
+The value can be displayed by the command SHOW TRANSLATION, eg.
+\begin{verbatim}
+     $ RUNSTAR MINMAX/IMAGE=XYZ
+     $ SHO TRANS MINMAX_RANGE
+       MINMAX_RANGE = "17,254"   (process)
+\end{verbatim}
+It can be used subsequently as input to other INTERIM programs:
+\begin{quote}
+{\tt \$ RUNSTAR STRETCH/IMRANGE=MINMAX\_RANGE}
+\end{quote}
+If the value will be used by many programs you may find it convenient to
+assign a shorter name:
+\begin{quote}
+{\tt \$ DEFINE MR MINMAX\_RANGE}
+\end{quote}
+The logical name MR can then be used in place of {\tt MINMAX\_RANGE} thus:
+\begin{quote}
+{\tt \$ RUNSTAR STRETCH/IMRANGE=MR}
+\end{quote}
+Although this facility is designed primarily for passing parameter values
+between programs, you can manipulate the logical names with the lexical
+function F\$LOGICAL.
+For example, the following DCL command procedure will display a centred image
+on the ARGS:
+\begin{quote}
+\begin{verbatim}
+$! Program SIZE will determine size of a 2-dimensional image
+$! and use WRKEYI to store the values in parameters NAXIS1
+$! and NAXIS2.
+$
+$        RUNSTAR SIZE/IMAGE='P1'
+$
+$! Use the logical names SIZE_NAXIS1 and SIZE_NAXIS2, set up
+$! by SIZE, to calculate the coordinates (X,Y) of the origin needed
+$! to centre the image on the ARGS display.
+$
+$        X = (512-'F$LOGICAL("SIZE_NAXIS1")')/2
+$        Y = (512-'F$LOGICAL("SIZE_NAXIS2")')/2
+$        IF X.LT.0 THEN X = 0
+$        IF Y.LT.0 THEN Y = 0
+$
+$! Program DISPLAY displays an image on the ARGS, given the
+$! display coordinates (X,Y) of the origin.
+$
+$        RUNSTAR DISPLAY/IMAGE='P1'/ORIGIN='X','Y'
+\end{verbatim}
+\end{quote}
+\subsection {Error handling}
+Normally, if an INTERIM routine sets its {\em status} argument to a value greater
+than 2, routine STLERR will automatically display on the terminal the name
+of the offending routine together with the status value.
+However, the standard version of STLERR may have been redefined by the
+programmer.
+If so, you will need to rely on the program documentation to understand the
+program's response to non-zero status values.
+
+The INTERIM routines make a number of calls to VMS System Services.
+Any error status encountered by these will force the execution of a system
+service exception handler.
+This displays various pieces of information on the terminal and abnormally
+terminates the program.
+Any such errors encountered should be reported to the user support staff at
+RAL (username RLVAD::STAR).
+Error reports should be accompanied by a program source listing, a link map, a
+connection file listing and a hardcopy log of the program execution phase,
+including the  error messages.
+
+The support programmer for this software item is:
+\begin{quote}
+M D Lawden,\\
+Rutherford Appleton Laboratory,\\
+Chilton, DIDCOT, Oxon, OX11 0QX.
+\end{quote}
+\section {REFERENCES}
+\begin{enumerate}
+\item SUN/74: DSCL --- An Interim Starlink Command Language
+\item SUN/53: ASPIC --- Application packages
+\item SUN/83: GKS --- Graphical Kernel System (7.2)
+\item SUN/65: SGS --- Reference Manual (7.2)
+\item SUN/85: SGS --- User Manual (7.2)
+\item SGP/16: Starlink applications programming standards
+\item Wells D C and Griesen E W,  [1979] `FITS: A flexible image
+transport system', Kitt Peak National Observatory
+\item `Programming in VAX FORTRAN', Digital Equipment Corporation
+\item `VAX/VMS DCL Dictionary', Digital Equipment Corporation
+\item `Guide to using DCL and Command Procedures on VAX/VMS',
+Digital Equipment Corporation
+\end{enumerate}
+\appendix
+\section {ROUTINE SPECIFICATIONS}
+This appendix documents the INTERIM routines in alphabetical order.\\
+\vspace{5mm}
+\rule{\textwidth}{0.3mm}
+{\Large {\bf ADDSCR} \hfill Add Descriptor Item \hfill {\bf ADDSCR}}
+\begin{description}
+\item [FUNCTION]:
+Writes a new item in a frame descriptor.
+In general, the item value is a vector of elements.
+If  an item with the same name already exists in the descriptor, the supplied
+elements are appended to the existing ones.
+\item [CALL]:
+\begin{quote}
+{\tt CALL ADDSCR(name,descr,value,nels,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em name}\>CHARACTER\>expression\>Parameter name (FRAME class).\\
+{\em descr}\>CHARACTER\>expression\>Descriptor item name.\\
+{\em value}\>CHARACTER\>array\>Element values.\\
+{\em nels}\>INTEGER\>expression\>Number of elements in {\em value}.
+\end{tabbing}
+\item [OUTPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em status}\>INTEGER\>variable\>Status return.
+\end{tabbing}
+\end{description}
+\rule{\textwidth}{0.3mm}
+{\Large {\bf CNPAR} \hfill Cancel Parameter Association \hfill {\bf CNPAR}}
+\begin{description}
+\item [FUNCTION]:
+Cancels the current association of a parameter with a value.
+Use it if you wish to specify a new association.
+\item [CALL]:
+\begin{quote}
+{\tt CALL CNPAR(name,status)}
+\end{quote}
+\item [INPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em name}\>CHARACTER\>expression\>Parameter name (VALUE or FRAME class).
+\end{tabbing}
+\item [OUTPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em status}\>INTEGER\>variable\>Status return.
+\end{tabbing}
+\item [NOTES]:
+In the following program segment, an integer scalar value in the range 1 to 255
+is required for the parameter SCALE:
+\begin{verbatim}
+     ISCALE = 0
+     DO WHILE ((ISCALE .LT. 1) .OR. (ISCALE .GT. 255))
+        CALL RDKEYI('SCALE',.FALSE.,1,ISCALE,N,STATUS)
+        IF (STATUS .EQ. ERR_PARNUL) THEN
+           CALL WRERR('NOVALUE')
+           CALL EXIT
+        ELSE IF ((ISCALE .LT. 1) .OR. (ISCALE .GT. 255)) THEN
+           CALL WRERR('BADVALUE')
+           CALL CNPAR('SCALE',STATUS)
+        ENDIF
+     ENDDO
+\end{verbatim}
+If no value for SCALE is supplied, the error message associated with the ERROR
+class parameter NOVALUE is displayed and the program terminates, otherwise the
+value is tested.
+If it is out of range, the error message associated with the ERROR class
+parameter BADVALUE is displayed and the association between the parameter SCALE
+and its value is  cancelled.
+The process is then repeated.
+Once a value is accepted, the program continues.
+\end{description}
+\rule{\textwidth}{0.3mm}
+{\Large {\bf CTOx} \hfill Character To Numeric Conversion \hfill {\bf CTOx}}
+\begin{description}
+\item [FUNCTION]:
+Converts a character representation of a numeric constant to a binary value of
+specified type.
+There are four routines:
+\begin{center}
+\begin{tabbing}
+CTODxx\=-xx\=\kill 
+{\bf CTOD}\>-\>CHARACTER to DOUBLE PRECISION\\
+{\bf CTOI}\>-\>CHARACTER to INTEGER\\
+{\bf CTOL}\>-\>CHARACTER to LOGICAL\\
+{\bf CTOR}\>-\>CHARACTER to REAL
+\end{tabbing}
+\end{center}
+\item [CALL]:
+\begin{quote}
+{\tt CALL CTOx(string,value,status)}
+\end{quote}
+\item [INPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=DOUBLE PRECISIONx\=expressionxxx\=\kill
+{\em string}\>CHARACTER\>expression\>Character representation to be converted.
+\end{tabbing}
+\item [OUTPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=DOUBLE PRECISIONx\=expressionxxx\=\kill
+{\em value}\>DOUBLE PRECISION\>variable or..\>Converted value.\\
+\>INTEGER\>variable\\
+\>LOGICAL\>variable\\
+\>REAL\>variable\\
+{\em status}\>INTEGER\>variable\>Status return.
+\end{tabbing}
+\item [NOTES]:
+The input character string must represent a legal FORTRAN optionally signed
+constant (spaces may precede or follow the value).
+The conversion is terminated by a space following a non-space character or by
+reaching the end of the input string.
+For example, the following strings will both convert to the floating point
+value 1.28035E+02:
+\begin{verbatim}
+     '    128.035'
+     '12.8035E+01    / BSCALE   '
+\end{verbatim}
+\end{description}
+\rule{\textwidth}{0.3mm}
+{\Large {\bf CYDSCR} \hfill Copy Complete Descriptor \hfill {\bf CYDSCR}}
+\begin{description}
+\item [FUNCTION]:
+Copies a complete descriptor from one frame to another.
+Any existing items in the descriptor of the destination frame will first be
+deleted.
+\item [CALL]:
+\begin{quote}
+{\tt CALL CYDSCR(name1,name2,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em name1}\>CHARACTER\>expression\>Parameter name of source (FRAME class).\\
+{\em name2}\>CHARACTER\>expression\>Parameter name of destination (FRAME class).
+\end{tabbing}
+\item [OUTPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em status}\>INTEGER\>variable\>Status return.
+\end{tabbing}
+\end{description}
+\rule{\textwidth}{0.3mm}
+{\Large {\bf DLDSCR} \hfill Delete Descriptor Item \hfill {\bf DLDSCR}}
+\begin{description}
+\item [FUNCTION]:
+Deletes an existing descriptor item from a frame.
+\item [CALL]:
+\begin{quote}
+{\tt CALL DLDSCR(name,descr,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em name}\>CHARACTER\>expression\>Parameter name (FRAME class).\\
+{\em descr}\>CHARACTER\>expression\>Descriptor item name.
+\end{tabbing}
+\item [OUTPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em status}\>INTEGER\>variable\>Status return.
+\end{tabbing}
+\end{description}
+\rule{\textwidth}{0.3mm}
+{\Large {\bf FRDATA} \hfill Free Dynamic Memory \hfill {\bf FRDATA}}
+\begin{description}
+\item [FUNCTION]:
+Releases frame data space previously mapped by RDDATA, WRDATA, RDIMAG, WRIMAG
+and storage areas previously mapped by GETDYN.
+\item [CALL]:
+\begin{quote}
+{\tt CALL FRDATA(name,status)}
+\end{quote}
+\item [INPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em name}\>CHARACTER\>expression\>Parameter name (FRAME class) or data area name.
+\end{tabbing}
+\item [OUTPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em status}\>INTEGER\>variable\>Status return.
+\end{tabbing}
+\item [NOTES]:
+After this routine has been called, no further reference can be made within the
+program to the mapped area unless another call is made to the appropriate
+mapping routine (RDDATA, etc.).
+If {\em name} is specified as a blank string (' '), all areas mapped by the
+program will be released.
+
+The routine does not cancel the association between a name and a frame; CNPAR
+must be used for this purpose.
+Access to the frame's descriptor items is still available (RDDSCR etc.).
+\end{description}
+\rule{\textwidth}{0.3mm}
+{\Large {\bf GETDYN} \hfill Get Dynamic Memory \hfill {\bf GETDYN}}
+\begin{description}
+\item [FUNCTION]:
+Maps a new data area into a program's address space and gives it a name.
+\item [CALL]:
+\begin{quote}
+{\tt CALL GETDYN(name,dtype,size,pointer,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em name}\>CHARACTER\>expression\>Symbolic name of data area.\\
+{\em dtype}\>INTEGER\>expression\>Data type (see RDDATA).\\
+{\em size}\>INTEGER\>expression\>Number of elements.
+\end{tabbing}
+\item [OUTPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em pointer}\>INTEGER\>variable\>Pointer to start of data area.\\
+{\em status}\>INTEGER\>variable\>Status return.
+\end{tabbing}
+\item [NOTES]:
+The returned pointer can be converted to a normal FORTRAN array reference using
+the `\%VAL' construct (section 4.1).
+
+The size of the data area allocated is the product of the element size and the
+number of elements requested.
+The element size depends on the data type specified.
+
+The scope of the symbolic name associated with the data area is local to the
+program and is not available to the user.
+
+FRDATA will release the memory mapped by this routine.
+CNPAR is not valid for use with {\em name} as this is not a parameter name.
+\end{description}
+\rule{\textwidth}{0.3mm}
+{\Large {\bf RDDATA} \hfill Read the DATA component of a frame \hfill {\bf RDDATA}}
+\begin{description}
+\item [FUNCTION]:
+Maps the DATA component of an existing frame into a program's address space
+as a vector of elements of specified type.
+The supported data types, their corresponding numeric codes and
+Starlink-supplied symbolic names are:
+\begin{center}
+\begin{tabbing}
+Double Precisionxxx\=208xx\=\kill
+Signed Byte\>101\>FMT\_SB\\
+Signed Word\>102\>FMT\_SW\\
+Signed Longword\>104\>FMT\_SL\\
+Real\>204\>FMT\_R\\
+Double Precision\>208\>FMT\_DP\\
+Unsigned Byte\>301\>FMT\_UB\\
+Unsigned Word\>302\>FMT\_UW
+\end{tabbing}
+\end{center}
+\item [CALL]:
+\begin{quote}
+{\tt CALL RDDATA(name,dtype,ftype,size,pointer,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em name}\>CHARACTER\>expression\>Parameter name (FRAME class).\\
+{\em dtype}\>INTEGER\>expression\>Data type.
+\end{tabbing}
+\item [OUTPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em ftype}\>CHARACTER\>variable\>Frame type.\\
+{\em size}\>INTEGER\>variable\>Number of data elements.\\
+{\em pointer}\>INTEGER\>variable\>Pointer to start of data area.\\
+{\em status}\>INTEGER\>variable\>Status return.
+\end{tabbing}
+\item [NOTES]:
+The returned pointer can be converted to a normal FORTRAN array reference using
+the `\%VAL' construct (section 4.1).
+
+If necessary, type conversion will be performed to make the data accessible in
+the requested data type.
+If you wish the routine to inform you whether or not data conversion has
+occurred (status = ERR\_FMTCON), specify {\em dtype} as a negative number.
+
+{\em IMAGE} type frames are more conveniently read using RDIMAG.
+
+FRDATA will release the memory mapped by this routine.
+CNPAR will cancel the association between the parameter and the frame.
+\end{description}
+\rule{\textwidth}{0.3mm}
+{\Large {\bf RDDSCN} \hfill Read Descriptor Item Name \hfill {\bf RDDSCN}}
+\begin{description}
+\item [FUNCTION]:
+Reads the name of an item from a frame descriptor.
+An item is accessed by its relative position in the descriptor.
+The order in which these are stored is not defined.
+\item [CALL]:
+\begin{quote}
+{\tt CALL RDDSCN(name,position,descr,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em name}\>CHARACTER\>expression\>Parameter name (FRAME class).\\
+{\em position}\>INTEGER\>expression\>Relative position of item.
+\end{tabbing}
+\item [OUTPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em descr}\>CHARACTER\>variable\>Descriptor item name.\\
+{\em status}\>INTEGER\>variable\>Status return.
+\end{tabbing}
+\end{description}
+\rule{\textwidth}{0.3mm}
+{\Large {\bf RDDSCR} \hfill Read Descriptor Item Value \hfill {\bf RDDSCR}}
+\begin{description}
+\item [FUNCTION]:
+Reads the value associated with a frame  descriptor item of specified name.
+In general, this value is a vector of elements.
+\item [CALL]:
+\begin{quote}
+{\tt CALL RDDSCR(name,descr,maxels,value,actels,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em name}\>CHARACTER\>expression\>Parameter name (FRAME class).\\
+{\em descr}\>CHARACTER\>expression\>Descriptor item name.\\
+{\em maxels}\>INTEGER\>expression\>Maximum number of elements allowed.
+\end{tabbing}
+\item [OUTPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em value}\>CHARACTER\>array\>Element values.\\
+{\em actels}\>INTEGER\>variable\>Actual number of elements associated with the\\
+\>\>\>descriptor item name.\\
+{\em status}\>INTEGER\>variable\>Status return.
+\end{tabbing}
+\item [NOTES]:
+Although the elements are read as text strings, they can be converted to
+numeric values by the CTOx routines.
+As for RDKEYC, the FORTRAN rules for CHARACTER assignment are used to fill the
+elements of the output array.
+\end{description}
+\rule{\textwidth}{0.3mm}
+{\Large {\bf RDIMAG} \hfill Read Image type Frame \hfill {\bf RDIMAG}}
+\begin{description}
+\item [FUNCTION]:
+This routine is similar to RDDATA in that it maps the DATA component of an
+existing frame into a program's address space as an array of elements of
+specified type.
+However, the frame should be of type {\em IMAGE} and should contain the mandatory
+descriptor items.
+\item [CALL]:
+\begin{quote}
+{\tt CALL RDIMAG(name,dtype,maxdims,dimens,actdims,pointer,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em name}\>CHARACTER\>expression\>Parameter name (FRAME class).\\
+{\em dtype}\>INTEGER\>expression\>Data type (see RDDATA).\\
+{\em maxdims}\>INTEGER\>expression\>Maximum number of dimensions allowed.
+\end{tabbing}
+\item [OUTPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em dimens}\>INTEGER\>array\>Size of each dimension.\\
+{\em actdims}\>INTEGER\>variable\>Actual number of dimensions found.\\
+{\em pointer}\>INTEGER\>variable\>Pointer to start of data area.\\
+{\em status}\>INTEGER\>variable\>Status return.
+\end{tabbing}
+\item [NOTES]:
+The returned pointer can be converted to a normal FORTRAN array reference using
+the `\%VAL' construct (section 4.1).
+If necessary, type conversion will be performed to make the data accessible in
+the requested data type.
+The number and size of the dimensions are returned rather than the total number
+of elements as in RDDATA.
+The argument {\em maxdims} determines how many dimension sizes are returned in
+array {\em dimens}.
+
+FRDATA will release the memory mapped by  this routine.
+CNPAR will cancel the association between the parameter and the frame.
+\end{description}
+\rule{\textwidth}{0.3mm}
+{\Large {\bf RDKEYx} \hfill Read Value of VALUE class parameter \hfill {\bf RDKEYx}}
+\begin{description}
+\item [FUNCTION]:
+Associates a value with a VALUE class parameter.
+The value is a vector of elements of specified type.
+The following routines are available:
+\begin{center}
+\begin{tabbing}
+RDKEYCxxx\=-xxx\=Read DOUBLE PRECISIONxxx\=\kill
+{\bf RDKEYC}\>-\>Read CHARACTER\>value\\
+{\bf RDKEYI}\>-\>Read INTEGER\>value\\
+{\bf RDKEYR}\>-\>Read REAL\>value\\
+{\bf RDKEYD}\>-\>Read DOUBLE PRECISION\>value\\
+{\bf RDKEYL}\>-\>Read LOGICAL\>value
+\end{tabbing}
+\end{center}
+\item [CALL]:
+\begin{quote}
+{\tt CALL RDKEYx(name,default,maxels,value,actels,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em name}\>CHARACTER\>expression\>Parameter name (VALUE class).\\
+{\em default}\>LOGICAL\>expression\>If TRUE then communicate run-time default to user.\\
+{\em maxels}\>INTEGER\>expression\>Maximum number of elements allowed.
+\end{tabbing}
+\item [OUTPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=DOUBLE PRECISIONx\=expressionxxx\=\kill
+{\em value}\>CHARACTER\>array or..\>Element values.  (If {\em default}\\
+\>INTEGER\>array\>is set to TRUE, then this array is\\
+\>REAL\>array\>also used as an input argument and\\
+\>LOGICAL\>array\>is assumed to hold run-time default value).\\
+\>DOUBLE PRECISION\>array\\
+{\em actels}\>INTEGER\>variable\>Actual number of elements supplied.\\
+{\em status}\>INTEGER\>variable\>Status return.
+\end{tabbing}
+\item [NOTES]:
+The program supplies an array {\em value} of appropriate type and size to hold the
+value of the parameter.
+Normally, the declared size of this array should be $>=$ {\em maxels} since adjacent
+storage locations could be corrupted if more values are returned than can be
+accommodated.
+The argument {\em actels} is set to the actual number of elements supplied and,
+together with {\em maxels}, determines how many elements of the array
+{\em value} are filled.
+If {\em actels} $>$ {\em maxels}, the surplus values are ignored and only
+{\em maxels} elements will be filled.
+If {\em actels} $<=$ {\em maxels}, then {\em actels} elements will be filled.
+In either case, elements of the array which have not been set will remain
+unchanged.
+This allows the program to initialise the array with default element values
+which can be used if none are supplied by the routine.
+The default value can be communicated to the user by setting {\em default}=.TRUE.
+He can then decide whether to proceed with this value or to replace it
+(section 5.2.3).
+
+RDKEYI, RDKEYR, RDKEYD and  RDKEYL expect a value to be of the appropriate type.
+They will demand a new value if the one supplied is incorrect.
+For RDKEYC, the FORTRAN rules for CHARACTER assignment are used to fill the
+elements of the output array; ie.\ if a value is greater in length than the array
+element, it is truncated from the right; if it is less, it is padded to the
+right with spaces.
+
+CNPAR will cancel the association between the parameter and the value.
+
+{\em LIMITATIONS}: RDKEYR does not recognise the exponent if the total length of the
+string supplied is $>$15 characters.
+Thus, the Fortran format `E15.8' is interpreted correctly, but a number
+like -0.123456789E-03 is read as -0.123456789.
+To overcome this limitation, use RDKEYD or truncate to the correct number of
+significant figures.
+A call to RDKEYC can result in the wrong data getting into the program if the
+input string happens to be a logical assignment as well.
+\end{description}
+\rule{\textwidth}{0.3mm}
+{\Large {\bf RDUSER} \hfill Read User Input \hfill {\bf RDUSER}}
+\begin{description}
+\item [FUNCTION]:
+Reads a line  of  text  from  the  user's  terminal.
+\item [CALL]:
+\begin{quote}
+{\tt CALL RDUSER(text,status)}
+\end{quote}
+\item [OUTPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em text}\>CHARACTER\>variable\>Text supplied by user.\\
+{\em status}\>INTEGER\>variable\>Status return.
+\end{tabbing}
+\item [NOTES]:
+Although {\em text} is read as a character string, it can be converted to a binary
+value by one of the CTOx routines.
+\end{description}
+\rule{\textwidth}{0.3mm}
+{\Large {\bf STLERR} \hfill Starlink Error Handler \hfill {\bf STLERR}}
+\begin{description}
+\item [FUNCTION]:
+This routine is unique in that it is not called directly in a program, but is
+called by other INTERIM routines when they set their status return to a
+non-zero value.
+It displays the calling routine name and status value on the user's terminal
+when the value is greater than 2.
+This normally indicates a severe or fatal error condition.
+\item [CALL]:
+\begin{quote}
+{\tt CALL STLERR(routine,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em routine}\>CHARACTER\>expression\>Name of INTERIM routine giving error.\\
+{\em status}\>INTEGER\>expression\>Status value set by calling INTERIM routine.
+\end{tabbing}
+\item [NOTES]:
+This routine can be replaced by a version supplied by the programmer to handle
+errors in his own way.
+This may be useful when testing new programs.
+\end{description}
+\rule{\textwidth}{0.3mm}
+{\Large {\bf WRDATA} \hfill Write the DATA component of a frame \hfill {\bf WRDATA}}
+\begin{description}
+\item [FUNCTION]:
+Maps the DATA component of a new frame into a program's address space as a
+vector of elements of specified type.
+The frame is written to disc when the program terminates.
+\item [CALL]:
+\begin{quote}
+{\tt CALL WRDATA(name,dtype,ftype,size,pointer,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em name}\>CHARACTER\>expression\>Parameter name (FRAME class).\\
+{\em dtype}\>INTEGER\>expression\>Data type (see RDDATA).\\
+{\em ftype}\>CHARACTER\>expression\>Frame type.\\
+{\em size}\>INTEGER\>expression\>Number of data elements.
+\end{tabbing}
+\item [OUTPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em pointer}\>INTEGER\>variable\>Pointer to start of data area.\\
+{\em status}\>INTEGER\>variable\>Status return.
+\end{tabbing}
+\item [NOTES]:
+The returned pointer can be converted to a normal FORTRAN array reference using
+the `\%VAL' construct (section 4.1).
+
+Unlike RDDATA, a negative code is not suitable as a value for {\em dtype} in
+WRDATA since data type conversion does not occur.
+
+{\em IMAGE} type frames are more conveniently written using WRIMAG.
+
+FRDATA will release the memory mapped by  this routine.
+CNPAR will cancel the association between the parameter and the frame.
+\end{description}
+\rule{\textwidth}{0.3mm}
+{\Large {\bf WRDSCR} \hfill Write Descriptor Item \hfill {\bf WRDSCR}}
+\begin{description}
+\item [FUNCTION]:
+Writes a new item in a frame descriptor.
+In general, the item value is a vector of elements.
+If an item with the same name already exists in the descriptor, the supplied
+elements replace the existing ones.
+\item [CALL]:
+\begin{quote}
+{\tt CALL WRDSCR(name,descr,value,nels,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em name}\>CHARACTER\>expression\>Parameter name (FRAME class).\\
+{\em descr}\>CHARACTER\>expression\>Descriptor item name.\\
+{\em value}\>CHARACTER\>array\>Element values.\\
+{\em nels}\>INTEGER\>expression\>Number of elements in {\em value}.
+\end{tabbing}
+\item [OUTPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em status}\>INTEGER\>variable\>Status return.
+\end{tabbing}
+\end{description}
+\rule{\textwidth}{0.3mm}
+{\Large {\bf WRERR} \hfill Display Message \hfill {\bf WRERR}}
+\begin{description}
+\item [FUNCTION]:
+Display a message on the user's terminal using an ERROR class parameter.
+\item [CALL]:
+\begin{quote}
+{\tt CALL WRERR(name)}
+\end{quote}
+\item [INPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em name}\>CHARACTER\>expression\>Parameter name (ERROR class).
+\end{tabbing}
+\item [NOTES]:
+The value of the parameter specified as {\em name} must be defined in the connection
+file.
+\end{description}
+\rule{\textwidth}{0.3mm}
+{\Large {\bf WRIMAG} \hfill Write Image type Frame \hfill {\bf WRIMAG}}
+\begin{description}
+\item [FUNCTION]:
+This routine is similar to WRDATA in that it maps the DATA component of a new
+frame into a program's address space as an array of elements of specified type.
+However, the frame type is set to {\em IMAGE} and the mandatory descriptor items are
+automatically written to the frame.
+\item [CALL]:
+\begin{quote}
+{\tt CALL WRIMAG(name,dtype,dimens,ndims,pointer,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em name}\>CHARACTER\>expression\>Parameter name (FRAME class).\\
+{\em dtype}\>INTEGER\>expression\>Data type (see RDDATA).\\
+{\em dimens}\>INTEGER\>array\>Size of each dimension.\\
+{\em ndims}\>INTEGER\>expression\>Number of dimensions.
+\end{tabbing}
+\item [OUTPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em pointer}\>INTEGER\>variable\>Pointer to start of data area.\\
+{\em status}\>INTEGER\>variable\>Status return.
+\end{tabbing}
+\item [NOTES]:
+The returned pointer can be converted to a normal FORTRAN array reference using
+the `\%VAL' construct (section 4.1).
+
+FRDATA will release the memory mapped by this routine.
+CNPAR will cancel the association between the parameter and the frame.
+\end{description}
+\rule{\textwidth}{0.3mm}
+{\Large {\bf WRKEYx} \hfill Write value of VALUE class parameter \hfill {\bf WRKEYx}}
+\begin{description}
+\item [FUNCTION]:
+Assigns a value to a VALUE class parameter.
+The value is a vector of elements of specified type.
+The following routines are available:
+\begin{center}
+\begin{tabbing}
+WRKEYDxxx\=-xxx\=Write DOUBLE PRECISIONxxx\=\kill
+{\bf WRKEYC}\>-\>Write CHARACTER\>value\\
+{\bf WRKEYI}\>-\>Write INTEGER\>value\\
+{\bf WRKEYR}\>-\>Write REAL\>value\\
+{\bf WRKEYD}\>-\>Write DOUBLE PRECISION\>value\\
+{\bf WRKEYL}\>-\>Write LOGICAL\>value
+\end{tabbing}
+\end{center}
+\item [CALL]:
+\begin{quote}
+{\tt CALL WRKEYx(name,value,nels,status)}
+\end{quote}
+\item [INPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=DOUBLE PRECISIONx\=expressionxxx\=\kill
+{\em name}\>CHARACTER\>expression\>Parameter name (VALUE class).\\
+{\em value}\>CHARACTER\>array or..\>Element values.\\
+\>INTEGER\>array\\
+\>REAL\>array\\
+\>LOGICAL\>array\\
+\>DOUBLE PRECISION\>array\\
+{\em nels}\>INTEGER\>expression\>Number of elements to be assigned.
+\end{tabbing}
+\item [OUTPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=DOUBLE PRECISIONx\=expressionxxx\=\kill
+{\em status}\>INTEGER\>variable\>Status return.
+\end{tabbing}
+\item [NOTES]:
+See section 5.4.
+\end{description}
+\rule{\textwidth}{0.3mm}
+{\Large {\bf WRUSER} \hfill Write User Output \hfill {\bf WRUSER}}
+\begin{description}
+\item [FUNCTION]:
+Writes a line of text to the user's terminal.
+\item [CALL]:
+\begin{quote}
+{\tt CALL WRUSER(text,status)}
+\end{quote}
+\item [INPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em text}\>CHARACTER\>expression\>Text to be sent to user.
+\end{tabbing}
+\item [OUTPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=CHARACTERx\=expressionxxx\=\kill
+{\em status}\>INTEGER\>variable\>Status return.
+\end{tabbing}
+\item [NOTES]:
+{\em text} is expressed as a character string.
+A binary value can be  converted into this form by one of the xTOC routines.
+This can also be done using the `internal file' mechanism of FORTRAN 77.
+For example, the code:
+\begin{verbatim}
+      CHARACTER*19 OUTPUT
+      .
+      .
+      WRITE (OUTPUT,'(2X,''RANGE='',I4,'' - '',I4)') MIN,MAX
+      CALL  WRUSER(OUTPUT,STATUS)
+\end{verbatim}
+will produce the following output on the user's terminal:
+\begin{verbatim}
+      RANGE=   0 -  255
+\end{verbatim}
+If the first character of the text string is a valid carriage control operator,
+the corresponding function will be performed.
+\end{description}
+\rule{\textwidth}{0.3mm}
+{\Large {\bf xTOC} \hfill Numeric to Character Conversion \hfill {\bf xTOC}}
+\begin{description}
+\item [FUNCTION]:
+Converts a binary value of specified type to a character representation.
+There are five routines:
+\begin{center}
+\begin{tabbing}
+DTOCxxx\=-xxx\=DOUBLE PRECISIONx\=\kill
+{\bf DTOC}\>-\>DOUBLE PRECISION\>to CHARACTER\\
+{\bf HTOC}\>-\>INTEGER\>to CHARACTER (hexadecimal)\\
+{\bf ITOC}\>-\>INTEGER\>to CHARACTER (decimal)\\
+{\bf LTOC}\>-\>LOGICAL\>to CHARACTER\\
+{\bf RTOC}\>-\>REAL\>to CHARACTER
+\end{tabbing}
+\end{center}
+\item [CALL]:
+\begin{quote}
+{\tt CALL xTOC(value,string,status)}
+\end{quote}
+\item [INPUT ARGUMENT]:
+\begin{tabbing}
+descrxxx\=DOUBLE PRECISIONx\=expressionxxx\=\kill
+{\em value}\>DOUBLE PRECISION\>expression or..\>Value to be converted.\\
+\>INTEGER\>expression\\
+\>LOGICAL\>expression\\
+\>REAL\>expression
+\end{tabbing}
+\item [OUTPUT ARGUMENTS]:
+\begin{tabbing}
+descrxxx\=DOUBLE PRECISIONx\=expressionxxx\=\kill
+{\em string}\>CHARACTER\>variable\>Character representation\\
+{\em status}\>INTEGER\>variable\>Status return.
+\end{tabbing}
+\item [NOTES]:
+The output character string must be of sufficient length to accommodate
+the conversion, otherwise the operation will fail.
+The following example shows the use of routine ITOC to perform the same
+operation as the WRUSER example:
+\begin{verbatim}
+     CHARACTER*19 OUTPUT
+     DATA         OUTPUT/ '  RANGE=**** - ****' /
+     .
+     .
+     CALL ITOC(MIN,OUTPUT(09:12),STATUS)
+     CALL ITOC(MAX,OUTPUT(16:19),STATUS)
+     CALL WRUSER(OUTPUT,STATUS)
+\end{verbatim}
+\end{description}
+\rule{\textwidth}{0.3mm}
+\section {SYMBOLIC NAMES}
+Standard symbolic names should be used in INTERIM programs for error status
+codes and data type codes.
+These names are defined in modules of the text library INTERIM\_DIR:INTERIM.TLB.
+\subsection {Error Status Codes}
+The symbols representing error status codes can be defined in a program by
+including the following line:
+\begin{quote}
+{\tt INCLUDE 'INTERIM(ERRPAR)'}
+\end{quote}
+with the specification statements.
+This will insert the following code into the program:
+\begin{quote}
+\begin{verbatim}
+C-----------------------------------------------------------
+        INTEGER    ERR_DIMINV, ERR_DSCNPR, ERR_FMTBAD
+        INTEGER    ERR_FMTCON, ERR_FMTINV, ERR_FRMINV
+        INTEGER    ERR_FRMNAC, ERR_FRMNUL, ERR_INPINV
+        INTEGER    ERR_NODATA, ERR_NORMAL, ERR_PARANC
+        INTEGER    ERR_PARINV, ERR_PARNUL, ERR_SIZINV
+        INTEGER    ERR_UIONAV
+C
+        PARAMETER (ERR_DIMINV = 6)
+        PARAMETER (ERR_DSCNPR = 2)
+        PARAMETER (ERR_FMTBAD = 8)
+        PARAMETER (ERR_FMTCON = 2)
+        PARAMETER (ERR_FMTINV = 5)
+        PARAMETER (ERR_FRMINV = 7)
+        PARAMETER (ERR_FRMNAC = 3)
+        PARAMETER (ERR_FRMNUL = 1)
+        PARAMETER (ERR_INPINV = 5)
+        PARAMETER (ERR_NODATA = 2)
+        PARAMETER (ERR_NORMAL = 0)
+        PARAMETER (ERR_PARANC = 2)
+        PARAMETER (ERR_PARINV = 4)
+        PARAMETER (ERR_PARNUL = 1)
+        PARAMETER (ERR_SIZINV = 6)
+        PARAMETER (ERR_UIONAV = 1)
+C-----------------------------------------------------------
+\end{verbatim}
+\end{quote}
+You can then refer to the error status codes using these symbolic names.
+\subsection {Data Type Codes}
+The symbols representing data type codes can be defined in a program by
+including the following line:
+\begin{quote}
+{\tt INCLUDE 'INTERIM(FMTPAR)'}
+\end{quote}
+with the specification statements.
+This will insert the following code into the program:
+\begin{quote}
+\begin{verbatim}
+C-----------------------------------------------------------
+        INTEGER    FMT_SB, FMT_SW, FMT_SL
+        INTEGER    FMT_R , FMT_DP
+        INTEGER    FMT_UB, FMT_UW
+C
+        PARAMETER (FMT_SB = 101)
+        PARAMETER (FMT_SW = 102)
+        PARAMETER (FMT_SL = 104)
+        PARAMETER (FMT_R  = 204)
+        PARAMETER (FMT_DP = 208)
+        PARAMETER (FMT_UB = 301)
+        PARAMETER (FMT_UW = 302)
+C-----------------------------------------------------------
+\end{verbatim}
+\end{quote}
+You can then refer to the data type codes using these symbolic names.
+Data type codes were originally referred to as data format codes.
+However, the term {\em data type} is a more accurate technical description of the
+concept being used than the term {\em data format}, so {\em data type} is used in this
+paper.
+\section {ERROR STATUS CODES}
+The meanings of the error status codes associated with particular INTERIM
+routines are summarised in section C.1.
+Some of the codes are associated with more than one routine.
+The meaning of individual codes are explained in more detail in section C.2.
+\subsection {Routine Summary}
+\begin{quote}
+\begin{tabbing}
+ROUTINExxx\=ERRxFMTBADxx\==x8xxxx\=\kill
+{\bf ROUTINE}\>{\bf SYMBOL}\>\>{\bf MEANING}\\
+\\
+ADDSCR:\>ERR\_FRMNUL\>= 1\>Frame null.\\
+\>ERR\_FRMNAC\>= 3\>Frame could not be accessed.\\
+\>ERR\_PARINV\>= 4\>Parameter name invalid.\\
+\\
+CNPAR:\>ERR\_PARANC\>= 2\>Parameter association not cancelled.\\
+\>ERR\_PARINV\>= 4\>Parameter name invalid.\\
+\\
+CTOI:\>ERR\_INPINV\>= 5\>Input invalid.\\
+\\
+CTOR:\>ERR\_INPINV\>= 5\>Input invalid.\\
+\\
+CYDSCR:\>ERR\_FRMNUL\>= 1\>Frame null.\\
+\>ERR\_FRMNAC\>= 3\>Frame could not be accessed.\\
+\>ERR\_PARINV\>= 4\>Parameter name invalid.\\
+\\
+DLDSCR:\>ERR\_FRMNUL\>= 1\>Frame null.\\
+\>ERR\_DSCNPR\>= 2\>Descriptor item not present.\\
+\>ERR\_FRMNAC\>= 3\>Frame could not be accessed.\\
+\>ERR\_PARINV\>= 4\>Parameter name invalid.\\
+\\
+FRDATA:\>ERR\_NODATA\>= 2\>No data to be freed.\\
+\\
+GETDYN:\>ERR\_FMTINV\>= 5\>Type code invalid.\\
+\>ERR\_SIZINV\>= 6\>Size invalid (out-of-range).\\
+\\
+ITOC:\>ERR\_INPINV\>= 5\>Input invalid.\\
+\\
+\end{tabbing}
+\begin{tabbing}
+ROUTINExxx\=ERRxFMTBADxx\==x8xxxx\=\kill
+RDDATA:\>ERR\_FRMNUL\>= 1\>Frame null.\\
+\>ERR\_FMTCON\>= 2\>Type conversion (if {\em type} -ve).\\
+\>ERR\_FRMNAC\>= 3\>Frame could not be accessed.\\
+\>ERR\_FMTINV\>= 5\>Type code invalid.\\
+\>ERR\_SIZINV\>= 6\>Size invalid (out-of-range).\\
+\>ERR\_FMTBAD\>= 8\>Type conversion failed.\\
+\\
+RDDSCN:\>ERR\_FRMNUL\>= 1\>Frame null.\\
+\>ERR\_DSCNPR\>= 2\>Descriptor item not present.\\
+\>ERR\_FRMNAC\>= 3\>Frame could not be accessed.\\
+\>ERR\_PARINV\>= 4\>Parameter name invalid.\\
+\\
+RDDSCR:\>ERR\_FRMNUL\>= 1\>Frame null.\\
+\>ERR\_DSCNPR\>= 2\>Descriptor item not present.\\
+\>ERR\_FRMNAC\>= 3\>Frame could not be accessed.\\
+\>ERR\_PARINV\>= 4\>Parameter name invalid.\\
+\\
+RDIMAG:\>ERR\_FRMNUL\>= 1\>Frame null.\\
+\>ERR\_FMTCON\>= 2\>Type conversion (if {\em type} -ve).\\
+\>ERR\_FRMNAC\>= 3\>Frame could not be accessed.\\
+\>ERR\_PARINV\>= 4\>Parameter name invalid.\\
+\>ERR\_FMTINV\>= 5\>Type code invalid.\\
+\>ERR\_DIMINV\>= 6\>Dimensions invalid (out-of-range).\\
+\>ERR\_FRMINV\>= 7\>Frame type invalid (not {\em IMAGE}).\\
+\>ERR\_FMTBAD\>= 8\>Type conversion failed.\\
+\\
+RDKEYx:\>ERR\_PARNUL\>= 1\>Parameter null value.\\
+\>ERR\_PARINV\>= 4\>Parameter name invalid.\\
+\\
+RDUSER:\>ERR\_UIONAV\>= 1\>User terminal I/O not available.\\
+\\
+RTOC:\>ERR\_INPINV\>= 5\>Input invalid.\\
+\\
+WRDATA:\>ERR\_FRMNUL\>= 1\>Frame null.\\
+\>ERR\_FRMNAC\>= 3\>Frame could not be accessed.\\
+\>ERR\_PARINV\>= 4\>Parameter name invalid.\\
+\>ERR\_FMTINV\>= 5\>Type code invalid.\\
+\>ERR\_SIZINV\>= 6\>Size invalid (out-of-range).\\
+\\
+WRDSCR:\>ERR\_FRMNUL\>= 1\>Frame null.\\
+\>ERR\_FRMNAC\>= 3\>Frame could not be accessed.\\
+\>ERR\_PARINV\>= 4\>Parameter name invalid.\\
+\\
+WRIMAG:\>ERR\_FRMNUL\>= 1\>Frame null.\\
+\>ERR\_FRMNAC\>= 3\>Frame could not be accessed.\\
+\>ERR\_PARINV\>= 4\>Parameter name invalid.\\
+\>ERR\_FMTINV\>= 5\>Type code invalid.\\
+\>ERR\_DIMINV\>= 6\>Dimensions invalid (out-of-range).\\
+\\
+WRKEYx:\>ERR\_PARINV\>= 4\>Parameter name invalid.\\
+\\
+WRUSER:\>ERR\_UIONAV\>= 1\>User terminal I/O not available.
+\end{tabbing}
+\end{quote}
+\subsection {Code Meanings}
+The error status code symbol is constructed by concatenating the string
+`ERR\_' with an error code.
+The error codes and their meanings are listed below:
+\begin{description}
+\item [DIMINV]:
+{\em Dimensions invalid (out-of-range)}.
+It is likely that certain groups of users will be restricted in the size of the
+frames they can access.
+RDIMAG and WRIMAG return this status if the user has insufficient quota to map
+the frame.
+This status will also be set when attempting to create an output frame of a
+negative or zero size.
+\item [DSCNPR]:
+{\em Descriptor item not present}.
+For DLDSCR and RDDSCR, the specified descriptor item name cannot be found within
+the frame's descriptor.
+For RDDSCN, no item can be found with the specified name as the end of the
+descriptor list was encountered.
+\item [FMTBAD]:
+{\em Format conversion failed}.
+This occurs during automatic data type conversion of frame data.
+The usual causes are: arithmetic overflow (converting from signed longword to
+signed byte, perhaps) and sign errors (converting negative values to unsigned
+byte or word).
+\item [FMTCON]:
+{\em Format conversion (if dtype -ve)}.
+When a program issues a call to RDDATA or RDIMAG it specifies the required data
+type.
+If the accessed frame file does not hold an incarnation of that type, one will
+be created by converting an existing incarnation.
+If the program wishes to be informed of this operation, specify the negative of
+the respective type code and the status value will be set accordingly.
+\item [FMTINV]:
+{\em Format code invalid}.
+This status is set by the frame handling routines if the data type code
+specified in the routine call is not supported by the system.
+\item [FRMINV]:
+{\em Frame type invalid}.
+This status is set by RDIMAG when it attempts to access a non-IMAGE type frame.
+\item [FRMNAC]:
+{\em Frame could not be accessed}.
+This status is set when a frame file cannot be accessed by one of the frame
+handling routines.
+This normally occurs when the filename cannot be translated to a valid VMS file
+specification.
+File protection and privilege violations can also cause this error.
+\item [FRMNUL]:
+{\em Frame null}.
+Some programs may process frames on an optional basis.
+The facility exists for users to specify a `null frame', which is signalled by
+this status value.
+\item [INPINV]:
+{\em Input invalid}.
+This status is set by the data conversion routines.
+For binary to character conversion, an output field of insufficient length will
+produce this status.
+For character to binary conversion, the usual cause is bad syntax, such as
+specifying a decimal point in an integer value.
+\item [NODATA]:
+{\em No data to be freed}.
+Subroutine FRDATA will set this status when attempting to release a non-existent
+data area.
+\item [PARANC]:
+{\em Parameter association not cancelled}.
+This status is returned by CNPAR when attempting to cancel a parameter that has
+no value associated with it.
+\item [PARINV]:
+{\em Parameter name invalid}.
+For every program parameter, there must exist an associated entry in the
+connection file.
+This status will be set if the entry cannot be found.
+\item [PARNUL]:
+{\em Parameter null value}.
+The user may specify a null value to the RDKEYx routines in the same manner as a
+null frame specification to the frame handling routines.
+This status signals that there is no value associated with the respective
+parameter.
+\item [SIZINV]:
+{\em Size invalid (out-of-range)}.
+Same as DIMINV.
+\item [UIONAV]:
+{\em User terminal I/O not available}.
+RDUSER and WRUSER may be used for interactive communication with the user via
+his terminal.
+This status will normally be set for programs expecting this type of
+user-access that are run in batch-mode.
+\end{description}
+\section {EXAMPLE PROGRAM \& CONNECTION FILE}
+The following source code and connection file listings are for an example
+INTERIM program GEN2D.
+This generates a 2-d image and, although the algorithm is trivial, it
+illustrates how to program the interaction with the user.
+Some status values have not been checked.
+In general, this is bad practice.
+
+The connection file shows that the program has 5 VALUE class parameters
+(START, VINC, HINC, NLINES, NSAMPLES), one FRAME class parameter (OUT), and one
+ERROR class parameter (BADFRAME).
+\vspace{5mm}
+\begin{center}
+{\bf SOURCE CODE}
+\end{center}
+\begin{quote}
+\begin{verbatim}
+*++
+*     GEN2D - Generate 2-Dimensional image
+
+*     This program will create a 2-dimensional image
+*     of  signed  32-bit integer pixels. The pixel values are
+*     determined by 3 program parameters:
+
+*     START:  Initial pixel value (line 1, sample 1)  (INTEGER)
+*     HINC:   Horizontal (sample) increment           (INTEGER)
+*     VINC:   Vertical (line) increment               (INTEGER)
+
+*     These  parameters  have  run-time  defaults  which  can  be
+*     communicated to the user for assessment.
+
+*     A pixel value at line L, sample S, is set to:
+*                  (START + L*VINC + S*HINC)
+
+*     The  dimensions of the image are specified by 2 program parameters:
+
+*     NLINES:    Number of lines                      (INTEGER)
+*     NSAMPLES:  Number of samples                    (INTEGER)
+
+*     Run-time defaults are not calculated for these parameters,
+*     although connection-file defaults exist.
+
+*     The  generated frame  is accessed through the program
+*     parameter 'OUT'. Any error encountered by WRIMAG will
+*     be signalled to the user through the ERROR class parameter,
+*     'BADFRAME'.
+
+*     M D Lawden   RAL   17.12.84
+*--
+
+      IMPLICIT  INTEGER (A-Z)
+      INTEGER   AXIS(2)
+
+      INCLUDE   'INTERIM(FMTPAR)'
+      INCLUDE   'INTERIM(ERRPAR)'
+
+* Get pixel values after setting run-time defaults
+      START=0
+      VINC=1
+      HINC=1
+      CALL RDKEYI('START',.TRUE.,1,START,N,STATUS)
+      CALL RDKEYI('VINC' ,.TRUE.,1,VINC ,N,STATUS)
+      CALL RDKEYI('HINC' ,.TRUE.,1,HINC ,N,STATUS)
+
+* Get image size
+      CALL RDKEYI('NLINES'  ,.FALSE.,1,AXIS(1),N,STATUS)
+      CALL RDKEYI('NSAMPLES',.FALSE.,1,AXIS(2),N,STATUS)
+
+* Initialise image frame for writing and check for errors
+   10 CALL WRIMAG('OUT',FMT_SL,AXIS,2,PNTR,STATUS)
+      IF (STATUS.NE.ERR_NORMAL) THEN
+         CALL WRERR('BADFRAME')
+         CALL CNPAR('OUT',STATUS)
+         GOTO 10
+      ENDIF
+
+* Generate 2-dimensional image
+      CALL GEN2D(%val(PNTR),AXIS(1),AXIS(2),START,VINC,HINC)
+
+* Free image data
+      CALL FRDATA('OUT',STATUS)
+
+      CALL EXIT
+      END
+*-------------------------------------------------------------------------
+      SUBROUTINE GEN2D(IMAGE,NL,NS,START,VINC,HINC)
+*+
+*     GEN2D - Generate 2-Dimensional image
+
+*     Input arguments:
+*     ---------------
+*     NL:      INTEGER expression:    Number of lines in IMAGE
+*     NS:      INTEGER expression:    Number of samples in IMAGE
+*     START:   INTEGER expression:    Initial start value: IMAGE(1,1)
+*     VINC:    INTEGER expression:    Vertical (line) increment
+*     HINC:    INTEGER expression:    Horizontal (sample) increment
+
+*     Output argument:
+*     ---------------
+*     IMAGE:   INTEGER array (2-D):   2-Dimensional image
+
+*     M D Lawden   RAL   17.12.84
+*-
+
+      IMPLICIT  INTEGER (A-Z)
+      INTEGER   NL,NS,START,VINC,HINC
+      INTEGER   IMAGE(NL,NS)
+
+* Initialise first column of image
+      IMAGE(1,1)=START
+      DO L=2,NL
+         IMAGE(L,1)=IMAGE(L-1,1)+VINC
+      ENDDO
+
+* Fill rest of image accordingly
+      DO S=2,NS
+         DO L=1,NL
+            IMAGE(L,S)=IMAGE(L,S-1)+HINC
+         ENDDO
+      ENDDO
+
+      RETURN
+      END
+*-------------------------------------------------------------------------
+
+
+\end{verbatim}
+\end{quote}
+\begin{center}
+{\bf CONNECTION FILE}
+\end{center}
+\begin{quote}
+\begin{verbatim}
+START/VALUE/
+VINC/VALUE/
+HINC/VALUE/
+NLINES/VALUE/4
+NSAMPLES/VALUE/6
+OUT/FRAME(W)/
+BADFRAME/ERROR/### Frame allocation failed - respecify:
+\end{verbatim}
+\end{quote}
+\section {EXAMPLE RUNSTAR COMMANDS}
+These examples illustrate different methods of using the RUNSTAR command.
+They are based on the program GEN2D and its connection file listed in appendix
+D.
+\subsection {EXAMPLE 1}
+\begin{verbatim}
+        $ RUNSTAR GEN2D
+        START/0/:=<return>
+        VINC/1/:= -3
+        HINC/1/:= %
+        HINC/0/:= 2
+        OUT:= DBA0:[JRG]GREY
+\end{verbatim}
+This example shows the simplest use of the RUNSTAR command.
+Parameters START, VINC, HINC and OUT have no connection-file defaults and no
+values for them have been specified in the RUNSTAR command, therefore the user
+is prompted for their values.
+Run-time defaults are offered for START, VINC and HINC.
+The run-time default for START (0) was acceptable so the user hit $<$return$>$.
+VINC, however, was reset to -3 and HINC to 2 after an incorrect value was
+initially supplied.
+The run-time default had been reset to zero as a consequence.
+The output frame was stored in the VMS file, [JRG]GREY.BDF;1 on device DBA0.
+The connection file defaults of 4 and 6 were taken for NLINES and NSAMPLES,
+respectively.
+The following image was generated:
+\begin{verbatim}
+         0   2   4   6   8  10
+        -3  -1   1   3   5   7
+        -6  -4  -2   0   2   4
+        -9  -7  -5  -3  -1   1
+\end{verbatim}
+\subsection {EXAMPLE 2}
+\begin{verbatim}
+        $ ASSIGN  DBB2:[LJC.IMAGES]  XXX
+        $ RUNSTAR GEN2D/START=2/VINC=/HINC=/NLINES=7/NSAMPLES=@
+        NSAMPLES:= 9
+        OUT:= XXX:SUMCOORD
+\end{verbatim}
+This example shows the specification of parameter values on the RUNSTAR command
+line.
+START is set to 2 and VINC and HINC are supplied as {\em null} values.
+However, as run-time defaults of 1 exist for these parameters, these will be
+used by the program.
+The connection file defaults for NLINES and NSAMPLES were overridden with
+values of 7 and 9, respectively.
+The user was prompted for NSAMPLES after he incorrectly supplied the value `@'
+on the command line.
+The image frame was stored in DBB2:[LJC.IMAGES]SUMCOORD.BDF;1.
+The logical name `XXX' was translated by the system.
+Each pixel value within the image is the sum of its co-ordinates:
+\begin{verbatim}
+        2   3   4   5   6   7   8   9  10
+        3   4   5   6   7   8   9  10  11
+        4   5   6   7   8   9  10  11  12
+        5   6   7   8   9  10  11  12  13
+        6   7   8   9  10  11  12  13  14
+        7   8   9  10  11  12  13  14  15
+        8   9  10  11  12  13  14  15  16
+\end{verbatim}
+\subsection {EXAMPLE 3}
+\begin{verbatim}
+        $ RUNSTAR GEN2D/OUT=WEDGE.DAT/START=/HINC=/VINC= -
+        $     /NSAMPLES=512/NLINES=512
+\end{verbatim}
+In this example, all the program parameters have been specified in the RUNSTAR
+command.
+Note the use of the DCL continuation facility to extend the command over more
+than one line.
+DCL may prompt with \$\_ or just \$ on the continuation line.
+START, HINC and VINC all take their run-time defaults.
+Both NLINES and NSAMPLES are set to 512 and the output frame is stored in
+WEDGE.DAT;1 in the user's default directory.
+The default filetype of `.BDF' has been overridden by `.DAT' for the output
+frame file.
+\subsection {EXAMPLE 4}
+\begin{verbatim}
+        $ RUNSTAR GEN2D/START=255/HINC=6/VINC=3/NLINES=60/NSAMPLES=60
+        OUT:=<return>
+        ### Frame allocation failed - respecify:
+        OUT:= [MDL]TESTPIC
+\end{verbatim}
+The user initially specified a {\em null} frame specification for the output frame.
+As a non-null value is mandatory for this parameter, the status returned from
+WRIMAG forces an error message to be displayed and the user is reprompted for a
+new frame file specification.
+\subsection {EXAMPLE 5}
+\begin{verbatim}
+        $ RUNSTAR GEN2D/NLINES=2000/NSAMPLES=2000/START=0/HINC=0/VINC=0
+        OUT:= SYS$SYSDISK:[PTW]FLATFIELD
+
+        ***(WRFRM/EXTBDF) ERROR
+        %RMS-E-EXT, ACP file extend failed 
+        *** ABNORMAL END
+\end{verbatim}
+This example shows the generation of a 2000 X 2000 flat field image frame.
+Unfortunately, the program has aborted due to a system service failure.
+Normally, for system service failures the error will be displayed as shown here.
+In this case, the program was aborted due to insufficient space for the output
+image.
+This can occur when the user's disc file quota is exceeded.
+The user should request an increased quota from the site manager, or choose a
+smaller image size.
+\subsection {EXAMPLE 6}
+\begin{verbatim}
+        $ RUNSTAR GEN2D/START=63/HINC=31/VINC=31/OUT=[.JUNK]ABC -
+        $ /NLINES=512/NSAMPLES=0
+
+        ---WRDATA  STATUS=6,    INVALID FRAME SIZE
+
+        ---WRDATA  STATUS=6,    INVALID FRAME SIZE
+
+        Frame allocation failed - respecify:
+        OUT:=
+        <cntrl>Y
+\end{verbatim}
+The user has attempted to generate an frame file [.JUNK]ABC, but a fatal error
+has been detected in routine WRDATA, (which is called by WRIMAG).
+This forces the Starlink error handling routine, STLERR, to be invoked.
+The status value of 6 indicates a {\em dimensions invalid (out-of-range)}
+condition which was caused by the erroneous NSAMPLES value (see description of
+DIMINV error).
+Although the user was re-prompted for a new frame-file specification, he cannot
+recover from this condition and, therefore, aborted the program by using
+$<$CTRL$>$Y to get out of an infinite loop.
+
+This illustrates the type of problem that can occur when status checks are
+omitted in a program.
+In this case, the safe procedure would be to check the values of NLINES and
+NSAMPLES.
+If they are erroneous, request new values from the user by using CNPAR to cancel
+the parameter association and then use RDKEYI again to get another value.
+\newpage
+\begin{center}
+{\LARGE\bf INTERIM routine summary}
+\end {center}
+\rule{\textwidth}{0.3mm}
+\setlength{\unitlength}{1mm}
+\begin{center}
+\begin{picture}(142,80)
+\thicklines
+\put (0,72){Parameter}
+\put (20,72){Value: {\bf RDKEYx},{\bf WRKEYx}}
+\put (2,69){access}
+\put (20,64){Frame:}
+\put (39,64){Basic}
+\put (55,64){Data: {\bf RDDATA, WRDATA}}
+\put (37,61){routines}
+\put (55,58){Descriptor}
+\put (76,58){complete: {\bf CYDSCR}}
+\put (76,53){items}
+\put (91,53){values: {\bf RDDSCR, WRDSCR}}
+\put (103,50){{\bf ADDSCR, DLDSCR}}
+\put (91,45){names: {\bf RDDSCN}}
+\put (37,40){{\em IMAGE} type: {\bf RDIMAG, WRIMAG}}
+\put (20,32){Error: {\bf WRERR}}
+\put (0,25){Parameter: {\bf CNPAR}}
+\put (2,22){control}
+\put (0,15){Utilities}
+\put (20,15){data conversion: {\bf CTOx, xTOC}}
+\put (20,10){mapping control: {\bf GETDYN, FRDATA}}
+\put (20,5){direct terminal I/O: {\bf RDUSER, WRUSER}}
+\put (20,0){error handler: {\bf STLERR}}
+\put (16,73){\line(1,0){4}}
+\put (18,65){\line(1,0){2}}
+\put (31,65){\line(1,0){8}}
+\put (47,65){\line(1,0){8}}
+\put (51,59){\line(1,0){4}}
+\put (71,59){\line(1,0){5}}
+\put (73.5,54){\line(1,0){2.5}}
+\put (84,54){\line(1,0){7}}
+\put (87.5,46){\line(1,0){3.5}}
+\put (35,41){\line(1,0){2}}
+\put (18,33){\line(1,0){2}}
+\put (12.5,16){\line(1,0){7.5}}
+\put (16,11){\line(1,0){4}}
+\put (16,6){\line(1,0){4}}
+\put (16,1){\line(1,0){4}}
+\put (16,16){\line(0,-1){15}}
+\put (18,73){\line(0,-1){40}}
+\put (35,65){\line(0,-1){24}}
+\put (51,65){\line(0,-1){6}}
+\put (73.5,59){\line(0,-1){5}}
+\put (87.5,54){\line(0,-1){8}}
+\end{picture}
+\end{center}
+\rule{\textwidth}{0.3mm}
+\begin{tabbing}
+namexx\=positionxx\=maxdimsxx\=dimensxx\=pointerxx\=pointerxxx\=\kill
+{\em name}\>{\em default}\>{\em maxels}\>{\em value}\>{\em actels}\>\>{\bf RDKEYx}\\
+{\em name}\>\>\>{\em value}\>{\em nels}\>\>{\bf WRKEYx}\\
+\\
+{\em name}\>{\em dtype}\>{\em ftype}\>{\em size}\>{\em pointer}\>\>{\bf RDDATA, WRDATA}\\
+{\em name}\>{\em dtype}\>\>{\em size}\>{\em pointer}\>\>{\bf GETDYN}\\
+\\
+{\em name}\>{\em dtype}\>{\em maxdims}\>{\em dimens}\>{\em actdims}\>{\em pointer}\>{\bf RDIMAG}\\
+{\em name}\>{\em dtype}\>\>{\em dimens}\>{\em ndims}\>{\em pointer}\>{\bf WRIMAG}\\
+\\
+{\em name}\>{\em descr}\>{\em maxels}\>{\em value}\>{\em actels}\>\>{\bf RDDSCR}\\
+{\em name}\>{\em descr}\>\>{\em value}\>{\em nels}\>\>{\bf ADDSCR, WRDSCR}\\
+\\
+{\em name}\>{\em position}\>{\em descr}\>\>\>\>{\bf RDDSCN}\\
+{\em name}\>\>{\em descr}\>\>\>\>{\bf DLDSCR}\\
+\\
+{\em name1}\>{\em name2}\>\>\>\>\>{\bf CYDSCR}\\
+\\
+{\em name}\>\>\>\>\>\>{\bf WRERR, CNPAR, FRDATA}\\
+\\
+{\em value}\>{\em string}\>\>\>\>\>{\bf xTOC}\\
+{\em string}\>{\em value}\>\>\>\>\>{\bf CTOx}\\
+\\
+{\em text}\>\>\>\>\>\>{\bf RDUSER, WRUSER}\\
+\\
+{\em routine}\>\>\>\>\>\>{\bf STLERR}
+\end{tabbing}
+\rule{\textwidth}{0.3mm}
+\end{document}

@@ -1,0 +1,2081 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+% STAR STAR STAR
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {76.5}
+\newcommand{\stardocauthors}   {James Tappin\footnote{School of Physics and 
+Space Research, University of Birmingham}}
+% STAR STAR STAR
+\newcommand{\stardocdate}      {18 December 1992}
+\newcommand{\stardoctitle}     {HXIS --- Hard X-ray Imaging Spectrometer}
+\newcommand{\hxdispvers}{8.0}
+%------------------------------------------------------------------------------
+
+% STAR STAR STAR
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+% STAR STAR STAR
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+% STAR STAR STAR
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\ {\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+% STAR STAR STAR
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\begin{center}
+{\Large\em Portable Version}
+\end{center}
+
+\vspace{2mm}
+
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\stardocname}
+
+\newpage
+
+\section{Introduction}
+
+The programs which make up the HXIS software package allow the display
+of images produced by the Hard X-ray Imaging Spectrometer (HXIS)
+carried on the Solar Maximum Mission (SMM). There are also facilities
+for displaying time series and for editing bad data. Programs are also
+provided for accessing and archiving the data files to and from tapes.
+
+\subsection{Programs}      
+
+The following programs make up the software package.
+
+\begin{description} 
+\item[\verb!hxdisp!: ] (Page \pageref{HXDISP}) This is the primary
+image display and manipulation program. Also contains options for
+time-series plots and some rudimentary analysis of spectral data.
+
+\item[\verb!rdhim!: ]  (Page \pageref{RDHIM}) Reads data from a HIMSEL
+tape and stores data on disk.
+
+\item[\verb!haxim!: ] (Page \pageref{HAXIM}) Converts Production Data
+Tapes to HIMSEL image tapes or to disk images.
+
+\item[\verb!hxlib!: ] (Page \pageref{HXLIB}) Allows access to the HIMSEL tape
+catalogue which is stored on disk. If it is desired to update the
+database then it must be run from an account with write access to the
+database.
+
+\item[\verb!wrhim!: ] (Page \pageref{WRHIM}) Writes disk images to a
+HIMSEL tape.
+
+\item[\verb!hxjoin!: ] (Page \pageref{HXJOIN}) Concatenates two disk
+image files.
+\end{description}
+
+More complete descriptions of the various programs are given in the
+remainder of this document.
+
+\subsection{Accessing HXIS Software}
+
+\subsubsection{Commands}
+
+To use the software you will need to add the line \verb!source
+${HXIS_DIR}/HXset! to your \verb!.login! file (UNIX) or
+\verb!@HXIS_DIR:HXSET! to your \verb!LOGIN.COM! file (VMS) (or run it
+explicitly each time you want to use the software).
+
+This will set up the necessary PATH additions and environment variables
+so that the commands can be run by typing their names (e.g.
+\verb!hxdisp! or
+\verb!rdhim!). A suitable place to put it would probably be straight after
+the \verb!source /star/etc/login! (\verb!@SSCLOGIN!) line.
+
+\subsubsection{Image files}
+
+In all the programs if you do not give a file type {\tt .dta} is
+assumed.  An image file with no extension is not accessible (one ending
+in a dot is accessible).
+
+The significance of the individual locations in each image is described
+in Appendix~\ref{DATA} on page~\pageref{DATA}.
+
+\subsubsection{Tapes}
+
+In those commands which always use tapes (or tape-like devices, e.g. an
+EXABYTE cartridge) the command sequence will prompt the user for the
+desired drive(s).
+
+On VMS you must allocate and mount the drive before running the program
+and dismount and deallocate afterwards. On Unix systems you do not
+mount drives, you just put the tape on or in the drive and use it.
+
+\subsubsection{File Transport}
+
+Files can be moved between different systems, but care needs to be taken
+with the file attributes when moving from Unix to VMS.
+
+A utility \verb!FIXATR! obtained from the National Center for
+Supercomputing Applications, at the University of Illinois has been
+provided for making the necessary conversions on a VMS system.
+The standard setup procedure initializes this and provides two sets of
+options one for the \verb!ipd*! files (\verb!fixipd!) and one for the
+\verb!.dta! files (\verb!fixdta!).
+
+The following points should also be observed:
+\begin{itemize}
+\item Files moved using \verb!ftp! should always be moved in binary (image)
+mode (and then \verb!FIXATR!ed for Unix to VMS).
+\item Files read from VMS backup tapes using \verb!vmsbackup! should
+always be retrieved using the binary \verb!-b! option.
+\item IPD files cannot safely be moved from VMS to Unix with the
+\verb!vms2tar! utility as this will mangle the records {\bf
+(IRRETRIEVABLY)}, \verb!tar2vms!
+followed by \verb!FIXATR! should be O.K. for moving files to VMS.
+\end{itemize}
+
+
+\section{HXDISP}
+\label{HXDISP}
+
+\subsection{General}
+
+This program allows the display and editing of images and time-series
+from HXIS, and also a certain amount of elementary spectral analysis.
+
+To make the images available to the program they should be read from
+tape using either \verb!rdhim!~(p.~\pageref{RDHIM}) (HIMSEL tapes) or
+\verb!haxim!~(p.~\pageref{HAXIM}) (production data tapes).
+
+To execute this program just type \verb!hxdisp!, and then reply to the
+prompts.
+
+Firstly the filename of the desired data is requested, the name given
+must include the directory where the file is stored (unless it is in
+the current directory).
+
+Note that there is a limit of 69
+\label{longname} characters for the length of the filename (excluding any
+implicit {\tt .dta} filetype, but including any explicit filetype).  If
+the filename is longer than this you must define a symbolic link (or a
+logical name on VMS) so that a name of less than 69 characters can be
+given: e.g. if the file is (UNIX)
+\begin{verbatim}
+/work1/solar/data_directory/images/hxis-smm/new_versions/24_september_1980.dta
+\end{verbatim}
+then you could use:
+\begin{verbatim}
+ln -s /work1/solar/data_directory/images/hxis-smm/new_versions ./imdir
+\end{verbatim}
+and then give the filename as \verb!imdir/24_september_1980! or for VMS:
+\begin{verbatim}
+DISK$WORK1:[SOLAR.DATA_DIRECTORY.IMAGES.HXIS-SMM.NEW_VERSIONS]24_SEPTEMBER_1980.DTA
+\end{verbatim}
+then you could use:
+\begin{verbatim}
+DEFINE IMDIR DISK$WORK1:[SOLAR.DATA_DIRECTORY.IMAGES.HXIS-SMM.NEW_VERSIONS]
+\end{verbatim} 
+and then give the filename as \verb!IMDIR:24_SEPTEMBER_1980!
+
+There is a limit of 2200 images per file, but as it is not possible to
+create a disk image file of more than 2200 images by the standard
+methods, there should not be any difficulties at this stage.
+
+If the number type of the file is different from that of the machine
+there will be a delay while the file is translated and re-written.
+
+When the image file has been opened the program informs the user of the
+number of images in the file and waits for commands with the main
+command level prompt:
+\begin{verbatim}
+Command :_
+\end{verbatim}
+
+A list of commands and a brief description of their function is given
+below, with the commands grouped by the type of operation performed. A
+more detailed description of the command is given on the page indicated
+by each command.  The interaction of the various setting commands with
+the display commands is summarized in Table~\ref{interact}.
+
+\begin{table}
+\caption{\label{interact} The interaction of the setting and device control
+commands with the data display commands in {\tt hxdisp}.} {\small
+\begin{center}
+\begin{tabular}{|l|*{7}{c}|*{4}{c}|*{2}{c}|} \hline
+& DUM & VIE & CON & DEC & ITC & ALL & MOV & TSE & SIX & RAT & PXT & SPE
+& SAV \\
+\hline
+AVERA & & & & & & & & Y & Y & Y & Y & & \\
+BACKG & & & & P & P & & & Y & Y & Y & Y & Y & \\
+BANDS & O & Y & O & O & O & & Y & Y & & O & Y & & Y \\
+COARS & & Y & Y & Y & Y & Y & Y & O & O & O & O & O & \\ 
+DEADT & & & & & & & & Y & Y & & Y & Y & \\ 
+FINE & & Y & Y & Y & Y & Y & Y & O & O & O & O & O & \\ 
+IMAGE & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y \\ 
+MASTE & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y \\
+SETPI & & & & & & & & Y & Y & Y & & Y & \\ 
+SLAVE & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y \\
+\hline
+ERRBA & & & & & & & & Y & Y & Y & Y & & \\ 
+FSD & & & & & & & & & & & Y & & \\ 
+LOGAR & & & & & & & & Y & Y & Y & Y & & \\ 
+MINRA & & & & & & & & Y & Y & Y & Y & & \\ 
+SCALE & & Y & & & & Y & Y & & & & & & \\ 
+SETLE & Y & & & & & & & & & & & & \\ 
+THRES & & & & Y & Y & & & & & & & & \\
+\hline
+AUTOP & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & & \\ 
+COLOU & & Y & & & O & Y & Y & & & & & & \\ 
+DELAY & & & & & & & Y & & & & & & \\ 
+DEVIC & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & & \\ 
+DXDY & & Y & & & & & Y & & & & & & \\ 
+FONT & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & P & & \\ 
+INTER & Y & & & & & & & Y & & Y & & & \\ 
+LAYOU & & & & & & & & & Y & & & & \\ 
+PAPER & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & Y & & \\ 
+SIZE & & Y & Y & Y & Y & & Y & Y & & Y & & & \\ 
+WRPIX & & & & & & & & Y & Y & Y & & & \\
+\hline
+\end{tabular}
+\end{center}
+Notes:
+\begin{enumerate}
+\item For items marked Y the option affects the results of the display command
+in the normal way.
+\item For items marked O the effect is dependent on the setting of other
+options (e.g. SETPI overrides the FINE/COARSE setting for TSER), or may
+be overridden by options within the command.
+\item For items marked P the option has only a partial effect:
+\begin{itemize}
+\item For PXTSER, FONT affects the header only.
+\item For DECON and ITCON, the levels set by BACK affect the lowest contour
+levels and the default base level for greyscales, irrespective of the
+switch setting.
+\end{itemize}
+\item The values for ITCON refer to contoured, greyscale and coloured output,
+the behaviour of dump output is as for DUMP.
+\item FTSER, FRATIO and FSIXTSER are similar to TSER etc. except that the only
+``plot'' command with any effect is ERRBAR.
+\end{enumerate}}
+\end{table}
+
+The first five letters of each command are significant, but any unique
+abbreviation of two or more characters may be used, the essential part
+of each command is underlined in the main descriptions of the command.
+For example for the DECONVOLVE command:
+\begin{quote}
+{\tt DEC, DECON} and {\tt DECONXXXXXXX} are all acceptable, but\\ {\tt
+DE} and {\tt DECXXXX} are not.
+\end{quote}
+
+Many commands prompt the user for necessary information if it has not
+been supplied in an argument to the command. The following features
+apply to most prompts.
+\begin{enumerate}
+\item If a real number is requested, an integer is acceptable.
+\item Any improper input will result in 
+the request being re-issued.
+\item Where a range is requested but that range could
+be of length 1 (e.g. a single image or pixel) then only a single number
+need be entered.
+\item If no values are entered at a prompt (i.e. carriage return)
+then the existing values are retained.
+\item All character responses apart from file-names
+are case-insensitive.
+\item Entering control-D will normally return you to the \verb!hxdisp!
+command level. There are a few exceptions where it will return you to
+the beginning of the prompt sequence (in which case a second control-D
+returns you to the command level).
+\end{enumerate}
+
+When arguments are used to pass information to commands {\tt YES} is
+always a synonym for {\tt ON} and {\tt NO} for {\tt OFF}. Any other
+synonyms will be listed with the appropriate commands.
+
+\subsection{Display Commands}
+ 	     
+The commands listed in this section are those which actually output
+graphical display of image data, or write data to disk files.
+
+\begin{tabbing}
+{\bf SHDETRUNCATIONXXX} \= p.~9999 \= Show truncation corrections.\kill
+{\bf ALLBANDS} \> p.~\pageref{al} \> Display images for all bands
+together.\\ 
+{\bf CONTOUR} \> p.~\pageref{con} \> Contour raw image.\\
+{\bf DECONVOLVE} \> p.~\pageref{dec} \> Contour deconvolved image
+(simple default options only).\\ 
+{\bf DUMP} \> p.~\pageref{du} \> Print Image.\\ 
+{\bf ITCON} \> p.~\pageref{it} \> Display deconvolved image (many options).\\ 
+{\bf FRATIO} \> p.~\pageref{fr} \> Ratio time series to file.\\ 
+{\bf FSIXTSER} \> p.~\pageref{fsi} \> 6 band time series to file.\\ 
+{\bf FTSER} \> p.~\pageref{ft} \> Write time series to file.\\
+{\bf MOVIE} \> p.~\pageref{mo} \> ``Movie'' of images.\\ 
+{\bf PXTSER} \> p.~\pageref{px} \> Time series for separate pixels.\\ 
+{\bf RATIO} \> p.~\pageref{ra} \> Plot time series of band ratios.\\ 
+{\bf SAVE} \> p.~\pageref{sa} \> Save image to disk.\\ 
+{\bf SIXTSER} \> p.~\pageref{six} \> Time series of all six bands.\\ 
+{\bf SPECTRA} \> p.~\pageref{sp} \> Simple spectral analysis.\\ 
+{\bf TSER} \> p.~\pageref{ts} \> Plot time series.\\ 
+{\bf VIEW} \> p.~\pageref{vi} \> Display image on screen.\\
+\end{tabbing}
+
+\subsection{Selection Commands}
+	 
+These commands select which part of the data will be displayed by the
+display commands.
+
+\begin{tabbing}
+{\bf SHDETRUNCATIONXXX} \= p.~9999 \= Show truncation corrections.\kill
+{\bf AVERAGE} \> p.~\pageref{av} \> Set averaging time.\\ 
+{\bf BACKGROUND} \> p.~\pageref{bac} \> Set background subtraction.\\ 
+{\bf BANDS} \> p.~\pageref{ban} \> Select band range.\\ 
+{\bf COARSE} \> p.~\pageref{coa} \> Select coarse field.\\ 
+{\bf DEADTIME} \> p.~\pageref{dea} \> Set deadtime correction.\\ 
+{\bf FINE} \> p.~\pageref{fin} \> Select fine field.\\ 
+{\bf IMAGE} \> p.~\pageref{im} \> Select image range.\\ 
+{\bf MASTER} \> p.~\pageref{mas} \> Select ``Master'' images.\\ 
+{\bf SELECT} \> p.~\pageref{sel} \> Select pixels above level.\\ 
+{\bf SETLEVEL} \> p.~\pageref{setl} \> Select selection level.\\ 
+{\bf SETPIXEL} \> p.~\pageref{setp} \> Select pixels.\\ 
+{\bf SLAVE} \> p.~\pageref{sl} \> Select ``Slave'' images.\\ 
+{\bf TIME} \> p.~\pageref{ti} \> Select image range by times.\\
+\end{tabbing}
+
+\subsection{Data Control Commands}
+
+These commands control how the data will be displayed (e.g. logarithms,
+error bars, scaling etc.).
+
+\begin{tabbing}
+{\bf SHDETRUNCATIONXXX} \= p.~9999 \= Show truncation corrections.\kill
+{\bf ERRBAR} \> p.~\pageref{er} \> Select error bars.\\ 
+{\bf FSD} \> p.~\pageref{fsd} \> Set pixel plot scaling.\\ 
+{\bf INTER} \> p.~\pageref{int} \> Select interactive graphics.\\ 
+{\bf LOGARITHMIC} \> p.~\pageref{lo} \> Select logarithmic plots.\\ 
+{\bf MINRATE} \> p.~\pageref{mi} \> Lower cut-off in logarithmic
+plots.\\ 
+{\bf SCALE} \> p.~\pageref{sc} \> Set image saturation level.\\ 
+{\bf THRESHOLD} \> p.~\pageref{th} \> Contouring threshold.\\
+\end{tabbing}
+
+\subsection{Device Control Commands}
+
+These commands control how the data will be displayed on the device
+(e.g. size, position etc.).
+
+\begin{tabbing}
+{\bf SHDETRUNCATIONXXX} \= p.~9999 \= Show truncation corrections.\kill
+{\bf AUTOPLOT} \> p.~\pageref{au} \> Select automatic plot spooling\\ 
+{\bf COLOUR} \> p.~\pageref{col} \> Select colour table.\\ 
+{\bf DELAY} \> p.~\pageref{del} \> Set delay time.\\ 
+{\bf DEVICE} \> p.~\pageref{dev} \> Select graphics device.\\ 
+{\bf DXDY} \> p.~\pageref{dx} \> Set plot offset.\\ 
+{\bf FONT} \> p.~\pageref{fo} \> Set graphics font.\\ 
+{\bf LAYOUT} \> p.~\pageref{la} \> Arrangement of 6-band plots.\\ 
+{\bf PAPER} \> p.~\pageref{pa} \> Paper size for plots.\\ 
+{\bf SIZE} \> p.~\pageref{siz} \> Set plot size.\\ 
+{\bf WRPIXEL} \> p.~\pageref{wr} \> Set time series output file.\\
+\end{tabbing}
+
+\subsection{Data Editing Commands}
+
+These commands actually alter the image file in some way, or else
+display how it has been altered. All have a permanent effect on the
+disc file with the image, however not all are irreversible.
+
+\begin{tabbing}
+{\bf SHDETRUNCATIONXXX} \= p.~9999 \= Show truncation corrections.\kill
+{\bf FLAG} \> p.~\pageref{fl} \> Flag bad images.\\ 
+{\bf LFLAG} \> p.~\pageref{lf} \> List flagged images.\\ 
+{\bf PIXEL} \> p.~\pageref{pi} \> Set pixel values.\\ 
+{\bf SUBTRACT} \> p.~\pageref{sub} \> Subtract background image.\\ 
+{\bf UNFLAG} \> p.~\pageref{un} \> Restore flagged images.\\
+\end{tabbing}
+
+\subsection{Program Control Commands}
+
+Exiting, changing input file etc.
+
+\begin{tabbing}
+{\bf SHDETRUNCATIONXXX} \= p.~9999 \= Show truncation corrections.\kill
+{\bf CTRL-D} \> p.~\pageref{eof} \> Return to command level (UNIX).\\ 
+{\bf EXIT} \> p.~\pageref{ex} \> Exit from program.\\ 
+{\bf FILE} \> p.~\pageref{fil} \> New image file.\\ 
+{\bf CTRL-Z} \> p.~\pageref{eof} \> Return to command level (VMS). \\
+\> p.~\pageref{dcl} \>  Suspend \verb!hxdisp! and start a
+new shell (UNIX).\\ 
+{\bf \$} \> p.~\pageref{dcl} \> Execute a system command.\\
+\end{tabbing}
+
+\subsection{Miscellaneous Commands}
+
+Give information about the image etc.
+
+\begin{tabbing}
+{\bf SHDETRUNCATIONXXX} \= p.~9999 \= Show truncation corrections.\kill
+{\bf CHECK} \> p.~\pageref{ch} \> Check for bad images.\\ 
+{\bf DOY} \> p.~\pageref{do} \> Convert date format.\\ 
+{\bf INFO} \> p.~\pageref{inf} \> Image and option setting
+information.\\ 
+{\bf HELP} \> p.~\pageref{he} \> HXDISP help.\\ 
+{\bf HMS} \> p.~\pageref{hm} \> Convert time format.\\ 
+{\bf LPIXELS} \> p.~\pageref{lp} \> List selected pixels.\\ 
+{\bf MAXIMUM} \> p.~\pageref{max} \> Find maximum in images.\\ 
+{\bf POINTING} \> p.~\pageref{po} \> List pointing information.\\ 
+{\bf SURVEY} \> p.~\pageref{sur} \> Image times and durations.\\ 
+{\bf VERIFY} \> p.~\pageref{ve} \> Check image numbers.\\
+\end{tabbing}
+
+\subsection{Output of Hardcopy}
+
+Plot files for hardcopies are stored in the current directory. When the
+plot file is closed the filename will be printed on your terminal.  If
+autoplot mode is selected you will then be prompted for a command for
+the disposal of the file, this command will then be spawned.  If you do
+not spool the plot and delete the file then on a VMS system, the next
+file will have the same name with a version number one higher; on a
+Unix system the name will be suffixed with a $.<n>$ (e.g.
+\verb!GKS_72.PS.2!).
+
+When the \TeX\ devices are used the filename will be the same and the
+file should be renamed and included into a \TeX\ or \LaTeX\ file with a
+\verb!\special! command.
+
+The commands {\tt VIEW, ALLBANDS, MOVIE} and the {\tt F} option of {\tt
+ITCON} produce colour plots which require that the device has a minimum
+of 32 available colour indices. If one of these commands is used when
+the selected device does not have sufficient indices, then after
+opening the device; \verb!hxdisp! will close it, delete any plot file
+produced, print an error message and return to the command level.
+
+\subsection{Batch Mode}
+
+Although \verb!hxdisp! was designed with interactive operation in mind,
+the current version may be operated reasonably safely with data read
+from a file.
+
+To run \verb!hxdisp! in batch mode create a file containing the
+commands for
+\verb!hxdisp! e.g. (UNIX version)
+
+\begin{verbatim}
+/work2/d234_1341
+COARSE 
+IMAGE 30,70 
+AVERAGE 30 
+MASTER ON 
+DEVICE POSTSCRIPT_L 
+AUTOPLOT OFF
+PXTSER 
+BAND 4,6 
+IMAGE ALL 
+SETPIXEL 
+23,25 
+42,44 
+-1 
+ERRBAR ON
+DEVICE POSTSCRIPT_P 
+TSER 
+EXIT
+\end{verbatim}
+
+If this file is \verb!hxdisp.inp! then giving the command
+\begin{verbatim}
+hxdisp < hxdisp.inp &
+\end{verbatim}
+will run the program in the background.
+
+For VMS add the line \verb!$ HXDISP! at the top of the file and use
+\verb!submit!.
+
+The following commands are not available in batch mode:
+\begin{quote} \tt
+VIEW, MOVIE, ALLBANDS, COLOUR, INTERACTIVE, VERIFY {\rm and} DELAY
+\end{quote}
+If they are specified they will be ignored.
+
+It is recommended that in batch mode arguments should be used to pass
+information to commands where possible this reduces the risk of chaos
+resulting from a missing value (this will usually take the form of a
+series of invalid value messages ending with an exit on end of file).
+For the same reason it is a good idea to use the {\tt DEVICE} command
+to select plot devices in batch mode.
+
+On VMS systems the \verb!$! command will be confused with end-of-file
+in batch mode (unless you use the \verb!DECK! and \verb!EOD! commands).
+
+\subsection{Command Descriptions}
+
+The following section contains the full descriptions of the
+\verb!hxdisp! commands, listed in alphabetical order. The underlined
+portion of each command name is the minimum abbreviation allowed.
+
+\begin{description}
+\item[\underline{AL}LBANDS: ] \label{al}
+Places an image of the current field in each of the 6 energy bands on
+the screen.  The images are accumulated over the selected images. The
+output of this command is affected by the {\tt SCALE} command.
+
+This command needs 255 available colour indices to work correctly.
+Available in interactive mode only.
+
+\item[\underline{AU}TOPLOT: ] \label{au}
+Select whether to spool plot files to the appropriate queue
+automatically.
+
+The default state is ON. When automatic plotting is turned off then a
+message is output, including the name of the plot file.
+
+Setting may be specified by the arguments {\tt ON} and {\tt OFF}.
+
+\item[\underline{AV}ERAGE: ] \label{av}
+Set time for averaging in time series. The averaging time is an elapsed
+time, which will be greater than or equal to the accumulation time.
+
+Setting may be specified by the arguments {\tt ON} and {\tt OFF} which
+switch the option but do not change the averaging time (if {\tt ON} is
+given without a value having been set a warning will be given and no
+averaging will occur). Specifying a real number as argument switches
+averaging on and sets the averaging time to that value.
+
+Hard, default off.
+
+\item[\underline{BAC}KGROUND: ] \label{bac}
+Background removal selection. If selected the user is shown the default
+levels, and asked whether to use these or to set new levels.  If levels
+have already been set then these are shown as well as the defaults and
+the user may choose to reset, set new values or keep the current ones.
+
+Setting may be specified by the arguments {\tt ON} and {\tt OFF} which
+switch the option without changing the levels. If {\tt NEW} or {\tt
+SET} is specified then the option is switched on and new levels are
+requested.  If {\tt RESET} is specified then the option is switched on
+and the default levels are restored.
+
+Hard, default off.
+
+\item[\underline{BAN}DS: ] \label{ban}
+Specify the range of energy bands over which images should be
+accumulated. For example, specifying 1,3 will cause all images to be
+summed over bands 1 to 3. There are a total of 6 energy bands.
+
+The band(s) may be given as an argument to the command as 1 or 2
+integers.
+
+This is a hard option, default band 1.
+
+\item[\underline{CH}ECK: ] \label{ch}
+This command is used to search for bad images which you may want to
+flag. First use the {\tt IMAGE} command to set the desired range of
+images. You should also set the desired band range with the {\tt BANDS}
+command.
+
+The {\tt CHECK} command requests whether to send its output to the line
+printer or the terminal (the latter is not recommended for large
+numbers of images). It then produces the following outputs on the
+selected device :
+\begin{quote}\tt
+(IMAGE NO., MAXIMUM COUNTS, PIXEL LOCATION)
+\end{quote}
+By scanning the output one can easily check for any data glitches since
+this would produce a maximum count in a pixel location which differed
+greatly from the pixel location of the true maximum. The use of this
+command in conjunction with {\tt TSER} in interactive mode provides a
+relatively easy way of finding and eliminating bad images.
+
+The user is prompted for the destination of the output: either the
+terminal or a printer.
+
+The device may be specified as an argument to the command:
+\begin{quote}
+{\tt T} or {\tt TERM} for the terminal\\ {\tt P} or {\tt PRINT} for the
+line printer.
+\end{quote}
+
+\item[\underline{COA}RSE: ] \label{coa}
+Selects the coarse field of view image data.
+      
+If the current field is fine and the pixel selection is for the entire
+fine field, then the pixel selection will be changed to the coarse
+field, if however any other pixel selections have been made with {\tt
+SETPIXEL} then no changes will be made.
+
+\item[\underline{COL}OUR: ] \label{col} 
+Specify desired colour table. Enter a number between 1 and 10.
+
+At present only tables 1 through 5 exist. If a non-existent table is
+specified then the default of 1 is used. If the program fails to read
+any colour tables then a standard ``greyscale'' table is used.
+
+The table may be specified as an integer argument to the command.
+
+Available in interactive mode only.
+
+\item[\underline{CON}TOUR: ] \label{con}
+Make a contour map of the selected field.
+
+The contour levels may be selected either as a percentage of the image
+peak (the initial default) or by counts/pixel.  If a file called {\tt
+CONTOUR.DCN} exists then this will be read and offered as a default set
+of contour levels. If such a file is not found or is rejected then an
+internal set of defaults is offered.  If these too are rejected then
+the program will prompt for levels, up to a maximum of 50, these will
+be saved as {\tt CONTOUR.DCN}.
+
+Header information on the plot gives the image range, start time and
+integration time for the image. The energy bands and range in keV are
+given along with the scaling of the image. Contour levels used are
+listed in counts and as a percentage of the peak.
+
+The routine will plot either the currently selected bands or produce
+separate plots of each of the six bands.  This may be selected by an
+argument to the command with:
+\begin{quote}
+{\tt ALL} for all bands (6 separate plots) or\\ {\tt C} for accumulated
+over the current bands
+\end{quote}
+Otherwise the program will prompt for a choice with current as the
+default.
+
+\item[\underline{DEA}DTIME: ] \label{dea}
+Correct for instrument dead-time on the basis of the DFM fields. These
+fields monitor a radioactive source so the count rate should be
+independent of levels of emission on the Sun.
+
+The command requests a range of images over which to accumulate the
+DFM's to create the base level, this should be a time when the count
+rates were low.  This applies to {\tt TSER} and {\tt SPECTRA}.
+
+Setting may be specified by the arguments {\tt ON} and {\tt OFF}.  If
+{\tt ON} is specified this implies that the image range for forming the
+base level is unchanged from the last time the option was set. If 1 or
+2 integers are given as an argument then the base range is reset to the
+range given and the option is switched on.
+
+Hard, default off.
+
+\item[\underline{DEC}ONVOLVE: ] \label{dec}
+This command produces a contour plot of the data deconvolved with the
+point spread function of HXIS using a basic set of default options. If
+more advanced options are needed use {\tt ITCON} (see p.~\pageref{it}).
+
+The details of the deconvolution algorithm are described in
+Appendix~\ref{ALGO} on p.~\pageref{ALGO}.
+
+The deconvolved image is then contoured with a standard set of contour
+levels.  The levels are:
+\begin{quote}
+100, 99, 98, 90, 80, 70, 55, 40, 26, 14, 7 \& 3\% of the image peak
+\end{quote}
+
+The only input needed from the user is the selection of a plot device,
+if no default has been selected.
+
+During the deconvolution process the program will type a summary of
+each step of the deconvolution at the users terminal.
+
+Header information on the plot states that the image has been
+deconvolved and gives the image range, start time and integration time
+for the image. The energy bands and range in keV are given along with
+the scaling of the image. Contour levels used are listed in counts and
+as a percentage of the peak.
+
+The routine will plot either the currently selected bands or produce
+separate plots of each of the six bands.  This may be selected by an
+argument to the command with:
+\begin{quote}
+{\tt ALL} for all bands (6 separate plots) or\\ {\tt C} for accumulated
+over the current bands
+\end{quote}
+Otherwise the program will prompt for a choice with current as the
+default.
+
+\item[\underline{DEL}AY: ] \label{del}
+Specifies how long, in seconds, the program is to wait between
+displaying successive images in {\tt MOVIE}.
+
+The delay may be specified as a real argument to the command or by {\tt
+OFF} which will set the delay to zero.
+
+Available in interactive mode only.
+
+Hard, default is 5.0.
+
+\item[\underline{DEV}ICE: ] \label{dev}
+Select the device for PGPLOT output. This may be any valid PGPLOT
+device given either in mnemonic or numeric form.
+
+When no device has been selected by this command then all graphical
+commands prompt for a device with a default of the last device used. If
+a device is set with {\tt DEVICE} then that device is used and no
+prompt is issued.
+
+To return to prompting by individual commands reply {\tt NONE} to the
+prompt for device.
+
+To check that the device selected is valid this routine opens the
+device and then closes it again (for hardcopy devices the file so
+produced is deleted).
+
+The device may be specified as an argument to the command. {\tt OFF} or
+{\tt NONE} will return to prompting by plotting commands and {\tt ON}
+will select the current default device for automatic use.
+
+If ``{\tt ?}'' is specified then a list of available devices will be
+produced, the prompt will then be repeated.
+
+\item[\underline{DO}Y: ] \label{do}
+This command will either return a day of the year when given a date, or
+a date given a day of the year (default).
+
+Unlike the equivalent command in the database management program
+(\verb!hxlib!)  this command uses dates in the British format (i.e.
+day/month/year).
+
+If the year is omitted 1980 is assumed (all HXIS data were from 1980).
+
+If 2 integers are given as an argument to the command then they are
+assumed to be a day of year and year. If 3 are given then they are
+taken as a date (d/m/y order). Therefore, if the values are passed as
+an argument the year must be given.
+
+\item[\underline{DU}MP: ] \label{du}
+This produces a plot of the accumulated counts in all the HXIS pixels.
+It is possible to produce dumps accumulated over the currently selected
+energy bands or to output separate plots plots for the first two bands,
+or for all six bands.
+
+Pixels selected by {\tt SETLEVEL} are highlighted by ringing. If the
+appropriate options have been set by {\tt INTER} and the output is
+directed to an interactive device then pixels may be selected
+interactively.
+
+The bands to be plotted may be selected by an argument to the command
+with:
+\begin{quote}
+{\tt ALL} for all bands (6 separate plots),\\ {\tt C} for accumulated
+over the current bands or\\ a number from 1 to 6 for bands 1--$<${\tt
+N}$>$ (separate plots for each band).
+\end{quote}
+
+\item[\underline{DX}DY: ] \label{dx}
+Specify the $x$ and $y$ screen coordinates in millimetres at which to
+place the image. The coordinates correspond to the upper left hand
+corner of the image. The upper left corner of the portion of the screen
+remaining after titling is $(0., 0.)$ and distances are measured down
+and to the right.
+
+Unless the size of the image has been reduced by the {\tt SIZE} command
+specifying non-zero values for dx and/or dy may result in part of the
+image being clipped at the edge of the screen.
+
+The offsets may be specified as arguments to the command (1 or 2
+reals), or by {\tt OFF} or {\tt NONE}.
+
+\item[\underline{ER}RBAR: ] \label{er}
+Select error bars on time series plots.
+
+Setting may be specified by the arguments {\tt ON} and {\tt OFF}.
+
+Hard, default off.
+
+\item[\underline{EX}IT: ] \label{ex}
+Exits \verb!hxdisp! program.  If End of File is encountered on two
+consecutive attempts to read a command the program will exit. This is a
+safety feature to prevent the possibility of an infinite loop in batch
+mode.
+
+\item[\underline{FIL}E: ] \label{fil}
+This command allows you to read in another data file. The new file is
+written into the same data array so the previous data are lost.
+
+The filename may be given as an argument to the command.
+
+When a new file is selected ``soft'' options are reset to default
+values, these are: {\tt IMAGE}, {\tt SETPIXEL} and {\tt DEADTIME}
+(accumulation range). All other options are hard and their settings are
+retained.
+
+Note that the filename may not exceed 69 characters in length, the way
+to access a long filename is given on page~\pageref{longname}.
+
+\item[\underline{FIN}E: ] \label{fin}
+Selects the fine field of view image data.  This is the default state,
+but the setting is hard (retained on change of data file).
+
+If the current field is coarse and the pixel selection is for the
+entire coarse field, then the pixel selection will be changed to the
+fine field, if however any other pixel selections have been made with
+{\tt SETPIXEL} then no changes will be made.
+
+\item[\underline{FL}AG: ] \label{fl}
+Specify the image number you wish to flag as a bad image.  Once an
+image has been flagged other commands will not act on that image. This
+is a permanent change; i.e.  when you terminate execution and return
+some other time all previously flagged images will still be flagged.
+
+Up to 20 images may be listed for flagging as an argument to the
+command (however the total length of the command may not exceed 72
+characters).
+
+\item[\underline{FO}NT: ] \label{fo}
+Select font for graphics. The choice is the four PGPLOT fonts: N for
+normal, R for roman, I for italic and S for script.  Normal font is
+much quicker than the other three.
+
+If given as an argument then the font may be specified as a single
+letter, the full name or the font number.
+
+\item[\underline{FR}ATIO: ] \label{fr}
+As {\tt RATIO} (p.~\pageref{ra}) but output to a file only.  For
+details of the filename see the description of {\tt WRPIXEL} on
+page~\pageref{wr}.
+
+\item[\underline{FSD}: ] \label{fsd}
+Set scaling for the plots produced by {\tt PXTSER}.  If 0 is used then
+all plots are individually scaled to the maximum rate in that pixel, if
+a value is given than that overrides the automatic scaling. The value
+given is in counts per second.  (The peak count rate can be obtained by
+using the {\tt MAXIMUM} command.)
+
+If specified as an argument the scaling is given as a real number or
+{\tt PEAK} or {\tt OFF} which both reset the scaling to 0.0.
+
+\item[\underline{FSI}XTSER: ] \label{fsi}
+As {\tt SIXTSER} (p.~\pageref{six}) but no plot is produced, only a
+disk file, irrespective of the state of {\tt WRPIXEL}. For details of
+the filename see the description of {\tt WRPIXEL} on page~\pageref{wr}.
+
+\item[\underline{FT}SER: ] \label{ft}
+As {\tt TSER} (p.~\pageref{ts}) but no plot is produced, only a disk
+file, irrespective of the state of {\tt WRPIXEL}. For details of the
+filename see the description of {\tt WRPIXEL} on page~\pageref{wr}.
+
+\item[\underline{HE}LP: ] \label{he}
+Invoke the HELP facility. {\tt HELP} on its own produces a list of
+topics.  {\tt HELP} $<${\em topic name}$>$ gives help on the requested
+topic.  After the information has been given HELP prompts for subtopics
+or for further topics, to return to the \verb!hxdisp! command level
+enter one or more returns or control-D.
+
+\item[\underline{HM}S: ] \label{hm}
+This command will convert a time expressed in hours to its
+corresponding hours, minutes, and seconds. You will be prompted for the
+hour to be converted.
+
+The hour may be given as a real argument to the command.
+
+\item[\underline{IM}AGE: ] \label{im}
+Set desired first and last image numbers. This restricts access to
+those images whose image numbers lie within this range. Almost all
+other commands use the image range set by {\tt IMAGE}.
+
+If either the first or last image selected has been flagged, then the
+program will ask for that value to be re-entered ({\tt TSER} and
+possibly other commands can become confused about times when the first
+or last image is flagged).
+
+The image values may be set as an argument to the command. If 2 values
+are given then this is the range, if only 1 is specified then the range
+is the single image and if `{\tt ALL}' is specified then all images in
+the file are used (excluding initial and terminal flagged images).
+
+This is a soft option (i.e. the value is reset when a new file is
+selected).  The default is the entire file (less any flagged images at
+the ends).
+
+\item[\underline{INF}O: ] \label{inf}
+Gives information on the current file (name, image range etc) and on
+the major option settings (Dead time correction, field etc).
+
+\item[\underline{INT}ER: ] \label{int}
+Select interactive graphics. If a suitable device is selected for
+output, then the user may select pixels interactively in {\tt DUMP} and
+image ranges in {\tt TSER}.
+
+Setting may be specified by the arguments {\tt ON} and {\tt OFF}.
+Available in interactive mode only.
+
+Hard, default off.
+
+\item[\underline{IT}CON: ] \label{it}
+Display a deconvolved image.  This command allows a much wider range of
+options than {\tt DECON} (p.~\pageref{dec}).  The deconvolution
+algorithm is the same as for {\tt DECON,} see Appendix~\ref{ALGO} on
+p.\pageref{ALGO} for details.
+
+As with {\tt CONTOUR} and {\tt DECON} this command can produce either a
+plot of the current bands or a set of plots of the six separate bands.
+This may be selected by argument as:
+\begin{quote}
+{\tt ALL} for all bands (6 separate plots) or\\ {\tt C} for accumulated
+over the current bands
+\end{quote}
+Otherwise the program will prompt for a choice with current as the
+default.
+
+The routine will then prompt for the following information:
+\begin{enumerate} 
+\item Contoured output (reply {\tt C}), greyscales (reply {\tt G}), colour
+plots (reply {\tt F} [for Fancy]) or none of these (reply {\tt N}). The
+initial default is contours, but the previous selection is subsequently
+remembered.
+\item Whether to produce DUMP format output (see the {\tt DUMP} command for a 
+description (p.~\pageref{du})). If none was selected at the previous
+level then the default is to produce DUMP output, else the default is no
+DUMP output.
+\item Number of iterations for deconvolution. 
+\begin{itemize}
+\item Zero (the default) means continue until $\chi^2 < $ degrees of freedom.
+\item A positive value means continue for that number of iterations unless the
+convergence criterion above is satisfied first.
+\item A negative value means continue for {\em exactly} the specified number of
+iterations.
+\end{itemize}
+\end{enumerate}
+
+After the image has been deconvolved then the levels for the display
+will be requested. For contours you will be asked:
+\begin{enumerate}
+\item Define the levels by counts or percent.
+\item If a previous run has defined a set of contour levels then these will
+be displayed and you will be asked whether to use these.
+\item If there is no previous set of levels (or if they were rejected) then
+the default levels are displayed and you have the choice of using these
+or defining your own set. If you define a new set of levels they will
+be saved in a file named {\tt LEVELS.DCN} on the selected output
+directory, superceding any previous sets.
+\end{enumerate}
+For greyscales or colour plots you will be asked:
+\begin{enumerate}
+\item Define the levels by counts or percent.
+\item Map the greyscale linearly or logarithmically.
+\item ``saturated'' level (Default peak of the data).
+\item ``empty'' level (Default: Background level $ +~T\sigma $, where $T$ is
+the level selected by the {\tt THRESHOLD} command).
+\end{enumerate}
+
+If no plot device has been selected you will also be prompted for it.
+
+Note that not all devices produce satisfactory greyscales.
+\begin{itemize}
+\item Devices with 255 available colour indices produce good greyscales by 
+using 128 of the colour indices as different shades of grey.
+``Saturated'' is white.  These are the \underline{only} devices able to
+produce colour plots.
+
+\item The Canon and PostScript laser printers produce good greyscales by
+creating half-tone images with dots, but this is very slow (it used
+about $1^{\rm m}20^{\rm s}$ of cpu on a microVAX 3400 for 1 image and
+about 1000--1500 blocks to the laser printer). ``Saturated'' is black.
+
+\item The Printronix uses the same
+algorithm as the laser printer to produce greyscales but the larger
+pixel size means that these are hardly worth the paper they are printed
+on.  ``Saturated'' is black.
+
+\item Line graphics terminals (e.g. CIFER T5) will make a stab at
+greyscales with a quasi-random array of dots, but the results aren't
+terribly impressive and it is inordinately slow.
+
+\end{itemize}
+
+The plot header contains extensive information about the image and
+deconvolution. For contours there is also material on the number of
+counts within each level.  For greyscales and colour plots this is
+replaced by a colour bar.
+
+\item[\underline{LA}YOUT: ] \label{la}
+Control the layout of plots produced by {\tt SIXTSER}.
+
+The numbers of columns and rows may be given as arguments, or they will
+be prompted for. Both values must be given, any pair of integers with a
+product of 6 is acceptable. If the argument ``{\tt DEF}'' is given the
+default state of 3~columns and 2~rows is restored.
+
+\item[\underline{LF}LAG: ] \label{lf}
+List the images which have been flagged in the current dataset.
+
+\item[\underline{LO}GARITHMIC: ] \label{lo}
+Select or deselect logarithmic plotting of time-series by {\tt TSER}
+etc.
+
+The setting may be specified by the arguments {\tt ON} or {\tt OFF}.
+
+Hard, default off.
+
+\item[\underline{LP}IXELS: ] \label{lp}
+List the currently selected pixels and the fields in which each range
+starts.
+
+\item[\underline{MAS}TER: ] \label{mas}
+Select images from the master microprocessor only. This command is
+applicable only at times when both microprocessors were working.
+
+This command and {\tt SLAVE} are mutually exclusive. In addition if the
+command {\tt MASTER~OFF} is issued when {\tt SLAVE} is selected, then
+normal operation is resumed, this is also the case if {\tt MASTER} with
+no argument is followed by carriage return.
+
+Setting may be specified by the arguments {\tt ON} and {\tt OFF}.
+
+Hard, default off.
+
+\item[\underline{MAX}IMUM: ] \label{max}
+Locates the maximum pixel value of an image. The search will be made
+among the images set by the {\tt IMAGE} command, which have been
+accumulated for a specified time in seconds over the band range
+determined by the {\tt BANDS} command.  The count rate in counts per
+second is also given.
+
+The accumulation may be given as a real argument to the command.  If no
+argument is given the command will prompt you for an accumulation time
+in seconds.
+
+This is most useful if you wish to manually scale the images to the
+maximum value of the data set in {\tt VIEW} (etc.) or in {\tt PXTSER}.
+
+\item[\underline{MI}NRATE: ] \label{mi}
+Set lower cut-off for logarithmic plots. When a value is set then this
+is treated as the lower limit of the data, thus cutting off very low
+level material. The setting has no effect on linear plots. If the peak
+rate on a plot is below the cut-off then the plot will not be generated
+(in the same way as when there are no non-zero data in a plot).
+
+The cut-off may be switched on and off by the arguments {\tt ON} and
+{\tt OFF}, which do not change the level (if no level has been selected
+then {\tt ON} will be faulted). Specifying a value will set the cut-off
+to that value and switch it on.
+
+\item[\underline{MO}VIE: ] \label{mo}
+This command is used if you wish to display images on the screen in
+movie form.
+
+The output from this command is controlled by the following commands:
+\begin{quote}      
+{\tt IMAGE}: To set first and last image.\\ {\tt FINE/COARSE}: To
+choose fine or coarse image.\\ {\tt BANDS}: To set low and high band.\\
+{\tt SIZE}: To set the size of the plot.\\ {\tt DELAY}: To specify wait
+time between display of successive images.\\ {\tt SCALE}: To set the
+saturation level on the plots.\\ {\tt COLOUR}: To choose the colour
+table.
+\end{quote}
+
+The only input the command requests is an accumulation time in seconds.
+This may be given as a real argument to the command.  Note that the
+time is an elapsed time, therefore if there was only one processor
+running, then the accumulation time appearing on the plot will be
+approximately half this.  If zero is specified then each image is
+displayed separately.
+
+This command needs 255 available colour indices to work correctly.
+Available in interactive mode only.
+
+\item[\underline{PA}PER: ] \label{pa}
+Set the size of the paper to be used in {\tt TSER, PXTSER} etc.  The
+sizes are the X and Y dimensions of the plotting page in millimetres.
+This should only affect the output to hard copy devices (a feature of
+the plotting library not of
+\verb!hxdisp!). The default behaviour is to fill the entire available sheet of the
+selected device.
+
+The main purpose of this command is to allow the selection of a
+suitable size of plot to be included in a \TeX\ or \LaTeX\ file, as in
+these cases the standard paper is usually too big.
+
+The sizes may be specified as arguments to the command (1 or 2 reals, 1
+gives a square page), or by {\tt OFF} which resets the default values
+(i.e. full page).
+
+This command is entirely independent of the {\tt SIZE} command.
+
+\item[\underline{PI}XEL: ] \label{pi}
+This command allows the user to change the value of individual pixels
+in a HXIS image. The user is prompted for the following information:
+\begin{quote}\tt      
+ENTER IMAGE NUMBER: {\rm Hitting RETURN will bring you back to the
+command level of \verb!hxdisp!.}\\ LOW,HIGH BAND: {\rm The band or
+bands in which you want to change pixel values.}\\ PIXEL NO., NEW
+VALUE: {\rm Hit RETURN when you have finished inputting new values. See
+HXIS image map for proper pixel numbers.}
+\end{quote}
+
+The argument to the command may be used in several ways:
+\begin{itemize}
+\item If a single integer is given as an argument then that is used as the image
+number, and the remaining values are requested, no further image
+numbers will be requested.
+\item If 2 or 3 values are given then the bands are also set from the argument
+and only the pixel numbers and values are requested.
+\item If 5 values are given then all values are taken from the argument and no
+prompts are issued.
+\item Specifying 4 values is an error. 
+\item Anything after the fifth value will be ignored.
+\end{itemize}
+
+\item[\underline{PO}INTING: ] \label{po}
+Make a list of the HXIS pointing information contained in the image
+file, for the selected image range. The information is given as Pitch
+in arcsec South of Sun centre, Yaw in arcsec East of Sun centre, and
+Roll in degrees West of North.
+
+The user is prompted for the destination of the output: either the
+terminal or a printer.
+
+The device may be specified as an argument to the command:
+\begin{quote}
+{\tt T} or {\tt TERM} for the terminal\\ {\tt P} or {\tt PRINT} for the
+line printer.
+\end{quote}
+
+\item[\underline{PX}TSER: ] \label{px}
+Plot a {\em montage} of time-series for individual pixels. If {\tt
+COARSE} has been selected then the entire coarse field is plotted. If
+{\tt FINE} has been selected then the user is prompted to choose a
+quadrant (the choices are {\tt FC} (default), {\tt TL, TR, BL {\rm or}
+BR}, for field centre, top left etc. which refer to the position in the
+field as conventionally plotted --- i.e. with North to the right).
+
+Most of the commands which set options for {\tt TSER} apply here but
+{\tt SIZE} and {\tt INTER} are ignored and {\tt FONT} only affects the
+title of the plot.
+
+By default the plots are scaled individually and the peak count rate
+(in counts/second) is given in the top left corner of each plot. The
+time axes are identical and the scale is given in the first plot of the
+last row. If {\tt FSD} has been called then all the plots are scaled as
+if that were their peak value and the scaling is given on the $y$-axis
+of the first plot of the last row.
+
+The field to be plotted may be selected by an argument to the command,
+the acceptable values are {\tt FC, TL, TR, BL, BR} or {\tt CO} (for
+coarse).  Any other value will be ignored, a prompt will be given for a
+quadrant if the currently selected field is fine.
+
+\item[\underline{RA}TIO: ] \label{ra}
+Produce a plot of the ratio of 2 bands. If the selected bands are
+different then these are offered as a default, if not or if that is
+rejected, then the user is prompted for the bands to form the ratio.
+(Note that the first band entered [the ``low'' band] will be the
+denominator.)
+
+This command is affected by the same options as {\tt TSER} except that
+{\tt DEADTIME} is ignored since that correction is the same for all
+bands and will therefore cancel in a ratio.
+
+\item[\underline{SA}VE: ] \label{sa}
+This command writes an image data array onto disk in a separate file.
+The data in this file are then available for use with other
+user-written programs.
+
+The saved data may be written with formatted i/o in the form of 768
+integers written one to a line in I7 format, or a a single record with
+unformatted i/o.  As some of the values in the header part contain
+REAL*4 values, the data must be read into an INTEGER*2 array of 768
+elements with suitable equivalence statements to be used.
+
+Details of the header information are the same as for the image format
+described in Appendix~\ref{DATA} on page~\pageref{DATA}.  In addition
+the spare fields 163--169 are used as follows:
+\begin{tabbing}
+888--888XX \= ITIMXX \= \kill 163 \> IBL \> Low energy band. \\ 164 \>
+IBH \> High energy band. \\ 165 \> MSTR \> Accumulated over: All (0),
+Master only (1), slave only (-1).\\ 166-169 \> ITIM \> Start time UT
+Day, hour, minute, second.
+\end{tabbing}
+Elements 193 to 768 then contain the accumulated image over the current
+bands and image range.
+
+The saved files have the following naming convention:
+\begin{quote}\tt
+dddhhmmss.Flh {\rm for fine field of view.}\\ dddhhmmss.Clh {\rm for
+coarse field of view.}
+\end{quote}
+where {\tt dddhhmmss} = start time of image, day of year and U.T.\\
+{\tt F}/{\tt C} = indicates whether fine or coarse field of view is
+currently selected. (Data written are identical.)\\ {\tt lh} =
+indicates the image is accumulated from band {\tt l} to {\tt h}\\ e.g.
+{\tt 176121833.C13} means the saved image is of the coarse field of
+view accumulated over bands 1 to 3 and the image start time is day 176
+at 12:18:33~UT.
+
+The arguments ``{\tt F}'' or ``{\tt FORM}'' select formatted writing,
+and ``{\tt U}'' or ``{\tt UNFO}'' select unformatted. If no argument is
+given then a prompt is issued, with an initial default of formatted.
+
+\item[\underline{SC}ALE: ] \label{sc}
+Specify maximum number of counts per pixel for saturation in {\tt VIEW,
+MOVIE} etc. By entering a number greater than zero (default is 0.0) for
+the maximum counts, all displayed images will be scaled to that maximum
+value. If zero is specified then the scaling is done to the actual
+maximum.
+
+The scaling may be specified as a real number argument to the command,
+or by specifying {\tt OFF} or {\tt PEAK} which resets the scaling to
+zero.
+
+\item[\underline{SEL}ECT:] \label{sel}
+Selects pixels in the fine and coarse fields according to the level
+specified by {\tt SETLEVEL}. This selection is the same as that in {\tt
+DUMP} when used on the current energy bands.
+
+\item[\underline{SETL}EVEL: ] \label{setl}
+This command is used to set a threshold value, which is input as a
+percentage, which is then used by the pixel selection facility of the
+{\tt DUMP} or {\tt SELECT} command.  The pixels selected are those
+whose counts, expressed as a percentage of the maximum counts recorded
+in a pixel, are greater than or equal to the set percentage. The
+calculation is performed for both the coarse and fine fields of view,
+and the pixels selected are indicated by having a box placed around
+them.
+
+The percentage level is firstly requested (a real number), enter 0.0 to
+cancel pixel selection in {\tt DUMP} and {\tt SELECT}.  If a number
+other than 0.0 has been selected, the program then asks if, when
+outputting more than one energy range, the pixels selected in the
+lowest energy band (band 1) should be used throughout, or the pixels
+re-selected in each band. Finally, the program asks if the pixels
+selected are to be saved in a file for later use.
+
+If the pixels are to be saved then when {\tt DUMP} or {\tt SELECT} is
+run the selected pixels will be written to a file called {\tt
+Pdddhhffffeeeelh.PXL} where: {\tt ddd} is the day of the year, {\tt hh}
+is the hour of the day at the first image, {\tt ffff} and {\tt eeee}
+are the first and last images and {\tt l} and {\tt h} are the low and
+high energy bands (or both 7 for band 1 pixels to be used for all
+bands).
+
+If pixels are to be selected in this manner, the {\tt SETLEVEL} command
+must be issued before the {\tt DUMP} or {\tt SELECT} command.
+
+The percentage level may be given as a real number argument to the
+command.  The writing of the selected pixels to disk is controllable by
+the arguments `{\tt DISK}' and `{\tt NODISK}'. The pixel selection for
+multiple band plots may be controlled by the arguments `{\tt ALL}'
+(same pixels for all bands) and `{\tt RESE}' (reselect for each band).
+If several settings are made then the percentage must be the first item
+in the argument.
+
+\item[\underline{SETP}IXEL: ] \label{setp}
+Select the pixels to be used for {\tt TSER} etc.
+
+If there is a file of pixels corresponding to the current image and
+band selections (see SETLEVEL (p.\pageref{setl}) for details of naming
+etc.) or if a file name has been given as a argument (see below) then
+the user is given the option of reading and editing it.
+
+If not then the pixels selected in the last run of {\tt DUMP} or of
+{\tt SETPIXEL} are chosen. If there are no previously selected pixels
+then the current field (as selected by {\tt FINE/COARSE}) are the
+default. The user is given the choice of using the current set of
+pixels or entering a new set as a series of ranges.
+
+The pixel numbers are entered as pairs of numbers representing start
+and stop pixels. If a single number is given then it is assumed that
+start and stop are the same. Input is terminated by a blank line or a
+negative value.
+
+A file other than the default may be read if the file name is given as
+an argument to the command, enclosed in double quotes. e.g. to read
+{\tt ALL.PXL} use
+\begin{verbatim}
+SETPI "ALL"
+\end{verbatim}
+
+If the argument {\tt NODISK} is given then no search will be made for
+an input pixel file. {\tt DISK} causes a search to be made firstly for
+any specified filename, and then for the default, if the file is found
+then it is automatically read.
+
+If the argument {\tt SAVE} is given then the pixels selected will be
+saved to either the specified file, or to the default file. {\tt
+NOSAVE} directs that the pixels will not be saved, this is the default
+action. If {\tt SAVEONLY} is specified then the currently selected
+pixels will be saved.
+
+The pixel selection setting is soft.
+
+\item[\underline{SIX}TSER: ] \label{six}
+This command displays a time series plot for each energy band from the
+selected pixels (see {\tt SETPIXEL} (p.~\pageref{setp})).
+
+The time-series is displayed in counts/second. The following commands
+control the output:
+\begin{quote}
+{\tt IMAGE}: To set first and last image.\\ {\tt SETPIXEL:} Select
+pixels to plot. (May also be set using {\tt DUMP}).\\ {\tt
+FINE/COARSE}: To choose fine or coarse image, if pixels have not been
+explicitly selected.\\ {\tt BACKGROUND:} Make corrections of instrument
+background noise.\\ {\tt DEADTIME:} Make corrections for instrument
+dead-time.\\ {\tt AVERAGE:} Average the plot over a specified time
+(real, not accumulation).\\ {\tt ERRBARS:} Put error bars on the
+plot.\\ {\tt WRPIXEL:} Write the time-series to a disk file.\\ {\tt
+LOGARITHMIC:} Plot time-series on logarithmic scale.\\ {\tt MINRATE:}
+Lower cut-off for logarithmic plots.\\ {\tt LAYOUT:} Arrangement of the
+plots on the page.
+\end{quote}
+
+If no pixels have been selected by {\tt SETPIXEL} or by {\tt
+SETLEVEL/DUMP} then the entire current field is used.
+
+\item[\underline{SIZ}E: ] \label{siz}
+Allows adjustment of the size of the image displayed by all display
+commands apart from {\tt ALLBANDS} and {\tt PXTSER}.  The size is
+determined in terms of the largest scale which will fit, without
+distortion of the scales, into the selected device after the title has
+been written.  The user specifies this as two real numbers less than or
+equal to 1.0, X then Y. If only one number is given then it is assumed
+that X and Y scalings are identical.
+
+The size may be set by specifying 1 or 2 real numbers as an argument to
+the command. If {\tt MAX} or {\tt FULL} is specified that is equivalent
+to setting both X and Y sizes to 1.0.
+
+Hard, default is 1.0.
+
+\item[\underline{SL}AVE: ] \label{sl}
+Select images from the slave microprocessor only. This command is
+applicable only at times when both microprocessors were working.
+
+This command and {\tt MASTER} are mutually exclusive.  In addition if
+the command {\tt SLAVE~OFF} is issued when {\tt MASTER} is selected,
+then normal operation is resumed, this is also the case if {\tt SLAVE}
+with no argument is followed by carriage return.
+
+Setting may be specified by the arguments {\tt ON} and {\tt OFF}.
+
+Hard, default off.
+
+\item[\underline{SP}ECTRA: ] \label{sp}
+Performs a basic spectral analysis on the selected images and pixels.
+The raw or corrected counts for each band are given along with the
+ratios between all the possible combinations of bands. The counts are
+converted to count rates (in counts sec$^{-1}$ keV$^{-1}$ cm$^{-2}$)
+for a plasma temperature of 20 million K. Temperatures and emission
+measures are computed from adjacent pairs of bands and these are
+printed (this will give an indication as to whether the count
+conversions are realistic!).
+
+N.B. It is the responsibility of the user to ensure that there are
+enough counts in the bands before making any use of the temperatures
+and emission measures.
+
+The command takes an argument to specify the destination of the output.
+The recognized values are:
+\begin{quote}
+{\tt T} or {\tt TERM} for the terminal (or batch job log),\\ {\tt P} or
+{\tt PRINT} for the line printer.
+\end{quote}
+If no argument is given the command will prompt for the destination.
+
+\item[\underline{SUB}TRACT: ] \label{sub}
+This command allows the user to form a background image and a series of
+accumulated images from which the background can be subtracted. The
+user is prompted for the following information:
+\begin{quote}\tt      
+ENTER LOW AND HIGH BAND\\ FORM A BACKGROUND IMAGE?\\ FIRST AND LAST
+IMAGE TO ACCUMULATE FOR BACKGROUND\\ FIRST AND LAST IMAGE TO ACCUMULATE
+{\rm - This prompt will repeat until you enter 0 or CR.}
+\end{quote}
+
+The new images will be stored back in the original data set and the
+user will be told exactly where they are located. Any other commands
+can then be used on these images.
+
+\item[\underline{SUR}VEY: ] \label{sur}
+Give a summary of the properties of each image in the currently
+selected range (Start time, duration, duty cycle). If an image has been
+flagged this will be indicated.
+
+The user is prompted for the destination of the output: either the
+terminal or a printer.
+
+The device may be specified as an argument to the command:
+\begin{quote}
+{\tt T} or {\tt TERM} for the terminal\\ {\tt P} or {\tt PRINT} for the
+line printer.
+\end{quote}
+
+\item[\underline{TH}RESHOLD: ] \label{th}
+Set threshold for lowest contour (and minimum level in greyscales and
+colour plots) for deconvolved images. The level is set as a number of
+standard deviations above the background level (as set by {\tt BACK}),
+thus if the threshold has been set as $T\sigma$ and the background
+level is $C$~counts/pixel then the lowest contour that can be plotted
+is: $ C + T \sqrt C $.  The default is 3.0$\sigma$.
+
+The value may be given as a real argument to the command or ``{\tt
+DEF}'' which resets the default level of 3.0. If no argument is given
+then a prompt is issued for a level.
+
+\item[\underline{TI}ME: ] \label{ti}
+Set image range by time. This command selects a subrange of the current
+image range, starting at a given U.T. and continuing for a specified
+period.
+
+The selected start image will be the first image {\em ending after} the
+specified U.T. the end image will be the last image {\em starting
+before} that U.T. plus the requested duration.
+
+Details of the first and last images will be displayed, along with the
+actual duration (in minutes) from the start of the first image to the
+end of the last.
+
+An argument may be given specifying the initial time as 4 integers, and
+optionally the accumulation as a real value. If the accumulation is
+specified then all 4 integers (day, hour, minute and second)
+\underline{must} be specified, otherwise zero for the seconds (and
+minutes if appropriate) may be omitted.
+
+\item[\underline{TS}ER: ] \label{ts}
+This command displays a time series plot of data from the selected
+pixels (see {\tt SETPIXEL} (p.~\pageref{setp})).
+
+The time-series is displayed in counts/second. The following commands
+control the output:
+\begin{quote}
+{\tt IMAGE}: To set first and last image.\\ {\tt BANDS}: To set low and
+high band.\\ {\tt SIZE}: To set the size of the plot.\\ {\tt SETPIXEL:}
+Select pixels to plot. (May also be set using {\tt DUMP}).\\ {\tt
+FINE/COARSE}: To choose fine or coarse image, if pixels have not been
+explicitly selected.\\ {\tt INTER:} Allow interactive selection of a
+range of pixels.\\ {\tt BACKGROUND:} Make corrections for instrument
+background noise.\\ {\tt DEADTIME:} Make corrections for instrument
+dead-time.\\ {\tt AVERAGE:} Average the plot over a specified time
+(real, not accumulation).\\ {\tt ERRBARS:} Put error bars on the
+plot.\\ {\tt WRPIXEL:} Write the time-series to a disk file.\\ {\tt
+LOGARITHMIC:} Plot time-series on logarithmic scale.\\ {\tt MINRATE:}
+Lower cut-off for logarithmic plots.
+\end{quote}
+
+If no pixels have been selected by {\tt SETPIXEL} or by {\tt
+SETLEVEL/DUMP} then the entire current field is used.
+
+\item[\underline{UN}FLAG: ] \label{un}
+Specify the image number which was incorrectly flagged. This will
+restore the image to the active dataset. If $-1$ is specified then all
+flagged images are restored.
+
+Up to 20 images may be listed for unflagging as an argument to the
+command (however the total length of the command may not exceed 72
+characters).  If $-1$ or {\tt ALL} is specified then all images are
+unflagged.
+
+\item[\underline{VE}RIFY: ] \label{ve}
+Checks that the image numbers in the selected range are correct.  If an
+incorrect number is found the user is asked whether to flag the image
+or to leave it.
+
+This is most likely to be of use if a set of images has been read from
+tape with several parity errors.
+
+Available in interactive mode only.
+
+\item[\underline{VI}EW: ] \label{vi}
+Places an accumulated image on the screen.  Accumulates from first to
+last image over specified range of bands (as specified by {\tt IMAGE}
+and {\tt BANDS}).
+
+This command will only work correctly when the device has 255 available
+colour indices.  Available in interactive mode only.
+
+\item[\underline{WR}PIXEL: ]  \label{wr}
+Control whether time-series generated by {\tt TSER}, {\tt RATIO} and
+{\tt SIXTSER} are written to disk as well as being plotted.
+
+The file name will be:
+\begin{quote} 
+{\tt Ndddhhffffeeeelh.NUM} for a count rate file from {\tt TSER},\\
+{\tt Sdddhhffffeeee.NUM} for a six-band count rate file from {\tt
+SIXTSER} and \\ {\tt Rdddhhffffeeeelh.RAT} for a ratio file from {\tt
+RATIO},\\ where\\ {\tt ddd}= start day of data (I3)\\ {\tt hh}= start
+hour of data (I2)\\ {\tt ffff, eeee} = first and last images saved
+(both I4)\\ {\tt l, h} = settings of low and high energy bands (both
+I1)
+\end{quote}
+
+The first line of the (formatted) file will contain the start day and
+hour, and the number of records (N).  The next N lines will hold the N
+values of image start time (in minutes) and the corresponding
+counts/second (6 values for a file from {\tt SIXTSER} otherwise 1
+value).  The next line will hold the number of lines of pixel
+information (J).  The next J lines will have that information as START,
+STOP.  If error bars have been requested with the {\tt ERRBAR} command
+then there will be a further N lines in the file with error limits
+(differences for {\tt TSER} or {\tt SIXTSER} and ratios for {\tt
+RATIO}).  Setting may be specified by the arguments {\tt ON} and {\tt
+OFF}.
+
+
+\item[CTRL-D: CTRL-Z:] \label{eof}
+
+For VMS systems read Z for D in all of what follows.
+
+At any prompt for input depressing the CTRL and D keys simultaneously
+will either return you to the \verb!hxdisp! command level or to the
+beginning of the sequence of prompts (in this case a second CTRL-D will
+return you to the command level).
+
+If End of File is encountered on two consecutive attempts to read at
+the command level the program will exit. This is a safety feature to
+prevent the possibility of an infinite loop in batch mode. (Thus a
+maximum of four successive CTRL-D's will exit from \verb!hxdisp!
+anywhere.)
+
+\item[\$: CTRL-Z:] \label{dcl}
+
+If you enter \verb!$! on its own at the command level prompt an
+interactive session will be started as a subprocess. For VMS this is
+straightforward. For Unix the session will be started up as a subshell
+running the C-shell (not \verb!tcsh!), but because of the way in which
+it is run your login aliases etc. are not set. On VMS type
+\verb!LOGOUT! to return, on Unix type \verb!exit!.
+
+If you enter \verb!$ <command>! then a subprocess will be spawned which
+runs the specified command and then returns. On VMS again this is
+straightforward. On Unix owing to the vagaries of the way that the
+system works the command will be run under the Bourne shell (so beware).
+
+If at any time on a Unix system supporting process suspension (i.e.
+C-shell and \verb!tcsh!) you enter CTRL-Z, then the process running
+\verb!hxdisp!  will be suspended, and a new process spawned. This
+allows you to run normal Unix commands. To return to \verb!hxdisp! use
+the \verb!fg!  command to recall the \verb!hxdisp! process to the
+foreground.
+\end{description}
+
+\section{Data access programs}
+      
+\subsection{HXLIB}
+\label{HXLIB}
+
+This program is used to update, search, and display information from
+the HXIS flare database file which lists all the events currently
+stored on the HIMSEL tapes. To execute simply type \verb!hxlib!. The
+following commands are available:
+
+\subsubsection{Search and display commands}
+
+\begin{description}      
+\item[LIST: ]    To list at the user's terminal the HIMSEL tapes and file
+numbers for one day, (and optionally hour). If the hour is omitted a
+list of all the data for that day will be produced, if neither day nor
+hour is given that the entire database will be listed.
+
+\item[PRINT: ]    Output the entire file on the line printer.
+
+\item[SURVEY: ]   To survey a HIMSEL tape. Output is at the user's terminal.
+Gives file number, start time, stop time and the total number of
+images.
+
+\item[DAY: ] Convert a day of the year to a date or {\em vice versa}.
+
+\item[HELP: ] Get help on \verb!hxlib! commands.
+
+\item[EXIT: ]     Terminate execution of program. (Two consecutive EOF's at
+the command level have the same effect, as a safety valve for an
+omitted EXIT in a batch job).
+\end{description}
+
+\subsubsection{Database maintenance commands}
+
+These commands are used to modify the database and require that the
+user has write access to it.  If you do not have write access a message
+will be given on entry to \verb!hxlib! and also if you attempt to use
+any of these commands.
+
+\begin{description}
+\item[ADD: ]  To update the file if a new HIMSEL tape has been created.
+Obtains HIMSEL tape number to be added from the header if it is
+present, otherwise this is prompted for.
+
+\item[DELETE: ] Deletes all records for a given HIMSEL tape from the file. 
+Prompts for HIMSEL tape number to be deleted.
+
+\item[SORT: ]  To sort the entire file in order of increasing day of
+year. Note: This is very slow when the file contains many tapes,
+therefore if possible it should be run as a batch job.
+\end{description}       
+
+To access a database other than the standard one use the command
+sequence:
+\begin{verbatim}
+setenv HXFLARE <filename>
+hxlib
+\end{verbatim}
+For VMS use \verb!DEFINE! instead of \verb!setenv!.
+
+WARNING: {\em The file numbers given in the database are those
+contained within the files} (rather than a count taken from the tape
+during the preparation of the database) these should correspond to the
+values which should be given to RDHIM but in a few cases the numbers
+are known to be incorrect. If an attempt to read a file from a HIMSEL
+tape gives the wrong data then use the SURVEY option to list the tape
+and then count the files.
+
+NOTE: If your database has been transferred from a different type of
+machine, use
+\begin{verbatim}
+hxtr <f> <t> <oldfile> <newfile>
+\end{verbatim}
+to convert it,
+where \verb!<f>! and \verb!<t>! are the from and to machine types and
+are each one of [\verb!v s d!] for VMS, Sun and DECstation respectively.
+
+\subsection{RDHIM}
+\label{RDHIM}
+
+This program reads HXIS image files from the HIMSEL tapes and stores
+the images on disk. To execute just type RDHIM.
+
+The user will be prompted for the following information:
+\begin{quote} \tt
+Tape drive with HIMSEL tape? :\_\\ 
+Re-read on read error? (Y/N) :\_
+\end{quote}
+and then for each file to be read
+\begin{quote} \tt
+File number? (EOF to end) :\_\\ 
+First and last image :\_ \\ 
+Output filename :\_
+\end{quote}
+
+File numbers and total number of images are given in the HIMSEL tape
+library (accessed by the \verb!hxlib! command). The program currently
+allows a maximum of 2200 images to be stored on disk, (the largest
+number of images in the light-time of a single orbit was 2196).
+
+If parity errors are encountered on the tape and re-reading has been
+requested then a message will be written and the tape will be back
+skipped and a maximum of three further attempts will be made to read
+the record. If the record cannot be read then the image is flagged (see
+\verb!hxdisp! for details of flagged images, p.~\pageref{fl}) and a
+further message is written. If the damaged record corresponds to the
+part of the image containing the image number then the number will be
+forced to be 1 more than that of the previous image. If re-reading was
+not requested then the program will abort the reading of a file on
+parity errors.
+
+When several files are requested, the file numbers need not be in
+sequence as the program is able to skip backwards on a tape (but
+repeated long moves on a tape will take time).
+      
+\subsection{HAXIM}
+\label{HAXIM}
+
+Converts the data on Production Data Tapes to image files on HIMSEL
+image tapes or to images on disk.  Can also read production data tape
+files from disk.
+
+Note that to ensure compatibility between production files read onto a
+VMS system using BACKUP and then transferred to a UNIX machine via NFS
+or with the binary mode of \verb!ftp! and files read using
+\verb!vmsbackup! it is necessary that the \verb!-b! option be used when
+reading the backup tape. Also if transferring production files via
+\verb!ftp!, you must use \verb!binary! or \verb!image! mode.
+
+In HAXIM the user is prompted with the following:
+
+\begin{description}
+\item[{\tt INPUT file (TT or $<$CR$>$ for terminal) }]{\tt :\_}\\
+Give the name of a disc file which contains a list of answers to the
+prompts that follow (the name given must be preceded by the name of the
+disc on which the command file is held, unless it is on the disk
+specified as the scratch disk on entering HAXIM) or hit $<$CR$>$ for
+interactive input.
+
+\item[{\tt Tape drive with HIMSEL tape or D for disk }]{\tt :\_}\\
+Answer tape drive name (e.g. \verb!/dev/rmt0h! or \verb!mub0! for
+HIMSEL tape output, or {\tt d} for output to a disk file.
+
+\item[{\tt Drive holding PD tape? (or D for disk) }]{\tt :\_}\\
+Answer name of drive with the data tape (e.g. \verb!/dev/rmt1h! or {\tt
+D} if the raw data files are on disk (as when read from {\tt BACKUP}
+format tapes).
+
+\item[{\tt Skip on read errors? (Y/N) }]{\tt :\_}\\
+If response is {\tt Y} then if HAXIM fails to read a block from tape it
+will continue to the next block and write a warning message to the
+terminal or job log. Otherwise the program will abort. (This request is
+omitted if input is from disk.)
+
+\item[{\tt New output tape (Y/N) :\_}] (Only if output is to tape)
+\begin{description}
+\item Answer ``{\tt N}'' if the HIMSEL output tape  already has image files written
+on it. The program will then attempt to find the HIMSEL tape number
+from the HIMSEL header. The program will then skip forward through the
+tape until it finds a double tape mark. At this point it will print the
+number of files it has found (excluding the header) and request if this
+is the right place.
+\begin{description}
+\item If it is then answer ``{\tt Y}'' then the program will continues.
+\item If this seems to be the wrong place answer ``{\tt N}''. You will then be
+given the option of looking for another double tape mark (answer ``{\tt
+F}'') or quitting (answer ``{\tt Q}'').
+\end{description}
+{\em N.B. the verification of location is always at the terminal.}
+\item Answer {\tt Y} if this is a new HIMSEL tape. The program will then
+request the number to be assigned to the new HIMSEL tape and create a
+new HIMSEL header.
+\end{description}
+These requests are omitted if output is to disk.
+
+\item[{\tt Input file numbers }]{\tt :\_}\\
+Give the file numbers on the PDT which you want converted to image
+files (maximum of 25).  The list entered is sorted into ascending order
+so that the tape is not skipped backwards. This is omitted if input is
+from disk.
+\end{description}
+
+Then for each file:
+\begin{description}
+\item[{\tt Name of input file? }]{\tt :\_}\\
+(Only if input is from disk.) The name of the input disk file,
+including disk and directory if not the same as the scratch directory.
+
+\item[{\tt Start time (H,M,S (Integers)) }]{\tt :\_}\\
+This prompt will appear when the file is located, this message is
+preceded by a message indicating the file number (or name for disk
+files) and the start and end times of the file (as obtained from the
+file header). The response is the U.T. of the start of the data you
+wish to read. Note if the time is not found in the specified file then
+no images will be read.
+
+\item[{\tt Duration (Minutes (I3)) }]{\tt :\_}\\
+The number of minutes of data which will be read. (Note: The data will
+be read from the last image starting before the given time up to the
+first one ending after it).  If end of file is encountered before the
+requested amount of data has been read, then the read will stop (to
+read a set of images bridging files read from the two files and then
+use \verb!HXJOIN! (p~\pageref{HXJOIN}) to concatenate the resulting disk
+files.
+\end{description}
+
+If output is to disk then following the reading of the tape file the
+user is asked:
+\begin{description}
+\item[{\tt Output file name }]{\tt :\_}\\
+This is the name of the ``permanent'' image file.
+\end{description}
+
+\subsection{WRHIM}
+\label{WRHIM}
+
+This program will write one or more image files from disk onto a HIMSEL
+tape.
+
+The program prompts for the drive with the HIMSEL tape to be written.
+When the tape has been successfully mounted and set to beginning of
+tape the program the requests whether this is a new tape or not.
+\begin{description}
+\item If the tape is new answer ``{\tt Y}''. The program will request the
+number to be assigned to the HIMSEL tape. This will be written to the
+header and writing will commence immediately after.
+\item Otherwise answer ``{\tt N}''. The program will then try to find the  tape
+number from the header. It will then skip through the tape until it
+finds a double tape mark. When this is found it will print the number
+of data files that it has skipped and request whether that is the right
+place to begin writing.
+\begin{description}
+\item If it is then answer ``{\tt Y}''. The program will then proceed to
+request files to write.
+\item If the wrong number of files appears to have been skipped answer ``{\tt
+N}''.  Then you will be given the option of searching for another
+double tape mark (answer ``{\tt F}'') or quitting (answer ``{\tt Q}'')
+(according to whether you think that there is an empty file on the
+tape, or you have mounted the wrong tape).
+\end{description}
+\end{description}
+
+After this the program simply prompts for file names until the user
+enters an end-of-file (ctrl-D or ctrl-Z). When all the files are
+written then the tape is rewound.
+
+If the physical end of tape is reached while writing a file, then the
+program will abandon that file, notify the user, write a logical
+end-of-tape after the previous file, rewind and exit.
+
+\subsection{HXJOIN}
+\label{HXJOIN}
+
+This program concatenates two (or more) image files on disk.
+
+The files are requested by the program. For the first file the image
+numbers found are reported. For subsequent files the image numbers are
+altered to be consecutive in the resulting file and the new numbers are
+reported. To terminate the list of input files enter ``{\tt **}''. End
+of File (control-D or control-Z) will terminate execution and blank lines are
+ignored. If more than 2200 images are read (in total over all the
+files) the program will output a warning and request the output file,
+to which it will write the first 2200 images read.
+
+After the input files have been read the program then requests the name
+of the output file. At the end of execution the total number of images
+transferred is reported.
+
+\subsection{FIXATR}
+\label{FIXATR}
+
+\verb!FIXATR! is a utility obtained from NCSA\footnote{National Center
+for Supercomputing studies; University of Illinois, Champaign, Il, USA}
+which modifies the attributes of a VMS file without altering the
+contents of the file itself.
+
+When the HXIS software has been initialized, then typing:
+\begin{verbatim}
+HELP @FIXATR FIXATR
+\end{verbatim}
+will give more information.
+
+The following aliases have been created in the HXIS initialization:
+\begin{verbatim}
+fixipd :== fixatr /rfm=var:6660 /rat=none 
+fixdta :== fixatr /rfm=fix:7680 /rat=none
+\end{verbatim}
+these will fix the processed data files (input to \verb!HAXIM!) and the
+HXIS image files (input to \verb!HXDISP! etc) respectively.
+
+{\large \bf NOTE: processed data files transferred from VMS to UNIX in
+ascii mode or written to a tar file using {\tt vms2tar} will be irreparably
+damaged!}
+
+\appendix
+\section{Deconvolution algorithm}
+\label{ALGO}
+The deconvolution routine makes a guess at the sky distribution of
+X-ray flux, computes the image, compares that with the observations,
+computes $\chi^2$ and either accepts the image (if $\chi^2$ is less
+than the degrees of freedom or the iteration limit has been reached) or
+uses the discrepancies between the images to make a new guess at the
+sky.
+
+\subsection{Initial Guess}
+
+The first guess is a uniform distribution
+with the same mean count rate as the observed image.
+
+\subsection{Computation of model image from model sky}
+
+The model image is computed by taking the model sky and summing the
+contribution of each point in the model sky to the current pixel
+according to the HXIS pixel response function.
+
+\subsection{Computation of $\chi^2$}
+
+The basic computation of $\chi^2$ is:
+$$ \chi^2 = \sum {{\rm (Observed - Model)}^2\over {\rm Model}} $$
+over all the pixels for which there exist observations.
+
+But it is recommended (e.g. Seigel --- Non-parametric statistics 
+for the behavioural
+sciences) that when computing $\chi^2$ no more than 20\% of the categories
+should have expected counts $< 5$. If each pixel is treated independently
+then this condition is unlikely to be met for most normal HXIS images. Also
+if any category has zero expectation and finite observation $\chi^2$ will
+diverge. Therefore all pixels with expectation 1 or 0
+are treated as a single category (if the expectation is still zero
+it is treated as 1). 
+
+If the maximum pixel in a model image is less than
+5 then the image is treated as a series of strips, with summing being
+carried out in both the Y and Z directions.
+
+\subsection{Model sky regeneration}
+
+At each image point the ratio between the observed and model images
+is computed. Then
+at each point in the sky grid the ratios for the four surrounding
+image points are formed into an average weighted by the pixel responses at that
+location.
+If there was no observation at one or more of those points then the
+sum of the weights is adjusted accordingly (i.e. we assume that the value
+there is unknown rather than zero) this allows proper handling
+of edges and data holes.
+
+If all four surrounding data are missing then the sky is {\em assumed}
+to be zero. This is justified on the grounds that the telemetry system
+preferentially omitted low regions of the image when in the fast 
+sampling modes.
+
+If a region of the model sky is a true zero in one iteration then ratios are
+replaced by differences in that region to prevent the model becoming ``frozen''
+in that region.
+
+The values of peak flux, $\chi^2$, degrees of freedom etc are reported
+for each iteration, e.g.:
+\begin{verbatim}
+FIRST: 129  LAST: 141  TIME:323:15: 5: 5  ACCU TIME:  59.904 SEC
+Iteration #   0  Peak rate =     40  CHI**2 = 112077.7      DF = 287  Strips = F
+Iteration #   1  Peak rate =    735  CHI**2 = 642.5782      DF = 187  Strips = F
+Iteration #   2  Peak rate =    897  CHI**2 = 192.1034      DF = 172  Strips = F
+Iteration #   3  Peak rate =    972  CHI**2 = 117.4386      DF = 183  Strips = F
+Number of iterations =            3
+\end{verbatim}
+
+If the difference between the value of $\chi^2$ and the degrees of freedom is
+reduced by less than 0.2\% for two consecutive iterations then a warning is
+output and the iteration is stopped.
+If this happens then unless you are very sure that everything is in order it is
+probably a good idea to go back and take a close look at your data for
+defective images which are inconsistent with any physically realizable sky.
+
+
+\section{Files written and/or read by {\tt hxdisp}}
+\label{FILES}
+
+The following files may be written or used by \verb!hxdisp!.
+\begin{description}
+\item[\tt CONTOUR.DCN] Contour levels for CONTOUR command.
+\item[\tt LEVELS.DCN] Contour levels for ITCON command.
+\item[\tt dddhhmmss.Flh] Saved image for fine field of view.
+\item[\tt dddhhmmdd.Clh] Saved image for coarse field of view.
+\item[\tt Pdddhhffffeeeelh.PXL] Pixel file (default name).
+\item[\tt Ndddhhffffeeeelh.NUM] Time-series file for a single band.
+\item[\tt Sdddhhffffeeee.NUM] Time-series file for six bands.
+\item[\tt Rdddhhffffeeeelh.RAT] Time-series file for a ratio of bands.
+\item[\tt CANON.DAT] Graphical output to go a CANON laser printer, or
+for inclusion in \TeX\ files.
+\item[\tt GKS\_72.PS] Graphical output to go to a PostScript printer.
+\item[\tt ZETA.DAT] Graphical output for the pen plotter.
+\item[\tt PRINTRONIX.BIT] Graphical output to go to the line printer.
+\end{description}
+In all the above uppercase letters represent themselves and lower case
+represent values as:
+\begin{description}
+\item[\tt ddd] Day of year at start of accumulation. (I3.3)
+\item[\tt hh] U.T. Hour at start (I2.2)
+\item[\tt mm] minute at start (I2.2)
+\item[\tt ss] second at start (I2.2)
+\item[\tt ffff] first image number (I4.4)
+\item[\tt eeee] final image number (I4.4)
+\item[\tt l] low energy band (I1)
+\item[\tt h] high energy band (I1)
+\end{description}
+
+\begin{table}
+\begin{center}
+\caption{\label{data} The format of the data in an individual HXIS image.}
+{\small
+\begin{tabular}{|llp{75mm}|} \hline
+Element(s) & Contents &  Notes \\
+\hline
+1 & Platform\hfill(H/A) & A ``magic number'' to indicate the machine
+type, 0 for VAX, 257 for SUN and 514 for DECstation. \\
+2 & ICAL\# \hfill(H) & Version of image calibration (always 0)\\
+3 & IPOS\# \hfill(H) & Version of position calibration (always 0)\\
+4 & FILE\# \hfill(H) & Position on HIMSEL tape.\\
+5 & Record count \hfill(H) & Cumulative image number on HIMSEL tape. Only correct on the
+original GSFC HIMSEL tapes.\\
+6 & Image count \hfill(H) & Self-explanatory. \\
+7--11 & Creation date \hfill(H) & (HRX2) CHARACTER*10, date read from PDT by HAXIM.\\
+12--14 & End time of this image. \hfill(S) & I*2,R*4 - Hour of year, Sec of hour\\
+15 & Bad image flag. \hfill(A) & 0 if image is O.K., 1 if bad.\\
+16 & Nminor \hfill(S/H) & Number of telemetry minor frames in image.\\
+17 & Spare & Reserved for encoding detruncation of telemetry.\\
+18 & Data quality \hfill(H) & 100 $\times$ quality as a percentage. (usually 
+= 10000)\\
+19--20 & Image index \hfill(S) & R*4, sequence\#, separate series for each 
+microprocessor.
+Increases by 2 each image for a given processor. Even values for master, 
+odd for slave.\\
+21 & Version\# \hfill(S) & 0 means ROM. (Always 0). \\
+22 & Duration of image \hfill(S) & in units of 0.128s.\\
+23--24 & HV1, HV2 \hfill(S) & High voltages, about 800 means supply on.\\
+25 & STAT11 \hfill (S) & Flare start bit. \\
+26 & STAT10 \hfill (S) & Flare present bit. \\
+27 & STAT09 \hfill (S) & Calibration mode bit. \\
+28 & STAT08 \hfill (S) & Internal belt bit. \\
+29 & STAT07 \hfill (S) & HV/off bit during belt.\\
+30 & Flare mode \hfill(S) & 0, 1 or 2.\\
+31 & coarse+fine+slits counts \hfill(S) & Modes 1 and 2 only.\\
+32--71 & Housekeeping data \hfill(S) & I*2 values.\\
+72--77 & EBS words. \hfill(S/H) & Indicate energy ranges of the bands, each word
+(2 bytes) has 2 1-byte values which refer to the table which follows 
+with the first element treated as number zero.\\
+78--91 & KeV table. \hfill(H) & 100 $\times$ energies in KeV.\\
+92 & NO \hfill(S) & Number of overflows.\\
+93--156 & Overflows \hfill(S) & RAM addresses? \\
+157--158 & Pitch \hfill(S) & R*4 degrees.\\
+159--160 & Yaw \hfill(S) & R*4 degrees.\\
+161--162 & Roll \hfill(S) & R*4 degrees.\\
+163--192 & Spare & \\
+193--768 & Band 1 \hfill(S) & \\
+769--1344 & Band 2 \hfill(S) & \\
+1345--1920 & Band 3 \hfill(S) & \\
+1921--2496 & Band 4 \hfill(S) & \\
+2497--3072 & Band 5 \hfill(S) & \\
+3073--3648 & Band 6 \hfill(S) & \\
+3649--3662 & Rates \hfill(S) & R*4 values.\\
+3663--3678 & Monitors \hfill(S) & I*2 values.\\
+3679--3806 & Data transfer pulses \hfill(S) & I*2 values, Number of pulses
+for each 0.128s interval of image.\\
+3807--3840 & Spare & \\
+\hline
+\end{tabular}}
+\end{center}
+\end{table}
+
+\section{Image file data format}
+\label{DATA}
+
+The data array is composed of images of 3840 INTEGER*2 values which
+contain the information as listed in Table~\ref{data}.
+
+The source of the values is indicated at the end of the contents field as:
+(S) --- Value set by spacecraft, (H) --- Value set by HAXIM, (A) --- Value set
+by analysis software. There are two cases given as (S/H) 
+these
+are: the number of minor frames, which is a count generated by HAXIM from the
+spacecraft data, and the EBS words, which have default values set by HAXIM and
+the spacecraft setting substituted if they are found. 
+
+The ``platform'' flag indicates the format of the numbers contained in
+the remainder of the image, the values are chosen to be numbers
+symmetrical under byte reversal. The value is set when the image is
+generated or translated. (A file does not need to have all images of
+the same type but whenever \verb!hxdisp! issued to view a file it
+will be converted to native type.)
+
+Each band contains 572 pixels which are arranged as listed in Table~\ref{pxls}.
+\begin{table}
+\begin{center}
+\caption{\label{pxls} The locations of the different HXIS fields within the
+bands.}
+\begin{tabular}{|ll|}
+\hline
+Pixel Number & Field \\ \hline
+1--128 & Coarse field \\
+129--432 & Fine field \\
+433--472 & Y-slits \\
+473--512 & Z-slits \\
+513--528 & High energy monitor \\
+529--544 & Drift field monitor \\
+545--560 & Amplitude and alignment monitor \\
+561--576 & Unused. \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+The spatial arrangement of the pixels is illustrated in Figure~1.
+
+\end{document}
+          

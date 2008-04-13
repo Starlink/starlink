@@ -1,0 +1,58 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {25.2}
+\newcommand{\stardocauthors}   {M D Lawden}
+\newcommand{\stardocdate}      {24 January 1990}
+\newcommand{\stardoctitle}     {LZCMP --- File compression}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+LZCMP implements the Lempel-Ziv file compression algorithm. 
+Files compressed by LZCMP are decompressed using LZDCM.
+The source files contain documentation (commented out at the beginning of the
+code) for those curious about the algorithm used.
+
+To compress a file, use the command:
+\begin{verbatim}
+    $ LZCMP -v inputfile.typ compressedfile.typ
+\end{verbatim}
+To decompress a file, use the command:
+\begin{verbatim}
+    $ LZDCM compressedfile.typ decompressedfile.typ
+\end{verbatim}
+The `--v' switch for LZCMP is the `verbose' switch which makes LZCMP report what
+it did on completion.
+VMS file attributes are preserved in the compressed file. 
+\end{document}

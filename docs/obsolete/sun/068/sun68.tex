@@ -1,0 +1,415 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {68.3}
+\newcommand{\stardocauthors}   {D L Terrett}
+\newcommand{\stardocdate}      {10 May 1989}
+\newcommand{\stardoctitle}     {TPU --- Tape Processing Utility}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{Introduction}
+
+TPU is a utility, originally developed for AOIPS (Atmospheric and Oceanographic
+Information Processing System), for the manipulation, examination and copying of
+magnetic tapes of any format.
+TPU sees a magnetic tape as only a series of files or records of unknown number
+and size.
+When TPU was designed, the main objective was to give the user maximum
+flexibility and not lock the user into some mode where it is supposed that there
+is some `normal' or `standard' procedure to be followed when processing the
+tape.
+The need for something like TPU surfaced when it was quickly apparent that
+formatted tapes, such as FLX or PIP tapes, with some physical or logical defect
+were often impossible to duplicate because the appropriate utility would abort
+as soon as such an error was encountered without giving the user any say in the
+matter.
+Hence, the objective of TPU to allow the user maximum control over operations,
+especially in the case of tape errors.
+
+TPU duplicates all the functionality of MTCOPY and MTDUMP (SUN/22) as well as
+performing many additional operations.
+It assumes a magnetic tape deck has only one density and so it cannot detect
+tape densities.
+
+\section{INITIALIZATION}
+
+TPU is run with the command:
+
+\begin{verbatim}
+      $ RUN TPU_DIR:TPU
+\end{verbatim}
+
+It then prompts for the name of the INPUT tape.
+The reply can be either the physical name of a tape deck (eg MTA0) or a generic
+name (eg MT) in which case TPU will select a free deck and ask you to load the
+tape.
+The tape need not be mounted before running TPU but it doesn't matter if it has
+(provided that it has been mounted /FOREIGN).
+It will then prompt for the OUTPUT tape (if the system has more than one deck)
+and then the density at which it is to be written.
+A carriage return instead of a tape name means that there will be no output
+tape.
+From this point on the tapes will be referred to as INPUT and OUTPUT and never 
+by their physical names.
+TPU then prompts for the first command, responding with a `?' will cause all the
+TPU commands to be listed.
+Most commands then prompt for additional information.
+
+For all operations in which TPU physically reads or writes a record, the
+maximum record size is 64,000 bytes and the minimum record size is 17 bytes.
+
+If the user responds with a `CTRL Z' sequence to a prompt, TPU will either exit
+or return to the main command dispatch mode.
+When TPU exits, the tapes are left mounted.
+
+\section{TPU COMMANDS}
+
+There are four functional command areas in TPU.
+They are POSITIONING, EXAMINATION, DUPLICATION and MISCELLANEOUS.
+
+
+The POSITIONING commands are:
+
+\begin{description}
+\begin{description}
+\item [SKIP~~~]	Skip records or files.
+\item [FLET~~~]	Find logical end-of-tape.
+\item [REWIND~]	Rewind a tape.
+\end{description}
+\end{description}
+
+The EXAMINATION commands are:
+
+\begin{description}
+\begin{description}
+\item[FDEN~~~~]	Find the density of a tape.
+\item[FDIR~~~~]	Produce a directory of the tape structure.
+\item[DMP~~~~~]	Dump tape records or files.
+\item[COMPARE~] Compare the contents of two tapes
+\end{description}
+\end{description}
+
+The DUPLICATION commands are:
+
+\begin{description}
+\begin{description}
+\item[COPY~~~~]	Copy tape-to-tape until logical end-of-tape.
+\item[C2T2~~~~]	Copy specified records/files tape-to-tape.
+\item[CTD~~~~~]	Copy designated files tape-to-disk.
+\item[IBM~~~~~]	Reads or creates an IBM EBCDIC tape. Some understanding of IBM 
+tape formats helpful.
+\end{description}
+\end{description}
+
+
+The MISCELLANEOUS commands are:
+
+\begin{description}
+\begin{description}
+\item[WEOF~~~~]	Write an end-of-file record.
+\item[WLEOT~~~]	Write two successive end-of-file records.
+\item[DEN~~~~~]	Set the density of a tape.
+\item[RED~~~~~]	Redirect the INPUT and OUTPUT tapes.
+\item[GEN~~~~~]	Generate a data test tape.
+\item[ERASE~~~]	Erase tape
+\item[EX~~~~~~]	Exit TPU
+\item[HELP~~~~]	Display valid TPU functions
+\end{description}
+\end{description}
+
+A detailed discussion of each command follows.
+
+\subsection{POSITIONING commands}
+
+There are three positioning commands.
+
+The SKIP command will skip forward or backward over a specified number of files
+or records.
+If no skip count is given, a count of one is assumed.
+Whether files are records are to be skipped will be prompted for.
+The SKIP command will not go past the DEC standard logical end-of-tape (two
+successive end-of-file records).
+In keeping with the design objective of allowing the user full control, TPU will
+not inhibit any command that causes the tape to continue forward movement even
+though the last command may have caused logical end-of-tape to be found.
+
+The FLET command will search the tape in a forward direction looking for the DEC
+standard logical end-of-tape (two successive end-of-file records).
+
+The REWIND command will rewind the designated tape.
+If two tapes are in use (INPUT and OUTPUT), both may be rewound with a single
+command.
+
+\subsection{EXAMINATION commands}
+
+There are three examination commands.
+
+The FDEN command will, by doing tape reads, try to determine the density of a
+tape.
+The densities attempted, in turn, are 800, 1600 and 6250 BPI.
+If the tape successfully responds to one of these densities, the density of the
+tape is so set.
+This whole operation is somewhat redundant as `automatic' determination of tape
+density is a normal feature of VAX/VMS, but is useful for verifying that a tape
+has been written at the desired density.
+It is important to realise that many of the newer tape drives at
+Starlink sites set the operating tape density in hardware on the
+front panel of the tape drive. If there is a difference between the
+operating density as indicated by the tape drive and either
+TPU or VMS itself, then the tape drive will be correct.
+
+The FDIR command will provide what TPU calls a `formatted directory' of a tape.
+This command will read the tape from its current position to the logical or
+physical end-of-tape.
+During this read, a one line report reflecting the composition of each file is
+listed.
+This report tells how many records there were in the file, and the minimum and
+maximum record size (in bytes).
+When the end-of-tape is reached, a short summary report on the number of files,
+records, sizes, etc, is produced.
+Optionally, TPU may be directed to perform the tape reads in the DATACHECK mode.
+In READ with DATACHECK, each record is read from tape into memory, the tape is
+back-spaced and the record is read again and the data read is compared to the
+data in memory.
+If no differences are found, the next read is performed.
+This is an excellent method of verifying tapes.
+
+The DMP command will read and dump to the terminal or line printer the specified
+number of tape records.
+The format of the dump is is selectable as OCTAL, ASCII or HEXADECIMAL byte.
+
+\subsection{DUPLICATION commands}
+
+There are four duplication commands.
+
+The COPY command will copy the contents of the INPUT tape to the OUTPUT tape.
+The copy is performed from the current position of each tape until the
+end-of-tape is detected.
+Both the INPUT and OUTPUT tape can be copied in the DATACHECK mode as described
+under the FDIR command.
+The copy may be directed to either stop or ignore tape parity errors.
+If directed not to stop on parity error, the position of the error (file and
+record number) will be reported.
+
+The C2T2 command copies a specified number of records or files from the INPUT
+drive to the OUTPUT drive.
+NB: After copying records/files, use WLEOT to indicate position of the logical
+end-of-tape.
+
+The COMPARE command does a record by record comparison of two tapes.
+The comparisons continue until a difference is found.
+The assumption here is that the comparison is done to validate copies etc.
+Once a difference is found, you are prompted for next action.
+The comparisons can proceed as before or you can skip to next file and continue
+from there or you can abort (exit) the operation.
+COMPARE does not rewind tapes, the comparison starts wherever tapes are
+positioned.
+The file and record numbers are relative to where the comparison begins.
+
+The CTD command is a copy of the INPUT tape to a specified disk file.
+It is assumed that the tape files to be copied are in some `normal' format as
+generated by RMS or some similar file control system.
+Various forms of binary data files, such as object or executable images, cannot
+be properly processed.
+In other words, DEC type text files are expected.
+There are four modes in which the copy may be done.
+They are:
+
+\begin{itemize}
+\item 
+Mode 1 - The specified number of records/files are copied to a named file in the
+current user directory.
+If there are existing copies of the named file already in the directory, the
+next higher version number is used.
+Disk files are never deleted.
+If a record/file count is not specified, the copy goes from the current tape
+position to the next end-of-file record.
+A Mode 1 copy will span tape files.
+If, during the copy, an end-of-file record is encountered, it is skipped and the
+copy continues with a message to the terminal so advising.
+
+\item
+Mode 2 - The specified number of records/files are copied to ascending versions
+of the named disk file on a one-to-one basis.
+In this mode, each record or file (depending on whether the copy is of records
+or files) is copied to a single disk file.
+If, for example, there are 10 files on the tape and the named file is
+`FOOBAR.DAT', then all of the records in the first tape file go into disk file
+`FOOBAR.DAT;1' while all the records in the second tape file go into disk file
+`FOOBAR.DAT;2', and so on.
+Mode 2 is specified by delimiting the file name prompt with an asterisk ``*'',
+eg, FOOBAR.DAT*.
+This mode allows records/files to be copied from tape to individual disk files
+without the user specifying each disk file name.
+Sort of a `wild-card' tape-to-disk copy.
+
+\item 
+Mode 3 - Same as Mode 1 except no file name is specified and TPU uses the
+default of FOR001.DAT.
+
+\item
+Mode 4 - Same as Mode 2 except no file name is specified and TPU uses the
+default of FOR001.DAT.
+Mode 4 copy is specified by responding to the file name prompt with only an
+asterisk ``*'' character.
+\end{itemize}
+
+The IBM command will either read a file from an IBM format tape and put it into
+a named disk file or `dump' a named disk file onto tape in IBM format.
+Both IBM Standard Label and unlabeled tapes are handled.
+
+\subsection{MISCELLANEOUS commands}
+
+There are six miscellaneous commands.
+
+The WEOF command writes an end-of-file record on the specified tape.
+
+The WLEOT command writes two successive end-of-file records to the specified
+tape which creates a logical end-of-tape.
+
+The ERASE command will erase a tape to the physical End-of-Tape (to the EOT
+marker) or else a specified number of inches (approximately).
+You can run into problems if you erase large (30+ feet) portions of tape which
+precede portions of the tape that are to be subsequently read.
+This might be the case if you start at BOT and erase and then follow with
+writing to the tape.
+Another case would be to write to the tape, erase some tape, and then write
+more.
+The problem arises because most tape units have a timeout function which is used
+mainly to detect runaway tape.
+If a tape read (or skip) is given and the tape is positioned in front of a large
+section of erased tape, an error will occur if data is not found before the
+timeout expires.
+In normal tape processing this is most likely a fatal error, but TPU will ask if
+you want to continue and if you know there is data further down the tape the
+operation will eventually succeed.
+
+The DEN command sets the specified tape to the specified density.
+The possible densities are 800, 1600 and 6250 BPI.
+It is important to realise that many of the newer tape drives at
+Starlink sites set the operating tape density in hardware on the
+front panel of the tape drive. If there is a difference between the
+operating density as indicated by the tape drive and either
+TPU or VMS itself, then the tape drive will be correct.
+Note that if the first operation performed on the tape is a read, it will
+switch back to density at which it was last written. 
+
+The RED command `swaps' the designation of the INPUT and OUTPUT tapes.
+The INPUT becomes the OUTPUT and the OUTPUT becomes the INPUT.
+
+The GEN command generates a `test' tape.
+The number of records/files and the data pattern of each tape character (byte)
+is specified by the user.
+Mainly used as a convenient method of making test tapes to check out TPU.
+
+The EX command causes a TPU exit.
+If TPU is in the main command dispatch mode, an exit to the system is made.
+If TPU is in a specific command execution mode (eg, COPY), an exit back to the
+main command dispatch mode is made.
+
+\pagebreak	% deliberate page break here to get example on one page
+
+\section{EXAMPLE}
+\begin{verbatim}
+$ RUN TPU_DIR:TPU
+
+       **** TPU - VAX/VMS Tape Processing Utility V3.2 *****
+
+ Enter Input tape drive> MT
+%MOUNT, Please mount device  MTA0:
+%MOUNT,  mounted on MTA0:
+%MOUNT, operator request canceled - mount completed successfully
+ The current tape density is 1600
+ Enter OUTPUT tape drive>
+ ** Enter TPU function > FDIR
+
+** WARNING - Next few questions refer only to INPUT tape MT:
+
+ Stop at [L]ogical or [P]ysical end-of-tape (Default is "L") > L
+ Stop on INPUT tape parity error (Default is "N") [Y/N]? > N
+ WRITE output to [L]ineprinter of [T]erminal (Default is "T")? > T
+ Read with datacheck [Y/N]? > N
+ File    1 has     23 recs, <minrec size=  80> <maxrec size =  80>
+ File    1 has    143 recs, <minrec size=  80> <maxrec size =  80>
+ File    1 has    343 recs, <minrec size=  80> <maxrec size =  80>
+ File    1 has    209 recs, <minrec size=  80> <maxrec size =  80>
+ File    1 has    354 recs, <minrec size=  80> <maxrec size =  80>
+ Logical end of tape detected.
+ End of formatted directory operation...
+
+ Total of 1072 records in 5 file(s).
+ Smallest record length is 80 bytes.
+ Largest record length is 80 bytes.
+
+ ** Enter TPU function > REWIND
+ ** Enter TPU function > SKIP
+
+** WARNING - Next few questions refer only to INPUT tape MT:
+
+ Enter number of records or files to skip > 3
+ Enter type of skip ("?" will list options) > ?
+ Enter FF for forward skip of files.
+ Enter BF for backward skip of files.
+ Enter FR for forward skip of records.
+ Enter BR for backward skip of records.
+ Enter type of skip ("?" will list options) > FF
+ A total of 3 records/files were skipped
+ ** Enter TPU function > CTD
+ Copy tape [R]ecords or tape [F]iles? (Default is "Files") > F
+ Enter number of tape FILES to copy  (Default = copy to next EOF) >
+ Enter disk filename (Default is FOR001.DAT) > TEST.FOR
+1 tape file transferred to disk file "TEST.FOR.
+
+ Do more tape to disk copying? > N
+ ** Enter TPU function > EXIT
+ TPU exiting
+ $
+
+\end{verbatim}
+
+\end{document}

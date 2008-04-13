@@ -1,0 +1,511 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {3.6}
+\newcommand{\stardocauthors}   {M D Lawden}
+\newcommand{\stardocdate}      {10 May 1989}
+\newcommand{\stardoctitle}     {FORMCON --- Data Format Conversion}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\begin{center}
+{\Large\bf (IPCSIN, VICARIN)}
+\end{center}
+\vspace{5mm}
+
+\section {INTRODUCTION}
+
+Two data format conversion utilities are available:
+\begin{description}
+\begin{description}
+\item[IPCSIN]: Convert IPCS data to Starlink format.
+\item[VICARIN]: Convert VICAR data to Starlink format.
+\end{description}
+\end{description}
+The Starlink format referred to is that used by the INTERIM Starlink
+environment described in SUN/4 and used by programs such as those in the ASPIC
+package.
+The input data is assumed to be held on magnetic tape.
+Both these programs are Starlink Application Programs and should be used within
+the INTERIM environment.
+This means that they are executed by the RUNSTAR command and use a connection
+file.
+The original programs and documentation were written by Dave Pearce at RAL.
+\section {IPCSIN}
+This utility will convert raw IPCS data held on magnetic tape to Starlink
+{\em IMAGE-type frames} on disc.
+To use the program, allocate a tape deck:
+\begin{verbatim}
+        $ ALLOC MT TAPE
+\end{verbatim}
+load the IPCS tape on the allocated deck and mount it:
+\begin{verbatim}
+        $ MOUNT/FOR TAPE
+\end{verbatim}
+then, run the program (for program parameters, see below):
+\begin{verbatim}
+        $ RUNSTAR FORMCON_DIR:IPCSIN
+\end{verbatim}
+For each IPCS data file selected, the following information is displayed on
+your terminal before the OUTPUT prompt:
+\begin{verbatim}
+        RUN number,  FRAME SIZE
+        Comment record #1
+        Comment record #2
+\end{verbatim}
+After responding to the OUTPUT prompt, the program will process the input data
+file and the last comment record will be displayed on your terminal.
+When you have processed all the files you require, rewind and remove the tape
+and deallocate the tape deck:
+\begin{verbatim}
+        $ DISMOUNT TAPE
+        $ DEALLOC  TAPE
+\end{verbatim}
+\subsection {Program Parameters}
+\begin{description}
+\item[INPUT]:
+specifies the name of the device on which the IPCS tape is loaded.
+If you followed the conventions shown above, the value would be TAPE.
+The following example illustrates the use of this parameter on the RUNSTAR
+command line:
+\begin{verbatim}
+        $ RUNSTAR FORMCON_DIR:IPCSIN/INPUT=TAPE
+\end{verbatim}
+If you do not specify the parameter on the RUNSTAR command line, you will be
+prompted for it:
+\begin{verbatim}
+        INPUT:=
+\end{verbatim}
+In the above example, your response would be:
+\begin{verbatim}
+        INPUT:= TAPE
+\end{verbatim}
+\item[FILES]:
+determines which data files on the input tape are to be processed.
+They are numbered consecutively, starting from 1.
+You may specify any file sequence, either as single entities or as sets of
+adjacent files, but the values must be increasing, eg:
+\begin{verbatim}
+        FILES:= 2,3,7-10,13,20-22
+\end{verbatim}
+will specify the file sequence: 2,3,7,8,9,10,13,20,21,22.
+\item[COREDUMP]:
+raw data tapes produced by IPCS systems normally have a `coredump'
+file and a `dummy run' file preceding the actual image data files.
+IPCSIN will automatically position the tape at the first data file by skipping
+the two preceding files.
+However, some installations have written utilities to produce copies of raw
+IPCS data tapes without these coredump and dummy run files (ie.\ the first data
+file is, in fact, the first physical file on the new tape).
+In this situation you must specify COREDUMP=NO on the RUNSTAR command line to
+ensure correct tape positioning, eg:
+\begin{verbatim}
+        $ RUNSTAR FORMCON_DIR:IPCSIN/COREDUMP=NO
+\end{verbatim}
+As the default for this parameter is COREDUMP=YES, you will not be prompted by
+the system if you omit it from the RUNSTAR command line.
+\item[OUTPUT]:
+specify an output disc file for each tape file processed.
+This file will be of type `.BDF'.
+If only one tape file is to be processed, this parameter can be specified
+on the RUNSTAR command line:
+\begin{verbatim}
+        $ RUNSTAR FORMCON_DIR:IPCSIN/INPUT=TAPE/FILES=3/OUTPUT=NGC1365
+\end{verbatim}
+However, for multi-file processing you will be prompted each time a new output
+file name is required:
+\begin{verbatim}
+        OUTPUT:= M87ALPHA
+\end{verbatim}
+This prompt is repeated until all the input files requested have been processed.
+\end{description}
+\subsection {Example}
+The following example illustrates the use of IPCSIN:
+\begin{quote}
+\begin{verbatim}
+$ ALLOC MT TAPE
+$ MOUNT/FOR TAPE
+$ RUNSTAR FORMCON_DIR:IPCSIN/INPUT=TAPE
+FILES:= 4,7-8
+
+RUN   =          4   FRAME SIZE =       500     390
+M83 FIELD 1
+NARROW HALPHA FILTER
+OUTPUT:= DISK$USER1:[IMAGES]M83HA
+BAD SHADOWING IN CORNER, STOP AND LOOK
+
+RUN   =          7   FRAME SIZE =       500     390
+FIELD 1
+S II FILTER
+OUTPUT:= DISK$USER1:[IMAGES]M83S
+THROUGH INCREASING CLOUD
+
+RUN   =          8   FRAME SIZE =       500     390
+DOME LIGHT
+THROUGH 6400 CONT FILTER
+OUTPUT:= [JR]DOME
+
+$ DISMOUNT TAPE
+$ DEALLOC  TAPE
+\end{verbatim}
+\end{quote}
+\subsection {Descriptors}
+The following descriptor items are constructed from the input file's header
+information and written to the frame:
+\begin{quote}
+\begin{verbatim}
+NAXIS:    Number of axes in frame (set to 2)
+NAXIS1:   Size of 1st axis (record length/2)
+NAXIS2:   Size of 2nd axis (number of records)
+
+COMMENT:  1st comment record
+COMMENT:  2nd comment record
+COMMENT:  Last comment record
+\end{verbatim}
+\end{quote}
+This version of IPCSIN does not process the {\em parameter} record, which
+contains information about integration time, co-ordinates, etc.
+This situation will be corrected when descriptor names have been formalised for
+these data, provided programming effort is available.
+\subsection {Run-time Errors}
+The following error conditions may occur:
+\begin{description}
+\item[UNABLE TO ALLOCATE TAPE UNIT]:
+Normally caused by incorrect device name specification for the INPUT parameter.
+Can also occur when the MOUNT operation was not performed for the device.
+\item[ERROR ENCOUNTERED ON REWIND]:
+The INPUT device is not online.
+\item[ERROR ENCOUNTERED ON FILE-SKIP]:
+This can be caused if the INPUT device is switched offline during a file-skip
+operation.
+\item[ERROR WHILE READING TAPE]:
+A number of factors can be responsible for this condition, such as
+hardware I/O error, (parity, etc.), or the INPUT device being switched offline
+during processing.
+\item[NULL FILE-SPECIFICATION --- NO DEFAULTS]:
+A null reply was given to the FILES parameter.
+No default exists.
+\item[INVALID FILE-SPECIFICATION]:
+A file name was not in the required format.
+\item[FILE SEQUENCE ERROR]:
+The present tape-position is beyond the file to be processed.
+The FILES list should form an increasing sequence.
+\item[UNEXPECTED END-OF-TAPE ENCOUNTERED]:
+A run number of -1 was detected in the file's header block.
+This normally signifies the end of data files.
+\item[UNABLE TO CONNECT TO BULK DATA FRAME --- RESPECIFY]:
+This error is detected during allocation of the output frame.
+It is caused by your supplying a `null' frame specification or, under this
+environment, an incorrect VMS filename.
+As the situation is recoverable, you will be reprompted with OUTPUT.
+This error can also occur if the file specified for output already exists but is
+protected against deletion.
+\item[FATAL ERROR ENCOUNTERED DURING FRAME ALLOCATION]:
+This error is detected during allocation of the output frame.
+It is irrecoverable and the program will be aborted.
+This normally occurs when processing large images which exceed your VMS resource
+quotas.
+\end{description}
+\section {VICARIN}
+This utility will convert standard VICAR format image data held on magnetic tape
+to Starlink {\em IMAGE-type frames} on disc.
+VICAR image files processed by this utility must satisfy these conventions:
+\begin{itemize}
+\item Each file must contain a standard VICAR system label specifying the
+dimensions of the image.
+\item All VICAR label information is encoded as EBCDIC characters.
+\item If the image files are blocked, the blocks are assumed to be of fixed
+length with no logical records spanning block boundaries, ie.\ each physical
+block contains an integral number of logical records.
+The maximum block size allowed is 32768 bytes.
+\end{itemize}
+To use the program, allocate a tape deck:
+\begin{verbatim}
+        $ ALLOC MT TAPE
+\end{verbatim}
+load the VICAR tape on the allocated deck and mount it:
+\begin{verbatim}
+        $ MOUNT/FOR TAPE
+\end{verbatim}
+then, run the program (for program parameters, see below):
+\begin{verbatim}
+        $ RUNSTAR FORMCON_DIR:VICARIN
+\end{verbatim}
+For each VICAR data file selected, the following information is displayed
+on your terminal before the OUTPUT prompt:
+\begin{verbatim}
+        TAPE FILE number
+        First VICAR label block
+\end{verbatim}
+When you have processed all the files you require, rewind and remove the tape
+and deallocate the tape deck:
+\begin{verbatim}
+        $ DISMOUNT TAPE
+        $ DEALLOC  TAPE
+\end{verbatim}
+\subsection {Program Parameters}
+\begin{description}
+\item[INPUT]:
+specifies the name of the device on which the VICAR  tape is loaded.
+If you followed the conventions shown above, the value would be TAPE.
+The following example illustrates the use of this parameter on the RUNSTAR
+command line:
+\begin{verbatim}
+        $ RUNSTAR FORMCON_DIR:VICARIN/INPUT=TAPE
+\end{verbatim}
+If you do not specify the parameter on the RUNSTAR command line, you will be
+prompted for it:
+\begin{verbatim}
+        INPUT:=
+\end{verbatim}
+In the above example, your response would be:
+\begin{verbatim}
+        INPUT:= TAPE
+\end{verbatim}
+\item[FILES]:
+determines which data files on the input tape are to be processed.
+They are numbered consecutively, starting from 1.
+You may specify any file sequence, either as single entities or as sets of
+adjacent files, but the values must be increasing, eg:
+\begin{verbatim}
+        FILES:= 2,3,7-10,13,20-22
+\end{verbatim}
+will specify the file sequence: 2,3,7,8,9,10,13,20,21,22.
+\item[LABELLED]:
+by default, it is assumed that the input tape is {\em non-labelled} ie.\ each
+image data file is separated from any adjacent files by a single tape mark.
+If the tape is {\em labelled}, specify LABELLED=YES on the RUNSTAR command line
+to ensure correct tape positioning:
+\begin{verbatim}
+        $ RUNSTAR FORMCON_DIR:VICARIN/LABELLED=YES
+\end{verbatim}
+As the default for this parameter is LABELLED=NO, you will not be prompted by
+the system if you omit it from the RUNSTAR command line.
+\item[OUTPUT]:
+specify an output disc file for each tape file processed.
+This file will be of type `.BDF'.
+If only one tape file is to be processed, this parameter can be specified on the
+RUNSTAR command line:
+\begin{verbatim}
+        $ RUNSTAR  FORMCON_DIR:VICARIN/INPUT=TAPE/FILES=3/OUTPUT=GANYMEDE
+\end{verbatim}
+However, for multi-file processing you will be prompted each time a new output
+file name is required:
+\begin{verbatim}
+        OUTPUT:= CALLISTO
+\end{verbatim}
+This prompt is repeated until all the input files requested have been processed.
+\item[FORMAT]:
+pixel values within a VICAR image are most commonly represented as 8-bit
+unsigned integers, ie.\ one byte corresponds to one pixel.
+However, data in other formats do exist, such as 16-bit signed integer or 32-bit
+floating point.
+The setting of this parameter determines the data format of each VICAR image
+file.
+The possible character-type values that can be assigned to this parameter are
+shown in the following table:
+\begin{verbatim}
+  PARAMETER
+   VALUE               MEANING           BYTES/PIXEL
+
+     SB             Signed Byte               1
+     SW             Signed Word               2
+     SL             Signed Longword           4
+     R              Real                      4
+     DP             Double Precision          8
+     UB             Unsigned Byte             1
+     UW             Unsigned Word             2
+\end{verbatim}
+VICARIN assigns an initial value of `UB' to this parameter and this will stay in
+effect until you change it.
+This can be accomplished after the first VICAR label block is displayed on the
+terminal.
+You will be prompted; if the current setting is correct for the image file
+being processed, hit {\em return} and the image data will be interpreted
+accordingly.
+However, if the current setting is incorrect it can be superseded by the
+appropriate value which then becomes the new current  setting.
+For example, to change from unsigned byte to signed word:
+\begin{verbatim}
+        FORMAT/UB/:= SW
+\end{verbatim}
+The current setting is displayed as a {\em run-time default} --- see reference
+(1).
+\item[OVERRIDE]:
+can be used to override VICARIN's interpretation of the image size
+fields on the VICAR system label.
+By convention, the number of video lines in the image is assumed to be held as
+a 4-character field starting at byte 33.
+The number of bytes in each line is assumed to be held in the same form starting
+at byte 37 (both values are right justified).
+If this convention does not hold true for any image data files on the tape,
+specify OVERRIDE=YES on the RUNSTAR command line.
+You will then be asked to supply the image size explicitly through use of the
+NLINES and NSAMPLES parameters described below.
+VICARIN's interpretation of these fields on the VICAR system label are displayed
+to you as run-time defaults.
+If they are correct, hit {\em return} and these will be taken as the true
+image size.
+The default for this parameter is  OVERRIDE=NO, therefore you will not be
+prompted by the system if you omit it from the RUNSTAR command line.
+\item[NLINES]:
+only used if OVERRIDE=YES has been specified on the RUNSTAR command line.
+If VICARIN's interpretation of this field on the VICAR system label is
+incorrect, you must override it with the appropriate value.
+\item[NSAMPLES]:
+only used if OVERRIDE=YES has been specified on the RUNSTAR command line.
+This value is the number of bytes in each video line of the image.
+\end{description}
+\subsection {Examples}
+The following examples illustrate the use of VICARIN:
+\begin{quote}
+\begin{verbatim}
+$ ALLOC MT TAPE
+$ MOUNT/FOR TAPE
+$ RUNSTAR FORMCON_DIR:VICARIN/FILES=1-2,4
+INPUT:= TAPE
+
+FILE   =    1 - FIRST VICAR LABEL BLOCK FOLLOWS:
+                           1   1 495 495                               C
+              IR1145   5 NOV1978                                       C
+*BOXAV2  SLP  15 SSP  15 LIP   5 SIP   5 RSCALE   1.0000BYTE TO BYTE  RC
+*ROTAT180                                                            1HL
+FORMAT/UB/:=
+OUTPUT:= [.IMAGES]IRMETEO
+
+FILE   =    2 - FIRST VICAR LABEL BLOCK FOLLOWS:
+                           1   1 495 495                               C
+             VIS1145   5 NOV1978                                       C
+*BOXAV2  SLP  15 SSP  20 LIP   5 SIP  10 RSCALE   1.0000BYTE TO BYTE  RC
+*ROTAT180                                                            1HL
+FORMAT/UB/:=
+OUTPUT:= [.IMAGES]VISMETEO
+
+FILE   =    4 - FIRST VICAR LABEL BLOCK FOLLOWS:
+77                   500    1000 5001000 I 2                          SC
+VGR-1   FDS 15311.06   PICNO 0101J1-036   SCET 79.028 13:26:11         C
+NA CAMERA  EXP 00240.0 MSEC  FILT 2( BLUE )  LO GAIN  SCAN RATE  1:1   C
+ERT 79.028 22:23:28   1/ 1 FULL    RES   VIDICON TEMP  -81.00 DEG C    C
+IN/012450/10 OUT/******/**                 DSS #**   BIT SNR    9.711  C
+FORMAT/UB/:= SW
+OUTPUT:= [.IMAGES]REDSPOT
+\end{verbatim}
+\end{quote}
+The last file is a 500x500 image in signed word format, ie.\ each pixel is
+represented as a 2-byte signed integer.
+The system label follows the conventions outlined in reference (2).
+
+The next example shows the use of the OVERRIDE parameter when processing a
+10000x10000 image file:
+\begin{quote}
+\begin{verbatim}
+$ RUNSTAR FORMCON_DIR:VICARIN/INPUT=TAPE/FILES=23/OVERRIDE=YES
+
+FILE   =   23 - FIRST VICAR LABEL BLOCK FOLLOWS:
+77                 10000   10000         L 1                          SC
+              WV1145   5 NOV1978                                       C
+*ZOOM                                                                 HL
+NLINES/0/:= 10000
+NSAMPLES/0/:= 10000
+FORMAT/UB/:=
+OUTPUT:= [.IMAGES]WVMETEO
+
+$ DISMOUNT TAPE
+$ DEALLOC  TAPE
+\end{verbatim}
+\end{quote}
+The above system label also follows the conventions outlined in reference (2),
+ie.\ the number of video lines is held in bytes 17 to 24 and the number of samples
+in bytes 25 to 32.
+For images of dimensions less than 10000, these values will also be held in
+those fields conventionally processed by this utility, namely 33 to 36 and 37 to
+40.
+However, for larger images, these last two fields are left blank which VICARIN
+will interpret as zero.
+Therefore, you must supply the image dimensions explicitly.
+\subsection {Descriptors}
+The following descriptor items are constructed from the input file's VICAR
+system label and written to the frame:
+\begin{quote}
+\begin{verbatim}
+NAXIS:    Number of axes in frame (set to 2)
+NAXIS1:   Size of 1st axis (number of pixels in each line)
+NAXIS2:   Size of 2nd axis (number of video lines)
+\end{verbatim}
+\end{quote}
+Each 72-byte VICAR label is written to the frame as `HISTORY' descriptor items.
+\subsection {Run-time Errors}
+The following error conditions may occur:
+\begin{description}
+\item[UNABLE TO ALLOCATE TAPE UNIT]:
+Normally caused by incorrect device name specification for the INPUT parameter.
+Can also occur when the MOUNT operation was not performed for the device.
+\item[ERROR ENCOUNTERED ON REWIND]:
+The INPUT device is not online.
+\item[ERROR ENCOUNTERED ON FILE-SKIP]:
+This can be caused if the INPUT device is switched offline during a file-skip
+operation.
+\item[ERROR WHILE READING TAPE]:
+A number of factors can be responsible for this condition, such as hardware I/O
+error, (parity, etc.), or the INPUT device being switched offline during
+processing.
+\item[NULL FILE-SPECIFICATION --- NO DEFAULTS]:
+A null reply was given to the FILES parameter.
+No default exists.
+\item[INVALID FILE-SPECIFICATION]:
+A file name was not in the required format.
+\item[FILE SEQUENCE ERROR]:
+The present tape-position is beyond the file to be processed.
+The FILES list should form an increasing sequence.
+\item[UNEXPECTED END-OF-TAPE ENCOUNTERED]:
+A run number of -1 was detected in the file's header block.
+This normally signifies the end of data files.
+\item[UNABLE TO CONNECT TO BULK DATA FRAME --- RESPECIFY]:
+This error is detected during allocation of the output frame.
+It is caused by your supplying a `null' frame specification or, under this
+environment, an incorrect VMS filename.
+As the situation is recoverable, you will be reprompted with OUTPUT.
+This error can also occur if the file specified for output already exists but is
+protected against deletion.
+\item[FATAL ERROR ENCOUNTERED DURING FRAME ALLOCATION]:
+This error is detected during allocation of the output frame.
+It is irrecoverable and the program will be aborted.
+This normally occurs when processing large images which exceed your VMS resource
+quotas.
+\item[IBM FLOATING POINT FORMAT NOT SUPPORTED]:
+This version of VICARIN is unable to convert binary image data held in IBM
+floating point format --- this facility may be added in the future.
+\end{description}
+\section {REFERENCES}
+(1) SUN/4: `INTERIM --- Starlink software environment'\\
+(2) J B Seidman, [1977]: `New VICAR Label Standard', Jet Propulsion Laboratory.
+\end{document}

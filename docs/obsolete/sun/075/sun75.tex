@@ -1,0 +1,104 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocnumber}    {75.1}
+\newcommand{\stardocauthors}   {M D Lawden, M J Bly}
+\newcommand{\stardocdate}      {12 December 1990}
+\newcommand{\stardoctitle}     {TOOLPACK --- Fortran 77 Software Tools}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+Starlink has purchased Release 2 of Toolpack/1 from NAG for its users.
+The first release of Toolpack was the result of an international collaborative
+effort started in 1979.
+The original project aims were twofold:
+\begin{itemize}
+\item To provide a suite of tools to assist the production, testing,
+maintenance, and transportation of medium-sized mathematical software projects
+written in standard Fortran 77.
+\item To investigate the development of extensible programming support
+environments built around integrated tool suites.
+\end{itemize}
+Readers who are interested in learning about the facilities offered by
+Toolpack should read the {\em Toolpack/1 Release 2 Introductory Guide} which
+can be obtained from your Site Manager.
+If you then wish to use any of the facilities, you should consult the
+{\em Toolpack/1 Release 2 Technical Reference Manual}.
+This can also be obtained from your Site Manager.
+
+To run Toolpack, the command
+\begin{verbatim}
+        $ TOOLPACK
+\end{verbatim}
+should be issued. This will run a command procedure which sets up the names
+of the Toolpack tools as DCL symbols. {\tt TOOLPACK} is a DCL symbol. It could 
+be added to the users {\tt LOGIN.COM} file.
+
+Users must also define the logical name TIE{\tt{\$}}PFS as follows:
+\begin{verbatim}
+        $ DEFINE TIE$PFS "DISK:/dir[/dir[/dir]...]"
+\end{verbatim}
+where {\tt DISK} is the disk, and {\tt /dir[/dir[/dir...]} is the path of 
+directories to the location of the files to be worked on. 
+
+For example, the directory
+structure:
+\begin{verbatim}
+        DISK$USER:[STAR.FORTRAN]
+\end{verbatim}
+would be specified as:
+\begin{verbatim}
+        $ DEFINE TIE$PFS "DISK$USER:/STAR/FORTRAN/"    
+\end{verbatim}
+In addition to the standard tools, five command procedures are provided, which
+combine the use of several tools to achieve more advanced processing of code.
+These command procedures have been given symbols, defined in the TOOLPACK.COM
+procedure. They are:
+\begin{description}
+\item [FFC] -
+A command procedure which checks source code for conformance to the full
+FORTRAN77 standard using Toolpack/1 tools. Uses normal VMS style filenames.
+\item [APT] -
+A command procedure which does Arithmetic Precision Transformation, using two
+of the Toolpack/1 monolithic tools. Uses normal VMS filenames.
+\item [PORT] -
+Checks source code for portability. Uses normal VMS filenames.
+\item [STRUCT] -
+This structures a fortran program to make it "look good". A final polishing
+tool. Uses normal VMS filenames.
+\item [UNROLL] -
+A procedure for "unrolling" Do loops.
+\end{description}
+\end{document}
