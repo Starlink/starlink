@@ -138,11 +138,13 @@ if { $tindex != -1 } {
 #  time around (and explicity saved), these go before other options so
 #  that these may be overridden on the command-line.
 set props [gaia::GaiaProperties::instance]
-foreach prop [$props get_named_keys Gaia] {
-   set value [$props get_property $prop]
-   set key [$props get_unnamed_key Gaia $prop]
-   if { $value != {} } {
-      set argv [linsert $argv 0 "-$key" "$value"]
+foreach fullname [$props get_named_keys Gaia] {
+   set value [$props get_property $fullname]
+   set option [$props get_unnamed_key Gaia $fullname]
+   if { [gaia::GaiaStartup::check_option $option] && $value != {} } {
+      set argv [linsert $argv 0 "-$option" "$value"]
+   } else {
+      puts stderr "Warning: rejected session persistent option: -$option $value"
    }
 }
 

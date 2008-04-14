@@ -83,6 +83,13 @@
     in the standards complying FITS-WCS format (see SUN/211 for the details
     of this terminology).
 
+    Session persistent startup options that do not match the current version
+    of GAIA will now be ignored. Previously this caused a fatal error and
+    it was necessary to remove the properties files from $HOME/.skycat.
+    This change will only work for future changes, so using different versions
+    of GAIA sharing the same properties file will continue with this issue 
+    until after all your versions are at least as new as this release.
+
   Humu Release
   ============
 

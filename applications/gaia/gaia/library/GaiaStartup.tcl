@@ -266,15 +266,7 @@ itcl::class gaia::GaiaStartup {
    #  Update the properties object to the local values and cause a
    #  save to backing store.
    protected method save_properties_ {} {
-      foreach key "extended_precision show_hdu_chooser float_panel \
-                   panel_orient with_zoom_window with_pan_window \
-                   with_colorramp focus_follows_mouse interop_menu scrollbars \
-                   transient_tools transient_spectralplot quiet_exit \
-                   min_scale max_scale zoom_factor default_cut default_cmap \
-                   default_itt linear_cartesian always_merge check_for_cubes \
-                   isize maxshift autoscale autofit pixel_indices \
-                   labelfont textfont wcsfont font_scale pick_zoom_factor \
-                   blank_color image_background" {
+      foreach key $options {
          $props_ set_named_property Gaia $key $values_($this,$key)
       }
       $props_ save_properties
@@ -817,7 +809,17 @@ itcl::class gaia::GaiaStartup {
       add_short_help $itk_component(fontscale) \
          {Scale factor for non-pixel fonts, 0 for default}
       pack $itk_component(fontscale) -side top -fill x
-   }   
+   }
+
+   #  Check if an option is currently supported. Use to test if
+   #  a stored values should be part of an objects configuration
+   #  (maybe untrue if this is an older version).
+   public proc check_option {option} {
+      if { [lsearch -exact $options $option] == -1 } {
+         return 0
+      }
+      return 1
+   }
 
    #  Configuration options: (public variables)
    #  ----------------------
@@ -856,6 +858,44 @@ itcl::class gaia::GaiaStartup {
 
    #  Common variables: (shared by all instances)
    #  -----------------
+
+   #  List of options that are handled. 
+   common options {
+      always_merge
+      autofit
+      autoscale
+      blank_color
+      check_for_cubes
+      default_cmap
+      default_cut
+      default_itt
+      extended_precision
+      float_panel
+      focus_follows_mouse
+      font_scale
+      image_background
+      interop_menu
+      isize
+      labelfont
+      linear_cartesian
+      max_scale
+      maxshift
+      min_scale
+      panel_orient
+      pick_zoom_factor
+      pixel_indices
+      quiet_exit
+      scrollbars
+      show_hdu_chooser
+      textfont
+      transient_spectralplot
+      transient_tools
+      wcsfont
+      with_colorramp
+      with_pan_window
+      with_zoom_window
+      zoom_factor
+   }
 
    #  Values shared by widgets -- indexed by ($this,fieldname).
    common values_
