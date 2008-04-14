@@ -270,6 +270,8 @@
 *     2008-04-09 (TIMJ):
 *        fix smf_created_qualname.
 *        smf_create_lutwcs and smf_detpos_wcs no longer needs steptime argument.
+*     2008-04-14 (EC):
+*        - Updated interface for smf_flag_spikes and smf_boxcar1
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -315,7 +317,9 @@ void smf_addto_smfArray( smfArray *ary, const smfData *data, int *status );
 void smf_average_data( const smfData *data, int start, int nslice, 
 		       const int interval, double **avdata, size_t *nelem, int *status);
 
-void smf_boxcar1 ( double *series, const size_t ninpts, size_t window, int *status);
+void smf_boxcar1 ( double *series, const size_t ninpts, size_t window, 
+		   unsigned char *qual, unsigned char mask, 
+		   int *status);
 
 void smf_calc_stats( const smfData *data, const char *mode, const int index,
                      int lo, int hi, double *mean, double *sigma, 
@@ -858,9 +862,9 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
 			unsigned char *quality, unsigned char mask, 
 			int *status );
 
-void smf_flag_spikes( smfData *data, unsigned char *quality, double thresh, 
-		      unsigned int niter, unsigned int maxiter, 
-		      unsigned int *aiter, int *status );
+void smf_flag_spikes( smfData *data, unsigned char *quality, 
+		      unsigned char mask, double thresh, unsigned int niter, 
+		      unsigned int maxiter, unsigned int *aiter, int *status );
 
 int *smf_find_bad_dets( Grp *igrp,  int size, int *nbaddet, int *status );
 void smf_maskacsis( int indf, int *mask, int *status );
