@@ -745,7 +745,7 @@
 
 *  Create a 3D GRID Frame, and put it in a new FrameSet.
       BFRM = AST_FRAME( 3, 'Domain=GRID,unit(1)=pixel,unit(2)=pixel,'//
-     :                  'unit(3)=pixel', STATUS );
+     :                  'unit(3)=pixel', STATUS )
       IWCS = AST_FRAMESET( BFRM, ' ', STATUS )      
 
 *  Construct a 3D CmpFrame describing all 3 axes. RA becomes axis 1 and DEC 
