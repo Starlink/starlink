@@ -460,7 +460,7 @@ STARTUP_SCRIPT = $(PKG_NAME).csh
 
 PRIVATE_INCLUDES = $(SLA_INCLUDES)
 
-SLA_INCLUDES = smblib.h smbmac.h 
+SLA_INCLUDES = slalib.h slamac.h 
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -468,7 +468,7 @@ SLA_INCLUDES = smblib.h smbmac.h
 #  reference the files within the source code, not the actual names of
 #  the files.
 
-EXTERNAL_INCLUDES = SAE_PAR
+EXTERNAL_INCLUDES =
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -498,31 +498,31 @@ PLATFORM_C = sysinfo.c
 
 SLA_SOURCE_LIBRARY = slalib_c.tar
 
-SLA_SOURCE = sbmaddet.c sbmcs2c6.c sbmdmat.c sbmecor.c sbmgeoc.c sbmpcd.c \
-sbmrvlsrd.c sbmdmoon.c sbmafin.c sbmctf2d.c sbmdmxm.c sbmeg50.c sbmgmst.c \
-sbmpda2h.c sbmrvlsrk.c sbmgmsta.c sbmairmas.c sbmctf2r.c sbmdmxv.c \
-sbmepb.c sbmpdq2h.c sbms2tp.c sbmplanet.c sbmaltaz.c sbmdaf2r.c sbmdr2af.c \
-sbmepb2d.c sbmh2e.c sbmpm.c sbmsep.c sbmpolmo.c sbmamp.c sbmdafin.c \
-sbmdr2tf.c sbmepco.c sbmimxv.c sbmprebn.c sbmampqk.c sbmdat.c sbmdrange.c \
-sbmepj.c sbmintin.c sbmprec.c sbmaop.c sbmdav2m.c sbmdranrm.c sbmepj2d.c \
-sbminvf.c sbmpreces.c sbmaoppa.c sbmdbear.c sbmds2c6.c sbmeqecl.c \
-sbmkbj.c sbmprecl.c sbmsmat.c sbmaoppat.c sbmdbjin.c sbmds2tp.c \
-sbmeqeqx.c sbmm2av.c sbmprenut.c sbmsubet.c sbmaopqk.c sbmdc62s.c \
-sbmdsep.c sbmeqgal.c sbmmap.c sbmpvobs.c sbmsupgal.c sbmatmdsp.c sbmav2m.c \
-sbmdcc2s.c sbmdtf2d.c sbmetrms.c sbmmappa.c sbmpxy.c sbmsvd.c sbmbear.c \
-sbmdcmpf.c sbmdtf2r.c sbmeuler.c sbmmapqk.c sbmsvdcov.c sbmcaf2r.c \
-sbmdcs2c.c sbmdtp2s.c sbmevp.c sbmmapqkz.c sbmrange.c sbmsvdsol.c \
-sbmcaldj.c sbmdd2tf.c sbmfitxy.c sbmmoon.c  sbmranorm.c sbmtp2s.c sbmdt.c \
-sbmtp2v.c sbmdtp2v.c sbmdtps2c.c sbmdtpv2c.c sbmcalyd.c sbmde2h.c sbmdtt.c \
-sbmfk425.c sbmmxm.c sbmrcc.c sbmdv2tp.c sbmrdplan.c sbmtps2c.c sbmtpv2c.c \
-sbmcc2s.c sbmdeuler.c sbmdvdv.c sbmfk45z.c sbmmxv.c sbmrefco.c sbmunpcd.c \
-sbmcc62s.c sbmdfltin.c sbmdvn.c sbmfk524.c sbmnut.c sbmrefro.c sbmvdv.c \
-sbmcd2tf.c sbmdh2e.c sbmdvxv.c sbmfk54z.c sbmnutc.c sbmrefv.c sbmvn.c \
-sbmcldj.c sbmdimxv.c sbme2h.c sbmflotin.c sbmoap.c sbmrefz.c sbmvxv.c \
-sbmclyd.c sbmv2tp.c sbmcr2af.c sbmdjcal.c sbmearth.c sbmgaleq.c sbmoapqk.c \
-sbmrverot.c sbmcr2tf.c sbmdjcl.c sbmecleq.c sbmgalsup.c sbmobs.c \
-sbmrvgalc.c sbmxy2xy.c sbmcs2c.c sbmdm2av.c sbmecmat.c sbmge50.c sbmpa.c \
-sbmrvlg.c sbmzd.c
+SLA_SOURCE = addet.c cs2c6.c dmat.c ecor.c geoc.c pcd.c \
+rvlsrd.c dmoon.c afin.c ctf2d.c dmxm.c eg50.c gmst.c \
+pda2h.c rvlsrk.c gmsta.c airmas.c ctf2r.c dmxv.c \
+epb.c pdq2h.c s2tp.c planet.c altaz.c daf2r.c dr2af.c \
+epb2d.c h2e.c pm.c sep.c polmo.c amp.c dafin.c \
+dr2tf.c epco.c imxv.c prebn.c ampqk.c dat.c drange.c \
+epj.c intin.c prec.c aop.c dav2m.c dranrm.c epj2d.c \
+invf.c preces.c aoppa.c dbear.c ds2c6.c eqecl.c \
+kbj.c precl.c smat.c aoppat.c dbjin.c ds2tp.c \
+eqeqx.c m2av.c prenut.c subet.c aopqk.c dc62s.c \
+dsep.c eqgal.c map.c pvobs.c supgal.c atmdsp.c av2m.c \
+dcc2s.c dtf2d.c etrms.c mappa.c pxy.c svd.c bear.c \
+dcmpf.c dtf2r.c euler.c mapqk.c svdcov.c caf2r.c \
+dcs2c.c dtp2s.c evp.c mapqkz.c range.c svdsol.c \
+caldj.c dd2tf.c fitxy.c moon.c  ranorm.c tp2s.c dt.c \
+tp2v.c dtp2v.c dtps2c.c dtpv2c.c calyd.c de2h.c dtt.c \
+fk425.c mxm.c rcc.c dv2tp.c rdplan.c tps2c.c tpv2c.c \
+cc2s.c deuler.c dvdv.c fk45z.c mxv.c refco.c unpcd.c \
+cc62s.c dfltin.c dvn.c fk524.c nut.c refro.c vdv.c \
+cd2tf.c dh2e.c dvxv.c fk54z.c nutc.c refv.c vn.c \
+cldj.c dimxv.c e2h.c flotin.c oap.c refz.c vxv.c \
+clyd.c v2tp.c cr2af.c djcal.c earth.c galeq.c oapqk.c \
+rverot.c cr2tf.c djcl.c ecleq.c galsup.c obs.c \
+rvgalc.c xy2xy.c cs2c.c dm2av.c ecmat.c ge50.c pa.c \
+rvlg.c zd.c planel.c dsepv.c el2ue.c ue2pv.c pv2ue.c
 
 # The A-task Fortran routines.
 
@@ -597,7 +597,7 @@ INCLUDE_LINKS = $(EXTERNAL_INCLUDES) $(PRIVATE_INCLUDES)
 
 #  Rules to set up links to locate each of the above include files.
 
-SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
+# SAE_PAR:   $(STAR_INC)/sae_par;   $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
@@ -646,9 +646,19 @@ A_TASKS_OBJECT_FILES = $(A_TASKS_F:.f=.o)
 
 #  Rules and dependencies for building the A-tasks.
 
-bch_fft: $(EXTERNAL_INCLUDES) bch_fft.o 
-	$(ALINK) bch_fft.o -L$(STAR_SOURCES)/kappa -lkapsub -lkapgen \
-        `pda_link`
+bch_fft: $(EXTERNAL_INCLUDES) bch_fft.o kps1_fopr.o kps1_fofo.o
+	$(ALINK) bch_fft.o kps1_fopr.o kps1_fofo.o \
+	         `kaplibs_link_adam` `pda_link`
+
+
+#  Local fudges, no internal KAPPA libraries.
+kps1_fopr.o: kps1_fopr.gdr
+	fgeneric -t rd kps1_fopr.gdr
+	$(FC) $(FFLAGS) -I$(STAR_INC) -c kps1_fopr.f
+
+kps1_fofo.o: kps1_fofo.gdr
+	fgeneric -t rd kps1_fofo.gdr
+	$(FC) $(FFLAGS) -I$(STAR_INC) -c kps1_fofo.f
 
 #  Rules for Non-ATASK binaries
 
@@ -656,7 +666,7 @@ bch_sysinfo: sysinfo.c
 	$(CC) $(CFLAGS) -o bch_sysinfo sysinfo.c
 
 bch_cfp: $(SLA_OBJECTS) bch_cfp.c
-	$(CC) $(CFLAGS) bch_cfp.c -I. $(SLA_OBJECTS) -o bch_cfp -L/usr/lib -lm
+	$(CC) $(CFLAGS) bch_cfp.c -I. $(SLA_OBJECTS) -o bch_cfp -lm
 
 #  Rules for building the help libraries.
 

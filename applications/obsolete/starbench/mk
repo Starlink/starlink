@@ -223,6 +223,13 @@
       export TAR_IN
       export TAR_OUT
       export INSTALL
+      export STARLINK
+
+#  STARLINK_DIR should always be defined. This sets local STARLINK.
+      STARLINK=${STARLINK:=$STARLINK_DIR}
+
+#  Development, installs into standard place.
+      INSTALL=${STARCONF_DEFAULT_PREFIX:=`pwd`}
 
 #  Check that the SYSTEM environment variable is defined.
       if test "$SYSTEM" = ""; then
@@ -286,7 +293,7 @@
 
 #  Install the package in the current directory.
 
-         INSTALL=`pwd`
+         INSTALL=${STARCONF_DEFAULT_PREFIX:=`pwd`}
 
 #  Invoke make with the appropriate environment variables set to override
 #  default macros defined in the makefile.

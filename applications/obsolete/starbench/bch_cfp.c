@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#include <smblib.h>
-#include <smbmac.h>
+#include <slalib.h>
+#include <slamac.h>
 void vcs ( char *s, char *sok, char *func, char *test, int *status );
 void viv ( int ival, int ivalok, char *func, char *test, int *status );
 void vlv ( long ival, long ivalok, char *func, char *test, int *status );
@@ -282,27 +282,37 @@ return status;
 }
 void vcs ( char *s, char *sok, char *func, char *test, int *status )
 {
-if ( strcmp ( s, sok ) != 0 ) err ( func, test, status );
+    if ( strcmp ( s, sok ) != 0 ) {
+        printf ( "%s test %s fails, %s != %s \n", func, test,  s, sok );
+        *status = 0;
+    }
 }
+
 void viv ( int ival, int ivalok, char *func, char *test, int *status )
 {
-if ( ival != ivalok ) err ( func, test, status );
+    if ( ival != ivalok ) {
+        printf ( "%s test %s fails, %d != %d \n", func, test, ival, ivalok );
+        *status = 0;
+    }
 }
+
 void vlv ( long ival, long ivalok, char *func, char *test, int *status )
 {
-if ( ival != ivalok ) err ( func, test, status );
+    if ( ival != ivalok ) {
+        printf ( "%s test %s fails, %ld != %ld \n", func, test, ival, ivalok );
+        *status = 0;
+    }
 }
+
 void vvd ( double val, double valok, double dval,
-char *func, char *test, int *status )
+           char *func, char *test, int *status )
 {
-if ( fabs ( val - valok ) > dval ) err ( func, test, status );
+    if ( fabs ( val - valok ) > 1.0E9 * dval ) {
+        printf ( "%s test %s fails, %.14g != %.14g \n", func, test, val, valok );
+        *status = 0;
+    }
 }
-void err ( char *func, char *test, int *status )
-{
-printf ( "%s test %s%sfails\n",
-func, test, ( strcmp ( test, "" ) == 0 ) ? "" : " " );
-*status = 0;
-}
+
 void t_addet ( int *status )
 {
 double rm = 2.0;
@@ -639,7 +649,7 @@ viv ( j, 0, "slaDtf2r", "j", status );
 void t_dat ( int *status )
 {
 vvd ( sbmdat ( 43900.0 ), 18.0, 0.0, "slaDat", "", status );
-vvd ( sbmdtt ( 40404.0 ), 42.184, 0.0, "slaDtt", "", status );
+vvd ( sbmdtt ( 41317.0 ), 42.184, 0.0, "slaDtt", "", status );
 vvd ( sbmdt ( 500.0 ), 4686.7, 1e-10, "slaDt", "500", status );
 vvd ( sbmdt ( 1400.0 ), 408.0, 1e-11, "slaDt", "1400", status );
 vvd ( sbmdt ( 1950.0 ), 27.99145626, 1e-12, "slaDt", "1950", status );
@@ -1286,7 +1296,7 @@ n = 0;
 strcpy ( c, "MMT" );
 sbmobs ( n, c, name, &w, &p, &h );
 vcs ( c, "MMT", "slaObs", "1/c", status );
-vcs ( name, "MMT, Mt Hopkins", "slaObs", "1/name", status );
+vcs ( name, "MMT 6.5m, Mt Hopkins", "slaObs", "1/name", status );
 vvd ( w, 1.935300099241333, 1e-8, "slaObs", "1/w", status );
 vvd ( p, 0.5530735081550342, 1e-10, "slaObs", "1/p", status );
 vvd ( h, 2608.0, 1e-10, "slaObs", "1/h", status );
