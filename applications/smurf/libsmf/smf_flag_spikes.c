@@ -13,8 +13,9 @@
 *     Library routine
 
 *  Invocation:
+
 *     smf_flag_spikes( smfData *data, unsigned char *quality, 
-*                      double thresh, unsigned int niter, 
+*                      unsigned char mask, double thresh, unsigned int niter, 
 *                      unsigned int maxiter, unsigned int *aiter, 
 *                      int *status )
 
@@ -25,6 +26,9 @@
 *        If set, use this buffer instead of QUALITY associated with data.
 *        If NULL, use the QUALITY associated with data. Locations of spikes
 *        will have bit SMF__Q_SPIKE set. 
+*     mask = unsigned char (Given)
+*        Define which bits in quality are relevant to ignore data in
+*        the calculation.
 *     thresh = double (Given)
 *        N-sigma threshold for spike detection
 *     niter = int (Given)
@@ -55,6 +59,9 @@
 *  History:
 *     2008-04-02 (EC):
 *        Initial Version
+*     2008-04-14 (EC):
+*        -Added mask to interface
+*        -fixed array index bug
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -99,9 +106,9 @@
 
 #define FUNC_NAME "smf_flag_spikes"
 
-void smf_flag_spikes( smfData *data, unsigned char *quality, double thresh, 
-		      unsigned int niter, unsigned int maxiter, 
-		      unsigned int *aiter, int *status ) {
+void smf_flag_spikes( smfData *data, unsigned char *quality, 
+		      unsigned char mask, double thresh, unsigned int niter, 
+		      unsigned int maxiter, unsigned int *aiter, int *status ){
 
   /* Local Variables */
   dim_t base;                   /* Base index for bolometer */
@@ -112,9 +119,9 @@ void smf_flag_spikes( smfData *data, unsigned char *quality, double thresh,
   int iter=0;                   /* Actual number of iterations */
   dim_t j;                      /* Loop Counter */
   unsigned char *qua=NULL;      /* Pointer to quality flags */
-  unsigned char mask;           /* bitmask for quality */
   double mean;                  /* Bolometer signal mean */
   dim_t nbolo;                  /* Number of bolometers */
+  size_t nflag;                 /* Number of samples flagged */
   dim_t ngood;                  /* How many good samples in measurement */
   dim_t ntslice;                /* Number of time slices */
   double sigma;                 /* Bolometer signal mean */
@@ -123,6 +130,7 @@ void smf_flag_spikes( smfData *data, unsigned char *quality, double thresh,
   if (*status != SAI__OK) return;
 
   /* Assert bolo-ordered data to make life easier */
+
   smf_dataOrder( data, 0, status );
 
   /* Pointers to data and quality */
@@ -174,10 +182,8 @@ void smf_flag_spikes( smfData *data, unsigned char *quality, double thresh,
     }
   }
 
-  /* Define the QUALITY bit mask for samples to ignore */
-  mask = SMF__Q_BADS | SMF__Q_BADB | SMF__Q_SPIKE;
-
   /* Iteratively find spikes */
+  nflag = 0;
   while( !done ) {
 
     done = 1;
@@ -205,12 +211,16 @@ void smf_flag_spikes( smfData *data, unsigned char *quality, double thresh,
 	  
 	  /* Significant excursion */
 	  if( fabs(dat[base+j]-mean) > dist ) {
-	    
-	    /* If it wasn't flagged before flag it now and set not done */
+
+	    /* If it wasn't flagged before set not done */
 	    if( !(qua[base+j] & SMF__Q_SPIKE) ) {
-	      qua[base+j] |= SMF__Q_SPIKE;
 	      done = 0;
+	      nflag++;
 	    }
+
+	    /* Flag the data point */
+	    qua[base+j] |= SMF__Q_SPIKE;
+	    
 	  }
 	}
       }
@@ -221,6 +231,8 @@ void smf_flag_spikes( smfData *data, unsigned char *quality, double thresh,
       done = 1;
     }
   }
+
+  printf(" Number of new samples flagged: %i\n", nflag );
 
   /* Return actual iterations if requested */
   if( aiter ) {
