@@ -41,6 +41,8 @@
 *        Initial version.
 *     2008-04-03 (EC):
 *        Asset ICD data-order before writing file.
+*     2008-04-14 (EC):
+*        Write QUALITY and VARIANCE if present.
 
 *  Notes:
 *
@@ -84,6 +86,7 @@
 #define FUNC_NAME "smf_model_NDFexport"
 
 void smf_model_NDFexport( const smfData *data, const char *name, int *status ){
+
   /* Local Variables */
   int added=0;                  /* Number of names added to group */
   size_t datalen;               /* Length in bytes of data array */
@@ -95,8 +98,10 @@ void smf_model_NDFexport( const smfData *data, const char *name, int *status ){
   size_t ndata;                 /* Number of elements in data array */
   int osize=0;                  /* Number of files in model group */
   Grp *outname = NULL;          /* 1-element group to hold output filename */
+  unsigned char *qual=NULL;     /* Pointer to QUALITY buffer */
   smfData *tempdata=NULL;       /* Temporary smfData pointer */
   int ubnd[NDF__MXDIM];         /* Dimensions of container */
+  void *var=NULL;               /* Pointer to VARIANCE buffer */
 
   char ndfname[GRP__SZNAM+1];  /* Input NDF name, derived from GRP */
   char *pname=NULL;
@@ -129,13 +134,31 @@ void smf_model_NDFexport( const smfData *data, const char *name, int *status ){
     datalen = ndata * smf_dtype_sz( data->dtype, status );
   }
 
-  /* Make a new empty container with associated smfData struct */
-  smf_open_newfile( outname, 1, data->dtype, data->ndims, lbnd, ubnd, 
-		    0, &tempdata, status );
+  /* Check for VARIANCE and QUALITY components */
 
-  /* Copy the data array to new smfData */
+  var = (data->pntr)[1];
+  qual = (data->pntr)[2];
+
+  /* Make a new empty container with associated smfData struct */
+
+  flag = 0;
+  if( var ) flag |= SMF__MAP_VAR;
+  if( qual ) flag |= SMF__MAP_QUAL;
+
+  smf_open_newfile( outname, 1, data->dtype, data->ndims, lbnd, ubnd, 
+		    flag, &tempdata, status );
+
+  /* Copy the data/variance/quality array to new smfData */
   if( *status == SAI__OK ) {
     memcpy( (tempdata->pntr)[0], (data->pntr)[0], datalen );
+
+    if( var ) {
+      memcpy( (tempdata->pntr)[1], var, datalen );
+    }
+
+    if( qual ) {
+      memcpy( (tempdata->pntr)[2], qual, ndata*sizeof(*qual) );
+    }
   }
 
   /* Close files and clean up */  
