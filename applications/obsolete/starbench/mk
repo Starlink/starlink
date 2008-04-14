@@ -249,7 +249,7 @@
                CC='cc'
                CFLAGS='-I$(STAR_INC) -O'
                FC='f77'
-               FFLAGS='-O -w'
+               FFLAGS='-O -w -I$(STAR_INC)'
                LINK='ln -s'
                RANLIB='ranlib'
                echo "mk: Environment variables defined for $SYSTEM system"
@@ -263,7 +263,7 @@
                CC='cc'
                CFLAGS='-I$(STAR_INC) -O'
                FC='f77'
-               FFLAGS='-O -w'
+               FFLAGS='-O -w -I$(STAR_INC)'
                LINK='ln -s'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
@@ -276,7 +276,7 @@
                CC='gcc'
                CFLAGS='-I. -I$(STAR_INC) -O2'
                FC='g77'
-               FFLAGS='-O2 -fno-second-underscore -Wno-globals'
+               FFLAGS='-O2 -I$(STAR_INC) -fno-second-underscore -Wno-globals'
                LINK='ln -s'
                RANLIB='ranlib'
                echo "mk: Environment variables defined for $SYSTEM system"
