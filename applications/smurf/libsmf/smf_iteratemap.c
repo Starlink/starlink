@@ -118,6 +118,10 @@
 *     2008-04-03 (EC):
 *        - Use QUALITY in map-maker
 *        - Added data cleaning options to CONFIG file
+*     2008-04-14 (EC):
+*        - Fixed memory-deallocation (res/ast/qua...)
+*        - Added QUALITY/VARIANCE to NDFexport
+*        
 
 *  Notes:
 
@@ -226,8 +230,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   int spikeiter_s;              /* signed version of spikeiter */
   double spikethresh;           /* Threshold for spike detection */
   smf_modeltype thismodel;      /* Type of current model */
-
-  unsigned char *q=NULL;
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -542,28 +544,30 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	    /* Synchronize quality flags */
 
 	    data = res[i]->sdata[idx];
-	    q = qua[i]->sdata[idx]->pntr[0];
+	    qua_data = (unsigned char *) qua[i]->sdata[idx]->pntr[0];
 
 	    msgOut(" ", "  update quality", status);
-	    smf_update_quality( data, q, 1, NULL, badfrac, status );
+	    smf_update_quality( data, qua_data, 1, NULL, badfrac, status );
 
 	    if( baseorder >= 0 ) {
 	      msgOut(" ", "  fit polynomial baselines", status);
-	      smf_scanfit( data, q, baseorder, status );
+	      smf_scanfit( data, qua_data, baseorder, status );
 
 	      msgOut(" ", "  remove polynomial baselines", status);
-	      smf_subtract_poly( data, q, 0, status );
+	      smf_subtract_poly( data, qua_data, 0, status );
 	    }
 
 	    if( dcthresh && dcbox ) {
 	      msgOut(" ", "  correct steps", status);
-	      smf_correct_steps( data, q, 20., 1000, status );
+	      smf_correct_steps( data, qua_data, 20., 1000, status );
 	    }
 
 	    if( spikethresh ) {
 	      msgOut(" ", "  flag spikes...", status);
-	      smf_flag_spikes( data, q, spikethresh, spikeiter, 100, &aiter, 
-			       status );
+	      smf_flag_spikes( data, qua_data, 
+	                       SMF__Q_BADS|SMF__Q_BADB|SMF__Q_SPIKE,
+	                       spikethresh, spikeiter, 100, 
+			       &aiter, status );
 	      msgSeti("AITER",aiter);
 	      msgOut(" ", "  ...finished in ^AITER iterations",
 		       status); 
@@ -727,11 +731,21 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
 	for( idx=0; idx<res[i]->ndat; idx++ ) {
 	  if( (res[i]->sdata[idx]->file->name)[0] ) {
+
+	    /* temporarily set the QUALITY pointer in the residual */	    
+	    qua_data = (unsigned char *) res[i]->sdata[idx]->pntr[2];
+	    res[i]->sdata[idx]->pntr[2] = qua[i]->sdata[idx]->pntr[0];
+
+	    /* Export the data */
 	    smf_model_NDFexport( res[i]->sdata[idx], 
 				 res[i]->sdata[idx]->file->name, 
 				 status );
+
+	    /* Set it to point back at the old buffer */
+	    res[i]->sdata[idx]->pntr[2] = (void *) qua_data;
 	  }
 	}
+
 	if( !memiter ) 
 	  smf_close_related( &res[i], status );
 
@@ -778,23 +792,33 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   if( lutgroup ) smf_close_smfGroup( &lutgroup, status );  
   if( quagroup ) smf_close_smfGroup( &quagroup, status );  
 
-  /* dynamic model smfArrays */
-  for( i=0; i<nchunks; i++ ) {
-    if( res ) {
+  /* fixed model smfArrays */
+  if( res ) {
+    for( i=0; i<nchunks; i++ ) {
       if( res[i] ) smf_close_related( &res[i], status );
     }
+    res = smf_free( res, status );
+  }
 
-    if( ast ) {
+  if( ast ) {
+    for( i=0; i<nchunks; i++ ) {
       if( ast[i] ) smf_close_related( &ast[i], status );
     }
+    ast = smf_free( ast, status );
+  }
 
-    if( lut ) {
+  if( lut ) {
+    for( i=0; i<nchunks; i++ ) {
       if( lut[i] ) smf_close_related( &lut[i], status );
     }
-
-    if( qua ) {
+    lut = smf_free( lut, status );
+  }
+  
+  if( qua ) {
+    for( i=0; i<nchunks; i++ ) {
       if( qua[i] ) smf_close_related( &qua[i], status );
     }
+    qua = smf_free( qua, status );
   }
 
   /* dynamic model smfGroups */
@@ -805,7 +829,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
     /* Free array of smfGroup pointers at this time chunk */
     modelgroups = smf_free( modelgroups, status );
-    modelgroups = NULL;
   }
     
   /* dynamic model smfArrays */
