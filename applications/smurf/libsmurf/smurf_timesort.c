@@ -148,6 +148,13 @@
 *        headers NSUBSCAN and OBSEND in the output NDFs.
 *     4-APR-2008 (DSB):
 *        Add parameter OUTFILES.
+*     14-APR-2008 (DSB):
+*        - Merge detector metadata from time slices that have the same
+*        RTS_NUM value.
+*        - Correct the check that the same RTS_NUM values are present in 
+*        each sub-system.
+*        - Report an error if conflicting data values are found for the
+*        same detector and RTS_NUM value.
 
 *  Copyright:
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
@@ -252,6 +259,7 @@ void smurf_timesort( int *status ) {
    int **sysrts = NULL;
    int *file_index = NULL;
    int *first = NULL;         
+   int *good_dets = NULL;         
    int *index = NULL;         
    int *itimeout = NULL;
    int *mask = NULL;
@@ -283,6 +291,7 @@ void smurf_timesort( int *status ) {
    int j;
    int jel;
    int k;
+   int l;
    int lbnd[ 3 ];
    int maxsyspop;
    int merge;                 
@@ -940,9 +949,16 @@ void smurf_timesort( int *status ) {
 
 /* Allocate an array to hold the output RTS_NUM values. */
             sysrts[ isubsys ] = astMalloc( sizeof( int )*nts_out );
-            nsysrts[ isubsys ] = nts_out;
+
+/* Allocate an array to hold flags indicating which detectors have any
+   good input data in a specific time slice. */
+            good_dets = astMalloc( sizeof( int )*ndet );
+
+/* Initialise the number of output time slices created for this
+   sub-system. */
+            l = 0;
       
-/* Note the number of detectors in each outptu NDF. The output NDFs will have 
+/* Note the number of detectors in each output NDF. The output NDFs will have 
    fewer detectors if any bad detectors are being purged. */
             ndet_out = ndet - nbaddet;
 
@@ -1124,7 +1140,7 @@ void smurf_timesort( int *status ) {
                   taiout[ k ] = tai[ i ]; 
       
 /* Store the RTS_NUM value for this output time slice. */
-                  sysrts[ isubsys ][ k ] = rts_num;
+                  sysrts[ isubsys ][ l++ ] = rts_num;
       
 /* Loop round all input time slices that refer to the same RTS_NUM value. */
                   init = 1;
@@ -1162,6 +1178,10 @@ void smurf_timesort( int *status ) {
 /* Loop round all detectors in the input NDF. */
                      for( idet = 0; idet < ndet; idet++ ) {
 
+/* Initialise a flag to indicate that the spectrum from this input detector 
+   contains no good data values. */
+                        good_dets[ idet ] = 0;
+
 /* Only copy this detector if we are not masking, or if the mask value
    for this detector is non-zero. */
                         if( !mask || mask[ idet ] ) {
@@ -1176,12 +1196,30 @@ void smurf_timesort( int *status ) {
                                 ichan++, iel++, jel++ ) {
 
 /* If the input data value is good, copy it to the output, plus any
-   associated quality and variance values. */
+   associated quality and variance values. Report an error if the output
+   has already been assigned a good value at this poiint. */
                               if( dts_in[ iel ] != VAL__BADR ) {
-                                 dts_out[ jel ] = dts_in[ iel ];
-                                 if( hasvar ) vts_out[ jel ] = vts_in[ iel ];
-                                 if( hasqual) qts_out[ jel ] = qts_in[ iel ];
+
+                                 if( init || dts_out[ jel ] == VAL__BADR ) {
+                                    dts_out[ jel ] = dts_in[ iel ];
+                                    if( hasvar ) vts_out[ jel ] = vts_in[ iel ];
+                                    if( hasqual) qts_out[ jel ] = qts_in[ iel ];
+
+                                 } else if( *status == SAI__OK ) {
+                                    *status = SAI__ERROR;
+                                    msgSeti( "D", idet + 1 );
+                                    msgSeti( "R", rts_num0 );
+                                    errRep( "", "More than one good input "
+                                            "spectrum found for detector "
+                                            "^D RTS_NUM ^R (possible data "
+                                            "integrity problem).", status );
+                                    break;
+                                 }
         
+/* Store a flag indicating that this input spectrum contains some good
+   data. */
+                                 good_dets[ idet ] = 1;
+
 /* If the input data value is bad, only copy it to the output if this is
    the first input time slice that contributes to the current output time
    slice. This prevents later bad values being pasted over the top of
@@ -1197,6 +1235,22 @@ void smurf_timesort( int *status ) {
       
 /* Annul the identifier for the current time slice in the input NDF. */
                      ndfAnnul( &indf1s, status );
+      
+/* Merge the extension values stored for this input time slice with the
+   extension values for the first time slice that referred to the current
+   RTS_NUM value. For most items the extension values should be the same
+   for all input time slices that refer to the same RTS_NUM value. If any
+   differences are found for these items, an error is reported. However,
+   items that are indexed by detector number (all in the ACSIS extension) 
+   need to be merged since each input time slice will describe a different 
+   set of detectors. It is assumed that any detector axis will always be
+   the last but one axis in the extension item (the last axis being the
+   time slice axis). Extension items are set bad for any detector that
+   has no good data values in its spectrum. */
+                     smf_kmmerge( "JCMTSTATE", km1, i, itimeout[ k ], ndet, 
+                                  good_dets, nts_in, rts_num0, status );
+                     smf_kmmerge( "ACSIS", km2, i, itimeout[ k ], ndet, 
+                                  good_dets, nts_in, rts_num0, status );
       
 /* Move on to the next input time slice. */
                      if( ++j < nts_in ) {
@@ -1266,6 +1320,9 @@ void smurf_timesort( int *status ) {
                }
             }
       
+/* Record the number of output time slices created for this sub-system. */
+            nsysrts[ isubsys ] = l;
+
 /* Free resources. */
             ndfid = astFree( ndfid );
             taiout = astFree( taiout );
@@ -1275,6 +1332,7 @@ void smurf_timesort( int *status ) {
             file_index = astFree( file_index );
             grid = astFree( grid );
             tai = astFree( tai );
+            good_dets = astFree( good_dets );
 
 /* End the AST and NDF context. */
             ndfEnd( status );

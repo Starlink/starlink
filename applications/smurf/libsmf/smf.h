@@ -871,5 +871,6 @@ void smf_detmaskd( double *in, int ndim, int *dims_in, int maxis, int *mask, dou
 void smf_detmaski( int *in, int ndim, int *dims_in, int maxis, int *mask, int *out, int *status );
 void smf_detmaskc( char *in, int len, int ndim, int *dims_in, int maxis, int *mask, char *out, int *status );
 
+void smf_kmmerge( const char *xname, AstKeyMap *keymap, int from, int into, int ndet, int *mask, int nts, int rts_num, int *status );
 
 #endif /* SMF_DEFINED */

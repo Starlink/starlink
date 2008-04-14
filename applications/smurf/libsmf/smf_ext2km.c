@@ -50,8 +50,10 @@
 *
 *     The named extension is searched for primitive array components
 *     that have a final trailing axis length equal to the length of the 
-*     NDFs 3rd pixel axis. Any such arrays are vectorised and stored in
-*     the KeyMap, in the manner determined by the "mode" argument.
+*     NDFs 3rd pixel axis. An additional constraint is that if "xname" is
+*     ACSIS, only arrays with at least 2 axes are used. Any such arrays are 
+*     vectorised and stored in the KeyMap, in the manner determined by the 
+*     "mode" argument.
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
@@ -60,6 +62,10 @@
 *  History:
 *     11-MAR-2008 (DSB):
 *        Initial version.
+*     14-APR-2008 (DSB):
+*        Only copy ACSIS arrays that have at least 2 axes. This guards
+*        against problems if the number of time slices is equal to the 
+*        number of detectors.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -139,8 +145,13 @@ void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap,
    to the number of time slices. */
             if( ndim > 0 && dim[ ndim - 1 ] == ntime ) {
 
+/* Also skip if we are dealing with the ACSIS extension and the array has
+   only 1 (or zero) axes. */
+               if( ndim > 1 || strcmp( xname, "ACSIS" ) ) {
+
 /* If it is, store the values as a new entry in "keymap". */
-               kpg1Hdsky( cloc, keymap, 2, 1, status );
+                  kpg1Hdsky( cloc, keymap, 2, 1, status );
+               }
             }
          }
          datAnnul( &cloc, status );
@@ -169,9 +180,13 @@ void smf_ext2km( int indf, const char *xname, AstKeyMap *keymap,
                datShape( cloc, NDF__MXDIM, dim, &ndim, status );
                if( ndim > 0 && dim[ ndim - 1 ] == ntime ) {
 
-/* If it is OK, append the values to the end of the existing KeyMap entry. */
-                  kpg1Hdsky( cloc, keymap, 1, 3, status );
+/* Also skip if we are dealing with the ACSIS extension and the array has
+   only 1 (or zero) axes. */
+                  if( ndim > 1 || strcmp( xname, "ACSIS" ) ) {
 
+/* If it is OK, append the values to the end of the existing KeyMap entry. */
+                     kpg1Hdsky( cloc, keymap, 1, 3, status );
+                  }
 
                } else if( *status == SAI__OK ) {
                   *status = SAI__ERROR;
