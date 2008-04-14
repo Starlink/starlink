@@ -69,6 +69,9 @@
 *        Modified interface to use smfDIMMData
 *     2008-04-03 (EC)
 *        Use QUALITY
+*     2008-04-14 (EC)
+*        - enabled boxcar smoothing again
+*        - improved QUALITY masking
 *     {enter_further_changes_here}
 
 
@@ -122,7 +125,8 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   int idx=0;                    /* Index within subgroup */
   dim_t j;                      /* Loop counter */
   double lastmean;              /* Mean from previous iteration */
-  unsigned char mask;           /* Bitmask for quality */
+  unsigned char mask_cor;       /* Ignore quality mask for correction */
+  unsigned char mask_meas;      /* Ignore quality mask for measurement */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   double *model_data_copy=NULL; /* Copy of model_data */
@@ -221,8 +225,11 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     /* Geta pointer to the QUAlity array */
     qua_data = (unsigned char *)(qua->sdata[idx]->pntr)[0];
 
-    /* Which QUALITY bits should be considered for ignoring data */
-    mask = 255 - SMF__Q_JUMP;
+    /* Which QUALITY bits should be checked for correcting samples */
+    mask_cor = SMF__Q_BADS | SMF__Q_BADB;
+
+    /* Which QUALITY bits should be checked for measuring the mean */
+    mask_meas = SMF__Q_BADS | SMF__Q_BADB | SMF__Q_SPIKE;
 
     if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;
@@ -234,16 +241,22 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 	
 	/* First loop over bolometers to put the previous common-mode
 	   signal back in at each time-slice, and calculate the sum of
-	   all the detectors. */
+	   all the detectors with good data. */
 
 	lastmean = model_data_copy[i];
 	sum = 0;
 	base = 0; /* Offset to the start of the j'th bolometer in the buffer */
 
-	for( j=0; j<nbolo; j++ ) if( !(qua_data[base+i]&mask) ) {
-	  res_data[base+i] += lastmean;
-	  model_data[i] += res_data[base+i];
-	  weight[i]++;
+	for( j=0; j<nbolo; j++ ) {
+	  if( !(qua_data[base+i]&mask_cor) ) {
+	    res_data[base+i] += lastmean;
+	  }
+
+	  if( !(qua_data[base+i]&mask_meas) ) {
+	    model_data[i] += res_data[base+i];
+	    weight[i]++;
+	  }
+
 	  base += ntslice;
 	}
       }
@@ -258,11 +271,9 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   }
 
   /* boxcar smooth if desired */
-  /* Currently disabled
   if( do_boxcar ) {
-    smf_boxcar1( model_data, ntslice, boxcar, status );
+    smf_boxcar1( model_data, ntslice, boxcar, NULL, 0, status );
   }
-  */
 
   /* remove common mode from residual */
   for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
@@ -280,7 +291,7 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
       /* Loop over bolometer */
       for( j=0; j<nbolo; j++ ) {
 	/* update the residual */
-	if( !(qua_data[base+i]&mask) ) {
+	if( !(qua_data[base+i]&mask_cor) ) {
 	  res_data[base + i] -= model_data[i];
 	}
 	base += ntslice;
