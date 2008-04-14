@@ -56,6 +56,8 @@
 *        Modified interface to use smfDIMMData
 *     2008-04-03 (EC)
 *        Use QUALITY
+*     2008-04-14 (EC)
+*        Added optional despiking (NOISPIKETHRESH/NOISPIKEITER)
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -101,6 +103,7 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 			smfArray **allmodel, int flags, int *status) {
 
   /* Local Variables */
+  unsigned int aiter;           /* Actual iterations of sigma clipper */
   dim_t base;                   /* Base index of bolometer */
   dim_t i;                      /* Loop counter */
   int idx=0;                    /* Index within subgroup */
@@ -118,6 +121,9 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   double sigma;                 /* Array standard deviation */ 
+  unsigned int spikeiter;       /* Number of iterations for spike detection */
+  int spikeiter_s;              /* signed version of spikeiter */
+  double spikethresh;           /* Threshold for spike detection */
   double var;                   /* Sample variance */
                                    
   /* Main routine */
@@ -132,6 +138,23 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
     smf_dataOrder( res->sdata[idx], 0, status );
     smf_dataOrder( qua->sdata[idx], 0, status );
+  }
+
+  /* Obtain parameters for despiker */
+
+  if( !astMapGet0D( keymap, "NOISPIKETHRESH", &spikethresh ) ) {
+    spikethresh = 0;
+  }
+  
+  if( !astMapGet0I( keymap, "NOISPIKEITER", &spikeiter_s ) ) {
+    spikeiter = 0;
+  } else {
+    if( spikeiter_s < 0 ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "spikeiter cannot be < 0.", status );
+    } else {
+      spikeiter = (unsigned int) spikeiter_s;
+    }
   }
 
   /* Which QUALITY bits should be considered for ignoring data */
@@ -154,6 +177,19 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
       nbolo = (res->sdata[idx]->dims)[0] * (res->sdata[idx]->dims)[1];
       ntslice = (res->sdata[idx]->dims)[2];
       ndata = nbolo*ntslice;
+
+      /* Flag spikes in the residual */
+
+      if( spikethresh ) {
+	msgOut(" ", "  flag spikes...", status);
+	smf_flag_spikes( res->sdata[idx], qua_data, 
+			 SMF__Q_BADS|SMF__Q_BADB|SMF__Q_SPIKE,
+			 spikethresh, spikeiter, 
+			 100, &aiter, status );
+	msgSeti("AITER",aiter);
+	msgOut(" ", "  ...finished in ^AITER iterations",
+	       status); 
+      }
 
       for( i=0; i<nbolo; i++ ) if( !(qua_data[i*ntslice]&SMF__Q_BADB) ) {
 	/* Measure the sample standard deviation for
