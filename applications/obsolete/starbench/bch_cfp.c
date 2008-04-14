@@ -862,7 +862,7 @@ vvd ( db, -0.4036047164116848, 1e-12, "slaEqecl", "b", status );
 }
 void t_eqeqx ( int *status )
 {
-vvd ( sbmeqeqx ( 41234.0 ), 5.357758254609261e-5, 1e-17,
+vvd ( sbmeqeqx ( 41234.0 ), 5.376047445838220e-5, 1e-17,
 "slaEqeqx", "", status );
 }
 void t_eqgal ( int *status )
@@ -987,8 +987,8 @@ vvd ( xz, -0.02603383018243591, 1e-12, "slaDcmpf", "xz", status);
 vvd ( yz, -0.003845593915717770, 1e-12, "slaDcmpf", "yz", status);
 vvd ( xs, -1.005634913465693, 1e-12, "slaDcmpf", "xs", status);
 vvd ( ys, 0.9994849826847614, 1e-12, "slaDcmpf", "ys", status);
-vvd ( perp, 0.002004707996156263, 1e-12, "slaDcmpf", "p", status);
-vvd ( orient, -3.140460861823333, 1e-12, "slaDcmpf", "o", status);
+vvd ( perp, -0.002004707996156263, 1e-12, "slaDcmpf", "p", status);
+vvd ( orient, 3.140460861823333, 1e-12, "slaDcmpf", "o", status);
 }
 void t_fk425 ( int *status )
 {
@@ -1283,8 +1283,8 @@ vvd ( rmatn[2][1],  2.380327391436537e-5, 1e-12,
 vvd ( rmatn[2][2],  9.999999992340332e-1, 1e-12,
 "slaNut", "[2][2]", status );
 sbmnutc ( 50123.4, &dpsi, &deps, &eps0 );
-vvd ( dpsi, 3.537714281665895e-5, 1e-17, "slaNutc", "dpsi", status );
-vvd ( deps, -4.140590085987164e-5, 1e-17, "slaNutc", "deps", status );
+vvd ( dpsi, 3.523550954747942e-5, 1e-17, "slaNutc", "dpsi", status );
+vvd ( deps, -4.143371566683342e-5, 1e-17, "slaNutc", "deps", status );
 vvd ( eps0, 0.4091016349007751, 1e-12, "slaNutc", "eps0", status );
 }
 void t_obs ( int *status )
