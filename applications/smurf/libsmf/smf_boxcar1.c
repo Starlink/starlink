@@ -14,6 +14,7 @@
 
 *  Invocation:
 *     smf_boxcar1 ( double *series, const size_t ninpts, size_t window, 
+*                   unsigned char *qual, unsigned char mask, 
 *                   int *status )
 
 *  Arguments:
@@ -23,6 +24,13 @@
 *        Number of points in input series
 *     window = size_t (Given)
 *        Size of boxcar filter window (in array elements)
+*     qual = usigned char* (Given)
+*        If specified, use this QUALITY array to decide which samples
+*        to use (provided mask). Otherwise data are only ignored if set
+*        to VAL__BADD.
+*     mask = unsigned char (Given)
+*        Use with qual to define which bits in quality are relevant to
+*        ignore data in the calculation.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -32,8 +40,8 @@
 *     the appropriate average value. If the window size exceeds the
 *     size of the input array then the routine will replace the array
 *     values with the mean of the entire array. The half-windows at
-*     the start and end are filled with the nearest calculated smooth
-*     values.
+*     the start and end are filled with smoothed values over shortened
+*     intervals (smoothly changes from WINDOW to 1 sample in length). 
 
 *  Notes: 
 *     Does not deal with bad values
@@ -53,6 +61,9 @@
 *        assigned same smooth value to all samples within disjoint windows)
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-04-14 (EC):
+*        -added QUALITY masking
+*        -algorithm now smooths with shortened intervals at array ends
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -99,9 +110,13 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_boxcar1"
 
-void smf_boxcar1 ( double *series, const size_t ninpts, size_t window, int *status) {
+void smf_boxcar1( double *series, const size_t ninpts, size_t window, 
+		  unsigned char *qual, unsigned char mask, 
+		  int *status) {
 
   /* Local variables */
+  size_t off;                 /* offset from loop counter to modified sample */
+  size_t count;               /* Number of samples in window */
   size_t i;                   /* Loop counter */
   size_t j;                   /* Loop counter */
   double pad=0;               /* Pad value */
@@ -112,14 +127,16 @@ void smf_boxcar1 ( double *series, const size_t ninpts, size_t window, int *stat
   if (*status != SAI__OK) return;
 
   /* Return if window is unity or the array only has 1 point */
-  if ( window == 1 || ninpts == 1 ) return;
+  if ( window == 1 || ninpts <= 1 ) return;
 
   /* Sanity check: is window smaller than size of input array? */
   if ( window > ninpts ) {
     msgSeti("B",(int)window);
     msgSeti("N",(int)ninpts);
-    msgOut(" ", "Size of window exceeds extent of data array: will return average for whole array", status);
-    window = ninpts;
+    *status = SAI__ERROR;
+    errRep(FUNC_NAME, "Size of window (^B) exceeds extent of data array (^N)", 
+	   status);
+    return;
   }
 
   /* Make a copy of the time series that won't get altered as we go */
@@ -129,42 +146,95 @@ void smf_boxcar1 ( double *series, const size_t ninpts, size_t window, int *stat
     memcpy( seriescopy, series, ninpts*sizeof(*series) );
 
     sum = 0;
+    count = 0;
 
-    for( i=0; i<ninpts; i++ ) {
-      /* sum another point from the unaltered array */
-      sum += seriescopy[i];
-
-      /* If we have a full window start calculating smooth values */
-      if( i >= (window-1) ) {
-	series[i-window/2] = sum / (double) window;
-
-	/* Subtract off the first sample in the window here before adding in
-           a new point next time around the loop */
-	sum -= seriescopy[i-(window-1)];
-      }
-    }
-
-    /* Pad the start and end half-windows with nearest smoothed value */
-
-    if( (ninpts == window) && ((ninpts % 2) == 0 ) ) {
-      /* In this special case modify the algorithm to correctly pad the
-	 entire array with the single mean value */
-      pad = series[ninpts-1-window/2];
+    if( qual ) {    /* QUALITY checking version */
+      
       for( i=0; i<ninpts; i++ ) {
-    	series[i] = pad;
+	/* sum another point from the unaltered array */
+	if( !(qual[i]&mask) ) {
+	  sum += seriescopy[i];
+	  count++;
+	}
+	
+	if( i < (window-1) ) off = -i/2;
+	else off = -window/2;
+	
+	/* As soon as we have at least 2 samples start applying smooth val */
+	if( count > 1 ) {
+	  series[i+off] = sum / (double) count;      
+	}
+	
+	/* Subtract off the first sample in the window if we are at
+	   least window samples from the start here before adding in a
+	   new point next time around the loop */
+	if( (i >= (window-1)) && !(qual[i-(window-1)]&mask) ) {
+	  sum -= seriescopy[i-(window-1)];
+	  count--;
+	}
+	
       }
-    } else { 
-      /* Otherwise pad value comes one sample after/before the ends of the
-         half-windows */ 
-      for( i=0; i<window/2; i++ ) {
-    	series[i] = series[window/2+1];
-    	series[ninpts-1-i] = series[ninpts-2-window/2];
+      
+      /* at the end of the array smooth using the partial window */
+      for( i=ninpts-window; i<ninpts; i++ ) {
+	off = (ninpts-i-1)/2;
+	
+	if( count > 1 ) {
+	  series[i+off] = sum / (double) count;
+	}
+	
+	/* Remove the sample at i from the window */
+	if( seriescopy[i] != VAL__BADD ) {
+	  sum -= seriescopy[i];
+	  count--;
+	}
+      }
+
+    } else {        /* VAL__BADD checking version */
+
+      for( i=0; i<ninpts; i++ ) {
+	/* sum another point from the unaltered array */
+	if( seriescopy[i] != VAL__BADD ) {
+	  sum += seriescopy[i];
+	  count++;
+	}
+	
+	if( i < (window-1) ) off = -i/2;
+	else off = -window/2;
+	
+	/* As soon as we have at least 2 samples start applying smooth val */
+	if( count > 1 ) {
+	  series[i+off] = sum / (double) count;      
+	}
+	
+	/* Subtract off the first sample in the window if we are at
+	   least window samples from the start here before adding in a
+	   new point next time around the loop */
+	if( (i >= (window-1)) && (seriescopy[i-(window-1)] != VAL__BADD) ) {
+	  sum -= seriescopy[i-(window-1)];
+	  count--;
+	}
+	
+      }
+      
+      /* at the end of the array smooth using the partial window */
+      for( i=ninpts-window; i<ninpts; i++ ) {
+	off = (ninpts-i-1)/2;
+	
+	if( count > 1 ) {
+	  series[i+off] = sum / (double) count;
+	}
+	
+	/* Remove the sample at i from the window */
+	if( seriescopy[i] != VAL__BADD ) {
+	  sum -= seriescopy[i];
+	  count--;
+	}
       }
     }
   }
 
   /* Clean Up */
-  if ( seriescopy ) 
-    seriescopy = smf_free( seriescopy, status );
+  if ( seriescopy ) seriescopy = smf_free( seriescopy, status );
 
 }
