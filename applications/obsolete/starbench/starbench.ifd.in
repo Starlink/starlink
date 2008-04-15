@@ -21,7 +21,12 @@ package starbench {
 	obey {$BENCH_DIR/scan}
     }
 
+    sh {
+      export BENCH_VERSION=@PACKAGE_VERSION@
+    }
+
     csh {
+      setenv BENCH_VERSION @PACKAGE_VERSION@
 
       echo -n "   USSC packages: "
       unsetenv BENCH_KAPPA BENCH_PISA BENCH_FIG BENCH_CCDPACK BENCH_USSC
