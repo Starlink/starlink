@@ -17,6 +17,7 @@ STAR_DEFAULTS(per-package-dirs)
 STAR_MONOLITHS
 
 STAR_CHECK_PROGS(fgeneric)
+STAR_CHECK_PROGS(ifd2star)
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
@@ -32,6 +33,6 @@ dnl    No use dependencies
 
 STAR_LATEX_DOCUMENTATION(ssn23)
 
-AC_CONFIG_FILES([Makefile component.xml slatest/Makefile])
+AC_CONFIG_FILES([Makefile component.xml slatest/Makefile starbench.ifd ])
 
 AC_OUTPUT

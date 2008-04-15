@@ -2,7 +2,7 @@
 
 SUBDIRS = slatest
 
-bin_SCRIPTS = bench scan submit starbench.csh $(PRIVATESCRIPTS)
+bin_SCRIPTS = bench scan submit $(STARTUP_SCRIPT) $(PRIVATESCRIPTS)
 
 bin_PROGRAMS = bch_cfp sysinfo
 
@@ -22,6 +22,9 @@ bin_DATA = $(DATA_FILES)
 
 #
 
+STARTUP_SCRIPT = starbench.csh starbench.sh
+
+IFD_FILES = starbench.ifd
 IFL_FILES = bch_fft.ifl
 IFC_FILES = $(IFL_FILES:.ifl=.ifc)
 
@@ -51,3 +54,6 @@ datdataps.par datfitsks.par datphotps.par starbench.cal
 
 .gdr.f:
 	$(FGENERIC)  -t dr $<
+
+$(IFL_FILES) $(STARTUP_SCRIPT): $(IFD_FILES)
+	$(IFD2STAR) starbench

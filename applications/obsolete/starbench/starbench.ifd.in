@@ -1,0 +1,66 @@
+package starbench {
+    version @PKG_VERS@
+    prefix bch
+
+    executable bch_fft {
+	action bch_fft {
+	    
+	}
+    }
+
+    command bench {
+	obey {$BENCH_DIR/bench}
+    }
+
+    command submit {
+	obey {$BENCH_DIR/submit}
+    }
+
+    command scan {
+	obey {$BENCH_DIR/scan}
+    }
+
+    csh {
+
+      echo -n "   USSC packages: "
+      unsetenv BENCH_KAPPA BENCH_PISA BENCH_FIG BENCH_CCDPACK BENCH_USSC
+      if ( $?KAPPA_DIR == 1 ) then
+         if ( -e $KAPPA_DIR ) setenv BENCH_KAPPA YES
+      endif
+      if ( $?PISA_DIR == 1 ) then
+         if ( -e $PISA_DIR ) setenv BENCH_PISA YES
+      endif
+      if ( $?FIG_DIR == 1 ) then
+         if ( -e $FIG_DIR ) setenv BENCH_FIG YES
+      endif
+      if ( $?CCDPACK_DIR == 1 ) then
+         if ( -e $CCDPACK_DIR ) setenv BENCH_CCDPACK YES
+      endif
+      if ( $?BENCH_KAPPA == 1 && \
+           $?BENCH_PISA == 1 && \
+           $?BENCH_FIG == 1 && \
+           $?BENCH_CCDPACK == 1 ) then
+        setenv BENCH_USSC YES
+      endif
+      if ( $?BENCH_USSC == 1 ) then
+        echo " Available"
+
+        # Get the version number for the Starlink installation
+        set ussc_ver = `tail -1 $STARLINK_DIR/manifests/starlink.version`
+        setenv BENCH_USSC_VER  $ussc_ver[1]
+      else
+        echo " Not available"
+      endif
+
+
+    }
+
+    display {
+
+	Starlink Benchmark Utility now available -- (Version @PKG_VERS@)
+
+	Type "showme ssn23" to browse the hypertext documentation.
+
+    }
+
+}
