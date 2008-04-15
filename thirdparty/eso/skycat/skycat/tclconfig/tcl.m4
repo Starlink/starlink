@@ -1703,7 +1703,7 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 		SHLIB_LD="$CXX -shared"
 		LD_SEARCH_FLAGS='-Wl,-R,${LIB_RUNTIME_DIR}'
 	    else
-		SHLIB_LD="/usr/ccs/bin/ld -G -z text"
+		SHLIB_LD="$CXX -G -z text"
 		LD_SEARCH_FLAGS='-R ${LIB_RUNTIME_DIR}'
 	    	SHLIB_CFLAGS="-KPIC"
 	    fi
@@ -1779,7 +1779,7 @@ dnl AC_CHECK_TOOL(AR, ar, :)
 		fi
 	    else
 	 	SHLIB_CFLAGS="-KPIC"
-		SHLIB_LD="/usr/ccs/bin/ld -G -z text"
+		SHLIB_LD="$CXX -G -z text"
 		LD_SEARCH_FLAGS='-R ${LIB_RUNTIME_DIR}'
 	    fi
 	    ;;
