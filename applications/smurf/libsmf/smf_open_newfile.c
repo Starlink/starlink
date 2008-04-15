@@ -76,6 +76,8 @@
 *        Add status checking
 *     2006-10-11 (AGG):
 *        Change API to take lbnd, ubnd from caller
+*     2008-04-14 (EC):
+*        Add named QUALITY extension
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -139,6 +141,7 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
   int isTstream = 0;            /* Flag to denote time series (3-D) data */
   int nel;                      /* Number of mapped elements */
   int newndf;                   /* NDF identified for new file */
+  IRQLocs *qlocs = NULL;        /* Named quality resources */
   char *pname = NULL;           /* Pointer to filename */
   void *pntr[3] = { NULL, NULL, NULL }; /* Array of pointers for smfData */
 
@@ -211,7 +214,15 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
     }
   }
   if ( flags & SMF__MAP_QUAL ) {
+
+    /* Create the named QUALITY bits extension before calling ndfMap */
+    smf_create_qualname( "WRITE", newndf, &qlocs, status );
+
     ndfMap(newndf, "QUALITY", "_UBYTE", "WRITE", &(pntr[2]), &nel, status);
+
+    /* Done with quality names so free resources */
+    irqRlse( &qlocs, status );
+
     if ( *status != SAI__OK ) {
       errRep(FUNC_NAME, "Unable to map quality array", status);
       return;
