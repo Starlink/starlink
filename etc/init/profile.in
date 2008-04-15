@@ -390,10 +390,18 @@ if test -f ${bindir}/sst/sst.sh; then
    export SST_HELP=${starhelpdir}/sst/sst
 fi
 
+#  STARBENCH
+
+if test -f ${bindir}/starbench/starbench.sh; then
+   export BENCH_DIR=${bindir}/starbench
+fi
+
 #  STARMAN
 
 if test -f ${bindir}/starman/starman.sh; then
    export STARMAN_DIR=${bindir}/starman
+   export STARMAN_HELP=${starhelpdir}/starman
+   export STARMAN_DATA=${staretcdir}/starman
 fi
 
 #  STILTS
@@ -684,6 +692,14 @@ if test -f ${bindir}/sst/sst.sh; then
 else
   sst () { ${staretcdir}/notinst sst; }
   sstsetup () { ${staretcdir}/notinst sst; }
+fi
+
+# STARBENCH
+
+if test -f ${bindir}/starbench/starbench.sh; then
+  starbench () { . $BENCH_DIR/starbench.sh; }
+else
+  starbench () { ${staretcdir}/notinst starbench; }
 fi
 
 # STARMAN

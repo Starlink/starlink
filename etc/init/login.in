@@ -536,9 +536,17 @@ endif
  endif
 
 #
+#  STARBENCH
+ if (-e ${bindir}/starbench/starbench.csh) then
+    setenv BENCH_DIR ${bindir}/starbench
+ endif
+
+#
 #  STARMAN
  if (-e ${bindir}/starman/starman.csh) then
     setenv STARMAN_DIR ${bindir}/starman
+    setenv STARMAN_HELP ${starhelpdir}/starman
+    setenv STARMAN_DATA ${staretcdir}/starman
  endif
  
 #

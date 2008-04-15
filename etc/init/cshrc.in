@@ -694,6 +694,16 @@ endif
  endif
 
 #
+#   Starbench
+#
+
+if ( -e ${bindir}/starbench/starbench.csh ) then
+   alias starbench source ${bindir}/starbench/starbench.csh
+else
+   alias starbench ${staretcdir}/notinst starbench
+endif
+
+#
 #   Starman
 #
 
