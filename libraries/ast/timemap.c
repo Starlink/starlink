@@ -84,6 +84,9 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 *     3-APR-2008 (DSB):
 *        Only call memcpy if the source and destination pointers are
 *        different.
+*     15-APR-2008 (DSB):
+*        Add missing "break;" statement to "case AST__LMSTTOGMST:" 
+*        in Transform.
 *class--
 */
 
@@ -4070,6 +4073,7 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                      }
                   }
                }
+               break;
 
 /* UT1 to UTC. */
 /* ------------- */
