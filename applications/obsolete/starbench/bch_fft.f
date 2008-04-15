@@ -21,6 +21,7 @@
 
 *  Authors:
 *     TMG: Tim Gledhill (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -29,6 +30,8 @@
 *    20-MAR-1996 (TMG):
 *        Change to use the FFTPACK routines implemented in the PDA
 *        package.
+*    15-APR-2008 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_changes_here}
 
 *  Bugs:
@@ -41,7 +44,8 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard constants
-      
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+
 *  Global Status:
       INTEGER STATUS             ! global status
       
@@ -84,7 +88,7 @@
 * Populate the array with double precision  values. The values range
 * from 1 to MAXX * MAXY.
 
-      CALL BCH_SETIP( %VAL( MP_IN ), NX, NY )
+      CALL BCH_SETIP( %VAL( CNF_PVAL( MP_IN ) ), NX, NY )
       DFILL = 0.0D0
 
 * Loop to transform the array.
@@ -93,11 +97,12 @@
 
 * Call the FFT preparation routine then do the forward FFT.
 
-        CALL KPS1_FOPRD( NX, NY, %VAL( MP_IN ), NX, NY, DFILL,
-     :                   .FALSE., %VAL( MP_WK1 ), STATUS )
-        CALL KPS1_FOFOD( NX, NY, .FALSE., %VAL( MP_WK1 ),
-     :                   %VAL( MP_WK2 ), %VAL( MP_WK4 ),
-     :                   %VAL( MP_WK3 ), STATUS ) 
+        CALL KPS1_FOPRD( NX, NY, %VAL( CNF_PVAL( MP_IN ) ),NX,NY,DFILL,
+     :                   .FALSE., %VAL( CNF_PVAL(MP_WK1) ), STATUS )
+        CALL KPS1_FOFOD( NX, NY, .FALSE., %VAL( CNF_PVAL(MP_WK1) ),
+     :                   %VAL( CNF_PVAL(MP_WK2) ), 
+     :                   %VAL( CNF_PVAL(MP_WK4) ),
+     :                   %VAL( CNF_PVAL(MP_WK3) ), STATUS ) 
          IF ( STATUS .NE. SAI__OK ) GO TO 99
  3    CONTINUE
 
