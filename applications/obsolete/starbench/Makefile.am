@@ -8,7 +8,7 @@ bin_SCRIPTS = bench scan submit $(STARTUP_SCRIPT) $(PRIVATESCRIPTS) \
 bin_PROGRAMS = bch_cfp sysinfo
 
 bin_MONOLITHS = bch_fft
-bch_fft_SOURCES = bch_fft.f $(KPS_DR_GEN)
+bch_fft_SOURCES = bch_fft.f $(GEN_F_ROUTINES)
 bch_fft_LDADD = `$(srcdir)/starbench_link_adam`
 
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
@@ -30,6 +30,8 @@ IFL_FILES = bch_fft.ifl
 IFC_FILES = $(IFL_FILES:.ifl=.ifc)
 
 KPS_DR_GEN = kps1_fopr.gdr kps1_fofo.gdr
+
+GEN_F_ROUTINES = $(KPS_DR_GEN:.gdr=.f)
 
 # Public scripts
 
