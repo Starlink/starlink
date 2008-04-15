@@ -99,6 +99,8 @@
 *        Remove wcs argument (not needed).
 *     2008-04-11 (JB):
 *        Add NCHNSUBS FITS header.
+*     2008-04-14 (JB):
+*        Add a few missing FITS headers.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -227,7 +229,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   /* Copy the obsID into the obsIDSS and add the subsystem number. */
   sprintf ( obsIDSS, "%s_%i", dateVars->obsID, 
-            subBandNum % nSubsys );
+            subBandNum % nSubsys + 1 );
 
 
   /* Integration time related. */
@@ -802,17 +804,26 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   }
 
+  astSetFitsS ( fitschan, "ROT_CRD", AST__UNDEFS,
+		"Coordinate frame of image rotator", 0 );
+
+  astSetFitsF ( fitschan, "ROT_PA", AST__UNDEFF,
+		"[[deg] Angle of image rotator", 0 );
+
   astSetFitsI ( fitschan, "JIGL_CNT", AST__UNDEFI,
 		"Number of offsets in jiggle pattern", 0 );
 
   astSetFitsS ( fitschan, "JIGL_NAM", AST__UNDEFS,
 		"File containing the jiggle offsets", 0 );
 
-  astSetFitsF ( fitschan, "JIGL_PA", AST__UNDEFF,
+  astSetFitsF ( fitschan, "JIG_PA", AST__UNDEFF,
 		"[deg] Jiggle PA; 0=in lat, 90=in long", 0 );
 
-  astSetFitsS ( fitschan, "JIGL_CRD", AST__UNDEFS,
+  astSetFitsS ( fitschan, "JIG_CRD", AST__UNDEFS,
 		"Jiggling co-ordinate system", 0 );
+
+  astSetFitsF ( fitschan, "JIG_SCAL", AST__UNDEFF,
+		"Scale size of jiggle pattern", 0 );
 
   if ( strcmp ( samMode, "raster" ) == 0
        && strcmp ( mapVars->swMode, "pssw" ) == 0 ) {
@@ -957,6 +968,9 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsS ( fitschan, "OCSCFG", AST__UNDEFS,
 	       "OCS config filename", 0 );
 
+  astSetFitsL ( fitschan, "SIMULATE", 0,
+		"True if any data are simulated", 0 );
+
   astSetFitsL ( fitschan, "SIM_CORR", 0,
 		"True if any CORRTASK is simualted", 0 );
 
@@ -966,14 +980,11 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsL ( fitschan, "SIM_TCS", 0,
 		"True if TCS data is simulated", 0 );
 
-  astSetFitsL ( fitschan, "RTS_SMU", 0,
+  astSetFitsL ( fitschan, "SIM_RTS", 0,
 		"True if RTS data is simulated", 0 );
 
-  astSetFitsL ( fitschan, "IF_SMU", 0,
+  astSetFitsL ( fitschan, "SIM_IF", 0,
 		"True if IF data is simulated", 0 );
-
-  astSetFitsL ( fitschan, "SIMULATE", 0,
-		"True if any data are simulated", 0 );
 
   astSetFitsS ( fitschan, "STATUS", "NORMAL",
 		"Status at end of observation", 0 );
@@ -991,5 +1002,12 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   astSetFitsF ( fitschan, "ROTAFREQ", AST__UNDEFF,
 		"[Hz] Spin frequency (if spinning)", 0 );
+
+  astSetFitsS ( fitschan, "POL_CRD", AST__UNDEFS,
+		"Coordinate frame of polarimeter angles", 0 );
+
+  astSetFitsF ( fitschan, "POL_PA", AST__UNDEFF,
+		"[[deg] Angle of pol fast axis", 0 );
+
 
 }
