@@ -225,7 +225,7 @@ dnl shift is an m4 macro
     [[shift]]
 done
 
-if test ! -z $STARLINK_DIR;
+if test ! -z "$STARLINK_DIR";
 then
   relocate=1
   star_libdir=${STARLINK_DIR}/lib
