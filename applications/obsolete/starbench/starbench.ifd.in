@@ -1,6 +1,7 @@
 package starbench {
     version @PACKAGE_VERSIONS@
     prefix bch
+    exepath { $BENCH_DIR }
 
     executable bch_fft {
 	action bch_fft {
