@@ -2,7 +2,8 @@
 
 SUBDIRS = slatest
 
-bin_SCRIPTS = bench scan submit $(STARTUP_SCRIPT) $(PRIVATESCRIPTS)
+bin_SCRIPTS = bench scan submit $(STARTUP_SCRIPT) $(PRIVATESCRIPTS) \
+	$(PRIVATE_PLATFORMSCRIPTS)
 
 bin_PROGRAMS = bch_cfp sysinfo
 
