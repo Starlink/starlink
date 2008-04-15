@@ -148,8 +148,8 @@
       echo "setenv LD_LIBRARY_PATH $LD_LIBRARY_PATH"             >> $control
       echo "setenv TERM $TERM"                                   >> $control
       echo "setenv iraf $iraf"                                   >> $control
-      echo "source /star/etc/login"                              >> $control
-      echo "source /star/etc/cshrc"                              >> $control
+      echo "source $STARLINK_DIR/etc/login"                              >> $control
+      echo "source $STARLINK_DIR/etc/cshrc"                              >> $control
       echo "cd $cwd"                                             >> $control
       echo "source $BENCH_DIR/starbench.csh"                     >> $control
       echo "$BENCH_DIR/bench -p $packs -l "'$logfile'            >> $control

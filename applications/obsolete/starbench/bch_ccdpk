@@ -53,7 +53,7 @@
 #  See if the ccdpack startup command exists
       set startup_com=`alias ccdpack`
       if ( "$startup_com" == "" ) then
-	 source /star/etc/cshrc
+	 source $STARLINK_DIR/etc/cshrc
       endif
 
 #  Ensure CCDPACK commands are available
