@@ -36,7 +36,7 @@
 # Define the Pisa startup command if necessary.
 #
       set startup_com=`alias pisa`
-      if ( "$startup_com" == "" ) source /star/etc/cshrc
+      if ( "$startup_com" == "" ) source ${STARLINK_DIR}/etc/cshrc
 #
 #  Establish the current directory as ADAM_USER.
 #
@@ -77,19 +77,19 @@ echo " "
 echo "......Finding objects using PISAFIND......"
 if ( -e pisafind.dat ) 'rm' pisafind.dat
 if ( -e pisasize.dat ) 'rm' pisasize.dat
-pisafind in=/star/bin/pisa/frame minpix=8 method=1 \
+pisafind in=${PISA_DIR}/frame minpix=8 method=1 \
  results=pisafind.dat sizes=pisasize.dat reset accept
 
 
 echo " "
 echo "......Fitting stars using PISAFIT and PISA profiling function......"
-pisafit in=/star/bin/pisa/frame positions=/star/bin/pisa/frame_stars.acc \
+pisafit in=${PISA_DIR}/frame positions=${PISA_DIR}/frame_stars.acc \
         minmode=n radius=9 again=f weighted=f background=492.2 \
        device=$device reset accept
 #
 echo " "
 echo "......Generating model frame using PISAGEN and profile fit......"
-pisagen input=/star/bin/pisa/frame positions=pisafind.dat \
+pisagen input=${PISA_DIR}/frame positions=pisafind.dat \
  output=model background=0 noise=g sigma=30 reset accept
 #
 
@@ -98,7 +98,7 @@ pisagen input=/star/bin/pisa/frame positions=pisafind.dat \
 echo " "
 echo "......Modifying PISA parameters using PISAPEAK......"
 if ( -e pisapeak.dat ) 'rm' pisapeak.dat
-pisapeak in=/star/bin/pisa/frame finddata=pisafind.dat \
+pisapeak in=${PISA_DIR}/frame finddata=pisafind.dat \
  results=pisapeak.dat reset accept
 #
 # apply a cut to the data in peakedness 

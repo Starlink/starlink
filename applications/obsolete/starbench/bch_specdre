@@ -58,7 +58,7 @@
 # Starlink cshrc file to define it.
 #
       set startup_com = `alias figaro`
-      if ( "$startup_com" == "" ) source /star/etc/cshrc
+      if ( "$startup_com" == "" ) source ${STARLINK_DIR}/etc/cshrc
 #
 # Start SPECDRE.
 #

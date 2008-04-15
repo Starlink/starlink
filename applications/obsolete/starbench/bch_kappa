@@ -43,7 +43,7 @@
 # Starlink cshrc file to define it.
 #
       set kappa_startup_com = `alias kappa`
-      if ( "$kappa_startup_com" == "" ) source /star/etc/cshrc
+      if ( "$kappa_startup_com" == "" ) source ${STARLINK_DIR}/etc/cshrc
 #
 # Start KAPPA package. Check the version number to make sure it is not
 # earlier than V0.10. This scripts is script is only compatible with
