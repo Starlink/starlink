@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@" status="obsolete" support="U">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/obsolete/starbench</path>
+  <description>StarBench - Starlink Benchmarking Utility</description>
+  <abstract><p>
+The Starlink Benchmarking Utility provides a set of tools for investigating
+the performance of computer systems running astronomy data reduction software.
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>C. A Clayton</name>
+      <uname>cac</uname>
+    </person>
+    <person>
+      <name>T. M. Gledhill</name>
+    </person>
+    <person>
+      <name>M. J. Bly</name>
+    </person>
+    <person>
+      <name>S. E. Rankin</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

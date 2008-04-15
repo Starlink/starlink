@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#include <slalib.h>
-#include <slamac.h>
+#include "slatest/sbmlib.h"
+#include "slatest/sbmmac.h"
 void vcs ( char *s, char *sok, char *func, char *test, int *status );
 void viv ( int ival, int ivalok, char *func, char *test, int *status );
 void vlv ( long ival, long ivalok, char *func, char *test, int *status );

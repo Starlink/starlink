@@ -1,0 +1,60 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     starbench_link_adam
+
+#  Purpose:
+#     Link a STARBENCH monolith.
+
+#  Language:
+#     {routine_language}
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script is invoked to print on standard output all the arguments
+#     required for a compilation command such as ALINK. 
+
+#  Copyright:
+#     Copyright (C) 2001, 2004 Central Laboratory of the Research
+#     Councils. All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+#     02111-1307, USA
+
+#  Authors:
+#     TIMJ: Tim Jenness (JAC, Hawaii)
+#     {enter_new_authors_here}
+
+#  History:
+#     14-APR-2008 (TIMJ):
+#        First version
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Generate the final argument list and pass it through an awk script 
+#  which eliminates all except the last reference to each library.
+      echo `kaplibs_link_adam -nogrf` \
+          | awk 'BEGIN{RS=" ";FS="\n"}
+                        {f[i++]=$1}
+                        END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
