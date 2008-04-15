@@ -35,10 +35,14 @@
 *  History:
 *     23-NOV-2007 (DSB):
 *        Initial version.
+*     15-APR-2008 (DSB):
+*        Use smf_getobsidss to get the OBSIDSS value from the FitsChan.
+*        This means that an OBSIDSS value can be formed from OBSID and 
+*        SUBSYSNR headers if OBSIDSS is not present in the FitsChan.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -75,7 +79,7 @@ void smf_updateprov( int ondf, smfData *data, int *status ){
 /* Local Variables */
    HDSLoc *cloc = NULL;         /* Locator for HDS component */
    HDSLoc *tloc = NULL;         /* Locator for temp HDS storage */
-   char *obsidss = NULL;        /* OBSIDSS value in input file */
+   const char *obsidss = NULL;  /* OBSIDSS value in input file */
 
 /* Check the inherited status */
    if( *status != SAI__OK ) return;
@@ -83,7 +87,8 @@ void smf_updateprov( int ondf, smfData *data, int *status ){
 /* Get the OBSIDSS keyword value from the input FITS header. If found,
    put it in an HDS structure that will be stored with the output
    provenance information. */
-   if( astGetFitsS( data->hdr->fitshdr, "OBSIDSS", &obsidss ) ) {
+   obsidss =  smf_getobsidss( data->hdr->fitshdr, status );
+   if( obsidss ) {
       datTemp( "MORE", 0, NULL, &tloc, status );
       datNew0C( tloc, "OBSIDSS", strlen( obsidss ), status );
       datFind( tloc, "OBSIDSS", &cloc, status );
