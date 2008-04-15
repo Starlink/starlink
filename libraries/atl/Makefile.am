@@ -24,7 +24,7 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 TESTS = test1 
 check_PROGRAMS = test1
 test1_SOURCES = atl_test.c
-test1_LDADD = libatl.la `$(srcdir)/atl_link`
+test1_LDADD = libatl.la `$(srcdir)/atl_link` @FCLIBS@
 
 PUBLIC_F_INCLUDES = ATL_PAR 
 PUBLIC_C_INCLUDES = atl.h
