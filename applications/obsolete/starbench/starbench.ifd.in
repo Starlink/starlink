@@ -1,5 +1,5 @@
 package starbench {
-    version @PKG_VERS@
+    version @PACKAGE_VERSIONS@
     prefix bch
 
     executable bch_fft {
@@ -57,7 +57,7 @@ package starbench {
 
     display {
 
-	Starlink Benchmark Utility now available -- (Version @PKG_VERS@)
+	Starlink Benchmark Utility now available -- (Version @PACKAGE_VERSION@)
 
 	Type "showme ssn23" to browse the hypertext documentation.
 
