@@ -29,7 +29,7 @@ test1_LDADD = libard.la `ast_link` `sla_link` `grp_link` `chr_link` \
 
 test2_SOURCES = ard_ctest.c
 test2_LDADD = libard.la `ast_link` `sla_link` `grp_link` `chr_link` \
-	`err_link`  `psx_link`
+	`err_link`  `psx_link` @FCLIBS@
 
 PUBLIC_C_INCLUDES = ard.h
 
