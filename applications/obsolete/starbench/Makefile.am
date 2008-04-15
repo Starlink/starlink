@@ -15,7 +15,7 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 
 bch_cfp_SOURCES = bch_cfp.c
-bch_cfp_LDADD = slatest/libsbm.la
+bch_cfp_LDADD = slatest/libsbm.la -lm
 
 sysinfo_SOURCES = sysinfo.c
 
@@ -58,3 +58,4 @@ datdataps.par datfitsks.par datphotps.par starbench.cal
 
 $(IFL_FILES) $(STARTUP_SCRIPT): $(IFD_FILES)
 	$(IFD2STAR) starbench
+
