@@ -731,18 +731,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
 	for( idx=0; idx<res[i]->ndat; idx++ ) {
 	  if( (res[i]->sdata[idx]->file->name)[0] ) {
-
-	    /* temporarily set the QUALITY pointer in the residual */	    
-	    qua_data = (unsigned char *) res[i]->sdata[idx]->pntr[2];
-	    res[i]->sdata[idx]->pntr[2] = qua[i]->sdata[idx]->pntr[0];
-
 	    /* Export the data */
-	    smf_model_NDFexport( res[i]->sdata[idx], 
+	    smf_model_NDFexport( res[i]->sdata[idx], NULL, 
+				 qua[i]->sdata[idx]->pntr[0],
 				 res[i]->sdata[idx]->file->name, 
 				 status );
-
-	    /* Set it to point back at the old buffer */
-	    res[i]->sdata[idx]->pntr[2] = (void *) qua_data;
 	  }
 	}
 
@@ -754,7 +747,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
 	for( idx=0; idx<ast[i]->ndat; idx++ ) {
 	  if( (ast[i]->sdata[idx]->file->name)[0] ) {
-	    smf_model_NDFexport( ast[i]->sdata[idx], 
+	    smf_model_NDFexport( ast[i]->sdata[idx], NULL, NULL,  
 				 ast[i]->sdata[idx]->file->name, 
 				 status );
 	  }
@@ -769,7 +762,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	  
 	  for( idx=0; idx<model[j][i]->ndat; idx++ ) {
 	    if( (model[j][i]->sdata[idx]->file->name)[0] ) {
-	      smf_model_NDFexport( model[j][i]->sdata[idx], 
+	      smf_model_NDFexport( model[j][i]->sdata[idx], NULL, NULL,  
 				   model[j][i]->sdata[idx]->file->name, 
 				   status);
 	    }

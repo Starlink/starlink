@@ -13,12 +13,17 @@
 *     C function
 
 *  Invocation:
-*     smf_model_NDFexport( const smfData *data, const char *name, 
+*     smf_model_NDFexport( const smfData *data, void *variance, 
+*                           unsigned char *quality, const char *name, 
 *                           int *status );
 
 *  Arguments:
 *     data = const smfData* (Given)
 *        Input smfData (any variety) that will have its DATA array copied.
+*     variance = void * (Given)
+*        If set, use this buffer instead of VARIANCE associated with data.
+*     quality = unsigned char * (Given)
+*        If set, use this buffer instead of QUALITY associated with data.
 *     name = const char* (Given)
 *        Name of the NDF container
 *     status = int* (Given and Returned)
@@ -43,6 +48,8 @@
 *        Asset ICD data-order before writing file.
 *     2008-04-14 (EC):
 *        Write QUALITY and VARIANCE if present.
+*     2008-04-15 (EC):
+*        Add ability to supply external VARIANCE & QUALITY arrays
 
 *  Notes:
 *
@@ -85,7 +92,9 @@
 
 #define FUNC_NAME "smf_model_NDFexport"
 
-void smf_model_NDFexport( const smfData *data, const char *name, int *status ){
+void smf_model_NDFexport( const smfData *data, void *variance, 
+			  unsigned char *quality, const char *name, 
+			  int *status ){
 
   /* Local Variables */
   int added=0;                  /* Number of names added to group */
@@ -108,7 +117,7 @@ void smf_model_NDFexport( const smfData *data, const char *name, int *status ){
 
   if (*status != SAI__OK ) return;
 
-  /* Assert ICD-compliant data order */
+  /* Check for ICD-compliant data order */
   smf_dataOrder( data, 1, status );
   if( *status = SMF__WDIM ) {
     /* fails if not 3-dimensional data. Just annul and write out data
@@ -136,8 +145,17 @@ void smf_model_NDFexport( const smfData *data, const char *name, int *status ){
 
   /* Check for VARIANCE and QUALITY components */
 
-  var = (data->pntr)[1];
-  qual = (data->pntr)[2];
+  if( variance ) {
+    var = variance;
+  } else {
+    var = (data->pntr)[1];    
+  }
+    
+  if( quality ) {
+    qual = quality;
+  } else {
+    qual = (data->pntr)[2];
+  }
 
   /* Make a new empty container with associated smfData struct */
 
@@ -160,6 +178,7 @@ void smf_model_NDFexport( const smfData *data, const char *name, int *status ){
       memcpy( (tempdata->pntr)[2], qual, ndata*sizeof(*qual) );
     }
   }
+
 
   /* Close files and clean up */  
   smf_close_file( &tempdata, status );
