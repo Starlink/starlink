@@ -15,16 +15,13 @@
 
 *  Invocation:
 *     gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode, 
-                         const char *obsType, mapVars *mapVars,
-*                        int *status )
+*                        mapVars *mapVars, int *status )
 
 *  Arguments:
 *     gsdVars = const gsdVars* (Given)
 *        GSD file access parameters
 *     samMode = const char* (Given)
 *        Sampling Mode
-*     obsType = const char* (Given)
-*        Observation type
 *     mapVars = mapVars* (Given and Returned)
 *        Map/Chop/Scan variables
 *     status = int* (Given and Returned)
@@ -51,6 +48,8 @@
 *        Get mapPA and scanPA.
 *     2008-04-03 (JB):
 *        Correct scanVel calculation.
+*     2008-04-14 (JB):
+*        Remove obsType argument (not needed).
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -90,8 +89,7 @@
 #define FUNC_NAME "gsdac_getMapVars"
 
 void gsdac_getMapVars ( const gsdVars *gsdVars, const char *samMode, 
-                        const char *obsType, mapVars *mapVars, 
-                        int *status )
+                        mapVars *mapVars, int *status )
 
 {
 

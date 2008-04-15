@@ -238,7 +238,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
 
   msgOutif(MSG__VERB," ", "Getting map, chop, and scan values", status); 
 
-  gsdac_getMapVars ( gsdVars, samMode, obsType, &mapVars, status );
+  gsdac_getMapVars ( gsdVars, samMode, &mapVars, status );
 
   if ( *status != SAI__OK ) {
     errRep ( FUNC_NAME, "Error getting date and map parameters", status );

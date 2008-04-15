@@ -53,6 +53,8 @@
 *        Add CALLGSD macro.
 *     2008-04-11 (JB):
 *        Remove wcs argument from putFits (not needed).
+*     2008-04-14 (JB):
+*        Remove obsType argument from getMapVars (not needed).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -261,7 +263,6 @@ void gsdac_getMapVars
 (
 const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 const char *samMode, /* sampling mode (given) */
-const char *obsType, /* observation type (given) */
 mapVars *mapVars,    /* map/chop/scan variables (given and returned) */
 int *status          /* global status (given and returned) */
 );
