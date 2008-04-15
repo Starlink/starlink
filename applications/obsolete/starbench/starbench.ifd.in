@@ -1,5 +1,5 @@
 package starbench {
-    version @PACKAGE_VERSIONS@
+    version @PACKAGE_VERSION@
     prefix bch
     exepath { $BENCH_DIR }
 
