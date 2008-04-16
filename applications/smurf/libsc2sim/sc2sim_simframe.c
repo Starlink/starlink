@@ -130,11 +130,12 @@
 *        - Added cosmic ray spikes
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
-*       
+*     2008-04-15 (AGG):
+*        Fix time bug
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
+*     Copyright (C) 2005-2008 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
 *  Licence:
@@ -231,7 +232,6 @@ int *status                  /* global status (given and returned) */
    double *skycoord=NULL;          /* az & el coordinates */
    double skytrans;                /* sky transmission (%) */
    double spike;                   /* Spike value */
-   double time = 0.0;              /* time from start of observation */
    int ubnd_in[2];
    double xpos;                    /* X measurement position */
    double xsky;                    /* X position on sky screen */
@@ -304,11 +304,6 @@ int *status                  /* global status (given and returned) */
      }
    }
 
-   /* Get time when frame taken in seconds from beginning of simulation */
-   if( *status == SAI__OK ) {
-     time = start_time + frame * samptime;
-   }
-
    /* Get the zenith atmospheric signal */ 
    sc2sim_calctrans( inx.lambda, &skytrans, sinx.tauzen, status );
    sc2sim_atmsky( inx.lambda, skytrans, &zenatm, status );
@@ -375,8 +370,8 @@ int *status                  /* global status (given and returned) */
 	    contains the atmosphere map value for the current position
 	    (XPOS,YPOS). */
        
-	 xsky = xpos + sinx.atmxvel * time + sinx.atmzerox;
-	 ysky = ypos + sinx.atmyvel * time + sinx.atmzeroy;
+	 xsky = xpos + sinx.atmxvel * start_time + sinx.atmzerox;
+	 ysky = ypos + sinx.atmyvel * start_time + sinx.atmzeroy;
 
          sc2sim_getbilinear ( xsky, ysky, atmscale, atmnaxes[0], atmsim, 
 			      &atmvalue, status );
@@ -447,10 +442,9 @@ int *status                  /* global status (given and returned) */
          /*  Add instrumental 1/f noise to the smoothed data in output */
          pos = bol * nterms * 3;
          fnoise = 0.0;
-         time = start_time + frame * samptime;
 	 
          for ( i=0; i<nterms*3; i+=3 ) {
-	   phase = fmod ( time, noisecoeffs[pos+i] ) / noisecoeffs[pos+i];
+	   phase = fmod ( start_time, noisecoeffs[pos+i] ) / noisecoeffs[pos+i];
 	   fnoise += noisecoeffs[pos+i+1] * cos ( 2.0 * AST__DPI * phase )
 	     + noisecoeffs[pos+i+2] * sin ( 2.0 * AST__DPI * phase );
          }
