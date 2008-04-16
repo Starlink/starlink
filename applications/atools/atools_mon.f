@@ -256,6 +256,9 @@
       ELSE IF ( NAME .EQ. 'ASTBOX' ) THEN
          CALL ASTBOX( STATUS )
  
+      ELSE IF ( NAME .EQ. 'ASTDISTANCE' ) THEN
+         CALL ASTDISTANCE( STATUS )
+ 
 
 *  If the action name is not recognised, then report an error.
       ELSE

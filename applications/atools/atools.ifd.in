@@ -1313,6 +1313,36 @@ iraf! {
 
       }
 
+      action astdistance {
+         helplib {$ATOOLS_HELP}
+
+          parameter point1 {
+            position 2
+            type _DOUBLE
+            prompt {Coords at first point}
+            ppath CURRENT
+            helpkey *
+          }
+
+          parameter point2 {
+            position 3
+            type _DOUBLE
+            prompt {Coords at second point}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter this {
+            position 1
+            type LITERAL
+            prompt {The input Frame}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+         }
+
+      }
+
       action astshiftmap {
          helplib {$ATOOLS_HELP}
 
