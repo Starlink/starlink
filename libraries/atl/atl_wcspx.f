@@ -656,12 +656,12 @@
 
       CARD = 'NAXIS1  = '
       IAT = 10
-      CALL CHR_PUTI( MAX( 2*CRPIX( 1 ), 100 ), CARD, IAT )
+      CALL CHR_PUTI( MAX( 2*INT(CRPIX( 1 )), 100 ), CARD, IAT )
       CALL AST_PUTFITS( FC, CARD, .FALSE., STATUS ) 
 
       CARD = 'NAXIS2  = '
       IAT = 10
-      CALL CHR_PUTI( MAX( 2*CRPIX( 2 ), 100 ), CARD, IAT )
+      CALL CHR_PUTI( MAX( 2*INT(CRPIX( 2 )), 100 ), CARD, IAT )
       CALL AST_PUTFITS( FC, CARD, .FALSE., STATUS ) 
 
       CALL AST_PUTFITS( FC, 'NAXIS3  = 1', .FALSE., STATUS ) 
