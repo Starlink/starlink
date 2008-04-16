@@ -62,6 +62,8 @@
 *        Actually use SMF__NOCREATE_DATA in smf_open_file call.
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-04-16 (EC):
+*        Fill chunk component of smfGroup based on time stamps
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -115,9 +117,12 @@
 
 #define FUNC_NAME "smf_grp_related"
 
-void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave, smfGroup **group, int *status ) {
+void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave, 
+			smfGroup **group, int *status ) {
 
   /* Local variables */
+  size_t *chunk=NULL;         /* Array of flags for continuous chunks */
+  size_t thischunk=0;         /* Current chunk that we're on */
   int i;                      /* Loop counter for index into Grp */
   int j;                      /* Loop counter */
   int k = 0;                  /* Incremental counter for subgroup indices */
@@ -126,8 +131,8 @@ void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave, smfGr
   double opentime;            /* RTS_END value at beginning of written data */
   double writetime;           /* RTS_END value at end of written data */
   int frame;                  /* Variable to store either first or last frame */
-
   int **subgroups = NULL;     /* Array of subgroups containing index arrays into parent Grp */
+  double steptime;            /* Length of a sample */
   int *indices = NULL;        /* Array of indices to be stored in subgroup */
   double *starts = NULL;      /* Array of starting RTS_END values */
   double *ends = NULL;        /* Array of ending RTS_END values */
@@ -161,7 +166,8 @@ void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave, smfGr
   ends = smf_malloc( grpsize, sizeof(double), 1, status );
   nbolx = smf_malloc( grpsize, sizeof(dim_t), 1, status );
   nboly = smf_malloc( grpsize, sizeof(dim_t), 1, status );
-  
+  chunk = smf_malloc( grpsize, sizeof(size_t) , 1, status );
+
   if ( *status != SAI__OK ) goto CLEANUP;
 
   /* Do we want to group by wavelength? */
@@ -276,8 +282,58 @@ void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave, smfGr
     }
   }
 
+  /* At this stage assume the subgroups are time-sorted, and that each
+     file within the group is itself continuous. Check the last sample of
+     each file with the first sample of the next to set up continuous
+     chunk flags */
+
+  for( i=0; i<ngroups; i++ ) {
+    /* Open header of the first file at each time */
+    smf_open_file( igrp, subgroups[i][0], "READ", SMF__NOCREATE_DATA, &data, 
+		   status );
+
+    hdr = data->hdr;
+
+    if( i == 0 ) {
+      /* length of a sample */
+      smf_fits_getD(hdr, "STEPTIME", &steptime, status);
+    }
+
+    /* Set header to first time slice and obtain RTS_END */
+    frame = 0;
+    smf_tslice_ast( data, frame, 0, status );
+
+    if( *status == SAI__OK ) {
+      opentime = hdr->state->rts_end;
+
+      if( i > 0 ) {
+	/* check against writetime from the last file to see if we're on the
+	   same chunk */
+
+	if( (opentime - writetime)*24.*3600. > steptime*2. ) {
+	  /* Found a discontinuity */
+	  thischunk++;
+	}
+      }
+    }
+
+    /* Obtain the last RTS_END from this file */
+    frame = (data->dims)[2] - 1;
+    smf_tslice_ast( data, frame, 0, status );
+    
+    if( *status == SAI__OK ) {
+      writetime = hdr->state->rts_end;
+
+      /* Store thischunk in chunk */
+      chunk[i] = thischunk;
+    }
+
+    /* Close file */
+    smf_close_file( &data, status );
+  }
+
   /* Create the smfGroup */
-  *group = smf_construct_smfGroup( igrp, subgroups, ngroups, nelem, 0, 
+  *group = smf_construct_smfGroup( igrp, subgroups, chunk, ngroups, nelem, 0, 
 				   status );
 
  CLEANUP:

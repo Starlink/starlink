@@ -269,9 +269,12 @@
 *        - Added QUALITY to smf_scanfit, smf_fit_poly, smf_subtract_poly, 
 *     2008-04-09 (TIMJ):
 *        fix smf_created_qualname.
-*        smf_create_lutwcs and smf_detpos_wcs no longer needs steptime argument.
+*        smf_create_lutwcs and smf_detpos_wcs no longer needs steptime argument
 *     2008-04-14 (EC):
 *        - Updated interface for smf_flag_spikes and smf_boxcar1
+*     2008-04-16 (EC):
+*        - Added optional external QUALITY and VARIANCE to smf_model_NDFexport
+*        - Added chunk to smf_construct_smfGroup
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -397,8 +400,9 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 		       const double tsys[], int * status );
 
 smfGroup * 
-smf_construct_smfGroup( Grp *igrp, int **subgroups, const int ngroups, 
-			const int nrelated, const int copysubgroups, 
+smf_construct_smfGroup( Grp *igrp, int **subgroups, size_t *chunk,
+			const int ngroups, 
+                        const int nrelated, const int copysubgroups, 
 			int *status );
 
 void smf_create_lutwcs( int clearcache, const double *fplane_x, 
@@ -752,7 +756,9 @@ void smf_open_model( const Grp *igrp, int index, const char *mode, smfData **dat
 
 size_t smf_dtype_sz( const smf_dtype dtype, int *status );
 
-void smf_model_NDFexport( const smfData *data, const char *name, int *status );
+void smf_model_NDFexport( const smfData *data, void *variance, 
+			  unsigned char *quality, const char *name, 
+			  int *status );
 
 void smf_open_related_model( const smfGroup *group, const int subindex, 
 			     const char *accmode, smfArray **relfiles, 

@@ -38,6 +38,8 @@
 *        Update to use new smf_free behaviour
 *     2008-04-03 (AGG):
 *        Free resources even if status is bad
+*     2008-04-16 (EC):
+*        Free chunk
 
 *  Copyright:
 *     Copyright (C) 2006-2008 University of British Columbia.  All
@@ -109,6 +111,16 @@ void smf_close_smfGroup ( smfGroup **group, int *status ) {
   } else {
     /* Free Grp */
     grpDelet( &((*group)->grp), status);
+
+    /* Free chunk */
+    if( (*group)->chunk ) {
+      (*group)->chunk = smf_free( (*group)->chunk, status );
+    } else {
+      *status = SAI__ERROR;
+      errRep( FUNC_NAME, 
+	      "Input smfGroup has no chunk (possible programming error)", 
+	      status );
+    }
 
     /* Free subgroups */
     subgroups = (*group)->subgroups;

@@ -127,6 +127,8 @@
 *        -Better file names for models based on iarray
 *     2008-03-03 (EC):
 *        -handle QUAlity
+*     2008-04-16 (EC):
+*        -added chunk to smfGroup
 
 *     {enter_further_changes_here}
 
@@ -279,8 +281,9 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
        grouping as igroup. mgroup has a copy of mgrp inside, so free up
        mgrp afterward. */
 
-    *mgroup = smf_construct_smfGroup( mgrp, igroup->subgroups, igroup->ngroups,
-				      igroup->nrelated, 1, status );
+    *mgroup = smf_construct_smfGroup( mgrp, igroup->subgroups, igroup->chunk,
+				      igroup->ngroups, igroup->nrelated, 1, 
+				      status );
 
     if( mgrp ) grpDelet( &mgrp, status );
   }

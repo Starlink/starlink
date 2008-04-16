@@ -112,6 +112,8 @@
 *        -Added SMF__UBYTE data type
 *     2008-03-04 (EC):
 *        -Added smfDIMMData; updated smf_calcmodelptr prototype
+*     2008-04-16 (EC):
+*        -Added chunk to smfGroup
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -306,6 +308,7 @@ typedef struct smfArray {
 typedef struct smfGroup {
   Grp *grp;                  /* Copy of input Grp */
   int **subgroups;           /* Array of indices into Grp */
+  size_t *chunk;             /* Flag for continuous chunks in time (ngroups)*/
   int ngroups;               /* Number of subgroups */
   int nrelated;              /* Maximum number of related files */
 } smfGroup;
