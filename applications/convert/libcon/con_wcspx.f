@@ -76,6 +76,8 @@
 *        The bulk of the working has been moved out to ATL_WCSPX.
 *      25-FEB-2008 (DSB):
 *        New interface for ATL_WCSPX.
+*      16-APR-2008 (DSB):
+*        ATL_WCSPX now requires CRPIX rather than DIM.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -106,6 +108,7 @@
 *  Local Variables:
       CHARACTER CVAL*60      ! Character extension item value
       CHARACTER KEY*20       ! Key for KeyMap entry
+      DOUBLE PRECISION CRPIX( 3 ) ! Pixel coords at reference position
       DOUBLE PRECISION DVAL  ! Double precision extension item value
       INTEGER DIM( 3 )       ! Dimensions of output NDF
       INTEGER INTT           ! Integration time in ms
@@ -207,8 +210,13 @@
          KM2 = AST__NULL
       END IF
 
+*  The reference pixel is at the middle of the array.
+      CRPIX( 1 ) = 0.5*( DIM( 1 ) + 1 )   
+      CRPIX( 2 ) = 0.5*( DIM( 2 ) + 1 )   
+      CRPIX( 3 ) = 0.5*( DIM( 3 ) + 1 )   
+
 *  Create the FrameSet describing the SPECX WCS information.
-      CALL ATL_WCSPX( KM1, KM2, DIM, OBSLON, OBSLAT, IWCS0, STATUS )
+      CALL ATL_WCSPX( KM1, KM2, CRPIX, OBSLON, OBSLAT, IWCS0, STATUS )
 
 *  Get a pointer to the FrameSet which forms the default WCS component for 
 *  the output NDF. This just contains GRID, PIXEL and AXIS Frames. The 
