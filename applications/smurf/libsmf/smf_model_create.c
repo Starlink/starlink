@@ -404,7 +404,7 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
       
       if( *status == SAI__OK ) {
 	  
-	  /* initialzie the header */
+	  /* initialize the header */
 	  
 	  memset( &head, 0, sizeof(head) );
 	  head.dtype=SMF__NULL;
