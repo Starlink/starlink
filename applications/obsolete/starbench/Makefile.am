@@ -5,7 +5,7 @@ SUBDIRS = slatest
 bin_SCRIPTS = bench scan submit $(STARTUP_SCRIPT) $(PRIVATESCRIPTS) \
 	$(PRIVATE_PLATFORMSCRIPTS)
 
-bin_PROGRAMS = bch_cfp sysinfo
+bin_PROGRAMS = bch_cfp bch_sysinfo
 
 bin_MONOLITHS = bch_fft
 bch_fft_SOURCES = bch_fft.f $(GEN_F_ROUTINES)
@@ -17,7 +17,7 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 bch_cfp_SOURCES = bch_cfp.c
 bch_cfp_LDADD = slatest/libsbm.la -lm
 
-sysinfo_SOURCES = sysinfo.c
+bch_sysinfo_SOURCES = sysinfo.c
 
 bin_DATA = $(DATA_FILES)
 
