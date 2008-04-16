@@ -61,7 +61,8 @@ smf_update_quality.c smf_get_spread.c smf_create_qualname.c \
 smf_correct_steps.c smf_simple_stats.c smf_sorti.c smf_ext2km.c \
 smf_km2ext.c smf_groupscans.c smf_reportprogress.c smf_getobsidss.c \
 smf_calc_telres.c smf_get_moltrans.c smf_quick_noise.c smf_flag_spikes.c \
-smf_find_bad_dets.c smf_detmask.c smf_maskacsis.c smf_kmmerge.c
+smf_find_bad_dets.c smf_detmask.c smf_maskacsis.c smf_kmmerge.c \
+smf_simpleaddmap.c
 
 
 noinst_INCLUDES = smf.h smf_typ.h

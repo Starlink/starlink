@@ -13,15 +13,17 @@
 *     C function
 
 *  Invocation:
-*     smf_concat_smfGroup( smfGroup *igrp, int isTordered, 
+*     smf_concat_smfGroup( smfGroup *igrp, int whichchunk, int isTordered, 
 *			  AstFrameSet *outfset, int moving, 
 *	        	  int *lbnd_out, int *ubnd_out, int flags,
 *			  smfArray **concat, int *status )
 
 
 *  Arguments:
-*     igrp = SmfGroup* (Given)
+*     igrp = smfGroup* (Given)
 *        Group of input data files
+*     whichchunk = int (Given)
+*        Which continuous subset of igrp will get concatenated?
 *     isTordered = int (Given)
 *        If 0, ensure concatenated data is ordered by bolometer. If 1 ensure 
 *        concatenated data is ordered by time slice (default ICD ordering)
@@ -84,6 +86,8 @@
 *        -Fixed data type for QUALITY
 *        -generate QUALITY array if not present
 *        -Use SMF__NOCREATE* flags
+*     2008-04-16 (EC):
+*        -added chunking based on time stamps
 
 *  Notes:
 *     It is assumed that input files are time-ordered. If projection
@@ -137,7 +141,7 @@
 
 #define FUNC_NAME "smf_concat_smfGroup"
 
-void smf_concat_smfGroup( smfGroup *igrp, int isTordered, 
+void smf_concat_smfGroup( smfGroup *igrp, int whichchunk, int isTordered, 
 			  AstFrameSet *outfset, int moving, 
 			  int *lbnd_out, int *ubnd_out, int flags,
 			  smfArray **concat, int *status ) {
@@ -145,6 +149,7 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
   /* Local Variables */
   smfData *data=NULL;           /* Concatenated smfData */
   char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */
+  int firstpiece;               /* index to start of whichchunk */
   int havearray[3];             /* flags for DATA/QUALITY/VARIANCE present */
   int havelut;                  /* flag for pointing LUT present */
   smfHead *hdr;                 /* pointer to smfHead in concat data */
@@ -152,6 +157,7 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
   dim_t j;                      /* Loop counter */
   dim_t k;                      /* Loop counter */
   dim_t l;                      /* Loop counter */
+  int lastpiece;                /* index to end of whichchunk */
   dim_t nbolo;                  /* Number of detectors */
   dim_t ndata;                  /* Total data points: nbolo*tlen */
   int nrelated;                 /* Number of subarrays */
@@ -171,6 +177,31 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 
   /* Main routine */
   if (*status != SAI__OK) return;
+
+  /* Verify that we have a valid whichchunk, and determine the range of
+     indices into igrp->chunk */
+  if( (whichchunk < 0) || (whichchunk > igrp->chunk[igrp->ngroups-1] ) ) {
+    msgSeti( "WHICHCHUNK", whichchunk );
+    msgSeti( "MAXCHUNK", igrp->chunk[igrp->ngroups-1] );
+    *status = SAI__ERROR;
+    errRep( FUNC_NAME, 
+	    "Invalid whichchunk: ^WHICHCHUNK. Must be 0 - ^MAXCHUNK", 
+	    status );
+  } else {
+    /* Find the range of indices */
+    firstpiece=-1;
+    lastpiece=-1;
+    
+    for( i=0; i<igrp->ngroups; i++ ) {
+      if( (igrp->chunk[i] == whichchunk) && (firstpiece == -1) ) {
+	firstpiece = i;
+      }
+
+      if( igrp->chunk[i] == whichchunk ) {
+	lastpiece = i;
+      }
+    }
+  }
 
   /* Allocate space for the smfArray */
   *concat = smf_create_smfArray( status );
@@ -197,8 +228,9 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 
     for( pass=0; pass<2; pass++ ) {
       
-      /* Loop over subgroups (number of time chunks) */
-      for( j=0; j<igrp->ngroups; j++ ) {
+      /* Loop over subgroups (number of time chunks), continuing only
+	 if the chunk is equal to whichchunk */
+      for( j=firstpiece; j<=lastpiece; j++ ) {
 
 	/* First pass - get dimensions */
 	if( pass == 0 ) {
@@ -229,7 +261,7 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 	  }
 
 	  if( *status == SAI__OK ) {
-	    if( j == 0 ) {
+	    if( j == firstpiece ) {
 	      /* If this is the first chunk we will use it for refdims
                  - check the number of bolometers! (Assumption is that
                  input data is standard ICD-compliant time-ordered
@@ -324,7 +356,7 @@ void smf_concat_smfGroup( smfGroup *igrp, int isTordered,
 	  if( *status == SAI__OK ) {
 
 	    /* If first chunk initialize the concatenated array */
-	    if( j == 0 ) {
+	    if( j == firstpiece ) {
 	      tchunk = 0;
  
 	      /* Allocate memory for empty smfData with a smfHead */

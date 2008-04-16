@@ -275,6 +275,7 @@
 *     2008-04-16 (EC):
 *        - Added optional external QUALITY and VARIANCE to smf_model_NDFexport
 *        - Added chunk to smf_construct_smfGroup
+         - Added smf_simpleaddmap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -787,7 +788,7 @@ void smf_polext( int ondf, double angle, int *status );
 
 void smf_fft_filter( smfData *data, double srate, int *status );
 
-void smf_concat_smfGroup( smfGroup *igrp, int isTordered, 
+void smf_concat_smfGroup( smfGroup *igrp, int whichchunk, int isTordered, 
 			  AstFrameSet *outfset, int moving, 
 			  int *lbnd_out, int *ubnd_out, int flags,
 			  smfArray **concat, int *status );
@@ -882,5 +883,11 @@ void smf_detmaski( int *in, int ndim, int *dims_in, int maxis, int *mask, int *o
 void smf_detmaskc( char *in, int len, int ndim, int *dims_in, int maxis, int *mask, char *out, int *status );
 
 void smf_kmmerge( const char *xname, AstKeyMap *keymap, int from, int into, int ndet, int *mask, int nts, int rts_num, int *status );
+
+void smf_simpleaddmap( double *map1, double *mapweight1, 
+                       unsigned int *hitsmap1, double *mapvar1, 
+                       double *map2, double *mapweight2, 
+                       unsigned int *hitsmap2, double *mapvar2, int msize, 
+                       int *status );
 
 #endif /* SMF_DEFINED */
