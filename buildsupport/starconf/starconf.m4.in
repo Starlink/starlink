@@ -677,7 +677,7 @@ AC_DEFUN([STAR_PRM_COMPATIBLE_SYMBOLS],
 #
 # A programmatic tests have not been successful as long can work when
 # int is prescribed as often when optimising alignment boundaries are
-# set to 4 byte (double), so we must use specific compiler checks.
+# set to 8 byte (double), so we must use specific compiler checks.
 #
 # The side-effect of this macros is to define TRAIL_TYPE to either "int"
 # or "long". Use the CNF include file "f77.h" to not worry about this.
