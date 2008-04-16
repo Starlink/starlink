@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.34}
 \newcommand{\stardocnumber}    {95.34}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2008 April 6}
+\newcommand{\stardocdate}      {2008 April 16}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.9-2}
+\newcommand{\stardocversion}   {1.9-3}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -12347,6 +12347,8 @@ Changes the current co-ordinate Frame in the WCS component of an NDF.}
 Tiles a group of NDFs using World Co-ordinate System information.}
 \menuitem{WCSREMOVE}{
 Removes co-ordinate Frames from the WCS component of an NDF.}
+\menuitem{WCSSLIDE}{
+Applies a translational correction to the WCS in an NDF.}
 \menuitem{WCSSHOW}{
 Examine the internal structure of a WCS description.}
 \menuitem{WCSTRAN}{
@@ -12710,6 +12712,8 @@ functions as follows.
  Sets new bounds for an NDF.
 \classitem{SLIDE}
  Shifts pixels in an NDF by a given amount along each axis.
+\classitem{WCSSLIDE}
+ Applies a translational correction to the WCS in an NDF.
 \end{description}
 \vspace*{0.7ex}
 %
@@ -12877,7 +12881,9 @@ WCS component of an NDF.
 \classitem{WCSREMOVE}
  Removes co-ordinate Frames from the WCS component of an NDF.
 \classitem{WCSSHOW}
- Examine the internal structure of a WCS description.
+ Examines the internal structure of a WCS description.
+\classitem{WCSSLIDE}
+ Applies a translational correction to the WCS in an NDF.
 \classitem{WCSTRAN}
  Transforms a position from one NDF co-ordinate Frame to another.
 \end{description}
@@ -48609,7 +48615,7 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
 \sstroutine{
    WCSSHOW
 }{
-   Examine the internal structure of a WCS description.
+   Examines the internal structure of a WCS description.
 }{
    \sstdescription{
       This application allows you to examine \htmlref{WCS}{se:wcsuse}~
@@ -48732,6 +48738,113 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       }
    }
 }
+
+\sstroutine{
+   WCSSLIDE
+}{
+   Applies a translational correction to the WCS in an NDF
+}{
+   \sstdescription{
+      This application modifies the \htmlref{WCS}{apndf:wcs} information 
+      in an NDF so that the WCS position of a given pixel is moved by 
+      specified amount along each WCS axis.  The shifts to use are
+      specified either by an absolute offset vector given by the ABS
+      parameter or by the difference between a fiducial point and a
+      standard object given by the FID and OBJ parameters
+      respectively.  In each case the co-ordinates are specified in
+      the NDF's \htmlref{current WCS co-ordinate Frame}{se:curframe}.
+   }
+   \sstusage{
+      wcsslide ndf abs
+   }
+   \sstparameters{
+      \sstsubsection{
+         ABS( ) = \_DOUBLE (Read)
+      }{
+         Absolute shift for each WCS axis.  The number of values supplied
+         must match the number of WCS axes in the NDF.  It is only used if
+         STYPE={\tt "Absolute"}.  Offsets for celestial longitude and 
+         latitude axes should be specified in arcseconds.  Offsets for all 
+         other types of axes should be given directly in the units of the
+         axis.
+      }
+      \sstsubsection{
+         FID = LITERAL (Read)
+      }{
+         A comma-separated list of \xref{formatted axis values}{sun210}{AST_UNFORMAT} 
+         giving the position of the fiducial point in WCS co-ordinates.  The 
+         number of values supplied must match the number of WCS axes in the 
+         NDF.  It is only used if STYPE={\tt "Relative"}.
+      }
+      \sstsubsection{
+         NDF = NDF (Update)
+      }{
+         The NDF to be translated.
+      }
+      \sstsubsection{
+         OBJ = LITERAL (Read)
+      }{
+         A comma-separated list of formatted axis values giving the position
+         of the standard object in WCS co-ordinates.  The number of values
+         supplied must match the number of WCS axes in the NDF.  It is only
+         used if STYPE={\tt "Relative"}.
+      }
+      \sstsubsection{
+         STYPE = LITERAL (Read)
+      }{
+         The sort of shift to be used.  The choice is {\tt "Relative"} or
+         {\tt "Absolute"}.  {\tt ["Absolute"]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         wcsslide m31 [32,23]
+      }{
+         The (RA,Dec) axes in the NDF m31 are shifted by 32~arcseconds
+         in right ascension and 23~arcseconds in declination.
+      }
+      \sstexamplesubsection{
+         wcsslide speca stype=rel fid=211.2 obj=211.7
+      }{
+         The spectral axis in the NDF speca (which measures frequency in
+         GHz), is shifted by 0.5~GHz (\emph{i.e.} 211.7--211.2).
+      }
+      \sstexamplesubsection{
+         wcsslide speca stype=abs abs=0.5
+      }{
+         This does just the same as the previous example.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem 
+         The correction is affected by translating pixel co-ordinates
+	 by a constant amount before projection them into WCS
+	 co-ordinates. Therefore, whilst the translation will be
+	 constant across the array in pixel co-ordinates, it may vary
+	 in WCS co-ordinates depending on the nature of the
+	 pixel$\rightarrow$WCS transformation. The size of the
+	 translation in pixel co-ordinates is chosen in order to
+	 produce the required shift in WCS co-ordinates at the OBJ
+	 position (if STYPE is {\tt "Relative"}), or at the array
+	 centre (if STYPE is {\tt "Absolute"}).
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: \htmlref{SLIDE}{SLIDE}.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         There can be an arbitrary number of NDF dimensions.
+      }
+   }
+}
+
 \sstroutine{
    WCSTRAN
 }{
@@ -54507,6 +54620,12 @@ The following new applications have been added:
    not intermediate products that existed only during data
    processing.
 
+   \item [\htmlref{WCSSLIDE}{WCSSLIDE}] \mbox{}
+   This applies a translational corrrection to the
+   \htmlref{WCS}{apndf:WCS} of an NDF so that the WCS position of
+   a given pixel is moved by a specified amount along each WCS axis.
+   Thus it could be used to correct pointing errors.
+
 \end{description}
 
 \subsection{Modified Commands}
@@ -54906,6 +55025,8 @@ functions as follows.
  Sets new bounds for an NDF.
 \classitem{SLIDE}
  Shifts pixels in an NDF by a given amount along each axis.
+\classitem{WCSSLIDE}
+ Applies a translational correction to the WCS in an NDF.
 \end{description}
 \vspace*{0.7ex}
 %
@@ -55071,7 +55192,9 @@ functions as follows.
 \classitem{WCSREMOVE}
  Removes co-ordinate Frames from the WCS component of an NDF.
 \classitem{WCSSHOW}
- Examine the internal structure of a WCS description.
+ Examines the internal structure of a WCS description.
+\classitem{WCSSLIDE}
+ Applies a translational correction to the WCS in an NDF.
 \classitem{WCSTRAN}
  Transforms a position from one NDF WCS co-ordinate Frame to another.
 \end{description}
@@ -55185,6 +55308,7 @@ functions as follows.
 \end{description}
 \vspace*{0.7ex}
 %
+\goodbreak
 \item {\large\bf Other}
 \begin{description}
 \classitem{BEAMFIT}

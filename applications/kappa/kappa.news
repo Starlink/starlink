@@ -15,10 +15,16 @@
    Ancestors can be removed by their indices or by pattern matching
    against their names.
 
+   o  WCSSLIDE applies a translational corrrection to the World
+   Co-ordinate System (WCS) of an NDF so that the WCS position of
+   a given pixel is moved by a specified amount along each WCS axis.
+   Thus it could be used to correct pointing errors.
+
 2 Modified_applications
 
-   o  SETBB can now use a comma-separated list of quality names (such as
-   created by SETQUAL) to define the bit mask instead of a numerical value.
+   o  SETBB can now use a comma-separated list of quality names (such 
+   as created by SETQUAL) to define the bit mask instead of a 
+   numerical value.
 
    o  FFCLEAN has been extended to operate on cubes, either by
    processing the cubes as a set of independent one-dimensional
