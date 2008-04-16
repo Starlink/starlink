@@ -101,6 +101,8 @@
 *        Add NCHNSUBS FITS header.
 *     2008-04-14 (JB):
 *        Add a few missing FITS headers.
+*     2008-04-16 (JB):
+*        Calculate OBSGEO values from -OBS values.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -175,6 +177,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   double nRefStep;            /* number of nod sets repeated */
   char object[SZFITSCARD];    /* object of interest */
   char object2[SZFITSCARD];   /* object of interest (second half of name) */
+  double obsgeo[3];           /* cartesian coordinates of telescope */
   char obsIDSS[SZFITSCARD];   /* unique observation number + subsystem
                                  number in format
                                  INSTR_NNNNN_YYYYMMDDTHHMMSS_N */
@@ -197,6 +200,10 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
+
+  /* Get the cartesian coordinates of the telescope's location. */
+  smf_terr( gsdVars->telLatitude * DD2R, gsdVars->telHeight * 1000.0, 
+            -gsdVars->telLongitude * DD2R, obsgeo );  
 
   /* Get the telescope efficiency and convert from percentage to decimal */
   etal = gsdVars->etal / 100.0; 
@@ -425,22 +432,22 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsS ( fitschan, "ORIGIN", "Joint Astronomy Centre, Hilo", 
                 "Origin of file", 0 );
 
-  astSetFitsF ( fitschan, "ALT-OBS", 4111.0, 
+  astSetFitsF ( fitschan, "ALT-OBS", gsdVars->telHeight * 1000.0, 
                 "[m] Height of observation above sea level", 0 );
 
-  astSetFitsF ( fitschan, "LAT-OBS", 19.825833335521,
+  astSetFitsF ( fitschan, "LAT-OBS", gsdVars->telLatitude,
                 "[deg] Latitude of Observatory", 0 );
 
-  astSetFitsF ( fitschan, "LONG-OBS", -155.4797222301,
-                "[deg] Latitude of Observatory", 0 ); 
-  
-  astSetFitsF ( fitschan, "OBSGEO-X", -5464594.335493,
+  astSetFitsF ( fitschan, "LONG-OBS", -(gsdVars->telLongitude),
+                "[deg] East longitude of Observatory", 0 );
+
+  astSetFitsF ( fitschan, "OBSGEO-X", obsgeo[0],
                 "[m]", 0 );  
 
-  astSetFitsF ( fitschan, "OBSGEO-Y", -2592695.151639,
+  astSetFitsF ( fitschan, "OBSGEO-Y", obsgeo[1],
                 "[m]", 0 );  
 
-  astSetFitsF ( fitschan, "OBSGEO-Z", 2150635.34,
+  astSetFitsF ( fitschan, "OBSGEO-Z", obsgeo[2],
                 "[m]", 0 ); 
 
   astSetFitsF ( fitschan, "ETAL", etal,
