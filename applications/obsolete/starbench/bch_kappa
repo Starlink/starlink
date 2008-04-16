@@ -54,8 +54,8 @@
       set keys = `echo $version | awk -f $BENCH_DIR/bch_ckver.awk`
       set major = $keys[1]
       set minor = $keys[2]
-      if( $major == 1 && $minor > 0 ) then
-	echo "***** Found KAPPA Version $version - expected Version 0.10 or later"
+      if( $major < 1 ) then
+	echo "***** Found KAPPA Version $version - expected Version 1.00 or later"
         goto abort_script 
       endif
 #
