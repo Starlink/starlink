@@ -89,6 +89,8 @@
 *        Store DUT1 in WCS frameset for later use by specwrite.
 *     2008-04-08 (JB):
 *        Use 1,1 as centre of grid, adjust CELL offsets accordingly.
+*     2008-04-16 (JB):
+*        Use crpix instead of dims as argument to atlWcspx.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -145,7 +147,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   AstKeyMap *cellMap;         /* Ast KeyMap for cell description */
   double coordIn[3];          /* input coordinates to transformation */
   double coordOut[3];         /* output coordinates from transformation */
-  int dataDims[3];            /* dimensions of data*/
+  double crpix[3];            /* pixel centres of data */
   AstKeyMap *datePointing;    /* Ast KeyMap for pointing and times */
   char dateString[SZFITSCARD];/* temporary string for date conversions. */
   int day;                    /* days */
@@ -387,14 +389,14 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   astMapPut0D( cellMap, "POSANGLE", gsdVars->cellV2Y, "" );
   astMapPut0I( cellMap, "CELLCODE", gsdVars->cellCode, "" );
 
-  /* Set the centre of the grid to 1,1, and set the dimensions
-     of the third axis to the number of channels. */
-  dataDims[0] = 1;
-  dataDims[1] = 1;
-  dataDims[2] = gsdVars->nBEChansOut;
+  /* Set the centre of the grid to 0,0, and set the centre
+     of the third axis to half the number of channels. */
+  crpix[0] = 0.0;
+  crpix[1] = 0.0;
+  crpix[2] = (double)gsdVars->nBEChansOut / 2.0;
 
   /* Get a frameset describing the mapping from cell to sky. */
-  atlWcspx ( datePointing, cellMap, dataDims, 
+  atlWcspx ( datePointing, cellMap, crpix, 
              gsdVars->telLongitude * -1.0 * AST__DD2R, 
              gsdVars->telLatitude * AST__DD2R, WCSFrame, status );
 
@@ -418,8 +420,8 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   }
 
   /* Calculate the centre in tracking. */
-  coordIn[0] = 1.0;
-  coordIn[1] = 1.0;
+  coordIn[0] = 0.0;
+  coordIn[1] = 0.0;
   coordIn[2] = 0.0;
 
   astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
@@ -438,8 +440,8 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   wcs->baseTr2 = coordOut[1];
 
   /* Calculate the cell offsets in tracking. */
-  coordIn[0] = gsdVars->mapTable[stepNum*2] + 1.0;
-  coordIn[1] = gsdVars->mapTable[stepNum*2+1] + 1.0;
+  coordIn[0] = gsdVars->mapTable[stepNum*2];
+  coordIn[1] = gsdVars->mapTable[stepNum*2+1];
 
   astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
 
@@ -459,8 +461,8 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   astSetC( frame, "System(1)", "AZEL" );
 
   /* Get centre in AZEL. */
-  coordIn[0] = 1.0;
-  coordIn[1] = 1.0;
+  coordIn[0] = 0.0;
+  coordIn[1] = 0.0;
 
   astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
 
@@ -478,8 +480,8 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   wcs->baseEl = coordOut[1];
 
   /* Calculate the cell offsets in AZEL. */
-  coordIn[0] = gsdVars->mapTable[stepNum*2] + 1.0;
-  coordIn[1] = gsdVars->mapTable[stepNum*2+1] + 1.0;
+  coordIn[0] = gsdVars->mapTable[stepNum*2];
+  coordIn[1] = gsdVars->mapTable[stepNum*2+1];
 
   astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
 
