@@ -117,7 +117,7 @@ maths median mstats mult noglobals nomagic normalize numb outset parget \
 paste permaxes pixdupe psf rift regrid rotate segment setmagic shadow \
 slide sqorst stats sub substitute surfit thresh trandat trig wiener   \
 zaplin listmake listshow profile wcsalign wcsmosaic wcstran kapversion \
-kaphelp mfittrend makesnr oddeven cumulvec beamfit pluck
+kaphelp mfittrend makesnr oddeven cumulvec beamfit pluck wcsslide
 
 KAPVIEW_TASKS = ardplot clinplot colcomp contour cursor drawsig \
 drawnorth display elprof gdclear gdnames gdset gdstate linplot lutable \
@@ -264,7 +264,7 @@ calpol.ifc cdiv.ifc centroid.ifc chanmap.ifc chpix.ifc \
 cmult.ifc collapse.ifc compadd.ifc compave.ifc compick.ifc \
 convolve.ifc copybad.ifc creframe.ifc csub.ifc cumulvec.ifc \
 div.ifc beamfit.ifc pluck.ifc pow.ifc ndfpack_mon.ifc \
-kapview_mon.ifc kappa_mon.ifc
+kapview_mon.ifc kappa_mon.ifc wcsslide.ifc
 
 
 BUILT_IFL_FILES = kappa_mon.ifl beamfit.ifl chanmap.ifl \
@@ -306,7 +306,7 @@ setext.ifl setlabel.ifl setnorm.ifl setorigin.ifl \
 setqual.ifl setsky.ifl settitle.ifl settype.ifl provmod.ifl provrem.ifl \
 setunits.ifl setvar.ifl showqual.ifl provshow.ifl provadd.ifl \
 vecplot.ifl wcsadd.ifl wcsattrib.ifl wcscopy.ifl wcsframe.ifl \
-wcsremove.ifl wcsshow.ifl axconv.ifl mem2d.ifl
+wcsremove.ifl wcsshow.ifl axconv.ifl mem2d.ifl wcsslide.ifl
 
 
 EXTRA_DIST = multiplot.csh.in kappa_master.hlp $(HELP_FILES)

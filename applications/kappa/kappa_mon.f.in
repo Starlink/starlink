@@ -584,6 +584,10 @@
          ELSE IF ( NAME .EQ. 'WCSTRAN' ) THEN
             CALL WCSTRAN ( STATUS )
 
+*  Translates WCS by given offsets
+         ELSE IF ( NAME .EQ. 'WCSSLIDE' ) THEN
+            CALL WCSSLIDE ( STATUS )
+
 *  Applies a Wiener filter to a 1- or 2-dimensional array.
          ELSE IF ( NAME .EQ. 'WIENER' ) THEN
             CALL WIENER ( STATUS )

@@ -17762,6 +17762,65 @@ iraf! {
 
       }
 
+      action wcsslide {
+         alias {wcsslid(e) wcssli(de)}
+
+         helplib {$KAPPA_HELP}
+
+         parameter abs {
+            position 2
+            size *
+            type _DOUBLE
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Absolute translation vector}
+            helpkey *
+         }
+
+         parameter fid {
+            size *
+            type LITERAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Co-ordinates of fiducial point}
+            helpkey *
+         }
+
+         parameter ndf {
+            position 1
+            type NDF
+            access READ
+            vpath PROMPT
+            ppath GLOBAL
+            association <->GLOBAL.DATA_ARRAY
+            prompt {NDF to modify}
+            helpkey *
+         }
+
+         parameter obj {
+            size *
+            type LITERAL
+            access READ
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Co-ordinates of standard object}
+            helpkey *
+         }
+
+         parameter stype {
+            type LITERAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Shift type}
+            default Absolute
+            helpkey *
+         }
+
+      }
+
       action wcstran {
          alias {wcst(ran)}
 
