@@ -455,18 +455,18 @@ void atlTolut( AstMapping *inmap, double xlo, double xhi, double dx,
 
 F77_SUBROUTINE(atl_wcspx)( INTEGER(KM1), 
                            INTEGER(KM2), 
-                           INTEGER_ARRAY(DIM),
+                           DOUBLE_ARRAY(CRPIX),
                            DOUBLE(OBSLON),
                            DOUBLE(OBSLAT),
                            INTEGER(IWCS),
                            INTEGER(STATUS) );
 
-void atlWcspx( AstKeyMap *km1, AstKeyMap *km2, int dim[3], double obslon,
+void atlWcspx( AstKeyMap *km1, AstKeyMap *km2, double crpix[3], double obslon,
                double obslat, AstFrameSet **iwcs, int *status ){
 
    DECLARE_INTEGER(KM1);
    DECLARE_INTEGER(KM2);
-   DECLARE_INTEGER_ARRAY(DIM,3);
+   DECLARE_DOUBLE_ARRAY(CRPIX,3);
    DECLARE_DOUBLE(OBSLON);
    DECLARE_DOUBLE(OBSLAT);
    DECLARE_INTEGER(IWCS);
@@ -478,7 +478,7 @@ void atlWcspx( AstKeyMap *km1, AstKeyMap *km2, int dim[3], double obslon,
    F77_EXPORT_INTEGER( astP2I( km1 ), KM1 );
    F77_EXPORT_INTEGER( astP2I( km2 ), KM2 );
 
-   for( i = 0; i < 3; i++ ) DIM[ i ] = (F77_INTEGER_TYPE) dim[ i ];
+   for( i = 0; i < 3; i++ ) CRPIX[ i ] = (F77_DOUBLE_TYPE) crpix[ i ];
 
    F77_EXPORT_DOUBLE( obslon, OBSLON );
    F77_EXPORT_DOUBLE( obslat, OBSLAT );
@@ -486,7 +486,7 @@ void atlWcspx( AstKeyMap *km1, AstKeyMap *km2, int dim[3], double obslon,
 
    F77_CALL(atl_wcspx)( INTEGER_ARG(&KM1),
                         INTEGER_ARG(&KM2),
-                        INTEGER_ARRAY_ARG(DIM),
+                        DOUBLE_ARRAY_ARG(CRPIX),
                         DOUBLE_ARG(&OBSLON),
                         DOUBLE_ARG(&OBSLAT),
                         INTEGER_ARG(&IWCS),

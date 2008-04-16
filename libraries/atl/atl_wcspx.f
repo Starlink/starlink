@@ -1,4 +1,4 @@
-      SUBROUTINE ATL_WCSPX( KM1, KM2, DIM, OBSLON, OBSLAT, IWCS, 
+      SUBROUTINE ATL_WCSPX( KM1, KM2, CRPIX, OBSLON, OBSLAT, IWCS, 
      :                      STATUS )
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL ATL_WCSPX( KM1, KM2, DIM, OBSLON, OBSLAT, IWCS, STATUS )
+*     CALL ATL_WCSPX( KM1, KM2, CRPIX, OBSLON, OBSLAT, IWCS, STATUS )
 
 *  Description:
 *     This returns a pointer to a FrameSet describing the WCS
@@ -72,9 +72,8 @@
 *        POSANGLE values refer. It may take any of the values listed for
 *        CENTRECODE in the "KM1" argument description above. If CELLCODE 
 *        is missing a value of 6 (FK4 B1950) is assumed.
-*     DIM( 3 ) = INTEGER (Given)
-*        The dimensions of the pixel axes of the array into which the SPECX 
-*        data is being placed.
+*     CRPIX( 3 ) = DOUBLE PRECISION (Given)
+*        The pixel co-ordinates at the reference point.
 *     OBSLON = DOUBLE PRECISION (Given)
 *        The geodetic longitude of the observatory. Radians, positive east.
 *     OBSLAT = DOUBLE PRECISION (Given)
@@ -110,6 +109,8 @@
 *        AST_MAPGET0C.
 *     5-MAR-2008 (DSB):
 *        SPECX supplied tinme and date appear to be UTC rather than UT1.
+*     16-APR-2008 (DSB):
+*        Replace the DIM argument (array dimensions) with CRPIX.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -128,7 +129,7 @@
 *  Arguments Given:
       INTEGER KM1
       INTEGER KM2
-      INTEGER DIM( 3 )
+      DOUBLE PRECISION CRPIX( 3 )
       DOUBLE PRECISION OBSLON
       DOUBLE PRECISION OBSLAT
 
@@ -172,9 +173,6 @@
       DOUBLE PRECISION CD1   ! RA pixel size
       DOUBLE PRECISION CD2   ! DEC pixel size
       DOUBLE PRECISION CD3   ! Frequency pixel size
-      DOUBLE PRECISION CRPIX1! GRID coord at centre of RA axis (degrees)
-      DOUBLE PRECISION CRPIX2! GRID coord at centre of Dec axis (degrees)
-      DOUBLE PRECISION CRPIX3! GRID coord at centre of FREQ axis (GHz)
       DOUBLE PRECISION CRVAL3! Frequency (GHz) at the axis 1 reference point
       DOUBLE PRECISION DDEC  ! Dec offset (arc-seconds)
       DOUBLE PRECISION DEC   ! Central Dec (degrees)
@@ -504,10 +502,6 @@
 *  assumed to be linear in frequency.
 *  ===================================================================
 
-*  Get the GRID coordinate at the centre of the central pixel on the 
-*  third axis of the output NDF. 
-      CRPIX3 = 0.5*( DIM( 3 ) + 1 )
-         
 *  Get the central frequency, in kHz. Convert to GHz.
       KEY = 'JFCEN(1)'
       CALL ATL_KYCHK( KM1, KEY, KM1ERR, STATUS )
@@ -571,11 +565,6 @@
 *  Now create the 3D Mapping which goes from 3D GRID coords to 
 *  (RA,Dec,Freq). 
 *  ===========================================================
-
-*  Get the central GRID coordinate on the first and second axes of the 
-*  output NDF (the RA and Dec axes).
-      CRPIX1 = 0.5*( DIM( 1 ) + 1 )
-      CRPIX2 = 0.5*( DIM( 2 ) + 1 )
 
 *  Does the input NDF have a SPECX_MAP extension?
       IF( KM2 .NE. AST__NULL ) THEN
@@ -667,19 +656,19 @@
 
       CARD = 'NAXIS1  = '
       IAT = 10
-      CALL CHR_PUTI( DIM( 1 ), CARD, IAT )
+      CALL CHR_PUTI( MAX( 2*CRPIX( 1 ), 100 ), CARD, IAT )
       CALL AST_PUTFITS( FC, CARD, .FALSE., STATUS ) 
 
       CARD = 'NAXIS2  = '
       IAT = 10
-      CALL CHR_PUTI( DIM( 2 ), CARD, IAT )
+      CALL CHR_PUTI( MAX( 2*CRPIX( 2 ), 100 ), CARD, IAT )
       CALL AST_PUTFITS( FC, CARD, .FALSE., STATUS ) 
 
       CALL AST_PUTFITS( FC, 'NAXIS3  = 1', .FALSE., STATUS ) 
 
       CARD = 'CRPIX1  = '
       IAT = 10
-      CALL CHR_PUTD( CRPIX1, CARD, IAT )
+      CALL CHR_PUTD( CRPIX( 1 ), CARD, IAT )
       CALL AST_PUTFITS( FC, CARD, .FALSE., STATUS ) 
 
       CARD = 'CRVAL1  = '
@@ -696,7 +685,7 @@
 
       CARD = 'CRPIX2  = '
       IAT = 10
-      CALL CHR_PUTD( CRPIX2, CARD, IAT )
+      CALL CHR_PUTD( CRPIX( 2 ), CARD, IAT )
       CALL AST_PUTFITS( FC, CARD, .FALSE., STATUS ) 
 
       CARD = 'CRVAL2  = '
@@ -718,7 +707,7 @@
 
       CARD = 'CRPIX3  = '
       IAT = 10
-      CALL CHR_PUTD( CRPIX3, CARD, IAT )
+      CALL CHR_PUTD( CRPIX( 3 ), CARD, IAT )
       CALL AST_PUTFITS( FC, CARD, .FALSE., STATUS ) 
 
       CARD = 'CRVAL3  = '
