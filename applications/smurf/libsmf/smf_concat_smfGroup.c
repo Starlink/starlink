@@ -88,15 +88,17 @@
 *        -Use SMF__NOCREATE* flags
 *     2008-04-16 (EC):
 *        -added chunking based on time stamps
+*     2008-04-17 (EC):
+*        -fixed calculation of number of subarrays
 
 *  Notes:
-*     It is assumed that input files are time-ordered. If projection
-*     information supplied, pointing LUT will not be concatenated if
-*     SMF__NOCREATE_LUT is specified. By default, a QUALITY array is
-*     created even if one is not present in the template file. This behaviour
-*     can be avoided by setting flag bit SMF__NOCREATE_QUALITY. Additionally,
-*     if VARIANCE and/or QUALITY is present in the template, prevent
-*     propagation to the concatenated file by setting SMF__NOCREATE_VARIANCE /
+*     If projection information supplied, pointing LUT will not be
+*     concatenated if SMF__NOCREATE_LUT is specified. By default, a
+*     QUALITY array is created even if one is not present in the
+*     template file. This behaviour can be avoided by setting flag bit
+*     SMF__NOCREATE_QUALITY. Additionally, if VARIANCE and/or QUALITY
+*     is present in the template, prevent propagation to the
+*     concatenated file by setting SMF__NOCREATE_VARIANCE /
 *     SMF__NOCREATE_QUALITY.
 
 *  Copyright:
@@ -206,10 +208,10 @@ void smf_concat_smfGroup( smfGroup *igrp, int whichchunk, int isTordered,
   /* Allocate space for the smfArray */
   *concat = smf_create_smfArray( status );
 
-  /* Determine how many subarrays there actually are */
+  /* Determine how many subarrays there actually are in this chunk*/
   nrelated = 0;
   for( i=0; i<igrp->nrelated; i++ ) {
-    for( j=0; j<igrp->ngroups; j++ ) {
+    for( j=firstpiece; j<=lastpiece; j++ ) {
       if( (igrp->subgroups[j][i] > 0) && ((i+1) > nrelated) ) {
 	nrelated = i+1;
       }
