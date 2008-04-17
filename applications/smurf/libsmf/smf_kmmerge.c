@@ -194,7 +194,10 @@
    that have no good spectral data values. */ \
                         } else if( from == into ){ \
                            for( j = 0; j < vpd; j++ ){ \
-                              pfrom##Sym3[ j ] = VAL__BAD##Sym3; \
+                              if( pfrom##Sym3[ j ] != VAL__BAD##Sym3 ) { \
+                                 pfrom##Sym3[ j ] = VAL__BAD##Sym3; \
+                                 changed = 1; \
+                              } \
                            } \
                         } \
 \
