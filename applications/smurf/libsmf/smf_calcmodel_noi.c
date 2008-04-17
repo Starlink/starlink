@@ -181,13 +181,13 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
       /* Flag spikes in the residual */
 
       if( spikethresh ) {
-	msgOut(" ", "  flag spikes...", status);
+	msgOut(" ", "    flag spikes...", status);
 	smf_flag_spikes( res->sdata[idx], qua_data, 
 			 SMF__Q_BADS|SMF__Q_BADB|SMF__Q_SPIKE,
 			 spikethresh, spikeiter, 
 			 100, &aiter, status );
 	msgSeti("AITER",aiter);
-	msgOut(" ", "  ...finished in ^AITER iterations",
+	msgOut(" ", "    ...finished in ^AITER iterations",
 	       status); 
       }
 
