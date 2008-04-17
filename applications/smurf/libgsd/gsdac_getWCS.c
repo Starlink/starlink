@@ -393,7 +393,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
      of the third axis to half the number of channels. */
   crpix[0] = 0.0;
   crpix[1] = 0.0;
-  crpix[2] = (double)gsdVars->nBEChansOut / 2.0;
+  crpix[2] = (double)gsdVars->BEChans[subBandNum] / 2.0;
 
   /* Get a frameset describing the mapping from cell to sky. */
   atlWcspx ( datePointing, cellMap, crpix, 
