@@ -13,8 +13,8 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave, 
-*                       smfGroup **group,int *status );
+*     smf_grp_related( Grp *igrp, const int grpsize, const int grpbywave, 
+*                      dim_t maxlen, smfGroup **group, int *status );
 
 *  Arguments:
 *     igrp = Grp* (Given)
@@ -23,6 +23,9 @@
 *        Size of input Grp
 *     grpbywave = const int (Given)
 *        Flag to denote whether to group files by common wavelength
+*     maxlen = dim_t (Given)
+*        If set, maximum length of a continuous chunk in time samples. If 0
+*        don't enforce a maximum length.
 *     group = smfGroup ** (Returned)
 *        Returned smfGroup
 *     status = int* (Given and Returned)
@@ -35,7 +38,13 @@
 *     pointers to integer arrays which contain the Grp index values
 *     corresponding to related files. This method reduces the number
 *     of Grps required to 1, and allows new Grps to be created on
-*     demand so that the maximum Grp number is not exceeded.
+*     demand so that the maximum Grp number is not exceeded. In addition,
+*     continuous subsets of the input data are identified and stored in
+*     the "chunk" component of group. The caller may optionally specify 
+*     a maximum sample length (in time) for these continuous pieces. In
+*     this case, the length of each continuously flagged region is truncated
+*     to the minimum complete set of files that does not exceed the limit
+*     (e.g. files are not broken up into several smaller pieces).
 
 *  Notes:
 *     Resources allocated with this routine should be freed by calling
@@ -64,6 +73,9 @@
 *        Update to use new smf_free behaviour
 *     2008-04-16 (EC):
 *        Fill chunk component of smfGroup based on time stamps
+*     2008-04-17 (EC):
+*        - check for the same subarrays in each chunk
+*        - added maxlen to interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -117,35 +129,42 @@
 
 #define FUNC_NAME "smf_grp_related"
 
-void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave, 
-			smfGroup **group, int *status ) {
+void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave, 
+		       dim_t maxlen, smfGroup **group, int *status ) {
 
   /* Local variables */
+  size_t allOK = 1;           /* Flag to determine whether to continue */
   size_t *chunk=NULL;         /* Array of flags for continuous chunks */
-  size_t thischunk=0;         /* Current chunk that we're on */
+  smfData *data = NULL;       /* Current smfData */
+  smfData *data2 = NULL;      /* Second smfData */
+  double *ends = NULL;        /* Array of ending RTS_END values */
+  int frame;                  /* Variable to store either first or last frame*/
+  smfHead *hdr=NULL;          /* Header for current file */
+  smfHead *hdr2=NULL;         /* Second header */
   int i;                      /* Loop counter for index into Grp */
+  int *indices = NULL;        /* Array of indices to be stored in subgroup */
   int j;                      /* Loop counter */
   int k = 0;                  /* Incremental counter for subgroup indices */
-  int ngroups = 0;            /* Incremental counter for subgroups to be stored */
-  smfHead *hdr;               /* Header for current file */
-  double opentime;            /* RTS_END value at beginning of written data */
-  double writetime;           /* RTS_END value at end of written data */
-  int frame;                  /* Variable to store either first or last frame */
-  int **subgroups = NULL;     /* Array of subgroups containing index arrays into parent Grp */
-  double steptime;            /* Length of a sample */
-  int *indices = NULL;        /* Array of indices to be stored in subgroup */
-  double *starts = NULL;      /* Array of starting RTS_END values */
-  double *ends = NULL;        /* Array of ending RTS_END values */
-  int nelem;                  /* Number of elements in index array */
-
-  smfData *data = NULL;       /* Current smfData */
   double *lambda = NULL;      /* Wavelength - only used if grpbywave is true */
+  int matchsubsys;            /* Flag for matched subarrays */
   dim_t *nbolx = NULL;        /* Number of bolometers in X direction */
   dim_t *nboly = NULL;        /* Number of bolometers in Y direction */
+  int nelem;                  /* Number of elements in index array */
   dim_t nx;                   /* (data->dims)[0] */
   dim_t ny;                   /* (data->dims)[1] */
-  size_t allOK = 1;           /* Flag to determine whether to continue */
+  int ngroups = 0;            /* Counter for subgroups to be stored */
   double obslam;              /* Observed wavelength from FITS header (m) */
+  double opentime;            /* RTS_END value at beginning of written data */
+  int *refsubsys;             /* Array of template subarrays */
+  double *starts = NULL;      /* Array of starting RTS_END values */
+  double steptime;            /* Length of a sample */
+  char subarray[81];          /* Subarray name */
+  int **subgroups = NULL;     /* Array containing index arrays to parent Grp */
+  int subsysnum;              /* Subsystem numeric id. 0 - 8 */
+  size_t thischunk;           /* Current chunk that we're on */
+  dim_t thislen;              /* Length of current time chunk */
+  dim_t totlen;               /* Total length of continuous time chunk */
+  double writetime;           /* RTS_END value at end of written data */
 
   if ( *status != SAI__OK ) return;
 
@@ -283,16 +302,43 @@ void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave,
   }
 
   /* At this stage assume the subgroups are time-sorted, and that each
-     file within the group is itself continuous. Check the last sample of
-     each file with the first sample of the next to set up continuous
-     chunk flags */
+     file within the group is itself continuous. Also assume that the
+     subarrays are sorted (second index of subgroups). Check the last
+     sample of each file with the first sample of the next to set up
+     continuous chunk flags. Also check that all of the same subarrays
+     are present in subsequent chunks flagged "continuous". */
+
+  refsubsys = smf_malloc( nelem, sizeof(*refsubsys), 0, status );
+  totlen = 0;
+  thischunk = 0;
 
   for( i=0; i<ngroups; i++ ) {
     /* Open header of the first file at each time */
     smf_open_file( igrp, subgroups[i][0], "READ", SMF__NOCREATE_DATA, &data, 
 		   status );
 
-    hdr = data->hdr;
+    if( *status == SAI__OK ) {
+      hdr = data->hdr;
+
+      if( data->isTordered ) {
+	thislen = data->dims[2];
+      } else {
+	thislen = data->dims[0];
+      }
+
+      /* Check that an individual file is too long */
+      if( maxlen && (thislen > maxlen) ) {
+	*status = SAI__ERROR;
+	msgSeti("THISLEN",thislen);
+	msgSeti("MAXLEN",maxlen);
+	errRep(FUNC_NAME, 
+	       "Length of file time steps exceeds maximum (^THISLEN>^MAXLEN)",
+	       status);
+      } 
+
+      /* Add length to running total */
+      totlen += thislen;
+    }
 
     if( i == 0 ) {
       /* length of a sample */
@@ -307,22 +353,90 @@ void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave,
       opentime = hdr->state->rts_end;
 
       if( i > 0 ) {
-	/* check against writetime from the last file to see if we're on the
-	   same chunk */
+	/* check that we have the same subarrays */
+	matchsubsys = 1;
+	for( j=0; j<nelem; j++ ) {
+	  if( subgroups[i][j] > 0 ) {
+	    if( j==0 ) {
+	      /* Look at header of file that is already opened */
+	      smf_fits_getS( hdr, "SUBARRAY", subarray, 81, status );
+	    } else {
+	      /* Otherwise open header in new file */
+	      smf_open_file( igrp, subgroups[i][j], "READ", 
+			     SMF__NOCREATE_DATA, &data2, status );
+	      if( *status == SAI__OK ) {
+		hdr2 = data2->hdr;
+		smf_fits_getS( hdr2, "SUBARRAY", subarray, 81, status );
+	      }
+	    }	
+	    sc2ast_name2num( subarray, &subsysnum, status);	
 
-	if( (opentime - writetime)*24.*3600. > steptime*2. ) {
+	    /* Close the new file that we've opened */
+	    if( j>0 ) {
+	      smf_close_file( &data2, status );
+	    }
+	  } else {
+	    /* Flag this subsystem spot as empty */
+	    subsysnum = -1;
+	  }
+
+	  if( subsysnum != refsubsys[j] ) {
+	    matchsubsys = 0;
+	  }
+	}
+
+	/* check against writetime from the last file to see if we're on the
+	   same chunk. Also check that the subsystems match, and that the
+           continuous chunk doesn't exceed maxlen */
+
+	if( ((opentime - writetime)*24.*3600. > steptime*2.) || 
+	    !matchsubsys || (maxlen && (totlen > maxlen)) ) {
 	  /* Found a discontinuity */
 	  thischunk++;
+
+	  /* Since this piece puts us over the limit, it is now the initial
+             total length for the next chunk. */
+	  totlen = thislen;
 	}
       }
     }
 
     /* Obtain the last RTS_END from this file */
-    frame = (data->dims)[2] - 1;
+    if( *status == SAI__OK ) {
+      frame = (data->dims)[2] - 1;
+    }
+
     smf_tslice_ast( data, frame, 0, status );
     
     if( *status == SAI__OK ) {
       writetime = hdr->state->rts_end;
+
+      /* Populate the reference subsystem array */
+      for( j=0; j<nelem; j++ ) {
+	if( subgroups[i][j] > 0 ) {
+	  if( j==0 ) {
+	    /* Look at header of file that is already opened */
+	    smf_fits_getS( hdr, "SUBARRAY", subarray, 81, status );
+	  } else {
+	    /* Otherwise open header in new file */
+	    smf_open_file( igrp, subgroups[i][j], "READ", SMF__NOCREATE_DATA, 
+			   &data2, status );
+	    hdr2 = data2->hdr;
+	    smf_fits_getS( hdr2, "SUBARRAY", subarray, 81, status );
+	  }	
+	  sc2ast_name2num( subarray, &subsysnum, status);	
+	  if( *status == SAI__OK ) {
+	    refsubsys[j] = subsysnum;
+	  }
+	  /* Close the new file that we've opened */
+	  if( j>0 ) {
+	    smf_close_file( &data2, status );
+	  }
+	} else if( *status == SAI__OK ) {
+	  /* Flag this subsystem slot as empty */
+	  refsubsys[j] = -1;
+	}
+      }
 
       /* Store thischunk in chunk */
       chunk[i] = thischunk;
@@ -341,6 +455,7 @@ void smf_grp_related (  Grp *igrp, const int grpsize, const int grpbywave,
   ends = smf_free( ends, status );
   nbolx = smf_free( nbolx, status );
   nboly = smf_free( nboly, status );
+  refsubsys = smf_free( refsubsys, status );
   if ( *status != SAI__OK ) {
     indices = smf_free( indices, status );
     subgroups = smf_free( subgroups, status );

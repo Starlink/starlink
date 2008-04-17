@@ -123,6 +123,8 @@
 *        - Added QUALITY/VARIANCE to NDFexport
 *     2008-04-16 (EC):
 *        - Added outer loop to handle multiple cont. chunks for memiter=1 case
+*     2008-04-17 (EC):
+*        - Added maxlen to config file, modified smf_grp_related
 
 *  Notes:
 
@@ -208,6 +210,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
   smfGroup *lutgroup=NULL;      /* smfGroup of lut model files */
   unsigned char mask;           /* Bitmask for QUALITY flags */
+  dim_t maxlen;                 /* Max chunk length in samples */
+  int maxlen_s;                 /* Max chunk length in seconds */  
   int memiter=0;                /* If set iterate completely in memory */
   smfArray ***model=NULL;       /* Array of pointers smfArrays for ea. model */
   smfGroup **modelgroups=NULL;  /* Array of group ptrs/ each model component */
@@ -232,6 +236,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   unsigned int spikeiter;       /* Number of iterations for spike detection */
   int spikeiter_s;              /* signed version of spikeiter */
   double spikethresh;           /* Threshold for spike detection */
+  double steptime;              /* Length of a sample in seconds */
   unsigned int *thishits=NULL;  /* Pointer to this hits map */
   double *thismap=NULL;         /* Pointer to this map */
   smf_modeltype thismodel;      /* Type of current model */
@@ -297,15 +302,46 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       spikethresh = 0;
     }
 
-    if( !astMapGet0I( keymap, "SPIKEITER", &spikeiter_s ) ) {
-      spikeiter = 0;
-    } else {
+    if( astMapGet0I( keymap, "SPIKEITER", &spikeiter_s ) ) {
       if( spikeiter_s < 0 ) {
 	*status = SAI__ERROR;
 	errRep(FUNC_NAME, "spikeiter cannot be < 0.", status );
       } else {
 	spikeiter = (unsigned int) spikeiter_s;
       }
+    } else {
+      spikeiter = 0;
+    }
+
+    /* Maximum length of a chunk */
+    if( astMapGet0I( keymap, "MAXLEN", &maxlen_s ) ) {
+
+      if( maxlen_s < 0 ) {
+	/* Trap negtive MAXLEN */
+	*status == SAI__ERROR;
+	errRep(FUNC_NAME, "Negative value for MAXLEN supplied.", status);
+      } else if( maxlen_s == 0 ) {
+	/* 0 is OK... gets ignored later */
+	maxlen = 0;
+      } else {
+	/* Obtain sample length from header of first file in igrp */
+	smf_open_file( igrp, 1, "READ", SMF__NOCREATE_DATA, &data, status );
+	if( (*status == SAI__OK) && (data->hdr) ) {
+	  smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
+
+	  if( steptime > 0 ) {
+	    maxlen = maxlen_s/steptime;
+	  } else {
+	    /* Trap invalud sample length in header */
+	    *status == SAI__ERROR;
+	    errRep(FUNC_NAME, "Invalid STEPTIME in FITS header.", status);
+	  }
+	}
+	smf_close_file( &data, status );
+      }
+
+    } else {
+      maxlen = 0;
     }
 
     /* Type and order of models to fit from MODELORDER keyword */
@@ -374,16 +410,16 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
      the files. Now added "chunk" to smfGroup as well -- this is used to
      concatenate _only_ continuous pieces of data */
 
-  smf_grp_related( igrp, isize, 1, &igroup, status );
+  smf_grp_related( igrp, isize, 1, maxlen, &igroup, status );
 
   /* KLUDGE -- plot the chunk array */
-
+  /*
   printf(" CHUUUUUNK!!!! ");
-  for( i=0; i<igroup->ngroups; i++ ) {
+  if( *status == SAI__OK ) for( i=0; i<igroup->ngroups; i++ ) {
     printf("%i ", igroup->chunk[i]);
   }
   printf("\n");
-
+  */
 
   if( *status == SAI__OK ) {
     if( memiter ) {

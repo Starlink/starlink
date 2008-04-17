@@ -278,6 +278,8 @@
          - Added smf_simpleaddmap
 *     2008-04-16 (AGG):
 *        Add genvar to smf_rebinmap
+*     2008-04-17 (EC):
+*        Modified smf_grp_related interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -519,7 +521,7 @@ HDSLoc *smf_get_xloc ( const smfData *data, const char *extname,
 			const int ndims, const int *dims, int *status );
 
 void smf_grp_related( Grp *igrp, const int grpsize, const int grpbywave, 
-		      smfGroup **group, int *status );
+		      dim_t maxlen, smfGroup **group, int *status );
 
 void smf_history_add( smfData* data, const char * appl, 
 			const char * text, int *status);
