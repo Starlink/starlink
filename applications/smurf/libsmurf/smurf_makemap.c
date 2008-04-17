@@ -552,7 +552,7 @@ void smurf_makemap( int *status ) {
 
       msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Beginning the REBIN step", status);
       /* Rebin the data onto the output grid */
-      smf_rebinmap(data, i, size, outfset, spread, params, moving, 
+      smf_rebinmap(data, i, size, outfset, spread, params, moving, 1,
 		   lbnd_out, ubnd_out, map, variance, weights3d, status );
   
       /* Close the data file */

@@ -276,6 +276,8 @@
 *        - Added optional external QUALITY and VARIANCE to smf_model_NDFexport
 *        - Added chunk to smf_construct_smfGroup
          - Added smf_simpleaddmap
+*     2008-04-16 (AGG):
+*        Add genvar to smf_rebinmap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -592,7 +594,7 @@ void * smf_realloc( void * pntr, size_t nelem, size_t bytes_per_elem,
 
 void smf_rebinmap( smfData *data, int index, int size, 
                    AstFrameSet *outframeset, int spread, const double params[], 
-		   int moving, int *lbnd_out, int *ubnd_out,
+		   int moving, int genvar, int *lbnd_out, int *ubnd_out,
                    double *map, double *variance,
 		   double *weights, int *status );
 

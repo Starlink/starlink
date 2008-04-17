@@ -92,6 +92,8 @@
 *     2008-03-11 (AGG):
 *        Remove old bad bolometer-mask code: masking is now done with
 *        quality flags
+*     2008-04-16 (AGG):
+*        Add genvar parameter
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -140,7 +142,7 @@
 
 void smf_rebinmap( smfData *data, int index, int size, 
 		   AstFrameSet *outfset, int spread, const double params[], 
-		   int moving, int *lbnd_out, int *ubnd_out, double *map, 
+		   int moving, int genvar, int *lbnd_out, int *ubnd_out, double *map, 
 		   double *variance, double *weights, int *status ) {
 
   /* Local Variables */
@@ -205,7 +207,6 @@ void smf_rebinmap( smfData *data, int index, int size,
     /* Calculate the bolometer to map-pixel transformation for this tslice */
     bolo2map = smf_rebin_totmap( data, i, abskyfrm, sky2map, moving, 
 				 status );
-
     /* Set rebin flags */
     rebinflags = 0;
 
@@ -220,8 +221,9 @@ void smf_rebinmap( smfData *data, int index, int size,
     if( (index == size) && (i == (data->dims)[2]-1) )
       rebinflags = rebinflags | AST__REBINEND;
 
-    /* Generate VARIANCE */
-    rebinflags = rebinflags | AST__GENVAR;
+    /* Generate VARIANCE if requested */
+    if ( genvar )
+      rebinflags = rebinflags | AST__GENVAR;
  
     /* Rebin this time slice */
     astRebinSeqD( bolo2map, 0.0, 2, lbnd_in, ubnd_in, &(boldata[i*nbol]),
