@@ -120,6 +120,7 @@
 *  Copyright:
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     Copyright (C) 1999 Central Laboratory of the Research Councils.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -153,6 +154,8 @@
 *        Subtract a background from each individual profile sample in
 *        order to prevent positions drifting if there is a varying 
 *        background under the feature.
+*     17-APR-2008 (DSB):
+*        Use KPG__NOCEN error code.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -168,6 +171,7 @@
       INCLUDE  'SAE_PAR'       ! SSE global definitions
       INCLUDE  'PRM_PAR'       ! VAL__ constants
       INCLUDE  'NDF_PAR'       ! NDF constants
+      INCLUDE  'KPG_ERR'       ! KPG error constants
 
 *  Arguments Given:
       INTEGER NDIM
@@ -587,7 +591,7 @@
 
 *  Check for potential errors that might cause a divide by zero later.
             IF ( BACK( I ) .EQ. VAL__MAXR ) THEN
-               STATUS = SAI__ERROR
+               STATUS = KPG__NOCEN
                CALL ERR_REP( 'KPG1_LOCTx_UNDEFBGD',
      :           'The background could not be defined in order to '/
      :           /'evaluate the centroid.', STATUS )
@@ -644,7 +648,7 @@
                FINAL( I ) = VAL__BADR
             END DO
 
-            STATUS = SAI__ERROR
+            STATUS = KPG__NOCEN
             CALL ERR_REP( 'KPG1_LOCTx_NODATA',
      :        'Unable to compute a centroid because the array is all '/
      :        /'bad.', STATUS )
@@ -661,7 +665,7 @@
 
 *  There were no data above/below the background.
                ELSE IF ( DENOM( I ) .LT. VAL__EPSR ) THEN
-                  STATUS = SAI__ERROR
+                  STATUS = KPG__NOCEN
                   CALL MSG_SETI( 'I', I )
                   IF ( POSTIV ) THEN
                      CALL MSG_SETC( 'SIGN', 'above' )
@@ -708,7 +712,7 @@
 
 *  Make the error report.
                CALL MSG_SETC( 'BUFFER', BUFFER )
-               STATUS = SAI__ERROR
+               STATUS = KPG__NOCEN
                CALL ERR_REP( 'KPG1_LOCT_SHIFT',
      :           'Maximum allowable shift has been exceeded. '/
      :           /'Current shift is ^BUFFER pixels.', STATUS )

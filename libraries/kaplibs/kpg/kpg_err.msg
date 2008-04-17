@@ -6,4 +6,5 @@
 
 .BASE       100
 NOFTS   <No FITS Extension present in NDF>
+NOCEN   <Centroid position cannot be found>
 .END
