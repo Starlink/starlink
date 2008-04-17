@@ -68,6 +68,10 @@
 *  History:
 *     14-APR-2008 (DSB):
 *        Initial version.
+*     17-APR-2008 (DSB):
+*        Correct error message text and handle cases where a time slice
+*        is being merged with itself (this happens for the first time
+*        slice encountered for a given RTS_NUM value).
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -184,6 +188,14 @@
                                  } \
                               } \
                            } \
+\
+/* If we are merging a time slice with itself (i.e. if this is the first \
+   time slice for the RTS_NUM value), set metatdata bad for detectors \
+   that have no good spectral data values. */ \
+                        } else if( from == into ){ \
+                           for( j = 0; j < vpd; j++ ){ \
+                              pfrom##Sym3[ j ] = VAL__BAD##Sym3; \
+                           } \
                         } \
 \
 /* Move pointers on to the start of the data for the next detector. */ \
@@ -234,39 +246,35 @@ void smf_kmmerge( const char *xname, AstKeyMap *keymap, int from, int into,
 /* Check the inherited status */
    if( *status != SAI__OK ) return;
 
-/* Do nothing if we are merging a time slice with itself. */
-   if( from != into ) {
-
 /* Loop round every entry in the KeyMap. */
-      nentry = astMapSize( keymap );
-      for( i = 0; i < nentry; i++ ) {
-         key = astMapKey( keymap, i );
+   nentry = astMapSize( keymap );
+   for( i = 0; i < nentry; i++ ) {
+      key = astMapKey( keymap, i );
 
 /* Get the vector length of the entry. */
-         veclen = astMapLength( keymap, key );
+      veclen = astMapLength( keymap, key );
 
 /* Set a flag indicating that the contents of the KeyMap entry have not
    been changed. */
-         changed = 0;
+      changed = 0;
 
 /* Invoke a macro to handle the data type. */
-         type = astMapType( keymap, key );
-         if( type == AST__INTTYPE ){
-            DOTYPE(int,I,i,I);
+      type = astMapType( keymap, key );
+      if( type == AST__INTTYPE ){
+         DOTYPE(int,I,i,I);
 
-         } else if( type == AST__FLOATTYPE ){
-            DOTYPE(float,F,r,R);
+      } else if( type == AST__FLOATTYPE ){
+         DOTYPE(float,F,r,R);
 
-         } else if( type == AST__DOUBLETYPE ){
-            DOTYPE(double,D,d,D);
+      } else if( type == AST__DOUBLETYPE ){
+         DOTYPE(double,D,d,D);
 
-         } 
-      }
+      } 
+   }
 
 /* Free resources. */
-      valuesD = astFree( valuesD );
-      valuesR = astFree( valuesR );
-      valuesI = astFree( valuesI );
-   }
+   valuesD = astFree( valuesD );
+   valuesR = astFree( valuesR );
+   valuesI = astFree( valuesI );
 }
 
