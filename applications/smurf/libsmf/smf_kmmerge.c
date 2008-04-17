@@ -174,10 +174,12 @@
                                     msgSetc( "X", xname ); \
                                     msgSetc( "N", key ); \
                                     msgSeti( "R", rts_num ); \
-                                    msgSet##Sym2( "V1", pinto##Sym3[ from ] ); \
-                                    msgSet##Sym2( "V2", pfrom##Sym3[ into ] ); \
-                                    errRep( "", "Differing values (^V1 and ^V2) found for " \
-                                            "item ^X.^N when RTS_NUM=^R.", status ); \
+                                    msgSeti( "D", idet + 1 ); \
+                                    msgSet##Sym2( "V1", pinto##Sym3[ j ] ); \
+                                    msgSet##Sym2( "V2", pfrom##Sym3[ j ] ); \
+                                    errRep( "", "Detector ^D has differing values " \
+                                            "(^V1 and ^V2) for item ^X.^N when " \
+                                            "RTS_NUM=^R.", status ); \
                                     break; \
                                  } \
                               } \
