@@ -170,6 +170,8 @@
 #         Added action SC2FTS
 #     27-MAR-2008 (EC)
 #         Add SC2CLEAN
+#     16-APR-2008 (AGG)
+#         Remove USEBAD, add GENVAR for QLMAKEMAP
 #     {enter_changes_here}
 
 #  Bugs:
@@ -482,12 +484,12 @@ package @PACKAGE@ {
             access READ
             vpath DEFAULT 
             ppath CURRENT DEFAULT
-            prompt {Celestial coord system for output cube}
+            prompt {Celestial coord system for output map}
             default TRACKING
             helpkey *
 	  }
 
-          parameter usebad {
+          parameter genvar {
             type _LOGICAL
             vpath DEFAULT
             default 0
@@ -845,6 +847,16 @@ package @PACKAGE@ {
             ppath GLOBAL CURRENT
             helpkey *
           }
+
+         parameter badbol {
+            type _CHAR
+            access READ
+            vpath {DEFAULT }
+            default !
+            prompt {ARD Description File for Bad Bolometer mask}
+            ppath GLOBAL CURRENT
+            helpkey *
+          }          
 
           parameter msg_filter {
 	    type _CHAR
@@ -1632,6 +1644,26 @@ package @PACKAGE@ {
           }
      }
 
+     action sc2test {
+         parameter in {
+            position 1
+            type NDF
+            access READ
+            vpath {PROMPT }
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.DATA_ARRAY
+            prompt {Input NDF data structure}
+            helpkey *
+          }
+           parameter msg_filter {
+            type _CHAR
+            prompt {Message level}
+            default NORM
+            vpath DEFAULT
+            helpkey *
+          }
+     }
+
      action sc2fts {
          helplib {$SMURF_HELP}
 
@@ -1734,7 +1766,6 @@ package @PACKAGE@ {
             helpkey *
           }
      }
-
    }
 
     command jcmtstate2cat {
