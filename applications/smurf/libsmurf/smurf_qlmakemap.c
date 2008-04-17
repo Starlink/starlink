@@ -31,6 +31,10 @@
 *     the MEANWVM tau value (at 225 GHz) from the FITS header.
 
 *  ADAM Parameters:
+*     GENVAR = _LOGICAL (Read)
+*          Flag to denote whether or not variances are to be generated
+*          in the output file. The task runs slightly quicker if
+*          variances are not generated. [FALSE]
 *     IN = NDF (Read)
 *          Input file(s)
 *     PARAMS( 2 ) = _DOUBLE (Read)
@@ -168,6 +172,9 @@
 *     2008-04-02 (AGG):
 *        Write 2-D WEIGHTS component + WCS in output file, protect
 *        against attempting to access NULL smfFile pointer
+*     2008-04-16 (AGG):
+*        Remove exp_time and weights components to ensure QLMAKEMAP
+*        lives up to its name, add GENVAR parameter
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -229,19 +236,19 @@ void smurf_qlmakemap( int *status ) {
 
   /* Local Variables */
   smfData *data = NULL;      /* Pointer to input SCUBA2 data struct */
-  float *exp_time = NULL;    /* Exposure time array written to output file */
   AstFitsChan *fchan = NULL; /* FitsChan holding output NDF FITS extension */
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
   int flag;                  /* Flag */
+  int genvar = 0;            /* Flag to denote whether to generate
+				variances in output image */
   dim_t i;                   /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   double *map = NULL;        /* Pointer to the rebinned map data */
   size_t mapsize;            /* Number of pixels in output image */
-  float medtexp = 0.0;       /* Median exposure time */
   int moving = 0;            /* Flag to denote a moving object */
-  int neluse;                /* Number of pixels with a non-zero exposure time */
   int nparam = 0;            /* Number of extra parameters for pixel spreading scheme*/
+  size_t nweights;           /* Number of elements in weights array */
   AstKeyMap * obsidmap = NULL; /* Map of OBSIDs from input data */
   smfData *odata=NULL;       /* Pointer to output SCUBA2 data struct */
   Grp *ogrp = NULL;          /* Group containing output file */
@@ -254,20 +261,12 @@ void smurf_qlmakemap( int *status ) {
   AstKeyMap * prvkeymap = NULL; /* Keymap of input files for PRVxxx headers */
   int size;                  /* Number of files in input group */
   int smfflags = 0;          /* Flags for creating a new smfData */
-  HDSLoc *smurfloc = NULL;   /* HDS locator of SMURF extension */
   int spread;                /* Code for pixel spreading scheme */
-  double steptime;           /* Integration time per sample, from FITS header */
   char system[10];           /* Celestial coordinate system for output image */
   double tau;                /* 225 GHz optical depth */
-  smfData *tdata = NULL;     /* Exposure time data */
-  int tndf = 0;              /* NDF identifier for EXP_TIME */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   void *variance = NULL;     /* Pointer to the variance map */
-  smfData *wdata = NULL;     /* Pointer to SCUBA2 data struct for weights */
-  double *weights = NULL;    /* Pointer to the weights map */
-  double *weights3d = NULL;  /* Pointer to 3-D weights array */
-  int wndf = 0;              /* NDF identifier for WEIGHTS */
-  float *work_array = NULL;  /* Temporary work space */
+  double *weights = NULL;    /* Pointer to the weights array */
 
   /* Main routine */
   ndfBegin();
@@ -288,6 +287,9 @@ void smurf_qlmakemap( int *status ) {
 	   status );
   }
 
+  /* Decide whether output map contains variance */
+  parGet0l( "GENVAR", &genvar, status );
+
   /* Obtain desired pixel-spreading scheme */
   parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
 	    "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
@@ -304,45 +306,36 @@ void smurf_qlmakemap( int *status ) {
   smf_mapbounds_approx( igrp, 1, system, pixsize, lbnd_out, ubnd_out, 
 			&outframeset, &moving, status );
  
+  /* Compute number of pixels in output map */
+  mapsize = (ubnd_out[0] - lbnd_out[0] + 1) * (ubnd_out[1] - lbnd_out[1] + 1);
+
+  /* Now allocate memory for weights array used by smf_rebinmap and
+     initialize to zero */
+  if ( genvar ) {
+    nweights = 2*mapsize;
+    /* Generate variances in output file */
+    smfflags |= SMF__MAP_VAR;
+  } else {
+    nweights = mapsize;
+  }
+  weights = smf_malloc( nweights, sizeof(double), 1, status);
+
   /* Create an output smfData */
   ndgCreat( "OUT", NULL, &ogrp, &outsize, &flag, status );
-  smfflags |= SMF__MAP_VAR;
   smf_open_newfile( ogrp, 1, SMF__DOUBLE, 2, lbnd_out, ubnd_out, smfflags, &odata, 
 		    status );
+
+  /* Map variance array if we want it in the output file - this should
+     be OK even if no variances are required because it is initialized
+     to a NULL pointer */
+  variance = (odata->pntr)[1];
 
   /* If created OK, retrieve pointers to data */
   if ( *status == SAI__OK ) {
     file = odata->file;
     ondf = file->ndfid;
-    /* Map the data, variance, and weights arrays */
+    /* Map the data array */
     map = (odata->pntr)[0];
-    variance = (odata->pntr)[1];
-  }
-
-  /* Create SMURF extension in the output file */
-  smurfloc = smf_get_xloc ( odata, "SMURF", "SMURF", "WRITE", 0, 0, status );
-
-  /* Compute number of pixels in output map */
-  mapsize = (ubnd_out[0] - lbnd_out[0] + 1) * (ubnd_out[1] - lbnd_out[1] + 1);
-
-  /* Create WEIGHTS component in output file */
-  smf_open_ndfname ( smurfloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
-                     2, lbnd_out, ubnd_out, &wdata, status );
-  if ( wdata ) {
-    weights = (wdata->pntr)[0];
-    wndf = wdata->file->ndfid;
-  }
-  /* Now allocate memory for 3-d work array used by smf_rebinmap -
-     plane 2 of this 3-D array is stored in the weights component
-     later. Initialize to zero. */
-  weights3d = smf_malloc( 2*mapsize, sizeof(double), 1, status);
-
-  /* Create EXP_TIME component in output file */
-  smf_open_ndfname ( smurfloc, "WRITE", NULL, "EXP_TIME", "NEW", "_REAL",
-		     2, lbnd_out, ubnd_out, &tdata, status );
-  if ( tdata ) {
-    exp_time = (tdata->pntr)[0];
-    tndf = tdata->file->ndfid;
   }
 
   /* Create provenance keymap */
@@ -351,7 +344,7 @@ void smurf_qlmakemap( int *status ) {
   /* Loop over each input file, subtracting bolometer drifts, a mean
      sky level (per timeslice), correcting for extinction and
      regridding the data into the output map */
-  msgOutif( MSG__VERB," ", "SMURF_QLMAKEMAP: Process data", status );
+  msgOutif( MSG__VERB," ", "SMURF_QLMAKEMAP: Process data files", status );
   for ( i=1; i<=size && *status == SAI__OK; i++ ) {
     /* Read data from the ith input file in the group */
     smf_open_and_flatfield( igrp, NULL, i, &data, status );
@@ -360,11 +353,6 @@ void smurf_qlmakemap( int *status ) {
        as is but we use a keymap in order to reuse smf_fits_add_prov */
     if (*status == SAI__OK)
       smf_accumulate_prov( prvkeymap, data->file, igrp, i, status );
-
-    /* Store steptime for calculating EXP_TIME */
-    if ( i==1 ) {
-      smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
-    }
 
     /* Handle output FITS header creation */
     smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
@@ -382,48 +370,28 @@ void smurf_qlmakemap( int *status ) {
 
     msgOutif(MSG__VERB, " ", "SMURF_QLMAKEMAP: Beginning the REBIN step", status);
     /* Rebin the data onto the output grid */
-    smf_rebinmap(data, i, size, outframeset, spread, params, moving, 
-		 lbnd_out, ubnd_out, map, variance, weights3d, status );
+    smf_rebinmap(data, i, size, outframeset, spread, params, moving, genvar,
+		 lbnd_out, ubnd_out, map, variance, weights, status );
 
     smf_close_file( &data, status );
   }
 
-  /* Calculate exposure time per output pixel from weights array -
-     note even if weights is a 3-D array we only use the first mapsize
-     number of values which represent the `hits' per pixel. Also store
-     the sum of the squares of the pixel weights (i.e. plane 2 of the
-     3-D weights array) */
-  for (i=0; (i<mapsize) && (*status == SAI__OK); i++) {
-    exp_time[i] = steptime * weights3d[i];
-    weights[i] = weights3d[i+mapsize];
-  }
-  weights3d = smf_free( weights3d, status );
-
-  /* Write WCS FrameSet to output file and to EXP_TIME */
+  /* Write WCS FrameSet to output file */
   ndfPtwcs( outframeset, ondf, status );
-  ndfPtwcs( outframeset, tndf, status );
-  ndfPtwcs( outframeset, wndf, status );
 
-  /* Calculate unweighted median exposure time - work_array is needed
-     because kpg1Medur optimizes the order of the input array */
-  work_array = smf_malloc( mapsize, sizeof(float), 1, status);
-  if ( work_array ) {
-    work_array = astStore( work_array, exp_time, mapsize*sizeof(float));
-    kpg1Medur( 1, (int)mapsize, work_array, &medtexp, &neluse, status);
-    astSetFitsF(fchan, "MEDTEXP", medtexp, "[s] Median MAKEMAP exposure time", 0);
-    smf_free( work_array, status );
-  }
+  /* Free up weights array */
+  weights = smf_free( weights, status);
 
-/* Retrieve the unique OBSID keys from the KeyMap and populate the OBSnnnnn
-   and PROVCNT headers from this information. */
+  /* Retrieve the unique OBSID keys from the KeyMap and populate the
+     OBSnnnnn and PROVCNT headers from this information. */
   smf_fits_add_prov( fchan, "OBS", obsidmap, status ); 
   smf_fits_add_prov( fchan, "PRV", prvkeymap, status ); 
   
   astAnnul( prvkeymap );
   astAnnul( obsidmap );
 
-/* If the FitsChan is not empty, store it in the FITS extension of the
-   output NDF (any existing FITS extension is deleted). */
+  /* If the FitsChan is not empty, store it in the FITS extension of
+     the output NDF (any existing FITS extension is deleted). */
   if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
 
   /* Free the WCS pointer */
