@@ -630,9 +630,9 @@ AC_DEFUN([STAR_PRM_COMPATIBLE_SYMBOLS],
        [star_cv_prm_compatible_symbols],
        [star_cv_prm_compatible_symbols="nocheck"
         AC_MSG_NOTICE([ ])
-        AC_FC_HAVE_TYPELESS_BOZ
+        AC_FC_HAVE_TYPELESS_BOZ 2>&5
         if test $ac_cv_fc_have_typeless_boz = no; then
-           AC_FC_HAVE_OLD_TYPELESS_BOZ
+           AC_FC_HAVE_OLD_TYPELESS_BOZ 2>&5
            if test $ac_cv_fc_have_old_typeless_boz = no; then
               #  Test if "-fno-range-check" works.
               AC_REQUIRE([AC_PROG_FC])dnl
@@ -669,33 +669,100 @@ AC_DEFUN([STAR_PRM_COMPATIBLE_SYMBOLS],
 # -------------------
 #
 # Work out what type to use for the trailing lengths of character strings
-# passed from C to Fortran. See the "TRAIL" descriptions in SUN/209.
+# passed from Fortran to C. See the "TRAIL" descriptions in SUN/209.
 #
 # For most compilers the maximum length of a string is limited to a 32bit
 # unsigned int, but for others, this can be a 64bit unsigned long. Currently
-# the only compiler with 64bit strings is 64bit Intel fortran.
+# the only compilers with 64bit strings are 64bit Intel fortran and
+# Solaris studio12 with -m64.
 #
-# A programmatic tests have not been successful as long can work when
-# int is prescribed as often when optimising alignment boundaries are
-# set to 8 byte (double), so we must use specific compiler checks.
+# The test is only performed for 64bit compilers, all others are assumed
+# to use 32bit lengths. Various attempts to trap this issue permanently 
+# using a test program have failed (especially for the Intel compiler), so the
+# actual test is to check for a known 64 bit compiler first and then try a
+# program that has had some success. Note no GNU compilers seem to have this
+# problem so they are never tested.
 #
-# The side-effect of this macros is to define TRAIL_TYPE to either "int"
+# The side-effect of this macro is to define TRAIL_TYPE to either "int"
 # or "long". Use the CNF include file "f77.h" to not worry about this.
 #
 AC_DEFUN([STAR_CNF_TRAIL_TYPE],
-   [AC_CACHE_CHECK([type used for Fortran string lengths],
-       [star_cv_trail_type],
-       [AC_REQUIRE([AC_PROG_FC])
-       if test "$ac_cv_fc_compiler_gnu" = no; then
-          if "$FC" -V 2>&1 < /dev/null | grep 'Intel.*64' > /dev/null; then
-             star_cv_trail_type=long
-          else
-             star_cv_trail_type=int
-          fi
-       else
-           star_cv_trail_type=int
-       fi])
-    AC_SUBST([TRAIL_TYPE], $star_cv_trail_type )
+   [AC_CHECK_SIZEOF(void*)dnl
+    AC_FC_HAVE_PERCENTLOC dnl
+    AC_CACHE_CHECK([type used for Fortran string lengths],
+       [star_cv_cnf_trail_type],
+       [if test "$ac_cv_sizeof_voidp" = 8 -a "$ac_cv_fc_compiler_gnu" = no; then
+           if "$FC" -V 2>&1 < /dev/null | grep 'Intel.*64' > /dev/null; then
+              star_cv_cnf_trail_type=long
+           elif "$FC" -V 2>&1 < /dev/null | grep 'Sun.*Fortran' > /dev/null; then
+              star_cv_cnf_trail_type=long
+           else
+              AC_REQUIRE([AC_PROG_FC])dnl
+              AC_LANG_PUSH([Fortran])
+              if test "$ac_cv_fc_have_percentloc" = yes; then
+                 FORTRAN_GETLOC='%loc'
+              else 
+                 FORTRAN_GETLOC='loc'
+              fi
+              AC_LANG_CONFTEST([AC_LANG_SOURCE([
+      program conftest
+
+C  checks passing 4 byte character string lengths on 64bit compiler.
+
+      integer*8 ip1, ip2
+      integer*4 l1, l2
+      integer dummy1, dummy2
+      real dummy3, dummy4
+      double precision dummy5, dummy6
+
+      character str1*(1024)
+      character str2*(2048)
+
+      ip1 = $FORTRAN_GETLOC (str1)
+      ip2 = $FORTRAN_GETLOC (str2)
+
+      l1 = 1024
+      l2 = 2048
+
+      call report( dummy1, dummy2, %val(ip1), dummy3, dummy4,
+     :             %val(ip2), dummy5, dummy6, 
+     :             %val(l1), %val(l2) )
+
+      end
+
+      subroutine report( dummy1, dummy2, str1, dummy3, dummy4,
+     :                   str2, dummy5, dummy6 )
+      integer dummy1, dummy2
+      real dummy3, dummy4
+      double precision dummy5, dummy6
+
+      character*(*) str1
+      character*(*) str2
+
+      if ( [len(str1)] .eq. 1024 .and. [len(str2)] .eq. 2048 ) then
+         print *, 'int'
+      else
+         print *, 'long'
+      endif
+      end
+])])
+              star_cv_cnf_trail_type=int
+              $FC $FCFLAGS $opt -o conftest conftest.f 2>&5
+              if test -r conftest
+              then
+                 star_cv_cnf_trail_type=`eval conftest | sed 's/\ //g'` > /dev/null
+              else
+                 AC_MSG_ERROR([failed to link program]) 
+              fi
+              rm -f conftest*
+              AC_LANG_POP([Fortran])
+           fi
+        else
+dnl  sizeof(void *) != 8 or GNU so no problems.
+           star_cv_cnf_trail_type=int
+        fi
+])
+    AC_SUBST([TRAIL_TYPE], $star_cv_cnf_trail_type )
 ])# STAR_CNF_TRAIL_TYPE
 
 # STAR_PATH_TCLTK([minversion=0], [options=''])
