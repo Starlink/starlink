@@ -68,6 +68,8 @@
 *        Reinstate the fallback to emsSyser (at least for g77 case)
 *     20-FEB-2007 (PWD):
 *        Add gfortran support.
+*     17-APR-2008 (PWD):
+*        Support for PC Solaris.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -98,6 +100,7 @@ int strcmp(const char*, const char*);
 #endif
 
 #define STRING_EQ(a,b) (strcmp((a), (b)) == 0)
+#define STRING_NEQ(a,b,n) (strncmp((a), (b), (n)) == 0)
 
 #define AC_FC 	   "@FC@"
 #define AC_is_gnu  "@ac_compiler_gnu@"
@@ -362,7 +365,8 @@ static const MessageInfo* getMessageInfo(void)
      info.lookup = 0;
 
    } else if ( STRING_EQ( AC_FC, "f77" )
-               && STRING_EQ( AC_vendor, "sun" ) ) {
+               && ( STRING_EQ( AC_vendor, "sun" ) || 
+                    STRING_NEQ( AC_os, "solaris", 7 ) ) ) {
       /* These values obtained from Solaris 9 `Sun Fortran Users' Guide' */
       static const char* msgs[] = {
          "Error in format",                       /* 1000 */
