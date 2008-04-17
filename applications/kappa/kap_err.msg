@@ -3,5 +3,6 @@
 .SEVERITY    ERROR
 
 WALA0       <In-situ alignment not possible due to non-linear Mapping>
+PSFSN       <Gaussian fit normal-equation matrix is singular>
 
 .END

@@ -75,7 +75,9 @@
 *  Copyright:
 *     Copyright (C) 1981, 1990 Science & Engineering Research Council.
 *     Copyright (C) 1996, 1998 Central Laboratory of the Research
-*     Councils. All Rights Reserved.
+*     Councils. 
+*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -96,6 +98,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Durham Univ.)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S Bewrru (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -111,6 +114,8 @@
 *        to meet the tolerance test is no longer fatal.  Warning
 *        messages showing the requested and used tolerances replace
 *        the error message.
+*     17-APR-2008 (DSBV):
+*        Use error code KAP__PSFSN instead of SAI__ERROR.
 *     {enter_further_changes_here}
 
 *-
@@ -121,6 +126,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! Bad-pixel constants
+      INCLUDE 'KAP_ERR'          ! KAPPA error constants
 
 *  Arguments Given:
       INTEGER NP
@@ -256,7 +262,7 @@
 
 *  Watch for an error.
          IF ( ERRCO .EQ. -4 ) THEN
-            STATUS = SAI__ERROR
+            STATUS = KAP__PSFSN
             CALL MSG_SETI( 'IFAIL', ERRCO )
             CALL ERR_REP( 'KPS1_PGFT<T>_NORMEQ',
      :        'Error solving the normal equations for the Gaussian '/
