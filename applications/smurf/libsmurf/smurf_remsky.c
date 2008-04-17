@@ -40,13 +40,17 @@
 *  Authors:
 *     Andy Gibb (UBC)
 *     Tim Jenness (JAC, Hawaii)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-02-16 (AGG):
 *        Initial test version
 *     2006-12-20 (TIMJ):
-*        Open related files in UPDATE mode to prevent overwrite of propogated components
+*        Open related files in UPDATE mode to prevent overwrite of propogated 
+*        components
+*     2008-04-17 (EC):
+*        Modified smf_grp_related interface
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -170,7 +174,7 @@ void smurf_remsky( int * status ) {
       smf_close_file( &odata, status);
     }
     /* Group output files together now that they exist */
-    smf_grp_related( ogrp, outsize, 1, &ogroup, status );
+    smf_grp_related( ogrp, outsize, 1, 0, &ogroup, status );
     if ( *status == SAI__OK ) {
       /* Open and process related files */
       for (i=0; i<ogroup->ngroups; i++) {
