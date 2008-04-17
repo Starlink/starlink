@@ -1,0 +1,131 @@
+*+
+*  Name:
+*     sun_iosdef
+
+*  Purpose:
+*     Set error status
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     INCLUDE 'sun_iosdef'
+
+*  Description:
+*     Error codes for Sun Fortran compiler studio12, see:
+*        http://docs.sun.com/app/docs/doc/819-5263/aevov?a=view
+*     if that still exists.
+
+*  Copyright:
+*     Copyright (C) 1992 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either version 2 of
+*     the License, or (at your option) any later version.
+*     
+*     This program is distributed in the hope that it will be
+*     useful,but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*     
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+*     02111-1307, USA
+
+*  Authors:
+*     PMA: Peter Allan (Starlink, RAL)
+*     PWD: Peter W. Draper (JAC, Durham University)
+*     {enter_new_authors_here}
+
+*  History:
+*     15-OCT-1992 (PMA):
+*        First version.
+*     17-APR-2008 (PWD):
+*        PC Solaris version for studio12 compilers.
+*     {enter_further_changes_here}
+
+*-
+
+      INTEGER SUN__ERFMT         ! Error in format
+      PARAMETER( SUN__ERFMT = 1000 )
+
+      INTEGER SUN__ILLUN         ! Illegal unit number
+      PARAMETER( SUN__ILLUN = 1001 )
+
+      INTEGER SUN__FIONA         ! Formatted I/O not allowed
+      PARAMETER( SUN__FIONA = 1002 )
+
+      INTEGER SUN__UIONA         ! Unformatted I/O not allowed
+      PARAMETER( SUN__UIONA = 1003 )
+
+      INTEGER SUN__DIONA         ! Direct I/O not allowed
+      PARAMETER( SUN__DIONA = 1004 )
+
+      INTEGER SUN__SIONA         ! Sequential I/O not allowed
+      PARAMETER( SUN__SIONA = 1005 )
+
+      INTEGER SUN__CNTBF         ! Cannot backspace file
+      PARAMETER( SUN__CNTBF = 1006 )
+
+      INTEGER SUN__OFBOR         ! Off beginning of record
+      PARAMETER( SUN__OFBOR = 1007 )
+
+      INTEGER SUN__CNTSF         ! Cannot stat file
+      PARAMETER( SUN__CNTSF = 1008 )
+
+      INTEGER SUN__NAARC         ! No * after repeat count
+      PARAMETER( SUN__NAARC = 1009 )
+
+      INTEGER SUN__OFEOR         ! Off end of record
+      PARAMETER( SUN__OFEOR = 1010 )
+
+      INTEGER SUN__ILSTI         ! Incomprehensible list input
+      PARAMETER( SUN__ILSTI = 1012 )
+
+      INTEGER SUN__OOFSP         ! Out of free space
+      PARAMETER( SUN__OOFSP = 1013 )
+
+      INTEGER SUN__UNTNC         ! Unit not connected
+      PARAMETER( SUN__UNTNC = 1014 )
+
+      INTEGER SUN__RUNCH         ! Read unexpected character
+      PARAMETER( SUN__RUNCH = 1015 )
+
+      INTEGER SUN__ILINP         ! Illegal logical input field
+      PARAMETER( SUN__ILINP = 1016 )
+
+      INTEGER SUN__NFEXI         ! 'new' file exists
+      PARAMETER( SUN__NFEXI = 1017 )
+
+      INTEGER SUN__CFOLF         ! Cannot find 'old' file
+      PARAMETER( SUN__CFOLF = 1018 )
+
+      INTEGER SUN__UNKNO         ! Unknown system error
+      PARAMETER( SUN__UNKNO = 1019 )
+
+      INTEGER SUN__REQSA         ! Requires seek ability
+      PARAMETER( SUN__REQSA = 1020 )
+
+      INTEGER SUN__ILARG         ! Illegal argument
+      PARAMETER( SUN__ILARG = 1021 )
+
+      INTEGER SUN__NEGRC         ! Negative repeat count
+      PARAMETER( SUN__NEGRC = 1022 )
+
+      INTEGER SUN__ILOPU         ! Illegal operation for unit
+      PARAMETER( SUN__ILOPU = 1023 )
+
+      INTEGER SUN__INSPE         ! Incompatible specifiers in open
+      PARAMETER( SUN__INSPE = 1025 )
+
+      INTEGER SUN__IINAM         ! Illegal input for namelist
+      PARAMETER( SUN__IINAM = 1026 )
+
+      INTEGER SUN__FILEO         ! Error in FILEOPT parameter
+      PARAMETER( SUN__FILEO = 1027 )
+
