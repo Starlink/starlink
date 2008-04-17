@@ -809,6 +809,10 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *     2-APR-2008 (DSB):
 *        In CLASSFromStore, adjust the spatial CRVAL and CRPIX values to be 
 *        the centre of the first pixel if the spatial axes are degenerate.
+*     17-APR-2008 (DSB):
+*        Ignore latitude axis PV terms supplied in a TAN header
+*        (previously, such PV terms were used as polynomial correction
+*        terms in a TPN projection).
 *class--
 */
 
@@ -7558,8 +7562,8 @@ static void DSSToStore( AstFitsChan *this, FitsStore *store,
       SetItemC( &(store->radesys), 0, ' ', "FK5" );
       SetItem( &(store->wcsaxes), 0, 0, ' ', 2.0 );
       store->naxis = 2;
-      SetItemC( &(store->ctype), 0, ' ', "RA---TAN" );
-      SetItemC( &(store->ctype), 1, ' ', "DEC--TAN" );
+      SetItemC( &(store->ctype), 0, ' ', "RA---TPN" );
+      SetItemC( &(store->ctype), 1, ' ', "DEC--TPN" );
    }
 }
 
@@ -24597,13 +24601,13 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    --------------------- */
       } else if( s == ' ' && !Ustrcmp( prj, "-TNX" ) ) {
 
-/* Replace TNX with TAN in the CTYPE values. */
-         strcpy( lontype + 4, "-TAN" );
+/* Replace TNX with TPN in the CTYPE values. */
+         strcpy( lontype + 4, "-TPN" );
          cval = lontype;
          SetValue( ret, FormatKey( "CTYPE", axlon + 1, -1, ' ' ),
                    (void *) &cval, AST__STRING, NULL );
    
-         strcpy( lattype + 4, "-TAN" );
+         strcpy( lattype + 4, "-TPN" );
          cval = lattype;
          SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, ' ' ),
                    (void *) &cval, AST__STRING, NULL );
@@ -27015,7 +27019,6 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
    int naxes;                /* Number of axes */
    int np;                   /* Max parameter index */
    int prj;                  /* Projection type identifier */
-   int useprj;               /* Projection type identifier to use */
    static char type[4];      /* Buffer for celestial system */
 
 /* Initialise the returned values. */
@@ -27292,32 +27295,8 @@ static AstMapping *WcsCelestial( AstFitsChan *this, FitsStore *store, char s,
    parameters (on any axes). */
             np = GetMaxJM( &(store->pv), s );
 
-/* If the CTYPE value specified a "TAN" projection, we will use AST__TPN
-   rather than AST__TAN for the WcsMap type if:
-   1) there are any projection parameters associated with the latitude
-      axis, or
-   2) There are projection parameters associated with the longitude axis
-      for m > 4 (FITS-WCS paper II allows a standard TAN projection to 
-      use PVi_0 -> PVi_4 to specify phi0,theta0,lonpole,latpole,etc). */
-            useprj = latprj;
-            if( latprj == AST__TAN ) {
-               for( m = 0; m <= np; m++ ){
-                  pv = GetItem( &(store->pv), axlat, m, s, NULL, method, class );
-                  if( pv != AST__BAD ) {
-                     useprj = AST__TPN;
-                     break;
-                  }
-         
-                  pv = GetItem( &(store->pv), axlon, m, s, NULL, method, class );
-                  if( pv != AST__BAD && m > 4 ) {
-                     useprj = AST__TPN;
-                     break;
-                  }
-               }
-            }
-
 /* Create the WcsMap */
-            map2 = (AstMapping *) astWcsMap( naxes, useprj, axlon + 1, 
+            map2 = (AstMapping *) astWcsMap( naxes, latprj, axlon + 1, 
                                              axlat + 1, "" );
 
 /* If the FITS header contains any projection parameters, store them in

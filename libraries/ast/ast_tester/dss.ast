@@ -1,5 +1,5 @@
  Begin FrameSet 	# Set of inter-related coordinate systems
-#   Title = "FK5 equatorial coordinates; mean equinox J2000.0; gnomonic projection" 	# Title of coordinate system
+#   Title = "FK5 equatorial coordinates; mean equinox J2000.0; gnomonic polynomial projection" 	# Title of coordinate system
 #   Naxes = 2 	# Number of coordinate axes
 #   Domain = "SKY" 	# Coordinate system domain
 #   Epoch = 2000 	# Julian epoch of observation
@@ -36,7 +36,7 @@
        Begin SkyFrame 	# Description of celestial coordinate system
           Ident = " " 	# Permanent Object identification string
        IsA Object 	# AST Object
-#         Title = "FK5 equatorial coordinates; mean equinox J2000.0; gnomonic projection" 	# Title of coordinate system
+#         Title = "FK5 equatorial coordinates; mean equinox J2000.0; gnomonic polynomial projection" 	# Title of coordinate system
           Naxes = 2 	# Number of coordinate axes
 #         Domain = "SKY" 	# Coordinate system domain
           Epoch = 2000 	# Julian epoch of observation
@@ -55,7 +55,7 @@
              Begin SkyAxis 	# Celestial coordinate axis
              End SkyAxis
        IsA Frame 	# Coordinate system description
-          Proj = "gnomonic" 	# Description of sky projection
+          Proj = "gnomonic polynomial" 	# Description of sky projection
           Eqnox = 2000 	# Julian epoch of mean equinox
           SRefIs = "Ignored" 	# Not rotated (ref. pos. is ignored)
           SRef1 = 2.82723746556841 	# Ref. pos. RA 10:47:57.3
