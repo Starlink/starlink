@@ -1517,6 +1517,16 @@ package @PACKAGE@ {
 
          helplib {$SMURF_HELP}
 
+	  parameter detectors {
+            type LITERAL
+            access READ
+            vpath DEFAULT 
+            ppath CURRENT DEFAULT
+            prompt {Names of detectors to be included}
+            default !
+            helpkey *
+	  }
+
          parameter detpurge {
             type _LOGICAL
             prompt {Remove dead detectors?}

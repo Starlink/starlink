@@ -50,11 +50,25 @@
 *     set of sub-scans from a sub-system.
 
 *  ADAM Parameters:
+*     DETECTORS = LITERAL (Read)
+*          A group of detector names to include in, or exclude from, the
+*          output cube. If the first name starts with a minus sign, then 
+*          the specified detectors are excluded from the output cube (all
+*          other detectors are included). Otherwise, the specified detectors 
+*          are included from the output cube (all other detectors are 
+*          excluded). Information in the ACSIS extension that is associated 
+*          with excluded detectors is also excluded from the output NDFs. If 
+*          a null (!) value is supplied, data from all detectors will be 
+*          used. See also DETPURGE. [!]
 *     DETPURGE = _LOGICAL (Read)
 *          If TRUE, then any detectors that have no good data values in
-*          the input NDFs will be excluded from the output NDFs. The
-*          information in the ACSIS extension that is associated with 
-*          such detectors is also excluded from the outptu NDFs. [FALSE]
+*          the input NDFs will be excluded from the output NDFs. This is
+*          in addition to any excluded detectors specified by the DETECTORS 
+*          parameter. Information in the ACSIS extension that is associated 
+*          with such detectors is also excluded from the output NDFs. Note, 
+*          DETPURGE takes precedence over DETECTORS. That is, if DETPURGE
+*          is set TRUE, then bad detectors will be excluded even if the 
+*          DETECTORS parameter indicates that they should be included. [FALSE]
 *     IN = NDF (Read)
 *          A group of input NDFs, each holding raw time series data.
 *     LIMITTYPE = LITERAL (Read)
@@ -155,6 +169,8 @@
 *        each sub-system.
 *        - Report an error if conflicting data values are found for the
 *        same detector and RTS_NUM value.
+*     18-APR-2008 (DSB):
+*        Added DETECTORS parameter.
 
 *  Copyright:
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
@@ -225,6 +241,7 @@ void smurf_timesort( int *status ) {
    AstMapping *omap = NULL;   
    AstMapping *tmap = NULL;   
    AstObject *obj = NULL;
+   Grp *detgrp = NULL;        
    Grp *igrp1 = NULL;         
    Grp *igrp2 = NULL;         
    Grp *igrp3 = NULL;         
@@ -244,6 +261,7 @@ void smurf_timesort( int *status ) {
    const char *comps = NULL;
    const char *dom = NULL;
    const char *key = NULL;
+   const char *lab = NULL;
    const char *timeorg = NULL;
    const char *timescl = NULL;
    const char *timesys = NULL;
@@ -271,11 +289,12 @@ void smurf_timesort( int *status ) {
    int detpurge;
    int dims[ 3 ];             
    int el;                    
+   int found;
    int hasqual;
    int hasvar;
    int i;                     
-   int idet;
    int ichan;
+   int idet;
    int iel;
    int ifile;                 
    int indf1;                 
@@ -286,6 +305,7 @@ void smurf_timesort( int *status ) {
    int iobs;
    int iout;
    int ioutname;
+   int irec;
    int isubscan;
    int isubsys;
    int j;
@@ -300,6 +320,7 @@ void smurf_timesort( int *status ) {
    int ncomp;                 
    int ndet;
    int ndet_out;
+   int ndetgrp;
    int ndim;                  
    int nnout[ NDF__MXDIM ];     
    int nobs;
@@ -327,6 +348,7 @@ void smurf_timesort( int *status ) {
    int ubnd[ 3 ];
    size_t len;                
    size_t ntai;               
+   smfData *data = NULL; 
    void *ipin;                
    void *ipout;               
    void *ptr[2];              
@@ -361,10 +383,67 @@ void smurf_timesort( int *status ) {
    if( detpurge ){
       mask = smf_find_bad_dets( igrp1, size, &nbaddet, status );
       if( nbaddet == 0 ) mask = astFree( mask );
+
    } else {
       mask = NULL;
       nbaddet = 0;
    }
+
+/* Get the user-selected detectors to use. If a null value is supplied, 
+   annul the error. Otherwise, make the group case insensitive. */
+   detgrp = NULL;
+   if( *status == SAI__OK ) {
+      kpg1Gtgrp( "DETECTORS", &detgrp, &ndetgrp, status );
+      if( *status == PAR__NULL ) {
+         errAnnul( status );
+	 if (detgrp) {
+	   grpDelet( &detgrp, status );
+	 }
+      } else {
+         grpSetcs( detgrp, 0, status );
+      }
+   }
+
+/* Issue a warning if any of the detector names specified in "detgrp"
+   were not found in the first input cube. If the supplied group holds the 
+   detectors to be excluded, modify it so that it holds the detectors to be
+   included. */
+   smf_open_file( igrp1, 1, "READ", 0, &data, status );
+   smf_checkdets( detgrp, data, status );
+
+/* Extend the detector mask to exclude any detectors that are excluded as a 
+   result of the DETECTORS parameter. */
+   if( detgrp ) {
+      lab = data->hdr->detname;
+      for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
+         grpIndex( lab, detgrp, 1, &found, status );
+         if( !found ) {
+            if( !mask ) {
+               mask = astMalloc( sizeof( int )*(data->dims)[ 1 ] );
+               if( mask ) {
+                  for( i = 0; i < (data->dims)[ 1 ]; i++ ) mask[ i ] = 1;
+                  mask[ irec ] = 0;
+               }
+            } else {
+               mask[ irec ] = 0;
+            }
+            nbaddet++;
+         }
+         lab += strlen( lab ) + 1;
+      }
+   }   
+
+/* Abort if there are no detectors to included. */
+   if( nbaddet == (data->dims)[ 1 ] && *status == SAI__OK ) {
+      *status = SAI__ERROR;
+      errRep( "", "The values supplied for the DETECTORS and DETPURGE "
+              "parameters would result in all detectors being rejected.",
+              status );
+   }
+
+/* Close the ifrst input file. */
+   smf_close_file( &data, status);
+   data = NULL;
 
 /* Initialise the number of output NDFs created. */
    totout = 0;
@@ -1391,6 +1470,7 @@ void smurf_timesort( int *status ) {
 /* Free resources. */
    mask = astFree( mask );
    obs_map = astAnnul( obs_map );
+   if( detgrp != NULL) grpDelet( &detgrp, status);
    grpDelet( &igrp1, status );
    grpDelet( &igrp3, status );
    grpDelet( &igrp4, status );
