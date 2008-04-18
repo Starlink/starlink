@@ -45,10 +45,12 @@
 *        Original version
 *     2007-08-27 (CV):
 *        Added microstepping
+*     2008-04-17 (AGG):
+*        Deal with 450um arrays
 
 *  Copyright:
-*     Copyright (C) 2007 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2007-2008 University of British Columbia. All
+*     Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -113,16 +115,20 @@ int *status            /* global status (given and returned) */
 
   if  ( strncmp( inx->instap, " ", 1 ) != 0 ) {
     /* Check for valid subarray */
-    if ( strncmp( inx->instap, "s8a", 3 ) == 0 ) {
+    if ( (strncmp( inx->instap, "s8a", 3 ) == 0 ) || 
+	 (strncmp( inx->instap, "s4d", 3 ) == 0 ) ){
       instap_arr[0] = halfx;
       instap_arr[1] = -halfy;
-    } else if ( strncmp( inx->instap, "s8b", 3 ) == 0 ) {
+    } else if ( (strncmp( inx->instap, "s8b", 3 ) == 0 ) ||
+		(strncmp( inx->instap, "s4c", 3 ) == 0 ) ) {
       instap_arr[0] = -halfy;
       instap_arr[1] = -halfx;
-    } else if ( strncmp( inx->instap, "s8c", 3 ) == 0 ) {
+    } else if ( (strncmp( inx->instap, "s8c", 3 ) == 0 ) ||
+		(strncmp( inx->instap, "s4b", 3 ) == 0 ) ) {
       instap_arr[0] = -halfx;
       instap_arr[1] = halfy;
-    } else if ( strncmp( inx->instap, "s8d", 3 ) == 0 ) {
+    } else if ( (strncmp( inx->instap, "s8d", 3 ) == 0 ) ||
+		(strncmp( inx->instap, "s4a", 3 ) == 0 ) ) {
       instap_arr[0] = halfy;
       instap_arr[1] = halfx;
     } else {
