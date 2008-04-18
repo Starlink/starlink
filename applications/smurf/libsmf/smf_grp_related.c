@@ -76,6 +76,9 @@
 *     2008-04-17 (EC):
 *        - check for the same subarrays in each chunk
 *        - added maxlen to interface
+*     2008-04-18 (EC):
+*        - check for very short chunks and remove from smfGroup
+*        - fixed memory unallocation bug
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -133,8 +136,11 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
 		       dim_t maxlen, smfGroup **group, int *status ) {
 
   /* Local variables */
+  dim_t *all_len = NULL;      /* Lengths of each chunk */
   size_t allOK = 1;           /* Flag to determine whether to continue */
   size_t *chunk=NULL;         /* Array of flags for continuous chunks */
+  int chunkend;               /* Index to end of chunk */
+  int chunkstart;             /* Index to start of chunk */
   smfData *data = NULL;       /* Current smfData */
   smfData *data2 = NULL;      /* Second smfData */
   double *ends = NULL;        /* Array of ending RTS_END values */
@@ -145,17 +151,21 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   int *indices = NULL;        /* Array of indices to be stored in subgroup */
   int j;                      /* Loop counter */
   int k = 0;                  /* Incremental counter for subgroup indices */
+  int *keepchunk=NULL;        /* Flag for chunks that will be kept */
   double *lambda = NULL;      /* Wavelength - only used if grpbywave is true */
   int matchsubsys;            /* Flag for matched subarrays */
   dim_t *nbolx = NULL;        /* Number of bolometers in X direction */
   dim_t *nboly = NULL;        /* Number of bolometers in Y direction */
   int nelem;                  /* Number of elements in index array */
+  size_t *new_chunk=NULL;     /* chunks associated with new_subgroups */
+  int new_ngroups=0;          /* counter for new_subgroups */
+  int **new_subgroups=NULL;   /* subgroups that are long enough */
+  int ngroups = 0;            /* Counter for subgroups to be stored */
   dim_t nx;                   /* (data->dims)[0] */
   dim_t ny;                   /* (data->dims)[1] */
-  int ngroups = 0;            /* Counter for subgroups to be stored */
   double obslam;              /* Observed wavelength from FITS header (m) */
   double opentime;            /* RTS_END value at beginning of written data */
-  int *refsubsys;             /* Array of template subarrays */
+  int *refsubsys=NULL;        /* Array of template subarrays */
   double *starts = NULL;      /* Array of starting RTS_END values */
   double steptime;            /* Length of a sample */
   char subarray[81];          /* Subarray name */
@@ -185,7 +195,9 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   ends = smf_malloc( grpsize, sizeof(double), 1, status );
   nbolx = smf_malloc( grpsize, sizeof(dim_t), 1, status );
   nboly = smf_malloc( grpsize, sizeof(dim_t), 1, status );
-  chunk = smf_malloc( grpsize, sizeof(size_t) , 1, status );
+  chunk = smf_malloc( grpsize, sizeof(*chunk), 1, status );
+  new_subgroups = smf_malloc( grpsize, sizeof(int*), 1, status );
+  new_chunk = smf_malloc( grpsize, sizeof(*new_chunk) , 1, status );
 
   if ( *status != SAI__OK ) goto CLEANUP;
 
@@ -309,6 +321,8 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
      are present in subsequent chunks flagged "continuous". */
 
   refsubsys = smf_malloc( nelem, sizeof(*refsubsys), 0, status );
+  all_len = smf_malloc( grpsize, sizeof(*all_len), 1, status ); 
+
   totlen = 0;
   thischunk = 0;
 
@@ -325,6 +339,9 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
       } else {
 	thislen = data->dims[0];
       }
+
+      /* Store length to check chunk lengths later */
+      all_len[i] = thislen;
 
       /* Check that an individual file is too long */
       if( maxlen && (thislen > maxlen) ) {
@@ -446,9 +463,64 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
     smf_close_file( &data, status );
   }
 
+  /* Now that the continuous chunks are flagged, check for any chunk that
+     is shorter than SMF__MINCHUNKSAMP in length (time) and remove it */
+
+  keepchunk = smf_malloc( ngroups, sizeof(*keepchunk), 0, status );
+
+  if( *status == SAI__OK ) {
+
+    totlen = all_len[i];
+    chunkstart = 0;
+
+    for( i=1; i<=ngroups; i++ ) {
+      
+      /* Chunk finished? */
+      if( (i==ngroups) || (chunk[i] != chunk[i-1]) ) {
+	
+	chunkend = i-1;
+	
+	/* Flag the pieces of last chunk as bad if it was too short */
+	if( totlen < SMF__MINCHUNKSAMP ) {
+	  for( j=chunkstart; j<=chunkend; j++ ) {
+	    keepchunk[j] = 0;
+	  }
+	  
+	  /* Warning message */
+	  msgSeti("LEN",totlen);
+	  msgSeti("MIN",SMF__MINCHUNKSAMP);
+	  msgOut( " ", "SMF_GRP_RELATED: ignoring short chunk (^LEN<^MIN)", 
+		  status);
+	}
+	
+	/* Re-set the chunk start/length */
+	chunkstart = i;
+	totlen = 0;
+      }
+      
+      /* Add to the length of the current chunk if we're not at the end */
+      if( i<ngroups ) totlen += all_len[i];
+    }
+
+    /* Create the new subgroups array from the chunks that we're keeping */
+    new_ngroups=0;
+    for( i=0; i<ngroups; i++ ) {
+      if( keepchunk[i] ) {
+	indices = smf_malloc( nelem, sizeof(int), 1, status);
+	if( *status == SAI__OK ) {
+	  memcpy( indices, subgroups[i], nelem*sizeof(int) );
+	  new_subgroups[new_ngroups] = indices;
+	  new_chunk[new_ngroups] = chunk[i];
+	  new_ngroups++;
+	}
+      }
+    }
+  }
+
   /* Create the smfGroup */
-  *group = smf_construct_smfGroup( igrp, subgroups, chunk, ngroups, nelem, 0, 
-				   status );
+    
+  *group = smf_construct_smfGroup( igrp, new_subgroups, new_chunk, new_ngroups,
+				   nelem, 0, status );
 
  CLEANUP:
   starts = smf_free( starts, status );
@@ -456,9 +528,27 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   nbolx = smf_free( nbolx, status );
   nboly = smf_free( nboly, status );
   refsubsys = smf_free( refsubsys, status );
-  if ( *status != SAI__OK ) {
-    indices = smf_free( indices, status );
+  keepchunk = smf_free( keepchunk, status );
+  chunk = smf_free( chunk, status );
+  all_len = smf_free( all_len, status); 
+
+  if( subgroups ) {
+    for( i=0; i<ngroups; i++ ) {
+      subgroups[i] = smf_free(subgroups[i], status);
+    }
     subgroups = smf_free( subgroups, status );
+  }
+  
+  if( *status != SAI__OK ) {
+    new_chunk = smf_free(new_chunk, status);
+
+    if( new_subgroups ) {
+      for( i=0; i<new_ngroups; i++ ) {
+	new_subgroups[i] = smf_free( new_subgroups[i], status );
+      }
+      new_subgroups = smf_free( new_subgroups, status );
+    }
+
   }
 
 }
