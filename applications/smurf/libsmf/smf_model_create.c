@@ -129,6 +129,8 @@
 *        -handle QUAlity
 *     2008-04-16 (EC):
 *        -added chunk to smfGroup
+*     2008-04-17 (EC):
+*        -improved initialization for SMF__NOI and SMF__QUA
 
 *     {enter_further_changes_here}
 
@@ -583,22 +585,41 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	    if( copyinput ) {
 	      /* memcpy because target and source are same type */
 	      memcpy( dataptr, (idata->pntr)[0], datalen );
-	    } else {
-	      /* otherwise zero the buffer */
-	      memset( dataptr, 0, datalen );
-	    }
-	    
-	    /* If this is a LUT copy it over from the template */
-	    if( mtype == SMF__LUT ) {
+
+	    } else if( mtype == SMF__LUT ) {
+	      /* If this is a LUT copy it over from the template */
 	      if( idata->lut ) {	  
 		/* dataptr can be mmap'd or malloc'd memory */
-		memcpy( dataptr, idata->lut, 
-			ndata*smf_dtype_sz(head.dtype, status) );
+		memcpy( dataptr, idata->lut, datalen );
 	      } else {
 		*status = SAI__ERROR;
 		errRep(FUNC_NAME, "No LUT present in template for LUT model", 
 		       status);      
 	      }
+	      
+	    } else if( mtype == SMF__NOI ) {
+	      /* If this is a NOI, set to 1 to avoid divide-by-zeros */
+	      if( head.dtype == SMF__DOUBLE ) {
+		for( k=0; k<ndata; k++ ) {
+		  ((double *) dataptr)[k] = 1;
+		}
+	      } else {
+		/* Generate error message if NOI is not double... */
+		*status = SAI__ERROR;
+		errRep(FUNC_NAME,
+		       "Possible programming error. NOI should be DOUBLE.", 
+		       status);
+	      }
+	      
+	    } else if( mtype == SMF__QUA ) {
+	      /* If this is a QUA, and quality available in template copy it */
+	      if( (idata->pntr)[2] ) {
+		memcpy( dataptr, (idata->pntr)[2], datalen );
+	      }
+
+	    } else {
+	      /* otherwise zero the buffer */
+	      memset( dataptr, 0, datalen );
 	    }
 	  }
 	
