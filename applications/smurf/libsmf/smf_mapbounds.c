@@ -98,6 +98,8 @@
 *        AlignOffset attributes are also set accordingly
 *     08-APR-2008 (TIMJ):
 *      	 Use tcs_tai instead of	rts_end	for position calculations.
+*     2008-04-18 (AGG):
+*        Set lbnd to 1,1
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -496,16 +498,18 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
   astExport( *outframeset );
 
   /* Change the pixel bounds to be consistent with the new CRPIX */
+  ubnd_out[0] -= lbnd_out[0]-1;
+  lbnd_out[0] = 1;
 
-  ubnd_out[0] -= lbnd_out[0];
-  lbnd_out[0] = 0;
+  ubnd_out[1] -= lbnd_out[1]-1;
+  lbnd_out[1] = 1;
 
-  ubnd_out[1] -= lbnd_out[1];
-  lbnd_out[1] = 0;
-
-  /* Clean Up */
- 
+  /* Clean Up */ 
  CLEANUP:
+  if (*status != SAI__OK) {
+    errRep(FUNC_NAME, "Unable to determine map bounds", status);
+  }
+
   if (sky2map) sky2map  = astAnnul( sky2map );
   if (bolo2map) bolo2map = astAnnul( bolo2map );
   if (fitschan) fitschan = astAnnul( fitschan );

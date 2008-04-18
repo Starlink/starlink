@@ -93,6 +93,8 @@
 *     2008-02-29 (AGG):
 *        Explicitly set SkyRef position, ensure SkyRefIs and
 *        AlignOffset attributes are also set accordingly
+*     2008-04-18 (AGG):
+*        Set lbnd to 1,1
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -439,15 +441,20 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
 
   astSetC( *outframeset, "SYSTEM", usesys );
   astExport( *outframeset );
-  /* Change the pixel bounds to be consistent with the new CRPIX */
-  ubnd_out[0] -= lbnd_out[0];
-  lbnd_out[0] = 0;
 
-  ubnd_out[1] -= lbnd_out[1];
-  lbnd_out[1] = 0;
+  /* Change the pixel bounds to be consistent with the new CRPIX */
+  ubnd_out[0] -= lbnd_out[0]-1;
+  lbnd_out[0] = 1;
+
+  ubnd_out[1] -= lbnd_out[1]-1;
+  lbnd_out[1] = 1;
 
   /* Clean Up */ 
  CLEANUP:
+  if (*status != SAI__OK) {
+    errRep(FUNC_NAME, "Unable to determine map bounds", status);
+  }
+
   if( data != NULL )
     smf_close_file( &data, status);
 

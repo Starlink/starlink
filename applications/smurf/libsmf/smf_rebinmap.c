@@ -94,6 +94,8 @@
 *        quality flags
 *     2008-04-16 (AGG):
 *        Add genvar parameter
+*     2008-04-18 (AGG):
+*        Set lbnd to 1,1
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -196,10 +198,10 @@ void smf_rebinmap( smfData *data, int index, int size,
   }
   /* Calculate bounds in the input array */
   nbol = (data->dims)[0] * (data->dims)[1];
-  lbnd_in[0] = 0;
-  lbnd_in[1] = 0;
-  ubnd_in[0] = (data->dims)[0]-1;
-  ubnd_in[1] = (data->dims)[1]-1;
+  lbnd_in[0] = 1;
+  lbnd_in[1] = 1;
+  ubnd_in[0] = (data->dims)[0];
+  ubnd_in[1] = (data->dims)[1];
 
   /* Loop over all time slices in the data */
   for( i=0; (i<(data->dims)[2]) && (*status == SAI__OK); i++ ) {
