@@ -83,6 +83,10 @@
     in the standards complying FITS-WCS format (see SUN/211 for the details
     of this terminology).
 
+    A bug when selecting the QUALITY component of a cube has been fixed.
+    Previously the extracted image had the wrong data type so displayed
+    incorrectly.
+
     Session persistent startup options that do not match the current version
     of GAIA will now be ignored. Previously this caused a fatal error and
     it was necessary to remove the properties files from $HOME/.skycat.
