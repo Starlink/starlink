@@ -317,6 +317,7 @@ typedef struct smfGroup {
    calculation */
 typedef struct smfDIMMData {
   smfArray **res;            /* array of smfArray's of model residuals */ 
+  smfArray **noi;           /* array of smfArray's of variance estimates */ 
   smfArray **qua;            /* array of smfArray's of quality flags */ 
   smfArray **lut;            /* array of smfArray's of pointing LUTs */ 
   double *map;               /* pointer to the current map estimate */
