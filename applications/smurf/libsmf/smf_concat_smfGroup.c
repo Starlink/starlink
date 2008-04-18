@@ -238,7 +238,7 @@ void smf_concat_smfGroup( smfGroup *igrp, int whichchunk, int isTordered,
 	if( pass == 0 ) {
 
 	  smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ", 
-			 0, &refdata, status );
+			 flags, &refdata, status );
 
 	  /* Verify that the array is 3-dimensional and compatible with the
 	     reference array dimensions. */
