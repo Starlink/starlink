@@ -683,8 +683,8 @@ AC_DEFUN([STAR_PRM_COMPATIBLE_SYMBOLS],
 # program that has had some success. Note no GNU compilers seem to have this
 # problem so they are never tested.
 #
-# The side-effect of this macro is to define TRAIL_TYPE to either "int"
-# or "long". Use the CNF include file "f77.h" to not worry about this.
+# The side-effect of this macro is to substitute TRAIL_TYPE with
+# the derived value and define TRAIL_TYPE. See "f77.h" in CNF.
 #
 AC_DEFUN([STAR_CNF_TRAIL_TYPE],
    [AC_CHECK_SIZEOF(void*)dnl
@@ -763,6 +763,8 @@ dnl  sizeof(void *) != 8 or GNU so no problems.
         fi
 ])
     AC_SUBST([TRAIL_TYPE], $star_cv_cnf_trail_type )
+    AC_DEFINE_UNQUOTED([TRAIL_TYPE], $star_cv_cnf_trail_type, 
+                       [Type of Fortran CNF TRAIL argument] )
 ])# STAR_CNF_TRAIL_TYPE
 
 # STAR_PATH_TCLTK([minversion=0], [options=''])
