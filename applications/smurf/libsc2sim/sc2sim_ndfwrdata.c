@@ -208,6 +208,8 @@
 *        Update to use new smf_free behaviour
 *     2008-03-19 (AGG):
 *        Add calls to new routines to get ORAC-DR recipe and DRGROUP
+*     2008-04-17 (AGG):
+*        Back out call to derive DRGROUP
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -481,8 +483,7 @@ int *status              /* Global status (given and returned) */
 		 "The proposal ID for the PROJECT", 0 );
    sc2sim_get_recipe( inx, &recipe, status );
    astSetFitsS ( fitschan, "RECIPE", recipe, "The ORAC-DR recipe", 0 );
-   sc2sim_get_drgroup( inx, filter, objectname, &drgroup, status );
-   astSetFitsS ( fitschan, "DRGROUP", drgroup, 
+   astSetFitsS ( fitschan, "DRGROUP", "", 
 		 "Name of group to combine current observation with", 0 );
    astSetFitsS ( fitschan, "MSBID", "", "ID of min schedulable block", 0 );
    astSetFitsS ( fitschan, "MSBTID", "", "Translation ID of MSB", 0 );
