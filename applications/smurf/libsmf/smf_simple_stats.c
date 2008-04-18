@@ -57,6 +57,8 @@
 *  History:
 *     2008-03-06 (EC):
 *        Initial version
+*     2008-04-18 (EC):
+*        Use SMF__MINSTATSAMP four sample length check
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -162,9 +164,10 @@ void smf_simple_stats( double *data, dim_t start, dim_t nsamp,
   if( ngood ) *ngood = count;
 
   /* Enough samples? */
-  if( count < 10 ) {
+  if( count < SMF__MINSTATSAMP ) {
     *status = SMF__INSMP;
-    errRep( FUNC_NAME, "Insufficient samples (<10) for statistics", status );
+    msgSeti("MIN",SMF__MINSTATSAMP);
+    errRep( FUNC_NAME, "Insufficient samples (<^MIN) for statistics", status );
     return;
   }
 
