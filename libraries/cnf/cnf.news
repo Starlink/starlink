@@ -1,4 +1,9 @@
 1 CNF_update
+ 
+ CNF Version 4.3
+
+ o New function CNF_CVAL, this converts a Fortran integer into the
+   correct type for passing as a character trail argument.
 
  CNF Version 4.2-2 is released.
 

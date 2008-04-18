@@ -2,7 +2,7 @@ dnl  Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl   Initialisation: package name and version number
-AC_INIT(cnf, 4.2-3, ussc@star.rl.ac.uk)
+AC_INIT(cnf, 4.3-0, ussc@star.rl.ac.uk)
 
 dnl   Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -27,6 +27,9 @@ AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 
 STAR_INITIALISE_FORTRAN
 STAR_CNF_COMPATIBLE_SYMBOLS
+
+dnl    Check for %LOC, if not present assume we have LOC.
+AC_FC_HAVE_PERCENTLOC
 
 dnl   We need this for the tests
 AC_FC_LIBRARY_LDFLAGS
@@ -54,6 +57,17 @@ STAR_CNF_BLANK_COMMON
 
 dnl   Type used for trailing lengths of character strings, int or long.
 STAR_CNF_TRAIL_TYPE
+
+dnl   Need to know size of these trailing character lengths for CNF_CVAL.
+if test "$star_cv_cnf_trail_type" = "int"; then
+   AC_CHECK_SIZEOF([int])
+   AC_DEFINE_UNQUOTED(SIZEOF_TRAILARG,$ac_cv_sizeof_int, 
+                      [Size of TRAIL argument])
+else
+   AC_CHECK_SIZEOF([long])
+   AC_DEFINE_UNQUOTED(SIZEOF_TRAILARG,$ac_cv_sizeof_long,
+                      [Size of TRAIL argument])
+fi
 
 dnl   This package has no dependencies
 

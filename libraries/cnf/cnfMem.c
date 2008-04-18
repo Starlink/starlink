@@ -27,6 +27,7 @@
 
 *  Copyright:
 *     Copyright (C) 1999 Central Laboratory of the Research Councils.
+*     Copyright (C) 2008 Science and Technology Facilties Council.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -103,6 +104,7 @@ static int Register( void * );
 static size_t Unregister( void * );
 static void *Malloc( size_t, int );
 void *F77_EXTERNAL_NAME(cnf_pval)( POINTER(FPTR) );
+TRAIL_TYPE F77_EXTERNAL_NAME(cnf_cval)( INTEGER(FINT) );
 F77_POINTER_FUNCTION(cnf_preg)( void **(cptr), LOGICAL(isnew) );
 F77_SUBROUTINE(cnf_unregp)( POINTER(FPTR) );
 
@@ -602,6 +604,54 @@ void *F77_EXTERNAL_NAME(cnf_pval)( POINTER(FPTR) ) {
    return cnfCptr( *FPTR );
 }
 
+TRAIL_TYPE F77_EXTERNAL_NAME(cnf_cval)( INTEGER(FINT) ) {
+/*
+*+
+*  Name:
+*     CNF_CVAL
+
+*  Purpose:
+*     Convert a Fortran INTEGER into the same type as used in the TRAIL macro.
+
+*  Invocation:
+*     CALL DOIT( %VAL( CNF_PVAL( FPTR ) ),..., %VAL( CNF_CVAL( FINT ) ) )
+
+*  Description:
+*     When passing dynamically allocated character strings to Fortran
+*     or C routines the character string length is passed as a hidden
+*     argument after the visible ones (see TRAIL). With some compilers this
+*     length is a 64bit long (INTEGER*8), whereas for others it is more
+*     typically a 32bit int (INTEGER*4). Using this function avoids the need
+*     to know which size is used for the configured compiler. 
+
+*  Arguments:
+*     FINT = INTEGER (Given)
+         The FORTRAN integer value giving the expected length of the strings.
+
+*  Returned Value:
+*     CNF_CVAL
+*        The string length in the correct type for the configured compiler.
+*        Fortran equivalent of the type used by the TRAIL macro.
+
+*  Notes:
+*     - The data type of this function will depend on the platform in
+*     use and is declared in the include file CNF_PAR.
+*     - When mixing calls that pass locally declared character strings
+*     and dynamically allocated ones, all the declared strings
+*     must preceed all the dynamic ones in the argument list so that
+*     the order of the TRAIL arguments is known.
+*-
+
+*  Implementation Notes:
+*     - This routine is designed to be called from Fortran.
+*/
+
+/* Local Variables: */
+   GENPTR_INTEGER(FINT)
+
+   /* Cast to the TRAIL_TYPE */
+   return (TRAIL_TYPE) *FINT;
+}
 
 /* Note that fortran will pass us a pointer to the %LOC value
    which in C is a pointer to a pointer */

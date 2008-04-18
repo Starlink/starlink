@@ -56,7 +56,7 @@ CLEANFILES = cnf.h CNF_PAR CNF_PAR.processed CNF_PAR.tmp
 # Testing
 
 TEST_FILES = cnf_test.c \
-             f_calls_c_main.f f_calls_c_sub.c \
+             f_calls_c_main.F f_calls_c_sub.c \
              c_calls_f_main.c c_calls_f_sub.f
 
 TESTS = cnf_test f_calls_c c_calls_f c_calls_f_args
@@ -65,7 +65,7 @@ check_PROGRAMS = cnf_test f_calls_c c_calls_f c_calls_f_args
 cnf_test_SOURCES = cnf_test.c
 cnf_test_LDADD = libcnf.la `starmem_link`
 
-f_calls_c_SOURCES = f_calls_c_main.f f_calls_c_sub.c
+f_calls_c_SOURCES = f_calls_c_main.F f_calls_c_sub.c
 f_calls_c_LDADD = libcnf.la `starmem_link`
 
 c_calls_f_SOURCES = c_calls_f_main.c c_calls_f_sub.f

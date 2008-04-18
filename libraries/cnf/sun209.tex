@@ -15,14 +15,15 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {209.6}
+\newcommand{\stardocnumber}    {209.10}
 \newcommand{\stardocauthors}   {P.M.\ Allan\\
                                 A.J.\ Chipperfield\\
-                                R.F.\ Warren-Smith}
-\newcommand{\stardocdate}      {19 January 2000}
+                                R.F.\ Warren-Smith\\
+                                P.W.\ Draper}
+\newcommand{\stardocdate}      {18 April 2008}
 \newcommand{\stardoctitle}     {CNF and F77 \\ [1ex]
                                 Mixed Language Programming -- FORTRAN and C}
-\newcommand{\stardocversion}   {Version 4.0}
+\newcommand{\stardocversion}   {Version 4.3}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 \newcommand{\stardocabstract}  {
 The CNF package comprises two sets of software which ease the task of writing
@@ -2158,17 +2159,6 @@ instance, on DEC Alphas it is an \texttt{INTEGER*8}
 function). However, the data type declaration for this function is
 encapsulated in the \texttt{CNF\_PAR} include file, so you need not
 include non-standard type declarations directly in your own software.
-
-{\bf{Historical note.}} Much existing Starlink software does not use the
-\htmlref{\texttt{CNF\_PVAL}}{CNF_PVAL}
-function because it was written before the need
-to operate on 64-bit operating systems arose. Omitting this function,
-and passing a FORTRAN pointer directly to \texttt{\%VAL}, will not
-cause problems on systems where C pointers and FORTRAN
-\texttt{INTEGER}s are the same length (or where linker options can be
-used to make them appear so). However, its use is recommended for new
-software in order to protect against possible future operating system
-developments.
 
 \subsection{\xlabel{registering_your_own_pointers}Registering Your Own
 Pointers}
@@ -7159,7 +7149,8 @@ DOUBLE, LOGICAL, BYTE, WORD, UBYTE, UWORD, LOCATOR or POINTER\@.
          will expand as follows:
 
           \sstexamplestable{
-            \sstexamplestableentry{All Unix:}  {,int arg\_length}\\
+            \sstexamplestableentry{32bit Unix:}  {,int arg\_length}\\
+            \sstexamplestableentry{Some 64bit Unix:}  {,long arg\_length}\\
             \sstexamplestableentry{VAX/VMS:}{}
           }
       }
@@ -8701,6 +8692,55 @@ characters}
          \sstitem
          The data type of this function will depend on the platform in
          use and is declared in the include file CNF\_PAR.
+      }
+   }
+}
+\rule{\textwidth}{0.5mm}
+\sstroutine{
+   CNF\_CVAL
+}{
+   Convert a Fortran INTEGER into the same type as used in the TRAIL macro.
+}{
+   \sstdescription{
+      When passing dynamically allocated character strings to Fortran
+      or C routines the character string length is passed as a hidden
+      argument after the visible ones (see \htmlref{TRAIL}{TRAIL}). With some
+      compilers this 
+      length is a 64bit long (INTEGER*8), whereas for others it is more
+      typically a 32bit int (INTEGER*4). Using this function avoids the need
+      to know which size is used for the configured compiler.
+   }
+   \sstinvocation{
+      CALL DOIT( \%VAL( CNF\_PVAL( FPTR ) ),..., \%VAL( CNF\_CVAL( FINT ) ) )
+   }
+   \sstarguments{
+      \sstsubsection{
+         FINT = INTEGER (Given)
+      }{
+         The FORTRAN integer value giving the expected length of the strings.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         CNF\_CVAL
+      }{
+         The string length in the correct type for the configured compiler.
+         Fortran equivalent of the type used by the TRAIL macro.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The data type of this function will depend on the platform in
+         use and is declared in the include file CNF\_PAR.
+         
+         \sstitem
+         When mixing calls that pass locally declared character strings
+         and dynamically allocated ones, all the declared strings
+         must preceed all the dynamic ones in the argument list so that
+         the order of the TRAIL arguments is known.
+
       }
    }
 }

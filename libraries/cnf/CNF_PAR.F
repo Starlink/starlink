@@ -19,15 +19,17 @@
 *     by the CNF_ system and which may also be needed by software which
 *     calls routines from this system.
 *
-*     It is dynamically generated such that CNF_PVAL returns the declared
-*     size of the return value from CNF_PVAL is large enough to hold
-*     a C pointer.
+*     It is dynamically generated so that the return type from CNF_PVAL 
+*     is large enough to hold a C pointer and so that the return type
+*     from CNF_CVAL is the same size as used for string lengths (which
+*     are passed as hidden trailing arguments).
 *
 *     Process this file with fpp to produce the actual CNF_PAR file,
-*     expanding the SIZEOF_VOIDP token below.
+*     expanding the SIZEOF_VOIDP and SIZEOF_TRAILARG tokens below.
 
 *  Copyright:
 *     Copyright (C) 1999-2004 Central Laboratory of the Research Councils
+*     Copyright (C) 2008 Science and Technology Facilities Council
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -49,6 +51,7 @@
 *     AJC: Alan J. Chipperfield (STARLINK)
 *     NG: Norman Gray (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -61,6 +64,8 @@
 *        that was removed during the initial autoconfing.
 *      17-AUG-2004 (TIMJ):
 *        Add CNF_PREG declaration
+*      18-APR-2008 (PWD):
+*        Add CNF_CVAL support.
 *      {For further changes, see the CVS history}
 
 *-
@@ -72,5 +77,7 @@
       INTEGER CNF_PREG
       EXTERNAL CNF_PREG
 
+*   Cast INTEGER to correct size for trailing character length.
+      INTEGER*SIZEOF_TRAILARG CNF_CVAL
 
 *.
