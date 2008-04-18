@@ -4,36 +4,38 @@
 *  subroutine linkage is provided by CNF.
 
       INTEGER NI, NR, ND, NL, NB, NW, NUB, NUW, NC
-      PARAMETER( NI = 10 )
-      PARAMETER( NR = 10 )
-      PARAMETER( ND = 10 )
-      PARAMETER( NL = 9 )
       PARAMETER( NB = 11 )
-      PARAMETER( NW = 20 )
+      PARAMETER( NC = 5 )
+      PARAMETER( ND = 10 )
+      PARAMETER( NI = 10 )
+      PARAMETER( NL = 9 )
+      PARAMETER( NR = 10 )
       PARAMETER( NUB = 12 )
       PARAMETER( NUW = 21 )
-      PARAMETER( NC = 5 )
-      INTEGER I, IA( NI )
-      REAL R, RA( NR )
-      DOUBLE PRECISION D, DA( ND )
-      LOGICAL L, LA( NL )
+      PARAMETER( NW = 20 )
+
       BYTE B, BA ( NB )
-      INTEGER*2 W, WA( NW )
-      BYTE UB, UBA ( NUB )
-      INTEGER*2 UW, UWA( NUW )
-      CHARACTER * ( 10 ) C, CA( NC )
-      CHARACTER * ( 1 ) CH
-      CHARACTER * ( 40 ) LINE
-      INTEGER CBI, CNI
-      REAL CBR, CNR
-      INTEGER FI
-      REAL FR
-      DOUBLE PRECISION FD
-      LOGICAL FL
-      CHARACTER * (40) FC
       BYTE FB, FUB
-      INTEGER*2 FW, FUW
+      BYTE UB, UBA ( NUB )
+      CHARACTER * ( 1 ) CH
+      CHARACTER * ( 10 ) C, CA( NC )
+      CHARACTER * ( 40 ) LINE
+      CHARACTER * (40) FC
+      DOUBLE PRECISION D, DA( ND )
+      DOUBLE PRECISION FD
+      INTEGER CBI, CNI
+      INTEGER FI
+      INTEGER I, IA( NI )
       INTEGER PTR
+      INTEGER*2 FW, FUW
+      INTEGER*2 UW, UWA( NUW )
+      INTEGER*2 W, WA( NW )
+      LOGICAL FL
+      LOGICAL ISNEW
+      LOGICAL L, LA( NL )
+      REAL CBR, CNR
+      REAL FR
+      REAL R, RA( NR )
 
       INCLUDE 'CNF_PAR'
 
@@ -118,6 +120,17 @@
          CA( J )( 1:5 ) = CH // CH // CH // CH // CH
       END DO
       CALL TC2( CA, NC, LINE )
+      PRINT '(A,A)',
+     :   'The built up character string is: ', LINE
+
+*  By value.
+#if HAVE_PERCENTLOC
+      PTR = CNF_PREG( %LOC( CA ), ISNEW )
+#else
+      PTR = CNF_PREG( LOC( CA ), ISNEW )
+#endif
+      CALL TC2( %VAL( CNF_PVAL( PTR ) ), NC, LINE, 
+     :          %VAL( CNF_CVAL( 10 ) ), %VAL( CNF_CVAL( 40 ) ) )
       PRINT '(A,A)',
      :   'The built up character string is: ', LINE
 
