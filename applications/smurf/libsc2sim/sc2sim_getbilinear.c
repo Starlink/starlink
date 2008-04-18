@@ -125,6 +125,8 @@ int *status          /* global status (given and returned) */
    ypix = ypos / scale;
    ixpix = (int)xpix;
    iypix = (int)ypix;
+   ixpix1 = ixpix + 1;
+   iypix1 = iypix + 1;
 
    /* Since ATM image has periodic boundary conditions, we can just
       return to the lower edge of the image if we go outside - use
