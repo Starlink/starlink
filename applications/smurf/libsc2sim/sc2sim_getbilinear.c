@@ -38,6 +38,7 @@
 
 *  Authors:
 *     B.D.Kelly (ROE)
+*     A.G. Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -53,6 +54,8 @@
 *        Wrap out-of-range indices
 *     2007-07-05 (AGG):
 *        Allow for multiple wraps
+*     2008-04-17 (AGG):
+*        Allow for negative velocities, use modulo arithmetic (thanks Ed)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -110,8 +113,8 @@ int *status          /* global status (given and returned) */
    double dy;            /* fractional pixel offset */
    int ixpix;            /* truncated pixel position */
    int iypix;            /* truncated pixel position */
-   int nwraps;           /* Multiplier to indicate how many times the
-			    atm image is wrapped */
+   int ixpix1;           /* truncated adjacent pixel position */
+   int iypix1;           /* truncated adjacent pixel position */
    double xpix;          /* pixel position */
    double ypix;          /* pixel position */
 
@@ -124,22 +127,23 @@ int *status          /* global status (given and returned) */
    iypix = (int)ypix;
 
    /* Since ATM image has periodic boundary conditions, we can just
-      return to the lower edge of the image if we go outside */
-   if ( ixpix > size ) {
-     nwraps = ixpix / size;
-     ixpix -= (nwraps*(size) - 1);
-   }
-   if ( iypix > size ) {
-     nwraps = iypix / size;
-     iypix -=  (nwraps*(size) - 1);
-   }
+      return to the lower edge of the image if we go outside - use
+      modulo arithmetic */
+   ixpix = ixpix % size;
+   iypix = iypix % size;
+   ixpix1 = ixpix1 % size;
+   iypix1 = iypix1 % size;
+   if( ixpix < 0 ) ixpix += size;
+   if( iypix < 0 ) iypix += size;
+   if( ixpix1 < 0 ) ixpix1 += size;
+   if( iypix1 < 0 ) iypix1 += size;
 
-   if ( ( ixpix > 0 ) && ( ixpix <= size ) &&
-        ( iypix > 0 ) && ( iypix <= size ) ) {
+   if ( ( ixpix >= 0 ) && ( ixpix < size ) &&
+        ( iypix >= 0 ) && ( iypix < size ) ) {
       a = image [ ixpix + size*iypix ];
-      b = image [ ixpix+1 + size*iypix ];
-      c = image [ ixpix + size*(iypix+1) ];
-      d = image [ ixpix+1 + size*(iypix+1) ];
+      b = image [ ixpix1 + size*iypix ];
+      c = image [ ixpix + size*(iypix1) ];
+      d = image [ ixpix1 + size*(iypix1) ];
       dx = xpix - (double)ixpix;
       dy = ypix - (double)iypix;
 
