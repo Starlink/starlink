@@ -266,8 +266,8 @@
 *  Poisson error of the peak bin.
          IF ( METHOD .EQ. 'MOMENTS' ) THEN
             FRAC = -3.0
-            CALL KPS1_HSCEM( NUMBIN, %VAL( HPNTR ), MAXPOS, FRAC, MODEI,
-     :                       STATUS )
+            CALL KPS1_HSCEM( NUMBIN, %VAL( CNF_PVAL( HPNTR ) ), MAXPOS, 
+     :                       FRAC, MODEI, STATUS )
          ELSE
             MODEI = MAXPOS
          END IF
