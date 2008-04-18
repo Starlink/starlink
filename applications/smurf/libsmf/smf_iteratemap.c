@@ -320,7 +320,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       spikeiter = 0;
     }
 
-    /* Maximum length of a chunk */
+    /* Maximum length of a continuous chunk */
     if( astMapGet0I( keymap, "MAXLEN", &maxlen_s ) ) {
 
       if( maxlen_s < 0 ) {
@@ -935,28 +935,29 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	  /* Remaining model components - excluding NOIse */
 
 	  for( j=0; j<nmodels; j++ ) { 
-	    if( !memiter && (modeltyps[j] != SMF__NOI) ) 
+	    if( !memiter && (modeltyps[j] != SMF__NOI) ) {
 	      smf_open_related_model( modelgroups[j], i, "UPDATE", 
 				      &model[j][i], status );
-	  
-	    for( idx=0; idx<model[j][i]->ndat; idx++ ) {
+	      
+	      for( idx=0; idx<model[j][i]->ndat; idx++ ) {
 
-	      smf_dataOrder( model[j][i]->sdata[idx], 1, status );
-	      if( *status = SMF__WDIM ) {
-		/* fails if not 3-dimensional data. Just annul and write out 
-		   data with other dimensions as-is */
-		errAnnul(status);
-		model[j][i]->sdata[idx]->isTordered=1;
+		smf_dataOrder( model[j][i]->sdata[idx], 1, status );
+		if( *status = SMF__WDIM ) {
+		  /* fails if not 3-dimensional data. Just annul and write out 
+		     data with other dimensions as-is */
+		  errAnnul(status);
+		  model[j][i]->sdata[idx]->isTordered=1;
+		}
+		
+		if( (model[j][i]->sdata[idx]->file->name)[0] ) {
+		  smf_model_NDFexport( model[j][i]->sdata[idx], NULL, NULL,  
+				       model[j][i]->sdata[idx]->file->name, 
+				       status);
+		}
 	      }
-
-	      if( (model[j][i]->sdata[idx]->file->name)[0] ) {
-		smf_model_NDFexport( model[j][i]->sdata[idx], NULL, NULL,  
-				     model[j][i]->sdata[idx]->file->name, 
-				     status);
-	      }
+	      if( !memiter ) 
+		smf_close_related( &model[j][i], status );
 	    }
-	    if( !memiter ) 
-	      smf_close_related( &model[j][i], status );
 	  }
 	}
       }
