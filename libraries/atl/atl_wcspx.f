@@ -73,7 +73,11 @@
 *        CENTRECODE in the "KM1" argument description above. If CELLCODE 
 *        is missing a value of 6 (FK4 B1950) is assumed.
 *     CRPIX( 3 ) = DOUBLE PRECISION (Given)
-*        The pixel co-ordinates at the reference point.
+*        The pixel co-ordinates at the reference point. The spatial
+*        position of the reference point is given by RA_DEC(1) and RA_DEC(2)
+*        offset by the DPOS(1) and DPOS(2) values (all these are in the KM1
+*        KeyMap). The spectral reference value is given by the JFCEN item
+*        in KM1.
 *     OBSLON = DOUBLE PRECISION (Given)
 *        The geodetic longitude of the observatory. Radians, positive east.
 *     OBSLAT = DOUBLE PRECISION (Given)
@@ -656,12 +660,12 @@
 
       CARD = 'NAXIS1  = '
       IAT = 10
-      CALL CHR_PUTI( MAX( 2*INT(CRPIX( 1 )), 100 ), CARD, IAT )
+      CALL CHR_PUTI( MAX( 2*INT( ABS( CRPIX( 1 ) ) ), 100 ), CARD, IAT )
       CALL AST_PUTFITS( FC, CARD, .FALSE., STATUS ) 
 
       CARD = 'NAXIS2  = '
       IAT = 10
-      CALL CHR_PUTI( MAX( 2*INT(CRPIX( 2 )), 100 ), CARD, IAT )
+      CALL CHR_PUTI( MAX( 2*INT( ABS( CRPIX( 2 ) ) ), 100 ), CARD, IAT )
       CALL AST_PUTFITS( FC, CARD, .FALSE., STATUS ) 
 
       CALL AST_PUTFITS( FC, 'NAXIS3  = 1', .FALSE., STATUS ) 
