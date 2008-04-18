@@ -32,10 +32,9 @@
 
 *  Description:
 *     Calculate the noise distribution for each detector. Currently this
-*     will just assume stationary, independent noise in each detector. In
-*     addition to storing the standard deviation in the model component, the
-*     VARIANCE component of the residuals will store the same information
-*     so that it may be used in the estimation of other model components.
+*     will just assume stationary, independent noise in each detector and 
+*     measure the sample variance over a short interval. In addition,
+*     there is an 
 
 *  Notes:
 
@@ -57,7 +56,12 @@
 *     2008-04-03 (EC)
 *        Use QUALITY
 *     2008-04-14 (EC)
-*        Added optional despiking (NOISPIKETHRESH/NOISPIKEITER)
+*        Added optional despiking config (NOISPIKETHRESH/NOISPIKEITER)
+*     2008-04-17 (EC)
+*        -fixed nbolo/ntslice calculation
+*        -store variance instead of standard deviation
+*        -use smf_quick_noise instead of smf_simple_stats on whole array;
+*         added config parameters (NOISAMP/NOICHUNK) 
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -114,7 +118,11 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t nbolo;                  /* Number of bolometers */
+  dim_t nchunk;                 /* Number of spots to measure white level */
+  int nchunk_s;                 /* Signed version of nchunk */
   dim_t ndata;                  /* Total number of data points */
+  dim_t nsamp;                  /* Length of window to measure white level */
+  int nsamp_s;                  /* Signed version of nsamp */
   dim_t ntslice;                /* Number of time slices */
   smfArray *qua=NULL;           /* Pointer to RES at chunk */
   unsigned char *qua_data=NULL; /* Pointer to RES at chunk */
@@ -157,6 +165,30 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     }
   }
 
+  /* Obtain parameters for the noise measurement */
+
+  if( !astMapGet0I( keymap, "NOISAMP", &nsamp_s ) ) {
+    nsamp = 1000;  /* Number of samples to measure white level */
+  } else {
+    if( nsamp_s <= 0 ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "NOISAMP must be > 0.", status );
+    } else {
+      nsamp = (dim_t) nsamp_s;
+    }
+  }
+
+  if( !astMapGet0I( keymap, "NOICHUNK", &nchunk_s ) ) {
+    nchunk = 10;  /* Number of locations from which to measure samples */
+  } else {
+    if( nchunk_s <= 0 ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "NOICHUNK must be > 0.", status );
+    } else {
+      nchunk = (dim_t) nchunk_s;
+    }
+  }
+
   /* Which QUALITY bits should be considered for ignoring data */
   mask = 255 - SMF__Q_JUMP;
 
@@ -174,8 +206,8 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     } else {
     
       /* Get the raw data dimensions */
-      nbolo = (res->sdata[idx]->dims)[0] * (res->sdata[idx]->dims)[1];
-      ntslice = (res->sdata[idx]->dims)[2];
+      nbolo = (res->sdata[idx]->dims)[1] * (res->sdata[idx]->dims)[2];
+      ntslice = (res->sdata[idx]->dims)[0];
       ndata = nbolo*ntslice;
 
       /* Flag spikes in the residual */
@@ -192,22 +224,25 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
       }
 
       for( i=0; i<nbolo; i++ ) if( !(qua_data[i*ntslice]&SMF__Q_BADB) ) {
-	/* Measure the sample standard deviation for
-	   each bolometer assuming it is stationary in time... */
 
-	smf_simple_stats( &res_data[i*ntslice], 0, ntslice, 
-			  &qua_data[i*ntslice], mask, &mean, &sigma, NULL,
-			  status );
+	/* Measure the sample standard deviation for each bolometer
+	assuming it is stationary in time. Use smf_quick_noise to
+	measure the rms in short intervals as a better estimate of the
+	white level unaffected by residual 1/f than the whole data
+	stream. The real way to do this is to examine the flat portion
+	of the power spectrum. */
 
+	sigma = smf_quick_noise( res->sdata[idx], i, nsamp, nchunk, 
+				 qua_data, mask, status );
+	
 	if( *status == SMF__INSMP ) {
 	  errAnnul( status );
 	} else if( (*status == SAI__OK) && (sigma > 0) ) {
 	  var = sigma*sigma;
-	  
 	  base = i*ntslice; 
-	  /* Loop over time and store the rms for each sample */
+	  /* Loop over time and store the variance for each sample */
 	  for( j=0; j<ntslice; j++ ) {
-	    model_data[base+j] = sigma;
+	    model_data[base+j] = var;
 	  }
 	}
       } 
