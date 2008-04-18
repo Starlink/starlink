@@ -128,6 +128,8 @@
 *        - Use variance stored in NOI to estimate map
 *        - Don't include VARIANCE of input files when concatenating
 *        - Store VARIANCE (from NOI) in residual 
+*     2008-04-18 (EC):
+*        Calculate and display chisquared for each chunk
 
 *  Notes:
 
@@ -192,6 +194,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   const char *asttemp=NULL;     /* Pointer to static strings created by ast */
   double badfrac;               /* Bad bolo fraction for flagging */
   int baseorder;                /* Order of poly for baseline fitting */
+  double *chisquared=NULL;      /* chisquared for each chunk */
   int contchunk;                /* Which chunk in outer loop */
   smfDIMMData dat;              /* Struct passed around to model components */
   smfData *data=NULL;           /* Temporary smfData pointer */
@@ -216,7 +219,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   smfGroup *lutgroup=NULL;      /* smfGroup of lut model files */
   unsigned char mask;           /* Bitmask for QUALITY flags */
   dim_t maxlen;                 /* Max chunk length in samples */
-  int maxlen_s;                 /* Max chunk length in seconds */  
+  double maxlen_s;              /* Max chunk length in seconds */  
   int memiter=0;                /* If set iterate completely in memory */
   smfArray ***model=NULL;       /* Array of pointers smfArrays for ea. model */
   smfGroup **modelgroups=NULL;  /* Array of group ptrs/ each model component */
@@ -321,7 +324,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     }
 
     /* Maximum length of a continuous chunk */
-    if( astMapGet0I( keymap, "MAXLEN", &maxlen_s ) ) {
+    if( astMapGet0D( keymap, "MAXLEN", &maxlen_s ) ) {
 
       if( maxlen_s < 0 ) {
 	/* Trap negtive MAXLEN */
@@ -337,7 +340,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	  smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
 
 	  if( steptime > 0 ) {
-	    maxlen = maxlen_s/steptime;
+	    maxlen = (dim_t) (maxlen_s / (double) steptime);
 	  } else {
 	    /* Trap invalud sample length in header */
 	    *status == SAI__ERROR;
@@ -429,6 +432,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   smf_grp_related( igrp, isize, 1, maxlen, &igroup, status );
 
   /* KLUDGE -- print the chunk array */
+  
   /*
   printf(" CHUUUUUNK!!!! ");
   if( *status == SAI__OK ) for( i=0; i<igroup->ngroups; i++ ) {
@@ -523,6 +527,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 			     ubnd_out, SMF__NOCREATE_VARIANCE, &res[0], 
 			     status );
       } 
+    }
+
+    /* Allocate space for the chisquared array */
+    if( havenoi ) {
+      chisquared = smf_malloc( nchunks, sizeof(*chisquared), 1, status );
     }
 
     /* Create containers for time-series model components */
@@ -632,6 +641,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     dat.lut = lut;
     dat.map = thismap;
     dat.mapvar = thisvar;
+    dat.chisquared = chisquared;
     if( havenoi ) {
       dat.noi = model[whichnoi];
     } else {
@@ -703,7 +713,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 		smf_flag_spikes( data, qua_data, 
 				 SMF__Q_BADS|SMF__Q_BADB|SMF__Q_SPIKE,
 				 spikethresh, spikeiter, 100, 
-				 &aiter, status );
+				 &aiter, NULL, status );
 		msgSeti("AITER",aiter);
 		msgOut(" ", "  ...finished in ^AITER iterations",
 		       status); 
@@ -813,6 +823,15 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	    for( j=0; j<nmodels; j++ ) {
 	      smf_close_related( &model[j][i], status );
 	    }
+	  }
+
+	  /* If NOI was present, we now have an estimate of chisquared */
+	  if( chisquared && (*status==SAI__OK) ) {
+	    msgSeti("CHUNK",i+1);
+	    msgSetd("CHISQ",chisquared[i]);
+	    msgOut( " ", 
+		    "SMF_ITERATEMAP: *** CHISQUARED = ^CHISQ for chunk ^CHUNK",
+		    status);
 	  }
 
 	  /* Set exit condition if bad status was set */
@@ -1034,6 +1053,9 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       smf_simpleaddmap( map, weights, hitsmap, mapvar, thismap, thisweight,
 			thishits, thisvar, msize, status );
     }
+
+    /* Free chisquared array */
+    if( chisquared) chisquared = smf_free( chisquared, status );
   }
     
   /* The second set of map arrays get freed in the multiple contchunk case */
