@@ -50,6 +50,9 @@
 *        Write QUALITY and VARIANCE if present.
 *     2008-04-15 (EC):
 *        Add ability to supply external VARIANCE & QUALITY arrays
+*     2008-04-17 (EC):
+*        Changed time-ordered data assertion to check to force caller to
+*        order the data themselves before calling the routine.
 
 *  Notes:
 *
@@ -118,11 +121,10 @@ void smf_model_NDFexport( const smfData *data, void *variance,
   if (*status != SAI__OK ) return;
 
   /* Check for ICD-compliant data order */
-  smf_dataOrder( data, 1, status );
-  if( *status = SMF__WDIM ) {
-    /* fails if not 3-dimensional data. Just annul and write out data
-       with other dimensions as-is */
-    errAnnul(status);
+  if( !data->isTordered ) {
+    *status = SMF__BORDB;
+    errRep( FUNC_NAME, "Data is bolo-ordered, must be time-ordered", status );
+    return;
   }
 
   /* Make a 1-element group containing the name of the new file */
