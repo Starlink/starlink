@@ -143,7 +143,7 @@ void smf_calcmodel_ext( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 	ntslice = (res->sdata[idx]->dims)[2];
 	ndata = nbolo*ntslice;
 
-	/* If SMF_DIMM_FIRSTITER set, call the extinction correction
+	/* If SMF__DIMM_FIRSTITER set, call the extinction correction
 	   routine for the residual model component, and store the corrections 
 	   for each data point to use in subsequent iterations */
 	if( flags & SMF__DIMM_FIRSTITER ) {
