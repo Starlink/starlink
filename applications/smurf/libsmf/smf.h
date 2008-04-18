@@ -280,6 +280,8 @@
 *        Add genvar to smf_rebinmap
 *     2008-04-17 (EC):
 *        Modified smf_grp_related interface
+*     2008-04-18 (EC):
+*        Modified smf_flag_spikes interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -874,8 +876,9 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
 			int *status );
 
 void smf_flag_spikes( smfData *data, unsigned char *quality, 
-		      unsigned char mask, double thresh, unsigned int niter, 
-		      unsigned int maxiter, unsigned int *aiter, int *status );
+                      unsigned char mask, double thresh, size_t niter, 
+                      size_t maxiter, size_t *aiter, size_t *nflagged,
+                      int *status );
 
 int *smf_find_bad_dets( Grp *igrp,  int size, int *nbaddet, int *status );
 void smf_maskacsis( int indf, int *mask, int *status );

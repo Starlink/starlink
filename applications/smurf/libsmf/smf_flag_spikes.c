@@ -15,8 +15,8 @@
 *  Invocation:
 
 *     smf_flag_spikes( smfData *data, unsigned char *quality, 
-*                      unsigned char mask, double thresh, unsigned int niter, 
-*                      unsigned int maxiter, unsigned int *aiter, 
+*                      unsigned char mask, double thresh, size_t niter, 
+*                      size_t maxiter, size_t *aiter, size_t *nflagged,
 *                      int *status )
 
 *  Arguments:
@@ -31,13 +31,15 @@
 *        the calculation.
 *     thresh = double (Given)
 *        N-sigma threshold for spike detection
-*     niter = int (Given)
+*     niter = size_t (Given)
 *        Number of iterations. If set to 0 iterate until the list of
 *        flagged sources doesn't change (converges).
-*     maxiter = int (Given)
+*     maxiter = size_t (Given)
 *        If niter=0 maxiter is a maximum number of iterations
-*     aiter = int (Returned)
+*     aiter = size_t * (Returned)
 *        The actual number of iterations executed. May be NULL.
+*     nflagged = size_t * (Returned)
+*        The number of new samples that were flagged. May be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -62,6 +64,9 @@
 *     2008-04-14 (EC):
 *        -Added mask to interface
 *        -fixed array index bug
+*     2008-04-18 (EC):
+*        - Return nflagged
+*        - use size_t in interface
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -107,8 +112,9 @@
 #define FUNC_NAME "smf_flag_spikes"
 
 void smf_flag_spikes( smfData *data, unsigned char *quality, 
-		      unsigned char mask, double thresh, unsigned int niter, 
-		      unsigned int maxiter, unsigned int *aiter, int *status ){
+                      unsigned char mask, double thresh, size_t niter, 
+                      size_t maxiter, size_t *aiter, size_t *nflagged,
+                      int *status ) {
 
   /* Local Variables */
   dim_t base;                   /* Base index for bolometer */
@@ -116,7 +122,7 @@ void smf_flag_spikes( smfData *data, unsigned char *quality,
   double dist;                  /* Size of significant excursion */
   int done=0;                   /* Loop exit flag */
   dim_t i;                      /* Loop Counter */
-  int iter=0;                   /* Actual number of iterations */
+  size_t iter=0;                /* Actual number of iterations */
   dim_t j;                      /* Loop Counter */
   unsigned char *qua=NULL;      /* Pointer to quality flags */
   double mean;                  /* Bolometer signal mean */
@@ -124,7 +130,7 @@ void smf_flag_spikes( smfData *data, unsigned char *quality,
   size_t nflag;                 /* Number of samples flagged */
   dim_t ngood;                  /* How many good samples in measurement */
   dim_t ntslice;                /* Number of time slices */
-  double sigma;                 /* Bolometer signal mean */
+  double sig;                   /* Bolometer signal mean */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -197,14 +203,14 @@ void smf_flag_spikes( smfData *data, unsigned char *quality,
 
       /* Calculate mean and rms of the bolometer */
       smf_simple_stats( &dat[base], 0, ntslice, qua, mask, &mean,
-			&sigma, &ngood, status );
+			&sig, &ngood, status );
 
       if( *status == SMF__INSMP ) {
 	/* Insufficient samples for this bolometer. Annul the error. */
 	errAnnul( status );
-      } else if( (*status == SAI__OK) && (sigma > 0) ) {
+      } else if( (*status == SAI__OK) && (sig > 0) ) {
 	/* Size of excursion for significant event */
-	dist = thresh*sigma;
+	dist = thresh*sig;
 	
 	/* Loop over all samples and flag outliers */
 	for( j=0; j<ntslice; j++ ) if( !(qua[base+j] & mask) ) {
@@ -232,10 +238,13 @@ void smf_flag_spikes( smfData *data, unsigned char *quality,
     }
   }
 
-  printf(" Number of new samples flagged: %i\n", nflag );
-
-  /* Return actual iterations if requested */
+  /* Return stuff if requested */
   if( aiter ) {
     *aiter = iter;
   }
+
+  if( nflagged ) {
+    *nflagged = nflag;
+  }
+
 }

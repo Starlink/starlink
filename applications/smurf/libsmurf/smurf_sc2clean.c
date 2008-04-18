@@ -117,7 +117,7 @@
 
 void smurf_sc2clean( int *status ) {
 
-  unsigned int aiter;       /* Number of iterations in sigma-clipper */
+  size_t aiter;             /* Number of iterations in sigma-clipper */
   double badfrac=0;         /* Fraction of bad samples to flag bad bolo */
   dim_t dcbox=0;            /* width of box for measuring DC steps */
   int dcbox_s=0;            /* signed int version of dcbox */
@@ -126,12 +126,13 @@ void smurf_sc2clean( int *status ) {
   int flag;                 /* Flag for how group is terminated */
   int i = 0;                /* Counter, index */
   Grp *igrp = NULL;         /* Input group of files */
+  size_t nflag;             /* Number of flagged samples */
   Grp *ogrp = NULL;         /* Output group of files */
   int order;                /* Order of polynomial for baseline fitting */
   int outsize;              /* Total number of NDF names in the output group */
   int size;                 /* Number of files in input group */
   double spikethresh;       /* Threshold for finding spikes */
-  unsigned int spikeiter;   /* Number of iterations for spike finder */
+  size_t spikeiter;         /* Number of iterations for spike finder */
   int spikeiter_s;          /* Signed int version of spikeiter_s */
 
   /* Main routine */
@@ -161,7 +162,7 @@ void smurf_sc2clean( int *status ) {
   parGet0d( "SPIKETHRESH", &spikethresh, status );
   parGdr0i( "SPIKEITER", 0, 0, 32767, 1, &spikeiter_s, status );
   if( *status == SAI__OK ) {
-    spikeiter = (unsigned int) spikeiter_s;
+    spikeiter = (size_t) spikeiter_s;
   }
 
   /* Loop over input files */
@@ -224,7 +225,7 @@ void smurf_sc2clean( int *status ) {
       }
 
       smf_flag_spikes( ffdata, NULL, SMF__Q_BADS | SMF__Q_BADB | SMF__Q_SPIKE,
-		       spikethresh, spikeiter, 100, &aiter, status );
+		       spikethresh, spikeiter, 100, &aiter, &nflag, status );
       if( *status == SAI__OK ) {
 	msgSeti("AITER",aiter);
 	msgOutif(MSG__VERB," ", "Finished in ^AITER iterations",
