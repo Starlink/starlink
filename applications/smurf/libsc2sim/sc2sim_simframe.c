@@ -132,6 +132,8 @@
 *        Update to use new smf_free behaviour
 *     2008-04-15 (AGG):
 *        Fix time bug
+*     2008-04-18 (AGG):
+*        Use transmission for current wavelength to get atmospheric power
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -323,8 +325,8 @@ int *status                  /* global status (given and returned) */
        
        /* Calculate mean atmospheric emission at current airmass
 	  from zenith emission */
-       meanatm = zenatm * ( 1.0 - exp(-sinx.tauzen * airmass) ) / 
-	 ( 1.0 - exp(-sinx.tauzen) );
+       meanatm = zenatm * ( 1.0 - pow(0.01*skytrans,airmass) ) / 
+	 ( 1.0 - (0.01*skytrans) );
 
        /* Calculate the photon noise from this mean loading */
        sc2sim_getsigma( sinx.refload, sinx.refnoise, 

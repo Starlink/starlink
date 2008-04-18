@@ -264,6 +264,8 @@
 *        incrementing as necessary) for each file.
 *     2008-04-02 (TIMJ):
 *        Fix strncpy usage.
+*     2008-04-18 (AGG):
+*        Use transmission for current wavelength to get atmospheric power
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -811,8 +813,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     }/* switch */
 
     msgSeti( "COUNT", count );
-    msgOutif(MSG__VERB," ", 
-              "Count = ^COUNT", status );
+    msgOutif(MSG__VERB, " ", "Count = ^COUNT", status );
 
   }/* if status OK */
 
@@ -1035,10 +1036,11 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       slaDe2h ( hourangle, decapp, phi, &temp1, &temp2 );
 
       /* Issue an error if the source is below 20 degrees */
-      if ( temp2 < 0.35 ) {
+      if ( temp2 < 0.349066 ) {
         if ( *status == SAI__OK ) {
           *status = SAI__ERROR;
-          errRep(" ", "Source is below 20 deg elevation", status);
+	  msgSetd("E",temp2*57.29);
+          errRep(" ", "Source is below 20 deg elevation (^E)", status);
           goto CLEANUP;
         }
       }
@@ -1249,6 +1251,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                               &(dbuf[(k*nbol*maxwrite) + (nbol*frame)]), 
 			      status );
 	  }
+
           /* Annul sc2 frameset for this time slice */
           if( fs ) fs = astAnnul( fs );
           if( fitschan ) fitschan = astAnnul( fitschan );
@@ -1410,8 +1413,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	    /* Get photon noise level */
 	    sc2sim_calctrans( inx->lambda, &skytrans, sinx->tauzen, status );
 	    sc2sim_atmsky( inx->lambda, skytrans, &zenatm, status );
-	    meanatm = zenatm * ( 1.0 - exp(-sinx->tauzen * airmass[0]) ) / 
-	      ( 1.0 - exp(-sinx->tauzen) );
+	    meanatm = zenatm * ( 1.0 - pow(0.01*skytrans,airmass[0]) ) / 
+	      ( 1.0 - (0.01*skytrans) );
 	    sc2sim_getsigma( sinx->refload, sinx->refnoise, 
 			     sinx->telemission + meanatm, &pnoise, status );
 
@@ -1433,7 +1436,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
 	  /* Compress and store as NDF */
           if( *status == SAI__OK ) {
-
             sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k], 
 		     date_yr, date_mo, date_da, obscounter, subscanno );
 	    /*If we are not overwriting existing files see if the file exists*/
@@ -1497,7 +1499,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 			      flatpar[k], INSTRUMENT, filter, dateobs, obsid,
 			      &(posptr[frameoffset*2]), jigsamples, 
                               &(jigpat[0]), obscounter,
-			      subscanno, obsend, obstype, utdate, 
+			      subscanno, obsend, inx->obstype, utdate, 
 			      head[0].tcs_az_bc1, 
 			      head[lastframe-1].tcs_az_bc1,
 			      head[0].tcs_az_bc2, 
