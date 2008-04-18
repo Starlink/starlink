@@ -38,10 +38,10 @@
    of spectra or images, then each individual spectrum or image is
    assigned its own noise level.
 
-   o  A new parameter, READONLY, allows the new quality name to be
-   flagged as "read only". This flag indicates that an error
-   should be reported if any subsequent attempt is made to remove
-   the quality name (for instance, using REMQUAL).
+   o  SETQUAL has new parameter, READONLY, that allows the new
+   quality name to be flagged as "read only".  This flag indicates
+   that an error should be reported if any subsequent attempt is
+   made to remove the quality name (for instance, using REMQUAL).
 
    o  WCSMOSAIC Parameter GENVAR now allows a null value.  Null 
    requests that a value of FALSE be adopted if and only if all the
