@@ -60,6 +60,8 @@
 *        Initial version
 *     2008-04-17 (EC):
 *        Fixed indexing problem 
+*     2008-04-18 (EC):
+*        Improved range checking on inputs
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -163,23 +165,37 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
     return retval;
   }
 
-  if( (nsamp < 2) || (nsamp >= ntslice) ) {
+  if( nsamp < SMF__MINSTATSAMP ) { 
     *status = SAI__ERROR;
+    msgSeti("MIN",SMF__MINSTATSAMP);
     msgSeti("NSAMP",nsamp);
-    msgSeti("NTSLICE",ntslice);
-    errRep(FUNC_NAME, "Invalid nsamp: ^NSAMP, must be in range [2,^NTSLICE-1]",
+    errRep(FUNC_NAME, 
+	   "Invalid nsamp: ^NSAMP, must be > ^MIN",
 	   status);
     return retval;
   }
 
-  if( (nchunk < 1) || (nchunk >= ntslice) ) {
+  if( nsamp > ntslice ) {
+    msgSeti("NSAMP",nsamp);
+    msgSeti("NTSLICE",ntslice);
+    msgOutif( MSG__VERB, " ",
+	   "SMF_QUICK_NOISE: Shortening nsamp ^NSAMP to file length ^NTSLICE",
+	   status);
+    nsamp = ntslice;
+  }
+
+  if( nchunk < 1 ) {
     *status = SAI__ERROR;
     msgSeti("NCHUNK",nchunk);
-    msgSeti("NTSLICE",ntslice);
-    errRep(FUNC_NAME, 
-	   "Invalid nchunk: ^NCHUNK, must be in range [1,^NTSLICE-1]",
-	   status);
+    errRep(FUNC_NAME, "Invalid nchunk: ^NCHUNK, must be >= 1", status);
     return retval;
+  }
+
+  if( nchunk > ntslice) {
+    msgSeti("NCHUNK",nchunk);
+    msgOutif( MSG__VERB, " ", 
+	      "SMF_QUICK_NOISE: Shortening nchunk ^NCHUNK to 1", status);
+    nchunk = 1;
   }
 
   /* Now calculate the rms in nchunk uniformly distributed chunks starting
@@ -220,7 +236,7 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
   /* If minsig is still zero, couldn't calculate an estimate */
   if( !minsig ) {
     *status = SMF__INSMP;
-    errRep( FUNC_NAME, "Insufficient samples for statistics", status );
+    errRep( FUNC_NAME, "Insufficient good samples for statistics", status );
   }
 
   return minsig;
