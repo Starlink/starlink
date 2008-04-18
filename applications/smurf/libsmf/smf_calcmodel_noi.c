@@ -26,7 +26,7 @@
 *     allmodel = smfArray ** (Returned)
 *        Array of smfArrays (each time chunk) to hold result of model calc
 *     flags = int (Given )
-*        Control flags: not used 
+*        Control flags: estimate VARIANCE only if SMF__DIMM_FIRSTITER set
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -62,6 +62,9 @@
 *        -store variance instead of standard deviation
 *        -use smf_quick_noise instead of smf_simple_stats on whole array;
 *         added config parameters (NOISAMP/NOICHUNK) 
+*     2008-04-18 (EC)
+*        -Only calculate the white noise level once (first iteration)
+*        -Add chisquared calculation
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -107,7 +110,7 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 			smfArray **allmodel, int flags, int *status) {
 
   /* Local Variables */
-  unsigned int aiter;           /* Actual iterations of sigma clipper */
+  size_t aiter;                 /* Actual iterations of sigma clipper */
   dim_t base;                   /* Base index of bolometer */
   dim_t i;                      /* Loop counter */
   int idx=0;                    /* Index within subgroup */
@@ -118,9 +121,11 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t nbolo;                  /* Number of bolometers */
+  size_t nchisq;                /* Number of data points in chisq calc */
   dim_t nchunk;                 /* Number of spots to measure white level */
   int nchunk_s;                 /* Signed version of nchunk */
   dim_t ndata;                  /* Total number of data points */
+  size_t nflag;                 /* Number of new flags */
   dim_t nsamp;                  /* Length of window to measure white level */
   int nsamp_s;                  /* Signed version of nsamp */
   dim_t ntslice;                /* Number of time slices */
@@ -128,8 +133,9 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   unsigned char *qua_data=NULL; /* Pointer to RES at chunk */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
-  double sigma;                 /* Array standard deviation */ 
-  unsigned int spikeiter;       /* Number of iterations for spike detection */
+  double sigma;                 /* Bolometer white level */
+  double sigma_tot;             /* Total rms of bolometer time stream */
+  size_t spikeiter;             /* Number of iterations for spike detection */
   int spikeiter_s;              /* signed version of spikeiter */
   double spikethresh;           /* Threshold for spike detection */
   double var;                   /* Sample variance */
@@ -161,7 +167,7 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "spikeiter cannot be < 0.", status );
     } else {
-      spikeiter = (unsigned int) spikeiter_s;
+      spikeiter = (size_t) spikeiter_s;
     }
   }
 
@@ -192,6 +198,10 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   /* Which QUALITY bits should be considered for ignoring data */
   mask = 255 - SMF__Q_JUMP;
 
+  /* Initialize chisquared */
+  dat->chisquared[chunk] = 0;
+  nchisq = 0;
+
   /* Loop over index in subgrp (subarray) */
   for( idx=0; idx<res->ndat; idx++ ) {
       
@@ -211,42 +221,69 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
       ndata = nbolo*ntslice;
 
       /* Flag spikes in the residual */
-
       if( spikethresh ) {
-	msgOut(" ", "    flag spikes...", status);
 	smf_flag_spikes( res->sdata[idx], qua_data, 
 			 SMF__Q_BADS|SMF__Q_BADB|SMF__Q_SPIKE,
 			 spikethresh, spikeiter, 
-			 100, &aiter, status );
+			 100, &aiter, &nflag, status );
+
+	msgSeti("THRESH",spikethresh);
+	msgSeti("NFLAG",nflag);
 	msgSeti("AITER",aiter);
-	msgOut(" ", "    ...finished in ^AITER iterations",
+	msgOut(" ", 
+	       "   flagged ^NFLAG new ^THRESH-sig spikes in ^AITER iterations",
 	       status); 
-      }
+      } 
 
-      for( i=0; i<nbolo; i++ ) if( !(qua_data[i*ntslice]&SMF__Q_BADB) ) {
+      /* Only estimate the white noise level once at the beginning - the
+	 reason for this is to make measurements of the convergence 
+	 easier (basically we think the map-maker has converged when the
+         rms of the entire data stream approaches that of a small segment
+         of data) */
 
-	/* Measure the sample standard deviation for each bolometer
-	assuming it is stationary in time. Use smf_quick_noise to
-	measure the rms in short intervals as a better estimate of the
-	white level unaffected by residual 1/f than the whole data
-	stream. The real way to do this is to examine the flat portion
-	of the power spectrum. */
+      if( flags & SMF__DIMM_FIRSTITER ) {
 
-	sigma = smf_quick_noise( res->sdata[idx], i, nsamp, nchunk, 
-				 qua_data, mask, status );
+	for( i=0; i<nbolo; i++ ) if( !(qua_data[i*ntslice]&SMF__Q_BADB) ) {
+
+	  /* Measure the sample standard deviation for each bolometer
+	     assuming it is stationary in time. Use smf_quick_noise to
+	     measure the rms in short intervals as a better estimate of the
+	     white level unaffected by residual 1/f than the whole data
+	     stream. The real way to do this is to examine the flat portion
+	     of the power spectrum. */
+
+	  sigma = smf_quick_noise( res->sdata[idx], i, nsamp, nchunk, 
+				   qua_data, mask, status );
 	
-	if( *status == SMF__INSMP ) {
-	  errAnnul( status );
-	} else if( (*status == SAI__OK) && (sigma > 0) ) {
-	  var = sigma*sigma;
-	  base = i*ntslice; 
-	  /* Loop over time and store the variance for each sample */
-	  for( j=0; j<ntslice; j++ ) {
-	    model_data[base+j] = var;
+	  if( *status == SMF__INSMP ) {
+	    errAnnul( status );
+	  } else if( (*status == SAI__OK) && (sigma > 0) ) {
+	    var = sigma*sigma;
+	    base = i*ntslice; 
+	    /* Loop over time and store the variance for each sample */
+	    for( j=0; j<ntslice; j++ ) {
+	      model_data[base+j] = var;
+	    }
 	  }
 	}
-      } 
-    }   
+      }
+
+      /* Now calculate contribution to chi^2 */
+      if( *status == SAI__OK ) {
+	for( i=0; i<ndata; i++ ) if( !(qua_data[i]&SMF__Q_BADB) &&
+				     (model_data[i] > 0) ) {
+
+	  dat->chisquared[chunk] += res_data[i]*res_data[i]/model_data[i];
+	  nchisq++;
+
+	}
+      }
+    }
+  }
+
+  /* Normalize chisquared for this chunk */
+  if( (*status == SAI__OK) && (nchisq >0) ) {
+    dat->chisquared[chunk] /= (double) nchisq;
   }
 }
 
