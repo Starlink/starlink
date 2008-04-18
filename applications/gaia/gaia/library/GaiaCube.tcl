@@ -821,7 +821,7 @@ itcl::class gaia::GaiaCube {
 
          #  And create the dummy image NDF. Will have axis removed from
          #  the WCS and be the size and type of cube in other axes.
-         set imageaccessor [$cubeaccessor_ createimage $section_name_ $axis_]
+         set imageaccessor [$cubeaccessor_ createimage $section_name_ $axis_ $component_]
 
          #  Map in the data component to initialise it. Use BAD
          #  to avoid NDF bad flag from being set false.
