@@ -1343,7 +1343,7 @@ This mapped array could be passed to a subroutine for use as follows:
 
       ...
 
-      CALL SHOW( EL, %VAL( CNF_PVAL( PNTR ) ), %VAL( 80 ) )
+      CALL SHOW( EL, %VAL( CNF_PVAL( PNTR ) ), %VAL( CNF_CVAL( 80 ) ) )
 \end{verbatim}
 \end{quote}
 \normalsize
@@ -1381,7 +1381,7 @@ required to determine this length, as follows:
 
       CALL DAT_MAPV( LOC, '_CHAR', 'READ', PNTR, EL, STATUS )
       CALL DAT_CLEN( LOC, LENGTH, STATUS )
-      CALL SHOW( EL, %VAL( CNF_PVAL( PNTR ) ), %VAL( LENGTH ) )
+      CALL SHOW( EL, %VAL( CNF_PVAL( PNTR ) ), %VAL( CNF_CVAL( LENGTH ) ) )
 \end{verbatim}
 \end{quote}
 \normalsize
