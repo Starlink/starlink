@@ -58,6 +58,8 @@
 *  History:
 *     2008-03-28 (EC):
 *        Initial version
+*     2008-04-17 (EC):
+*        Fixed indexing problem 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -155,7 +157,7 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
   if( bolo >= nbolo ) {
     *status = SAI__ERROR;
     msgSeti("BOLO",bolo);
-    msgSeti("NBOLO",nbolo);
+    msgSeti("NBOLO",nbolo-1);
     errRep(FUNC_NAME, "Invalid bolo: ^BOLO, must be in range [0,^NBOLO]",
 	   status);
     return retval;
@@ -189,8 +191,8 @@ double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk,
 
   for( i=0; i<nchunk; i++ ) {
     /* Calculate the r.m.s. of this chunk */
-    smf_simple_stats( &dat[bolo*ntslice], i*len/(nchunk-1), nsamp, qua,
-		      mask, NULL, &sig, &ngood, status );
+    smf_simple_stats( &dat[bolo*ntslice], i*len/(nchunk-1), nsamp, 
+		      &qua[bolo*ntslice], mask, NULL, &sig, &ngood, status );
 	
     if( *status == SMF__INSMP ) {
       /* Annul the bad status; there simply weren't enough samples for
