@@ -162,9 +162,9 @@ void smf_simple_stats( double *data, dim_t start, dim_t nsamp,
   if( ngood ) *ngood = count;
 
   /* Enough samples? */
-  if( count < 2 ) {
+  if( count < 10 ) {
     *status = SMF__INSMP;
-    errRep( FUNC_NAME, "Insufficient samples (<2) for statistics", status );
+    errRep( FUNC_NAME, "Insufficient samples (<10) for statistics", status );
     return;
   }
 
