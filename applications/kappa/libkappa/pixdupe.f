@@ -528,7 +528,7 @@
 *  Expand the quality array. Do not use masking since the result of
 *  multiplying a quality value by a mask value may not mean anything.
          CALL KPG1_PXDPUB( IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                     EXPAND, .FALSE., %VAL( PNTRM ),
+     :                     EXPAND, .FALSE., %VAL( CNF_PVAL( PNTRM ) ),
      :                     ODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                     STATUS )
 
@@ -575,43 +575,50 @@
 *  data type. No masking here.
             IF ( ITYPE .EQ. '_REAL' ) THEN
                CALL KPG1_PXDPR( AIDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                          AEXPND, .FALSE., %VAL( PNTRM ),
+     :                          AEXPND, .FALSE., 
+     :                          %VAL( CNF_PVAL( PNTRM ) ),
      :                          AODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
                CALL KPG1_PXDPB( AIDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                          AEXPND, .FALSE., %VAL( PNTRM ),
+     :                          AEXPND, .FALSE., 
+     :                          %VAL( CNF_PVAL( PNTRM ) ),
      :                          AODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                 CALL KPG1_PXDPD( AIDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                           AEXPND, .FALSE., %VAL( PNTRM ),
+     :                           AEXPND, .FALSE., 
+     :                           %VAL( CNF_PVAL( PNTRM ) ),
      :                           AODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                           STATUS )
 
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                CALL KPG1_PXDPI( AIDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                          AEXPND, .FALSE., %VAL( PNTRM ),
+     :                          AEXPND, .FALSE., 
+     :                          %VAL( CNF_PVAL( PNTRM ) ),
      :                          AODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                CALL KPG1_PXDPUB( AIDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                           AEXPND, .FALSE., %VAL( PNTRM ),
+     :                           AEXPND, .FALSE., 
+     :                           %VAL( CNF_PVAL( PNTRM ) ),
      :                           AODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                           STATUS )
 
             ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                CALL KPG1_PXDPUW( AIDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                           AEXPND, .FALSE., %VAL( PNTRM ),
+     :                           AEXPND, .FALSE., 
+     :                           %VAL( CNF_PVAL( PNTRM ) ),
      :                           AODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                           STATUS )
 
             ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                CALL KPG1_PXDPW( AIDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ),
-     :                          AEXPND, .FALSE., %VAL( PNTRM ),
+     :                          AEXPND, .FALSE., 
+     :                          %VAL( CNF_PVAL( PNTRM ) ),
      :                          AODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ),
      :                          STATUS )
             END IF
@@ -651,7 +658,8 @@
                IF ( ITYPE .EQ. '_REAL' ) THEN
                   CALL KPG1_PXDPR( AIDIMS, 
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                             AEXPND, .FALSE., %VAL( PNTRM ),
+     :                             AEXPND, .FALSE., 
+     :                             %VAL( CNF_PVAL( PNTRM ) ),
      :                             AODIMS, 
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                             STATUS )
@@ -659,15 +667,17 @@
                ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
                    CALL KPG1_PXDPB( AIDIMS, 
      :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                              AEXPND, .FALSE., %VAL( PNTRM ),
-     :                             AODIMS, 
-     :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
-     :                             STATUS )
+     :                              AEXPND, .FALSE., 
+     :                              %VAL( CNF_PVAL( PNTRM ) ),
+     :                              AODIMS, 
+     :                              %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                              STATUS )
 
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                    CALL KPG1_PXDPD( AIDIMS, 
      :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                              AEXPND, .FALSE., %VAL( PNTRM ),
+     :                              AEXPND, .FALSE., 
+     :                              %VAL( CNF_PVAL( PNTRM ) ),
      :                              AODIMS, 
      :                              %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                              STATUS )
@@ -675,7 +685,8 @@
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                   CALL KPG1_PXDPI( AIDIMS, 
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                             AEXPND, .FALSE., %VAL( PNTRM ),
+     :                             AEXPND, .FALSE., 
+     :                             %VAL( CNF_PVAL( PNTRM ) ),
      :                             AODIMS, 
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                             STATUS )
@@ -683,7 +694,8 @@
                ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                   CALL KPG1_PXDPUB( AIDIMS, 
      :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                              AEXPND, .FALSE., %VAL( PNTRM ),
+     :                              AEXPND, .FALSE., 
+     :                              %VAL( CNF_PVAL( PNTRM ) ),
      :                              AODIMS, 
      :                              %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                              STATUS )
@@ -691,7 +703,8 @@
                ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                   CALL KPG1_PXDPUW( AIDIMS, 
      :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                              AEXPND, .FALSE., %VAL( PNTRM ),
+     :                              AEXPND, .FALSE., 
+     :                              %VAL( CNF_PVAL( PNTRM ) ),
      :                              AODIMS, 
      :                              %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                              STATUS )
@@ -699,7 +712,8 @@
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                   CALL KPG1_PXDPW( AIDIMS, 
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                             AEXPND, .FALSE., %VAL( PNTRM ),
+     :                             AEXPND, .FALSE., 
+     :                             %VAL( CNF_PVAL( PNTRM ) ),
      :                             AODIMS, 
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                             STATUS )
@@ -741,7 +755,8 @@
                IF ( ITYPE .EQ. '_REAL' ) THEN
                   CALL KPG1_PXDPR( AIDIMS, 
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                             AEXPND, .FALSE., %VAL( PNTRM ),
+     :                             AEXPND, .FALSE., 
+     :                             %VAL( CNF_PVAL( PNTRM ) ),
      :                             AODIMS, 
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                             STATUS )
@@ -749,7 +764,8 @@
                ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
                   CALL KPG1_PXDPB( AIDIMS, 
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                             AEXPND, .FALSE., %VAL( PNTRM ),
+     :                             AEXPND, .FALSE., 
+     :                             %VAL( CNF_PVAL( PNTRM ) ),
      :                             AODIMS, 
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                             STATUS )
@@ -757,7 +773,8 @@
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                    CALL KPG1_PXDPD( AIDIMS, 
      :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                              AEXPND, .FALSE., %VAL( PNTRM ),
+     :                              AEXPND, .FALSE., 
+     :                              %VAL( CNF_PVAL( PNTRM ) ),
      :                              AODIMS, 
      :                              %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                              STATUS )
@@ -765,7 +782,8 @@
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                   CALL KPG1_PXDPI( AIDIMS, 
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                             AEXPND, .FALSE., %VAL( PNTRM ),
+     :                             AEXPND, .FALSE., 
+     :                             %VAL( CNF_PVAL( PNTRM ) ),
      :                             AODIMS, 
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                             STATUS )
@@ -773,7 +791,8 @@
                ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                   CALL KPG1_PXDPUB( AIDIMS, 
      :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                              AEXPND, .FALSE., %VAL( PNTRM ),
+     :                              AEXPND, .FALSE., 
+     :                              %VAL( CNF_PVAL( PNTRM ) ),
      :                              AODIMS, 
      :                              %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                              STATUS )
@@ -781,7 +800,8 @@
                ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                   CALL KPG1_PXDPUW( AIDIMS, 
      :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                              AEXPND, .FALSE., %VAL( PNTRM ),
+     :                              AEXPND, .FALSE., 
+     :                              %VAL( CNF_PVAL( PNTRM ) ),
      :                              AODIMS, 
      :                              %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                              STATUS )
@@ -789,7 +809,8 @@
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                   CALL KPG1_PXDPW( AIDIMS, 
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                             AEXPND, .FALSE., %VAL( PNTRM ),
+     :                             AEXPND, .FALSE., 
+     :                             %VAL( CNF_PVAL( PNTRM ) ),
      :                             AODIMS, 
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                             STATUS )
