@@ -114,6 +114,9 @@
 *        -Added smfDIMMData; updated smf_calcmodelptr prototype
 *     2008-04-16 (EC):
 *        -Added chunk to smfGroup
+*     2008-04-18 (EC):
+*        -Added chisquared to smfDIMMData
+*        -Added SMF__MINCHUNKSAMP and SMF__MINSTATSAMP
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -155,6 +158,12 @@
 #define SMF_PATH_MAX GRP__SZNAM
 #define SMF_NAME_MAX GRP__SZFNM
 #define SMF__MXSMF 8 /* Maximum number of smfDatas in a smfArray */
+
+/* Minimum number of time samples for a data chunk to be useful*/
+#define SMF__MINCHUNKSAMP 100
+
+/* Minimum number of samples for meaningful stats (like sample variance) */
+#define SMF__MINSTATSAMP 10
 
 /* Different data types supported by SMURF */
 typedef enum smf_dtype {
@@ -317,11 +326,12 @@ typedef struct smfGroup {
    calculation */
 typedef struct smfDIMMData {
   smfArray **res;            /* array of smfArray's of model residuals */ 
-  smfArray **noi;           /* array of smfArray's of variance estimates */ 
+  smfArray **noi;            /* array of smfArray's of variance estimates */ 
   smfArray **qua;            /* array of smfArray's of quality flags */ 
   smfArray **lut;            /* array of smfArray's of pointing LUTs */ 
   double *map;               /* pointer to the current map estimate */
   double *mapvar;            /* pointer to the current map variance estimate */
+  double *chisquared;        /* chisquared at each chunk */
 } smfDIMMData;
 
 
@@ -351,9 +361,5 @@ typedef struct smfTile {
   AstMapping *map2d;
   AstMapping *map3d;
 } smfTile;
-
-
-
-
 
 #endif /* SMF_TYP_DEFINED */
