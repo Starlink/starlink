@@ -55,6 +55,8 @@
 *        Remove wcs argument from putFits (not needed).
 *     2008-04-14 (JB):
 *        Remove obsType argument from getMapVars (not needed).
+*     2008-04-18 (JB):
+*        Add special configuration flag.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -100,6 +102,14 @@
     }\
   }
 
+
+void gsdac_checkSpecial 
+(
+const gsdVars *gsdVars, /* GSD headers and arrays (given) */
+int *special,        /* flag for special configurations 
+                        (given and returned) */
+int *status          /* global status (given and returned) */
+);
 
 void gsdac_freeArrays
 (
@@ -326,6 +336,7 @@ const char *samMode, /* sample mode (given) */
 const char *obsType, /* observation type (given) */
 const dateVars *dateVars, /* date/time variables (given) */
 const mapVars *mapVars, /* map/chop/scan variables (given) */
+const int *special,  /* flag for special configurations (given) */
 const AstFitsChan *fitschan,  /* FITS headers (given and returned) */
 int *status          /* pointer to global status (given and returned) */
 ); 

@@ -19,7 +19,7 @@
 
 *  Arguments:
 *     gsdVars = const gsdVars* (Given)
-*        GSD headers and arrays
+*        GSD headers and arrays.
 *     directory = char* (Given)
 *        Directory to write the file
 *     nSteps = const unsigned int (Given)
@@ -71,6 +71,8 @@
 *        Convert AZEL start/end to degrees.
 *     2008-04-11 (JB):
 *        Don't rewrite FITS headers unnecessarily.
+*     2008-04-18 (JB):
+*        Use flag for special configurations.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -155,6 +157,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   ACSISSpecHdr *specHdr;      /* ACSIS spectrum-specific information */
   unsigned long specIndex;    /* index into spectral data */
   long spectrumSize;          /* size of spectrum data */
+  int special;                /* flag for special configurations */
   unsigned int stepNum;       /* current step */
   int subBandNum;             /* subband number of current spectrum */
   unsigned int utDate;        /* UT date in YYYYMMDD format */
@@ -245,6 +248,9 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
     return;
   }
 
+  /* Check to see if this is a special configuration. */
+  gsdac_checkSpecial ( gsdVars, &special, status );  
+
   /* Get the size of the data array */
   spectrumSize = gsdVars->nBEChansOut * gsdVars->nScanPts * gsdVars->nScan;
                 
@@ -305,8 +311,8 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
         /* Fill the FITS headers. */
         gsdac_putFits ( gsdVars, subBandNum, nSubsys, obsNum, utDate, nSteps, 
                         backend, recepsUsed, recepNames, samMode, obsType, 
-                        &dateVars, &mapVars, fitschan[subBandNum % nSubsys], 
-                        status );
+                        &dateVars, &mapVars, &special, 
+                        fitschan[subBandNum % nSubsys], status );
 
         /* Write the WCSFrame information to the fitschan. */
         astWrite ( fitschan[subBandNum % nSubsys], WCSFrame );

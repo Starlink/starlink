@@ -18,9 +18,9 @@
 *                     const int nSubsys, const int obsNum, 
 *                     const int utDate, const int nSteps, 
 *                     const char *backend, const int recepsUsed,
-*                     char *recepNames[],
-*                     const char *samMode, const char *obsType,
-*                     const dateVars *dateVars, const mapVars *mapVars,
+*                     char *recepNames[], const char *samMode, 
+*                     const char *obsType, const dateVars *dateVars,
+*                     const mapVars *mapVars, const int *special,
 *                     const AstFitsChan *fitschan, int *status )
 
 *  Arguments:
@@ -50,6 +50,8 @@
 *        Date and time variables
 *     mapVars = const mapVars* (Given)
 *        Map/Chop/Scan variables
+*     special = const int* (Given)
+*        Flag for special configurations
 *     fitschan = const AstFitsChan* (Given and Returned)
 *        FITS headers
 *     status = int* (Given and Returned)
@@ -103,6 +105,8 @@
 *        Add a few missing FITS headers.
 *     2008-04-16 (JB):
 *        Calculate OBSGEO values from -OBS values.
+*     2008-04-18 (JB):
+*        For special configs use centreFreq for moltrans.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -149,9 +153,9 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
                      const int nSubsys, const int obsNum, 
                      const int utDate, const int nSteps, 
                      const char *backend, const int recepsUsed, 
-                     char *recepNames[],
-                     const char *samMode, const char *obsType,
-                     const dateVars *dateVars, const mapVars *mapVars,
+                     char *recepNames[], const char *samMode,
+                     const char *obsType, const dateVars *dateVars,
+                     const mapVars *mapVars, const int *special,
                      const AstFitsChan *fitschan, int *status )
 
 {
@@ -262,8 +266,13 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   /* ACSIS Specific. */
 
   /* Get the molecule and transition. */
-  smf_get_moltrans ( gsdVars->restFreqs[0] * 1000.0, &molecule, 
-                     &transiti, status );
+  if ( *special ) {
+    smf_get_moltrans ( gsdVars->centreFreqs[subBandNum] * 1000.0, &molecule, 
+                       &transiti, status );
+  } else {
+    smf_get_moltrans ( gsdVars->restFreqs[subBandNum] * 1000.0, &molecule, 
+                       &transiti, status );
+  }
 
   /* Get the bandwidth setup. */
 /***** NOTE: may be different for rxb widebands *****/  
