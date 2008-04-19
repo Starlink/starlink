@@ -52,6 +52,8 @@
 *        Check that this is DAS/AOSC version 5.3
 *     04-APR-2008 (JB):
 *        Wrap gsd calls in macro for error checking.
+*     04-APR-2008 (JB):
+*        Alphabetize local variables.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -112,13 +114,13 @@ void smurf_gsd2acsis( int *status ) {
   dasFlag dasFlag;            /* file structure type */
   char directory[MAXNAME];    /* directory to write the file */
   char filename[MAXNAME];     /* name of the GSD file */
+  FILE *fptr;                 /* pointer to GSD file */
   struct gsdac_gsd_struct gsd; /* GSD file access parameters */
   gsdVars gsdVars;            /* GSD headers and arrays */
-  unsigned int nSteps;        /* number of time steps */
-  float version;              /* GSD file version */
   char label[41];             /* GSD label */
   int nitem;                  /* number of items in GSD file */
-  FILE *fptr;                 /* pointer to GSD file */
+  unsigned int nSteps;        /* number of time steps */
+  float version;              /* GSD file version */
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
