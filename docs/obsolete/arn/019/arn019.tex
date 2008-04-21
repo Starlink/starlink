@@ -4,10 +4,10 @@
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {ADAM Release Note}
 \newcommand{\stardocinitials}  {ARN}
-\newcommand{\stardocnumber}    {19-1.1}
+\newcommand{\stardocnumber}    {19-2.1}
 \newcommand{\stardocauthors}   {A J Chipperfield}
-\newcommand{\stardocdate}      {18 February 1991}
-\newcommand{\stardoctitle}     {ADAM --- Release 1.9-1}
+\newcommand{\stardocdate}      {22 February 1991}
+\newcommand{\stardoctitle}     {ADAM --- Release 1.9-2}
 %------------------------------------------------------------------------------
 
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
@@ -54,10 +54,9 @@ RUTHERFORD APPLETON LABORATORY\\
 %------------------------------------------------------------------------------
 
 \section{SUMMARY}
-This is a partial release of ADAM to update Version 1.9 with fixes for two 
-bugs in the parameter system, and some other minor changes.
-This release note also documents corrections to the SGS and GKS include files
-which were issued in SSC495A.
+This is a partial release of ADAM to update Version 1.9-1 with a fix for a
+bug in the parameter system. Also, some additional documents are listed in the
+documentation summaries.
 It will not be necessary to re-link tasks for this release.
 
 \section{INSTALLATION}
@@ -66,13 +65,11 @@ Change Notice.
 
 \section{NEW FEATURES IN THIS RELEASE}
 
-
 \subsection{ADAMSTART}
-ADAMSTART.COM is modified to display the latest ADAM version number
-and to revise the definition of the DCL symbol, TRACE (see below).
+ADAMSTART.COM is modified to display the latest ADAM version number.
 
 \subsection{TRACE}
-The TRACE utility will shortly be released in a new, improved form as
+The TRACE utility has been released in a new, improved form as
 a separate Starlink software item.
 ADAMSTART and the standard ICL startup procedures will point to the new 
 version.
@@ -80,9 +77,10 @@ The version currently distributed with ADAM will be removed in a future
 release.
 As an interim measure, ADAMSTART will define symbol TRACE to run the new version
 if that version is installed; otherwise it will run the original version.
+(This change was actually made in ADAM Version 1.9-1.)
 
 \subsection{Documentation}
-ARN/19-1.1 describes ADAM release 1.9-1.
+ARN/19-2.1 describes ADAM release 1.9-2.
 There is no corresponding SSN/45.
 
 The summaries, ADAM\_DOCS:0CONTENTS.LIS, FULLDOCS.LIS and NEWDOCS.LIS, have 
@@ -91,33 +89,8 @@ been updated.
 \section{BUGS FIXED}
 
 \subsection{Parameter System}
-The following bugs in SUBPAR have been fixed.
-\begin{itemize}
-\item A bug which caused global parameters not to be updated at the end of a 
-task and may have caused other problems associated with HDS object names.
-(SUB\-PAR\_\-SPLIT)
-\item A bug which caused the wrong parameter to be given a value if the
-value corresponded with the keyword of a parameter not required for a
-particular action in a D-task.
-The system now checks that any logical keyword specified on the command
-line is for a parameter which is required by the action and has not already
-been set by position.
-If it is not, the normal process for resolving ambiguous items will continue.
-It is assumed that all specified parameters are required by the A-task action.
+A bug has been fixed which caused command-line parameters to get mixed up if 
+the `keyword' or `NOkeyword' form was used for logical parameters which had not
+been allocated a `position' by the interface file.
 (SUB\-PAR\_\-CMD\-LINE) 
-\end{itemize}
-
-\subsection{SGS and GKS Include Files}
-The SGS and GKS Fortran include files were not updated in ADAM\_INC in line 
-with the source directories. In particular the names were changed from
-SGS/GKSERR.FOR to SGS/GKS\_ERR.FOR
-
-\subsection{MESSYS Version 2}
-The procedures {\em etc.} for creating the shareable images using the
-MSP-based version of the inter-task message system, are brought into line
-with the Version 1 system.
-It is hoped to release the Version 2 system in the near future. 
-
-{\em This is expected to coincide with other changes which will require all 
-tasks to be re-linked.}
 \end{document}

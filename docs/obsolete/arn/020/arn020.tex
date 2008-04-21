@@ -4,10 +4,10 @@
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {ADAM Release Note}
 \newcommand{\stardocinitials}  {ARN}
-\newcommand{\stardocnumber}    {20-1.1}
+\newcommand{\stardocnumber}    {20-2.1}
 \newcommand{\stardocauthors}   {A J Chipperfield}
-\newcommand{\stardocdate}      {3 June 1992}
-\newcommand{\stardoctitle}     {ADAM --- Release 2.0-1}
+\newcommand{\stardocdate}      {1 February 1993}
+\newcommand{\stardoctitle}     {ADAM --- Release 2.0-2}
 %------------------------------------------------------------------------------
 
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
@@ -50,22 +50,30 @@ RUTHERFORD APPLETON LABORATORY\\
 \end{center}
 This is a `partial' release of ADAM -- its main features are:
 \begin{itemize}
-\item The use of separately released shareable images for the
-graphics libraries -- thus allowing easier task linking and automatic inclusion
-of updates into ADAM tasks.
+\item Enhanced ICL:
 \begin{itemize}
-\item PGPLOT, SGS and GKS libraries will be searched automatically by ALINK,
-MLINK and ICLMLINK but not by ILINK, DLINK or CDLINK.
-\item ARGSLIB is no longer available as part of ADAM. Any tasks using it must
-be re-linked in the next few months.
+\item Much improved error reporting and recovery when tasks fail -- notably
+when they fail to load.
+\item Setting default directory for loaded tasks.
+\item Improved access to information.
+\item Optional passing of unrecognized commands to the DCL subprocess.
 \end{itemize}
-\item Improvements to error checking, reporting and recovery in interface file
-parsing.
-\item NBS available for application development when only the
-mini-system is installed.
-\item Change in the method of using the PAR\_PAR include file.
-\item Bugs fixed in the parameter system, message system, ICL and DTASK
+\item Enhanced parameter system:
+\begin{itemize}
+\item ACCEPT at a prompt.
+\item Any string as a `name'.
+\item Improvements when `putting' array parameter values to the parameter file.
+\item A conceptual split of output into message and error streams.
+\item Re-use of dynamic storage.
 \end{itemize}
+\item Enhancements to SMS.
+\item Use of the portable help system.
+\item Bugs fixed in the Parameter System, ICL, MESSYS, TASK, UFACE and SMS.
+\end{itemize}
+
+N.B. TASKS WHICH HAVE NOT BEEN RE-LINKED WITH ADAM V2 SHOULD NOW BE RE-LINKED
+-- apart from not providing a number of useful enhancements, the old built-in
+fixed-part is no longer valid for all cases.
 
 \newpage
 %------------------------------------------------------------------------------
@@ -84,357 +92,772 @@ The full system requires about 38000 blocks of disk storage and includes a
 mini-system which can be extracted and put up separately. The mini-system
 requires about 12000 blocks and allows tasks to be run and  developed.
 
-\section{NEW FEATURES IN THIS RELEASE}
+\section{NEW FEATURES OF ICL}
+Version 1.6 of ICL is released. The new and changed features are described
+below. SG/5 will be re-issued separately in the near future.
 
-\subsection{Graphics Shareable Images}
-\subsubsection{SGS, GKS and GNS}
-\label{graphs}
-ADAM tasks which use SGS, GKS or GNS will now link with the relevant
-{\em lib}\_IMAGE\_ADAM shareable images, which are part of the separate
-Starlink Software Items. These also now include the {\em lib}PAR routines
-which connect the graphics libraries to the ADAM parameter system.
-The SGS and GKS directories have been removed from the ADAM release.
+\subsection{Control of ADAM Tasks}
+The task control logic of ICL has been extensively rewritten to cure various
+problems. ICL now uses the VMS termination mailbox facility to accurately
+track the failures of tasks initiated by this incarnation of ICL. This
+mechanism does not work with detached tasks but they are entered into the task
+tables when first used. Users should get more accurate error messages when
+tasks abort and will not experience the long delays seen at present.\\
+(ICLADAM.PAS)
+\subsection{Improved DCL Subprocess Control}
+It is now possible to send a CTRL/C to a DCL subprocess command 
+({\em e.g.}\ MAIL)
+correctly and without interfering with ICL (which sometimes used to hang).
+Also a CTRL/Y typed to the DCL subprocess will abort only the subprocess and 
+not ICL.\\
+(ICLIO.PAS)
 
-This means that the separate items must be installed if they are used.
+\subsection{Error Handling} 
+\label{errs}
+A number of improvements to error handling within ICL have been made.
+\begin{itemize}
+\item ICL now uses EMS internally and will process EMS 
+errors from HDS correctly.\\
+(Various modules)
+\item Internally ICL now holds its own error status and any status it can 
+derive from external functions in one global location. 
+This can be accessed by the user in
+one of several formats using a new function, SYSERR (see 
+Section \ref{syserr}). The ICL exception
+mechanism and exception names are left unchanged for compatibility reasons. 
+Use
+of SYSERR after an exception should provide more information on what 
+occurred.\\
+(All modules)
+\item Numerous other improvements to error messages to improve clarity and
+accuracy.\\
+(Mostly ICLADAM.PAS)
+\end{itemize}
 
+\subsection{Miscellaneous Other Improvements to ICL}
+\label{iclmisc}
+\begin{itemize}
+\item ICL.SDF is now called ICL\_\verb%<process_id>%.SDF and 
+created in
+ADAM\_USER by default (or in old location of SYS\$SCRATCH if ADAM\_USER is not
+defined). The file is deleted at ICL exit. 
+This should avoid conflicts when several copies of ICL are run from
+one username.\\
+(ICLMAIN.PAS)
+\item The DECW\$DISPLAY logical name will be copied into the LNM\$JOB table 
+on ICL startup. 
+This avoids a problem whereby graphics could work from tasks started
+from DCL but not from ICL.\\
+(Routine ICL\_INIT in ICLMAIN.PAS)
+\item ICL may now optionally use portable help libraries (ref.\ SUN/124)
+both for the HELP command and to provide multi-line parameter
+help in response to ? or ?? at parameter prompts.
 
-\subsubsection{Linking `Analysis' Tasks}
-On being re-linked, `Analysis' tasks will link directly to the separate 
-shareable images.
-On standard systems, ALINK, MLINK and ICLMLINK will do this automatically via
-the options file and shareable image library, STAR\_LINK\_ADAM;
-{\em if you use a non-standard system, it must be altered accordingly if you 
-are using graphics.} The advantage of this scheme is that the shareable image
-library will be updated when the separate software items are updated and will
-not depend on an ADAM release.
+If the given library file extension is .SHL, the portable system will be used.
+If the library file extension is omitted or .HLB, the system will look for a
+file with the given name and extension .SHL. If one is found, the portable 
+system will be called to use it: if not, VMS help will be used.
 
-\subsubsection{Linkng `Instrumentation' Tasks}
-For I-, D- and CD-tasks, the graphics libraries must now be
-included separately in the linker inputs, {\em e.g.}:
+In the interests of portability, library names may include logical names in 
+either of the following forms:
 \begin{quote} \begin{verbatim}
-$ ILINK task,SGS_LINK_ADAM/OPT
+logical_name:filename
 \end{verbatim} \end{quote}
 or
 \begin{quote} \begin{verbatim}
-$ DLINK task,STAR_LINK_ADAM/OPT
+$logical_name/filename
 \end{verbatim} \end{quote}
-
-Logical names required for application development will be defined at standard
-sites via the procedure pointed at by logical name STAR\_DEV\_ADAM when 
-ADAM\_DEV (ADAMDEV) is issued.
-
-\subsection{SGS Test Program}
-The source of the SGS test program SGSX1 has been moved to
-[ADAM.ADAMEXE.SOURCE]. The build and copy procedures have been altered 
-accordingly.
-
-\subsection{ADAMGRAPH7}
-The ADAMGRAPH7 shareable image now contains only DIAGRAM and dummy transfer
-vectors which will allow existing linked tasks to continue to work.\\
-(ADAMGRAPH7.COM/.MAR)
-
-\subsubsection{ARGS}
-\label{args}
-The ARGS library is no longer available automatically to ADAM tasks. Existing
-linked tasks which use it will continue to work but must be re-linked, 
-specifying the ARGS library explicitly.
-\begin{quote} \begin{verbatim}
-$ ALINK task,ARGSLIB_DIR:ARGS/INCLUDE=(BDTAT$DATA)/LIBR
-\end{verbatim} \end{quote}
-It is proposed to remove ARGSLIB completely from the ADAM system in a few
-months time.
-Tasks will then cease to work unless they have been re-linked.\\
-(ADAMGRAPH7.COM/.MAR)
-
-\subsection{The Parameter System (PARSECON)}
-\label{parsecon}
-\begin{itemize}
-\item The library is now held in CMS and has been completely rebuilt from CMS
-using MMS.
-\item PARSECON now conforms to the error reporting conventions in SUN/104 and 
-uses EMS throughout for error reporting.\\
-(Numerous routines changed)
-\item PARSECON now checks, at {\em endinterface}, that the parameter {\em
-positions} form a contiguous set. An additional error status, PARSECON\_\_NCPOS,
-is defined and will be set in the event of a failure.\\
-(PARSECON\_FACEND, \_SETFACE, \_SETPOS, \_SETFACE, PARSECON\_ERR,\\
-PARSECON\-\_CMN, PARSECON4\_CMN,)
-\item PARSECON will now recover sensibly from a missing {\em endinterface}
-field.\\
-(PARSECON\_TABINIT)
-\item Case will be retained for default values other than quoted strings, and 
-for help library specifiers.
-This is required for the Unix implementation.
-(PARSECON\_ARRCHAR, \_TOKTYP, \_READIFL)
-\item Some modifications to the allowable characters in names have been made
-to allow \verb%~% and \verb%/% in names, again for Unix purposes.\\
-(PARSECON\_ARRCHAR, \_DECVAL)
-\item The names of the routines PARSECON\_{\em x}COORDS have been changed to 
-PARSECON\-\_{\em x}CRDS for portability reasons.\\
-(Also changed PARSECON\_READIFL)
-\item PARSECON\_ERFL has been changed to use WRITE with a FORMAT, and the
-FORMAT includes an initial 1X for VMS. This is removed automatically in the 
-process of building the Unix release, thus ensuring that no initial space is
-printed.
-\item An additional argument for SUBPAR\_CREATIFC specifies the STATUS ('NEW'
-or 'UNKNOWN') to be specified in the OPEN statement for the .IFC file.
-This is required because some Unix flavours report an error if an attempt is
-made to create a file which already exists.\\
-(Also changed COMPIFL)
-\item COMPIFL has been modified for portability and improved error reporting.
-Versions for VMS and Unix differ as follows:
-\begin{center}
-\begin{tabular}{lcc}
-& {\bf VMS} & {\bf Unix} \\
-File extensions & Upper case & Lower case \\
-OPEN STATUS & \verb%'NEW'% & \verb%'UNKNOWN'% \\
-Prompt FORMAT & \verb%( 1X, A, $ )% & \verb%( A, $ )%
-\end{tabular}
-\end{center}
+where \verb%filename% is optional.\\
+(See also Section \ref{uface}, UFACE)
 \end{itemize}
 
-\subsection{The Parameter System (SUBPAR)}
-\label{subp}
+\subsection{Modified Commands}
+\begin{description}
+\item[DEFAULT] may now be used to set the default directory for loaded tasks.
+This involves a related change to the DTASK fixed part 
+(see Section \ref{dtask}).
+\begin{quote} \begin{verbatim}
+DEFAULT [directory [taskname]]
+\end{verbatim} \end{quote}
+will set the default directory for task \verb%taskname% to \verb%directory%.
+
+If \verb%taskname% is omitted, the default directory for ICL, the DCL
+subprocess and any cached tasks will be set.
+
+If \verb%directory% is omitted, the current default directory for ICL will be
+displayed.\\
+(ICLPROC.PAS, ICLIO.PAS and DTASK library)
+\item[GET and PUTNBS]
+will now handle variable length strings.\\
+(ICLNBS.PAS)
+\item[SET (NO)MESSAGES]
+SET NOMESSAGES will cause fewer messages than before and will allow DEFSTRINGs
+(for example) to be redefined silently.\\
+(ICLUSER.PAS)
+\item[PROCS]
+The PROCS  command will output the list in alphabetical order and a selective
+listing of procedures is now possible.
+\begin{quote} \begin{verbatim}
+PROCS [string]
+\end{verbatim} \end{quote}
+If \verb%string% is specified, only those procedures whose names begin with 
+`\verb%string%' will be listed.\\
+(ICLMAIN.PAS, ICLPROC.PAS)
+\item[KILL and KILLW]
+Users can now refer to tasks by their DEFINEd command name rather
+than their full name ({\em e.g.} KILL KAPPA rather than 
+KILL KAPPA\_DIR:KAPPA).\\
+(ICLADAM.PAS)
+\item[DEFSTRING, DEFUSER, DEFPROC]
+Any conflict between the command names defined by these commands or
+a defined PROCedure name will be reported, although the new definition
+will remain.
+These commands can now be `undone' by re-entering them with only the first
+(command) parameter.\\
+(ICLUSER.PAS)
+\item[PROC]
+Any conflict between the PROCedure name and a command name defined by
+DEFSTRING, DEFUSER or DEFPROC  will be reported.\\
+(ICLMAIN.PAS)
+\item[SET PROMPT] The tokens \$DATE and \$TIME may now be included in the
+string defining the required prompt. The date and time at the time of the
+prompt will be substituted.
+\begin{quote} \begin{verbatim}
+SET PROMPT '$DATE $TIME ICL >'
+\end{verbatim} \end{quote}
+(ICLMAIN.PAS)
+\item[EDIT] In addition to editing procedures, this command may now be used to 
+edit normal files without creating a subprocess. If the parameter contains `.', 
+it is assumed to be a filename rather than a procedure, {\em e.g.\ }
+\begin{quote} \begin{verbatim}
+ICL> EDIT MYDIR:MYFILE.TXT   ! edits a file
+ICL> EDIT MYFILE             ! edits procedure MYFILE
+\end{verbatim} \end{quote}
+The editor selected by default or the SET EDITOR command will be used.
+
+There are some differences from using the editors in DCL:
+\begin{enumerate}
+\item Only one parameter may be given.
+\item The editors assume a change has been made so always create a new file.
+\end{enumerate}
+(ICLPROC.PAS)
+\end{description}
+
+\subsection{New Commands}
+\begin{description}
+\item[STRINGS]
+This will list, in alphabetical order, the strings defined by DEFSTRING, 
+DEFUSER, DEFHELP or DEFPROC.
+\begin{quote} \begin{verbatim}
+STRINGS [string]
+\end{verbatim} \end{quote}
+If \verb%string% is specified, only those strings whose names begin with 
+`\verb%string%' will be listed.\\
+(ICLUSER.PAS)
+\item[VERSION]
+Prints the ICL version number and creation date.\\
+(ICLPROC.PAS)
+\item[SET (NO)AUTODCL]
+Unrecognized ICL commands will, by default, be passed through to DCL. To avoid
+spelling mistakes accidentally starting the DCL subprocess the user is reminded
+what to do if the DCL subprocess is not active.
+The default is AUTODCL.\\
+(ICLPROC.PAS)
+\item[SET (NO)COMMENTS] SET NOCOMMENTS will cause ICL not to save comments
+when procedures are loaded. In large systems this can cut down considerably
+the memory required and the number of page faults. 
+The default is SET COMMENTS so there is no change in behaviour by default.\\
+(ICLMAIN.PAS, ICLDEF.PAS)
+\item[SET (NO)CTRLZ]
+If SET NOCTRLZ is in effect it should be impossible to escape from ICL by
+typing CTRL/Z. In this case an explicit EXIT is required.
+The default is CTRLZ.\\
+(ICLPROC.PAS)
+\end{description}
+
+\subsection{New Function SYSERR()}
+\label{syserr}
+The global status code can be returned as a number or any (or all) of the
+translation of this number through LIB\$SYS\_GETMSG
+(See also Section \ref{errs}.)
+\begin{quote} \begin{verbatim}
+ERR = SYSERR([part])
+\end{verbatim} \end{quote}
+\verb%part% may be:
+\begin{description}
+\item[omitted or 'default'] A string in the form {\em fac\_\_ident} will be 
+returned.
+\item['full'] The translated message is returned in full.
+\item['facility'] The facility name for the message is returned.
+\item['ident'] The ident for the message is returned.
+\item['severity'] The severity of the message is returned.
+\item['value'] The status code is returned as an integer.
+\end{description}
+It should be borne in mind that use of this facility may not be fully portable
+and some packages do not have messages associated with their status values.\\
+(ICLFUNC.PAS)
+
+\subsection{ICL Procedures {\em etc.}}
+\begin{description}
+\item[LOGIN.ICL, ADAMLOGIN.ICL]
+The login banner has been changed to display the new version number, 1.6.
+\item[ICLHELP] The changes described above have been reflected in the ICL help
+library.\\
+(ICLHELP.HLP, ICLHELP.HLB)
+\item[LINK\_ICL] The procedure for linking ICL has been changed to pick up all
+libraries {\em etc.\ } from the appropriate source directory -- previously some 
+libraries were picked up from ADAM\_LIB.
+The HLP shareable library is also included in the link.
+\item[SMSLINK] The procedure for linking SMSICL has been renamed to SMSLINK\_ICL
+and changed to pick up ICLSMS from the ICL object library and certain UFACE 
+routines from the ICL UFACE library rather than the SMS UFACE library (see 
+Section \ref{uface}). 
+Furthermore, the image produced is named SMSICL.EXE rather than just SMS.
+\item[COMPILE\_ICL] Allow for revised format for ICL library.
+\end{description}
+
+\section{NEW FEATURES OF DTASK}
+\label{dtask}
+\subsection{CONTROL Context}
+The task fixed part has been modified to cater for a new type of context
+message, namely CONTROL context. Currently the only CONTROL context message
+is to set the default directory for the task.\\
+(Modified: DTASK\_DTASK, \_GSOC, DTASK\_ERR, ADAMDEFNS\\
+New: DTASK\_CONTROL)
+
+\subsection{Include Files}
 \begin{itemize}
-\item The library is now held in CMS and has been completely rebuilt from CMS 
-using MMS.
-\item The SUBPAR\_DEF1x routines are now non-generic and store values in the 
-type supplied. Values are converted to the type of the parameter when they are
-used.
-If there are fewer than six values they will be stored in the parameter system
-common blocks.
-If new dynamic default values are supplied in the same type and number as
-previously, the same common block storage will be re-used; otherwise an HDS
-component of the task's parameter file will be created with the required
-dimensionality and size and the value(s) will be stored there.\\
-(SUBPAR\_DEF1x, \_DEACT)
-\item SUBPAR\_DEF1x routines will now assume a scalar default if NVAL of 0 is
-given. Previously specifying NVAL = 0 would have had unpredictable effects.
-This allows a scalar HDS object to be created if a call to PAR/SUBPAR\_DEF0x
-requires it.\\
-(SUBPAR\_DEF0x, SUBPAR\_DEF1x)
-\item HDS is now used to do type conversion when N-dimensional dynamic defaults
-are set -- this may result in changes to the values stored. 
-In particular the integer part, rather than the nearest integer, is taken in 
-REAL to INTEGER conversion.\\
-(SUBPAR\_DEFNx)
-\item When a primitive object in the GLOBAL file is used, by association, as 
-the value for a parameter, the relevant component in the task's parameter file
-is created by copying the GLOBAL component using DAT\_COPY.
-This procedure has been adopted to avoid the need for mapping, with its
-requirement for non-portable features and complications with type \_CHAR --
-it may result in a parameter file component with a type different from the
-declared type of the parameter but HDS will take care of any required
-conversions.\\
-(SUBPAR\_HDSASS)
-\item When object names are set repeatedly as dynamic defaults, the same common
-block storage for the name will now be re-used.\\
-(SUBPAR\_DATDEF)
-\item New routine SUBPAR\_PFER has been added to the SUBPARZ library to
-produce a system dependent message in the even of being unable to open the
-parameter file.\\
-(SUBPAR\_ACTIV, \_ACTDCL, \_ACTSHR)
-\item New routine SUBPAR\_ADMUS has been added to the SUBPARZ library to return
-the string represented by ADAM\_USER:.\\
-(SUBPAR\_TSKNM, \_DEACT, \_HDSASS, \_VALASS)
-\item The parameter system will now create the GLOBAL parameter file if it does
-not exist.\\ (SUBPAR\_DEACT)
-\item SUBPAR no longer sets PARSECON error values. An additional error value,
-SUBPAR\-\_\_NOACT, is defined.\\
-(SUBPAR\_DATDEF, \_FINDACT, \_FINDKEY, SUBPAR\_ERR)
-\item Unused variables {\em etc.} have been cleaned up.\\
-(SUBPAR\_TYPE, \_SELHELP, \_LOADIFC, \_SHRNM)
+\item The names of the DTASK include files have been changed to DTASK\_xxx.FOR.
+This is to assist in the porting exercise.\\
+(DTASK.PAR, DTASK.CMN, DTASK.SYS)
+\item An additional constant, DTASK\_\_SYSNORM is defined (see Section
+\ref{port}).\\
+(DTASK\_SYS)
 \end{itemize}
 
-\subsection{The Parameter System (PAR)}
-\label{par}
-There has been a change to the use of the PAR\_PAR include file. 
-Formerly this was included automatically if SAE\_PAR was included in the code 
-but the approved method now is to include PAR\_PAR explicitly.
+\subsection{Revised Error Messages}
+Several error messages have been split to provide neater displays than are
+provided by the simple wrapping employed by ERR.\\
+(DTASK\_DTASK)
+
+\subsection{Portability}
+\label{port}
+To enable the same code to be used as far as possible on both VMS and Unix
+systems, the following changes have been made:
+\begin{itemize}
+\item The task of obtaining the parameter section of the command line when a
+task is activated direct from the operating system is separated out into a new
+(system-specific) routine.\\
+(Modified DTASK\_DCLTASK, DTASK\_ERR; New DTASK\_GTCMD)
+\item The task of including the message associated with a status value within
+an error message is now done in two stages. The special syntax \verb%^STATUS%
+is not used. 
+In this way the fact that there is no message associated with status 
+values on Unix can be handled whilst retaining the existing behaviour on VMS.
+A new (system-specific) routine is provided to set a normal token to the 
+appropriate message.
+In the Unix version, the message will be the status value.\\
+( Modified DTASK\_DCLTASK, \_DTASK, \_CANCEL, \_COMSHUT,
+\_RESCHED, \_SUBSID; New DTASK\_ESETK)
+\item An additional constant, DTASK\_\_SYSNORM is defined in DTASK\_SYS.
+It is set to 1, the value of VMS SS\$\_NORMAL. The application reschedule
+request is tested against this constant, rather than SS\$\_NORMAL, at the end 
+of an obey action to trap the special case which may occur with some tasks on
+VMS.\\
+(DTASK\_OBEY, \_OBEYDCL, DTASK\_SYS)
+\end{itemize}
+
+\section{NEW FEATURES OF THE PARAMETER SYSTEM}
+\subsection{ACCEPT at a Prompt}
+It is now possible to reply to a prompt with `\verb%\%'. 
+The effect will be to take the suggested (prompt) value for the current 
+parameter and for all remaining unset parameters.
+
+{\em Note that this overrides the VPATH for the remaining parameters.}\\
+(Modified: SUBPAR\_INPUT)
+
+\subsection{Strings as Names}
+SUBPAR\_GETNAME will now accept a quoted string as the name to be obtained.
+This is primarily to allow lists of names to be supplied for the forthcoming
+GRP library.
+It also allows dynamic defaults set using SUBPAR\_DEF0C.
+
+{\em Note that the above does not apply to names to be associated by DAT\_ASSOC
+or NDF\_ASSOC.}
+
+Names specified as default in the interface file may now be enclosed in 
+quotes. How the string is interpreted will depend on how the parameter value
+is obtained.\\
+(Modified: SUBPAR\_GETNAME, \_CHECKNAME, PARSECON\_CONVERT)
+
+\subsection{Putting Array Parameter Values}
+It is no longer necessary for the parameter file component associated with a
+parameter to be the correct size for a `put'. The PAR\_PUT routines
+will now change the size if associated with the parameter file -- they will
+not change the size of an external object.
+
+This makes it possible to avoid being prompted {\em and} have global parameters
+updated by specifying:
+
 \begin{quote} \begin{verbatim}
-INCLUDE 'SAE_PAR'
-INCLUDE 'PAR_PAR'
+vpath   default
+default n
 \end{verbatim} \end{quote}
-This makes PAR consistent with other Starlink libraries and is necessary on 
-Unix implementations.
-In order that existing code will continue to work on VMS and to enable common
-code to be used for VMS or Unix, a scheme has been set up similar to that used 
-for DAT\_PAR. On VMS, SAE\_PAR will \verb%INCLUDE 'PAR_FIX'% which actually
-defines the PAR symbolic constants; PAR\_PAR will point to an empty file.
-Then, whether or not the code has an explicit \verb%INCLUDE 'PAR_PAR'%, it will
-correctly include the requisite definitions.
+where \verb%n% is a constant of an appropriate type, in the interface file, 
+Appendix C of SUN/115 will be modified to reflect this shortly.\\
+(Modified: SUBPAR\_PUT1/V/N.GEN)
 
-\subsection{NBS}
-\label{nbs}
-Elements of NBS which are required for application development, together with
-the NBS shareable image have been brought into a newly created directory,
-[ADAM.RELEASE.NBS]. This allows NBS applications to be developed when only the
-mini-system is installed.
+\subsection{Message Streams}
+This version of ADAM is linked with version 1\_2-3 of EMS which will be
+released at the same time. (See SUN/104.5 for details of changes to
+MSG/ERR/EMS.)
 
-System logical names NBS\_DIR and NBS\_SHARE are defined by SYSLOGNAM.COM at
-system startup and process logical names NBS\_PAR and NBS\_ERR are defined by
-logging in for ADAM application development (ADAMDEV.COM).
+The ADAM versions of MSG and ERR have been changed to output their messages 
+using two new routines, SUBPAR\-\_WRMSG and SUBPAR\-\_WRERR, respectively. 
+Currently both these routines call SUBPAR\-\_WRITE so there is effectively no 
+change.
+
+A new routine, SUBPAR\_EFLSH, has been written to flush error messages from
+within SUBPAR -- it uses SUBPAR\_WRERR
+Various routines have been modified to use SUBPAR\_EFLSH.\\
+(New: SUBPAR\_WRMSG, \_WRERR, \_EFLSH\\
+(Modified: SUBPAR\_GETNAME, \_FINDHDS, \_GET0C/D/I/L/R)
+
+\subsection{Dynamic Default Storage}
+Pointers to the common block areas used for storing dynamic defaults 
+{\em etc.\ }
+at run time are reset at SUBPAR de-activation to avoid overflowing the 
+available space after multiple task invocations, particularly with large
+monoliths.\\
+(Modified: SUBPAR\_RDIF, \_DEACT, \_DATDEF, \_DEF1C/D/I/L/R, \_HDSDYN, \_INPUT,
+\_GETNAME, SUBPAR\_CMN, PARSECON\_NEWPAR)
+
+\subsection{Portable Help System}
+\label{porthelp}
+When a task is run direct from DCL, the parameter system provides the same
+optional use of the portable help system for multi-line parameter help as is
+provided by UFACE for user interfaces.
+Existing interface files will continue to work, using the portable help system
+if a .SHL file is found. (See Section \ref{iclmisc} for more details.)\\
+(Modified: SUBPAR\_WRHELP, SUBPAR\_ERR\\
+New: SUBPAR\_PWHLP, \_VWHLP, \_NAMETR, \_HLPEX)
+
+\subsection{Futures}
+Some additions have been made to the SUBPAR global constants and common blocks
+in preparation for the MIN/MAX system.\\
+(Modified: SUBPAR\_PAR, SUBPAR\_CMN)
+
+\section{OTHER CHANGES TO ADAM}
+
+\subsection{UFACE}
+\subsubsection{ICL UFACE}
+\label{uface}
+\begin{itemize}
+\item Changes have been made to handle the new (CONTROL) context.\\
+(UFACE\_MSGINFO, \_SEND)
+\item Changes have been made to define termination mailboxes for the improved 
+task failure reporting system. This includes additional arguments in two
+routines.\\
+(UFACE\_LOAD, \_LOADD)
+\item An improvement has been made to send only the `used part' of message
+strings.\\
+(UFACE\_SEND)
+\item The returned value will no longer be displayed if it is the same as
+the sent value when an error occurs on SET or GET contexts. 
+(UFACE\_SEND)
+\item UFACE\_SEND will now correctly handle information (error) messages 
+returned from the task during transactions it handles (GET, SET {\em etc}).\\
+(UFACE\_SEND)
+\item The system will now handle help from either portable help or VMS help
+libraries. For details of the help library selection process see Section 
+\ref{iclmisc}.\\
+(Modified: UFACE\_WRHELP, \_IPUT, \_OPUT,\\ 
+New: UFACE\_PWHLP, \_VWHLP, \_SCRNSZ)
+\item The AST handler is changed to use MESSYS\_ASTMSG rather than 
+MESSYS\_ASTINT which is now obsolete.\\
+(UFACE\_ASTHDLR)
+\end{itemize}
+\subsubsection{SMS UFACE}
+\begin{itemize}
+\item The changed calling sequence for UFACE\_LOAD and UFACE\_LOADD implies
+changes to ADAMCL, which is effectively frozen.
+As a consequence of this, the SMS versions of these have not been changed but
+the procedure (in ICL\_DIR) for linking 
+ICLSMS has been modified to take the LOAD routines from ICL UFACE.\\
+(ICL\_DIR:SMSLINK\_ICL.COM)
+\item The changes listed for UFACE\_SEND in the ICL UFACE library have been
+made to the SMS UFACE library. In addition, because the SMS version now 
+calls SMS\_INFORM to handle returned information messages, it has diverged from
+the other two versions (which call UFACE\_INFORM).\\
+(UFACE\_SEND)
+\end{itemize}
+\subsubsection{ADAMCL UFACE}
+\begin{itemize}
+\item The modifications to UFACE\_SEND has been applied (but note that ADAMCL
+{\em etc.}\ have not been re-linked to use it, nor will the new context be
+used).\\
+(UFACE\_SEND)
+\item Error codes UFACE\_\_IFNF and UFACE\_\_HLPER have been added for use 
+with the help system and
+the message associated with the status UFACE\_\_ILLCONTEXT has been 
+changed to allow for the new context.\\
+(UFACERR.MSG/.OBJ/.FOR)
+\item The AST handler is changed to use MESSYS\_ASTMSG rather than
+MESSYS\_ASTINT which is now obsolete.\\
+(UFACE\_ASTHDLR)
+\end{itemize}
+{\em Note that ADAMCL etc.\ have not been re-linked to include the above 
+changes.}
+
+\subsection{SMS}
+The following changes have been made to the SMS library.
+\begin{description}
+\item[Pre-entry] The pre-entry actions for switch fields are now carried out
+BEFORE any  values for parameters are obtained using the `from' statement. 
+This potentially allows the latter values to be updated by carrying out an
+action of some sort.  This change could affect the behaviour of existing systems
+but is desired by both UKIRT and JCMT who are believed to be the only serious
+users of SMS, so has been included.\\
+(SMS\_NEWSWITCH)
+\item[New Configuration Parameters] There are two new configuration parameters.
+They may be set using the configuration switch (type keypad `,') or by the
++config+ command in a control table. The initial settings preserve the existing 
+behaviour.
+\begin{description}
+\item[pf4\_prompt]
+If turned on, this causes a prompt `Do you mean to ABORT this menu? /N/' if
+PF4 is keyed.
+If the default N is returned the menu is not exited. If `Y' is entered then
+the menu is exited.  This is to stop `illegal' use of PF4 (for instance where
+PF1 exit does essential things).
+\item[topexit\_prompt] If turned off, this suppresses the `Do you mean to exit
+from SMS ? (y/n)' prompt on exiting from the top menu.
+\end{description}
+(SMSCOMTIO, SMS\_COMNINIT, \_SYSCONFIG, \_PFKEY, \_RUN)
+\item[EDIT] The ICL EDIT command is treated as a `special' command in the same
+way as HELP. This means deassigning the terminal from SMS so that the editor
+can use it. The terminal is re-assigned to SMS and the screen refreshed on
+exit from the editor.\\
+(SMS\_DOCMDLINE)
+\item[UFACE Equivalent] The equivalent routine to UFACE\_MSGINFO for SMS has
+been changed in line with UFACE.\\
+(SMS\_MSGINFO)
+\item[Stopping HDS] As the ICL exit handler now uses HDS (to delete the ICL.SDF
+file), the call to HDS\_STOP in SMS has been removed.\\
+(SMS\_MAIN)
+\item[AST Handler] The AST handler is changed to use MESSYS\_ASTMSG rather than
+the obsolete MESSYS\_ASTINT.\\
+(SMS\_ASTHDLR)
+\item[HELPSYS] An additional possible status value from HELPSYS is allowed
+for.\\
+(SMS\_BRIEFHELP)
+\item[SCT Include files] The new configuration parameters have been added to 
+the configuration switch in the include files defining the `system' part of 
+control tables.
+The changes are also reflected in the modified include files
+AON004.INC and AON004ICL.INC in directory ADAM\_TEST.\\
+(FIXED.SCT, SMSSYSTAB.INC, ICL\_DIR:SMSICLSYSTAB.INC)
+\item[SMS\_HELPFILE] Both the ADAM HELPSYS and VMS HELP versions of 
+SMS\_HELPFILE have been updated. The source file and a HELPINFO file describing
+how to produce the help files have been moved from [ADAM.HELP] to SMS\_DIR 
+\item[SMSLINK] SMSLINK.COM is renamed SMSLINK\_ADAMCL.COM and produces 
+executable image SMSADAMCL.EXE. 
+The procedure has also been updated to use the ISD\_MAX link option.
+\end{description}
+
+\subsection{TASK}
+\begin{itemize}
+\item The new context name (CONTROL) has been added to the options.\\
+(TASK\_GET\_CONTEXTNAME)
+\item The names of the TASK include files have been changes to TASK\_xxx.FOR.
+This is to assist in the porting exercise.\\
+(TASK.PAR, TASK.CMN)
+\item Several unnecessary files have been removed from the TASK directory.\\
+(DRIVER.OBJ, TASKTEST.OBJ, TASKTEST.IFC)
+\end{itemize}
 
 \subsection{MESSYS}
-The values MESSYS\_\_MXPATH and MESSYS\_\_MXTRANS, which specify the maximum
-number of concurrently active paths and transactions, have been increased from
-16 to 32.
+\begin{itemize}
+\item MESSYS\_ASTINT is now actually obsolete. For the moment it has been
+re-implemented using MESSYS\-\_ASTMSG.
+\item MESSYS\_CLRESCH and MESSYS\-\_REMNAME are now obsolete and removed from
+the library. The ADAMSHARE transfer vector for MESSYS\-\_CLRESCH now uses the
+`obsolete' feature (see Section \ref{shr}).
 
-\subsection{Other Procedures etc.}
+THIS MEANS THAT ANY TASKS WHICH HAVE NOT BEEN RE-LINKED WITH ADAM V2.0 OR
+LATER, SHOULD NOW BE RE-LINKED AS THE OLD BUILT-IN FIXED-PART IS NO LONGER
+VALID IN ALL CASES.
+\item The MESSYS parameter file is renamed to MESSYS\_PAR.FOR. At the same
+time,
+parameter MESSYS\_\_NETNAME (= 'ADAMNET'), the root name of network processes,
+is defined. The new parameter with '\_2', '\_3' and '\_4' appended is used
+to define the names of the four possible systems.\\
+(MESSYS\_PAR.FOR, MESSYS\_INIT, LOGICAL.COM)
+\end{itemize}
+
+\subsection{FIO/RIO}
+The FIO/RIO library has been released as a separate Starlink software item.
+The new release has changed and enhanced functionality and uses a shareable 
+image with different linking instructions.
+
+The existing system will remain within the ADAM release for a short while to 
+allow users to make any necessary changes to their software. The old linking
+instruction will link with the old library but ADAMDEV will obey FIO\_DEV to 
+set up logical names FIO\_PAR and FIO\_ERR pointing to the new system (if it 
+is installed).
+The FIO shareable image will be searched automatically by ALINK, MLINK and
+ICLMLINK.
+
+For full details of the new facilities, see SUN/143.
+
+\subsection{SHR}
+\label{shr}
+A new library, SHR,  has been created in SHARE\_DIR to contain routines 
+for use in building shareable images containing obsolete or not-yet-implemented
+routines. The principle is that the shareable images will be built without 
+defining universal symbols for the missing routine so that it will not be 
+possible to link with the new image. However, if a task was linked with a 
+previous image which did define the symbol, and the symbol is accessed, some
+error messages will be reported and a bad status returned.\\
+(SHARE\_DIR:SHR.OLB/.TLB, SHR\_ERR.MSG/.FOR/.OBJ)
+
+\subsection{AZUSS}
+A dummy version of the AZUSS shareable image has been created to satisfy
+requests from sites which do not find it convenient to have to INSTALL the
+shareable images, particularly with privilege. The dummy image contains only
+a dummy for AZ\$SNDAST which, if it is called, will report some error messages
+and return a bad status. It makes use of the new SHR library.
+
+The dummy image can be used with any tasks which do not require to trigger an
+AST in another task. To use it:
+\begin{quote} \begin{verbatim}
+$ DEFINE/x AZUSS ADAM_EXE:AZUSS
+\end{verbatim} \end{quote}
+Where \verb%x% is JOB, GROUP or SYSTEM.\\
+(AZUSS\_DIR:AZUSS\_DUM.MAR/.COM, ADAMEXE\_DIR:AZUSS\_DUM.EXE)
+
+\subsection{Procedures {\em etc.}}
 \begin{description}
 
-\item[ADAMSTART.COM] Changes have been made to:
+\item[ADAMSTART.COM] Changes are:
 \begin{itemize}
-\item Display the latest ADAM version number.
-\item Set JOB logical name ADAM\$\_VERSION to `ADAM\_V2.0-1'.
-This will be updated with each new release and can be used by procedures
-to determine which version of ADAM is in use.
-\end{itemize}
-\item[SYSLOGNAM.COM (SYSLOGNAM.MINI)] Now define NBS\_DIR 
-and NBS\_SHR. 
-{\em If you have modified versions of these files, they should be
-updated in line with the new versions.}
-\item[ADAMDEV.COM (APPLOG.COM)] Changes have been made to:
+\item The ADAM version number has been updated. So that
+only a single change to the procedure is required to update the version 
+number, the latest number is set as a symbol and the symbol used wherever the 
+version number is needed in the procedure,
+{\em i.e.\ }:
 \begin{itemize}
-\item Define PAR\_FIX (see Section \ref{par}).
-\item Define  NBS\_PAR and NBS\_ERR.
-\item Reflect the renamed files for SUBPAR\_PAR and LEX\_ERR.
-\item Define SGS and GKS logical names only via STAR\_DEV\_ADAM.
+\item In the displayed messages.
+\item In setting the ADAM\_CHANGES command.
+\item In setting the ADAM\$\_VERSION logical name.
 \end{itemize}
 
-\item[SYSDEV.COM (LOGICAL.COM, DIR.COM)] Changes have been made to:
-\begin{itemize} 
-\item Set logical names for SUBPAR, PARSECON and  LEX via procedures
-LOGICAL\-.COM in the facility directory.
-\item Remove definitions for SGSPAR and GKSPAR which are now completely within
-the separate SGS/GKS Starlink software item.
-\end{itemize}
+The version number is set to `2.0-2'.
 
-\item[STAR\_LINK\_ADAM, STAR\_DEV\_ADAM] These are not actually part of the 
-ADAM release, but for correct operation of the revised ADAM graphics system,
-SGS, GKS and GNS are added to these files. PGPLOT is also added.
+\item SMS and SMSICL are redefined to pick up the renamed executable images,
+SMS\-ADAMCL and SMSICL.
+\end{itemize}
 
 \item[ADAMSHARE]
 ADAMSHARE.COM and ADAMSHARE.MAR are altered to reflect:
 \begin{itemize}
-\item An increased minor id
-\item The name change to LEX\_ERR
-\item An additional common block for PARSECON.
-\item Renamed PARSECON\_xCOORDS routines.
+\item An increased minor id.
+\item An additional common block for SUBPAR.
+\item Use of the portable help system shareable library.
+\item The PSX library.
+\item Additional routines SUBPAR\_WRERR, \_WRMSG, \_NAMETR and \_HLPEX.
+\item Additional routines ICL\_TERM\_CANCIO and ICL\_TERM\_ENABLE\_CTRLC
+(in ICLTERMADAM).
+\item The new `obsolete' feature and MESSYS\_CLRESCH declared obsolete.
 \end{itemize}
 
 \item[LINKNOSHR.OPT]
-The options file used for linking tasks `non-shareable' has been changed in
-line with ADAMSHARE.COM and ADAMGRAPH7.COM.
+The options file used for linking tasks `non-shareable' has been changed:
+\begin{itemize}
+\item In line with ADAMSHARE.COM.
+\item To link with the EMS shareable image to avoid conflicts with other
+libraries.
+\end{itemize}
 
-\item[GOD.PRC]
-The ADAMCL login procedure has been altered to remove references to packages
-which no longer work.
+\item[APPLOG.COM, LOGICAL.COM and DIR.COM]
+The procedures for setting up process logical names for development have been
+changed as follows:
+\begin{itemize}
+\item Logical names for FIO/RIO are no longer defined.
+\item The names of include files for DTASK and TASK have been changed.
+\item .FOR is added to the definition for MESSYS\_ERR.
+\end{itemize}
+\item[TASK\_LINK.COM] The procedure which does the work for ALINK etc.\ has been
+modified to use DELETE/NOCONFIRM during cleanup.
+\item[DEVDATASET] TMSCP device names (node\_name\$device\_name) appropriate for
+RAL have been added to the DEVICE7 files.
 \end{description}
 
-\subsection{ICL}
-\begin{itemize}
-\item ICL Version 1.5-7 is released - the login banner has been changed
-appropriately.\\
-(LOGIN.ICL, ADAMLOGIN.ICL)
-\item NBS\_SHR.EXE is removed from ICLDIR (see Section \ref{nbs}).
-\item DEVLOGNAM.COM no longer defines NBS logical names.
-\item AAOLIB has been updated and the corresponding text library added.
-\end{itemize}
+\subsection{Tasks}
+Several tasks released with ADAM in [ADAM.RELEASE.EXE] which had not been
+re-linked since before ADAM V2.0 have now been re-linked. This is necessary to
+allow the ICL `DEFAULT' command to work with them.\\
+(LISTLOG, SDFCREATE, TAPECREATE, TAPEDISM, TAPEMOUNT)
 
-\subsection{SMS}
-Now uses the routine ADAM\_ACKNOW, rather than ADAM\_REPLY to reply to
-parameter requests.\\
-(SMS\_ASKPARAM, \_GETUSRLIN)
-
-\subsection{Directory Structure}
-\begin{itemize}
-\item The SGS and GKS directories are deleted from [ADAM.LIB] (see Section 
-\ref{graphs}).
-\item A new directory, NBS, has been created in [ADAM.RELEASE] (see Section
-\ref{nbs}).
-\end{itemize}
+\subsection{ADAM\_HELP}
+A number of unnecessary files have been deleted from the help source directory 
+[ADAM.HELP]. SMS\_HELPFILE.HLP and INFO.LIS have been moved to SMS\_DIR.\\
+(SMS\_HELPFILE.HLP, ADAMCL.AHF, ADAMCL.HEL, ADAMCL.LIS, CHECKTASK.HLP)
 
 \subsection{Documentation}
 \label{docs}
 \begin{itemize}
-\item SSN/45 and ARN/21 describe ADAM release 2.0-1.
-\item The ADAM\_CHANGES help library introduced with V2.0 has been updated 
-with the information contained in this document. The information for V2.0 is
+\item SSN/45 and ARN/2.0-2 describe ADAM release 2.0-2.
+\item The ADAM\_CHANGES help library has been updated 
+with the information contained in this document. The information for earlier
+releases is
 retained in the library.
-The source files are kept in DOCS\_DIR and the library in ADAM\_DOCS.
-\item The following applicable Starlink document has been released since the
-last ADAM release:
-\begin{itemize}
-\item SUN/144 ADAM -- Unix Version.
-\end{itemize}
 \item The following applicable Starlink documents have been updated since the
 last ADAM release.
 \begin{itemize}
-\item SSN/44 ADAM -- Installation Guide.
-\item SSN/64 ADAM -- VAX Organization of Applications Packages.
-\item SUN/134 ADAM -- Guide to Writing Instrumentation Tasks.
+\item SG/4 ADAM -- The Starlink Software Environment.
+\item SUN/104 MSG and ERR -- Message and Error Reporting Systems.
+\item SSN/4 EMS -- Error Message Service.
+\end{itemize}
+\item The following applicable Starlink documents have been released since the
+last ADAM release:
+\begin{itemize}
+\item SUN/143 FIO/RIO -- FORTRAN File I/O Routines.
+\end{itemize}
+\item The following document from the old ADAM series has been withdrawn:
+\begin{itemize}
+\item APN/9 ADAM Programmers Guide to the FIO/RIO Package.
+\end{itemize}
+\item The following applicable Starlink document has been withdrawn:
+\begin{itemize}
+\item SUN/35 ICL -- Interactive Command Language: An Introduction.
 \end{itemize}
 \item The summaries, 0CONTENTS.LIS, FULLDOCS.LIS and NEWDOCS.LIS in
 ADAM\-\_DOCS, have been updated. 
-\item Most of the early release notes have been removed from ADAM\_DOCS.
-They are retained in [ADAM.DOCS].
 \end{itemize}
-
 
 \section{BUGS FIXED}
 
 \subsection{SUBPAR}
 \begin{itemize}
-\item The parameter system will now correctly handle a non-integer numeric 
-character string being `put' as the value for an INTEGER parameter.
-The integer part will be used. (This is actually a change from the behaviour
-before Version 2.0, when the nearest integer was used.) 
-This fixes a problem detected in the IRCAM SETQUAD command.\\
-(SUBPAR\_PUT0C)
-\item The error context will now be released correctly after a name has been
-obtained as a parameter value.\\
+\item A zero length command line is now correctly checked for.\\
+(SUBPAR\_CMDLINE)
+\item A bug which caused command line array values for `internal' parameters
+to be ignored has been corrected.\\
+(SUBPAR\_CMDLINE)
+\item A number of inconsistencies in handling arrays declared as `internal'
+have been corrected.
+\begin{itemize}
+\item Formerly, if PAR\_GET1/N/Vx was called for an internal parameter and no
+value (or a scalar value) was preset, the `current' (last used) value would be
+used if the relevant component of the interface file existed. Any dynamic or
+static default would be ignored. This has been corrected.\\
+(SUBPAR\_FINDHDS)
+\item The order of precedence in which the defaults are taken for `internal'
+parameters obtained by PAR\_GET1/N/Vx has been switched to be the same as that
+for `internal' parameters obtained by PAR\_GET0x, {\em i.e.} dynamic, static.\\
+(PARSECON\_SETVP)
+\item A scalar value may be given for an `internal' parameter obtained by
+PAR\_GET1x. This is the same as for `normal' parameters.\\
+(SUBPAR\_GET1.GEN)
+\end{itemize}
+\item 1-d suggested (prompt) values will be enclosed in [ ]. This allows
+character arrays to be handled correctly.\\
+(SUBPAR\_CONVALS)
+\item A bug which prevented `internal' parameters taking dynamic defaults which
+were specified in a type different from the declared type of the parameter, has
+been corrected.\\
+(SUBPAR\_FETCHC/D/I/L/R)
+\item A bug which prevented global parameters being used as suggested values
+for names on Unix has been corrected.\\
+(SUBPAR\_NAMEASS)
+\item Messages exceeding the maximum size which may be output to SYS\$OUTPUT
+when running tasks direct from DCL are now truncated before attempting to
+WRITE them.
+Failures on the Fortran WRITE are trapped and status SUBPAR\_\_OPTER returned.\\
+(SUBPAR\_WRITE, SUBPAR\_ERR)
+\item A bug which caused an HDS object slice such as ARRAY(x,y1:y2) to be
+interpreted as ARRAY(1:x,y1:y2) instead of ARRAY(x:x,y1:y2), has been 
+corrected.\\
+(SUBPAR\_HDSARR)
+\item A bug which caused RESET to have no effect on the VPATH for some
+name-type parameters ({\em e.g.\ }FIO filenames) has been corrected.\\
 (SUBPAR\_GETNAME)
+\item Numerous other minor changes to error reports and layout 
+{\em etc.\ }have been made.
 \end{itemize}
 
 \subsection{PARSECON}
-\begin{itemize}
-\item A bug which caused overwriting of the common blocks when non-contiguous
-parameter position numbers were specified, has been corrected.\\
-(For details see Section \ref{parsecon})
-\item A spurious error message on COMPIFL completion has been prevented.\\
-(COMPIFL)
-\end{itemize}
+A bug which prevented task names in INTERFACE or MONOLITH statements in the
+interface file being of the form `D' or `E' possibly followed by
+an integer, has been corrected. The mod also fixes a problem on Suns whereby a 
+single-letter name could not be specified.\\
+(PARSECON\_TOKTYP)
 
-\subsection{DTASK}
-\begin{itemize}
-\item Correctly handle return status from CACT.\\
-(DTASK\_APPLIC\_CD)
-\item ACTCODE has been added to the action details stored.\\
-(DTASK\_ASSOC, \_ADDLST)
-\end{itemize}
+\subsection{TASK}
+A bug which caused the TASK encode and decode routines to fail to cooperate
+over LOGICAL values has been corrected. The solution makes the `L' routines
+different from the other types so GENERIC can now only be used for types C,D,I
+and L.\\
+(TASK\_ENC0L/1L/NL, TASK\_DEC0L/1L/NL, TASK\_VAL0L/1L/NL, TASKDEV.COM)
 
 \subsection{ICL}
 \begin{itemize}
-\item ICL now reports if it fails to start up MESSYS.\\
+\item Failure to initialize the message system is now reported correctly
+and will cause an ICL abort.\\
 (ICL.PAS)
-\item Spurious error reports occurring on ({\em variable}\/) constructs, have 
-been removed.\\
-(ICLEXT, ICLDEF)
+\item Correction to the code such that spurious (non-fatal) "invalid HDS
+locator" messages are eliminated.\\
+(ICLDEF.PAS)
+\item Various points of failure (ICL crashes) caused by zero length character
+strings have been eliminated.\\
+(ICLMAIN.PAS, ICLDEF.PAS)
+\item A bug in the processing of quoted strings ({\em e.g.\ } CONTOUR ABSLAB=
+"X (AXIS)") has been fixed.\\
+(ICLPARSE.PAS)
+\item ICL will now correctly handle error messages returned from the task
+during SEND SET and SEND GET contexts. Furthermore, the returned value will 
+not be displayed on error if it is the same as the value sent.\\
+(See section \ref{ufbugs} on UFACE\_SEND)
 \end{itemize}
 
 \subsection{MESSYS}
-`Delete the acknowledgement queue' now uses ISTAT not STATUS.\\
-(MESSYS\_CALL\_OUT)
+A bug which prevented ADAMNET\_4 being used has been corrected.\\
+(MESSYS\_PATH)
 
-\subsection{MSP}
-TASK\_LIST is now correctly initialised.\\
-(MSP\_INIT)
+\subsection{UFACE}
+\label{ufbugs}
+\begin{itemize}
+\item The check on whether there was sufficient subprocess quota to start another
+task was out by one. This has been corrected in both ICL and SMS UFACE
+libraries.\\
+(UFACE\_CHECKQUOT)
+\item Information (error) messages returned from tasks during SET and GET 
+contexts will now be correctly handled.\\
+(UFACE\_SEND)
+\end{itemize}
 
-\subsection{AZUSS}
-A bug in AZ\$SNDAST which caused the AST quota to be exceeded in the target
-process has been corrected.\\
-(AZ\$SNDAST)
+\subsection{SMS}
+\begin{itemize} 
+\item `\verb%+config+ refresh%' in an action will now correctly
+refresh the SMS screen.\\
+(SMS\_DORFSH)
+\item A number of small bugs have been fixed - most (all?) were places where
+zero-length strings could potentially create problems.\\
+(SMS\_GETUSRLIN, \_INFORM, \_MOVECURS, \_MSGINFO, \_SUBSPARS,\\
+\_SWITEXT, \_WRSCRL, \_WRUSER )
+\end{itemize}
+
+\subsection{ADAM\_TEST}
+The `DEFINE TRACE' command in the example SMS control table has been
+corrected.\\
+(AON004.SCT)
+
+\subsection{HELPSYS}
+A bug in the ADAM help system has been fixed. It caused access violation if 
+the variable supplied to receive the brief help string was not long enough. 
+This caused SMS to crash occasionally when running CGS4.\\
+(HELPSYS\_BRIEFGET, HELPMSG)
 
 \section{PROPOSED DEVELOPMENTS}
 \subsection{Parameter System}
@@ -443,13 +866,9 @@ include a number of improvements to the parameter system, notably:
 \begin{itemize}
 \item The ability to specify MIN or MAX as a parameter value, in which case
 the system will take a specified minimum or maximum value.
-\item The ability to respond to a parameter prompt with `\verb%\%', in which 
-case the suggested value will automatically be taken for the current, and any 
-remaining, unset parameters.
 \item The ability to specify the null value `!' on the command line.
 \item PAR routines with the functionality of the AIF routines which have been
 used by several packages but never officially released for use.
-\item The use of a portable help system.
 \end{itemize}
 
 \subsection{STRING}
@@ -457,4 +876,5 @@ The STRING library is being considered for removal. It seems appropriate that
 its general purpose functions should be transferred to portable code in the
 CHR library and other more specific functions be incorporated into other
 ADAM system packages.
+
 \end{document}
