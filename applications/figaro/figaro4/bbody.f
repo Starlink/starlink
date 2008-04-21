@@ -324,8 +324,9 @@
      :                 %VAL( CNF_PVAL(EMNPTR) ), STATUS )
 
 *    Calculate the variance from the maximum and minimum spectra.
-        CALL SPD_ERTMP( NELM, %VAL(DPTR), %VAL(EMXPTR), %VAL(EMNPTR),
-     :    %VAL(EPTR), STATUS )
+        CALL SPD_ERTMP( NELM, %VAL(CNF_PVAL(DPTR)), 
+     :                  %VAL(CNF_PVAL(EMXPTR)), %VAL(CNF_PVAL(EMNPTR)),
+     :                  %VAL(CNF_PVAL(EPTR)), STATUS )
 
 *    Delete the temporary maximum and minimum variance arrays.
         CALL PSX_FREE( EMXPTR, STATUS )
