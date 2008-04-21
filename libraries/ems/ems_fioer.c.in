@@ -205,9 +205,10 @@ F77_SUBROUTINE (ems_fioer)( CHARACTER(token), INTEGER(iostat) TRAIL(token) )
 	 to put the test here rather than extending the g77 lookup
 	 code to act like the alpha version (ie an external lookup
 	 routine). Of course, the external look up function is 
-	 more correct than this hack...
+	 more correct than this hack... Same for Solaris it seems...
      */
-     if ( STRING_EQ( AC_is_gnu, "yes") && *iostat < 100 ) {
+     if ( STRING_EQ( AC_is_gnu, "yes") && *iostat < 100 ||
+          STRING_NEQ( AC_os, "solaris", 7 ) && *iostat < 1000 ) {
        emsSyser( ctok, *iostat );
      } else {	   
        ems1Stok( ctok,
