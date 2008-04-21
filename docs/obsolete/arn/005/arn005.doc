@@ -1,0 +1,301 @@
+                                                                 
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      ARN/5.1
+ROYAL OBSERVATORY EDINBURGH 
+and UNIVERSITY OF EDINBURGH 
+
+ADAM Project                                                Issued by
+ADAM Release Note 5.1 
+
+                                             John Cooke, Dennis Kelly
+                                                           14.01.1985
+
+---------------------------------------------------------------------
+
+                      ADAM Software Release 0.6                       _________________________ 
+
+
+
+
+
+
+
+1. SUMMARY 
+
+
+This release is a minor update to version 0.5,  and  is  arranged  so
+that only changed items are included, rather than a copy of the whole
+system. The reason for this is that  it  enables  the  update  to  be
+distributed by network rather than magtape. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 ARN/5.1                           2                           ARN/5.1
+
+
+
+
+
+
+2. CONTENTS 
+
+
+          3. INTRODUCTION 
+          4. NEW FEATURES IN THIS RELEASE 
+               4.1 Organisation 
+               4.2 Linking 
+               4.3 Parameter System 
+          5. STILL MISSING FROM THIS RELEASE 
+          6. BUGS FIXED FROM PREVIOUS RELEASE 
+          7. KNOWN BUGS 
+
+
+
+3. INTRODUCTION 
+
+
+The overall ADAM directory structure is the same as that  in  release
+0.0;  for  details refer to ARN/2.  Further logical names and symbols
+have been added. 
+
+Note that in this, as in all releases, the  logical  name  "ADAM_DIR"
+must  be set up correctly in the "DEVLOGIN.COM" file in the top level
+directory;  all sub-directories are defined relative to this one. 
+
+
+
+
+4. NEW FEATURES IN THIS RELEASE 
+
+
+
+
+4.1 Organisation     ____________ 
+
+The release consists of three files:- 
+
+DEVLOGIN.COM - to set-up the initial logical names 
+
+VER06.BCK - save-set containing the new source code 
+
+VER06.COM - command file which performs the update 
+
+It is necessary to put these three  files  into  the  top-level  ADAM
+directory, where DEVLOGIN.COM will replace its previous version. Also
+ensure that this  directory  does  not  have  a  subdirectory  called
+[.UPDATE]  as  this  name  is  used  by  the V0.6 update procedure as
+temporary storage. 
+
+
+
+
+
+                                                                 ARN/5.1                           3                           ARN/5.1
+
+
+
+Then 
+
+Edit DEVLOGIN.COM so that the physical name  of  the  top-level  ADAM
+directory is named correctly. 
+
+@VER06 then causes VER06.BCK to be expanded into [.UPDATE...]*.*  and
+puts   files  into  the  relevant  ADAM  directories  and  libraries,
+compiling   them   where   necessary.   It   finishes   by   deleting
+[.UPDATE...]*.*. 
+
+It is now necessary to regenerate the shareable image. This  is  done
+by 
+
+SET DEF LIB_DIR 
+
+@ADAMSHARE 
+
+As the shareable image is large, the person  doing  the  installation
+might  prefer  to delete the previous ADAMSHARE.EXE before generating
+the new one, if disk-space is limited. 
+
+After replacing the shareable image it is necessary  to  re-link  all
+A-tasks and D-tasks. 
+
+The ADAM command-language can be re-linked by 
+
+SET DEF CLI_DIR 
+
+@ADAMCLINK 
+
+
+4.2 Linking     _______ 
+
+The commands ALINK and DLINK are used to  produce  A-  and  D-  tasks
+linked  with the shareable image. ALINK uses the 'CH' tool, which was
+accidentally omitted from V0.5, but is included here. 
+
+
+4.3 Parameter System     ________________ 
+
+The routines for setting-up dynamic defaults have  been  implemented.
+These are: 
+
+DAT_DEF - provide HDS structure as a dynamic default 
+
+PAR_DEF0<T> - set scalar dynamic default 
+
+PAR_DEF1<T> - set vector dynamic default 
+
+PAR_DEFN<T> - set array dynamic default. 
+
+Where <T> is in turn CDILR for the various data types. 
+
+
+
+
+                                                                 ARN/5.1                           4                           ARN/5.1
+
+
+
+5. STILL MISSING FROM THIS RELEASE 
+
+
+The following list is not complete but indicates  major  areas  where
+some  action  might  be  expected  soon.   In particular, the work on
+networking has started, and initial work on graphics will start soon.
+
+Major items missing: 
+Graphics packages 
+Networking 
+
+
+
+
+6. BUGS FIXED FROM PREVIOUS RELEASE 
+
+
+Dtasks exiting under a  variety  of  error  conditions,  rather  than
+reporting the error and continuing to run. 
+
+ADAMCL  failing  to  do  default  declaration  of  numeric  variables
+correctly. 
+
+HDS names given on a command-line not being set-up correctly. 
+
+Using SET  on  a  D-task  parameter  (ie.  a  parameter  declared  as
+INTERNAL)  with  the  value  having the syntax of an HDS name made it
+impossible  to  revert  to  setting  a  scalar  into   the   internal
+common-blocks for the parameter. This meant that if one did: 
+
+SEND JUNK > SET PAR1 VALUE 
+
+when 
+
+SEND JUNK > SET PAR1 'VALUE' 
+
+was meant, the parameter system would assume that VALUE was the  name
+of  an HDS structure into which values of PAR1 were to be put, and it
+was impossible to escape from  this  condition  without  killing  the
+task. 
+
+
+
+
+7. KNOWN BUGS 
+
+
+These are the most important bugs found that can potentially  produce
+unwanted  effects and may cause confusion.  Please let us know of any
+unusual behaviour of the system ! 
+
+(1) At present, any task can open channels to  other  tasks  no  more
+than 20 times. 
+
+
+
+                                                                 ARN/5.1                           5                           ARN/5.1
+
+
+
+(2) When the "engineering interface" is started up, it can be  "hung"
+completely by typing something before the prompt appears. (Get out of
+this with ctrl-Y.) 
+
+(3) If the command "SPAWN" is used in the Adam command language,  two
+carriage  returns  are  needed  to  obtain the DCL "$" prompt.  After
+logout  from  the  spawned  subprocess,  the  extra  carriage  return
+reappears as a blank command line. 
+
+(4) If a number of SEND commands are issued within a command language
+loop,  action  stops  after  the first few until a carriage return is
+typed. Sometimes the terminal receives a non-printable  character  at
+this point. 
+
+(5) The CANCEL context does not always work correctly.  Sometimes  an
+action  can  be  reported  to  have been cancelled, but the timer for
+rescheduling may not be cancelled and the action re-starts  when  the
+timer expires. 
+
+(6) CALL ADAM_SEND in a C-task returns  as  soon  as  it  receives  a
+message  from  another  task,  rather than insisting on receiving the
+acknowledgement to the message just sent. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 

@@ -1,0 +1,785 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {ADAM Release Note}
+\newcommand{\stardocinitials}  {ARN}
+\newcommand{\stardocnumber}    {16.1}
+\newcommand{\stardocauthors}   {A J Chipperfield}
+\newcommand{\stardocdate}      {1 December 1989}
+\newcommand{\stardoctitle}     {ADAM --- Release 1.6}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\font\tt=CMTT10 scaled 1095
+\renewcommand{\_}{{\tt\char'137}}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+  \setlength{\parskip}{0mm}
+  \tableofcontents
+  \setlength{\parskip}{\medskipamount}
+  \markright{\stardocname}
+%------------------------------------------------------------------------------
+\newpage
+\section{SUMMARY}
+This is a complete release of ADAM. 
+It includes version 1.5 of ICL, some of the improvements to the parameter 
+system which were agreed at the 1989 ADAM Workshop, and a number of bug and 
+deficiency fixes.
+The release also prepares the way for the switch to the Version 2 Message
+System (see Sections \ref{messys}, \ref{msp}, \ref{azuss} and \ref{adamnet}).
+
+It will not generally be necessary to re-link applications for this release but
+applications linked with this release will not run with an earlier one.
+There was, however, a bug in the DTASK library (see Section \ref{dtask})
+which will be corrected by re-linking.
+
+The full release requires about 42000 blocks of disk storage and includes a
+mini-release which can be extracted and put up separately.
+The mini-release requires about 13100 blocks and allows the system to be run
+and tasks to be developed.
+
+\section{INSTALLATION}
+Full installation instructions are given in SSN/44 and the Starlink Software 
+Change Notice.\\
+\begin{tabular}{ll}
+{\bf N.B.} & 1. A number of changes have been made to the installation 
+instructions in SSN/44.\\
+& 2. SYSLOGNAM.COM has been changed, so any site specific versions must
+also be changed.\\
+\end{tabular}
+
+\section{NEW FEATURES IN THIS RELEASE}
+
+\subsection{ICL}
+\subsubsection{Summary}
+ICL version 1.5 incorporates a number of changes recommended by the 1989
+ADAM workshop. The main changes are summarized below:
+\begin{itemize}
+\item Real variables are now represented in double precision.
+\item SAVEINPUT command saves previous lines of input in a file.
+\item `\$' symbol can be used in place of the DCL command.
+\item New functions ELEMENT and FILE\_EXISTS.
+\item The behaviour of the \verb+~+ continuation character has been 
+   tidied up.
+\item It is no longer necessary to have a space in expressions of 
+   the form keyword=(variable) on the ADAM command line.
+\item DIR command, and callable FIGARO have been removed from ICL.
+\item New command CREATEGLOBAL creates an ADAM global parameter.
+\item Sub-topics on HELP command.
+\item Revised login command files.
+\item Revised User Guide.
+\end{itemize}
+See also Section \ref{bugfix} for a list of fixed bugs.
+
+\subsubsection{Details}                                                        
+\begin{description}
+\item[Real variables now in double precision]
+All real variables are now represented in double precision (about 16
+decimal digits of precision). 
+
+In order to ensure upward compatibility, the default behaviour when performing
+un-formatted conversions of real variables to strings is to convert with six
+digits of precision as in the old version. This ensures that the resulting
+strings have the same size as previously.
+
+Full precision conversion to strings can be obtained using formatted conversion
+(with the colon operator) or by controlling the precision of un-formatted
+conversions using a new command SET PRECISION n. Here n is the number of digits
+of precision and can range from 1 to 16.
+
+\item[SAVEINPUT command]
+This command has the form:
+\begin{quote}
+\begin{verbatim}
+SAVEINPUT n filename
+\end{verbatim}
+\end{quote}
+and causes the last n lines of input to be saved in the file with name
+filename. If filename is omitted, the file SAVEINPUT.ICL in the default
+directory is used. If n is omitted, the entire contents of the input buffer
+are saved.
+
+\item[`\$' symbol in place of DCL command]
+The `\$' symbol, if it occurs as the first non-blank character on a line, is
+interpreted as equivalent to the DCL command. Thus:
+\begin{quote}
+\begin{verbatim}
+$TYPE SAVEINPUT.ICL
+\end{verbatim}
+\end{quote}
+is equivalent to:
+\begin{quote}
+\begin{verbatim}
+DCL TYPE SAVEINPUT.ICL
+\end{verbatim}
+\end{quote}
+
+\item[New functions]
+Two new functions are available:
+\begin{itemize}
+\item ELEMENT provides the equivalent of the F\$ELEMENT lexical function in DCL.
+\begin{quote}
+ELEMENT({\em n,delim,string})
+\end{quote}
+
+returns the {\em n}\/th element of {\em string}, where string is divided into 
+elements using the delimiter character {\em delim}. 
+If the element does not exist, it returns the delimiter character. 
+The first element in the string is numbered zero.
+
+For example:
+\begin{quote}
+\begin{verbatim}
+ELEMENT(3,'/','Mon/Tue/Wed/Thu/Fri/Sat/Sun')
+\end{verbatim}
+\end{quote}
+returns `Thu'.
+
+\item FILE\_EXISTS has the form:
+\begin{quote}
+FILE\_EXISTS({\em filename})
+\end{quote}
+and is a logical function returning TRUE if the file of name {\em filename}
+exists.
+\end{itemize}
+
+\item[Continuations]
+The behaviour of the \verb+~+ continuation character has been improved. 
+The character may be used in direct input as well as in files. 
+Output files and LIST output of procedures, will now appear formatted as they 
+were input, including continuations.
+
+There is a maximum of 10 continuations on a single statement, as well as a
+maximum statement length of 300 characters.
+Note that ADAM inter-task communications impose tighter restrictions on
+task parameter string lengths.
+
+\item[Formatting of keyword=(variable)]
+On an ADAM command line it is no longer necessary to have a space after the
+equal sign on expressions of the form keyword=(variable).
+
+\item[Removal of DIR and callable FIGARO]
+The DIR command has been removed from the language. It was something of an
+anomaly as it was the only DCL command provided in this way. The DIR command
+was exactly equivalent to \$DIR or DCL DIR, and can therefore be provided
+if required by including the line:
+\begin{quote}
+\begin{verbatim}
+DEFSTRING DIR DCL DIR
+\end{verbatim}
+\end{quote}
+in the LOGIN.ICL file.
+
+Previous versions of ICL included direct access to callable Figaro. This has
+now been removed. Equivalent behaviour can be obtained by defining callable
+Figaro commands using the DEFUSER facility in the form.
+\begin{quote}
+\begin{verbatim}
+DEFUSER SPLOT BIGFIG FIGARO
+\end{verbatim}
+\end{quote}
+where SPLOT is the command being defined, BIGFIG is the logical name for the
+callable Figaro shareable image, and FIGARO is the subroutine to be called
+within that image.
+
+\item[CREATEGLOBAL command]
+This command creates an ADAM global parameter of a specified primitive type.
+It has the form.
+\begin{quote}
+\begin{verbatim}
+CREATEGLOBAL name type
+\end{verbatim}
+\end{quote}
+where name is the name of the global parameter to be created, and type
+is one of the HDS primitive type names (\_REAL, \_INTEGER, \_LOGICAL, 
+\_DOUBLE or \_CHAR*n). Any previous parameter of the same name is deleted.
+
+\item[Sub-topics on HELP]
+The HELP command will now accept sub-topics.
+For example:
+\begin{quote}
+\begin{verbatim}
+ICL> HELP SCAR GETTING_STARTED
+\end{verbatim}
+\end{quote}
+
+\item[Login Command Files]
+The `system' ICL login command files, ICLDIR:LOGIN.ICL and ADAM\-LOG\-IN\-.ICL
+have been modified to implement the Starlink applications package organization
+described in SSN/64.
+\item[User Guide]
+See Section \ref{docs}.
+\end{description}
+
+\subsection{Parameter System -- SUBPAR and LEX}
+\subsubsection{Summary}
+A number of improvements have been implemented. Many of them were agreed at
+the 1989 ADAM Workshop.
+The changes are:
+\begin{itemize}
+\item Interface file search path.
+\item Efficient monolith initialization.
+\item Consistency in saving `current' values. 
+\item RESET affects vpath.
+\item Revised action for CANCELLED parameters.
+\item Sensible behaviour in the event of unallocated parameter positions.
+\item Improved formatting of prompt values.
+\item Tabs treated as spaces.
+\item Simplified code for saving GLOBAL values.
+\item Symbolic names used in setting up the LEX decision table.
+\end{itemize}
+
+\subsubsection{Details}
+\begin{description}
+\item[Interface File Search Path]
+The interface file search path has been implemented as described in the
+ADAM\_DEVELOPMENT VAX Notes conference.
+Basically, if a JOB logical name search path, ADAM\_IFL, is defined, it will be
+used to find the interface file.
+If ADAM\_IFL is not defined, or an interface file is not found using it, an
+attempt will be made to find one in the directory in which the task executable
+image was found.
+The following subroutines were modified to implement the change:
+\begin{quote}
+SUBPAR\_ACTIV\\
+SUBPAR\_ACTDCL\\
+SUBPAR\_ACTSHR\\
+SUBPAR\_FINDIF (New subroutine)
+\end{quote}
+and an additional SUBPAR Status value has been defined:
+\begin{quote}
+SUBPAR\_\_IFNF - failed to find interface module
+\end{quote}
+\item[Monolith Initialization]
+Monoliths no longer create parameter storage components in their .SDF files
+for all their tasks when they are loaded but only as each task is activated.
+The modification was developed by Keith Shortridge.
+The following subroutines were modified to implement the change:
+\begin{quote}
+SUBPAR\_ACTIV\\
+SUBPAR\_ACTDCL\\
+SUBPAR\_ACTSHR\\
+SUBPAR\_FINDACT
+\end{quote}
+
+\item[`Current' Values]
+Names supplied as parameter values will now become `current' immediately and
+not only if the parameter is still active on task deactivation.
+This results in the same behaviour for parameters whether they are specified
+as primitive values or as names.
+One disadvantage is that names which are unsuitable for one reason or another
+may become current values and be offered as prompt values on re-tries.
+
+The following subroutines were modified to implement the change:
+\begin{quote}
+SUBPAR\_DEACT\\
+SUBPAR\_GETHDS\\
+SUBPAR\_GETNAME\\
+SUBPAR\_CURSAV (New subroutine)
+\end{quote}
+
+\item[RESET affects vpath]
+The special keyword RESET will now cause `current' to be ignored on vpath as
+well as ppath fields in the interface file.
+
+The following subroutines were modified to implement the change:
+\begin{quote}
+SUBPAR\_FINDHDS\\
+SUBPAR\_GETNAME
+\end{quote}
+
+\item[Action on CANCELLED]
+If a parameter is in the CANCELLED state, any attempt to obtain a parameter
+value will totally ignore the vpath and prompt for the value.
+This will result in modified behaviour in the case of vpath `current' or
+`noprompt'.
+
+The following subroutines were modified to implement the change:
+\begin{quote}
+SUBPAR\_FINDHDS\\
+SUBPAR\_GETNAME
+\end{quote}
+
+\item[Simplified Saving of GLOBALS]
+DAT\_ERASE and DAT\_COPY have been used to simplify the code for making
+global associations at task deactivation.
+
+The following subroutine has been modified:
+\begin{quote}
+SUBPAR\_DEACT
+\end{quote}
+
+\item[Unallocated Parameter Positions]
+A fix in this release means that if parameter position {\em n} is unallocated,
+the {\em n}\/th non-keyword parameter on the command line will be ignored.
+(An attempt to provide this fix in the Release 1.5 contained an error, so it
+was withdrawn.)
+
+Note that this situation should not really be allowed (see Section \ref{bugs}).
+
+The following subroutine was modified to implement the change:
+\begin{quote}
+SUBPAR\_CMDLINE
+\end{quote}
+
+\item[Prompt Value Formats]
+The use of the new CHR library and HDS type conversion may result in changed 
+formats for numerical prompt values.
+
+The following subroutine has been modified to use HDS type conversion:
+\begin{quote}
+SUBPAR\_HDSASS
+\end{quote}
+
+\item[Tabs]
+Tabs are now treated as `space' on command lines.
+The following subroutine has been modified to implement the change:
+\begin{quote}
+LEX\_CMDLINE
+\end{quote}
+
+\item[LEX Constants]
+LEX\_CMDLINE has been modified to use the LEX symbolic constants defined in
+LEX\_DIR:LEX.PAR.
+Symbol LEX\_\_NULL has been added to LEX.PAR.
+\end{description}
+
+\subsection{Error Include Files}
+All `include' files defining symbolic names for error status values have been 
+re-generated using the latest version of the ERRGEN utility to produce standard 
+Fortran 77 code.
+There should be no change in the error values generated.
+
+\subsection{SYSLOGNAM.COM}
+\label{syslog}
+Changes have been made to SYSLOGNAM.COM as follows:
+\begin{itemize}
+\item Logical names ADAM\_PACKAGES, LADAM\_PACKAGES and ADAMLOGIN are defined
+(see SSN/44 and SSN/64).
+\item Logical names MSP\_SHR and AZUSS are defined.
+\item Shared images MSP\_SHR and AZUSS are installed.
+\item The commented out section re-defining LNM\$TEMPORARY\_MAILBOX has been
+removed.
+\end{itemize}
+
+\subsection{ADAMSTART}
+\begin{description}
+\item[ADAM Version Number]
+ADAMSTART will now display the ADAM Version number as a definitive check on
+which release is in use at a site.
+This implies that a new version of ADAMSTART will be released with every
+release of ADAM, whether complete or partial.
+
+\item[User-defined ADAM\_USER]
+To allow users to define their own preferred location for parameter files etc.,
+ADAM\-START will only create the [.ADAM] directory and define {\em job} logical 
+name ADAM\-\_USER if ADAM\-\_USER is not already defined as a {\em job} logical 
+name.
+If ADAM\_USER is so defined, the assigned directory is assumed to exist.
+
+The existence of GLOBAL.SDF in ADAM\_USER will still be ensured in both cases.
+
+This scheme also raises the possibility of `sets' of task and global parameter
+values; something which has been seen as desirable.
+
+\item[Prevention of Repeated ADAMSTART]
+To enable users to prevent the undoing of changes to symbols and logical names
+etc. made after ADAM\-START is obeyed, a logical name, ADAM\$\_INITIAL\-IZED,
+will be tested on entry to ADAMSTART.
+If its equivalence name is `TRUE', then ADAM\-START will do nothing, apart from
+displaying the ADAM version number; otherwise it will proceed.
+
+On exit from ADAMSTART, if the equivalence name of ADAM\$\-\_INITIAL\-IZED is
+`FALSE', a {\em process} logical name ADAM\$\-\_INITIALIZED will be DEFINED to
+be `TRUE'; otherwise it will not be affected.
+
+Thus if ADAM\$\-\_INITIAL\-IZED is undefined, ADAMSTART will proceed as now.
+
+If it is required that ADAMSTART will operate once only, 
+ADAM\$\-\_INITIAL\-IZED must be defined as `FALSE' before ADAMSTART is obeyed.
+This process could be initiated by a {\em system} logical name permanently set 
+to `FALSE', it would continue with the {\em process} logical name.
+
+\item[ADAM\_INC Defined]
+The definition of logical name ADAM\_INC has been moved from ADAMDEV to
+ADAMSTART so that the SMS control table include files can be accessed without
+obeying ADAMDEV (See Section \ref{smssystab}).
+\end{description}
+
+\subsection{Graphics}
+\begin{description}
+\item[GNS]
+The transfer vector of the ADAM graphics shared image now includes the GNS
+Graphics Workstation Naming Service subroutines (see SUN/57).
+The latest versions of SGS and GKS, which use GNS are also incorporated but,
+for the time being, the Device Dataset method of obtaining device names will
+be retained for ADAM.
+It is expected to be withdrawn soon.
+
+\item[SGS]
+\begin{itemize}
+\item The way in which ADAM tells SGS to use the inherited status mechanism 
+has been revised.
+The following subroutines have been modified to implement the change:
+\begin{quote}
+SGS\_\$HSTAT (Removed from SGSPAR)\\
+SGS\_\$ISTAT\\
+SGS\_ASSOC
+\end{quote}
+\item The operation of SGS\_ASSOC has been improved in that:
+\begin{enumerate}
+\item The ACMODE parameter is now checked fully.
+\item The ACMODE parameter is now checked outside the loop attempting to open
+the device.
+\end{enumerate}
+\item Additional possible errors have been added to SGS\_\$ERR and SGSERR.MSG
+to bring them in to line with the Starlink release of SGS, particularly with
+the inclusion of GNS.
+A catch-all error, SGS\_\_SGSER has also been added.
+\item SGS\_\$ERR will now stack error reports using ERR\_REP rather than 
+outputting them immediately with ERR\_OUT.
+\end{itemize}
+
+\item[Linking]
+The graphics shared image has been re-linked to include the latest versions
+of SGS and GKS which now use the GNS system.
+The GNS subroutines have been included in the transfer vector.
+
+Linking with the graphics object libraries is now done according to documented
+Starlink method, i.e. using @SGS\_DIR:SGSLINK.COM. 
+This is true for both building the shared image and the `noshr' task linking.
+
+The following files have been modified to implement the change:
+\begin{quote}
+SHARE\_DIR:ADAMGRAPH7.MAR\\
+SHARE\_DIR:ADAMGRAPH7.COM\\
+LIB\_DIR:LINKNOSHR.OPT\\
+A\_DIR:ANOSHR.COM\\
+A\_DIR:MNOSHR.COM\\
+D\_DIR:DNOSHR.COM\\
+D\_DIR:CDNOSHR.COM
+\end{quote}
+\end{description}
+
+\subsection{CHR}
+The shared image is now built using the Starlink release of the CHR character
+handling routines (see SUN/40) and the ADAM CHR directory has been removed.
+This may result in some format changes for displayed numbers.
+
+Subroutines CHR\_STRDEC and CHR\_LDBLNK are still included in the transfer
+vector but will be withdrawn at the next release.
+
+\subsection{FIO}
+\label{fio}
+A new subroutine FIO\_READF has been written; it reads a block from the tape 
+but does not return the used length of the buffer.
+This makes reading much faster when the used length is not required.
+FIO\_READ has been implemented using the new routine.
+This is a technique used by the SCAR version of FIO.
+It is hoped that SCAR will now be modified to use the ADAM version of FIO;
+however, the name of the new routine has been changed, from FIO\_\$READ, to
+meet Starlink standards.
+
+Subroutines FIO\_\$CHKFD, FIO\_GUNIT and FIO\_PUNIT have been tidied up.
+
+\subsection{MESSYS}
+\label{messys}
+Because of a recently discovered problem with the Version 2 inter-process 
+message system, MESSYS, which uses Jeremy Bailey's Message System Primitive 
+system, MSP, rather than mailboxes, the switch has not yet been made.
+However, the source of the  new system has been included in sub-directory 
+MESSYSV2 of LIB\_DIR and sub-directory NEWSHARE contains the procedures 
+necessary for creating the ADAM Version 2 shared images.
+Furthermore, the version of MESSYSMSG copied to the mini-release directories 
+is actually the new version but will do for either.
+It is hoped that this will encourage observatories in particular to exercise
+the new system.
+
+If it is required to communicate between processes under different usernames
+in a group using the new system, GROUP privilege is required and the logical 
+name GBL\$MSP\_username must be defined to be the common global section name.
+Processes not in the same group cannot communicate with each other.
+
+The hoped-for improvement in speed has not materialized but the new system 
+opens the way to a number of other improvements in ADAM.
+The new message system is fully described in ASN/2.
+
+\subsection{MSP}
+\label{msp}
+Version 2.1 of MSP is included.
+This includes improvements arising from a code walkthrough held at ROE in June.
+
+The shared image MSP\_SHR is also INSTALLed by SYS\-LOGNAM\-.COM; this will
+ease the conversion to MESSYS V2.
+A document describing MSP may be found in directory MSP\_DIR of the full
+release.
+
+\subsection{AZUSS}
+\label{azuss}
+AZUSS is a shared image of User System Services which is required by MSP.
+It was written by Graham Bothwell at the AAO and revised by Lew Waller to 
+improve security.
+AZUSS must be INSTALLed; this is done by SYSLOGNAM.COM.
+A document describing the AZUSS routines may be found in directory AZUSS\_DIR
+of the full release.
+
+\subsection{ADAMNET}
+\label{adamnet}
+The ADAM Networking Task, ADAMNET, is released in ANT\_DIR.
+It requires the Version 2 MESSYS and will not be run as part of a standard 
+Starlink installation anyway until various security problems are resolved.
+ADAMNET is described in ASN/2.
+
+\subsection{SMS}
+\label{smssystab}
+\begin{description}
+\item[SMSSYSTAB]
+The SMS control table include file, SMSSYSTAB.INC, which defines the `system'
+components, has been copied to the ADAM\_INC directory.
+It can be included into SMS control tables using the `include file' facility.
+A modified version, SMSICL\-SYSTAB\-.INC, is also provided for use with SMSICL
+control tables; this version does not provide help.
+SMSSYSTAB.SCT, previously held in directory ADAM\_TEST, has been withdrawn;
+there are some differences.
+
+\item[Demonstration Control Tables]
+Control tables AON004\-.SCT and AON004ICL\-.SCT may be found in directory
+ADAM\_TEST (defined after `\$ ADAMDEV' has been obeyed).
+AON004\-.SCT is the example given in AON/4 and AON004ICL\-.SCT is the same 
+example modified for use with SMSICL.
+To demonstrate SMS, type:
+\begin{quote}
+\begin{verbatim}
+$ ADAMSTART
+$ ADAMDEV
+$ DEFINE SMSTABLE ADAM_TEST:AON004.SCT
+$ DEFINE AON004 ADAM_TEST:AON004
+$ SMS
+\end{verbatim}
+\end{quote}
+or, to demonstrate SMSICL, type:
+\begin{quote}
+\begin{verbatim}
+$ ADAMSTART
+$ ADAMDEV
+$ DEFINE SMSTABLE ADAM_TEST:AON004ICL.SCT
+$ SMSICL
+\end{verbatim}
+\end{quote}
+The demonstration can then proceed using the keystrokes defined in AON/4.
+
+These demonstration tables replace TESTTAB.SCT which was formerly in
+ADAM\-\_TEST
+\end{description}
+
+\subsection{Documentation}
+\label{docs}
+SSN/45.8 and ARN/16.1 describe ADAM release 1.6.
+Note that both are now \LaTeX\ documents. 
+The ARNs will be retained for historical purposes as SSN/45 gets replaced at
+each new release.
+
+The following documents have been re-issued:
+\begin{description}
+\item[SSN/44.6] {\it ADAM --- Installation Guide} -- reflects the change to MSP 
+for inter-task communication and the revised use of the ICL login command file
+feature.
+\item[APN/9.4] {\it ADAM Programmer's Guide to the FIO Package} -- Describes the
+new routine FIO\_READF (see Section \ref{fio}).
+\item[AED/14.3] {\it Using the MSG and ERR Systems} -- Improved subroutine
+descriptions; MSG\_MARK and MSG\_RLSE added.
+\item[ICL User's Guide] -- Additional functions and commands; minor 
+clarifications and corrections.
+The document source, ICL.TEX and ICL.TOC can be found in ICLDIR or hardcopies
+obtained from The Starlink Software Librarian.
+\end{description}
+
+The following document has been released in the Starlink System Note series:
+\begin{description}
+\item[SSN/64.1] {\it ADAM --- Organization of Applications Packages} --
+describes the way in which Starlink will set up ADAM applications packages.
+\end{description}
+
+The summaries, ADAM\_DOCS:CONTENTS.LIS, FULLDOCS.LIS and NEWDOCS.LIS, have been 
+updated. 
+Related documents, not classified as ADAM documents have been included in 
+FULLDOCS and NEWDOCS.
+
+\section{BUGS FIXED}
+\label{bugfix}
+\subsection{ICL}
+\begin{itemize}
+\item In ICL/SMS a cached load of a task caused by a `from' 
+   statement in an SMS switch field did not work properly. 
+   This has now been fixed.
+\item A double space preceding the parameter part of an ADAM 
+   command caused a leading space to be passed as part of the 
+   parameter string. Leading spaces are now removed in these 
+   cases.
+\item Files created by the SAVE operation were created with a 
+   maximum record size of 133 bytes. This has been increased 
+   to allow for the maximum ICL statement length of 300 
+   characters.
+\item Process names longer than 15 characters are truncated. 
+   Previously an ADAM task would fail to load if its process 
+   name was too long.
+\item DEFHELP will now work properly with more than one key name.
+   (e.g. DEFHELP {\em name helplib key1 key2 key3}\/)
+\item DEFUSER, DEFSTRING, DEFPROC and DEFHELP now no longer output
+   a `command redefined' message if the redefinition is the same 
+   as the original definition. Previously only DEFINE had this 
+   behaviour.
+\item A bug, which caused the ICL command KILLW to hang if the task had
+  crashed, has been fixed.
+\item A bug, which caused STKOVFLOW error while processing loops within
+  loops, has been fixed.
+\item A bug, which caused ICL to hang if the \$ICL command specified
+  a command file which contained EXIT following a task run, has been fixed.
+\item A bug, which caused corruption of a procedure argument if it was used
+  to pass a parameter value to a task, has been fixed.
+\item ICL variables no longer need to be defined before being used to receive
+  an output parameter value from a task.
+\item A bug, which caused error condition LOGZERNEG if the second argument
+  of the SNAME function was zero, has been fixed.
+\item A number of typing errors in the ICL help file have been corrected.
+\end{itemize}
+
+\subsection{Parameter System -- SUBPAR and LEX}
+\begin{itemize}
+\item Shared image monoliths are now correctly re-activated. (SUBPAR\_ACTSHR)
+\item The parameter system will no longer report an error if $<$return$>$ is 
+hit in response to a prompt and there is no prompt value; it will just 
+re-prompt. (SUBPAR\_PROMPT)
+\item A bug, which caused problems when updating global parameters if the global
+file was corrupted, has been corrected. (SUBPAR\_DEACT)
+\item Special characters are now allowed in literals in arrays. (LEX\_CMDSET)
+\end{itemize}
+
+\subsection{MSG}
+\begin{itemize}
+\item A bug, which caused an attempt at recursion if `\$' was found in a token
+value, has been corrected. (MSG\_FORM)
+\end{itemize}
+
+\subsection{SMS}
+\begin{itemize}
+\item The cursor is now restored on message output. (SMS\_GETUSRKEY and
+SMS\_GETUSRLIN)
+\item The keystroke reading has been re-implemented using QIOs instead of SMG
+to overcome the problem of incomplete escape sequences which has appeared
+with VMS version 5.
+The SMG version will be saved and restored if the problem is fixed.
+
+The following routines have changed:
+\begin{quote}
+SMS\_ASTHDLR\\
+SMS\_SACTV\\
+SMS\_KRESTART\\
+SMS\_SDEAC\\
+SMS\_SETBUFF\\
+SMS\_CLRBUFF\\
+SMS\_DODCL\\
+SMS\_SMSESCIN (New routine)\\
+SMS\_READ\_KEYSTROKE (New routine)\\
+SMSCOMAST  (New common block)
+\end{quote}
+\end{itemize}
+
+\subsection{UFACE}
+\begin{itemize}
+\item PROCESS logical names which form part of the executable image name will
+be translated before calling SYS\$CREPRC with the image name. 
+This corrects an unfortunate side effect of the modification in ADAM version
+1.5 to allow privileged tasks to be run.
+The UFACE libraries in UFACE\_DIR, SMSUFACE\_DIR and ICL\_DIR have been 
+updated. (UFACE\_LOAD)
+\end{itemize}
+
+\subsection{DTASK}
+\label{dtask}
+\begin{itemize}
+\item A bug, which caused a Dtask which does some rescheduling and which gets
+sent more than 32767 OBEY commands to crash with a stack dump indicating integer
+overflow in DTASK\_RESCHED, has been corrected. (DTCOMMON, DTASK\_OBEY)
+\end{itemize}
+
+\section{CLEANUP}
+\subsection{Items Removed}
+\begin{description}
+\item[CHR]         Replaced by Starlink stand-alone library
+\item[ENGINT]      Obsolete
+\item[TEL]         UKIRT specific and obsolete
+\item[CAMAC]       Obsolete
+\end{description}
+
+\subsection{Candidates for Removal}
+It is proposed to remove the following items in the near future:
+\begin{description}
+\item[ADAMCL] This has almost entirely been replaced by ICL and is no longer
+properly supported.
+It is therefore proposed that ADAMCL be withdrawn at the next release.
+CLITASK (ADAMCL running as a task) will be withdrawn at the same time as will
+command language monoliths.
+
+\item[MESDEFNS] This `include' file was part of the old MESSYS but is not part
+of the new one and should therefore go when Version 2 comes into use.
+However, it is thought that it may be used by some tasks to define INFINITE
+and EF\_APP01 etc.
+Can anyone comment?
+\end{description}
+
+
+\section{KNOWN BUGS}
+\label{bugs}
+The following bugs have been reported but have not yet been fixed:
+\begin{itemize}
+\item Arrays in interface files - Arrays specified as defaults in interface 
+files must be enclosed in parentheses.
+Square brackets (the normal parameter system syntax) are not accepted.
+\item Parameter POSITION Fields - AED/3 says that every parameter should be 
+allocated a position but the interface file parsing permits POSITION fields to 
+be omitted.  
+It should not be necessary to define a position for every parameter, especially
+if there are a large number of them, but it must be a mistake to have
+non-contiguous positions allocated; therefore it is proposed to check for this
+condition during interface file parsing in a future release.
+\item HDS - There is a bug which causes a crash if an attempt is made to 
+create a file smaller than the disk cluster size.
+CLITASK - Reports \%PAR-I-NOUSR if an attempt is made to use it.
+\item There is a bug which causes long error messages to be truncated, and in
+some cases to produce garbage at the end.
+\end{itemize}
+\end{document}

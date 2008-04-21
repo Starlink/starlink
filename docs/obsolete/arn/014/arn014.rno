@@ -1,0 +1,371 @@
+
+.!           Template RUNOFF file for an ADAM Environment Description
+.!           --------------------------------------------------------
+.!
+.!  Replace n.m by the document number
+.!     "    dd,mm,yyyy by the date
+.!     "    *Author* by the document author(s)
+.!     "    *Title* by the title
+.!--------------------------------------------------------
+.title ARN/14.1
+.set date 31,1,1989
+.autoparagraph
+.set paragraph 0,1,2
+.layout 3,2
+.page size 57,70
+.flags substitute
+.nofill
+.keep
+.justify
+SCIENCE#AND#ENGINEERING#RESEARCH#COUNCIL ARN/14.1
+ROYAL#OBSERVATORY#EDINBURGH
+and#UNIVERSITY#OF#EDINBURGH
+
+ADAM#Project Issued#by
+ADAM#Release#Note#14.1
+
+.right;A J Chipperfield   
+.right;$$date
+
+.fill
+.repeat 70,"-"
+.blank
+.centre;ADAM - Release 1.4
+.centre;------------------
+.!
+.!now switch off overstrike, substitute, accept and uppercase flags
+.!as we wish to use %, $, ^ and _ regularly
+.no flags overstrike
+.no flags substitute
+.no flags accept
+.no flags uppercase
+.!
+.blank 2
+.! DSRTOC version V2.1-09
+.! RUNOFF/CONTENTS SSN45
+.SAVE
+.NO FLAGS ALL
+.NO FLAGS BREAK		.NO FLAGS CAPITALIZE	.NO FLAGS ENDFOOTNOTE
+.NO FLAGS HYPHENATE	.NO FLAGS INDEX		.NO FLAGS PERIOD
+.NO FLAGS SPACE		.NO FLAGS SUBSTITUTE
+.FLAGS ACCEPT _		.FLAGS BOLD *		.FLAGS COMMENT !
+.FLAGS LOWERCASE \	.FLAGS OVERSTRIKE %	.FLAGS UNDERLINE &
+.FLAGS UPPERCASE ^
+.FLAGS ALL
+.NO FILL		.NO JUSTIFY
+.LEFT MARGIN 8		.RIGHT MARGIN 70	.PAGE SIZE , 70
+.CENTER;CONTENTS
+.BLANK
+.TEST PAGE 2
+
+1       SUMMARY  . . . . . . . . . . . . . . . . . . . . . . 2
+2       INSTALLATION . . . . . . . . . . . . . . . . . . . . 2
+3       NEW FEATURES IN THIS RELEASE . . . . . . . . . . . . 2
+3_.1       ICL  . . . . . . . . . . . . . . . . . . . . . . . 2
+3_.2       SMS  . . . . . . . . . . . . . . . . . . . . . . . 3
+3_.3       PARAMETER SYSTEM - SUBPAR  . . . . . . . . . . . . 4
+3_.4       MAG  . . . . . . . . . . . . . . . . . . . . . . . 4
+3_.5       ADAMSHARE  . . . . . . . . . . . . . . . . . . . . 5
+3_.6       DOMAN  . . . . . . . . . . . . . . . . . . . . . . 5
+3_.7       DOCUMENTATION  . . . . . . . . . . . . . . . . . . 5
+3_.8       MISCELLANEOUS  . . . . . . . . . . . . . . . . . . 6
+3_.8_.1     DEVDATASET . . . . . . . . . . . . . . . . . . . . 6
+3_.8_.2     ADAMCL . . . . . . . . . . . . . . . . . . . . . . 6
+3_.8_.3     MSG And ERR Systems  . . . . . . . . . . . . . . . 6
+3_.8_.4     CHR  . . . . . . . . . . . . . . . . . . . . . . . 6
+3_.8_.5     SCREEN TASK  . . . . . . . . . . . . . . . . . . . 6
+3_.8_.6     SYSLOGNAM_.COM  . . . . . . . . . . . . . . . . . . 7
+3_.8_.7     ADAMSTART_.COM  . . . . . . . . . . . . . . . . . . 7
+3_.8_.8     ADAMDEV_.COM  . . . . . . . . . . . . . . . . . . . 7
+3_.8_.9     SYSDEV_.COM . . . . . . . . . . . . . . . . . . . . 7
+3_.8_.10    HDSLINK  . . . . . . . . . . . . . . . . . . . . . 7
+3_.8_.11    NBS  . . . . . . . . . . . . . . . . . . . . . . . 7
+3_.8_.12    MESSYS VERSION 2 . . . . . . . . . . . . . . . . . 7
+3_.8_.13    LEX  . . . . . . . . . . . . . . . . . . . . . . . 7
+4       BUGS FIXED FROM PREVIOUS RELEASE . . . . . . . . . . 8
+5       CLEANUP  . . . . . . . . . . . . . . . . . . . . . . 8
+.RESTORE
+.page
+.!now switch off overstrike, substitute, accept and uppercase flags
+.!as we wish to use %, $, ^ and _ regularly
+.no flags overstrike
+.no flags substitute
+.no flags accept
+.no flags uppercase
+.!
+.hl 1 SUMMARY
+This release is forced by the requirement to include the version of HDS
+which is independent of VMS version. 
+The release does however include a number of other bug fixes and improvements 
+(notably ICL version 1.4) as detailed below.
+Applications will not, in general need to be re-linked with this release but
+command language monoliths should be re-linked.
+
+The full release requires about 45000 blocks of disk storage and
+includes a mini-release which can be extracted and put up 
+separately. 
+The mini-release requires about 13500 blocks and allows the system 
+to be run and tasks to be developed and linked.
+
+.hl 1 INSTALLATION
+Full installation instructions are given in SSN/44.4.
+
+.hl 1 NEW FEATURES IN THIS RELEASE
+.hl 2 ICL
+ICL Version 1.41 is released herewith.
+ICL1.4 contains many new features, summarized below. 
+For details, see ICLDIR:ICL014.MEM.
+
+ICL Version 1.41 consists mainly of bug fixes to version 1.4. 
+For details, see ICLDIR:ICL0141.MEM.
+.lm 1
+.list "o"
+.le;Shareable  Image  Monoliths  -  An ADAM monolith can be 
+linked as a shareable image and loaded by ICL into the same 
+process as that running ICL. (New command DEFSHARE).
+Symbol ICLMLINK is defined by ADAMSTART to run the shareable monolith
+linking procedure.
+.le;Text file input/output (New commands CREATE, OPEN, APPEND, 
+WRITE, READ, READR, READI, READL, CLOSE).
+.le;Screen input/output mode (New commands SET SCREEN/NOSCREEN, 
+LOCATE, SET ATTRIBUTES, CLEAR, KEY, KEYTRAP, KEYUSER; New 
+functions INKEY, KEYVAL).
+.le;Noticeboard system access (New commands GETNBS, PUTNBS; New 
+function GETNBS).
+.le;Logging facility similar to that in ADAMCL (New commands 
+REPORT, REPFILE, NOREP).
+.le;SET SAVE/NOSAVE commands control writing of SAVE.ICL file.
+.le;WAIT command causes a wait for a specified interval.
+.le;RA2S, DEC2S functions format RA and DEC into strings.
+.le;The document: ICL - The New ADAM Command Language Users Guide, is
+updated.
+.els
+.lm 0
+
+.hl 2 SMS
+SMS has been extensively updated and the User's Note AON/4 revised.
+The main revisions are:
+
+.lm 1
+.list "o"
+.le;The CLI prompt is now configurable using "cli_prompt"
+.le;Prompts and "information" output are now logged
+.le;The stand-alone table compiler now produces formatted
+printouts of menus and parameter lists which provide
+hardcopy for previews or documentation.
+Symbol COMPSCT is defined by ADAMDEV to run the stand-alone table compiler.
+See AON/4 Section 5 for details.
+.le;Inline editing of parameter list items has been added
+.le;An "expert user" facility has been added
+.le;SMS may now be configured to provide one-line help
+automatically as the cursor is moved around menu items
+or parameter list entries
+.le;The internal mechanism for SMS system configuration 
+changes made using the keypad "COMMA" key facility has
+been changed.  
+To make use of this facility, new "+config+" entries are needed in the 
+system part of the control table.  
+See the example in Appendix B.
+.le;Equivalences have been set up for those using SMS on a
+VT220 terminal as follows (by JHF@JACH):
+.literal
+
+             VT100 key          VT220 key
+
+             ENTER              NEXT_SCREEN 
+             PF1                DO
+             PF2                INSERT_HERE
+             PF3                FIND
+             PF4                PREV_SCREEN
+             keypad "." key     SELECT 
+             "?" key            HELP 
+             "ctrl-U"           REMOVE 
+
+.el
+.le;Help entries can include the help file name (by JHF@JACH).
+.le;Continuation lines can be used within action entries.
+.le;A file "include" facility has been added.
+.els
+
+.hl 2 PARAMETER SYSTEM - SUBPAR
+.lm 1
+.list "o"
+.le;The format of displayed prompt values has been improved. Some rounding
+problems may occur if prompt values are accepted.
+.le;To support ICL's shareable monolith facility, SUBPAR_PROMPT now uses the 
+ICL terminal I/O routines. This has the added advantage that A-tasks
+run from DCL now have all the facilities, such as command recall and use of 
+the TAB key, that are available with ICL. 
+.le;Also to support shareable monoliths, a new subroutine, SUBPAR_ACTSHR is
+added. This is used to activate/re-activate each shareable monolith's
+parameter system as it is required.
+.le;Improvements have been made to the efficiency, readability and correctness
+of the parameter interpreting routines SUBPAR_CMDLINE, SUBPAR_CMDPAR and
+SUBPAR_HDSIN.
+.le;Logical constants in mixed case may now be given as parameter values.
+.els
+.lm 0
+
+.hl 2 MAG
+.lm 1
+.list "o"
+.le;The subroutine reference section of APN/1 is corrected and improved.
+Notably, UPDATE is removed as a valid access mode for MAG_ASSOC and MAG_OPEN,
+and UNLOAD is added as an argument of MAG_DISM. 
+The subroutines have not changed.
+.le;A section on allocating and mounting tapes has been added to APN/1.
+.le;The tasks TAPEMOUNT and TAPEDISM have been added to ADAM_EXE, and symbols
+TAPEMOUNT and TAPEDISM defined in ADAMSTART to run them from DCL.
+Use of these utilities tapes ensures correct functioning of the absolute 
+positioning system.
+.els
+.lm 0
+.hl 2 ADAMSHARE
+.lm 1
+.list "o"
+.le;ADAMSHARE now incorporates the version of HDS which is independent of
+VMS version. 
+Thus it can be used under version 4 or 5 of VMS.
+.le;ADAMSHARE is now linked with the VAXCRTL object library rather than the
+shared image. 
+This prevents some problems with duplicated subroutine names but does mean 
+that applications containing C routines may now require the VAXCRTL to be 
+linked explicitly.
+.le;ADAMSHARE now includes the ICL terminal I/O routines including the SMG
+screen management system. All these additional routines have been added at
+the end of the transfer vector.
+.els
+.lm 0
+
+.hl 2 DOMAN
+The automatic documentation program DOMAN has been modified to justify
+'wrapped' ends of lines with the start of the line. 
+Also it will now produce documents to the Starlink standard width.
+
+The program has been moved to a subdirectory of ADAMTOOLS and the system
+development login procedure (SYSDEV) defines a logical name DOMAN_DIR to 
+point to that directory.
+The associated DCL command procedures have also been installed in DOMAN_DIR
+and SYSDEV defines symbols to run them as follows:
+.literal
+
+   DOMAN     - Produce entries in a document library from a source file.
+   PRMAN     - Produce a simple APN from a document library.
+   REFPROLOG - Produce the APN header for PRMAN.
+   CRMANSECT - Produce an entry in a document library from a subroutine
+               source library.
+   PRGUIDE   - Produce a reference manual consisting of a guide followed
+               by a subroutine reference section.
+.el
+.hl 2 DOCUMENTATION
+SSN/45.6 and ARN/14 describe ADAM release 1.4.
+
+The following documents have been re-issued:
+.lm 1
+.list ,"o"
+.le;AED/14  Using the MSG and ERR Systems
+.le;AON/4   Using the ADAM Screen Management System
+.le;APN/1   ADAM Programmers' Guide to the MAG Package
+.els
+.lm 0
+The following documents have been added to DOCS_DIR but not to the mini-
+release.
+.lm 1
+.list "o"
+.le;ASP/7   Enhancements to the MESSYS and DTASK libraries
+.le;ASN/2   ADAM V2 Message System
+.els
+.lm 0
+The following documents have been removed from the ADAM release.
+.lm 1
+.list "o"
+.le;All IDNs
+.els
+.lm 0
+
+.hl 2 MISCELLANEOUS
+.hl 3 DEVDATASET
+Magnetic tape devices MSA0 and MUA0 have been added to the released version
+of the device dataset. DEVICE7.PRC is altered correspondingly.
+.hl 3 ADAMCL
+ADAMCL_HELP and ADAMCL_FULLHELP have been enhanced to allow the library
+as well as the topic to be specified in HELP commands.
+.literal
+
+e.g.    HELP @FILE.TOPIC
+
+.el
+.hl 3 MSG and ERR Systems
+The %parameter form of token will now work to display the name associated
+with a parameter.
+.hl 3 CHR
+The precision used by CHR_RTOC and CHR_DTOC has been increased to 7 and 14
+places respectively.
+.hl 3 SCREEN TASK
+SCREEN_FILE has been amended to increase the length of the filename and
+to open it READONLY.
+.hl 3 SYSLOGNAM.COM
+Instructions to define and install NBS_SHR have been added.
+.hl 3 ADAMSTART.COM
+DCL symbols to run TRACE, TAPEMOUNT and TAPEDISM are now defined.
+.hl 3 ADAMDEV.COM
+DCL symbols to run ICLMLINK and COMPSCT are now defined.
+.hl 3 SYSDEV.COM
+DCL symbols ICLMLINK, COMPSCT, DOMAN, PRMAN, REFPROLOG, CRMANSECT 
+and PRGUIDE are now defined.
+Logical name DOMAN_DIR is defined.
+Also, via DIR.COM, logical name NBS_DIR is defined.
+
+The re-definition of logical name ADAMDIR is no longer done so that the normal
+login procedure ADAM_DIR:GOD.PRC is obeyed.
+.hl 3 HDSLINK
+The stand-alone HDS program linking procedure has been modified in line
+with the VMS version independent HDS.
+.hl 3 NBS
+The Notice Board System, has been added; it is required by ICL version 1.4
+onwards.
+NBS_DIR is defined (see SYSDEV above) to point to the
+source directory but the shareable image is copied into ICLDIR (in the 
+mini-release section) and installed by SYSLOGNAM.COM. 
+If you wish to develop applications using NBS then the full release will be 
+required and linking procedures must be worked out.
+.hl 3 MESSYS VERSION 2
+The new message system (based on MSP) and ADAM Networking (ANT) has not yet
+been included.
+.hl 3 LEX
+A LEX parameter file has been created to provide symbolic names for constants
+defining LEX states and actions.
+This parameter file has been used to improve the readability of the SUBPAR
+routines which use LEX but is not yet used by LEX itself.
+
+.hl 1 BUGS FIXED FROM PREVIOUS RELEASE
+.lm 1
+.list "o"
+.le;SMS - Bugs in the routine which handles SMS parameter 
+substitution causing integer overflow errors have been 
+fixed; errors in parameter substitution are now reported.
+.le;ADAMCL - ADAMCL_SEND has been corrected to correctly report STATUS.
+.le;ERR - A bug in ERR_RLSE which caused messages to be lost when using the 
+undocumented MARK and RELEASE feature is corrected. 
+.le;HELPSYS -
+A bug in HELPSYS_SETFILE has been corrected so that switching help libraries
+now operates correctly.
+.le;MSP -
+Several bugs including a very restrictive name length have been corrected.
+Note that MSP is not yet used by the ADAM system.
+.els
+.lm 0
+
+.hl 1 CLEANUP
+.lm 1
+.list "o"
+.le;Subdirectory [.OLD] has been removed from PARSE_DIR.
+.le;Subdirectory [.SHARELIBS] has been removed from LIB_DIR.
+.le;TR.MAR has been removed from LIB_DIR.
+.le;SYSLOGTEST.COM is removed from ADAM_DIR.
+.le;Compiled interface files (.IFCs) have been removed from source directories.
+.le;It is proposed to remove the old versions of FIO and RIO at the next
+release, so all applications using them should be converted. APN/9 section 6
+describes the differences.
+.els
+.lm 0

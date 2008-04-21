@@ -1,0 +1,684 @@
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      ARN/12.1
+ROYAL OBSERVATORY EDINBURGH
+and UNIVERSITY OF EDINBURGH
+
+ADAM Project                                                 Issued by
+ADAM Release Note 12.1
+
+                                                             B D Kelly
+                                                          23 July 1987
+
+----------------------------------------------------------------------
+
+                      ADAM Software Release 1.2
+                      -------------------------
+
+
+
+
+
+1  SUMMARY
+
+This is a major release (via magtape) and is  rather  large  (25  Mb).
+The  reason for this is that it includes the graphics packages as well
+as the full system and a number of application programs.
+
+It also includes a mini-release which can  be  extracted  and  put  up
+separately.   It  takes  up  about  4Mb  of disk space, and allows the
+system to be run and tasks to be developed and linked.
+
+It is assumed that the mini-release will be the system normally in use
+even  on  machines which have the full release on disk.  This approach
+avoids unnecessary strains on VMS resources.
+
+*** Warning - all tasks need to be re-linked and all  interface  files
+need to be re-compiled.
+
+***  Repeat  warning  -  the  directory  structure  has  been  changed
+significantly  since  version  1.0  to  improve  the usefulness of the
+mini-release.  For example, ADAM_DIR  no  longer  points  to  the  top
+directory of the whole system!
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 1 -
+ARN/12.1                                                        Page 2
+
+
+2  CONTENTS
+
+
+         3. QUOTAS NEEDED TO RUN ADAM
+         4. INSTALLATION
+         5. INSTALLATION TESTING
+         6. UTILITY PROGRAMS RUN FROM DCL
+         7. NEW FEATURES IN THIS RELEASE
+                7.1 Linking
+                7.2 Running Tasks
+                7.3 User status codes
+                7.4 HDS
+                7.5 MESSYS
+                7.6 Logging
+                7.7 Graphics
+                7.8 Parameter System
+                7.9 ERR
+                7.10 SMS
+                7.11 ADAMCL
+                7.12 Engineering interface
+                7.13 Program development
+                7.14 System development
+         8. STILL MISSING FROM THIS RELEASE
+         9. BUGS FIXED FROM PREVIOUS RELEASE
+        10. KNOWN BUGS
+
+
+
+3  QUOTAS NEEDED TO RUN ADAM
+
+Typical ADAM quotas are as follows
+
+Process Quotas:
+ CPU limit:                      Infinite  Direct I/O limit:       18
+ Buffered I/O byte count quota:     20480  Buffered I/O limit:     18
+ Timer queue entry quota:               9  Open file quota:        28
+ Paging file quota:                 20000  Subprocess quota:       10
+ Default page fault cluster:           32  AST limit:              23
+ Enqueue quota:                        30  Shared file limit:       0
+ Max detached processes:                0  Max active jobs:         0
+
+
+
+4  INSTALLATION
+
+The release consists of a BACKUP save set on magtape.  The command  to
+generate it was :
+
+$ BACKUP [ADAM...]*.*;* MT:ADAM12.BCK
+
+The tape contains the full system,  including  all  the  source  code.
+However,  everything  necessary  for  running  the  system either on a
+
+                                - 2 -
+ARN/12.1                                                        Page 3
+
+
+Starlink machine or at an observatory, or for  developing  ADAM  tasks
+has  been  collected  in  the  directory tree [ADAM.RELEASE...].  Most
+sites should only need to backup this subdirectory tree to disk.
+
+The [ADAM.RELEASE]  directory  contains  the  file  SYSLOGNAM.RELEASE.
+This  should  be  studied, edited to suit the individual site, and the
+result of the edit written to SYSLOGNAM.COM.
+
+Arrangements should be made to have SYSLOGNAM.COM executed at VMS boot
+time.
+
+The global symbol
+ADAMSTART == @ADAM_DIR:ADAMSTART
+
+should be put into the VMS system-wide login file.
+
+
+
+5  INSTALLATION TESTING
+
+Login under a user name which should have  sufficient  privileges  and
+quotas  to  run  ADAM  as  set up on your machine.  There are then two
+categories of tests which should be tried.
+
+
+
+5.1  Running ADAM
+
+Issue the command ADAMSTART.  The command ADAMCL should  start-up  the
+ADAM command language.  Then
+Adamcl:> DEFINE TRACE TRACE
+Adamcl:> TRACE ADAM_USER:GLOBAL
+    .
+   a message saying that TRACE is being loaded followed by
+   a listing of the contents of global.sdf should appear
+    .
+Adamcl:> $DIR
+    .
+   the DCL subprocess should be spawned, then a directory listing
+   should appear
+    .
+Adamcl:> EXIT
+    .
+   return to DCL. The two subprocesses should vanish.
+
+
+
+5.2  Program Development
+
+A reasonably complete test that program development is possible can be
+carried out by building a command-language monolith.  After ADAMSTART,
+execute the DCL command ADAMDEV.  Then copy the  source  of  the  test
+
+                                - 3 -
+ARN/12.1                                                        Page 4
+
+
+monolith into your working directory.
+$ COPY ADAM_TEST:TESTADAM.* *
+
+This will have copied the source and interface  file  for  a  monolith
+called TESTADAM containing the single Atask TESTRUN.
+$ FORT TESTADAM
+$ CL_MLINK TESTADAM
+$ RUN TESTADAM
+Adamcl:> DEFINE TESTRUN %255
+Adamcl:> TESTRUN
+  TESTRUN successfully executed
+Adamcl:> EXIT
+
+Note that TESTADAM.EXE has to be RUN - it is a user  interface  rather
+than an ADAM task.
+
+
+
+6  UTILITY PROGRAMS RUN FROM DCL
+
+There are a set of DCL commands which  have  been  defined  to  enable
+certain utilities to be run from DCL.  These are
+
+KILLTASK - kill an ADAM task
+
+COMPIFL - compile an interface module
+
+ADDHELP - put help information into an ADAM help file
+
+HELPDUMP - write the contents of an ADAM help file into a text file
+
+STARTUP - create ADAM_USER:GLOBAL.SDF
+
+
+
+7  NEW FEATURES IN THIS RELEASE
+
+7.1  Linking
+
+Note  that  all  tasks  need  to  be  re-linked.   Linking  has   been
+reorganised  to  use  a  shareable image library.  This should improve
+startup times for tasks which do not call the graphics packages.
+
+The commands ALINK and DLINK are used to  produce  A-  and  D-  tasks.
+MLINK  links  a  set  of  'A-tasks' into a monolith.  DCAMLINK links a
+Dtask with the CAMAC  library.   CDLINK  links  a  CD-task.   CL_MLINK
+produces  a  version  of  ADAMCL with an Atask monolith built into it.
+The resulting execution module can then be started up by the  DCL  RUN
+command.
+
+
+
+
+                                - 4 -
+ARN/12.1                                                        Page 5
+
+
+7.2  Running Tasks
+
+All Atasks generated with the ALINK command can be run either  at  the
+terminal or loaded from an ADAM user interface.
+
+It is also possible to run other  tasks  at  the  terminal  using  the
+debugger  provided  that  control is taken immediately and the name of
+the required action is  set  into  the  variable  NAME  in  subroutine
+DTASK_DCLTASK.
+
+A subroutine DTASK_SETDUMP(STATUS) has been provided.  If called  from
+DEVINIT  this  initialises  a  mechanism which allows stack dumps of a
+task to be generated from the user interface.  The stack dump  appears
+on  the  terminal  from which the task was loaded.  The task continues
+executing after showing the dump.
+
+
+
+7.3  User Status Codes
+
+A set of ten status  codes  called  USER__01  to  USER__10  have  been
+allocated.  These can be accessed by
+      INCLUDE 'USER_ERR'
+
+These can be used as status values by  applications  programmers  with
+the knowledge that the values will not coincide with any other ADAM or
+VMS status numbers.
+
+If, during debugging, LIB$SIGNAL is being used, then linking the  task
+with  ADAM_LIB:USER.OBJ  will  cause  the  USER errors to be signalled
+successfully.
+
+Note that the actual  values  of  the  user  status  codes  have  been
+changed.  Any tasks which include USER_ERR should be re-compiled.
+
+
+
+7.4  HDS
+
+This release contains the version of HDS  coded  in  C.   Its  version
+number is 3.6.
+
+
+
+7.5  MESSYS
+
+This release contains no enhancement to the  network  capabilities  of
+MESSYS beyond those in v1.1.
+
+
+
+
+
+                                - 5 -
+ARN/12.1                                                        Page 6
+
+
+7.6  Logging
+
+The LOG library has been reimplemented  to  give  improved  speed  and
+better  facilities.  This means that the new logfiles are incompatible
+with the old ones.
+
+
+
+7.7  Graphics
+
+The SYSLOGNAM.RELEASE file includes options  which  should  be  edited
+corresponding to whether GKS6 or GKS7 is to be used.
+
+
+
+7.8  Parameter System
+
+Considerable enhancements have been  made  to  the  parameter  system.
+These include improved syntax, control over the value suggested on the
+prompt line and extensions to provide the most popular facilities from
+the original FIGARO parameter system.
+
+
+
+7.8.1  Syntax - This is the syntax  for  command-line  parameters  and
+responses  to  parameter  prompts  implemented  by  Jeremy Bailey.  It
+includes the ability to put arrays  of  values  on  the  command-line.
+Handling of character strings has been made more user friendly, in the
+sense that if the relevant  parameter  is  of  type  '_CHAR'  then  an
+attempt will be made to interpret the value as a character string even
+if it is not surrounded by quotes.  Indirection via HDS can  still  be
+achieved by prefixing the HDS structure name with @.
+
+Handling of HDS names has been improved to deal with  multidimensional
+structure arrays.
+
+Automatic slicing of HDS arrays is now supported, eg
+
+JUNK.DATA_ARRAY(20:500,30:150)
+
+
+It is now possible to SET a parameter value in  a  monolith.   In  the
+case of ADAMCL, an example would be
+
+...> SEND FIGARO SET SPLOT.XSTART 3000
+
+which would set the value  of  the  XSTART  parameter  for  the  SPLOT
+command within FIGARO.
+
+
+
+
+
+                                - 6 -
+ARN/12.1                                                        Page 7
+
+
+7.8.2  PPATH - A new entry in the interface file has been provided  to
+allow  a search-path to be specified for the value which is shown when
+a parameter is prompted for.
+
+   PPATH 'current,default'
+
+is an example of the most typical search path.  This  means  that  the
+value  shown  on  the prompt-line will be the value last used for this
+parameter.  If there is no last value, which is the case if  the  user
+has  not  run  this  application before, or if the task's SDF has been
+deleted, then the DEFAULT value specified in  the  interface  file  is
+shown instead.
+
+
+
+7.8.3  FIGARO Features - The FIGARO command-line instructions  PROMPT,
+and   reset  have  been  implemented.   these  can  be  typed  on  the
+commandline following a list of zero or more parameter values.
+
+prompt forces prompting for all parameters which have not been given a
+value already.  in other words, it overrides the vpath.
+
+forces acceptance of the value which would have appeared on the prompt
+line for all parameters which have not been given a value already.
+
+reset removes 'current' from the ppath.
+
+so, for example,
+
+..> TRACE PROMPT
+
+will cause  the  trace  task  to  run  and  to  prompt  for  both  its
+parameters,   rather  than  its  normal  operation  where  the  second
+parameterautomatically picks-up a default value.
+
+combinations of the instructions can be used.
+
+..> JUNK PROMPT RESET
+
+will force all parameters of the junk task to be prompted for, but the
+values  shown on the prompt line will not be the 'current' values even
+if the ppath specifies  'current'.   typically  this  will  cause  the
+prompt value to revert to being a 'default' or 'dynamic' value.
+
+
+
+7.8.4  NULL Defaults - It is now possible to specify a NULL  value  as
+the  default  in  an  interface file by giving exclamation mark as the
+value.
+
+   VPATH 'DEFAULT'
+   DEFAULT !
+
+                                - 7 -
+ARN/12.1                                                        Page 8
+
+
+7.8.5  Storage Space - The parameter system  storage  space  has  been
+increased  to allow the production of larger tasks and monoliths.  The
+maximum number of parameters allowed  is  now  1500  and  the  maximum
+number of actions is 300.
+
+
+
+7.8.6  Keywords - The   interface   file   KEYWORD   declaration   for
+parameters  is  now the name by which the parameter is always known to
+the outside world.  A similar keyword definition has been  implemented
+for action declarations.
+
+
+
+7.8.7  Naming Conventions - The naming conventions in interface  files
+have  been relaxed.  There are now no reserved words, for example, one
+can declare a parameter called TYPE.  The names of HDS structures have
+been  relaxed in line with the C-version of HDS, so one can now have a
+structure name which starts with a number.  (eg 47TUC.DATA_ARRAY).
+
+
+
+7.8.8  Single Element Arrays - Calls to  PAR_GET1<T>  and  PAR_GETn<T>
+will  now  succeed if the user responds to a prompt by giving a single
+value.  In other words, the dimensionality is converted  if  it  makes
+sense to do so.
+
+
+
+7.8.9  Support For Menu User Interfaces - A set of new interface  file
+declarations  have  been  implemented  to allow specification of where
+action and parameter keywords should be presented on  a  menu  screen.
+In  addition,  a set of SUBPAR inquiry routines have been implemented.
+These features are intended for the use  of  programmers  implementing
+screen formatting user interfaces.
+
+
+
+7.9  PAR_STATE
+
+A new parameter system routine allows the current state of a parameter
+to  be  determined,  that  is,  whether  it is in the ground state, or
+active or several other possibilities.
+
+
+
+7.10  SMS
+
+SMS is described in AON/4.
+
+
+
+
+                                - 8 -
+ARN/12.1                                                        Page 9
+
+
+SMS has been changed so that all its terminal handling is now done via
+the  VMS  SMG  library.  This means that SMS can now be used on non-VT
+terminals subject to the provision of  the  relevant  SMG  description
+file.
+
+The SMS handling of DCL commands has been changed so that it now  uses
+the  ADAMCL  'permanent'  DCL  subprocess  rather  than spawning a new
+subprocess for each command.
+
+
+
+7.11  ADAMCL
+
+The ADAMCL manual is to be found in AON001.
+
+
+
+7.11.1  The ACL Monolith - The standard ACL monolith has had an  extra
+built-in task provided.  This is
+
+LISTLOG   - select and output the contents of a log file
+
+
+
+
+7.11.2  Task Loading - When a task is loaded, it now is given the same
+WSQUOTA  as the process running ADAMCL.  This has proved necessary for
+certain Dtasks which wish  to  lock-in  sizeable  amounts  of  virtual
+memory.
+
+Formerly, given a name of an execution module for a task which did not
+contain  a  directory  specification, the current directory was always
+searched first.  Now the search-path is followed strictly.
+
+
+
+7.11.3  Task Killing - The protection mechanisms on task killing  have
+been  reduced.  However, ADAMCL will only KILL tasks which were loaded
+at the current terminal.  The KILLTASK program  (available  from  DCL)
+does not have this restriction.
+
+
+
+7.11.4  Reporting - The reporting system has been changed to  use  the
+new-format logfiles.  In addition, more control is provided over which
+file is in use.
+
+The REPORT command has been changed to be
+
+...> REPORT [filename[,category]]
+
+The default categories  are  as  before.   filename  defaults  to  the
+
+                                - 9 -
+ARN/12.1                                                       Page 10
+
+
+logical  name  ADAM_LOGFILE.   The  file  is  actually opened when the
+REPORT command is issued,  and  closed  on  the  NOREP  command.   The
+command REPORT NONE has been withdrawn.
+
+REPFILE has been extended to become
+
+...> REPFILE [filename[,DTNS]]
+
+DTNS specifies which combinations of Date, Time, taskName  and  String
+are   to   be   displayed  for  each  record.   filename  defaults  to
+ADAM_LOGFILE.
+
+More control over the listing of logfiles is provided by  the  LISTLOG
+task.
+
+
+
+7.11.5  New Commands - The following new commands have been  added  to
+ADAMCL.
+CHECKTASK  - check whether a task is loaded
+STARTOBEY  - start a task obeying an action
+ENDOBEY    - wait for the completion of an action
+
+
+
+7.11.6  Nesting - The size of the stack in ADAMCL has  been  increased
+to allow increased level of nesting of subroutine calls, IF blocks, DO
+blocks, etc.
+
+
+
+7.12  Engineering Interface
+
+The ENG user interface has now been withdrawn.
+
+
+
+7.13  GEN Library
+
+The GEN library (formerly used by the DAT library) has been withdrawn.
+
+
+
+7.14  Program Development
+
+The standard subroutine prologue is now available in ADAM_PRO:SUB.PRO.
+
+Interest has been expressed in enabling the use of the VMS debugger on
+ADAM  tasks running in subprocesses.  Interested parties might like to
+try including in DEVINIT a call to DTASK_SETDUMP(STATUS) and
+$ DLINK prog,libraries,ADAM_TEST:DTASK_DUMPAST
+If this task is loaded and the ADAMCL command DUMPTASK is directed  at
+
+                                - 10 -
+ARN/12.1                                                       Page 11
+
+
+it,  then  it  will  go  into debug mode rather than providing a stack
+dump.
+
+It is  recommended  that,  in  order  to  'switch  ADAMCL  off'  while
+debugging one should provide a procedure such as
+
+PROCEDURE DUMP
+   STARTOBEY PATH MESSID task parameters
+   DUMPTASK task
+   ENDOBEY PATH MESSID
+END PROCEDURE
+
+Experience gained with debugging should be  fed  back  to  the  system
+developers to assist in deciding the best way of doing this.
+
+
+
+7.15  System Development
+
+The top-level of the full ADAM directory structure now should be given
+the  logical  name  ADAM_SYS.   Someone who wishes to work on the ADAM
+system itself needs to logon  with  suitable  privileges  and  execute
+ADAM_SYS:SYSDEV.COM.   This  sets-up all the symbols and logical names
+needed.
+
+WARNING - some of the symbols and names are identical  with  those  in
+ADAMSTART/ADAMDEV but point to different directories.
+
+After modifations have been made, the relevant files should be  copied
+into the ADAM_DIR tree.
+
+NOTE - it is inadvisable to execute SYSDEV when doing  normal  program
+development  or  just  running  ADAM tasks.  Under these circumstances
+problems can arise due to the large numbers of VMS logical  names  and
+symbols defined.
+
+
+
+8  STILL MISSING FROM THIS RELEASE
+
+The following list is not complete but  indicates  major  areas  where
+some action might be expected soon.
+
+Major items missing:
+Higher-level documentation.
+ADAMCL variables interpreted in reply to parameter prompts
+Installation of AAO low-level message system
+Relational database (ADC) and file handling (FIO)
+Improved networking.
+
+
+
+
+                                - 11 -
+ARN/12.1                                                       Page 12
+
+
+9  BUGS FIXED FROM PREVIOUS RELEASE
+
+9.1  ADAMCL
+
+trap for integer overflow in integer functions
+skip random combinations of leading TAB and SPACE in commands
+spurious error message when returning from nested batch files
+messages from tasks being truncated at 80 characters
+allow abbreviations for tasks in ACL monolith
+
+
+
+9.2  Parameter System
+
+help entries were being truncated at 80 characters
+VPATH 'CURRENT' now works for HDS names
+
+
+
+10  KNOWN BUGS
+
+These are the most important bugs found that can  potentially  produce
+unwanted  effects  and may cause confusion.  Please let us know of any
+unusual behaviour of the system !
+
+(1) At present, any task can have channels open to  no  more  than  20
+other tasks simultaneously.  (This is a 'feature' rather than a bug).
+
+(2) If a number of SEND <task>  OBEY  commands  are  issued  within  a
+command  language  loop,  the  message  system  fills  with  the final
+acknowledgements.  The cure is to avoid SEND <task> OBEY in a loop  by
+using OBEYW instead.
+
+(3) The RPATH field in the IFL is not yet implemented.
+
+(4) DIA_ASSOC and DIA_ANNUL appear to work  satisfactorily  the  first
+time an A-task is run, but give GKS errors the second time the task is
+run.  (This problem has been solved under GKS 7.2).
+
+(5) In Dtasks, array parameters with  their  literal  list  of  values
+defaulted in the IFL must not be put on a NEEDS list.
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 12 -

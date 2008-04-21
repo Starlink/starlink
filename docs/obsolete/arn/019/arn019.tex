@@ -1,0 +1,388 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {ADAM Release Note}
+\newcommand{\stardocinitials}  {ARN}
+\newcommand{\stardocnumber}    {19.1}
+\newcommand{\stardocauthors}   {A J Chipperfield}
+\newcommand{\stardocdate}      {31 January 1991}
+\newcommand{\stardoctitle}     {ADAM --- Release 1.9}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\font\tt=CMTT10 scaled 1095
+\renewcommand{\_}{{\tt\char'137}}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+  \setlength{\parskip}{0mm}
+  \tableofcontents
+  \setlength{\parskip}{\medskipamount}
+  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{SUMMARY}
+This is a `complete' release of ADAM to update the system with the latest 
+versions of the Starlink graphics and other libraries and to provide some 
+enhancements to ICL and SMS.
+There are minor enhancements to other facilities and some bugs are fixed in 
+ICL, the parameter system and the TASK library.
+
+The release also begins the process of making Starlink subroutine
+libraries available automatically to application developers.
+
+IT WILL BE NECESSARY TO MODIFY ANY PRIVATE OR SITE-SPECIFIC VERSIONS OF
+SYSLOGNAM.COM
+
+It will not be necessary to re-link tasks for this release unless the 
+alterations to the TASK or DTASK libraries are required.
+(See Sections \ref{task} and \ref{dtask}.)
+The TRACE utility has been re-linked to incorporate the improved DTASK
+routines.
+
+The following important Starlink Software Changes are incorporated:
+\begin{itemize}
+\item SGS
+\item HDS -- (see also Section \ref{hds})
+\item ERR, MSG and EMS
+\item NDF, ARY
+\end{itemize}
+For details, refer to the latest relevant SSC number prior to that of this 
+release.
+
+The full system requires about 42000 blocks of disk storage and includes a
+mini-system which can be extracted and put up separately. The mini-system
+requires about 14000 blocks and allows tasks to be run and  developed.
+
+\section{INSTALLATION}
+Full installation instructions are given in SSN/44 and the Starlink Software 
+Change Notice.
+
+\section{NEW FEATURES IN THIS RELEASE}
+
+\subsection{ICL}
+\begin{itemize}
+\item ICL Version 1.5-4 is released - the login banner has been changed
+appropriately.\\ (LOGIN.ICL, ADAMLOGIN.ICL)
+\item A new command, SET NOAUTOLOAD/AUTOLOAD is implemented. It prevents ICL
+from automatically loading tasks which can cause trouble, particularly for
+D-tasks following crashes.
+The default is AUTOLOAD.\\
+(ICLDEF.PAS, ICLMAIN.PAS, ICLPROC.PAS, ICLADAM.PAS).
+\item The help library has been updated to include the new commands.\\
+(ICLHELP.HLP/.HLB)
+\end{itemize}
+
+\subsection{SGS}
+\label{sgs}
+\begin{itemize}
+\item The include files for error status values have been renamed to the
+standard form.\\ (SGSERR becomes SGS\_ERR)
+\item The graphics shared image includes the latest release of SGS - errors from
+SGS are reported in standard fashion and standard status values are returned.
+This means that the ADAM-special version of the SGS\_\$ERR subroutine is no
+longer required -- it has been removed from the library.
+Three new SGS status values are defined.\\
+(SGS\_\-ERR\-.MSG/.FOR/.OBJ, 
+\item The prologues of the environment-level subroutines have been improved
+to provide better automatic documentation.\\
+(SGS\_\-ANNUL, ASSOC, CANCL, DEACT )
+\end{itemize}
+
+\subsection{GKS}
+\label{gks}
+\begin{itemize}
+\item The include files for error status values have been renamed to the
+standard form.\\ (GKSERR becomes GKS\_ERR)
+\item The prologues of the environment-level subroutines have been improved
+to provide better automatic documentation.\\
+(GKS\_\-ANNUL, ASSOC, CANCL, DEACT, GSTAT)
+\end{itemize}
+
+\subsection{HDS}
+\label{hds}
+The ADAMSHARE shared image is built with the latest version of HDS available
+at RAL. It contains major internal revisions but should be functionally the
+same as the released version, apart from an additional subroutine DAT\_WHERE.
+It has been modified in line with SSC487, to correct the file-extend error 
+when copying small files.
+
+{\em This version has not yet been released}, therefore any attempt to rebuild
+the system must take this into account, possibly removing DAT\_WHERE from the
+transfer vector.
+
+\subsection{DTASK}
+\label{dtask}
+\begin{itemize}
+\item DTASK\_GET and DTASK\_SET, which implement the GET and SET context 
+messages, have been modified.
+DTASK\_SET has been made to work for monoliths in the same way as DTASK\_GET.
+At the same time, improvements have been made to check that the format of
+the parameter name is appropriate for the type of task ({\em i.e.}\ in the form 
+{\em task:parameter} for a monolith).
+A new SUBPAR routine is provided to determine whether or not the task is a
+monolith (see Section \ref{subpar}).\\
+(Modified: DTASK\_GET, DTASK\_SET)
+\item The task ending messages from A-tasks ending with STATUS set when run 
+from DCL, have been improved.
+The command-line parameter string will now be output in the form:
+\begin{quote}
+Command parameters /{\em parameters}\//.
+\end{quote}
+No message will be output if there are no command-line parameters.\\
+(Modified: DTASK\_DCLTASK)
+\end{itemize}
+
+\subsection{The Parameter System (SUBPAR)}
+\label{subpar}
+\begin{itemize}
+\item A new subroutine, SUBPAR\_MLITH, is provided to return the value of the 
+MONOLITH flag from the SUBPAR common block, SUBPARPTR.
+(New routine: SUBPAR\_MLITH)
+\item SUBPAR\_CMDLINE has been modified to increase the maximum number of 
+parameters allowed on the command line from 32 to 50.
+(Modified: SUBPAR\_CMDLINE)
+\end{itemize}
+
+\subsection{MSG, ERR and EMS}
+Numerous enhancements have been made to these systems.
+New subroutines have been provided and the behaviour of others, particularly
+the token setting routines, has been changed.
+ERR\_LOAD and ERR\_ELOAD have additional arguments and
+the way in which they and ERR\_REP treat the STATUS argument has also changed.
+These changes could result in different behaviour by tasks.
+For full details, see EMS release notes and SUN/104.2.
+
+\subsection{Starlink Libraries}
+\label{starshrlib}
+A start has been made on allowing application developers to use the main
+Starlink subroutine libraries without the need to issue additional commands
+or include additional specifications in their link commands.
+To this end:
+\begin{enumerate}
+\item The `analysis' application link commands ALINK, MLINK and ICLMLINK have 
+been modified to include STAR\_LINK\_ADAM/OPT\footnote{.
+The scheme is not implemented for the non-shareable link commands, 
+ANOSHR and MNOSHR.}.
+The released version of SYSLOGNAM.COM defines a logical name STAR\_LINK\_ADAM
+to be ADAM\-\_EXE:\-STAR\-\_LINK\-\_ADAM.
+
+\item A link options file, ADAM\_EXE:STAR\_LINK\_ADAM.OPT, has been created.
+Currently it includes the option:
+\begin{quote}
+STAR\_LINK\_ADAM/LIB
+\end{quote}
+
+\item A shareable image library, ADAM\_EXE:STAR\_LINK\_ADAM.OLB has been 
+created.
+Currently it contains the shareable images for NDF and ARY.
+
+\item A procedure defined by the logical name STAR\_DEV\_ADAM is obeyed by 
+the ADAMDEV procedure.
+The released version of SYSLOGNAM.COM defines the logical name to be
+ADAM\_DIR:\-STAR\_DEV\_ADAM.
+The supplied procedure will obey NDF\_DEV, ARY\_DEV and PRM\_DEV if those 
+symbols are defined.
+\end{enumerate}
+
+Notes:
+\begin{itemize}
+
+\item The additional library search should not cause any significant overhead
+in link times and the shareable images themselves need only be available if 
+routines within them are required by the task being linked.
+However, those sites which are not interested in having this facility, or want
+alternative libraries available, may wish to modify SYSLOGNAM.COM
+to re-define STAR\_LINK\_ADAM and/or STAR\_DEV\_ADAM.
+
+A null version of the link options file is provided in 
+ADAM\_EXE:STAR\_LINK\_ADAM0.OPT and a null version of the procedure in
+ADAM\_DIR:STAR\_DEV\_ADAM0.COM.
+These may be used instead to cause effectively no action.
+(For details of how to modify SYSLOGNAM.COM, see SSN/44.)
+
+\item Existing link commands should continue to work, albeit with some
+redundant library searching.
+
+\item Users developing libraries which are included in 
+STAR\_LINK\_ADAM.OLB will also need to prevent the normal operation.
+This is easily done by defining a logical name STAR\_LINK\_ADAM to take 
+precedence over the SYSTEM logical name and pointing to 
+ADAM\_EXE:\-STAR\-\_LINK\_ADAM0 or to a
+private library containing just those shareable images which they do want.
+
+\item A procedure to create STAR\_LINK\_ADAM.OLB is held in SHARE\_DIR.
+It may be used as a template for private libraries.
+
+\item For the moment, the STAR\_LINK\_ADAM files and STAR\_DEV\_ADAM.COM
+are part of the ADAM release.
+They will probably be reorganised into the Starlink directories in the near 
+future so that they may be maintained separately from ADAM releases.
+\end{itemize}
+
+(Modified: ALINK.COM, MLINK\-.COM, ICLMLINK.COM,
+ADAM\-DEV\-.COM, SYS\-LOG\-NAM\-.COM, SYS\-LOG\-NAM\-.MINI.
+ New files: STAR\-\_LINK\-\_ADAM\-.OPT/\-.OLB/\-.COM, STAR\-\_DEV\-\_ADAM\-.COM,
+STAR\-\_LINK\-\_ADAM0\-.OPT, STAR\-\_DEV\-\_ADAM0\-.COM)
+
+\subsection{Other Procedures Etc.}
+\begin{description}
+
+\item[SYSLOGNAM.COM/.MINI]
+MODIFIED VERSIONS OF THESE FILES WILL NEED UPDATING.
+\begin{itemize}
+\item Logical names STAR\_DEV\_ADAM and STAR\_LINK\_ADAM are defined as 
+indicated in Section \ref{starshrlib}. 
+THEY MAY NEED CHANGING AT SPECIFIC SITES.
+\item SYS\$DISK has been added to the `current directory' part of the 
+definition of ADAM\_EXE.
+\end{itemize}
+
+\item[ADAMSTART.COM] is modified to:
+\begin{itemize}
+\item Display the latest ADAM version number.
+\item Switch off verification -- restoring to its initial state on exit.
+\item Symbol ADAM\_DEV is defined equivalent to ADAMDEV for compatibility
+with other Starlink packages.
+\end{itemize}
+
+\item[ADAMDEV.COM] is modified to:
+\begin{itemize}
+\item Obey STAR\_DEV\_ADAM to make logical names for Starlink libraries 
+available for application development (see Section \ref{starshrlib}).
+\item Switch off verification -- restoring to its initial state on exit.
+\end{itemize}
+
+\item[ADAMSHARE.COM] is modified to:
+\begin{itemize}
+\item Increase the minor id of the shareable image.
+\item Use the changed names of the object modules for SGS and GKS error values 
+(see Sections \ref{sgs} and \ref{gks}).
+\item Declare an additional common block for EMS.
+\end{itemize}
+
+\item[ADAMSHARE.MAR]
+Additional subroutines for SUBPAR, MSG, ERR and EMS are added to the end of 
+the transfer vector.
+
+\item[ADAMGRAPH7.COM]
+The names of the object modules for SGS and GKS error values have been changed.
+SGS\_\$ERR is no longer included.
+
+\item[LINKNOSHR.OPT]
+The names of the object modules for SGS and GKS error values have been 
+changed. SGS\_\$ERR is no longer included.
+
+\item[APPLOG.COM, LOGICAL.COM]
+The names of the include files for SGS and GKS error values have been changed.
+
+\item[ALINK.COM, MLINK.COM and ICLMLINK.COM] Include STAR\_LINK\_ADAM link
+options file (see Section \ref{starshrlib}).
+\end{description}
+
+\subsection{Documentation}
+\begin{itemize}
+
+\item SSN/45 and ARN/19 describe ADAM release 1.9.
+
+\item The first steps are taken to withdraw all the documents in the ADAM
+documentation set and replace relevant ones with Starlink documents.
+\begin{itemize}
+\item The APP series is no longer distributed.
+\item AED/3, AED/7, AED/8 AND AED/12 are withdrawn. They have been superceded
+by SG/4 and SUN/115.
+\item APN/2 (GKS) and APN/3 (SGS) are withdrawn. They are replaced by SUN/113.
+\end{itemize}
+
+\item The following applicable Starlink documents have been released or
+updated.
+\begin{itemize}
+\item SSN/44 ADAM -- Installation Guide.
+\item SUN/104 MSG and ERR -- Message and Error Reporting Systems.
+\item SUN/113 SGS and GKS -- ADAM Programmer's Guide.
+\item SUN/115 ADAM -- Interface Module Reference Manual
+\item SSN/4 EMS -- Error Message Service.
+\end{itemize}
+
+\item The summaries, ADAM\_DOCS:0CONTENTS.LIS, FULLDOCS.LIS and NEWDOCS.LIS,
+have been updated. 
+\end{itemize}
+
+
+\section{BUGS FIXED}
+
+\subsection{ICL}
+\begin{itemize}
+\item The CHECKTASK command has been modified.
+If task does not exist but is present in ICL's internal tables
+then the entry in the tables is now removed. 
+This prevents confusion when a task crashes. 
+Checktask used to find the task wasn't there, but issuing LOADW
+would return with an error `Task already loaded'.\\
+(ICLADAM.PAS)
+\item A bug in the ELEMENT function has been fixed.
+The last element in a list was being truncated
+by one character if it wasn't terminated by the delimiter.\\
+(ICLFUNC.PAS)
+\end{itemize}
+
+\subsection{Parameter System (SUBPAR)}
+
+A number bugs which prevented correct interpretation of object names in some
+cases, particularly where the top level object name was omitted or was an 
+array, have been corrected.\\
+(SUBPAR\_\-SPLIT, CREAT, DELET, HDS\-OPEN)
+
+\subsection{STRING}
+A bug which caused strings to be split up incorrectly if they contained
+terminators within brackets ({\em e.g.}\ OBJECT(1,1) where `,' is normally
+a terminator), has been fixed.
+This affected parsing of the interface file.\\
+(STRING\_\-ARRCHAR)
+
+\subsection{TASK}
+\label{task}
+A bug which has prevented TASK\_ASKPARAM from working properly since a new
+format for the parameter request message was introduced in ADAM V1.8, has
+been corrected.\\
+(TASK\_ASKPARAM)
+
+
+\section{CLEANUP}
+The STRING library is being considered for removal. It seems appropriate that
+its general purpose functions should be transferred to portable code in the
+CHR library and other more specific functions be incorporated into other
+ADAM system packages.
+\end{document}

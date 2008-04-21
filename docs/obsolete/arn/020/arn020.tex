@@ -1,0 +1,473 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {ADAM Release Note}
+\newcommand{\stardocinitials}  {ARN}
+\newcommand{\stardocnumber}    {20.0}
+\newcommand{\stardocauthors}   {A J Chipperfield}
+\newcommand{\stardocdate}      {22nd October 1991}
+\newcommand{\stardoctitle}     {ADAM --- Release 2.0}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\font\tt=CMTT10 scaled 1095
+\renewcommand{\_}{{\tt\char'137}}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+  \setlength{\parskip}{0mm}
+  \tableofcontents
+  \setlength{\parskip}{\medskipamount}
+  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{SUMMARY}
+This is a `complete' release of ADAM. 
+Its main features are Version 2 of the inter-task message system (based on the
+Message System Primitive Routines, MSP) and Version 2 of the task fixed-part
+which introduces the concept of an Instrumentation Task to supercede D-tasks
+and CD-tasks and goes some way to rationalizing the different task types.
+
+HDS Version 4 is used -- this will produce files which cannot be read by earlier
+versions of HDS (or ADAM).
+
+The parameter system code has been extensively modified, mainly in the
+interests of portability. 
+EMS and the Starlink error conventions are introduced, notably in HDS and the
+parameter system -- this will result in more helpful error messages but may
+also cause extra warning messages if tasks have not obeyed the conventions
+(see Section \ref{ems}).
+
+There are minor enhancements and bug fixes to other facilities.
+
+IT WILL BE NECESSARY TO MODIFY ANY PRIVATE OR SITE-SPECIFIC VERSIONS OF
+SYSLOGNAM.COM
+
+Although it should not be strictly necessary to re-link tasks at this release,
+it has been required in some cases.
+Re-linking is recommended anyway so that full benefit may be obtained from the 
+improved error reporting, and future changes to the fixed-part will be
+incorporated automatically into existing tasks.
+(See Sections \ref{dtask} and \ref{task}.)
+
+The full system requires about 39000 blocks of disk storage and includes a
+mini-system which can be extracted and put up separately. The mini-system
+requires about 13000 blocks and allows tasks to be run and  developed.
+
+\section{INSTALLATION}
+Full installation instructions are given in SSN/44 and the Starlink Software 
+Change Notice.
+
+\section{NEW FEATURES IN THIS RELEASE}
+
+\subsection{DEPENDENCIES}
+There are some additional Starlink Software items required to be installed
+before tasks may be run.
+They are:
+\begin{itemize}
+\item HDS -- (see Section \ref{hds})
+\item EMS -- (see Section \ref{ems})
+\item CHR -- (see Section \ref{chr})
+\end{itemize}
+
+
+\subsection{DTASK}
+\label{dtask}
+\begin{itemize}
+\item Extensive changes to the DTASK library have been made to implement the 
+Version 2 task fixed-part based on William Lupton's ADAMSYS system and further
+developed at ROE.
+
+The new fixed part is described in SUN/134.
+\item The DTASK library is now linked into tasks using a shareable image,
+DTASK\_IMAGE\_ADAM.
+\end{itemize}
+
+\subsection{TASK}
+\label{task}
+\begin{itemize}
+\item Extensive changes to the TASK library have been made to implement the 
+Version 2 task fixed-part.
+See SUN/134.
+\item The TASK library is now linked into tasks using the shareable image
+DTASK\_IMAGE\_ADAM. References to the object library must be removed from
+link commands.
+\end{itemize}
+
+\subsection{The Message System}
+The Version 2 Message System based on MSP is now used.
+Version 1 is not distributed.
+Some changes have been made to support the new fixed part and rationalize the
+system as follows:
+\begin{itemize}
+\item A `TRIGGER' facility has been added. (MESSYS\_ERR and MESSYS\_REPLY)
+\item A new routine is provided to signal reschedule messages to the mainline
+code. (MESSYS\_RESMSG)
+\item A new routine is provided to signal an ASTINT event to the mainline
+code.( MESSYS\_ASTMSG)
+\item Multiple (up to four) different networks may be used. They are accessed
+by using \verb%^^%, \verb%!!% or \verb%##% in place of the \verb%::% which 
+causes MESSYS to route messages via ADAMNET. 
+The alternatives access processes ADAMNET\_2, ADAMNET\_3 and ADAMNET\_4 
+respectively.
+\item MESSYSMSG.* is renamed MESSYS\_ERR.*
+\end{itemize}
+
+\subsection{The Parameter System (SUBPAR)}
+\label{subpar}
+Extensive changes have been made to the parameter system, mainly in the
+interests of portability and improving error reporting to conform with SUN/104
+and error reporting from HDS.
+Exceptions to this at the moment are the the SUBPAR\_DEF routines.
+\begin{itemize}
+\item Calls to VMS run time library routines have been replaced as far as
+possible - mainly by CHR routines.
+\item Operations which are by their nature system-dependent have been
+separated into a new library SUBPARZ which will need to be implemented for
+different machines.
+\item A further library SUBPARO has been created to hold routines which appear
+only to be needed because they are referred to in the ADAMSHARE transfer
+vector.
+\item Type conversion for data read from or written to HDS objects is now
+handled by HDS itself.
+This will allow some conversions which failed before but could also give
+slightly different results.
+\item Better error reports are generated - where the user can be expected to 
+respond, the messages will be prefixed with `SUBPAR:' 
+For more obscure problems, the complete subroutine name will be given.
+\item Interface files in their compiled form of are now run-length encoded.
+This results in smaller files and faster startup times.
+Existing compiled interface files will still be accepted but should be
+re-compiled to gain the benefits.
+\item SUBERR.* is renamed SUBPAR\_ERR.*
+\item Additional error status values are defined to avoid SUBPAR setting status
+values defined by other packages, and in preparation for future developments.
+\end{itemize}
+
+\subsection{The Parameter System (PARSECON)}
+\label{parsecon}
+\begin{itemize}
+\item Calls to VMS run time library routines have been replaced as far as
+possible - mainly by CHR routines.
+\item The new, run-length encoded form of compiled interface file will be
+produced by COMPIFL.
+\item Error reports are prefixed with `PARSECON:'.
+\item PARSERR.* is renamed PARSECON\_ERR.*
+\item An additional status PARSE\_\_BIGVEC has been added to PARSECON\_ERR.
+\item Stricter typing is imposed on values given in the interface file
+(for DEFAULTS {\em etc.}). This may result in failures which did not occur
+before, but is easily corrected.
+\end{itemize}
+
+\subsection{LEX}
+Error reports are now generated. (LEX\_PARSE)
+
+\subsection{MSG, ERR and EMS}
+\label{ems}
+\begin{itemize}
+\item Numerous enhancements have been made to these systems.
+New subroutines have been provided and the behaviour of others, particularly
+the token setting routines, has been changed.
+ERR\_LOAD and ERR\_ELOAD have additional arguments and
+the way in which they and ERR\_REP treat the STATUS argument has also changed.
+For full details, see EMS release notes and SUN/104.2.
+\item EMS is now used extensively by ADAM system routines (notably HDS and
+the parameter system.
+This will result in much-improved error reporting {\em but could result in
+extra warning messages if tasks have not obeyed the Starlink error 
+conventions.}
+In particular, a warning  message will be generated if ERR/EMS\_REP is 
+called with STATUS OK or if some other facility routines are called with
+bad status but no error reported.
+
+If such message appear to come from the ADAM code, they should be reported
+as bugs.
+\item The EMG\_IMAGE\_ADAM (EMS) shareable image released as part of the 
+Starlink EMS software item is now used by ADAM. 
+Updates to EMS will therefore be included automatically in ADAM tasks. 
+However, MSG and ERR still form part of the ADAMSHARE shareable image as they 
+require the parameter system.
+\end{itemize}
+
+\subsection{HDS}
+\begin{itemize}
+\item The HDS\_IMAGE\_ADAM shareable image released as part of the Starlink HDS
+software item is now used. Updates will therefore be included automatically
+in ADAM tasks but files produced cannot be read by earlier versions of HDS
+such as that incorporated into the ADAMSHARE shareable image for ADAM V1.
+\item The DATPAR routines (DAT\_ASSOC) {\em etc.} still form part of the
+ADAMSHARE shareable image as they require the parameter system.
+\item The DAT\_ERx routines have been removed from the DATPAR library as they
+are now included in the HDS kernel.
+\item HDS now produces error reports and does checks which may result in 
+changed behaviour of tasks which have not obeyed the Starlink error conventions
+(See SUN/104).
+\end{itemize}
+
+\subsection{CHR}
+\label{chr}
+The CHR\_IMAGE\_ADAM shareable image released as part of the Starlink CHR
+software item is now used. Updates will therefore be included automatically
+in ADAM tasks.
+
+\subsection{Other Procedures Etc.}
+\begin{description}
+
+\item[SYSLOGNAM.COM/.MINI]
+The logical name DTASK\_IMAGE\_ADAM is now defined.
+
+MODIFIED VERSIONS OF THESE FILES WILL NEED UPDATING.
+
+\item[ADAMSTART.COM] is modified to:
+\begin{itemize}
+\item Display the latest ADAM version number.
+\item Define the symbol LISTLOG to run the ICL log listing program.
+\end{itemize}
+
+\item[ADAMDEV.COM and SYSDEV.COM] Numerous changes have been made to:
+\begin{itemize}
+\item Use F\_DIR instead of D\_DIR.
+\item Define symbols for the new task linking procedures.
+\item Remove definition of DCAMLINK and CL\_MLINK.
+\item Reflect the use by ADAM of separate Starlink software releases of HDS,
+MSG/ERR/EMS and CHR.
+\end{itemize}
+
+\item[APPLOG.COM and LOGICAL.COM] Numerous changes have been made, mainly to 
+reflect the use by ADAM of separate Starlink software releases of HDS, 
+MSG/ERR/EMS and CHR.
+
+\item[ADAMSHARE]
+ADAMSHARE.COM and ADAMSHARE.MAR are altered to reflect:
+\begin{itemize}
+\item An increased minor id
+\item Shareable images for HDS, EMS, MSP and CHR
+\item The name changes to various directories and object (error message)
+files.
+\item VAXCRTL/LIB (shareable now included with EMS).
+\end{itemize}
+
+\item[LINKNOSHR.OPT]
+The options file used for linking tasks `non-shareable' has been changed in
+line with ADAMSHARE.COM
+
+\item[Task Linking Procedures]
+\label{links}
+All task linking is now done by a common procedure, TASK\_LINK, called
+via procedures with the familiar names and invocations:
+\begin{itemize}
+\item \begin{description}
+\item[ALINK] Links an A-task (or C-task)
+\item[MLINK] Links an A-task monolith.
+\item[ICLMLINK] Links an ICL shareable monolith.
+\item[ILINK] Links an I(Instrumentation)-task
+\item[DLINK] Links an old-style D-task
+\item[CDLINK] Links an old-style CD-task
+\end{description}
+For example:
+\begin{quote} \begin{verbatim}
+$ ALINK TEST /DEBUG
+\end{verbatim} \end{quote}
+Will link the A-task TEST in debug mode.
+\item The `NOSHR' procedures are withdrawn.
+To link a task with the ADAM object libraries rather than shared images, 
+add a third parameter `*' to the appropriate link procedure invocation.
+For example:
+\begin{quote} \begin{verbatim}
+$ ALINK TEST /NODEBUG *
+\end{verbatim} \end{quote}
+Notes:
+\begin{enumerate}
+\item The second parameter must be present. /NODEBUG may be used if nothing
+else is required.
+\item Object libraries will not be used for HDS, EMS or CHR.
+\end{enumerate}
+\item DCAMLINK and CL\_MLINK have been withdrawn.
+\end{itemize}
+\end{description}
+
+\subsection{HDS}
+\label{hds}
+ADAM tasks are now linked with the ADAM version of the HDS shareable image
+which forms part of the standard Starlink HDS release.
+
+\subsection{ICL}
+\begin{itemize}
+\item ICL Version 1.5-6 is released - the login banner has been changed
+appropriately. (LOGIN.ICL, ADAMLOGIN.ICL)
+\item Modifications were required because of the new error reporting strategy
+in HDS. (ICLMAIN, ICLEXT)
+\item The Guide has been updated and released as SG/4. It has been removed
+from the ADAM directories. (ICL.TEX)
+\item See also Section \ref{sms} -- change to ICL\_DIR:SMSLINK and Section 
+\ref{links} (ICLMLINK, MAIN.FOR)
+\end{itemize}
+
+\subsection{SMS}
+\label{sms}
+\begin{itemize}
+\item The length of an expression allowed in the `from adamcl' option of a 
+switch entry has been increased from 32 to 80 characters.
+\item The procedure for linking ICLSMS has been modified to include the option
+ISD\_MAX=200 to avoid a very large image being produced.
+\end{itemize}
+
+\subsection{Directory Structure}
+\begin{itemize}
+\item The AFIX and DFIX directories are deleted.
+The DTASK library and task linking procedures {\em etc.} are now held in
+DTASK\_DIR.
+Those files in DTASK\_DIR which are required for task linking are copied into
+a directory, FIX\_DIR, in the mini-release portion of the structure.
+The link procedures are accessed via a logical name F\_DIR.
+On obeying ADAM\_DEV, F\_DIR is set to FIX\_DIR; on obeying SYSDEV, F\_DIR is
+set to DTASK\_DIR.
+\item The directory containing MESSYS is now pointed at by logical name 
+MESSYS\_DIR rather than MES\_DIR.
+\end{itemize}
+
+\subsection{Documentation}
+\label{docs}
+\begin{itemize}
+\item SSN/45 and ARN/20 describe ADAM release 2.0
+\item The following applicable Starlink documents have been released:
+\begin{itemize}
+\item SUN/134 ADAM -- Guide to Writing Instrumentation Tasks.
+\item SUN/77 NBS -- The Noticeboard System (As Version Feb. 1990)
+\item SG/5 ICL -- Interactive Command Language for ADAM (Revised version of
+ICL -- The New ADAM Command Language Users Guide)
+\end{itemize}
+\item The following applicable Starlink documents have been updated.
+\begin{itemize}
+\item SSN/44 ADAM -- Installation Guide.
+\item SUN/104 MSG and ERR -- Message and Error Reporting Systems.
+\item SSN/4 EMS -- Error Message Service.
+\item SUN/92 HDS -- Hierarchical Data System.
+\end{itemize}
+\item The following documents have been withdrawn:
+\begin{itemize}
+\item AED/1 How to write a D-task
+\item AED/2 Fast monitoring and screen updates
+\item AED/6 C Tasks with Actions -- C(d) Tasks
+\item AED/9 Fast monitoring (noticeboard) and data transfer between tasks
+\item AED/11 How to write a C-task
+\item SSN/27 HDS -- Hierarchical Data System Design and Implementation
+\item ICL -- The New ADAM Command Language Users Guide
+\item NBS -- The Noticeboard System V2.3.1 (Version in NBS\_DIR)
+\item MSP -- Message System primitive Routines (Version in MSP\_DIR)
+\end{itemize}
+
+\item The summaries, ADAM\_DOCS:0CONTENTS.LIS, FULLDOCS.LIS and NEWDOCS.LIS,
+have been updated. 
+\end{itemize}
+
+
+\section{BUGS FIXED}
+
+\subsection{MSP}
+\begin{itemize}
+\item A bug which caused ASTs to be occasionally re-enabled when they
+shouldn't have been, has been fixed. (MSP\_SEND\_MESSAGE)
+\item A bug which caused a failure to re-enable ASTs under the `deleted queue'
+error condition, has been fixed. (MSP\_SEND\_MESSAGE)
+\item A bug which caused problems with short task names, has been fixed.
+(MSPFOR.FOR)
+\end{itemize}
+
+\subsection{LEX}
+Some unused declarations have been removed. (LEX\_CMDSET)
+
+\subsection{ANT}
+In the event of a failure to forward a net GSOC start message, NET\_OUT\_TYPE
+is now set to C\_NET\_GSOC\_END\_OUT. (ANT\_FORWARD\_START\_IN)
+
+\subsection{PAR}
+References to SAI\_PAR have been replace by SAE\_PAR.
+(PAR\_GET0.GEN)
+
+\subsection{ADAM\_DEV}
+NOLOG is added to the DEFINE commands for ADAM\$\_INITIALIZED and
+ADAM\$\_INITDONE.
+
+\subsection{UFACE}
+The maximum size of the executable image name is increase from 63 to 120
+characters for ICL and SMS. (UFACE\_LOAD, UFACE\_LOADD)
+
+\subsection{MAG/MIO}
+A bug which caused corruption of the byte count returned on reading and writing
+blocks greater than 32K bytes in length, has been corrected.
+(MIO\_BREAD, MIO\_BWRIT)
+
+\section{CLEANUP}
+\begin{description}
+\item[TRACE] The obsolete version of TRACE, which was temporarily retained in 
+the ADAM directories after TRACE was issued as a separate Starlink software 
+item, has been removed.
+\item[MBLOGNAM.COM]
+This procedure which was used for inter-job communication using the Version 1
+message system, has been deleted. {\em This may require changes to system setup
+procedures.}
+\item[LIB\_DIR] The following sub-directories of LIB\_DIR have been removed.
+\begin{itemize}
+\item MESSYSV2 and NEWSHARE -- they are no longer relevant
+\item BDKTEST -- an early architecture trial
+\end{itemize}
+\item[Documents] Source of documents which are now issued as Starlink 
+documents has been removed from ICLDIR, NBS\_DIR and MSP\_DIR.
+They may now be found in the Starlink DOCSDIR directory.
+\end{description}
+
+\section{PROPOSED DEVELOPMENTS}
+\subsection{Parameter System}
+It is intended that another ADAM release will be made in the near future to
+include a number of improvements to the parameter system, notably:
+\begin{itemize}
+\item The ability to specify MIN or MAX as a parameter value, in which case
+the system will take a specified minimum or maximum value.
+\item The ability to respond to a parameter prompt with `\verb%\%', in which 
+case the suggested value will automatically be taken for the current, and any 
+remaining, parameters for which a prompt would be issued.
+\item The ability to specify the null value `!' on the command line.
+\item PAR routines with the functionality of the AIF routines which have been
+used by several packages but never officially released for use.
+\item Automatic creation of the GLOBAL parameter file if it does not exist.
+\end{itemize}
+
+\subsection{STRING}
+The STRING library is being considered for removal. It seems appropriate that
+its general purpose functions should be transferred to portable code in the
+CHR library and other more specific functions be incorporated into other
+ADAM system packages.
+\end{document}

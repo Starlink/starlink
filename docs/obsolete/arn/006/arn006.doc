@@ -1,0 +1,481 @@
+                                                                 
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      ARN/6.1
+ROYAL OBSERVATORY EDINBURGH 
+and UNIVERSITY OF EDINBURGH 
+
+ADAM Project                                                Issued by
+ADAM Release Note 6.1 
+
+                                                         Dennis Kelly
+                                                           24.04.1985
+
+---------------------------------------------------------------------
+
+                      ADAM Software Release 0.7                       _________________________ 
+
+
+
+
+
+
+
+1. SUMMARY 
+
+
+This is a major release (via magtape) and is rather  large  (21  Mb).
+The reason for this is that it includes the graphics packages as well
+as the full system and a number of application programs. 
+
+Any  local  application  programs  need  re-linking.   Any   compiled
+interface files need recompiling. 
+
+The SYSTEM logical names (formerly GROUP) have  been  collected  into
+[ADAM.COM]SYSLOGNAM.COM.  It  is  suggested that a command to execute
+this file (after editing the directory names) should be put into  the
+VMS startup. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 ARN/6.1                           2                           ARN/6.1
+
+
+
+
+
+
+2. CONTENTS 
+
+
+          3. INTRODUCTION 
+          4. NEW FEATURES IN THIS RELEASE 
+              4.1 Organisation 
+              4.2 Linking 
+              4.3 Parameter System 
+              4.4 Monitor System 
+              4.5 SMS 
+              4.6 The CMP_ package 
+              4.7 Cancelling D-task actions 
+              4.8 Graphics 
+              4.9 ADAMCL 
+          5. STILL MISSING FROM THIS RELEASE 
+          6. BUGS FIXED FROM PREVIOUS RELEASE 
+          7. KNOWN BUGS 
+
+
+
+3. INTRODUCTION 
+
+
+The overall ADAM directory structure is the same as that  in  release
+0.0;  for  details refer to ARN/2.  Further logical names and symbols
+have been added. 
+
+Note that in this, as in all releases, the  logical  name  "ADAM_DIR"
+must  be set up correctly in the "DEVLOGIN.COM" file in the top level
+directory;  all sub-directories are defined relative to this one. 
+
+
+
+
+4. NEW FEATURES IN THIS RELEASE 
+
+
+
+
+4.1 Organisation     ____________ 
+
+The release consists of a BACKUP save set on magtape. The command  to
+generate it was : $ BACKUP [ADAM...]*.*;* MT:VER07.BCK 
+
+
+
+4.2 Linking     _______ 
+
+The commands ALINK, DLINK and GLINK are used to  produce  A-  and  D-
+tasks and A-tasks which do graphics linked with the shareable image. 
+
+
+
+                                                                 ARN/6.1                           3                           ARN/6.1
+
+
+
+4.3 Parameter System     ________________ 
+
+The routines PAR_CANCL and DAT_DELET have  been  added.  This  should
+complete  the  set  of  PAR and DAT routines in the Starlink standard
+which have a parameter name as  the  first  argument.  An  additional
+routine, not part of the Starlink standard, called DAT_UPDAT has been
+added to assist with multitasking. 
+
+VPATH 'CURRENT' has now been implemented.  It  causes  the  parameter
+system  to  pick up the value that the parameter had the last time an
+A-task was run.  The  implementation  is  incomplete,  in  two  ways.
+Firstly, it only works for scalar values, not HDS names. Secondly, it
+ought to give the value that the parameter  had  the  last  time  the
+A-task was SUCCESSFULLY run. 
+
+
+4.4 Monitor System     ______________ 
+
+The subroutines for accessing parameters  in  the  monitoring  system
+(MON_)  are  now  included  when  the ADAM linking commands are used.
+However they are not actually part of the ADAMSHARE  shareable  image
+because  different  tasks need write access to a global section (this
+can only be done if the image is installed). 
+
+The calling procedure for MON_PUT1, MON_GET1, MONI_PUT1 and MONI_GET1
+has  been  modified  so that they appear more like PAR_GET1R etc. The
+calls are described in AED/2.3 
+
+The following system logical name is needed by the Monitor system: 
+
+$   define/system cam_dir sys$sysdevice:[adam.lib.camac] 
+
+
+4.5 SMS     ___ 
+
+
+
+   4.5.1 Bug fixes 
+
+   It used to be the case that switch/parameter fields  had  to  have
+   the longest line of switch alternatives at the bottom of the list,
+   else longer lines higher in the list were not displayed  properly.
+   This has been fixed. 
+
+
+   4.5.2 Changes and additions 
+
+   SMS now displays a welcome page on startup to  distract  the  user
+   whilst it compiles the control tables. 
+
+   The 'nobox' format for menus has been added, i.e.  "format  nobox"
+   will give menus displayed without a box around them. 
+
+
+
+
+                                                                 ARN/6.1                           4                           ARN/6.1
+
+
+
+   Switch/parameter value  substitution  in  action  lines  has  been
+   added; the syntax for this is a little verbose, but needs to avoid
+   any possible character combinations in ADAM command  language,  as
+   ultimately the SMS will use the ADAMCL parser.  An example is 
+
+   SEND DTASK SET IMAGE <<parms_entry:imagename>> 
+
+   where "parms_entry" is the name of a switch/parameter field in the
+   table,  and  "imagename"  is  the name of a switch or parameter in
+   that field. 
+
+   For trivial examples see SMS_DIR:LOADTEST.SCT 
+
+   To run SMS it is necessary  to  define  a  logical  name  SMSTABLE
+   pointing at the screen control table, then type the command SMS. 
+
+
+4.6 The CMP_ package     ________________ 
+
+The SSE CMP_ package has now been incorporated in  ADAM.  This  is  a
+subroutine library for simplifying the coding of some HDS operations.
+For example, 
+      CALL CMP_GET0R ( LOC, NAME, VALUE, STATUS ) 
+gets the REAL scalar value from the HDS component NAME below the  HDS
+component with locator LOC. It is, therefore, equivalent to 
+      CALL DAT_FIND ( LOC, NAME, TEMPLOC, STATUS ) 
+      CALL DAT_GETR ( TEMPLOC, 0, 0, VALUE, STATUS ) 
+      CALL DAT_ANNUL ( TEMPLOC, STATUS ) 
+The specification of the CMP_ routines is to be found in the Starlink
+SSE directories in CMPMAN.DOC. 
+
+
+4.7 Cancelling D-task actions     _________________________ 
+
+When a D-task receives a message instructing it to CANCEL an  action,
+then,   if   the   CANCEL   is   successful,   the  D-task  sends  an
+acknowledgement to the task which issued  the  CANCEL.  It  now  also
+sends  a  message to the task which issued the original OBEY if it is
+different from the the cancelling task.  This  allows  the  following
+abort mechanism to work. 
+
+Suppose there is a D-task called MEASURE which has an  action  called
+INTEGRATE.  INTEGRATE causes an instrument to start a measurement and
+reschedules itself to wait for the completion. 
+
+Suppose there is a C-task called OBSERVE which sends  OBEY  INTEGRATE
+to MEASURE. 
+
+Suppose there is a command language procedure called ISTOP which is 
+
+   PROC ISTOP 
+      SEND MEASURE CANCEL INTEGRATE 
+   END PROC 
+
+
+
+                                                                 ARN/6.1                           5                           ARN/6.1
+
+
+
+Now suppose OBSERVE has executed SEND MEASURE OBEY INTEGRATE  and  is
+awaiting  the  final  acknowledgement  from MEASURE. While measure is
+rescheduled, the observer types the command ISTOP. 
+
+MEASURE cancels INTEGRATE, and OBSERVE receives the  DTASK__ACTCANCEL
+status.  This  means that OBSERVE can now perform tidying operations,
+such as asking the observer what to do next. 
+
+
+4.8 Graphics     ________ 
+
+The graphics libraries GKS, SGS and  DIAGRAM  are  included  in  this
+release. For linking, they are provided as a graphics shareable image
+ADAMGRAPH, and a command GLINK is provided  which  is  equivalent  to
+ALINK  but  includes  the graphics. The graphics routines can be used
+'stand alone' for opening and closing graphics devices, or  this  can
+be done via the parameter system. 
+
+For example 
+
+      CALL GKS_ASSOC ( 'JUNK', 'WRITE', WKID, STATUS ) 
+
+where 'JUNK' is declared in the interface file, will cause  the  user
+to be prompted for the graphics device to be used. He may reply 
+
+JUNK > T4010 
+
+with no surrounding quotes, and GKS_ASSOC will open  the  workstation
+and  return  a  workstation  identifier  (WKID)  which can be used in
+further GKS calls. 
+
+See GKSMAN.DOC in the Starlink SSE directories. 
+
+Installing  the  graphics  involves  having  a  SYSTEM  logical  name
+pointing  at  the GKS workstation description table. It also involves
+having logical names for any specific devices, for example 
+
+$  assign/system sys$sysdevice:[adam.lib.gks]adamwdt.dat 
+$  assign/system __txa7: GKS_19_1 
+
+The first assignment is always necessary if GKS is to  be  used.  The
+second  is  relevant  when one wants to plot somewhere other than the
+user's terminal. 
+
+It is also necessary, if one wants to use GKS_ASSOC and reply to  the
+prompt  with  names  such  as  SIGMA  or  T4010  to  set  up  an ADAM
+specification of the graphics device. This is done by 
+
+$   SET DEF GKS_DIR 
+$   ADAMCL 
+ADAMCL:> LOAD CRPDEV 
+ADAMCL:> DEFINE CRPDEV CRPDEV 
+ADAMCL:> CRPDEV 'SIGMA' 'GKS_19_1' 19 1 
+
+
+
+                                                                 ARN/6.1                           6                           ARN/6.1
+
+
+
+ADAMCL:> CRPDEV 'T4010' 'GKS_2_0' 2 0 
+
+and so on for any further specific devices. CRPDEV  simply  load  the
+given   definitions   into   the  HDS  structure  with  logical  name
+DEVDATASET. 
+
+The GKS numbers (19,1) specify the type of the  physical  device  and
+which  individual  device is meant. If the second number is zero, the
+device is the terminal the user is sitting at. Therefore (2,0)  means
+device type 2 (a Tektronix), and the one where the user is logged-in.
+
+
+4.9 ADAMCL     ______ 
+
+The SEND command now interprets  ADAMCL  variables  and  expressions.
+This carries over to commands created using DEFINE. For example 
+
+ADAMCL:> DEFINE TRACE TRACE 
+ADAMCL:> DECLARE JUNK CHAR 80 
+ADAMCL:> JUNK = "ADAM_USER:LS" 
+ADAMCL:> TRACE JUNK 
+
+will cause SEND TRACE OBEY RUN ADAM_USER:LS to happen. 
+
+Furthermore, 
+
+ADAMCL:> JUNK = "TRACE OBEY RUN ADAM_USER:LS" 
+ADAMCL:> SEND JUNK 
+
+will have the same result. 
+
+
+
+5. STILL MISSING FROM THIS RELEASE 
+
+
+The following list is not complete but indicates  major  areas  where
+some action might be expected soon. 
+
+Major items missing: 
+Networking 
+Data analysis mode 
+
+
+
+
+6. BUGS FIXED FROM PREVIOUS RELEASE 
+
+
+(1) CALL ADAM_SEND in a C-task used to return as soon as it  received
+a  message  from another task, rather than insisting on receiving the
+acknowledgement to the message just sent. 
+
+
+
+
+                                                                 ARN/6.1                           7                           ARN/6.1
+
+
+
+(2) DAT_CREAT followed by DAT_ASSOC in an A-task used  to  result  in
+the user being prompted twice for the HDS name. 
+
+(3) Prompting from  A-tasks  sometimes  used  to  send  non-printable
+characters to the terminal. 
+
+(4) If two people log into two terminals under the same username, one
+of  them  gets  the  process name _TXA7: (or something similar). This
+used to result in tasks crashing when they tried to talk to him. 
+
+(5) If an A-task parameter got into  an  error  condition,  it  would
+remain in that condition until the A-task was killed. 
+
+(6) A default 1-D array of values declared in an interface  file  was
+not  accepted  if  it was in brackets. Now the values are accepted if
+they are in brackets and all on a single line (SSE spec.).  An  array
+of  values  without  brackets is still accepted, and can be continued
+over more than one line. Arrays of  greater  dimensionality  are  not
+handled. 
+
+(7) A default 1-D array of values declared in an interface  file  was
+not picked up if the VPATH was 'INTERNAL'. 
+
+(8) A user logged-in to a VMS username which didn't have write access
+to the ADAM directories used to get a CANTOPEN message instead of the
+version number message on starting ADAMCL. 
+
+(9) The ERR_ and MSG_ routines failed to  work  correctly  the  first
+time an A-task was RUN after loading it. 
+
+(10) DAT_CANCL used to fail when its entry status was bad. 
+
+(11) Default logical parameter values were  not  presented  with  the
+correct syntax in A-task prompts. 
+
+(12) "SEND task SET  parameter  value"  didn't  do  type  conversions
+between numbers and quoted character strings. 
+
+(13) An invalid response to a prompt for a parameter just resulted in
+re-prompting rather than an error message followed by re-prompting. 
+
+(14) HDS  names  including  a  subdirectory  specification,  such  as
+[ADAM.USER]LS, weren't handled correctly by the parameter system. 
+
+
+
+7. KNOWN BUGS 
+
+
+These are the most important bugs found that can potentially  produce
+unwanted  effects and may cause confusion.  Please let us know of any
+unusual behaviour of the system ! 
+
+
+
+
+                                                                 ARN/6.1                           8                           ARN/6.1
+
+
+
+(1) At present, any task can have channels open to no  more  than  20
+other tasks simultaneously. 
+
+(2) When the "engineering interface" is started up, it can be  "hung"
+completely by typing something before the prompt appears. (Get out of
+this with ctrl-Y.) 
+
+(3) If the command "SPAWN" is used in the Adam command language,  two
+carriage  returns  are  needed  to  obtain the DCL "$" prompt.  After
+logout  from  the  spawned  subprocess,  the  extra  carriage  return
+reappears as a blank command line. 
+
+(4) If a number of SEND commands are issued within a command language
+loop,  action  stops  after  the first few until a carriage return is
+typed. Sometimes the terminal receives a non-printable  character  at
+this point. 
+
+(5) Incomplete implementation of VPATH 'CURRENT'. See above. 
+
+(6) The RPATH field in the IFL is not yet implemented. 
+
+(7) DIA_ASSOC and DIA_ANNUL appear to work satisfactorily  the  first
+time  an  A-task is run, but give GKS errors the second time the task
+is run. (8) The  CANCEL  context  does  not  always  work  correctly.
+Sometimes  an  action can be reported to have been cancelled, but the
+timer for rescheduling may not be cancelled and the action  re-starts
+when  the  timer  expires. This is a reported bug which we have never
+seen. If no further reports on it are received, we  shall  assume  it
+has gone away. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 

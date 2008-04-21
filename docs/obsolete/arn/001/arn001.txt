@@ -1,0 +1,3 @@
+The first release notes for ADAM can be found in 
+ADAM Design Note 8.1. That documented was duplicated exactly as
+ARN/001.

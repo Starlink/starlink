@@ -1,0 +1,628 @@
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      ARN/13.2
+ROYAL OBSERVATORY EDINBURGH
+and UNIVERSITY OF EDINBURGH
+
+ADAM Project                                                 Issued by
+ADAM Release Note 13.2
+
+                                                      A J Chipperfield
+                                                     12 September 1988
+
+----------------------------------------------------------------------
+
+                          ADAM - Release 1.3
+                          ------------------
+
+
+                                   CONTENTS
+
+
+        1       SUMMARY  . . . . . . . . . . . . . . . . . . . . . . 2
+        2       INSTALLATION . . . . . . . . . . . . . . . . . . . . 2
+        3       NEW FEATURES IN THIS RELEASE . . . . . . . . . . . . 2
+        3.1       Structure And Contents . . . . . . . . . . . . . . 2
+        3.2       Starlink Software  . . . . . . . . . . . . . . . . 3
+        3.3       Software Items Withdrawn . . . . . . . . . . . . . 3
+        3.4       SMS  . . . . . . . . . . . . . . . . . . . . . . . 4
+        3.5       ICL  . . . . . . . . . . . . . . . . . . . . . . . 4
+        3.6       Parameter System . . . . . . . . . . . . . . . . . 4
+        3.7       FIO/RIO  . . . . . . . . . . . . . . . . . . . . . 5
+        3.8       HDS/DAT  . . . . . . . . . . . . . . . . . . . . . 5
+        3.9       Task Loading . . . . . . . . . . . . . . . . . . . 6
+        3.10      Error Messages . . . . . . . . . . . . . . . . . . 6
+        3.11      Documentation  . . . . . . . . . . . . . . . . . . 6
+        3.12      REF  . . . . . . . . . . . . . . . . . . . . . . . 7
+        4       BUGS FIXED FROM PREVIOUS RELEASE . . . . . . . . . . 7
+        4.1       Parameter System . . . . . . . . . . . . . . . . . 7
+        4.2       User Interfaces  . . . . . . . . . . . . . . . . . 8
+        4.3       Miscellaneous  . . . . . . . . . . . . . . . . . . 8
+        5       KNOWN BUGS . . . . . . . . . . . . . . . . . . . . . 9
+
+
+APPENDIX A      ADAM - UPDATE 1 TO VERSION 1.3
+
+        A.1     BUGS FIXED FROM PREVIOUS RELEASE . . . . . . . . . A-1
+        A.1.1     Command Language Startup Procedures  . . . . . . A-1
+        A.1.2     FIO  . . . . . . . . . . . . . . . . . . . . . . A-1
+        A.1.3     Parameter System . . . . . . . . . . . . . . . . A-1
+        A.1.4     Adamcl . . . . . . . . . . . . . . . . . . . . . A-1
+        A.2     DOCUMENTATION  . . . . . . . . . . . . . . . . . . A-2
+        A.3     SYSDEV . . . . . . . . . . . . . . . . . . . . . . A-2
+        A.4     STRUCTURE  . . . . . . . . . . . . . . . . . . . . A-2
+
+
+                                - 1 -
+ARN/13.2                                                        Page 2
+
+
+1  SUMMARY
+
+This release consists mainly of bug corrections and a major tidying up
+exercise.   The  GKS6.2  version of the system has been removed and so
+have items of software distributed separately by Starlink.
+
+The full release requires about  45000  blocks  of  disk  storage  and
+includes  a mini-release which can be extracted and put up separately.
+The mini-release requires about 13000 blocks and allows the system  to
+be run and tasks to be developed and linked.
+
+The FIO/RIO facilities are  officially  released  with  this  version.
+Applications  using  old versions of FIO/RIO should be modified to use
+the official release.
+
+It will not in general be necessary  to  re-link  tasks  to  use  this
+release.
+
+
+
+2  INSTALLATION
+
+Full installation and  testing  instructions  are  given  in  Starlink
+System  Note  SSN/44.   Note  that  these  instructions  have  changed
+considerably with this release and should be followed from scratch.
+
+
+
+3  NEW FEATURES IN THIS RELEASE
+
+3.1  Structure And Contents
+
+In  order  to  save  disk  space  and  to  rationalize  the  directory
+structure, the following things have been done:
+
+  o  ADAM on Starlink is now installed in a top level directory.   The
+     same  directory  tree  may  be used to install either the full or
+     mini release.
+
+  o  The  applications  directory  has  been  removed  from  the  ADAM
+     directory  tree.   This enables the system and applications to be
+     treated separately and one level of the hierarchy to be removed.
+
+  o  Numerous old and temporary files  have  been  deleted.   In  some
+     cases  it  was not clear if the files were being used by anybody.
+     If any files vital to your work have been removed, please  inform
+     RLVAD::AJC.   The  intention is that development work is not done
+     within the ADAM directory structure so that the release  is  kept
+     free from junk.
+
+
+
+
+                                - 2 -
+ARN/13.2                                                        Page 3
+
+
+  o  Libraries have been compressed  and  reduced.   Object  libraries
+     needed for applications development have not been reduced.
+
+  o  GKS6.2 versions, are no longer included.
+
+  o  EXE  files  in  the  mini-release  are  not  duplicated  in   the
+     development levels of the full release.
+
+  o  The ADAMSHARE options file has been replaced by ADAMSHRLIB in all
+     link procedures.
+
+
+
+
+3.2  Starlink Software
+
+To avoid  the  many  problems  associated  with  duplicate  copies  of
+software,  items  which  are  distributed  separately  by Starlink are
+omitted from this release apart from  being  included  in  the  shared
+images.   An exception to this rule is that copies of relevant Fortran
+INCLUDE files will be contained in  ADAM_INC  as  before.   This  will
+enable  ADAM  tasks  to  be developed and run without the necessity to
+install other Starlink software apart from GKS7.2 if graphics is used.
+
+Some items remain to be organized in this  fashion;  notably  ADC  and
+FIO/RIO distributed with SCAR.
+
+The software items used by ADAM but no longer included in the  release
+are:
+
+   GKS7.2
+   SGS
+   HDS
+   DAT
+   CMP
+   ARGSLIB
+   LIBMAINT
+   GENERIC
+
+Note that environment level routines (x_ASSOC, x_CANCL etc.) for these
+packages do still form part of the ADAM release.
+
+
+
+3.3  Software Items Withdrawn
+
+The following items which are not distributed by Starlink are also  no
+longer distributed with ADAM:
+
+   GEN
+   AUTODOC
+
+
+                                - 3 -
+ARN/13.2                                                        Page 4
+
+
+3.4  SMS
+
+
+  o  Output Message Prefix - The taskname  prefix  on  output  may  be
+     switched off.
+
+  o  Prompt - The command language prompt may be altered.
+
+  o  Documentation - An updated version of  AON/4  describes  the  new
+     features.
+
+
+
+
+3.5  ICL
+
+
+  o  ICL - ICL, and the object libraries necessary for linking it, are
+     included in this release.  Not all the source code is included.
+
+  o  Login files - The installation instructions  will  cause  ICL  to
+     obey ICLDIR:LOGIN.ICL on startup unless ADAMSTART has been obeyed
+     in which case ICL will  obey  ICLDIR:ADAMLOGIN.ICL.   The  former
+     will  warn  that ADAM tasks are not available and the latter will
+     define procedures to invoke the major applications packages.
+
+  o  ICL/SMS - A version of SMS using ICL as the command  language  is
+     available.  To invoke it, type:
+
+     $ SMSICL
+
+
+  o  Documentation - The .TEX and .TOC files for "ICL - The  New  ADAM
+     Command Language Users Guide" are included in ICLDIR.
+
+
+
+
+3.6  Parameter System
+
+
+  o  Global ppath - A global parameter value may be used as the prompt
+     value by including 'global' in the ppath specification.
+
+  o  Case Insensitivity - The parameter system is now case-insensitive
+     for  RANGE  and  IN  and  for  the  NOkeyword  form  for  logical
+     parameters on the command line.
+
+  o  Documentation -
+
+
+
+
+                                - 4 -
+ARN/13.2                                                        Page 5
+
+
+      o  AED/3 'Interface Module Reference Manual' has been updated.
+
+      o  APN/6 'The PAR Library' has been updated.  PAR_STATE  is  now
+         documented and the descriptions of all routines improved.
+
+
+  o  Parameter and  Action  Names  -  Any  constant  may  be  a  valid
+     parameter or action name.
+
+  o  Syntax -  The  parameter  system  will  now  distinguish  between
+     directory specifications and arrays.
+
+
+
+
+3.7  FIO/RIO
+
+The FIO and RIO facilities for file IO are included  in  the  release.
+They  are  based on the versions which have been used in SCAR, but the
+subroutine interface has been rationalized so that there is  now  only
+one  subroutine  to  open  files  for  each  facility  package.  APN/9
+describes the package.
+
+The directory structure (with logical names in parentheses) is:
+
+                                    |
+                         [ADAM.LIB.FIO]  (FIO_ENV)
+                          The environment level
+                                    |
+                   ---------------------------------
+                   |                               |
+       [ADAM.LIB.FIO.STD] (FIO_DIR)        [ADAM.LIB.FIO.TEST]
+          The stand-alone level              FIO test program
+
+There is a similar structure for RIO.
+
+
+
+3.8  HDS/DAT
+
+
+  o  DAT_EXIST on protected  files  -  DAT_EXIST  will  now  return  a
+     suitable error if the file exists but is protected.
+
+  o  Documentation  -  APN/8  has   been   withdrawn   as   definitive
+     descriptions of the DAT utility routines are given in SUN/92.
+
+
+
+
+
+
+
+                                - 5 -
+ARN/13.2                                                        Page 6
+
+
+3.9  Task Loading
+
+
+  o  ASTLM - When a task is loaded, it now is given the same ASTLM  as
+     the process running the user interface.
+     Subroutines altered are:
+        UFACE_LOAD
+        UFACE_LOADD
+        UFACE_CHECKQUOT
+
+  o  Insufficient Subprocess Quota -  If  the  user  has  insufficient
+     subprocess  quota  when  attempting  to load a cached task, it is
+     treated like 'cache full'.  I.e.  the task at  the  head  of  the
+     queue is killed.
+     Subroutines altered are:
+        ADAMCL_PUTTASK
+        ADAMCL_OPTLOAD
+        ADAMCL_CACHE   (new subroutine)
+        ADAMCL_PRCCNT  (new subroutine)
+
+
+
+
+3.10  Error Messages
+
+
+  o  Inclusion in shared image - All known error message modules  have
+     been  included in the shared image ADAMSHARE so that they will be
+     readily available for user interfaces as  well  as  tasks.   Link
+     options files have been altered appropriately.
+
+  o  ERRGEN - The ERRGEN utility has been  re-implemented  in  Fortran
+     and now outputs standard F77 code.
+
+
+
+
+3.11  Documentation
+
+This is a list of documents changed or issued for the first time  with
+ADAM version 1.3.
+
+        AED
+
+AED001        How to write a d-task
+AED003        Interface module reference manual
+AED010        The ADAM Logging System
+AED017        The TASK library of routines for task control
+        AON
+
+AON004        Using the ADAM Screen Management System
+AON008        UKIRT Status Display Tasks
+
+                                - 6 -
+ARN/13.2                                                        Page 7
+
+
+        APN
+
+APN006         The PAR Library
+APN008         <withdrawn - superceded by SUN/92>
+APN009         ADAM Programmers' Guide to the FIO/RIO package
+
+        ARN
+
+ARN013         Adam release  1.3
+
+        IDN
+
+IDN021        VISPHOT D-Task (Mechanical Control)
+
+
+
+3.12  REF
+
+The REF facility  for  handling  references  to  HDS  objects  is  not
+included   in  the  shared  image  and  must  therefore  be  installed
+separately if it is to  be  used.   REF  error  messages  are  however
+included in ADAMSHARE and are therefore known to the user interfaces.
+
+REF is described in SUN/31.
+
+
+
+4  BUGS FIXED FROM PREVIOUS RELEASE
+
+4.1  Parameter System
+
+
+  o  Parameter system failing to handle YES and NO for logicals.
+
+  o  SUBPAR_SYNC has RUNFACE defined as INTEGER.
+
+  o  Bug in inner loops of SUBPAR_INCOPYx/OUTCOPYx.
+
+  o  SUBPAR not re-using space for storing dynamic default scalars.
+
+  o  SUBPAR_GET0<T> overwriting error status with OUTRANGE status.
+
+  o  SUBPAR - inconsistent handling of @ at start of names.
+
+  o  MESDEFNS defined for the mini-release.
+
+  o  SUBPAR_CMDLINE should look for 'no' as  well  as  'NO'  preceding
+     keywords.
+
+  o  Tasks crash if trying to create over-long prompt values.
+
+
+
+                                - 7 -
+ARN/13.2                                                        Page 8
+
+
+  o  Slice syntax only  works  if  there  is  a  preceding  ":"  (i.e.
+     JUNK:DATA(3:5) OK, DATA(3:5) fails.
+
+  o  SUBPAR_HDSOPEN Correct case of filename containing array  element
+     information.
+
+
+
+
+4.2  User Interfaces
+
+
+  o  Long command lines crash ADAMCL.
+
+  o  IFL for HDSCREATE in ACL has file declared  as  READ  instead  of
+     WRITE.
+
+  o  Don't prefix ADAMCL output by "- " when SHTASK switched off.
+
+  o  ADAMCL not trapping multiple ctrl-C's correctly.
+
+  o  Stop SMS reporting error at end of batching an  ADAMCL  PRC  file
+     (change ADAMCL_DOIT).
+
+  o  CLV searching too far for '(' following a variable name.
+
+  o  Prevent ADAMCL hang if $LOGOUT or $EOJ issued.
+
+  o  Remove quotes from prompt in ADAMCL ASK- commands.
+
+
+
+
+4.3  Miscellaneous
+
+
+  o  LEXERR included in shared image.
+
+  o  DTASK_OBEYDCL sets STATUS=ADAM__OK  if  bad  status  returned  by
+     SUBPAR_CMDLINE.
+
+  o  In TRACE, the <array of structures> message has a typo.
+
+  o  Make STRING_ARRCHAR accept "?" as normal alphanumeric.
+
+  o  MAGLINK.OPT references MAG_DIR.
+
+  o  ARGSLIB out of date.
+
+  o  Definition of SGS/GKS logicals should refer to _ENV directories.
+
+
+
+                                - 8 -
+ARN/13.2                                                        Page 9
+
+
+  o  Insufficient HDS WFLQUOTA for some purposes.
+
+  o  Increase ERR_SZMSG to 200 characters.
+
+  o  VT_ERASE_PAGE Allow erase from line 24.
+
+  o  VT_PUT_SCREEN Make INFOSTR 132 chars to hold escape sequences.
+
+
+
+
+5  KNOWN BUGS
+
+These are the most important bugs found that can  potentially  produce
+unwanted  effects  and may cause confusion.  Please let us know of any
+unusual behaviour of the system !
+
+  o  At present, any task can have channels open to no  more  than  20
+     other  tasks  simultaneously.  (This is a 'feature' rather than a
+     bug).
+
+  o  If a number of SEND <task> OBEY  commands  are  issued  within  a
+     command  language  loop,  the message system fills with the final
+     acknowledgements.  The cure is to avoid SEND  <task>  OBEY  in  a
+     loop by using OBEYW instead.
+
+  o  The RPATH field in the IFL is not yet implemented.
+
+  o  In Dtasks, array parameters with their  literal  list  of  values
+     defaulted in the IFL must not be put on a NEEDS list.
+
+  o  ADAMCL will hang if $EXIT or $STOP is issued.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 9 -
+
+
+
+
+
+
+
+
+
+
+
+
+                              APPENDIX A
+
+                    ADAM - UPDATE 1 TO VERSION 1.3
+
+
+
+A.1  BUGS FIXED FROM PREVIOUS RELEASE
+
+A.1.1  Command Language Startup Procedures
+
+The command language startup  procedures  GOD.PRC  and  OTHER.PRC  are
+corrected  to  simplify  access to KAPPA.  The date in GOD.PRC is also
+updated to indicate that this release has been implemented.
+
+
+
+A.1.2  FIO
+
+The prologue comments  of  FIO_ASSOC  are  corrected  to  include  the
+argument FORM in the invocation.
+
+
+
+A.1.3  Parameter System
+
+
+  o  A  bug  in  SUBPAR_GETxy  and  SUBPAR_PUTxy  routines  has   been
+     corrected.  The bug caused corruption of HDS locators when a null
+     or abort response was given to a prompt.
+
+  o  The checks in SUBPAR_CHECKNAME have been relaxed to allow  object
+     names of the form "file_specification".
+
+
+
+
+A.1.4  Adamcl
+
+ADAMCL_GETDEF has been corrected to prevent a bug which caused  Adamcl
+commands  such  as  ASKCHOICE  to reject default values given in lower
+case.  ADAMCL, ACL, CLITASK and SMS have been re-linked to include the
+correction.   Any  private  command  language monoliths should also be
+re-linked.
+
+                                - 10 -
+ADAM - UPDATE 1 TO VERSION 1.3                                Page A-2
+
+
+A.2  DOCUMENTATION
+
+
+  o  APN/9 is re-issued to correct the specification of FIO_ASSOC.
+
+  o  SSN/45 and ARN/13 have  been  re-issued  to  include  Appendix  1
+     describing the first update to ADAM version 1.3.  There is also a
+     correction to Section 5, point 5 of the main document.
+
+
+
+
+A.3  SYSDEV
+
+The system development login procedure SYSDEV.COM has been altered  as
+follows:
+
+  o  ADAM_EXE and ADAM_HELP are not re-defined.  They remain  pointing
+     at  the  mini-release  directories  as  .EXE  files are no longer
+     duplicated in other parts of the directory structure.
+
+  o  LIB_DIR:SYMBOL.COM is no longer called to re-define  symbols  for
+     system development.  LIB_DIR:SYMBOL.COM is still provided but can
+     only be used if all the required .EXE files are restored  to  the
+     system source directories.  Symbol EDEN is no longer defined.
+
+  o  Symbols required for application development are defined  as  for
+     ADAMDEV  but  logical  names  A_DIR  and  D_DIR will point to the
+     system source directories.
+
+  o  Logical names for include files will point to the  system  source
+     directories.
+
+  o  Symbols ANOSHR, DNOSHR,  CDNOSHR  and  MNOSHR  are  provided  for
+     linking A, D, C(d) tasks and monoliths with libraries rather than
+     shared images.
+
+
+
+
+A.4  STRUCTURE
+
+
+  o  The SUBPAR library has been re-organized so that  only  the  .GEN
+     versions  of  generic routines are kept in the text library.  The
+     GENERIC feature of LIBMAINT is used to automatically produce  the
+     required  object  modules.   This saves almost 700 blocks of disk
+     space and simplifies updates.
+
+  o  The disk space requirement for the full release of ADAM has  been
+     reduced to about 41100 blocks.
+
+
+                                - 11 -
+

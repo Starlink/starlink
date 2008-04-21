@@ -1,0 +1,361 @@
+.af geroffdir:prelude.grf
+.arna 10.1 "ADAM Software Release 1.0" "Dennis Kelly" 18.04.1986
+.uc `
+.level1 "SUMMARY"
+This is a major release (via magtape) and is rather large (25 Mb).
+The reason for this is that it includes the graphics packages as well as 
+the full system and a number of application programs.
+
+It also includes a mini-release which can be extracted and put up 
+separately. It takes up about 3Mb of disk space, and allows the system 
+to be run and tasks to be developed and linked.
+
+***WARNING
+
+Any local application programs need re-linking and interface files need 
+recompiling. Dtask subroutines which include DTDEFNS need recompiling.
+
+The SYSTEM logical names (formerly GROUP) have been collected into
+[ADAM.COM]SYSLOGNAM.COM. It is suggested that a command to execute this 
+file should be put into the VMS startup following a command to define 
+the SYSTEM logical name ADAM_DIR to point to the top-level ADAM 
+directory.
+.bp
+.level1 "CONTENTS"
+.nf
+.ta 10,15
+	 3. QUOTAS NEEDED TO RUN ADAM
+	 4. UTILITY PROGRAMS RUN FROM DCL
+	 5. NEW FEATURES IN THIS RELEASE
+		5.1 Organisation
+		5.2 Linking
+		5.3 Task Loading
+		5.4 DCL-ATASKS
+		5.5 MON
+		5.6 Logging
+		5.7 HELPSYS
+		5.8 Graphics
+		5.9 Parameter System
+		5.10 SMS
+		5.11 ADAMCL
+		5.12 The minimal system
+		5.13 Status returns from ACT
+	 6. STILL MISSING FROM THIS RELEASE
+	 7. BUGS FIXED FROM PREVIOUS RELEASE
+	 8. KNOWN BUGS
+.fi
+.level1 "QUOTAS NEEDED TO RUN ADAM"
+Typical ADAM quotas are as follows
+
+.nf
+Process Quotas:
+ CPU limit:                      Infinite  Direct I/O limit:       18
+ Buffered I/O byte count quota:     20480  Buffered I/O limit:     18
+ Timer queue entry quota:               9  Open file quota:        28
+ Paging file quota:                 20000  Subprocess quota:       10
+ Default page fault cluster:           32  AST limit:              23
+ Enqueue quota:                        30  Shared file limit:       0
+ Max detached processes:                0  Max active jobs:         0
+.fi
+.level1 "UTILITY PROGRAMS RUN FROM DCL"
+There are a set of DCL commands which have been defined to enable 
+certain utilities to be run from DCL. These are
+
+KILLTASK - kill an ADAM task
+
+COMPIFL - compile an interface module
+
+ADDHELP - put help information into an ADAM help file
+
+HELPDUMP - write the contents of an ADAM help file into a text file
+
+STARTUP - create ADAM_USER:GLOBAL.SDF
+.level1 "NEW FEATURES IN THIS RELEASE"
+.level2 "Organisation"
+The release consists of a BACKUP save set on magtape. The command to 
+generate it was :
+$ BACKUP [ADAM...]*.*;* MT:ADAM10.BCK
+.level2 "Linking"
+The commands ALINK and  DLINK are used to produce A- and D- tasks. MLINK
+links a set of 'A-tasks' into a monolith. DCAMLINK links a Dtask with
+the CAMAC library. CDLINK links a CD-task. DCL_ALINK links an Atask
+which is to run directly at the terminal and is to be started by the DCL
+RUN command. 
+.level2 "Task Loading"
+On being loaded, a task expects to find its IFL or IFC in the same 
+directory as the file containing the execution module. The task first 
+looks for an IFC, and if this is not found, it looks for an IFL.
+.level2 "DCL-Atasks"
+It is now possible to link an A-task into a .EXE which is to be run from 
+DCL rather than from an ADAM user interface. This is valuable for 
+program development, where the typical sequence of operations is EDIT, 
+FORT, LINK, RUN, and for interactive graphics programs where the command 
+terminal is the graphics device.
+.level2 "MON"
+The monitor system has been extensively modified. Its subroutine 
+interface is now organised on 'generic' lines, so that there are 
+routines
+.nf
+MON_GET0<t>
+MON_PUT0<t>
+MON_GET1<t>
+MON_PUT1<t>
+.fi
+where <t> is one of C,D,L,I,R. The maximum size of vector handled has 
+increased considerably to 65536 bytes. See AED9.
+.level2 "Logging"
+A mulititasking logging facility is provided. This is documented in 
+AED10. The ADAM log file produced is an indexed-sequential unformatted 
+file, each record being time-stamped with the VMS system time. Records 
+can be written to the log file by any task without concurrent access 
+problems by using the LOG library. This also provides routines for 
+reading the log file and so producing output as text or for a remote 
+observer.
+
+The LOG facility is not built into the shareable image, so it is 
+necessary to use (for example):
+.nf
+$ ALINK JUNK,LOG_DIR:LOG/LIB,LOCK_DIR:LOCK/LIB
+.fi
+The LOCK library is used by LOG, and is a simple wrap-around for the VMS 
+lock manager.
+.level2 "HELPSYS"
+The ADAM HELPSYS library is described in AED4 and AED5. In summary, 
+subroutines are provided to select a help file and to extract 
+information from it. The help files are HDS files. They are generated 
+from a text source compatible with VMS HELP, but with extra conventions 
+added. The command ADDHELP processes the text source and stores it in 
+HDS. It is suggested that each observing mode or data analysis mode 
+should have its own help file. ADAMCL and SMS provide commands for 
+accessing and displaying the contents of help files.
+.level2 "Graphics"
+The low-level graphics system is still GKS 6.2. Work is proceeding at 
+RAL to provide GKS 7.2 for ADAM. Provision will have to be made for this 
+update in due course.
+
+DIAGRAM has been updated to correspond to the latest Starlink version. 
+This includes a contouring facility.
+
+ARGSLIB has been included, meaning that ADAM tasks can now be used to 
+plot to an ARGS.
+.level2 "Parameter System"
+The routine PAR_PROMT has been implemented. This allows a task to 
+generate the prompt string for a parameter at run time.
+
+The routine DAT_EXIST has been modified so as to allow code such as
+.nf
+      CALL DAT_EXIST ( 'JUNK', 'UPDATE', LOC, STATUS )
+      IF ( STATUS .EQ. PAR__ERROR ) THEN
+         CALL DAT_CREAT ( 'JUNK', 'STRUC', 0, 0, STATUS )
+         CALL DAT_ASSOC ( 'JUNK', 'UPDATE', LOC, STATUS )
+      ENDIF
+.fi
+to behave as one might reasonably expect.
+
+Small (< 6 element) dynamic default vectors set using PAR_DEF1<T> are 
+now shown on the prompt line as a list of values rather than an HDS 
+name. The format for displaying default _REAL values has been improved.
+
+The type 'LITERAL' has been added to the possible standard types 
+declared in the interface file. The parameter system interprets LITERAL 
+parameters as scalar character strings, even if they do not have quotes.
+This implies that one can never give the name of an HDS structure 
+containing the 'true' value of the parameter for a LITERAL parameter.
+.level2 "SMS"
+The Screen Management System has undergone extensive development. 
+.level3 "Screen handling"
+SMS now uses the VMS version 4 SMG routines for terminal handling. This
+results in the following changes which are apparent to the user: 
+.nf
+   - scroll region delimiters are solid rather than dotted lines
+   - screen write and erase operations are generally faster
+.fi
+.level3 "Titles"
+Menu and parameter display titles, if present in the control table, are 
+now displayed in the top left of the display border.  Note that a 
+display is automatically bordered (with the line "box") if a title is 
+added.
+.level3 "Macros"
+The macro display has been changed to take up less space on the screen. 
+The facility for using nested macros has been implemented. This means 
+that when defining a macro, you can use previously defined macros inside 
+the one you are defining by pressing the appropriate numeric keypad key.
+There is a trap to prevent you from using the key you are presently
+defining (this was a bug in the previous version).
+.level3 "SMS exit"
+An "exit" or "quit" from the top-level (or root, depending on which way 
+you look at it) menu causes a check to ask if you really want to exit 
+SMS. This is in response to user requests.
+.level3 "SMS configuration"
+Since SMS is designed to display only one parameter list (or "switch 
+field") at once, it cannot be configured via the "comma" key function 
+whilst displaying a parameter list.  A trap has been added to prevent 
+this happening.
+.level3 "Help system"
+SMS uses the new version of the ADAM help system and can display "full" 
+help;  to do this, press "?" to get the one-line help, and press "?" 
+again to get full help if any is present.  Note that to start up the 
+system, a file "sms_helpfile.ahf" must be present in a directory 
+search path specified by the logical name "adam_help".  By default, this
+is set up to be "[]" (current directory) followed by "[adam.help]".  The
+facility for switching to a different helpfile has also been added as
+part of the SMS configuration parameter list. 
+
+In addition, the keypad "minus" key has been allocated to put the user 
+into an SMS "system help" menu.  This change means that the system part 
+of the control table ("smstable") has been extended, and existing tables 
+need the new version as a replacement.  This new version of the system 
+part exists as the file "sms_dir:smssystab.sct".
+.level3 "Scrolling device"
+The separate scrolling device feature in the previous version has not 
+been implemented yet.  An attempt to set the scroll device to anything 
+other than "TT" in the configuration parameter list will cause scrolling 
+region output not to be displayed.
+.level2 "ADAMCL"
+The ADAMCL manual is to be found in AON001.
+.level3 "CLITASK"
+A 'background' version of ADAMCL called CLITASK now exists. This is 
+loaded as an ADAM task and can be sent commands by
+
+.nf
+Adamcl:> LOADW CLITASK
+Adamcl:> SEND CLITASK OBEY RUN command
+.fi
+
+Where command is any ADAMCL command line. This enables, for example, 
+ADAMCL procedures to be executed without tying-up the terminal.
+.level3 "HELP"
+ADAMCL now uses the ADAM HELP system. On startup, ADAMCL is attached to 
+its own help file, but the HELP @name command allows the selected help 
+file to be changed.
+.level3 "Task caching"
+Task caching has been implemented. This is designed primarily with data 
+analysis in mind and complements the LOADW/KILL method of creating and 
+removing tasks. A task is loaded into the 'cache' automatically whenever 
+ADAMCL attempts to communicate with a task which does not exist. The 
+cache has a fixed size. When the cache is full, the creation of a new 
+cached task causes one of the others to be killed. Tasks loaded using 
+LOADW are non-cached. The command SHOWTASK lists the cached and 
+non-cached tasks currently known to ADAMCL. The command CONTASK switches 
+a task from cached to non-cached or vice-versa. On leaving ADAMCL, all 
+the cached tasks are killed automatically. Non-cached tasks remain.
+.level3 "Reporting"
+The ADAMCL REPORT facility has been changed to use the LOG system. The 
+command REPORT switches default reporting on. This copies all typed-in 
+commands, prompts and output from PRINT to the log file. REPORT ALL 
+records everything, including commands executed inside procedures, 
+output from the HELP commands and echoing of BATCH input. Because the 
+log file is nonprintable, the command REPFILE is provided to translate 
+it into an ordinary text file.
+.level3 "Startup batch files"
+ADAMCL now attempts to read two batch files on first startup. The first 
+is ADAMDIR:GOD.PRC, as before. The second may be assigned to the logical 
+name USER_GOD by the user.
+.level3 " New commands"
+The following new commands have been added to ADAMCL.
+
+   [square brackets means the parameter is optional]
+
+.nf
+? - give help information or switch help files
+?? - give full help on the named item
+COMPARE - compare character strings
+CONCAT - concatenate character strings
+CONTASK - switches a task from cached to non-cached or vice-versa
+ERASE - clears the screen of a VT terminal
+LOADD - load-with-wait a task as a detached process
+LOADDICT - load the ADAMCL dictionary from a file
+REPFILE - copy the ADAM logging file to a text file
+SAVEDICT - save the ADAMCL dictionary to a file
+SHOWTASK - list the known cached/non-cached tasks
+.fi
+.level2 "The minimal system"
+The subdirectories [ADAM.RELEASE...] contain all that is necessary, 
+apart from the shareable images, to run the ADAM system and to develop 
+tasks.
+
+To produce a minimal release
+
+.nf
+$ COPY [ADAM.LIB]ADAMSHARE.EXE [ADAM.RELEASE.EXE]*
+$ COPY [ADAM.LIB]ADAMGRAPH.EXE [ADAM.RELEASE.EXE]*
+.FI
+
+then backup or copy [ADAM.RELEASE...]*.*.
+
+Inspection of the command files in [ADAM.RELEASE] will reveal what is 
+needed to start the system up.
+.level2 "Status returns from ACT"
+The numeric values of ACT__STAGE, ACT__RESCHED, etc. as defined by the 
+DTDEFNS include file have all been changed. This is so that their values 
+can be distinguished from VMS status numbers. It implies that all 
+writers of Dtasks should recompile any routines which include DTDEFNS.
+.level1 "STILL MISSING FROM THIS RELEASE"
+The following list is not complete but indicates major areas where some 
+action might be expected soon.
+
+Major items missing:
+.nf
+Higher-level documentation.
+Networking.
+.fi
+.level1 "BUGS FIXED FROM PREVIOUS RELEASE"
+.level2 "ADAMCL"
+.nf
+Failed to evaluate expressions involving <> or & 
+Functions not working correctly
+Tags on PRINT not working
+LOADDICT failing on long filenames
+$ commands being split if they contain semicolon
+Failing if more than 20 procedure parameters declared in a session
+Failing to interpret error numbers from MON
+.fi
+.level2 "Parameter system"
+.nf
+Failing to open interface file in a "rooted" directory
+Failing to handle elements of HDS structure array
+Failing to handle command-line parameters for monoliths
+NEEDS lists for CD tasks being tested like Dtasks
+Failing to close HDS files on failure to access a component
+.fi
+.level2 "Dtask fixed part"
+.nf
+Trap invalid returns of ADAM__OK from ACT
+Timed reschedule/stage + CANCEL not interacting correctly
+Attempts to CANCEL non-active actions not trapped properly
+Dtask main program signalling errors without reducing severity
+Trap ACT__CANCEL returns from ACT during OBEY
+.fi
+.level2 "Message system"
+.nf
+The PATH and MESSID arguments being corrupted occasionally
+PATH not being checked as valid for SEND operations
+Failed SEND resulting in error being signalled fatally
+Incoming messages occasionally being lost
+.fi
+.level1 "KNOWN BUGS"
+These are the most important bugs found that can potentially produce 
+unwanted effects and may cause confusion.  Please let us know of any 
+unusual behaviour of the system !
+
+(1) At present, any task can have channels open to no more than 
+20 other tasks simultaneously. (This is a 'feature' rather than a bug).
+
+(2) When the "engineering interface" is started up, it can be "hung"
+completely by typing something before the prompt appears. (Get out of
+this with ctrl-Y.) 
+
+(3) If a number of SEND <task> OBEY commands are issued within a command
+language loop, the message system fills with the final acknowledgements.
+The cure is to avoid SEND <task> OBEY in a loop by using OBEYW instead.
+
+(4) Incomplete implementation of VPATH 'CURRENT'. See ARN6.
+
+(5) The RPATH field in the IFL is not yet implemented.
+
+(6) DIA_ASSOC and DIA_ANNUL appear to work satisfactorily the first time 
+an A-task is run, but give GKS errors the second time the task is run.
+(This problem has been solved under GKS 7.2).
+
+(7) In Dtasks, array parameters with their literal list of values 
+defaulted in the IFL must not be put on a NEEDS list.

@@ -1,0 +1,235 @@
+.af geroffdir:prelude.grf
+.arna 7.1 "ADAM Software Release 0.8" "Dennis Kelly" 17.07.1985
+.uc `
+.level1 "SUMMARY"
+This is a major release (via magtape) and is rather large (25 Mb).
+The reason for this is that it includes the graphics packages as well as 
+the full system and a number of application programs.
+
+Any local application programs need re-linking.
+
+The SYSTEM logical names (formerly GROUP) have been collected into 
+[ADAM.COM]SYSLOGNAM.COM. It is suggested that a command to execute this 
+file (after editing the directory names) should be put into the VMS 
+startup.
+.bp
+.level1 "CONTENTS"
+.nf
+.ta 10,15
+	 3. INTRODUCTION
+	 4. NEW FEATURES IN THIS RELEASE
+		4.1 Organisation
+		4.2 Linking
+		4.3 Task Loading
+		4.4 Parameter System
+		4.5 ADAMENG
+		4.6 SMS
+		4.7 ADAMCL
+	 5. STILL MISSING FROM THIS RELEASE
+	 6. BUGS FIXED FROM PREVIOUS RELEASE
+	 7. KNOWN BUGS
+.fi
+.level1 "INTRODUCTION"
+The overall ADAM directory structure is the same as that in release 0.0; 
+for details refer to ARN/2.  Further logical names and symbols have been 
+added.
+
+Note that in this, as in all releases, the logical name "ADAM_DIR" must 
+be set up correctly in the "DEVLOGIN.COM" file in the top level 
+directory;  all sub-directories are defined relative to this one.
+
+.level1 "NEW FEATURES IN THIS RELEASE"
+.level2 "Organisation"
+The release consists of a BACKUP save set on magtape. The command to 
+generate it was :
+$ BACKUP [ADAM...]*.*;* MT:ADAM08.BCK
+
+.level2 "Linking"
+The commands ALINK, DLINK and GLINK are used to produce A- and D- tasks
+and A-tasks which do graphics linked with the shareable image. 
+.level2 "Task Loading"
+On being loaded, a task now expects to find its IFL or IFC in the same 
+directory as the file containing the execution module. The task first 
+looks for an IFC, and if this is not found, it looks for an IFL.
+.level2 "Parameter System"
+DAT_ASSOC, DAT_EXIST and DAT_CREAT now handle the cases where the user 
+has typed an HDS name which includes a component of a structure array.
+.level2 "ADAMENG"
+The engineering interface no longer attempts to spawn a DCL command 
+whenever it receives an unrecognised command. To give a command to DCL 
+the command should be prefixed by a $.
+.level2 "SMS"
+The Screen Management System now displays information messages coming 
+back from tasks in a scrolling region, and also handles prompts for 
+A-task parameters.
+.level2 "ADAMCL"
+The ADAMCL terminal handling has been changed, and now intercepts 
+control-C. If control-C is typed as a 'command', then this is 
+interpreted as ABORT. The user should provide an ADAMCL procedure called 
+ABORT to make use of this facility. If control-C is typed in response to 
+a parameter prompt, then "!!" is returned to the task, causing a 
+PAR__ABORT status. If control-C is typed while OBEYW is being executed, 
+the user escapes back to the command prompt.
+
+The ADAMCL task loading has been changed, so that if the task is not 
+found in the current directory (assuming no directory was specified) 
+then it is looked for in the directory with logical name ADAM_EXE.
+
+The following new commands have been added to ADAMCL.
+
+   [square brackets means the parameter is optional]
+
+ABORT
+
+This does nothing. It is automatically called when ctrl-C is 
+typed. The intention is that the observer should define a procedure 
+called ABORT which responds to ctrl_C.
+
+GET taskname parameter_name [variable_name]
+
+Get the value of the named parameter from the named task and put 
+it into the ADAMCL variable called variable_name. If variable_name is 
+missing from the command, it defaults to parameter_name. If an ADAMCL 
+variable of the correct name does not exist, then if the value got has 
+the syntax of a number, a real variable will be created to store it.
+
+LOADW exename [taskname]
+
+Load the named task and wait for loading to be complete.
+
+SETRA [right_ascension]
+
+Convert HH MM SS.S into a real number and store it in the ADAMCL 
+variable RA_INPUT. If the value is not given on the command line, prompt 
+for it.
+
+SETDEC [declination]
+
+Convert DD MM SS.S into a real number and store it in the ADAMCL 
+variable DEC_INPUT. If the value is not given on the command line, prompt 
+for it.
+
+ASKCHAR variable_name [prompt_string]
+
+Prompt the user for input using the given prompt string. If 
+prompt_string is not specified, use variable_name as the prompt.
+If the user's reply is not inside single quotes, add them. Store the 
+result in the ADAMCL variable variable_name. Note that variable_name 
+must have been previously declared.
+
+ASKNAME variable_name [prompt_string]
+
+As ASKCHAR, but don't add surrounding quotes.
+
+ASKNUM variable_name [prompt_string]
+
+Prompt the user for input using the given prompt string. If 
+prompt_string is not specified, use variable_name as the prompt.
+Interpret the response as a number and store it in the ADAMCL variable 
+variable_name. If the variable hasn't been declared already, it will be 
+created.
+
+ASKDEC variable_name [prompt_string]
+
+Prompt the user for input using the given prompt string. If 
+prompt_string is not specified, use variable_name as the prompt.
+Interpret the response as DD MM SS.S, convert it to a real number and
+store it in the ADAMCL variable variable_name. If the variable hasn't
+been declared already, it will be created.
+
+ASKRA variable_name [prompt_string]
+
+Prompt the user for input using the given prompt string. If 
+prompt_string is not specified, use variable_name as the prompt.
+Interpret the response as HH MM SS.S, convert it to a real number and
+store it in the ADAMCL variable variable_name. If the variable hasn't
+been declared already, it will be created.
+
+OBEYW string
+
+Interpret string as a possible list of ADAMCL variables or 
+expressions. After any relevant translations, interpret the result as
+
+task_name action_name [parameters]
+
+Then perform 
+
+   SEND task_name OBEY action_name parameters
+
+and wait for the final acknowledgement. If parameter requests come from 
+the task, handle them by prompting the user, then return to waiting for 
+the final acknowledgement.
+
+INIT_TIMER
+
+Initialise the VMS timer. This calls the VMS runtime library routine 
+LIB$INIT_TIMER.
+
+SHOW_TIMER
+
+Display the VMS timer. This calls the VMS runtime library routine 
+LIB$SHOW_TIMER.
+
+REPORT
+
+Cause copies of all commands and error messages to be written to a file 
+called <process_name>.REP. The file is a text file and can be TYPED. 
+This also provides a mechanism for retaining a copy of procedures which 
+have been typed directly into ADAMCL.
+
+NOREP
+
+Switches reporting off.
+
+.level1 "STILL MISSING FROM THIS RELEASE"
+The following list is not complete but indicates major areas where some 
+action might be expected soon.
+
+Major items missing:
+.nf
+Networking
+Data analysis mode
+.fi
+
+.level1 "BUGS FIXED FROM PREVIOUS RELEASE"
+(1) The ADAMCL SPAWN command no longer requires an extra carriage 
+return.
+
+(2) Dtask actions 'reinventing' themselves under some circumstances when 
+AST routines or reschedules are involved and the action has either 
+completed or been cancelled, is believed to have been cured.
+
+(3) ADAMCL is no longer liable to hang-up if the user types-ahead while 
+it is starting up.
+
+(4) ADAM_PATH now returns status ok if the path was already open.
+
+(5) A variety of problems with global associations have been fixed. 
+
+(6) It was formerly not possible to do a PAR_GET after having done a 
+PAR_PUT on the same parameter.
+
+(7) In ADAMCL, if a procedure failed because of an error condition, its 
+stack space was not recovered.
+.level1 "KNOWN BUGS"
+These are the most important bugs found that can potentially produce 
+unwanted effects and may cause confusion.  Please let us know of any 
+unusual behaviour of the system !
+
+(1) At present, any task can have channels open to no more than 
+20 other tasks simultaneously.
+
+(2) When the "engineering interface" is started up, it can be "hung"
+completely by typing something before the prompt appears. (Get out of
+this with ctrl-Y.) 
+
+(3) If a number of SEND <task> OBEY commands are issued within a command
+language loop, the message system fills with the final acknowledgements.
+The cure is to avoid SEND <task> OBEY in a loop by using OBEYW instead.
+
+(4) Incomplete implementation of VPATH 'CURRENT'. See ARN6.
+
+(5) The RPATH field in the IFL is not yet implemented.
+
+(6) DIA_ASSOC and DIA_ANNUL appear to work satisfactorily the first time 
+an A-task is run, but give GKS errors the second time the task is run.

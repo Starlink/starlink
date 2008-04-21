@@ -1,0 +1,567 @@
+.af geroffdir:prelude.grf
+.arna 11.1 "ADAM Software Release 1.1" "Dennis Kelly" 15.09.1986
+.uc `
+.level1 "SUMMARY"
+This is a major release (via magtape) and is rather large (25 Mb).
+The reason for this is that it includes the graphics packages as well as 
+the full system and a number of application programs.
+
+It also includes a mini-release which can be extracted and put up 
+separately. It takes up about 4Mb of disk space, and allows the system 
+to be run and tasks to be developed and linked.
+
+*** Warning - the directory structure has been changed significantly to 
+improve the usefulness of the mini-release. For example, ADAM_DIR no 
+longer points to the top directory of the whole system!
+.bp
+.level1 "CONTENTS"
+.nf
+.ta 10,15
+	 3. QUOTAS NEEDED TO RUN ADAM
+	 4. INSTALLATION
+	 5. INSTALLATION TESTING
+	 6. UTILITY PROGRAMS RUN FROM DCL
+	 7. NEW FEATURES IN THIS RELEASE
+		7.1 Organisation
+		7.2 Linking
+		7.3 Running Tasks
+		7.4 User status codes
+		7.5 MESSYS
+		7.6 Logging
+		7.7 HELPSYS
+		7.8 Graphics
+		7.9 Parameter System
+		7.10 SMS
+		7.11 ADAMCL
+		7.12 Magtape handling
+		7.13 System development
+	 8. STILL MISSING FROM THIS RELEASE
+	 9. BUGS FIXED FROM PREVIOUS RELEASE
+	10. KNOWN BUGS
+.fi
+.level1 "QUOTAS NEEDED TO RUN ADAM"
+Typical ADAM quotas are as follows
+
+.nf
+Process Quotas:
+ CPU limit:                      Infinite  Direct I/O limit:       18
+ Buffered I/O byte count quota:     20480  Buffered I/O limit:     18
+ Timer queue entry quota:               9  Open file quota:        28
+ Paging file quota:                 20000  Subprocess quota:       10
+ Default page fault cluster:           32  AST limit:              23
+ Enqueue quota:                        30  Shared file limit:       0
+ Max detached processes:                0  Max active jobs:         0
+.fi
+.level1 "INSTALLATION"
+The release consists of a BACKUP save set on magtape. The command to 
+generate it was :
+
+.nf
+$ BACKUP [ADAM...]*.*;* MT:ADAM11.BCK
+.fi
+
+The tape contains the full system, including all the source code. 
+However, everything necessary for running the system either on a 
+Starlink machine or at an observatory, or for developing ADAM tasks has 
+been collected in the directory tree [ADAM.RELEASE...]. Most sites 
+should only need to backup this subdirectory tree to disk. 
+
+The [ADAM.RELEASE] directory contains the file SYSLOGNAM.RELEASE. This
+should be studied, edited to suit the individual site, and the result
+of the edit written to SYSLOGNAM.COM. 
+
+Arrangements should be made to have SYSLOGNAM.COM executed at VMS boot 
+time.
+
+The global symbol
+
+.nf
+ADAMSTART == @ADAM_DIR:ADAMSTART
+.FI
+
+should be put into the VMS system-wide login file.
+.level1 "INSTALLATION TESTING"
+Login under a user name which should have sufficient privileges and 
+quotas to run ADAM as set up on your machine. There are then two 
+categories of tests which should be tried.
+.level2 "Running ADAM"
+Issue the command ADAMSTART. The command ADAMCL should start-up the ADAM 
+command language. Then
+
+.nf
+Adamcl:> DEFINE TRACE TRACE
+Adamcl:> TRACE ADAM_USER:GLOBAL
+    .
+   a message saying that TRACE is being loaded followed by
+   a listing of the contents of global.sdf should appear
+    .
+Adamcl:> $DIR
+    .
+   the DCL subprocess should be spawned, then a directory listing
+   should appear
+    .
+Adamcl:> EXIT
+    .
+   return to DCL. The two subprocesses should vanish.
+.fi
+.level2 "Program development"
+A reasonably complete test that program development is possible can be 
+carried out by building a command-language monolith.
+After ADAMSTART, execute the DCL command ADAMDEV. Then copy the source 
+of the test monolith into your working directory.
+
+.nf
+$ COPY ADAM_TEST:TESTADAM.* *
+.FI
+
+This will have copied the source and interface file for a monolith 
+called TESTADAM containing the single Atask TESTRUN.
+
+.nf
+$ FORT TESTADAM
+$ CL_MLINK TESTADAM
+$ RUN TESTADAM
+Adamcl:> DEFINE TESTRUN %255
+Adamcl:> TESTRUN
+  TESTRUN successfully executed
+Adamcl:> EXIT
+.fi
+
+Note that TESTADAM.EXE has to be RUN - it is a user interface rather 
+than an ADAM task.
+.level1 "UTILITY PROGRAMS RUN FROM DCL"
+There are a set of DCL commands which have been defined to enable 
+certain utilities to be run from DCL. These are
+
+KILLTASK - kill an ADAM task
+
+COMPIFL - compile an interface module
+
+ADDHELP - put help information into an ADAM help file
+
+HELPDUMP - write the contents of an ADAM help file into a text file
+
+STARTUP - create ADAM_USER:GLOBAL.SDF
+.level1 "NEW FEATURES IN THIS RELEASE"
+.level2 "Linking"
+The commands ALINK and  DLINK are used to produce A- and D- tasks. MLINK
+links a set of 'A-tasks' into a monolith. DCAMLINK links a Dtask with
+the CAMAC library. CDLINK links a CD-task. CL_MLINK produces a version 
+of ADAMCL with an Atask monolith built into it. The resulting execution 
+module can then be started up by the DCL RUN command.
+.level2 "Running Tasks"
+The DCL_ATASK concept has been retired. All Atasks generated with the 
+ALINK command can be run either at the terminal or loaded from an ADAM 
+user interface.
+
+A subroutine DTASK_SETDUMP(STATUS) has been provided. If called from 
+DEVINIT this initialises a mechanism which allows stack dumps of a task 
+to be generated from the user interface. The stack dump appears on the 
+terminal from which the task was loaded. The task continues executing 
+after showing the dump.
+.level2 "User status codes"
+A set of ten status codes called USER__01 to USER__10 have been 
+allocated. These can be accessed by 
+
+.nf
+      INCLUDE 'USER_ERR'
+.fi
+
+These can be used as status values by applications programmers with the 
+knowledge that the values will not coincide with any other ADAM or VMS 
+status numbers.
+
+If, during debugging, LIB$SIGNAL is being used, then linking the task 
+with LIB_DIR:USER.OBJ will cause the USER errors to be signalled 
+successfully.
+.level2 "MESSYS"
+The ADAM intertask communication libraries MESSYS and ADAM have been 
+extensively rewritten following walkthroughs of the source code. This is 
+with a view to improving reliability.
+
+Limited networking capabilities have been added. These are only 
+sufficient to enable some remote observing experiments to be carried 
+out, and only work between DECnetted machines.
+
+To perform networking operations it is necessary to
+
+.nf
+$DEFINE/TABLE = LNM$SYSTEM_DIRECTORY LNM$TEMPORARY_MAILBOX LNM$SYSTEM
+.FI
+
+on both machines. This results in the names of the mailboxes generated 
+being put into the SYSTEM logical name table. It also means that users 
+running ADAM tasks need the necessary privilege.
+
+If a user on machine REVA has loaded TRACE, it is then possible for a 
+user on machine REVS to
+
+.nf
+Adamcl:> OBEYW REVA::TRACE RUN ADAM_USER:GLOBAL
+.FI
+
+and the output of the trace of REVA::ADAM_USER:GLOBAL will appear on the 
+terminal of the user on REVS.
+
+This example assumes that REVA and REVS are DECnetted and are known by 
+those mnemonics.
+
+After the networking experiments it is necessary to restore 
+LNM$TEMPORARY_MAILBOX to allow less privileged users to create 
+mailboxes.
+
+Please note that the networking has not been tested across different 
+machines as yet - it is included in this release to enable such testing.
+.level2 "HELPSYS"
+The task HELPDUMP has been produced. This reads the contents of an ADAM 
+HELP file in HDS format, and outputs a text file suitable for inclusion 
+in a manual.
+.level2 "Graphics"
+The low-level graphics system provided with this release is still 
+GKS6.2. However, ADAM releases for Starlink produced at RAL will include 
+GKS7.2. The intention is that future releases of ADAM from ROE will also 
+use GKS7.2. Please be warned.
+.level2 "Parameter System"
+The space for storing NEEDS lists in the parameter system has been 
+increased.
+
+In response to a parameter system prompt for a number, the reply can now 
+start with a decimal point.
+.level2 "SMS"
+There have been several changes to SMS since the Adam V1.0 release.
+These have mostly been in response to users of the system. The following
+is a summary of changes made; details of these may be found in the file
+"adam_docs:sms.changes". 
+
+In addition to system changes, an initial "user guide" to SMS has been
+written; this is the Adam document "AON4.1" which was issued on 13 June
+1986. The AON4 document has not yet been updated for the Adam V1.1
+release, and should be read in conjunction with these notes and the
+relevant details given in "adam_docs:sms.changes". 
+
+The version of SMS released with Adam V1.1 has the version number (given 
+in the "welcome" message) of "1.0".
+.level3 "Summary of changes"
+text for "PF key" labels may be initialised from the control table
+
+internal limits for the SMS table sizes have been increased; they are
+now:
+.nf
+
+    max. number of menus                         100   (as before)
+    max. number of parameter lists               100   (as before)
+    max. number of actions                       400   (was 100)
+    max. number of list entries (names etc.)    1500   (was 1000)
+.fi
+
+the table compiler now has explicit checks for undefined names and 
+table limits, and produces error messages at table compilation time 
+(SMS startup)
+
+the SMS scroll region is now set up as "permanent" by default;  this
+default can be changed by an entry in the control table. Note that this
+change means that in the parameter list definition "sms_sys_config"
+given in the "system" part of the table, parameter "scroll_region"
+should default to "permanent" not "temporary". 
+
+Trapping of control-C is now enabled in SMS. The effects of this 
+are:
+
+.nf
+any macro is aborted at the present point
+parameter requests are cancelled
+Adamcl is interrupted, and will interrupt procedures
+the message "Cancel" is echoed on the terminal screen; this can be
+removed by typing "ctrl-R" ("refresh") as normal
+.fi
+
+a bug which gave unwanted spurious output remaining on the screen 
+during prompting has been fixed
+
+cursor motion in parameter list "switch" fields has been changed so
+that the cursor "wraps" 
+
+cursor wrap has also been implemented in menus
+
+if no limit has been explicitly stated (see below) for parameter list
+single-valued entries, then the parameter list display can grow in 
+width to accommodate what the user types.  Note that this is not 
+actually displayed until the parameter list is re-pasted.
+
+the macro feature can be disabled by an entry in the system part of
+the SMS table
+
+a bug which limited parameter list values to 15 characters in length
+when substituted in ADAMCL command lines with the "<<name:parm>>"
+mechanism has been fixed.  The SMS system maximum for name lengths (and 
+parameter value lengths) is set up at 60 characters.
+
+a new mechanism allows the maximum length of individual parameter
+values to be (optionally) specified, e.g.
+
+.nf
+	parameter object_name help_key The_Moon
+	  maxchars 25
+.fi
+
+sets up a parameter with initial value "The_Moon" and will not allow
+the user to change this value to anything longer than 25 characters.  
+This can be used in conjunction with the "from" mechanism for
+parameters.
+
+the keypress used to return to the SMS screen after DCL command
+execution is now ignored
+ 
+during prompting, the "current position" of the cursor on a menu or
+parameter list display is marked by a reversed video block when user
+prompting is in progress.  This enables the user to see where he has
+got to in the menu or parameter list. 
+
+"pre_entry" and "pre_exit" actions have been added to menus and 
+parameter lists.  In conjunction with the use of two Adamcl 
+variables, this allows more control over the entry and exit of menu 
+and parameter list displays.
+
+the parameter list "from" mechanism has been extended so that in 
+addition to being to obtain the values of SMS parameters from Adam 
+tasks, the values can be obtained from command language variables, 
+e.g.
+
+.nf
+	parameter myparm help_key 0 [1] 2 3
+	  from adamcl <variable_name>
+.fi
+
+will pick up the value of the Adamcl variable as a character string 
+
+
+Note that the stand-alone table compiler is currently being modified;
+use of this stand-alone version will be documented for future releases. 
+.level2 "ADAMCL"
+The ADAMCL manual is to be found in AON001.
+.level3 "Terminal handling"
+The way the terminal is handled has been changed in the ADAMCL user 
+interface. Input is now handled a line at a time instead of a single 
+character at a time. This change gives improved speed, makes the 
+behaviour of type-ahead more predictable, and allows recall of the last 
+command by using the up-arrow key. The disadvantage is that a half-typed 
+command line is lost if it is interrupted by a request for a parameter 
+value from a task. This condition can never occur anyway if OBEYW or 
+equivalent is being used to drive tasks which prompt.
+.level3 "Control-C"
+Ctrl-C will now interrupt procedure execution.
+.level3 "Formatting of numbers"
+The formatting of numbers displayed by ADAMCL has been improved.
+.level3 "ADAMCL error variable"
+ADAMCL now has a variable called ADAMCL_ERROR. This is set to non-zero 
+(ie logical TRUE) whenever a command terminates with a bad status.
+It is set to zero whenever a command terminates successfully.
+An example of use might be
+
+.nf
+PROC TEST
+   ON ERROR CONTINUE
+   DEFINE TRACE TRACE
+   TRACE ADAM_USER:GLOBAL
+   IF ADAMCL_ERROR
+      PRINT "SOMETHING WENT WRONG"
+      KILLW TRACE
+   END IF
+   ON ERROR RETURN
+END PROC
+.FI
+.level3 "The ACL monolith"
+The CL_MLINK command makes it possible to build an execution module 
+containing the ADAMCL user interface along with an Atask monolith. A 
+trivial example of this is given in the installation test. The Atasks 
+built-in with the command language can be just normal Atasks such as 
+TRACE. However, it also becomes possible to build-in Atasks which use 
+both the ADAM parameter system and the ADAMCL variable store.
+
+A standard command language monolith is provided with the system. This 
+can be activated by the DCL command ACL. When ACL first starts up, it is 
+not aware of its built-in Atasks, and their definitions have to be 
+batched-in.
+
+.nf
+$ ACL
+Adamcl:> BATCH ADAM_EXE:ACL
+.FI
+
+ACL contains the following Atasks.
+
+.nf
+TRACE     - trace a full HDS structure
+LS        - list the given level of an HDS structure
+HDSCREATE - create an HDS structure
+HDSEXIST  - test whether an HDS structure exists
+HDSGET    - get a value from HDS and store in a variable
+HDSPUT    - put a value into HDS from a variable
+HDSDELETE - delete an HDS structure
+.fi
+.level3 "Task loading"
+The defaulting of subprocess names on task loading has been improved.
+For explicit loading, it is now acceptable to
+
+.nf
+Adamcl:> LOADW [BDK.TESTS]DOIT
+.fi
+
+and have the task successfully load into a subprocess called DOIT.
+
+Automatic (cached) loading has been improved similarly.
+
+.nf
+Adamcl:> DEFINE D [BDK.TESTS]DOIT
+Adamcl:> D
+.fi
+
+Results in DOIT being loaded into the subprocess xxxxDOIT.
+.level3 "Large dictionaries"
+The ADAMCL dictionary, which is where procedures and defined commands 
+are stored, has been increased in size to 0.5Mb. As a result, 
+considerable speed improvements have had to be made in compiling and 
+executing large dictionaries.
+.level3 "Reporting"
+The ADAMCL REPORT facility has been changed so that it now writes to the 
+logical name ADAM_LOGFILE. By default, this is set to be 
+ADAM_USER:ADAM.LOG.
+.level3 "Running ADAMCL in BATCH"
+It is possible to submit a job to a VMS batch queue which runs ADAMCL. 
+An example of how to do this is provided in ADAM_TEST:BATCHCL.COM.
+.level3 "Modified commands"
+ASKNUM, ASKCHAR, ASKNAME, ASKRA, ASKDEC now allow default values to be 
+specified in the prompt string. eg.
+
+.nf
+  ASKRA JUNK "give right ascension /30/"
+.fi
+
+ERASE <row> <column> now erases the screen from the given position 
+onwards.
+.level3 " New commands"
+The following new commands have been added to ADAMCL.
+
+.nf
+ADDQUOTES  - add single quotes to string in variable
+ASKCHOICE  - present user with a set of alternatives
+ASKLOG     - prompt for a logical and store in a variable
+BELL       - ring bell N times with M seconds interval
+DUMPTASK   - ask a task to produce a stack dump
+KILLALL    - kill all tasks known to ADAMCL
+KILLW      - kill a task and wait for completion
+REMQUOTES  - remove single quotes from string in variable
+RETURN     - unstack procedures and return to interactive
+SETLOGICAL - DEFINE/JOB a DCL logical name
+SETPROMPT  - set the ADAMCL prompt to a given string
+SHOWVARS   - show currently declared ADAMCL variables
+TASKPRE    - switch taskname display on/off
+TOCHAR     - convert number and store in character variable
+WAIT       - wait for n seconds
+WAITCR     - wait until <CR> typed
+.fi
+.level2 "Magtape handling"
+The SSE libraries for handling magtapes, MAG and MIO, are included in 
+this release. APN/1 describes the MAG library.
+
+To make use of the MAG library it is necessary for the translation 
+between the user names for tape decks and the system names to be stored 
+in the HDS file with logical name DEVDATASET. An example of how to do 
+this follows.
+
+.nf
+logon under a privileged username
+$ ADAMSTART
+$ ADAMDEV
+$ SET DEF ADAM_DIR
+$ RUN ADAM_EXE:TAPECREATE 'MTA0' '_MTA0:'
+.FI
+
+This will add '_MTA0' as a device known to users as MTA0.
+
+The TAPECREATE program is actually an Atask. If a number of device names
+are to be defined, it may be advantageous to drive TAPECREATE from
+ADAMCL and use an ADAMCL procedure. An example can be found in
+ADAM_DIR:DEVICES.PRC. 
+.level2 "System development"
+The top-level of the full ADAM directory structure now should be given 
+the logical name ADAM_SYS. Someone who wishes to work on the ADAM system 
+itself needs to logon with suitable privileges and execute 
+ADAM_SYS:SYSDEV.COM. This sets-up all the symbols and logical names 
+needed.
+
+WARNING - some of the symbols and names are identical with those in
+ADAMSTART/ADAMDEV but point to different directories.
+
+After modifations have been made, the relevant files should be copied 
+into the ADAM_DIR tree.
+.level1 "STILL MISSING FROM THIS RELEASE"
+The following list is not complete but indicates major areas where some 
+action might be expected soon.
+
+Major items missing:
+.nf
+Higher-level documentation.
+ADAMCL variables interpreted in reply to parameter prompts
+Installation of AAO low-level message system
+Relational database (ADC) and file handling (FIO)
+Installation of C version of HDS
+Improved networking.
+.fi
+.level1 "BUGS FIXED FROM PREVIOUS RELEASE"
+.level2 "ADAMCL"
+.nf
+Sometimes hung if a task crashed during OBEYW
+Ctrl-C failed to escape from LOADD and LOADW
+Some commands not logging output
+PRINT not accepting comma as delimiter following variable
+PRINT sometimes going into infinite loop
+.fi
+.level2 "Parameter system"
+.nf
+LITERAL parameters not accepting commas and spaces
+Global associations not working for HDS names
+Getting and putting array parameters sometimes crashing
+Names of elements in structure arrays >1D not handled
+.fi
+.level2 "HELPSYS"
+Selection of help file not working if filename included a directory
+spec. 
+.level2 "LOGGING"
+A user could be kept waiting for another user to complete a logging
+operation even if they were writing to different logfiles.
+.level2 "HDS"
+HDS has been updated to the latest Starlink version. Also a problem in 
+DAT_RCOPY has been traced to the GEN library and fixed.
+.fi
+.level1 "KNOWN BUGS"
+These are the most important bugs found that can potentially produce 
+unwanted effects and may cause confusion.  Please let us know of any 
+unusual behaviour of the system !
+
+(1) At present, any task can have channels open to no more than 
+20 other tasks simultaneously. (This is a 'feature' rather than a bug).
+
+(2) When the "engineering interface" is started up, it can be "hung"
+completely by typing something before the prompt appears. (Get out of
+this with ctrl-Y.) 
+
+(3) If a number of SEND <task> OBEY commands are issued within a command
+language loop, the message system fills with the final acknowledgements.
+The cure is to avoid SEND <task> OBEY in a loop by using OBEYW instead.
+
+(4) Incomplete implementation of VPATH 'CURRENT'. See ARN6.
+
+(5) The RPATH field in the IFL is not yet implemented.
+
+(6) DIA_ASSOC and DIA_ANNUL appear to work satisfactorily the first time 
+an A-task is run, but give GKS errors the second time the task is run.
+(This problem has been solved under GKS 7.2).
+
+(7) In Dtasks, array parameters with their literal list of values 
+defaulted in the IFL must not be put on a NEEDS list.
+
+(8) HDS names specifying an array element are not handled correctly on 
+the command line for a task if the array is more than 1-D. That is, 
+[USER.ADAM]JUNK.DATA_ARRAY(3,5) will fail if used as a command-line 
+parameter, although it CAN be used in response to a prompt.

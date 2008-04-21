@@ -1,0 +1,481 @@
+                                                                 
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      ARN/3.1
+ROYAL OBSERVATORY EDINBURGH 
+and UNIVERSITY OF EDINBURGH 
+
+ADAM Project                                                Issued by
+ADAM Release Note 3.1 
+
+                                             John Cooke, Dennis Kelly
+                                                            21.8.1984
+
+---------------------------------------------------------------------
+
+                      ADAM Software Release 0.1                       _________________________ 
+
+
+
+
+
+
+
+1. SUMMARY 
+
+
+This release is an advance over release 0.0 in that  many  bugs  have
+been fixed and sufficient important changes made to the system that a
+release is worthwhile, even though the parameter system is still  not
+implemented. 
+
+
+
+
+2. CONTENTS 
+
+
+          3. INTRODUCTION 
+          4. NEW FEATURES IN THIS RELEASE 
+               4.1 Organisation 
+               4.2 The 'engineering' user interface 
+               4.3 D-tasks 
+               4.4 System error handling and reporting 
+               4.5 A-tasks 
+               4.6 The RGO Adam command language 
+          5. UPPER/LOWER CASE CONSIDERATIONS 
+          6. STILL MISSING FROM THIS RELEASE 
+          7. KNOWN BUGS 
+          Appendix A: logical names and symbols 
+
+
+
+
+
+
+
+
+
+
+                                                                 ARN/3.1                           2                           ARN/3.1
+
+
+
+3. INTRODUCTION 
+
+
+The overall ADAM directory structure is the same as that  in  release
+0.0;  for  details refer to ARN/2.  Further logical names and symbols
+have been added;  all logical names and symbols are given in appendix
+A. 
+
+Note that in this, as in all releases, the  logical  name  "ADAM_DIR"
+must  be set up correctly in the "DEVLOGIN.COM" file in the top level
+directory;  all sub-directories are defined relative to this one. 
+
+This release contains the whole  of  the  ADAM  directory  structure;
+note  that  there  are  several  undocumented  directories containing
+experimental or development work. 
+
+We had hoped to include the D-task parameter system in this  release,
+but  this  is  not  yet implemeted.  Rather than further delaying the
+release, we are distributing it without this component as it contains
+quite a few new features. 
+
+
+
+
+4. NEW FEATURES IN THIS RELEASE 
+
+
+
+
+4.1 Organisation     ____________ 
+
+There are no major changes in the way that the ADAM  directories  are
+organised.   Additional  help is provided, in the form of the symbols
+"logicals" and "symbols".  Typing one of these produces a listing  at
+the  terminal  of  the  ADAM  logical names or symbols, with one-line
+descriptions of their function. 
+
+
+
+4.2 The 'engineering' user interface     ________________________________ 
+
+Following requests from users writing real d-tasks,  various  changes
+have been made to this interface;  briefly, these are as follows: 
+
+(1) The output produced by the interface has been tidied up.  In  the
+last release there were a fair number of uninformative debug messages
+appearing;  these have been removed. 
+
+(2) Help information (though brief) is obtained in this interface  by
+typing  "?", e.g. "?" alone gives a list of commands available; "load
+?" gives the format of the load command, and also now has a  line  to
+say what the command does. 
+
+
+
+
+                                                                 ARN/3.1                           3                           ARN/3.1
+
+
+
+(3) Testing d-tasks became more than a little tedious by the repeated
+typing  of "send taskname";  to alleviate this a new command, "task",
+has been added.  This sets a default task for the interface  to  send
+messages  to,  and  changes the prompt appropriately.  Exit from this
+"mode" is made using ctrl-Z. 
+
+(4) In the previous release the "value" part of any message typed was
+not  sent  to  the  task  for contexts "obey" and "cancel".  This was
+incorrect and has been fixed. 
+
+
+
+4.3 D-tasks     _______ 
+
+(1) A document describing "How to write a D-task" has been issued  in
+draft form previously, and is now available in revised form as AED/1.
+Please replace your previous copy of "How to  write  a  D-task"  with
+this one ! 
+
+(2) Until recently the "value" parameter of the "ACT" subroutine  was
+not  passed back to the originating task with the acknowledgment when
+"ACT" returned.  This was a bug and has been fixed. 
+
+(3) It is now possible to use AST routines within D-tasks.   See  the
+appropriate section in AED/1. 
+
+(4) Recently another possible status return, "ACT__INFORM", has  been
+added to the "special" returns for "ACT".  This status indicates that
+the action has completed, probably with an error, and that the  value
+string  contains  text  intended for the user, which (it is expected)
+will usually be an  error  message.   A  "normal"  action  completion
+should  use  the status "ACT_END" and not confuse the user with extra
+messages. 
+
+
+
+4.4 System error handling and reporting     ___________________________________ 
+
+All the ADAM system errors have defined values and are parameterised.
+Initially  this was done simply by using include files of "parameter"
+statements, but  the  system  became  sufficiently  complicated  that
+tracking  down  a  particular  error  number  which  appeared  at the
+terminal was made annoying.  The VAX has  a  nice  error  and  status
+message system which can be used to produce text messages rather than
+error numbers, and can also be  used  to  initiate  tracebacks  where
+required for debugging (if you have tasks which produce errors in the
+ADAM system with traceback, please note the traceback and let us know
+about it). 
+
+The message files are formatted for the VMS  "message"  utility,  and
+processed  using "message/list"; examples may be found in most of the
+ADAM  system  directories.   The  ".lis"  files  produced  are   then
+processed with a tool invoked by the symbol "errgen" which produces a
+
+
+
+                                                                 ARN/3.1                           4                           ARN/3.1
+
+
+
+".for" file for  inclusion  in  Fortran  source;  this  include  file
+contains  parametric  definitions of the error/status symbols.  Brief
+details of how this system is used are contained in the sub-directory
+"draft"  under  "docs_dir", in the file "errgen.lis".  It is intended
+to extend this document and release it in due course. 
+
+
+
+4.5 A-tasks     _______ 
+
+Without the full  parameter  system  it  is  not  possible  to  write
+"proper" A-tasks, but an example of the appearance of a simple A-task
+may be found in the directory with logical name  "atasks".   As  with
+D-tasks at present, parameter values must be set explicitly (as there
+is no "interface module"  to  contain  default  values),  but  it  is
+possible to load an A-task, set parameter values with "set", and make
+the A-task "obey" the action "run" (this is the only  action  allowed
+for an A-task !). 
+
+This is at present only a "frig"; it will not be necessary to tell  a
+real  A-task  to  "obey run".  Also, the implementation presently has
+parts missing; for example, if a D-task has  been  told  to  obey  an
+action  which fails fatally, then not just the A-task which asked the
+D-task to obey the action, but also the task originating  the  action
+(i.e.  the  one  that  instructed  the A-task) must also be informed.
+However the example illustrates how the subroutine calls to send  and
+receive messages to and from D-tasks are used. 
+
+To link an A-task, use the symbol "ALINK". 
+
+
+
+4.6 The RGO Adam command language     _____________________________ 
+
+The ADAM command  language  has  been  further  implemented  so  that
+procedures  can  now  be  defined  and  called.   It is therefore now
+possible to write procedures which send messages to  tasks.   However
+ADAM  variables  still cannot be passed inline in the "send" command.
+Several  chapters  of  the  RGO  ADAM  command  language  manual  are
+available   in   docs_dir,   in   sub-directory   "RGO",  with  names
+"*chap.txt". 
+
+
+
+
+5. UPPER/LOWER CASE CONSIDERATIONS 
+
+
+Several decisions  regarding  upper/lower  alphabetic  case  and  its
+conversion  have  been  arbitrarily  made  in this release, to try to
+facilitate use of the system.  Feedback from programmers  (and  users
+or  potential  users) of the ADAM system would be appreciated to help
+to resolve problems encountered here. 
+
+
+
+                                                                 ARN/3.1                           5                           ARN/3.1
+
+
+
+At present, the parameter system available in ADAM is a "frig"  which
+allows  parameters  to  be used.  However these parameters still need
+names!  This parameter system has recently been modified so that  the
+parameter  names  are  internally  converted  to a single case.  This
+means that it does not matter whether upper or  lower  case  is  used
+outside  the  system  to specify the parameters (i.e. FILTER, filter,
+and Filter are all considered to be the  same  parameter).   Is  this
+what people want? 
+
+Another problem is the naming of actions inside D-tasks.   These  are
+usually  given  as  explicit  character  strings in the D-task device
+dependent code (i.e. in ACT or below).  However the  action  name  is
+passed  to the D-task from software over which the user has no direct
+control.  Currently the 'engineering' interface forces  action  names
+to  upper case, which assumes that they have been given as upper case
+in the D-task  code.   The  solution  here  is  not  to  use  logical
+comparison  within  the D-task (e.g. to compare the variable "ACTION"
+with the value "'INTEGRATE'"), but to use a function  which  performs
+this  operation  without regard to case; this is the solution used in
+the Starlink environment.  It is proposed that the function  be  made
+available and its use described carefully to D-task authors. 
+
+
+
+
+6. STILL MISSING FROM THIS RELEASE 
+
+
+The following list is not complete but indicates  major  areas  where
+some   action   might   be   expected   soon.    In  particular,  the
+implementation of the parameter system has started, and initial  work
+on advanced user interfaces will start soon. 
+
+Major items missing: 
+The full parameter system (including d-task "interface files") 
+Advanced user interfaces 
+Networking 
+Adam command language global variables 
+
+
+
+7. KNOWN BUGS 
+
+
+These are the most important bugs found that can potentially  produce
+unwanted  effects and may cause confusion.  Please let us know of any
+unusual behaviour of the system ! 
+
+(1) At present, any task can open channnels to other  tasks  no  more
+than 20 times. 
+
+(2) When a task shuts down, it does not cleanly  disassociate  itself
+from its communicating tasks.  This could cause problems. 
+
+
+
+                                                                 ARN/3.1                           6                           ARN/3.1
+
+
+
+(3) When the "engineering interface" is started up, it can be  "hung"
+completely by typing something before the prompt appears. (Get out of
+this with ctrl-Y.) 
+
+(4) If the command "SPAWN" is used in the Adam command language,  two
+carriage  returns  are  needed  to  obtain the DCL "$" prompt.  After
+logout  from  the  spawned  subprocess,  the  extra  carriage  return
+reappears as a blank command line. 
+
+(5) The CANCEL context does not always work correctly.  Sometimes  an
+action  can  be  reported  to  have been cancelled, but the timer for
+rescheduling may not be cancelled and the action re-starts  when  the
+timer expires. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 ARN/3.1                           7                           ARN/3.1
+
+
+
+Appendix A __________ 
+
+Logical names and symbols for the Adam system _____________________________________________ 
+
+
+Logical names: (this list may be obtained online by typing "logicals") 
+
+ADAMDEFNS  system-wide parameter definitions (include file) 
+ADAMDIR    ADAM command language [duplicate for BDK] (directory) 
+ADAMERRS   system-wide parameter definitions (include file) 
+ADAMTOOLS  useful ADAM tools (directory) 
+ADAM_DIR   ADAM top level (directory) 
+ASTCOM     d-task AST handler common block (include file) 
+AST_DIR    ast example dtask (directory) 
+ATASKS     a-tasks (directory) 
+A_DIR      a-task fixed part code (directory) 
+CLI_DIR    ADAM command language (directory) 
+COM_DIR    DCL .COM tools (directory) 
+DDMSG      message structure data definition (include file) 
+DDVAL      message value data definition (include file) 
+DEV_DIR    software development directory 
+DOCS_DIR   documentation (directory) 
+DTASKS     d-tasks (directory) 
+DTCOMMON   d-task action list common block (include file) 
+DTDEFNS    d-task parameter definitions (include file) 
+DTERRS     d-task parameter definitions (include file) 
+D_DIR      d-task fixed part code (directory) 
+ENGDEFNS   engineering interface parameter definitions (include file) 
+ENGERRS    engineering interface parameter definitions (include file) 
+ENG_DIR    engineering interface (directory) 
+INT_DIR    "ADAM_" interface used by applications (directory) 
+IN_LOG     logical name for input device (process creation) 
+LIB_DIR    level above ADAM code sub-directories (directory) 
+MESDEFNS   message system parameter definitions (include file) 
+MESERRS    message system parameter definitions (include file) 
+MES_DIR    ADAM message system (directory) 
+NETADR     used by "autodoc" ( = "REVA::" ) 
+OUT_LOG    logical name for output device (process creation) 
+PARCOMMON  parameter system common block (include file) 
+PARERRS    parameter system parameter definitions (include file) 
+PAR_DIR    parameter system (directory) 
+PRO_DIR    model prologues (directory) 
+RGO_DIR    RGO source (directory) 
+SSE_TOOLS  SSE tools (directory) 
+SIMP_DIR   simple d-task example (directory) 
+STEHLP     STE help file 
+SYS_TOOLS  SSE tools [duplicate] (directory) 
+TIOCOM     engineering interface common block (include file) 
+UTILITYDIR Starlink utilities (e.g. Geroff) (directory) 
+UTIL_DIR   utility subroutines (directory) 
+
+
+
+
+
+
+                                                                 ARN/3.1                           8                           ARN/3.1
+
+
+
+Symbols:  (this list may be obtained online by typing "symbols") 
+
+ADAMCL     start the ADAM command language (currently not implemented) 
+ADAMDEV    set up ADAM system for software development 
+ADAMENG    start up the ADAM "engineering" interface 
+ALINK      link an a-task 
+ASSUB      assign a sub-directory logical name 
+AUTODOC    set up symbols for "autodoc" library maintainance (all ADAM code) 
+CH         make global changes to a text file (tools) 
+CHLIB      make global changes to a text library 
+DLINK      link a d-task 
+ERRGEN     create symbol parameters "include" file from "message" .LIS file 
+LIBMAINT   set up symbols for library maintainance 
+LOGICALS   type the list of ADAM logical names 
+SYMBOLS    type the list of ADAM symbols (this file) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 

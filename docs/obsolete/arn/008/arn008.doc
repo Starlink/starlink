@@ -1,0 +1,361 @@
+                                                                 
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      ARN/8.1
+ROYAL OBSERVATORY EDINBURGH 
+and UNIVERSITY OF EDINBURGH 
+
+ADAM Project                                                Issued by
+ADAM Release Note 8.1 
+
+                                                         Dennis Kelly
+                                                           01.10.1985
+
+---------------------------------------------------------------------
+
+                      ADAM Software Release 0.9                       _________________________ 
+
+
+
+
+
+
+
+1. SUMMARY 
+
+
+This is a major release (via magtape) and is rather  large  (25  Mb).
+The reason for this is that it includes the graphics packages as well
+as the full system and a number of application programs. 
+
+It also includes a mini-release which can be  extracted  and  put  up
+separately.  It  takes  up  about  2Mb  of disk space, and allows the
+system to be run and tasks to be developed and linked. 
+
+Any local application programs need re-linking. 
+
+The SYSTEM logical names (formerly GROUP) have  been  collected  into
+[ADAM.COM]SYSLOGNAM.COM.  It  is  suggested that a command to execute
+this file (after editing the directory names) should be put into  the
+VMS startup. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 ARN/8.1                           2                           ARN/8.1
+
+
+
+
+
+
+2. CONTENTS 
+
+
+          3. INTRODUCTION 
+          4. QUOTAS NEEDED TO RUN ADAM 
+          5. NEW FEATURES IN THIS RELEASE 
+              5.1 Organisation 
+              5.2 Linking 
+              5.3 Task Loading 
+              5.4 A-task Monoliths 
+              5.5 CD-TASKS 
+              5.6 SMS 
+              5.7 ADAMCL 
+              5.8 The minimal system 
+          6. STILL MISSING FROM THIS RELEASE 
+          7. BUGS FIXED FROM PREVIOUS RELEASE 
+          8. KNOWN BUGS 
+
+
+
+3. INTRODUCTION 
+
+
+The overall ADAM directory structure is the same as that  in  release
+0.0;  for  details refer to ARN/2.  Further logical names and symbols
+have been added. 
+
+Note that in this, as in all releases, the  logical  name  "ADAM_DIR"
+must  be set up correctly in the "DEVLOGIN.COM" file in the top level
+directory;  all sub-directories are defined relative to this one. 
+
+
+
+4. QUOTAS NEEDED TO RUN ADAM 
+
+
+Typical ADAM quotas are as follows 
+
+Process Quotas: 
+ CPU limit:                      Infinite  Direct I/O limit:        18 
+ Buffered I/O byte count quota:     20480  Buffered I/O limit:      18 
+ Timer queue entry quota:               9  Open file quota:         28 
+ Paging file quota:                 20000  Subprocess quota:        10 
+ Default page fault cluster:           32  AST limit:               23 
+ Enqueue quota:                        30  Shared file limit:        0 
+ Max detached processes:                0  Max active jobs:          0 
+
+
+
+
+
+
+
+                                                                 ARN/8.1                           3                           ARN/8.1
+
+
+
+5. NEW FEATURES IN THIS RELEASE 
+
+
+
+
+5.1 Organisation     ____________ 
+
+The release consists of a BACKUP save set on magtape. The command  to
+generate it was : $ BACKUP [ADAM...]*.*;* MT:ADAM09.BCK 
+
+
+
+5.2 Linking     _______ 
+
+The commands ALINK, DLINK and GLINK are used to  produce  A-  and  D-
+tasks  and A-tasks which do graphics linked with the shareable image.
+DCAMLINK links a  Dtask  with  the  CAMAC  library.  CDLINK  links  a
+CD-task. 
+
+
+5.3 Task Loading     ____________ 
+
+On being loaded, a task now expects to find its IFL  or  IFC  in  the
+same  directory as the file containing the execution module. The task
+first looks for an IFC, and if this is not found,  it  looks  for  an
+IFL. 
+
+
+5.4 A-task Monoliths     ________________ 
+
+It is now possible to link a set of A-tasks into a single .EXE and to
+concatenate their interface files into a single IFL. See AED007. 
+
+
+5.5 CD-tasks     ________ 
+
+CD-tasks are tasks which control other tasks (like C-tasks) but which
+have multiple ACTIONS (like D-tasks). See AED006. 
+
+
+5.6 SMS     ___ 
+
+The Screen Management System has undergone extensive development.  It
+now  uses  ADAMCL,  and  so  any  ADAMCL command, including executing
+procedures, is now available in SMS. 
+
+SMS macros have been implemented. These allow a set of operations  to
+be   remembered   and   associated  with  a  terminal  function  key.
+Subsequently, whenever that key is pressed, SMS repeats the  sequence
+of operations. 
+
+The values which SMS displays in a parameter  field  can  be  updated
+from a task on entry to the relevant parameter screen. 
+
+
+
+                                                                 ARN/8.1                           4                           ARN/8.1
+
+
+
+See ASP002. 
+
+
+5.7 ADAMCL     ______ 
+
+The ADAMCL manual is to be found in AON001. 
+
+The ADAMCL BATCH command can now be nested  up  to  16  levels  deep.
+Previously it could only be chained. 
+
+On startup of ADAMCL, commands  can  be  typed-ahead.  Previously  on
+startup, parts of a typed-ahead command were lost. 
+
+ADAMCL has been restructured so that it can be  called  from  another
+user interface (eg. SMS) as a subroutine library. 
+
+ADAMCL works satisfactorily over networks between VAXes  running  VMS
+version 4. It has the disadvantage of doing single-character terminal
+input,  which  gives  slow  response  over  networks.  A   line-input
+orientated version exists. This can be run using 
+
+$ RUN CLI_DIR:ACLREM 
+
+The following new commands have been added to ADAMCL. 
+
+   [square brackets means the parameter is optional] 
+
+$command - send a DCL command to the permanent subprocess 
+CREATESUB - create the permanent subprocess 
+MONOLITH [name] - change prompt and select a monolith 
+ON ERROR command - control ADAMCL action if an error occurs 
+
+
+5.8 The minimal system     __________________ 
+
+The subdirectories [ADAM.RELEASE...] contain all that  is  necessary,
+apart  from  the  shareable  images,  to  run  the ADAM system and to
+develop tasks. 
+
+To produce a minimal release 
+
+$ COPY [ADAM.LIB]ADAMSHARE.EXE [ADAM.RELEASE.EXE]* 
+$ COPY [ADAM.LIB]ADAMGRAPH.EXE [ADAM.RELEASE.EXE]* 
+
+then backup or copy [ADAM.RELEASE...]*.*. 
+
+Inspection of the command files in [ADAM.RELEASE] will reveal what is
+needed to start the system up. 
+
+
+
+
+
+
+
+
+                                                                 ARN/8.1                           5                           ARN/8.1
+
+
+
+6. STILL MISSING FROM THIS RELEASE 
+
+
+The following list is not complete but indicates  major  areas  where
+some action might be expected soon. 
+
+Major items missing: 
+Higher-level documentation. 
+Handling larger arrays in the MONITOR system. 
+Networking. 
+
+
+
+
+7. BUGS FIXED FROM PREVIOUS RELEASE 
+
+
+(1) In ADAMCL, IF-ELSE-END blocks failed if there  was  more  than  a
+small amount of code in the ELSE block (eg a nested IF block). 
+
+(2) The PARAMETER system used to require logical values and HDS names
+in  uppercase. These errors were normally hidden by ADAMCL, but users
+of ADAMENG may have seen them. 
+
+(3) In the PARAMETER system, DAT_CREAT used to crash when  trying  to
+create a component of a structure. 
+
+(4) In Dtasks, timed reschedules asking for  times  less  than  about
+6msec  used  to  get very long times instead. The code now enforces a
+minimum 10msec reschedule. 
+
+(5) In the PARAMETER system, dynamic defaults for arrays didn't work.
+
+(6) In the PARAMETER system, PAR_GET1C failed if the given  character
+array had elements less than CHARACTER*132. 
+
+(7) In ADAMCL, the LOADW  command  resulted  in  ADAMCL  hanging  for
+100sec  if  the  task being loaded crashed. This can now sometimes be
+escaped from by using ctrl-C. Also, the likelihood of a task crashing
+when reading its interface file has been reduced. However, the 100sec
+hangup (which is a timeout)  will  still  happen  if,  say,  a  Dtask
+crashes during DEVINIT. 
+
+(9) If a Ctask was using ADAM_GETREPLY for a reply from a Dtask,  and
+the  Dtask  crashed,  then  the  Ctask hung. Similarly, if ADAMCL was
+performing OBEYW, the message 'unknown flag set' appeared. 
+
+
+
+
+
+
+
+
+
+
+                                                                 ARN/8.1                           6                           ARN/8.1
+
+
+
+8. KNOWN BUGS 
+
+
+These are the most important bugs found that can potentially  produce
+unwanted  effects and may cause confusion.  Please let us know of any
+unusual behaviour of the system ! 
+
+(1) At present, any task can have channels open to no  more  than  20
+other tasks simultaneously. (This is a 'feature' rather than a bug). 
+
+(2) When the "engineering interface" is started up, it can be  "hung"
+completely by typing something before the prompt appears. (Get out of
+this with ctrl-Y.) 
+
+(3) If a number of SEND <task> OBEY  commands  are  issued  within  a
+command  language  loop,  the  message  system  fills  with the final
+acknowledgements. The cure is to avoid SEND <task> OBEY in a loop  by
+using OBEYW instead. 
+
+(4) Incomplete implementation of VPATH 'CURRENT'. See ARN6. 
+
+(5) The RPATH field in the IFL is not yet implemented. 
+
+(6) DIA_ASSOC and DIA_ANNUL appear to work satisfactorily  the  first
+time  an  A-task is run, but give GKS errors the second time the task
+is run. 
+
+(7) In Dtasks, array parameters with their  literal  list  of  values
+defaulted in the IFL must not be put on a NEEDS list. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 

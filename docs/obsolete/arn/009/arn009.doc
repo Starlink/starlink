@@ -1,0 +1,481 @@
+                                                                 
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      ARN/9.1
+ROYAL OBSERVATORY EDINBURGH 
+and UNIVERSITY OF EDINBURGH 
+
+ADAM Project                                                Issued by
+ADAM Release Note 9.1 
+
+                                                         Dennis Kelly
+                                                           29.11.1985
+
+---------------------------------------------------------------------
+
+                          ADAM Mini-release                           _________________ 
+
+
+
+
+
+
+
+1. SUMMARY 
+
+
+This is a 'mini-release' of ADAM in that  it  consists  of  just  the
+shareable  images,  execution modules and command files necessary for
+running the system and developing application programs. It  does  not
+include  the  various  source  and  object  libraries  or most of the
+documentation.  The  release  has  been  prepared  specifically   for
+evaluation  at  Starlink sites. The ADAM version number is 0.91 - ie.
+it is between the development of ADAM version 0.9 and 1.0. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 ARN/9.1                           2                           ARN/9.1
+
+
+
+
+
+
+2. CONTENTS 
+
+
+          3. INSTALLATION 
+          4. ORGANISATION 
+          5. TESTING THE INSTALLATION 
+          6. SUMMARY OF FEATURES 
+              6.1 User Interfaces 
+              6.2 Linking 
+              6.3 Program startup 
+              6.4 Parameter System 
+              6.5 SMS 
+              6.6 ADAMCL 
+              6.7 SPAN - analysis of IR spectra 
+              6.8 RAPI2D - 2-D image manipulation 
+              6.9 PLT2D - image display 
+          7. EXAMPLES OF USE 
+          8. STILL MISSING FROM THIS RELEASE 
+          9. BUGS FIXED FROM PREVIOUS RELEASE 
+         10. KNOWN BUGS 
+
+
+
+3. INSTALLATION 
+
+
+The release comes as a disk backup save set. 
+
+$ BACKUP ADAM091.BCK/SAVE/SEL=[STARLOCAL.PACK.ADAM...]*.* - 
+LSTARDISK:[STARLOCAL.PACK.ADAM...]*.* 
+
+It is necessay to edit  LSTARDISK:[STARLOCAL]STARTUP.COM  to  include
+the line 
+
+$ DEFINE/SYSTEM ADAM_DIR LSTARDISK:[STARLOCAL.PACK.ADAM] 
+
+and to insert in LSSC:LOGIN.COM 
+
+$ ADAMSTART :== @ADAM_DIR:ADAMSTART 
+
+Typical ADAM quotas are as follows 
+
+Process Quotas: 
+ CPU limit:                      Infinite  Direct I/O limit:        18 
+ Buffered I/O byte count quota:     20480  Buffered I/O limit:      18 
+ Timer queue entry quota:               9  Open file quota:         28 
+ Paging file quota:                 20000  Subprocess quota:        10 
+ Default page fault cluster:           32  AST limit:               23 
+ Enqueue quota:                        30  Shared file limit:        0 
+ Max detached processes:                0  Max active jobs:          0 
+
+
+
+                                                                 ARN/9.1                           3                           ARN/9.1
+
+
+
+These may be excessive for someone simply doing data analysis. 
+
+
+
+4. ORGANISATION 
+
+
+The ADAM_DIR directory contains the following command files 
+
+SYSLOGNAM.COM      -   shouldn't be needed 
+ADAMSTART.COM      -   set up for running ADAM 
+ADAMDEV.COM        -   set up for developing programs 
+
+It also has the following subdirectories 
+
+[.AFIX]            -   A-task 'fixed part' and link files 
+[.COM]             -   extra command files 
+[.DFIX]            -   D-task 'fixed part' and link files 
+[.DOCS]            -   documentation for this release 
+[.EXE]             -   shareable images and programs 
+[.INC]             -   include files for error definitions 
+
+It also contains the HDS file DEVICES.SDF,  which  holds  the  device
+definitions used by DIA_ASSOC, SGS_ASSOC and GKS_ASSOC. 
+
+
+
+5. TESTING THE INSTALLATION 
+
+
+Login under some suitable user name. Then 
+
+$ ADAMSTART 
+$ ADAMCL 
+
+The ADAM command language should start up. Try the HELP command. Then
+try 
+
+Adamcl:> LOADW TRACE 
+Adamcl:> DEFINE TRACE TRACE 
+Adamcl:> TRACE 
+TRACE should cause a parameter prompt to appear. Reply with 
+
+ADAM_USER:GLOBAL 
+
+The listing of an empty structure should appear. Then try the example
+of program development given in AED 8. 
+
+
+
+
+
+
+
+
+
+                                                                 ARN/9.1                           4                           ARN/9.1
+
+
+
+6. SUMMARY OF FEATURES 
+
+
+
+
+6.1 User interfaces     _______________ 
+
+ADAM tasks can be linked to run directly from DCL. However, they  are
+normally linked in a different way which requires them to be run in a
+subprocess. In this latter case, they are loaded from and  controlled
+by  a  user  interface which runs in the main process. ADAM has three
+user interfaces. 
+
+ADAMENG  -  the 'engineering' interface, for testing. 
+ADAMCL   -  the ADAM command language. 
+SMS      -  the screen management system. 
+
+ADAMENG is not part of this release. 
+
+
+6.2 Linking     _______ 
+
+The commands ALINK and DCL_ALINK  are  used  for  creating  SSE-style
+applications  programs  for running from ADAMCL and DCL respectively.
+MLINK is used for linking ADAM monoliths. 
+
+
+6.3 Program startup     _______________ 
+
+On starting up, a task expects to find its IFL or  IFC  in  the  same
+directory as the file containing the execution module. The task first
+looks for an IFC, and if this is not found, it looks for an IFL. 
+
+
+6.4 Parameter System     ________________ 
+
+The parameter system has been extended  to  recognise  the  parameter
+type  'LITERAL'.  The  system  never  attempts to interpret a LITERAL
+parameter as an HDS name, but always assumes a character string. This
+means that single words can be given without surrounding quotes. 
+
+
+6.5 SMS     ___ 
+
+The Screen Management System is included in this  release,  but  will
+only   be   of  interest  to  enthusiasts,  primarily  because  extra
+documentation plus simple examples of its use are not yet  available.
+(See ASP 2). 
+
+
+
+
+
+
+
+
+                                                                 ARN/9.1                           5                           ARN/9.1
+
+
+
+6.6 ADAMCL     ______ 
+
+The ADAMCL task loading looks for  the  named  task  in  the  current
+directory  (assuming no directory was specified). If it is not found,
+then it is looked for in the directory with  logical  name  ADAM_EXE.
+(See AON 1). 
+
+
+6.7 SPAN - analysis of IR spectra     _____________________________ 
+
+SPAN is linked as a DCL task, and so is run directly at the terminal.
+An  HDS  file  containing  infrared  spectra  is  included  with this
+release. Software for converting from earlier UKIRT formats to HDS is
+not included. (See SPANUG.LIS) 
+
+Note that SPAN cursoring does not yet work on an ARGS. 
+
+
+6.8 RAPI2D - 2-D image manipulation     _______________________________ 
+
+This is an enhanced version of  the  ASPIC  KERNEL  plus  some  extra
+functions.  It  is built as an ADAM MONOLITH, and so should be loaded
+using a user interface. (See AON 3). 
+
+For example, 
+
+Adamcl:> LOADW RAPI2D 
+Adamcl:> MONOLITH RAPI2D 
+RAPI2D:> 
+
+
+6.9 PLT2D - image display     _____________________ 
+
+This is an ADAM D-task for controlling graphics devices. It has to be
+loaded from a user interface. (See AON 2). 
+
+
+
+7. EXAMPLES OF USE 
+
+
+The following is an example session using ADAMCL,  PLT2D  and  RAPI2D
+together.  Note  that  logical  names have to go into the JOB logical
+name table if they are to be seen by ADAM subprocesses. 
+
+$ ADAMSTART 
+$ DEFINE/JOB ARGS_DEVICE IDA0: 
+$ ADAMCL 
+Adamcl:> LOADDICT ADAM_EXE:PLT2D 
+Adamcl:> L 
+
+Welcome to PLT2D, the 2-D data plotting task 
+____________________________________________ 
+
+
+
+                                                                 ARN/9.1                           6                           ARN/9.1
+
+
+
+Loading... Please wait 
+
+O.K. Load complete : TASKNAME = plt2d 
+Help is available by typing ? <CR> 
+Use OPEN to initialize plotting on a SPECIFIC device 
+
+Adamcl:> OPEN 
+{the list of devices appears} 
+
+DEVICE_NUMBER > 1 
+Plotting device defined as 'ARGS' 
+Use ? to get HELP on what to do next 
+
+Adamcl:> PLOT 
+Give the name of IMAGE to be plotted ? 
+NAME_IMAGE > ADAM_EXE:PONY 
+O.K. have plotted image on device 'ARGS' 
+
+Adamcl:> SPEC 
+O.K. SPECTRUM colour table displayed 
+
+Adamcl:> LOADW RAPI2D 
+Adamcl:> MONOLITH RAPI2D 
+RAPI2D:> FLIP 
+? RAPI2D:"Image to be flipped" > ADAM_EXE:PONY 
+? RAPI2D:"horizontal, H, or vertical, V /'H'/ > <CR> 
+? RAPI2D:"Image after being flipped" > YNOP 
+? RAPI2D:"Title for output image" /'Rapi2d - Flip'/ > <CR> 
+RAPI2D:> PLOT 
+Give the name of IMAGE to be plotted ? 
+NAME_IMAGE > YNOP 
+O.K. have plotted image on device 'ARGS' 
+
+RAPI2D:> KILL RAPI2D 
+RAPI2D:> KILL PLT2D 
+RAPI2D:> EXIT 
+$ 
+
+An example of using SPAN is as follows. Log into a T4010 and copy the
+example  data set into your own directory so that you can have update
+access to it. The following  sequence  plots  a  spectrum,  uses  the
+cursor to remove a point from it, and plots the modified spectrum. 
+
+$ ADAMSTART 
+$ COPY ADAM_EXE:MK1.SDF MK1.SDF 
+$ SPAN 
+START:spectrum(S),options(O),quit(Q) >S 
+HDS file >MK1 
+Operation >EM 
+device >T4010 
+{plot appears} 
+mode >E 
+{position cursor on point to be erased} 
+
+
+
+                                                                 ARN/9.1                           7                           ARN/9.1
+
+
+
+{hit key 1} 
+{hit full stop to exit from cursor} 
+mode >P 
+{plots modified spectrum} 
+mode >Q 
+are the changes to be made permanent? T or F >F 
+START:spectrum(S),options(O),quit(Q) >Q 
+$ 
+
+
+
+8. STILL MISSING FROM THIS RELEASE 
+
+
+The following list is not complete but indicates  major  areas  where
+some action might be expected soon. 
+
+Major items missing: 
+Calling the ADAM help system from ADAMCL. 
+Introductory documentation. 
+
+
+
+
+9. KNOWN BUGS 
+
+
+These are the most important bugs found that can potentially  produce
+unwanted  effects and may cause confusion.  Please let us know of any
+unusual behaviour of the system ! 
+
+(1) At present, any task can have channels open to no  more  than  20
+other tasks simultaneously. 
+
+(2) When the "engineering interface" is started up, it can be  "hung"
+completely by typing something before the prompt appears. (Get out of
+this with ctrl-Y.) 
+
+(3) If a number of SEND <task> OBEY  commands  are  issued  within  a
+command  language  loop,  the  message  system  fills  with the final
+acknowledgements. The cure is to avoid SEND <task> OBEY in a loop  by
+using OBEYW instead. 
+
+(4) Incomplete implementation of VPATH 'CURRENT'. See ARN6. 
+
+(5) The RPATH field in the IFL is not yet implemented. 
+
+(6) DIA_ASSOC and DIA_ANNUL appear to work satisfactorily  the  first
+time  an  A-task is run, but give GKS errors the second time the task
+is run. 
+
+(7) There is a conflict of interest when ADAM  is  being  used  on  a
+Starlink  machine  as opposed to at the telescope. This occurs in the
+
+
+
+                                                                 ARN/9.1                           8                           ARN/9.1
+
+
+
+area of task loading. At the telescope a  loaded  task  needs  to  be
+accessible to terminals other than the one at which it was loaded. On
+Starlink, the task should only be 'visible'  to  the  terminal  which
+loaded  it.  If more than one user on a Starlink machine wants to run
+the same task, the second  and  subsequent  users  must  specify  the
+taskname explicitly in the ADAMCL LOADW command. For example 
+Adamcl:> LOADW TRACE    {first user lets taskname default to TRACE} 
+   . 
+Adamcl:> LOADW TRACE JUNK  {second user - taskname is JUNK} 
+Adamcl:> DEFINE TRACE JUNK  {define ADAMCL command TRACE} 
+
+(8) Whenever  a  subdirectory  name  is  specified  as  part  of  the
+execution  module  name  in  the ADAMCL LOAD or LOADW commands, it is
+necessary to give the taskname explicitly 
+Adamcl:> LOADW ADAM_EXE:RAPI2D RAPI2D 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 

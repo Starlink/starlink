@@ -1,0 +1,290 @@
+.af geroffdir:prelude.grf
+.arna 2.1 "ADAM Software Release 0.0" "John Cooke" 11.5.1984
+.uc `
+
+.level1 "SUMMARY"
+
+This release contains the bare bones of the ADAM system, with several
+important features of the final system missing.  However it allows
+programmers who will use the ADAM environment to see the methods used
+for inter-task communication.  It is also possible to write device-dependent
+routines for d-tasks and alternative user interfaces, and attach these to
+the ADAM software;  the simple examples given should facilitate this.
+
+.level1 "INTRODUCTION"
+
+There is rather more in this release than in the last, and so the software
+organisation has been tidied up a little.  In particular, the released
+software is contained in a directory structure for ease of maintenance and of
+use.  This structure is modelled on Sid Wright's SSE directory structure, and
+has been found to make software management relatively easy. 
+
+All the directories in the structure have logical names, and a system is
+provided for setting these up.
+
+.bp
+One change needs to be made to the software before it can be used:
+
+In the top-level directory (which should ideally be called "[ADAM]") is a 
+"login" file called "DEVLOGIN.COM".  The first executable line of this file is 
+a logical name definition for "ADAM_DIR" which is this top-level directory.  
+If this line is changed to define "ADAM_DIR" correctly, then all the other 
+logical names required will be set up automatically when "DEVLOGIN.COM" is 
+executed.  This is probably best done by setting up a symbol in your own 
+"LOGIN.COM" file to enable the ADAM development login to be made by typing,
+e.g. "adamdev".
+
+.ne 6
+.level1 "ORGANISATION"
+
+On initialising the ADAM system with the "DEVLOGIN.COM" file, a host of
+logical names is set up; many of them point at directories, but some
+point at "include" files for use when maintaining the present software or
+writing new software which needs to use global parameters.  A list of these
+names is given at the end of this document. 
+
+At present only four symbols are set up;  the symbols "adameng" and "adamcl"
+start up the test engineering interface and the RGO ADAM command language 
+respectively.
+
+This release contains the following components:
+
+.ne 6
+.level2 "mes dir"
+
+The directory with logical name "mes_dir" contains the message system
+software.  This includes the message system object module library which can be
+linked in to other code using ",mes_dir:messys/lib";  this should generally be
+the last item in the link list as the message system is used by most other
+ADAM components. 
+
+This low level software is considered to be practically complete as far as
+the interface definitions are concerned;  the actual implementation could
+be changed (for example, if a considerably faster method of communication
+could be implemented) without altering the interfaces.  There are some
+modules still missing, notably in the areas of initialisation and closing
+down;  the final definition of these depends to a certain extent on the
+software environment used for the parameter system (e.g. the SSE).
+
+.ne 6
+.level2 "int dir"
+
+This directory contains the application-level interface to the message system
+(the ADAM_ routines) which can be linked using ",int_dir:adam/lib,".  Note
+that this library calls routines in the MESSYS library which will have to
+be linked in as well.
+
+This library is less than half complete;  there are some high level calls
+to send "get", "set", "obey" and "cancel" messages, and some packaged
+initialisation and shutdown routines not yet implemented.
+
+.ne 6
+.level2 "d dir"
+
+This directory contains the d-task software.  Currently this consists of a
+main program ("dtask") which calls the device-dependent routines "devinit" and
+"act". Trivial examples of these are included.  Two sets of library routines
+are called, the "DTASK_" routines and the "PAR_" routines;  both libraries are
+present in this directory.  To link a d-task the command 
+
+.nf
+link dtask,devinit,act,dtask/lib,par/lib,int_dir:adam/lib,-
+  mes_dir:messys/lib
+.fi
+
+should be used.  The resulting execution module need not be called "dtask" as 
+the name of the required execution module must be given when a d-task is 
+loaded.  This command is packaged in the file "dlink.com" which will prompt
+for the name to be given to the execution module if this is not given as
+the first parameter.
+
+.ne 6
+.level2 "eng dir"
+
+The directory with logical name "eng_dir" contains the test engineering
+interface software.  This shows how a user interface can be trivially linked
+into the ADAM system.  It is planned that the next release will include a more
+realistic user interface which allows actions in tasks to be run concurrently.
+This interface is started up using the symbol "adameng".
+
+.ne 8
+.level2 "cli dir"
+
+This directory contains the software of the RGO ADAM command language, as far
+as it has been implemented.  It is connected to the ADAM system with the calls
+used in the engineering interface.  This interface is started up using the 
+symbol "adamcl".
+
+.level1 "EXAMPLES OF USE"
+
+.level2 "The test engineering interface"
+
+This interface is very simple and can be used only for loading and stopping
+tasks, and for sending messages to tasks.  It has a very basic command line
+interpreter, which responds to the commands "LOAD", "SEND", "STOP", "EXIT",
+"QUIT" and the request for help "?".  Commands can be requested to divulge 
+their parameters by typing e.g. "LOAD ?".
+
+On startup (by typing "adameng" at DCL level) the startup message and the
+prompt
+.nf
++ ADAM engineering interface in process <process-name>
+  ADAM_ENG>
+
+.fi
+is given.  Both blank lines of input and unknown commands are ignored.
+
+A d-task can be loaded using
+.nf
+
+  ADAM_ENG> load <execution module> <taskname>
+
+.fi
+where <execution module> is the name of the d-task execution module and 
+<taskname> is the name by which you wish to know this particular task.
+(Thus you can have several copies of the same task with different "tasknames"
+for experimental purposes.)  Once the task has started it issues its own 
+startup message to the terminal, and can then receive messages using the SEND 
+command, e.g.
+.nf
+
+  ADAM_ENG> send ircam get filter
+ ..response..
+  ADAM_ENG> send ircam set coolant malt_whisky
+ ..response..
+  ADAM_ENG> send ircam obey integrate
+ ..response..
+
+.fi
+and so on.  At present the "frig" parameter system means that you can set the 
+values of previously unknown parameters in this way;  eventually all 
+parameters will have to be declared in an interface file.
+
+.level2 "The RGO ADAM command language"
+
+This is a partial implementation of the command language;  in particular it 
+does not yet handle procedures or have proper error messages, and this release 
+still contains a few bugs.  However it allows the commands "LOAD", "SEND",
+and "KILL" for d-task control, and is left with the command "QUIT".  Variables
+can be declared, arithmetic performed on them, and they can be printed.  
+However they can not yet be passed as parameters to the SEND command.
+
+The interpreter is started using the symbol "adamcl";  the startup message
+(defined by RGO, not BDK; and easily changed !) is produced followed by the
+prompt
+.nf
+
+Adam:>
+
+.fi
+Task control is accomplished in a similar manner to that used in the test 
+engineering interface.
+
+A manual is in preparation at RGO by William Lupton describing the ADAM 
+commands in this language.  Several chapters of this manual, in draft form,
+are in "docs_dir" with names "*chap.txt".  These are released for information
+as they contain examples of the use of the ADAM command language.
+
+.level2 "How to write your own d-task"
+
+Examine the DEVINIT and ACT modules in d_dir;  these should serve as models 
+for your own device-dependent routines.  For the present release, the 
+parameters of these subroutines are those used by RGO;  these are some 
+apparent inconsistencies present which we hope to resolve during a visit to 
+RGO in late May.  Thus the subroutine parameters cannot yet be regarded as 
+fixed.  A design document relating to d-tasks will be issued in due course;  
+this document will hopefully include the final specification of these calls.
+
+Once you have written the DEVINIT and ACT modules, you can link them with the 
+"fixed part" of the d-task by issuing the command
+.nf
+
+@d_dir:dlink <name>
+
+.fi
+from within the directory containing your compiled device-dependent modules.
+An execution module for the d-task with the name "<name>.exe" will be produced 
+in the same directory.
+
+This execution module can then be loaded, for example from within the 
+engineering interface with
+.nf
+
+  ADAM_ENG> load <name> <taskname>
+
+.fi
+and messages can then be sent to your d-task using "send".
+
+.level2 "Source listings and software maintenance"
+
+Included with this release is a copy of the "libmaint" software used at ROE 
+for maintenance of text/object software libraries.  In addition, the Starlink
+document describing this tool is also present.  It is given as 
+docs_dir:roelun4.doc in printable form and docs_dir:roelun4.lis in terminal 
+listable form.  The commands are made available by typing the symbol 
+"libmaint" (once set up for ADAM development);  this makes all the libmaint 
+symbols available.
+
+The "autodoc" version of this tool has also been included; this is made 
+available by typing the symbol "autodoc".  The diffrence between the tools is 
+that the "autodoc" version was developed for working on libraries containing
+subroutines with the library name as a prefix;  it also prompts for a reason 
+for a change on replacing a routine in its library.
+
+All libraries released here are maintained using "autodoc", with the exception 
+of the RGO ADAM command language library "ADAMCL".
+
+For listing the entire contents of a text library use the libmaint/autodoc
+command "PRINTSEP <libraryname>".
+
+.bp
+.sp 2
+`Appendix A`
+
+`Logical names and symbols defined for the ADAM system:`
+
+.nf
+Top level directory (needs to be changed for your system):
+      adam_dir disk$user1:[adam]
+
+Logical names for sub-directories:
+      lib_dir    the ADAM software
+      pro_dir    code prologues
+      docs_dir   documentation  ( only certain items present )
+      rgo_dir    RGO ADAM source code  ( not released )
+      com_dir    contains ".COM" tools
+
+Logical names for include files:
+      adamdefns   int_dir:adamdefns.for
+      adamerrs    int_dir:adamerrs.for
+      mesdefns    mes_dir:mesdefns.for
+      meserrs     mes_dir:meserrs.for
+      ddmsg       mes_dir:ddmsg.for
+      ddval       mes_dir:ddval.for
+      ddmsgstor   mes_dir:ddmsgstor.for
+      tasktab     mes_dir:tasktab.for
+      engerrs     eng_dir:engerrs.for
+      parerrs     d_dir:parerrs.for
+      parcommon   d_dir:parcommon.for
+
+Logical names for lib_dir subdirectories:
+      d_dir     d-task code and libraries
+      mes_dir   message system
+      eng_dir   engineering interface
+      int_dir   applications interface modules
+      cli_dir   RGO ADAM command language interpreter
+      adamdir   as cli_dir - used to point at init file
+
+Terminal i/o logical names used for development:
+      in_log    set to point at the user's terminal
+      out_log   set to point at the user's terminal
+
+ADAM symbols set up for development and testing:
+      assub :== @adam_dir:assub  [ used to set up sub-directory
+                                   logical names]
+      adameng :== run eng_dir:testif  [ to start up the
+                                        test interface ]
+      adamcl :== run cli_dir:test  [ to start up the ADAM CL ]
+      ttdev :== f$getjpi("","TERMINAL")  [ used to define in_log
+                                           and out_log ]
+
