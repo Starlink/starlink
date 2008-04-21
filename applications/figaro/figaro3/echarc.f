@@ -292,6 +292,8 @@ C                  file names to 132 chars.
 C     2005 June 1  MJC / Starlink.  Use CNF_PVAL for pointers to mapped
 C                  data.
 C     2005 Aug 15  TIMJ / JACH. NAME= should be FILE= in Fortran standard
+C     2008 Apr 21  MJC / Starlink.  Handle pointer arithmetic for 64-bit
+C                  use.
 C+
       IMPLICIT NONE
 
@@ -316,10 +318,8 @@ C
       LOGICAL QUIT,
      :GIVEN,PREV
       LOGICAL MONITOR,DOWAVES
-      INTEGER 
-     :IBYTES,NFIT,FMPTR,FWPTR,FOPTR,NCFILL,
-     :   NELM,
-     :NYSUB,I
+      LOGICAL ISNEW
+      INTEGER IBYTES,NFIT,FMPTR,FWPTR,FOPTR,NCFILL,NELM,NYSUB,I
       INTEGER INTERACT,NINTERACTIVE,IORDPTR,ISTAT
       INTEGER IWTSPTR,IMLDPTR,JORDPTR,FITSPTR,RCHAR,NARCS,ARCPTR
       INTEGER BYTES,FORDER,IGNORE,INVOKE,IOUT,DIMS(2)
@@ -489,22 +489,22 @@ C
       IBYTES=4*NINTERACTIVE*4+NORDERS*4
       CALL DSA_GET_WORKSPACE(IBYTES,IORDPTR,SLOT,STATUS)
       IF (STATUS.NE.0) GO TO 500
-      IWTSPTR=IORDPTR+NINTERACTIVE*4
-      IMLDPTR=IWTSPTR+NINTERACTIVE*4
-      JORDPTR=IMLDPTR+NINTERACTIVE*4
-      FITSPTR=JORDPTR+NINTERACTIVE*4
-
-         FORDR=GEN_ELEMF(%VAL(CNF_PVAL(YPTR)),1)
-         LORDR=GEN_ELEMF(%VAL(CNF_PVAL(YPTR)),NORDERS)
-         IF (FORDR.LE.LORDR) THEN
-            DI=1
-            ORDMIN=FLOAT(FORDR)
-            ORDMAX=FLOAT(LORDR)
-         ELSE
-            DI=-1
-            ORDMIN=FLOAT(LORDR)
-            ORDMAX=FLOAT(FORDR)
-         END IF
+      CALL DYN_INCAD(IORDPTR,'FLOAT',NINTERACTIVE,IWTSPTR,ISNEW,STATUS)
+      CALL DYN_INCAD(IWTSPTR,'FLOAT',NINTERACTIVE,IMLDPTR,ISNEW,STATUS)
+      CALL DYN_INCAD(IMLDPTR,'FLOAT',NINTERACTIVE,JORDPTR,ISNEW,STATUS)
+      CALL DYN_INCAD(JORDPTR,'INT',NINTERACTIVE,FITSPTR,ISNEW,STATUS)
+      
+      FORDR=GEN_ELEMF(%VAL(CNF_PVAL(YPTR)),1)
+      LORDR=GEN_ELEMF(%VAL(CNF_PVAL(YPTR)),NORDERS)
+      IF (FORDR.LE.LORDR) THEN
+         DI=1
+         ORDMIN=FLOAT(FORDR)
+         ORDMAX=FLOAT(LORDR)
+      ELSE
+         DI=-1
+         ORDMIN=FLOAT(LORDR)
+         ORDMAX=FLOAT(FORDR)
+      END IF
 
       CALL ECH_ORINIT(NINTERACTIVE,FORDR,LORDR,%VAL(CNF_PVAL(IORDPTR)))
       CALL PAR_RDARY('ORDERS',ORDMIN,ORDMAX,'None','Order #',
@@ -553,8 +553,7 @@ C
          CALL PAR_SDCHAR('WAVES','waves',STATUS)
          CALL DSA_OUTPUT('WAVES','WAVES','IMAGE',0,0,STATUS)
          CALL DSA_COERCE_DATA_ARRAY('WAVES','DOUBLE',2,DIMS,STATUS)
-         CALL DSA_MAP_DATA('WAVES','WRITE','DOUBLE',
-     :      OPTR,SLOT,STATUS)
+         CALL DSA_MAP_DATA('WAVES','WRITE','DOUBLE',OPTR,SLOT,STATUS)
          IF (STATUS.NE.0) GO TO 500
 C
 C     If a WAVES file was not requested, create an IMAGE.X.DATA structure
@@ -596,6 +595,7 @@ C
       QUIT=.FALSE.
       INTERACT=1
       SVRMS=0.0
+      ISNEW = .FALSE.
       DO WHILE ((INTERACT.LE.NINTERACTIVE).AND.(.NOT.QUIT))
 C
 C        Set integer variable IORDR equal to the next order number
@@ -614,9 +614,11 @@ C
 C        Set I2ZPTR to point to IORDR row of image, and copy row of
 C           image beginning at I2ZPTR over to ZPTR workspace
 C
-         I2ZPTR=IPTR+DI*(IORDR-FORDR)*BYTES
+         CALL DYN_INCAD(IPTR,'FLOAT',NX*DI*(IORDR-FORDR),I2ZPTR,ISNEW,
+     :                  STATUS)
          CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(I2ZPTR)),
      :                 %VAL(CNF_PVAL(ZPTR)))
+         IF (ISNEW) CALL CNF_UNREGP(I2ZPTR)
 C
 C        Identify all lines within this order using ARPLOT,ARSLCT,ARMENU
 C
@@ -626,6 +628,8 @@ C
      :                   NLARCS,ARC1,ARC2,ARC3,ARCS,IOUT,AP,
      :                   WEIGHTS,%VAL(CNF_PVAL(WPTR)),
      :                   %VAL(CNF_PVAL(WPTR2)),RMS)
+
+
          IF (PAR_ABORT()) GO TO 500
 C
 C        Give user option to CONTINUE [default] on to next order,
@@ -665,9 +669,11 @@ C
 C           Set O2PTR to point to IORDR row of image, and copy XDPTR data
 C              over to OPTR image beginning at I2ZPTR.
 C
-            O2PTR=OPTR+DI*(IORDR-FORDR)*BYTES*2
+            CALL DYN_INCAD(OPTR,'FLOAT',NX*DI*(IORDR-FORDR)*2,O2PTR,
+     :                     ISNEW,STATUS)
             CALL GEN_MOVE(BYTES*2,%VAL(CNF_PVAL(XDPTR)),
      :                    %VAL(CNF_PVAL(O2PTR)))
+            IF (ISNEW) CALL CNF_UNREGP(O2PTR)
 C
 C           ...and now continue normally
 C
@@ -746,7 +752,14 @@ C
 C
       CALL ECH_ARFILL(%VAL(CNF_PVAL(OPTR)),NX,NORDERS,FORDR,LORDR,
      :                %VAL(CNF_PVAL(FITSPTR)),NINTERACTIVE,NCFILL,
-     :          %VAL(CNF_PVAL(IMLDPTR)),%VAL(IWTSPTR),%VAL(JORDPTR))
+     :                %VAL(CNF_PVAL(IMLDPTR)),%VAL(CNF_PVAL(IWTSPTR)),
+     :                %VAL(CNF_PVAL(JORDPTR)))
+
+C    Deregister pointers within the workspace.
+      CALL CNF_UNREGP(IMLDPTR)
+      CALL CNF_UNREGP(IWTSPTR)
+      CALL CNF_UNREGP(JORDPTR)
+
 C
 C     Below we call a utility routine to get a single, sorted ARC array
 C        after first getting the workspace for it ...
@@ -812,6 +825,9 @@ C
      :                %VAL(CNF_PVAL(F1PTR)),%VAL(CNF_PVAL(F2PTR)),
      :                %VAL(CNF_PVAL(F3PTR)),%VAL(CNF_PVAL(F4PTR)),
      :                %VAL(CNF_PVAL(F5PTR)),DEVICE,MONITOR)
+
+C    Deregister pointer within the workspace.
+      CALL CNF_UNREGP(FITSPTR)
 C
 C     List name of output list file
 C
@@ -863,9 +879,11 @@ C
          IF (STATUS.EQ.0) THEN
             DO I=1,NORDERS,1
                IORDR=GEN_ELEMF(%VAL(CNF_PVAL(YPTR)),I)
-               I2ZPTR=IPTR+DI*(IORDR-FORDR)*BYTES
+               CALL DYN_INCAD(IPTR,'FLOAT',NX*DI*(IORDR-FORDR),I2ZPTR,
+     :                        ISNEW,STATUS)
                CALL GEN_MOVE(BYTES,%VAL(CNF_PVAL(I2ZPTR)),
      :                       %VAL(CNF_PVAL(ZPTR)))
+               IF (ISNEW) CALL CNF_UNREGP(I2ZPTR)
                CALL ECH_ATLAS(%VAL(CNF_PVAL(XPTR)),
      :                        %VAL(CNF_PVAL(ZPTR)),XLAB,ZLAB,NX,
      :                        IORDR,NLMAX,ORDER,CHANS,WAVES,
