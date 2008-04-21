@@ -4,10 +4,10 @@
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {ADAM Release Note}
 \newcommand{\stardocinitials}  {ARN}
-\newcommand{\stardocnumber}    {19-2.1}
+\newcommand{\stardocnumber}    {19-3.1}
 \newcommand{\stardocauthors}   {A J Chipperfield}
-\newcommand{\stardocdate}      {22 February 1991}
-\newcommand{\stardoctitle}     {ADAM --- Release 1.9-2}
+\newcommand{\stardocdate}      {1 March 1991}
+\newcommand{\stardoctitle}     {ADAM --- Release 1.9-3}
 %------------------------------------------------------------------------------
 
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
@@ -54,43 +54,64 @@ RUTHERFORD APPLETON LABORATORY\\
 %------------------------------------------------------------------------------
 
 \section{SUMMARY}
-This is a partial release of ADAM to update Version 1.9-1 with a fix for a
-bug in the parameter system. Also, some additional documents are listed in the
-documentation summaries.
-It will not be necessary to re-link tasks for this release.
-
-\section{INSTALLATION}
+This is a partial release of ADAM to update Version 1.9-2. 
 Full installation instructions are given in the Starlink Software 
 Change Notice.
+
+The main change is to reorganize the files associated with the automatic 
+inclusion of Starlink selected libraries in the development startup and 
+linking procedures.
+Some other minor changes are made to the documentation directories. This note
+also includes a section on SMS enhancements which should have been included
+in ARN019 (and SSN/45).
+
+It will not be necessary to re-link tasks for this release.
 
 \section{NEW FEATURES IN THIS RELEASE}
 
 \subsection{ADAMSTART}
 ADAMSTART.COM is modified to display the latest ADAM version number.
 
-\subsection{TRACE}
-The TRACE utility has been released in a new, improved form as
-a separate Starlink software item.
-ADAMSTART and the standard ICL startup procedures will point to the new 
-version.
-The version currently distributed with ADAM will be removed in a future
-release.
-As an interim measure, ADAMSTART will define symbol TRACE to run the new version
-if that version is installed; otherwise it will run the original version.
-(This change was actually made in ADAM Version 1.9-1.)
+\subsection{STAR\_DEV\_ADAM and STAR\_LINK\_ADAM}
+As forewarned in ADAM Release 1.9, the files for automatically including
+standard Starlink libraries in development startup and linking procedures
+are hereby transferred from the ADAM directory structure to the Starlink
+directories. This is so that they may be easily updated as the libraries
+themselves are updated.
+
+The STAR\_DEV\_ADAM procedure and STAR\_LINK\_ADAM link options file and
+shareable image library are removed from ADAM.
+The null versions of the procedure and options file will remain 
+in ADAM for sites which do not want to include the Starlink libraries.
+They may be selected by modifying the SYSLOGNAM procedure.
+
+\subsection{SYSLOGNAM.COM}
+Files SYSLOGNAM.COM and SYSLOGNAM.MINI now point the logical
+names STAR\_DEV\_ADAM and STAR\_LINK\_ADAM to the appropriate Starlink
+directory.
+If you have modified versions of these files, they should be updated in line
+with the new versions.
+
+\subsection{SMS}
+{\em This section should heve been included in ARN019 (and SSN/45.12).}
+
+A user can now define commands to be executed by pressing keys f17-f20. In
+the SCT file one needs lines such as:
+\begin{quote}
+f17  {\em icl\_command}\\
+f18  {\em another\_icl\_command}
+\end{quote}
+where {\em icl\_command} might be something like \$ SHOW DEF or a procedure 
+name {\em etc.}\\
+(Modified: SMS\_CHECKKEY,\_LOADTABLE,\_DOIT,\_ESCIN and SMSDEFNS.FOR; \\
+New files: SMS\_UKEYINIT,\_USERKEY and SMSCOMUKY.FOR.)
 
 \subsection{Documentation}
-ARN/19-2.1 describes ADAM release 1.9-2.
+ARN/19-3.1 describes ADAM release 1.9-3.
 There is no corresponding SSN/45.
 
 The summaries, ADAM\_DOCS:0CONTENTS.LIS, FULLDOCS.LIS and NEWDOCS.LIS, have 
-been updated. 
+been updated. The summaries in DOCS\_DIR in the full system have been
+removed as they only duplicate those in ADAM\_DOCS.
 
-\section{BUGS FIXED}
-
-\subsection{Parameter System}
-A bug has been fixed which caused command-line parameters to get mixed up if 
-the `keyword' or `NOkeyword' form was used for logical parameters which had not
-been allocated a `position' by the interface file.
-(SUB\-PAR\_\-CMD\-LINE) 
 \end{document}
