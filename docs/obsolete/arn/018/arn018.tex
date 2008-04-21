@@ -4,10 +4,10 @@
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {ADAM Release Note}
 \newcommand{\stardocinitials}  {ARN}
-\newcommand{\stardocnumber}    {18.1}
+\newcommand{\stardocnumber}    {18.1-1}
 \newcommand{\stardocauthors}   {A J Chipperfield}
-\newcommand{\stardocdate}      {18 September 1990}
-\newcommand{\stardoctitle}     {ADAM --- Release 1.8}
+\newcommand{\stardocdate}      {12 October 1990}
+\newcommand{\stardoctitle}     {ADAM --- Release 1.8-1}
 %------------------------------------------------------------------------------
 
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
@@ -47,504 +47,45 @@ RUTHERFORD APPLETON LABORATORY\\
 \vspace{5mm}
 %------------------------------------------------------------------------------
 %  Add this part if you want a table of contents
-  \setlength{\parskip}{0mm}
-  \tableofcontents
-  \setlength{\parskip}{\medskipamount}
-  \markright{\stardocname}
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
 %------------------------------------------------------------------------------
 
 \section{SUMMARY}
-This is a {\it complete} release of ADAM available as either a {\it full}
-or {\it mini-release}.
-It will not be necessary to re-link tasks for this release unless the bug
-correction to DTASK\_CANCEL is required.
-
-The main improvement is the provision of better help facilities. In particular,
-the method of producing multi-line help on parameter prompts in ICL is 
-extended to SMS and to tasks running directly from DCL or as ICL shareable 
-monoliths. The facility to remain in the help system is also provided as is 
-paging of the help output.
-SMS is improved to provide a help window which is used for multi-line parameter
-help and by the ICL `HELP' command.
-
-The full release requires about 43000 blocks of disk storage and includes a
-mini-release which can be extracted and put up separately.
-The mini-release requires about 14200 blocks and allows the system to be run
-and tasks to be developed.
+This is a partial release of ADAM to update Version 1.8 with fixes for two 
+bugs in the paramter system.
+It will not be necessary to re-link tasks for this release.
 
 \section{INSTALLATION}
-Full installation instructions are given in SSN/44 and the Starlink Software 
+Full installation instructions are given in the Starlink Software 
 Change Notice.
 
 \section{NEW FEATURES IN THIS RELEASE}
 
-\subsection{SUBPAR}
-\begin{itemize}
-\item Modifications are made to implement the parameter help system described
-in Appendix \ref{parhelp}.
-The following routines/files have been changed: SUB\-PAR\-\_INP\-UT, \_REQU\-EST, 
-\_PROMPT, \_PROMP\-TCL, \_LOAD\-IFC, SUB\-PAR.\-CMN.
-The following new routines have been written: SUBPAR\-\_SPLIT\-VAL, \_SEL\-HELP,
-\_OPUT, \_IPUT.
-\item SUBPAR\_\_MAXLIMS, the size of the `data lists' in the SUBPAR common
-block, has been increased from 350 to 500.
-File changed: SUBPAR.CMN.
-\end{itemize}
 
-\subsection{PARSECON}
-\label{parse}
-\begin{itemize}
-\item Additional fields {\em helpkey} and {\em helplib} are provided to
-extend the parameter help facilities as described in the revised AED/3.
-The following routines/files have been changed: PARSE\-CON\-\_TAB\-INIT,
-\_READ\-IFL,
-\_DUMP\-IFC, \_NEW\-PAR, \_TOK\-TYP, \_SET\-VP and PARSE\-CON\-.CMN
-The following new routines/files have been written: PARSE\-CON\-\_SET\-HKEY, 
-\_SET\-HLIB, PARSE\-CON2\-.CMN, PARSE\-CON3\-.CMN
-\item Error reporting has been improved. To facilitate this, the input
-buffer and the current interface/action and parameter names are now stored in a 
-common block. All available information is then output in the event of an
-error.
-(PARSERR, PARSE\-CON\-\_GET\-TOK, \_READ\-IFL, \_NEW\-PAR, \_PAR\-END(new),
-\_FAC\-END(new), \_ACT\-END,
-\_ERROR, PARSE\-CON\-.CMN, PARSE\-CON3\-.CMN)
-\item Recovery from errors is now more sophisticated. 
-A new state is set depending upon the state in which the error occurred and
-parsing will now continue after some errors which previously caused exit with 
-status set.
-(PARSE\-CON\-\_READ\-IFL, \_GET\-TOK, \_RE\-SET(new))
-\item The interface file syntax has been rationalised, in particular, fewer 
-things now have to be enclosed in quotes. The allowed syntax is fully described
-in the revised AED/3\@. (PARSECON\_TABINIT)
-\end{itemize}
-
-\subsection{ICL}
-\label{icl}
-ICL Version 1.5-3 is issued with this release.
-Improvements have been made in the following areas:
-\begin{itemize}
-\item Symbol table handling now avoids efficiency problems with large
-tables. (ICLPARSE)
-\item ICL now calls routine UFACE\_WRHELP to output help. This enables SMS
-to handle ICL help output sensibly (see Section \ref{sms})\@. (ICLTERM, ICLEXT)
-\item The enhanced parameter help system described in Appendix \ref{parhelp}
-has been implemented; so has paging of ICL help.
-(ICL\-TERM, ICL\-EXT, UFACE\_\-ASK\-PARAM, \_WRHELP\-(new), \_IPUT\-(new), 
-\_OPUT\-(new) UFACE\_\-CMN).
-\item A new command, SET HELPFILE, has been added (see Section \ref{sms})\@.
-The new command has been added to the ICL help file.
-\item Improvements have also been made to the parameter system re-initialisation
-required for shareable monoliths. Locators to the top-level of the
-monolith parameter files are kept so that the file does not need to be
-re-opened every time. (SUBPAR\_ACTSHR)
-\end{itemize}
-
-\subsection{SMS}
-\subsubsection{User-interface}
-\label{sms}
-A number of modifications have been made by Chris Mayer (JACH::CJM)\@.
-The purpose of the modifications is:
-\begin{itemize}
-\item To enable command line recall. (SMS\_GETUSRLIN)
-\item To enable better handling of ICL help.
-In order to implement this:
-\begin{itemize}
-\item A special `help' window is used which disappears when help output is
-complete. Help library searching is provided and the output is `paged'\@.
-(SMS\_COMNINIT, \_LOAD\-TABLE, \_WRHELP, common blocks SMSCOMSMG, SMSCOMFLD)
-\item Modifications have been made to ICL.
-The changes involve the addition of a SET HELPFILE command and the provision 
-of a UFACE\_WRHELP subroutine (see Section \ref{icl}).
-\end{itemize}
-
-\item To decouple SMS's help system from that of the underlying command
-language. The SMS (ADAM) help file can now be set using the new {\em config}
-parameter {\em helpfile} (see Appendix \ref{smshelp}).
-(SMS\-\_SYS\-CONFIG)
-\item An additional {\em +config+} parameter, {\em refresh} is provided to
-refresh the screen from the SCT\@. (SMS\-\_SYS\-CONFIG)
-\item Handle the spawn command correctly so that SMS and the
-subprocess are not expecting input at the same time and
-the screen is repainted on logging out from the sub-process. (SMS\_DOCMDLINE)
-\item Update the SMS help library with the latest changes. (SMS\_HELPFILE)
-\item Fix known bugs (see Section \ref{smsbugs}).
-\end{itemize}
-
-Additionally, SMS has been extended to handle multi-line parameter help
-(see Appendix \ref{parhelp}). The new help display is used for this
-purpose. (SMS\_ASKPARAM, UFACE\_WRHELP)
-
-\subsubsection{Control Table Files}
-\begin{itemize}
-\item The template SMS Control Table `system include' (SMSYSTAB.INC and
-SMSICLSYSTAB.INC) files have been modified to:
-
-\begin{itemize}
-\item Make use of the new {\em +config+ helpfile} parameter.
-\item In the case of SMSICLSYSTAB, to restore correct SMS help and auto-help
-working.
-To this end, an additional VMS help file SMS\_HELPFILE is provided in
-ADAM\_HELP.
-The new help display window is used for SMS help.
-\item Slightly modify the position of the SMS help and configuration menus.
-\item Remove reference to the AON004 help file.
-\end{itemize}
-
-\item An additional template `system include' file (FIXED.SCT),  which will 
-work with either SMS or SMSICL, is provided in ADAM\_INC.
-It specifies a non-default help window and a help menu which uses `??' rather
-than `ENTER' to obtain full help (SMSICL will not use its new help display in
-this case).
-
-\item The example control tables (AON004.SCT and AON004ICL.SCT) in ADAM\_TEST
-(see SG/4 section 15.2) have been improved to:
-\begin{itemize}
-\item Use suitably modified versions of the `system include' files.
-\item Add menu option to run an A-task (TRACE).
-This can be used to demonstrate parameter help with SMS (ref. Section
-\ref{trace}).
-\item In the case of AON004ICL, restore auto-help and SMS help.
-\end{itemize}
-\end{itemize}
-
-\subsection{Adamcl}
-The Adamcl UFACE\_ASKPARAM routine has been modified to accept the revised
-parameter request message format (see Appendix \ref{parhelp}).
-Note however that multi-line parameter help is not available with Adamcl and
-that {\em helpkey} and {\em helplib} interface file fields will be ignored.
-
-\subsection{TRACE}
-\label{trace}
-The interface module of TRACE, the HDS structure tracing utility, has been
-modified to specify multi-line help for the parameters.
-This is not actually very useful but serves to demonstrate the new parameter
-help facilities.
-A suitable help file been created -- the source is in ADAMEXE\_SOURCE and the
-library in ADAM\_HELP.
-
-\subsection{HDS}
-The shared image is built with the latest version of the HDS kernel library
-available at RAL. 
-It contains major internal revisions but should be functionally the same as 
-previous versions, apart from an additional subroutine, DAT\_WHERE.
-{\em This version has not yet been released}, therefore any attempt to rebuild 
-the system must take this into account, possibly removing DAT\_WHERE from the
-transfer vector.
-
-\subsection{PROCEDURES etc.}
-\subsubsection{ADAMSTART}
-ADAMSTART.COM is modified to:
-\begin{itemize}
-\item Display the latest ADAM version number.
-\item Use F\$TRNLNM rather than F\$LOGICAL to translate all names
-\end{itemize}
-
-\subsubsection{LIB\_DIR:LOGICAL}
-\begin{itemize}
-\item PARSECON2\_CMN and PARSECON3\_CMN are defined (see Section \ref{parse}).
-\item Logical names required for ICL linking are defined.
-\end{itemize}
-
-\subsubsection{ADAMSHARE}
-\begin{itemize}
-\item Minor id increased for version 1.8
-\item CHR\_STRDEC and CHR\_LDBLNK are no longer linked into the shared image.
-\item New common blocks PARESECON2, PARSECON3 and SUBPARTERM.
-\item SUBPAR\_SELHELP and SUBPAR\_SPLITVAL are added to the transfer vector.
-\item Dummy transfers are defined in place of CHR\_STRDEC and CHR\_LDBLNK
-(see Section \ref{cleanchr}).
-\end{itemize}
-
-\subsubsection{ADAMGRAPH7}
-\begin{itemize}
-\item Minor id increased for version 1.8
-\item GNS\_IANG, GNS\_IANI, GNS\_IGAG, GNS\_IIAI and GNS\_ITWCG are added to 
-the transfer vector.
-\end{itemize}
-
-\subsubsection{LINKNOSHR etc.}
-The order of library search in the `noshareable' link commands has been altered
-to cope with new releases of the Starlink graphics libraries which use EMS for
-error reporting.
-(LINKNOSHR.OPT, ANOSHR.COM, MNOSHR.COM, DNOSHR.COM, CDNOSHR.COM)
+\subsection{ADAMSTART}
+ADAMSTART.COM is modified to display the latest ADAM version number.
 
 \subsection{Documentation}
-SSN/45.11 and ARN/18.1 describe ADAM release 1.8.
-ARNs will be retained for reference as SSN/45 gets replaced at each new release.
-
-The following document has been re-issued:
-\begin{description}
-\item[AED/3.4] {\it ADAM -- Interface Module Reference Manual} -- various
-improvements and additions. In particular describing the enhanced parameter
-help fields. 
-Also converted to \LaTeX.
-\end{description}
+ARN/18-1.1 describes ADAM release 1.8-1.
+There is no corresponding SSN/45.
 
 The summaries, ADAM\_DOCS:0CONTENTS.LIS, FULLDOCS.LIS and NEWDOCS.LIS, have 
 been updated. 
 
 \section{BUGS FIXED}
-\subsection{ICL}
-The following bugs have been fixed.
-\begin{itemize}
-\item The SMSICL `from adamcl' switch facility did not work. (ICLINTERP)
-\item Incorrect typing of un-initialised variables used to receive parameter 
-values returned from tasks if the variable was an argument of a procedure.
-{\em Note that if the variable has already been given a value, it 
-still must be a suitable type.}
-(ICLDEF)
-\item Exponentiation of a negative number failed. (ICLINTERP)
-\item The global parameter file was not closed if the component specified
-by a GETGLOBAL or GETPAR command did not exist. This led to values
-apparently not being updated. (ICLADAM)
-\item A failure to open additional ({\em e.g.}\ interface) files after
-multiple invocations of tasks in different shareable monoliths.
-(SUBPAR\_ACTSHR)
-\item There were a number of typos in the ICLHELP file. (ICLHELP.HLP/.HLB)
-\end{itemize}
 
 \subsection{Parameter System}
 The following bugs in SUBPAR have been fixed.
 \begin{itemize}
-\item Array bounds were exceeded, usually causing a spurious HDS\_\_TYPIN
-error, if more than 32 parameters were defined for a task.
-The checking has been improved and two new errors defined:
-\begin{description}
-\item[SUBPAR\_\_XMXPOS] too many command line parameter positions allocated.
-\item[SUBPAR\_\_PNOTAL] command line parameter position used is not allocated.
-\end{description}
-Thus it is no longer possible to put a parameter value on the command line and
-have it ignored because no parameter had that position allocated to it.
-(SUBPAR\_CMDLINE, SUBERR.MSG etc.)
-\item Dynamic defaults were remembered across invocations of tasks if the
-task remained loaded. (SUBPAR\_DEACT, \_DEF1x, \_HDSDYN, \_INPUT, 
-PARSECON\_NEWPAR)
-\item If a new value for a cancelled parameter was requested and a valid value
-was not given in response to the prompt, no error message was output before
-the first re-prompt. (SUBPAR\_FINDHDS, \_GETNAME)
-\item The number of attempts to get a valid value in response to a prompt
-before status PAR\_\_NULL was returned could be anything up to five.
-It will now be consistently five. (SUBPAR\_FINDHDS, SUBPAR\_GETNAME)
+\item A bug which caused dynamic default arrays to go wrong on invocations,
+other than the first, of tasks which remained loaded.
+(SUB\-PAR\_\-DEF1\-.GEN) 
+\item A bug which caused the command line to be mis-interpreted for `internal'
+parameters.
+(SUB\-PAR\_\-CMD\-LINE) 
 \end{itemize}
-
-\subsection{LEX}
-The following bug in LEX has been fixed.
-\begin{itemize}
-\item A filename starting with digits followed by E or D was not recognised.
-\end{itemize}
-
-\subsection{SMS}
-\label{smsbugs}
-The following bugs in SMS have been fixed.
-\begin{itemize}
-\item ICL could hang if a very large number of procedures were being loaded. 
-The bug was only seen when two invocations of SMSICL were running but of 
-course using the same SDF file.
-It was due to the default of 32 for the maximum size of the  HDS working page 
-list being too low.
-HDS\_TUNE is now called to set it to 256. (SMS\_MAIN)
-\item The value of NEWOPTION was being retained between calls to
-SMS\_MOVCURMEN.
-This caused SMS to crash with a divide by zero error in some circumstances.
-(SMS\_MOVCURMEN)
-\item If in command line mode and a message came in whilst typing a command, 
-subsequent characters would appear in the scrolling region.
-(SMS\_GETUSRLIN)
-\item For a parameter list occurring as the last item in a control table,
-the `from' lines were ignored.
-(SMS\_LOADTABLE)
-\item One-line help messages were not cleared up correctly after displaying
-full help.
-\end{itemize}
-
-\subsection{MSP}
-The following bugs in MSP have been corrected:
-\begin{itemize}
-\item A problem occurred when a process was killed without running its exit 
-handler (as happens if you log out with the task still running). 
-This caused the task entries to be left in the MSP data structures as long 
-as the global section existed (which could be all the time, {\em e.g.}\ if 
-running ADAMNET)\@.
-The problem occurs if another task tries to get a path to the killed task 
-before it is reloaded. 
-
-An earlier correction for this condition was flawed, causing an infinite loop.
-This has now been fixed and GET\_TASK\_QUEUE will now return status 
-MSP\_\_NOSUCHTASK under these circumstances.
-(MSP\_GET\_TASK\_QUEUE)
-
-\item The variable TASK\_LIST was not page-aligned. This caused a problem when
-linking non-shareable. (MSP.PAS)
-\end{itemize}
-
-\subsection{DTASK}
-An acknowledgement was not sent to terminate the OBEY transaction if it was
-from the same process as the CANCEL. This is now done, provided that the
-action is cancelled. (DTASK\_CANCEL)
-
-\subsection{FIO/RIO}
-The following bugs in FIO/RIO have been corrected.
-\begin{itemize}
-\item If FIO/\-RIO\-\_ASSOC failed after having obtained a value for the 
-specified parameter, FIO/\-RIO\-\_CANCL would fail to cancel the parameter 
-value. 
-Hence it was not possible to obtain a different value by calling the ASSOC 
-routine again. (FIO/\-RIO\-\_ASSOC, FIO/\-RIO\-\_CANCL)
-\item FIO/\-RIO\-\_ASSOC and FIO/\-RIO\-\_CANCL were not case-insensitive 
-about the parameter name. (FIO\_\$FNDFP)
-\end{itemize}
-
-\section{CLEANUP}
-\subsection{CHR}
-\label{cleanchr}
-As forewarned at the last release,
-the temporary alternative names CHR\-\_STRDEC and CHR\-\_LDBLNK for routines 
-CHR\-\_DCWRD and CHR\-\_LDBLK have been removed.
-Tasks which are already linked will continue to work, but it will not now
-be possible to link tasks which call the old names.
-A direct name substitution in the code is possible.
-
-\appendix
-\newpage
-\section{Parameter Help Enhancements}
-\label{parhelp}
-To meet requirements expressed in the ADAM\_DEVELOPMENT conference and
-elsewhere, the following modifications to the parameter help system have
-been implemented
-
-A parameter may now have two help specifiers defined in the interface file.
-\begin{description}
-\item[help] - a one-line help string (as now).
-For the time being, the one-line help specifier may in the form 
-proposed and implemented by Jeremy to provide `multi-line' help for
-ICL\@.
-That is:
-\begin{quote}
-\begin{verbatim}
-help '%library key1 key2 etc.'
-\end{verbatim}
-\end{quote}
-Single-line help is not expected to be used in important packages.
-   
-
-\item[helpkey] - to specify a help library and a module within it at 
-which `multi-line' help on the parameter may be found.
-
-For example:   
-\begin{quote}
-\begin{verbatim}
-helpkey 'kappa_dir:kappa kappa add object'
-\end{verbatim}
-\end{quote}
-
-Note that `multi-line' is a reference to how many lines of help there 
-could be, rather than how many there are.
-
-If the specifier is of the form:
-\begin{quote}
-\verb%helpkey *% or \verb%helpkey '*'% 
-\end{quote}
-a default value of \verb%interface_name PARAMETERS parameter_name% will be
-used, where \verb%interface_name% is the name specified in the current 
-INTERFACE field.
-\end{description}
-The response to the parameter prompt may be ? or ?? and the effect will
-depend upon the particular user-interface in use and which of the help
-specifiers are given. The following table shows the order in which the 
-options will be tried by the user-interfaces ICL, DCL and SMS. Adamcl
-will ignore any {\em helpkey} specifier.
-\begin{center}
-\begin{tabular}{|c|c|} \hline
-Response  & Options \\
-\hline
-? & help, helpkey, apology\\
-?? & helpkey, help, apology\\
-\hline
-\end{tabular}
-\end{center}
-
-Notes.
-\begin{enumerate}
-\item The `help' option uses the interface file {\em help} field if there is
-one. Note that this could produce either one-line or multi-line help.
-
-\item The `helpkey' option uses the interface file {\em helpkey} field if
-there is one.
-
-\item The `apology' option will be selected if no earlier one is available.
-It consists of outputting an apologetic message. 
-
-\item For ICL and DCL, if multi-line help is output in response to `?', the 
-user is prompted again immediately; if it is output in response to `??',
-the user will be left in the help system and prompted for further keys.
-This means that single-line help plus immediate return from multi-line
-help is not available. SMS will always leave the user in the help system.
-
-\item Multi-line help will be paged.
-
-\item If the specified help library cannot be found or opened by the user,
-an error message will be output.
-
-\item Other messages may appear from the help system itself.
-\end{enumerate}
-
-\subsection{Further Extensions}
-An additional interface file field {\em helplib} is provided.
-The intention is to specify a top level for all succeeding helpkey specifiers 
-until another {\em helplib} field is found. 
-When the interface file is parsed, the specified string is inserted (with 
-an intervening space) in front of any string specified in subsequent 
-{\em helpkey} fields. 
-The {\em helplib} specifier can be a blank string to nullify an earlier one.
-
-\subsection{Implementation}
-Both the {\em help} and {\em helpkey} specifiers are included in the parameter 
-request message sent to the user-interface. 
-This has become possible with the recently increased maximum inter-task
-message length.
-
-\newpage
-\section{SMS Help Enhancements}
-\label{smshelp}
-To configure the new VMS help display, the following extra {\em fields} entries
-are permitted.
-\begin{center}
-\begin{tabular}{ll}
-help\_width  {\em n} & the width of the help display in columns\\
-help\_height  {\em n} & the height of the help display in rows\\
-help\_leftcol {\em n} & the column position of the top left hand corner of the
-                   help display\\
-help\_toprow  {\em n} & the row position of the top left hand corner of the help
-                   display\\
-\end{tabular}
-\end{center}
-If no values are specified then the system defaults to
-\begin{center}
-\begin{tabular}{lr}
-help\_width   & 78\\
-help\_height  & 22\\
-help\_leftcol  & 2\\
-help\_toprow   & 2\\
-\end{tabular}\\
-\end{center}
-This will pass the full screen over to VMS help ( a border is applied around
-the display) and so enable the maximum amount of information to be seen at
-any one time. 
-
-The new {\em config} parameters allow actions such as the following
-\begin{quote}
-\begin{verbatim}
-action set_help
-+config+ helpfile <filename>
-\end{verbatim}
-\end{quote}
-where \verb%<filename>% is a valid ADAM help file or a logical name that 
-points to one.
-\begin{quote}
-\begin{verbatim}
-action refresh
-+config+ refresh
-\end{verbatim}
-\end{quote}
 
 \end{document}
