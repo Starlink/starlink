@@ -123,7 +123,8 @@
           end if
 
           if(iplt.ne.3) then
-            call plot_line(line,(iplt.eq.2),vcorr,%VAL(d_wptr),
+            call plot_line(line,(iplt.eq.2),vcorr,
+     :                     %VAL(CNF_PVAL(d_wptr)),
 *     :           ix,iy,velplt,vtype,dynamic_chars(idsptr:idsend),
      :                     ix,iy,velplt,vtype,idstring,
      :                     %VAL(CNF_PVAL(d_rptr)),
