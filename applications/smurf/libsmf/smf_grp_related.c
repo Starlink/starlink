@@ -467,10 +467,13 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
      is shorter than SMF__MINCHUNKSAMP in length (time) and remove it */
 
   keepchunk = smf_malloc( ngroups, sizeof(*keepchunk), 0, status );
+  for( i=0; i<ngroups; i++ ) {
+    keepchunk[i] = 1;
+  }
 
   if( *status == SAI__OK ) {
 
-    totlen = all_len[i];
+    totlen = all_len[0];
     chunkstart = 0;
 
     for( i=1; i<=ngroups; i++ ) {
