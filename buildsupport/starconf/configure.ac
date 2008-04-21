@@ -162,9 +162,7 @@ AC_SUBST(aclocaldir)
 
 # Convert the version number in PACKAGE_VERSION into an integer
 # Pick a version (I'm getting bored with this project...)
-PACKAGE_VERSIONINT=[`echo $PACKAGE_VERSION 0 0 0 | sed 's/[^0-9]/ /g;s/$/ [Saz0<x]sx lxx La 1000*La+1000*La+p/' | dc`]
-#PACKAGE_VERSIONINT=[`echo $PACKAGE_VERSION 0 0 0 | sed 's/[^0-9]*\([0-9]*\)[^0-9]*\([0-9]*\)[^0-9]*\([0-9]*\).*/\3 \2 \1 1000*+1000*+p/' | dc`]
-#PACKAGE_VERSIONINT=[`echo $PACKAGE_VERSION | sed 's/[^0-9]/ /g' | $AWK '{print $1*1000000+$2*1000+(NF>2 ? $3 : 0)}'`]
+PACKAGE_VERSIONINT=[`echo $PACKAGE_VERSION | sed 's/[^0-9]/ /g' | $AWK '{print $1*1000000+$2*1000+$3}'`]
 AC_SUBST(PACKAGE_VERSIONINT)
 
 
