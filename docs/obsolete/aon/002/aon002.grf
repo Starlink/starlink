@@ -1,0 +1,603 @@
+.AF GEROFFDIR:PRELUDE.GRF
+.AONA 2 "PLT2D - The 2D Graphics D-Task" "Colin Aspin" "25.11.85"
+
+
+.level1 "SUMMARY"
+
+	This document describes the operation of 
+the D-task PLT2D. PLT2D is a general plotting routine for 
+the display of 2D IMAGE type data and/or LINE/TEXT graphics.
+It was primarily written for display of IRCAM images on the Sigma 5688
+workstation but can be run on `ANY` currently supported GKS workstation.
+The task is currently controlled by a PROCEDURE type user interface 
+(C-task) which is also described below. The use of this tasks is not 
+restricted to 2D infrared image data and should be considered as a
+general ADAM graphics tasks to provide IMAGE DISPLAY and MANIPULATION,
+IMAGE CONTOURING, IMAGE CUTS/SLICES and LINE/TEXT ANNOTATION.
+
+
+.level1 "THE PLT2D D-TASK"
+.level2 "Design"
+	During the design phase of PLT2D, its operation was considered 
+primarily as driving a graphics workstation. The implementation of the 
+task therefore took the form of a D-task. This meant that the primitive
+routines to display graphics are coded as named ACTIONS in the ACT 
+subroutine of the D-task and are defined as ACTIONs in the task 
+interface file. At present no action is performed in the D-task DEVINIT
+subroutine.
+
+.level2 "Primitive OBEY actions"
+
+	Below are described the current OBEY actions in PLT2D which can 
+be called directly if needed. Operation in such a mode is not 
+recommended since numerous parameters (~100) are called upon which may need 
+setting before satisfactory results can be obtained.
+
+.nf
+action BLOCK
+	Plots a colour table BLOCK on a colour workstation
+
+action BORDER
+	Plots a BORDER of specified width around an image
+
+action BOX
+	Plots a BOX of specified size at specified position
+
+action CIRCLE
+	Plots a CIRCLE of specified diamter at specified position
+
+action CLEAR
+	CLEARS the workstation of all graphics
+
+action CLOSE
+	CLOSES plotting on the current workstation
+
+action COLTAB
+	Writes a specified COLour TABle (LUT) to a colour workstation
+
+action COMMENT
+	Plots a COMMENT at a specified position
+
+action CONTOUR
+	Plots a CONTOUR map of an image
+
+action CROSS
+	Plots a CROSS of specified size at specifed position
+
+action CURBOX
+	Plots a BOX of specified size at the CURSOR position
+
+action CURCIR
+	Plots a CIRCLE of specified diameter at the CURSOR position
+
+action CURCOM
+	Plots a specified COMMENT at the CURSOR position
+
+action CURCRO
+	Plots a CROSS of specified size at the CURSOR position
+
+action CURCUT
+	Plots a CUT (slice/profile) through an image between 
+	two CURSOR positions
+
+action CURLIN
+	Plots a LINE between two CURSOR positions
+
+action CURSOR
+	Displays the CURSOR and sets position and value in 
+	CURSOR_IMAGE
+
+action CUT
+	Plots a CUT (slice/profile) through an image from X,Y start
+	to X,Y end pixels
+
+action DEFANN
+	Plots the DEFAULT annotation around an image
+
+action FLASH
+	Displays an image without scaling and/or manipulation 
+	(faster than PLOT)
+
+action GRID
+	Plots a GRID of lines across image at specified increments
+
+action LINE
+	Plots a LINE between X,Y start and X,Y end pixels
+
+action OPEN
+	OPENS plotting on a specified workstation
+
+action PLOT
+	PLOTS an image with scaling and manipulation 
+
+action SETCOL
+	SETs the COLour of a pen in range 0-255 on colour workstation
+.fi
+
+
+
+.level1 "THE PLT2D PROCEDURE C-TASK"
+
+	Above PLT2D exists a user interface in the form of
+one (or more) C-tasks which take input from the user and instruct 
+the D-task to perform its primitive operations. The current C-task 
+takes the form of a ADAMCL PROCEDURE. This will be eventually re-coded as a 
+FORTRAN C-task when complete debugging has occurred and the users are 
+satisfied with the operation and extent of the PLT2D actions.
+
+	Below are listed ALL the current procedures to drive PLT2D.
+In general, the operation of the procedures takes the form of 
+a PROMPT for 
+the VALUES of the parameters defining an action, the SETTING of the parameters 
+and the EXECUTION of that action. Several procedures however 
+allow the SETTING of 
+values without execution of the action, these are prefixed SET. Others allow 
+the INSPECTION of the current values of parameters and are prefixed GET.
+Also available are several one line HELP routines which can be listed by
+using the procedure ?
+
+.level2 "Current Procedures"
+
+.nf
+procedure `?`
+	Gives HELP list for PLT2D
+
+procedure `ABORT`
+	ABORT procedure for PLT2D
+
+procedure `BLOCK`
+	Asks for X,Y CENTRE, SCALE factor and ORIENTATION for a BLOCK
+	plotted on colour workstation to display colour table (LUT)
+
+	The X,Y CENTRE can be between the minimum and maximum X and Y
+	pixel units (raster units) for the device and on opening the
+	workstation are put in parameters MAX_XSIZE and MAX_YSIZE.
+	They can be inspected using the GETRAN procedure.
+
+	An example of this is : Using the ARGS the maximum pixel (raster)
+	units are 512 in both X and Y. Thus an X and Y centre of 256,500
+	would place the colour BLOCK at the centre of the screen in X and
+	close to the top of the screen in Y.
+
+	The SCALE factor is the number of times the size of the colour
+	table is duplicated. Thus, a colour table of 256 colours scaled by
+	a factor 2 will appear as a 10 by 512 block on the workstation.
+
+	The ORIENTATION of the colour block defines whether the block is
+	plotted Horizontally or Vertically (H/V) on thw workstation.
+
+procedure `BORDER`
+	Asks for the width of the border (in resolution elements) and
+	plots a BORDER of specified width around image.
+
+procedure `BOX`
+	Asks for the X,Y CENTRE and X,Y size of the BOX and plots it
+	at the specified position.
+
+	The X,Y centre and size of the BOX are in units of the maximum
+	pixel (raster) units (see BLOCK).
+
+procedure `BYE`
+	Kills the loaded task and quits ADAMCL
+
+procedure `CIRCLE`
+	Asks for the X,Y centre and diameter of the CIRCLE and plots 
+	it at the specified position.
+
+	The X,Y centre and diameter of the CIRCLE are in units of the 
+	maximum pixel (raster) units (see BLOCK).
+
+procedure `CLEAR`
+	CLEARS the workstation of all graphics. The current colour
+	table is not affected.
+
+procedure `CLOSE`
+	CLOSES plotting on the current workstation.
+
+procedure `COLTAB`
+	Writes a COLOUR TABLE to the current workstation if it is a 
+	colour device. The procedure asks for the name of the SDF file
+	containing the colour table which must be in primitive element
+	DATA_ARRAY and be of 3 by 256 elements.
+
+procedure `COMMENT`
+	Asks for the COMMENT to be plotted, the X,Y centre of the COMMENT
+	and the size of the COMMENT. It then plots the COMMENT at the
+	specified position.
+
+	The X,Y centre of the COMMENT are in units of the maximum
+	pixel (raster) units (see BLOCK). The size of the COMMENT is
+	the height of the characters in terms of the same units.
+
+procedure `CONTOUR`
+	Asks for the name of the image to be CONTOURed, the number of
+	contours, the base contour level, the contour interval and the 
+	type of contour map drawn. The procedure then plots a contour
+	map on the current workstation.
+
+	The image to be contoured has to be an SDF data file with 
+	primitive element DATA_ARRAY containing the image array.
+	The type of contour map drawn is defined as type 1 or type 2
+	Type 1 contour map means that ALL contours defined by the number
+	of contours, the contour base level and contour interval are
+	plotted in one scan through the data image. Type 2 contours are
+	plotted individually with the number of scans through the image
+	being equal to the number of contours drawn.
+
+procedure `CROSS`
+	Asks for the X,Y centre and size of the CROSS plotted.
+
+	The X,Y centre and size of the CROSS are in units of the 
+	maximum pixel (raster) units (see BLOCK).
+
+procedure `CURBOX`
+	Asks for the X,Y size of the BOX plotted and displays a CURSOR
+	whose position is selected by pressing any key on the input device
+	(trackerball buttons on the ARGS, any key on keyboard on TEKTRONIX)
+	The BOX is then plotted centred on the CURSOR position
+
+	The X,Y size of the BOX are in units of the maximum pixel (raster) 
+	units (see BLOCK).
+
+procedure `CURCIR`
+	Asks for the diameter of the CIRCLE and displays a CURSOR whose
+	position will be the centre of the CIRCLE plotted.
+
+procedure `CURCOM`
+	Asks for the COMMENT word(s), and the size (see COMMENT) and
+	displays a CURSOR whose postion is the centre of the text string
+
+procedure `CURCRO`
+	Asks for the size of the CROSS to be plotted and displays a 
+	CURSOR whose position is the centre of the CROSS.
+
+procedure `CURCUT`
+	Asks for the name of the image containing the data to be plotted
+	as a CUT (slice/profile) and, assuming you have an image displayed
+	on the workstation displays the CURSOR twice for the start and end
+	points of the CUT. The procedure then plots the CUT on the current
+	workstation through the cut image. This image need not be the same
+	one as currently displayed. The cut image is the one specified in
+	the CURCUT procedure while the image displayed is specified in the
+	PLOT procedure.
+
+procedure `CURLIN`
+	Displays the CURSOR twice for the start and end position in 
+	screen (raster) units between which is plotted a line.
+
+procedure `CURSOR`
+	Displays the workstation CURSOR and on selection of a point using
+	the trackerball buttons/keyboard reports the X,Y pixel selected
+	in the image displayed and the value of that pixel in the
+	CURSOR image. The CURSOR image need not be the same as the image
+	displayed and can be set using the procedure SETCURIM.
+
+procedure `CUT`
+	Asks for the image from which the CUT (slice/profile) is to
+	be extracted and plotted and the X,Y start and end pixels in that
+	image. The procedure then plots the defined CUT through the cut
+	image.
+
+	Other CUT parameters can be SET using the procedure SETCUT
+
+procedure `DEFANN`
+	This procedure informs PLT2D to plot the default annotation
+	arrangement around the current image. This option is not yet
+	complete in PLT2D and has variuos parameters defaulted in the code
+	at present. The same annotation will therefore appear regardless
+	of the image displayed.
+
+procedure `FLASH`
+	This procedure allow the user to display an image on a image
+	workstation with any pre-scaling of the image and in the centre
+	of the image area at maximum magnification so that the image fills
+	the display screen. It is therefore a FASTER image display routine
+	than PLOT but is not as flexible in its operation. The image array
+	has to be stored in an SDF type data file under the primitive
+	component DATA_ARRAY.
+
+procedure `GETCALC`
+	Procedure to GET the calculated maximum and minimum values in an
+	image that is scaled and displayed using PLOT. These values are set
+	if the values chosen for the PLT2D parameters MAXIMUM and MINIMUM
+	are equal to less than 1.0e-10.
+
+procedure `GETCURR`
+	Gets the REAL screen position of the CURSOR which will be in the
+	range 0-MAX_XSIZE and 0-MAX_YSIZE.
+
+procedure `GETCURP`
+	Gets the PIXEL position of the CURSOR with respect to the last
+	or current image displayed. The latest value of the PIXEL is 
+	also returned to the user.
+
+procedure `GETPLOT`
+	Gets the IMAGE plot type. This option is SET using the SETPLOT
+	procedure and defines whether ALL (A) of the currently defined image 
+	is plotted displayed or whether a SUB-IMAGE (S) of the currently
+	defined image is shown on the workstation. If the S option is in
+	operation the portion of the image plotted is defined by the
+	PLT2D parameters SUBIM_XST,SUBIM_YST and SUBI_XEN,SUBIM_YEN which
+	can be SET using the SETSUBIM procedure. Thus, if we use SETPLOT 
+	to define that we want to plot a SUB_IMAGE (S) of the current image
+	then we can use SETSUBIM to set the area plotted to say, 1,1
+	32,32 and the area whose first and last pixels are 1,1 and 32,32
+	resectively will be plotted. (see also SETPLOT, SETSUBIM, PLOT
+	and CONTOUR)
+
+procedure `GETSIZE`
+	Gets the SIZE of image (in pixels) currently displayed on the
+	workstation. This defaults to 64 by 64 and is set only when the
+	image is plotted using PLOT.
+
+procedure `GETSTEN`
+	Gets the START,END coordinates (in screen units) of image 
+	currently display on the workstation.
+
+procedure `GETSUBIM`
+	Gets the SUB-IMAGE plot type. This procedure set whether the whole 
+	(A) or a sub-image (S) of the current image is plotted when the
+	PLOT command is issued. This idea also works when plotting
+	contour maps with CONTOUR.
+
+procedure `GETRAN`
+	Gets the MAXIMUM values, in screen coordinates of the current
+	workstation. For example, the ARGS has a maximum worksation size
+	of 512 by 512 pixels, while the T4014 can address 4096 by 3120
+	pixels or resolution elements. The values returned by GETRAN
+	are these parameters.
+
+procedure `GREY`
+	This procedure writes a GREY scale colour table to the workstation
+	if it is a colour supporting device. (This is a special version
+	of COLTAB)
+
+procedure `GRID`
+	Plots a GRID of lines on an image at a specified X and Y increment
+	which may or may not be equal. the procedure asks for the values
+	of these two parameters.
+
+procedure `HEAT`
+	Writes a HEAT colour table to the current workstation if it is a
+	colour supporting device. (see COLTAB)
+
+procedure `HELPST`
+	Temporary HELP procedure on STARTING to use PLT2D with procedures.
+
+procedure `HELPEN`
+	Temporary HELP procedure on ENDING the use of PLT2D with procedures.
+
+procedure `HELPIM`
+	Temporary HELP procedure on displaying IMAGES using PLT2D procedures.
+
+procedure `HELPLI`
+	Temporary HELP procedure on displaying LINE graphics using PLT2D 
+	procedures.
+
+procedure `HELPWR`
+	Temporary HELP procedure on WRITING comments using PLT2D procedures.
+
+procedure `HELPCO`
+	Temporary HELP procedure on displaying COLOURS using PLT2D procedures.
+
+procedure `HELPME`
+	Temporary HELP procedure on MISCELLANEOUS PLT2D procedures.
+
+procedure `HELPSE`
+	Temporary HELP procedure on SETTING PLT2D parameter values using 
+	procedures.
+
+procedure `HELPGE`
+	Temporary HELP procedure on GETTING parameter values using PLT2D 
+	procedures.
+
+procedure `HELPAL`
+	Temporary HELP procedure on ALL PLT2D procedures.
+
+procedure `K`
+	Kills the current PLT2D task
+
+procedure `L`
+	Loads PLT2D under the currently defined ALIAS
+
+procedure `LINE`
+	Asks for the start and end X,Y coordinates of a line and plots it.
+
+procedure `OPEN`
+	OPENS plotting on a specified device. Currently the device is
+	identified by its GKS workstation identifer (ARGS=1, T4010=2 etc.)
+
+	If the user wishes the list of currently supported workstation
+	then typing OPEN will list them and prompt for the one to use.
+
+	If the user does NOT wish the list of devices executing this
+	procedure as OPEN 1 or OPEN 5 for example will just do the work.
+
+
+procedure `NEWDEV`
+	This prcoedure allow the user to CLOSE plotting on the current
+	workstation and OPEN it on a different (or the same) one.
+
+procedure `PENCOL`
+	Asks for the pen number (0-255) and the Pen colour (W,R,B,G,Y,P,
+	C,S,N) and sets that pen to that colour immediately.
+
+procedure `PLOT`
+	This routine is the main one for PLOTTING images on a workstation.
+	It asks for the name of the image plotted only but uses several
+	other PLT2D parameters in is processing of the image before display.
+
+	The parameters use here are :
+
+	MAXIMUM, MINIMUM the range of values in the image that are 
+	displayed. Above the maximum value the value plotted is placed to 
+	the maximum allowable. Below the minimum the value plotted is placed 
+	to the minimum allowable. These values can be set with SETMAX and 
+	SETMIN. Thus if we define the MAXIMUM and MINIMUM as 4000 and 100
+	respectively for an image with a maximum and minimum value of say
+	5000 and 0 every pixel above 4000 will be displayed at the colour of
+	the top pen i.e. 255 and every pixel with a value below 100 will
+	be displayed with the colour of the 0th pen. For a GREY colour table
+	this would be WHITE and BLACK respectively. If MAXIMUM and MINIMUM
+	are equal (see GETMAX,GETMIN) then the real maximum and minimum value 
+	in the data image will be used as the upper and lower limits of the 
+	image display. 
+
+	IM_XCEN, IM_YCEN which are the X,and Y image centre in screen 
+	coordinates (i.e. 0-512 in both X and Y for the ARGS) and are set
+	using the procedure SETCEN. If these parameters are set to 0,0
+	respectively then the image will be positioned in the centre of 
+	the current workstation screen area.
+
+	MAGNIFICATION is a parameter defining the size of the image with
+	respect to the maximum screen coordinates when displayed on the
+	workstation. Thus a 64 by 64 image displayed at a MAGNIFICATION of
+	8 will appear as a 512 by 512 image with each REAL pixel duplicated
+	in 8x8 resolution elements. If the value set is 0 then the value
+	used for the MAGNIFICATION will be calculated to fill the current 
+	workstation screen area with the current image.
+
+procedure `PONY`
+	This routine PLOTS one of the test images called PONY. This image 
+	is a reduced resolution and size version of the Starlink HORSE image.
+	It is 64 by 64 pixels square and has maximum and minimum values of 
+	255 and 0.
+
+procedure `RESET`
+	Procedure to RESET the current workstation. this takes the form
+	of the device being CLOSED and then OPENED again.
+
+procedure `SETCOL`
+	Asks for the type of line feature whose colour is to be set after
+	giving a list of possible types. Then asks for the colour the feature
+	is to be set to. Then the procedure sets the colour of the specified 
+	feature to the specified colour. This routine does not work 
+	immediately but sets the colour from the next action.
+
+procedure `SETCEN`
+	Sets the CENTRE of the coordinates for the next image to be 
+	displayed. The procedure prompts the user for the X,Y centres in
+	screen coordinates.
+
+procedure `SETCURIM`
+	Sets the cursor IMAGE name. This allow the user to change the image
+	that is used to find values of pixels whose position is defined
+	by the cursor on the screen.
+
+procedure `SETCUT`
+	Sets the list of CUT (slice/profile) parameter. This list includes
+	the type of line/markers plotted in the CUT, the scaling option
+	for the plot and the position and increment of the axis tick marks
+	plotted on the CUT.
+
+procedure `SETIM`
+	Sets the IMAGE name that is displayed if the PLIT procedure is not
+	used and PLT2D is called directly via OBEYW PLT2D PLOT.
+
+procedure `SETMAG`
+	Sets the MAGNIFICATION for the next image displayed. this is really
+	the duplication factor that each pixel is scaled by when plotting
+	takes place. Thus, is the MAGNIFICATION is specified as 6 then each
+	pixel in the input image is plotted as a 6 by 6 box of resolution
+	elements on the current workstation.
+
+procedure `SETMAX`
+	Sets the MAXIMUM value for image display (see PLOT)
+
+procedure `SETMIN`
+	Sets the MINIMUM value for image display (see PLOT)
+
+procedure `SETPLOT`
+	Sets the IMAGE section parameter and determines whether all or part
+	of the next image to be displayed is plotted to the workstation.
+
+procedure `SETSUBIM`
+	Sets the start and end coordinates of the SUB-IMAGE displayed if the
+	S option is chosen under SETPLOT.
+
+procedure `SETTASK`
+	Sets the NAME used when loading PLT2D with the procedure L.
+	Once this is set all subseqent procedure calls use the ALIAS name
+	for PLT2D. this is a useful facility when wanting to run PLT2D
+	on more than one device at the same time. Thus, each additional
+	version of PLT2D is called something different and controls a 
+	different plotting workstation.
+
+procedure `SPEC`
+	Writes a SPECTRUM type COLOUR TABLE to the current workstation if 
+	it is a colour supporting device.
+
+procedure `TEKLINE`
+	Sets the LINE type for subsequent TEKTRONIX plotting to LOCAL 
+	or REMOTE. Local plotting means that the TEKTRONIX used is the 
+	terminal the user is logged in at while REMOTE means that the 
+	TEKTRONIX used for plotting is another terminal defined as GKS
+	unit GKS_2_1 or GKS_4_1. This facility can only be setup before
+	plotting is opened (with OPEN) on that device.
+.fi
+
+
+.level1 "USING PLT2D"
+
+	On entry to ADAMCL the user should load the dictionary of PLT2D 
+procedures using the CL command LOADDICT ADAM_EXE:PLT2D. After a few seconds (at most) 
+the CL prompt will reappear meaning that the procedures have been loaded into 
+the current dictionary. This dictionary can be inspected using the SHOWDICT CL 
+command. Next the PLT2D task must be loaded into memory. This can be achieved 
+by immediately using the L procedure ( type L <CR>) when PLT2D will be loaded 
+under the NAME PLT2D or by first executing the procedure SETTASK (type SETTASK 
+<CR>) to set the NAME PLT2D is loaded under to something else. If SETTASK is 
+executed the load procedure L must then be run. On typing L <CR> the task will 
+be loaded and suitable messages are displayed on the terminal with some 
+indication of what to do next. To start plotting to some device you must open 
+plotting on that workstation using the OPEN procedure (type OPEN <CR>). This 
+will list the available workstations and prompt you for the one you want to 
+plot on. At present the input of the workstation to be used is in the form of 
+the workstation sequence number (1 for ARGS, 2 for T4010 etc.) since at 
+present strings cannot be compared (for different actions) in a procedure.
+On selection of the device to be used plotting will be opened and the plotting 
+can proceed. The standard viewport used for the majority of devices is the 
+FULL extent in both X and Y. Workstations with extended working areas such as 
+the VERSATEK have a viewport set to give a X/Y ratio of 1.5. The coordinate 
+system used in plotting is defined as merely the raster units in both X and Y.
+Thus, on the ARGS, the viewport will be set to 0-512 in both X and Y and the 
+world coordinate system in use will be 0-512 in both X and Y also. This 
+unfortunately does mean that at present swapping devices may mean changing 
+plot parameters. A rationalization of this system is currently in progress.
+
+Once plotting is opened on the workstation any of the above procedure to 
+display images/line graphics can be used to produce output.
+
+
+.level1 "ADDITIONAL ROUTINES"
+
+	Several additional PLT2D routines are being implemented at present 
+including an automatic `+`3-sigma image dipsplay facility.
+
+	Users wishing to see additional routines/operations implemented 
+in PLT2D should address their remarks to REVA::CAA who will consider 
+and (maybe) implement them.
+
+
+.level1 "IMAGE DATA FORMAT"
+
+	In PLT2D data to be plotted is assumed stored in an HDS format
+data file. Where 2D data is used the subroutine CMP_MAPN is used to map the
+data image which is assumed stored in a component of a structure called
+DATA_ARRAY. Thus, on calling the image plotting action for example, the image 
+to be plotted will be searched for under the primitive component DATA_ARRAY.
+No other component is assumed to exist at present. This will probably change 
+in the not to distant future so that the routines will look for other elements 
+in the Starlink 'IMAGE' structure.
+
+.level1 "TEST DATA"
+
+	Their are several test images and colour tables available to allow the 
+user to immediately use PLT2D. At present this list contains PONY, a small
+64 by 64 version of the Horsehead Nebula, STARS a 64 by 64 image of a 
+simulated random star field (see CREFRAME in RAPI2D) and RMON a 64 by 64 image
+of the bipolar reflection nebula RMON/NGC2261. Colour tables available include 
+GREY, a grey scale table, HEAT, a heatcon colour table and SPEC a spectrum 
+colour table. Colour tables MUST be 3 by 256 in size (as in Starlink LUTs).
+Images for plotting can be any size.
+

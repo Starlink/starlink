@@ -1,0 +1,150 @@
+.af geroffdir:prelude.grf
+.aona 3.1 "Rapi2d - Reduction and Analysis Package for Infra-red Imaging Data" "Mark McCaughrean" "2nd December 1985"
+.uc `
+
+.level1 "Overview Of Rapi2d"
+  Rapi2d, a `R`eduction and `A`nalysis `P`ackage for `I`nfra-red `I`maging
+`D`ata, comprises an Adam monolith containing forty individual A-tasks.
+The package has been specifically implemented for use in the reduction
+and analysis of data taken with the common-user 1-5 micron infra-red
+array camera (Ircam) currently under construction for the United Kingdom 
+Infra-Red Telescope (UKIRT), in Hawaii. It is, however, a generalised
+2-d image processing package, and is relevant to any such data. There
+are two important points worth noting here : firstly, Rapi2d is not at
+all complete, and is being released in this preliminary state with the
+warning the current package has not been fully tested and may contain bugs.
+Secondly, Rapi2d expects to find data in an HDS format, and more
+explicitly, operates on the DATA_ARRAY component of a standard IMAGE
+structure, found in an .SDF file. 
+The routine CREFRAME generates test data in this format, 
+and your attention
+is drawn to the note at the end of the following list for details.
+
+  There now follows a list of the currently available routines in
+Rapi2d.
+
+.nf
+## ADD - addition of image+image, scalar+image, scalar+scalar
+
+## APERADD - bins up pixels in a circular aperture and 
+             gives statistics
+
+## BCAL - calculates various statistical parameters for an 
+          image
+
+## BLOCK - perform a block smooth on a 2-D image
+
+## CHPIX - replace 'bad' pixels with specified values
+
+## COMPADD - compresses image by adding together a specified 
+             number of pixels
+
+## COMPAVE - compresses image by averaging over specified 
+             number of pixels
+
+## COMPICK - compresses image by selecting pixels from the 
+             input image
+
+## COMPRESS - compresses image by different amounts in x 
+              and y dimensions
+
+## CREFRAME - allows user to generate specific forms of test data
+
+## DIV - division of image/image, image/scalar, scalar/scalar
+
+## EXP - calculates the exponential of an image or scalar 
+         ( base e )
+
+## EXP10 - calculates the exponential of an image or scalar 
+           ( base 10 )
+
+## EXPON - calculates the exponential of an image or scalar 
+           ( prompted for base )
+
+## FLIP - reverse a 2-D image about either the horizontal 
+          or vertical axis
+
+## GAUSS - perform a gaussian smooth on a 2-D image
+
+## GLITCH - replace 'bad' pixels with local mean
+
+## HISTEQ - performs histogram equalisation on an image
+
+## HISTO - calculates histogram of an image sub-array and certain 
+##         statistical parameters from the histogram
+
+## LOG10 - takes the logarithm of an image or scalar ( base 10 )
+
+## LOGAR - takes the logarithm of an image or scalar 
+           ( prompted for base )
+
+## LOGE - takes the logarithm of an image or scalar ( base e )
+
+## MANIC - 1,2 or 3-D image to 1,2 or 3-D image reshaping program
+
+## MEDIAN - perform weighted median filtering on a 2-D image
+
+## MOSAIC - merges several non-congruent images into one big image
+
+## MULT - multiplication of image*image, scalar*image, scalar*scalar
+
+## NUMB - count how many pixels in a 2-D image with absolute 
+          values > value
+
+## OUTSET - replaces pixels outside specified circle with 
+            specified value
+
+## PIXDUPE - expands an input image by pixel duplication
+
+## POW - calculates the power of an image or scalar 
+         ( prompted for power )
+
+## ROTATE - rotate a 2-D image through any number of degrees
+
+## SHIFT - realign a 2-D image
+
+## SHSIZE - output the dimensions of an image to the environment
+
+## SQORST - change the dimensions of a 2-D image
+
+## SUB - subtraction image-image, image-scalar, scalar-scalar
+
+## THRESH - for a 2-D image set all values outside a given range to
+##          user defined values both above and below limits
+
+## THRESH0 - for a 2-D image set all values outside a given 
+             range to zero
+
+## TRACE - trace through the contents of a data structure
+
+## TRANDAT - converts free-format x,y,i data into .SDF images
+
+## ZAPLIN - interpolates over bad rows or columns
+
+.fi
+.level1 "Notes :"
+`CREFRAME` - When running this routine, the user is prompted for a two
+letter string which will define the type of test data output in the
+form of an .SDF file. The options are :
+
+GS - Gaussian stars on a background, both with pseudo-Poisson noise
+
+RR - Random numbers between the limits 0 to 1
+
+RL - Random numbers between user-defined limits
+
+RP - Poisson type noise on a user defined mean
+
+RA - Ramp across image between user-defined limits and in user-defined direction
+
+FL - Flat user-defined value over whole image
+
+BL - Zero across whole image
+
+
+`MANIC` - Has a bug that crops up whilst prompting for one of the parameters.
+May work under certain circumstances (!).
+
+`TRANDAT` - Given a free-format text file with image data in the form
+of x and y coordinate values and an intensity value in three separate
+columns, this routine will create an .SDF IMAGE.

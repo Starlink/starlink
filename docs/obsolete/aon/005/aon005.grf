@@ -1,0 +1,133 @@
+.AF GEROFFDIR:PRELUDE.GRF
+.AONA 5.1 "Introduction to ADAM" "B.D.Kelly" 19.06.1986
+.level1 "PROLOGUE"
+This document attempts to provide a simple introduction to the ADAM 
+system. As such, the description must be incomplete. That is, it must 
+make many 'sins of omission'. Furthermore, the underlying ADAM system is 
+designed to be very flexible, which means that its apparent capabilities 
+may be changed drastically in the future. This document describes ADAM 
+version 1.1.
+.level1 "WHAT IS ADAM?"
+ADAM is a 'multitasking programming environment'. In English, this means 
+that someone can have a number of ADAM programs running simultaneously. 
+An ADAM program is one which has been written with the intention of 
+running under ADAM. As such it obeys special protocols for inputting and 
+outputting information. In other words 'ADAM' is not a program. It is, 
+instead, a set of rules for writing programs plus standard subroutine 
+libraries.
+.level1 "WHAT HAPPENS WHEN SOMEONE STARTS USING ADAM?"
+The least sophisticated way to use ADAM in its multitasking form is via 
+the ADAM command language. As an example, on a Starlink machine the 
+command
+
+.nf
+$ ADAMSTART
+.fi
+
+Sets up various logical names and commands needed to use ADAM. Then, on
+the command 
+
+.nf
+$ ADAMCL
+.fi
+
+a FORTRAN program called ADAMCL starts running. It writes its prompt on 
+the terminal and reads the commands input. ADAMCL is not an 'ADAM
+program' as defined above. It is an 'ADAM user interface'. This means
+that it handles the interactive terminal and has the ability to control
+ADAM programs. 
+
+Certain of the commands typed into ADAMCL cause an 'ADAM program',
+generally referred to as a TASK, to start executing. A task usually 
+executes in a VMS subprocess. This means that it effectively logs into 
+the machine as an extra user, but one subservient to the user who 
+created it. When a task starts executing it carries out various 
+initialisation activities and then waits for a command. ADAMCL is 
+capable of sending commands to tasks. When the task has completed a 
+command, it goes back to waiting for another one. This behaviour is 
+rather different from the usual idea of 'running' a program. As a 
+result, it is convenient to think of 'loading', 'running' and 'killing' 
+tasks as separate operations.
+.level1 "TASK LOADING, RUNNING AND KILLING'
+Loading a task involves creating the subprocess/process for the task and 
+starting the task executing. The 'natural state' of a loaded task is 
+waiting for commands. When a task receives a command it starts executing 
+its intended operation - that is, it starts adding spectra together or 
+whatever. It is reasonable to describe it as 'running'. A task remains 
+loaded until it is explicitly 'killed' by ADAMCL, or crashes.
+.level1 "TASK TYPES"
+There are a number of different types of ADAM tasks. This proliferation 
+of types is primarily for the convenience (or confusion!) of 
+programmers. Some types are orientated towards writing tasks for 
+instrument control, others towards data analysis. In general, however, 
+it is sufficient to know that most tasks understand a set of commands. 
+When a task receives the instruction to obey one of its commands, it 
+runs. There is a simple type of task called an 'A-task' which 
+understands only a single command. It, therefore, understands ANY 
+command as an instruction to run.
+.level1 "TASK PARAMETERS"
+Tasks have parameters. These are values or filenames which a task 
+requires to carry out a command. In general, each command in the task 
+has its own list of parameters. The values can be provided as part of 
+the command line or the task may need to ask for them.
+.level1 "ACCESS TO DCL COMMANDS"
+It is very useful to have access to DCL commands such as DIRECTORY, 
+DELETE, TYPE,... and so on. This is achieved by having a subprocess 
+containing DCL. Any command typed into ADAMCL which starts with a $ is 
+passed to the DCL subprocess for execution.
+.level1 "CONTROL OF TERMINAL I/O"
+Tasks, unless they are doing interactive graphics on the terminal, do 
+not communicate with the terminal directly. They always work via ADAMCL.
+DCL commands such as $DIR are input by ADAMCL and forwarded to the DCL 
+subprocess. DCL outputs directly to the terminal and inputs directly 
+from the terminal. To avoid getting 'in the way' of the DCL access to 
+the terminal, ADAMCL relinquishes control of the terminal to DCL for the 
+duration of the command. This enables commands such as $EDIT or
+$DELETE/CONFIRM to work correctly.
+.level1 "FURTHER READING"
+One of the logical names created by the command ADAMSTART is ADAM_DIR. 
+This points to the top of a set of ADAM directories. ADAM_DIR contains a 
+subdirectory called [.DOCS] which contains printable versions of various 
+ADAM documents. Some useful ones are
+
+.nf
+AON1  The ADAM command language
+APP1  Document Production for the ADAM Project
+AED8  Writing ADAM data analysis programs
+.fi
+.bp
+.nf
+
+
+
+          +----------+
+          |          |
+          | terminal |
+      +-->|          |<---------+
+      |   +----------+          |   +----------+
+      |                         +-->|          |<-----------+
+      |                             |  ADAMCL  |<------+    |
+      |                             |          |----+  |    |
+      |                             +----------+    |  |    |
+      |                                             |  |    |
+      |   +----------+                              |  |    |
+      +-->|          |<-----------------------------+  |    |
+          |   DCL    |   +---------+                   |    |
+          |          |   |         |<------------------+    |
+          +----------+   |  TASK   |  +--------+            |
+                         |         |  |        |<-----------+
+                         +---------+  |  TASK  |
+                                      |        |
+                                      +--------+
+
+
+
+
+
+NOTE
+
+Tasks do not communicate directly with the terminal
+Two-way communication between tasks and ADAMCL
+One-way communication between ADAMCL and DCL
+DCL commands come from ADAMCL, not from the terminal
+DCL commands can write to the terminal and read from it

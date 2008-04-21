@@ -1,0 +1,669 @@
+.AF GEROFFDIR:PRELUDE.GRF
+.AONA 6.1 "SPAN user guide" "G.I.Thompson" 28.04.1986
+.level1 "INTRODUCTION"
+SPAN is a general program for examining, measuring and manipulating
+spectra held in HDS files. 
+
+A suitable HDS structure must have type SPECTRUM. Initially the only
+components of a spectrum recognised by SPAN are the four arrays DATA,
+ERROR, AXIS1_DATA(wavelength) and QUALITY. It may acquire other
+components using SPAN. 
+
+SPAN can deal with several spectra in the same session. 
+.level1 "OVERVIEW"
+SPAN consists of two parts, a graphics phase and a non-graphics phase. 
+
+.nf
+In the graphics phase a spectrum can be:- 
+ 1) displayed in whole or part 
+ 2) the axis scales changed 
+ 3) individual points "deleted" 
+ 4) a continuum inserted 
+ 5) measurements made. 
+
+In the non-graphics phase a spectrum may be:- 
+ 1) smoothed 
+ 2) divided by a black body flux distribution 
+ 3) the axis scales changed 
+ 4) combined with another spectrum 
+.fi
+
+The graphics phase can be entered directly to manipulate an original
+file or, optionally, after a non-graphics operation to inspect or alter
+the product. 
+
+When a phase completes the result may be an altered version of the
+original spectrum or a new structure. The user may wish to:- 
+.nf
+ a) in certain cases transfer the changes to the original file 
+ b) create a new HDS structure 
+ c) throw the results away. 
+.fi
+
+These possibilities are catered for. No new HDS structure is created
+without user permission. The only change to the original file which
+is made without permission is insertion of components to hold the TITLE
+and the axis annotation strings. 
+.level1 "ENTRY"
+On entry the prompt START is displayed. The possible replies are (one
+character) :- 
+
+.nf
+Q  - Quit; exit from the program. This is the only (elegant) exit
+O  - Options; user may alter some defaults to taste
+S  - Spectrum; manipulate a SPECTRUM structure
+.fi
+
+After the operations are completed SPAN returns to the START prompt and
+may be re-entered independently of what went before. If some fatal error
+occurs SPAN attempts to tidy up and return to START when the user may
+try again. 
+.level1 "START option S"
+The prompt "HDS file" is displayed. The user has to supply the HDS name
+of a SPECTRUM structure. For an arbitrary HDS structure the name must be
+complete down to a component with type SPECTRUM. There is a special
+means for getting at spectra in a UKIRT_DATA structure without typing
+the complete name every time (see sect 12). If the structure is one
+dimensional the number of components is displayed and the user asked to
+nominate one. 
+
+The prompt "operation" is displayed. Possible replies are:- 
+
+.nf
+EM  - enter the graphics phase
+B  - divide by a black body flux distribution
+WL  - make linear alterations to the X-axis scale
+SM  - smooth a spectrum
++C,-C,*C,/C  - alter the Y-axis scale
++S,-S,/S and variants on +S  - combine two spectra
+.fi
+
+The flow path differs after operation EM from that after all the
+other operations. 
+
+After EM it may be that no changes have been made to the spectrum
+(plotting and measuring only) in which case SPAN returns to START
+immediately. Otherwise the user is asked if he wishes to make the
+changes permanent. If he does he has to choose to either make the
+alterations in the original structure, or to create a new HDS file. The
+latter is a partial copy of the original incorporating the changes.
+Finally SPAN returns to START. 
+
+For all other operations the result is a new SPECTRUM structure. On exit
+the user may optionally enter the interactive graphics phase to inspect
+or alter the new spectrum. After this phase he may either discard the
+result or transfer it to a new HDS structure. If the graphics phase is
+not entered it is assumed that a new HDS structure is required. 
+
+These flow paths and other parameters can be modified. In the
+description below the default settings are assumed. The possible
+modifications are described in section 7), option O. 
+.level1 "THE INTERACTIVE GRAPHICS PHASE"
+On first entry the user is asked for the device type. The possibilities
+are T4010, T4014, SIG, TEK1, TEK2, ARGSA, ARGSB. 
+
+On entry the spectrum is plotted with provisional plotting limits.
+
+There are two plotting formats. The basic format gives only two axes
+with some numbers on them, the data joined by a polyline and the
+continuum points (if any). The non-basic format gives additionally title
+and axis annotation strings, axis tick marks and choice on how the data
+is displayed. To switch between them, see section 7. The program initial
+setting is BASIC. For all the following operations the plotting format
+is irrelevant. 
+
+The prompt MODE appears. This is the nodal point of this phase. An
+operation is initiated by a reply to this prompt and each operation
+returns to this prompt on completion. If a fatal error occurs SPAN
+attempts to tidy up and return to this prompt. 
+
+Many MODE operations require a range of data to be specified in some
+coordinate. The process is the same in all cases. Set the cursor at one
+end of the desired range and KEY whatever is required by the operation.
+A line appears under the wire. Set the cursor to the other end of the
+range and KEY the same number. A line appears under the wire and the
+operation carried out. Keying anything else at the second setting aborts
+the operation (no line appears). The order of setting is irrelevant. 
+
+All the MODE operations, except E,C,M, return to MODE immediately.
+However, for E,C,M as many sub-operations can be carried out as desired
+and a special keying is required to return to MODE. 
+
+Replies to MODE (one character) :- 
+
+Q Quit; The only exit
+
+H help; list possible replies and their meaning (not implemented)
+
+O options; This is identical to the O reply to START. See section 7
+
+P Plot; clear the screen and plot the spectrum in its current state i.e.
+showing any changes already made.
+
+The next three are provided to override default settings for particular
+plots. 
+
+J Join; Join the data points with a polyline
+
+K show the data points by a marker
+
+L show the error bars
+
+
+E Edit; delete and undelete points
+
+C continuum; insert and delete continuum points
+
+M; make measurements
+
+X; make a linear change to the X-axis scale
+
+Y; make changes to Y-axis scale
+
+S; snip. Reduce the operating area
+
+U; unsnip. The operating area is reset to the full area
+
+F; convert to frequency units
+
+W; convert from fequency units
+
+R; divide by the continuum
+.level2 "Mode E,Edit"
+If a datum is not marked as GOOD quality it is not used by SPAN for any
+purpose. Span recognises two kinds of BAD quality data. There is
+"deleted data" which is under the control of the user. He can mark a
+datum as such or unmark it using the E mode. The data and its error are
+not affected. There is also "unusable data" which arises in derived
+spectra if it is not possible to compute a value due to the presence of
+"deleted data" or other reasons. In this case the data is unset and
+carries a different quality mark. This kind of BAD quality data cannot
+be recovered by the user. However both show on the plot as a gap. 
+
+On entry the cursor appears. 
+
+1) to delete a point set the vertical wire on it and KEY 1 
+-a marker appears 
+
+2) to undelete a point set the vertical wire on it and key 2 
+-the point is replotted 
+
+The accuracy of setting required is 0.25 of the wavelength step 
+
+3) to delete all the points in a range use KEY 3 
+
+4) to undelete all deleted points in a range use KEY 4 
+
+5) to exit KEY .(dot). 
+.level2 "Mode C,continuum"
+A continuum is a polyline interpolated between points inserted by the
+user. It is necessary that a continuum exist before some measures can be
+made. A continuum point can be defined in two ways, by setting the cross
+wires or defining a range of data whose mean and mean wavelength are
+used. 
+
+On entry the cursor appears 
+
+1) to insert a continuum point, centre the cursor on it and KEY 1. 
+-a marker appears 
+
+2) to delete a continuum point (of either origin), centre the cursor on
+it and KEY 2. 
+-a marker appears. Accuracy of centring required is 2% of full scale. 
+
+3) to define a continuum point as a mean of a range of data, KEY 3
+-a marker appears 
+
+4) to join continuum points with a polyline, KEY 4 
+
+5) to exit KEY .(dot). 
+
+Note that the minimum distance allowed between continuum points is 
+1.5 times the average wavelength step.
+.level2 "Mode M, measurements"
+Positional measures:- 
+
+1) to measure a value on the X axis, set the vertical wire and KEY 1. 
+
+2) to measure a value on the Y axis set the horizontal wire and KEY 2.
+
+3) to list the X,Y coordinates of a datum set the cursor on it and KEY 
+3. 
+
+These data are read from the file, not the graph. Accuracy of centring
+required is 0.4 times the mean wavelength step in X and 2% of full scale
+in Y. 
+
+4) to measure an equivalent width within a range of data, KEY 4. 
+
+The equivalent width is the sum of all of the differences between a
+continuum and the data inside the designated range, divided by the
+mean continuum and multiplied by the mean X-axis step. Its units are
+those of the X axis.
+
+The continuum is the linear interpolation between continuum points,
+created by MODE C. This must exist before attempting to measure an
+equivalent width. Also there must be a continuum point outside the
+designated range on both sides, though others may exist inside the
+range. 
+
+An isolated BAD quality datum is replaced by the mean of those on each
+side for this purpose. However, if contiguous BAD quality data exist
+no measurement is attempted. 
+
+5) to measure the total flux in a range KEY 5. (not implemented) 
+
+6) to fit a gauss profile to a line specify a range of data using KEY 
+6 or 7. 
+
+A continuum must pre-exist as for measuring equivalent width. 
+
+This routine is intended to provide an estimate of the line centre and a
+representative value of its width. It is not intended for high quality
+physical investigations of line profile. The method employed is to find
+the datum with the largest deviation from the continuum. Then the data
+are searched in both directions from this one to find those with
+deviations in the same sense and "big enough". At least three data must
+be found. The difference between KEYs 6 and 7 is in the meaning of "big
+enough". For key 6 the deviation from the continuum must exceed twice
+the datum error; for KEY 7 it must exceed 0.25 times the maximum
+deviation. Naturally KEY 6 cannot be used if errors do not exist (are
+zero). For weak lines one or other method may work. For strong lines
+they sometimes use the same selection of data and give identical
+results. 
+
+It is possible for the range to contain only part of the line if one 
+wing is blended, but the centre must be well represented to get a
+sensible result. 
+
+If BAD quality data exist in the range no measurement is attempted. 
+
+The values returned are the centre of the gauss profile, the FWHM in 
+X-axis units and the central ordinate. The fitted profile is drawn. 
+
+7) to exit KEY .(dot). 
+.level2 "Mode X,change X-axis scale linearly"
+All the operations with OPERATION WL are available here, see section
+6.1.
+
+On entry the prompt "option?" appears. Possible replies are:- 
+
+all the possiblities listed under OPERATION WL and also 
+
+G; interactive mode 
+
+The cursor appears. 
+Set the vertical wire to a chosen point on the X-axis and KEY 1. A line
+appears under the wire, also the prompt "new wavelength". Reply to the
+prompt with the new wavelength value required. The cursor reappears and
+the operation is repeated at another point. Keying anything except 1
+aborts the operation. 
+.level2 "Mode Y, alter Y-axis scale"
+The non-graphic operations (sec 6.3) are available here and also a
+graphical option. 
+
+On entry the prompt "algebraic or graphic option" appears. Reply with
+one of +,-,*,/ or G. 
+
+For the first four the Y-axis scales have a constant added or subtracted
+or are multiplied or divided by a constant. The prompt "constant"
+appears. 
+
+For reply G the cursor appears. Set the horizontal wire and key 1. Reply
+to the prompt "new Y value". The cursor reappears and the operation
+repeated at a different point. This effects a linear change in the
+Y-axis scale. Errors are multiplied by the gradient factor in the linear
+relation. 
+.level2 "Mode S,snip i.e. alter plotting limits"
+This can be achieved both graphically and non-graphically. 
+
+1) to restrict the range in X graphically, specify a range using KEY 1 
+
+2) to restrict the range in Y graphically, specify a range using KEY 2. 
+
+3) to change the range in X non-graphically, hit KEY 3 and respond to
+the prompt "plotting limits in X" with two real numbers 
+
+4) to change the range in Y non-graphically, hit KEY 4 and respond to
+the prompt "plotting limits in Y" with two real numbers 
+
+Once a spectrum is snipped in X all the data outside the snipped range
+are unavailable. A new plot will show only the snipped range. However
+any continuum points outside the range remain effective for measurements
+under mode M. Snipping in X counts as a change which is made permanent
+after exit from the graphics phase. 
+
+When the first plot is made by OPERATION EM the plotting limits in Y are
+set to allow a small margin above and below the maximum and minimum
+data. Snipping in X does not affect these limits and the only effect of
+snipping in Y is to reset them. Snipping in Y is not a change which can
+be made permanent. 
+.level2 "Mode F and its converse W"
+F converts a spectrum from wavelength units to frequency units and W
+converts it back. It is assumed that the units are
+(microns,ergs/(sec.cm**2.micron)) and (hertz**14,jansky) 
+
+All graphics functions are available when in frequency units 
+
+It is possible to exit from the graphics phase with the spectrum in
+frequency units and to create a new structure in these units. However it
+is not advisable to reenter such a structure in SPAN. SPAN was written
+assuming that the input spectrum is in wavelength units and one in
+frequency units may give curious results. 
+
+If the axis annotation strings are used (they are not when in BASIC
+plotting format) they are changed to "frequency hertz**14", "flux
+jansky" by F and to "wavelength micron","erg/(sec.cm**2.micron" by W
+independent of the original string or defaults. 
+
+Note that in frequency units the spectrum is reversed. The data are held
+and plotted with hertz increasing.
+.level2 "R divide by the continuum"
+The continuum is the linear interpolation between continuum points
+created by mode C. Only data between the extreme continuum points
+remains available. All graphics operations are available on the
+difference. The Y-axis annotation strings become 'FLUX/CONTINUUM .'. On
+exit from the graphics phase this can be made into a new structure. 
+
+This operation is not reversible. 
+.level1 "THE NON-GRAPHICS OPERATIONS"
+.level2 "WL,alter the X-axis scale linearly"
+
+The scale is altered by the formula 
+
+wavelength(new)=A+B*wavelength(old) 
+
+Continuum points (if there are any) are altered by the same formula. 
+
+On entry the options are listed. Reply to the prompt "option?" with one
+of the following 
+
+V; correct for a radial velocity. A velocity in km/sec is requested.
+[A=0.0,B=1-V/c] 
+
+A; constant shift . The current X-axis units are displayed and a constant
+D in these units is requested. [A=D,B=1] 
+
+P; constant shift. A real constant P in X-axis pixels is requested this
+is converted to X-axis units using the mean X-axis
+step(DX). [A=P*DX,B=1] 
+
+*; multiply by a constant. [A=0.0,B=const] 
+
+L; linear change. Reply to the prompt "old wavelength, new 
+wavelength" twice. Old wavelength is in X-axis 
+units whose annotation string is displayed. 
+
+M; linear change. Reply to the prompt "pixel,wavelength" twice. The 
+pixels are converted to X-axis units using the 
+mean X-axis step and the first wavelength in the array. 
+.level2 "SM Smooth a spectrum" 
+Only smoothing functions with positive integrals are catered for. A
+smoothed datum is the weighted mean of the data within the 
+function, the smoothing function providing the weights. The errors of
+the smoothed datum are generated in the same way except for the
+necessary squaring. 
+
+A smoothing function with an even number of pixels causes an 
+effective wavelength shift of half a pixel. This is not corrected. 
+
+BAD quality data: The smoothed datum is the weighted mean of the valid
+data within the function. If the length of the function is M, the
+number used can be less than M. A criterion is set (currently 0.35*M)
+and if a smoothed datum is the mean of less than this number it is
+recorded in output as BAD; otherwise it is accepted. This means that
+narrow gaps are smoothed over but wide gaps leave gaps in the output
+somewhat narrower than themselves. 
+
+The maximum length of smoothing function is 1/3 of the length of the
+spectrum 
+
+On entry the list of options is displayed. Reply to the prompt "which 
+one?" with one of the following. 
+
+R; running mean smoothing; give an integer number of pixels 
+
+G; gaussian smoothing; give the FWHM of the required function in X-axis
+units 
+
+H; hanning smoothing; give the hanning length in X-axis units 
+
+D; do-it-yourself smoothing; the user provides the function. Reply to the
+prompt "function" with a real number list of arbitrary length, except
+that they must all be typed on one line. 
+
+For options G and H the quantities input are converted to X-axis pixels,
+rounded to the odd integer. 
+.level2 "+C,-C,*C,/C " 
+Add, subtract, multiply or divide the data values by a constant. 
+
+For +C and -C the errors are unchanged. For *C and /C the errors are
+multiplied or divided by the same constant. Continuum points (if there
+are any) are also altered. 
+.level2 "B, divide by a black body flux distribution" 
+The user is asked to supply the temperature. The result is normalised so
+that the average value of the ratio is unity. 
+
+The Y-axis annotation string YLABEL is created/changed to "RATIO TO 
+BLACK BODY" and YUNITS to .(dot). 
+.level2 "-S,/S,+S,+M,+W,+U" 
+Algebraic combination of two spectra. 
+
+The user is asked to supply the HDS name of the second 
+spectrum. The wavelength ranges need not be identical, but must
+overlap. The output exists in the overlap only. The second spectrum is
+regridded to the grid of the first if necessary. The variants on the
++ operation are:- 
+
++S; add the two 
+
++M; form the mean of the two 
+
++W; form the weighted mean, using errors to form the weights 
+
++U; form the weighted mean, the user supplies the weights in reply to
+the prompt "weights". Give two real numbers typed on the same line. 
+.level2 "+ME,+WE,+UE" 
+Same as +M,+W and +U except that the output covers the entire wavelength
+range, the parts outside the overlap being copies of parts of the
+originals. 
+
+The spectra need not overlap. In this case the M,W,U distinction is
+irrelevant,but a character must be given (use M). The two spectra are
+just butt joined with no attempt to fill the gap. 
+.level1 "START and MODE option O" 
+This operation permits the resetting of some program defaults and is
+available at two points in the program; at the prompts START and MODE. 
+
+There are two kinds of option which can be altered. The "prompt
+switches" allow some of the prompts to be overridden thus allowing
+program flow to be changed. The "plotting options" control the format of
+the plot. 
+
+The default setting can be changed permanently for each user (see
+section 7.3). 
+
+On entry the prompt "which option" is displayed. After each alteration
+SPAN returns to this prompt and the only exit is 'Q'. Reply with one of
+the character strings listed below--the first four characters are
+required. 
+.level2 "Prompt switches" 
+Some of the prompts (and their action) can be turned off by the
+following switches. The initial setting is .TRUE., which means the
+prompt is given. They are all logical. 
+
+After all non-graphics operations the user has the choice to enter the
+graphics phase at the prompt "plot,edit and measure?" This may be
+switched off by the switch 'PLOT' 
+
+After the non-graphics operations followed by a graphics phase, the
+choice is given to make the structure permanent as an HDS file. This
+choice may be switched off by the switch 'MAKEPERM' 
+
+After the operation 'EM', if changes have been made to the spectrum the
+user has the choice to make the changes permanent at the prompt "are the
+changes to be made permanent?" This can be turned off by the switch
+'CHANGE' 
+.level2 "Plotting options" 
+'SCROLL' integer. Number of lines of textual output. Initial setting, 20.
+
+'BASIC' logical. Switch between plotting formats. Initial setting is
+true, which gives the basic format. All the following options are
+relevant only if BASIC is false. 
+
+'MARKDATA' integer. Reference number of the symbol for plotting data
+points. Possible values are 1(dot), 2(+), 3(o), 4(x), 5(*). The initial
+setting is a special value, zero, which gives a + if there are less than
+a 100 data values and dot if there are more. 
+
+'JOINDATA' logical. Join the data values with a polyline, leaving gaps
+for invalid data. Initial setting is true, which means join them. 
+
+'SHOWDATA' logical. Show the GOOD data by the marker. Initial setting is
+true. 
+
+'HIST' logical. Show the spectrum as a histogram. BAD data are marked by
+a special marker. Initial setting is false. 
+
+The above three parameters are interlocked such that they cannot all be
+false simultaneously, if HIST is true both JOIN and SHOW are false, if
+either SHOW or JOIN is true HIST is false. 
+
+'ERRORBAR' logical. Show error bars on data values. Initial setting is
+false, which means the bars are not shown 
+
+Axis annotation strings, all character*72:- 
+
+'XLABEL' initial setting 'WAVELENGTH' 
+
+'XUNITS' initial setting 'MICRONS' 
+
+'YLABEL' initial setting 'FLUX' 
+
+'YUNITS' initial setting 'ERGS/(CM**2.SEC.MICRON)' 
+
+'ANNOTATION' logical. If true, the annotation strings are taken from the
+program settings. If false,they are prompted for every time they are
+required. Initial setting is true. 
+
+Tick marks on the axis. Controls the number of medium(M) and small(S)
+tick marks between major tick marks on the axis. All integer. 
+
+'MXTICK' initial setting 1 
+
+'MYTICK' initial setting 1 
+
+'SXTICK' initial setting 4 
+
+'SYTICK' initial setting 4 
+
+The initial settings divide the distance between major tick marks into
+tenths. 
+.level2 "The SPANOPTS.SPN file"
+Each user will have his own requirements for the option settings which
+will not be identical to the inbuilt defaults. A means is provided for
+each user to tailor the defaults to his own needs. This is achieved by
+creating a file, called SPANOPTS.SPN, in the user's directory which
+contains his preferred defaults. On entry to SPAN this file is
+automatically searched for and, if found, the inbuilt defaults altered. 
+
+To use this facility ensure that all defaults are set as required, then 
+reply to the "which option" prompt with 'FILE'. The SPANOPTS.SPN file
+is created or overwritten. 
+.level1 "TITLE" 
+When a new spectrum is first entered into SPAN,or a new SPECTRUM
+structure created the user is asked to supply a title - a string up to
+72 characters long. This is made a permanent component of the structure
+and will not be prompted for again. The string must be in quotes and
+case of letters is retained. 
+
+For derived spectra input data such as temperature, constant, weights
+etc are not remembered and it is recomended that they are incorporated
+in TITLE. 
+.level1 "SCROLLING" 
+During the graphics phase normal scrolling is suspended. Any textual
+output appears in sucessive lines down the left hand side of the screen.
+The number of lines whch are output is a program parameter which can be
+altered (c.f. sect 7.2, 'SCROLL'). If this number is exceeded further
+output starts at the top again overwriting previous values, so it is
+necessary to clear the screen by re-plotting. The default setting of 20
+lines will give good separation of the lines on most screens, although
+many screens will accommodate closer packing. 
+.level1 "CREATED SPECTRUM STRUCTURES" 
+Any new SPECTRUM structure created contains the bare minimum of
+components i.e. 
+
+.nf
+The TITLE and axis annotation strings 
+The four arrays
+The continuum point arrays,if they exist 
+The SNIP component recording the current X axis snipping. 
+.fi
+
+There is no attempt to copy other components which may exist in the
+originals 
+.level1 "USER NOTES" 
+.level2 "Replies to prompts" 
+Replies may be in upper or lower case. When the request is for a TITLE
+or axis annotation string the reply must be in quotes and case is
+significant. 
+
+Note the special case of replying to "ukirt spectrum" (Section 12). 
+
+An empty character string is not acceptable. Because trailing spaces in
+a character string are ignored a string of spaces only counts as empty
+and so is not acceptable. 
+
+Fortran F or E format may be used to reply to a prompt requiring a real
+number. It must start with a number (i.e. 0.1 not .1). With E
+format the + in the exponent is required (i.e. 1.0E+3 not 1.0E3) 
+
+Conversion between real and integer is automatic except when replying
+to a prompt which requires a string of reals. 
+.level2 "Effect of errors and the null response" 
+An inappropriate response to a prompt usually results in a message and a
+repeat of the prompt. SPAN allows up to five errors to occur in replying
+to a prompt. If this is exceeded the user is returned to a preceding
+prompt. 
+
+Similarly if a error occurs SPAN attempts to tidy up and returns the
+user to a preceding prompt. Also the user may partially abort at any
+time by giving the null response (!) to any prompt (except START), when
+SPAN returns to a preceding prompt. 
+
+In all cases the "preceding" prompt is not necessarily the 
+immediatly preceding one, it may be several prompts earlier. The
+user should be able to continue from the one presented. However there
+will often be a loss of work done. 
+.level1 "UKIRT DATA STRUCTURES"
+The complete name of a spectrum within a UKIRT DATA structure is
+NAME.OBS_N.POS_M.SCAN_L or NAME.OBS_N.POS_M.COADD where L,M,N are
+integer characters which have different values to distinguish the
+spectra. 
+
+If the reply to the prompt "HDS file" is NAME and SPAN recognises this
+as a UKIRT DATA structure it gives the prompt "ukirt spectrum". The
+reply has the form L,M,N which are the three integers in the name above
+separated by commas. Note reversal of order. The integers should be in
+the range 1:999 except that L=0 means the COADD component. The spectrum
+can now be processed following the prompt "operation". On completion of
+this spectrum SPAN returns to the prompt "ukirt spectrum" and another
+spectrum within the same UKIRT_DATA structure processed in the same way.
+The structure may be quitted by replying to "ukirt spectrum" with Q. 
+
+If the spectrum corresponding to a set L,M,N does not exist SPAN
+notifies which component does not exist and returns to "ukirt spectrum".
+
+The string 'L,M,N' must be enclosed in quotes. 
+
+In the string L,M,N blanks are ignored, otherwise it must contain only
+integers and commas. An integer can be defaulted to "same as before" by
+omission, provided its place is indicated by the commas. The default on
+first entry is 0,1,1. Trailing commas caused by defaulting can be
+omitted unless it is the only character in the string. Thus a single
+comma means same spectrum as last time. 
+
+Note that when two spectra are combined (operations +S etc) there 
+is no specialisation for UKIRT_DATA for the second spectrum. The
+full name of the second spectrum must be typed in even if it is a 
+member of the current UKIRT_DATA structure. 

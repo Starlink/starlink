@@ -1,0 +1,265 @@
+.!           Template RUNOFF file for an ADAM Environment Description
+.!           --------------------------------------------------------
+.!
+.!  Replace n.m by the document number
+.!     "    dd,mm,yyyy by the date
+.!     "    *Author* by the document author(s)
+.!     "    *Title* by the title
+.!--------------------------------------------------------
+.title AON/8.1
+.set date 01,10,1987
+.autoparagraph
+.set paragraph 0,1,2
+.layout 3,2
+.page size 57,69
+.flags substitute
+.nofill
+.keep
+.justify
+SCIENCE#AND#ENGINEERING#RESEARCH#COUNCIL AON/8.1
+ROYAL#OBSERVATORY#EDINBURGH
+and#UNIVERSITY#OF#EDINBURGH
+
+ADAM#Project Issued#by
+ADAM#Observer#Note#8.1
+
+.right;B D Kelly       
+.right;J M Stewart
+.right;$$date
+
+.fill
+.repeat 69,"-"
+.blank
+.centre;UKIRT Status Display Tasks
+.centre;--------------------------
+.!
+.!now switch off overstrike, substitute, accept and uppercase flags
+.!as we wish to use %, $, ^ and _ regularly
+.no flags overstrike
+.no flags substitute
+.no flags accept
+.no flags uppercase
+.!
+.blank 2
+
+.hl 1 ACKNOWLEDGEMENTS
+The original SCREEN task for use at UKIRT was produced by J.M.Stewart 
+and is described in AED/2. The tasks described in this document have 
+been derived from the original SCREEN task.
+
+.hl 1 INTRODUCTION
+An important facility at the telescope is the ability to have one or 
+more terminals displaying status information at an update rate of about 
+once per second. This is achieved by having a 'noticeboard' in the VAX 
+memory which can be written-to by the tasks containing important status 
+information and which can be read by screen display tasks. Two screen 
+display tasks are described here. They both use the MON facility as the 
+noticeboard system.
+
+SCREEN is an updated version of the original SCREEN task. The 
+significant enhancements are that it can generate output on a terminal 
+other than the one from which it was loaded, and it can continue 
+updating a terminal running ADAMCL while the user is part way through 
+typing a command line.
+
+MSC is the multi-screen task. It implements only the file-driven part of 
+SCREEN, but can generate output to up to nine different terminals each 
+driven by a separate screen format file.
+
+.hl 1 BACKGROUND READING
+A very simple overview of ADAM is provided by AON/5. 
+The ADAM command language manual is in AON/1.
+The MON facility is described in AED/9.
+
+.hl 1 SCREEN FORMAT FILES
+Both SCREEN and MSC make use of screen format files. A format file is an 
+ASCII file which contains one line for each parameter to be displayed.
+The line contains the following information:
+.literal
+
+  process name, within single quotes
+  parameter name, within single quotes
+  title for parameter on screen, within single quotes
+  line number (1 to 24)
+  column number for start of title
+  column number for start of parameter value
+  format type, within single quotes (see below)
+  format width (see below)
+  format precision (see below)
+
+.end literal
+Formats can be of type F, E, A or I (similar to Fortran specifiers) or
+of type H (hours, minutes and seconds). The format type is repectively
+'F', 'E', 'A', 'I' or 'H'. The format width is the number of columns
+taken up by the parameter. The format precision is the number of columns
+after the decimal point (E or F format). The format width is not used in
+H format which also shows a maximum precision of 2 - ie 0.01 seconds. 
+
+If a format width or precision is not used, an entry (e.g. zero) should
+still appear in the file. 
+
+Typical entries might be :
+.literal
+
+'TELE'       'RA'     'R.A. :'     10 5 14 'H' 0 1
+'CRYOSTAT'   'FILTER' 'Filter is'  14 5 15 'A' 8 0
+'FABRYPEROT' 'LAMBDA' 'Microns :'  20 1 10 'F' 8 4
+
+.end literal
+
+.hl 1 SCREEN
+SCREEN is a D task which performs parameter display on a named terminal.
+It can display selected regions of the MON noticeboard e.g. from index 1
+to 40, in a default format. Alternatively names of parameters,
+preceeding text and screen co-ordinates may be read from a screen format
+file. This file can be edited on another terminal to provide rapid
+interactive design of screens. 
+
+Driving the SCREEN task is described in terms of ADAMCL commands.
+
+.hl 2 Initialisation
+SCREEN is a Dtask, so first load it.
+.literal
+
+Adamcl:> LOADW SCREEN
+
+.end literal
+
+Next tell it which terminal is to be used for output.
+.literal
+
+Adamcl:> SEND SCREEN OBEY INIT terminal
+
+.end literal
+where terminal is the name of the output terminal. This is defaulted to 
+SYS$OUTPUT in the interface file.
+.hl 2 Changing default behaviour
+By default, SCREEN assumes that the terminal is not driving a hardcopy 
+device and that the update rate should be one refresh per second. This 
+can be changed by
+.literal
+
+Adamcl:> SEND SCREEN OBEY PRINT printing
+
+.end literal
+where printing should be TRUE or FALSE and defaults to FALSE, and
+.literal
+
+Adamcl:> SEND SCREEN OBEY UPDATE msecs
+
+.end literal
+where msecs it the update time in millisecs and defaults to 1000.
+.hl 2 Using a screen format file
+SCREEN can be asked to take the specification of the screen appearance 
+from a screen format file by
+.literal
+
+Adamcl:> SEND SCREEN OBEY FORMAT format_file
+
+.end literal
+where format_file is the name of the text file. This is defaulted to 
+SCFORMAT.DAT in the interface file.
+.hl 2 Commands useful for debugging
+It is expected that in normal observing the screen will be specified 
+using a format file. However, it is also possible to format the screen 
+using one of the following commands.
+.literal
+
+Adamcl:> SEND SCREEN OBEY SHOWALL fromindex toindex
+
+.end literal
+where fromindex and toindex are integers defaulting to 1 and 20 
+respectively and specify the range of indices into MON to be picked-up. 
+Default formatting is used for the display.
+.literal
+
+Adamcl:> SEND SCREEN OBEY CLEAR
+
+.end literal
+clears the screen.
+.literal
+
+Adamcl:> SEND SCREEN OBEY PROCESS process_name
+
+.end literal
+causes all the MON parameters belonging to the named process to be 
+displayed with a default format. process_name defaults to SCREEN.
+
+.hl 2 Starting the screen update
+SCREEN is told to start its periodic update of the display by
+.literal
+
+Adamcl:> SEND SCREEN OBEY LOOP msecs
+
+.end literal
+where msecs is an integer and is the number of millisecs per update 
+loop. msecs is defaulted to 1000 in the interface file.
+
+The part of the screen below that being used to display the values is 
+left as a scrolling region, and is typically used for ADAMCL 
+interaction.
+.hl 2 Typical example of using SCREEN
+.literal
+
+Adamcl:> LOADW SCREEN
+Adamcl:> SEND SCREEN OBEY INIT 
+Adamcl:> SEND SCREEN OBEY FORMAT SCRTEST.DAT
+Adamcl:> SEND SCREEN OBEY LOOP
+
+.end literal
+.hl 1 MSC
+MSC is a D task which performs parameter display on up to nine named 
+terminals. The appearance of each terminal is controlled by a screen 
+format file.
+
+Driving the MSC task is described in terms of ADAMCL commands.
+
+.hl 2 Initialisation
+MSC is a Dtask, so first load it.
+.literal
+
+Adamcl:> LOADW MSC
+
+.end literal
+.hl 2 Starting the display
+MSC has nine identical actions called SCREEN1 to SCREEN9. Each can be 
+asked to update a terminal screen at a specified rate using a specified 
+format file.
+.literal
+
+Adamcl:> SEND MSC OBEY SCREEN1 file1 term1 time1 flags1 print1
+
+.end literal
+where
+
+file1 is the name of the format file and defaults to SCFORMAT.DAT
+
+term1 is the name of the terminal and defaults to SYS$OUTPUT
+
+time1 is the update time in millisecs and defaults to 1000
+
+flags1 controls the text appearance and defaults to 1
+
+print1 indicates whether hardcopy is enabled and defaults to FALSE
+.hl 2 Driving MSC from a procedure
+MSC has a parameter called FREEACT which contains the name of the first 
+unused action. If MSC is being used for multiple screens, it is probably 
+wise to drive it with an ADAMCL procedure such as
+.literal
+
+   PROCEDURE MSCDRIVE
+      DECLARE MSC_ACTION CHAR 16 LOCAL
+      GET MSC FREEACT MSC_ACTION
+      REMQUOTES MSC_ACTION
+      SEND MSC OBEY MSC_ACTION _TXA3:
+   END PROCEDURE
+
+.end literal
+.hl 1 Likely problems
+On most VAXes, terminals are set up such that only the logged-in user 
+can produce output on them. To use the screen tasks to talk to terminals 
+other than SYS$OUTPUT it is necessary for the target terminals to be 
+set-up for write access by WORLD.
+.hl 1 Performance
+A screen task can be expected to use about 6 percent of a VAX 11/730 
+when performing one screen update per second.
