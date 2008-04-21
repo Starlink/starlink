@@ -1,0 +1,356 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {ADAM System Note}
+\newcommand{\stardocinitials}  {ASN}
+\newcommand{\stardocnumber}    {1.2}
+\newcommand{\stardocauthors}   {A J Chipperfield}
+\newcommand{\stardocdate}      {1 March 1990}
+\newcommand{\stardoctitle}     {Organization of Graphics in ADAM}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+\catcode`\$=12 \catcode`\_=12
+\font\tt=CMTT10 scaled 1095
+\renewcommand{\_}{{\tt\char'137}}
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+\section{INTRODUCTION}
+This document describes the way in which GKS, SGS and DIAGRAM have
+been incorporated into ADAM. 
+{\em Note that DIAGRAM is now virtually obsolete.}
+The document also includes sections on
+the high-level graphics package NCAR which is not fully integrated
+with ADAM but can be used.
+The Applications Graphics Interface, AGI (see SUN/48), will provide
+more versatile access to graphics within ADAM.
+
+\section{GENERAL}
+Each package has been organized within ADAM to :
+\begin{itemize}
+\item Incorporate the GKS 7.2 versions of DIAGRAM, SGS and GKS
+\item Clearly separate the environment and stand-alone layers of each
+of the packages to facilitate the update of the stand-alone parts with new
+releases from Starlink.
+\end{itemize}
+The directory structure for each package is shown in Figure \ref{pic}.
+
+\begin{figure}[h]
+\begin{center}
+\begin{picture}(70,25)
+\put(15,5){\makebox(0,0){[.SSC]}}
+\put(55,5){\makebox(0,0){[.TEST]}}
+\put(35,20){\makebox(0,0){[ADAM.LIB.{\it pkg}\/]}}
+\put(15,13){\line(1,0){40}}
+\put(15,13){\line(0,-1){4}}
+\put(55,13){\line(0,-1){4}}
+\put(35,13){\line(0,1){4}}
+\end{picture}
+\caption{Graphics Directory Structure}
+\label{pic}
+\end{center}
+\end{figure}
+Logical names {\it pkg}\_ENV and {\it pkg}\_DIR are assigned
+to the top level and [.SSC] directories respectively.
+{\it pkg}\_ENV contains the environment layer, ie subroutines handling 
+activation and de-activation of the package under ADAM, the 
+association between the package and physical devices, and the reporting of
+errors to ADAM.
+
+Note that this is not consistent with other ADAM {\it pkg}\_DIR logical names
+where {\it pkg}\_DIR is the top level.
+
+In addition to the true environment layer subroutines, {\it pkg}\_ENV
+contains any subroutines which need to be altered from the version
+contained in the Starlink stand-alone libraries. Inclusion of the correct
+version of these subroutines is ensured by the order of searching the
+libraries. The changes required are described below under each package
+heading. The environment specific subroutines are contained in libraries named
+{\it pkg}\/PAR.OLB and {\it pkg}\/PAR.TLB.
+
+{\it pkg}\_DIR contains those parts of the Starlink Software Collection's
+stand-alone release of the package which are required. 
+For Starlink sites, the logical names SGS\_DIR and GKS\_DIR be assigned to the
+actual stand-alone system directories to save disk space.
+
+A slight deviation from the above occurs in the case of the DIAGRAM package
+and its subsidiary DIP.
+DIP\_ENV and DIP\_DIR are still defined separately
+but they are both assigned to the DIAGRAM directories. Furthermore, in order
+to incorporate the ADAM status values in DIA\_ERR and DIP\_ERR, the Starlink
+stand-alone versions must
+be re-compiled. The stand-alone libraries cannot be used as they will result
+in unrecognized status values.
+
+The [.TEST] directory contains test programs for the package.
+They may mostly be compiled, linked and run in the normal way. 
+Some deliberate errors are produced so check before getting too worried.
+
+\section{GKS ADAM IMPLEMENTATION}
+
+\subsection{THE ENVIRONMENT LAYER}
+ Environment level GKS subroutine names are of the
+form GKS\_name. They handle:
+\begin{itemize}
+\item The activation and de-activation of GKS under ADAM.
+\item The connection between GKS and the physical devices.
+\item The allocation of `graphics descriptors' which tabulate the connection 
+between ADAM parameters and GKS workstations.
+\item The reporting of GKS errors to ADAM.
+\end{itemize}
+
+\subsection{THE STAND-ALONE LAYER}
+This corresponds with the standard Starlink release although the standard
+error handling subroutines GERHND and GERLOG will not be used (see below).
+The ISO standard (G) form of name is used for GKS kernel subroutines throughout 
+the ADAM implementation
+of the graphics systems.This is because SGS and NCAR both use the standard form.
+If for any reason it is
+essential to use the GKS\_ form in an application, try including
+GKS\_DIR:GKSLIBG/LIB in the link command. 
+{\em No guarantees are given. The wrong error handler may be loaded}
+
+\subsection{ERROR HANDLING}
+The GKS standard allows the user to replace the GKS error handling subroutine
+GERHND and this is done in the ADAM implementation. The ADAM version of the
+subroutine is a modification of the GKS error handler used by
+the standard release of SGS.
+It sets a flag in common to indicate to the environment layer (or SGS) that
+an error has occurred
+and then calls the ADAM GKS error logging subroutine GKS\_ERLOG regardless
+of whether or not inherited status mode is in use.
+GKS\_ERLOG is a modification of the standard error logger and uses a 
+modification of the RAL/ICL implementation internal subroutine GKGEM 
+(renamed GKS\_KGEM) to obtain the standard GKS error message text from a 
+direct access file defined by the logical name GKS\_EMF. 
+Currently this is the method used by the RAL
+implementation of GKS.
+In case the GKS release style of error message file changes, the program
+GKSEMF.FOR and its input data file GKSEMF.DAT are included in GKS\_ENV. 
+
+Having obtained the text of the error message, GKS\_ERLOG reports the error
+to ADAM using ERR\_REP so that the message may be output or annulled in the
+usual way.
+
+An alternative, simpler, error logger is also provided in case the sophisticated
+one fails to work after a GKS update.
+The alternative is held in the module GKS\_ERLOGB in GKS\_ENV:GKSPAR.TLB.
+In order to incorporate it into the object library, it must be extracted and
+compiled and the resultant object file used to replace GKS\_ERLOG in
+GKS\_ENV:GKSPAR.OLB.
+{\em Note that if the complete library is re-built, care must be exercised to 
+ensure that the primary error logger and not the fallback one is included in 
+the object library.}
+
+GKS environment layer subroutines use subroutine GKS\_GSTAT to interrogate
+the error flag set by GERHND.   
+
+\section{SGS ADAM IMPLEMENTATION}
+
+\subsection{THE ENVIRONMENT LAYER}
+Handles:
+\begin{itemize}
+\item The activation and de-activation of SGS under ADAM.
+\item The connection between SGS and the physical devices.
+\item The allocation of `zone descriptors' which tabulate the connection 
+between ADAM parameters SGS zones.
+\item The reporting of SGS errors to ADAM.
+\end{itemize}
+
+\subsection{THE STAND-ALONE LAYER}
+This corresponds with the standard Starlink release of SGS although the
+following subroutines will not be used (ADAM versions in the environment
+layer libraries will be used).
+\begin{itemize}
+\item GERHND The ADAM GKS version described above is used.
+\item SGS\_$ERR The ADAM version reports the error
+using ERR\_REP and sets the status to the ADAM error status corresponding
+with the input error number.
+\item SGS\_$ISTAT The ADAM version does nothing. It doesn't matter anyway as
+SGS\_$HSTAT does nothing.
+\end{itemize}
+Note that the cursor sampling routines SGS\_ENSCU,SGS\_SAMCU and SGS\_DISCU
+cannot be used with GKS 7.2 at the moment. They are included in the
+ADAMGRAPH shared image but the corresponding GKS routines will give an
+error message.
+
+\subsection{ERROR HANDLING}
+SGS replaces the standard GKS error handler with one of
+its own. However, as the ADAM GKS error handler does for both SGS and GKS
+under ADAM that is used in preference. 
+The subroutine SGS\_$GKERR is used to check for GKS error under SGS (The
+text of any GKS error will already have been reported but not output).
+SGS errors are reported via subroutine SGS\_$ERR which is altered as described
+above.
+
+\section{DIAGRAM AND DIP}
+
+\subsection{ENVIRONMENT LAYER}
+Handles:
+\begin{itemize}
+\item The activation and de-activation of DIAGRAM under ADAM.
+\item The connection between DIAGRAM and the physical devices. This is done
+via the appropriate SGS environment layer subroutines.
+\item The allocation of `diagram descriptors' which tabulate the connection 
+between ADAM parameters DIAGRAM diagrams.
+\item The reporting of DIAGRAM and DIP errors to ADAM.
+\end{itemize}
+
+\subsection{THE STAND-ALONE LAYER}
+
+\subsubsection{DIAGRAM}
+The standard Starlink release of DIAGRAM must be re-compiled using
+the ADAM error numbers defined in DIA\_ENV:DIAERR.FOR .
+The Starlink text library has
+subroutines grouped into larger modules whereas the current ADAM version
+has them separately in conformity with other ADAM packages.
+
+\subsubsection{DIP}
+The standard Starlink release of DIP must be re-compiled using
+the ADAM error numbers defined in DIP\_ENV:DIPERR.FOR .
+The Starlink text library has
+subroutines grouped into larger modules whereas the current ADAM version
+has them separately in conformity with other ADAM packages.
+The current Starlink release of DIAGRAM/DIP uses GKS 6.2. In order to convert
+it to GKS 7.2, the three subroutines comprising module DIPZ in library DIP
+i.e. DIP\_CLONE, DIP\_$UPDTE and DIP\_$SELH must be replaced by the versions
+contained in DIP\_ENV
+
+\section{NCAR}
+NCAR, the high level graphics package distributed by the National Center for
+Atmospheric Research in Boulder, Colorado has not yet been integrated with
+ADAM.
+
+\section{PROGRAMMING}
+Under each section, reference is made to the relevant Starlink User Note
+(SUN). This document briefly describes the environment level programming,
+APN/2 and APN/3 give more information on the GKS and SGS environment-level
+routines.
+
+\subsection{GKS}
+GKS\_ASSOC performs GKS initialization if necessary via GKS\_ACTIV which
+calls GOPKS. It ensures that the workstation specified by the associated
+parameter is activated performing the functions GOPWK and GACWK.
+
+GKS\_ANNUL will just close a workstation, 
+GKS\_CANCL will close a workstation and also cancel the parameter,
+and GKS\_DEACT will close all open workstations and GKS.
+
+Task caching means that GKS, workstations and parameters
+may or may not remain active between invocations of a task so correct
+closedown procedures should always be adopted to ensure consistent results.
+
+Example:
+\begin{quote} \begin{verbatim}
+CALL GKS_ASSOC
+     -
+GKS kernel calls
+     -
+CALL GKS_CANCL
+CALL GKS_DEACT
+\end{verbatim} \end{quote}
+For information on programming using GKS, see SUN/83.
+
+\subsection{SGS}
+SGS\_ASSOC performs SGS initialization if necessary via SGS\_ACTIV which calls
+SGS\_INIT. It then call SGS\_OPNWK rather than SGS\_OPEN.
+
+SGS\_ANNUL will just close a workstation, 
+SGS\_CANCL will close a workstation and also cancel the parameter,
+and SGS\_DEACT will close all open workstations and SGS.
+
+Task caching means that SGS, workstations and parameters
+may or may not remain active between invocations of a task so correct
+closedown procedures should always be adopted to ensure consistent results.
+
+Example:
+\begin{quote} \begin{verbatim}
+CALL SGS_ASSOC
+     -
+SGS plotting calls etc.
+     -
+CALL SGS_CANCL
+CALL SGS_DEACT
+\end{verbatim} \end{quote}
+For information on programming using SGS, see SUN/85.
+
+\subsection{DIAGRAM}
+DIA\_ASSOC performs DIAGRAM initialization if necessary via DIA\_ACTIV which 
+calls SGS\_ASSOC.
+
+DIA\_ANNUL will just close a workstation, 
+DIA\_CANCL will close a workstation and also cancel the parameter,
+and DIA\_DEACT will close all open workstations and DIAGRAM.
+
+Task caching means that DIA, workstations and parameters
+may or may not remain active between invocations of a task so correct
+closedown procedures should always be adopted to ensure consistent results.
+
+Example:
+\begin{quote} \begin{verbatim}
+CALL DIA_ASSOC
+     -
+DIA plotting calls etc.
+     -
+CALL DIA_CANCL
+CALL DIA_DEACT
+
+\end{verbatim} \end{quote}
+For information on programming using DIAGRAM, see SUN/54
+
+\subsection{NCAR}
+For the time being
+NCAR can be used by treating applications as GKS or SGS applications
+(See above). The NCAR library can be searched by including it as a private
+library in the ADAM link command:
+
+For example:
+\begin{quote} \begin{verbatim}
+ALINK application,NCAR_DIR:NCARLIB/LIB
+\end{verbatim} \end{quote}
+Assuming that NCAR has been installed according to Starlink instructions.
+
+One major problem with this is that NCAR utilities have a habit of obeying
+Fortran STOP in the event of errors. This causes confusion for the environment.
+
+For information on programming using NCAR, see SUN/88, SUN/90
+
+\end{document}

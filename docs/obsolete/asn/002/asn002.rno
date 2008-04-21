@@ -1,0 +1,451 @@
+.!           Template RUNOFF file for an ADAM Environment Description
+.!           --------------------------------------------------------
+.!
+.!  Replace n.m by the document number
+.!     "    dd,mm,yyyy by the date
+.!     "    *Author* by the document author(s)
+.!     "    *Title* by the title
+.!--------------------------------------------------------
+.title ASN/2.2
+.set date 15,02,1990
+.autoparagraph
+.set paragraph 0,1,2
+.layout 3,2
+.page size 57,70
+.flags substitute
+.nofill
+.keep
+.justify
+SCIENCE#AND#ENGINEERING#RESEARCH#COUNCIL ASN/2.2
+ROYAL#OBSERVATORY#EDINBURGH
+and#UNIVERSITY#OF#EDINBURGH
+
+ADAM#Project Issued#by
+ADAM#System#Note#2.2
+
+.right;B D Kelly       
+.right;$$date
+
+.fill
+.repeat 70,"-"
+.blank
+.centre;ADAM v2 Message System
+.centre;----------------------
+.!
+.!now switch off overstrike, substitute, accept and uppercase flags
+.!as we wish to use %, $, ^ and _ regularly
+.no flags overstrike
+.no flags substitute
+.no flags accept
+.no flags uppercase
+.!
+.blank 2
+
+
+.hl 1 SUMMARY
+This describes the implementation of the ADAM v2 intertask communication 
+software. 
+
+.hl 1 REFERENCES
+It is essential to be familiar with the following
+.literal
+
+How to write A Ctask
+Dtask design doc
+Messys design doc
+MSP doc
+
+.end literal
+
+.hl 1 INTRODUCTION
+The purpose of this document is to provide a view of the implementation 
+of the v2 MESSYS library to help programmers responsible for supporting 
+the MESSYS code.
+
+.hl 1 BACKGROUND
+In many ways the thing which defines an ADAM system is the set of 
+protocols for synchronous intertask communication. These protocols are
+provided by a subroutine library called MESSYS. It is in the nature of
+things that certain events such as AST delivery to an ADAM task need to
+be detected when the main-line code is waiting for an incoming ADAM
+message. This means that MESSYS also has to support the notion of
+'intertask communication' which is actually from an AST routine to the
+mainline code in the same task. 
+
+With the passage of time, three reasons have surfaced which call for a 
+drastic reimplementation of the MESSYS library.
+
+(1) The hope that it would be possible to make intertask communication 
+happen significantly faster.
+
+(2) The need for extended communication facilities between ASTs and 
+mainline code.
+
+(3) The need to support a distributed ADAM system, therefore involving 
+intertask communication across a network.
+
+The attempt on (1) has proved in vain. (2) should be trivial to retrofit 
+to the new MESSYS. (3) has been achieved.
+
+.hl 1 BASIC REQUIREMENTS FOR V2
+The following are the basic requirements for v2 of the ADAM message 
+system.
+
+The MESSYS subroutine interface must be upwards compatible with the v1 
+MESSYS. All existing calls should be present and should have the same 
+apparent behaviour as far as the calling software is concerned. This 
+requirement is designed to avoid Ctasks having to be rewritten. It is 
+also intended to avoid unpredictable knock-on effects in other parts of 
+the ADAM system.
+
+The MESSYS library should be implemented using MSP rather than a 
+combination of QIO to mailboxes plus event flag manipulations.
+
+MESSYS should have the ability to operate across DECNET fully integrated 
+in its design.
+
+.hl 1 OVERVIEW
+The networking requirement has a big impact on the way the v2 MESSYS 
+works, so it is necessary to describe the networking part of the 
+software at the beginning rather than considering networking as an 
+add-on.
+
+In a distributed ADAM system, each VAX has to be capable of 
+communicating with a number of other VAXes. This translates to the 
+requirement that the ADAM networking software has to be capable of 
+accepting 'multiple inbound connection requests'. This in turn implies 
+that the techniques of 'non-transparent DECnet communication' have to be 
+used.
+
+This is achieved as follows.
+
+Each VAX has running a single copy of the ADAM DECnet 'server' process
+called ADAMNET. ADAMNET arranges for DECnet communications between the
+various machines. Only one network connection exists between any pair of
+machines (ie ADAMNET multiplexes the communication paths between tasks
+on a pair of machines). 
+
+.hl 1 THE REMOTE PATH HANDSHAKE
+This is a warm-up exercise for the reader. If you are familiar with the 
+v1 MESSYS, this section should give you a strong hold on the way 
+networking is handled.
+
+Suppose an ADAM user interface or task wishes to communicate with a task 
+on another machine. It simply executes CALL MESSYS_PATH (or the 
+higher-level ADAM equivalent) passing the taskname in the form 
+NODE::TASK.
+
+CALL ADAM_PATH ( 'REVAD::TRACE', PATH, STATUS )
+
+MESSYS detects the 'REVAD::' and deduces that this PATH actually 
+involves forwarding messages via ADAMNET.
+
+So, obtaining a PATH involves
+
+(1) Ask ADAMNET to make a DECnet call to the target machine.
+
+(2) ADAMNET checks whether that call already exists. If it doesn't, make 
+the call. If everything is ok, return a message to the requesting task. 
+Note that the ADAMNET processes on the two machines now know about one 
+another and have exchanged messages enabling them to store information 
+about one another.
+
+(3) MESSYS receives the 'ok, that call is made' message.
+
+(4) MESSYS sends an open path call to ADAMNET specifying the target task 
+on the target machine.
+
+(5) ADAMNET forwards the request to the ADAMNET process on the other 
+machine.
+
+(6) The other ADAMNET forwards the request to the target task.
+
+(7) The target task returns an acknowledgement to the other ADAMNET.
+
+(8) The other ADAMNET forwards the acknowledgement to ADAMNET on this 
+machine.
+
+(9) This ADAMNET forwards the acknowledgement to the task which issued 
+the original PATH call.
+
+Note that all four VMS processes involved have stored internally the 
+information required for forwarding messages on this path. Note that 
+they require to store DIFFERENT information.
+
+.hl 1 CONCEPTS AND TERMINOLOGY
+.hl 2 Transactions
+The AAO workshop in 1985 identified the fact that the ADAM intertask 
+communication protocols embedded the concept of a TRANSACTION. This 
+concept was recognised as a central feature of the protocols and MSP was 
+designed specifically to support this concept.
+
+So what is a 'transaction'?
+
+It is the old GET, SET, OBEY, CANCEL (GSOC).
+
+A GET transaction involves a simple handshake between two process.
+
+A SET or CANCEL is the same as GET.
+
+An OBEY is more complex. It is initiated by a task sending a STARTOBEY 
+message to the target task. It is terminated by the target task 
+returning an ENDOBEY message. Between these, various messages can pass
+in both directions as part of the continuing transaction. If the OBEY is 
+rejected by the target task it immediately returns an ENDOBEY, so a 
+failed OBEY transaction has the same pattern of messages as a simple GET 
+transaction. If the OBEY is successful, then the first message returned 
+by the target task must carry a status of DTASK__ACTSTART. Subsequent 
+messages from the target task can be simple information (typically 
+originating in a MSG_OUT call) or a request for a handshake with the 
+originating task. Such a handshake occurs if, for example, the target 
+task wishes the user to be prompted for a parameter value.
+
+If an OBEY is terminated because a CANCEL occurred, then if the CANCEL 
+was issued by the same process which initiated the OBEY, only a single 
+ENDOBEY message with status ACT__CANCEL is returned. If the OBEY and the 
+CANCEL were issued by two different processes, then the CANCEL handshake 
+is completed as well as an ENDOBEY being sent.
+.hl 2 Queues
+The MSP facility allows a process to identify itself to MSP by 
+specifying some character string which we shall call the MSPNAME of the 
+process. MSP allocates the process a "command queue". Any other process 
+can then gain access to this command queue provided it knows the MSPNAME 
+of the other process and is accessing the same MSP global section. A
+process can ask MSP to allocate further queues to it, and can also
+release queues. However, some other process can only know of the
+existence of these further queues if the first process tells 
+it.
+.hl 1 IMPLEMENTATION
+.hl 2 The MSPNAME
+The MSPNAME is the item which, in combination with the MSP global 
+section definition, allows processes to initiate communication 
+with one another. The combination works as follows.
+
+A 'Starlink-style' user has an MSP global section which is username 
+specific. The MSPNAME for any of the tasks created by such a user is 
+generated from each task's name. 
+
+This implies the following:
+
+If the same username is logged-in on two separate terminals, then tasks 
+created automatically by the user interface (usually 'cached') will be 
+visible only to the terminal at which they were created.
+
+Tasks loaded explicitly by name will be visible at both terminals.
+
+eg
+
+on terminal 1
+
+ICL:> LOADW TRACE TRACE
+
+on terminal 2
+
+ICL:> OBEYW TRACE TRACE
+
+will succeed in running the version of TRACE already loaded.
+
+An 'observatory-style' user may wish to load detached processes and 
+communicate with them. To do this it is necessary that the detached 
+process knows the global section name to be used. The same problem 
+occurs if cooperation is required between terminals logged-in under 
+different usernames. This is achieved by
+
+$ define/group GBL$MSP_<username> <section_name>
+
+where <section_name> is the name to be used for the MSP global section.
+
+Note that the cooperating users have to be in the same GROUP, and 
+futhermore that if different usernames are cooperating they need GROUP 
+privilege.
+
+If network communication is required, ADAMNET needs to be loaded from a 
+username in the same GROUP as the users requiring the facility, and 
+GBL$MSP_<username> has to be set-up for it.
+
+.hl The permanent queues
+On loading, each task makes itself known to MSP using its MSPNAME. This 
+results in MSP allocating a queue called the COMMAND queue. Other tasks 
+can ask MSP for access to this queue by specifying the MSPNAME of the 
+target task. The task asks MSP to allocate the following additional 
+queues.
+
+.literal
+
+EXTINT_Q for AST communication, implements the EXTINT ability
+ASTINT_Q for AST communication, implements the ASTINT ability
+RESCHED_Q for AST communication, implements timed reschedules
+TIMEOUT_Q for AST communication, implements timeout on receiving 
+          messages
+STACKDUMP_Q allows another task to trigger a stackdump
+UNWIND_Q allows another task to trigger an unwind
+
+.end literal
+The first four of these essentially replace the local event flags in 
+MESSYS version 1.
+
+.hl 2 Getting a path
+To get a path to another task, MESSYS_INIT decides from the syntax 
+whether a network operation is involved. If no networking is required, 
+then it generates the MSPNAME of the target task and asks MSP for the 
+COMMAND queue of the target task. It then performs an INIT transaction. 
+This involves using MESSYS_SEND to send an init followed by 
+MESSYS_GETREPLY to receive the response. During the handshake the tasks 
+exchange information about the PATH numbers they have allocated and the 
+numbers of their respective COMMAND, STACKDUMP and UNWIND queues.
+
+When networking is involved the procedure is very similar, except that 
+the message actually goes to the command queue for the ADAMNET process.
+
+.hl 2 Transactions
+All transaction start when some process (ie task or user interface) 
+executes a call of MESSYS_SEND. The latter finds a free transaction 
+number (which appears to the outside world as a MESSID) which points to 
+an unused element of an array of data structures for storing details of 
+currently active transactions. Provided the message to be sent is not a
+DE_INIT, an MSP queue is set-up specifically for receiving replies 
+associated with this transaction, and the queue number is stored in the 
+data structure. The message to be sent is then built from the available 
+information and sent to the COMMAND queue of the other task using 
+MSP_SEND_MESSAGE.
+
+A task's COMMAND queue is only looked-at by MESSYS_RECEIVE. When this 
+identifies a message which implies a new transaction starting it 
+allocates a transaction number and stores the details of the 
+transaction. Also, if the message is the start of an OBEY, an 
+acknowledgement queue is created.
+
+Ongoing messages as part of an OBEY are sent using MESSYS_REPLY and are 
+directed to each task's allocated acknowledgement queue.
+
+A transaction ends when MESSYS_REPLY detects that the message status is 
+not one of 
+.literal
+
+   MESSYS__PARAMREQ
+   MESSYS__PARAMREP
+   MESSYS__INFORM
+   MESSYS__SYNC
+   DTASK__ACTSTART
+
+.end literal
+
+It then deletes the acknowledgement queue (if it exists) frees the
+transaction storage space and sends the message. Similar tidying-up 
+occurs in MESSYS_RECEIVE and MESSYS_GETREPLY when they receive the 
+message.
+
+.hl 2 RECEIVE and GETREPLY
+MESSYS_RECEIVE looks for messages on the following queues
+.literal
+
+   EXTINT
+   ASTINT
+   RESCHED
+   TIMEOUT
+   COMMAND
+   all transaction queues
+
+.end literal
+
+with that order of priority.
+
+
+MESSYS_GETREPLY looks for messages on the following queues
+.literal
+
+   EXTINT
+   TIMEOUT
+   transaction queue for given MESSID
+
+.end literal
+
+with that order of priority.
+
+.hl 2 AST events
+The signalling of AST events is now implemented using MSP messages 
+rather than event flags. For example, performing MESSYS_GETREPLY with a 
+timeout causes the VMS timer service to be invoked specifying 
+MESSYS_TIMEOUT as the AST handler. If the timeout occurs, MESSYS_TIMEOUT 
+builds a timeout message and puts it on the TIMEOUT queue using 
+MSP_SEND_MESSAGE. Similarly, MESSYS_ASTINT puts a message on the ASTINT 
+queue.
+
+.hl 2 Interrupts
+The STACKDUMP and UNWIND queues exist with a view to implementing the 
+ability for one task to cause another to show a stackdump or to unwind 
+its stack.
+
+.hl 2 The ADAMNET process
+The ADAMNET process acts as a multiplexing interface between MSP and 
+DECNET. To perform this function it needs to interact correctly with the 
+relevant MSP global section, so GBL$MSP_<username> has to be defined for 
+it. It also needs to have the SYSNAM privilege which enables it to
+declare itself to DECnet. 
+
+ADAMNET initialises itself by giving MSP its name and obtaining its 
+COMMAND queue. It also requests two further MSP queues, the NETMBX_Q and 
+the NETMSG_Q. It creates a mailbox for receiving messages from DECnet 
+itself (ie network EVENTS as opposed to actual messages), and declares 
+itself to DECnet. Finally, it starts a QIO for read on the mailbox 
+specifying ANT_MBXAST as the ast routine.
+
+Subsequently ADAMNET spends its time waiting for messages on
+.literal
+
+   COMMAND_Q
+   NETMBX_Q
+   NETMSG_Q
+
+.end literal
+
+in that order of priority.
+
+Messages from tasks on this machine arrive on the COMMAND_Q. Path and
+transaction information is stored somewhat analogously to inside tasks,
+but it is also necessary to keep track of which machines are involved.
+ADAMNET does not associate acknowledgement queues with transactions. 
+
+A request to initiate communications with another machine results in a
+channel being assigned, a message being sent across the network and a
+QIO for read being started on the new channel specifying ANT_MSGAST as
+the AST handler. 
+
+An incoming request to start communication between two machines arrives
+as an EVENT and so ultimately shows up on NETMBX_Q via the ANT_NETMBX
+routine. 
+
+Once machine communications exist, messages come into COMMAND_Q and are
+forwarded using QIOW to write to the relevant network channel, or
+messages show up on NETMSG_Q via ANT_NETMSG having arrived on a network 
+channel.
+
+The bulk of the ADAMNET task (implemented as the ANT library) is 
+concerned with keeping track of the communications in process and 
+translating the machine-machine protocol into the task-ADAMNET protocol.
+
+It is possible to get ADAMNET to write diagnostics to a text file. The 
+program ADAMNETTEST achieves this by sending a message to ADAMNET which 
+outputs a summary of the currently-open communication paths. It does 
+this to 'ADAMNET_REPORT' which can be defined as a logical name.
+
+.hl 1 DEFICIENCIES
+The following items either await fuller implementation or are problem 
+areas.
+
+.hl 2 ADAMNET accessibility
+ADAMNET, and therefore the ADAM networking ability is only available to 
+one GROUP at a time as only one copy of ADAMNET can be loaded into the 
+machine and ADAMNET is associated with a specific group.
+.hl 2 STACKDUMP and UNWIND
+These functions are not implemented. The queues are created, but the 
+relevant AST routines have to be written and attached to the queues 
+using the MSP facility. The idea is that if a message arrives on one of 
+these queues the corresponding AST routine starts executing and triggers 
+the required behaviour. In the case of STACKDUMP this is trivial. In the 
+case of UNWIND changes have to be made to the DTASK fixed part to 
+indicate where the UNWIND stops and to decide what recovery action 
+should be taken. 
+
+Note that triggering of the symbolic DEBUGGER could be done using a 
+similar technique.
