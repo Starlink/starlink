@@ -129,6 +129,7 @@
 #include "smf.h"
 #include "smf_typ.h"
 #include "smf_err.h"
+#include "sc2da/sc2ast.h"
 
 #define FUNC_NAME "smf_grp_related"
 
@@ -323,8 +324,11 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   refsubsys = smf_malloc( nelem, sizeof(*refsubsys), 0, status );
   all_len = smf_malloc( grpsize, sizeof(*all_len), 1, status ); 
 
+  thislen = 0;
   totlen = 0;
   thischunk = 0;
+  opentime = 0;
+  writetime = 0;
 
   for( i=0; i<ngroups; i++ ) {
     /* Open header of the first file at each time */
