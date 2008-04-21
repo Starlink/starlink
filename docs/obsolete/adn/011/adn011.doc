@@ -1,0 +1,241 @@
+                                                                 
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                     ADN/11.1
+ROYAL OBSERVATORY EDINBURGH 
+and UNIVERSITY OF EDINBURGH 
+
+ADAM Project                                                Issued by
+ADAM Design Note 11.1 
+
+                                             John Cooke, Dennis Kelly
+                                                            13.3.1984
+
+---------------------------------------------------------------------
+
+             Notes on implementation of ADAM procedures              __________________________________________ 
+
+
+
+
+
+
+
+
+1. SUMMARY 
+
+
+
+The suggested implementation of the ADAM command language  procedures
+is  described, together with the impact of this on the implementation
+of other parts of the system.  Changes to the implementation as given
+in release -1.0 of the message system are noted.  This is intended as
+a discussion document for further revision, as procedures are not due
+to be implemented until July 1984. 
+
+
+
+
+2. INTRODUCTION 
+
+
+
+Following the issue of release  -1.0  of  the  message  system,  much
+discussion resulted in several changes to ideas about how the various
+concepts should  be  implemented.   Several  problems  had  not  been
+tackled  at all for release -1.0. In particular, little consideration
+had been given as to the internal workings of  the  command  language
+interpreter  (CLI),  the  user  interfaces, or to the storage of ADAM
+global and local data.  It was assumed that the CLI would in some way
+handle  the  command  language procedures using much of the code from
+the RGO implementation, which uses the  "SPICA"  language  dictionary
+code for handling procedures.  These topics are considered in turn. 
+
+
+
+
+
+
+
+                                                                 ADN/11.1                          2                          ADN/11.1
+
+
+
+3. PROCEDURES 
+
+
+
+In the RGO implementation, procedures in  the  command  language  are
+read  from  some stream and compiled from it into an internal form in
+the "dictionary". This dictionary also contains descriptions  of  the
+ADAM  "built-in"  (i.e. initially defined) commands, and any commands
+defined using the "define" command itself.  Several "contexts"  (i.e.
+sources  of  commands)  may  be  running  procedures  at once, and so
+pointers are maintained for each "context"  into  the  dictionary  to
+describe  how  far  that particular procedure has got. This all chugs
+along merrily as the main ADAM  polling  loops  run  around  all  the
+"streams" and "contexts". 
+
+Clearly we do not want  to  re-write  any  of  the  command  language
+analysis code (which handles if..then..else etc.) and so require that
+procedures are  implemented  using  the  SPICA  code.   It  had  been
+proposed  that this would run in a "CLI" task, and all commands would
+pass through it.  However this would lead to quite  long  "chains  of
+command" and clearly an intelligent user interface would know exactly
+where it wanted to send a certain message and could therefore  bypass
+the  CLI.   It  was  not  clear  how the CLI would handle procedures;
+"reading" them itself would make it quite a complex  task,  and  some
+thought had been given to building a "procedure reader" task. 
+
+The solution seems to be to have a "sequencer" task actually  running
+the  procedure;   from  the  outside  this  would  look  like another
+sequencer task written in  FORTRAN77,  but  internally  it  would  be
+obtaining  its  messages  from  the  "dictionary" code of SPICA.  The
+implication is that such procedure sequencer tasks have to be created
+when  the  procedure  is specified;  such a task would then hibernate
+until required. 
+
+
+
+
+
+4. FUNCTION OF THE COMMAND LANGUAGE INTERPRETER 
+
+
+
+The proposal for procedures above has left the CLI to be purely a CLI
+to  check on "built-in" commands, which is still adding an extra step
+in the chain of messages passed around the  system.   It  seems  that
+what  is  required of the CLI is purely a check to see if the command
+specified is defined as "built-in", in which case it is handled by  a
+subroutine  call  for that function (which may in turn send a message
+somewhere or whatever).  If the command is not "built-in",  then  the
+function  is  to  be  handled by running a task, which should already
+have been  defined  (in  fact,  in  our  case,  loaded  and  possibly
+hibernating).   This  CLI could be implemented purely as a subroutine
+call with the command string passed  as  a  parameter;   it  is  thus
+
+
+
+                                                                 ADN/11.1                          3                          ADN/11.1
+
+
+
+greatly simplified on the outside.  The sorts of commands  which  are
+described here as "built-in" are as follows: 
+
+      print         prints character strings, variable values 
+      quit          e.g. to change user interfaces 
+      let           set ADAM variable 
+      declare       declare ADAM variable 
+      get/put       get or save "dictionaries" 
+      hold/release  hold/release a "context" (e.g. a file queue of 
+                    commands) 
+      set           various control flags 
+      show          variables,  streams,   error,   procedure   list,
+                    logfile 
+
+This is taken from the RGO ADAM list.  There are  some  changes;  for
+example,  PROC  or PROCEDURE would be done by running a process which
+would handle the input of the procedure from a stream (a  file  or  a
+terminal)  and  the  creation  and loading of the associated process.
+DEFINE would be done by using the VMS logical name service. 
+
+
+
+
+
+5. USER INTERFACE IMPLICATIONS 
+
+
+
+The above really implies that even the simplest user interface  would
+in  fact  have  to handle the simplest CLI function;  in other words,
+the user interface would have to call the CLI subroutine  to  perform
+the check described above. 
+
+The simplest user interface would simply take command  lines  from  a
+terminal.  These  would  be  stuffed  into this CLI subroutine.  If a
+"built-in" command had been typed, appropriate action would be  taken
+by  this routine and control returned to the user interface.  If not,
+the return status would indicate this and the  user  interface  would
+then  attempt  to run the (already loaded) task with the logical name
+given as the first word in the command string. 
+
+This simple user interface would  receive  messages  as  input  which
+would  be  copied in some simple way to the user terminal display. (I
+think !) May there be other categories of messages received ? 
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 ADN/11.1                          4                          ADN/11.1
+
+
+
+6. LOCAL/GLOBAL DATA VARIABLE STORAGE 
+
+
+
+In the RGO ADAM there are three levels of variable thingie:  local to
+procedures,  local  to  "contexts"  (and  global  to procedures), and
+global to everything.  In  the  VAX  implementation  these  would  be
+maintained,   with   "contexts"   replaced   by   the  term  "users".
+Procedure-local variables would be implemented in the same way as  in
+the SPICA system (i.e. declared at procedure run-time), but the other
+two would be implemented in another data-storage handling task.  This
+would  mean that access to global/user variables would be slower from
+procedures, but this should not be important;  if  speed  is  of  the
+essence  in  a  procedure,  then  the  sequencing  involved should be
+written in FORTRAN77 rather than in the ADAM command language. 
+
+The RGO implementation of the data variables HAS to be  rewritten  as
+it  is  currently  written  in  assembler  for the Perkin-Elmer;  the
+variables are stored in reserved areas  of  memory  in  the  machine.
+Inter-process  communication  of  these  variables is via these areas
+which are inter-process "common blocks". The implementation  proposed
+here  stores the global and user variables where they can be accessed
+directly only by one task, that which is responsible for them. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 

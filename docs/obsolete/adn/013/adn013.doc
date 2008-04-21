@@ -1,0 +1,399 @@
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      ADN/13.1
+ROYAL OBSERVATORY EDINBURGH
+and UNIVERSITY OF EDINBURGH
+
+ADAM Project                                                 Issued by
+ADAM Environment Description 13.1
+
+                                                             J A Cooke
+                                                           29 May 1984
+
+----------------------------------------------------------------------
+
+                    Design of the Dtask Fixed Part
+                    ------------------------------
+
+
+
+
+
+1  INTRODUCTION
+
+Draft of design document following  experiences  with  prototype.   At
+present  purely  a  list  of  present experiences and ideas; not to be
+regarded as definitive!
+
+
+
+2  GENERAL COMMENTS
+
+The Dtask fixed  part  controls  the  calls  to  the  device-dependent
+modules 'devinit' and 'act'.  It also performs parameter checking (not
+done at all in the prototype).
+
+'Idle' state of a d-task is "waiting for message".
+
+At this point, several things can happen:
+
+(a)  message arrives
+(b)  a timed reschedule goes off
+(c)  an interrupt goes off (instigated by hardware)
+
+Note that a d-task does a "receive  without  timeout",  so  a  receive
+timeout does not occur.
+
+For (a), a message arriving, the message is decoded:
+   SET or GET handled inside the fixed part
+   OBEY or CANCEL handled by a call to ACT
+
+For (b) the appropriate message contents  are  gathered  up  from  the
+action list.  (This would also be the case for (c).)
+
+
+
+                                - 1 -
+ADN/13.1                                                        Page 2
+
+
+Both these cases (a) and (b)  produce  an  equivalent  reaction  at  a
+higher  level.   In  the  prototype,  "dtask_input"  gets the incoming
+instruction from the d-task, either from a new  message  or  from  the
+action list if prompted by a timed reschedule.
+
+Note that an interrupt should have a given action associated with  it,
+so  the  same  mechanism  can be used; this was not implemented in the
+prototype.
+
+
+
+3  DEFICIENCIES
+
+The d-task fixed part prototype has pointed out deficiencies in  other
+parts of the system.
+
+
+
+3.1  Message System
+
+messys_receive must be interruptable by:
+
+   message arriving
+   timeout (message not received within given time)
+   timed reschedule required (for d-tasks)
+   interrupt (for d-tasks, or for user interface e.g. typing a 
+     character)
+
+These should be distinguishable.  An AST/EF system has been  partially
+implemented in the prototype.
+
+
+
+3.2  Status Handling
+
+It must be clear which status returns  are  handled  locally  (in  the
+d-task  fixed part) and are either cleared or cause fatal termination,
+and what can be sent back to the controller task (in msg_status).
+
+Also, the status codes are getting out of hand - they are all over the
+place!   Those  used  at  high  level should be visible and defined in
+ADAMDEFNS  rather  than  in  the  library  definition   files   (which
+consequently  need  to  be  included  all  over  the  place).   To  be
+investigated!
+
+
+
+3.3  System Service Calls
+
+I am in favour of packaging the system service  calls  with  a  normal
+'status'  argument to make the code easier to read.  However this will
+take a little time hence cannot be done  yet.   It  should  not  cause
+
+                                - 2 -
+ADN/13.1                                                        Page 3
+
+
+insufferable  overheads  (tests  by BDK indicate about 15 microseconds
+per subroutine call on the 780).
+
+
+
+3.4  Cross-library Interference
+
+To implement the "interrupted receive" in the message system,  messys_
+calls must be introduced to hide the message system implementation (so
+that it can be changed).  These relate to the setting of event  flags,
+in  the  present  implementation.  These calls must be clearly defined
+and added to the message system specification.
+
+
+
+4  "DEVINIT" AND "ACT"
+
+We must decide exactly what parameters are  needed  for  these  calls.
+The only one (of the RGO parameters) that I have not used in the trial
+implementation is "obstat" which seems to be  connected  with  cleanly
+tidying up a "cancel"; and I think that we can handle this without the
+"obstat" parameter.   However  it  is  no  trouble  to  leave  in  for
+compatibility  with  the  RGO calls if required; we could even set the
+appropriate bit as they do!
+
+
+
+5  CLEANING UP A CANCEL
+
+There are slight problems here - we can cancel the timer queue easily,
+but if there is a reschedule request IN A QUEUE waiting to set the EF,
+then we can't find it.  I think that it  can  be  identified  when  it
+appears by means of the "messid" parameter.
+
+The problem is that we cannot LEAVE a timed entry; it could be set for
+3  hours'  time!  (unless we are prepared to leave lots of "cancelled"
+entries in the action list)
+
+
+
+6  DTASK MAIN PROGRAM
+
+
+dtask
+        DEVINIT
+        dtask_input
+                adam_receive
+                sys$...
+        dtask_put
+                par_put0c   (frig)
+        dtask_get
+                par_get0c   (frig)
+
+                                - 3 -
+ADN/13.1                                                        Page 4
+
+
+        dtask_obey
+                dtask_srchlst
+                messys_reply
+                dtask_addlst
+                ACT
+                dtask_resched
+                        messys_time   (should be utility !)
+                        sys$...
+                dtask_remlst
+        dtask_cancel
+                dtask_srchlst
+                ACT
+                sys$...
+                messys_reply
+
+
+
+
+7  SUMMARY OF MODULE FUNCTIONS
+
+
+  DTASK_ADDLST - add item to d-task action list
+  DTASK_ASTHDLR - d-task AST handler
+  DTASK_CANCEL - handle action for "cancel" request in d-task fixed part
+  DTASK_GET - routine handling d-task get
+  DTASK_INIT - d-task initialisation package
+  DTASK_INPUT - get input to d-task; message or interrupt
+  DTASK_OBEY - handle action for "obey" request in d-task fixed part
+  DTASK_PUT - routine handling d-task set
+  DTASK_REMLST - remove named action from active action list
+  DTASK_RESCHED - re-schedules a d-task for next action stage
+  DTASK_SRCHLST - search action list for named action
+
+
+
+
+8  DTASK MAIN PROGRAM PSEUDOCODE
+
+
+        initialise
+
+        call DEVINIT
+
+        loop:
+                call dtask_input ( path, context, name, value, ... )
+
+                if SET then
+                        call dtask_put ( name, value, ... )
+                        acknowledge (adam_reply)
+
+                else if GET then
+                        call dtask_get ( name, value, ... )
+
+                                - 4 -
+ADN/13.1                                                        Page 5
+
+
+                        acknowledge (adam_reply)
+
+                else if OBEY then
+                        call dtask_obey ( path, name, value, ... )
+
+                else if CANCEL then
+                        call dtask_cancel ( path, name, value, ... )
+
+                endif
+
+        endloop
+
+
+[ plus error/status handling ]
+
+
+
+
+9  DTASK_INPUT PSEUDOCODE
+
+
+  DTASK_INPUT - get input to d-task; message or interrupt
+
+
++       access to COMMON action list
+
+        wait for message (adam_receive)
+
+        if (resceduled or interrupt) then
+                get message components from COMMON:
+                context = OBEY (by default)
+                name =
+                value =
+                etc.
+                tidy up ready for next interrupt/reschedule
+
+        else
+                normal message, components returned by adam_receive
+
+        endif
+
+
+
+
+10  DTASK_OBEY PSEUDOCODE
+
+
+  DTASK_OBEY - handle action for "obey" request in d-task fixed part
+
+
++       access to COMMON action list
+
+
+                                - 5 -
+ADN/13.1                                                        Page 6
+
+
+        search list to see if this action is in progress
+
+        if active, then
+                if next stage (messid correct) then
+                        get stuff from list
+                else
+                        already in progress - return "rejected"
+                          message
+                endif
+
+        else if not on list, then
+                create new list entry
+                send initial "acknowledge"
+
+        endif
+
+        if status OK then
+                call ACT ( ... status )
+                if status STAGE then
+                        call dtask_resched with no time delay
+                else if status WAIT then
+                        call dtask_resched with time delay
+                else if status CANCEL then
+                        this shouldn't happen
+                else
+                        entire action assumed complete
+                        close down action and return value and status in 
+                          final acknowledgment
+                endif
+        endif
+
+
+[ plus additional status handling ]
+
+
+
+
+11  DTASK_CANCEL PSEUDOCODE
+
+
+  DTASK_CANCEL - handle action for "cancel" request in d-task fixed part
+
+
++       access to COMMON action list
+
+        search list to see if this action is in progress
+
+        if active, then
+                call ACT ( ... status )
+                if status CANCEL then
+                        tidied up OK,
+                        cancel outstanding reschedules and tidy up AST 
+
+                                - 6 -
+ADN/13.1                                                        Page 7
+
+
+                          system
+                else if status STAGE then
+                        error status
+                else if status WAIT then
+                        error status
+                else if status END then
+                        error status
+                endif
+        else if not found then
+                status = cannot cancel it
+        endif
+
+        if status OK then
+                send acknowledgment with appropriate status
+        endif
+
+
+[ plus additional status handling ]
+
+
+
+
+12  DTASK_RESCHED PSEUDOCODE
+
+
+  DTASK_RESCHED - re-schedules a d-task for next action stage
+
+
+        get time in system-time format
+
+        set timer on AST; AST param is pointer to required action in 
+          action list
+
+
+
+
+13  OTHER ROUTINES NEEDED
+
+The following are needed to add, remove items to/from  and  to  search
+the action list (trivial table lookup).
+
+  DTASK_ADDLST - add item to d-task action list
+  DTASK_REMLST - remove named action from active action list
+  DTASK_SRCHLST - search action list for named action
+
+
+The following routines are also needed
+
+  DTASK_ASTHDLR - d-task AST handler
+  DTASK_GET - routine handling d-task get
+  DTASK_INIT - d-task initialisation package
+  DTASK_PUT - routine handling d-task set
+
+                                - 7 -

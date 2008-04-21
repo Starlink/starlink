@@ -1,0 +1,151 @@
+.af geroffdir:prelude.grf
+.adna 12.1 "Specification of the ADAM help system." "B.D.Kelly" "21.03.1984"
+.level1 "PROPERTIES OF THE HELP SYSTEM"
+.level2 "General Requirements"
+A user, working through a user interface, needs to be able to request
+two levels of help information to be produced on a given topic. The name 
+of the topic known to the user might not be the same as the entry in the 
+help library, since the user interface may be giving him a different 
+view of the operation in question. However, the help information 
+produced should refer to the name known to the user.
+
+It should also be possible for the user to ask for information, such as 
+the list of filters in the instrument, which  is held in a file distinct 
+from the help library.
+.level2 "Observer's View"
+.level3 "Brief Help"
+This might typically be produced in response to a user typing a single 
+"?". A single line of information should appear visible to the observer 
+on some convenient output device. The user interface immediately returns 
+to awaiting the observer's input.
+
+A sensible format for the message output might be :
+
+public_name : help_string
+
+Where public_name is the name of the help topic as known to the 
+observer.
+.level3 "Full Help"
+This might typically be presented if the observer types "??" or if his
+next input after receiving brief help information is "?". About a
+screen's worth of information should appear on a suitable output device.
+This should look like standard VMS help information, complete with 
+'additional information' and prompt. The observer then has to take 
+positive action to escape from the help system and return to the 
+command-accepting part of the user interface.
+
+Note that it is generally considered undesirable that full help 
+information should appear on the observer's usual vdu. This is obvious 
+in the case where the user interface is some sophisticated 
+screen-formatting package, but even in simpler cases it tends to result 
+in information useful to the observer being scrolled off his screen.
+
+The output format should be :
+
+.nf
+public_name 
+
+   help_text...
+.fi
+
+Names of items such as commands or parameters referred to in the help 
+text must correspond to the names presented to the observer by the user 
+interface.
+.level3 "The Help Output Device"
+It is necessary that the help information can appear on some device 
+other than that being used by the observer to input commands. It is also 
+desirable that the user interface should be able to control where the 
+output appears. It is also likely that the brief and full help may 
+appear on different devices.
+
+A likely actual example is the case of a screen-formatting menu system. 
+For such a setup, it is likely that the user interface would want to put 
+brief help information to its own screen in a way under its own control. 
+It would, however, want the full help information to go to some other 
+screen. In addition, it is likely that some of the commands presented 
+within an individual menu would have parameters in common, which would 
+therefore have the same names. The underlying ADAM ANALYSIS tasks would, 
+however, have been written independently of one another, and so their 
+parameters would differ in name.
+
+In the simplest case of a user interface, which is one which accepts 
+typed-in command lines in response to prompts on a scrolling screen, the 
+observer should have the freedom to specify which physical devices 
+should be used for brief and full help. This implies that there must be, 
+conceptually, two help devices as well as the device for the user 
+interface.
+.level1 "Design Suggestions"
+To achieve the requirements indicated, the following approaches have 
+been considered.
+.level2 "Help Devices"
+The help devices should be designated by two entries in the user 
+interface's PROCESS logical name table translating HELP_BRIEF and 
+HELP_FULL. This allows an observer to specify the physical help devices. 
+It also means that two users working simultaneously on separate 
+terminals can specify their help devices independently. The logical 
+names have to be translated by the HELPSYS i/o routines.
+.level2 "Storage of Help Information"
+Assuming a basic set of 100 commands, some with parameters, one is 
+thinking of a total of about 300 brief and 300 full sets of information.
+The information will have been generated initially as text files. It is 
+suggested that these have a format similar to the source files for VMS 
+help libraries. Investigation of the HELPSYS requirements has revealed
+that simple DCL HELP is inadequate. Furthermore, even use of VMS HELP 
+libraries and utilities is beset with difficulties. It seems, therefore, 
+that the help information will have to be stored using the Starlink data 
+system. This seems to have the facilities required, but it would be nice 
+if it were easy to get some significant subset of the information from 
+the ADAM help libraries into VMS and vice-versa without too much 
+trouble. This is the reason for preferring the VMS-style source texts. 
+It is recognised that these may be insufficient.
+.level2 "HELPSYS Implementation"
+The help system software should be a set of subroutines which are called 
+by the user interface. In other words, the HELPSYS is part of the user 
+interface task rather than an independent task in its own right. This 
+avoids problems of contention if the help output devices are coincident 
+with the user interface device, and also contention problems which could 
+occur if there are two or more users on the system.
+
+The requirement that all names should be capable of translation from 
+those stored in the help library (HELP_NAME) to those known to the 
+observer (PUBLIC_NAME) means that a user interface has to be able to 
+specify a translation table to be used by the HELPSYS routines. 
+Furthermore, words subject to translation must be flagged as such in the 
+text stored in the help library. When text is extracted from the help 
+library, the HELPSYS must search for all flagged words and see whether 
+translations exist for them. String substitution is then applied before 
+the text is returned or output. Where no translation is provided, the 
+original name is used with its flag removed.
+
+A suggested set of interfaces to the HELPSYS is :
+
+.nf
+HELPSYS_LOAD ( PUBLIC_NAME, HELP_NAME, STATUS )
+   Loads an entry into the translation table.
+HELPSYS_CLEAR ( STATUS )
+   Removes all entries from the translation table
+HELPSYS_BRIEFOUT ( PUBLIC_NAME, STATUS )
+HELPSYS_FULLOUT ( PUBLIC_NAME, STATUS )
+HELPSYS_BRIEFGET ( PUBLIC_NAME, NUMCHARS, HELP_LINE, STATUS )
+HELPSYS_FULLGET ( PUBLIC_NAME, NUMCHARS, HELP_TEXT, STATUS )
+.fi
+
+ The OUT routines output the text to the HELP_BRIEF and HELP_FULL 
+devices respectively. The GET routines return the text to the caller.
+
+The arguments are :
+
+.nf
+PUBLIC_NAME   C*(*)      Name known to observer
+HELP_NAME     C*(*)      Name stored in help text
+HELP_LINE     C*80       Single line of help text
+HELP_TEXT     C*32767    A full help text
+NUMCHARS      I          Number of significant characters returned
+.fi
+
+Probably the OUT routines should call the GET routines. BRIEFOUT simply 
+outputs HELP_LINE on the HELP_BRIEF device, and then returns. FULLOUT 
+outputs HELP_TEXT on the HELP_FULL device, then waits for instructions 
+to be typed at the HELP_FULL device by the user. These should be similar 
+to those available in VMS HELP. A series of carriage returns or ctrl-z 
+should return control to the user interface.

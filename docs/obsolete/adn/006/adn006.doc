@@ -1,0 +1,121 @@
+                                                                 
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      ADN/6.1
+ROYAL OBSERVATORY EDINBURGH 
+and UNIVERSITY OF EDINBURGH 
+
+ADAM Project                                                Issued by
+ADAM Design Note 6.1 
+
+                                                       D.C.Richardson
+                                                           26.01.1984
+
+---------------------------------------------------------------------
+
+               FUNCTIONS OF FUTURE SYSTEM (IDEAS ONLY)                _______________________________________ 
+
+
+
+
+1     Control Telescope 
+2     Control Instruments 
+3     Receive Data from Instruments and store it 
+4     Receive Weather Information 
+5     Control Dome 
+6     Control Shutters/Windblinds 
+7     Display Instrument Status 
+8     Display Telescope Status (Position etc.) 
+9     Display "Mimic" path 
+10    Primary analysis of Data (Real time) 
+11    Displaying Primary analysis of Data (Real time) 
+12    Secondary (offline?) analysis of data (possibly not done?) 
+13    Displaying secondary    "     "     " 
+14    Control Crosshead 
+15    Display Crosshead position 
+16    Control Chopper 
+17    Display Chopper parameters 
+18    Receive data from Telescope structure probes 
+19    Talk to Observer via:- 
+      i)    Control Terminal (touch screen as well?) 
+      ii)   Button box 
+      iii)  Other VDU's 
+      iv)   Remotely 
+      ... 
+20    Downline loading of programs into preprocessors 
+21    Providing user with HELP 
+22    Controlling ISU II 
+23    Switching quickly from one instrument to another 
+24    Telescope Balancing 
+25    Userfiles of positions (easily changed on/off line) 
+26    Hold Catalogues of standard and SAO type positions 
+27    Print out on hardcopy whatever is needed (userfiles,data,graphs, 
+      maps,statistics,command log,...) 
+28    Engineering debugging 
+29    Remote operations 
+30    Give warning of dangerous conditions 
+
+
+
+                                                                 ADN/6.1                           2                           ADN/6.1
+
+
+
+31    File all commands to "log file" 
+32    Create Batch command files for next observing run 
+33    Provide Engineering procedures & checkoff sheets for day crews? 
+34    Perform Pointing tests 
+35    Allow operator to switch which terminals are in use for what 
+36    Allow operator the overriding control to stop any process 
+37    Archiving of engineering data 
+38    Talk to MMT 
+39    Fault finding and holding flow charts for fault finding 
+40    ...? 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 

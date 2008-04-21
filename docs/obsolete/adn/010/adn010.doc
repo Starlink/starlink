@@ -1,0 +1,721 @@
+                                                                 
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                     ADN/10.1
+ROYAL OBSERVATORY EDINBURGH 
+and UNIVERSITY OF EDINBURGH 
+
+ADAM Project                                                Issued by
+ADAM Design Note 10.1 
+
+                                    B.V.McNally, J.A.Cooke, B.D.Kelly
+                                                           14.03.1984
+
+---------------------------------------------------------------------
+
+               Design document for the message system                ______________________________________ 
+
+
+
+
+
+
+
+
+1. SUMMARY 
+
+
+
+The  specification  for  the  message  system   used   in   the   VAX
+implementation   of   ADAM   is   given   here.   This  includes  the
+specification of subroutine calls and data  structures  used  in  the
+message  system.   An  initial specification of higher level calls to
+the message system is also given. 
+
+
+
+
+
+2. INTRODUCTION 
+
+
+
+In the Perkin-Elmer implementation of ADAM, communication between the
+monitoring process (sometimes referred to as 'ADAM' !) and D-tasks is
+done using 'messages'.  The design of  the  system  was  extended  to
+allow communication between A-tasks and the controlling process, also
+using messages. A preliminary release ( -1.0 ) of the VAX version  of
+the  "message  system"  developed  the ADAM concept of messages still
+further,  so  that  the  Command  Language  Interpreter  (CLI),  user
+interfaces,  task  loaders  etc.  were  also separate processes, each
+communicating via a central 'message system' which  makes  sure  that
+messages  and replies are sent to the correct destinations.  This was
+described in ADN 5.0. 
+
+Further  discussion  about  the  implementation  of  the  preliminary
+release  has resulted in a number of ideas about implementation being
+
+
+
+                                                                 ADN/10.1                          2                          ADN/10.1
+
+
+
+"firmed-up", in particular in  areas  where  previously  no  detailed
+ideas regarding implementation (or, in some cases, function) had been
+put forward.  This resulted in some important design suggestions  for
+the  implementation  of the command language interpreter (CLI), which
+are discussed in ADN 11.0.  The design specification specific to  the
+message system is, however, given here. 
+
+
+
+
+
+3. IMPLEMENTATION 
+
+
+
+Implementation of the VAX message system for ADAM is scheduled to  be
+completed  by  the  end  of  March  1984.  The message format and the
+details of the  message  system  subroutine  interfaces  are  defined
+below. 
+
+
+3.1 General notes     _____________ 
+
+
+In the VAX implementation the messages are sent to,  and  read  from,
+'mailboxes'  maintained  by  VMS.  The "message system" as originally
+conceived in ADN 5.0 was considered a a separate process with its own
+input  mailbox;  discussion resulting from release -1.0 has convinced
+us  that  the  message  system  can  reside  entirely  in  a  set  of
+subroutines  that  are  called  from  other  processes.  This has the
+advantage that a layer of  communication  in  what  was  a  chain  of
+communication  has been removed. Each task has its own input mailbox,
+where it  looks  for  its  messages.   Messages  are  not  explicitly
+"trapped"  (using  AST's)  or  polled  for but are received using the
+standard system QIO calls. 
+
+
+
+3.2 Communication paths     ___________________ 
+
+On start-up, any process must  initialise  itself  into  the  message
+system  with  a  subroutine  call.   This  initialisation sets up the
+logical  name  of  the  mailbox  attached  to  the  process   to   be
+"MBX_adamname"  (where adamname is specified usually in the interface
+module for the process), and opens a channel for the process to  that
+mailbox.  The logical name is held in the group (or system) table. 
+
+When a process needs to send a mesage to  another  process,  it  must
+first  establish  the connection with a "path" subroutine call.  This
+actually sends a message to the other process telling it  to  open  a
+channel to the input mailbox of the sending process, which allows for
+acknowledgment of messages;  all this information is then put into  a
+"path" data structure which becomes part of the message and is passed
+
+
+
+                                                                 ADN/10.1                          3                          ADN/10.1
+
+
+
+across with the message. 
+
+When a process needs to receive a message (e.g.  an  acknowledgment),
+it  uses  the "receive" call to the message system which simply waits
+for a message to appear at the input mailbox.  A timeout can  be  put
+on  this  receive, for example for use in the higher level ADAM_SENDT
+call. 
+
+A process can be waiting for a  message  for  two  reasons.   It  can
+either  be waiting for any message to arrive, in which case it should
+acknowledge the arriving message using the "reply" call;  or  it  can
+be  waiting  for  an  acknowledgment  to  a message it has sent.  The
+"reply" call sends a message as an acknowledgement, i.e. it  sends  a
+message for which a reply is not expected. 
+
+On shutdown of a task, an "exit" subroutine is called which cleans up
+so as not to leave the message system confused.  This should form the
+process exit handler, for cases of accidental exit. 
+
+
+
+
+
+4. DATA STRUCTURES 
+
+
+
+This section gives the specification of the message data  structures.
+These include the overall data structure of messages passed, the data
+structure of stored paths which tell the system where to put messages
+(i.e.  the mailbox channels opened), and the size of the "value" part
+of the message which is available for other uses.  This part  of  the
+specification  may  be  considered to be housekeeping information for
+the message system, and  apart  from  the  visibility  of  a  pointer
+indicating  the  path  to  a  named  process,  should be invisible to
+calling modules. 
+
+
+
+4.1 Common area data structure     __________________________ 
+
+
+There will  be  a  COMMON  storage  area  for  the  messys  primitive
+routines;  this is of course only visible to the routines in a single
+process. 
+
+Contains: 
+  channel to this task's mailbox 
+  privilege of this task (defines what it can send messages to) 
+   (comes in as a message from the loader) 
+  privilege needed by a task to send messages to this task 
+   (comes from interface module standard declaration) 
+  information on paths known about by this task 
+
+
+
+                                                                 ADN/10.1                          4                          ADN/10.1
+
+
+
+4.2 Path data structure     ___________________ 
+
+
+Contains: 
+  channel to receiving task from this task 
+  channel to this task from receiving task 
+  flag/identifier for remote working;  if zero, message is for the 
+   network task;  otherwise it is a pointer into the network task 
+   address table.  This identifier has no relevence to tasks other 
+   than the network task. 
+
+
+
+4.3 Message data structure     ______________________ 
+
+
+Contains: 
+  length of message in bytes 
+  identification of originating task (character string) 
+  privilege level of originating task 
+  message number (given by task issuing the message) 
+  message context code (get, set, obey, cancel) 
+  message status 
+  path structure being used by this message 
+  value part of the message (may contain anything recognisable to 
+   processes sending and receiving the message) 
+
+
+
+5. SUBROUTINE INTERFACES 
+
+
+
+Subroutines called to use the message system. 
+
+These will be in library "messys" with prefix MESSYS_ 
+
+INIT - task initialisation routine 
+    Description: 
+      Initialises the task into the message system. 
+      This involves the creation of the task's mailbox and 
+      attachment to it. 
+    Invocation: 
+      CALL MESSYS_INIT ( OWN_NAME, STATUS ) 
+    Method: 
+      if status normal 
+         construct the mailbox logical name MBX_ownname 
+         insert the logical name into the logical name table (group) 
+         use CREMBX to assign channel 
+         declare the exit handler 
+         put this channel in COMMON area to the messys primitives 
+         get the privilege for other task to send this one messages 
+           from the connection module 
+
+
+
+                                                                 ADN/10.1                          5                          ADN/10.1
+
+
+
+         put this privilege into COMMON 
+         establish path to loader with MESSYS_PATH 
+         get this task's privilege using MESSYS_GETPRIV 
+         put this privilege in common 
+         set status on errors 
+      endif 
+    Import: 
+      CHARACTER OWN_NAME    !  name of this task in character string 
+    Status: 
+      INTEGER STATUS 
+
+PATH 
+    Description: 
+      Obtains a pointer to path information ( stored in common in 
+      the message system routines ).  This pointer points to complete 
+      round-path information.  The task to which the path is being 
+      set up is also requested to initialise a connection with this 
+      calling task. 
+    Invocation: 
+      CALL MESSYS_PATH ( TASK_NAME, PATH, STATUS ) 
+    Method: 
+      if status normal 
+         if (path to that task already open) then 
+            get the known path 
+         else 
+            construct mailbox name from the taskname 
+            open a channel to that mailbox 
+            store that channel as part of the path 
+            MESSYS_SEND a message to that channel requesting 
+              initialisation back 
+            MESSYS_RECEIVE the reply containing the reply channel 
+              from the other task 
+            store that channel too as part of the path 
+            set status on errors 
+         endif 
+      endif 
+    Import: 
+      CHARACTER TASK_NAME   !  name of task to which path is required 
+    Export: 
+      INTEGER  PATH         !  pointer to the path 
+    Status: 
+      INTEGER  STATUS 
+
+SEND 
+    Description: 
+      Send a value data-structure as a message to another process. 
+      The path to this process must already have been established 
+      using the PATH call. 
+      Use of SEND implies that the other process is expected to send 
+      an acknowledgment. 
+    Invocation: 
+      CALL MESSYS_SEND ( PATH, STUFF, MESSID, STATUS ) 
+    Method: 
+
+
+
+                                                                 ADN/10.1                          6                          ADN/10.1
+
+
+
+      if status normal 
+         get new message number 
+         construct the message 
+         set some message status as 'send' 
+         get destination channel from path 
+         perform QIO to destination channel 
+         set status on errors 
+      endif 
+
+    Import: 
+      CHARACTER   STUFF        !  value structure to be sent 
+      INTEGER     PATH         !  pointer to the path 
+    Export: 
+      INTEGER     MESSID       !  message number issued by this task 
+    Status: 
+      INTEGER     STATUS 
+
+REPLY 
+    Description: 
+      Send a value data-structure as a message to another process. 
+      The path to this process must either already exist from the 
+      received path or have been established using the PATH call. 
+      Use of REPLY implies that the other process is not expected 
+      to send an acknowledgment;  this message is probably an 
+      acknowledgment ! 
+    Invocation: 
+      CALL MESSYS_REPLY ( PATH, STUFF, MESSID, STATUS ) 
+    Method: 
+      if status normal 
+         construct the message 
+         set some message status as 'reply' 
+         get reply channel from path 
+         perform QIO to the channel 
+      endif 
+    Import: 
+      INTEGER   PATH         !  pointer to the path 
+      CHARACTER STUFF        !  value structure received 
+      INTEGER   MESSID       !  message number issued by this task 
+    Status: 
+      INTEGER   STATUS 
+
+RECEIVE 
+    Description: 
+      Receive a value data-structure as a message from another 
+      process.  The path to this process is given in the PATH 
+      argument, to facilitate replying.  The receive is performed 
+      with a timeout facility. This low-level RECEIVE call also 
+      handles initialisation of tasks with each other by setting up 
+      channels to mailboxes; this is done "invisibly" at this level. 
+    Invocation: 
+      CALL MESSYS_RECEIVE ( TIMEOUT, PATH, STUFF, MESSID, STATUS ) 
+    Method: 
+      if status normal 
+
+
+
+                                                                 ADN/10.1                          7                          ADN/10.1
+
+
+
+         get own channel from COMMON 
+         if timeout not infinite (i.e. zero or positive !) 
+            set timer running (defaults to using event flag 0) 
+         endif 
+         do until got message or timed out 
+            perform QIOW from the channel 
+            check iosb to find whether timed-out or i/o complete 
+            if timed-out then 
+               cancel i/o 
+               set status timed-out 
+            else 
+               cancel timer 
+               got message: 
+               if (initialise to another task) then 
+                  if insufficient privilege 
+                     REPLY with appropriate message status set 
+                  else 
+                     construct MBX logical name 
+                     use ASSIGN to open channel to the other task 
+                     add this task/channel to the table 
+                     REPLY giving this channel to the other task 
+                  endif 
+               else if (de-initialise) then 
+                  cancel that task's entry from the table 
+               else 
+                  got message 
+                  set status OK 
+               endif 
+            endif 
+         enddo 
+      endif 
+    Deficiencies: 
+      It appears that if a timeout occurs whilst I/O is occurring, 
+      and the QIO is then cancelled, that the data forming the 
+      message MIGHT be lost; we do not know if this is the case. 
+      If it is, then the lock management services may have to be used 
+      to prevent this happening. 
+      Alternatively, by checking for ABORT return status on the 
+      CANCEL and finding the associated process PID, we can tell the 
+      sending process that we have mangled its message. 
+    Import: 
+      INTEGER     TIMEOUT      !  timeout time in 10ms increments 
+    Export: 
+      INTEGER     PATH         !  pointer to the path 
+      CHARACTER   STUFF 
+      INTEGER     MESSID       !  message number of incoming message 
+    Status: 
+      INTEGER     STATUS 
+
+GETPRIV 
+    Description: 
+      Call to get task privilege from the loader.  Uses code from 
+      the high level routine ADAM_GETI. 
+
+
+
+                                                                 ADN/10.1                          8                          ADN/10.1
+
+
+
+    Invocation: 
+      CALL MESSYS_GETPRIV ( PATH, PRIV, STATUS ) 
+    Method: 
+      Uses code from high level routine ADAM_GETI, which does a call 
+      to send a message which gets an integer value from the loader. 
+    Import: 
+      INTEGER PATH       !  path to loader 
+    Export: 
+      INTEGER PRIV       !  privilege of this task 
+    Status: 
+      INTEGER STATUS 
+
+EXIT - declared as the task exit handler 
+    Description: 
+      Cleans up on shutdown of a task; this routine must 
+      do things like deleting its logical name from the logical name 
+        table. 
+      No status return as it is an exit handler. 
+    Invocation (if required at all): 
+      CALL EXIT ( SYS_STATUS ) 
+    Import/export: 
+      INTEGER SYS_STATUS    !  system status on process exit 
+
+
+
+
+6. GENERAL PARAMETER DEFINITIONS 
+
+
+
+It is important that NOTHING AT ALL should be "hard wired"  into  the
+code  apart  from  its  structure!   All  control  values  should  be
+parameterised,  and  in  particular  all  error  messages  and  other
+messages should be in some way parameterised.  General parameters for
+the message system should be kept in a single "include" file that can
+be  used in all modules.  Each parameter must be documented on a line
+by line basis in this file. 
+
+
+
+
+
+7. SOFTWARE ORGANISATION 
+
+
+
+The modules will be stored in a text library, with compiled source in
+the  corresponding object library.  These libraries are maintained by
+a derivative of the "libmaint" tool  at  ROE  which  handles  library
+prefixes and automatic history records. 
+
+The message system libraries will be "messys.tlb"  and  "messys.olb".
+The module names will have the prefix "messys_". 
+
+
+
+                                                                 ADN/10.1                          9                          ADN/10.1
+
+
+
+
+
+
+
+8. HIGHER LEVEL CALLS 
+
+
+
+These are the subroutine calls which will normally be visible to  the
+author  of, for example, a sequencer or an analysis task.  These will
+be in a library and have the prefix ADAM_ 
+
+There are two levels of routines here;  the first group are the lower
+level,  the  second group sit on top of them and make the lower level
+ones easier to use.  However the lower level calls may be  needed  in
+some  instances  for  efficiency  reasons.   All these calls have the
+prefix "ADAM_". 
+
+
+
+8.1 Lower level calls     _________________ 
+
+
+PATH 
+    Invocation: 
+      CALL ADAM_PATH ( TASK_NAME, PATH, STATUS ) 
+    Description: 
+      Returns a pointer the the task described by TASK_NAME 
+    Import: 
+      CHARACTER TASK_NAME   !  name of task to which path is required 
+    Export: 
+      INTEGER PATH          !  pointer to the path 
+    Status: 
+      INTEGER STATUS 
+
+SEND 
+    Invocation: 
+      CALL ADAM_SEND ( PATH, CONTEXT, NAME, INVAL, OUTVAL, MESSID, 
+     :  STATUS ) 
+    Description: 
+      Corresponds to the RGO SEND routine.  Sends a message to a task 
+      via 'PATH' with given context (get, set, obey, cancel) and 
+      packed input values;  returns packed output values from the 
+      received acknowledgment message.  Returns message identifier in 
+      case any more replies are expected from the communicating task. 
+    Import: 
+      INTEGER PATH     !  pointer to the path to the required task 
+      INTEGER CONTEXT  !  parameterised 'get, set, obey, cancel' 
+      CHARACTER NAME   !  name of required function or parameter 
+      CHARACTER INVAL  !  contains input values in packed form, 
+                       !  or may contain anything understood by 
+                       !  the other task 
+    Export: 
+
+
+
+                                                                 ADN/10.1                          10                         ADN/10.1
+
+
+
+      CHARACTER OUTVAL !  contains return values if any in packed form 
+      INTEGER MESSID   !  message number issued by this task 
+    Status: 
+      INTEGER STATUS 
+
+SENDT 
+    Invocation: 
+      CALL ADAM_SENDT ( TIME, PATH, CONTEXT, NAME, INVAL, 
+     :  OUTVAL, MESSID, STATUS ) 
+    Description: 
+      As SEND but allows a timer to be set on the acknowledgment. 
+    Import: 
+      INTEGER TIME     !  timeout time in 10ms increments 
+      INTEGER PATH     !  pointer to the path to the required task 
+      INTEGER CONTEXT  !  parameterised 'get, set, obey, cancel' 
+      CHARACTER NAME   !  name of required function or parameter 
+      CHARACTER INVAL  !  contains input values in packed form, 
+                       !  or may contain anything understood by 
+                       !  the other task 
+    Export: 
+      CHARACTER OUTVAL !  contains return values if any in packed form 
+      INTEGER MESSID   !  message number issued by this task 
+    Status: 
+      INTEGER STATUS 
+
+RECEIVE 
+    Invocation: 
+      CALL ADAM_RECEIVE ( PATH, CONTEXT, NAME, VALUE, MESSID, STATUS ) 
+    Description: 
+      Waits for a message to arrive at this task, and returns with 
+      the message and associated parameters. 
+    Export: 
+      INTEGER PATH     !  pointer to the path back to the originating 
+                       !  task 
+      INTEGER CONTEXT  !  parameterised 'get, set, obey, cancel' 
+      CHARACTER NAME   !  name of required function or parameter 
+      CHARACTER VALUE  !  received value (usually in packed form) 
+      INTEGER MESSID   !  message number of received message 
+    Status: 
+      INTEGER STATUS 
+
+REPLY 
+    Invocation: 
+      CALL ADAM_REPLY ( PATH, CONTEXT, NAME, VALUE, MESSID, STATUS ) 
+    Description: 
+      Sends a message to the task indicated in the path, but does not 
+      expect an acknowledgment and so does not wait before returning. 
+      The values of PATH, CONTEXT, NAME, VALUE and MESSID will 
+      usually have been copied from the corresponding values obtained 
+      by a call to RECEIVE. 
+    Import: 
+      INTEGER PATH     !  pointer to the path back to the originating 
+                       !  task 
+
+
+
+                                                                 ADN/10.1                          11                         ADN/10.1
+
+
+
+      INTEGER CONTEXT  !  parameterised 'get, set, obey, cancel' 
+      CHARACTER NAME   !  name of required function or parameter 
+      CHARACTER VALUE  !  received value (usually in packed form) 
+      INTEGER MESSID   !  message number of received message 
+    Status: 
+      INTEGER STATUS 
+
+To use the 'value' part of these lower level calls to pass values  in
+the  standard  way  expected by d-tasks, the PACK and UNPACK routines
+are provided to facilitate packing in the expected  format.   However
+it  is  a requirement that it should be possible to send any required
+character string, e.g.: 
+
+  In sending task: 
+      CALL ADAM_SEND ( path, OBEY, 'RUN', 'SOME COMMAND STRING', 
+                       outval, messid, status ) 
+  and obtain in the receiving task: 
+      CALL ADAM_RECEIVE ( path, context, name, INSTRING, messid, 
+     :  status ) 
+  where INSTRING would be a character string containing 'SOME COMMAND 
+  STRING'. 
+
+
+
+
+8.2 Higher level calls     __________________ 
+
+
+SETI 
+    Invocation: 
+      CALL ADAM_SETI ( PATH, NAME, NVALS, ARRAY, STATUS ) 
+    Description: 
+      Sets an integer variable in the connection module 
+    Import: 
+      INTEGER PATH      !  pointer to path to task 
+      CHARACTER NAME    !  name of variable 
+      INTEGER NVALS     !  number of values to be sent 
+      INTEGER ARRAY     !  array of the values 
+    Status: 
+      INTEGER STATUS 
+
+GETI 
+    Invocation: 
+      CALL ADAM_GETI ( PATH, NAME, MAXVALS, ARRAY, ACTVALS, STATUS ) 
+    Description: 
+      Gets an integer variable in the connection module 
+    Import: 
+      INTEGER PATH      !  pointer to path to task 
+      CHARACTER NAME    !  name of variable 
+      INTEGER MAXVALS   !  maximum number of values to be received 
+    Export: 
+      INTEGER ARRAY     !  array of the values 
+      INTEGER ACTVALS   !  actual number of values received 
+
+
+
+                                                                 ADN/10.1                          12                         ADN/10.1
+
+
+
+    Status: 
+      INTEGER STATUS 
+
+OBEY 
+    Invocation: 
+      CALL ADAM_OBEY ( PATH, NAME, MESSID, STATUS ) 
+    Description: 
+      Sends an OBEY NAME message without associated values. 
+    Import: 
+      INTEGER PATH      !  pointer to path to task 
+      CHARACTER NAME    !  name of function required 
+    Export: 
+      INTEGER MESSID    !  message number 
+    Status: 
+      INTEGER STATUS 
+
+CANCEL 
+    Invocation: 
+      CALL ADAM_CANCEL ( PATH, NAME, STATUS ) 
+    Description: 
+    Import: 
+      INTEGER PATH      !  pointer to path to task 
+      CHARACTER NAME    !  name of function required 
+    Status: 
+      INTEGER STATUS 
+
+
+
+
+
+
+9. RECOMMENDATIONS 
+
+
+
+This  document  is  intended  to  provide  as  final  as  possible  a
+specification   of  the  message  system,  its  interfaces  and  data
+structures.  No changes  to  this  specification  should  be  allowed
+without  documented  agreement  of  the  implementors of the VAX ADAM
+system. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 

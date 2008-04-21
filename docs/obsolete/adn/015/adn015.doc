@@ -1,0 +1,1425 @@
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      ADN/15.1
+ROYAL OBSERVATORY EDINBURGH
+and UNIVERSITY OF EDINBURGH
+
+ADAM Project                                                 Issued by
+ADAM Design Note 15.1
+
+                                                             B D Kelly
+                                                            J A Bailey
+                                                      11 December 1986
+
+----------------------------------------------------------------------
+
+          Interfacing Command Languages and User Interfaces
+          -------------------------------------------------
+
+
+
+
+
+1  SUMMARY
+
+This document describes the ways in which user interfaces and  command
+languages  interface with each other and with other ADAM tasks.  It is
+required reading  for  anyone  writing  a  command  language  or  user
+interface to run in the ADAM system.
+
+
+
+2  INTRODUCTION
+
+A distinction is drawn between a command language, which is seen as  a
+subroutine  library  which  can  be  asked  to  execute  commands  and
+procedures, and a user interface which is seen as a piece of  software
+which controls the command terminal.  This document attempts to define
+a standard subroutine interface between  these  two  components.   The
+assumption  is that the subroutines have to be re-implemented for each
+user interface, but allow different combinations of user interface and
+command  language  to  be  built.   This allows, for example, a set of
+procedures written in some command language to remain  available  even
+though the user interface has changed.
+
+It is additionally recognised that all command language/user interface
+combinations  have to control ADAM tasks, and so an attempt is made to
+define a standard subroutine library to perform this function.
+
+
+
+3  COMMAND LANGUAGES
+
+A command language to be built into an ADAM system must provide  as  a
+minimum  a  set  of  three  subroutines  to start and stop the command
+
+                                - 1 -
+ADN/15.1                                                        Page 2
+
+
+language, and to execute a command.  These  will  have  the  following
+form:
+
+COMLAN_START ( STATUS )
+COMLAN_STOP ( STATUS )
+COMLAN_DOCMD ( COMMAND, STATUS )
+
+
+These routines are called by  the  user  interface.   COMLAN_DOCMD  is
+called  with  the  character string COMMAND containing a command to be
+executed.  It returns  to  the  user  interface  after  executing  the
+command.   COMLAN_START  and COMLAN_STOP will generally be called once
+at the start and end of each  session  and  will  perform  appropriate
+initialization and tidying up.
+
+The command language may provide  additional  subroutines  to  provide
+access  to other features, such as its command language variables.  In
+general such facilities will depend on the particular command language
+being implemented.
+
+A command language should use the UFACE_ routines, described below, to
+perform  all terminal I/O operations.  It should use the TCS_ routines
+(also described below) to perform control  operations  on  other  ADAM
+tasks.
+
+
+
+4  USER INTERFACES
+
+A  user  interface  must  consist  of  a  program  which   calls   the
+COMLAN_START   routine  to  initialize  the  command  language,  calls
+COMLAN_DOCMD to execute any  command  language  command,  and  finally
+calls COMLAN_STOP to close down the command language.
+
+A user interface must provide an  appropriate  implementation  of  the
+UFACE_  routines.   These  can  be divided into two groups, those that
+handle  messages  received  from  other  ADAM  tasks  (UFACE_ASKPARAM,
+UFACE_INFORM,   UFACE_SYNC)   and  those  that  perform  terminal  I/O
+functions for the command language.
+
+A user interface must respond to ADAM messages which are received from
+other  tasks.   These  can  be parameter requests, messages requesting
+screen output, SYNC messages, and  completion  messages  for  actions.
+Such messages can also be received in other places (for example when a
+TCS_OBEYW call is waiting to complete).  Thus the  TCS  routines  call
+the  UFACE  routines  (ASKPARAM,  INFORM  and SYNC) to respond to such
+messages.
+
+In order for parallel operations to work as described below, the  user
+interface  must  call  the  routine  PARAL_CHECK_MES  for  each action
+completion message received.  It  may  call  this  routine  for  every
+message received.
+
+                                - 2 -
+ADN/15.1                                                        Page 3
+
+
+5  UFACE
+
+The UFACE routines are  listed  below.   An  implementation  of  these
+routines  needs  to be provided for each user interface.  The routines
+ASKPARAM, INFORM and SYNC are used to respond to messages  from  other
+tasks  as  described  above.  GETCMD and WRUSER perform terminal input
+and output for the command language.   TESTCTRLC  allows  the  command
+language  to  test for a user initiated interrupt (e.g.  the control-C
+key).  STARTIO and STOPIO are  used  to  turn  on  and  off  the  user
+interface's   terminal   input   when  the  command  language,  or  an
+application program, wants to use the  terminal  directly  (e.g.   for
+graphics).
+
+UFACE_ASKPARAM ( PATH, VALUE, MESSID, STATUS )
+UFACE_INFORM ( PATH, VALUE, STATUS )
+UFACE_GETCMD ( PROMPT, LINE, STATUS )
+UFACE_STARTIO ( STATUS )
+UFACE_STOPIO ( STATUS )
+UFACE_SYNC ( PATH, MESSID, STATUS )
+UFACE_TESTCTRLC ( CTRLC, STATUS )
+UFACE_WRUSER ( STRING, STATUS )
+
+
+
+
+6  TCS
+
+The TCS (Task Control System) routines provide standard facilities for
+loading  and  killing  tasks,  sending  messages  (GET,  SET, OBEY and
+CANCEL) to tasks, and enabling implementation of parallel  operations.
+The  routines  are  listed  below  and described in more detail in the
+Appendix.
+
+TCS_BEGINPAR ( STATUS )
+TCS_CANCEL ( PROCNAME, ACTNAME, VALUE, STATUS )
+TCS_GET ( PROCNAME, PARNAME, VALUE, STATUS )
+TCS_KILL ( PROCNAME, STATUS )
+TCS_KILLW ( PROCNAME, STATUS )
+TCS_LOAD ( PROCNAME, EXENAME, PRIORITY, INPUT, OUTPUT, FILEXE, STATUS )
+TCS_LOADD ( PROCNAME, EXENAME, PRIORITY, INPUT, OUTPUT, FILEXE, STATUS )
+TCS_LOADW ( PROCNAME, EXENAME, PRIORITY, INPUT, OUTPUT, FILEXE, STATUS )
+TCS_OBEY ( PROCNAME, ACTNAME, VALUE, STATUS )
+TCS_OBEYW ( PROCNAME, ACTNAME, VALUE, STATUS )
+TCS_SET ( PROCNAME, PARNAME, VALUE, STATUS )
+TCS_SYNCH ( OPERATION, PROCNAME, ACTNAME, VALUE, STATUS )
+
+
+
+
+7  PARALLEL OPERATIONS
+
+Although  ADAM  D-tasks  provide  the  facility  to  carry  out   many
+
+                                - 3 -
+ADN/15.1                                                        Page 4
+
+
+operations  in parallel, it has hitherto been difficult to make use of
+this  facility  conveniently  from  the  command  language.   The  TCS
+routines  now  provide the ability to carry out a number of OBEY, LOAD
+or KILL operations (in any combination) in  parallel.   The  following
+sequence of calls is used:
+
+    CALL TCS_BEGINPAR
+    .
+    .
+    calls to TCS_LOAD, TCS_OBEY or TCS_KILL
+    .
+    .
+    FINISHED = .FALSE.
+    DO WHILE (.NOT. FINISHED)
+        CALL TCS_SYNCH(OPN, TASKNAME, ACTNAME, VALUE, STATUS)
+        FINISHED = STATUS .EQ. TCS__EMPTY
+        IF (.NOT. FINISHED) THEN
+            .
+            deal with completion status/value for operation
+            .
+        ENDIF
+    ENDDO
+
+
+The  call  to  TCS_BEGINPAR  starts  the  parallel   operation   mode.
+Subsequent  calls  to  TCS_LOAD,  TCS_OBEY and TCS_KILL (or TCS_LOADW,
+TCS_OBEYW, TCS_KILLW which are equivalent in  this  mode)  proceed  in
+parallel.  Each call to TCS_SYNCH returns the completion status of one
+of the parallel operations, waiting for it to complete  if  necessary.
+When  a  status  of TCS__EMPTY is returned all the parallel operations
+have completed.
+
+The PARAL_ routines are used by the TCS_ routines  to  keep  track  of
+parallel  operations.   If  the  parallel facility is to work the user
+interface must check any unsolicited messages it receives  to  see  if
+any  of  them  are  completion messages for one of the parallel obeys.
+This is done by calling the routine PARAL_CHECK_MES
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 4 -
+ADN/15.1                                                        Page 5
+
+
++-----------------------------------------------------------------------------+
+|  UFACE_ASKPARAM  |  ask user for parameter value                            |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  This routine is used to respond to a parameter prompt message              |
+|  from a task.                                                               |
+|  Given parameter info in "value", ask user (by prompting) for               |
+|  a value for the parameter.                                                 |
+|  Reply to the task using the specified path and messid and giving the       |
+|  parameter value in the reply message.                                      |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL UFACE_ASKPARAM ( PATH, VALUE, MESSID, STATUS )                        |
+|                                                                             |
+|                                                                             |
+|  PATH=INTEGER                                                               |
+|        path to requesting task                                              |
+|                                                                             |
+|  VALUE=CHARACTER*(*)                                                        |
+|        message value string                                                 |
+|                                                                             |
+|  MESSID=INTEGER                                                             |
+|        ID for reply message                                                 |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        Status Return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 5 -
+ADN/15.1                                                        Page 6
+
+
++-----------------------------------------------------------------------------+
+|  UFACE_GETCMD  |  get user command string                                   |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  Get an input command from the user. Handle internally any messages         |
+|  arriving from other tasks while the command is awaited.                    |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL UFACE_GETCMD ( PROMPT, LINE, STATUS )                                 |
+|                                                                             |
+|                                                                             |
+|  PROMPT=CHARACTER*(*) (given)                                               |
+|        the prompt to be used                                                |
+|                                                                             |
+|  LINE=CHARACTER*(*) (returned)                                              |
+|        the command-line                                                     |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        Status Return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 6 -
+ADN/15.1                                                        Page 7
+
+
++-----------------------------------------------------------------------------+
+|  UFACE_INFORM  |  put inform string to user                                 |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  Displays value as a text message.                                          |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL UFACE_INFORM ( PATH, VALUE, STATUS )                                  |
+|                                                                             |
+|                                                                             |
+|  PATH=INTEGER (given)                                                       |
+|        path to the task originating the message                             |
+|                                                                             |
+|  VALUE=CHARACTER*(*) (given)                                                |
+|        message string                                                       |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        Status Return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 7 -
+ADN/15.1                                                        Page 8
+
+
++-----------------------------------------------------------------------------+
+|  UFACE_STARTIO  |  restart terminal input                                   |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  Restart terminal input after it has been completed or stopped.             |
+|  Note: this is not the same as starting terminal input the first            |
+|  time.                                                                      |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL UFACE_STARTIO ( STATUS )                                              |
+|                                                                             |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        Status Return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 8 -
+ADN/15.1                                                        Page 9
+
+
++-----------------------------------------------------------------------------+
+|  UFACE_STOPIO  |  stop terminal input                                       |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  Cancel terminal input to free the terminal for i/o.                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL UFACE_STOPIO ( STATUS )                                               |
+|                                                                             |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        Status Return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 9 -
+ADN/15.1                                                       Page 10
+
+
++-----------------------------------------------------------------------------+
+|  UFACE_SYNC  |  Respond to a Sync message                                   |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  Respond to a Sync message from a task by replying using the                |
+|  path and messid specified.                                                 |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL UFACE_SYNC ( PATH, MESSID, STATUS )                                   |
+|                                                                             |
+|                                                                             |
+|  PATH=INTEGER                                                               |
+|        path to requesting task                                              |
+|                                                                             |
+|  MESSID=INTEGER                                                             |
+|        ID for reply message                                                 |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        Status Return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 10 -
+ADN/15.1                                                       Page 11
+
+
++-----------------------------------------------------------------------------+
+|  UFACE_TESTCTRLC  |  Test for a control-C                                   |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  Tested whether the user typed a control-C (or equivalent).                 |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL UFACE_TESTCTRLC ( CTRLC, STATUS )                                     |
+|                                                                             |
+|                                                                             |
+|  CTRLC=LOGICAL (returned)                                                   |
+|        TRUE if the user typed a control-C.                                  |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        Status Return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 11 -
+ADN/15.1                                                       Page 12
+
+
++-----------------------------------------------------------------------------+
+|  UFACE_WRUSER  |  output a string                                           |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  Types the given string on the terminal.                                    |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL UFACE_WRUSER ( STRING, STATUS )                                       |
+|                                                                             |
+|                                                                             |
+|  STRING=CHARACTER*(*) (given)                                               |
+|        the string to be typed-out.                                          |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        Status Return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 12 -
+ADN/15.1                                                       Page 13
+
+
++-----------------------------------------------------------------------------+
+|  TCS_BEGINPAR  |  begin parallel operations                                 |
++-----------------------------------------------------------------------------+
+|                                                                             | 
+|  Begin parallel operations - subsequent LOADs, KILLs and OBEYs proceed      |
+|  in parallel. Parallel mode continues until a TCS_SYNCH call finds no       |
+|  parallel operations waiting to complete.                                   |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL TCS_BEGINPAR ( STATUS )                                               |
+|                                                                             |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        status return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 13 -
+ADN/15.1                                                       Page 14
+
+
++-----------------------------------------------------------------------------+
+|  TCS_CANCEL  |  Cancel an action in a task                                  |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  Send a CANCEL message to a task.                                           |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL TCS_CANCEL ( PROCNAME, ACTNAME, VALUE, STATUS )                       |
+|                                                                             |
+|                                                                             |
+|  PROCNAME=CHARACTER*(*) (given)                                             |
+|        name of task in which action is to be cancelled                      |
+|                                                                             |
+|  ACTNAME=CHARACTER*(*) (given)                                              |
+|        name of action to be cancelled                                       |
+|                                                                             |
+|  VALUE=CHARACTER*(*) (given)                                                |
+|        parameter string.                                                    |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        status return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 14 -
+ADN/15.1                                                       Page 15
+
+
++-----------------------------------------------------------------------------+
+|  TCS_GET  |  get a parameter of a task                                      |
++-----------------------------------------------------------------------------+
+|                                                                             | 
+|  Get the value of a parameter of a task.                                    |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL TCS_GET ( PROCNAME, PARNAME, VALUE, STATUS )                          |
+|                                                                             |
+|                                                                             |
+|  PROCNAME=CHARACTER*(*) (given)                                             |
+|        name of task whose parameter is to be got                            |
+|                                                                             |
+|  PARNAME=CHARACTER*(*) (given)                                              |
+|        name of parameter                                                    |
+|                                                                             |
+|  VALUE=CHARACTER*(*) (returned)                                             |
+|        value of parameter                                                   |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        status return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 15 -
+ADN/15.1                                                       Page 16
+
+
++-----------------------------------------------------------------------------+
+|  TCS_KILL  |  stop a running ADAM task                                      |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  Stops a running task.                                                      |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL TCS_KILL ( PROCNAME, STATUS )                                         |
+|                                                                             |
+|                                                                             |
+|  PROCNAME=CHARACTER*(*) (given)                                             |
+|        name of task                                                         |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        status return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 16 -
+ADN/15.1                                                       Page 17
+
+
++-----------------------------------------------------------------------------+
+|  TCS_KILLW  |  stop a running ADAM task and wait for completion             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  Stops a running task.                                                      |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL TCS_KILLW( PROCNAME, STATUS )                                         |
+|                                                                             |
+|                                                                             |
+|  PROCNAME=CHARACTER*(*) (given)                                             |
+|        name of task                                                         |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        status return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 17 -
+ADN/15.1                                                       Page 18
+
+
++-----------------------------------------------------------------------------+
+|  TCS_LOAD  |  load a d-task and start it running                            |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  Load an execution module as a d-task and start it running                  |
+|  in a sub-process.                                                          |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL TCS_LOAD ( PROCNAME, EXENAME, PRIORITY, INPUT, OUTPUT, FILEXE,        |
+|                  STATUS )                                                   |
+|                                                                             |
+|  PROCNAME=CHARACTER*(*) (given)                                             |
+|        name of task to be created - ie subprocess name                      |
+|                                                                             |
+|  EXENAME=CHARACTER*(*) (given)                                              |
+|        name of execution module                                             |
+|                                                                             |
+|  PRIORITY=INTEGER (given)                                                   |
+|        base priority of process created                                     |
+|                                                                             |
+|  INPUT=CHARACTER*(*) (given)                                                |
+|        SYS$INPUT assignment for the subprocess - if a blank string is       |
+|        specified the logical name IN_LOG is used                            |
+|                                                                             |
+|  OUTPUT=CHARACTER*(*) (given)                                               |
+|        SYS$OUTPUT assignment for the subprocess - if a blank string is      |
+|        specified the logical name OUT_LOG is used                           |
+|                                                                             |
+|  FILEXE=CHARACTER*(*) (returned)                                            |
+|        The full name of the executable image actually used                  |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        status return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 18 -
+ADN/15.1                                                       Page 19
+
+
++-----------------------------------------------------------------------------+
+|  TCS_LOADD  |  load a task in a detached process and start it running       |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  Load an execution module as a d-task and start it running                  |
+|  in a   detached process.                                                   |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL TCS_LOADD ( PROCNAME, EXENAME, PRIORITY, INPUT, OUTPUT, FILEXE,       |
+|                   STATUS )                                                  |
+|                                                                             |
+|  PROCNAME=CHARACTER*(*) (given)                                             |
+|        name of task to be created - ie process name                         |
+|                                                                             |
+|  EXENAME=CHARACTER*(*) (given)                                              |
+|        name of execution module                                             |
+|                                                                             |
+|  PRIORITY=INTEGER (given)                                                   |
+|        base priority of process created                                     |
+|                                                                             |
+|  INPUT=CHARACTER*(*) (given)                                                |
+|        SYS$INPUT assignment for the subprocess - if a blank string is       |
+|        specified the logical name IN_LOG is used                            |
+|                                                                             |
+|  OUTPUT=CHARACTER*(*) (given)                                               |
+|        SYS$OUTPUT assignment for the subprocess - if a blank string is      |
+|        specified the logical name OUT_LOG is used                           |
+|                                                                             |
+|  FILEXE=CHARACTER*(*) (returned)                                            |
+|        The full name of the executable image actually used                  |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        status return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 19 -
+ADN/15.1                                                       Page 20
+
+
++-----------------------------------------------------------------------------+
+|  TCS_LOADW  |  load a task in a subprocess and start it running             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  Load an execution module as a d-task and start it running                  |
+|  in a subprocess and wait for load to complete.                             |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL TCS_LOADW ( PROCNAME, EXENAME, PRIORITY, INPUT, OUTPUT, FILEXE,       |
+|                   STATUS )                                                  |
+|                                                                             |
+|  PROCNAME=CHARACTER*(*) (given)                                             |
+|        name of task to be created - ie subprocess name                      |
+|                                                                             |
+|  EXENAME=CHARACTER*(*) (given)                                              |
+|        name of execution module                                             |
+|                                                                             |
+|  PRIORITY=INTEGER (given)                                                   |
+|        base priority of process created                                     |
+|                                                                             |
+|  INPUT=CHARACTER*(*) (given)                                                |
+|        SYS$INPUT assignment for the subprocess - if a blank string is       |
+|        specified the logical name IN_LOG is used                            |
+|                                                                             |
+|  OUTPUT=CHARACTER*(*) (given)                                               |
+|        SYS$OUTPUT assignment for the subprocess - if a blank string is      |
+|        specified the logical name OUT_LOG is used                           |
+|                                                                             |
+|  FILEXE=CHARACTER*(*) (returned)                                            |
+|        The full name of the executable image actually used                  |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        status return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 20 -
+ADN/15.1                                                       Page 21
+
+
++-----------------------------------------------------------------------------+
+|  TCS_OBEY  |  send an OBEY to a task                                        |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  Send an OBEY to a task.                                                    |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL TCS_OBEY ( PROCNAME, ACTNAME, VALUE, STATUS )                         |
+|                                                                             |
+|                                                                             |
+|  PROCNAME=CHARACTER*(*) (given)                                             |
+|        name of task to be told OBEY                                         |
+|                                                                             |
+|  ACTNAME=CHARACTER*(*) (given)                                              |
+|        name of action to be obeyed                                          |
+|                                                                             |
+|  VALUE=CHARACTER*(*) (given)                                                |
+|        parameter string.                                                    |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        status return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 21 -
+ADN/15.1                                                       Page 22
+
+
++-----------------------------------------------------------------------------+
+|  TCS_OBEYW  |  Send OBEY to a task and wait for completion                  |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  Send an OBEY to a task and wait for completion.                            |
+|  Terminal input is disabled in case the task wishes to do I/O               |
+|  (eg graphics).                                                             |
+|  CTRL-C is still active and can be used to break-out.                       |
+|  Terminal input is re-enabled temporarily if parameter requests             |
+|  come from the task.                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL TCS_OBEYW ( PROCNAME, ACTNAME, VALUE, STATUS )                        |
+|                                                                             |
+|                                                                             |
+|  PROCNAME=CHARACTER*(*) (given)                                             |
+|        name of task to be told OBEY                                         |
+|                                                                             |
+|  ACTNAME=CHARACTER*(*) (given)                                              |
+|        name of action to be obeyed                                          |
+|                                                                             |
+|  VALUE=CHARACTER*(*) (given and returned)                                   |
+|        parameter string on input. If a final status other than              |
+|        ACTCOMPLETE is returned, then the value string from the task         |
+|        is copied into it.                                                   |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        status return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 22 -
+ADN/15.1                                                       Page 23
+
+
++-----------------------------------------------------------------------------+
+|  TCS_SET  |  set a parameter of a task                                      |
++-----------------------------------------------------------------------------+
+|                                                                             | 
+|  Set the value of a parameter of a task.                                    |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL TCS_SET ( PROCNAME, PARNAME, VALUE, STATUS )                          |
+|                                                                             |
+|                                                                             |
+|  PROCNAME=CHARACTER*(*) (given)                                             |
+|        name of task whose parameter is to be set                            |
+|                                                                             |
+|  PARNAME=CHARACTER*(*) (given)                                              |
+|        name of parameter to be set                                          |
+|                                                                             |
+|  VALUE=CHARACTER*(*) (given)                                                |
+|        value to which parameter will be set                                 |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        status return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 23 -
+ADN/15.1                                                       Page 24
+
+
++-----------------------------------------------------------------------------+
+|  TCS_SYNCH  |  Wait for completion of parallel operation                    |
++-----------------------------------------------------------------------------+
+|                                                                             | 
+|  Wait for an operation in a parallel set of operations to complete.         |
+|  Return its completion status. If there are no more operations              |
+|  waiting to complete return TCS__EMPTY and turn off parallel mode.          |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL TCS_SYNCH ( OPERATION, PROCNAME, ACTNAME, VALUE, STATUS )             |
+|                                                                             |
+|  OPERATION=INTEGER (returned)                                               |
+|        type of operation which completed                                    | 
+|        0 = LOAD, 1 = KILL, 2 = OBEY                                         | 
+|                                                                             |
+|  PROCNAME=CHARACTER*(*) (returned)                                          |
+|        name of task being loaded, killed or obeying the action              |
+|                                                                             |
+|  ACTNAME=CHARACTER*(*) (returned)                                           |
+|        name of action (for an obey)                                         |
+|                                                                             |
+|  VALUE=CHARACTER*(*) (returned)                                             |
+|        value string (for an obey)                                           |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        status return, TCS__EMPTY or completion status of operation          |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 24 -
+ADN/15.1                                                       Page 25
+
+
++-----------------------------------------------------------------------------+
+|  PARAL_CHECK_MES  |  Check for completion message                           |
++-----------------------------------------------------------------------------+
+|                                                                             | 
+|  Check whether a message is the completion message of an OBEY which         |
+|  is currently part of a parallel operation.                                 |
+|  Must be called for every completion message received by the user           |
+|  interface.                                                                 |
+|                                                                             |
++-----------------------------------------------------------------------------+
+|                                                                             |
+|  CALL PARAL_CHECK_MES ( MESSID, MESSTATUS, VALUE, AWAITED, STATUS )         |
+|                                                                             |
+|  MESSID=INTEGER (given)                                                     |
+|        Message id of message received                                       | 
+|                                                                             |
+|  MESSTATUS=INTEGER (given)                                                  |
+|        The status of the message (ie status from ADAM_RECEIVE)              |
+|                                                                             |
+|  VALUE=CHARACTER*(*) (given)                                                |
+|        value string of message                                              |
+|                                                                             |
+|  AWAITED=LOGICAL (returned)                                                 |
+|        TRUE if it was a completion message for a parallel OBEY              |
+|                                                                             |
+|  STATUS=INTEGER                                                             |
+|        status return                                                        |
+|                                                                             |
++-----------------------------------------------------------------------------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 25 -

@@ -1,0 +1,103 @@
+.af geroffdir:prelude.grf
+.adna 8.1 "A pre-release version of the ADAM message system" "John Cooke, Bernard McNally" 1.3.1984
+
+.level1 "SUMMARY"
+
+The VAX implementation of the ADAM system is to include a "message system" to 
+control the passing of ADAM messages between processes.  This message system 
+is due for completion at the end of March 1984.  Initial tests have resulted 
+in a "pre-release" version ( which we have numbered -1.0 ) which is available 
+to interested parties, particularly those who will have some involvement with 
+the development of d-tasks.  This document gives some details of what is being 
+released and how to use it for tests.
+
+
+.level1 "COMPONENTS OF THE RELEASE"
+
+The filenames of source code in this release are given below under descriptive 
+headings.
+
+1.	The temporary loader.
+		loader.com
+		loader.for
+
+2.	General parameter definitions for the message system.
+		mesdefns.for
+
+3.	Data structure definitions.
+		ddmsg.for
+		ddmsgstor.for
+		ddval.for
+
+4.	Common blocks.
+		tasktab.for
+
+5.	Main programs.  The execution modules of these are loaded
+	by the loader.
+		clistub.for
+		dtaskfix.for (includes other modules)
+		messys.for
+
+6.	Messys library ( Prefix "messys_" ) "messys.tlb" and
+	"messys.olb".
+	These modules are stored in a text library, with compiled
+	source in the corresponding object library.  These
+	libraries are maintained by a derivative of the "libmaint"
+	tool at ROE which handles library prefixes and automatic
+	history records.
+		enter           getloc          getmsg
+		iocomplet       lookup          send
+		timeout         tinbox          tinit
+
+7.	Utility routines. ( Prefix "util_" )
+	( Not yet in a library )
+		last.for
+
+
+.level1 "RUNNING THE PROTOTYPE SYSTEM"
+
+The system is loaded by running the DCL command file "loader.com".  Start-up 
+messages will be displayed by the three co-operating processes, followed by 
+the "command:" prompt from the CLI stub.  There are two acceptable replies to 
+this prompt.  A reply of "send" allows further prompts which result in a 
+message being sent to the d-task stub; "exit" stops the CLI stub.  Once the 
+CLI stub has been stopped, a ctrl-Y is needed to interrupt a "wait" command 
+which holds DCL in abeyance.  Superfluous sub-processes will then have to be 
+killed off by "stop" ( or "suicide" at ROE ).
+
+If "send" is selected, the next prompt is "to which task:" to which the reply 
+should be "taskc" as that is what the co-operating d-task has been called.  
+Other d-tasks can be created with other names, but at present this involves 
+changes to the d-task fixed part.  The next prompt is "context:" to which the 
+sensible replies are "get", "set", "obey" or "cancel".  A "message" is also
+prompted for; any character string will do.
+
+On receipt of the message, the d-task stub calls modules to handle the "get", 
+"set" or "obey" ( "cancel" is also handled by the "ACT" module ).  The "ACT" 
+module called by an "obey" types the message on the user's terminal.
+
+After processing the message, the d-task stub returns an acknowledgment to the 
+CLI stub, which is then ready to accept another command.
+
+
+.level1 "GENERAL NOTES"
+
+This release is purely for information and is not guaranteed to become part of 
+the final ADAM system.  However we hope that it will bear much more than a 
+passing resemblance to the final version.  There are important chunks missing 
+from the fixed part of the d-tak stub, particularly relating to the 
+interaction with the interface module.  The RGO document "How to write a 
+d-task" by William Lupton should be consulted for further details of the 
+d-task architecture;  we hope to follow this general design fairly closely.
+For details of the inner workings of the system the reader is referred to the
+source code;  however this should not be necessary for most people as the
+message system implementation details should not have an impact on the
+operation of d-tasks. 
+
+The message system is due for completion at the end of March 1984.  From tests 
+made with this prototype we have no reason to doubt the fundamental design of 
+the ADAM system, and every reason to think that the message system can be 
+completed on schedule.  However the d-task fixed part will clearly require a 
+fair amount of effort and it is not clear from the current project timescales 
+how that fits in;  much will depend on the speed of progress made with the 
+command language integration into this VAX implementation.

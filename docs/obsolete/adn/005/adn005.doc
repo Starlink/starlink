@@ -1,0 +1,241 @@
+                                                                 
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      ADN/5.1
+ROYAL OBSERVATORY EDINBURGH 
+and UNIVERSITY OF EDINBURGH 
+
+ADAM Project                                                Issued by
+ADAM Design Note 5.1 
+
+                                                            J.A.Cooke
+                                                           12.01.1984
+
+---------------------------------------------------------------------
+
+           VAX implementation of ADAM: the message system            ______________________________________________ 
+
+
+
+
+
+
+
+
+1. INTRODUCTION 
+
+
+In the Perkin-Elmer implementation of ADAM, communication between the
+controlling  process  (sometimes referred to as 'ADAM' !) and D-tasks
+is  done  using  'messages'.   This  has  been  extended   to   allow
+communication between A-tasks and the controlling process, also using
+messages. 
+
+
+
+2. DEVELOPMENTS FOR THE VAX 
+
+
+A development of the ADAM concept of messages is to split the  system
+still  further,  so that the Command Language Interpreter (CLI), user
+interfaces, task loaders  etc.  are  also  separate  processes,  each
+communicating  via  a  central 'message system' which makes sure that
+messages and replies are sent to the correct destinations. 
+
+Figure 1 (below) illustrates this concept.  Since it is expected that
+there  will be a lot of communication between the CLI and A-tasks, it
+was decided that the CLI running an A-task should reside in the  same
+machine  as  that A-task;  this means that, for remote observing, the
+remote workstation (VAX computer, not  just  a  terminal)  should  be
+running  ADAM with its own message system.  Communication between the
+remote and local (Hawaii) message systems is via  another  connection
+to  the  message  system;  this  in  fact  turns  out  simply to be a
+connection to a network. 
+
+Another development is particularly required  for  remote  observing,
+but  will  be  generally  useful.  This is the concept of attaching a
+
+
+
+                                                                 ADN/5.1                           2                           ADN/5.1
+
+
+
+'privilege' to all processes attached to  the  message  system.   The
+message  system  will  be  told  which  processes are allowed to send
+messages to which other processes as  they  became  active,  and  the
+message  system  will  supervise this, only passing messages with the
+correct privilege. 
+
+Note that it must be well defined what happens when a message  cannot
+be delivered, for whatever reason ! 
+
+
+
+3. IMPLEMENTATION 
+
+
+Implementation of the VAX message system for ADAM is scheduled to  be
+completed by the end of March 1984. 
+
+
+3.1 General notes     _____________ 
+
+It is necessary to define firstly the message  format,  and  secondly
+the  details  of  the message system subroutine interfaces.  The ADAM
+system acts as the basis for both of these. 
+
+In the VAX implementation the messages are sent to,  and  read  from,
+'mailboxes'  maintained by VMS (RMS?).  The message system has either
+a set of input mailboxes, each set up for a particular task (process)
+when  that task is loaded;  or alternatively, a single input mailbox.
+Each task has its own input mailbox, where it looks for its messages.
+It  is  suggested that messages should be trapped (using ASTs) rather
+than polled for. 
+
+Note that if a process 'dies' its exit handler should place a message
+to that effect in the message system mailbox for that process. 
+
+
+3.2 Initial tests     _____________ 
+
+A 'trial' message system is to  be  constructed  to  test  the  ideas
+brought  forward  so  far,  from  consideration  of  the Perkin-Elmer
+implementation and the system-provided operations  available  on  the
+VAX.   This  should  be a 'proper' test in the sense that the message
+system should stand alone, and react correctly to test messages.   To
+this  end,  it  is  necessary  to  write  'stub'  routines which will
+simulate a D-task and the CLI.  The CLI has been chosen as the  first
+real  test  of the message system will come when single line commands
+are needed to control the trial D-tasks in June. 
+
+
+
+
+
+
+
+
+
+                                                                 ADN/5.1                           3                           ADN/5.1
+
+
+
+
+
+
+
+
+_Fig. 1: Connection between processes_ 
+
+(a) HAWAII: 
+
+
+   +------------+ 
+   | button box |  ( could be a 
+   +------------+     remote terminal ) 
+   | terminal   | 
+   +------------+ 
+         | | 
+- - - - -|-|- - - - - 
+         | | 
+   +-----------------+       +-----+        +----------------+ 
+   | user interface  |       | CLI |        | initialisation | 
+   | (SCS or prompt) |       +-----+        | A-task         | 
+   +-----------------+          |           +----------------+ 
+                  |       +-----------+        | 
+                  +-------|           |--------+ 
+    +---------+           |  message  |     +---------------+ 
+ <==| network |-----------|           |-----| error handler |--<-+ 
+    +---------+           |  system   |     +---------------+    | 
+         +--------+   +---|           |                          | 
+         | loader |---+   +-----------+                  from IEEE 
+         +--------+          |  |  |                       driver 
+               +--------+    |  |  |    +--------+ 
+               | D-task |----+  |  +----| A-task | 
+               +--------+       |       +--------+ 
+                           +---------+         | 
+                           | mimic   |      +---------------+ 
+                           | display |      | graphics etc. | 
+                           +---------+      +---------------+ 
+                           | display | 
+                           | device  | 
+                           +---------+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 ADN/5.1                           4                           ADN/5.1
+
+
+
+
+
+
+
+(b) EDINBURGH or other remote workstation: 
+
+
+   +------------+ 
+   | button box | 
+   +------------+ 
+   | terminal   | 
+   +------------+ 
+         | | 
+         | | 
+   +-----------------+       +-----+        +----------------+ 
+   | user interface  |       | CLI |        | initialisation | 
+   | (SCS or prompt) |       +-----+        | A-task         | 
+   +-----------------+          |           +----------------+ 
+                  |       +-----------+        | 
+                  +-------|           |--------+ 
+    +---------+           |  message  | 
+ <==| network |-----------|           | 
+    +---------+           |  system   | 
+         +--------+   +---|           | 
+         | loader |---+   +-----------+ 
+         +--------+             |  | 
+                                |  |    +--------+ 
+                                |  +----| A-task | 
+                                |       +--------+ 
+                           +---------+         | 
+                           | mimic   |      +---------------+ 
+                           | display |      | graphics etc. | 
+                           +---------+      +---------------+ 
+                           | display | 
+                           | device  | 
+                           +---------+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 

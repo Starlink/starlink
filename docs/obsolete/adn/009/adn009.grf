@@ -1,0 +1,280 @@
+.af GEROFFDIR:PRELUDE.GRF
+.adna 9.1 "Definitions of the Various Task Types Known to ADAM" "B.D.Kelly, J.A.Cooke & B.V.McNally" "21.03.1984"
+.level1 "INTRODUCTION"
+This document attempts to define the various categories of executable 
+program known to ADAM, and to define how they interact with the rest 
+of the system. At present, eight categories have been defined, although 
+some of these eight are degenerate in the sense that only single 
+examples of certain categories are expected to exist.
+
+The task types are :
+.nf
+
+   Loader
+   Network
+   ADAM storage
+   Procedure
+   User interface
+   Analysis
+   Sequencer
+   Driver
+   Status
+.fi
+
+It is expected that there will be only one of each of the first three
+types.
+
+.level1 "GENERAL PROPERTIES OF TASKS"
+Each task on first starting-up creates an input mailbox and inserts its 
+name into the VMS system logical name table, thereby enabling other 
+tasks to determine its mailbox address and to send it messages.
+
+A task which wishes to communicate with another task, opens a channel to 
+the relevant mailbox and sends an initialization message. On receiving 
+an acknowledgement it then proceeds with the communication.
+
+Each task obtains messages from its input mailbox, and if it receives a 
+path initialization message it responds by opening a channel to the task 
+which originated the message and sending an acknowledgement.
+
+Each task knows two privileges. The first is the privilege (INPRIV) 
+required by another task to initiate communication with it. The second 
+is its privilege to initiate communication with other tasks (OUTPRIV).
+.level1 "LOADER"
+The function of the LOADER is to receive instructions to start up any 
+process, and to carry them out.
+.level2 "Startup"
+The loader itself has to be loaded on system initialization, creating 
+the usual input mailbox and informing the system logical name table.
+It then loads the operator's user interface and attaches it to the 
+control terminal.
+.level2 "Operation"
+After startup, the loader watches its input mailbox. On receiving a load 
+instruction, which includes the name of the task to be loaded and the 
+OUTPRIV which it is to be given, it inspects the interface module with 
+that name to determine the file name of the associated execution module. 
+If it is actually loading the PROCEDURE program, it determines the name 
+of the procedure required. It then creates a process with the 
+task/procedure name, and sets the execution module running in it. It 
+then responds to a message from the new task asking what its OUTPRIV is 
+to be.
+
+The loader also has the ability to delete tasks.
+.level1 "NETWORK"
+The purpose of the NETWORK task is to forward ADAM messages intended for 
+another machine, and to receive and forward ADAM messages from other 
+machines.
+.level2 "Startup"
+The network task is loaded by a network 'fielding' task. The latter purely 
+serves the function of recognizing that an incoming network call is 
+requesting to be received, and redirecting incoming network data to the
+ADAM NETWORK task. The NETWORK task creates its mailbox and logical name 
+table entry. It then watches for input both from the network and from 
+its mailbox.
+.level2 "Operation"
+On receiving a request to initialize communication with a remote ADAM 
+task, the local NETWORK task makes the necessary network call to the 
+remote ADAM NETWORK task, which initializes with the requested remote 
+task and returns the full path information over the network. The local 
+NETWORK task stores the full path information, and returns a REMOTE PATH 
+IDENTIFIER to the originating local task. Communication can then occur 
+transparently via the two (local and remote) NETWORK tasks.
+.level1 "ADAM STORAGE"
+The ADAM storage task contains ADAM command language variables which 
+are global to procedures. These fall into two categories, those local to 
+a user and those global to the system.
+.level2 "Startup"
+On startup the ADAM storage task reads its interface module and stores
+the information internally. It then creates its input mailbox and puts
+its name in the system logical name table. It then waits for messages to
+arrive at its mailbox. 
+.level2 "Operation"
+The task can respond to messages to DECLARE, STORE or RETURN values of
+ADAM command language variables.
+.level1 "PROCEDURE"
+A PROCEDURE task exists for each ADAM command language procedure loaded. 
+A procedure task has essentially the same capabilities as a SEQUENCER 
+task, but its source code is in ADAM command language. This is the same
+command language as the Perkin-Elmer implementation of ADAM, and is the
+SPICA command language designed by Keith Shortridge. 
+.level2 "Startup"
+The task is created by the LOADER.
+On startup the PROCEDURE task reads its interface module and stores the
+information internally. It then creates its input mailbox and puts its
+name in the system logical name table. Its process name, as specified by
+the LOADER is the name of the defined procedure. The process name is
+then used to generate the name of the text file containing the
+procedure's source code, and this is read and stored in its dictionary. 
+It then waits for messages to arrive at its mailbox. 
+.level2 "Operation"
+On receiving an instruction to run, the task executes its procedure.
+This will typically involve sending messages to other tasks. It accesses
+ADAM global variables via messages to the ADAM storage task. 
+.level1 "USER INTERFACE"
+A user interface controls all I/O to its attached terminal. It also has 
+process logical names declared for the help devices. A user interface 
+must not only accept input from the user, but must also accept messages 
+from the rest of the system and display them to the user. Some of these 
+messages will be requests for information from the user, and the user 
+interface must ensure that these are handled correctly.
+.level2 "Startup"
+On startup a USER INTERFACE reads its interface module and stores the 
+information internally. It then creates its input mailbox and puts its 
+name in the system logical name table. It then waits for messages to
+arrive at its mailbox. These tell it which terminal it should be
+attached to. It then opens the necessary channels, writes information to
+the terminal, and awaits input either from the user or to its mailbox. 
+.level2 "Operation"
+A user interface receives commands from the user in some way. In 
+general, it will have done some identification work on the command, and 
+will respond by sending a message to the relevant task. In the case 
+where an interface can accept a command string from the user, it should 
+first pass it to the ADAM_COMMANDS subroutine in case it is a special 
+ADAM command. If the status return indicates it is unidentified, then an 
+attempt should be made to SEND the command, on the assumption that the 
+first word in the command string is the name of the relevant task. If a 
+request is received from the user for help, the HELPSYS subroutines 
+should be called.
+
+In parallel with these activities, the user interface can receive 
+messages from the rest of the system. These should be displayed in a 
+suitable location on the user's terminal. If they are requests for 
+parameter values, then the relevant prompt should be displayed, and the 
+user's response accepted and sent to the requesting task.
+.level1 "ANALYSIS"
+Analysis tasks are Starlink applications programs. They are able to 
+access the disk data structures, carry out manipulations on the data, 
+and create displays on graphics devices.
+.level2 "Startup"
+On startup an ANALYSIS task reads its interface module and stores the 
+information internally. It then creates its input mailbox and puts its
+name in the system logical name table. It then waits for messages to
+arrive at its mailbox. 
+.level2 "Operation"
+Instructions received at the mailbox may cause the ANALYSIS task to set 
+or return the value of one of its parameters, or may cause it to RUN. In 
+the latter case, it executes the code provided by the applications 
+programmer. In general, this involves calling subroutines which return 
+the values of the task's parameters. If the parameter requested already 
+has a value, then this is returned. If it does not, then a message is 
+sent to the task which issued the RUN command requesting the missing 
+parameter. The message sent includes the parameter name and its 
+associated prompt string. If the result of this message is an SSE 'NULL' 
+or the message times-out, then the application routine exits with a 
+suitable status. If the task receives suitable values for all necessary 
+parameters, then it executes. In the process of doing this, it may 
+perform subroutine calls to set the values of some of its parameters. 
+These values are stored. On exit a suitable status value is set. The 
+values of parameters are now available to be requested or set by other 
+tasks. If the analysis task is run again, then the 'old' values of its 
+parameters will still be used unless they have been annulled either by 
+itself or by messages from other tasks. This implies that the SET 
+message must be able to specify a null value.
+.level1 "SEQUENCER"
+A SEQUENCER task is similar in implementation to an ANALYSIS task, but 
+it has the additional ability to send instructions to other tasks. It 
+has the ability to send such instructions without waiting for the 
+requested operation to be completed by the receiving task. This means 
+that it can coordinate the operation of concurrent tasks. The prime use 
+of this is to enable an observing sequence to be set up whereby the 
+'last' observation is being plotted simultaneously with the 'new' 
+observation being taken. The sequencer task is also able to determine 
+when the operations it has set running in other tasks are complete. All 
+these abilities are achieved via the message system.
+.level2 "Startup"
+On startup a SEQUENCER task reads its interface module and stores the 
+information internally. It then creates its input mailbox and puts its 
+name in the system logical name table. It then waits for messages to
+arrive at its mailbox. 
+.level2 "Operation"
+Instructions received at the mailbox may cause the SEQUENCER task to set 
+or return the value of one of its parameters, or may cause it to RUN. In 
+the latter case, it executes the code provided by the applications 
+programmer. In general, this involves calling subroutines which return 
+the values of the task's parameters. If the parameter requested already 
+has a value, then this is returned. If it does not, then a message is 
+sent to the task which issued the RUN command requesting the missing 
+parameter. The message sent includes the parameter name and its 
+associated prompt string. If the result of this message is an SSE 'NULL' 
+or the message times-out, then the application routine exits with a 
+suitable status. If the task receives suitable values for all necessary 
+parameters, then it executes. In the process of doing this, it may 
+perform subroutine calls to set the values of some of its parameters. 
+These values are stored. On exit a suitable status value is set. The 
+values of parameters are now available to be requested or set by other 
+tasks. If the SEQUENCER task is run again, then the 'old' values of its 
+parameters will still be used unless they have been annulled either by 
+itself or by messages from other tasks. This implies that the SET 
+message must be able to specify a null value.
+.level1 "DRIVER"
+One DRIVER task exists for each instrument (including the telescope). 
+The driver task is responsible for controlling its instrument, acquiring 
+data from it, and storing the data on disk in an SSE data structure.
+.level2 "Startup"
+On startup a DRIVER task reads its interface module and stores the 
+information internally. It then creates its input mailbox and puts its 
+name in the system logical name table. It then executes the instrument
+initialization subroutine provided by the programmer. Thereafter it
+waits for messages to arrive at its mailbox. 
+.level2 "Operation"
+A DRIVER task understands four categories of operation - GET, SET, OBEY 
+and CANCEL.
+
+GET and SET instructions received at the mailbox cause the DRIVER task
+to set or return the value of one of its parameters.
+
+In the case of OBEY, it checks that values exist for all the parameters
+declared as necessary for the command to be OBEYed. If values are
+missing, then it sends an error message to the task which issued the
+OBEY, and returns to watching its mailbox. Otherwise, it executes the
+code provided by the applications programmer. In general, this involves
+calling subroutines which return the values of the task's parameters. If
+the parameter requested already has a value, then this is returned. If
+it does not, then this is an error condition. 
+
+If the task has suitable values for all necessary parameters, then it
+executes. In the process of doing this, it may perform subroutine calls
+to set the values of some of its parameters. These values are stored. 
+
+On exit a suitable status value is set. The value of this status plus
+the values of other arguments to the application subroutine may result
+in a timed rescheduling of the operation being OBEYed. This enables the
+DRIVER task to initiate some hardware operation and check for completion
+at some later time while being available for other work in the interim.
+On the application subroutine returning a completion status, a message
+is sent to the task which initiated the OBEY. 
+
+CANCEL names a command currently being OBEYed and causes its operation 
+to cease, and a suitable message to be sent to the task which initiated 
+the OBEY. Obviously, this can only work if the command is currently 
+waiting for the DRIVER task to reschedule it.
+
+The values of parameters are now available to be requested or set by
+other tasks. If the DRIVER task is run again, then the 'old' values of
+its parameters will still be used unless they have been annulled either
+by itself or by messages from other tasks. This implies that the SET
+message must be able to specify a null value. 
+.level1 "STATUS"
+A STATUS task typically performs a continuous poll, obtaining the values
+of the parameters of a DRIVER task and displaying them. The display may
+be a simple listing of values, or it may be graphical. A STATUS task is
+essentially an ANALYSIS task with the additional ability of asking a
+DRIVER task for its parameters. 
+.level2 "Startup"
+On startup a STATUS task reads its interface module and stores the 
+information internally. It then creates its input mailbox and puts its 
+name in the system logical name table. It then waits for messages to
+arrive at its mailbox. 
+.level2 "Operation"
+On receiving the instruction to run, the STATUS task sends a series of 
+GET messages to its associated DRIVER task, thereby determining the 
+current state of the DRIVER's parameters. These are then displayed to 
+the user. A STATUS task might then either return to reading its input 
+mailbox, or it might be programmed to execute a continuous polling 
+loop with a suitable wait period in it.
+
+A general purpose STATUS task should be provided which has the name of 
+the DRIVER task as a settable parameter. This STATUS task should proceed 
+by determining the names of all the parameters of the DRIVER task from 
+the DRIVER's interface module, and thereafter determining their values. This 
+would provide a generally useful testing tool.

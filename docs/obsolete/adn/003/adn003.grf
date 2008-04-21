@@ -1,0 +1,127 @@
+.af GEROFFDIR:PRELUDE.GRF
+.adna 3.1 "CONNECTING INSTRUMENTS TO THE VAX" "B.D.Kelly" "27.01.1984"
+.level1 "SUMMARY OF KNOWN SPEED CONSIDERATIONS WHEN INTERFACING TO VAX" 
+.level2 "CAMAC - VAX"
+At AAO, Helen Davies has received successfully 1 KHz interrupts.
+The recommended UNIBUS limit is 100 Hz.
+.level2 "IEEE-488 - VAX"
+IEEE-488 interfaces from both DEC and NATIONAL claim DMA rates of
+200 Kbytes/sec.
+
+IEEE-488 bus extenders - NATIONAL claim 200 Kbytes/sec, H-P claim
+50 Kbytes/sec.
+.level1 "EXISTING UKIRT INSTRUMENTS WITH KNOWN SPEED PROBLEMS"
+.level2 "UKIRT CGSII and 8-banger"
+The computer generates the chopper control signal and inputs the
+8 channels of data every chopper half-cycle, which means 20 Hz.
+Interrupts have to be serviced within about 5 msecs.
+.level2 "UKIRT Speckle interferometry"
+The computer is used to generate a ramp to drive the chopper, and
+samples the signal at each point of the ramp. The timing is achieved by
+interrupting the computer at about 200 Hz using a programmable clock.
+.level2 "UKIRT High-speed photometry"
+This requires measurements without beamswitching at up to a few
+hundred Hz.
+.level1 "Summary of Existing Instruments"
+.level2 "CGS II"
+.level3 "Description"
+7 channel spectrometer
+.level3 "Electronics Interface"
+CAMAC
+.level3 "Contact Person"
+J.M.Stewart 
+.level2 "IRASFU"
+.level3 "Description"
+16 channel mapping array photometer
+.level3 "Electronics Interface"
+CAMAC
+.level3 "Contact Person"
+J.M.Stewart 
+.level2 "2 BANGER"
+.level3 "Description"
+2 channel InSb photometer
+.level3 "Electronics Interface"
+CAMAC
+.level3 "Contact Person"
+J.M.Stewart 
+.level1 "Instruments in Final Stages of Construction."
+.level2 "8 BANGER"
+.level3 "Description"
+8 channel bolometric array
+.level3 "Electronics Interface"
+CAMAC
+.level3 "Contact Person"
+Ian Gatley
+.level2 "UKT 9"
+.level3 "Description"
+1 channel photometer/spectrometer
+.level3 "Electronics Interface"
+CAMAC
+.level3 "Contact Person"
+J.M.Stewart 
+.level2 "UKT12"
+.level3 "Description"
+Arizona-built submillimetre photometer
+.level3 "Electronics Interface"
+CAMAC
+.level3 "Contact Person"
+Bill Duncan
+.level1 "Instruments Under Construction."
+.level2 "ISU II"
+.level3 "Description"
+Instrument support unit
+.level3 "Electronics Interface"
+IEEE-488 
+.level3 "Contact Person"
+P.R.Williams
+.level2 "UKT14"
+.level3 "Description"
+ROE submillimetre photometer
+.level3 "Electronics Interface"
+IEEE-488 
+.level3 "Contact Person"
+Bill Duncan
+.level2 "NLHET"
+.level3 "Description"
+Dutch millimetre/submillimetre heterodyne spectrometer
+.level3 "Electronics Interface"
+IEEE-488 
+.level3 "Contact Person"
+A.S.Webster
+.level2 "MRAOHET"
+.level3 "Description"
+Cambridge millimeter/submillimeter heterodyne spectrometer
+.level3 "Electronics Interface"
+IEEE-488 
+.level3 "Contact Person"
+A.S.Webster
+.level1 "Instruments Being Designed."
+.level2 "VISPHOT"
+.level3 "Description"
+1 channel visible photometer
+.level3 "Electronics Interface"
+CAMAC or IEEE-488 
+.level3 "Contact Person"
+P.R.Williams
+.level2 "IRPOL"
+.level3 "Description"
+Infrared/optical polarimeter
+.level3 "Electronics Interface"
+CAMAC or IEEE-488 
+.level3 "Contact Person"
+P.R.Williams
+.level1 "Projected Instruments."
+.level2 "CGS IV"
+.level3 "Description"
+32+ channel array spectrometer
+.level3 "Electronics Interface"
+IEEE-488 
+.level3 "Contact Person"
+R.Wade
+.level2 "MAP II"
+.level3 "Description"
+32x32 channel mapping array photometer
+.level3 "Electronics Interface"
+IEEE-488 
+.level3 "Contact Person"
+R.Wade

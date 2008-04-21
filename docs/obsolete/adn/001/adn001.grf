@@ -1,0 +1,195 @@
+.AF GEROFFDIR:PRELUDE.GRF
+.ADNA 1.1 "Summary of P-E ADAM implementation" "B.D.Kelly" 07.10.1983
+.level1 "BACKGROUND"
+ADAM is the software system which has been developed at RGO for the
+Perkin-Elmer instrumentation computers on the LPO 2.5m and 1m
+telescopes. The same system architecture will be used on the 4.2m, but
+consideration is being given to changing to VAX 11/750.
+
+The system has the advantages of attempting a coherent standardised
+approach to the problem of instrumentation software, and it also tries
+to capitalise on the expansion of software expertise within the British
+astronomical community due to the Starlink project.
+
+The system has taken two years to define. It is written in
+FORTRAN 77 plus a minimal amount of assembler.
+.ne 12
+.level1 "ADAM DOCUMENTS AVAILABLE."
+.nf
+Astronomical Data Acquisition Monitor (ADAM).   L.R.Jones & R.Martin
+How to use ADAM and a-tasks to talk to d-tasks.
+How to write a d-task.                          W.F.Lupton
+Layout of a d-task connection file.             W.F.Lupton
+Discussion of the user interface to the a-task. W.F.Lupton
+A prototype a-task parameter system.            W.F.Lupton
+Handling bulk data under ADAM.                  W.F.Lupton
+Bulk data routines.
+ADAM commands.
+Listing of the ADAM help library.
+.bp
+      OVERALL ARCHITECTURE OF ADAM
+      ____________________________
+
+
+                +----------+
+                | LIST OF  |
+                | COMMANDS |  +----------+
+                |PROCEDURES|  | TERMINAL |
+                | PROGRAMS |  +----------+
+                +----------+       |
+                       |           |
+                       | ..........|............
+                       | .         |           .
+                       | .   +-----------+     .
+                       | .   | TERMINAL  |---+ .
+                       | .   |  HANDLER  |   | .
+                       | .   +-----------+   | .
+       +-----------+   | .         |         | .     +-----------+
+       |   "D"     |   | .   +-----------+   | .     |   "A"     |
+       |CONNECTION |   +-----|    ACL    |   | .     |CONNECTION |
+       |  FILE     |     .   | DICTIONARY|   | .     |  FILE     |
+       +-----------+     .   +-----------+   | .     +-----------+
+            |            .         |         | .          |
+       +-----------+     .    +---------+----+ .     +-----------+
+       |   "D"     |     .    |         |------------|   "A"     |
+   +---| PARAMETER |     .    | MESSAGE |      .     | PARAMETER |
+   | +-|  SYSTEM   |  +-------| SYSTEM  |--------+   |  SYSTEM   |
+   | | +-----------+  |  .    +---------+      . |   +-----------+
+   | |      |         |  .     |       |       . |        |
+   | |      |         |  .     |       |       . |        |
+   | | +-----------+  |  .     |       |       . |        |
+   | | | "D"TASK   |  |  .     |       |       . |        |
+   | | |...........|  |  .     |       |       . |        |
+   | +-|  FIXED    |--+  . +------+ +------+   . |   +-----------+
+   |   |  PART     |     . | LOAD | | LOAD |   . +---|   "A"     |
+   |   |...........|_______| "D"  | | "A"  |_________|  TASK     |
+   |   |INSTRUMENT-|_______| TASK | | TASK |_________|           |
+   +---| SPECIFIC  |     . +------+ +------+   .     +-----------+
+       |  PART     |     .       adam          .       |
+       +-----------+     .......................       |
+            |    |                                     |
+            |    +-------------+     +-----------------+
+            |                  |     |
+       +-----------+         +----------+
+       |INSTRUMENT |         |   BULK   |
+       +-----------+         |   DATA   |
+                             |  SYSTEM  |
+                             +----------+
+                                  |
+                             +----------+
+                             |  DISK    |
+                             +----------+
+
+.bp
+.fi
+.level1 "OVERALL ARCHITECTURE"
+ADAM effectively consists of two Starlink environments. One of
+these, in which "A" (applications) Tasks are run, bears a close
+resemblance to one of the intermediate steps in the development of
+Starlink (PROTOSTAR by S.L.Wright, UCL). The other 'pseudo-Starlink'
+environment is one orientated towards instrument control, and
+"D" (device-driver) Tasks use this. The two environments share a common
+bulk-data system, which can be seen as the Starlink Interim environment
+bulk-data system adapted to a non-virtual memory machine.
+
+The idea is that a single "D" Task is written for each instrument.
+It implements all the capabilities of the instrument, gathers data
+and stores it in the bulk-data system. Only "D" Tasks are allowed to
+communicate with instruments.
+
+"A" Tasks allow the observer to examine the data. They can also be
+used to run "D" Tasks and to allow the coordination of cooperating
+instruments.
+
+The writing of a "D" Task requires considerable expertise and a
+detailed specification of the requirements of the instrument involved.
+The writing of "A" Tasks is equivalent to Starlink applications
+programming.
+
+ADAM also has a command language which can control the operation of
+both "D" Tasks and "A" Tasks.
+.bp
+.level1 "ADAM COMMAND LANGUAGE"
+The ADAM command language is the means by which the user gives
+commands to the system. From the user's point of view it consists of
+three components.
+.level2 "BUILT-IN commands."
+These define the basic command language, and include the
+facilities for building procedures.
+.nf
+        eg. :-
+        PRINT "HELLO"
+        IF.....ELSE.....END IF
+        DO I = 1 TO N ...... END DO
+        DO WHILE............END DO
+.fi
+
+        Note that control structures can only be used within procedures.
+
+        The command SEND is used to communicate with D-tasks.
+.level2 "PROCEDURES."
+These are constructed from all three components of the command
+language, that is, built-in commands, procedures and programs.
+.level2 "PROGRAMS (A-tasks and D-tasks)."
+Executable images (originally programmed in, say, FORTRAN) can
+be made known to the system by using DEFINE.
+.nf
+
+        eg. :-
+        DEFINE JUNK PROGNAME
+.fi
+
+causes the program PROGNAME to be loaded in response to the
+command JUNK. If PROGNAME is an A-task it immediately executes. If it
+is a D-task, it executes an initialization subroutine and then remains
+in memory waiting for instructions. The instructions come from either
+the ADAM command language, using SEND, or from A-tasks using a call
+to a subroutine SEND.
+.bp
+.level1 "D-Tasks."
+A D-task normally operates by being loaded in response to a DEFINE
+command, at, say, the beginning of the night. It executes an
+initialization subroutine, if necessary, and then remains in memory
+where it can receive communications from the system.
+
+Associated with the D-task is a connection file, which contains
+declarations of variables and commands which the D-task can execute.
+It also contains declarations of restrictions (eg. range checking on
+the values of variables, conditions under which a given command can be
+executed) which enable automatic validation of the communications sent
+to the D-task.
+
+Only four classes of communication can be sent to a D-task. These
+are GET, SET, OBEY and CANCEL.
+
+GET - requests the value of a D-task connection-file variable.
+
+SET - sets the value of a D-task connection-file variable.
+
+OBEY - sends a command to a D-task. The command must be declared
+in the connection file. It is only executed if the declared conditions
+(usually valid values of various GETable/SETable variables) are met.
+
+CANCEL - discontinues the operation of a command currently being
+OBEYed.
+
+The observational data acquired by a D-task from its associated
+instrument are stored in the bulk data system via a standard set of
+subroutine calls.
+.bp
+.level1 "A-Tasks."
+A-tasks can be used for displaying data and for coordinating the
+operation of D-tasks. As such, one expects very large numbers of
+A-tasks to exist. A-tasks consist of a program plus a connection file.
+The connection file contains declarations of all variables which need
+to be accessed from outside. An A-task uses subroutine calls to read
+values from the connection-file variables or to write values to them.
+The connection file also contains the information needed for automatic
+range checking on the values of variables.
+
+If an A-tasks requests a value for a parameter which does not already
+have a value, then the user is prompted for input. This is unlike
+D-tasks which cannot cause the user to be prompted.
+
+A-tasks have access to the bulk data system, and so can obtain the
+data written by D-tasks.

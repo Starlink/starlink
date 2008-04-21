@@ -1,0 +1,241 @@
+                                                                 
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      ADN/7.1
+ROYAL OBSERVATORY EDINBURGH 
+and UNIVERSITY OF EDINBURGH 
+
+ADAM Project                                                Issued by
+ADAM Design Note 7.1 
+
+                                          John Cooke, Bernard McNally
+                                                             1.3.1984
+
+---------------------------------------------------------------------
+
+               Timing tests on the ADAM message system                _______________________________________ 
+
+
+
+
+
+
+
+
+1. SUMMARY 
+
+
+
+This document describes timing tests made on the prototype version of
+the  VAX  implementation  of  ADAM, issued as release -1.0.  The time
+taken for a message to be  passed  through  the  message  system  and
+acknowledged  is  about 20ms (CPU) [ 80ms elapsed ] on the UKIRT 730.
+The corresponding CPU time on the Starlink 780  is  about  6ms.   The
+elapsed  time  taken  between  a message being sent from a controller
+task to when it is acted upon by a d-task is about 30ms on  the  730,
+and about 20ms on the 780. 
+
+
+
+
+
+2. BRIEF SYSTEM DESCRIPTION 
+
+
+
+A prototype of the message system has been  constructed  and  tested.
+This is available to interested parties as release -1.0 (described in
+document ADN 8.1 ).  It consists of the message system, together with
+a  'stub'  task  to  simulate the production of messages by a command
+language interpreter (CLI), and  a  'stub'  d-task  to  simulate  the
+reactions of a real instrument controlling d-task.  Messages are sent
+from a task by sending them to  the  message  system,  along  with  a
+locator to the destination task.  This locator is obtained on request
+from the message system.  The originating task then has the option of
+waiting  for an acknowledgment from the destination task, and this is
+what is done in the prototype. 
+
+
+
+                                                                 ADN/7.1                           2                           ADN/7.1
+
+
+
+The software was originally put together on the 780, and  preliminary
+timing  tests  done  there.  This is a busy machine and elapsed times
+were not considered to be relevant;  a record of CPU times was  made.
+The  execution  modules  were  then transferred to the 730 and timing
+tests repeated.  This was done on an otherwise quiet machine (running
+with 1 Mbyte memory, with the PSI software loaded). 
+
+
+
+
+
+3. THE TESTS MADE AND RESULTS OBTAINED 
+
+
+
+Initially two times are of interest:  the total time for a  cycle  of
+sending   a   message   from   an   originating  task,  to  when  the
+acknowledgment of receipt of that message returns to the  originating
+task;   and  the time taken from when a message is sent to when it is
+acted upon by a receiving task. 
+
+The CPU timing tests were made  using  calls  to  the  local  routine
+"GETCPU"  which  is  simply  an  interface  to the system service and
+returns the CPU time in 10ms ticks.  To  obtain  reasonably  accurate
+times  a  large number of messages ( typically 100 ) was sent between
+time requests.  This incidentally  showed  up  a  problem  where  the
+system  'hung  up' when all three co-operating processes were running
+as sub-processes of one logged-in process;  this  does  not  normally
+happen  under  interactive  operation  when  sending one message at a
+time.  The problem does not occur when the  processes  are  run  from
+independent  main  processes,  and  so  seems  to  be  one  of  quota
+limitations.  This problem has not yet been investigated in detail. 
+
+This first set of tests included  the  following  operations  in  the
+timed cycle: 
+
+      1.    get locator to the d-task 
+      2.    send a message to the d-task via the message system 
+      3.    wait for acknowledgment of reception of the message by 
+            the d-task. 
+
+The results were: 
+
+      Number of   CPU time    Elapsed time            Notes 
+      messages    per cycle   per cycle 
+
+ 730:   100         19ms               80ms                 empty
+                                                            machine 
+
+ 780:  1000          6ms            not recorded            busy
+                                                            machine 
+
+
+
+
+
+                                                                 ADN/7.1                           3                           ADN/7.1
+
+
+
+
+The second set of tests was made using the system service "ASCTIM" to
+obtain the current time.  This only has a resolution of 10ms and thus
+because of the small number of tests made the times obtained are only
+indicative of the actual times taken. 
+
+The current time was obtained at the following points: 
+
+      1.    immediately before sending the message 
+      2.    on entry to the device-dependent routine "ACT" 
+
+The resulting time differences recorded were: 
+
+ 730: 30ms  30ms  30ms  40ms  30ms 
+
+ 780: 20ms  30ms  20ms  20ms 
+
+
+
+
+
+4. COMPARISON WITH QUOTED TIMES FOR THE PERKIN-ELMER IMPLEMENTATION 
+
+
+
+The  complete  cycle  of  "obtain  locator"   through   to   "receive
+acknowledgment"  uses  six mailbox read/write operations.  On the 780
+this takes about 1ms per mailbox read/write, whereas on the  730  the
+corresponding  figure  is about 3ms (CPU).  This time may be compared
+with the inferred corresponding time  from  Sidney  Kenderdine's  730
+timing  tests  in "times.mem" of 6 February 84 which would seem to be
+4.5ms.  The time for what  may  be  presumed  to  be  the  equivalent
+operation on the Perkin-Elmer, is that for "inter-task communication"
+which was given as about 1ms by William Lupton on his visit to ROE in
+December   1983.    It  therefore  looks  as  though  our  inter-task
+communication on the 730's is about 3 or 4 times slower than that  on
+the Perkin-Elmer. 
+
+The other time obtained, the "action time"  involved  when  one  task
+asks another to do something, would seem to be about 30ms on the 730.
+The corresponding time quoted by William  for  the  Perkin-Elmers  is
+5ms;  we are therefore about 6 times slower here. 
+
+
+
+
+
+5. COMMENTS 
+
+
+
+The  present  system  is  clearly  slower   than   the   Perkin-Elmer
+implementation, but we shall not have a clear feeling for how slow it
+
+
+
+                                                                 ADN/7.1                           4                           ADN/7.1
+
+
+
+"feels" to a user until several  real  instrument-driving  tasks  are
+being run.  At present it does not feel slow at all;  the response of
+a process is inside 100ms and thus appears to be instantaneous to the
+user  !   We  clearly do not know at present what difference, if any,
+the addition of more memory  to  the  730  will  make  to  the  times
+obtained   here;   we  hope  for  some  improvement  as  the  current
+configuration of the 730 does result in a  lot  of  paging  even  for
+small processes. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 

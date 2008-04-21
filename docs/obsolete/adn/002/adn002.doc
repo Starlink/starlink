@@ -1,0 +1,661 @@
+                                                                 
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      ADN/2.1
+ROYAL OBSERVATORY EDINBURGH 
+and UNIVERSITY OF EDINBURGH 
+
+ADAM Project                                                Issued by
+ADAM Design Note 2.1 
+
+                                                            B.D.Kelly
+                                                           05.12.1983
+
+---------------------------------------------------------------------
+
+         Summary of Meetings about Design of UKIRT Software          __________________________________________________ 
+
+
+
+
+
+
+
+1. BACKGROUND 
+
+
+It has  been  suggested  that  the  new,  VAX-based,  instrumentation
+software for UKIRT could benefit from the experience gained at RGO in
+developing a system (called ADAM) for instrument control at LPO. This
+system  is  currently  running  on  Perkin-Elmer  computers,  but the
+intention is that the equivalent software for the 4.2m will be  on  a
+VAX  11/750. This is seen by RGO as an opportunity for both improving
+the ADAM system, and making use of Starlink software. The  suggestion
+has  been  made  that  ROE  should adopt ADAM for UKIRT, and that the
+revised ADAM system should be developed jointly by ROE and RGO. 
+
+William Lupton (RGO) was invited to ROE to take part  in  discussions
+designed to make progress on the questions : 
+
+   (1)  Is the basic ADAM architecture suited to the needs of UKIRT ?
+
+   (2)  Is joint development of the system feasible/desirable ? 
+
+Two days of discussions were held, and  the  basic  conclusions  were
+that : 
+
+   (1)  The ADAM architecture seems sensible in a UKIRT context. 
+
+   (2)  Joint development of the system is desirable, but ROE  cannot
+take  the  risk of UKIRT progress being held-up due to the demands on
+the time of RGO  staff  of  the  commissioning  of  the  current  LPO
+telescopes. ROE must, therefore, aim to produce a VAX version of ADAM
+with minimal help from RGO. This should require less  effort  than  a
+total  design  from  scratch, and RGO assistance could be expected to
+appear at some time in the future. 
+
+
+
+
+                                                                 ADN/2.1                           2                           ADN/2.1
+
+
+
+2. REFERENCE 
+
+
+   Summary of ADAM.         B.D.Kelly. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 ADN/2.1                           3                           ADN/2.1
+
+
+
+
+
+
+3. AGENDA FOR VISIT TO ROE OF W.F.LUPTON 
+
+
+      1/2 December 1983 
+
+   Thursday 1 Dec. 
+   _______________ 
+
+   11.30 am   Conference room : Description of ADAM. 
+              (This should be relevant to instrument developers) 
+
+    1.00 pm   Lunch 
+
+   Remaining discussions are to cover the present state of ADAM and 
+desirable possible changes to it. 
+
+    2.00 pm   Graphics. 
+
+    3.00 pm   Help system. 
+
+    4.00 pm   User interface and system capabilities from the observer's 
+              viewpoint. 
+
+    5.00 pm   End. 
+
+
+   Friday 2 Dec. 
+   _____________ 
+
+    9.00 am   Parameter system. 
+
+   10.00 am   Bulk data system. 
+
+   11.00 am   Interface to instruments and telescope control. 
+
+    1.00 pm   Lunch 
+
+    2.00 pm   Forward planning. 
+
+    4.00 pm   End. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 ADN/2.1                           4                           ADN/2.1
+
+
+
+
+
+
+4. REPORTS OF THE DISCUSSIONS 
+
+
+
+
+4.1 Description of ADAM.     ____________________ 
+
+WFL  presented  a  description  of  the  overall   architecture   and
+properties  of  ADAM as implemented on the Perkin-Elmer computers for
+the 1m and 2.5m telescopes at LPO (See BDK description document). 
+
+In  subsequent  discussion,  the  point  was  raised  that  a   joint
+development  of  ADAM for the VAXes would depend on RGO having made a
+firm decision to use a VAX  for  the  control  of  the  4.2m.  Nobody
+present  was  clear  as to the current state of this decision. It was
+decided that clarification would have to be sought from Ralph Martin.
+
+
+4.2 Graphics.     _________ 
+
+B.V.McNally summarized the use of graphics  packages  at  ROE.  UKIRT
+currently  use  PLOT10. COSMOS use a home-brewed system. Starlink use
+GKS, which is an international standard but is  only  a  Kernel  -  a
+rather  low-level  system. A preferred implementation of GKS would be
+in firmware, thereby reducing the load on the VAX. Versions  of  GINO
+and  PLOT10 can sit on top of GKS. TEKTRONIX are becoming involved in
+providing firmware to  implement  GKS  for  their  graphics  devices,
+meaning  that  the  top-level  GKS  command is sent from the computer
+(VAX) to  a  special-purpose  device  which  does  the  rest  of  the
+processing. 
+
+The actual performance of various graphics packages on the VAX 11/730
+is  unknown,  and  extensive  tests  will be required to determine an
+acceptable combination. 
+
+WFL described the graphics side of the current  ADAM  implementation.
+This  uses FINGS for line grapics, plus special routines for plotting
+images. Some work has been done on a graphics database  (this  stores
+information about plots, so that a program can be used to cursor on a
+plot which has been produced by another program).The graphics devices
+used are T4010+compatible, LEXIDATA for image display, and printronix
+for plotting. A pen-plotter might appear eventually. 
+
+J.M.Stewart  said  that   UKIRT   currently   have   T4010+compatible
+terminals, VERSATEK and HP plotters. 
+
+I.W.Sheffield drew attention to the possibilities of colour terminals
+and  the  existence  of  the  Sigma  colour  display obtained for the
+infrared array project. 
+
+
+
+
+                                                                 ADN/2.1                           5                           ADN/2.1
+
+
+
+BVM said that the adopted graphics system should have some degree  of
+device  independence,  but  that  it  was  not necessary to go to the
+Starlink extreme  where  the  GKS  implementation  produces  standard
+metafiles. This is expensive in cpu loading. 
+
+WFL added that not many graphics programs have been written  for  the
+current ADAM implementation, due to other priorities. 
+
+JMS said that for UKIRT, PLOT10 is called directly (ie. there  is  no
+high-level  graphics  layer),  and  it  is  mostly  used for plotting
+spectra. 
+
+BDK concluded that the correct procedure is  to  adopt  the  Starlink
+high-level    graphics   package,   DIAGRAM,   and   let   efficiency
+considerations determine whether the lower levels  of  Starlink  (SGS
+and  GKS) can also be adopted. It is necessary to note the importance
+of the graphics database, which in Starlink is part of DIAGRAM. 
+
+
+4.3 Help system.     ____________ 
+
+IWS asked what were the problems in simply using the VAX help system.
+
+BDK mentioned the desirability of a multi-level help system, that is,
+one in which more than one level of detail could be asked for. 
+
+WFL indicated that the top levels of the help system will be  general
+topics  under  which  specific commands will be found. Would a strict
+hierarchical help system such as VAX know where  a  user  is  in  the
+system  conceptually  - eg. the user considers himself to be 'inside'
+some section concerned with galaxy  photometry,  but  that  identical
+information   might  be  required  'inside'  a  section  for  stellar
+photometry. Do you have multiple copies of all  the  information,  or
+does the user just get the impression that he is in a hierarchy ? 
+
+BVM suggested that 'global' and 'local' help  information  is  needed
+for  a  user  to  think he's in a subsystem, yet still have access to
+help on more general commands. 
+
+BDK mentioned that this  might  be  achieved  using  a  'search-path'
+approach. 
+
+WFL stated that a search-path can cause problems  with  requests  for
+entries  in the help system such as 'author'. Most sections will have
+author information in them at some low-level.  If  a  general  search
+path  strategy  is  adopted, and someone asks for 'author' where such
+information is not  available,  then  the  system  is  likely  to  go
+wandering  off  until  it finds 'author' information under some other
+topic ! 
+
+JMS drew attention to the case where a person  wanted  to  know  what
+filters  were  in  an instrument, and the way to find this out was to
+issue a command which typed the file containing the filter list.  The
+
+
+
+                                                                 ADN/2.1                           6                           ADN/2.1
+
+
+
+help information would be concerned with the command,  but  the  user
+would   expect   to  find  it  under  'filters'.  The  actual  filter
+information would not be held in the actual help library  because  it
+changes from week to week. 
+
+BDK announced that this drew attention to  a  problem  -  information
+about  instruments,  such  as  the filters installed, and information
+about commands, such as 'SET TELESCOPE', are not  part  of  the  same
+hierarchy.  Furthermore,  the request 'help filters' should give what
+the observer wants, ie. the actual list of filters, NOT  instructions
+how  to  obtain such a list. This implies that issuing a help command
+should be able to result in a file of updatable information, not held
+in the help library, being typed. 
+
+The conclusion was that VMS help libraries should be used for storing
+the  help  information,  but  that  the  information would have to be
+accessed  by  writing  software  to  use  the  DEC-provided   utility
+subroutines rather than simply using the DCL HELP command. 
+
+
+4.4 User  interface  and  system  capabilities  from  the  observer's    _________________________________________________________________
+viewpoint. __________ 
+
+BDK described the trend at ROE, initiated by John Cooke, to  consider
+the  user  interface  to  be  distinct from the command language. The
+command language is increasingly viewed as a programming language  in
+which  one  can  write  procedures.  The  ability to type in a single
+command-line and have it executed should be viewed  as  a  degenerate
+case of a user interface. 
+
+JAC demonstrated his screen control system (SCS),  which  requires  a
+VT-compatible  terminal  as the interactive device. He also described
+the  present  implementation  of  SCS  and  the  advantage   of   its
+table-driven  nature.  Possible  future  developments were mentioned,
+including the likely relevance of touch-screens. 
+
+BDK inquired what RGO's experience had been with touch screens. 
+
+WFL replied that a screen had been obtained, but that it had not been
+a success. He attributed this to problems with the particular make of
+screen used rather than the intrinsic nature of touch screens. 
+
+BDK moved on to the question of what general limitations were imposed
+by the ADAM architecture. 
+
+WFL answered that Perkin-Elmer  inter-task  communication  occurs  in
+about  1ms.  This  results in about 5ms action time involved when one
+task asks another to do something. 
+
+BDK stated that this was something which had to be  measured  on  the
+VAX. 
+
+
+
+
+
+                                                                 ADN/2.1                           7                           ADN/2.1
+
+
+
+JMS suggested that DECNET could be used for inter-task communication.
+He  also  wandered  what  potential clashes could occur if two people
+were trying to control ADAM simultaneously - eg.  a  remote  observer
+and an observer at the telescope. 
+
+
+4.5 4.2m instrumentation computer     _____________________________ 
+
+A telephone call to Ralph Martin concerning  the  current  status  of
+decisions  about  the choice of instrumentation computer revealed the
+following : 
+
+   (1)  No firm decision to use a VAX 11/750 can be taken until tests
+have demonstrated that this is viable. 
+
+   (2)  However, the intention is that a VAX 11/750 should  be  used.
+There  seems  to be no real alternative to this, given the increasing
+demands for data  reduction  facilities  at  the  telescope  and  the
+existence of Starlink. 
+
+   (3)  The computer  cannot  be  delivered  before  March  1985  for
+financial  reasons. This means development of the software before the
+machine is delivered. 
+
+   (4)  Time has been obtained on the RGO VAX 11/750  for  tests  and
+system development. 
+
+
+4.6 Parameter system.     _________________ 
+
+BDK stated that range-checking of values is a very desirable  feature
+of  the A-task parameter system. This has not yet been implemented in
+the Starlink parameter system. Dynamic range checking (ie. acceptable
+range  not  known  until  runtime)  is  also  desirable,  but  may be
+technically difficult. The  difficulty  in  achieving  dynamic  range
+checking  should  not  be  allowed to inhibit the provision of static
+range checking. 
+
+WFL replied that dynamic range checking should be reasonable  to  do.
+The  present  ADAM  system  has  a  syntax for declaring static range
+checking, but the actual check  is  not  carried  out.  Sid  Wright's
+Starlink  parameter  system should be used. This should provide range
+checking in due course. 
+
+BDK pointed out that the order of calls from an 'A'  task  requesting
+values  with  dynamic  range constraints should not be important, and
+the implementation must take account of this. 
+
+D.Baines indicated that he thought that the manipulation of the names
+of   data   structures   should  be  possible  in  the  new  Starlink
+environment, thereby getting around the problems of dumping  a  large
+number  of datasets from a magtape to disk experienced in the interim
+environment. 
+
+
+
+                                                                 ADN/2.1                           8                           ADN/2.1
+
+
+
+WFL mentioned that the 'D' task parameter system is a vital  part  of
+'D'  task  control.  In  this  case,  static  range checking is fully
+implemented. 
+
+
+4.7 Bulk data system.     _________________ 
+
+WFL - the present ADAM bulk data system is a  simplified  version  of
+the Starlink interim environment. 
+
+BDK - will a VAX version of ADAM use Starlink format ? 
+
+WFL - the only justification for NOT  using  Starlink  would  be  the
+question of efficiency. 
+
+JAC - is that storage efficiency or cpu usage ? 
+
+BVM - the speed with which an instrument can  write  data  is  a  key
+question. 
+
+BDK - it is necessary to distinguish between array data which can  be
+memory-mapped and tabular data (eg. photometry). 
+
+D.Baines - some tests have been done on the VAX 11/780 on  using  the
+facilities  in  the  new  Starlink environment to memory-map parts of
+large images. This seems rather slow. 
+
+JMS - when raster mapping an area of sky it is sometimes desirable to
+do check measurements at certain locations. How would these be stored
+? 
+
+BDK - the 'D' task would need two functions, one  for  memory-mapping
+contiguous  areas for the storage of data on contiguous areas of sky,
+and  the  other  for  memory-mapping   a   sparse   array   to   hold
+non-contiguous data. 
+
+The conclusion  was  that  the  key  question  is  to  determine  the
+efficiency of the Starlink data system on the VAX 11/730. 
+
+
+4.8 Interface to instruments and telescope control.     _______________________________________________ 
+
+BDK - what about the need for close time-critical interaction between
+different bits of hardware ? 
+
+WFL - this has not  proved  necessary  for  any  of  the  instruments
+produced for LPO so far. 
+
+JMS - one wants to shift this kind of thing into  hardware,  although
+some of this kind of work is done in the UKIRT PDP at present. 
+
+P.R.Williams - what is the importance of CAMAC at LPO ? 
+
+
+
+
+                                                                 ADN/2.1                           9                           ADN/2.1
+
+
+
+WFL - CAMAC provides RS-232 output  to  instruments.  Detectors  have
+specific CAMAC modules in them. 
+
+PRW - does an individual crate contain  modules  for  more  than  one
+instrument ? 
+
+WFL - Yes. 
+
+PRW - so you couldn't remove an instrument plus its CAMAC crate. 
+
+JMS - the CAMAC crates are to be seen as part of the computer  system
+rather than the instrument. 
+
+WFL - the plan is that new 4.2m instruments will not use CAMAC.  They
+will  use a local area network, RS-232 plus some data bus. There will
+be CAMAC support for other instruments. 
+
+PRW - what standards or guidelines have been set down for  instrument
+development for the 4.2m ? 
+
+WFL - I don't know. I will have to find out. 
+
+PRW - what about future specification of  interfaces  to  instruments
+for  UKIRT ? If any consideration is being given to this, it is vital
+that the instrument developers be kept informed. 
+
+IWS - IEEE are trying to standardise GPIB messages. A requirement  is
+appearing,  by the way, to put two GPIB's on the Edinburgh VAX 11/730
+for instrument development. 
+
+BVM - why not put Ethernet  into  the  Technology  building  and  put
+GPIB/RS 232 onto that wherever needed ? 
+
+PRW - Standard protocols are being proposed for the 15m. instruments.
+It  is  now  suggested  that  instruments  should  be interchangeable
+between UKIRT and the 15m. 
+
+BDK - what about control of the LPO telescopes ? 
+
+WFL - the plan is to duplicate the control panel buttons. 
+
+BDK - how about raster mapping ? 
+
+JMS - step and map is ok, but mapping on the  fly  is  difficult.  It
+probably implies special hardware. 
+
+BDK - on the subject of local area networks, it is  vital  that  file
+transfer  should exist between the UKIRT and 15m VAXes for reasons of
+software management. It is not intended  that,  say,  the  UKIRT  VAX
+should be able to control the 15m, or any of its instruments. 
+
+BVM - people are bound to find some reason for wanting to do that. 
+
+
+
+
+                                                                 ADN/2.1                           10                          ADN/2.1
+
+
+
+4.9 Forward planning.     _________________ 
+
+WFL - it would be a good idea if ROE people had a better idea of  how
+ADAM works. 
+
+BDK - the only real way to do that is  by  familiarisation  with  the
+code. 
+
+A summary of what has gone on over  that  past  two  days  is  fairly
+simple.  No-one  has  raised  any  objection to ROE adopting the ADAM
+architecture for the UKIRT system. 
+
+MGS - that's rather a negative way to put it. ADAM certainly seems to
+me to be a very natural way of thinking about these things. 
+
+BDK - I agree. 
+
+MGS - we have to define what degree of actual collaboration can occur
+between  ROE  and  RGO  in  the development of a VAX-based version of
+ADAM. 
+
+BDK - The way the implementation is likely to be  done  seems  fairly
+clear.  The 'A' task system, the graphics system and the data storage
+system  will  be  Sid  Wright's  Starlink  environment,  subject   to
+efficiency  tests.  That means that what remains to be implemented is
+the 'D' task system, the command language and the user interface. 
+
+WFL - perhaps the thing to start looking at is the command  language.
+This  was provided by Keith Shortridge, and is the SPICA language put
+on to the Perkin-Elmer in the simplest  way.  Maybe  it  is  time  to
+rewrite parts of it. 
+
+I feel that you should expect to get more from RGO than just  a  tape
+of  the current source code. At the least, the machine-dependent part
+should be separated  out  for  you.  We,  of  course,  will  be  very
+interested in the tests you are carrying out on the 730. 
+
+MGS - the danger is that the UKIRT development may become tied to the
+demands of the current telescopes on LaPalma. It seems to me that the
+way forward is that, in the first instance, ROE must try  to  develop
+the new system without requiring the availability of RGO manpower. 
+
+WFL -  then  we  will  have  to  start  by  getting  a  copy  of  the
+command-language  code to ROE, who will have to determine the machine
+dependent parts of it. 
+
+BDK - it seems that the areas to be studied include the important one
+of  the  interaction  between  the  user  interface  and  the command
+language. In particular, this involves the two-way  communication  of
+data  between  the  user interface and the command language/parameter
+system. 
+
+
+
+
+
+                                                                 ADN/2.1                           11                          ADN/2.1
+
+
+
+A summary of the priorities for the immediate future looks like : 
+
+   Priority                        topic 
+   ________                        _____ 
+
+   (0)             CAMAC 
+   (1)             Do VAX 11/730 performance tests 
+   (2)             Work on command language. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 

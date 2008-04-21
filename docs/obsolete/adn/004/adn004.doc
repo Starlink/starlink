@@ -1,0 +1,361 @@
+                                                                 
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      ADN/4.1
+ROYAL OBSERVATORY EDINBURGH 
+and UNIVERSITY OF EDINBURGH 
+
+ADAM Project                                                Issued by
+ADAM Design Note 4.1 
+
+                                                            B.D.Kelly
+                                                           20.10.1983
+
+---------------------------------------------------------------------
+
+      POSSIBLE ALTERNATIVES FOR FINAL REMOTE OBSERVING SET-UP.       ________________________________________________________ 
+
+
+
+
+
+
+
+1. BACKGROUND. 
+
+
+In the short term, a simple remote observing facility is required, in
+which  a  set  of terminals at Edinburgh allow communication with the
+PDP-11 instrumentation computer on Mauna Kea. The only way to achieve
+this without the commitment of software effort appears to be to use a
+hardware PAD to connect the PDP to the network. File transfer is  not
+provided by this option. 
+
+In the longer term the PDP will be replaced by the  VAX  11/730.  The
+remote  observing facility will then have to meet the requirements of
+the 15-m telescope, and will have to allow file  transfer  with  data
+compression.  This  note  concerns  the alternative ways of achieving
+these long-term aims. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 ADN/4.1                           2                           ADN/4.1
+
+
+
+
+
+
+2. HARDWARE PAD. 
+
+
+This involves ROE providing file transfer protocols,  which  means  a
+considerable amount of non-trivial software effort. 
+
+                +---------+                   +---------+ 
+                |  UKIRT  |                   |  15-m   | 
+            ____|   VAX   |                   |   VAX   | 
+           /    +---------+                   +---------+ 
+          /      |       \                       / 
+  +------+       |        \                     / 
+  | DISK |       |         \                   / 
+  +------+       |          \                 / 
+                 |           \               / 
+           +-----------+      +-------------+ 
+           | TERMINALS |      |     PAD     | 
+           +-----------+      +-------------+ 
+                                     | 
+                                 +-------+ 
+                                 | MODEM | 
+                                 +-------+ 
+                                     : 
+                                     : 
+                                     : 
+                                     : 
+                                     : 
+                                 +-------+ 
+                                 | MODEM | 
+                                 +-------+ 
+                                     | 
+                              +-------------+ 
+                              |     PSI     | 
+                              |.............| 
+                              | ROE SOFTWARE| 
+                              |-------------| 
+                              |     ROE     | 
+                              |     VAX     | 
+                              +-------------+ 
+                               /           \ 
+                              /             \ 
+                             /               \ 
+                  +----------+                +-----------+ 
+                  |  DISK    |                | TERMINALS | 
+                  +----------+                +-----------+ 
+
+
+
+
+
+
+
+
+                                                                 ADN/4.1                           3                           ADN/4.1
+
+
+
+
+
+
+3. DECNET. 
+
+
+Communication  between  the  machines  is  achieved  by  buying   DEC
+software.  DECNET  allows  a  full range of facilities including file
+transfer and the ability to  communicate  directly  between  programs
+running  on  the  separate  machines.  Provision  is  also  made  for
+electronic mail facilities and the ability to issue commands such  as
+DIRECTORY.  A potential worry is that DECNET is very inefficient, and
+so a remote observer might see an excessively slow response. 
+
+                +---------+                   +---------+ 
+                |  UKIRT  |                   |  15-m   | 
+                |   VAX   |                   |   VAX   | 
+                |.........|                   |.........| 
+                | DECNET  |                   | DECNET  | 
+      +---------|.........|                   |.........| 
+      |         |  PSI    |                   |  PSI    | 
+      |         +---------+                   +---------+ 
+      |          |       \                         | 
+  +------+       |        +-------+           +-------+ 
+  | DISK |       |        | MODEM |           | MODEM | 
+  +------+       |        +-------+           +-------+ 
+                 |                 \         / 
+           +-----------+            \       / 
+           | TERMINALS |             \     / 
+           +-----------+           +--------+ 
+                                   | SWITCH |----+ 
+                                   +--------+    : 
+                                                 : 
+                                                 : 
+                                                 : 
+                                                 : 
+                              +-------------+  +-------+ 
+                              |     PSI     |--| MODEM | 
+                              |.............|  +-------+ 
+                              |   DECNET    | 
+                              |-------------| 
+                              |     ROE     | 
+                              |     VAX     | 
+                              +-------------+ 
+                               /           \ 
+                              /             \ 
+                             /               \ 
+                  +----------+                +-----------+ 
+                  |  DISK    |                | TERMINALS | 
+                  +----------+                +-----------+ 
+
+
+
+
+
+
+                                                                 ADN/4.1                           4                           ADN/4.1
+
+
+
+
+
+
+4. UWIST. 
+
+
+The UWIST software allows file transfer, is free, and appears  to  be
+much  faster than DECNET. It does not provide the other facilities of
+DECNET and has the disadvantage of being a university product. 
+
+                +---------+                   +---------+ 
+                |  UKIRT  |                   |  15-m   | 
+                |   VAX   |                   |   VAX   | 
+                |.........|                   |.........| 
+                |  UWIST  |                   |  UWIST  | 
+      +---------|.........|                   |.........| 
+      |         |   PSI   |                   |   PSI   | 
+      |         +---------+                   +---------+ 
+      |          |       \                        | 
+  +------+       |        +-------+           +-------+ 
+  | DISK |       |        | MODEM |           | MODEM | 
+  +------+       |        +-------+           +-------+ 
+                 |           \               / 
+           +-----------+      +-------------+ 
+           | TERMINALS |      |    SWITCH   |----+ 
+           +-----------+      +-------------+    : 
+                                                 : 
+                                                 : 
+                                                 : 
+                              +-------------+   +-------+ 
+                              |     PSI     |---| MODEM | 
+                              |.............|   +-------+ 
+                              |   UWIST     | 
+                              +-------------+ 
+                              |     ROE     | 
+                              |     VAX     | 
+                              +-------------+ 
+                               /           \ 
+                              /             \ 
+                             /               \ 
+                  +----------+                +-----------+ 
+                  |  DISK    |                | TERMINALS | 
+                  +----------+                +-----------+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 ADN/4.1                           5                           ADN/4.1
+
+
+
+
+
+
+5. ETHERNET 
+
+
+Communication  between  the  machines  is  achieved  by  buying   DEC
+software.  DECNET  allows  a  full range of facilities including file
+transfer and the ability to  communicate  directly  between  programs
+running  on  the  separate  machines.  Provision  is  also  made  for
+electronic mail facilities and the ability to issue commands such  as
+DIRECTORY.  A potential worry is that DECNET is very inefficient, and
+so a remote observer might see  an  excessively  slow  response.  The
+DECNET-ETHERNET   combination   is   cheaper   than   the  DECNET-PSI
+combination. It also provides a local-area network on Mauna Kea. 
+
+                +---------+                   +---------+ 
+                |  UKIRT  |                   |  15-m   | 
+                |   VAX   |                   |   VAX   | 
+                |.........|                   |.........| 
+                | DECNET  |                   | DECNET  | 
+      +---------|.........|                   |.........| 
+      |         |ETHERNET |                   |ETHERNET | 
+      |         +---------+                   +---------+ 
+      |          |       \                         | 
+  +------+       |        +------------+-----------+ 
+  | DISK |       |                     | 
+  +------+       |                     | 
+           +-----------+           +--------+ 
+           | TERMINALS |           |ETHERNET| 
+           +-----------+           | -X25   | 
+                                   | SWITCH |----+ 
+                                   +--------+    : 
+                                                 : 
+                                                 : 
+                                                 : 
+                              +-------------+  +-------+ 
+                              |     PSI     |--| MODEM | 
+                              |.............|  +-------+ 
+                              |   DECNET    | 
+                              |-------------| 
+                              |     ROE     | 
+                              |     VAX     | 
+                              +-------------+ 
+                               /           \ 
+                              /             \ 
+                             /               \ 
+                  +----------+                +-----------+ 
+                  |  DISK    |                | TERMINALS | 
+                  +----------+                +-----------+ 
+
+
+
+
+
+
+                                                                 ADN/4.1                           6                           ADN/4.1
+
+
+
+
+
+
+6. MEMO  (9.12.1983) 
+
+
+      To:  Malcolm Longair 
+
+    From:  Dennis Kelly 
+           Peter Thanisch 
+
+ Subject:  Report on remote observing to UK/NL Joint Steering Committee. 
+
+
+6.1 Observers' needs.     _________________ 
+
+Different observers will require different levels  of  sophistication
+from  the  remote  observing  set-up.  For  example,  some  would  be
+satisfied by a hard-copy  terminal  +  modem  +  domestic  telephone,
+whereas others might require image processing and display facilities.
+This has an effect on the requirement for remote observers to  travel
+-  some  could  actually  observe from home (this has been done, as a
+test, by Paul Bryant of RAL), whereas others might  need  a  Starlink
+node,   and   yet   others  would  have  to  travel  to  one  of  the
+observatories. 
+
+
+6.2 UKIRT timescales.     _________________ 
+
+p.5, section 3.1 mentions ROE having the UKIRT VAX on the  summit  of
+Mauna Kea and communicating with networks by Spring 1984. This should
+be changed to Spring 1985, or (optimistically) late 1984. 
+
+
+6.3 Observers' opinions of remote observing.     ________________________________________ 
+
+The report probably  exaggerates  the  enthusiasm  of  observers  for
+remote observing. 
+
+
+6.4 Instrumentation.     ________________ 
+
+Note the impact of modern instruments with embedded  microprocessors.
+This   allows   remote  diagnostics  to  be  built-in,  PROVIDED  the
+requirement is forseen by the instrument developers. 
+
+
+6.5 Weather.     ________ 
+
+p.3, first paragraph,  mentions  taking  advantage  of  POOR  weather
+conditions   being  a  potential  gain  from  remote  observing.  The
+utilisation of rare, exceptionally  GOOD  weather  conditions  should
+also be mentioned. 
+
+
+
+                                                                 
