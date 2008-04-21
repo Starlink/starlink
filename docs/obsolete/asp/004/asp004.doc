@@ -1,0 +1,241 @@
+                                                                 
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      ASP/4.1
+ROYAL OBSERVATORY EDINBURGH 
+and UNIVERSITY OF EDINBURGH 
+
+ADAM Project                                                Issued by
+ADAM Software Proposal 4.1 
+
+                                                          J.M.Stewart
+                                                           6 May 1986
+
+---------------------------------------------------------------------
+
+                    USE OF NETWORKING WITHIN ADAM                     _____________________________ 
+
+
+
+
+
+
+
+
+1. Need for Networking 
+
+
+
+VAX ADAM as currently implemented  runs  entirely  on  a  single  VAX
+computer  system.  However there are advantages in extending the ADAM
+system to a multi-processor environment. The areas that would benefit
+include remote observing and data preprocessing. This note proposes a
+means of running ADAM tasks in other VAXes, PDPs,  IBM  PCs  etc.  by
+linking them using Decnet and media such as X25 and Ethernet. 
+
+
+
+1.1 Remote Observing     ________________ 
+
+
+It is anticipated that remote observing will involve the  use  of  an
+ADAM  system  on  a  VAX  system  in the UK, i.e. the ROE VAX 11/730.
+Remote observers in Edinburgh and elsewhere in the UK will  log  onto
+the  Edinburgh  VAX,  perhaps  using JANET, and interact with an ADAM
+system. This ADAM system in  turn  will  communicate  with  the  ADAM
+system on the observing computer in Hawaii. 
+
+One way to implement this is to have a special networking  ADAM  task
+at  each  end.  These  two tasks could communicate with each other by
+calling PSI or 'Coloured Book' subroutines with an appropriate higher
+level  protocol.  The  disadvantages  with this approach are (a) that
+some code would need rewriting if the  communication  medium  changed
+from  X25  (e.g.  to  linked  Ethernets) and (b) that effort would be
+required in implementing the networking task protocol. 
+
+
+
+
+
+                                                                 ASP/4.1                           2                           ASP/4.1
+
+
+
+An alternative is to use the ADAM message  system  for  communication
+between  ADAM tasks in the two computers. The communication protocols
+will then be the same as currently used, although some  modifications
+will be required to the message system software. 
+
+
+
+1.2 Pre-processors     ______________ 
+
+
+The ADAM system at ROE already communicates  with  other  processors,
+viz. the two PDP systems associated with IRCAM and running Micropower
+Pascal. Communication is implemented over  individual  RS  232  lines
+using  a  protocol particular to this particular application i.e. the
+d-task in the VAX handles communication in its  own  particular  way.
+Data  transfer  takes  place  over  a parallel connection between the
+DRV-11 and DMF-32 interfaces in each  computer  again  using  ad  hoc
+protocols.  It should be noted that this was the only viable approach
+at the time the IRCAM system was designed. 
+
+A better approach would  be  to  use  the  ADAM  message  system  for
+communication  between  the  processors.  The preprocessor would then
+look like an ADAM d-task to the VAX ADAM  system.  If  Ethernet  were
+used as the communication medium, then it could also be used for data
+transfer, eliminating the need for the parallel  connection  and  the
+unsupported  device  driver  in  the  VAX. Other auxillary processors
+could  be  simply  connected  onto  the  Ethernet  rather  than  over
+additional dedicated cables. 
+
+
+
+
+2. Decnet and Ethernet 
+
+
+
+The necessary hardware and software exists to allow the extension  of
+ADAM  to  a  multi-processor  environment  relatively  easily.  It is
+anticipated that X25 will continue to  be  used  for  some  time  for
+communication  between  Hawaii and the UK. DEC's PSI software handles
+this at the lower levels. For communication  between  closely  spaced
+processors,  Ethernet and the associated DEC driver software provides
+ease of use and flexibility. 
+
+At the higher level, Decnet links processors so that they may  access
+each  other's  peripherals  e.g.  disk  files.  Decnet  also supports
+intertask communication  using  mailboxes,  which  is  the  mechanism
+already  used  for  the  ADAM  message system. If the mailbox name is
+preceded by a Decnode node name in a call to SYS$ASSIGN or a  Fortran
+OPEN statement, then data can be written to the mailbox as if it were
+in the same computer. 
+
+
+
+
+
+                                                                 ASP/4.1                           3                           ASP/4.1
+
+
+
+It should be noted that SYS$CREMBX cannot access mailboxes in  remote
+computers. This is not important so long as each task creates its own
+mailbox in the computer in which it runs.  Also  the  mailboxes  must
+reside in the system table, not the group table as at present. 
+
+The use of Decnet  also  removes  the  depenence  on  any  particular
+communication medium. Remote observing, currently using X25, could be
+transfered to a linked Ethernet system for example without having  to
+change any (or very little) software. 
+
+Decnet is supported by Micropower Pascal as standard (as an end  node
+on  Ethernet) and is available as an option for RT-11, Micro VMS etc.
+It is also shortly to be introduced for IBM PCs using Ethernet.  This
+might  then  allow  us to use IBM PCs in the system, making them look
+like ADAM d-tasks. 
+
+Decnet and some DEC Ethernet products  do  not  conform  to  all  the
+internationally  agreed  standards,  but  DEC  have stated that their
+policy is to migrate gradually to these standards in such a way as to
+protect current users. 
+
+
+
+
+3. Limitations 
+
+
+
+The scheme described  above  does  not  fully  integrate  ADAM  tasks
+running  on the different processors. It merely allows tasks in these
+processors to communicate using the ADAM message system. Using Decnet
+one  can access files on other processors but this does not mean that
+HDS  structures,  for  example,  can  easily  be  accessed  in  other
+processors. This also applies to other components such as the monitor
+system. 
+
+For remote observing there will still have to be  special  networking
+software,  e.g.  to  transfer  monitor  parameters so that the remote
+machine can maintain status screens. However data  transfer  will  be
+facilitated  by  the use of Decnet since a disk file can be read by a
+local process and written to by a remote one. Such a mechanism  would
+also be used for data transfer from a preprocessor. 
+
+
+
+
+4. Recommendations 
+
+
+
+(a) We should proceed with the installation of Ethernet within ROE. 
+
+
+
+
+
+                                                                 ASP/4.1                           4                           ASP/4.1
+
+
+
+(b) We should install Decnet on the ROE VAX 11/730 and link  this  to
+at least the summit VAX. 
+
+(c) The ADAM message system should be modified to support node names.
+
+(d) A Micropower Pascal system should be connected  to  Ethernet  and
+procedures  developed to allow it to look like an ADAM d-task, as far
+as is possible. 
+
+(e) Remote observing software should  be  written  using  Decnet  and
+interprocessor ADAM. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 

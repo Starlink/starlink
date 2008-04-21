@@ -1,0 +1,421 @@
+                                                                 
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      ASP/2.2
+ROYAL OBSERVATORY EDINBURGH 
+and UNIVERSITY OF EDINBURGH 
+
+ADAM Project                                                Issued by
+ADAM Software Proposal 2.2 
+
+                                                            J.A.Cooke
+                                                          27 Aug 1985
+
+---------------------------------------------------------------------
+
+               SMS - the ADAM Screen Management System                _______________________________________ 
+
+
+
+
+
+
+
+
+At present few people have  used  SMS  and  little  documentation  is
+around  to  explain  how  to  use it.  This document is intended as a
+first introduction to SMS, and  hopefully  answers  the  most  common
+first  questions;   this version is updated to contain information on
+the current state of SMS. 
+
+
+
+
+
+Contents                                                   page 
+
+1. SMS - what is it?                                         2 
+2. What would I use SMS for?                                 2 
+3. What facilities are in SMS?                               2 
+4. How do I use SMS?                                         3 
+5. How do I start up SMS?                                    4 
+6. What is a control table?                                  4 
+7. How do I write a control table?                           5 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 ASP/2.2                           2                           ASP/2.2
+
+
+
+
+
+
+1. SMS - what is it? 
+
+
+SMS is a part of the ADAM system.  It is one of the  user  interfaces
+on  the  system,  and  is  intended  to  be  a  general  purpose user
+interface.  It is general purpose because the same program (SMS)  can
+be  configured to give different views of the ADAM system to the user
+at a terminal.  For example, there could be an SMS configuration  set
+up for one particular instrument. 
+
+Note that at present SMS is set up to run  only  on  VT100  or  VT100
+compatible terminals. 
+
+
+
+2. What would I use SMS for? 
+
+
+SMS will be used for instrument control, data  acquisition  and  data
+analysis.  In the ADAM system these functions are accomplished in the
+command language (ADAMCL) by issuing commands.  SMS can  be  used  to
+package  these  commands  in  more  complex  ways than is possible in
+ADAMCL procedures, so that, for example, by selecting a  single  menu
+item from several displayed on the screen, a particular set of ADAMCL
+commands would be issued. 
+
+
+
+3. What facilities are in SMS? 
+
+
+SMS provides a menu-driven control system which  has  a  user-defined
+structure;  it  can  be  set  up  to  be hierarchical but this is not
+essential.  Menu entries may  select  other  menus,  or  actions,  or
+parameter definition fields. 
+
+A menu is simply a list of items which are displayed on the screen in
+any rectangular format, with or without a box drawn around them.  The
+screen cursor points at menu items;  by using the "arrow" keys on the
+terminal  the  cursor  can  be  made  to  jump around the menu items.
+Pressing the "ENTER" key selects a menu item; pressing the "PF1"  key
+escapes from the menu. 
+
+An action can be one or many ADAMCL commands;   the  actual  commands
+are defined in the SMS control table being used. 
+
+A parameter definition field has one or more parameter entries  whose
+values  may  be set either to one of a set of predefined constants or
+to a single typed value as required. 
+
+
+
+
+                                                                 ASP/2.2                           3                           ASP/2.2
+
+
+
+Menus and parameter definition fields can both have  actions  set  up
+which  will  be  executed  on entry or on exit, so that, for example,
+after SMS parameters have been set up in a parameter definition field
+the  appropriate  ADAMCL commands can be executed to change the state
+of an instrument according to  the  parameter  values  selected.   On
+pressing  "PF1"  to  exit,  these  actions are executed;  on pressing
+"PF4", the menu or parameter definition field is left but the actions
+are not executed. 
+
+SMS is mostly single keystroke driven;  for example, the  arrow  keys
+to  move  the  cursor,  or  the  keypad  keys  for  a  whole range of
+functions.  Note in particular the use of the "PF" keys of the  VT100
+terminal;   the  current  function  of  these keys is always shown in
+status fields on the screen (which are set up at the  bottom  of  the
+screen in the default control table). 
+
+SMS is a macro system.  The  basics  of  the  macro  system  are  now
+implemented.   It  is  a  "keystroke"  macro system, something like a
+programmable calculator.  At any time the  system  can  be  asked  to
+"learn"  a  macro  as  a  set  of keystrokes;  this macro can then be
+assigned to one of the keypad numeric keys (or to a button box  key).
+The  macro  can  then  be  "called"  at  any  time  by  pressing  the
+appropriate keypad key.  This allows, for example, a particular place
+in  the  SMS  menu  tree to be "remembered" as a macro keystroke, and
+subsequently returned to at any time by pressing the  correct  keypad
+key.    It  also  allows  a  whole  instrument  configuration  to  be
+"remembered" as a macro and re-used on the following  night.   (Macro
+definitions  can,  of  course,  be stored in files).  Note that it is
+intended that macros can be called from within other macros;  this is
+not yet implemented. 
+
+SMS has a "help" system (which is not in the ADAM 0.7 release but  is
+now partly implemented).  At any time help may be requested by typing
+the "?" key.  The help  given  is  controlled  from  entries  in  the
+control  table  for  each  menu  item and each SMS parameter, and two
+levels of help information may be accessed as  required.   This  help
+information is extracted from the ADAM help structure. 
+
+SMS allows single ADAMCL  commands  to  be  issued  at  any  time  by
+pressing  the  keypad  "."  key;   this gives a prompt for the ADAMCL
+command. 
+
+SMS  allows  some  interactive  configuration  of  its  behaviour  by
+pressing  the  keypad  ","  key;   this enters a parameter definition
+field which allows the SMS "beep" to be turned on and off, allows the
+SMS  "scroll region" to be made temporary or permanent (in which case
+it is not erased on new keyboard input), and also allows  redirection
+of scroll region output to other terminals. 
+
+
+
+
+
+
+
+
+                                                                 ASP/2.2                           4                           ASP/2.2
+
+
+
+4. How do I use SMS? 
+
+
+To use  SMS  you  need  an  SMS  control  table  which  provides  the
+definition  of  what you see at the terminal.  This control table may
+be provided by someone else, in which case you need to  know  nothing
+about  ADAMCL  and  its  commands, or you can have built it yourself,
+knowing which ADAMCL commands you want to package up. 
+
+Having obtained the  appropriate  control  table,  the  logical  name
+SMSTABLE needs to be set up to point to it, and the system is started
+up by typing "SMS".  The control table is then read and compiled into
+an  internal  form  (which takes a little while);  the top-level menu
+(the first one defined in the control  table)  then  appears  on  the
+screen. 
+
+From this point you move around the menus by using the "arrow"  keys,
+the  "ENTER"  key  and  the  "PF1" key, and obtain help when required
+using the "?" key. 
+
+If you enter a parameter definition field, then the parameters  there
+are  set in one of two ways.  If the control table specifies a set of
+possible values  for  the  parameter,  then  the  value  required  is
+selected  simply by using the "arrow" keys:  up or down to select the
+parameter, left or right  to  select  a  particular  value.   If  the
+control  table  specifies  just  one  value,  then  this value may be
+altered with simple "in-line" editing;  at present, "LF" will  delete
+the  current  value,  characters  typed  will appear as the parameter
+value, and the "DEL" key  allows  the  last  character  typed  to  be
+deleted.  This "line editing" may be improved in a later release. 
+
+The parameter values given in the parameter definition field  may  be
+set  up  by a mechanism which interrogates named tasks for the values
+of named parameters;  for an example of this see  the  control  table
+referred to below. 
+
+
+
+5. How do I start up SMS? 
+
+
+If you are logged in such that all the ADAM symbols and logical names
+are set up, then you simply type 
+
+$ SMS 
+
+in response to the VMS prompt.  This  will  start  up  SMS  with  its
+default control table (which is currently sms_dir:kk.sct and will not
+do you much good).  The control table used can be selected by setting
+up  the  logical  name  SMSTABLE  to point at the file containing the
+control table. 
+
+
+
+
+
+                                                                 ASP/2.2                           5                           ASP/2.2
+
+
+
+6. What is a control table? 
+
+
+The  format  of  menus  displayed  on  the  screen,  the   switchable
+parameters  used  in  SMS,  the  ADAM  commands  sent by SMS, and the
+definition of the function of parts of the screen are all defined  in
+an  ASCII text file called the "control table".  This file is read by
+SMS at run-time and compiled into an internal, quickly accessed form.
+(It  will  be  possible  eventually  to save the compiled form of the
+table so that SMS will start up faster.) 
+
+
+
+7. How do I write a control table? 
+
+
+To create a control table you use a text editor.  The best plan is to
+take  the useful parts from an existing table to save re-typing them.
+The control table syntax is fairly straightforward but it is best  to
+look  at  an  example  to  see  what a control table looks like.  See
+"[adam.lib.sms.ukt9]ukt9table.sct". 
+
+At present all the SMS configuration is in one control table.  It  is
+likely   that   in   some  future  release  the  first  part  of  the
+configuration will be removed to a separate  control  table,  as  the
+first  part relates to the screen positions of essential parts of the
+SMS system, such as the position of the text describing the "PF"  key
+functions.   The  rest  of  the  configuration  relates to the menus,
+parameter definition fields and actions for a particular application.
+
+Thus there are currently four types of  entry  in  a  control  table.
+These are introduced by the following keywords: 
+
+  fields  -  the definitions for the location of SMS system 
+             information on the screen.  There will only be one 
+             "fields" entry. 
+
+  menu    -  a menu definition entry 
+
+  switch  -  a "parameter definition field" entry 
+
+  action  -  an entry with containing one or more ADAMCL commands 
+
+These keywords must be in lower case starting in the first  character
+position on the line. 
+
+Comments may appear in the control table, identified by  "*"  in  the
+leftmost character position. 
+
+Items on the lines in the table may be separated by spaces or tabs or
+both. 
+
+
+
+
+
+                                                                 ASP/2.2                           6                           ASP/2.2
+
+
+
+Examples of these four entry types follow: 
+
+
+fields 
+*  definition of field locations ... 
+*  (This should probably be in a separate input file.) 
+*  keypad "pf" keys ... 
+*    <key> <line> <column> 
+      pf1 24 1 
+      pf2 24 21 
+      pf3 24 41 
+      pf4 24 61 
+*     pf_width <field-width> 
+      pf_width 19 
+*  prompted command field ... 
+*     cmd_line <line> 
+      cmd_line 22 
+*     cmd_column <column> 
+      cmd_column 1 
+*  on-line help ... 
+      help_line 23 
+*  one-line ADAM message display ... 
+      msg_line 21 
+
+
+menu <name> <title if any> 
+*  whether or not a box is drawn around the menu ... 
+      format box/nobox 
+*  position of top left corner of the menu on the screen 
+*  (N.B. the box goes OUTSIDE this if present - sorry) 
+      position <line> <column> 
+*  width of field on screen of each menu item ... 
+      field_width <number of characters> 
+*  the number of columns could be one, giving a tall thin menu! 
+      columns <number of columns in the menu> 
+*  the next two need not be present ... 
+      entry <action name for action on entry> 
+      exit <action name for action on exit> 
+*  the menu items which can point to actions, parameter 
+*  definition fields, or other menus ... 
+      option <option name> action/menu/switch <name> <help key> 
+      option ... 
+      option ... 
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 ASP/2.2                           7                           ASP/2.2
+
+
+
+
+switch <name> <title if any> 
+*  this is a "parameter definition field" 
+
+*  position on the screen ... 
+      position <line> <column> 
+*  width of field to hold parameter name ... 
+      field_width <number of characters> 
+
+*  parameters: note that "help-key" is the help keyword for that 
+*  parameter;  it may, of course, be the same as the parameter 
+*  name. 
+* 
+*  a "switched value" parameter (default indicated by [ ] at 
+*  present) 
+*  (this [] will probably change as it conflicts with VMS 
+*  directories!) 
+      parameter <parameter name> <help key> [<default>] <another> <next> 
+      parameter ... 
+*  a "single valued" parameter ... 
+      parameter <parameter name> <help key> <single value> 
+      parameter ... 
+*  this next parameter gets its value from a named task ... 
+      parameter ... 
+      from mytask filetr_name 
+      parameter ... 
+
+*  note these next two are not present if not required ... 
+*  if any action is to be called on entry to this field 
+      entry <action name> 
+*  and if any action to be called on exit 
+      exit <action name> 
+
+
+
+action <action name> 
+*  an action definition may contain one or more ADAMCL commands: 
+      load atasks:junktask junk 
+      send junk obey something 
+      etc ... 
+*  and SMS parameter substitution is done to allow variables in 
+*  these ADAMCL lines as follows ... 
+      send junk set something <<switch_name:parameter_name>> 
+*  where "switch name" is the name of a parameter definition 
+*  field, and "parameter name" is the name of a parameter in that 
+*  field.  The characters held in SMS representing the current 
+*  value of the parameter are simply substituted in the ADAMCL 
+*  command line. 
+
+
+
+
+
+
+
+
+                                                                 

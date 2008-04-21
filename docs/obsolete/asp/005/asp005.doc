@@ -1,0 +1,361 @@
+                                                                 
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      ASP/5.1
+ROYAL OBSERVATORY EDINBURGH 
+and UNIVERSITY OF EDINBURGH 
+
+ADAM Project                                                Issued by
+ADAM Software Proposal 5.1 
+
+                                                            B.D.Kelly
+                                                           12.05.1986
+
+---------------------------------------------------------------------
+
+                   Proposed change to ADAM syntax                    ______________________________ 
+
+
+
+
+
+
+
+1. SUMMARY 
+
+
+It is generally accepted that the syntax VAX ADAM requires of a  user
+specifying  parameter  values  is  unsatisfactory.  Furthermore,  the
+problem is aggravated by the syntax  of  the  ADAM  command  language
+(ADAMCL).  It  is proposed that the syntax should be respecified. The
+aim should be to make the syntax easy for the casual users  of  ADAM,
+if  necessary  at  the  expense  of expert users who may need to know
+about obscure exceptions to handle more unusual cases. 
+
+
+
+2. BACKGROUND 
+
+
+The ADAM syntax has been taken from two independent sources. The ADAM
+parameter  system  inherited  its  syntax  from the Starlink Software
+Environment (SSE). ADAMCL inherited its syntax from the  Perkin-Elmer
+ADAM. 
+
+
+2.1 Parameter system syntax     _______________________ 
+
+This is concerned with the syntax of parameter values provided on the
+command  line  when  the  command  is  serviced  by  an ADAM task, or
+parameter values provided in response to a prompt from an ADAM  task.
+A  command  line  consists  of  the  command  followed  by  a list of
+parameter values. The values are separated from one another by spaces
+or  commas. An individual value can be an HDS name, or a scalar or an
+array. An array is a set of scalars, separated by spaces  or  commas,
+with    dimensions    being    indicated   by   parentheses   -   eg.
+((value,value),(value,value)). Note that  array  syntax  is  not  yet
+
+
+
+                                                                 ASP/5.1                           2                           ASP/5.1
+
+
+
+actually implemented in VAX ADAM. 
+
+The primitive items are, therefore, HDS names and scalars. 
+
+
+   2.1.1 HDS names 
+
+   These are  commonly  in  the  form  COMP1.COMP2......,  where  the
+   component  names  must  each  consist  of up to 15 characters. The
+   first character must be  alphabetic  and  the  remainder  must  be
+   alphanumeric  or  underscore.  The names are case-insensitive. The
+   full syntax is actually 
+
+   "full_vms_file_spec"structure_name 
+   eg. "DISK$USER:[BDK.DATA]JUNK.DAT;3"RUBBISH.DATA 
+
+   or 
+
+   vms_directory_spec + structure_name 
+   eg. ADAM_USER:GLOBAL.TRACE 
+
+   or 
+   structure_name 
+
+
+   2.1.2 Scalars 
+
+   These are one of the primitive  types  _CHAR,  _DOUBLE,  _INTEGER,
+   _LOGICAL, _REAL. 
+
+   _CHAR constants consist of a character string surrounded by single
+   quotes  (apostrophes).  A  quote within the string is indicated by
+   doubling it. 
+
+   The numeric constants start with a numeric character. 
+
+   A logical constant is T, F, Y, N, TRUE, FALSE, YES, NO.  They  are
+   case-insensitive. 
+
+
+2.2 ADAMCL syntax     _____________ 
+
+ADAMCL recognises two  types  of  variable.  These  are  numbers  and
+character  strings.  Values  of  variables  can  be set by assignment
+statements, or on a command line invoking a procedure, or in response
+to  a  prompt  generated  by  one  of  the ADAMCL prompting commands.
+Numbers are actually REAL, but the syntax for constants is reasonably
+forgiving.  Character strings have to be surrounded by double quotes.
+An embedded double quote  in  a  character  string  is  indicated  by
+doubling it. 
+
+
+
+
+
+
+                                                                 ASP/5.1                           3                           ASP/5.1
+
+
+
+2.3 The main problem     ________________ 
+
+People hate the  necessity  of  surrounding  character  strings  with
+quotes.  This  is  viewed as being especially perverse when a program
+has prompted for a character string value and the response has to  be
+in quotes to distinguish it from an HDS name. Furthermore, in a large
+proportion of instances the character  string  value  consists  of  a
+single  word  which,  therefore,  could not be confused with multiple
+values even on a command line. 
+
+
+2.4 Various current ad hoc solutions     ________________________________ 
+
+In the parameter system, a type LITERAL  has  been  introduced.  When
+such a parameter is prompted for, the result is always interpreted as
+a character string, NOT an HDS name, irrespective of the presence  of
+quotes. 
+
+In ADAMCL the command ASKCHAR prompts  for  a  character  string  and
+surrounds  the  result  with  single  quotes  before storing it in an
+ADAMCL variable. The variable can then be used as part of  a  command
+line  going  to  a  task. Commands ASKRA and ASKDEC allow the user to
+input right ascension or declination in the form 
+
+HH MM SS.S 
+or 
+DD MM SS.S 
+
+or arbitrary contractions of these so long as  the  most  significant
+components  are  present. They are then converted to decimal hours or
+decimal degrees and stored in ADAMCL numeric variables. 
+
+
+2.5 Unstatisfactory nature of current solutions     ___________________________________________ 
+
+There are various problems with the ad hoc solutions. 
+
+Use of type LITERAL  prevents  the  use  of  an  HDS  name  for  that
+parameter,  and  so  removes the main mechanism for passing parameter
+values from one program to another. 
+
+Converting  angles  to  decimal  hours   and   decimal   degrees   is
+unsatisfactory  when  default  values  are  shown on the prompt line.
+Furthermore, an angle cannot be given on the command line  unless  it
+is presented as a decimal. 
+
+Finally, a user might not be aware whether a given command  he  types
+runs a procedure or runs a program. Yet in the first case a character
+string parameter on the command line  would  have  to  be  in  double
+quotes, and in the second case it would have to be in single quotes. 
+
+
+
+
+
+
+                                                                 ASP/5.1                           4                           ASP/5.1
+
+
+
+3. OBJECTIVES IN CHANGING THE SYNTAX 
+
+
+Experience with the  SSE  indicates  that  adopting  a  theoretically
+satisfactory  syntax,  that  is,  one which has the minimum number of
+special conditions, doesn't result  in  something  which  users  find
+friendly.  Users  actually  seem  to prefer a syntax which is simpler
+when the user himself sees himself as  doing  something  simple,  and
+which changes to meet the needs of a more complex situation. 
+
+It seems reasonable to aim for the following. 
+
+The  command  line  for  invoking  an  ADAMCL  procedure  should   be
+indistinguishable from that for telling a task to run. 
+
+A character string which is a simple 'word' should never  require  to
+be  quoted  either  in  a  command  line  or in response to a prompt.
+Arguably, it shouldn't be necessary in  an  ADAMCL  assignment  of  a
+character string variable, but this is not so clear. 
+
+A character string which is a  'sentence',  that  is,  with  embedded
+spaces  or  commas,  should not need to be quoted when it is input in
+response to a prompt. When it is given as part of a command  line  or
+as  an  element  of  an  array, then it needs to be quoted. These two
+conditions, especially the second, should be rare compared  with  the
+other   cases,   and   the  notion  that  they  are  doing  something
+'complicated' should be easy to sell to users. 
+
+Finally, as we are doing Astronomy, angles should be handled neatly. 
+
+
+
+4. PROPOSED SYNTAX 
+
+
+To achieve the objectives, it is first  necessary  to  split-off  the
+parameter  values  which  are not character strings. The following is
+suggested. 
+
+Logicals are as before. 
+
+Numbers are as before, but allow them to start with a decimal point. 
+
+HDS names are prefixed by % which is followed by the old syntax. 
+
+ANGLES should be number1:number2:number3 where the  most  significant
+part must be present. Any of the numbers can be real. 
+
+Array values are built as before, but in addition the task  parameter
+system  should  accept  a  scalar  as  a  single  element  vector  if
+necessary. 
+
+
+
+
+
+                                                                 ASP/5.1                           5                           ASP/5.1
+
+
+
+Character strings can then be handled as in section 3. 
+
+There is the question of whether  'quotes'  means  double  quotes  or
+single  quotes  (apostrophes). DCL uses double quotes. It may be best
+to consider double and single quotes as equivalent. 
+
+
+
+5. ADAMCL COMMAND LINE HANDLING 
+
+
+When parameters are given on an ADAMCL command line,  an  attempt  is
+made   to   interpret   any  'words'  as  ADAMCL  variables.  If  the
+interpretation fails, the original word is retained. 
+
+
+
+6. CHANGES TO THE PARAMETER SYSTEM 
+
+
+Type LITERAL becomes the same as _CHAR, and can now be given  an  HDS
+name. 
+
+A new type, ANGLE, has to be introduced. Inside the parameter  system
+this  will be identical with _DOUBLE, but input from a user or output
+as a default in a prompt string would be in angle format. 
+
+
+
+7. SPECIAL CHARACTERS ?, !, !! AND # 
+
+
+In response to a prompt from a task, there are six special replies. 
+
+<CR> means take the displayed default. If there is  no  default,  the
+prompt is repeated. 
+
+? means show the help information from the interface file. 
+
+! means return the status PAR__NULL to the task. 
+
+!! means return the status PAR__ABORT to the task. 
+
+ctrl-Z means return the status PAR__NOUSR to the task. 
+
+ctrl-C means return PAR__ABORT to the task. 
+
+None of these characters can be put in a command line. 
+
+It is suggested that ! should be handled when in a command  line.  It
+is  also  suggested  that  # should mean take the default if there is
+one. 
+
+
+
+
+                                                                 ASP/5.1                           6                           ASP/5.1
+
+
+
+8. SUMMARY 
+
+
+A series of changes to the ADAM syntax have been proposed with a view
+to  making  the  user  interface more friendly. It must be emphasised
+that  a  non-negligible  amount  of  work  would   be   involved   in
+implementing  these  changes. It is therefore important that everyone
+with VAX ADAM experience should scrutinise the proposals closely  for
+possible improvements or flaws. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 

@@ -1,0 +1,342 @@
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                       ASP/8.1
+ROYAL OBSERVATORY EDINBURGH
+and UNIVERSITY OF EDINBURGH
+
+ADAM Project                                                 Issued by
+ADAM Software Proposal 8.1
+
+                                                             B D Kelly
+                                                      27 February 1989
+
+----------------------------------------------------------------------
+
+              Suggested improvements to Dtask facilities
+              ------------------------------------------
+
+
+
+
+
+1  SUMMARY
+
+It is argued that the Dtask DEVINIT routine should be phased-out,  and
+that  the  freedom to call the top-level Dtask routine something other
+than "ACT" should be introduced.  The insistence on  Dtask  parameters
+having vpath 'INTERNAL' is also investigated.
+
+
+
+2  RECOMMENDATIONS
+
+The points discussed should be considered by interested  parties.   If
+there  are  no  objections,  the  DEVINIT  and  ACT  items  should  be
+implemented immediately.  If people feel there are conceptual problems
+then presentations should be prepared for the forthcoming workshop.
+
+
+
+3  REFERENCES
+
+1) How to write a dtask for the VAX ADAM implementation, 
+   J.A.Cooke and B.D.Kelly, AED/1
+2) Interface Module Reference Manual, S.L.Wright and B.D.Kelly, AED/3
+3) The TASK library of routines for task control, B.D.Kelly, AED/17
+
+
+
+
+
+
+
+
+
+
+                                - 1 -
+ASP/8.1                                                         Page 2
+
+
+4  INTRODUCTION
+
+At the  ADAM  workshop  in  Hilo  the  point  was  made  that  it  was
+undesirable  that the growing number of Dtasks should all have to have
+the names DEVINIT and ACT for their top-level routines.   Furthermore,
+the  problems  of  generating  informative  messages  from Dtasks were
+discussed resulting in the recommendation that Dtasks should  be  able
+to  use  the  same  mechanisms  as  other  sorts of task.  Indeed, the
+rationale for having Dtasks so different from other sorts of task  has
+become increasingly questioned.  This document attempts to review some
+areas where the behaviour of Dtasks can be "tweaked"  more  into  line
+with other types of task.
+
+
+
+5  DEVINIT
+
+I have come increasingly to the  conclusion  that  the  Dtask  DEVINIT
+routine  is  a  mistake.   I  think that it does not really add useful
+functionality, while it causes various problems.
+
+
+
+5.1  Is It Bad To Use DEVINIT?
+
+DEVINIT was designed to be the "device initialisation"  routine,  that
+is,  a  piece  of  code  which carried out any initialisation required
+whenever the Dtask was loaded (ref 1).  The problem  with  DEVINIT  is
+that  it is only ever called once.  This means that anything set-up in
+DEVINIT can only be re-initialised by killing and reloading the Dtask.
+This  is  a  trap  for Dtask programmers who are inevitably tempted to
+initialise things in DEVINIT which it might be reasonable to  wish  to
+reinitialise  under  error recovery conditions (for example).  Really,
+it would be much better if Dtask writers  produced  an  initialisation
+action   which   could  be  invoked  when  required.   Obviously,  the
+programmer would  have  to  consider  whether  "reinitialisation"  was
+meaningless  for certain items and write the code appropriately, but I
+think that it would be better if the system encouraged maximising  the
+number  of  things that could be reinitialised rather than the present
+scheme where it encourages minimising such things.
+
+
+
+5.2  Generating Messages On Initialisation
+
+As a multitasking  system,  it  is  an  essential  ADAM  feature  that
+messages  generated  in  a  task  and intended for the user have to be
+returned to the relevant "instantiation" of the user  interface  -  ie
+they  have  to  come out on the right terminal.  The way this works is
+that every action has been invoked by some other ADAM process, and  so
+messages  issued within that action are sent to that invoking process.
+DEVINIT has no invoking process, therefore no messages can  be  output
+
+                                - 2 -
+ASP/8.1                                                         Page 3
+
+
+from  it  using  the standard mechanisms.  As initialisation is one of
+the places where things can go seriously wrong (eg the hardware  isn't
+switched on), this is very unsatisfactory.
+
+
+
+5.3  Implementation
+
+If the command to  link  a  Dtask  included  a  search  of  a  library
+including  a  dummy DEVINIT routine, then phasing-out of DEVINIT could
+be started in an upwards-compatible way.
+
+
+
+6  THE NAME OF THE ACT ROUTINE
+
+Writers of Atasks are not constrained to give their top-level  routine
+a  particular name.  Dtask writers are.  Obviously, this could lead to
+software management problems as the number of Dtasks  grows.   At  the
+Hilo  workshop  the question was raised as to how this situation could
+be improved.  One of the problems is, of course, that a Dtask has  two
+top-level  routines.   Therefore, there are problems about "neat" ways
+of the programmer specifying the names of these  routines.   Obviously
+this problem is simplified if there is no DEVINIT.  The same technique
+can then be used as is used for Atasks.
+
+As an aside, if the naming of ACT is relaxed, it might also  be  worth
+considering its arguments at this stage.  What about
+
+   SUBROUTINE NEWACT ( CONTEXT, NAME, SEQ, RETVAL, STATUS )
+
+or even
+
+   SUBROUTINE NEWACT ( STATUS )
+
+with access to the other items obtained through subroutine calls?
+
+
+
+7  DTASK VPATHS
+
+Ref (2) says that all Dtask parameters  should  have  vpath  INTERNAL.
+This  is  a severe restriction on the way Dtasks can work.  It puts an
+absolute ban on a Dtask prompting for parameters.   It  even  prevents
+useful vpaths such as 'CURRENT,DEFAULT'.
+
+
+
+7.1  Why VPATH 'INTERNAL'?
+
+This was invented in the interests  of  'efficiency'.   The  parameter
+system  stores  INTERNAL  parameters  in  common  blocks.   All  other
+
+                                - 3 -
+ASP/8.1                                                         Page 4
+
+
+parameters are stored in HDS.
+
+
+
+7.2  Nasty Implementation Consequences
+
+The parameter system always checks if  a  parameter  is  INTERNAL  and
+promptly  moves into common-block handling mode.  Its logic also tends
+to assume that Dtasks have  INTERNAL  parameters  which  are  tied  to
+particular  actions  through  the  NEEDS  lists.  The Dtask fixed part
+therefore validates all the parameters on the NEEDS list of the action
+currently  requested  by  seeing  if they are in the common blocks and
+checking that they obey any RANGE or IN constraints.  The ACT  routine
+is called only if everything is ok.
+
+The checking implies, firstly, that if a parameter value is not stored
+in common (because it hasn't vpath INTERNAL) the checking may fail, or
+worse get into a twist.  Secondly, that if a parameter  has  no  value
+because you want to prompt for it, then ACT never even gets called.
+
+This behaviour, would of course, prevent  CDtasks  from  ever  working
+satisfactorily,  so  there  is a frig.  The Dtask fixed part code goes
+something like this.
+
+routine to handle the command-line for a given action
+
+ get the list of values which were on the command-line
+
+ if there is a NEEDS list, then  -- Dtask/CDtask behaviour
+
+   use the order of the needs list to interpret the list of 
+   parameter values
+
+   if the CHECKNEEDS flag is set  -- genuine Dtask
+     check the common blocks for valid, in-range parameter values
+     pulling-in DEFAULT values if necessary
+   endif
+
+ else   -- some sort of Atask-type behaviour
+
+   use the IFL "POSITION" entries to interpret the list of 
+   parameter values
+
+ endif
+
+
+So, there is an interaction between validating parameters on the NEEDS
+list,  and the concept of INTERNAL parameters.  Furthermore, the NEEDS
+list is also used to specify  the  order  of  the  parameters  on  the
+command-line.    CDtasks   bypass   the   problems   by  switching-off
+CHECKNEEDS.
+
+
+                                - 4 -
+ASP/8.1                                                         Page 5
+
+
+Unorthodox  specification  of  Dtask  parameters  can  result  in  the
+following symptoms.
+
+If a parameter is not on the NEEDS list for the action, then its value
+cannot  be  passed  on  the  command  line.   The  value  must  be SET
+explicitly, or can be prompted for if communications are enabled  (ref
+3).  Under these circumstances all the vpath options are available.
+
+If a parameter is on the NEEDS list, then it must have vpath  INTERNAL
+unless the CHECKNEEDS flag is unset.
+
+If the CHECKNEEDS flag is unset, then ACT  gets  called  even  if  the
+NEEDS list is not satisfied (CDtask behaviour).
+
+The nasty circumstance occurs if CHECKNEEDS is set, a parameter is  on
+the  NEEDS list, its vpath is not INTERNAL and it has a DEFAULT value.
+This is an error path which  is  not  satisfactorily  trapped  by  the
+parameter  system.   The  effect  is  that  the  Dtask fixed part sees
+CHECKNEEDS set, so it copies the default value into the  common  block
+and  flags  the  parameter  as ACTIVE.  It then calls ACT.  Within ACT
+some application does a call to  PAR_GET0x.   The  latter  checks  the
+VPATH,  finds it is not INTERNAL, and deduces that the value is not to
+be found in COMMON.  It then finds that the parameter is ACTIVE and so
+goes looking in HDS for its value.....  So PAR_GET0x ends up returning
+a bad status.
+
+
+
+7.3  Summary Of The Problem
+
+There are three properties which are tangled together; the ability  to
+have  the  fixed-part  check that the parameters needed for the action
+are valid, the ability to provide values on the command-line, and  the
+ability to prompt for values from the application code.
+
+
+
+8  SUMMARY
+
+I have  argued  that  DEVINIT  is  a  bad  idea,  and  certain  future
+improvements  will  be  achieved much more easily if it is phased-out.
+One of the improvements is that  the  programmer  should  be  free  to
+specify the name of the "ACT" routine.  Improving the behaviour of the
+parameter  system  in  Dtasks  tends  to  clash  with  the  "automatic
+parameter validation" facility under the current implementation.
+
+
+
+
+
+
+
+
+                                - 5 -
+ASP/8.1                                                         Page 6
+
+
+9  APPENDIX - IMPLEMENTATION OF NEWACT
+
+The following is a simple  implementation  of  the  command  file  for
+linking  Dtasks.   It  assumes  that the "real" ACT routine is held in
+D_DIR:NEWACT.PRO,  and  is  preprocessed  to  call  the   programmer's
+routine.   DEVINIT  is picked up automatically from D_DIR:DUMINIT.OLB.
+It also assumes that the object  module  for  the  programmer's  "ACT"
+routine  is sitting in a ".OBJ" file.  Probably this assumption should
+be removed, enabling the OBJ to be held in an OLB along with the  rest
+of the Dtask code.
+
+
+$! newdlink - link a d-task
+$
+$  if P1 .eqs. "" then inquire P1 "name of execution module"
+$
+$! Extract the first object name from P1
+$
+$    comma = f$locate(",",p1)
+$    slash = f$locate("/",p1)
+$    len = comma
+$    if slash .lt. comma then -
+        len = slash
+$    program = f$parse(f$extract(0,len,p1),,,"NAME")
+$
+$! Assume that the program and file names are the same!!!
+$
+$    ch <d_dir:newact.pro >appmain.for "<applic>" 'program'
+$    for/nolist appmain
+$    delete appmain.for;0
+$
+$    link/nomap/exec='program'.exe'p2' appmain,'p1',-
+     D_DIR:MAINTASK, D_DIR:DTASK/LIB, D_DIR:DUMINIT/LIB,-
+     ADAMSHRLIB/OPT
+$!
+$    delete appmain.obj;*
+$
+$ end:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                - 6 -

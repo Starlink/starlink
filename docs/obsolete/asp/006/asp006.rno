@@ -1,0 +1,169 @@
+.!           Template RUNOFF file for an ADAM Environment Description
+.!           --------------------------------------------------------
+.!
+.!  Replace n.m by the document number
+.!     "    dd,mm,yyyy by the date
+.!     "    *Author* by the document author(s)
+.!     "    *Title* by the title
+.!--------------------------------------------------------
+.title ASP/6.1
+.set date 21,4,1987
+.autoparagraph
+.set paragraph 0,1,2
+.layout 3,2
+.page size 57,70
+.flags substitute
+.nofill
+.keep
+.justify
+SCIENCE#AND#ENGINEERING#RESEARCH#COUNCIL ASP/6.1
+ROYAL#OBSERVATORY#EDINBURGH
+and#UNIVERSITY#OF#EDINBURGH
+
+ADAM#Project Issued#by
+ADAM#Software#Proposal#6.1
+
+.right;B D Kelly       
+.right;J A Bailey       
+.right;$$date
+
+.fill
+.repeat 70,"-"
+.blank
+.centre;Parameter system enhancements
+.centre;-----------------------------
+.!
+.!now switch off overstrike, substitute, accept and uppercase flags
+.!as we wish to use %, $, ^ and _ regularly
+.no flags overstrike
+.no flags substitute
+.no flags accept
+.no flags uppercase
+.!
+.blank 2
+
+.hl 1 INTRODUCTION
+This document summarises suggestions for enhancing the ADAM parameter 
+system discussed by BDK and JAB during April 1987.
+
+.hl 1 DEFAULT NULL STATE
+A discussion has been taking place concerning the definition of standard 
+data structures, particularly those to be handled by KAPPA. One of the 
+problems has concerned the positioning of AXIS data, when the data might 
+be relevant to more than one DATA_ARRAY. Suggestions for overcoming this 
+problem have included general tree-walking (ie applications should 
+search upwards through data structures) and the use of references to 
+point from one part of a data structure to another.
+
+Our initial feeling is that both these solutions are over-elaborate.
+
+We propose that the interface file syntax should be extended to allow a 
+parameter to be placed in the NULL state by default. The algorithm for 
+picking up (say) a DATA_ARRAY plus associated AXIS structure would be as 
+follows
+
+.LITERAL
+
+       .
+       .
+   parameter junk2
+      vpath 'default'
+      default !
+   endparameter
+       .
+       .
+
+*
+*   Ask for the structure containing the DATA_ARRAY
+*
+      CALL DAT_ASSOC ( 'JUNK1', 'READ', LOC1, STATUS )
+*
+*   Ask for the AXIS data structure
+*
+      CALL DAT_ASSOC ( 'JUNK2', 'READ', LOC2, STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+*
+*      The structure has not been defined on the command line.
+*      Look for it as part of the data.
+*
+         STATUS = SAI__OK
+         CALL DAT_FIND ( LOC1, 'AXIS', LOC2, STATUS )
+         IF ( STATUS .NE. SAI__OK ) THEN
+*
+*         No axis data. Do without it.
+*
+                .
+                .
+
+.end literal
+
+We think that this approach should handle most standard cases.
+
+.hl 1 ENHANCEMENTS FOR FIGARO
+FIGARO would benefit greatly from having three features adding to the 
+parameter system. The first involves providing control over where the 
+value presented on the prompt-line comes from. The second involves 
+forcing this value to be taken as the actual parameter value without the 
+user being prompted at all. The third involves forcing prompting for 
+values, in other words, overriding the VPATH.
+
+.hl 2 Prompt value search path
+Currently, when a user is prompted for a parameter, the parameter system 
+displays a value on the prompt line if either a dynamic or static 
+default exists for the parameter. The user causes this displayed value 
+to become the actual value of the parameter by responding with 
+carriage-return. To avoid ambiguous use of the word 'default', we shall 
+call the value displayed the  PROMPT VALUE. Currently a hard-wired 
+search-path is taken to find the prompt value. If a dynamic default 
+exists, then it is used. If there is no dynamic default, the static 
+default (as defined in the IFL) is used. If neither dynamic nor static 
+defaults exist, then no prompt value appears.
+
+It is proposed that the search-path for the prompt value should be 
+controlled by an entry in the interface file with syntax similar to that 
+for VPATH.
+
+.literal
+
+   PPATH 'CURRENT,DYNAMIC,DEFAULT'
+
+.END LITERAL
+might be an example.
+
+It is further proposed that there should be some dynamic control over 
+this search-path, equivalent to the FIGARO RESET feature. This would 
+have the effect, for the current invocation of the application only, of 
+removing any 'CURRENT' entries from the prompt search-path for any 
+parameters which have not yet been given values.
+
+.hl 2 Forcing acceptance of prompt values
+.flags accept
+It is proposed that a feature equivalent to the FIGARO '_\' should be 
+.no flags accept
+added. This would have the effect, for the current invocation of the 
+application only, of causing any parameters which have not yet been 
+given values to accept the value from the prompt-path without prompting 
+the user.
+
+It should be possible to have both reset and prompt acceptance enabled 
+simultaneously.
+
+.hl 2 Forcing prompting
+It is proposed that a feature equivalent to the FIGARO PROMPT state 
+should be added. This would have the effect, for the current invocation 
+of the application only, of causing any parameters which have not yet 
+been given values to be prompted for irrespective of their declared 
+VPATHs.
+
+It should be possible to have both reset and prompting enabled 
+simultaneously.
+
+.hl 1 SYNTAX
+An interface file syntax has to be defined to set a parameter into the 
+NULL state and to specify a prompt search-path.
+
+A command-line syntax has to be specified to allow a number of parameter 
+values to be given, followed by a RESET and/or an ACCEPT PROMPT symbol, 
+or followed by a RESET and/or a PROMPT symbol.
+
+The specification of the syntax is open to discussion.

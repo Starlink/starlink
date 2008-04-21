@@ -1,0 +1,301 @@
+                                                                 
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      ASP/3.1
+ROYAL OBSERVATORY EDINBURGH 
+and UNIVERSITY OF EDINBURGH 
+
+ADAM Project                                                Issued by
+ADAM Software Proposal 3.1 
+
+                                                            B.D.Kelly
+                                                           19.12.1985
+
+---------------------------------------------------------------------
+
+                ADAMCL logging, remoting and prompts                 ____________________________________ 
+
+
+
+
+
+
+
+1. INTRODUCTION 
+
+
+This document describes  proposed  changes  to  ADAMCL.  The  changes
+involve  the  production  of  the  logfile  (REPORT facility) and the
+implementation  of  a  REMOTE  facility.  The  latter  involves   the
+generation  of  a  logfile which can be written by multiple processes
+and read incrementally by a process transferring  the  log  across  a
+network. Finally, it is proposed that the appearance of the task name
+at the beginning of  prompt  strings  and  messages  should  be  made
+switchable. 
+
+
+
+2. LOGGING 
+
+
+
+
+2.1 The meaning of logging     ______________________ 
+
+Only logging directly relevant to ADAMCL is considered.  The  logging
+of  information  known to tasks but not explicitly known to ADAMCL is
+ignored. A superficial definition of logging then becomes 
+
+"Writing to a file all information known to ADAMCL which also appears
+on the terminal screen" 
+
+In practice, this definition includes a heterogeneous  collection  of
+information which it is useful to split into classes. 
+
+command prompts from ADAMCL 
+commands input by user 
+
+
+
+                                                                 ASP/3.1                           2                           ASP/3.1
+
+
+
+value prompts from ADAMCL 
+values input by user 
+program parameter prompts 
+program parameter values input by user 
+messages from tasks 
+output from ADAMCL PRINT 
+HELP output 
+error messages 
+
+It is probably also useful to add input to ADAMCL from a batch  file,
+although this does not appear on the terminal. 
+
+
+2.2 Present REPORT facility     _______________________ 
+
+This consists of two commands. REPORT switches reporting on.  Reports
+are  appended to a text file called <process_name>.REP in the current
+directory. This has  been  known  to  cause  trouble  when  a  user's
+process_name  is  not  a valid filename. Reporting is switched off by
+the command NOREP, which also closes the output file. The information
+logged  consists  only  of  commands  typed  by  the  user  and error
+messages. 
+
+
+2.3 Proposed REPORT facility     ________________________ 
+
+
+
+   2.3.1 Logging categories 
+
+   It makes sense to group prompts with the corresponding user input.
+   For  implementation  reasons,  it  is  also  convenient  to  group
+   together command prompts with value prompts from  built-in  ADAMCL
+   commands (eg. ASKNUM). 
+
+   COMMS 
+   command prompts from ADAMCL //  commands input by user 
+   value prompts from ADAMCL  //  values input by user 
+
+   PROMPTS 
+   program parameter prompts//program parameter values input by user 
+
+   MSG 
+   messages from tasks 
+
+   PRINT 
+   output from ADAMCL PRINT 
+
+   HELP 
+   HELP output 
+
+   ERRORS 
+   error messages 
+
+
+
+                                                                 ASP/3.1                           3                           ASP/3.1
+
+
+
+   BATCH 
+   echo of batch input 
+
+   Experience is likely to extend or modify this classification. 
+
+
+   2.3.2 Control of logging 
+
+   It is proposed that  the  various  logging  categories  should  be
+   independently switchable. This will be done by the commands 
+
+   LOG <list> 
+
+   NOLOG <list> 
+
+   where <list> is a list of one or more category names. 
+
+   LOG HELP ERRORS 
+
+   would enable logging of HELP and ERRORS output, without  disabling
+   any previously enabled categories. 
+
+
+   2.3.3 The REPORT command 
+
+   It is proposed that the REPORT command should become 
+
+   REPORT [filename] 
+
+   where filename is the name of the file to which the  log  will  be
+   appended.  If  filename  is  not specified, it will be invented as
+   previously. A default choice of logging categories will be set  up
+   on  initial  entry  to  ADAMCL. The REPORT and NOREP commands will
+   have no effect on the enabled categories. 
+
+   It is proposed that the default logging categories should be 
+
+   COMMS PROMPTS MSG PRINT ERRORS 
+
+
+
+3. REMOTE OBSERVING 
+
+
+The intention remains that implementation  of  remote  command  entry
+should  require  no special features in ADAMCL, but should be handled
+automatically by the message system.  However,  the  biggest  use  of
+remote  observing  is  likely  to  fall  in  the  category  of remote
+eavesdropping. In this case, the remote observer has to be  presented
+with  information  about  what  is  happening  on the computer at the
+telescope. 
+
+
+
+
+
+                                                                 ASP/3.1                           4                           ASP/3.1
+
+
+
+3.1 General approach to remote eavesdropping     ________________________________________ 
+
+Arguably, the remote eavesdropper  is  seeing  the  'log'  as  it  is
+updated.  However,  he  also wants to see information not going via a
+specific user interface. It seems that the simplest  solution  is  to
+have  a  disk  file  on  the  telescope  computer  which has relevant
+information appended to it, and to have a task which reads  the  file
+and  copies  new  information to the remote observer. The task has to
+keep track of how much of the log has been  transferred  successfully
+so  that  it  can  recommence  at  the  correct place in the event of
+network breaks. The log file is accessed by multiple writers, so this
+has to be handled carefully. The individual entries probably ought to
+be time-stamped. 
+
+
+3.2 Requirement specific to ADAMCL     ______________________________ 
+
+ADAMCL has to append information to the eavesdropping log.  At  first
+sight  this  appears  to  be  the  same  requirement as the reporting
+facility. The report file, however, is written to only  by  a  single
+copy  of  ADAMCL.  Furthermore, it is a simple text file, which means
+that DCL commands such as TYPE, EDIT and PRINT  can  be  used  on  it
+successfully.  As an experiment, it seems that commands to enable and
+disable copying of the currently enabled logging categories would  be
+sufficient. 
+
+eg. 
+
+$ ADAMCL 
+
+Adamcl:> EAVES 
+
+Would cause the default  categories  of  information  to  go  to  the
+eavesdropping file, while no REPORTing would be occurring. 
+
+
+
+4. PROMPT STRINGS 
+
+
+From time to time requests have been made for changes to the  display
+of messages and prompts which ADAMCL has received from tasks. 
+
+
+4.1 Present prompt and message output     _________________________________ 
+
+Currently, all messages and prompts from tasks are displayed  on  the
+terminal  preceded  by  the name of the originating task. This can be
+useful  when  multitasking,  but  can  be  annoying   during   simple
+sequential  use  of the system, particularly for data analysis. Apart
+from showing extraneous information, it also reduces the space  on  a
+line available for prompts and responses. 
+
+
+
+
+                                                                 ASP/3.1                           5                           ASP/3.1
+
+
+
+4.2 Proposed change     _______________ 
+
+It is proposed that the presence  of  the  taskname  should  be  made
+switchable  by  the commands SHOWTASK and HIDETASK. It is not obvious
+whether the contents of the log files should be affected. 
+
+
+
+5. COMMAND NAMES 
+
+
+This document has been concerned with a number of areas where  ADAMCL
+options  are  switchable.  This involves the creation of commands for
+toggling logical values. It is desirable that  such  commands  should
+conform  to  some  pattern  so  that  a  user can deduce the negative
+command from knowing the positive command. 
+
+A simple pattern would be 
+
+SET LOG ON <list> 
+SET LOG OFF <list> 
+SET REPORTING ON [filename] 
+SET REPORTING OFF 
+SET SHOWTASK ON 
+SET SHOWTASK OFF 
+
+However, this might be considered rather verbose. It also has  a  bad
+effect  on the presentation of HELP information. One might be tempted
+to simply leave the SET off the beginning, however,  one  can  see  a
+requirement for commands such as 
+
+SHOW LOG 
+SHOW REPORTING 
+SHOW SHOWTASK 
+SHOW DICTIONARY 
+SHOW VARIABLES 
+
+Suggestions of ways to resolve  these  problems  will  be  gratefully
+received. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                 

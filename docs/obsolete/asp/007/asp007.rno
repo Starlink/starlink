@@ -1,0 +1,185 @@
+.!           Template RUNOFF file for an ADAM Environment Description
+.!           --------------------------------------------------------
+.!
+.!  Replace n.m by the document number
+.!     "    dd,mm,yyyy by the date
+.!     "    *Author* by the document author(s)
+.!     "    *Title* by the title
+.!--------------------------------------------------------
+.title ASP/7.1
+.set date 14,10,1988
+.autoparagraph
+.set paragraph 0,1,2
+.layout 3,2
+.page size 57,70
+.flags substitute
+.nofill
+.keep
+.justify
+SCIENCE#AND#ENGINEERING#RESEARCH#COUNCIL ASP/7.1
+ROYAL#OBSERVATORY#EDINBURGH
+and#UNIVERSITY#OF#EDINBURGH
+
+ADAM#Project Issued#by
+ADAM#Software#Proposal#7.1
+
+.right;B D Kelly       
+.right;$$date
+
+.fill
+.repeat 70,"-"
+.blank
+.centre;Enhancements to the MESSYS and DTASK libraries
+.centre;----------------------------------------------
+.!
+.!now switch off overstrike, substitute, accept and uppercase flags
+.!as we wish to use %, $, ^ and _ regularly
+.no flags overstrike
+.no flags substitute
+.no flags accept
+.no flags uppercase
+.!
+.blank 2
+
+.hl 1 SUMMARY
+The main work of implementing v2 of the ADAM message system was carried 
+out during the first half of 1988. Part of the reason for reimplementing 
+the MESSYS library was with a view to extending the standard facilities 
+available to ADAM tasks. This document is intended to make initial 
+proposals for what features should be implemented in the short term and 
+to encourage interested parties to suggest alternatives.
+
+.hl 1 REFERENCES
+1) ADAM v2 Message System, B.D.Kelly, ASN/2.1
+
+2) The TASK library of routines for task control, B.D.Kelly, AED/17.1
+.hl 1 INTRODUCTION
+Version 2 of the ADAM message system uses the MSP package for low-level 
+communication (ref 1). Certain enhancements to the message system and 
+its interaction with the Dtask fixed-part now become feasible, and so it 
+has become necessary to tie down precisely what is required and to draw 
+attention to problems which may arise.
+
+.page
+.hl 1 MULTIPLE DTASK_ASTSIGNAL
+.hl 2 The problem
+Under v1 an AST routine can only make a single call to DTASK_ASTSIGNAL 
+per invocation of the AST. This is because the name of the action to be 
+AST-rescheduled is simply written into a DTASK_ common block. A second 
+call to DTASK_ASTSIGNAL within the same invocation of the AST handler 
+results in the second action name overwriting the first one. There are 
+ways around this - eg using DCLAST to requeue the AST after the call to 
+DTASK_ASTSIGNAL, but these are clearly frigs. 
+.hl 2 The proposed change
+In the new message system the ASTSIGNAL feature is implemented by using
+MSP to write a message onto a special queue (ref 1). It clearly becomes
+possible to pass the action name by this route and so remove the
+restriction on the use of DTASK_ASTSIGNAL. To do this involves a new 
+MESSYS_ routine accepting the action name as an argument, and a change
+to MESSYS_RECEIVE so that it returns the name from the ASTINT_Q (already 
+done). It also involves changes to DTASK_ASTSIGNAL to call the new
+MESSYS_ routine and a change to DTASK_INPUT to accept the name returned
+from the message system. 
+.hl 2 Snags
+It is believed that implementing these changes to the system is trivial
+(ie 0.5 to 2.0 programmer days). However, the DTASK library is not part 
+of the ADAM shareable image. This means that the additional 
+MESSYS_ routine has to be added to the transfer vector. It could imply 
+that tasks need to be re-linked.
+.hl 2 Possible further enhancements
+An obvious next step would be to invent a new routine
+.literal
+
+DTASK_ASTMSG ( NAME, VALUE, STATUS )
+
+.end literal
+where NAME is the name of the action to be rescheduled and VALUE is the 
+value string to be passed to ACT when the reschedule occurred. It should 
+be considered whether the VALUE string should be passed to the parameter 
+system for parsing before ACT is called.
+.page
+.hl 1 AST TRIGGERING FROM MESSAGE RECEIPT
+.hl 2 The problem
+There are occasions when it would be convenient for a Ctask or CDtask to 
+use ADAM_SEND to start an action in some other task and to associate an 
+AST handler with the expected final acknowledgement. Furthermore, at the 
+moment it is common for Dtasks to have a QIO for read going which 
+triggers an AST on read completion. If there is a move to using the 
+message system for general communication (ie with an instrument) then a 
+similar facility will be required.
+.hl 2 The proposed change
+A new routine is required
+.literal
+
+ADAM_ENAST ( PATH, MESSID, ASTHANDLER, STATUS )
+
+.end literal
+where PATH and MESSID identify the message to be expected and ASTHANDLER is 
+the AST routine.
+.hl 2 Snags
+To support the ADAM protocol, the message received HAS to be read from 
+the queue using MESSYS_GETREPLY or MESSYS_RECEIVE. These routines are 
+not AST-reentrant, and cannot really be made so as they modify COMMON 
+blocks. This means that the message has to be read from main-line code.
+The ASTHANDLER, therefore, has to communicate back to the mainline code 
+somehow. 
+
+The MSP_ENABLE_AST facility results in the AST routine triggered being
+given the number of the MSP queue responsible via its AST parameter. So
+if the ASTHANDLER which was specified by ADAM_ENAST was simply passed to
+MSP_ENABLE_AST, it would not be able to deduce what PATH and MESSID it
+was associated with. It may, therefore, be necessary to use the type of
+technique used by the VMS SMG utility - namely having a MESSYS AST
+handler which declares itself to MSP and when activated it in turn calls
+the application ASTHANDLER, passing the PATH and MESSID to it as
+arguments. Alternatively, the ASTHANDLER could be declared directly to
+MSP and provided with a MESSYS routine which, when given the MSP
+queue-id would return the PATH and MESSID. 
+
+ASTHANDLER would then have to find some way of passing the PATH and
+MESSID back to the main-line code of the Dtask. 
+
+.page
+.hl 1 RESCHEDULING WITH OUTSTANDING GETREPLY
+.hl 2 The problem
+It is not currently possible to write a CDtask which sends a message to 
+another task initiating an action (ie sends OBEY) and then reschedules 
+itself before receiving the final acknowledgement. This restriction 
+carries over to Dtasks if one starts using the message system to enable 
+Dtasks to talk to instruments.
+
+The cause of the restriction is that the Dtask fixed part looks for 
+incoming commands using MESSYS_RECEIVE. The latter looks for ALL 
+incoming messages including those which might be acknowledgements to 
+messages sent from within ACT. In the case of such an acknowledgement 
+being received, an error message is produced. 
+.hl 2 The proposed change
+It is extremely trivial to stop MESSYS_RECEIVE looking at the queues for 
+acknowledgements expected by ACT.
+.hl 2 Snags
+The current behaviour of MESSYS_RECEIVE provides a useful "automatic
+tidy-up" of a common applications bug - namely failing to pick up the
+final acknowledgement. If this tidy were not done, then any task
+containing this type of bug would eventually fail in a way puzzling to
+programmers and users. 
+
+Possible ways forward include:
+
+Informing MESSYS of the action in progress prior to every call to ACT, 
+and informing MESSYS whenever an action completed. MESSYS could then 
+"tag" any queues that were created from inside ACT and RECEIVE could 
+ignore tagged queues. When an action completed any queues tagged by that 
+action could be un-tagged, enabling RECEIVE to tidy-up any outstanding 
+queues.
+
+Providing a "context" for the Dtask fixed part which would cause it to 
+tidy any outstanding queues.
+.hl 1 CONCLUSION
+A combination of the suggestions in sections 4, 5 and 6 would enable a 
+task to send an OBEY message, declare an AST associated with the PATH 
+and MESSID, and then AST reschedule. The ASTHANDLER, on being delivered, 
+could use DTASK_ASTMSG to cause the action to be rescheduled passing the 
+PATH and MESSID in the VALUE string. The rescheduled action could then 
+call GETREPLY to read the acknowledgement. Note that problems could 
+occur at this point if the message received was not a FINAL 
+acknowledgement (see ref 2 ).

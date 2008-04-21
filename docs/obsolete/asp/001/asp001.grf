@@ -1,0 +1,306 @@
+.AF GEROFFDIR:PRELUDE.GRF
+.ASPA 1.1 "Implementation of the ADAM command language" "B.D.Kelly" "18.02.1985"
+.LEVEL1 "STATEMENT OF THE PROBLEM"
+The ADAM command language is a variant of the command language for the
+commonly-used spectroscopic reduction package SPICA, originated by Keith
+Shortridge. ACL was implemented on the Perkin-Elmer machine for
+controlling the INT instrumentation at LaPalma. ACL is implemented as
+very much a centralised controlling component of the PE ADAM system, so
+that, for example, if more than one user requires to have access to the
+system, this is done by attaching multiple terminals to the single copy
+of ACL. Each attached user has to have his own area of variable storage
+within ACL, and each user has to be capable of running procedures
+independently of the other users. This means that the PE implementation
+of ACL does 'multitasking' on a polling basis within itself. This adds
+considerably to the complexity of implementation of ACL, and exacerbates
+an already-serious support problem given that ACL has some of the
+features of a fairly advanced programming language. 
+.LEVEL1 "THE VAX ADAM VIEW OF THE COMMAND LANGUAGE"
+The VAX implementation of ADAM does not view the command language as
+'special' in any way, for example the system can be operated without the
+command language being loaded. This being the case, a natural
+arrangement in the case of multiple users is for them each to have their
+own copy of the command language task. This means that handling multiple
+users no longer requires that the command language should handle
+multiple input streams. However, disposing of 'multitasking' within ACL
+creates difficulties when a command language procedure is being run. Two
+main problems are seen at present. 
+.level2 "Interrupting Procedures"
+If a procedure is running inside a user-interface task, it may prevent
+the user from typing unsolicited commands, such as 'abort', which need
+servicing immediately rather than after the procedure completes. In the
+PE implementation this is done by having input from the dictionary on
+one stream and input from the terminal on another. This means that the
+'multitasking' polling loop occurs between each command of the executing
+procedure. It also leads to the concept of some streams being the
+'parents' of other streams. In this example, the terminal stream is the
+parent of the stream executing the procedure. Commands have to be
+provided for 'parents' to control their 'children'. 
+
+Basically, one has the requirement that the user interface should be 
+able to recognise user input in between executing commands within a 
+procedure.
+.level2 "Synchronising control of D-tasks"
+A simple observing sequence might consist of
+
+.nf
+command telescope to slew
+wait until slew complete
+take a measurement
+wait until measurement complete
+.fi
+
+within a loop. The problem here is that 'wait until slew complete' is a 
+single command language command which might take a long time, and one 
+does not want the user locked-out while it completes. A related sequence 
+is one involving an A-task such as
+
+.nf
+take a measurement
+wait until measurement complete
+plot data
+wait until plot complete
+.fi
+
+within a loop, where the plot program may ask the user interface to 
+prompt for a value. In practice, the loops involving A-tasks which 
+prompt are most likely to appear during data analysis rather than in the 
+middle of data capture, but the technical problem is the same.
+.level1 "THE SUGGESTED VAX APPROACH: B-TASKS"
+In ADN9.1 it was proposed that command language procedures should run in
+a task separate from the user interface. This simplifies some of the
+tangle arising from trying to be continuously available to the user on
+the one hand and being able to run procedures on the other. Essentially
+one is attempting to resolve the problem in the same way as the PE
+implementation, but using VMS to do the multitasking. The procedure has
+been set running in the background, hence B-task. 
+.level1 "DESCRIPTION OF B-TASKS"
+.level2 "B-task structure"
+A B-task is a 'program' written in command language. A command language 
+procedure can, of course, invoke other procedures. These must be 
+available within the one task, for reasons of efficiency. This means 
+that it is necessary to introduce the concept of a command language 
+program which consists of a set of commands accompanied by all the 
+procedures and variable declarations needed to execute those commands. 
+Obviously the program also has to be able to have parameters.
+.level2 "Proposed B-task appearance"
+The command-language source for a B-task should begin with a PROGRAM (or 
+PROG) statement and end with END PROGRAM (or END PROG).
+
+.nf
+PROGRAM JUNK
+   .
+   .
+END PROGRAM
+.fi
+
+The PROGRAM statement has to be followed by statements defining all the 
+procedures needed. After these the code to be executed can appear, 
+introduced by the command PROC RUN and terminated by END PROC.
+
+.nf
+PROGRAM JUNK
+
+   PROC N1
+     .
+     .
+   END PROC
+
+   PROC JUNK1
+     .
+     .
+   END PROC
+
+   PROC RUN
+     .
+     .
+   END PROC
+
+END PROGRAM
+.nf
+.level2 "Proposed B-task parameters"
+B-tasks should have a set of parameters named in the PROGRAM statement
+whose values are copied into command language variables when the program 
+starts executing.
+
+.nf
+PROGRAM TEST ZX Y
+   .
+   .
+   DECLARE ZX CHAR 80
+   DECLARE Y REAL
+
+   PROMPT ZX "give value of string"
+   PROMPT Y "a numeric value"
+
+   PRINT ZX
+   PRINT Y
+   .
+   .
+END PROGRAM
+.fi
+
+The actual values may have been provided on the command-line which 
+instructed the B-task to run. If not, then the user interface will be 
+requested to prompt for the values using the parameter name as the 
+prompt unless a prompt string has been specified by a PROMPT statement.
+
+If the current values of the parameters are to be discarded and new 
+values obtained from the user interface, then the ACCEPT command can be 
+used:
+
+.nf
+   .
+   .
+   ACCEPT ZX "another string value"
+   ACCEPT Y
+   .
+   .
+.FI
+
+The prompt string is optional, and if present will be used in preference 
+to that declared in a PROMPT statement.
+
+.nf
+   .
+   .
+   ACCEPT Z "do you want more, y or n"
+   .
+   .
+.FI
+
+will cause a value to be obtained for Z, EVEN THOUGH Z IS NOT A 
+PARAMETER AND CANNOT BE GIVEN ON THE COMMAND-LINE.
+.level2 "Versions of the SEND command needed by B-tasks"
+Sequencing the operation of other (primarily D-) tasks requires the
+provision of an OBEYW command, which waits for the final completion
+message from the task. To allow overlap of realtime operations an OBEY
+command which does not await completion, plus an explicit COMPLETE
+command to wait for the eventual completion message are needed. Suppose
+two D-tasks are being controlled, TCC (the telescope) and UKT9. The
+sequence 
+
+.nf
+OBEYW TCC SLEW
+OBEYW UKT9 INTEGRATE
+.fi
+
+might move the telescope to some position and then take a measurement.
+The sequence
+
+.nf
+OBEY TCC SLEW
+OBEYW UKT9 FILTER_SELECT 'K'
+COMPLETE TCC SLEW
+OBEYW UKT9 INTEGRATE
+.fi
+
+would allow the operations of slewing the telescope and selecting the 
+filter to be concurrent.
+
+When the OBEY (without wait) command is used in a B-task, there MUST be 
+an eventual COMPLETE command to accept the final acknowledgement. If 
+this is not done, the acknowledgement may pop-up somewhere it isn't 
+wanted - probably resulting in an error message to the user interface.
+The END PROG statement will also generate an error message if 
+insufficient COMPLETE commands have been executed.
+
+If during an OBEYW or COMPLETE command, a request for a parameter is 
+made by the A-task doing the OBEY, the request is forwarded to the user 
+interface and the reply returned to the A-task. The B-task then 
+continues waiting for the final completion message.
+
+If the final completion status is not DTASK__ACTCOMPLETE, then this is 
+an error and the behaviour of the B-task will depend upon whether it has 
+been instructed to ignore errors. Typically, the execution will 
+terminate, but the task will remain loaded.
+.level1 "IMPLEMENTATION OF B-TASKS"
+.level2 "General Approach"
+The FORTRAN implementation should be similar to a D-task which creates 
+its own interface file internally to be equivalent to:
+
+.nf
+INTERFACE TEST
+
+   PARAMETER ZX
+      POSITION 1
+      TYPE '_CHAR'
+      VPATH 'INTERNAL'
+   ENDPARAMETER
+
+   PARAMETER Y
+      POSITION 2
+      TYPE '_CHAR'
+      VPATH 'INTERNAL'
+   ENDPARAMETER
+      .
+      .
+.fi
+
+If a command-language program called TEST has been created, then the 
+source text will be put into a file called TEST.PRC. The B-task will 
+then be loaded into a task with name TEST, and its DEVINIT will read 
+TEST.PRC into its dictionary. When ACT is called, it will execute the 
+procedure called RUN.
+.level2 "Creating the source file"
+The source file should preferably be created using an ordinary editor, 
+but the option of typing it into the user interface, which would write it 
+to the text file, should be provided. In either case, the user interface 
+should have the capability of doing a test compilation of the program.
+.level2 "Running a B-task"
+The DEFINE command should be extended to allow
+
+DEFINE TEST TEST /B
+
+as care has to be taken over the syntax of parameters sent to B-tasks. 
+As all B-task parameters are character strings, the user interface has 
+to ensure that they are surrounded by quotes. This is because the user 
+'knows' that 3.14 is a number and NOV19.DATA is a structure, whereas the 
+B-task does not distinguish between these things. Specifically, if it 
+requires the name of a data structure it will be because it is going to 
+forward it to some other task. This consideration also means that 
+standard parameter system prompts cannot be used - hence VPATH 
+'INTERNAL' - and special steps have to be taken to ask the user interface 
+to prompt.
+.level2 "Interrupting B-tasks"
+Interrupting the operation of a B-task is most easily done by killing 
+it. This method of stopping a procedure may be inadequate, as 
+it does not allow a pause/restart operation. Again, KILL/LOAD on the 
+B-task will be very slow, but this is seen as the only way of stopping a 
+B-task in the middle of executing a single line of command language.
+
+The ACL programmer, however, can be provided with a command which checks 
+for interruptions.
+
+.nf
+   .
+   .
+   DO J = 1 TO 10
+      OBEYW CGS9 INTEGRATE
+      CHECK
+   END DO
+   .
+   .
+.fi
+
+The CHECK statement would see whether an incoming message was available. 
+If there was one, it would receive it. If it was a command CHECK 
+couldn't handle, it would return an error which would abort (but not 
+KILL!) the B-task. If the command was HOLD, it would wait for another 
+message. Acceptable messages would include:
+
+.nf
+   RELEASE - continue B-task execution
+   LET     - set variable value and continue in HOLD
+   PRINT   - print something and continue in HOLD
+   anything else - abort
+.fi
+
+It is likely that using CHECK between OBEY and COMPLETE may not be 
+allowed.
+.LEVEL1 "SNAGS"
+The primary snag is that creating the B-task subprocess is likely to be
+slow. This may be a nuisance, particularly if ADAM is being used for
+off-line data analysis. It may be convenient to have access to a 
+permanent B-task which could have different command language programs 
+loaded into it without killing it and re-loading it.
