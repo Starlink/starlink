@@ -414,21 +414,38 @@ void smurf_timesort( int *status ) {
 /* Extend the detector mask to exclude any detectors that are excluded as a 
    result of the DETECTORS parameter. */
    if( detgrp ) {
+
+/* Loop round each detector. */
       lab = data->hdr->detname;
       for( irec = 0; irec < (data->dims)[ 1 ]; irec++ ) {
+
+/* See if the label for the current detector is present in the group holding 
+   the detectors to be included in the output cube. */
          grpIndex( lab, detgrp, 1, &found, status );
+
+/* If it is, pass on to the next detector. Otherwise we modify the
+   detector mask to exclude the current detector. */
          if( !found ) {
+
+/* Create a new detector mask if needed, initialising it so that all
+   detectors are included. */
             if( !mask ) {
                mask = astMalloc( sizeof( int )*(data->dims)[ 1 ] );
                if( mask ) {
                   for( i = 0; i < (data->dims)[ 1 ]; i++ ) mask[ i ] = 1;
-                  mask[ irec ] = 0;
                }
-            } else {
-               mask[ irec ] = 0;
             }
-            nbaddet++;
+/* If we now have a mask, and if the mask indicates that the current
+   detector is to be included in the output, toggle the mask value so
+   that the detector is excluded, and increment the number of excluded
+   detectors. */
+            if( mask && mask[ irec ] ) {
+               mask[ irec ] = 0;
+               nbaddet++;
+            }
          }
+
+/* Get a pointer to the label for the next detector. */
          lab += strlen( lab ) + 1;
       }
    }   
