@@ -71,6 +71,8 @@
 *        Update to use new smf_free behaviour
 *     2008-01-25 (EC):
 *        -explicitly close MAPCOORD extension before calculating new one
+*     2008-04-21 (EC):
+*        -Applied Andy's fix for off-by-one errors in nearest-neighbour calc
 
 *  Notes:
 *     This routines asserts ICD data order.
@@ -381,8 +383,8 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
 		       2, nbolo, outmapcoord );
 	  
 	  for( j=0; j<nbolo; j++ ) {
-	    xnear = (int) (outmapcoord[j] + 0.5);
-	    ynear = (int) (outmapcoord[nbolo+j] + 0.5);
+	    xnear = (int) (outmapcoord[j] - 0.5);
+	    ynear = (int) (outmapcoord[nbolo+j] - 0.5);
 	    
 	    if( (xnear >= 0) && (xnear <= ubnd_out[0] - lbnd_out[0]) &&
 		(ynear >= 0) && (ynear <= ubnd_out[1] - lbnd_out[1]) ) {
