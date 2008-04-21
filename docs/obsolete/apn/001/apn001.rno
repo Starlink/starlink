@@ -1,0 +1,1039 @@
+.!           Template RUNOFF file for an ADAM Programmers' Note
+.!           --------------------------------------------------
+.!
+.!  Replace n.m by the document number
+.!     "    dd,mm,yyyy by the date
+.!     "    *Author* by the document author(s)
+.!     "    *Title* by the title
+.!--------------------------------------------------------
+.title APN/1.4
+.set date 19,01,1990
+.autoparagraph
+.set paragraph 0,1,2
+.layout 3,2
+.page size 57,70
+.flags substitute
+.nofill
+.keep
+.justify
+SCIENCE#AND#ENGINEERING#RESEARCH#COUNCIL APN/1.4
+ROYAL#OBSERVATORY#EDINBURGH
+and#UNIVERSITY#OF#EDINBURGH
+
+ADAM#Project Issued#by
+ADAM#Programmers'#Note#1.4
+
+.right;A.Chipperfield
+.right;$$date
+
+.fill
+.repeat 70,"-"
+.blank
+.centre;ADAM Programmers' Guide to the MAG Package
+.centre;------------------------------------------
+.!
+.!now switch off substitute flag and re-define accept flag
+.!as we wish to use $ and _ regularly
+.!% becomes accept flag
+.no flags substitute
+.no flags accept
+.flag accept %
+.!
+.blank 2
+.hl 1 INTRODUCTION
+It is expected that the major part of data stored in the data system
+will be input by applications reading "foreign" magnetic tapes. To a
+lesser extent, data export will also involve applications writing
+foreign tapes. 
+
+The contents of such tapes can be accessed and manipulated using the
+MAG package. The MAG package uses the lower level MIO package to perform
+tape operations.
+
+This document  describes the use of the MAG package in ADAM. It is
+based on an original by S.L.Wright.
+
+.hl 1 FACILITIES
+The operations which can be performed on tapes using the MAG package
+include:
+
+Relative tape movement (skip files/blocks and rewind).
+
+Reading and writing of data contained in tape blocks.
+
+Absolute tape positioning.
+
+.hl 1 TAPE PARAMETERS
+The application refers to a tape device using a Device Parameter, which
+is associated (via the Parameter System and Command Language) with the
+actual tape drive. We can see how this association is made by looking at
+the basic structure of an application which reads from a tape: 
+.literal
+
+      INTEGER MT                 ! Magnetic Tape Descriptor
+
+      ..
+
+*    Make association between TAPE Device Parameter and actual device.
+      CALL MAG_ASSOC('TAPE', 'READ', MT, STATUS)
+      IF (STATUS .EQ. SAI__OK) THEN
+
+*       Rewind tape.
+         CALL MAG_REW(MT, STATUS)
+
+         ..
+         Perform operations on tape
+         ..
+
+*       Release Tape device.
+         CALL MAG_ANNUL(MT, STATUS)
+
+      ENDIF
+
+      ..
+
+.end literal
+The corresponding interface file could contain:
+.literal
+
+      PARAMETER TAPE
+        PTYPE   'DEVICE'
+        TYPE    'TAPE'
+        VPATH   'PROMPT'      
+        PROMPT  'Tape Deck'
+        PPATH   'CURRENT,DEFAULT'
+        DEFAULT MTA0
+      ENDPARAMETER
+
+.end literal
+The MAG_ASSOC call makes the association between the Device Parameter
+named 'TAPE' (1st argument) and a physical device,
+requests 'READ' access (2nd argument), and
+returns a Tape Descriptor in the MT variable (3rd argument). The tape
+can subsequently be referenced using this tape descriptor, as can be
+seen in the MAG_REW call (which rewinds the tape). 
+
+When the application has finished with the tape, it uses MAG_ANNUL
+to break the association between the device and the application, and
+to update any environment data concerned with this device.
+If the tape parameter is also to be cancelled, MAG_CANCL may be used
+instead of MAG_ANNUL.
+
+
+.hl 1 ABSOLUTE TAPE POSITIONS
+Often, the data need to be read from or written to some position along
+the tape other than its start. Programmers and user alike become
+familiar with the idea of "skipping over" a number of files to get to
+the correct tape position. If this must be done several times for a
+particular tape, the user can get quite "lost". This is especially true
+if it is not obvious whether a program which reads a file also skips
+over the tape mark at its end so that it is at the beginning of the next
+file. 
+
+Some programs avoid the user learning how to skip and count files by
+allowing tape positions to be referred to using absolute file numbers.
+If the program is running in isolation (outside of any environment),
+then this normally means that the tape is rewound afresh each time the
+program is run. If the program is running in some kind of environment,
+then the tape position can be "remembered" between runs. 
+
+The MAG package contains facilities for making absolute tape positions
+available to the application (and hence the user) in a  way which is
+independent of the environment. That is, the application asks for what
+it wants and the MAG package provides the service. Thus if absolute
+positioning is required the program just calls MAG_ routines that
+specify the explicit file number etc.. This forces the system to find
+out the absolute position.
+
+This is best demonstrated by an example. Suppose an application wishes
+to refer to absolute file positions: 
+.literal
+      ..
+
+      INTEGER FILE                 ! File number
+      LOGICAL START                ! Whether at start of file
+      INTEGER BLOCK                ! Block number
+
+      ..
+
+      FILE = 2
+      START = .TRUE.
+      BLOCK = 1
+      CALL MAG_MOVE(MT, FILE, START, BLOCK, STATUS)
+
+      ..
+
+.end literal
+The MAG_MOVE routine requires absolute tape positions, thus if the
+application is running in an environment which remembers tape positions,
+then this information is immediately available;  otherwise, this might
+involve rewinding the tape. 
+
+The call to MAG_MOVE then moves the tape to the file number indicated by
+FILE (2nd argument).
+The third argument (set to .TRUE.) indicates that the block number
+(4th argument) is to be counted from the start of the file.
+A value ".FALSE." implies that the block numbering is from the end of the
+file (as if the tape were being read in reverse). That is: block number 1,
+from the end of the file, positions the tape between the the last block of
+the file and the end-of-file mark. This is not in position to read the last
+block
+
+At any time, the tape position can be enquired by, for example:
+.literal
+
+      ..
+
+      CALL MAG_POS(MT, FILE, START, BLOCK, STATUS)
+
+      ..
+
+.end literal
+where the returned values (FILE, START and BLOCK) correspond to the
+MAG_MOVE call. The values of these returned arguments are used to
+indicate whether the tape position is known. For example, FILE=0
+indicates that the absolute file number is not known, similarly for
+BLOCK=0. 
+
+.hl 1 DEVICE DATASETS
+Information about each of the user's tape devices is held in a structure
+object within an HDS container file defined by the logical name USRDEVDATA. 
+The name of each structure is the same as the user's name for the associated
+physical device. 
+The structure is used by the MAG package environment level routines to hold
+the name of the physical device to be associated and to retain the absolute 
+tape position between runs. 
+If no such structure exists when MAG_ASSOC is called, it is created by copying
+the relevant entry from the system physical device dataset (logical name
+DEVDATASET). This should have been set up with appropriate device definitions
+by your system manager. For more information on device datasets, see SSN/44.
+
+MAG_ASSOC will read USRDEVDATA to determine which physical device to use, and 
+copy the absolute tape position into the MAG common block.
+To operate this system correctly, the tape must be mounted using MAG_MOUNT
+and the tape descriptor must be annulled using MAG_CANCL or MAG_ANNUL at the 
+end of each task invocation with the tape in a known position (i.e. it knew 
+where it was to start with and was able to keep track of its movements).
+MAG_MOUNT will initialize the tape dataset to FILE=1, START=.TRUE., BLOCK=1.
+and MAG_DISM will 'undefine' the entries (as will the creation of an entry
+in USRDEVDATA for a particular device).
+MAG_ANNUL/MAG_CANCL will write the current tape position back to USRDEVDATA.
+
+.hl 1 DEVICE ALLOCATION AND MOUNTING
+The multi-process nature of normal ADAM working and the rules associated 
+with device allocation and mounting in VMS can result in confusion.
+
+A simple strategy is to ALLOCATE the tape deck and MOUNT/FOREIGN the
+tape using DCL in the top-level process before entering any user-interface 
+such as ICL (ICL also provides MOUNT and DISMOUNT commands in the 
+top-level process). 
+The advantage of using DCL's ALLOCATE command is that generic device names 
+may be specified.
+
+Unfortunately, if MAG_MOUNT is not used to mount the tape, the position 
+information in the MAG common block following the MAG_ASSOC call may be
+incorrect.
+If absolute tape positions are not required, this presents no problems; 
+however, if absolute tape positions are to be used, special action must be 
+taken to ensure that the MAG package knows the correct position of the tape.
+MAG_REW as the first operation after MAG_ASSOC in the task will ensure that 
+the position is correct, but the preferred method is to mount the tape by
+running the TAPEMOUNT task (which calls MAG_MOUNT) from DCL in the top-level 
+process.
+.literal
+
+E.g.
+      $ ADAMSTART
+      $ ALL MT
+      %DCL-I-ALLOC, _RL780$MTA0: allocated
+      $ TAPEMOUNT MTA0 READ
+      %MOUNT-I-MOUNTED,  mounted on _RL780$MTA0:
+      $ ICL
+        etc.
+
+.el
+The parameters of TAPEMOUNT are:
+.list
+.le;DRIVE  = DEVICE(READ) - Name of the tape to be mounted.
+.le;ACMODE = CHARACTER(READ) - Required access mode ('READ' or 'WRITE')
+.els
+When the user has finished with the tape, it may be dismounted using the 
+TAPEDISM task (which calls MAG_DISM).
+.literal
+
+E.g.
+      $ TAPEDISM MTA0 NOUNLOAD
+
+.el
+The parameters of TAPEDISM are:
+.list
+.le;DRIVE = DEVICE(READ) - Name of the tape to be dismounted.
+.le;UNLOAD = LOGICAL - TRUE if tape is to be unloaded. This parameter
+defaults to TRUE if it is not specified.
+.els
+
+If it is required that the tape is to be mounted in a subprocess, it
+cannot be allocated in a different process (even the parent). It is
+however available for use by other subprocesses or the parent process
+even if the mounting process is killed.
+
+.hl 1 ERROR HANDLING
+The MAG subroutines use the ADAM error strategy. Each routine has a STATUS
+argument and, in most cases, if the value of STATUS is not SAI__OK on entry, 
+the routine returns without action. Exceptions to this are the 'clear-up'
+routines MAG_ANNUL, MAG_CANCL and MAG_DEACT which will attempt to execute
+whatever the import status.
+
+If an error is detected during execution, an error message may be reported
+(but not output) using the ADAM ERR system (See AED/14) and an appropriate
+STATUS value set.
+
+If it is required to test for explicit status values returned from
+MAG subroutines, include the statement:
+.lt
+
+      INCLUDE 'MAG_ERR'
+
+.el
+in the program. The status can then be tested by, for example:
+.lt
+
+      IF( STATUS.EQ.MAG__EOV ) RETURN
+
+.el
+If an error status is to be ignored, the error message stack should be
+cleared and STATUS reset by calling subroutine ERR_ANNUL.
+.hl 1 LINKING
+To link an ADAM program with the MAG and/or MIO libraries, include
+ADAM_LIB:MAGLINK/OPT in the link command.
+
+For example:
+.lt
+
+      $ ALINK task,ADAM_LIB:MAGLINK/OPT
+
+.el
+.page
+.hl 1 MAG STATUS VALUES
+The following status values may be reported by the MAG package.
+.lt
+
+MAG__TOOTD           <No more available tape descriptors>
+MAG__ILLTD           <Illegal tape descriptor>
+MAG__TOMNY           <Too many open tapes>
+MAG__ILLAC           <Illegal access mode>
+MAG__UNKPA           <Parameter not found>
+MAG__NTACT           <Parameter not currently active>
+MAG__ISACT           <Parameter currently active>
+MAG__ERACT           <Error activating MAG>
+MAG__EREXH           <Error establishing exit handler for MAG>
+MAG__IVACM           <Invalid access mode>
+MAG__BUFTB           <Invalid buffer size>
+MAG__UNKDV           <Unable to locate device in DEVDATASET>
+MAG__NOASS           <No channel assigned to tape drive>
+MAG__NOFIL           <No tape file specified>
+MAG__NOPOS           <Tape position not known>
+MAG__NOEOV           <End of volume not found>
+MAG__EXCDV           <Too many tape devices>
+MAG__ISOPN           <Tape device already open>
+MAG__NTOPN           <Tape not open>
+MAG__LCERR           <Unable to open DEVDATASET>
+MAG__CRERR           <Unable to create Magnetic Tape dataset>
+MAG__CNERR           <Unable to cancel Magnetic Tape dataset>
+MAG__WRERR           <Error Writing to Magnetic Tape dataset>
+MAG__RDERR           <Error Reading from Magnetic Tape dataset>
+MAG__IVRSZ           <Invalid record size>
+MAG__IVBSZ           <Invalid block size>
+MAG__NTMUL           <BLock size not a multiple of record size>
+MAG__IVBUF           <Invalid buffer size>
+MAG__ICBSZ           <Inconsistent block size>
+MAG__NOREC           <Unknown record size>
+MAG__ERROR           <Error>
+MAG__NTSUP           <Option not supported>
+MAG__DVALL           <Tape drive allocated to another user>
+MAG__DVNAL           <Tape drive not allocated>
+MAG__NSHDV           <No such tape drive>
+MAG__DVASS           <Tape drive already assigned>
+MAG__ACVIO           <Access violation>
+MAG__BUFOV           <Buffer overflow>
+MAG__DVMNT           <Tape drive already mounted>
+MAG__REMOT           <Tape drive on remote node>
+MAG__NOPRV           <No privilege for attempted operation>
+MAG__INVCH           <Invalid channel>
+MAG__EXQUO           <Quota exceeded>
+MAG__EXCCH           <No channel available>
+MAG__INVDV           <Illegal device name>
+MAG__INVLG           <Illegal logical name>
+MAG__CTLER           <Tape drive controller error>
+MAG__DTCHK           <Tape write error>
+MAG__DRVER           <Tape drive error>
+MAG__EOF             <End of file on tape>
+MAG__EOT             <End of tape>
+MAG__EOV             <End of volume (2 tape marks)>
+MAG__MDOFL           <Tape drive offline>
+MAG__PARIT           <Parity error on tape>
+MAG__UNSAF           <Tape drive unsafe>
+MAG__VLINV           <Tape not mounted>
+MAG__WTLCK           <Tape drive write locked>
+MAG__DATOV           <Tape data block exceeds buffer size>
+MAG__DVNMT           <Tape not mounted>
+MAG__UNKSS           <Unknown System Service code>
+MAG__BADSS           <VMS System Service Failed>
+.el
+
+.hl 1 REFERENCE SECTION
+There follows a description of each of the application level
+subroutines in the package
+.nofill
+.lm 0
+.rm 79
+.page
+.literal
++--------------------------------------------------------------------+
+|  MAG_ALOC                                                          |
+|   Allocate tape device.                                            |
++--------------------------------------------------------------------+
+|                                                                    |
+|  Allocate the tape drive specified by the parameter for continued  |
+|  use.                                                              |
+|  If an entry for the specified tape drive cannot be found in the   |
+|  user's device dataset (USRDEVDATA) or in the system dataset       |
+|  (DEVDATASET), the user will be prompted [again].                  |
+|  Similarly if the entry specifies a physical device which does     |
+|  not exist.                                                        |
+|                                                                    |
++--------------------------------------------------------------------+
+|                                                                    |
+|  CALL MAG_ALOC(PARAM, STATUS)                                      |
+|                                                                    |
+|                                                                    |
+|  PARAM=CHARACTER*(*)                                               |
+|        Expression specifying the name of a Tape Device Parameter.  |
+|                                                                    |
+|  STATUS=INTEGER                                                    |
+|        Variable holding the status value.                          |
+|        If this variable is not SAI__OK on input, then the routine  |
+|        will return without action.                                 |
+|        If the routine fails to complete, this variable will be set |
+|        to an appropriate error number.                             |
+|                                                                    |
++--------------------------------------------------------------------+
+|  Sid Wright (UCL::SLW)                                             |
+|  A J Chipperfield (RAL::AJC)                                       |
++--------------------------------------------------------------------+
+.end literal
+.page
+.literal
++--------------------------------------------------------------------+
+|  MAG_ANNUL                                                         |
+|   Annul tape descriptor, releasing any associated tape drive.      |
++--------------------------------------------------------------------+
+|                                                                    |
+|  Release the tape drive associated with the tape descriptor.       |
+|  Annul the tape descriptor.                                        |
+|                                                                    |
++--------------------------------------------------------------------+
+|                                                                    |
+|  CALL MAG_ANNUL(TD, STATUS)                                        |
+|                                                                    |
+|                                                                    |
+|  TD=INTEGER                                                        |
+|        A variable containing the tape descriptor.                  |
+|                                                                    |
+|  STATUS=INTEGER                                                    |
+|        Variable holding the status value.                          |
+|        If the routine fails to complete, this variable will be set |
+|        to an appropriate error number.                             |
+|        If this variable is not SAI__OK on input, then the routine  |
+|        will still attempt to execute, but will return with STATUS  |
+|        set to the import value.                                    |
+|                                                                    |
++--------------------------------------------------------------------+
+|  Sid Wright (UCL::SLW)                                             |
++--------------------------------------------------------------------+
+.end literal
+.page
+.literal
++--------------------------------------------------------------------+
+|  MAG_ASSOC                                                         |
+|   Open a tape device and return a descriptor                       |
++--------------------------------------------------------------------+
+|                                                                    |
+|  Get descriptor for tape device specified by its Parameter Name.   |
+|                                                                    |
++--------------------------------------------------------------------+
+|                                                                    |
+|  CALL MAG_ASSOC(DEVICE, MODE, TD, STATUS)                          |
+|                                                                    |
+|                                                                    |
+|  DEVICE=CHARACTER*(*)                                              |
+|        Expression specifying the name of a Tape Device Parameter.  |
+|                                                                    |
+|  MODE=CHARACTER*(*)                                                |
+|        Expression specifying the access mode: 'READ' or 'WRITE'.   |
+|                                                                    |
+|  TD=INTEGER                                                        |
+|        A Variable to contain the tape descriptor.                  |
+|                                                                    |
+|  STATUS=INTEGER                                                    |
+|        Variable holding the status value.                          |
+|        If this variable is not SAI__OK on input, then the routine  |
+|        will return without action.                                 |
+|        If the routine fails to complete, this variable will be set |
+|        to an appropriate error number.                             |
+|                                                                    |
++--------------------------------------------------------------------+
+|  Sid Wright  (UCL::SLW)                                            |
++--------------------------------------------------------------------+
+.end literal
+.page
+.literal
++--------------------------------------------------------------------+
+|  MAG_CANCL                                                         |
+|   Close tape device                                                |
++--------------------------------------------------------------------+
+|                                                                    |
+|  Break the association between a tape device and the specified     |
+|  device parameter.                                                 |
+|                                                                    |
++--------------------------------------------------------------------+
+|                                                                    |
+|  CALL MAG_CANCL(DEVICE, STATUS)                                    |
+|                                                                    |
+|                                                                    |
+|  DEVICE=CHARACTER*(*)                                              |
+|        Expression specifying the name of a Tape Device Parameter,  |
+|        which has previously been associated with a device using    |
+|        MAG_ASSOC.                                                  |
+|                                                                    |
+|  STATUS=INTEGER                                                    |
+|        Variable holding the status value.                          |
+|        If the routine fails to complete, this variable will be set |
+|        to an appropriate error number.                             |
+|        If this variable is not SAI__OK on input, then the routine  |
+|        will still attempt to execute, but will return with STATUS  |
+|        set to the import value.                                    |
+|                                                                    |
++--------------------------------------------------------------------+
+|  Sid Wright  (UCL::SLW)                                            |
++--------------------------------------------------------------------+
+.end literal
+.page
+.literal
++--------------------------------------------------------------------+
+|  MAG_DEACT                                                         |
+|   Deactivate MAG library after SCL application                     |
++--------------------------------------------------------------------+
+|                                                                    |
+|  The MAG library is de-activated.                                  |
+|                                                                    |
++--------------------------------------------------------------------+
+|                                                                    |
+|  CALL MAG_DEACT(STATUS)                                            |
+|                                                                    |
+|                                                                    |
+|  STATUS=INTEGER                                                    |
+|        Variable holding the status value.                          |
+|        If the routine fails to complete, this variable will be set |
+|        to an appropriate error number.                             |
+|        If this variable is not SAI__OK on input, then the routine  |
+|        will still attempt to execute, but will return with STATUS  |
+|        set to the import value.                                    |
+|                                                                    |
++--------------------------------------------------------------------+
+|  Sid Wright  (UCL::SLW)                                            |
++--------------------------------------------------------------------+
+.end literal
+.page
+.literal
++--------------------------------------------------------------------+
+|  MAG_DEAL                                                          |
+|   De-allocate a tape device.                                       |
++--------------------------------------------------------------------+
+|                                                                    |
+|  De-allocate the tape drive specified by the parameter, from the   |
+|  process.                                                          |
+|  If an entry for the specified tape drive cannot be found in the   |
+|  user's device dataset (USRDEVDATA) or in the system dataset       |
+|  (DEVDATASET), the user will be prompted [again].                  |
+|  Similarly if the entry specifies a physical device which does     |
+|  not exist.                                                        |
+|                                                                    |
++--------------------------------------------------------------------+
+|                                                                    |
+|  CALL MAG_DEAL(PARAM, STATUS)                                      |
+|                                                                    |
+|                                                                    |
+|  PARAM=CHARACTER*(*)                                               |
+|        Expression specifying the name of a Tape Device Parameter.  |
+|                                                                    |
+|  STATUS=INTEGER                                                    |
+|        Variable holding the status value.                          |
+|        If this variable is not SAI__OK on input, then the routine  |
+|        will return without action.                                 |
+|        If the routine fails to complete, this variable will be set |
+|        to an appropriate error number.                             |
+|                                                                    |
++--------------------------------------------------------------------+
+|  A J Chipperfield (RAL::AJC)                                       |
++--------------------------------------------------------------------+
+.end literal
+.page
+.literal
++--------------------------------------------------------------------+
+|  MAG_DISM                                                          |
+|   Dismount tape from drive.                                          |
++--------------------------------------------------------------------+
+|                                                                    |
+|  Dismount a tape from the tape drive specified by the parameter    |
+|  and set the entry for the drive in the user's device dataset      |
+|  (USREDEVDATA) to unknown position.                                |
+|  If the dismount fails, the entry will be unaltered.               |
+|  If an entry for the specified tape drive cannot be found in the   |
+|  user's device dataset (USRDEVDATA) or in the system dataset       |
+|  (DEVDATASET), the user will be prompted [again].                  |
+|  Similarly if the entry specifies a physical device which does     |
+|  not exist.                                                        |
+|                                                                    |
++--------------------------------------------------------------------+
+|                                                                    |
+|  CALL MAG_DISM(PARAM, UNLOAD, STATUS)                              |
+|                                                                    |
+|                                                                    |
+|  PARAM=CHARACTER*(*)                                               |
+|        Expression specifying the name of a Tape Device Parameter.  |
+|                                                                    |
+|  UNLOAD=LOGICAL                                                    |
+|        Expression specifying whether the tape is to be unloaded.   |
+|        If .TRUE. the tape will be unloaded; if .FALSE. it will     |
+|        not.                                                        |
+|                                                                    |
+|  STATUS=INTEGER                                                    |
+|        Variable holding the status value.                          |
+|        If this variable is not SAI__OK on input, then the routine  |
+|        will return without action.                                 |
+|        If the routine fails to complete, this variable will be set |
+|        to an appropriate error number.                             |
+|                                                                    |
++--------------------------------------------------------------------+
+|  Sid Wright (UCL::SLW)                                             |
++--------------------------------------------------------------------+
+.end literal
+.page
+.literal
++--------------------------------------------------------------------+
+|  MAG_JEOV                                                          |
+|   Jump over an EOV condition (2 consecutive tape marks)            |
++--------------------------------------------------------------------+
+|                                                                    |
+|  This jumps over an end-of-volume (EOV) condition, assuming that   |
+|  the tape is currently positioned between its two consecutive      |
+|  tape marks.                                                       |
+|                                                                    |
++--------------------------------------------------------------------+
+|                                                                    |
+|  CALL MAG_JEOV(TD, STATUS)                                         |
+|                                                                    |
+|                                                                    |
+|  TD=INTEGER                                                        |
+|        A variable containing the tape descriptor.                  |
+|                                                                    |
+|  STATUS=INTEGER                                                    |
+|        Variable holding the status value.                          |
+|        If this variable is not SAI__OK on input, then the routine  |
+|        will return without action.                                 |
+|        If the routine fails to complete, this variable will be set |
+|        to an appropriate error number.                             |
+|                                                                    |
++--------------------------------------------------------------------+
+|  Jack Giddings (UCL::JRG)                                          |
+|  Sid Wright (UCL::SLW)                                             |
++--------------------------------------------------------------------+
+.end literal
+.page
+.literal
++--------------------------------------------------------------------+
+|  MAG_JUMP                                                          |
+|   Skip a specified number of physical blocks                       |
++--------------------------------------------------------------------+
+|                                                                    |
+|  The tape is moved a specified number of blocks;  a negative       |
+|  number indicating backwards movement.                             |
+|                                                                    |
++--------------------------------------------------------------------+
+|                                                                    |
+|  CALL MAG_JUMP(TD, NBLOCK, STATUS)                                 |
+|                                                                    |
+|                                                                    |
+|  TD=INTEGER                                                        |
+|        A variable containing the tape descriptor.                  |
+|                                                                    |
+|  NBLOCK=INTEGER                                                    |
+|        Expression specifying the number of blocks to be skipped.   |
+|        A negative number indicates that the tape is to be moved    |
+|        in the reverse direction (towards its load point).          |
+|                                                                    |
+|  STATUS=INTEGER                                                    |
+|        Variable holding the status value.                          |
+|        If this variable is not SAI__OK on input, then the routine  |
+|        will return without action.                                 |
+|        If the routine fails to complete, this variable will be set |
+|        to an appropriate error number.                             |
+|                                                                    |
++--------------------------------------------------------------------+
+|  Sid Wright (UCL::SLW)                                             |
+|  Jack Giddings (UCL::JRG)                                          |
++--------------------------------------------------------------------+
+.end literal
+.page
+.literal
++--------------------------------------------------------------------+
+|  MAG_MOUNT                                                         |
+|   Mount tape on drive.                                             |
++--------------------------------------------------------------------+
+|                                                                    |
+|  Mount a tape on the tape drive specified by the parameter and     |
+|  initialise the entry for the drive in the user's device dataset   |
+|  (USRDEVDATA).                                                     |
+|  If an entry for the specified tape drive cannot be found in the   |
+|  USRDEVDATA or in the system dataset (DEVDATASET), the user will   |
+|  be prompted [again].                                              |
+|  Similarly if the entry specifies a physical device which does     |
+|  not exist.                                                        |
+|  If the mount fails, but a device entry was found, the entry will  |
+|  be cancelled (i.e. set to unknown position) unless the failure    |
+|  was MAG__DVMNT (device already mounted), in which case it will    |
+|  be unaltered.                                                     |
+|                                                                    |
++--------------------------------------------------------------------+
+|                                                                    |
+|  CALL MAG_MOUNT(PARAM, MODE, STATUS)                               |
+|                                                                    |
+|                                                                    |
+|  PARAM=CHARACTER*(*)                                               |
+|        Expression specifying the name of a Tape Device Parameter.  |
+|                                                                    |
+|  MODE=CHARACTER*(*)                                                |
+|        Expression specifying the access mode:  'READ', 'WRITE' or  |
+|        'UPDATE', as appropriate.                                   |
+|                                                                    |
+|  STATUS=INTEGER                                                    |
+|        Variable holding the status value.                          |
+|        If this variable is not SAI__OK on input, then the routine  |
+|        will return without action.                                 |
+|        If the routine fails to complete, this variable will be set |
+|        to an appropriate error number.                             |
+|                                                                    |
++--------------------------------------------------------------------+
+|  Sid Wright (UCL::SLW)                                             |
++--------------------------------------------------------------------+
+.end literal
+.page
+.literal
++--------------------------------------------------------------------+
+|  MAG_MOVE                                                          |
+|   Move to a specified file and block on tape                       |
++--------------------------------------------------------------------+
+|                                                                    |
+|  Assuming that the current tape position is known, move to a       |
+|  position on the tape specified by a file and block number.        |
+|  The block number can be relative either to the start or the       |
+|  end of the specified file.                                        |
+|                                                                    |
++--------------------------------------------------------------------+
+|                                                                    |
+|  CALL MAG_MOVE(TD, FILE, START, BLOCK, STATUS)                     |
+|                                                                    |
+|                                                                    |
+|  TD=INTEGER                                                        |
+|        A variable containing the tape descriptor.                  |
+|                                                                    |
+|  FILE=INTEGER                                                      |
+|        Expression specifying the file number to which the tape     |
+|        is to be moved.                                             |
+|                                                                    |
+|  START=LOGICAL                                                     |
+|        Expression indicating whether the block number is relative  |
+|        to the start or end of the specified file.                  |
+|                                                                    |
+|  BLOCK=INTEGER                                                     |
+|        Expression specifying the block number within the file at   |
+|        which the tape is to be positioned. Note that when START    |
+|        is false i.e. BLOCK is relative to the end of the file, its |
+|        value is what would be expected if the tape were being read |
+|        backwards. This means that in order to position the tape to |
+|        read the last block in the file, BLOCK must be set to 2 and |
+|        not 1.                                                      |
+|                                                                    |
+|  STATUS=INTEGER                                                    |
+|        Variable holding the status value.                          |
+|        If this variable is not SAI__OK on input, then the routine  |
+|        will return without action.                                 |
+|        If the routine fails to complete, this variable will be set |
+|        to an appropriate error number.                             |
+|                                                                    |
++--------------------------------------------------------------------+
+|  Jack Giddings (UCL::JRG)                                          |
++--------------------------------------------------------------------+
+.end literal
+.page
+.literal
++--------------------------------------------------------------------+
+|  MAG_POS                                                           |
+|   Enquire current tape file/block positions                        |
++--------------------------------------------------------------------+
+|                                                                    |
+|  Return current tape position.                                     |
+|                                                                    |
++--------------------------------------------------------------------+
+|                                                                    |
+|  CALL MAG_POS(TD, FILE, START, BLOCK, MOVED, STATUS)               |
+|                                                                    |
+|                                                                    |
+|  TD=INTEGER                                                        |
+|        A variable containing the tape descriptor.                  |
+|                                                                    |
+|  FILE=INTEGER                                                      |
+|        Variable to receive the tape file number. This is returned  |
+|        zero if not known.                                          |
+|                                                                    |
+|  START=LOGICAL                                                     |
+|        Variable to receive whether the block number is relative    |
+|        to the start or end of the file.                            |
+|                                                                    |
+|  BLOCK=INTEGER                                                     |
+|        Variable to receive the block number.   If START is TRUE    |
+|        then this is relative to the start of the file;  otherwise  |
+|        it is relative to the end of the file.                      |
+|        It is returned zero if not known.                           |
+|                                                                    |
+|  MOVED=LOGICAL                                                     |
+|        Variable to receive whether the tape has been moved.        |
+|                                                                    |
+|  STATUS=INTEGER                                                    |
+|        Variable holding the status value.                          |
+|        If this variable is not SAI__OK on input, then the routine  |
+|        will return without action.                                 |
+|        If the routine fails to complete, this variable will be set |
+|        to an appropriate error number.                             |
+|                                                                    |
++--------------------------------------------------------------------+
+|  Jack Giddings (UCL::JRG)                                          |
+|  Sid Wright (UCL::SLW)                                             |
++--------------------------------------------------------------------+
+.end literal
+.page
+.literal
++--------------------------------------------------------------------+
+|  MAG_READ                                                          |
+|   Read a block from tape.                                          |
++--------------------------------------------------------------------+
+|                                                                    |
+|  Read a tape block into the array provided, and return its length  |
+|  in basic machine units (bytes).                                   |
+|                                                                    |
++--------------------------------------------------------------------+
+|                                                                    |
+|  CALL MAG_READ(TD, MAXVAL, VALUES, ACTVAL, STATUS)                 |
+|                                                                    |
+|                                                                    |
+|  TD=INTEGER                                                        |
+|        A variable containing the tape descriptor.                  |
+|                                                                    |
+|  MAXVAL=INTEGER                                                    |
+|        Expression specifying the size of the array (in bytes)      |
+|        into which data are to be read from tape.                   |
+|                                                                    |
+|  VALUES(MAXVAL)=BYTE                                               |
+|        Array to receive the binary contents of a tape block.       |
+|        It must be of sufficient size to contain the entire block.  |
+|                                                                    |
+|  ACTVAL=INTEGER                                                    |
+|        Variable to receive the actual number of bytes read.        |
+|                                                                    |
+|  STATUS=INTEGER                                                    |
+|        Variable holding the status value.                          |
+|        If this variable is not SAI__OK on input, then the routine  |
+|        will return without action.                                 |
+|        If the routine fails to complete, this variable will be set |
+|        to an appropriate error number.                             |
+|                                                                    |
++--------------------------------------------------------------------+
+|  Sid Wright (UCL::SLW)                                             |
+|  Jack Giddings (UCL::JRG)                                          |
++--------------------------------------------------------------------+
+.end literal
+.page
+.literal
++--------------------------------------------------------------------+
+|  MAG_REW                                                           |
+|   Rewind tape                                                      |
++--------------------------------------------------------------------+
+|                                                                    |
+|  The tape is rewound to its load point.                            |
+|                                                                    |
++--------------------------------------------------------------------+
+|                                                                    |
+|  CALL MAG_REW(TD, STATUS)                                          |
+|                                                                    |
+|                                                                    |
+|  TD=INTEGER                                                        |
+|        A variable containing the tape descriptor.                  |
+|                                                                    |
+|  STATUS=INTEGER                                                    |
+|        Variable holding the status value.                          |
+|        If this variable is not SAI__OK on input, then the routine  |
+|        will return without action.                                 |
+|        If the routine fails to complete, this variable will be set |
+|        to an appropriate error number.                             |
+|                                                                    |
++--------------------------------------------------------------------+
+|  Sid Wright (UCL::SLW)                                             |
+|  Jack Giddings (UCL::JRG)                                          |
++--------------------------------------------------------------------+
+.end literal
+.page
+.literal
++--------------------------------------------------------------------+
+|  MAG_SET                                                           |
+|   Set current tape file/block positions                            |
++--------------------------------------------------------------------+
+|                                                                    |
+|  Supply the MAG library with the current tape position.            |
+|                                                                    |
++--------------------------------------------------------------------+
+|                                                                    |
+|  CALL MAG_SET(TD, FILE, START, BLOCK, STATUS)                      |
+|                                                                    |
+|                                                                    |
+|  TD=INTEGER                                                        |
+|        A variable containing the tape descriptor.                  |
+|                                                                    |
+|  FILE=INTEGER                                                      |
+|        Expression specifying the tape file number.   This can be   |
+|        zero or negative if unknown.                                |
+|                                                                    |
+|  START=LOGICAL                                                     |
+|        Expression specifying whether the block number is relative  |
+|        to the start or end of the specified file.                  |
+|                                                                    |
+|  BLOCK=INTEGER                                                     |
+|        Expression specifying the block number.                     |
+|        If START is TRUE then this is relative to the start of the  |
+|        file;  otherwise it is relative to the end of the file.     |
+|        It can be specified zero or negative if unknown.            |
+|                                                                    |
+|  STATUS=INTEGER                                                    |
+|        Variable holding the status value.                          |
+|        If this variable is not SAI__OK on input, then the routine  |
+|        will return without action.                                 |
+|        If the routine fails to complete, this variable will be set |
+|        to an appropriate error number.                             |
+|                                                                    |
++--------------------------------------------------------------------+
+|  Jack Giddings (UCL::JRG)                                          |
++--------------------------------------------------------------------+
+.end literal
+.page
+.literal
++--------------------------------------------------------------------+
+|  MAG_SKIP                                                          |
+|   Skip a specified number of tape marks                            |
++--------------------------------------------------------------------+
+|                                                                    |
+|  The tape is moved over a specified number of tape marks.          |
+|                                                                    |
++--------------------------------------------------------------------+
+|                                                                    |
+|  CALL MAG_SKIP(TD, NTM, STATUS)                                    |
+|                                                                    |
+|                                                                    |
+|  TD=INTEGER                                                        |
+|        A variable containing the tape descriptor.                  |
+|                                                                    |
+|  NTM=INTEGER                                                       |
+|        Expression specifying the number of tape marks to be        |
+|        skipped.                                                    |
+|        A negative number indicates that the tape is to be moved    |
+|        in the reverse direction (towards its load point).          |
+|                                                                    |
+|  STATUS=INTEGER                                                    |
+|        Variable holding the status value.                          |
+|        If this variable is not SAI__OK on input, then the routine  |
+|        will return without action.                                 |
+|        If the routine fails to complete, this variable will be set |
+|        to an appropriate error number.                             |
+|                                                                    |
++--------------------------------------------------------------------+
+|  Sid Wright (UCL::SLW)                                             |
+|  Jack Giddings (UCL::JRG)                                          |
++--------------------------------------------------------------------+
+.end literal
+.page
+.literal
++--------------------------------------------------------------------+
+|  MAG_WRITE                                                         |
+|   Write a block to tape.                                           |
++--------------------------------------------------------------------+
+|                                                                    |
+|  A supplied byte array is written to tape as a single block.       |
+|                                                                    |
++--------------------------------------------------------------------+
+|                                                                    |
+|  CALL MAG_WRITE(TD, NVAL, VALUES, ACTVAL, STATUS)                  |
+|                                                                    |
+|                                                                    |
+|  TD=INTEGER                                                        |
+|        A variable containing the tape descriptor.                  |
+|                                                                    |
+|  NVAL=INTEGER                                                      |
+|        Expression specifying the number of bytes to be written     |
+|        to tape as a single block.                                  |
+|                                                                    |
+|  VALUES(NVAL)=BYTE                                                 |
+|        Array containing the data to be written to tape.            |
+|                                                                    |
+|  ACTVAL=INTEGER                                                    |
+|        Variable to receive the actual number of bytes written.     |
+|                                                                    |
+|  STATUS=INTEGER                                                    |
+|        Variable holding the status value.                          |
+|        If this variable is not SAI__OK on input, then the routine  |
+|        will return without action.                                 |
+|        If the routine fails to complete, this variable will be set |
+|        to an appropriate error number.                             |
+|                                                                    |
++--------------------------------------------------------------------+
+|  Sid Wright (UCL::SLW)                                             |
+|  Jack Giddings (UCL::JRG)                                          |
++--------------------------------------------------------------------+
+.end literal
+.page
+.literal
++--------------------------------------------------------------------+
+|  MAG_WTM                                                           |
+|   Write tape mark                                                  |
++--------------------------------------------------------------------+
+|                                                                    |
+|  A tape mark is written at the current tape position.              |
+|                                                                    |
++--------------------------------------------------------------------+
+|                                                                    |
+|  CALL MAG_WTM(TD, STATUS)                                          |
+|                                                                    |
+|                                                                    |
+|  TD=INTEGER                                                        |
+|        A variable containing the tape descriptor.                  |
+|                                                                    |
+|  STATUS=INTEGER                                                    |
+|        Variable holding the status value.                          |
+|        If this variable is not SAI__OK on input, then the routine  |
+|        will return without action.                                 |
+|        If the routine fails to complete, this variable will be set |
+|        to an appropriate error number.                             |
+|                                                                    |
++--------------------------------------------------------------------+
+|  Sid Wright (UCL::SLW)                                             |
+|  Jack Giddings (UCL::JRG)                                          |
++--------------------------------------------------------------------+
+.end literal

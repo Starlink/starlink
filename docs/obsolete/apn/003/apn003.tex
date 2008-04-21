@@ -1,0 +1,552 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {ADAM Programmer's Note}
+\newcommand{\stardocinitials}  {APN}
+\newcommand{\stardocnumber}    {3.3}
+\newcommand{\stardocauthors}   {A J Chipperfield}
+\newcommand{\stardocdate}      {27 February 1990}
+\newcommand{\stardoctitle}     {SGS --- ADAM Programmer's Guide}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%+                              M A N . S T Y
+%
+%  Module name:
+%    MAN.STY
+%
+%  Function:
+%    Starlink definitions for \LaTeX\ macros used in MAN output
+%
+%  Description:
+%    As much as possible of the output from the MAN automatic manual generator
+%    uses calls to user-alterable macros rather than direct calls to built-in
+%    \LaTeX\ macros. This file is a version of the MAN default definitions for
+%    these macros modified for Starlink preferences.
+%
+%  Language:
+%    \LaTeX
+%
+%  Support:
+%    William Lupton, {AAO}
+%    Alan Chipperfield (RAL)
+%-
+%  History:
+%    16-Nov-88 - WFL - Add definitions to permit hyphenation to work on
+%		 words containing special characters and in teletype fonts.
+%    27-Feb-89 - AJC - Redefine \manroutine
+%                      Added \manheadstyle
+%                      Switch order of argument descriptors
+%    07-Mar-89 - AJC - Narrower box for parameter description
+%                      Remove Intro section and other unused bits
+%
+% permit hyphenation when in teletype font (support 9,10,11,12 point only -
+% could extend), define lccodes for special characters so that the hyphen-
+% ation algorithm is not switched off. Define underscore character to be
+% explicit underscore rather than lots of kerns etc.
+
+\hyphenchar\nintt=`-\hyphenchar\tentt=`-\hyphenchar\elvtt=`-\hyphenchar\twltt=`-
+
+\lccode`_=`_\lccode`$=`$
+
+\renewcommand{\_}{{\tt\char'137}}
+%+                      M A N _ S U M M A R Y
+%
+%  Section name:
+%    MAN_SUMMARY
+%
+%  Function:
+%    Macros used in the .TEX_SUMMARY file
+%
+%  Description:
+%    There is a command to introduce a new section (mansection) and a list-like
+%    environment (mansectionroutines) that handles the list of routines in the
+%    current section. In addition a mansectionitem command can be used instead
+%    of the item command to introduce a new routine in the current section.
+%-
+
+\newcommand {\mansection}[2]{\subsection{#1 --- #2}}
+
+\newenvironment {mansectionroutines}{\begin{description}\begin{description}}%
+{\end{description}\end{description}}
+
+\newcommand {\mansectionitem}[1]{\item [#1:] \mbox{}}
+
+%+                      M A N _ D E S C R
+%
+%  Section name:
+%    MAN_DESCR
+%
+%  Function:
+%    Macros used in the .TEX_DESCR file
+%
+%  Description:
+%    There is a command to introduce a new routine (manroutine) and a list-like
+%    environment (manroutinedescription) that handles the list of paragraphs
+%    describing the current routine. In addition a manroutineitem command can
+%    be used instead of the item command to introduce a new paragraph for the
+%    current routine.
+%
+%    Two-column tables (the ones that can occur anywhere and which are
+%    triggered by "=>" as the second token on a line) are bracketed by a
+%    new environment (mantwocolumntable). Other sorts of table are introduced
+%    by relevant  environments (manparametertable, manfunctiontable and
+%    manvaluetable). The definitions of these environments call various other
+%    user-alterable commands, thus allowing considerable user control over such
+%    tables... (to be filled in when the commands have been written)
+%-
+
+\newcommand {\manrule}{\rule{\textwidth}{0.5mm}}
+
+%\newcommand {\manroutine}[2]{\subsection{#1 --- #2}}
+\newlength{\speccaption}
+\newlength{\specname}
+\newcommand{\manroutine}[2]{\goodbreak
+                          \rule{\textwidth}{0.5mm}  % draw thick line
+                          \settowidth{\specname}{{\Large {\bf #1}}}
+                        % left and right box width is text width plus gap
+                          \addtolength{\specname}{4ex} 
+                        % caption width is width of page less the two names
+                        % less than empirical fudge factor
+                          \setlength{\speccaption}{\textwidth}
+                          \addtolength{\speccaption}{-2.0\specname}
+                          \addtolength{\speccaption}{-4.45pt}
+                        % move text up the page because \flushleft environ-
+                        % ment creates a paragraph
+                          \vspace{-7mm}
+                          \newline
+                          \parbox[t]{\specname}{\flushleft{\Large {\bf #1}}}
+                          \parbox[t]{\speccaption}{\flushleft{\Large #2}}
+                          \parbox[t]{\specname}{\flushright{\Large {\bf #1}}}
+                          }
+
+\newenvironment {manroutinedescription}{\begin{description}}{\end{description}}
+
+\newcommand {\manroutineitem}[2]{\item [#1:] #2\mbox{}}
+
+
+% parameter tables
+
+\newcommand {\manparametercols}{lllp{75mm}}
+
+\newcommand {\manparameterorder}[3]{#2 & #3 & #1 &}
+
+\newcommand {\manparametertop}{}
+
+\newcommand {\manparameterblank}{\gdef\manparameterzhl{}\gdef\manparameterzss{}}
+
+\newcommand {\manparameterbottom}{}
+
+\newenvironment {manparametertable}{\gdef\manparameterzss{}%
+\gdef\manparameterzhl{}\hspace*{\fill}\vspace*{-\partopsep}\begin{trivlist}%
+\item[]\begin{tabular}{\manparametercols}\manparametertop}{\manparameterbottom%
+\end{tabular}\end{trivlist}}
+
+\newcommand {\manparameterentry}[3]{\manparameterzss\gdef\manparameterzss{\\}%
+\gdef\manparameterzhl{\hline}\manparameterorder{#1}{#2}{#3}}
+
+
+% list environments
+
+\newenvironment {manenumerate}{\begin{enumerate}}{\end{enumerate}}
+
+\newcommand {\manenumerateitem}[1]{\item [#1]}
+
+\newenvironment {manitemize}{\begin{itemize}}{\end{itemize}}
+
+\newcommand {\manitemizeitem}{\item}
+
+\newenvironment {mandescription}{\begin{description}\begin{description}}%
+{\end{description}\end{description}}
+
+\newcommand {\mandescriptionitem}[1]{\item [#1]}
+
+\newcommand {\mantt}{\tt}
+
+% manheadstyle for Starlink
+\newcommand {\manheadstyle}{}
+
+\catcode`\$=12 \catcode`\_=12
+\font\tt=CMTT10 scaled 1095
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+%------------------------------------------------------------------------------
+%  Add this part if you want a table of contents
+%  \setlength{\parskip}{0mm}
+%  \tableofcontents
+%  \setlength{\parskip}{\medskipamount}
+%  \markright{\stardocname}
+%------------------------------------------------------------------------------
+
+\section{INTRODUCTION}
+This guide describes the use of the Simple Graphics System (SGS)
+in ADAM application programs.
+It is expected that the reader is familiar with programming for
+ADAM and with SGS.
+
+\section{APPLICATION}
+First ask yourself `Should I be using SGS?'.
+The answer to this question should probably be `No' because higher-level
+graphics packages  NCAR (see SUN/88) or DIAGRAM (see SUN/54) should be
+adequate for most application programs wanting to do graphics.
+In addition, AGI, the Applications Graphics Interface (see SUN/48), now
+provides a more versatile way of handling graphical information.
+There are some applications, however, for which the high level packages are
+not appropriate and SGS or even GKS should be considered.
+
+SGS (The Simple Graphics System) in its stand-alone use is fully described 
+in SUN/85.
+This guide will therefore only deal with issues relating to use of SGS in
+ADAM application programs.
+
+All SGS routines may be used in ADAM applications with the exception of the
+following routines, which must {\em never} be called in ADAM programs :
+\begin{itemize}
+\item SGS\_INIT
+\item SGS\_OPEN
+\item SGS\_OPNWK
+\item SGS\_CLOSE
+\end{itemize}
+The functions of SGS\_INIT, SGS\_OPEN and SGS\_OPNWK are performed by the
+Environment routine SGS\_ASSOC.
+The Environment routines SGS\_ANNUL and SGS\_CANCL dispose of resources used in
+SGS programs.
+SGS\_CLOSE will be called by the environment-level SGS de-activation routine
+SGS\_DEACT.
+
+\section{THE SGS PARAMETER ROUTINES}
+As with all other packages in the Software Environment, the only access to
+objects outside of application programs is via Program Parameters.
+SGS has three environment-level subroutines (the SGS `parameter' or SGSPAR 
+routines) which provide the necessary interaction with the outside world.
+They are :
+
+\begin{center}
+\begin{tabular}{||l|l||} \hline
+Subroutine & Function \\ \hline
+SGS\_ASSOC  & Associate a graphics workstation with a parameter and open it.\\
+SGS\_ANNUL  & Close a graphics workstation without cancelling the parameter.\\
+SGS\_CANCL  & Close a graphics workstation and cancel the parameter.\\
+SGS\_DEACT  & De-activate ADAM SGS.\\ \hline
+\end{tabular}
+\end{center}
+
+Here is a skeletal example of a program using SGS :
+\begin{quote}
+\begin{verbatim}
+      SUBROUTINE SGSTEST( STATUS )
+      ..
+      INTEGER STATUS
+      INTEGER ZONE
+
+      ..
+*    Obtain Zone on a graphics workstation
+      CALL SGS_ASSOC('DEVICE', 'WRITE', ZONE, STATUS)
+      IF (STATUS .EQ. SAI__OK) THEN
+
+         ..
+
+*       Perform graphics operations on the zone
+
+         ..
+
+*       Release Zone
+         CALL SGS_ANNUL(ZONE, STATUS)
+      ENDIF
+
+      ..
+
+      CALL SGS_DEACT (STATUS)
+
+\end{verbatim}
+\end{quote}
+
+SGS\_ASSOC should be the first SGS routine to be called in the application.
+It obtains (via the parameter system) the name of the graphics workstation 
+to be used, creates an initial SGS zone on the workstation, and returns an
+SGS zone identifier which can be used in subsequent SGS subroutine calls.
+
+The first argument of SGS\_ASSOC is a Program Parameter (which should be defined
+to be a graphics device parameter in the Interface Module for the application).
+The parameter should be given a name as a value and the name should be a
+workstation name as defined by GNS (see SUN/57).
+
+The second argument is the access mode required. This can be one of :
+\begin{description}
+\item[READ]   The application is only going to `read' from the workstation
+({\em i.e.}\ perform cursor or similar operations). 
+Screens will not be cleared when vdu workstations are opened.
+\item[WRITE]  The application is going to `write' on the workstation,
+{\em i.e.}\ actually do some graphics. 
+Workstations are completely initialized when they are opened.
+\item[UPDATE] The application will modify the graphics on the workstation.
+Screens will not be cleared when vdu workstations are opened.
+\end{description}
+
+Note that the facility to prevent screen clearing is specific to RAL GKS and
+is not implemented for all workstations.
+
+The third argument is the SGS zone identifier returned to the application.
+
+The fourth argument is the usual status value. It follows the ADAM error
+strategy as described in SG/4.
+
+When the application has finished using the workstation, it should be closed
+using SGS\_CANCL unless it is required to keep the parameter active 
+(to update a global parameter for example), in which case SGS\_ANNUL 
+should be used.
+
+When the application has finished using SGS, it should be de-activated by
+calling SGS_DEACT.
+
+\section{INTERFACE FILE}
+An simple interface file for the above example would be:
+\begin{quote}
+\begin{verbatim}
+## SGSTEST
+
+interface SGSTEST
+
+   parameter	DEVICE
+      ptype		'DEVICE'
+      position		1
+      type		'GRAPHICS'
+      access		'read'
+      vpath		'prompt'
+      help		'name of workstation to be used'
+      default           PERICOM_MG
+   endparameter
+
+endinterface
+\end{verbatim}
+\end{quote}
+
+\section{ERROR HANDLING}
+The SGS parameter routines conform to the Starlink error reporting and
+inherited status strategy described in SUN/104.
+Error reports will generally be of the form:
+\begin{quote}
+\begin{verbatim}
+ROUTINE_NAME: Text
+\end{verbatim}
+\end{quote}
+but where there routine name is not useful, it will be omitted.
+
+If it is required to test for particular status values, symbolic names should
+be used. 
+They can be defined by including, in the application,  the statements:
+\begin{quote}
+\begin{verbatim}
+INCLUDE 'SAE_PAR'   ! To define SAI__OK etc.
+INCLUDE 'SGS_ERR'   ! To define the SGS__ error values
+\end{verbatim}
+\end{quote}
+The names are listed in Section \ref{errs}.
+
+Note that a substitute SGS error handling routine is linked with ADAM
+applications.
+This will result in conforming error reports and ADAM status values being 
+returned, even from SGS stand-alone routines.
+
+\section{COMPILING AND LINKING}
+The normal ADAM compiling and linking procedures will make both the SGSPAR
+and SGS stand-alone routines available.
+For example:
+\begin{quote}
+\begin{verbatim}
+$ ADAMSTART
+$ ADAMDEV
+$ ALINK program
+\end{verbatim}
+\end{quote}
+
+\section{ADDITIONAL MATERIAL}
+\begin{itemize}
+\item Starlink Guide 4 : {\it ADAM --- The Starlink Software Environment}
+\item Starlink User Note 57 : {\it GNS --- Graphics Workstation Name Service}
+\item Starlink User Note 85 : {\it SGS --- Simple Graphics System}
+\item Starlink User Note 48 : {\it AGI --- Applications Graphics Interface}
+\item Starlink User Note 54 : {\it DIAGRAM --- A High Level Graphics Package}
+\item Starlink User Note 88 : {\it NCAR --- Graphics Utilities}
+\item Starlink User Note 104 : {\it MSG and ERR --- Message and Error Reporting
+Systems}
+\end{itemize}
+
+\section{SGS STATUS VALUES}
+\label{errs}
+The following status values may be returned by the SGS parameter
+routines.
+
+\begin{tabular}{ll}
+SGS\_\_BADWK     & Bad Workstation name \\
+SGS\_\_BADWT     & Bad Workstation type \\
+SGS\_\_GKSER     & GKS Error \\
+SGS\_\_GNSER     & Error returned by GNS routine \\
+SGS\_\_ILLAC     & Illegal access mode \\
+SGS\_\_INQER     & Error returned by GKS inquiry routine \\
+SGS\_\_INVZN     & Invalid zone id \\
+SGS\_\_ISACT     & Parameter currently active \\
+SGS\_\_PENER     & SGS pen does not exist \\
+SGS\_\_SGSER     & Unspecified SGS error \\
+SGS\_\_SURFN     & Display surface is not empty \\
+SGS\_\_SVCRP     & Save data is corrupt \\
+SGS\_\_TOOZD     & No more available zone descriptors \\
+SGS\_\_UNKPA     & Parameter not found \\
+SGS\_\_UNOPN     & Workstation could not be opened \\
+SGS\_\_WRKEX     & Too many Workstations \\
+SGS\_\_ZEREX     & Zero Extent \\
+SGS\_\_ZNOUT     & New zone not inside current zone \\
+SGS\_\_ZNZEX     & Too many Zones \\
+SGS\_\_ZONNB     & Specified zone is not a base zone \\
+SGS\_\_ZONNF     & Specified zone does not exist \\
+SGS\_\_ZONTB     & Requested zone bigger than current zone 
+\end{tabular}
+
+
+
+
+
+\newpage
+\section{ROUTINE DESCRIPTIONS}
+\manroutine {{\manheadstyle{SGS\_ANNUL}}}{ Close a graphics workstation without %
+cancelling the parameter}
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+     De-activate and close the graphics workstation whose base zone 
+     ({\mantt{ZONE}}) was obtained using {\mantt{SGS\_ASSOC}}, and annul 
+     the zone identifier.
+     Do not cancel the associated parameter.
+\manroutineitem {Invocation }{}
+     {\mantt{CALL}} {\mantt{SGS\_ANNUL}} ( {\mantt{ZONE}}, {\mantt{STATUS}} )
+\manroutineitem {Arguments }{}
+\begin{manparametertable}
+\manparameterentry {Modified}{{\mantt{ZONE}} }{{\mantt{INTEGER}} }
+           A variable containing the base zone identifier.
+\manparameterentry {Modified}{{\mantt{STATUS}} }{{\mantt{INTEGER}} }
+           Variable to contain the status. This routine is executed
+           regardless of the import value of status.
+           If its input value is not {\mantt{SAI\_\_OK}} then it is left %
+unchanged
+           by this routine, even if it fails to complete.   If its
+           input value is {\mantt{SAI\_\_OK}} and this routine fails, then the
+           value is changed to an appropriate error number.
+\end{manparametertable}
+\manroutineitem {Authors }{}
+     Sid Wright. ({\mantt{UCL}}::{\mantt{SLW}})
+\end{manroutinedescription}
+\manroutine {{\manheadstyle{SGS\_ASSOC}}}{ Associate a graphics workstation with a %
+parameter, and open it.}
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+     Associate a graphics workstation with the specified Graphics
+     Device Parameter and return an {\mantt{SGS}} zone identifier to reference
+     the base zone of the workstation.
+\manroutineitem {Invocation }{}
+     {\mantt{CALL}} {\mantt{SGS\_ASSOC}} ( {\mantt{PNAME}}, {\mantt{MODE}}; {%
+\mantt{ZONE}}, {\mantt{STATUS}})
+\manroutineitem {Arguments }{}
+\begin{manparametertable}
+\manparameterentry {Given}{{\mantt{PNAME}} }{{\mantt{CHARACTER*}}({\mantt{*}}) }
+
+           Expression specifying the name of a graphics parameter.
+\manparameterentry {Given}{{\mantt{MODE}} }{{\mantt{CHARACTER*}}({\mantt{*}}) }
+           Expression specifying the access mode.
+           If it is '{\mantt{READ}}' or '{\mantt{UPDATE}}', a vdu workstation %
+screen
+           will not be cleared when the workstation is opened.
+           (Note that this facility is not implemented on all
+workstations.)
+           If it is '{\mantt{WRITE}}', the screen will be cleared as usual.
+\manparameterentry {Returned}{{\mantt{ZONE}} }{{\mantt{INTEGER}} }
+           A Variable to contain the Zone identifier.
+\manparameterentry {Modified}{{\mantt{STATUS}} }{{\mantt{INTEGER}} }
+           Variable holding the status value.   If this variable
+           is not {\mantt{SAI\_\_OK}} on input, then the routine will return
+           without action.   If the routine fails to complete,
+           this variable will be set to an appropriate error
+           number.
+\end{manparametertable}
+\manroutineitem {Authors }{}
+     Sid Wright.  ({\mantt{UCL}}::{\mantt{SLW}})
+     A J Chipperfield.  ({\mantt{RAL}}::{\mantt{AJC}})
+\end{manroutinedescription}
+\manroutine {{\manheadstyle{SGS\_CANCL}}}{ Close a graphics workstation and cancel %
+the parameter.}
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+     De-activate and close the graphics workstation associated with
+     the specified graphics device parameter and cancel the parameter.
+     The workstation must have been opened using {\mantt{SGS\_ASSOC}}.
+\manroutineitem {Invocation }{}
+     {\mantt{CALL}} {\mantt{SGS\_CANCL}} ( {\mantt{PNAME}}; {\mantt{STATUS}} )
+\manroutineitem {Arguments }{}
+\begin{manparametertable}
+\manparameterentry {Given}{{\mantt{PNAME}} }{{\mantt{CHARACTER*}}({\mantt{*}}) }
+
+           Expression specifying the name of a Graphics Device
+           Parameter.
+\manparameterentry {Modified}{{\mantt{STATUS}} }{{\mantt{INTEGER}} }
+           Variable holding the status value.
+           The routine will attempt to execute regardless of the input
+           value of this variable.
+           If its input value is not {\mantt{SAI\_\_OK}} then it is left %
+unchanged
+           by this routine, even if it fails to complete.   If its
+           input value is {\mantt{SAI\_\_OK}} and this routine fails, then the
+           value is changed to an appropriate error number.
+\end{manparametertable}
+\manroutineitem {Authors }{}
+     Sid Wright.  ({\mantt{UCL}}::{\mantt{SLW}})
+\end{manroutinedescription}
+\manroutine {{\manheadstyle{SGS\_DEACT}}}{ De-activate {\mantt{ADAM}} {\mantt{SGS}}.}
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+     De-activate {\mantt{ADAM}} {\mantt{SGS}} after use by an application.
+\manroutineitem {Invocation }{}
+     {\mantt{CALL}} {\mantt{SGS\_DEACT}} ( {\mantt{STATUS}} )
+\manroutineitem {Arguments }{}
+\begin{manparametertable}
+\manparameterentry {Modified}{{\mantt{STATUS}} }{{\mantt{INTEGER}} }
+           Variable to contain the status. This routine is executed
+           regardless of the import value of status.
+           If its input value is not {\mantt{SAI\_\_OK}} then it is left %
+unchanged
+           by this routine, even if it fails to complete.   If its
+           input value is {\mantt{SAI\_\_OK}} and this routine fails, then the
+           value is changed to an appropriate error number.
+\end{manparametertable}
+\manroutineitem {Authors }{}
+     Sid Wright.  ({\mantt{UCL}}::{\mantt{SLW}})
+\end{manroutinedescription}
+
+\manrule
+ 
+\end{document}
