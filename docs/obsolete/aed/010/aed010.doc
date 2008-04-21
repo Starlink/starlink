@@ -1,0 +1,228 @@
+
+
+
+SCIENCE AND ENGINEERING RESEARCH COUNCIL                      AED/10.2
+ROYAL OBSERVATORY EDINBURGH
+and UNIVERSITY OF EDINBURGH
+
+ADAM Project                                                 Issued by
+ADAM Environment Description 10.2
+
+                                                             B D Kelly
+                                                          G I Thompson
+                                                      5 September 1987
+
+----------------------------------------------------------------------
+
+                       The ADAM Logging System
+                       -----------------------
+
+
+
+
+
+1  SUMMARY
+
+The ADAM logging system is a subroutine  interface  allowing  multiple
+tasks  read  and write access to an ADAM logfile, which is implemented
+as an RMS sequential file with fixed-length records.  Each  record  in
+the file contains the VMS system time followed by the name of the task
+which wrote the record, followed by a CHARACTER*132 string  containing
+whatever  information  is  being  logged.  Multiple safe access to the
+file is achieved by using the VMS LOCK MANAGER on a name based on  the
+file id.
+
+This document applies to ADAM version 1.2.
+
+
+
+2  OPENING AND CLOSING LOGGING
+
+A process can open a logfile for either READ or WRITE access.   If  it
+is  going to write to logfiles it must first initialize the LOG system
+by  specifying  its  identifying   process   name   in   a   call   to
+LOG_INIT_WRITE.   Subsequently,  files  can  be  opened and closed for
+write access using LOG_OPEN_WRITE and LOG_CLOSE_WRITE.
+
+If only read access is required, the INIT call is not necessary.   The
+routines  LOG_OPEN_READ  and  LOG_CLOSE_READ  are used for opening and
+closing files.
+
+Note that only one logfile can be open at any one time.
+
+
+
+
+
+                                - 1 -
+AED/10.2                                                        Page 2
+
+
+2.1  LOG_INIT_WRITE ( TASKNAME, STATUS )
+
+TASKNAME is the name by which this task wishes  to  be  known  to  the
+logging  system.   It is automatically embedded in all records written
+by this task.  Probably, it should generally be made equal to the name
+returned by ADAM_PRCNAM.
+
+
+
+2.2  LOG_OPEN_WRITE ( FILENAME, MESSAGE, STATUS )
+
+The logfile is opened and the use of the lock manager is initiated.
+
+FILENAME is the name of the file to be opened.
+
+MESSAGE is a string in which is returned informative messages
+  "opening a logfile"
+  "logfile opened at <time>"
+
+If  the  log  file  does  not  already  exist  when   a   task   calls
+LOG_INIT_WRITE, then it is created.
+
+
+
+2.3  LOG_CLOSE_WRITE ( NOT_REP, STATUS )
+
+The log file is closed and use of the lock  manager  is  discontinued.
+This routine executes even if STATUS is not ok on entry.
+
+NOT_REP is a logical value which is returned as .TRUE.  if no file was
+opened for writing.
+
+
+
+2.4  LOG_OPEN_READ ( FILENAME, ISTAT, STATUS )
+
+This opens a logfile for read access.
+
+FILENAME is the name of the file.
+
+ISTAT is an integer which is returned  containing  the  value  of  the
+FORTRAN status from the file open statement.
+
+
+
+2.5  LOG_CLOSE_READ ( STATUS )
+
+Closes a logfile which is open for  reading.   This  routine  executes
+even if STATUS is not ok on entry.
+
+
+
+
+                                - 2 -
+AED/10.2                                                        Page 3
+
+
+3  WRITING TO THE LOG
+
+A single routine is provided for writing new records to the log file.
+
+
+
+3.1  LOG_WRITE ( STRING, STATUS )
+
+STRING is a CHARACTER*132 containing the information  to  be  written.
+LOG_WRITE  determines  the VMS system time in ASCII format and inserts
+it plus the taskname at the start of each  record.   The  contents  of
+STRING are then appended to the record.
+
+
+
+4  READING FROM THE LOG
+
+Utilities are provided for reading from the logfile in the form of the
+ADAMCL command REPFILE and the ADAM task LISTLOG.
+
+It is recommended that these be used for reading logfiles rather  than
+writing new utilities in FORTRAN.
+
+
+
+5  EXAMPLES
+
+The following example shows how a task can write to the log file.
+
+*+  SENDER - task to send records to the ADAM log
+      SUBROUTINE SENDER ( STATUS )
+*    Description :
+*     ADAM task to test writing to the log.
+*    Invocation :
+*     CALL SENDER ( STATUS )
+*    Parameters :
+*     STATUS=INTEGER
+*    Method :
+*     Initialise into the logging system, then write 100 records at 
+*     half second intervals. Finally, close the logging.
+*    Deficiencies :
+*     <description of any deficiencies>
+*    Bugs :
+*     <description of any "bugs" which have not been fixed>
+*    Authors :
+*     B.D.Kelly (REVAD::BDK)
+*    History :
+*     24.02.1986:  Original (REVAD::BDK)
+*     05.09.1987:  use new LOG routines (REVAD::BDK)
+*    endhistory
+*    Type Definitions :
+      IMPLICIT NONE
+
+                                - 3 -
+AED/10.2                                                        Page 4
+
+
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+
+*    Status :
+      INTEGER STATUS
+
+*    Local variables :
+      CHARACTER*132 STRING       ! message written to log
+      INTEGER J                  ! loop counter
+      LOGICAL NOT_REP            ! flag from CLOSE_WRITE
+      CHARACTER*80 MESSAGE       ! info string from OPEN_WRITE
+*-
+
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*
+*   Initialise into logging system
+*
+      CALL LOG_INIT_WRITE ( 'SENDER', STATUS )
+*
+*   Open a logfile
+*
+      CALL LOG_OPEN_WRITE ( 'TESTLOG.REP', MESSAGE, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
+*
+*      Tell user what happened
+*
+         CALL MSG_OUT ( ' ', MESSAGE, STATUS )
+*
+*   Write the messages
+*
+         DO J = 1, 100
+
+            WRITE ( STRING, '(I3,A)' ) J, ' RECORD'
+            CALL LOG_WRITE ( STRING, STATUS )
+            CALL ADAM_WAIT ( 500, STATUS )
+
+         ENDDO
+
+      ENDIF
+
+      CALL LOG_CLOSE ( STATUS )
+
+      END
+
+
+
+
+
+
+
+
+
+                                - 4 -

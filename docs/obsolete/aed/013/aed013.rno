@@ -1,0 +1,193 @@
+.!           Template RUNOFF file for an ADAM Environment Description
+.!           --------------------------------------------------------
+.!
+.!  Replace n.m by the document number
+.!     "    dd,mm,yyyy by the date
+.!     "    *Author* by the document author(s)
+.!     "    *Title* by the title
+.!--------------------------------------------------------
+.title AED/13.1
+.set date 30,10,1986
+.autoparagraph
+.set paragraph 0,1,2
+.layout 3,2
+.page size 57,70
+.flags substitute
+.nofill
+.keep
+.justify
+SCIENCE#AND#ENGINEERING#RESEARCH#COUNCIL AED/13.1
+ROYAL#OBSERVATORY#EDINBURGH
+and#UNIVERSITY#OF#EDINBURGH
+
+ADAM#Project Issued#by
+ADAM#Environment#Description#13.1
+
+.right;J A Cooke
+.right;B D Kelly
+.right;$$date
+
+.fill
+.repeat 70,"-"
+.blank
+.centre;Generating Status Values
+.centre;------------------------
+.!
+.!now switch off overstrike, substitute, accept and uppercase flags
+.!as we wish to use %, $, ^ and _ regularly
+.no flags overstrike
+.no flags substitute
+.no flags accept
+.no flags uppercase
+.!
+.blank 2
+
+.hl 1 INTRODUCTION
+The ADAM system consists of a large number of standard libraries. In 
+addition, a large set of complex tasks, many of them mutually 
+interacting, have been written to run under ADAM. Much of the system and 
+applications call VMS utility routines. It is, therefore, necessary to 
+have some mechanism for defining status values in some standard way 
+which avoids accidental clashes between ADAM system status values and 
+VMS values. This is done by using the VMS MESSAGE utility, plus an ADAM 
+tool called ERRGEN to produce the necessary FORTRAN INCLUDE file.
+
+.hl 1 BACKGROUND READING
+The ADAM MSG and ERR routines are described in AED/14.
+
+.hl 1 GENERATING THE STATUS VALUES
+The symbols for the status values have the form
+.literal
+
+PACKAGE__STATUS
+
+.end literal
+where 'PACKAGE' relates to the library the symbol is associated with, 
+and 'STATUS' is the name of the particular symbol.  The packages each 
+have a unique 'package number';  current ones are given in the file
+"lib_dir:packages.lis". Any new packages should have a package number 
+allocated by ROE (to ensure uniqueness) if they are to use this error
+system. 
+
+Once the code is designed, a number of required symbols, and their 
+associated messages, will have been specified.  The input file for the 
+VMS "message" utility can then be written; an example is given at the 
+end of this document.  The 'package number' must be given in the message 
+utility input file.
+
+The message utility is then invoked with
+.literal
+
+message/list <filename>
+
+.end literal
+where <filename> has default type ".msg".  This produces two output 
+files:  <filename>.obj which is subsequently linked with software 
+wishing to write out the messages, and <filename>.lis which is used as 
+input to the next tool.
+
+The .LIS file should be inspected. If the listing exceeds one page, then
+the file should be edited to remove the extra form-feeds and the headers
+on the second and subsequent pages. 
+
+The <filename>.lis file is processed by the "ERRGEN" tool into an 
+include file for FORTRAN, which should be included in the code which
+references the symbols;  it consists of parameter definitions for all
+the symbol names. This tool is invoked with 
+.literal
+
+errgen <filename>
+
+.end literal
+and produces the output file <filename>.for which is the "include" file.
+Note that this tool is still "verbose" and produces lots of junk whilst 
+it is working. Please ignore this !
+
+.hl 1 SIGNALLING THE ERROR MESSAGES
+The simplest way to signal the messages generated is to use the run-time 
+routine "lib$signal";  given the status return in a variable, e.g. 
+"status", the error can be signalled with
+.literal
+
+      call lib$signal ( %val(status) )
+
+.end literal
+providing that the code calling this routine has been linked with the 
+<filename>.obj file for the particular package.
+For fatal and error conditions, a traceback is produced; for fatal
+conditions the task terminates.  To prevent this (e.g. when displaying
+fatal system messages) there are ADAM utilities 
+.literal
+
+UTIL_CHSEVI ( INSTATUS, OUTSTATUS )
+UTIL_CHSEVE ( INSTATUS, OUTSTATUS )
+
+.end literal
+to change the apparent severity of a given condition to 
+informational and error respectively, but keep the associated message. 
+.page
+.hl 1 Example Message utility source file
+The file should have filetype '.MSG'.
+.literal
+
+.TITLE		MESSYS		ADAM message system
+.FACILITY	MESSYS,110/PREFIX=MESSYS__
+.IDENT		'Version 0.00'
+!author		REVA:ADAM 21Jun84 (John Cooke)
+
+
+.SEVERITY	INFORMATIONAL
+.BASE 100
+
+PATHOPEN	<path already established>
+MESNUM		<maximum message number reached>
+NOTFOUND	<path not found to that task in table lookup>
+NOPRIV		<no privilege for establishing path>
+TIMEOUT		<timeout occurred in messys_receive>
+RESCHED		<reschedule occurred in messys_receive>
+ASTINT		<AST interrupt occurred in messys_receive>
+EXTINT		<external interrupt occurred in messys_receive>
+
+
+.SEVERITY	ERROR
+.BASE 200
+
+COMFULL		<cannot open another path, common block full>
+NONEXIST	<non-existent path pointer>
+MSGFUNC		<error in message function code>
+INTFLG		<error in setting interrupt flag>
+FLAGS		<unknown flag set>
+
+
+.END
+
+.end literal
+
+.page
+.hl 1 EXAMPLE GENERATED FORTRAN INCLUDE FILE
+The MESSAGE utility output listing is generated as a .LIS file. This
+should be inspected. If the listing exceeds one page, then the file
+should be edited to remove the extra form-feeds and the headers on the
+second and subsequent pages. The ADAM ERRGEN utility can then be used to
+create the FORTRAN INCLUDE file with type .FOR. This is an example of
+the output from ERRGEN. 
+.literal
+
+*  Symbol parameter definitions generated by ADAM errgen tool
+*  MESSYSMSG Message definitions 26-JUL-1984 16:06:02  VAX-11 Message V03.00
+*  from SYS$SYSDEVICE:[ADAM.LIB.MESSYS]MESSYSMSG.MSG
+      PARAMETER MESSYS__PATHOPEN = '086E8323'X
+      PARAMETER MESSYS__MESNUM = '086E832B'X
+      PARAMETER MESSYS__NOTFOUND = '086E8333'X
+      PARAMETER MESSYS__NOPRIV = '086E833B'X
+      PARAMETER MESSYS__TIMEOUT = '086E8343'X
+      PARAMETER MESSYS__RESCHED = '086E834B'X
+      PARAMETER MESSYS__ASTINT = '086E8353'X
+      PARAMETER MESSYS__EXTINT = '086E835B'X
+      PARAMETER MESSYS__COMFULL = '086E8642'X
+      PARAMETER MESSYS__NONEXIST = '086E864A'X
+      PARAMETER MESSYS__MSGFUNC = '086E8652'X
+      PARAMETER MESSYS__INTFLG = '086E865A'X
+      PARAMETER MESSYS__FLAGS = '086E8662'X
+
+.end literal

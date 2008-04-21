@@ -1,0 +1,162 @@
+.AF GEROFFDIR:PRELUDE.GRF
+.AEDA 5.3 "Generating Files for the Adam Help System" "J.A.Cooke" "04.03.1986"
+.LEVEL1 "Introduction"
+This document contains information on the ADAM help system relevant to 
+those programmers providing the help information for any part of the 
+ADAM system;  this includes help on system components, and help on 
+specific instruments, D-tasks, A-tasks and so on.  It describes how to 
+write the help source files, and how to convert these into the form 
+required by ADAM user interfaces which display the help to the user when 
+required.
+
+.LEVEL1 "General Information"
+The ADAM help system was specified in ADN/12.1.  It is different from
+VMS help information in several ways;  the most important difference
+being that, firstly, both "brief" and "full" help may be provided on any
+topic. Secondly, as presently specified the system does not allow a deep
+tree structure to the help information;  the help information is
+organised on the basis of having one entry for each topic, and under
+that one entry is held the "brief" information, the "full" information,
+and if required information on any number of subtopics.  There is no
+provision at present for storing data deeper in the structure (i.e.
+subtopics of subtopics). 
+
+The "brief" help information is intended to be no longer than one line 
+of text, which can be displayed by the user interface on one line of the 
+user's terminal screen.  "Full" help and "subtopic" help can be much 
+longer;  it is stored as a long string, with no end-of-line markers, 
+because different user interfaces may require the text in differing 
+widths, and more importantly once name translation is implemented the 
+translation can alter line lengths.  However, information where the 
+format is important can be included in the help information by means of 
+an escape mechanism;  each line which is not to be re-formatted must be 
+enclosed by escape characters (currently backwards single quote, defined 
+in "helpsys_dir:constants.inc").
+
+The help information is entered into a "source" file which uses the VMS 
+help source format.  This file is then used by the "addhelp" utility to 
+add the help information into an already existing help file.  Thus, for 
+example, a copy could be taken of the "ADAMCL" help file, and additional 
+information put into it relating to specific A- and D-tasks for a 
+particular instrument.  Note that it is also possible to over-write 
+entries in the original help file;  this may be required in certain 
+cases, but if not then the person adding help information to a 
+particular file needs to be aware of what is already contained therein.
+
+.LEVEL1 "Help File Creation"
+The stages in setting up an ADAM help file are as follows:
+
+1. Create the help source file using the text editor.  The format is 
+identical to that for VMS help source, except that only two levels are 
+allowed, and there is a specific "level 2" entry name, "HELP_LINE", 
+which may be used to specify the brief help information for each entry 
+in the help structure.  See the example below.  You can best look at the 
+information in this source file by putting it into a VMS help library 
+and running the VMS help system on it (see Appendix).
+
+2. Type the DCL symbol "ADDHELP".  This runs a FORTRAN program which 
+optionally creates the help file. It then adds the help information in
+the help source into the help structure.  It over-writes previous
+entries of the same name, and so can be used to correct or update help
+information.  New entries are created as required.  If you do not
+provide parameters to this command it will prompt for them.  The
+parameters are new file (Y or N), the source file name and the output
+container file name, in that order. 
+
+3. You can look at the structure you have created using any suitable 
+application, e.g. the "LS" (list structure) tool or "TRACE".
+
+.LEVEL1 "Using the Help File"
+When the user interface which uses the help information you have stored 
+is run, the logical name "ADAM_HELP" must be set up to define a 
+directory search path which includes the help system container file.
+
+.LEVEL1 "Example Source File"
+
+.nf
+1 help_level
+The "help_level" switch determines the level of help information 
+output by the system.  Level 1 selects brief help, i.e. when help 
+is requested only the brief help information held in the system is 
+given by default. Level 2 defaults to giving full help information.
+The "auto" setting will adjust the level of help information given 
+depending on the way the system is used.
+2 HELP_LINE
+"help_level" 1 gives brief help, 2 gives full help
+1 beep
+The "beep" switch determines whether or not the SMS system uses the 
+terminal "bell" to signal various conditions to the user.  This can 
+be silenced by setting the switch to "off".
+2 HELP_LINE
+"beep" switches the terminal "bell" on or off as selected
+1 another
+This is another item of help in the help library.  This part is the 
+main text for the help, and can be as long as required (up to 65535 
+characters).  The user interface will format it appropriately to the 
+help device selected by the user.  It should in general be 
+accompanied by a "level 2" entry with the name "HELP_LINE";  this 
+will be used by the help system as the "brief" help information.
+This entry also has two other subtopics, which must also be given as 
+level 2 entries.
+2 HELP_LINE
+I don't know what this command does.
+2 subtopic_1
+This is the help information on the first subtopic, which again can 
+cover as many lines as required.  In the ADAM help system as 
+presently specified, you can't go any deeper than this level.
+2 subtopic_2
+This is the subtopic_2 help information.
+1 table_stuff
+This help item contains tabular information.  The table itself needs 
+to have each line escaped at both ends;  the escape character is 
+currently backwards single quote.
+.uc _
+`This line shows the escape characters at each end.`
+`The next is a blank line:`
+``
+`   Name              Rating`
+`  Lagavulin         excellent`
+`  Jura              no' bad at all`
+`  Talisker          OK if at least 25 yrs old`
+``
+.uc `
+This stuff here should be out of the escaped table format 
+again, and packed up
+to (I think) 72 characters
+per line or whatever is used in the test run.
+2 HELP_LINE
+An example of embedded tabular information that doesn't get 
+reformatted.
+
+.fi
+
+.LEVEL1 "Name Translation"
+A facility in the ADAM help system is that names in the supplied help 
+file may be translated to "public names" under the control of a 
+translation table.  This feature is not yet implemented and will be 
+described in a further version of this document.
+
+.ne 25
+.LEVEL1 "Appendix"
+
+.nf
+Using the VMS help system:
+
+
+1. Create a help library using
+
+$ library/help/create myhelp
+
+
+2. Insert the contents of your help source using
+
+$ library/help/insert myhelp myhelp.hlp
+
+
+3. Run the HELP system on this library with
+
+$ help/lib=<full_directory_spec>:myhelp
+
+
+The help library behaves as a standard VMS help facility.
+.fi

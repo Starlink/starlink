@@ -1,0 +1,394 @@
+.!           Template RUNOFF file for an ADAM Environment Description
+.!           --------------------------------------------------------
+.!
+.!  Replace n.m by the document number
+.!     "    dd,mm,yyyy by the date
+.!     "    *Author* by the document author(s)
+.!     "    *Title* by the title
+.!--------------------------------------------------------
+.title AED/15.1
+.set date 16,12,1986
+.autoparagraph
+.set paragraph 0,1,2
+.layout 3,2
+.page size 57,70
+.flags substitute
+.nofill
+.keep
+.justify
+SCIENCE#AND#ENGINEERING#RESEARCH#COUNCIL AED/15.1
+ROYAL#OBSERVATORY#EDINBURGH
+and#UNIVERSITY#OF#EDINBURGH
+
+ADAM#Project Issued#by
+ADAM#Environment#Description#15.1
+
+.right;B D Kelly       
+.right;$$date
+
+.fill
+.repeat 70,"-"
+.blank
+.centre;Using the ADAM Parameter System
+.centre;-------------------------------
+.!
+.!now switch off overstrike, substitute, accept and uppercase flags
+.!as we wish to use %, $, ^ and _ regularly
+.no flags overstrike
+.no flags substitute
+.no flags accept
+.no flags uppercase
+.!
+.blank 2
+
+.hl 1 INTRODUCTION
+This document refers to ADAM version 1.1. Its applicability to other 
+versions should be checked in the release notes.
+
+The document tries to fill-in gaps in understanding left by AED/1, AED/3 
+and AED/8. It does this by touching on the way the parameter system is 
+actually implemented in the hope that this will help programmers to 
+understand behaviour not explicitly described in the other documents.
+
+.hl 1 BACKGROUND READING
+A very simple overview of ADAM is provided by AON/5. An initial 
+introduction to Atask writing is provided by AED/8. A fuller guide to 
+Atask writing is in AED/12. Ctask writing is described in AED/11. 
+Dtask writing is described in AED/1.
+Interface modules are described in AED/3.
+The ADAM command language manual is in AON/1.
+
+.hl 1 PURPOSE OF THE PARAMETER SYSTEM
+The parameter system is primarily for getting information into a task 
+from the outside world. The information may have been provided on the 
+command-line, or prompted for, or may have been defaulted. The 
+information may include where to put output values.
+
+.hl 1 MAIN COMPONENTS OF THE PARAMETER SYSTEM
+The programmer sees the parameter system as two parts. One is a set of 
+subroutines called from the application referring to program parameters 
+by name. The other is the interface file, which is a text file 
+containing declarations for each program parameter.
+
+.hl 1 THE IMPLEMENTATION OF THE PARAMETER SYSTEM
+The parameter system consists of a subroutine library called SUBPAR, 
+which in turn makes use of HDS and the ADAM intertask communication 
+libraries. For parsing the interface files, SUBPAR also uses a special 
+library called PARSECON. Essentially, PARSECON parses the interface file 
+and loads the result into a set of FORTRAN COMMON blocks which can then
+be accessed by SUBPAR. All access to the parameter system from a program
+has to be made via SUBPAR, although the application programmer is not
+normally aware of this. The programmer usually calls subroutines which
+are wrap-arounds for the SUBPAR routines. 
+
+.hl 1 VIEW FROM APPLICATION CODE
+To get the value of an integer parameter, an application normally 
+performs
+.literal
+
+      CALL PAR_GET0I ( PNAME, VALUE, STATUS )
+
+.end literal
+where PNAME is a character string containing the name of a parameter and 
+VALUE is an INTEGER variable to contain the result. There are a number 
+of routines belonging to the PAR library (see APN/6). Another example is
+.literal
+
+      CALL PAR_PUT0I ( PNAME, VALUE, STATUS )
+
+.end literal
+where PNAME is still the parameter name, but VALUE now contains the 
+integer to be put somewhere. The parameter system gets the information 
+about where the value is to be put (eg. by prompting the user for an HDS 
+name) and stores it there.
+
+Other routines belonging to other libraries which in turn call SUBPAR 
+include DAT_ASSOC, GKS_ASSOC, MSG_OUT, ERR_REP and so on.
+
+.hl 1 VIEW FROM THE INTERFACE FILE
+The interface file is a text file of type .IFL which contains 
+declarations for each of the program parameters. When an ADAM task 
+starts up, it looks for a .IFC file (see below) in the same directory as 
+its .EXE. If it doesn't find one, it reads the .IFL, parses it, and 
+stores the result in the SUBPAR COMMON blocks. A .IFC file is simply a 
+copy of the COMMON blocks dumped to disk, so reading the .IFC is a lot 
+faster than having to parse the .IFL. An ADAM program which is invoked 
+by the DCL command COMPIFL is used to generate a .IFC from a .IFL.
+
+The SUBPAR COMMON blocks contain all the information that was specified 
+in the .IFL. Any information coming into the task concerning a parameter 
+(ie its 'value') is interpreted with the help of the COMMON block data 
+before being stored. Typically, this involves converting the 'value' 
+from a text string into the type specified for the parameter and storing 
+the result. This conversion is, naturally,  not applied if the 'value' 
+is actually an HDS name. In this instance the name is stored.
+
+If the parameter system detects that it is necessary to prompt for a 
+value, then it collects the various relevant pieces of information such 
+as one-line help, default value and prompt string and gives them to the 
+user interface which can use them as necessary.
+
+.hl 1 PARAMETER STATES
+Each parameter for a loaded task is at any instant in a particular 
+'state'. The valid states are GROUND, ACTIVE, CANCELLED and ANNULLED.
+All parameters start out in the GROUND state. A parameter passes to the 
+ACTIVE state when it is given a value. A parameter passes into the 
+CANCELLED state if the application calls PAR_CANCL or DAT_CANCL or 
+equivalent. A parameter passes into the ANNULLED state if the user 
+responds to a prompt for that parameter with an exclamation mark.
+
+If a parameter is in the GROUND or CANCELLED states, a call to get a 
+value for the parameter results in the VPATH being followed to obtain a 
+value. If the parameter is in the ACTIVE state, its value is returned. 
+If the parameter is in the ANNULLED state, the status PAR__NULL is 
+returned. A parameter can be moved from the ANNULLED state to the 
+CANCELLED state by calls such as PAR_CANCL.
+
+.hl 1 STORAGE OF PARAMETER VALUES
+Normally, parameter values are stored in an HDS file. This is so that 
+the values have a lifetime greater than the time for which the task is 
+loaded. This makes it possible to tell the task to take the same value 
+for a parameter as it had the last time it was executed. The parameter 
+files are stored in a subdirectory with logical name ADAM_USER. It may 
+be instructive to use the ADAM task TRACE to inspect various HDS files
+found in ADAM_USER. (Note: ADAM_USER is generally a JOB logical name 
+defined for each user. It must not be a PROCESS logical name because the 
+tasks in subprocesses would not be able to 'see' it.)
+
+Each ADAM task has an HDS file in ADAM_USER with the same name as the 
+execution module. This means, of course, that a whole Atask monolith has 
+a single HDS file.
+
+ADAM_USER also contains a file called GLOBAL.SDF which contains the 
+values written via global associations.
+
+.hl 2 Structure of HDS files for Tasks
+Suppose there is a task contained in JUNK.EXE, with interface file 
+JUNK.IFL. The first time this task is loaded it will create 
+ADAM_USER:JUNK.SDF. If the program has a parameter called VAL, then 
+after the program has been run and preferably killed, ADAM_USER:JUNK 
+will be found to contain a component called VAL with the relevant type 
+and containing the parameter value. The program JUNK keeps its .SDF file 
+open for as long as it is loaded. This is why it may be necessary to 
+kill JUNK before the current contents of the file can be scrutinised.
+
+Consider an Atask monolith called PROGS which contains applications 
+called JUNK1 and JUNK2, each of which has a parameter called VAL. After 
+loading PROGS, executing JUNK1 and JUNK2 and killing PROGS, ADAM_USER 
+will be found to contain PROGS.SDF. The file will be found to 
+incorporate structures PROGS.JUNK1 and PROGS.JUNK2. Each of these 
+structures will contain a component called VAL containing the 
+corresponding parameter values.
+
+.hl 2 Global Parameters
+The file GLOBAL.SDF looks very similar to the file for a program. Tasks 
+which write values into GLOBAL close the file immediately the write 
+completes, so there is not the problem of concurrent access which is 
+present for the program files. Let us assume that the application JUNK1 
+in monolith PROGS has the statements in its interface file
+.literal
+
+   .
+   parameter val
+      type '_real'
+      association '->global.prop'
+   endparameter
+   .
+
+.end literal
+then after JUNK1 has executed it will create the PROP component in 
+GLOBAL (if it doesn't exist already) and copy the value of VAL into it.
+
+If the 'value' of VAL was actually an HDS name, then GLOBAL.PROP will be 
+found to be a structure of type 'ADAM_PARNAME' containing a component of 
+type '_CHAR' called NAMEPTR which holds the actual name.
+
+.hl 2 INTERNAL Parameters
+There is a class of parameter which is specified by being given a VPATH 
+of 'INTERNAL'. If such a parameter has a scalar value, then the value is
+not stored in HDS. Instead it is stored in the SUBPAR COMMON blocks. As
+such, its lifetime is not greater than the time for which the task is
+loaded. This type of parameter is primarily designed with Dtask writers
+in mind. It is never prompted for. Its purpose is to provide faster
+access to parameters in real-time programs. 
+
+If a parameter with VPATH 'INTERNAL' has a non-scalar value, then the 
+value is stored in the HDS file for the task.
+
+Calls to PAR_PUT for an internal parameter cause the value to be stored 
+in the relevant place, rather than, for example, prompting for an HDS 
+name.
+
+.hl 1 PARAMETER SYSTEM OPERATIONS AT RUN TIME
+When an ADAM task is loaded but not currently executing it is capable of 
+understanding four commands usually termed 'contexts'. These are GET,
+SET, OBEY and CANCEL. The CANCEL context is only relevant for Dtasks and
+has no particular significance from the point of view of the parameter
+system. 
+
+.hl 2 GET
+The GET context requests the value of a named parameter. This is most 
+relevant for Dtasks. It does not work for monoliths. For Atasks, it only 
+works for parameters which have been SET since the task was last 
+executed, or which automatically take a default or automatically take a 
+global.
+
+.hl 2 SET
+The SET context allows a named parameter to be set to a given value. It 
+does not work for monoliths.
+
+.hl 2 OBEY
+The OBEY context causes a task to execute. Along with the OBEY a set of 
+command-line parameter values may be provided. These are matched-up with 
+the program parameters following declarations in the .IFL.
+
+Calls to parameter system routines within the application cause 
+parameter values to be returned if they already exist - ie if they were 
+previously given in a SET or were provided on the command-line. If the 
+value for a parameter does not already exist, then the parameter system 
+looks for a value following the search-path specified by VPATH.
+
+When any type of task other than a Dtask finishes executing the OBEY, 
+then it deactivates its parameter system. This means that its parameters 
+are no longer 'active', and so, for example, the GET context will be 
+unable to return values for parameters unless it can obtain new values 
+as indicated above.
+
+.hl 1 MONOLITHS
+An Atask MONOLITH is a set of independent Atasks which, purely for 
+efficiency reasons, have been linked together into a single .EXE (see 
+AED/7). As such, it is necessary that the parameters of the different
+tasks remain independent of one another. The areas of the SUBPAR COMMON 
+blocks used by the individual Atasks are marked by pointers, and SUBPAR 
+also 'knows' which Atask is currently being executed and so which 
+section of the parameter data is relevant. This condition only holds 
+true during the operation of an OBEY context, which is why, at present, 
+GET and SET do not work for monoliths. Command-line values CAN be given 
+to MONOLITHS as part of an OBEY.
+
+.hl 1 PROBLEMS
+This section includes a discussion of a selection of items which have 
+caused a significant amount of difficulty in the past.
+
+.hl 2 HDS Corruption.
+On occasion the HDS file for a program has been corrupted for some 
+unknown reason. Guessed explanations include using the DCL STOP command 
+to remove an ADAM task instead of using KILL from a user interface or 
+running the KILLTASK program from DCL. If this occurs, the symptom is a 
+nasty-looking HDS error such as INTEGRITY CHECK whenever the task is 
+executed. The cure is to delete the file in ADAM_USER.
+
+.hl 2 Parameters with VPATH 'CURRENT'
+By definition, a program parameter with a VPATH of 'CURRENT' will keep 
+picking-up the value it had the last time the task was executed. If, for 
+example, the VPATH was actually 'CURRENT,DEFAULT' then this value will 
+be the default which was provided the first time the task was executed. 
+If the actual value of the default is changed in the interface file, 
+this will have no effect because the current value will still be taken. 
+The simplest cure for this is to use the SET context to overwrite the 
+current value. If this is unsatisfactory, a more drastic step is to 
+delete the task's file in ADAM_USER.
+
+.hl 2 Contents of the HDS files
+The TRACE task can be used to look at the HDS files in ADAM_USER. If it 
+is used to look at the file of a task which is currently loaded, it may 
+see an out-of-date copy of the file. This is because the HDS files for 
+tasks are only fully updated when the task is killed. For the same 
+reason, although it is in principle possible to have global associations 
+going directly between programs, it is recommended that they should 
+always be made via the GLOBAL file.
+
+.hl 1 SUBPAR
+It has been mentioned that the 'real' parameter system is implemented by 
+a library called SUBPAR. This library provides a low-level subroutine 
+interface to the parameter system. In general, calls to SUBPAR from 
+applications should be avoided, as its interface isn't really part of 
+the system specification, and the interface may need to change at some 
+time in the future for implementation reasons. Nonetheless, there are 
+circumstances where it may be necessary to use SUBPAR, and these are 
+documented here.
+
+.hl 2 Efficiency of Dtasks
+Dtasks have the following properties. They are real-time programs. They 
+may have large numbers of parameters. Their parameters usually have a 
+VPATH of 'INTERNAL'. Under these circumstances, the execution time of a 
+call to PAR_GET for a scalar parameter may be dominated by the time 
+taken in looking-up the parameter name. The Dtask writer can achieve an 
+optimisation by using SUBPAR_FINDPAR to get an integer which points to 
+the named parameter, and then use other SUBPAR calls to get the actual 
+value. Obviously, the SUBPAR_FINDPAR call only has to be used once for 
+each parameter, for example in DEVINIT.
+.literal
+
+SUBPAR_FINDPAR ( NAME, NAMECODE, STATUS )
+  NAME=CHARACTER*(*) (given)
+        parameter name
+  NAMECODE=INTEGER (returned)
+        pointer to parameter
+  STATUS=INTEGER
+
+SUBPAR_GET0<t> ( NAMECODE, VALUE, STATUS )
+   NAMECODE=INTEGER (given)
+        pointer to parameter
+   VALUE=<type> (returned)
+        value of parameter
+   STATUS=INTEGER
+
+SUBPAR_PUT0<t> ( NAMECODE, VALUE, STATUS )
+   NAMECODE=INTEGER (given)
+        pointer to parameter
+   VALUE=<type> (given)
+        value of parameter
+   STATUS=INTEGER
+
+SUBPAR_CANCL ( NAMECODE, STATUS )
+   NAMECODE=INTEGER (given)
+        pointer to parameter
+   STATUS=INTEGER
+
+.end literal
+
+SUBPAR actually implements a complete set of routines for all the PAR 
+calls and the DAT parameter system calls. However, the routines listed 
+here are the only ones for which the optimisation may be relevant.
+
+.hl 2 SUBPAR calls for library implementors
+Programmers implementing libraries need to call SUBPAR in order to write 
+the subroutines which make the connection between the library and the 
+parameter system. The calls needed are SUBPAR_FINDPAR and SUBPAR_CANCL, 
+as above, and also
+.literal
+
+SUBPAR_GETNAME ( NAMECODE, NAMESTRING, STATUS )
+   NAMECODE=INTEGER ( given)
+        pointer to parameter
+   NAMESTRING=CHARACTER*(*) (returned)
+        string with the syntax of an HDS name
+   STATUS=INTEGER
+
+.end literal
+SUBPAR_GETNAME gets a value following the VPATH for the parameter, but 
+does not perform indirection via HDS. Instead, it checks that the string 
+obtained obeys the syntax of an HDS name, and returns the actual name.
+
+In practice, using the call to SUBPAR_GETNAME means that when a user 
+types-in the name of, say, a physical device, the syntax required might 
+be T4010 rather than 'T4010' (ie. in quotes).
+
+.hl 2 SUBPAR calls for CDtask writers
+If a programmer wishes to have command-line parameter values associated 
+with an action in a CDtask, then he has to declare a NEEDS list in the 
+interface file. If he also wishes the CDtask to be able to prompt for 
+parameter values, he has to 'switch-off' the standard Dtask check for 
+all parameters on the NEEDS list being satisfied. This has to be done in 
+DEVINIT by a call to
+.literal
+
+SUBPAR_SETCHECK ( CHECK, STATUS )
+   CHECK=LOGICAL (given)
+        .TRUE. => enable checking
+        .FALSE.=> disable checking
+   STATUS=INTEGER
+
+.end literal
+with CHECK=.FALSE.
