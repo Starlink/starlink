@@ -42,6 +42,10 @@
 *     specx2ndf in out [gridfile] [telescope] [latitude] [longitude]
 
 *  ADAM Parameters:
+*     AXIS =  _LOGICAL (Read)
+*        AXIS structures will be added to the output NDF if and only if
+*        AXIS is set TRUE. The dynamic default is the current value, which 
+*        initially is TRUE. []
 *     GRIDFILE  =  LITERAL (Read)
 *        The name of a text file to which a schematic of the SPECX map
 *        will be written.  This schematic shows those positions in the
@@ -135,12 +139,12 @@
 *     RA and DEC, and Axis 3 is frequency in units of GHz.  The nature of 
 *     these axes can be changed if necessary by subsequent use of the
 *     WCSATTRIB application within the KAPPA package.  For compatibility 
-*     with older applications, AXIS structures are also added to the 
-*     output cube. Axes 1 and 2 are offsets from the central position of 
-*     the map, with units of seconds of arc, and Axis 3 is frequency
-*     offset in GHz relative to the central frequency.  The pixel origin
-*     is placed at the source position on Axes 1 and 2, and the central
-*     frequency on Axis 3.
+*     with older applications, AXIS structures may also be added to the 
+*     output cube (see parameter AXIS). Axes 1 and 2 are offsets from the 
+*     central position of the map, with units of seconds of arc, and Axis 
+*     3 is frequency offset in GHz relative to the central frequency.  The 
+*     pixel origin is placed at the source position on Axes 1 and 2, and 
+*     the central frequency on Axis 3.
 *
 *     SPECX2NDF reads map files in Version 4.2 or later of the SPECX
 *     data format.  If it is given a map file in an earlier version of
@@ -223,6 +227,8 @@
 *        Use CNF_PVAL
 *     8-FEB-2008 (DSB):
 *        Add a variance component to the output NDF.
+*     21-APR-2008 (DSB):
+*        Add AXIS parameter.
 *     {enter_further_changes_here}
 *-
 
@@ -298,6 +304,7 @@
       INTEGER SPTS             ! Number of points in each spectrum
       LOGICAL APPHST           ! Flag; append history to output cube?
       LOGICAL GRIDFG           ! Flag; write schematic of grid to a file?
+      LOGICAL MKAXIS           ! Create AXIS structures?
       REAL VAR                 ! Constant variance for output spectra
       REAL VERSN               ! Data format version number
 *.
@@ -313,6 +320,9 @@
 
 *  Open the input HDS file.
       CALL DAT_ASSOC( 'IN', 'READ', LOC1, STATUS )
+
+*  See if AXIS structure sare to be added to the output NDF.
+      CALL PAR_GET0L( 'AXIS', MKAXIS, STATUS )
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -437,8 +447,8 @@
 
 *  Add AXIS structures to the output NDF.
          CALL PSX_CALLOC( 6*MXDIM, '_DOUBLE', IPWORK, STATUS )
-         CALL CON_CAXES( INDF1, INDF2, %VAL( CNF_PVAL( IPWORK ) ), 
-     :                   STATUS )
+         CALL CON_CAXES( INDF1, INDF2, MKAXIS, 
+     :                   %VAL( CNF_PVAL( IPWORK ) ), STATUS )
          CALL PSX_FREE( IPWORK, STATUS )
 
 *  Copy any auxilliary information.
@@ -591,8 +601,8 @@
 *  Add AXIS structures to the output NDF.
                CALL PSX_CALLOC( 6*( MUPBND(3) - MLWBND(3) + 1 ), 
      :                          '_DOUBLE', IPWORK, STATUS )
-               CALL CON_CAXES( INDF1, INDF2, %VAL( CNF_PVAL( IPWORK ) ), 
-     :                         STATUS )
+               CALL CON_CAXES( INDF1, INDF2, MKAXIS, 
+     :                         %VAL( CNF_PVAL( IPWORK ) ), STATUS )
                CALL PSX_FREE( IPWORK, STATUS )
 
 *  Set the output NDF label and unit.

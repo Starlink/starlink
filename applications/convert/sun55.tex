@@ -23,10 +23,10 @@
                                 A.J.Chipperfield\\
                                 D.S.Berry\\
                                 A.C.Davenhall}
-\newcommand{\stardocdate}      {2008 February 12}
+\newcommand{\stardocdate}      {2008 April 21}
 \newcommand{\stardoctitle}     {CONVERT\\
                                 A Format-conversion Package}
-\newcommand{\stardocversion}   {Version 1.5-13}
+\newcommand{\stardocversion}   {Version 1.5-14}
 \newcommand{\stardocmanual}    {User's Manual}
 \newcommand{\stardocabstract}  {
 The \CONVERT\ package contains utilities for converting data files
@@ -5878,6 +5878,13 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
    }
    \sstparameters{
       \sstsubsection{
+         AXIS =  _LOGICAL (Read)
+      }{
+         AXIS structures will be added to the output NDF if and only if
+         AXIS is set TRUE. The dynamic default is the current value, which 
+         initially is TRUE. \texttt{[]}
+      }
+      \sstsubsection{
          GRIDFILE  =  LITERAL (Read)
       }{
          The name of a text file to which a schematic of the SPECX map
@@ -6005,8 +6012,8 @@ fits2ndf '"abc.fit,def.fits"' 'fgh,ijk"' fmtcnv='"F,T"' noproexts
       these axes can be changed if necessary by subsequent use of the
       \xref{WCSATTRIB}{sun95}{WCSATTRIB} application within the \KAPPA\ package.
       For compatibility
-      with older applications, AXIS structures are also added to the output
-      cube. Axes 1 and 2 are offsets from the central position of the map,
+      with older applications, AXIS structures may also be added to the output
+      cube (see parameter AXIS). Axes 1 and 2 are offsets from the central position of the map,
       with units of seconds of arc, and Axis 3 is frequency offset in GHz
       relative to the central frequency.  The pixel origin is placed at the
       source position on Axes 1 and 2, and the central frequency on Axis 3.

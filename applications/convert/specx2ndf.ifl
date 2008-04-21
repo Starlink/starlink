@@ -58,6 +58,16 @@ interface SPECX2NDF
       helpkey  '*'
    endparameter
 
+   parameter AXIS                      # Create AXIS structures?
+      type        '_LOGICAL'
+      access      'READ'
+      vpath       'CURRENT,DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Create AXIS structures?'
+      default     'TRUE'
+      helpkey     '*'
+   endparameter
+
    parameter OUT                         # Name of the output cube.
       position    2
       type        'NDF'

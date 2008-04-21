@@ -1,4 +1,4 @@
-      SUBROUTINE CON_CAXES( IMAP, INDF, WORK, STATUS )
+      SUBROUTINE CON_CAXES( IMAP, INDF, MKAXIS, WORK, STATUS )
 *+
 *  Name:
 *     CON_CAXES
@@ -10,7 +10,7 @@
 *     Fortran 77.
 
 *  Invocation:
-*     CALL CON_CAXES( IMAP, INDF, WORK, STATUS )
+*     CALL CON_CAXES( IMAP, INDF, MKAXIS, WORK, STATUS )
 
 *  Description:
 *     Construct the NDF axis components for a SPECX data cube.
@@ -23,6 +23,8 @@
 *        Identifier for the input SPECX map grid.
 *     INDF  =  INTEGER (Given)
 *        Identifier for the output NDF cube.
+*     MKAXIS =  LOGICAL (Given)
+*        Create AXIS structures?
 *     WORK( * ) =  DOUBLE PRECISION (Returned)
 *        A work array. The number of elements in it should be at least 6
 *        times the largest pixel dimension of the output NDF.
@@ -45,6 +47,8 @@
 *        the NDF cube.
 *     2004 September 9 (TIMJ):
 *        Use CNF_PVAL.
+*     21-APR-2008 (DSB):
+*        Added argument MKAXIS.
 *     {enter_further_changes_here}
 
 *-
@@ -60,6 +64,7 @@
 *  Arguments Given:
       INTEGER IMAP
       INTEGER INDF
+      LOGICAL MKAXIS
       DOUBLE PRECISION WORK( * )
 
 *  Status:
@@ -152,8 +157,11 @@
       SHIFT( 3 ) = 1 - LBND( 3 ) - NINT( BPOS( 3 ) ) 
       CALL NDF_SHIFT( 3, SHIFT, INDF, STATUS )      
 
+*  We only do the rest if we are creating AXIS structures.
+      IF( MKAXIS ) THEN
+
 *  Now produce each axis in turn.
-      DO I = 1, 3
+         DO I = 1, 3
 
 *  Fill the work array with the grid coords at the centre of each pixel
 *  along the I'th axis. On axis I, these go from 1.0 at the first pixel
@@ -162,113 +170,114 @@
 *  axis-1 values, followed by a set of axis-2 values, followed by a set 
 *  of axis 3 values. The number of values in each set is equal to the size 
 *  of the I'th pixel axis.
-         L = 1
-         DO K = 1, 3
-            DO J = 1, DIM( I )
-               IF( K .NE. I ) THEN 
-                  WORK( L ) = BPOS( K )
-               ELSE
-                  WORK( L ) = DBLE( J )
-               END IF 
-               L = L + 1
+            L = 1
+            DO K = 1, 3
+               DO J = 1, DIM( I )
+                  IF( K .NE. I ) THEN 
+                     WORK( L ) = BPOS( K )
+                  ELSE
+                     WORK( L ) = DBLE( J )
+                  END IF 
+                  L = L + 1
+               END DO
             END DO
-         END DO
 
 *  Transform the grid coords into the current Frame. The transformed
 *  values are stored at the end of the WORK array.
-         CALL AST_TRANN( IWCS, DIM( I ), 3, DIM( I ), WORK, .TRUE., 3, 
-     :                   DIM( I ), WORK( L ), STATUS ) 
+            CALL AST_TRANN( IWCS, DIM( I ), 3, DIM( I ), WORK, .TRUE.,
+     :                      3, DIM( I ), WORK( L ), STATUS ) 
 
 *  Map the axis centre array. 
-         CALL NDF_AMAP( INDF, 'CENTRE', I, '_DOUBLE', 'WRITE', IPAXIS, 
-     :                  NEL, STATUS )
+            CALL NDF_AMAP( INDF, 'CENTRE', I, '_DOUBLE', 'WRITE', 
+     :                     IPAXIS, NEL, STATUS )
 
 *  For axis 3 (the Frequency axis), we subtract the central frequency, and 
 *  copy them into the AXIS centre array.
-         IF( I .EQ. 3 ) THEN
-            L = L + 2*DIM( 3 )
-            DO J = L, L + DIM( 3 ) - 1
-               WORK( J ) = WORK( J ) - CPOS( 3 )
-            END DO
-            CALL VEC_DTOD( .FALSE., NEL, WORK( L ), 
-     :                     %VAL( CNF_PVAL( IPAXIS ) ),
-     :                     IERR, NERR, STATUS )
+            IF( I .EQ. 3 ) THEN
+               L = L + 2*DIM( 3 )
+               DO J = L, L + DIM( 3 ) - 1
+                  WORK( J ) = WORK( J ) - CPOS( 3 )
+               END DO
+               CALL VEC_DTOD( .FALSE., NEL, WORK( L ), 
+     :                        %VAL( CNF_PVAL( IPAXIS ) ),
+     :                        IERR, NERR, STATUS )
 
 *  For RA and DEC axes, find the arc-distance from the source position at
 *  each pixel centre along the axis. Convert from radians to arc-seconds.
 *  Distances returned by AST_DISTANCE are always positive. So set the sign 
 *  of the distance depending on which side of the central position it is.
-         ELSE
-            DO J = 1, DIM( I )
-               DO K = 0, 2
-                  DPOS( K + 1 ) = WORK( L + K*DIM( I ) )
+            ELSE
+               DO J = 1, DIM( I )
+                  DO K = 0, 2
+                     DPOS( K + 1 ) = WORK( L + K*DIM( I ) )
+                  END DO
+                  L  = L + 1
+	    
+                  WORK( J ) = AST_DISTANCE( IWCS, CPOS, DPOS, STATUS )
+	    
+                  IF( WORK( J ) .NE. AST__BAD ) THEN
+                     WORK( J ) = WORK( J )*3600.0/D2R
+                     IF( SLA_DRANGE( DPOS( I ) - CPOS( I ) ) .LT. 0.0 ) 
+     :                                           WORK( J ) = -WORK( J )
+                  END IF
+	    
                END DO
-               L  = L + 1
-
-               WORK( J ) = AST_DISTANCE( IWCS, CPOS, DPOS, STATUS )
-
-               IF( WORK( J ) .NE. AST__BAD ) THEN
-                  WORK( J ) = WORK( J )*3600.0/D2R
-                  IF( SLA_DRANGE( DPOS( I ) - CPOS( I ) ) .LT. 0.0 ) 
-     :                                        WORK( J ) = -WORK( J )
-               END IF
-
-            END DO
 
 *  Copy these to the AXIS centre array.
-            CALL VEC_DTOD( .FALSE., NEL, WORK, 
-     :                     %VAL( CNF_PVAL( IPAXIS ) ), IERR,
-     :                     NERR, STATUS )
-         END IF
+               CALL VEC_DTOD( .FALSE., NEL, WORK, 
+     :                        %VAL( CNF_PVAL( IPAXIS ) ), IERR,
+     :                        NERR, STATUS )
+            END IF
 
 *  Unmap the AXIS centre array.
-         CALL NDF_AUNMP( INDF, 'CENTRE', I, STATUS )
+            CALL NDF_AUNMP( INDF, 'CENTRE', I, STATUS )
 
 *  Now add units and initialise the starting text for the labels.
-         INCSYM = .FALSE.
-         IF( I .EQ. 3 ) THEN
-            CALL NDF_ACPUT( 'GHz', INDF, 'UNITS', I, STATUS )
-            TEXT = 'Frequency '
-            IAT = 10
-         ELSE 
-            CALL NDF_ACPUT( 'arcsec', INDF, 'UNITS', I, STATUS )
-            IF( POSANG .NE. 0.0 ) THEN
-               INCSYM = .TRUE.
-               IF( I .EQ. 2 ) THEN
-                  TEXT = 'X '
-                  IAT = 2
+            INCSYM = .FALSE.
+            IF( I .EQ. 3 ) THEN
+               CALL NDF_ACPUT( 'GHz', INDF, 'UNITS', I, STATUS )
+               TEXT = 'Frequency '
+               IAT = 10
+            ELSE 
+               CALL NDF_ACPUT( 'arcsec', INDF, 'UNITS', I, STATUS )
+               IF( POSANG .NE. 0.0 ) THEN
+                  INCSYM = .TRUE.
+                  IF( I .EQ. 2 ) THEN
+                     TEXT = 'X '
+                     IAT = 2
+                  ELSE
+                     TEXT = 'Y '
+                     IAT = 2
+                  END IF
                ELSE
-                  TEXT = 'Y '
-                  IAT = 2
-               END IF
-            ELSE
-               IF( I .EQ. 1 ) THEN
-                  TEXT = 'RA '
-                  IAT = 3
-               ELSE
-                  TEXT = 'Dec '
-                  IAT = 4
+                  IF( I .EQ. 1 ) THEN
+                     TEXT = 'RA '
+                     IAT = 3
+                  ELSE
+                     TEXT = 'Dec '
+                     IAT = 4
+                  END IF
                END IF
             END IF
-         END IF
 
 *  Complete the label text by adding the absolute central axis value.
 *  Include the axis symbol if required.
-         CALL CHR_APPND( 'offset from', TEXT, IAT )
-         IAT = IAT + 1
-
-         IF( INCSYM ) THEN
-            CALL CHR_APPND( AST_GETC( IWCS, LA( I ), STATUS ),
-     :                      TEXT, IAT )
+            CALL CHR_APPND( 'offset from', TEXT, IAT )
             IAT = IAT + 1
-         END IF
-
-         CALL CHR_APPND( AST_FORMAT( IWCS, I, CPOS( I ), STATUS ), TEXT,
-     :                   IAT )
+	    
+            IF( INCSYM ) THEN
+               CALL CHR_APPND( AST_GETC( IWCS, LA( I ), STATUS ),
+     :                         TEXT, IAT )
+               IAT = IAT + 1
+            END IF
+	    
+            CALL CHR_APPND( AST_FORMAT( IWCS, I, CPOS( I ), STATUS ), 
+     :                      TEXT, IAT )
 
 *  Store the axis label in the NDF. 
-         CALL NDF_ACPUT( TEXT( : IAT ), INDF, 'LABEL', I, STATUS )
+            CALL NDF_ACPUT( TEXT( : IAT ), INDF, 'LABEL', I, STATUS )
+         END DO
 
-      END DO
+      END IF
 
       END
