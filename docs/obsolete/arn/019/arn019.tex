@@ -4,10 +4,10 @@
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {ADAM Release Note}
 \newcommand{\stardocinitials}  {ARN}
-\newcommand{\stardocnumber}    {19-3.1}
+\newcommand{\stardocnumber}    {19-4.1}
 \newcommand{\stardocauthors}   {A J Chipperfield}
-\newcommand{\stardocdate}      {1 March 1991}
-\newcommand{\stardoctitle}     {ADAM --- Release 1.9-3}
+\newcommand{\stardocdate}      {13 September 1991}
+\newcommand{\stardoctitle}     {ADAM --- Release 1.9-4}
 %------------------------------------------------------------------------------
 
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
@@ -54,64 +54,162 @@ RUTHERFORD APPLETON LABORATORY\\
 %------------------------------------------------------------------------------
 
 \section{SUMMARY}
-This is a partial release of ADAM to update Version 1.9-2. 
+This is a partial release of ADAM to update Version 1.9-3. 
 Full installation instructions are given in the Starlink Software 
 Change Notice.
 
-The main change is to reorganize the files associated with the automatic 
-inclusion of Starlink selected libraries in the development startup and 
-linking procedures.
-Some other minor changes are made to the documentation directories. This note
-also includes a section on SMS enhancements which should have been included
-in ARN019 (and SSN/45).
+The purpose of the release is to change references to the setup procedures
+for HDS and REF in line with the reorganization of those libraries. 
+A new procedure is added to ease the task of starting up an ADAM session.
+
+The opportunity is also taken to update ICL and SMS with some enhancements
+and bug fixes, mainly provided by Chris Mayer from JACH.
 
 It will not be necessary to re-link tasks for this release.
 
 \section{NEW FEATURES IN THIS RELEASE}
 
 \subsection{ADAMSTART}
-ADAMSTART.COM is modified to display the latest ADAM version number.
+ADAMSTART.COM is modified to:
+\begin{itemize}
+\item Display the latest ADAM version number.
+\item Set a PROCESS logical name ADAM\$\_INITDONE to `TRUE'. This may be
+tested by other procedures to determine whether or not ADAMSTART has
+already been obeyed.
+\end{itemize}
 
-\subsection{STAR\_DEV\_ADAM and STAR\_LINK\_ADAM}
-As forewarned in ADAM Release 1.9, the files for automatically including
-standard Starlink libraries in development startup and linking procedures
-are hereby transferred from the ADAM directory structure to the Starlink
-directories. This is so that they may be easily updated as the libraries
-themselves are updated.
+\subsection{ADAMDEV}
+The setup for ADAM application development has been modified as follows:
+\begin{itemize}
+\item Now obeys HDS\_DEV to set up logical names {\em etc.} for HDS 
+application development.\\
+(ADAMDEV.COM, APPLOG.COM)
+\item Now defines symbol REF to be `REF\_DEV'.
+This is a temporary measure to enable user's procedures to continue
+working but they should be modified in accordance with SUN/31.3 as soon as
+possible.
 
-The STAR\_DEV\_ADAM procedure and STAR\_LINK\_ADAM link options file and
-shareable image library are removed from ADAM.
-The null versions of the procedure and options file will remain 
-in ADAM for sites which do not want to include the Starlink libraries.
-They may be selected by modifying the SYSLOGNAM procedure.
+{\em Note that the definition of REF will be removed in the near future.}\\
+(ADAMDEV.COM)
+\item ADAM copies of DAT\_PAR, DAT\_ERR, DAT\_SYS and CMP\_ERR are
+no longer used. The versions in HDS\_DIR (HDS\_TOP\_DIR) are used.\\
+(Modified APPLOG.COM).
+\end{itemize}
 
-\subsection{SYSLOGNAM.COM}
-Files SYSLOGNAM.COM and SYSLOGNAM.MINI now point the logical
-names STAR\_DEV\_ADAM and STAR\_LINK\_ADAM to the appropriate Starlink
-directory.
-If you have modified versions of these files, they should be updated in line
-with the new versions.
+\subsection{SYSDEV}
+The setup for ADAM system development has been modified as follows:
+\begin{itemize}
+\item REF\_DIR is assumed to be set as a SYSTEM logical name.\\
+(Modified DIR.COM)
+\item Logical names for HDS are set by obeying HDS\_TOP\_DIR:LOGICAL.COM as
+before. However, that procedure no longer defines logical names for REF so
+reference to REF is removed from the comment in LIB\_DIR:LOGICAL.COM.\\
+(Modified LOGICAL.COM)
+\item HDS\_DIR is now defined as a SYSTEM logical name pointing to the 
+top-level directory for HDS, therefore a new logical name, HDS\_KERNEL, is used
+for ADAM system development to point to the HDS kernel directory.\\
+(Modified: DIR.COM, ADAMSHARE.COM, LINKNOSHR.OPT)
+\end{itemize}
+{\em Note that further changes in this area are expected when the next version
+of HDS is released.}
+
+\subsection{The ADAM Procedure}
+A new procedure, ADAM\_DIR:ADAM.COM, has been written to merge the sequence
+of instructions formerly required to start up an ADAM session.
+A symbol, ADAM, is defined by SSC:LOGIN.COM to run the procedure.
+\begin{quote} \begin{verbatim}
+$ ADAM command
+\end{verbatim} \end{quote}
+may be issued to replace the sequence:
+\begin{quote} \begin{verbatim}
+$ ADAMSTART
+$ ICL
+ICL> command
+\end{verbatim} \end{quote}
+
+Notes:
+\begin{itemize}
+\item \verb%command% is optional and may be any valid ICL command, {\em e.g.}
+KAPPA.
+\item Any other initialisation procedure specified via the ICL\_LOGIN 
+logical name will still be executed beforehand.
+\item Invocations of ADAM.COM other than the first in a process will not obey
+ADAMSTART.
+\end{itemize}
+
+\subsection{ICL}
+\begin{itemize}
+\item ICL Version 1.5-5 is released - the login banner has been changed
+appropriately.\\
+(Modified: LOGIN.ICL, ADAMLOGIN.ICL, INFO.LIS)
+\item A new command, SET [NO]SETPARS is implemented. It allows ICL to be
+prevented from checking the number of parameters supplied to procedures.
+Thus procedures may be written which prompt the user for any required parameters
+which are not supplied on the command line.\\
+(Modified: ICLDEF.PAS, ICLMAIN.PAS, ICLPROC.PAS).
+\item The help library has been updated to include the new commands.\\
+(Modified: ICLHELP.HLP/.HLB)
+\end{itemize}
 
 \subsection{SMS}
-{\em This section should heve been included in ARN019 (and SSN/45.12).}
+SMS has been modified to support user scrolling of the scrolling region.
+The scrolling keys are only accessible after pressing the SELECT  or PERIOD
+key and the following are defined:
 
-A user can now define commands to be executed by pressing keys f17-f20. In
-the SCT file one needs lines such as:
-\begin{quote}
-f17  {\em icl\_command}\\
-f18  {\em another\_icl\_command}
-\end{quote}
-where {\em icl\_command} might be something like \$ SHOW DEF or a procedure 
-name {\em etc.}\\
-(Modified: SMS\_CHECKKEY,\_LOADTABLE,\_DOIT,\_ESCIN and SMSDEFNS.FOR; \\
-New files: SMS\_UKEYINIT,\_USERKEY and SMSCOMUKY.FOR.)
+\begin{tabbing}
+gold/right\_arrow \= - \= \kill
+\verb%<crtl>N% \> - \> scroll to next line\\
+\verb%<crtl>P% \> - \> scroll to previous line\\
+prev\_screen \> - \> scroll up by one screen\\
+next\_screen \> - \> scroll down by one screen\\
+left\_arrow  \> - \> scroll one column to the left\\
+right\_arrow \> - \> scroll one column to the right\\
+\\
+gold/up\_arrow \> - \> scroll to top of display buffer\\
+gold/down\_arrow \> - \> scroll to bottom of display buffer\\
+gold/left\_arrow \> - \> scroll to far left of buffer\\
+gold/right\_arrow \> - \> scroll to far right of buffer\\
+\end{tabbing}
+
+Note the following points:
+\begin{itemize}
+\item The `gold' key is PF1, a `/' indicates press the keys in sequence
+and \verb%<ctrl>% means press at the same time as the following letter.
+\item None of these keys get into the command buffer so can be freely mixed with
+any other input you may be entering at the command prompt.
+\item Currently the previous 100 lines of SMS output are available in this way 
+and the width of the buffer is 132 characters.
+\item On pressing return and thus exiting from command mode, the display
+automatically scrolls to the bottom of the buffer.
+\end{itemize}
+(Modified: SMS\_\-GETUSRLIN, SMS\_\-KEYCHAR, SMS\_\-WRSCRL, SMS\_\-SCROLL\-VIEW, 
+SMS\_\-GET\-USR\-KEY, SMS\_\-DODCL, SMS\-DEFNS, SMS\-COM\-SMG, INFO.LIS\\
+New include file: SMSCOMVIEW.)
 
 \subsection{Documentation}
-ARN/19-3.1 describes ADAM release 1.9-3.
-There is no corresponding SSN/45.
+SSN/45.13 and ARN/19-4.1 describe ADAM release 1.9-4. The ARN will remain when
+the SSN is superseded.
 
 The summaries, ADAM\_DOCS:0CONTENTS.LIS, FULLDOCS.LIS and NEWDOCS.LIS, have 
-been updated. The summaries in DOCS\_DIR in the full system have been
-removed as they only duplicate those in ADAM\_DOCS.
+been updated, as has the COPYDOCS procedure.
+
+\section{BUGS FIXED}
+
+\subsection{ICL}
+\begin{itemize}
+\item A bug, which caused ICL to fail with ``Error opening file'' after a
+large number of LOAD commands, has been fixed.\\
+(Modified: ICLMAIN.PAS)
+\item LOAD files are now opened `READONLY' to prevent inter-user conflicts.\\
+(Modified: ICLMAIN.PAS)
+\item A bug, which caused incorrect behaviour if \verb%<CR>% or \verb%?% was
+given in response to parameter prompts when ICL was in screen mode, has been 
+fixed. (There is still a problem if \verb%<TAB>% is typed.)\\
+(Modified: UFACE\_ASKPARAM)
+\end{itemize}
+
+\subsection{SMS}
+A bug, which could cause SMS to get into an infinite loop, has been corrected.\\
+(Modified: SMS\_GETUSRKEY)
 
 \end{document}
