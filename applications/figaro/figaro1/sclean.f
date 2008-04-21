@@ -292,7 +292,7 @@ C
 C
 C     Perform the interactive or batch cleaning.
 C
-      CALL FIG_CSCLEAN(%VAL(CNF_PVAL(DPTR)),%VAL(QPTR),
+      CALL FIG_CSCLEAN(%VAL(CNF_PVAL(DPTR)),%VAL(CNF_PVAL(QPTR)),
      :                      %VAL(CNF_PVAL(VPTR)),VEXIST,NX,NY,BITNUM,
      :                      .TRUE.,%VAL(CNF_PVAL(WPTR)),WSIZE,ARRAY,
      :                      COL1,COL2,BATCH,BFD,LOG,LFD,PLOT,CHANGE,
@@ -776,8 +776,8 @@ C              coordinates on the plotting surface, offset by a half pixel.
 C
                CALL FIG_SCLEAN_1(.TRUE.,BADVAL,MINVAL,COLHI,
      :            NX,NY,IXST,IYST,IXEN-IXST+1,IYEN-IYST+1,
-     :            DATA,QUAL,LOW,HIGH,%VAL(CNF_PVAL(CNF_PVAL(IPTR))))
-               CALL PGPIXL(%VAL(CNF_PVAL(CNF_PVAL(IPTR))),IXEN-IXST+1,
+     :            DATA,QUAL,LOW,HIGH,%VAL(CNF_PVAL(IPTR)))
+               CALL PGPIXL(%VAL(CNF_PVAL(IPTR)),IXEN-IXST+1,
      :                     IYEN-IYST+1,
      :                     1,IXEN-IXST+1,1,IYEN-IYST+1,
      :                     REAL(IXST)-.5,REAL(IXEN)+0.5,
