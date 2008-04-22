@@ -168,7 +168,7 @@
 
 *  Map the data component and get the size.
       CALL NDF_MAP( IDIN, 'DATA', TYPE, 'READ', IPIN, EL, STATUS )
-      CALL NDF_BOUND( IDin, 2, LBND, UBND, NDIM, STATUS )
+      CALL NDF_BOUND( IDIN, 2, LBND, UBND, NDIM, STATUS )
       DIMS( 1 ) = UBND( 1 ) - LBND( 1 ) + 1
       DIMS( 2 ) = UBND( 2 ) - LBND( 2 ) + 1
 

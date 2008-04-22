@@ -142,9 +142,12 @@
 *  Convert the ARD descriptions into a MASK.
       REGVAL = 2
       TRCOEF( 1 ) = VAL__BADR
+      LBNDI( 1 ) = VAL__MAXI
+      LBNDE( 1 ) = VAL__MAXI
       CALL ARD_WORK( IGRP, 2, LBND, UBND, TRCOEF, .FALSE., REGVAL,
      :               %VAL( CNF_PVAL( IPMASK ) ), LBNDI, UBNDI, 
      :               LBNDE, UBNDE, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Now calculate the statistics.
       IF ( TYPE .EQ. '_BYTE' ) THEN
