@@ -1327,4 +1327,106 @@ void kpg1Datcp( HDSLoc *loc1, HDSLoc *loc2, const char *name, int *status ){
    F77_IMPORT_INTEGER( STATUS, *status );
 }
 
+/* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_ghstd)( LOGICAL(BAD),
+                            INTEGER(DIM), 
+                            DOUBLE_ARRAY(ARRAY), 
+                            INTEGER(NUMBIN), 
+                            LOGICAL(CUMUL), 
+                            DOUBLE(VALMAX),
+                            DOUBLE(VALMIN),
+                            INTEGER_ARRAY(HIST), 
+                            INTEGER(STATUS) );
+
+void kpg1Ghstd( int bad, int dim, double *array, int numbin, int cumul,
+                double valmax, double valmin, int *hist, int *status ){
+   DECLARE_LOGICAL(BAD);
+   DECLARE_INTEGER(DIM);
+   DECLARE_DOUBLE_ARRAY_DYN(ARRAY);
+   DECLARE_INTEGER(NUMBIN);
+   DECLARE_LOGICAL(CUMUL);
+   DECLARE_DOUBLE(VALMAX);
+   DECLARE_DOUBLE(VALMIN);
+   DECLARE_INTEGER_ARRAY_DYN(HIST);
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_LOGICAL( bad, BAD );
+   F77_EXPORT_INTEGER( dim, DIM );
+   F77_CREATE_DOUBLE_ARRAY( ARRAY, dim );
+   F77_EXPORT_DOUBLE_ARRAY( array, ARRAY, dim );
+   F77_EXPORT_INTEGER( numbin, NUMBIN );
+   F77_EXPORT_LOGICAL( cumul, CUMUL );
+   F77_EXPORT_DOUBLE( valmax, VALMAX );
+   F77_EXPORT_DOUBLE( valmin, VALMIN );
+   F77_CREATE_INTEGER_ARRAY( HIST, numbin );
+   F77_ASSOC_INTEGER_ARRAY( HIST, hist );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_ghstd)( LOGICAL_ARG(&BAD),
+                         INTEGER_ARG(&DIM), 
+                         DOUBLE_ARRAY_ARG(ARRAY), 
+                         INTEGER_ARG(&NUMBIN), 
+                         LOGICAL_ARG(&CUMUL), 
+                         DOUBLE_ARG(&VALMAX),
+                         DOUBLE_ARG(&VALMIN),
+                         INTEGER_ARRAY_ARG(HIST), 
+                         INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_IMPORT_INTEGER_ARRAY( HIST, hist, numbin );
+   F77_FREE_INTEGER( ARRAY );
+   F77_FREE_INTEGER( HIST );
+}
+
+/* ------------------------------- */
+
+F77_SUBROUTINE(kpg1_hsstp)( INTEGER(NUMBIN), 
+                            INTEGER_ARRAY(HIST), 
+                            DOUBLE(VALMAX),
+                            DOUBLE(VALMIN),
+                            DOUBLE(SUM),
+                            DOUBLE(MEAN),
+                            DOUBLE(MEDIAN),
+                            DOUBLE(MODE),
+                            INTEGER(STATUS) );
+
+void kpg1Hsstp( int numbin, int *hist, double valmax, double valmin,
+                double *sum, double *mean, double *median, double *mode,
+                int *status ){
+   DECLARE_INTEGER(NUMBIN);
+   DECLARE_INTEGER_ARRAY_DYN(HIST);
+   DECLARE_DOUBLE(VALMAX);
+   DECLARE_DOUBLE(VALMIN);
+   DECLARE_DOUBLE(SUM);
+   DECLARE_DOUBLE(MEAN);
+   DECLARE_DOUBLE(MEDIAN);
+   DECLARE_DOUBLE(MODE);
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_INTEGER( numbin, NUMBIN );
+   F77_CREATE_INTEGER_ARRAY( HIST, numbin );
+   F77_EXPORT_INTEGER_ARRAY( hist, HIST, numbin );
+   F77_EXPORT_DOUBLE( valmax, VALMAX );
+   F77_EXPORT_DOUBLE( valmin, VALMIN );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_hsstp)( INTEGER_ARG(&NUMBIN), 
+                         INTEGER_ARRAY_ARG(HIST), 
+                         DOUBLE_ARG(&VALMAX),
+                         DOUBLE_ARG(&VALMIN),
+                         DOUBLE_ARG(&SUM),
+                         DOUBLE_ARG(&MEAN),
+                         DOUBLE_ARG(&MEDIAN),
+                         DOUBLE_ARG(&MODE),
+                         INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_DOUBLE( SUM, *sum );
+   F77_IMPORT_DOUBLE( MEAN, *mean );
+   F77_IMPORT_DOUBLE( MEDIAN, *median );
+   F77_IMPORT_DOUBLE( MODE, *mode );
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_FREE_INTEGER( HIST );
+}
+
 
