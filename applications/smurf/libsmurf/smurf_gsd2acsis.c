@@ -26,10 +26,11 @@
 
 *  ADAM Parameters:
 *     IN = CHAR (Read)
-*          Name of the input GSD file to be converted.  This name
-*          should include the .gsd extension.
-*     OUT = CHAR (Read)
-*          Output ACSIS-formatted NDF file.
+*          Name of the input GSD file to be converted.
+*     DIRECTORY = CHAR (Read)
+*          Directory for output ACSIS files.
+*     OBSNUM = INT (Read)
+*          Observation number for files prior to Feb 03.
 
 *  Authors:
 *     Jen Balfour (JAC, UBC)
@@ -54,6 +55,10 @@
 *        Wrap gsd calls in macro for error checking.
 *     04-APR-2008 (JB):
 *        Alphabetize local variables.
+*     21-APR-2008 (JB):
+*        Add ADAM parameter documentation. 
+*     22-APR-2008 (JB):
+*        Use gsdac_flagBad.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -199,6 +204,9 @@ void smurf_gsd2acsis( int *status ) {
 
   /* Get the GSD file headers and data arrays. */
   gsdac_getGSDVars ( &gsd, dasFlag, &gsdVars, status );
+
+  /* Flag the bad values with STARLINK VAL__BAD. */
+  gsdac_flagBad ( dasFlag, &gsdVars, status );
 
   if ( *status != SAI__OK ) {
     errRep ( FUNC_NAME, "Couldn't get GSD headers and arrays.", status );

@@ -59,6 +59,8 @@
 *        Add special configuration flag.
 *     2008-04-21 (JB):
 *        Add gsdac_printHdr.
+*     2008-04-22 (JB):
+*        Add gsdac_flagBad.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -111,6 +113,13 @@ const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 int *special,        /* flag for special configurations 
                         (given and returned) */
 int *status          /* global status (given and returned) */
+);
+
+void gsdac_flagBad
+(
+const dasFlag dasFlag,  /* DAS file structure flag (given) */
+gsdVars *gsdVars,    /* GSD headers and arrays (given and returned) */
+int *status          /* pointer to global status (given and returned) */
 );
 
 void gsdac_freeArrays

@@ -5,6 +5,7 @@ libgsd_la_SOURCES = $(C_ROUTINES)
 
 C_ROUTINES = \
 gsdac_checkSpecial.c \
+gsdac_flagBad.c \
 gsdac_freeArrays.c \
 gsdac_get0x.c \
 gsdac_get1x.c \
