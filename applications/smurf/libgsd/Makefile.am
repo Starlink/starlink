@@ -16,6 +16,7 @@ gsdac_getRecepNames.c \
 gsdac_getSampleMode.c \
 gsdac_getStartIdx.c \
 gsdac_getWCS.c \
+gsdac_printHdr.c \
 gsdac_putFits.c \
 gsdac_putJCMTStateC.c \
 gsdac_putJCMTStateS.c \

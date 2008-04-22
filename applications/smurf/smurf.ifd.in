@@ -172,6 +172,8 @@
 #         Add SC2CLEAN
 #     16-APR-2008 (AGG)
 #         Remove USEBAD, add GENVAR for QLMAKEMAP
+#     21-APR-2008 (JB)
+#         Add action GSDSHOW
 #     {enter_changes_here}
 
 #  Bugs:
@@ -1776,7 +1778,49 @@ package @PACKAGE@ {
             helpkey *
           }
      }
+
+     action gsdshow {
+         helplib {$SMURF_HELP}
+
+         parameter in {
+            position 1
+            type _CHAR
+            access READ
+            vpath {PROMPT }
+            prompt {Input DAS or AOSC GSD File}
+            ppath GLOBAL CURRENT
+            helpkey *
+          }
+
+         parameter descriptions {
+            position 2
+            type _LOGICAL
+            prompt {Show descriptions?}
+            ppath DEFAULT CURRENT
+            default FALSE
+            helpkey *
+         }
+
+         parameter showdata {
+            position 3
+            type _LOGICAL
+            prompt {Print out data array?}
+            ppath DEFAULT CURRENT
+            default FALSE
+            helpkey *
+         }
+
+         parameter msg_filter {
+            type _CHAR
+            prompt {Message level}
+            vpath DEFAULT
+	    default NORM
+            helpkey *
+          }
+     }
+
    }
+
 
     command jcmtstate2cat {
 	obey {@PERL@ $SMURF_DIR/jcmtstate2cat}

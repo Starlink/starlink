@@ -33,7 +33,9 @@
  *     2008-03-28 (JB):
  *        Add standard source lookup table.
  *     2008-04-02 (JB):
- *        Move lookup tables to smf_moltrans.h and gsdac_standard_sources.h
+ *        Move lookup tables to smf_moltrans.h and gsdac_standard_sources.h.
+ *     2008-04-21 (JB):
+ *        Add gsdDType.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -72,6 +74,9 @@ typedef enum {DAS_NONE, DAS_TP, DAS_CONT_CAL, DAS_CROSS_CORR} dasFlag;
 /* Enumerated type for DAS file type */
 enum {COORD_AZ = 1, COORD_EQ = 3, COORD_RD = 4, 
       COORD_RB = 6, COORD_RJ = 7, COORD_GA = 8};
+
+/* Enumerated type for GSD headers and arrays (data types). */
+typedef enum {GSD_INT = 1, GSD_DOUBLE = 2, GSD_FLOAT = 3, GSD_CHAR = 4, GSD_CHARPTR = 5} gsdDType;
 
 typedef struct gsdac_gsd_struct  /* GSD file access parameters */
 {

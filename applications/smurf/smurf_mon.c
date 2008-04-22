@@ -102,6 +102,8 @@
 *        Added SC2CLEAN
 *     2008-04-09 (TIMJ):
 *        API change to create_lutwcs and detpos_wcs
+*     2008-04-21 (JB):
+*        Add GSDSHOW task.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -244,6 +246,8 @@ void smurf_mon( int * status ) {
     smurf_sc2fts( status );
   } else if (strcmp( taskname, "SC2CLEAN" ) == 0 ) {
     smurf_sc2clean( status );
+  } else if (strcmp( taskname, "GSDSHOW" ) == 0 ) {
+    smurf_gsdshow( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );
