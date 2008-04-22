@@ -47,6 +47,8 @@
 *  History:
 *     2008-04-18 (JB):
 *        Original.
+*     2008-04-22 (JB):
+*        Fix printing of character arrays.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -95,9 +97,13 @@ void gsdac_printHdr ( const char *nrao, const char *jcmt, const gsdDType dType,
 
   /* Local variables */
   long i;                     /* loop counter */
+  char tempString[17];
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
+
+  /* Set the last character in the tempstring to '\0' */
+  tempString[16] = '\0';
 
   /* If this is a scalar header, print the entire header on one line. */
   if ( !arrayFlag ) {
@@ -149,8 +155,10 @@ void gsdac_printHdr ( const char *nrao, const char *jcmt, const gsdDType dType,
 	printf ( "   %-20.4f", ((float*)value)[i] );
       else if ( dType == GSD_CHAR )   
 	printf ( "   %-20c", ((char*)value)[i] );
-      else if ( dType == GSD_CHARPTR )   
-	printf ( "   %-20.4f", ((char*)value)[i] );
+      else if ( dType == GSD_CHARPTR ) {
+        strncpy ( tempString, &(((char*)value)[i*16]), 16 );
+	printf ( "   %-20s", tempString );
+      }
 
       if ( i % 4 == 3 ) 
         printf ( "\n" );
