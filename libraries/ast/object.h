@@ -87,6 +87,8 @@
 *           Export an Object pointer to an outer context.
 *        astGet<X>, where <X> = C, D, F, I, L
 *           Get an attribute value for an Object.
+*        astSame
+*           Return true if two pointers refer to the same object.
 *        astSet
 *           Set attribute values for an Object.
 *        astSet<X>, where <X> = C, D, F, I, L
@@ -315,6 +317,8 @@
 *        - Make astVSet return a pointer to dynamic memory holding the 
 *        expanded setting string.
 *        - Add ast astSetVtab and astCast.
+*     22-APR-2008 (DSB):
+*        Added astSame.
 *--
 */
 
@@ -1210,6 +1214,7 @@ typedef struct AstObjectVtab {
    const char *(* GetAttrib)( AstObject *, const char * );
    int (* TestAttrib)( AstObject *, const char * );
    int (* TestID)( AstObject * );
+   int (* Same)( AstObject *, AstObject * );
    int (* TestIdent)( AstObject * );
    void (* Clear)( AstObject *, const char * );
    void (* ClearAttrib)( AstObject *, const char * );
@@ -1317,6 +1322,7 @@ double astGetD_( AstObject *, const char * );
 float astGetF_( AstObject *, const char * );
 int astGetI_( AstObject *, const char * );
 int astTest_( AstObject *, const char * );
+int astSame_( AstObject *, AstObject * );
 long astGetL_( AstObject *, const char * );
 void astClear_( AstObject *, const char * );
 void astSetC_( AstObject *, const char *, const char * );
@@ -1460,6 +1466,8 @@ astINVOKE(V,astSetL_(astCheckObject(this),attrib,value))
 astINVOKE(V,astShow_(astCheckObject(this)))
 #define astTest(this,attrib) \
 astINVOKE(V,astTest_(astCheckObject(this),attrib))
+#define astSame(this,that) \
+astINVOKE(V,astSame_(astCheckObject(this),astCheckObject(that)))
 
 #if defined(astCLASS)            /* Protected */
 

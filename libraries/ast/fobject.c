@@ -428,6 +428,20 @@ F77_LOGICAL_FUNCTION(ast_test)( INTEGER(THIS),
    return RESULT;
 }
 
+F77_LOGICAL_FUNCTION(ast_same)( INTEGER(THIS),
+                                INTEGER(THAT),
+                                INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_INTEGER(THAT)
+   F77_LOGICAL_TYPE(RESULT);
+
+   astAt( "AST_SAME", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astSame( astI2P( *THIS ), astI2P( *THAT ) ) ? F77_TRUE : F77_FALSE;
+   )
+   return RESULT;
+}
+
 
 #ifdef MEM_DEBUG
 

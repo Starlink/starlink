@@ -46,6 +46,7 @@ c     - astExempt: Exempt an Object pointer from AST context handling
 c     - astExport: Export an Object pointer to an outer context
 c     - astGet<X>: Get an attribute value for an Object
 c     - astIsA<Class>: Test class membership
+c     - astSame: Do two AST pointers refer to the same Object?
 c     - astSet: Set attribute values for an Object
 c     - astSet<X>: Set an attribute value for an Object
 c     - astShow: Display a textual representation of an Object on standard
@@ -65,6 +66,7 @@ f     - AST_EXEMPT: Exempt an Object pointer from AST context handling
 f     - AST_EXPORT: Export an Object pointer to an outer context
 f     - AST_GET<X>: Get an attribute value for an Object
 f     - AST_ISA<CLASS>: Test class membership
+f     - AST_SAME: Do two AST pointers refer to the same Object?
 f     - AST_SET: Set attribute values for an Object
 f     - AST_SET<X>: Set an attribute value for an Object
 f     - AST_SHOW: Display a textual representation of an Object on standard
@@ -177,6 +179,8 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 *     20-SEP-2007 (DSB):
 *        In astDelete, ensure the error status is reset before calling
 *        astGrow to extend the vtab free list.
+*     22-APR-2008 (DSB):
+*        Added astSame.
 *class--
 */
 
@@ -253,6 +257,7 @@ static const char *GetAttrib( AstObject *, const char * );
 static const char *GetID( AstObject * );
 static const char *GetIdent( AstObject * );
 static int Equal( AstObject *, AstObject * );
+static int Same( AstObject *, AstObject * );
 static int TestAttrib( AstObject *, const char * );
 static int TestID( AstObject * );
 static int TestIdent( AstObject * );
@@ -2389,6 +2394,69 @@ AstObject *astCast_( AstObject *this, AstObject *obj ) {
    return new;
 }
 
+static int Same( AstObject *this, AstObject *that ) {
+/*
+*++
+*  Name:
+c     astSame
+f     AST_SAME
+
+*  Purpose:
+*     Test if two AST pointers refer to the same Object.
+
+*  Type:
+*     Public function.
+
+*  Synopsis:
+c     #include "object.h"
+c     int astSame( AstObject *this,  AstObject *that )
+f     RESULT = AST_SAME( THIS, THAT, STATUS )
+
+*  Class Membership:
+*     Object method.
+
+*  Description:
+c     This function returns a boolean result (0 or 1) to indicate
+f     This function returns a logical result to indicate
+*     whether two pointers refer to the same Object.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the first Object.
+c     that
+f     THAT = INTEGER (Given)
+*        Pointer to the second Object.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astSame()
+c        One if the two pointers refer to the same Object, otherwise zero.
+f     AST_SAME = LOGICAL
+f        .TRUE. if the two pointers refer to the same Object, otherwise
+f        .FALSE.
+
+*  Applicability:
+*     Object
+c        This function applies to all Objects.
+f        This routine applies to all Objects.
+
+*  Notes:
+c     - A value of zero will be returned if this function is invoked
+c     with the AST error status set, or if it should fail for any reason.
+f     - A value of .FALSE. will be returned if this function is invoked
+f     with STATUS set to an error value, or if it should fail for any reason.
+*--
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* Return the result. */
+   return ( this == that ) ? 1 : 0;
+}
+
 /*
 *++
 *  Name:
@@ -3688,6 +3756,7 @@ void astInitObjectVtab_(  AstObjectVtab *vtab, const char *name ) {
    vtab->GetAttrib = GetAttrib;
    vtab->GetID = GetID;
    vtab->GetIdent = GetIdent;
+   vtab->Same = Same;
    vtab->SetAttrib = SetAttrib;
    vtab->SetID = SetID;
    vtab->SetIdent = SetIdent;
@@ -4078,6 +4147,10 @@ void astVSet_( AstObject *this, const char *settings, char **text, va_list args 
 int astGetObjSize_( AstObject *this ) {
    if ( !astOK || !this ) return 0;
    return (**astMEMBER(this,Object,GetObjSize))( this );
+}
+int astSame_( AstObject *this, AstObject *that ) {
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Object,Same))( this, that );
 }
 
 /* External interface. */
