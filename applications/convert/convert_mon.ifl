@@ -1366,6 +1366,16 @@ interface SPECX2NDF
 
    helplib 'CONVERT_HELP:'
 
+   parameter AXIS                      # Create AXIS structures?
+      type        '_LOGICAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Create AXIS structures?'
+      default     'FALSE'
+      helpkey     '*'
+   endparameter
+
    parameter GRIDFILE                     # Flag; write map schematic?
       position 3
       type     'LITERAL'

@@ -18,6 +18,16 @@ interface SPECX2NDF
 
    helplib 'CONVERT_HELP:'
 
+   parameter AXIS                      # Create AXIS structures?
+      type        '_LOGICAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Create AXIS structures?'
+      default     'FALSE'
+      helpkey     '*'
+   endparameter
+
    parameter GRIDFILE                     # Flag; write map schematic?
       position 3
       type     'LITERAL'
@@ -56,16 +66,6 @@ interface SPECX2NDF
       ppath    'DEFAULT'
       prompt   'Geodetic (geographic) longitude of telescope'
       helpkey  '*'
-   endparameter
-
-   parameter AXIS                      # Create AXIS structures?
-      type        '_LOGICAL'
-      access      'READ'
-      vpath       'CURRENT,DEFAULT'
-      ppath       'CURRENT,DEFAULT'
-      prompt      'Create AXIS structures?'
-      default     'TRUE'
-      helpkey     '*'
    endparameter
 
    parameter OUT                         # Name of the output cube.

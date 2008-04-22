@@ -44,8 +44,7 @@
 *  ADAM Parameters:
 *     AXIS =  _LOGICAL (Read)
 *        AXIS structures will be added to the output NDF if and only if
-*        AXIS is set TRUE. The dynamic default is the current value, which 
-*        initially is TRUE. []
+*        AXIS is set TRUE. [FALSE]
 *     GRIDFILE  =  LITERAL (Read)
 *        The name of a text file to which a schematic of the SPECX map
 *        will be written.  This schematic shows those positions in the
