@@ -440,7 +440,7 @@
      :                          %VAL( CNF_PVAL( IPDBLE ) ), 
      :                          %VAL( CNF_PVAL( IPLOG ) ),
      :                          %VAL( CNF_PVAL( IPCHR )), STATUS, 
-     :                          %VAL( 80 ) )
+     :                          %VAL( CNF_CVAL( 80 ) ) )
             END IF
 
 *  Unmap FITS block.

@@ -159,7 +159,7 @@
 *  The second character argument is no problem since it is not passed by
 *   pointer.
          CALL KPG1_LISTC( FD, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
-     :                    LOGF, STATUS, %VAL( LENGTH ) )
+     :                    LOGF, STATUS, %VAL( CNF_CVAL( LENGTH ) ) )
 
 *  Reset the MSG tuning parameter
          CALL MSG_TUNE( 'STREAM', 0, STATUS )

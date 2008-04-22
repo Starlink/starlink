@@ -122,7 +122,7 @@
          ICARD = 0
          CALL RTD1_GKEYC( NHEAD, %VAL( CNF_PVAL( IPHEAD ) ), 0, 'END ', 
      :                    NOCCUR, THERE, VALUE, ICARD, STATUS, 
-     :                    %VAL( 80 ) )
+     :                    %VAL( CNF_CVAL( 80 ) ) )
 
 *  Now read the channel until we have all the cards.
  1       CONTINUE

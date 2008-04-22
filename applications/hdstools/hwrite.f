@@ -178,7 +178,7 @@
             CALL DAT_MAPV(LOC,TYPE,'READ',PTR,NVAL,STATUS)
             CALL HWRITE_CPUT ( lun, BINARY,%VAL(CNF_PVAL(PTR)),
      :                         NVAL,FMT,STATUS,
-     &        %VAL(CLEN))
+     :                         %VAL(CNF_CVAL(CLEN)))
           ENDIF
 
           CALL DAT_UNMAP(LOC,STATUS)

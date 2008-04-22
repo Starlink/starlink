@@ -170,7 +170,8 @@
             FROT = 0D0
             CALL FTS1_GKEYD( NCARD, %VAL( CNF_PVAL( IPFITS ) ), 
      :                       1, FITROT, THERE,
-     :                       FROT, ICARD, STATUS, %VAL( 80 ) )
+     :                       FROT, ICARD, STATUS, 
+     :                       %VAL( CNF_CVAL( 80 ) ) )
             IF ( THERE ) THEN
                ROTATE = ROTATE + FROT
             ELSE

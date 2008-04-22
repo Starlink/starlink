@@ -391,7 +391,8 @@
          CALL SPD_WZJA( MODE, NCOMP, TNPAR, %VAL( CNF_PVAL(PNTR(8)) ),
      :                  %VAL(CNF_PVAL(PNTR(7))),
      :                  %VAL(CNF_PVAL(PNTR(11)) ), STATUS,
-     :                  %VAL(LEN(MODE)), %VAL(XCLEN), %VAL(XCLEN) )
+     :                  %VAL(CNF_CVAL(LEN(MODE))), 
+     :                  %VAL(CNF_CVAL(XCLEN)), %VAL(CNF_CVAL(XCLEN)) )
 
 *     Release the results' extension vectors.
          DO 1003 I = 2, 8
@@ -423,13 +424,13 @@
 *     Set up the results' extension vectors.
          IF ( MODE .EQ. 'G' ) THEN
             CALL SPD_UAAFC( 1, NELM(3), %VAL( CNF_PVAL(PNTR(7)) ),
-     :         'Gauss feature', STATUS, %VAL(XCLEN) )
+     :         'Gauss feature', STATUS, %VAL(CNF_CVAL(XCLEN)) )
          ELSE IF ( MODE .EQ. 'T' ) THEN
             CALL SPD_UAAFC( 1, NELM(3), %VAL( CNF_PVAL(PNTR(7)) ),
-     :         'triangle feature', STATUS, %VAL(XCLEN) )
+     :         'triangle feature', STATUS, %VAL(CNF_CVAL(XCLEN)) )
          END IF
          CALL SPD_WZJB( NELM(4), %VAL(CNF_PVAL(PNTR(11))), STATUS,
-     :                  %VAL(XCLEN) )
+     :                  %VAL(CNF_CVAL(XCLEN)) )
 
 *     Release the results' extension vectors.
          DO 1001 I = 2, 8

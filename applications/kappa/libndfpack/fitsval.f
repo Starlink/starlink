@@ -223,12 +223,13 @@
 
 *  Attempt to locate the keyword's occurrence in the array of FITS cards.
       CALL FTS1_LOKEY( EL, %VAL( CNF_PVAL( FTSPNT( 1 ) ) ), KEYWRD,
-     :                 KOCCUR, CARD, STATUS, %VAL( FITSLN ) )
+     :                 KOCCUR, CARD, STATUS, 
+     :                 %VAL( CNF_CVAL( FITSLN ) ) )
 
 *  Print the keyword's value.
       CALL FTS1_PRVAL( EL, %VAL( CNF_PVAL( FTSPNT( 1 ) ) ), KEYWRD,
      :                 KOCCUR, CARD, SVALUE, COMENT, STATUS, 
-     :                 %VAL( FITSLN ) )
+     :                 %VAL( CNF_CVAL( FITSLN ) ) )
       
 * Store the value in an output parameter.
       CALL PAR_PUT0C( 'VALUE', SVALUE, STATUS )

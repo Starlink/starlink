@@ -134,7 +134,8 @@
 *  no difference.
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL POL1_IMPRT(  FITLEN, %VAL( CNF_PVAL( IPFIT )), 0, ' ',
-     :                     POLLOC, .TRUE., STATUS, %VAL( 80 ) )
+     :                     POLLOC, .TRUE., STATUS, 
+     :                     %VAL( CNF_CVAL( 80 ) ) )
       END IF
 
 *  Check the values in the POLPACK extension are usable.

@@ -146,7 +146,7 @@
 *  Attempt to get numerical value for named keyword.
       CALL FTS1_GKEYR( NCARD, %VAL( CNF_PVAL( IPFITS ) ), 
      :                 1, NAME, THERE, RVAL,
-     :                 ICARD, STATUS, %VAL( LENGTH ) )
+     :                 ICARD, STATUS, %VAL( CNF_CVAL( LENGTH ) ) )
       IF ( STATUS .EQ. SAI__OK .AND. THERE ) THEN
          CALL CHR_RTOC( RVAL, VALUE, NCHAR )
          GO TO 1
@@ -157,7 +157,7 @@
 *  Attempt to get logical value for named keyword.
       CALL FTS1_GKEYL( NCARD, %VAL( CNF_PVAL( IPFITS ) ), 
      :                 1, NAME, THERE, LVAL,
-     :                 ICARD, STATUS, %VAL( LENGTH ) )
+     :                 ICARD, STATUS, %VAL( CNF_CVAL( LENGTH ) ) )
       IF ( STATUS .EQ. SAI__OK .AND. THERE ) THEN
          CALL CHR_LTOC( LVAL, VALUE, NCHAR )
          GO TO 1
@@ -168,7 +168,7 @@
 *  Attempt to get character value for named keyword.
       CALL FTS1_GKEYC( NCARD, %VAL( CNF_PVAL( IPFITS ) ), 
      :                 1, NAME, THERE, CVAL,
-     :                 ICARD, STATUS, %VAL( LENGTH ) )
+     :                 ICARD, STATUS, %VAL( CNF_CVAL( LENGTH ) ) )
       IF ( STATUS .EQ. SAI__OK .AND. THERE ) THEN
          VALUE = '''' // CVAL
          VALUE( CHR_LEN( VALUE ) + 1: ) = ''''

@@ -540,7 +540,7 @@
 *  Copy the mapped value to the binary table.
                     CALL FTPCLS( FUNIT, 1, 1, 1, EL, 
      :                           %VAL( CNF_PVAL( OPNTR ) ),
-     :                           FSTAT, %VAL( STRLEN ) )
+     :                           FSTAT, %VAL( CNF_CVAL( STRLEN ) ) )
                  END IF
 
 *  Release the new error context.
@@ -745,7 +745,7 @@
                ELSE
                   CALL FTPCLS( FUNIT, 1, 1, 1, EL, 
      :                         %VAL( CNF_PVAL( OPNTR ) ),
-     :                         FSTAT, %VAL( STRLEN ) )
+     :                         FSTAT, %VAL( CNF_CVAL( STRLEN ) ) )
                END IF
                ROUTIN = 'FTPCLS'
 
@@ -1338,8 +1338,9 @@
 
 *  Copy the mapped value to the binary table.
                                  CALL FTPCLS( FUNIT, NOPRIM, 1, 1, EL,
-     :                                        %VAL( CNF_PVAL( OPNTR ) ),
-     :                                        FSTAT, %VAL( STRLEN ) )
+     :                                      %VAL( CNF_PVAL( OPNTR ) ),
+     :                                      FSTAT, 
+     :                                      %VAL( CNF_CVAL( STRLEN ) ) )
                               END IF
 
 *  Release the new error context.
@@ -1581,8 +1582,9 @@
                                  END DO
                               ELSE
                                  CALL FTPCLS( FUNIT, NOPRIM, 1, 1, EL,
-     :                                        %VAL( CNF_PVAL( OPNTR ) ),
-     :                                        FSTAT, %VAL( STRLEN ) )
+     :                                      %VAL( CNF_PVAL( OPNTR ) ),
+     :                                      FSTAT, 
+     :                                      %VAL( CNF_CVAL( STRLEN ) ) )
                               END IF
                               ROUTIN = 'FTPCLS'
 

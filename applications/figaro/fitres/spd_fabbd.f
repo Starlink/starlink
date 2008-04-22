@@ -148,9 +148,9 @@
 
 *  Set up the line name, lab frequency, component type.
       CALL SPD_FDAAC( COMP, COMP, %VAL( CNF_PVAL(CPNTR(1,SLOT)) ),
-     :                LINNAM, STATUS, %VAL(XCLEN) )
+     :                LINNAM, STATUS, %VAL(CNF_CVAL(XCLEN)) )
       CALL SPD_FDAAC( COMP, COMP, %VAL( CNF_PVAL(CPNTR(3,SLOT)) ),
-     :                CMPTYP, STATUS, %VAL(XCLEN) )
+     :                CMPTYP, STATUS, %VAL(CNF_CVAL(XCLEN)) )
       CALL SPD_FDAAD( COMP, COMP, %VAL( CNF_PVAL(CPNTR(2,SLOT)) ),
      :                LABFRQ, STATUS )
 
@@ -230,7 +230,7 @@
          END IF
          CALL SPD_FDACC( 'unknown parameter', NEWTNP, 1, SHIFT0, SHIFT1,
      :                   %VAL( CNF_PVAL(PPNTR(1,SLOT)) ), STATUS,
-     :                   %VAL(XCLEN) )
+     :                   %VAL(CNF_CVAL(XCLEN)) )
 
 *     Store the new value into its place.
          TNPAR(SLOT) = NEWTNP
@@ -253,7 +253,7 @@
       DO 5 I = 0, NPARA - 1
          CALL SPD_FDAAC( FPARA+I, FPARA+I,
      :                   %VAL( CNF_PVAL(PPNTR(1,SLOT)) ),
-     :                   PARTYP(I+1), STATUS, %VAL(XCLEN) )
+     :                   PARTYP(I+1), STATUS, %VAL(CNF_CVAL(XCLEN)) )
  5    CONTINUE
       IF ( STATUS .NE. SAI__OK ) GO TO 500
 

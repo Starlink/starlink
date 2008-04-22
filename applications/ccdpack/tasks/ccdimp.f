@@ -285,7 +285,8 @@
                      CALL FTS1_GKEYC( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                                1,
      :                                KEYWRD, FOUND, CVAL, CARD,
-     :                                STATUS, %VAL( LENGTH ) )
+     :                                STATUS, 
+     :                                %VAL( CNF_CVAL( LENGTH ) ) )
                      IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  If a TRANSFORM value was found, then inform the necessary routine
@@ -310,7 +311,7 @@
                      CALL FTS1_GKEYC( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                                1, LINE( I1( 3 ):I2( 3 ) ), FOUND,
      :                                CVAL, CARD, STATUS,
-     :                                %VAL( LENGTH ) )
+     :                                %VAL( CNF_CVAL( LENGTH ) ) )
                      IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  If a value was found, then find its length and store it in the
@@ -331,7 +332,7 @@
                      CALL FTS1_GKEYD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                                1, LINE( I1( 3 ):I2( 3 ) ), FOUND,
      :                                DVAL, CARD, STATUS,
-     :                                %VAL( LENGTH ) )
+     :                                %VAL( CNF_CVAL( LENGTH ) ) )
                      IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  If a value was found, then store it in the extension.
@@ -350,7 +351,7 @@
                      CALL FTS1_GKEYI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                                1, LINE( I1( 3 ):I2( 3 ) ), FOUND,
      :                                IVAL, CARD, STATUS,
-     :                                %VAL( LENGTH ) )
+     :                                %VAL( CNF_CVAL( LENGTH ) ) )
                      IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  If a value was found, then store it in the extension.
@@ -369,7 +370,7 @@
                      CALL FTS1_GKEYL( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                                1, LINE( I1( 3 ):I2( 3 ) ), FOUND,
      :                                LVAL, CARD, STATUS,
-     :                                %VAL( LENGTH ) )
+     :                                %VAL( CNF_CVAL( LENGTH ) ) )
                      IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  If a value was found, then store it in the extension.
@@ -387,7 +388,7 @@
                      CALL FTS1_GKEYR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                                1, LINE( I1( 3 ):I2( 3 ) ), FOUND,
      :                                RVAL, CARD, STATUS,
-     :                                %VAL( LENGTH ) )
+     :                                %VAL( CNF_CVAL( LENGTH ) ) )
                      IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  If a value was found, then store it in the extension.
@@ -451,7 +452,7 @@
          KEYWRD = 'LBOUND'//C( 1 : NC )
          CALL FTS1_GKEYI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                    KEYWRD, FOUND, IVAL, CARD, STATUS,
-     :                    %VAL( LENGTH ) )
+     :                    %VAL( CNF_CVAL( LENGTH ) ) )
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
             GO TO 7

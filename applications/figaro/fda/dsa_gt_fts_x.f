@@ -137,7 +137,7 @@
       CALL DSA1_KEYVAL( DSA__REFFNE(SLOT), 
      :                  %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
      :                  KEYUC, ELEM, STRING, LCOMNT, ISTR,
-     :                  ISSTR, STATUS, %VAL(80) )
+     :                  ISSTR, STATUS, %VAL(CNF_CVAL(80)) )
       COMENT = LCOMNT
 
 *  Read the value from the value string.
@@ -196,7 +196,7 @@
       CALL DSA1_KEYVAL( DSA__REFFNE(SLOT),
      :                  %VAL( CNF_PVAL(DSA__REFFPT(SLOT) ) ),
      :                  KEYUC, ELEM, STRING, LCOMNT, ISTR, ISSTR,
-     :                  STATUS, %VAL( CNF_PVAL(80) ) )
+     :                  STATUS, %VAL( CNF_CVAL(80) ) )
       COMENT = LCOMNT
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL CHR_CTOD( STRING, VALUE, STATUS )
@@ -259,7 +259,7 @@
       CALL DSA1_KEYVAL( DSA__REFFNE(SLOT),
      :                  %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
      :                  KEYUC, ELEM, STRING, LCOMNT, ISTR, ISSTR,
-     :                  STATUS, %VAL(80) )
+     :                  STATUS, %VAL(CNF_CVAL(80)) )
       COMENT = LCOMNT
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL CHR_CTOR( STRING, VALUE, STATUS )
@@ -323,7 +323,7 @@
       CALL DSA1_KEYVAL( DSA__REFFNE(SLOT),
      :                  %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
      :                  KEYUC, ELEM, STRING, LCOMNT, ISTR,
-     :                  ISSTR, STATUS, %VAL(80) )
+     :                  ISSTR, STATUS, %VAL(CNF_CVAL(80)) )
       COMENT = LCOMNT
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL CHR_CTOD( STRING, DVALUE, STATUS )
@@ -388,7 +388,7 @@
       CALL DSA1_KEYVAL( DSA__REFFNE(SLOT),
      :                  %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
      :                  KEYUC, ELEM, STRING, LCOMNT, ISTR,
-     :                  ISSTR, STATUS, %VAL(CNF_PVAL(80) ) )
+     :                  ISSTR, STATUS, %VAL(CNF_CVAL(80) ) )
       COMENT = LCOMNT
       IF ( STATUS .EQ. SAI__OK ) THEN
          CALL CHR_CTOL( STRING, VALUE, STATUS )

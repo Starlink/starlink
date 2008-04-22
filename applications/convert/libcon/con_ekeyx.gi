@@ -137,7 +137,7 @@
          CALL CON_GKEY<T>( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
      :                     SCARD, NAME, NOCCUR,
      :                     THERE, VALUE, COMENT, CARD, STATUS,
-     :                     %VAL( LENGTH ) )
+     :                     %VAL( CNF_CVAL( LENGTH ) ) )
 
 *  Unmap the array of FITS header cards and release the locator.
          CALL DAT_UNMAP( LOC, STATUS )

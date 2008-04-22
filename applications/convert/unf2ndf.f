@@ -369,7 +369,7 @@
          CALL CON_MANDH( .TRUE., NCARD, %VAL( CNF_PVAL( HPNTR ) ), 
      :                   HSTART( NHEADS ),
      :                   BITPIX, NDIM, DIMS, DARRAY, NONSDA, EL,
-     :                   STATUS, %VAL( 80 ) )
+     :                   STATUS, %VAL( CNF_CVAL( 80 ) ) )
 
 *   Cannot handle grouped data, or no data array, so set a bad status
 *   and make an error report follows.
@@ -397,7 +397,7 @@
      :                   %VAL( CNF_PVAL( HPNTR ) ), 
      :                   BSCALE, BZERO, BLANK,
      :                   BADPIX, UNSIGN, STATUS, 
-     :                   %VAL( 80 ) )
+     :                   %VAL( CNF_CVAL( 80 ) ) )
 
 *  Determine the HDS data type of the data array.  Note that the QUALITY
 *  component must be unsigned byte.
@@ -527,7 +527,7 @@
          CALL CON_NDFCM( HSTART( NHEADS ) - 1 + NCARD, 
      :                   %VAL( CNF_PVAL( HPNTR ) ),
      :                   HSTART( NHEADS ), .NOT. UPDATE, NDF, STATUS,
-     :                   %VAL( 80 ) )
+     :                   %VAL( CNF_CVAL( 80 ) ) )
       END IF
 
 *  End the NDF context.

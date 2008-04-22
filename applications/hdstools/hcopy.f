@@ -306,8 +306,8 @@
 *                  Copy the data - Note truncation can't occur here
                      CALL ARR_COP1C(
      &                 NVAL,%VAL(CNF_PVAL(IPTR)),%VAL(CNF_PVAL(OPTR)),
-     :                 TRUNC,STATUS,
-     &                 %VAL(CLENI),%VAL(CLENI))
+     &                 TRUNC,STATUS,
+     &                 %VAL(CNF_CVAL(CLENI)),%VAL(CNF_CVAL(CLENI)))
 
 *               Treat all numeric types as double precision
                   ELSEIF (HDX_NUMERIC(ILOC)) THEN

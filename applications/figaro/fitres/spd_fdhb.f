@@ -171,7 +171,8 @@
 
 *     Line names.
          CALL SPD_FDAAC( OLDNCO+1, NCOMP, %VAL( CNF_PVAL(CPNTR(1)) ),
-     :                   'unidentified component', STATUS, %VAL(CSIZE) )
+     :                   'unidentified component', STATUS, 
+     :                   %VAL(CNF_CVAL(CSIZE)) )
 
 *     Laboratory frequencies.
          IF ( TYPE(2) .EQ. '_DOUBLE' ) THEN
@@ -184,7 +185,8 @@
 
 *     Component types.
          CALL SPD_FDAAC( OLDNCO+1, NCOMP, %VAL( CNF_PVAL(CPNTR(3)) ),
-     :                   'unknown function', STATUS, %VAL(CSIZE) )
+     :                   'unknown function', STATUS, 
+     :                   %VAL(CNF_CVAL(CSIZE)) )
 
 *     Number of result parameters for each spectral component.
          I = INT( (TNPAR-OLDTNP) / (NCOMP-OLDNCO) )
@@ -210,7 +212,8 @@
 *  elements.
       IF ( TNPAR .GT. OLDTNP ) THEN
          CALL SPD_FDAAC( OLDTNP+1, TNPAR, %VAL( CNF_PVAL(PPNTR(1)) ),
-     :                   'unknown parameter', STATUS, %VAL(CSIZE) )
+     :                   'unknown parameter', STATUS, 
+     :                   %VAL(CNF_CVAL(CSIZE)) )
 
 *  If parameter indexed vectors are shorter now, some retained spectral
 *  components may have been deprived of parameters they used to have.

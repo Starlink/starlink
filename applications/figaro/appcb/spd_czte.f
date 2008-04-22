@@ -1001,9 +1001,9 @@
 
 *        Line names.
             STRNG1 = SPD_UAAGC( %VAL( CNF_PVAL( CPNTR1(1) ) ), I,
-     :                          STATUS, %VAL( 32 ) )
+     :                          STATUS, %VAL( CNF_CVAL( 32 ) ) )
             STRNG2 = SPD_UAAGC( %VAL( CNF_PVAL( CPNTR2(1) ) ), I,
-     :                          STATUS, %VAL( 32 ) )
+     :                          STATUS, %VAL( CNF_CVAL( 32 ) ) )
             IF ( .NOT. CHR_SIMLR( STRNG1, STRNG2 ) ) THEN
                MATCH = .FALSE.
                GO TO 6
@@ -1011,9 +1011,9 @@
 
 *        Component types.
             STRNG1 = SPD_UAAGC( %VAL( CNF_PVAL( CPNTR1(3) ) ), I,
-     :                          STATUS, %VAL( 32 ) )
+     :                          STATUS, %VAL( CNF_CVAL( 32 ) ) )
             STRNG2 = SPD_UAAGC( %VAL( CNF_PVAL( CPNTR2(3) ) ), I,
-     :                          STATUS, %VAL( 32 ) )
+     :                          STATUS, %VAL( CNF_CVAL( 32 ) ) )
             IF ( .NOT. CHR_SIMLR( STRNG1, STRNG2 ) ) THEN
                MATCH = .FALSE.
                GO TO 6
@@ -1085,9 +1085,9 @@
 *     Compare the parameter related extension vector.
          DO 5 I = 1, TNPAR
             STRNG1 = SPD_UAAGC( %VAL( CNF_PVAL( PPNTR1(1) ) ), I,
-     :                           STATUS, %VAL( 32 ) )
+     :                           STATUS, %VAL( CNF_CVAL( 32 ) ) )
             STRNG2 = SPD_UAAGC( %VAL( CNF_PVAL( PPNTR2(1) ) ), I,
-     :                           STATUS, %VAL( 32 ) )
+     :                           STATUS, %VAL( CNF_CVAL( 32 ) ) )
             IF ( .NOT. CHR_SIMLR( STRNG1, STRNG2 ) ) THEN
                MATCH = .FALSE.
                GO TO 6

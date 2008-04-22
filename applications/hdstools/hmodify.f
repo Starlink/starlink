@@ -162,8 +162,8 @@
                      CALL DAT_MAPV(OBJLOC,TYPE,'WRITE',OPTR,NVAL,STATUS)
                      CALL ARR_COP1C(
      &                 NVAL,%VAL(CNF_PVAL(VPTR)),%VAL(CNF_PVAL(OPTR)),
-     :                 TRUNC,STATUS,
-     &                 %VAL(CLENV),%VAL(CLENO))
+     &                 TRUNC,STATUS,
+     &                 %VAL(CNF_CVAL(CLENV)),%VAL(CNF_CVAL(CLENO)))
 
 *                  Warn if truncation occurred
                      IF ( ( STATUS .EQ. SAI__OK ) .AND. TRUNC ) THEN
@@ -181,7 +181,7 @@
                      CALL DAT_MAPV(
      &                 OBJLOC,'_DOUBLE','WRITE',OPTR,NVAL,STATUS)
                      CALL ARR_COP1D(NVAL,%VAL(CNF_PVAL(VPTR)),
-     :                              %VAL(CNF_PVAL(OPTR)),STATUS)
+     &                              %VAL(CNF_PVAL(OPTR)),STATUS)
 
 *               Logicals
                   ELSEIF (TYPE.EQ.'_LOGICAL') THEN
@@ -190,7 +190,7 @@
                      CALL DAT_MAPV(
      &                 OBJLOC,'_LOGICAL','WRITE',OPTR,NVAL,STATUS)
                      CALL ARR_COP1L(NVAL,%VAL(CNF_PVAL(VPTR)),
-     :                              %VAL(CNF_PVAL(OPTR)),STATUS)
+     &                              %VAL(CNF_PVAL(OPTR)),STATUS)
                   ENDIF
 
                   CALL DAT_UNMAP(OBJLOC,STATUS)

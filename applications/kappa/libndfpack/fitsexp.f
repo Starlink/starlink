@@ -647,7 +647,7 @@
                CALL FTS1_UKEYC( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                          KEYWDS( ICOMP ), CVAL, '/',
      :                          COMNTS( ICOMP ), .FALSE., FOUND, CARD,
-     :                          STATUS, %VAL( LENGTH ) )
+     :                          STATUS, %VAL( CNF_CVAL( LENGTH ) ) )
  
 *  Double precision:
 *  ================
@@ -658,7 +658,7 @@
                CALL FTS1_UKEYD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                          KEYWDS( ICOMP ), DVAL, '/',
      :                          COMNTS( ICOMP ), FOUND, CARD, STATUS,
-     :                          %VAL( LENGTH ) )
+     :                          %VAL( CNF_CVAL( LENGTH ) ) )
 
 *  Integer, signed and unsigned word and byte:
 *  ===========================================
@@ -671,7 +671,7 @@
                CALL FTS1_UKEYI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                          KEYWDS( ICOMP ), IVAL, '/',
      :                          COMNTS( ICOMP ), FOUND, CARD, STATUS,
-     :                          %VAL( LENGTH ) )
+     :                          %VAL( CNF_CVAL( LENGTH ) ) )
 
 *  Logical:
 *  =======
@@ -682,7 +682,7 @@
                CALL FTS1_UKEYL( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                          KEYWDS( ICOMP ), LVAL, '/',
      :                          COMNTS( ICOMP ), FOUND, CARD, STATUS,
-     :                          %VAL( LENGTH ) )
+     :                          %VAL( CNF_CVAL( LENGTH ) ) )
 
 *  Real:
 *  ====
@@ -693,7 +693,7 @@
                CALL FTS1_UKEYR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                          KEYWDS( ICOMP ), RVAL, '/',
      :                          COMNTS( ICOMP ), FOUND, CARD, STATUS,
-     :                          %VAL( LENGTH ) )
+     :                          %VAL( CNF_CVAL( LENGTH ) ) )
 
             END IF
 

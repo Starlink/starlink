@@ -139,14 +139,15 @@
          CALL ERR_MARK
          CALL RTD1_GKEY<T>( NHEAD, %VAL( CNF_PVAL( IPHEAD ) ), 1, 
      :                      'END', 0, THERE,  LVAL, AT, STATUS, 
-     :                      %VAL( 80 ) )
+     :                      %VAL( CNF_CVAL( 80 ) ) )
          IF ( THERE .AND. STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
          CALL ERR_RLSE
          THERE = .FALSE.
       ELSE
          CALL ERR_MARK
          CALL RTD1_GKEY<T>( NHEAD, %VAL( CNF_PVAL( IPHEAD ) ), 1, LKEY, 
-     :                      0, THERE, LVAL, AT, STATUS, %VAL( 80 ) )
+     :                      0, THERE, LVAL, AT, STATUS, 
+     :                      %VAL( CNF_CVAL( 80 ) ) )
          IF ( THERE .AND. STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
          CALL ERR_RLSE
       END IF
@@ -163,6 +164,7 @@
       NEWEND = .NOT. THERE
       IF ( .NOT. THERE ) NHEAD = NHEAD + 1
       CALL RTD1_WKEY<T>( NHEAD, %VAL( CNF_PVAL( IPHEAD ) ), AT, NEWEND, 
-     :                   LKEY, COMMEN, VALUE, STATUS, %VAL( 80 ) )
+     :                   LKEY, COMMEN, VALUE, STATUS, 
+     :                   %VAL( CNF_CVAL( 80 ) ) )
       END
 

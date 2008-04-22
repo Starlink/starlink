@@ -106,5 +106,5 @@
 *  Now write in card.
       NHEAD = NHEAD + 1
       CALL RTD1_WCARD( CARD, NHEAD, %VAL( CNF_PVAL( IPHEAD ) ), 
-     :                 STATUS, %VAL( 80 ) )
+     :                 STATUS, %VAL( CNF_CVAL( 80 ) ) )
       END

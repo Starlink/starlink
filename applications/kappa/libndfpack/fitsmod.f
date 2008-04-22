@@ -633,8 +633,12 @@
      :                    %VAL( CNF_PVAL( VAPNTR ) ), 
      :                    %VAL( CNF_PVAL( COPNTR ) ),
      :                    %VAL( CNF_PVAL( TYPNTR ) ), STATUS,  
-     :                    %VAL( 1 ), %VAL( HKEYLN ), %VAL( HKEYLN ),
-     :                    %VAL( CVALLN ), %VAL( COMLN ), %VAL( 8 ) )
+     :                    %VAL( CNF_CVAL( 1 ) ), 
+     :                    %VAL( CNF_CVAL( HKEYLN ) ), 
+     :                    %VAL( CNF_CVAL( HKEYLN ) ),
+     :                    %VAL( CNF_CVAL( CVALLN ) ), 
+     :                    %VAL( CNF_CVAL( COMLN ) ), 
+     :                    %VAL( CNF_CVAL( 8 ) ) )
 
 *  Perform the edits on the FITS extension.
          CALL FTS1_EDFEX( NEDIT, %VAL( CNF_PVAL( EDPNTR ) ),
@@ -645,9 +649,12 @@
      :                    %VAL( CNF_PVAL( VAPNTR ) ), 
      :                    %VAL( CNF_PVAL( COPNTR ) ),
      :                    %VAL( CNF_PVAL( TYPNTR ) ), 
-     :                    LOC, EXISTS, STATUS, %VAL( 1 ), 
-     :                    %VAL( HKEYLN ), %VAL( HKEYLN ),
-     :                    %VAL( CVALLN ), %VAL( COMLN ), %VAL( 8 ) )
+     :                    LOC, EXISTS, STATUS, %VAL( CNF_CVAL( 1 ) ),
+     :                    %VAL( CNF_CVAL( HKEYLN ) ), 
+     :                    %VAL( CNF_CVAL( HKEYLN ) ),
+     :                    %VAL( CNF_CVAL( CVALLN ) ), 
+     :                    %VAL( CNF_CVAL( COMLN ) ), 
+     :                    %VAL( CNF_CVAL( 8 ) ) )
 
 *  Free the workspace.
          CALL PSX_FREE( EDPNTR, STATUS )

@@ -106,5 +106,5 @@
 *  Now insert card.
       NHEAD = MAX( NHEAD, ICARD )
       CALL GAI1_ICARD( CARD, NHEAD, ICARD, %VAL( CNF_PVAL( IPHEAD ) ), 
-     :                 STATUS, %VAL( 80 ) )
+     :                 STATUS, %VAL( CNF_CVAL( 80 ) ) )
       END

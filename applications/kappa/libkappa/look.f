@@ -581,7 +581,7 @@
      :                   QUIET, LOG, FDL,
      :                   %VAL( CNF_PVAL( IPLINE ) ), 
      :                   FORMAT, MAXLEN, VALUE,
-     :                   STATUS, %VAL( MAXLEN ) )
+     :                   STATUS, %VAL( CNF_CVAL( MAXLEN ) ) )
 
 *  Annull the temporary resources.
          IF( MODE .EQ. 'CENTRE' .OR. MODE .EQ. 'BOUNDS' ) THEN

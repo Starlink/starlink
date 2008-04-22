@@ -1007,7 +1007,7 @@
      :                    'DISK',
      :                    UDFITS, TLOC, BLKSIZ, MAXHDR, .NOT. AUTO,
      :                    ACTSIZ, OFFSET, CURREC, HSTART, HDNUM, EXTEND,
-     :                    NHEADS, STATUS, %VAL( 80 ) )
+     :                    NHEADS, STATUS, %VAL( CNF_CVAL( 80 ) ) )
 
          IF ( STATUS .NE. SAI__OK ) GOTO 970
 
@@ -1037,7 +1037,7 @@
             CALL FTS1_GKEYL( WHDIM( 1 ), %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
      :                       HSTART( 1 ), 'EXTEND', 1, THERE, GEXTND,
      :                       COMENT, NKC, STATUS, 
-     :                       %VAL( 1 ) )
+     :                       %VAL( CNF_CVAL( 1 ) ) )
             GEXTND = GEXTND .AND. THERE
          END IF
 
@@ -1054,7 +1054,7 @@
      :                    %VAL( CNF_PVAL( HPNTR( 1 ) ) ), 
      :                    HSTART( NHEADS ), BITPIX,
      :                    NDIM, DIMS, DARRAY, NONSDA, SIZE, STATUS,
-     :                    %VAL( 1 ) )
+     :                    %VAL( CNF_CVAL( 1 ) ) )
 
 *       Check for an error, because file is not in FITS
 *       format, or has an unsupported FITS extension.
@@ -1104,7 +1104,7 @@
             CALL FTS1_HDLOG( %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
      :                       FD, INFILE, SUBFIL,
      :                       NHEADS, HDNUM, STATUS, 
-     :                       %VAL( 1 ) )
+     :                       %VAL( CNF_CVAL( 1 ) ) )
 
             IF ( STATUS .NE. SAI__OK ) GOTO 970
          END IF
@@ -1127,7 +1127,7 @@
             CALL FTS1_GKEYC( WHDIM( 1 ), %VAL( CNF_PVAL( HPNTR( 1 ) ) ),
      :                       HSTART( NHEADS ), 'XTENSION', 1, THERE,
      :                       EXTNAM, COMENT, NKC, STATUS, 
-     :                       %VAL( 1 ) )
+     :                       %VAL( CNF_CVAL( 1 ) ) )
 
 *          Report any errors.
 
@@ -1156,7 +1156,7 @@
      :                         HSTART( NHEADS ), NDIM, DIMS, LOGHDR,
      :                         FD, INFILE, SUBFIL, PREFIX, AUTO,
      :                         BLKSIZ, ACTSIZ, BFPNTR, OFFSET, CURREC,
-     :                         RCPNTR, STATUS, %VAL( 1 ) )
+     :                         RCPNTR, STATUS, %VAL( CNF_CVAL( 1 ) ) )
      
             END IF
 
@@ -1241,7 +1241,7 @@
      :                    MXPARM,
      :                    NDIM, DIMS, BSCALE, BZERO, BLANK, BADPIX,
      :                    IEEE, GCOUNT, PCOUNT, PTYPE, PSCALE, PZERO,
-     :                    STATUS, %VAL( 1 ) )
+     :                    STATUS, %VAL( CNF_CVAL( 1 ) ) )
 
          IF ( STATUS .NE. SAI__OK ) THEN
 
@@ -1342,7 +1342,7 @@
      :                  LOGHDR, FD, INFILE, SUBFIL, GEXTND, WHDIM( 1 ),
      :                  HSTART( NHEADS ), NENCOD, ENCODS, BLKSIZ, 
      :                  ACTSIZ, OFFSET, CURREC, NEXT, PARAMS, STATUS, 
-     :                  %VAL( 80 ) )
+     :                  %VAL( CNF_CVAL( 80 ) ) )
 
 *       Test for exit.
 

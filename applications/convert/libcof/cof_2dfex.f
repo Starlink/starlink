@@ -889,7 +889,7 @@
 *  Transfer the values to the binary-table column.
                 CALL FTPCLS( FUNIT, I, 1, 1, EL, 
      :                       %VAL( CNF_PVAL( OPNTR ) ),
-     :                       FSTAT, %VAL( STRLEN ) )
+     :                       FSTAT, %VAL( CNF_CVAL( STRLEN ) ) )
 
 *  Unmap the component.
                 CALL DAT_UNMAP( CLOC, STATUS )

@@ -171,14 +171,14 @@
       DO 3 I = 0, NPARA - 1
          CALL SPD_FDAAD( FELEM+I, FELEM+I,
      :                   %VAL( CNF_PVAL(DPNTR(1,SLOT)) ),
-     :                   DATA(I+1), STATUS, %VAL(XCLEN) )
+     :                   DATA(I+1), STATUS, %VAL(CNF_CVAL(XCLEN)) )
  3    CONTINUE
 
 *  Put the variances.
       DO 4 I = 0, NPARA - 1
          CALL SPD_FDAAD( FELEM+I, FELEM+I,
      :                   %VAL( CNF_PVAL(DPNTR(2,SLOT)) ),
-     :                   VAR(I+1), STATUS, %VAL(XCLEN) )
+     :                   VAR(I+1), STATUS, %VAL(CNF_CVAL(XCLEN)) )
  4    CONTINUE
 
 *  Return.

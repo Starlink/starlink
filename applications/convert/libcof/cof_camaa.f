@@ -255,7 +255,7 @@
 *  Transfer the headers from the primary HDU to the workspace.
          CALL COF_RHEAD( FUNIT, FILE, NHEAD, TNHEAD, 
      :                   %VAL( CNF_PVAL( HPNTR ) ),
-     :                   STATUS, %VAL( 80 ) )
+     :                   STATUS, %VAL( CNF_CVAL( 80 ) ) )
 
       END IF
 
@@ -676,7 +676,7 @@
                CALL COF_WGBFE( FUNIT, FILE, NDFE, PROFIT, IOBS, NFIELD,
      :                         USED, NHEAD, TNHEAD, 
      :                         %VAL( CNF_PVAL( HPNTR ) ),
-     :                         STATUS, %VAL( 80 ) )
+     :                         STATUS, %VAL( CNF_CVAL( 80 ) ) )
          END IF
 
 *  Write out the headers to a logfile.  This also needs the FITS file
@@ -685,7 +685,7 @@
             IF ( LOGHDR )
      :        CALL COF_HALOG( FDL, TNHEAD, %VAL( CNF_PVAL( HPNTR ) ), 
      :                        FILE, 1,
-     :                        STATUS, %VAL( 80 ) )
+     :                        STATUS, %VAL( CNF_CVAL( 80 ) ) )
 
 *  Tidy the NDF and locators need to make the extension.
             IF ( ARTYPE .EQ. 'EXPOSURE' ) THEN

@@ -225,7 +225,7 @@
             do while(n_work.lt.worksize)
               call rdids(lu,%VAL(CNF_PVAL(wavestable)),
      :                   %VAL(CNF_PVAL(namesst)),filend,n_work,
-     :                   %VAL(namlen))
+     :                   %VAL(CNF_CVAL(namlen)))
               if(filend) goto 1
             end do
 *
@@ -245,8 +245,9 @@
             call copr2r(n_work,%VAL(CNF_PVAL(wavestable)),
      :                  %VAL(CNF_PVAL(new_wavestable)))
             call chr_move(%VAL(CNF_PVAL(namesst)),
-     :                    %VAL(CNF_PVAL(new_namesst)),%VAL(namlen),
-     :                    %VAL(new_namlen))
+     :                    %VAL(CNF_PVAL(new_namesst)),
+     :                    %VAL(CNF_CVAL(namlen)),
+     :                    %VAL(CNF_CVAL(new_namlen)))
 
 *  and free old workspace
 
@@ -295,7 +296,8 @@
 
         if(n_work.gt.1) then
           call arsort2(%VAL(CNF_PVAL(wavestable)),
-     :                 %VAL(CNF_PVAL(namesst)),n_work,%VAL(namlen))
+     :                 %VAL(CNF_PVAL(namesst)),n_work,
+     :                 %VAL(CNF_CVAL(namlen)))
         end if
 *
 *   Identify lines

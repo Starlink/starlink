@@ -66,6 +66,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard HDS constants
       INCLUDE 'CCD1_PAR'         ! Local CCDPACK constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       
 *  Global Variables:
       INCLUDE 'CCD1_CACM'        ! CCD1_CALEN = INTEGER
@@ -78,7 +79,6 @@
                                  !    Pointer to character array
                                  ! CCD1_CALOC = CHARACTER * ( DAT__SZLOC )
                                  !    Locator for HDS component storing array
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       
 *  Status:
       INTEGER STATUS             ! Global status
@@ -106,7 +106,7 @@
 
 *  Get the line at the current position and increment the line counter.
          CALL CCD1_CA2C( %VAL( CNF_PVAL( CCD1_CAPTR ) ), CCD1_CAPOS,
-     :                   BUF, STATUS, %VAL( CCD1_CALEN ) )
+     :                   BUF, STATUS, %VAL( CNF_CVAL( CCD1_CALEN ) ) )
 
 *  This is the start of a do..while loop over continuation lines.
  1       CONTINUE
@@ -126,7 +126,8 @@
          IF ( CCD1_CAPOS .LT. CCD1_CANUM .AND. STATUS .EQ. SAI__OK ) 
      :      THEN
             CALL CCD1_CA2C( %VAL( CNF_PVAL( CCD1_CAPTR ) ), CCD1_CAPOS,
-     :                      BUF, STATUS, %VAL( CCD1_CALEN ) )
+     :                      BUF, STATUS, 
+     :                      %VAL( CNF_CVAL( CCD1_CALEN ) ) )
 
 *  If the next line is a continuation line loop round.
             IF ( BUF( 1:1 ) .EQ. '+' ) GO TO 1

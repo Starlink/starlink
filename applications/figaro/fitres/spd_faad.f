@@ -180,7 +180,7 @@
          CALL SPD_FDAAC( NCOMP(SLOT)+1, A_NCOMP,
      :                   %VAL( CNF_PVAL(CPNTR(1,SLOT)) ),
      :                   'unidentified component', STATUS,
-     :                   %VAL(CSIZE) )
+     :                   %VAL(CNF_CVAL(CSIZE)) )
 
 *     Laboratory frequencies.
          IF ( TYPE(2,SLOT) .EQ. '_DOUBLE' ) THEN
@@ -197,7 +197,7 @@
          CALL SPD_FDAAC( NCOMP(SLOT)+1, A_NCOMP,
      :                   %VAL( CNF_PVAL(CPNTR(3,SLOT)) ),
      :                   'unknown function', STATUS,
-     :                   %VAL(CSIZE) )
+     :                   %VAL(CNF_CVAL(CSIZE)) )
 
 *     Number of result parameters for each spectral component.
          I = INT( (A_TNPAR-TNPAR(SLOT)) / (A_NCOMP-NCOMP(SLOT)) )
@@ -230,7 +230,7 @@
          CALL SPD_FDAAC( TNPAR(SLOT)+1, A_TNPAR,
      :                   %VAL( CNF_PVAL(PPNTR(1,SLOT)) ),
      :                   'unknown parameter', STATUS,
-     :                    %VAL(CSIZE) )
+     :                    %VAL(CNF_CVAL(CSIZE)) )
 
 *  If parameter indexed vectors are shorter now, some retained spectral
 *  components may have been deprived of parameters they used to have.

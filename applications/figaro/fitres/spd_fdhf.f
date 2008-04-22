@@ -201,7 +201,8 @@
       CALL NDF_XNEW( XNDF, XC9C1, XT9C1, 1, NCOMP, RLOC, STATUS )
       CALL DAT_MAPC( RLOC, 'WRITE', 1, NCOMP, PNTR(1), STATUS )
       CALL SPD_FDAAC( 1, NCOMP, %VAL( CNF_PVAL(PNTR(1)) ), 
-     :                'unidentified component', STATUS, %VAL(CSIZE) )
+     :                'unidentified component', STATUS, 
+     :                %VAL(CNF_CVAL(CSIZE)) )
       CALL DAT_ANNUL( RLOC, STATUS )
 
 *  .RESULTS.MORE.LABFREQ is a _REAL or _DOUBLE vector. There is one
@@ -223,7 +224,8 @@
       CALL NDF_XNEW( XNDF, XC9C3, XT9C3, 1, NCOMP, RLOC, STATUS )
       CALL DAT_MAPC( RLOC, 'WRITE', 1, NCOMP, PNTR(1), STATUS )
       CALL SPD_FDAAC( 1, NCOMP, %VAL( CNF_PVAL(PNTR(1)) ),
-     :                'unknown function', STATUS, %VAL(CSIZE) )
+     :                'unknown function', STATUS, 
+     :                %VAL(CNF_CVAL(CSIZE)) )
       CALL DAT_ANNUL( RLOC, STATUS )
 
 *  .RESULTS.MORE.NPARA is an _INTEGER vector. There is one element for
@@ -268,7 +270,8 @@
       CALL NDF_XNEW( XNDF, XC9P1, XT9P1, 1, TNPAR, RLOC, STATUS )
       CALL DAT_MAPC( RLOC, 'WRITE', 1, TNPAR, PNTR(1), STATUS )
       CALL SPD_FDAAC( 1, TNPAR, %VAL( CNF_PVAL(PNTR(1)) ),
-     :                'unknown parameter', STATUS, %VAL(CSIZE) )
+     :                'unknown parameter', STATUS, 
+     :                %VAL(CNF_CVAL(CSIZE)) )
       CALL DAT_ANNUL( RLOC, STATUS )
 
 *  Check status.

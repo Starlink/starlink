@@ -366,7 +366,7 @@
 *  Read the FITS headers looking for a WCS. If the headers are bad for
 *  any reason this can fail, so trap any errors.
          CALL RTD1_DEWCS( %VAL( CNF_PVAL( IPHEAD ) ), NHEAD, .FALSE., 
-     :                    IWCS, STATUS, %VAL( 80 ) )
+     :                    IWCS, STATUS, %VAL( CNF_CVAL( 80 ) ) )
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
          END IF

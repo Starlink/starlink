@@ -353,7 +353,8 @@
          ELSE IF ( CTYPE( 1:5 ) .EQ. '_CHAR' ) THEN
             CALL FTGCVS( FUNITD, COLNUM, 1, 1, NV, ' ',
      :                   %VAL( CNF_PVAL( PNTR ) ), BAD, FSTAT,
-     :                   %VAL( 1 ), %VAL( WIDTH ) )
+     :                   %VAL( CNF_CVAL( 1 ) ), 
+     :                   %VAL( CNF_CVAL( WIDTH ) ) )
       
          END IF
 

@@ -218,7 +218,8 @@
 
 *  Attempt to locate the keyword's occurrence in the array of FITS cards.
       CALL FTS1_LOKEY( EL, %VAL( CNF_PVAL( FTSPNT( 1 ) ) ), KEYWRD,
-     :                 KOCCUR, CARD, STATUS, %VAL( FITSLN ) )
+     :                 KOCCUR, CARD, STATUS, 
+     :                 %VAL( CNF_CVAL( FITSLN ) ) )
 
 * A bad status indicates that the keyword was not found.
 * Annul the error message in this case, as it's normal.

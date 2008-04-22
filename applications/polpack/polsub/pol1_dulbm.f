@@ -885,7 +885,7 @@
      :               %VAL( CNF_PVAL( IPDE ) ), 
      :               %VAL( CNF_PVAL( IPTI1 ) ),
      :               %VAL( CNF_PVAL( IPTI2 ) ), STATUS, 
-     :               %VAL( IDLEN ) )
+     :               %VAL( CNF_CVAL( IDLEN ) ) )
 
 *   Release unwanted workspace. Keep the weight array (if defined) for
 *   use when calculating the stokes parameters.

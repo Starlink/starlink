@@ -458,7 +458,7 @@
 *        If this succeeds, it tells where the item is to go.
             CALL DSA1_KEYVAL( DSA__REFFNE(SLOT),
      :         %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ), KEYUC, 1,
-     :         IGNOR1, IGNOR2, ISTR, ISSTR, STATUS, %VAL(80) )
+     :         IGNOR1, IGNOR2, ISTR, ISSTR, STATUS, %VAL(CNF_CVAL(80)) )
 
 *        If no old item for keyword.
             IF ( STATUS .NE. SAI__OK ) THEN
@@ -486,10 +486,11 @@
 *  the length of the extension and are overwriting the current 'END'.
       CALL DSA1_ITMPUT( DSA__REFFNE(SLOT),
      :                  %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
-     :                  STRING, ISTR, STATUS, %VAL(80) )
+     :                  STRING, ISTR, STATUS, %VAL(CNF_CVAL(80)) )
       CALL DSA1_ITMPUT( DSA__REFFNE(SLOT),
      :                  %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
-     :                  ENDSTR, DSA__REFFNE(SLOT), STATUS, %VAL(80) )
+     :                  ENDSTR, DSA__REFFNE(SLOT), STATUS, 
+     :                  %VAL(CNF_CVAL(80)) )
 
 *  Return.
       END

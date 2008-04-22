@@ -239,7 +239,7 @@
       IF ( ADFITS ) THEN
          CALL CON_WFMAN( XLINES, MDIM, DIMS, BITPIX,
      :                   %VAL( CNF_PVAL( FIPNTR( 1 ) ) ), STATUS, 
-     :                   %VAL( FITSLN ) )
+     :                   %VAL( CNF_CVAL( FITSLN ) ) )
 
          IF ( STATUS .NE. SAI__OK) GOTO 999
       
@@ -287,7 +287,7 @@
 *  mapped character array is passed by value for UNIX.
                CALL CON_PCARD( CARD, NFITSA, XLINES,
      :                         %VAL( CNF_PVAL( FIPNTR( 1 ) ) ), STATUS,
-     :                         %VAL( FITSLN ) )
+     :                         %VAL( CNF_CVAL( FITSLN ) ) )
 
 *  Keep a tally of the entries used in the FITS airlock.
                NFITSA = NFITSA + 1
@@ -328,7 +328,7 @@
 *  mapped character array is passed by value for UNIX.
          CALL CON_PCARD( CARD, LINENO, XLINES, 
      :                   %VAL( CNF_PVAL( FIPNTR( 1 ) ) ),
-     :                   STATUS, %VAL( FITSLN ) )
+     :                   STATUS, %VAL( CNF_CVAL( FITSLN ) ) )
          LINENO = LINENO + 1
       END DO
 
@@ -346,7 +346,7 @@
 *  Add the line to the image.
       CALL CON_PCARD( CARD, LINENO, XLINES, 
      :                %VAL( CNF_PVAL( FIPNTR( 1 ) ) ), STATUS,
-     :                %VAL( FITSLN ) )
+     :                %VAL( CNF_CVAL( FITSLN ) ) )
 
 *  Report the HISTORY line in verbose-message mode.
       CALL MSG_OUTIF( MSG__VERB, ' ', CARD, STATUS )
@@ -374,7 +374,7 @@
 *  Add the line to the image.
       CALL CON_PCARD( CARD, LINENO, XLINES, 
      :                %VAL( CNF_PVAL( FIPNTR( 1 ) ) ), STATUS,
-     :                %VAL( FITSLN ) )
+     :                %VAL( CNF_CVAL( FITSLN ) ) )
 
 *  Report the HISTORY line in verbose-message mode.
       CALL MSG_OUTIF( MSG__VERB, ' ', CARD, STATUS )
@@ -391,7 +391,7 @@
 *  Add the line to the image.
       CALL CON_PCARD( CARD, LINENO, XLINES, 
      :                %VAL( CNF_PVAL( FIPNTR( 1 ) ) ), STATUS,
-     :                %VAL( FITSLN ) )
+     :                %VAL( CNF_CVAL( FITSLN ) ) )
 
 *  Report the line in verbose-message mode.
       CALL MSG_OUTIF( MSG__VERB, ' ', CARD, STATUS )

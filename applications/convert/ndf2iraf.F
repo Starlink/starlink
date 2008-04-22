@@ -213,6 +213,7 @@
       INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'NDF_ERR'          ! NDF error constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_CVAL function
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -424,15 +425,19 @@
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-            CALL KPG1_CHVAW( EL, %VAL( PNTR( 1 ) ), VAL__BADW, WFILBA,
-     :                       %VAL( PNTRT( 1 ) ), NREP, STATUS )
+            CALL KPG1_CHVAW( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                       VAL__BADW, WFILBA,
+     :                       %VAL( CNF_PVAL( PNTRT( 1 ) ) ), 
+     :                       NREP, STATUS )
 
          ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
 
 *  Replace the magic values in the output array, otherwise copy from
 *  the input to the output NDF.
-            CALL KPG1_CHVAR( EL, %VAL( PNTR( 1 ) ), VAL__BADR, FILBAD,
-     :                       %VAL( PNTRT( 1 ) ), NREP, STATUS )
+            CALL KPG1_CHVAR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                       VAL__BADR, FILBAD,
+     :                       %VAL( CNF_PVAL( PNTRT( 1 ) ) ), 
+     :                       NREP, STATUS )
 
          END IF
 
@@ -482,13 +487,13 @@
 *  the type.
       IF ( ITYPE .EQ. '_WORD' ) THEN
          CALL CON_CD2IW( MDIM, DIMS( 1 ), DIMS( 2 ), DIMS( 3 ),
-     :                   %VAL( PNTR( 1 ) ), IMDESC, ERR,
-     :                   %VAL( LIPNTR ), STATUS )
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), IMDESC, ERR,
+     :                   %VAL( CNF_PVAL( LIPNTR ) ), STATUS )
       
       ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL CON_CD2IR( MDIM, DIMS( 1 ), DIMS( 2 ), DIMS( 3 ),
-     :                   %VAL( PNTR( 1 ) ), IMDESC, ERR,
-     :                   %VAL( LIPNTR ), STATUS )
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), IMDESC, ERR,
+     :                   %VAL( CNF_PVAL( LIPNTR ) ), STATUS )
       END IF
 
 *  Report the number of replacements.

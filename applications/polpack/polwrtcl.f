@@ -750,7 +750,7 @@
      :                 %VAL( CNF_PVAL( IPW2 ) ), 
      :                 %VAL( CNF_PVAL( IPW3 ) ),
      :                 %VAL( CNF_PVAL( IPW4 ) ), STATUS, 
-     :                 %VAL( IDLEN ) )
+     :                 %VAL( CNF_CVAL( IDLEN ) ) )
 
 *  Free the work space.
       CALL PSX_FREE( IPW1, STATUS )

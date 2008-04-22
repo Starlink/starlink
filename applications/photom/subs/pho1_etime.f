@@ -152,7 +152,9 @@
 *  %VAL*( 80 ) is required when passing characters arrays via pointers
 *  on UNIX.
             CALL PHO1_GKEY( NREC, %VAL( CNF_PVAL( PNTR ) ), CETIME, 
-     :                      EXISTS, ETIME, STATUS, %VAL( 80 ) )
+     :                      EXISTS, ETIME, STATUS, 
+     :                      %VAL( CNF_CVAL( 80 ) ) )
+
             IF ( STATUS .EQ. SAI__OK .AND. .NOT. EXISTS ) THEN 
                ETIME = 1.0
                STATUS = SAI__ERROR

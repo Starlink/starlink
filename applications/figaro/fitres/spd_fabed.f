@@ -171,13 +171,13 @@
 
 *     Line name.
          TESTC = SPD_FDABC( %VAL( CNF_PVAL(CPNTR(1,SLOT)) ), COMP,
-     :                      STATUS, %VAL(XCLEN) )
+     :                      STATUS, %VAL(CNF_CVAL(XCLEN)) )
          IF ( .NOT. CHR_SIMLR( LINNAM, 'unidentified component' ) .AND.
      :        .NOT. CHR_SIMLR( LINNAM, TESTC ) ) GO TO 4
 
 *     Component type.
          TESTC = SPD_FDABC(%VAL( CNF_PVAL(CPNTR(3,SLOT)) ),
-     :                     COMP, STATUS, %VAL(XCLEN) )
+     :                     COMP, STATUS, %VAL(CNF_CVAL(XCLEN)) )
          IF ( .NOT. CHR_SIMLR( CMPTYP, 'unknown function' ) .AND.
      :        .NOT. CHR_SIMLR( CMPTYP, TESTC ) ) GO TO 4
 
@@ -205,7 +205,7 @@
  2       CONTINUE
          DO 3 I = 0, NPARA - 1
             TESTC = SPD_FDABC( %VAL( CNF_PVAL(PPNTR(1,SLOT)) ), FPARA+I,
-     :                         STATUS, %VAL(XCLEN)  )
+     :                         STATUS, %VAL(CNF_CVAL(XCLEN))  )
             IF ( .NOT. CHR_SIMLR(PARTYP(I+1), 'unknown parameter') .AND.
      :           .NOT. CHR_SIMLR(PARTYP(I+1),TESTC ) ) GO TO 4
  3       CONTINUE
@@ -228,9 +228,9 @@
 
 *     Set up the component.
          CALL SPD_FDAAC( COMP, COMP, %VAL( CNF_PVAL(CPNTR(1,SLOT)) ),
-     :                   LINNAM, STATUS, %VAL(XCLEN)  )
+     :                   LINNAM, STATUS, %VAL(CNF_CVAL(XCLEN))  )
          CALL SPD_FDAAC( COMP, COMP, %VAL( CNF_PVAL(CPNTR(3,SLOT)) ),
-     :                   CMPTYP, STATUS, %VAL(XCLEN)  )
+     :                   CMPTYP, STATUS, %VAL(CNF_CVAL(XCLEN))  )
          CALL SPD_FDAAD( COMP, COMP, %VAL( CNF_PVAL(CPNTR(2,SLOT)) ),
      :                   LABFRQ, STATUS )
          CALL SPD_FDAAI( COMP, COMP, %VAL( CNF_PVAL(CPNTR(4,SLOT)) ),
@@ -243,7 +243,8 @@
          DO 7 I = 0, NPARA - 1
             CALL SPD_FDAAC( FPARA+I, FPARA+I,
      :                      %VAL( CNF_PVAL(PPNTR(1,SLOT)) ),
-     :                      PARTYP(I+1), STATUS, %VAL(XCLEN)  )
+     :                      PARTYP(I+1), STATUS, 
+     :                      %VAL(CNF_CVAL(XCLEN))  )
  7       CONTINUE
       END IF
 

@@ -875,14 +875,15 @@
 *  Obtain the requested number of values.
                         CALL PAR_EXACC( 'CVALUE', EL, 
      :                                  %VAL( CNF_PVAL( CPNTR ) ),
-     :                                  STATUS, %VAL( 6 ),
-     :                                  %VAL( CLEN ) )
+     :                                  STATUS, %VAL( CNF_CVAL( 6 ) ),
+     :                                  %VAL( CNF_CVAL( CLEN ) ) )
 
 *  Write the array to the component.
                         CALL DAT_PUTVC( CLOC, EL, 
      :                                  %VAL( CNF_PVAL( CPNTR ) ),
-     :                                  STATUS, %VAL( DAT__SZLOC ),
-     :                                  %VAL( CLEN ) )
+     :                                  STATUS, 
+     :                                  %VAL( CNF_CVAL( DAT__SZLOC ) ),
+     :                                  %VAL( CNF_CVAL( CLEN ) ) )
 
 *  Free the workspace.
                         CALL AIF_ANTMP( WKLOC, STATUS )

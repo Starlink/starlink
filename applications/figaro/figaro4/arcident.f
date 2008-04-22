@@ -467,7 +467,7 @@
      :                  %VAL( CNF_PVAL(IPNTR(5)) ),
      :                  %VAL( CNF_PVAL(IPNTR(9)) ), NCOMP2,
      :                  %VAL( CNF_PVAL(WPNTR(1)) ), STATUS,
-     :                  %VAL(XCLEN), %VAL(XCLEN) )
+     :                  %VAL(CNF_CVAL(XCLEN)), %VAL(CNF_CVAL(XCLEN)) )
 
 *     Release input results extension vectors.
          DO 1 I = 2, 8
@@ -495,7 +495,8 @@
      :   STATUS )
       CALL SPD_WZKJ( NELM(6), NELM(7), %VAL( CNF_PVAL(OPNTR(5)) ),
      :               %VAL( CNF_PVAL(OPNTR(9)) ),
-     :               STATUS, %VAL(XCLEN), %VAL(XCLEN) )
+     :               STATUS, %VAL(CNF_CVAL(XCLEN)), 
+     :               %VAL(CNF_CVAL(XCLEN)) )
       DO 2 I = 10, 16
          CALL DAT_ANNUL( LOC(I), STATUS )
  2    CONTINUE

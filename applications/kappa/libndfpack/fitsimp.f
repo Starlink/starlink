@@ -271,7 +271,7 @@
                   CALL FTS1_GKEYC( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                             LINE( I1( 3 ):I2( 3 ) ), 1, FOUND,
      :                             CVAL, COMENT, CARD, STATUS,
-     :                             %VAL( LENGTH ) )
+     :                             %VAL( CNF_CVAL( LENGTH ) ) )
                   IF ( STATUS .EQ. SAI__OK ) THEN
  
 *  If a value was found, then find its length and store it in the
@@ -291,7 +291,7 @@
                   CALL FTS1_GKEYD( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                             LINE( I1( 3 ):I2( 3 ) ), 1, FOUND,
      :                             DVAL, COMENT, CARD, STATUS,
-     :                             %VAL( LENGTH ) )
+     :                             %VAL( CNF_CVAL( LENGTH ) ) )
                   IF ( STATUS .EQ. SAI__OK ) THEN
  
 *  If a value was found, then store it in the extension.
@@ -309,7 +309,7 @@
                   CALL FTS1_GKEYI( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                             LINE( I1( 3 ):I2( 3 ) ), 1, FOUND,
      :                             IVAL, COMENT, CARD, STATUS,
-     :                             %VAL( LENGTH ) )
+     :                             %VAL( CNF_CVAL( LENGTH ) ) )
                   IF ( STATUS .EQ. SAI__OK ) THEN
  
 *  If a value was found, then store it in the extension.
@@ -327,7 +327,7 @@
                   CALL FTS1_GKEYL( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                             LINE( I1( 3 ):I2( 3 ) ), 1, FOUND,
      :                             LVAL, COMENT, CARD, STATUS,
-     :                             %VAL( LENGTH ) )
+     :                             %VAL( CNF_CVAL( LENGTH ) ) )
                   IF ( STATUS .EQ. SAI__OK ) THEN
  
 *  If a value was found, then store it in the extension.
@@ -345,7 +345,7 @@
                   CALL FTS1_GKEYR( EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 1,
      :                             LINE( I1( 3 ):I2( 3 ) ), 1, FOUND,
      :                             RVAL, COMENT, CARD, STATUS,
-     :                             %VAL( LENGTH ) )
+     :                             %VAL( CNF_CVAL( LENGTH ) ) )
                   IF ( STATUS .EQ. SAI__OK ) THEN
  
 *  If a value was found, then store it in the extension.

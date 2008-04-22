@@ -323,25 +323,28 @@
             IF ( COMP(N) .GE. 1 .AND. COMP(N) .LE. NCOMP ) THEN
                IF ( CHR_SIMLR( 'Chebyshev series',
      :              SPD_UAAGC( %VAL( CNF_PVAL(PNTR(5)) ), COMP(N), 
-     :                         STATUS, %VAL(CHLEN) ) ) .AND.
+     :                         STATUS, %VAL(CNF_CVAL(CHLEN)) ) ) .AND.
      :              SPD_UAAGI( %VAL( CNF_PVAL(PNTR(6)) ), COMP(N),
      :                         STATUS ) .EQ. 11 ) THEN
                   CCODE = 1
                ELSE IF ( CHR_SIMLR( 'Gauss',
      :                   SPD_UAAGC( %VAL( CNF_PVAL(PNTR(5)) ), COMP(N),
-     :                              STATUS, %VAL(CHLEN) ) ) .AND.
+     :                              STATUS, %VAL(CNF_CVAL(CHLEN)) ) ) 
+     :                   .AND.
      :                   SPD_UAAGI( %VAL( CNF_PVAL(PNTR(6)) ), COMP(N),
      :                              STATUS) .EQ. 4 ) THEN
                   CCODE = 2
                ELSE IF ( CHR_SIMLR( 'triangle',
      :                   SPD_UAAGC( %VAL( CNF_PVAL(PNTR(5)) ), COMP(N),
-     :                              STATUS, %VAL(CHLEN) ) ) .AND.
+     :                              STATUS, %VAL(CNF_CVAL(CHLEN)) ) ) 
+     :                   .AND.
      :                   SPD_UAAGI( %VAL( CNF_PVAL(PNTR(6)) ), COMP(N),
      :                              STATUS) .EQ. 4 ) THEN
                   CCODE = 3
                ELSE IF ( CHR_SIMLR( 'polynomial',
      :                   SPD_UAAGC( %VAL( CNF_PVAL(PNTR(5)) ), COMP(N),
-     :                              STATUS, %VAL(CHLEN) ) ) .AND.
+     :                              STATUS, %VAL(CNF_CVAL(CHLEN)) ) ) 
+     :                   .AND.
      :                   SPD_UAAGI( %VAL( CNF_PVAL(PNTR(6)) ), COMP(N),
      :                              STATUS) .EQ. 9 ) THEN
                   CCODE = 4

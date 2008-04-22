@@ -154,7 +154,7 @@
  1    CONTINUE
       NEL = NEL - 1
       CALL CCD1_CA2C( %VAL( CNF_PVAL( IPWCS ) ), NEL, LINE, STATUS, 
-     :                %VAL( CLEN ) )
+     :                %VAL( CNF_CVAL( CLEN ) ) )
       IF ( LINE .EQ. ' ' .AND. NEL .GT. 1 ) GO TO 1
 
 *  Unmap the data and resize the array to the number of non-empty lines.

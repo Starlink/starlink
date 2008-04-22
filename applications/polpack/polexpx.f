@@ -195,7 +195,8 @@
          DO J = 1, NITEM
             CALL POL1_SETFT( ICARD - 1, %VAL( CNF_PVAL( IPFITS ) ), 
      :                       ITNAM( J ), FTNAM( J ), POLLOC, ICARD, 
-     :                       COMMNT( J ), NEW, STATUS, %VAL( 80 ) )
+     :                       COMMNT( J ), NEW, STATUS, 
+     :                       %VAL( CNF_CVAL( 80 ) ) )
 
 *  If a new card was added, increment the index at which the next card will 
 *  be written.
@@ -227,7 +228,7 @@
          CALL POL1_STFTR( ICARD - 1, %VAL( CNF_PVAL( IPFITS ) ), ANGROT,
      :                    'PPCKANGR', ICARD, 'POLPACK: X-axis '//
      :                    'to ref. direction in degs', NEW, 
-     :                    STATUS, %VAL( 80 ) )
+     :                    STATUS, %VAL( CNF_CVAL( 80 ) ) )
 
 *  If a new card was added, increment the index at which the next card will 
 *  be written.

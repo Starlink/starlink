@@ -424,7 +424,8 @@
          IF ( STATUS .EQ. SAI__OK ) THEN
             CALL POL1_IMPRT(  FITLEN, %VAL( CNF_PVAL( IPFIT )), 
      :                        FDIN, FNAME,
-     :                        POLLOC, QUIET, STATUS, %VAL( 80 ) )
+     :                        POLLOC, QUIET, STATUS, 
+     :                        %VAL( CNF_CVAL( 80 ) ) )
          END IF
 
 *  Check the values in the POLPACK extension are usable.

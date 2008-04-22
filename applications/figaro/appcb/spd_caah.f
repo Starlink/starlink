@@ -255,13 +255,13 @@
 
 *     If the line names do not match ...
          TESTC = SPD_UAAGC( %VAL( CNF_PVAL( RPNTR(1) ) ), 1, STATUS,
-     :                      %VAL( XCLEN ) )
+     :                      %VAL( CNF_CVAL( XCLEN ) ) )
          IF ( .NOT. CHR_SIMLR( LINENA, 'unidentified component' ) .AND.
      :        .NOT. CHR_SIMLR( LINENA, TESTC ) ) GO TO 3
 
 *     If the component types do not match ...
          TESTC = SPD_UAAGC( %VAL( CNF_PVAL( RPNTR(3) ) ), 1, STATUS,
-     :                      %VAL( XCLEN ) )
+     :                      %VAL( CNF_CVAL( XCLEN ) ) )
          IF ( .NOT. CHR_SIMLR( COMPTY, 'unknown function' ) .AND.
      :        .NOT. CHR_SIMLR( COMPTY, TESTC ) ) GO TO 3
 
@@ -299,7 +299,7 @@
 
 *        Test is positive if one of the strings is blank.
             TESTC = SPD_UAAGC( %VAL( CNF_PVAL( RPNTR(XC9NC+1) ) ), I,
-     :                         STATUS, %VAL( XCLEN ) )
+     :                         STATUS, %VAL( CNF_CVAL( XCLEN ) ) )
             IF ( .NOT. CHR_SIMLR( PARATY(I), 'unknown parameter' ) .AND.
      :           .NOT. CHR_SIMLR( PARATY(I), TESTC ) ) GO TO 3
  2       CONTINUE
@@ -390,9 +390,9 @@
 *     NPARA is not set, it should be all right from the creation
 *     or reshaping.
          CALL SPD_UAAFC( 1, 1, %VAL( CNF_PVAL( RPNTR(1) ) ), LINENA,
-     :                   STATUS, %VAL( XCLEN ) )
+     :                   STATUS, %VAL( CNF_CVAL( XCLEN ) ) )
          CALL SPD_UAAFC( 1, 1, %VAL( CNF_PVAL( RPNTR(3) ) ), COMPTY,
-     :                   STATUS, %VAL( XCLEN ) )
+     :                   STATUS, %VAL( CNF_CVAL( XCLEN ) ) )
          IF ( LABTYP .EQ. '_DOUBLE' ) THEN
             CALL SPD_UAAFD( 1, 1, %VAL( CNF_PVAL( RPNTR(2) ) ), LABFRE,
      :                      STATUS )
@@ -405,7 +405,7 @@
          DO 5 I = 1, NPARA
             CALL SPD_UAAFC( I, I, %VAL( CNF_PVAL( RPNTR(XC9NC+1) ) ),
      :                      PARATY(I), STATUS, 
-     :                      %VAL( XCLEN ) )
+     :                      %VAL( CNF_CVAL( XCLEN ) ) )
  5       CONTINUE
       END IF
 

@@ -218,6 +218,7 @@
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'MSG_PAR'          ! MSG constants
       INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'CNF_PAR'          ! For CNF_CVAL function
       
 *  Status:
       INTEGER STATUS             ! Global status
@@ -406,10 +407,12 @@
 *  the IRAF image will be extracted and propagated to the NDF array.
       IF ( DTYPE .EQ. 3 ) THEN
          CALL CON_CI2DW( MDIM, NCOLS, NROWS, NBANDS, IMDESC, ERR,
-     :                   %VAL( PNTR( 1 ) ), %VAL( LIPNTR ), STATUS )
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( LIPNTR ) ), STATUS )
       ELSE
          CALL CON_CI2DR( MDIM, NCOLS, NROWS, NBANDS, IMDESC, ERR,
-     :                   %VAL( PNTR( 1 ) ), %VAL( LIPNTR ), STATUS )
+     :                   %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
+     :                   %VAL( CNF_PVAL( LIPNTR ) ), STATUS )
       END IF
 
 *  Obtain other parameters.
@@ -441,7 +444,8 @@
 *  the airlock.
       IF ( ( PROFIT .OR. PROHIS ) .AND. NHDRLI .GT. 0 ) THEN
          CALL PSX_CALLOC( NHDRLI, '_LOGICAL', REPNTR, STATUS )
-         CALL CON_CONSL( .TRUE., NHDRLI, %VAL( REPNTR ), STATUS )
+         CALL CON_CONSL( .TRUE., NHDRLI, %VAL( CNF_PVAL( REPNTR ) ), 
+     :                   STATUS )
       END IF
 
 *  Deal with the NDF-style history records.  Search for such records,
@@ -450,11 +454,12 @@
 *  This is to avoid growing duplication of potentially bulky text
 *  especially if a user is mixing Starlink and IRAF tasks.
       IF ( PROHIS .AND. NHDRLI .GT. 0 )
-     :   CALL COI_CHISR( IMDESC, NDF, NHDRLI, %VAL( REPNTR ), STATUS )
+     :   CALL COI_CHISR( IMDESC, NDF, NHDRLI, 
+     :                   %VAL( CNF_PVAL( REPNTR ) ), STATUS )
 
 *  Propagate the FITS headers, and include mandatory headers too.
       IF ( PROFIT .AND. NHDRLI .GT. 0 ) CALL COI_HEADS( IMDESC, IRAFIL,
-     :  NDF, NHDRLI, %VAL( REPNTR ), PROHIS, STATUS )
+     :  NDF, NHDRLI, %VAL( CNF_PVAL( REPNTR ) ), PROHIS, STATUS )
 
 *  Free the work space.
       CALL PSX_FREE( REPNTR, STATUS )
@@ -523,8 +528,10 @@
       CALL PSX_MALLOC( BUFLEN, SPNTR, STATUS )
 
 *  Create the axis structure.
-      CALL COI_AXIMP( IMDESC, NDF, %VAL( BUPNTR ), %VAL( SPNTR ),
-     :                STATUS, %VAL( BUFLEN ), %VAL( BUFLEN ) )
+      CALL COI_AXIMP( IMDESC, NDF, %VAL( CNF_PVAL( BUPNTR ) ), 
+     :                %VAL( CNF_PVAL( SPNTR ) ),
+     :                STATUS, %VAL( CNF_CVAL( BUFLEN ) ), 
+     :                %VAL( CNF_CVAL( BUFLEN ) ) )
 
 *  Free the buffers.
       CALL PSX_FREE( BUPNTR, STATUS )

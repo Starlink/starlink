@@ -145,7 +145,7 @@
       CALL DSA1_KEYVAL( DSA__REFFNE(SLOT),
      :                  %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
      :                  KEYUC, 1, STRING, BUFFER, ISTR, ISSTR,
-     :                  STATUS, %VAL(80) )
+     :                  STATUS, %VAL(CNF_CVAL(80)) )
 
 *  If failure, annul error and return indicating absence of item
 *  (or absence of FITS extension.)
@@ -171,7 +171,7 @@
 *     Count items in the array that have this keyword.
          CALL DSA1_KEYCNT( DSA__REFFNE(SLOT),
      :                     %VAL( CNF_PVAL(DSA__REFFPT(SLOT)) ),
-     :                     KEYUC, NELM, STATUS, %VAL(80) )
+     :                     KEYUC, NELM, STATUS, %VAL(CNF_CVAL(80)) )
 
 *     Type is CHARACTER.
          TYPE = 'C'

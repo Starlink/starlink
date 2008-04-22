@@ -66,6 +66,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! Standard HDS constants
       INCLUDE 'CCD1_PAR'         ! CCDPACK parameters
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       
 *  Global Variables:
       INCLUDE 'CCD1_CACM'        ! CCD1_CALEN = INTEGER
@@ -78,7 +79,6 @@
                                  !    Pointer to character array
                                  ! CCD1_CALOC = CHARACTER * ( DAT__SZLOC )
                                  !    Locator for HDS component storing array
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  External References:
       INTEGER CHR_LEN            ! Significant length of a string
@@ -141,7 +141,8 @@
      :                        CCD1_CANUM, STATUS )
                DO K = CCD1_CAPOS, CCD1_CANUM
                   CALL CCD1_C2CA( %VAL( CNF_PVAL( CCD1_CAPTR ) ), 
-     :                            K, ' ', STATUS, %VAL( CCD1_CALEN ) )
+     :                            K, ' ', STATUS, 
+     :                            %VAL( CNF_CVAL( CCD1_CALEN ) ) )
                END DO
             END IF
 
@@ -153,7 +154,7 @@
                CALL CCD1_C2CA( %VAL( CNF_PVAL( CCD1_CAPTR ) ), 
      :                         CCD1_CAPOS,
      :                         FLAG // LINE( I : J ), STATUS,
-     :                         %VAL( CCD1_CALEN ) )
+     :                         %VAL( CNF_CVAL( CCD1_CALEN ) ) )
 
 *  Increment the line number to be used next, and set the flag 
 *  appropriately for a continuation line.

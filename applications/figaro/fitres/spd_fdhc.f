@@ -214,7 +214,8 @@
      :                   SHIFT1, %VAL( CNF_PVAL(PNTR(3)) ), STATUS )
       END IF
       CALL SPD_FDACC( 'unknown parameter', NEWTNP, DIM2, SHIFT0,
-     :   SHIFT1, %VAL( CNF_PVAL(PNTR(1) )), STATUS, %VAL(CSIZE) )
+     :   SHIFT1, %VAL( CNF_PVAL(PNTR(1) )), STATUS, 
+     :   %VAL(CNF_CVAL(CSIZE)) )
 
 *  Finally, store the new value into its place.
       CALL SPD_FDAAI( COMP, COMP, %VAL( CNF_PVAL(NPARA) ), NPARAI,

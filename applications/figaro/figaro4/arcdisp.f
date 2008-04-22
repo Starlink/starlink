@@ -365,7 +365,7 @@
       CALL SPD_WZMC( NCOMP, TNPAR, %VAL(CNF_PVAL(PNTR(8))),
      :               %VAL( CNF_PVAL(PNTR(7)) ), 
      :               %VAL( CNF_PVAL(PNTR(11)) ), STATUS,
-     :               %VAL(XCLEN), %VAL(XCLEN) )
+     :               %VAL(CNF_CVAL(XCLEN)), %VAL(CNF_CVAL(XCLEN)) )
 
 *  Release the results' extension vectors.
       DO 1 I = 2, 8

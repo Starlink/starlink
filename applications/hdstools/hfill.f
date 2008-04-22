@@ -151,7 +151,7 @@
                   CALL DAT_MAPV(OBJLOC,TYPE,'WRITE',OPTR,NVAL,STATUS)
                   CALL ARR_INIT1C(
      &              NVAL, %VAL(CNF_PVAL(OPTR)), CHARVAL, TRUNC, STATUS,
-     &              %VAL(CLEN) )
+     &              %VAL(CNF_CVAL(CLEN)) )
                   IF( ( STATUS.EQ.SAI__OK ) .AND. TRUNC ) THEN
                      CALL MSG_OUTIF( MSG__NORM, ' ',
      &                ' WARNING: Used length of _CHAR value is '//

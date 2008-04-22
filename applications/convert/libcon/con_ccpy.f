@@ -140,7 +140,7 @@
             CALL CON_WGRID ( %VAL(CNF_PVAL(IPBUF)), 
      :                       GRIDFL, TITLE, MAPX, MAPY,
      :                       %VAL(CNF_PVAL(MAPPTR)), STATUS, 
-     :                       %VAL( BUFLEN ) )
+     :                       %VAL( CNF_CVAL( BUFLEN ) ) )
 
             IF (STATUS .NE. SAI__OK) THEN
                CALL ERR_FLUSH (STATUS)

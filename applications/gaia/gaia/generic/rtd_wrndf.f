@@ -278,7 +278,7 @@
          CALL DAT_MAPV( FITLOC, '_CHAR*80', 'WRITE', IPFIT, NFITS,
      :                  STATUS )
          CALL RTD1_CHEAD( HEAD, NHEAD, %VAL( CNF_PVAL( IPFIT ) ), 
-     :                    STATUS, %VAL( 80 ) )
+     :                    STATUS, %VAL( CNF_CVAL( 80 ) ) )
          CALL DAT_UNMAP( FITLOC, STATUS )
 
 *  Take control of the NDF history component, by giving values to
