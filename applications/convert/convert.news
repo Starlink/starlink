@@ -1,7 +1,7 @@
 1 CONVERT_Version_1.5-14
 
- The creation of AXIS structures by SPECX2NDF can now be suppressed using
- the new SPECX2NDF parameter "AXIS".
+ The creation of AXIS structures by SPECX2NDF can now be suppressed 
+ using its new AXIS parameter.
 
 1 CONVERT_Version_1.5-13
 
@@ -37,7 +37,7 @@
 
 1 CONVERT_Version_1.5-10
 
-FITS2NDF supports externally and internally compressed FITS files.
+ FITS2NDF supports externally and internally compressed FITS files.
 
  NDF2FITS writes integrity check keywords CHECKSUM and DATASUM at
  the end of each header if new Parameter CHECKSUMS is TRUE.

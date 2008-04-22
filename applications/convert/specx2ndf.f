@@ -23,7 +23,7 @@
 *  Description:
 *     This application converts a SPECX map file into a simple data cube
 *     formatted as a standard NDF.  It works on map files in Version 4.2
-*     or later of the SPECX format.  It can optionally write a schematic 
+*     or later of the SPECX format.  It can optionally write a schematic
 *     of the map grid to a text file.
 *
 *     In addition, it will also convert an HDS container file containing
@@ -34,9 +34,9 @@
 *     In both cases, WCS components are added to the output NDFs
 *     describing the spectral and spatial axes.
 *
-*     A Variance component is added to the output NDF that has a constant
-*     value derived from the Tsys value, integration time, and channel 
-*     spacing in the input.
+*     A VARIANCE component is added to the output NDF that has a 
+*     constant value derived from the Tsys value, integration time, and 
+*     channel spacing in the input.
 
 *  Usage:
 *     specx2ndf in out [gridfile] [telescope] [latitude] [longitude]
@@ -73,7 +73,7 @@
 *        JCMT.  ["155:28:47"]
 *     OUT  =  NDF (Write)
 *        The name of the output NDF containing the data cube or spectra 
-*        written by the application.  The file extension ('.sdf') should 
+*        written by the application.  The file extension ('.sdf') should
 *        not be included since it is appended automatically by the 
 *        application.
 *     TELESCOPE  =  LITERAL (Read)
@@ -135,15 +135,15 @@
 *     cube is usually larger than the original map file.
 *
 *     The created NDF cube has a WCS component in which Axes 1 and 2 are
-*     RA and DEC, and Axis 3 is frequency in units of GHz.  The nature of 
+*     RA and DEC, and Axis 3 is frequency in units of GHz.  The nature of
 *     these axes can be changed if necessary by subsequent use of the
-*     WCSATTRIB application within the KAPPA package.  For compatibility 
-*     with older applications, AXIS structures may also be added to the 
-*     output cube (see parameter AXIS). Axes 1 and 2 are offsets from the 
-*     central position of the map, with units of seconds of arc, and Axis 
-*     3 is frequency offset in GHz relative to the central frequency.  The 
-*     pixel origin is placed at the source position on Axes 1 and 2, and 
-*     the central frequency on Axis 3.
+*     WCSATTRIB application within the KAPPA package.  For compatibility
+*     with older applications, AXIS structures may also be added to the
+*     output cube (see parameter AXIS). Axes 1 and 2 are offsets from 
+*     the central position of the map, with units of seconds of arc, and
+*     Axis 3 is frequency offset in GHz relative to the central 
+*     frequency.  The pixel origin is placed at the source position on 
+*     Axes 1 and 2, and the central frequency on Axis 3.
 *
 *     SPECX2NDF reads map files in Version 4.2 or later of the SPECX
 *     data format.  If it is given a map file in an earlier version of
@@ -183,7 +183,7 @@
 *     SPECX2NDF copies all the auxiliary information present in the
 *     original map file to the output data cube.  However, the arrays
 *     holding the original spectra are not copied in order to save
-*     disk space.  
+*     disk space. 
 
 *  Input and output spectra formats:
 *     In addition to converting SPECX map files, this application can 
@@ -216,8 +216,9 @@
 *        First stable version.
 *     17-FEB-2003 (DSB):
 *        Extensive modifications to replace the original spectral axis
-*        code by code which adds a WCS component to the output, including 
-*        a SpecFrame. Changed axis order to make spectral axis, axis 3.
+*        code by code which adds a WCS component to the output, 
+*        including a SpecFrame. Changed axis order to make spectral 
+*        axis, Axis 3.
 *     24-FEB-2004 (DSB):
 *        Modified NDF label to use AST escape sequences.
 *     11-AUG-2004 (TIMJ):
@@ -238,19 +239,19 @@
       DOUBLE PRECISION SLA_DRANGE
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'          ! Standard SAE constants.
-      INCLUDE 'AST_PAR'          ! AST constants and functions.
-      INCLUDE 'DAT_PAR'          ! HDS constants 
-      INCLUDE 'NDF_PAR'          ! NDF constants 
-      INCLUDE 'PAR_ERR'          ! PAR_ error constants.
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'DAT_PAR'          ! HDS constants
+      INCLUDE 'NDF_PAR'          ! NDF constants
+      INCLUDE 'PAR_ERR'          ! PAR_ error constants
       INCLUDE 'PRM_PAR'          ! VAL constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
-      INTEGER STATUS             ! Global status.
+      INTEGER STATUS             ! Global status
 
 *  External Referecnes:
-      INTEGER CHR_LEN          ! Used length of a string
+      INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Variables:
       INTEGER NCOMP
@@ -274,10 +275,10 @@
       CHARACTER LOC5*(DAT__SZLOC)
       LOGICAL GOTMAP
       LOGICAL OK
-      CHARACTER CLAT*12        ! Geodetic latitude (sexagesimal string format)
-      CHARACTER CLONG*12       ! Geodetic longitude (sexagesimal string format)
+      CHARACTER CLAT*12        ! Geodetic latitude (sexagesimal format)
+      CHARACTER CLONG*12       ! Geodetic longitude (sexagesimal format)
       CHARACTER DESCR*40       ! Description of the telescope
-      CHARACTER GRIDFL*70      ! Name of file containing schematic of map grid
+      CHARACTER GRIDFL*70      ! File containing schematic of map grid
       CHARACTER TELSCP*10      ! Name of telescope
       CHARACTER TTL*80         ! Title for output NDF
       DOUBLE PRECISION HT      ! Height above sea level
@@ -301,8 +302,8 @@
       INTEGER NY               ! Y size of the data cube
       INTEGER NZ               ! Z size of the data cube
       INTEGER SPTS             ! Number of points in each spectrum
-      LOGICAL APPHST           ! Flag; append history to output cube?
-      LOGICAL GRIDFG           ! Flag; write schematic of grid to a file?
+      LOGICAL APPHST           ! Append history to output cube?
+      LOGICAL GRIDFG           ! Write schematic of grid to a file?
       LOGICAL MKAXIS           ! Create AXIS structures?
       REAL VAR                 ! Constant variance for output spectra
       REAL VERSN               ! Data format version number
@@ -327,10 +328,10 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Attempt to import the top level object as an NDF.
-      CALL NDF_FIND( LOC1, ' ', INDF1, STATUS ) 
+      CALL NDF_FIND( LOC1, ' ', INDF1, STATUS )
 
-*  If this was succesful, and the NDF is 2-D, we assume we have a SPECX map 
-*  file as input.
+*  If this was succesful, and the NDF is two-dimensional, we assume we 
+*  have a SPECX map file as input.
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL NDF_BOUND( INDF1, 2, MLWBND, MUPBND, DIMS, STATUS )
          GOTMAP = ( DIMS .EQ. 2 )
@@ -347,11 +348,11 @@
          CALL SLA_OBS( 0, TELSCP, DESCR, LONG, LAT, HT )
 
          IF( DESCR .EQ. '?' ) THEN
-            IF( STATUS .EQ. SAI__OK ) THEN         
+            IF( STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETC( 'TELSCP', TELSCP )
                CALL ERR_REP( 'SPECX2NDF_TEL', 'The given telescope '//
-     :                       '(^TELSCP) is unknown.', STATUS  )
+     :                       '(^TELSCP) is unknown.', STATUS )
             END IF
          END IF
 
@@ -386,9 +387,10 @@
 *  Abort if an error has occurred.
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Determine whether to write a schematic of the map grid. If no schematic 
-*  is required then a null value is returned for GRIDFL; otherwise it is 
-*  set to the name of the file to which the schematic will be written.
+*  Determine whether to write a schematic of the map grid.  If no
+*  schematic is required then a null value is returned for GRIDFL; 
+*  otherwise it is set to the name of the file to which the schematic
+*  will be written.
          CALL PAR_GET0C( 'GRIDFILE', GRIDFL, STATUS )
          IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS  )
@@ -401,11 +403,12 @@
 *  Determine the size of the input map grid.
          CALL NDF_BOUND( INDF1, 2, MLWBND, MUPBND, DIMS, STATUS )
 
-*  Determine the number of spectra and the number of points in each spectrum.
+*  Determine the number of spectra and the number of points in each
+*  spectrum.
          CALL NDF_XGT0I( INDF1, 'SPECX_MAP', 'NSPEC', NSPEC, STATUS )
          CALL NDF_XGT0I( INDF1, 'SPECX_MAP', 'NPTS1', SPTS, STATUS )
             
-*  Attempt to get an identifier for the output cube and proceed if ok.  
+*  Attempt to get an identifier for the output cube and proceed if ok. 
 *  First construct the array bounds.
          CLWBND( 1 ) = MLWBND( 1 )
          CUPBND( 1 ) = MUPBND( 1 )
@@ -416,7 +419,7 @@
          CLWBND( 3 ) = 1
          CUPBND( 3 ) = SPTS
    
-         CALL NDF_CREAT( 'OUT', '_REAL', 3, CLWBND, CUPBND, INDF2, 
+         CALL NDF_CREAT( 'OUT', '_REAL', 3, CLWBND, CUPBND, INDF2,
      :                   STATUS )
 
 *  Find the largest dimension.
@@ -437,9 +440,9 @@
 *  Map the output variance array and fill it with the constant value
 *  returned by CON_WCSPX. 
          IF( VAR .NE. VAL__BADR ) THEN
-            CALL NDF_MAP( INDF2, 'VARIANCE', '_REAL', 'WRITE', 
-     :                    IPVOUT, EL, STATUS ) 
-            CALL CON_CONSR( VAR, EL, %VAL( CNF_PVAL( IPVOUT ) ), 
+            CALL NDF_MAP( INDF2, 'VARIANCE', '_REAL', 'WRITE',
+     :                    IPVOUT, EL, STATUS )
+            CALL CON_CONSR( VAR, EL, %VAL( CNF_PVAL( IPVOUT ) ),
      :                      STATUS )
             CALL NDF_UNMAP( INDF2, 'VARIANCE', STATUS )
          END IF
@@ -457,17 +460,17 @@
          CALL NDF_XGT0C( INDF1, 'SPECX_MAP', 'ID', TTL, STATUS )
          CALL CHR_LDBLK( TTL )
          LTTL = CHR_LEN( TTL )
-         IF( LTTL .NE. 0 ) CALL NDF_CPUT( TTL( : LTTL ), INDF2, 'TITLE', 
+         IF( LTTL .NE. 0 ) CALL NDF_CPUT( TTL( : LTTL ), INDF2, 'TITLE',
      :                                    STATUS ) 
          CALL NDF_CPUT( 'T%s60+%v30+A%^50+%<20+*%+   corrected '//
-     :                  'antenna temperature', INDF2, 'LABEL', STATUS ) 
-         CALL NDF_CPUT( 'K', INDF2, 'Unit', STATUS ) 
+     :                  'antenna temperature', INDF2, 'LABEL', STATUS )
+         CALL NDF_CPUT( 'K', INDF2, 'Unit', STATUS )
 
 *  Report success.
          IF( STATUS .EQ. SAI__OK ) THEN
-            NX = CUPBND(1 ) + 1 - CLWBND(1 )
-            NY = CUPBND(2 ) + 1 - CLWBND(2 )
-            NZ = CUPBND(3 ) + 1 - CLWBND(3 )
+            NX = CUPBND( 1 ) + 1 - CLWBND( 1 )
+            NY = CUPBND( 2 ) + 1 - CLWBND( 2 )
+            NZ = CUPBND( 3 ) + 1 - CLWBND( 3 )
          
             CALL MSG_SETI( 'NX', NX )
             CALL MSG_SETI( 'NY', NY )
@@ -495,20 +498,21 @@
                NNDF = 1
 
 *  Create the output from the input.
-               CALL NDF_PROP( INDF1, 'UNITS', 'OUT', INDF2, STATUS ) 
+               CALL NDF_PROP( INDF1, 'UNITS', 'OUT', INDF2, STATUS )
             END IF
 
 *  If the supplied input HDS object was not an NDF, see if it has an
-*  1D array component called SPECTRUM. If so get the length of the array,
-*  and attempt to import an NDF from the first cell.
+*  one-dimensional array component called SPECTRUM.  If so get the 
+*  length of the array, and attempt to import an NDF from the first 
+*  cell.
          ELSE
             CALL DAT_THERE( LOC1, 'SPECTRUM', OK, STATUS ) 
             IF( OK ) THEN
-               CALL DAT_FIND( LOC1, 'SPECTRUM', LOC2, STATUS )             
-               CALL DAT_SHAPE( LOC2, 1, NNDF, NDIM, STATUS ) 
+               CALL DAT_FIND( LOC1, 'SPECTRUM', LOC2, STATUS )
+               CALL DAT_SHAPE( LOC2, 1, NNDF, NDIM, STATUS )
 
                IF( NDIM .EQ. 1 ) THEN
-                  CALL DAT_CELL( LOC2, 1, 1, LOC3, STATUS ) 
+                  CALL DAT_CELL( LOC2, 1, 1, LOC3, STATUS )
 
                   IF( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -522,22 +526,23 @@
                   END IF
                   CALL DAT_ANNUL( LOC3, STATUS )
 
-*  Create a container file for the output NDFs by copying the input file.
-                  CALL DAT_CREAT( 'OUT' , 'SPECX_SPECTRA', 0, 0, 
-     :                            STATUS ) 
+*  Create a container file for the output NDFs by copying the input
+*  file.
+                  CALL DAT_CREAT( 'OUT' , 'SPECX_SPECTRA', 0, 0,
+     :                            STATUS )
                   CALL DAT_ASSOC( 'OUT', 'UPDATE', LOC4, STATUS )
-                  CALL DAT_NCOMP( LOC1, NCOMP, STATUS ) 
+                  CALL DAT_NCOMP( LOC1, NCOMP, STATUS )
                   DO I = 1, NCOMP
-                     CALL DAT_INDEX( LOC1, I, LOC5, STATUS ) 
-                     CALL DAT_NAME( LOC5, NAME, STATUS ) 
+                     CALL DAT_INDEX( LOC1, I, LOC5, STATUS )
+                     CALL DAT_NAME( LOC5, NAME, STATUS )
                      IF( NAME(:4) .NE. 'SPEC' ) THEN
-                        CALL DAT_COPY( LOC5, LOC4, NAME, STATUS ) 
+                        CALL DAT_COPY( LOC5, LOC4, NAME, STATUS )
                      END IF
                   END DO
 
 *  Create the first output NDF from the first input NDF.
-                  CALL NDF_PLACE( LOC4, 'SPECTRUM1', PLACE, STATUS ) 
-                  CALL NDF_SCOPY( INDF1, 'UNITS', PLACE, INDF2, STATUS ) 
+                  CALL NDF_PLACE( LOC4, 'SPECTRUM1', PLACE, STATUS )
+                  CALL NDF_SCOPY( INDF1, 'UNITS', PLACE, INDF2, STATUS )
 
                ELSE
                   OK = .FALSE.
@@ -569,14 +574,14 @@
                MUPBND( 3 ) = MUPBND( 1 )
                MUPBND( 1 ) = 1
                MUPBND( 2 ) = 1
-               CALL NDF_SBND( 3, MLWBND, MUPBND, INDF2, STATUS ) 
+               CALL NDF_SBND( 3, MLWBND, MUPBND, INDF2, STATUS )
 
 *  Copy the data values.
-               CALL NDF_MAP( INDF1, 'DATA', '_REAL', 'READ', IPIN, EL, 
-     :                       STATUS ) 
-               CALL NDF_MAP( INDF2, 'DATA', '_REAL', 'WRITE', IPOUT, EL, 
-     :                       STATUS ) 
-               CALL VEC_RTOR( .FALSE., EL, %VAL( CNF_PVAL( IPIN ) ), 
+               CALL NDF_MAP( INDF1, 'DATA', '_REAL', 'READ', IPIN, EL,
+     :                       STATUS )
+               CALL NDF_MAP( INDF2, 'DATA', '_REAL', 'WRITE', IPOUT, EL,
+     :                       STATUS )
+               CALL VEC_RTOR( .FALSE., EL, %VAL( CNF_PVAL( IPIN ) ),
      :                        %VAL( CNF_PVAL( IPOUT ) ),
      :                        IERR, NERR, STATUS )
 
@@ -590,35 +595,35 @@
 *  Map the output variance array and fill it with the constant value
 *  returned by CON_WCSPX. 
                IF( VAR .NE. VAL__BADR ) THEN
-                  CALL NDF_MAP( INDF2, 'VARIANCE', '_REAL', 'WRITE', 
-     :                          IPVOUT, EL, STATUS ) 
-                  CALL CON_CONSR( VAR, EL, %VAL( CNF_PVAL( IPVOUT ) ), 
+                  CALL NDF_MAP( INDF2, 'VARIANCE', '_REAL', 'WRITE',
+     :                          IPVOUT, EL, STATUS )
+                  CALL CON_CONSR( VAR, EL, %VAL( CNF_PVAL( IPVOUT ) ),
      :                            STATUS )
                   CALL NDF_UNMAP( INDF2, 'VARIANCE', STATUS )
                END IF
 
 *  Add AXIS structures to the output NDF.
-               CALL PSX_CALLOC( 6*( MUPBND(3) - MLWBND(3) + 1 ), 
+               CALL PSX_CALLOC( 6*( MUPBND(3) - MLWBND(3) + 1 ),
      :                          '_DOUBLE', IPWORK, STATUS )
-               CALL CON_CAXES( INDF1, INDF2, MKAXIS, 
+               CALL CON_CAXES( INDF1, INDF2, MKAXIS,
      :                         %VAL( CNF_PVAL( IPWORK ) ), STATUS )
                CALL PSX_FREE( IPWORK, STATUS )
 
 *  Set the output NDF label and unit.
                CALL NDF_CPUT( 'T%s60+%v30+A%^50+%<20+*%+   corrected '//
      :              'antenna temperature', INDF2, 'LABEL', STATUS ) 
-               CALL NDF_CPUT( 'K', INDF2, 'Unit', STATUS ) 
+               CALL NDF_CPUT( 'K', INDF2, 'Unit', STATUS )
 
-*  Annul the current input and output NDF identifiers. 
+*  Annul the current input and output NDF identifiers.
                CALL NDF_ANNUL( INDF2, STATUS )
             END IF
             CALL NDF_ANNUL( INDF1, STATUS )
 
 *  Get an identifier for the next input NDF if necessary.
             IF( I .LT. NNDF ) THEN
-               CALL DAT_CELL( LOC2, 1, I + 1, LOC3, STATUS ) 
-               CALL NDF_FIND( LOC3, ' ', INDF1, STATUS ) 
-               CALL NDF_BOUND( INDF1, 2, MLWBND, MUPBND, DIMS, 
+               CALL DAT_CELL( LOC2, 1, I + 1, LOC3, STATUS )
+               CALL NDF_FIND( LOC3, ' ', INDF1, STATUS )
+               CALL NDF_BOUND( INDF1, 2, MLWBND, MUPBND, DIMS,
      :                         STATUS )
                CALL DAT_ANNUL( LOC3, STATUS )
 
@@ -627,8 +632,8 @@
                   OUTNAM = 'SPECTRUM'
                   IAT = 8
                   CALL CHR_PUTI( I + 1, OUTNAM, IAT )
-                  CALL NDF_PLACE( LOC4, OUTNAM( : IAT ), PLACE, STATUS ) 
-                  CALL NDF_COPY( INDF1, PLACE, INDF2, STATUS ) 
+                  CALL NDF_PLACE( LOC4, OUTNAM( : IAT ), PLACE, STATUS )
+                  CALL NDF_COPY( INDF1, PLACE, INDF2, STATUS )
                ELSE
                   INDF2 = NDF__NOID
                END IF
@@ -644,7 +649,7 @@
 *  Report success.
          IF( NDONE .GT. 0 .AND. STATUS .EQ. SAI__OK ) THEN
             CALL MSG_SETI( 'N', NDONE )
-            CALL MSG_OUT( ' ', '^N spectra converted successfully.', 
+            CALL MSG_OUT( ' ', '^N spectra converted successfully.',
      :                   STATUS )
          END IF
 
