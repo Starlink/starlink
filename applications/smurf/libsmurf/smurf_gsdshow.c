@@ -26,8 +26,11 @@
 
 *  ADAM Parameters:
 *     IN = CHAR (Read)
-*          Name of the input GSD file to be converted.  This name
-*          should include the .gsd extension.
+*          Name of the input GSD file to be converted.  
+*     DESCRIPTIONS = LOGICAL (Read)
+*          Flag for showing header descriptions.
+*     SHOWDATA = LOCICAL (Read)
+*          Flag for showing data array.
 
 *  Authors:
 *     Jen Balfour (JAC, UBC)
@@ -36,6 +39,8 @@
 *  History:
 *     18-APR-2008 (JB):
 *        Original version.
+*     22-APR-2008 (JB):
+*        Use T/F for logical values.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -96,7 +101,7 @@ void smurf_gsdshow ( int *status ) {
   FILE *fptr;                 /* pointer to GSD file */
   struct gsdac_gsd_struct gsd; /* GSD file access parameters */
   gsdVars gsdVars;            /* GSD headers and arrays */
-  int logConv;                /* logical converter */
+  char logConv[2];            /* logical converter */
   char label[41];             /* GSD label */
   int nitem;                  /* number of items in GSD file */
   int nObs;                   /* integer value of observation number */
@@ -110,11 +115,23 @@ void smurf_gsdshow ( int *status ) {
   /* Get the user defined input and output file names. */
   parGet0c ( "IN", filename, MAXNAME, status );
 
+  if ( *status != SAI__OK ) return;
+
   /* Find out if the user wants data. */
   parGet0l ( "DESCRIPTIONS", &showDesc, status );
 
+  if ( *status == PAR__NULL ) {
+    errAnnul ( status );
+    showDesc = 0;
+  }
+
   /* Find out if the user wants data. */
   parGet0l ( "SHOWDATA", &showData, status );
+
+  if ( *status == PAR__NULL ) {
+    errAnnul ( status );
+    showData = 0;
+  }
 
   if ( *status != SAI__OK ) return;  
    
@@ -198,6 +215,9 @@ void smurf_gsdshow ( int *status ) {
   if ( *status != SAI__OK ) return;
 
   /* Write out the contents of the file. */
+
+  logConv[1] = '\0';
+
   gsdac_printHdr ( "C1TEL", "TEL_NAME", 5,
                    "Telescope name",
                    &(gsdVars.telName[0]), 0, 0, showDesc, status );
@@ -238,11 +258,14 @@ void smurf_gsdshow ( int *status ) {
                    "Type of epoch, JULIAN, BESSELIAN or APPARENT",
                    &(gsdVars.epochType[0]), 0, 0, showDesc, status );
 
-  logConv = (int)gsdVars.centreMoving;
+  if ( (int)gsdVars.centreMoving )
+    logConv[0] = 'T';
+  else 
+    logConv[0] = 'F';
 
-  gsdac_printHdr ( "C4MCF", "CENTRE_MOVING", 1,
+  gsdac_printHdr ( "C4MCF", "CENTRE_MOVING", 5,
                    "Centre moving flag (solar system object)",
-                   &(logConv), 0, 0, showDesc, status );
+                   logConv, 0, 0, showDesc, status );
 
   gsdac_printHdr ( "C4EPH", "CENTRE_EPOCH", 2,
                    "Date of the RA",
@@ -390,35 +413,50 @@ void smurf_gsdshow ( int *status ) {
                    "Local sidereal time at the start of the observation",
                    &(gsdVars.obsLST), 0, 0, showDesc, status );
 
-  logConv = (int)gsdVars.obsCalibration;
+  if ( (int)gsdVars.obsCalibration )
+    logConv[0] = 'T';
+  else 
+    logConv[0] = 'F';
 
-  gsdac_printHdr ( "C3CAL", "OBS_CALIBRATION", 1,
+  gsdac_printHdr ( "C3CAL", "OBS_CALIBRATION", 5,
                    "Calibration observation?",
-                   &(logConv), 0, 0, showDesc, status );
+                   logConv, 0, 0, showDesc, status );
 
-  logConv = (int)gsdVars.obsCentre;
+  if ( (int)gsdVars.obsCentre )
+    logConv[0] = 'T';
+  else 
+    logConv[0] = 'F';
 
-  gsdac_printHdr ( "C3CEN", "OBS_CENTRE", 1,
+  gsdac_printHdr ( "C3CEN", "OBS_CENTRE", 5,
                    "Centre moves between scans?",
-                   &(logConv), 0, 0, showDesc, status );
+                   logConv, 0, 0, showDesc, status );
 
-  logConv = (int)gsdVars.obsContinuous;
+  if ( (int)gsdVars.obsContinuous )
+    logConv[0] = 'T';
+  else 
+    logConv[0] = 'F';
 
-  gsdac_printHdr ( "C3FLY", "OBS_CONTINUOUS", 1,
+  gsdac_printHdr ( "C3FLY", "OBS_CONTINUOUS", 5,
                    "Data taken on the fly or in discrete mode?",
-                   &(logConv), 0, 0, showDesc, status );
+                   logConv, 0, 0, showDesc, status );
 
-  logConv = (int)gsdVars.obsFocus;
+  if ( (int)gsdVars.obsFocus )
+    logConv[0] = 'T';
+  else
+    logConv[0] = 'F';
 
-  gsdac_printHdr ( "C3FOCUS", "OBS_FOCUS", 1,
+  gsdac_printHdr ( "C3FOCUS", "OBS_FOCUS", 5,
                    "Focus observation?",
-                   &(logConv), 0, 0, showDesc, status );
+                   logConv, 0, 0, showDesc, status );
 
-  logConv = (int)gsdVars.obsMap;
+  if ( (int)gsdVars.obsMap )
+    logConv[0] = 'T';
+  else 
+    logConv[0] = 'F';
 
-  gsdac_printHdr ( "C3MAP", "OBS_MAP", 1,
+  gsdac_printHdr ( "C3MAP", "OBS_MAP", 5,
                    "Map observation?",
-                   &(logConv), 0, 0, showDesc, status );
+                   logConv, 0, 0, showDesc, status );
 
   gsdac_printHdr ( "C3NPP", "NO_MAP_DIMS", 1,
                    "Number of dimension in the map table",
@@ -444,25 +482,34 @@ void smurf_gsdshow ( int *status ) {
                    "Y coordinate of the first map point",
                    &(gsdVars.mapStartY), 0, 0, showDesc, status );
 
-  logConv = (int)gsdVars.scanRev;
+  if ( (int)gsdVars.scanRev )
+    logConv[0] = 'T';
+  else 
+    logConv[0] = 'F';
 
-  gsdac_printHdr ( "C6REV", "SCAN_REVERSAL", 1,
+  gsdac_printHdr ( "C6REV", "SCAN_REVERSAL", 5,
                    "Map rows scanned in alternate directions?",
-                   &(logConv), 0, 0, showDesc, status );
+                   logConv, 0, 0, showDesc, status );
 
   gsdac_printHdr ( "C6SD", "OBS_DIRECTION", 5,
                    "Map rows are in X (horizontal) or Y(vertical) direction",
                    &(gsdVars.obsDirection[0]), 0, 0, showDesc, status );
 
-  logConv = (int)gsdVars.mapPosX;
+  if ( (int)gsdVars.mapPosX )
+    logConv[0] = 'T';
+  else 
+    logConv[0] = 'F';
 
-  gsdac_printHdr ( "C6XPOS", "X_MAP_POSITIVE", 1,
+  gsdac_printHdr ( "C6XPOS", "X_MAP_POSITIVE", 5,
                    "In first row x increases (TRUE) or decreases (FALSE)",
-                   &(logConv), 0, 0, showDesc, status );
+                   logConv, 0, 0, showDesc, status );
 
-  logConv = (int)gsdVars.mapPosY;
+  if ( (int)gsdVars.mapPosY )
+    logConv[0] = 'T';
+  else 
+    logConv[0] = 'F';
 
-  gsdac_printHdr ( "C6YPOS", "Y_MAP_POSITIVE", 1,
+  gsdac_printHdr ( "C6YPOS", "Y_MAP_POSITIVE", 5,
                    "In first row y increases (TRUE) or decreases (FALSE)",
                    &(logConv), 0, 0, showDesc, status );
 
@@ -570,11 +617,14 @@ void smurf_gsdshow ( int *status ) {
                    "Forward spillover and scattering efficiency",
                    &(gsdVars.etafss), 0, 0, showDesc, status );
 
-  logConv = (int)gsdVars.chopping;
+  if ( (int)gsdVars.chopping )
+    logConv[0] = 'T';
+  else 
+    logConv[0] = 'F';
 
-  gsdac_printHdr ( "C4SM", "CHOPPING", 1,
+  gsdac_printHdr ( "C4SM", "CHOPPING", 5,
                    "Secondary mirror is chopping",
-                   &(logConv), 0, 0, showDesc, status );
+                   logConv, 0, 0, showDesc, status );
 
   gsdac_printHdr ( "C4FUN", "WAVEFORM", 5,
                    "Secondary mirror chopping waveform",
