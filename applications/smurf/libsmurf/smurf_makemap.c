@@ -267,6 +267,9 @@
 *     2008-04-02 (AGG):
 *        Write 2-D WEIGHTS component + WCS in output file, protect
 *        against attempting to access NULL smfFile pointer
+*     2008-04-22 (AGG):
+*        Use faster histogram-based method for calculating median
+*        exposure time
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -339,10 +342,11 @@ void smurf_makemap( int *status ) {
   /* Local Variables */
   Grp *confgrp = NULL;       /* Group containing configuration file */
   smfData *data=NULL;        /* Pointer to SCUBA2 data struct */
-  float *exp_time = NULL;    /* Exposure time array written to output file */
+  double *exp_time = NULL;    /* Exposure time array written to output file */
   AstFitsChan *fchan = NULL; /* FitsChan holding output NDF FITS extension */
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
   int flag;                  /* Flag */
+  int *histogram = NULL;     /* Histogram for calculating exposure time statistics */
   unsigned int *hitsmap;     /* Hitsmap array calculated in ITERATE method */
   dim_t i;                   /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
@@ -352,11 +356,14 @@ void smurf_makemap( int *status ) {
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   double *map=NULL;          /* Pointer to the rebinned map data */
   size_t mapsize;            /* Number of pixels in output image */
-  float medtexp = 0.0;       /* Median exposure time */
+  double meantexp;           /* Mean exposure time */
+  double maxtexp = 0.0;      /* Maximum exposure time */
+  double modetexp;           /* Modal exposure time */ 
+  double medtexp = 0.0;      /* Median exposure time */
   char method[LEN__METHOD];  /* String for map-making method */
   int moving = 0;            /* Is the telescope base position changing? */
-  int neluse;                /* Number of pixels with a non-zero exposure time */
   int nparam = 0;            /* Number of extra parameters for pixel spreading scheme*/
+  int numbin;                /* Number of exposure time bins in histogram */
   AstKeyMap * obsidmap = NULL; /* Map of OBSIDs from input data */
   smfData *odata=NULL;       /* Pointer to output SCUBA2 data struct */
   Grp *ogrp = NULL;          /* Group containing output file */
@@ -374,6 +381,7 @@ void smurf_makemap( int *status ) {
   HDSLoc *smurfloc=NULL;     /* HDS locator of SMURF extension */
   int spread;                /* Code for pixel spreading scheme */
   double steptime;           /* Integration time per sample, from FITS header */
+  double sumtexp;            /* Total exposure time across all pixels */
   char system[10];           /* Celestial coordinate system for output image */
   smfData *tdata=NULL;       /* Exposure time data */
   int tndf = 0;              /* NDF identifier for EXP_TIME */
@@ -385,7 +393,6 @@ void smurf_makemap( int *status ) {
   double *weights=NULL;      /* Pointer to the weights map */
   double *weights3d = NULL;  /* Pointer to 3-D weights array */
   int wndf = 0;              /* NDF identifier for WEIGHTS */
-  float *work_array = NULL;  /* Temporary work space */
 
   /* Main routine */
   ndfBegin();
@@ -495,7 +502,7 @@ void smurf_makemap( int *status ) {
   }
 
   /* Create EXP_TIME component in output file */
-  smf_open_ndfname ( smurfloc, "WRITE", NULL, "EXP_TIME", "NEW", "_REAL",
+  smf_open_ndfname ( smurfloc, "WRITE", NULL, "EXP_TIME", "NEW", "_DOUBLE",
 		     2, lbnd_out, ubnd_out, &tdata, status );
   if ( tdata ) {
     exp_time = (tdata->pntr)[0];
@@ -570,8 +577,16 @@ void smurf_makemap( int *status ) {
        mapsize number of values which represent the `hits' per
        pixel */
     for (i=0; (i<mapsize) && (*status == SAI__OK); i++) {
-      exp_time[i] = steptime * weights[i];
-      weights[i] = weights3d[i+mapsize];
+      if ( map[i] == VAL__BADD) {
+	exp_time[i] = 0.0;
+	weights[i] = VAL__BADD;
+      } else {
+	exp_time[i] = steptime * weights3d[i];
+	weights[i] = weights3d[i+mapsize];
+	if ( exp_time[i] > maxtexp ) {
+	  maxtexp = exp_time[i];
+	}
+      }
     }
     weights3d = smf_free( weights3d, status );
   } else if ( iterate ) {
@@ -626,6 +641,9 @@ void smurf_makemap( int *status ) {
 	exp_time[i] = 0.0;
       } else {
 	exp_time[i] = steptime * hitsmap[i];
+	if ( exp_time[i] > maxtexp ) {
+	  maxtexp = exp_time[i];
+	}
       }
     }
     smf_free( hitsmap, status );
@@ -636,15 +654,19 @@ void smurf_makemap( int *status ) {
   ndfPtwcs( outfset, tndf, status );
   ndfPtwcs( outfset, wndf, status );
 
-  /* Calculate unweighted median exposure time - work_array is needed
-     because kpg1Medur optimizes the order of the input array */
-  work_array = smf_malloc( mapsize, sizeof(float), 1, status);
-  if ( work_array ) {
-    work_array = astStore( work_array, exp_time, mapsize*sizeof(float));
-    kpg1Medur( 1, (int)mapsize, work_array, &medtexp, &neluse, status);
+  /* Calculate median exposure time - use faster histogram-based
+     method which should be accurate enough for our purposes */
+  numbin = (int)(maxtexp / steptime) - 1;
+  histogram = smf_malloc( (size_t)numbin, sizeof(int), 1, status );
+  if ( histogram ) {
+    kpg1Ghstd( 1, (int)mapsize, exp_time, numbin, 0, maxtexp, steptime, histogram, 
+	       status );
+    kpg1Hsstp( numbin, histogram, maxtexp, steptime, 
+	       &sumtexp, &meantexp, &medtexp, &modetexp, status);
     astSetFitsF(fchan, "MEDTEXP", medtexp, "[s] Median MAKEMAP exposure time", 0);
-    smf_free( work_array, status );
+    histogram = smf_free( histogram, status );
   }
+
 
 /* Retrieve the unique OBSID keys from the KeyMap and populate the OBSnnnnn
    and PROVCNT headers from this information. */
