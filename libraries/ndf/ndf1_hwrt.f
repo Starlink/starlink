@@ -309,7 +309,8 @@
                CALL DAT_CLEN( TLOC, CLEN, STATUS )
                IF ( STATUS .EQ. SAI__OK ) THEN
                   CALL NDF1_HCPY( NLINES, %VAL( CNF_PVAL( PNTR ) ),
-     :                            TEXT, STATUS, %VAL( CLEN ) )
+     :                            TEXT, STATUS, 
+     :                            %VAL( CNF_CVAL( CLEN ) ) )
                END IF
 
 *  Annul the TEXT array locator, thus unmapping the new lines.

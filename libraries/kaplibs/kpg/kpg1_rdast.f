@@ -90,10 +90,10 @@
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
       INCLUDE 'KPG_PAR'          ! KPG_ constants      
       INCLUDE 'AST_PAR'          ! AST_ public interface
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       
 *  Global Variables:
       INCLUDE 'KPG_AST'          ! KPG AST common blocks.
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        ASTLC = CHARACTER * ( DAT__SZLOC ) (Read)
 *           Locator to HDS _CHAR array holding AST_ data.
 *        ASTLN = INTEGER (Read and Write)
@@ -164,7 +164,7 @@
             IF ( ASTLN .LE. DIM( 1 ) ) THEN
                CALL KPG1_H2AST( %VAL( CNF_PVAL( ASTPT ) ), ASTLN,
      :                          NEXT( : LENGTH ), STATUS,
-     :                          %VAL( LENGTH ) )
+     :                          %VAL( CNF_CVAL( LENGTH ) ) )
 
 *  If this is the first element read, insert it at the start of the
 *  text buffer (minus the first character, which is a flag) and update

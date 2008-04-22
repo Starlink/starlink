@@ -285,7 +285,7 @@
                END IF
                CALL IMG1_WCEL( ALLOC, NPRIM, LOCSTK( NOBJ ),
      :                         %VAL( CNF_PVAL( IPLOC ) ), STATUS,
-     :                         %VAL( DAT__SZLOC ) )
+     :                         %VAL( CNF_CVAL( DAT__SZLOC ) ) )
 
 *  Now try for another object at this level.
                LOCSTK( NOBJ ) = DAT__NOLOC

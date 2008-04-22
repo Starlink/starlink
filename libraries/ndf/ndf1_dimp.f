@@ -262,13 +262,15 @@ c            CALL ERR_RLSE
 *  refused to handle their data as a result).
                      IF ( .NOT. CHR_SIMLR( %VAL( CNF_PVAL( PNTR ) ),
      :                                     'SIMPLE',
-     :                                     %VAL( LENV ) ) ) THEN
+     :                                     %VAL( CNF_CVAL( LENV ) ) ) ) 
+     :THEN
                         IF ( TCB_WARN ) THEN
                            CALL ERR_MARK
                            STATUS = NDF__VARIN
                            CALL DAT_MSG( 'NDF', LOC )
                            CALL NDF1_SETC( %VAL( CNF_PVAL( PNTR ) ),
-     :                                     'BADVARIANT', %VAL( LENV ) )
+     :                                     'BADVARIANT', 
+     :                                     %VAL( CNF_CVAL( LENV ) ) )
                            CALL ERR_REP( 'NDF1_DIMP_WVRNT',
      :                     'Warning: the VARIANT component in the ' //
      :                     'NDF structure ^NDF has an invalid ' //

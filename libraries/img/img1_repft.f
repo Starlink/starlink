@@ -113,6 +113,6 @@
      :                 ECB_FTSN( SLOT2 ),
      :                 %VAL( CNF_PVAL( ECB_FTSP( SLOT2 ) ) ), 
      :                 NOUT, STATUS, 
-     :                 %VAL( 80 ), %VAL( 80 ) )
+     :                 %VAL( CNF_CVAL( 80 ) ), %VAL( CNF_CVAL( 80 ) ) )
       END
 * $Id$

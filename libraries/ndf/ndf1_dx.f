@@ -231,14 +231,14 @@
                               IF ( .NOT.
      :                             CHR_SIMLR( %VAL( CNF_PVAL( PNTR ) ),
      :                                        'SIMPLE',
-     :                                        %VAL( LENV ) ) ) THEN
+     :                                %VAL( CNF_CVAL( LENV ) ) ) ) THEN
                                  STATUS = NDF__VARIN
                                  CALL DAT_MSG( 'MORE',
      :                                         DCB_XLOC( IDCB ) )
                                  CALL NDF1_SETC(
      :                                         %VAL( CNF_PVAL( PNTR ) ),
      :                                           'BADVARIANT',
-     :                                           %VAL( LENV ) )
+     :                                        %VAL( CNF_CVAL( LENV ) ) )
                                  CALL ERR_REP( 'NDF1_DX_VRNT',
      :                           'The VARIANT component in the NDF ' //
      :                           'extension structure ^MORE has an ' //

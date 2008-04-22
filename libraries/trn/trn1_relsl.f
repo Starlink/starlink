@@ -104,7 +104,7 @@
         IF( CTTI( TRN_CT_NMOD, SLOT ) .NE. 0 ) THEN
           CALL TRN1_RELTS( CTTI( TRN_CT_NMOD, SLOT ),
      :                   %VAL( CNF_PVAL( CTTI( TRN_CT_PLOCM, SLOT ) ) ),
-     :                     LSTAT, %VAL( DAT__SZLOC ) )
+     :                     LSTAT, %VAL( CNF_CVAL( DAT__SZLOC ) ) )
 
 *  Use TRN1_RELTS to delete the temporary structure holding the CML
 *  (which includes the locator list just used), releasing the resources

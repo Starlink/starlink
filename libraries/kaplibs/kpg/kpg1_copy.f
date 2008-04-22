@@ -146,7 +146,8 @@
          CALL CHR_CTOI( TYPE( 7 : ), CLEN, STATUS )
          CALL KPG1_COPYC( NEL, %VAL( CNF_PVAL( IPIN ) ), 
      :                    %VAL( CNF_PVAL( IPOUT ) ), STATUS,
-     :                    %VAL( CLEN ), %VAL( CLEN ) )
+     :                    %VAL( CNF_CVAL( CLEN ) ), 
+     :                    %VAL( CNF_CVAL( CLEN ) ) )
 
       ELSE
 

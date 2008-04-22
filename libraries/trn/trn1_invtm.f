@@ -140,7 +140,8 @@
         CALL DAT_FIND( LOCTM, 'COMMENT', LOCC, STATUS )
         CALL DAT_MAP( LOCC, '_CHAR', 'UPDATE', 0, 0, IPC, STATUS )
         CALL DAT_CLEN( LOCC, LENC, STATUS )
-        CALL TRN1_INVCM( %VAL( CNF_PVAL( IPC ) ), STATUS, %VAL( LENC ) )
+        CALL TRN1_INVCM( %VAL( CNF_PVAL( IPC ) ), STATUS, 
+     :                   %VAL( CNF_CVAL( LENC ) ) )
         CALL DAT_UNMAP( LOCC, STATUS )
         CALL DAT_ANNUL( LOCC, STATUS )
       ENDIF

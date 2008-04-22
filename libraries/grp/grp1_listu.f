@@ -81,10 +81,10 @@
       INCLUDE 'GRP_CONST'        ! GRP private constants.
       INCLUDE 'GRP_PAR'          ! GRP public constants.
       INCLUDE 'GRP_ERR'          ! GRP error values.
+      INCLUDE 'CNF_PAR'          ! For CNF_CVAL function
 
 *  Global Variables:
       INCLUDE 'GRP_COM'          ! GRP common blocks.
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CMN_GSIZE( GRP__MAXG ) = INTEGER (Read)
 *           The index of the last entry in each group.
 *        CMN_NMPNT( GRP__MAXG ) = INTEGER (Read)
@@ -221,7 +221,7 @@
          CALL GRP1_ILIST( CMN_UPPER( SLOT ), CMN_GSIZE( SLOT ),
      :                    %VAL( CNF_PVAL( CMN_NMPNT( SLOT ) ) ), 
      :                    LOLIM, HILIM,
-     :                    UNIT, STATUS, %VAL( GRP__SZNAM ) )
+     :                    UNIT, STATUS, %VAL( CNF_CVAL( GRP__SZNAM ) ) )
       END IF
 
  999  CONTINUE

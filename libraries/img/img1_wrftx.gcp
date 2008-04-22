@@ -145,7 +145,7 @@
          CALL IMG1_GKEY<T>( ECB_FTSN( SLOT ), 
      :                      %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ),
      :                      1, 'END', 0, THERE, LVAL, AT, STATUS,
-     :                      %VAL( 80 ) )
+     :                      %VAL( CNF_CVAL( 80 ) ) )
          IF ( THERE .AND. STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
          CALL ERR_RLSE
          THERE = .FALSE.
@@ -154,7 +154,7 @@
          CALL IMG1_GKEY<T>( ECB_FTSN( SLOT ), 
      :                      %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ),
      :                      1, LKEY, 0, THERE, LVAL, AT, STATUS,
-     :                      %VAL( 80 ) )
+     :                      %VAL( CNF_CVAL( 80 ) ) )
          IF ( THERE .AND. STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
          CALL ERR_RLSE
       END IF
@@ -171,7 +171,7 @@
       CALL IMG1_WKEY<T>( ECB_FTSN( SLOT ), 
      :                   %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ),
      :                   AT, NEWEND, LKEY, COMMEN, VALUE,
-     :                   STATUS, %VAL( 80 ) )
+     :                   STATUS, %VAL( CNF_CVAL( 80 ) ) )
 
 *  Beef up the report to include mention of the NDF name.
       IF ( STATUS .NE. SAI__OK ) THEN

@@ -124,7 +124,7 @@
                LOC = IMG1_NCEL( 
      :                     %VAL( CNF_PVAL( ECB_XPSTK(SLOT,ESLOT) ) ),
      :                     ECB_XNSTK(SLOT, ESLOT), I, STATUS, 
-     :                     %VAL( DAT__SZLOC ) )
+     :                     %VAL( CNF_CVAL( DAT__SZLOC ) ) )
                CALL DAT_ANNUL( LOC, STATUS )
  1          CONTINUE
          END IF

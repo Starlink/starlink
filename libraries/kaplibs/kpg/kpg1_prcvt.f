@@ -177,7 +177,7 @@
      :                           STATUS )
                   CALL KPG1_NAGTC( %VAL( CNF_PVAL( PNTR ) ), 
      :                             LOC, NDIM, DIM, STATUS,
-     :                             %VAL( LENGTH ) )
+     :                             %VAL( CNF_CVAL( LENGTH ) ) )
 
 *  If it is not a character object, then allocate memory for the
 *  converted values and read the original object valuies into it (thus
@@ -221,7 +221,7 @@
                IF ( TYPE( : 5 ) .EQ. '_CHAR' ) THEN
                   CALL KPG1_NAPTC( %VAL( CNF_PVAL( PNTR ) ), 
      :                             LOC, NDIM, DIM, STATUS,
-     :                             %VAL( LENGTH ) )
+     :                             %VAL( CNF_CVAL( LENGTH ) ) )
                   CALL DAT_ANNUL( LOCSCR, STATUS )
                   CALL DAT_ERASE( LOCTMP, 'SCRATCH', STATUS )
 

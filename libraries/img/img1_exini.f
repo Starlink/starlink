@@ -267,7 +267,8 @@
      :                                   NFITS,
      :                                   %VAL(CNF_PVAL(ECB_FTSP(SLOT))), 
      :                                   NOUT, STATUS, 
-     :                                   %VAL( 80 ), %VAL( 80 ))
+     :                                   %VAL( CNF_CVAL( 80 ) ), 
+     :                                   %VAL( CNF_CVAL( 80 ) ))
 
 *  And release the real data.
                         CALL DAT_UNMAP( LOC, STATUS )

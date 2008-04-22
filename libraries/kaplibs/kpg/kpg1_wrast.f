@@ -94,10 +94,10 @@
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
       INCLUDE 'KPG_PAR'          ! KPG_ constants      
       INCLUDE 'AST_PAR'          ! AST_ public interface
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
       
 *  Global Variables:
       INCLUDE 'KPG_AST'          ! KPG AST common blocks 
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        ASTLC = CHARACTER * ( DAT__SZLOC ) (Read)
 *           Locator to HDS _CHAR array holding AST_ data.
 *        ASTLN = INTEGER (Read and Write)
@@ -191,7 +191,7 @@
 *  Write the line, prefixed by the flag character.
                   CALL KPG1_AST2H( %VAL( CNF_PVAL( ASTPT ) ), ASTLN,
      :                             FLAG // TEXT( I1 : I2 ),
-     :                             STATUS, %VAL( LENGTH ) )
+     :                             STATUS, %VAL( CNF_CVAL( LENGTH ) ) )
 
 *  Increment the line number to be used next, and note that the next
 *  line (if any) will be a continuation line.

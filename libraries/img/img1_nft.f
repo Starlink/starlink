@@ -126,7 +126,8 @@
 *  that UNIX compilers use to pass this information.
          CALL IMG1_RKEY( ECB_FTSN( SLOT ), 
      :                   %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ),
-     :                   .FALSE., N, ITEM, INRANG, STATUS, %VAL( 80 ) )
+     :                   .FALSE., N, ITEM, INRANG, STATUS, 
+     :                   %VAL( CNF_CVAL( 80 ) ) )
          IF ( STATUS .NE. SAI__OK ) THEN
 
 *  Beef up the report to include mention of the NDF name.

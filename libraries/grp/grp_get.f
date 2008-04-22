@@ -78,10 +78,10 @@
       INCLUDE 'GRP_CONST'        ! GRP private constants.
       INCLUDE 'GRP_PAR'          ! GRP public constants.
       INCLUDE 'GRP_ERR'          ! GRP error values.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'GRP_COM'          ! GRP common blocks.
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CMN_GSIZE( GRP__MAXG ) = INTEGER (Read)
 *           The index of the last entry in each group.
 *        CMN_NMPNT( GRP__MAXG ) = INTEGER (Read)
@@ -143,7 +143,7 @@
             CALL GRP1_GETC( CMN_GSIZE( SLOT ),
      :                      %VAL( CNF_PVAL( CMN_NMPNT( SLOT ) ) ),
      :                      I, NAMES( I - INDEX + 1 ), STATUS,
-     :                      %VAL( GRP__SZNAM ) )
+     :                      %VAL( CNF_CVAL( GRP__SZNAM ) ) )
 
 *  If the group is case insensitive, convert the name to upper case.
             IF( CMN_UPPER( SLOT ) ) CALL CHR_UCASE(

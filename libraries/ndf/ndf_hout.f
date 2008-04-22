@@ -257,7 +257,8 @@
                         IF ( STATUS .EQ. SAI__OK ) THEN
                            CALL ROUTIN( DIM( 1 ),
      :                                  %VAL( CNF_PVAL( PNTR ) ),
-     :                                  STATUS, %VAL( CLEN ) )
+     :                                  STATUS, 
+     :                                  %VAL( CNF_CVAL( CLEN ) ) )
                            IF ( STATUS .NE. SAI__OK ) THEN
                               CALL ERR_REP( 'NDF_HOUT_SERV',
      :                                      'Error status set by ' //

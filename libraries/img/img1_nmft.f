@@ -112,6 +112,6 @@
 *  compilers use to pass this information.
       CALL IMG1_CKEY( ECB_FTSN( SLOT ), 
      :                %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ), N,
-     :                STATUS, %VAL( 80 ) )
+     :                STATUS, %VAL( CNF_CVAL( 80 ) ) )
       END
 * $Id$

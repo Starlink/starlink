@@ -136,7 +136,7 @@
       IF ( N .LE. ECB_XNSTK( SLOT, ESLOT ) ) THEN
          LOC = IMG1_NCEL( %VAL( CNF_PVAL( ECB_XPSTK( SLOT, ESLOT ) ) ),
      :                    ECB_XNSTK( SLOT, ESLOT ), N, STATUS,
-     :                    %VAL( DAT__SZLOC) )
+     :                    %VAL( CNF_CVAL( DAT__SZLOC )) )
 
 *  Construct the item's name. This is the trace of the current object
 *  with characters which make up the extension trace removed. The value

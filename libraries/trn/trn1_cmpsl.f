@@ -85,7 +85,6 @@
 *  Global Variables:
       INCLUDE 'TRN_CMN'         ! TRN_ common blocks
 
-
 *  Arguments Given:
       CHARACTER * ( * ) LOCTR   ! Locator to transformation structure
       LOGICAL FORWD             ! Select forward/inverse transformation
@@ -170,7 +169,7 @@
      :                  %VAL( CNF_PVAL( CTTI( TRN_CT_PNVAR, SLOT ) ) ),
      :                  %VAL( CNF_PVAL( CTTI( TRN_CT_PIPRC, SLOT ) ) ),
      :                  CTTI( TRN_CT_MXWRK, SLOT ), CTTC( 1, SLOT ),
-     :                  STATUS, %VAL( DAT__SZLOC ) )
+     :                  STATUS, %VAL( CNF_CVAL( DAT__SZLOC ) ) )
 
 *  If there is no error, increment the CCT entry for the number of
 *  modules in the CML.

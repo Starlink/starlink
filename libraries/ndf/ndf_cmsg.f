@@ -152,7 +152,7 @@
 *  Assign the component's value to the message token and then unmap it.
                IF ( STATUS .EQ. SAI__OK ) THEN
                   CALL NDF1_SETC( %VAL( CNF_PVAL( PNTR ) ), TOKEN,
-     :                            %VAL( LENC ) )
+     :                            %VAL( CNF_CVAL( LENC ) ) )
                END IF
                CALL NDF1_HUNMP( DCB_CLOC( ICCOMP, IDCB ), STATUS )
             END IF

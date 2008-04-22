@@ -118,10 +118,10 @@
       INCLUDE 'GRP_CONST'        ! GRP private constants.
       INCLUDE 'GRP_PAR'          ! GRP public constants.
       INCLUDE 'GRP_ERR'          ! GRP error values.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'GRP_COM'          ! GRP common blocks.
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CMN_CHARS( GRP__MAXG ) = CHARACTER*(GRP__NCHAR) (Write)
 *           The control characters used to define the syntax of group
 *           expressions. A set of characters stored in a single string
@@ -235,7 +235,7 @@
       CALL GRP1_SETC( 1, GRP__INITN, GRP__INITN,
      :                %VAL( CNF_PVAL( CMN_NMPNT( SLOT ) ) ), 
      :                ' ', STATUS,
-     :                %VAL( GRP__SZNAM ) )
+     :                %VAL( CNF_CVAL( GRP__SZNAM ) ) )
 
 *  Get a pointer to an integer array (known as MOD_GROUP), storing it
 *  in common (the size will always be the same as NAMES).

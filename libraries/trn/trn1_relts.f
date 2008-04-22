@@ -149,7 +149,7 @@
 *   active locator array.
         IF( SSTAT .EQ. SAI__OK ) THEN
           CALL TRN1_ANLST( NLOC, %VAL( CNF_PVAL( LP ) ), SSTAT,
-     :                     %VAL( DAT__SZLOC ) )
+     :                     %VAL( CNF_CVAL( DAT__SZLOC ) ) )
           CALL CMP_UNMAP( LOCS( ISTR ), 'LOCATORS', SSTAT )
         ENDIF
 

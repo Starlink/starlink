@@ -84,6 +84,7 @@
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
       INCLUDE 'CAT_PAR'          ! CAT constants 
       INCLUDE 'GRP_PAR'          ! GRP constants 
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER CI
@@ -100,7 +101,6 @@
 
 *  Global Variables:
       INCLUDE 'KPG_AST'          ! KPG AST common blocks.
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        ASTGRP = INTEGER (Write)
 *           GRP identifier for group holding AST_ data.
 *        ASTLN = INTEGER (Write)
@@ -157,8 +157,8 @@
 *  we are using a pointer (IPBUF) instead of a genuine CHARACTER
 *  variable. 
          CALL CAT_GETXT( CI, DONE, CLASS, %VAL( CNF_PVAL( IPBUF ) ), 
-     :                   STATUS, %VAL( LEN( CLASS ) ), 
-     :                   %VAL( LINESZ ) )
+     :                   STATUS, %VAL( CNF_CVAL( LEN( CLASS ) ) ),
+     :                   %VAL( CNF_CVAL( LINESZ ) ) )
 
 *  Ignore it if the class is not COMMENT.
          IF( .NOT. DONE .AND. ( CLASS .EQ. 'COMMENT' .OR.
@@ -170,12 +170,12 @@
 *  line which disrupts the mechanism for finding continuation lines).
             IAT = 1
             CALL CHR_FIND( %VAL( CNF_PVAL( IPBUF ) ), '!!', .TRUE., IAT,
-     :                     %VAL( LINESZ ) )
+     :                     %VAL( CNF_CVAL( LINESZ ) ) )
 
 *  Shift the string to the left in order to remove everything upto the final 
 *  character in "!!".
             CALL KPG1_CSHFT( -( IAT + 1 ), %VAL( CNF_PVAL( IPBUF ) ),
-     :                          %VAL( LINESZ ) )
+     :                          %VAL( CNF_CVAL( LINESZ ) ) )
 
 *  Update the maximum line length after removal of everything upto the
 *  final character in "!!".
@@ -183,7 +183,8 @@
 
 *  Report an error if the used length of the text is too long to be
 *  stored in a GRP group without truncation.
-            TLEN = CHR_LEN( %VAL( CNF_PVAL( IPBUF ) ), %VAL( LINESZ ) )
+            TLEN = CHR_LEN( %VAL( CNF_PVAL( IPBUF ) ), 
+     :                      %VAL( CNF_CVAL( LINESZ ) ) )
             IF( TLEN .GT. GRP__SZNAM .AND. STATUS .EQ. SAI__OK ) THEN 
                CALL CAT_TIQAC( CI, 'NAME', NAME, STATUS )
                STATUS = SAI__ERROR
@@ -196,7 +197,8 @@
      :                       'characters but only ^GLEN can be '//
      :                       'processed:',STATUS )
                CALL CHR_COPY( %VAL( CNF_PVAL( IPBUF ) ), 
-     :                        .FALSE., TXT, LSTAT, %VAL( LINESZ ) )
+     :                        .FALSE., TXT, LSTAT, 
+     :                        %VAL( CNF_CVAL( LINESZ ) ) )
                CALL MSG_SETC( 'TXT', TXT )
                CALL ERR_REP( 'KPG1_RCATW_2', '   ^TXT...', STATUS )
 
@@ -204,7 +206,7 @@
 *  end of the group.
             ELSE IF( TLEN .GT. 0 ) THEN
                CALL GRP_PUT( ASTGRP, 1, %VAL( CNF_PVAL( IPBUF ) ), 
-     :                       0, STATUS, %VAL( LINESZ ) )
+     :                       0, STATUS, %VAL( CNF_CVAL( LINESZ ) ) )
             END IF
          END IF
 

@@ -222,7 +222,7 @@
 *  Assign the mapped value to the message token.
                IF ( STATUS .EQ. SAI__OK ) THEN
                   CALL NDF1_SETC( %VAL( CNF_PVAL( PNTR ) ), TOKEN,
-     :                            %VAL( LENC ) )
+     :                            %VAL( CNF_CVAL( LENC ) ) )
                END IF
 
 *  Unmap the component.

@@ -100,10 +100,10 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_CONST'        ! GRP private constants.
       INCLUDE 'GRP_PAR'          ! GRP public constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'GRP_COM'          ! GRP common blocks.
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CMN_NMPNT( GRP__MAXG ) = INTEGER (Write)
 *           Pointers to the mapped NAMES array of each group.
 *        CMN_MGPNT( GRP__MAXG ) = INTEGER (Write)
@@ -179,7 +179,7 @@
          CALL GRP1_SETC( FSTNEW, NEWSIZ, NEWSIZ,
      :                   %VAL( CNF_PVAL( CMN_NMPNT( SLOT ) ) ), 
      :                   ' ', STATUS,
-     :                   %VAL( GRP__SZNAM ) )
+     :                   %VAL( CNF_CVAL( GRP__SZNAM ) ) )
 
 *  MOD_GROUP...
 *  Extend the memory mapped to the integer data.
@@ -232,7 +232,7 @@
      :             %VAL( CNF_PVAL( CMN_MGPNT( SLOT ) ) ), 
      :             %VAL( CNF_PVAL( CMN_MIPNT( SLOT ) ) ),
      :             NAME, LEVEL, IFILE, MODGP, MODIN, STATUS,
-     :             %VAL( GRP__SZNAM ) )
+     :             %VAL( CNF_CVAL( GRP__SZNAM ) ) )
          END IF
 
       END IF

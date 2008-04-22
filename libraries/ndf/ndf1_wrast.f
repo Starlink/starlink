@@ -187,7 +187,7 @@
 *  Write the line, prefixed by the flag character.
                   CALL NDF1_AST2H( %VAL( CNF_PVAL( DCB_ASTPT ) ),
      :                             DCB_ASTLN, FLAG // TEXT( I1 : I2 ),
-     :                             STATUS, %VAL( LENGTH ) )
+     :                             STATUS, %VAL( CNF_CVAL( LENGTH ) ) )
 
 *  Increment the line number to be used next, and note that the next
 *  line (if any) will be a continuation line.

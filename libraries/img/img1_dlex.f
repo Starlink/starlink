@@ -215,7 +215,7 @@
                         TMPLOC = IMG1_NCEL( 
      :                           %VAL(CNF_PVAL( ECB_XPSTK(SLOT,ESLOT))),
      :                           ECB_XNSTK( SLOT, ESLOT ), I,
-     :                           STATUS, %VAL( DAT__SZLOC) )
+     :                           STATUS, %VAL( CNF_CVAL( DAT__SZLOC )) )
 
 *  Get the complete path name for this object and compare it with the
 *  name of the object which we are about to delete.
@@ -227,7 +227,7 @@
 *  the locator stack to remove the gap created by this erasure.
                            CALL IMG1_DCEL( ECB_XNSTK( SLOT, ESLOT ), I,
      :                          %VAL(CNF_PVAL( ECB_XPSTK(SLOT,ESLOT)) ),
-     :                          STATUS, %VAL( DAT__SZLOC) )
+     :                          STATUS, %VAL( CNF_CVAL( DAT__SZLOC )) )
 
 *  Adjust the locator stack to remove the extra element.
                            ECB_XNSTK( SLOT, ESLOT ) =

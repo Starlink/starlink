@@ -230,42 +230,48 @@
                                  IF ( CHR_SIMLR(
      :                                %VAL( CNF_PVAL( PNTR ) ),
      :                                'SIMPLE',
-     :                                %VAL( LENV ) ) ) THEN
+     :                                %VAL( CNF_CVAL( LENV ) ) ) ) 
+     :                           THEN
                                     DCB_FRM( IDCB ) = 'SIMPLE'
 
 *  ...scaled array.
                                  ELSE IF ( CHR_SIMLR(
      :                                     %VAL( CNF_PVAL( PNTR ) ),
      :                                     'SCALED',
-     :                                     %VAL( LENV ) ) ) THEN
+     :                                     %VAL( CNF_CVAL( LENV ) ) ) ) 
+     :                           THEN
                                     DCB_FRM( IDCB ) = 'SCALED'
 
 *  ...spaced array.
                                  ELSE IF ( CHR_SIMLR(
      :                                     %VAL( CNF_PVAL( PNTR ) ),
      :                                     'SPACED',
-     :                                     %VAL( LENV ) ) ) THEN
+     :                                     %VAL( CNF_CVAL( LENV ) ) ) ) 
+     :                           THEN
                                     DCB_FRM( IDCB ) = 'SPACED'
 
 *  ...sparse array.
                                  ELSE IF ( CHR_SIMLR(
      :                                     %VAL( CNF_PVAL( PNTR ) ),
      :                                     'SPARSE',
-     :                                     %VAL( LENV ) ) ) THEN
+     :                                     %VAL( CNF_CVAL( LENV ) ) ) ) 
+     :                           THEN
                                     DCB_FRM( IDCB ) = 'SPARSE'
 
 *  ...polynomial array.
                                  ELSE IF ( CHR_SIMLR(
      :                                     %VAL( CNF_PVAL( PNTR ) ),
      :                                     'POLYNOMIAL',
-     :                                     %VAL( LENV ) ) ) THEN
+     :                                     %VAL( CNF_CVAL( LENV ) ) ) ) 
+     :                           THEN
                                     DCB_FRM( IDCB ) = 'POLYNOMIAL'
 
 *  ...defered primitive array.
                                  ELSE IF ( CHR_SIMLR(
      :                                     %VAL( CNF_PVAL( PNTR ) ),
      :                                     'PRIMITIVE',
-     :                                     %VAL( LENV ) ) ) THEN
+     :                                     %VAL( CNF_CVAL( LENV ) ) ) ) 
+     :                           THEN
                                     DCB_FRM( IDCB ) = 'PRIMITIVE'
 
 *  If the VARIANT value is not recognised, then report an error.
@@ -276,7 +282,7 @@
                                     CALL ARY1_SETC(
      :                                         %VAL( CNF_PVAL( PNTR ) ),
      :                                              'BADVARIANT',
-     :                                              %VAL( LENV ) )
+     :                                        %VAL( CNF_CVAL( LENV ) ) )
                                     CALL ERR_REP( 'ARY1_DFRM_VRNT',
      :                              'The VARIANT component in the ' //
      :                              'array structure ^ARRAY has an ' //

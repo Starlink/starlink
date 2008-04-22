@@ -225,11 +225,13 @@
 *  Test its value. Report an error if it is not 'SIMPLE'.
                         IF ( .NOT. CHR_SIMLR( %VAL( CNF_PVAL( PNTR ) ),
      :                                        'SIMPLE',
-     :                                        %VAL( CLEN ) ) ) THEN
+     :                                     %VAL( CNF_CVAL( CLEN ) ) ) ) 
+     :                  THEN
                            STATUS = NDF__VARIN
                            CALL DAT_MSG( 'HIST', DCB_HLOC( IDCB ) )
                            CALL NDF1_SETC( %VAL( CNF_PVAL( PNTR ) ),
-     :                                     'BADVAR', %VAL( CLEN ) )
+     :                                     'BADVAR', 
+     :                                     %VAL( CNF_CVAL( CLEN ) ) )
                            CALL ERR_REP( 'NDF1_DH_VAR',
      :                     'The VARIANT component in the NDF ' //
      :                     'history structure ^HIST has an invalid ' //
@@ -526,19 +528,23 @@
 *  appropriate update mode in the DCB.
                         IF ( CHR_SIMLR( %VAL( CNF_PVAL( PNTR ) ),
      :                                  'DISABLED',
-     :                                  %VAL( CLEN ) ) ) THEN
+     :                                  %VAL( CNF_CVAL( CLEN ) ) ) ) 
+     :                  THEN
                            DCB_HUMOD( IDCB ) = NDF__HDISA
                         ELSE IF ( CHR_SIMLR( %VAL( CNF_PVAL( PNTR ) ),
      :                                       'QUIET',
-     :                                       %VAL( CLEN ) ) ) THEN
+     :                                      %VAL( CNF_CVAL( CLEN ) ) ) )
+     :                  THEN
                            DCB_HUMOD( IDCB ) = NDF__HQUIE
                         ELSE IF ( CHR_SIMLR( %VAL( CNF_PVAL( PNTR ) ),
      :                                       'NORMAL',
-     :                                       %VAL( CLEN ) ) ) THEN
+     :                                      %VAL( CNF_CVAL( CLEN ) ) ) )
+     :                  THEN
                            DCB_HUMOD( IDCB ) = NDF__HNORM
                         ELSE IF ( CHR_SIMLR( %VAL( CNF_PVAL( PNTR ) ),
      :                                       'VERBOSE',
-     :                                       %VAL( CLEN ) ) ) THEN
+     :                                      %VAL( CNF_CVAL( CLEN ) ) ) )
+     :                  THEN
                            DCB_HUMOD( IDCB ) = NDF__HVERB
 
 *  If the UPDATE_MODE value was not recognised, then report an error.
@@ -547,7 +553,7 @@
                            CALL DAT_MSG( 'HIST', DCB_HLOC( IDCB ) )
                            CALL NDF1_SETC( %VAL( CNF_PVAL( PNTR ) ),
      :                                     'BADUMODE',
-     :                                     %VAL( CLEN ) )
+     :                                     %VAL( CNF_CVAL( CLEN ) ) )
                            CALL ERR_REP( 'NDF1_DH_UMODE',
      :                                   'The UPDATE_MODE component ' //
      :                                   'in the NDF history ' //

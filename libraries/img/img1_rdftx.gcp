@@ -123,7 +123,7 @@
       CALL IMG1_GKEY<T>( ECB_FTSN( SLOT ), 
      :                   %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ), 1,
      :                   ITEM, NOCCUR, THERE, VALUE, AT, STATUS,
-     :                   %VAL( 80 ) )
+     :                   %VAL( CNF_CVAL( 80 ) ) )
       IF ( STATUS .NE. SAI__OK ) THEN
 
 *  Beef up the report to include mention of the NDF name (should only

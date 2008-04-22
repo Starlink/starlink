@@ -125,7 +125,7 @@
       IF( LSTAT .EQ. SAI__OK )
      :  CALL TRN1_RELSL( SLOT, SLOT, %VAL( CNF_PVAL( TRN_PCTTI ) ),
      :                   %VAL( CNF_PVAL( TRN_PCTTL ) ), LSTAT,
-     :                   %VAL( DAT__SZLOC ) )
+     :                   %VAL( CNF_CVAL( DAT__SZLOC ) ) )
 
 *   If there is no error, reset the ID value.
       IF( LSTAT .EQ. SAI__OK ) THEN

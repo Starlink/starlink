@@ -161,7 +161,7 @@
             IF ( DCB_ASTLN .LE. DIM( 1 ) ) THEN
                CALL NDF1_H2AST( %VAL( CNF_PVAL( DCB_ASTPT ) ),
      :                          DCB_ASTLN, NEXT( : LENGTH ), STATUS,
-     :                          %VAL( LENGTH ) )
+     :                          %VAL( CNF_CVAL( LENGTH ) ) )
 
 *  If this is the first element read, insert it at the start of the
 *  text buffer (minus the first character, which is a flag) and update

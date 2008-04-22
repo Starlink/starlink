@@ -75,10 +75,10 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_CONST'        ! GRP private constants.
       INCLUDE 'GRP_PAR'          ! GRP public constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'GRP_COM'          ! GRP common blocks.
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CMN_FLPNT( GRP__MAXG ) = INTEGER (Read and Write)
 *           Pointers to the mapped FILES array of each group.
 *        CMN_FLSIZ( GRP__MAXG ) = INTEGER (Read and Write)
@@ -143,7 +143,7 @@
 *  dummy argument in the code for GRP1_SETC.
       CALL GRP1_SETC( INDEX, INDEX, INDEX, 
      :                %VAL( CNF_PVAL( CMN_FLPNT( SLOT ) ) ),
-     :                FILE, STATUS, %VAL( GRP__SZNAM ) )
+     :                FILE, STATUS, %VAL( CNF_CVAL( GRP__SZNAM ) ) )
 
  999  CONTINUE
 

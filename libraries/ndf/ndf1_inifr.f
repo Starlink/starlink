@@ -305,7 +305,7 @@
                   IF ( STATUS .EQ. SAI__OK ) THEN
                      CALL NDF1_ASETC( IWCS, %VAL( CNF_PVAL( PNTR ) ),
      :                                'Label(' // AXIS( : NC ) // ')',
-     :                                STATUS, %VAL( CLEN ) )
+     :                                STATUS, %VAL( CNF_CVAL( CLEN ) ) )
                      CALL DAT_UNMAP( DCB_ACLOC( IAXIS, NDF__ALAB,
      :                                          IDCB ), STATUS )
                   END IF
@@ -367,7 +367,7 @@
                   IF ( STATUS .EQ. SAI__OK ) THEN
                      CALL NDF1_ASETC( IWCS, %VAL( CNF_PVAL( PNTR ) ),
      :                                'Unit(' // AXIS( : NC ) // ')',
-     :                                STATUS, %VAL( CLEN ) )
+     :                                STATUS, %VAL( CNF_CVAL( CLEN ) ) )
                      CALL DAT_UNMAP( DCB_ACLOC( IAXIS, NDF__AUNI,
      :                                          IDCB ), STATUS )
                   END IF

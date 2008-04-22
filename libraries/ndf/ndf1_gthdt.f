@@ -176,7 +176,7 @@
 *  Parse the string and report a contextual error message if necessary.
                IF ( STATUS .EQ. SAI__OK ) THEN
                   CALL NDF1_PSHDT( %VAL( CNF_PVAL( PNTR ) ), YMDHM, SEC,
-     :                             STATUS, %VAL( CLEN ) )
+     :                             STATUS, %VAL( CNF_CVAL( CLEN ) ) )
                   IF ( STATUS .NE. SAI__OK ) THEN
                      CALL MSG_SETI( 'IREC', IREC )                     
                      CALL DAT_MSG( 'HIST', DCB_HLOC( IDCB ) )

@@ -274,7 +274,7 @@
 *  time.
                IF ( STATUS .EQ. SAI__OK ) THEN
                   CALL NDF1_PSHDT( %VAL( CNF_PVAL( PNTR ) ), YMDHM, SEC,
-     :                             STATUS, %VAL( CLEN ) )
+     :                             STATUS, %VAL( CNF_CVAL( CLEN ) ) )
 
 *  If an error occurred, then report contextual information.
                   IF ( STATUS .NE. SAI__OK ) THEN

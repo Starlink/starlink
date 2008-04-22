@@ -113,7 +113,7 @@
 *  compilers for passing the lengths of strings on UNIX.
       CALL IMG1_NKEY( ECB_FTSN( SLOT ), 
      :                %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ), ITEM,
-     :                FOUND, NCOMP, STATUS, %VAL( 80 ) )
+     :                FOUND, NCOMP, STATUS, %VAL( CNF_CVAL( 80 ) ) )
       END
 
 * $Id$

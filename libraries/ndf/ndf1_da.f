@@ -286,14 +286,14 @@
                               IF ( .NOT.
      :                             CHR_SIMLR( %VAL( CNF_PVAL( PNTR ) ),
      :                                        'SIMPLE',
-     :                                        %VAL( LENV ) ) ) THEN
+     :                                %VAL( CNF_CVAL( LENV ) ) ) ) THEN
                                  STATUS = NDF__VARIN
                                  CALL DAT_MSG( 'AXIS',
      :                                         DCB_ALOC( IAX, IDCB ) )
                                  CALL NDF1_SETC(
      :                                         %VAL( CNF_PVAL( PNTR ) ),
      :                                           'BADVAR',
-     :                                           %VAL( LENV ) )
+     :                                        %VAL( CNF_CVAL( LENV ) ) )
                                  CALL ERR_REP( 'NDF1_DA_VAR',
      :                           'The VARIANT component in the NDF ' //
      :                           'axis structure ^AXIS has an ' //

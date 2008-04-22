@@ -77,10 +77,10 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_CONST'        ! GRP private constants.
       INCLUDE 'GRP_PAR'          ! GRP public constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'GRP_COM'          ! GRP common blocks.
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CMN_CHARS( GRP__MAXG ) = CHARACTER*(GRP__NCHAR) (Read and Write)
 *           The control characters used to define the syntax of group
 *           expressions. A set of characters stored in a single string
@@ -178,8 +178,8 @@
      :           %VAL( CNF_PVAL( CMN_LVPNT( SLOT2 ) ) ), 
      :           %VAL( CNF_PVAL( CMN_INPNT( SLOT2 ) ) ),
      :           CMN_GSIZE( SLOT2 ), STATUS ,
-     :           %VAL( GRP__SZNAM ), 
-     :           %VAL( GRP__SZNAM ) )
+     :           %VAL( CNF_CVAL( GRP__SZNAM ) ),
+     :           %VAL( CNF_CVAL( GRP__SZNAM ) ) )
 
 *  Set the case sensitivity flag and control characters for the output
 *  group.

@@ -80,10 +80,10 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_CONST'        ! GRP private constants.
       INCLUDE 'GRP_PAR'          ! GRP public constants.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Global Variables:
       INCLUDE 'GRP_COM'          ! GRP common blocks.
-      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *        CMN_NMPNT( GRP__MAXG ) = INTEGER (Read)
 *           Pointers to the mapped NAMES array of each group.
 *        CMN_GSIZE( GRP__MAXG ) = INTEGER (Read)
@@ -136,7 +136,7 @@
       CALL GRP1_FIND( CMN_UPPER( SLOT ), CMN_GSIZE( SLOT ), START,
      :                %VAL( CNF_PVAL( CMN_NMPNT( SLOT ) ) ), 
      :                NAME, INDEX, STATUS,
-     :                %VAL( GRP__SZNAM ) )
+     :                %VAL( CNF_CVAL( GRP__SZNAM ) ) )
 
 *  If an error occurred, give a context message and ensure that the
 *  returned index is 1.

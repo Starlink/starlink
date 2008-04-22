@@ -210,7 +210,8 @@
      :                    NAMES, PSTNS, ACTNUM,
      :                    %VAL( CNF_PVAL( IPNTR1( 1 ) ) ), 
      :                    %VAL( CNF_PVAL( IPNTR2( 1 ) ) ),
-     :                    STATUS, %VAL( FITSLN ), %VAL( FITSLN ) )
+     :                    STATUS, %VAL( CNF_CVAL( FITSLN ) ), 
+     :                    %VAL( CNF_CVAL( FITSLN ) ) )
 
 *  Unmap the FITS array.
       CALL DAT_UNMAP( FTSLOC, STATUS )

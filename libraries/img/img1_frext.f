@@ -161,7 +161,8 @@
             CALL IMG1_FTSCP( %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ), 
      :                       NFITS, %VAL( CNF_PVAL( IPFITS  ) ), 
      :                       NOUT, STATUS,
-     :                       %VAL( 80 ), %VAL( 80 ) )
+     :                       %VAL( CNF_CVAL( 80 ) ), 
+     :                       %VAL( CNF_CVAL( 80 ) ) )
 
 *  and unmap it.
             CALL DAT_UNMAP( ECB_XLOC( SLOT, ESLOT ), STATUS )

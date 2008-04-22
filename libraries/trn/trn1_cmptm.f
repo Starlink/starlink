@@ -85,7 +85,6 @@
                                  ! transformation modules
       INCLUDE 'TRN_ERR'          ! TRN_ error codes
 
-
 *  Arguments Given:
       CHARACTER * ( * ) LOCTM   ! Locator to transformation module
       LOGICAL FORWD             ! Select forward/inverse transformation
@@ -309,10 +308,12 @@
 *   variable names and determines if the transformation is defined.
       CALL TRN1_CLVAR( NVIN, %VAL( CNF_PVAL( IPI ) ),
      :                 %VAL( CNF_PVAL( IPVAR ) ), STATUS,
-     :                 %VAL( LENI ), %VAL( LENI ) )
+     :                 %VAL( CNF_CVAL( LENI ) ), 
+     :                 %VAL( CNF_CVAL( LENI ) ) )
       CALL TRN1_CLEXP( NVOUT, %VAL( CNF_PVAL( IPF ) ),
      :                 %VAL( CNF_PVAL( IPEXP ) ), DEF, STATUS,
-     :                 %VAL( LENF ), %VAL( LENF ) )
+     :                 %VAL( CNF_CVAL( LENF ) ), 
+     :                 %VAL( CNF_CVAL( LENF ) ) )
 
 *   Annul (and unmap) the function definition arrays.
       CALL DAT_ANNUL( LOCF, STATUS )
@@ -349,7 +350,8 @@
      :                   LENF, .FALSE., 1, 1,
      :                   DUMMYI, NCODE, DUMMYD, NCON,
      :                   MXWRK, IERR, %VAL( CNF_PVAL( IPWRK ) ), STATUS,
-     :                   %VAL( LENF ), %VAL( LENI ) )
+     :                   %VAL( CNF_CVAL( LENF ) ), 
+     :                   %VAL( CNF_CVAL( LENI ) ) )
 
 *   If there was a compilation error, make a further error report citing
 *   the offending data object.
@@ -411,7 +413,8 @@
      :                 %VAL( CNF_PVAL( INDEX( TRN_IN_CODE ) ) ), ICODE,
      :                 %VAL( CNF_PVAL( INDEX( TRN_IN_CONST ) ) ), ICON,
      :                 MXWRK, IERR, %VAL( CNF_PVAL( IPWRK ) ), STATUS,
-     :                 %VAL( LENF ), %VAL( LENI ) )
+     :                 %VAL( CNF_CVAL( LENF ) ), 
+     :                 %VAL( CNF_CVAL( LENI ) ) )
 
 *   If an error was detected, attempt to delete any parts of the
 *   temporary structure which may have been created.

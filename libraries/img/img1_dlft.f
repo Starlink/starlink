@@ -118,7 +118,8 @@
 *  set blank).
       CALL IMG1_DKEY( ECB_FTSN( SLOT ), 
      :                %VAL( CNF_PVAL( ECB_FTSP( SLOT ) ) ),
-     :                ITEM, NOCCUR, DELETE, STATUS, %VAL( 80 ) )
+     :                ITEM, NOCCUR, DELETE, STATUS, 
+     :                %VAL( CNF_CVAL( 80 ) ) )
       END
 
 * $Id$

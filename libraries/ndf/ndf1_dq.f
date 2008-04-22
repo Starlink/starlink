@@ -284,11 +284,12 @@
 *  Test its value. Report an error if it is not 'SIMPLE'.
                         IF ( .NOT. CHR_SIMLR( %VAL( CNF_PVAL( PNTR ) ),
      :                                        'SIMPLE',
-     :                                        %VAL( LENV ) ) ) THEN
+     :                                %VAL( CNF_CVAL( LENV ) ) ) ) THEN
                            STATUS = NDF__VARIN
                            CALL DAT_MSG( 'QUAL', DCB_QLOC( IDCB ) )
                            CALL NDF1_SETC( %VAL( CNF_PVAL( PNTR ) ),
-     :                                     'BADVAR', %VAL( LENV ) )
+     :                                     'BADVAR', 
+     :                                     %VAL( CNF_CVAL( LENV ) ) )
                            CALL ERR_REP( 'NDF1_DQ_VAR',
      :                     'The VARIANT component in the NDF ' //
      :                     'quality structure ^QUAL has an invalid ' //

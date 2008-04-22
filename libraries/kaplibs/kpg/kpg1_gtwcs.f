@@ -357,7 +357,8 @@
 *  Attempt to create a WCS component within the NDF selected above. 
                   CALL FTS1_FTWCS( NCARD, %VAL( CNF_PVAL( PNTR ) ), 
      :                             1, INDFC,
-     :                             NENCOD, ENCODS, STATUS, %VAL( 80 ) )
+     :                             NENCOD, ENCODS, STATUS, 
+     :                             %VAL( CNF_CVAL( 80 ) ) )
 
 *  If an error occurred reading the FITS WCS information, annul or flush it
 *  since failure to read WCS information is probably not fatal. 

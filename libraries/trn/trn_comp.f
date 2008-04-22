@@ -137,7 +137,7 @@
       CALL TRN1_XCMPSL( %VAL( CNF_PVAL( TRN_PCTTL ) ), FORWD, SLOT,
      :                  %VAL( CNF_PVAL( TRN_PCTTI ) ),
      :                  LOCTR, %VAL( CNF_PVAL( TRN_PCTTC ) ), STATUS,
-     :                  %VAL( DAT__SZLOC ) )
+     :                  %VAL( CNF_CVAL( DAT__SZLOC ) ) )
 
 *   If the compilation failed, reset the IDT value.
       IF( STATUS .NE. SAI__OK ) IDT = TRN__NOID

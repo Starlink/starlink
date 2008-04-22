@@ -189,7 +189,7 @@
             CALL TRN1_RELSL( 1, TRN_SZCTT,
      :                       %VAL( CNF_PVAL( TRN_PCTTI ) ),
      :                       %VAL( CNF_PVAL( TRN_PCTTL ) ), LSTAT,
-     :                       %VAL( DAT__SZLOC ) )
+     :                       %VAL( CNF_CVAL( DAT__SZLOC ) ) )
 
 *   Release the top level temporary structure containing the CTT,
 *   freeing the resources used by it.

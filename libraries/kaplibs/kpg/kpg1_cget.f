@@ -105,12 +105,13 @@
 
 *  Use NDF_CGET to get the full value of the requested character component.
       CALL NDF_CGET( INDF, COMP, %VAL( CNF_PVAL( IPBUF ) ), STATUS, 
-     :               %VAL( LEN( COMP ) ), %VAL( BUFLEN ) )
+     :               %VAL( CNF_CVAL( LEN( COMP ) ) ), 
+     :               %VAL( CNF_CVAL( BUFLEN ) ) )
 
 *  Remove AST escape sequences.
       REMESC = AST_ESCAPES( 0, STATUS )
       VALUE = AST_STRIPESCAPES( %VAL( CNF_PVAL( IPBUF ) ), STATUS, 
-     :                          %VAL( BUFLEN ) )
+     :                          %VAL( CNF_CVAL( BUFLEN ) ) )
       REMESC = AST_ESCAPES( REMESC, STATUS )
 
 *  Remove PGPLOT escape sequences.
