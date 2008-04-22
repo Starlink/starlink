@@ -107,6 +107,8 @@
 *        Calculate OBSGEO values from -OBS values.
 *     2008-04-18 (JB):
 *        For special configs use centreFreq for moltrans.
+*     2008-04-22 (JB):
+*        Add BUNIT header for compatability with specwrite.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -1024,6 +1026,8 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   astSetFitsF ( fitschan, "POL_PA", AST__UNDEFF,
 		"[[deg] Angle of pol fast axis", 0 );
+
+  astSetFitsS ( fitschan, "BUNIT", "K", "", 0 );
 
 
 }
