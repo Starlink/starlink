@@ -87,6 +87,8 @@
 *  History:
 *     9-OCT-2007 (DSB):
 *        Original version.
+*     22-APR-2008 (DSB):
+*        Ensure returned Mappings are independent.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -240,6 +242,26 @@
          CALL AST_ANNUL( MAPS( I ), STATUS )
 
       END DO         
+
+*  Ensure the returned Mappings are independent of each other. This means
+*  that inverting one will have no effect on any of the others.
+      IF( MAP0 .NE. AST__NULL ) THEN
+         TMAP = AST_COPY( MAP0, STATUS )
+         CALL AST_ANNUL( MAP0, STATUS )
+         MAP0 = TMAP
+      END IF
+
+      IF( MAP1 .NE. AST__NULL ) THEN
+         TMAP = AST_COPY( MAP1, STATUS )
+         CALL AST_ANNUL( MAP1, STATUS )
+         MAP1 = TMAP
+      END IF
+ 
+      IF( MAP2 .NE. AST__NULL ) THEN
+         TMAP = AST_COPY( MAP2, STATUS )
+         CALL AST_ANNUL( MAP2, STATUS )
+         MAP2 = TMAP
+      END IF
 
 *  Call error tracing routine and exit.
       IF ( STATUS .NE. SAI__OK ) CALL NDF1_TRACE( 'NDF1_MPSPT', STATUS )
