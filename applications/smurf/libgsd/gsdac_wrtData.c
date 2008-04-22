@@ -73,6 +73,8 @@
 *        Don't rewrite FITS headers unnecessarily.
 *     2008-04-18 (JB):
 *        Use flag for special configurations.
+*     2008-04-21 (JB):
+*        Pass special flag to getWCS.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -267,7 +269,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
     for ( subBandNum = 0; subBandNum < gsdVars->nBESections; subBandNum++ ) {
 
       /* Get the pointing and time values. */
-      gsdac_getWCS ( gsdVars, stepNum, subBandNum, dasFlag, wcs, 
+      gsdac_getWCS ( gsdVars, stepNum, subBandNum, dasFlag, special, wcs, 
                      &WCSFrame, status );
 
       /* If this is the first spectrum, get the amStart, 

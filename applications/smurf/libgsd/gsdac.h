@@ -57,6 +57,8 @@
 *        Remove obsType argument from getMapVars (not needed).
 *     2008-04-18 (JB):
 *        Add special configuration flag.
+*     2008-04-21 (JB):
+*        Add gsdac_printHdr.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -316,9 +318,23 @@ const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 const unsigned int stepNum,    /* time step of this spectrum (given) */
 const int subBandNum, /* subband number (given) */
 const dasFlag dasFlag,  /* DAS file structure flag (given) */
+const int special,   /* flag for special configuration (given) */
 gsdWCS *wcs,         /* pointing and time values (given and returned) */
 AstFrameSet **WCSFrame, /* WCS frameset (given and returned) */
 int *status          /* global status (given and returned) */
+);
+
+void gsdac_printHdr
+(
+const char *nrao,    /* NRAO name (given) */
+const char *jcmt,    /* JCMT name (given) */
+const gsdDType dType, /* data type (given) */
+char *desc,          /* description (given) */
+void *value,         /* value(s) (given) */
+int arrayFlag,       /* flag for array data (given) */
+long arraySize,      /* size of array (if array data) (given) */
+int descFlag,        /* print out description? (given) */
+int *status          /* pointer to global status (given and returned) */
 );
 
 void gsdac_putFits

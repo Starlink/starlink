@@ -15,22 +15,25 @@
 
 *  Invocation:
 *     gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
-*                    const int subBandNum, const dasFlag dasFlag
-*                    gsdWCS *wcs, AstFrameSet **WCSFrame, int *status )
+*                    const int subBandNum, const dasFlag dasFlag,
+*                    const int special, gsdWCS *wcs, AstFrameSet **WCSFrame,
+*                    int *status )
 
 *  Arguments:
 *     gsdVars = const gsdVars* (Given)
-*        GSD headers and arrays
+*        GSD headers and arrays.
 *     stepNum = const unsigned int (Given)
-*        Number of this time step
+*        Number of this time step.
 *     subBandNum = const int (Given)
-*        Number of this subband
+*        Number of this subband.
 *     dasFlag = const dasFlag (Given)
-*        DAS file structure type
+*        DAS file structure type.
+*     special = const int (Given)
+*        Flag for special configurations.
 *     wcs = gsdWCS** (Given and Returned)
-*        Time and Pointing values
+*        Time and Pointing values.
 *     WCSFrame = AstFrameSet* (Given and Returned)
-*        WCS frameset of RA/Dec and frequency
+*        WCS frameset of RA/Dec and frequency.
 *     status = int* (Given and Returned)
 *        Pointer to global status.  
 
@@ -91,6 +94,8 @@
 *        Use 1,1 as centre of grid, adjust CELL offsets accordingly.
 *     2008-04-16 (JB):
 *        Use crpix instead of dims as argument to atlWcspx.
+*     2008-04-21 (JB):
+*        Check special configuration flag.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -139,7 +144,8 @@
 
 void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
                     const int subBandNum, const dasFlag dasFlag, 
-                    gsdWCS *wcs, AstFrameSet **WCSFrame, int *status )
+                    const int special, gsdWCS *wcs, AstFrameSet **WCSFrame,
+                    int *status )
 
 {
 
@@ -362,8 +368,13 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   /*if ( subBandNum == 0 && DEBUGON ) printf ( "CENTRE (base) RA_DEC (radians) : %f %f\n", wcs->baseTr1, wcs->baseTr2 );*/
 
   /* Fill the keymaps from the input GSD. */
-  astMapPut0I( datePointing, "JFREST(1)", 
-               gsdVars->restFreqs[subBandNum]*1000000.0, "" );
+  if ( special ) {
+    astMapPut0I( datePointing, "JFREST(1)", 
+                 gsdVars->centreFreqs[subBandNum]*1000000.0, "" );
+  } else {
+    astMapPut0I( datePointing, "JFREST(1)", 
+                 gsdVars->restFreqs[subBandNum]*1000000.0, "" );
+  }
   astMapPut0D( datePointing, "RA_DEC(1)", wcs->baseTr1 / AST__DD2R, "" );
   astMapPut0D( datePointing, "RA_DEC(2)", wcs->baseTr2 / AST__DD2R, "" );
   astMapPut0I( datePointing, "DPOS(1)", 0.0, "" );
