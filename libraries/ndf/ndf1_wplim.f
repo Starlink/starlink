@@ -211,10 +211,22 @@
       CALL NDF1_MPSPT( FSMAP, MAP, MAP1, MAP2, PPERM, WPERM, STATUS )
 
 *  Invert the Mappings so that their forward transformation goes from the 
-*  current Frame to the pixel Frame.
+*  current Frame to the pixel Frame. Check that we are bnverting a
+*  different Mapping each time, to avoid inverting the same Mapping twice.
       CALL AST_INVERT( MAP, STATUS )
-      IF( MAP1 .NE. AST__NULL ) CALL AST_INVERT( MAP1, STATUS )
-      IF( MAP2 .NE. AST__NULL ) CALL AST_INVERT( MAP2, STATUS )
+
+      IF( MAP1 .NE. AST__NULL ) THEN
+         IF( .NOT. AST_SAME( MAP1, MAP, STATUS ) ) THEN
+            CALL AST_INVERT( MAP1, STATUS )
+         END IF
+      END IF
+
+      IF( MAP2 .NE. AST__NULL ) THEN
+         IF( .NOT. AST_SAME( MAP2, MAP, STATUS ) .AND.
+     :       .NOT. AST_SAME( MAP2, MAP1, STATUS ) ) THEN
+            CALL AST_INVERT( MAP2, STATUS )
+         END IF
+      END IF
 
 *  Get the number of pixel and WCS axes in the NDF.
       NPIX = AST_GETI( IWCS, 'Nin', STATUS )
