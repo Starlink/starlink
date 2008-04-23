@@ -1340,7 +1340,7 @@ F77_SUBROUTINE(kpg1_ghstd)( LOGICAL(BAD),
                             INTEGER(STATUS) );
 
 void kpg1Ghstd( int bad, int dim, double *array, int numbin, int cumul,
-                double valmax, double valmin, int *hist, int *status ){
+                double *valmax, double *valmin, int *hist, int *status ){
    DECLARE_LOGICAL(BAD);
    DECLARE_INTEGER(DIM);
    DECLARE_DOUBLE_ARRAY_DYN(ARRAY);
@@ -1357,8 +1357,8 @@ void kpg1Ghstd( int bad, int dim, double *array, int numbin, int cumul,
    F77_EXPORT_DOUBLE_ARRAY( array, ARRAY, dim );
    F77_EXPORT_INTEGER( numbin, NUMBIN );
    F77_EXPORT_LOGICAL( cumul, CUMUL );
-   F77_EXPORT_DOUBLE( valmax, VALMAX );
-   F77_EXPORT_DOUBLE( valmin, VALMIN );
+   F77_EXPORT_DOUBLE( *valmax, VALMAX );
+   F77_EXPORT_DOUBLE( *valmin, VALMIN );
    F77_CREATE_INTEGER_ARRAY( HIST, numbin );
    F77_ASSOC_INTEGER_ARRAY( HIST, hist );
    F77_EXPORT_INTEGER( *status, STATUS );
@@ -1373,6 +1373,8 @@ void kpg1Ghstd( int bad, int dim, double *array, int numbin, int cumul,
                          INTEGER_ARRAY_ARG(HIST), 
                          INTEGER_ARG(&STATUS) );
 
+   F77_IMPORT_DOUBLE( VALMAX, *valmax );
+   F77_IMPORT_DOUBLE( VALMIN, *valmin );
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_IMPORT_INTEGER_ARRAY( HIST, hist, numbin );
    F77_FREE_INTEGER( ARRAY );
@@ -1392,7 +1394,7 @@ F77_SUBROUTINE(kpg1_ghstr)( LOGICAL(BAD),
                             INTEGER(STATUS) );
 
 void kpg1Ghstr( int bad, int dim, float *array, int numbin, int cumul,
-                float valmax, float valmin, int *hist, int *status ){
+                float *valmax, float *valmin, int *hist, int *status ){
    DECLARE_LOGICAL(BAD);
    DECLARE_INTEGER(DIM);
    DECLARE_REAL_ARRAY_DYN(ARRAY);
@@ -1409,8 +1411,8 @@ void kpg1Ghstr( int bad, int dim, float *array, int numbin, int cumul,
    F77_EXPORT_REAL_ARRAY( array, ARRAY, dim );
    F77_EXPORT_INTEGER( numbin, NUMBIN );
    F77_EXPORT_LOGICAL( cumul, CUMUL );
-   F77_EXPORT_REAL( valmax, VALMAX );
-   F77_EXPORT_REAL( valmin, VALMIN );
+   F77_EXPORT_REAL( *valmax, VALMAX );
+   F77_EXPORT_REAL( *valmin, VALMIN );
    F77_CREATE_INTEGER_ARRAY( HIST, numbin );
    F77_ASSOC_INTEGER_ARRAY( HIST, hist );
    F77_EXPORT_INTEGER( *status, STATUS );
@@ -1425,6 +1427,8 @@ void kpg1Ghstr( int bad, int dim, float *array, int numbin, int cumul,
                          INTEGER_ARRAY_ARG(HIST), 
                          INTEGER_ARG(&STATUS) );
 
+   F77_IMPORT_REAL( VALMAX, *valmax );
+   F77_IMPORT_REAL( VALMIN, *valmin );
    F77_IMPORT_INTEGER( STATUS, *status );
    F77_IMPORT_INTEGER_ARRAY( HIST, hist, numbin );
    F77_FREE_INTEGER( ARRAY );
