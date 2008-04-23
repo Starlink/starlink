@@ -60,8 +60,9 @@ TESTS = par_test
 
 check_MONOLITHS = par_test
 par_test_SOURCES = par_test.f
-# no variable par_test_TASKS -- par_test is an ATASK
-par_test_LDADD = libpar_adam.la `err_link_adam` `subpar_link_adam` `chr_link_adam`
+# no variable par_test_TASKS -- par_test is an ATASK, note since this
+# is an ATASK this is really a post-installation test.
+par_test_LDADD = `err_link_adam` `subpar_link_adam` `chr_link_adam`
 
 CLEANFILES = par_test par_test.ifc
 
