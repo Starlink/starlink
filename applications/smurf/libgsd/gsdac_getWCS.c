@@ -96,6 +96,8 @@
 *        Use crpix instead of dims as argument to atlWcspx.
 *     2008-04-21 (JB):
 *        Check special configuration flag.
+*     2008-04-22 (JB):
+*        Set IFFREQ to default of -4 GHz. 
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -390,8 +392,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
                gsdVars->centreFreqs[subBandNum]*1000000.0, "" ); 
   astMapPut0I( datePointing, "JFINC(1)", 
                gsdVars->freqRes[subBandNum]*1000000.0, "" );
-  astMapPut0I( datePointing, "IFFREQ(1)", 
-               gsdVars->totIFs[subBandNum], "" );
+  astMapPut0I( datePointing, "IFFREQ(1)", -4.0, "" );
   astMapPut0I( datePointing, "CENTRECODE", gsdVars->centreCode, "" );
 
   /* Convert cell sizes to radians. */
@@ -451,7 +452,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   wcs->baseTr2 = coordOut[1];
 
   /* Calculate the cell offsets in tracking. */
-  coordIn[0] = gsdVars->mapTable[stepNum*2];
+  coordIn[0] = -gsdVars->mapTable[stepNum*2];
   coordIn[1] = gsdVars->mapTable[stepNum*2+1];
 
   astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
@@ -491,7 +492,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   wcs->baseEl = coordOut[1];
 
   /* Calculate the cell offsets in AZEL. */
-  coordIn[0] = gsdVars->mapTable[stepNum*2];
+  coordIn[0] = -gsdVars->mapTable[stepNum*2];
   coordIn[1] = gsdVars->mapTable[stepNum*2+1];
 
   astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
