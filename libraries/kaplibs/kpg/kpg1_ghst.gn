@@ -42,6 +42,9 @@
 *        Global status value.
 
 *  Notes:
+*     - If VALMAX or VALMIN is supplied equal to VAL__BAD<T>, then the
+*     actual maximum and minimum values will be found (by searching the 
+*     ARRAY), and used.
 *     -  There is a routine for all numeric data types: replace "x" in
 *     the routine name by B, D, R, I, UB, UW, or W as appropriate.  The
 *     arguments ARRAY, VALMAX, and VALMIN must have the data type
@@ -52,6 +55,7 @@
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
 *     Copyright (C) 2006 Particle Physics & Astronomy Research
 *                   Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -88,6 +92,9 @@
 *        Made to cope with unsigned integer types.
 *     23-FEB-2006 (DSB):
 *        Added argument CUMUL.
+*     23-APR-2008 (DSB):
+*        If VALMAX/MIN are supplied bad, then find the max/min values in
+*        ARRAY.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -129,6 +136,8 @@
       DOUBLE PRECISION TEMP      ! Work variable
       DOUBLE PRECISION THRESH    ! Threshold for identical-limits test
       DOUBLE PRECISION TNUMB     ! Number of bins
+      <TYPE> VLMAX               ! Actual max data value
+      <TYPE> VLMIN               ! Actual min data value
 
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
@@ -144,9 +153,38 @@
          HIST( K ) = 0
       END DO
 
+*  If either max or min values were not supplied, find them now. 
+      IF( VALMAX .EQ. VAL__BAD<T> .OR. 
+     :    VALMIN .EQ. VAL__BAD<T> ) THEN
+
+         VLMAX = VAL__MIN<T>
+         VLMIN = VAL__MAX<T>
+
+         IF( BAD ) THEN
+            DO  K = 1, DIM
+               IF( ARRAY( K ) .NE. VAL__BAD<T> ) THEN
+                  VLMAX = MAX( VLMAX, ARRAY( K ) )
+                  VLMIN = MIN( VLMIN, ARRAY( K ) )
+               END IF
+            END DO
+
+         ELSE
+            DO  K = 1, DIM
+               VLMAX = MAX( VLMAX, ARRAY( K ) )
+               VLMIN = MIN( VLMIN, ARRAY( K ) )
+            END DO
+
+         END IF
+
 *  Assign some useful variables.
-      DVMIN = NUM_<T>TOD( VALMIN )
-      DVMAX = NUM_<T>TOD( VALMAX )
+         DVMIN = NUM_<T>TOD( VLMIN )
+         DVMAX = NUM_<T>TOD( VLMAX )
+
+      ELSE
+         DVMIN = NUM_<T>TOD( VALMIN )
+         DVMAX = NUM_<T>TOD( VALMAX )
+      END IF
+
       TNUMB = DBLE( NUMBIN )
 
 *  Set the minimum separation allowed for the data limits such that
