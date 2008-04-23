@@ -35,6 +35,8 @@
 *  History :
 *     2008-04-18 (JB):
 *        Original.
+*     2008-04-23 (JB):
+*        Fix broken sorting algorithm, set boundary value to 150 MHz.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -100,8 +102,8 @@ void gsdac_checkSpecial ( const gsdVars *gsdVars, int *special,
  
     freq = centreFreqs[i];
 
-    for ( j = i - 1; j >= 0 && centreFreqs[i] > freq; j-- ) {
-      centreFreqs[j + 1] = centreFreqs[i];
+    for ( j = i - 1; j >= 0 && centreFreqs[j] > freq; j-- ) {
+      centreFreqs[j + 1] = centreFreqs[j];
     }
 
     centreFreqs[j + 1] = freq;
@@ -111,12 +113,12 @@ void gsdac_checkSpecial ( const gsdVars *gsdVars, int *special,
   /* Check for any spacing greater than 125 MHz. */
   for ( i = 1; i < gsdVars->nBESections; i++ ) {
 
-    if ( 1000.0 * fabs ( centreFreqs[i] - centreFreqs[i - 1] ) > 125.0 ) {
+    if ( 1000.0 * fabs ( centreFreqs[i] - centreFreqs[i - 1] ) > 150.0 ) {
 
       i = gsdVars->nBESections;
       *special = 1;
       msgOutif(MSG__VERB," ", 
-	       "This appears to be a special configuration", status); 
+      	       "This appears to be a special configuration", status); 
 
     }
 
