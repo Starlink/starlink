@@ -49,6 +49,9 @@
 *     exists with status set to SMF__INSMP.
 
 *  Notes: 
+*     The algorithm is "naive" and may suffer roundoff problems. It may be
+*     necessary to switch to a (slower) compensated method. See:
+*     http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance
 
 *  Authors:
 *     Edward Chapin (UBC)
@@ -58,7 +61,7 @@
 *     2008-03-06 (EC):
 *        Initial version
 *     2008-04-18 (EC):
-*        Use SMF__MINSTATSAMP four sample length check
+*        Use SMF__MINSTATSAMP for sample length check
 *     {enter_further_changes_here}
 
 *  Copyright:
