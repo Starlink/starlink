@@ -46,13 +46,18 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
 
+dnl    Check for libraries needed for network services. These are added 
+dnl    to the standard link script.
+AC_SEARCH_LIBS([gethostbyname], [nsl])
+AC_SEARCH_LIBS([connect], [socket],,, [-lnsl])
+
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
 STAR_LATEX_DOCUMENTATION(sun227)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES([Makefile component.xml])
+AC_CONFIG_FILES([Makefile component.xml cfitsio_link])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT

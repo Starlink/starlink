@@ -43,13 +43,13 @@
 #     03-DEC-1998 (BLY):
 #        Modified for CFITSIO v2.0.32.
 #     23-APR-2008 (PWD):
-#        Added autoconf support -lsocket -lnsl  for network libraries.
+#        Added autoconf support @LIBS@ for network libraries.
 #     {enter_further_changes_here}
 
 #  Bugs:
 #     {note_any_bugs_here}
 
 #-
-      echo -lcfitsio -lsocket -lnsl 
+      echo -lcfitsio @LIBS@
 
 #  End of script.
