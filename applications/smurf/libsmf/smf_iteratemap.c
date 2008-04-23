@@ -133,6 +133,7 @@
 *     2008-04-23 (EC):
 *        - Added sample variance estimate for varmap
 *        - Propagate header information to exported model components
+*        - Added CHITOL config parameter to control stopping
 
 *  Notes:
 
@@ -197,8 +198,10 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   const char *asttemp=NULL;     /* Pointer to static strings created by ast */
   double badfrac;               /* Bad bolo fraction for flagging */
   int baseorder;                /* Order of poly for baseline fitting */
-  double *chisquared=NULL;      /* chisquared for each chunk */
+  double *chisquared=NULL;      /* chisquared for each chunk each iter */
+  double chitol=0;              /* chisquared change tolerance for stopping */
   int contchunk;                /* Which chunk in outer loop */
+  int converged=0;              /* Has stopping criteria been met? */
   smfDIMMData dat;              /* Struct passed around to model components */
   smfData *data=NULL;           /* Temporary smfData pointer */
   int dcbox;                    /* Box size for fixing DC steps */
@@ -218,10 +221,12 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   dim_t j;                      /* Loop counter */
   dim_t k;                      /* Loop counter */
   dim_t l;                      /* Loop counter */
+  double *lastchisquared=NULL;  /* chisquared for last iter */
   smfArray **lut=NULL;          /* Pointing LUT for each file */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
   smfGroup *lutgroup=NULL;      /* smfGroup of lut model files */
   unsigned char mask;           /* Bitmask for QUALITY flags */
+  int maxiter=0;                /* Maximum number of iterations */
   dim_t maxlen;                 /* Max chunk length in samples */
   double maxlen_s;              /* Max chunk length in seconds */  
   int memiter=0;                /* If set iterate completely in memory */
@@ -241,6 +246,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   smfArray **qua=NULL;          /* Quality flags for each file */
   unsigned char *qua_data=NULL; /* Pointer to DATA component of qua */
   smfGroup *quagroup=NULL;      /* smfGroup of quality model files */
+  int quit=0;                   /* flag indicates when to quit */
   int rebinflags;               /* Flags to control rebinning */
   smfArray **res=NULL;          /* Residual signal */
   double *res_data=NULL;        /* Pointer to DATA component of res */
@@ -254,6 +260,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   smf_modeltype thismodel;      /* Type of current model */
   double *thisweight=NULL;      /* Pointer to this weights map */
   double *thisvar=NULL;         /* Pointer to this variance map */
+  int untilconverge=0;          /* Set if iterating to convergence */
   double *var_data=NULL;        /* Pointer to DATA component of NOI */
   int varmapmethod=0;           /* Method for calculating varmap */
   dim_t whichnoi;               /* Model index of NOI if present */
@@ -272,8 +279,35 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   if( *status == SAI__OK ) {
     /* Number of iterations */
     if( !astMapGet0I( keymap, "NUMITER", &numiter ) ) {
+      numiter = -20;
+    }
+
+    if( numiter == 0 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "DIMM Failed: NUMITER unspecified", status);      
+      errRep(FUNC_NAME, "SMF_ITERATEMAP: NUMITER cannot be 0", status);      
+    } else {
+      if( numiter < 0 ) {
+	/* If negative, iterate to convergence or abs(numiter), whichever comes
+           first */
+	maxiter = abs(numiter);
+	untilconverge = 1;
+      } else {
+	/* Otherwise iterate a fixed number of times */
+	maxiter = numiter;
+	untilconverge = 0;
+      }
+    }
+
+    /* Chisquared change tolerance for stopping */
+    if( !astMapGet0D( keymap, "CHITOL", &chitol ) ) {
+      chitol = 0.0001;
+    }
+
+    if( chitol <= 0 ) {
+      *status = SAI__ERROR;
+      msgSetd("CHITOL",chitol);
+      errRep(FUNC_NAME, 
+	     "SMF_ITERATEMAP: CHITOL is ^CHITOL, must be > 0", status);      
     }
 
     /* Do iterations completely in memory - minimize disk I/O */
@@ -413,8 +447,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	      }
 	      nmodels++;
 	      j = 0;
-
-
 	    }
 	  }
 	}
@@ -434,6 +466,25 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	     status);
       nmodels = 0;
     }
+  }
+
+  /* If !havenoi can't measure convergence, so turn off untilconverge */
+  if( !havenoi ) {
+    untilconverge = 0;
+  }
+
+  if( untilconverge ) {
+    msgSeti("MAX",maxiter);
+    msgOut(" ", 
+	   "SMF_ITERATEMAP: Iterate to convergence (max ^MAX)",
+	   status );
+    msgSetd("CHITOL",chitol);
+    msgOut(" ", 
+	   "SMF_ITERATEMAP: Stopping criteria is a change in chi^2 < ^CHITOL",
+	   status);
+  } else {
+    msgSeti("MAX",maxiter);
+    msgOut(" ", "SMF_ITERATEMAP: ^MAX Iterations", status );
   }
 
   msgSeti("NUMCOMP",nmodels);
@@ -551,6 +602,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     /* Allocate space for the chisquared array */
     if( havenoi ) {
       chisquared = smf_malloc( nchunks, sizeof(*chisquared), 1, status );
+      lastchisquared = smf_malloc( nchunks, sizeof(*chisquared), 1, status );
     }
 
     /* Create containers for time-series model components */
@@ -670,13 +722,22 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     /* Start the main iteration loop */
     if( *status == SAI__OK ) {
 
-      for( iter=0; iter<numiter; iter++ ) {    
+      quit = 0;
+      iter = 0;
+      while( !quit ) {
 	msgSeti("ITER", iter+1);
-	msgSeti("NUMITER", numiter);
+	msgSeti("MAXITER", maxiter);
 	msgOut(" ", 
-	       "SMF_ITERATEMAP: Iteration ^ITER / ^NUMITER ---------------",
+	       "SMF_ITERATEMAP: Iteration ^ITER / ^MAXITER ---------------",
 	       status);
       
+	/* Assume we've converged until we find a chunk that hasn't */
+	if( iter > 0 ) {
+	  converged = 1;
+	} else {
+	  converged = 0;
+	}
+
 	for( i=0; i<nchunks; i++ ) {
 	  if( !memiter ) {
 	    msgSeti("CHUNK", i+1);
@@ -834,7 +895,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	  /* Close files here if memiter not set */
 
 	  if( !memiter ) {
-
 	    smf_close_related( &res[i], status );
 	    smf_close_related( &ast[i], status );    
 	    smf_close_related( &lut[i], status );    
@@ -845,17 +905,37 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	    }
 	  }
 
+	  /* Set exit condition if bad status was set */
+	  if( *status != SAI__OK ) i=isize+1;
+
 	  /* If NOI was present, we now have an estimate of chisquared */
-	  if( chisquared && (*status==SAI__OK) ) {
+	  if( chisquared ) {
 	    msgSeti("CHUNK",i+1);
 	    msgSetd("CHISQ",chisquared[i]);
 	    msgOut( " ", 
 		    "SMF_ITERATEMAP: *** CHISQUARED = ^CHISQ for chunk ^CHUNK",
 		    status);
-	  }
 
-	  /* Set exit condition if bad status was set */
-	  if( *status != SAI__OK ) i=isize+1;
+	    if( iter > 0 ) {
+	      msgSetd("DIFF", chisquared[i]-lastchisquared[i]);
+	      msgOut( " ",
+		      "SMF_ITERATEMAP: *** change: ^DIFF", status );
+	    }
+
+	    /* Check for the stopping criteria */
+	    if( untilconverge ) {
+	      if( iter > 0 ) {
+		if( (lastchisquared[i]-chisquared[i]) > chitol ) {
+		  /* Found a chunk that isn't converged yet */
+		  converged=0;
+		}
+	      } 	    
+	    }
+
+	    /* Update lastchisquared */
+	    lastchisquared[i] = chisquared[i];
+
+	  }
 	}
       
 	if( *status == SAI__OK ) {
@@ -890,6 +970,34 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	    }
 	  }
 	}
+
+	/* Increment iteration counter */
+	iter++;
+
+	if( *status == SAI__OK ) {
+
+	  /* Check that we've exceeded maxiter */
+	  if( iter >= maxiter ) {
+	    quit = 1;
+	  }
+
+	  /* Check for convergence */
+	  if( untilconverge && converged ) {
+	    quit = 1;
+	  }
+
+	} else {
+	  quit = 1;
+	}
+      }
+
+      msgSeti("ITER",iter);
+      msgOut( " ", 
+	      "SMF_ITERATEMAP: ****** Completed in ^ITER iterations", status);
+      if( untilconverge && converged ) {
+	msgOut( " ", 
+		"SMF_ITERATEMAP: ****** Solution CONVERGED",
+		status);
       }
 
       /* Export DIMM model components to NDF files.
@@ -1097,6 +1205,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
     /* Free chisquared array */
     if( chisquared) chisquared = smf_free( chisquared, status );
+    if( lastchisquared) lastchisquared = smf_free( lastchisquared, status );
   }
     
   /* The second set of map arrays get freed in the multiple contchunk case */
