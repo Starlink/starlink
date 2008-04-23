@@ -841,9 +841,9 @@ void smurf_makecube( int *status ) {
    AstSkyFrame *oskyfrm = NULL;/* SkyFrame from the output WCS Frameset */
    Grp *detgrp = NULL;        /* Group of detector names */
    Grp *igrp = NULL;          /* Group of input files */
+   Grp *igrp4 = NULL;         /* Group holding output NDF names */
    Grp *ogrp = NULL;          /* Group containing output file */
    Grp *tgrp = NULL;          /* Temporary Group pointer */
-   Grp *igrp4 = NULL;         /* Group holding output NDF names */
    HDSLoc *smurf_xloc = NULL; /* HDS locator for output SMURF extension */
    HDSLoc *weightsloc = NULL; /* HDS locator of weights array */
    char *pname = NULL;        /* Name of currently opened data file */
@@ -860,6 +860,7 @@ void smurf_makecube( int *status ) {
    double gx_out[ 4 ];        /* X WCS coordinates of four corners */
    double gy_in[ 4 ];         /* Y Grid coordinates of four corners */
    double gy_out[ 4 ];        /* Y WCS coordinates of four corners */
+   float median;              /* Median data value */
    double par[ 7 ];           /* Projection parameter */
    double params[ 4 ];        /* astRebinSeq parameters */
    double wcslbnd_out[3];     /* Array of lower bounds of output cube */
@@ -874,14 +875,12 @@ void smurf_makecube( int *status ) {
    float *var_array = NULL;   /* Pointer to temporary variance array */
    float *var_out = NULL;     /* Pointer to the output variance array */
    float *work2_array = NULL; /* Pointer to temporary work array */
-   float medeff;              /* Median effective integration time in output NDF. */
-   float medexp;              /* Median exposure time in output NDF. */
-   float medtsys;             /* Median system temperature in output NDF. */
    float polbinsize;          /* Angular size of polarisation bins */
    float polbinzero;          /* Angle at centre of first polarisation bin */
    float teff;                /* Effective integration time */
    float var;                 /* Variance value */
    int ***ptime;              /* Holds time slice indices for each bol bin */
+   int *hist = NULL;          /* Histogram array */
    int *pt;                   /* Holds time slice indices for each bol bin */
    int alignsys;              /* Align data in the output system? */
    int autogrid;              /* Determine projection parameters automatically? */
@@ -912,7 +911,6 @@ void smurf_makecube( int *status ) {
    int nbad;                  /* No. of o/p pixels with good data but bad variance */
    int ndet;                  /* Number of detectors supplied for "DETECTORS" */
    int nel;                   /* Number of elements in 3D array */
-   int neluse;                /* Number of elements used */
    int ngood;                 /* No. of o/p pixels with good data */
    int nparam = 0;            /* No. of parameters required for spreading scheme */
    int npbin;                 /* No. of polarisation angle bins */
@@ -1973,16 +1971,16 @@ void smurf_makecube( int *status ) {
 
             }
          }
-      
+
 /* If we created an output Variance component, store the median system 
    temperature as keyword TSYS in the FitsChan. */
          if( tsys_array ) {
             msgOutif( MSG__VERB, " ", "Calculating median output Tsys value",
                       status );
             if( genvar ) {
-               work2_array = astStore( work2_array, tsys_array, nxy*sizeof( float ) );
-               kpg1Medur( 1, nxy, work2_array, &medtsys, &neluse, status );
-               atlPtftr( fchan, "MEDTSYS", medtsys, 
+               hist = smf_find_median( tsys_array, NULL, nxy, hist, &median, 
+                                       status );
+               atlPtftr( fchan, "MEDTSYS", median, 
                          "[K] Median MAKECUBE system temperature", status );
          
             } else {
@@ -2000,28 +1998,28 @@ void smurf_makecube( int *status ) {
    first. */
          msgOutif( MSG__VERB, " ", "Calculating median output exposure time",
                    status );
-         work2_array = astStore( work2_array, exp_array, nxy*sizeof( float ) );
-         kpg1Medur( 1, nxy, work2_array, &medexp, &neluse, status );
-         atlPtftr( fchan, "EXP_TIME", medexp, 
+         hist = smf_find_median( exp_array, NULL, nxy, hist, &median, status );
+         atlPtftr( fchan, "EXP_TIME", median, 
                    "[s] Median MAKECUBE exposure time", status );
-      
+         
 /* Store the median effective integration time as keyword EFF_TIME in the 
    FitsChan. Since kpg1Medur partially sorts the array, we need to take a 
    copy of it first. */
          msgOutif( MSG__VERB, " ", "Calculating median output effective exposure time",
                    status );
-         work2_array = astStore( work2_array, eff_array, nxy*sizeof( float ) );
-         kpg1Medur( 1, nxy, work2_array, &medeff, &neluse, status );
-         atlPtftr( fchan, "EFF_TIME", medeff, 
+
+         hist = smf_find_median( eff_array, NULL, nxy, hist, &median, status );
+         atlPtftr( fchan, "EFF_TIME", median, 
                    "[s] Median MAKECUBE effective integration time", status );
-      
+
 /* Retrieve the unique OBSID keys from the KeyMap and populate the OBSnnnnn
          and OBSCNT headers from this information. */
          smf_fits_add_prov( fchan, "OBS", obskeymap, status ); 
          smf_fits_add_prov( fchan, "PRV", prvkeymap, status ); 
       
-/* Free the second work array. */
+/* Free the second work array amd histogram array. */
          work2_array = astFree( work2_array );
+         hist = astFree( hist );
       
 /* Store the keywords holding the number of tiles generated and the index
    of the current tile. */

@@ -897,4 +897,9 @@ void smf_simpleaddmap( double *map1, double *mapweight1,
                        unsigned int *hitsmap2, double *mapvar2, int msize, 
                        int *status );
 
+
+int *smf_find_median( float *farray, double *darray, int nel, 
+                      int *hist, float *median, int *status );
+
+
 #endif /* SMF_DEFINED */
