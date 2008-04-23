@@ -469,8 +469,6 @@ int *status             /* global status (given and returned) */
       astSetD( skyframe, "ObsLon", -telpos[0] );
       astSetD( skyframe, "ObsLat", telpos[1] );
 
-      printf("telpos: %e %e\n", telpos[0], telpos[1] );
-
       astExempt( skyframe );
    }
    astSet( skyframe, "Epoch=MJD %.*g", DBL_DIG, state->rts_end + 32.184/SC2AST_SPD );
