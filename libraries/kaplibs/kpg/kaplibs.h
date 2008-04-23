@@ -166,6 +166,7 @@ void kpg1Datcp( HDSLoc *, HDSLoc *, const char *, int * );
 void kpg1Hdsky( HDSLoc *, AstKeyMap *, int, int, int * );
 void kpg1Kyhds( AstKeyMap *, int *, int, int, HDSLoc *, int * );
 void kpg1Ghstd( int, int, double *, int, int, double, double, int *, int * );
+void kpg1Ghstr( int, int, float *, int, int, float, float, int *, int * );
 void kpg1Hsstp( int, int *, double, double, double *, double *, double *, double *, int * );
 
 

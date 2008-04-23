@@ -1381,6 +1381,58 @@ void kpg1Ghstd( int bad, int dim, double *array, int numbin, int cumul,
 
 /* ------------------------------- */
 
+F77_SUBROUTINE(kpg1_ghstr)( LOGICAL(BAD),
+                            INTEGER(DIM), 
+                            REAL_ARRAY(ARRAY), 
+                            INTEGER(NUMBIN), 
+                            LOGICAL(CUMUL), 
+                            REAL(VALMAX),
+                            REAL(VALMIN),
+                            INTEGER_ARRAY(HIST), 
+                            INTEGER(STATUS) );
+
+void kpg1Ghstr( int bad, int dim, float *array, int numbin, int cumul,
+                float valmax, float valmin, int *hist, int *status ){
+   DECLARE_LOGICAL(BAD);
+   DECLARE_INTEGER(DIM);
+   DECLARE_REAL_ARRAY_DYN(ARRAY);
+   DECLARE_INTEGER(NUMBIN);
+   DECLARE_LOGICAL(CUMUL);
+   DECLARE_REAL(VALMAX);
+   DECLARE_REAL(VALMIN);
+   DECLARE_INTEGER_ARRAY_DYN(HIST);
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_LOGICAL( bad, BAD );
+   F77_EXPORT_INTEGER( dim, DIM );
+   F77_CREATE_REAL_ARRAY( ARRAY, dim );
+   F77_EXPORT_REAL_ARRAY( array, ARRAY, dim );
+   F77_EXPORT_INTEGER( numbin, NUMBIN );
+   F77_EXPORT_LOGICAL( cumul, CUMUL );
+   F77_EXPORT_REAL( valmax, VALMAX );
+   F77_EXPORT_REAL( valmin, VALMIN );
+   F77_CREATE_INTEGER_ARRAY( HIST, numbin );
+   F77_ASSOC_INTEGER_ARRAY( HIST, hist );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(kpg1_ghstr)( LOGICAL_ARG(&BAD),
+                         INTEGER_ARG(&DIM), 
+                         REAL_ARRAY_ARG(ARRAY), 
+                         INTEGER_ARG(&NUMBIN), 
+                         LOGICAL_ARG(&CUMUL), 
+                         REAL_ARG(&VALMAX),
+                         REAL_ARG(&VALMIN),
+                         INTEGER_ARRAY_ARG(HIST), 
+                         INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+   F77_IMPORT_INTEGER_ARRAY( HIST, hist, numbin );
+   F77_FREE_INTEGER( ARRAY );
+   F77_FREE_INTEGER( HIST );
+}
+
+/* ------------------------------- */
+
 F77_SUBROUTINE(kpg1_hsstp)( INTEGER(NUMBIN), 
                             INTEGER_ARRAY(HIST), 
                             DOUBLE(VALMAX),
