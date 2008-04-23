@@ -90,6 +90,8 @@
 *        -added chunking based on time stamps
 *     2008-04-17 (EC):
 *        -fixed calculation of number of subarrays
+*     2008-04-23 (EC):
+*        -propagate time series WCS
 
 *  Notes:
 *     If projection information supplied, pointing LUT will not be
@@ -442,7 +444,7 @@ void smf_concat_smfGroup( smfGroup *igrp, int whichchunk, int isTordered,
 		}
 
 		/* Copy over the FITS header */
-		if( *status == SAI__OK ) {
+		if( (*status == SAI__OK) && (refhdr->fitshdr) ) {
 		  hdr->fitshdr = astCopy( refhdr->fitshdr );
 		  if (!astOK) {
 		    if (*status == SAI__OK) {
@@ -452,7 +454,20 @@ void smf_concat_smfGroup( smfGroup *igrp, int whichchunk, int isTordered,
 		    }
 		  }
 		}
-		
+
+		/* Copy over the TSWCS */
+		if( (*status == SAI__OK) && (refhdr->tswcs) ) {
+		  hdr->tswcs = astCopy( refhdr->tswcs );
+		  if (!astOK) {
+		    if (*status == SAI__OK) {
+		      *status = SAI__ERROR;
+		      errRep( FUNC_NAME, 
+			      "AST error copying time series WCS", 
+			      status);
+		    }
+		  }
+		}		
+
 	      }
 	    }
 

@@ -154,6 +154,8 @@
  *        Read/create quality names extension
  *     2008-03-10 (AGG):
  *        Factor out quality names code into new routine
+ *     2008-04-23 (EC):
+ *        Read time series WCS even if the data is raw
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -493,8 +495,8 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
           ndfGtwcs( indf, &(hdr->wcs), status);
           hdr->nframes = 1;
         } else {
-          /* Get the time series WCS */
-          ndfGtwcs( indf, &(hdr->tswcs), status );
+	  /* Get the time series WCS */
+	  ndfGtwcs( indf, &(hdr->tswcs), status );
 
           /* Need to get the location of the extension for STATE parsing */
           ndfXloc( indf, JCMT__EXTNAME, "READ", &tloc, status );
@@ -559,6 +561,11 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
         file->isTstream = isTseries;
       }
     } else {
+      /* Get the time series WCS if header exists */
+      if( hdr ) {
+	ndfGtwcs( indf, &(hdr->tswcs), status );
+      }
+
       /* OK, we have raw data. Close the NDF because
          sc2store_rdtstream will open it again */
       ndfAnnul( &indf, status );

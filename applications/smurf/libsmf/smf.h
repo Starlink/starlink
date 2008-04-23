@@ -275,13 +275,16 @@
 *     2008-04-16 (EC):
 *        - Added optional external QUALITY and VARIANCE to smf_model_NDFexport
 *        - Added chunk to smf_construct_smfGroup
-         - Added smf_simpleaddmap
+*        - Added smf_simpleaddmap
 *     2008-04-16 (AGG):
 *        Add genvar to smf_rebinmap
 *     2008-04-17 (EC):
 *        Modified smf_grp_related interface
 *     2008-04-18 (EC):
 *        Modified smf_flag_spikes interface
+*     2008-04-23 (EC):
+*        -Added sampvar to smf_simplerebinmap
+*        -Added hdr to smf_model_NDFexport
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -609,9 +612,9 @@ void smf_scanfit( smfData *data, unsigned char *quality, int order,
 
 void smf_simplerebinmap( double *data, double *variance, int *lut, 
 			 unsigned char *qual, unsigned char mask, int dsize, 
-			 int flags, double *map, double *mapweight, 
-			 unsigned int *hitsmap, double *mapvar, int msize, 
-			 int *status );
+			 int sampvar, int flags, double *map, 
+			 double *mapweight, unsigned int *hitsmap, 
+			 double *mapvar, int msize, int *status );
 
 void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim, 
 		      int dims[], int nsampcycle, int vxmin, int vymin, 
@@ -764,8 +767,8 @@ void smf_open_model( const Grp *igrp, int index, const char *mode, smfData **dat
 size_t smf_dtype_sz( const smf_dtype dtype, int *status );
 
 void smf_model_NDFexport( const smfData *data, void *variance, 
-			  unsigned char *quality, const char *name, 
-			  int *status );
+			  unsigned char *quality, smfHead *hdr, 
+			  const char *name, int *status );
 
 void smf_open_related_model( const smfGroup *group, const int subindex, 
 			     const char *accmode, smfArray **relfiles, 

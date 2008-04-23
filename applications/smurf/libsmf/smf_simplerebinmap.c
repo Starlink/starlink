@@ -14,10 +14,10 @@
 
 *  Invocation:
 *     smf_simplerebinmap( double *data, double *variance, int *lut, 
-*                         unsigned char *qual, unsigned char mask, int dsize, 
-*                         int flags, double *map, double *mapweight, 
-*                         unsigned int *hitsmap, double *mapvar, int msize, 
-*                         int *status ) {
+*                         unsigned char *qual, unsigned char mask, int
+*                         dsize, int sampvar, int flags, double *map,
+*                         double *mapweight, unsigned int *hitsmap,
+*                         double *mapvar, int msize, int *status ) {
 
 *  Arguments:
 *     data = double* (Given)
@@ -35,6 +35,10 @@
 *        ignore data in the calculation.
 *     dsize = int (Given)
 *        Number of elements in data stream
+*     int sampvar (Given)
+*        If set, calculate mapvar from the (weighted) sample variance of data
+*        that land in the pixel. Otherwise a theoretical variance is calculated
+*        by propagating the variance on each sample into the pixel. 
 *     int flags (Given)
 *        Flags to control the rebinning process (see astRebin flags)
 *     map = double* (Returned)
@@ -42,7 +46,7 @@
 *     mapweight = double* (Returned)
 *        Relative weighting for each pixel in map
 *     hitsmap = unsigned int* (Returned)
-*        Number of samples that land in a pixel (ignore if NULL pointer)
+*        Number of samples that land in a pixel.
 *     mapvar = double* (Returned)
 *        Variance of each pixel in map 
 *     msize = int (Given)
@@ -68,10 +72,14 @@
 *        Added hitsmap calculation
 *     2008-04-03 (EC):
 *        - Added QUALITY to interface
+*     2008-04-23 (EC):
+*        Added sample variance calculation 
 *     {enter_further_changes_here}
 
 *  Notes:
-*
+*     The "sample variance" method isn't correct. I've fudged an approximate
+*     formula for the standard error (squared) when the data are assigned
+*     arbitrary weights. Needs to be fixed up. 
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -115,13 +123,15 @@
 
 void smf_simplerebinmap( double *data, double *variance, int *lut, 
 			 unsigned char *qual, unsigned char mask, int dsize, 
-			 int flags, double *map, double *mapweight, 
-			 unsigned int *hitsmap, double *mapvar, int msize, 
-			 int *status ) {
+			 int sampvar, int flags, double *map, 
+			 double *mapweight, unsigned int *hitsmap, 
+			 double *mapvar, int msize, int *status ) {
 
   /* Local Variables */
   dim_t i;                   /* Loop counter */
-  
+  double temp;               /* Temporary variable */
+  double thisweight;         /* The weight at this point */
+
   /* Main routine */
   if (*status != SAI__OK) return;
 
@@ -130,40 +140,74 @@ void smf_simplerebinmap( double *data, double *variance, int *lut,
     memset( map, 0, msize*sizeof(*map) );
     memset( mapweight, 0, msize*sizeof(*mapweight) );
     memset( mapvar, 0, msize*sizeof(*mapvar) );
-
-    if( hitsmap ) memset( hitsmap, 0, msize*sizeof(*hitsmap) );
+    memset( hitsmap, 0, msize*sizeof(*hitsmap) );
   }
 
   if( variance ) {
     /* Accumulate data and weights in the case that variances are given*/
 
-    if( qual ) {       /* QUALITY checking version */
-      for( i=0; i<dsize; i++ ) {
-	/* Check that the LUT, data and variance values are valid */
-	if( (lut[i] != VAL__BADI) && !(qual[i]&mask) && (variance[i] != 0) ) {
-	  map[lut[i]] += data[i]/variance[i];
-	  mapweight[lut[i]] += 1/variance[i];  
-	  
-	  /* If hitsmap array provided, accumulate hits */
-	  if( hitsmap ) hitsmap[lut[i]] ++;
+    if( sampvar ) {
+      /* Measure weighted sample variance for varmap */
+      
+      if( qual ) {       /* QUALITY checking version */
+	for( i=0; i<dsize; i++ ) {
+	  /* Check that the LUT, data and variance values are valid */
+	  if( (lut[i] != VAL__BADI) && !(qual[i]&mask) && (variance[i] != 0) ){
+	    thisweight = 1/variance[i];
+	    map[lut[i]] += thisweight*data[i];
+	    mapweight[lut[i]] += thisweight;  	    
+	    hitsmap[lut[i]] ++;
+
+	    /* Calculate this sum to estimate E(x^2) */
+	    mapvar[lut[i]] += thisweight*data[i]*data[i];
+	  }
+	}
+      } else {           /* VAL__BADD checking version */	
+	for( i=0; i<dsize; i++ ) {
+	  /* Check that the LUT, data and variance values are valid */
+	  if( (lut[i] != VAL__BADI) && (data[i] != VAL__BADD) && 
+	      (variance[i] != VAL__BADD) && (variance[i] != 0) ) {        
+
+	    thisweight = 1/variance[i];
+	    map[lut[i]] += thisweight*data[i];
+	    mapweight[lut[i]] += thisweight;  	    
+	    hitsmap[lut[i]] ++;
+	    
+	    /* Calculate this sum to estimate E(x^2) */
+	    mapvar[lut[i]] += thisweight*data[i]*data[i];
+	  }
 	}
       }
-    } else {           /* VAL__BADD checking version */
-	
-      for( i=0; i<dsize; i++ ) {
-	/* Check that the LUT, data and variance values are valid */
-	if( (lut[i] != VAL__BADI) && (data[i] != VAL__BADD) && 
-	    (variance[i] != VAL__BADD) && (variance[i] != 0) ) {        
-	  map[lut[i]] += data[i]/variance[i];
-	  mapweight[lut[i]] += 1/variance[i];  
-	  
-	  /* If hitsmap array provided, accumulate hits */
-	  if( hitsmap ) hitsmap[lut[i]] ++;
+
+    } else {
+      /* Otherwise use simple error propagation for varmap */
+
+      if( qual ) {       /* QUALITY checking version */
+	for( i=0; i<dsize; i++ ) {
+	  /* Check that the LUT, data and variance values are valid */
+	  if( (lut[i] != VAL__BADI) && !(qual[i]&mask) && (variance[i] != 0) ){
+	    thisweight = 1/variance[i];
+	    map[lut[i]] += thisweight*data[i];
+	    mapweight[lut[i]] += thisweight;  	    
+	    hitsmap[lut[i]] ++;
+	  }
+	}
+      } else {           /* VAL__BADD checking version */	
+	for( i=0; i<dsize; i++ ) {
+	  /* Check that the LUT, data and variance values are valid */
+	  if( (lut[i] != VAL__BADI) && (data[i] != VAL__BADD) && 
+	      (variance[i] != VAL__BADD) && (variance[i] != 0) ) {        
+	    thisweight = 1/variance[i];
+	    map[lut[i]] += thisweight*data[i];
+	    mapweight[lut[i]] += thisweight;  	    
+	    hitsmap[lut[i]] ++;
+	  }
 	}
       }
     }
   } else {
-    /* Accumulate data and weights when no variances are given */
+    /* Accumulate data and weights when no variances are given. In this case
+       the variance map is always estimated from the sample variance */
 
     if( qual ) {       /* QUALITY checking version */
       for( i=0; i<dsize; i++ ) {
@@ -171,9 +215,10 @@ void smf_simplerebinmap( double *data, double *variance, int *lut,
 	if( (lut[i] != VAL__BADI) && !(qual[i]&mask) ) {
 	  map[lut[i]] += data[i];
 	  mapweight[lut[i]] ++;
-	  
-	  /* If hitsmap array provided, accumulate hits */
-	  if( hitsmap ) hitsmap[lut[i]] ++;
+	  hitsmap[lut[i]] ++;
+
+	  /* Calculate this sum to estimate E(x^2) */
+	  mapvar[lut[i]] += data[i]*data[i];
 	}
       }
     } else {           /* VAL__BADD checking version */
@@ -182,9 +227,10 @@ void smf_simplerebinmap( double *data, double *variance, int *lut,
 	if( (lut[i] != VAL__BADI) && (data[i] != VAL__BADD) ) {
 	  map[lut[i]] += data[i];
 	  mapweight[lut[i]] ++;
-	  
-	  /* If hitsmap array provided, accumulate hits */
-	  if( hitsmap ) hitsmap[lut[i]] ++;
+	  hitsmap[lut[i]] ++;
+
+	  /* Calculate this sum to estimate E(x^2) */
+	  mapvar[lut[i]] += data[i]*data[i];
 	}
       }
     }
@@ -192,16 +238,37 @@ void smf_simplerebinmap( double *data, double *variance, int *lut,
 
   /* If this is the last data to be accumulated re-normalize */
   if( flags & AST__REBINEND ) { 
-    for( i=0; i<msize; i++ ) {      
-      if( mapweight[i] == 0 ) {
-	/* If 0 weight set pixels to bad */
-	mapweight[i] = VAL__BADD;
-	map[i] = VAL__BADD;
-	mapvar[i] = VAL__BADD;
-      } else {
-	/* Otherwise re-normalize */
-	mapvar[i] = 1/mapweight[i];
-	map[i] *= mapvar[i];
+
+    if( sampvar || !variance ) {
+      /* Variance also needs re-normalization in sampvar case */
+
+      for( i=0; i<msize; i++ ) {      
+	if( mapweight[i] == 0 ) {
+	  /* If 0 weight set pixels to bad */
+	  mapweight[i] = VAL__BADD;
+	  map[i] = VAL__BADD;
+	  mapvar[i] = VAL__BADD;
+	} else {
+	  /* Otherwise re-normalize */
+	  thisweight = 1/mapweight[i];
+	  map[i] *= thisweight;
+	  mapvar[i] = (mapvar[i]*thisweight - map[i]*map[i])/hitsmap[i];
+	}
+      }
+    } else {
+      /* Re-normalization for error propagation case */
+
+      for( i=0; i<msize; i++ ) {      
+	if( mapweight[i] == 0 ) {
+	  /* If 0 weight set pixels to bad */
+	  mapweight[i] = VAL__BADD;
+	  map[i] = VAL__BADD;
+	  mapvar[i] = VAL__BADD;
+	} else {
+	  /* Otherwise re-normalize */
+	  mapvar[i] = 1/mapweight[i];
+	  map[i] *= mapvar[i];
+	}
       }
     }
   }

@@ -130,6 +130,9 @@
 *        - Store VARIANCE (from NOI) in residual 
 *     2008-04-18 (EC):
 *        Calculate and display chisquared for each chunk
+*     2008-04-23 (EC):
+*        - Added sample variance estimate for varmap
+*        - Propagate header information to exported model components
 
 *  Notes:
 
@@ -205,6 +208,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
   int flag;                     /* Flag */
   int havenoi;                  /* Set if NOI is one of the models */
+  smfHead *hdr=NULL;            /* Pointer to smfHead */
   dim_t i;                      /* Loop counter */
   int idx=0;                    /* index within subgroup */
   smfGroup *igroup=NULL;        /* smfGroup corresponding to igrp */
@@ -251,6 +255,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   double *thisweight=NULL;      /* Pointer to this weights map */
   double *thisvar=NULL;         /* Pointer to this variance map */
   double *var_data=NULL;        /* Pointer to DATA component of NOI */
+  int varmapmethod=0;           /* Method for calculating varmap */
   dim_t whichnoi;               /* Model index of NOI if present */
 
   /* Main routine */
@@ -282,6 +287,21 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     } else {
       msgOut(" ", 
 	     "SMF_ITERATEMAP: MEMITER not set; perform iterations on disk",
+	     status );
+    }
+
+    /* Method to use for calculating the variance map */
+    if( !astMapGet0I( keymap, "VARMAPMETHOD", &varmapmethod ) ) {
+      varmapmethod = 0;
+    }
+
+    if( varmapmethod ) {
+      msgOut(" ", 
+	     "SMF_ITERATEMAP: Will use sample variance to estimate variance map",
+	     status );
+    } else {
+      msgOut(" ", 
+	     "SMF_ITERATEMAP: Will use error propagation to estimate variance map",
 	     status );
     }
 
@@ -470,7 +490,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	     status);
     }
   }
-
 
   /* There are two loops over files apart from the iteration. In the
      memiter=1 case the idea is to concatenate all continuous data
@@ -806,8 +825,9 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	    
 	      /* Rebin the residual + astronomical signal into a map */
 	      smf_simplerebinmap( res_data, var_data, lut_data, qua_data, mask,
-				  dsize, rebinflags, thismap, thisweight, 
-				  thishits, thisvar, msize, status );
+				  dsize, varmapmethod, rebinflags, thismap, 
+				  thisweight, thishits, thisvar, msize, 
+				  status );
 	    }
 	  }
 
@@ -893,89 +913,110 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
              everything must be changed to time-ordered data before
              writing ICD-compliant files. */
 
-	  /* RESidual */
-
-	  if( !memiter ) {
+	  if( !memiter ) { /* Open if we're doing disk i/o */
+	    /* Fixed components */
 	    smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
 	    smf_open_related_model( quagroup, i, "UPDATE", &qua[i], status );
+	    smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
 
-	    if( havenoi ) {
-	      smf_open_related_model( modelgroups[whichnoi], i, "UPDATE", 
-				      &model[whichnoi][i], status );      
+	    /* Dynamic components */
+	    for( j=0; j<nmodels; j++ ) { 
+	      smf_open_related_model( modelgroups[j], i, "UPDATE", 
+				      &model[j][i], status );	      
 	    }
 	  }
 
+	  /* Loop over subgroup (subarray), re-order and export */
 	  for( idx=0; idx<res[i]->ndat; idx++ ) {
-	    if( (res[i]->sdata[idx]->file->name)[0] ) {
+	    smf_dataOrder( res[i]->sdata[idx], 1, status );
+	    smf_dataOrder( qua[i]->sdata[idx], 1, status );
+	    smf_dataOrder( ast[i]->sdata[idx], 1, status );
 
-	      smf_dataOrder( res[i]->sdata[idx], 1, status );
-	      smf_dataOrder( qua[i]->sdata[idx], 1, status );
+	    for( j=0; j<nmodels; j++ ) { 
+	      smf_dataOrder( model[j][i]->sdata[idx], 1, status );
+	      if( *status = SMF__WDIM ) {
+		/* fails if not 3-dimensional data. Just annul and write out 
+		   data as-is. */
+		errAnnul(status);
+		model[j][i]->sdata[idx]->isTordered=1;
+	      }
+	    }
 
+	    if( *status == SAI__OK ) {
+	      if( memiter ) {
+		/* Pointer to the header in the concatenated data */
+		hdr = res[i]->sdata[idx]->hdr;
+	      } else {
+		/* Open the header of the original input file in memiter=0
+		   case since it won't have been stored in the .DIMM files */
+		smf_open_file( igrp, resgroup->subgroups[i][idx], "READ", 
+			       SMF__NOCREATE_DATA, &data, status );
+		if( *status == SAI__OK ) {
+		  hdr = data->hdr;
+		}
+	      }
+	    }
+
+	    /* QUA becomes the quality component of RES. NOI becomes
+               the variance component of RES if present. */
+	    if( *status == SAI__OK ) {
 	      if( havenoi ) {
-		smf_dataOrder( model[whichnoi][i]->sdata[idx], 1, status );
 		var_data = (double *)(model[whichnoi][i]->sdata[idx]->pntr)[0];
 	      } else {
 		var_data = NULL;
 	      }
-
-	      smf_model_NDFexport( res[i]->sdata[idx], var_data, 
-				   qua[i]->sdata[idx]->pntr[0],
-				   res[i]->sdata[idx]->file->name, 
-				   status );
-	    }
-	  }
-
-	  if( !memiter ) {
-	    smf_close_related( &res[i], status );
-	    smf_close_related( &qua[i], status );
-
-	    if( havenoi ) {
-	      smf_close_related( &model[whichnoi][i], status );
-	    }
-	  }
-
-	  /* ASTronomical signal */
-
-	  if( !memiter ) 
-	    smf_open_related_model( astgroup, i, "UPDATE", &ast[i], status );
-
-	  for( idx=0; idx<ast[i]->ndat; idx++ ) {
-	    smf_dataOrder( ast[i]->sdata[idx], 1, status );
-		  
-	    if( (ast[i]->sdata[idx]->file->name)[0] ) {
-	      smf_model_NDFexport( ast[i]->sdata[idx], NULL, NULL,  
-				   ast[i]->sdata[idx]->file->name, 
-				   status );
-	    }
-	  }
-	  if( !memiter ) 
-	    smf_close_related( &ast[i], status );
-	
-	  /* Remaining model components - excluding NOIse */
-
-	  for( j=0; j<nmodels; j++ ) { 
-	    if( !memiter && (modeltyps[j] != SMF__NOI) ) {
-	      smf_open_related_model( modelgroups[j], i, "UPDATE", 
-				      &model[j][i], status );
 	      
-	      for( idx=0; idx<model[j][i]->ndat; idx++ ) {
-
-		smf_dataOrder( model[j][i]->sdata[idx], 1, status );
-		if( *status = SMF__WDIM ) {
-		  /* fails if not 3-dimensional data. Just annul and write out 
-		     data with other dimensions as-is */
-		  errAnnul(status);
-		  model[j][i]->sdata[idx]->isTordered=1;
-		}
-		
+	      if( (res[i]->sdata[idx]->file->name)[0] ) {
+		smf_model_NDFexport( res[i]->sdata[idx], var_data, 
+				     qua[i]->sdata[idx]->pntr[0], hdr,
+				     res[i]->sdata[idx]->file->name, 
+				     status );
+	      } else {
+		msgOut( " ", 
+			"SMF__ITERATEMAP: Can't export RES -- NULL filename",
+			status);
+	      }
+	      
+	      if( (ast[i]->sdata[idx]->file->name)[0] ) {
+		smf_model_NDFexport( ast[i]->sdata[idx], NULL, NULL, hdr, 
+				     ast[i]->sdata[idx]->file->name, 
+				   status );
+	      } else {
+		msgOut( " ", 
+			"SMF__ITERATEMAP: Can't export AST -- NULL filename",
+			status);
+	      }
+	    }
+	      
+	    /* Dynamic components excluding NOI */
+	    for( j=0; j<nmodels; j++ ) 
+	      if( (*status == SAI__OK) && (modeltyps[j] != SMF__NOI) ) {
 		if( (model[j][i]->sdata[idx]->file->name)[0] ) {
 		  smf_model_NDFexport( model[j][i]->sdata[idx], NULL, NULL,  
+				       NULL, /* hdr,*/ 
 				       model[j][i]->sdata[idx]->file->name, 
 				       status);
+		} else {
+		  msgSetc("MOD",smf_model_getname(modeltyps[j], status) );
+		  msgOut( " ", 
+			  "SMF__ITERATEMAP: Can't export ^MOD: NULL filename",
+			  status);
 		}
 	      }
-	      if( !memiter ) 
-		smf_close_related( &model[j][i], status );
+	    
+	    /* Close the input file containing the header */
+	    if( !memiter ) {
+	      smf_close_file( &data, status );
+	    }
+	  }
+	  
+	  if( !memiter ) { /* Close files if doing disk i/o */
+	    smf_close_related( &res[i], status );
+	    smf_close_related( &qua[i], status );
+	    smf_close_related( &ast[i], status );
+	    
+	    for( j=0; j<nmodels; j++ ) { 
+	      smf_close_related( &model[j][i], status );
 	    }
 	  }
 	}

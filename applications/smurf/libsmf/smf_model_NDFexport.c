@@ -14,8 +14,8 @@
 
 *  Invocation:
 *     smf_model_NDFexport( const smfData *data, void *variance, 
-*                           unsigned char *quality, const char *name, 
-*                           int *status );
+*                          unsigned char *quality, smfHead *hdr,
+*                          const char *name, int *status );
 
 *  Arguments:
 *     data = const smfData* (Given)
@@ -24,6 +24,8 @@
 *        If set, use this buffer instead of VARIANCE associated with data.
 *     quality = unsigned char * (Given)
 *        If set, use this buffer instead of QUALITY associated with data.
+*     hdr = smfHead * (Given)
+*        If set use this header instead of data->hdr.
 *     name = const char* (Given)
 *        Name of the NDF container
 *     status = int* (Given and Returned)
@@ -53,6 +55,8 @@
 *     2008-04-17 (EC):
 *        Changed time-ordered data assertion to check to force caller to
 *        order the data themselves before calling the routine.
+*     2008-04-23 (EC):
+*        Propagate header information to file
 
 *  Notes:
 *
@@ -92,31 +96,39 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
+#include "jcmt/state.h"
 
 #define FUNC_NAME "smf_model_NDFexport"
 
 void smf_model_NDFexport( const smfData *data, void *variance, 
-			  unsigned char *quality, const char *name, 
-			  int *status ){
+			  unsigned char *quality, smfHead *hdr, 
+			  const char *name, int *status ){
 
   /* Local Variables */
   int added=0;                  /* Number of names added to group */
+  AstMapping *cbmap=NULL;       /* Pointer to current->base mapping */
   size_t datalen;               /* Length in bytes of data array */
   int flag=0;                   /* Flag */
-  int i;                        /* Counter */
+  AstFrameSet *fset1d=NULL;    	/* Frameset for 1D data */
+  size_t i;                     /* Counter */
+  HDSLoc *jcmtstateloc=NULL;    /* HDS Locator for JCMT headers */
   int lbnd[NDF__MXDIM];         /* Dimensions of container */
-  Grp *inname = NULL;           /* 1-element group to hold input filename */
+  Grp *inname=NULL;             /* 1-element group to hold input filename */
   int msize=0;                  /* Number of files in name group */
+  dim_t nbolo;                  /* Number of bolometers */
   size_t ndata;                 /* Number of elements in data array */
+  dim_t ntslice;                /* Number of time slices */
   int osize=0;                  /* Number of files in model group */
+  int out[NDF__MXDIM];          /* Indices outputs of mapping */
   Grp *outname = NULL;          /* 1-element group to hold output filename */
   unsigned char *qual=NULL;     /* Pointer to QUALITY buffer */
+  smfHead *header=NULL;         /* Pointer to header data */  
+  int taxis;                    /* Index of time axis */
   smfData *tempdata=NULL;       /* Temporary smfData pointer */
+  AstFrame *tfrm=NULL;          /* 1D frame (TimeFrame) */
+  AstMapping *tmap=NULL;        /* Mapping for time axis */
   int ubnd[NDF__MXDIM];         /* Dimensions of container */
   void *var=NULL;               /* Pointer to VARIANCE buffer */
-
-  char ndfname[GRP__SZNAM+1];  /* Input NDF name, derived from GRP */
-  char *pname=NULL;
 
   if (*status != SAI__OK ) return;
 
@@ -125,6 +137,22 @@ void smf_model_NDFexport( const smfData *data, void *variance,
     *status = SMF__BORDB;
     errRep( FUNC_NAME, "Data is bolo-ordered, must be time-ordered", status );
     return;
+  }
+
+  /* Get number of bolos / time slices */
+  if( data->ndims == 1 ) {
+    /* Assume one time-domain axis */
+    nbolo = 1;
+    ntslice = data->dims[0];
+  } else if( data->ndims == 3 ) {
+    /* Assume 3-d cube of data */
+    nbolo = data->dims[0]*data->dims[1];
+    ntslice = data->dims[2];
+  } else {
+    *status = SAI__ERROR;
+    msgSeti("NDIMS",data->ndims);
+    errRep( FUNC_NAME, "Don't know how to export ^NDIMS dimensional data",
+	    status );
   }
 
   /* Make a 1-element group containing the name of the new file */
@@ -145,8 +173,7 @@ void smf_model_NDFexport( const smfData *data, void *variance,
     datalen = ndata * smf_dtype_sz( data->dtype, status );
   }
 
-  /* Check for VARIANCE and QUALITY components */
-
+  /* Check for VARIANCE and QUALITY components, and header */
   if( variance ) {
     var = variance;
   } else {
@@ -159,8 +186,13 @@ void smf_model_NDFexport( const smfData *data, void *variance,
     qual = (data->pntr)[2];
   }
 
-  /* Make a new empty container with associated smfData struct */
+  if( hdr ) {
+    header = hdr;
+  } else {
+    header = data->hdr;
+  }
 
+  /* Make a new empty container with associated smfData struct */
   flag = 0;
   if( var ) flag |= SMF__MAP_VAR;
   if( qual ) flag |= SMF__MAP_QUAL;
@@ -179,6 +211,117 @@ void smf_model_NDFexport( const smfData *data, void *variance,
     if( qual ) {
       memcpy( (tempdata->pntr)[2], qual, ndata*sizeof(*qual) );
     }
+  }
+
+  /* If header was provided, create and map relevant information */
+  if( header && (tempdata->file) ) {
+    
+    if( header->instrument == INST__SCUBA2 ) {
+      
+      /* MORE.JCMTSTATE */
+      if( header->allState ) {
+	
+	/* Get an HDS locator */
+	ndfXnew( tempdata->file->ndfid, JCMT__EXTNAME, JCMT__EXTTYPE, 0, 0,
+		 &jcmtstateloc, status );
+
+	/* Map the header */
+	sc2store_headcremap( jcmtstateloc, ntslice, INST__SCUBA2, status  );
+
+	/* Write out the per-frame headers */
+	for( i=0; i<ntslice; i++ ) {
+	  sc2store_headput( i, header->allState[i], status );
+	}
+      }
+
+      /* MORE.FITS */
+      if( header->fitshdr ) {
+	kpgPtfts( tempdata->file->ndfid, header->fitshdr, status );
+      }
+
+      /* WCS */
+      if( header->tswcs ) {
+	if( data->ndims == 3 ) {
+	  /* For 3-dimensional data assume it is ICD bolo-format */
+	  ndfPtwcs( header->tswcs, tempdata->file->ndfid, status );
+
+	} else if( data->ndims == 1 ) {
+	  /* For 1=dimensional data, assume it is the time axis which we
+	     extract from the 3d WCS */
+
+	  astBegin;
+
+	  /* Get a pointer to the current->base Mapping (i.e. the Mapping from
+	     WCS coords to GRID coords). */
+	  cbmap = astGetMapping( header->tswcs, AST__CURRENT, AST__BASE );
+
+	  /* Use astMapSplit to split off the Mapping for the time
+	     axis. This assumes that the time axis is the 3rd axis
+	     (i.e. index 2) */
+
+	  taxis = 2;
+	  astMapSplit( cbmap, 1, &taxis, out, &tmap );
+
+	  astShow( cbmap );
+
+	  /* We now check that the Mapping was split succesfully. This should
+	     always be the case for the time axis since the time axis is 
+	     independent of the others, but it is as well to check in case of 
+	     bugs, etc. */
+	  if( !tmap ) {
+	    /* The "tmap" mapping will have 1 input (the WCS time value) -
+	       astMapSplit guarantees this. But we
+	       should also check that it also has only one output (the
+	       corresponding GRID axis). */
+	    *status = SAI__ERROR;
+	    errRep( FUNC_NAME, "Couldn't extract time-axis mapping",
+		    status );
+	  } else if( astGetI( tmap, "Nout" ) != 1 ) {
+	    *status = SAI__ERROR;
+	    errRep( FUNC_NAME, 
+		    "Time-axis mapping has incorrect number of outputs",
+		    status );
+	  } else {
+
+	    /* Create a new FrameSet containing a 1D GRID Frame. */
+	    fset1d = astFrameSet( astFrame( 1, "Domain=GRID" ), "" );
+
+	    /* Extract the 1D Frame (presumably a TimeFrame)
+	       describing time from the current (WCS) 3D Frame. */
+	    tfrm = astPickAxes( header->tswcs, 1, &taxis, NULL);
+
+	    /* Add the time frame into the 1D FrameSet, using the
+	       Mapping returned by astMapSplit. Note, this Mapping
+	       goes from time to grid, so we invert it first so that
+	       it goes from grid to time, as required by
+	       astAddFrame. */
+
+	    astInvert( tmap );
+	    astAddFrame( fset1d, AST__BASE, tmap, tfrm );
+	  }
+
+	  if( astOK && *status==SAI__OK ) {
+	    /* Write out the frameset */
+	    ndfPtwcs( fset1d, tempdata->file->ndfid, status );
+	  } else {
+	    *status = SAI__ERROR;
+	    errRep( FUNC_NAME, "Error extracting 1-d frameset",
+		    status );
+	  }
+
+	  astEnd;
+
+	} else {
+	  msgSeti("NDIMS",data->ndims);
+	  msgOut( " ", "SMF_MODEL_NDFEXPORT: Don't know how to handle WCS for ^NDIMS dimensions", status );
+	}
+      }
+
+    } else {
+      msgOut(" ",
+	     "SMF_MODEL_NDFEXPORT: Warning: only know how to write SCUBA2 header", status );
+    }
+
   }
 
 
