@@ -32,10 +32,14 @@
 *        example, byte data should never have more than 256 bins.
 *     CUMUL = LOGICAL (Given)
 *        Is a cumulative histogram required?
-*     VALMAX = ? (Given)
-*        Maximum data value included in the array.
-*     VALMIN = ? (Given)
-*        Minimum data value included in the array.
+*     VALMAX = ? (Given and Returned)
+*        Maximum data value included in the array. If this is supplied as 
+*        VAL__BAD<T>, then the actual maximum value in the ARRAY is found
+*        and used, and returned on exit.
+*     VALMIN = ? (Given and Returned)
+*        Minimum data value included in the array. If this is supplied as 
+*        VAL__BAD<T>, then the actual minimum value in the ARRAY is found
+*        and used, and returned on exit.
 *     HIST( NUMBIN ) = INTEGER (Returned)
 *        Array containing the histogram.
 *     STATUS = INTEGER (Given and Returned)
@@ -114,8 +118,9 @@
       INTEGER NUMBIN
       LOGICAL CUMUL
       LOGICAL BAD
-
       <TYPE> ARRAY( DIM )
+
+*  Arguments Given and Returned:
       <TYPE> VALMAX
       <TYPE> VALMIN
 
@@ -176,15 +181,14 @@
 
          END IF
 
-*  Assign some useful variables.
-         DVMIN = NUM_<T>TOD( VLMIN )
-         DVMAX = NUM_<T>TOD( VLMAX )
+         IF( VALMAX .EQ. VAL__BAD<T> ) VALMAX = VLMAX
+         IF( VALMIN .EQ. VAL__BAD<T> ) VALMIN = VLMIN
 
-      ELSE
-         DVMIN = NUM_<T>TOD( VALMIN )
-         DVMAX = NUM_<T>TOD( VALMAX )
       END IF
 
+*  Assign some useful variables.
+      DVMIN = NUM_<T>TOD( VALMIN )
+      DVMAX = NUM_<T>TOD( VALMAX )
       TNUMB = DBLE( NUMBIN )
 
 *  Set the minimum separation allowed for the data limits such that

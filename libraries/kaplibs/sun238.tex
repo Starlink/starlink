@@ -28789,14 +28789,18 @@ from one graphical element to another.
          Is a cumulative histogram required?
       }
       \sstsubsection{
-         VALMAX = ? (Given)
+         VALMAX = ? (Given and Returned)
       }{
-         Maximum data value included in the array.
+         Maximum data value included in the array. If this is supplied as
+         VAL\_\_BAD$<$T$>$, then the actual maximum value in the ARRAY is found
+         and used, and returned on exit.
       }
       \sstsubsection{
-         VALMIN = ? (Given)
+         VALMIN = ? (Given and Returned)
       }{
-         Minimum data value included in the array.
+         Minimum data value included in the array. If this is supplied as
+         VAL\_\_BAD$<$T$>$, then the actual minimum value in the ARRAY is found
+         and used, and returned on exit.
       }
       \sstsubsection{
          HIST( NUMBIN ) = INTEGER (Returned)
