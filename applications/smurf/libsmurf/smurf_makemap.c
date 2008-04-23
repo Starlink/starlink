@@ -270,12 +270,15 @@
 *     2008-04-22 (AGG):
 *        Use faster histogram-based method for calculating median
 *        exposure time
+*     2008-04-23 (DSB):
+*        Modify call to kpg1Ghstd to pass max and min values by reference
+*        rather than by value.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2005-2008 University of British Columbia.
-*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -659,7 +662,7 @@ void smurf_makemap( int *status ) {
   numbin = (int)(maxtexp / steptime) - 1;
   histogram = smf_malloc( (size_t)numbin, sizeof(int), 1, status );
   if ( histogram ) {
-    kpg1Ghstd( 1, (int)mapsize, exp_time, numbin, 0, maxtexp, steptime, histogram, 
+    kpg1Ghstd( 1, (int)mapsize, exp_time, numbin, 0, &maxtexp, &steptime, histogram, 
 	       status );
     kpg1Hsstp( numbin, histogram, maxtexp, steptime, 
 	       &sumtexp, &meantexp, &medtexp, &modetexp, status);
