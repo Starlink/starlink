@@ -43,12 +43,14 @@
 #  Copyright:
 #     Copyright (C) 1994 Science & Engineering Research Council.
 #     Copyright (C) 1996, 1998, 2000 Central Laboratory of the Research
-#     Councils. All Rights Reserved.
+#     Councils. 
+#     Copyright (C) 2008 Science and Technology facilities Council.
+#     All Rights Reserved.
 
 #  Licence:
 #     This program is free software; you can redistribute it and/or
 #     modify it under the terms of the GNU General Public License as
-#     published by the Free Software Foundation; either version 2 of
+#     published by the Free Software Foundation; either Version 2 of
 #     the License, or (at your option) any later version.
 #
 #     This program is distributed in the hope that it will be
@@ -58,8 +60,8 @@
 #
 #     You should have received a copy of the GNU General Public License
 #     along with this program; if not, write to the Free Software
-#     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-#     02111-1307, USA
+#     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+#     02111-1307, USA.
 
 #  Authors:
 #     Malcolm J. Currie (STARLINK)
@@ -88,6 +90,8 @@
 #        "echo -n" commands to use the csh built-in echo command in place
 #        of the sh built-in echo command which does not seem to recognize
 #        the -n option on Solaris.
+#     2008 April 24 (MJC):
+#        Expand the kappa alias that no longer works.
 #     {enter_further_changes_here}
 #
 #-
@@ -100,7 +104,7 @@ if (-e zzfitsedit.tmp) rm zzfitsedit.tmp
 #  Make sure that KAPPA is available hiding it from view.
 #
 alias echo 'echo >/dev/null'
-kappa
+source $KAPPA_DIR/kappa.csh
 unalias echo
 #
 #  See whether or not the NDF has been defined.
