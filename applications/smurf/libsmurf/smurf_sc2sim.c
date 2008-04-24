@@ -20,24 +20,24 @@
 *        Pointer to global status.
 
 *  Description:
-*     This is the main routine implementing the SIMULATE task.
-*     This attempts to simulate the data taken by a SCUBA2
-*     subarray when observing an astronomical image plus atmospheric
-*     background while driving the JCMT. The simulation includes photon
-*     and 1/f noise, and nonlinear response which varies for different
-*     bolometers. It also includes SCUBA-2 field distortion.  Sc2sim 
-*     combines the functionality of a number of executables
-*     built in earlier versions of the simulator: staresim, dreamsim, 
-*     pongsim.  The output file from a 'heat' observation is named after 
-*     the subarray, date, and filenumber, for example : 
-*     s8a20060301_00001_0001.sdf.  For each subarray used in a 
-*     simulation, a corresponding 'heat' output file must be
-*     present in the working directory.
+*     This is the main routine implementing the SIMULATE task.  This
+*     attempts to simulate the data taken by a SCUBA-2 subarray when
+*     observing an astronomical image plus atmospheric background
+*     while driving the JCMT. The simulation includes photon and 1/f
+*     noise, and nonlinear response which varies for different
+*     bolometers. It also includes SCUBA-2 field distortion. Sc2sim
+*     combines the functionality of a number of executables built in
+*     earlier versions of the simulator: staresim, dreamsim,
+*     pongsim. The output file from a 'heat' observation is named
+*     after the subarray, date, and filenumber, for example:
+*     s8a20060301_00001_0001.sdf.  For each subarray used in a
+*     simulation, a corresponding 'heat' output file must be present
+*     in the working directory.
 
 *     Sc2sim also performs the heatrun task when supplied an input
-*     file with 'heat' observation mode specified.  This generates
-*     a heater flat-field measurement from simulated data for each
-*     of range of heater settings.  The output file from a 'heat'
+*     file with 'heat' observation mode specified.  This generates a
+*     heater flat-field measurement from simulated data for each of
+*     range of heater settings.  The output file from a 'heat'
 *     observation is named after the subarray, date, and filenumber,
 *     for example : s8aheat20060301_00001.sdf.
 
@@ -403,60 +403,54 @@
 *          current simulation given the parameters specified in
 *          SIMPAR and OBSPAR. The simulation is not carried out.
 *     SIMTYPE = CHAR (Read)
-*          Simulation type : In a 'full' simulation the flux
-*          for each bolometer at each time slice is calculated
-*          and stored in the output files, along with the
-*          pointing information.  In a 'weights' simulation, 
-*          the flux is set to zero for each bolometer, but the
-*          pointing information is written to the output
-*          files.  These 'weights' files can be used to 
-*          predict the rate of sampling across a mapped area
-*          for a given observation. 
+*          Simulation type : In a 'full' simulation the flux for each
+*          bolometer at each time slice is calculated and stored in
+*          the output files, along with the pointing information.  In
+*          a 'weights' simulation, the flux is set to zero for each
+*          bolometer, but the pointing information is written to the
+*          output files.  These 'weights' files can be generated in
+*          less time than for a 'full' simulation and may be used to
+*          predict the rate of sampling across a mapped area for a
+*          given observation.
 
 *  Authors:
-*     Tim Jenness (JAC, Hawaii)
 *     Andy Gibb (UBC)
 *     Edward Chapin (UBC)
-*     David Berry (JAC, UCLan)
 *     B.D.Kelly (ROE)
 *     Jen Balfour (UBC)
 *     {enter_new_authors_here}
 
 *  History :
-*     2006-03-28: Original version (EC)
-*     2006-04-19: Added jiggle offsets, filename consistent with mjd (EC)
-*     2006-06-06  (AGG/EC/JB): Clone from smurf_makemap
+*     2005-02-16  Original (bdk@roe.ac.uk)
+*     2005-05-18  Get xbc, ybc from instrinit (BDK)
+*     2005-05-20  Add flatcal (BDK)
+*     2005-06-17  Allocate workspace dynamically (BDK)
+*     2005-08-19  Do calibration fit, remove flux2cur flag check (BDK)
+*     2005-10-04  Change to new data interface (BDK)
+*     2006-01-13  Write subarray name (EC)
+*     2006-01-24  Write filter/atstart/atend (EC)
+*     2006-04-19  Added jiggle offsets, filename consistent with MJD (EC)
+*     2006-06-06  Convert to SMURF task: clone from smurf_makemap (AGG/EC/JB)
 *     2006-06-09  Added heatrun task (JB)
 *     2006-07-31  Split into subroutines and added simhits capability (JB)
+*     2006-08-18  Fixed memory leak (EC)
+*     2006-08-21  Removed unused variables (JB)
 *     2006-08-21  Free resources allocated in sc2sim_instrinit (EC)
 *     2006-09-14  Seed optional
 *     2006-09-14  Ability to scan in AzEl and RADec coordinates (EC)
 *     2006-09-22  Convert to using AstKeyMaps for input parameters (JB)
 *     2006-10-03  Remove unused variables (JB)
 *     2006-11-21  Expanded comments section for use with 
-*                 smurf_help task and added Lissajous mode.(JB)
+*                 smurf_help task and added Lissajous mode (JB)
 *     2006-11-22  Added multiple map cycle capabilities to liss/pong (JB)
 *     2006-12-08  Removed sc2sim_simhits and replaced with 
 *                 hits-only flag (JB)
 *     2007-01-26  Added OVERWRITE parameter (AGG)
 *     2007-03-01  Added SIMSTATS parameter (AGG)
+*     2007-07-03  Made obsMode enumerated type more readable (EC)
 *     2007-10-05  Changed OBSFILE and SIMFILE to OBSPAR and SIMPAR (AGG)
-*     {enter_further_changes_here}
-
-*    History (HEATRUN task):
-*     2005-02-16:  original (bdk@roe.ac.uk)
-*     2005-05-18:  get xbc, ybc from instrinit (bdk)
-*     2005-05-20:  add flatcal (bdk)
-*     2005-06-17:  allocate workspace dynamically (bdk)
-*     2005-08-19:  do calibration fit, remove flux2cur flag check (bdk)
-*     2005-10-04:  change to new data interface (bdk)
-*     2006-01-13:  write subarray name (elc)
-*     2006-01-24:  write filter/atstart/atend (elc)
-*     2006-06-09:  added to smurf_sim (jb)
-*     2006-08-18:  fixed memory leak (elc)
-*     2006-08-21:  removed unused variables (jb)
-*     2007-07-03:  made obsMode enumerated type more readable (EC)
-*     2007-12-18   Update to use new smf_free behaviour (AGG)
+*     2007-12-18  Update to use new smf_free behaviour (AGG)
+*     2008-04-24  Rationalize code layout (AGG)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -487,7 +481,7 @@
 #if HAVE_CONFIG_H
 #include <config.h>
 #endif
-
+/* System includes */
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -508,7 +502,9 @@
 #include "star/grp.h"
 #include "star/kaplibs.h"
 #include "star/slalib.h"
+#include "star/ard.h"
 
+/* SC2DA includes */
 #include "sc2da/Dits_Err.h"
 #include "sc2da/Ers.h"
 #include "sc2da/sc2store_par.h"
@@ -519,7 +515,6 @@
 #include "smurf_par.h"
 #include "smurflib.h"
 #include "libsmf/smf.h"
-
 #include "libsc2sim/sc2sim.h"
 
 #include "wvm/wvmCal.h" /* Water Vapor Monitor routines */
@@ -535,183 +530,223 @@
 
 void smurf_sc2sim( int *status ) {
 
-   /* Local variables */
-   struct sc2sim_obs_struct inx;   /* structure for values from XML */
-   struct sc2sim_sim_struct sinx;  /* structure for sim values from XML */
-   mapCoordframe coordframe;       /* Coordinate frame for simulated map */
-   double coeffs[SC2SIM__NCOEFFS]; /* bolometer response coeffs */
-   double digcurrent;              /* digitisation mean current */
-   double digmean;                 /* digitisation mean value */
-   double digscale;                /* digitisation scale factore */
-   double elevation;               /* telescope elevation (radians) */
-   char filter[8];                 /* string to hold filter name */
-   double *heater=NULL;            /* bolometer heater ratios */
-   int hitsonly=0;                 /* flag to indicate hits-only simulation */
-   int maxwrite;                   /* file close time */
-   obsMode mode;                   /* what type of observation are we doing? */
-   int nbol;                       /* total number of bolometers */
-   Grp *obsGrp = NULL;             /* Group containing obs parameter file */
-   AstKeyMap *obskeymap=NULL;      /* AstKeyMap for obs parameters */
-   int osize = 0;                  /* Size of obsGrp */
-   int overwrite = 0;              /* Flag to specify whether existing
-				      files are overwritten */
-   double *pzero=NULL;             /* bolometer power offsets */
-   int rseed;                      /* seed for random number generator */
-   Grp *simGrp = NULL;             /* Group containing sim parameter file */
-   AstKeyMap *simkeymap=NULL;      /* AstKeyMap for sim parameters */
-   int simstats = 0;               /* Flag to denote whether just to
-				      list simulation statistics */
-   char simtype[LEN__METHOD];      /* String for simulation type */
-   int ssize = 0;                  /* Size of simGrp */
-   struct timeval time;            /* Structure for system time */
-   static double weights[SC2SIM__MXIRF]; /* impulse response */
-   double *xbc=NULL;               /* projected NAS X offsets of bolometers 
-				      in arcsec */
-   double *xbolo=NULL;             /* Native bolo x-offsets */
-   double *ybc=NULL;               /* projected NAS Y offsets of bolometers 
-				      in arcsec */
-   double *ybolo=NULL;             /* Native bolo y-offsets */
+  /* Local variables */
+  struct sc2sim_obs_struct inx;   /* structure for values from XML */
+  struct sc2sim_sim_struct sinx;  /* structure for sim values from XML */
+  mapCoordframe coordframe;       /* Coordinate frame for simulated map */
+  double coeffs[SC2SIM__NCOEFFS]; /* bolometer response coeffs */
+  double digcurrent;              /* digitisation mean current */
+  double digmean;                 /* digitisation mean value */
+  double digscale;                /* digitisation scale factore */
+  double elevation;               /* telescope elevation (radians) */
+  char filter[8];                 /* string to hold filter name */
+  double *heater = NULL;          /* bolometer heater ratios */
+  int hitsonly = 0;               /* Flag to indicate hits-only simulation */
+  int maxwrite;                   /* file close time */
+  obsMode mode;                   /* what type of observation are we doing? */
+  int nbol;                       /* total number of bolometers */
+  Grp *obsGrp = NULL;             /* Group containing obs parameter file */
+  AstKeyMap *obskeymap = NULL;    /* AstKeyMap for obs parameters */
+  int osize = 0;                  /* Size of obsGrp */
+  int overwrite = 0;              /* Flag to specify whether existing
+				     files are overwritten */
+  double *pzero = NULL;           /* bolometer power offsets */
+  int rseed;                      /* seed for random number generator */
+  Grp *simGrp = NULL;             /* Group containing sim parameter file */
+  AstKeyMap *simkeymap = NULL;    /* AstKeyMap for sim parameters */
+  int simstats = 0;               /* Flag to denote whether just to
+				     list simulation statistics */
+  char simtype[LEN__METHOD];      /* String for simulation type */
+  int ssize = 0;                  /* Size of simGrp */
+  struct timeval time;            /* Structure for system time */
+  static double weights[SC2SIM__MXIRF]; /* impulse response */
+  double *xbc = NULL;             /* projected NAS X offsets of bolometers 
+				     in arcsec */
+  double *xbolo = NULL;           /* Native bolo x-offsets */
+  double *ybc = NULL;             /* projected NAS Y offsets of bolometers 
+				     in arcsec */
+  double *ybolo = NULL;           /* Native bolo y-offsets */
+  
+  char ard[LEN__METHOD];         /* Name of ARD description */
+  int ardFlag=0;                 /* Flag for ARD description */
+  Grp *ardGrp = NULL;            /* Group containing ARD description */
+  int *bolos = NULL;             /* Array of all bolometers */
+  int lbnd[2];                   /* Lower pixel bounds for bad pixel mask */
+  int lbnde[2];                  /* Lower pixel bounds encompassing all
+				    external pixels */
+  int lbndi[2];                  /* Lower pixel bounds encompassing all
+				    internal pixels */
+  int regval=0;                  /* First keyword in ARD description */
+  float trcoeff;                 /* Coefficients for ARD mapping */
+  int ubnd[2];                   /* Upper pixel bounds for bad pixel mask */
+  int ubnde[2];                  /* Upper pixel bounds encompassing all
+				    external pixels */
+  int ubndi[2];                  /* Upper pixel bounds encompassing all
+				    internal pixels */
+  int heatrun = 0;
+  int dreamstare = 0;
+  int scan = 0;
 
+  /* Get input parameters */
+  kpg1Gtgrp ( "OBSPAR", &obsGrp, &osize, status );
+  kpg1Kymap ( obsGrp, &obskeymap, status );
+  kpg1Gtgrp ( "SIMPAR", &simGrp, &ssize, status );
+  kpg1Kymap ( simGrp, &simkeymap, status );
 
-   /* Get input parameters */
-   kpg1Gtgrp ( "OBSPAR", &obsGrp, &osize, status );
-   kpg1Kymap ( obsGrp, &obskeymap, status );
-   kpg1Gtgrp ( "SIMPAR", &simGrp, &ssize, status );
-   kpg1Kymap ( simGrp, &simkeymap, status );
-   parGet0i( "SEED", &rseed, status );
+  /* Seed random number generator, either with the time in 
+     milliseconds, or from user-supplied seed */
+  parGet0i( "SEED", &rseed, status );
+  if ( *status == PAR__NULL ) {
+    errAnnul ( status );
+    gettimeofday ( &time, NULL );
+    rseed = ( time.tv_sec * 1000 ) + ( time.tv_usec / 1000 );
+    msgOutif(MSG__VERB," ",
+	     "Seeding random numbers with clock time", status);
+  } else {
+    msgSeti( "SEED", rseed );
+    msgOutif(MSG__VERB," ","Seeding random numbers with ^SEED", status);
+  } 
 
-   /* Seed random number generator, either with the time in 
-      milliseconds, or from user-supplied seed */
-   if ( *status == PAR__NULL ) {
-      errAnnul ( status );
-      gettimeofday ( &time, NULL );
-      rseed = ( time.tv_sec * 1000 ) + ( time.tv_usec / 1000 );
-      msgOutif(MSG__VERB," ",
-               "Seeding random numbers with clock time", status);
-   } else {
-      msgSeti( "SEED", rseed );
-      msgOutif(MSG__VERB," ","Seeding random numbers with ^SEED", status);
-   } 
+  /* Initialise random number generator to give same sequence every time,
+     leading to the same series of pzero and heater offsets */
+  srand(53);
 
-   /* Initialise random number generator to give same sequence every time,
-      leading to the same series of pzero and heater offsets */
-   srand(53);
+  /* Information for user */
+  msgOutif(MSG__NORM, "", " ==== SCUBA-2 simulator ====", status);
 
-   msgOutif(MSG__VERB," ", "Initialise instrument.", status);
+  msgOutif(MSG__VERB, "", "  Initialise instrument", status);
+  sc2sim_instrinit ( &inx, &sinx, obskeymap, simkeymap, coeffs, &digcurrent,
+		     &digmean, &digscale, &elevation, weights, &heater, 
+		     &pzero, &xbc, &ybc, &xbolo, &ybolo, status );
+  /* Re-initialise random number generator to give a different sequence
+     each time by using the given seed. */
+  srand ( rseed );
 
-   sc2sim_instrinit ( &inx, &sinx, obskeymap, simkeymap, coeffs, &digcurrent,
-		      &digmean, &digscale, &elevation, weights, &heater, 
-		      &pzero, &xbc, &ybc, &xbolo, &ybolo, status );
+  nbol = inx.nbolx * inx.nboly;
+  /* Bad bolometer mask */
+  bolos = smf_malloc( (size_t)(nbol), sizeof(int), 1, status );
+  lbnd[0] = 1;
+  lbnd[1] = 1;
+  ubnd[0] = inx.nbolx;
+  ubnd[1] = inx.nboly;
+  parGet0c("BADBOL", ard, LEN__METHOD, status);
+  if ( *status == PAR__NULL ) {
+    errAnnul( status );
+  } else {
+    ardGrpex ( ard, NULL, &ardGrp, &ardFlag, status );
+    trcoeff = VAL__BADR;
+    ardWork ( ardGrp, 2, lbnd, ubnd, &trcoeff, 0, &regval, bolos,
+	      lbndi, ubndi, lbnde, ubnde, status );
+  }
 
-   /* Re-initialise random number generator to give a different sequence
-      each time by using the given seed. */
-   srand ( rseed );
+  /* String for the wavelength of the filter */
+  sprintf( filter,"%i",(int) (inx.lambda*1e6) );
+  
+  /* Get observation mode and coordinate frame */
+  mode = sc2sim_getobsmode( inx.obsmode, status );
+  coordframe = sc2sim_getcoordframe( inx.coordframe, status );
 
-   nbol = inx.nbolx * inx.nboly;
+  /* Let user know details of simulation */
+  msgSetc("L", filter);
+  switch ( mode ) {
 
-   /* String for the wavelength of the filter */
-   sprintf( filter,"%i",(int) (inx.lambda*1e6) );
+  case MODE__HEATRUN:
+    msgSetc("M","HEATRUN");
+    heatrun = 1;
+    break;
+  case MODE__STARE:
+    msgSetc("M","STARE");
+    dreamstare = 1;
+    break;
+  case MODE__DREAM:
+    msgSetc("M","DREAM");
+    dreamstare = 1;
+    break;
+  case MODE__PONG:
+    if ( strncmp(inx.pong_type, "CURV", 4) == 0 ) {
+      msgSetc("M","CURVY PONG");
+    } else if ( strncmp(inx.pong_type, "STRA", 4) == 0 ) {
+      msgSetc("M","STRAIGHT PONG");
+    }
+    scan = 1;
+    break;
+  case MODE__BOUS:
+    msgSetc("M","BOUSTROPHEDON");
+    scan = 1;
+    break;
+  case MODE__SINGLESCAN:
+    msgSetc("M","SINGLESCAN");
+    scan = 1;
+    break;
+  case MODE__LISS:
+    msgSetc("M","LISSAJOUS");
+    scan = 1;
+    break;
+  default:
+    *status = SAI__ERROR;
+    msgSetc( "M", inx.obsmode );
+    errRep("", "^M is not a supported observation mode", status);
+  }
 
-   /* Get the relevant pointing solution for the telescope based on the
-      observation type + relevant parameters & check to see if this is 
-      a heatrun*/
+  msgSetc("T",inx.obstype);
+  msgOutif(MSG__NORM, "", "  Simulating a ^T observation at ^L um in ^M mode", 
+	   status);
+  msgSetc("SUB", sinx.subname);
+  msgOutif(MSG__NORM, "", "  Simulating subarrays: ^SUB", status);
 
-   mode = sc2sim_getobsmode( inx.obsmode, status );
-   coordframe = sc2sim_getcoordframe( inx.coordframe, status );
+  /* Carry out the appropriate simulation based on the observation type */
+  if ( heatrun ) {
+    /* Do a heatrun/flatfield simulation */
+    sc2sim_heatrun ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, filter,
+		     heater, nbol, pzero, inx.steptime, status );
 
-   if ( mode == MODE__HEATRUN ) {
+  } else {
 
-     /* Do a heatrun */
-
-     sc2sim_heatrun ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, filter,
-                      heater, nbol, pzero, inx.steptime, status );
-
-   } else if ( mode == MODE__STARE || mode == MODE__DREAM ) {
-
-      /* Do a simulation */
-
-      /* Get the file close time */
-      parGet0i("MAXWRITE", &maxwrite, status);
-
-      parGet0l("OVERWRITE", &overwrite, status);
-
-      parGet0l( "SIMSTATS", &simstats, status );
-
-      hitsonly = 0;
-
-      sc2sim_simulate ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, 
-                        filter, heater, maxwrite, mode, coordframe, nbol, 
-			pzero, rseed, inx.steptime, weights, xbc, xbolo, ybc, 
-			ybolo, hitsonly, overwrite, simstats, status);
-
-   }  else if ( mode == MODE__PONG || mode == MODE__SINGLESCAN || 
-		mode == MODE__BOUS || mode == MODE__LISS ) {
-
-      /* Do a simulation */
-
-      /* Get the file close time */
-      parGet0i("MAXWRITE", &maxwrite, status);
-
-      /***  NOTE : The following code includes the option to perform a 
-            scan test.  This is to check the quality of the sampling of 
-            the image.  The scan test is a pared-down version of the simulator,
-            which generates only the weights map, and not the values for
-            each bolometer.  This is for the purposes of testing sampling of
-            scanning at various angles, and will likely be removed in the 
-            final version.  JB  ***/
-
+    if ( scan ) {
       /* Check if this is a full of weights-only simulation */
       parChoic( "SIMTYPE", "FULL", "FULL, WEIGHTS", 1, 
-                simtype, LEN__METHOD, status);
-
-      parGet0l("OVERWRITE", &overwrite, status);
-      parGet0l( "SIMSTATS", &simstats, status );
-
+		simtype, LEN__METHOD, status);
       /* Set the flag for hits-only */
       if( strncmp( simtype, "FULL", 4 ) == 0 ) {
-
-        hitsonly = 0; 
-
-      } else if ( strncmp( simtype, "WEIGHTS", 4 ) == 0 ) {
-
-        hitsonly = 1;
-
+	hitsonly = 0; 
+      } else if ( strncmp( simtype, "WEIGHTS", 7 ) == 0 ) {
+	hitsonly = 1;
       } else {
-
-        if ( *status == SAI__OK ) {
-          *status = SAI__ERROR;
-          msgSetc( "MODE", inx.obsmode );
-          errRep("", "^MODE is not a supported observation mode", status);
-        }
-
+	if ( *status == SAI__OK ) {
+	  *status = SAI__ERROR;
+	  msgSetc( "S", simtype );
+	  errRep("", "^S is not a supported simulation type", status);
+	}
       }
+    } else if ( dreamstare ) {
+      hitsonly = 0;
+    }
 
-      /* Run either a FULL or WEIGHTS simulation */
-      sc2sim_simulate ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, 
-                        filter, heater, maxwrite, mode, coordframe, nbol, 
-		        pzero, rseed, inx.steptime, weights, xbc, xbolo, ybc, 
-			ybolo, hitsonly, overwrite, simstats, status );
+    /* Get the file close interval */
+    parGet0i("MAXWRITE", &maxwrite, status);
+    /* Will new output files overwrite old ones? */
+    parGet0l("OVERWRITE", &overwrite, status);
+    /* Has the user requested a listing of the stats only? */
+    parGet0l( "SIMSTATS", &simstats, status );
 
-   } else {
-
-     if ( *status == SAI__OK ) {
-       *status = SAI__ERROR;
-       msgSetc( "MODE", inx.obsmode );
-       errRep("", "^MODE is not a supported observation mode", status);
-     }
-
-   }
+    sc2sim_simulate ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, 
+		      filter, heater, maxwrite, mode, coordframe, nbol, 
+		      pzero, rseed, inx.steptime, weights, xbc, xbolo, ybc, 
+		      ybolo, hitsonly, overwrite, simstats, status);
+  }
  
-   /* Free resources */
+  /* Free resources */
+  heater = smf_free( heater, status );
+  pzero = smf_free( pzero, status );
+  xbc = smf_free( xbc, status );
+  ybc = smf_free( ybc, status );
+  xbolo = smf_free( xbolo, status );
+  ybolo = smf_free( ybolo, status );
 
-   heater = smf_free( heater, status );
-   pzero = smf_free( pzero, status );
-   xbc = smf_free( xbc, status );
-   ybc = smf_free( ybc, status );
-   xbolo = smf_free( xbolo, status );
-   ybolo = smf_free( ybolo, status );
+  if ( ardGrp ) grpDelet ( &ardGrp, status ); 
+  if ( simGrp ) grpDelet ( &simGrp, status ); 
+  if ( obsGrp ) grpDelet ( &obsGrp, status ); 
 
-   if ( simGrp ) grpDelet ( &simGrp, status ); 
-   if ( obsGrp ) grpDelet ( &obsGrp, status ); 
+  msgOutif(MSG__NORM, "", " Simulation complete", status);
 
 }
