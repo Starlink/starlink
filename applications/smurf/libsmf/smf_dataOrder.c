@@ -146,6 +146,13 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
     return;
   }
 
+  /* Check for a valid data */
+  if( !data ) {
+    *status = SAI__ERROR;
+    errRep(FUNC_NAME, "NULL data supplied", status);
+    return;
+  }
+
   /* If value of isTordered matches current value in smfData return */
   if( data->isTordered == isTordered ) return;
   
