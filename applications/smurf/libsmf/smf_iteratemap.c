@@ -134,6 +134,9 @@
 *        - Added sample variance estimate for varmap
 *        - Propagate header information to exported model components
 *        - Added CHITOL config parameter to control stopping
+*     2008-04-24 (EC):
+*        - Improved status checking
+*        - extra checks for valid pointers before exporting model components
 
 *  Notes:
 
@@ -703,24 +706,25 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       }
     }
 
-    /* Stuff pointers into smfDIMMData to pass around to model component
-       solvers */
-  
-    memset( &dat, 0, sizeof(dat) ); /* Initialize structure */
-    dat.res = res;
-    dat.qua = qua;
-    dat.lut = lut;
-    dat.map = thismap;
-    dat.mapvar = thisvar;
-    dat.chisquared = chisquared;
-    if( havenoi ) {
-      dat.noi = model[whichnoi];
-    } else {
-      dat.noi = NULL;
-    }
-
+ 
     /* Start the main iteration loop */
     if( *status == SAI__OK ) {
+
+      /* Stuff pointers into smfDIMMData to pass around to model component
+	 solvers */
+
+      memset( &dat, 0, sizeof(dat) ); /* Initialize structure */
+      dat.res = res;
+      dat.qua = qua;
+      dat.lut = lut;
+      dat.map = thismap;
+      dat.mapvar = thisvar;
+      dat.chisquared = chisquared;
+      if( havenoi ) {
+	dat.noi = model[whichnoi];
+      } else {
+	dat.noi = NULL;
+      }
 
       quit = 0;
       iter = 0;
@@ -1041,12 +1045,18 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	    smf_dataOrder( ast[i]->sdata[idx], 1, status );
 
 	    for( j=0; j<nmodels; j++ ) { 
-	      smf_dataOrder( model[j][i]->sdata[idx], 1, status );
-	      if( *status = SMF__WDIM ) {
-		/* fails if not 3-dimensional data. Just annul and write out 
-		   data as-is. */
-		errAnnul(status);
-		model[j][i]->sdata[idx]->isTordered=1;
+	      
+	      /* Check for existence of the model for this subarray - in
+		 some cases, like COM, there is only a file for one subarray,
+		 unlike RES from which the idx loop counter is derived. */
+	      if( model[j][i]->sdata[idx] ) {
+		smf_dataOrder( model[j][i]->sdata[idx], 1, status );
+		if( *status == SMF__WDIM ) {
+		  /* fails if not 3-dimensional data. Just annul and write out 
+		     data as-is. */
+		  errAnnul(status);
+		  model[j][i]->sdata[idx]->isTordered=1;
+		}
 	      }
 	    }
 
@@ -1095,13 +1105,16 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 			status);
 	      }
 	    }
-	      
+
 	    /* Dynamic components excluding NOI */
 	    for( j=0; j<nmodels; j++ ) 
-	      if( (*status == SAI__OK) && (modeltyps[j] != SMF__NOI) ) {
+	      /* Remember to check again whether model[j][i]->sdata[idx] exists
+                 for cases like COM */
+	      if( (*status == SAI__OK) && (modeltyps[j] != SMF__NOI) &&
+		  model[j][i]->sdata[idx] ) {
 		if( (model[j][i]->sdata[idx]->file->name)[0] ) {
 		  smf_model_NDFexport( model[j][i]->sdata[idx], NULL, NULL,  
-				       NULL, /* hdr,*/ 
+				       hdr, 
 				       model[j][i]->sdata[idx]->file->name, 
 				       status);
 		} else {
