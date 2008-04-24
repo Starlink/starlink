@@ -31,9 +31,12 @@
 *  History:
 *     3-NOV-2006 (DSB)
 *        Original version.
+*     24-APR-2008 (DSB)
+*        Check that the INSTAP keywords have a defined value.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -100,8 +103,8 @@ void smf_instap_get( smfHead * hdr, int * status ) {
 
   /* Otherwise, store the values in the smfHead. */
   } else {
-    hdr->instap[ 0 ] = instapx*DAS2R;
-    hdr->instap[ 1 ] = instapy*DAS2R;
+    if( instapx != (float) AST__UNDEFF ) hdr->instap[ 0 ] = instapx*DAS2R;
+    if( instapy != (float) AST__UNDEFF ) hdr->instap[ 1 ] = instapy*DAS2R;
   }
 
 }
