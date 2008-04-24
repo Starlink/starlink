@@ -32,11 +32,16 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
 *     20-SEP-1994 (DSB):
 *        Original version.
+*     24-APR-2008 (PWD):
+*        Use CNF RTL initialisations when FC_MAIN is just the normal
+*        C main. This is necessary to pass the command-line arguments
+*        to Fortran.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -65,11 +70,24 @@ extern F77_SUBROUTINE(dipso)( INTEGER(n) );
 jmp_buf here;      
 
 /*  Entry Point: */
-/*  FC_MAIN is a macro expanding to the entry point used by the Fortran RTL */
-int FC_MAIN() {
+
+/* FC_MAIN can be a macro expanding to the entry point used by the 
+ * Fortran RTL. When that is true assume all Fortran initialisations are
+ * done, otherwise we need to take more care.
+ */ 
+#if HAVE_FC_MAIN
+   int FC_MAIN() {
+#else
+   int main( int argc, char *argv[] ) {
+#endif
 
 /*  Local Variables: */
       DECLARE_INTEGER(n);
+
+/* If not a Fortran main, pass on the arguments. */
+#if ! HAVE_FC_MAIN
+      cnfInitRTL( argc, argv );
+#endif
 
 #if HAVE_IEEE_HANDLER
 /*  Switch off ieee floating point exception handling, so that it doesn't

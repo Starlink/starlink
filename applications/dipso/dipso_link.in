@@ -1,3 +1,3 @@
 
-echo `kaplibs_link` `ast_link` \
+echo `kaplibs_link` `ast_link` `cnfrtl_link` \
       | @AWK@ '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'
