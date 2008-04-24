@@ -123,6 +123,8 @@ extern F77_INTEGER_FUNCTION(ccd1_iargc)();
 extern F77_SUBROUTINE(ccd1_getarg)
      (INTEGER(k), CHARACTER(argstring) TRAIL(argstring));
 
+extern F77_SUBROUTINE(ccd1_linflt)();
+
 /* Release the memory allocated to my_argv */
 #define RELEASE_ARGV                                    \
     if (my_argv != NULL) {                              \
@@ -136,8 +138,15 @@ extern F77_SUBROUTINE(ccd1_getarg)
    arguments.  1024 should be large enough, I hope. */
 #define MAX_ARG_LEN 1024
 
-/* FC_MAIN is a macro expanding to the entry point used by the Fortran RTL */
+/* FC_MAIN can be a macro expanding to the entry point used by the 
+ * Fortran RTL. When that is true assume all Fortran initialisations are
+ * done, otherwise we need to take more care.
+ */ 
+#if HAVE_FC_MAIN
    int FC_MAIN() {
+#else
+   int main( int argc, char *argv[] ) {
+#endif
 /*
 *+
 *  Name:
@@ -191,6 +200,10 @@ extern F77_SUBROUTINE(ccd1_getarg)
       DECLARE_INTEGER(k);
       DECLARE_CHARACTER(argstr, MAX_ARG_LEN);
 
+/* If not a Fortran main, pass on the arguments. */
+#if ! HAVE_FC_MAIN
+      cnfInitRTL( argc, argv );
+#endif
 
 /* Tweak floating point behaviour on linux. */
       F77_CALL(ccd1_linflt)();
@@ -432,7 +445,7 @@ extern F77_SUBROUTINE(ccd1_getarg)
 
 /* Get the string to write back - either the interpreter result string,
    or the value of the errorInfo variable as appropriate. */
-         c = ( tclrtn == TCL_ERROR )
+         c = (char *) ( tclrtn == TCL_ERROR )
             ? Tcl_GetVar( interp, "errorInfo", TCL_GLOBAL_ONLY )
             : Tcl_GetStringResult( interp );
 

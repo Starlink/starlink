@@ -4,7 +4,7 @@
 #     pgp_ccdpack_link
 
 #  Purpose:
-#     Link against CCDPACK libraries and plotting.
+#     Link against CCDPACK, plotting and CNF RTL libraries.
 
 #  Language:
 #     Bourne Shell
@@ -46,4 +46,6 @@
 
 #-
 
-./ccdpack_link -pgplot
+echo `./ccdpack_link -pgplot` `cnfrtl_link`
+exit
+
