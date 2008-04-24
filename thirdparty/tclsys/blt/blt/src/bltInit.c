@@ -28,6 +28,7 @@
 
 #include <bltInt.h>
 #include <float.h>
+#include <math.h>
 
 #define EXACT 1
 
@@ -294,11 +295,19 @@ MakeNaN(void)
 #endif /* _MSC_VER */
 
 #if !defined(__BORLANDC__) && !defined(_MSC_VER)
+#if defined(HAVE_NAN)
+static double
+MakeNaN(void)
+{
+    return nan("");
+}
+#else
 static double
 MakeNaN(void)
 {
     return 0.0 / 0.0;		/* Generate IEEE 754 Not-A-Number. */
 }
+#endif
 #endif /* !__BORLANDC__  && !_MSC_VER */
 
 #endif /* DBL_QNAN */

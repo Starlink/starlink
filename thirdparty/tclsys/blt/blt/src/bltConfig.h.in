@@ -87,6 +87,9 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
+/* Define to 1 if you have the `nan' function. */
+#undef HAVE_NAN
+
 /* Define to 1 if you have the <setjmp.h> header file. */
 #undef HAVE_SETJMP_H
 
