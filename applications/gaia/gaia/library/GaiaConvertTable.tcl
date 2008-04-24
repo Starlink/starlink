@@ -349,10 +349,19 @@ itcl::class gaia::GaiaConvertTable {
                   default {
                      #  Assume this is a declination, unless name starts with
                      #  "pos", which is most likely a position angle (for an
-                     #  ellipse).
+                     #  ellipse), and l or a b. Those are galactic coords.
+                     switch -glob $name {
+                        pos* -
+                        l* -
+                        b* {
+                           #  Do nothing.
+                        }
+                        default {
+                           set deccol $i
+                        }
+                     }
                      if { ! [string match "pos*" $name] } {
                         if { $deccol == -1 } {
-                           set deccol $i
                         }
                      }
                   }
