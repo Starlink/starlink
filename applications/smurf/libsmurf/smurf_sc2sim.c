@@ -422,66 +422,66 @@
 
 *  History :
 *     2005-02-16 (BDK):
-*        Original (bdk@roe.ac.uk)
+*        Original.
 *     2005-05-18 (BDK):
-*        Get xbc, ybc from instrinit (BDK)
+*        Get xbc, ybc from instrinit.
 *     2005-05-20 (BDK):
-*        Add flatcal (BDK)
+*        Add flatcal.
 *     2005-06-17 (BDK):
-*        Allocate workspace dynamically (BDK)
+*        Allocate workspace dynamically.
 *     2005-08-19 (BDK):
-*        Do calibration fit, remove flux2cur flag check (BDK)
+*        Do calibration fit, remove flux2cur flag check.
 *     2005-10-04 (BDK):
-*        Change to new data interface (BDK)
+*        Change to new data interface.
 *     2006-01-13 (EC):
-*        Write subarray name (EC)
+*        Write subarray name.
 *     2006-01-24 (EC):
-*        Write filter/atstart/atend (EC)
+*        Write filter/atstart/atend.
 *     2006-04-19 (EC):
-*        Added jiggle offsets, filename consistent with MJD (EC)
+*        Added jiggle offsets, filename consistent with MJD.
 *     2006-06-06 (AGG/EC/JB):
-*        Convert to SMURF task: clone from smurf_makemap (AGG/EC/JB)
+*        Convert to SMURF task: clone from smurf_makemap.
 *     2006-06-09 (JB):
-*        Added heatrun task (JB)
+*        Added heatrun task.
 *     2006-06-27 (TIMJ):
 *        switch from sc2head to a generic JCMTState definition that can be used for 
 *        ACSIS and SCUBA-2. Also involves moving the STATE information into a separate
 *        part of the data file.
 *     2006-07-31 (JB):
-*        Split into subroutines and added simhits capability (JB)
+*        Split into subroutines and added simhits capability.
 *     2006-08-18 (EC):
-*        Fixed memory leak (EC)
+*        Fixed memory leak.
 *     2006-08-21 (JB):
-*        Removed unused variables (JB)
+*        Removed unused variables.
 *     2006-08-21 (EC):
-*        Free resources allocated in sc2sim_instrinit (EC)
+*        Free resources allocated in sc2sim_instrinit.
 *     2006-09-14 (JB):
-*        Seed optional
+*        Seed optional.
 *     2006-09-14 (EC):
-*        Ability to scan in AzEl and RADec coordinates (EC)
+*        Ability to scan in AzEl and RADec coordinates.
 *     2006-09-22 (JB):
-*        Convert to using AstKeyMaps for input parameters (JB)
+*        Convert to using AstKeyMaps for input parameters.
 *     2006-10-03 (JB):
-*        Remove unused variables (JB)
+*        Remove unused variables.
 *     2006-11-21 (JB):
 *         Expanded comments section for use with 
-*         smurf_help task and added Lissajous mode (JB)
+*         smurf_help task and added Lissajous mode.
 *     2006-11-22 (JB):
-*         Added multiple map cycle capabilities to liss/pong (JB)
+*         Added multiple map cycle capabilities to liss/pong
 *     2006-12-08 (JB):
-*         Removed sc2sim_simhits and replaced with hits-only flag (JB)
+*         Removed sc2sim_simhits and replaced with hits-only flag
 *     2007-01-26 (AGG):
-*         Added OVERWRITE parameter (AGG)
+*         Added OVERWRITE parameter.
 *     2007-03-01 (AGG):
-*         Added SIMSTATS parameter (AGG)
+*         Added SIMSTATS parameter.
 *     2007-07-03 (EC):
-*         Made obsMode enumerated type more readable (EC)
+*         Made obsMode enumerated type more readable.
 *     2007-10-05 (AGG):
-*         Changed OBSFILE and SIMFILE to OBSPAR and SIMPAR (AGG)
+*         Changed OBSFILE and SIMFILE to OBSPAR and SIMPAR.
 *     2007-12-18 (AGG):
-*         Update to use new smf_free behaviour (AGG)
+*         Update to use new smf_free behaviour.
 *     2008-04-24 (AGG):
-*         Rationalize code layout (AGG)
+*         Rationalize code layout.
 *     2008-04-24 (TIMJ):
 *         History now uses standard SST format.
 *     {enter_further_changes_here}
