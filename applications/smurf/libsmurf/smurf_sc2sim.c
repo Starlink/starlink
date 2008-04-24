@@ -421,41 +421,76 @@
 *     {enter_new_authors_here}
 
 *  History :
-*     2005-02-16  Original (bdk@roe.ac.uk)
-*     2005-05-18  Get xbc, ybc from instrinit (BDK)
-*     2005-05-20  Add flatcal (BDK)
-*     2005-06-17  Allocate workspace dynamically (BDK)
-*     2005-08-19  Do calibration fit, remove flux2cur flag check (BDK)
-*     2005-10-04  Change to new data interface (BDK)
-*     2006-01-13  Write subarray name (EC)
-*     2006-01-24  Write filter/atstart/atend (EC)
-*     2006-04-19  Added jiggle offsets, filename consistent with MJD (EC)
-*     2006-06-06  Convert to SMURF task: clone from smurf_makemap (AGG/EC/JB)
-*     2006-06-09  Added heatrun task (JB)
-*     2006-07-31  Split into subroutines and added simhits capability (JB)
-*     2006-08-18  Fixed memory leak (EC)
-*     2006-08-21  Removed unused variables (JB)
-*     2006-08-21  Free resources allocated in sc2sim_instrinit (EC)
-*     2006-09-14  Seed optional
-*     2006-09-14  Ability to scan in AzEl and RADec coordinates (EC)
-*     2006-09-22  Convert to using AstKeyMaps for input parameters (JB)
-*     2006-10-03  Remove unused variables (JB)
-*     2006-11-21  Expanded comments section for use with 
-*                 smurf_help task and added Lissajous mode (JB)
-*     2006-11-22  Added multiple map cycle capabilities to liss/pong (JB)
-*     2006-12-08  Removed sc2sim_simhits and replaced with 
-*                 hits-only flag (JB)
-*     2007-01-26  Added OVERWRITE parameter (AGG)
-*     2007-03-01  Added SIMSTATS parameter (AGG)
-*     2007-07-03  Made obsMode enumerated type more readable (EC)
-*     2007-10-05  Changed OBSFILE and SIMFILE to OBSPAR and SIMPAR (AGG)
-*     2007-12-18  Update to use new smf_free behaviour (AGG)
-*     2008-04-24  Rationalize code layout (AGG)
+*     2005-02-16 (BDK):
+*        Original (bdk@roe.ac.uk)
+*     2005-05-18 (BDK):
+*        Get xbc, ybc from instrinit (BDK)
+*     2005-05-20 (BDK):
+*        Add flatcal (BDK)
+*     2005-06-17 (BDK):
+*        Allocate workspace dynamically (BDK)
+*     2005-08-19 (BDK):
+*        Do calibration fit, remove flux2cur flag check (BDK)
+*     2005-10-04 (BDK):
+*        Change to new data interface (BDK)
+*     2006-01-13 (EC):
+*        Write subarray name (EC)
+*     2006-01-24 (EC):
+*        Write filter/atstart/atend (EC)
+*     2006-04-19 (EC):
+*        Added jiggle offsets, filename consistent with MJD (EC)
+*     2006-06-06 (AGG/EC/JB):
+*        Convert to SMURF task: clone from smurf_makemap (AGG/EC/JB)
+*     2006-06-09 (JB):
+*        Added heatrun task (JB)
+*     2006-06-27 (TIMJ):
+*        switch from sc2head to a generic JCMTState definition that can be used for 
+*        ACSIS and SCUBA-2. Also involves moving the STATE information into a separate
+*        part of the data file.
+*     2006-07-31 (JB):
+*        Split into subroutines and added simhits capability (JB)
+*     2006-08-18 (EC):
+*        Fixed memory leak (EC)
+*     2006-08-21 (JB):
+*        Removed unused variables (JB)
+*     2006-08-21 (EC):
+*        Free resources allocated in sc2sim_instrinit (EC)
+*     2006-09-14 (JB):
+*        Seed optional
+*     2006-09-14 (EC):
+*        Ability to scan in AzEl and RADec coordinates (EC)
+*     2006-09-22 (JB):
+*        Convert to using AstKeyMaps for input parameters (JB)
+*     2006-10-03 (JB):
+*        Remove unused variables (JB)
+*     2006-11-21 (JB):
+*         Expanded comments section for use with 
+*         smurf_help task and added Lissajous mode (JB)
+*     2006-11-22 (JB):
+*         Added multiple map cycle capabilities to liss/pong (JB)
+*     2006-12-08 (JB):
+*         Removed sc2sim_simhits and replaced with hits-only flag (JB)
+*     2007-01-26 (AGG):
+*         Added OVERWRITE parameter (AGG)
+*     2007-03-01 (AGG):
+*         Added SIMSTATS parameter (AGG)
+*     2007-07-03 (EC):
+*         Made obsMode enumerated type more readable (EC)
+*     2007-10-05 (AGG):
+*         Changed OBSFILE and SIMFILE to OBSPAR and SIMPAR (AGG)
+*     2007-12-18 (AGG):
+*         Update to use new smf_free behaviour (AGG)
+*     2008-04-24 (AGG):
+*         Rationalize code layout (AGG)
+*     2008-04-24 (TIMJ):
+*         History now uses standard SST format.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006-2007 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2006-2008 University of British Columbia.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
