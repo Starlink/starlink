@@ -57,6 +57,8 @@
 *        order the data themselves before calling the routine.
 *     2008-04-23 (EC):
 *        Propagate header information to file
+*     2008-04-24 (EC):
+*        Fixed axis index bug in 1-d frameset case using patch from DB
 
 *  Notes:
 *
@@ -259,10 +261,8 @@ void smf_model_NDFexport( const smfData *data, void *variance,
 	     axis. This assumes that the time axis is the 3rd axis
 	     (i.e. index 2) */
 
-	  taxis = 2;
+	  taxis = 3;
 	  astMapSplit( cbmap, 1, &taxis, out, &tmap );
-
-	  astShow( cbmap );
 
 	  /* We now check that the Mapping was split succesfully. This should
 	     always be the case for the time axis since the time axis is 
