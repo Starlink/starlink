@@ -106,15 +106,6 @@
     }\
   }
 
-
-void gsdac_checkSpecial 
-(
-const gsdVars *gsdVars, /* GSD headers and arrays (given) */
-int *special,        /* flag for special configurations 
-                        (given and returned) */
-int *status          /* global status (given and returned) */
-);
-
 void gsdac_flagBad
 (
 const dasFlag dasFlag,  /* DAS file structure flag (given) */
@@ -327,9 +318,19 @@ const gsdVars *gsdVars, /* GSD headers and arrays (given) */
 const unsigned int stepNum,    /* time step of this spectrum (given) */
 const int subBandNum, /* subband number (given) */
 const dasFlag dasFlag,  /* DAS file structure flag (given) */
-const int special,   /* flag for special configuration (given) */
+const double *lineFreqs, /* line frequencies of each subband (given) */
+const double *IFFreqs, /* IF of each subband (given) */
 gsdWCS *wcs,         /* pointing and time values (given and returned) */
 AstFrameSet **WCSFrame, /* WCS frameset (given and returned) */
+int *status          /* global status (given and returned) */
+);
+
+void gsdac_matchFreqs
+(
+const gsdVars *gsdVars, /* GSD headers and arrays (given) */
+double *lineFreqs,   /* line frequency of molecular transitions for
+                        each subband (given and returned) */
+double *IFFreqs,     /* IF for each subband (given and returned) */
 int *status          /* global status (given and returned) */
 );
 
@@ -361,7 +362,8 @@ const char *samMode, /* sample mode (given) */
 const char *obsType, /* observation type (given) */
 const dateVars *dateVars, /* date/time variables (given) */
 const mapVars *mapVars, /* map/chop/scan variables (given) */
-const int *special,  /* flag for special configurations (given) */
+const double *lineFreqs, /* line frequencies of each subband (given) */
+const double *IFFreqs, /* IF of each subband (given) */
 const AstFitsChan *fitschan,  /* FITS headers (given and returned) */
 int *status          /* pointer to global status (given and returned) */
 ); 

@@ -16,7 +16,8 @@
 *  Invocation:
 *     gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 *                    const int subBandNum, const dasFlag dasFlag,
-*                    const int special, gsdWCS *wcs, AstFrameSet **WCSFrame,
+*                    const double *lineFreqs, const double *IFFreqs, 
+*                    gsdWCS *wcs, AstFrameSet **WCSFrame,
 *                    int *status )
 
 *  Arguments:
@@ -28,8 +29,10 @@
 *        Number of this subband.
 *     dasFlag = const dasFlag (Given)
 *        DAS file structure type.
-*     special = const int (Given)
-*        Flag for special configurations.
+*     lineFreqs = const double* (Given)
+*        Molecular transition lines for each subband.
+*     IFFreqs = const double* (Given)
+*        IF for each subband.
 *     wcs = gsdWCS** (Given and Returned)
 *        Time and Pointing values.
 *     WCSFrame = AstFrameSet* (Given and Returned)
@@ -98,6 +101,8 @@
 *        Check special configuration flag.
 *     2008-04-22 (JB):
 *        Set IFFREQ to default of -4 GHz. 
+*     2008-04-23 (JB):
+*        Use frequencies from matchFreqs for refchan/IF.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -146,7 +151,8 @@
 
 void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
                     const int subBandNum, const dasFlag dasFlag, 
-                    const int special, gsdWCS *wcs, AstFrameSet **WCSFrame,
+                    const double *lineFreqs, const double *IFFreqs, 
+                    gsdWCS *wcs, AstFrameSet **WCSFrame,
                     int *status )
 
 {
@@ -370,13 +376,8 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   /*if ( subBandNum == 0 && DEBUGON ) printf ( "CENTRE (base) RA_DEC (radians) : %f %f\n", wcs->baseTr1, wcs->baseTr2 );*/
 
   /* Fill the keymaps from the input GSD. */
-  if ( special ) {
-    astMapPut0I( datePointing, "JFREST(1)", 
-                 gsdVars->centreFreqs[subBandNum]*1000000.0, "" );
-  } else {
-    astMapPut0I( datePointing, "JFREST(1)", 
-                 gsdVars->restFreqs[subBandNum]*1000000.0, "" );
-  }
+  astMapPut0I ( datePointing, "JFREST(1)",
+                lineFreqs[subBandNum]*1000000.0, "" );
   astMapPut0D( datePointing, "RA_DEC(1)", wcs->baseTr1 / AST__DD2R, "" );
   astMapPut0D( datePointing, "RA_DEC(2)", wcs->baseTr2 / AST__DD2R, "" );
   astMapPut0I( datePointing, "DPOS(1)", 0.0, "" );
@@ -392,7 +393,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
                gsdVars->centreFreqs[subBandNum]*1000000.0, "" ); 
   astMapPut0I( datePointing, "JFINC(1)", 
                gsdVars->freqRes[subBandNum]*1000000.0, "" );
-  astMapPut0I( datePointing, "IFFREQ(1)", -4.0, "" );
+  astMapPut0I ( datePointing, "IFFREQ(1)", IFFreqs[subBandNum], "" );
   astMapPut0I( datePointing, "CENTRECODE", gsdVars->centreCode, "" );
 
   /* Convert cell sizes to radians. */
@@ -402,10 +403,13 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   astMapPut0I( cellMap, "CELLCODE", gsdVars->cellCode, "" );
 
   /* Set the centre of the grid to 0,0, and set the centre
-     of the third axis to half the number of channels. */
+     of the third axis to the reference channel (offset
+     from channel which contains IFFreq).*/
   crpix[0] = 0.0;
   crpix[1] = 0.0;
-  crpix[2] = (double)gsdVars->BEChans[subBandNum] / 2.0;
+  crpix[2] = ( (double)( gsdVars->BEChans[subBandNum] ) / 2.0 ) +
+             ( ( IFFreqs[subBandNum] - gsdVars->totIFs[subBandNum] ) /
+               ( fabs( gsdVars->freqRes[subBandNum] ) / 1000.0 ) );
 
   /* Get a frameset describing the mapping from cell to sky. */
   atlWcspx ( datePointing, cellMap, crpix, 
@@ -526,8 +530,10 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   gapptRA = coordOut[0];
   gapptDec = coordOut[1];
+
   index = (int) ( stepNum / gsdVars->nScanPts );
-  gapptRA = ( gsdVars->scanTable1[index] - gapptRA ) * 2 * AST__DPI / 24.0;
+  gapptRA = ( gsdVars->scanTable1[index] * 2.0 * AST__DPI / 24.0 ) - gapptRA;
+
   wcs->trAng = slaPa( gapptRA, gapptDec, gsdVars->telLatitude );
 
 }

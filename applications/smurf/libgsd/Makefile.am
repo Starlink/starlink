@@ -4,7 +4,6 @@ noinst_LTLIBRARIES = libgsd.la
 libgsd_la_SOURCES = $(C_ROUTINES)
 
 C_ROUTINES = \
-gsdac_checkSpecial.c \
 gsdac_flagBad.c \
 gsdac_freeArrays.c \
 gsdac_get0x.c \
@@ -17,6 +16,7 @@ gsdac_getRecepNames.c \
 gsdac_getSampleMode.c \
 gsdac_getStartIdx.c \
 gsdac_getWCS.c \
+gsdac_matchFreqs.c \
 gsdac_printHdr.c \
 gsdac_putFits.c \
 gsdac_putJCMTStateC.c \

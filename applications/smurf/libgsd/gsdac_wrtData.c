@@ -75,6 +75,8 @@
 *        Use flag for special configurations.
 *     2008-04-21 (JB):
 *        Pass special flag to getWCS.
+*     2008-04-23 (JB):
+*        Use matchFreqs instead of special flag.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -144,6 +146,9 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   float fPlaneX[MAXRECEP]; 
   float fPlaneY[MAXRECEP];
   int i;                      /* loop counter */
+  double *IFFreqs;            /* IFFreqs for each subband */
+  double *lineFreqs;          /* transition line frequencies for 
+                                 each subband */
   mapVars mapVars;            /* map/chop/scan variables */
   double mem;                 /* amount of memory for spectrum */
   int nSubsys;                /* number of subsystems */
@@ -159,7 +164,6 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   ACSISSpecHdr *specHdr;      /* ACSIS spectrum-specific information */
   unsigned long specIndex;    /* index into spectral data */
   long spectrumSize;          /* size of spectrum data */
-  int special;                /* flag for special configurations */
   unsigned int stepNum;       /* current step */
   int subBandNum;             /* subband number of current spectrum */
   unsigned int utDate;        /* UT date in YYYYMMDD format */
@@ -250,8 +254,15 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
     return;
   }
 
-  /* Check to see if this is a special configuration. */
-  gsdac_checkSpecial ( gsdVars, &special, status );  
+  /* Allocate memory for the lineFreqs and IFFreqs. */
+  lineFreqs = smf_malloc ( gsdVars->nBESections, 
+                           sizeof(double), 0, status );
+  IFFreqs = smf_malloc ( gsdVars->nBESections, 
+                         sizeof(double), 0, status );
+
+  /* Check to see if this is a special configuration and 
+     determine which subbands belong together. */
+  gsdac_matchFreqs ( gsdVars, lineFreqs, IFFreqs, status );  
 
   /* Get the size of the data array */
   spectrumSize = gsdVars->nBEChansOut * gsdVars->nScanPts * gsdVars->nScan;
@@ -269,8 +280,8 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
     for ( subBandNum = 0; subBandNum < gsdVars->nBESections; subBandNum++ ) {
 
       /* Get the pointing and time values. */
-      gsdac_getWCS ( gsdVars, stepNum, subBandNum, dasFlag, special, wcs, 
-                     &WCSFrame, status );
+      gsdac_getWCS ( gsdVars, stepNum, subBandNum, dasFlag, lineFreqs, 
+                     IFFreqs, wcs, &WCSFrame, status );
 
       /* If this is the first spectrum, get the amStart, 
          azStart and elStart. */
@@ -313,7 +324,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
         /* Fill the FITS headers. */
         gsdac_putFits ( gsdVars, subBandNum, nSubsys, obsNum, utDate, nSteps, 
                         backend, recepsUsed, recepNames, samMode, obsType, 
-                        &dateVars, &mapVars, &special, 
+                        &dateVars, &mapVars, lineFreqs, IFFreqs, 
                         fitschan[subBandNum % nSubsys], status );
 
         /* Write the WCSFrame information to the fitschan. */
@@ -366,6 +377,8 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   /* Free allocated memory. */
   smf_free ( record, status );
   smf_free ( specHdr, status );
+  smf_free ( lineFreqs, status );
+  smf_free ( IFFreqs, status );
 
   for ( i = 0; i < gsdVars->nFEChans; i++ ) { 
     smf_free ( recepNames[i], status );

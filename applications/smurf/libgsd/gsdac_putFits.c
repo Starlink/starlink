@@ -20,40 +20,43 @@
 *                     const char *backend, const int recepsUsed,
 *                     char *recepNames[], const char *samMode, 
 *                     const char *obsType, const dateVars *dateVars,
-*                     const mapVars *mapVars, const int *special,
+*                     const mapVars *mapVars, const double *lineFreqs,
+*                     const double *IFFreqs,
 *                     const AstFitsChan *fitschan, int *status )
 
 *  Arguments:
 *     gsdVars = const gsdVars* (Given)
-*        GSD file access parameters
+*        GSD file access parameters.
 *     subBandNum = const int (Given)
-*        Subband number
+*        Subband number.
 *     nSubsys = const int (Given)
-*        Number of subsystems
+*        Number of subsystems.
 *     obsNum = const int (Given)
-*        Observation number
+*        Observation number.
 *     utDate = const int (Given)
-*        UT observation date
+*        UT observation date.
 *     nSteps = const int (Given)
-*        Number of time steps in observation
+*        Number of time steps in observation.
 *     backend = const char* (Given)
-*        Name of the backend
+*        Name of the backend.
 *     recepsUsed = const int (Given)
-*        Number of receptors actually used
+*        Number of receptors actually used.
 *     recepnames = char*[] (Given)
-*        Names of receptors
+*        Names of receptors.
 *     samMode = const char* (Given)
-*        Sample mode
+*        Sample mode.
 *     obsType = const char* (Given)
-*        Observation type
+*        Observation type.
 *     dateVars = const dateVars* (Given)
-*        Date and time variables
+*        Date and time variables.
 *     mapVars = const mapVars* (Given)
-*        Map/Chop/Scan variables
-*     special = const int* (Given)
-*        Flag for special configurations
+*        Map/Chop/Scan variables.
+*     lineFreqs = const double* (Given)
+*        Frequencies for line transitions for each subband.
+*     IFFreqs = const double* (Given)
+*        IFs for each subband.
 *     fitschan = const AstFitsChan* (Given and Returned)
-*        FITS headers
+*        FITS headers.
 *     status = int* (Given and Returned)
 *        Pointer to global status.  
 
@@ -109,6 +112,8 @@
 *        For special configs use centreFreq for moltrans.
 *     2008-04-22 (JB):
 *        Add BUNIT header for compatability with specwrite.
+*     2008-04-23 (JB):
+*        Use frequencies from matchFreqs for refchan/IF.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -157,7 +162,8 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
                      const char *backend, const int recepsUsed, 
                      char *recepNames[], const char *samMode,
                      const char *obsType, const dateVars *dateVars,
-                     const mapVars *mapVars, const int *special,
+                     const mapVars *mapVars, const double *lineFreqs,
+                     const double *IFFreqs,
                      const AstFitsChan *fitschan, int *status )
 
 {
@@ -177,7 +183,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   double intTime;             /* total time spent integrating (s) */
   int josMin;                 /* ?? */
   int min;                    /* minutes for time conversion. */
-  char *molecule;  /* target molecular species */
+  char *molecule;             /* target molecular species */
   int month;                  /* months for time conversion. */
   int nMix;                   /* number of mixers */
   double nRefStep;            /* number of nod sets repeated */
@@ -268,13 +274,8 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   /* ACSIS Specific. */
 
   /* Get the molecule and transition. */
-  if ( *special ) {
-    smf_get_moltrans ( gsdVars->centreFreqs[subBandNum] * 1000.0, &molecule, 
-                       &transiti, status );
-  } else {
-    smf_get_moltrans ( gsdVars->restFreqs[subBandNum] * 1000.0, &molecule, 
-                       &transiti, status );
-  }
+  smf_get_moltrans ( lineFreqs[subBandNum] * 1000.0, &molecule, &transiti,
+                     status );
 
   /* Get the bandwidth setup. */
 /***** NOTE: may be different for rxb widebands *****/  
@@ -284,10 +285,11 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 /***** NOTE: Possibly undef? *****/
   strcpy ( subBands, bwMode );
 
-  /* Get the reference channel (offset from channel which contains IFFreq). */
-  refChan = ( (double)( gsdVars->BEChans[subBandNum] ) / 2.0 ) + 
-            ( ( 4.0 - ( fabs ( gsdVars->totIFs[subBandNum] ) ) ) / 
-	      ( gsdVars->freqRes[subBandNum] / 1000.0 ) );
+  /* Get the reference channel (offset from channel which contains
+     IFFreq). */
+  refChan = ( (double)( gsdVars->BEChans[subBandNum] ) / 2.0 ) +
+            ( ( IFFreqs[subBandNum] - gsdVars->totIFs[subBandNum] ) /
+              ( fabs(gsdVars->freqRes[subBandNum]) / 1000.0 ) );
 
   IFchanSp = gsdVars->freqRes[subBandNum] * 1000000.0;
 
@@ -296,9 +298,6 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
 
   /* Truncate the name of the frontend. */
   cnfImprt ( gsdVars->frontend, 16, instrume );
-
-  /* Get the IF frequency and make sure it's always positive. */
-  IFfreq = 4.0;
 
   /* Get the number of mixers, 2 for RXB & RXW, 1 for others. */
   if ( strncmp ( "RXB", gsdVars->frontend, 3 ) == 0 ||
@@ -645,7 +644,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsS ( fitschan, "SB_MODE", gsdVars->sbMode, 
 	        "Sideband mode", 0 ); 
 
-  astSetFitsF ( fitschan, "IFFREQ", IFfreq,
+  astSetFitsF ( fitschan, "IFFREQ", IFFreqs[subBandNum],
                 "[GHz] IF Frequency", 0 );
 
   astSetFitsI ( fitschan, "N_MIX", nMix, 
