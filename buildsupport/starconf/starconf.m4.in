@@ -1611,6 +1611,11 @@ fi
 # for_rtl_finish_ to run during closedown. The intel compiler signature
 # is to have "IFORT" in the --version string.
 #
+# Under Solaris and the studio compilers the argc and argv values are no
+# longer automatically shared, so we test for "Sun Fortran" and have a 
+# code section that copies the given argc and argv directly to the global
+# variable __xargc and __xargv, this may need fixing from time to time.
+# Doesn't seem to be a function for doing this job.
 #
 AC_DEFUN([STAR_INITIALISE_FORTRAN],
    [AC_CACHE_CHECK([how to initialise the Fortran RTL],
@@ -1621,14 +1626,14 @@ AC_DEFUN([STAR_INITIALISE_FORTRAN],
                 star_cv_initialise_fortran=g95-start
             elif "$FC" --version 2>&1 < /dev/null | grep 'GNU Fortran.*[[4-9]]\.[[0-9]][[0-9]]*\.[[0-9]][[0-9]]*' > /dev/null; then
                 star_cv_initialise_fortran=gfortran-setarg
-            elif "$FC" --version 2>&1 < /dev/null | grep 'IFORT' > /dev/null; then
-                star_cv_initialise_fortran=ifort-setarg
             else
                 star_cv_initialise_fortran=g77-setarg
             fi
         else
             if "$FC" --version 2>&1 < /dev/null | grep 'IFORT' > /dev/null; then
                 star_cv_initialise_fortran=ifort-setarg
+            elif "$FC" -V 2>&1 < /dev/null | grep 'Sun Fortran' > /dev/null; then
+                star_cv_initialise_fortran=sunstudio-setarg
             else
                 star_cv_initialise_fortran=
             fi
@@ -1651,6 +1656,10 @@ AC_DEFUN([STAR_INITIALISE_FORTRAN],
       ifort-setarg)
         AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
                   [{extern void for_rtl_init_(int*,char**); for_rtl_init_(&argc, argv);}])
+        ;;
+      sunstudio-setarg)
+        AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],
+                  [{extern int __xargc; extern char **__xargv;__xargc = argc;__xargv = argv;}])
         ;;
       *) 
         AC_DEFINE([STAR_INITIALISE@&t@_FORTRAN(argc,argv)],[])
