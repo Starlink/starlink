@@ -175,7 +175,7 @@
 #     21-APR-2008 (JB)
 #         Add action GSDSHOW
 #     24-APR-2008 (AGG)
-*         Change SIMFILE/OBSFILE to SIMPAR/OBSPAR for SKYNOISE
+#         Change SIMFILE/OBSFILE to SIMPAR/OBSPAR for SKYNOISE
 #     {enter_changes_here}
 
 #  Bugs:
