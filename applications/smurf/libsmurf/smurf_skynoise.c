@@ -100,7 +100,8 @@
 *        - For same reason removed calculation of meanatm from here
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
-*     
+*     2008-04-24 (AGG):
+*        Change SIM/OBSFILE parameters to SIM/OBSPAR
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -172,7 +173,6 @@ void smurf_skynoise ( int *status ) {
    FILE *fp;                       /* file pointer */
    char file_name[SC2SIM__FLEN];   /* output file name */
    int indf;                       /* NDF identifier */
-   int j;                          /* loop counter */
    int lbnd[2];                    /* lower bounds of pixel array */
    int n;                          /* Number of elements mapped */
    Grp *obsGrp = NULL;             /* Group containing obs parameter file */
@@ -183,7 +183,6 @@ void smurf_skynoise ( int *status ) {
    Grp *simGrp = NULL;             /* Group containing sim parameter file */
    AstKeyMap *simkeymap=NULL;      /* AstKeyMap for sim parameters */
    int size;                       /* width of square area in pixels */
-   double skytrans;                /* sky transmission (%) */
    double *spectrum;               /* complex array for holding 2D spectrum */
    int ssize = 0;                  /* Size of simGrp */
    struct timeval time;            /* Structure for system time */
@@ -192,15 +191,15 @@ void smurf_skynoise ( int *status ) {
    ndfBegin ();
  
    /* Get input parameters */
-   kpg1Gtgrp ("OBSFILE", &obsGrp, &osize, status );
+   kpg1Gtgrp ("OBSPAR", &obsGrp, &osize, status );
    kpg1Kymap ( obsGrp, &obskeymap, status );
-   kpg1Gtgrp ("SIMFILE", &simGrp, &ssize, status );
+   kpg1Gtgrp ("SIMPAR", &simGrp, &ssize, status );
    kpg1Kymap ( simGrp, &simkeymap, status );
    parGet0d ("EXPONENT", &exp, status ); 
-   parGet0i ("SEED", &rseed, status);
 
    /* Seed random number generator, either with the time in 
       milliseconds, or from user-supplied seed */
+   parGet0i ("SEED", &rseed, status);
    if ( *status == PAR__NULL ) {
       errAnnul ( status );
       gettimeofday ( &time, NULL );
@@ -211,8 +210,7 @@ void smurf_skynoise ( int *status ) {
       msgSeti( "SEED", rseed );
       msgOutif(MSG__VERB," ","Seeding random numbers with ^SEED", status);
    } 
-
-   srand(rseed);
+   srand((unsigned int)rseed);
 
    /* Retrieve the simulation parameters */
    sc2sim_getobspar ( obskeymap, &inx, status );
@@ -230,10 +228,10 @@ void smurf_skynoise ( int *status ) {
    }
 
    /* 15m at 600m subtends 5156 arcsec */     
-   pixsize = 2500.0;
-   size = 512;
-   corner = ( sinx.atmrefnu * 15.0 ) / ( sinx.atmrefvel * 5156 );
-   spectrum = smf_malloc ( size*size*2, sizeof(*spectrum), 1, status );
+   pixsize = 2500.0; /* Arcsec */
+   size = 512; /* Surely this should be a parameter? */
+   corner = ( sinx.atmrefnu * 15.0 ) / ( sinx.atmrefvel * 5156.0 );
+   spectrum = smf_malloc ( (size_t)(size*size*2), sizeof(*spectrum), 1, status );
  
    lbnd[0] = 1;
    lbnd[1] = 1;
