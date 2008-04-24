@@ -103,7 +103,7 @@ $VERSION = '1.47';
                             cmp_shape cmp_size cmp_struc cmp_type cmp_unmap
                           /],
 
-                'ndg'=>[qw/ ndg_ctprv ndg_gtprv ndg_mdprv
+                'ndg'=>[qw/ ndg_ctprv ndg_gtprv ndg_mdprv ndg_rmprv
                           /],
 
                 'misc'=>[qw/mem2string string2mem array2mem mem2array
