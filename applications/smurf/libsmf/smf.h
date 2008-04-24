@@ -285,6 +285,8 @@
 *     2008-04-23 (EC):
 *        -Added sampvar to smf_simplerebinmap
 *        -Added hdr to smf_model_NDFexport
+*     2008-04-24 (EC):
+*        -Added smf_check_mapsize
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -903,6 +905,9 @@ void smf_simpleaddmap( double *map1, double *mapweight1,
 
 int *smf_find_median( float *farray, double *darray, int nel, 
                       int *hist, float *median, int *status );
+
+void smf_check_mapsize( const int *lbnd, const int *ubnd, int rebin, 
+			size_t available, size_t *necessary, int *status );
 
 
 #endif /* SMF_DEFINED */

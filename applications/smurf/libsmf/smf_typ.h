@@ -117,6 +117,8 @@
 *     2008-04-18 (EC):
 *        -Added chisquared to smfDIMMData
 *        -Added SMF__MINCHUNKSAMP and SMF__MINSTATSAMP
+*     2008-04-24 (EC):
+*        -Added SMF__MB definition
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -157,7 +159,8 @@
 #include "smurf_typ.h"
 #define SMF_PATH_MAX GRP__SZNAM
 #define SMF_NAME_MAX GRP__SZFNM
-#define SMF__MXSMF 8 /* Maximum number of smfDatas in a smfArray */
+#define SMF__MXSMF 8      /* Maximum number of smfDatas in a smfArray */
+#define SMF__MB 1048576   /* SMURF definition of a megabyte = 2^20 */
 
 /* Minimum number of time samples for a data chunk to be useful*/
 #define SMF__MINCHUNKSAMP 100

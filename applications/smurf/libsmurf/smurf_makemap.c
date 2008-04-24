@@ -273,6 +273,8 @@
 *     2008-04-23 (DSB):
 *        Modify call to kpg1Ghstd to pass max and min values by reference
 *        rather than by value.
+*     2008-04-24 (EC):
+*        Added MAXMEM parameter, memory checking for output map
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -360,6 +362,8 @@ void smurf_makemap( int *status ) {
   double *map=NULL;          /* Pointer to the rebinned map data */
   size_t mapsize;            /* Number of pixels in output image */
   double meantexp;           /* Mean exposure time */
+  size_t maxmem;             /* Max memory usage in bytes */
+  int maxmem_mb;             /* Max memory usage in Mb */
   double maxtexp = 0.0;      /* Maximum exposure time */
   double modetexp;           /* Modal exposure time */ 
   double medtexp = 0.0;      /* Median exposure time */
@@ -417,6 +421,16 @@ void smurf_makemap( int *status ) {
 	   status);
   }
 
+  /* Get the maximum amount of memory that we can use */
+  parGet0i( "MAXMEM", &maxmem_mb, status );
+  if ( maxmem_mb <= 0 ) {
+    msgSeti("MAXMEM", maxmem_mb);
+    *status = SAI__ERROR;
+    errRep(" ", "Invalid MAXMEM, ^MAXMEM Mb (must be > 0 )", status);
+  } else {
+    maxmem = (size_t) maxmem_mb * SMF__MB;
+  }
+
   /* Get METHOD - set rebin/iterate flags */
   parChoic( "METHOD", "REBIN", 
 	    "REBIN, ITERATE.", 1,
@@ -464,6 +478,9 @@ void smurf_makemap( int *status ) {
     msgOutif(MSG__VERB, " ", "Tracking a stationary object", status);
   }
 
+  /* Check memory requirements for output map */
+  smf_check_mapsize( lbnd_out, ubnd_out, rebin, maxmem, NULL, status );
+
   /* Create an output smfData */
   ndgCreat ( "OUT", NULL, &ogrp, &outsize, &flag, status );
   smfflags = 0;
@@ -497,12 +514,6 @@ void smurf_makemap( int *status ) {
     weights = (wdata->pntr)[0];
     wndf = wdata->file->ndfid;
   }
-  /* Now allocate memory for 3-d work array used by smf_rebinmap -
-     plane 2 of this 3-D array is stored in the weights component
-     later. Initialize to zero. */
-  if ( rebin ) {
-    weights3d = smf_malloc( 2*mapsize, sizeof(double), 1, status);
-  }
 
   /* Create EXP_TIME component in output file */
   smf_open_ndfname ( smurfloc, "WRITE", NULL, "EXP_TIME", "NEW", "_DOUBLE",
@@ -514,6 +525,11 @@ void smurf_makemap( int *status ) {
 
   /* Create the output map using the chosen METHOD */
   if ( rebin ) {
+    /* Now allocate memory for 3-d work array used by smf_rebinmap -
+       plane 2 of this 3-D array is stored in the weights component
+       later. Initialize to zero. */
+    weights3d = smf_malloc( 2*mapsize, sizeof(double), 1, status);
+
     /* Simple Regrid of the data */
     msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using REBIN method", 
 	     status);

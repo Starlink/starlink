@@ -176,6 +176,8 @@
 #         Add action GSDSHOW
 #     24-APR-2008 (AGG)
 #         Change SIMFILE/OBSFILE to SIMPAR/OBSPAR for SKYNOISE
+#     24-APR-2008 (EC)
+#         Added MAXMEM to MAKEMAP
 #     {enter_changes_here}
 
 #  Bugs:
@@ -342,6 +344,15 @@ package @PACKAGE@ {
 	    prompt {Output map pixel size in arcsec}
 	    ppath GLOBAL CURRENT
 	    default 3.0
+	    helpkey *
+	  }
+
+	 parameter maxmem {
+	    type _INTEGER
+	    vpath {PROMPT }
+	    prompt {Maximum memory available for map-making in Mb}
+	    ppath GLOBAL CURRENT
+	    default 1024
 	    helpkey *
 	  }
 
