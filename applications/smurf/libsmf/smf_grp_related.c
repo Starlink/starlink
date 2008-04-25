@@ -79,6 +79,8 @@
 *     2008-04-18 (EC):
 *        - check for very short chunks and remove from smfGroup
 *        - fixed memory unallocation bug
+*     2008-04-24 (EC):
+*        - Determine actual nrelated for these data and store in smfGroup
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -155,6 +157,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   int *keepchunk=NULL;        /* Flag for chunks that will be kept */
   double *lambda = NULL;      /* Wavelength - only used if grpbywave is true */
   int matchsubsys;            /* Flag for matched subarrays */
+  int maxnelem=0;             /* Max elem (subarrays) encountered */
   dim_t *nbolx = NULL;        /* Number of bolometers in X direction */
   dim_t *nboly = NULL;        /* Number of bolometers in Y direction */
   int nelem;                  /* Number of elements in index array */
@@ -174,6 +177,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   int subsysnum;              /* Subsystem numeric id. 0 - 8 */
   size_t thischunk;           /* Current chunk that we're on */
   dim_t thislen;              /* Length of current time chunk */
+  int thisnelem;              /* Number of elements (subarrays) at this chunk*/
   dim_t totlen;               /* Total length of continuous time chunk */
   double writetime;           /* RTS_END value at end of written data */
 
@@ -329,6 +333,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   thischunk = 0;
   opentime = 0;
   writetime = 0;
+  maxnelem = 0;
 
   for( i=0; i<ngroups; i++ ) {
     /* Open header of the first file at each time */
@@ -376,8 +381,15 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
       if( i > 0 ) {
 	/* check that we have the same subarrays */
 	matchsubsys = 1;
+
+	/* Initialize subarray counter at this chunk */
+	thisnelem = 0;
+
 	for( j=0; j<nelem; j++ ) {
 	  if( subgroups[i][j] > 0 ) {
+	    /* Increment subarray counter */
+	    thisnelem++;
+
 	    if( j==0 ) {
 	      /* Look at header of file that is already opened */
 	      smf_fits_getS( hdr, "SUBARRAY", subarray, 81, status );
@@ -404,6 +416,11 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
 	  if( subsysnum != refsubsys[j] ) {
 	    matchsubsys = 0;
 	  }
+	}
+
+	/* update maxnelem based on this chunk */
+	if( thisnelem > maxnelem ) {
+	  maxnelem = thisnelem;
 	}
 
 	/* check against writetime from the last file to see if we're on the
@@ -513,9 +530,9 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
     new_ngroups=0;
     for( i=0; i<ngroups; i++ ) {
       if( keepchunk[i] ) {
-	indices = smf_malloc( nelem, sizeof(int), 1, status);
+	indices = smf_malloc( maxnelem, sizeof(int), 1, status);
 	if( *status == SAI__OK ) {
-	  memcpy( indices, subgroups[i], nelem*sizeof(int) );
+	  memcpy( indices, subgroups[i], maxnelem*sizeof(int) );
 	  new_subgroups[new_ngroups] = indices;
 	  new_chunk[new_ngroups] = chunk[i];
 	  new_ngroups++;
@@ -527,7 +544,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   /* Create the smfGroup */
     
   *group = smf_construct_smfGroup( igrp, new_subgroups, new_chunk, new_ngroups,
-				   nelem, 0, status );
+				   maxnelem, 0, status );
 
  CLEANUP:
   starts = smf_free( starts, status );
