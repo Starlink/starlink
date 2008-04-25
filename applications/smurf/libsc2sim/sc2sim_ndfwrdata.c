@@ -23,7 +23,7 @@
 *                        const char dateobs[], const char obsid[], 
 *                        const double *posptr, size_t jigsamples, 
 *                        const double jigptr[][2], const int obsnum,       
-*                        const int nsubscan, const char obstype[], 
+*                        const int nsubscan, 
 *                        const char utdate[], const double azstart,
 *                        const double azend, const double elstart,   
 *                        const double elend, const char lststart[],  
@@ -76,8 +76,6 @@
 *        Observation number
 *     nsubscan = const int (Given)
 *        Sub-scan number
-*     obstype[] = const char (Given)
-*        Observation type, e.g. SCIENCE
 *     utdate[] = const char (Given)
 *        UT date in YYYYMMDD form
 *     azstart = const double (Given)
@@ -210,6 +208,9 @@
 *        Add calls to new routines to get ORAC-DR recipe and DRGROUP
 *     2008-04-17 (AGG):
 *        Back out call to derive DRGROUP
+*     2008-04-24 (AGG):
+*        - Write out FOCUS parameters
+*        - Remove obstype from API as it is in obs struct
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -286,7 +287,6 @@ double jigptr[][2],      /* Array of X, Y jiggle positions (given) */
 const int obsnum,        /* Observation number (given) */
 const int nsubscan,      /* Sub-scan number (given) */
 const int obsend,        /* Flag to indicate whether this is the last file */
-const char obstype[],    /* Observation type, e.g. SCIENCE (given)*/
 const char utdate[],     /* UT date in YYYYMMDD form (given) */
 const double azstart,    /* Azimuth at start of sub-scan (given) */
 const double azend,      /* Azimuth at end of sub-scan (given) */
@@ -309,8 +309,8 @@ int *status              /* Global status (given and returned) */
    double coadd[2*DREAM__MXBOL];   /* Coadded values in output image */
    char cosys[JCMT__SZTCS_TR_SYS+1]; /* Tracking coordinate system */
    int dims[2];                    /* Extent of output image */
-   char drgroup[40];               /* Name of ORAC-DR data reduction group */
    AstFitsChan *fitschan;          /* FITS headers */
+   double focposn;                 /* Current focus position */
    int fitsfind;
    char fitsrec[SC2STORE__MAXFITS*80+1]; /* Store for FITS records */
    int framesize;                  /* Number of points in a single `frame' */
@@ -509,7 +509,7 @@ int *status              /* Global status (given and returned) */
    }
    astSetFitsS ( fitschan, "SW_MODE", "NONE", 
 		 "Switch mode: CHOP, PSSW, FREQ, or NONE", 0 );
-   astSetFitsS ( fitschan, "OBS_TYPE", obstype, 
+   astSetFitsS ( fitschan, "OBS_TYPE", inx->obstype, 
 		 "Observation type -  Science, Pointing or Focus", 0 );
 
    if ( strncmp( inx->obsmode, "DREAM", 5) == 0 ) {
@@ -592,6 +592,23 @@ int *status              /* Global status (given and returned) */
      astSetFitsI ( fitschan, "N_SUB", 0, 
 		   "Number of sub-scans written to file", 0 );
    }
+
+  /* Write out details for FOCUS observation */
+   if ( strcmp(inx->obstype, "FOCUS") == 0 ) {
+     astSetFitsS ( fitschan, "FOCAXIS", "Z",
+		   "Focus axis to move (X, Y, Z)", 0 );
+
+     astSetFitsI ( fitschan, "NFOCSTEP", inx->nfocstep,
+		   "Number of focal position steps", 0 );
+
+     focposn = inx->focstart + (double)(nsubscan-1) * inx->focstep;
+     astSetFitsF ( fitschan, "FOCPOSN", focposn,
+		   "[mm] Absolute position of the SMU", 0 );
+
+     astSetFitsF ( fitschan, "FOCSTEP", inx->focstep,
+		   "[mm] Distance between focus steps", 0 );
+   }
+   /* End hack */
 
    /* SMU specific */
    astSetFitsCN ( fitschan, "COMMENT", "", "-- SMU-specific parameters --", 0 );
