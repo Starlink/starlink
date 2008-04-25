@@ -114,6 +114,8 @@
 *        Add BUNIT header for compatability with specwrite.
 *     2008-04-23 (JB):
 *        Use frequencies from matchFreqs for refchan/IF.
+*     2008-04-25 (JB):
+*        INSTAP_X = INSTAP_Y = 0.0.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -535,10 +537,10 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsS ( fitschan, "INSTAP", AST__UNDEFS,
                 "Receptor at tracking centre (if any)", 0 );
 
-  astSetFitsF ( fitschan, "INSTAP_X", AST__UNDEFF,
+  astSetFitsF ( fitschan, "INSTAP_X", 0.0,
                 "[arcsec] Aperture X off. rel. to instr centre", 0 );
 
-  astSetFitsF ( fitschan, "INSTAP_Y", AST__UNDEFF,
+  astSetFitsF ( fitschan, "INSTAP_Y", 0.0,
                 "[arcsec] Aperture Y off. rel. to instr centre", 0 );
 
   /* The following 6 cards are just placeholders and will be
