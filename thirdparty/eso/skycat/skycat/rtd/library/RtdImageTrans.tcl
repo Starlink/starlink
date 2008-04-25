@@ -10,6 +10,8 @@
 # who             when       what
 # --------------  ---------  ----------------------------------------
 # Allan Brighton  01 Jun 95  Created
+# Peter W. Draper 15 Apr 08  Don't assume X and Y scales are already set
+#                            to the same value
 
 itk::usual RtdImageTrans {}
 
@@ -158,20 +160,32 @@ itcl::class rtd::RtdImageTrans {
 	}
 	incr xs $inc
 	incr ys $inc
+
+        # PWD: treat xs and ys independently
 	if {$xs == 0 || $xs == -1} {
 	    if {$inc == -1} {
 		set xs -2
-		set ys -2
 	    } else {
 		set xs 1
-		set ys 1
 	    }
 	} elseif {$xs < $itk_option(-min_scale)} {
-	    set xs [set ys $itk_option(-min_scale)]
+	    set xs $itk_option(-min_scale)
 	} elseif {$xs > $itk_option(-max_scale)} {
-	    set xs [set ys $itk_option(-max_scale)]
+	    set xs $itk_option(-max_scale)
 	}
-	
+
+	if {$ys == 0 || $ys == -1} {
+	    if {$inc == -1} {
+		set ys -2
+	    } else {
+		set ys 1
+	    }
+	} elseif {$ys < $itk_option(-min_scale)} {
+	    set ys $itk_option(-min_scale)
+	} elseif {$ys > $itk_option(-max_scale)} {
+           set ys $itk_option(-max_scale)
+	}
+
 	$itk_option(-image) scale $xs $ys
 	update_trans
     }

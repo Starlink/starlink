@@ -30,6 +30,7 @@
 *                          use, leading to memory allocation errors).
 *                 14/12/07 Add option to statisticsCmd so that world
 *                          coordinates can be reported in degrees (J2000).
+*                 24/04/08 Allow scales to have differing signs.
 */
 
 /************************************************************************
@@ -2404,8 +2405,6 @@ int RtdImage::scaleCmd(int argc, char* argv[])
 	xScale = 1;
     if (yScale == -1 || yScale == 0)
 	yScale = 1;
-    if ((xScale < 0 && yScale > 0) || (xScale > 0 && yScale < 0)) 
-	return error("invalid arguments, expected 2 positive or 2 negative integer values");
 
 #if 0
     // add a check for the Tk limit on canvas coords

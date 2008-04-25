@@ -34,6 +34,7 @@
  * pbiereic        27/06/01  Added method 'noiseStatistics'
  * pbiereic        10/02/03  Native byte order routines revised
  * P.W. Draper     16/01/07  Make sure object_ is null terminated.
+ *                 24/04/08  Added growAndShrink().
  */
 
 #include <sys/types.h>
@@ -227,6 +228,10 @@ protected:
 
     virtual void grow(int x0, int y0, int x1, int y1, 
 		      int dest_x, int dest_y) = 0;
+
+
+    virtual void growAndShrink(int x0, int y0, int x1, int y1, 
+                               int dest_x, int dest_y) = 0;
 
     // initialize conversion from base type to short,
     // used by color scaling algorithms as index in lookup table 

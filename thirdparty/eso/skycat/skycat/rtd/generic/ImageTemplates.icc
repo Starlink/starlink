@@ -35,6 +35,9 @@
  *                 16/07/07  When first pixel is blank or NaN make sure
  *                           failed check for a valid pixel tests both
  *                           blank and NaN, not just NaN.
+ *                 16/04/08  Added growAndShrink() to allow scales
+ *                           to have positive and negative values
+ *                           at the same time.
  *
  * This file is included in the .C files for classes derived from class
  * ImageData. The file defines a number of member functions that are
@@ -749,6 +752,131 @@ void CLASS_NAME::grow(int x0, int y0, int x1, int y1,
 	k = dest_x * xs;
 	l += ys;
 	src += src_y_inc;
+    }
+}
+
+
+/*
+ * This method is called when the image scales require grow and shrink.
+ *
+ * The arguments x0, y0, x1 and y1 are the bounding box of the region
+ * of the raw image that needs to be copied (origin at upper left (0,0)).
+ *
+ * dest_x and dest_y give the coordinates in the XImage where copying
+ * should start. These are normally either (x0,y0) or (0,0).
+ */
+void CLASS_NAME::growAndShrink(int x0, int y0, int x1, int y1,
+                               int dest_x, int dest_y)
+{
+    register int i, j, n, m;
+    register int xs = xScale_, ys = yScale_;
+    register int rxs = xScale_, rys = yScale_;
+
+    //  One of these is negative, the other not. 
+    if ( xs < 0 ) xs = 1;
+    if ( ys < 0 ) ys = 1;
+
+    // row/col increments
+    register int src_x_inc, src_y_inc;
+
+    // source/dest images
+    register DATA_TYPE* rawImage = (DATA_TYPE*)image_.dataPtr();
+    register int src;
+
+    initGetVal();  // init flag for speeding up bias subtraction
+
+    // width of image area to update
+    int w = x1 - x0 + 1;
+
+    // set loop increments based on current transformations
+    switch (flipX_<<1|flipY_) {
+    case 0: // none
+        src =  (height_ - 1 - y0) * width_ + x0;
+        src_x_inc = 1;
+        src_y_inc = -width_ - w;
+        break;
+    case 1: // flipY
+        src =  y0 * width_ + x0;
+        src_x_inc = 1;
+        src_y_inc = width_ - w;
+        break;
+    case 2: // flipX
+        src =  (height_ - 1 - y0) * width_ + (width_ - 1 - x0);
+        src_x_inc = -1;
+        src_y_inc = -(width_ - w);
+        break;
+    case 3: // flipX and flipY
+        src =  y0 * width_ + (width_ - 1 - x0);
+        src_x_inc = -1;
+        src_y_inc = width_ + w;
+        break;
+    }
+
+    int k = dest_x * xs;
+    int l = dest_y * ys;
+    unsigned long cl;
+    int width;
+    int height;
+    if ( rotate_ ) {
+        height = xImage_->width();
+        width = xImage_->height();
+    }
+    else {
+        width = xImage_->width();
+        height = xImage_->height();
+    }
+
+    //  For the axis that is shrank, we need to stop the pick for a number of
+    //  times that gets a step along that axis of the right number.
+    int yskip = 0;
+    int xskip = 0;
+    if ( rys < 0 ) {
+        yskip = -rys;
+    }
+    if ( rxs < 0 ) {
+        xskip = -rxs;
+    }
+
+    //  Skip counters.
+    int xc = 0;
+    int yc = 0;
+
+    for ( i = y0; i <= y1; i++ ) {
+        xc = 0;
+        for ( j = x0; j <= x1; j++ ) {
+            cl = llookup(getVal(rawImage, src));
+            // replicate the source pixel to an xs x ys box
+            int maxN = min(l+ys,height), maxM = min(k+xs,width);
+            for ( n = l; n < maxN; n++ ) {
+                for ( m = k; m < maxM; m++ ) {
+                    if ( rotate_ ) {
+                        xImage_->putpixel( n, m, cl );
+                    }
+                    else {
+                        xImage_->putpixel( m, n, cl );
+                    }
+                }
+            }
+
+            //  When xScale_ < 0 need to use same pixel again...
+            xc++;
+            if ( xc >= xskip ) {
+                k += xs;
+                xc = 0;
+            }
+
+            src += src_x_inc;
+        }
+        k = dest_x * xs;
+
+        //  When yScale_ < 0 need to use same pixel again...
+        yc++;
+        if ( yc >= yskip ) {
+            l += ys;
+            yc = 0;
+        }
+
+        src += src_y_inc;
     }
 }
 

@@ -17,6 +17,7 @@
  * Peter W. Draper 14/12/05  Remove local knowledge of FitsIO class so 
  *                           that other ImageIORep implementations can be
  *                           used.
+ *                 25/04/08  Add growAndShrink().
  */
 
 
@@ -746,6 +747,20 @@ void CompoundImageData::rawToXImage(int x0, int y0, int x1, int y1,
  */
 void CompoundImageData::grow(int x0, int y0, int x1, int y1, 
 			     int dest_x, int dest_y)
+{
+    return;  // see toXImage() above
+}
+
+/*
+ * This method is called to scale image when factor have different signs.
+ * The arguments x0, y0, x1 and y1 are the bounding box of the region
+ * that needs to be copied.
+ *
+ * dest_x and dest_y give the coordinates in the XImage where copying
+ * should start. These are normally either (x0,y0) or (0,0).
+ */
+void CompoundImageData::growAndShrink(int x0, int y0, int x1, int y1, 
+                                      int dest_x, int dest_y)
 {
     return;  // see toXImage() above
 }

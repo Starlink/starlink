@@ -13,6 +13,7 @@
  * --------------  --------  ----------------------------------------
  * Allan Brighton  14/02/00  Created
  * Peter W. Draper 15/11/05  Added getBlank() and haveBlank().
+ *                 25/04/08  Add growAndShrink().
  */
 
 #include "ImageData.h"
@@ -51,6 +52,7 @@ protected:
     void rawToXImage(int x0, int y0, int x1, int y1, int dest_x, int dest_y);
     void grow(int x0, int y0, int x1, int y1, int dest_x, int dest_y);
     void shrink(int x0, int y0, int x1, int y1, int dest_x, int dest_y);
+    void growAndShrink(int x0, int y0, int x1, int y1, int dest_x, int dest_y);
 
     // Set x0, y0, x1, y1 to the bounds of the given image data in FITS image coordinates.
     void getBounds(ImageData* imageData, double& x0, double& y0, double& x1, double& y1);
