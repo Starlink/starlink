@@ -97,6 +97,8 @@
  *        Use size_t following sc2store changes.
  *     2008-03-19 (AGG):
  *        Add obstype.
+ *     2008-04-24 (AGG):
+ *        Add nfocstep, focstep and focstart
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -161,6 +163,8 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
   double distfac;             /* distortion factor (0=no distortion) */
   double dut1;                /* Value of UT1 - UTC for current date */
   char flatname[SC2SIM__FLEN]; /* name of flatfield algorithm */
+  double focstart;            /* Starting SMU position (mm) for focus observation */
+  double focstep;             /* Interval (in mm) between SMU positions for focus */
   double grid_step_x;         /* Grid step in X direction */
   double grid_step_y;         /* Grid step in Y direction */
   int gridpts[SC2SIM__MXGRID][2];  /* relative grid coordinates */
@@ -187,6 +191,7 @@ struct sc2sim_obs_struct      /* parameters read from obs input file */
 				    (units: number of decectors) */
   size_t nbolx;                  /* number of bolometers in X */
   size_t nboly;                  /* number of bolometers in Y */
+  int nfocstep;               /* Number of focus positions */
   int ngrid;                  /* Nr of reconstruction points for single
 				 bolometer */
   double nmaps;               /* Number of times to repeat pattern */
