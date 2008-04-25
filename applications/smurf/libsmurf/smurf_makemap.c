@@ -360,10 +360,11 @@ void smurf_makemap( int *status ) {
   int ksize=0;               /* Size of group containing CONFIG file */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   double *map=NULL;          /* Pointer to the rebinned map data */
+  size_t mapmem;             /* Memory needed for output map */
   size_t mapsize;            /* Number of pixels in output image */
-  double meantexp;           /* Mean exposure time */
   size_t maxmem;             /* Max memory usage in bytes */
   int maxmem_mb;             /* Max memory usage in Mb */
+  double meantexp;           /* Mean exposure time */
   double maxtexp = 0.0;      /* Maximum exposure time */
   double modetexp;           /* Modal exposure time */ 
   double medtexp = 0.0;      /* Median exposure time */
@@ -479,7 +480,7 @@ void smurf_makemap( int *status ) {
   }
 
   /* Check memory requirements for output map */
-  smf_check_mapsize( lbnd_out, ubnd_out, rebin, maxmem, NULL, status );
+  smf_checkmem_map( lbnd_out, ubnd_out, rebin, maxmem, &mapmem, status );
 
   /* Create an output smfData */
   ndgCreat ( "OUT", NULL, &ogrp, &outsize, &flag, status );
@@ -652,7 +653,7 @@ void smurf_makemap( int *status ) {
 
     /* Call the low-level iterative map-maker */
     smf_iteratemap( igrp, keymap, outfset, moving, lbnd_out, ubnd_out,
-		    map, hitsmap, variance, weights, status );
+		    maxmem-mapmem, map, hitsmap, variance, weights, status );
 
     /* Calculate exposure time per output pixel from hitsmap */
     for (i=0; (i<mapsize) && (*status == SAI__OK); i++) {

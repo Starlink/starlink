@@ -15,7 +15,7 @@
 *  Invocation:
 *     smf_iteratemap( Grp *igrp, AstKeyMap *keymap, 
 *                    AstFrameSet *outfset, int moving, 
-*	             int *lbnd_out, int *ubnd_out,
+*	             int *lbnd_out, int *ubnd_out, size_t maxmem, 
 *                    double *map, unsigned int *hitsmap, double *mapvar, 
 *                    double *weights, int *status );
 
@@ -32,6 +32,8 @@
 *     lbnd_out = double* (Given)
 *        2-element array pixel coord. for the lower bounds of the output map
 *        (if outfset specified) 
+*     maxmem = size_t (Given)
+*        Maximum memory that me be used by smf_iteratemap (bytes)
 *     map = double* (Returned)
 *        The output map array 
 *     hitsmap = unsigned int* (Returned)
@@ -189,7 +191,7 @@
 
 void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, 
 		     AstFrameSet *outfset, int moving, 
-	             int *lbnd_out, int *ubnd_out,
+	             int *lbnd_out, int *ubnd_out, size_t maxmem, 
                      double *map, unsigned int *hitsmap, double *mapvar, 
 		     double *weights, int *status ) {
 
@@ -504,18 +506,16 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
      concatenate _only_ continuous pieces of data */
 
   smf_grp_related( igrp, isize, 1, maxlen, &igroup, status );
+  printf("Number of subarrays = %i\n", igroup->nrelated);
 
-  /* KLUDGE -- print the chunk array */
-  
-  /*
-  printf(" CHUUUUUNK!!!! ");
-  if( *status == SAI__OK ) for( i=0; i<igroup->ngroups; i++ ) {
-    printf("%i ", igroup->chunk[i]);
-  }
-  printf("\n");
-  */
 
   if( *status == SAI__OK ) {
+
+    /* Once we've run smf_grp_related we know how many subarrays there are.
+       We also know the value of maxlen, and which model components were
+       requested. Use this information to verify the required memory to
+       proceed. */
+
     if( memiter ) {
       /* only one concatenated chunk within the iteration loop */
       nchunks = 1;
@@ -1048,7 +1048,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	      
 	      /* Check for existence of the model for this subarray - in
 		 some cases, like COM, there is only a file for one subarray,
-		 unlike RES from which the idx loop counter is derived. */
+		 unlike RES from which the range of idx is derived */
 	      if( model[j][i]->sdata[idx] ) {
 		smf_dataOrder( model[j][i]->sdata[idx], 1, status );
 		if( *status == SMF__WDIM ) {

@@ -286,7 +286,8 @@
 *        -Added sampvar to smf_simplerebinmap
 *        -Added hdr to smf_model_NDFexport
 *     2008-04-24 (EC):
-*        -Added smf_check_mapsize
+*        -Added smf_check_mapsize (then renamed smf_checkmem_map)
+*        -Added maxmem to smf_iteratemap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -547,7 +548,7 @@ inst_t smf_inst_get( const smfHead * hdr, int * status );
 
 void smf_iteratemap( Grp *igrp, AstKeyMap *keymap, 
 		     AstFrameSet *outfset, int moving, 
-	             int *lbnd_out, int *ubnd_out,
+	             int *lbnd_out, int *ubnd_out, size_t mapmem,
                      double *map, unsigned int *hitsmap, double *mapvar, 
 		     double *weights, int *status );
 
@@ -906,8 +907,8 @@ void smf_simpleaddmap( double *map1, double *mapweight1,
 int *smf_find_median( float *farray, double *darray, int nel, 
                       int *hist, float *median, int *status );
 
-void smf_check_mapsize( const int *lbnd, const int *ubnd, int rebin, 
-			size_t available, size_t *necessary, int *status );
+void smf_checkmem_map( const int *lbnd, const int *ubnd, int rebin, 
+		       size_t available, size_t *necessary, int *status );
 
 
 #endif /* SMF_DEFINED */
