@@ -103,6 +103,8 @@
 *        Set IFFREQ to default of -4 GHz. 
 *     2008-04-23 (JB):
 *        Use frequencies from matchFreqs for refchan/IF.
+*     2008-04-24 (JB):
+*        Fix calculation of TCS_TR_ANG.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -168,8 +170,6 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   double dLST;                /* difference in LSTs */
   double dut1;                /* UT1-UTC correction */
   AstFrameSet *frame;         /* frame for pointing */
-  double gapptDec;            /* geocentric apparent declination (radians) */
-  double gapptRA;             /* geocentric apparent hour angle (radians) */
   int hour;                   /* hours */
   char iDate[10];             /* date in specx string format */
   long index;                 /* index into array data */
@@ -180,18 +180,13 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   int min;                    /* minutes */
   int month;                  /* months */
   double sec;                 /* seconds */
+  AstTimeFrame *TAIFrame;     /* AstTimeFrame for TCS_TAI */
   double TAIStart;            /* start TAI time */
   AstTimeFrame *tFrame = NULL;  /* AstTimeFrame for retrieving TAI times */
   AstTimeFrame *UTCFrame = NULL; /* AstTimeFrame for retrieving UTC times */
   const char *UTCString;      /* UTC time as a string */
   double UTCTime;             /* UTC time */
   int year;                   /* year */
-
-  AstTimeFrame *tempFrame;
-  const char *tempString1;
-  const char *tempString2;
-  double tempTime1;
-  double tempTime2;
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
@@ -333,23 +328,9 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
      step to UTC and get the correct formatting. */
   astSetD ( tFrame, "TimeOrigin", wcs->tai );
 
-  tempTime1 = astGetD ( tFrame, "timeOrigin" );
-  tempFrame = astCopy ( tFrame );
-  astClear ( tempFrame, "timeOrigin" );
-  astSet ( tempFrame, "format(1)=iso.2" );
-  tempString1 = astFormat ( tempFrame, 1, tempTime1 );
-
   astSet ( tFrame, "timescale=UTC" );
 
   UTCTime = astGetD ( tFrame, "TimeOrigin" );
-
-  tempTime2 = astGetD ( tFrame, "timeOrigin" );
-  tempFrame = astCopy ( tFrame );
-  astClear ( tempFrame, "timeOrigin" );
-  astSet ( tempFrame, "format(1)=iso.2" );
-  tempString2 = astFormat ( tempFrame, 1, tempTime2 );
-
-  if ( subBandNum == 0 && DEBUGON ) printf ( "TAI: %f (%s), UTC: %f (%s)\n", tempTime1, tempString1, tempTime2, tempString2 );
 
   UTCFrame = astCopy ( tFrame );
   astClear ( UTCFrame, "timeOrigin" );
@@ -423,6 +404,12 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   if ( subBandNum == 0 && DEBUGON ) 
    printf("Epoch = %s MJD=%f\n",astGetC(*WCSFrame,"Epoch"),
            slaEpj2d(astGetD(*WCSFrame,"Epoch")));
+
+  /* Update TCS_TAI to match frameset. */
+  TAIFrame = astTimeFrame ( "timescale=UTC" );
+  astSetD ( TAIFrame, "timeOrigin", slaEpj2d(astGetD(*WCSFrame,"Epoch") ) );
+  astSet ( TAIFrame, "timescale=TAI" );
+  wcs->tai = astGetD ( TAIFrame, "timeOrigin" );
 
   /* Make a copy of the frameset for local calculations. */
   frame = astCopy ( *WCSFrame );
@@ -526,14 +513,10 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   astSet( frame, "System(1)=GAPPT" );
   astTranN( frame, 1, 3, 1, coordIn, 1, 3, 1, coordOut );
 
+  coordOut[0] = ( ( LSTStart + ( dLST * 24.0 ) ) * 2.0 * AST__DPI / 24.0 ) - coordOut[0];
+
   astNorm ( frame, coordOut );
 
-  gapptRA = coordOut[0];
-  gapptDec = coordOut[1];
-
-  index = (int) ( stepNum / gsdVars->nScanPts );
-  gapptRA = ( gsdVars->scanTable1[index] * 2.0 * AST__DPI / 24.0 ) - gapptRA;
-
-  wcs->trAng = slaPa( gapptRA, gapptDec, gsdVars->telLatitude );
+  wcs->trAng = slaPa( coordOut[0], coordOut[1], gsdVars->telLatitude );
 
 }
