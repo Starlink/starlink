@@ -18,9 +18,9 @@
 *                       int astnaxes[2], double astscale, double *astsim, 
 *                       int atmnaxes[2], double atmscale, double *atmsim, 
 *                       double coeffs[], AstFrameSet *fset, double heater[],
-*                       int nboll, int frame, int nterms, double *noisecoeffs, 
+*                       int nbol, double focposn, int frame, int nterms, double *noisecoeffs, 
 *                       double *pzero, double samptime, double start_time, 
-*                       double telemission, double *weights, AstMapping *sky2map,
+*                       double *weights, AstMapping *sky2map,
 *                       double *xbolo, double *ybolo, double *xbc, double *ybc,
 *                       double *position, double *dbuf, int *status )
 
@@ -49,6 +49,8 @@
 *        Bolometer heater ratios
 *     nbol = int (Given)
 *        Total number of bolometers
+*     focposn = double (Given)
+*        SMU position for FOCUS observation
 *     frame = int (Given)
 *        Number of current frame
 *     nterms = int (Given)
@@ -61,8 +63,6 @@
 *        Sample time in sec
 *     start_time = double (Given)
 *        Time at start of scan in seconds since the simulation started
-*     telemission = double (Given)
-*        Power from telescope emission
 *     weights = double* (Given)
 *        Impulse response
 *     sky2map = AstMapping* (Given)
@@ -83,14 +83,18 @@
 *        Pointer to global status.  
 
 *  Description:
-*     Interpolate values of atmospheric background and astronomical image
-*     for each bolometer in the current frame. Simulate photon and
-*     instrumental noise and bolometer responses.
+*     Interpolate values of atmospheric background and astronomical
+*     image for each bolometer in the current frame. Simulate photon
+*     and instrumental noise and bolometer responses. If the
+*     simulation is of a FOCUS observation then a simple quadratic
+*     model is used to reduce (defocus) the astronomical signal as a
+*     function of the given focus position.
 
 *  Authors:
 *     B.D.Kelly (ROE)
 *     E.Chapin (UBC)
 *     J.Balfour (UBC)
+*     A.G.Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -134,6 +138,10 @@
 *        Fix time bug
 *     2008-04-18 (AGG):
 *        Use transmission for current wavelength to get atmospheric power
+*     2008-04-24 (AGG):
+*        - Add focus (SMU) position to API
+*        - Remove telemission from API
+*        - Add defocus multiplier
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -171,6 +179,7 @@
 #include "ast.h"
 #include "sae_par.h"
 #include "mers.h"
+#include "prm_par.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -193,6 +202,7 @@ double coeffs[],             /* bolometer response coeffs (given) */
 AstFrameSet *fset,           /* World Coordinate transformations */
 double heater[],             /* bolometer heater ratios (given) */
 int nbol,                    /* total number of bolometers (given) */
+double focposn,              /* SMU position for FOCUS observation */
 int frame,                   /* number of current frame (given) */
 int nterms,                  /* number of 1/f noise coeffs (given) */
 double *noisecoeffs,         /* 1/f noise coeffs (given) */
@@ -200,7 +210,6 @@ double *pzero,               /* bolometer power offsets (given) */
 double samptime,             /* sample time in sec (given) */
 double start_time,           /* time at start of scan in sec since start of 
 				simulation (given) */
-double telemission,          /* power from telescope emission (given) */
 double *weights,             /* impulse response (given) */
 AstMapping *sky2map,         /* Mapping celestial->map coordinates */
 double *xbolo,               /* native X offsets of bolometers */
@@ -214,6 +223,7 @@ int *status                  /* global status (given and returned) */
 
 {
    /* Local variables */
+  double a[3];                    /* Quadratic coefficients for defocus multiplier */
    double airmass;                 /* airmass for each bolometer */
    double astvalue;                /* obs. astronomical value in pW */
    double atmvalue;                /* obs. atmospheric emission in pW */
@@ -222,6 +232,7 @@ int *status                  /* global status (given and returned) */
    AstCmpMap *bolo2map=NULL;       /* Combined mapping bolo->map coordinates */
    AstMapping *bolo2sky=NULL;      /* Mapping bolo->celestial coordinates */
    double current;                 /* bolometer current in amps */
+   double defocus = 1.0;           /* Multiplier for `de-focussing' an image */
    double exponent;                /* Exponent of spike power law integral */
    double flux;                    /* flux at bolometer in pW */
    double fnoise;                  /* 1/f noise value */
@@ -306,6 +317,21 @@ int *status                  /* global status (given and returned) */
      }
    }
 
+   /* If a valid focus position has been passed in then artificially
+      dim (defocus) the astronomical source by a factor given by a
+      simple quadratic. Note that a[2] must be negative or else there
+      is no maximum! It must also be `small' so that the quadratic
+      expression remains positive for all focus positions. Default
+      coefficients of [+0.95,+0.10,-0.05] yield a best-fit focus
+      position of +1 mm.
+   */
+   if ( focposn != VAL__BADD ) {
+     a[0] = 0.95;
+     a[1] = 0.1;
+     a[2] = -0.05;
+     defocus = a[0] + a[1]*focposn + a[2]*focposn*focposn;
+   }
+
    /* Get the zenith atmospheric signal */ 
    sc2sim_calctrans( inx.lambda, &skytrans, sinx.tauzen, status );
    sc2sim_atmsky( inx.lambda, skytrans, &zenatm, status );
@@ -321,7 +347,7 @@ int *status                  /* global status (given and returned) */
        /* Get the observed astronomical value in Jy and convert it to pW.
           This value is not yet corrected for atmospheric transmission! */
        astvalue = dbuf[bol];
-       astvalue = astvalue * sinx.jy2pw;
+       astvalue = astvalue * sinx.jy2pw * defocus;
        
        /* Calculate mean atmospheric emission at current airmass
 	  from zenith emission */
@@ -330,7 +356,7 @@ int *status                  /* global status (given and returned) */
 
        /* Calculate the photon noise from this mean loading */
        sc2sim_getsigma( sinx.refload, sinx.refnoise, 
-			meanatm + telemission, &sigma, status );
+			meanatm + sinx.telemission, &sigma, status );
 
        /* Add spikes if desired. In a given sample there is approximately
           a inx.steptime/sinx.spike_t0 chance of there being a spike. Spikes
@@ -354,7 +380,7 @@ int *status                  /* global status (given and returned) */
 			( pow(sinx.spike_p1,exponent) - 
 			  pow(sinx.spike_p0,exponent) ) +
 			pow(sinx.spike_p0,exponent), 1./exponent ) *
-	     sinx.jy2pw;	   
+ 	           sinx.jy2pw;
 	 }
        }
 
@@ -406,7 +432,7 @@ int *status                  /* global status (given and returned) */
 	 /*  Add atmospheric and telescope emission.
 	     TELEMISSION is a constant value for all bolometers. 
              The 0.01 is needed because skytrans is a % */
-	 flux = 0.01 * skytrans * astvalue + atmvalue + telemission + spike;
+	 flux = 0.01 * skytrans * astvalue + atmvalue + sinx.telemission + spike;
        }	 
        /*  Add photon noise */
        if ( sinx.add_pns == 1 ) {
@@ -416,13 +442,12 @@ int *status                  /* global status (given and returned) */
 
        /* Add heater, assuming mean heater level is set to add onto meanatm and
 	  TELEMISSION to give targetpow */
-       
        if( *status == SAI__OK ) {
 	 if ( sinx.add_hnoise == 1 ) {
-	   flux = flux + ( inx.targetpow - meanatm - telemission ) * 
+	   flux = flux + ( inx.targetpow - meanatm - sinx.telemission ) * 
 	     heater[bol];
 	 } else {
-	   flux = flux + ( inx.targetpow - meanatm - telemission );
+	   flux = flux + ( inx.targetpow - meanatm - sinx.telemission );
 	 }
        }
 
@@ -432,8 +457,8 @@ int *status                  /* global status (given and returned) */
 	  help of the polynomial expression with coefficients in COEFFS(*) */
        if ( sinx.flux2cur == 1 ) {
 	 
-         sc2sim_ptoi ( flux, SC2SIM__NCOEFFS, coeffs, 
-                       pzero[bol], &current, status );
+         sc2sim_ptoi ( flux, SC2SIM__NCOEFFS, coeffs, pzero[bol], &current, 
+		       status );
 	 
        } else {
          current = flux;
@@ -452,7 +477,6 @@ int *status                  /* global status (given and returned) */
          }
 	 
          current += fnoise;
-	 
        }
        
        dbuf[bol] = current;
@@ -465,11 +489,9 @@ int *status                  /* global status (given and returned) */
    }
 
    /* Free resources */
-
    if( bolo2sky) bolo2sky = astAnnul(bolo2sky);
    if( bolo2map ) bolo2map = astAnnul(bolo2map);
    if( bolo2azel ) bolo2azel = astAnnul(bolo2azel);
-   skycoord = smf_free( skycoord, status );
-   
+   skycoord = smf_free( skycoord, status );   
 }
 
