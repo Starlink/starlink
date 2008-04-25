@@ -1,7 +1,7 @@
 /*
 *+
 *  Name:
-*     smf_check_mapsize
+*     smf_checkmem_map
 
 *  Purpose:
 *     Verify that there is enough memory to map components of output map
@@ -13,8 +13,8 @@
 *     C function
 
 *  Invocation:
-*     smf_check_mapsize( const int *lbnd, const int *ubnd, int rebin, 
-*                        size_t available, size_t *necessary, int *status );
+*     smf_checkmem_map( const int *lbnd, const int *ubnd, int rebin, 
+*                       size_t available, size_t *necessary, int *status );
 
 *  Arguments:
 *     lbnd = int* (Given)
@@ -89,10 +89,10 @@
 #include "libsmf/smf_err.h"
 
 
-#define FUNC_NAME "smf_check_mapsize"
+#define FUNC_NAME "smf_checkmem_map"
 
-void smf_check_mapsize( const int *lbnd, const int *ubnd, int rebin, 
-			size_t available, size_t *necessary, int *status ) {
+void smf_checkmem_map( const int *lbnd, const int *ubnd, int rebin, 
+		       size_t available, size_t *necessary, int *status ) {
 
  /* Local Variables */
   int i;                       /* Loop counter */
