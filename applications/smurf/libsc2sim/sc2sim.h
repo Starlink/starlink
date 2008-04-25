@@ -78,7 +78,12 @@
 *     2007-10-05 (AGG):
 *        Add obsend flag
 *     2008-03-19 (AGG):
-*        Add sc2sim_get_recipe and sc2sim_get_drgroup
+*        - Add sc2sim_get_recipe and sc2sim_get_drgroup
+*        - Add dateobs to sc2sim_get_drgroup
+*     2008-04-24 (AGG):
+*        - Remove obstype from sc2sim_ndfwrdata API
+*        - Add current focus position to & remove telemission from
+           sc2sim_simframe API
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -489,7 +494,8 @@ void sc2sim_get_recipe ( const struct sc2sim_obs_struct *inx, char *recipe,
 			 int *status );
 
 void sc2sim_get_drgroup ( const struct sc2sim_obs_struct *inx, const char *filter, 
-			  const char *object, char *drgroup, int *status );
+			  const char *object, const char *dateobs, char *drgroup, 
+			  int *status );
 
 void sc2sim_heatrun ( struct sc2sim_obs_struct *inx, 
                       struct sc2sim_sim_struct *sinx, 
@@ -570,7 +576,6 @@ double jigptr[][2], /* Array of X, Y jiggle positions (given) */
 const int obsnum,         /* Observation number (given) */		 
 const int nsubscan,       /* Sub-scan number (given) */			 
 const int obsend,        /* Flag to indicate whether this is the last file */
-const char obstype[],     /* Observation type, e.g. SCIENCE (given)*/	 
 const char utdate[],      /* UT date in YYYYMMDD form (given) */		 
 const double azstart,     /* Azimuth at start of sub-scan (given) */	 
 const double azend,       /* Azimuth at end of sub-scan (given) */	 
@@ -649,13 +654,13 @@ double coeffs[],             /* bolometer response coeffs (given) */
 AstFrameSet *fset,           /* World Coordinate transformations */
 double heater[],             /* bolometer heater ratios (given) */
 int nboll,                   /* total number of bolometers (given) */
+double focposn,              /* SMU position for FOCUS observation */
 int frame,                   /* number of current frame (given) */
 int nterms,                  /* number of 1/f noise coeffs (given) */
 double *noisecoeffs,         /* 1/f noise coeffs (given) */
 double *pzero,               /* bolometer power offsets (given) */
 double samptime,             /* sample time in sec (given) */
 double start_time,           /* time at start of scan in sec  (given) */
-double telemission,          /* power from telescope emission (given) */
 double *weights,             /* impulse response (given) */
 AstMapping *sky2map,         /* Mapping celestial->map coordinates */
 double *xbolo,               /* native X offsets of bolometers */
