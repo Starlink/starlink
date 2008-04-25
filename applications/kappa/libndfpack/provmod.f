@@ -49,26 +49,36 @@
 *        - Any reasonable combination of above values separated by 
 *        commas.  ["ALL"]
 *     CREATOR = LITERAL (Read)
-*        Specifies one or more substitutions to be performed on the 
-*        "CREATOR" string read from each of the ancestors being 
-*        modified.  See "Substitution Syntax" below.  If null (!) is 
-*        supplied, the PATH item is left unchanged.  [!]
+*        If the supplied string includes no equals signs, then it is a
+*        new value for the "CREATOR" string read from each of the ancestors 
+*        being modified. If the supplied string includes one or more equals 
+*        signs, then it specifies one or more substitutions to be performed 
+*        on the "CREATOR" string read from each of the ancestors being 
+*        modified. See "Substitution Syntax" below.  If null (!) is supplied, 
+*        the CREATOR item is left unchanged.  [!]
 *     DATE = LITERAL (Read)
-*        Specifies one or more substitutions to be performed on the 
-*        "DATE" string read from each of the ancestors being modified. 
-*        See "Substitution Syntax" below.  An error will be reported if 
-*        any of these substitutions result in a string that is not a 
-*        valid date-and-time string.  If null (!) is supplied, the PATH 
-*        item is left unchanged.  [!]
+*        If the supplied string includes no equals signs, then it is a
+*        new value for the "DATE" string read from each of the ancestors 
+*        being modified. If the supplied string includes one or more equals 
+*        signs, then it specifies one or more substitutions to be performed 
+*        on the "DATE" string read from each of the ancestors being modified. 
+*        See "Substitution Syntax" below.  If null (!) is supplied, the 
+*        DATE item is left unchanged.  [!]
 *     NDF = NDF (Update)
 *        The NDF data structure.
 *     PATH = LITERAL (Read)
-*        Specifies one or more substitutions to be performed on the 
-*        "PATH" string read from each of the ancestors being modified. 
+*        If the supplied string includes no equals signs, then it is a
+*        new value for the "PATH" string read from each of the ancestors 
+*        being modified. If the supplied string includes one or more equals 
+*        signs, then it specifies one or more substitutions to be performed 
+*        on the "PATH" string read from each of the ancestors being modified. 
 *        See "Substitution Syntax" below.  If null (!) is supplied, the 
 *        PATH item is left unchanged.  [!]
 
 *  Examples:
+*     provmod ff path=/home/dsb/real-file.sdf
+*        This modifies any ancestor within the NDF called ff by setting
+*        its PATH to "/home/dsb/real-file.sdf".
 *     provmod ff path='(_x)$=_y'
 *        This modifies any ancestor within the NDF called ff that has a
 *        path ending in "_x" by replacing the final "_x" with "_y".
@@ -183,6 +193,9 @@
 *  History:
 *     26-FEB-2008 (DSB):
 *        Original version.
+*     25-APR-2008 (DSB):
+*        Allow new values to be speicfied literally as well as by
+*        substitution.
 *     {enter_further_changes_here}
 
 *-
@@ -308,7 +321,11 @@
 *  If the specifier matches the CREATOR string, perform the 
 *  substitutions and use the resulting string in place of the current 
 *  CREATOR string.
-               IF( AST_CHRSUB( TEST, CRESUB, RESULT, STATUS ) ) THEN
+               IF( INDEX( CRESUB, '=' ) .EQ. 0 ) THEN
+                  TEST = CRESUB
+
+               ELSE IF( AST_CHRSUB( TEST, CRESUB, RESULT, 
+     :                              STATUS ) ) THEN
                   TEST = RESULT
                END IF
 
@@ -335,7 +352,11 @@
 
 *  If the specifier matches the DATE string, perform the substitutions
 *  and use the resulting string in place of the current DATE string.
-               IF( AST_CHRSUB( TEST, DATSUB, RESULT, STATUS ) ) THEN
+               IF( INDEX( DATSUB, '=' ) .EQ. 0 ) THEN
+                  TEST = DATSUB
+
+               ELSE IF( AST_CHRSUB( TEST, DATSUB, RESULT, 
+     :                              STATUS ) ) THEN
                   TEST = RESULT
                END IF
 
@@ -361,7 +382,11 @@
 
 *  If the specifier matches the PATH string, perform the substitutions
 *  and use the resulting string in place of the current PATH string.
-               IF( AST_CHRSUB( TEST, PTHSUB, RESULT, STATUS ) ) THEN
+               IF( INDEX( PTHSUB, '=' ) .EQ. 0 ) THEN
+                  TEST = PTHSUB
+
+               ELSE IF( AST_CHRSUB( TEST, PTHSUB, RESULT, 
+     :                              STATUS ) ) THEN
                   TEST = RESULT
                END IF
 

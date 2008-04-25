@@ -39346,22 +39346,28 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
       \sstsubsection{
          CREATOR = LITERAL (Read)
       }{
-         Specifies one or more substitutions to be performed on the
-         {\tt "CREATOR"} string read from each of the ancestors being
-         modified.  See 
+         If the supplied string includes no equals signs, then it is a
+         new value for the {\tt "CREATOR"} string read from each of the 
+         ancestors being modified. If the supplied string includes one or 
+         more equals signs, then it specifies one or more substitutions to 
+         be performed on the {\tt "CREATOR"} string read from each of the 
+         ancestors being modified. See 
          \htmlref{``Substitution Syntax''}{substitution_syntax:provmod} 
-         below.  If null {\tt{(!)}} is
-         supplied, the PATH item is left unchanged.  {\tt [!]}
+         below.  If null {\tt{(!)}} is supplied, the CREATOR item is left 
+         unchanged.  {\tt [!]}
       }
       \sstsubsection{
          DATE = LITERAL (Read)
       }{
-         Specifies one or more substitutions to be performed on the
-	 {\tt "DATE"} string read from each of the ancestors being
-	 modified.  See ``Substitution Syntax'' below.  An error will
-	 be reported if any of these substitutions result in a string
-	 that is not a valid date-and-time string.  If null {\tt{(!)}}
-	 is supplied, the PATH item is left unchanged.  {\tt [!]}
+         If the supplied string includes no equals signs, then it is a
+         new value for the {\tt "DATE"} string read from each of the 
+         ancestors being modified. If the supplied string includes one or 
+         more equals signs, then it specifies one or more substitutions to 
+         be performed on the {\tt "DATE"} string read from each of the 
+         ancestors being modified. See 
+         \htmlref{``Substitution Syntax''}{substitution_syntax:provmod} 
+         below.  If null {\tt{(!)}} is supplied, the DATE item is left 
+         unchanged.  {\tt [!]}
       }
       \sstsubsection{
          NDF = NDF (Update)
@@ -39371,14 +39377,25 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
       \sstsubsection{
          PATH = LITERAL (Read)
       }{
-         Specifies one or more substitutions to be performed on the
-         {\tt "PATH"} string read from each of the ancestors being modified.
-         See ``Substitution Syntax'' below.  If null {\tt{(!)}} is supplied, 
-         the PATH item is left unchanged.  {\tt [!]}
+         If the supplied string includes no equals signs, then it is a
+         new value for the {\tt "PATH"} string read from each of the 
+         ancestors being modified. If the supplied string includes one or 
+         more equals signs, then it specifies one or more substitutions to 
+         be performed on the {\tt "PATH"} string read from each of the 
+         ancestors being modified. See 
+         \htmlref{``Substitution Syntax''}{substitution_syntax:provmod} 
+         below.  If null {\tt{(!)}} is supplied, the PATH item is left 
+         unchanged.  {\tt [!]}
       }
    }
    \label{examples:provmod}
    \sstexamples{
+      \sstexamplesubsection{
+         provmod ff path=/home/dsb/real-file.sdf
+      }{
+         This modifies any ancestor within the NDF called ff by setting
+         its PATH to {\tt "/home/dsb/real-file.sdf"}.
+      }
       \sstexamplesubsection{
          provmod ff path='(\_x)\$=\_y'
       }{
