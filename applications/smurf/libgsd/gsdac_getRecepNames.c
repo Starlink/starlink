@@ -41,6 +41,8 @@
 *        Check for how many receptors for each receiver. 
 *     2008-04-02 (JB):
 *        Use single letter names for one-receptor frontends.
+*     2008-04-25 (JB):
+*        Check for MPI frontend. 
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -108,7 +110,11 @@ void gsdac_getRecepNames ( const gsdVars *gsdVars, char *recepNames[],
   }
 
   /* First get the letter of the frontend. */
-  frontendLetter = gsdVars->frontend[2];
+  if ( strncmp ( gsdVars->frontend, "MPI", 3 ) == 0 ) {
+    frontendLetter = 'E';
+  } else {
+    frontendLetter = gsdVars->frontend[2];
+  }
 
   /* If this is receiver W, check if this is C band or
      D band. */
