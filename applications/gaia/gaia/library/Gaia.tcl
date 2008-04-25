@@ -399,10 +399,11 @@ itcl::class gaia::Gaia {
       after 0 [code $this file_loaded_]
 
       #  If autoscaling, need to wait for realization the first time.
-      if { $itk_option(-autoscale) } {
+      if { $itk_option(-autofill) } {
+         after 0 [code $this configure -autofill 1]
+      } elseif { $itk_option(-autoscale) } {
          after 0 [code $this configure -autoscale 1]
-      }
-      if { $itk_option(-autofit) } {
+      } elseif { $itk_option(-autofit) } {
          after 0 [code $this configure -autofit 1]
       }
 
@@ -429,7 +430,7 @@ itcl::class gaia::Gaia {
       set_image_background
 
       #  Trap window closing and handle that.
-      wm protocol $w_ WM_DELETE_WINDOW [code $this quit]
+      wm protocol $w_ WM_DELETE_WINDOW [code $this close]
    }
 
    #  Set/get X defaults - can be overridden in subclass and/or
@@ -657,14 +658,27 @@ itcl::class gaia::Gaia {
          {See any problems found with current astrometry headers} \
          -command [code $image_ display_astwarn]
 
-      #  Auto fit to complement autoscale.
+      #  Locate "Auto scale" item and change to activate our local
+      #  method.
       set index [$m index "Auto scale"]
+      $m entryconfigure $index -command [code $this autoscale_]
+
+      #  Append experimental auto fill autoscale variant.
+      incr index
+      insert_menuitem $m $index checkbutton "Auto fill*" \
+         {Scale the image to fit the window in both dimensions (experimental)} \
+         -variable [scope itk_option(-autofill)] \
+         -onvalue 1 -offvalue 0 \
+         -command [code $this autofill_ 1]
+
+      #  Auto fit to complement autoscale.
       incr index
       insert_menuitem $m $index checkbutton "Auto fit" \
          {Scale the image to the max. visible size when loaded} \
          -variable [scope itk_option(-autofit)] \
          -onvalue 1 -offvalue 0 \
          -command [code $this autofit_]
+
 
       #  HDUs are for NDFs too.
       $m entryconfigure "Select FITS HDU..." \
@@ -1503,11 +1517,11 @@ itcl::class gaia::Gaia {
 	 open_image_ $file
       }
    }
-   
+
    #  Get a file using a suitably configured dialog for images. Also
    #  provides browsing of NDFs and FITS MEFS for HDUs.
    protected method get_file_ {{dir "."} {pattern "*"}} {
-      if { ! [info exists itk_component(fileselect)] || 
+      if { ! [info exists itk_component(fileselect)] ||
            ! [winfo exists $itk_component(fileselect)] } {
          itk_component add fileselect {
             util::FileSelect $w_.select \
@@ -1566,7 +1580,7 @@ itcl::class gaia::Gaia {
             open_image_ $name
          }
       } elseif { $type == "table" } {
-         
+
          #  Set the catalog config entry from the $catinfo table
          if { [catch "$astrocat_ entry get $name"] } {
             if { "[string index $name 0]" != "/"} {
@@ -1578,7 +1592,7 @@ itcl::class gaia::Gaia {
                [list "serv_type local" "long_name $fname" "short_name $name" \
                    "url $fname"]
          }
-         
+
          #  Display the catalogue.
          gaia::GaiaSearch::new_local_catalog $name $image_ ::gaia::GaiaSearch
       }
@@ -2098,13 +2112,13 @@ itcl::class gaia::Gaia {
       ::close $fileid
       if { !$ok } {
          set msg \
-"Your local catalogue configuration file '$config_file'
+            "Your local catalogue configuration file '$config_file'
 is out of date. Do you want to update it?"
          set choice [choice_dialog $msg {OK Details Cancel} {OK}]
 
          if { $choice == "Details" } {
             set detailsmsg \
-"The local catalogue configuration file '$config_file'
+               "The local catalogue configuration file '$config_file'
 contains a description of catalogues that are shown in the
 Data-Servers menus. It appears that this file is now out of date with
 respect to the system default version (which may contain new
@@ -2211,9 +2225,42 @@ window gives you access to this."
       }
    }
 
-   # Apply the autofit value.
+   #  Apply the autoscale value. Need to also manage autofill, which
+   #  requires autoscale to be true.
+   protected method autoscale_ {} {
+      global ::$w_.autoscale
+      if { ! [set $w_.autoscale] } {
+         if { $itk_option(-autofill) } {
+            configure -autofill 0
+            autofill_ 0
+         }
+      }
+      $image_ autoscale $w_.autoscale
+   }
+
+   #  Apply the autofit value.
    protected method autofit_ {} {
       $image_ configure -autofit $itk_option(-autofit)
+   }
+
+   #  Apply the autofill value, also make sure autoscale is set or unset 
+   #  as needed.
+   protected method autofill_ {autoscale} {
+      if { $autoscale } {
+         global ::$w_.autoscale
+         if { $itk_option(-autofill) } {
+            if { ! [set $w_.autoscale] } {
+               set $w_.autoscale 1
+               autoscale_
+            }
+         } else {
+            if { [set $w_.autoscale] } {
+               set $w_.autoscale 0
+               autoscale_
+            }
+         }
+      }
+      $image_ configure -autofill $itk_option(-autofill)
    }
 
    # -- public variables (also program options) --
@@ -2368,6 +2415,15 @@ window gives you access to this."
        }
    }
 
+   #  Autofill new images to fit main window. Like autoscale except
+   #  independent scaling in the two axes. Dangerous as not all
+   #  graphics items etc. will function correctly.
+   itk_option define -autofill autofill AutoFill 0 {
+       if { [info exists image_] } {
+          autofill_ 1
+       }
+   }
+
    #  A font used for labels.
    itk_option define -labelfont labelfont LabelFont variable {
       set ::gaia_fonts(labelfont) $itk_option(-labelfont)
@@ -2388,7 +2444,7 @@ window gives you access to this."
    itk_option define -pick_zoom_factor pick_zoom_factor Pick_Zoom_Factor 10
 
    #  Additional text for title bar (expected use is identifying amongst
-   # instances). 
+   # instances).
    itk_option define -ident ident Ident {} {
        if { [info exists image_] } {
           $image_ configure -ident $itk_option(-ident)
@@ -2490,7 +2546,7 @@ window gives you access to this."
 set util::TopLevelWidget::help_window_class gaia::HelpWin
 
 #
-#  Need to override this proc so we use the browser version of the 
+#  Need to override this proc so we use the browser version of the
 #  open dialog (and we need it here so that it is used in preference).
 #
 itcl::body ::cat::AstroCat::local_catalog {{id ""} {classname AstroCat} {debug 0} {w ""}} {

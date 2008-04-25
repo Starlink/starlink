@@ -502,8 +502,9 @@ itcl::class gaia::GaiaImageCtrl {
       #  Set the default for merging headers.
       set_always_merge_
 
-      #  Do autofit if needed.
+      #  Do autofit & autofill if needed.
       autofit_
+      autofill_
    }
 
    #  Set the precision used to display RA/Dec coordinates. By default
@@ -1119,6 +1120,88 @@ itcl::class gaia::GaiaImageCtrl {
       }
    }
 
+   #  Autofill. This option is like autoscale, except the scale factors
+   #  can be different so that the image fills the display. This does not
+   #  work correctly (any parametric shapes for instance will be incorrect)
+   #  and does not work with axes interchange, so should be used only for effect
+   protected method autofill_ {} {
+      if { $itk_option(-autofill) } {
+
+         #  Make sure the image is not interchanged and disable that facility.
+         $itk_component(info) disable_interchange 1
+
+         set autofill_ 1
+         catch {
+            maybe_autoscale
+         }
+         set autofill_ 0
+         update
+      } else {
+
+         #  Autofill is switched off (was on?). Make sure we can now flip.
+         if { [info exists itk_component(info)] } {
+            $itk_component(info) enable_interchange
+         }
+         lassign [$image_ scale] xs ys
+         if { $ys != "" } {
+            set scale [max $itk_option(-min_scale) [min $xs $ys $itk_option(-max_scale)]]
+            scale $scale $scale
+         }
+      }
+   }
+
+   #  Override the method used by autoscale to do the fit so we can vary the
+   #  scales, if needed.
+   protected method fill_to_fit {cw ch} {
+
+      #  Fit to all items on the canvas, not just the image.
+      lassign [$canvas_ bbox all] x0 y0 x1 y1
+      $image_ convert coords $x0 $y0 canvas x0 y0 image
+      $image_ convert coords $x1 $y1 canvas x1 y1 image
+      
+      set w [expr int(abs($x1-$x0))]
+      set h [expr int(abs($y1-$y0))]
+      
+      #  Nothing on canvas, so nothing to do.
+      if { $w == 0 || $h == 0 } {
+         return
+      }
+      
+      if { $autofill_ } {
+         set xf [expr min(150,int($cw/$w))]
+         set yf [expr min(150,int($ch/$h))]
+
+         if { $xf == 0 } {
+            set xf [expr -$w/$cw]
+            if {$xf >= -1} {
+               set xf 2
+            }
+         }
+         if { $yf == 0 } {
+            set yf [expr -$h/$ch]
+            if {$yf >= -1} {
+               set yf 2
+            }
+         }
+
+         #  Straight to the image, autoscale should be in effect
+         #  and nothing else understands differing scales (so can
+         #  get callback loop).
+         $image_ scale $xf $yf
+         
+      } else {
+         
+         set factor [expr {min(150,min($cw/$w, $ch/$h))}]
+         if {$factor == 0} {
+            set factor [expr {-max(($w-1)/$cw+1, ($h-1)/$ch+1)}]
+            if {$factor >= -1} {
+               set factor 1
+            }
+         }
+         scale $factor $factor
+      }
+   }
+
    #  Configuration options.
    #  ======================
 
@@ -1245,6 +1328,12 @@ itcl::class gaia::GaiaImageCtrl {
       }
    }
 
+   #  Whether to autofill new images to fit window. Also applies first
+   #  time regardless.
+   itk_option define -autofill autofill AutoFill 0 {
+      autofill_
+   }
+
    #  Additional text for the title. Used to mark different instances.
    itk_option define -ident ident Ident {}
 
@@ -1272,6 +1361,9 @@ itcl::class gaia::GaiaImageCtrl {
    #  Last zoom factor stack.
    protected variable lastzoom_
    protected variable nlastzoom_ 0
+
+   #  Autofill value for fit_to_fill method tweaks.
+   protected variable autofill_ 0
 
    #  Common variables:
    #  =================

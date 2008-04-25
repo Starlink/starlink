@@ -907,6 +907,9 @@ itcl::class gaia::GaiaCube {
 
       #  Update the coordinate label, if needed.
       update_coord_label_
+
+      #  Update everything to make sure we don't get partial image refreshes.
+      update idletasks
    }
 
    #  Set the position of a reference line shown in the plot.

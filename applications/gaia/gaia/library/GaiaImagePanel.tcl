@@ -21,8 +21,9 @@
 #     {enter_new_authors_here}
 
 #  Copyright:
-#     Copyright (C) 1998 Central Laboratory of the Research Councils
+#     Copyright (C) 1998 Central Laboratory of the Research Councils.
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2008 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -700,6 +701,22 @@ itcl::class gaia::GaiaImagePanel {
          -command [code $this updateValues]
    }
 
+
+   #  Disable the interchange facility, potentially undoing the current
+   #  state.
+   public method disable_interchange {undo} {
+      set rotate [$itk_component(trans) component rotate]
+      set v [$rotate cget -variable]
+      if { [set ::$v] } {
+         set ::$v 0
+      }
+      $rotate configure -state disabled
+   }
+
+   #  Enable the interchange facility.
+   public method enable_interchange {} {
+      [$itk_component(trans) component rotate] configure -state normal
+   }
 
    #   Define the fonts as the RtdImagePanel ones are not available on
    #   all Linux systems.

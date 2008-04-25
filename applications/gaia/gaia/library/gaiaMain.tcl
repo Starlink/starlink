@@ -144,7 +144,7 @@ foreach fullname [$props get_named_keys Gaia] {
    if { [gaia::GaiaStartup::check_option $option] && $value != {} } {
       set argv [linsert $argv 0 "-$option" "$value"]
    } else {
-      puts stderr "Warning: rejected session persistent option: -$option $value"
+      puts stderr "Warning: rejected incompatible session persistent option: -$option $value"
    }
 }
 

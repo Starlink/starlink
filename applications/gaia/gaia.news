@@ -12,6 +12,16 @@
     grid coordinates, but they include the NDF origin and are integer
     values.
 
+    An experimental "autofill" option has been introduced. This works 
+    like "autoscale", but allows the X and Y scale factors to differ
+    so that the image fills the main display. This option has several
+    known issues, like graphics overlays will not always be drawn 
+    correctly and you cannot interchange the X and Y axes, but should
+    be useful for long thin images and cube planes as coordinates readout 
+    and spectral extraction will work. Enable this using the  
+    "Options->Auto fill" item or by using the "-autofill 1" command-line
+    option.
+
     Contour and grid overlay lines can now be drawn in dotted and 
     dashed styles.
 
