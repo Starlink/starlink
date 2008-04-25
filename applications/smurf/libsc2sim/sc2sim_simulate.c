@@ -266,6 +266,8 @@
 *        Fix strncpy usage.
 *     2008-04-18 (AGG):
 *        Use transmission for current wavelength to get atmospheric power
+*     2008-04-25 (AGG):
+*        Add loop over focus positions
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -424,6 +426,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   char flatname[8][SC2STORE_FLATLEN];/* flatfield algorithm names for
 					all subarrays */
   double *flatpar[8];             /* flatfield parameters for all subarrays */
+  size_t focidx;                  /* Focus position counter */
+  double focposn;                 /* SMU focus position */
   int frame;                      /* frame counter */
   int frameoffset;                /* Frame offset into time stream for current file */
   int frmperms;                   /* number of frames per microstep */
@@ -484,7 +488,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double start_time=0.0;          /* UTC time of start of current scan */
   char subarrays[8][80];          /* list of parsed subarray names */
   int subnum;                     /* Subarray number */
-  int subscanno;                  /* Sub-scan number (last number in output filanem)*/
+  int subscanno = 0;              /* Sub-scan number (last number in output filanem)*/
   double taiutc;                  /* Difference between TAI and UTC time (TAI-UTC s) */
   double tauCSO=0;                /* CSO zenith optical depth */
   float tbri[3];                  /* simulated wvm measurements */
@@ -943,6 +947,10 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   /* Number of output files per subarray */
   noutfiles = inx->nmicstep * chunks;
 
+  /* Loop over number of SMU (focus) positions */
+  for ( focidx = 0; focidx < inx->nfocstep; focidx++ ) {
+    focposn = inx->focstart + (double)focidx * inx->focstep;
+
   /* loop over microsteps */
   for ( curms = 0; curms < inx->nmicstep; curms++ ) {
     sc2sim_instap_calc( inx, curms, instap, status );
@@ -957,7 +965,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     lastframe = maxwrite;
 
     /* Sub-scan number to write into filename */
-    subscanno = (curms * chunks) + curchunk + 1;
+    subscanno++;
     if ( subscanno == noutfiles ) {
       obsend = 1;
     }
@@ -1244,8 +1252,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
             sc2sim_simframe ( *inx, *sinx, astnaxes, astscale, 
 			      astdata->pntr[0], atmnaxes, atmscale, 
 			      atmdata->pntr[0], coeffs, fs, heater, nbol, 
-			      curframe, nterms, noisecoeffs, pzero, samptime, 
-			      timesincestart, sinx->telemission, weights, 
+			      focposn, curframe, nterms, noisecoeffs, pzero, samptime, 
+			      timesincestart, weights, 
 			      sky2map, xbolo, ybolo, xbc, ybc, 
 			      &(posptr[curframe*2]), 
                               &(dbuf[(k*nbol*maxwrite) + (nbol*frame)]), 
@@ -1465,7 +1473,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
 
             msgSetc( "FILENAME", filename );
-            msgOut(" ", "Writing ^FILENAME", status ); 
+            msgOutif(MSG__NORM, "", "  Writing ^FILENAME", status ); 
 
 	    /* Calculate OBSID */
 	    date_hr = (int)(date_df * 24);
@@ -1499,7 +1507,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 			      flatpar[k], INSTRUMENT, filter, dateobs, obsid,
 			      &(posptr[frameoffset*2]), jigsamples, 
                               &(jigpat[0]), obscounter,
-			      subscanno, obsend, inx->obstype, utdate, 
+			      subscanno, obsend, utdate, 
 			      head[0].tcs_az_bc1, 
 			      head[lastframe-1].tcs_az_bc1,
 			      head[0].tcs_az_bc2, 
@@ -1508,9 +1516,6 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 			      totaltime, exptime, nimage, 
 			      sinx->tauzen, sinx->tauzen,
 			      status);
-
- 	    msgSetc( "FILENAME", filename );
-	    msgOut(" ", "Done ^FILENAME", status );
 
 	  }/* if status OK */
 
@@ -1525,13 +1530,13 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 	curms = inx->nmicstep;
       } 
      
-    }/* for all frames in this chunk */
+    }/* For all frames in this chunk */
    
-  }/* for each chunk */
-  } /* for each microstep */
+  } /* For each chunk */
+  } /* For each microstep */
+  } /* For each focus position */
 
-  /* Release memory. */
-
+  /* Release memory */
   /* Free buffers that get allocated for each subarray */
   for ( k = 0; k < narray; k++ ) {
 
