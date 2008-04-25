@@ -494,8 +494,7 @@ void sc2sim_get_recipe ( const struct sc2sim_obs_struct *inx, char *recipe,
 			 int *status );
 
 void sc2sim_get_drgroup ( const struct sc2sim_obs_struct *inx, const char *filter, 
-			  const char *object, const char *dateobs, char *drgroup, 
-			  int *status );
+			  const char *object, char *drgroup, int *status );
 
 void sc2sim_heatrun ( struct sc2sim_obs_struct *inx, 
                       struct sc2sim_sim_struct *sinx, 
