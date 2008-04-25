@@ -817,7 +817,7 @@ void smf_reorderr( float *in, int ndim, int *dims, int axis, int *index, int max
 void smf_reorderi( int *in, int ndim, int *dims, int axis, int *index, int maxis, int *mask, int *out, int *status );
 void smf_reorderd( double *in, int ndim, int *dims, int axis, int *index, int maxis, int *mask, double *out, int *status );
 void smf_reorderc( char *in, int len, int ndim, int *dims, int axis, int *index, int maxis, int *mask, char *out, int *status );
-void smf_updateprov( int ondf, smfData *data, int *status );
+void smf_updateprov( int ondf, smfData *data, int indf, const char *creator, int *status );
 
 void smf_fits_setL( const smfHead *hdr, const char *name, int value, 
 		    const char *comment, int overwrite, int *status );

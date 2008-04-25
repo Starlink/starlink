@@ -710,7 +710,7 @@ void smurf_timesort( int *status ) {
          datAnnul( &loc1, status );
    
 /* Record indf1 as a direct parent of indf2. */
-         ndgPtprv( indf2, indf1, NULL, 0, "SMURF:TIMESORT", status );
+         smf_updateprov( indf2, NULL, indf1, "SMURF:TIMESORT", status );
    
 /* End the AST and NDF contexts for this pair of input and output NDFs. */
          ndfEnd( status );
@@ -1388,8 +1388,8 @@ void smurf_timesort( int *status ) {
       
 /* Record each input NDF as a direct parent of indf2. */
                for( isubscan = 0; isubscan < nsubscan; isubscan++ ) {
-                  ndgPtprv( indf2, ndfid[ isubscan ], NULL, 0, "SMURF:TIMESORT", 
-                            status );
+                  smf_updateprov( indf2, NULL, ndfid[ isubscan ], 
+                                  "SMURF:TIMESORT", status );
                }
          
 /* Reduce the number of time slices remaining to be written out. */

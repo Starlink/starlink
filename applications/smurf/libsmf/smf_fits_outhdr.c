@@ -24,8 +24,9 @@
 *        call to this routine (it will then be populated with a copy of
 *        the first inhdr).
 *     obsidmap = AstKeyMap ** (Given & Returned)
-*        Keymap for tracking OBSID information. *obsidmap hould be NULL 
-*        for the first call to this routine.
+*        Keymap for tracking OBSID information. *obsidmap should be NULL 
+*        for the first call to this routine. Also, the supplied pointer 
+*        itself may be NULL, in which case no KeyMap is created.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -53,6 +54,8 @@
 *        OBSID and SUBSYSNR if OBSID is missing.
 *     2008-03-27 (DSB):
 *        Use smf_getobsidss to determine the OBSIDSS value.
+*     2008-04-25 (DSB):
+*        Allow a NULL pointer to be supplied for "obsidmap".
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -105,7 +108,7 @@ void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
    header for the output NDF. Also create the output key map at this point. */
    if( *outhdr == NULL ) {
       *outhdr = astCopy( inhdr );
-      *obsidmap = astKeyMap( "" );
+      if( obsidmap ) *obsidmap = astKeyMap( "" );
 
 /* If this is not the first file, merge the input NDF's FITS extension
    into the output NDF's FITS extension by removing any headers from the
@@ -121,5 +124,6 @@ void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
    header so that we do not risk losing the value after merging of the
    FITS headers. CADC require that it is OBSIDSS that is unique and the
    thing that should be tracked. */
-   astMapPut0I( *obsidmap, smf_getobsidss( inhdr, status ), 1, NULL );
+   if( obsidmap ) astMapPut0I( *obsidmap, smf_getobsidss( inhdr, status ), 1, 
+                               NULL );
 }

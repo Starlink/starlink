@@ -13,13 +13,20 @@
 *     C function
 
 *  Invocation:
-*     void smf_updateprov( int ondf, smfData *data, int *status )
+*     void smf_updateprov( int ondf, smfData *data, int indf, 
+*                          const char *creator, int *status )
 
 *  Arguments:
 *     ondf = int (Given)
 *        The output NDF identifier.
 *     data = smfData * (Given)
-*        Pointer to the structure describing the current input NDF.
+*        Pointer to the structure describing the current input NDF. If
+*        NULL, then the "indf" is used instead.
+*     indf = int (Given)
+*        NDF identifier for the current input NDF. Only accessed if "data"
+*        is NULL.
+*     creator = const char * (Given)
+*        A string such as "SMURF:MAKECUBE" indicating the calling app.
 *     status = int * (Given and Returned)
 *        Inherited status value. 
 
@@ -39,6 +46,10 @@
 *        Use smf_getobsidss to get the OBSIDSS value from the FitsChan.
 *        This means that an OBSIDSS value can be formed from OBSID and 
 *        SUBSYSNR headers if OBSIDSS is not present in the FitsChan.
+*     25-APR-2008 (DSB):
+*        Added "indf" and "creator" arguments. Changed to retain
+*        information about ancestors if one of the ancestors refers to 
+*        the OBSIDSS value of the input NDF.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -74,35 +85,85 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-void smf_updateprov( int ondf, smfData *data, int *status ){
+void smf_updateprov( int ondf, smfData *data, int indf, const char *creator,
+                     int *status ){
 
 /* Local Variables */
+   AstFitsChan *fc = NULL;      /* AST FitsChan holding input FITS header */
    HDSLoc *cloc = NULL;         /* Locator for HDS component */
+   HDSLoc *prov = NULL;         /* Locator for ancestor provenance info */
    HDSLoc *tloc = NULL;         /* Locator for temp HDS storage */
+   char value[ 256 ];           /* Buffer for ancestor's OBSIDSS value */
    const char *obsidss = NULL;  /* OBSIDSS value in input file */
+   int found;                   /* Was OBSIDSS value found in an input ancestor? */
+   int ianc;                    /* Ancestor index */
+   int isroot;                  /* Ignore any ancestors in the input NDF? */
+   int there;                   /* Was the required component found? */
 
 /* Check the inherited status */
    if( *status != SAI__OK ) return;
 
-/* Get the OBSIDSS keyword value from the input FITS header. If found,
-   put it in an HDS structure that will be stored with the output
-   provenance information. */
-   obsidss =  smf_getobsidss( data->hdr->fitshdr, status );
+/* Get a FitsChan holding the contents of the input NDF FITS extension. */
+   if( !data ) {
+      kpgGtfts( indf, &fc, status );
+   } else {
+      fc = data->hdr->fitshdr;
+   }
+
+/* Get the input NDF identifier. */
+   if( data ) indf = data->file->ndfid;
+
+/* Initially, assume that we should include details of ancestor NDFs. */
+   isroot = 0;
+
+/* Get the OBSIDSS keyword value from the input FITS header. */
+   obsidss =  smf_getobsidss( fc, status );
    if( obsidss ) {
-      datTemp( "MORE", 0, NULL, &tloc, status );
-      datNew0C( tloc, "OBSIDSS", strlen( obsidss ), status );
-      datFind( tloc, "OBSIDSS", &cloc, status );
-      datPut0C( cloc, obsidss, status );
-      datAnnul( &cloc, status );
+
+/* Search through all the ancestors of the input NDF (including the input
+   NDF itself) to see if any of them refer to the same OBSIDSS value. */
+      found = 0;
+      ianc = 0; 
+      ndgGtprv( indf, ianc, &prov, status );
+      while( prov ) {
+         datThere( prov, "MORE", &there, status );
+         if( there ) {
+            datFind( prov, "MORE", &tloc, status );
+            datThere( tloc, "OBSIDSS", &there, status );
+            if( there ) {
+               datFind( tloc, "OBSIDSS", &cloc, status );
+               datGet0C( cloc, value, 255, status );
+               found = !strcmp( obsidss, value );
+               datAnnul( &cloc, status );
+            }
+            datAnnul( &tloc, status );
+         }
+         datAnnul( &prov, status );
+         if( ! found ) ndgGtprv( indf, ++ianc, &prov, status );
+      }
+
+/* If the OBSIDSS value was not found in any ancestor, then we add it
+   now. So put the OBSIDSS keyword value in an HDS structure that will be 
+   stored with the output provenance information. */
+      if( ! found ) {
+         datTemp( "MORE", 0, NULL, &tloc, status );
+         datNew0C( tloc, "OBSIDSS", strlen( obsidss ), status );
+         datFind( tloc, "OBSIDSS", &cloc, status );
+         datPut0C( cloc, obsidss, status );
+         datAnnul( &cloc, status );
+
+/* Ignore ancestor NDFs if none of them referred to the correct OBSIDSS. */
+         isroot = 1;
+      } 
    }
 
 /* Update the provenance for the output NDF to include the input NDF as
    an ancestor. Indicate that each input NDF is a root NDF (i.e. has no 
    parents). */
-   ndgPtprv( ondf, data->file->ndfid, tloc, 1, "SMURF:MAKECUBE", status );
+   ndgPtprv( ondf, indf, tloc, isroot, creator, status );
 
 /* Free resources. */
    if( tloc ) datAnnul( &tloc, status );
-
+   if( !data ) fc = astAnnul( fc );
 }
 

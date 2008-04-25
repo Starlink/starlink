@@ -581,17 +581,6 @@
 *     TSYS array (also stored in the SMURF extension of the output NDF). If 
 *     any of these values cannot be calculated for any reason, the 
 *     corresponding FITS keyword is assigned a blank value.
-*     - FITS keywords OBSCNT and OBSnnnnn are added to the output FITS
-*     extension. These allow for tracking of OBSID FITS headers from the
-*     input files. If the OBSID FITS header exists in input files, unique
-*     ones from the set of input files are stored in the OBSnnnnn headers,
-*     where nnnnn is a zero-padded integer starting at 1. OBSCNT contains
-*     the count of unique input OBSID headers. If none of the input files
-*     contain an OBSID header, then OBSCNT will exist in the output file
-*     with a value of 0, and no OBSnnnnn headers will exist.
-*     - FITS keywords PRVCNT and PRVnnnnn are added to the output FITS
-*     header. These are simply the names of all the input files included
-*     in the output map. PRVCNT indicates how many files are present.
 *     - FITS keywords NUMTILES and TILENUM are added to the output FITS
 *     header. These are the number of tiles used to hold the output data,
 *     and the index of the NDF containing the header, in the range 1 to
@@ -758,6 +747,10 @@
 *        - Display the bin angle for each polarisation bin.
 *     10-APR-2008 (DSB):
 *        Add parameter OUTFILES.
+*     25-APR-2008 (DSB):
+*        Do not put OBSxxx and PRVxxx keywords into the output NDF FITS
+*        extensions any more since ndf2fits now creates these on the basis 
+*        of the PROVENANCE extenson.
 
 *  Copyright:
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
@@ -831,8 +824,6 @@ void smurf_makecube( int *status ) {
    AstFrameSet *wcsout2d = NULL;/* WCS Frameset describing 2D spatial axes */
    AstFrameSet *wcstile = NULL;/* WCS Frameset for output tile */
    AstFrameSet *wcstile2d = NULL;/* WCS Frameset describing 2D spatial axes */
-   AstKeyMap *obskeymap = NULL;  /* KeyMap to hold unique OBSnnnn headers */
-   AstKeyMap *prvkeymap = NULL;  /* KeyMap to hold unique PRVnnnn headers */
    AstMapping *oskymap = NULL;/* GRID->SkyFrame Mapping from output WCS */
    AstMapping *ospecmap = NULL;/* GRID->SpecFrame Mapping from output WCS */
    AstMapping *tmap = NULL;   /* Base->current Mapping from output WCS */
@@ -1659,9 +1650,6 @@ void smurf_makecube( int *status ) {
             }
          }
    
-/* Create provenance keymap */
-         prvkeymap = astKeyMap( "" );
-
 /* Find the last input file that contributes to the current output tile
    and polarisation bin. */
          ilast = 0;
@@ -1726,13 +1714,10 @@ void smurf_makecube( int *status ) {
                msgOutif( MSG__VERB, " ", "Processing ^FILE (^THISFILE/^NUMFILES)",
                          status );
 
-/* Store the filename in the keymap for later - the GRP would be fine
-   as is but we use a keymap in order to reuse smf_fits_add_prov */
-               smf_accumulate_prov( prvkeymap, data->file, NULL, 0, status );
-
 /* Update the provenance for the output NDF to include the input NDF as
    an ancestor. */
-               smf_updateprov( ondf, data, status );
+               smf_updateprov( ondf, data, NDF__NOID, "SMURF:MAKECUBE", 
+                               status );
 
 /* Check that the input data type is single precision. */
                if( data->dtype != SMF__FLOAT ) {
@@ -1754,7 +1739,7 @@ void smurf_makecube( int *status ) {
                }
          
 /* Handle output FITS header creation/manipulation */
-               smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obskeymap, status );
+               smf_fits_outhdr( data->hdr->fitshdr, &fchan, NULL, status );
          
 /* Rebin the data into the output grid. */
                if( !sparse ) {
@@ -2012,11 +1997,6 @@ void smurf_makecube( int *status ) {
          atlPtftr( fchan, "EFF_TIME", median, 
                    "[s] Median MAKECUBE effective integration time", status );
 
-/* Retrieve the unique OBSID keys from the KeyMap and populate the OBSnnnnn
-         and OBSCNT headers from this information. */
-         smf_fits_add_prov( fchan, "OBS", obskeymap, status ); 
-         smf_fits_add_prov( fchan, "PRV", prvkeymap, status ); 
-      
 /* Free the second work array amd histogram array. */
          work2_array = astFree( work2_array );
          hist = astFree( hist );
