@@ -61,6 +61,8 @@
 *        Fix bug in getting AZ demand coordinates.
 *     2008-04-08 (JB):
 *        Convert sample time to days before adding to TAI.
+*     2008-04-25 (JB):
+*        enviro_air_temp should be tamb.
 
 
 *  Copyright:
@@ -170,9 +172,7 @@ void gsdac_putJCMTStateS ( const gsdVars *gsdVars,
     arrayIndex = subBandNum;
   }
 
-  /* Set the enviro_air_temp to the correct value from the
-     TSKY array. */
-  record->enviro_air_temp = gsdVars->skyTemps[arrayIndex];
+  record->enviro_air_temp = gsdVars->tamb;
 
   record->fe_doppler = gsdVars->restFreqs[subBandNum] / 
                ( record->fe_lofreq + gsdVars->totIFs[subBandNum] );
