@@ -52,6 +52,8 @@
 *        Don't set status to SAI__ERROR if already bad.
 *     2008-04-22 (JB):
 *        Move flagging of bad values to gsdac_flagBad.
+*     2008-04-25 (JB):
+*        Check for presence of C3MIXNUM array.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -627,9 +629,6 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
   /* Get the subband overlaps. */
   gsdac_get1r ( gsd, "C3OVERLAP", gsdVars->sbOverlaps, status );
 
-  /* ?? */
-  gsdac_get1i ( gsd, "C3MIXNUM", gsdVars->mixNums, status );
-
   /* Get the number of BE input channels for each section. */
   gsdac_get1i ( gsd, "C3BESCONN", gsdVars->BEInputChans, status );
   
@@ -645,6 +644,46 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
 
   /* Get the centre frequencies. */
   gsdac_get1d ( gsd, "C12CF", gsdVars->centreFreqs, status );
+
+  /* Try to get the C3MIXNUM array.  If this array is not present
+     warn the user and try to figure out how many receptors were 
+     used from the centreFreqs.  */
+  if ( *status == SAI__OK ) {
+
+    gsdac_get1i ( gsd, "C3MIXNUM", gsdVars->mixNums, status );
+
+    if ( *status != SAI__OK ) {
+
+      errAnnul ( status );
+      msgOutif(MSG__VERB," ", "Could not find GSD C3MIXNUM array, attempting to use BES_NUOBS to determine how many receptors were used", status); 
+
+      /* If there's only one subband, let's assume that the 
+         first receptor was used. */
+      if ( gsdVars->nBESections == 1 ) gsdVars->mixNums[0] = 1;
+
+      else {
+
+        /* Check to see if the centreFreqs match, if so, it's 
+           likely there were two receptors used.  Otherwise, 
+           probably one receptor was used. */        
+        if ( gsdVars->centreFreqs[0] == 
+             gsdVars->centreFreqs[gsdVars->nBESections/2] ) {
+       
+          for ( i = 0; i < gsdVars->nBESections / 2; i++ ) {
+            gsdVars->mixNums[i] = 1;
+            gsdVars->mixNums[i + gsdVars->nBESections/2] = 2;
+	  }
+
+	} else {
+
+          for ( i = 0; i < gsdVars->nBESections; i++ ) {
+            gsdVars->mixNums[i] = 1;
+	  }
+
+	}
+      }
+    }
+  }
 
   /* Get the rest frequencies. */
   gsdac_get1d ( gsd, "C12RF", gsdVars->restFreqs, status );
