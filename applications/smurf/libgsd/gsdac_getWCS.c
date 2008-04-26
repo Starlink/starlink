@@ -44,20 +44,6 @@
 *    This routine calculates the pointing, time, and airmass 
 *    values to fill the JCMTState. NOTE: adequate memory for the
 *    arrays must be allocated prior to calling this function.
-*
-*    A note on converting from CELL (in GSD) to GRID (in ATL):
-*    CELL coordinates set 0,0 to the centre of the grid, and other
-*    cells are defined with positive and negative coordinates around
-*    this centre.  GRID coordinates use 1,1 as the centre of the 
-*    grid, so cell offsets must be adjusted accordingly.  Example:
-*
-*    CELL:  -1, 1    0, 1    1, 1
-*           -1, 0    0, 0    1, 0
-*           -1,-1    0,-1    1,-1
-*
-*    GRID:   0, 2    1, 2    2, 2
-*            0, 1    1, 1    2, 1
-*            0, 0    1, 0    2, 0  
 
 *  Authors:
 *     J.Balfour (UBC)
@@ -105,6 +91,8 @@
 *        Use frequencies from matchFreqs for refchan/IF.
 *     2008-04-24 (JB):
 *        Fix calculation of TCS_TR_ANG.
+*     2008-04-25 (JB):
+*        Update TCS_TAI to match frameset.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -205,7 +193,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   sec = ( ( ( gsdVars->obsUT1h - hour ) * 60.0 ) - min ) * 60.0;
 
   /* Set up the timeframe. */
-  tFrame = astTimeFrame ( "timescale=UT1" );
+  tFrame = astTimeFrame ( "TimeScale=UT1" );
 
   astSet ( tFrame, "TimeOrigin=%04d-%02d-%02dT%02d:%02d:%f", 
            year, month, day, hour, min, sec );
@@ -230,9 +218,9 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   LSTFrame = astCopy ( tFrame );
 
   /* Get the LST start. */
-  astSet ( LSTFrame, "timescale=LAST" );
+  astSet ( LSTFrame, "TimeScale=LAST" );
 
-  LSTStart = astGetD ( LSTFrame, "timeOrigin" );
+  LSTStart = astGetD ( LSTFrame, "TimeOrigin" );
 
   /* Get the LST in hours. */
   LSTStart = ( LSTStart - (int)LSTStart ) * 24.0;
@@ -252,10 +240,6 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
       *status = SAI__ERROR;
       errRep ( FUNC_NAME, "Equatorial coordinates not supported", status );
       return;
-      /*wcs->baseTr1 = gsdVars->obsLST - 
-	               ( gsdVars->centreDec * 24.0 / 360.0 );
-      if ( wcs->baseTr1 < 0 ) wcs->baseTr1 += 24.0;
-      wcs->baseTr2 = gsdVars->centreEl;*/
       break;
     case COORD_RD:
       wcs->baseTr1 = gsdVars->centreRA * AST__DD2R;
@@ -317,23 +301,22 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   if ( dLST < 0 ) dLST = dLST + 1.0;
 
   /* Get the start TAI. */
-  astSet ( tFrame, "timescale=TAI" );  
+  astSet ( tFrame, "TimeScale=TAI" );  
 
   TAIStart = astGetD ( tFrame, "TimeOrigin" );
 
-  /* Correct for difference between solar and sidereal time. */
-  wcs->tai = TAIStart + ( dLST / SOLSID );
-
   /* Get the idate and itime.  We need to convert the time for this
-     step to UTC and get the correct formatting. */
-  astSetD ( tFrame, "TimeOrigin", wcs->tai );
+     step to UTC and get the correct formatting.  The time origin is 
+     the starting TAI time plus the LST offset (corrected for the
+     difference between solar and sidereal time). */
+  astSetD ( tFrame, "TimeOrigin", TAIStart + ( dLST / SOLSID ) );
 
-  astSet ( tFrame, "timescale=UTC" );
+  astSet ( tFrame, "Timescale=UTC" );
 
   UTCTime = astGetD ( tFrame, "TimeOrigin" );
 
   UTCFrame = astCopy ( tFrame );
-  astClear ( UTCFrame, "timeOrigin" );
+  astClear ( UTCFrame, "TimeOrigin" );
 
   astSet ( UTCFrame, "format(1)=iso.2" );
   UTCString = astFormat ( UTCFrame, 1, UTCTime );
@@ -354,7 +337,7 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   datePointing = astKeyMap( "" );
   cellMap = astKeyMap( "" ); 
 
-  /*if ( subBandNum == 0 && DEBUGON ) printf ( "CENTRE (base) RA_DEC (radians) : %f %f\n", wcs->baseTr1, wcs->baseTr2 );*/
+  if ( subBandNum == 0 && DEBUGON ) printf ( "CENTRE (base) RA_DEC (radians) : %f %f\n", wcs->baseTr1, wcs->baseTr2 );
 
   /* Fill the keymaps from the input GSD. */
   astMapPut0I ( datePointing, "JFREST(1)",
@@ -402,14 +385,14 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
   astSet ( *WCSFrame, "DUT1(1)=%f,DUT1(3)=%f", dut1, dut1 );
 
   if ( subBandNum == 0 && DEBUGON ) 
-   printf("Epoch = %s MJD=%f\n",astGetC(*WCSFrame,"Epoch"),
-           slaEpj2d(astGetD(*WCSFrame,"Epoch")));
+    printf("Epoch = %s MJD=%f\n",astGetC(*WCSFrame,"Epoch"),
+            slaEpj2d(astGetD(*WCSFrame,"Epoch")));
 
   /* Update TCS_TAI to match frameset. */
-  TAIFrame = astTimeFrame ( "timescale=UTC" );
-  astSetD ( TAIFrame, "timeOrigin", slaEpj2d(astGetD(*WCSFrame,"Epoch") ) );
-  astSet ( TAIFrame, "timescale=TAI" );
-  wcs->tai = astGetD ( TAIFrame, "timeOrigin" );
+  TAIFrame = astTimeFrame ( "TimeScale=TDB,System=JEPOCH" );
+  astSetD ( TAIFrame, "TimeOrigin", astGetD ( *WCSFrame, "Epoch" ) );
+  astSet ( TAIFrame, "System=MJD,TimeScale=TAI" );
+  wcs->tai = astGetD ( TAIFrame, "TimeOrigin" );
 
   /* Make a copy of the frameset for local calculations. */
   frame = astCopy ( *WCSFrame );
@@ -431,13 +414,13 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   astNorm ( frame, coordOut );
 
-  /*if ( subBandNum == 0 && DEBUGON ) 
+  if ( subBandNum == 0 && DEBUGON ) 
     printf ( "GRID (base) coordinates  : %f %f\n", 
              coordIn[0], coordIn[1] );
 
   if ( subBandNum == 0 && DEBUGON ) 
     printf ( "RA/Dec (base) coordinates (radians)  : %f %f\n", 
-    coordOut[0], coordOut[1] );*/
+             coordOut[0], coordOut[1] );
 
   wcs->baseTr1 = coordOut[0];
   wcs->baseTr2 = coordOut[1];
@@ -450,13 +433,13 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   astNorm ( frame, coordOut );
 
-  /*if ( subBandNum == 0 && DEBUGON ) 
+  if ( subBandNum == 0 && DEBUGON ) 
     printf ( "GRID (offset) coordinates  : %f %f\n", 
              coordIn[0], coordIn[1] );
 
   if ( subBandNum == 0 && DEBUGON ) 
     printf ( "RA/Dec (offset) coordinates (radians)  : %f %f\n", 
-    coordOut[0], coordOut[1] );*/
+             coordOut[0], coordOut[1] );
 
   wcs->acTr1 = coordOut[0];
   wcs->acTr2 = coordOut[1];
@@ -471,13 +454,13 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   astNorm ( frame, coordOut );
 
-  /*if ( subBandNum == 0 && DEBUGON ) 
+  if ( subBandNum == 0 && DEBUGON ) 
     printf ( "GRID (base) coordinates  : %f %f\n", 
              coordIn[0], coordIn[1] );
 
   if ( subBandNum == 0 && DEBUGON ) 
     printf ( "AZEL (base) coordinates (radians)  : %f %f\n", 
-    coordOut[0], coordOut[1] );*/
+             coordOut[0], coordOut[1] );
 
   wcs->baseAz = coordOut[0];
   wcs->baseEl = coordOut[1];
@@ -490,13 +473,13 @@ void gsdac_getWCS ( const gsdVars *gsdVars, const unsigned int stepNum,
 
   astNorm ( frame, coordOut );
 
-  /*if ( subBandNum == 0 && DEBUGON ) 
+  if ( subBandNum == 0 && DEBUGON ) 
     printf ( "GRID (offset) coordinates  : %f %f\n", 
              coordIn[0], coordIn[1] );
 
   if ( subBandNum == 0 && DEBUGON ) 
     printf ( "AZEL (offset) coordinates (radians)  : %f %f\n", 
-    coordOut[0], coordOut[1] );*/
+             coordOut[0], coordOut[1] );
 
   wcs->acAz = coordOut[0];
   wcs->acEl = coordOut[1];
