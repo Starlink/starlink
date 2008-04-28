@@ -871,7 +871,7 @@ int hlpRepsub ( int ( * nametr ) ( int, char*, int, char* ),
       /* Yes: load the output buffer with the current subtopic's name. */
 
       /* First check if there will be room for it. */
-         if ( ic + hlpLength ( name ) > maxind ) {
+         if ( ic + hlpLength ( name ) >= maxind ) {
 
          /* There is not: display the current contents of the buffer. */
             if ( hlpLinout ( outsub, lout, indent, hlpTrim ( outbuf ) ) != 1 )
