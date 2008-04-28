@@ -290,6 +290,9 @@
 *        -Added maxmem to smf_iteratemap
 *     2008-04-28 (AGG):
 *        Add meansky parameter to smf_subtract_plane1/2
+*     2008-04-28 (EC):
+*        -Added maxconcatlen to smf_grp_related interface
+*        -Added smf_checkmem_dimm
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -532,8 +535,9 @@ HDSLoc *smf_get_xloc ( const smfData *data, const char *extname,
 			const char *extype, const char *accmode, 
 			const int ndims, const int *dims, int *status );
 
-void smf_grp_related( Grp *igrp, const int grpsize, const int grpbywave, 
-		      dim_t maxlen, smfGroup **group, int *status );
+void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
+                       dim_t maxlen, dim_t *maxconcatlen, smfGroup **group,
+                       int *status );
 
 void smf_history_add( smfData* data, const char * appl, 
 			const char * text, int *status);
@@ -915,6 +919,11 @@ int *smf_find_median( float *farray, double *darray, int nel,
 
 void smf_checkmem_map( const int *lbnd, const int *ubnd, int rebin, 
 		       size_t available, size_t *necessary, int *status );
+
+
+void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
+                        smf_modeltype *modeltyps, dim_t nmodels,
+                        size_t available, size_t *necessary, int *status );
 
 
 #endif /* SMF_DEFINED */

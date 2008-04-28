@@ -139,6 +139,8 @@
 *     2008-04-24 (EC):
 *        - Improved status checking
 *        - extra checks for valid pointers before exporting model components
+*     2008-04-28 (EC):
+*        - Added memory usage check
 
 *  Notes:
 
@@ -182,6 +184,7 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
+#include "jcmt/state.h"
 
 /* Other includes */
 #include "sys/time.h"
@@ -196,7 +199,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 		     double *weights, int *status ) {
 
   /* Local Variables */
-  unsigned int aiter;           /* Actual iterations of sigma clipper */
+  size_t aiter;                 /* Actual iterations of sigma clipper */
   smfArray **ast=NULL;          /* Astronomical signal */
   double *ast_data=NULL;        /* Pointer to DATA component of ast */
   smfGroup *astgroup=NULL;      /* smfGroup of ast model files */
@@ -231,10 +234,12 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
   smfGroup *lutgroup=NULL;      /* smfGroup of lut model files */
   unsigned char mask;           /* Bitmask for QUALITY flags */
+  dim_t maxconcat;              /* Longest continuous chunk length in samples*/
   int maxiter=0;                /* Maximum number of iterations */
   dim_t maxlen;                 /* Max chunk length in samples */
   double maxlen_s;              /* Max chunk length in seconds */  
   int memiter=0;                /* If set iterate completely in memory */
+  size_t memneeded;             /* Memory required for map-maker */
   smfArray ***model=NULL;       /* Array of pointers smfArrays for ea. model */
   smfGroup **modelgroups=NULL;  /* Array of group ptrs/ each model component */
   smf_modeltype *modeltyps=NULL;/* Array of model types */
@@ -245,9 +250,9 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   int nchunks=0;                /* Number of chunks within iteration loop */
   int ncontchunks=0;            /* Number continuous chunks outside iter loop*/
   int nmap;                     /* Number of elements mapped */
-  int nmodels=0;                /* Number of model components / iteration */
+  dim_t nmodels=0;              /* Number of model components / iteration */
   int numiter;                  /* Total number iterations */
-  int pass;                     /* Two pass parsing of MODELORDER */
+  size_t pass;                  /* Two pass parsing of MODELORDER */
   smfArray **qua=NULL;          /* Quality flags for each file */
   unsigned char *qua_data=NULL; /* Pointer to DATA component of qua */
   smfGroup *quagroup=NULL;      /* smfGroup of quality model files */
@@ -505,16 +510,45 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
      the files. Now added "chunk" to smfGroup as well -- this is used to
      concatenate _only_ continuous pieces of data */
 
-  smf_grp_related( igrp, isize, 1, maxlen, &igroup, status );
-  printf("Number of subarrays = %i\n", igroup->nrelated);
+  smf_grp_related( igrp, isize, 1, maxlen, &maxconcat, &igroup, status );
+
+  /* Once we've run smf_grp_related we know how many subarrays there
+     are.  We also know the maximum length of a concatenated piece of
+     data, and which model components were requested. Use this
+     information to check that enough memory is available. */
+
+  smf_checkmem_dimm( maxconcat, INST__SCUBA2, igroup->nrelated, modeltyps,
+		     nmodels, maxmem, &memneeded, status );
+
+  if( *status == SMF__NOMEM ) {
+    /* If we need too much memory, generate a warning message and then try
+       to re-group the files using smaller chunks */
+
+    errAnnul( status );
+    msgOut( " ", "SMF_ITERATEMAP: *** WARNING ***", status );
+    msgSeti( "LEN", maxconcat );
+    msgSeti( "AVAIL", maxmem/SMF__MB );
+    msgSeti( "NEED", memneeded/SMF__MB );
+    msgOut( " ", "^LEN continuous samples requires ^NEED Mb > ^AVAIL Mb", 
+	    status );
+    msgSeti( "TRY", (size_t) ((double) maxconcat * maxmem / memneeded) );
+    msgOut( " ", "Will try to re-group data in chunks < ^TRY samples long",
+	    status);
+    msgOut( " ", "SMF_ITERATEMAP: ***************", status );
+
+    /* Close igroup if needed before re-running smf_grp_related */
+
+    if( igroup ) {
+      smf_close_smfGroup( &igroup, status );
+    }
+
+    smf_grp_related( igrp, isize, 1, 
+		     (size_t) ((double) maxconcat * maxmem / memneeded),
+		     &maxconcat, &igroup, status );
+  }
 
 
   if( *status == SAI__OK ) {
-
-    /* Once we've run smf_grp_related we know how many subarrays there are.
-       We also know the value of maxlen, and which model components were
-       requested. Use this information to verify the required memory to
-       proceed. */
 
     if( memiter ) {
       /* only one concatenated chunk within the iteration loop */

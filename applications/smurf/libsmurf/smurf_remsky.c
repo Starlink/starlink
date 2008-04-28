@@ -51,6 +51,9 @@
 *        components
 *     2008-04-17 (EC):
 *        Modified smf_grp_related interface
+*     2008-04-18 (EC):
+*        Modified smf_grp_related interface
+*
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -174,7 +177,7 @@ void smurf_remsky( int * status ) {
       smf_close_file( &odata, status);
     }
     /* Group output files together now that they exist */
-    smf_grp_related( ogrp, outsize, 1, 0, &ogroup, status );
+    smf_grp_related( ogrp, outsize, 1, 0, NULL, &ogroup, status );
     if ( *status == SAI__OK ) {
       /* Open and process related files */
       for (i=0; i<ogroup->ngroups; i++) {

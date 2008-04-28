@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     smf_grp_related( Grp *igrp, const int grpsize, const int grpbywave, 
-*                      dim_t maxlen, smfGroup **group, int *status );
+*                      dim_t maxlen, dim_t *maxconcatlen, smfGroup **group, 
+*                      int *status );
 
 *  Arguments:
 *     igrp = Grp* (Given)
@@ -26,6 +27,9 @@
 *     maxlen = dim_t (Given)
 *        If set, maximum length of a continuous chunk in time samples. If 0
 *        don't enforce a maximum length.
+*     maxconcatlen = dim_t* (Returned)
+*        The actual length in time samples of the longest continuous chunk.
+*        Can be NULL.
 *     group = smfGroup ** (Returned)
 *        Returned smfGroup
 *     status = int* (Given and Returned)
@@ -81,6 +85,8 @@
 *        - fixed memory unallocation bug
 *     2008-04-24 (EC):
 *        - Determine actual nrelated for these data and store in smfGroup
+*     2008-04-28 (EC):
+*        - Added maxconcatlen to interface
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -136,7 +142,8 @@
 #define FUNC_NAME "smf_grp_related"
 
 void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave, 
-		       dim_t maxlen, smfGroup **group, int *status ) {
+		       dim_t maxlen, dim_t *maxconcatlen, smfGroup **group, 
+		       int *status ) {
 
   /* Local variables */
   dim_t *all_len = NULL;      /* Lengths of each chunk */
@@ -157,6 +164,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   int *keepchunk=NULL;        /* Flag for chunks that will be kept */
   double *lambda = NULL;      /* Wavelength - only used if grpbywave is true */
   int matchsubsys;            /* Flag for matched subarrays */
+  dim_t maxconcat=0;          /* Longest continuous chunk length */
   int maxnelem=0;             /* Max elem (subarrays) encountered */
   dim_t *nbolx = NULL;        /* Number of bolometers in X direction */
   dim_t *nboly = NULL;        /* Number of bolometers in Y direction */
@@ -334,6 +342,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   opentime = 0;
   writetime = 0;
   maxnelem = 0;
+  maxconcat = 0;
 
   for( i=0; i<ngroups; i++ ) {
     /* Open header of the first file at each time */
@@ -364,6 +373,11 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
 
       /* Add length to running total */
       totlen += thislen;
+
+      /* Update maxconcat */
+      if( totlen > maxconcat ) {
+	maxconcat = totlen;
+      }
     }
 
     if( i == 0 ) {
@@ -488,11 +502,12 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
      is shorter than SMF__MINCHUNKSAMP in length (time) and remove it */
 
   keepchunk = smf_malloc( ngroups, sizeof(*keepchunk), 0, status );
-  for( i=0; i<ngroups; i++ ) {
-    keepchunk[i] = 1;
-  }
 
   if( *status == SAI__OK ) {
+
+    for( i=0; i<ngroups; i++ ) {
+      keepchunk[i] = 1;
+    }
 
     totlen = all_len[0];
     chunkstart = 0;
@@ -545,6 +560,11 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
     
   *group = smf_construct_smfGroup( igrp, new_subgroups, new_chunk, new_ngroups,
 				   maxnelem, 0, status );
+
+  /* Return maxconcatlen if requested */
+  if( maxconcatlen ) {
+    *maxconcatlen = maxconcat; 
+  }
 
  CLEANUP:
   starts = smf_free( starts, status );
