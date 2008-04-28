@@ -175,6 +175,8 @@
 *     2008-04-16 (AGG):
 *        Remove exp_time and weights components to ensure QLMAKEMAP
 *        lives up to its name, add GENVAR parameter
+*     2008-04-28 (AGG):
+*        Write mean sky level to output parameter
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -246,6 +248,7 @@ void smurf_qlmakemap( int *status ) {
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   double *map = NULL;        /* Pointer to the rebinned map data */
   size_t mapsize;            /* Number of pixels in output image */
+  double meansky;            /* Mean sky level for current file */
   int moving = 0;            /* Flag to denote a moving object */
   int nparam = 0;            /* Number of extra parameters for pixel spreading scheme*/
   size_t nweights;           /* Number of elements in weights array */
@@ -255,6 +258,7 @@ void smurf_qlmakemap( int *status ) {
   int ondf = NDF__NOID;      /* output NDF identifier */
   AstFrameSet *outframeset = NULL; /* Frameset containing sky->output map mapping */
   int outsize;               /* Number of files in output group */
+  double overallmeansky = 0.0; /* Mean sky level across all input files */
   char pabuf[ 10 ];          /* Text buffer for parameter value */
   double params[ 4 ];        /* astRebinSeq parameters */
   double pixsize = 3.0;      /* Size of an output map pixel in arcsec */
@@ -361,7 +365,10 @@ void smurf_qlmakemap( int *status ) {
     smf_subtract_poly( data, NULL, 1, status );
 
     /* Remove a mean sky level - call low-level 1-D routine */
-    smf_subtract_plane1( data, "MEAN", status );
+    smf_subtract_plane1( data, "MEAN", &meansky, status );
+    if ( meansky != VAL__BADD ) {
+      overallmeansky += meansky;
+    }
 
     /* Correct for atmospheric extinction using the mean WVM-derived
        225-GHz optical depth */
@@ -370,17 +377,20 @@ void smurf_qlmakemap( int *status ) {
 
     msgOutif(MSG__VERB, " ", "SMURF_QLMAKEMAP: Beginning the REBIN step", status);
     /* Rebin the data onto the output grid */
-    smf_rebinmap(data, i, size, outframeset, spread, params, moving, genvar,
-		 lbnd_out, ubnd_out, map, variance, weights, status );
+    smf_rebinmap( data, i, size, outframeset, spread, params, moving, genvar,
+		  lbnd_out, ubnd_out, map, variance, weights, status );
 
     smf_close_file( &data, status );
   }
+
+  overallmeansky /= (double)size;
+  parPut0d("MEANSKY", overallmeansky, status);
 
   /* Write WCS FrameSet to output file */
   ndfPtwcs( outframeset, ondf, status );
 
   /* Free up weights array */
-  weights = smf_free( weights, status);
+  weights = smf_free( weights, status );
 
   /* Retrieve the unique OBSID keys from the KeyMap and populate the
      OBSnnnnn and PROVCNT headers from this information. */
