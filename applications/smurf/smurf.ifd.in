@@ -511,6 +511,14 @@ package @PACKAGE@ {
             helpkey *
           }
 
+          parameter meansky {
+            type _DOUBLE
+            access WRITE
+            vpath DEFAULT
+            default 0.0
+            helpkey *
+          }
+
 	  parameter msg_filter {
 	    type _CHAR
 	    prompt {Message level}
