@@ -13,13 +13,16 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_subtract_plane2( smfArray *array, const char *fittype, int *status ) 
+*     smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
+*                          int *status ) 
 
 *  Arguments:
 *     array = smfArray* (Given and Returned)
 *        Pointer to input array of related data structs
 *     fittype = char* (Given)
 *        Fit-type for PLANE sky-removal method
+*     meansky = double* (Returned)
+*        Mean sky level subtracted from signal
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -55,6 +58,8 @@
 *        smf_subtract_plane
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-04-28 (AGG):
+*        Return mean sky level subtracted
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -104,53 +109,52 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_subtract_plane2"
 
-void smf_subtract_plane2( smfArray *array, const char *fittype, int *status ) {
+void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky, 
+			  int *status ) {
 
   /* Local variables */
-  smfHead *hdr;            /* Pointer to full header struct */
+  double *azel = NULL;     /* Array of AzEl coordinates */
+  gsl_matrix *azelmatx = NULL; /* Matrix of input positions */
+  size_t base;             /* Starting point for index into arrays */
+  double chisq;            /* Chi-squared from the linear regression fit */
+  int curlevel;            /* Current messaging level */
+  smfData *data = NULL;    /* Pointer to current smfData */
+  double dskyaz;           /* Sky power fit - azimuth gradient */
+  double dskyel;           /* Sky power fit - elev gradient */
+  size_t fitmean = 0;      /* Flag to specify if the fit type is mean */
+  size_t fitplane = 0;     /* Flag to specify if the fit is a 2-D plane */
+  size_t fitslope = 0;     /* Flag to specify if the fit is a 1-D elev slope */
+  smfHead *hdr = NULL;     /* Pointer to full header struct */
   int i;                   /* Loop counter */
-  int j;                   /* Loop counter */
-  const char *origsystem = '\0';  /* Character string to store the coordinate
-			      system on entry */
-  AstFrameSet *wcs = NULL; /* Pointer to AST WCS frameset */
   double *indata = NULL;   /* Pointer to data array */
   dim_t index;             /* index into vectorized data array */
-  dim_t k;                 /* Loop counter */
   size_t *indices = NULL;  /* Array of indices for data points within
 			      a given smfData */
-
+  int ioff;                /* Index into azelmatx array */
+  int j;                   /* Loop counter */
+  size_t k;                /* Loop counter over timeslice */
+  size_t kk;               /* Loop counter of number of smfDatas in smfArray */
+  int lbnd[2];             /* Lower bound */
+  gsl_matrix *mcov = NULL;  /* Covariance matrix */
+  size_t ncoeff = 2;       /* Number of coefficients to fit for; default straight line */
+  int ndat;                /* Number of related data files in the smfArray */
+  size_t needast = 0;      /* Flag to specify if astrometry is needed for fit */
   size_t nframes = 0;      /* Number of frames/timeslices */
   int npts = 0;            /* Total Number of data points */
-  size_t base;             /* Starting point for index into arrays */
-  int z;                   /* Counter */
-  double sky0 = 0;         /* Sky power fit - intercept */
-  double dskyel;           /* Sky power fit - elev gradient */
-  double dskyaz;           /* Sky power fit - azimuth gradient */
-  double chisq;            /* Chi-squared from the linear regression fit */
-
-  gsl_matrix *azelmatx = NULL; /* Matrix of input positions */
-  gsl_vector *psky = NULL; /* Vector containing sky brightness */
-  gsl_vector *weight = NULL; /* Weights for sky brightness vector */
-  gsl_vector *skyfit = NULL; /* Solution vector */
-  gsl_matrix *mcov = NULL;  /* Covariance matrix */
-  gsl_multifit_linear_workspace *work = NULL; /* Workspace */
-  size_t ncoeff = 2;       /* Number of coefficients to fit for; default straight line */
-
-  size_t needast = 0;      /* Flag to specify if astrometry is needed for fit */
-  size_t fitmean = 0;      /* Flag to specify if the fit type is mean */
-  size_t fitslope = 0;     /* Flag to specify if the fit is a 1-D elev slope */
-  size_t fitplane = 0;     /* Flag to specify if the fit is a 2-D plane */
-
-  smfData *data = NULL;    /* Pointer to current smfData */
-  int kk;
-  int ndat;                /* Number of related data files in the smfArray */
   int nptsdat = 0;         /* Number of points per data file */
-
-  double *azel = NULL;     /* Array of AzEl coordinates */
-  int lbnd[2];             /* Lower bound */
-  int ubnd[2];             /* Upper bound */
+  size_t numgood = 0;      /* Number of good values for calculating mean */
   int offset;              /* Offset into azelmatx array */
-  int ioff;                /* Index into azelmatx array */
+  const char *origsystem = '\0';  /* Character string to store the coordinate
+			      system on entry */
+  gsl_vector *psky = NULL; /* Vector containing sky brightness */
+  double sky;              /* Fitted sky level for current bolometer */
+  double sky0 = 0.0;       /* Sky power fit - intercept */
+  gsl_vector *skyfit = NULL; /* Solution vector */
+  int ubnd[2];             /* Upper bound */
+  AstFrameSet *wcs = NULL; /* Pointer to AST WCS frameset */
+  gsl_vector *weight = NULL; /* Weights for sky brightness vector */
+  gsl_multifit_linear_workspace *work = NULL; /* Workspace */
+  int z;                   /* Index counter for 2-d array */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -218,12 +222,13 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, int *status ) {
 	  index = base + i;
 	  if (indata[index] != VAL__BADD) {
 	    sky0 += indata[index];
+	    numgood++;
 	  }
 	}
       }
       /* Calculate mean sky level across all related data for this
 	 timeslice */
-      sky0 /= npts;
+      sky0 /= (double)numgood;
       /* Now to subtract fitted sky from data. Loop over the smfDatas in
 	 the smfArray, select each one in turn and subtract sky */
       for ( kk=0; kk<ndat; kk++) {
@@ -239,14 +244,18 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, int *status ) {
 	  }
 	}
       }
+      *meansky = sky0;
       /* Debugging info */
-      msgSeti("K",k+1);
-      msgSetc("F",fittype);
-      msgOutif(MSG__VERB," ", 
-		" Fit results for timeslice ^K (fit type = ^F)", status );
-      msgSetd("DS",sky0);
-      msgOutif(MSG__VERB," ", 
-		"              Sky0   = ^DS, ", status );
+      msgIflev( &curlevel );
+      if (curlevel >= MSG__VERB) {
+	msgSeti("K",k+1);
+	msgSetc("F",fittype);
+	msgOutif(MSG__VERB," ", 
+		 " Fit results for timeslice ^K (fit type = ^F)", status );
+	msgSetd("DS",sky0);
+	msgOutif(MSG__VERB," ", 
+		 "              Sky0   = ^DS, ", status );
+      }
     }
   } else if ( needast ) {
     /* Everything in this block is done for data which must be placed
@@ -356,6 +365,8 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, int *status ) {
 
       /* Now to subtract fitted sky from data. Loop over the smfDatas in
 	 the smfArray, select each one in turn and subtract sky */
+      numgood = 0;
+      *meansky = 0.0;
       for ( kk=0; kk<ndat; kk++) {
 	data = (array->sdata)[kk];
 	indata = (data->pntr)[0];
@@ -365,31 +376,39 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, int *status ) {
 	  index = i + base;
 	  if (indata[index] != VAL__BADD) {
 	    /* Subtract sky value; no need to update variance */
-	    indata[index] -= (sky0 + dskyel*azel[i+nptsdat] + dskyaz*azel[i]);
+	    sky = (sky0 + dskyel*azel[i+nptsdat] + dskyaz*azel[i]);
+	    numgood++;
+	    *meansky += sky;
+	    indata[index] -= sky;
 	  }
 	}
 	/* Reset coordinates to original system on entry */
 	astSetC( wcs, "SYSTEM", origsystem );
       }
+      *meansky /= (double)numgood;
+
       /* Debugging info */
-      msgSeti("K",k+1);
-      msgSetc("F",fittype);
-      msgOutif(MSG__VERB," ", 
-		" Fit results for timeslice ^K (fit type = ^F)", status );
-      msgSetd("DS",sky0);
-      msgOutif(MSG__VERB," ", 
-		"              Sky0   = ^DS, ", status );
-      msgSetd("DE",dskyel);
-      msgOutif(MSG__VERB," ", 
-		"              Dskyel = ^DE, ", status );
-      if ( dskyaz != 0 ) {
-	msgSetd("DA",dskyaz);
+      msgIflev( &curlevel );
+      if (curlevel >= MSG__VERB) {
+	msgSeti("K",k+1);
+	msgSetc("F",fittype);
 	msgOutif(MSG__VERB," ", 
-		  "              Dskyaz = ^DA", status );
+		 " Fit results for timeslice ^K (fit type = ^F)", status );
+	msgSetd("DS",sky0);
+	msgOutif(MSG__VERB," ", 
+		 "              Sky0   = ^DS, ", status );
+	msgSetd("DE",dskyel);
+	msgOutif(MSG__VERB," ", 
+		 "              Dskyel = ^DE, ", status );
+	if ( dskyaz != 0 ) {
+	  msgSetd("DA",dskyaz);
+	  msgOutif(MSG__VERB," ", 
+		   "              Dskyaz = ^DA", status );
+	}
+	msgSetd("X",chisq);
+	msgOutif(MSG__VERB," ", 
+		 "              X^2 = ^X", status );
       }
-      msgSetd("X",chisq);
-      msgOutif(MSG__VERB," ", 
-		"              X^2 = ^X", status );
       
     } /* End of loop over timeslice frame */
 

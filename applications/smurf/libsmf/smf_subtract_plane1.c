@@ -13,13 +13,16 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_subtract_plane1( smfData *data, const char *fittype, int *status ) 
+*     smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
+*                          int *status ) 
 
 *  Arguments:
 *     data = smfData* (Given and Returned)
 *        Pointer to input data struct
 *     fittype = char* (Given)
 *        Fit-type for PLANE sky-removal method
+*     meansky = double* (Returned)
+*        Mean sky level subtracted from signal
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -90,6 +93,8 @@
 *        Update to use new smf_free behaviour
 *     2008-02-26 (AGG):
 *        Count number of good data points for determining mean
+*     2008-04-28 (AGG):
+*        Return mean sky level subtracted
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -143,61 +148,58 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_subtract_plane1"
 
-void smf_subtract_plane1( smfData *data, const char *fittype, int *status ) {
+void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky, 
+			  int *status ) {
 
   /* Local variables */
-  int curlevel;             /* Current messaging level */
-  smfHead *hdr;             /* Pointer to full header struct */
-  dim_t i;                  /* Loop counter */
-  dim_t j;                  /* Loop counter */
-  const char *origsystem = '\0';  /* Character string to store the coordinate
-			      system on entry */
-  AstFrameSet *wcs = NULL;  /* Pointer to AST WCS frameset */
-  double *indata = NULL;    /* Pointer to data array */
-  dim_t index;              /* index into vectorized data array */
-  dim_t k;                  /* Loop counter */
-  double *xin = NULL;       /* X coordinates of input mapping */
-  double *xout = NULL;      /* X coordinates of output */
-  double *yin = NULL;       /* Y coordinates of input */
-  double *yout = NULL;      /* Y coordinates of output */
-  size_t *indices = NULL;
-
-  size_t nframes = 0;       /* Number of frames */
-  size_t npts;              /* Number of data points */
-  size_t numgood;           /* Number of pixels with non-BAD values */
-  size_t base;              /* Starting point for index into arrays */
-  int z;                    /* Counter */
-  double sky;               /* Sky power to be subtracted */
-  double sky0;              /* Sky power fit - intercept */
-  double dskyel;            /* Sky power fit - elev gradient */
-  double dskyaz;            /* Sky power fit - azimuth gradient */
-  double chisq;             /* Chi-squared from the linear regression fit */
-
+  double a[2];              /* Coordinates for point A */
+  double alpha = 0;         /* Angle ABC (radians) */
+  double angle0 = 0;        /* Initial angle */
   gsl_matrix *azel = NULL;  /* Matrix of input positions */
-  gsl_vector *psky = NULL;  /* Vector containing sky brightness */
-  gsl_vector *weight = NULL; /* Weights for sky brightness vector */
-  gsl_vector *skyfit = NULL; /* Solution vector */
-  gsl_matrix *mcov = NULL;  /* Covariance matrix */
-  gsl_multifit_linear_workspace *work = NULL; /* Workspace */
-  size_t ncoeff = 2;        /* Number of coefficients to fit for; default straight line */
-
-  size_t needast = 0;       /* Flag to specify if astrometry is needed for fit */
+  double b[2];              /* Coordinates for point B */
+  size_t base;              /* Starting point for index into arrays */
+  double c[2];              /* Coordinates for point C (zenith) */
+  double chisq = 0;         /* Chi-squared from the linear regression fit */
+  double cosalpha;          /* Cosine alpha */
+  int curlevel;             /* Current messaging level */
+  double dalpha;            /* Change in focal plane angle (radians) */
+  double delta;             /* Change in angle */
+  double dskyaz;            /* Sky power fit - azimuth gradient */
+  double dskyel;            /* Sky power fit - elev gradient */
   size_t fitmean = 0;       /* Flag to specify if the fit type is mean */
   size_t fitslope = 0;      /* Flag to specify if the fit is a 1-D elev slope */
   size_t fitplane = 0;      /* Flag to specify if the fit is a 2-D plane */
-
-  double *x0 = NULL;        /* Pixel coordinates of x points in subarray */
-  double *y0 = NULL;        /* Pixel coordinates of y points in subarray */
-  double *ynew = NULL;      /* Transformed y coordinates */
-  double a[2];              /* Coordinates for point A */
-  double b[2];              /* Coordinates for point B */
-  double c[2];              /* Coordinates for point C (zenith) */
-  double alpha = 0;         /* Angle ABC (radians) */
-  double dalpha;            /* Change in focal plane angle (radians) */
-  double angle0 = 0;        /* Initial angle */
-  double delta;             /* Change in angle */
-  double cosalpha;          /* Cosine alpha */
+  smfHead *hdr = NULL;      /* Pointer to full header struct */
+  dim_t i;                  /* Loop counter */
+  double *indata = NULL;    /* Pointer to data array */
+  dim_t index;              /* index into vectorized data array */
+  size_t *indices = NULL;
+  dim_t j;                  /* Loop counter */
+  dim_t k;                  /* Loop counter */
+  gsl_matrix *mcov = NULL;  /* Covariance matrix */
+  size_t ncoeff = 2;        /* Number of coefficients to fit for; default straight line */
+  size_t needast = 0;       /* Flag to specify if astrometry is needed for fit */
+  size_t nframes = 0;       /* Number of frames */
+  size_t npts;              /* Number of data points */
+  size_t numgood;           /* Number of pixels with non-BAD values */
+  const char *origsystem = '\0';  /* Character string to store the coordinate
+			      system on entry */
+  gsl_vector *psky = NULL;  /* Vector containing sky brightness */
   double sinalpha;          /* Sine alpha */
+  double sky;               /* Sky power to be subtracted */
+  double sky0;              /* Sky power fit - intercept */
+  gsl_vector *skyfit = NULL; /* Solution vector */
+  AstFrameSet *wcs = NULL;  /* Pointer to AST WCS frameset */
+  gsl_vector *weight = NULL; /* Weights for sky brightness vector */
+  gsl_multifit_linear_workspace *work = NULL; /* Workspace */
+  double *x0 = NULL;        /* Pixel coordinates of x points in subarray */
+  double *xin = NULL;       /* X coordinates of input mapping */
+  double *xout = NULL;      /* X coordinates of output */
+  double *y0 = NULL;        /* Pixel coordinates of y points in subarray */
+  double *yin = NULL;       /* Y coordinates of input */
+  double *ynew = NULL;      /* Transformed y coordinates */
+  double *yout = NULL;      /* Y coordinates of output */
+  int z;                    /* Counter */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -421,6 +423,8 @@ void smf_subtract_plane1( smfData *data, const char *fittype, int *status ) {
     }
 
     /* Subtract fit from timeslice */
+    numgood = 0;
+    *meansky = 0;
     for (i=0; i < npts; i++ ) {
       index = indices[i] + base;
       if (indata[index] != VAL__BADD) {
@@ -431,30 +435,34 @@ void smf_subtract_plane1( smfData *data, const char *fittype, int *status ) {
 	  sky = sky0 + dskyel * yin[indices[i]] + dskyaz * xin[indices[i]];
 	}
 	/* Subtract sky value; no need to update variance */
+	numgood++;
+	*meansky += sky;
 	indata[index] -= sky;
       }
     }
-      /* Debugging info - do not set all the tokens unless we
-	 actually need to print them out */
-      msgIflev( &curlevel );
-      if (curlevel >= MSG__VERB) {
-	msgSeti("K",k+1);
-	msgSetc("F",fittype);
-	msgOutif(MSG__VERB," ", 
-		 " Fit results for timeslice ^K (fit type = ^F)", status );
-	msgSetd("DS",sky0);
-	msgOutif(MSG__VERB," ", 
-		 "              Sky0   = ^DS, ", status );
-	msgSetd("DE",dskyel);
-	msgOutif(MSG__VERB," ", 
-		 "              Dskyel = ^DE, ", status );
-	msgSetd("DA",dskyaz);
-	msgOutif(MSG__VERB," ", 
-		 "              Dskyaz = ^DA", status );
-	msgSetd("X",chisq);
-	msgOutif(MSG__VERB," ", 
-		 "              X^2 = ^X", status );
-      } 
+    *meansky /= (double)numgood;
+
+    /* Debugging info - do not set all the tokens unless we
+       actually need to print them out */
+    msgIflev( &curlevel );
+    if (curlevel >= MSG__VERB) {
+      msgSeti("K",k+1);
+      msgSetc("F",fittype);
+      msgOutif(MSG__VERB," ", 
+	       " Fit results for timeslice ^K (fit type = ^F)", status );
+      msgSetd("DS",sky0);
+      msgOutif(MSG__VERB," ", 
+	       "              Sky0   = ^DS, ", status );
+      msgSetd("DE",dskyel);
+      msgOutif(MSG__VERB," ", 
+	       "              Dskyel = ^DE, ", status );
+      msgSetd("DA",dskyaz);
+      msgOutif(MSG__VERB," ", 
+	       "              Dskyaz = ^DA", status );
+      msgSetd("X",chisq);
+      msgOutif(MSG__VERB," ", 
+	       "              X^2 = ^X", status );
+    } 
 
     /* Reset coordinate frame to that on entry if necessary */
     if (needast) {
