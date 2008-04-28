@@ -472,8 +472,9 @@ static int gaiaArrayRelease( ClientData clientData, Tcl_Interp *interp,
     }
 
     /* Free memory */
-    gaiaArrayFree( (ARRAYinfo *)adr );
-
+    if ( adr != 0 ) {
+        gaiaArrayFree( (ARRAYinfo *)adr );
+    }
     return TCL_OK;
 }
 
