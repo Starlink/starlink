@@ -23,11 +23,8 @@ void RtdLineQuickSetCoords( Tcl_Interp *interp, Tk_Canvas canvas,
                             Tk_Item *itemPtr, const double *x,
                             const double *y, int numPoints );
 
-void RtdLineQuickSetCoords( Tcl_Interp *interp, Tk_Canvas canvas,
-                            Tk_Item *itemPtr, const double *x,
-                            const double *y, int numPoints );
-
-void RtdLineSetColour( Display *display, Tk_Item *itemPtr, XColor *colour );
+void RtdLineSetColour( Tk_Window tkwin, Display *display, Tk_Item *itemPtr, 
+                       XColor *colour );
 
 void RtdLineSetWidth( Display *display, Tk_Item *itemPtr, int width );
 
@@ -38,7 +35,29 @@ int RtdLineToPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
 void RtdWordLastBBox( double *xb, double *yp );
 
 /* rtd_segment */
+int RtdSegmentCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item **itemPtr,
+                      int argc, char **argv );
+
+int RtdSegmentDelete( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display );
+
+void RtdSegmentDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
+                        Drawable dst, int x, int y, int width, int height );
+
 void RtdSegmentSetCoords( Tcl_Interp *interp, int append,
                           const double *x, const double *y,
                           int numPoints );
+
+void RtdSegmentQuickSetCoords( Tcl_Interp *interp, Tk_Canvas canvas,
+                               Tk_Item *itemPtr, int append, 
+                               const double *x, const double *y, 
+                               int numPoints );
+
+void RtdSegmentSetColour( Tk_Window tkwin, Display *display, Tk_Item *itemPtr, 
+                          XColor *colour );
+
+void RtdSegmentSetWidth( Display *display, Tk_Item *itemPtr, int width );
+
+int RtdSegmentToPostscript( Tcl_Interp *interp, Tk_Canvas canvas,
+                            Tk_Item *itemPtr, int prepass );
+
 #endif

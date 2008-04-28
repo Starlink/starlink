@@ -1818,7 +1818,7 @@ void RtdLineSetLastCoords( Tcl_Interp *interp, const double *x,
  *
  * RtdQuickSetLineCoords --
  *
- *      This procedure is called to reset the item coordinates,
+ *      This procedure is called to set the item coordinates,
  *      without the need to parse a string.
  *
  * Side effects:
@@ -1876,11 +1876,21 @@ void RtdLineQuickSetCoords( Tcl_Interp *interp, Tk_Canvas canvas,
 
 /*  Quick configuration routines. */
 
-EXTERN void RtdLineSetColour( Display *display, Tk_Item *itemPtr,
-                              XColor *colour )
+EXTERN void RtdLineSetColour( Tk_Window tkwin, Display *display, 
+                              Tk_Item *itemPtr, XColor *colour )
 {
+    XColor *tkColor;
     PolyLineItem *linePtr = (PolyLineItem *) itemPtr;
-    linePtr->fg = colour;
+
+    /*  Look up the colour and register with Tk. */
+    tkColor = Tk_GetColorByValue( tkwin, colour );
+
+    /*  Release the existing colour. */
+    if ( linePtr->fg != None ) {
+        Tk_FreeColor( linePtr->fg );
+    }
+
+    linePtr->fg = tkColor;
     XSetForeground( display, linePtr->gc, linePtr->fg->pixel );
 }
 

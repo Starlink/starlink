@@ -154,9 +154,6 @@ static char *           DashPrintProc _ANSI_ARGS_((ClientData clientData,
                             Tcl_FreeProc **freeProcPtr));
 static void             DeleteLine _ANSI_ARGS_((Tk_Canvas canvas,
                             Tk_Item *itemPtr, Display *display));
-static void             DisplayLine _ANSI_ARGS_((Tk_Canvas canvas,
-                            Tk_Item *itemPtr, Display *display, Drawable dst,
-                            int x, int y, int width, int height));
 static int              LineCoords _ANSI_ARGS_((Tcl_Interp *interp,
                             Tk_Canvas canvas, Tk_Item *itemPtr,
                             int argc, char **argv));
@@ -164,8 +161,6 @@ static int              LineToArea _ANSI_ARGS_((Tk_Canvas canvas,
                             Tk_Item *itemPtr, double *rectPtr));
 static double           LineToPoint _ANSI_ARGS_((Tk_Canvas canvas,
                             Tk_Item *itemPtr, double *coordPtr));
-static int              LineToPostscript _ANSI_ARGS_((Tcl_Interp *interp,
-                            Tk_Canvas canvas, Tk_Item *itemPtr, int prepass));
 static int              ParseArrowShape _ANSI_ARGS_((ClientData clientData,
                             Tcl_Interp *interp, Tk_Window tkwin, char *value,
                             char *recordPtr, int offset));
@@ -237,11 +232,11 @@ Tk_ItemType tkSegmentType = {
     ConfigureLine,                      /* configureProc */
     LineCoords,                         /* coordProc */
     DeleteLine,                         /* deleteProc */
-    DisplayLine,                        /* displayProc */
+    RtdSegmentDisplay,                  /* displayProc */
     0,                                  /* alwaysRedraw */
     LineToPoint,                        /* pointProc */
     LineToArea,                         /* areaProc */
-    LineToPostscript,                   /* postscriptProc */
+    RtdSegmentToPostscript,             /* postscriptProc */
     ScaleLine,                          /* scaleProc */
     TranslateLine,                      /* translateProc */
     (Tk_ItemIndexProc *) NULL,          /* indexProc */
@@ -300,6 +295,46 @@ int Segment_Init() {
   Tk_CreateItemType(&tkSegmentType);
   return TCL_OK;
 }
+
+
+/*
+ *--------------------------------------------------------------
+ * RtdSegmentCreate --
+ *
+ *    Create an "instance" for indirect use.
+ *
+ *    Returns a Tk_Item pointer, which can then be used in
+ *    conjunction with another item that is directly managed
+ *    by a canvas. All arguments except itemPtr are as passed to the
+ *    CreateLine function.
+ *
+ *--------------------------------------------------------------
+ *
+ */
+int RtdSegmentCreate( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item **itemPtr,
+                      int argc, char **argv )
+{
+    *itemPtr = (Tk_Item *) ckalloc( sizeof(SegmentItem) );
+    return CreateLine( interp, canvas, *itemPtr, argc, argv );
+}
+
+/*
+ *--------------------------------------------------------------
+ * RtdSegmentDelete --
+ *
+ *    Delete an "instance" created for indirect use.
+ *
+ *--------------------------------------------------------------
+ */
+int RtdSegmentDelete( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display )
+{
+    DeleteLine( canvas, itemPtr, display );
+    if ( itemPtr != NULL ) {
+        ckfree( (char *) itemPtr );
+    }
+    return TCL_OK;
+}
+
 
 
 /*
@@ -862,7 +897,7 @@ ComputeLineBbox(canvas, linePtr)
 /*
  *--------------------------------------------------------------
  *
- * DisplayLine --
+ * RtdSegmentDisplay --
  *
  *      This procedure is invoked to draw a line item in a given
  *      drawable.
@@ -877,8 +912,8 @@ ComputeLineBbox(canvas, linePtr)
  *--------------------------------------------------------------
  */
 
-static void
-DisplayLine(canvas, itemPtr, display, drawable, x, y, width, height)
+void
+RtdSegmentDisplay(canvas, itemPtr, display, drawable, x, y, width, height)
     Tk_Canvas canvas;                   /* Canvas that contains item. */
     Tk_Item *itemPtr;                   /* Item to be displayed. */
     Display *display;                   /* Display on which to draw item. */
@@ -1628,7 +1663,7 @@ ConfigureArrows(canvas, linePtr)
 /*
  *--------------------------------------------------------------
  *
- * LineToPostscript --
+ * RtdSegmentToPostscript --
  *
  *      This procedure is called to generate Postscript for
  *      line items.
@@ -1646,8 +1681,8 @@ ConfigureArrows(canvas, linePtr)
  *--------------------------------------------------------------
  */
 
-static int
-LineToPostscript(interp, canvas, itemPtr, prepass)
+int
+RtdSegmentToPostscript(interp, canvas, itemPtr, prepass)
     Tcl_Interp *interp;                 /* Leave Postscript or error message
                                          * here. */
     Tk_Canvas canvas;                   /* Information about overall canvas. */
@@ -1849,7 +1884,7 @@ ArrowheadPostscript(interp, canvas, linePtr, arrowPtr)
  *
  * RtdSegmentSetCoords --
  *
- *      This procedure is called to reset the item coordinates,
+ *      This procedure is called to set and reset the item coordinates,
  *      without the need to parse a string.
  *
  * Side effects:
@@ -1869,67 +1904,123 @@ void RtdSegmentSetCoords( Tcl_Interp *interp, int append,
                           const double *x, const double *y,  
                           int numPoints )
 {
-  SegmentItem *linePtr = (SegmentItem *) lastItem_;
-  Tk_Canvas canvas = lastCanvas_;
-  int i, j;
-  int npoints;
-
-  if ( ! append ) {
-
-    /*  Use positions to replace the existing coodinates */
-    if (linePtr->numPoints != numPoints) {
-      if (linePtr->coordPtr != NULL) {
-        ckfree((char *) linePtr->coordPtr);
-      }
-      linePtr->coordPtr = (double *)
-        ckalloc((unsigned)(sizeof(double) * numPoints * 2));
-    }
-    for ( i = 0, j = 0; j < numPoints; j++, i+=2 ) {
-      linePtr->coordPtr[i]   = x[j];
-      linePtr->coordPtr[i+1] = y[j];
-    }
-    linePtr->numPoints = numPoints;
-
-  } 
-  else {
-    
-    /*  Append coordinates to existing ones. */
-    npoints = numPoints + linePtr->numPoints;
-    linePtr->coordPtr = (double *) 
-        ckrealloc( (char *)linePtr->coordPtr, 
-                   (unsigned)(sizeof(double) * npoints * 2 ));
-
-    fflush( stdout );
-    for ( i =  linePtr->numPoints * 2, j = 0; j < numPoints; j++, i+=2 ) {
-      linePtr->coordPtr[i]   = x[j];
-      linePtr->coordPtr[i+1] = y[j];
-    }
-    linePtr->numPoints = npoints;
-  }
-
-  /*
-   * Update arrowheads by throwing away any existing arrow-head
-   * information and calling ConfigureArrows to recompute it.
-   */
-
-  if (linePtr->firstArrowPtr != NULL) {
-    ckfree((char *) linePtr->firstArrowPtr);
-    linePtr->firstArrowPtr = NULL;
-  }
-  if (linePtr->lastArrowPtr != NULL) {
-    ckfree((char *) linePtr->lastArrowPtr);
-    linePtr->lastArrowPtr = NULL;
-  }
-  if (linePtr->arrow != noneUid) {
-    ConfigureArrows(canvas, linePtr);
-  }
-  ComputeLineBbox(canvas, linePtr);
-
-  /* Request canvas redraw */
-  Tk_CanvasEventuallyRedraw( canvas, linePtr->header.x1, 
-                             linePtr->header.y1, linePtr->header.x2, 
-                             linePtr->header.y2 );
+    RtdSegmentQuickSetCoords( interp, lastCanvas_, (Tk_Item *) lastItem_,
+                              append, x, y, numPoints );
 }
+
+/*
+ *--------------------------------------------------------------
+ *
+ * RtdSegmentQuickSetCoords --
+ *
+ *      This procedure is called to set the item coordinates,
+ *      without the need to parse a string.
+ *
+ * Side effects:
+ *      The coordinates for the given item will be changed.
+ *
+ * Notes:
+ *      Version of RtdSegmentSetCoords, if you have the item
+ *      and canvas.
+ *
+ *--------------------------------------------------------------
+ */
+void RtdSegmentQuickSetCoords( Tcl_Interp *interp, Tk_Canvas canvas,
+                               Tk_Item *itemPtr, int append, 
+                               const double *x, const double *y, 
+                               int numPoints )
+{
+    SegmentItem *linePtr = (SegmentItem *) itemPtr;
+
+    int i, j;
+    int npoints;
+
+    if ( ! append ) {
+        
+        /*  Use positions to replace the existing coodinates */
+        if (linePtr->numPoints != numPoints) {
+            if (linePtr->coordPtr != NULL) {
+                ckfree((char *) linePtr->coordPtr);
+            }
+            linePtr->coordPtr = (double *)
+                ckalloc((unsigned)(sizeof(double) * numPoints * 2));
+        }
+        for ( i = 0, j = 0; j < numPoints; j++, i+=2 ) {
+            linePtr->coordPtr[i]   = x[j];
+            linePtr->coordPtr[i+1] = y[j];
+        }
+        linePtr->numPoints = numPoints;
+        
+    } 
+    else {
+        
+        /*  Append coordinates to existing ones. */
+        npoints = numPoints + linePtr->numPoints;
+        linePtr->coordPtr = (double *) 
+            ckrealloc( (char *)linePtr->coordPtr, 
+                       (unsigned)(sizeof(double) * npoints * 2 ));
+        
+        fflush( stdout );
+        for ( i =  linePtr->numPoints * 2, j = 0; j < numPoints; j++, i+=2 ) {
+            linePtr->coordPtr[i]   = x[j];
+            linePtr->coordPtr[i+1] = y[j];
+        }
+        linePtr->numPoints = npoints;
+    }
+    
+    /*
+     * Update arrowheads by throwing away any existing arrow-head
+     * information and calling ConfigureArrows to recompute it.
+     */
+    
+    if (linePtr->firstArrowPtr != NULL) {
+        ckfree((char *) linePtr->firstArrowPtr);
+        linePtr->firstArrowPtr = NULL;
+    }
+    if (linePtr->lastArrowPtr != NULL) {
+        ckfree((char *) linePtr->lastArrowPtr);
+        linePtr->lastArrowPtr = NULL;
+    }
+    if (linePtr->arrow != noneUid) {
+        ConfigureArrows(canvas, linePtr);
+    }
+    ComputeLineBbox(canvas, linePtr);
+    
+    /* Request canvas redraw */
+    Tk_CanvasEventuallyRedraw( canvas, linePtr->header.x1, 
+                               linePtr->header.y1, linePtr->header.x2, 
+                               linePtr->header.y2 );
+}
+
+/*  Quick configuration routines. */
+
+EXTERN void RtdSegmentSetColour( Tk_Window tkwin, Display *display, 
+                                 Tk_Item *itemPtr, XColor *colour )
+{
+    XColor *tkColor;
+    SegmentItem *linePtr = (SegmentItem *) itemPtr;
+
+    /* Look up the color and register with Tk */
+    tkColor = Tk_GetColorByValue( tkwin, colour );
+
+    /*  Release the existing colour. */
+    if ( linePtr->fg != None ) {
+        Tk_FreeColor( linePtr->fg );
+    }
+
+    linePtr->fg = tkColor;
+    XSetForeground( display, linePtr->gc, linePtr->fg->pixel );
+}
+
+EXTERN void RtdSegmentSetWidth( Display *display, Tk_Item *itemPtr, int width )
+{
+    SegmentItem *linePtr = (SegmentItem *) itemPtr;
+
+    linePtr->width = width;
+    XSetLineAttributes( display, linePtr->gc, linePtr->width, LineSolid,
+                        linePtr->capStyle, linePtr->joinStyle );
+}
+
 /*
  *--------------------------------------------------------------
  *
