@@ -484,6 +484,8 @@
 *         Rationalize code layout.
 *     2008-04-24 (TIMJ):
 *         History now uses standard SST format.
+*     2008-04-28 (AGG):
+*         Check for simstats parameter before writing simulation info to stdout
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -723,11 +725,16 @@ void smurf_sc2sim( int *status ) {
     errRep("", "^M is not a supported observation mode", status);
   }
 
-  msgSetc("T",inx.obstype);
-  msgOutif(MSG__NORM, "", "  Simulating a ^T observation at ^L um in ^M mode", 
-	   status);
-  msgSetc("SUB", sinx.subname);
-  msgOutif(MSG__NORM, "", "  Simulating subarrays: ^SUB", status);
+  /* Has the user requested a listing of the stats only? */
+  parGet0l( "SIMSTATS", &simstats, status );
+
+  if ( !simstats ) {
+    msgSetc("T",inx.obstype);
+    msgOutif(MSG__NORM, "", "  Simulating a ^T observation at ^L um in ^M mode", 
+	     status);
+    msgSetc("SUB", sinx.subname);
+    msgOutif(MSG__NORM, "", "  Simulating subarrays: ^SUB", status);
+  }
 
   /* Carry out the appropriate simulation based on the observation type */
   if ( heatrun ) {
@@ -761,8 +768,6 @@ void smurf_sc2sim( int *status ) {
     parGet0i("MAXWRITE", &maxwrite, status);
     /* Will new output files overwrite old ones? */
     parGet0l("OVERWRITE", &overwrite, status);
-    /* Has the user requested a listing of the stats only? */
-    parGet0l( "SIMSTATS", &simstats, status );
 
     sc2sim_simulate ( &inx, &sinx, coeffs, digcurrent, digmean, digscale, 
 		      filter, heater, maxwrite, mode, coordframe, nbol, 
