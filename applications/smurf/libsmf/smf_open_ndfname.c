@@ -167,7 +167,7 @@ void smf_open_ndfname( const HDSLoc *loc, char *accmode, char *filename,
     }
   }
   
-  /* Get the dtype */
+  /* Convert the data type string to SMURF dtype */
   smf_string_to_dtype ( dattype, &dtype, status );
 
   /* First step is to create an empty smfData with no extra components */
