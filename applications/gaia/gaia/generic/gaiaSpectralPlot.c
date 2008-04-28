@@ -825,7 +825,7 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
             }
 
             if ( varArrayInfo != NULL ) {
-                gaiaArrayToDouble( dataArrayInfo, spPtr->badvalue,
+                gaiaArrayToDouble( varArrayInfo, spPtr->badvalue,
                                    spPtr->varPtr );
             }
         }
@@ -1189,7 +1189,7 @@ static void SPDisplay( Tk_Canvas canvas, Tk_Item *itemPtr, Display *display,
                 for ( j = 0; j < spPtr->numPoints; j += spPtr->frequency ) {
                     if ( varPtr[j] != spPtr->badvalue ) {
 
-                        half = sqrt( abs( varPtr[j] ) ) * spPtr->nsigma;
+                        half = sqrt( fabs( varPtr[j] ) ) * spPtr->nsigma;
                         xin[0] = spPtr->coordPtr[j];
                         yin[0] = dataPtr[j] - half;
                         xin[1] = spPtr->coordPtr[j];
