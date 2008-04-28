@@ -99,13 +99,14 @@
 void smf_subtract_plane( smfData *data, smfArray *array, const char *fittype, 
 			 int *status ) {
 
+  double meansky;
   /* Check status */
   if (*status != SAI__OK) return;
 
   /* Select sky subtraction method based on input parameters */
   if ( data == NULL ) {
     if ( array != NULL ) {
-      smf_subtract_plane2( array, fittype, status );
+      smf_subtract_plane2( array, fittype, &meansky, status );
     } else {
       if ( *status == SAI__OK ) {
 	*status = SAI__ERROR;
@@ -113,7 +114,7 @@ void smf_subtract_plane( smfData *data, smfArray *array, const char *fittype,
       }
     }
   } else {
-    smf_subtract_plane1( data, fittype, status );
+    smf_subtract_plane1( data, fittype, &meansky, status );
   }
 
 }
