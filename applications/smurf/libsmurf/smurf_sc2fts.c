@@ -90,6 +90,7 @@
 #include "libsmf/smf_err.h"
 */
 
+#include "libsmurf/smurflib.h"
 #include "libsc2fts/sc2fts.h"
 
 #define FUNC_NAME "smurf_sc2fts"
