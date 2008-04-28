@@ -257,8 +257,6 @@ void sc2sim_instrinit( struct sc2sim_obs_struct *inx,
 
   if( *status == SAI__OK ) {
 
-    printf("NBOL = %d\n", nbol);
-
     astSetC( fset, "SYSTEM", "AzEl" );
     astTran2( fset, nbol, *ybolo, *xbolo, 1, *xbc, *ybc );
 
