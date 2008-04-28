@@ -288,6 +288,8 @@
 *     2008-04-24 (EC):
 *        -Added smf_check_mapsize (then renamed smf_checkmem_map)
 *        -Added maxmem to smf_iteratemap
+*     2008-04-28 (AGG):
+*        Add meansky parameter to smf_subtract_plane1/2
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -473,6 +475,8 @@ char *smf_dtype_string( const smfData* data, int * status );
 
 size_t smf_dtype_size( const smfData* data, int * status );
 
+void  smf_dump_smfData( const smfData *data, int showflags, int *status );
+
 void smf_fit_poly(const smfData *data, unsigned char *quality, 
 		  const int order, double *poly, int *status);
 
@@ -628,9 +632,11 @@ void smf_string_to_dtype ( const char * datatype, smf_dtype *dtype, int * status
 void smf_subtract_plane( smfData *data, smfArray *array, const char *fittype, 
 			 int *status);
 
-void smf_subtract_plane1( smfData *data, const char *fittype, int *status);
+void smf_subtract_plane1( smfData *data, const char *fittype, double *meansky,
+			  int *status);
 
-void smf_subtract_plane2( smfArray *array, const char *fittype, int *status);
+void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
+			  int *status);
 
 void smf_subtract_poly( smfData *data, unsigned char *quality, int rel, 
 			int *status );
