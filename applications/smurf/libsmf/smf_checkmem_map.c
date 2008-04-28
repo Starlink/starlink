@@ -46,7 +46,6 @@
 *     {enter_further_changes_here}
 
 *  Notes:
-*     Currently lon_0 and lat_0 are interpreted only as ra/dec of tangent point
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
