@@ -616,6 +616,9 @@ itcl::class gaia::GaiaCube {
          #  Always start with the DATA component (essential).
          set component_ "DATA"
          set last_component_ "DATA"
+         if { [info exists itk_component(spectrum)] } {
+            $itk_component(spectrum) configure -component "DATA"
+         }
 
          if { $cubeaccessor_ == {} } {
             set cubeaccessor_ [uplevel \#0 GaiaNDAccess \#auto]
@@ -821,7 +824,8 @@ itcl::class gaia::GaiaCube {
 
          #  And create the dummy image NDF. Will have axis removed from
          #  the WCS and be the size and type of cube in other axes.
-         set imageaccessor [$cubeaccessor_ createimage $section_name_ $axis_ $component_]
+         set comp [get_component_]
+         set imageaccessor [$cubeaccessor_ createimage $section_name_ $axis_ $comp]
 
          #  Map in the data component to initialise it. Use BAD
          #  to avoid NDF bad flag from being set false.
@@ -1104,17 +1108,17 @@ itcl::class gaia::GaiaCube {
 
          #  The ERROR component is the VARIANCE component in fact, that just
          #  applies when mapping.
-         set component $component_
-         if { $component == "ERROR" } {
-            $cubeaccessor_ configure -maperrors 1
-            set component "VARIANCE"
-         } else {
-            $cubeaccessor_ configure -maperrors 0
-         }
+         set component [get_component_]
 
          if { [$cubeaccessor_ exists $component] } {
+
             #  Only the DATA component is mapped by default, so make sure
             #  we access the others too.
+            if { $component_ == "ERROR" } {
+               $cubeaccessor_ configure -maperrors 1
+            } else {
+               $cubeaccessor_ configure -maperrors 0
+            }
             if { $component != "DATA" } {
                set adr [$cubeaccessor_ map "READ" $component]
             }
@@ -1122,7 +1126,8 @@ itcl::class gaia::GaiaCube {
             #  Cause an update of the image.
             set_display_plane $plane_ 1
          } else {
-            #  No such component....
+
+            #  Undo changes and remain with current component.
             info_dialog "No $component_ component in cube" $w_
             if { $component_ != $last_component_ } {
                set component_ $last_component_

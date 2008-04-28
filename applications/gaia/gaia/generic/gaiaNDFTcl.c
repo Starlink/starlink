@@ -564,6 +564,7 @@ static int gaiaNDFTclMap( ClientData clientData, Tcl_Interp *interp,
     NDFinfo *ndfInfo;
     const char *access;
     const char *component;
+    const char *fullComponent;
     char *error_mess;
     char *error_mess2;
     char ctype[NDF__SZTYP+1];
@@ -590,11 +591,17 @@ static int gaiaNDFTclMap( ClientData clientData, Tcl_Interp *interp,
         /* Mmap mode. */
         result = Tcl_GetBooleanFromObj( interp, objv[2], &mmap );
 
-        /* Component */
+        /* Component, need underlying component name in the case of ERROR */
         component = Tcl_GetString( objv[4] );
+        if ( strcmp( component, "ERROR" ) == 0 ) {
+            fullComponent = "VARIANCE";
+        }
+        else {
+            fullComponent = component;
+        }
 
         if ( result == TCL_OK ) {
-            result = gaiaNDFType( ndfInfo->ndfid, component, ctype,
+            result = gaiaNDFType( ndfInfo->ndfid, fullComponent, ctype,
                                   NDF__SZTYP+1, &error_mess );
             type = gaiaArrayHDSType( ctype );
             if ( result == TCL_OK ) {
@@ -791,6 +798,7 @@ static int gaiaNDFTclExists( ClientData clientData, Tcl_Interp *interp,
 {
     NDFinfo *info;
     Tcl_Obj *resultObj;
+    const char *component;
     char *error_mess;
     int exists;
     int result;
@@ -804,6 +812,13 @@ static int gaiaNDFTclExists( ClientData clientData, Tcl_Interp *interp,
     /* Get the NDF */
     result = importNdfHandle( interp, objv[1], &info );
     if ( result == TCL_OK ) {
+
+        /*  ERROR component is really VARIANCE */
+        component = Tcl_GetString( objv[2] );
+        if ( strcmp( component, "ERROR" ) == 0 ) {
+            component = "VARIANCE";
+        }
+
         result = gaiaNDFExists( info->ndfid, Tcl_GetString( objv[2] ),
                                 &exists, &error_mess );
         resultObj = Tcl_GetObjResult( interp );

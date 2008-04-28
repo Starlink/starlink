@@ -155,6 +155,7 @@ itcl::class gaia::GaiaNDAccess {
          set tdims_ {}
          set bounds_ {}
          set tbounds_ {}
+         set maperrors 0
          return 1
       }
       return 0
@@ -249,7 +250,8 @@ itcl::class gaia::GaiaNDAccess {
          unmap $component
       }
 
-      #  Map VARIANCE as ERROR if asked.
+      #  Map VARIANCE as ERROR if asked. Note only have one of these
+      #  mapped at the same time.
       set comp $component
       if { $comp == "VARIANCE" && $maperrors } {
          set comp "ERROR"

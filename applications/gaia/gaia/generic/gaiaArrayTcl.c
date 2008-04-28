@@ -507,6 +507,10 @@ static int gaiaArrayInfo( ClientData clientData, Tcl_Interp *interp,
                           (char *) NULL );
         return TCL_ERROR;
     }
+    if ( adr == 0L ) {
+        Tcl_SetResult( interp, "NULL pointer supplied", (char *) NULL );
+        return TCL_ERROR;
+    }
     info = (ARRAYinfo *) adr;
 
     resultObj = Tcl_GetObjResult( interp );
