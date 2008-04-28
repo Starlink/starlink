@@ -673,6 +673,13 @@ static int SPCoords( Tcl_Interp *interp, Tk_Canvas canvas, Tk_Item *itemPtr,
             }
             return TCL_OK;
         }
+
+        if ( adr == 0L ) {
+            Tcl_AppendResult( interp, "Given zero valued ARRAYinfo pointer",
+                              (char *) NULL );
+            return TCL_ERROR;
+        }
+
         ispointer = 1;
         dataArrayInfo = (ARRAYinfo *) adr;
         nel = dataArrayInfo->el;
