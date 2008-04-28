@@ -52,6 +52,7 @@
 
 #  Copyright:
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2008 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -171,6 +172,16 @@ itcl::class gaia::GaiaSpectralPlot {
       add_menu_short_help $Options {Remove ref spec}  \
          {Remove the reference spectrum from the plot}
 
+      #  Whether to display error bars.
+      $Options add checkbutton \
+         -label {Error bars} \
+         -variable [scope use_errors_] \
+         -onvalue 1 \
+         -offvalue 0 \
+         -command [code $this set_use_errors_]
+      add_menu_short_help $Options {Error bars}  \
+         {If available use data variances to display error bars}
+
       #  Whether to draw the X coordinates running min to max, or
       #  as they are from the "front" to "back" of cube.
       $Options add checkbutton \
@@ -244,6 +255,46 @@ itcl::class gaia::GaiaSpectralPlot {
       }
       add_menu_short_help $Options {Line width} \
          {Change the width of the spectral line}
+
+      #  Choose a colour for the error bars.
+      $Options add cascade -label "Error color" \
+         -menu [menu $Options.errorcolour]
+      foreach {index colour} $simplecolours_ {
+         $Options.errorcolour add radiobutton \
+             -background $colour \
+             -variable [scope errorcolour_] \
+             -value $colour \
+             -label {    } \
+             -command [code $this set_errorcolour $colour]
+      }
+      add_menu_short_help $Options {Error color} \
+         {Change the colour of the error bars}
+
+      #  Number of sigma for the error bars.
+      $Options add cascade -label "Error length" \
+         -menu [menu $Options.errorlength]
+      foreach nsigma {1 2 3 4 5} {
+         $Options.errorlength add radiobutton \
+            -variable [scope errornsigma_] \
+            -value $nsigma \
+            -label $nsigma \
+            -command [code $this set_errornsigma $nsigma]
+      }
+      add_menu_short_help $Options {Error length} \
+         {Length of error bars, multiple of standard deviation}
+      
+      #  Choose a frequency for the error bars.
+      $Options add cascade -label "Error frequency" \
+         -menu [menu $Options.errorfreq]
+      foreach freq {1 2 5 10 20 50} {
+         $Options.errorfreq add radiobutton \
+            -variable [scope errorfreq_] \
+            -value $freq \
+            -label $freq \
+            -command [code $this set_errorfreq $freq]
+      }
+      add_menu_short_help $Options {Error frequency} \
+         {Frequency for error bars, one every n is displayed}
 
       #  Choose a colour for the all the axis and labels.
       $Options add cascade -label "Axes color" \
@@ -485,17 +536,44 @@ itcl::class gaia::GaiaSpectralPlot {
    #
    #  The axis defines the WCS axis that should be used for the plot X axis.
    #  If autoscale is true, then the plot should be rescaled so that the
-   #  spectrum fits, unless the data range is being fixed. Otherwise the 
-   #  existing plot bounds are used (unless the local autoscale option 
-   #  is enabled, that takes precendence).  The alow and ahigh arguments 
+   #  spectrum fits, unless the data range is being fixed. Otherwise the
+   #  existing plot bounds are used (unless the local autoscale option
+   #  is enabled, that takes precendence).  The alow and ahigh arguments
    #  are the range along the axis to extract.
    public method display_region {accessor axis alow ahigh desc meth \
                                  autoscale} {
       #  Get the spectral data from the accessor.
-      #  XXXX Note assumes WCS & data array axes are aligned and in same order.
-      set adr [$accessor getregionspectrum $axis $alow $ahigh \
-                  $desc $meth 1 $itk_option(-component)]
-      display_spectrum_ $adr $accessor $axis $alow $autoscale
+      #  Note assumes WCS & data array axes are aligned and in same order.
+      set dataadr [get_region_spectrum_ \
+                      $accessor $axis $alow $ahigh $desc $meth]
+      set varadr [get_region_spectrum_errors_ \
+                     $accessor $axis $alow $ahigh $desc $meth]
+      display_spectrum_ $dataadr $varadr $accessor $axis $alow $autoscale
+   }
+
+   #  Get the spectral data from a region of the current component.
+   protected method get_region_spectrum_ {accessor axis alow ahigh desc meth} {
+      return [$accessor getregionspectrum $axis $alow $ahigh \
+                 $desc $meth 1 $itk_option(-component)]
+   }
+
+   #  Extract the variance associated with a region of a spectrum. If not
+   #  already displaying and available.
+   protected method get_region_spectrum_errors_ {accessor axis alow ahigh desc meth} {
+      set varadr 0
+      if { $use_errors_ } {
+         if { $itk_option(-component) != "VARIANCE" } {
+            if { [$accessor exists "VARIANCE"] } {
+               set mapped [$accessor ismapped "VARIANCE"]
+               if { ! $mapped } {
+                  $accessor map "READ" "VARIANCE"
+               }
+               set varadr [$accessor getregionspectrum $axis $alow $ahigh \
+                              $desc $meth 1 VARIANCE]
+            }
+         }
+      }
+      return $varadr
    }
 
    #  Display a spectrum extracted from a point. The data is wrapped by an
@@ -503,39 +581,71 @@ itcl::class gaia::GaiaSpectralPlot {
    #
    #  The axis defines the WCS axis that should be used for the plot X axis.
    #  If autoscale is true, then the plot should be rescaled so that the
-   #  spectrum fits unless the data range is being fixed. Otherwise the 
-   #  existing plot bounds are used (unless the local autoscale option is 
-   #  enabled, that takes precendence).  The alow and ahigh arguments are 
-   #  the range along the axis to extract and p1 and p2 the positions of 
+   #  spectrum fits unless the data range is being fixed. Otherwise the
+   #  existing plot bounds are used (unless the local autoscale option is
+   #  enabled, that takes precendence).  The alow and ahigh arguments are
+   #  the range along the axis to extract and p1 and p2 the positions of
    #  the spectrum along the remaining two axes.
    public method display {accessor axis alow ahigh p1 p2 autoscale} {
 
       #  Get the spectral data from the accessor.
-      #  XXXX Note assumes WCS & data array axes are aligned and in same order.
-      set adr [$accessor getspectrum $axis $alow $ahigh \
-                  $p1 $p2 1 $itk_option(-component)]
-      display_spectrum_ $adr $accessor $axis $alow $autoscale
+      #  Note assumes WCS & data array axes are aligned and in same order.
+      set dataadr [get_spectrum_ $accessor $axis $alow $ahigh $p1 $p2]
+      set varadr [get_spectrum_errors_ $accessor $axis $alow $ahigh $p1 $p2]
+      display_spectrum_ $dataadr $varadr $accessor $axis $alow $autoscale
    }
 
-   #  Display a spectrum whose data are pointed at by "adr". The associated
-   #  cube is wrapped by an instance of GaiaNDAccess (accessor) and the
-   #  axis and offset along that axis, used to extract the spectrum are
-   #  axis and alow. Autoscale determines how the plot limits are determined.
-   protected method display_spectrum_ {adr accessor axis alow autoscale} {
+   #  Get the spectral data from the current component.
+   protected method get_spectrum_ {accessor axis alow ahigh p1 p2} {
+      return [$accessor getspectrum $axis $alow $ahigh \
+                 $p1 $p2 1 $itk_option(-component)]
+   }
+
+   #  Extract the variance associated with a spectrum. If not already
+   #  displaying and available.
+   protected method get_spectrum_errors_ {accessor axis alow ahigh p1 p2} {
+      set varadr 0
+      if { $use_errors_ } {
+         if { $itk_option(-component) != "VARIANCE" } {
+            if { [$accessor exists "VARIANCE"] } {
+               set mapped [$accessor ismapped "VARIANCE"]
+               if { ! $mapped } {
+                  $accessor map "READ" "VARIANCE"
+               }
+               set varadr [$accessor getspectrum $axis $alow $ahigh \
+                              $p1 $p2 1 VARIANCE]
+            }
+         }
+      }
+      return $varadr
+   }
+
+   #  Display a spectrum whose data are pointed at by "dataadr" and
+   #  associated variances (if needed and it has any) by "varadr".
+   #  The associated cube is wrapped by an instance of GaiaNDAccess (accessor)
+   #  and the axis and offset along that axis, used to extract the spectrum
+   #  are axis and alow. Autoscale determines how the plot limits are
+   #  determined.
+   protected method display_spectrum_ {dataadr varadr accessor axis alow autoscale} {
 
       #  Create the main spectral_plot.
       if { $spectrum_ == {} } {
          set autoscale 1
          set spectrum_ [$itk_component(canvas) create spectral_plot \
-                           pointer $adr \
+                           pointer $dataadr $varadr \
                            -x 25 -y 5 -width 650 -height 200 \
-                           -linecolour $linecolour_ -linewidth $linewidth_ \
+                           -linecolour $linecolour_ \
+                           -linewidth $linewidth_ \
                            -gridoptions $gridoptions_ \
                            -showaxes 1 -xminmax $itk_option(-xminmax)\
                            -reflinecolour $refspeccolour_\
                            -fixdatarange $itk_option(-fix_data_range) \
                            -ytop $itk_option(-data_high) \
-                           -ybot $itk_option(-data_low)]
+                           -ybot $itk_option(-data_low)\
+                           -showerrorbars $use_errors_ \
+                           -errorcolour $errorcolour_ \
+                           -frequency $errorfreq_ \
+                           -nsigma $errornsigma_]
          #  Clicking on the plot deselects other graphics.
          $itk_component(canvas) bind $spectrum_ <1> \
             +[code $itk_component(draw) deselect_objects]
@@ -546,8 +656,8 @@ itcl::class gaia::GaiaSpectralPlot {
          move_ref_line_ 1
       }
 
-      #  When autoscaling and not fixing the data range (or if we have just 
-      #  created one of the plots), set the frameset and the NDF data units, 
+      #  When autoscaling and not fixing the data range (or if we have just
+      #  created one of the plots), set the frameset and the NDF data units,
       #  and the offset to the start of the spectrum.
       if { $autoscale || ( $itk_option(-autoscale) &&
                            ! $itk_option(-fix_data_range) ) } {
@@ -563,10 +673,13 @@ itcl::class gaia::GaiaSpectralPlot {
       }
 
       #  Pass in the data.
-      $itk_component(canvas) coords $spectrum_ pointer $adr
+      $itk_component(canvas) coords $spectrum_ pointer $dataadr $varadr
 
       #  Finished with the spectral data.
-      $accessor release $adr
+      $accessor release $dataadr
+      if { $varadr != 0 } {
+         $accessor release $varadr
+      }
    }
 
    #  Display a reference spectrum extracted from a region.
@@ -581,14 +694,19 @@ itcl::class gaia::GaiaSpectralPlot {
       }
 
       #  Get the spectral data from the accessor.
-      set adr [$accessor getregionspectrum $axis $alow $ahigh \
-                  $desc $meth 1 $itk_option(-component)]
+      set dataadr [get_region_spectrum_ \
+                      $accessor $axis $alow $ahigh $desc $meth]
+      set varadr [get_region_spectrum_errors_ \
+                     $accessor $axis $alow $ahigh $desc $meth]
 
       #  Pass in the data.
-      $itk_component(canvas) coords $spectrum_ refpointer $adr
+      $itk_component(canvas) coords $spectrum_ refpointer $dataadr $varadr
 
       #  Finished with the spectral data.
-      $accessor release $adr
+      $accessor release $dataadr
+      if { $varadr != 0 } {
+         $accessor release $varadr
+      }
    }
 
    #  Display a reference spectrum extracted from a point.
@@ -602,14 +720,17 @@ itcl::class gaia::GaiaSpectralPlot {
       }
 
       #  Get the spectral data from the accessor.
-      set adr [$accessor getspectrum $axis $alow $ahigh $p1 $p2 1 \
-                  $itk_option(-component)]
+      set dataadr [get_spectrum_ $accessor $axis $alow $ahigh $p1 $p2]
+      set varadr [get_spectrum_errors_ $accessor $axis $alow $ahigh $p1 $p2]
 
       #  Pass in the data.
-      $itk_component(canvas) coords $spectrum_ refpointer $adr
+      $itk_component(canvas) coords $spectrum_ refpointer $dataadr $varadr
 
       #  Finished with the spectral data.
-      $accessor release $adr
+      $accessor release $dataadr
+      if { $varadr != 0 } {
+         $accessor release $varadr
+      }
    }
 
    #  Remove the reference spectrum, if displayed.
@@ -958,6 +1079,22 @@ itcl::class gaia::GaiaSpectralPlot {
       $itk_component(canvas) itemconfigure $spectrum_ -x $x -y $y
    }
 
+   #  Set whether to display error bars. Depends on data having variances.
+   public method set_use_errors_ {} {
+      $props_ set_named_property GaiaSpectralPlot use_errors_ $use_errors_
+      $itk_component(canvas) itemconfigure \
+         $spectrum_ -showerrorbars $use_errors_
+
+      #  May need to re-extract spectrum as errors may not be extracted yet.
+      #  Don't store this state locally so get pass to GaiaCubeSpectrum.
+      if { $last_use_errors_ != $use_errors_ && $use_errors_ } {
+         if { $itk_option(-gaiacubespectrum) != {} } {
+            $itk_option(-gaiacubespectrum) reextract
+         }
+      }
+      set last_use_errors_ $use_errors_
+   }
+
    #  Set the xminmax value of spectrum.
    public method set_xminmax {} {
       $itk_component(canvas) itemconfigure \
@@ -1048,6 +1185,36 @@ itcl::class gaia::GaiaSpectralPlot {
       }
    }
 
+   #  Set the colour of the error bars.
+   public method set_errorcolour {colour} {
+      set errorcolour_ $colour
+      $props_ set_named_property GaiaSpectralPlot errorcolour_ $colour
+      if { $spectrum_ != {} } {
+         $itk_component(canvas) itemconfigure $spectrum_ \
+            -errorcolour $errorcolour_
+      }
+   }
+
+   #  Set length of the error bars.
+   public method set_errornsigma {nsigma} {
+      set errornsigma_ $nsigma
+      $props_ set_named_property GaiaSpectralPlot errornsigma_ $nsigma
+      if { $spectrum_ != {} } {
+         $itk_component(canvas) itemconfigure $spectrum_ \
+            -nsigma $errornsigma_
+      }
+   }
+
+   #  Set frequency of the error bars.
+   public method set_errorfreq {freq} {
+      set errorfreq_ $freq
+      $props_ set_named_property GaiaSpectralPlot errorfreq_ $freq
+      if { $spectrum_ != {} } {
+         $itk_component(canvas) itemconfigure $spectrum_ \
+            -frequency $errorfreq_
+      }
+   }
+
    #  Set the colour of the axes.
    public method set_axescolour {colour} {
       set axescolour_ $colour
@@ -1086,6 +1253,9 @@ itcl::class gaia::GaiaSpectralPlot {
    #  to date.
    protected method reset_options_ {} {
       set_linecolour "blue"
+      set_errorcolour "red"
+      set_errornsigma 1
+      set_errorfreq 1
       set_linewidth 1
       set_axescolour 0
       set_axes_font 0
@@ -1217,6 +1387,10 @@ itcl::class gaia::GaiaSpectralPlot {
    #  Whether to log data axis.
    itk_option define -log_y_axis log_y_axis Log_Y_Axis 0
 
+   #  A GaiaCubeSpectrum instance, optional. Required if toggling
+   #  errorbars is to work without requiring an image click.
+   itk_option define -gaiacubespectrum gaiacubespectrum GaiaCubeSpectrum {}
+
    #  A GaiaSpecCoords object for controlling the coordinate systems.
    #  Actual control is handled by the GaiaCube instance.
    itk_option define -spec_coords spec_coords Spec_Coords {}
@@ -1337,7 +1511,6 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Names of the fonts that we will use and their AST indices.
    #  A text string to very briefly describe the font is also set.
-   #  XXX cut and paste from GaiaAstGrid.tcl, should share.
    protected variable fontmap_ {
       0  "-adobe-helvetica-medium-r-normal--*-140-*-*-*-*-*-*" "medium"
       1  "-adobe-helvetica-medium-o-normal--*-140-*-*-*-*-*-*" "medium"
@@ -1369,6 +1542,19 @@ itcl::class gaia::GaiaSpectralPlot {
 
    #  Global properties handler.
    protected variable props_ {}
+
+   #  Whether to display errorbars.
+   protected variable use_errors_ 0
+   protected variable last_use_errors_ 0
+
+   #  Current colour of the error bars.
+   protected variable errorcolour_ "red"
+
+   #  Frequency of the error bars (one every ...).
+   protected variable errorfreq_ 1
+
+   #  Number of standard deviations for error bar length.
+   protected variable errornsigma_ 1
 
    #  Common variables: (shared by all instances)
    #  -----------------

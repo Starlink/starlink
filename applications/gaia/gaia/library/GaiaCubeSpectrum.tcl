@@ -107,7 +107,7 @@ itcl::class gaia::GaiaCubeSpectrum {
       #  Do a re-extraction, without clicking on the image.
       itk_component add reextract {
          button $itk_component(tframe).reextract -text "Re-extract" \
-            -command [code $this reextract_]
+            -command [code $this reextract]
       }
       add_short_help $itk_component(reextract) \
          {Re-extract spectrum using new limits}
@@ -387,6 +387,7 @@ itcl::class gaia::GaiaCubeSpectrum {
          set spectrum_ \
             [GaiaSpectralPlot $w_.specplot \
                 -number [$itk_option(-gaia) cget -number] \
+                -gaiacubespectrum $this \
                 -spec_coords $itk_option(-spec_coords) \
                 -spec_writer [code $spec_writer_] \
                 -ref_line_changed_cmd [code $cube ref_line_moved_] \
@@ -709,7 +710,7 @@ itcl::class gaia::GaiaCubeSpectrum {
 
    #  Re-extract the spectrum. Quick button to avoid clicking on the image
    #  (which can be unzoomed so accuracy is difficult).
-   protected method reextract_ {} {
+   public method reextract {} {
       if { $spectrum_ != {} } {
          set spectype [last_extracted_type]
          if { $spectype == "point"  } {

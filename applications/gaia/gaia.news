@@ -2,6 +2,9 @@
     Version 4.2-2
     =============
 
+    Spectral extraction can now display error bars based on the data
+    variance.
+
     The coordinate of the slice extracted from a cube can now be displayed
     as a label in the main window (and will be captured when creating an
     animation).

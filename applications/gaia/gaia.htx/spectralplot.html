@@ -67,13 +67,21 @@
     <h3>The Options menu</h3>
     <p>
       There are various items available in this menu that mostly effect the
-      presentation of the spectrum. <tt>Autoscale</tt> is described above,
-      the log options should be obvious (but see the gotcha below) as should
-      the various presentational ones (which are useful when creating
-      hardcopies). Note that the options to do with colours, the line width
-      and the axes font are retained between sessions. To get back to the
-      defaults selected the <tt>Reset</tt> item.
-      </p>
+      presentation of the spectrum and whether error bars are displayed.
+      <tt>Autoscale</tt> is described above, the log options should be obvious
+      (but see the gotcha below) as should the various presentational ones
+      (which are useful when creating hardcopies). Note that the options to do
+      with displaying error bars, colours, the line width and the axes font
+      are retained between sessions. To get back to the defaults selected the
+      <tt>Reset</tt> item.
+    </p>
+    <p>
+      When error bars are displayed (this requires that the cube is an NDF and
+      has a variance component) you can use other items to control how long
+      they are (a number of standard deviations) and how frequently they
+      should be drawn (every n'th value, this is useful for spectra with many
+      points when the error bars merge into each other).
+    </p>
     <p>
       The <tt>X min to max</tt> item controls how the X axis of the plot is
       draw. When selected the minimum X coordinate will appear on the left and
