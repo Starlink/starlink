@@ -57,8 +57,8 @@
 *        easily scaled on-the-fly when we do scan simulations.
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2006-2007 University of British Columbia. All
+*     Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
