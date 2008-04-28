@@ -62,6 +62,8 @@
 *     2007-07-09 (AGG):
 *        Refactor usage calculations so short simulations don't report
 *        0 MB usage
+*     2007-12-11 (AGG):
+*        Make output a little more user-friendly
 
 *  Copyright:
 *     Copyright (C) 2007 University of British Columbia and Particle Physics and
@@ -108,9 +110,10 @@ void sc2sim_simstats ( int npoints, double samptime, int maxwrite, int nbol,
 		       int narray, int nboly, int *status ) {
 
   /* Local variables */
+  JCMTState *head;               /* Pointer to a JCMTState struct */
+  double rawdata;                /* Amount of data simulation will generate */
   double simlength;              /* Length of simulation */
   char temp[SZTEMP];             /* temporary character string */
-  JCMTState *head;               /* Pointer to a JCMTState struct */
 
   if ( *status != SAI__OK ) return;
 
@@ -120,9 +123,13 @@ void sc2sim_simstats ( int npoints, double samptime, int maxwrite, int nbol,
   if ( simlength > 60 && simlength < 3600 ) {
     simlength /= 60.0;
     strncpy( temp, "min", SZTEMP );
-  } else if ( simlength > 3600 ) {
+  } else if ( simlength >= 3600 ) {
     simlength /= 3600.0;
-    strncpy( temp, "hrs", SZTEMP);
+    if ( fabs(simlength - 1.0) < 0.01 ) {
+      strncpy( temp, "hr", SZTEMP);
+    } else {
+      strncpy( temp, "hrs", SZTEMP);
+    }
   } else {
     strncpy( temp, "sec", SZTEMP);
   }
@@ -144,8 +151,16 @@ void sc2sim_simstats ( int npoints, double samptime, int maxwrite, int nbol,
   
   /* And finally tell user how much data this will generate (not
      including headers) */
-  printf( "  ...and will generate ~ %4.1f MB of raw data\n", 
-	  ( ( (double)(npoints*nbol*narray*sizeof(double)) ) / 3.1e6) );
+  rawdata = ((double)(npoints)*(double)(nbol*narray*sizeof(double))) / 1.5e6;
+  /* Use SI definition of Giga/Mega... */
+  if ( rawdata > 1000.0 ) {
+    rawdata /= 1000.0;
+    strncpy( temp, "GB", SZTEMP );
+  } else {
+    strncpy( temp, "MB", SZTEMP );
+  }
+  printf( "  ...and will generate at least %4.1f %s of raw data\n", 
+	  rawdata,temp );
   
   /* Report memory usage if desired: this adds up all the sizes of the
      smf_mallocs below as well as the allocation for posptr */
