@@ -203,8 +203,8 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 .hlp.shl:
 	@HLIB@ $<
 
-kappa.hlp: kappa_master.hlp $(MON_HELP_FILES) $(HELP_FILES) 
-	cat kappa_master.hlp $(MON_HELP_FILES) $(HELP_FILES) > kappa.hlp
+kappa.hlp: kappa_master.hlp $(MON_HELP_FILES) $(HELP_FILES) sort-help.pl.in
+	cat kappa_master.hlp $(MON_HELP_FILES) $(HELP_FILES) | ./sort-help.pl > kappa.hlp
 
 # Fixup scripts with bin location
 # The scripts needs to have installation locations edited into them

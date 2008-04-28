@@ -28,6 +28,7 @@ STAR_CHECK_PROGS(awish)
 STAR_CHECK_PROGS(atclsh) 
 STAR_CHECK_PROGS(hlib) 
 STAR_CHECK_PROGS(fgeneric)
+STAR_CHECK_PROGS(perl)
  
 
 dnl    Look for tcl/tk system
@@ -59,5 +60,6 @@ AC_CONFIG_FILES([Makefile component.xml
 AC_CONFIG_FILES(kappa_link_adam,  [chmod +x kappa_link_adam])
 AC_CONFIG_FILES(lutedit.tcl,      [chmod +x lutedit.tcl])
 AC_CONFIG_FILES(stardemo.tcl,     [chmod +x stardemo.tcl])
+AC_CONFIG_FILES(sort-help.pl,     [chmod +x sort-help.pl])
 
 AC_OUTPUT

@@ -1,0 +1,48 @@
+#!@PERL@
+
+#+
+#  Name:
+#     sort-help.pl
+
+#  Purpose:
+#     Sort the entries in the kappa.hlp file into alphabetical order.
+
+#  Usage:
+#     cat kappa.hlp | sprt-help.pl > kappa.hlp
+
+#  Authors:
+#     DSB: David S. Berry (JAC, UCLAN)
+
+#  History:
+#     28-APR-2008 (DSB):
+#        Initial version.
+#-
+
+#  Read lines of text from standard input.
+   while( $line = <STDIN> ) {
+
+#  If the current line begines with a digit 1 followed by a space, then
+#  we are starting a new entry. Extract the title of the entry from the
+#  line (the text following the initial "1 " string).
+      if( $line =~ /^1 (\s*.*)\s$/ ){
+         $key = $1;
+      } 
+
+#  Use the title as the key into a hash, appending the whole line of text
+#  to any current entry for the key.
+      if( $key ) {
+         $map{$key} .= $line;
+
+#  Print any stuff that comes before the first "1 " line immediately.
+      } else {
+         print $line;
+      }
+   }
+
+#  Once all text has been read from standard input, sort the hash keys 
+#  into alphabetical order, and the write the has entries out to standard
+#  output.
+   foreach $key (sort keys %map){
+      print $map{$key},"\n";
+   }
+
