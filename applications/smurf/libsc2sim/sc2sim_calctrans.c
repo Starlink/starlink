@@ -41,9 +41,12 @@
 *        Original
 *     2006-07-20 (JB):
 *        Split from dsim.c
+*     2007-07-13 (AGG):
+*        Trap cases when tauCSO is out of range. Shouldn't happen of
+*        course...
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
+*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
 *  Licence:
@@ -86,10 +89,17 @@ int *status           /* global status (given and returned) */
    if ( !StatusOkP(status) ) return;
 
    if ( fabs ( lambda - 0.45e-3 ) < 0.1e-3 ) {
-      *trans = 100 / exp ( 26.2 * ( tauCSO - 0.014 ) );
+     if ( tauCSO > 0.014) {
+       *trans = 100.0 / exp ( 26.2 * ( tauCSO - 0.014 ) );
+     } else {
+       *trans = 100.0;
+     }
    } else {
-      *trans = 100 / exp ( 4.02 * ( tauCSO - 0.001 ) );
+     if ( tauCSO > 0.001 ) {
+       *trans = 100 / exp ( 4.02 * ( tauCSO - 0.001 ) );
+     } else {
+       *trans = 100.0;
+     }
    }
-
 }
 
