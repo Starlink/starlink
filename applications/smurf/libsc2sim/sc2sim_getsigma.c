@@ -32,6 +32,9 @@
 *     Calculate photon noise
 
 *  Authors:
+*     J.Balfour (UBC)
+*     E.Chapin (UBC)
+*     A.G. Gibb (UBC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -40,10 +43,13 @@
 *     2007-06-29 (EC):
 *        Removed physical model for noise and replaced with simple scaling
 *        from reference power/noise
+*     2008-04-28 (AGG):
+*        Change return type to void
+*     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2006-2008 University of British Columbia. All
+*     Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -72,7 +78,7 @@
 /* SC2SIM includes */
 #include "sc2sim.h"
 
-double sc2sim_getsigma( double flux_0, double sig_0, double flux, double *sig,
+void sc2sim_getsigma( double flux_0, double sig_0, double flux, double *sig,
 			int *status ) {
    /* Check status */
    if ( !StatusOkP(status) ) return;

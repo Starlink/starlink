@@ -83,7 +83,9 @@
 *     2008-04-24 (AGG):
 *        - Remove obstype from sc2sim_ndfwrdata API
 *        - Add current focus position to & remove telemission from
-           sc2sim_simframe API
+*          sc2sim_simframe API
+*     2008-04-28 (AGG):
+*        Change sc2sim_getsigma type to void 
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -431,7 +433,7 @@ int *size,           /* number of samples in pattern (returned) */
 int *status          /* global status (given and returned) */
 );
 
-double sc2sim_getsigma( double flux_0, double sig_0, double flux, double *sig,
+void sc2sim_getsigma( double flux_0, double sig_0, double flux, double *sig,
 			int *status );
 
 void sc2sim_getsimpar 
