@@ -212,7 +212,7 @@ HDSLoc * smf_get_xloc ( const smfData *data, const char *extname,
       }
     } else {
       msgOutif(MSG__VERB," ", 
-	       "That's OK: we don't to create a new one", status);
+	       "That's OK: we don't need to create a new one", status);
     }
   }
 
