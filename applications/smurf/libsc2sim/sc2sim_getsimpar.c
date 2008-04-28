@@ -55,11 +55,13 @@
 *        Check that tauzen is within a valid range
 *     2007-10-09 (AGG):
 *        Print out value of tauzen if too low, use msgOut for reporting
+*     2008-04-24 (AGG):
+*        Set more appropriate default values for the atmosphere
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2005-2008 University of British Columbia. All
+*     Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -142,22 +144,22 @@ void sc2sim_getsimpar ( AstKeyMap *keymap, struct sc2sim_sim_struct *sinx,
       strncpy ( sinx->atmname, temp, SC2SIM__FLEN );
 
    if ( !astMapGet0D ( keymap, "ATMREFNU", &(sinx->atmrefnu) ) )
-      sinx->atmrefnu = 1.0;  
+      sinx->atmrefnu = 0.5;  
 
    if ( !astMapGet0D ( keymap, "ATMREFVEL", &(sinx->atmrefvel) ) )
       sinx->atmrefvel = 15.0; 
 
    if ( !astMapGet0D ( keymap, "ATMXVEL", &(sinx->atmxvel) ) )
-      sinx->atmxvel = 5000.0; 
+      sinx->atmxvel = 2500.0; 
 
    if ( !astMapGet0D ( keymap, "ATMYVEL", &(sinx->atmyvel) ) )
-      sinx->atmyvel = 200.0; 
+      sinx->atmyvel = 2500.0; 
 
    if ( !astMapGet0D ( keymap, "ATMZEROX", &(sinx->atmzerox) ) )
       sinx->atmzerox = 5000.0;  
 
    if ( !astMapGet0D ( keymap, "ATMZEROY", &(sinx->atmzeroy) ) )
-      sinx->atmzeroy = 50000.0;  
+      sinx->atmzeroy = 5000.0;  
 
    if ( !astMapGet0D ( keymap, "ATSTART", &(sinx->atstart) ) )
       sinx->atstart = 5.0;  
