@@ -517,8 +517,10 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
      data, and which model components were requested. Use this
      information to check that enough memory is available. */
 
-  smf_checkmem_dimm( maxconcat, INST__SCUBA2, igroup->nrelated, modeltyps,
-		     nmodels, maxmem, &memneeded, status );
+  if( *status == SAI__OK ) {
+    smf_checkmem_dimm( maxconcat, INST__SCUBA2, igroup->nrelated, modeltyps,
+		       nmodels, maxmem, &memneeded, status );
+  }
 
   if( *status == SMF__NOMEM ) {
     /* If we need too much memory, generate a warning message and then try
