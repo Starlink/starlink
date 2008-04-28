@@ -290,7 +290,7 @@ dist_noinst_SCRIPTS = makeh
 
 # Headers required by library users.  Both of the following lines
 # indicate headers which are installed.
-include_HEADERS = GRF_PAR
+include_HEADERS = GRF_PAR grf.h
 # Following are generated, so should not be distributed.
 nodist_include_HEADERS = ast.h AST_PAR
 include_MESSAGES = AST_ERR ast_err.h
