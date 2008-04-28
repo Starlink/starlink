@@ -47,7 +47,9 @@
 
 *  Description:
 *     The heatrun method generates a heater flat-field measurement
-*     from simulated data for each of a range of heater settings.
+*     from simulated data for each of a range of heater settings. Note
+*     that if multiple sub-arrays are requested, the same flatfield
+*     solution is written for each one
 
 *  Notes:
 
@@ -261,6 +263,7 @@ void sc2sim_heatrun ( struct sc2sim_obs_struct *inx,
     for ( sample=0; sample<numsamples; sample++ ) {
       dbuf[sample*nbol+bol] = output[sample];
     }
+
   }
 
   /* Digitise the numbers */
