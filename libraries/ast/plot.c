@@ -15974,7 +15974,7 @@ f     The first argument (GRFCON)
 *     The contents of the KeyMap are determined by the calling
 *     application, which should obtain a pointer to the KeyMap using the
 f     AST_GETGRFCONTEXT routine,
-c     astGetGRFContext function,
+c     astGetGrfContext function,
 *     and then store any necessary information in the KeyMap using the
 *     methods of the KeyMap class. Note, the functions listed below
 *     should never annul or delete the supplied KeyMap pointer.
