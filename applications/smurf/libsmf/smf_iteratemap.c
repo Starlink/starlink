@@ -145,7 +145,8 @@
 *  Notes:
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2006-2008 University of British Columbia
 *     All Rights Reserved.
 
 *  Licence:
@@ -692,7 +693,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	   (in this case res). */
 
 	res = smf_malloc( nchunks, sizeof(*res), 1, status );
-      
+
 	smf_model_create( igroup, NULL, 0, SMF__RES, 0, 
 			  NULL, 0, NULL, NULL,
 			  &resgroup, memiter, 
