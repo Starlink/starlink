@@ -16,6 +16,7 @@
     05Nov2007 : add sc2store_bscale and sc2store_compflag (bdk)
     09Nov2007 : have separate sc2store_rdbscale and _wrbscale (bdk)
     11Nov2007 : store compressed data as short, not unsigned short (bdk)
+    18Jun2007 : add history component to output files (agg)
 */
 
 #include <string.h>
@@ -1385,6 +1386,10 @@ int *status              /* global status (given and returned) */
    {
       sc2store_writefitshead ( uindf, nrec, fitshd, status );
    }
+
+/* Create HISTORY component */
+
+   ndfHcre( uindf, status );
 
 /* Unmap the data array */
 
