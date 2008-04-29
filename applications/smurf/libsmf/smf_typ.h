@@ -250,7 +250,7 @@ typedef struct smfHead {
   const double * fplaney;   /* Y coords (radians) of focal plane detectors */
   const double * detpos;    /* Tracking coords (radians) of detectors */
   const double * tsys;      /* System Noise temperatures */
-  const char * detname;     /* Concatentated list of null-terminated detector names */
+  const char * detname;     /* Concatenated list of null-terminated detector names */
   int dpazel;               /* Flag: does "detpos" hold AZEL values? */
   double instap[2];         /* instrument aperture (focal plane offsets)  */
   double telpos[3];         /* West LON/LAT/Alt of telescope (deg/deg/m) */
