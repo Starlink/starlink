@@ -293,6 +293,8 @@
 *     2008-04-28 (EC):
 *        -Added maxconcatlen to smf_grp_related interface
 *        -Added smf_checkmem_dimm
+*     2008-04-28 (AGG):
+*        Add smf_dump_smfData
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -478,7 +480,7 @@ char *smf_dtype_string( const smfData* data, int * status );
 
 size_t smf_dtype_size( const smfData* data, int * status );
 
-void  smf_dump_smfData( const smfData *data, int showflags, int *status );
+void smf_dump_smfData( const smfData *data, int showflags, int *status );
 
 void smf_fit_poly(const smfData *data, unsigned char *quality, 
 		  const int order, double *poly, int *status);
