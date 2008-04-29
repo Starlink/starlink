@@ -1965,8 +1965,10 @@ void smurf_makecube( int *status ) {
             if( genvar ) {
                hist = smf_find_median( tsys_array, NULL, nxy, hist, &median, 
                                        status );
-               atlPtftr( fchan, "MEDTSYS", median, 
-                         "[K] Median MAKECUBE system temperature", status );
+               if( median != VAL__BADR ) {
+                  atlPtftr( fchan, "MEDTSYS", median, 
+                            "[K] Median MAKECUBE system temperature", status );
+               } 
          
             } else {
                if( !blank ) msgBlank( status );
@@ -1984,8 +1986,10 @@ void smurf_makecube( int *status ) {
          msgOutif( MSG__VERB, " ", "Calculating median output exposure time",
                    status );
          hist = smf_find_median( exp_array, NULL, nxy, hist, &median, status );
-         atlPtftr( fchan, "EXP_TIME", median, 
-                   "[s] Median MAKECUBE exposure time", status );
+         if( median != VAL__BADR ) {
+            atlPtftr( fchan, "EXP_TIME", median, 
+                      "[s] Median MAKECUBE exposure time", status );
+         }
          
 /* Store the median effective integration time as keyword EFF_TIME in the 
    FitsChan. Since kpg1Medur partially sorts the array, we need to take a 
@@ -1994,8 +1998,10 @@ void smurf_makecube( int *status ) {
                    status );
 
          hist = smf_find_median( eff_array, NULL, nxy, hist, &median, status );
-         atlPtftr( fchan, "EFF_TIME", median, 
-                   "[s] Median MAKECUBE effective integration time", status );
+         if( median != VAL__BADR ) {
+            atlPtftr( fchan, "EFF_TIME", median, 
+                      "[s] Median MAKECUBE effective integration time", status );
+         }
 
 /* Free the second work array amd histogram array. */
          work2_array = astFree( work2_array );
