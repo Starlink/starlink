@@ -17384,6 +17384,42 @@ from one graphical element to another.
    }
 }
 \sstroutine{
+   KPG1\_GTMOR
+}{
+   Create an HDS structure holding a user-supplied set of keyword=value
+   strings
+}{
+   \sstdescription{
+      This routine returns a locator for a temporary HDS structure that
+      holds a set of keyword values obtained from the environment.
+   }
+   \sstinvocation{
+      CALL KPG1\_GTMOR( PARAM, MORE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the environment parameter to use. The parameter is
+         accessed as a group of text strings, using GRP. Each string
+         should be of the form {\tt "}keyword=value{\tt "}. The keyword can be a
+         single name or a dot-delimited heirarchy. The returned HDS
+         object will contain a sinmilar heiracrhy.
+      }
+      \sstsubsection{
+         MORE = CHARACTER $*$ (DAT\_\_SZLOC) (Returned)
+      }{
+         A locator for the returned temporary HDS object. It will be a
+         scalar structure with HDS type of {\tt "}KPG1\_GTMOR\_TYPE{\tt "}.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
    KPG1\_GTNDF
 }{
    Gets an NDF or NDF section with a specified number of significant
@@ -34729,6 +34765,37 @@ from one graphical element to another.
 
          \sstitem
          An error is reported if the supplied HDS object is a structure.
+      }
+   }
+}
+\sstroutine{
+   KPG1\_KY2HD
+}{
+   Convert an AST KeyMap into an HDS structure
+}{
+   \sstdescription{
+      This routine copies the contents of an AST KeyMap into a supplied
+      HDS structure.
+   }
+   \sstinvocation{
+      CALL KPG1\_KY2HD( KEYMAP, LOC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         KEYMAP = INTEGER (Given)
+      }{
+         The AST KeyMap identifier.
+      }
+      \sstsubsection{
+         LOC = CHARACTER $*$ (DAT\_\_SZLOC) (Given)
+      }{
+         A locator for the HDS object into which the KeyMap contents
+         are to be copied.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
       }
    }
 }
