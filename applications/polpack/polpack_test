@@ -28,11 +28,13 @@
 #       Original Version based on ircampack_test.
 #     29-SEP-1999 (DSB):
 #       Changed to use POLPACK-specific data file instead of kappa/comwest.
+#     29-APR-2008 (DSB):
+#       Replace INSTALL_BIN by $POLPACK_DIR.
 #     {enter_changes_here}
 #
 #-
 #
-source INSTALL_BIN/polpack.csh
-polka INSTALL_BIN/test_data nostarthelp out_s=\! out_o=\! out_e=\! accept
+source $POLPACK_DIR/polpack.csh
+polka $POLPACK_DIR/test_data nostarthelp out_s=stokes out_o=\! out_e=\! accept
 echo "  POLPACK test script completed."
 #      End of shell script.
