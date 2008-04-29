@@ -99,6 +99,9 @@
 *     23-APR-2008 (DSB):
 *        If VALMAX/MIN are supplied bad, then find the max/min values in
 *        ARRAY.
+*     29-APR-2008 (DSB):
+*        Report an error if VALMAX/MIN are supplied bad, and all data
+*        values are bad.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -179,6 +182,13 @@
                VLMIN = MIN( VLMIN, ARRAY( K ) )
             END DO
 
+         END IF
+
+         IF( VLMAX .EQ. VAL__MIN<T> .OR. VLMIN .EQ. VAL__MAX<T> ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( ' ', 'No good data values found in the '//
+     :                    'array. No histogram formed', STATUS )
+            GO TO 999
          END IF
 
          IF( VALMAX .EQ. VAL__BAD<T> ) VALMAX = VLMAX
