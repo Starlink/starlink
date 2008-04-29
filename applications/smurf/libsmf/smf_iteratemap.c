@@ -141,6 +141,9 @@
 *        - extra checks for valid pointers before exporting model components
 *     2008-04-28 (EC):
 *        - Added memory usage check
+*     2008-04-29 (EC)
+*        Check for VAL__BADD in map to avoid propagating to residual
+*     {enter_further_changes_here}
 
 *  Notes:
 
@@ -532,10 +535,10 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     msgSeti( "LEN", maxconcat );
     msgSeti( "AVAIL", maxmem/SMF__MB );
     msgSeti( "NEED", memneeded/SMF__MB );
-    msgOut( " ", "^LEN continuous samples requires ^NEED Mb > ^AVAIL Mb", 
+    msgOut( " ", "  ^LEN continuous samples requires ^NEED Mb > ^AVAIL Mb", 
 	    status );
     msgSeti( "TRY", (size_t) ((double) maxconcat * maxmem / memneeded) );
-    msgOut( " ", "Will try to re-group data in chunks < ^TRY samples long",
+    msgOut( " ", "  Will try to re-group data in chunks < ^TRY samples long",
 	    status);
     msgOut( " ", "SMF_ITERATEMAP: ***************", status );
 
@@ -901,7 +904,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	      mask = 255 - SMF__Q_JUMP;
 
 	      for( k=0; k<dsize; k++ ) {	  
-		if( !(qua_data[k]&mask) ) {
+		if( !(qua_data[k]&mask) && (ast_data[k] != VAL__BADD) ) {
 		  res_data[k] += ast_data[k];
 		}
 

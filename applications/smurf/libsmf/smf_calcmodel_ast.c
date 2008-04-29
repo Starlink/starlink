@@ -62,6 +62,8 @@
 *        Modified interface to use smfDIMMData
 *     2008-04-02 (EC)
 *        Use QUALITY
+*     2008-04-29 (EC)
+*        Check for VAL__BADD in map to avoid propagating to residual
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -162,13 +164,16 @@ void smf_calcmodel_ast( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 
 	  /* Add previous iteration of the model back into the residual */
 	  if( !(qua_data[i]&mask) )
-	    res_data[i] += model_data[i];
+
+	    if( model_data[i] != VAL__BADD ) {
+	      res_data[i] += model_data[i];
+	    }
 	    
 	  /* calculate new model using the map/LUT */
 	  model_data[i] = dat->map[lut_data[i]];
 	    
 	  /* update the residual model */
-	  if( !(qua_data[i]&mask) )
+	  if( !(qua_data[i]&mask) && (model_data[i] != VAL__BADD) )
 	    res_data[i] -= model_data[i];
 	}
       } 
