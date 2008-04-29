@@ -2522,11 +2522,20 @@ package kappa {
           }
 
          parameter more {
-            position 5
             type UNIV
             ppath CURRENT DEFAULT
             vpath DEFAULT
             prompt {HDS object containing extra information about the parent}
+            helpkey *
+            default !
+          }
+
+         parameter moretext {
+            position 5
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            prompt {Group of keyword=value strings giving extra information about the parent}
             helpkey *
             default !
           }
@@ -2588,6 +2597,14 @@ package kappa {
             helpkey *
           }
 
+         parameter moretext {
+            type LITERAL
+            ppath CURRENT DEFAULT
+            vpath DEFAULT
+            prompt {Group of keyword=value strings giving extra information about the ancestor}
+            helpkey *
+            default !
+          }
          parameter ndf {
             position 1
             type NDF

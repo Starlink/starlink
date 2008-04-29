@@ -64,6 +64,30 @@
 *        on the "DATE" string read from each of the ancestors being modified. 
 *        See "Substitution Syntax" below.  If null (!) is supplied, the 
 *        DATE item is left unchanged.  [!]
+*     MORETEXT = GROUP (Read)
+*        This parameter is accessed only if a single ancestor is being
+*        modified (see parameter ANCESTORS). It gives information to 
+*        store in the MORE component of the ancestor (any existing
+*        information is first removed). If a null (!) value is supplied,
+*        then existing MORE component is left unchanged.
+*
+*        The supplied value should be either a comma-separated list of
+*        strings or the name of a text file preceded by an up-arrow character
+*        "^", containing one or more comma-separated list of strings. Each
+*        string is either a "keyword=value" setting, or the name of a text 
+*        file preceded by an up-arrow character "^". Such text files
+*        should contain further comma-separated lists which will be read 
+*        and interpreted in the same manner (any blank lines or lines
+*        beginning with "#" are ignored). Within a text file, newlines can 
+*        be used as delimiters as well as commas. 
+*
+*        Each individual setting should be of the form:
+*
+*           <keyword>=<value>
+*
+*        where <keyword> is either a simple name, or a dot-delimited
+*        heirarchy of names (e.g. "camera.settings.exp=1.0"). The 
+*        <value> string should not contain any commas. [!]
 *     NDF = NDF (Update)
 *        The NDF data structure.
 *     PATH = LITERAL (Read)
@@ -79,6 +103,11 @@
 *     provmod ff path=/home/dsb/real-file.sdf
 *        This modifies any ancestor within the NDF called ff by setting
 *        its PATH to "/home/dsb/real-file.sdf".
+*     provmod ff ancestor=3 moretext="obsidss=acsis_00026_20080322T055855_1"
+*        This modifies ancestor number 3 by storing a value of
+*        "acsis_00026_20080322T055855_1" for key "obsidss" within the 
+*        additonal information for the ancestor. Any existing additional
+*        information is removed.
 *     provmod ff path='(_x)$=_y'
 *        This modifies any ancestor within the NDF called ff that has a
 *        path ending in "_x" by replacing the final "_x" with "_y".
@@ -196,6 +225,8 @@
 *     25-APR-2008 (DSB):
 *        Allow new values to be speicfied literally as well as by
 *        substitution.
+*     29-APR-2008 (DSB):
+*        Added parameter MORETEXT.
 *     {enter_further_changes_here}
 
 *-
@@ -225,6 +256,7 @@
       CHARACTER CRESUB*400       ! Substitution string
       CHARACTER DATSUB*400       ! Substitution string
       CHARACTER LOC*(DAT__SZLOC) ! Locator for required component
+      CHARACTER MORE*(DAT__SZLOC)! Locator for new MORE information
       CHARACTER PROV*(DAT__SZLOC)! Locator for provenance store
       CHARACTER PTHSUB*400       ! Substitution string
       CHARACTER RESULT*400       ! result of substitutions
@@ -296,6 +328,18 @@
          PTHSUB = ' ' 
       END IF
 
+*  If only a single ancestor is being modified, get additional 
+*  information as a set of text strings using the MORETEXT parameter.
+      IF( MANC .EQ. 1 .AND. STATUS .EQ. SAI__OK ) THEN
+         CALL KPG1_GTMOR( 'MORETEXT', MORE, STATUS )
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            MORE = DAT__NOLOC 
+         END IF
+      ELSE
+         MORE = DAT__NOLOC
+      END IF
+
 *  Loop round all the ancestors that are to be modified.
       DO J = 1, MANC
 
@@ -309,6 +353,14 @@
 *  Get a temporary HDS structure holding the existing provenance
 *  information for the specified ancestor.
          CALL NDG_GTPRV( INDF, I, PROV, STATUS )
+
+*  If required, replace the MORE component.
+         IF( MORE .NE. DAT__NOLOC ) THEN     
+            CALL DAT_THERE( PROV, 'MORE', THERE, STATUS )
+            IF( THERE ) CALL DAT_ERASE( PROV, 'MORE', STATUS )
+            CALL DAT_COPY( MORE, PROV, 'MORE', STATUS )
+            CALL DAT_ANNUL( MORE, STATUS )
+         END IF
 
 *  Does the information for this ancestor include a CREATOR string? If
 *  so, get its value.

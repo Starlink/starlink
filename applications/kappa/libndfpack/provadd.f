@@ -26,7 +26,7 @@
 *     application should be run multiple times, once for each parent.
 
 *  Usage:
-*     provadd ndf parent creator isroot more
+*     provadd ndf parent creator isroot moretext
 
 *  ADAM Parameters:
 *     CREATOR = LITERAL (Read)
@@ -43,10 +43,37 @@
 *        the main NDF.  PARENT is then only a root NDF only if it 
 *        contains no provenance information.  [FALSE]
 *     MORE = UNIV (Read)
-*        An HDS object containing arbitrary additional information about
-*        the parent NDF, and how it was used in the creation of the main
-*        NDF.  If supplied, this information is stored with the 
-*        provenance in the main NDF.  [!]
+*        Only accessed if a null value is supplied for parameter MORETEXT.
+*        If supplied, it should be an HDS object containing arbitrary 
+*        additional information about the parent NDF, and how it was used 
+*        in the creation of the main NDF.  This information is stored with 
+*        the provenance in the main NDF.  If a null (!) value is supplied
+*        no additional information is stored. [!]
+*     MORETEXT = GROUP (Read)
+*        A group of "keyword=value" strings that give additional information 
+*        about the parent NDF, and how it was used in the creation of 
+*        the main NDF.  If supplied, this information is stored with the 
+*        provenance in the main NDF.  If a null (!) value is supplied,
+*        then the MORE parameter will be used to obtain this extra 
+*        information instead of MORETEXT. 
+*
+*        The supplied value should be either a comma-separated list of
+*        strings or the name of a text file preceded by an up-arrow character
+*        "^", containing one or more comma-separated list of strings. Each
+*        string is either a "keyword=value" setting, or the name of a text 
+*        file preceded by an up-arrow character "^". Such text files
+*        should contain further comma-separated lists which will be read 
+*        and interpreted in the same manner (any blank lines or lines
+*        beginning with "#" are ignored). Within a text file, newlines can 
+*        be used as delimiters as well as commas. 
+*
+*        Each individual setting should be of the form:
+*
+*           <keyword>=<value>
+*
+*        where <keyword> is either a simple name, or a dot-delimited
+*        heirarchy of names (e.g. "camera.settings.exp=1.0"). The 
+*        <value> string should not contain any commas. [!]
 *     NDF = NDF (Read and Write)
 *        The NDF which is to be modified.
 *     PARENT = NDF (Read)
@@ -93,6 +120,8 @@
 *  History:
 *     24-JAN-2008 (DSB):
 *        Original version.
+*     29-APR-2008 (DSB):
+*        Added parameter MORETEXT.
 *     {enter_further_changes_here}
 
 *-
@@ -113,6 +142,7 @@
       CHARACTER MORE*(DAT__SZLOC) ! Locator for MORE structure
       INTEGER INDF1              ! Identifier for NDF being modified
       INTEGER INDF2              ! Identifier for parent NDF
+      LOGICAL CNCLMR             ! Cancel the MORE parameter on exit?
       LOGICAL ISROOT             ! Is the parent an orphan?
 *.
 
@@ -128,14 +158,31 @@
 *  Obtain the parent NDF.
       CALL LPG_ASSOC( 'PARENT', 'READ', INDF2, STATUS )
 
-*  Obtain a locator to the MORE object.
-      IF( STATUS .EQ. SAI__OK ) THEN
+*  ABort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Attempt to get additional information first as a set of text strings
+*  using the MORETEXT parameter.
+      CALL KPG1_GTMOR( 'MORETEXT', MORE, STATUS )
+       
+*  If a null value was supplied for MORETEXT, annul the error and attempt
+*  to get the additional information directly as an HDS object using 
+*  parameter MORE.
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+
          MORE = DAT__NOLOC
          CALL DAT_ASSOC( 'MORE', 'READ', MORE, STATUS )
+
          IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
             MORE = DAT__NOLOC
+         ELSE
+            CNCLMR = .TRUE.
          END IF
+
+      ELSE         
+         CNCLMR = .FALSE.
       END IF      
 
 *  Obtain the creator string.
@@ -153,8 +200,17 @@
 *  Store the information in the provenance extension of INDF1.
       CALL NDG_PTPRV( INDF1, INDF2, MORE, ISROOT, CREATR, STATUS )
 
+*  Arrive here if an error occurrs.
+ 999  CONTINUE
+
 *  Free the MORE structure locator.
-      IF( MORE .NE. DAT__NOLOC ) CALL DAT_CANCL( 'MORE', STATUS )
+      IF( MORE .NE. DAT__NOLOC ) THEN
+         IF( CNCLMR ) THEN
+            CALL DAT_CANCL( 'MORE', STATUS )
+         ELSE
+            CALL DAT_ANNUL( MORE, STATUS )
+         END IF
+      END IF
 
 *  End the NDF context.
       CALL NDF_END( STATUS )
