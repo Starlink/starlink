@@ -30,6 +30,7 @@
 *  Copyright:
 *     Copyright (C) 1998 Central Laboratory of the Research Councils
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -71,6 +72,8 @@
 *        Added POLRDTCL.
 *     16-AUG-2006 (BC):
 *        Add GRP and locator leak checker.
+*     29-APR-2008 (DSB):
+*        Use NDG_BEGPV/ENDPV to provide automatic provenance propagation.
 *     {enter_further_changes_here}
 
 *-
@@ -139,6 +142,13 @@
 
 *  Re-read the polpack configuration file.
       CALL POL1_CNFIG( ' ', STATUS )
+
+*  Begin a provenance block. This causes event handlers to be registered
+*  with the NDF library so that a handler routine in NDG is called every
+*  time an NDF is opened. This handler routine keeps a record of all NDFs 
+*  that are opened for input or output, until the block is closed by 
+*  calling NDG_ENDPV.
+      CALL NDG_BEGPV( STATUS )
 
 *  Check the string against valid A-task names---if matched then call
 *  the relevant A-task
@@ -213,6 +223,15 @@
      :     'POLPACK: No such command ^CMD.', STATUS )
 
       END IF
+
+*  End the provenance block. This will result in every output NDF being
+*  given a provenance extension containing a record of the input NDFs
+*  that the application accessed in order to create the output NDF. Any
+*  output NDF that already contains a provenance extension is left
+*  unchanged (so individual application can over-ride this automatic
+*  provenance handling by adding a provenance extension to the output NDF
+*  itself).
+      CALL NDG_ENDPV( 'POLPACK:'//NAME, STATUS )
 
 *  Note the current number of active GRP identifiers. Do this in a new
 *  error reporting context so that we get the correct value even if an
