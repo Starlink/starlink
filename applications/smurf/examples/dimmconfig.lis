@@ -1,30 +1,55 @@
 # Number of iterations
+#  postive number  = fixed number of iterations
+#  negative number = maximum iterations if using chi^2 stopping criteria
 numiter = 5
+
+# chi^2 tolerance in negative-numiter case (requires noi model component)
+chitol = 1e-6
 
 # Export DIMM files as NDF?
 exportndf = 0
 
-# Model order (space delimited list)
+# Model components/order (space delimited list)
+#  com = remove common-mode signal
+#  noi = estimate time-domain variance
 modelorder = com noi
 
+# low-pass boxcar filter on COM (samples) to assist with convergence
+com_boxcar = 100
+
+# additional despiking after each iteration within noi calculation
+noispikethresh = 10
+noispikeiter = 0
+
+# method of estimating variance map
+#  0 = propagate from the time-domain noise (requires noi model component)
+#  1 = samples variance of data that land in each pixel
+varmapmethod = 0
+
 # Perform iterations in memory?
-memiter = 0
+memiter = 1
+
+# If performing iterations in memory, maximum length (seconds) for concatenated
+# data. If 0 attempt to concatenate entire continuous chunks.
+maxlen = 0
+
+# The following are for data cleaning. Disable until we know what we need...
 
 # fraction of samples to be bad to flag entire bolo as dead
 badfrac = 0.05
 
 # S/N threshold to detect DC steps
-dcthresh = 20
+# dcthresh = 20
 
 # box size over which to measure rms for DC step finder
-dcbox = 1000
+# dcbox = 1000
 
 # subtract a baseline polynomial of this order
-order = 1
+# order = 1
 
 # S/N ratio to flag spikes with sigma-clipper
-spikethresh = 5
+# spikethresh = 5
 
 # Number of iterations for sigma-clipper (0=until convergence)
-spikeiter = 0
+# spikeiter = 0
 
