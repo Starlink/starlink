@@ -74,6 +74,8 @@
 *        - Added QUALITY to interface
 *     2008-04-23 (EC):
 *        Added sample variance calculation 
+*     2008-04-29 (EC):
+*        Flag map/weight/variance pixels with < SMF__MINSTATSAMP hits as bad
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -134,6 +136,13 @@ void smf_simplerebinmap( double *data, double *variance, int *lut,
 
   /* Main routine */
   if (*status != SAI__OK) return;
+
+  /* Check inputs */
+  if( !data || !map || !lut || !mapweight || !mapvar || !hitsmap ) {
+    *status = SAI__ERROR;
+    errRep("FUNC_NAME", "Null inputs", status ); 
+    return;
+  }
 
   /* If this is the first data to be accumulated zero the arrays */
   if( flags & AST__REBININIT ) { 
@@ -241,9 +250,9 @@ void smf_simplerebinmap( double *data, double *variance, int *lut,
 
     if( sampvar || !variance ) {
       /* Variance also needs re-normalization in sampvar case */
-
+      
       for( i=0; i<msize; i++ ) {      
-	if( mapweight[i] == 0 ) {
+	if( !mapweight[i] || (hitsmap[i] < SMF__MINSTATSAMP) ) {
 	  /* If 0 weight set pixels to bad */
 	  mapweight[i] = VAL__BADD;
 	  map[i] = VAL__BADD;
@@ -259,7 +268,7 @@ void smf_simplerebinmap( double *data, double *variance, int *lut,
       /* Re-normalization for error propagation case */
 
       for( i=0; i<msize; i++ ) {      
-	if( mapweight[i] == 0 ) {
+	if( !mapweight[i] || (hitsmap[i] < SMF__MINSTATSAMP) ) {
 	  /* If 0 weight set pixels to bad */
 	  mapweight[i] = VAL__BADD;
 	  map[i] = VAL__BADD;
