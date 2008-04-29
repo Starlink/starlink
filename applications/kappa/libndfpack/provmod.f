@@ -50,20 +50,21 @@
 *        commas.  ["ALL"]
 *     CREATOR = LITERAL (Read)
 *        If the supplied string includes no equals signs, then it is a
-*        new value for the "CREATOR" string read from each of the ancestors 
-*        being modified. If the supplied string includes one or more equals 
-*        signs, then it specifies one or more substitutions to be performed 
-*        on the "CREATOR" string read from each of the ancestors being 
-*        modified. See "Substitution Syntax" below.  If null (!) is supplied, 
-*        the CREATOR item is left unchanged.  [!]
+*        new value for the "CREATOR" string read from each of the 
+*        ancestors being modified. If the supplied string includes one 
+*        or more equals signs, then it specifies one or more 
+*        substitutions to be performed on the "CREATOR" string read from
+*        each of the ancestors being modified. See "Substitution Syntax"
+*        below.  If null (!) is supplied, the CREATOR item is left 
+*        unchanged.  [!]
 *     DATE = LITERAL (Read)
 *        If the supplied string includes no equals signs, then it is a
-*        new value for the "DATE" string read from each of the ancestors 
-*        being modified. If the supplied string includes one or more equals 
-*        signs, then it specifies one or more substitutions to be performed 
-*        on the "DATE" string read from each of the ancestors being modified. 
-*        See "Substitution Syntax" below.  If null (!) is supplied, the 
-*        DATE item is left unchanged.  [!]
+*        new value for the "DATE" string read from each of the ancestors
+*        being modified. If the supplied string includes one or more 
+*        equals signs, then it specifies one or more substitutions to be
+*        performed on the "DATE" string read from each of the ancestors 
+*        being modified.  See "Substitution Syntax" below.  If null (!) 
+*        is supplied, the DATE item is left unchanged.  [!]
 *     MORETEXT = GROUP (Read)
 *        This parameter is accessed only if a single ancestor is being
 *        modified (see parameter ANCESTORS). It gives information to 
@@ -72,39 +73,40 @@
 *        then existing MORE component is left unchanged.
 *
 *        The supplied value should be either a comma-separated list of
-*        strings or the name of a text file preceded by an up-arrow character
-*        "^", containing one or more comma-separated list of strings. Each
-*        string is either a "keyword=value" setting, or the name of a text 
-*        file preceded by an up-arrow character "^". Such text files
-*        should contain further comma-separated lists which will be read 
-*        and interpreted in the same manner (any blank lines or lines
-*        beginning with "#" are ignored). Within a text file, newlines can 
-*        be used as delimiters as well as commas. 
+*        strings or the name of a text file preceded by an up-arrow 
+*        character "^", containing one or more comma-separated list of 
+*        strings. Each string is either a "keyword=value" setting, or 
+*        the name of a text file preceded by an up-arrow character "^". 
+*        Such text files should contain further comma-separated lists 
+*        which will be read and interpreted in the same manner (any 
+*        blank lines or lines beginning with "#" are ignored). Within a 
+*        text file, newlines can be used as delimiters as well as 
+*        commas. 
 *
 *        Each individual setting should be of the form:
 *
 *           <keyword>=<value>
 *
 *        where <keyword> is either a simple name, or a dot-delimited
-*        heirarchy of names (e.g. "camera.settings.exp=1.0"). The 
-*        <value> string should not contain any commas. [!]
+*        hierarchy of names (e.g. "camera.settings.exp=1.0"). The 
+*        <value> string should not contain any commas.  [!]
 *     NDF = NDF (Update)
 *        The NDF data structure.
 *     PATH = LITERAL (Read)
 *        If the supplied string includes no equals signs, then it is a
-*        new value for the "PATH" string read from each of the ancestors 
-*        being modified. If the supplied string includes one or more equals 
-*        signs, then it specifies one or more substitutions to be performed 
-*        on the "PATH" string read from each of the ancestors being modified. 
-*        See "Substitution Syntax" below.  If null (!) is supplied, the 
-*        PATH item is left unchanged.  [!]
+*        new value for the "PATH" string read from each of the ancestors
+*        being modified. If the supplied string includes one or more 
+*        equals signs, then it specifies one or more substitutions to be
+*        performed on the "PATH" string read from each of the ancestors 
+*        being modified.  See "Substitution Syntax" below.  If null (!) 
+*        is supplied, the PATH item is left unchanged.  [!]
 
 *  Examples:
 *     provmod ff path=/home/dsb/real-file.sdf
 *        This modifies any ancestor within the NDF called ff by setting
 *        its PATH to "/home/dsb/real-file.sdf".
 *     provmod ff ancestor=3 moretext="obsidss=acsis_00026_20080322T055855_1"
-*        This modifies ancestor number 3 by storing a value of
+*        This modifies ancestor Number 3 by storing a value of
 *        "acsis_00026_20080322T055855_1" for key "obsidss" within the 
 *        additonal information for the ancestor. Any existing additional
 *        information is removed.

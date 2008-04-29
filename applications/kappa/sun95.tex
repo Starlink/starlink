@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.34}
 \newcommand{\stardocnumber}    {95.34}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2008 April 16}
+\newcommand{\stardocdate}      {2008 April 29}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.9-3}
+\newcommand{\stardocversion}   {1.9-4}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -39238,7 +39238,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
       application should be run multiple times, once for each parent.
    }
    \sstusage{
-      provadd ndf parent creator isroot more
+      provadd ndf parent creator isroot moretext
    }
    \sstparameters{
       \sstsubsection{
@@ -39253,7 +39253,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
       \sstsubsection{
          ISROOT = \_LOGICAL (Read)
       }{
-         If {\tt TRUE}, then the NDF given by parameter {\tt "PARENT"} will be treated
+         If {\tt TRUE}, then the NDF given by parameter PARENT will be treated
          as a root NDF.  That is, any provenance information within PARENT
          describing its own parents is ignored.  If {\tt FALSE}, then any provenance
          information within PARENT is copied into the main NDF.  PARENT
@@ -39263,10 +39263,41 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
       \sstsubsection{
          MORE = UNIV (Read)
       }{
-         An HDS object containing arbitrary additional information about
-         the parent NDF, and how it was used in the creation of the main NDF.
-         If supplied, this information is stored with the provenance in
-         the main NDF.  {\tt [!]}
+         This is only accessed if a null value is supplied for parameter
+         MORETEXT.  If supplied, it should be an HDS object containing
+         arbitrary additional information about the parent NDF, and how 
+         it was used in the creation of the main NDF.  This information 
+         is stored with the provenance in the main NDF.  If a null ({\tt{!}}) 
+         value is supplied no additional information is stored.  {\tt [!]}
+      }
+      \sstsubsection{
+         MORETEXT = \htmlref{GROUP}{se:groups} (Read)
+      }{
+         A group of ``keyword=value'' strings that give additional 
+         information about the parent NDF, and how it was used in the 
+         creation of the main NDF.  If supplied, this information is 
+         stored with the provenance in the main NDF.  If a null ({\tt{!}}) 
+         value is supplied, then the MORE parameter will be used to 
+         obtain this extra information instead of MORETEXT. 
+
+         The supplied value should be either a comma-separated list of
+         strings, or the name of a text file preceded by an up-arrow 
+         character {\tt "$\wedge$"}, containing one or more comma-separated 
+         list of strings.  Each string is either a ``keyword=value'' setting, or 
+         the name of a text file preceded by an up-arrow character {\tt "$\wedge$"}.
+         Such text files should contain further comma-separated lists 
+         which will be read and interpreted in the same manner (any 
+         blank lines or lines beginning with {\tt \#} are ignored).  Within a
+         text file, newlines can be used as delimiters as well as 
+         commas.
+
+         Each individual setting should be of the form:
+
+            $<$keyword$>$=$<$value$>$
+
+         where $<$keyword$>$ is either a simple name, or a dot-delimited
+         hierarchy of names (\emph{e.g.} {\tt "camera.settings.exp=1.0"}).  The 
+         $<$value$>$ string should not contain any commas.  {\tt [!]}
       }
       \sstsubsection{
          NDF = NDF (Read and Write)
@@ -39295,7 +39326,8 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
    \sstdiytopic{
       Related Applications
    }{
-      KAPPA: \htmlref{PROVSHOW}{PROVSHOW}, \htmlref{HISCOM}{HISCOM}.
+      KAPPA: \htmlref{PROVMOD}{PROVMOD}, \htmlref{PROVSHOW}{PROVSHOW}, 
+      \htmlref{HISCOM}{HISCOM}.
    }
 }
 
@@ -39353,7 +39385,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          be performed on the {\tt "CREATOR"} string read from each of the 
          ancestors being modified.  See 
          \htmlref{``Substitution Syntax''}{substitution_syntax:provmod} 
-         below.  If null {\tt{(!)}} is supplied, the CREATOR item is left 
+         below.  If null ({\tt{!}}) is supplied, the CREATOR item is left 
          unchanged.  {\tt [!]}
       }
       \sstsubsection{
@@ -39365,8 +39397,36 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          more equals signs, then it specifies one or more substitutions to 
          be performed on the {\tt "DATE"} string read from each of the 
          ancestors being modified.  See ``Substitution Syntax'' below.  If 
-         null {\tt{(!)}} is supplied, the DATE item is left unchanged.  
+         null ({\tt{!}}) is supplied, the DATE item is left unchanged.  
          {\tt [!]}
+      }
+      \sstsubsection{
+         MORETEXT = \htmlref{GROUP}{se:groups} (Read)
+      }{
+         This parameter is accessed only if a single ancestor is being
+         modified (see parameter ANCESTORS). It gives information to 
+         store in the MORE component of the ancestor (any existing
+         information is first removed).  If a null ({\tt{!}}) value is 
+         supplied, then existing MORE component is left unchanged.
+
+         The supplied value should be either a comma-separated list of
+         strings, or the name of a text file preceded by an up-arrow 
+         character {\tt "$\wedge$"}, containing one or more comma-separated 
+         list of strings.  Each string is either a ``keyword=value'' setting, or 
+         the name of a text file preceded by an up-arrow character {\tt "$\wedge$"}.
+         Such text files should contain further comma-separated lists 
+         which will be read and interpreted in the same manner (any 
+         blank lines or lines beginning with {\tt \#} are ignored).  Within a
+         text file, newlines can be used as delimiters as well as 
+         commas.
+
+         Each individual setting should be of the form:
+
+            $<$keyword$>$=$<$value$>$
+
+         where $<$keyword$>$ is either a simple name, or a dot-delimited
+         hierarchy of names (\emph{e.g.} {\tt "camera.settings.exp=1.0"}).  The 
+         $<$value$>$ string should not contain any commas.  {\tt [!]}
       }
       \sstsubsection{
          NDF = NDF (Update)
@@ -39382,7 +39442,7 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          more equals signs, then it specifies one or more substitutions to 
          be performed on the {\tt "PATH"} string read from each of the 
          ancestors being modified.  See ``Substitution Syntax'' below.  If 
-         null {\tt{(!)}} is supplied, the PATH item is left unchanged.  
+         null ({\tt{!}}) is supplied, the PATH item is left unchanged.  
          {\tt [!]}
       }
    }
@@ -39393,6 +39453,14 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
       }{
          This modifies any ancestor within the NDF called ff by setting
          its PATH to {\tt "/home/dsb/real-file.sdf"}.
+      }
+      \sstexamplesubsection{
+         provmod ff ancestor=3 moretext="obsidss=acsis\_00026\_20080322T055855\_1"
+      }{
+         This modifies ancestor Number 3 by storing a value of
+         {\tt acsis\_00026\_20080322T055855\_1} for key {\tt obsidss} within the 
+         additonal information for the ancestor.  Any existing additional
+         information is removed.
       }
       \sstexamplesubsection{
          provmod ff path='(\_x)\$=\_y'
