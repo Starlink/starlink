@@ -1,0 +1,30 @@
+# Number of iterations
+numiter = 5
+
+# Export DIMM files as NDF?
+exportndf = 0
+
+# Model order (space delimited list)
+modelorder = com noi
+
+# Perform iterations in memory?
+memiter = 0
+
+# fraction of samples to be bad to flag entire bolo as dead
+badfrac = 0.05
+
+# S/N threshold to detect DC steps
+dcthresh = 20
+
+# box size over which to measure rms for DC step finder
+dcbox = 1000
+
+# subtract a baseline polynomial of this order
+order = 1
+
+# S/N ratio to flag spikes with sigma-clipper
+spikethresh = 5
+
+# Number of iterations for sigma-clipper (0=until convergence)
+spikeiter = 0
+
