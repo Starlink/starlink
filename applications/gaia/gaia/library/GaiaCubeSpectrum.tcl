@@ -1229,7 +1229,7 @@ itcl::class gaia::GaiaCubeSpectrum {
             set ddec [angdiff_ $pdec $cdec]
 
             #  Offset from centre, arcsecs.
-            set dra [format "%f" [expr $dra*3600.0]]
+            set dra [format "%f" [expr $dra*3600.0*cos($pdec*$PI_/180.0)]]
             set ddec [format "%f" [expr $ddec*3600.0]]
          } msg
 
@@ -1262,7 +1262,8 @@ itcl::class gaia::GaiaCubeSpectrum {
                set drefra [angdiff_ $pra $rra]
                set drefdec [angdiff_ $pdec $rdec]
 
-               set drefra [format "%f" [expr $drefra*3600.0]]
+               set drefra [format "%f" \
+                              [expr $drefra*3600.0*cos($pdec*$PI_/180.0)]]
                set drefdec [format "%f" [expr $drefdec*3600.0]]
 
                #  Format reference RA and Dec.

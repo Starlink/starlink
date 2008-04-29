@@ -107,6 +107,9 @@
     of GAIA sharing the same properties file will continue with this issue 
     until after all your versions are at least as new as this release.
 
+    A bug in the calculations of the offsets for extracted spectra has been
+    corrected (the offsets where not corrected for latitude).
+
   Humu Release
   ============
 
