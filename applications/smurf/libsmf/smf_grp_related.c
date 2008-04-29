@@ -87,6 +87,8 @@
 *        - Determine actual nrelated for these data and store in smfGroup
 *     2008-04-28 (EC):
 *        - Added maxconcatlen to interface
+*     2008-04-29 (EC):
+*        -Fixed bug in calculation of actual nrelated (subarrays)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -341,10 +343,10 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   thischunk = 0;
   opentime = 0;
   writetime = 0;
-  maxnelem = 0;
   maxconcat = 0;
 
   for( i=0; i<ngroups; i++ ) {
+
     /* Open header of the first file at each time */
     smf_open_file( igrp, subgroups[i][0], "READ", SMF__NOCREATE_DATA, &data, 
 		   status );
@@ -396,9 +398,6 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
 	/* check that we have the same subarrays */
 	matchsubsys = 1;
 
-	/* Initialize subarray counter at this chunk */
-	thisnelem = 0;
-
 	for( j=0; j<nelem; j++ ) {
 	  if( subgroups[i][j] > 0 ) {
 	    /* Increment subarray counter */
@@ -430,11 +429,6 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
 	  if( subsysnum != refsubsys[j] ) {
 	    matchsubsys = 0;
 	  }
-	}
-
-	/* update maxnelem based on this chunk */
-	if( thisnelem > maxnelem ) {
-	  maxnelem = thisnelem;
 	}
 
 	/* check against writetime from the last file to see if we're on the
@@ -496,6 +490,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
 
     /* Close file */
     smf_close_file( &data, status );
+
   }
 
   /* Now that the continuous chunks are flagged, check for any chunk that
@@ -541,8 +536,28 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
       if( i<ngroups ) totlen += all_len[i];
     }
 
+    /* Determine max subarrays */
+
+    maxnelem = 0;
+    if( *status == SAI__OK ) for( i=0; i<ngroups; i++ ) {
+      thisnelem = 0;
+      
+      for( j=0; j<nelem; j++ ) {
+	if( subgroups[i][j] > 0 ) {
+	  /* Increment subarray counter */
+	  thisnelem++;
+	}
+      }
+      
+      /* update maxnelem based on this chunk */
+      if( thisnelem > maxnelem ) {
+	maxnelem = thisnelem;
+      }
+    }
+
     /* Create the new subgroups array from the chunks that we're keeping */
     new_ngroups=0;
+
     for( i=0; i<ngroups; i++ ) {
       if( keepchunk[i] ) {
 	indices = smf_malloc( maxnelem, sizeof(int), 1, status);
@@ -556,6 +571,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
     }
   }
 
+  
   /* Create the smfGroup */
     
   *group = smf_construct_smfGroup( igrp, new_subgroups, new_chunk, new_ngroups,
