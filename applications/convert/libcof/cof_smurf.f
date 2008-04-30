@@ -218,7 +218,7 @@
 
 *  There are no non-NDF objects that would propagate the SMURF structure
 *  in a BINTABLE.  So created a small table with one dummy value.
-*  FITS2NDF will recognise this as be a dummy component and wil not
+*  FITS2NDF will recognise this as be a dummy component and will not
 *  create an NDF extension component for it.
       IF ( NONNDF .EQ. 0 ) THEN
          CALL HDS_TRACE( LOC, NLEV, NAME, FILE, STATUS )
@@ -250,7 +250,7 @@
             CALL NDF_ANNUL( NDFE, STATUS )
          ELSE
 
-*  Process the component into a hierarchy if its a structure.
+*  Process the component into a hierarchy if it's a structure.
             CALL COF_THIER( NAME, CLOC, FUNIT, STATUS )
             NONNDF = NONNDF + 1
          END IF
