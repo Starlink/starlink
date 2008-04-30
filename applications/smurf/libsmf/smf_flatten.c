@@ -132,11 +132,7 @@ void smf_flatten ( smfData *data, int *status ) {
 		     da->flatpar, dataArr, status);
 
     /* Update units and title if we have a header */
-    if (data->hdr) {
-      strcpy( data->hdr->units, "pW" );
-      strncpy( data->hdr->title, "Flatfielded", SMF__CHARLABEL);
-      (data->hdr->title)[SMF__CHARLABEL-1] = '\0';
-    }
+    smf_set_clabels( "Flatfielded", NULL, "pW", data->hdr, status);
 
     /* Now check for a QUALITY array */
     qual = (data->pntr)[2];

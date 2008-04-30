@@ -295,6 +295,8 @@
 *        -Added smf_checkmem_dimm
 *     2008-04-28 (AGG):
 *        Add smf_dump_smfData
+*     2008-04-30 (TIMJ):
+*        Add _clabels routines.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -928,5 +930,8 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
                         smf_modeltype *modeltyps, dim_t nmodels,
                         size_t available, size_t *necessary, int *status );
 
+void smf_set_clabels( const char title[], const char label[], const char units[],
+		      smfHead* hdr, int * status );
 
+void smf_write_clabels( const smfData* data, int * status );
 #endif /* SMF_DEFINED */
