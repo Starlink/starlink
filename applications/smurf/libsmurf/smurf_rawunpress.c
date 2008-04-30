@@ -41,12 +41,14 @@
 *        Clone from smurf_flatfield.c
 *     2007-11-28 (TIMJ):
 *        Copy the right number of elements!
+*     2008-04-30 (TIMJ):
+*        Write out NDF title.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2006-2007 University of British Columbia.
-*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -144,6 +146,9 @@ void smurf_rawunpress( int *status ) {
       nout *= sizeof(int); /* number of bytes to copy */
       memcpy( (outdata)[0], (data->pntr)[0], nout );
     }
+
+    /* Set labels */
+    ndfCput( "Uncompressed, not flatfielded", outndf, "TITLE", status);
 
     /* Free resources for files */
     ndfAnnul( &outndf, status);
