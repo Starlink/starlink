@@ -54,6 +54,8 @@
 *     2008-04-23 (JB):
 *        Transform gsdac_checkSpecial into generic subband-matching
 *        routine.
+*     2008-04-30 (JB):
+*        Change IF for MPI frontend.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -163,7 +165,13 @@ void gsdac_matchFreqs ( const gsdVars *gsdVars, double *lineFreqs,
 
     for ( i = 0; i < gsdVars->nBESections; i++ ) {
 
-      IFFreqs[i] = 4.0 * gsdVars->sbSigns[i];
+      /* MPI frontends used an IF of 3.5 GHz, other frontends 
+         used 4.0GHz. */
+      if ( strncmp ( gsdVars->frontend, "MPI", 3 ) == 0 )
+        IFFreqs[i] = 3.5 * gsdVars->sbSigns[i];
+      else 
+        IFFreqs[i] = 4.0 * gsdVars->sbSigns[i];
+
       lineFreqs[i] = gsdVars->restFreqs[i];
 
     }
