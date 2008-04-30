@@ -36,16 +36,20 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2008-04-02 (AGG):
 *        Initial version
+*     2008-04-30 (TIMJ):
+*        Add units, title and label.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2008 University of British Columbia. All Rights
-*     Reserved.
+*     Copyright (C) 2008 University of British Columbia.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -311,6 +315,14 @@ void smf_dump_smfData( const smfData *data, int showflags, int *status) {
       }
     }
     msgOut("", "    telpos =^T", status);
+
+    msgSetc( "U", hdr->units );
+    msgOut(" ","    units = ^U", status);
+    msgSetc( "U", hdr->dlabel );
+    msgOut(" ","    label = ^U", status);
+    msgSetc( "U", hdr->title );
+    msgOut(" ","    title = ^U", status);
+
   }
 
   /* smfDA */

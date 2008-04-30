@@ -168,6 +168,10 @@
 /* Minimum number of samples for meaningful stats (like sample variance) */
 #define SMF__MINSTATSAMP 10
 
+/* Define the size of strings defining NDF char components (Units, label) */
+#define SMF__CHARLABEL  32
+
+
 /* Different data types supported by SMURF */
 typedef enum smf_dtype {
   SMF__NULL,
@@ -254,6 +258,10 @@ typedef struct smfHead {
   int dpazel;               /* Flag: does "detpos" hold AZEL values? */
   double instap[2];         /* instrument aperture (focal plane offsets)  */
   double telpos[3];         /* West LON/LAT/Alt of telescope (deg/deg/m) */
+  char units[SMF__CHARLABEL]; /* Data units */
+  char dlabel[SMF__CHARLABEL]; /* Label associated with data */
+  char title[SMF__CHARLABEL]; /* Title associated with data */
+
 } smfHead;
 
 /* This structure contains ancilliary information obtained from a raw

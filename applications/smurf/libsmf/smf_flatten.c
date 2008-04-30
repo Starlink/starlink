@@ -131,6 +131,13 @@ void smf_flatten ( smfData *data, int *status ) {
     sc2math_flatten( nboll, nframes, da->flatname, da->nflat, da->flatcal,
 		     da->flatpar, dataArr, status);
 
+    /* Update units and title if we have a header */
+    if (data->hdr) {
+      strcpy( data->hdr->units, "pW" );
+      strncpy( data->hdr->title, "Flatfielded", SMF__CHARLABEL);
+      (data->hdr->title)[SMF__CHARLABEL-1] = '\0';
+    }
+
     /* Now check for a QUALITY array */
     qual = (data->pntr)[2];
     if ( qual != NULL ) {

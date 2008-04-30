@@ -18,7 +18,8 @@
 *              AstFitsChan * fitshdr, const JCMTState * allState,
 *              dim_t curframe, unsigned int ndet,
 *              const double fplanex[], const double fplaney[],
-*              const double detpos[], const char *detname, int dpazel, 
+*              const double detpos[], const char *detname, int dpazel, const double tsys[], 
+*              const char title[], const char dlabel[], const char units[],
 *              int * status );
 
 *  Arguments:
@@ -59,6 +60,12 @@
 *        positions. Otherwise they are TRACKING positions.
 *     tsys = const double[] (Given)
 *        System temperatures for each receptor
+*     title = const char[] (Given)
+*        Title associated with header.
+*     dlabel = const char[] (Given)
+*        Data label associated with header.
+*     units = const char[] (Given)
+*        Data units.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -82,6 +89,8 @@
 *       to false.
 *     - Free this memory using smf_close_file, via a smfData structure.
 *     - Can be freed with a smf_free if header resources are freed first.
+*     - units, data label and title are copied into this header and will
+*       not be freed (they are a defined part of the struct, not dynamic memory).
 
 *  Authors:
 *     Tim Jenness (TIMJ)
@@ -111,11 +120,15 @@
 *        Add tsys
 *     2007-02-23 (AGG):
 *        Add instap to API
+*     2008-04-30 (TIMJ):
+*        Add title, units and dlabel.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Council. Copyright (C) 2006-2007 University of British Columbia.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -163,7 +176,9 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 		       double instap[], dim_t nframes, unsigned int ndet,
 		       const double fplanex[], const double fplaney[],
 		       const double detpos[], const char *detname, 
-                       int dpazel, const double tsys[], int * status ) {
+                       int dpazel, const double tsys[], const char title[],
+		       const char dlabel[], const char units[],
+		       int * status ) {
 
   smfHead * hdr = NULL;   /* Header components */
 
@@ -193,6 +208,13 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
     hdr->isCloned = 1;
     hdr->instap[0] = instap[0];
     hdr->instap[1] = instap[1];
+
+    /* Have to copy the string items in since the struct has a slot for them -
+       we know these fit in the struct */
+    if (units) strcpy(hdr->units, units );
+    if (dlabel) strcpy(hdr->dlabel, dlabel );
+    if (title) strcpy(hdr->title, title );
+
   }
 
   return hdr;

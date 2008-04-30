@@ -59,11 +59,15 @@
 *        Add detname.
 *     2007-02-06 (AGG):
 *        Add tsys
+*     2008-04-30 (TIMJ):
+*        Add units, title and dlabel.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
+*     Council. Copyright (C) 2006-2007 University of British Columbia.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -139,5 +143,8 @@ smf_create_smfHead( int * status ) {
   hdr->instap[0] = 0;
   hdr->instap[1] = 0;
   hdr->tsys = NULL;
+  (hdr->units)[0] = '\0';
+  (hdr->dlabel)[0] = '\0';
+  (hdr->title)[0] = '\0';
   return hdr;
 }

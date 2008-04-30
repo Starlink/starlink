@@ -143,7 +143,7 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
     /* Open the input file solely to propagate it to the output file */
     ndgNdfas( igrp, index, "READ", &indf, status );
     /* We want QUALITY too if it's available */
-    ndgNdfpr( indf, "WCS,QUALITY", ogrp, index, &outndf, status );
+    ndgNdfpr( indf, "WCS,QUALITY,UNITS,TITLE,LABEL", ogrp, index, &outndf, status );
     ndfAnnul( &indf, status);
 
     /* Set parameters of the DATA array in the output file */
@@ -168,6 +168,7 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
   /* Open the output file for write. If the output grp is NULL then
      ffdata is returned NULL. Use UPDATE mode to retain components such as WCS */
   if (*status == SAI__OK) {
+    /* Returns without action if ogrp is not defined */
     smf_open_file( ogrp, index, "UPDATE", 0, ffdata, status);
     if ( *status == SAI__ERROR) {
       errRep("", "Unable to open output flatfielded file(s)", status);
@@ -209,6 +210,9 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
     }
     /* Flatfield the data */
     smf_flatfield( data, ffdata, flags, status );
+
+    /* synchronize units and label with the new file */
+    smf_write_clabels( *ffdata, status );
 
   } else if ( *status == SMF__FLATN ) {
     /* Just copy input to output file */

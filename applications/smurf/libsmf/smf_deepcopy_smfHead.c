@@ -62,11 +62,15 @@
 *        Add tsys
 *     2007-02-23 (AGG):
 *        Add instap
+*     2008-04-30 (TIMJ):
+*        Add units, label and title
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Council. Copyright (C) 2006-2007 University of British Columbia.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -194,7 +198,9 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
   new = smf_construct_smfHead( new, instrument, wcs, tswcs, fitshdr,
 			       allState, curframe, instap,
 			       nframes, ndet, fplanex, fplaney, detpos,
-                               detname, old->dpazel, tsys, status );
+                               detname, old->dpazel, tsys,
+			       old->title, old->dlabel, old->units,
+			       status );
 
   /* set isCloned to 0 since we have allocated this memory */
   if (new) new->isCloned = 0;

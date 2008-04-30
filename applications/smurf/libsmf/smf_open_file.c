@@ -128,7 +128,7 @@
  *        - renamed isNDF to isFlat to be less confusing
  *        - only issue a warning if data not 2d or 3d to handle iterative
  *          map-maker model containers.
- *     2007-03028 (TIMJ):
+ *     2007-03-28 (TIMJ):
  *        - Annul SCU2RED locator even if SCANFIT is not present
  *        - Noting Ed's comment that isFlat is less confusing, I disagree
  *          because isNDF applied to non-SCUBA2 data
@@ -156,11 +156,13 @@
  *        Factor out quality names code into new routine
  *     2008-04-23 (EC):
  *        Read time series WCS even if the data is raw
+ *     2008-04-30 (TIMJ):
+ *        Support reading of units, title and data label.
  *     {enter_further_changes_here}
 
  *  Copyright:
- *     Copyright (C) 2007 Science and Technology Facilities Council.
- *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+ *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+ *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
  *     Copyright (C) 2005-2008 University of British Columbia.
  *     All Rights Reserved.
 
@@ -474,6 +476,12 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
       }
 
       if ( !(flags & SMF__NOCREATE_HEAD) ) {
+
+	/* Read the units and data label */
+	ndfCget( indf, "UNITS", hdr->units, SMF__CHARLABEL, status );
+	ndfCget( indf, "LABEL", hdr->dlabel, SMF__CHARLABEL, status );
+	ndfCget( indf, "TITLE", hdr->title, SMF__CHARLABEL, status );
+
         /* Read the FITS headers */
         kpgGtfts( indf, &(hdr->fitshdr), status );
         /* Just continue if there are no FITS headers */
