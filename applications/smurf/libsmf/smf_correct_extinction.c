@@ -378,9 +378,9 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 	     assumes that the extinction correction is the same for
 	     all points, clearly not true but it may be close
 	     enough. */
-	  /*	if (vardata != NULL && vardata[index] != VAL__BADD) {
+	  if (vardata != NULL && vardata[index] != VAL__BADD) {
 	    vardata[index] *= extcorr*extcorr;
-	    }*/
+	  }
 	}
       }
       
