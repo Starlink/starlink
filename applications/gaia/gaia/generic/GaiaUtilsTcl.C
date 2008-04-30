@@ -850,7 +850,7 @@ static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
 }
 
 /**
- * Determine the separation of two values along a 2D axis.
+ * Determine the separation of two values along an axis.
  *
  * There are four arguments, the address of an AstFrame (or subclass),
  * the axis, and two coordinate values. Returns the separation.
@@ -895,7 +895,6 @@ static int GaiaUtilsAstAxDistance( ClientData clientData, Tcl_Interp *interp,
     /* Get the separation */
     dist = astAxDistance( frame, axis, value1, value2 );
 
-
     /* Export the result */
     if ( astOK ) {
         Tcl_SetObjResult( interp, Tcl_NewDoubleObj( dist ) );
@@ -908,7 +907,7 @@ static int GaiaUtilsAstAxDistance( ClientData clientData, Tcl_Interp *interp,
 }
 
 /**
- * Determine the offsets between two 2D positions.
+ * Determine the axis aligned offsets between two 2D positions.
  *
  * There are five arguments, the address of an AstFrame (or subclass),
  * and the four coordinate values. Returns the offsets along the 
@@ -921,6 +920,7 @@ static int GaiaUtilsAstAxOffsets( ClientData clientData, Tcl_Interp *interp,
 {
     AstFrame *frame;
     Tcl_Obj *resultObj;
+    double dist;
     double offset1;
     double offset2;
     double p1[2];
@@ -965,7 +965,18 @@ static int GaiaUtilsAstAxOffsets( ClientData clientData, Tcl_Interp *interp,
     p2[0] = p3[0];
     p2[1] = p1[1];
 
+    /* And get the lengths representing the offset magnitude. */
     astResolve( frame, p1, p2, p3, p4, &offset1, &offset2 );
+
+    /* Keep the correct signs using the full axis offsets. */
+    dist = astAxDistance( frame, 1, p1[0], p3[0] );
+    if ( dist < 0.0 ) {
+        offset1 *= -1.0;
+    }
+    dist = astAxDistance( frame, 2, p1[1], p3[1] );
+    if ( dist < 0.0 ) {
+        offset2 *= -1.0;
+    }
 
     /* Export the offsets */
     if ( astOK ) {
