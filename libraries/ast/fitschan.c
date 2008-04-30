@@ -813,6 +813,9 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        Ignore latitude axis PV terms supplied in a TAN header
 *        (previously, such PV terms were used as polynomial correction
 *        terms in a TPN projection).
+*     30-APR-2008 (DSB):
+*        SetValue changed so that new keywords are inserted before the
+*        current card.
 *class--
 */
 
@@ -21762,8 +21765,7 @@ static void SetValue( AstFitsChan *this, const char *keyname, void *value,
 *     for the keyword is over-written with the new value (even if it is 
 *     marked as having been read). Otherwise, (i.e. if it is not a comment
 *     card, and no previous value exists) it is inserted in front 
-*     of the current card. The newly inserted card becomes the current card 
-*     on exit.
+*     of the current card. 
 
 *  Parameters:
 *     this
@@ -21851,21 +21853,17 @@ static void SetValue( AstFitsChan *this, const char *keyname, void *value,
       }
 
 /* If the keyword has not yet been stored (i.e. if it did not exist in the 
-   FitsChan), insert it after the original current card and make the new
-   card the current ard on exit. */
+   FitsChan), re-instate the original current card and insert the new card 
+   before the original current card, leaving the current card unchanged. */
       if( !stored ) {
          this->card = (void *) card;
-         MoveCard( this, 1, "astWrite", astGetClass( this ) );
          SetFits( this, keyname, value, type, comment, 0 );
-         MoveCard( this, -1, "astWrite", astGetClass( this ) );
       }
 
 /* Re-instate the original flag indicating if cards marked as having been 
    read should be skipped over. */
       IgnoreUsed = old_ignoreused;
    }
-
-
 }
 
 static int Similar( const char *str1, const char *str2 ){
