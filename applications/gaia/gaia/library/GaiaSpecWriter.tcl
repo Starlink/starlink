@@ -570,8 +570,8 @@ itcl::class gaia::GaiaSpecWriter {
                      lassign [gaiautils::asttran2 $wcs $rx $ry] grx gry
 
                      #  Determine the separation between these positions.
-                     set drra [gaiautils::astaxdistance $wcs 1 $grx $sx]
-                     set drdec [gaiautils::astaxdistance $wcs 2 $gry $sy]
+                     lassign [gaiautils::astaxoffset \
+                                 $wcs $grx $gry $sx $sy] drra drdec
                      gaiautils::astannul $toframe
                      gaiautils::astannul $wcs
                   }
@@ -604,8 +604,8 @@ itcl::class gaia::GaiaSpecWriter {
                         set sdec [gaiautils::astformat $wcs 2 $sy]
 
                         #  Determine the separation between these positions.
-                        set drra [gaiautils::astaxdistance $wcs 1 $rx $sx]
-                        set drdec [gaiautils::astaxdistance $wcs 2 $ry $sy]
+                        lassign [gaiautils::astaxoffset \
+                                    $wcs $rx $ry $sx $sy] drra drdec
                      }
 
                      #  Switch wcs to skyframe, so we get the right system
@@ -627,10 +627,8 @@ itcl::class gaia::GaiaSpecWriter {
                         set sdec [gaiautils::astformat $skyframe 2 $sy]
 
                         #  Determine the separation between these positions.
-                        set drra \
-                           [gaiautils::astaxdistance $skyframe 1 $rx $sx]
-                        set drdec \
-                           [gaiautils::astaxdistance $skyframe 2 $ry $sy]
+                        lassign [gaiautils::astaxoffset \
+                                    $skyframe $rx $ry $sx $sy] drra drdec
                      }
                   }
 

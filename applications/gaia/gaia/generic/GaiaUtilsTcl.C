@@ -64,6 +64,8 @@ static int GaiaUtilsAstAnnul( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstAxDistance( ClientData clientData, Tcl_Interp *interp,
                                    int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsAstAxOffsets( ClientData clientData, Tcl_Interp *interp,
+                                  int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstClear( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstConvert( ClientData clientData, Tcl_Interp *interp,
@@ -125,6 +127,10 @@ int GaiaUtils_Init( Tcl_Interp *interp )
                           GaiaUtilsAstAxDistance, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
+    Tcl_CreateObjCommand( interp, "gaiautils::astaxoffset",
+                          GaiaUtilsAstAxOffsets, (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+
     Tcl_CreateObjCommand( interp, "gaiautils::astclear", GaiaUtilsAstClear,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
@@ -141,12 +147,12 @@ int GaiaUtils_Init( Tcl_Interp *interp )
                           GaiaUtilsAstGetRefPos, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
 
+    Tcl_CreateObjCommand( interp, "gaiautils::astformat", GaiaUtilsAstFormat,
+                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
+
     Tcl_CreateObjCommand( interp, "gaiautils::astlinearapprox",
                           GaiaUtilsAstLinearApprox, (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
-
-    Tcl_CreateObjCommand( interp, "gaiautils::astformat", GaiaUtilsAstFormat,
-                          (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::astset", GaiaUtilsAstSet,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
@@ -844,7 +850,7 @@ static int GaiaUtilsGtAxisWcs( ClientData clientData, Tcl_Interp *interp,
 }
 
 /**
- * Determine the separation of two values along an axis.
+ * Determine the separation of two values along a 2D axis.
  *
  * There are four arguments, the address of an AstFrame (or subclass),
  * the axis, and two coordinate values. Returns the separation.
@@ -897,6 +903,80 @@ static int GaiaUtilsAstAxDistance( ClientData clientData, Tcl_Interp *interp,
     }
     astClearStatus;
     Tcl_SetResult( interp, "Failed to determine separation of two points",
+                   TCL_VOLATILE );
+    return TCL_ERROR;
+}
+
+/**
+ * Determine the offsets between two 2D positions.
+ *
+ * There are five arguments, the address of an AstFrame (or subclass),
+ * and the four coordinate values. Returns the offsets along the 
+ * current frame's axes between the two points. Since both axes are
+ * determined together any positional changes needed in the offsets
+ * (like latitude corrections) are applied by AST.
+ */
+static int GaiaUtilsAstAxOffsets( ClientData clientData, Tcl_Interp *interp,
+                                  int objc, Tcl_Obj *CONST objv[] )
+{
+    AstFrame *frame;
+    Tcl_Obj *resultObj;
+    double offset1;
+    double offset2;
+    double p1[2];
+    double p2[2];
+    double p3[2];
+    double p4[2];
+    long adr;
+
+    /* Check arguments, only allow five, the frame and the four coordinates. */
+    if ( objc != 6 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "frame axis1_coord1 axis1_coord2 "
+                          "axis2_coord1 axis2_coord2" );
+        return TCL_ERROR;
+    }
+
+    /* Get the frame */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    frame = (AstFrame *) adr;
+
+    /* Get the coordinates, these are positions 1 and 3 for astResolve. */
+    if ( Tcl_GetDoubleFromObj( interp, objv[2], &p1[0] ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    if ( Tcl_GetDoubleFromObj( interp, objv[3], &p1[1] ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    if ( Tcl_GetDoubleFromObj( interp, objv[4], &p3[0] ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    if ( Tcl_GetDoubleFromObj( interp, objv[5], &p3[1] ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+
+    /* Second position is dropped line onto first axis.
+     *           p3
+     *           |
+     *    p1-----p2
+     */
+    p2[0] = p3[0];
+    p2[1] = p1[1];
+
+    astResolve( frame, p1, p2, p3, p4, &offset1, &offset2 );
+
+    /* Export the offsets */
+    if ( astOK ) {
+        Tcl_ResetResult( interp );
+        resultObj = Tcl_GetObjResult( interp );
+        Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewDoubleObj(offset1));
+        Tcl_ListObjAppendElement(interp, resultObj, Tcl_NewDoubleObj(offset2));
+        return TCL_OK;
+    }
+    astClearStatus;
+    Tcl_SetResult( interp, "Failed to determine offsets between two points",
                    TCL_VOLATILE );
     return TCL_ERROR;
 }
