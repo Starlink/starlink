@@ -238,7 +238,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
     tau = smf_scale_tau( tau, filter, status);
   }
 
-  /* Asset time-ordered (ICD compliant) data order */
+  /* Assert time-ordered (ICD compliant) data order */
   smf_dataOrder( data, 1, status );
 
   /* Assign pointer to input data array if status is good */
@@ -332,7 +332,6 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 	  airmass = hdr->state->tcs_airmass;
 	}
 	extcorr = exp(airmass*tau);
-	printf("frame %d tau = %g A = %g extcorr = %g\n",(int)k,tau,airmass,extcorr);
       } else {
 	/* Not using quick so retrieve WCS to obtain elevation info */
 	wcs = hdr->wcs;
