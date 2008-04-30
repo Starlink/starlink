@@ -21,18 +21,20 @@
 *     data = smfData* (Given)
 *        smfData struct
 *     method = const char* (Given)
-*        "CSOT" or "WVMR" for CSO Tau or Water Vapout Monitor respectively
-*     tau = float (Given)
+*        Extinction correction method
+*     quick = const int (Given)
+*        Flag to denote whether to use a single airmass for all measurements
+*     tau = double (Given)
 *        Optical depth
-*     allexrcorr = double* (Given and Returned)
+*     allextcorr = double* (Given and Returned)
 *        If given, store calculated corrections for each bolo/time slice. Must
 *        have same dimensions as bolos in *data
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     This is the main routine implementing the EXTINCTION task.
-
+*     This is the main low-level routine implementing the EXTINCTION
+*     task.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -89,11 +91,14 @@
 *        Update to use new smf_free behaviour
 *     2008-04-03 (EC):
 *        Assert time-ordered (ICD compliant) data
+*     2008-04-29 (AGG):
+*        Code reorg to ensure correct status handling
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Council. Copyright (C) 2005-2008 University of British
+*     Columbia. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -140,38 +145,36 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 			    double tau, double *allextcorr, int *status) {
 
   /* Local variables */
-  smfHead *hdr;            /* Pointer to full header struct */
+  double airmass;          /* Airmass */
+  size_t base;             /* Offset into 3d data array */
+  double extcorr = 1.0;    /* Extinction correction factor */
+  char filter[81];         /* Name of filter */
+  smfHead *hdr = NULL;     /* Pointer to full header struct */
   dim_t i;                 /* Loop counter */
+  double *indata = NULL;   /* Pointer to data array */
+  dim_t index;             /* index into vectorized data array */
+  size_t *indices = NULL;  /* Index into data array */
   dim_t j;                 /* Loop counter */
+  dim_t k;                 /* Loop counter */
+  size_t ndims;            /* Number of dimensions in input data */
+  size_t newtau = 0;       /* Flag to denote whether to calculate a
+			      new tau from the WVM data */
+  double newtwvm[3];       /* Array of WVM temperatures */
+  size_t nframes = 0;      /* Number of frames */
+  size_t npts = 0;         /* Number of data points */
+  double oldtwvm[3] = {0.0, 0.0, 0.0}; /* Cached value of WVM temperatures */
   const char *origsystem = '\0';  /* Character string to store the coordinate
 			      system on entry */
+  double *vardata = NULL;  /* Pointer to variance array */
   AstFrameSet *wcs = NULL; /* Pointer to AST WCS frameset */
-  double airmass;          /* Airmass */
-  double *indata;          /* Pointer to data array */
-  double *vardata;         /* Pointer to variance array */
-  dim_t index;             /* index into vectorized data array */
-  dim_t k;                 /* Loop counter */
+  int wvmr = 0;            /* Flag to denote whether the WVMRAW method
+			      is to be used */
   double *xin = NULL;      /* X coordinates of input mapping */
   double *xout = NULL;     /* X coordinates of output */
   double *yin = NULL;      /* Y coordinates of input */
   double *yout = NULL;     /* Y coordinates of output */
+  int z;                   /* Counter for number of data points */
   double zd;               /* Zenith distance */
-  size_t *indices = NULL;
-  size_t ndims;            /* Number of dimensions in input data */
-  size_t nframes = 0;      /* Number of frames */
-  size_t npts;             /* Number of data points */
-  double extcorr = 1.0;    /* Extinction correction factor */
-  size_t base;             /* ?? */
-  int z;                   /* ?? */
-
-  char filter[81];         /* Name of filter */
-
-  double newtwvm[3];       /* Array of WVM temperatures */
-  double oldtwvm[3] = {0.0, 0.0, 0.0}; /* Cached value of WVM temperatures */
-  size_t newtau = 0;       /* Flag to denote whether to calculate a
-			      new tau from the WVM data */
-  int wvmr = 0;            /* Flag to denote whether the WVMRAW method
-			      is to be used */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -218,19 +221,19 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   if ( ndims == 2 && wvmr ) {
     if ( *status == SAI__OK ) {
       *status = SAI__ERROR;
-      errRep( FUNC_NAME, "Method WVMR can not be used on 2-D image data", status );
+      errRep( FUNC_NAME, "Method WVMRaw can not be used on 2-D image data", status );
     }
   }
 
   /* If we have a CSO Tau then convert it to the current filter */
   if ( strncmp( method, "CSOT", 4) == 0 ) {
     hdr = data->hdr;
-
     if( hdr == NULL ) {
-      *status = SAI__ERROR;
-      errRep( FUNC_NAME, "smfData doesn't contain header", status);
+      if ( *status == SAI__OK ) {
+	*status = SAI__ERROR;
+	errRep( FUNC_NAME, "Input data has no header", status);
+      }
     }
-
     smf_fits_getS( hdr, "FILTER", filter, 81, status);
     tau = smf_scale_tau( tau, filter, status);
   }
@@ -238,12 +241,12 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   /* Asset time-ordered (ICD compliant) data order */
   smf_dataOrder( data, 1, status );
 
-  /* Assign pointer to input data array */
-  /* of course, check status on return... */
-  indata = (data->pntr)[0]; 
-  vardata = (data->pntr)[1];
-  npts = (data->dims)[0] * (data->dims)[1];
-
+  /* Assign pointer to input data array if status is good */
+  if ( *status == SAI__OK ) {
+    indata = (data->pntr)[0]; 
+    vardata = (data->pntr)[1];
+    npts = (data->dims)[0] * (data->dims)[1];
+  }
   /* It is more efficient to call astTran2 with all the points
      rather than one point at a time */
   if (!quick) {
@@ -285,54 +288,39 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
     hdr = data->hdr;
     if( hdr == NULL ) {
       *status = SAI__ERROR;
-      errRep( FUNC_NAME, "smfData doesn't contain header", status);
-    }
-
-    if( *status == SAI__OK ) {
+      errRep( FUNC_NAME, "Data has no header after attempt to update", status);
+    } else {
       /* See if we have a new WVM value */
       if (wvmr) {
 	newtwvm[0] = hdr->state->wvm_t12;
 	newtwvm[1] = hdr->state->wvm_t42;
 	newtwvm[2] = hdr->state->wvm_t78;
 	/* Have any of the temperatures changed? */
-	if (newtwvm[0] != oldtwvm[0]) {
+	if ( (newtwvm[0] != oldtwvm[0]) || 
+	     (newtwvm[1] != oldtwvm[1]) || 
+	     (newtwvm[2] != oldtwvm[2]) ) {
 	  newtau = 1;
 	  oldtwvm[0] = newtwvm[0];
-	} else if (newtwvm[1] != oldtwvm[1]) {
-	  newtau = 1;
 	  oldtwvm[1] = newtwvm[1];
-	} else if (newtwvm[2] != oldtwvm[2]) {
-	  newtau = 1;
 	  oldtwvm[2] = newtwvm[2];
 	} else {
 	  newtau = 0;
 	}
 	if (newtau) {
 	  tau = smf_calc_wvm( hdr, status );
+	  newtau = 0;
 	  /* Check status and/or value of tau */
-	}
-      }
-      if (!quick) {
-	wcs = hdr->wcs;
-	/* Check current frame and store it */
-	origsystem = astGetC( wcs, "SYSTEM");
-	/* Select the AZEL system */
-	if (wcs != NULL) 
-	  astSetC( wcs, "SYSTEM", "AZEL" );
-	if (!astOK) {
-	  if (*status == SAI__OK) {
-	    *status = SAI__ERROR;
-	    errRep( FUNC_NAME, "Error from AST: WCS is NULL", status);
+	  if ( tau == VAL__BADD ) {
+	    if ( *status == SAI__OK ) {
+	      *status = SAI__ERROR;
+	      errRep("", "Error calculating tau from WVM temperatures", status);
+	    }
 	  }
 	}
-	/* Transfrom from pixels to AZEL */
-	astTran2(wcs, npts, xin, yin, 1, xout, yout );
       }
+
       /* If we're using the QUICK application method, we assume a single
 	 airmass and tau for the whole array */
-      /* Loop over data in time slice. Start counting at 1 since this is
-	 the GRID coordinate frame */
-      base = npts * k; /* Offset into 3d data array */
       if (quick) {
 	/* For 2-D data, get airmass from the FITS header rather than
 	   the state structure */
@@ -340,11 +328,39 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 	  /* This may change depending on exact FITS keyword */
 	  smf_fits_getD( hdr, "AMSTART", &airmass, status );
 	} else {
+	  /* Else use airmass value in state structure */
 	  airmass = hdr->state->tcs_airmass;
 	}
 	extcorr = exp(airmass*tau);
-      }
-      for (i=0; i < npts; i++ ) {
+	printf("frame %d tau = %g A = %g extcorr = %g\n",(int)k,tau,airmass,extcorr);
+      } else {
+	/* Not using quick so retrieve WCS to obtain elevation info */
+	wcs = hdr->wcs;
+	/* Check current frame, store it and then select the AZEL
+	   coordinate system */
+	if (wcs != NULL) {
+	  origsystem = astGetC( wcs, "SYSTEM");
+	  astSetC( wcs, "SYSTEM", "AZEL" );
+	  /* Transfrom from pixels to AZEL */
+	  astTran2(wcs, npts, xin, yin, 1, xout, yout );
+	  if (!astOK) {
+	    if (*status == SAI__OK) {
+	      *status = SAI__ERROR;
+	      errRep( FUNC_NAME, "Error from AST when attempting to set SYSTEM to AZEL: WCS is NULL", status);
+	    }
+	  }
+	} else {
+	  /* Throw an error if no WCS */
+	  if ( *status == SAI__OK ) {
+	    *status = SAI__ERROR;
+	    errRep("", "Error: input file has no WCS", status);
+	  }
+	}
+      } 
+      /* Loop over data in time slice. Start counting at 1 since this is
+	 the GRID coordinate frame */
+      base = npts * k; /* Offset into 3d data array */
+      for (i=0; i < npts && ( *status == SAI__OK ); i++ ) {
 	index = indices[i] + base;
 	if (indata[index] != VAL__BADD) {
 	  if (!quick) {
@@ -376,13 +392,13 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 	  if (!astOK) {
 	    if (*status == SAI__OK) {
 	      *status = SAI__ERROR;
-	      errRep( FUNC_NAME, "Error from AST", status);
+	      errRep( FUNC_NAME, "Error from AST when attempting to return to input coordinate system", status);
 	    }
 	  }
 	}
       }
     }
-  }
+  } /* End loop over timeslice */
 
   /* Add history entry */
   if ( *status == SAI__OK ) {
