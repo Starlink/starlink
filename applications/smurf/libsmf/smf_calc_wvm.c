@@ -39,12 +39,14 @@
 *        Initial test version
 *     2006-07-26 (TIMJ):
 *        sc2head no longer used. Use JCMTState instead.
+*     2008-04-29 (AGG):
+*        Code tidy, add status check
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
-*     All Rights Reserved.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research
+*     Council.  Copyright (C) 2006-2008 University of British
+*     Columbia.  All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -88,20 +90,19 @@
 
 double smf_calc_wvm( const smfHead *hdr, int *status ) {
 
+  /* Local variables */
   double airmass;           /* Airmass of current observation */
-  JCMTState * state;        /* STATE struct containing TCS info */
+  char filter[80];          /* Current filter */
+  float pwv;                /* Precipitable water vapour in mm */
+  const JCMTState *state = NULL; /* STATE struct containing TCS info */
   double tau;               /* Zenith tau at current wavelength */
+  double tamb;              /* Effective ambient temperature */
+  float tau0;               /* Optical depth along line of sight */
+  double tau225 = 0.0;      /* 225 GHz zenith optical depth */
+  float twater;             /* Effective temperature of water vapour */
   float wvm[3];             /* WVM temperature in the 3 channels */
 
-  float pwv;
-  float tau0;
-  float twater;
-
-  double tamb;
-  double tau225;
-
-  char filter[80];
-
+  /* Routine */
   if ( *status != SAI__OK) return VAL__BADD;
 
   /* Store TCS info */
@@ -119,13 +120,16 @@ double smf_calc_wvm( const smfHead *hdr, int *status ) {
   smf_fits_getD( hdr, "ATSTART", &tamb, status );
   smf_fits_getS( hdr, "FILTER", filter, 81, status);
 
-  wvmOpt( airmass, tamb, wvm, &pwv, &tau0, &twater);
+  if ( *status == SAI__OK ) {
 
-  tau225 = pwv2tau( airmass, pwv );
+    wvmOpt( (float)airmass, (float)tamb, wvm, &pwv, &tau0, &twater);
+
+    tau225 = pwv2tau( airmass, pwv );
+  }
 
   tau = smf_scale_tau( tau225, filter, status);
 
-  /*  printf("tau = %g\n",tau);*/
+  /*  printf("A = %g tau225 = %g tau = %g\n",airmass,tau225,tau);*/
 
   return tau;
 }
