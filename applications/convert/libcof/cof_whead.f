@@ -193,6 +193,10 @@
 *     2008 March 12 (MJC):
 *        Remove CHECKSUM and DATASUM keywords, and CADC provenance
 *        keywords.
+*     2008 April 28 (MJC):
+*        Do not exclude provenance keywords if the NDF does not have a
+*        PROVENANCE extension.  Allow for latest FITS citation COMMENT
+*        cards.
 *     {enter_further_changes_here}
 
 *-
@@ -290,7 +294,8 @@
       LOGICAL   NDFKEY           ! Not a NDF structure header?
       INTEGER   NHEAD            ! Number of headers
       CHARACTER NULL*1           ! ASCII null character
-      LOGICAL   PRORIG           ! Use supplied ORIGIN argument
+      LOGICAL   PRORIG           ! Use supplied ORIGIN argument?
+      LOGICAL   PROVPR           ! PROVENANCE extension present?
       LOGICAL   PRVCOM           ! Not the provenance caption comment?
       LOGICAL   PRVKEY           ! Not a provenance header?
       LOGICAL   ROTAX( DAT__MXDIM ) ! An axis is rotated in the FITS
@@ -486,6 +491,16 @@
          LABFND = CMPFND( 5 )
          UNTFND = CMPFND( 6 )
 
+*  Check for presence of NDF FITS extension.
+         CALL NDF_XSTAT( NDFI, 'PROVENANCE', PROVPR, STATUS )
+ 
+*  Can use provenance keywords in the airlock provided there is no
+*  no PROVENANCE extension to supersede them.
+         IF ( .NOT. PROVPR ) THEN
+            CADCKY = .TRUE.
+            PRVKEY = .TRUE.
+         END IF
+
 *  Obtain the number of dimensions of the NDF.
          CALL NDF_DIM( NDFI, NDF__MXDIM, DIMS, NDIM, STATUS )
 
@@ -536,7 +551,7 @@
      :               ( KEYWRD( 1:5 ) .NE. 'NAXIS' ) .AND.
      :               ( KEYWRD .NE. 'END' )
 
-*  This combines tests for the FITSIO FITS banner.
+*  This combines tests for the FITSIO FITS banner, new and old.
             BANKEY = ( KEYWRD .EQ. 'COMMENT' ) .AND. (
      :               ( VALUE( 1:14 ) .EQ. 'FITS (Flexible' ) .OR.
      :               ( VALUE( 1:40 ) .EQ. 'Astrophysics Supplement '/
@@ -544,7 +559,9 @@
      :               ( VALUE( 1:31 ) .EQ. 'Contact the NASA Science '/
      :                 /'Office' ) .OR.
      :               ( VALUE( 1:39 ) .EQ. 'FITS Definition document '/
-     :                 /'#100 and other' ) )
+     :                 /'#100 and other' ) .OR. 
+     :               ( VALUE( 1:39 ) .EQ. 'and Astrophysics'', '/
+     :                 /'volume 376, page 359') )
 
 *  This tests for the absence of scaling keywords.
             SCAKEY = KEYWRD .NE. 'BSCALE' .AND. KEYWRD .NE. 'BZERO'
@@ -575,64 +592,73 @@
             ICKEY = ( KEYWRD .NE. 'CHECKSUM' ) .AND.
      :              ( KEYWRD .NE. 'DATASUM' )
 
+
+*  Cannot use provenance keywords in the airlock when there a
+*  ROVENANCE extension to supersede them.
+            IF ( PROVPR ) THEN
+
 *  Test for CADC provenance keywords.  While these may not be unique, 
 *  it is more likely they are provenance than some other institution's 
 *  keywords.  First test whether or not there is an index number after 
 *  the first three characters of the keyword.
-            CALL ERR_MARK
-            CALL CHR_CTOI( KEYWRD( 4:8 ), IVALUE, STATUS )
-            IF ( STATUS .NE. SAI__OK ) THEN
-               CALL ERR_ANNUL( STATUS )
-               ISNUM = .FALSE.
-            ELSE
-               ISNUM = .TRUE.
-            END IF
-            CALL ERR_RLSE
+               CALL ERR_MARK
+               CALL CHR_CTOI( KEYWRD( 4:8 ), IVALUE, STATUS )
+               IF ( STATUS .NE. SAI__OK ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  ISNUM = .FALSE.
+               ELSE
+                  ISNUM = .TRUE.
+               END IF
+               CALL ERR_RLSE
 
-*  Test for absence of PRVCNT, PRVn, OBSCNT, and OBSn keywords.
-            CADCKY = ( KEYWRD .NE. 'PRVCNT' ) .AND.
-     :               ( KEYWRD .NE. 'OBSCNT' ) .AND.
-     :               ( KEYWRD( 1:3 ) .NE. 'PRV' .OR. .NOT. ISNUM ) .AND.
-     :               ( KEYWRD( 1:3 ) .NE. 'OBS' .OR. .NOT. ISNUM )
+*  Test for absence of PRVCNT, PRVn, OBSCNT, and OBSn keywords unless
+*  there is no PROVENANCE extension.
+               CADCKY = ( KEYWRD .NE. 'PRVCNT' ) .AND.
+     :                  ( KEYWRD .NE. 'OBSCNT' ) .AND.
+     :                  ( KEYWRD( 1:3 ) .NE. 'PRV' .OR. .NOT. ISNUM )
+     :                  .AND.
+     :                  ( KEYWRD( 1:3 ) .NE. 'OBS' .OR. .NOT. ISNUM )
 
 *  Test for general provenance keywords.  While these may not be unique,
 *  it is more likely they are provenance than some other institution's 
 *  keywords.  First test whether or not there is an index number after 
 *  the first four characters of the keyword.
-            CALL ERR_MARK
-            CALL CHR_CTOI( KEYWRD( 5:8 ), IVALUE, STATUS )
-            IF ( STATUS .NE. SAI__OK ) THEN
-               CALL ERR_ANNUL( STATUS )
-               ISNUM = .FALSE.
-            ELSE
-               ISNUM = .TRUE.
-            END IF
-            CALL ERR_RLSE
+               CALL ERR_MARK
+               CALL CHR_CTOI( KEYWRD( 5:8 ), IVALUE, STATUS )
+               IF ( STATUS .NE. SAI__OK ) THEN
+                  CALL ERR_ANNUL( STATUS )
+                  ISNUM = .FALSE.
+               ELSE
+                  ISNUM = .TRUE.
+               END IF
+               CALL ERR_RLSE
 
 *  Test for absence of PRVPn, PRVIn, PRVDn, PRVCn, PRVMn.
-            PRVKEY = .NOT. ISNUM .OR.
-     :               ( ( KEYWRD( 1:4 ) .NE. 'PRVP' ) .AND.
-     :                 ( KEYWRD( 1:4 ) .NE. 'PRVI' ) .AND. 
-     :                 ( KEYWRD( 1:4 ) .NE. 'PRVD' ) .AND. 
-     :                 ( KEYWRD( 1:4 ) .NE. 'PRVC' ) .AND. 
-     :                 ( KEYWRD( 1:4 ) .NE. 'PRVM' ) ) 
+               PRVKEY = .NOT. ISNUM .OR.
+     :                  ( ( KEYWRD( 1:4 ) .NE. 'PRVP' ) .AND.
+     :                    ( KEYWRD( 1:4 ) .NE. 'PRVI' ) .AND. 
+     :                    ( KEYWRD( 1:4 ) .NE. 'PRVD' ) .AND. 
+     :                    ( KEYWRD( 1:4 ) .NE. 'PRVC' ) .AND. 
+     :                    ( KEYWRD( 1:4 ) .NE. 'PRVM' ) ) 
 
 *  Exclude the provenance caption.  
 
 *  First remove leading blanks from the header in case this is the 
 * "Provenance:" comment-only header.
-            COMENT = FITSTR
-            CALL CHR_LDBLK( COMENT )
+               COMENT = FITSTR
+               CALL CHR_LDBLK( COMENT )
 
 *  Also remove the the blank line before the caption too otherwise
 *  repeated conversions to and from FITS could generate lots of blank 
 *  lines.  Find the current header position and delete the header
-*  provided it is blank..
-            PRVCOM = COMENT .NE. '/ Provenance:'
-            IF ( .NOT. PRVCOM ) THEN
-               CALL FTGHSP( FUNIT, NHEAD, CHEAD, STATUS )
-               CALL FTGREC( FUNIT, CHEAD, CARD, STATUS )
-               IF ( CARD .EQ. ' ' ) CALL FTDREC( FUNIT, CHEAD, STATUS )
+*  provided it is blank.
+               PRVCOM = COMENT .NE. '/ Provenance:'
+               IF ( .NOT. PRVCOM ) THEN
+                  CALL FTGHSP( FUNIT, NHEAD, CHEAD, STATUS )
+                  CALL FTGREC( FUNIT, CHEAD, CARD, STATUS )
+                  IF ( CARD .EQ. ' ' ) 
+     :              CALL FTDREC( FUNIT, CHEAD, STATUS )
+               END IF
             END IF
 
 *  Use an intermediate variable to reduce the number of continuation
