@@ -522,35 +522,36 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
      information to check that enough memory is available. */
 
   if( *status == SAI__OK ) {
+
     smf_checkmem_dimm( maxconcat, INST__SCUBA2, igroup->nrelated, modeltyps,
 		       nmodels, maxmem, &memneeded, status );
-  }
 
-  if( *status == SMF__NOMEM ) {
-    /* If we need too much memory, generate a warning message and then try
-       to re-group the files using smaller chunks */
+    if( *status == SMF__NOMEM ) {
+      /* If we need too much memory, generate a warning message and then try
+	 to re-group the files using smaller chunks */
 
-    errAnnul( status );
-    msgOut( " ", "SMF_ITERATEMAP: *** WARNING ***", status );
-    msgSeti( "LEN", maxconcat );
-    msgSeti( "AVAIL", maxmem/SMF__MB );
-    msgSeti( "NEED", memneeded/SMF__MB );
-    msgOut( " ", "  ^LEN continuous samples requires ^NEED Mb > ^AVAIL Mb", 
-	    status );
-    msgSeti( "TRY", (size_t) ((double) maxconcat * maxmem / memneeded) );
-    msgOut( " ", "  Will try to re-group data in chunks < ^TRY samples long",
-	    status);
-    msgOut( " ", "SMF_ITERATEMAP: ***************", status );
+      errAnnul( status );
+      msgOut( " ", "SMF_ITERATEMAP: *** WARNING ***", status );
+      msgSeti( "LEN", maxconcat );
+      msgSeti( "AVAIL", maxmem/SMF__MB );
+      msgSeti( "NEED", memneeded/SMF__MB );
+      msgOut( " ", "  ^LEN continuous samples requires ^NEED Mb > ^AVAIL Mb", 
+	      status );
+      msgSeti( "TRY", (size_t) ((double) maxconcat * maxmem / memneeded) );
+      msgOut( " ", "  Will try to re-group data in chunks < ^TRY samples long",
+	      status);
+      msgOut( " ", "SMF_ITERATEMAP: ***************", status );
+      
+      /* Close igroup if needed before re-running smf_grp_related */
+      
+      if( igroup ) {
+	smf_close_smfGroup( &igroup, status );
+      }
 
-    /* Close igroup if needed before re-running smf_grp_related */
-
-    if( igroup ) {
-      smf_close_smfGroup( &igroup, status );
+      smf_grp_related( igrp, isize, 1, 
+		       (size_t) ((double) maxconcat * maxmem / memneeded),
+		       &maxconcat, &igroup, status );
     }
-
-    smf_grp_related( igrp, isize, 1, 
-		     (size_t) ((double) maxconcat * maxmem / memneeded),
-		     &maxconcat, &igroup, status );
   }
 
 
