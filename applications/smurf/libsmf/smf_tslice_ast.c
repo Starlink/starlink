@@ -89,6 +89,8 @@
 *        - Set the DUT1 value in the returned current Frame.
 *     2008-04-09 (TIMJ):
 *        - STEPTIME handled elsewhere.
+*     2008-04-30 (EC):
+*        - Handle bolo-ordered data
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -147,6 +149,7 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
 
   AstFrame *cfrm = NULL;     /* Pointer to current Frame */
   smfHead *hdr;              /* Local copy of the header structure */
+  dim_t ntslice;             /* Number of time-slices in data */
   const JCMTState *tmpState; /* Local pointer to STATE */
   double dut1;               /* UT1-UTC correction, in days */ 
   int subsysnum;             /* Subsystem numeric id. 0 - 8 */
@@ -193,12 +196,19 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
     }
   }
 
+  /* Obtain number of time slices */
+  if( data->isTordered ) {
+    ntslice = data->dims[2];
+  } else {
+    ntslice = data->dims[0];
+  }
+
   /* Check index bounds */
-  if ( index < 0 || index >= (data->dims)[2] ) {
+  if ( index < 0 || index >= ntslice ) {
     if ( *status == SAI__OK ) {
       *status = SAI__ERROR;
       msgSeti( "I", index );
-      msgSeti( "TMX", (data->dims)[2] );
+      msgSeti( "TMX", ntslice );
       msgSeti( "TMN", 0 );
       errRep( FUNC_NAME, "Index out of bounds ( ^TMN <= ^I < ^TMX )", status );
       return;

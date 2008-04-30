@@ -34,7 +34,8 @@
 
 *  Description:
 *     This is the main low-level routine implementing the EXTINCTION
-*     task.
+*     task. If allextcorr is specified, no correction is applied to
+*     the data (the correction factors are just stored). 
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -93,6 +94,9 @@
 *        Assert time-ordered (ICD compliant) data
 *     2008-04-29 (AGG):
 *        Code reorg to ensure correct status handling
+*     2008-04-30 (EC):
+*        - Extra valid pointer checks
+*        - Removed time-ordered data assertion. Handle bolo-ordered case.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -147,6 +151,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   /* Local variables */
   double airmass;          /* Airmass */
   size_t base;             /* Offset into 3d data array */
+  dim_t indexb;            /* bolo-ordered array offset */
   double extcorr = 1.0;    /* Extinction correction factor */
   char filter[81];         /* Name of filter */
   smfHead *hdr = NULL;     /* Pointer to full header struct */
@@ -154,6 +159,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   double *indata = NULL;   /* Pointer to data array */
   dim_t index;             /* index into vectorized data array */
   size_t *indices = NULL;  /* Index into data array */
+  int isTordered;          /* data order of input data */
   dim_t j;                 /* Loop counter */
   dim_t k;                 /* Loop counter */
   size_t ndims;            /* Number of dimensions in input data */
@@ -162,6 +168,8 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   double newtwvm[3];       /* Array of WVM temperatures */
   size_t nframes = 0;      /* Number of frames */
   size_t npts = 0;         /* Number of data points */
+  dim_t nx;                /* # pixels in x-direction */
+  dim_t ny;                /* # pixels in y-direction */
   double oldtwvm[3] = {0.0, 0.0, 0.0}; /* Cached value of WVM temperatures */
   const char *origsystem = '\0';  /* Character string to store the coordinate
 			      system on entry */
@@ -179,19 +187,30 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   /* Check status */
   if (*status != SAI__OK) return;
 
-  if ( smf_history_check( data, FUNC_NAME, status) ) {
-    msgSetc("F", FUNC_NAME);
-    msgOutif(MSG__VERB," ", 
-	      "^F has already been run on these data, returning to caller", status);
-    return;
+  if( smf_history_check( data, FUNC_NAME, status) ) {
+    /* If caller not requesting allextcorr fail here */
+    if( !allextcorr ) {
+      msgSetc("F", FUNC_NAME);
+      msgOutif(MSG__VERB," ", 
+	       "^F has already been run on these data, returning to caller", 
+	       status);
+      return;
+    }
   }
+
+  /* Acquire the data order */
+  isTordered = data->isTordered;
 
   /* Do we have 2-D image data? */
   ndims = data->ndims;
   if (ndims == 2) {
     nframes = 1;
   } else if (ndims == 3 ) {
-    nframes = (data->dims)[2];
+    if( isTordered ) {
+      nframes = (data->dims)[2];
+    } else {
+      nframes = (data->dims)[0];
+    }
   } else {
     /* Abort with an error if the number of dimensions is not 2 or 3 */
     if ( *status == SAI__OK) {
@@ -238,14 +257,19 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
     tau = smf_scale_tau( tau, filter, status);
   }
 
-  /* Assert time-ordered (ICD compliant) data order */
-  smf_dataOrder( data, 1, status );
-
   /* Assign pointer to input data array if status is good */
   if ( *status == SAI__OK ) {
     indata = (data->pntr)[0]; 
     vardata = (data->pntr)[1];
-    npts = (data->dims)[0] * (data->dims)[1];
+
+    if( isTordered ) {
+      nx = (data->dims)[0];
+      ny = (data->dims)[1];
+    } else {
+      nx = (data->dims)[1];
+      ny = (data->dims)[2];
+    }
+    npts = nx*ny;
   }
   /* It is more efficient to call astTran2 with all the points
      rather than one point at a time */
@@ -263,9 +287,9 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 
   /* Prefill with coordinates */
   z = 0;
-  for (j = 0; j < (data->dims)[1]; j++) {
-    base = j *(data->dims)[0];
-    for (i = 0; i < (data->dims)[0]; i++) {
+  for (j = 0; j < ny; j++) {
+    base = j * nx;
+    for (i = 0; i < nx; i++) {
       if (!quick) {
 	xin[z] = (double)i + 1.0;
 	yin[z] = (double)j + 1.0;
@@ -276,6 +300,8 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   }
 
   /* Loop over number of time slices/frames */
+
+  indexb = 0;
   for ( k=0; k<nframes && (*status == SAI__OK) ; k++) {
     /* Call tslice_ast to update the header for the particular
        timeslice. If we're in QUICK mode then we don't need the WCS */
@@ -313,7 +339,8 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 	  if ( tau == VAL__BADD ) {
 	    if ( *status == SAI__OK ) {
 	      *status = SAI__ERROR;
-	      errRep("", "Error calculating tau from WVM temperatures", status);
+	      errRep("", "Error calculating tau from WVM temperatures", 
+		     status);
 	    }
 	  }
 	}
@@ -358,29 +385,48 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
       } 
       /* Loop over data in time slice. Start counting at 1 since this is
 	 the GRID coordinate frame */
-      base = npts * k; /* Offset into 3d data array */
+      base = npts * k;  /* Offset into 3d data array (time-ordered) */
+      indexb = k;       /* Offset into 3d data array (bolo-ordered) */
+
       for (i=0; i < npts && ( *status == SAI__OK ); i++ ) {
+	/* update array indices */
 	index = indices[i] + base;
-	if (indata[index] != VAL__BADD) {
-	  if (!quick) {
-	    zd = M_PI_2 - yout[indices[i]];
-	    airmass = slaAirmas( zd );
-	    extcorr = exp(airmass*tau);
+
+	if (!quick) {
+	  zd = M_PI_2 - yout[indices[i]];
+	  airmass = slaAirmas( zd );
+	  extcorr = exp(airmass*tau);
+	}
+	
+	if( allextcorr ) {
+	  /* Store extinction correction factor */
+	  if( isTordered ) {
+	    allextcorr[index] = extcorr;
+	  } else {
+	    allextcorr[indexb] = extcorr;
 	  }
-	  indata[index] *= extcorr;
-	  
-	  /* If an allextcor pointer is given, store the extinction
-	     correction term for this bolometer, timeslice */
-	  if( allextcorr ) allextcorr[index] = extcorr;
-	  
-	  /* Scale variances by the extinction correction. This
-	     assumes that the extinction correction is the same for
-	     all points, clearly not true but it may be close
-	     enough. */
-	  if (vardata != NULL && vardata[index] != VAL__BADD) {
-	    vardata[index] *= extcorr*extcorr;
+	} else {
+	  /* Otherwise Correct the data */
+	  if( indata && (indata[index] != VAL__BADD) ) {
+	    if( isTordered ) {
+	      indata[index] *= extcorr;
+	    } else {
+	      indata[indexb] *= extcorr;
+	    }
+	  }
+
+	  /* Correct the variance */
+	  if( vardata && (vardata[index] != VAL__BADD) ) {
+	    if( isTordered ) {
+	      vardata[index] *= extcorr*extcorr;
+	    } else {
+	      vardata[indexb] *= extcorr*extcorr;
+	    }
 	  }
 	}
+
+	/* Incremeber bolo-ordered data index */
+	indexb += nframes;
       }
       
       if (!quick) {
@@ -396,7 +442,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 	  }
 	}
       }
-    }
+    }    
   } /* End loop over timeslice */
 
   /* Add history entry */

@@ -51,6 +51,8 @@
 *  History:
 *     2008-04-28 (EC):
 *        Initial version.
+*     2008-04-30 (EC):
+*        Added SMF__EXT
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -175,6 +177,9 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
 	  break;
 	case SMF__COM:
 	  total += maxlen*smf_dtype_sz(SMF__DOUBLE,status);
+	  break;
+	case SMF__EXT:
+	  total += nsamp*smf_dtype_sz(SMF__DOUBLE,status)*nrelated;
 	  break;
 	default:
 	  *status = SAI__ERROR;

@@ -131,6 +131,8 @@
 *        -added chunk to smfGroup
 *     2008-04-17 (EC):
 *        -improved initialization for SMF__NOI and SMF__QUA
+*     2008-04-30 (EC):
+*        -Calculate and store extinction coefficients for SMF__EXT
 
 *     {enter_further_changes_here}
 
@@ -295,8 +297,8 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 
   oflag = 0;
 
-  /* Only map head if creating LUT */
-  if( mtype != SMF__LUT ) oflag |= SMF__NOCREATE_HEAD;
+  /* Only map head if creating LUT or EXT */
+  if( (mtype != SMF__LUT) && (mtype != SMF__EXT) ) oflag |= SMF__NOCREATE_HEAD;
 
   if( mtype == SMF__RES ) {
     /* Propagate input if RES */
@@ -616,6 +618,14 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	      if( (idata->pntr)[2] ) {
 		memcpy( dataptr, (idata->pntr)[2], datalen );
 	      }
+
+	    } else if( mtype == SMF__EXT ) {
+	      /* In this case run smf_correct_extinction on the input data
+		 (with only the header mapped) and store the gain coefficients
+		 in the model bufffer */
+
+	      smf_correct_extinction( idata, "WVMR", 0, 0, (double *) dataptr, 
+				      status );
 
 	    } else {
 	      /* otherwise zero the buffer */
