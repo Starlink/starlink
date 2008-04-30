@@ -27,7 +27,13 @@
 *     This routine returns the optical depth for the given SCUBA-2
 *     filter based on the tau from the WVM. Currently the SCUBA
 *     scaling numbers are used assuming that the WVM tau is actually
-*     the 225 GHz zenith optical depth. 
+*     the 225 GHz zenith optical depth. The scaling relation is given
+*     by:
+*         tau (filter) = a * ( tau_WVM - b )
+*     where tau_WVM is the 225 GHz optical depth as derived from the
+*     WVM and constants a and b were fitted from SCUBA
+*     measurements. IF status is bad on entry then VAL__BADD is
+*     returned.
 
 *  Notes:
 
@@ -44,12 +50,13 @@
 *        API change: filter is now a string
 *     2006-03-23 (AGG):
 *        Limit filter pattern match to a single character
+*     2008-04-29 (AGG):
+*        Smarten up the code, expand documentation
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
-*     All Rights Reserved.
+*     Copyright (C) 2006-2008 University of British Columbia.  All
+*     Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -72,23 +79,27 @@
 *-
 */
 
+/* Standard includes */
 #include <stdio.h>
 #include <string.h>
 
-#include "smf.h"
+/* Starlink includes */
 #include "sae_par.h"
-#include "ast.h"
 #include "mers.h"
-#include "msg_par.h"
 #include "prm_par.h"
-#include "smurf_par.h"
-#include "smurf_typ.h"
+
+/* SMURF includes */
+#include "smf.h"
 
 double smf_scale_tau( const double tauwvm, const char *filter, int *status ) {
 
-  double tau;
-  double a = 0;
-  double b = 0;
+  /* Local variables */
+  double tau;                   /* Optical depth at current wavelength */
+  double a = 0;			/* Wavelength-dependent constant */
+  double b = 0;			/* Wavelength-dependent constant */
+
+  /* Return bad value if status bad on entry */
+  if ( *status != SAI__OK ) return VAL__BADD;
 
   /* Note these are tau_CSO to SCUBA tau_filter conversions.... */
   /* Also note that we are assuming that the filter names start with
@@ -111,6 +122,6 @@ double smf_scale_tau( const double tauwvm, const char *filter, int *status ) {
   }
 
   tau = a * ( tauwvm - b );
-  
+
   return tau;
 }
