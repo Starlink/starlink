@@ -78,15 +78,16 @@
 *        Add call to smf_subtract_plane for sky removal
 *     2008-03-05 (EC):
 *        Changed smf_correct_extinction interface
+*     2008-04-29 (AGG):
+*        Remove sky subtraction call, remove placeholder code for future methods
 *     {enter_further_changes_here}
 
 *  Notes:
-*     At the moment there is no way of exploiting the range of options
-*     for sky removal so only a simple mean is removed if necessary.
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2005 Particle Physics and Astronomy Research
+*     Council. Copyright (C) 2005-2008 University of British
+*     Columbia. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -140,47 +141,44 @@
 void smurf_extinction( int * status ) {
 
   /* Local Variables */
+  double deftau = 0.0;       /* Default value for the zenith tau */
+  char filter[81];           /* Name of filter */
   int flag;                  /* Flag for how group is terminated */
   int i;                     /* Loop counter */
   Grp *igrp = NULL;          /* Input group */
+  char method[LEN__METHOD];  /* String for optical depth method */
   smfData *odata = NULL;     /* Output data struct */
   Grp *ogrp = NULL;          /* Output group */
-  smfHead *ohdr;             /* Pointer to header in odata */
+  smfHead *ohdr = NULL;      /* Pointer to header in odata */
   int outsize;               /* Total number of NDF names in the output group */
+  int quick;                 /* Flag to denote whether to assume a
+				single airmass for all bolometers */
   int size;                  /* Number of files in input group */
   double tau = 0.0;          /* Zenith tau at this wavelength */
-  char filter[81];           /* Name of filter */
-
-  char method[LEN__METHOD];  /* String for optical depth method */
-  double deftau = 0.0;       /* Default value for the zenith tau */
-  int quick;
 
   /* Main routine */
-
   ndfBegin();
-
-  /*  msgOut( " ", "Inside EXTINCTION", status );*/
 
   /* Read the input file */
   ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
 
-  /* Get output file(s) : assumes a 1:1 correspondence between input
+  /* Get output file(s): assumes a 1:1 correspondence between input
      and output files */
   ndgCreat( "OUT", igrp, &ogrp, &outsize, &flag, status );
 
   /* Get METHOD */
   parChoic( "METHOD", "CSOTAU", 
-	    "CSOtau, Filtertau, WVMraw, WVMsmooth, Polynomial, Data.", 1,
+	    "CSOtau, Filtertau, WVMraw", 1,
 	    method, LEN__METHOD, status);
 
   /* Get QUICK flag */
   parGet0l( "QUICK", &quick, status);
 
-  for (i=1; i<=size; i++) {
+  for (i=1; i<=size && ( *status == SAI__OK ); i++) {
 
     /* Flatfield - if necessary */
     smf_open_and_flatfield( igrp, ogrp, i, &odata, status );
-
+    /* Check flatfield status */
     if (*status == SMF__FLATN) {
       errAnnul( status );
       msgOutif(MSG__VERB, "",
@@ -188,20 +186,20 @@ void smurf_extinction( int * status ) {
     } else if ( *status == SAI__OK) {
       msgOutif(MSG__VERB," ","Flatfield applied", status);
     } else {
-      /* Tell the user which file it was... */
-      /* Would be user-friendly to trap 1st etc... */
+      /* Error flatfielding: tell the user which file it was */
       msgSeti("I",i);
-      errRep(TASK_NAME, "Unable to flatfield data from file ^I", status);
+      msgSeti("N",size);
+      errRep(TASK_NAME, "Unable to flatfield data from file ^I of ^N", status);
     }
 
-    /* What next if status is bad? */
-
-    /* Remove sky */
-    smf_subtract_plane( odata, NULL, "MEAN", status);
-
-    /* Tell user if polynomials have already been removed */
-
-    /* Check (and tell user) if extinction has already been done */
+    /* Now check that the data are sky-subtracted */
+    if ( !smf_history_check( odata, "smf_subtract_plane", status ) ) {
+      if ( *status == SAI__OK ) {
+	*status = SAI__ERROR;
+	msgSeti("I",i);
+	errRep("", "Input data from file ^I are not sky-subtracted", status);
+      }
+    }
 
     /* If status is OK, make decisions on method keywords */
     if ( *status == SAI__OK ) {
@@ -226,32 +224,19 @@ void smurf_extinction( int * status ) {
 	}
 	parGet0d( "FILTERTAU", &tau, status );
       } else if ( strncmp( method, "WVMR", 4) == 0 ) {
-	/*	*status = SAI__ERROR;
-	msgSetc("METHOD", "WVMR");
-	errRep("", "Sorry, method, ^METHOD, not supported yet", status);*/
 	msgOutif(MSG__VERB," ", "Using Raw WVM data", status);
-      } else if ( strncmp( method, "WVMS", 4) == 0 ) {
-	*status = SAI__ERROR;
-	msgSetc("METHOD", "WVMS");
-	errRep("", "Sorry, method, ^METHOD, not supported yet", status);
-      } else if ( strncmp( method, "POLY", 4) == 0 ) {
-	*status = SAI__ERROR;
-	msgSetc("METHOD", "POLY");
-	errRep("", "Sorry, method, ^METHOD, not supported yet", status);
-      } else if ( strncmp( method, "DATA", 4) == 0 ) {
-	*status = SAI__ERROR;
-	msgSetc("METHOD", "DATA");
-	errRep("", "Sorry, method, ^METHOD, not supported yet", status);
       } else {
 	*status = SAI__ERROR;
 	errRep("", "Unsupported method. Possible programming error.", status);
       }
     }
-    /* Apply extinction correction */
+    /* Apply extinction correction - note that a check is made to
+       determine whether the data have already been extinction
+       corrected */
     smf_correct_extinction( odata, method, quick, tau, NULL, status );
 
     /* Free resources for output data */
-    /*smf_close_file( &odata, status );*/
+    smf_close_file( &odata, status );
   }
   /* Tidy up after ourselves: release the resources used by the grp routines  */
   grpDelet( &igrp, status);
