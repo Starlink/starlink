@@ -116,6 +116,8 @@
 *        Use frequencies from matchFreqs for refchan/IF.
 *     2008-04-25 (JB):
 *        INSTAP_X = INSTAP_Y = 0.0.
+*     2008-04-30 (JB):
+*        Correct FFT_WIN and BEDEFAC.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -626,11 +628,25 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   astSetFitsF ( fitschan, "IFCHANSP", IFchanSp,
                 "[Hz] TOPO IF channel spacing (signed)", 0 ); 
 
-  astSetFitsS ( fitschan, "FFT_WIN", AST__UNDEFS, 
-	        "Type of window used for FFT", 0 ); 
+  astSetFitsS ( fitschan, "FFT_WIN", "truncate", 
+	        "Type of window used for FFT", 0 );
 
-  astSetFitsF ( fitschan, "BEDEGFAC", AST__UNDEFF, 
-	        "Backend degradation factor", 0 ); 
+  if ( strncmp ( gsdVars->backend, "DAS", 3 ) == 0 ) {
+
+    astSetFitsF ( fitschan, "BEDEGFAC", 1.15, 
+	          "Backend degradation factor", 0 );
+
+  } else if ( strncmp ( gsdVars->backend, "AOSC", 4 ) == 0 ) {
+
+    astSetFitsF ( fitschan, "BEDEGFAC", 1.0, 
+	          "Backend degradation factor", 0 );
+
+  } else {
+
+    astSetFitsF ( fitschan, "BEDEGFAC", AST__UNDEFF, 
+	         "Backend degradation factor", 0 ); 
+
+  }
 
   astSetFitsS ( fitschan, "MSROOT", AST__UNDEFS, 
 	        "Root name of raw measurement sets", 0 ); 
