@@ -79,7 +79,10 @@
 *     2008-03-05 (EC):
 *        Changed smf_correct_extinction interface
 *     2008-04-29 (AGG):
-*        Remove sky subtraction call, remove placeholder code for future methods
+*        Remove sky subtraction call, remove placeholder code for future
+*        methods
+*     2008-05-01 (TIMJ):
+*        Add title to output file.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -234,6 +237,10 @@ void smurf_extinction( int * status ) {
        determine whether the data have already been extinction
        corrected */
     smf_correct_extinction( odata, method, quick, tau, NULL, status );
+
+    /* Set character labels */
+    smf_set_clabels( "Extinction corrected",NULL, NULL, odata->hdr, status);
+    smf_write_clabels( odata, status );
 
     /* Free resources for output data */
     smf_close_file( &odata, status );
