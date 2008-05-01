@@ -17,7 +17,9 @@
 *     Frame. The axes to select are determined using the supplied
 *     environment parameter. Each axis can be specified either by giving 
 *     its index within the Frame in the range 1 to the number of axes in 
-*     the Frame, or by giving its symbol. If the first value supplied in 
+*     the Frame, or by giving its symbol. Spectral, time and celestial
+*     longitude/latitude axes may also be specified using the options "SPEC",
+*     "TIME", "SKYLON" and "SKYLAT". If the first value supplied in 
 *     AXES is not zero, the supplied axes are used as the dynamic default 
 *     for the parameter. The parameter value should be given as a GRP group 
 *     expression, with default GRP control characters.
@@ -71,6 +73,8 @@
 *  History:
 *     10-SEP-1998 (DSB):
 *        Original version.
+*     1-MAY-2008 (DSB):
+*        Allow SPEC, TIME, SKYLON and SKYLAT to be used to select axes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -99,11 +103,17 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER CAXIS( NDF__MXDIM )*20 ! Available axis symbols
+      CHARACTER CAXIS( 2*NDF__MXDIM )*20 ! Available axis symbols
+      CHARACTER DOM*30             ! Value of Domain attribute
       CHARACTER PAXIS*( VAL__SZI ) ! Buffer for new axis number
+      INTEGER AXPOS( 2*NDF__MXDIM )! Index of axis within "CAXIS" array
+      INTEGER DEFAX                ! Default axis index
       INTEGER I                    ! Axis index
+      INTEGER J                    ! Axis index
       INTEGER NCP                  ! No. of characters in PAXIS text buffer
       INTEGER NFC                  ! No. of axes in original Current Frame
+      INTEGER NOPT                 ! No. of options in CAXIS
+      LOGICAL DOSKY                ! Save indices of sky axes?
 *.
 
 *  Check the inherited global status.
@@ -112,20 +122,83 @@
 *  Get the number of axes in the supplied Frame.
       NFC = AST_GETI( FRAME, 'NAXES', STATUS )
 
+*  Initialise the number of options stored in CAXIS.
+      NOPT = 0
+
+*  Indicate we have not yet added the SKYLON and SKYLAT options to the
+*  CAXIS list.
+      DOSKY = .TRUE.
+
 *  Get the axis symbols and their lengths for all axes in the Frame.
       DO I = 1, NFC
+         NOPT = NOPT + 1
+
          NCP = 0
          CALL CHR_PUTI( I, PAXIS, NCP )
-         CAXIS( I ) = AST_GETC( FRAME, 'Symbol(' // 
+         CAXIS( NOPT ) = AST_GETC( FRAME, 'Symbol(' // 
      :                          PAXIS( : NCP ) // ')', STATUS )
-         CALL CHR_LDBLK( CAXIS( I ) )
-         CALL KPG1_PGESC( CAXIS( I ), STATUS )
+         CALL CHR_LDBLK( CAXIS( NOPT ) )
+         CALL KPG1_PGESC( CAXIS( NOPT ), STATUS )
+         AXPOS( NOPT ) = I
+
+*  Search for any sky, spectral and time axes. We use the Domain
+*  attribute to identify each type of axis (assuming the Domain values
+*  have not been changed from the default values provided by AST).
+         DOM = AST_GETC( FRAME, 'Domain(' // PAXIS( : NCP ) // ')', 
+     :                   STATUS )
+
+*  If this is a spectral axis, allow the user to specify this axis using
+*  the option "SPEC".
+         IF( DOM .EQ. 'SPECTRUM' .OR. DOM .EQ. 'DSBSPECTRUM' ) THEN
+            NOPT = NOPT + 1
+            CAXIS( NOPT ) = 'SPEC'
+            AXPOS( NOPT ) = I
+
+*  If this is a time axis, allow the user to specify this axis using
+*  the option "TIME".
+         ELSE IF( DOM .EQ. 'TIME' ) THEN
+            NOPT = NOPT + 1
+            CAXIS( NOPT ) = 'TIME'
+            AXPOS( NOPT ) = I
+
+*  If this is a celestial axis, find the indices of the longitude and
+*  latitude axes and allow the user to specify them using the options
+*  "SKYLON" and "SKYLAT".
+         ELSE IF( DOM .EQ. 'SKY' .AND. DOSKY ) THEN
+            NOPT = NOPT + 1
+            CAXIS( NOPT ) = 'SKYLAT'
+            AXPOS( NOPT ) = AST_GETI( FRAME, 'LatAxis(' // 
+     :                                PAXIS( : NCP ) // ')', STATUS )
+
+            NOPT = NOPT + 1
+            CAXIS( NOPT ) = 'SKYLON'
+            AXPOS( NOPT ) = AST_GETI( FRAME, 'LonAxis(' // 
+     :                                PAXIS( : NCP ) // ')', STATUS )
+
+            DOSKY = .FALSE.
+         END IF
+
       END DO
+
+*  Translate the supplied default axis indices into default option indices.
+      IF( AXES( 1 ) .GT. 0 ) THEN
+         DO J = 1, NAX
+            DEFAX = AXES( J )
+            DO I = NOPT, 1, -1
+               IF( AXPOS( I ) .EQ. DEFAX ) AXES( J ) = I
+            END DO
+         END DO
+      END IF
 
 *  Get the required number of axis selections. A resonable guess should
 *  be to assume a one-to-one correspondance between Current and Base axes.
 *  Therefore, use the significant axes selected above as the defaults to be
 *  used if a null (!) parameter value is supplied.
-      CALL KPG1_GTCHV( NFC, CAXIS, PARAM, NAX, AXES, AXES, STATUS )
+      CALL KPG1_GTCHV( NOPT, CAXIS, PARAM, NAX, AXES, AXES, STATUS )
+
+*  Translate the returned option indices into axis indices.
+      DO J = 1, NAX
+         AXES( J ) = AXPOS( AXES( J ) ) 
+      END DO
     
       END
