@@ -275,6 +275,9 @@
 *        rather than by value.
 *     2008-04-24 (EC):
 *        Added MAXMEM parameter, memory checking for output map
+*     2008-05-01 (TIMJ):
+*        Use BAD in EXP_TIME when no integration time.
+*        Tidy up some status logic.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -598,7 +601,7 @@ void smurf_makemap( int *status ) {
        pixel */
     for (i=0; (i<mapsize) && (*status == SAI__OK); i++) {
       if ( map[i] == VAL__BADD) {
-	exp_time[i] = 0.0;
+	exp_time[i] = VAL__BADD;
 	weights[i] = VAL__BADD;
       } else {
 	exp_time[i] = steptime * weights3d[i];
@@ -622,10 +625,12 @@ void smurf_makemap( int *status ) {
     if( *status == SAI__OK ) {
       for(i=1; i<=size; i++ ) {	
 
-        smf_open_file( igrp, i, "UPDATE", SMF__NOCREATE_DATA, &data, status );
-        if( *status != SAI__OK) {
-          errRep(FUNC_NAME, "Bad status opening smfData", status);      
-        }
+	if (*status == SAI__OK) {
+	  smf_open_file( igrp, i, "UPDATE", SMF__NOCREATE_DATA, &data,status );
+	  if( *status != SAI__OK) {
+	    errRep(FUNC_NAME, "Bad status opening smfData", status);      
+	  }
+	}
         
 	/* Store steptime for calculating EXP_TIME */
 	if ( i==1 ) {
@@ -641,13 +646,15 @@ void smurf_makemap( int *status ) {
 	   he header is available) */
 	smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
 
-        smf_close_file( &data, status );
-        if( *status != SAI__OK) {
-          errRep(FUNC_NAME, "Bad status closing smfData", status);      
-        }          
+	if (*status == SAI__OK) {
+	  smf_close_file( &data, status );
+	  if( *status != SAI__OK) {
+	    errRep(FUNC_NAME, "Bad status closing smfData", status);      
+	  }
+	}     
 
 	/* Exit loop if error status */
-	if( *status != SAI__OK ) i=size;        
+	if( *status != SAI__OK ) break;
       }
     }
 
@@ -658,7 +665,7 @@ void smurf_makemap( int *status ) {
     /* Calculate exposure time per output pixel from hitsmap */
     for (i=0; (i<mapsize) && (*status == SAI__OK); i++) {
       if ( map[i] == VAL__BADD) {
-	exp_time[i] = 0.0;
+	exp_time[i] = VAL__BADD;
       } else {
 	exp_time[i] = steptime * hitsmap[i];
 	if ( exp_time[i] > maxtexp ) {
@@ -666,7 +673,14 @@ void smurf_makemap( int *status ) {
 	}
       }
     }
-    smf_free( hitsmap, status );
+    hitsmap = smf_free( hitsmap, status );
+  } else {
+    /* no idea what mode */
+    if (*status == SAI__OK) {
+      *status = SAI__ERROR;
+      errRep( " ", "Map maker mode not understood. Should not be possible",
+	      status );
+    }
   }
 
   /* Write WCS */
