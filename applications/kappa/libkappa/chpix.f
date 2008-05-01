@@ -147,6 +147,9 @@
 *     18-SEP-2007 (DSB):
 *        Correct formatting of bad values when using current pixel value as 
 *        dynamic default for NEWVAL.
+*     2008 May 1 (MJC):
+*        Fix bug affecting bad-value substitution for byte and word
+*        data types.
 *     {enter_further_changes_here}
 
 *-
@@ -415,8 +418,8 @@
                BADO = .TRUE.
             ELSE
                CALL CHR_CTOI( CVALUE, IVALUE, STATUS )
+               BVALUE = NUM_ITOB( IVALUE )
             END IF
-            BVALUE = NUM_ITOB( IVALUE )
 
 *  Fill the array with the constant.
             CALL KPG1_FILLB( BVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
@@ -446,8 +449,8 @@
                BADO = .TRUE.
             ELSE
                CALL CHR_CTOI( CVALUE, IVALUE, STATUS )
+               BVALUE = NUM_ITOUB( IVALUE )
             END IF
-            BVALUE = NUM_ITOUB( IVALUE )
 
 *  Fill the array with the constant.
             CALL KPG1_FILLUB( BVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
@@ -477,8 +480,8 @@
                BADO = .TRUE.
             ELSE
                CALL CHR_CTOI( CVALUE, IVALUE, STATUS )
+               WVALUE = NUM_ITOW( IVALUE )
             END IF
-            WVALUE = NUM_ITOW( IVALUE )
 
 *  Fill the array with the constant.
             CALL KPG1_FILLW( WVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
@@ -507,8 +510,8 @@
                BADO = .TRUE.
             ELSE
                CALL CHR_CTOI( CVALUE, IVALUE, STATUS )
+               WVALUE = NUM_ITOUW( IVALUE )
             END IF
-            WVALUE = NUM_ITOUW( IVALUE )
 
 *  Fill the array with the constant.
             CALL KPG1_FILLUW( WVALUE, EL, %VAL( CNF_PVAL( PNTR( 1 ) ) ), 
