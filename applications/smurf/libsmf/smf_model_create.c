@@ -220,6 +220,7 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
   char *pname=NULL;             /* Poiner to fname */
   long remainder=0;             /* Extra length beyond integer pagesize */
   char suffix[] = SMF__DIMM_SUFFIX; /* String containing model suffix */
+  double tau;                   /* 225 GHz optical depth */
   int thisnrel;                 /* Number of related items for this model */
 
   /* Main routine */
@@ -624,8 +625,14 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 		 (with only the header mapped) and store the gain coefficients
 		 in the model bufffer */
 
+	      /*
 	      smf_correct_extinction( idata, "WVMR", 0, 0, (double *) dataptr, 
 				      status );
+	      */
+
+	       smf_fits_getD( idata->hdr, "MEANWVM", &tau, status );
+	       smf_correct_extinction( idata, "CSOTAU", 1, tau, 
+				       (double *) dataptr, status );
 
 	    } else {
 	      /* otherwise zero the buffer */
