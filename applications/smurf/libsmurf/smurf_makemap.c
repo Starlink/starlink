@@ -276,8 +276,9 @@
 *     2008-04-24 (EC):
 *        Added MAXMEM parameter, memory checking for output map
 *     2008-05-01 (TIMJ):
-*        Use BAD in EXP_TIME when no integration time.
-*        Tidy up some status logic.
+*        - Use BAD in EXP_TIME when no integration time.
+*        - Tidy up some status logic.
+*        - Add units and label to output file.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -350,6 +351,7 @@ void smurf_makemap( int *status ) {
   /* Local Variables */
   Grp *confgrp = NULL;       /* Group containing configuration file */
   smfData *data=NULL;        /* Pointer to SCUBA2 data struct */
+  char data_units[SMF__CHARLABEL+1]; /* Units string */
   double *exp_time = NULL;    /* Exposure time array written to output file */
   AstFitsChan *fchan = NULL; /* FitsChan holding output NDF FITS extension */
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
@@ -395,7 +397,7 @@ void smurf_makemap( int *status ) {
   double sumtexp;            /* Total exposure time across all pixels */
   char system[10];           /* Celestial coordinate system for output image */
   smfData *tdata=NULL;       /* Exposure time data */
-  int tndf = 0;              /* NDF identifier for EXP_TIME */
+  int tndf = NDF__NOID;      /* NDF identifier for EXP_TIME */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   int uselonlat = 0;         /* Flag for whether to use given lon_0 and
 				lat_0 for output frameset */
@@ -403,7 +405,12 @@ void smurf_makemap( int *status ) {
   smfData *wdata=NULL;       /* Pointer to SCUBA2 data struct for weights */
   double *weights=NULL;      /* Pointer to the weights map */
   double *weights3d = NULL;  /* Pointer to 3-D weights array */
-  int wndf = 0;              /* NDF identifier for WEIGHTS */
+  int wndf = NDF__NOID;      /* NDF identifier for WEIGHTS */
+
+  if (*status != SAI__OK) return;
+
+  /* initialisation */
+  data_units[0] = '\0';
 
   /* Main routine */
   ndfBegin();
@@ -566,6 +573,9 @@ void smurf_makemap( int *status ) {
 	}
       }
 
+      /* Check units are consistent */
+      smf_check_units( i, data_units, data->hdr, status);
+
       /* Store steptime for calculating EXP_TIME */
       if ( i==1 ) {
 	smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
@@ -637,6 +647,9 @@ void smurf_makemap( int *status ) {
 	  smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
 	}
 
+	/* Check units are consistent */
+	smf_check_units( i, data_units, data->hdr, status);
+
 	/* Store the filename in the keymap for later - the GRP would be fine
 	   as is but we use a keymap in order to reuse smf_fits_add_prov */
 	if (*status == SAI__OK)
@@ -687,6 +700,18 @@ void smurf_makemap( int *status ) {
   ndfPtwcs( outfset, ondf, status );
   ndfPtwcs( outfset, tndf, status );
   ndfPtwcs( outfset, wndf, status );
+
+  /* write units - hack we do not have a smfHead */
+  if (strlen(data_units)) ndfCput( data_units, ondf, "UNITS", status);
+  ndfCput("Flux Density", ondf, "LABEL", status);
+  ndfCput("Weight", wndf, "LABEL", status);
+  ndfCput("s", tndf, "UNITS", status);
+  ndfCput("Exposure time", tndf, "LABEL", status);
+
+  /* Weights are related to data_units */
+  strncat(data_units, "**-2", (SMF__CHARLABEL - 5)); 
+  ndfCput(data_units, wndf, "UNITS", status);
+
 
   /* Calculate median exposure time - use faster histogram-based
      method which should be accurate enough for our purposes */

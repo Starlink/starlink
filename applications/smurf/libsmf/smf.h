@@ -297,6 +297,8 @@
 *        Add smf_dump_smfData
 *     2008-04-30 (TIMJ):
 *        Add _clabels routines.
+*     2008-05-01 (TIMJ):
+*        Add check_units
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -934,4 +936,9 @@ void smf_set_clabels( const char title[], const char label[], const char units[]
 		      smfHead* hdr, int * status );
 
 void smf_write_clabels( const smfData* data, int * status );
+
+
+void smf_check_units( int count, char current[],
+		      smfHead* hdr, int * status );
+
 #endif /* SMF_DEFINED */
