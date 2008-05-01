@@ -80,14 +80,17 @@ void smf_write_clabels( const smfData* data, int * status ) {
   if (hdr == NULL || file == NULL) return;
   if (file->ndfid == NDF__NOID) return;
 
-  if (strlen(hdr->units))
+  if (strlen(hdr->units)) {
     ndfCput( hdr->units, file->ndfid, "UNITS", status);
+  }
 
-  if (strlen(hdr->dlabel))
+  if (strlen(hdr->dlabel)) {
     ndfCput( hdr->dlabel, file->ndfid, "LABEL", status);
+  }
 
-  if (strlen(hdr->title))
+  if (strlen(hdr->title)) {
     ndfCput( hdr->title, file->ndfid, "TITLE", status);
+  }
 
   return;
 }
