@@ -143,6 +143,8 @@
 *        - Added memory usage check
 *     2008-04-29 (EC)
 *        Check for VAL__BADD in map to avoid propagating to residual
+*     2008-04-30 (EC)
+*        -Undo EXTinction correction after calculating AST
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -222,6 +224,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   dim_t dsize;                  /* Size of data arrays in containers */
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
   int flag;                     /* Flag */
+  int haveext;                  /* Set if EXT is one of the models */
   int havenoi;                  /* Set if NOI is one of the models */
   smfHead *hdr=NULL;            /* Pointer to smfHead */
   dim_t i;                      /* Loop counter */
@@ -277,6 +280,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   int untilconverge=0;          /* Set if iterating to convergence */
   double *var_data=NULL;        /* Pointer to DATA component of NOI */
   int varmapmethod=0;           /* Method for calculating varmap */
+  dim_t whichext;               /* Model index of EXT if present */
   dim_t whichnoi;               /* Model index of NOI if present */
 
   /* Main routine */
@@ -424,6 +428,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
     /* Type and order of models to fit from MODELORDER keyword */
     havenoi = 0;
+    haveext = 0;
     if( astMapGet0C( keymap, "MODELORDER", &asttemp ) ) {
 
       modelname[3] = 0;
@@ -457,6 +462,12 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 		if( thismodel == SMF__NOI ) {
 		  havenoi = 1;
 		  whichnoi = nmodels; 
+		}
+
+		/* set haveext/whichext */
+		if( thismodel == SMF__EXT ) {
+		  haveext = 1;
+		  whichext = nmodels; 
 		}
 	      }
 	      nmodels++;
@@ -766,6 +777,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       } else {
 	dat.noi = NULL;
       }
+      if( haveext ) {
+	dat.ext = model[whichext];
+      } else {
+	dat.ext = NULL;
+      }
 
       quit = 0;
       iter = 0;
@@ -874,7 +890,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	    }
 	  }
 
-	  /* Once all the other map components have been calculated put the
+	  /* Once all the other model components have been calculated put the
 	     previous iteration of AST back into the residual, zero ast,
 	     and rebin the noise+astro signal into the map */
 
@@ -995,6 +1011,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	      smf_open_related_model( resgroup, i, "UPDATE", &res[i], status );
 	      smf_open_related_model( lutgroup, i, "UPDATE", &lut[i], status );
 	      smf_open_related_model( quagroup, i, "UPDATE", &qua[i], status );
+	      
+	      if( haveext ) {
+		smf_open_related_model( modelgroups[whichext], i, "UPDATE", 
+					&model[whichext][i], status );
+	      }
 	    }
 
 	    /* Calculate the AST model component. It is a special model
@@ -1005,13 +1026,26 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
 	    smf_calcmodel_ast( &dat, i, keymap, ast, 0, status );
 
+	    /* If EXTinction was applied during this iteration, AST and RES
+               are currently in units of Jy. Un-do the EXTinction correction
+               here so that RES is in the right units again before starting
+               the next iteration */
+
+	    if( haveext ) {
+	      smf_calcmodel_ext( &dat, i, keymap, model[whichext], 
+				 SMF__DIMM_INVERT, status );
+	    }
+
 	    /* Close files if memiter not set */
 	    if( !memiter ) {
-
 	      smf_close_related( &ast[i], status );    
 	      smf_close_related( &res[i], status );
 	      smf_close_related( &lut[i], status );
 	      smf_close_related( &qua[i], status );
+
+	      if( haveext ) {
+		smf_close_related( &model[whichext][i], status );
+	      }
 	    }
 	  }
 	}

@@ -26,12 +26,12 @@
 *     allmodel = smfArray ** (Returned)
 *        Array of smfArrays (each time chunk) to hold result of model calc
 *     flags = int (Given )
-*        Control flags: only execute if SMF__DIMM_FIRSTITER set
+*        Control flags: if SMF__DIMM_INVERT undo the extinction correction
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     Dummy routine since EXT is filled once by smf_model_create
+*     Apply the extinction correction to the residual
 
 *  Notes:
 
@@ -48,8 +48,8 @@
 *     2008-03-04 (EC)
 *        Modified interface to use smfDIMMData
 *     2008-03-30 (EC)
-*        Stripped out functionality. Model is now filled by smf_model_create.
-*        Will be applied to data inside smf_calcmodel_ast and smf_iteratemap.
+*        -Stripped out calculation. Model is now filled by smf_model_create.
+*        -added SMF__DIMM_INVERT flag to undo extinction correction
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -94,9 +94,74 @@
 void smf_calcmodel_ext( smfDIMMData *dat, int chunk, AstKeyMap *keymap, 
 			smfArray **allmodel, int flags, int *status) {
 
-  /* This is a dummy function, so just return... */
-  return;
+  /* Local Variables */
+  dim_t i;                      /* Loop counter */
+  int idx=0;                    /* Index within subgroup */
+  unsigned char mask;           /* Bitmask for quality */
+  smfArray *model=NULL;         /* Pointer to model at chunk */
+  double *model_data=NULL;      /* Pointer to DATA component of model */
+  dim_t ndata;                  /* Number of data points */
+  smfArray *qua=NULL;           /* Pointer to QUA at chunk */
+  unsigned char *qua_data=NULL; /* Pointer to quality data */
+  smfArray *res=NULL;           /* Pointer to RES at chunk */
+  double *res_data=NULL;        /* Pointer to DATA component of res */
+
+
+  /* Main routine */
+  if (*status != SAI__OK) return;
+
+  /* Obtain pointers to relevant smfArrays for this chunk */
+  res = dat->res[chunk];
+  qua = dat->qua[chunk];
+  model = allmodel[chunk];
+
+  /* Loop over index in subgrp (subarray) */
+  for( idx=0; idx<res->ndat; idx++ ) {
+
+    /* Ensure everything is in bolo-order */
+    smf_dataOrder( res->sdata[idx], 0, status );
+    smf_dataOrder( qua->sdata[idx], 0, status );
+    smf_dataOrder( model->sdata[idx], 0, status );
+
+    /* Get pointers to DATA components */
+    res_data = (double *)(res->sdata[idx]->pntr)[0];
+    qua_data = (unsigned char *)(qua->sdata[idx]->pntr)[0];
+    model_data = (double *)(model->sdata[idx]->pntr)[0];
+
+
+    if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, "Null data in inputs", status);      
+    } else {
+	
+      /* Get the raw data dimensions */
+      ndata = (res->sdata[idx]->dims)[0] * (res->sdata[idx]->dims)[1] * 
+	(res->sdata[idx]->dims)[2];
+	
+      /* Which QUALITY bits should be considered for ignoring data */
+      mask = 255 - SMF__Q_JUMP;
+
+      /* Loop over data points */ 
+
+      if( !(flags&SMF__DIMM_INVERT) ) {
+	/* Apply the extinction correction */
+	for( i=0; i<ndata; i++ ) {
+	  if( !(qua_data[i]&mask) ) {
+	    res_data[i] *= model_data[i];
+	  }
+	}
+      } else {
+	/* Undo the extinction correction */
+	for( i=0; i<ndata; i++ ) {
+	  if( !(qua_data[i]&mask) && (model_data[i] > 0) ) {
+	    res_data[i] /= model_data[i];
+	  }
+	}
+      }
+    }
+  }
 }
+
 
 
 

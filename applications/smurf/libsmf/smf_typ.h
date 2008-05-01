@@ -119,6 +119,8 @@
 *        -Added SMF__MINCHUNKSAMP and SMF__MINSTATSAMP
 *     2008-04-24 (EC):
 *        -Added SMF__MB definition
+*     2008-04-30 (EC):
+*        -Added EXT to smfDIMMData
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -199,8 +201,9 @@ typedef enum smf_modeltype {
 #define SMF__DIMM_SUFFIX ".dimm"
 
 /* Bit flags for smf_calcmodel* model component calculations */
-#define SMF__DIMM_FIRSTCOMP 1
-#define SMF__DIMM_FIRSTITER 2
+#define SMF__DIMM_FIRSTCOMP 1 /* First component in the solution */
+#define SMF__DIMM_FIRSTITER 2 /* First iteration */
+#define SMF__DIMM_INVERT 4    /* Inverse of the model calculation */
 
 /* Flags for smf_create_smf*, smf_open_file and smf_concat_smfGroup
    Must be individual bits in a single integer
@@ -340,6 +343,7 @@ typedef struct smfDIMMData {
   smfArray **noi;            /* array of smfArray's of variance estimates */ 
   smfArray **qua;            /* array of smfArray's of quality flags */ 
   smfArray **lut;            /* array of smfArray's of pointing LUTs */ 
+  smfArray **ext;            /* array of smfArray's of extinction corrections*/
   double *map;               /* pointer to the current map estimate */
   double *mapvar;            /* pointer to the current map variance estimate */
   double *chisquared;        /* chisquared at each chunk */
