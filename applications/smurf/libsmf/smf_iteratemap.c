@@ -144,7 +144,9 @@
 *     2008-04-29 (EC)
 *        Check for VAL__BADD in map to avoid propagating to residual
 *     2008-04-30 (EC)
-*        -Undo EXTinction correction after calculating AST
+*        - Undo EXTinction correction after calculating AST
+*     2008-05-01 (EC)
+*        - More intelligent auto-sizing of concantenated chunks
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -277,6 +279,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   smf_modeltype thismodel;      /* Type of current model */
   double *thisweight=NULL;      /* Pointer to this weights map */
   double *thisvar=NULL;         /* Pointer to this variance map */
+  size_t try;                   /* Try to concatenate this many samples */
   int untilconverge=0;          /* Set if iterating to convergence */
   double *var_data=NULL;        /* Pointer to DATA component of NOI */
   int varmapmethod=0;           /* Method for calculating varmap */
@@ -548,7 +551,12 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       msgSeti( "NEED", memneeded/SMF__MB );
       msgOut( " ", "  ^LEN continuous samples requires ^NEED Mb > ^AVAIL Mb", 
 	      status );
-      msgSeti( "TRY", (size_t) ((double) maxconcat * maxmem / memneeded) );
+
+      /* Try is meant to be the largest chunks of ~equal length that fit in
+	 memory */
+      try = maxconcat / ((size_t) ((double) memneeded/maxmem)+1)+1;
+
+      msgSeti( "TRY", try );
       msgOut( " ", "  Will try to re-group data in chunks < ^TRY samples long",
 	      status);
       msgOut( " ", "SMF_ITERATEMAP: ***************", status );
@@ -559,9 +567,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	smf_close_smfGroup( &igroup, status );
       }
 
-      smf_grp_related( igrp, isize, 1, 
-		       (size_t) ((double) maxconcat * maxmem / memneeded),
-		       &maxconcat, &igroup, status );
+      smf_grp_related( igrp, isize, 1, try, &maxconcat, &igroup, status );
     }
   }
 
