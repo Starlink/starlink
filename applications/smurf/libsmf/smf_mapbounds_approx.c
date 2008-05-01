@@ -61,6 +61,9 @@
 *     FITS header entries. An output map that is made from mulitple
 *     observations of a moving target may not include all of the data
 *     if created in a stationary coordinate frame (e.g. RA/Dec).
+*
+*     This routine works sufficiently well for roughly square maps,
+*     but fails for maps with an aspect ratio more than about 1.5.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -95,9 +98,9 @@
 *        AlignOffset attributes are also set accordingly
 *     2008-04-18 (AGG):
 *        Set lbnd to 1,1
+*     2008-05-01 (AGG):
+*        Use FP angle in calculation of map size and centre
 *     {enter_further_changes_here}
-
-*  Notes:
 
 *  Copyright:
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research Council.
@@ -150,6 +153,7 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
   double az[ 2 ];              /* Azimuth values */
   AstMapping *azel2usesys = NULL; /* Mapping form AZEL to requested system */
   double bolospacing = 6.28;   /* Bolometer spacing in arcsec */
+  double c;                    /* cos theta */
   smfData *data = NULL;        /* pointer to  SCUBA2 data struct */
   double dec[ 2 ];             /* Dec values */
   double el[ 2 ];              /* Elevation values */
@@ -159,7 +163,8 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
   AstFitsChan *fitschan = NULL;/* Fits channels to construct WCS header */
   AstFrameSet *fs = NULL;      /* A general purpose FrameSet pointer */
   smfHead *hdr = NULL;         /* Pointer to data header this time slice */
-  int hghtpix;                 /* Map height in pixels */
+  double hghtbox;              /* Map height in arcsec */
+  int hghtpix;                 /* RA-Dec map height in pixels */
   int instap = 0;              /* Flag to denote whether the
 				  instrument aperture is non-zero */
   double instapx = 0.0;        /* Effective X offset in tracking frame */
@@ -175,6 +180,7 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
   double origval = 0.0;        /* A temporary double variable */
   char *pname = NULL;          /* Name of currently opened data file */
   double ra[ 2 ];              /* RA values */
+  double s;                    /* sin theta */
   double sep;                  /* Separation between first and last BASE positions */
   AstFrame *sf1 = NULL;        /* Frame representing AZEL system */
   AstFrame *sf2 = NULL;        /* Frame representing requested system */
@@ -185,9 +191,10 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
   double skyref[ 2 ];          /* Values for output SkyFrame SkyRef attribute */
   AstFrameSet *swcsin = NULL;  /* FrameSet describing input WCS */
   int temp;                    /* Temporary variable  */
-  double theta = 0.0;          /* */
+  double theta = 0.0;          /* Angle between FP up and tracking up */
   const char *usesys = NULL;   /* AST system for output image */
-  int wdthpix;                 /* Map width in pixels */
+  double wdthbox;              /* Map width in arcsec */
+  int wdthpix;                 /* RA-Dec map width in pixels */
   double x_array_corners[4];   /* X-Indices for corner bolos in array */ 
   double y_array_corners[4];   /* Y-Indices for corner pixels in array */ 
 
@@ -269,11 +276,13 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
     smf_fits_getD( hdr, "INSTAP_Y", &instapy, status );
     /* If the instrument aperture is set, calculate the projected
        values in the tracking coordinate frame */
+    c = cos(theta);
+    s = sin(fabs(theta));
     if ( instapx && instapy ) {
       instap = 1;
       origval = instapx;
-      instapx = instapx*cos(theta) - instapy*sin(theta);
-      instapy = origval*sin(theta) + instapy*cos(theta);
+      instapx = instapx*c - instapy*s;
+      instapy = origval*s + instapy*c;
     }
 
     /* Convert map Position Angle to radians */
@@ -281,8 +290,14 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
     mappa *= AST__DD2R;
 
     /* Calculate size of output map in pixels */
-    wdthpix = (int) ( ( mapwdth*cos(mappa) + maphght*sin(mappa) ) / pixsize);
-    hghtpix = (int) ( ( maphght*cos(mappa) + mapwdth*sin(mappa) ) / pixsize);
+    /* Note: this works for the simulator... */
+    wdthbox = mapwdth*cos(mappa) + maphght*sin(mappa);
+    hghtbox = maphght*cos(mappa) + mapwdth*sin(mappa);
+    wdthpix = (int) ( ( wdthbox*s + hghtbox*c ) / pixsize);
+    hghtpix = (int) ( ( wdthbox*c + hghtbox*s ) / pixsize);
+    origval = mapx;
+    mapx = mapx*s + mapy*c;
+    mapy = mapy*s - origval*c;
     dxpix = (int) ((mapx + instapx) / pixsize);
     dypix = (int) ((mapy + instapy) / pixsize);
 
