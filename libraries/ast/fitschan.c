@@ -816,6 +816,8 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *     30-APR-2008 (DSB):
 *        SetValue changed so that new keywords are inserted before the
 *        current card.
+*     1_MAY-2008 (DSB):
+*        Added UndefRead warning.
 *class--
 */
 
@@ -922,7 +924,7 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 #define LATAX              1
 #define NDESC              9
 #define MXCTYPELEN        81
-#define ALLWARNINGS       " distortion noequinox noradesys nomjd-obs nolonpole nolatpole tnx zpx badcel noctype badlat badmat badval badctype "
+#define ALLWARNINGS       " distortion noequinox noradesys nomjd-obs nolonpole nolatpole tnx zpx badcel noctype badlat badmat badval badctype undefread "
 #define NPFIT             10
 #define SPD               86400.0
 
@@ -12469,6 +12471,7 @@ f     AST_GETFITSS
 static int GetFits##code( AstFitsChan *this, const char *name, ctype value ){ \
 \
 /* Local Variables: */ \
+   char wbuf[ 80 ];       /* Buffer for warning message */ \
    const char *class;     /* Object class */ \
    const char *method;    /* Calling method */ \
    char *lcom;            /* Supplied keyword comment */ \
@@ -12532,6 +12535,18 @@ static int GetFits##code( AstFitsChan *this, const char *name, ctype value ){ \
    lname = (char *) astFree( (void *) lname ); \
    lvalue = (char *) astFree( (void *) lvalue ); \
    lcom = (char *) astFree( (void *) lcom ); \
+\
+/* Issue a warning if the returned value is undefed. */ \
+   if( ( ftype == AST__STRING && *value && !strcmp( *((char **) value), AST__UNDEFS ) ) || \
+       ( ftype == AST__FLOAT && *((double *) value) == AST__UNDEFF ) || \
+       ( ftype == AST__INT && *((int *) value) == AST__UNDEFI ) || \
+       ( ftype == AST__COMPLEXF && ( *((double *) value) == AST__UNDEFF || \
+                                     *(((double *) value)+1) == AST__UNDEFF ) ) || \
+       ( ftype == AST__COMPLEXI && ( *((int *) value) == AST__UNDEFI || \
+                                     *(((int *) value)+1) == AST__UNDEFI ) ) ){ \
+      sprintf( wbuf, "The %s keyword has an undefined value.", name ); \
+      Warn( this, "undefread", wbuf, method, class ); \
+   } \
 \
 /* Return the answer. */ \
    return ret; \
@@ -33076,11 +33091,11 @@ astMAKE_TEST(FitsChan,FitsDigits,( this->fitsdigits != DBL_DIG ))
 
 *  Description:
 *     This attribute controls the issuing of warnings about selected
-*     conditions when an Object is read from or written to a FitsChan.
-*     The value supplied for the Warnings attribute should consist of a
-*     space separated list of condition names (see the AllWarnings
-*     attribute for a list of the currently defined names). Each name 
-*     indicates a condition which should be reported. The default 
+*     conditions when an Object or keyword is read from or written to a 
+*     FitsChan. The value supplied for the Warnings attribute should 
+*     consist of a space separated list of condition names (see the 
+*     AllWarnings attribute for a list of the currently defined names). 
+*     Each name indicates a condition which should be reported. The default 
 *     value for Warnings is the string "Tnx Zpx BadCel BadMat BadCTYPE".
 *
 *     The text of any warning will be stored within the FitsChan in the
@@ -33218,6 +33233,12 @@ f     the date of observation within AST_READ, due to no value being present
 *     header containing an IRAF "TNX" projection which includes terms
 *     not supproted by AST. Such terms are ignored and so the resulting
 *     FrameSet may be inaccurate.
+*
+*     - "UndefRead": This condition arises when a keyword with an undefined
+*     value is accessed by any of the 
+c     astGetFits<X>
+f     AST_GETFITS<X>
+*     functions.
 *
 *     - "Zpx": This condition arises if a FrameSet is read from a FITS
 *     header containing an IRAF "ZPX" projection which includes "lngcor" 
