@@ -53,7 +53,9 @@
 *        Modified smf_grp_related interface
 *     2008-04-18 (EC):
 *        Modified smf_grp_related interface
-*
+*     2008-04-30 (TIMJ):
+*        Tidy up logic (no longer need to trap for SMF__FLATN.
+*        Update data file title.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -61,8 +63,10 @@
 *     correction has already been applied.
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia and the Particle Physics
-*     and Astronomy Research Council. All Rights Reserved.
+*     Copyright (C) 2006, 2008 University of British Columbia.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -192,16 +196,10 @@ void smurf_remsky( int * status ) {
       /* Flatfield - if necessary */
       smf_open_and_flatfield( igrp, ogrp, i, &odata, status );
 
-      if (*status == SMF__FLATN) {
-	errAnnul( status );
-	msgOutif(MSG__VERB, "",
-		 TASK_NAME ": Data are already flatfielded", status);
-      } else if ( *status == SAI__OK) {
-	msgOutif(MSG__VERB," ","Flatfield applied", status);
-      } else {
+      if (*status != SAI__OK) {
 	/* Tell the user which file it was... */
 	msgSeti("I",i);
-	errRep(TASK_NAME, "Unable to flatfield data from the ^I th file", status);
+	errRep(TASK_NAME, "Unable to open the ^I th file", status);
       }
       if ( *status == SAI__OK ) {
 	if ( strncmp( method, "POLY", 4 ) == 0 ) {
@@ -217,6 +215,13 @@ void smurf_remsky( int * status ) {
 	  errRep(TASK_NAME, "Unsupported method, ^M. Possible programming error.", status);
 	}
       }
+
+      /* Set character labels */
+      smf_set_clabels( "Sky-removed",NULL, NULL, odata->hdr, status);
+      smf_write_clabels( odata, status );
+
+      /* Tidy */
+      smf_close_file( &odata, status );
     }
   }
 
