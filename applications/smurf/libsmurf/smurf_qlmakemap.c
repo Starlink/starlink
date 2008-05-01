@@ -176,13 +176,15 @@
 *        Remove exp_time and weights components to ensure QLMAKEMAP
 *        lives up to its name, add GENVAR parameter
 *     2008-04-28 (AGG):
-*        Write mean sky level to output parameter
+*        Write mean sky level to output parameter.
+*     2008-05-01 (TIMJ):
+*        Write output units.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006-2007 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2006-2008 University of British Columbia.
-*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -238,6 +240,7 @@ void smurf_qlmakemap( int *status ) {
 
   /* Local Variables */
   smfData *data = NULL;      /* Pointer to input SCUBA2 data struct */
+  char data_units[SMF__CHARLABEL+1]; /* Units string */
   AstFitsChan *fchan = NULL; /* FitsChan holding output NDF FITS extension */
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
   int flag;                  /* Flag */
@@ -271,6 +274,11 @@ void smurf_qlmakemap( int *status ) {
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   void *variance = NULL;     /* Pointer to the variance map */
   double *weights = NULL;    /* Pointer to the weights array */
+
+  if (*status != SAI__OK) return;
+
+  /* initialisation */
+  data_units[0] = '\0';
 
   /* Main routine */
   ndfBegin();
@@ -353,6 +361,9 @@ void smurf_qlmakemap( int *status ) {
     /* Read data from the ith input file in the group */
     smf_open_and_flatfield( igrp, NULL, i, &data, status );
 
+    /* Check units are consistent */
+    smf_check_units( i, data_units, data->hdr, status);
+
     /* Store the filename in the keymap for later - the GRP would be fine
        as is but we use a keymap in order to reuse smf_fits_add_prov */
     if (*status == SAI__OK)
@@ -388,6 +399,10 @@ void smurf_qlmakemap( int *status ) {
 
   /* Write WCS FrameSet to output file */
   ndfPtwcs( outframeset, ondf, status );
+
+  /* write units - hack we do not have a smfHead */
+  if (strlen(data_units)) ndfCput( data_units, ondf, "UNITS", status);
+  ndfCput("Flux Density", ondf, "LABEL", status);
 
   /* Free up weights array */
   weights = smf_free( weights, status );
