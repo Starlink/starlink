@@ -12536,16 +12536,18 @@ static int GetFits##code( AstFitsChan *this, const char *name, ctype value ){ \
    lvalue = (char *) astFree( (void *) lvalue ); \
    lcom = (char *) astFree( (void *) lcom ); \
 \
-/* Issue a warning if the returned value is undefed. */ \
-   if( ( ftype == AST__STRING && *value && !strcmp( *((char **) value), AST__UNDEFS ) ) || \
-       ( ftype == AST__FLOAT && *((double *) value) == AST__UNDEFF ) || \
-       ( ftype == AST__INT && *((int *) value) == AST__UNDEFI ) || \
-       ( ftype == AST__COMPLEXF && ( *((double *) value) == AST__UNDEFF || \
-                                     *(((double *) value)+1) == AST__UNDEFF ) ) || \
-       ( ftype == AST__COMPLEXI && ( *((int *) value) == AST__UNDEFI || \
-                                     *(((int *) value)+1) == AST__UNDEFI ) ) ){ \
-      sprintf( wbuf, "The %s keyword has an undefined value.", name ); \
-      Warn( this, "undefread", wbuf, method, class ); \
+/* Issue a warning if the returned value is undefined. */ \
+   if( ret ) { \
+      if( ( ftype == AST__STRING && *value && !strcmp( *((char **) value), AST__UNDEFS ) ) || \
+          ( ftype == AST__FLOAT && *((double *) value) == AST__UNDEFF ) || \
+          ( ftype == AST__INT && *((int *) value) == AST__UNDEFI ) || \
+          ( ftype == AST__COMPLEXF && ( *((double *) value) == AST__UNDEFF || \
+                                        *(((double *) value)+1) == AST__UNDEFF ) ) || \
+          ( ftype == AST__COMPLEXI && ( *((int *) value) == AST__UNDEFI || \
+                                        *(((int *) value)+1) == AST__UNDEFI ) ) ){ \
+         sprintf( wbuf, "The %s keyword has an undefined value.", name ); \
+         Warn( this, "undefread", wbuf, method, class ); \
+      } \
    } \
 \
 /* Return the answer. */ \
@@ -27567,7 +27569,7 @@ static void WcsFcRead( AstFitsChan *fc, AstFitsChan *fc2, FitsStore *store,
    each card. Note, the single "=" is correct in the following "while"
    statement. */
    s = 0;
-   jm =-1;
+   jm = -1;
    i = -1;
    type = AST__NOTYPE;
    while( (keynam = CardName( fc )) ){
