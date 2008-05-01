@@ -131,8 +131,10 @@ void smf_fits_crchan( int nfits, const char * headrec, AstFitsChan ** fits,
     if (nfits == 0) nfits = (int)len / 80;
   }
 
-  /* Create the empty fitschan */
-  *fits = astFitsChan( NULL, NULL, "" );
+/* Create the empty fitschan. Request warnings be added to the FitsChan
+   if any call to astGetFits<X> reers to a keyword that is present in the
+   header but has an undefined value. */
+  *fits = astFitsChan( NULL, NULL, "Warnings=UndefRead" );
 
   /* Fill it */
   card = headrec;

@@ -158,6 +158,9 @@
  *        Read time series WCS even if the data is raw
  *     2008-04-30 (TIMJ):
  *        Support reading of units, title and data label.
+ *     2008-05-01 (DSB):
+ *        Ensure AST issues warnings if it tries to return undefined
+ *        keyword values via the astGetFits<X> functions.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -489,6 +492,10 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
           errRep(FUNC_NAME, "File has no FITS header - continuing but this may cause problems later", status );
           errAnnul( status );
         }
+
+        /* Ensure we get warnings about undefined values read by
+           astGetFits. */
+        if( hdr->fitshdr ) astSet( hdr->fitshdr, "Warnings=UndefRead" );   
 
         /* Determine and store the telescope location in hdr->telpos */
         smf_telpos_get( hdr, status );
