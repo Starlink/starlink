@@ -52,6 +52,8 @@
 *  History:
 *     16-DEC-1999 (DSB):
 *        Original version.
+*     1-MAY-2008 (DSB):
+*        Cater for an INDF value of NDF__NOID.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -65,6 +67,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
+      INCLUDE 'NDF_PAR'          ! NDF constants 
 
 *  Arguments Given:
       INTEGER FC
@@ -102,7 +105,7 @@
 *  first card.
       CALL AST_CLEAR( FC, 'Card', STATUS )
 
-*  Search the FItsChan for cards containing messages issued by AST.
+*  Search the FitsChan for cards containing messages issued by AST.
       DO WHILE( AST_FINDFITS( FC, 'ASTWARN', HEADER, .TRUE., STATUS ) )
 
 *  Extract the keyword value from the header card (minus delimiting 
@@ -132,16 +135,19 @@
 *  Otherwise, display the current total message. Prepend the name of the
 *  NDF to the first non-blank warning.
          ELSE
-            CALL MSG_SETC( 'T', MESS )
 
-            IF( .NOT. WARNED .AND. IAT .GT. 0 )  THEN
-               CALL NDF_MSG( 'NDF', INDF )
-               CALL MSG_OUT( 'FTS1_ASTWN_MSG1', '''^NDF'' - ^T', 
-     :                       STATUS )
-               WARNED = .TRUE.
+            IF( IAT .GT. 0 )  THEN
+               IF( .NOT. WARNED )  THEN
+                  IF( INDF .NE. NDF__NOID ) THEN
+                     CALL NDF_MSG( 'NDF', INDF )
+                     CALL MSG_OUT( 'FTS1_ASTWN_MSG1', '''^NDF'':', 
+     :                             STATUS )
+                  END IF
+                  WARNED = .TRUE.
+               END IF
 
-            ELSE
-               CALL MSG_OUT( 'FTS1_ASTWN_MSG2', '^T', STATUS )
+               CALL MSG_SETC( 'T', MESS )
+               CALL MSG_OUT( 'FTS1_ASTWN_MSG2', '   ^T', STATUS )
             END IF
 
             MESS = ' '
@@ -154,16 +160,19 @@
 
 *  If we still have a message to report, report it now.
       IF( REPORT .AND. IAT .GT. 0 ) THEN
-         CALL MSG_SETC( 'T', MESS( : IAT ) )
 
          IF( .NOT. WARNED )  THEN
-            CALL NDF_MSG( 'NDF', INDF )
-            CALL MSG_OUT( 'FTS1_ASTWN_MSG3', '''^NDF'' - ^T', STATUS )
+            IF( INDF .NE. NDF__NOID ) THEN
+               CALL NDF_MSG( 'NDF', INDF )
+               CALL MSG_OUT( 'FTS1_ASTWN_MSG3', '''^NDF'': ', 
+     :                       STATUS )
+            END IF
             WARNED = .TRUE.
 
-         ELSE
-            CALL MSG_OUT( 'FTS1_ASTWN_MSG4', '^T', STATUS )
          END IF
+
+         CALL MSG_SETC( 'T', MESS( : IAT ) )
+         CALL MSG_OUT( 'FTS1_ASTWN_MSG4', '   ^T', STATUS )
 
       END IF
 

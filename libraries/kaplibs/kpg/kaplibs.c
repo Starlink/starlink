@@ -1485,4 +1485,24 @@ void kpg1Hsstp( int numbin, int *hist, double valmax, double valmin,
    F77_FREE_INTEGER( HIST );
 }
 
+/* ------------------------------- */
+F77_SUBROUTINE(fts1_astwn)( INTEGER(FC),
+                            INTEGER(INDF),
+                            INTEGER(STATUS) );
+
+void fts1Astwn( AstFitsChan *fc, int indf, int *status ){
+   DECLARE_INTEGER(FC);
+   DECLARE_INTEGER(INDF);
+   DECLARE_INTEGER(STATUS);
+
+   F77_EXPORT_INTEGER( astP2I( fc ), FC );
+   F77_EXPORT_INTEGER( indf, INDF );
+   F77_EXPORT_INTEGER( *status, STATUS );
+
+   F77_CALL(fts1_astwn)( INTEGER_ARG(&FC),
+                         INTEGER_ARG(&INDF),
+                         INTEGER_ARG(&STATUS) );
+
+   F77_IMPORT_INTEGER( STATUS, *status );
+}
 
