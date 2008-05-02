@@ -279,6 +279,8 @@
 *        - Use BAD in EXP_TIME when no integration time.
 *        - Tidy up some status logic.
 *        - Add units and label to output file.
+*     2008-05-02 (EC):
+*        - Added mapbounds timing message
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -314,6 +316,10 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <sys/time.h>
+#include <time.h>
+
+
 
 /* STARLINK includes */
 #include "ast.h"
@@ -327,7 +333,6 @@
 #include "star/ndg.h"
 #include "star/grp.h"
 #include "star/kaplibs.h"
-
 
 /* SMURF includes */
 #include "smurf_par.h"
@@ -407,6 +412,8 @@ void smurf_makemap( int *status ) {
   double *weights3d = NULL;  /* Pointer to 3-D weights array */
   int wndf = NDF__NOID;      /* NDF identifier for WEIGHTS */
 
+  struct timeval tv1, tv2;
+
   if (*status != SAI__OK) return;
 
   /* initialisation */
@@ -479,9 +486,17 @@ void smurf_makemap( int *status ) {
   }
 
   /* Calculate the map bounds */
+
+  gettimeofday( &tv1, NULL );
+
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Determine map bounds", status);
   smf_mapbounds( igrp, size, system, 0.0, 0.0, uselonlat, pixsize, 
 		 lbnd_out, ubnd_out, &outfset, &moving, status );
+
+  gettimeofday( &tv2, NULL );
+
+  msgSeti("TDIFF",tv2.tv_sec-tv1.tv_sec);
+  msgOutif( MSG__DEBUG, " ", "Mapbounds took ^TDIFF s", status);
 
   if ( moving ) {
     msgOutif(MSG__VERB, " ", "Tracking a moving object", status);
