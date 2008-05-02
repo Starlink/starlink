@@ -69,6 +69,7 @@
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
 *     AJC: A. J. Chipperfield (STARLINK)
+*     EC: Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -83,6 +84,8 @@
 *        Add CLEAN argument to call MSG1_FORM
 *     22-FEB-2001 (AJC):
 *        Use MSG1_KTOK not EMS1_KTOK
+*     02-MAY-2008 (EC):
+*        Fixed logic for MSG__DEBUG
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -129,7 +132,7 @@
 
 *     The given status is OK, so check that the given value of the
 *     output filter is allowed.
-         IF ( PRIOR .LT. MSG__QUIET .OR. PRIOR .GT. MSG__VERB ) THEN
+         IF ( PRIOR .LT. MSG__QUIET .OR. PRIOR .GT. MSG__DEBUG ) THEN
 
 *        The given message filtering level is out of range: set the
 *        returned status and report an error. (Mark and subsequently 
