@@ -242,12 +242,21 @@
 *        the NDF has more than two axes.  A group of two strings should 
 *        be supplied specifying the two axes which are to be used when
 *        determining distances, reporting positions, etc.  Each axis can
-*        be specified either by its integer index within the current 
-*        Frame (in the range 1 to the number of axes in the current 
-*        Frame), or by its Symbol attribute.  A list of acceptable 
-*        values is displayed if an illegal value is supplied.  If a null
-*        (!) value is supplied, the axes with the same indices as the 
-*        two significant NDF pixel axes are used.  [!]
+*        be specified using one of the following options.
+*
+*        - Its integer index within the current Frame of the input 
+*        NDF (in the range 1 to the number of axes in the current 
+*        Frame).
+*        - Its symbol string such as "RA" or "VRAD".
+*        - A generic option where "SPEC" requests the spectral axis, 
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
+*        sky longitude and latitude axes respectively.  Only those axis
+*        domains present are available as options.
+*
+*        A list of acceptable values is displayed if an illegal value is
+*        supplied.  If a null (!) value is supplied, the axes with the 
+*        same indices as the two significant NDF pixel axes are used. 
+*        [!]
 *     XCEN  =  LITERAL (Write)
 *         The formatted X co-ordinate of the first fitted star position,
 *         in the current co-ordinate Frame of the NDF. 
@@ -255,7 +264,7 @@
 *        The axis value to place at the left hand end of the horizontal
 *        axis of the plot.  If a null (!) value is supplied, a suitable
 *        default value will be found and used.  The value supplied may
-*        be greater than or less than the value supplied for XRIGHT.
+*        be greater than or less than the value supplied for XRIGHT. 
 *        [!]
 *     XRIGHT = _REAL (Read)
 *        The axis value to place at the right hand end of the horizontal

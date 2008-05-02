@@ -13458,11 +13458,30 @@ KAPPA: \htmlref{CADD}{CADD},
          NDF has too many axes.  A group of strings should be supplied
          specifying the axes which are to be used when specifying the
          aperture using parameters ARDFILE, CENTRE and DIAM.  Each axis can
-         be specified either by its integer index within the current Frame
-         (in the range 1 to the number of axes in the current Frame), or by
-         its symbol string.  A list of acceptable values is displayed if an
-         illegal value is supplied.  If a null ({\tt{!}}) value is supplied, the
-         axes with the same indices as the 2 used pixel axes within the
+         be specified using one of the following options.
+
+         \ssthitemlist{
+
+            \sstitem 
+            Its integer index within the current Frame of the 
+            input  NDF (in the range 1 to the number of axes in the 
+            current Frame).
+
+            \sstitem 
+            Its \htmlattref{Symbol}{Symbol(axis)}~ string such as 
+            {\tt "RA"} or {\tt "VRAD"}.
+
+            \sstitem 
+            A generic option where {\tt "SPEC"} requests the spectral axis, 
+            {\tt "TIME"} selects the time axis, {\tt "SKYLON"} and 
+            {\tt "SKYLAT"} picks the sky longitude and latitude axes 
+            respectively.  Only those axis domains present are 
+            available as options.
+         }
+
+         A list of acceptable values is displayed if an illegal value is 
+         supplied.  If a null ({\tt{!}}) value is supplied, the
+         axes with the same indices as the two used pixel axes within the
          NDF are used.  {\tt [!]}
       }
       \sstsubsection{
@@ -17216,7 +17235,6 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          \ssthitemlist{
 
             \sstitem
-
             Its integer index within the \htmlref{current
             Frame}{se:curframe}~ of the NDF (in the range 1 to 3 in
             the current frame).
@@ -19106,13 +19124,32 @@ KAPPA: \htmlref{BLOCK}{BLOCK},
          USEAXIS is only accessed if the current co-ordinate Frame of the
          NDF has more than two axes.  A group of two strings should be
          supplied specifying the two axes which are to be used when annotating
-         and aligning the contour map.  Each axis can be specified either by
-         its integer index within the current Frame (in the range 1 to the
-         number of axes in the current Frame), or by its
-         \htmlattref{Symbol}{Symbol(axis)}~ attribute.  A list of acceptable 
-         values is displayed if an illegal value is supplied.  If a null
-         ({\tt{!}}) value is supplied, the axes with the same
-         indices as the two significant NDF pixel axes are used. {\tt [!]}
+         and aligning the contour map.  Each axis can be specified 
+         using one of the following options.
+
+         \ssthitemlist{
+
+            \sstitem 
+            Its integer index within the current Frame of the 
+            input  NDF (in the range 1 to the number of axes in the 
+            current Frame).
+
+            \sstitem 
+            Its \htmlattref{Symbol}{Symbol(axis)}~ string such as 
+            {\tt "RA"} or {\tt "VRAD"}.
+
+            \sstitem 
+            A generic option where {\tt "SPEC"} requests the spectral axis, 
+            {\tt "TIME"} selects the time axis, {\tt "SKYLON"} and 
+            {\tt "SKYLAT"} picks the sky longitude and latitude axes 
+            respectively.  Only those axis domains present are 
+            available as options.
+         }
+
+         A list of acceptable values is displayed if an illegal value is 
+         supplied.  If a null ({\tt{!}}) value is supplied, the axes with 
+         the same indices as the two significant NDF pixel axes are used. 
+         {\tt [!]}
       }
    }
    \sstresparameters{
@@ -20900,10 +20937,29 @@ KAPPA: \htmlref{LISTSHOW}{LISTSHOW},
          NDF has more than two axes.  A group of two strings should be
          supplied specifying the two axes which are to be used when annotating
          the image, and when supplying a value for parameter CENTRE.  Each
-         axis can be specified either by its integer index within the current
-         Frame (in the range 1 to the number of axes in the current Frame), or
-         by its symbol string.  A list of acceptable values is displayed if an
-         illegal value is supplied.  If a null ({\tt{!}}) value is supplied, the axes
+         axis can be specified using one of the following options.
+
+         \ssthitemlist{
+
+            \sstitem 
+            Its integer index within the current Frame of the 
+            input  NDF (in the range 1 to the number of axes in the 
+            current Frame).
+
+            \sstitem 
+            Its \htmlattref{Symbol}{Symbol(axis)}~ string such as 
+            {\tt "RA"} or {\tt "VRAD"}.
+
+            \sstitem 
+            A generic option where {\tt "SPEC"} requests the spectral axis, 
+            {\tt "TIME"} selects the time axis, {\tt "SKYLON"} and 
+            {\tt "SKYLAT"} picks the sky longitude and latitude axes 
+            respectively.  Only those axis domains present are 
+            available as options.
+         }
+
+         A list of acceptable values is displayed if an illegal value is 
+         supplied.  If a null ({\tt{!}}) value is supplied, the axes
          with the same indices as the two used pixel axes within the NDF
          are used.  {\tt[!]}
       }
@@ -30239,10 +30295,28 @@ KAPPA: \htmlref{LOG10}{LOG10},
          NDF has more than two axes.  A group of two strings should be
          supplied specifying the two axes which are to be used when supplying
          positions for parameters CENTRE, LBOUND and UBOUND.  Each axis can
-         be specified either by its integer index within the current Frame
-         (in the range 1 to the number of axes in the 
-         \htmlref{current Frame}{se:curframe}), or by
-         its symbol string.  A list of acceptable values is displayed
+         be specified using one of the following options.
+
+         \ssthitemlist{
+
+            \sstitem 
+            Its integer index within the \htmlref{current Frame}{se:curframe}~ of
+            the input NDF (in the range 1 to the number of axes in the 
+            current Frame).
+
+            \sstitem 
+            Its \htmlattref{Symbol}{Symbol(axis)}~ string such as 
+            {\tt "RA"} or {\tt "VRAD"}.
+
+            \sstitem 
+            A generic option where {\tt "SPEC"} requests the spectral axis, 
+            {\tt "TIME"} selects the time axis, {\tt "SKYLON"} and 
+            {\tt "SKYLAT"} picks the sky longitude and latitude axes 
+            respectively.  Only those axis domains present are 
+            available as options.
+         }
+
+         A list of acceptable values is displayed
          if you supply an illegal value.  If a null ({\tt{!}}) value is
          supplied, the axes with the same indices as the two used pixel
          axes within the NDF are selected.  {\tt [!]}
@@ -40448,16 +40522,34 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
       \sstsubsection{
          USEAXIS = GROUP (Read)
       }{
-         USEAXIS is only accessed if the current \htmlref{co-ordinate Frame}{se:domains}~  of the
-         NDF has more than two axes.  A group of two strings should be
+         USEAXIS is only accessed if the current \htmlref{co-ordinate Frame}{se:domains}~ of
+         the NDF has more than two axes.  A group of two strings should be
          supplied specifying the two axes which are to be used when
          determining distances, reporting positions, \emph{etc}.  Each axis can be
-         specified either by its integer index within the current Frame (in
-         the range 1 to the number of axes in the current Frame), or by its
-         \htmlattref{Symbol}{Symbol(axis)}~ attribute.  A list of acceptable values is displayed if an
-         illegal value is supplied.  If a null ({\tt{!}}) value is supplied, the
-         axes with the same indices as the two significant NDF pixel axes are
-         used. {\tt [!]}
+         specified using one of the following options.
+
+         \ssthitemlist{
+
+            \sstitem 
+            Its integer index within the current Frame of the 
+            input  NDF (in the range 1 to the number of axes in the 
+            current Frame).
+
+            \sstitem 
+            Its \htmlattref{Symbol}{Symbol(axis)}~ string such as 
+            {\tt "RA"} or {\tt "VRAD"}.
+
+            \sstitem 
+            A generic option where {\tt "SPEC"} requests the spectral axis, 
+            {\tt "TIME"} selects the time axis, {\tt "SKYLON"} and 
+            {\tt "SKYLAT"} picks the sky longitude and latitude axes 
+            respectively.  Only those axis domains present are 
+            available as options.
+         }
+         
+         A list of acceptable values is displayed if an illegal value is 
+         supplied.  If a null ({\tt{!}}) value is supplied, the axes with the 
+         same indices as the two significant NDF pixel axes are used. {\tt [!]}
       }
       \sstsubsection{
          XLEFT = \_REAL (Read)
@@ -41623,12 +41715,31 @@ KAPPA: \htmlref{CADD}{CADD},
          the NDF has more than two axes.  A group of two strings should be
          supplied specifying the two axes which are to be used when
          determining the rotation angle needed to make north vertical.  Each
-         axis can be specified either by its integer index within the current
-         Frame (in the range 1 to the number of axes in the current Frame), or
-         by its symbol string.  A list of acceptable values is displayed if an
-         illegal value is supplied.  If a null ({\tt{!}}) value is supplied, the axes
+         axis can be specified using one of the following options.
+
+         \ssthitemlist{
+
+            \sstitem 
+            Its integer index within the current Frame of the 
+            input  NDF (in the range 1 to the number of axes in the 
+            current Frame).
+
+            \sstitem 
+            Its \htmlattref{Symbol}{Symbol(axis)}~ string such as 
+            {\tt "RA"} or {\tt "VRAD"}.
+
+            \sstitem 
+            A generic option where {\tt "SPEC"} requests the spectral axis, 
+            {\tt "TIME"} selects the time axis, {\tt "SKYLON"} and 
+            {\tt "SKYLAT"} picks the sky longitude and latitude axes 
+            respectively.  Only those axis domains present are 
+            available as options.
+         }
+
+         A list of acceptable values is displayed if an illegal value is 
+         supplied.  If a null ({\tt{!}}) value is supplied, the axes
          with the same indices as the two used pixel axes within the NDF
-         are used. {\tt [!]}
+         are used.  {\tt [!]}
       }
       \sstsubsection{
          VARIANCE = \_LOGICAL (Read)
@@ -42307,7 +42418,7 @@ KAPPA: \htmlref{NORMALIZE}{NORMALIZE}.
 
             \sstitem 
             An integer index of an axis within the current Frame of the 
-            input NDF (in the range 1 to the number of axes in the current
+            output NDF (in the range 1 to the number of axes in the current
             Frame).
 
             \sstitem
@@ -46851,12 +46962,29 @@ KAPPA: \htmlref{ADD}{ADD},
          USEAXIS is only accessed if the current co-ordinate Frame of the
          NDF has more than two axes.  A group of two strings should be
          supplied specifying the two axes which are to be used when annotating
-         and aligning the vector map.  Each axis can be specified either by
-         its integer index within the 
-         \htmlref{current Frame}{se:curframe}~ (in the range 1 to the
-         number of axes in the current Frame), or by its 
-         \htmlattref{Symbol}{Symbol(axis)}~ attribute.  A
-         list of acceptable values is displayed if an illegal value is
+         and aligning the vector map.  Each axis can be specified
+         using one of the following options.
+
+         \ssthitemlist{
+
+            \sstitem 
+            Its integer index within the current Frame of the 
+            input  NDF (in the range 1 to the number of axes in the 
+            current Frame).
+
+            \sstitem 
+            Its \htmlattref{Symbol}{Symbol(axis)}~ string such as 
+            {\tt "RA"} or {\tt "VRAD"}.
+
+            \sstitem 
+            A generic option where {\tt "SPEC"} requests the spectral axis, 
+            {\tt "TIME"} selects the time axis, {\tt "SKYLON"} and 
+            {\tt "SKYLAT"} picks the sky longitude and latitude axes 
+            respectively.  Only those axis domains present are 
+            available as options.
+         }
+
+         A list of acceptable values is displayed if an illegal value is
          supplied.  If a null ({\tt{!}}) value is supplied, the axes with the same
          indices as the two significant NDF pixel axes are used.  {\tt [!]}
       }
@@ -49831,13 +49959,31 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          USEAXIS is only accessed if the current co-ordinate Frame of the
          input NDF has more than two axes.  A group of two strings should be
          supplied specifying the two axes spanning the plane containing the
-         areas to be replaced.  Each axis can be specified either
-         by its integer index within the \htmlref{current Frame}{se:curframe}~ 
-         of the output NDF
-         (in the range 1 to the number of axes in the current Frame), or
-         by its \htmlattref{Symbol}{Symbol(axis)}~ attribute.  A list of acceptable values is displayed
-         if an illegal value is supplied.  If a null ({\tt{!}}) value is supplied,
-         the axes with the same indices as the first two significant NDF pixel
+         areas to be replaced.  Each axis can be specified 
+         using one of the following options.
+
+         \ssthitemlist{
+
+            \sstitem 
+            Its integer index within the current Frame of the 
+            output NDF (in the range 1 to the number of axes in the 
+            current Frame).
+
+            \sstitem 
+            Its \htmlattref{Symbol}{Symbol(axis)}~ string such as 
+            {\tt "RA"} or {\tt "VRAD"}.
+
+            \sstitem 
+            A generic option where {\tt "SPEC"} requests the spectral axis, 
+            {\tt "TIME"} selects the time axis, {\tt "SKYLON"} and 
+            {\tt "SKYLAT"} picks the sky longitude and latitude axes 
+            respectively.  Only those axis domains present are 
+            available as options.
+         }
+
+         A list of acceptable values is displayed if an illegal value is 
+         supplied.  If a null ({\tt{!}}) value is supplied, the axes with the 
+         same indices as the first two significant NDF pixel
          axes are used.  {\tt [!]}
       }
       \sstsubsection{

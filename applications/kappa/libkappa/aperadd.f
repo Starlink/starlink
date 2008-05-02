@@ -70,7 +70,7 @@
 *        "COFRAME(SKY,System=FK5)" would indicate that positions are
 *        specified in RA/DEC (FK5,J2000). The statement "COFRAME(PIXEL)"
 *        indicates explicitly that positions are specified in pixel
-*        co-ordinates. [!]
+*        co-ordinates.  [!]
 *     CENTRE = LITERAL (Read)
 *        The co-ordinates of the centre of the circular aperture. Only
 *        used if parameter ARDFILE is set to null. The position must be 
@@ -85,7 +85,7 @@
 *        ARDFILE is set to null. If the current co-ordinate Frame of the 
 *        NDF is a SKY Frame (e.g. RA and DEC), then the value should be
 *        supplied as an increment of celestial latitude (e.g. DEC). Thus,
-*        "10.2" means 10.2 arc-seconds, "30:0" would mean 30 arc-minutes,
+*        "10.2" means 10.2 arcseconds, "30:0" would mean 30 arcminutes,
 *        and "1:0:0" would mean 1 degree. If the current co-ordinate
 *        Frame is not a SKY Frame, then the diameter should be specified 
 *        as an increment along axis 1 of the current co-ordinate Frame.
@@ -94,7 +94,7 @@
 *     LOGFILE  =  FILENAME (Read)
 *        Name of the text file to log the results.  If null, there
 *        will be no logging.  Note this is intended for the human reader
-*        and is not intended for passing to other applications. [!]
+*        and is not intended for passing to other applications.  [!]
 *     MEAN = _DOUBLE (Write)
 *        The mean of the pixel values within the aperture.
 *     NDF = NDF (Read)
@@ -105,13 +105,13 @@
 *        The total number of pixels within the aperture.
 *     QUIET = LOGICAL (Read)
 *        If TRUE then the statistics are not displayed on the screen. 
-*        Output parameters and log files are still created. [FALSE]
+*        Output parameters and log files are still created.  [FALSE]
 *     SIGMA = _DOUBLE (Write)
 *        The standard deviation of the pixel values within the
 *        aperture.
 *     SIGMEAN = _DOUBLE (Write)
-*        The standard deviation on the mean pixel value. If variances are
-*        available this is the RMS value of the standard deviations
+*        The standard deviation on the mean pixel value. If variances
+*        are available this is the RMS value of the standard deviations
 *        associated with each included pixel value. If variances are not
 *        available, it is the standard deviation of the pixel values
 *        divided by the square root of the number of good pixels in 
@@ -126,16 +126,26 @@
 *     TOTAL = _DOUBLE (Write)
 *        The total of the pixel values within the aperture.
 *     USEAXIS = GROUP (Read)
-*        USEAXIS is only accessed if the current co-ordinate Frame of the 
-*        NDF has too many axes. A group of strings should be supplied 
-*        specifying the axes which are to be used when specifying the 
-*        aperture using parameters ARDFILE, CENTRE and DIAM. Each axis can 
-*        be specified either by its integer index within the current Frame 
-*        (in the range 1 to the number of axes in the current Frame), or by 
-*        its symbol string. A list of acceptable values is displayed if an 
-*        illegal value is supplied. If a null (!) value is supplied, the 
-*        axes with the same indices as the 2 used pixel axes within the 
-*        NDF are used. [!]
+*        USEAXIS is only accessed if the current co-ordinate Frame of 
+*        the NDF has too many axes. A group of strings should be 
+*        supplied specifying the axes which are to be used when 
+*        specifying the aperture using parameters ARDFILE, CENTRE and 
+*        DIAM.  Each axis can be specified using one of the following
+*        options.
+*
+*        - Its integer index within the current Frame of the input 
+*        NDF (in the range 1 to the number of axes in the current 
+*        Frame).
+*        - Its symbol string such as "RA" or "VRAD".
+*        - A generic option where "SPEC" requests the spectral axis, 
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
+*        sky longitude and latitude axes respectively.  Only those axis
+*        domains present are available as options.
+*
+*        A list of acceptable values is displayed if an illegal value is 
+*        supplied.  If a null (!) value is supplied, the axes with the 
+*        same indices as the two used pixel axes within the NDF are 
+*        used.  [!]
 *     WEIGHT = _LOGICAL (Read)
 *        If a TRUE value is supplied, and the input NDF has a VARIANCE
 *        component, then pixels with larger variances will be given
@@ -145,7 +155,7 @@
 *        is unity. The pixel value and pixel variance are multiplied by
 *        the pixels weight before being used to calculate the statistics.
 *        The calculation of the statistics remains unchanged in all other 
-*        respects. [FALSE]
+*        respects.  [FALSE]
 
 *  Examples:
 *     aperadd neb1 "13.5,201.3" 20
@@ -158,7 +168,7 @@
 *        aperture of NDF neb1. Assuming the current co-ordinate Frame of
 *        neb1 is a SKY Frame describing RA and DEC, the aperture is centred 
 *        at RA 15:23:43.2 and DEC -22:23:34.2, and has a diameter of 10
-*        arc-minutes.
+*        arcminutes.
 *     aperadd ndf=neb1 ardfile=outline.dat quiet logfile=obj1
 *        This calculates the statistics of the pixels within an aperture 
 *        of NDF neb1 described within the file "outline.dat". The file

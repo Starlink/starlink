@@ -227,13 +227,21 @@
 *        the input NDF has more than two axes.  A group of two strings
 *        should be supplied specifying the two axes spanning the plane 
 *        containing the areas to be replaced.  Each axis can be 
-*        specified either by its integer index within the current Frame
-*        of the output NDF (in the range 1 to the number of axes in the
-*        current Frame), or by its Symbol attribute.  A list of
-*        acceptable values is displayed if an illegal value is supplied. 
-*        If a null (!) value is supplied, the axes with the same 
-*        indices as the first two significant NDF pixel axes are used.
-*        [!]
+*        specified using one of the following options.
+*
+*        - Its integer index within the current Frame of the output 
+*        NDF (in the range 1 to the number of axes in the current 
+*        Frame).
+*        - Its symbol string such as "RA" or "VRAD".
+*        - A generic option where "SPEC" requests the spectral axis, 
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
+*        sky longitude and latitude axes respectively.  Only those axis
+*        domains present are available as options.
+*
+*        A list of acceptable values is displayed if an illegal value is
+*        supplied.  If a null (!) value is supplied, the axes with the
+*        same indices as the first two significant NDF pixel axes are
+*        used.  [!]
 *     ZAPTYPE = LITERAL (Read)
 *        The method used to choose the replacement pixel values.  It 
 *        should be one of the options below.

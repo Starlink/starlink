@@ -86,12 +86,21 @@
 *        the NDF has more than two axes.  A group of two strings should
 *        be supplied specifying the two axes which are to be used when
 *        determining the rotation angle needed to make north vertical. 
-*        Each axis can be specified either by its integer index within
-*        the current Frame (in the range 1 to the number of axes in the
-*        current Frame), or by its symbol string.  A list of acceptable
-*        values is displayed if an illegal value is supplied.  If a null
-*        (!) value is supplied, the axes with the same indices as the 
-*        two used pixel axes within the NDF are used.  [!]
+*        Each axis can be specified using one of the following options.
+*
+*        - Its integer index within the current Frame of the input 
+*        NDF (in the range 1 to the number of axes in the current 
+*        Frame).
+*        - Its symbol string such as "RA" or "VRAD".
+*        - A generic option where "SPEC" requests the spectral axis, 
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
+*        sky longitude and latitude axes respectively.  Only those axis
+*        domains present are available as options.
+*
+*        A list of acceptable values is displayed if an illegal value is
+*        supplied.  If a null (!) value is supplied, the axes with the 
+*        same indices as the two used pixel axes within the NDF are 
+*        used.  [!]
 *     VARIANCE = _LOGICAL (Read)
 *        A TRUE value causes variance values to be used as weights for
 *        the pixel values in bi-linear interpolation, and also causes 

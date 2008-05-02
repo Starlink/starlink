@@ -316,15 +316,24 @@
 *        DASHED.  [current value]
 *     USEAXIS = GROUP (Read)
 *        USEAXIS is only accessed if the current co-ordinate Frame of 
-*        the NDF has more than 2 axes.  A group of two strings should be
-*        supplied specifying the 2 axes which are to be used when
-*        annotating and aligning the contour map.  Each axis can be 
-*        specified either by its integer index within the current Frame 
-*        (in the range 1 to the number of axes in the current Frame), or
-*        by its Symbol attribute.  A list of acceptable values is 
-*        displayed if an illegal value is supplied.  If a null (!) value
-*        is supplied, the axes with the same indices as the two 
-*        significant NDF pixel axes are used.  [!]
+*        the NDF has more than two axes.  A group of two strings should
+*        be supplied specifying the two axes which are to be used when
+*        annotating and aligning the contour map.  Each axis can be
+*        specified using one of the following options.
+*
+*        - Its integer index within the current Frame of the input 
+*        NDF (in the range 1 to the number of axes in the current 
+*        Frame).
+*        - Its symbol string such as "RA" or "VRAD".
+*        - A generic option where "SPEC" requests the spectral axis, 
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
+*        sky longitude and latitude axes respectively.  Only those axis
+*        domains present are available as options.
+*
+*        A list of acceptable values is displayed if an illegal value is
+*        supplied.  If a null (!) value is supplied, the axes with the
+*        same indices as the two significant NDF pixel axes are used. 
+*        [!]
 
 *  Examples:
 *     contour myfile 
