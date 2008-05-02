@@ -245,12 +245,23 @@
 *        the output NDF has more than two axes.  A group of two strings
 *        should be supplied specifying the two axes spanning the plane 
 *        in which the supplied polygons are defined.  Each axis can be
-*        specified either by its integer index within the current Frame
-*        of the output NDF (in the range 1 to the number of axes in the
-*        current Frame), or by its Symbol attribute.  A list of
-*        acceptable values is displayed if an illegal value is supplied.
-*        If a null (!) value is supplied, the axes with the same indices
-*        as the first two significant NDF pixel axes are used.  [!]
+*        specified using one of the following options.
+*
+*        - An integer index of an axis within the current Frame of the 
+*        input NDF (in the range 1 to the number of axes in the current
+*	 Frame).
+*
+*        - An axis symbol string such as "RA" or "VRAD".
+*
+*        - A generic option where "SPEC" requests the spectral axis, 
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
+*        sky longitude and latitude axes respectively.  Only those axis 
+*        domains present are available as options.
+*
+*        A list of acceptable values is displayed if an illegal value is 
+*        supplied.  If a null (!) value is supplied, the axes with the 
+*        same indices as the first two significant NDF pixel axes are 
+*        used.  [!]
 *     VARIANCE = _LOGICAL (Read) 
 *        If a TRUE value is supplied for parameter VARIANCE then
 *        variance information is copied from the input NDFs to the

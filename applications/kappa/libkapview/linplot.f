@@ -356,14 +356,24 @@
 *        See the description of the STYLE parameter for more information
 *        about values that can be assigned to this parameter.  [!]
 *     USEAXIS = LITERAL (Read)
-*        Specifies the quantity to be used to annotate the horizontal
-*        axis of the plot.  The index or label of an axis within the
-*        current co-ordinate Frame of the NDF should be supplied. 
-*        Alternatively, if USEAXIS is given the value 0 (zero), then the
-*        distance along the profile from the centre of the first
-*        element in the supplied NDF will be used to annotate the axis.
-*        This will be measured in the current co-ordinate Frame of the
-*        NDF. 
+*        Specifies the quantity to be used to annotate the horizontal axis
+*        of the plot using one of the following options.
+*
+*        - An integer index of an axis within the current Frame of the 
+*        input NDF (in the range 1 to the number of axes in the current
+*	 Frame).
+*
+*        - An axis symbol string such as "RA", or "VRAD".
+*
+*        - A generic option where "SPEC" requests the spectral axis, 
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
+*        sky longitude and latitude axes respectively.  Only those axis 
+*        domains present are available as options.
+*
+*        - The special value 0 (zero), asks for the distance along the
+*	 profile from the centre of the first element in the supplied
+*        NDF to be used to annotate the axis.  This will be measured in 
+*        the current co-ordinate Frame of the NDF.
 *
 *        The quantity used to annotate the horizontal axis must have a
 *        defined value at all points in the array, and must increase or 

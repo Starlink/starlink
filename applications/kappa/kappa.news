@@ -47,6 +47,17 @@
    requests that a value of FALSE be adopted if and only if all the
    input NDFs have variance components.  TRUE is used otherwise.
 
+2 General_changes
+
+   o  Parameters that require one or more WCS axes to be
+   specified---these are usually called USEAXIS, AXIS or AXES and
+   appear in applications such LINPLOT, COLLAPSE and PLUCK---now
+   accept generic names of those axes present (in addition to axis
+   Symbol or indices).  These generic names are: "SPEC" to select 
+   the spectral axis, "TIME" to pick the time axis, and "SKYLON" and
+   "SKYLAT" to choose the sky longitude and latitude axes 
+   respectively.
+
 
 1 KAPPA_Version_1.8
 

@@ -63,14 +63,25 @@
 *        automatically, and parameter RANGES is ignored.  [FALSE]
 *     AXIS = LITERAL (Read)
 *        The axis of the current co-ordinate system that defines the
-*        direction of the trends.  This is specified by its integer 
-*        index within the current Frame of the input NDF (in the range
-*        1 to the number of axes in the current Frame), or by its symbol
-*        string.  A list of acceptable values is displayed if an illegal
-*        value is supplied.  If the axes of the current Frame are not
-*        parallel to the NDF pixel axes, then the pixel axis which is
-*        most nearly parallel to the specified current Frame axis will
-*        be used.  AXIS defaults to the last axis.  [!]
+*        direction of the trends.  This is specified using one of the
+*        following options.
+*
+*        - An integer index of an axis within the current Frame of the 
+*        input NDF (in the range 1 to the number of axes in the current
+*	 Frame).
+*
+*        - An axis symbol string such as "RA" or "VRAD".
+*
+*        - A generic option where "SPEC" requests the spectral axis, 
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
+*        sky longitude and latitude axes respectively.  Only those axis 
+*        domains present are available as options.
+*
+*        A list of acceptable values is displayed if an illegal value
+*        is supplied.  If the axes of the current Frame are not parallel
+*        to the NDF pixel axes, then the pixel axis which is most nearly
+*        parallel to the specified current Frame axis will be used. 
+*        AXIS defaults to the last axis.  [!]
 *     CLIP() = _REAL (Read)
 *        Array of standard-deviation limits for progressive clipping 
 *        of outlying binned (see NUMBIN) pixel values while determining 

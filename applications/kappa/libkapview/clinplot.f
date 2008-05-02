@@ -41,7 +41,7 @@
 *     is defined over the spatial extent of the cube, and a spectrum
 *     is drawn at each such point. If NX and NY equal the spatial
 *     dimensions of the cube (which is the default for spatial axes of
-*     less than 31 pixels), then one spectrum is drawn for every
+*     fewer than 31 pixels), then one spectrum is drawn for every
 *     spatial pixel in the cube. For speed, the spectrum will be
 *     binned up so that the number of elements in the spectrum does
 *     not exceed the horizontal number of device pixels available for
@@ -53,7 +53,7 @@
 *     parameters STYLE and MARGIN).
 *
 *     The data value at the top and bottom of each line plot can be
-*     specified using parameters YBOT and YTOP. The defaults can be
+*     specified using parameters YBOT and YTOP.  The defaults can be
 *     selected in several ways including percentiles (see parameter
 *     LMODE).
 *
@@ -64,9 +64,9 @@
 *
 *     The range and nature of the vertical and horizontal axes in each
 *     line plot can be displayed in a key to the right of the main
-*     plot (see parameter KEY). Also, an option exists to add
+*     plot (see parameter KEY).  Also, an option exists to add
 *     numerical labels to the first (i.e. bottom left) line plot, see
-*     parameter REFLABEL. However, due to the nature of the plot, the
+*     parameter REFLABEL.  However, due to the nature of the plot, the
 *     text used may often be too small to read.
 
 *  Usage:
@@ -92,19 +92,19 @@
 *        (i.e. parameter AXES is FALSE). []
 *     CLEAR = _LOGICAL (Read)
 *        If TRUE the current picture is cleared before the plot is
-*        drawn. IF FALSE, then the display is left uncleared and an
+*        drawn.  IF FALSE, then the display is left uncleared and an
 *        attempt is made to align the spatial axes of the new plot
-*        with any spatial axes of the existing plot. Thus, for
+*        with any spatial axes of the existing plot.  Thus, for
 *        instance, a while light image may be displayed using DISPLAY,
 *        and then spectra drawn over the top of the image using this
-*        application. [TRUE]
+*        application.  [TRUE]
 *     COMP = LITERAL (Read)
 *        The NDF array component to be displayed.  It may be "Data",
 *        "Quality", "Variance", or "Error" (where "Error" is an
 *        alternative to "Variance" and causes the square root of the
 *        variance values to be displayed).  If "Quality" is specified,
 *        then the quality values are treated as numerical values (in
-*        the range 0 to 255). ["Data"]
+*        the range 0 to 255).  ["Data"]
 *     DEVICE = DEVICE (Read)
 *        The name of the graphics device used to display the cube.
 *        [current graphics device]
@@ -115,7 +115,7 @@
 *        more of the display surface at the cost of different spatial
 *        scales, and when the spatial axes have markedly different
 *        dimensions.  The dynamic default is TRUE if either of the
-*        spatial diensions is one. and FALSE otherwise. []
+*        spatial diensions is one. and FALSE otherwise.  []
 *     KEY = _LOGICAL (Read)
 *        If TRUE, then a "key" will be drawn to the right of the plot.
 *        The key will include information about the vertical and
@@ -123,7 +123,7 @@
 *        minimum value covered by the axis and the quantity
 *        represented by the axis. The appearance of this key can be
 *        controlled using parameter KEYSTYLE, and its position can be
-*        controlled using parameter KEYPOS. [TRUE]
+*        controlled using parameter KEYPOS.  [TRUE]
 *     KEYPOS() = _REAL (Read)
 *        Two values giving the position of the key.  The first value
 *        gives the gap between the right-hand edge of the grid plot
@@ -134,7 +134,7 @@
 *        top of the key is placed level with the top of the grid
 *        plot.  Both values should be in the range 0.0 to 1.0.  If a
 *        key is produced, then the right-hand margin specified by
-*        parameter MARGIN is ignored. [current value]
+*        parameter MARGIN is ignored.  [current value]
 *     KEYSTYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style
 *        to use for the key (see parameter KEY).
@@ -154,7 +154,7 @@
 *
 *        where <name> is the name of a plotting attribute, and <value>
 *        is the value to assign to the attribute. Default values will be
-*        used for any unspecified attributes. All attributes will be
+*        used for any unspecified attributes.  All attributes will be
 *        defaulted if a null value (!) is supplied.  See section 
 *        "Plotting Attributes" in SUN/95 for a description of the 
 *        available attributes.  Any unrecognised attributes are ignored 
@@ -221,7 +221,7 @@
 *        margins are too narrow any axis annotation may be clipped.
 *        If a null (!) value is supplied, the value used is (for all
 *        edges); 0.15 if annotated axes are being produced; and 0.0
-*        otherwise.  The initial default is null. [current value]
+*        otherwise.  The initial default is null.  [current value]
 *     NDF = NDF (Read)
 *        The input NDF structure containing the data to be displayed.
 *        It should have three significant axes, i.e. whose dimensions
@@ -232,20 +232,20 @@
 *        dynamic default is the number of pixels along the X axis of
 *        the NDF, so long as this value is no more than 30. If the X
 *        axis spans more than 30 pixels, then the dynamic default is
-*        30 (meaning that some spatial pixels will be ignored). []
+*        30 (meaning that some spatial pixels will be ignored).  []
 *     NY = _INTEGER (Read)
 *        The number of spectra to draw in each column. The spectra
 *        will be equally spaced over the bounds of the Y pixel axis.
 *        The dynamic default is the number of pixels along the Y axis
 *        of the NDF, so long as this value is no more than 30. If the
 *        Y axis spans more than 30 pixels, then the dynamic default is
-*        30 (meaning that some spatial pixels will be ignored). []
+*        30 (meaning that some spatial pixels will be ignored).  []
 *     REFLABEL = _LOGICAL (Read)
 *        If TRUE then the first line plot (i.e. the lower left
 *        spectrum) will be annotated with numerical and textual labels
 *        describing the two axes. Note, due to the small size of the
 *        line plot, such text may be too small to read on some
-*        graphics devices. [current value]
+*        graphics devices.  [current value]
 *     SPECSTYLE = LITERAL (Read)
 *        A group of attribute settings describing the plotting style
 *        to use when drawing the axes and data values in the spectrum
@@ -301,20 +301,30 @@
 *        be defaulted if a null value (!) is supplied.  See section
 *        "Plotting Attributes" in SUN/95 for a description of the
 *        available attributes.  Any unrecognised attributes are
-*        ignored (no error is reported). [current value]
+*        ignored (no error is reported).  [current value]
 *     USEAXIS = LITERAL (Read)
 *        The WCS axis that will appear along the horizontal axis of
-*        each line plot (the other 2 axes will be used as the spatial
-*        axes). The axis can be specified by its integer index within
-*        the current Frame of the NDF (in the range 1 to 3 in the
-*        current Frame), or by its symbol string.  A list of
-*        acceptable values is displayed if an illegal value is
+*        each line plot (the other two axes will be used as the spatial
+*        axes). The axis can be specified using one of the following 
+*        options.
+*
+*         -  Its integer index within the current Frame of the NDF (in 
+*         the range 1 to 3 in the current frame).
+*
+*         -  Its symbol string such as "RA", or "VRAD".
+*
+*         - A generic option where "SPEC" requests the spectral axis, 
+*         "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
+*         sky longitude and latitude axes respectively.  Only those axis
+*         domains present are available as options.
+*
+*        A list of acceptable values is displayed if an illegal value is
 *        supplied.  The dynamic default is the index of any spectral
-*        axis found in the current Frame of the NDF. []
+*        axis found in the current Frame of the NDF.  []
 *     YBOT = _REAL (Read)
 *        The data value for the bottom edge of each line plot. The
 *        dynamic default is chosen in a manner determined by parameter
-*        LMODE. []
+*        LMODE.  []
 *     YTOP = _REAL (Read)
 *        The data value for the top edge of each line plot. The dynamic
 *        default is chosen in a manner determined by parameter LMODE. []
@@ -382,7 +392,7 @@
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -392,8 +402,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J.Currie (RAL)

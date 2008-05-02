@@ -43,13 +43,21 @@
 *  ADAM Parameters:
 *     AXIS = LITERAL (Read)
 *        The axis along which to collapse the NDF.  This can be
-*        specified by its integer index within the current Frame of the 
-*        input NDF (in the range 1 to the number of axes in the current
-*        Frame), or by its symbol string.  A list of acceptable values
-*        is displayed if an illegal value is supplied.  If the axes of 
-*        the current Frame are not parallel to the NDF pixel axes, then
-*        the pixel axis which is most nearly parallel to the specified
-*        current Frame axis will be used.
+*        specified using one of the following options.
+*
+*        - Its integer index within the current Frame of the input 
+*        NDF (in the range 1 to the number of axes in the current 
+*        Frame).
+*        - Its symbol string such as "RA" or "VRAD".
+*        - A generic option where "SPEC" requests the spectral axis, 
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
+*        sky longitude and latitude axes respectively.  Only those axis
+*        domains present are available as options.
+*
+*        A list of acceptable values is displayed if an illegal value is
+*        supplied.  If the axes of the current Frame are not parallel to
+*        the NDF pixel axes, then the pixel axis which is most nearly 
+*        parallel to the specified current Frame axis will be used.
 *     ESTIMATOR = LITERAL (Read)
 *        The method to use for estimating the output pixel values.  It
 *        can be one of the following options. 
@@ -134,13 +142,22 @@
 *        USEAXIS is only accessed if the current co-ordinate Frame of 
 *        the input NDF has more than three axes.  A group of three 
 *        strings should be supplied specifying the three axes which are 
-*        to be retained in a collapsed slab.  Each axis can be 
-*        specified either by its integer index within the current Frame 
-*        (in the range 1 to the number of axes in the current Frame), or
-*         by its symbol string.  A list of acceptable values is 
-*        displayed if an illegal value is supplied.  If a null (!) value
-*        is supplied, the axes with the same indices as the three used 
-*        pixel axes within the NDF are used.  [!]
+*        to be retained in a collapsed slab.  Each axis can be specified 
+*        using one of the following options.
+*
+*        - Its integer index within the current Frame of the input 
+*        NDF (in the range 1 to the number of axes in the current 
+*        Frame).
+*        - Its symbol string such as "RA" or "VRAD".
+*        - A generic option where "SPEC" requests the spectral axis, 
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
+*        sky longitude and latitude axes respectively.  Only those axis
+*        domains present are available as options.
+*
+*        A list of acceptable values is displayed if an illegal value is 
+*        supplied.  If a null (!) value is supplied, the axes with the 
+*        same indices as the three used pixel axes within the NDF are 
+*        used.  [!]
 *     WLIM = _REAL (Read)
 *        If the input NDF contains bad pixels, then this parameter
 *        may be used to determine the number of good pixels which must

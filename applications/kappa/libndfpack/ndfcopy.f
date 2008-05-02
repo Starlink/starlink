@@ -94,12 +94,22 @@
 *        TRUE, and some axes need to be removed from the current WCS
 *        Frame of the output NDF.  It gives the axes which are to be
 *        retained in the current WCS Frame of the output NDF.  Each axis
-*        can be specified either by giving its index within the Current
-*        Frame of the input NDF in the range 1 to the number of axes in
-*        the Frame, or by giving its symbol.  The dynamic default
-*        selects the axes with the same indices as the pixel axes being 
-*        copied.  The value should be given as a comma-separated list. 
-*        []
+*        can be specified using one of the following options.
+*
+*        - An integer index of an axis within the current Frame of the 
+*        input NDF (in the range 1 to the number of axes in the current
+*	 Frame).
+*
+*        - An axis symbol string such as "RA" or "VRAD".
+*
+*        - A generic option where "SPEC" requests the spectral axis, 
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
+*        sky longitude and latitude axes respectively.  Only those axis 
+*        domains present are available as options.
+
+*        The dynamic default selects the axes with the same indices as 
+*        the pixel axes being copied.  The value should be given as a 
+*        comma-separated list.  []
 
 *  Examples:
 *     ndfcopy infile outfile

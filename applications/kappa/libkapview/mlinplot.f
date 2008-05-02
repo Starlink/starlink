@@ -333,9 +333,19 @@
 *        edge of the plotting area, and 1.0 the right edge.  Values
 *        outside the range 0 to 1 may be used.  [current value]
 *     USEAXIS = LITERAL (Read)
-*        The index or label of the axis within the current co-ordinate
-*        Frame of the NDF which is to be used to annotate the horizontal
-*        axis of the plot.  
+*        The quantity to be used to annotate the horizontal axis
+*        of the plot specified by using one of the following options.
+*
+*        - An integer index of an axis within the current Frame of the 
+*        input NDF (in the range 1 to the number of axes in the current
+*	 Frame).
+*
+*        - An axis symbol string such as "RA" or "VRAD".
+*
+*        - A generic option where "SPEC" requests the spectral axis, 
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
+*        sky longitude and latitude axes respectively.  Only those axis 
+*        domains present are available as options.
 *
 *        The quantity used to annotate the horizontal axis must have a
 *        defined value at all points in the array, and must increase or 

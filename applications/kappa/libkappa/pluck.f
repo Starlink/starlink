@@ -66,11 +66,19 @@
 *        along these axes.  The maximum number of axes is one fewer 
 *        than the number of WCS axes in the NDF.
 *
-*        Each axis can be specified by its integer index within the 
-*        current Frame of the input NDF (in the range 1 to the number 
-*        of axes in the current Frame), or by its symbol string.  A list
-*        of acceptable values is displayed if an illegal value is 
-*        supplied.  If the axes of the current Frame are not parallel to 
+*        Each axis can be specified using one of the following options.
+*
+*        - Its integer index within the current Frame of the input 
+*        NDF (in the range 1 to the number of axes in the current 
+*        Frame).
+*        - Its symbol string such as "RA" or "VRAD".
+*        - A generic option where "SPEC" requests the spectral axis, 
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
+*        sky longitude and latitude axes respectively.  Only those axis
+*        domains present are available as options.
+*
+*        A list of acceptable values is displayed if an illegal value is
+*        supplied.  If the axes of the current Frame are not parallel to
 *        the NDF pixel axes, then the pixel axis which is most nearly 
 *        parallel to the specified current Frame axis will be used.
 *     COIN = FILENAME (Read)
@@ -83,7 +91,7 @@
 *     CONTAINER = _LOGICAL (Read)
 *        If TRUE, each slice extracted is written as an NDF component of
 *        the HDS container file specified by the OUT parameter.  The nth
-*        component will be named PLUCK_n.  If set FALSE, each extraction 
+*        component will be named PLUCK_n.  If set FALSE, each extraction
 *        is written to a separate file.  On-the-fly format conversion to
 *        foreign formats is not possible when CONTAINER=TRUE. [FALSE]
 *     DESCRIBE = _LOGICAL (Read)
@@ -93,11 +101,11 @@
 *        MODE="Catalogue".  [current value]
 *     INCAT = FILENAME (Read)
 *        A catalogue containing a positions list giving the co-ordinates
-*        of the fixed positions, such as produced by applications CURSOR, 
-*        LISTMAKE, etc.  It is only accessed if parameter MODE is given 
-*        the value "Catalogue".  The catalogue should have a WCS Frame
-*        common with the NDF, so that the NDF and catalogue FrameSets 
-*        can be aligned.
+*        of the fixed positions, such as produced by applications 
+*        CURSOR, LISTMAKE, etc.  It is only accessed if parameter MODE
+*        is given the value "Catalogue".  The catalogue should have a 
+*        WCS Frame common with the NDF, so that the NDF and catalogue 
+*        FrameSets can be aligned.
 *     MODE = LITERAL (Read)
 *        The mode in which the initial co-ordinates are to be obtained.
 *        The supplied string can be one of the following values.
@@ -226,6 +234,9 @@
 *        This example reads the fixed positions from the
 *        positions list in file a.FIT.  The selected spectra are stored
 *        in an HDS container file called omc1_spectra.sdf.
+*     pluck omc1 mode=cat incat=a axes=SPEC container out=omc1_spectra
+*        As the previous example, plucking spectra, this time by
+*        selecting the generic spectral axis.
 *     pluck omc1 pos=3.45732E11 axes="RA,Dec" method=lin out=peakplane
 *        This example extracts a plane from omc1 at frequency 
 *        3.45732E11 Hz using linear interpolation and stores it in NDF
@@ -234,7 +245,7 @@
 *  Notes:
 *     -  In Interface or File modes all positions should be supplied in 
 *     the current co-ordinate Frame of the NDF.  A description of the 
-*     co-ordinate Frame being used is given if parameter DESCRIBE is set 
+*     co-ordinate Frame being used is given if parameter DESCRIBE is set
 *     to a TRUE value.  Application WCSFRAME can be used to change the 
 *     current co-ordinate Frame of the NDF before running this 
 *     application if required.
@@ -248,7 +259,7 @@
 *     prevents some old non-KAPPA tasks from operating.
 *     -  In Catalogue or File modes the table file need only contain
 *     columns supplying the fixed positions.  In this case the 
-*     co-ordinates along the retained axes are deemed to be independent, 
+*     co-ordinates along the retained axes are deemed to be independent,
 *     that is they do not affect the shifts required of the other axes.
 *     In practice this assumption only affects File mode, as catalogues
 *     made with CURSOR or LISTMAKE will contain WCS information.
@@ -339,8 +350,8 @@
       INTEGER J                  ! Loop counter
       INTEGER MAP1               ! Mapping from GRID Frame to Current
                                  ! Frame
-      INTEGER MAP2               ! Mapping from supplied Frame to Current 
-                                 ! Frame
+      INTEGER MAP2               ! Mapping from supplied Frame to
+                                 ! Current Frame
       INTEGER MAP3               ! Mapping from supplied Frame to GRID 
                                  ! Frame
       INTEGER MAPX               ! Basic Mapping to use (without extra
@@ -437,7 +448,7 @@
 *  We need to know how many significant axes there are (i.e. pixel axes
 *  spanning more than a single pixel), so count them.  We ignore
 *  insignificant axes since the user will probably not be interested in
-*  them (and the interpolating routines cannot handle axes spanning only 
+*  them (and the interpolating routines cannot handle axes spanning only
 *  a single pixel).
       CALL NDF_DIM( NDFI, NDF__MXDIM, DIMS, NDIM, STATUS )
       NDIMS = 0

@@ -166,11 +166,22 @@
 *        using parameter FRAME has more than two axes.  A group of two
 *        strings should be supplied specifying the two axes to which
 *        the two drawn arrows should refer.  Each axis can be specified
-*        either by its integer index within the Frame (in the range 1 to
-*        the number of axes in the current Frame), or by its symbol
-*        string. A list of acceptable values is displayed if an illegal
-*        value is supplied.  If a null (!) value is supplied, the 
-*        first two axes of the Frame are used.  [!]
+*        using one of the following options.
+*
+*        - An integer index of an axis within the current Frame of the 
+*        input NDF (in the range 1 to the number of axes in the current
+*	 Frame).
+*
+*        - An axis symbol string such as "RA" or "VRAD".
+*
+*        - A generic option where "SPEC" requests the spectral axis, 
+*        "TIME" selects the time axis, "SKYLON" and "SKYLAT" picks the 
+*        sky longitude and latitude axes respectively.  Only those axis 
+*        domains present are available as options.
+*
+*        A list of acceptable values is displayed if an illegal value
+*        is supplied.  If a null (!) value is supplied, the first two 
+*        axes of the Frame are used.  [!]
 
 *  Examples:
 *     drawnorth 

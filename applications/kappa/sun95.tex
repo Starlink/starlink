@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.34}
 \newcommand{\stardocnumber}    {95.34}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2008 April 29}
+\newcommand{\stardocdate}      {2008 May 1}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.9-4}
+\newcommand{\stardocversion}   {1.9-5}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -14453,11 +14453,11 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          BEAMS = \_INTEGER (Read)
       }{
          The number of beam positions to fit.  This will normally be
-	 1, unless a chopped observation is supplied, when there may
-	 be two or three beam positions.  This parameter is ignored
-	 for {\tt "File"} and {\tt "Catalogue"} modes, where the
-	 number comes from the number of beam positions read from the
-	 files; and for "Interface" mode when the beam positions POS, 
+         1, unless a chopped observation is supplied, when there may
+         be two or three beam positions.  This parameter is ignored
+         for {\tt "File"} and {\tt "Catalogue"} modes, where the
+         number comes from the number of beam positions read from the
+         files; and for "Interface" mode when the beam positions POS, 
          POS2, \emph{etc.} are supplied in full on the command line 
          without BEAMS.  In all modes there is a maximum of five 
          positions, which for {\tt "File"} or {\tt "Catalogue"} modes 
@@ -14523,15 +14523,15 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          full-width half maxima.
 
          If the current co-ordinate Frame of the NDF is a SKY Frame
-	 (\emph{e.g.} right ascension and declination), then the value should
-	 be supplied as an increment of celestial latitude (\emph{e.g.}
-	 declination).  Thus, {\tt "5.7"} means 5.7 arcseconds, {\tt
-	 "20:0"} would mean 20 arcminutes, and {\tt "1:0:0"} would
-	 mean 1 degree.  If the current co-ordinate Frame is not a SKY
-	 Frame, then the widths should be specified as an increment
-	 along Axis 1 of the current co-ordinate Frame.  Thus, if the
-	 Current Frame is PIXEL, the value should be given simply as a
-	 number of pixels.
+         (\emph{e.g.} right ascension and declination), then the value should
+         be supplied as an increment of celestial latitude (\emph{e.g.}
+         declination).  Thus, {\tt "5.7"} means 5.7 arcseconds, {\tt
+         "20:0"} would mean 20 arcminutes, and {\tt "1:0:0"} would
+         mean 1 degree.  If the current co-ordinate Frame is not a SKY
+         Frame, then the widths should be specified as an increment
+         along Axis 1 of the current co-ordinate Frame.  Thus, if the
+         Current Frame is PIXEL, the value should be given simply as a
+         number of pixels.
 
          Null indicates that the FWHM values are free parameters of the
          fit.  {\tt [!]}
@@ -14693,30 +14693,30 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
          POS = LITERAL (Read)
       }{
          When MODE = {\tt "Interface"} POS specifies the co-ordinates
-	 of the primary beam position.  This is either merely an
-	 initial guess for the fit, or if parameter FIXPOS is {\tt
-	 TRUE}, it defines a fixed location.  It is specified in the
-	 current co-ordinate Frame of the NDF (supplying a colon {\tt
-	 ":"} will display details of the current co-ordinate Frame).
-	 A position should be supplied as a list of formatted
-	 WCS axis values separated by spaces or commas.
+         of the primary beam position.  This is either merely an
+         initial guess for the fit, or if parameter FIXPOS is {\tt
+         TRUE}, it defines a fixed location.  It is specified in the
+         current co-ordinate Frame of the NDF (supplying a colon {\tt
+         ":"} will display details of the current co-ordinate Frame).
+         A position should be supplied as a list of formatted
+         WCS axis values separated by spaces or commas.
 
          If the initial co-ordinates are supplied on the command line 
-	 without BEAMS the number of contiguous POS, POS2,\ldots
-	 parameters specifies the number of beams to be fit.  If the
-	 initial co-ordinates are supplied on the command line without
-	 BEAMS specified only one beam will be fit.
+         without BEAMS the number of contiguous POS, POS2,\ldots
+         parameters specifies the number of beams to be fit.  If the
+         initial co-ordinates are supplied on the command line without
+         BEAMS specified only one beam will be fit.
       }
       \sstsubsection{
          POS2-POS5 = LITERAL (Read)
       }{
          When MODE = {\tt "Interface"} these parameters specify the
-	 co-ordinates of the secondary beam positions.  For each
-	 parameter the supplied location may be merely an initial
-	 guess for the fit, or if parameter FIXPOS is {\tt TRUE}, it
-	 defines a fixed location, unless parameter FIXSEP is {\tt
-	 TRUE}, whereupon it defines a fixed separation from the
-	 primary beam.
+         co-ordinates of the secondary beam positions.  For each
+         parameter the supplied location may be merely an initial
+         guess for the fit, or if parameter FIXPOS is {\tt TRUE}, it
+         defines a fixed location, unless parameter FIXSEP is {\tt
+         TRUE}, whereupon it defines a fixed separation from the
+         primary beam.
 
          For POLAR = {\tt FALSE} each distance should be given as a single
          literal string containing a space- or comma-separated list of 
@@ -14975,12 +14975,12 @@ KAPPA: \htmlref{AXLABEL}{AXLABEL},
 
          \sstitem
          All positions are supplied and reported in the current
-	 co-ordinate Frame of the NDF.  A description of the
-	 co-ordinate Frame being used is given if parameter DESCRIBE
-	 is set to a {\tt TRUE} value.  Application
-	 \htmlref{WCSFRAME}{WCSFRAME} can be used to change the
-	 current co-ordinate Frame of the NDF before running this
-	 application if required.
+         co-ordinate Frame of the NDF.  A description of the
+         co-ordinate Frame being used is given if parameter DESCRIBE
+         is set to a {\tt TRUE} value.  Application
+         \htmlref{WCSFRAME}{WCSFRAME} can be used to change the
+         current co-ordinate Frame of the NDF before running this
+         application if required.
 
          \sstitem
          The uncertainty in the positions are estimated iteratively
@@ -16369,15 +16369,33 @@ KAPPA: \htmlref{PASTE}{PASTE},
       \sstsubsection{
          AXIS = LITERAL (Read)
       }{
-         The axis along which to collapse the NDF.  This can be
-         specified by its integer index within the 
-         \htmlref{current Frame}{se:curframe}~ of the
-         input NDF (in the range 1 to the number of axes in the current
-         Frame), or by its symbol string.  A list of acceptable values
-         is displayed if an illegal value is supplied.  If the axes of
-         the current Frame are not parallel to the NDF pixel axes, then
-         the pixel axis which is most nearly parallel to the specified
-         current Frame axis will be used.
+         The axis along which to collapse the NDF.
+         This can be specified using one of the following options.
+
+         \ssthitemlist{
+
+            \sstitem 
+            Its integer index within the \htmlref{current
+            Frame}{se:curframe}~ of the input NDF (in the range 1 to
+            the number of axes in the current Frame).
+
+            \sstitem 
+            Its \htmlattref{Symbol}{Symbol(axis)}~ string such as 
+            {\tt "RA"} or {\tt "VRAD"}.
+
+            \sstitem 
+            A generic option where {\tt "SPEC"} requests the spectral axis, 
+            {\tt "TIME"} selects the time axis, {\tt "SKYLON"} and 
+            {\tt "SKYLAT"} picks the sky longitude and latitude axes 
+            respectively.  Only those axis domains present are 
+            available as options.
+         }
+
+         A list of acceptable values is displayed if an illegal value
+         is supplied.  If the axes of the current Frame are not
+         parallel to the NDF pixel axes, then the pixel axis which is
+         most nearly parallel to the specified current Frame axis will
+         be used.
       }
       \sstsubsection{
          ESTIMATOR = \htmlref{LITERAL}{se:parmenu} (Read)
@@ -16443,8 +16461,8 @@ KAPPA: \htmlref{PASTE}{PASTE},
          }
          The selection is restricted if each channel contains three
          or fewer pixels.  For instance, measures of dispersion like
-  	 "Sigma" and "Iwd" are meaningless for single-pixel channels.
-  	 If you supply an unavailable option, you will be informed,
+           "Sigma" and "Iwd" are meaningless for single-pixel channels.
+           If you supply an unavailable option, you will be informed,
          and presented with the available options.
          {\tt ["Mean"]}
       }
@@ -16521,13 +16539,33 @@ KAPPA: \htmlref{PASTE}{PASTE},
          USEAXIS is only accessed if the current co-ordinate Frame of
          the input NDF has more than three axes.  A group of three
          strings should be supplied specifying the three axes which are
-         to be retained in a collapsed slab.  Each axis can be
-         specified either by its integer index within the current Frame
-         (in the range 1 to the number of axes in the current Frame), or
-          by its symbol string.  A list of acceptable values is
-         displayed if an illegal value is supplied.  If a null ({\tt{!}}) value
-         is supplied, the axes with the same indices as the three used
-         pixel axes within the NDF are used.   {\tt [!]}
+         to be retained in a collapsed slab.
+         
+         Each axis can be specified using one of the following options.
+
+         \ssthitemlist{
+
+            \sstitem 
+            Its integer index within the current Frame of the 
+            input  NDF (in the range 1 to the number of axes in the 
+            current Frame).
+
+            \sstitem 
+            Its \htmlattref{Symbol}{Symbol(axis)}~ string such as 
+            {\tt "RA"} or {\tt "VRAD"}.
+
+            \sstitem 
+            A generic option where {\tt "SPEC"} requests the spectral axis, 
+            {\tt "TIME"} selects the time axis, {\tt "SKYLON"} and 
+            {\tt "SKYLAT"} picks the sky longitude and latitude axes 
+            respectively.  Only those axis domains present are 
+            available as options.
+         }
+
+         A list of acceptable values is displayed if an illegal value
+         is supplied.  If a null ({\tt{!}}) value is supplied, the
+         axes with the same indices as the three used pixel axes
+         within the NDF are used.  {\tt [!]}
       }
       \sstsubsection{
          WLIM = \_REAL (Read)
@@ -16612,17 +16650,17 @@ KAPPA: \htmlref{PASTE}{PASTE},
          axis proceeds as follows.
 
          The current-Frame co-ordinates of the central pixel in the
-	 input NDF are determined (or some other point if the
-	 co-ordinates of the central pixel are undefined).  Two
-	 current-Frame positions are then generated by substituting in
-	 turn into this central position each of the HIGH and LOW
-	 values for the current-Frame axis specified by parameter
-	 AXIS.  These two current-Frame positions are transformed into
-	 pixel co-ordinates, and the projections of the vector joining
-	 these two pixel positions on to the pixel axes are found.
-	 The pixel axis with the largest projection is selected as the
-	 collapse axis, and the two end points of the projection
-	 define the range of axis values to collapse.
+         input NDF are determined (or some other point if the
+         co-ordinates of the central pixel are undefined).  Two
+         current-Frame positions are then generated by substituting in
+         turn into this central position each of the HIGH and LOW
+         values for the current-Frame axis specified by parameter
+         AXIS.  These two current-Frame positions are transformed into
+         pixel co-ordinates, and the projections of the vector joining
+         these two pixel positions on to the pixel axes are found.
+         The pixel axis with the largest projection is selected as the
+         collapse axis, and the two end points of the projection
+         define the range of axis values to collapse.
 
          \sstitem
          The WCS of the output NDF retains the three-dimensional
@@ -17109,26 +17147,26 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          line plots.
 
          A comma-separated list of strings should be given in which
-	 each string is either an attribute setting, or the name of a
-	 text file preceded by an up-arrow character {\tt "$\wedge$"}.
-	 Such text files should contain further comma-separated lists
-	 which will be read and interpreted in the same manner.
-	 Attribute settings are applied in the order in which they
-	 occur within the list, with later settings overriding any
-	 earlier settings given for the same attribute.
+         each string is either an attribute setting, or the name of a
+         text file preceded by an up-arrow character {\tt "$\wedge$"}.
+         Such text files should contain further comma-separated lists
+         which will be read and interpreted in the same manner.
+         Attribute settings are applied in the order in which they
+         occur within the list, with later settings overriding any
+         earlier settings given for the same attribute.
 
          Each individual attribute setting should be of the form:
 
               $<$name$>$=$<$value$>$
 
          where $<$name$>$ is the name of a plotting attribute, and
-	 $<$value$>$ is the value to assign to the attribute.  Default
-	 values will be used for any unspecified attributes.  All
-	 attributes will be defaulted if a null value ({\tt{!}}) is
-	 supplied.  See \hyperref{Plotting 
+         $<$value$>$ is the value to assign to the attribute.  Default
+         values will be used for any unspecified attributes.  All
+         attributes will be defaulted if a null value ({\tt{!}}) is
+         supplied.  See \hyperref{Plotting 
          Attributes}{Section~}{}{se:plotting_attr} for a description
-	 of the available attributes.  Any unrecognised attributes are
-	 ignored (no error is reported).
+         of the available attributes.  Any unrecognised attributes are
+         ignored (no error is reported).
 
          By default the axes have interior tick marks, and are without
          labels and a title to avoid overprinting on adjacent plots.
@@ -17146,25 +17184,25 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
          use for the annotated outer spatial axes (see parameter AXES).
 
          A comma-separated list of strings should be given in which
-	 each string is either an attribute setting, or the name of a
-	 text file preceded by an up-arrow character {\tt "$\wedge$"}.
-	 Such text files should contain further comma-separated lists
-	 which will be read and interpreted in the same manner.
-	 Attribute settings are applied in the order in which they
-	 occur within the list, with later settings overriding any
-	 earlier settings given for the same attribute.
+         each string is either an attribute setting, or the name of a
+         text file preceded by an up-arrow character {\tt "$\wedge$"}.
+         Such text files should contain further comma-separated lists
+         which will be read and interpreted in the same manner.
+         Attribute settings are applied in the order in which they
+         occur within the list, with later settings overriding any
+         earlier settings given for the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
          where $<$name$>$ is the name of a plotting attribute, and
-	 $<$value$>$ is the value to assign to the attribute.  Default
-	 values will be used for any unspecified attributes.  All
-	 attributes will be defaulted if a null value ({\tt{!}}) is
-	 supplied.  See \hyperref{Plotting 
+         $<$value$>$ is the value to assign to the attribute.  Default
+         values will be used for any unspecified attributes.  All
+         attributes will be defaulted if a null value ({\tt{!}}) is
+         supplied.  See \hyperref{Plotting 
          Attributes}{Section~}{}{se:plotting_attr} for a description
-	 of the available attributes.  Any unrecognised attributes are
+         of the available attributes.  Any unrecognised attributes are
          ignored (no error is reported).  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
@@ -17172,10 +17210,30 @@ KAPPA: \htmlref{ARDMASK}{ARDMASK},
       }{
          The WCS axis that will appear along the horizontal axis of
          each line plot (the other two axes will be used as the spatial
-         axes).  The axis can be specified by its integer index within
-         the \htmlref{current Frame}{se:curframe}~ of the NDF (in the 
-         range 1 to 3 in the current Frame), or by its symbol string.  A 
-         list of acceptable values is displayed if an illegal value is
+         axes).  The axis can be specified using one of the following 
+         options.
+
+         \ssthitemlist{
+
+            \sstitem
+
+            Its integer index within the \htmlref{current
+            Frame}{se:curframe}~ of the NDF (in the range 1 to 3 in
+            the current frame).
+
+            \sstitem 
+            Its \htmlattref{Symbol}{Symbol(axis)}~ string such as 
+            {\tt "RA"} or {\tt "VRAD"}.
+
+            \sstitem 
+            A generic option where {\tt "SPEC"} requests the
+            spectral axis, {\tt "TIME"} selects the time axis, 
+            {\tt "SKYLON"} and {\tt "SKYLAT"} picks the sky longitude
+            and latitude axes respectively.  Only those axis domains
+            present are available as options.
+         }
+
+         A list of acceptable values is displayed if an illegal value is
          supplied.  The dynamic default is the index of any spectral
          axis found in the current Frame of the NDF.  {\tt []}
       }
@@ -17695,13 +17753,33 @@ XV; PBMPLUS; NETPBM.
          AXIS = LITERAL (Read)
       }{
          The axis along which to collapse the NDF.  This can be specified
-         by its integer index within the \htmlref{current Frame}{se:curframe}~ 
-         of the input NDF (in the range 1 to the number of axes in the current 
-         Frame), or by its symbol string.  A list of acceptable values is 
-         displayed if an illegal value is supplied.  If the axes of the 
-         current Frame are not parallel to the NDF pixel axes, then the pixel 
-         axis which is most nearly parallel to the specified current-Frame 
-         axis will be used.
+         using one of the following options.
+
+         \ssthitemlist{
+
+            \sstitem 
+           
+            Its integer index within the \htmlref{current
+            Frame}{se:curframe}~ of the input NDF (in the range 1 to
+            the number of axes in the current Frame).
+
+            \sstitem 
+            Its \htmlattref{Symbol}{Symbol(axis)}~ string such as 
+            {\tt "RA"} or {\tt "VRAD"}.
+
+            \sstitem 
+            A generic option where {\tt "SPEC"} requests the spectral axis, 
+            {\tt "TIME"} selects the time axis, {\tt "SKYLON"} and 
+            {\tt "SKYLAT"} picks the sky longitude and latitude axes 
+            respectively.  Only those axis domains present are 
+            available as options.
+         }
+
+         A list of acceptable values is displayed if an illegal value
+         is supplied.  If the axes of the current Frame are not
+         parallel to the NDF pixel axes, then the pixel axis which is
+         most nearly parallel to the specified current Frame axis will
+         be used.
       }
       \sstsubsection{
          ESTIMATOR = \htmlref{LITERAL}{se:parmenu} (Read)
@@ -17855,24 +17933,24 @@ XV; PBMPLUS; NETPBM.
          the output NDF).
 
          A comma-separated list of strings should be given in which each
-	 string is either an attribute setting, or the name of a text
-	 file preceded by an up-arrow character {\tt "$\wedge$"}.  Such
-	 text files should contain further comma-separated lists which
-	 will be read and interpreted in the same manner.  Attribute
-	 settings are applied in the order in which they occur within the
-	 list, with later settings overriding any earlier settings given
-	 for the same attribute.
+         string is either an attribute setting, or the name of a text
+         file preceded by an up-arrow character {\tt "$\wedge$"}.  Such
+         text files should contain further comma-separated lists which
+         will be read and interpreted in the same manner.  Attribute
+         settings are applied in the order in which they occur within the
+         list, with later settings overriding any earlier settings given
+         for the same attribute.
 
          Each individual attribute setting should be of the form:
 
             $<$name$>$=$<$value$>$
 
          where $<$name$>$ is the name of a plotting attribute, and
-	 $<$value$>$ is the value to assign to the attribute. Any
-	 unspecified attributes will retain the value they have in the
-	 supplied NDF.  No attribute values will be changed if a null
-	 value ({\tt{!}}) is supplied.  Any unrecognised attributes are
-	 ignored (no error is reported).  {\tt [!]}
+         $<$value$>$ is the value to assign to the attribute. Any
+         unspecified attributes will retain the value they have in the
+         supplied NDF.  No attribute values will be changed if a null
+         value ({\tt{!}}) is supplied.  Any unrecognised attributes are
+         ignored (no error is reported).  {\tt [!]}
       }
       \sstsubsection{
          WLIM = \_REAL (Read)
@@ -21316,11 +21394,30 @@ KAPPA: \htmlref{ADD}{ADD},
          USEAXIS is only accessed if the co-ordinate Frame selected using
          parameter FRAME has more than two axes.  A group of two strings should
          be supplied specifying the two axes to which the two drawn arrows should
-         refer.  Each axis can be specified either by its integer index within
-         the Frame (in the range 1 to the number of axes in the current Frame),
-         or by its symbol string.  A list of acceptable values is displayed if
-         an illegal value is supplied.  If a null ({\tt{!}}) value is supplied, the
-         first two axes of the Frame are used. {\tt [!]}
+         refer.  Each axis can be specified using one of the following options.
+
+         \ssthitemlist{
+
+            \sstitem 
+            An integer index of an axis within the current Frame of the 
+            input NDF (in the range 1 to the number of axes in the current
+            Frame).
+
+            \sstitem
+            An axis \htmlattref{Symbol}{Symbol(axis)}~ string such as 
+            {\tt "RA"} or {\tt "VRAD"}.
+
+            \sstitem 
+            A generic option where {\tt "SPEC"} requests the spectral
+            axis, {\tt "TIME"} selects the time axis, {\tt "SKYLON"}
+            and {\tt "SKYLAT"} picks the sky longitude and latitude
+            axes respectively.  Only those axis domains present are 
+            available as options.
+         }
+         
+         A list of acceptable values is displayed if an illegal value is 
+         supplied.  If a null ({\tt{!}}) value is supplied, the
+         first two axes of the Frame are used.  {\tt [!]}
       }
    }
    \sstexamples{
@@ -22268,20 +22365,20 @@ KAPPA: \htmlref{LOG10}{LOG10},
          AXES( 2 ) = \_INTEGER (Read)
       }{
          The indices of up to two axes that span the rows or planes that
-	 are to be cleaned.  If only one value is supplied, then the NDF
-	 is processed as a set of one-dimensional spectra parallel to the
-	 specified pixel axis.  If two values are supplied, then the NDF
-	 is processed as a set of two-dimensional images spanned by the
-	 given axes.  Thus, a two-dimensional NDF can be processed either
-	 as a single two-dimensional image or as a set of one-dimensional
-	 spectra.  Likewise, a three-dimensional NDF can be processed
-	 either as a set of two-dimensional images or a set of
-	 one-dimensional spectra.  By default, a two-dimensional NDF is
-	 processed as a single two-dimensional image, and a
-	 three-dimensional NDF is processed as a set of one-dimensional
-	 spectra (the spectral axis is chosen by examining the WCS
-	 component---pixel-axis 1 is used if the current WCS frame does
-	 not contain a spectral axis).  {\tt []}
+         are to be cleaned.  If only one value is supplied, then the NDF
+         is processed as a set of one-dimensional spectra parallel to the
+         specified pixel axis.  If two values are supplied, then the NDF
+         is processed as a set of two-dimensional images spanned by the
+         given axes.  Thus, a two-dimensional NDF can be processed either
+         as a single two-dimensional image or as a set of one-dimensional
+         spectra.  Likewise, a three-dimensional NDF can be processed
+         either as a set of two-dimensional images or a set of
+         one-dimensional spectra.  By default, a two-dimensional NDF is
+         processed as a single two-dimensional image, and a
+         three-dimensional NDF is processed as a set of one-dimensional
+         spectra (the spectral axis is chosen by examining the WCS
+         component---pixel-axis 1 is used if the current WCS frame does
+         not contain a spectral axis).  {\tt []}
       }
       \sstsubsection{
          BOX( 2 ) = \_INTEGER (Read)
@@ -22308,15 +22405,15 @@ KAPPA: \htmlref{LOG10}{LOG10},
          GENVAR = \_LOGICAL (Read)
       }{
          If {\tt TRUE}, the noise level implied by the deviations from 
-	 the local mean over the supplied box size are stored in the
-	 output VARIANCE component.  This noise level has a constant
-	 value over the whole NDF (or over each section of the NDF if the
-	 NDF is being processed in sections---see parameter AXES).  This 
-	 constant noise level is also displayed on the screen if 
-	 parameter ILEVEL is set to {\tt 2}.  If GENVAR is {\tt FALSE},
-	 then the output variances will be copied from the input
-	 variances (if the input NDF has no variances, then the output
-	 NDF will not have any variances either).  {\tt [FALSE]}
+         the local mean over the supplied box size are stored in the
+         output VARIANCE component.  This noise level has a constant
+         value over the whole NDF (or over each section of the NDF if the
+         NDF is being processed in sections---see parameter AXES).  This 
+         constant noise level is also displayed on the screen if 
+         parameter ILEVEL is set to {\tt 2}.  If GENVAR is {\tt FALSE},
+         then the output variances will be copied from the input
+         variances (if the input NDF has no variances, then the output
+         NDF will not have any variances either).  {\tt [FALSE]}
       }
       \sstsubsection{
          ILEVEL = \_INTEGER (Read)
@@ -22608,41 +22705,41 @@ KAPPA: \htmlref{CHPIX}{CHPIX},
          \sstitem
 
          The algorithm is based on the relaxation method of repeatedly
-	 replacing each bad pixel with the mean of its two nearest
-	 neighbours along each pixel axis.  Such a method converges to
-	 the required solution, but information about the good regions
-	 only propagates at a rate of about one pixel per iteration
-	 into the bad regions, resulting in slow convergence if large
-	 areas are to be filled.
+         replacing each bad pixel with the mean of its two nearest
+         neighbours along each pixel axis.  Such a method converges to
+         the required solution, but information about the good regions
+         only propagates at a rate of about one pixel per iteration
+         into the bad regions, resulting in slow convergence if large
+         areas are to be filled.
 
          This application speeds convergence to an acceptable function
-	 by forming the replacement mean from all the pixels in the
-	 same axis (such as row or a column), using a weight which
-	 decreases exponentially with distance and goes to zero after
-	 the first good pixel is encountered in any direction.  If
-	 there is variance information, this is included in the
-	 weighting so as to give more weight to surrounding values
-	 with lower variance.  The scale length of the exponential
-	 weight is initially set large, to allow rapid propagation of
-	 an approximate `smooth' solution into the bad regions---an
-	 initially acceptable solution is thus rapidly obtained (often
-	 in the first one or two iterations).  The scale length is
-	 subsequently reduced by a factor of 2 whenever the maximum
-	 absolute change occurring in an iteration has decreased by a
-	 factor of 4 since the current scale length was first used.
-	 In this way, later iterations introduce progressively finer
-	 detail into the solution.  Since this fine detail occurs
-	 predominantly close to the `crinkly' edges of the bad
-	 regions, the slower propagation of the solution in the later
-	 iterations is then less important.
+         by forming the replacement mean from all the pixels in the
+         same axis (such as row or a column), using a weight which
+         decreases exponentially with distance and goes to zero after
+         the first good pixel is encountered in any direction.  If
+         there is variance information, this is included in the
+         weighting so as to give more weight to surrounding values
+         with lower variance.  The scale length of the exponential
+         weight is initially set large, to allow rapid propagation of
+         an approximate `smooth' solution into the bad regions---an
+         initially acceptable solution is thus rapidly obtained (often
+         in the first one or two iterations).  The scale length is
+         subsequently reduced by a factor of 2 whenever the maximum
+         absolute change occurring in an iteration has decreased by a
+         factor of 4 since the current scale length was first used.
+         In this way, later iterations introduce progressively finer
+         detail into the solution.  Since this fine detail occurs
+         predominantly close to the `crinkly' edges of the bad
+         regions, the slower propagation of the solution in the later
+         iterations is then less important.
 
          When there is variance processing the output variance is
-	 reassigned if either the input variance or data value was
-	 bad. Where the input value is good but its associated
-	 variance is bad, the calculation proceeds as if the data
-	 value were bad, except that only the variance is substituted
-	 in the output.  The new variance is approximated as twice the
-	 inverse of the sum of the weights.
+         reassigned if either the input variance or data value was
+         bad. Where the input value is good but its associated
+         variance is bad, the calculation proceeds as if the data
+         value were bad, except that only the variance is substituted
+         in the output.  The new variance is approximated as twice the
+         inverse of the sum of the weights.
 
          \sstitem
          The price of the above efficiency means that considerable
@@ -24746,18 +24843,18 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          KNOTS( 2 ) = \_INTEGER (Read)
       }{
          The number of interior knots used for the bi-cubic-spline fit
-	 along the \textit{x} and \textit{y} axes.  These knots are
-	 equally spaced within the image.  Both values must be in the
-	 range 0 to 11.  If you supply a single value, it applies to
-	 both axes.  Thus {\tt 1} creates one interior knot, {\tt [5,4]} 
+         along the \textit{x} and \textit{y} axes.  These knots are
+         equally spaced within the image.  Both values must be in the
+         range 0 to 11.  If you supply a single value, it applies to
+         both axes.  Thus {\tt 1} creates one interior knot, {\tt [5,4]} 
          gives five along the \textit{x} axis and four along
-	 the \textit{y} direction.  Increasing this parameter values
-	 increases the flexibility of the surface.  Normally, {\tt 4}
-	 is a reasonable value.  The upper limit of acceptable values
-	 will be reduced along each axis when its binned array
-	 dimension is fewer than 29.  KNOTS is only accessed when
-	 FITTYPE={\tt "Spline"}.  The default is the current value,
-	 which is {\tt 4} initially. {\tt[]}
+         the \textit{y} direction.  Increasing this parameter values
+         increases the flexibility of the surface.  Normally, {\tt 4}
+         is a reasonable value.  The upper limit of acceptable values
+         will be reduced along each axis when its binned array
+         dimension is fewer than 29.  KNOTS is only accessed when
+         FITTYPE={\tt "Spline"}.  The default is the current value,
+         which is {\tt 4} initially. {\tt[]}
       }
       \sstsubsection{
          NDF  = NDF (Update)
@@ -24768,8 +24865,8 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          NXPAR = \_INTEGER (Read)
       }{
          The number of fitting parameters to be used in the \textit{x}
-	 direction.  It must be in the range 1 to 15 for a polynomial
-	 fit.  Thus {\tt 1} gives a constant, {\tt 2} a linear fit, 
+         direction.  It must be in the range 1 to 15 for a polynomial
+         fit.  Thus {\tt 1} gives a constant, {\tt 2} a linear fit, 
          {\tt 3} a quadratic \emph{etc}.  Increasing this parameter 
          increases the flexibility of the surface in the \textit{x} 
          direction.  The upper limit of acceptable values will be 
@@ -24780,8 +24877,8 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          NYPAR = \_INTEGER (Read)
       }{
          The number of fitting parameters to be used in the \textit{y}
-	 direction.  It must be in the range 1 to 15 for a polynomial
-	 fit.  Thus {\tt 1} gives a constant, {\tt 2} a linear fit, 
+         direction.  It must be in the range 1 to 15 for a polynomial
+         fit.  Thus {\tt 1} gives a constant, {\tt 2} a linear fit, 
          {\tt 3} a quadratic \emph{etc}.  Increasing this parameter 
          increases the flexibility of the surface in the \textit{y} 
          direction.  The upper limit of acceptable values will be 
@@ -24809,60 +24906,60 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          XMAX = \_DOUBLE (Read)
       }{
          The maximum \textit{x} value to be used in the fit.  This
-	 must be greater than or equal to the \textit{x} co-ordinate
-	 of the right-hand pixel in the data array.  Normally this
-	 parameter is automatically set to the maximum \textit{x}
-	 co-ordinate found in the data, but this mechanism can be
-	 overridden by specifying XMAX on the command line.  The
-	 parameter is provided to allow the fit limits to be fine
-	 tuned for special purposes.  It should not normally be
-	 altered.  If a null ({\tt{!}}) value is supplied, the value
-	 used is the maximum \textit{x} co-ordinate of the fitted
-	 data. {\tt [!]}
+         must be greater than or equal to the \textit{x} co-ordinate
+         of the right-hand pixel in the data array.  Normally this
+         parameter is automatically set to the maximum \textit{x}
+         co-ordinate found in the data, but this mechanism can be
+         overridden by specifying XMAX on the command line.  The
+         parameter is provided to allow the fit limits to be fine
+         tuned for special purposes.  It should not normally be
+         altered.  If a null ({\tt{!}}) value is supplied, the value
+         used is the maximum \textit{x} co-ordinate of the fitted
+         data. {\tt [!]}
       }
       \sstsubsection{
          XMIN = \_DOUBLE (Read)
       }{
          The minimum \textit{x} value to be used in the fit.  This
-	 must be smaller than or equal to the \textit{x} co-ordinate
-	 of the left-hand pixel in the data array.  Normally this
-	 parameter is automatically set to the minimum \textit{x}
-	 co-ordinate found in the data, but this mechanism can be
-	 overridden by specifying XMIN on the command line.  The
-	 parameter is provided to allow the fit limits to be fine
-	 tuned for special purposes.  It should not normally be
-	 altered.  If a null ({\tt{!}}) value is supplied, the value
-	 used is the minimum \textit{x} co-ordinate of the fitted
-	 data. {\tt [!]}
+         must be smaller than or equal to the \textit{x} co-ordinate
+         of the left-hand pixel in the data array.  Normally this
+         parameter is automatically set to the minimum \textit{x}
+         co-ordinate found in the data, but this mechanism can be
+         overridden by specifying XMIN on the command line.  The
+         parameter is provided to allow the fit limits to be fine
+         tuned for special purposes.  It should not normally be
+         altered.  If a null ({\tt{!}}) value is supplied, the value
+         used is the minimum \textit{x} co-ordinate of the fitted
+         data. {\tt [!]}
       }
       \sstsubsection{
          YMAX = \_DOUBLE (Read)
       }{
          The maximum \textit{y} value to be used in the fit.  This
-	 must be greater than or equal to the \textit{y} co-ordinate
-	 of the top pixel in the data array.  Normally this parameter
-	 is automatically set to the maximum \textit{y} co-ordinate
-	 found in the data, but this mechanism can be overridden by
-	 specifying YMAX on the command line.  The parameter is
-	 provided to allow the fit limits to be fine tuned for special
-	 purposes.  It should not normally be altered.  If a null
-	 ({\tt{!}}) value is supplied, the value used is the maximum
-	 \textit{y} co-ordinate of the fitted data. {\tt [!]}
+         must be greater than or equal to the \textit{y} co-ordinate
+         of the top pixel in the data array.  Normally this parameter
+         is automatically set to the maximum \textit{y} co-ordinate
+         found in the data, but this mechanism can be overridden by
+         specifying YMAX on the command line.  The parameter is
+         provided to allow the fit limits to be fine tuned for special
+         purposes.  It should not normally be altered.  If a null
+         ({\tt{!}}) value is supplied, the value used is the maximum
+         \textit{y} co-ordinate of the fitted data. {\tt [!]}
       }
       \sstsubsection{
          YMIN = \_DOUBLE (Read)
       }{
          The minimum \textit{y} value to be used in the fit.  This
-	 must be smaller than or equal to the \textit{y} co-ordinate
-	 of the bottom pixel in the data array.  Normally this
-	 parameter is automatically set to the minimum \textit{y}
-	 co-ordinate found in the data, but this mechanism can be
-	 overridden by specifying YMIN on the command line.  The
-	 parameter is provided to allow the fit limits to be fine
-	 tuned for special purposes.  It should not normally be
-	 altered.  If a null ({\tt{!}}) value is supplied, the value
-	 used is the minimum \textit{y} co-ordinate of the fitted
-	 data. {\tt [!]}
+         must be smaller than or equal to the \textit{y} co-ordinate
+         of the bottom pixel in the data array.  Normally this
+         parameter is automatically set to the minimum \textit{y}
+         co-ordinate found in the data, but this mechanism can be
+         overridden by specifying YMIN on the command line.  The
+         parameter is provided to allow the fit limits to be fine
+         tuned for special purposes.  It should not normally be
+         altered.  If a null ({\tt{!}}) value is supplied, the value
+         used is the minimum \textit{y} co-ordinate of the fitted
+         data. {\tt [!]}
       }
    }
    \sstexamples{
@@ -26735,27 +26832,27 @@ KAPPA: \htmlref{HISCOM}{HISCOM},
 
             \sstitem 
              {\tt "Histogram"} --- This finds the peak of an optimally
-	     binned histogram, the mode being the central value of
-	     that bin.  The number of bins may be altered given
-	     through parameter NUMBIN, however it is recommended to
-	     use the optimal binsize derived from the prescription of
-	     Freedman \& Diatonis.
+             binned histogram, the mode being the central value of
+             that bin.  The number of bins may be altered given
+             through parameter NUMBIN, however it is recommended to
+             use the optimal binsize derived from the prescription of
+             Freedman \& Diatonis.
 
             \sstitem
             {\tt "Moments"} --- As {\tt "Histogram"} but the mode is
-	    the weighted centroid from the moments of the peak bin and
-	    its neighbours.  The neighbours are those bins either side
-	    of the peak in a continuous sequence whose membership
-	    exceeds the peak value less three times the Poisson error
-	    of the peak bin.  Thus it gives an interpolated mode and
-	    does reduce the effect of noise.
+            the weighted centroid from the moments of the peak bin and
+            its neighbours.  The neighbours are those bins either side
+            of the peak in a continuous sequence whose membership
+            exceeds the peak value less three times the Poisson error
+            of the peak bin.  Thus it gives an interpolated mode and
+            does reduce the effect of noise.
 
             \sstitem
             {\tt "Pearson"} --- This uses the 3 * median - 2 * mean
-	    formula devised by Pearson.  See the first two References.
-	    This assumes that the median is bracketed by the mode and
-	    mean and only a mildly skew unimodal distribution.  This
-	    often applies to an image of the sky.
+            formula devised by Pearson.  See the first two References.
+            This assumes that the median is bracketed by the mode and
+            mean and only a mildly skew unimodal distribution.  This
+            often applies to an image of the sky.
          }
          {\tt ["Moments"]}
       }
@@ -26768,14 +26865,14 @@ KAPPA: \htmlref{HISCOM}{HISCOM},
          NUMBIN = \_INTEGER (Read)
       }{
          The number of histogram bins to be used for the coarse
-	 histogram to evaluate the mode.  It is only accessed when
-	 METHOD={"Histogram"} or {\tt "Moments"}.  This must lie in
-	 the range 10 to 10000.  The suggested default is calculated
-	 dynamically depending on the data spread and number of values
-	 (using the prescription of Freedman \& Diaconis).  For
-	 integer data it is advisble to use the dynamic default or an
-	 integer multiple thereof to avoid creating non-integer wide
-	 bins.  {\tt []}
+         histogram to evaluate the mode.  It is only accessed when
+         METHOD={"Histogram"} or {\tt "Moments"}.  This must lie in
+         the range 10 to 10000.  The suggested default is calculated
+         dynamically depending on the data spread and number of values
+         (using the prescription of Freedman \& Diaconis).  For
+         integer data it is advisble to use the dynamic default or an
+         integer multiple thereof to avoid creating non-integer wide
+         bins.  {\tt []}
       }
       \sstsubsection{
          PERCENTILES( 100 ) = \_REAL (Read)
@@ -28198,18 +28295,18 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          ALIGNSYS = LITERAL (Read)
       }{
          This is only used if a {\tt TRUE} value is supplied for parameter
-	 ALIGN.  It specifies the co-ordinate system in which the new plot and
-	 the existing plot are aligned (for further details see the
-	 description of the {\xref{\att{AlignSystem}}{sun210}{AlignSystem}}
-	 attribute in \xref{SUN/210}{sun210}{}.).  The supplied name should be
-	 a valid co-ordinate system name for the horizontal axis (see the
-	 description of the {\xref{\att{System}}{sun210}{System}} attribute in
-	 SUN/210 for a list of these names).  It may also take the special
-	 value {\tt "Data"}, in which case alignment occurs in the co-ordinate
-	 system represented by the \htmlref{current WCS Frame}{se:curframe}~
-	 in the supplied NDF.  If a null ({\tt{!}}) value is supplied.  The
-	 alignment system is determined by the current value of {\att
-	 AlignSystem} attribute in the supplied NDF.  {\tt ["Data"]}
+         ALIGN.  It specifies the co-ordinate system in which the new plot and
+         the existing plot are aligned (for further details see the
+         description of the {\xref{\att{AlignSystem}}{sun210}{AlignSystem}}
+         attribute in \xref{SUN/210}{sun210}{}.).  The supplied name should be
+         a valid co-ordinate system name for the horizontal axis (see the
+         description of the {\xref{\att{System}}{sun210}{System}} attribute in
+         SUN/210 for a list of these names).  It may also take the special
+         value {\tt "Data"}, in which case alignment occurs in the co-ordinate
+         system represented by the \htmlref{current WCS Frame}{se:curframe}~
+         in the supplied NDF.  If a null ({\tt{!}}) value is supplied.  The
+         alignment system is determined by the current value of {\att
+         AlignSystem} attribute in the supplied NDF.  {\tt ["Data"]}
       }
       \sstsubsection{
          AXES = \_LOGICAL (Read)
@@ -28543,12 +28640,33 @@ KAPPA: \htmlref{SHADOW}{SHADOW},
          USEAXIS = LITERAL (Read)
       }{
          Specifies the quantity to be used to annotate the horizontal axis
-         of the plot.  The index or label of an axis within the current
-         co-ordinate Frame of the NDF should be supplied.  Alternatively,
-         if USEAXIS is given the value {\tt{0}} (zero), then the distance along the
-         profile from the centre of the first element in the supplied NDF
-         will be used to annotate the axis.  This will be measured in the
-         current co-ordinate Frame of the NDF.
+         of the plot using one of the following options.
+
+         \ssthitemlist{
+
+            \sstitem 
+            An integer index of an axis within the current Frame of the 
+            input NDF (in the range 1 to the number of axes in the current
+            Frame).
+
+            \sstitem
+            An axis \htmlattref{Symbol}{Symbol(axis)}~ string such as 
+            {\tt "RA"} or {\tt "VRAD"}.
+
+            \sstitem 
+            A generic option where {\tt "SPEC"} requests the spectral
+            axis, {\tt "TIME"} selects the time axis, {\tt "SKYLON"}
+            and {\tt "SKYLAT"} picks the sky longitude and latitude
+            axes respectively.  Only those axis domains present are 
+            available as options.
+
+            \sstitem 
+            The special value {\tt{0}} (zero), asks for the distance
+            along the profile from the centre of the first element in
+            the supplied NDF to be used to annotate the axis.  This
+            will be measured in the current co-ordinate Frame of the
+            NDF.
+         }
 
          The quantity used to annotate the horizontal axis must have a
          defined value at all points in the array, and must increase or
@@ -28922,11 +29040,11 @@ plot (10k).
          }
 
          If a null ({\tt{!}}) value is supplied, the positions will be
-	 stored in a SKY Frame, if a SKY Frame is available within the
-	 input catalogue.  Otherwise, they will be stored in PIXEL 
-	 co-ordinates, if a PIXEL Frame is available within the input 
-	 catalogue.  Otherwise, they are stored in the base Frame of
-	 the supplied WCS information.  {\tt [!]}
+         stored in a SKY Frame, if a SKY Frame is available within the
+         input catalogue.  Otherwise, they will be stored in PIXEL 
+         co-ordinates, if a PIXEL Frame is available within the input 
+         catalogue.  Otherwise, they are stored in the base Frame of
+         the supplied WCS information.  {\tt [!]}
       }
       \sstsubsection{
          CATEPOCH = \_DOUBLE (Read)
@@ -29034,14 +29152,14 @@ plot (10k).
          NDF = NDF (READ)
       }{
          The NDF which defines the available co-ordinate Frames in the
-	 output positions list.  If an NDF is supplied, the positions
-	 obtained using parameter POSITION or FILE are assumed to be
-	 in the current co-ordinate Frame of the NDF, and the
-	 \htmlref{WCS}{apndf:wcs} component of the NDF is copied to
-	 the output positions list.  If a null value is supplied, the
-	 single co-ordinate Frame defined by parameter FRAME is stored
-	 in the output positions list, and supplied positions are
-	 assumed to be in the same Frame. {\tt [!]}
+         output positions list.  If an NDF is supplied, the positions
+         obtained using parameter POSITION or FILE are assumed to be
+         in the current co-ordinate Frame of the NDF, and the
+         \htmlref{WCS}{apndf:wcs} component of the NDF is copied to
+         the output positions list.  If a null value is supplied, the
+         single co-ordinate Frame defined by parameter FRAME is stored
+         in the output positions list, and supplied positions are
+         assumed to be in the same Frame. {\tt [!]}
       }
       \sstsubsection{
          OUTCAT = FILENAME (Write)
@@ -29052,22 +29170,22 @@ plot (10k).
          POSITION = LITERAL (Read)
       }{
          The co-ordinates of a single position to be stored in the
-	 output positions list.  Supplying {\tt ":"} will display
-	 details of the co-ordinate Frame in which the position is
-	 required.  The position should be given as a list of
-	 \xref{formatted axis values}{sun210}{AST_UNFORMAT} separated 
+         output positions list.  Supplying {\tt ":"} will display
+         details of the co-ordinate Frame in which the position is
+         required.  The position should be given as a list of
+         \xref{formatted axis values}{sun210}{AST_UNFORMAT} separated 
          by white space. You are prompted for new values for this
-	 parameter until a null value is entered.  It is only accessed
-	 if parameter MODE is given the value {\tt "Interface"}.
+         parameter until a null value is entered.  It is only accessed
+         if parameter MODE is given the value {\tt "Interface"}.
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
          A title for the output positions list.  If a null ({\tt{!}})
-	 value is supplied, the value used is obtained from the input
-	 positions list if one is supplied.  Otherwise, it is obtained
-	 from the NDF if one is supplied.  Otherwise, it is {\tt
-	 "Output from LISTMAKE"}.  {\tt [!]}
+         value is supplied, the value used is obtained from the input
+         positions list if one is supplied.  Otherwise, it is obtained
+         from the NDF if one is supplied.  Otherwise, it is {\tt
+         "Output from LISTMAKE"}.  {\tt [!]}
       }
    }
    \sstexamples{
@@ -30127,7 +30245,7 @@ KAPPA: \htmlref{LOG10}{LOG10},
          its symbol string.  A list of acceptable values is displayed
          if you supply an illegal value.  If a null ({\tt{!}}) value is
          supplied, the axes with the same indices as the two used pixel
-         axes within the NDF are selected. {\tt [!]}
+         axes within the NDF are selected.  {\tt [!]}
       }
    }
    \sstresparameters{
@@ -31861,18 +31979,18 @@ KAPPA: \htmlref{DISPLAY}{DISPLAY},
 
          \sstitem
          The polynomial surface fit is stored in SURFACEFIT extension,
-	 component FIT of type POLYNOMIAL, variant CHEBYSHEV or
-	 BSPLINE.  This extension is created by FITSURFACE.  Also read
-	 from the SURFACEFIT extension is the co-ordinate system
-	 (component COSYS), and the fit RMS (component RMS).
+         component FIT of type POLYNOMIAL, variant CHEBYSHEV or
+         BSPLINE.  This extension is created by FITSURFACE.  Also read
+         from the SURFACEFIT extension is the co-ordinate system
+         (component COSYS), and the fit RMS (component RMS).
 
          \sstitem
          When LIKE={\tt{!}}, COSYS={\tt "Data"} or {\tt "Axis"} and
-	 the original NDF had an axis that decreased with increasing
-	 pixel index, you may want to flip the co-ordinate limits (via
-	 parameters XLIMIT or YLIMIT) to match the original sense of
-	 the axis, otherwise the created surface will be flipped with
-	 respect to the image from which it was fitted.
+         the original NDF had an axis that decreased with increasing
+         pixel index, you may want to flip the co-ordinate limits (via
+         parameters XLIMIT or YLIMIT) to match the original sense of
+         the axis, otherwise the created surface will be flipped with
+         respect to the image from which it was fitted.
       }
    }
    \sstdiytopic{
@@ -32086,20 +32204,20 @@ KAPPA: \htmlref{COLLAPSE}{COLLAPSE},
          EXP = LITERAL (Read)
       }{
          The mathematical expression to be evaluated for each NDF
-	 pixel, \emph{e.g.} {\tt "(IA-IB$+$2)$*$PX"}.  In this
-	 expression, input NDFs are denoted by the variables IA, IB,
-	 \ldots IZ, while constants may either be given literally or
-	 represented by the variables PA, PB, \ldots PZ.  Values for
-	 those NDFs and constants which appear in the expression will
-	 be requested via the application's parameter of the same
-	 name.
+         pixel, \emph{e.g.} {\tt "(IA-IB$+$2)$*$PX"}.  In this
+         expression, input NDFs are denoted by the variables IA, IB,
+         \ldots IZ, while constants may either be given literally or
+         represented by the variables PA, PB, \ldots PZ.  Values for
+         those NDFs and constants which appear in the expression will
+         be requested via the application's parameter of the same
+         name.
 
          Fortran-77 syntax is used for specifying the expression,
-	 which may contain the usual intrinsic functions, plus a few
-	 extra ones.  An appendix in \xref{SUN/61}{sun61}{} gives a
-	 full description of the syntax used and an up to date list of
-	 the functions available. The expression may be up to 132
-	 characters long and is case insensitive.
+         which may contain the usual intrinsic functions, plus a few
+         extra ones.  An appendix in \xref{SUN/61}{sun61}{} gives a
+         full description of the syntax used and an up to date list of
+         the functions available. The expression may be up to 132
+         characters long and is case insensitive.
       }
       \sstsubsection{
          FA-FZ = LITERAL (Read)
@@ -33294,11 +33412,29 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          AXIS =  \htmlref{LITERAL}{se:parmenu} (Read)
       }{
          The axis of the current co-ordinate system that defines the
-         direction of the trends.  This is specified by its integer
-         index within the \htmlref{current Frame}{se:curframe}~ of the 
-         input NDF (in the range
-         1 to the number of axes in the current Frame), or by its symbol
-         string.  A list of acceptable values is displayed if an illegal
+         direction of the trends.  This is specified using one of the 
+         following options.
+
+         \ssthitemlist{
+
+            \sstitem 
+            Its integer index within the \htmlref{current Frame}{se:curframe}~ of 
+            the input NDF (in the range 1 to the number of axes in the current
+            Frame).
+
+            \sstitem 
+            Its \htmlattref{Symbol}{Symbol(axis)}~ string such as 
+            {\tt "RA"} or {\tt "VRAD"}.
+
+            \sstitem 
+            A generic option where {\tt "SPEC"} requests the spectral axis, 
+            {\tt "TIME"} selects the time axis, {\tt "SKYLON"} and 
+            {\tt "SKYLAT"} picks the sky longitude and latitude axes 
+            respectively.  Only those axis domains present are 
+            available as options.
+         }
+         
+         A list of acceptable values is displayed if an illegal
          value is supplied.  If the axes of the current Frame are not
          parallel to the NDF pixel axes, then the pixel axis which is
          most nearly parallel to the specified current Frame axis will
@@ -33364,10 +33500,10 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
 
             \sstitem
             {\tt "Single"} --- This is like {\tt "Region"} except
-	    there is neither averaging of lines nor a single set of
-	    ranges.  Each line is masked independently.  The
-	    dispersion for the clipping of outliers within a line is
-	    the standard deviation within that line.
+            there is neither averaging of lines nor a single set of
+            ranges.  Each line is masked independently.  The
+            dispersion for the clipping of outliers within a line is
+            the standard deviation within that line.
 
              This is more appropriate when the features being masked
             vary widely across the image, and significantly between
@@ -33379,7 +33515,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
             {\tt "Global"} --- This is a variant of {\tt "Single"}.  The 
             only difference is that the dispersion used to reject features 
             using the standard deviation of the whole data array.  This
-            is more robust than "{\tt Single"}, however it does not perform
+            is more robust than {\tt "Single"}, however it does not perform
             rejections well for lines with anomalous noise.
          }
 
@@ -33447,17 +33583,17 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          SECTION = LITERAL (Read)
       }{
          The region from which representative lines are averaged in
-	 automatic mode to determine the regions to fit trends.  It is
-	 therefore only accessed when AUTO={\tt TRUE}, METHOD={\tt
-	 "Region"}, and the dimensionality of the input NDF is more
-	 than 1.  The value is defined as an NDF section, so that
-	 ranges can be defined along any axis, and be given as pixel
-	 indices or axis (data) co-ordinates.  The pixel axis
-	 corresponding to parameter AXIS is ignored.  So for example,
-	 if the pixel axis were 3 in a cube, the value {\tt "3:5,4,"}
-	 would average all the lines in elements in columns 3 to 5 and
-	 row 4.  See \hyperref{NDF Sections}{Section~}{}{se:ndfsect}
-	 for details.
+         automatic mode to determine the regions to fit trends.  It is
+         therefore only accessed when AUTO={\tt TRUE}, METHOD={\tt
+         "Region"}, and the dimensionality of the input NDF is more
+         than 1.  The value is defined as an NDF section, so that
+         ranges can be defined along any axis, and be given as pixel
+         indices or axis (data) co-ordinates.  The pixel axis
+         corresponding to parameter AXIS is ignored.  So for example,
+         if the pixel axis were 3 in a cube, the value {\tt "3:5,4,"}
+         would average all the lines in elements in columns 3 to 5 and
+         row 4.  See \hyperref{NDF Sections}{Section~}{}{se:ndfsect}
+         for details.
 
          A null value ({\tt{!}}) requests that a representative region 
          around the centre be used.  {\tt [!]}
@@ -33524,17 +33660,17 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
 
          \sstitem
          This application attempts to solve the problem of fitting
-	 numerous polynomials in a least-squares sense and that do not
-	 follow the natural ordering of the NDF data, in the most
-	 CPU-time-efficient way possible.
+         numerous polynomials in a least-squares sense and that do not
+         follow the natural ordering of the NDF data, in the most
+         CPU-time-efficient way possible.
 
          To do this requires the use of additional memory (of order
-	 one fewer than the dimensionality of the NDF itself, times the
-	 polynomial order squared).  To minimise the use of memory and
-	 get the fastest possible determinations you should not use
-	 weighting and assert that the input data do not have any BAD
-	 values (use the application SETBAD to set the appropriate
-	 flag).
+         one fewer than the dimensionality of the NDF itself, times the
+         polynomial order squared).  To minimise the use of memory and
+         get the fastest possible determinations you should not use
+         weighting and assert that the input data do not have any BAD
+         values (use the application SETBAD to set the appropriate
+         flag).
 
          \sstitem
          If you choose to use the automatic range determination.  You 
@@ -33633,10 +33769,10 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
          ABSAXS = \_INTEGER (Read)
       }{
          This selects whether to plot rows or columns within the NDF.
-	 If ABSAXS is {\tt 1}, each curve will represent the array
-	 values within a single row of pixels within the NDF.  If it
-	 is {\tt 2}, each curve will represent the array values within
-	 a single column of pixels within the NDF. {\tt [1]}
+         If ABSAXS is {\tt 1}, each curve will represent the array
+         values within a single row of pixels within the NDF.  If it
+         is {\tt 2}, each curve will represent the array values within
+         a single column of pixels within the NDF. {\tt [1]}
       }
       \sstsubsection{
          AXES = \_LOGICAL (Read)
@@ -33706,15 +33842,15 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
          KEYPOS() = \_REAL (Read)
       }{
          Two values giving the position of the key.  The first value
-	 gives the gap between the right-hand edge of the
-	 multiple-line plot and the left-hand edge of the key (0.0 for
-	 no gap, 1.0 for the largest gap).  The second value gives the
-	 vertical position of the top of the key (1.0 for the highest
-	 position, 0.0 for the lowest).  If the second value is not
-	 given, the top of the key is placed level with the top of the
-	 multiple-line plot.  Both values should be in the range 0.0 to 1.0.
-	 If a key is produced, then the right hand margin specified by
-	 parameter MARGIN is ignored.  {\tt [}current value{\tt{]}}
+         gives the gap between the right-hand edge of the
+         multiple-line plot and the left-hand edge of the key (0.0 for
+         no gap, 1.0 for the largest gap).  The second value gives the
+         vertical position of the top of the key (1.0 for the highest
+         position, 0.0 for the lowest).  If the second value is not
+         given, the top of the key is placed level with the top of the
+         multiple-line plot.  Both values should be in the range 0.0 to 1.0.
+         If a key is produced, then the right hand margin specified by
+         parameter MARGIN is ignored.  {\tt [}current value{\tt{]}}
       }
       \sstsubsection{
          KEYSTYLE = \htmlref{GROUP}{se:groups} (Read)
@@ -33988,9 +34124,27 @@ KAPPA: \htmlref{SETBAD}{SETBAD}.
       \sstsubsection{
          USEAXIS = LITERAL (Read)
       }{
-         The index or label of the axis within the current \htmlref{co-ordinate Frame}{se:domains}~ 
-         of the NDF which is to be used to annotate the horizontal axis of
-         the plot.
+         The quantity to be used to annotate the horizontal axis
+         of the plot specified by using one of the following options.
+
+         \ssthitemlist{
+
+            \sstitem
+            An integer index of an axis within the current \htmlref{co-ordinate 
+            Frame}{se:domains}~ of the input NDF (in the range 1 to the number 
+            of axes in the current Frame).
+
+            \sstitem
+            An axis \htmlattref{Symbol}{Symbol(axis)}~ string such as 
+            {\tt "RA"} or {\tt "VRAD"}.
+
+            \sstitem
+            A generic option where {\tt "SPEC"} requests the spectral
+            axis, {\tt "TIME"} selects the time axis, {\tt "SKYLON"}
+            and {\tt "SKYLAT"} picks the sky longitude and latitude
+            axes respectively.  Only those axis domains present are 
+            available as options.
+         }
 
          The quantity used to annotate the horizontal axis must have a
          defined value at all points in the array, and must increase or
@@ -34722,37 +34876,37 @@ KAPPA: \htmlref{ADD}{ADD},
          TRIM = \_LOGICAL (Read)
       }{
          If {\tt TRUE}, then the number of pixel axes in the output NDF will
-	 be reduced if necessary to remove any pixel axes which span only a
-	 single pixel.  For instance if {\tt stokes} is a three-dimensional
-	 data cube with pixel bounds (1:100,-50:40,1:3), and the parameter IN
-	 is given the value {\tt "stokes(,,2)"}, then the dimensionality of
-	 the output depends on the setting of TRIM: if TRIM={\tt FALSE} the
-	 output is three-dimensional with pixel bounds (1:100,-50:40,2:2) and
-	 if TRIM={\tt TRUE} the output is two-dimensional with pixel bounds
-	 (1:100,-50:40).  In this example, the third pixel axis spans only a
-	 single pixel and is consequently removed if TRIM={\tt TRUE}.  {\tt
-	 [FALSE]}
+         be reduced if necessary to remove any pixel axes which span only a
+         single pixel.  For instance if {\tt stokes} is a three-dimensional
+         data cube with pixel bounds (1:100,-50:40,1:3), and the parameter IN
+         is given the value {\tt "stokes(,,2)"}, then the dimensionality of
+         the output depends on the setting of TRIM: if TRIM={\tt FALSE} the
+         output is three-dimensional with pixel bounds (1:100,-50:40,2:2) and
+         if TRIM={\tt TRUE} the output is two-dimensional with pixel bounds
+         (1:100,-50:40).  In this example, the third pixel axis spans only a
+         single pixel and is consequently removed if TRIM={\tt TRUE}.  {\tt
+         [FALSE]}
       }
       \sstsubsection{
          TRIMWCS = \_LOGICAL (Read)
       }{
          This parameter is only accessed if parameter TRIM is {\tt TRUE}.  It
-	 controls the number of axes in the current WCS \htmlref{co-ordinate
-	 Frame}{se:domains}~ of the output NDF. If TRIMWCS={\tt YES}, then the
-	 \htmlref{current Frame}{se:curframe}~ in the output NDF will have the same number of axes as
-	 there are pixel axes in the output NDF.  If this involves removing
-	 axes, then the axes to retain are specified by parameter USEAXIS.  If
-	 TRIMWCS={\tt NO} then all axes are retained in the \htmlref{current
-	 WCS Frame}{se:curframe}~ of the output NDF. Using the example in the
-	 description of the TRIM parameter, if the input NDF {\tt stokes} has
-	 a three-dimensional current WCS Frame with axes (RA,Dec,Stokes) and
-	 TRIMWSC=YES, then an axis will be removed from the current Frame to
-	 make it 2 dimensional (that is, to match the number of pixel axes
-	 remaining after the removal of insignificant pixel axes). The choice
-	 of which two axes to retain is controlled by parameter USEAXIS.  If,
-	 on the other hand, TRIMWCS was set to {\tt FALSE}, then the output
-	 NDF would still have two pixel axes, but the current WCS Frame would
-	 retain all three axes from the input NDF.  If one or more 
+         controls the number of axes in the current WCS \htmlref{co-ordinate
+         Frame}{se:domains}~ of the output NDF. If TRIMWCS={\tt YES}, then the
+         \htmlref{current Frame}{se:curframe}~ in the output NDF will have the same number of axes as
+         there are pixel axes in the output NDF.  If this involves removing
+         axes, then the axes to retain are specified by parameter USEAXIS.  If
+         TRIMWCS={\tt NO} then all axes are retained in the \htmlref{current
+         WCS Frame}{se:curframe}~ of the output NDF. Using the example in the
+         description of the TRIM parameter, if the input NDF {\tt stokes} has
+         a three-dimensional current WCS Frame with axes (RA,Dec,Stokes) and
+         TRIMWSC=YES, then an axis will be removed from the current Frame to
+         make it 2 dimensional (that is, to match the number of pixel axes
+         remaining after the removal of insignificant pixel axes). The choice
+         of which two axes to retain is controlled by parameter USEAXIS.  If,
+         on the other hand, TRIMWCS was set to {\tt FALSE}, then the output
+         NDF would still have two pixel axes, but the current WCS Frame would
+         retain all three axes from the input NDF.  If one or more 
          current-Frame axes are removed, the transformation from the current 
          Frame to pixel Frame may become undefined resulting in some WCS 
          operations being unusable.  The inverse of this transformation (from 
@@ -34765,11 +34919,30 @@ KAPPA: \htmlref{ADD}{ADD},
          and some axes need to be removed from the current WCS Frame of
          the output NDF.  It gives the axes which are to be retained in
          the current WCS Frame of the output NDF.  Each axis can be
-         specified either by giving its index within the Current Frame
-         of the input NDF in the range 1 to the number of axes in the Frame,
-         or by giving its symbol.  The dynamic default selects the axes with
-         the same indices as the pixel axes being copied.  The value should
-         be given as a comma-separated list. {\tt []}
+         specified using one of the following options.
+
+         \ssthitemlist{
+
+            \sstitem 
+            An integer index of an axis within the current Frame of the 
+            input NDF (in the range 1 to the number of axes in the current
+            Frame).
+
+            \sstitem
+            An axis \htmlattref{Symbol}{Symbol(axis)}~ string such as 
+            {\tt "RA"} or {\tt "VRAD"}.
+
+            \sstitem 
+            A generic option where {\tt "SPEC"} requests the spectral
+            axis, {\tt "TIME"} selects the time axis, {\tt "SKYLON"}
+            and {\tt "SKYLAT"} picks the sky longitude and latitude
+            axes respectively.  Only those axis domains present are 
+            available as options.
+         }
+         
+         The dynamic default selects the axes with the same indices as
+         the pixel axes being copied.  The value should be given as a 
+         comma-separated list.  {\tt []}
       }
    }
    \sstexamples{
@@ -38573,10 +38746,28 @@ KAPPA: \htmlref{COMPADD}{COMPADD},
          along these axes.  The maximum number of axes is one fewer
          than the number of WCS axes in the NDF.
 
-         Each axis can be specified by its integer index within the
-         current Frame of the input NDF (in the range 1 to the number 
-         of axes in the current Frame), or by its symbol string.  A list
-         of acceptable values is displayed if an illegal value is
+         Each axis can be specified using one of the following options.
+
+         \ssthitemlist{
+
+            \sstitem 
+            Its integer index within the current Frame of the 
+            input  NDF (in the range 1 to the number of axes in the 
+            current Frame).
+
+            \sstitem 
+            Its \htmlattref{Symbol}{Symbol(axis)}~ string such as 
+            {\tt "RA"} or {\tt "VRAD"}.
+
+            \sstitem 
+            A generic option where {\tt "SPEC"} requests the 
+            spectral axis, {\tt "TIME"} selects the time axis, 
+            {\tt "SKYLON"} and {\tt "SKYLAT"} picks the sky longitude 
+            and latitude axes  respectively.  Only those axis domains 
+            present are available as options.
+         }
+
+         A list of acceptable values is displayed if an illegal value is
          supplied.  If the axes of the current Frame are not parallel to
          the NDF pixel axes, then the pixel axis which is most nearly
          parallel to the specified current Frame axis will be used.
@@ -38723,13 +38914,13 @@ KAPPA: \htmlref{COMPADD}{COMPADD},
          SombCos, and Gauss methods.
 
          PARAMS(1) is required by all the above schemes.  It is used
-	 to specify how many pixels are to contribute to the
-	 interpolated result on either side of the interpolation in
-	 each dimension.  Typically, a value of {\tt 2} is appropriate
-	 and the minimum allowed value is {\tt 1} (\emph{i.e.} one
-	 pixel on each side).  A value of zero or fewer indicates that
-	 a suitable number of pixels should be calculated
-	 automatically. {\tt [0]}
+         to specify how many pixels are to contribute to the
+         interpolated result on either side of the interpolation in
+         each dimension.  Typically, a value of {\tt 2} is appropriate
+         and the minimum allowed value is {\tt 1} (\emph{i.e.} one
+         pixel on each side).  A value of zero or fewer indicates that
+         a suitable number of pixels should be calculated
+         automatically. {\tt [0]}
 
          PARAMS(2) is required only by the SombCos, Gauss, SincSinc,
          SincCos, and SincGauss schemes.  For the SombCos, SincSinc, and
@@ -38802,6 +38993,12 @@ KAPPA: \htmlref{COMPADD}{COMPADD},
          in an HDS container file called {\tt omc1\_spectra.sdf}.
       }
       \sstexamplesubsection{
+         pluck omc1 mode=cat incat=a axes=SPEC container out=omc1\_spectra
+      }{
+         As the previous example, plucking spectra, this time by
+         selecting the generic spectral axis.
+      }
+      \sstexamplesubsection{
          pluck omc1 pos=3.45732E11 axes="RA,Dec" method=lin out=peakplane
       }{
          This example extracts a plane from omc1 at frequency
@@ -38818,7 +39015,7 @@ KAPPA: \htmlref{COMPADD}{COMPADD},
          co-ordinate Frame being used is given if parameter DESCRIBE is set
          to a {\tt TRUE} value.  Application \htmlref{WCSFRAME}{WCSFRAME} 
          can be used to change the current co-ordinate Frame of the
-	 NDF before running this application if required.
+         NDF before running this application if required.
 
          \sstitem
          The output NDF has the same dimensionality as the input NDF,
@@ -39029,16 +39226,16 @@ KAPPA: \htmlref{ADD}{ADD},
          FINISH = LITERAL (Read)
       }{
          The co-ordinates of the last sample in the profile, in the
-	 current co-ordinate Frame of the NDF (supplying {\tt ":"}
-	 will display details of the required co-ordinate Frame).  The
-	 position should be supplied as a list of \xref{formatted axis
-	 values}{sun210}{AST_UNFORMAT} separated by spaces.  This
-	 parameter is only accessed if parameter MODE is set to {\tt
-	 "Curve"} and a null ({\tt{!}}) value is given for INCAT.  If
-	 the last (top-right) pixel in the NDF has valid co-ordinates
-	 in the current co-ordinate Frame of the NDF, then these
-	 co-ordinates will be used as the suggested default. Otherwise
-	 there will be no suggested default.
+         current co-ordinate Frame of the NDF (supplying {\tt ":"}
+         will display details of the required co-ordinate Frame).  The
+         position should be supplied as a list of \xref{formatted axis
+         values}{sun210}{AST_UNFORMAT} separated by spaces.  This
+         parameter is only accessed if parameter MODE is set to {\tt
+         "Curve"} and a null ({\tt{!}}) value is given for INCAT.  If
+         the last (top-right) pixel in the NDF has valid co-ordinates
+         in the current co-ordinate Frame of the NDF, then these
+         co-ordinates will be used as the suggested default. Otherwise
+         there will be no suggested default.
       }
       \sstsubsection{
          GEODESIC = \_LOGICAL (Read)
@@ -39367,8 +39564,8 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
             {\tt "xx:yy"} --  Ancestor indices between \emph{xx} and 
             \emph{yy} inclusively.  When \emph{xx} is omitted, the range 
             begins from 0; when \emph{yy} is omitted, the range ends with the
-	    maximum value it can take, that is the number of ancestors
-	    described in the PROVENANCE extension.
+            maximum value it can take, that is the number of ancestors
+            described in the PROVENANCE extension.
 
             \sstitem
             Any reasonable combination of above values separated by
@@ -39917,13 +40114,13 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
 
          \sstitem
          {\tt "Parents"} --- A comma-separated list of integers that
-	 are the indices of the immediate parents of the NDF.  These
-	 are the integers that are displayed on the first line of each
-	 NDF description.
+         are the indices of the immediate parents of the NDF.  These
+         are the integers that are displayed on the first line of each
+         NDF description.
 
          \sstitem
          {\tt "Date"} --- The formatted UTC date and time at which the
-	 provenance information for the NDF was recorded.
+         provenance information for the NDF was recorded.
 
          \sstitem
          {\tt "Creator"} --- A string identifying the software that created
@@ -39931,15 +40128,15 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
 
          \sstitem
          {\tt "More"} --- A summary of any extra information about the
-	 NDF stored with the provenance information.  In general this may
-	 be an arbitrary HDS structure and so full details cannot be
-	 given on a single line.  The HDSTRACE command can be used to
-	 examine the MORE field in detail.  To see full details of the
-	 NDF with {\tt "ID"} value of 12 (say), enter (from a UNIX shell)
-	 {\tt "hdstrace fred.more.provenance.ancestors'(12)'"}, where
-	 {\tt fred} is the name of the NDF supplied for parameter NDF.
-	 If the NDF has no extra information, this item will not be
-	 present.
+         NDF stored with the provenance information.  In general this may
+         be an arbitrary HDS structure and so full details cannot be
+         given on a single line.  The HDSTRACE command can be used to
+         examine the MORE field in detail.  To see full details of the
+         NDF with {\tt "ID"} value of 12 (say), enter (from a UNIX shell)
+         {\tt "hdstrace fred.more.provenance.ancestors'(12)'"}, where
+         {\tt fred} is the name of the NDF supplied for parameter NDF.
+         If the NDF has no extra information, this item will not be
+         present.
       } 
 
       In addition, a text file can be created containing the paths for the
@@ -39976,18 +40173,18 @@ KAPPA: \htmlref{LINPLOT}{LINPLOT},
          \sstitem
 
          If a KAPPA application uses one or more input NDFs to create an
-	 output NDF, the output NDF may or may not contain provenance
-	 information depending on two things: 1) whether any of the input
-	 NDFs already contain provenance information, and 2) the value of
-	 the AUTOPROV environment variable.  It is usually necessary to
-	 set the AUTOPROV variable to {\tt "1"} in order to create output
-	 NDFs that contain provenance information.  The exception to this
-	 if you are supplied with NDFs from another source that already
-	 contain provenance.  If such NDFs are used as inputs to KAPPA
-	 applications, then the output NDFs will contain provenance even
-	 if the AUTOPROV variable is unset.  However, setting AUTOPROV to
-	 {\tt "0"} will always prevent provenance information being
-	 stored in the output NDFs.
+         output NDF, the output NDF may or may not contain provenance
+         information depending on two things: 1) whether any of the input
+         NDFs already contain provenance information, and 2) the value of
+         the AUTOPROV environment variable.  It is usually necessary to
+         set the AUTOPROV variable to {\tt "1"} in order to create output
+         NDFs that contain provenance information.  The exception to this
+         if you are supplied with NDFs from another source that already
+         contain provenance.  If such NDFs are used as inputs to KAPPA
+         applications, then the output NDFs will contain provenance even
+         if the AUTOPROV variable is unset.  However, setting AUTOPROV to
+         {\tt "0"} will always prevent provenance information being
+         stored in the output NDFs.
 
          \sstitem
          Some other packages, such as CCDPACK, follow the same strategy
@@ -40771,26 +40968,26 @@ KAPPA: \htmlref{REMQUAL}{REMQUAL},
          SombCos, and Gauss methods.
 
          PARAMS(1) is required by all the above schemes.  It is used to
-	 specify how many pixels are to contribute to the interpolated
-	 result on either side of the interpolation or binning point
-	 in each dimension.  Typically, a value of {\tt 2} is
-	 appropriate and the minimum allowed value is {\tt 1}
-	 (\emph{i.e.} one pixel on each side). A value of zero or
-	 fewer indicates that a suitable number of pixels should be
-	 calculated automatically. {\tt [0]}
+         specify how many pixels are to contribute to the interpolated
+         result on either side of the interpolation or binning point
+         in each dimension.  Typically, a value of {\tt 2} is
+         appropriate and the minimum allowed value is {\tt 1}
+         (\emph{i.e.} one pixel on each side). A value of zero or
+         fewer indicates that a suitable number of pixels should be
+         calculated automatically. {\tt [0]}
 
          PARAMS(2) is required only by the Gauss, SincSinc, SincCos,
-	 and SincGauss schemes.  For the SombCos, SincSinc, and
-	 SincCos schemes, it specifies the number of pixels at which
-	 the envelope of the function goes to zero.  The minimum value
-	 is {\tt 1.0}, and the run-time default value is {\tt 2.0}.
-	 For the Gauss and SincGauss scheme, it specifies the
-	 full-width at half-maximum (FWHM) of the Gaussian envelope.
-	 The minimum value is {\tt 0.1}, and the run-time default is
-	 {\tt 1.0}.  On astronomical images and spectra, good results
-	 are often obtained by approximately matching the FWHM of the
-	 envelope function, given by PARAMS(2), to the point-spread
-	 function of the input data. {\tt []}
+         and SincGauss schemes.  For the SombCos, SincSinc, and
+         SincCos schemes, it specifies the number of pixels at which
+         the envelope of the function goes to zero.  The minimum value
+         is {\tt 1.0}, and the run-time default value is {\tt 2.0}.
+         For the Gauss and SincGauss scheme, it specifies the
+         full-width at half-maximum (FWHM) of the Gaussian envelope.
+         The minimum value is {\tt 0.1}, and the run-time default is
+         {\tt 1.0}.  On astronomical images and spectra, good results
+         are often obtained by approximately matching the FWHM of the
+         envelope function, given by PARAMS(2), to the point-spread
+         function of the input data. {\tt []}
       }
       \sstsubsection{
          REBIN = \_LOGICAL (Read)
@@ -41415,8 +41612,9 @@ KAPPA: \htmlref{CADD}{CADD},
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         A \htmlref{title}{apndf:title} for the output NDF.  A null value will cause the title
-         of the NDF supplied for parameter IN to be used instead. {\tt [!]}
+         A \htmlref{title}{apndf:title} for the output NDF.  A null value 
+         will cause the title of the NDF supplied for parameter IN to be 
+         used instead. {\tt [!]}
       }
       \sstsubsection{
          USEAXIS = \htmlref{GROUP}{se:groups} (Read)
@@ -42102,13 +42300,32 @@ KAPPA: \htmlref{NORMALIZE}{NORMALIZE}.
          USEAXIS is only accessed if the current \htmlref{co-ordinate Frame}{se:domains}~ of
          the output NDF has more than two axes.  A group of two strings should be
          supplied specifying the two axes spanning the plane in which the
-         supplied polygons are defined.  Each axis can be specified either
-         by its integer index within the current Frame of the output NDF
-         (in the range 1 to the number of axes in the current Frame), or
-         by its \htmlattref{Symbol}{Symbol(axis)}~ attribute.  A list of acceptable values is displayed
+         supplied polygons are defined.  Each axis can be specified
+         using one of the following options.
+
+         \ssthitemlist{
+
+            \sstitem 
+            An integer index of an axis within the current Frame of the 
+            input NDF (in the range 1 to the number of axes in the current
+            Frame).
+
+            \sstitem
+            An axis \htmlattref{Symbol}{Symbol(axis)}~ string such as 
+            {\tt "RA"} or {\tt "VRAD"}.
+
+            \sstitem 
+            A generic option where {\tt "SPEC"} requests the spectral
+            axis, {\tt "TIME"} selects the time axis, {\tt "SKYLON"}
+            and {\tt "SKYLAT"} picks the sky longitude and latitude
+            axes respectively.  Only those axis domains present are 
+            available as options.         
+         } 
+
+         A list of acceptable values is displayed
          if an illegal value is supplied.  If a null ({\tt{!}}) value is supplied,
          the axes with the same indices as the first two significant NDF pixel
-         axes are used. {\tt [!]}
+         axes are used.  {\tt [!]}
       }
       \sstsubsection{
          VARIANCE = \_LOGICAL (Read)
@@ -42733,9 +42950,9 @@ KAPPA: \htmlref{NOMAGIC}{NOMAGIC},
 
          It may also be specified as a comma-separated list of 
          \htmlref{quality names.}{se:qnames}~
-	 A quality name is a symbolic name that identifies a
-	 specific quality bit (quality names can be defined using
-	 SETQUAL, and displayed using SHOWQUAL).
+         A quality name is a symbolic name that identifies a
+         specific quality bit (quality names can be defined using
+         SETQUAL, and displayed using SHOWQUAL).
 
          The default value suggested when prompting for this value is
          chosen so as to leave the original mask value unchanged.
@@ -44771,15 +44988,15 @@ KAPPA: \htmlref{REGRID}{REGRID},
          AXIS = \_INTEGER (Read)
       }{
          Assigning a value to this parameter indicates that a single
-	 axis should be squashed or stretched.  If a null ({\tt{!}})
-	 value is supplied for AXIS, a squash or stretch factor must
-	 be supplied for each axis in the manner indicated by the MODE
-	 parameter.  If a non-null value is supplied for AXIS, it
-	 should be the integer index of the axis to be squashed or
-	 stretched (the first axis has index 1).  In this case, only a
-	 single squash or stretch factor should be supplied, and all
-	 other axes will be left unchanged.  If MODE is set to
-	 {\tt PixelScale"}, then the supplied value should be the index 
+         axis should be squashed or stretched.  If a null ({\tt{!}})
+         value is supplied for AXIS, a squash or stretch factor must
+         be supplied for each axis in the manner indicated by the MODE
+         parameter.  If a non-null value is supplied for AXIS, it
+         should be the integer index of the axis to be squashed or
+         stretched (the first axis has index 1).  In this case, only a
+         single squash or stretch factor should be supplied, and all
+         other axes will be left unchanged.  If MODE is set to
+         {\tt PixelScale"}, then the supplied value should be the index 
          of a WCS axis.  Otherwise it should be the index of a pixel 
          axis.  {\tt [!]}
      }
@@ -44787,14 +45004,14 @@ KAPPA: \htmlref{REGRID}{REGRID},
          FACTORS( ) = \_DOUBLE (Read)
       }{
          This parameter is used only if MODE={\tt "Factors"}.  It
-	 defines the factor by which each dimension will be distorted
-	 to produce the output NDF.  A factor greater than one is a
-	 stretch and less than one is a squash.  If no value has been
-	 supplied for parameter AXIS, the number of values supplied
-	 for FACTORS must be the same as the number of pixel axes in
-	 the NDF.  If a non-null value has been supplied for parameter
-	 AXIS, then only a single value should be supplied for FACTORS
-	 and that value will be used to distort the axis indicated by 
+         defines the factor by which each dimension will be distorted
+         to produce the output NDF.  A factor greater than one is a
+         stretch and less than one is a squash.  If no value has been
+         supplied for parameter AXIS, the number of values supplied
+         for FACTORS must be the same as the number of pixel axes in
+         the NDF.  If a non-null value has been supplied for parameter
+         AXIS, then only a single value should be supplied for FACTORS
+         and that value will be used to distort the axis indicated by 
          parameter AXIS.
       }
       \sstsubsection{
@@ -44806,15 +45023,15 @@ KAPPA: \htmlref{REGRID}{REGRID},
          LBOUND( ) = \_INTEGER (Read)
       }{
          This parameter is only used if MODE={\tt "Bounds"}.  It
-	 specifies the lower pixel-index values of the output NDF.  If
-	 no value has been supplied for parameter AXIS, the number of
-	 values supplied for LBOUND must be the same as the number of
-	 pixel axes in the NDF.  If a non-null value has been supplied
-	 for parameter AXIS, then only a single value should be
-	 supplied for LBOUND and the supplied value will be used as
-	 the new lower bounds on the axis indicated by parameter AXIS.
-	 If null ({\tt{!}}) is given, the lower pixel bounds of the
-	 input NDF will be used.  
+         specifies the lower pixel-index values of the output NDF.  If
+         no value has been supplied for parameter AXIS, the number of
+         values supplied for LBOUND must be the same as the number of
+         pixel axes in the NDF.  If a non-null value has been supplied
+         for parameter AXIS, then only a single value should be
+         supplied for LBOUND and the supplied value will be used as
+         the new lower bounds on the axis indicated by parameter AXIS.
+         If null ({\tt{!}}) is given, the lower pixel bounds of the
+         input NDF will be used.  
       }
       \sstsubsection{
          METHOD = \htmlref{LITERAL}{se:parmenu} (Read)
@@ -44908,18 +45125,18 @@ KAPPA: \htmlref{REGRID}{REGRID},
          PIXSCALE = LITERAL (Read)
       }{
          The PIXSCALE parameter is only used if parameter MODE is set
-	 to {\tt "PixelScale"}.  It should be supplied holding the
-	 required new pixel scales.  In this context, a pixel scale
-	 for a WCS axis is the increment in WCS axis value caused by a
-	 movement of one pixel along the WCS axis, and are measured at
-	 the first pixel in the array.  The suggested default value
-	 are the current pixel scales.  If no value has been supplied
-	 for parameter AXIS, the number of values supplied for
-	 PIXSCALE must be the same as the number of WCS axes in the
-	 NDF.  If a non-null value has been supplied for parameter
-	 AXIS, then only a single value should be supplied for
-	 PIXSCALE and that value will be used as the new pixel scale
-	 on the WCS axis indicated by parameter AXIS. 
+         to {\tt "PixelScale"}.  It should be supplied holding the
+         required new pixel scales.  In this context, a pixel scale
+         for a WCS axis is the increment in WCS axis value caused by a
+         movement of one pixel along the WCS axis, and are measured at
+         the first pixel in the array.  The suggested default value
+         are the current pixel scales.  If no value has been supplied
+         for parameter AXIS, the number of values supplied for
+         PIXSCALE must be the same as the number of WCS axes in the
+         NDF.  If a non-null value has been supplied for parameter
+         AXIS, then only a single value should be supplied for
+         PIXSCALE and that value will be used as the new pixel scale
+         on the WCS axis indicated by parameter AXIS. 
       }
       \sstsubsection{
          TITLE = LITERAL (Read)
@@ -44931,15 +45148,15 @@ KAPPA: \htmlref{REGRID}{REGRID},
          UBOUND( ) = \_INTEGER (Read)
       }{
          This parameter is only used if MODE={\tt "Bounds"}.  The upper
-	 pixel index values of the output NDF. If no value has been
-	 supplied for parameter AXIS, the number of values supplied
-	 for UBOUND must be the same as the number of pixel axes in
-	 the NDF.  If a non-null value has been supplied for parameter
-	 AXIS, then only a single value should be supplied for UBOUND
-	 and the supplied value will be used as the new upper bounds
-	 on the axis indicated by parameter AXIS.  If null ({\tt{!}})
-	 is given, the upper pixel bounds of the input NDF will be
-	 used.  
+         pixel index values of the output NDF. If no value has been
+         supplied for parameter AXIS, the number of values supplied
+         for UBOUND must be the same as the number of pixel axes in
+         the NDF.  If a non-null value has been supplied for parameter
+         AXIS, then only a single value should be supplied for UBOUND
+         and the supplied value will be used as the new upper bounds
+         on the axis indicated by parameter AXIS.  If null ({\tt{!}})
+         is given, the upper pixel bounds of the input NDF will be
+         used.  
       }
    }
    \sstexamples{
@@ -45011,16 +45228,16 @@ KAPPA: \htmlref{REGRID}{REGRID},
          \sstitem
 
          The \htmlref{LABEL}{apndf:label},
-	 \htmlref{UNITS}{apndf:units}, and
-	 \htmlref{HISTORY}{apndf:history}~ components, and all 
-	 \htmlref{extensions}{apndf:extensions}~ are propagated.
-	 \htmlref{TITLE}{apndf:title}~ is controlled by the TITLE
-	 parameter.  DATA, \htmlref{VARIANCE}{apndf:variance},
-	 \htmlref{AXIS}{apndf:axis}~ and \htmlref{WCS}{apndf:wcs} are
-	 propagated after appropriate modification.  The
-	 \htmlref{QUALITY}{apndf:quality}~ component is also
-	 propagated if nearest-neighbour interpolation is being used.
-	 
+         \htmlref{UNITS}{apndf:units}, and
+         \htmlref{HISTORY}{apndf:history}~ components, and all 
+         \htmlref{extensions}{apndf:extensions}~ are propagated.
+         \htmlref{TITLE}{apndf:title}~ is controlled by the TITLE
+         parameter.  DATA, \htmlref{VARIANCE}{apndf:variance},
+         \htmlref{AXIS}{apndf:axis}~ and \htmlref{WCS}{apndf:wcs} are
+         propagated after appropriate modification.  The
+         \htmlref{QUALITY}{apndf:quality}~ component is also
+         propagated if nearest-neighbour interpolation is being used.
+         
 
          \sstitem
          Processing of \htmlref{bad pixels}{se:masking} and automatic \htmlref{quality masking}{se:qualitymask} are
@@ -47456,17 +47673,17 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          calculated automatically. {\tt [0]}
 
          PARAMS(2) is required only by the Gauss, SombCos, SincSinc,
-	 SincCos, and SincGauss schemes.  For the SombCos, SincSinc
-	 and SincCos schemes, it specifies the number of pixels at
-	 which the envelope of the function goes to zero.  The minimum
-	 value is {\tt 1.0}, and the run-time default value is {\tt
-	 2.0}.  For the Gauss and SincGauss scheme, it specifies the
-	 full-width at half-maximum (FWHM) of the Gaussian envelope.
-	 The minimum value is {\tt 0.1}, and the run-time default is
-	 {\tt 1.0}.  On astronomical NDFs and spectra, good results
-	 are often obtained by approximately matching the FWHM of the
-	 envelope function, given by PARAMS(2), to the point-spread
-	 function of the input data. {\tt []}
+         SincCos, and SincGauss schemes.  For the SombCos, SincSinc
+         and SincCos schemes, it specifies the number of pixels at
+         which the envelope of the function goes to zero.  The minimum
+         value is {\tt 1.0}, and the run-time default value is {\tt
+         2.0}.  For the Gauss and SincGauss scheme, it specifies the
+         full-width at half-maximum (FWHM) of the Gaussian envelope.
+         The minimum value is {\tt 0.1}, and the run-time default is
+         {\tt 1.0}.  On astronomical NDFs and spectra, good results
+         are often obtained by approximately matching the FWHM of the
+         envelope function, given by PARAMS(2), to the point-spread
+         function of the input data. {\tt []}
       }
       \sstsubsection{
          REBIN = \_LOGICAL (Read)
@@ -47776,18 +47993,18 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          REMAP = \_LOGICAL (Read)
       }{
          Only accessed if MODE is {\tt "Set"}.  If REMAP is {\tt TRUE}, then
-	 the \htmlref{Mappings}{se:curframe}~ which connect the current Frame
-	 to the other Frames within the \htmlref{WCS FrameSet}{se:curframe}~
-	 will be modified (if necessary) to maintain the FrameSet integrity.
-	 For instance, if the current Frame of the NDF represents FK5 RA and
-	 DEC, and you change {\att System} from {\tt "FK5"} to {\tt
-	 "Galactic"}, then the Mappings which connect the SKY Frame to the
-	 other Frames (\emph{e.g.} PIXEL, AXIS) will be modified so that each
-	 pixel corresponds to the correct Galactic co-ordinates.  If REMAP is
-	 {\tt FALSE}, then the Mappings will not be changed.  This can be
-	 useful if the FrameSet has incorrect attribute values for some
-	 reason, which need to be corrected without altering the Mappings to
-	 take account of the change. {\tt [TRUE]}
+         the \htmlref{Mappings}{se:curframe}~ which connect the current Frame
+         to the other Frames within the \htmlref{WCS FrameSet}{se:curframe}~
+         will be modified (if necessary) to maintain the FrameSet integrity.
+         For instance, if the current Frame of the NDF represents FK5 RA and
+         DEC, and you change {\att System} from {\tt "FK5"} to {\tt
+         "Galactic"}, then the Mappings which connect the SKY Frame to the
+         other Frames (\emph{e.g.} PIXEL, AXIS) will be modified so that each
+         pixel corresponds to the correct Galactic co-ordinates.  If REMAP is
+         {\tt FALSE}, then the Mappings will not be changed.  This can be
+         useful if the FrameSet has incorrect attribute values for some
+         reason, which need to be corrected without altering the Mappings to
+         take account of the change. {\tt [TRUE]}
       }
       \sstsubsection{
          SETTING = LITERAL (Read)
@@ -47817,11 +48034,11 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          wcsattrib my\_spec set System freq
       }{
          This sets the \htmlattref{System}{System}~ attribute of the
-	 current co-ordinate Frame in the NDF called my\_Spec so that
-	 the Frame represents frequency (this assumes the current
-	 Frame is a \xref{SpecFrame}{sun210}{SpecFrame}).  The
-	 Mappings between the current Frame and the other Frames are
-	 modified to take account of the change of system.
+         current co-ordinate Frame in the NDF called my\_Spec so that
+         the Frame represents frequency (this assumes the current
+         Frame is a \xref{SpecFrame}{sun210}{SpecFrame}).  The
+         Mappings between the current Frame and the other Frames are
+         modified to take account of the change of system.
       }
       \sstexamplesubsection{
          wcsattrib my\_spec mset setting='unit(1)=km/s,system(1)=vrad'
@@ -47847,9 +48064,9 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
       }{
          This sets the \htmlattref{Format}{Format(axis)}~ attribute for axis 1 in 
          the current co-ordinate Frame in the NDF called my\_data, so
-	 that axis values are formatted as floating-point values using
-	 a minimum field width of ten characters, and displaying five
-	 significant figures.  An exponent is used if necessary.
+         that axis values are formatted as floating-point values using
+         a minimum field width of ten characters, and displaying five
+         significant figures.  An exponent is used if necessary.
       }
       \sstexamplesubsection{
          wcsattrib ngc5128 set format(2) bdms.2
@@ -48487,23 +48704,23 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
          SombCos and Gauss methods.
 
          PARAMS(1) is required by all the above schemes.  It is used
-	 to specify how many output pixels on either side of the
-	 central output pixel are to receive contribution from the
-	 corresponding input pixel.  Typically, a value of {\tt 2} is
-	 appropriate and the minimum allowed value is {\tt 1}
-	 (\emph{i.e.} one pixel on each side).  A value of zero or
-	 fewer indicates that a suitable number of pixels should be
-	 calculated automatically. {\tt [0]}
+         to specify how many output pixels on either side of the
+         central output pixel are to receive contribution from the
+         corresponding input pixel.  Typically, a value of {\tt 2} is
+         appropriate and the minimum allowed value is {\tt 1}
+         (\emph{i.e.} one pixel on each side).  A value of zero or
+         fewer indicates that a suitable number of pixels should be
+         calculated automatically. {\tt [0]}
 
          PARAMS(2) is required only by the Gauss, SombCos, SincSinc,
-	 SincCos, and SincGauss schemes. For the SombCos, SincSinc and
-	 SincCos schemes, it specifies the number of output pixels at
-	 which the envelope of the function goes to zero.  The minimum
-	 value is {\tt 1.0}, and the run-time default value is {\tt
-	 2.0}.  For the Gauss and SincGauss scheme, it specifies the
-	 full-width at half-maximum (FWHM) of the Gaussian envelope.
-	 The minimum value is {\tt 0.1}, and the run-time default is
-	 {\tt 1.0}. {\tt []}
+         SincCos, and SincGauss schemes. For the SombCos, SincSinc and
+         SincCos schemes, it specifies the number of output pixels at
+         which the envelope of the function goes to zero.  The minimum
+         value is {\tt 1.0}, and the run-time default value is {\tt
+         2.0}.  For the Gauss and SincGauss scheme, it specifies the
+         full-width at half-maximum (FWHM) of the Gaussian envelope.
+         The minimum value is {\tt 0.1}, and the run-time default is
+         {\tt 1.0}. {\tt []}
       }
       \sstsubsection{
          REF = NDF (Read)
@@ -48903,15 +49120,15 @@ KAPPA: \htmlref{NDFTRACE}{NDFTRACE},
 
          \sstitem 
          The correction is affected by translating pixel co-ordinates
-	 by a constant amount before projection them into WCS
-	 co-ordinates. Therefore, whilst the translation will be
-	 constant across the array in pixel co-ordinates, it may vary
-	 in WCS co-ordinates depending on the nature of the
-	 pixel$\rightarrow$WCS transformation. The size of the
-	 translation in pixel co-ordinates is chosen in order to
-	 produce the required shift in WCS co-ordinates at the OBJ
-	 position (if STYPE is {\tt "Relative"}), or at the array
-	 centre (if STYPE is {\tt "Absolute"}).
+         by a constant amount before projection them into WCS
+         co-ordinates. Therefore, whilst the translation will be
+         constant across the array in pixel co-ordinates, it may vary
+         in WCS co-ordinates depending on the nature of the
+         pixel$\rightarrow$WCS transformation. The size of the
+         translation in pixel co-ordinates is chosen in order to
+         produce the required shift in WCS co-ordinates at the OBJ
+         position (if STYPE is {\tt "Relative"}), or at the array
+         centre (if STYPE is {\tt "Absolute"}).
       }
    }
    \sstdiytopic{
@@ -54376,9 +54593,9 @@ The following applications have been modified:
       \begin{itemize} 
          \item Fits to lines may be rejected and flagged bad in the
          output data using the new parameter CLIPRMS.  Given the
-	 number of clipping standard deviations, MFITTREND locates
-	 positive outliers from the distribution of root-mean-squared
-	 residuals of the fits.
+         number of clipping standard deviations, MFITTREND locates
+         positive outliers from the distribution of root-mean-squared
+         residuals of the fits.
 
          \item There is a new output parameter ARANGES to record the
          fitting ranges found in automatic mode.  The automatic ranges
@@ -54754,6 +54971,21 @@ The following applications have been modified:
       \end{itemize}
 
 \end{description}
+
+\subsection{General Changes}
+\begin{itemize}
+
+   \item Parameters that require one or more WCS axes to be
+   specified---these are usually called USEAXIS, AXIS or AXES and
+   appear in applications such \htmlref{LINPLOT}{LINPLOT},
+   \htmlref{COLLAPSE}{COLLAPSE} and \htmlref{PLUCK}{PLUCK}---now
+   accept generic names of those axes present (in addition to axis
+   Symbol or indices).  These generic names are: {\tt "SPEC"} to
+   select the spectral axis, {\tt "TIME"} to pick the time axis, and
+   {\tt "SKYLON"} and {\tt "SKYLAT"} to choose the sky longitude and
+   latitude axes respectively.
+
+\end{itemize}
 
 
 \begin{latexonly}
