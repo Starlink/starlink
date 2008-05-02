@@ -741,6 +741,7 @@ represented by symbolic constants defined in the include file
 \item [MSG\_\_QUIET] -- quiet mode, high priority;
 \item [MSG\_\_NORM] -- normal mode, normal priority (default);
 \item [MSG\_\_VERB] -- verbose mode, low priority.
+\item [MSG\_\_DEBUG] -- debug mode, lowest priority
 \end {description}
 \end {quote}
 Whether or not the message will be output depends upon the ``conditional
@@ -770,9 +771,12 @@ as follows:
 \item [MSG\_\_QUIET] -- always output given the message, regardless of output
 filter setting;
 \item [MSG\_\_NORM] -- output the given message if the current output filter is
-set to either MSG\_\_NORM or MSG\_\_VERB;
+set to either MSG\_\_NORM, MSG\_\_VERB or MSG\_\_DEBUG;
 \item [MSG\_\_VERB] -- output the given message only if the current output
-filter is set to MSG\_\_VERB.
+filter is set to MSG\_\_VERB or MSG\_\_DEBUG.
+\item [MSG\_\_VERB] -- output the given message only if the current output
+filter is set to MSG\_\_DEBUG.
+
 \end {description}
 \end {quote}
 In this scheme, messages given the priority MSG\_\_QUIET could never be 
@@ -2848,6 +2852,7 @@ level.
 \item \textbf{MSG\_\_SZMSG} -- Maximum length of message text.
 \item \textbf{MSG\_\_VERB} -- Verbose (abundant messages) conditional message
 output level.
+\item \textbf{MSG\_\_DEBUG} -- Debug (many many messages) conditional message output level.
 \end {description}
 \item [MSG\_ERR] Defines the Message Reporting System errors.
 \begin{description}
@@ -3218,6 +3223,9 @@ int \texttt{*}status );] \listline
 
             \sstitem
                MSG\_\_VERB = verbose mode.
+
+	    \sstitem
+               MSG\_\_DEBUG = debugging mode
          }
       }
       \sstsubsection{
@@ -3357,6 +3365,10 @@ int \texttt{*}status );] \listline
             \sstitem
                MSG\_\_VERB = Do not output the message unless the current
                output filter is set to \hspace{1cm} MSG\_\_VERB.
+
+            \sstitem
+               MSG\_\_DEBUG = Do not output the message unless the current
+               output filter is set to \hspace{1cm} MSG\_\_DEBUG.
          } 
          \end{sloppypar}
          If any other value is given, STATUS is set to MSG\_\_INVIF
@@ -4292,6 +4304,7 @@ The three acceptable strings for MSG\_FILTER are:
 \item [QUIET] -- representing MSG\_\_QUIET;
 \item [NORMAL] -- representing MSG\_\_NORM;
 \item [VERBOSE] -- representing MSG\_\_VERB.
+\item [DEBUG] -- representing MSG\_\_DEBUG
 \end {description}
 \end {quote}
 Abbreviations are accepted but
@@ -4469,6 +4482,9 @@ It should not be used in applications software.
 
          \sstitem
             VERBOSE -- representing MSG\_\_VERB.
+
+         \sstitem
+            DEBUG -- representing MSG\_\_DEBUG.
       }
       MSG\_IFGET accepts abbreviations of these strings; any other value 
       will result in an error report and the status value being returned 
@@ -4672,6 +4688,28 @@ A bug which caused the linker to report subroutine MSG\_IFSET missing if
 MSG\_IFGET was called, has been corrected.
 
 This section has been added to this document.
+
+\section{\xlabel{changes_in_version_1_7_1}Changes in Version 1.7-1}
+
+Corrects a problem using the reserved token STATUS if another token precedes
+it in the message, and includes a minor update to SUN/104.
+
+\section{\xlabel{changes_in_version_1_8}Changes in Version 1.8}
+
+MSG1_GREF is completely revised to simplify its interface with the parameter
+system, using a new routine SUBPAR_GREF. This allows the underlying parameter
+system to be replaced more easily. Suboutine MSG1_GLOC is now not requited and
+has been removed. This Version of MERS requires PCS Version 4.1 or later.
+
+\section{\xlabel{changes_in_version_1_8_1}Changes in Version 1.8-1}
+
+Builds with the Gnu auto tools and released under the GPL.
+
+\section{\xlabel{changes_in_version_1_8_2}Changes in Version 1.8-2}
+
+Added MSG\_\_DEBUG reporting level.
+
+
 % ? End of main text
 \end{document}
 

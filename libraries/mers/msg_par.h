@@ -8,7 +8,7 @@
 *     Define the MSG_ global constants.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Type of module:
 *     Global constants include file.
@@ -18,6 +18,7 @@
 *     by the MSG_ system.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1998 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
@@ -45,6 +46,8 @@
 *  History:
 *     22-Sep-1998 (fhead):
 *        Original version
+*     02-May-2008 (TIMJ):
+*        Add MSG__DEBUG
 *     {enter_changes_here}
 
 *-
@@ -65,6 +68,9 @@
 
 /*   Verbose conditional message output level */
 #define MSG__VERB 3 
+
+/*   Debug conditional message output level */
+#define MSB__DEBUG 4
 
 /*. */
 #endif  /* MSG_PAR_DEFINED */

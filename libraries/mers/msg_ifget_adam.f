@@ -25,6 +25,7 @@
 *        -  QUIET -- representing MSG__QUIET;
 *        -  NORMAL -- representing MSG__NORM;
 *        -  VERBOSE -- representing MSG__VERB.
+*        -  DEBUG -- representing MSG__DEBUG
 *
 *     MSG_IFGET accepts abbreviations of these strings; any other value
 *     will result in an error report and the status value being
@@ -39,6 +40,7 @@
 *        The global status.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1991, 1992 Science & Engineering Research Council.
 *     Copyright (C) 1996, 1999, 2004 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
@@ -62,6 +64,8 @@
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
 *     AJC: A. J. Chipperfield (STARLINK)
+*     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -81,6 +85,8 @@
 *        Use MSG1_GT... functions to get the values from the MSG_CMN 
 *        common blocks rather than directly accessing the common blocks
 *        (which are initialised in a different shared library).
+*     02-MAY-2008 (TIMJ):
+*        Add MSG__DEBUG
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -115,6 +121,9 @@
 
       CHARACTER * ( 7 ) VERBOS   ! VERBOSE string
       PARAMETER ( VERBOS = 'VERBOSE' )
+
+      CHARACTER * ( 7 ) DEBUG    ! DEBUG string
+      PARAMETER ( DEBUG = 'DEBUG' )
 
 *  Local Variables:
       LOGICAL MATCH              ! Whether a match has been found
@@ -189,8 +198,21 @@
             IF ( VLEN .GE. FLEN ) THEN
                MATCH = CHR_SIMLR( FNAME( : FLEN ), VNAME( : FLEN ) )
 
-*           Check whether a match has been found: if so, set QUIET mode.
+*           Check whether a match has been found: if so, set VERBOSE mode.
                IF ( MATCH ) FILTER = MSG__VERB
+            END IF
+         END IF
+
+*     If there has been no match, try DEBUG mode.
+         IF ( .NOT. MATCH ) THEN
+            VNAME = DEBUG
+            VLEN = CHR_LEN( VNAME )
+
+            IF ( VLEN .GE. FLEN ) THEN
+               MATCH = CHR_SIMLR( FNAME( : FLEN ), VNAME( : FLEN ) )
+
+*           Check whether a match has been found: if so, set DEBUG mode.
+               IF ( MATCH ) FILTER = MSG__DEBUG
             END IF
          END IF
 

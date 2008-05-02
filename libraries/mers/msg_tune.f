@@ -33,8 +33,8 @@
 *     1. The following values of PARAM may be used:
 *
 *        'FILTER' Specifies the required MSG conditional message reporting
-*            level. VALUE may be 1, 2 or 3, corresponding with quiet, normal
-*            (the default) and verbose levels respectively.
+*            level. VALUE may be 1, 2, 3 or 4, corresponding with quiet, normal
+*            (the default), verbose and debug levels respectively.
 *
 *        'SZOUT' Specifies a maximum line length to be used in the line wrapping
 *            process. By default the message output by MSG is split into chunks 
@@ -67,6 +67,7 @@
 *        the ADAM message system.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
@@ -88,6 +89,7 @@
 
 *  Authors:
 *     AJC: A.J. Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -100,6 +102,8 @@
 *        Improve error messages
 *     20-FEB-2001 (AJC):
 *        EMS1_TUNE renamed EMS_TUNE
+*     02-MAY-2008 (TIMJ):
+*        Add MSG__DEBUG level.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -135,7 +139,7 @@
       INTEGER EVALUE               ! Value from environment variable
       INTEGER UVALUE               ! Value actually used
       INTEGER LEVEL                ! The required reporting level
-      INTEGER LEVELS(3)            ! The possible reporting levels
+      INTEGER LEVELS(4)            ! The possible reporting levels
       CHARACTER*20 UPARAM          ! PARAM in upper case
       CHARACTER*20 TRANS           ! Translation of the environment variable
       CHARACTER*20 PARNAMES(MAX_PARS)  ! Tuning parameter names
@@ -144,7 +148,7 @@
       LOGICAL ENVVAL               ! Whether value came from env variable
 
 *  Local Data:
-      DATA LEVELS/ MSG__QUIET, MSG__NORM, MSG__VERB /
+      DATA LEVELS/ MSG__QUIET, MSG__NORM, MSG__VERB, MSG__DEBUG /
       DATA PARNAMES/ 'SZOUT', 'STREAM', 'FILTER' /
 *.
 
@@ -230,7 +234,7 @@
                END IF
 
             ELSE IF ( UPARAM .EQ. 'FILTER' ) THEN
-               IF ( ( UVALUE .GT. 0 ) .AND. ( UVALUE .LT. 4 ) ) THEN
+               IF ( ( UVALUE .GT. 0 ) .AND. ( UVALUE .LT. 5 ) ) THEN
                   LEVEL = LEVELS( UVALUE )
                   CALL MSG_IFSET( LEVEL, STATUS )
                ELSE

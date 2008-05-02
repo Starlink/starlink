@@ -16,6 +16,7 @@
 *     by the MSG_ system.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1990, 1991 Science & Engineering Research Council.
 *     Copyright (C) 1997 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
@@ -40,6 +41,7 @@
 *     BDK: Dennis Kelly (ROE)
 *     PCTR: P.C.T. Rees (STARLINK)
 *     AJC: A.J.Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -47,8 +49,10 @@
 *        Original version adapted from MSG_SYS.
 *     21-JAN-1991 (PCTR):
 *        Added message output level symbolic constants.
-*     28-OCT-1997 (AJC)
+*     28-OCT-1997 (AJC):
 *        MSG_SZMSG 200->300
+*     02-MAY-2008 (TIMJ):
+*        Add MSG__DEBUG
 *     {enter_further_changes_here}
 
 *-
@@ -65,5 +69,8 @@
 
       INTEGER MSG__VERB                 ! Verbose conditional message output level
       PARAMETER ( MSG__VERB = 3 )
+
+      INTEGER MSG__DEBUG                ! Debug conditional message output level
+      PARAMETER ( MSG__DEBUG = 4 )
 
 *.

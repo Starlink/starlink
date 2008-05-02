@@ -25,6 +25,7 @@
 *        The global status.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1991 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -46,11 +47,14 @@
 
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     10-JUN-1991 (PCTR):
 *        Original version.
+*     02-MAY-2008 (TIMJ):
+*        Added MSG__DEBUG
 *     {enter_changes_here}
 
 *  Bugs:
@@ -81,7 +85,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check that the given filter value is acceptable.
-      IF ( FILTER .LT. MSG__QUIET .OR. FILTER .GT. MSG__VERB ) THEN
+      IF ( FILTER .LT. MSG__QUIET .OR. FILTER .GT. MSG__DEBUG ) THEN
 
 *     The given value for message filtering is outside the allowed
 *     range: set status and report an error message.
