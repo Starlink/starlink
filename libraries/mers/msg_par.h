@@ -70,7 +70,7 @@
 #define MSG__VERB 3 
 
 /*   Debug conditional message output level */
-#define MSB__DEBUG 4
+#define MSG__DEBUG 4
 
 /*. */
 #endif  /* MSG_PAR_DEFINED */
