@@ -122,6 +122,8 @@
 *  Local Constants:
       INTEGER MAX_PARS           ! Number of possible tuning parameters
       PARAMETER ( MAX_PARS = 3 )
+      INTEGER MAX_LEVELS         ! Number of possible filter levels
+      PARAMETER( MAX_LEVELS = 4 )
 
 *  Global Variables:
       INCLUDE 'MSG_CMN'          ! MSG_ output filter level
@@ -139,7 +141,7 @@
       INTEGER EVALUE               ! Value from environment variable
       INTEGER UVALUE               ! Value actually used
       INTEGER LEVEL                ! The required reporting level
-      INTEGER LEVELS(4)            ! The possible reporting levels
+      INTEGER LEVELS(MAX_LEVELS)   ! The possible reporting levels
       CHARACTER*20 UPARAM          ! PARAM in upper case
       CHARACTER*20 TRANS           ! Translation of the environment variable
       CHARACTER*20 PARNAMES(MAX_PARS)  ! Tuning parameter names
@@ -234,7 +236,8 @@
                END IF
 
             ELSE IF ( UPARAM .EQ. 'FILTER' ) THEN
-               IF ( ( UVALUE .GT. 0 ) .AND. ( UVALUE .LT. 5 ) ) THEN
+               IF ( ( UVALUE .GT. 0 ) .AND. 
+     :              ( UVALUE .LE. MAX_LEVELS ) ) THEN
                   LEVEL = LEVELS( UVALUE )
                   CALL MSG_IFSET( LEVEL, STATUS )
                ELSE
