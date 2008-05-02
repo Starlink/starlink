@@ -68,6 +68,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -75,6 +76,10 @@
 *        Original version.
 *     1-MAY-2008 (DSB):
 *        Allow SPEC, TIME, SKYLON and SKYLAT to be used to select axes.
+*     2008 May 1 (MJC):
+*        Ensure that the Symbols appear in order at the start of the
+*        list of options, so that supplied integer values correspond to 
+*        axis indices. 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -122,8 +127,10 @@
 *  Get the number of axes in the supplied Frame.
       NFC = AST_GETI( FRAME, 'NAXES', STATUS )
 
-*  Initialise the number of options stored in CAXIS.
-      NOPT = 0
+*  Initialise the number of options stored in CAXIS.  We need to have 
+*  the symbols first and in axis order for KPG1_GTCHV to work for
+*  integer axis indices.  So insert the generic options after those.
+      NOPT = NFC
 
 *  Indicate we have not yet added the SKYLON and SKYLAT options to the
 *  CAXIS list.
@@ -131,15 +138,13 @@
 
 *  Get the axis symbols and their lengths for all axes in the Frame.
       DO I = 1, NFC
-         NOPT = NOPT + 1
-
          NCP = 0
          CALL CHR_PUTI( I, PAXIS, NCP )
-         CAXIS( NOPT ) = AST_GETC( FRAME, 'Symbol(' // 
+         CAXIS( I ) = AST_GETC( FRAME, 'Symbol(' // 
      :                          PAXIS( : NCP ) // ')', STATUS )
-         CALL CHR_LDBLK( CAXIS( NOPT ) )
-         CALL KPG1_PGESC( CAXIS( NOPT ), STATUS )
-         AXPOS( NOPT ) = I
+         CALL CHR_LDBLK( CAXIS( I ) )
+         CALL KPG1_PGESC( CAXIS( I ), STATUS )
+         AXPOS( I ) = I
 
 *  Search for any sky, spectral and time axes. We use the Domain
 *  attribute to identify each type of axis (assuming the Domain values
@@ -190,7 +195,7 @@
          END DO
       END IF
 
-*  Get the required number of axis selections. A resonable guess should
+*  Get the required number of axis selections. A reasonable guess should
 *  be to assume a one-to-one correspondance between Current and Base axes.
 *  Therefore, use the significant axes selected above as the defaults to be
 *  used if a null (!) parameter value is supplied.
