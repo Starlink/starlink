@@ -17,10 +17,12 @@
 *     Frame.  The axes to select are determined using the supplied
 *     environment parameter.  Each axis can be specified either by 
 *     giving its index within the Frame in the range 1 to the number of
-*     axes in the Frame, or by giving its symbol.  If the first value 
+*     axes in the Frame, or by giving its symbol.  Spectral, time and
+*     celestial longitude/latitude axes may also be specified using the 
+*     options "SPEC", "TIME", "SKYLON" and "SKYLAT".  If the first value
 *     supplied in AXES is not zero, the supplied axes are used as the 
-*     dynamic default for the parameter.  The parameter value should be
-*     given as a GRP group expression, with default GRP control 
+*     dynamic default for the parameter.  The parameter value should be 
+*     given as a GRP group expression, with default GRP control
 *     characters.
 
 *  Arguments:
@@ -48,7 +50,7 @@
 *     available axis symbols.
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -77,6 +79,11 @@
 *        Original version derived from DSB's KPG1_GTAXI.  Would like to
 *        call it KPG1_GTAXV in keeping with the PAR notation but that
 *        name has gone.
+*     2008 May 1 (MJC):
+*        Allow SPEC, TIME, SKYLON, and SKYLAT to be used to select axes.
+*        This from DSB's updated KPG1_GTAXI modified to ensure that the 
+*        Symbols appear in order at the start of the list of options, so 
+*        that supplied integer values correspond to axis indices. 
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -108,11 +115,17 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER*20 CAXIS( NDF__MXDIM ) ! Available axis symbols
+      INTEGER AXPOS( 2*NDF__MXDIM ) ! Index of axis within "CAXIS" array
+      CHARACTER*20 CAXIS( 2 * NDF__MXDIM ) ! Available axis symbols
+      INTEGER DEFAX              ! Default axis index
+      CHARACTER*30 DOM           ! Value of Domain attribute
+      LOGICAL DOSKY              ! Save indices of sky axes?
       INTEGER I                  ! Axis index
-      INTEGER NCP                ! No. of characters in PAXIS buffer
-      INTEGER NFC                ! No. of axes in original Current 
+      INTEGER J                  ! Axis index
+      INTEGER NCP                ! Number of characters in PAXIS buffer
+      INTEGER NFC                ! Number of axes in original Current 
                                  ! Frame
+      INTEGER NOPT               ! No. of options in CAXIS
       CHARACTER*( VAL__SZI ) PAXIS ! Buffer for new axis number
 
 *.
@@ -123,6 +136,15 @@
 *  Get the number of axes in the supplied Frame.
       NFC = AST_GETI( FRAME, 'NAXES', STATUS )
 
+*  Initialise the number of options stored in CAXIS.  We need to have 
+*  the symbols first and in axis order for KPG1_GTCHV to work for
+*  integer axis indices.  So insert the generic options after those.
+      NOPT = NFC
+
+*  Indicate we have not yet added the SKYLON and SKYLAT options to the
+*  CAXIS list.
+      DOSKY = .TRUE.
+
 *  Get the axis symbols and their lengths for all axes in the Frame.
       DO I = 1, NFC
          NCP = 0
@@ -131,14 +153,69 @@
      :                          PAXIS( : NCP ) // ')', STATUS )
          CALL CHR_LDBLK( CAXIS( I ) )
          CALL KPG1_PGESC( CAXIS( I ), STATUS )
+         AXPOS( I ) = I
+
+*  Search for any sky, spectral and time axes.  We use the Domain
+*  attribute to identify each type of axis (assuming the Domain values
+*  have not been changed from the default values provided by AST).
+         DOM = AST_GETC( FRAME, 'Domain(' // PAXIS( : NCP ) // ')', 
+     :                   STATUS )
+
+*  If this is a spectral axis, allow the user to specify this axis using
+*  the option "SPEC".
+         IF ( DOM .EQ. 'SPECTRUM' .OR. DOM .EQ. 'DSBSPECTRUM' ) THEN
+            NOPT = NOPT + 1
+            CAXIS( NOPT ) = 'SPEC'
+            AXPOS( NOPT ) = I
+
+*  If this is a time axis, allow the user to specify this axis using
+*  the option "TIME".
+         ELSE IF ( DOM .EQ. 'TIME' ) THEN
+            NOPT = NOPT + 1
+            CAXIS( NOPT ) = 'TIME'
+            AXPOS( NOPT ) = I
+
+*  If this is a celestial axis, find the indices of the longitude and
+*  latitude axes and allow the user to specify them using the options
+*  "SKYLON" and "SKYLAT".
+         ELSE IF ( DOM .EQ. 'SKY' .AND. DOSKY ) THEN
+            NOPT = NOPT + 1
+            CAXIS( NOPT ) = 'SKYLAT'
+            AXPOS( NOPT ) = AST_GETI( FRAME, 'LatAxis(' // 
+     :                                PAXIS( : NCP ) // ')', STATUS )
+
+            NOPT = NOPT + 1
+            CAXIS( NOPT ) = 'SKYLON'
+            AXPOS( NOPT ) = AST_GETI( FRAME, 'LonAxis(' // 
+     :                                PAXIS( : NCP ) // ')', STATUS )
+
+            DOSKY = .FALSE.
+         END IF
+
       END DO
+
+*  Translate the supplied default axis indices into default option 
+*  indices.
+      IF ( AXES( 1 ) .GT. 0 ) THEN
+         DO J = 1, NAX
+            DEFAX = AXES( J )
+            DO I = NOPT, 1, -1
+               IF ( AXPOS( I ) .EQ. DEFAX ) AXES( J ) = I
+            END DO
+         END DO
+      END IF
 
 *  Obtain up to the maximum number of axis selections.  A reasonable 
 *  guess should be to assume a one-to-one correspondance between
 *  Current and Base axes.  Therefore, use the significant axes selected
 *  above as the defaults to be used if a null (!) parameter value is 
 *  supplied.
-      CALL KPG1_GCHMV( PARAM, NFC, CAXIS, MAXAX, AXES, NAX, AXES,
+      CALL KPG1_GCHMV( PARAM, NOPT, CAXIS, MAXAX, AXES, NAX, AXES,
      :                 STATUS )
-    
+
+*  Translate the returned option indices into axis indices.
+      DO J = 1, NAX
+         AXES( J ) = AXPOS( AXES( J ) ) 
+      END DO
+
       END
