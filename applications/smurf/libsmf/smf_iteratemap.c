@@ -576,7 +576,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     }
   }
 
-
   if( *status == SAI__OK ) {
 
     if( memiter ) {
@@ -607,6 +606,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	     status);
     }
   }
+
 
   /* There are two loops over files apart from the iteration. In the
      memiter=1 case the idea is to concatenate all continuous data
