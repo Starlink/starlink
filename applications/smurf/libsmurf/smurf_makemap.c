@@ -658,12 +658,14 @@ void smurf_makemap( int *status ) {
 	}
         
 	/* Store steptime for calculating EXP_TIME */
-	if ( i==1 ) {
+	if( (i==1) && (*status == SAI__OK) ) {
 	  smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
 	}
 
 	/* Check units are consistent */
-	smf_check_units( i, data_units, data->hdr, status);
+	if( *status == SAI__OK ) {
+	  smf_check_units( i, data_units, data->hdr, status);
+	}
 
 	/* Store the filename in the keymap for later - the GRP would be fine
 	   as is but we use a keymap in order to reuse smf_fits_add_prov */
@@ -672,7 +674,9 @@ void smurf_makemap( int *status ) {
 
 	/* Handle output FITS header creation (since the file is open and
 	   he header is available) */
-	smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
+	if( *status == SAI__OK ) {
+	  smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
+	}
 
 	if (*status == SAI__OK) {
 	  smf_close_file( &data, status );
