@@ -281,6 +281,8 @@
 *        - Add units and label to output file.
 *     2008-05-02 (EC):
 *        - Added mapbounds timing message
+*     2008-05-03 (EC):
+*        - In provenance loop for iterate use READ instead of UPDATE
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -651,7 +653,7 @@ void smurf_makemap( int *status ) {
       for(i=1; i<=size; i++ ) {	
 
 	if (*status == SAI__OK) {
-	  smf_open_file( igrp, i, "UPDATE", SMF__NOCREATE_DATA, &data,status );
+	  smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data,status );
 	  if( *status != SAI__OK) {
 	    errRep(FUNC_NAME, "Bad status opening smfData", status);      
 	  }
