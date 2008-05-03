@@ -147,6 +147,8 @@
 *        - Undo EXTinction correction after calculating AST
 *     2008-05-01 (EC)
 *        - More intelligent auto-sizing of concantenated chunks
+*     2008-05-02 (EC)
+*        - Use different levels of verbosity in messages
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -337,10 +339,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     } 
 
     if( memiter ) {
-      msgOut(" ", "SMF_ITERATEMAP: MEMITER set; perform iterations in memory",
+      msgOutif(MSG__VERB, " ", 
+	       "SMF_ITERATEMAP: MEMITER set; perform iterations in memory",
 	     status );
     } else {
-      msgOut(" ", 
+      msgOutif(MSG__VERB, " ", 
 	     "SMF_ITERATEMAP: MEMITER not set; perform iterations on disk",
 	     status );
     }
@@ -351,11 +354,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     }
 
     if( varmapmethod ) {
-      msgOut(" ", 
+      msgOutif(MSG__VERB, " ", 
 	     "SMF_ITERATEMAP: Will use sample variance to estimate variance map",
 	     status );
     } else {
-      msgOut(" ", 
+      msgOutif(MSG__VERB, " ", 
 	     "SMF_ITERATEMAP: Will use error propagation to estimate variance map",
 	     status );
     }
@@ -516,11 +519,13 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   }
 
   msgSeti("NUMCOMP",nmodels);
-  msgOut(" ", "SMF_ITERATEMAP: ^NUMCOMP model components in solution: ", 
+  msgOutif(MSG__VERB," ", 
+	   "SMF_ITERATEMAP: ^NUMCOMP model components in solution: ", 
 	 status);
   for( i=0; i<nmodels; i++ ) {
     msgSetc( "MNAME", smf_model_getname(modeltyps[i], status) );
-    msgOut(" ", "  ^MNAME", status ); 
+    msgOutif(MSG__VERB,
+	     " ", "  ^MNAME", status ); 
   }
 
   /* Create an ordered smfGrp which keeps track of files corresponding to
@@ -592,13 +597,13 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
     if( memiter ) {
       msgSeti( "NCONTCHUNKS", ncontchunks );
-      msgOut(" ", 
+      msgOutif(MSG__VERB," ", 
 	     "SMF_ITERATEMAP: ^NCONTCHUNKS large continuous chunks outside iteration loop.", 
 	     status);
     } else {
       msgSeti( "NCHUNKS", nchunks );
-      msgOut(" ", 
-	     "SMF_ITERATEMAP: ^NCHUNKS small chunks inside iteration loop.", 
+      msgOutif(MSG__VERB," ", 
+	     "SMF_ITERATEMAP: ^NCHUNKS file chunks inside iteration loop.", 
 	     status);
     }
   }
@@ -646,7 +651,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	   smf_concat_smfGroup below. */
 
 	msgSeti("C",contchunk+1);
-	msgOut(" ", 
+	msgOutif(MSG__VERB," ", 
 	       "SMF_ITERATEMAP: Concatenating files in continuous chunk ^C", 
 	       status);
 
@@ -667,7 +672,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     }
 
     /* Create containers for time-series model components */
-    msgOut(" ", "SMF_ITERATEMAP: Create model containers", status);
+    msgOutif(MSG__VERB," ", "SMF_ITERATEMAP: Create model containers", status);
 
     /* Components that always get made */
     if( igroup && (*status == SAI__OK) ) {
@@ -809,7 +814,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	  if( !memiter ) {
 	    msgSeti("CHUNK", i+1);
 	    msgSeti("NUMCHUNK", nchunks);
-	    msgOut(" ", "SMF_ITERATEMAP: Small chunk ^CHUNK / ^NUMCHUNK", 
+	    msgOut(" ", "SMF_ITERATEMAP: File chunk ^CHUNK / ^NUMCHUNK", 
 		   status);
 	  }
 
@@ -839,30 +844,31 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	      data = res[i]->sdata[idx];
 	      qua_data = (unsigned char *) qua[i]->sdata[idx]->pntr[0];
 
-	      msgOut(" ", "  update quality", status);
+	      msgOutif(MSG__VERB," ", "  update quality", status);
 	      smf_update_quality( data, qua_data, 1, NULL, badfrac, status );
 
 	      if( baseorder >= 0 ) {
-		msgOut(" ", "  fit polynomial baselines", status);
+		msgOutif(MSG__VERB," ", "  fit polynomial baselines", status);
 		smf_scanfit( data, qua_data, baseorder, status );
 
-		msgOut(" ", "  remove polynomial baselines", status);
+		msgOutif(MSG__VERB," ", "  remove polynomial baselines", 
+			 status);
 		smf_subtract_poly( data, qua_data, 0, status );
 	      }
 
 	      if( dcthresh && dcbox ) {
-		msgOut(" ", "  correct steps", status);
+		msgOutif(MSG__VERB," ", "  correct steps", status);
 		smf_correct_steps( data, qua_data, 20., 1000, status );
 	      }
 
 	      if( spikethresh ) {
-		msgOut(" ", "  flag spikes...", status);
+		msgOutif(MSG__VERB," ", "  flag spikes...", status);
 		smf_flag_spikes( data, qua_data, 
 				 SMF__Q_BADS|SMF__Q_BADB|SMF__Q_SPIKE,
 				 spikethresh, spikeiter, 100, 
 				 &aiter, NULL, status );
 		msgSeti("AITER",aiter);
-		msgOut(" ", "  ...finished in ^AITER iterations",
+		msgOutif(MSG__VERB," ", "  ...finished in ^AITER iterations",
 		       status); 
 	      }
 	    }
@@ -882,7 +888,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	      if( j==0 ) dimmflags |= SMF__DIMM_FIRSTCOMP;
 	    
 	      msgSetc("MNAME", smf_model_getname(modeltyps[j],status));
-	      msgOut( " ", "  ^MNAME", status);
+	      msgOutif(MSG__VERB," ", "  ^MNAME", status);
 	      modelptr = smf_model_getptr( modeltyps[j], status );
 	    
 	      if( *status == SAI__OK ) {
@@ -1097,7 +1103,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	for( i=0; i<nchunks; i++ ) {  /* Chunk loop */
 	  msgSeti("CHUNK", i+1);
 	  msgSeti("NUMCHUNK", nchunks);
-	  msgOut(" ", "  Chunk ^CHUNK / ^NUMCHUNK", status);
+	  msgOutif(MSG__VERB," ", "  Chunk ^CHUNK / ^NUMCHUNK", status);
 
 	  /* Open each subgroup, loop over smfArray elements and export,
 	     then close subgroup. DIMM open/close not needed if memiter set.

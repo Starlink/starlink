@@ -65,6 +65,8 @@
 *     2008-04-18 (EC)
 *        -Only calculate the white noise level once (first iteration)
 *        -Add chisquared calculation
+*     2008-05-02 (EC)
+*        - Use different levels of verbosity in messages
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -222,6 +224,7 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 
       /* Flag spikes in the residual */
       if( spikethresh ) {
+	/* Now re-flag */
 	smf_flag_spikes( res->sdata[idx], qua_data, 
 			 SMF__Q_BADS|SMF__Q_BADB|SMF__Q_SPIKE,
 			 spikethresh, spikeiter, 
@@ -230,7 +233,7 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 	msgSeti("THRESH",spikethresh);
 	msgSeti("NFLAG",nflag);
 	msgSeti("AITER",aiter);
-	msgOut(" ", 
+	msgOutif(MSG__VERB," ", 
 	       "   flagged ^NFLAG new ^THRESH-sig spikes in ^AITER iterations",
 	       status); 
       } 
