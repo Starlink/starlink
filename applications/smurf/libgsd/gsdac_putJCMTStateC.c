@@ -60,6 +60,8 @@
 *        Get TCS_TR_SYS.
 *     2008-04-08 (JB):
 *        Don't convert PAMB, it is already in mbar. 
+*     2008-04-30 (JB):
+*        Allow for MPI frontend.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -114,17 +116,12 @@ void gsdac_putJCMTStateC ( const gsdVars *gsdVars, const unsigned int stepNum,
     
   record->rts_num = stepNum + 1;
 
-  /* Check the frequency band to determine tasklist. */
-  if ( gsdVars->centreFreqs[0] < 290.0 ) {
-    strncpy ( record->rts_tasks, "PTCS FE_A ", 11 );
-  } else if ( gsdVars->centreFreqs[0] < 395.0 ) {  
-    strncpy ( record->rts_tasks, "PTCS FE_B ", 11 );
-  } else if ( gsdVars->centreFreqs[0] < 600.0 ) {
-    strncpy ( record->rts_tasks, "PTCS FE_C ", 11 );
+  /* Check the frontend name to determine tasklist. */
+  if ( strncmp ( gsdVars->frontend, "MPI", 3 ) == 0 ) {
+    strncpy ( record->rts_tasks, "PTCS FE_E ", 11 );    
   } else {
-    strncpy ( record->rts_tasks, "PTCS FE_D ", 11 );
+    sprintf ( record->rts_tasks, "PTCS FE_%c %s",  gsdVars->frontend[2], backend );
   }
-  strcat ( record->rts_tasks, backend );
 
   record->smu_x = 0.0;
 
