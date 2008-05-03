@@ -179,6 +179,8 @@
 *        Write mean sky level to output parameter.
 *     2008-05-01 (TIMJ):
 *        Write output units.
+*     2008-05-03 (AGG):
+*        Only access variance if status is good
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -340,7 +342,6 @@ void smurf_qlmakemap( int *status ) {
   /* Map variance array if we want it in the output file - this should
      be OK even if no variances are required because it is initialized
      to a NULL pointer */
-  variance = (odata->pntr)[1];
 
   /* If created OK, retrieve pointers to data */
   if ( *status == SAI__OK ) {
@@ -348,6 +349,7 @@ void smurf_qlmakemap( int *status ) {
     ondf = file->ndfid;
     /* Map the data array */
     map = (odata->pntr)[0];
+    variance = (odata->pntr)[1];
   }
 
   /* Create provenance keymap */
