@@ -97,6 +97,8 @@
 *     2008-04-30 (EC):
 *        - Extra valid pointer checks
 *        - Removed time-ordered data assertion. Handle bolo-ordered case.
+*     2008-05-03 (EC):
+*        - Only write history if applying extinction (!allextcorr case)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -445,8 +447,8 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
     }    
   } /* End loop over timeslice */
 
-  /* Add history entry */
-  if ( *status == SAI__OK ) {
+  /* Add history entry if !allextcorr */
+  if( (*status == SAI__OK) && !allextcorr ) {
     smf_history_add( data, FUNC_NAME, 
 		       "Extinction correction successful", status);
   }
