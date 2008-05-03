@@ -1,7 +1,7 @@
 # Number of iterations
 #  postive number  = fixed number of iterations
 #  negative number = maximum iterations if using chi^2 stopping criteria
-numiter = 5
+numiter = 10
 
 # chi^2 tolerance in negative-numiter case (requires noi model component)
 chitol = 1e-6
@@ -11,11 +11,16 @@ exportndf = 0
 
 # Model components/order (space delimited list)
 #  com = remove common-mode signal
+#  ext = apply extinction correction
 #  noi = estimate time-domain variance
-modelorder = com noi
+modelorder = com ext noi
 
 # low-pass boxcar filter on COM (samples) to assist with convergence
-com_boxcar = 100
+# if boxfact set reduce width of boxcar by this factor each iteration
+# boxmin specifies a minimum width below which it can't be reduced
+com_boxcar  = 400
+com_boxfact = 0.5
+com_boxmin  = 100
 
 # additional despiking after each iteration within noi calculation
 noispikethresh = 10
