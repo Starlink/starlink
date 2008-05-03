@@ -88,6 +88,7 @@ dnl    No use dependencies
 
 dnl Documentation
 dnl STAR_LATEX_DOCUMENTATION( sun216/ ssn72/ sc10/ sc11/ )
+STAR_LATEX_DOCUMENTATION(sun259)
 
 dnl Ask for a config.h so that we can retain control of when to define
 dnl parameters. And also to simplify the build line

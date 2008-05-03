@@ -84,6 +84,8 @@ BUILT_SOURCES = $(DYNSCRIPTS) $(IFL_FILES)
 $(IFL_FILES) $(DYNSCRIPTS): smurf.ifd
 	$(IFD2STAR) smurf
 
+stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
+
 # Help compilation
 .hlp.shl:
 	@HLIB@ $<
