@@ -72,6 +72,8 @@
 *     2008-04-14 (EC)
 *        - enabled boxcar smoothing again
 *        - improved QUALITY masking
+*     2008-05-02 (EC)
+*        - Added damping to boxcar smooth: COM_BOXFACT, COM_BOXMIN
 *     {enter_further_changes_here}
 
 
@@ -120,7 +122,12 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   /* Local Variables */
   dim_t base;                   /* Store base index for data array offsets */
   int boxcar=0;                 /* width in samples of boxcar filter */ 
+  double boxcard=0;             /* double precision version of boxcar */ 
+  double boxfact=0;             /* Box width damping parameter */
+  int boxmin=0;                 /* Min boxcar width if boxfact set */
   int do_boxcar=0;              /* flag to do boxcar smooth */
+  int do_boxfact=0;             /* flag to damp boxcar width */
+  int do_boxmin=0;              /* flag for minimum boxcar */
   dim_t i;                      /* Loop counter */
   int idx=0;                    /* Index within subgroup */
   dim_t j;                      /* Loop counter */
@@ -157,6 +164,23 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     do_boxcar = 1;
   }
 
+  /* Check for damping parameter on boxcar */
+  if( astMapGet0D( keymap, "COM_BOXFACT", &boxfact) ) {
+    do_boxfact = 1;
+
+    /* If first iteration, set COM_BOXCARD (this value will get decreased) */
+    if( flags&SMF__DIMM_FIRSTITER ) {
+      astMapPut0D( keymap, "COM_BOXCARD", (double) boxcar, NULL );
+    }
+
+  }
+
+  /* Check for minimum boxcar width*/
+  if( astMapGet0I( keymap, "COM_BOXMIN", &boxmin) ) {
+    do_boxmin = 1;
+  }
+
+
   /* Assert bolo-ordered data */
   for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
     smf_dataOrder( res->sdata[idx], 0, status );
@@ -192,7 +216,6 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     *status = SAI__ERROR;
     errRep(FUNC_NAME, "Model smfData was not loaded!", status);      
   }
-
 
   /* Loop over index in subgrp (subarray) */
   for( idx=0; idx<res->ndat; idx++ ) if (*status == SAI__OK ) {
@@ -272,7 +295,38 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 
   /* boxcar smooth if desired */
   if( do_boxcar ) {
+
+    if( do_boxfact ) {
+      if( !astMapGet0D( keymap, "COM_BOXCARD", &boxcard) ) {
+	*status = SAI__ERROR;
+	errRep(FUNC_NAME, "Failed to retrieve COM_BOXCARD from keymap", 
+	       status);
+      } else {
+	/* Use damped boxcard for smoothing width */
+	boxcar = (int) boxcard;
+      }
+
+    } 
+
+    msgSeti("BOX",boxcar);
+    msgOutif(MSG__VERB, " ", "    boxcar width ^BOX",status);
+
+    /* Do the smooth */
     smf_boxcar1( model_data, ntslice, boxcar, NULL, 0, status );
+
+    /* If damping, apply it here */
+    if( do_boxfact && (*status == SAI__OK) ) {
+      boxcard = boxcard * boxfact;
+
+      /* Enforce minimum if available */
+      if( do_boxmin ) {
+	if( boxcard < boxmin ) boxcard = (double) boxmin;
+      }
+
+      /* Update value in the keymap */
+      astMapPut0D( keymap, "COM_BOXCARD", boxcard, NULL );
+    }
+
   }
 
   /* remove common mode from residual */
