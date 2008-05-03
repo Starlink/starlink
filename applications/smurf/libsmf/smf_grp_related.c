@@ -89,6 +89,8 @@
 *        - Added maxconcatlen to interface
 *     2008-04-29 (EC):
 *        -Fixed bug in calculation of actual nrelated (subarrays)
+*     2008-05-03 (EC):
+*        Check absolute value of time step to find discontinuities
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -435,7 +437,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
 	   same chunk. Also check that the subsystems match, and that the
            continuous chunk doesn't exceed maxlen */
 
-	if( ((opentime - writetime)*24.*3600. > steptime*2.) || 
+	if( ( fabs((opentime - writetime)*24.*3600.) > steptime*2.) || 
 	    !matchsubsys || (maxlen && (totlen > maxlen)) ) {
 	  /* Found a discontinuity */
 	  thischunk++;
