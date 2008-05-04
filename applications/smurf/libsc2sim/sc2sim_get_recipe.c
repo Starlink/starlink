@@ -37,6 +37,8 @@
 *  History :
 *     2008-03-19 (AGG):
 *        Original
+*     2008-05-04 (AGG):
+*        Add support for Lissajous observing mode
 
 *  Copyright:
 *     Copyright (C) 2008 University of British Columbia. All Rights Reserved.
@@ -76,30 +78,47 @@
 void sc2sim_get_recipe ( const struct sc2sim_obs_struct *inx, char *recipe, 
 			 int *status ) {
 
+  /* Local variable */
+  int scan = 0;           /* Flag to denote SCAN mode data*/
+
   /* Check status */
   if ( *status != SAI__OK ) return;
+
+  /* Check for SCAN mode data */
+  if ( (strncmp( inx->obsmode, "PONG", 4) == 0) || 
+       (strncmp( inx->obsmode, "SCAN", 4) == 0) ||
+       (strncmp( inx->obsmode, "LISS", 4) == 0) ||
+       (strncmp( inx->obsmode, "BOUS", 4) == 0) ) {
+    scan = 1;
+  } else {
+    scan = 0;
+  }
 
   /* Do we have FOCUS data? */
   if ( (strncmp( inx->obstype, "FOCUS", 5) == 0) ) {
     strncpy( recipe, "REDUCE_FOCUS", 13);
-    if ( (strncmp( inx->obsmode, "PONG", 4) == 0) ) {
+    if ( scan ) {
       strncat( recipe, "_SCAN", 5);
     }
   } else if ( (strncmp( inx->obstype, "POINT", 5) == 0) ) {
     /* POINTING observation */
     strncpy( recipe, "REDUCE_POINTING", 16);
-    if ( (strncmp( inx->obsmode, "PONG", 4) == 0) ) {
+    if ( scan ) {
       strncat( recipe, "_SCAN", 5);
     }
   } else if ( (strncmp( inx->obstype, "SCIENCE", 7) == 0) ) {
     /* SCIENCE observation - now check obsmode */
-    if ( (strncmp( inx->obsmode, "PONG", 4) == 0) || 
-	 (strncmp( inx->obsmode, "SCAN", 4) == 0) ||
-	 (strncmp( inx->obsmode, "BOUS", 4) == 0) ) {
+    if ( scan ) {
       strncpy( recipe, "REDUCE_SCAN", 12);
     } else if ( (strncmp( inx->obsmode, "DREAM", 4) == 0) || 
 		(strncmp( inx->obsmode, "STARE", 4) == 0) ) {
       strncpy( recipe, "REDUCE_DREAMSTARE", 18);
+    } else {
+      /* Shouldn't get here... */
+      *status = SAI__ERROR;
+      errRep("", 
+	     "Error - unrecognized observing mode (possible programming error?)", 
+	     status);
     }
   }
 
