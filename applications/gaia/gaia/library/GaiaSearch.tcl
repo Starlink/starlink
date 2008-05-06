@@ -109,8 +109,10 @@ itcl::class gaia::GaiaSearch {
       }
 
       #  Use our Open dialog so we can browse for HDUs.
-      $m entryconfigure "Open" -command [code GaiaSearch::get_local_catalog \
-                                            $itk_option(-id) $w_]
+      if { $iscat_ } {
+         $m entryconfigure "Open" -command [code GaiaSearch::get_local_catalog \
+                                               $itk_option(-id) $w_]
+      }
 
       #  Remove <Enter> binding as this slows down the zoom window a lot.
       $canvas_ bind $object_tag_  <Any-Enter> {}
