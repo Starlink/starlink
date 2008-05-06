@@ -101,9 +101,10 @@ build any of the Starlink classic applications to build the Java ones.
    At the time of writing (March 2007) it is known that the gfortran
    compiler will work, but only from GCC4.3 onwards (the development main
    line). If this is picked up by default on your system you need to re-define
-   FC and F77 to select another compiler. For other versions of GCC you will
+   FC and F77 to select another compiler. For other versions of GCC4 you will
    need to use g95 (thanks to Andy Vaught for his help with this), which
-   is available from the g95 web site: www.g95.org.
+   is available from the g95 web site: www.g95.org. For GCC3 based systems
+   g77 should be used.
 
 
  The build sequence
