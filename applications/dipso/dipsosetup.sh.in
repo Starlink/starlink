@@ -7,7 +7,7 @@
 # make sure edits are synchronized with csh version.
 
 
-if test "$DIPSO_DIR" = ""; then
+if test "$DIPSO_DIR" != ""; then
    export DIPSODIR="$DIPSO_DIR"
    export DIPSOLIB="$DIPSO_DIR"
 
