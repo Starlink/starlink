@@ -74,6 +74,8 @@
 *        Modified interface to smf_open_file.
 *     2008-03-11 (AGG):
 *        Propagate QUALITY from input file
+*     2008-05-07 (EC):
+*        Use smf_realloc instead of astRealloc
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -200,8 +202,8 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
       *ffdata = smf_deepcopy_smfData( data, 1, flags, status );
       /* Change data type to DOUBLE */
       if ( *status == SAI__OK) {
-	((*ffdata)->pntr)[0] = astRealloc( ((*ffdata)->pntr)[0], 
-					   npts * sizeof(double) );
+	((*ffdata)->pntr)[0] = smf_realloc( ((*ffdata)->pntr)[0], npts, 
+					    sizeof(double), status );
 	(*ffdata)->dtype = SMF__DOUBLE;
       } else {
 	errRep(FUNC_NAME, "Error: unable to allocate memory for new smfData", 
