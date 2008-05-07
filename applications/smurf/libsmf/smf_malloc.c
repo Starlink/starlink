@@ -39,6 +39,7 @@
 *  Authors:
 *     Tim Jenness (TIMJ)
 *     Andy Gbb (AGG)
+*     Edward Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -46,6 +47,8 @@
 *        Initial version
 *     2006-05-23 (AGG):
 *        Add status check on return from astMalloc
+*     2008-05-07 (EC):
+*        Ast status was not being checked properly
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -113,13 +116,10 @@ smf_malloc( size_t nelem, size_t bperel, int zero, int * status ) {
   }
 
   retval = astMalloc( nelem * bperel );
+  /*retval = malloc( nelem * bperel );*/
 
-  /* Check we have got the memory we asked for */
-  if ( *status == AST__NOMEM ) {
-    retval = NULL;
-  }
-
-  if (retval == NULL) {
+  /* Check for error */
+  if ( !astOK || !retval ) {
     *status = SMF__NOMEM;
     msgSeti( "NEL", nelem );
     msgSeti( "BP" , bperel );
