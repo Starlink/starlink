@@ -221,10 +221,8 @@
 *           End a sequnece of calls to astRebinSeq<X>
 *        AST__NOBAD
 *           Leave bad output pixels unchanged in calls to astResample<X>
-*
-*     Protected:
 *        AST__USEVAR
-*           Use variance arrays (astResample<X>, Fortran interface only)?
+*           Use variance arrays?
 
 *  Type Definitions:
 *     Public:
@@ -336,9 +334,7 @@
 #define AST__URESAMP2 (2)
 #define AST__URESAMP3 (4)
 #define AST__URESAMP4 (8)
-#if defined(astFORTRAN77)        /* Only needed for Fortran interface */
 #define AST__USEVAR (16)         /* Use variance arrays? */
-#endif
 #define AST__USEBAD (32)         /* Recognise bad pixels? */
 #define AST__CONSERVEFLUX (64)   /* Conserve flux? */
 #define AST__REBININIT (128)     /* Initialise a new sequence of calls to astRebinSeq? */
