@@ -253,6 +253,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        Add an option for astResample to leave unchanged any output pixels
 *        for which an interpolated value cannot be obtained. This is
 *        controlled by the new AST__NOBAD flag.
+*     7-MAY-2008 (DSB):
+*        Clarified meaning of AST__GENVAR, AST__USEVAR and AST__VARWGT flags
+*        in astRebinSeq.
 *class--
 */
 
@@ -10732,9 +10735,10 @@ f     FLAGS argument.
 c     "wlim" are set to "badval".
 f     WLIM are set to BADVAL.
 *
-*     An option is available to generate output variances based on the
-*     spread of data values contributing to each output pixel (see the
-*     AST__GENVAR flag).
+*     Output variances can be generated in two ways; by rebinning the supplied
+*     input variances with appropriate weights, or by finding the spread of 
+*     input data values contributing to each output pixel (see the AST__GENVAR 
+*     and AST__USEVAR flags).
 
 *  Parameters:
 c     this
@@ -10815,27 +10819,25 @@ c        the output arrays, but any initialisation or normalisation
 c        requested by "flags" is still performed.
 c     in_var
 f     IN_VAR( * ) = <Xtype> (Given)
-c        An optional pointer to a second array with the same size and
-c        type as the "in" array. If given, this should contain a set
-c        of non-negative values which represent estimates of the
-c        statistical variance associated with each element of the "in"
-c        array. If this array is supplied (together with the
-c        corresponding "out_var" array), then estimates of the
-c        variance of the rebined output data will be calculated.
-c
-c        If no input variance estimates are being provided, a NULL
-c        pointer should be given.
-f        An optional second array with the same size and type as the
-f        IN array. If the AST__USEVAR flag is set via the FLAGS
-f        argument (below), this array should contain a set of
-f        non-negative values which represent estimates of the
-f        statistical variance associated with each element of the IN
-f        array. Estimates of the variance of the rebined output data
-f        will then be calculated.
-f
-f        If the AST__USEVAR flag is not set, no input variance
-f        estimates are required and this array will not be used. A
-f        dummy (e.g. one-element) array may then be supplied.
+*        An optional 
+c        pointer to a 
+*        second array with the same size and type as the 
+c        "in" 
+f        IN 
+*        array. If given, this should contain a set of non-negative values 
+*        which represent estimates of the statistical variance associated 
+*        with each element of the
+c        "in" 
+f        IN 
+*        array. 
+*        If neither the AST__USEVAR nor the AST__VARWGT flag is set, no 
+*        input variance estimates are required and this 
+f        array 
+c        pointer 
+*        will not be used. 
+f        A dummy (e.g. one-element) array 
+c        A NULL pointer
+*        may then be supplied.
 c     spread
 f     SPREAD = INTEGER (Given)
 c        This parameter specifies the scheme to be used for dividing
@@ -11001,34 +11003,27 @@ c        (i.e. Fortran array indexing is used).
 f        (i.e. normal Fortran array storage order).
 c     out_var
 f     OUT_VAR( * ) = <Xtype> (Given and Returned)
-*        An optional 
+*        A
 c        pointer to an 
 *        array with the same type and size as the 
 c        "out" 
 f        OUT
-*        array. If given, variance estimates for the rebined data values will 
-*        be added into this array.
-f        This array will only be used if the 
-f        AST__USEVAR flag is set via the FLAGS argument.
-*
-*        The output variance values will be calculated on the
-*        assumption that errors on the input data values are
-*        statistically independent and that their variance estimates
-*        may simply be summed (with appropriate weighting factors)
-*        when several input pixels contribute to an output data
-*        value. If this assumption is not valid, then the output error
-*        estimates may be biased. In addition, note that the
-*        statistical errors on neighbouring output data values (as
-*        well as the estimates of those errors) may often be
-*        correlated, even if the above assumption about the input data
-*        is correct, because of the pixel spreading schemes
-*        employed.
-*
-c        If no output variance estimates are required, a NULL pointer
-c        should be given.
-f        If the AST__USEVAR flag is not set, no output variance
-f        estimates will be calculated and this array will not be
-f        used. A dummy (e.g. one-element) array may then be supplied.
+*        array. This 
+c        pointer
+f        array 
+*        will only be used if the AST__USEVAR or AST__GENVAR flag is set
+f        via the FLAGS argument,
+f        via the "flags" parameter,
+*        in which case variance estimates for the rebined data values will 
+*        be added into the array. If neither the AST__USEVAR flag nor the 
+*        AST__GENVAR flag is set, no output variance estimates will be 
+*        calculated and this 
+c        pointer
+f        array 
+*        will not be used. A
+c        NULL pointer
+f        dummy (e.g. one-element) array 
+*        may then be supplied.
 c     weights
 f     WEIGHTS( * ) = DOUBLE PRECISION (Given and Returned)
 c        Pointer to an array of double, 
@@ -11126,26 +11121,26 @@ f     value given for BADVAL and propagated to the output array(s).
 c     and the "badval" value is only used for flagging output array
 f     and the BADVAL value is only used for flagging output array
 *     values.
-f     - AST__USEVAR: Indicates that variance information should be
-f     processed in order to provide estimates of the statistical error
-f     associated with the rebined values. If this flag is not set,
-f     no variance processing will occur and the IN_VAR and OUT_VAR
-f     arrays will not be used. (Note that this flag is only available
-f     in the Fortran interface to AST.)
-*     - AST__GENVAR: Indicates that the supplied output variance array should 
-*     be used as a work array to accumulate the temporary values needed to 
-*     generate output variances based on the spread of input data values 
-*     contributing to each output pixel. If this flag is given, any supplied 
-*     input variances have no effect on the output variances (although input 
-*     variances will still be used to weight the input data if the AST__VARWGT
-*     flag is also supplied). If the generation of such output variances 
-*     is required, this flag should be used on every invocation of this
+*     - AST__USEVAR: Indicates that output variance estimates should be
+*     created by rebinning the supplied input variance estimates. An
+*     error will be reported if both this flag and the AST__GENVAR flag
+*     are supplied.
+*     - AST__GENVAR: Indicates that output variance estimates should be
+*     created based on the spread of input data values contributing to each 
+*     output pixel. An error will be reported if both this flag and the 
+*     AST__USEVAR flag are supplied. If the AST__GENVAR flag is specified,
+*     the supplied output variance array is first used as a work array to 
+*     accumulate the temporary values needed to generate the output
+*     variances. When the sequence ends (as indicated by the
+*     AST__REBINEND flag), the contents of the output variance array are 
+*     converted into the required variance estimates. If the generation of 
+*     such output variances is required, this flag should be used on every 
+*     invocation of this
 c     function
 f     routine
-*     within a sequence. In addition, the AST__REBINEND flag should be
-*     given on the last invocation within the sequence (this causes the
-*     temporary values accumulated in the variance array to be replaced with 
-*     the final required variances).
+*     within a sequence, and any supplied input variances will have no effect 
+*     on the output variances (although input variances will still be used 
+*     to weight the input data if the AST__VARWGT flag is also supplied).
 *     - AST__VARWGT: Indicates that the input data should be weighted by
 *     the reciprocal of the input variances. Otherwise, all input data are 
 *     given equal weight. If this flag is specified, the calculation of the 
@@ -11205,6 +11200,18 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
+\
+/* Ensure any supplied "in_var" pointer is ignored if no input variances are \
+   needed. */ \
+   if( !( flags & AST__USEVAR ) && !( flags & AST__VARWGT ) ) { \
+      in_var = NULL; \
+   } \
+\
+/* Ensure any supplied "out_var" pointer is ignored if no output variances \
+   being created. */ \
+   if( !( flags & AST__USEVAR ) && !( flags & AST__GENVAR ) ) { \
+      out_var = NULL; \
+   } \
 \
 /* Obtain values for the Nin and Nout attributes of the Mapping. */ \
    nin = astGetNin( this ); \
@@ -11315,6 +11322,43 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
                       idim + 1 ); \
             break; \
          } \
+      } \
+   } \
+\
+/* Check that only one of AST__USEVAR and ASR__GENVAR has been supplied. */ \
+   if( ( flags & AST__USEVAR ) && ( flags & AST__GENVAR ) ) { \
+      if( astOK ) { \
+         astError( AST__BDPAR, "astRebinSeq"#X"(%s): Incompatible flags " \
+                   "AST__GENVAR and AST__USEVAR have been specified " \
+                   "together (programming error)." ); \
+      } \
+   } \
+\
+/* If AST__USEVAR or AST_VARWGT has been specified, check we have an \
+   input variance array. */ \
+   if( !in_var && astOK ) { \
+      if( ( flags & AST__USEVAR ) ) { \
+         astError( AST__BDPAR, "astRebinSeq"#X"(%s): The AST__USEVAR flag " \
+                   "was specified but no input variance array was supplied " \
+                   "(programming error)." ); \
+      } else if( ( flags & AST__VARWGT ) ) { \
+         astError( AST__BDPAR, "astRebinSeq"#X"(%s): The AST__VARWGT flag " \
+                   "was specified but no input variance array was supplied " \
+                   "(programming error)." ); \
+      } \
+   } \
+\
+/* If AST__USEVAR or AST_GENVAR has been specified, check we have an \
+   output variance array. */ \
+   if( !out_var && astOK ) { \
+      if( ( flags & AST__USEVAR ) ) { \
+         astError( AST__BDPAR, "astRebinSeq"#X"(%s): The AST__USEVAR flag " \
+                   "was specified but no output variance array was supplied " \
+                   "(programming error)." ); \
+      } else if( ( flags & AST__GENVAR ) ) { \
+         astError( AST__BDPAR, "astRebinSeq"#X"(%s): The AST__GENVAR flag " \
+                   "was specified but no output variance array was supplied " \
+                   "(programming error)." ); \
       } \
    } \
 \
@@ -15973,9 +16017,14 @@ static int SpecialBounds( const MapData *mapdata, double *lbnd, double *ubnd,
 *        - AST__USEBAD: indicates whether there are "bad" (i.e. missing) data 
 *        in the input array(s) which must be recognised.  If this flag is not 
 *        set, all input values are treated literally.
-*        - AST__GENVAR: Indicates that any input variances are to be
-*        ignored, and that the output variances should be generated from
-*        the spread of values contributing to each output pixel.
+*        - AST__GENVAR: Indicates that output variances should be generated 
+*        from the spread of values contributing to each output pixel.
+*        - AST__USEVAR: Indicates that output variances should be generated 
+*        by rebinning the input variances.
+*        - AST__VARWGT: Indicates that input variances should be used to
+*        create weights for the input data values.
+*
+*        Only one of AST__GENVAR and AST__USEVAR should be supplied.
 *     badval
 *        If the AST__USEBAD flag is set in the "flags" value (above),
 *        this parameter specifies the value which is used to identify
@@ -16118,9 +16167,14 @@ static void SpreadKernel1##X( AstMapping *this, int ndim_out, \
 \
 /* Determine if we are processing bad pixels or variances. */ \
       usebad = flags & AST__USEBAD; \
-      genvar = ( flags & AST__GENVAR ) && out_var && work; \
+      usevar = 0; \
+      genvar = 0; \
+      if( flags & AST__GENVAR ) { \
+         genvar = out_var && work; \
+      } else if( flags & AST__USEVAR ) { \
+         usevar = in_var && out_var; \
+      } \
       varwgt = ( flags & AST__VARWGT ) && in_var && work; \
-      usevar = !genvar && in_var && out_var; \
 \
 /* Handle the 1-dimensional case optimally. */ \
 /* ---------------------------------------- */ \
@@ -17093,9 +17147,14 @@ static void SpreadLinear##X( int ndim_out, \
 \
 /* Determine if we are processing bad pixels or variances. */ \
    usebad = flags & AST__USEBAD; \
-   genvar = ( flags & AST__GENVAR ) && out_var && work; \
+   usevar = 0; \
+   genvar = 0; \
+   if( flags & AST__GENVAR ) { \
+      genvar = out_var && work; \
+   } else if( flags & AST__USEVAR ) { \
+      usevar = in_var && out_var; \
+   } \
    varwgt = ( flags & AST__VARWGT ) && in_var && work; \
-   usevar = !genvar && in_var && out_var; \
 \
 /* Handle the 1-dimensional case optimally. */ \
 /* ---------------------------------------- */ \
@@ -17781,9 +17840,14 @@ MAKE_SPREAD_LINEAR(I,int,1)
 *        - AST__USEBAD: indicates whether there are "bad" (i.e. missing) data 
 *        in the input array(s) which must be recognised.  If this flag is not 
 *        set, all input values are treated literally.
-*        - AST__GENVAR: Indicates that any input variances are to be
-*        ignored, and that the output variances should be generated from
-*        the spread of values contributing to each output pixel.
+*        - AST__GENVAR: Indicates that output variances should be generated 
+*        from the spread of values contributing to each output pixel.
+*        - AST__USEVAR: Indicates that output variances should be generated 
+*        by rebinning the input variances.
+*        - AST__VARWGT: Indicates that input variances should be used to
+*        create weights for the input data values.
+*
+*        Only one of AST__GENVAR and AST__USEVAR should be supplied.
 *     badval
 *        If the AST__USEBAD flag is set in the "flags" value (above),
 *        this parameter specifies the value which is used to identify
@@ -17875,9 +17939,14 @@ static void SpreadNearest##X( int ndim_out, \
 \
 /* Determine if we are processing bad pixels or variances. */ \
    usebad = flags & AST__USEBAD; \
-   genvar = ( flags & AST__GENVAR ) && out_var && work; \
+   usevar = 0; \
+   genvar = 0; \
+   if( flags & AST__GENVAR ) { \
+      genvar = out_var && work; \
+   } else if( flags & AST__USEVAR ) { \
+      usevar = in_var && out_var; \
+   } \
    varwgt = ( flags & AST__VARWGT ) && in_var && work; \
-   usevar = !genvar && in_var && out_var; \
 \
 /* Handle the 1-dimensional case optimally. */ \
 /* ---------------------------------------- */ \
