@@ -816,8 +816,10 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *     30-APR-2008 (DSB):
 *        SetValue changed so that new keywords are inserted before the
 *        current card.
-*     1_MAY-2008 (DSB):
+*     1-MAY-2008 (DSB):
 *        Added UndefRead warning.
+*     7-MAY-2008 (DSB):
+*        Correct conversion of CDi_j to PCi_j/CDELT in SpecTrans.
 *class--
 */
 
@@ -23690,10 +23692,12 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    double lambda;                 /* Ratio of CDELTs */
    double projp;                  /* Projection parameter value */
    double restfreq;               /* Rest frequency (Hz) */
+   double rowsum2;                /* Sum of squared CDi_j row elements */
    double sinrota;                /* Sin( CROTA ) */
    int *mp;                       /* Pointer to next projection parameter index */
    int axlat;                     /* Index of latitude axis */
    int axlon;                     /* Index of longitude axis */
+   int diag;                      /* Sign of diagonal CDi_j element */
    int gotpcij;                   /* Does FitsChan contain any PCi_j keywords? */
    int i,j;                       /* Indices */
    int jlo;                       /* Lowest axis index */
@@ -23957,6 +23961,26 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 /* Do each row in the matrix. */
             for( j = 0; j < naxis; j++ ){
  
+/* First find the sum of the squared elements in the row. and note the
+   sign of the diagonal element. */
+               rowsum2 = 0.0;
+               diag = +1;
+               for( i = 0; i < naxis; i++ ){
+                  if( GetValue2( ret, this, FormatKey( "CD", j + 1, i + 1, s ),
+                                  AST__FLOAT, (void *) &dval, 0, method, class ) ){
+                     rowsum2 += dval*dval;
+                     if( i == j ) diag = ( dval >= 0.0 ) ? +1 : -1;
+                  }
+               }
+
+/* The CDELT value for this row will be the length of the row vector. This means that 
+   each row will be a unit vector when converted to PCi_j form, and the CDELT will 
+   give a real indication of the pixel size. Ensure that the diagonal
+   PCi+j element has a positive sign. */
+               cdelti = sqrt( rowsum2 )*diag;
+               SetValue( ret, FormatKey( "CDELT", j + 1, -1, s ),
+                         (void *) &cdelti, AST__FLOAT, NULL );
+               
 /* Do each column in the matrix. */
                for( i = 0; i < naxis; i++ ){
  
@@ -23967,13 +23991,9 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                      dval = 0.0;
                   }
 
-/* Save it with name PCj_i, and ensure a CDELT of 1.0 (the default) is
-   used. This will over-ride any extraneous CDELT value which may be 
-   included in the header. */
+/* Divide by the rows cdelt value and save it with name PCj_i. */
+                  if( cdelti != 0.0 ) dval /= cdelti;
                   SetValue( ret, FormatKey( "PC", j + 1, i + 1, s ),
-                            (void *) &dval, AST__FLOAT, NULL );
-                  dval = 1.0;
-                  SetValue( ret, FormatKey( "CDELT", j + 1, -1, s ),
                             (void *) &dval, AST__FLOAT, NULL );
                   gotpcij = 1;
                }
