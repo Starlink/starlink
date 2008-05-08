@@ -1,8 +1,17 @@
 1 NCAR - graphics library
                                                    expires: 99.??.??
 
+  V1.3-2:
+
+  Routines from SNX that replace NCAR calls or access the NCAR common
+  blocks have been moved into the NCAR package. This is for various
+  technical reasons. The linker scripts have been changed, if you
+  want to link against the SNX variant of NCAR you need to supply
+  the -snx flag. Note that snx_link and snx_link_adam do this
+  automatically so this change should be hidden.
+
   This is NCAR v1.3-1,  a maintenance release which provides a hypertext
   version of SUN/88 (`showme sun88' or `findme ncar').
 
-  There ar eno code changes.
+  There are no code changes.
 

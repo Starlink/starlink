@@ -21,9 +21,10 @@ dist_bin_SCRIPTS = ncar_link ncar_link_adam
 # This is the standalone version that can be used when SNX is not in use
 libncar_la_SOURCES = $(F_ROUTINES) $(NONSNX_F_ROUTINES) $(BLOCKDATA_ROUTINES) $(FPP_ROUTINES)
 
-# This version of the library should be used for snx since it lacks
-# the override functions. Do not link this and libncar at the same time
-libncar_snx_la_SOURCES = $(F_ROUTINES) $(BLOCKDATA_ROUTINES) $(FPP_ROUTINES)
+# This version of the library should be used for SNX since it contains the
+# SNX override functions, along with those that access the NCAR common-blocks.
+# Do not link this and libncar at the same time
+libncar_snx_la_SOURCES = $(F_ROUTINES) $(SNX_F_ROUTINES) $(BLOCKDATA_ROUTINES) $(FPP_ROUTINES)
 
 libncar_conrecqck_la_SOURCES = conrecqck.f
 libncar_conrecsupr_la_SOURCES = conrecsupr.f
@@ -33,8 +34,7 @@ libncar_dashsupr_la_SOURCES = dashsupr.f
 libncar_conras_la_SOURCES = conras.f
 libncar_conpms_la_SOURCES = conpms.f
 
-# Make all library code position independent. DIPSO creates a shareable
-# library that includes this code.
+# Make all library code position independent.
 if !NOPIC
 libncar_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
 libncar_snx_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
@@ -54,7 +54,14 @@ stardocs_DATA = @STAR_LATEX_DOCUMENTATION@
 
 # Source files
 
+# Routines overridden by SNX equivalents.
 NONSNX_F_ROUTINES = agpwrt.f agchnl.f
+
+# SNX routines that match above and that access the SNX common blocks
+# (moved here as that is not allowed for shareable libraries).
+SNX_F_ROUTINES = snx_agchnlz.f snx_agpwritx.f snx_agcs.f snx_agguy.f \
+snx_agsav.f snx_agugy.f snx_aggux.f snx_agres.f snx_agugx.f snx_chset.f
+
 
 F_ROUTINES = agaxis.f agback.f agbnch.f agchax.f agchcu.f agchil.f \
 agctcs.f agctko.f agcurv.f agdash.f agdflt.f agdlch.f agdshn.f \
@@ -115,7 +122,7 @@ convrt_SOURCES = $(CONVRT_ROUTINES)
 CONVRT_ROUTINES = convrt.f
 
 pcrbin_SOURCES = $(PWRITX_ROUTINES)
-pcrbin_LDADD = libncar.la
+pcrbin_LDADD = libncar.la `gks_link`
 PWRITX_ROUTINES = pcrbin.f
 
 ezmap.dat: convrt
@@ -142,34 +149,3 @@ CLEANFILES = pwritx.dat ezmap.dat
 dist_starnews_DATA = ncar.news
 
 EXTRA_DIST = ncar.h
-
-#  Form second links to the main object library (static and shared). This is 
-#  used when a second pass through the library is needed during linking.
-#  Do not forget to change the contents of the libncar_pass2.la file to refer
-#  to the pass2 libraries rather than the original libraries. Use target 
-#  install-exec-hook rather than install-exec-local so that the soft links 
-#  and files are created *after* the main library has been installed. 
-install-exec-hook: libncar.la
-	$(mkdir_p) $(DESTDIR)$(libdir) 
-	cd $(DESTDIR)$(libdir); \
-	for f in `ls libncar.*`; do \
-	  ff=`echo $$f | sed -e 's/libncar/libncar_pass2/'`; \
-	  if test -f "$$ff"; then rm "$$ff"; fi; \
-	  $(LN_S) $$f $$ff; \
-	  $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(libdir)/$$ff" || :; \
-	done; \
-	if test -f "libncar.la"; then \
-	  if test -f "libncar_pass2.la"; then rm "libncar_pass2.la"; fi; \
-	  sed -e 's/libncar/libncar_pass2/g' libncar.la > libncar_pass2.la; \
-	fi
-	cd $(DESTDIR)$(libdir); \
-	for f in `ls libncar_snx.*`; do \
-	  ff=`echo $$f | sed -e 's/libncar_snx/libncar_snx_pass2/'`; \
-	  if test -f "$$ff"; then rm "$$ff"; fi; \
-	  $(LN_S) $$f $$ff; \
-	  $(MANIFEST) && echo "MANIFEST:$(DESTDIR)$(libdir)/$$ff" || :; \
-	done; \
-	if test -f "libncar_snx.la"; then \
-	  if test -f "libncar_snx_pass2.la"; then rm "libncar_snx_pass2.la"; fi; \
-	  sed -e 's/libncar_snx/libncar_snx_pass2/g' libncar_snx.la > libncar_snx_pass2.la; \
-	fi

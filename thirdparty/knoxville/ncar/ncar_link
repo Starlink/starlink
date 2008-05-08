@@ -15,11 +15,11 @@
 
 #  Description:
 #     This script should be invoked when linking against the NCAR library.
-#     Use the -star option when linking with SNX and pass in the replacement
-#     SNX routines as the second argument (-lsnx_ncar usually).
+#     Use the -snx option when linking with SNX.
 
 #  Copyright:
 #     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2008 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -49,28 +49,25 @@
 #      19-MAR-2007 (PWD):
 #         Add option to include replacement (SNX) routines so that 
 #         their dependencies are resolved in a second pass.
+#      08-MAY-2008 (PWD):
+#         Introduce local SNX routines to avoid common block access
+#         issues in shareable libraries. Also make replacement routines
+#         local to simplify the above.
 #     {enter_further_changes_here}
 
 #-
 
 #  Initialise linking options (default to non-Starlink)
-      star='-lncar'
-      starpass2=''
+      libs='-lncar'
 
 #  Interpret command line switches.
 #  --------------------------------
       while :; do
          case "${1}" in
 
-#  -star - Requests linking with Starlink extensions
-#          This means we do not include the routines used by SNX and expect 
-#          that those will be supplied as a library given as argument 2.
-         -star)
-            star="-lncar_snx"
-            starpass2="$2 -lncar_snx_pass2"
-            if test "$2" != ""; then
-               shift
-            fi
+#  -snx -  Requests linking with Starlink extensions
+         -snx)
+            libs="-lncar_snx"
             shift;;
 
 #  Once all switches have been read, continue with the rest of the script.
@@ -84,7 +81,7 @@
       done
 
 
-      echo $star `gks_link` $starpass2 \
+      echo $libs `gks_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
