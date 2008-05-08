@@ -12,7 +12,7 @@ nodist_bin_SCRIPTS = dipsosetup dipso_link my_dipso dipsosetup.sh
 
 dist_bin_SCRIPTS = dipsotest
 
-noinst_LTLIBRARIES = libdipso.la
+lib_LTLIBRARIES = libdipso.la
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 
