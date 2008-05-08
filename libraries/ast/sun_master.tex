@@ -18689,6 +18689,7 @@ Object             - Base class for all AST Objects
    Channel         - Basic (textual) I/O channel
       FitsChan     - I/O Channel using FITS header cards
       XmlChan      - I/O Channel using XML
+   KeyMap          - Store a set of key/value pairs
    Mapping         - Inter-relate two coordinate systems
       CmpMap       - Compound Mapping
       DssMap       - Map points using Digitised Sky Survey plate solution
@@ -18722,14 +18723,17 @@ Object             - Base class for all AST Objects
       LutMap       - Transform 1-dimensional coordinates using a lookup table
       MathMap      - Transform coordinates using mathematical expressions
       MatrixMap    - Map positions by multiplying them by a matrix
+      NormMap      - Normalise coordinates using a supplied Frame
       PcdMap       - Apply 2-dimensional pincushion/barrel distortion
       PermMap      - Coordinate permutation Mapping
       PolyMap      - General N-dimensional polynomial Mapping
       RateMap      - Calculates an element of a Mapping's Jacobian matrix 
+      SelectorMap  - Locates positions within a set of Regions
       ShiftMap     - Shifts each axis by a constant amount
       SlaMap       - Sequence of celestial coordinate conversions
       SpecMap      - Sequence of spectral coordinate conversions
       SphMap       - Map 3-d Cartesian to 2-d spherical coordinates
+      SwitchMap    - Encapuslates a set of alternate Mappings
       TimeMap      - Sequence of time coordinate conversions
       TranMap      - Combine fwd. and inv. transformations from two Mappings
       UnitMap      - Unit (null) Mapping
