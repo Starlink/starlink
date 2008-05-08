@@ -195,6 +195,7 @@ static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
 static int *MapSplit1( AstMapping *, int, int *, AstMapping ** );
 static int CountMappings( AstMapping * );
 static int Equal( AstObject *, AstObject * );
+static int GetIsLinear( AstMapping * );
 static int MapList( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int PatternCheck( int, int, int **, int * );
@@ -338,6 +339,39 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 /* Return the result, */
    return result;
+}
+
+static int GetIsLinear( AstMapping *this_mapping ){
+/*
+*  Name:
+*     GetIsLinear
+
+*  Purpose:
+*     Return the value of the IsLinear attribute for a CmpMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void GetIsLinear( AstMapping *this )
+
+*  Class Membership:
+*     CmpMap member function (over-rides the protected astGetIsLinear
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns the value of the IsLinear attribute for a
+*     Frame, which is one if both component Mappings have a value of 1
+*     for the IsLinear attribute.
+
+*  Parameters:
+*     this
+*        Pointer to the CmpqMap.
+*/
+   AstCmpMap *this;
+   this = (AstCmpMap *) this_mapping;
+   return astGetIsLinear( this->map1 ) && astGetIsLinear( this->map2 );
 }
 
 static int GetObjSize( AstObject *this_object ) {
@@ -748,6 +782,7 @@ void astInitCmpMapVtab_(  AstCmpMapVtab *vtab, const char *name ) {
    mapping->MapMerge = MapMerge;
    mapping->Simplify = Simplify;
    mapping->Rate = Rate;
+   mapping->GetIsLinear = GetIsLinear;
 
 /* Declare the copy constructor, destructor and class dump function. */
    astSetCopy( vtab, Copy );

@@ -219,6 +219,7 @@ static int Equal( AstObject *, AstObject * );
 static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
 static int Ustrcmp( const char *, const char * );
 static int GetTranForward( AstMapping * );
+static int GetIsLinear( AstMapping * );
 static int GetTranInverse( AstMapping * );
 static int CanSwap( AstMapping *, AstMapping *, int, int, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
@@ -1041,6 +1042,36 @@ static int FindString( int n, const char *list[], const char *test,
    return ret;
 }
 
+static int GetIsLinear( AstMapping *this_mapping ){
+/*
+*  Name:
+*     GetIsLinear
+
+*  Purpose:
+*     Return the value of the IsLinear attribute for a MatrixMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void GetIsLinear( AstMapping *this )
+
+*  Class Membership:
+*     MatrixMap member function (over-rides the protected astGetIsLinear
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns the value of the IsLinear attribute for a
+*     Frame, which is always one.
+
+*  Parameters:
+*     this
+*        Pointer to the MatrixMap.
+*/
+   return 1;
+}
+
 static int Ustrcmp( const char *a, const char *b ){
 /*
 *  Name:
@@ -1198,6 +1229,7 @@ void astInitMatrixMapVtab_(  AstMatrixMapVtab *vtab, const char *name ) {
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    object->Equal = Equal;
+   mapping->GetIsLinear = GetIsLinear;
    mapping->GetTranForward = GetTranForward;
    mapping->GetTranInverse = GetTranInverse;
    mapping->MapMerge = MapMerge;

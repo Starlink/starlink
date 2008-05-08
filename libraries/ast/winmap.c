@@ -182,6 +182,7 @@ static const char *GetAttrib( AstObject *, const char * );
 static double Rate( AstMapping *, double *, int, int );
 static int CanSwap( AstMapping *, AstMapping *, int, int, int * );
 static int Equal( AstObject *, AstObject * );
+static int GetIsLinear( AstMapping * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int TestAttrib( AstObject *, const char * );
 static int WinTerms( AstWinMap *, double **, double ** );
@@ -562,6 +563,36 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
    return result;
 }
 
+static int GetIsLinear( AstMapping *this_mapping ){
+/*
+*  Name:
+*     GetIsLinear
+
+*  Purpose:
+*     Return the value of the IsLinear attribute for a WinMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void GetIsLinear( AstMapping *this )
+
+*  Class Membership:
+*     WinMap member function (over-rides the protected astGetIsLinear
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns the value of the IsLinear attribute for a
+*     Frame, which is always one.
+
+*  Parameters:
+*     this
+*        Pointer to the WinMap.
+*/
+   return 1;
+}
+
 static int GetObjSize( AstObject *this_object ) {
 /*
 *  Name:
@@ -782,6 +813,7 @@ void astInitWinMapVtab_(  AstWinMapVtab *vtab, const char *name ) {
    mapping->MapMerge = MapMerge;
    mapping->MapSplit = MapSplit;
    mapping->Rate = Rate;
+   mapping->GetIsLinear = GetIsLinear;
 
 /* Declare the class dump, copy and delete functions.*/
    astSetDump( vtab, Dump, "WinMap", "Map one window on to another" );

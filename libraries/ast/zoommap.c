@@ -133,7 +133,9 @@ AstZoomMap *astZoomMapId_( int, double, const char *, ... );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *GetAttrib( AstObject *, const char * );static double GetZoom( AstZoomMap * );
 static double Rate( AstMapping *, double *, int, int);
+static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
 static int Equal( AstObject *, AstObject * );
+static int GetIsLinear( AstMapping * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int TestAttrib( AstObject *, const char * );
 static int TestZoom( AstZoomMap * );
@@ -142,7 +144,6 @@ static void ClearZoom( AstZoomMap * );
 static void Dump( AstObject *, AstChannel * );
 static void SetAttrib( AstObject *, const char * );
 static void SetZoom( AstZoomMap *, double );
-static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
 
 /* Member functions. */
 /* ================= */
@@ -380,6 +381,36 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 #undef BUFF_LEN
 }
 
+static int GetIsLinear( AstMapping *this_mapping ){
+/*
+*  Name:
+*     GetIsLinear
+
+*  Purpose:
+*     Return the value of the IsLinear attribute for a ZoomMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void GetIsLinear( AstMapping *this )
+
+*  Class Membership:
+*     ZoomMap member function (over-rides the protected astGetIsLinear
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns the value of the IsLinear attribute for a
+*     Frame, which is always one.
+
+*  Parameters:
+*     this
+*        Pointer to the ZoomMap.
+*/
+   return 1;
+}
+
 void astInitZoomMapVtab_(  AstZoomMapVtab *vtab, const char *name ) {
 /*
 *+
@@ -465,6 +496,7 @@ void astInitZoomMapVtab_(  AstZoomMapVtab *vtab, const char *name ) {
    mapping->MapMerge = MapMerge;
    mapping->MapSplit = MapSplit;
    mapping->Rate = Rate;
+   mapping->GetIsLinear = GetIsLinear;
 
 /* Declare the class dump function. There is no copy constructor or
    destructor. */

@@ -133,6 +133,7 @@ static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void SetAttrib( AstObject *, const char * );
 static int Equal( AstObject *, AstObject * );
+static int GetIsLinear( AstMapping * );
 static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
 
 /* Function Macros */
@@ -295,6 +296,36 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 /* Return the result, */
    return result;
+}
+
+static int GetIsLinear( AstMapping *this_mapping ){
+/*
+*  Name:
+*     GetIsLinear
+
+*  Purpose:
+*     Return the value of the IsLinear attribute for a ShiftMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void GetIsLinear( AstMapping *this )
+
+*  Class Membership:
+*     ShiftMap member function (over-rides the protected astGetIsLinear
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns the value of the IsLinear attribute for a
+*     Frame, which is always one.
+
+*  Parameters:
+*     this
+*        Pointer to the ShiftMap.
+*/
+   return 1;
 }
 
 static int GetObjSize( AstObject *this_object ) {
@@ -515,6 +546,7 @@ void astInitShiftMapVtab_(  AstShiftMapVtab *vtab, const char *name ) {
    mapping->MapMerge = MapMerge;
    mapping->Rate = Rate;
    mapping->MapSplit = MapSplit;
+   mapping->GetIsLinear = GetIsLinear;
 
 /* Declare the class dump, copy and delete functions.*/
    astSetDump( vtab, Dump, "ShiftMap", "Shift each coordinate axis" );

@@ -413,6 +413,7 @@ typedef struct AstMappingVtab {
    int (* GetReport)( AstMapping * );
    int (* GetTranForward)( AstMapping * );
    int (* GetTranInverse)( AstMapping * );
+   int (* GetIsLinear)( AstMapping * );
    int (* LinearApprox)( AstMapping *, const double *, const double *, double, double * );
    int (* MapMerge)( AstMapping *, int, int, int *, AstMapping ***, int ** );
    void (* RebinD)( AstMapping *, double, int, const int [], const int [], const double [], const double [], int, const double [], int, double, int, double, int, const int [], const int [], const int [], const int [], double [], double [] );
@@ -529,6 +530,7 @@ int astGetNout_( AstMapping * );
 int astGetReport_( AstMapping * );
 int astGetTranForward_( AstMapping * );
 int astGetTranInverse_( AstMapping * );
+int astGetIsLinear_( AstMapping * );
 int astMapMerge_( AstMapping *, int, int, int *, AstMapping ***, int ** );
 int astTestInvert_( AstMapping * );
 int astTestReport_( AstMapping * );
@@ -675,6 +677,8 @@ astINVOKE(V,astGetReport_(astCheckMapping(this)))
 astINVOKE(V,astGetTranForward_(astCheckMapping(this)))
 #define astGetTranInverse(this) \
 astINVOKE(V,astGetTranInverse_(astCheckMapping(this)))
+#define astGetIsLinear(this) \
+astINVOKE(V,astGetIsLinear_(astCheckMapping(this)))
 #define astMapList(this,series,invert,nmap,map_list,invert_list) \
 astINVOKE(V,astMapList_(this,series,invert,nmap,map_list,invert_list))
 #define astMapMerge(this,where,series,nmap,map_list,invert_list) \

@@ -4,7 +4,8 @@
 *     SelectorMap
 
 *  Purpose:
-*     Mapping with locates positions within one of a set of alternate Regions.
+*     A Mapping that locates positions within one of a set of alternate 
+*     Regions.
 
 *  Constructor Function:
 c     astSelectorMap

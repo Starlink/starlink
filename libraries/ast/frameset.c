@@ -809,6 +809,7 @@ static int GetCurrent( AstFrameSet * );
 static int GetDigits( AstFrame * );
 static int GetDirection( AstFrame *, int );
 static int GetActiveUnit( AstFrame * );
+static int GetIsLinear( AstMapping * );
 static int GetMatchEnd( AstFrame * );
 static int GetMaxAxes( AstFrame * );
 static int GetMinAxes( AstFrame * );
@@ -3993,6 +3994,54 @@ f     function is invoked with STATUS set to an error value, or if it
    return result;
 }
 
+static int GetIsLinear( AstMapping *this_mapping ){
+/*
+*  Name:
+*     GetIsLinear
+
+*  Purpose:
+*     Return the value of the IsLinear attribute for a FrameSet.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void GetIsLinear( AstMapping *this )
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astGetIsLinear
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns the value of the IsLinear attribute for a
+*     FrameSet, which is the IsLinear value of he base->current Mapping.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*/
+/* Local Variables: */
+   AstMapping *map;
+   int result;
+
+/* Check global status */
+   if( !astOK ) return 0;
+
+/* Get the Mapping. */
+   map = astGetMapping( (AstFrameSet *) this_mapping, AST__BASE, 
+                        AST__CURRENT );
+
+/* Get its IsLinear attribute value. */
+   result = astGetIsLinear( map );
+
+/* Free the Mapping. */
+   map = astAnnul( map );
+
+/* Return the result. */
+   return result;
+}
+
 static AstMapping *GetMapping( AstFrameSet *this, int iframe1, int iframe2 ) {
 /*
 *++
@@ -4774,6 +4823,7 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
    object->GetUseDefs = GetUseDefs;
    object->Equal = Equal;
 
+   mapping->GetIsLinear = GetIsLinear;
    mapping->GetNin = GetNin;
    mapping->GetNout = GetNout;
    mapping->GetTranForward = GetTranForward;

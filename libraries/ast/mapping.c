@@ -29,6 +29,8 @@
 *     Mapping also has the following attributes:
 *
 *     - Invert: Mapping inversion flag
+*     - IsLinear: Is the Mapping linear?
+*     - IsSimple: Has the Mapping been simplified?
 *     - Nin: Number of input coordinates for a Mapping
 *     - Nout: Number of output coordinates for a Mapping
 *     - Report: Report transformed coordinates?
@@ -411,6 +413,7 @@ static int GetIsSimple( AstMapping * );
 static int GetNin( AstMapping * );
 static int GetNout( AstMapping * );
 static int GetReport( AstMapping * );
+static int GetIsLinear( AstMapping * );
 static int GetTranForward( AstMapping * );
 static int GetTranInverse( AstMapping * );
 static int InterpolateKernel1B( AstMapping *, int, const int *, const int *, const signed char *, const signed char *, int, const int *, const double *const *, void (*)( double, const double *, int, double * ), int, const double *, int, signed char, signed char *, signed char * );
@@ -599,6 +602,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "nin" ) ||
                !strcmp( attrib, "nout" ) ||
                !strcmp( attrib, "issimple" ) ||
+               !strcmp( attrib, "islinear" ) ||
                !strcmp( attrib, "tranforward" ) ||
                !strcmp( attrib, "traninverse" ) ) {
       astError( AST__NOWRT, "astClear: Invalid attempt to clear the \"%s\" "
@@ -1535,6 +1539,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    AstMapping *this;             /* Pointer to the Mapping structure */
    const char *result;           /* Pointer value to return */
    int invert;                   /* Invert attribute value */
+   int islinear;                 /* IsLinear attribute value */
    int issimple;                 /* IsSimple attribute value */
    int nin;                      /* Nin attribute value */
    int nout;                     /* Nout attribute value */
@@ -1563,6 +1568,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
       invert = astGetInvert( this );
       if ( astOK ) {
          (void) sprintf( buff, "%d", invert );
+         result = buff;
+      }
+
+/* IsLinear. */
+/* --------- */
+   } else if ( !strcmp( attrib, "islinear" ) ) {
+      islinear = astGetIsLinear( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", islinear );
          result = buff;
       }
 
@@ -1631,6 +1645,48 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Undefine macros local to this function. */
 #undef BUFF_LEN
+}
+
+static int GetIsLinear( AstMapping *this ) {
+/*
+*+
+*  Name:
+*     astGetIsLinear
+
+*  Purpose:
+*     Determine if a Mapping is an instance of a linear Mapping class.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     int astGetIsLinear( AstMapping *this )
+
+*  Class Membership:
+*     Mapping method.
+
+*  Description:
+*     This function returns a value indicating whether a Mapping is
+*     a member of a class of linear Mappings. The base Mapping class
+*     returns a value of zero. Linear Mapping classes should over-ride
+*     this function to return a non-zero value.
+
+*  Parameters:
+*     this
+*        Pointer to the Mapping.
+
+*  Returned Value:
+*     One if the Mapping is a member of a linear Mapping class. Zero
+*     otherwise.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+   return 0;
 }
 
 static int GetNin( AstMapping *this ) {
@@ -2531,6 +2587,7 @@ void astInitMappingVtab_(  AstMappingVtab *vtab, const char *name ) {
    vtab->ClearReport = ClearReport;
    vtab->Decompose = Decompose;
    vtab->GetInvert = GetInvert;
+   vtab->GetIsLinear = GetIsLinear;
    vtab->GetIsSimple = GetIsSimple;
    vtab->GetNin = GetNin;
    vtab->GetNout = GetNout;
@@ -14991,6 +15048,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    if a read-only attribute has been specified. */
    } else if ( MATCH( "nin" ) ||
         MATCH( "nout" ) ||
+        MATCH( "islinear" ) ||
         MATCH( "issimple" ) ||
         MATCH( "tranforward" ) ||
         MATCH( "traninverse" ) ) {
@@ -18533,6 +18591,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    read-only attributes of this class. If it does, then return
    zero. */
    } else if ( !strcmp( attrib, "nin" ) ||
+        !strcmp( attrib, "islinear" ) ||
         !strcmp( attrib, "issimple" ) ||
         !strcmp( attrib, "nout" ) ||
         !strcmp( attrib, "tranforward" ) ||
@@ -21454,6 +21513,49 @@ astMAKE_TEST(Mapping,Invert,( this->invert != CHAR_MAX ))
 /*
 *att++
 *  Name:
+*     IsLinear
+
+*  Purpose:
+*     Is the Mapping linear?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean), read-only.
+
+*  Description:
+*     This attribute indicates whether a Mapping is an instance of a
+*     class that always represents a linear transformation. Note, some 
+*     Mapping classes can represent linear or non-linear transformations
+*     (the MathMap class for instance). Such classes have a zero value for 
+*     the IsLinear attribute. Specific instances of such classes can be
+*     tested for linearity using the
+*     astLinearApprox function.
+*     AST_LINEARAPPROX routine.
+
+*  Applicability:
+*     Mapping
+*        All Mappings have this attribute.
+*     CmpMap
+*        The IsLinear value for a CmpMap is determined by the classes
+*        of the encapsulated Mappings. For instance, a CmpMap that combines
+*        a ZoomMap and a ShiftMap will have a non-zero value for its IsLinear
+*        attribute, but a CmpMap that contains a MathMap will have a
+*        value of zero for its IsLinear attribute.
+*     Frame
+*        The IsLinear value for a Frame is 1 (since a Frame is equivalent
+*        to a UnitMap).
+*     FrameSet
+*        The IsLinear value for a FrameSet is obtained from the Mapping
+*        from the base Frame to the current Frame.
+
+*att--
+*/
+
+/*
+*att++
+*  Name:
 *     IsSimple
 
 *  Purpose:
@@ -22284,6 +22386,10 @@ int astGetNin_( AstMapping *this ) {
 int astGetNout_( AstMapping *this ) {
    if ( !astOK ) return 0;
    return (**astMEMBER(this,Mapping,GetNout))( this );
+}
+int astGetIsLinear_( AstMapping *this ) {
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Mapping,GetIsLinear))( this );
 }
 int astGetTranForward_( AstMapping *this ) {
    if ( !astOK ) return 0;

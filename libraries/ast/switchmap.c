@@ -4,7 +4,7 @@
 *     SwitchMap
 
 *  Purpose:
-*     Mapping with encapuslates a set of alternate Mappings.
+*     A Mapping that encapsulates a set of alternate Mappings.
 
 *  Constructor Function:
 c     astSwitchMap

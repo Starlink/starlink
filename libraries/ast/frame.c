@@ -726,6 +726,7 @@ static int DefaultMaxAxes( AstFrame * );
 static int DefaultMinAxes( AstFrame * );
 static int Equal( AstObject *, AstObject * );
 static int Fields( AstFrame *, int, const char *, const char *, int, char **, int *, double * );
+static int GetIsLinear( AstMapping * );
 static int GetIsSimple( AstMapping * );
 static int GetDigits( AstFrame * );
 static int GetDirection( AstFrame *, int );
@@ -4660,6 +4661,36 @@ static int GetFrameFlags( AstFrame *this ){
    return this->flags;
 }
 
+static int GetIsLinear( AstMapping *this_mapping ){
+/*
+*  Name:
+*     GetIsLinear
+
+*  Purpose:
+*     Return the value of the IsLinear attribute for a Frame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void GetIsLinear( AstMapping *this )
+
+*  Class Membership:
+*     Frame member function (over-rides the protected astGetIsLinear
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns the value of the IsLinear attribute for a
+*     Frame, which is always one because a Frame is treated like a UnitMap.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*/
+   return 1;
+}
+
 static int GetIsSimple( AstMapping *this_mapping ){
 /*
 *  Name:
@@ -5126,6 +5157,7 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name ) {
    mapping = (AstMappingVtab *) vtab;
 
    object->Equal = Equal;
+   mapping->GetIsLinear = GetIsLinear;
    mapping->GetIsSimple = GetIsSimple;
    mapping->GetNin = GetNin;
    mapping->GetNout = GetNout;

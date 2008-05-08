@@ -115,11 +115,12 @@ AstUnitMap *astUnitMapId_( int, const char *, ... );
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static int Equal( AstObject *, AstObject * );
-static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static double Rate( AstMapping *, double *, int, int );
-static void Dump( AstObject *, AstChannel * );
 static int *MapSplit( AstMapping *, int, int *, AstMapping ** );
+static int Equal( AstObject *, AstObject * );
+static int GetIsLinear( AstMapping * );
+static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
+static void Dump( AstObject *, AstChannel * );
 
 /* Member functions. */
 /* ================= */
@@ -190,6 +191,36 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
 /* Return the result, */
    return result;
+}
+
+static int GetIsLinear( AstMapping *this_mapping ){
+/*
+*  Name:
+*     GetIsLinear
+
+*  Purpose:
+*     Return the value of the IsLinear attribute for a UnitMap.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     void GetIsLinear( AstMapping *this )
+
+*  Class Membership:
+*     UnitMap member function (over-rides the protected astGetIsLinear
+*     method inherited from the Mapping class).
+
+*  Description:
+*     This function returns the value of the IsLinear attribute for a
+*     Frame, which is always one.
+
+*  Parameters:
+*     this
+*        Pointer to the UnitMap.
+*/
+   return 1;
 }
 
 void astInitUnitMapVtab_(  AstUnitMapVtab *vtab, const char *name ) {
@@ -266,6 +297,7 @@ void astInitUnitMapVtab_(  AstUnitMapVtab *vtab, const char *name ) {
    mapping->MapMerge = MapMerge;
    mapping->MapSplit = MapSplit;
    mapping->Rate = Rate;
+   mapping->GetIsLinear = GetIsLinear;
 
 /* Declare the class dump function. There is no copy constructor or
    destructor. */
