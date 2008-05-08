@@ -50,7 +50,7 @@
 #-
 
       echo `kaplibs_link_adam` \
-           `cat_link_adam` `snx_link_adam` `ncar_link_adam` \
+           `cat_link_adam` `snx_link_adam` \
            `idi_link_adam` `sgs_link_adam` `ndg_link_adam` \
            `gks_link_adam` `gwm_link_adam` `gns_link_adam` \
            `ndf_link_adam` \
