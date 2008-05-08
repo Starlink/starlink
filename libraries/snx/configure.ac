@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
  
 dnl    Initialisation: package name and version number
-AC_INIT(snx, 1.1-1, ussc@star.rl.ac.uk)
+AC_INIT(snx, 1.1-3, ussc@star.rl.ac.uk)
  
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -18,11 +18,8 @@ dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
  
 dnl    Find required versions of the programs we need for configuration
-dnl    Note we disable shared libraries by default, this is because SNX
-dnl    makes direct use of the NCAR common-blocks.
 AC_PROG_FC
 AC_PROG_FPP
-AC_DISABLE_SHARED
 AC_PROG_LIBTOOL
 
 AC_FC_OPEN_SPECIFIERS(readonly)

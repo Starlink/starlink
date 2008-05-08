@@ -1,2 +1,2 @@
-echo -lsnx `ncar_link_adam -star -lsnx_ncar` `sgs_link_adam` \
+echo -lsnx `ncar_link_adam -snx` `sgs_link_adam` \
 | awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'

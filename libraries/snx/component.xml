@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="snx" support="U">
-  <version>1.1-1</version>
+  <version>1.1-3</version>
   <path>libraries/snx</path>
   <description>Starlink extensions to the NCAR Graphics Utilities</description>
   <abstract><p> The NCAR graphics suite (SUN/88) consists of a set of
