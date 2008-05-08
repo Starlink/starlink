@@ -820,6 +820,9 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        Added UndefRead warning.
 *     7-MAY-2008 (DSB):
 *        Correct conversion of CDi_j to PCi_j/CDELT in SpecTrans.
+*     8-MAY-2008 (DSB):
+*        When writing out a FITS-WCS header, allow linear grid->WCS
+*        mapping to be represented by a CAR projection.
 *class--
 */
 
@@ -25433,6 +25436,8 @@ static int SplitMap( AstMapping *map, int invert, int ilon, int ilat,
    char card[ FITSCARDLEN + 1 ]; /* Buffer for header card */
    double **ptr1;          /* Pointer to pixel axis values */
    double **ptr2;          /* Pointer to WCS axis values */
+   double *iwc_origin;     /* Array holding IWC at pixel origin */
+   double *pix_origin;     /* Array holding pixel coords at pixel origin */
    double *w1;             /* Pointer to work space */
    int i;                  /* Loop index */
    int npix;               /* Number of pixel axes */
@@ -25478,6 +25483,47 @@ static int SplitMap( AstMapping *map, int invert, int ilon, int ilat,
          }
       }
    } 
+
+/* If the above failed to find a suitable WcsMap, we now consider cases
+   where the pixel->WCS mapping is linear. We can invent a CAR projection
+   WcsMap for such cases. We use a ShiftMap to move the origin of the
+   longitude IWC axis to a sensible value (it is left at zero otherwise).
+   We cannot do this with the latitude axis since pre-FITS-WCS fits
+   readers could not handle the resulting rotation from native to celestial
+   coords. */
+   if( !ret && astGetIsLinear( map ) ) {
+      nwcs = astGetNout( map );
+      npix = astGetNin( map );
+      iwc_origin = astMalloc( sizeof( double )*nwcs );
+      pix_origin = astMalloc( sizeof( double )*npix );
+
+      if( astOK ) {
+
+         for( i = 0; i < npix; i++ ) pix_origin[ i ] = 0.0;
+         astTranN( map, 1, npix, 1, pix_origin, 1, nwcs, 1, iwc_origin );
+
+         for( i = 0; i < nwcs; i++ ) {
+            if( i != ilon ) {
+               iwc_origin[ i ] = 0.0;
+            } else {
+               iwc_origin[ i ] *= -1;
+            }
+         }
+         mapa = (AstMapping *) astShiftMap( nwcs, iwc_origin, "" );
+
+         *map1 = (AstMapping *) astCmpMap( map, mapa, 1, "" );
+         *map2 = astWcsMap( nwcs, AST__CAR, ilon + 1, ilat + 1, "Invert=1" );
+
+         astInvert( mapa );
+         *map3 = astClone( mapa );
+
+         mapa = astAnnul( mapa );
+         ret = 1;
+      }
+
+      iwc_origin = astFree( iwc_origin );
+      pix_origin = astFree( pix_origin );
+   }
 
 /* If the above failed to find a suitable WcsMap, we now consider cases
    where the output (long,lat) values are constants supplied by a
