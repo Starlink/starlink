@@ -59,7 +59,7 @@ c     - astTranP: Transform N-dimensional coordinates held in separate arrays
 f     - AST_DECOMPOSE: Decompose a Mapping into two component Mappings
 f     - AST_TRANGRID: Transform a grid of positions
 f     - AST_INVERT: Invert a Mapping
-f     - AST_LINEARAPPOX: Calculate a linear approximation to a Mapping
+f     - AST_LINEARAPPROX: Calculate a linear approximation to a Mapping
 f     - AST_MAPBOX: Find a bounding box for a Mapping
 f     - AST_MAPSPLIT: Split a Mapping up into parallel component Mappings
 f     - AST_RATE: Calculate the rate of change of a Mapping output
@@ -6525,7 +6525,7 @@ f        The global status.
 
 *  Returned Value:
 c     astLinearApprox()
-f     AST_LINEARAPPOX = LOGICAL
+f     AST_LINEARAPPROX = LOGICAL
 *        If the forward transformation is sufficiently linear,
 c        a non-zero value is returned. Otherwise zero is returned 
 f        .TRUE is returned. Otherwise .FALSE. is returned
