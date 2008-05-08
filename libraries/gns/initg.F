@@ -329,7 +329,7 @@
   999 CONTINUE
 
       IF ( STATUS .NE. 0 .AND. NAMFNG .NE. ' ' ) THEN
-         CALL MSG_SETC( 'FILENAME', NAMFNG )
+         CALL EMS_SETC( 'FILENAME', NAMFNG )
          CALL EMS_REP( 'GNS_INITG_NAMESFILE',
      :                 'GNS names database: ^FILENAME', STATUS )
       END IF
