@@ -211,6 +211,9 @@
 *     2008-04-24 (AGG):
 *        - Write out FOCUS parameters
 *        - Remove obstype from API as it is in obs struct
+*     2008-05-07 (AGG):
+*        Set seqstart/end from beginning of observation, not just
+*        within current subscan
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -337,6 +340,7 @@ int *status              /* Global status (given and returned) */
    double *rdata;                  /* Pointer to flatfielded data */
    char recipe[30];                /* Name of default ORAC-DR recipe */
    int seqend;                     /* RTS index of last frame in output image */
+   int seqoffset;
    int seqstart;                   /* RTS index of first frame in output image */
    JCMTState state;                /* Dummy JCMT state structure for creating WCS */
    int subnum;                     /* sub array index */
@@ -702,6 +706,7 @@ int *status              /* Global status (given and returned) */
      }
 
      /* Loop over number of images */
+     seqoffset = (nsubscan-1)*nimage/(inx->steptime) + 1;
      for ( k=0; k<nsubim; k++ ) {
        /* Initialize sums to zero */
        for ( i=0; i<framesize; i++ ) {
@@ -753,9 +758,9 @@ int *status              /* Global status (given and returned) */
        astSetD( wcs, "SkyRef(2)", head[seqstart].tcs_az_ac2 );
        astSetC( wcs, "SYSTEM", cosys );
 
-       /* Increment seqstart/end for FITS header */
-       seqstart++;
-       seqend++;
+       /* Set seqstart/end for FITS header */
+       seqstart += seqoffset;
+       seqend += seqoffset;
 
        /* First time round the loop the SEQSTART/END headers won't
 	  exist so just write them. Plus there is no need to change
