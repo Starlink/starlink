@@ -505,6 +505,10 @@ void smf_rebincube_ast( smfData *data, int first, int last, int *ptime,
    output arrays). */
       fullmap = (AstMapping *) astPermMap( 2, NULL, 3, NULL, NULL, "" );
 
+/* Exclude flags that require access to the input variances. */
+      ast_flags = AST__USEBAD;
+      if( genvar == 1 ) ast_flags = ast_flags | AST__GENVAR;
+
 /* Normalise the data values. */
       astRebinSeqF( fullmap, 0.0, 2, lbnd_in, ubnd_in, NULL, NULL, spread, 
                     params, AST__REBINEND | ast_flags, 0.0, 50, VAL__BADR, 
