@@ -449,6 +449,10 @@
 *        Remove unused variable and wrapped long lines (including code).
 *     30-MAY-2006 (DSB):
 *        Changed ATL1_ prefix to ATL_.
+*     8-MAY-2008 (DSB):
+*        Negate the scale factors for any axis that is normally displayed
+*        reversed. This prevents the RA axis in an (RA,Dec) image being 
+*        flipped after regridding.
 *     {enter_further_changes_here}
 
 *-
@@ -475,6 +479,7 @@
       EXTERNAL AST_ISAMAPPING
 
 *  Local Variables:
+      CHARACTER ATTRIB * ( 15 )  ! Attribute name
       CHARACTER DTYPE * ( NDF__SZFTP ) ! Full data type name
       CHARACTER ITYPE * ( NDF__SZTYP ) ! HDS Data type name
       CHARACTER METHOD * ( 16 )  ! Name of resampling scheme
@@ -832,6 +837,17 @@
                   SCEQU = .TRUE.
                ELSE IF( SCALE( I ) .NE. SCVAL ) THEN
                   SCEQU = .FALSE.
+               END IF
+
+
+
+*  If the axis is normally displayed reversed (e.g. RA), negate the scale 
+*  factor. Without this an (RA,Dec) image would end up with Dec upwards
+*  and RA increasing to the right.
+               ATTRIB = 'Direction(1)'
+               ATTRIB( 11 : 11 ) = CHAR( ICHAR( '0' ) + I )
+               IF( .NOT. AST_GETL( WCSI, ATTRIB, STATUS ) ) THEN
+                  SCALE( I ) = -SCALE( I )
                END IF
                   
             END DO
