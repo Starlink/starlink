@@ -11387,7 +11387,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
       if( astOK ) { \
          astError( AST__BDPAR, "astRebinSeq"#X"(%s): Incompatible flags " \
                    "AST__GENVAR and AST__USEVAR have been specified " \
-                   "together (programming error)." ); \
+                   "together (programming error).", astGetClass( this ) ); \
       } \
    } \
 \
@@ -11397,11 +11397,11 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
       if( ( flags & AST__USEVAR ) ) { \
          astError( AST__BDPAR, "astRebinSeq"#X"(%s): The AST__USEVAR flag " \
                    "was specified but no input variance array was supplied " \
-                   "(programming error)." ); \
+                   "(programming error).", astGetClass( this )  ); \
       } else if( ( flags & AST__VARWGT ) ) { \
          astError( AST__BDPAR, "astRebinSeq"#X"(%s): The AST__VARWGT flag " \
                    "was specified but no input variance array was supplied " \
-                   "(programming error)." ); \
+                   "(programming error).", astGetClass( this )  ); \
       } \
    } \
 \
@@ -11411,11 +11411,11 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
       if( ( flags & AST__USEVAR ) ) { \
          astError( AST__BDPAR, "astRebinSeq"#X"(%s): The AST__USEVAR flag " \
                    "was specified but no output variance array was supplied " \
-                   "(programming error)." ); \
+                   "(programming error).", astGetClass( this )  ); \
       } else if( ( flags & AST__GENVAR ) ) { \
          astError( AST__BDPAR, "astRebinSeq"#X"(%s): The AST__GENVAR flag " \
                    "was specified but no output variance array was supplied " \
-                   "(programming error)." ); \
+                   "(programming error).", astGetClass( this )  ); \
       } \
    } \
 \
