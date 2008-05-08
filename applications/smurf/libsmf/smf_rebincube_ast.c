@@ -163,6 +163,9 @@
 *        Use nearest neighbour interpolation with the "detlut" LutMap.
 *     11-OCT-2007 (DSB):
 *        Added parameter "ptime".
+*     8-MAY-2008 (DSB):
+*        Use AST__USEVAR flag with astRebinSeq if output variances are
+*        based on input noise temperatures.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -297,7 +300,12 @@ void smf_rebincube_ast( smfData *data, int first, int last, int *ptime,
    AST__REBININIT because the arrays have been initialised). */
    ast_flags = AST__USEBAD;
    if( usewgt ) ast_flags = ast_flags | AST__VARWGT;
-   if( genvar == 1 ) ast_flags = ast_flags | AST__GENVAR;
+
+   if( genvar == 1 ) {
+      ast_flags = ast_flags | AST__GENVAR;
+   } else if( genvar == 2 ) {
+      ast_flags = ast_flags | AST__USEVAR;
+   }
 
 /* If required, allocate a work array to hold all the input variances for a 
    single time slice. */
