@@ -823,6 +823,8 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *     8-MAY-2008 (DSB):
 *        When writing out a FITS-WCS header, allow linear grid->WCS
 *        mapping to be represented by a CAR projection.
+*     9-MAY-2008 (DSB):
+*        Make class variables IgnoreUsed and MarkNew static.
 *class--
 */
 
@@ -1146,12 +1148,12 @@ static AstTimeFrame *timeframe = NULL;
    have been removed from the FitsChan). If 1, then cards which have been 
    "definitely used" will be skipped over. If zero then no cards will be 
    skipped over. */
-int IgnoreUsed;
+static int IgnoreUsed;
 
 /* MarkNew: If non-zero, then all cards added to the FitsChan will be
    marked with both the NEW1 and NEW2 flags (see above). If zero then 
    new cards will not be marked with either NEW1 or NEW2. */
-int MarkNew;
+static int MarkNew;
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
