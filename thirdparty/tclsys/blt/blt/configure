@@ -7272,7 +7272,8 @@ SIZEOF_INT="${ac_cv_sizeof_int}"
 
 
 
-for ac_func in strdup strcasecmp strncasecmp drand48 srand48 finite isnan nan
+
+for ac_func in strdup strcasecmp strncasecmp drand48 srand48 finite strtod isnan nan
 do
 as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $ac_func" >&5
@@ -7493,7 +7494,7 @@ else
   echo "$as_me:$LINENO: checking whether DBL_EPSILON can be computed" >&5
 echo $ECHO_N "checking whether DBL_EPSILON can be computed... $ECHO_C" >&6
   cat > conftest.$ac_ext <<EOF
-#line 7496 "configure"
+#line 7497 "configure"
 #include "confdefs.h"
 
 main () {

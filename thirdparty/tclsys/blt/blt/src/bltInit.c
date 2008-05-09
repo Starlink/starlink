@@ -295,7 +295,13 @@ MakeNaN(void)
 #endif /* _MSC_VER */
 
 #if !defined(__BORLANDC__) && !defined(_MSC_VER)
-#if defined(HAVE_NAN)
+#if defined(HAVE_STRTOD)
+static double
+MakeNaN(void)
+{
+    return strtod("NaN()",NULL);
+}
+#elif defined(HAVE_NAN)
 static double
 MakeNaN(void)
 {

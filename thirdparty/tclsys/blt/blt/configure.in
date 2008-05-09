@@ -306,7 +306,7 @@ AC_SUBST(SIZEOF_VOID_P)
 #
 # -----------------------------------------------------------------------
 
-AC_HAVE_FUNCS(strdup strcasecmp strncasecmp drand48 srand48 finite isnan nan)
+AC_HAVE_FUNCS(strdup strcasecmp strncasecmp drand48 srand48 finite strtod isnan nan)
 
 # For HPUX it's a little more complicated to search for isfinite
 AC_MSG_CHECKING([for isfinite])
