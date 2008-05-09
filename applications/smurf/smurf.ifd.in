@@ -178,6 +178,8 @@
 #         Change SIMFILE/OBSFILE to SIMPAR/OBSPAR for SKYNOISE
 #     24-APR-2008 (EC)
 #         Added MAXMEM to MAKEMAP
+#     09-MAY-2008 (AGG)
+#         Remove USEBAD parameter, set MAXMEM default to 2048 for MAKEMAP
 #     {enter_changes_here}
 
 #  Bugs:
@@ -349,10 +351,10 @@ package @PACKAGE@ {
 
 	 parameter maxmem {
 	    type _INTEGER
-	    vpath {PROMPT }
+	    vpath {DEFAULT }
 	    prompt {Maximum memory available for map-making in Mb}
 	    ppath GLOBAL CURRENT
-	    default 1024
+	    default 2048
 	    helpkey *
 	  }
 
@@ -391,13 +393,6 @@ package @PACKAGE@ {
             access WRITE
             dynamic yes
             prompt {Output NDF time series estimate of noise}
-            helpkey *
-          }
-
-          parameter usebad {
-            type _LOGICAL
-            vpath DEFAULT
-            default 1
             helpkey *
           }
 
