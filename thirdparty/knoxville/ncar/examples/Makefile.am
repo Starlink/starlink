@@ -13,7 +13,7 @@ tpwrzi tsrfac
 
 
 exampl_SOURCES = exampl.f
-exampl_LDADD = ../libncar.la ../libncar_dashsupr.la ../libncar_conpms.la `gks_link` `sgs_link`
+exampl_LDADD = ../libncar.la ../libncar_user.la ../libncar_dashsupr.la ../libncar_conpms.la `gks_link` `sgs_link`
 
 # These examples do not really compile well since ncarex needs to be 
 # edited for each example and then you need to know the GKS workstation

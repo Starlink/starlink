@@ -64,7 +64,7 @@
            -lira_adam -lira -lirq_adam -lirq -llpg \
            -lctg -lfts_adam -lfts -laif_adam -laif -lkapgrf \
            `atl_link_adam` \
-           `cat_link_adam` `snx_link_adam` \
+           `cat_link_adam` `snx_link_adam -user` \
            `sgs_link_adam` `ndg_link_adam` \
            `gks_link_adam` `gns_link_adam` \
            `ndf_link_adam` `ast_link_adam -grf` \

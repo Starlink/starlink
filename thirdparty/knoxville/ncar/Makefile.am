@@ -14,6 +14,7 @@ lib_LTLIBRARIES = libncar.la \
 		  libncar_dashsupr.la \
 		  libncar_conras.la \
 		  libncar_conpms.la \
+		  libncar_user.la \
 		  libncar_snx.la
 
 dist_bin_SCRIPTS = ncar_link ncar_link_adam
@@ -34,6 +35,10 @@ libncar_dashsupr_la_SOURCES = dashsupr.f
 libncar_conras_la_SOURCES = conras.f
 libncar_conpms_la_SOURCES = conpms.f
 
+# Library of the user replaceable functions, dummy functions. Currently if you
+# don't use this you need to supply all the named functions.
+libncar_user_la_SOURCES = $(USER_F_ROUTINES)
+
 # Make all library code position independent.
 if !NOPIC
 libncar_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
@@ -45,6 +50,7 @@ libncar_dashsmth_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
 libncar_dashsupr_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
 libncar_conras_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
 libncar_conpms_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
+libncar_user_la_FCFLAGS = $(AM_FCFLAGS) -prefer-pic
 endif
 
 # Install the data files
@@ -62,8 +68,11 @@ NONSNX_F_ROUTINES = agpwrt.f agchnl.f
 SNX_F_ROUTINES = snx_agchnlz.f snx_agpwritx.f snx_agcs.f snx_agguy.f \
 snx_agsav.f snx_agugy.f snx_aggux.f snx_agres.f snx_agugx.f snx_chset.f
 
+# NCAR routines that can be replaced with user versions. Note need
+# replacements for all these when -user linking flag is used.
+USER_F_ROUTINES = agchax.f agchcu.f agchil.f
 
-F_ROUTINES = agaxis.f agback.f agbnch.f agchax.f agchcu.f agchil.f \
+F_ROUTINES = agaxis.f agback.f agbnch.f  \
 agctcs.f agctko.f agcurv.f agdash.f agdflt.f agdlch.f agdshn.f \
 agexax.f agexus.f agezsu.f agfpbn.f agftol.f aggetc.f aggetf.f aggeti.f \
 aggetp.f aggtch.f aginit.f agkurv.f aglbls.f agmaxi.f agmini.f agnumb.f \
@@ -122,7 +131,7 @@ convrt_SOURCES = $(CONVRT_ROUTINES)
 CONVRT_ROUTINES = convrt.f
 
 pcrbin_SOURCES = $(PWRITX_ROUTINES)
-pcrbin_LDADD = libncar.la `gks_link`
+pcrbin_LDADD = libncar.la libncar_user.la `gks_link`
 PWRITX_ROUTINES = pcrbin.f
 
 ezmap.dat: convrt

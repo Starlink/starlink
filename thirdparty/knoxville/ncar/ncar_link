@@ -15,7 +15,8 @@
 
 #  Description:
 #     This script should be invoked when linking against the NCAR library.
-#     Use the -snx option when linking with SNX.
+#     Use the -snx option when linking with SNX, and -user when supplying
+#     all the user replaceable functions.
 
 #  Copyright:
 #     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
@@ -53,12 +54,15 @@
 #         Introduce local SNX routines to avoid common block access
 #         issues in shareable libraries. Also make replacement routines
 #         local to simplify the above.
+#      09-MAY-2008 (PWD):
+#         Add -user flag and changes.
 #     {enter_further_changes_here}
 
 #-
 
 #  Initialise linking options (default to non-Starlink)
       libs='-lncar'
+      userlibs='-lncar_user'
 
 #  Interpret command line switches.
 #  --------------------------------
@@ -67,7 +71,12 @@
 
 #  -snx -  Requests linking with Starlink extensions
          -snx)
-            libs="-lncar_snx"
+            libs='-lncar_snx'
+            shift;;
+
+#  -user -  Requests linking with user functions
+         -user)
+            userlibs=''
             shift;;
 
 #  Once all switches have been read, continue with the rest of the script.
@@ -81,7 +90,7 @@
       done
 
 
-      echo $libs `gks_link` \
+      echo $libs $userlibs `gks_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
