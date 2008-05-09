@@ -258,6 +258,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *     7-MAY-2008 (DSB):
 *        Clarified meaning of AST__GENVAR, AST__USEVAR and AST__VARWGT flags
 *        in astRebinSeq.
+*     9-MAY-2008 (DSB):
+*        Prevent memory over-run in RebinSeq<X>.
 *class--
 */
 
@@ -11475,7 +11477,6 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
       if( flags & AST__GENVAR ) { \
          w = weights + npix_out; \
          for( ipix_out = 0; ipix_out < npix_out; ipix_out++, w++ ) *w = 0; \
-         *w = 0; \
       } \
    } \
 \
