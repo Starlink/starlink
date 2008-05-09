@@ -194,7 +194,6 @@ kpg1_fit1d.f \
 kpg1_floor.f \
 kpg1_flpth.f \
 kpg1_gtwcs.f \
-kpg1_gtmor.f \
 kpg1_h2ast.f \
 kpg1_hmsg.f \
 kpg1_hrcpr.f \
@@ -298,6 +297,7 @@ kpg1_gtaxm.f \
 kpg1_gtaxv.f \
 kpg1_gtchv.f \
 kpg1_gtgrp.f \
+kpg1_gtmor.f \
 kpg1_gtndf.f \
 kpg1_gtobj.f \
 kpg1_gtplr.f \
