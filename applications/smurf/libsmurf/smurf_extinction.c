@@ -38,6 +38,11 @@
 *          wavelength. Only used if METHOD = FILTERTAU
 *     OUT = NDF (Write)
 *          Output file(s)
+*     HASSKYREM = LOGICAL (Read)
+*          Indicate that the data have been sky removed even if the
+*          fact can not be verified. This is useful for the case where you
+*          have removed the sky background using an application
+*          other than SMURF REMSKY. Default is false.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -83,11 +88,14 @@
 *        methods
 *     2008-05-01 (TIMJ):
 *        Add title to output file.
+*     2008-05-09 (TIMJ):
+*        Enable ability to override remsky nannying.
 *     {enter_further_changes_here}
 
 *  Notes:
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2005 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2005-2008 University of British
 *     Columbia. All Rights Reserved.
@@ -147,6 +155,7 @@ void smurf_extinction( int * status ) {
   double deftau = 0.0;       /* Default value for the zenith tau */
   char filter[81];           /* Name of filter */
   int flag;                  /* Flag for how group is terminated */
+  int has_been_sky_removed = 0;/* Data are sky-removed */
   int i;                     /* Loop counter */
   Grp *igrp = NULL;          /* Input group */
   char method[LEN__METHOD];  /* String for optical depth method */
@@ -155,7 +164,7 @@ void smurf_extinction( int * status ) {
   smfHead *ohdr = NULL;      /* Pointer to header in odata */
   int outsize;               /* Total number of NDF names in the output group */
   int quick;                 /* Flag to denote whether to assume a
-				single airmass for all bolometers */
+                                single airmass for all bolometers */
   int size;                  /* Number of files in input group */
   double tau = 0.0;          /* Zenith tau at this wavelength */
 
@@ -197,10 +206,14 @@ void smurf_extinction( int * status ) {
 
     /* Now check that the data are sky-subtracted */
     if ( !smf_history_check( odata, "smf_subtract_plane", status ) ) {
-      if ( *status == SAI__OK ) {
-	*status = SAI__ERROR;
-	msgSeti("I",i);
-	errRep("", "Input data from file ^I are not sky-subtracted", status);
+
+      /* Should we override remsky check? */
+      parGet0l("HASSKYREM", &has_been_sky_removed, status);
+
+      if ( !has_been_sky_removed && *status == SAI__OK ) {
+        *status = SAI__ERROR;
+        msgSeti("I",i);
+        errRep("", "Input data from file ^I are not sky-subtracted", status);
       }
     }
 

@@ -166,20 +166,22 @@
 #         Add USEBAD parameter to QLMAKEMAP
 #     13-FEB-2008 (AGG):
 #         Add SPREAD and PARAMS to MAKEMAP and QLMAKEMAP
-#     16-MAR-2008 (BZ)
+#     16-MAR-2008 (BZ):
 #         Added action SC2FTS
-#     27-MAR-2008 (EC)
+#     27-MAR-2008 (EC):
 #         Add SC2CLEAN
-#     16-APR-2008 (AGG)
+#     16-APR-2008 (AGG):
 #         Remove USEBAD, add GENVAR for QLMAKEMAP
-#     21-APR-2008 (JB)
+#     21-APR-2008 (JB):
 #         Add action GSDSHOW
-#     24-APR-2008 (AGG)
+#     24-APR-2008 (AGG):
 #         Change SIMFILE/OBSFILE to SIMPAR/OBSPAR for SKYNOISE
-#     24-APR-2008 (EC)
+#     24-APR-2008 (EC):
 #         Added MAXMEM to MAKEMAP
-#     09-MAY-2008 (AGG)
+#     09-MAY-2008 (AGG):
 #         Remove USEBAD parameter, set MAXMEM default to 2048 for MAKEMAP
+#     09-MAY-2008 (TIMJ):
+#         Add EXTINCTION:HASSKYREM
 #     {enter_changes_here}
 
 #  Bugs:
@@ -287,6 +289,15 @@ package @PACKAGE@ {
 	    default FALSE
 	    helpkey *
 	  }
+
+    parameter hasskyrem {
+        type _LOGICAL
+        vpath {DEFAULT}
+        prompt {Has sky removal been applied?}
+        ppath GLOBAL CURRENT
+        default FALSE
+        helpkey *
+    }
 
 	 parameter csotau {
 	    type _REAL
