@@ -614,7 +614,6 @@
 
 *  Determine the number of blocks.
          CALL NDF_NBLOC( ONDF, NDIM, IBLSIZ, NBLOCK, STATUS )
-         print *, NBLOCK
 
 *  Loop through each block.  Start a new NDF context.
          NFLAG = 0
