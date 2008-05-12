@@ -69,8 +69,6 @@
       INTEGER IGRP
       INTEGER NNDF
       CHARACTER*( * ) COMP
-      CHARACTER*( * ) STRIM
-      CHARACTER*( * ) OPARAM
 
 *  Arguments Returned:
       LOGICAL VAR
