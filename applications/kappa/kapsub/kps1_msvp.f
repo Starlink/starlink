@@ -68,7 +68,6 @@
 *  Arguments Given:
       INTEGER IGRP
       INTEGER NNDF
-      CHARACTER*( * ) COMP
 
 *  Arguments Returned:
       LOGICAL VAR
