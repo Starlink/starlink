@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.34}
 \newcommand{\stardocnumber}    {95.34}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2008 May 1}
+\newcommand{\stardocdate}      {2008 May 4}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.9-5}
+\newcommand{\stardocversion}   {1.9-6}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -34418,27 +34418,24 @@ plot (9k).
       pixel in one of the array components (DATA, VARIANCE or QUALITY)
       accumulated over all the input NDFs and written to an output
       NDF; each pixel of the output NDF is a result of combination
-      of pixels with the same Pixel co-ordinates in all the input NDFs.
-      If SMODE={\tt "Mean"} then the output NDF has a DATA component giving
-      the pixel averages of the input NDFs, and a VARIANCE component
-      giving the variances.  If SMODE={\tt "Median"}, then the output NDF
-      has only a DATA component, which gives the medians.  The data type
-      of the output arrays will be of a floating point type even if
-      the input arrays were of an integer type.  The input NDFs
-      must all have the same number of dimensions, but need not all
-      be the same shape.  The shape of the output NDF can be set
-      to either the intersection or the union of the shapes of the
-      input NDFs using the TRIM parameter.
+      of pixels with the same Pixel co-ordinates in all the input NDFs.  
+      There is a selection of statistics available to form the output
+      values.
+      
+      The input NDFs must all have the same number of dimensions, but
+      need not all be the same shape.  The shape of the output NDF can
+      be set to either the intersection or the union of the shapes of
+      the input NDFs using the TRIM parameter.
 
       In single pixel mode (SINGLE={\tt TRUE}) a position in the current
       co-ordinate Frame of all the NDFs is given, and the value at
       the pixel covering this point in each of the input NDFs is
-      accumulated to form the result.  The result, and if ILEVEL={\tt 3},
-      the value of each contributing pixel, is reported directly
-      to the user.
+      accumulated to form the results that comprise the mean, variance,
+      and median.  These statistics, and if ILEVEL={\tt 3}, the value of
+      each contributing pixel, is reported directly to the user.
    }
    \sstusage{
-      mstats in out
+      mstats in out [estimator]
    }
    \sstparameters{
       \sstsubsection{
@@ -34452,6 +34449,85 @@ plot (9k).
          the range 0 to 255).  In cases other than {\tt "Data"}, which is
          always present, a missing component will be treated as having
          all pixels set to the `bad' value.  {\tt ["Data"]}
+      }
+      \sstsubsection{
+         ESTIMATOR = LITERAL (Read)
+      }{
+         The method to use for estimating the output pixel values.  It
+         can be one of the following options.  The first four are
+         more for general collapsing, and the remainder are for cube
+         analysis.
+
+         \ssthitemlist{
+
+            \sstitem
+            {\tt "Mean"} --- Mean value
+
+            \sstitem
+            {\tt "WMean"}  --- Weighted mean in wich each data value is weighted
+                        by the reciprocal of the associated variance.  
+
+            \sstitem
+            {\tt "Mode"}   --- Modal value
+
+            \sstitem
+            {\tt "Median"} --- Median value.  Note that this is extremely memory
+                        and CPU intensive for large datasets; use with 
+                        care!  If strange things happen, use {\tt "Mean"}. \\
+
+            \sstitem
+            {\tt "Absdev"} --- Mean absolute deviation from the unweighted mean.
+
+            \sstitem
+            {\tt "Comax"}  --- Co-ordinate of the maximum value.
+
+            \sstitem
+            {\tt "Comin"}  --- Co-ordinate of the minimum value.
+
+            \sstitem
+            {\tt "Integ"}  --- Integrated value, being the sum of the products 
+                        of the value and pixel width in world
+                        co-ordinates.
+
+            \sstitem
+            {\tt "Iwc"}    --- Intensity-weighted co-ordinate, being the sum of 
+                        each value times its co-ordinate, all divided by
+                        the integrated value (see the {\tt "Integ"} option).
+
+            \sstitem
+            {\tt "Iwd"}    --- Intensity-weighted dispersion of the
+                        co-ordinate, normalised like {\tt "Iwc"} by the 
+                        integrated value.
+
+            \sstitem
+            {\tt "Max"}    --- Maximum value.
+
+            \sstitem
+            {\tt "Min"}    --- Minimum value.
+
+            \sstitem
+            {\tt "Rms"}    --- Root-mean-square value.
+
+            \sstitem
+            {\tt "Sigma"}  --- Standard deviation about the unweighted mean.
+
+            \sstitem
+            {\tt "Sum"}    --- The total value.
+         }
+
+          Where needed, the co-ordinates are the indices of the input
+          NDFs in the supplied order.  Thus the calculations behave like
+          the NDFs were stacked one upon another to form an extra axis,
+          and that axis had GRID co-ordinates.  Care using wildcards is 
+          necessary, to achieve a specific order, say for a time series,
+          and hence assign the desired co-ordinate for a each NDF.  
+          Indirection through a text file is recommended.
+  
+          The selection is restricted if each channel contains three or
+          fewer pixels.  For instance, measures of dispersion like {\tt "Sigma"} 
+          and {\tt "Iwd"} are meaningless for combining only two NDFs.
+          If you supply an unavailable option, you will be informed,
+          and presented with the available options.  {\tt ["Mean"]}
       }
       \sstsubsection{
          ILEVEL = \_INTEGER (Read)
@@ -34520,18 +34596,6 @@ plot (9k).
          the results for all the pixels.  {\tt [FALSE]}
       }
       \sstsubsection{
-         SMODE = LITERAL (Read)
-      }{
-         The way in which the input arrays should be processed in order
-         to generate the output NDF.  It may be {\tt "Mean"} or {\tt "Median"}.
-         If it is {\tt "Mean"} (the default) then OUT will be an NDF in which
-         the DATA component gives the averages of the pixels of the
-         selected component of the input NDFs, and the VARIANCE component
-         gives their variances.  If it is {\tt "Median"} then then OUT will
-         have a DATA component giving the medians of the input pixels,
-         and it will have no VARIANCE component.  {\tt ["Mean"]}
-      }
-      \sstsubsection{
          TITLE = LITERAL (Read)
       }{
          Title for the output NDF.  {\tt ["KAPPA - Mstats"]}
@@ -34546,6 +34610,27 @@ plot (9k).
          If TRIM={\tt FALSE}, the output is the shape of the union of the
          inputs, \emph{i.e.} every pixel which appears in the input arrays
          will be represented in the output.  {\tt [TRUE]}
+      }
+      \sstsubsection{
+         VARIANCE = \_LOGICAL (Read)
+      }{
+         A flag indicating whether a variance array present in the
+         NDF is used to weight the array values while forming the 
+         estimator's statistic, and to derive output variance.  If 
+         VARIANCE is TRUE and all the input NDFs contain a variance 
+         array, this array will be used to define the weights, otherwise
+         all the weights will be set equal.  {\tt [TRUE]}
+      }
+      \sstsubsection{
+         WLIM = \_REAL (Read)
+      }{
+         If the input NDFs contain bad pixels, then this parameter
+         may be used to determine at a given pixel location the number 
+         of good pixels which must be present within the input NDFs 
+         before a valid output pixel is generated.  It can be used, for 
+         example, to prevent output pixels from being generated in 
+         regions where there are relatively few good pixels to 
+         contribute to the result of combining the input NDFs.
       }
    }
    \sstresparameters{
@@ -34569,7 +34654,7 @@ plot (9k).
       \sstexamplesubsection{
          mstats idat$*$ ostats
       }{
-         This calculates the mean and variance of each pixel in the
+         This calculates the mean of each pixel in the
          Data arrays of all the NDFs in the current directory with names
          which start {\tt "idat"}, and writes the result in a new NDF called
          ostats.  The shape of ostats will be the intersection of the
@@ -34586,7 +34671,13 @@ plot (9k).
          each dimension.
       }
       \sstexamplesubsection{
-         mstats idat$*$ ostats comp=variance
+         mstats idat$*$ ostats variance
+      }{
+         This is like the first example except variance information
+         present is used to weight the data values.
+      }
+      \sstexamplesubsection{
+         mstats idat$*$ ostats comp=variance variance
       }{
          This does the same as the first example except that statistics
          are calculated on the VARIANCE components of all the input
@@ -34611,11 +34702,27 @@ plot (9k).
          bad or falls outside the NDF, this is also indicated.
       }
       \sstexamplesubsection{
-         mstats in="arr1,arr2,arr3" out=middle smode=median
+         mstats in="arr1,arr2,arr3" out=middle estimator=median wlim=1.0
+         
       }{
          This example calculates the medians of the DATA components of
          the three named NDFs and writes them into a new NDF called
-         middle.
+         middle.  All input values must be good to form a non-bad
+         output value.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         A warning is issued (at the normal reporting level) whenever 
+         any output values are set bad because there are too few 
+         contributing data values.  This reports the fraction of flagged 
+         output data in comparison with the WLIM parameter.  
+
+         No warning is given when parameter WLIM={\tt 0}.  Input data 
+         containing only bad values are not counted in the flagged 
+         fraction, since no potential good output value has been lost.
       }
    }
    \sstdiytopic{
@@ -34625,7 +34732,33 @@ plot (9k).
 \xref{MAKECAL}{sun139}{MAKECAL},
 \xref{MAKEFLAT}{sun139}{MAKEFLAT}.
    }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         This routine correctly processes the \htmlref{AXIS}{apndf:axis}, DATA, 
+         \htmlref{VARIANCE}{apndf:variance}, \htmlref{QUALITY}{apndf:quality}, 
+         \htmlref{LABEL}{apndf:label}, \htmlref{TITLE}{apndf:title}, 
+         \htmlref{UNITS}{apndf:units}, \htmlref{WCS}{apndf:wcs}, and
+         \htmlref{HISTORY}{apndf:history}~ components of the first input NDF, 
+         and propagates all its \htmlref{extensions}{apndf:extensions}.
+
+         \sstitem
+         Processing of \htmlref{bad pixels}{se:masking} and automatic \htmlref{quality masking}{se:qualitymask} are supported.
+
+         \sstitem
+         All \htmlref{non-complex numeric data types}{ap:HDStypes} can be handled.
+         Calculations are performed using the most appropriate of the
+         data types integer, real or double precision.  If the input NDFs'
+         structures contain values with other data types, then conversion
+         will be performed as necessary.
+
+         \sstitem
+         Up to six NDF dimensions are supported.
+      }
+   }
 }
+   
 \sstroutine{
    MULT
 }{
@@ -55079,13 +55212,6 @@ The following applications have been modified:
 
 \begin{description}
 
-   \item [\htmlref{SETBB}{SETBB}] \mbox{}
-      \begin{itemize}
-          \item A comma-separated list of quality names (such as created by
-          SETQUAL) can now be used to define the bit mask instead of a 
-          numerical value.
-      \end{itemize}
-
    \item [\htmlref{FFCLEAN}{FFCLEAN}] \mbox{}
       \begin{itemize}
          \item This has been extended to operate on cubes, either by
@@ -55099,6 +55225,31 @@ The following applications have been modified:
          variance array (see new parameter GENVAR).  If the NDF is
          processed as a set of spectra or images, then each individual 
          spectrum or image is assigned its own noise level.
+      \end{itemize}
+
+   \item [\htmlref{MSTATS}{MSTATS}] \mbox{}
+      \begin{itemize}
+          \item A wider selection of statistics is available to combine
+          the supplied NDFs.  Note that for consistency with other
+          applications, the SMODE parameter has been replaced by ESTIMATOR.
+          Scripts should be modified accordingly.
+
+          \item
+          There are two further new parameters: VARIANCE to control
+          whether or not to use variance to weight the statistics
+          (previously this effectively set true); and WLIM to decide the 
+          minimum fraction of good contributing value to form a non-bad
+          output value.
+
+          \item It uses NDF blocking to avoid excessive memory
+          requirements.
+      \end{itemize}
+
+   \item [\htmlref{SETBB}{SETBB}] \mbox{}
+      \begin{itemize}
+          \item It can now use a comma-separated list of quality names 
+          (such as created by SETQUAL) to define the bit mask instead of
+          a numerical value.
       \end{itemize}
 
    \item [\htmlref{SETQUAL}{SETQUAL}] \mbox{}

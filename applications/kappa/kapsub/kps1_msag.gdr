@@ -1,0 +1,171 @@
+      SUBROUTINE KPS1_MSAG<T>( NNDF, INDFS, COMP, NDIM, BLKSIZ, IBLOCK,
+     :                      IPIN, STATUS )
+*+
+*  Name:
+*     KPS1_MSAGx
+
+*  Purpose:
+*     Concatenates blocks from a series of NDFs for MSTATS.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPS1_MSAGx( NNDF, INDFS, COMP, NDIM, BLKSIZ, IBLOCK,
+*                      IPIN, STATUS )
+
+*  Description:
+*     This routine concatenates the same NDF block from each of a
+*     series of NDFs, and returns a pointer to the mapped array of 
+*     combined data.  The supplied NDFs must have matching bounds and
+*     dimensionality so that the block in each corresponds to the same
+*     section.  
+*
+*     This routine serves MSTATS, in effect turns an NDIM-dimensional
+*     set of NDFs into one of NDIM+1 dimensions, so that standard 
+*     collapse code may be applied.  The processing is performed in
+*     NDF blocks to avoid excessive demands on memory.
+
+*  Arguments:
+*     NNDF = INTEGER (Given)
+*        The number of NDFs to concatenate.
+*     INDFS( NNDF ) = INTEGER (Given)
+*        NDF identifiers of matched NDF sections for the input NDFs.
+*     COMP = CHARACTER * ( * ) (Given)
+*        The component of the NDFs which is to be concatenated.  This
+*        may be Data, Variance, Error, or Quality.
+*     NDIM = INTEGER (Given)
+*        The number of dimensions in the NDFs to concatenate.
+*     BLKSIZ( NDIM ) = INTEGER (Given)
+*        The maximum blocksizes in pixels along each dimension (as 
+*        obtained from NDF_NBLOC).
+*     IBLOCK = INTEGER (Given)
+*        The index of the block currently being processed.
+*     IPIN = INTEGER (Returned)
+*        The pointer to the mapped array.  This should be released
+*        once it is no longer reuquired, with PSX_FREE.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*     Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D or R as appropriate. 
+
+*  Copyright:
+*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     2008 April 13 (MJC):
+*        Original version.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'NDF_PAR'          ! NDF system constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+
+*  Arguments Given:
+      INTEGER NNDF
+      INTEGER INDFS( NNDF )
+      CHARACTER*( * ) COMP
+      INTEGER NDIM
+      INTEGER BLKSIZ( NDIM )
+      INTEGER IBLOCK
+
+*  Arguments Returned:
+      INTEGER IPIN
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER EL                 ! Number of elements in a block
+      INTEGER I                  ! Loop variable
+      INTEGER IBL                ! Identifier for input-NDF block
+      INTEGER IDIMS( NDF__MXDIM ) ! Pasting input dimensions
+      INTEGER IPB                ! Pointer to mapped block
+      INTEGER ODIMS( NDF__MXDIM ) ! Pasting output dimensions
+      INTEGER OFFSET( NDF__MXDIM ) ! Pasting offsets
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Pasting routine needs NDF__MXDIM arrays, although we just concatenate
+*  a vector, so supply defaults for the higher dimensions.
+      DO I = 2, NDF__MXDIM
+         OFFSET( I ) = 0
+         IDIMS( I ) = 1
+         ODIMS( I ) = 1
+      END DO
+      
+*  Try to open all the NDFs.
+      DO I = 1, NNDF
+         CALL NDF_BEGIN
+
+*  Obtain an identifier to the block for the current input NDF, and
+*  map the block.
+         CALL NDF_BLOCK( INDFS( I ), NDIM, BLKSIZ, IBLOCK, IBL, STATUS )
+         CALL NDF_MAP( IBL, COMP, '<HTYPE>', 'READ', IPB, EL, STATUS )
+
+*  Now we know the number of elements, set the significant paste 
+*  dimensions and offset.
+         OFFSET( 1 ) = EL * ( I - 1 )
+         IF ( I .EQ. 1 ) THEN
+            IDIMS( 1 ) = EL
+            ODIMS( 1 ) = EL * NNDF
+            CALL PSX_CALLOC( ODIMS( 1 ), '<HTYPE>', IPIN, STATUS )
+
+            IF ( STATUS .NE. SAI__OK ) THEN
+               CALL MSG_SETI( 'NNDF', NNDF )
+               CALL MSG_SETI( 'EL', EL )
+               CALL ERR_REP( 'KPS1_MSAG_ERR1', 'Unable to obtain ' //
+     :                       'workspace to combine ^NNDF blocks ' //
+     :                       'of ^EL elements.', STATUS )
+               GO TO 999
+            END IF
+         END IF
+
+*  Paste in the current NDF into the workspace.  Transparency is
+*  irrelevant as we are concatening into unused space.  There may be
+*  bad pixels present.
+         CALL KPG1_PAST<T>( .FALSE., .TRUE., OFFSET, IDIMS, EL, 
+     :                      %VAL( CNF_PVAL( IPB ) ), ODIMS, EL * NNDF,
+     :                      %VAL( CNF_PVAL( IPIN ) ), STATUS )
+
+*   Close NDF context.
+         CALL NDF_END( STATUS )
+         IF ( STATUS .NE. SAI__OK ) GO TO 999
+      END DO
+
+*  Error exit label.
+  999 CONTINUE
+
+      END

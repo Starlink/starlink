@@ -1,0 +1,101 @@
+      SUBROUTINE KPS1_MSGR<T>( NNDF, EL, COORDS, STATUS )
+*+
+*  Name:
+*     KPS1_MSGRx
+
+*  Purpose:
+*     Supplies GRID co-ordinates for the concatenated array in MSTATS.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPS1_MSGRx( NNDF, EL, COORDS, STATUS )
+
+*  Description:
+*     This routine returns GRID co-ordinates for the concatenated 
+*     array of input NDFs that MSTATS collapses.  The GRID co-ordinate
+*     is the index of the NDF for each original input pixel.
+
+*  Arguments:
+*     NNDF = INTEGER (Given)
+*        The number of NDFs to combine.
+*     EL = INTEGER (Given)
+*        The number of elements in each input NDF to be combined.
+*     COORDS( NNDF * EL ) = ? (Given)
+*        The grid co-ordinates of the concatenated array
+*     STATUS = INTEGER (Given)
+*        The global status.
+
+*     Notes:
+*     -  There is a routine for each numeric data type: replace "x" in
+*     the routine name by D or R as appropriate for dounble- or
+*     single-precision floating point respectively.  The COORDS array 
+*     should also have the same data type.
+
+*  Copyright:
+*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE.  See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     2008 May 6 (MJC):
+*        Original version.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER NNDF
+      INTEGER EL
+
+*  Arguments Returned:
+      <TYPE> COORDS( EL * NNDF )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop variable
+      INTEGER J                  ! Loop variable
+      INTEGER OFFSET             ! Offset to 
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  The GRID co-ordinate is the number of the NDF.
+      DO J = 1, NNDF
+         OFFSET = ( J - 1 ) * EL
+         DO I = 1, EL
+            COORDS( I + OFFSET ) = J
+         END DO
+      END DO
+      
+      END

@@ -13436,6 +13436,16 @@ iraf! {
             default Data
          }
 
+         parameter estimator {
+            position 3
+            type LITERAL
+            vpath DEFAULT
+            prompt {Method for estimating collapsed pixel values}
+            ppath CURRENT DEFAULT
+            default Mean
+            helpkey *
+         }
+
          parameter ilevel {
             type _INTEGER
             access READ
@@ -13500,15 +13510,6 @@ iraf! {
             helpkey *
          }
 
-         parameter smode {
-            type LITERAL
-            vpath PROMPT
-            ppath CURRENT DEFAULT
-            prompt {Type of statistics to generate}
-            default Mean
-            helpkey *
-         }
-
          parameter title {
             type LITERAL
             access READ
@@ -13534,8 +13535,26 @@ iraf! {
             vpath DEFAULT
             helpkey *
             default 0.0D0
-          }
+         }
 
+         parameter variance {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Process the variance array?}
+            helpkey *
+         }
+
+         parameter wlim {
+            type _REAL
+            vpath DEFAULT
+            prompt {Weight limit for good output pixels}
+            ppath CURRENT DEFAULT
+            default 0.3
+            helpkey *
+         }
       }
 
       action mult {

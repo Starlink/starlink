@@ -36,7 +36,8 @@ kps1_lucsm.f kps1_lucy.f  kps1_mdset.f kps1_mfaur.f kps1_mfgns.f \
 kps1_mfsb.f \
 kps1_mlpcp.f kps1_mlpcv.f kps1_mlpfs.f kps1_mlpky.f kps1_mlplb.f \
 kps1_mlpml.f kps1_mlpmp.f kps1_mlpnd.f kps1_mlpng.f kps1_mlppn.f \
-kps1_msa.f   kps1_mss.f   kps1_mthcd.f kps1_mthcr.f kps1_nmplt.f \
+kps1_msa.f   kps1_msbs.f  kps1_mss.f   kps1_msvp.f  kps1_mthcd.f \
+kps1_mthcr.f kps1_nmplt.f \
 kps1_op1.f   kps1_op2.f   kps1_plclc.f kps1_plcpy.f kps1_plfil.f \
 kps1_plint.f kps1_plmsk.f \
 kps1_polyv.f kps1_prflt.f kps1_prfmk.f kps1_prfsm.f kps1_psdim.f \
@@ -86,7 +87,8 @@ KPG_DR_GEN = kps1_med.gdr kps1_mmv.gdr kps1_clps.gdr kps1_subi.gdr \
              kps1_fofo.gdr kps1_fohe.gdr kps1_fopp.gdr kps1_fopr.gdr \
              kps1_foqu.gdr kps1_fore.gdr kps1_fori.gdr kps1_heqp.gdr \
              kps1_mfad.gdr kps1_mfeb.gdr kps1_sucl.gdr kps1_susk.gdr \
-             kps1_xyzw.gdr kps1_mfld.gdr kps1_bafn.gdr
+             kps1_xyzw.gdr kps1_mfld.gdr kps1_bafn.gdr kps1_msag.gdr \
+             kps1_msgr.gdr
 
 KPG_DIR_GEN = kps1_trdr.gdir kps1_trnd.gdir kps1_trnv.gdir
 

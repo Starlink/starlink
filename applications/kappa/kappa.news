@@ -22,21 +22,40 @@
 
 2 Modified_applications
 
-   o  SETBB can now use a comma-separated list of quality names (such 
-   as created by SETQUAL) to define the bit mask instead of a 
-   numerical value.
+   o  FFCLEAN 
+   
+      - This has been extended to operate on cubes, either by
+      processing the cubes as a set of independent one-dimensional
+      spectra, or as a set of independent two-dimensional images
+      (see the new parameter AXES).  Likewise you can process a
+      two-dimensional NDF as a set of independent one-dimensional
+      spectra.
 
-   o  FFCLEAN has been extended to operate on cubes, either by
-   processing the cubes as a set of independent one-dimensional
-   spectra, or as a set of independent two-dimensional images
-   (see the new parameter AXES).  Likewise you can process a
-   two-dimensional NDF as a set of independent one-dimensional
-   spectra.
+      - It can store the calculated noise level in the output
+      variance array (see new parameter GENVAR).  If the NDF is
+      processed as a set of spectra or images, then each
+      individual spectrum or image is assigned its own noise
+      level.
 
-   It can store the calculated noise level in the output variance
-   array (see new parameter GENVAR).  If the NDF is processed as a set
-   of spectra or images, then each individual spectrum or image is
-   assigned its own noise level.
+   o  MSTATS 
+   
+      - This now offers a wider selection of statistics to combine
+      the supplied NDFs.  Note that for consistency with other
+      applications, the SMODE parameter has been replaced by
+      ESTIMATOR. Scripts should be modified accordingly.
+
+      - There are two further new parameters: VARIANCE to control
+      whether or not to use variance to weight the statistics
+      (previously this effectively set true); and WLIM to decide
+      the minimum fraction of good contributing value to form a
+      non-bad output value.
+
+      - It uses NDF blocking to avoid excessive memory
+      requirements.
+
+   o  SETBB can now use a comma-separated list of quality names 
+   (such as created by SETQUAL) to define the bit mask instead of
+   a numerical value.
 
    o  SETQUAL has new parameter, READONLY, that allows the new
    quality name to be flagged as "read only".  This flag indicates
