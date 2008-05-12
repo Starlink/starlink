@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_MSVP( IGRP, NNDF, VARSTATUS )
+*     CALL KPS1_MSVP( IGRP, NNDF, VAR,STATUS )
 
 *  Description:
 *     This routine tests a supplied group of NDFs for the presence of a 
@@ -24,7 +24,7 @@
 *        The number of NDFs in the group (size of IGRP).
 *     VAR = LOGICAL (Returned)
 *        This is set .TRUE. if all the NDFs within the supplied group
-*        have VARIANCE components, and .FALSE> otherwise.
+*        have VARIANCE components, and .FALSE. otherwise.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
