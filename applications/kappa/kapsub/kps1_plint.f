@@ -26,7 +26,7 @@
 *     are specified through argument RETAX.
 *
 *     A series of slices can be extracted, the loop ending if a null
-*     value is supplied for zany of the PARAMS parameters.  Only one
+*     value is supplied for any of the PARAMS parameters.  Only one
 *     slice is extracted if PARAM(1) is specified on the command line
 *     to allow easier scripting).
 *
