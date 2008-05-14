@@ -53,8 +53,7 @@
 *          Only accessed if a null value is supplied for parameter REF.
 *          The angle, in degrees, from north through east (in the
 *          coordinate system specified by the SYSTEM parameter) to the second
-*          pixel axis in the output cube. The dynamic default value is
-*          determined by the AUTOGRID parameter. []
+*          pixel axis in the output cube. 
 *     IN = NDF (Read)
 *          Input file(s)
 *     LBND( 2 ) = _INTEGER (Read)
