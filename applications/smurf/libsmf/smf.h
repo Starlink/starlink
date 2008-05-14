@@ -299,6 +299,10 @@
 *        Add _clabels routines.
 *     2008-05-01 (TIMJ):
 *        Add check_units
+*     2008-05-14 (EC):
+*        -Added smf_get_projpar
+*        -Modified smf_mapbounds interface to use par
+*        -Moved NINT macro here from smf_cubegrid
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -338,6 +342,9 @@
 #include "star/grp.h"
 #include "smf_typ.h"
 #include "star/kaplibs.h"
+
+/* Returns nearest integer to "x" */
+#define NINT(x) ( ( (x) > 0 ) ? (int)( (x) + 0.5 ) : (int)( (x) - 0.5 ) )
 
 void smf_addto_smfArray( smfArray *ary, const smfData *data, int *status );
 
@@ -570,10 +577,9 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 void * smf_malloc( size_t nelem, size_t bytes_per_elem, int zero, 
                    int * status );
 
-void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0, 
-		    double lat_0, int flag, double pixsize, int *lbnd_out, 
-		    int *ubnd_out, AstFrameSet **outframeset, int *moving,
-		    int *status );
+void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ], 
+		    int flag, int *lbnd_out, int *ubnd_out, 
+		    AstFrameSet **outframeset, int *moving, int *status );
 
 void smf_mapbounds_approx( Grp *igrp, int index, char *system, double pixsize, 
 			   int *lbnd_out, int *ubnd_out, AstFrameSet **outframeset, 
@@ -940,5 +946,8 @@ void smf_write_clabels( const smfData* data, int * status );
 
 void smf_check_units( int count, char current[],
 		      smfHead* hdr, int * status );
+
+void smf_get_projpar( AstSkyFrame *skyframe, double par[ 7 ], int *usedefs,
+                      int *status );
 
 #endif /* SMF_DEFINED */

@@ -173,6 +173,9 @@
 *        co-incident.
 *     08-APR-2008 (TIMJ):
 *        Use tcs_tai instead of rts_end for position calculations.
+*     08-MAY-2008 (EC):
+*        -Moved parsing of projection ADAM parameters into smf_get_projpar
+*        -Moved NINT macro into smf.h
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -222,10 +225,6 @@
 #include "sc2da/sc2ast.h"
 
 #define FUNC_NAME "smf_cubegrid"
-
-
-/* Returns nearest integer to "x" */
-#define NINT(x) ( ( (x) > 0 ) ? (int)( (x) + 0.5 ) : (int)( (x) - 0.5 ) )
 
 void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos, 
                    int autogrid, int alignsys, Grp *detgrp, double par[ 7 ], 
@@ -775,104 +774,8 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
             astSet( *skyframe, "SkyRefIs=Origin" ); 
          }
      
-/* Set up a flag indicating that the default values calculated above are
-   being used. */
-         usedefs = 1;
-     
-/* Ensure we have usable CRPIX1/2 values */
-         if( par[ 0 ] == AST__BAD ) par[ 0 ] = 1.0;
-         if( par[ 1 ] == AST__BAD ) par[ 1 ] = 1.0;
-     
-/* Get the reference position strings. Use the returned SkyFrame to
-   format and unformat them. */
-         if( par[ 2 ] != AST__BAD ) {
-            deflon = astFormat( *skyframe, 1, par[ 2 ] );
-            parDef0c( "REFLON", deflon, status );
-         } else {
-            deflon = NULL;
-         }
-     
-         if( par[ 3 ] != AST__BAD ) {
-            deflat = astFormat( *skyframe, 2, par[ 3 ] );
-            parDef0c( "REFLAT", deflat, status );
-         } else {
-            deflat = NULL;
-         }
-     
-         parGet0c( "REFLON", reflon, 40, status );
-         parGet0c( "REFLAT", reflat, 40, status );
-     
-         if( *status == SAI__OK ) {
-     
-            if( ( deflat && strcmp( deflat, reflat ) ) ||
-                  ( deflon && strcmp( deflon, reflon ) ) ) usedefs = 0;
-                  
-            if( astUnformat( *skyframe, 1, reflon, par + 2 ) == 0 && *status == SAI__OK ) {
-               msgSetc( "REFLON", reflon );
-               errRep( "", "Bad value supplied for REFLON: '^REFLON'", status );
-            }
-              
-            if( astUnformat( *skyframe, 2, reflat, par + 3 ) == 0 && *status == SAI__OK ) {
-               msgSetc( "REFLAT", reflat );
-               errRep( "", "Bad value supplied for REFLAT: '^REFLAT'", status );
-            }  
-         }
-         
-/* Get the user defined spatial pixel size in arcsec (the calibration for 
-   the spectral axis is fixed by the first input data file - see 
-   smf_cubebounds.c). First convert the autogrid values form rads to arcsec
-   and establish them as the dynamic default for "PIXSIZE". */
-         if( par[ 4 ] != AST__BAD && par[ 5 ] != AST__BAD ) {
-            defsize[ 0 ] = 0.1*NINT( fabs( par[ 4 ] )*AST__DR2D*36000.0 );
-            defsize[ 1 ] = 0.1*NINT( fabs( par[ 5 ] )*AST__DR2D*36000.0 );
-            parDef1d( "PIXSIZE", ( defsize[ 0 ] == defsize[ 1 ] ) ? 1 : 2, 
-                           defsize, status );
-         }
-         parGet1d( "PIXSIZE", 2, pixsize, &nval, status );
-     
-/* If OK, duplicate the first value if only one value was supplied. */
-         if( *status == SAI__OK ) {
-            if( nval < 2 ) pixsize[ 1 ] = pixsize[ 0 ];
-     
-            if( defsize[ 0 ] != pixsize[ 0 ] ||
-                  defsize[ 1 ] != pixsize[ 1 ] ) usedefs = 0;
-         
-/* Check the values are OK. */
-            if( pixsize[ 0 ] <= 0 || pixsize[ 1 ] <= 0 ) {
-               msgSetd( "P1", pixsize[ 0 ] );
-               msgSetd( "P2", pixsize[ 1 ] );
-               *status = SAI__ERROR;
-               errRep( FUNC_NAME, "Invalid pixel sizes (^P1,^P2).", status);
-            }
-     
-/* Convert to rads, and set the correct signs. */
-            if( par[ 4 ] == AST__BAD || par[ 4 ] < 0.0 ) {
-               par[ 4 ] = -pixsize[ 0 ]*AST__DD2R/3600.0;
-            } else {
-               par[ 4 ] = pixsize[ 0 ]*AST__DD2R/3600.0;
-            }
-     
-            if( par[ 5 ] == AST__BAD || par[ 5 ] < 0.0 ) {
-               par[ 5 ] = -pixsize[ 1 ]*AST__DD2R/3600.0;
-            } else {
-               par[ 5 ] = pixsize[ 1 ]*AST__DD2R/3600.0;
-            }
-                  
-         }
-         
-/* Convert the autogrid CROTA value from rads to degs and set as the
-   dynamic default for parameter CROTA (the position angle of the output 
-   Y axis, in degrees). The get the CROTA value and convert to rads. */
-         if( par[ 6 ] != AST__BAD ) {
-            defrot = par[ 6 ]*AST__DR2D;
-            parDef0d( "CROTA", defrot, status );
-         } else {
-            defrot = AST__BAD;
-         }
-     
-         parGet0d( "CROTA", par + 6, status );
-         if( par[ 6 ] != defrot ) usedefs = 0;
-         par[ 6 ] *= AST__DD2R;
+/* Parse ADAM parameters for the projections */         
+	 smf_get_projpar( skyframe, par, &usedefs, status );
      
 /* If any parameter were given explicit values which differ from the
    default values, then we need to re-calculate the optimal CRPIX1/2 

@@ -340,6 +340,60 @@ package @PACKAGE@ {
             helpkey *
           }
 
+         parameter lbnd {
+            size *
+            type _INTEGER
+            access READ
+            vpath DYNAMIC
+            ppath DYNAMIC
+            prompt {Lower pixel index bounds for output spatial axes}
+            helpkey *
+          }
+
+         parameter lbound {
+            size *
+            type _INTEGER
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
+         parameter ubnd {
+            size *
+            type _INTEGER
+            access READ
+            vpath DYNAMIC
+            ppath DYNAMIC
+            prompt {Upper pixel index bounds for output spatial axes}
+            helpkey *
+          }
+
+          parameter ubound {
+            size *
+            type _INTEGER
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
+	  parameter reflat {
+            type LITERAL
+            access READ
+	    ppath DYNAMIC
+	    vpath DYNAMIC
+            prompt {Celestial latitude at output reference point}
+            helpkey *
+	  }
+
+	  parameter reflon {
+            type LITERAL
+            access READ
+	    ppath DYNAMIC
+	    vpath DYNAMIC
+            prompt {Celestial longitude at output reference point}
+            helpkey *
+	  }
+
          parameter out {
             position 2
             type NDF
@@ -353,10 +407,17 @@ package @PACKAGE@ {
 	 parameter pixsize {
 	    position 3
 	    type _REAL
-	    vpath {PROMPT }
-	    prompt {Output map pixel size in arcsec}
-	    ppath GLOBAL CURRENT
-	    default 3.0
+	    prompt {Output pixel size(s) for the map (arcsec)}
+	    ppath DYNAMIC
+	    vpath DYNAMIC
+	    helpkey *
+	  }
+
+	 parameter crota {
+	    type _REAL
+	    prompt {Position angle of second pixel axis in output (degs)}
+	    ppath DYNAMIC
+	    vpath DYNAMIC
 	    helpkey *
 	  }
 
@@ -382,30 +443,6 @@ package @PACKAGE@ {
             prompt {Map-maker tuning parameters}
             helpkey *
 	 }
-
-         parameter astmodel {
-            type NDF
-            access WRITE
-            dynamic yes
-            prompt {Output NDF time series estimate of astronomical signal}
-            helpkey *
-          }
-
-         parameter atmmodel {
-	    type NDF 	
-            access WRITE
-            dynamic yes
-            prompt {Output NDF time series estimate of atmospheric signal}
-            helpkey *
-          }
-
-         parameter noisemodel {
-            type NDF
-            access WRITE
-            dynamic yes
-            prompt {Output NDF time series estimate of noise}
-            helpkey *
-          }
 
          parameter params {
             size *

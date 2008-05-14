@@ -51,20 +51,27 @@
 *        (that is, no error is reported). [current value]
 *     IN = NDF (Read)
 *          Input file(s)
+*     LBND( 2 ) = _INTEGER (Read)
+*        An array of values giving the lower pixel index bound on each
+*        spatial axis of the output NDF. The suggested default values 
+*        encompass all the input spatial information. []
+*     LBOUND( 2 ) = _INTEGER (Write)
+*          The lower pixel bounds of the output NDF. Note, values will be
+*          written to this output parameter even if a null value is supplied 
+*          for parameter OUT.
 *     METHOD = LITERAL (Read)
 *          Specify which map maker should be used to construct the map. The
 *          parameter can take the following values:
-*
-*          - "REBIN" -- Use a single pass rebinning algorithm. This technique
-*          assumes that the data have previously had atmosphere and instrument
-*          signatures removed. It makes use of the standard AST library rebinning
-*          algorithms (see also KAPPA WCSMOSAIC). It's an excellent choice for
-*          obtaining an image quickly, especially of a bright source.
-*
-*          - "ITERATE" -- Use the iterative map maker. This map maker is much slower
-*          than the REBIN algorithm because it continually makes a map, constructs models
-*          for different data components (common-mode, spikes etc).
-*
+*          - "REBIN" -- Use a single pass rebinning algorithm. This
+*          technique assumes that the data have previously had
+*          atmosphere and instrument signatures removed. It makes use
+*          of the standard AST library rebinning algorithms (see also
+*          KAPPA WCSMOSAIC). It's an excellent choice for obtaining an
+*          image quickly, especially of a bright source.
+*          - "ITERATE" -- Use the iterative map maker. This map maker
+*          is much slower than the REBIN algorithm because it
+*          continually makes a map, constructs models for different
+*          data components (common-mode, spikes etc).
 *     OUT = NDF (Write)
 *          Output file
 *     PARAMS( 2 ) = _DOUBLE (Read)
@@ -91,9 +98,18 @@
 *          the run-time default is 1.0.  On astronomical images and 
 *          spectra, good results are often obtained by approximately 
 *          matching the FWHM of the envelope function, given by PARAMS(2),
-*          to the point-spread function of the input data.  []
-*     PIXSIZE = REAL (Read)
-*          Pixel size in output image, in arcsec. []
+*          to the point-spread function of the input data.
+*     PIXSIZE( 2 ) = _REAL (Read)
+*          Pixel dimensions in the output image, in arcsec. If only one value 
+*          is supplied, the same value will be used for both axes.
+*     REFLAT = LITERAL (Read)
+*          The formatted celestial latitude value at the tangent point of 
+*          the spatial projection in the output cube. This should be provided 
+*          in the system specified by parameter SYSTEM. 
+*     REFLON = LITERAL (Read)
+*          The formatted celestial longitude value at the tangent point of 
+*          the spatial projection in the output cube. This should be provided 
+*          in the system specified by parameter SYSTEM. 
 *     SPREAD = LITERAL (Read)
 *          The method to use when spreading each input pixel value out
 *          between a group of neighbouring output pixels. If SPARSE is set 
@@ -156,6 +172,14 @@
 *          had for the first time slice. For any other system, no such 
 *          shifts are applied, even if the base telescope position is
 *          changing through the observation. [TRACKING]
+*     UBND( 2 ) = _INTEGER (Read)
+*        An array of values giving the upper pixel index bound on each
+*        spatial axis of the output NDF. The suggested default values 
+*        encompass all the input spatial information. []
+*     UBOUND( 2 ) = _INTEGER (Write)
+*          The upper pixel bounds of the output NDF. Note, values will be
+*          written to this output parameter even if a null value is supplied 
+*          for parameter OUT.
 
 *  Iterative MapMaker Configuration Parameters:
 *     The following configuration parameters are available for the iterative
@@ -283,6 +307,9 @@
 *        - Added mapbounds timing message
 *     2008-05-03 (EC):
 *        - In provenance loop for iterate use READ instead of UPDATE
+*     2008-05-14 (EC):
+*        Added projection functionality cloned from smurf_makecube. See 
+*        ADAM parameters: PIXSIZE, REFLAT, REFLON, [L/U]BND/BOUND.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -320,8 +347,6 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <time.h>
-
-
 
 /* STARLINK includes */
 #include "ast.h"
@@ -391,9 +416,9 @@ void smurf_makemap( int *status ) {
   int outsize;               /* Number of files in output group */
   AstFrameSet *outfset=NULL; /* Frameset containing sky->output mapping */
   char pabuf[ 10 ];          /* Text buffer for parameter value */
+  double par[ 7 ];           /* Projection parameters */
   double params[ 4 ];        /* astRebinSeq parameters */
   int parstate;              /* State of ADAM parameters */
-  double pixsize=3;          /* Size of an output map pixel in arcsec */
   AstKeyMap * prvkeymap = NULL; /* Keymap of input files for PRVxxx headers */
   int rebin=1;               /* Flag to denote whether to use the REBIN method */
   int size;                  /* Number of files in input group */
@@ -431,16 +456,15 @@ void smurf_makemap( int *status ) {
   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
 	    "GAPPT,FK4,FK4-NO-E,ECLIPTIC", 1, system, 10, status );
 
-  /* Get the user defined pixel size */
-  parGet0d( "PIXSIZE", &pixsize, status );
-  if ( pixsize <= 0 || pixsize > 60. ) {
-    msgSetd("PIXSIZE", pixsize);
-    *status = SAI__ERROR;
-    errRep(" ", 
-	   "Invalid pixel size, ^PIXSIZE (must be positive but < 60 arcsec)", 
-	   status);
-  }
-
+  /* Indicate we have no projection parameters as yet. */
+  par[0] = AST__BAD;
+  par[1] = AST__BAD;
+  par[2] = AST__BAD;
+  par[3] = AST__BAD;
+  par[4] = AST__BAD;
+  par[5] = AST__BAD;
+  par[6] = AST__BAD;
+  
   /* Get the maximum amount of memory that we can use */
   parGet0i( "MAXMEM", &maxmem_mb, status );
   if ( maxmem_mb <= 0 ) {
@@ -492,7 +516,8 @@ void smurf_makemap( int *status ) {
   gettimeofday( &tv1, NULL );
 
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Determine map bounds", status);
-  smf_mapbounds( igrp, size, system, 0.0, 0.0, uselonlat, pixsize, 
+
+  smf_mapbounds( igrp, size, system, par, uselonlat, 
 		 lbnd_out, ubnd_out, &outfset, &moving, status );
 
   gettimeofday( &tv2, NULL );
@@ -609,8 +634,9 @@ void smurf_makemap( int *status ) {
 
       msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Beginning the REBIN step", status);
       /* Rebin the data onto the output grid */
+      
       smf_rebinmap(data, i, size, outfset, spread, params, moving, 1,
-		   lbnd_out, ubnd_out, map, variance, weights3d, status );
+      		   lbnd_out, ubnd_out, map, variance, weights3d, status );
   
       /* Close the data file */
       smf_close_file( &data, status);

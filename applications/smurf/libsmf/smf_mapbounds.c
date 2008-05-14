@@ -14,10 +14,9 @@
 *     C function
 
 *  Invocation:
-*     smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0, 
-*                   double lat_0, int flag, double pixsize, int *lbnd_out, 
-*                   int *ubnd_out, AstFrameSet **outframeset, int *moving,
-*                   int *status );
+*     smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ], 
+*                   int flag, int *lbnd_out, int *ubnd_out, 
+*                   AstFrameSet **outframeset, int *moving, int *status );
 
 *  Arguments:
 *     igrp = Grp* (Given)
@@ -26,10 +25,18 @@
 *        Number of elements in igrp
 *     system = char* (Given)
 *        String indicating the type of projection (e.g. "icrs")
-*     lon_0 = double (Given)
-*        The longitude of the map reference point in the given system (radians)
-*     lat_0 = double (Given)
-*        The latitude of the map reference point in the given system (radians)
+*     par = double[ 7 ] (Given and Returned)
+*        An array holding the parameters describing the spatial
+*        projection between celestial (longitude,latitude) in the
+*        system specified by "system", and an interim GRID coordinate
+*        system for the output cube (interim because the bounds of the
+*        output map are not yet known - the interim grid system is
+*        thus more like a PIXEL system for the output cube but with an
+*        arbitrary pixel origin). These are stored in the order
+*        CRPIX1, CRPIX2, CRVAL1, CRVAL2, CDELT1, CDELT2, CROTA2. The
+*        supplied values are used to produce the output WCS
+*        FrameSet. All the angular parameters are in units of radians,
+*        and CRPIX1/2 are in units of pixels.
 *     flag = int (Given)
 *        If 0, use lon_0, lat_0. If non-zero BASE coordinates are adopted for
 *        the reference point instead.
@@ -100,6 +107,9 @@
 *      	 Use tcs_tai instead of	rts_end	for position calculations.
 *     2008-04-18 (AGG):
 *        Set lbnd to 1,1
+*     2008-05-14 (EC):
+*        - Modified to use projection parameters in the same style as makecube
+*        - use astSetFits instead of sc2ast_makefitschan
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -147,13 +157,13 @@
 
 #define FUNC_NAME "smf_mapbounds"
 
-void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0, 
-		    double lat_0, int flag, double pixsize, int *lbnd_out, 
-		    int *ubnd_out, AstFrameSet **outframeset, int *moving,
-                    int *status ) {
+void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ], 
+		    int flag, int *lbnd_out, int *ubnd_out, 
+		    AstFrameSet **outframeset, int *moving, int *status ) {
 
   /* Local Variables */
   AstSkyFrame *abskyframe = NULL; /* Output Absolute SkyFrame */
+  int actval;                  /* Number of parameter values supplied */
   double az[ 2 ];              /* Azimuth values */
   AstMapping *azel2usesys = NULL; /* Mapping form AZEL to requested system */
   AstMapping *bolo2map = NULL; /* Combined mapping bolo->map
@@ -167,8 +177,10 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
   AstFrameSet *fs = NULL;      /* A general purpose FrameSet pointer */
   smfHead *hdr = NULL;         /* Pointer to data header this time slice */
   int i;                       /* Loop counter */
+  int itmp;                    /* Temporary storage */
   int j;                       /* Loop counter */
   dim_t k;                     /* Loop counter */
+  int lbnd0[ 2 ];              /* Defaults for LBND parameter */
   char *pname = NULL;          /* Name of currently opened data file */
   double ra[ 2 ];              /* RA values */
   double sep = 0;              /* Separation between first and last base positions */
@@ -183,6 +195,7 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
   double skyref[ 2 ];          /* Values for output SkyFrame SkyRef attribute */
   int startboundcheck = 1;     /* Flag for first check of map dimensions */
   AstFrameSet *swcsin = NULL;  /* FrameSet describing input WCS */
+  int ubnd0[ 2 ];              /* Defaults for UBND parameter */
   const char *usesys = NULL;   /* AST system for output cube */
   double x_array_corners[4];   /* X-Indices for corner bolos in array */ 
   double x_map[4];             /* Projected X-coordinates of corner bolos */ 
@@ -388,34 +401,71 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
         if ( *moving ) {
           astSet( skyframe, "SkyRefIs=origin,AlignOffset=1" );
           /* Also set tangent position */
-          lon_0 = 0.0;
-          lat_0 = 0.0;
+          par[2] = 0.0;
+          par[3] = 0.0;
         } else {
           astSet( skyframe, "SkyRefIs=ignored,AlignOffset=0" );
 	  /* If `flag' is set, use lon_0/lat_0 values given, else set
 	     them to the skyref coordinates  */
-	  if ( !flag ) {
-	    lon_0 = skyref[0];
-	    lat_0 = skyref[1];
+	  if( !flag ) {
+	    par[2] = skyref[0];
+	    par[3] = skyref[1];
 	  }
 	}
 
-        if ( *outframeset == NULL && skyframe != NULL ) {
+	/* Ensure the pixel sizes have the correct signs. */
+	if( par[4] != AST__BAD ) {
+	  if( usesys && !strcmp( usesys, "AZEL" ) ) {
+            par[4] = fabs( par[4] );
+	  } else {
+            par[4] = -fabs( par[4] );
+	  }
+	  par[5] = fabs( par[5] );
+	}
+
+	/* Update par to contain some reasonable defaults */
+	par[0] = 1.0;
+	par[1] = 1.0;
+	par[4] = (3./3600.)*AST__DD2R;
+	par[5] = (3./3600.)*AST__DD2R;
+	par[6] = 0.;
+
+	/* Ensure the pixel sizes have the correct signs. */
+	if( par[4] != AST__BAD ) {
+	  if( usesys && !strcmp( usesys, "AZEL" ) ) {
+            par[4] = fabs( par[4] );
+	  } else {
+            par[4] = -fabs( par[4] );
+	  }
+	  par[5] = fabs( par[5] );
+	}
+
+	/* Update par based on user-specified values */
+	smf_get_projpar( skyframe, par, NULL, status );
+
+        if ( *outframeset == NULL && skyframe != NULL && (*status == SAI__OK)){
           /* Now populate a FitsChan with FITS-WCS headers describing
              the required tan plane projection. The longitude and
              latitude axis types are set to either (RA,Dec) or (AZ,EL)
              to get the correct handedness. Convert from radians to
              degrees as required by FITS. */
           fitschan = astFitsChan ( NULL, NULL, "" );
-          if ( !strcmp( astGetC( skyframe, "SYSTEM" ), "AZEL" ) ) {
-            sc2ast_makefitschan( 0.0, 0.0, (pixsize*DAS2D), (pixsize*DAS2D),
-                                 (lon_0*DR2D), (lat_0*DR2D),
-                                 "AZ---TAN", "EL---TAN", fitschan, status );
-          } else {
-            sc2ast_makefitschan( 0.0, 0.0, (-pixsize*DAS2D), (pixsize*DAS2D),
-                                 (lon_0*DR2D), (lat_0*DR2D),
-                                 "RA---TAN", "DEC--TAN", fitschan, status );
-          }
+
+	  if( !strcmp( astGetC( skyframe, "System" ), "AZEL" ) ){
+	    astSetFitsS( fitschan, "CTYPE1", "AZ---TAN", " ", 1 );
+	    astSetFitsS( fitschan, "CTYPE2", "EL---TAN", " ", 1 );
+	  } else {
+	    astSetFitsS( fitschan, "CTYPE1", "RA---TAN", " ", 1 );
+	    astSetFitsS( fitschan, "CTYPE2", "DEC--TAN", " ", 1 );
+	  }
+	  astSetFitsF( fitschan, "CRPIX1", par[0], " ", 1 );
+	  astSetFitsF( fitschan, "CRPIX2", par[1], " ", 1 );
+	  astSetFitsF( fitschan, "CRVAL1", par[2]*AST__DR2D, " ", 1 );
+	  astSetFitsF( fitschan, "CRVAL2", par[3]*AST__DR2D, " ", 1 );
+	  astSetFitsF( fitschan, "CDELT1", par[4]*AST__DR2D, " ", 1 );
+	  astSetFitsF( fitschan, "CDELT2", par[5]*AST__DR2D, " ", 1 );
+	  astSetFitsF( fitschan, "CROTA2", par[6]*AST__DR2D, " ", 1 );
+
           astClear( fitschan, "Card" );
           fs = astRead( fitschan );
 
@@ -486,6 +536,34 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double lon_0,
     /* Break out of loop over data files if bad status */
     if (*status != SAI__OK) goto CLEANUP;
   }
+
+  /* Allow the user to override the output pixel bounds calculated above. */
+  lbnd0[ 0 ] = lbnd_out[ 0 ];
+  lbnd0[ 1 ] = lbnd_out[ 1 ];
+  parDef1i( "LBND", 2, lbnd0, status );
+  
+  ubnd0[ 0 ] = ubnd_out[ 0 ];
+  ubnd0[ 1 ] = ubnd_out[ 1 ];
+  parDef1i( "UBND", 2, ubnd0, status );
+  
+  parGet1i( "LBND", 2, lbnd_out, &actval, status );
+  if( actval == 1 ) lbnd_out[ 1 ] = lbnd_out[ 0 ];
+  
+  parGet1i( "UBND", 2, ubnd_out, &actval, status );
+  if( actval == 1 ) ubnd_out[ 1 ] = ubnd_out[ 0 ];
+  
+  /* Ensure the bounds are the right way round. */
+  if( lbnd_out[ 0 ] > ubnd_out[ 0 ] ) { 
+    itmp = lbnd_out[ 0 ];
+    lbnd_out[ 0 ] = ubnd_out[ 0 ];
+    ubnd_out[ 0 ] = itmp;
+  }      
+  
+  if( lbnd_out[ 1 ] > ubnd_out[ 1 ] ) { 
+    itmp = lbnd_out[ 1 ];
+    lbnd_out[ 1 ] = ubnd_out[ 1 ];
+    ubnd_out[ 1 ] = itmp;
+   } 
 
   /* Apply a ShiftMap to the output FrameSet to re-align the GRID
      coordinates */
