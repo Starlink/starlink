@@ -49,6 +49,12 @@
 *        Parameters" sections below. Default values will be used for
 *        any unspecified parameters. Unrecognised options are ignored
 *        (that is, no error is reported). [current value]
+*     CROTA = _REAL (Read)
+*          Only accessed if a null value is supplied for parameter REF.
+*          The angle, in degrees, from north through east (in the
+*          coordinate system specified by the SYSTEM parameter) to the second
+*          pixel axis in the output cube. The dynamic default value is
+*          determined by the AUTOGRID parameter. []
 *     IN = NDF (Read)
 *          Input file(s)
 *     LBND( 2 ) = _INTEGER (Read)
