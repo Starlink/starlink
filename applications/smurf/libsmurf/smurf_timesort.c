@@ -413,7 +413,7 @@ void smurf_timesort( int *status ) {
 
 /* Extend the detector mask to exclude any detectors that are excluded as a 
    result of the DETECTORS parameter. */
-   if( detgrp ) {
+   if( detgrp && *status == SAI__OK ) {
 
 /* Loop round each detector. */
       lab = data->hdr->detname;
@@ -451,7 +451,7 @@ void smurf_timesort( int *status ) {
    }   
 
 /* Abort if there are no detectors to included. */
-   if( nbaddet == (data->dims)[ 1 ] && *status == SAI__OK ) {
+   if( *status == SAI__OK && nbaddet == (data->dims)[ 1 ] ) {
       *status = SAI__ERROR;
       errRep( "", "The values supplied for the DETECTORS and DETPURGE "
               "parameters would result in all detectors being rejected.",
