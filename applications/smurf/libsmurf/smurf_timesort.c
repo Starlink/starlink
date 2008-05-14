@@ -1407,11 +1407,12 @@ void smurf_timesort( int *status ) {
 /* Delete the output NDF if an error occurred. Otherwise, annul the
    output NDF identifier. */
                msgSetc( "N", fullname );
-               msgOutif( MSG__VERB, "", "Closing output NDF \"^N\".", status );
 
                if( *status != SAI__OK ) {
+                  errRep( "", "Failed to create \"^N\".", status );
                   ndfDelet( &indf2, status );
                } else {
+                  msgOutif( MSG__VERB, "", "Closing output NDF \"^N\".", status );
                   ndfAnnul( &indf2, status );
                }
             }
