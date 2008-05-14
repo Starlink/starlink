@@ -44,6 +44,7 @@
 *     par, each element should be initialized to AST__BAD.
 
 *  Authors:
+*     David Berry (JAC, UCLan)
 *     Edward Chapin (UBC)
 *     {enter_new_authors_here}
 
