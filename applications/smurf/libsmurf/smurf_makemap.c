@@ -315,6 +315,10 @@
 *     2008-05-14 (EC):
 *        Added projection functionality cloned from smurf_makecube. See 
 *        ADAM parameters: PIXSIZE, REFLAT, REFLON, [L/U]BND/BOUND.
+*     2008-05-15 (EC):
+*        - Trap SMF__NOMEM from smf_checkmem_map; request new [L/U]BND
+*        - Set [L/U]BOUND
+*        - Fix read error caused by status checking in for loop
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -352,6 +356,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <time.h>
+#include <math.h>
 
 /* STARLINK includes */
 #include "ast.h"
@@ -370,6 +375,7 @@
 #include "smurf_par.h"
 #include "smurflib.h"
 #include "libsmf/smf.h"
+#include "libsmf/smf_err.h"
 #include "smurf_typ.h"
 
 #include "sc2da/sc2store_par.h"
@@ -386,6 +392,7 @@
 void smurf_makemap( int *status ) {
 
   /* Local Variables */
+  int actval;                /* Number of parameter values supplied */
   Grp *confgrp = NULL;       /* Group containing configuration file */
   smfData *data=NULL;        /* Pointer to SCUBA2 data struct */
   char data_units[SMF__CHARLABEL+1]; /* Units string */
@@ -398,6 +405,7 @@ void smurf_makemap( int *status ) {
   dim_t i;                   /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
   int iterate=0;             /* Flag to denote whether to use the ITERATE method */
+  int itmp;                  /* Temporary storage */
   AstKeyMap *keymap=NULL;    /* Pointer to keymap of config settings */
   int ksize=0;               /* Size of group containing CONFIG file */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
@@ -425,7 +433,9 @@ void smurf_makemap( int *status ) {
   double params[ 4 ];        /* astRebinSeq parameters */
   int parstate;              /* State of ADAM parameters */
   AstKeyMap * prvkeymap = NULL; /* Keymap of input files for PRVxxx headers */
+  int quit=0;                /* Flag for exiting while loop */
   int rebin=1;               /* Flag to denote whether to use the REBIN method */
+  double scale;              /* How much to scale bounds */
   int size;                  /* Number of files in input group */
   int smfflags=0;            /* Flags for smfData */
   HDSLoc *smurfloc=NULL;     /* HDS locator of SMURF extension */
@@ -530,14 +540,73 @@ void smurf_makemap( int *status ) {
   msgSeti("TDIFF",tv2.tv_sec-tv1.tv_sec);
   msgOutif( MSG__DEBUG, " ", "Mapbounds took ^TDIFF s", status);
 
+  quit = 0;
+  while( (*status==SAI__OK) && !quit ) {
+    /* Allow the user to override defaults */  
+    parGet1i( "LBND", 2, lbnd_out, &actval, status );
+    if( actval == 1 ) lbnd_out[ 1 ] = lbnd_out[ 0 ];
+    
+    parGet1i( "UBND", 2, ubnd_out, &actval, status );
+    if( actval == 1 ) ubnd_out[ 1 ] = ubnd_out[ 0 ];
+    
+    /* Ensure the bounds are the right way round. */
+    if( lbnd_out[ 0 ] > ubnd_out[ 0 ] ) { 
+      itmp = lbnd_out[ 0 ];
+      lbnd_out[ 0 ] = ubnd_out[ 0 ];
+      ubnd_out[ 0 ] = itmp;
+    }      
+    
+    if( lbnd_out[ 1 ] > ubnd_out[ 1 ] ) { 
+      itmp = lbnd_out[ 1 ];
+      lbnd_out[ 1 ] = ubnd_out[ 1 ];
+      ubnd_out[ 1 ] = itmp;
+    }
+    
+    /* Check memory requirements for output map */
+    smf_checkmem_map( lbnd_out, ubnd_out, rebin, maxmem, &mapmem, status );
+    
+    /* If the user requested too much memory */
+    if( *status == SMF__NOMEM ) {
+      /* Annul the error */
+      errAnnul( status );
+        
+      /* Display message indicating necessary *bnd too big */
+      msgSeti("L0",lbnd_out[0]);
+      msgSeti("L1",lbnd_out[1]);
+      msgSeti("U0",ubnd_out[0]);
+      msgSeti("U1",ubnd_out[1]);
+      msgOut(" ", "Map too big: LBND=(^L0,^L1) UBND=(^U0,^U1)", status);
+
+      /* Recommend new size that uses ~75% of maxmem */
+      scale = sqrt(0.75 * (double) maxmem / (double) mapmem);
+      
+      /* Cancel the old values of the parameter */
+      parCancl( "LBND", status );
+      parCancl( "UBND", status );
+
+      /* Set new default size */
+      lbnd_out[0] = (int) ceil(scale*lbnd_out[0]);
+      lbnd_out[1] = (int) ceil(scale*lbnd_out[1]);
+      ubnd_out[0] = (int) floor(scale*ubnd_out[0]);
+      ubnd_out[1] = (int) floor(scale*ubnd_out[1]);
+      parDef1i( "LBND", 2, lbnd_out, status );
+      parDef1i( "UBND", 2, ubnd_out, status );
+
+    } else if( *status == SAI__OK ) {
+      quit = 1;
+    }
+
+  }
+
+  /* Output pixel bounds of the output array */
+  parPut1i( "LBOUND", 2, lbnd_out, status );
+  parPut1i( "UBOUND", 2, ubnd_out, status );
+
   if ( moving ) {
     msgOutif(MSG__VERB, " ", "Tracking a moving object", status);
   } else {
     msgOutif(MSG__VERB, " ", "Tracking a stationary object", status);
   }
-
-  /* Check memory requirements for output map */
-  smf_checkmem_map( lbnd_out, ubnd_out, rebin, maxmem, &mapmem, status );
 
   /* Create an output smfData */
   ndgCreat ( "OUT", NULL, &ogrp, &outsize, &flag, status );
@@ -592,7 +661,7 @@ void smurf_makemap( int *status ) {
     msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using REBIN method", 
 	     status);
 
-    for(i=1; (i<=size) && (*status == SAI__OK); i++ ) {
+    for(i=1; (*status == SAI__OK) && (i <= size); i++ ) {
       /* Read data from the ith input file in the group */      
       smf_open_and_flatfield( igrp, NULL, i, &data, status ); 
 

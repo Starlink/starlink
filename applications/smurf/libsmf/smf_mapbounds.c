@@ -110,6 +110,9 @@
 *     2008-05-14 (EC):
 *        - Modified to use projection parameters in the same style as makecube
 *        - use astSetFits instead of sc2ast_makefitschan
+*     2008-05-15 (EC):
+*        Moved user query of lbnd/ubnd into smurf_makemap. Here just set the
+*        ?bound_out values, and set dynamic defaults for LBND/UBND
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -163,7 +166,6 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
 
   /* Local Variables */
   AstSkyFrame *abskyframe = NULL; /* Output Absolute SkyFrame */
-  int actval;                  /* Number of parameter values supplied */
   double az[ 2 ];              /* Azimuth values */
   AstMapping *azel2usesys = NULL; /* Mapping form AZEL to requested system */
   AstMapping *bolo2map = NULL; /* Combined mapping bolo->map
@@ -177,7 +179,6 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
   AstFrameSet *fs = NULL;      /* A general purpose FrameSet pointer */
   smfHead *hdr = NULL;         /* Pointer to data header this time slice */
   int i;                       /* Loop counter */
-  int itmp;                    /* Temporary storage */
   int j;                       /* Loop counter */
   dim_t k;                     /* Loop counter */
   int lbnd0[ 2 ];              /* Defaults for LBND parameter */
@@ -537,34 +538,6 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
     if (*status != SAI__OK) goto CLEANUP;
   }
 
-  /* Allow the user to override the output pixel bounds calculated above. */
-  lbnd0[ 0 ] = lbnd_out[ 0 ];
-  lbnd0[ 1 ] = lbnd_out[ 1 ];
-  parDef1i( "LBND", 2, lbnd0, status );
-  
-  ubnd0[ 0 ] = ubnd_out[ 0 ];
-  ubnd0[ 1 ] = ubnd_out[ 1 ];
-  parDef1i( "UBND", 2, ubnd0, status );
-  
-  parGet1i( "LBND", 2, lbnd_out, &actval, status );
-  if( actval == 1 ) lbnd_out[ 1 ] = lbnd_out[ 0 ];
-  
-  parGet1i( "UBND", 2, ubnd_out, &actval, status );
-  if( actval == 1 ) ubnd_out[ 1 ] = ubnd_out[ 0 ];
-  
-  /* Ensure the bounds are the right way round. */
-  if( lbnd_out[ 0 ] > ubnd_out[ 0 ] ) { 
-    itmp = lbnd_out[ 0 ];
-    lbnd_out[ 0 ] = ubnd_out[ 0 ];
-    ubnd_out[ 0 ] = itmp;
-  }      
-  
-  if( lbnd_out[ 1 ] > ubnd_out[ 1 ] ) { 
-    itmp = lbnd_out[ 1 ];
-    lbnd_out[ 1 ] = ubnd_out[ 1 ];
-    ubnd_out[ 1 ] = itmp;
-   } 
-
   /* Apply a ShiftMap to the output FrameSet to re-align the GRID
      coordinates */
   shift[0] = -lbnd_out[0];
@@ -581,6 +554,15 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
 
   ubnd_out[1] -= lbnd_out[1]-1;
   lbnd_out[1] = 1;
+
+  /* Set the dynamic defaults for lbnd/ubnd */
+  lbnd0[ 0 ] = lbnd_out[ 0 ];
+  lbnd0[ 1 ] = lbnd_out[ 1 ];
+  parDef1i( "LBND", 2, lbnd0, status );
+  
+  ubnd0[ 0 ] = ubnd_out[ 0 ];
+  ubnd0[ 1 ] = ubnd_out[ 1 ];
+  parDef1i( "UBND", 2, ubnd0, status );
 
   /* Clean Up */ 
  CLEANUP:
