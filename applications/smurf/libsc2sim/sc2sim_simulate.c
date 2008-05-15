@@ -268,6 +268,8 @@
 *        Use transmission for current wavelength to get atmospheric power
 *     2008-04-25 (AGG):
 *        Add loop over focus positions
+*     2008-05-14 (AGG):
+*        Take focus step into account for setting obsend flag
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -945,7 +947,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   chunks = ceil ( (double)frmperms / maxwrite );
 
   /* Number of output files per subarray */
-  noutfiles = inx->nmicstep * chunks;
+  noutfiles = inx->nmicstep * chunks * inx->nfocstep;
 
   /* Loop over number of SMU (focus) positions */
   for ( focidx = 0; focidx < inx->nfocstep; focidx++ ) {
