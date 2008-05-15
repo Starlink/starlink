@@ -102,6 +102,8 @@
 *     29-APR-2008 (DSB):
 *        Report an error if VALMAX/MIN are supplied bad, and all data
 *        values are bad.
+*     15-MAY-2008 (DSB):
+*        Guard against cases where all values are equal and THRESH is zero.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -218,7 +220,7 @@
 *  Again the halving prevents arithmetic overflow for data with a very
 *  large dynamic range.  Thus both sides of the comparison have been
 *  halved.
-      IF ( ABS( DVMAX / 2.0D0 - DVMIN / 2.0D0 ) .GE. THRESH ) THEN
+      IF ( ABS( DVMAX / 2.0D0 - DVMIN / 2.0D0 ) .GT. THRESH ) THEN
          SCALE  =  DVMAX - DVMIN
       ELSE
          STATUS = SAI__ERROR
