@@ -231,7 +231,7 @@
          CALL MSG_SETI( 'NBIN', NBIN )
          CALL MSG_SETI( 'MCOEF', MCOEF )
          CALL ERR_REP( 'KPS1_FSPF2_INSFD',
-     :     'KPS1_FSPF2: Insufficient data --- ^NBINS bins and ^MCOEF '/
+     :     'KPS1_FSPF2: Insufficient data --- ^NBIN bins and ^MCOEF '/
      :     /'free parameters.', STATUS )
          GOTO 999
       END IF

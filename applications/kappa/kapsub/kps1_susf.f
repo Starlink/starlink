@@ -220,7 +220,7 @@
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'NBIN', NBIN )
          CALL ERR_REP( 'KPS1_SUSF_INSFD',
-     :     'KPS1_SUSF: Insufficient data --- ^NBINS bins.', STATUS )
+     :     'KPS1_SUSF: Insufficient data --- ^NBIN bins.', STATUS )
          GO TO 999
        END IF
 
