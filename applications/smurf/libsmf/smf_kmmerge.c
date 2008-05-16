@@ -72,6 +72,8 @@
 *        Correct error message text and handle cases where a time slice
 *        is being merged with itself (this happens for the first time
 *        slice encountered for a given RTS_NUM value).
+*     16-MAY-2008 (DSB):
+*        Ignore discrepancies in ENVIRO_ items.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -124,14 +126,16 @@
    error if the value in the two time slices differ. */ \
                if( veclen == nts ) { \
                   if( values##Sym3[ from ] != values##Sym3[ into ] ) { \
-                     *status = SAI__ERROR; \
-                     msgSetc( "X", xname ); \
-                     msgSetc( "N", key ); \
-                     msgSeti( "R", rts_num ); \
-                     msgSet##Sym2( "V1", values##Sym3[ from ] ); \
-                     msgSet##Sym2( "V2", values##Sym3[ into ] ); \
-                     errRep( "", "Differing values (^V1 and ^V2) found for " \
-                             "item ^X.^N when RTS_NUM=^R.", status ); \
+                     if( ! ignore ) { \
+                        *status = SAI__ERROR; \
+                        msgSetc( "X", xname ); \
+                        msgSetc( "N", key ); \
+                        msgSeti( "R", rts_num ); \
+                        msgSet##Sym2( "V1", values##Sym3[ from ] ); \
+                        msgSet##Sym2( "V2", values##Sym3[ into ] ); \
+                        errRep( "", "Differing values (^V1 and ^V2) found for " \
+                                "item ^X.^N when RTS_NUM=^R.", status ); \
+                     } \
                   } \
 \
 /* If the vector length is multiple of the number of time slices... */ \
@@ -174,17 +178,19 @@
 /* If the "into" value is not bad, and differs from the "from" value, \
    report an error. */ \
                                  } else if( pinto##Sym3[ j ] != pfrom##Sym3[ j ] ) { \
-                                    *status = SAI__ERROR; \
-                                    msgSetc( "X", xname ); \
-                                    msgSetc( "N", key ); \
-                                    msgSeti( "R", rts_num ); \
-                                    msgSeti( "D", idet + 1 ); \
-                                    msgSet##Sym2( "V1", pinto##Sym3[ j ] ); \
-                                    msgSet##Sym2( "V2", pfrom##Sym3[ j ] ); \
-                                    errRep( "", "Detector ^D has differing values " \
-                                            "(^V1 and ^V2) for item ^X.^N when " \
-                                            "RTS_NUM=^R.", status ); \
-                                    break; \
+                                    if( ! ignore ) { \
+                                       *status = SAI__ERROR; \
+                                       msgSetc( "X", xname ); \
+                                       msgSetc( "N", key ); \
+                                       msgSeti( "R", rts_num ); \
+                                       msgSeti( "D", idet + 1 ); \
+                                       msgSet##Sym2( "V1", pinto##Sym3[ j ] ); \
+                                       msgSet##Sym2( "V2", pfrom##Sym3[ j ] ); \
+                                       errRep( "", "Detector ^D has differing values " \
+                                               "(^V1 and ^V2) for item ^X.^N when " \
+                                               "RTS_NUM=^R.", status ); \
+                                       break; \
+                                    } \
                                  } \
                               } \
                            } \
@@ -239,6 +245,7 @@ void smf_kmmerge( const char *xname, AstKeyMap *keymap, int from, int into,
    int changed;
    int i;
    int idet;
+   int ignore;
    int j;
    int nentry;
    int seclen;
@@ -253,6 +260,9 @@ void smf_kmmerge( const char *xname, AstKeyMap *keymap, int from, int into,
    nentry = astMapSize( keymap );
    for( i = 0; i < nentry; i++ ) {
       key = astMapKey( keymap, i );
+
+/* Ignore discrepancies in ENVIRO_ items. */
+      ignore = key || strncmp( key, "ENVIRO_", 7 );
 
 /* Get the vector length of the entry. */
       veclen = astMapLength( keymap, key );
