@@ -433,8 +433,7 @@
 *  Get parameters.
 *  ===============
 
-*  Obtain the type of the fit ('POLYNOMIAL' or 'SPLINE').  (For the
-*  time being only 'POLYNOMIAL' is implemented).
+*  Obtain the type of the fit ('POLYNOMIAL' or 'SPLINE').
       CALL PAR_CHOIC( 'FITTYPE', 'Polynomial', 'Polynomial,Spline',
      :                .TRUE., FITYPE, STATUS )
      
