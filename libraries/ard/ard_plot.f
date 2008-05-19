@@ -81,6 +81,8 @@
 *  History:
 *     12-SEP-2001 (DSB):
 *        Original version.
+*     19-MAY-2008 (DSB):
+*        Add IWCS argument to ARD1_ADANL call.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -150,6 +152,7 @@
       INTEGER IPMASK             ! Pointer to mask array
       INTEGER IPOPND             ! operand stack
       INTEGER IPXY               ! Pointer to contour locus work array
+      INTEGER IWCS               ! pixel->user FrameSet
       INTEGER JPLOT              ! AST pointer to modified Plot
       INTEGER LBND( 2 )          ! Lower bounds for mask array 
       INTEGER LBNDE( 2 )         ! Lower bounds of exterior bounding box
@@ -288,7 +291,7 @@
 *  to the ARD description as supplied (i.e. no implicit .OR.s are
 *  inserted).
          CALL ARD1_ADANL( IGRP, 2, AWCS, DLBND, DUBND, IPEXPR, IPOPND, 
-     :                    SZEXPR, SZOPND, INP, STATUS )
+     :                    SZEXPR, SZOPND, INP, IWCS, STATUS )
 
 *  Attempt to draw the region assuming it consists of a single keyword.
          CALL ARD1_FPLOT( SZEXPR, %VAL( CNF_PVAL( IPEXPR ) ), SZOPND,
