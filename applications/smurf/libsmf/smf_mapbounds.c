@@ -113,6 +113,8 @@
 *     2008-05-15 (EC):
 *        Moved user query of lbnd/ubnd into smurf_makemap. Here just set the
 *        ?bound_out values, and set dynamic defaults for LBND/UBND
+*     2008-05-20 (EC):
+*        Set intelligent dynamic default for CROTA like smf_cubegrid
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -182,6 +184,7 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
   int j;                       /* Loop counter */
   dim_t k;                     /* Loop counter */
   int lbnd0[ 2 ];              /* Defaults for LBND parameter */
+  double map_pa=0;             /* Map PA in output coord system (rads) */ 
   char *pname = NULL;          /* Name of currently opened data file */
   double ra[ 2 ];              /* RA values */
   double sep = 0;              /* Separation between first and last base positions */
@@ -306,6 +309,13 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
 
 	/* Create output SkyFrame */
         if ( skyframe == NULL ) {
+
+          /* Get the orientation of the map vertical within the output
+             celestial coordinate system. This is derived form the
+             MAP_PA FITS header, which gives the orientation of the
+             map vertical within the tracking system. */
+            map_pa = smf_calc_mappa( hdr, system, skyin, status );
+
           /* Determine the tracking coordinate system, and choose
              the celestial coordinate system for the output cube. */
           if( !strncmp( system, "TRACKING", 8 ) ) {
@@ -429,7 +439,7 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
 	par[1] = 1.0;
 	par[4] = (3./3600.)*AST__DD2R;
 	par[5] = (3./3600.)*AST__DD2R;
-	par[6] = 0.;
+	par[6] = map_pa;
 
 	/* Ensure the pixel sizes have the correct signs. */
 	if( par[4] != AST__BAD ) {
