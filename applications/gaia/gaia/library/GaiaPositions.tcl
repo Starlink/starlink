@@ -374,7 +374,7 @@ itcl::class gaia::GaiaPositions {
       }
       pack $itk_component(fwhmx) -fill x -side top -pady 2 -padx 2
       add_short_help $itk_component(fwhmx) \
-         {Mean FWHM in X direction (range) pixels/arcsec}
+         {Mean FWHM in X direction (range) in pixels/arcsec}
 
       itk_component add fwhmy {
          LabelValue $w_.fwhmy -text {FwhmY:} \
@@ -383,7 +383,7 @@ itcl::class gaia::GaiaPositions {
       }
       pack $itk_component(fwhmy) -fill x -side top -pady 2 -padx 2
       add_short_help $itk_component(fwhmy) \
-         {Mean FWHM in Y direction (range) pixels/arcsec}
+         {Mean FWHM in Y direction (range) in pixels/arcsec}
 
       itk_component add angle {
          LabelValue $w_.angle -text {Angle:} \
@@ -480,12 +480,7 @@ itcl::class gaia::GaiaPositions {
             lassign $msg fwhmx rfwhmx fwhmy rfwhmy angle peak back nused
 
             #  Get image scale.
-            set ix [lindex $coords 0]
-            set iy [lindex $coords 1]
-            $itk_option(-rtdimage) convert coords $ix $iy image x1 y1 canvas
-            set ix [expr $ix + 1.0]
-            $itk_option(-rtdimage) convert coords $ix $iy image x2 y2 canvas
-            set imgscale [$itk_option(-rtdimage) wcsdist $x1 $y1 $x2 $y2]
+            lassign [$itk_option(-rtdimage) wcsset] ra dec imgscale
             if { $imgscale == "" } {
                set imgscale 0.0
             }
