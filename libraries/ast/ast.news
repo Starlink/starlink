@@ -16,6 +16,10 @@ environment-independent.
 Main Changes in this Version
 ----------------------------
 
+-  The TimeFrame class now support Local Time as a time scale. The offset
+from UTC to Local Time is specified by a new TimeFrame attribute called 
+LTOffset.
+
 -  Addition of a new class called Plot3D that provides facilities for
 producing 3-dimensional annotated coordinate grids.
 

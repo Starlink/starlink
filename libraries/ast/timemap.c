@@ -87,6 +87,8 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 *     15-APR-2008 (DSB):
 *        Add missing "break;" statement to "case AST__LMSTTOGMST:" 
 *        in Transform.
+*     20-MAY-2008 (DSB):
+*        Add conversions between Local Time and UTC (LTTOUTC and UTCTOLT).
 *class--
 */
 
@@ -124,6 +126,8 @@ f     - AST_TIMEADD: Add a time coordinate conversion to an TimeMap
 #define AST__LMSTTOLAST 23       /* LMST to LAST */
 #define AST__UTTOUTC    24       /* UT1 to UTC */
 #define AST__UTCTOUT    25       /* UTC to UT1 */
+#define AST__LTTOUTC    26       /* Local Time to UTC */
+#define AST__UTCTOLT    27       /* UTC to Local Time */
 
 /* Maximum number of arguments required by a conversion. */
 #define MAX_ARGS 5
@@ -609,6 +613,10 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args ) {
 *           Convert a UT1 MJD to a UTC MJD.
 *        AST__UTCTOUT( DUT1 )
 *           Convert a UTC MJD to a UT1 MJD.
+*        AST__LTTOUTC( LTOFF )
+*           Convert a local time MJD to a UTC MJD.
+*        AST__UTCTOLT( LTOFF )
+*           Convert a UTC MJD to a local time MJD.
 *
 *     The units for the values processed by the above conversions are as
 *     follows: 
@@ -626,6 +634,8 @@ static void AddTimeCvt( AstTimeMap *this, int cvttype, const double *args ) {
 *     - CLOCKLON: Clock longitude in radians (+ve westwards)
 *     - CLOCKLAT: Clock geodetic latitude in radians (+ve northwards)
 *     - DUT1: The value of UT1-UTC
+*     - LTOFF: The offset between Local Time and UTC (in hours, positive 
+*     for time zones east of Greenwich).
 
 *  Notes:
 *     - The specified conversion is appended only if the TimeMap's
@@ -819,6 +829,12 @@ static int CvtCode( const char *cvt_string ) {
 
    } else if ( astChrMatch( cvt_string, "UTCTOUT" ) ) { 
       result = AST__UTCTOUT;    
+
+   } else if ( astChrMatch( cvt_string, "LTTOUTC" ) ) { 
+      result = AST__LTTOUTC;    
+
+   } else if ( astChrMatch( cvt_string, "UTCTOLT" ) ) { 
+      result = AST__UTCTOLT;    
    }
 
 /* Return the result. */
@@ -1138,6 +1154,22 @@ static const char *CvtString( int cvt_code, const char **comment,
       *nargs = 1;
       *szargs = 1;
       arg[ 0 ] = "DUT1";
+      break;
+
+   case AST__LTTOUTC:
+      *comment = "Convert Local Time to UTC";
+      result = "LTTOUTC";
+      *nargs = 1;
+      *szargs = 1;
+      arg[ 0 ] = "LTOFF";
+      break;
+
+   case AST__UTCTOLT:
+      *comment = "Convert UTC to Local Time";
+      result = "UTCTOLT";
+      *nargs = 1;
+      *szargs = 1;
+      arg[ 0 ] = "LTOFF";
       break;
    }
 
@@ -2012,6 +2044,7 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                SWAP_CODES( AST__GMSTTOLMST, AST__LMSTTOGMST ) 
                SWAP_CODES( AST__LASTTOLMST, AST__LMSTTOLAST ) 
                SWAP_CODES( AST__UTTOUTC, AST__UTCTOUT ) 
+               SWAP_CODES( AST__LTTOUTC, AST__UTCTOLT ) 
 
 /* Exchange transformation codes for their inverses, and swap the offset
    values. */
@@ -2075,7 +2108,9 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
                      PAIR_CVT2( AST__TAITOTT, AST__TTTOTAI ) ||
                      PAIR_CVT2( AST__UTTOGMST, AST__GMSTTOUT ) ||
                      PAIR_CVT2( AST__TTTOTCG, AST__TCGTOTT ) || 
-                     PAIR_CVT2( AST__UTTOUTC, AST__UTCTOUT ) ) &&
+                     PAIR_CVT2( AST__TTTOTCG, AST__TCGTOTT ) || 
+                     PAIR_CVT2( AST__UTTOUTC, AST__UTCTOUT ) ||
+                     PAIR_CVT2( AST__LTTOUTC, AST__UTCTOLT ) ) &&
                           EQUAL( cvtargs[ istep ][ 0 ], 
                                  cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
@@ -3485,6 +3520,8 @@ f     these arguments should be given, via the ARGS array, in the
 *     - "LMSTTOLAST" (MJDOFF, CLOCKLON, CLOCKLAT): Convert a LMST MJD to a GMST MJD.
 *     - "UTTOUTC" (DUT1): Convert a UT1 MJD to a UTC MJD.
 *     - "UTCTOUT" (DUT1): Convert a UTC MJD to a UT1 MJD.
+*     - "LTTOUTC" (LTOFF): Convert a Local Time MJD to a UTC MJD.
+*     - "UTCTOLT" (LTOFF): Convert a UTC MJD to a Local Time MJD.
 *
 *     The units for the values processed by the above conversions are as
 *     follows: 
@@ -3510,6 +3547,8 @@ f     AST_TRANSFORM
 *     - CLOCKLON: Clock longitude in radians (+ve westwards).
 *     - CLOCKLAT: Clock geodetic latitude in radians (+ve northwards).
 *     - DUT1: The UT1-UTC value to use. 
+*     - LTOFF: The offset between Local Time and UTC (in hours, positive 
+*     for time zones east of Greenwich).
 *--
 */
 
@@ -4107,6 +4146,43 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                   for ( point = 0; point < npoint; point++ ) { 
                      if ( time[ point ] != AST__BAD ) {
                         time[ point ] -= args[ 0 ]/86400.0;
+                     }
+                  }
+               }
+               break;
+            
+/* LT to UTC. */
+/* ---------- */
+            case AST__LTTOUTC:
+               if ( forward ) {
+                  for ( point = 0; point < npoint; point++ ) { 
+                     if ( time[ point ] != AST__BAD ) {
+                        time[ point ] -= args[ 0 ]/24.0;
+                     }
+                  }
+               } else {
+                  for ( point = 0; point < npoint; point++ ) { 
+                     if ( time[ point ] != AST__BAD ) {
+                        time[ point ] += args[ 0 ]/24.0;
+                     }
+                  }
+               }
+               break;
+
+
+/* UTC to LT. */
+/* ---------- */
+            case AST__UTCTOLT:
+               if ( forward ) {
+                  for ( point = 0; point < npoint; point++ ) { 
+                     if ( time[ point ] != AST__BAD ) {
+                        time[ point ] += args[ 0 ]/24.0;
+                     }
+                  }
+               } else {
+                  for ( point = 0; point < npoint; point++ ) { 
+                     if ( time[ point ] != AST__BAD ) {
+                        time[ point ] -= args[ 0 ]/24.0;
                      }
                   }
                }

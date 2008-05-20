@@ -9793,6 +9793,11 @@ The main TimeFrame attributes which qualify the System attribute are:
 \item[TimeScale]\mbox{}\\
 This specifies the time scale.
 
+\item[LTOffset]\mbox{}\\
+This specifies the offset from Local Time to UTC in hours (time zones
+east of Greenwich have positive values). Note, AST uses the value as
+supplied without making any correction for daylight saving.
+
 \item[TimeOrigin]\mbox{}\\
 This specifies the zero point from which time values are measured, within
 the system specified by the System attribute. Thus, a value ofzero (the
@@ -21402,6 +21407,10 @@ occurred in the AST library between versions V4.5 and V4.6 (the
 current version):
 
 \begin{enumerate}
+
+\item The TimeFrame class now support Local Time as a time scale. The offset
+from UTC to Local Time is specified by a new TimeFrame attribute called 
+LTOffset.
 
 \item A new class called Plot3D has been added. The Plot3D class allows
 the creation of 3-dimensional annotated coordinate grids.

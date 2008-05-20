@@ -79,6 +79,7 @@
 #define AST__TDB          8
 #define AST__TCB          9
 #define AST__TCG         10
+#define AST__LT          11
 
 #endif
 
@@ -98,6 +99,7 @@ typedef struct AstTimeFrame {
    AstFrame frame;               /* Parent class structure */
 
 /* Attributes specific to objects in this class. */
+   double ltoffset;              /* Offset from UTC to Local Time */
    double timeorigin;            /* Zero point for time axis */
    AstTimeScaleType timescale;   /* Time scale */
    AstTimeScaleType aligntimescale; /* Alignment time scale */
@@ -118,6 +120,11 @@ typedef struct AstTimeFrameVtab {
 
 /* Properties (e.g. methods) specific to this class. */
    double (* CurrentTime)( AstTimeFrame * );
+
+   double (* GetLTOffset)( AstTimeFrame * );
+   int (* TestLTOffset)( AstTimeFrame * );
+   void (* ClearLTOffset)( AstTimeFrame * );
+   void (* SetLTOffset)( AstTimeFrame *, double );
 
    double (* GetTimeOrigin)( AstTimeFrame * );
    int (* TestTimeOrigin)( AstTimeFrame * );
@@ -170,6 +177,11 @@ AstTimeFrame *astLoadTimeFrame_( void *, size_t, AstTimeFrameVtab *,
 double astCurrentTime_( AstTimeFrame * );
 
 #if defined(astCLASS)            /* Protected */
+
+double astGetLTOffset_( AstTimeFrame * );
+int astTestLTOffset_( AstTimeFrame * );
+void astClearLTOffset_( AstTimeFrame * );
+void astSetLTOffset_( AstTimeFrame *, double );
 
 double astGetTimeOrigin_( AstTimeFrame * );
 int astTestTimeOrigin_( AstTimeFrame * );
@@ -246,6 +258,11 @@ astINVOKE(O,astLoadTimeFrame_(mem,size,vtab,name,astCheckChannel(channel)))
 #define astTestTimeOrigin(this) astINVOKE(V,astTestTimeOrigin_(astCheckTimeFrame(this)))
 #define astClearTimeOrigin(this) astINVOKE(V,astClearTimeOrigin_(astCheckTimeFrame(this)))
 #define astSetTimeOrigin(this,value) astINVOKE(V,astSetTimeOrigin_(astCheckTimeFrame(this),value))
+
+#define astGetLTOffset(this) astINVOKE(V,astGetLTOffset_(astCheckTimeFrame(this)))
+#define astTestLTOffset(this) astINVOKE(V,astTestLTOffset_(astCheckTimeFrame(this)))
+#define astClearLTOffset(this) astINVOKE(V,astClearLTOffset_(astCheckTimeFrame(this)))
+#define astSetLTOffset(this,value) astINVOKE(V,astSetLTOffset_(astCheckTimeFrame(this),value))
 
 #define astGetTimeScale(this) astINVOKE(V,astGetTimeScale_(astCheckTimeFrame(this)))
 #define astTestTimeScale(this) astINVOKE(V,astTestTimeScale_(astCheckTimeFrame(this)))

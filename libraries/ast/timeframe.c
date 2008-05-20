@@ -49,6 +49,7 @@ f     AST_TIMEFRAME
 *     TimeFrame also has the following attributes:
 *
 *     - AlignTimeScale: Time scale in which to align TimeFrames
+*     - LTOffset: The offset of Local Time from UTC, in hours.
 *     - TimeOrigin: The zero point for TimeFrame axis values
 *     - TimeScale: The timescale used by the TimeFrame
 *
@@ -134,6 +135,8 @@ f     - AST_CURRENTTIME: Return the current system time
 *     2-OCT-2007 (DSB):
 *        In Overlay, clear AlignSystem as well as System before calling
 *        the parent overlay method.
+*     2-OCT-2007 (DSB):
+*        Added "LT" (Local Time) time scale.
 *class--
 */
 
@@ -150,7 +153,7 @@ f     - AST_CURRENTTIME: Return the current system time
 
 /* Define the first and last acceptable TimeScale values. */
 #define FIRST_TS AST__TAI
-#define LAST_TS AST__TCG
+#define LAST_TS AST__LT
 
 /* Macros which return the maximum and minimum of two values. */
 #define MAX(aa,bb) ((aa)>(bb)?(aa):(bb))
@@ -181,6 +184,11 @@ f     - AST_CURRENTTIME: Return the current system time
           ts == AST__LAST || \
           ts == AST__GMST || \
           ts == AST__UT1 ) ? 1 : 0 )
+
+/* Define a macro which tests if a given timescale requires a LTOffset value 
+   in order to convert from the timescale to UTC. */
+#define LTOFFSET_SCALE(ts) \
+      ( ( ts == AST__LT ) ? 1 : 0 )
 
 /* Header files. */
 /* ============= */
@@ -298,6 +306,11 @@ static double GetTimeOrigin( AstTimeFrame * );
 static int TestTimeOrigin( AstTimeFrame * );
 static void ClearTimeOrigin( AstTimeFrame * );
 static void SetTimeOrigin( AstTimeFrame *, double );
+
+static double GetLTOffset( AstTimeFrame * );
+static int TestLTOffset( AstTimeFrame * );
+static void ClearLTOffset( AstTimeFrame * );
+static void SetLTOffset( AstTimeFrame *, double );
 
 static const char *GetAttrib( AstObject *, const char * );
 static int TestAttrib( AstObject *, const char * );
@@ -635,6 +648,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "clocklon" ) ) {
       astClearAttrib( this, "obslon" );
 
+/* LTOffset. */
+/* --------- */
+   } else if ( !strcmp( attrib, "ltoffset" ) ) {
+      astClearLTOffset( this );
+
 /* TimeOrigin. */
 /* ---------- */
    } else if ( !strcmp( attrib, "timeorigin" ) ) {
@@ -790,7 +808,8 @@ f     This routine
 *     returns the current system time, represented in the form specified
 *     by the supplied TimeFrame. That is, the returned floating point
 *     value should be interpreted using the attribute values of the
-*     TimeFrame. This includes System, TimeOrigin, TimeScale, and Unit.
+*     TimeFrame. This includes System, TimeOrigin, LTOffset, TimeScale, 
+*     and Unit.
 
 *  Parameters:
 c     this
@@ -1544,6 +1563,15 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
          result = buff;
       }
 
+/* LTOffset. */
+/* --------- */
+   } else if ( !strcmp( attrib, "ltoffset" ) ) {
+      dval = astGetLTOffset( this );
+      if( astOK ) {
+         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
+         result = buff;
+      }
+
 /* TimeScale. */
 /* ---------- */
 /* Obtain the TimeScale code and convert to a string. */
@@ -1895,6 +1923,7 @@ static const char *GetLabel( AstFrame *this, int axis ) {
    char *new_lab;                /* Modified label string */
    const char *fmt;              /* Pointer to original Format string */
    const char *result;           /* Pointer to label string */
+   double ltoff;                 /* Local Time offset from UTC (hours) */
    double orig;                  /* Time origin (seconds) */
    int fmtSet;                   /* Was Format attribute set? */
    int ndp;                      /* Number of decimal places for seconds field */
@@ -1984,6 +2013,17 @@ static const char *GetLabel( AstFrame *this, int axis ) {
                if( map ) map = astAnnul( map );
             }
          }
+      }
+
+/* If the time is a Local Time, indicate the offset from UTC. */
+      if( astGetTimeScale( this ) == AST__LT ) {
+         ltoff = astGetLTOffset( this );
+         if( ltoff >= 0.0 ) {
+            sprintf( buff, "%s (UTC+%g)", result, ltoff );
+         } else {
+            sprintf( buff, "%s (UTC-%g)", result, -ltoff );
+         }
+         result = buff;
       }
    }
 
@@ -2404,6 +2444,7 @@ static const char *GetTitle( AstFrame *this_frame ) {
    AstTimeFrame *this;           /* Pointer to TimeFrame structure */
    const char *fmt;              /* Pointer to original Format string */
    const char *result;           /* Pointer to result string */
+   double ltoff;                 /* Local Time offset from UTC (hours) */
    double orig;                  /* Time origin (seconds) */
    int fmtSet;                   /* Was Format attribute set? */
    int nc;                       /* No. of characters added */
@@ -2442,7 +2483,22 @@ static const char *GetTitle( AstFrame *this_frame ) {
    Do not do this if the system is BEPOCH since BEPOCH can only be used
    with the TT timescale. */
          if( system != AST__BEPOCH && astTestTimeScale( this ) ) {
-            nc = sprintf( buff + pos, " [%s]", TimeScaleString( ts ) );
+            nc = sprintf( buff + pos, " [%s", TimeScaleString( ts ) );
+            pos += nc;
+
+/* For Local Time, include the offset from UTC. */
+            if( ts == AST__LT ) {
+               ltoff = astGetLTOffset( this );
+               if( ltoff >= 0.0 ) {
+                  nc = sprintf( buff + pos, " (UTC+%g)", ltoff );
+               } else {
+                  nc = sprintf( buff + pos, " (UTC-%g)", -ltoff );
+               }
+               pos += nc;
+            }
+
+/* Close the brackets. */
+            nc = sprintf( buff + pos, " ]" );
             pos += nc;
          }
 
@@ -2625,6 +2681,11 @@ void astInitTimeFrameVtab_(  AstTimeFrameVtab *vtab, const char *name ) {
    vtab->GetTimeOrigin = GetTimeOrigin;
    vtab->SetTimeOrigin = SetTimeOrigin;
 
+   vtab->ClearLTOffset = ClearLTOffset;
+   vtab->TestLTOffset = TestLTOffset;
+   vtab->GetLTOffset = GetLTOffset;
+   vtab->SetLTOffset = SetLTOffset;
+
    vtab->ClearTimeScale = ClearTimeScale;
    vtab->TestTimeScale = TestTimeScale;
    vtab->GetTimeScale = GetTimeScale;
@@ -2750,8 +2811,8 @@ static AstMapping *MakeMap( AstTimeFrame *this, AstSystemType sys1,
 
 *  Parameters:
 *     this
-*        A TimeFrame which specifies the clock position (for both input
-*        and output).
+*        A TimeFrame which specifies extra attributes (the clock position, 
+*        time zone, etc) for both input and output. 
 *     sys1
 *        The input System.
 *     sys2
@@ -2789,7 +2850,8 @@ static AstMapping *MakeMap( AstTimeFrame *this, AstSystemType sys1,
    AstMapping *umap2;
    AstTimeMap *timemap;
    const char *du;
-   double args[ 3 ];
+   double args[ 4 ];
+   double args_lt[ 1 ];
    double args_ut[ 1 ];
    double shift;
 
@@ -2883,8 +2945,12 @@ static AstMapping *MakeMap( AstTimeFrame *this, AstSystemType sys1,
       args[ 1 ] = -astGetObsLon( this );
       args[ 2 ] = astGetObsLat( this );
 
-/* The UTTOUTC and UTCTOUT conversions required just he DUT1 value. */
+/* The UTTOUTC and UTCTOUT conversions required just the DUT1 value. */
       args_ut[ 0 ] = astGetDut1( this );
+
+/* The LTTOUTC and UTCTOLT conversions required just the time zone
+   correction. */
+      args_lt[ 0 ] = astGetLTOffset( this );
 
 /* If the input and output timescales differ, now add a conversion from the 
    input timescale to TAI. */
@@ -2904,6 +2970,10 @@ static AstMapping *MakeMap( AstTimeFrame *this, AstSystemType sys1,
          } else if( ts1 == AST__TCG ) {
             astTimeAdd( timemap, "TCGTOTT", args );
             astTimeAdd( timemap, "TTTOTAI", args );
+       
+         } else if( ts1 == AST__LT ) {
+            astTimeAdd( timemap, "LTTOUTC", args_lt );
+            astTimeAdd( timemap, "UTCTOTAI", args );
        
          } else if( ts1 == AST__TCB ) {
             astTimeAdd( timemap, "TCBTOTDB", args );
@@ -2977,6 +3047,10 @@ static AstMapping *MakeMap( AstTimeFrame *this, AstSystemType sys1,
             astTimeAdd( timemap, "UTTOGMST", args );
             astTimeAdd( timemap, "GMSTTOLMST", args );
 
+         } else if( ts2 == AST__LT ) {
+            astTimeAdd( timemap, "TAITOUTC", args );
+            astTimeAdd( timemap, "UTCTOLT", args_lt );
+       
          }
       } 
 
@@ -3096,15 +3170,20 @@ static int MakeTimeMapping( AstTimeFrame *target, AstTimeFrame *result,
    const char *u1;               /* Input target units */
    const char *u2;               /* Output target units */
    double align_off;             /* Axis offset */
+   double ltoff1;                /* Input axis Local Time offset */
+   double ltoff2;                /* Output axis Local Time offset */
    double off1;                  /* Input axis offset */
    double off2;                  /* Output axis offset */
    int arclk;                    /* Align->result depends on clock position? */
    int ardut;                    /* Align->result depends on Dut1? */
+   int arlto;                    /* Align->result depends on LT offset? */
    int clkdiff;                  /* Do target and result clock positions differ? */
    int dut1diff;                 /* Do target and result Dut1 values differ? */
+   int ltodiff;                  /* Do target and result LTOffset values differ? */
    int match;                    /* Mapping can be generated? */
    int taclk;                    /* Target->align depends on clock position? */
    int tadut;                    /* Target->align depends on Dut1? */
+   int talto;                    /* Target->align depends on LT offset? */
 
 /* Check the global error status. */
    if ( !astOK ) return 0;
@@ -3157,17 +3236,25 @@ static int MakeTimeMapping( AstTimeFrame *target, AstTimeFrame *result,
    tadut = DUT1_SCALE( ts1 ) != DUT1_SCALE( align_ts );
    ardut = DUT1_SCALE( align_ts ) != DUT1_SCALE( ts2 );
 
+/* In addition, the alignment frame is significant if either of the Mappings 
+   depends on LTOffset and the values of the LTOffset attribute are different 
+   for the two TimeFrames. */
+   ltodiff = ( ltoff1 != ltoff2 );
+   talto = LTOFFSET_SCALE( ts1 ) != LTOFFSET_SCALE( align_ts );
+   arlto = LTOFFSET_SCALE( align_ts ) != LTOFFSET_SCALE( ts2 );
+
 /* If the alignment frame can be ignored, use MakeMap */
    if( ( !clkdiff || !( taclk || arclk ) ) &&
+       ( !ltodiff || !( talto || arlto ) ) &&
        ( !dut1diff || !( tadut || ardut ) ) ) {
       *map = MakeMap( target, sys1, sys2, ts1, ts2, off1, off2, u1, u2, 
                       "astSubFrame" );
       if( *map ) match = 1;
 
 /* Otherwise, we create the Mapping in two parts; first a Mapping from
-   the target Frame to the alignment Frame (using the target clock and dut1),
-   then a Mapping from the alignment Frame to the results Frame (using the 
-   result clock and dut1). */
+   the target Frame to the alignment Frame (using the target clock, dut1
+   and ltoffset), then a Mapping from the alignment Frame to the results 
+   Frame (using the result clock, dut1 and ltoffset). */
    } else {
 
 /* Create a Mapping from target units/system/timescale/offset to MJD in 
@@ -3730,6 +3817,7 @@ static void Overlay( AstFrame *template, const int *template_axes,
    for SourceVel would be changed from the default SourceVRF to the specified
    SourceVRF when SourceVRF was overlayed. */
       OVERLAY(AlignTimeScale)
+      OVERLAY(LTOffset)
       OVERLAY(TimeOrigin)
       OVERLAY(TimeScale)
    }
@@ -3886,6 +3974,13 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
       strcpy( new_setting + 3, setting + 5 );
       astSetAttrib( this, new_setting );
       new_setting = astFree( new_setting );
+
+/* LTOffset */
+/* -------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "ltoffset= %lg %n", &dval, &nc ) )
+        && ( nc >= len ) ) {
+      astSetLTOffset( this, dval );
 
 /* TimeOrigin */
 /* ---------- */
@@ -4242,6 +4337,9 @@ static AstTimeScaleType TimeScaleCode( const char *ts ) {
    } else if ( astChrMatch( "TCB", ts ) ) {
       result = AST__TCB;
 
+   } else if ( astChrMatch( "LT", ts ) ) {
+      result = AST__LT;
+
    }
 
 /* Return the result. */
@@ -4338,6 +4436,10 @@ static const char *TimeScaleString( AstTimeScaleType ts ) {
 
    case AST__TCG:
       result = "TCG";
+      break;
+
+   case AST__LT:
+      result = "LT";
       break;
 
    }
@@ -4940,6 +5042,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "clocklon" ) ) {
       result = astTestAttrib( this, "obslon" );
 
+/* LTOffset. */
+/* --------- */
+   } else if ( !strcmp( attrib, "ltoffset" ) ) {
+      result = astTestLTOffset( this );
+
 /* TimeOrigin. */
 /* --------- */
    } else if ( !strcmp( attrib, "timeorigin" ) ) {
@@ -5538,6 +5645,10 @@ static void VerifyAttrs( AstTimeFrame *this, const char *purp,
                      set = astTestTimeOrigin( this );
                      desc = "time offset";
 
+                  } else if( !strncmp( "LTOffset", a, len ) ) {
+                     set = astTestLTOffset( this );
+                     desc = "local time offset";
+
                   } else if( !strncmp( "TimeScale", a, len ) ) {
                      set = astTestTimeScale( this );
                      desc = "time scale";
@@ -5651,6 +5762,37 @@ astMAKE_CLEAR(TimeFrame,TimeOrigin,timeorigin,AST__BAD)
 astMAKE_GET(TimeFrame,TimeOrigin,double,0.0,((this->timeorigin!=AST__BAD)?this->timeorigin:0.0))
 astMAKE_SET(TimeFrame,TimeOrigin,double,timeorigin,value)
 astMAKE_TEST(TimeFrame,TimeOrigin,( this->timeorigin != AST__BAD ))
+
+/*
+*att++
+*  Name:
+*     LTOffset
+
+*  Purpose:
+*     The offset from UTC to Local Time, in hours.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Floating point.
+
+*  Description:
+*     This specifies the offset from UTC to Local Time, in hours (fractional 
+*     hours can be supplied). It is positive for time zones east of Greenwich. 
+*     AST uses the figure as given, without making any attempt to correct for 
+*     daylight saving. The default value is zero.
+
+*  Applicability:
+*     TimeFrame
+*        All TimeFrames have this attribute.
+
+*att--
+*/
+astMAKE_CLEAR(TimeFrame,LTOffset,ltoffset,AST__BAD)
+astMAKE_GET(TimeFrame,LTOffset,double,0.0,((this->ltoffset!=AST__BAD)?this->ltoffset:0.0))
+astMAKE_SET(TimeFrame,LTOffset,double,ltoffset,value)
+astMAKE_TEST(TimeFrame,LTOffset,( this->ltoffset != AST__BAD ))
 
 /*
 *att++
@@ -5769,6 +5911,7 @@ astMAKE_SET(TimeFrame,AlignTimeScale,AstTimeScaleType,aligntimescale,(
 *     - "TDB" - Barycentric Dynamical Time
 *     - "TCB" - Barycentric Coordinate Time
 *     - "TCG" - Geocentric Coordinate Time
+*     - "LT" - Local Time (the offset from UTC is given by attribute LTOffset)
 *
 *     An very informative description of these and other time scales is
 *     available at http://www.ucolick.org/~sla/leapsecs/timescales.html.
@@ -5917,6 +6060,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    set = TestTimeOrigin( this );
    dval = set ? GetTimeOrigin( this ) : astGetTimeOrigin( this );
    astWriteDouble( channel, "TmOrg", set, 0, dval, "Time offset" );
+
+/* LTOffset. */
+/* --------- */
+   set = TestLTOffset( this );
+   dval = set ? GetLTOffset( this ) : astGetLTOffset( this );
+   astWriteDouble( channel, "LTOff", set, 0, dval, "Local Time offset from UTC" );
 
 }
 
@@ -6110,6 +6259,7 @@ AstTimeFrame *astInitTimeFrame_( void *mem, size_t size, int init,
 /* ----------------------------- */
 /* Initialise all attributes to their "undefined" values. */
       new->timeorigin = AST__BAD;
+      new->ltoffset = AST__BAD;
       new->timescale = AST__BADTS;
       new->aligntimescale = AST__BADTS;
 
@@ -6310,6 +6460,11 @@ AstTimeFrame *astLoadTimeFrame_( void *mem, size_t size,
 /* --------- */
       new->timeorigin = astReadDouble( channel, "tmorg", AST__BAD );
       if ( TestTimeOrigin( new ) ) SetTimeOrigin( new, new->timeorigin );
+
+/* LTOffset. */
+/* --------- */
+      new->ltoffset = astReadDouble( channel, "ltoff", AST__BAD );
+      if ( TestLTOffset( new ) ) SetLTOffset( new, new->ltoffset );
 
 /* If an error occurred, clean up by deleting the new TimeFrame. */
       if ( !astOK ) new = astDelete( new );
