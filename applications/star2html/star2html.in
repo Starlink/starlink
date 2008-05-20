@@ -227,6 +227,8 @@
 #     17-MAR-2008 (PDRAPER):
 #        Moved back to a single version of latex2html, 2002.2, and
 #        made associated changes.
+#     20-MAY-2008 (PDRAPER):
+#        Parse stardocopyright to convert \newline into <BR>.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -471,6 +473,7 @@ if ( $NOCOPYRIGHT ) {
    $COPYRIGHT = &get_item('\stardoccopyright');
    if ( $COPYRIGHT ) {
       $COPYRIGHT =~ s/\\copyright\\/&copy/g;
+      $COPYRIGHT =~ s/\\newline\\/<BR>/g;
    } elsif ( $ENV{'HTX_COPYRIGHT'} ) {
       $COPYRIGHT = $ENV{'HTX_COPYRIGHT'};
       if ( $COPYRIGHT =~ /^none$/i ) {
