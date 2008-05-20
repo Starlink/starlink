@@ -161,10 +161,11 @@ void smf_get_projpar( AstSkyFrame *skyframe, double par[ 7 ], int *usedefs,
     }  
   }
   
-  /* Get the user defined spatial pixel size in arcsec (the calibration for 
-     the spectral axis is fixed by the first input data file - see 
-     smf_cubebounds.c). First convert the autogrid values form rads to arcsec
-     and establish them as the dynamic default for "PIXSIZE". */
+  /* Get the user defined spatial pixel size in arcsec (the
+     calibration for the spectral axis is fixed by the first input
+     data file - see smf_cubebounds.c). First convert the provided
+     values form rads to arcsec and establish them as the dynamic
+     default for "PIXSIZE". */
   if( par[ 4 ] != AST__BAD && par[ 5 ] != AST__BAD ) {
     defsize[ 0 ] = 0.1*NINT( fabs( par[ 4 ] )*AST__DR2D*36000.0 );
     defsize[ 1 ] = 0.1*NINT( fabs( par[ 5 ] )*AST__DR2D*36000.0 );
@@ -203,9 +204,10 @@ void smf_get_projpar( AstSkyFrame *skyframe, double par[ 7 ], int *usedefs,
     
   }
   
-  /* Convert the autogrid CROTA value from rads to degs and set as the
-     dynamic default for parameter CROTA (the position angle of the output 
-     Y axis, in degrees). The get the CROTA value and convert to rads. */
+  /* Provided CROTA value from rads to degs and set as the dynamic
+     default for parameter CROTA (the position angle of the output Y
+     axis, in degrees). Then get the CROTA value and convert to
+     rads. */
 
   if( par[ 6 ] != AST__BAD ) {
     defrot = par[ 6 ]*AST__DR2D;
