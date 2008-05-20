@@ -173,6 +173,9 @@
 *        co-incident.
 *     08-APR-2008 (TIMJ):
 *        Use tcs_tai instead of rts_end for position calculations.
+*     20-MAY-2008 (DSB):
+*        If autogrid is false, use a default CROTA value determined by
+*        the MAP_PA FITS header.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -264,9 +267,10 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    double az[ 2 ];       /* Azimuth values */
    double b;             /* Latitude value */
    double dec[ 2 ];      /* Dec values */
-   double defrot;        /* Default for CROTA parameter */
+   double autorot;       /* Autogrid default for CROTA parameter */
    double defsize[ 2 ];  /* Default pixel sizes in arc-seconds */
    double el[ 2 ];       /* Elevation values */
+   double map_pa;        /* Map position angle in output coord system (rads) */ 
    double pixsize[ 2 ];  /* Pixel sizes in arc-seconds */
    double ra[ 2 ];       /* RA values */
    double rdiam;         /* Diameter of bounding circle, in rads */
@@ -287,7 +291,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    int nallpos;          /* Number of positions */
    int nval;             /* Number of values supplied */
    int outcat;           /* Produce an output catalogue holding sample positions? */
-   int usedefs;          /* Are default projection parameters being used? */
+   int useauto;          /* Are autogrid default projection parameters being used? */
    smfData *data = NULL; /* Pointer to data struct for current input file */
    smfFile *file = NULL; /* Pointer to file struct for current input file */
    smfHead *hdr = NULL;  /* Pointer to data header for this time slice */
@@ -456,6 +460,11 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 /* If we have not yet created the output SkyFrame, do so now. */
          if( ! *skyframe ) {
 
+/* Get the orientation of the map vertical within the output celestial
+   coordinate system. This is derived form the MAP_PA FITS header, which
+   gives the orientation of the map vertical within the tracking system. */
+            map_pa = smf_calc_mappa( hdr, system, skyin, status );
+
 /* Determine the tracking system, and choose the celestial coordinate system 
    for the output cube. */
             trsys = smf_convert_system( hdr->state->tcs_tr_sys, status );
@@ -497,7 +506,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    we ignoring a moving base pointing position unless the output system 
    is AZEL or GAPPT. */
             if( !strcmp( usesys, "AZEL" ) ||
-                  !strcmp( usesys, "GAPPT" ) ) {
+                !strcmp( usesys, "GAPPT" ) ) {
 
 /* Get a copy of the output SkyFrame. */
                sf2 = astCopy( *skyframe );
@@ -735,7 +744,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
          par[ 1 ] = 0.0;
          par[ 4 ] = (6.0/3600.0)*AST__DD2R;
          par[ 5 ] = (6.0/3600.0)*AST__DD2R;
-         par[ 6 ] = 0.0;
+         par[ 6 ] = map_pa;
       }
      
 /* Ensure the pixel sizes have the correct signs. */
@@ -775,9 +784,9 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
             astSet( *skyframe, "SkyRefIs=Origin" ); 
          }
      
-/* Set up a flag indicating that the default values calculated above are
-   being used. */
-         usedefs = 1;
+/* Set up a flag indicating that the default values calculated by autogrid 
+   are being used. */
+         useauto = 1;
      
 /* Ensure we have usable CRPIX1/2 values */
          if( par[ 0 ] == AST__BAD ) par[ 0 ] = 1.0;
@@ -805,7 +814,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
          if( *status == SAI__OK ) {
      
             if( ( deflat && strcmp( deflat, reflat ) ) ||
-                  ( deflon && strcmp( deflon, reflon ) ) ) usedefs = 0;
+                  ( deflon && strcmp( deflon, reflon ) ) ) useauto = 0;
                   
             if( astUnformat( *skyframe, 1, reflon, par + 2 ) == 0 && *status == SAI__OK ) {
                msgSetc( "REFLON", reflon );
@@ -835,7 +844,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
             if( nval < 2 ) pixsize[ 1 ] = pixsize[ 0 ];
      
             if( defsize[ 0 ] != pixsize[ 0 ] ||
-                  defsize[ 1 ] != pixsize[ 1 ] ) usedefs = 0;
+                  defsize[ 1 ] != pixsize[ 1 ] ) useauto = 0;
          
 /* Check the values are OK. */
             if( pixsize[ 0 ] <= 0 || pixsize[ 1 ] <= 0 ) {
@@ -864,20 +873,22 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    dynamic default for parameter CROTA (the position angle of the output 
    Y axis, in degrees). The get the CROTA value and convert to rads. */
          if( par[ 6 ] != AST__BAD ) {
-            defrot = par[ 6 ]*AST__DR2D;
-            parDef0d( "CROTA", defrot, status );
+            autorot = par[ 6 ]*AST__DR2D;
+            parDef0d( "CROTA", autorot, status );
+
          } else {
-            defrot = AST__BAD;
+            parDef0d( "CROTA", map_pa*AST__DR2D, status );
+            autorot = AST__BAD;
          }
      
          parGet0d( "CROTA", par + 6, status );
-         if( par[ 6 ] != defrot ) usedefs = 0;
+         if( par[ 6 ] != autorot ) useauto = 0;
          par[ 6 ] *= AST__DD2R;
      
 /* If any parameter were given explicit values which differ from the
-   default values, then we need to re-calculate the optimal CRPIX1/2 
+   autogrid default values, then we need to re-calculate the optimal CRPIX1/2 
    values. We also do this if all the points are effectively co-incident. */
-         if( ( coin || !usedefs ) && autogrid && usesys ) {
+         if( ( coin || !useauto ) && autogrid && usesys ) {
             par[ 0 ] = AST__BAD;
             par[ 1 ] = AST__BAD;
             kpg1Opgrd( nallpos, allpos, strcmp( usesys, "AZEL" ), par,

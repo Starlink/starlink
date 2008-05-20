@@ -77,10 +77,11 @@
 *          adjusting the grid until as many data samples as possible fall 
 *          close to the centre of pixels in the output cube. If FALSE, 
 *          REFLON/REFLAT are set to the first pointing BASE position, CROTA 
-*          is set to zero, and PIXSIZE is are set to 6 arc-seconds. In 
-*          addition, if AUTOGRID is TRUE the precise placement of the tangent 
-*          point is adjusted by up to 1 pixel along each spatial pixel axis 
-*          in order to optimise the grid. [FALSE]
+*          is set to the MAP_PA value in the FITS header (converted to the
+*          requested sky co-oridnate system), and PIXSIZE is are set to 6 
+*          arc-seconds. In addition, if AUTOGRID is TRUE the precise placement 
+*          of the tangent point is adjusted by up to 1 pixel along each 
+*          spatial pixel axis in order to optimise the grid. [FALSE]
 *     BADMASK = LITERAL (Read)
 *          A string determining the way in which bad pixels are propagated
 *          from input to output. "AND" should usually be used since this 

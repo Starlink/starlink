@@ -950,4 +950,7 @@ void smf_check_units( int count, char current[],
 void smf_get_projpar( AstSkyFrame *skyframe, double par[ 7 ], int *usedefs,
                       int *status );
 
+double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf, 
+                       int *status );
+
 #endif /* SMF_DEFINED */
