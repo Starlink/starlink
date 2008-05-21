@@ -126,6 +126,9 @@
 *  Begin a new error reporting context (we want to clean up even if an
 *  error has occurred).
       CALL ERR_BEGIN( STATUS )
+      THERE = .FALSE.
+      INDF1 = NDF__NOID
+      INDF2 = NDF__NOID
 
 *  Indicate that the routine NDG1_HNDLR should no longer be called 
 *  whenever an NDF is opened or closed.
