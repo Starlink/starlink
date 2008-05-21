@@ -251,8 +251,6 @@ foreach image $argv {
       set cmd "$gaia noblock_clone $clone [$namer fullname]"
    }
    
-   puts "cmd = $cmd"
-
    #  And send the command.
    set gaianame [send_to_gaia remotetcl $cmd]
    if { $gaianame == "" || [string match ".gaia*" $gaianame] } {
