@@ -381,7 +381,7 @@ void smf_rebincube_ast( smfData *data, int first, int last, int *ptime,
    inperm[ 2 ] = 2;
    pmap = astPermMap( 3, inperm, 3, outperm, NULL, "" );
 
-/* Initialise a pointer to the ntex time slice index to be used. */
+/* Initialise a pointer to the next time slice index to be used. */
    nexttime = ptime;
 
 /* Initialise the progress meter. */
