@@ -216,31 +216,31 @@
 
 *- 
 *  Type Definitions:
-      IMPLICIT NONE                  ! No implicit typing
+      IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'              ! Standard ADAM constants
-      INCLUDE 'DAT_PAR'              ! Data-system constants
+      INCLUDE 'SAE_PAR'          ! Standard ADAM constants
+      INCLUDE 'DAT_PAR'          ! Data-system constants
 
 *  Status:                  
-      INTEGER STATUS                 ! Global status
+      INTEGER STATUS             ! Global status
 
 *  External References:
-      INTEGER CHR_LEN                ! Get effective length of string
+      INTEGER CHR_LEN            ! Get effective length of string
 
 *  Local Variables:
-      INTEGER   EL                   ! Number of elements in NDF
-      CHARACTER FIGFIL * ( 80 )      ! Name of input file
-      CHARACTER FORM * ( 9 )         ! NDF storage form
-      CHARACTER LOC * ( DAT__SZLOC ) ! HDS locator to a transient NDF
-      INTEGER   NCF                  ! Length of the Figaro file name
-      INTEGER   NCN                  ! Length of the NDF file name
-      INTEGER   NDF                  ! NDF identifier
-      INTEGER   NLEV                 ! Number of levels in NDF
-      CHARACTER NDFFIL * ( 80 )      ! Name of output file
-      CHARACTER PATH * ( 132 )       ! Path to the NDF within the
-                                     ! container file
-      INTEGER   PNTR                 ! Pointer to mapped NDF data array
+      INTEGER EL                 ! Number of elements in NDF
+      CHARACTER*256 FIGFIL       ! Name of input file
+      CHARACTER*9 FORM           ! NDF storage form
+      CHARACTER*( DAT__SZLOC ) LOC ! HDS locator to a transient NDF
+      INTEGER NCF                ! Length of the Figaro file name
+      INTEGER NCN                ! Length of the NDF file name
+      INTEGER NDF                ! NDF identifier
+      INTEGER NLEV               ! Number of levels in NDF
+      CHARACTER*256 NDFFIL       ! Name of output file
+      CHARACTER*132 PATH         ! Path to the NDF within the
+                                 ! container file
+      INTEGER   PNTR             ! Pointer to mapped NDF data array
 
 *.
 
