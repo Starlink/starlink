@@ -183,10 +183,10 @@ itcl::class rtd::RtdImagePick {
                 -relief groove \
                 -anchor e
         } 
-	# LabelValue(n) for "FHWM X:Y arcsecs" in arcseconds.
+	# LabelValue(n) for FHWM in "arcsecs".
         itk_component add fwhmarc {
             util::LabelValue $labelf.fwhmarc \
-                -text "FWHM X:Y arcsecs:" \
+                -text "arcsecs:" \
                 -labelfont $itk_option(-labelfont) \
                 -valuefont $itk_option(-valuefont) \
                 -valuewidth $itk_option(-valuewidth) \
@@ -793,7 +793,7 @@ itcl::class rtd::RtdImagePick {
     itk_option define -wcsfont wcsFont WcsFont -*-symbol-*-*-*-*-14-*-*-*-*-*-*-*
 
     # set the width for  displaying labels and values
-    itk_option define -labelwidth labelWidth LabelWidth 18
+    itk_option define -labelwidth labelWidth LabelWidth 16
 
     # set the width for  displaying labels and values
     itk_option define -valuewidth valueWidth ValueWidth 11
