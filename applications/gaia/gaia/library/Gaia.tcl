@@ -2305,7 +2305,13 @@ window gives you access to this."
    itk_option define -scrollbars scrollbars Scrollbars 1
 
    #  The NDF component to display.
-   itk_option define -component component Component data
+   itk_option define -component component Component data {
+      if { [info exists image_] } {
+         if { [winfo exists $image_] } {
+            $image_ configure -component $itk_option(-component)
+         }
+      }
+   }
 
    #  Switch on demo mode (this makes an additional class available
    #  for running GAIA and making it show off/test some of its

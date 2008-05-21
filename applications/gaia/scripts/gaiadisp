@@ -9,11 +9,11 @@ exec $GAIA_DIR/gaia_tcl $0 ${1+"$@"}
 #      Display images in a GAIA tool.
 
 #   Usage:
-#         gaiadisp [-p value] image
+#         gaiadisp [-p value] [-c component] image
 #      or
-#         gaiadisp [-p value] image clone_number
+#         gaiadisp [-p value] [-c component] image clone_number
 #      or
-#         gaiadisp [-p value] image1 image2 image3 ...
+#         gaiadisp [-p value] [-c component] image1 image2 image3 ...
 
 #   Description:
 #      This command displays images in GAIA. It has two basic modes
@@ -32,7 +32,7 @@ exec $GAIA_DIR/gaia_tcl $0 ${1+"$@"}
 #  Copyright:
 #     Copyright (C) 1996-2005 Central Laboratory of the Research Councils.
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-#     Copyright (C) 2007 Science and Technology Facilities Council.
+#     Copyright (C) 2007-2008 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -67,10 +67,11 @@ exec $GAIA_DIR/gaia_tcl $0 ${1+"$@"}
 
 #  Check the command-line arguments.
 
-#  Handle the -p argument.
+#  Handle the -p and -c arguments.
 package require cmdline
 set options {
-   {p.arg  -1   "percentile cut for display (50-100)" }
+   {p.arg  -1     "percentile cut for display (50-100)"}
+   {c.arg  "DATA" "NDF component, DATA, VARIANCE or QUALITY"}
 }
 
 set usage ": 
@@ -81,7 +82,29 @@ options:"
 array set params [::cmdline::getoptions argv $options $usage]
 
 set percentile "$params(p)"
+set component "$params(c)"
 set clone -1
+
+#  Allow shortname for component.
+switch -glob $component {
+   d* -
+   D* {
+      set component "DATA"
+   }
+   v* -
+   V* {
+      set component "VARIANCE"
+   }
+   q* -
+   Q* {
+      set component "QUALITY"
+   }
+   default {
+      puts stderr "Unknown NDF component: \"$component\""
+      puts stderr "Should be one of DATA, VARIANCE or QUALITY"
+      exit
+   }
+}
 
 #  Handle non option values (images and clone number).
 set argc [llength $argv]
@@ -103,8 +126,8 @@ if { $argc == 1 } {
 } elseif { $argc > 2 } {
    set clone -1
 } else {
-    set argv "-help"
-    puts stderr [::cmdline::usage $options $usage]
+   set argv "-help"
+   puts stderr [::cmdline::usage $options $usage]
    exit
 }
 
@@ -214,6 +237,10 @@ foreach image $argv {
    #  If it has a FITS extension then we need to protect the [].
    $namer protect
 
+   #  Apply component if set.
+   set cmd "$gaia configure -component $component"
+   send_to_gaia remotetcl $cmd
+
    #  Construct the command needed to display the image. Note
    #  complication when we create GAIA, need to display into the first
    #  clone.
@@ -223,6 +250,8 @@ foreach image $argv {
    } else {
       set cmd "$gaia noblock_clone $clone [$namer fullname]"
    }
+   
+   puts "cmd = $cmd"
 
    #  And send the command.
    set gaianame [send_to_gaia remotetcl $cmd]

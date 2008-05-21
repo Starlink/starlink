@@ -5,6 +5,9 @@
     The pick object toolbox will now report the FWHM in arcseconds as well
     as pixels.
 
+    The gaiadisp command now offers the facility to display an NDF data
+    component, such as variance or quality.
+
     Spectral extraction can now display error bars based on the data
     variance.
 
