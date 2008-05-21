@@ -33,6 +33,7 @@
 #  Copyright:
 #     Copyright (C) 1998-1999 Central Laboratory of the Research Councils
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2008 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -162,7 +163,7 @@ itcl::class gaia::GaiaImagePick {
 
       #  If new file then add headers.
       if { $init } {
-         puts $fd "# name \t x \t y \t ra \t dec \t equinox \t angle \t peak \t background \t fwhm (X:Y)"
+         puts $fd "# name \t x \t y \t ra \t dec \t equinox \t angle \t peak \t background \t fwhm (X:Y) \t fwhm (X:Y)"
       }
 
       #  Add the comment and time stamp.
@@ -191,6 +192,7 @@ itcl::class gaia::GaiaImagePick {
       set object [$itk_component(object) cget -value]
       set background [$itk_component(background) cget -value]
       set fwhm [$itk_component(fwhm) cget -value]
+      set fwhmarc [$itk_component(fwhmarc) cget -value]
 
       #  Make sure we have something to write...
       if { $x == "" } {
@@ -199,7 +201,7 @@ itcl::class gaia::GaiaImagePick {
       }
 
       #  Write them out.
-      puts $fd "$name \t $x \t $y \t $ra \t $dec \t $equinox \t $angle \t $object \t $background \t $fwhm"
+      puts $fd "$name \t $x \t $y \t $ra \t $dec \t $equinox \t $angle \t $object \t $background \t $fwhm \t $fwhmarc"
       $itk_option(-shorthelpwin) short_help {saved values...}
 
       ::close $fd
