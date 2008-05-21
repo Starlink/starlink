@@ -1690,13 +1690,14 @@ itcl::class gaia::Gaia {
 	 set name ""
       }
 
-      #  If named window already exists, just configure file and return.
+      #  If named window already exists, just configure args and file 
+      #  and return.
       if { [winfo exists $name] } {
-          if { $file != "" } {
-              $name open $file
-          }
           if { $args != "" } {
               eval $name configure $args
+          }
+          if { $file != "" } {
+              $name open $file
           }
           return $name
       }

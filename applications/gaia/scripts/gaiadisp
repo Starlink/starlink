@@ -19,7 +19,9 @@ exec $GAIA_DIR/gaia_tcl $0 ${1+"$@"}
 #      This command displays images in GAIA. It has two basic modes
 #      display a single image into a specified "clone", or display
 #      a list of images into a series of automatically created clones.
-#      An optional argument allows for a percentile cut to be applied.
+#      Optional arguments allow for a percentile cut to be applied
+#      and a data component of an NDF to be displayed (VARIANCE
+#      or QUALITY).
 #
 #      Clones are specified by an integer number less than 1000.
 #      The special number -1 indicates that a number should be generated.
@@ -74,7 +76,7 @@ set options {
    {c.arg  "DATA" "NDF component, DATA, VARIANCE or QUALITY"}
 }
 
-set usage ": 
+set usage ":
              gaiadisp \[options] image
              gaiadisp \[options] image clone_number
              gaiadisp \[options] image1 image2 image3 ...
@@ -237,24 +239,26 @@ foreach image $argv {
    #  If it has a FITS extension then we need to protect the [].
    $namer protect
 
-   #  Apply component if set.
-   set cmd "$gaia configure -component $component"
-   send_to_gaia remotetcl $cmd
-
    #  Construct the command needed to display the image. Note
    #  complication when we create GAIA, need to display into the first
    #  clone.
    if { $created_instance || $clone == "" } {
+
+      #  Apply component choice before open.
+      set cmd "$gaia configure -component $component"
+      send_to_gaia remotetcl $cmd
+
       set cmd "$gaia open [$namer fullname]"
       set created_instance 0
    } else {
-      set cmd "$gaia noblock_clone $clone [$namer fullname]"
+      #  Component is passed as configuration arguments.
+      set cmd "$gaia noblock_clone $clone [$namer fullname] 0 -component $component"
    }
-   
+
    #  And send the command.
    set gaianame [send_to_gaia remotetcl $cmd]
    if { $gaianame == "" || [string match ".gaia*" $gaianame] } {
-      puts stderr "Displayed image: $image."
+      puts stderr "Displayed image: $image"
    } else {
       puts stderr "Failed to display image: ($gaianame)"
    }
