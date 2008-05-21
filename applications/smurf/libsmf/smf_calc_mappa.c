@@ -44,6 +44,8 @@
 *  History:
 *     20-MAY-2008 (DSB):
 *        Original version.
+*     21-MAY-2008 (DSB):
+*        Check for undefined MAP_PA values, and use zero instead.
 
 *  Copyright:
 *     Copyright (C) 2008 Science & Technology Facilities Council.
@@ -120,6 +122,7 @@ double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf,
 /* Move along the map "vertical" axis (as specified by the MAP_PA FITS
    header) for 1 arc-minute from the base pointing position. */
    smf_fits_getD( hdr, "MAP_PA", &map_pa, status );
+   if( map_pa == AST__UNDEFF ) map_pa = 0.0;
    (void) astOffset2( sf, p1, map_pa*AST__DD2R, AST__DD2R/60.0, p2 );
 
 /* Take a copy of the Frame and set its System value to the requested
