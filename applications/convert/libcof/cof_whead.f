@@ -131,7 +131,7 @@
 *          container file.
 *        DATASUM and CHECKSUM --- are removed to avoid spurious values
 *          being stored.
-*        PRVn and OBSn --- CADC provenance headers are removed.
+*        PRVn, OBSn, and FILEID --- CADC provenance headers are removed.
 *        PRVPn, PRVIn, PRVDn, PRVCn, PRVMn ---  provenance headers are
 *          removed.
 
@@ -197,6 +197,8 @@
 *        Do not exclude provenance keywords if the NDF does not have a
 *        PROVENANCE extension.  Allow for latest FITS citation COMMENT
 *        cards.
+*     2008 May 20 (MJC):
+*        Exclude CADC new FILEID provenance header.
 *     {enter_further_changes_here}
 
 *-
@@ -615,6 +617,7 @@
 *  there is no PROVENANCE extension.
                CADCKY = ( KEYWRD .NE. 'PRVCNT' ) .AND.
      :                  ( KEYWRD .NE. 'OBSCNT' ) .AND.
+     :                  ( KEYWRD .NE. 'FILEID' ) .AND.
      :                  ( KEYWRD( 1:3 ) .NE. 'PRV' .OR. .NOT. ISNUM )
      :                  .AND.
      :                  ( KEYWRD( 1:3 ) .NE. 'OBS' .OR. .NOT. ISNUM )

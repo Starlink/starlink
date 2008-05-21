@@ -485,6 +485,8 @@
 *        OBSCNT --- is the number of root ancestor OBSm headers.
 *        OBSm --- is mth root ancestor identifier from its
 *          MORE.OBSIDSS component.
+*        FILEID --- is the name of the output FITS file, omitting any
+*          file extension.
 *
 *     When PROFITS is TRUE any existing provenance keywords in the FITS
 *     airlock are not copied to the FITS file.

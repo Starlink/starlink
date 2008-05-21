@@ -29,12 +29,15 @@
 *         :        :        :        :        :        :
 *     PRVn    = _CHAR                / Name of the PRVCNTth parent
 *
-*     and for the root provenance:
+*     for the root provenance:
 *     OBSCNT  =             _INTEGER / Number of root-ancestor headers
 *     OBS1    = _CHAR                / First observation identifier
 *         :        :        :        :        :        :
 *     OBSn    = _CHAR                / OBSCNTth observation identifier
 *
+*     and the output file name:
+*     FILEID  = _CHAR                / Filename without extension
+
 *     The above headers are prefaced by a blank header and a title
 *     "Provenance:" comment.
 
@@ -74,6 +77,8 @@
 *     2008 March 6 (MJC):
 *        Check for existence of PARENTS component.  Remove the limit on
 *        the number of parents.
+*     2008 May 19 (MJC):
+*        Write FILEID keyword.
 *     {enter_further_changes_here}
 
 *-
@@ -108,6 +113,7 @@
       CHARACTER*( DAT__SZLOC ) ANCLOC ! Locator to an ancestor
       CHARACTER*80 CARD          ! FITS header card
       INTEGER CPOS               ! Current string position
+      CHARACTER*256 FNAME        ! Output file name
       INTEGER FSTAT              ! FITSIO status
       LOGICAL IDPRS              ! Index to root present?
       INTEGER ID                 ! Index to a root ancestor
@@ -130,6 +136,7 @@
       CHARACTER*( DAT__SZLOC ) PARLOC ! Locator to PARENTS component
       CHARACTER*256 PATH         ! Path to ancestor
       CHARACTER*( DAT__SZLOC ) PRVLOC ! Locator to PROVENANCE component
+      INTEGER SOE                ! Character position of file extension
       LOGICAL THERE              ! Component is present
 
 *.
@@ -188,10 +195,14 @@
                CALL CMP_GET0C( ANCLOC, 'PATH', PATH, STATUS )
                IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*  Extract the name.  *** Assume UNIX for the moment. ***
+*  Extract the name excluding the file extension. 
+*  *** Assume UNIX for the moment. ***
                CALL CHR_LASTO( PATH, '/', CPOS )
-               NAME = PATH( CPOS + 1: )
-               NCNAME = CHR_LEN( NAME )
+               CALL CHR_LASTO( FNAME, '.', SOE )
+               IF ( SOE .EQ. 0 ) SOE = CHR_LEN( PATH ) + 1
+
+               NAME = PATH( CPOS + 1 : SOE - 1 )
+               NCNAME = SOE - CPOS - 1
 
 *  Form keyword without leading zeroes (the FITS Standard says it shall
 *  be done this way).
@@ -296,12 +307,28 @@
             CALL FTMKYJ( FUNIT, 'OBSCNT', NOBSID,
      :                   'Number of root-ancestor headers', FSTAT )
          END IF
+
+*  FILEID header
+*  =============
+
+*  Inquire the filename.
+         CALL FTFLNM( FUNIT, FNAME, STATUS )
+
+*  *** Alert!  UNIX assumption. *** We need a generic routine to extract
+*  the filename, path, and extension. ***
+         CALL CHR_LASTO( FNAME, '/', CPOS )
          
-      END IF
+         CALL CHR_LASTO( FNAME, '.', SOE )
+         IF ( SOE .EQ. 0 ) SOE = CHR_LEN( FNAME ) + 1
+
+         CALL FTPKYS( FUNIT, 'FILEID', FNAME( CPOS + 1 : SOE - 1 ), 
+     :                'Filename minus extension', FSTAT )
 
 *  Write a blank header.
-      CARD = ' '
-      CALL FTPREC( FUNIT, CARD, FSTAT )
+         CARD = ' '
+         CALL FTPREC( FUNIT, CARD, FSTAT )
+      END IF
+
 
 *  Come here is there has been an error.
   999 CONTINUE
