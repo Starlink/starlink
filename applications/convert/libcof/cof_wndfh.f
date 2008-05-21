@@ -100,6 +100,8 @@
 *        VARIANCE.
 *     2008 March 15 (MJC):
 *        Use KAPLIBS routines instead of their cloned CON equivalents.
+*     2008 April 1 (MJC):
+*        Do not write blank BUNIT.
 *     {enter_further_changes_here}
 
 *-
@@ -550,26 +552,32 @@
       IF ( THERE .AND. COMP .NE. 'QUALITY' ) THEN
          CALL NDF_CGET( NDF, 'UNITS', VALUE, STATUS )
          CALL NDF_CLEN( NDF, 'UNITS', NCHAR, STATUS )
-         KEYWRD = 'BUNIT  '
 
-         IF ( COMP .EQ. 'VARIANCE' ) THEN
-            VALUE = '('//VALUE( :NCHAR )//')**2'
-            NCHAR = NCHAR + 5
-            UNICOM = 'Units of the Variance array'
-         ELSE
-            UNICOM = 'Units of the primary array'
-         END IF
+*  Do not write blank units strings.  These look especially silly 
+*  for variance.
+         IF ( VALUE .NE. ' ' ) THEN
+
+            KEYWRD = 'BUNIT  '
+
+            IF ( COMP .EQ. 'VARIANCE' ) THEN
+               VALUE = '('//VALUE( :NCHAR )//')**2'
+               NCHAR = NCHAR + 5
+               UNICOM = 'Units of the Variance array'
+            ELSE
+               UNICOM = 'Units of the primary array'
+            END IF
 
 *  Remove unprintable characters that are not permitted in FITS.
-         CALL CHR_CLEAN( VALUE )
+            CALL CHR_CLEAN( VALUE )
 
 *  Write the BUNIT card to the FITS header.  68 is the maximum number
 *  of characters that can be accommodated in a header card.
-         CALL FTPKYS( FUNIT, KEYWRD, VALUE( :MIN( SZVAL, NCHAR ) ),
-     :                UNICOM, FSTAT )
+            CALL FTPKYS( FUNIT, KEYWRD, VALUE( :MIN( SZVAL, NCHAR ) ),
+     :                   UNICOM, FSTAT )
 
 *  Record the fact that the title has been written.
-         UNTFND = .TRUE.
+            UNTFND = .TRUE.
+         END IF
       END IF
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
