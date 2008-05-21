@@ -20,6 +20,7 @@
 #                             protected keywords to methods (for doc).
 # pbiereic          14/12/99  Apply transformations when a picked object is zoomed
 # pbiereic          04/11/03  Workaround bug in tcl 8.4.3 (SourceForge Request ID 835020)
+# Peter W. Draper   21/05/08  Add FWHM estimates in arcseconds.
 
 
 
@@ -171,10 +172,21 @@ itcl::class rtd::RtdImagePick {
                 -relief groove \
                 -anchor e
         } 
-	# LabelValue(n) for "FWHM X:Y"
+	# LabelValue(n) for "FWHM X:Y pixels" in pixels.
         itk_component add fwhm {
             util::LabelValue $labelf.fwhm \
-                -text "FWHM X:Y:" \
+                -text "FWHM X:Y pixels:" \
+                -labelfont $itk_option(-labelfont) \
+                -valuefont $itk_option(-valuefont) \
+                -valuewidth $itk_option(-valuewidth) \
+                -labelwidth $itk_option(-labelwidth) \
+                -relief groove \
+                -anchor e
+        } 
+	# LabelValue(n) for "FHWM X:Y arcsecs" in arcseconds.
+        itk_component add fwhmarc {
+            util::LabelValue $labelf.fwhmarc \
+                -text "FWHM X:Y arcsecs:" \
                 -labelfont $itk_option(-labelfont) \
                 -valuefont $itk_option(-valuefont) \
                 -valuewidth $itk_option(-valuewidth) \
@@ -205,7 +217,7 @@ itcl::class rtd::RtdImagePick {
                 -anchor e
         } 
 
-        foreach el {x y ra dec equinox object background fwhm angle nsize} {
+        foreach el {x y ra dec equinox object background fwhm angle nsize fwhmarc} {
             [$itk_component($el) component entry] config -justify right -highlightthickness 0
 	    pack [$itk_component($el) component label] [$itk_component($el) component entry] \
 		    -ipadx 0 -ipady 0 -pady 1 -padx 0
@@ -219,6 +231,7 @@ itcl::class rtd::RtdImagePick {
             $itk_component(object) \
             $itk_component(background) \
             $itk_component(fwhm) \
+            $itk_component(fwhmarc) \
             $itk_component(angle) \
             $itk_component(nsize) \
             -side top -padx 0.0m -pady 0.0m -fill x -expand 1
@@ -238,7 +251,9 @@ itcl::class rtd::RtdImagePick {
         add_short_help $itk_component(background) \
 	    {Background: mean background level}
         add_short_help $itk_component(fwhm) \
-	    {FWHM: full width half maximum in X and Y}
+	    {FWHM: full width half maximum in pixels along X and Y}
+        add_short_help $itk_component(fwhmarc) \
+	    {FWHM: full width half maximum in arcsecs along X and Y}
         add_short_help $itk_component(angle) \
 	    {Angle: angle of major axis, degrees, along X = 0}
         add_short_help $itk_component(nsize) \
@@ -384,7 +399,7 @@ itcl::class rtd::RtdImagePick {
         #utilRaiseWindow $w_  ; # too slow if already raised (on Linux guest)
         if { $waiting_ } { return }
 
-        if {[llength $list_] == 10} {
+        if {[llength $list_] == 12} {
             set_values $list_
         }
     }
@@ -392,7 +407,7 @@ itcl::class rtd::RtdImagePick {
 
     # This method is called to allow the user to pick an object in the main image.
     # The return value is a list of:
-    # "ra dec equinox fwhmX fwhmY angle objectPeak meanBackground" 
+    # "ra dec equinox fwhmX fwhmY angle objectPeak meanBackground fwhmXa fwhmYa" 
     # as returned from the rtdimage "statistics" subcommand,
     # or an error.
     
@@ -507,7 +522,7 @@ itcl::class rtd::RtdImagePick {
         $itk_option(-target_image) busy {
             busy {
                 if {! [catch {set list_ [$image_ statistics]} msg]} {
-                    if {[llength $list_] == 10} {
+                    if {[llength $list_] == 12} {
                         set_values $list_ 0
                     }
                 }
@@ -532,7 +547,7 @@ itcl::class rtd::RtdImagePick {
     # If the list is not empty, mark the ra,dec spot in the image.
 
     protected method set_values {list {with_rmt 1}} {
-        lassign $list x y ra dec equinox fwhmX fwhmY angle object background
+        lassign $list x y ra dec equinox fwhmX fwhmY angle object background fwhmXa fwhmYa
 
         # create a dot which is used to mark the center pixel
 	$target_canvas_ delete $pickc_
@@ -570,6 +585,12 @@ itcl::class rtd::RtdImagePick {
             [$itk_component(fwhm)  component entry] config -foreground red
             $itk_component(angle)  config -value ""
         }
+        if { "$fwhmXa" != {} } {
+            $itk_component(fwhmarc) config -value "[format_val $fwhmXa] : [format_val $fwhmYa]"
+        } else {
+            $itk_component(fwhmarc) config -value ""
+        }
+
         if {"$x" != "" && "$y" != ""} {
             set imageX_ $x
             set imageY_ $y
@@ -698,9 +719,9 @@ itcl::class rtd::RtdImagePick {
                     error_dialog $msg
                     cancel_pick
                 } else {
-                    lassign $list {} {} {} {} {} fwhmX fwhmY angle object background
+                    lassign $list {} {} {} {} {} fwhmX fwhmY angle object background fwmhXa fwhmYa
                     picked_wcs_object \
-                        [list $x $y $ra $dec $equinox $fwhmX $fwhmY $angle $object $background]
+                        [list $x $y $ra $dec $equinox $fwhmX $fwhmY $angle $object $background $fwhmXa $fwhmYa]
                 }
             }
         }
@@ -772,7 +793,7 @@ itcl::class rtd::RtdImagePick {
     itk_option define -wcsfont wcsFont WcsFont -*-symbol-*-*-*-*-14-*-*-*-*-*-*-*
 
     # set the width for  displaying labels and values
-    itk_option define -labelwidth labelWidth LabelWidth 16
+    itk_option define -labelwidth labelWidth LabelWidth 18
 
     # set the width for  displaying labels and values
     itk_option define -valuewidth valueWidth ValueWidth 11
