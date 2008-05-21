@@ -3197,12 +3197,14 @@ static int MakeTimeMapping( AstTimeFrame *target, AstTimeFrame *result,
    ts1 = astGetTimeScale( target );
    off1 = astGetTimeOrigin( target );
    u1 = astGetUnit( target, 0 );
+   ltoff1= astGetLTOffset( target );
 
 /* Get the required properties of the output (result) TimeFrame */
    sys2 = astGetSystem( result );
    ts2 = astGetTimeScale( result );
    off2 = astGetTimeOrigin( result );
    u2 = astGetUnit( result, 0 );
+   ltoff2= astGetLTOffset( result );
 
 /* Get the timescale in which alignment is to be performed. The alignment
    System does not matter since they all supported time systems are linearly 
