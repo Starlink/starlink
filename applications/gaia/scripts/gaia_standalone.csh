@@ -49,4 +49,4 @@ setenv CONVERT_DIR $GAIA_DIR/../convert
 unalias echo
 
 #  Now start up the application proper.
-$GAIA_DIR/gaia.sh "$1" $argv[2-]
+$GAIA_DIR/gaia.sh "$*"

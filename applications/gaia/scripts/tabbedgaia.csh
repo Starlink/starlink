@@ -59,9 +59,9 @@ endif
 
 #  Now start up the application proper. 
 if ( $?GAIA_DIR ) then 
-   $GAIA_DIR/tabbedgaia.sh "$1" $argv[2-]
+   eval $GAIA_DIR/tabbedgaia.sh "$*"
 else if ( -e /star/bin/gaia/tabbedgaia.sh ) then 
-   /star/bin/gaia/tabbedgaia.sh "$1" $argv[2-]
+   eval /star/bin/gaia/tabbedgaia.sh "$*"
 else 
    echo Sorry cannot find tabbed GAIA anywhere on your system
 endif

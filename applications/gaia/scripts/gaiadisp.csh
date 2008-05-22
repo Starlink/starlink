@@ -66,9 +66,9 @@ endif
 
 #  Now start up the application proper. 
 if ( $?GAIA_DIR ) then 
-   $GAIA_DIR/gaiadisp.sh "$1" $argv[2-]
+   eval $GAIA_DIR/gaiadisp.sh "$*"
 else if ( -e /star/bin/gaia/gaiadisp.sh ) then 
-   /star/bin/gaia/gaiadisp.sh "$1" $argv[2-]
-else 
+   eval /star/bin/gaia/gaiadisp.sh "$*"
+else
    echo Sorry cannot find 'gaiadisp' anywhere on your system
 endif
