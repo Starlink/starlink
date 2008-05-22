@@ -190,7 +190,7 @@
 
 *  set up model parameters, these are as per-APM
       CMIX =  MIN( 0.999, MAX( 0.0, COMIX ) )
-      CROS =  MAX( 0.001, CROSS )
+      CROS =  MIN( 100.0, MAX( 0.001, CROSS ) )
       PARM1 = -1.0 / ( GSIGM**2 )
       CHANGE = LOG( 0.01 * CROS )
       PARM2 = SQRT( -4.0 * CHANGE / GSIGM**2 )
