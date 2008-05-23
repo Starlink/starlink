@@ -214,6 +214,8 @@
 *     2008-05-07 (AGG):
 *        Set seqstart/end from beginning of observation, not just
 *        within current subscan
+*     2008-05-23 (AGG):
+*        Add focposn to API
 
 *  Copyright:
 *     Copyright (C) 2007 Science and Technology Facilities Council.
@@ -288,6 +290,7 @@ const double *posptr,    /* Pointing offsets from map centre (given) */
 size_t jigsamples,       /* Number of jiggle samples (given) */
 double jigptr[][2],      /* Array of X, Y jiggle positions (given) */
 const int obsnum,        /* Observation number (given) */
+const double focposn,    /* Focus position */
 const int nsubscan,      /* Sub-scan number (given) */
 const int obsend,        /* Flag to indicate whether this is the last file */
 const char utdate[],     /* UT date in YYYYMMDD form (given) */
@@ -313,7 +316,6 @@ int *status              /* Global status (given and returned) */
    char cosys[JCMT__SZTCS_TR_SYS+1]; /* Tracking coordinate system */
    int dims[2];                    /* Extent of output image */
    AstFitsChan *fitschan;          /* FITS headers */
-   double focposn;                 /* Current focus position */
    int fitsfind;
    char fitsrec[SC2STORE__MAXFITS*80+1]; /* Store for FITS records */
    int framesize;                  /* Number of points in a single `frame' */
@@ -340,7 +342,8 @@ int *status              /* Global status (given and returned) */
    double *rdata;                  /* Pointer to flatfielded data */
    char recipe[30];                /* Name of default ORAC-DR recipe */
    int seqend;                     /* RTS index of last frame in output image */
-   int seqoffset;
+   int seqoffset;                  /* Sequence number offset from beginning of 
+				      observation */
    int seqstart;                   /* RTS index of first frame in output image */
    JCMTState state;                /* Dummy JCMT state structure for creating WCS */
    int subnum;                     /* sub array index */
@@ -605,14 +608,12 @@ int *status              /* Global status (given and returned) */
      astSetFitsI ( fitschan, "NFOCSTEP", inx->nfocstep,
 		   "Number of focal position steps", 0 );
 
-     focposn = inx->focstart + (double)(nsubscan-1) * inx->focstep;
      astSetFitsF ( fitschan, "FOCPOSN", focposn,
 		   "[mm] Absolute position of the SMU", 0 );
 
      astSetFitsF ( fitschan, "FOCSTEP", inx->focstep,
 		   "[mm] Distance between focus steps", 0 );
    }
-   /* End hack */
 
    /* SMU specific */
    astSetFitsCN ( fitschan, "COMMENT", "", "-- SMU-specific parameters --", 0 );

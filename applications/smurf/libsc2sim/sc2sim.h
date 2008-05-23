@@ -86,6 +86,8 @@
 *          sc2sim_simframe API
 *     2008-04-28 (AGG):
 *        Change sc2sim_getsigma type to void 
+*     2008-05-23 (AGG):
+*        Add focposn to sc2sim_ndfwrdata API
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -575,6 +577,7 @@ const double *posptr,     /* Pointing offsets from map centre */
 size_t jigsamples,        /* Number of jiggle samples (given) */
 double jigptr[][2], /* Array of X, Y jiggle positions (given) */
 const int obsnum,         /* Observation number (given) */		 
+const double focposn,    /* Focus position */
 const int nsubscan,       /* Sub-scan number (given) */			 
 const int obsend,        /* Flag to indicate whether this is the last file */
 const char utdate[],      /* UT date in YYYYMMDD form (given) */		 

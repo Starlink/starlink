@@ -270,6 +270,8 @@
 *        Add loop over focus positions
 *     2008-05-14 (AGG):
 *        Take focus step into account for setting obsend flag
+*     2008-05-23 (AGG):
+*        Pass focposn to sc2sim_ndfwrdata
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1508,7 +1510,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 			      flatname[k], head, digits, dksquid, flatcal[k], 
 			      flatpar[k], INSTRUMENT, filter, dateobs, obsid,
 			      &(posptr[frameoffset*2]), jigsamples, 
-                              &(jigpat[0]), obscounter,
+                              &(jigpat[0]), obscounter, focposn, 
 			      subscanno, obsend, utdate, 
 			      head[0].tcs_az_bc1, 
 			      head[lastframe-1].tcs_az_bc1,
