@@ -35,8 +35,6 @@
 #include "Dits_Err.h"
 #include "Ers.h"
 
-#include "fitsio.h"
-
 #include "dream_par.h"
 
 #include "jcmt/state.h"
