@@ -43,6 +43,8 @@
 *        Copy the right number of elements!
 *     2008-04-30 (TIMJ):
 *        Write out NDF title.
+*     2008-05-23 (TIMJ):
+*        Add provenance propagation.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -125,6 +127,11 @@ void smurf_rawunpress( int *status ) {
     /* Open output file as type _INTEGER */
     ndgNdfas( igrp, i, "READ", &indf, status );
     ndgNdfpr( indf, "WCS", ogrp, i, &outndf, status );
+
+    /* Update provenance in the output before we close the input
+       because sc2store will not give us access to an NDF identifier
+       from the raw time series */
+    smf_updateprov( outndf, NULL, indf, "SMURF:RAWUNPRESS", status );
     ndfAnnul( &indf, status);
 
     /* Set parameters of the DATA array in the output file */

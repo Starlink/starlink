@@ -76,11 +76,15 @@
 *        Propagate QUALITY from input file
 *     2008-05-07 (EC):
 *        Use smf_realloc instead of astRealloc
+*     2008-05-23 (TIMJ):
+*        Enable provenance propagation.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
-*     2006-2008 University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2006-2008 University of British Columbia.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -145,7 +149,8 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
     /* Open the input file solely to propagate it to the output file */
     ndgNdfas( igrp, index, "READ", &indf, status );
     /* We want QUALITY too if it's available */
-    ndgNdfpr( indf, "WCS,QUALITY,UNITS,TITLE,LABEL", ogrp, index, &outndf, status );
+    ndgNdfpr( indf, "WCS,QUALITY,UNITS,TITLE,LABEL", 
+              ogrp, index, &outndf, status );
     ndfAnnul( &indf, status);
 
     /* Set parameters of the DATA array in the output file */
@@ -175,6 +180,21 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
     if ( *status == SAI__ERROR) {
       errRep("", "Unable to open output flatfielded file(s)", status);
     }
+
+    /* Propagate provenance to the output. This will happen automatically
+       unless the input is raw data without OBSIDSS provenance */
+    if (ogrp != NULL) {
+      /* see if data are flagged as raw */
+      if (data->file->isSc2store) {
+        /* need an ndfid */
+        ndgNdfas( igrp, index, "READ", &indf, status );
+        smf_updateprov( (*ffdata)->file->ndfid,
+                        NULL, indf, "SMURF:viaFlatfield",
+                        status);
+        ndfAnnul( &indf, status);
+      }
+    }
+
   }
 
   /* how many elements in the data array? */

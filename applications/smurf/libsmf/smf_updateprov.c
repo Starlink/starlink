@@ -111,7 +111,7 @@ void smf_updateprov( int ondf, smfData *data, int indf, const char *creator,
    }
 
 /* Get the input NDF identifier. */
-   if( data ) indf = data->file->ndfid;
+   if( data && data->file->ndfid != NDF__NOID) indf = data->file->ndfid;
 
 /* Initially, assume that we should include details of ancestor NDFs. */
    isroot = 0;
