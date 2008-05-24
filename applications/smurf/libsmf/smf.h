@@ -303,6 +303,8 @@
 *        -Added smf_get_projpar
 *        -Modified smf_mapbounds interface to use par
 *        -Moved NINT macro here from smf_cubegrid
+*     2008-05-23 (TIMJ):
+*        Add smf_get_taskname
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -952,5 +954,8 @@ void smf_get_projpar( AstSkyFrame *skyframe, double par[ 7 ], int *usedefs,
 
 double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf, 
                        int *status );
+
+
+void smf_get_taskname( char * taskname, char * prvname, int * status);
 
 #endif /* SMF_DEFINED */

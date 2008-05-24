@@ -105,7 +105,7 @@
 *     2008-04-21 (JB):
 *        Add GSDSHOW task.
 *     2008-05-23 (TIMJ):
-*        Turn on automatic NDG propagation.
+*        Turn on automatic NDG propagation. Factor out task_get_name.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -157,8 +157,7 @@
 #include "libsmf/smf.h"
 
 /* internal protoypes */
-F77_SUBROUTINE(task_get_name)(CHARACTER(TASKNAME),
-			      INTEGER(STATUS) TRAIL(TASKNAME));
+
 void smurf_mon (int * );
 
 /* Main monolith routine */
@@ -167,6 +166,7 @@ void smurf_mon( int * status ) {
 
   /* Local variables */
   char taskname[PAR__SZNAM+1];
+  char prvname[2*PAR__SZNAM+1];
   char appname[NDF__SZAPP+1];
   char filter[PAR__SZNAM+PAR__SZNAM+1];
   int ngrp0;                   /* Number of grp ids at start */
@@ -180,11 +180,8 @@ void smurf_mon( int * status ) {
   /* Register our status variable with AST */
   astWatch( status );
 
-  /* Find out the task name we were invoked with */
-  memset( taskname, ' ', PAR__SZNAM );
-  taskname[PAR__SZNAM] = '\0';
-  F77_CALL(task_get_name)(taskname,  status, PAR__SZNAM);
-  cnfImprt( taskname, PAR__SZNAM, taskname);
+  /* Find out the task name and provenance name we were invoked with */
+  smf_get_taskname( taskname, prvname, status );
 
   /* Get the GRP and HDS status for leak checking - need the task name
     to mask out parameter names. Also need to mask out the monlith name */
@@ -271,8 +268,7 @@ void smurf_mon( int * status ) {
    *  provenance handling by adding a provenance extension to the output NDF
    *  itself).
    */
-  snprintf( appname, NDF__SZAPP, "%s:%s",PACKAGE_UPCASE,taskname);
-  ndgEndpv(appname, status);
+  ndgEndpv(prvname, status);
 
   /* Clear all possible cached info from the different createwcs routines */
   sc2ast_createwcs(-1, NULL, NULL, NULL, NULL, status);

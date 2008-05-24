@@ -122,6 +122,7 @@
 #include "prm_par.h"
 #include "sae_par.h"
 #include "msg_par.h"
+#include "par.h"
 
 #include "smf.h"
 #include "smurf_par.h"
@@ -142,6 +143,7 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
   char *pname;              /* Pointer to input filename */
   size_t npts = 0;          /* Number of data points */
   int flags = 0;            /* Flags for creating smfFile and smfHead */
+  char prvname[2*PAR__SZNAM+1]; /* provenance ID string */
 
   if ( *status != SAI__OK ) return;
 
@@ -187,9 +189,10 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
       /* see if data are flagged as raw */
       if (data->file->isSc2store) {
         /* need an ndfid */
+        smf_get_taskname( NULL, prvname, status );
         ndgNdfas( igrp, index, "READ", &indf, status );
         smf_updateprov( (*ffdata)->file->ndfid,
-                        NULL, indf, "SMURF:viaFlatfield",
+                        NULL, indf, prvname,
                         status);
         ndfAnnul( &indf, status);
       }
