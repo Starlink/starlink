@@ -2208,6 +2208,7 @@ $(MANIFESTS)/smurf: \
 		$(MANIFESTS)/gks \
 		$(MANIFESTS)/gns \
 		$(MANIFESTS)/grp \
+		$(MANIFESTS)/gsd \
 		$(MANIFESTS)/gsl \
 		$(MANIFESTS)/gwm \
 		$(MANIFESTS)/hds \
@@ -2433,6 +2434,22 @@ $(MANIFESTS)/star2html: \
 	cd applications/star2html \
 	  && $(MAKE_CPT)
 
+# Component starbench is OBSOLETE -- do not build
+$(MANIFESTS)/starbench: \
+		$(MANIFESTS)/chr \
+		$(MANIFESTS)/cnf \
+		$(MANIFESTS)/ems \
+		$(MANIFESTS)/hds \
+		$(MANIFESTS)/hlp \
+		$(MANIFESTS)/mers \
+		$(MANIFESTS)/pcs \
+		$(MANIFESTS)/psx \
+		$(MANIFESTS)/sae \
+		$(MANIFESTS)/star2html \
+		$(MANIFESTS)/starmem
+	cd applications/obsolete/starbench \
+	  && $(MAKE_CPT)
+
 # Component starconf is a buildsupport component
 $(MANIFESTS)/starconf: \
 		$(MANIFESTS)/autoconf \
@@ -2536,11 +2553,6 @@ $(MANIFESTS)/sun107: \
 $(MANIFESTS)/sun119: \
 		$(MANIFESTS)/star2html
 	cd docs/sun/119 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/sun120: \
-		$(MANIFESTS)/star2html
-	cd docs/sun/120 \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/sun127: \
@@ -2687,11 +2699,6 @@ $(MANIFESTS)/sun82: \
 $(MANIFESTS)/sun9: \
 		$(MANIFESTS)/star2html
 	cd docs/sun/009 \
-	  && $(MAKE_CPT)
-
-$(MANIFESTS)/sun90: \
-		$(MANIFESTS)/star2html
-	cd docs/sun/090 \
 	  && $(MAKE_CPT)
 
 $(MANIFESTS)/sun91: \
@@ -2948,7 +2955,6 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/sun101 \
 	$(MANIFESTS)/sun107 \
 	$(MANIFESTS)/sun119 \
-	$(MANIFESTS)/sun120 \
 	$(MANIFESTS)/sun127 \
 	$(MANIFESTS)/sun145 \
 	$(MANIFESTS)/sun161 \
@@ -2977,7 +2983,6 @@ SUPPORTED_COMPONENTS = \
 	$(MANIFESTS)/sun73 \
 	$(MANIFESTS)/sun82 \
 	$(MANIFESTS)/sun9 \
-	$(MANIFESTS)/sun90 \
 	$(MANIFESTS)/sun91 \
 	$(MANIFESTS)/sun93 \
 	$(MANIFESTS)/surf \
