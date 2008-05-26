@@ -319,6 +319,9 @@
 *        - Trap SMF__NOMEM from smf_checkmem_map; request new [L/U]BND
 *        - Set [L/U]BOUND
 *        - Fix read error caused by status checking in for loop
+*     2008-05-26 (EC)
+*        - changed default map size to use ~50% of memory if too big
+*        - handle OUT=! case to test map size
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -577,8 +580,8 @@ void smurf_makemap( int *status ) {
       msgSeti("U1",ubnd_out[1]);
       msgOut(" ", "Map too big: LBND=(^L0,^L1) UBND=(^U0,^U1)", status);
 
-      /* Recommend new size that uses ~75% of maxmem */
-      scale = sqrt(0.75 * (double) maxmem / (double) mapmem);
+      /* Recommend new size that uses ~50% of maxmem */
+      scale = sqrt(0.5 * (double) maxmem / (double) mapmem);
       
       /* Cancel the old values of the parameter */
       parCancl( "LBND", status );
@@ -595,7 +598,6 @@ void smurf_makemap( int *status ) {
     } else if( *status == SAI__OK ) {
       quit = 1;
     }
-
   }
 
   /* Output pixel bounds of the output array */
@@ -610,6 +612,13 @@ void smurf_makemap( int *status ) {
 
   /* Create an output smfData */
   ndgCreat ( "OUT", NULL, &ogrp, &outsize, &flag, status );
+
+  /* If OUT is NULL annul the bad status and skip map-making */
+  if( *status == PAR__NULL ) {
+    errAnnul( status );
+    goto L998;
+  }
+
   smfflags = 0;
   smfflags |= SMF__MAP_VAR;
 
@@ -867,6 +876,9 @@ void smurf_makemap( int *status ) {
   
   smf_close_file ( &wdata, status );
   smf_close_file ( &odata, status );
+
+  /* Arrive here if no output NDF is being created. */
+ L998:;
 
   if( igrp != NULL ) grpDelet( &igrp, status);
   if( ogrp != NULL ) grpDelet( &ogrp, status);
