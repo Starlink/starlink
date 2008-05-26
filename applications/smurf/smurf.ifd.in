@@ -430,6 +430,23 @@ package @PACKAGE@ {
 	    helpkey *
 	  }
 
+	 parameter tiledims {
+	    type _INTEGER
+	    prompt {Output tile dimensions in pixels}
+	    ppath CURRENT DEFAULT
+	    vpath DEFAULT
+	    default !
+	    helpkey *
+	  }
+
+         parameter ntile {
+            type _INTEGER
+            access WRITE
+            vpath DEFAULT
+            default 0
+            helpkey *
+          }
+
 	 parameter method {
             type _CHAR
             prompt {Map-making method}

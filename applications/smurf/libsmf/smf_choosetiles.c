@@ -16,7 +16,7 @@
 *  Invocation:
 *     tiles = smf_choosetiles( Grp *igrp,  int size, int *lbnd, int *ubnd, 
 *                              smfBox *boxes, int spread, const double params[],
-*                              AstFrameSet *wcsout, int tile_size[ 2 ],
+*                              AstFrameSet *wcsout, int is2d, int tile_size[2],
 *                              int trim, int border, int *ntiles, int *status )
 
 *  Arguments:
@@ -47,6 +47,8 @@
 *        NULL pointer may be given. 
 *     wcsout = AstFrameSet * (Given)
 *        Pointer to the FrameSet describing the WCS of the output cube.
+*     is2d = int (Given )
+*        If set, wcsout describes 2-d data. Otherwise it describes a data cube.
 *     trim = int (Given)
 *        If true then the border tiles are trimmed to exclude pixels off
 *        the edge of the full size output array.
@@ -107,6 +109,7 @@
 
 *  Authors:
 *     David S Berry (JAC, UCLan)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -129,6 +132,8 @@
 *        bounds without border.
 *        - Allow for reference points that are outside the bounds of the
 *        full sized output array.
+*     26-MAY-2008 (EC):
+*        Added is2d parameter
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -166,7 +171,7 @@
 
 smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd, 
                           int *ubnd, smfBox *boxes, int spread, 
-                          const double params[], AstFrameSet *wcsout, 
+                          const double params[], AstFrameSet *wcsout, int is2d, 
                           int tile_size[ 2 ], int trim, int border,
                           int *ntiles, int *status ){
 
@@ -252,10 +257,16 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 /* Get the celestial coordinates of the reference position (the SkyRef
    value in the current Frame of the output WCS FrameSet), and find the
    corresponding grid coordinates. */
+
       refwcs[ 0 ] = astGetD( wcsout, "SkyRef(1)" );
       refwcs[ 1 ] = astGetD( wcsout, "SkyRef(2)" );
       refwcs[ 2 ] = AST__BAD;
-      astTranN( wcsout, 1, 3, 1, refwcs, 0, 3, 1, refpix );
+
+      if( is2d ) {
+         astTranN( wcsout, 1, 2, 1, refwcs, 0, 2, 1, refpix );
+      } else {
+         astTranN( wcsout, 1, 3, 1, refwcs, 0, 3, 1, refpix );
+      }
 
 /* Convert grid coords to pixel coords */
       refpix[ 0 ] += lbnd[ 0 ] - 1.5;

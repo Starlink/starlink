@@ -77,6 +77,11 @@
 *          is much slower than the REBIN algorithm because it
 *          continually makes a map, constructs models for different
 *          data components (common-mode, spikes etc).
+*     NTILE = _INTEGER (Write)
+*          The number of output tiles used to hold the entire output
+*          array (see parameter TILEDIMS). If no input data falls within
+*          a specified tile, then no output NDF will be created for the
+*          tile, but the tile will still be included in the tile numbering 
 *     OUT = NDF (Write)
 *          Output file
 *     PARAMS( 2 ) = _DOUBLE (Read)
@@ -177,6 +182,30 @@
 *          had for the first time slice. For any other system, no such 
 *          shifts are applied, even if the base telescope position is
 *          changing through the observation. [TRACKING]
+*     TILEDIMS( 2 ) = _INTEGER (Read)
+*          For large data sets, it may sometimes be beneficial to break 
+*          the output array up into a number of smaller rectangular tiles, 
+*          each created separately and stored in a separate output NDF. This 
+*          can be accomplished by supplying non-null values for the TILEDIMS 
+*          parameter. If supplied, these values give the spatial size of each 
+*          output tile, in pixels. If only one value is supplied, the
+*          supplied value is duplicated to create square tiles. Tiles are
+*          created in a raster fashion, from bottom left to top right of
+*          the spatial extent. The NDF file name specified by "out" is
+*          modified for each tile by appending "_<N>" to the end of it, 
+*          where <N> is the integer tile index (starting at 1). The
+*          number of tiles used to cover the entire output cube is written 
+*          to output parameter NTILES. The tiles all share the same 
+*          projection and so can be simply pasted together in pixel 
+*          coordinates to reconstruct the full size output array. The tiles 
+*          are centred so that the reference position (given by REFLON and 
+*          REFLAT) falls at the centre of a tile. If a tile receives no
+*          input data, then no corresponding output NDF is created, but 
+*          the tile is still included in the tile numbering scheme. If a 
+*          null (!) value is supplied for TILEDIMS, then the 
+*          entire output array is created as a single tile and stored in 
+*          a single output NDF with the name given by parameter OUT 
+*          (without any "_<N>" appendix). [!]
 *     UBND( 2 ) = _INTEGER (Read)
 *        An array of values giving the upper pixel index bound on each
 *        spatial axis of the output NDF. The suggested default values 
@@ -322,6 +351,8 @@
 *     2008-05-26 (EC)
 *        - changed default map size to use ~50% of memory if too big
 *        - handle OUT=! case to test map size
+*        - started adding tiling infrastructure: NTILE + TILEDIMS
+*        - check for minimum numbin for histogram
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -396,6 +427,7 @@ void smurf_makemap( int *status ) {
 
   /* Local Variables */
   int actval;                /* Number of parameter values supplied */
+  smfBox *boxes = NULL;      /* Pointer to array of i/p file bounding boxes */
   Grp *confgrp = NULL;       /* Group containing configuration file */
   smfData *data=NULL;        /* Pointer to SCUBA2 data struct */
   char data_units[SMF__CHARLABEL+1]; /* Units string */
@@ -403,11 +435,11 @@ void smurf_makemap( int *status ) {
   AstFitsChan *fchan = NULL; /* FitsChan holding output NDF FITS extension */
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
   int flag;                  /* Flag */
-  int *histogram = NULL;     /* Histogram for calculating exposure time statistics */
+  int *histogram = NULL;     /* Histogram for calculating exposure statistics */
   unsigned int *hitsmap;     /* Hitsmap array calculated in ITERATE method */
   dim_t i;                   /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
-  int iterate=0;             /* Flag to denote whether to use the ITERATE method */
+  int iterate=0;             /* Flag to denote ITERATE method */
   int itmp;                  /* Temporary storage */
   AstKeyMap *keymap=NULL;    /* Pointer to keymap of config settings */
   int ksize=0;               /* Size of group containing CONFIG file */
@@ -423,8 +455,10 @@ void smurf_makemap( int *status ) {
   double medtexp = 0.0;      /* Median exposure time */
   char method[LEN__METHOD];  /* String for map-making method */
   int moving = 0;            /* Is the telescope base position changing? */
-  int nparam = 0;            /* Number of extra parameters for pixel spreading scheme*/
+  int nparam = 0;            /* Number of extra parameters for pixel spreading*/
+  int ntile;                 /* Number of output tiles */
   int numbin;                /* Number of exposure time bins in histogram */
+  int nval;                  /* Number of parameter values supplied */
   AstKeyMap * obsidmap = NULL; /* Map of OBSIDs from input data */
   smfData *odata=NULL;       /* Pointer to output SCUBA2 data struct */
   Grp *ogrp = NULL;          /* Group containing output file */
@@ -437,7 +471,7 @@ void smurf_makemap( int *status ) {
   int parstate;              /* State of ADAM parameters */
   AstKeyMap * prvkeymap = NULL; /* Keymap of input files for PRVxxx headers */
   int quit=0;                /* Flag for exiting while loop */
-  int rebin=1;               /* Flag to denote whether to use the REBIN method */
+  int rebin=1;               /* Flag to denote whether to use the REBIN method*/
   double scale;              /* How much to scale bounds */
   int size;                  /* Number of files in input group */
   int smfflags=0;            /* Flags for smfData */
@@ -447,6 +481,8 @@ void smurf_makemap( int *status ) {
   double sumtexp;            /* Total exposure time across all pixels */
   char system[10];           /* Celestial coordinate system for output image */
   smfData *tdata=NULL;       /* Exposure time data */
+  int tiledims[2];           /* Dimensions (in pixels) of each output tile */
+  smfTile *tiles=NULL;       /* Pointer to array of output tile descriptions */
   int tndf = NDF__NOID;      /* NDF identifier for EXP_TIME */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   int uselonlat = 0;         /* Flag for whether to use given lon_0 and
@@ -600,15 +636,70 @@ void smurf_makemap( int *status ) {
     }
   }
 
-  /* Output pixel bounds of the output array */
+  /* See if the output is to be split up into a number of separate tiles,
+     each one being stored in a separate output NDF. If a null value is
+     supplied for TILEDIMS, annul the error and retain the original NULL 
+     pointer for the array of tile structures (this is used as a flag that 
+     the entire output grid should be stored in a single output NDF). */
+
+  /*
+  boxes = smf_malloc( size, sizeof(smfBox), 1, status ); 
+  */
+
+
+  if( *status == SAI__OK ) {
+    parGet1i( "TILEDIMS", 2, tiledims, &nval, status );
+    if( *status == PAR__NULL ) {
+      errAnnul( status );
+    } else {
+
+      /* KLUDGE: Since tiles aren't actually implemented yet, set 
+         lbnd_out/ubnd_out to tiledims (like ntile=1) */
+      
+      if( *status == SAI__OK ) {
+        ntile = 1;
+        ubnd_out[0] = lbnd_out[0] + tiledims[0] - 1;
+        ubnd_out[1] = lbnd_out[1] + tiledims[1] - 1;
+      }
+
+
+      /*
+      if( nval == 1 ) tiledims[ 1 ] = tiledims[ 0 ];
+      tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes, 
+                               spread, params, outfset, 1, tiledims,
+                               0, 0, &ntile, status );
+
+      */
+
+    }
+  }
+
+  /* If we are not splitting the output up into tiles, then create an array
+     containing a single tile description that encompasses the entire full
+     size output grid. */
+
+  /*
+  if( !tiles ) {
+    tiledims[ 0 ] = -1;
+    tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes, 
+                             spread, params, outfset, 1, tiledims, 
+                             0, 0, &ntile, status );
+  }
+  */
+
+  /* Write the number of tiles being created to an output parameter. */
+  parPut0i( "NTILE", ntile, status );
+  
+  /* Output the pixel bounds of the full size output array (not of an
+     individual tile). */
   parPut1i( "LBOUND", 2, lbnd_out, status );
   parPut1i( "UBOUND", 2, ubnd_out, status );
-
+  
   if ( moving ) {
     msgOutif(MSG__VERB, " ", "Tracking a moving object", status);
-  } else {
-    msgOutif(MSG__VERB, " ", "Tracking a stationary object", status);
-  }
+   } else {
+     msgOutif(MSG__VERB, " ", "Tracking a stationary object", status);
+   }
 
   /* Create an output smfData */
   ndgCreat ( "OUT", NULL, &ogrp, &outsize, &flag, status );
@@ -715,7 +806,8 @@ void smurf_makemap( int *status ) {
       if (*status == SAI__OK)
 	smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
 
-      msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Beginning the REBIN step", status);
+      msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Beginning the REBIN step", 
+               status);
       /* Rebin the data onto the output grid */
       
       smf_rebinmap(data, i, size, outfset, spread, params, moving, 1,
@@ -840,19 +932,27 @@ void smurf_makemap( int *status ) {
 
   /* Weights are related to data_units */
   strncat(data_units, "**-2", (SMF__CHARLABEL - 5)); 
+
   ndfCput(data_units, wndf, "UNITS", status);
 
 
   /* Calculate median exposure time - use faster histogram-based
      method which should be accurate enough for our purposes */
   numbin = (int)(maxtexp / steptime) - 1;
+
+  if( numbin < 1 ) {
+    /* Numbins must always be at least 1 */
+    numbin = 1;
+  }
+
   histogram = smf_malloc( (size_t)numbin, sizeof(int), 1, status );
   if ( histogram ) {
-    kpg1Ghstd( 1, (int)mapsize, exp_time, numbin, 0, &maxtexp, &steptime, histogram, 
-	       status );
+    kpg1Ghstd( 1, (int)mapsize, exp_time, numbin, 0, &maxtexp, &steptime, 
+               histogram, status );
     kpg1Hsstp( numbin, histogram, maxtexp, steptime, 
 	       &sumtexp, &meantexp, &medtexp, &modetexp, status);
-    astSetFitsF(fchan, "MEDTEXP", medtexp, "[s] Median MAKEMAP exposure time", 0);
+    astSetFitsF(fchan, "MEDTEXP", medtexp, "[s] Median MAKEMAP exposure time",
+                0);
     histogram = smf_free( histogram, status );
   }
 

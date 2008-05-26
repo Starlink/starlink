@@ -305,6 +305,8 @@
 *        -Moved NINT macro here from smf_cubegrid
 *     2008-05-23 (TIMJ):
 *        Add smf_get_taskname
+*     2008-05-26 (EC):
+*        Added is2d to smf_choosetiles
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -804,7 +806,7 @@ void smf_open_related_model( const smfGroup *group, const int subindex,
 
 smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd, 
                           int *ubnd, smfBox *boxes, int spread, 
-                          const double params[], AstFrameSet *wcsout, 
+                          const double params[], AstFrameSet *wcsout, int is2d, 
                           int tile_size[ 2 ], int trim, int border,
                           int *ntiles, int *status );
 
