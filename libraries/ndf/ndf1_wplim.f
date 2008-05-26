@@ -172,6 +172,7 @@
       INTEGER MAP
       INTEGER MAP1
       INTEGER MAP2
+      INTEGER NEXTRA
       INTEGER NPIX
       INTEGER NWCS
       INTEGER PBOX
@@ -187,6 +188,8 @@
       LOGICAL ALLPIX
       LOGICAL ALLWCS
       LOGICAL MIXED
+
+C      integer kk
 *.
 
 *  Check inherited global status.
@@ -211,7 +214,7 @@
       CALL NDF1_MPSPT( FSMAP, MAP, MAP1, MAP2, PPERM, WPERM, STATUS )
 
 *  Invert the Mappings so that their forward transformation goes from the 
-*  current Frame to the pixel Frame. Check that we are bnverting a
+*  current Frame to the pixel Frame. Check that we are inverting a
 *  different Mapping each time, to avoid inverting the same Mapping twice.
       CALL AST_INVERT( MAP, STATUS )
 
@@ -375,12 +378,12 @@
 
       END DO
 
-c      write(*,*) 'A:'
-c      write(*,*) '   PLBND: ',PLBND(1),PLBND(2)
-c      write(*,*) '   PUBND: ',PUBND(1),PUBND(2)
-c      write(*,*) '   WLBND: ',WLBND(1),WLBND(2)
-c      write(*,*) '   WUBND: ',WUBND(1),WUBND(2)
-c      write(*,*) '   '
+C      write(*,*) 'A:'
+C      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
+C      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
+C      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NAX)
+C      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NAX)
+C      write(*,*) '   '
 
 *  If any centre/values bounds were specified in which the centre is
 *  given as a pixel value and the width as a WCS value, then we need 
@@ -446,13 +449,12 @@ c      write(*,*) '   '
          END DO
       END IF
 
-c      write(*,*) 'B:'
-c      write(*,*) '   PLBND: ',PLBND(1),PLBND(2)
-c      write(*,*) '   PUBND: ',PUBND(1),PUBND(2)
-c      write(*,*) '   WLBND: ',WLBND(1),WLBND(2)
-c      write(*,*) '   WUBND: ',WUBND(1),WUBND(2)
-c      write(*,*) '   '
-
+C      write(*,*) 'B:'
+C      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
+C      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
+C      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NAX)
+C      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NAX)
+C      write(*,*) '   '
 
 *  If all bounds are now specified using pixel indices, then we can pass
 *  on to cut the required section from the NDF. If some bounds were
@@ -587,12 +589,12 @@ c      write(*,*) '   '
             END DO
          END IF
 
-c      write(*,*) 'D:'
-c      write(*,*) '   PLBND: ',PLBND(1),PLBND(2)
-c      write(*,*) '   PUBND: ',PUBND(1),PUBND(2)
-c      write(*,*) '   WLBND: ',WLBND(1),WLBND(2)
-c      write(*,*) '   WUBND: ',WUBND(1),WUBND(2)
-c      write(*,*) '   '
+C      write(*,*) 'D:'
+C      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
+C      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
+C      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NAX)
+C      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NAX)
+C      write(*,*) '   '
 
 *  If we still need to find the overlap of the WCS and PIXEL boxes, do it
 *  now.
@@ -682,6 +684,13 @@ c      write(*,*) '   '
                PBOX = AST_INTERVAL( PFRM, PLBND, PUBND, AST__NULL, ' ', 
      :                              STATUS )
 
+C      write(*,*) 'F:'
+C      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
+C      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
+C      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NAX)
+C      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NAX)
+C      write(*,*) '   '
+
 *  Now form a compound region that is the intersection of the two aboves
 *  Boxes (both now defined in the PIXEL Frame).
                CMPREG = AST_CMPREGION( PBOX, WBOXP, AST__AND, ' ', 
@@ -690,6 +699,13 @@ c      write(*,*) '   '
 *  Find the bounds (in PIXEL coords) of the compound Region, and store in
 *  PLBND/PUBND. 
                CALL AST_GETREGIONBOUNDS( CMPREG, PLBND, PUBND, STATUS )
+
+C      write(*,*) 'G:'
+C      write(*,*) '   PLBND: ',(PLBND(KK),kk=1,NAX)
+C      write(*,*) '   PUBND: ',(PUBND(KK),kk=1,NAX)
+C      write(*,*) '   WLBND: ',(WLBND(KK),kk=1,NAX)
+C      write(*,*) '   WUBND: ',(WUBND(KK),kk=1,NAX)
+C      write(*,*) '   '
 
 *  Report an error if the pixel and WCS boxes do not overlap.
                DO I = 1, NAX
@@ -708,23 +724,96 @@ c      write(*,*) '   '
 *  Convert the pixel coordinate box to pixel indices.
       IF( STATUS .EQ. SAI__OK ) THEN
          DO I = 1, NAX
+
+*  Swap the limits, if required, so that they are the right way round.
             IF ( PLBND( I ) .GT. PUBND( I ) ) THEN
                TEMP = PLBND( I )
                PLBND( I ) = PUBND( I )
                PUBND( I ) = TEMP
             END IF
-            UBND( I ) = NINT( PUBND( I ) ) 
 
-*  If the section width was specified in pixels, ensure that the section
-*  has the requested width (rounding problems can otherwise cause this not
-*  to be the case).
-            IF( ISPIX2( I ) .AND. .NOT. ISBND( I ) ) THEN
-               LBND( I ) = UBND( I ) - VALUE2( I ) + 1
-            ELSE
-               LBND( I ) = UBND( I ) - NINT( PUBND( I ) - PLBND( I ) ) 
-     :                     + 1 
+*  For the upper bound, select the index of the pixel that contains the
+*  PUBND value. Integer values are considered to be part of the lower
+*  pixel.
+            UBND( I ) = INT( PUBND( I ) ) 
+            IF(  PUBND( I ) .GT. 0.0 .AND.
+     :           DBLE( UBND( I ) ) .LT.  PUBND( I ) ) 
+     :         UBND( I ) = UBND( I ) + 1
+
+*  For the lower bound, select the index of the pixel that contains the
+*  PLBND value. Integer values are considered to be part of the higher
+*  pixel.
+            IF( PLBND( I ) .GT. 0.0 ) THEN
+               LBND( I ) = INT( PLBND( I ) ) + 1
+            ELSE 
+               LBND( I ) = INT( PLBND( I ) ) 
+               IF( DBLE( LBND( I ) ) .EQ.  PLBND( I ) ) 
+     :            LBND( I ) = LBND( I ) - 1
+            END IF              
+
+*  Ensure that any supplied pixel bounds are honoured exactly.
+            IF( ISBND( I ) ) THEN
+               IF( ISPIX1( I ) ) LBND( I ) = VALUE1( I )
+               IF( ISPIX2( I ) ) UBND( I ) = VALUE2( I )
+
+*  Ensure that any supplied pixel widths are honoured exactly.
+            ELSE IF( ISPIX2( I ) ) THEN
+
+*  Find out by how many pixels the width of our current interval is short of
+*  the requested width. Pass on if we already have the right width.
+               NEXTRA = VALUE2( I ) - UBND( I ) + LBND( I ) - 1
+               IF( NEXTRA .NE. 0 ) THEN
+
+*  We will expand the current interval by an equal number of pixels at each 
+*  end to achieve the requested width. 
+                  LBND( I ) = LBND( I ) - NEXTRA/2
+                  UBND( I ) = UBND( I ) + NEXTRA/2
+
+*  In addition, if we are short by an odd number of pixels, we need to 
+*  expand one of the two ends by an extra pixel. 
+                  NEXTRA = NEXTRA - 2*( NEXTRA/2 )
+                  IF( NEXTRA .NE. 0 ) THEN
+
+*  If the centre was specified as a pixel coordinate, we choose the end 
+*  which puts the central pixel closer to the centre of the interval.
+                     IF( ISPIX1( I ) ) THEN
+
+*  If the central value is more positive than the interval centre, move
+*  the interval to more positive values.
+                        IF( 2*VALUE1( I ) .GT. 
+     :                      LBND( I ) - 1 + UBND( I ) ) THEN
+
+*  If the current width is too little, extend the upper bound.
+                           IF( NEXTRA .GT. 0 ) THEN
+                              UBND( I ) = UBND( I ) + NEXTRA
+
+*  If the current width is too much, retract the lower bound.
+                           ELSE
+                              LBND( I ) = LBND( I ) - NEXTRA
+                           END IF
+
+*  If the central value is more negative than the interval centre, move
+*  the interval to more negative values.
+                        ELSE
+
+*  If the current width is too little, extend the lower bound.
+                           IF( NEXTRA .GT. 0 ) THEN
+                              LBND( I ) = LBND( I ) - NEXTRA
+
+*  If the current width is too much, retract the upper bound.
+                           ELSE
+                              UBND( I ) = UBND( I ) + NEXTRA
+                           END IF
+                        END IF
+
+*  If the centre was not specified as a pixel coordinate, we arbitrarily
+*  choose to adjust the upper bound.
+                     ELSE
+                        UBND( I ) = UBND( I ) + NEXTRA
+                     END IF
+                  END IF
+               END IF
             END IF
-
          END DO
       END IF
 
