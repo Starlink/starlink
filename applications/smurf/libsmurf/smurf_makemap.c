@@ -646,7 +646,6 @@ void smurf_makemap( int *status ) {
   boxes = smf_malloc( size, sizeof(smfBox), 1, status ); 
   */
 
-
   if( *status == SAI__OK ) {
     parGet1i( "TILEDIMS", 2, tiledims, &nval, status );
     if( *status == PAR__NULL ) {
@@ -658,8 +657,13 @@ void smurf_makemap( int *status ) {
       
       if( *status == SAI__OK ) {
         ntile = 1;
-        ubnd_out[0] = lbnd_out[0] + tiledims[0] - 1;
-        ubnd_out[1] = lbnd_out[1] + tiledims[1] - 1;
+        if( tiledims[0] < (ubnd_out[0]-lbnd_out[0]) ) {
+          ubnd_out[0] = lbnd_out[0] + tiledims[0] - 1;
+        }
+
+        if( tiledims[1] < (ubnd_out[1]-lbnd_out[1]) ) {
+          ubnd_out[1] = lbnd_out[1] + tiledims[1] - 1;
+        }
       }
 
 
