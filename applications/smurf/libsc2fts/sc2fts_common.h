@@ -52,3 +52,4 @@
 *     {note_any_bugs_here}
 *-
 */
+void csi_simplied(float *y_old, int _n, double *x_new, int _m, float *y_new);

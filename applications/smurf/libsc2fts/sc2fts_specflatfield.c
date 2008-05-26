@@ -13,11 +13,13 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2fts_specflatfield ( smfData* idata indf, AstKeyMap * parKeymap, int *status )
+*     sc2fts_specflatfield ( Grp* igrp, Grp* ogrp, AstKeyMap * parKeymap, int *status )
 
 *  Arguments:
-*     idata = smfData* (Given)
-*        Pointer to input SCUBA2 data struct
+*     igrp = Grp* (Given)
+*        the group of input files
+*     ogrp = Grp* (Given)
+*        the group of output files
 *     parKeymap = AstKeyMap* (Given)
 *        the parameter Keymap for this operation
 *     status = int* (Given and Returned)
@@ -70,7 +72,8 @@
 
 void sc2fts_specflatfield 
 (
-smfData*   idata,
+Grp *igrp,
+Grp* ogrp,
 AstKeyMap* parKeymap,
 int *status          /* global status (given and returned) */
 )

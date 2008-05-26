@@ -13,11 +13,13 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2fts_addwcs ( smfData *data, AstKeyMap* parKeymap, int *status )
+*     sc2fts_addwcs ( Grp* igrp, Grp* ogrp, AstKeyMap* parKeymap, int *status )
 
 *  Arguments:
-*     data = smfData* (Given)
-*        Pointer to a SCUBA2 data struct
+*     igrp = Grp* (Given)
+*        the group of input files
+*     ogrp = Grp* (Given)
+*        the group of output files
 *     parKeymap = AstKeyMap* (Given)
 *        the parameter Keymap for this operation
 *     status = int* (Given and Returned)
@@ -79,21 +81,26 @@
 
 /* STARLINK includes */
 #include "ast.h"
+#include "sae_par.h"
+#include "star/hds.h"
 
 /* SMURF includes */
 #include "libsmf/smf_typ.h"
 #include "smurf_par.h"
+#include "libsmf/smf.h"
 
 #include "sc2da/sc2ast.h"
 
 void sc2fts_addwcs 
 (
-smfData*   data,
+Grp *igrp,
+Grp* ogrp,
 AstKeyMap* parKeymap,
 int   *status          /* global status (given and returned) */
 )
 {
   /* Local Variables */
+  smfData *data;                /* Pointer to input SCUBA2 data struct */
   HDSLoc *fts2drloc = NULL;     /* HDSLoc to More.FTS2DR */
   HDSLoc *ftswnloc = NULL;      /* HDSLoc to More.FTS2DR.FTS_WN */
   
@@ -111,10 +118,22 @@ int   *status          /* global status (given and returned) */
   int subnum;                   /* Subarray index number */
   double refra, refdec;         /* Attributes: RefRA, RefDec */
 
+  char oname[GRP__SZNAM];
+  char *pname = oname;
+  grpGet( ogrp, 1, 1, &pname, GRP__SZNAM, status );
+
+  /* main routine */
+  ndfBegin();
+
+  /* open ogrp for further processing */
+  smf_open_file( ogrp, 1, "UPDATE", SMF__NOCREATE_DATA, &data, status );
+
   /* get the locator to More.FTS2DR */
   fts2drloc = smf_get_xloc( data, "FTS2DR", "EXT", "READ", 0, 0, status );
+
   /* get the locator to More.FTS2DR.FTS_WN_FACTOR */
   datFind( fts2drloc, "FTS_WN_FACTOR", &ftswnloc, status );
+
   /* get the scaling factor of spectrum of FTS. The scaling factor is 
    * 1/L (L is the double-sided scan length with unit millimeter) 
   */
@@ -122,7 +141,6 @@ int   *status          /* global status (given and returned) */
   /* Annual HDSLoc */
   datAnnul( &ftswnloc, status );
   datAnnul( &fts2drloc, status );
-
   /* AST begin */
   astBegin;
 
@@ -182,4 +200,10 @@ int   *status          /* global status (given and returned) */
 
   /* AST end */
   astEnd;
+
+  /* close NDF file */
+  smf_close_file(&data, status);
+
+  /* end of NDF */
+  ndfEnd( status );
 }

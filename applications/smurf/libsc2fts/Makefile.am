@@ -10,5 +10,5 @@ C_ROUTINES =  \
               sc2fts_transcorr.c
 
 
-noinst_INCLUDES = sc2fts.h sc2fts_funs.h sc2fts_par.h sc2fts_common.h
+noinst_INCLUDES = sc2fts.h sc2fts_entry.h sc2fts_par.h sc2fts_common.h
 

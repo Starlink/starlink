@@ -59,31 +59,18 @@
 /* SMURF includes */
 #include "libsmf/smf_typ.h"
 
-/* the list of available data reduction operations for FTS-2 */
-const char *ops_sc2fts[] = { "IFGMFLATFIELD",  /* parameters: X, Y */
-                             "ADDWCS",         /* parameters: X, Y */
-                             "FREQCORR",       /* parameters: X, Y */
-                             "PORTIMBALANCE",  /* parameters: X, Y */
-                             "TRANSCORR",      /* parameters: X, Y */
-                             "SPECFLATFIELD",  /* parameters: X, Y */
-                             "GROUPCOADD"      /* parameters: X, Y */
-                           };
 /* functions of FTS-2 calibration modules */
-void sc2fts_ifgmflatfield ( smfData* idata, AstKeyMap* parKeymap, int *status );
-void sc2fts_addwcs ( smfData* idata, AstKeyMap* parKeymap, int *status );
-void sc2fts_freqcorr ( smfData* idata, AstKeyMap* parKeymap, int *status );
-void sc2fts_portimbalance ( smfData* idata, AstKeyMap* parKeymap, int *status );
-void sc2fts_transcorr ( smfData* idata, AstKeyMap* parKeymap, int *status );
-void sc2fts_specflatfield ( smfData* idata, AstKeyMap* parKeymap, int *status );
+void sc2fts_ifgmflatfield ( Grp *igrp, Grp *ogrp, AstKeyMap* parKeymap, int *status );
+void sc2fts_addwcs ( Grp *igrp, Grp *ogrp, AstKeyMap* parKeymap, int *status );
+void sc2fts_freqcorr ( Grp *igrp, Grp *ogrp, AstKeyMap* parKeymap, int *status );
+void sc2fts_portimbalance ( Grp *igrp, Grp *ogrp, AstKeyMap* parKeymap, int *status );
+void sc2fts_transcorr ( Grp *igrp, Grp *ogrp, AstKeyMap* parKeymap, int *status );
+void sc2fts_specflatfield ( Grp *igrp, Grp *ogrp, AstKeyMap* parKeymap, int *status );
 void sc2fts_groupcoadd ( Grp *igrp, Grp *ogrp, AstKeyMap* parKeymap, int *status );
 
-/* function pointers */
-void (*sc2fts_op[])( smfData* idata, AstKeyMap* parKeymap, int *status ) = {
-     sc2fts_ifgmflatfield,
-     sc2fts_addwcs,
-     sc2fts_freqcorr,
-     sc2fts_portimbalance,
-     sc2fts_transcorr,
-     sc2fts_specflatfield,
+/* a structure for storing calibration info */
+struct sc2fts_fun
+{
+  char *name;
+  void (*op)( Grp *igrp, Grp *ogrp, AstKeyMap* parKeymap, int *status );
 };
-
