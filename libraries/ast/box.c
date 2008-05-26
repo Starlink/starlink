@@ -36,6 +36,8 @@ f     The Box class does not define any new routines beyond those
 *  Copyright:
 *     Copyright (C) 1997-2006 Council for the Central Laboratory of the
 *     Research Councils
+*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -72,6 +74,9 @@ f     The Box class does not define any new routines beyond those
 *        Boxes.
 *        - In RegBaseMesh, use flat geometry if all axes come from simple
 *        frames or from 1-dimensional specialist frames.
+*     26-MAY-2008 (DSB):
+*        Fix bug in RegBaseMesh that caused an error to be reported if
+*        the Box occupies a single point.
 *class--
 */
 
@@ -1303,6 +1308,7 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
    int np_axis;                   /* No. of points per axis in ND box */
    int np_edge[ 4 ];              /* No. of points per edge in 2D box */
    int paxis;                     /* Axis index in primary Frame */
+   int single;                    /* Does the Box occupy a single point? */
 
 /* Initialise */
    result= NULL;
@@ -1332,8 +1338,27 @@ static AstPointSet *RegBaseMesh( AstRegion *this ){
 /* Get the requested number of points to put on the mesh. */
       np = astGetMeshSize( this );
 
-/* First deal with 1-D boxes. */
-      if( naxes == 1 ) {
+/* See if the box occupies a single point. */
+      single = 1;
+      for( i = 0; i < naxes; i++ ) {
+         if( ubnd[ i ] > lbnd[ i ] ) {
+            single = 0;
+            break;
+         }
+      }
+
+/* If so, we return a PointSet holding a single point. */
+      if( single ) {
+         result = astPointSet( 1, naxes, "" );
+         ptr = astGetPoints( result );
+         if( astOK ) {
+            for( i = 0; i < naxes; i++ ) {
+               ptr[ i ][ 0 ] = 0.5*( lbnd[ 0 ] + ubnd[ 0 ] );
+            }
+         }
+             
+/* Otherwise, first deal with 1-D boxes. */
+      } else if( naxes == 1 ) {
 
 /* The boundary of a 1-D box consists of 2 points - the two extreme values. 
    Create a PointSet to hold 2 1-D values, and store the extreme values. */
