@@ -2498,7 +2498,7 @@ static const char *GetTitle( AstFrame *this_frame ) {
             }
 
 /* Close the brackets. */
-            nc = sprintf( buff + pos, " ]" );
+            nc = sprintf( buff + pos, "]" );
             pos += nc;
          }
 
