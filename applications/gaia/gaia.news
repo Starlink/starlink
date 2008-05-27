@@ -6,7 +6,11 @@
     as pixels.
 
     The gaiadisp command now offers the facility to display an NDF data
-    component, such as variance or quality.
+    component, such as variance or quality using the -c flag.
+
+    When using the -component command-line option to display a non-existent
+    NDF component is now an error. After such an error the displayed
+    component will reset to DATA.
 
     Spectral extraction can now display error bars based on the data
     variance.

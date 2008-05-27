@@ -733,19 +733,16 @@ itcl::class gaia::GaiaImageCtrl {
             if {[catch {$image_ config -file [$namer_ fullname 0] \
                            -component $itk_option(-component)} msg]} {
 
-               #  If component isn't "data" then try that.
-               if { $itk_option(-component) != "data" } {
-                  if {[catch {$image_ config -file [$namer_ fullname 0] \
-                                 -component "data"} msg]} {
-                     error_dialog $msg $w_
-                     clear
-                  } else {
-                     configure -component "data"
-                  }
+               #  Failed to open image. Complain, but switch component
+               #  back to DATA if it's not set to that (otherwise we
+               #  could be fixed with the wrong component forever).
+               if { $itk_option(-component) != "DATA" } {
+                  configure -component "DATA"
+                  error_dialog "$msg (Component reset to DATA.)" $w_
                } else {
                   error_dialog $msg $w_
-                  clear
                }
+               clear
             }
             set center_ok_ 1
          }
@@ -1274,7 +1271,9 @@ itcl::class gaia::GaiaImageCtrl {
    itk_option define -real_time_command real_time_command Real_Time_Command {}
 
    #  Component of the NDF that is displayed.
-   itk_option define -component component Component data
+   itk_option define -component component Component DATA {
+      set itk_option(-component) [string toupper $itk_option(-component)]
+   }
 
    #  Define the HDU initially displayed from each FITS file that is loaded.
    itk_option define -hdu hdu Hdu 0
