@@ -45,7 +45,7 @@ TAU  <NDF>
 
    MORE           <EXT>           {structure}
       UNIT           <_CHAR*4>       '1/mm'
-      FACTOR         <_REAL>         0.0001
+      FACTOR         <_DOUBLE>       0.0001
       DRY(25001)     <_REAL>         0,1.680301E-9,6.7279533E-9,
                                      ... 0.02712704,0.02691713,0.02676998
       WET(25001)     <_REAL>         0,6.5415251E-10,2.6174807E-9,
@@ -99,6 +99,9 @@ Combinative TAU = (PWV x AM x TAU_wet) + (AM x TAU_dry)
 /* SMURF includes */
 #include "libsmf/smf_typ.h"
 
+/* FTS-2 includes */
+#include "sc2fts_common.h"
+
 void sc2fts_transcorr
 (
 Grp *igrp,
@@ -107,102 +110,171 @@ AstKeyMap* parKeymap,
 int *status          /* global status (given and returned) */
 )
 {
-   int i, j, k;
-   int indf;            /* NDF identifier for a NDF */
-   const char* tau_fn;  /* the file name of TAU */
-   float airmass;       /* Air Mass */
-   float pwv;           /* Precipitable Water Vapor */
-   HDSLoc *loc_tau = NULL;   /* root HDSLoc */
-   HDSLoc *loc_more = NULL;  /* HDSLoc to More */
-   HDSLoc *loc_dry  = NULL;  /* HDSLoc to More.DRY */
-   HDSLoc *loc_wet  = NULL;  /* HDSLoc to More.WET */
-   HDSLoc *loc_wn_factor = NULL; /* HDSLoc to More.FACTOR */
-   float wn_factor; 
-   float *dry_ptr;               /* pointer to Dry component */
-   float *wet_ptr;               /* pointer to Wet component */
-   double *tau_ptr;              /* pointer to combinative TAU */
-   int drywet_size;
+  int i, j, k, index;
+  int indf;            /* NDF identifier for a NDF */
+  const char* tau_fn;  /* the file name of TAU */
+  float airmass;       /* Air Mass */
+  float pwv;           /* Precipitable Water Vapor */
+  HDSLoc *loc_tau = NULL;   /* root TAU HDSLoc */
+  HDSLoc *loc_more = NULL;  /* HDSLoc to TAU More */
+  HDSLoc *loc_dry  = NULL;  /* HDSLoc to TAU More.DRY */
+  HDSLoc *loc_wet  = NULL;  /* HDSLoc to TAU More.WET */
+  HDSLoc *loc_wn_factor = NULL; /* HDSLoc to TAU More.FACTOR */
+  HDSLoc *fts2drloc = NULL;     /* HDSLoc to More.FTS2DR */
+  HDSLoc *ftswnloc = NULL;      /* HDSLoc to More.FTS2DR.FTS_WN */
+  double tau_wnfactor;          /* TAU's scaling factor of wave number */
+  double fts_wnfactor;          /* Spectrum's scaling factor of wave number */
+  float *dry_ptr;               /* pointer to Dry component */
+  float *wet_ptr;               /* pointer to Wet component */
+  float *tau_ptr;               /* pointer to combinative TAU */
+  int drywet_size;              /* size of dry/wet components of TAU */
+  smfData *data;                /* Pointer to in/output SCUBA2 data struct */
+  int nwn;                      /* number of spectral wavenumber in input data */
+  float *tsm;                   /* Atomspheric Transmittance */
+  double *ftswn_rel;            /* spectrum's wavenumber relative to TAU's wavenumber */
+  float *tstream = NULL;        /* Pointer to input data stream */
+  int bolrow;                   /* Row of bolometer array */
+  int bolcol;                   /* Col of bolometer array */
+  float intensity;              /* intensity for a specified wavenumber of a pixel */
 
-   printf("TransCorr operation!\n");
+  printf("TransCorr operation!\n");
  
-   /* get the TAU file name */
-   if(astMapHasKey( parKeymap, "TAU" ) ==0)
-   {
-     printf("No TAU file!!!\n");
-     return;
-   }
-   else
-   {
-     astMapGet0C(parKeymap, "TAU", &tau_fn);
-   }
-   /* get the value of airmass */
-   if(astMapHasKey( parKeymap, "AM" ) ==0)
-   {
-     printf("No AirMass!!!\n");
-     return;
-   }
-   else
-   {
-     astMapGet0F(parKeymap, "AM", &airmass);
-   }
-   /* get the value of PWV */
-   if(astMapHasKey( parKeymap, "PWV" ) ==0)
-   {
-     printf("No PWV!!!\n");
-     return;
-   }
-   else
-   {
-     astMapGet0F(parKeymap, "PWV", &pwv);
-   }
+  /* get the TAU file name */
+  if(astMapHasKey( parKeymap, "TAU" ) ==0)
+  {
+    printf("No TAU file!!!\n");
+    return;
+  }
+  else
+  {
+    astMapGet0C(parKeymap, "TAU", &tau_fn);
+  }
+  /* get the value of airmass */
+  if(astMapHasKey( parKeymap, "AM" ) ==0)
+  {
+    printf("No AirMass!!!\n");
+    return;
+  }
+  else
+  {
+    astMapGet0F(parKeymap, "AM", &airmass);
+  }
+  /* get the value of PWV */
+  if(astMapHasKey( parKeymap, "PWV" ) ==0)
+  {
+    printf("No PWV!!!\n");
+    return;
+  }
+  else
+  {
+    astMapGet0F(parKeymap, "PWV", &pwv);
+  }
 
-   /* NDF start */
-   ndfBegin();
+  /* NDF start */
+  ndfBegin();
 
-   /* open TAU file */
-   hdsOpen(tau_fn, "READ", &loc_tau, status);
-   datFind(loc_tau, "MORE", &loc_more, status);
-   datFind(loc_more, "DRY", &loc_dry, status);
-   datFind(loc_more, "WET", &loc_wet, status);
-   datFind(loc_more, "FACTOR", &loc_wn_factor, status);
+  /* open TAU file */
+  hdsOpen(tau_fn, "READ", &loc_tau, status);
+  datFind(loc_tau, "MORE", &loc_more, status);
+  datFind(loc_more, "DRY", &loc_dry, status);
+  datFind(loc_more, "WET", &loc_wet, status);
+  datFind(loc_more, "FACTOR", &loc_wn_factor, status);
 
-   /* get wavenumber */
-   datGet0R(loc_wn_factor, &wn_factor, status);
+  /* get wavenumber */
+  datGet0D(loc_wn_factor, &tau_wnfactor, status);
 
-   /* get dry/wet components */
-   datSize(loc_dry, &drywet_size, status);
+  /* get dry/wet components */
+  datSize(loc_dry, &drywet_size, status);
 
-   dry_ptr = (float*)smf_malloc(drywet_size, sizeof(float), 0, status);
-   wet_ptr = (float*)smf_malloc(drywet_size, sizeof(float), 0, status);
+  dry_ptr = (float*)smf_malloc(drywet_size, sizeof(float), 0, status);
+  wet_ptr = (float*)smf_malloc(drywet_size, sizeof(float), 0, status);
 
    
-   datGetVR(loc_dry, drywet_size, (double*)dry_ptr,
+  datGetVR(loc_dry, drywet_size, (double*)dry_ptr,
+           &drywet_size, status);
+  datGetVR(loc_wet, drywet_size, (double*)wet_ptr,
             &drywet_size, status);
-   datGetVR(loc_wet, drywet_size, (double*)wet_ptr,
-            &drywet_size, status);
 
-   /* generate combinative TAU and e^(-tau) */
-   tau_ptr = (double*)smf_malloc(drywet_size, sizeof(double), 0, status);
-   for(i=0; i<drywet_size; i++)
-   {
-     *(tau_ptr+i) = airmass*(pwv*(*(wet_ptr+i)) + *(dry_ptr+i));
-     *(tau_ptr+i) = exp(-(*(tau_ptr+i)));
-   }
+  /* generate combinative TAU and e^(-tau) */
+  tau_ptr = (float*)smf_malloc(drywet_size, sizeof(float), 0, status);
+  for(i=0; i<drywet_size; i++)
+  {
+    *(tau_ptr+i) = airmass*(pwv*(*(wet_ptr+i)) + *(dry_ptr+i));
+    *(tau_ptr+i) = exp(-(*(tau_ptr+i)));
+  }
 
-   /* release memories */
-   smf_free(dry_ptr, status);
-   smf_free(wet_ptr, status);
+  /* release memories */
+  smf_free(dry_ptr, status);
+  smf_free(wet_ptr, status);
 
-   /* close THETA file */
-   datAnnul(&loc_wn_factor, status);
-   datAnnul(&loc_wet,  status);
-   datAnnul(&loc_dry,  status);
-   datAnnul(&loc_more, status);
-   datAnnul(&loc_tau, status);
+  /* close THETA file */
+  datAnnul(&loc_wn_factor, status);
+  datAnnul(&loc_wet,  status);
+  datAnnul(&loc_dry,  status);
+  datAnnul(&loc_more, status);
+  datAnnul(&loc_tau, status);
 
-   /* release memories */
-   smf_free(tau_ptr, status);
+   /* open spectrumcube file */
+   smf_open_file( ogrp, 1, "UPDATE", SMF__NOCREATE_QUALITY, &data, status );
 
-   /* NDF end */
-   ndfEnd(status);
+  /* get the locator to More.FTS2DR */
+  fts2drloc = smf_get_xloc( data, "FTS2DR", "EXT", "READ", 0, 0, status );
+
+  /* get the locator to More.FTS2DR.FTS_WN_FACTOR */
+  datFind( fts2drloc, "FTS_WN_FACTOR", &ftswnloc, status );
+
+  /* get the scaling factor of spectrum of FTS. The scaling factor is
+   * 1/L (L is the double-sided scan length with unit millimeter)
+  */
+  datGet0D( ftswnloc, &fts_wnfactor, status );
+
+  /* Annual HDSLoc */
+  datAnnul( &ftswnloc, status );
+  datAnnul( &fts2drloc, status );
+
+  if(data->ndims != 3)
+  {
+    printf("structure of data array is wrong!!!\n");
+  }
+  else
+  {
+    nwn = (data->dims)[2];
+    tsm = (float*)smf_malloc(nwn, sizeof(float), 0, status);
+    ftswn_rel = (double*)smf_malloc(nwn, sizeof(double), 0, status);
+    for(i=0; i<nwn; i++)
+    {
+      *(ftswn_rel + i) = i*fts_wnfactor/tau_wnfactor;
+    }
+
+    csi_simplified(tau_ptr, drywet_size, ftswn_rel, nwn, tsm);
+
+
+    /* get bolometer dimension */
+    bolrow =  (data->dims)[0];
+    bolcol =  (data->dims)[1];
+
+    /* retrieve pointer to the input data */
+    tstream = (float*)((data->pntr)[0]);
+
+    for(i=0; i<bolrow; i++)
+      for(j=0; j<bolcol; j++)
+      {
+        for(k=0; k<nwn; k++)
+        {
+          index = i + bolrow*j + bolrow*bolcol*k;
+          intensity = *(tstream+index);
+          intensity = intensity/(*(tsm+k));
+          *(tstream+index) = intensity;
+        }
+      }
+    /* release memory */
+    smf_free(tsm, status);
+    smf_free(ftswn_rel, status);
+  }
+
+  /* release memories */
+  smf_free(tau_ptr, status);
+ 
+  /* NDF end */
+  ndfEnd(status);
 }

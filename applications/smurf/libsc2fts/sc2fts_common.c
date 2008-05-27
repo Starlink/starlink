@@ -63,7 +63,7 @@
  * @return the values of the interpolate y values corresponding to x_new.
  */
 
-void csi_simplied(float *y_old, int _n, double *x_new, int _m, float *y_new)
+void csi_simplified(float *y_old, int _n, double *x_new, int _m, float *y_new)
 {
    int i;
    double *_coeff = (double*)malloc(_n*sizeof(double));
@@ -103,12 +103,19 @@ void csi_simplied(float *y_old, int _n, double *x_new, int _m, float *y_new)
    for(i=0; i<_m; i++) 
    {
       int k = (int)(x_new[i]) + 1;
-      double y0 = y_old[k-1], y1 = y_old[k];
-      double coeff0 = _coeff[k-1], coeff1 = _coeff[k];
-      double a = (k - x_new[i]);
-      double b = (x_new[i] - k + 1);
-      y_new[i] =  a * y0 + b * y1
-         + ((a*a*a - a) * coeff0 + (b*b*b - b) * coeff1) / 6.0;
+      if(k>_n) 
+      { 
+        y_new[i] = 0.0; 
+      }
+      else
+      {
+        double y0 = y_old[k-1], y1 = y_old[k];
+        double coeff0 = _coeff[k-1], coeff1 = _coeff[k];
+        double a = (k - x_new[i]);
+        double b = (x_new[i] - k + 1);
+        y_new[i] =  a * y0 + b * y1
+           + ((a*a*a - a) * coeff0 + (b*b*b - b) * coeff1) / 6.0;
+      }
    }
 
    free(_coeff);

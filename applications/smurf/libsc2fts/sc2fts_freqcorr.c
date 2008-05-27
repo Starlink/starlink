@@ -166,15 +166,15 @@ int *status          /* global status (given and returned) */
        {
          for(k=0; k<nwn; k++)
          {
-           index = i + 40*j + 40*32*k;
+           index = i + BOLROW*j + BOLROW*BOLCOL*k;
            *(spectrum_orig + k) = *(tstream+index);
            wn_corr[k] = k*cos(theta_vals[i][j]);
          }
          /* frequency shift by cubic spline */
-         csi_simplied(spectrum_orig, nwn, wn_corr, nwn, spectrum_corr);
+         csi_simplified(spectrum_orig, nwn, wn_corr, nwn, spectrum_corr);
          for(k=0; k<nwn; k++)
          {
-           index = i + 40*j + 40*32*k;
+           index = i + BOLROW*j + BOLROW*BOLCOL*k;
            *(tstream+index) = *(spectrum_corr + k);
          }
        }
