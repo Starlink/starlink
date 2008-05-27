@@ -1505,7 +1505,7 @@ itcl::class gaia::GaiaContour {
                -text "$level" \
                -anchor w \
                -fill $colour \
-               -tags "$itk_option(-ast_tag) $keytag_ $texttag_" \
+               -tags "$itk_option(-ast_tag) $keytag_ $texttag_ $leveltags_($i)" \
                -width 0 \
                -font $font
             set y [expr $y+$dy]
