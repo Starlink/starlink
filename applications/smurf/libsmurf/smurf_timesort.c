@@ -171,6 +171,13 @@
 *        same detector and RTS_NUM value.
 *     18-APR-2008 (DSB):
 *        Added DETECTORS parameter.
+*     27-MAY-2008 (DSB):
+*        - If MERGE=YES, and all input NDFs use the ACSIS file naming
+*        convention, do not report an error if the user supplies an
+*        output NDF basename that does not use the ACSIS file naming
+*        convention. Instead, just append the output subscan number to
+*        the end of the supplied basename.
+*        - Correct implementation of LIMITTYPE=SLICES.
 
 *  Copyright:
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
@@ -1067,17 +1074,19 @@ void smurf_timesort( int *status ) {
                if( nout > 0 ) tslimit = nts_out/nout;
                if( nout*tslimit < nts_out ) tslimit++;
 
-            } else {
+            } else if( *status == SAI__OK ){
                if( sizelimit <= 0 ) {
                   nout = 1;
                   tslimit = nts_out;
    
                } else {
-                  if( !strcmp( ltbuf, "SPECTRA" ) ) {
+                  if( !strcmp( ltbuf, "SLICES" ) ) {
+                     if( ndet_out > 0 ) tslimit = sizelimit / ndet_out;
+
+                  } else if( !strcmp( ltbuf, "SPECTRA" ) ) {
                      if( ndet_out > 0 ) tslimit = sizelimit / ndet_out;
             
-                  } else if( *status == SAI__OK && 
-                             !strcmp( ltbuf, "FILESIZE" ) ) {
+                  } else if( !strcmp( ltbuf, "FILESIZE" ) ) {
                      tslimit = sizelimit / 
                                  ( ndet_out*nchan*( VAL__NBR*( hasvar ? 2 : 1 ) + 
                                                 ( hasqual ? VAL__NBUB : 0) ) );
@@ -1164,11 +1173,11 @@ void smurf_timesort( int *status ) {
                      strcpy( fullname, match );
                      match = astFree( match );
 
-                  } else if( *status == SAI__OK ) {
-                     *status = SAI__ERROR;
-                     msgSetc( "N", basename );
-                     errRep( "", "File name \"^N\" has unexpected format " 
-                             "(programming error).", status );
+/* If the basename supplied by the user does not use the ACSIS file
+   naming convention, then the output NDF name for this subscan is formed by 
+   appending "_n" to the end of the base name. */
+                  } else {
+                     sprintf( fullname, "%s_%d", basename, iout + 1 );
                   }
 
 /* If any of the input NDFs do not conform to the naming convention for ACSIS 
