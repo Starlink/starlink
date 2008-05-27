@@ -409,7 +409,14 @@ int gaiaMapComponent( int ndfid, void **data, const char* component,
    /* Get the type of the NDF component. */
    emsMark();
    ndfBegin();
-   ndfType( ndfid, component, dtype, NDF__SZTYP+1, &status );
+
+   /* Allow ERROR as synonym for VARIANCE. */
+   if ( strcasecmp( component, "ERROR" ) == 0 ) {
+       ndfType( ndfid, "VARIANCE", dtype, NDF__SZTYP+1, &status );
+   } 
+   else {
+       ndfType( ndfid, component, dtype, NDF__SZTYP+1, &status );
+   }
 
    /*  Trap _BYTE and map _WORD */
    if ( strncmp( dtype, "_BYTE", 7 ) == 0 ) {
@@ -975,7 +982,7 @@ int gaiaCheckMNDF( const void *handle, int index, const char *component )
    /*  Get pointer to relevant NDF */
    current = getNDFInfo( handle, index );
 
-   /*  See if the component exists */
+   /*  See if the component exists (note ERROR is synonym for VARIANCE). */
    if ( current ) {
       switch ( component[0] ) {
          case 'd':
@@ -985,7 +992,9 @@ int gaiaCheckMNDF( const void *handle, int index, const char *component )
          break;
 
          case 'v':
-         case 'V': {
+         case 'V': 
+         case 'e':
+         case 'E': {
             if ( current->havevar ) {
                status = 1;
             }

@@ -15,7 +15,8 @@
 #     file chooser in that is understands multiple NDFs stored in the
 #     same container file, and also allows the selection of a
 #     "displayable" component (these are the NDF data, variance and
-#     quality arrays).
+#     quality arrays, with error as a synonym for variance as standard
+#     deviations).
 #
 #     This class is the NDF equivalent of SkyCatHDUChooser.
 
@@ -177,6 +178,11 @@ itcl::class gaia::GaiaNDFChooser {
             -text Variance \
             -command [code $this set_ndf_ variance]
       }
+      itk_component add err {
+         button $w_.buttons.err \
+            -text Error \
+            -command [code $this set_ndf_ error]
+      }
       itk_component add qual {
          button $w_.buttons.qual \
             -text Quality \
@@ -207,6 +213,7 @@ itcl::class gaia::GaiaNDFChooser {
 
       pack $itk_component(data) -side left -expand 1
       pack $itk_component(var) -side left -expand 1
+      pack $itk_component(err) -side left -expand 1
       pack $itk_component(qual) -side left -expand 1
       pack $itk_component(display) -side left -expand 1
       pack $itk_component(show) -side left -fill y -expand 1 
@@ -262,6 +269,9 @@ itcl::class gaia::GaiaNDFChooser {
 
       add_short_help $itk_component(var) \
          {Open and display the selected NDF variance component}
+
+      add_short_help $itk_component(err) \
+         {Display the selected NDF variance component in standard deviations}
 
       add_short_help $itk_component(qual) \
          {Open and display the selected NDF quality component}
@@ -497,8 +507,10 @@ itcl::class gaia::GaiaNDFChooser {
          lassign [lindex $sel 0] number name naxis1 naxis2 havvar havqual
          if { "$havvar" == "true" } {
             $itk_component(var) configure -state normal
+            $itk_component(err) configure -state normal
          } else {
             $itk_component(var) configure -state disabled
+            $itk_component(err) configure -state disabled
          }
          if { "$havqual" == "true" } {
             $itk_component(qual) configure -state normal
@@ -565,8 +577,6 @@ itcl::class gaia::GaiaNDFChooser {
 
    #  Common variables: (shared by all instances)
    #  -----------------
-
-
    protected variable component_ "data"
 
 #  End of class definition.

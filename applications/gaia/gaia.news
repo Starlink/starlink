@@ -12,6 +12,10 @@
     NDF component is now an error. After such an error the displayed
     component will reset to DATA.
 
+    The VARIANCE component of an NDF can now be displayed in standard
+    deviations using the component name ERROR. ERROR is also selectable
+    in the NDF chooser dialog.
+
     Spectral extraction can now display error bars based on the data
     variance.
 
