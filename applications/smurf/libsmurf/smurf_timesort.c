@@ -1081,7 +1081,7 @@ void smurf_timesort( int *status ) {
    
                } else {
                   if( !strcmp( ltbuf, "SLICES" ) ) {
-                     if( ndet_out > 0 ) tslimit = sizelimit / ndet_out;
+                     tslimit = sizelimit;
 
                   } else if( !strcmp( ltbuf, "SPECTRA" ) ) {
                      if( ndet_out > 0 ) tslimit = sizelimit / ndet_out;
