@@ -161,6 +161,9 @@
  *     2008-05-01 (DSB):
  *        Ensure AST issues warnings if it tries to return undefined
  *        keyword values via the astGetFits<X> functions.
+ *     2008-05-28 (TIMJ):
+ *        Make sure return pointer is initialised to NULL even if status is
+ *        bad on entry.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -288,6 +291,9 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
   IRQLocs *qlocs = NULL;     /* Named quality resources */
   char xname[DAT__SZNAM+1];  /* Name of extension holding quality names */
   double steptime = 0.0;     /* Step time for this file */
+
+  /* make sure return pointer is initialised */
+  *data = NULL;
 
   if ( *status != SAI__OK ) return;
 

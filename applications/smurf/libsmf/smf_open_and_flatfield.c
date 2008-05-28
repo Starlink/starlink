@@ -78,6 +78,8 @@
 *        Use smf_realloc instead of astRealloc
 *     2008-05-23 (TIMJ):
 *        Enable provenance propagation.
+*     2008-05-28 (TIMJ):
+*        Initialise pointers.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -134,11 +136,11 @@
 
 void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata, int *status) {
 
-  smfData *data;            /* Pointer to input data struct */
-  smfFile *file;            /* Pointer to input file struct */
+  smfData *data = NULL;     /* Pointer to input data struct */
+  smfFile *file = NULL;     /* Pointer to input file struct */
   int indf;                 /* NDF identifier for input file */
   int nout;                 /* Number of data points in output data file */
-  void *outdata[1];         /* Pointer to array of output mapped pointers*/
+  void *outdata[1] = { NULL };/* Pointer to array of output mapped pointers*/
   int outndf;               /* Output NDF identifier */
   char *pname;              /* Pointer to input filename */
   size_t npts = 0;          /* Number of data points */
