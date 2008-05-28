@@ -13,6 +13,7 @@
  * Peter W. Draper 14/07/98  Changed interpolate to get last colorcell 
  *                           (so pure white/black is available in principle).
  * pbiereic        17/02/03  Added 'using namespace std'. Removed ::std specs.
+ * Peter W. Draper 28/05/08  Stop leak of name from ::get.
  */
 static const char* const rcsId="@(#) $Id: ColorMapInfo.C,v 1.1.1.1 2006/01/12 16:39:22 abrighto Exp $";
 
@@ -37,9 +38,25 @@ ColorMapInfo* cmaps_ = NULL;
  * have been allocated.
  */
 ColorMapInfo::ColorMapInfo(char* name, RGBColor* rgb)
-    : rgb_(rgb),
-      name_(name), 
-      next_(cmaps_)
+    : name_(name),
+      rgb_(rgb),
+      next_(cmaps_),
+      nameowner_(0)
+{
+    // make this the head of the list of colormaps
+    cmaps_ = this;
+}
+
+/*
+ * constructor - main arguments are the name of the colormap and an array of
+ * RGB color values. Both are assumed to have been allocated, but if nameowner
+ * is 1 then the memory will be freed on destruction.
+ */
+ColorMapInfo::ColorMapInfo(char* name, RGBColor* rgb, int nameowner)
+    : name_(name), 
+      rgb_(rgb),
+      next_(cmaps_),
+      nameowner_(nameowner)
 {
     // make this the head of the list of colormaps
     cmaps_ = this;
@@ -63,6 +80,11 @@ ColorMapInfo::~ColorMapInfo()
 	    }
 	}
     }
+
+    // release the name_ pointer, if we've been given ownership
+    if ( nameowner_ ) {
+        free( name_ );
+    }
 }
 
 
@@ -80,19 +102,23 @@ ColorMapInfo* ColorMapInfo::get(char* filename)
 	if (strcmp(m->name(), name) == 0)
 	    break;
 
-    if (m) 
+    if (m) {
+        free(name);
 	return m;
+    }
 
     // have to read in file
     ifstream f(filename);
     if (! f) {
 	error("could not open colormap file: ", filename);
+        free(name);
 	return (ColorMapInfo*) NULL;
     }
 
     RGBColor* rgb = new RGBColor[MAX_COLOR];
     if (! rgb) {
 	error("could not allocate colormap");
+        free(name);
 	return (ColorMapInfo*) NULL;
     }
     for (int i = 0; i < MAX_COLOR; i++) {
@@ -100,10 +126,11 @@ ColorMapInfo* ColorMapInfo::get(char* filename)
     }
     if (! f) {
 	error("error reading colormap file: ", filename);
+        free(name);
 	return (ColorMapInfo*) NULL;
     }
 
-    m = new ColorMapInfo(name, rgb);
+    m = new ColorMapInfo(name, rgb, 1);
     if (! m) 
 	error("could not create colormap");
     

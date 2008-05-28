@@ -45,8 +45,9 @@ struct RGBColor {
 class ColorMapInfo {
 private:
     char* name_;		// filename
-    RGBColor* rgb_;	// array of RGB values
+    RGBColor* rgb_;	        // array of RGB values
     ColorMapInfo* next_;	// pointer to next colormap
+    int nameowner_;             // true if we "own" the name_ memory pointer
 
     // copy constructor (not defined)
     ColorMapInfo(const ColorMapInfo&); 
@@ -54,8 +55,10 @@ private:
 public:
     // constructor - arguments are the name of the colormap
     // and an array of RGB color values. Both are assumed to
-    // have been allocated.
+    // have been allocated. If second form we take ownership
+    // of the name memory (allocated by malloc).
     ColorMapInfo(char* name, RGBColor* rgb);
+    ColorMapInfo(char* name, RGBColor* rgb, int nameowner);
 
     // destructor
     ~ColorMapInfo();
