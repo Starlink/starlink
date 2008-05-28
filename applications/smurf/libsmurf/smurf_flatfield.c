@@ -137,6 +137,8 @@ void smurf_flatfield( int *status ) {
 
   for (i=1; i<=size; i++ ) {
 
+    if (*status != SAI__OK) break;
+
     /* Call flatfield routine */
     smf_open_and_flatfield(igrp, ogrp, i, &ffdata, status);
 
