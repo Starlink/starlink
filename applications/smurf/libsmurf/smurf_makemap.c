@@ -486,7 +486,7 @@ void smurf_makemap( int *status ) {
   int tndf = NDF__NOID;      /* NDF identifier for EXP_TIME */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   int uselonlat = 0;         /* Flag for whether to use given lon_0 and
-				lat_0 for output frameset */
+                                lat_0 for output frameset */
   void *variance=NULL;       /* Pointer to the variance map */
   smfData *wdata=NULL;       /* Pointer to SCUBA2 data struct for weights */
   double *weights=NULL;      /* Pointer to the weights map */
@@ -508,7 +508,7 @@ void smurf_makemap( int *status ) {
 
   /* Get the celestial coordinate system for the output cube. */
   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
-	    "GAPPT,FK4,FK4-NO-E,ECLIPTIC", 1, system, 10, status );
+            "GAPPT,FK4,FK4-NO-E,ECLIPTIC", 1, system, 10, status );
 
   /* Indicate we have no projection parameters as yet. */
   par[0] = AST__BAD;
@@ -531,8 +531,8 @@ void smurf_makemap( int *status ) {
 
   /* Get METHOD - set rebin/iterate flags */
   parChoic( "METHOD", "REBIN", 
-	    "REBIN, ITERATE.", 1,
-	    method, LEN__METHOD, status);
+            "REBIN, ITERATE.", 1,
+            method, LEN__METHOD, status);
   if( strncmp( method, "REBIN", 5 ) == 0 ) {
     rebin = 1;
     iterate = 0;
@@ -545,8 +545,8 @@ void smurf_makemap( int *status ) {
   if ( rebin ) {
     /* Obtain desired pixel-spreading scheme */
     parChoic( "SPREAD", "NEAREST", "NEAREST,LINEAR,SINC,"
-	      "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
-	      1, pabuf, 10, status );
+              "SINCSINC,SINCCOS,SINCGAUSS,SOMB,SOMBCOS,GAUSS", 
+              1, pabuf, 10, status );
 
     smf_get_spread( pabuf, &spread, &nparam, status );
 
@@ -572,7 +572,7 @@ void smurf_makemap( int *status ) {
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Determine map bounds", status);
 
   smf_mapbounds( igrp, size, system, par, uselonlat, 
-		 lbnd_out, ubnd_out, &outfset, &moving, status );
+                 lbnd_out, ubnd_out, &outfset, &moving, status );
 
   gettimeofday( &tv2, NULL );
 
@@ -643,7 +643,7 @@ void smurf_makemap( int *status ) {
      the entire output grid should be stored in a single output NDF). */
 
   /*
-  boxes = smf_malloc( size, sizeof(smfBox), 1, status ); 
+    boxes = smf_malloc( size, sizeof(smfBox), 1, status ); 
   */
 
   if( *status == SAI__OK ) {
@@ -668,10 +668,10 @@ void smurf_makemap( int *status ) {
 
 
       /*
-      if( nval == 1 ) tiledims[ 1 ] = tiledims[ 0 ];
-      tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes, 
-                               spread, params, outfset, 1, tiledims,
-                               0, 0, &ntile, status );
+        if( nval == 1 ) tiledims[ 1 ] = tiledims[ 0 ];
+        tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes, 
+        spread, params, outfset, 1, tiledims,
+        0, 0, &ntile, status );
 
       */
 
@@ -683,12 +683,12 @@ void smurf_makemap( int *status ) {
      size output grid. */
 
   /*
-  if( !tiles ) {
+    if( !tiles ) {
     tiledims[ 0 ] = -1;
     tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes, 
-                             spread, params, outfset, 1, tiledims, 
-                             0, 0, &ntile, status );
-  }
+    spread, params, outfset, 1, tiledims, 
+    0, 0, &ntile, status );
+    }
   */
 
   /* Write the number of tiles being created to an output parameter. */
@@ -701,9 +701,9 @@ void smurf_makemap( int *status ) {
   
   if ( moving ) {
     msgOutif(MSG__VERB, " ", "Tracking a moving object", status);
-   } else {
-     msgOutif(MSG__VERB, " ", "Tracking a stationary object", status);
-   }
+  } else {
+    msgOutif(MSG__VERB, " ", "Tracking a stationary object", status);
+  }
 
   /* Create an output smfData */
   ndgCreat ( "OUT", NULL, &ogrp, &outsize, &flag, status );
@@ -718,7 +718,7 @@ void smurf_makemap( int *status ) {
   smfflags |= SMF__MAP_VAR;
 
   smf_open_newfile ( ogrp, 1, SMF__DOUBLE, 2, lbnd_out, ubnd_out, smfflags, 
-		     &odata, status );
+                     &odata, status );
 
   if ( *status == SAI__OK ) {
     file = odata->file;
@@ -748,7 +748,7 @@ void smurf_makemap( int *status ) {
 
   /* Create EXP_TIME component in output file */
   smf_open_ndfname ( smurfloc, "WRITE", NULL, "EXP_TIME", "NEW", "_DOUBLE",
-		     2, lbnd_out, ubnd_out, &tdata, status );
+                     2, lbnd_out, ubnd_out, &tdata, status );
   if ( tdata ) {
     exp_time = (tdata->pntr)[0];
     tndf = tdata->file->ndfid;
@@ -763,7 +763,7 @@ void smurf_makemap( int *status ) {
 
     /* Simple Regrid of the data */
     msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using REBIN method", 
-	     status);
+             status);
 
     for(i=1; (*status == SAI__OK) && (i <= size); i++ ) {
       /* Read data from the ith input file in the group */      
@@ -771,26 +771,26 @@ void smurf_makemap( int *status ) {
 
       /* Check that the data dimensions are 3 (for time ordered data) */
       if( *status == SAI__OK ) {
-	if( data->ndims != 3 ) {
-	  msgSeti("I",i);
-	  msgSeti("THEDIMS", data->ndims);
-	  *status = SAI__ERROR;
-	  errRep(FUNC_NAME, 
-		 "File ^I data has ^THEDIMS dimensions, should be 3.", 
-		 status);
-	}
+        if( data->ndims != 3 ) {
+          msgSeti("I",i);
+          msgSeti("THEDIMS", data->ndims);
+          *status = SAI__ERROR;
+          errRep(FUNC_NAME, 
+                 "File ^I data has ^THEDIMS dimensions, should be 3.", 
+                 status);
+        }
       }
       
       /* Check that the input data type is double precision */
       if( *status == SAI__OK ) {
-	if( data->dtype != SMF__DOUBLE) {
-	  msgSeti("I",i);
-	  msgSetc("DTYPE", smf_dtype_string( data, status ));
-	  *status = SAI__ERROR;
-	  errRep(FUNC_NAME, 
-		 "File ^I has ^DTYPE data type, should be DOUBLE.",
-		 status);
-	}
+        if( data->dtype != SMF__DOUBLE) {
+          msgSeti("I",i);
+          msgSetc("DTYPE", smf_dtype_string( data, status ));
+          *status = SAI__ERROR;
+          errRep(FUNC_NAME, 
+                 "File ^I has ^DTYPE data type, should be DOUBLE.",
+                 status);
+        }
       }
 
       /* Check units are consistent */
@@ -798,32 +798,32 @@ void smurf_makemap( int *status ) {
 
       /* Store steptime for calculating EXP_TIME */
       if ( i==1 ) {
-	smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
+        smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
       }
 
       /* Store the filename in the keymap for later - the GRP would be fine
-	 as is but we use a keymap in order to reuse smf_fits_add_prov */
+         as is but we use a keymap in order to reuse smf_fits_add_prov */
       if (*status == SAI__OK)
         smf_accumulate_prov( prvkeymap, data->file, igrp, i, status );
 
       /* Handle output FITS header creation */
       if (*status == SAI__OK)
-	smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
+        smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
 
       msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Beginning the REBIN step", 
                status);
       /* Rebin the data onto the output grid */
       
       smf_rebinmap(data, i, size, outfset, spread, params, moving, 1,
-      		   lbnd_out, ubnd_out, map, variance, weights3d, status );
+                   lbnd_out, ubnd_out, map, variance, weights3d, status );
   
       /* Close the data file */
       smf_close_file( &data, status);
       
       /* Break out of loop over data files if bad status */
       if (*status != SAI__OK) {
-	errRep(FUNC_NAME, "Rebinning step failed", status);
-	break;
+        errRep(FUNC_NAME, "Rebinning step failed", status);
+        break;
       }
 
     }
@@ -833,14 +833,14 @@ void smurf_makemap( int *status ) {
        pixel */
     for (i=0; (i<mapsize) && (*status == SAI__OK); i++) {
       if ( map[i] == VAL__BADD) {
-	exp_time[i] = VAL__BADD;
-	weights[i] = VAL__BADD;
+        exp_time[i] = VAL__BADD;
+        weights[i] = VAL__BADD;
       } else {
-	exp_time[i] = steptime * weights3d[i];
-	weights[i] = weights3d[i+mapsize];
-	if ( exp_time[i] > maxtexp ) {
-	  maxtexp = exp_time[i];
-	}
+        exp_time[i] = steptime * weights3d[i];
+        weights[i] = weights3d[i+mapsize];
+        if ( exp_time[i] > maxtexp ) {
+          maxtexp = exp_time[i];
+        }
       }
     }
     weights3d = smf_free( weights3d, status );
@@ -848,7 +848,7 @@ void smurf_makemap( int *status ) {
 
     /* Iterative map-maker */
     msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using ITERATE method", 
-	     status);
+             status);
 
     /* Allocate space for hitsmap */
     hitsmap = smf_malloc( mapsize, sizeof (int), 1, status);
@@ -857,59 +857,59 @@ void smurf_makemap( int *status ) {
     if( *status == SAI__OK ) {
       for(i=1; i<=size; i++ ) {	
 
-	if (*status == SAI__OK) {
-	  smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data,status );
-	  if( *status != SAI__OK) {
-	    errRep(FUNC_NAME, "Bad status opening smfData", status);      
-	  }
-	}
+        if (*status == SAI__OK) {
+          smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data,status );
+          if( *status != SAI__OK) {
+            errRep(FUNC_NAME, "Bad status opening smfData", status);      
+          }
+        }
         
-	/* Store steptime for calculating EXP_TIME */
-	if( (i==1) && (*status == SAI__OK) ) {
-	  smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
-	}
+        /* Store steptime for calculating EXP_TIME */
+        if( (i==1) && (*status == SAI__OK) ) {
+          smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
+        }
 
-	/* Check units are consistent */
-	if( *status == SAI__OK ) {
-	  smf_check_units( i, data_units, data->hdr, status);
-	}
+        /* Check units are consistent */
+        if( *status == SAI__OK ) {
+          smf_check_units( i, data_units, data->hdr, status);
+        }
 
-	/* Store the filename in the keymap for later - the GRP would be fine
-	   as is but we use a keymap in order to reuse smf_fits_add_prov */
-	if (*status == SAI__OK)
+        /* Store the filename in the keymap for later - the GRP would be fine
+           as is but we use a keymap in order to reuse smf_fits_add_prov */
+        if (*status == SAI__OK)
           smf_accumulate_prov( prvkeymap, data->file, igrp, i, status );
 
-	/* Handle output FITS header creation (since the file is open and
-	   he header is available) */
-	if( *status == SAI__OK ) {
-	  smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
-	}
+        /* Handle output FITS header creation (since the file is open and
+           he header is available) */
+        if( *status == SAI__OK ) {
+          smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
+        }
 
-	if (*status == SAI__OK) {
-	  smf_close_file( &data, status );
-	  if( *status != SAI__OK) {
-	    errRep(FUNC_NAME, "Bad status closing smfData", status);      
-	  }
-	}     
+        if (*status == SAI__OK) {
+          smf_close_file( &data, status );
+          if( *status != SAI__OK) {
+            errRep(FUNC_NAME, "Bad status closing smfData", status);      
+          }
+        }     
 
-	/* Exit loop if error status */
-	if( *status != SAI__OK ) break;
+        /* Exit loop if error status */
+        if( *status != SAI__OK ) break;
       }
     }
 
     /* Call the low-level iterative map-maker */
     smf_iteratemap( igrp, keymap, outfset, moving, lbnd_out, ubnd_out,
-		    maxmem-mapmem, map, hitsmap, variance, weights, status );
+                    maxmem-mapmem, map, hitsmap, variance, weights, status );
 
     /* Calculate exposure time per output pixel from hitsmap */
     for (i=0; (i<mapsize) && (*status == SAI__OK); i++) {
       if ( map[i] == VAL__BADD) {
-	exp_time[i] = VAL__BADD;
+        exp_time[i] = VAL__BADD;
       } else {
-	exp_time[i] = steptime * hitsmap[i];
-	if ( exp_time[i] > maxtexp ) {
-	  maxtexp = exp_time[i];
-	}
+        exp_time[i] = steptime * hitsmap[i];
+        if ( exp_time[i] > maxtexp ) {
+          maxtexp = exp_time[i];
+        }
       }
     }
     hitsmap = smf_free( hitsmap, status );
@@ -918,7 +918,7 @@ void smurf_makemap( int *status ) {
     if (*status == SAI__OK) {
       *status = SAI__ERROR;
       errRep( " ", "Map maker mode not understood. Should not be possible",
-	      status );
+              status );
     }
   }
 
@@ -954,23 +954,23 @@ void smurf_makemap( int *status ) {
     kpg1Ghstd( 1, (int)mapsize, exp_time, numbin, 0, &maxtexp, &steptime, 
                histogram, status );
     kpg1Hsstp( numbin, histogram, maxtexp, steptime, 
-	       &sumtexp, &meantexp, &medtexp, &modetexp, status);
+               &sumtexp, &meantexp, &medtexp, &modetexp, status);
     astSetFitsF(fchan, "MEDTEXP", medtexp, "[s] Median MAKEMAP exposure time",
                 0);
     histogram = smf_free( histogram, status );
   }
 
 
-/* Retrieve the unique OBSID keys from the KeyMap and populate the OBSnnnnn
-   and PROVCNT headers from this information. */
+  /* Retrieve the unique OBSID keys from the KeyMap and populate the OBSnnnnn
+     and PROVCNT headers from this information. */
   smf_fits_add_prov( fchan, "OBS", obsidmap, status ); 
   smf_fits_add_prov( fchan, "PRV", prvkeymap, status ); 
   
   astAnnul( prvkeymap );
   astAnnul( obsidmap );
 
-/* If the FitsChan is not empty, store it in the FITS extension of the
-   output NDF (any existing FITS extension is deleted). */
+  /* If the FitsChan is not empty, store it in the FITS extension of the
+     output NDF (any existing FITS extension is deleted). */
   if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
 
   if( outfset != NULL ) {
