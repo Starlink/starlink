@@ -295,7 +295,8 @@ StarWCS::StarWCS( const char *header, const size_t lheader )
             //  cards.
             astClear( fitschan, "Card" );
             constructWarning( default_encoding, wcs_ == NULL, fitschan );
-
+            astClear( fitschan, "Warnings" );
+            
             //  Release the fitschan.
             fitschan = (AstFitsChan *) astAnnul( fitschan );
         }
