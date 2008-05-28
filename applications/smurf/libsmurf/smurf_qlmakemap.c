@@ -181,6 +181,8 @@
 *        Write output units.
 *     2008-05-03 (AGG):
 *        Only access variance if status is good
+*     2008-05-28 (TIMJ):
+*        Use smf_updateprov
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -250,6 +252,7 @@ void smurf_qlmakemap( int *status ) {
 				variances in output image */
   dim_t i;                   /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
+  int indf;                  /* input NDF identifier */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   double *map = NULL;        /* Pointer to the rebinned map data */
   size_t mapsize;            /* Number of pixels in output image */
@@ -257,7 +260,6 @@ void smurf_qlmakemap( int *status ) {
   int moving = 0;            /* Flag to denote a moving object */
   int nparam = 0;            /* Number of extra parameters for pixel spreading scheme*/
   size_t nweights;           /* Number of elements in weights array */
-  AstKeyMap * obsidmap = NULL; /* Map of OBSIDs from input data */
   smfData *odata=NULL;       /* Pointer to output SCUBA2 data struct */
   Grp *ogrp = NULL;          /* Group containing output file */
   int ondf = NDF__NOID;      /* output NDF identifier */
@@ -267,7 +269,6 @@ void smurf_qlmakemap( int *status ) {
   char pabuf[ 10 ];          /* Text buffer for parameter value */
   double params[ 4 ];        /* astRebinSeq parameters */
   double pixsize = 3.0;      /* Size of an output map pixel in arcsec */
-  AstKeyMap * prvkeymap = NULL; /* Keymap of input files for PRVxxx headers */
   int size;                  /* Number of files in input group */
   int smfflags = 0;          /* Flags for creating a new smfData */
   int spread;                /* Code for pixel spreading scheme */
@@ -352,9 +353,6 @@ void smurf_qlmakemap( int *status ) {
     variance = (odata->pntr)[1];
   }
 
-  /* Create provenance keymap */
-  prvkeymap = astKeyMap( "" );
-
   /* Loop over each input file, subtracting bolometer drifts, a mean
      sky level (per timeslice), correcting for extinction and
      regridding the data into the output map */
@@ -366,13 +364,8 @@ void smurf_qlmakemap( int *status ) {
     /* Check units are consistent */
     smf_check_units( i, data_units, data->hdr, status);
 
-    /* Store the filename in the keymap for later - the GRP would be fine
-       as is but we use a keymap in order to reuse smf_fits_add_prov */
-    if (*status == SAI__OK)
-      smf_accumulate_prov( prvkeymap, data->file, igrp, i, status );
-
     /* Handle output FITS header creation */
-    smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
+    smf_fits_outhdr( data->hdr->fitshdr, &fchan, NULL, status );
 
     /* Remove bolometer drifts if a fit is present */
     smf_subtract_poly( data, NULL, 1, status );
@@ -389,6 +382,18 @@ void smurf_qlmakemap( int *status ) {
     smf_correct_extinction( data, "CSOTAU", 1, tau, NULL, status );
 
     msgOutif(MSG__VERB, " ", "SMURF_QLMAKEMAP: Beginning the REBIN step", status);
+
+    /* Propagate provenance to the output file - need access to the
+       input file again if we read from raw data. Must use updateprov
+       to prevent all the extensions being listed in provenance via
+       sc2store */
+    if (!data->file || ( data->file && data->file->ndfid == NDF__NOID)) {
+      ndgNdfas( igrp, i, "READ", &indf, status );
+    } else {
+      indf = data->file->ndfid;
+    }
+    smf_updateprov( odata->file->ndfid, data, indf, "SMURF:QLMAKEMAP",status );
+
     /* Rebin the data onto the output grid */
     smf_rebinmap( data, i, size, outframeset, spread, params, moving, genvar,
 		  lbnd_out, ubnd_out, map, variance, weights, status );
@@ -409,17 +414,12 @@ void smurf_qlmakemap( int *status ) {
   /* Free up weights array */
   weights = smf_free( weights, status );
 
-  /* Retrieve the unique OBSID keys from the KeyMap and populate the
-     OBSnnnnn and PROVCNT headers from this information. */
-  smf_fits_add_prov( fchan, "OBS", obsidmap, status ); 
-  smf_fits_add_prov( fchan, "PRV", prvkeymap, status ); 
-  
-  astAnnul( prvkeymap );
-  astAnnul( obsidmap );
-
-  /* If the FitsChan is not empty, store it in the FITS extension of
-     the output NDF (any existing FITS extension is deleted). */
-  if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
+  /* If the FitsChan is not empty, store it in the FITS extension of the
+     output NDF (any existing FITS extension is deleted). */
+  if( fchan ){
+    if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
+    fchan = astAnnul( fchan );
+  }
 
   /* Free the WCS pointer */
   if ( outframeset != NULL ) {
