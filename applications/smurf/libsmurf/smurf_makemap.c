@@ -554,15 +554,9 @@ void smurf_makemap( int *status ) {
     if ( nparam > 0 ) parExacd( "PARAMS", nparam, params, status );
   } else if ( iterate ) {
     /* Read a group of configuration settings into keymap */
-    parState( "CONFIG", &parstate, status );
-    if( parstate == PAR__ACTIVE ) {
-      kpg1Gtgrp( "CONFIG", &confgrp, &ksize, status );
-      kpg1Kymap( confgrp, &keymap, status );
-      if( confgrp ) grpDelet( &confgrp, status );      
-    } else {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, "CONFIG unspecified", status);      
-    }
+    kpg1Gtgrp( "CONFIG", &confgrp, &ksize, status );
+    kpg1Kymap( confgrp, &keymap, status );
+    if( confgrp ) grpDelet( &confgrp, status );      
   }
 
   /* Calculate the map bounds */
