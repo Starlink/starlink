@@ -307,6 +307,8 @@
 *        Add smf_get_taskname
 *     2008-05-26 (EC):
 *        Added is2d to smf_choosetiles
+*     2008-05-28 (TIMJ):
+*        Change smf_accumulate_prov
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -505,9 +507,10 @@ void smf_fits_add_prov( AstFitsChan * hdr, const char * keyroot,
 			const AstKeyMap * idmap,
 			int * status);
 
+
 void
-smf_accumulate_prov( AstKeyMap * prvmap, const smfFile * file, const Grp* igrp,
-                int index, int * status );
+smf_accumulate_prov( const smfData * data, const Grp* igrp, int index, 
+                     int ondf, const char *creator, int * status );
 
 void smf_fits_crchan( int nfits, const char * headrec, AstFitsChan ** fits, 
                       int *status);
@@ -844,7 +847,7 @@ void smf_reorderr( float *in, int ndim, int *dims, int axis, int *index, int max
 void smf_reorderi( int *in, int ndim, int *dims, int axis, int *index, int maxis, int *mask, int *out, int *status );
 void smf_reorderd( double *in, int ndim, int *dims, int axis, int *index, int maxis, int *mask, double *out, int *status );
 void smf_reorderc( char *in, int len, int ndim, int *dims, int axis, int *index, int maxis, int *mask, char *out, int *status );
-void smf_updateprov( int ondf, smfData *data, int indf, const char *creator, int *status );
+void smf_updateprov( int ondf, const smfData *data, int indf, const char *creator, int *status );
 
 void smf_fits_setL( const smfHead *hdr, const char *name, int value, 
 		    const char *comment, int overwrite, int *status );

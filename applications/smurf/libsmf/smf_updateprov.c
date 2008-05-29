@@ -13,13 +13,13 @@
 *     C function
 
 *  Invocation:
-*     void smf_updateprov( int ondf, smfData *data, int indf, 
+*     void smf_updateprov( int ondf, const smfData *data, int indf, 
 *                          const char *creator, int *status )
 
 *  Arguments:
 *     ondf = int (Given)
 *        The output NDF identifier.
-*     data = smfData * (Given)
+*     data = const smfData * (Given)
 *        Pointer to the structure describing the current input NDF. If
 *        NULL, then the "indf" is used instead.
 *     indf = int (Given)
@@ -85,8 +85,8 @@
 /* SMURF includes */
 #include "libsmf/smf.h"
 
-void smf_updateprov( int ondf, smfData *data, int indf, const char *creator,
-                     int *status ){
+void smf_updateprov( int ondf, const smfData *data, int indf, 
+                     const char *creator, int *status ){
 
 /* Local Variables */
    AstFitsChan *fc = NULL;      /* AST FitsChan holding input FITS header */

@@ -4,7 +4,7 @@
 *     smf_accumulate_prov
 
 *  Purpose:
-*     Store file provenance information into keymap
+*     Store file provenance from Grp information using smf_updateprov
 
 *  Language:
 *     Starlink ANSI C
@@ -13,27 +13,32 @@
 *     C function
 
 *  Invocation:
-*     smf_accumulate_prov( astKeyMap * keymap, const smfFile * file,
-*                    const Grp * igrp, int index, int * status );
+*     smf_accumulate_prov( const smfData * data, const Grp * igrp,
+*                    int index, int ondf, const char * creator, int * status );
 
 *  Arguments:
-*     obsidmap = AstKeyMap * (Given & Returned)
-*        Keymap for tracking provenance information. Must have been
-*        created beforehand.
-*     file = const smfFile * (Given)
-*        smfFile containing the file name. Can be NULL if a group is being used.
+*     data = const smfData* (Given)
+*        Input file from which provenance should be obtained. If no
+*        NDF identifier is present the Grp will be used. Can be NULL.
 *     igrp = const Grp * (Given)
-*        NDG group identifier. If "file" is present and contains a filename in the
-*        struct that takes precedence over the Grp.
+*        NDG group identifier. Not used if the "data" struct contains
+*        an NDF identifier.
 *     index = int (Given)
-*        Index corresponding to required file in group
+*        Index corresponding to required file in group of Grp is used.
+*     ondf = int (Given)
+*        Output NDF identifier.
+*     creator = const char * (Given)
+*        String to associate with the provenance entry. Usually SMURF:TASKNAME
 *     status = int* (Given and Returned)
 *        Pointer to inherited status.
 
 *  Description:
-*     This function is used to build up provenance information into a
-*     keymap suitable for use in a call to smf_fits_add_prov. The filename
-*     is determined from the input parameters.
+*     This function incrementally updates the provenance information in
+*     an output file based on an input provenance. It is a small wrapper
+*     around smf_updateprov because when raw data are read using sc2store
+*     functions the input NDF identifier is not present in the smfData
+*     struct and so the input file must be reopened. If the smfData contains
+*     an NDF identifier the input file will not be reopened.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
@@ -44,6 +49,8 @@
 *        Initial version.
 *     2007-07-06 (TIMJ):
 *        Strip path from filename
+*     2008-05-28 (TIMJ):
+*        Now a wrapper around smf_updateprov
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -76,73 +83,35 @@
 *-
 */
 #include "smf.h"
-#include "star/grp.h"
+#include "ndf.h"
+#include "star/ndg.h"
 #include "sae_par.h"
-#include "ast.h"
-#include "merswrap.h"
-
-#include <string.h>
 
 void
-smf_accumulate_prov( AstKeyMap * prvmap, const smfFile * file, const Grp* igrp,
-                int index, int * status ) {
+smf_accumulate_prov( const smfData * data, const Grp* igrp, int index, 
+                     int ondf, const char *creator, int * status ) {
 
-  char filename[GRP__SZNAM + 1];    /* buffer for filename */
-  char *pname = NULL;               /* pointer to start of name */
-  size_t flen;                      /* Length of filename */
-  int i;                            /* Counter */
+  int indf = NDF__NOID;  /* input NDF identifier */
+  int opened = 0;  /* We had to open the file */
 
-  if ( *status != SAI__OK ) return;
+  if (*status != SAI__OK) return;
 
-  if ( file ) {
-    /* Look at the smfFile struct */
-    if (file->name) {
-      /* Look for name inside smfFile */
-      strncpy( filename, file->name, GRP__SZNAM);
-      filename[GRP__SZNAM] = '\0';
-      pname = filename;
-    }
+    /* Propagate provenance to the output file - need access to the
+       input file again if we read from raw data. Must use updateprov
+       to prevent all the extensions being listed in provenance via
+       sc2store */
+  if (data && data->file && data->file->ndfid != NDF__NOID) {
+    indf = data->file->ndfid;
+  } else {
+    ndgNdfas( igrp, index, "READ", &indf, status );
+    opened = 1;
   }
 
-  if (pname == NULL) {
-    /* Look in the group */
-    if (igrp) {
-      pname = filename;
-      grpGet( igrp, index, 1, &pname, SMF_PATH_MAX, status);
-    }
+  smf_updateprov( ondf, data, indf, creator,status );
+
+  if (opened) {
+    ndfAnnul( &indf, status );
   }
-
-  if (pname == NULL && *status == SAI__OK) {
-    *status = SAI__ERROR;
-    errRep( "", "Unable to determine filename for provenance tracking", status );
-    return;
-  }
-
-  /* Need to strip directory information and any file suffix that may have crept
-     in */
-  flen = strlen( pname );
-  
-  /* Look for extension - truncate at first "." and break at first "/" */
-  for (i = flen; i > 0 ; i--) {
-    if ( filename[i] == '.' ) {
-      filename[i] = '\0';
-      flen = strlen( filename );
-      break;
-    } else if ( filename[i] == '/') {
-      break;
-    }
-  }
-
-  /* Remove directory path (inefficient loop through the string a second time) */
-  for (i = flen; i > 0; i-- ) {
-    if ( filename[i] == '/' && i < flen) {
-      pname = &(filename[i+1]);
-      break;
-    }
-  }
-
-  /* Store it in the keymap */
-  astMapPut0I( prvmap, pname, 1, NULL );
-
+    
   return;
 }
