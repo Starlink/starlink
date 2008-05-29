@@ -43,6 +43,29 @@ double **flatpar,        /* pointer to flat parameters (returned) */
 int *status              /* global status (given and returned) */
 );
 
+/*+ sc2store_cremapwts - create and write a DREAM weights file */
+
+void sc2store_cremapwts
+(
+const char *filename,      /* name of HDS container file (given) */
+int *windext,              /* Table of window extents for the DREAM
+                              solution (given) */
+int *gridext,              /* Table of grid extents for a single
+                              bolometer (given) */
+double gridsize,           /* size in arcsec of grid step (given) */
+int *jigext,               /* Table of SMU pattern extents for a single
+                              bolometer (given) */
+double jigsize,            /* size in arcsec of SMU step (given) */
+int gridwtsdim[],          /* dimensions of grid interpolation weights 
+                              (given) */
+double *gridwts,           /* grid interpolation weights (given) */
+int invmatdim,             /* dimension of inverted matrix (given) */
+double *invmat,            /* inverted matrix (given) */
+int qualdim[],             /* dimensions of quality mask (given) */
+int *qual,                 /* bolometer quality mask (given) */
+int *status                /* global status (given and returned) */
+);
+
 /*+ sc2store_decompress - decompress frame of unsigned short to integers */
 
 void sc2store_decompress 
@@ -126,6 +149,29 @@ int *status                   /* global status (given and returned) */
 void sc2store_headunmap
 (
 int *status                   /* global status (given and returned) */
+);
+
+/*+ sc2store_mapwts - open and map a DREAM weights file */
+
+void sc2store_mapwts
+(
+const char *filename,      /* name of HDS container file (given) */
+int **windext,             /* Table of window extents for the DREAM
+                              solution (returned) */
+int **gridext,             /* Table of grid extents for a single
+                              bolometer (returned) */
+double *gridsize,          /* size in arcsec of grid step (returned) */
+int **jigext,               /* Table of SMU pattern extents for a single
+                              bolometer (returned) */
+double *jigsize,           /* size in arcsec of SMU step (returned) */
+int gridwtsdim[],          /* dimensions of grid interpolation weights 
+                              (returned) */
+double **gridwts,          /* grid interpolation weights (returned) */
+int *invmatdim,            /* dimension of inverted matrix (returned) */
+double **invmat,           /* inverted matrix (returned) */
+int qualdim[],             /* dimensions of quality mask (returned) */
+int **qual,                /* bolometer quality mask (returned) */
+int *status                /* global status (given and returned) */
 );
 
 /*+ sc2store_ndfreadscan - read a single scan from an NDF file */
@@ -220,7 +266,7 @@ int *status              /* global status (given and returned) */
 void sc2store_rdflatcal
 (
 const char *filename,    /* name of HDS container file (given) */
-size_t flatlen,             /* length of space for flatfield name (given) */
+size_t flatlen,          /* length of space for flatfield name (given) */
 size_t *colsize,         /* number of pixels in column (returned) */
 size_t *rowsize,         /* number of pixels in row (returned) */
 size_t *nflat,           /* number of flat coeffs per bol (returned) */
@@ -340,6 +386,13 @@ int compflag,         /* value to be set, 1=>compress 0=>don't (given) */
 int *status           /* global status (given and returned) */
 );
 
+/*+ sc2store_unmapwts - unmap and close a DREAM weights file */
+
+void sc2store_unmapwts
+(
+int *status               /* global status (given and returned) */
+);
+
 /*+ sc2store_wrconfigxml - Store the CONFIGURE XML */
 
 void sc2store_wrconfigxml
@@ -443,18 +496,18 @@ const char *xmlfile,        /* name of CONFIGURE XML file (given) */
 int *status                 /* global status (given and returned) */
 );
 
-
 /*+ sc2store_resize_head - modify JCMTSTATE arrays to take account of the
                            NDF pixel origin. */
 
 void sc2store_resize_head
 (
 int indf,                /* Id. for NDF holding the JCMTSTATE extension */
-HDSLoc **xloc,           /* Locator for the JCMTSTATE extension (annuled on 
+HDSLoc **xloc,           /* Locator for the JCMTSTATE extension (annuled on
                             exit) */
-HDSLoc **yloc,           /* Locator for new HDS object containing resized 
+HDSLoc **yloc,           /* Locator for new HDS object containing resized
                             arrays. */
 int *status              /* Global status (given and returned) */
 );
+ 
  
 #endif

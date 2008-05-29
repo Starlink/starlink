@@ -15,13 +15,301 @@
 #include "Ers.h"
 #include "sae_par.h"
 #include "prm_par.h"
-#include "dat_par.h"
+#include "f77.h"
 #include "sc2math.h"
 #include "dream_par.h"
+
+/* Not needed */
+#include "dat_par.h"
+#include "star/hds.h"
+#include "ast.h"
+#include "ndf.h"
+#include "mers.h"
 
 #define EPS 1.0e-20                      /* near-zero trap */
 
 static char errmess[132];          /* error string */
+
+
+
+
+/*+ sc2math_calcmapwt - Make weight matrix for DREAM solution*/
+
+void sc2math_calcmapwt
+(
+char *subname,          /* subarray name (given) */
+int nbolx,              /* first dimension of subarray (given) */
+int nboly,              /* second dimension of subarray (given) */
+int *qual,              /* quality array, 0=>good, 1=>bad (given) */
+int conv_shape,         /* flag for type of interpolation (given) */
+double conv_sig,        /* interpolation parameter (given) */
+double gridstep,        /* size of reconstruction grid step in arcsec (given) */
+int nvert,              /* number of vertices in SMU path (given) */
+int leg_len,            /* number of millisec between vertices (given) */
+double sample_t,        /* time between samples in millisec (given) */
+int jig_vert[][2],      /* Table with relative vertex coordinates in time
+                           (given) */
+double jig_stepx,       /* The step size in -X- direction between Jiggle
+                           positions in arcsec (given) */
+double jig_stepy,       /* The step size in -Y- direction between Jiggle
+                           positions in arcsec (given) */
+int smu_move,           /* The code for the SMU waveform that determines the
+                           SMU motion (given) */
+double smu_offset,      /* smu timing offset in msec (given) */
+int gridpts[][2],       /* relative grid coordinates */
+int gridwtsdim[],       /* dimensions of gridwts array (returned) */
+double **gridwts,       /* Pointer to array of sky grid weights (returned) */
+int *invmatdim,         /* dimension of inverted matrix (returned) */
+double **invmat,        /* pointer to inverted matrix (returned) */
+int *status             /* global status (given and returned) */
+)
+
+/* Description :
+    Given the geometry of the Secondary mirror scanning pattern, return the grid
+    weights array need for converting bolometer measurements into the normal
+    equations values, and return the inverted normal equation matrix ready for
+    applying the solution.
+
+   Each measured intensity can be seen as a linear equation :
+      Vi = SUM{Aij.Ij} where :
+      Vi  - Measured intensity for sample i.
+      Aij - Equation coefficients.
+      Ij  - Sky pixel intensity.
+      The coefficients {Aij} are calculated, they consist of a matrix with
+      ngrid columns (j=0,1,2,...,ngrid-1), and npath rows (i=0,1,..,npath)
+      ngrid :
+       During a cycle the SMU describes a cyclic path through pixel points.
+       Within the total area of the path ngrid pixel points are defined.
+       These points are at average bolometer distances and should lie on a 
+       rectangular (but almost square) grid.
+       ngrid should be a square.
+      npath = nvert * smu_samples
+       nvert    - The number of vertices visited by the SMU
+       smu_samples - The number of samples taken between two vertices of
+                     the SMU pattern. 
+       sample_t - The sample interval in msec.
+ 
+      For each of the npath points in the path coefficients {Bij} are PSF 
+      values following from the distances to each pixel point.
+      The coefficients {Aij} are the {Bij} values convolved with the 
+      Impulse response function.
+ 
+     The ngrid pixel points are defined relative to the centre bolometer
+     position.
+ 
+   Authors :
+    H.W. van Someren Greve (greve@astron.nl)
+
+   History :
+     12-07-1996 : Original version (GREVE)
+     24-07-2003 : calcmapwt version (bdk)
+     20Apr2005 : include ast.h (bdk)
+     17May2005 : allow for array orientations (bdk)
+     22May2005 : fix orientation calculation for "b" and "d" arrays (bdk)
+     07Aug2006 : add bolometer quality mask (bdk)
+     01May2008 : put into sc2math library (bdk)
+*/
+
+
+{
+
+   int bolnum;                   /* bolometer counter */
+   double calc_t;                /* Time per calculated point */
+   double dmin;                  /* minimum found during inversion */
+   int err;                      /* Error in reducing */
+   int i;                        /* Loop variable */
+   int ipos;                     /* position in reconstructed map */
+   int j;                        /* Loop variable */
+   static double jiggrid[DREAM__MXSAM][2]; /* grid Jiggle path coordinates */
+   static double jigpath[DREAM__MXSAM][2]; /* arcsec Jiggle path coordinates */
+   int jgrid;                    /* count through reconstructed map */
+   int jpos;                     /* position in reconstructed map */
+   int k;                        /* Loop variable */
+   int l;                        /* Loop variable */
+   int loc;                      /* Matrix location */
+   int ngrid;                    /* number of grid points */
+   int npath;                    /* Nr of points in jigpath */
+   int nrvout;                   /* Nr of R8 values out matrix */
+   int nrvswt;                   /* Nr of R8 values swt matrix */
+   int numbad;                   /* Nr of bad bolometers */
+   int nunkno;                   /* Nr of unknowns */
+   double *par = NULL;                  /* Pointer to array for problem eqns */
+   int skyheight;                /* height of reconstructed map */
+   int skywid;                   /* width of reconstructed map */
+   int smu_samples;              /* number of samples between vertices */
+   double tbol;                  /* Bolometer time const (msec) */
+   double vertex_t;              /* time between jiggle vertices (msec) */
+   int xmax;                     /* maximum grid offset */
+   int xmin;                     /* minimum grid offset */
+   int ymax;                     /* maximum grid offset */
+   int ymin;                     /* minimum grid offset */
+
+
+   if ( !StatusOkP(status) ) return;
+
+
+
+/* Calculate all the relative SMU positions on the sky during
+   the cycle. */
+
+   calc_t = sample_t;
+   smu_samples = (int) ( 0.5 + (double)leg_len / sample_t );
+   npath = nvert * smu_samples;
+   vertex_t = leg_len;
+
+   sc2math_smupath ( nvert, vertex_t, jig_vert, jig_stepx,
+     jig_stepy, smu_move, smu_samples, calc_t,
+     smu_offset, DREAM__MXSAM, jigpath, status );
+
+/* Convert jiggle arcsec coordinates to units of the reconstruction grid */
+
+   sc2math_jig2grid ( subname, gridstep, npath, jigpath, jiggrid, status );
+
+/* Count the pixel quality mask for the subarray */
+
+   numbad = 0;
+   for ( j=0; j<nbolx*nboly; j++ )
+   {
+      if ( qual[j] > 0 )
+      {
+         numbad++;
+      }
+   }
+   
+/* Calculate the pixel equation coefficients.
+   It is assumed that all bolometer time constants are the same !! */
+
+   tbol = 5.0;
+
+/* Prepare information for making matrices. */
+
+   ngrid = 81;
+   gridwtsdim[0] = ngrid;
+   gridwtsdim[1] = npath;
+   nrvout = npath * ngrid;
+   *gridwts = (double *)calloc ( nrvout, sizeof(double) );
+
+   if ( *gridwts == 0 )
+   {
+      *status = DITS__APP_ERROR;
+      sprintf ( errmess, "sc2math_calcmapwt: failed to allocate memory" );
+      ErsRep ( 0, status, errmess );
+   }
+
+/* Put in gridwts all the sky grid weights for all measurements with a
+   single bolometer */
+
+   sc2math_interpwt ( npath, ngrid, conv_shape, conv_sig, calc_t, tbol, jiggrid,
+     gridpts, *gridwts, status );
+
+
+/* Calculate the size of the sky map which includes all the grid points
+   contributing to all the bolometers */
+
+   sc2math_gridext ( ngrid, gridpts, &xmin, &xmax, &ymin, &ymax,
+     status );
+
+   skywid = nbolx + xmax - xmin;
+   skyheight = nboly + ymax - ymin;
+
+/* Create the parameters of the problem equation for each measurement for
+   each working bolometer and initialise the arrays to zero */
+
+   nunkno = skywid * skyheight + ( nbolx * nboly - numbad );
+   par = (double *)calloc ( nunkno, sizeof(double) );
+
+   nrvswt = (nunkno * (nunkno+1))/2;
+   *invmatdim = nrvswt;
+   *invmat = (double *)calloc ( nrvswt, sizeof(double) );
+
+/* generate the parameters of one problem equation at a time and collect
+   them into the normal equation array */
+   
+   bolnum = -1;
+
+   for ( j=0; j<nboly; j++ )
+   {
+      for ( i=0; i<nbolx; i++ )
+      {
+         if ( qual[nbolx*j + i] == 0 )
+	 {
+	 
+            bolnum++;
+
+/* Set the flag corresponding to the zero point of this bolometer */
+
+            par[bolnum] = 1.0;
+
+            for ( k=0; k<npath; k++ )
+            {
+
+/* Set the weight for all the sky grid points relevant at this path point
+   of this bolometer */
+
+               for ( l=0; l<ngrid; l++ )
+               {
+                  ipos = i - xmin + gridpts[l][0];
+                  jpos = j - ymin + gridpts[l][1];
+                  jgrid = jpos * skywid + ipos;
+                  par[nbolx*nboly-numbad+jgrid] = (*gridwts)[ngrid*k+l];
+               }
+
+/* Insert the parameters into the accumulating normal equations */
+
+               sc2math_eq0 ( nunkno, par, *invmat );
+
+/* Unset the weight for all the sky grid points relevant at this path point
+   of this bolometer */
+
+               for ( l=0; l<ngrid; l++ )
+               {
+                  ipos = i - xmin + gridpts[l][0];
+                  jpos = j - ymin + gridpts[l][1];
+                  jgrid = jpos * skywid + ipos;
+                  par[nbolx*nboly-numbad+jgrid] = 0.0;
+               }
+            }
+
+/* Unset the flag corresponding to the zero point of this bolometer */
+
+            par[bolnum] = 0.0;
+	 }
+      }
+   }
+
+/* Provide the constraint that the sum of all bolometer zero points is
+   zero */
+
+   for ( j=0; j<nboly*nbolx-numbad; j++ )
+   {
+      par[j] = 1.0;
+   }
+
+   sc2math_eq0 ( nunkno, par, *invmat );
+
+/* Invert the normal equation matrix */
+
+   sc2math_cholesky ( nunkno, *invmat, &loc, &dmin, &err );
+
+   if ( err == -1 )
+   {
+      *status = DITS__APP_ERROR;
+      sprintf ( errmess, 
+        "sc2math_calcmapwt: Can't invert matrix, not positive definite" );
+      ErsRep ( 0, status, errmess );
+   }
+   else if ( err == 1 )
+   {
+      *status = DITS__APP_ERROR;
+      sprintf ( errmess, 
+        "sc2math_calcmapwt: Can't invert matrix, loss of significance" );
+      ErsRep ( 0, status, errmess );
+   }
+
+
+
+}
+
 
 /*+ sc2math_choles - Factorize symmetric positive definite matrix */
 
@@ -243,7 +531,8 @@ int *status         /* global status (given and returned) */
                 add sinc(dx).sinc(dy) option (bdk)
     06Aug2003 : add sinc(dx).sinc(dy) tapered (bdk)
     12Aug2003 : add bessel function (bdk)
-    15Mar2006:  copied from weight.c into sc2math (agg)
+    15Mar2006 : copied from weight.c into sc2math (agg)
+    06May2008 : make convolution codes sc2math constants (bdk)
 */
 
 {
@@ -255,12 +544,12 @@ int *status         /* global status (given and returned) */
 
    if ( !StatusOkP(status) ) return 0.0;
 
-   if ( conv_shape == CONV__GAUS )               /* Gaussian */
+   if ( conv_shape == SC2MATH__GAUS )               /* Gaussian */
    {
       s = 1.0 / ( 2.0 * conv_sig * conv_sig );
       w = exp( -s*(dx*dx + dy*dy) );
    }
-   else if ( conv_shape == CONV__SINC )          /* sinc(dx).sinc(dy) */
+   else if ( conv_shape == SC2MATH__SINC )          /* sinc(dx).sinc(dy) */
    {
       if ( fabs(dx) > 1.0e-9 )
       {
@@ -282,7 +571,7 @@ int *status         /* global status (given and returned) */
       }
       w = s1 * s2;
    }
-   else if ( conv_shape == CONV__SINCTAP )          /* sinc(dx).sinc(dy) tapered */
+   else if ( conv_shape == SC2MATH__SINCTAP )          /* sinc(dx).sinc(dy) tapered */
    {
       if ( fabs(dx) > 3.0 )
       {
@@ -312,7 +601,7 @@ int *status         /* global status (given and returned) */
       }
       w = s1 * s2;
    }
-   else if ( conv_shape == CONV__SINCDEL )   /* sinc(dx).sinc(dy) delay tapered */
+   else if ( conv_shape == SC2MATH__SINCDEL )   /* sinc(dx).sinc(dy) delay tapered */
    {
       if ( fabs(dx) > 3.0 )
       {
@@ -373,8 +662,11 @@ int *status         /* global status (given and returned) */
       }*/
    else
    {
-      printf ( "Convolution function %d not implemented\n", conv_shape );
       *status = DITS__APP_ERROR;
+      sprintf ( errmess, 
+        "sc2math_conval: Convolution function %d not implemented\n", 
+	conv_shape );
+      ErsRep ( 0, status, errmess );
       w = 0.0;
    }
    return w;
@@ -663,6 +955,100 @@ int *status            /* global status (given and returned) */
 }
 
 
+
+/*+ sc2math_flat2mask - produce dead pixel mask from flatfield */
+
+void sc2math_flat2mask
+(
+int nboll,                /* number of bolometers (given) */
+const char *flatname,     /* name of flatfield algorithm (given) */
+int nflat,                /* number of flatfield parameters (given) */
+const double *fcal,       /* calibration coefficients (given) */
+const double *fpar,       /* calibration parameters (given) */
+int *mask,                /* pixel mask (returned) */
+int *status               /* global status (given and returned) */
+)
+
+/* Description :
+    Check the calibration corrections indicated by the given algorithm
+    name. Currently two are supported.
+
+    "POLYNOMIAL" requires six coefficients per bolometer.
+
+    "TABLE" means use the fcal values for any bolometer as an
+     interpolation table to determine the corresponding fpar value.
+
+   Authors :
+    B.D.Kelly (bdk@roe.ac.uk)
+
+   History :
+    29Jan2008 : original (bdk)
+    06May2008 : make mask int instead of char (bdk)
+*/
+
+{
+   int i;              /* loop counter */
+
+
+   if ( !StatusOkP(status) ) return;
+
+   if ( strcmp ( "POLYNOMIAL", flatname ) == 0 )
+   {
+
+/* chec the first polynomial coefficient for each bolometer */
+
+      for ( i=0; i<nboll; i++ )
+      {
+         if ( fcal[i] == VAL__BADD )
+         {
+            mask[i] = 1;
+         }
+         else
+         {
+            mask[i] = 0;
+         }
+      }
+   }
+   else if ( strcmp ( "TABLE", flatname ) == 0 )
+   {
+
+/*  Check the first table value for each bolometer */
+
+      for ( i=0; i<nboll; i++ )
+      {
+         if ( fcal[i] == VAL__BADD )
+	 {
+	    mask[i] = 1;
+	 }
+	 else
+	 {
+	    mask[i] = 0;
+	 }
+      }
+
+   }
+   else if ( strcmp ( "NULL", flatname ) == 0 )
+   {
+
+/* No calibration, return a zero mask */
+
+      for ( i=0; i<nboll; i++ )
+      {
+         mask[i] = 0;
+      }
+   }
+   else
+   {
+      *status = DITS__APP_ERROR;
+      sprintf ( errmess, "sc2math_flat2mask: invalid flatfield name - %s",
+        flatname );
+      ErsRep ( 0, status, errmess );
+   }
+
+}
+
+
+
 /*+ sc2math_flatten - apply flat field correction to set of frames */
 
 void sc2math_flatten
@@ -768,10 +1154,14 @@ int *status               /* global status (given and returned) */
    else
    {
       *status = DITS__APP_ERROR;
-      printf ( "map_flatten: invalid flatfield name - %s\n", flatname );
+      sprintf ( errmess, "sc2math_flatten: invalid flatfield name - %s",
+        flatname );
+      ErsRep ( 0, status, errmess );
    }
 
 }
+
+
 
 /*+ sc2math_get_cycle - Return data for a single measurement cycle */
 
@@ -1215,6 +1605,116 @@ double a[]   /* Square Matrix with NxN points.
 
 }
 
+
+
+/*+ sc2math_jig2grid - convert DREAM jiggle coordinates to grid coordinates */
+
+void sc2math_jig2grid
+(
+char *subname,          /* subarray name (given) */
+double grid_step,       /* size of reconstruction grid step in arcsec (given) */
+int npath,              /* number of steps in path (given) */
+double jigpath[][2],    /* jiggle path coordinates in arcsec (given) */
+double jiggrid[][2],    /* jiggle path in grid coordinates (returned) */
+int *status             /* global status (given and returned) */
+)
+/* Description :
+    Convert DREAM SMU coordinates into the orientation and scale of the required
+    reconstruction grid.
+
+   History :
+    01May2008 : original (bdk)
+*/
+
+{
+   int i;               /* loop counter */
+
+
+   if ( !StatusOkP(status) ) return;
+
+
+
+   if ( strcmp ( subname, "s4a" ) == 0 )
+   {
+      for ( i=0; i<npath; i++ )
+      {
+         jiggrid[i][0] = jigpath[i][0] / grid_step;
+         jiggrid[i][1] = jigpath[i][1] / grid_step;
+      }
+   }
+   else if ( strcmp ( subname, "s4b" ) == 0 )
+   {
+      for ( i=0; i<npath; i++ )
+      {
+         jiggrid[i][0] = jigpath[i][1] / grid_step;
+         jiggrid[i][1] = -jigpath[i][0] / grid_step;
+      }
+   }
+   else if ( strcmp ( subname, "s4c" ) == 0 )
+   {
+      for ( i=0; i<npath; i++ )
+      {
+         jiggrid[i][0] = -jigpath[i][0] / grid_step;
+         jiggrid[i][1] = -jigpath[i][1] / grid_step;
+      }
+   }
+   else if ( strcmp ( subname, "s4d" ) == 0 )
+   {
+      for ( i=0; i<npath; i++ )
+      {
+         jiggrid[i][0] = -jigpath[i][1] / grid_step;
+         jiggrid[i][1] = jigpath[i][0] / grid_step;
+      }
+   }
+   else if ( strcmp ( subname, "s8a" ) == 0 )
+   {
+      for ( i=0; i<npath; i++ )
+      {
+         jiggrid[i][0] = jigpath[i][0] / grid_step;
+         jiggrid[i][1] = -jigpath[i][1] / grid_step;
+      }
+   }
+   else if ( strcmp ( subname, "s8b" ) == 0 )
+   {
+      for ( i=0; i<npath; i++ )
+      {
+         jiggrid[i][0] = -jigpath[i][1] / grid_step;
+         jiggrid[i][1] = -jigpath[i][0] / grid_step;
+      }
+   }
+   else if ( strcmp ( subname, "s8c" ) == 0 )
+   {
+      for ( i=0; i<npath; i++ )
+      {
+         jiggrid[i][0] = -jigpath[i][0] / grid_step;
+         jiggrid[i][1] = jigpath[i][1] / grid_step;
+      }
+   }
+   else if ( strcmp ( subname, "s8d" ) == 0 )
+   {
+      for ( i=0; i<npath; i++ )
+      {
+         jiggrid[i][0] = jigpath[i][1] / grid_step;
+         jiggrid[i][1] = jigpath[i][0] / grid_step;
+      }
+   }
+   else
+   {
+      sprintf ( errmess, "sc2math_jig2grid: invalid subarray name %s", 
+        subname );
+      *status = DITS__APP_ERROR;
+      ErsRep ( 0, status, errmess );
+      
+   }
+}
+
+
+
+
+
+
+
+
 /*+ sc2math_linfit - straight line fit */
 
 void sc2math_linfit
@@ -1282,6 +1782,250 @@ int *status           /* global status (given and returned) */
    }
    *cons = ym - (*grad) * xm;
 }
+
+
+/*+ sc2math_mapsolve - Reconstruct SCUBA-2 DREAM data in a single step */
+
+void sc2math_mapsolve
+(
+int nframes,              /* no of data frames (given) */
+int nbolx,                /* number of bolometers in X (given) */
+int nboly,                /* number of bolometers in Y (given) */
+int gridext[],            /* Table of grid extents for a single
+                             bolometer (given) */
+double gridsize,          /* size in arcsec of grid step (given) */
+int jigext[],             /* Table of SMU pattern extents for a single
+                             bolometer (given) */
+double jigsize,           /* size in arcsec of SMU step (given) */
+double *interpwt,         /* interpolation weights (given) */
+double *invmat,           /* inverted matrix (given) */
+int *qual,                /* bolometer quality array (given) */
+double *psbuf,            /* flatfielded data set [nbolx.nboly.nframes](given) */
+int maxmap,               /* maximum size of reconstructed map (given) */
+int dims[],               /* actual dimensions of map (returned) */
+double *map,              /* Solved intensities (returned) */
+double *pbolzero,         /* bolometer zero points (returned) */
+int *status
+)
+/* Method :
+    Given a set of flatfielded frames corresponding to a set of samples around
+    the DREAM pattern, reconstruct an image.
+
+   Authors :
+    H.W. van Someren Greve (greve@astron.nl)
+    B.D.Kelly (bdk@roe.ac.uk)
+
+   History :
+    04-08-1997 : Original version (GREVE)
+    05Aug2003 : adapted from the dreamsolve program (bdk)
+    08Apr2008 : adapted from the mapsolve program (bdk)
+    14Apr2008 : modified handling of grid and SMU extents (bdk)
+    25Apr2008 : change assumed ordering of psbuf to match sc2_flatten() (bdk)
+    28Apr2008 : standardise on names gridsize and jigsize (bdk)
+    07May2008 : add bolometer quality mask (bdk)
+*/
+
+
+{
+
+   int bolnum;               /* bolometer counter */
+   int i;                    /* loop counter */
+   int ipos;                 /* position in reconstructed map */
+   int j;                    /* loop counter */
+   int jgrid;                /* count through reconstructed map */
+   int jig2grid;             /* conversion from SMU steps to grid steps */
+   int jpos;                 /* position in reconstructed map */
+   int k;                    /* loop counter */
+   double *kvec;             /* Pointer to reduced vector of values */
+   int l;                    /* loop counter */
+   double lme;               /* quality of solution */
+   double lssum;             /* sum of square of known values */
+   int m;                    /* loop counter */
+   int n;                    /* loop counter */
+   int nbol;                 /* number of observed bolometers */
+   int ngrid;                /* number of points in grid for a bolometer */
+   int numbad;               /* number of bad bolometers */
+   int nunkno;               /* number of unknowns in solution */ 
+   int outheight;            /* height of output map */
+   int outwid;               /* width of output map */
+   double *par;              /* Pointer to parameters of problem eqn. */
+   int skyheight;            /* height of reconstructed map */
+   int skywid;               /* width of reconstructed map */
+   double *sme = NULL;              /* rms errors solutions */
+   double *sint =NULL;             /* solved parameters */
+   int zx;                   /* x offset of output map in solution */
+   int zy;                   /* y offset of output map in solution */
+
+
+
+   if ( !StatusOkP(status) ) return;
+
+
+/* Check the pixel quality mask */
+
+   numbad = 0;
+   for ( j=0; j<nbolx*nboly; j++ )
+   {
+      if ( qual[j] > 0 )
+      {
+         numbad++;
+      }
+   }
+
+/* Calculate the size of the sky map which includes all the grid points
+   contributing to all the bolometers */
+
+   skywid = nbolx + gridext[1] - gridext[0];
+   skyheight = nboly + gridext[3] - gridext[2];
+   ngrid = ( 1 + gridext[1] - gridext[0] ) * ( 1 + gridext[3] - gridext[2] );
+
+   nbol = nbolx * nboly;
+   nunkno = skywid * skyheight + nbolx * nboly - numbad;
+
+/* Calculate the number of pixels around the edge of the solved map which
+   should be discarded because they lie outside the area observed
+   directly, and so have low weight */
+
+   jig2grid = (int) ( 0.5 + jigsize / gridsize );
+   outwid = nbolx + jig2grid * ( jigext[1] - jigext[0] );
+   outheight = nboly + jig2grid * ( jigext[3] - jigext[2] );
+   zx = jig2grid * jigext[0] - gridext[0];
+   zy = jig2grid * jigext[2] - gridext[2];
+
+/* Proceed if enough space has been provided for the output map */
+
+   if ( maxmap >= outwid*outheight )
+   {
+   
+      dims[0] = outwid;
+      dims[1] = outheight;
+
+/* Arrays for holding the solution and errors */
+
+      sme = (double *)calloc ( nunkno, sizeof(double) );
+      sint = (double *)calloc ( nunkno, sizeof(double) );
+/* Create the parameters of the problem equation for each measurement for
+   each bolometer */
+
+      par = (double *)calloc ( nunkno, sizeof(double) );
+      kvec = (double *)calloc ( nunkno, sizeof(double) );
+
+      lssum = 0.0;
+
+/* generate the parameters of one problem equation at a time and collect
+   them into the normal equation array */
+   
+      bolnum = -1;
+
+      for ( j=0; j<nboly; j++ )
+      {
+         for ( i=0; i<nbolx; i++ )
+         {
+	    if ( qual[nbolx*j + i] == 0 )
+	    {
+	    
+               bolnum++;
+
+/* Set the flag corresponding to the zero point of this bolometer */
+
+               par[bolnum] = 1.0;
+
+               for ( k=0; k<nframes; k++ )
+               {
+
+/* Set the weight for all the sky grid points relevant at this path point
+   of this bolometer */
+
+                  l = 0;
+	          for ( m=gridext[0]; m<=gridext[1]; m++ )
+	          {
+	             for ( n=gridext[2]; n<=gridext[3]; n++ )
+	             {
+	                ipos = i - gridext[0] + m;
+                        jpos = j - gridext[2] + n;
+		        jgrid = jpos * skywid + ipos;
+		        par[nbolx*nboly-numbad+jgrid] = interpwt[ngrid*k+l];
+		        l++;
+                     }
+                  }
+
+/* Combine the measurement for this bolometer at this path point into the
+   measurement vector */
+
+                  sc2math_vec ( nunkno, par, psbuf[k*nbolx*nboly+j*nbolx+i], 
+		    kvec, &lssum );
+
+/* Unset the weight for all the sky grid points relevant at this path point
+   of this bolometer */
+
+                  for ( m=gridext[0]; m<=gridext[1]; m++ )
+                  {
+	             for ( n=gridext[2]; n<=gridext[3]; n++ )
+	             {
+	                ipos = i - gridext[0] + m;
+		        jpos = j - gridext[2] + n;
+		        jgrid = jpos * skywid + ipos;
+		        par[nbolx*nboly-numbad+jgrid] = 0.0;
+                     }
+                  }
+               }
+
+/* Unset the flag corresponding to the zero point of this bolometer */
+
+               par[bolnum] = 0.0;
+            }
+	 }
+      }
+
+/* Solve for the pixel values and their rms values */
+
+      sc2math_sol ( nunkno, nframes*(nbol-numbad), invmat, kvec, lssum, &lme, 
+        sme, sint );
+
+/* Extract the intensities - sint and sme contain both the solved
+   intensity data and the bolometer offsets  */
+
+      for ( j=0; j<outheight; j++ )
+      {
+         for ( i=0; i<outwid; i++ )
+         {
+            map[j*outwid+i] = sint[nbol+(j+zy)*skywid+zx+i];
+         }
+      }
+
+      bolnum = -1;
+      for ( j=0; j<nboly; j++ )
+      {
+         for ( i=0; i<nbolx; i++ )
+         {
+            if ( qual[nbolx*j + i] == 0 )
+            {
+               bolnum++;
+               pbolzero[nbolx*j + i] = sint[bolnum];
+	    }
+	    else
+	    {
+               pbolzero[nbolx*j + i] = VAL__BADD;
+	    }
+         }
+      }
+
+
+      free (sme);
+      free (sint);
+      free (kvec);
+      free (par);
+   }
+   else
+   {
+      *status = DITS__APP_ERROR;
+      sprintf ( errmess,
+        "%d elements in provided reconstruction array, but %d points needed",
+        maxmap, outwid*outheight );
+      ErsRep ( 0, status, errmess );
+   }
+}
+
 
 
 /*+  sc2math_martin - spike removal from chop-scan data */
@@ -2614,7 +3358,7 @@ int *status          /* global status (given and returned) */
      31Oct2002  : C translation (bdk)
      13Feb2003  : change to use dream_smupos and to allow smu_offset (bdk)
      20Jun2003  : pass-in pathsz, change constant name to DREAM__MXVERT (bdk)
-     15Mar2006:  copied from dream.c into sc2math (agg)
+     15Mar2006  : copied from dream.c into sc2math (agg)
 */
 
 {
@@ -2640,7 +3384,6 @@ int *status          /* global status (given and returned) */
       ErsRep ( 0, status, errmess );
    }
 
-
    if ( nvert > 1)
    {
 
@@ -2649,7 +3392,7 @@ int *status          /* global status (given and returned) */
 
       if ( sc2math_trace(0) )
       {
-         printf ( "dream_smupath: vertext offsets are\n" );
+         printf ( "sc2math_smupath: vertext offsets are\n" );
       }
       for ( j=0; j<nvert; j++ )
       {
@@ -2657,7 +3400,7 @@ int *status          /* global status (given and returned) */
          vertxy[j][1] = jig_stepy * (double)jig_vert[j][1];
          if ( sc2math_trace(3) )
          {
-            printf ( "dream_smupath: %e   %e\n", vertxy[j][0], vertxy[j][1] );
+            printf ( "sc2math_smupath: %e   %e\n", vertxy[j][0], vertxy[j][1] );
          }
       }
 
@@ -2682,7 +3425,7 @@ int *status          /* global status (given and returned) */
 
    if ( sc2math_trace(2) )
    {
-      printf ( "dream_smupath : jigpath with %d positions\n", np );
+      printf ( "sc2math_smupath : jigpath with %d positions\n", np );
 
       printf ( "Position    -X-       -Y-\n" );
       for ( j=0; j<np; j++ )

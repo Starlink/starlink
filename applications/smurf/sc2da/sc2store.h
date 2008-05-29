@@ -27,6 +27,7 @@
 *                prototypes, so include sc2store_pro.h. This allows the
 *                prototypes to be created in the data acquisition
 *                system, but this is hidden from smurf.
+*     2008-05-15 (BDK) add SC2STORETelpar structure.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -61,6 +62,18 @@
  
 /* Following include is for JCMTState definition */
 #include "jcmt/state.h"
+
+
+struct SC2STORETelpar
+{
+     double dut1;       /* difference UT1-UTC */
+     double latdeg;     /* telescope latitude in degrees */
+     double longdeg;    /* telescope east longitude in degrees */
+};
+
+typedef struct SC2STORETelpar SC2STORETelpar;
+
+
 
 /* The function prototypes */
 #include "sc2store_pro.h"

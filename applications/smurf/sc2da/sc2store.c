@@ -16,7 +16,6 @@
     05Nov2007 : add sc2store_bscale and sc2store_compflag (bdk)
     09Nov2007 : have separate sc2store_rdbscale and _wrbscale (bdk)
     11Nov2007 : store compressed data as short, not unsigned short (bdk)
-    18Jun2007 : add history component to output files (agg)
 */
 
 #include <string.h>
@@ -51,6 +50,7 @@ static AstFrameSet *timeWcs( int subnum, int ntime, const double times[], int * 
 static HDSLoc *sc2store_bscaleloc = NULL;    /* HDS locator to scale factor */
 static int sc2store_compflag = 1;            /* flag enabling data compression */
 static int sc2store_dindf = NDF__NOID;       /* NDF identifier for dark SQUID values */
+static HDSLoc *sc2store_dreamwtloc = NULL;   /* HDS locator to DREAM weights */
 static HDSLoc *sc2store_drmloc = NULL;       /* HDS locator to DREAM parameters */
 static char sc2store_errmess[132];           /* error string */
 static HDSLoc *sc2store_fdataloc = NULL;     /* HDS locator to FLATDATA structure */
@@ -59,6 +59,15 @@ static HDSLoc *sc2store_fnameloc = NULL;     /* HDS locator to FLATNAME structur
 static HDSLoc *sc2store_fparloc = NULL;      /* HDS locator to FLATPAR structure */
 static HDSLoc *sc2store_incomploc = NULL;    /* HDS locator to INCOMPS structure */
 static int sc2store_indf = NDF__NOID;        /* main NDF identifier */
+static int sc2store_indfgridext = NDF__NOID; /* NDF identifier for grid extent */
+static int sc2store_indfgridwts = NDF__NOID; /* NDF identifier for weights array */
+static int sc2store_indfinvmatx = NDF__NOID; /* NDF identifier for inverse
+                                                matrix */
+static int sc2store_indfjigext = NDF__NOID;  /* NDF identifier for DREAM extent */
+static int sc2store_indfqual = NDF__NOID;    /* NDF identifier for quality */
+static int sc2store_indfwindext = NDF__NOID; /* NDF identifier for window extent */
+static int sc2store_indfwt = NDF__NOID;      /* main NDF identifier for weights */
+static int sc2store_initialised = 0;         /* NDF initialisation flag */
 static HDSLoc *sc2store_jcmtstateloc = NULL; /* HDS locator to JCMTSTATE structure */
 static int sc2store_jigvndf = NDF__NOID;     /* NDF identifier for jiggle vertices */
 static int sc2store_jigpndf = NDF__NOID;     /* NDF identifier for the SMU path */
@@ -220,7 +229,6 @@ int *status              /* global status (given and returned) */
 
 {
    int el;                     /* number of elements mapped */
-   static int initialised = 0; /* first-time flag */
    int lbnd[3];                /* lower dimension bounds */
    int place;                  /* NDF placeholder */
    int tdims[1];               /* temporary dimension store */
@@ -231,11 +239,11 @@ int *status              /* global status (given and returned) */
 
 /* Initialise Starlink error reporting NDF and start its context */
 
-   if ( initialised == 0 )
+   if ( sc2store_initialised == 0 )
    {
       errBegin ( status );
       ndfInit ( 0, 0, status );
-      initialised = 1;
+      sc2store_initialised = 1;
    }
 
    errMark();
@@ -364,6 +372,195 @@ int *status              /* global status (given and returned) */
 
    sc2store_errconv ( status );
 }
+
+
+
+/*+ sc2store_cremapwts - create and write a DREAM weights file */
+
+void sc2store_cremapwts
+(
+const char *filename,      /* name of HDS container file (given) */
+int *windext,              /* Table of window extents for the DREAM
+                              solution (given) */
+int *gridext,              /* Table of grid extents for a single
+                              bolometer (given) */
+double gridsize,           /* size in arcsec of grid step (given) */
+int *jigext,               /* Table of SMU pattern extents for a single
+                              bolometer (given) */
+double jigsize,            /* size in arcsec of SMU step (given) */
+int gridwtsdim[],          /* dimensions of grid interpolation weights 
+                              (given) */
+double *gridwts,           /* grid interpolation weights (given) */
+int invmatdim,             /* dimension of inverted matrix (given) */
+double *invmat,            /* inverted matrix (given) */
+int qualdim[],             /* dimensions of quality mask (given) */
+int *qual,                 /* bolometer quality mask (given) */
+int *status                /* global status (given and returned) */
+)
+/*
+   Method :
+    Create and write the contents of a SCUBA-2 DREAM weights file.
+   History :
+    15Apr2008 : original (bdk)
+    09May2008 : add windext argument (bdk)
+*/
+{
+   int *data;                  /* pointer to top-level NDF data */
+   int el;                     /* number of elements */
+   HDSLoc *gridszloc = NULL;   /* HDS locator to grid step size */
+   HDSLoc *jigszloc = NULL;    /* HDS locator to DREAM step size */
+   int lbnd[3];                /* lower dimension bounds */
+   int ndim;                   /* number of dimensions */
+   int place;                  /* NDF placeholder */
+   size_t *tgridext;           /* Table of grid extents for a single
+                                  bolometer */
+   double *tinterpwt;          /* pointer to interpolation data */
+   double *tinvmat;            /* pointer to inverted matrix */
+   size_t *tjigext;            /* Table of SMU pattern extents for a single
+                                  bolometer */
+   int *tqual;                 /* pointer to quality array */
+   size_t *twindext;           /* Table of window extents for the DREAM
+                                  solution */
+   int ubnd[3];                /* upper dimension bounds */
+
+
+   if ( *status != SAI__OK ) return;
+
+/* Initialise Starlink error reporting NDF and start its context */
+
+   if ( sc2store_initialised == 0 )
+   {
+      errBegin ( status );
+      ndfInit ( 0, 0, status );
+      sc2store_initialised = 1;
+   }
+/*
+   errMark();
+   ndfBegin();
+*/
+/* Create an HDS container file */
+
+   ndfPlace ( NULL, filename, &place, status );
+
+/* Create an NDF inside the container */
+
+   ndim = 2;
+   lbnd[0] = 1;
+   lbnd[1] = 1;
+   ubnd[0] = 1;
+   ubnd[1] = 1;
+   
+   ndfNew ( "_INTEGER", ndim, lbnd, ubnd, &place, &sc2store_indfwt, status );
+   ndfMap ( sc2store_indfwt, "DATA", "_INTEGER", "WRITE", (void **)&data, &el, 
+     status );
+   data[0] = 0;
+
+
+/* Create extension for holding DREAM details */
+
+   ndfXnew ( sc2store_indfwt, "DREAM", "DREAM_WEIGHTS", 0, 0, 
+     &sc2store_dreamwtloc, status );
+
+/* Map interpolation weights array and copy data */
+
+   ndim = 2;
+   lbnd[0] = 1;
+   lbnd[1] = 1;
+   ubnd[0] = gridwtsdim[0];
+   ubnd[1] = gridwtsdim[1];
+   ndfPlace ( sc2store_dreamwtloc, "GRIDWTS", &place, status );
+   ndfNew ( "_DOUBLE", ndim, lbnd, ubnd, &place, &sc2store_indfgridwts, 
+     status );
+
+   ndfMap ( sc2store_indfgridwts, "DATA", "_DOUBLE", "WRITE", 
+     (void *)&tinterpwt, &el, status );
+   memcpy ( tinterpwt, gridwts, el*sizeof(double) );
+
+/* Map inverse matrix array and copy data */
+
+   ndim = 1;
+   lbnd[0] = 1;
+   ubnd[0] = invmatdim;
+   ndfPlace ( sc2store_dreamwtloc, "INVMATX", &place, status );
+   ndfNew ( "_DOUBLE", ndim, lbnd, ubnd, &place, &sc2store_indfinvmatx, 
+     status );
+
+   ndfMap ( sc2store_indfinvmatx, "DATA", "_DOUBLE", "WRITE", (void *)&tinvmat,
+     &el, status );
+   memcpy ( tinvmat, invmat, el*sizeof(double) );
+     
+/* Map window extent array */
+
+   ndim = 1;
+   lbnd[0] = 1;
+   ubnd[0] = 4;
+   ndfPlace ( sc2store_dreamwtloc, "WINDEXT", &place, status );
+   ndfNew ( "_INTEGER", ndim, lbnd, ubnd, &place, &sc2store_indfwindext, 
+     status );
+
+   ndfMap ( sc2store_indfwindext, "DATA", "_INTEGER", "WRITE", 
+     (void *)&twindext, &el, status );
+   memcpy ( twindext, windext, el*sizeof(int) );
+
+/* Map grid extent array */
+
+   ndim = 1;
+   lbnd[0] = 1;
+   ubnd[0] = 4;
+   ndfPlace ( sc2store_dreamwtloc, "GRIDEXT", &place, status );
+   ndfNew ( "_INTEGER", ndim, lbnd, ubnd, &place, &sc2store_indfgridext, 
+     status );
+
+   ndfMap ( sc2store_indfgridext, "DATA", "_INTEGER", "WRITE", 
+     (void *)&tgridext, &el, status );
+   memcpy ( tgridext, gridext, el*sizeof(int) );
+
+/* Map SMU pattern extent array */
+
+   ndim = 1;
+   lbnd[0] = 1;
+   ubnd[0] = 4;
+   ndfPlace ( sc2store_dreamwtloc, "JIGEXT", &place, status );
+   ndfNew ( "_INTEGER", ndim, lbnd, ubnd, &place, &sc2store_indfjigext, 
+     status );
+
+   ndfMap ( sc2store_indfjigext, "DATA", "_INTEGER", "WRITE", (void *)&tjigext,
+     &el, status );
+   memcpy ( tjigext, jigext, el*sizeof(int) );
+
+/* Put step intervals */
+
+   datNew ( sc2store_dreamwtloc, "GRID_SIZE", "_DOUBLE", 0, 0, status );
+   datFind ( sc2store_dreamwtloc, "GRID_SIZE", &gridszloc, status );
+   datPut0D ( gridszloc, gridsize, status );
+   datAnnul ( &gridszloc, status );
+
+   datNew ( sc2store_dreamwtloc, "JIG_SIZE", "_DOUBLE", 0, 0, status );
+   datFind ( sc2store_dreamwtloc, "JIG_SIZE", &jigszloc, status );
+   datPut0D ( jigszloc, jigsize, status );
+   datAnnul ( &jigszloc, status );
+
+/* Map bolometer quality array */
+
+   ndim = 2;
+   lbnd[0] = 1;
+   lbnd[1] = 1;
+   ubnd[0] = qualdim[0];
+   ubnd[1] = qualdim[1];
+   ndfPlace ( sc2store_dreamwtloc, "QUAL", &place, status );
+   ndfNew ( "_INTEGER", ndim, lbnd, ubnd, &place, &sc2store_indfqual, 
+     status );
+
+   ndfMap ( sc2store_indfqual, "DATA", "_INTEGER", "WRITE", (void *)&tqual,
+     &el, status );
+   memcpy ( tqual, qual, el*sizeof(int) );
+
+
+   sc2store_errconv ( status );
+   
+}
+
+
 
 
 /*+ sc2store_decompress - decompress frame of unsigned short to integers */
@@ -1030,6 +1227,7 @@ int *status                   /* global status (given and returned) */
      if (isthere) {
        datFind ( headloc, hdsRecords[j].name, &(sc2store_loc[pos]), 
 		 status );
+
        if ( *status != SAI__OK ) break;
        datMap ( sc2store_loc[pos], hdsRecords[j].type, "READ", 
 		ndim, dim, &(sc2store_ptr[pos]), status );
@@ -1089,6 +1287,189 @@ int *status                   /* global status (given and returned) */
 
 
 
+/*+ sc2store_mapwts - open and map a DREAM weights file */
+
+void sc2store_mapwts
+(
+const char *filename,      /* name of HDS container file (given) */
+int **windext,             /* Table of window extents for the DREAM
+                              solution (returned) */
+int **gridext,             /* Table of grid extents for a single
+                              bolometer (returned) */
+double *gridsize,          /* size in arcsec of grid step (returned) */
+int **jigext,               /* Table of SMU pattern extents for a single
+                              bolometer (returned) */
+double *jigsize,           /* size in arcsec of SMU step (returned) */
+int gridwtsdim[],          /* dimensions of grid interpolation weights 
+                              (returned) */
+double **gridwts,          /* grid interpolation weights (returned) */
+int *invmatdim,            /* dimension of inverted matrix (returned) */
+double **invmat,           /* inverted matrix (returned) */
+int qualdim[],             /* dimensions of quality mask (returned) */
+int **qual,                /* bolometer quality mask (returned) */
+int *status                /* global status (given and returned) */
+)
+/*
+   Method :
+    Open and map the contents of a SCUBA-2 DREAM weights file.
+   History :
+    14Apr2008 : original (bdk)
+    22Apr2008 : add arguments for gridwtsdim and invmatdim (bdk)
+    02May2008 : add arguments for qual and qualdim (bdk)
+    09May2008 : add windext argument (bdk)
+*/
+{
+   HDSLoc *gridszloc = NULL;   /* HDS locator to grid step size */
+   HDSLoc *jigszloc = NULL;    /* HDS locator to DREAM step size */
+   int el;                     /* number of elements */
+   int ndim;                   /* actual number of dimensions queried */
+   int ndimx;                  /* maximum number of dimensions queried */
+   int place;                  /* NDF placeholder */
+   int there;                  /* flag for HDS component existence */
+
+
+   if ( *status != SAI__OK ) return;
+
+/* Initialise Starlink error reporting NDF and start its context */
+
+   if ( sc2store_initialised == 0 )
+   {
+      errBegin ( status );
+      ndfInit ( 0, 0, status );
+      sc2store_initialised = 1;
+   }
+
+   errMark();
+   ndfBegin();
+
+/* Open an HDS container file */
+
+   ndfOpen ( NULL, filename, "READ", "OLD", &sc2store_indfwt, &place, status );
+
+
+/* Find extension for holding DREAM details */
+
+   ndfXloc ( sc2store_indfwt, "DREAM", "READ", &sc2store_dreamwtloc, status );
+
+/* Map interpolation weights array */
+
+   ndfOpen ( sc2store_dreamwtloc, "GRIDWTS", "READ", "OLD",
+     &sc2store_indfgridwts, &place, status );
+
+   ndfMap ( sc2store_indfgridwts, "DATA", "_DOUBLE", "READ", (void **)gridwts,
+     &el, status );
+   ndimx = 2;
+   ndfDim ( sc2store_indfgridwts, ndimx, gridwtsdim, &ndim, status );
+
+/* Map inverse matrix array */
+
+   ndfOpen ( sc2store_dreamwtloc, "INVMATX", "READ", "OLD",
+     &sc2store_indfinvmatx, &place, status );
+
+   ndfMap ( sc2store_indfinvmatx, "DATA", "_DOUBLE", "READ", (void **)invmat,
+     &el, status );
+   ndimx = 1;
+   ndfDim ( sc2store_indfinvmatx, ndimx, invmatdim, &ndim, status );
+
+/* Get step intervals */
+
+   datFind ( sc2store_dreamwtloc, "GRID_SIZE", &gridszloc, status );
+   datGet0D ( gridszloc, gridsize, status );
+   datAnnul ( &gridszloc, status );
+
+/* Get window extents */
+
+   datThere ( sc2store_dreamwtloc, "WINDEXT", &there, status );
+
+   if ( there != 0 )
+   {
+      ndfOpen ( sc2store_dreamwtloc, "WINDEXT", "READ", "OLD",
+        &sc2store_indfwindext, &place, status );
+
+      ndfMap ( sc2store_indfwindext, "DATA", "_INTEGER", "READ", 
+        (void *)windext, &el, status );
+   }
+   else
+   {
+      *windext = calloc ( 4, sizeof(int) );
+      (*windext)[0] = 0;
+      (*windext)[1] = 39;
+      (*windext)[2] = 0;
+      (*windext)[3] = 31;
+   }
+
+/* Get grid extents */
+
+   ndfOpen ( sc2store_dreamwtloc, "GRIDEXT", "READ", "OLD",
+     &sc2store_indfgridext, &place, status );
+
+   ndfMap ( sc2store_indfgridext, "DATA", "_INTEGER", "READ", (void *)gridext,
+     &el, status );
+   
+/* Size of DREAM pattern - not present in early version of file */
+
+   datThere ( sc2store_dreamwtloc, "JIG_SIZE", &there, status );
+
+   if ( there != 0 )
+   {
+      datFind ( sc2store_dreamwtloc, "JIG_SIZE", &jigszloc, status );
+      datGet0D ( jigszloc, jigsize, status );
+      datAnnul ( &jigszloc, status );
+   }
+   else
+   {
+      *jigsize = 12.56;
+   }
+   
+/* Get DREAM extents */
+
+   datThere ( sc2store_dreamwtloc, "JIGEXT", &there, status );
+
+   if ( there != 0 )
+   {
+      ndfOpen ( sc2store_dreamwtloc, "JIGEXT", "READ", "OLD",
+        &sc2store_indfjigext, &place, status );
+
+      ndfMap ( sc2store_indfjigext, "DATA", "_INTEGER", "READ", (void *)jigext,
+        &el, status );
+   }
+   else
+   {
+      *jigext = calloc ( 4, sizeof(int) );
+      (*jigext)[0] = -1;
+      (*jigext)[1] = 1;
+      (*jigext)[2] = -1;
+      (*jigext)[3] = 1;
+   }
+
+/* Get bolometer quality mask */
+
+   datThere ( sc2store_dreamwtloc, "QUAL", &there, status );
+
+   if ( there != 0 )
+   {
+      ndfOpen ( sc2store_dreamwtloc, "QUAL", "READ", "OLD",
+        &sc2store_indfqual, &place, status );
+
+      ndimx = 2;
+      ndfDim ( sc2store_indfqual, ndimx, qualdim, &ndim, status );
+
+      ndfMap ( sc2store_indfqual, "DATA", "_INTEGER", "READ", (void *)qual,
+        &el, status );
+   }
+   else
+   {
+      qualdim[0] = 40;
+      qualdim[1] = 32;
+      *qual = calloc ( qualdim[0]*qualdim[1], sizeof(int) );
+   }
+   
+   sc2store_errconv ( status );
+   
+}
+
+
+   
 /*+ sc2store_ndfreadscan - read a single scan from an NDF file */
 
 void sc2store_ndfreadscan
@@ -1125,7 +1506,7 @@ int *status            /* global status (given and returned) */
     12Jul2005 : return COPY of flatfield data (bdk)
     05Oct2005 : use new data interface (bdk)
     25Jan2006 : add access argument to sc2store_rdtstream (bdk)
-    26Jan2006 : pass-in access argument to sc2store_rdtstream (bdk)
+    26Jan2006 : pass-in access argument to sc2store_ (bdk)
     13Mar2006 : copied over from map.c (agg)
     14Mar2006 : change FHEAD__MXREC to SC2STORE__MAXFITS (agg)
     21Aug2006 : update API to reflect change to rdtstream (agg)
@@ -1216,7 +1597,6 @@ int *status              /* global status (given and returned) */
     16Nov2007 : original (bdk)
 */
 {
-   static int initialised = 0; /* first-time flag */
    int dim[3];                 /* dimensions */
    int ndim;                   /* number of dimensions */
    int ndimx;                  /* max number of dimensions */
@@ -1227,11 +1607,11 @@ int *status              /* global status (given and returned) */
 
 /* Initialise Starlink error reporting NDF and start its context */
 
-   if ( initialised == 0 )
+   if ( sc2store_initialised == 0 )
    {
       errBegin ( status );
       ndfInit ( 0, 0, status );
-      initialised = 1;
+      sc2store_initialised = 1;
    }
 
    errMark();
@@ -1297,6 +1677,8 @@ int *status              /* global status (given and returned) */
     15May2007 : handle FITS headers as concatenated string (bdk)
     23Oct2007 : remove calls to ndfHcre (bdk)
     31Oct2007 : change name nfits to nrec (bdk)
+    06Dec2007 : restore call to ndfHcre for main NDF (bdk)
+    28Mar2008 : call sc2store_creimages to create the containing structure (bdk)
 */
 {
 
@@ -1316,93 +1698,98 @@ int *status              /* global status (given and returned) */
 
    if ( *status != SAI__OK ) return;
 
-/* Get structure for nth constructed image */
+/* create storage structure */
 
-   strnum = frame + 1;
-   sprintf ( imname, "I%d", strnum );
-
-   ntot = 1;
-   for ( j=0; j<ndim; j++ )
-   {
-      ubnd[j] = dims[j];
-      lbnd[j] = 1;
-      ntot *= dims[j];
-   }
-   ndfPlace ( sc2store_scu2redloc, imname, &place, status );
-   ndfNew ( "_DOUBLE", ndim, lbnd, ubnd, &place, &uindf, status );
-
-/* Map the data array */
-
-   ndfMap ( uindf, "DATA", "_DOUBLE", "WRITE", (void *)&imptr, &el, 
-     status );
-
-/* Copy image array */
+   sc2store_creimages ( status );
 
    if ( *status == SAI__OK )
    {
-      for ( j=0; j<ntot; j++ )
+
+/* Get structure for nth constructed image */
+
+      strnum = frame + 1;
+      sprintf ( imname, "I%d", strnum );
+
+      ntot = 1;
+      for ( j=0; j<ndim; j++ )
       {
-         imptr[j] = image[j];
+         ubnd[j] = dims[j];
+         lbnd[j] = 1;
+         ntot *= dims[j];
       }
-   }
+      ndfPlace ( sc2store_scu2redloc, imname, &place, status );
+      ndfNew ( "_DOUBLE", ndim, lbnd, ubnd, &place, &uindf, status );
+      ndfHcre ( uindf, status );
+
+/* Map the data array */
+
+      ndfMap ( uindf, "DATA", "_DOUBLE", "WRITE", (void *)&imptr, &el, 
+        status );
+
+/* Copy image array */
+
+      if ( *status == SAI__OK )
+      {
+         for ( j=0; j<ntot; j++ )
+         {
+            imptr[j] = image[j];
+         }
+      }
 
 /* Store world coordinate transformations */
 
-   ndfPtwcs ( fset, uindf, status );
+      ndfPtwcs ( fset, uindf, status );
 
 /* Store the bolometer zero points as an NDF in the extension */
 
-   ndfXnew ( uindf, "BOLZERO", "SCUBA2_ZER_ARR", 0, 0, &bz_imloc, status );
-   ndfPlace ( bz_imloc, "ZERO", &place, status );
+      ndfXnew ( uindf, "BOLZERO", "SCUBA2_ZER_ARR", 0, 0, &bz_imloc, status );
+      ndfPlace ( bz_imloc, "ZERO", &place, status );
 
 /* Create the array for bolometer zeros */
 
-   ubnd[0] = nbolx;
-   lbnd[0] = 1;
-   ubnd[1] = nboly;
-   lbnd[1] = 1;
-   ndfNew ( "_DOUBLE", 2, lbnd, ubnd, &place, &bsc2store_zindf, status );
+      ubnd[0] = nbolx;
+      lbnd[0] = 1;
+      ubnd[1] = nboly;
+      lbnd[1] = 1;
+      ndfNew ( "_DOUBLE", 2, lbnd, ubnd, &place, &bsc2store_zindf, status );
 
 /* Map the data array */
 
-   ndfMap ( bsc2store_zindf, "DATA", "_DOUBLE", "WRITE", (void *)&bzptr, &el, 
-     status );
+      ndfMap ( bsc2store_zindf, "DATA", "_DOUBLE", "WRITE", (void *)&bzptr, &el,
+        status );
 
 /* Copy image array */
 
-   if ( *status == SAI__OK )
-   {
-      for ( j=0; j<nbolx*nboly; j++ )
+      if ( *status == SAI__OK )
       {
-         bzptr[j] = zero[j];
+         for ( j=0; j<nbolx*nboly; j++ )
+         {
+            bzptr[j] = zero[j];
+         }
       }
-   }
 
 /* Store the FITS headers */
 
-   if ( nrec > 0 )
-   {
-      sc2store_writefitshead ( uindf, nrec, fitshd, status );
-   }
-
-/* Create HISTORY component */
-
-   ndfHcre( uindf, status );
+      if ( nrec > 0 )
+      {
+         sc2store_writefitshead ( uindf, nrec, fitshd, status );
+      }
 
 /* Unmap the data array */
 
-   ndfUnmap ( bsc2store_zindf, "DATA", status );
-   ndfAnnul ( &bsc2store_zindf, status );
+      ndfUnmap ( bsc2store_zindf, "DATA", status );
+      ndfAnnul ( &bsc2store_zindf, status );
 
 
 /* Unmap the data array */
 
-   ndfUnmap ( uindf, "DATA", status );
-   ndfAnnul ( &uindf, status );
+      ndfUnmap ( uindf, "DATA", status );
+      ndfAnnul ( &uindf, status );
 
 /* Free the locators for the frame */
-   datAnnul ( &bz_imloc, status );
 
+      datAnnul ( &bz_imloc, status );
+   }
 
    sc2store_errconv ( status );
 
@@ -1480,6 +1867,7 @@ int *status           /* global status (given and returned) */
    ndfAnnul ( &uindf, status );
 
 /* Free the locator for the frame */
+
    datAnnul ( &loc2, status );
 
    sc2store_errconv ( status );
@@ -1630,7 +2018,7 @@ int *status              /* global status (given and returned) */
 void sc2store_rdflatcal
 (
 const char *filename,    /* name of HDS container file (given) */
-size_t flatlen,             /* length of space for flatfield name (given) */
+size_t flatlen,          /* length of space for flatfield name (given) */
 size_t *colsize,         /* number of pixels in column (returned) */
 size_t *rowsize,         /* number of pixels in row (returned) */
 size_t *nflat,           /* number of flat coeffs per bol (returned) */
@@ -1995,14 +2383,12 @@ int *status              /* global status (given and returned) */
    ndfXstat ( sc2store_indf, JCMT__EXTNAME, &isthere, status );
    if ( isthere ) 
    {
-      ndfXloc( sc2store_indf, JCMT__EXTNAME, "READ", &tloc, 
-        status );
-
+      ndfXloc( sc2store_indf, JCMT__EXTNAME, "READ", &tloc, status );
 /* Re-size the arrays in the JCMTSTATE extension to match the pixel index 
    bounds of the NDF. The resized arrays are stored in a new temporary HDS 
    object, and the old locator is annull. */
       sc2store_resize_head( sc2store_indf, &tloc, &sc2store_jcmtstateloc,
-                            status );
+			    status );
    } 
    else 
    {
@@ -2230,8 +2616,6 @@ int *status              /* global status (given and returned) */
 
 }
 
-
-
 /*+ sc2store_resize_head - modify JCMTSTATE arrays to take account of the
                            NDF pixel origin. */
 
@@ -2370,6 +2754,7 @@ int *status              /* Global status (given and returned) */
 }
 
 
+
 /*+ sc2store_setbscale - Set the scale factor for data compression */
 
 void sc2store_setbscale
@@ -2414,6 +2799,67 @@ int *status           /* global status (given and returned) */
    if ( *status != SAI__OK ) return;
 
    sc2store_compflag = compflag;
+}
+
+
+
+/*+ sc2store_unmapwts - unmap and close a DREAM weights file */
+
+void sc2store_unmapwts
+(
+int *status               /* global status (given and returned) */
+)
+/*
+   Method :
+    Unmap and close the SCUBA-2 DREAM weights file.
+   History :
+    15Apr2008 : original (bdk)
+    09May2008 : add windext (bdk)
+*/
+{
+   int tstatus;      /* local status */
+
+   tstatus = SAI__OK;
+
+   if ( sc2store_indfwt != NDF__NOID ) 
+   {
+      if ( sc2store_indfjigext != NDF__NOID ) 
+      {
+         ndfUnmap ( sc2store_indfjigext, "DATA", &tstatus );
+         ndfAnnul ( &sc2store_indfjigext, &tstatus );
+      }
+      if ( sc2store_indfwindext != NDF__NOID ) 
+      {
+         ndfUnmap ( sc2store_indfwindext, "DATA", &tstatus );
+         ndfAnnul ( &sc2store_indfwindext, &tstatus );
+      }
+      if ( sc2store_indfgridext != NDF__NOID ) 
+      {
+         ndfUnmap ( sc2store_indfgridext, "DATA", &tstatus );
+         ndfAnnul ( &sc2store_indfgridext, &tstatus );
+      }
+      if ( sc2store_indfinvmatx != NDF__NOID ) 
+      {
+         ndfUnmap ( sc2store_indfinvmatx, "DATA", &tstatus );
+         ndfAnnul ( &sc2store_indfinvmatx, &tstatus );
+      }
+      if ( sc2store_indfgridwts != NDF__NOID ) 
+      {
+         ndfUnmap ( sc2store_indfgridwts, "DATA", &tstatus );
+         ndfAnnul ( &sc2store_indfgridwts, &tstatus );
+      }
+      if ( sc2store_indfqual != NDF__NOID ) 
+      {
+         ndfUnmap ( sc2store_indfqual, "DATA", &tstatus );
+         ndfAnnul ( &sc2store_indfqual, &tstatus );
+      }
+
+      datAnnul ( &sc2store_dreamwtloc, &tstatus );
+
+/* Unmap the main data array */
+
+      ndfAnnul ( &sc2store_indfwt, &tstatus );
+   }
 }
 
 
@@ -2880,7 +3326,6 @@ int *status              /* global status (given and returned) */
    static int digits[2*DREAM__MXBOL]; /* copy of each frame */
    int el;                     /* number of elements mapped */
    size_t framesize;           /* number of values per frame */
-   static int initialised = 0; /* first-time flag */
    int i;                      /* loop counter */
    int *idata;                 /* pointer to uncompressed data array */
    int j;                      /* loop counter */
@@ -2901,11 +3346,11 @@ int *status              /* global status (given and returned) */
 
 /* Initialise Starlink error reporting NDF and start its context */
 
-   if ( initialised == 0 )
+   if ( sc2store_initialised == 0 )
    {
       errBegin ( status );
       ndfInit ( 0, 0, status );
-      initialised = 1;
+      sc2store_initialised = 1;
    }
 
    errMark();
