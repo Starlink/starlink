@@ -81,13 +81,13 @@
 /* define all fts-2-related calibration operations */
 struct sc2fts_fun sc2fts_cal[] =
 {
-  { "IFGMFLATFIELD", sc2fts_ifgmflatfield },  /* parameters: X, Y */
-  { "ADDWCS",        sc2fts_addwcs },         /* parameters: X, Y */
-  { "FREQCORR",      sc2fts_freqcorr },       /* parameters: theta, Y */
-  { "PORTIMBALANCE", sc2fts_portimbalance },  /* parameters: X, Y */
-  { "TRANSCORR",     sc2fts_transcorr },      /* parameters: tau, am, pwv */
-  { "SPECFLATFIELD", sc2fts_specflatfield },  /* parameters: X, Y */
-  { "GROUPCOADD",    sc2fts_groupcoadd }      /* parameters: X, Y */
+  { "IFGMFLATFIELD", sc2fts_ifgmflatfield },  /* keywords:  */
+  { "ADDWCS",        sc2fts_addwcs },         /* keywords: none */
+  { "FREQCORR",      sc2fts_freqcorr },       /* keywords: theta */
+  { "PORTIMBALANCE", sc2fts_portimbalance },  /* keywords:  */
+  { "TRANSCORR",     sc2fts_transcorr },      /* keywords: tau, am, pwv */
+  { "SPECFLATFIELD", sc2fts_specflatfield },  /* keywords:  */
+  { "GROUPCOADD",    sc2fts_groupcoadd }      /* keywords:  */
 };
 
 /* the main entry to FTS-2 data reduction operation */
@@ -149,11 +149,6 @@ void sc2fts_entry ( int *status )         /* status: global status (given and re
       /* end of NDF */
       ndfEnd( status );
     }
-//    else /* when output file is not provided, input file will be used as output */
-//    {
-      /* copy igrp to ogrp. */
-//      ogrp = grpCopy( igrp, 0, 0, 0, status );
-//    }
   }
 
   for( i=0; i<sizeof(sc2fts_cal)/sizeof(sc2fts_cal[0]); i++ )
