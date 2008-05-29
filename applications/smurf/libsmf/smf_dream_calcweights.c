@@ -199,6 +199,7 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
       /* Read DREAM parameters from input file */
       smf_fits_getS( hdr, "SUBARRAY", subarray, SUB__MAXNAM+1, status);
       smf_fits_getD( hdr, "STEPTIME", &tsamp, status);
+      tsamp *= 1000.0;
 
       nsampcycle = (int)(dream->nsampcycle);
       dream->gridstep = gridstep;
