@@ -457,6 +457,7 @@ package @PACKAGE@ {
 	 parameter config {
             type LITERAL
             access READ
+            ppath CURRENT
             prompt {Map-maker tuning parameters}
             helpkey *
 	 }
