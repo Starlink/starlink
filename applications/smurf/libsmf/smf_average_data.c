@@ -59,9 +59,12 @@
 *        - Check averaging window is a factor of the number of samples
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-05-29 (TIMJ):
+*        Fix memory leak.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 University of British Columbia. All
 *     Rights Reserved.
 
@@ -254,8 +257,10 @@ void smf_average_data( const smfData *data, int start,  int nslice,
         (*avdata)[j + offset] = sum;
       }
     }
-  } else {
-    *avdata = smf_free( *avdata, status);
   }
+
+  /* cleanup resources */
+  *avdata = smf_free( *avdata, status);
+
 }
 
