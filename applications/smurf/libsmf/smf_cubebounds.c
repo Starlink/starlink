@@ -204,6 +204,8 @@
 *     12-FEB-2008 (DSB):
 *        Modify the pixel origin in the returned FrameSet if the user
 *        changes the lower pixel bounds using parameter LBND.
+*     28-MAY-2008 (TIMJ):
+*        NINT now defined in smf.h
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -253,9 +255,6 @@
 #include "sc2da/sc2ast.h"
 
 #define FUNC_NAME "smf_cubebounds"
-
-/* Returns nearest integer to "x" */
-#define NINT(x) ( ( x > 0 ) ? (int)( x + 0.5 ) : (int)( x - 0.5 ) )
 
 void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
                      int autogrid, int usedetpos, AstFrameSet *spacerefwcs, 
