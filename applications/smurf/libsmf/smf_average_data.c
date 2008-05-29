@@ -118,7 +118,7 @@
 #define FUNC_NAME "smf_average_data"
 
 void smf_average_data( const smfData *data, int start,  int nslice, 
-		       const int interval, double **avdata, size_t *nelem, int *status) {
+                       const int interval, double **avdata, size_t *nelem, int *status) {
 
   int base;                 /* Base index */
   double currentdata;       /* Value of current data point */
@@ -142,8 +142,8 @@ void smf_average_data( const smfData *data, int start,  int nslice,
       *status = SAI__ERROR;
       msgSeti("N",data->ndims);
       errRep( FUNC_NAME, 
-	      "Input data not in time-series format (ndims = ^N, should be 3)", 
-	      status );
+              "Input data not in time-series format (ndims = ^N, should be 3)", 
+              status );
       return;
     }
   }
@@ -157,8 +157,8 @@ void smf_average_data( const smfData *data, int start,  int nslice,
       msgSeti("I",start);
       msgSeti("N",nframes-1);
       errRep( FUNC_NAME, 
-	      "Starting index, ^I, out of range (must lie between 0 and ^N)", 
-	      status );
+              "Starting index, ^I, out of range (must lie between 0 and ^N)", 
+              status );
       return;
     }
   }
@@ -169,13 +169,13 @@ void smf_average_data( const smfData *data, int start,  int nslice,
       start = 0;
     } else {
       if ( *status == SAI__OK ) {
-	*status = SAI__ERROR;
-	msgSeti("I",nslice);
-	msgSeti("N",nframes);
-	errRep( FUNC_NAME, 
-		"Number of time slices to average, ^I, out of range (must lie between 1 and ^N)", 
-		status );
-	return;
+        *status = SAI__ERROR;
+        msgSeti("I",nslice);
+        msgSeti("N",nframes);
+        errRep( FUNC_NAME, 
+                "Number of time slices to average, ^I, out of range (must lie between 1 and ^N)", 
+                status );
+        return;
       }
     }
   }
@@ -186,8 +186,8 @@ void smf_average_data( const smfData *data, int start,  int nslice,
       msgSeti("I",interval);
       msgSeti("N",nframes);
       errRep( FUNC_NAME, 
-	      "Averaging interval, ^I, out of range (must lie between 1 and ^N)", 
-	      status );
+              "Averaging interval, ^I, out of range (must lie between 1 and ^N)", 
+              status );
       return;
     }
   }
@@ -201,16 +201,16 @@ void smf_average_data( const smfData *data, int start,  int nslice,
        of nframes */
     if ( noutslice != nframes%nslice ) {
       /* Tell user - would be good to store this knowledge in the
-	 output file somehow */
+         output file somehow */
       msgSeti("S",nslice);
       msgSeti("N",noutslice);
       msgSeti("F",nframes);
       msgOutif(MSG__VERB, FUNC_NAME, 
-	       "Warning: time stream does not contain an integer number of output time slices: noutslice * nslice (^N * ^S) != nframes (^F)", 
-	       status);
+               "Warning: time stream does not contain an integer number of output time slices: noutslice * nslice (^N * ^S) != nframes (^F)", 
+               status);
       msgOutif(MSG__VERB, FUNC_NAME, 
-	       "The final image will be made up from fewer samples than the rest", 
-	       status);
+               "The final image will be made up from fewer samples than the rest", 
+               status);
       /* Increment the number of output slices */
       noutslice++;
     }
@@ -232,26 +232,26 @@ void smf_average_data( const smfData *data, int start,  int nslice,
     for ( i=0; i<noutslice; i++ ) {
       offset = i*nbol;
       if (i == noutslice - 1) {
-	lastslice = nframes;
+        lastslice = nframes;
       } else {
-	lastslice = base + nslice;
+        lastslice = base + nslice;
       }
       /* Then for each element in the current output time slice.... */
       for ( j=0; j<nbol; j++ ) {
-	sum = 0.0;
-	nsamples = 0;
-	/* Sum all the contributions from that element in the desired
-	   range of time slices */
-	for ( k=base; k<lastslice; k++ ) {
-	  currentdata = tstream[j + k*nbol];
-	  if ( currentdata != VAL__BADD ) {
-	    sum += currentdata;
-	    nsamples++;
-	  }
-	}
-	/* Calculate the average and store it in the output array */
-	sum /= nsamples;
-	(*avdata)[j + offset] = sum;
+        sum = 0.0;
+        nsamples = 0;
+        /* Sum all the contributions from that element in the desired
+           range of time slices */
+        for ( k=base; k<lastslice; k++ ) {
+          currentdata = tstream[j + k*nbol];
+          if ( currentdata != VAL__BADD ) {
+            sum += currentdata;
+            nsamples++;
+          }
+        }
+        /* Calculate the average and store it in the output array */
+        sum /= nsamples;
+        (*avdata)[j + offset] = sum;
       }
     }
   } else {
