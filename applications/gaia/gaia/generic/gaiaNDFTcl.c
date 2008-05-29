@@ -266,8 +266,8 @@ static int gaiaNDFTclOpen( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] )
 {
     Tcl_Obj *resultObj;
-    char *error_mess1;
-    char *error_mess2;
+    char *error_mess1 = NULL;
+    char *error_mess2 = NULL;
     char *name;
     int ndfid;
 
