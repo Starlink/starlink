@@ -182,7 +182,7 @@
 *     2008-05-03 (AGG):
 *        Only access variance if status is good
 *     2008-05-28 (TIMJ):
-*        Use smf_updateprov
+*        Use smf_accumulate_prov. Break from loop if status is bad.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -381,24 +381,20 @@ void smurf_qlmakemap( int *status ) {
     smf_fits_getD( data->hdr, "MEANWVM", &tau, status );
     smf_correct_extinction( data, "CSOTAU", 1, tau, NULL, status );
 
-    msgOutif(MSG__VERB, " ", "SMURF_QLMAKEMAP: Beginning the REBIN step", status);
+    /* Propagate provenace */
+    smf_accumulate_prov( data, igrp, i, odata->file->ndfid,
+                         "SMURF:QLMAKEMAP", status );
 
-    /* Propagate provenance to the output file - need access to the
-       input file again if we read from raw data. Must use updateprov
-       to prevent all the extensions being listed in provenance via
-       sc2store */
-    if (!data->file || ( data->file && data->file->ndfid == NDF__NOID)) {
-      ndgNdfas( igrp, i, "READ", &indf, status );
-    } else {
-      indf = data->file->ndfid;
-    }
-    smf_updateprov( odata->file->ndfid, data, indf, "SMURF:QLMAKEMAP",status );
+    msgOutif(MSG__VERB, " ", "SMURF_QLMAKEMAP: Beginning the REBIN step",
+             status);
 
     /* Rebin the data onto the output grid */
     smf_rebinmap( data, i, size, outframeset, spread, params, moving, genvar,
 		  lbnd_out, ubnd_out, map, variance, weights, status );
 
     smf_close_file( &data, status );
+
+    if (*status != SAI__OK) break;
   }
 
   overallmeansky /= (double)size;
