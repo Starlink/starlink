@@ -193,7 +193,6 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
     if (ogrp != NULL) {
         /* need an ndfid */
         smf_get_taskname( NULL, prvname, status );
-        printf("Taskname: %s\n",prvname);
         smf_accumulate_prov( data, igrp, index, (*ffdata)->file->ndfid,
                              prvname, status );
     }
