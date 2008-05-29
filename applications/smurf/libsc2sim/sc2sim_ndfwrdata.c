@@ -216,9 +216,12 @@
 *        within current subscan
 *     2008-05-23 (AGG):
 *        Add focposn to API
+*     2008-05-28 (TIMJ):
+*        - Fix strncpy issues
+*        - Correct call to sc2sim_get_recipe
 
 *  Copyright:
-*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2007, 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2005-2008 University of British
 *     Columbia. All Rights Reserved.
@@ -421,23 +424,23 @@ int *status              /* Global status (given and returned) */
    /* Set object name - use planet name if known */
    if ( inx->planetnum != -1 ) {
      if ( inx->planetnum == 2 ) {
-       strncpy( objectname, "VENUS", 5 );
+       strncpy( objectname, "VENUS", JCMT__SZTCS_SOURCE+1 );
      } else if ( inx->planetnum == 3 ) {
-       strncpy( objectname, "MOON", 4 );
+       strncpy( objectname, "MOON", JCMT__SZTCS_SOURCE+1 );
      } else if ( inx->planetnum == 4 ) {
-       strncpy( objectname, "MARS", 4 );
+       strncpy( objectname, "MARS", JCMT__SZTCS_SOURCE+1 );
      } else if ( inx->planetnum == 5 ) {
-       strncpy( objectname, "JUPITER", 7 );
+       strncpy( objectname, "JUPITER", JCMT__SZTCS_SOURCE+1 );
      } else if ( inx->planetnum == 6 ) {
-       strncpy( objectname, "SATURN", 6 );
+       strncpy( objectname, "SATURN", JCMT__SZTCS_SOURCE+1 );
      } else if ( inx->planetnum == 7 ) {
-       strncpy( objectname, "URANUS", 5 );
+       strncpy( objectname, "URANUS", JCMT__SZTCS_SOURCE+1 );
      } else if ( inx->planetnum == 8 ) {
-       strncpy( objectname, "NEPTUNE", 7 );
+       strncpy( objectname, "NEPTUNE", JCMT__SZTCS_SOURCE+1 );
      }
    } else {
      /* Generic name... */
-     strncpy( objectname, "SMURF", 5 );
+     strncpy( objectname, "SMURF", JCMT__SZTCS_SOURCE+1 );
    }
    astSetFitsS ( fitschan, "OBJECT", objectname, "Object Name", 0 );
    astSetFitsL ( fitschan, "STANDARD", 0, "True if source is a calibrator", 0 );
@@ -488,7 +491,7 @@ int *status              /* Global status (given and returned) */
    astSetFitsCN ( fitschan, "COMMENT", "", "-- OMP & ORAC-DR parameters --", 0 );
    astSetFitsS ( fitschan, "PROJECT", "M08AC00", 
 		 "The proposal ID for the PROJECT", 0 );
-   sc2sim_get_recipe( inx, &recipe, status );
+   sc2sim_get_recipe( inx, recipe, status );
    astSetFitsS ( fitschan, "RECIPE", recipe, "The ORAC-DR recipe", 0 );
    astSetFitsS ( fitschan, "DRGROUP", "", 
 		 "Name of group to combine current observation with", 0 );
