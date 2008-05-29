@@ -80,6 +80,8 @@
 *        Enable provenance propagation.
 *     2008-05-28 (TIMJ):
 *        Initialise pointers.
+*     2008-05-29 (TIMJ):
+*        Use smf_accumulate_prov. Do not propagate provenance extension.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -153,7 +155,7 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
     /* Open the input file solely to propagate it to the output file */
     ndgNdfas( igrp, index, "READ", &indf, status );
     /* We want QUALITY too if it's available */
-    ndgNdfpr( indf, "WCS,QUALITY,UNITS,TITLE,LABEL", 
+    ndgNdfpr( indf, "WCS,QUALITY,UNITS,TITLE,LABEL,NOEXTENSION(PROVENANCE)", 
               ogrp, index, &outndf, status );
     ndfAnnul( &indf, status);
 
@@ -185,19 +187,15 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
       errRep("", "Unable to open output flatfielded file(s)", status);
     }
 
-    /* Propagate provenance to the output. This will happen automatically
-       unless the input is raw data without OBSIDSS provenance */
+    /* Propagate provenance to the output. We always have to run this
+       because automatic provenance propagation becomes really slow
+       for raw data with many INCOMPS NDFs. */
     if (ogrp != NULL) {
-      /* see if data are flagged as raw */
-      if (data->file->isSc2store) {
         /* need an ndfid */
         smf_get_taskname( NULL, prvname, status );
-        ndgNdfas( igrp, index, "READ", &indf, status );
-        smf_updateprov( (*ffdata)->file->ndfid,
-                        NULL, indf, prvname,
-                        status);
-        ndfAnnul( &indf, status);
-      }
+        printf("Taskname: %s\n",prvname);
+        smf_accumulate_prov( data, igrp, index, (*ffdata)->file->ndfid,
+                             prvname, status );
     }
 
   }
