@@ -423,8 +423,7 @@ void smurf_qlmakemap( int *status ) {
 
   /* Free the WCS pointer */
   if ( outframeset != NULL ) {
-    astAnnul( outframeset );
-    outframeset = NULL;
+    outframeset = astAnnul( outframeset );
   }
 
   /* Tidy up and close the output file */  
