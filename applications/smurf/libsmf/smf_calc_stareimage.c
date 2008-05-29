@@ -44,10 +44,13 @@
 *        Change verbose level for warning message to normal
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-05-29 (TIMJ):
+*        Free avdata to prevent memory leak.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006 University of British Columbia.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2007 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -157,6 +160,7 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
       smf_store_image( data, scu2redloc, j, 2, dims, naver, 0, 0, avdata, zero, 
 		       status);
 
+      avdata = smf_free( avdata, status );
       zero = smf_free( zero, status );
     }
     /* Add a history entry if everything's OK */

@@ -27,7 +27,8 @@
 *     interval = const int (Given)
 *        Averaging interval
 *     avdata = double ** (Returned)
-*        Pointer to 2 or 3-D array of averaged data
+*        Pointer to 2 or 3-D array of averaged data. Must be freed by
+*        caller.
 *     nelem = size_t * (Returned)
 *        Number of elements in the averaged data
 *     status = int* (Given and Returned)
@@ -45,7 +46,8 @@
 *     to 0, irrespective of the value of interval.
 
 *  Notes:
-
+*     The caller should free the memory allocated in avdata by this routine
+*     by using smf_free.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -60,7 +62,7 @@
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
 *     2008-05-29 (TIMJ):
-*        Fix memory leak.
+*        Clarify that someone needs to free this memory.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -257,10 +259,9 @@ void smf_average_data( const smfData *data, int start,  int nslice,
         (*avdata)[j + offset] = sum;
       }
     }
+  } else {
+    /* cleanup resources */
+    *avdata = smf_free( *avdata, status);
   }
-
-  /* cleanup resources */
-  *avdata = smf_free( *avdata, status);
-
 }
 
