@@ -106,6 +106,9 @@
 *        Add GSDSHOW task.
 *     2008-05-23 (TIMJ):
 *        Turn on automatic NDG propagation. Factor out task_get_name.
+*     2008-05-28 (TIMJ):
+*        No longer use automatic provenance propagation. It took too
+*        long even if provenance had already been written.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -202,13 +205,6 @@ void smurf_mon( int * status ) {
   memory_caching = astTune( "MemoryCaching", 1 ); 
   astBegin;
 
-  /* Begin a provenance block. This causes event handlers to be registered
-   * with the NDF library so that a handler routine in NDG is called every
-   * time an NDF is opened. This handler routine keeps a record of all NDFs 
-   * that are opened for input or output, until the block is closed by 
-   * calling NDG_ENDPV. */
-  ndgBegpv( status );
-
   /* Call the subroutine associated with the requested task */
   if (strcmp( taskname, "EXTINCTION" ) == 0 ) {
     smurf_extinction( status );
@@ -259,16 +255,6 @@ void smurf_mon( int * status ) {
     msgSetc( "TASK", taskname );
     errRep( "smurf_mon", "Unrecognized taskname: ^TASK", status);
   }
-
-  /*  End the provenance block. This will result in every output NDF being
-   *  given a provenance extension containing a record of the input NDFs
-   *  that the application accessed in order to create the output NDF. Any
-   *  output NDF that already contains a provenance extension is left
-   *  unchanged (so individual application can over-ride this automatic
-   *  provenance handling by adding a provenance extension to the output NDF
-   *  itself).
-   */
-  ndgEndpv(prvname, status);
 
   /* Clear all possible cached info from the different createwcs routines */
   sc2ast_createwcs(-1, NULL, NULL, NULL, NULL, status);
