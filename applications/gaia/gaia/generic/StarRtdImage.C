@@ -252,11 +252,8 @@
 // member function when requested.
 #include "StarRtdForeignCmds.h"
 
-//  Size of buffer used for Tcl commands.
-static const int eval_buf_size_ = 1024;
-
 //  Size of buffer used temporary filenames.
-static const int file_buf_size_ = 1024;
+static const int FILEBUFSIZE = 1024;
 
 //  Number of characters in a FITS header card.
 static const int FITSCARD = 80;
@@ -5668,17 +5665,17 @@ int StarRtdImage::fullNameCmd( int argc, char *argv[] )
         int nndf = ndf->getNDFNum();
 
         //  Need NDF path
-        char ndfpath[file_buf_size_], naxis1[32], naxis2[32],
+        char ndfpath[FILEBUFSIZE], naxis1[32], naxis2[32],
             hasvar[32], hasqual[32];
         ndf->getNDFInfo( nndf, ndfpath, naxis1, naxis2, hasvar, hasqual );
-        char buffer[file_buf_size_];
 
-        if ( strcmp( ndfpath, file() ) == 0 ) {
-            //  Top-level NDF, just return name.
+        if ( ndfpath[0] == '.' ) {
+            //  Main NDF, just return name.
             set_result( file() );
         } else {
             //  Sub-NDF, so need path (which has slice information
             //  appended already).
+            char buffer[FILEBUFSIZE];
             strcpy( buffer, name );
             char *start = strstr( buffer, ndfpath );
             if ( start != NULL ) {
@@ -5698,7 +5695,7 @@ int StarRtdImage::fullNameCmd( int argc, char *argv[] )
         if ( hdu == 1 ) {
             set_result( file() );
         } else {
-            char buffer[1024];
+            char buffer[FILEBUFSIZE];
             sprintf( buffer, "%s[%d]", file(), hdu );
             set_result( buffer );
         }

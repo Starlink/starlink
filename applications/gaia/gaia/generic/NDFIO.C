@@ -546,26 +546,27 @@ int NDFIO::makeDisplayable( int index, const char *component )
 //
 //  Get information about an NDF. All returned as strings.
 //
-//  Note that name should have a length equal to MAXNDFNAME (defined
-//  in gaiaNDF.h).
+//  Note that path should have a length equal to MAXNDFNAME (defined
+//  in gaiaNDF.h) and will be returned as "." for the main NDF
+//  (previously this was the full NDF specification for such objects).
 //
-void NDFIO::getNDFInfo( int index, char *name, char *naxis1, char *naxis2,
+void NDFIO::getNDFInfo( int index, char *path, char *naxis1, char *naxis2,
                         char *hasvar, char *hasqual )
 {
    int bitpix;
    int width;
    int height;
    char *header;
-   char *named;
+   char *pathd;
    int hlen;
    int ndfid;
    int hasq;
    int hasv;
 
-   gaiaGetInfoMNDF( NDFinfo_, index, &named, &bitpix, &width, &height,
+   gaiaGetInfoMNDF( NDFinfo_, index, &pathd, &bitpix, &width, &height,
                     &header, &hlen, &ndfid, &hasv, &hasq );
 
-   strcpy( name, named );
+   strcpy( path, pathd );
    sprintf( naxis1, "%d", width );
    sprintf( naxis2, "%d", height );
    if ( hasv ) {

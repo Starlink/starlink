@@ -126,6 +126,36 @@ extern F77_SUBROUTINE(rtd1_aqual)( INTEGER(ndfId),
                                    LOGICAL(haveQual),
                                    POINTER(q) );
 
+/*
+ *  Local structure to store information about an NDF.
+ */
+struct NDFinfo {
+    char name[MAXNDFNAME]; /*  NDF name (within file)*/
+    int ndfid;             /*  NDF identifier */
+    int ncomp;             /*  Number of data components */
+    int type;              /*  NDF data type (as bitpix) */
+    int nx;                /*  First dimension of NDF */
+    int ny;                /*  Second dimension of NDF */
+    int readonly;          /*  Readonly access */
+    int havevar;           /*  Variance component exists */
+    int havequal;          /*  Quality array exists */
+    char *header;          /*  Pointer to FITS headers */
+    int hlen;              /*  Length of header */
+    struct NDFinfo *next;  /*  Pointer to next NDF with displayables */
+};
+typedef struct NDFinfo NDFinfo;
+
+/* Trace siblings of an NDF rooted at baseloc. */
+static void traceMNDFs( NDFinfo **head, HDSLoc *baseloc, int baseid,
+                        char *slice, int *status );
+
+/*  Trace NDFs rooted at a given locator. */
+static void traceSiblings( HDSLoc *baseloc, int ndfid, 
+                           const char *prefix, char **props, 
+                           int *used, int *avail, int *need,
+                           int *nsiblings, int *status );
+
+
 /**
  * ===================================
  * Simple Skycat-like access routines.
@@ -413,7 +443,7 @@ int gaiaMapComponent( int ndfid, void **data, const char* component,
    /* Allow ERROR as synonym for VARIANCE. */
    if ( strcasecmp( component, "ERROR" ) == 0 ) {
        ndfType( ndfid, "VARIANCE", dtype, NDF__SZTYP+1, &status );
-   } 
+   }
    else {
        ndfType( ndfid, component, dtype, NDF__SZTYP+1, &status );
    }
@@ -592,24 +622,6 @@ int gaiaCopyNDF( const char *filename, int indf, const char *clist,
  *  =====================================
  */
 
-/*
- *  Structure to store information about an NDF.
- */
-struct NDFinfo {
-      char name[MAXNDFNAME]; /*  NDF name (within file)*/
-      int ndfid;             /*  NDF identifier */
-      int ncomp;             /*  Number of data components */
-      int type;              /*  NDF data type (as bitpix) */
-      int nx;                /*  First dimension of NDF */
-      int ny;                /*  Second dimension of NDF */
-      int readonly;          /*  Readonly access */
-      int havevar;           /*  Variance component exists */
-      int havequal;          /*  Quality array exists */
-      char *header;          /*  Pointer to FITS headers */
-      int hlen;              /*  Length of header */
-      struct NDFinfo *next;  /*  Pointer to next NDF with displayables */
-};
-typedef struct NDFinfo NDFinfo;
 
 /*
  *   Name:
@@ -717,32 +729,19 @@ static NDFinfo *getNDFInfo( const void *handle, const int index )
 int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
 {
     HDSLoc *baseloc = NULL;
-    HDSLoc *newloc = NULL;
     HDSLoc *tmploc = NULL;
     NDFinfo *head = NULL;
-    NDFinfo *newstate = NULL;
-    NDFinfo *state = NULL;
     char *emess = NULL;
     char *filename = NULL;
-    char *ftype = NULL;
     char *header = NULL;
     char *left = NULL;
     char *path = NULL;
     char *right = NULL;
-    char ndffile[MAXNDFNAME];
-    char ndfpath[MAXNDFNAME];
     char slice[MAXNDFNAME];
     int baseid = 0;
-    int first;
     int height;
     int hlen;
-    int i;
-    int isect;
-    int istop = 0;
-    int level;
-    int ncomp = 0;
     int ndfid;
-    int same;
     int status = SAI__OK;
     int type;
     int valid;
@@ -764,21 +763,29 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
     if ( gaiaAccessNDF( name, &type, &width, &height, &header, &hlen,
                         &ndfid, &emess ) ) {
 
-        /*  Name is an NDF. Need a HDS path to its top-level so we can
-            check for other NDFs at this level, also need to check for the
-            existence of other displayables in the NDF */
+        /*  Name is an NDF. */
         baseid = ndfid;
-        head = (NDFinfo *) malloc( sizeof( NDFinfo ) );
-        setState( head, ndfid, name, type, width, height, header, hlen,
-                  &status );
 
         /*  Get the locator to the NDF and hence to its parent. */
         tmploc = NULL;
         ndfLoc( ndfid, "READ", &tmploc, &status );
         datParen( tmploc, &baseloc, &status );
 
-        /*  See if the NDF has a slice. If so all components and NDFs in
-            this file will also have that slice applied */
+        if ( status == DAT__OBJIN ) {
+
+            /*  Means we're at the top level of the container file, so no
+                parent available. */
+            emsAnnul( &status );
+            datClone( tmploc, &baseloc, &status );
+        }
+
+        /*  Store info about this NDF. Note path is set to "." */
+        head = (NDFinfo *) malloc( sizeof( NDFinfo ) );
+        setState( head, ndfid, ".", type, width, height, header, hlen,
+                  &status );
+
+        /*  Check for a slice. If found all components in this file will also
+            have that slice applied. */
         left = strrchr( name, '(');
         right = strrchr( name, ')');
         if ( left && right ) {
@@ -787,22 +794,29 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
         else {
             slice[0] = '\0';
         }
-        if ( status == DAT__OBJIN ) {
 
-            /*  At top level, so no parent available */
-            emsAnnul( &status );
-            datClone( tmploc, &baseloc, &status );
+        /*  If in error trap latest message for the report. */
+        if ( status != SAI__OK ) {
+            emess = gaiaUtilsErrMessage();
         }
         else {
-            /*  Some other error occured, just let it go */
-            emess = gaiaUtilsErrMessage();
+            /*  JAC extension: search NDF for further NDFs that
+             *  are expected to live in the JAC extensions. */
+            {
+                int havesmurf = 0;
+                ndfXstat( ndfid, "SMURF", &havesmurf, &status );
+                if ( havesmurf && status == SAI__OK ) {
+                    HDSLoc *smurfloc = NULL;
+                    ndfXloc( ndfid, "SMURF", "READ", &smurfloc, &status );
+                    traceMNDFs( &head, smurfloc, NDF__NOID, slice, &status );
+                    datAnnul( &smurfloc, &status );
+                }
+            }
         }
     }
     else {
-
-        /*  May just be a HDS container name with NDFs at this level. Need
-         *  to parse down to a filename and an HDS path.
-         */
+        /*  Not an NDF. May just be a HDS container name with NDFs at this
+            level. Need to parse down to a filename and an HDS path. */
         filename = strdup( name );
         path = strstr( filename, ".sdf" );
         if ( path ) {
@@ -819,120 +833,40 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
             path = strchr( path, '.' );
         }
         if ( path ) {
-            *path = '\0';  /*  Remove "." from filename, rest is HDS path */
+            *path = '\0';  /*  Remove "." from front, rest is HDS path. */
             path++;
         }
 
         /*  Attempt to open the file and obtain a base locator. */
         hdsOpen( filename, "READ", &tmploc, &status );
 
-        /*  Now look for the object specified by the PATH */
+        /*  Now look for the object specified by the PATH. */
         if ( path && status == SAI__OK ) {
-            datFind( tmploc, path, &baseloc, &status );
+            hdsFind( tmploc, path, "READ", &baseloc, &status );
         }
         else {
+            /*  No PATH, so re-use tmploc as baseloc. */
             datClone( tmploc, &baseloc, &status );
         }
 
         /*  If all is well, cancel pending error message (from initial
-            attempt to open) */
+            attempt to open). */
         if ( status == SAI__OK && emess != NULL ) {
             free( emess );
             emess = NULL;
         }
         free( filename );
 
-        /*  Top level container file, so safe to strip .sdf from name
-         *  (if this was an NDF then .sdf.gz might be used).
-         */
-        istop = 1;
-
-        /*
-         *  No slice for plain top-level.
-         */
+        /*  No slice for non-NDF specification. */
         slice[0] = '\0';
     }
     valid = 0;
     datValid( baseloc, &valid, &status );
     if ( valid && status == SAI__OK ) {
-        /*  Look for additional NDFs at baseloc, ignore tmploc which is
-         *  NDF itself (or baseloc). If only one component, must be this NDF.
-         */
-        datNcomp( baseloc, &ncomp, &status );
-        if ( status != SAI__OK || ncomp == 1 ) {
-            ncomp = 0;
-        }
-        first = 1;
-        for ( i = 1; i <= ncomp; i++ ) {
-            datIndex( baseloc, i, &newloc, &status );
 
-            /*  Get full name of component and see if it is an NDF */
-            hdsTrace( newloc, &level, ndfpath, ndffile, &status,
-                      MAXNDFNAME, MAXNDFNAME );
-
-            ftype = strstr( ndffile, ".sdf" ); /* Strip .sdf from filename */
-            if ( ftype ) *ftype = '\0';
-
-            path = strstr( ndfpath, "." );  /* Now find first component */
-            if ( path == NULL ) {           /* and remove it (not used as */
-                strcat( ndffile, "." );      /* part of NDF name) */
-                path = ndfpath;
-            }
-            strcat( ndffile, path );        /*  Join filename and HDS
-                                                path to give NDF full
-                                                name */
-            if ( slice[0] != '\0' ) {
-                strcat( ndffile, slice );    /*  Add the NDF slice, if set */
-                strcat( path, slice );
-            }
-
-            /*  Attempt to open NDF to see if it exists (could check for
-                DATA_ARRAY component) */
-            emess = NULL;
-            if ( gaiaAccessNDF( ndffile, &type, &width, &height,
-                                &header, &hlen, &ndfid, &emess ) ) {
-
-                /*  Check that this isn't the base NDF by another name */
-                if ( ndfid != 0 && baseid != 0 ) {
-                    ndfSame( baseid, ndfid, &same, &isect, &status );
-                }
-                else {
-                    same = 0;
-                }
-                if ( ! same ) {
-                    /*  NDF exists so add its details to the list of NDFs */
-                    newstate = (NDFinfo *) malloc( sizeof( NDFinfo ) );
-                    if ( first ) {
-                        if ( head ) {
-                            head->next = newstate;
-                        }
-                        else {
-                            head = newstate;
-                        }
-                        first = 0;
-                    }
-                    else {
-                        state->next = newstate;
-                    }
-                    state = newstate;
-                    setState( state, ndfid, path, type, width, height, header,
-                              hlen, &status );
-                }
-                else {
-                    /* Same NDF as before, release it and continue */
-                    gaiaFreeNDF( ndfid );
-                }
-            }
-            if ( emess != NULL ) {
-                free( emess );
-                emess = NULL;
-            }
-            datAnnul( &newloc, &status );
-        }
-
-        /*  Release locators */
-        datAnnul( &baseloc, &status );
-        datAnnul( &tmploc, &status );
+        /*  Look for additional NDFs at baseloc and append these to the head
+            state. If only one component, must be this NDF. */
+        traceMNDFs( &head, baseloc, baseid, slice, &status );
     }
     else {
 
@@ -963,7 +897,135 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
     if ( emess ) {
         free( emess );
     }
+
+    /*  Release locators */
+    datAnnul( &baseloc, &status );
+    datAnnul( &tmploc, &status );
+
     return 1;
+}
+
+/*
+ *  Name:
+ *     traceMNDF
+ *
+ *  Purpose:
+ *     Given a locator to an NDF locate siblings and add to the multiple
+ *     NDF structure given. Does work for gaiaInitMNDF. Exists so that
+ *     we can recurse looking for NDFs in JAC extensions.
+ *
+ */
+void traceMNDFs( NDFinfo **headptr, HDSLoc *baseloc, int baseid,
+                 char *slice, int *status )
+{
+    HDSLoc *newloc = NULL;
+    NDFinfo *state = NULL;
+    NDFinfo *newstate = NULL;
+    NDFinfo *head = *headptr;
+    char *emess = NULL;
+    char *ftype = NULL;
+    char *header = NULL;
+    char *path = NULL;
+    char ndffile[MAXNDFNAME];
+    char ndfpath[MAXNDFNAME];
+    int first;
+    int height;
+    int hlen;
+    int i;
+    int isect;
+    int level;
+    int ncomp = 0;
+    int ndfid;
+    int same;
+    int type;
+    int width;
+
+    datNcomp( baseloc, &ncomp, status );
+    if ( *status != SAI__OK || ncomp == 1 ) {
+        ncomp = 0;
+    }
+    first = 1;
+    for ( i = 1; i <= ncomp; i++ ) {
+        datIndex( baseloc, i, &newloc, status );
+
+        /*  Get full name of component and see if it is an NDF */
+        hdsTrace( newloc, &level, ndfpath, ndffile, status,
+                  MAXNDFNAME, MAXNDFNAME );
+
+        ftype = strstr( ndffile, ".sdf" ); /* Strip .sdf from filename */
+        if ( ftype ) *ftype = '\0';
+
+        path = strstr( ndfpath, "." );   /* Now find first component */
+        if ( path == NULL ) {            /* and remove it (not used as */
+            strcat( ndffile, "." );      /* part of NDF name) */
+            path = ndfpath;
+        }
+        strcat( ndffile, path );        /*  Join filename and HDS
+                                            path to give NDF full
+                                            name */
+        if ( slice[0] != '\0' ) {
+            strcat( ndffile, slice );    /*  Add the NDF slice, if set */
+            strcat( path, slice );
+        }
+
+        /*  Attempt to open NDF to see if it exists (could check for
+         *  DATA_ARRAY component) */
+        emess = NULL;
+        if ( gaiaAccessNDF( ndffile, &type, &width, &height,
+                            &header, &hlen, &ndfid, &emess ) ) {
+
+            /*  Check that this isn't the base NDF by another name */
+            if ( ndfid != 0 && baseid != 0 ) {
+                ndfSame( baseid, ndfid, &same, &isect, status );
+            }
+            else {
+                same = 0;
+            }
+            if ( ! same ) {
+                /*  NDF exists so add its details to the list of NDFs. */
+                newstate = (NDFinfo *) malloc( sizeof( NDFinfo ) );
+                if ( first ) {
+                    if ( head != NULL ) {
+                        head->next = newstate;
+                    }
+                    else {
+                        head = newstate;
+                    }
+                    first = 0;
+                }
+                else {
+                    state->next = newstate;
+                }
+                state = newstate;
+                setState( state, ndfid, path, type, width, height, header,
+                          hlen, status );
+
+                /*  JAC extension: search each NDF for further NDFs that
+                 *  are expected to live in the JAC extensions. */
+                {
+                    int havesmurf = 0;
+                    ndfXstat( ndfid, "SMURF", &havesmurf, status );
+                    if ( havesmurf ) {
+                        HDSLoc *smurfloc = NULL;
+                        ndfXloc( ndfid, "SMURF", "READ", &smurfloc, status );
+                        traceMNDFs( &state, smurfloc, NDF__NOID, slice,
+                                    status );
+                        datAnnul( &smurfloc, status );
+                    }
+                }
+            }
+            else {
+                /* Same NDF as before, release it and continue */
+                gaiaFreeNDF( ndfid );
+            }
+        }
+        if ( emess != NULL ) {
+            free( emess );
+            emess = NULL;
+        }
+        datAnnul( &newloc, status );
+    }
+    *headptr = head;
 }
 
 /*
@@ -992,7 +1054,7 @@ int gaiaCheckMNDF( const void *handle, int index, const char *component )
          break;
 
          case 'v':
-         case 'V': 
+         case 'V':
          case 'e':
          case 'E': {
             if ( current->havevar ) {
@@ -1884,7 +1946,7 @@ int gaiaNDFFindChild( const char *name, int *ndfid, char **error_mess )
 
     /*  Now look for the object specified by the PATH */
     if ( path ) {
-        datFind( tmploc, path, &baseloc, &status );
+        hdsFind( tmploc, path, "READ", &baseloc, &status );
     }
     else {
         datClone( tmploc, &baseloc, &status );
@@ -1896,14 +1958,14 @@ int gaiaNDFFindChild( const char *name, int *ndfid, char **error_mess )
         for ( i = 1; i <= ncomp; i++ ) {
             *ndfid = NDF__NOID;
             datIndex( baseloc, i, &newloc, &status );
-            
+
             /*  Get full name of component and see if it is an NDF */
             hdsTrace( newloc, &level, ndfpath, ndffile, &status,
                       MAXNDFNAME, MAXNDFNAME );
-            
+
             ftype = strstr( ndffile, ".sdf" ); /* Strip .sdf from filename */
             if ( ftype ) *ftype = '\0';
-            
+
             path = strstr( ndfpath, "." );  /* Now find first component */
             if ( path == NULL ) {           /* and remove it (not used as */
                 strcat( ndffile, "." );     /* part of NDF name) */
@@ -1911,7 +1973,7 @@ int gaiaNDFFindChild( const char *name, int *ndfid, char **error_mess )
             }
             strcat( ndffile, path );        /*  Join filename and HDS path to
                                              *  give NDF full name */
-            
+
             /*  Attempt to open NDF to see if it exists */
             if ( gaiaNDFOpen( ndffile, ndfid, error_mess ) == TCL_OK ) {
                 datAnnul( &newloc, &status );
@@ -1919,18 +1981,19 @@ int gaiaNDFFindChild( const char *name, int *ndfid, char **error_mess )
             }
             if ( *error_mess ) {
                 free( *error_mess );
+                *error_mess = NULL;
             }
-            
+
             datAnnul( &newloc, &status );
         }
-        
+
         /*  Release locators */
         datAnnul( &baseloc, &status );
         datAnnul( &tmploc, &status );
     }
     else {
         *ndfid = NDF__NOID;
-    }       
+    }
 
     /* If an error occurred return an error message */
     if ( status != SAI__OK ) {
@@ -1951,28 +2014,22 @@ int gaiaNDFFindChild( const char *name, int *ndfid, char **error_mess )
  * Search an HDS container file for sibling NDFs. Siblings are at the same HDS
  * level as the given NDF. The number of sibling located and a Tcl list of
  * their basic properties is returned (HDS path and dimensionality followed by
- * the first three dimensions).
+ * the first three dimensions). Note if props points at some memory already
+ * that will be extended (must be allocated by malloc).
  */
 int gaiaNDFSiblingSearch( int ndfid, int *nsiblings, char **props )
 {
     HDSLoc *baseloc = NULL;
     HDSLoc *ndfloc = NULL;
-    HDSLoc *newloc = NULL;
     char *ptr;
     char name[DAT__SZNAM+1];
     int added;
-    int avail;
+    int avail = 0;
     int dims[NDF__MXDIM];
-    int i;
-    int isect;
-    int ncomp;
     int ndims;
     int need;
-    int newid;
-    int place;
-    int same;
     int status = SAI__OK;
-    int used;
+    int used = 0;
 
     /*  Mark the error stack */
     emsMark();
@@ -1983,7 +2040,16 @@ int gaiaNDFSiblingSearch( int ndfid, int *nsiblings, char **props )
 
     /*  Create a string for the Tcl list of properties. The first entry is
      *  for the given NDF. */
-    *props = (char *) malloc( EMS__SZMSG );
+    if ( *props == NULL ) {
+        *props = (char *) malloc( EMS__SZMSG );
+        used = 0;
+        avail = EMS__SZMSG;
+    }
+    else {
+        used = strlen( *props );
+        *props = (char *) realloc( *props, used + EMS__SZMSG );
+        avail = EMS__SZMSG;
+    }
     ptr = *props;
     ndfDim( ndfid, NDF__MXDIM, dims, &ndims, &status );
 
@@ -2002,60 +2068,29 @@ int gaiaNDFSiblingSearch( int ndfid, int *nsiblings, char **props )
                      *nsiblings, name, ndims, dims[0], dims[1], dims[2] );
     ptr += added;
 
-    /*  Manage string space, realloc when avail < need. */
-    used = 0;
-    avail = EMS__SZMSG;
+    /*  Set up variables to manage string space, this will be realloc when avail < need. */
     need = added * 2;
     avail -= added;
-    used = added;
+    used += added;
 
-    if ( baseloc && status == SAI__OK ) {
-
-        /*  Found parent, so now look for additional NDFs at baseloc. */
-        datNcomp( baseloc, &ncomp, &status );
-        if ( status != SAI__OK || ncomp == 1 ) {
-            /* There's only one. */
-            ncomp = 0;
+    /*  Check this NDF for JAC extensions. */
+    {
+        int havesmurf = 0;
+        int istat = SAI__OK;
+        ndfXstat( ndfid, "SMURF", &havesmurf, &istat );
+        if ( havesmurf && istat == SAI__OK ) {
+            HDSLoc *smurfloc = NULL;
+            ndfXloc( ndfid, "SMURF", "READ", &smurfloc, &istat );
+            traceSiblings( smurfloc, ndfid, "MORE.SMURF.", props, &used,
+                           &avail, &need, nsiblings, &istat );
+            datAnnul( &smurfloc, &istat );
         }
-        datName( baseloc, name, &status );
+    }
 
-        for ( i = 1; i <= ncomp; i++ ) {
-            status = SAI__OK;
-            newloc = NULL;
-            datIndex( baseloc, i, &newloc, &status );
-
-            /*  See if newloc is an NDF by attempting to open it. */
-            ndfOpen( newloc, "", "READ", "OLD", &newid, &place, &status );
-            if ( status == SAI__OK ) {
-
-                /*  Don't include self twice. */
-                ndfSame( ndfid, newid, &same, &isect, &status );
-                if ( ! same ) {
-                    (*nsiblings)++;
-
-                    /* Add description. */
-                    ndfDim( newid, NDF__MXDIM, dims, &ndims, &status );
-                    datName( newloc, name, &status );
-                    if ( avail < need ) {
-                        *props = (char *) realloc( *props, 
-                                                   used + avail + EMS__SZMSG );
-                        avail += EMS__SZMSG;
-                        ptr = *props;
-                        ptr += used;
-                    }
-                    added = sprintf( ptr, "{{%d} {NDF} {%s} {%d} {%d} {%d} {%d}} ",
-                                     *nsiblings, name, ndims, dims[0], dims[1], dims[2] );
-                    ptr += added;
-                    avail -= added;
-                    used += added;
-                }
-                ndfAnnul( &newid, &status );
-            }
-            datAnnul( &newloc, &status );
-            if ( status != SAI__OK ) {
-                emsAnnul( &status );
-            }
-        }
+    /*  Look for additional NDFs at baseloc. */
+    if ( status == SAI__OK && baseloc ) {
+        traceSiblings( baseloc, ndfid, "", props, &used, &avail, &need,
+                       nsiblings, &status ); 
     }
 
     datAnnul( &ndfloc, &status );
@@ -2066,4 +2101,85 @@ int gaiaNDFSiblingSearch( int ndfid, int *nsiblings, char **props )
 
     emsRlse();
     return TCL_OK;
+}
+
+/*
+ *  Do the work for gaiaNDFSiblingSearch by tracing the properties of any
+ *  siblings to the main NDF. Also searches for additional NDFs in the known
+ *  JAC extension (mainly exists so that can be done recursively).
+ */
+void traceSiblings( HDSLoc *baseloc, int ndfid, const char *prefix,
+                    char **props, int *used, int *avail, int *need,
+                    int *nsiblings, int *status )
+{
+    HDSLoc *newloc = NULL;
+    char *ptr;
+    char name[DAT__SZNAM+1];
+    int added;
+    int dims[NDF__MXDIM];
+    int i;
+    int isect;
+    int ncomp;
+    int ndims;
+    int newid;
+    int place;
+    int same;
+
+    ptr = *props;
+    ptr += *used;
+
+    datNcomp( baseloc, &ncomp, status );
+
+    for ( i = 1; i <= ncomp; i++ ) {
+        *status = SAI__OK;
+        newloc = NULL;
+        datIndex( baseloc, i, &newloc, status );
+
+        /*  See if newloc is an NDF by attempting to open it. */
+        ndfOpen( newloc, "", "READ", "OLD", &newid, &place, status );
+        if ( *status == SAI__OK ) {
+
+            /*  Don't include self twice. */
+            ndfSame( ndfid, newid, &same, &isect, status );
+            if ( ! same ) {
+                (*nsiblings)++;
+
+                /* Add description. */
+                ndfDim( newid, NDF__MXDIM, dims, &ndims, status );
+                datName( newloc, name, status );
+                if ( *avail < *need ) {
+                    *props = (char *) realloc( *props,
+                                               *used + *avail + EMS__SZMSG );
+                    *avail += EMS__SZMSG;
+                    ptr = *props;
+                    ptr += *used;
+                }
+                added = sprintf( ptr, "{{%d} {NDF} {%s%s} {%d} {%d} {%d} {%d}} ",
+                                 *nsiblings, prefix, name,
+                                 ndims, dims[0], dims[1], dims[2] );
+                ptr += added;
+                *avail -= added;
+                *used += added;
+
+                /*  Check this NDF for JAC extensions. */
+                {
+                    int havesmurf = 0;
+                    int istat = SAI__OK;
+                    ndfXstat( newid, "SMURF", &havesmurf, &istat );
+                    if ( havesmurf && istat == SAI__OK ) {
+                        HDSLoc *smurfloc = NULL;
+                        ndfXloc( ndfid, "SMURF", "READ", &smurfloc, &istat );
+                        traceSiblings( smurfloc, newid, "MORE.SMURF.", props,
+                                       used, avail, need, nsiblings, &istat );
+                        datAnnul( &smurfloc, &istat );
+                    }
+                }
+            }
+            ndfAnnul( &newid, status );
+        }
+        datAnnul( &newloc, status );
+        if ( *status != SAI__OK ) {
+            emsAnnul( status );
+        }
+    }
 }
