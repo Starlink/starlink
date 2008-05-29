@@ -286,6 +286,9 @@ itcl::class gaia::GaiaCubeHduChooser {
       set hdu_list [$accessor hdu list]
       $itk_component(table) clear
       $itk_component(table) config -height [llength $hdu_list] -info $hdu_list
+
+      #  And table title.
+      $itk_component(table) configure -title "  [$accessor cget -dataset]  "
    }
 
    #  Set the HDU to display. Makes the currently selected HDU the current HDU

@@ -185,6 +185,9 @@ itcl::class gaia::GaiaHduBrowser {
       $itk_component(table) clear
       $itk_component(table) config -height [llength $hdu_list] -info $hdu_list
       $itk_component(table) select_row 0
+
+      #  And table title.
+      $itk_component(table) configure -title "  [$accessor_ cget -dataset]  "
    }
 
    #  HDU is selected. Need to fire the open_cmd if set.
@@ -217,7 +220,6 @@ itcl::class gaia::GaiaHduBrowser {
          eval $itk_option(-cancel_cmd)
       }
    }
-
 
    #  If the current FITS table is a compressed image or cube, uncompress
    #  it and display.
