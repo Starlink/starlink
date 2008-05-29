@@ -32,13 +32,15 @@
 *     NDF = NDF (Read)
 *          Raw DREAM data file(s)
 *     CONFIG = Literal (Read)
-*          Name of config file
+*          Name of config file. If CONFIG=! some default parameters will be
+*          used.
 *     OUT = NDF (Write)
 *          Output weights file(s)
 
 *  Authors:
 *     Andy Gibb (UBC)
 *     Ed Chapin (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -55,10 +57,13 @@
 *        Modified interface to smf_open_file.
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-05-28 (TIMJ):
+*        Allow CONFIG=!
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 the University of British Columbia. All
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2006, 2007 the University of British Columbia. All
 *     Rights Reserved.
 
 *  Licence:
@@ -151,23 +156,22 @@ void smurf_dreamweights ( int *status ) {
   }
 
   /* Read configuration settings into keymap */
-  parState( "CONFIG", &parstate, status );
-  if( parstate == PAR__ACTIVE ) {
+  if (*status == SAI__OK) {
     kpg1Gtgrp( "CONFIG", &confgrp, &ksize, status );
-    kpg1Kymap( confgrp, &keymap, status );
-    if( confgrp ) grpDelet( &confgrp, status );      
-  } else {
-    /* Should we assume some defaults on behalf of the user, or just
-       throw an error? */
-    /* 2006-10-11: assuming some defaults for convenience... */
-    keymap = astKeyMap("");
-    astMapPut0I( keymap, "GRIDXMIN", -4, "" );
-    astMapPut0I( keymap, "GRIDXMAX", 4, "" );
-    astMapPut0I( keymap, "GRIDYMIN", -4, "" );
-    astMapPut0I( keymap, "GRIDYMAX", 4, "" );
-    astMapPut0D( keymap, "GRIDSTEP", 6.28, "" );
-    /*    *status = SAI__ERROR;
-	  errRep(FUNC_NAME, "CONFIG unspecified", status);      */
+    if (*status == PAR__NULL) {
+      /* NULL value so provide defaults */
+      errAnnul( status );
+      msgOut(" ", "Assuming some default configuration parameters", status);
+      keymap = astKeyMap("");
+      astMapPut0I( keymap, "GRIDXMIN", -4, "" );
+      astMapPut0I( keymap, "GRIDXMAX", 4, "" );
+      astMapPut0I( keymap, "GRIDYMIN", -4, "" );
+      astMapPut0I( keymap, "GRIDYMAX", 4, "" );
+      astMapPut0D( keymap, "GRIDSTEP", 6.28, "" );
+    } else {
+      kpg1Kymap( confgrp, &keymap, status );
+      if( confgrp ) grpDelet( &confgrp, status );      
+    }
   }
 
   /* Retrieve grid parameters */
