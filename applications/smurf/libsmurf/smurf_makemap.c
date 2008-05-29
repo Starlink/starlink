@@ -348,11 +348,13 @@
 *        - Trap SMF__NOMEM from smf_checkmem_map; request new [L/U]BND
 *        - Set [L/U]BOUND
 *        - Fix read error caused by status checking in for loop
-*     2008-05-26 (EC)
+*     2008-05-26 (EC):
 *        - changed default map size to use ~50% of memory if too big
 *        - handle OUT=! case to test map size
 *        - started adding tiling infrastructure: NTILE + TILEDIMS
 *        - check for minimum numbin for histogram
+*     2008-05-28 (TIMJ):
+*        "Proper" provenance propagation.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -459,7 +461,6 @@ void smurf_makemap( int *status ) {
   int ntile;                 /* Number of output tiles */
   int numbin;                /* Number of exposure time bins in histogram */
   int nval;                  /* Number of parameter values supplied */
-  AstKeyMap * obsidmap = NULL; /* Map of OBSIDs from input data */
   smfData *odata=NULL;       /* Pointer to output SCUBA2 data struct */
   Grp *ogrp = NULL;          /* Group containing output file */
   int ondf = NDF__NOID;      /* output NDF identifier */
@@ -469,7 +470,6 @@ void smurf_makemap( int *status ) {
   double par[ 7 ];           /* Projection parameters */
   double params[ 4 ];        /* astRebinSeq parameters */
   int parstate;              /* State of ADAM parameters */
-  AstKeyMap * prvkeymap = NULL; /* Keymap of input files for PRVxxx headers */
   int quit=0;                /* Flag for exiting while loop */
   int rebin=1;               /* Flag to denote whether to use the REBIN method*/
   double scale;              /* How much to scale bounds */
@@ -728,9 +728,6 @@ void smurf_makemap( int *status ) {
     variance = (odata->pntr)[1];
   }
 
-  /* Create provenance keymap */
-  prvkeymap = astKeyMap( "" );
-
   /* Compute number of pixels in output map */
   mapsize = (ubnd_out[0] - lbnd_out[0] + 1) * (ubnd_out[1] - lbnd_out[1] + 1);
 
@@ -801,14 +798,13 @@ void smurf_makemap( int *status ) {
         smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
       }
 
-      /* Store the filename in the keymap for later - the GRP would be fine
-         as is but we use a keymap in order to reuse smf_fits_add_prov */
-      if (*status == SAI__OK)
-        smf_accumulate_prov( prvkeymap, data->file, igrp, i, status );
+      /* Propagate provenance to the output file */
+      smf_accumulate_prov( data, igrp, i, ondf, "SMURF:MAKEMAP(REBIN)",
+                           status);
 
       /* Handle output FITS header creation */
       if (*status == SAI__OK)
-        smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
+        smf_fits_outhdr( data->hdr->fitshdr, &fchan, NULL, status );
 
       msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Beginning the REBIN step", 
                status);
@@ -816,7 +812,7 @@ void smurf_makemap( int *status ) {
       
       smf_rebinmap(data, i, size, outfset, spread, params, moving, 1,
                    lbnd_out, ubnd_out, map, variance, weights3d, status );
-  
+
       /* Close the data file */
       smf_close_file( &data, status);
       
@@ -874,23 +870,18 @@ void smurf_makemap( int *status ) {
           smf_check_units( i, data_units, data->hdr, status);
         }
 
-        /* Store the filename in the keymap for later - the GRP would be fine
-           as is but we use a keymap in order to reuse smf_fits_add_prov */
-        if (*status == SAI__OK)
-          smf_accumulate_prov( prvkeymap, data->file, igrp, i, status );
+        /* Propagate provenance to the output file */
+        smf_accumulate_prov( data, igrp, i, ondf, "SMURF:MAKEMAP(ITER)",
+                             status);
 
         /* Handle output FITS header creation (since the file is open and
-           he header is available) */
+           the header is available) */
         if( *status == SAI__OK ) {
-          smf_fits_outhdr( data->hdr->fitshdr, &fchan, &obsidmap, status );
+          smf_fits_outhdr( data->hdr->fitshdr, &fchan, NULL, status );
         }
 
-        if (*status == SAI__OK) {
-          smf_close_file( &data, status );
-          if( *status != SAI__OK) {
-            errRep(FUNC_NAME, "Bad status closing smfData", status);      
-          }
-        }     
+        /* close the input file */
+        smf_close_file( &data, status );
 
         /* Exit loop if error status */
         if( *status != SAI__OK ) break;
@@ -961,21 +952,15 @@ void smurf_makemap( int *status ) {
   }
 
 
-  /* Retrieve the unique OBSID keys from the KeyMap and populate the OBSnnnnn
-     and PROVCNT headers from this information. */
-  smf_fits_add_prov( fchan, "OBS", obsidmap, status ); 
-  smf_fits_add_prov( fchan, "PRV", prvkeymap, status ); 
-  
-  astAnnul( prvkeymap );
-  astAnnul( obsidmap );
-
   /* If the FitsChan is not empty, store it in the FITS extension of the
      output NDF (any existing FITS extension is deleted). */
-  if( astGetI( fchan, "NCard" ) > 0 ) kpgPtfts( ondf, fchan, status );
+  if( astGetI( fchan, "NCard" ) > 0 ) {
+    kpgPtfts( ondf, fchan, status );
+    fchan = astAnnul( fchan );
+  }
 
   if( outfset != NULL ) {
-    astAnnul( outfset );
-    outfset = NULL;
+    outfset = astAnnul( outfset );
   }
   
   smf_close_file ( &wdata, status );
