@@ -355,6 +355,8 @@
 *        - check for minimum numbin for histogram
 *     2008-05-28 (TIMJ):
 *        "Proper" provenance propagation.
+*     2008-05-29 (EC):
+*        Don't call smf_checkmem_map if OUT=!
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -574,6 +576,11 @@ void smurf_makemap( int *status ) {
   msgOutif( MSG__DEBUG, " ", "Mapbounds took ^TDIFF s", status);
 
   quit = 0;
+
+  /* Check for out=! */
+  parstate = 0;
+  parState( "OUT", &parstate, status );
+
   while( (*status==SAI__OK) && !quit ) {
     /* Allow the user to override defaults */  
     parGet1i( "LBND", 2, lbnd_out, &actval, status );
@@ -595,37 +602,42 @@ void smurf_makemap( int *status ) {
       ubnd_out[ 1 ] = itmp;
     }
     
-    /* Check memory requirements for output map */
-    smf_checkmem_map( lbnd_out, ubnd_out, rebin, maxmem, &mapmem, status );
+    /* Check memory requirements for output map -- unless out=! */
+
+    if( parstate != PAR__NULLST ) {
+      smf_checkmem_map( lbnd_out, ubnd_out, rebin, maxmem, &mapmem, status );
     
-    /* If the user requested too much memory */
-    if( *status == SMF__NOMEM ) {
-      /* Annul the error */
-      errAnnul( status );
+      /* If the user requested too much memory */
+      if( *status == SMF__NOMEM ) {
+        /* Annul the error */
+        errAnnul( status );
         
-      /* Display message indicating necessary *bnd too big */
-      msgSeti("L0",lbnd_out[0]);
-      msgSeti("L1",lbnd_out[1]);
-      msgSeti("U0",ubnd_out[0]);
-      msgSeti("U1",ubnd_out[1]);
-      msgOut(" ", "Map too big: LBND=(^L0,^L1) UBND=(^U0,^U1)", status);
-
-      /* Recommend new size that uses ~50% of maxmem */
-      scale = sqrt(0.5 * (double) maxmem / (double) mapmem);
-      
-      /* Cancel the old values of the parameter */
-      parCancl( "LBND", status );
-      parCancl( "UBND", status );
-
-      /* Set new default size */
-      lbnd_out[0] = (int) ceil(scale*lbnd_out[0]);
-      lbnd_out[1] = (int) ceil(scale*lbnd_out[1]);
-      ubnd_out[0] = (int) floor(scale*ubnd_out[0]);
-      ubnd_out[1] = (int) floor(scale*ubnd_out[1]);
-      parDef1i( "LBND", 2, lbnd_out, status );
-      parDef1i( "UBND", 2, ubnd_out, status );
-
-    } else if( *status == SAI__OK ) {
+        /* Display message indicating necessary *bnd too big */
+        msgSeti("L0",lbnd_out[0]);
+        msgSeti("L1",lbnd_out[1]);
+        msgSeti("U0",ubnd_out[0]);
+        msgSeti("U1",ubnd_out[1]);
+        msgOut(" ", "Map too big: LBND=(^L0,^L1) UBND=(^U0,^U1)", status);
+        
+        /* Recommend new size that uses ~50% of maxmem */
+        scale = sqrt(0.5 * (double) maxmem / (double) mapmem);
+        
+        /* Cancel the old values of the parameter */
+        parCancl( "LBND", status );
+        parCancl( "UBND", status );
+        
+        /* Set new default size */
+        lbnd_out[0] = (int) ceil(scale*lbnd_out[0]);
+        lbnd_out[1] = (int) ceil(scale*lbnd_out[1]);
+        ubnd_out[0] = (int) floor(scale*ubnd_out[0]);
+        ubnd_out[1] = (int) floor(scale*ubnd_out[1]);
+        parDef1i( "LBND", 2, lbnd_out, status );
+        parDef1i( "UBND", 2, ubnd_out, status );
+        
+      } else if( *status == SAI__OK ) {
+        quit = 1;
+      }
+    } else {
       quit = 1;
     }
   }
