@@ -439,6 +439,7 @@ void smurf_makemap( int *status ) {
   AstFitsChan *fchan = NULL; /* FitsChan holding output NDF FITS extension */
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
   int flag;                  /* Flag */
+  int haveout=1;             /* Flag indicating presence of OUT parameter */
   int *histogram = NULL;     /* Histogram for calculating exposure statistics */
   unsigned int *hitsmap;     /* Hitsmap array calculated in ITERATE method */
   dim_t i;                   /* Loop counter */
@@ -471,7 +472,6 @@ void smurf_makemap( int *status ) {
   char pabuf[ 10 ];          /* Text buffer for parameter value */
   double par[ 7 ];           /* Projection parameters */
   double params[ 4 ];        /* astRebinSeq parameters */
-  int parstate;              /* State of ADAM parameters */
   int quit=0;                /* Flag for exiting while loop */
   int rebin=1;               /* Flag to denote whether to use the REBIN method*/
   double scale;              /* How much to scale bounds */
@@ -577,9 +577,15 @@ void smurf_makemap( int *status ) {
 
   quit = 0;
 
-  /* Check for out=! */
-  parstate = 0;
-  parState( "OUT", &parstate, status );
+  /* Create an output smfData */
+  ndgCreat ( "OUT", NULL, &ogrp, &outsize, &flag, status );
+
+  /* If OUT is NULL annul the bad status but set a flag so that we
+     know to skip memory checks and actual map-making */
+  if( *status == PAR__NULL ) {
+    errAnnul( status );
+    haveout = 0;
+  }
 
   while( (*status==SAI__OK) && !quit ) {
     /* Allow the user to override defaults */  
@@ -604,7 +610,7 @@ void smurf_makemap( int *status ) {
     
     /* Check memory requirements for output map -- unless out=! */
 
-    if( parstate != PAR__NULLST ) {
+    if( haveout ) {
       smf_checkmem_map( lbnd_out, ubnd_out, rebin, maxmem, &mapmem, status );
     
       /* If the user requested too much memory */
@@ -711,12 +717,8 @@ void smurf_makemap( int *status ) {
     msgOutif(MSG__VERB, " ", "Tracking a stationary object", status);
   }
 
-  /* Create an output smfData */
-  ndgCreat ( "OUT", NULL, &ogrp, &outsize, &flag, status );
-
-  /* If OUT is NULL annul the bad status and skip map-making */
-  if( *status == PAR__NULL ) {
-    errAnnul( status );
+  /* If OUT is NULL skip map-making */
+  if( !haveout ) {
     goto L998;
   }
 
