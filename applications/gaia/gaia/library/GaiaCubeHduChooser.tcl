@@ -6,7 +6,7 @@
 #     [incr Tk] class
 
 #  Purpose:
-#     Browser for HDUs in FITS or HDS container files.
+#     Chooser for HDUs in FITS or HDS container files.
 
 #  Description:
 #     This class provides an interface for browsing all the extensions
@@ -255,10 +255,10 @@ itcl::class gaia::GaiaCubeHduChooser {
          return
       }
 
-      #  Move to the HDU, it's a cube. Do nothing else yet.
-      if { ( "$Type" == "image" || "$Type" == "NDF" ) && "$NAXIS" >= 3 } {
+      #  Move to the HDU if an image or cube..
+      if { ( "$Type" == "image" || "$Type" == "NDF" ) } {
 
-         #  Update name with this HDU and open it.
+         #  Update name with this HDU.
          set dataset [$accessor cget -dataset]
          if { $namer_ == {} } {
             set namer_ [GaiaImageName \#auto]
@@ -270,7 +270,13 @@ itcl::class gaia::GaiaCubeHduChooser {
          } else {
             $namer_ setfitshdunum $hdu
          }
-         $itk_option(-gaiacube) configure -cube [$namer_ fullname]
+
+         if { "$NAXIS" >= 3 } {
+            $itk_option(-gaiacube) configure -cube [$namer_ fullname]
+         } else {
+            set gaia [$itk_option(-gaiacube) cget -gaia]
+            $gaia open [$namer_ fullname]
+         }
 
          #  Close as need to re-visit to populate for new MEF/NDF.
          quit
