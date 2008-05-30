@@ -219,6 +219,7 @@
 *     2008-05-28 (TIMJ):
 *        - Fix strncpy issues
 *        - Correct call to sc2sim_get_recipe
+*        - use one_strlcpy
 
 *  Copyright:
 *     Copyright (C) 2007, 2008 Science and Technology Facilities Council.
@@ -257,6 +258,7 @@
 #include "mers.h"
 #include "sae_par.h"
 #include "prm_par.h"
+#include "star/one.h"
 
 /* SC2SIM includes */
 #include "sc2sim.h"
@@ -424,23 +426,23 @@ int *status              /* Global status (given and returned) */
    /* Set object name - use planet name if known */
    if ( inx->planetnum != -1 ) {
      if ( inx->planetnum == 2 ) {
-       strncpy( objectname, "VENUS", JCMT__SZTCS_SOURCE+1 );
+       one_strlcpy( objectname, "VENUS", JCMT__SZTCS_SOURCE+1, status );
      } else if ( inx->planetnum == 3 ) {
-       strncpy( objectname, "MOON", JCMT__SZTCS_SOURCE+1 );
+       one_strlcpy( objectname, "MOON", JCMT__SZTCS_SOURCE+1, status );
      } else if ( inx->planetnum == 4 ) {
-       strncpy( objectname, "MARS", JCMT__SZTCS_SOURCE+1 );
+       one_strlcpy( objectname, "MARS", JCMT__SZTCS_SOURCE+1, status );
      } else if ( inx->planetnum == 5 ) {
-       strncpy( objectname, "JUPITER", JCMT__SZTCS_SOURCE+1 );
+       one_strlcpy( objectname, "JUPITER", JCMT__SZTCS_SOURCE+1, status );
      } else if ( inx->planetnum == 6 ) {
-       strncpy( objectname, "SATURN", JCMT__SZTCS_SOURCE+1 );
+       one_strlcpy( objectname, "SATURN", JCMT__SZTCS_SOURCE+1, status );
      } else if ( inx->planetnum == 7 ) {
-       strncpy( objectname, "URANUS", JCMT__SZTCS_SOURCE+1 );
+       one_strlcpy( objectname, "URANUS", JCMT__SZTCS_SOURCE+1, status );
      } else if ( inx->planetnum == 8 ) {
-       strncpy( objectname, "NEPTUNE", JCMT__SZTCS_SOURCE+1 );
+       one_strlcpy( objectname, "NEPTUNE", JCMT__SZTCS_SOURCE+1, status );
      }
    } else {
      /* Generic name... */
-     strncpy( objectname, "SMURF", JCMT__SZTCS_SOURCE+1 );
+     one_strlcpy( objectname, "SMURF", JCMT__SZTCS_SOURCE+1, status );
    }
    astSetFitsS ( fitschan, "OBJECT", objectname, "Object Name", 0 );
    astSetFitsL ( fitschan, "STANDARD", 0, "True if source is a calibrator", 0 );
@@ -700,13 +702,11 @@ int *status              /* Global status (given and returned) */
      instap[1] = DAS2R * inx->instap_y;
 
      /* Set coordinate system */
-     strncpy( cosys, head[0].tcs_tr_sys, JCMT__SZTCS_TR_SYS+1 );
+     one_strlcpy( cosys, head[0].tcs_tr_sys, JCMT__SZTCS_TR_SYS+1, status );
      if ( strncmp( cosys, "APP", 3 ) == 0 ) {
-       strncpy( cosys, "GAPPT", JCMT__SZTCS_TR_SYS+1 );
-       cosys[5] = '\0'; // to be safe
+       one_strlcpy( cosys, "GAPPT", JCMT__SZTCS_TR_SYS+1, status );
      } else if (strncmp( cosys, "J2000", 5 ) == 0) {
-       strncpy( cosys, "ICRS", JCMT__SZTCS_TR_SYS+1 );
-       cosys[4] = '\0'; // to be safe
+       one_strlcpy( cosys, "ICRS", JCMT__SZTCS_TR_SYS+1, status);
      }
 
      /* Loop over number of images */
