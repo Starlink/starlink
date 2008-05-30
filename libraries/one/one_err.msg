@@ -8,5 +8,5 @@ PIPEERR    <Pipe Error>
 LENERR     <Name Length Error>
 MALLOCERR  <Malloc error>
 EXECERROR  <Error in exec/fork>
-
+TRUNC      <String truncated>
 .END

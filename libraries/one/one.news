@@ -1,6 +1,6 @@
-1 ONE_Version_1.1
+1 ONE_Version_1.2
 
-   The Odds and Ends Library (V1.1) is now released. The full specification
+   The Odds and Ends Library (V1.2) is now released. The full specification
    can be found in sun234.
 
    This Library is a set of Fortran and C routines of a general nature and
@@ -21,7 +21,14 @@
    - ONE_SCRSZ: Fortran callable routine written in C to find the width and
    height of the terminal output screen.
 
+   - one_strlcpy: C wrapper around the BSD strlcpy function which itself
+      is a safer replacement for the standard strncpy function.
+
 2 Changes_in_ONE
+
+3 V1.2
+
+   - Add one_strlcpy
 
 3 V1.1
 
