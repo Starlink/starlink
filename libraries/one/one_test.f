@@ -69,7 +69,7 @@
 
 *  Set STATUS OK and report start of test.
       STATUS = SAI__OK      
-      CALL ERR_BEGIN( STATUS )
+      CALL EMS_BEGIN( STATUS )
 
       WRITE(*,*) 'Test of libone routines ...'
       WRITE(*,*) ' '
@@ -111,7 +111,7 @@
 
 *  Reset status and close find file system.
 
-      CALL ERR_ANNUL( STATUS )
+      CALL EMS_ANNUL( STATUS )
       CALL ONE_FIND_FILE_END( CONTEXT, STATUS )
 
       WRITE(*,*) ' '
@@ -149,6 +149,6 @@
          WRITE(*,*) 'Test of libone failed.'
       ENDIF
 
-      CALL ERR_END( STATUS )
+      CALL EMS_END( STATUS )
 
       END
