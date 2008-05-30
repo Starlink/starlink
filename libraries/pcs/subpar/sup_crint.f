@@ -44,6 +44,7 @@
 *  Copyright:
 *     Copyright (C) 1984, 1985, 1990, 1991, 1993, 1994 Science & Engineering Research Council.
 *     Copyright (C) 2000 Central Laboratory of the Research Councils.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -65,6 +66,7 @@
 *  Authors:
 *     BDK: B D Kelly (ROE)
 *     AJC: A J Chipperfield (STARLINK)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 
 *  History:
@@ -87,6 +89,9 @@
 *        (which do not close parameter system at end).
 *      3-FEB-2000 (AJC):
 *        Use SUBPAR_PARGP to get an HDS group name for the parameter
+*     30-AY-2008 (PWD):
+*        When a DAT__INCHK is seen report that the parameter files
+*        will need removing.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -99,26 +104,27 @@
 
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'                 ! SAI Constants
+      INCLUDE 'SAE_PAR'         ! SAI Constants
       INCLUDE 'DAT_PAR'
+      INCLUDE 'DAT_ERR'
       INCLUDE 'SUBPAR_PAR'
 
 
 *  Arguments Given:
-      INTEGER NAMECODE                  ! Parameter number
+      INTEGER NAMECODE          ! Parameter number
 
-      CHARACTER*(*) HDSTYPE             ! type of storage to be created
+      CHARACTER*(*) HDSTYPE     ! type of storage to be created
 
-      INTEGER NDIMS                     ! number of dimensions required
+      INTEGER NDIMS             ! number of dimensions required
 
-      INTEGER DIMS(*)               ! size of dimensions required
+      INTEGER DIMS(*)           ! size of dimensions required
 
 
 *  Arguments Returned:
-      CHARACTER*(DAT__SZLOC) LOC        ! locator to the created storage
+      CHARACTER*(DAT__SZLOC) LOC ! locator to the created storage
 
 *    Status return :
-      INTEGER STATUS                    ! Status Return
+      INTEGER STATUS            ! Status Return
 
 
 *  Global Variables:
@@ -126,7 +132,7 @@
 
 
 *  External Functions:
-      CHARACTER*(DAT__SZGRP) SUBPAR_PARGP           ! HDS group name
+      CHARACTER*(DAT__SZGRP) SUBPAR_PARGP ! HDS group name
       EXTERNAL SUBPAR_PARGP
 
 
@@ -135,17 +141,21 @@
 
       CHARACTER*(DAT__SZLOC) BOTLOC
 
+      CHARACTER*(200) FILNAM    ! name of parameter file
+      CHARACTER*(DAT__SZNAM) PATH ! HDS path of parameter
+
       LOGICAL THERE
 
-      CHARACTER*(DAT__SZTYP) TTYPE      ! type of existing space
+      CHARACTER*(DAT__SZTYP) TTYPE ! type of existing space
 
-      INTEGER TNUM                      ! dimensionality of existing
-                                        ! space
+      INTEGER TNUM              ! dimensionality of existing space
 
-      INTEGER TDIMS(DAT__MXDIM)         ! dimensions of existing space
+      INTEGER TDIMS(DAT__MXDIM) ! dimensions of existing space
 
-      INTEGER J                         ! loop counter
+      INTEGER J                 ! loop counter
 
+      INTEGER NLEV              ! ununsed
+      
 *.
 
 
@@ -234,7 +244,24 @@
          CALL EMS_REP( 'SUP_CRINT1',
      :   'SUBPAR: Failed to obtain parameter file component for '//
      :   'parameter ^P', STATUS )
+         PRINT *, 'STATUS = ', STATUS
 
+*    If DAT__INCHK make the report more helpful.
+         IF ( STATUS .EQ. DAT__INCHK ) THEN
+
+*    Add parameter file name.
+            CALL EMS_MARK
+            STATUS = SAI__OK 
+            CALL HDS_TRACE( EXTLOC, NLEV, PATH, FILNAM, STATUS )
+            CALL EMS_RLSE
+            STATUS = DAT__INCHK
+
+            CALL EMS_SETC( 'F', FILNAM )
+            CALL EMS_REP( 'SUP_CRINT2', 'SUBPAR: Parameter file: '//
+     :                    '^F is corrupt and should be deleted',
+     :                    STATUS )
+
+         END IF
       ENDIF
 
       END

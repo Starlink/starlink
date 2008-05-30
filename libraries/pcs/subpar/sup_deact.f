@@ -390,6 +390,23 @@
                   CALL EMS_REP( 'SUP_DEACT5', 'SUBPAR: '//
      :            'Failed to update GLOBAL file for parameter ^PARAM',
      :             STATUS )
+
+
+*           If the file is corrupt, recommend its removal.
+                  IF ( STATUS .EQ. DAT__INCHK ) THEN
+                     CALL EMS_MARK
+                     STATUS = SAI__OK
+                     CALL SUBPAR_ADMUS( ADMUSR, AULEN, STATUS )
+                     CALL SUBPAR_FNAME( ADMUSR(1:AULEN)//'GLOBAL.sdf',
+     :                                  FILENAME, NAMLEN, STATUS )
+                     CALL EMS_RLSE
+                     STATUS = DAT__INCHK
+                     CALL EMS_SETC( 'F', FILENAME )
+                     CALL EMS_REP( 'SUP_CRINT2',
+     :                           'SUBPAR: The global parameter file: '//
+     :                           '^F is corrupt and should be deleted',
+     :                           STATUS )
+                  END IF
                ENDIF
 
             ENDIF

@@ -1,3 +1,9 @@
+1 PCS Version 4.1-2
+
+When a parameter file returns DAT__INCHK a report recommending
+the removal of the file (including its fullname) is now made.
+Changes to subpar/sup_deact.f and subpar/sup_crint.f.
+
 1 PCS Version 4.1-1
 
 LEX_PARSE now initialises the output token string to prevent warnings from the
