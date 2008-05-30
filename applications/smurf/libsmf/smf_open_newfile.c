@@ -78,6 +78,8 @@
 *        Change API to take lbnd, ubnd from caller
 *     2008-04-14 (EC):
 *        Add named QUALITY extension
+*     2008-05-30 (EC):
+*        Initialize history component
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -228,6 +230,9 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
       return;
     }
   }
+
+  /* Initialize history */
+  ndfHcre( newndf, status );
 
   /* Get filename from the group */
   pname = filename;
