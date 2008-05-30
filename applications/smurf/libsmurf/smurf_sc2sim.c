@@ -486,6 +486,8 @@
 *         History now uses standard SST format.
 *     2008-04-28 (AGG):
 *         Check for simstats parameter before writing simulation info to stdout
+*     2008-05-29 (TIMJ):
+*         Free bolos array.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -782,6 +784,7 @@ void smurf_sc2sim( int *status ) {
   ybc = smf_free( ybc, status );
   xbolo = smf_free( xbolo, status );
   ybolo = smf_free( ybolo, status );
+  bolos = smf_free( bolos, status );
 
   if ( ardGrp ) grpDelet ( &ardGrp, status ); 
   if ( simGrp ) grpDelet ( &simGrp, status ); 
