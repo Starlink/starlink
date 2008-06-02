@@ -43,7 +43,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -75,6 +75,10 @@
 *        - Annul errors and continue if any NDF cannot be opened.
 *     21-NOV-2007 (DSB):
 *        Add CREATR argument.
+*     2-JUN-2008 (DSB):
+*        Use a pair of AST KeyMaps to hold the NDF names rather than a
+*        pair of GRP groups (avoids the need to purgew duplicate NDF
+*        names, which can be very slow for large numbers of NDFs).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -87,15 +91,15 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'GRP_PAR'          ! GRP constants
+      INCLUDE 'AST_PAR'          ! AST constants and functions
       INCLUDE 'DAT_PAR'          ! DAT constants
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'PSX_ERR'          ! PSX error constants
 
 *  Global Variables:
-      INTEGER RDGRP              ! Group holding input NDFs
-      INTEGER WRGRP              ! Group holding output NDFs
-      COMMON /NDG_PRV/ RDGRP, WRGRP
+      INTEGER RDKMP              ! KeyMap holding input NDFs
+      INTEGER WRKMP              ! KeyMap holding output NDFs
+      COMMON /NDG_PRV/ RDKMP, WRKMP
 
 *  Arguments Given:
       CHARACTER CREATR*(*) 
@@ -108,8 +112,8 @@
 
 *  Local Variables:
       CHARACTER AUTOPV*10
-      CHARACTER RDNDF*(GRP__SZNAM)
-      CHARACTER WRNDF*(GRP__SZNAM)
+      CHARACTER RDNDF*512
+      CHARACTER WRNDF*512
       INTEGER INDF1
       INTEGER INDF2
       INTEGER IR
@@ -117,8 +121,6 @@
       INTEGER NR
       INTEGER NW
       INTEGER PLACE
-      INTEGER WRGRP2
-      INTEGER RDGRP2
       LOGICAL INPRV
       LOGICAL THERE
 *.
@@ -126,6 +128,8 @@
 *  Begin a new error reporting context (we want to clean up even if an
 *  error has occurred).
       CALL ERR_BEGIN( STATUS )
+
+*  Initialise things to avoid compiler warnings.
       THERE = .FALSE.
       INDF1 = NDF__NOID
       INDF2 = NDF__NOID
@@ -166,15 +170,10 @@
 *  is unset and at least one input NDF had a provenance extension.
          IF( AUTOPV .EQ. '1' .OR. AUTOPV .EQ. ' ' ) THEN
 
-*  Purge duplicate entries from the two groups. These can be caused if
-*  the same NDF is opened several times.
-            CALL GRP_PURGE( WRGRP, WRGRP2, STATUS )
-            CALL GRP_PURGE( RDGRP, RDGRP2, STATUS )
-
 *  Loop round each output NDF
-            CALL GRP_GRPSZ( WRGRP2, NW, STATUS )
+            NW = AST_MAPSIZE( WRKMP, STATUS )
             DO IW = 1, NW
-               CALL GRP_GET( WRGRP2, IW, 1, WRNDF, STATUS )
+               WRNDF = AST_MAPKEY( WRKMP, IW, STATUS )
 
 *  Check no error has occurred.
                IF( STATUS .EQ. SAI__OK ) THEN 
@@ -202,11 +201,12 @@
 *  Otherwise, loop round each input NDF, maintaining a flag that
 *  indicates if any input NDF had a PROVENANCE extension.
                      INPRV = .FALSE.
-                     CALL GRP_GRPSZ( RDGRP2, NR, STATUS )
-                     DO IR = 1, NR
-                        CALL GRP_GET( RDGRP2, IR, 1, RDNDF, STATUS )
 
-*  Existing NDFs that were opened for UPDATE will be in both groups. Check
+                     NR = AST_MAPSIZE( RDKMP, STATUS )
+                     DO IR = 1, NR
+                        RDNDF = AST_MAPKEY( RDKMP, IR, STATUS )
+
+*  Existing NDFs that were opened for UPDATE will be in both KeyMaps. Check
 *  to make sure we are not establishing an NDF as its own parent. Also
 *  check no error has occurred.
                         IF( WRNDF .NE. RDNDF .AND. 
@@ -251,15 +251,11 @@
      :                                                       STATUS )
                END IF
             END DO
-
-*  Delete the GRP groups.
-            CALL GRP_DELET( RDGRP2, STATUS )
-            CALL GRP_DELET( WRGRP2, STATUS )
          END IF
-
       END IF
 
-      CALL GRP_DELET( RDGRP, STATUS )
-      CALL GRP_DELET( WRGRP, STATUS )
+*  Free resources.
+      CALL AST_ANNUL( RDKMP, STATUS )
+      CALL AST_ANNUL( WRKMP, STATUS )
 
       END

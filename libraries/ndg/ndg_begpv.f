@@ -24,7 +24,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -50,6 +50,10 @@
 *  History:
 *     31-OCT-2007 (DSB):
 *        Original version.
+*     2-JUN-2008 (DSB):
+*        Use a pair of AST KeyMaps to hold the NDF names rather than a
+*        pair of GRP groups (avoids the need to purgew duplicate NDF
+*        names, which can be very slow for large numbers of NDFs).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -62,19 +66,18 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PAR'          ! AST constants and functions
 
 *  Global Variables:
-      INTEGER RDGRP              ! Group holding input NDFs
-      INTEGER WRGRP              ! Group holding output NDFs
-      COMMON /NDG_PRV/ RDGRP, WRGRP
+      INTEGER RDKMP              ! KeyMap holding input NDFs
+      INTEGER WRKMP              ! KeyMap holding output NDFs
+      COMMON /NDG_PRV/ RDKMP, WRKMP
 
 *  External References:
       EXTERNAL NDG1_HNDLR
 
 *  Status:
       INTEGER STATUS             ! Global status
-
-*  Local Variables:
 *.
 
 *  Check the inherited global status.
@@ -93,12 +96,14 @@
 *  default when NDF_PROP or NDF_SCOPY is called.
       CALL NDF_TUNE( 0, 'PXTPROVENANCE', STATUS )
 
-*  Create a GRP group to hold the paths to the NDFs that are read during 
-*  the provenance block.
-      CALL GRP_NEW( 'Input NDFs', RDGRP, STATUS )
+*  Create a AST KeyMap to hold the paths to the NDFs that are read during 
+*  the provenance block. Each KeyMap entry has a key that is an NDF name
+*  (the entry value is of no significance and will be set arbitrarily to 
+*  zero).
+      RDKMP = AST_KEYMAP( ' ', STATUS )
 
-*  Create a GRP group to hold the paths to the NDFs that are written during 
+*  Create a AST KeyMap to hold the paths to the NDFs that are written during 
 *  the provenance block.
-      CALL GRP_NEW( 'Output NDFs', WRGRP, STATUS )
+      WRKMP = AST_KEYMAP( ' ', STATUS )
 
       END

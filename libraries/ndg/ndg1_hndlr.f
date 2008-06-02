@@ -26,7 +26,7 @@
 *        The global status.
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -52,6 +52,10 @@
 *  History:
 *     1-NOV-2007 (DSB):
 *        Original version.
+*     2-JUN-2008 (DSB):
+*        Use a pair of AST KeyMaps to hold the NDF names rather than a
+*        pair of GRP groups (avoids the need to purgew duplicate NDF
+*        names, which can be very slow for large numbers of NDFs).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -65,12 +69,11 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and functions
-      INCLUDE 'DAT_PAR'          ! AST constants and functions
 
 *  Global Variables:
-      INTEGER RDGRP              ! Group holding input NDFs
-      INTEGER WRGRP              ! Group holding output NDFs
-      COMMON /NDG_PRV/ RDGRP, WRGRP
+      INTEGER RDKMP              ! KeyMap holding input NDFs
+      INTEGER WRKMP              ! KeyMap holding output NDFs
+      COMMON /NDG_PRV/ RDKMP, WRKMP
 
 *  Arguments Given:
       CHARACTER EVNAME*(*)
@@ -78,28 +81,28 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
-
-*  Local Variables:
-
 *.
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  If the event was the opening of an input NDF( i.e. an existing NDF 
-*  opened for READ or UPDATE mode), add the path to the NDF to the RDGRP
-*  group.
+*  opened for READ or UPDATE mode), add the path to the NDF to the RDKMP
+*  KeyMap. Use the NDF name as the key, rather than the value so that any
+*  subsequent invocations of this routine with the same NDF will overwrite
+*  the earlier KeyMap entry, rather than creating an extra KeyMap entry.
+*  Arbitrarily store zero as the value for the KeyMap entry.
       IF( EVNAME .EQ. 'READ_EXISTING_NDF' .OR. 
      :    EVNAME .EQ. 'UPDATE_EXISTING_NDF' ) THEN
-         CALL GRP_PUT1( RDGRP, EVTEXT, 0, STATUS )
+         CALL AST_MAPPUT0I( RDKMP, EVTEXT, 0, ' ', STATUS )
       END IF
 
 *  If the event was the opening of an output NDF( i.e. an existing NDF 
 *  opened for UPDATE mode or a new NDF opened), add the path to the NDF 
-*  to the RDGRP group.
+*  to the RDKMP KeyMap.
       IF( EVNAME .EQ. 'UPDATE_EXISTING_NDF' .OR. 
      :    EVNAME .EQ. 'OPEN_NEW_NDF' ) THEN
-         CALL GRP_PUT1( WRGRP, EVTEXT, 0, STATUS )
+         CALL AST_MAPPUT0I( WRKMP, EVTEXT, 0, ' ', STATUS )
       END IF
 
       END
