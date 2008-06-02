@@ -357,6 +357,8 @@
 *        "Proper" provenance propagation.
 *     2008-05-29 (EC):
 *        Don't call smf_checkmem_map if OUT=!
+*     2008-06-02 (EC):
+*        Handle 1-element TILEDIMS
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -664,6 +666,8 @@ void smurf_makemap( int *status ) {
       errAnnul( status );
     } else {
 
+      if( nval == 1 ) tiledims[ 1 ] = tiledims[ 0 ];
+
       /* KLUDGE: Since tiles aren't actually implemented yet, set 
          lbnd_out/ubnd_out to tiledims (like ntile=1) */
       
@@ -680,7 +684,6 @@ void smurf_makemap( int *status ) {
 
 
       /*
-        if( nval == 1 ) tiledims[ 1 ] = tiledims[ 0 ];
         tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes, 
         spread, params, outfset, 1, tiledims,
         0, 0, &ntile, status );
