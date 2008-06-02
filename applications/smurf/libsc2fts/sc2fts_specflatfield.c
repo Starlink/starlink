@@ -21,13 +21,29 @@
 *     ogrp = Grp* (Given)
 *        the group of output files
 *     parKeymap = AstKeyMap* (Given)
-*        the parameter Keymap for this operation
+*        the parameter Keymap for this operation. Currently, there is one 
+*        parameter in parKeymap:
+*        RESP:  the responsivity data file name.
+
 *     status = int* (Given and Returned)
 *        Pointer to global status.  
 
 *  Description:
 *
 *
+* Structure of pixel's spectral responsivity data file.
+* Output of hdstrace:
+RESPONSIVITY  <NDF>
+
+   DATA_ARRAY     <ARRAY>         {structure}
+      DATA(40,32,5000)  <_DOUBLE>    -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,
+                                     ... 0.3931,0.3931,0.3931,0.3931,0.3931
+
+   MORE           <EXT>           {structure}
+      UNIT           <_CHAR*4>       '1/mm'
+      FACTOR         <_DOUBLE>       0.001
+
+End of Trace.
 
 *  Authors:
 *     B.Zhang (UoL)
@@ -70,6 +86,8 @@
 /* SMURF includes */
 #include "libsmf/smf_typ.h"
 
+#include "libsc2sim/sc2sim.h"   /* for constants: BOLCOL, BOLROW */
+
 void sc2fts_specflatfield 
 (
 Grp *igrp,
@@ -78,6 +96,60 @@ AstKeyMap* parKeymap,
 int *status          /* global status (given and returned) */
 )
 {
+   const char* resp_fn;              /* the file name of RESPONSIVITY */
+   HDSLoc *loc_resp = NULL;          /* root HDSLoc */
+   HDSLoc *loc_da = NULL;            /* HDSLoc to DATA_ARRAY */
+   HDSLoc *loc_data = NULL;          /* HDSLoc to DATA of DATA_ARRAY */
+   float *resp_vals = NULL;          /* RESPONSIVITY values */ 
+   HDSLoc *loc_more = NULL;          /* HDSLoc to RESPONSIVITY More */
+   HDSLoc *loc_wn_factor = NULL;     /* HDSLoc to RESPONSIVITY More.FACTOR */
+   double resp_wnfactor;             /* wavenumber factor of RESPONSIVITY */  
+   int resp_size;                    /* size of RESPONSIVITY */
+
+   /* get the Theta file name */
+   if( astMapHasKey( parKeymap, "RESP" ) ==0)
+   {
+     printf("No RESPONSIVITY file!!!\n");
+     return;
+   }
+   else
+   {
+     astMapGet0C(parKeymap, "RESP", &resp_fn);
+   }
+
+   /* NDF start */
+   ndfBegin();
+
+   /* open RESPONSIVITY file */
+   hdsOpen(resp_fn, "READ", &loc_resp, status);
+   datFind(loc_resp, "DATA_ARRAY", &loc_da, status);
+   datFind(loc_da, "DATA", &loc_data, status);
+
+   /* get the size of data_array */
+   datSize(loc_data, &resp_size, status);
+
+   resp_vals = (float*)smf_malloc(resp_size, sizeof(float), 0, status);
+   /* get data_array */
+   datGetVR(loc_data, resp_size, resp_vals,
+            &resp_size, status);
+
+   /* get wavenumber */
+   datFind(loc_resp, "MORE", &loc_more, status);
+   datFind(loc_more, "FACTOR", &loc_wn_factor, status);
+   datGet0D(loc_wn_factor, &resp_wnfactor, status);
+
+   /* close THETA file */
+   datAnnul(&loc_wn_factor, status);
+   datAnnul(&loc_more, status);
+   datAnnul(&loc_data,  status);
+   datAnnul(&loc_da,    status);
+   datAnnul(&loc_resp, status);
+
+  /* release momery */
+  smf_free(resp_vals, status);
+
+  /* NDF end */
+  ndfEnd(status);
+
   printf("SpecFlatfield operation!\n");
-  if(parKeymap != NULL) astShow(parKeymap);
 }

@@ -21,11 +21,12 @@
 *     ogrp = Grp* (Given)
 *        the group of output files
 *     parKeymap = AstKeyMap* (Given)
-*        the parameter Keymap for this operation
+*        the parameter Keymap for this operation. Currently, there is one 
+*        parameter in parKeymap:
+*        THETA:  the THETA data file name.
+
 *     status = int* (Given and Returned)
-*        Pointer to global status. Currently, there is one parameter
-*        in parKeymap:
-*        THETA:  the THETA data file name. 
+*        Pointer to global status.
 
 *  Description:
 *

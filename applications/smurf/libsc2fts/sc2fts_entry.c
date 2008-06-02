@@ -86,7 +86,7 @@ struct sc2fts_fun sc2fts_cal[] =
   { "FREQCORR",      sc2fts_freqcorr },       /* keywords: theta */
   { "PORTIMBALANCE", sc2fts_portimbalance },  /* keywords:  */
   { "TRANSCORR",     sc2fts_transcorr },      /* keywords: tau, am, pwv */
-  { "SPECFLATFIELD", sc2fts_specflatfield },  /* keywords:  */
+  { "SPECFLATFIELD", sc2fts_specflatfield },  /* keywords: resp */
   { "GROUPCOADD",    sc2fts_groupcoadd }      /* keywords:  */
 };
 
