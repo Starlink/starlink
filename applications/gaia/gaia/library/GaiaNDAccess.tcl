@@ -456,9 +456,10 @@ itcl::class gaia::GaiaNDAccess {
       set lbnd2 [lindex $bounds [expr (${axis2}-1)*2]]
       set ubnd2 [lindex $bounds [expr (${axis2}-1)*2+1]]
 
-      #  And create the NDF.
-      set newhandle \
-         [ndf::create $name "$lbnd1 $lbnd2" "$ubnd1 $ubnd2" $fulltype $imagewcs]
+      #  And create the NDF as a copy of this NDF, but without any
+      #  data arrays.
+      set newhandle [ndf::copy $name $handle_ "AXIS, UNITS" \
+                        "$lbnd1 $lbnd2" "$ubnd1 $ubnd2" $fulltype $imagewcs]
 
       #  Create a new instance to manage the new NDF.
       set accessor [uplevel \#0 GaiaNDAccess \#auto]
