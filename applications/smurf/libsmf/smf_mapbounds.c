@@ -163,16 +163,16 @@
 #define FUNC_NAME "smf_mapbounds"
 
 void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ], 
-		    int flag, int *lbnd_out, int *ubnd_out, 
-		    AstFrameSet **outframeset, int *moving, int *status ) {
+                    int flag, int *lbnd_out, int *ubnd_out, 
+                    AstFrameSet **outframeset, int *moving, int *status ) {
 
   /* Local Variables */
   AstSkyFrame *abskyframe = NULL; /* Output Absolute SkyFrame */
   double az[ 2 ];              /* Azimuth values */
   AstMapping *azel2usesys = NULL; /* Mapping form AZEL to requested system */
   AstMapping *bolo2map = NULL; /* Combined mapping bolo->map
-				  coordinates, WCS->GRID Mapping from
-				  input WCS FrameSet */
+                                  coordinates, WCS->GRID Mapping from
+                                  input WCS FrameSet */
   smfData *data = NULL;        /* pointer to  SCUBA2 data struct */
   double dec[ 2 ];             /* Dec values */
   double el[ 2 ];              /* Elevation values */
@@ -192,8 +192,8 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
   AstFrame *sf2 = NULL;        /* Spatial Frame representing requested system */
   double shift[ 2 ];           /* Shifts from PIXEL to GRID coords */
   AstMapping *sky2map = NULL;  /* Mapping celestial->map coordinates,
-				  Sky <> PIXEL mapping in output
-				  FrameSet */
+                                  Sky <> PIXEL mapping in output
+                                  FrameSet */
   AstSkyFrame *skyframe = NULL;/* Output SkyFrame */
   AstFrame *skyin = NULL;      /* Sky Frame in input FrameSet */
   double skyref[ 2 ];          /* Values for output SkyFrame SkyRef attribute */
@@ -244,50 +244,50 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
     if( *status == SAI__OK ) {
       if( data->ndims == 3 ) {
 	
-	/* If OK Decide which detectors (GRID coord) to use for
-	   checking bounds, depending on the instrument in use. */
-	hdr = data->hdr;  
+        /* If OK Decide which detectors (GRID coord) to use for
+           checking bounds, depending on the instrument in use. */
+        hdr = data->hdr;  
 
-	switch( hdr->instrument ) {
+        switch( hdr->instrument ) {
 	  
-	case INST__SCUBA2:
-	  /* 4 corner bolometers of the subarray */
-	  x_array_corners[0] = 1;
-	  x_array_corners[1] = 1;
-	  x_array_corners[2] = (data->dims)[0];
-	  x_array_corners[3] = (data->dims)[0];
+        case INST__SCUBA2:
+          /* 4 corner bolometers of the subarray */
+          x_array_corners[0] = 1;
+          x_array_corners[1] = 1;
+          x_array_corners[2] = (data->dims)[0];
+          x_array_corners[3] = (data->dims)[0];
 	  
-	  y_array_corners[0] = 1;
-	  y_array_corners[1] = (data->dims)[1];
-	  y_array_corners[2] = 1;
-	  y_array_corners[3] = (data->dims)[1];
-	  break;
+          y_array_corners[0] = 1;
+          y_array_corners[1] = (data->dims)[1];
+          y_array_corners[2] = 1;
+          y_array_corners[3] = (data->dims)[1];
+          break;
 	  
-	case INST__AZTEC:
-	  /* Rough guess for extreme bolometers around the edge */
-	  x_array_corners[0] = 22;
-	  x_array_corners[1] = 65;
-	  x_array_corners[2] = 73;
-	  x_array_corners[3] = 98;
+        case INST__AZTEC:
+          /* Rough guess for extreme bolometers around the edge */
+          x_array_corners[0] = 22;
+          x_array_corners[1] = 65;
+          x_array_corners[2] = 73;
+          x_array_corners[3] = 98;
 	  
-	  y_array_corners[0] = 1; /* Always 1 for AzTEC */
-	  y_array_corners[1] = 1;
-	  y_array_corners[2] = 1;
-	  y_array_corners[3] = 1;
-	  break;
+          y_array_corners[0] = 1; /* Always 1 for AzTEC */
+          y_array_corners[1] = 1;
+          y_array_corners[2] = 1;
+          y_array_corners[3] = 1;
+          break;
 	  
-	default:
-	  *status = SAI__ERROR;
-	  errRep(FUNC_NAME, "Don't know how to calculate mapbounds for data created with this instrument", status);	  
-	}
+        default:
+          *status = SAI__ERROR;
+          errRep(FUNC_NAME, "Don't know how to calculate mapbounds for data created with this instrument", status);	  
+        }
       } else {
-	/* Otherwise report error */
-	msgSetc("FILE", pname);
-	msgSeti("THEDIMS", data->ndims);
-	*status = SAI__ERROR;
-	errRep("smf_mapbounds", 
-	       "^FILE data has ^THEDIMS dimensions, should be 3.", 
-	       status);
+        /* Otherwise report error */
+        msgSetc("FILE", pname);
+        msgSeti("THEDIMS", data->ndims);
+        *status = SAI__ERROR;
+        errRep("smf_mapbounds", 
+               "^FILE data has ^THEDIMS dimensions, should be 3.", 
+               status);
       }
     }
 
@@ -296,25 +296,25 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
       /* Get the astrometry for all the time slices in this data file */
       for( j=0; j<(data->dims)[2]; j++ ) {
 
-	/* smf_tslice_ast only needs to get called once to set up framesets */
+        /* smf_tslice_ast only needs to get called once to set up framesets */
 
-	if( data->hdr->wcs == NULL ) {
-	  smf_tslice_ast( data, j, 1, status);
-	}
+        if( data->hdr->wcs == NULL ) {
+          smf_tslice_ast( data, j, 1, status);
+        }
 
         swcsin = hdr->wcs;
 
-	/* Retrieve input SkyFrame */
+        /* Retrieve input SkyFrame */
         skyin = astGetFrame( swcsin, AST__CURRENT );
 
-	/* Create output SkyFrame */
+        /* Create output SkyFrame */
         if ( skyframe == NULL ) {
 
           /* Get the orientation of the map vertical within the output
              celestial coordinate system. This is derived form the
              MAP_PA FITS header, which gives the orientation of the
              map vertical within the tracking system. */
-            map_pa = smf_calc_mappa( hdr, system, skyin, status );
+          map_pa = smf_calc_mappa( hdr, system, skyin, status );
 
           /* Determine the tracking coordinate system, and choose
              the celestial coordinate system for the output cube. */
@@ -324,19 +324,19 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
             usesys = system;
           }
 
-	  /* Begin by taking a copy of the input SkyFrame (in order to
-	     inherit all the other attributes like Epoch, Equinox,
-	     ObsLat, ObsLon, Dut1, etc) and then set its System to the
-	     required system. */
+          /* Begin by taking a copy of the input SkyFrame (in order to
+             inherit all the other attributes like Epoch, Equinox,
+             ObsLat, ObsLon, Dut1, etc) and then set its System to the
+             required system. */
           skyframe = astCopy( skyin );
           astSetC( skyframe, "SYSTEM", usesys );
 
-	  /* We will later record the telescope base pointing position
-	     as the SkyRef attribute in the output SkyFrame. To do
-	     this, we need to convert the stored telescope base
-	     pointing position from AZEL to the requested output
-	     system. Create a Mapping to do this using astConvert, and
-	     then use the Mapping to transform the stored position. */
+          /* We will later record the telescope base pointing position
+             as the SkyRef attribute in the output SkyFrame. To do
+             this, we need to convert the stored telescope base
+             pointing position from AZEL to the requested output
+             system. Create a Mapping to do this using astConvert, and
+             then use the Mapping to transform the stored position. */
           sf1 = astCopy( skyin );
           astSetC( sf1, "SYSTEM", "AZEL" );
           azel2usesys = astConvert( sf1, skyframe, "" );
@@ -345,15 +345,15 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
           azel2usesys = astAnnul( azel2usesys );
           astNorm( skyframe, skyref );
 
-	  /* Determine if the telescope is tracking a moving target
-	     such as a planet or asteroid. This is indicated by
-	     significant change in the telescope base pointing
-	     position within the ICRS coordinate system. Here,
-	     "significant" means more than 1 arc-second. Apparently
-	     users will only want to track moving objects if the
-	     output cube is in AZEL or GAPPT, so we ignoring a moving
-	     base pointing position unless the output system is AZEL
-	     or GAPPT. */
+          /* Determine if the telescope is tracking a moving target
+             such as a planet or asteroid. This is indicated by
+             significant change in the telescope base pointing
+             position within the ICRS coordinate system. Here,
+             "significant" means more than 1 arc-second. Apparently
+             users will only want to track moving objects if the
+             output cube is in AZEL or GAPPT, so we ignoring a moving
+             base pointing position unless the output system is AZEL
+             or GAPPT. */
           if( !strcmp( usesys, "AZEL" ) || !strcmp( usesys, "GAPPT" ) ) {
             /* Set the "sf2" SkyFrame to represent ICRS coords
                ("sf1" already represents AZEL coords). */
@@ -361,9 +361,9 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
             astSetC( sf2, "System", "ICRS" );
 
             /* Set the Epoch for `sf1' andf `sf2' to the epoch of the
-	    first time slice, then use the Mapping from `sf1' (AzEl) to
-	    `sf2' (ICRS) to convert the telescope base pointing position
-	    for the first time slices from (az,el) to ICRS. */
+               first time slice, then use the Mapping from `sf1' (AzEl) to
+               `sf2' (ICRS) to convert the telescope base pointing position
+               for the first time slices from (az,el) to ICRS. */
 
             astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
                     (hdr->allState)[ 0 ].tcs_tai + 32.184/86400.0 );
@@ -375,9 +375,9 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
 
 
             /* Set the Epoch for `sf1' andf `sf2' to the epoch of the
-	    last time slice, then use the Mapping from `sf1' (AzEl) to
-	    `sf2' (ICRS) to convert the telescope base pointing position
-	    for the last time slices from (az,el) to ICRS. */
+               last time slice, then use the Mapping from `sf1' (AzEl) to
+               `sf2' (ICRS) to convert the telescope base pointing position
+               for the last time slices from (az,el) to ICRS. */
 
             astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
                     (hdr->allState)[ hdr->nframes - 1 ].tcs_tai + 32.184/86400.0 );
@@ -386,10 +386,10 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
             az[ 1 ] = (hdr->allState)[ hdr->nframes - 1 ].tcs_az_bc1;
             el[ 1 ] = (hdr->allState)[ hdr->nframes - 1 ].tcs_az_bc2;
             astTran2( astConvert( sf1, sf2, "" ), 1, az + 1, el + 1, 1, 
-                                                     ra + 1, dec + 1 );
+                      ra + 1, dec + 1 );
 
-	    sf1 = astAnnul( sf1 );
-	    sf2 = astAnnul( sf2 );
+            sf1 = astAnnul( sf1 );
+            sf2 = astAnnul( sf2 );
             /* Get the arc distance between the two positions and
                see if it is greater than 0.1 arc-sec. */
             sep = slaDsep( ra[ 0 ], dec[ 0 ], ra[ 1 ], dec[ 1 ] );
@@ -397,15 +397,15 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
           } else {
             *moving = 0;
           }
-	  /* Just for kicks, let the user know the value of *moving */
+          /* Just for kicks, let the user know the value of *moving */
           msgSeti("M",*moving);
           msgSetd("R", sep*AST__DR2D*3600.0 );
           msgOutif(MSG__VERB, " ", "Moving = ^M (^R arcsec)", status);
         } /* End skyframe construction */
 
-	/* Set the reference position to the telescope BASE position */
-	astSetD( skyframe, "SkyRef(1)", skyref[0] );
-	astSetD( skyframe, "SkyRef(2)", skyref[1] );
+        /* Set the reference position to the telescope BASE position */
+        astSetD( skyframe, "SkyRef(1)", skyref[0] );
+        astSetD( skyframe, "SkyRef(2)", skyref[1] );
         /* Before adding to frameset, ensure that the SkyFrame
            represents offsets from the first telescope base position,
            rather than absolute coordinates */
@@ -416,43 +416,43 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
           par[3] = 0.0;
         } else {
           astSet( skyframe, "SkyRefIs=ignored,AlignOffset=0" );
-	  /* If `flag' is set, use lon_0/lat_0 values given, else set
-	     them to the skyref coordinates  */
-	  if( !flag ) {
-	    par[2] = skyref[0];
-	    par[3] = skyref[1];
-	  }
-	}
+          /* If `flag' is set, use lon_0/lat_0 values given, else set
+             them to the skyref coordinates  */
+          if( !flag ) {
+            par[2] = skyref[0];
+            par[3] = skyref[1];
+          }
+        }
 
-	/* Ensure the pixel sizes have the correct signs. */
-	if( par[4] != AST__BAD ) {
-	  if( usesys && !strcmp( usesys, "AZEL" ) ) {
+        /* Ensure the pixel sizes have the correct signs. */
+        if( par[4] != AST__BAD ) {
+          if( usesys && !strcmp( usesys, "AZEL" ) ) {
             par[4] = fabs( par[4] );
-	  } else {
+          } else {
             par[4] = -fabs( par[4] );
-	  }
-	  par[5] = fabs( par[5] );
-	}
+          }
+          par[5] = fabs( par[5] );
+        }
 
-	/* Update par to contain some reasonable defaults */
-	par[0] = 1.0;
-	par[1] = 1.0;
-	par[4] = (3./3600.)*AST__DD2R;
-	par[5] = (3./3600.)*AST__DD2R;
-	par[6] = map_pa;
+        /* Update par to contain some reasonable defaults */
+        par[0] = 1.0;
+        par[1] = 1.0;
+        par[4] = (3./3600.)*AST__DD2R;
+        par[5] = (3./3600.)*AST__DD2R;
+        par[6] = map_pa;
 
-	/* Ensure the pixel sizes have the correct signs. */
-	if( par[4] != AST__BAD ) {
-	  if( usesys && !strcmp( usesys, "AZEL" ) ) {
+        /* Ensure the pixel sizes have the correct signs. */
+        if( par[4] != AST__BAD ) {
+          if( usesys && !strcmp( usesys, "AZEL" ) ) {
             par[4] = fabs( par[4] );
-	  } else {
+          } else {
             par[4] = -fabs( par[4] );
-	  }
-	  par[5] = fabs( par[5] );
-	}
+          }
+          par[5] = fabs( par[5] );
+        }
 
-	/* Update par based on user-specified values */
-	smf_get_projpar( skyframe, par, NULL, status );
+        /* Update par based on user-specified values */
+        smf_get_projpar( skyframe, par, NULL, status );
 
         if ( *outframeset == NULL && skyframe != NULL && (*status == SAI__OK)){
           /* Now populate a FitsChan with FITS-WCS headers describing
@@ -462,20 +462,20 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
              degrees as required by FITS. */
           fitschan = astFitsChan ( NULL, NULL, "" );
 
-	  if( !strcmp( astGetC( skyframe, "System" ), "AZEL" ) ){
-	    astSetFitsS( fitschan, "CTYPE1", "AZ---TAN", " ", 1 );
-	    astSetFitsS( fitschan, "CTYPE2", "EL---TAN", " ", 1 );
-	  } else {
-	    astSetFitsS( fitschan, "CTYPE1", "RA---TAN", " ", 1 );
-	    astSetFitsS( fitschan, "CTYPE2", "DEC--TAN", " ", 1 );
-	  }
-	  astSetFitsF( fitschan, "CRPIX1", par[0], " ", 1 );
-	  astSetFitsF( fitschan, "CRPIX2", par[1], " ", 1 );
-	  astSetFitsF( fitschan, "CRVAL1", par[2]*AST__DR2D, " ", 1 );
-	  astSetFitsF( fitschan, "CRVAL2", par[3]*AST__DR2D, " ", 1 );
-	  astSetFitsF( fitschan, "CDELT1", par[4]*AST__DR2D, " ", 1 );
-	  astSetFitsF( fitschan, "CDELT2", par[5]*AST__DR2D, " ", 1 );
-	  astSetFitsF( fitschan, "CROTA2", par[6]*AST__DR2D, " ", 1 );
+          if( !strcmp( astGetC( skyframe, "System" ), "AZEL" ) ){
+            astSetFitsS( fitschan, "CTYPE1", "AZ---TAN", " ", 1 );
+            astSetFitsS( fitschan, "CTYPE2", "EL---TAN", " ", 1 );
+          } else {
+            astSetFitsS( fitschan, "CTYPE1", "RA---TAN", " ", 1 );
+            astSetFitsS( fitschan, "CTYPE2", "DEC--TAN", " ", 1 );
+          }
+          astSetFitsF( fitschan, "CRPIX1", par[0], " ", 1 );
+          astSetFitsF( fitschan, "CRPIX2", par[1], " ", 1 );
+          astSetFitsF( fitschan, "CRVAL1", par[2]*AST__DR2D, " ", 1 );
+          astSetFitsF( fitschan, "CRVAL2", par[3]*AST__DR2D, " ", 1 );
+          astSetFitsF( fitschan, "CDELT1", par[4]*AST__DR2D, " ", 1 );
+          astSetFitsF( fitschan, "CDELT2", par[5]*AST__DR2D, " ", 1 );
+          astSetFitsF( fitschan, "CROTA2", par[6]*AST__DR2D, " ", 1 );
 
           astClear( fitschan, "Card" );
           fs = astRead( fitschan );
@@ -488,21 +488,21 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
           astClear( abskyframe, "SkyRefIs" );
           astClear( abskyframe, "AlignOffset" );
 
-	  /* Tidy up */
-	  fs = astAnnul( fs );
-	  /* Create the output FrameSet */
+          /* Tidy up */
+          fs = astAnnul( fs );
+          /* Create the output FrameSet */
           *outframeset = astFrameSet( astFrame(2, "Domain=GRID"), "");
 
-	  /* Now add the SkyFrame to it */
+          /* Now add the SkyFrame to it */
           astAddFrame( *outframeset, AST__BASE, sky2map, skyframe );
-	  /* Invert the sky2map mapping */
+          /* Invert the sky2map mapping */
           astInvert( sky2map );
 
         } /* End WCS FrameSet construction */
 
-	/* Calculate the bolo to map-pixel transformation for this tslice */
-	bolo2map = smf_rebin_totmap( data, j, abskyframe, sky2map, 
-				     *moving, status );
+        /* Calculate the bolo to map-pixel transformation for this tslice */
+        bolo2map = smf_rebin_totmap( data, j, abskyframe, sky2map, 
+                                     *moving, status );
 
         if ( *status == SAI__OK ) {
           /* Check corner pixels in the array for their projected extent
@@ -527,11 +527,11 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
             if( y_map[k] > ubnd_out[1] ) ubnd_out[1] = y_map[k];
           }
         }
-	/* Explicitly annul these mappings each time slice for reduced
-	   memory usage */
-	if (bolo2map) bolo2map = astAnnul( bolo2map );
-	if (fs) fs = astAnnul( fs );
-	if ( skyin ) skyin = astAnnul( skyin );
+        /* Explicitly annul these mappings each time slice for reduced
+           memory usage */
+        if (bolo2map) bolo2map = astAnnul( bolo2map );
+        if (fs) fs = astAnnul( fs );
+        if ( skyin ) skyin = astAnnul( skyin );
 
         /* Break out of loop over time slices if bad status */
         if (*status != SAI__OK) goto CLEANUP;
