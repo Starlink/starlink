@@ -841,8 +841,12 @@ itcl::class gaia::GaiaCube {
          #  the RtdImage) so that the data replacement happens on the file
          #  we've just loaded (can get out of sync when unexpected errors
          #  autoloading Tcl scripts occur, which defer the newImage acceptance
-         #  callbacks).
-         update
+         #  callbacks). Unset ndfname_ so that this method isn't called 
+         #  during the update.
+         set temp $ndfname_
+         set ndfname_ {}
+         ::update
+         set ndfname_ $temp
 
          #  Cube may have been waiting for clear.
          if { $cubeaccessor_ == {} } {
