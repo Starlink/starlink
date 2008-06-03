@@ -410,10 +410,9 @@ itcl::class gaia::GaiaNDAccess {
    }
 
    #  Create an NDF that represents the bare bones of an image extracted from
-   #  the attached dataset that is a cube. The bare bones are an NDF of the
-   #  correct dimensions and bounds, with an appropriate WCS. No data
-   #  components are copied. Returns a new instance of this class wrapping the
-   #  new NDF.
+   #  the attached dataset, which must be a cube. The bare bones are an NDF of
+   #  the include everything, except the data components. Returns a new
+   #  instance of this class wrapping the new NDF.
    public method createimage {name axis {component "DATA"}} {
       if { $addr_($component) == 0 } {
          error "Must map in cube data before creating an image"
