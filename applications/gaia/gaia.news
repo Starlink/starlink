@@ -16,9 +16,8 @@
     deviations using the component name ERROR. ERROR is also selectable
     in the NDF chooser dialog.
  
-    The various configuration images (exposure and Tsys) stored in the 
-    SMURF extension of NDFs will now be shown as children of an NDF 
-    and can be selected for display.
+    NDFs stored in the extensions of an NDF will now be offered for display
+    in the various chooser and browser dialogs.
 
     Spectral extraction can now display error bars based on the data
     variance.

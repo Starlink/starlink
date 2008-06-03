@@ -96,7 +96,8 @@ public:
 
    //  Read an NDF and return a pointer to an allocated NDFIO object
    //  NULL if an error occurred.
-   static NDFIO *read( const char *filename, const char *component );
+   static NDFIO *read( const char *filename, const char *component,
+                       int deep_search );
 
    //  Return the class name as a string.
    const char* classname() const { return "NDFIO"; }

@@ -300,8 +300,8 @@ itcl::class gaia::GaiaHduBrowser {
       $namer_ configure -imagename $dataset
 
       if { "$Type" == "NDF" } {
-         if { $ExtName != "" } { 
-            $namer_ setpath ".${ExtName}"
+         if { $ExtName != "" && $ExtName != "." } { 
+            $namer_ setpath "${ExtName}"
          }
       } else {
          $namer_ setfitshdunum $hdu

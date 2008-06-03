@@ -154,7 +154,8 @@ int NDFIO::wcsinit()
 //  compatible object (FITS-like). The filename is the fully specified name of
 //  the file containing the NDF.
 //-
-NDFIO *NDFIO::read( const char *filename, const char *component )
+NDFIO *NDFIO::read( const char *filename, const char *component, 
+                    int deepsearch )
 {
     Mem data;
     Mem header;
@@ -180,7 +181,7 @@ NDFIO *NDFIO::read( const char *filename, const char *component )
     //  that describes the NDFs (of a list of NDFs if more than one are
     //  available at the given HDS path). Displayable array components
     //  of each NDF are known as "displayables".
-    if ( gaiaInitMNDF( filename, &NDFinfo, &error_mess ) ) {
+    if ( gaiaInitMNDF( filename, deepsearch, &NDFinfo, &error_mess ) ) {
 
         //  Now check that the first NDF contains a displayable that
         //  corresponds to the given component.

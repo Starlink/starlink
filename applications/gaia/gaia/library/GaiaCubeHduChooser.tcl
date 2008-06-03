@@ -266,7 +266,9 @@ itcl::class gaia::GaiaCubeHduChooser {
          $namer_ configure -imagename $dataset
 
          if { "$Type" == "NDF" } {
-            $namer_ setpath ".${ExtName}"
+            if { $ExtName != "." } {
+               $namer_ setpath "${ExtName}"
+            }
          } else {
             $namer_ setfitshdunum $hdu
          }

@@ -51,7 +51,8 @@ extern "C" {
 /*  ===================================== */
 
    /*  Initialise multiple NDF access */
-   int gaiaInitMNDF( const char *name, void **handle, char **error_mess );
+   int gaiaInitMNDF( const char *name, int deepsearch, void **handle, 
+                     char **error_mess );
 
    /*  Check component of NDF exists */
    int gaiaCheckMNDF( const void *handle, int index, const char *component );
@@ -171,7 +172,8 @@ extern "C" {
     int gaiaNDFFindChild( const char *name, int *ndfid, char **error_mess );
 
     /* Enerumerate the number of siblings an NDF has. */
-    int gaiaNDFSiblingSearch( int ndfid, int *nsiblings, char **props );
+    int gaiaNDFSiblingSearch( int ndfid, int deepsearch, int *nsiblings, 
+                              char **props );
 
 #ifdef __cplusplus
 }

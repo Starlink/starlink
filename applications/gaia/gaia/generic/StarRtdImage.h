@@ -16,7 +16,7 @@
  *  Copyright:
  *     Copyright (C) 1997-2005 Central Laboratory of the Research Councils.
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
- *     Copyright (C) 2007 Science and Technology Facilities Council.
+ *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -90,6 +90,7 @@ typedef struct Gaia_Options : Rtd_Options
 {
     char *ast_tag;      // Canvas tag for all ast graphics
     char *component;    // NDF component to display
+    int deep_search;    // Look for NDFs in extensions
     int plot_wcs;       // Scale and orient plot symbols using WCS system if available
     int ukirt_ql;       // Whether ukirt quick look stats are enabled.
     int pixel_indices;  // Whether X,Y coordinates are pixel indices.
@@ -116,6 +117,7 @@ class StarRtdImageOptions : public RtdImageOptions
 
         gaia_options_.ast_tag = NULL;
         gaia_options_.component= NULL;
+        gaia_options_.deep_search = 1;
         gaia_options_.plot_wcs = 1;
         gaia_options_.ukirt_ql = 0;
         gaia_options_.pixel_indices = 0;
@@ -136,6 +138,9 @@ static int Gaia_Options_Offset( const char* member )
     if ( member[0] == 'c' && member[1] == 'o' ) {
         return (char *)&ptr->component - (char *)ptr;
     }
+    if ( member[0] == 'd' && member[1] == 'e' ) {
+        return (char *)&ptr->deep_search - (char *)ptr;
+    }
     if ( member[0] == 'p' && member[1] == 'l' ) {
         return (char *)&ptr->plot_wcs - (char *)ptr;
     }
@@ -153,6 +158,7 @@ static int Gaia_Options_Offset( const char* member )
 #define GAIA_OPTIONS \
 {TK_CONFIG_STRING, "-ast_tag",        NULL, NULL, "ast_element", GAIA_OPTION("ast_tag"),       0, NULL}, \
 {TK_CONFIG_STRING, "-component",      NULL, NULL, "data",        GAIA_OPTION("component"),     0, NULL}, \
+{TK_CONFIG_INT,    "-deep_search",    NULL, NULL, "1",           GAIA_OPTION("deep_search"),   0, NULL}, \
 {TK_CONFIG_INT,    "-plot_wcs",       NULL, NULL, "1",           GAIA_OPTION("plot_wcs"),      0, NULL}, \
 {TK_CONFIG_INT,    "-ukirt_ql",       NULL, NULL, "0",           GAIA_OPTION("ukirt_ql"),      0, NULL}, \
 {TK_CONFIG_INT,    "-pixel_indices",  NULL, NULL, "0",           GAIA_OPTION("pixel_indices"), 0, NULL}
@@ -163,6 +169,7 @@ static int Gaia_Options_Offset( const char* member )
 #define GAIA_OPTIONS \
 {TK_CONFIG_STRING, "-ast_tag",        NULL, NULL, "ast_element", GAIA_OPTION(ast_tag),       0, NULL}, \
 {TK_CONFIG_STRING, "-component",      NULL, NULL, "data",        GAIA_OPTION(component),     0, NULL}, \
+{TK_CONFIG_INT,    "-deep_search",    NULL, NULL, "1",           GAIA_OPTION(deep_search),   0, NULL}, \
 {TK_CONFIG_INT,    "-plot_wcs",       NULL, NULL, "1",           GAIA_OPTION(plot_wcs),      0, NULL}, \
 {TK_CONFIG_INT,    "-ukirt_ql",       NULL, NULL, "0",           GAIA_OPTION(ukirt_ql),      0, NULL}, \
 {TK_CONFIG_INT,    "-pixel_indices",  NULL, NULL, "0",           GAIA_OPTION(pixel_indices), 0, NULL}
@@ -393,6 +400,11 @@ class StarRtdImage : public Skycat
    //  Return the NDF component displayed.
    char *component() const {
        return ((StarRtdImageOptions* )options_)->gaia_options_.component;
+   }
+
+   //  Return whether we're checking for related NDFs in extensions.
+   int deep_search() const {
+       return ((StarRtdImageOptions* )options_)->gaia_options_.deep_search;
    }
 
    //  Return whether to scale and orient plotting symbols using the WCS

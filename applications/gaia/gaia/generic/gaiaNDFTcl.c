@@ -64,6 +64,7 @@ struct NDFinfo {
     int fitschanmod;       /* Set true then fitschan has been modified
                             * (will require saving) */
     int nhdu;              /* Number of HDUs associated with this NDF */
+    int deepsearch;        /* Whether this was a deepsearch. */
     char *hdulist;         /* Tcl list of the properties of each HDU */
 };
 typedef struct NDFinfo NDFinfo;
@@ -1585,18 +1586,21 @@ static int gaiaNDFTclGetPropertyDims( ClientData clientData,
  *
  * The headings are: HDU Type ExtName NAXIS NAXIS1 NAXIS2 NAXIS3, note we
  * do not also list the presence of other displayable components in the NDF
- * (variance & quality) and Type is always "NDF".
+ * (variance & quality) and Type is always "NDF". A deeper search for children
+ * in the NDFs extensions can also be included when querying for a list.
  */
 static int gaiaNDFTclHdu( ClientData clientData, Tcl_Interp *interp,
                            int objc, Tcl_Obj *CONST objv[] )
 {
     NDFinfo *info;
+    int deepsearch = 1;
     int result;
 
-    /* Check arguments, need the NDF handle and the hdu command. */
-    if ( objc < 2 || objc > 5 ) {
+    /* Check arguments, need the NDF handle, the hdu command and whether to 
+     * look for NDFs in the extension. */
+    if ( objc < 3 || objc > 4 ) {
         Tcl_WrongNumArgs( interp, 1, objv, 
-                          "ndf_handle [list|listheadings|get]" );
+                          "ndf_handle [list|listheadings|get] [deepsearch]" );
         return TCL_ERROR;
     }
 
@@ -1608,7 +1612,7 @@ static int gaiaNDFTclHdu( ClientData clientData, Tcl_Interp *interp,
 
     const char *action = Tcl_GetString( objv[2] );
 
-    /*  hdu listheadings. */
+    /* hdu listheadings. */
     if ( strcmp( action, "listheadings" ) == 0 ) {
         Tcl_SetResult( interp, "HDU Type ExtName NAXIS NAXIS1 NAXIS2 NAXIS3",
                        TCL_VOLATILE );
@@ -1617,10 +1621,20 @@ static int gaiaNDFTclHdu( ClientData clientData, Tcl_Interp *interp,
 
     /* hdu list. */
     if ( strcmp( action, "list" ) == 0 ) {
+        if ( objc == 4 ) {
+            Tcl_GetIntFromObj( interp, objv[3], &deepsearch );
+        }
 
-        /* If this NDF hasn't been check for "HDUs" then do that now. */
-        if ( info->nhdu == -1 ) {
-            gaiaNDFSiblingSearch( info->ndfid, &info->nhdu, &info->hdulist );
+        /* If this NDF hasn't been checked for "HDUs" then do that now. 
+         * Also need to do this again if deepsearch changes as that produces a
+         * different listing*/
+        if ( info->nhdu == -1 || ( deepsearch != info->deepsearch ) ) {
+            if ( info->hdulist != NULL ) {
+                free( info->hdulist );
+            }
+            info->deepsearch = deepsearch;
+            gaiaNDFSiblingSearch( info->ndfid, deepsearch, &info->nhdu, 
+                                  &info->hdulist );
         }
         Tcl_SetResult( interp, info->hdulist, TCL_VOLATILE );
         return TCL_OK;

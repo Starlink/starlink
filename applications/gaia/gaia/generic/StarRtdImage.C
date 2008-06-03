@@ -13,8 +13,9 @@
  *     Allan Brighton, ESO (ALLAN)
 
  *  Copyright:
- *     Copyright (C) 1997-2005 Central Laboratory of the Research Councils
+ *     Copyright (C) 1997-2005 Central Laboratory of the Research Councils.
  *     Copyright (C) 2006-2007 Particle Physics & Astronomy Research Council.
+ *     Copyright (C) 2008 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -592,13 +593,13 @@ ImageData* StarRtdImage::getStarImage( const char* filename,
             if ( slice ) strcat( fullname, slice );
 
             //  Open image.
-            imio = NDFIO::read( fullname, component() );
+            imio = NDFIO::read( fullname, component(), deep_search() );
             delete[] fullname;
 
         } else {
 
             //  Plain name so just open image.
-            imio = NDFIO::read( filename, component() );
+            imio = NDFIO::read( filename, component(), deep_search() );
         }
     }  else {
 
@@ -5669,7 +5670,7 @@ int StarRtdImage::fullNameCmd( int argc, char *argv[] )
             hasvar[32], hasqual[32];
         ndf->getNDFInfo( nndf, ndfpath, naxis1, naxis2, hasvar, hasqual );
 
-        if ( ndfpath[0] == '.' ) {
+        if ( ndfpath[0] == '.' && ndfpath[1] == '\0' ) {
             //  Main NDF, just return name.
             set_result( file() );
         } else {
