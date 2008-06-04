@@ -163,9 +163,6 @@
 
 #define FUNC_NAME "smf_rebinsparse"
 
-/* Returns nearest integer to "x" */
-#define NINT(x) ( ( x > 0 ) ? (int)( x + 0.5 ) : (int)( x - 0.5 ) )
-
 void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
                       AstMapping *ospecmap, AstSkyFrame *oskyframe, 
                       Grp *detgrp, int lbnd_out[ 3 ], int ubnd_out[ 3 ], 

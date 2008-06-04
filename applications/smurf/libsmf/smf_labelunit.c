@@ -89,9 +89,6 @@
 
 #define FUNC_NAME "smf_labelunit"
 
-/* Returns nearest integer to "x" */
-#define NINT(x) ( ( x > 0 ) ? (int)( x + 0.5 ) : (int)( x - 0.5 ) )
-
 void smf_labelunit( Grp *igrp,  int size, smfData *odata, int *status ){
 
 /* Local Variables */

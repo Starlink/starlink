@@ -231,9 +231,6 @@
 #define FUNC_NAME "smf_cubegrid"
 
 
-/* Returns nearest integer to "x" */
-#define NINT(x) ( ( (x) > 0 ) ? (int)( (x) + 0.5 ) : (int)( (x) - 0.5 ) )
-
 void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos, 
                    int autogrid, int alignsys, Grp *detgrp, double par[ 7 ], 
                    int *moving, AstSkyFrame **skyframe, int *sparse, 

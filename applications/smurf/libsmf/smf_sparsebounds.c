@@ -132,9 +132,6 @@
 
 #define FUNC_NAME "smf_sparsebounds"
 
-/* Returns nearest integer to "x" */
-#define NINT(x) ( ( x > 0 ) ? (int)( x + 0.5 ) : (int)( x - 0.5 ) )
-
 void smf_sparsebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe, 
                        int usedetpos, Grp *detgrp, int lbnd[ 3 ], 
                        int ubnd[ 3 ], AstFrameSet **wcsout, int *hasoffexp, 
