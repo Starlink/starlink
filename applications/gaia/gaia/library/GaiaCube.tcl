@@ -178,11 +178,11 @@ itcl::class gaia::GaiaCube {
       add_menu_short_help $Options {Autocut}  \
          {Continuously change set the cuts of the image slices, data limits}
 
-      #  Choice of cube component.
-      set submenu [menu $Options.component]
-      $Options add cascade -label "Data component" -menu $submenu
+      #  Choice of cube component, only for NDFs.
+      set component_menu_ [menu $Options.component]
+      $Options add cascade -label "NDF data component" -menu $component_menu_
       foreach type {DATA VARIANCE ERROR QUALITY} {
-         $submenu add radiobutton \
+         $component_menu_ add radiobutton \
             -variable [scope component_] \
             -value $type \
             -label $type \
@@ -194,7 +194,6 @@ itcl::class gaia::GaiaCube {
       set submenu [menu $Options.slave]
       $Options add cascade -label "Slaves" -menu $submenu
       $submenu config -postcommand [code $this update_slave_menu_ $submenu]
-
 
       #  Submenus to offer font + colour controls for label in main window.
       $Options add cascade -label "Label colour" -menu [menu $Options.labelcolor]
@@ -706,6 +705,9 @@ itcl::class gaia::GaiaCube {
 
          #  Update FITS headers, if viewed.
          maybe_update_fitsheaders_
+
+         #  Disable or enable NDF component menu.
+         configure_component_menu_
       }
    }
 
@@ -1148,6 +1150,20 @@ itcl::class gaia::GaiaCube {
       #  Fallback when component doesn't exist.
       set last_component_ $component_
    }
+
+   #  Enable or disable items in NDF component menu depending on whether we
+   #  have an NDF cube or not.
+   protected method configure_component_menu_ {} {
+      if { $type_ == ".sdf" } {
+         set state normal
+      } else {
+         set state disabled
+      }
+      foreach type {DATA VARIANCE ERROR QUALITY} {
+         $component_menu_ entryconfigure $type -state $state
+      }
+   }
+
 
    #  Read a region from an ARD file.
    protected method read_ard_region_ {} {
@@ -1931,6 +1947,9 @@ itcl::class gaia::GaiaCube {
       -adobe-courier-medium-o-*-*-*-240-*-*-*-*-*-*
       -adobe-courier-bold-r-*-*-*-240-*-*-*-*-*-*
    }
+
+   #  Menu used for NDF component selection.
+   protected variable component_menu_ {}
 
    #  Common variables: (shared by all instances)
    #  -----------------
