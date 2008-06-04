@@ -1193,7 +1193,7 @@ F77_SUBROUTINE(kpg1_opgrd)( INTEGER(NPOS),
                             INTEGER(STATUS) );
 
 
-void kpg1Opgrd( int npos, double *pos, int west, double *par, double *rdiam, int *status ){
+void kpg1Opgrd( int npos, const double pos[], int west, double *par, double *rdiam, int *status ){
    DECLARE_INTEGER(NPOS);
    DECLARE_DOUBLE_ARRAY_DYN(POS);
    DECLARE_LOGICAL(WEST);
