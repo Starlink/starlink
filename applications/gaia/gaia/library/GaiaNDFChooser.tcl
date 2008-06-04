@@ -6,7 +6,7 @@
 #     [incr Tk] class
 
 #  Purpose:
-#     Provides a toolbox for displaying NDFs and their components, 
+#     Provides a toolbox for displaying NDFs and their components,
 #     stored in a single container file
 
 #  Description:
@@ -124,7 +124,7 @@ itcl::class gaia::GaiaNDFChooser {
    }
 
    # Quit this widget
-   public method quit { } {
+   public method quit {} {
       destroy $w_
    }
 
@@ -216,7 +216,7 @@ itcl::class gaia::GaiaNDFChooser {
       pack $itk_component(err) -side left -expand 1
       pack $itk_component(qual) -side left -expand 1
       pack $itk_component(display) -side left -expand 1
-      pack $itk_component(show) -side left -fill y -expand 1 
+      pack $itk_component(show) -side left -fill y -expand 1
       pack $itk_component(close) -side left -expand 1
       pack $itk_component(buttons) -side top -fill x -expand 1
    }
@@ -238,7 +238,7 @@ itcl::class gaia::GaiaNDFChooser {
       if {! [info exists ext_(0,image)]} {
          return
       }
-      
+
       lassign [$image_ cut] low high
       if { "$low" == "" || "$high" == "" || [$image_ isclear] } {
          return
@@ -256,7 +256,7 @@ itcl::class gaia::GaiaNDFChooser {
          }
       }
    }
-   
+
    #  Add a short help window
    protected method make_short_help_ {} {
       TopLevelWidget::make_short_help
@@ -297,7 +297,7 @@ itcl::class gaia::GaiaNDFChooser {
       }
 
       #  Initially we don't show the small image, until we know we
-      #  have more than one. 
+      #  have more than one.
       $w_.buttons.show config -state disabled
 
       #  Delete old images
@@ -356,9 +356,12 @@ itcl::class gaia::GaiaNDFChooser {
    public method delete_images {} {
       global $w_.show
       set $w_.show 0
-      
+      delete_images_
+   }
+
+   # Really remove all image miniatures, if displayed.
+   protected method delete_images_ {} {
       if {[info exists imagetab_]} {
-         # delete old images
          destroy $imagetab_
          unset imagetab_
       }
@@ -367,17 +370,16 @@ itcl::class gaia::GaiaNDFChooser {
    # Show all image minature versions (called by checkbutton)
    protected method show_images {} {
       global $w_.show
+      delete_images_
       if { [set $w_.show] } {
          create_images
-      } else {
-         delete_images
       }
    }
 
    # Put the images in the table
    protected method create_images {} {
       make_image_table_
-      
+
       set w $imagetab_
       for {set i 0} {$i < $num_images_} {incr i} {
          set f [frame $w.f$i -borderwidth 2 -relief raised]
@@ -389,32 +391,32 @@ itcl::class gaia::GaiaNDFChooser {
 		    -fitwidth 100 \
 		    -fitheight 100]
          pack $im -fill both -expand 1
-         
+
          # save widget names for later reference
          set ext_($i,frame) $f
          set ext_($i,RtdImage) $im
          set ext_($i,image) [$im get_image]
          set ext_($i,canvas) [$im get_canvas]
-         
+
          #  Add the image to the table
          set row [expr $max_row_-$ext_($i,row)]
          set col $ext_($i,col)
          blt::table $w $f ${row},${col} -fill both
       }
-      
+
       frame $w.buttons2 -borderwidth 2
       pack [button $w.buttons2.settings \
                -text "Use Settings from Main Image" \
                -command [code $this use_settings_from_main_image]]
-      
+
       add_short_help $w.buttons2.settings \
          {Set the cut levels and colormap for the preview images to the one used in the main image}
-      
+
       blt::table $w \
          $w.buttons2 [expr $max_row_ + 1],0 -fill x -columnspan [min 4 $num_images_]
-      
+
       update  ; # wait until images are displayed (needed !)
-      
+
       # configure the images
       lassign [$image_ cut] low high
       busy {
@@ -435,7 +437,7 @@ itcl::class gaia::GaiaNDFChooser {
             $image_ hdu $ndf $component
             $itk_option(-image) configure -component $component
             $itk_option(-image) update_title
-            
+
             for {set i 0} {$i < $num_images_} {incr i} {
                if {[info exists ext_($i,frame)]} {
                   if {"$ext_($i,ndf)" == "$ndf"} {
@@ -520,11 +522,11 @@ itcl::class gaia::GaiaNDFChooser {
       }
    }
 
-   # Display all of the image extensions as a single image (combine based 
+   # Display all of the image extensions as a single image (combine based
    # on CRPIX1 and CRPIX2 keywords).
    protected method display_as_one_image {} {
-      busy { 
-         $image_ hdu display 
+      busy {
+         $image_ hdu display
       }
    }
 
@@ -541,10 +543,10 @@ itcl::class gaia::GaiaNDFChooser {
       }
    }
 
-   #  Flag: if true, images are "subsampled" when shrinking, 
+   #  Flag: if true, images are "subsampled" when shrinking,
    #  otherwise the pixels are averaged
    itk_option define -subsample subsample Subsample 1
-    
+
    #  Default: show image extensions, bool
    itk_option define -show_images show_images Show_images {0}
 
