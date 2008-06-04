@@ -108,8 +108,8 @@
 *        coordinate system from the full sized output array to the tile.
 
 *  Authors:
-*     David S Berry (JAC, UCLan)
-*     Ed Chapin (UBC)
+*     DSB: David S Berry (JAC, UCLan)
+*     EC: Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
