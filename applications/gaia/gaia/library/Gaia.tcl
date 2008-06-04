@@ -564,7 +564,8 @@ itcl::class gaia::Gaia {
             -always_merge $itk_option(-always_merge) \
             -show_hdu_chooser $itk_option(-show_hdu_chooser) \
             -default_cut $itk_option(-default_cut) \
-            -ident $itk_option(-ident)
+            -ident $itk_option(-ident) \
+            -deep_search $itk_option(-deep_search)
       }
 
       #  Keep a list of SkyCat/GAIA instances.
@@ -2470,6 +2471,11 @@ window gives you access to this."
       if { $itk_option(-font_scale) > 0.0 } {
          tk scaling -displayof $w_ $itk_option(-font_scale)
       }
+   }
+
+   #  Whether to search NDF extension for additional related NDFs.
+   itk_option define -deep_search deep_search Deep_Search 1 {
+      gaia::GaiaNDAccess::set_deep_search $itk_option(-deep_search)
    }
 
    # -- Protected variables --

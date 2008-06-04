@@ -1590,7 +1590,7 @@ static int gaiaNDFTclGetPropertyDims( ClientData clientData,
  * in the NDFs extensions can also be included when querying for a list.
  */
 static int gaiaNDFTclHdu( ClientData clientData, Tcl_Interp *interp,
-                           int objc, Tcl_Obj *CONST objv[] )
+                          int objc, Tcl_Obj *CONST objv[] )
 {
     NDFinfo *info;
     int deepsearch = 1;
@@ -1598,7 +1598,7 @@ static int gaiaNDFTclHdu( ClientData clientData, Tcl_Interp *interp,
 
     /* Check arguments, need the NDF handle, the hdu command and whether to 
      * look for NDFs in the extension. */
-    if ( objc < 3 || objc > 4 ) {
+    if ( objc < 3 || objc > 5 ) {
         Tcl_WrongNumArgs( interp, 1, objv, 
                           "ndf_handle [list|listheadings|get] [deepsearch]" );
         return TCL_ERROR;

@@ -307,15 +307,6 @@ itcl::class gaia::GaiaHduBrowser {
          $namer_ setfitshdunum $hdu
       }
 
-      #   Get the dimensionality, since it's free.
-      #   Pick out the HDU description from the full list.
-      set list [$accessor_ hdu list]
-      set hdulist [lindex $list [expr $hdu-1]]
-
-      #   Assign parts to the names of the headers.
-      set headings [$accessor_ hdu listheadings]
-      eval lassign [list $hdulist] $headings
-
       #   Cubes have a non-trivial last dimension, make sure we get
       #   that right (note we don't have access to dimensions higher
       #   than 3, so this could still be incorrect).

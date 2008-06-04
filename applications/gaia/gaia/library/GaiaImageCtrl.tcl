@@ -169,6 +169,9 @@ itcl::class gaia::GaiaImageCtrl {
 
       #  Same for pixel indices request.
       $image_ configure -pixel_indices $itk_option(-pixel_indices)
+
+      #  And deep_search
+      $image_ configure -deep_search $itk_option(-deep_search)
    }
 
    #  Test for buttons 4, 5 6 and 7 and scroll the main window.
@@ -1335,6 +1338,9 @@ itcl::class gaia::GaiaImageCtrl {
 
    #  Additional text for the title. Used to mark different instances.
    itk_option define -ident ident Ident {}
+
+   #  Whether to search NDF extension for additional related NDFs.
+   itk_option define -deep_search deep_search Deep_Search 1
 
    #  Protected variables:
    #  ====================

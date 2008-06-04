@@ -678,6 +678,9 @@ itcl::class gaia::GaiaNDAccess {
       if { $args == {} } {
          return [${type_}::hdu $handle_]
       }
+      if { $args == "list" } {
+         return [${type_}::hdu $handle_ list $deep_search]
+      }
       return [eval ${type_}::hdu $handle_ $args]
    }
 
@@ -716,6 +719,12 @@ itcl::class gaia::GaiaNDAccess {
          unmap "VARIANCE"
       }
       set last_maperrors_ $maperrors
+   }
+
+   #  Whether all "hdu list" calls should perform a deep search (global
+   #  as this class is used in many places which are difficult to track).
+   public proc set_deep_search {value} {
+      set deep_search $value
    }
 
    #  Protected variables: (available to instance)
@@ -760,6 +769,8 @@ itcl::class gaia::GaiaNDAccess {
    #  Common variables: (shared by all instances)
    #  -----------------
 
+   #  Whether to search for related NDFs in the NDF extensions (hdu list).
+   protected common deep_search 1
 
 #  End of class definition.
 }
