@@ -96,12 +96,15 @@
 *        Add genvar parameter
 *     2008-04-18 (AGG):
 *        Set lbnd to 1,1
+*     2008-06-04 (TIMJ):
+*        astRebinSeq requires GRID output bounds not PIXEL
 *     {enter_further_changes_here}
 
 *  Notes:
 *     Currently lon_0 and lat_0 are interpreted only as ra/dec of tangent point
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2005-2008 University of British Columbia
 *     All Rights Reserved.
@@ -153,12 +156,14 @@ void smf_rebinmap( smfData *data, int index, int size,
   double *boldata = NULL;       /* Pointer to bolometer data */
   dim_t i;                      /* Loop counter */
   int lbnd_in[2];               /* Lower pixel bounds for input maps */
+  int ldim[ 2 ];                /* Output array lower GRID bounds */
   dim_t nbol;                   /* # of bolometers in the sub-array */
   int nused;                    /* No. of input values used */
   AstSkyFrame *oskyfrm = NULL;  /* SkyFrame from the output WCS Frameset */
   int rebinflags = 0;           /* Control the rebinning procedure */
   AstMapping *sky2map=NULL;     /* Mapping from celestial->map coordinates */
   int ubnd_in[2];               /* Upper pixel bounds for input maps */
+  int udim[ 2 ];                /* Output array upper GRID bounds */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -175,6 +180,15 @@ void smf_rebinmap( smfData *data, int index, int size,
     errRep( "", "Supplied FrameSet is NULL", status );
     return;
   }
+
+/* Fill an array with the lower grid index bounds of the output. */
+   ldim[ 0 ] = 1;
+   ldim[ 1 ] = 1;
+
+/* Integer upper grid index bounds of the output. */
+   udim[ 0 ] = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1;
+   udim[ 1 ] = ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1;
+
 
   /* Retrieve the sky2map mapping from the output frameset (actually
      map2sky) */
@@ -230,7 +244,7 @@ void smf_rebinmap( smfData *data, int index, int size,
     /* Rebin this time slice */
     astRebinSeqD( bolo2map, 0.0, 2, lbnd_in, ubnd_in, &(boldata[i*nbol]),
 		  NULL, spread, params, rebinflags, 0.1, 1000000, 
-		  VAL__BADD, 2, lbnd_out, ubnd_out, lbnd_in, ubnd_in,
+		  VAL__BADD, 2, ldim, udim, lbnd_in, ubnd_in,
 		  map, variance, weights, &nused );
 
     /* clean up ast objects */

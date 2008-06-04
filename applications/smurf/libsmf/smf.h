@@ -311,6 +311,8 @@
 *        Change smf_accumulate_prov
 *     2008-06-03 (TIMJ):
 *        Add smf_display_projpars
+*     2008-06-04 (TIMJ):
+*        smf_get_projpar new API.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -588,7 +590,7 @@ void * smf_malloc( size_t nelem, size_t bytes_per_elem, int zero,
 
 void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ], 
 		    int flag, int *lbnd_out, int *ubnd_out, 
-		    AstFrameSet **outframeset, int *moving, int *status );
+        AstFrameSet **outframeset, int *moving, smfBox ** boxes,int *status );
 
 void smf_mapbounds_approx( Grp *igrp, int index, char *system, double pixsize, 
 			   int *lbnd_out, int *ubnd_out, AstFrameSet **outframeset, 
@@ -956,7 +958,10 @@ void smf_write_clabels( const smfData* data, int * status );
 void smf_check_units( int count, char current[],
 		      smfHead* hdr, int * status );
 
-void smf_get_projpar( AstSkyFrame *skyframe, double par[ 7 ], int *usedefs,
+void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
+                      int moving, int autogrid,
+                      int nallpos, const double * allpos, float telres, 
+                      double map_pa, double par[7], int *sparse, int *useauto,
                       int *status );
 
 double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf, 
