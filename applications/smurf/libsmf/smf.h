@@ -309,6 +309,8 @@
 *        Added is2d to smf_choosetiles
 *     2008-05-28 (TIMJ):
 *        Change smf_accumulate_prov
+*     2008-06-03 (TIMJ):
+*        Add smf_display_projpars
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -962,5 +964,8 @@ double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf,
 
 
 void smf_get_taskname( char * taskname, char * prvname, int * status);
+
+void smf_display_projpars( AstSkyFrame * skyframe, double par[7],
+                           int *status);
 
 #endif /* SMF_DEFINED */

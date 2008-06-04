@@ -176,6 +176,8 @@
 *     20-MAY-2008 (DSB):
 *        If autogrid is false, use a default CROTA value determined by
 *        the MAP_PA FITS header.
+*     03-JUN-2008 (TIMJ):
+*        Factor out printing of projection parameters.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -899,28 +901,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
          if( *status != SAI__OK ) goto L999;
      
 /* Display the projection parameters being used. */
-         msgBlank( status );
-         msgOutif( MSG__NORM, " ", "   Projection parameters used:", status );
-         msgSetd( "V", par[ 0 ] );
-         msgOutif( MSG__NORM, " ", "      CRPIX1 = ^V", status );
-         msgSetd( "V", par[ 1 ] );
-         msgOutif( MSG__NORM, " ", "      CRPIX2 = ^V", status );
-         msgSetd( "V", par[ 2 ]*AST__DR2D );
-         msgSetc( "V2", astFormat( *skyframe, 1, par[ 2 ] ) );
-         msgSetc( "S", astGetC( *skyframe, "Symbol(1)" ) );
-         msgOutif( MSG__NORM, " ", "      CRVAL1 = ^V ( ^S = ^V2 )", status );
-         msgSetd( "V", par[ 3 ]*AST__DR2D );
-         msgSetc( "V2", astFormat( *skyframe, 2, par[ 3 ] ) );
-         msgSetc( "S", astGetC( *skyframe, "Symbol(2)" ) );
-         msgOutif( MSG__NORM, " ", "      CRVAL2 = ^V ( ^S = ^V2 )", status );
-         msgSetd( "V", par[ 4 ]*AST__DR2D );
-         msgSetd( "V2", 0.1*NINT(par[ 4 ]*AST__DR2D*36000.0) );
-         msgOutif( MSG__NORM, " ", "      CDELT1 = ^V ( ^V2 arcsec )", status );
-         msgSetd( "V", par[ 5 ]*AST__DR2D );
-         msgSetd( "V2", 0.1*NINT(par[ 5 ]*AST__DR2D*36000.0) );
-         msgOutif( MSG__NORM, " ", "      CDELT2 = ^V ( ^V2 arcsec )", status );
-         msgSetd( "V", par[ 6 ]*AST__DR2D );
-         msgOutif( MSG__NORM, " ", "      CROTA2 = ^V", status );
+         smf_display_projpars( *skyframe, par, status );
      
 /* If no grid was found, indicate that no spatial projection will be used. */
       } else {
