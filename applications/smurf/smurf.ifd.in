@@ -376,6 +376,56 @@ package @PACKAGE@ {
             helpkey *
           }
 
+          parameter fbl {
+            size *
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
+          parameter fbr {
+            size *
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
+
+          parameter flbnd {
+            size *
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
+          parameter fubnd {
+            size *
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
+          parameter ftl {
+            size *
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
+          parameter ftr {
+            size *
+            type _DOUBLE
+            access WRITE
+            vpath INTERNAL
+            helpkey *
+          }
+
+
 	  parameter reflat {
             type LITERAL
             access READ
