@@ -329,6 +329,15 @@ package @PACKAGE@ {
 
          helplib {$SMURF_HELP}
 
+         parameter alignsys {
+             type _LOGICAL
+             vpath DEFAULT
+             ppath CURRENT
+             prompt {Align data in the output spatial co-ordinate system?}
+             default FALSE
+             helpkey *
+         }
+
          parameter in {
             position 1
             type NDF

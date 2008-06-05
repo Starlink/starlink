@@ -393,6 +393,8 @@
 *        - Calculate and free smfBox in smf_mapbounds
 *        - Handle pixel bounds in smf_mapbounds.
 *        - Use smf_store_outputbounds and document new F* parameters.
+*     2008-06-05 (TIMJ):
+*        Add ALIGNSYS parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -467,6 +469,7 @@ void smurf_makemap( int *status ) {
 
   /* Local Variables */
   int actval;                /* Number of parameter values supplied */
+  int alignsys;              /* Align data in the output system? */
   smfBox *boxes = NULL;      /* Pointer to array of i/p file bounding boxes */
   Grp *confgrp = NULL;       /* Group containing configuration file */
   smfData *data=NULL;        /* Pointer to SCUBA2 data struct */
@@ -598,9 +601,13 @@ void smurf_makemap( int *status ) {
 
   gettimeofday( &tv1, NULL );
 
+  /* See if the input data is to be aligned in the output coordinate system
+     rather than the default of ICRS. */
+  parGet0l( "ALIGNSYS", &alignsys, status );
+
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Determine map bounds", status);
 
-  smf_mapbounds( igrp, size, system, par, 0,
+  smf_mapbounds( igrp, size, system, par, alignsys,
                  lbnd_out, ubnd_out, &outfset, &moving, &boxes, status );
   msgBlank( status );
 
