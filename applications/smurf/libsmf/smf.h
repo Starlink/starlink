@@ -314,6 +314,8 @@
 *     2008-06-04 (TIMJ):
 *        smf_get_projpar new API.
 *        Add smf_calc_skyframe
+*     2008-06-05 (EC):
+*        Removed is2d from smf_choosetiles
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -814,7 +816,7 @@ void smf_open_related_model( const smfGroup *group, const int subindex,
 
 smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd, 
                           int *ubnd, smfBox *boxes, int spread, 
-                          const double params[], AstFrameSet *wcsout, int is2d, 
+                          const double params[], AstFrameSet *wcsout, 
                           int tile_size[ 2 ], int trim, int border,
                           int *ntiles, int *status );
 

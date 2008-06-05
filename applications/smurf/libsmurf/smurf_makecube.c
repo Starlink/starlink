@@ -752,10 +752,12 @@
 *        Do not put OBSxxx and PRVxxx keywords into the output NDF FITS
 *        extensions any more since ndf2fits now creates these on the basis 
 *        of the PROVENANCE extenson.
-*     26-MAY-2008 (EC)
+*     26-MAY-2008 (EC):
 *        Added is2d parameter to smf_choosetiles
 *     04-JUN-2008 (TIMJ):
 *        Factor out WCS bounds reporting into separate function.
+*     05-JUN-2008 (EC):
+*        Removed is2d from smf_choosetiles interface
 
 *  Copyright:
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
@@ -1190,7 +1192,7 @@ void smurf_makecube( int *status ) {
          parGet0i( "TILEBORDER", &tileborder, status );
          if( nval == 1 ) tiledims[ 1 ] = tiledims[ 0 ];
          tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes, 
-                                  spread, params, wcsout, 0, tiledims,
+                                  spread, params, wcsout, tiledims,
                                   trimtiles, tileborder, &ntile, status );
       }
    }
@@ -1201,7 +1203,7 @@ void smurf_makecube( int *status ) {
    if( !tiles ) {
       tiledims[ 0 ] = -1;
       tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes, 
-                               spread, params, wcsout, 0, tiledims, 
+                               spread, params, wcsout, tiledims, 
                                0, 0, &ntile, status );
    }
 

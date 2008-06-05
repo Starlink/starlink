@@ -16,7 +16,7 @@
 *  Invocation:
 *     tiles = smf_choosetiles( Grp *igrp,  int size, int *lbnd, int *ubnd, 
 *                              smfBox *boxes, int spread, const double params[],
-*                              AstFrameSet *wcsout, int is2d, int tile_size[2],
+*                              AstFrameSet *wcsout, int tile_size[2],
 *                              int trim, int border, int *ntiles, int *status )
 
 *  Arguments:
@@ -47,8 +47,6 @@
 *        NULL pointer may be given. 
 *     wcsout = AstFrameSet * (Given)
 *        Pointer to the FrameSet describing the WCS of the output cube.
-*     is2d = int (Given )
-*        If set, wcsout describes 2-d data. Otherwise it describes a data cube.
 *     trim = int (Given)
 *        If true then the border tiles are trimmed to exclude pixels off
 *        the edge of the full size output array.
@@ -134,6 +132,8 @@
 *        full sized output array.
 *     26-MAY-2008 (EC):
 *        Added is2d parameter
+*     05-JUN-2008 (EC):
+*        Remove is2d from API, determine number of axes internally
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -171,7 +171,7 @@
 
 smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd, 
                           int *ubnd, smfBox *boxes, int spread, 
-                          const double params[], AstFrameSet *wcsout, int is2d, 
+                          const double params[], AstFrameSet *wcsout, 
                           int tile_size[ 2 ], int trim, int border,
                           int *ntiles, int *status ){
 
@@ -262,11 +262,8 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
       refwcs[ 1 ] = astGetD( wcsout, "SkyRef(2)" );
       refwcs[ 2 ] = AST__BAD;
 
-      if( is2d ) {
-         astTranN( wcsout, 1, 2, 1, refwcs, 0, 2, 1, refpix );
-      } else {
-         astTranN( wcsout, 1, 3, 1, refwcs, 0, 3, 1, refpix );
-      }
+      astTranN( wcsout, 1, astGetI( wcsout, "Nin" ), 1, refwcs,
+                0, astGetI( wcsout, "Nout" ), 1, refpix );
 
 /* Convert grid coords to pixel coords */
       refpix[ 0 ] += lbnd[ 0 ] - 1.5;
