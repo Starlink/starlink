@@ -456,8 +456,9 @@ itcl::class gaia::GaiaNDAccess {
       set ubnd2 [lindex $bounds [expr (${axis2}-1)*2+1]]
 
       #  And create the NDF as a copy of this NDF, but without any
-      #  data arrays, or with just a basic structure if an FITS file.
-      if { $type_ == "ndf" } {
+      #  data arrays. If deep searches are enabled propagate the extension.
+      #  If underlying cube is FITS create basic NDF only.
+      if { $type_ == "ndf" && $deep_search } {
          set newhandle [ndf::copy $name $handle_ "AXIS, UNITS" \
                            "$lbnd1 $lbnd2" "$ubnd1 $ubnd2" $fulltype $imagewcs]
       } else {
@@ -723,6 +724,8 @@ itcl::class gaia::GaiaNDAccess {
 
    #  Whether all "hdu list" calls should perform a deep search (global
    #  as this class is used in many places which are difficult to track).
+   #  Also controls if NDF extensions are propagated, not needed if no
+   #  searching is done.
    public proc set_deep_search {value} {
       set deep_search $value
    }
