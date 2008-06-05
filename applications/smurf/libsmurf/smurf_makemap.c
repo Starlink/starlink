@@ -23,6 +23,15 @@
 *     This is the main routine implementing the MAKEMAP task.
 
 *  ADAM Parameters:
+*     ALIGNSYS = _LOGICAL (Read)
+*        If TRUE, then the spatial positions of the input data are
+*        aligned in the co-ordinate system specified by parameter
+*        SYSTEM. Otherwise, they are aligned in the ICRS co-ordinate
+*        system. For instance, if the output co-ordinate system is
+*        AZEL, then setting ALIGNSYS to TRUE will result in the AZEL
+*        values of the input data positions being compared directly,
+*        disregarding the fact that a given AZEL will correspond to
+*        different positions on the sky at different times. [FALSE]
 *     CONFIG = GROUP (Read) 
 *        Specifies values for the configuration parameters used by the
 *        iterative map maker (METHOD=ITERATE). If the string "def"
