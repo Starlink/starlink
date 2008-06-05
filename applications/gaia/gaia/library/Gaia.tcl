@@ -168,6 +168,7 @@ Options:
  -component <component>   - NDF component to display (one of: data, variance)
  -check_for_cubes <bool>  - Check input files to see if they are cubes (default: 1) \\
  -debug <bool>            - debug flag: run bg processes in fg.
+ -deep_search <bool>      - search NDF extensions for related NDFs
  -default_cmap <cmap>     - default colormap.
  -default_itt <itt>       - default intensity transfer table.
  -extended_precision      - show extra readout precision (default: 0).
