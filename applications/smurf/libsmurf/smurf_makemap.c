@@ -54,6 +54,36 @@
 *          The angle, in degrees, from north through east (in the
 *          coordinate system specified by the SYSTEM parameter) to the second
 *          pixel axis in the output cube. 
+*     FBL( ) = _DOUBLE (Write)
+*          Sky coordinates (radians) of the bottom left corner of the output map
+*          (the corner with the smallest PIXEL dimension for axis 1 and the smallest
+*          pixel dimension for axis 2). No check is made that the pixel corresponds
+*          valid data. Note that the position is reported for the centre of the pixel.
+*     FBR( ) = _DOUBLE (Write)
+*          Sky coordinates (radians) of the bottom right corner of the output map
+*          (the corner with the largest PIXEL dimension for axis 1 and the smallest
+*          pixel dimension for axis 2). No check is made that the pixel corresponds
+*          valid data. Note that the position is reported for the centre of the pixel.
+*     FLBND( ) = _DOUBLE (Write)
+*          The lower bounds of the bounding box enclosing the output map in the
+*          selected output WCS Frame. The values are calculated even if no output
+*          cube is created. Celestial axis values will be in units of radians.
+*          The parameter is named to be consistent with KAPPA NDFTRACE output.
+*     FUBND( ) = _DOUBLE (Write)
+*          The upper bounds of the bounding box enclosing the output map in the
+*          selected output WCS Frame. The values are calculated even if no output
+*          cube is created. Celestial axis values will be in units of radians.
+*          The parameter is named to be consistent with KAPPA NDFTRACE output.
+*     FTL( ) = _DOUBLE (Write)
+*          Sky coordinates (radians) of the top left corner of the output map
+*          (the corner with the smallest PIXEL dimension for axis 1 and the largest
+*          pixel dimension for axis 2). No check is made that the pixel corresponds
+*          valid data. Note that the position is reported for the centre of the pixel.
+*     FTR( ) = _DOUBLE (Write)
+*          Sky coordinates (radians) of the top right corner of the output map
+*          (the corner with the largest PIXEL dimension for axis 1 and the largest
+*          pixel dimension for axis 2). No check is made that the pixel corresponds
+*          valid data. Note that the position is reported for the centre of the pixel.
 *     IN = NDF (Read)
 *          Input file(s)
 *     LBND( 2 ) = _INTEGER (Read)
@@ -360,8 +390,9 @@
 *     2008-06-02 (EC):
 *        Handle 1-element TILEDIMS
 *     2008-06-04 (TIMJ):
-*        Calculate and free smfBox in smf_mapbounds
-*        Handle pixel bounds in smf_mapbounds.
+*        - Calculate and free smfBox in smf_mapbounds
+*        - Handle pixel bounds in smf_mapbounds.
+*        - Use smf_store_outputbounds and document new F* parameters.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -477,7 +508,6 @@ void smurf_makemap( int *status ) {
   char pabuf[ 10 ];          /* Text buffer for parameter value */
   double par[ 7 ];           /* Projection parameters */
   double params[ 4 ];        /* astRebinSeq parameters */
-  int quit=0;                /* Flag for exiting while loop */
   int rebin=1;               /* Flag to denote whether to use the REBIN method*/
   double scale;              /* How much to scale bounds */
   int size;                  /* Number of files in input group */
@@ -492,8 +522,6 @@ void smurf_makemap( int *status ) {
   smfTile *tiles=NULL;       /* Pointer to array of output tile descriptions */
   int tndf = NDF__NOID;      /* NDF identifier for EXP_TIME */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
-  int uselonlat = 0;         /* Flag for whether to use given lon_0 and
-                                lat_0 for output frameset */
   void *variance=NULL;       /* Pointer to the variance map */
   smfData *wdata=NULL;       /* Pointer to SCUBA2 data struct for weights */
   double *weights=NULL;      /* Pointer to the weights map */
@@ -572,15 +600,19 @@ void smurf_makemap( int *status ) {
 
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Determine map bounds", status);
 
-  smf_mapbounds( igrp, size, system, par, uselonlat, 
+  smf_mapbounds( igrp, size, system, par, 0,
                  lbnd_out, ubnd_out, &outfset, &moving, &boxes, status );
+  msgBlank( status );
 
   gettimeofday( &tv2, NULL );
 
   msgSeti("TDIFF",tv2.tv_sec-tv1.tv_sec);
   msgOutif( MSG__DEBUG, " ", "Mapbounds took ^TDIFF s", status);
 
-  quit = 0;
+  /* Write WCS bounds */
+  smf_store_outputbounds(lbnd_out, ubnd_out, outfset, NULL, NULL, 
+                         status);
+  msgBlank( status );
 
   /* Create an output smfData */
   ndgCreat ( "OUT", NULL, &ogrp, &outsize, &flag, status );

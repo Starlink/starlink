@@ -754,6 +754,8 @@
 *        of the PROVENANCE extenson.
 *     26-MAY-2008 (EC)
 *        Added is2d parameter to smf_choosetiles
+*     04-JUN-2008 (TIMJ):
+*        Factor out WCS bounds reporting into separate function.
 
 *  Copyright:
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
@@ -844,21 +846,11 @@ void smurf_makecube( int *status ) {
    char basename[ GRP__SZNAM + 1 ]; /* Output base file name */
    char pabuf[ 10 ];          /* Text buffer for parameter value */
    char system[ 10 ];         /* Celestial coord system for output cube */
-   char tmpstr[10];           /* temporary unit string */
    double *pangle;            /* Ptr to array holding angle for each pol bin */
-   double corner[2];          /* WCS of a corner (SKY) */
    double fcon;               /* Tsys factor for file */
-   double glbnd_out[ 3 ];     /* double prec Lower GRID bounds for output map */
-   double gubnd_out[ 3 ];     /* double prec Upper GRID bounds for output map */
-   double gx_in[ 4 ];         /* X Grid coordinates of four corners */
-   double gx_out[ 4 ];        /* X WCS coordinates of four corners */
-   double gy_in[ 4 ];         /* Y Grid coordinates of four corners */
-   double gy_out[ 4 ];        /* Y WCS coordinates of four corners */
    float median;              /* Median data value */
    double par[ 7 ];           /* Projection parameter */
    double params[ 4 ];        /* astRebinSeq parameters */
-   double wcslbnd_out[3];     /* Array of lower bounds of output cube */
-   double wcsubnd_out[3];     /* Array of upper bounds of output cube */
    float *eff_array = NULL;   /* Pointer to array of eff times  */
    float *exp_array = NULL;   /* Pointer to array of exp times */
    float *ipd = NULL;         /* Pointer to the next output data value */
@@ -889,7 +881,6 @@ void smurf_makecube( int *status ) {
    int genvar;                /* How to create output Variances */
    int hasoffexp;             /* Any ACS_OFFEXPOSURE values found in the i/p? */
    int hastsys;               /* Have some good Tsys values been found? */
-   int i;                     /* Loop index */
    int ifile;                 /* Input file index */
    int ilast;                 /* Index of the last input file */
    int iout;                  /* Index of next output NDF name */
@@ -915,7 +906,7 @@ void smurf_makecube( int *status ) {
    int nval;                  /* Number of parameter values supplied */
    int nwgtdim;               /* No. of axes in the weights array */
    int nxy;                   /* Number of elements in a 2D output tile */
-   int ondf;                  /* Output NDF identifier */
+   int ondf = NDF__NOID;      /* Output NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
    int outsize;               /* Number of files in output group */
    int polobs;                /* Do the input files contain polarisation data? */
@@ -1256,84 +1247,11 @@ void smurf_makecube( int *status ) {
 /* See if weights are to be saved in the output NDFs. */
    parGet0l( "WEIGHTS", &savewgt, status );
 
-/* Calculate and output the WCS bounds (matching NDFTRACE output). The bounds 
-   are normalised. Celestial coordinates will use radians. */
-   for( i = 0; i < 3; i++ ) {
-     glbnd_out[ i ] = 0.5;
-     gubnd_out[ i ] = ubnd_out[ i ] - lbnd_out[i] + 1.5;
-   }
-
-   for( i = 0; i < 3; i++ ) {
-     astMapBox( tmap, glbnd_out, gubnd_out, 1, i+1, &(wcslbnd_out[ i ]), 
-                &(wcsubnd_out[ i ]), NULL, NULL );
-   }
-
-   astNorm( wcsout, wcslbnd_out );
-   astNorm( wcsout, wcsubnd_out );
-
-   parPut1d( "FLBND", 3,  wcslbnd_out, status );
-   parPut1d( "FUBND", 3,  wcsubnd_out, status );
-
-   msgOutif( MSG__NORM, "WCS_WBND1",
-	     "   Output cube WCS bounds:", status );
-
-   for( i = 0; i < 3 && *status == SAI__OK; i++ ) {
-     msgSetc( "L", astFormat( wcsout, i+1, wcslbnd_out[i]));
-     msgSetc( "U", astFormat( wcsout, i+1, wcsubnd_out[i]));
-
-     if( i == 2 ) {
-       sprintf( tmpstr, "unit(%d)", i+1 );
-       msgSetc( "UNT", astGetC( wcsout, tmpstr ));
-     } else {
-       msgSetc( "UNT", "" );
-     }
-
-     sprintf( tmpstr, "label(%d)", i + 1 );
-     msgSetc( "LAB", astGetC( wcsout, tmpstr ) );
-
-     msgOutif( MSG__NORM, "WCS_WBND2",
-	       "        ^LAB: ^L -> ^U ^UNT", status );
-   }
+/* Report the WCS bounds and store the WCS bounds parameters */
+   smf_store_outputbounds( lbnd_out, ubnd_out, wcsout, oskyfrm,
+                           oskymap, status);
    msgBlank( status );
    blank = 1;
-
-/* Now also calculate the spatial coordinates of the four corners (required
-   for CADC science archive. First, calculate input GRID coordinates for 4 
-   corners: TR, TL, BR, BL. Use pixel centres for reporting. This is 
-   important for cases where the pixels are very large and we want to make 
-   sure that we are conservative with the database reporting. */
-
-   gx_in[ 0 ] = ubnd_out[ 0 ] - lbnd_out[ 0 ] + 1.0; /* Right */
-   gx_in[ 1 ] = 1.0;                                 /* Left */
-   gx_in[ 2 ] = gx_in[ 0 ];                          /* Right */
-   gx_in[ 3 ] = gx_in[ 1 ];                          /* Left */
-   gy_in[ 0 ] = ubnd_out[ 1 ] - lbnd_out[ 1 ] + 1.0; /* Top */
-   gy_in[ 1 ] = gy_in[ 0 ];                          /* Top */
-   gy_in[ 2 ] = 1.0;                                 /* Bottom */
-   gy_in[ 3 ] = gy_in[ 2 ];                          /* Bottom */
-
-   astTran2( oskymap, 4, gx_in, gy_in, 1, gx_out, gy_out );
-   
-/* Horrible code duplication */
-   corner[ 0 ] = gx_out[ 0 ];
-   corner[ 1 ] = gy_out[ 0 ];
-   astNorm( oskyfrm, corner );
-   parPut1d( "FTR", 2, corner, status );
-
-   corner[ 0 ] = gx_out[ 1 ];
-   corner[ 1 ] = gy_out[ 1 ];
-   astNorm( oskyfrm, corner );
-   parPut1d( "FTL", 2, corner, status );
-
-   corner[ 0 ] = gx_out[ 2 ];
-   corner[ 1 ] = gy_out[ 2 ];
-   astNorm( oskyfrm, corner );
-   parPut1d( "FBR", 2, corner, status );
-
-   corner[ 0 ] = gx_out[ 3 ];
-   corner[ 1 ] = gy_out[ 3 ];
-   astNorm( oskyfrm, corner );
-   parPut1d( "FBL", 2, corner, status );
 
 /* Get the polarisation analyser angular bin size, and convert from
    degrees to radians. Watch for null values, using zero bin size to flag

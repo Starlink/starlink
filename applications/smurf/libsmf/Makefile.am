@@ -65,7 +65,8 @@ smf_find_bad_dets.c smf_detmask.c smf_maskacsis.c smf_kmmerge.c \
 smf_simpleaddmap.c smf_find_median.c smf_checkmem_map.c smf_checkmem_dimm.c \
 smf_dump_smfData.c smf_write_clabels.c smf_set_clabels.c \
 smf_check_units.c smf_get_projpar.c smf_calc_mappa.c \
-smf_get_taskname.c smf_display_projpars.c smf_calc_skyframe.c
+smf_get_taskname.c smf_display_projpars.c smf_calc_skyframe.c \
+smf_store_outputbounds.c
 
 noinst_INCLUDES = smf.h smf_typ.h
 
