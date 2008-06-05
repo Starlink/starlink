@@ -53,6 +53,7 @@
 #     02111-1307, USA
 
 #  Authors:
+#     EC: Edward Chapin (UBC)
 #     TIMJ:   Tim Jenness (JACH)
 #     MJC:  Malcolm J. Currie (STARLINK)
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
@@ -94,6 +95,8 @@
 #        Add ard_link
 #     2006 Oct 9 (TIMJ):
 #        Should be ard_link_adam
+#     2008 June 3 (EC):
+#        Add fftw3
 #     {enter_further_changes_here}
 
 #-
@@ -104,7 +107,7 @@
            `prm_link_adam` `ard_link_adam` \
            `grp_link_adam` `ndg_link_adam` `kaplibs_link_adam -nogrf` \
            `gsd_link_adam` \
-           -lgsl -lgslcblas \
+           -lgsl -lgslcblas -lfftw3 \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
