@@ -48,7 +48,7 @@
 *        NDF. This will be NULL if no reference NDF was supplied or if
 *        the reference NDF had no spatial axes. If a non-null pointer is
 *        supplied, the output WCS is inherited from this FrameSet rather than 
-*        from the values supsplied in "par".
+*        from the values supplied in "par".
 *     specrefwcs = AstFrameSet * (Given)
 *        A pointer to a FrameSet describing the spectral axis of the reference 
 *        NDF. This will be NULL if no reference NDF was supplied or if
