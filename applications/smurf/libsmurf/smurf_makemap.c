@@ -151,6 +151,12 @@
 *     PIXSIZE( 2 ) = _REAL (Read)
 *          Pixel dimensions in the output image, in arcsec. If only one value 
 *          is supplied, the same value will be used for both axes.
+*     REF = NDF (Read)
+*          An existing NDF that is to be used to define the output grid.
+*          If supplied, the output grid will be aligned with the supplied 
+*          reference NDF. The reference can be either 2D or 3D and the spatial
+*          frame will be extracted. If a null (!) value is supplied then the output
+*          grid is determined by parameters REFLON, REFLAT, etc. [!]
 *     REFLAT = LITERAL (Read)
 *          The formatted celestial latitude value at the tangent point of 
 *          the spatial projection in the output cube. This should be provided 
@@ -403,7 +409,8 @@
 *        - Handle pixel bounds in smf_mapbounds.
 *        - Use smf_store_outputbounds and document new F* parameters.
 *     2008-06-05 (TIMJ):
-*        Add ALIGNSYS parameter.
+*        - Add ALIGNSYS parameter.
+*        - Add REF parameter.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -477,7 +484,6 @@
 void smurf_makemap( int *status ) {
 
   /* Local Variables */
-  int actval;                /* Number of parameter values supplied */
   int alignsys;              /* Align data in the output system? */
   smfBox *boxes = NULL;      /* Pointer to array of i/p file bounding boxes */
   Grp *confgrp = NULL;       /* Group containing configuration file */
@@ -493,14 +499,13 @@ void smurf_makemap( int *status ) {
   dim_t i;                   /* Loop counter */
   Grp *igrp = NULL;          /* Group of input files */
   int iterate=0;             /* Flag to denote ITERATE method */
-  int itmp;                  /* Temporary storage */
   AstKeyMap *keymap=NULL;    /* Pointer to keymap of config settings */
   int ksize=0;               /* Size of group containing CONFIG file */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   double *map=NULL;          /* Pointer to the rebinned map data */
   size_t mapmem;             /* Memory needed for output map */
   size_t mapsize;            /* Number of pixels in output image */
-  size_t maxmem;             /* Max memory usage in bytes */
+  size_t maxmem=0;           /* Max memory usage in bytes */
   int maxmem_mb;             /* Max memory usage in Mb */
   double meantexp;           /* Mean exposure time */
   double maxtexp = 0.0;      /* Maximum exposure time */
@@ -518,13 +523,13 @@ void smurf_makemap( int *status ) {
   int outsize;               /* Number of files in output group */
   AstFrameSet *outfset=NULL; /* Frameset containing sky->output mapping */
   char pabuf[ 10 ];          /* Text buffer for parameter value */
-  double par[ 7 ];           /* Projection parameters */
   double params[ 4 ];        /* astRebinSeq parameters */
   int rebin=1;               /* Flag to denote whether to use the REBIN method*/
-  double scale;              /* How much to scale bounds */
   int size;                  /* Number of files in input group */
   int smfflags=0;            /* Flags for smfData */
   HDSLoc *smurfloc=NULL;     /* HDS locator of SMURF extension */
+  AstFrameSet *spacerefwcs = NULL;/* WCS Frameset for spatial reference axes */
+  AstFrameSet *specrefwcs = NULL;/* WCS Frameset for spectral reference axis */
   int spread;                /* Code for pixel spreading scheme */
   double steptime;           /* Integration time per sample, from FITS header */
   double sumtexp;            /* Total exposure time across all pixels */
@@ -556,15 +561,6 @@ void smurf_makemap( int *status ) {
   /* Get the celestial coordinate system for the output cube. */
   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
             "GAPPT,FK4,FK4-NO-E,ECLIPTIC", 1, system, 10, status );
-
-  /* Indicate we have no projection parameters as yet. */
-  par[0] = AST__BAD;
-  par[1] = AST__BAD;
-  par[2] = AST__BAD;
-  par[3] = AST__BAD;
-  par[4] = AST__BAD;
-  par[5] = AST__BAD;
-  par[6] = AST__BAD;
   
   /* Get the maximum amount of memory that we can use */
   parGet0i( "MAXMEM", &maxmem_mb, status );
@@ -608,19 +604,18 @@ void smurf_makemap( int *status ) {
 
   /* Calculate the map bounds */
 
-  gettimeofday( &tv1, NULL );
+  smf_getrefwcs( "REF", &specrefwcs, &spacerefwcs, status );
 
   /* See if the input data is to be aligned in the output coordinate system
      rather than the default of ICRS. */
   parGet0l( "ALIGNSYS", &alignsys, status );
 
   msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Determine map bounds", status);
-
-  smf_mapbounds( igrp, size, system, par, alignsys,
+  gettimeofday( &tv1, NULL );
+  smf_mapbounds( igrp, size, system, spacerefwcs, alignsys,
                  lbnd_out, ubnd_out, &outfset, &moving, &boxes, status );
-  msgBlank( status );
-
   gettimeofday( &tv2, NULL );
+  msgBlank( status );
 
   msgSeti("TDIFF",tv2.tv_sec-tv1.tv_sec);
   msgOutif( MSG__DEBUG, " ", "Mapbounds took ^TDIFF s", status);

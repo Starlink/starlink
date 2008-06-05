@@ -14,7 +14,8 @@
 *     C function
 
 *  Invocation:
-*     smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ], 
+*     smf_mapbounds( Grp *igrp,  int size, const char *system,
+*                   const AstFrameSet *refwcs,
 *                   int alignsys, int *lbnd_out, int *ubnd_out, 
 *                   AstFrameSet **outframeset, int *moving, smfBox ** boxes,
 *                   int *status );
@@ -24,26 +25,15 @@
 *        Group of timestream NDF data files to retrieve pointing
 *     size = int (Given)
 *        Number of elements in igrp
-*     system = char* (Given)
+*     system = const char* (Given)
 *        String indicating the type of projection (e.g. "icrs")
-*     par = double[ 7 ] (Given and Returned)
-*        An array holding the parameters describing the spatial
-*        projection between celestial (longitude,latitude) in the
-*        system specified by "system", and an interim GRID coordinate
-*        system for the output cube (interim because the bounds of the
-*        output map are not yet known - the interim grid system is
-*        thus more like a PIXEL system for the output cube but with an
-*        arbitrary pixel origin). These are stored in the order
-*        CRPIX1, CRPIX2, CRVAL1, CRVAL2, CDELT1, CDELT2, CROTA2. The
-*        supplied values are used to produce the output WCS
-*        FrameSet. All the angular parameters are in units of radians,
-*        and CRPIX1/2 are in units of pixels.
+*     spacerefwcs = const AstFrameSet * (Given)
+*        Frameset corresponding to a reference WCS that should be
+*        used to define the output pixel grid. Can be NULL.
 *     alignsys = int (Given)
 *        If non-zero, then the input data will be aligned in the coordinate 
 *        system specified by "system" rather than in the default system
 *        (ICRS).
-*     pixsize = double (Given)
-*        Linear size of a map pixel (arcsec)
 *     lbnd_out = double* (Returned)
 *        2-element array pixel coord. for the lower bounds of the output map 
 *     ubnd_out = double* (Returned)
@@ -133,10 +123,13 @@
 *        - Add alignsys flag. Replaces "int flag" that was unused.
 *        - Fix -Wall warnings.
 *        - use smf_calc_skyframe
+*     2008-06-05 (TIMJ):
+*        - par[] does not need to be an argument.
+*        - replace par[] with reference spatial frameset.
 *     {enter_further_changes_here}
 
 *  Notes:
-*     Currently lon_0 and lat_0 are interpreted only as ra/dec of tangent point
+*     The par[7] array used in this routine is documented in smf_get_projpar.c
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -183,7 +176,8 @@
 
 #define FUNC_NAME "smf_mapbounds"
 
-void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ], 
+void smf_mapbounds( Grp *igrp,  int size, const char *system,
+                    const AstFrameSet *spacerefwcs,
                     int alignsys, int *lbnd_out, int *ubnd_out, 
                     AstFrameSet **outframeset, int *moving,
                     smfBox ** boxes, int *status ) {
@@ -207,12 +201,13 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
   dim_t k;                     /* Loop counter */
   int lbnd0[ 2 ];              /* Defaults for LBND parameter */
   double map_pa=0;             /* Map PA in output coord system (rads) */ 
+  double par[7];               /* Projection parameters */
   char *pname = NULL;          /* Name of currently opened data file */
   double shift[ 2 ];           /* Shifts from PIXEL to GRID coords */
-  AstMapping *sky2map = NULL;  /* Mapping celestial->map coordinates,
+  AstMapping *oskymap = NULL;  /* Mapping celestial->map coordinates,
                                   Sky <> PIXEL mapping in output
                                   FrameSet */
-  AstSkyFrame *skyframe = NULL;/* Output SkyFrame */
+  AstSkyFrame *oskyframe = NULL;/* Output SkyFrame */
   AstFrame *skyin = NULL;      /* Sky Frame in input FrameSet */
   double skyref[ 2 ];          /* Values for output SkyFrame SkyRef attribute */
   AstFrameSet *swcsin = NULL;  /* FrameSet describing input WCS */
@@ -221,7 +216,7 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
   double x_map[4];             /* Projected X-coordinates of corner bolos */ 
   double y_array_corners[4];   /* Y-Indices for corner pixels in array */ 
   double y_map[4];             /* Projected X-coordinates of corner bolos */ 
-   
+
   /* Main routine */
   if (*status != SAI__OK) return;
 
@@ -229,11 +224,16 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
   *outframeset = NULL;
   *moving = 0;
 
-  /* initialize double precision output bounds */
+  /* initialize double precision output bounds and the proj pars */
+  for( i = 0; i < 7; i++ ) par[ i ] = AST__BAD;
   dlbnd[ 0 ] = VAL__MAXD;
   dlbnd[ 1 ] = VAL__MAXD;
   dubnd[ 0 ] = VAL__MIND;
   dubnd[ 1 ] = VAL__MIND;
+
+  /* If we have a supplied reference WCS we can use that directly
+     without having to calculate it from the data */
+  if (spacerefwcs) oskyframe = astGetFrame( spacerefwcs, AST__CURRENT );
 
   /* Create array of returned smfBox structures and store a pointer
      to the next one to be initialised. */
@@ -363,9 +363,9 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
         skyin = astGetFrame( swcsin, AST__CURRENT );
 
         /* Create output SkyFrame */
-        if ( skyframe == NULL ) {
+        if ( oskyframe == NULL ) {
 
-          smf_calc_skyframe( skyin, system, hdr, alignsys, &skyframe, skyref,
+          smf_calc_skyframe( skyin, system, hdr, alignsys, &oskyframe, skyref,
                              moving, status );
 
           /* Get the orientation of the map vertical within the output celestial
@@ -376,59 +376,65 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
           /* Calculate the projection parameters. We do not enable autogrid determination
              for SCUBA-2 so we do not need to obtain all the data before calculating
              projection parameters. */
-          smf_get_projpar( skyframe, skyref, *moving, 0, 0, NULL, 0,
+          smf_get_projpar( oskyframe, skyref, *moving, 0, 0, NULL, 0,
                            map_pa, par, NULL, NULL, status );
 
-        } /* End skyframe construction */
+        } /* End oskyframe construction */
 
-        if ( *outframeset == NULL && skyframe != NULL && (*status == SAI__OK)){
+        if ( *outframeset == NULL && oskyframe != NULL && (*status == SAI__OK)){
+          /* Now created a spatial Mapping. Use the supplied reference frameset
+             if supplied */
+          if (spacerefwcs) {
+            oskymap = astGetMapping( spacerefwcs, AST__BASE, AST__CURRENT );
+          } else {
           /* Now populate a FitsChan with FITS-WCS headers describing
              the required tan plane projection. The longitude and
              latitude axis types are set to either (RA,Dec) or (AZ,EL)
              to get the correct handedness. Convert from radians to
              degrees as required by FITS. */
-          fitschan = astFitsChan ( NULL, NULL, "" );
+            fitschan = astFitsChan ( NULL, NULL, "" );
 
-          if( !strcmp( astGetC( skyframe, "System" ), "AZEL" ) ){
-            astSetFitsS( fitschan, "CTYPE1", "AZ---TAN", " ", 1 );
-            astSetFitsS( fitschan, "CTYPE2", "EL---TAN", " ", 1 );
-          } else {
-            astSetFitsS( fitschan, "CTYPE1", "RA---TAN", " ", 1 );
-            astSetFitsS( fitschan, "CTYPE2", "DEC--TAN", " ", 1 );
+            if( !strcmp( astGetC( oskyframe, "System" ), "AZEL" ) ){
+              astSetFitsS( fitschan, "CTYPE1", "AZ---TAN", " ", 1 );
+              astSetFitsS( fitschan, "CTYPE2", "EL---TAN", " ", 1 );
+            } else {
+              astSetFitsS( fitschan, "CTYPE1", "RA---TAN", " ", 1 );
+              astSetFitsS( fitschan, "CTYPE2", "DEC--TAN", " ", 1 );
+            }
+            astSetFitsF( fitschan, "CRPIX1", par[0], " ", 1 );
+            astSetFitsF( fitschan, "CRPIX2", par[1], " ", 1 );
+            astSetFitsF( fitschan, "CRVAL1", par[2]*AST__DR2D, " ", 1 );
+            astSetFitsF( fitschan, "CRVAL2", par[3]*AST__DR2D, " ", 1 );
+            astSetFitsF( fitschan, "CDELT1", par[4]*AST__DR2D, " ", 1 );
+            astSetFitsF( fitschan, "CDELT2", par[5]*AST__DR2D, " ", 1 );
+            astSetFitsF( fitschan, "CROTA2", par[6]*AST__DR2D, " ", 1 );
+
+            astClear( fitschan, "Card" );
+            fs = astRead( fitschan );
+
+            /* Extract the output PIXEL->SKY Mapping. */
+            oskymap = astGetMapping( fs, AST__BASE, AST__CURRENT );
+            /* Tidy up */
+            fs = astAnnul( fs );
           }
-          astSetFitsF( fitschan, "CRPIX1", par[0], " ", 1 );
-          astSetFitsF( fitschan, "CRPIX2", par[1], " ", 1 );
-          astSetFitsF( fitschan, "CRVAL1", par[2]*AST__DR2D, " ", 1 );
-          astSetFitsF( fitschan, "CRVAL2", par[3]*AST__DR2D, " ", 1 );
-          astSetFitsF( fitschan, "CDELT1", par[4]*AST__DR2D, " ", 1 );
-          astSetFitsF( fitschan, "CDELT2", par[5]*AST__DR2D, " ", 1 );
-          astSetFitsF( fitschan, "CROTA2", par[6]*AST__DR2D, " ", 1 );
-
-          astClear( fitschan, "Card" );
-          fs = astRead( fitschan );
-
-          /* Extract the output PIXEL->SKY Mapping. */
-          sky2map = astGetMapping( fs, AST__BASE, AST__CURRENT );
           /* Get a copy of the output SkyFrame and ensure it represents
              absolute coords rather than offset coords. */
-          abskyframe = astCopy( skyframe );
+          abskyframe = astCopy( oskyframe );
           astClear( abskyframe, "SkyRefIs" );
           astClear( abskyframe, "AlignOffset" );
 
-          /* Tidy up */
-          fs = astAnnul( fs );
           /* Create the output FrameSet */
           *outframeset = astFrameSet( astFrame(2, "Domain=GRID"), "");
 
           /* Now add the SkyFrame to it */
-          astAddFrame( *outframeset, AST__BASE, sky2map, skyframe );
-          /* Invert the sky2map mapping */
-          astInvert( sky2map );
+          astAddFrame( *outframeset, AST__BASE, oskymap, oskyframe );
+          /* Invert the oskymap mapping */
+          astInvert( oskymap );
 
         } /* End WCS FrameSet construction */
 
         /* Calculate the bolo to map-pixel transformation for this tslice */
-        bolo2map = smf_rebin_totmap( data, j, abskyframe, sky2map, 
+        bolo2map = smf_rebin_totmap( data, j, abskyframe, oskymap, 
                                      *moving, status );
 
         if ( *status == SAI__OK ) {
@@ -478,6 +484,13 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
       *status = SAI__ERROR;
       errRep( " ", "Unable to find any valid map bounds", status );
     }
+  }
+
+  /* If spatial reference wcs was supplied, store par values that result in
+     no change to the pixel origin. */
+  if( spacerefwcs ){
+    par[ 0 ] = 0.5;
+    par[ 1 ] = 0.5;
   }
 
   /* Need to re-align with the interim GRID coordinates */
@@ -562,7 +575,7 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
     errRep(FUNC_NAME, "Unable to determine map bounds", status);
   }
 
-  if (sky2map) sky2map  = astAnnul( sky2map );
+  if (oskymap) oskymap  = astAnnul( oskymap );
   if (bolo2map) bolo2map = astAnnul( bolo2map );
   if (fitschan) fitschan = astAnnul( fitschan );
 
