@@ -238,7 +238,6 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
 /* Local Variables */
    AstFrame *sf1 = NULL;      /* Spatial Frame representing AZEL system */
-   AstFrame *sf2 = NULL;      /* Spatial Frame representing requested system */
    AstFrame *skyin = NULL;    /* Sky Frame in input FrameSet */
    AstFrameSet *fs = NULL;    /* A general purpose FrameSet pointer */
    AstFrameSet *swcsin = NULL;/* FrameSet describing spatial input WCS */
@@ -247,13 +246,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    Grp *labgrp = NULL;        /* GRP group holding used detector labels */
    char *pname = NULL;        /* Name of currently opened data file */
    char outcatnam[ 41 ];      /* Output catalogue name */
-   char reflat[ 41 ];         /* Reference latitude string */
-   char reflon[ 41 ];         /* Reference longitude string */
-   const char *deflat;        /* Default for REFLAT */
-   const char *deflon;        /* Default for REFLON */
    const char *lab = NULL;    /* Pointer to start of next detector name */
-   const char *trsys = NULL;  /* AST tracking system */
-   const char *usesys = NULL; /* AST system for output cube */
    const double *tsys;        /* Pointer to Tsys value for first detector */
    double *allpos = NULL;/* Array of all sample positions */
    double *allpos2 = NULL;/* Array of all sample positions */
@@ -265,19 +258,11 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    double *yin = NULL;   /* Workspace for detector input grid positions */
    double *yout = NULL;  /* Workspace for detector output pixel positions */
    double a;             /* Longitude value */
-   double az[ 2 ];       /* Azimuth values */
    double b;             /* Latitude value */
-   double dec[ 2 ];      /* Dec values */
-   double defsize[ 2 ];  /* Default pixel sizes in arc-seconds */
-   double el[ 2 ];       /* Elevation values */
-   double map_pa;        /* Map position angle in output coord system (rads) */ 
-   double pixsize[ 2 ];  /* Pixel sizes in arc-seconds */
-   double ra[ 2 ];       /* RA values */
-   double rdiam;         /* Diameter of bounding circle, in rads */
-   double sep;           /* Separation between first and last base positions */
+   double map_pa=0;      /* Map position angle in output coord system (rads) */ 
    double skyref[ 2 ];   /* Values for output SkyFrame SkyRef attribute */
    float *pdata;         /* Pointer to next data sample */
-   float telres;         /* Telescope resolution in radians */
+   float telres=0;       /* Telescope resolution in radians */
    int found;            /* Was current detector name found in detgrp? */
    int good;             /* Are there any good detector samples? */
    int ibasein;          /* Index of base Frame in input FrameSet */
@@ -288,7 +273,6 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
    int ispec;            /* Index of current spectral sample */
    int itime;            /* Index of current time slice */
    int nallpos;          /* Number of positions */
-   int nval;             /* Number of values supplied */
    int outcat;           /* Produce an output catalogue holding sample positions? */
    int useauto;          /* Are autogrid default projection parameters being used? */
    smfData *data = NULL; /* Pointer to data struct for current input file */
@@ -459,89 +443,12 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 /* If we have not yet created the output SkyFrame, do so now. */
          if( ! *skyframe ) {
 
+           smf_calc_skyframe( skyin, system, hdr, alignsys, skyframe, skyref, moving, status );
+
 /* Get the orientation of the map vertical within the output celestial
    coordinate system. This is derived form the MAP_PA FITS header, which
    gives the orientation of the map vertical within the tracking system. */
-            map_pa = smf_calc_mappa( hdr, system, skyin, status );
-
-/* Determine the tracking system, and choose the celestial coordinate system 
-   for the output cube. */
-            trsys = smf_convert_system( hdr->state->tcs_tr_sys, status );
-            if( !strcmp( system, "TRACKING" ) ) {
-               usesys = trsys;
-            } else {
-               usesys = system;
-            }
-
-/* Create a SkyFrame by copying the input SkyFrame (in order to inherit
-   all the other attributes like Epoch, Equinox, ObsLat, ObsLon, Dut1, etc)
-   and then set its System to the required system. */
-            *skyframe = astCopy( skyin );
-            astSetC( *skyframe, "System", usesys );
-
-/* If required, ensure that alignment on the sky is performed in the output
-   coordinate system rather than the default (ICRS). */
-            if( alignsys ) astSetC( *skyframe, "AlignSystem", usesys );
-
-/* We will later record the telescope base pointing position as the SkyRef 
-   attribute in the output SkyFrame. To do this, we need to convert the 
-   stored telescope base pointing position from AZEL to the requested
-   output system. Create a Mapping to do this using astConvert, and then
-   use the Mapping to transform the stored position. */
-            sf1 = astCopy( *skyframe );
-            astSetC( sf1, "System", "AZEL" );
-            azel2usesys = astConvert( sf1, *skyframe, "" );
-            astTran2( azel2usesys, 1, &(hdr->state->tcs_az_bc1),
-                           &(hdr->state->tcs_az_bc2), 1, skyref, skyref + 1 );
-
-/* Normalise these values. */
-            astNorm( *skyframe, skyref );
-
-/* Determine if the telescope is tracking a moving target such as a planet 
-   or asteroid. This is indicated by significant change in the telescope 
-   base pointing position within the output coordinate system. Here, 
-   "significant" means more than 1 arc-second. Apparently users will only 
-   want to track moving objects if the output cube is in AZEL or GAPPT, so 
-   we ignoring a moving base pointing position unless the output system 
-   is AZEL or GAPPT. */
-            if( !strcmp( usesys, "AZEL" ) ||
-                !strcmp( usesys, "GAPPT" ) ) {
-
-/* Get a copy of the output SkyFrame. */
-               sf2 = astCopy( *skyframe );
-
-/* Set the Epoch for `sf1' andf `sf2' to the epoch of the first time slice, 
-   then use  the Mapping from `sf1' (AzEl) to `sf2' (output system) to 
-   convert the telescope base pointing position for the first time slices 
-   from (az,el) to the output system. */
-               astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
-                           (hdr->allState)[ 0 ].tcs_tai + 32.184/86400.0 );
-               astSet( sf2, "Epoch=MJD %.*g", DBL_DIG, 
-                           (hdr->allState)[ 0 ].tcs_tai + 32.184/86400.0 );
-               az[ 0 ] = (hdr->allState)[ 0 ].tcs_az_bc1;
-               el[ 0 ] = (hdr->allState)[ 0 ].tcs_az_bc2;
-               astTran2( astConvert( sf1, sf2, "" ), 1, az, el, 1, ra, dec );
-
-/* Set the Epoch for `sf1' andf `sf2' to the epoch of the last time slice, 
-   then use  the Mapping from `sf1' (AzEl) to `sf2' (output system) to 
-   convert the telescope base pointing position for the last time slices 
-   from (az,el) to the output system. */
-               astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
-                           (hdr->allState)[ hdr->nframes - 1 ].tcs_tai + 32.184/86400.0 );
-               astSet( sf2, "Epoch=MJD %.*g", DBL_DIG, 
-                           (hdr->allState)[ hdr->nframes - 1 ].tcs_tai + 32.184/86400.0 );
-               az[ 1 ] = (hdr->allState)[ hdr->nframes - 1 ].tcs_az_bc1;
-               el[ 1 ] = (hdr->allState)[ hdr->nframes - 1 ].tcs_az_bc2;
-               astTran2( astConvert( sf1, sf2, "" ), 1, az + 1, el + 1, 1, 
-                              ra + 1, dec + 1 );
-
-/* Get the arc distance between the two positions and see if it is
-   greater than 1 arc-sec. */
-               sep = slaDsep( ra[ 0 ], dec[ 0 ], ra[ 1 ], dec[ 1 ] );
-               *moving = ( sep > AST__DD2R/3600.0 );
-            } else {
-               *moving = 0;
-            }
+           map_pa = smf_calc_mappa( hdr, system, skyin, status );
 
 /* If we do not need to look at any other time slices, we can leave the loop
    early. */
@@ -707,8 +614,6 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 /* Free resources. */
       allpos2 = astFree( allpos2 );
    } 
-
-  L999:;
 
 /* Free work space. */
    allpos = astFree( allpos );

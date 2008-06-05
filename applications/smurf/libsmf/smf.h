@@ -313,6 +313,7 @@
 *        Add smf_display_projpars
 *     2008-06-04 (TIMJ):
 *        smf_get_projpar new API.
+*        Add smf_calc_skyframe
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -589,7 +590,7 @@ void * smf_malloc( size_t nelem, size_t bytes_per_elem, int zero,
                    int * status );
 
 void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ], 
-		    int flag, int *lbnd_out, int *ubnd_out, 
+                    int alignsys, int *lbnd_out, int *ubnd_out, 
         AstFrameSet **outframeset, int *moving, smfBox ** boxes,int *status );
 
 void smf_mapbounds_approx( Grp *igrp, int index, char *system, double pixsize, 
@@ -973,4 +974,9 @@ void smf_get_taskname( char * taskname, char * prvname, int * status);
 void smf_display_projpars( AstSkyFrame * skyframe, double par[7],
                            int *status);
 
+void smf_calc_skyframe( const AstFrame * skyin, const char * system,
+                        const smfHead* hdr, 
+                        int alignsys, AstSkyFrame ** skyframe,
+                        double skyref[2],
+                        int * moving, int * status );
 #endif /* SMF_DEFINED */

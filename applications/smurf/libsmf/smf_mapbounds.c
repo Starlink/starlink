@@ -15,7 +15,7 @@
 
 *  Invocation:
 *     smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ], 
-*                   int flag, int *lbnd_out, int *ubnd_out, 
+*                   int alignsys, int *lbnd_out, int *ubnd_out, 
 *                   AstFrameSet **outframeset, int *moving, smfBox ** boxes,
 *                   int *status );
 
@@ -38,9 +38,10 @@
 *        supplied values are used to produce the output WCS
 *        FrameSet. All the angular parameters are in units of radians,
 *        and CRPIX1/2 are in units of pixels.
-*     flag = int (Given)
-*        If 0, use lon_0, lat_0. If non-zero BASE coordinates are adopted for
-*        the reference point instead.
+*     alignsys = int (Given)
+*        If non-zero, then the input data will be aligned in the coordinate 
+*        system specified by "system" rather than in the default system
+*        (ICRS).
 *     pixsize = double (Given)
 *        Linear size of a map pixel (arcsec)
 *     lbnd_out = double* (Returned)
@@ -128,6 +129,10 @@
 *        Change API of smf_get_projpar
 *        Return pixel bounds rather than grid bounds
 *        Prompt for bounds here rather than in caller.
+*     2008-06-04 (TIMJ):
+*        - Add alignsys flag. Replaces "int flag" that was unused.
+*        - Fix -Wall warnings.
+*        - use smf_calc_skyframe
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -167,6 +172,7 @@
 #include "mers.h"
 #include "prm_par.h"
 #include "sae_par.h"
+#include "par.h"
 #include "star/ndg.h"
 #include "star/slalib.h"
 
@@ -178,24 +184,20 @@
 #define FUNC_NAME "smf_mapbounds"
 
 void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ], 
-                    int flag, int *lbnd_out, int *ubnd_out, 
+                    int alignsys, int *lbnd_out, int *ubnd_out, 
                     AstFrameSet **outframeset, int *moving,
                     smfBox ** boxes, int *status ) {
 
   /* Local Variables */
   AstSkyFrame *abskyframe = NULL; /* Output Absolute SkyFrame */
   int actval;           /* Number of parameter values supplied */
-  double az[ 2 ];              /* Azimuth values */
-  AstMapping *azel2usesys = NULL; /* Mapping form AZEL to requested system */
   AstMapping *bolo2map = NULL; /* Combined mapping bolo->map
                                   coordinates, WCS->GRID Mapping from
                                   input WCS FrameSet */
   smfBox *box = NULL;          /* smfBox for current file */
   smfData *data = NULL;        /* pointer to  SCUBA2 data struct */
-  double dec[ 2 ];             /* Dec values */
   double dlbnd[ 2 ];    /* Floating point lower bounds for output map */
   double dubnd[ 2 ];    /* Floating point upper bounds for output map */
-  double el[ 2 ];              /* Elevation values */
   smfFile *file = NULL;        /* SCUBA2 data file information */
   AstFitsChan *fitschan = NULL;/* Fits channels to construct WCS header */
   AstFrameSet *fs = NULL;      /* A general purpose FrameSet pointer */
@@ -206,10 +208,6 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
   int lbnd0[ 2 ];              /* Defaults for LBND parameter */
   double map_pa=0;             /* Map PA in output coord system (rads) */ 
   char *pname = NULL;          /* Name of currently opened data file */
-  double ra[ 2 ];              /* RA values */
-  double sep = 0;              /* Separation between first and last base positions */
-  AstFrame *sf1 = NULL;        /* Spatial Frame representing AZEL system */
-  AstFrame *sf2 = NULL;        /* Spatial Frame representing requested system */
   double shift[ 2 ];           /* Shifts from PIXEL to GRID coords */
   AstMapping *sky2map = NULL;  /* Mapping celestial->map coordinates,
                                   Sky <> PIXEL mapping in output
@@ -217,10 +215,8 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
   AstSkyFrame *skyframe = NULL;/* Output SkyFrame */
   AstFrame *skyin = NULL;      /* Sky Frame in input FrameSet */
   double skyref[ 2 ];          /* Values for output SkyFrame SkyRef attribute */
-  int startboundcheck = 1;     /* Flag for first check of map dimensions */
   AstFrameSet *swcsin = NULL;  /* FrameSet describing input WCS */
   int ubnd0[ 2 ];              /* Defaults for UBND parameter */
-  const char *usesys = NULL;   /* AST system for output cube */
   double x_array_corners[4];   /* X-Indices for corner bolos in array */ 
   double x_map[4];             /* Projected X-coordinates of corner bolos */ 
   double y_array_corners[4];   /* Y-Indices for corner pixels in array */ 
@@ -369,97 +365,13 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
         /* Create output SkyFrame */
         if ( skyframe == NULL ) {
 
-          /* Get the orientation of the map vertical within the output
-             celestial coordinate system. This is derived form the
-             MAP_PA FITS header, which gives the orientation of the
-             map vertical within the tracking system. */
+          smf_calc_skyframe( skyin, system, hdr, alignsys, &skyframe, skyref,
+                             moving, status );
+
+          /* Get the orientation of the map vertical within the output celestial
+             coordinate system. This is derived form the MAP_PA FITS header, which
+             gives the orientation of the map vertical within the tracking system. */
           map_pa = smf_calc_mappa( hdr, system, skyin, status );
-
-          /* Determine the tracking coordinate system, and choose
-             the celestial coordinate system for the output cube. */
-          if( !strncmp( system, "TRACKING", 8 ) ) {
-            usesys = smf_convert_system( hdr->state->tcs_tr_sys, status );
-          } else {
-            usesys = system;
-          }
-
-          /* Begin by taking a copy of the input SkyFrame (in order to
-             inherit all the other attributes like Epoch, Equinox,
-             ObsLat, ObsLon, Dut1, etc) and then set its System to the
-             required system. */
-          skyframe = astCopy( skyin );
-          astSetC( skyframe, "SYSTEM", usesys );
-
-          /* We will later record the telescope base pointing position
-             as the SkyRef attribute in the output SkyFrame. To do
-             this, we need to convert the stored telescope base
-             pointing position from AZEL to the requested output
-             system. Create a Mapping to do this using astConvert, and
-             then use the Mapping to transform the stored position. */
-          sf1 = astCopy( skyin );
-          astSetC( sf1, "SYSTEM", "AZEL" );
-          azel2usesys = astConvert( sf1, skyframe, "" );
-          astTran2( azel2usesys, 1, &(hdr->state->tcs_az_bc1),
-                    &(hdr->state->tcs_az_bc2), 1, skyref, skyref+1 );
-          azel2usesys = astAnnul( azel2usesys );
-          astNorm( skyframe, skyref );
-
-          /* Determine if the telescope is tracking a moving target
-             such as a planet or asteroid. This is indicated by
-             significant change in the telescope base pointing
-             position within the ICRS coordinate system. Here,
-             "significant" means more than 1 arc-second. Apparently
-             users will only want to track moving objects if the
-             output cube is in AZEL or GAPPT, so we ignoring a moving
-             base pointing position unless the output system is AZEL
-             or GAPPT. */
-          if( !strcmp( usesys, "AZEL" ) || !strcmp( usesys, "GAPPT" ) ) {
-            /* Set the "sf2" SkyFrame to represent ICRS coords
-               ("sf1" already represents AZEL coords). */
-            sf2 = astCopy( skyin );
-            astSetC( sf2, "System", "ICRS" );
-
-            /* Set the Epoch for `sf1' andf `sf2' to the epoch of the
-               first time slice, then use the Mapping from `sf1' (AzEl) to
-               `sf2' (ICRS) to convert the telescope base pointing position
-               for the first time slices from (az,el) to ICRS. */
-
-            astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
-                    (hdr->allState)[ 0 ].tcs_tai + 32.184/86400.0 );
-            astSet( sf2, "Epoch=MJD %.*g", DBL_DIG, 
-                    (hdr->allState)[ 0 ].tcs_tai + 32.184/86400.0 );
-            az[ 0 ] = (hdr->allState)[ 0 ].tcs_az_bc1;
-            el[ 0 ] = (hdr->allState)[ 0 ].tcs_az_bc2;
-            astTran2( astConvert( sf1, sf2, "" ), 1, az, el, 1, ra, dec );
-
-
-            /* Set the Epoch for `sf1' andf `sf2' to the epoch of the
-               last time slice, then use the Mapping from `sf1' (AzEl) to
-               `sf2' (ICRS) to convert the telescope base pointing position
-               for the last time slices from (az,el) to ICRS. */
-
-            astSet( sf1, "Epoch=MJD %.*g", DBL_DIG, 
-                    (hdr->allState)[ hdr->nframes - 1 ].tcs_tai + 32.184/86400.0 );
-            astSet( sf2, "Epoch=MJD %.*g", DBL_DIG, 
-                    (hdr->allState)[ hdr->nframes - 1 ].tcs_tai + 32.184/86400.0 );
-            az[ 1 ] = (hdr->allState)[ hdr->nframes - 1 ].tcs_az_bc1;
-            el[ 1 ] = (hdr->allState)[ hdr->nframes - 1 ].tcs_az_bc2;
-            astTran2( astConvert( sf1, sf2, "" ), 1, az + 1, el + 1, 1, 
-                      ra + 1, dec + 1 );
-
-            sf1 = astAnnul( sf1 );
-            sf2 = astAnnul( sf2 );
-            /* Get the arc distance between the two positions and
-               see if it is greater than 0.1 arc-sec. */
-            sep = slaDsep( ra[ 0 ], dec[ 0 ], ra[ 1 ], dec[ 1 ] );
-            *moving = ( sep > 0.1*AST__DD2R/3600.0 );
-          } else {
-            *moving = 0;
-          }
-          /* Just for kicks, let the user know the value of *moving */
-          msgSeti("M",*moving);
-          msgSetd("R", sep*AST__DR2D*3600.0 );
-          msgOutif(MSG__VERB, " ", "Moving = ^M (^R arcsec)", status);
 
           /* Calculate the projection parameters. We do not enable autogrid determination
              for SCUBA-2 so we do not need to obtain all the data before calculating
@@ -639,7 +551,6 @@ void smf_mapbounds( Grp *igrp,  int size, char *system, double par[ 7 ],
      current AST context so that it will not be annulled when the AST
      context is ended. Otherwise, ensure a null pointer is returned. */
   if( *status == SAI__OK ) {
-    astSetC( *outframeset, "SYSTEM", usesys );
     astExport( *outframeset );
   } else {
     *outframeset = astAnnul( *outframeset );
