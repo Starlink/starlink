@@ -758,6 +758,8 @@
 *        Factor out WCS bounds reporting into separate function.
 *     05-JUN-2008 (EC):
 *        Removed is2d from smf_choosetiles interface
+*     06-JUN-2008 (TIMJ):
+*        Change smf_open_ndfname API.
 
 *  Copyright:
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
@@ -1522,7 +1524,7 @@ void smurf_makecube( int *status ) {
                                            0, 0, status );
                smf_open_ndfname ( weightsloc, "WRITE", NULL, "WEIGHTS", "NEW", 
                                   "_DOUBLE", nwgtdim, (int *) lbnd_wgt, 
-                                  (int *) ubnd_wgt, &wdata, status );
+                                  (int *) ubnd_wgt, NULL, NULL, NULL,  &wdata, status );
                if( wdata ) wgt_array = (wdata->pntr)[ 0 ];
          
             } else {
@@ -1540,36 +1542,28 @@ void smurf_makecube( int *status ) {
    
          smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "EXP_TIME", "NEW", 
                             "_REAL", 2, (int *) tile->elbnd, 
-                            (int *) tile->eubnd, &expdata, status );
+                            (int *) tile->eubnd, "Total exposure time",
+                            "s", wcstile2d, &expdata, status );
          if( expdata ) {
             exp_array = (expdata->pntr)[ 0 ];
-            ndfPtwcs( wcstile2d, expdata->file->ndfid, status );
-            ndfCput( "Total exposure time", expdata->file->ndfid, "Label", 
-                     status ); 
-            ndfCput( "s", expdata->file->ndfid, "Unit", status ); 
          }
    
          smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "EFF_TIME", "NEW", 
                             "_REAL", 2, (int *) tile->elbnd, 
-                            (int *) tile->eubnd, &effdata, status );
+                            (int *) tile->eubnd, "Effective integration time",
+                            "s", wcstile2d, &effdata, status );
          if( effdata ) {
             eff_array = (effdata->pntr)[ 0 ];
-            ndfPtwcs( wcstile2d, effdata->file->ndfid, status );
-            ndfCput( "Effective integration time", effdata->file->ndfid, 
-                     "Label", status ); 
-            ndfCput( "s", effdata->file->ndfid, "Unit", status ); 
          }
    
          if( genvar && spread == AST__NEAREST ) {
             smf_open_ndfname ( smurf_xloc, "WRITE", NULL, "TSYS", "NEW", 
                                "_REAL", 2, (int *) tile->elbnd, 
-                               (int *) tile->eubnd, &tsysdata, status );
+                               (int *) tile->eubnd,
+                               "Effective system temperature", "K", wcstile2d,
+                               &tsysdata, status );
             if( tsysdata ) {
                tsys_array = (tsysdata->pntr)[ 0 ];
-               ndfPtwcs( wcstile2d, tsysdata->file->ndfid, status );
-               ndfCput( "Effective system temperature", tsysdata->file->ndfid, 
-                        "Label", status ); 
-               ndfCput( "K", tsysdata->file->ndfid, "Unit", status ); 
             }
          }
    
