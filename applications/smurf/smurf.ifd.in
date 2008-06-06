@@ -434,6 +434,16 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter ref {
+                type NDF
+                access READ
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
+                prompt {Reference NDF}
+                default !
+                helpkey *
+            }
+
             parameter reflat {
                 type LITERAL
                 access READ
