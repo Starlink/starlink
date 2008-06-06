@@ -994,4 +994,8 @@ smf_store_outputbounds (const int lbnd_out[3],const int ubnd_out[3],
                         const AstSkyFrame *oskyfrm, 
                         const AstMapping *oskymap, int *status);
 
+void
+smf_expand_tilegroup ( Grp * ogrp, int ntile, int npbin, int * outsize,
+                       int * status);
+
 #endif /* SMF_DEFINED */
