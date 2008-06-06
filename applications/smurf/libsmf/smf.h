@@ -316,6 +316,8 @@
 *        Add smf_calc_skyframe
 *     2008-06-05 (EC):
 *        Removed is2d from smf_choosetiles
+*     2008-06-06 (EC):
+*        Renamed smf_fft_filter to smf_filter_execute
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -836,7 +838,7 @@ int ***smf_freepolbins( int nndf, int npbin, double **pangle, int ***ptime,
 
 void smf_polext( int ondf, double angle, int *status );
 
-void smf_fft_filter( smfData *data, double srate, int *status );
+void smf_filter_execute( smfData *data, double srate, int *status );
 
 void smf_concat_smfGroup( smfGroup *igrp, int whichchunk, int isTordered, 
 			  AstFrameSet *outfset, int moving, 
