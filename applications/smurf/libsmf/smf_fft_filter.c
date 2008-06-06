@@ -73,12 +73,10 @@
 #include "star/ndg.h"
 #include "prm_par.h"
 #include "par_par.h"
+#include "fftw3.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
-
-/* Externel includes */
-#include <fftw3.h>
 
 #define FUNC_NAME "smf_fft_filter"
 
@@ -145,7 +143,7 @@ void smf_fft_filter( smfData *data, double srate, int *status ) {
   /* Build the filter array (test with a low-pass filter, 10 Hz) */
 
   df = srate/(double) ntslice; 
-  icut = (dim_t) 10./df;         /* index of cutoff frequency in filter */
+  icut = (dim_t) 1./df;         /* index of cutoff frequency in filter */
 
   for( i=0; i<ntslice/2+1; i++ ) {
     if( i < icut ) {
