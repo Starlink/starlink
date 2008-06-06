@@ -760,6 +760,7 @@
 *        Removed is2d from smf_choosetiles interface
 *     06-JUN-2008 (TIMJ):
 *        Change smf_open_ndfname API.
+*        Use smf_expand_tilegroup
 
 *  Copyright:
 *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
@@ -843,7 +844,6 @@ void smurf_makecube( int *status ) {
    Grp *igrp = NULL;          /* Group of input files */
    Grp *igrp4 = NULL;         /* Group holding output NDF names */
    Grp *ogrp = NULL;          /* Group containing output file */
-   Grp *tgrp = NULL;          /* Temporary Group pointer */
    HDSLoc *smurf_xloc = NULL; /* HDS locator for output SMURF extension */
    HDSLoc *weightsloc = NULL; /* HDS locator of weights array */
    char *pname = NULL;        /* Name of currently opened data file */
@@ -877,7 +877,6 @@ void smurf_makecube( int *status ) {
    int axes[ 2 ];             /* Indices of selected axes */
    int badmask;               /* How is the output bad pixel mask chosen? */
    int blank;                 /* Was a blank line just output? */
-   int blen;                  /* Used length of the "basename" string */
    int el0;                   /* Index of 2D array element */
    int el;                    /* Index of 3D array element */
    int first;                 /* Is this the first input file? */
@@ -1312,41 +1311,8 @@ void smurf_makecube( int *status ) {
          goto L998;
       }
 
-/* Expand the group to hold an output NDF name for each tile. */
-      if( ntile > 1 ) {
-         pname = basename;
-         grpGet( ogrp, 1, 1, &pname, GRP__SZNAM, status );
-         grpDelet( &ogrp, status);
-
-         blen = astChrLen( basename );
-         ogrp = grpNew( "", status );
-         for( itile = 0; itile < ntile; itile++ ) {
-            sprintf( basename + blen, "_%d", itile + 1 );            
-            grpPut1( ogrp, basename, 0, status );
-         }
-         outsize = ntile;
-      } else {
-         outsize = 1;
-      }
-         
-/* Expand the group to hold an output NDF name for each polarisation bin
-   and tile. */
-      if( npbin > 1 ) {
-         tgrp = grpNew( "", status );
-         for( itile = 1; itile <= outsize; itile++ ) {
-            pname = basename;
-            grpGet( ogrp, itile, 1, &pname, GRP__SZNAM, status );
-            blen = astChrLen( basename );
-
-            for( ipbin = 0; ipbin < npbin; ipbin++ ){
-               sprintf( basename + blen, ".p%d", ipbin + 1 );            
-               grpPut1( tgrp, basename, 0, status );
-            }
-
-            grpDelet( &ogrp, status);
-            ogrp = tgrp;
-         }
-      }
+/* Expand the group to hold an output NDF name for each tile and/or pol bin. */
+      smf_expand_tilegroup( ogrp, ntile, npbin, &outsize, status );
    }
 
 /* Initialise the index of the next output NDF name to use in "ogrp". */
