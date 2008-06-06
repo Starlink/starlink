@@ -182,6 +182,10 @@
 #         Remove USEBAD parameter, set MAXMEM default to 2048 for MAKEMAP
 #     09-MAY-2008 (TIMJ):
 #         Add EXTINCTION:HASSKYREM
+#     05-JUN-2008 (TIMJ):
+#         Add F* parameters to MAKEMAP.
+#         Add ALIGNSYS to MAKEMAP.
+#         Add REF to MAKEMAP
 #     {enter_changes_here}
 
 #  Bugs:
