@@ -139,12 +139,10 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
                       int *status ) {
 
   /* Local Variables */
-  AstSkyFrame *abskyframe = NULL; /* Output Absolute SkyFrame */
   double autorot;       /* Autogrid default for CROTA parameter */
   int coin;             /* Are all points effectively co-incident? */
   const char *deflat;             /* Default for REFLAT */
   const char *deflon;             /* Default for REFLON */
-  double defrot;                  /* Default for CROTA parameter */
   double defsize[ 2 ];            /* Default pixel sizes in arc-seconds */
   int nval;                       /* Number of values supplied */
   double pixsize[ 2 ];            /* Pixel sizes in arc-seconds */
@@ -152,7 +150,7 @@ void smf_get_projpar( AstSkyFrame *skyframe, const double skyref[2],
   char reflat[ 41 ];              /* Reference latitude string */
   char reflon[ 41 ];              /* Reference longitude string */
   int sparse = 0;                 /* Local definition of sparseness */
-  int udefs;                      /* Flag for defaults used or not */
+  int udefs = 0;                  /* Flag for defaults used or not */
   char usesys[ 41 ];              /* Output skyframe system */
 
 /* Main routine */
