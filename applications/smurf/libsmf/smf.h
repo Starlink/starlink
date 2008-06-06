@@ -624,10 +624,13 @@ void smf_open_mapcoord( smfData *data, const char *mode, int *status );
 void smf_open_ndf( const int newndf, char *accmode, char *filename, 
 		   smf_dtype dtype, smfData **ndata, int *status);
 
-void smf_open_ndfname( const HDSLoc *loc, char *accmode, char *filename, 
-                       const char *extname,
-		       const char *state, const char *dattype, const int ndims, 
-		       const int *lbnd, const int *ubnd, smfData **ndfdata, 
+void smf_open_ndfname( const HDSLoc *loc, const char accmode[],
+                       const char filename[], const char extname[],
+                       const char state[], const char dattype[],
+                       const int ndims, const int lbnd[], const int ubnd[], 
+                       const char datalabel[], const char dataunits[],
+                       const AstFrameSet * wcs,
+                       smfData **ndfdata, 
                        int *status);
 
 void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, 

@@ -13,30 +13,45 @@
 *     Library routine
 
 *  Invocation:
-*     smf_open_ndfname( HDSLoc *loc, char *accmode, char *filename, char *extname,
-*		        const char *state, const char *dattype, const int ndims, 
-*		        const int *lbnd, const int *ubnd, smfData **ndfdata, 
+*     smf_open_ndfname( const HDSLoc *loc, const char accmode[],
+*           const char filename[], const char extname[],
+*		        const char state[], const char dattype[], const int ndims, 
+*		        const int lbnd[], const int ubnd[], const char datalabel[],
+*           const char dataunits[], const AstFrameSet * wcs,
+*           smfData **ndfdata, 
 *                       int *status);
 
 *  Arguments:
-*     loc = HDSLoc * (Given)
-*        HDSLocator  for the requested NDF extension
-*     accmode = const char* (Given)
+*     loc = const HDSLoc * (Given)
+*        HDSLocator  for the requested NDF extension. This must be supplied
+*        and can not be NULL.
+*     accmode = const char[] (Given)
 *        Access mode for locator (READ, WRITE or UPDATE)
-*     filename = char * (Given)
-*        Name of disk file which holds the requested NDF
-*     extname = const char* (Given)
+*     filename = const char[] (Given)
+*        Name of disk file which holds the requested NDF. Only used
+*        so that the smfFile struct has the correct file information.
+*        Is not used to actually open the file.
+*     extname = const char[] (Given)
 *        Name of extension
-*     state = const char* (Given)
+*     state = const char[] (Given)
 *        State of NDF (NEW, OLD or UNKNOWN)
-*     dattype = const char* (Given)
+*     dattype = const char[] (Given)
 *        Data type to be stored in NDF
 *     ndims = const int (Given)
 *        Number of dimensions in new locator
-*     lbnd = const int* (Given)
+*     lbnd = const int[] (Given)
 *        Pointer to array containing lower bounds for each axis
-*     ubnd = const int* (Given)
+*     ubnd = const int[] (Given)
 *        Pointer to array containing upper bounds for each axis
+*     datalabel = const char[] (Given)
+*        Data label to associate with this extension.  Only accessed if access mode is
+*        WRITE or UPDATE. Can be NULL.
+*     dataunits = const char[] (Given)
+*        Units of the data in this extension. Only accessed if access mode is
+*        WRITE or UPDATE. Can be NULL.
+*     wcs = const AstFrameSet * (Given)
+*        World coordinates associated with this data. Only accessed if
+*        access mode is WRITE or UPDATE. Can be NULL.
 *     ndfdata = smfData** (Returned)
 *        Output smfData with mapped access to requested NDF
 *     status = int* (Given and Returned)
@@ -64,9 +79,12 @@
 *        ensure a NULL pointer in case of error
 *     2007-09-07 (AGG):
 *        Add ndimsmapped to check that the NDF was mapped correctly
+*     2008-06-06 (TIMJ):
+*        Can store WCS, data label and units in write mode.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 University of British Columbia. All
 *     Rights Reserved.
 
@@ -114,10 +132,12 @@
 
 #define FUNC_NAME "smf_open_ndfname"
 
-void smf_open_ndfname( const HDSLoc *loc, char *accmode, char *filename, 
-                       const char *extname,
-		       const char *state, const char *dattype, const int ndims, 
-		       const int *lbnd, const int *ubnd, smfData **ndfdata, 
+void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filename[], 
+                       const char extname[], const char state[], const char dattype[],
+                       const int ndims, const int lbnd[], const int ubnd[],
+                       const char datalabel[], const char dataunits[],
+                       const AstFrameSet* wcs,
+                       smfData **ndfdata, 
                        int *status) {
 
   /* Local variables */
@@ -133,6 +153,7 @@ void smf_open_ndfname( const HDSLoc *loc, char *accmode, char *filename,
   smfFile *newfile = NULL;      /* New smfFile with details of requested NDF */
   int place;                    /* Placeholder for NDF */
   int temp;                     /* Temporary integer to convert to dim_t */
+  int updating = 0;             /* True if the extension is being updated */
 
   /* Initialize the output smfData to NULL pointer */
   *ndfdata = NULL;
@@ -148,6 +169,9 @@ void smf_open_ndfname( const HDSLoc *loc, char *accmode, char *filename,
   /* Note: write access clears the contents of the NDF */
   if ( strncmp( accmode, "WRITE", 5 ) == 0 ) {
     msgOutif(MSG__VERB," ", "Opening NDF with WRITE access: this will clear the current contents if the NDF exists.", status);
+    updating = 1;
+  } else if ( strncmp( accmode, "UPDATE", 6) == 0) {
+    updating = 1;
   }
   ndfOpen( loc, extname, accmode, state, &ndfid, &place, status );
   if ( *status != SAI__OK ) {
@@ -200,6 +224,14 @@ void smf_open_ndfname( const HDSLoc *loc, char *accmode, char *filename,
   dimens[0] = temp;
   temp = dims[1];
   dimens[1] = temp;  
+
+  /* Allow for label, units and WCS to be written */
+  if (updating) {
+    if (datalabel) ndfCput( datalabel, ndfid, "Label", status ); 
+    if (dataunits) ndfCput( dataunits, ndfid, "Unit", status );
+    if (wcs) ndfPtwcs( wcs, ndfid, status );
+  }
+
 
   /* Create the smfFile */
   newfile = smf_construct_smfFile( newfile, ndfid, 0, 0, filename, status );
