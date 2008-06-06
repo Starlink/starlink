@@ -76,6 +76,7 @@
 #include <stdio.h>
 
 /* Starlink includes */
+#include "sae_par.h"
 #include "ast.h"
 #include "star/grp.h"
 
@@ -123,7 +124,7 @@ smf_expand_tilegroup ( Grp * ogrp, int ntile, int npbin, int * outsize,
     grpSetsz(ogrp, 0, status );
 
     /* loop over each tile and create names for each pol bin */
-    for( itile = 1; itile <= outsize; itile++ ) {
+    for( itile = 1; itile <= *outsize; itile++ ) {
       pname = basename;
       grpGet( tgrp, itile, 1, &pname, GRP__SZNAM, status );
       blen = astChrLen( basename );
