@@ -108,6 +108,7 @@
 *  Authors:
 *     DSB: David S Berry (JAC, UCLan)
 *     EC: Ed Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -134,6 +135,9 @@
 *        Added is2d parameter
 *     05-JUN-2008 (EC):
 *        Remove is2d from API, determine number of axes internally
+*     06-JUN-2008 (TIMJ):
+*        For the 2d case also make sure that the 3rd bounds are 1. Prevents
+*        overruns in smf_reshapendf
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -185,8 +189,9 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
    float *w = NULL;
    float *work = NULL;
    float val;
-   int extend;
+   int extend = 0;
    int i;
+   int indims;
    int ix;
    int iy;
    int lbin;
@@ -195,6 +200,8 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
    int plbnd[ 2 ];
    int pubnd[ 2 ];
    int refpixind;
+   int tlbnd[ 3 ];
+   int tubnd[ 3 ];
    int ubin;
    int ubout;
    int yhi;
@@ -209,6 +216,22 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 /* Check inherited status */
    if( *status != SAI__OK ) return NULL;
 
+/* Make sure that we handle 2d or 3d bounds */
+   indims = astGetI(wcsout, "Nin");
+
+/* copy input bounds to local temp copy */
+   for (i = 0; i < 2; i++ ) {
+     tlbnd[ i ] = lbnd[ i ];
+     tubnd[ i ] = ubnd[ i ];
+   }
+   if (indims == 3) {
+     tlbnd[ 3 ] = lbnd[ 3 ];
+     tubnd[ 3 ] = ubnd[ 3 ];
+   } else {
+     tlbnd[ 3 ] = 1;
+     tubnd[ 3 ] = 1;
+   }
+
 /* If required, produce a description of a single tile that is just large
    enough to hold the entire output array. */
    if( tile_size[ 0 ] < 0 ) {
@@ -218,24 +241,24 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 
 /* Store the bordered tile area. */
          for( i = 0; i < 3; i++ ) {
-            result->lbnd[ i ] = lbnd[ i ];
-            result->ubnd[ i ] = ubnd[ i ];
+            result->lbnd[ i ] = tlbnd[ i ];
+            result->ubnd[ i ] = tubnd[ i ];
          }
 
 /* Store the non-border tile area (the same). */
          for( i = 0; i < 3; i++ ) {
-            result->qlbnd[ i ] = lbnd[ i ];
-            result->qubnd[ i ] = ubnd[ i ];
+            result->qlbnd[ i ] = tlbnd[ i ];
+            result->qubnd[ i ] = tubnd[ i ];
          }
 
 /* Store the extended tile area (the same). */
          for( i = 0; i < 3; i++ ) {
-            result->elbnd[ i ] = lbnd[ i ];
-            result->eubnd[ i ] = ubnd[ i ];
+            result->elbnd[ i ] = tlbnd[ i ];
+            result->eubnd[ i ] = tubnd[ i ];
          }
 
 
-/* We do not need to re-map the GRID frame of the full sized output WCS
+/* We do not need to re-map the GRxID frame of the full sized output WCS
    FrameSet. */
          result->map2d = NULL;
          result->map3d = NULL;
@@ -262,12 +285,12 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
       refwcs[ 1 ] = astGetD( wcsout, "SkyRef(2)" );
       refwcs[ 2 ] = AST__BAD;
 
-      astTranN( wcsout, 1, astGetI( wcsout, "Nin" ), 1, refwcs,
+      astTranN( wcsout, 1, indims, 1, refwcs,
                 0, astGetI( wcsout, "Nout" ), 1, refpix );
 
 /* Convert grid coords to pixel coords */
-      refpix[ 0 ] += lbnd[ 0 ] - 1.5;
-      refpix[ 1 ] += lbnd[ 1 ] - 1.5;
+      refpix[ 0 ] += tlbnd[ 0 ] - 1.5;
+      refpix[ 1 ] += tlbnd[ 1 ] - 1.5;
 
 /* We place the pixel containing the reference position at the centre
    of a tile, and then pad the supplied full size grid bounds by adding a 
@@ -289,7 +312,7 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
 
 /* Decrease the lower pixel bounds by a tile size until the whole output
    array is encompassed. */
-         while( plbnd[ i ] > lbnd[ i ] ) {
+         while( plbnd[ i ] > tlbnd[ i ] ) {
             plbnd[ i ] -= tile_size[ i ];
             numtile[ i ]++;
          }
@@ -298,18 +321,18 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
    to exclude tiles that are off the edge. So increase the lower pixel 
    bounds by a tile size until the upper bound of the corresponding tile
    is inside the full sized output array. */
-         while( plbnd[ i ] + tile_size[ i ] - 1 < lbnd[ i ] ) {
+         while( plbnd[ i ] + tile_size[ i ] - 1 < tlbnd[ i ] ) {
             plbnd[ i ] += tile_size[ i ];
             numtile[ i ]--;
          }
 
 /* Now modify the upper bounds in the same way. */
-         while( pubnd[ i ] < ubnd[ i ] ) {
+         while( pubnd[ i ] < tubnd[ i ] ) {
             pubnd[ i ] += tile_size[ i ];
             numtile[ i ]++;
          }
 
-         while( pubnd[ i ] - tile_size[ i ] + 1 > ubnd[ i ] ) {
+         while( pubnd[ i ] - tile_size[ i ] + 1 > tubnd[ i ] ) {
             pubnd[ i ] -= tile_size[ i ];
             numtile[ i ]--;
          }
@@ -365,15 +388,15 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
             tile->qubnd[ 0 ] = tile->qlbnd[ 0 ] + tile_size[ 0 ] - 1;
             tile->qlbnd[ 1 ] = ylo;
             tile->qubnd[ 1 ] = yhi;
-            tile->qlbnd[ 2 ] = lbnd[ 2 ];
-            tile->qubnd[ 2 ] = ubnd[ 2 ];
+            tile->qlbnd[ 2 ] = tlbnd[ 2 ];
+            tile->qubnd[ 2 ] = tubnd[ 2 ];
 
 /* Limit the tile area to the bounds of the output cube. */
             if( trim ) {
-               if( tile->qlbnd[ 0 ] < lbnd[ 0 ] ) tile->qlbnd[ 0 ] = lbnd[ 0 ];
-               if( tile->qlbnd[ 1 ] < lbnd[ 1 ] ) tile->qlbnd[ 1 ] = lbnd[ 1 ];
-               if( tile->qubnd[ 0 ] > ubnd[ 0 ] ) tile->qubnd[ 0 ] = ubnd[ 0 ];
-               if( tile->qubnd[ 1 ] > ubnd[ 1 ] ) tile->qubnd[ 1 ] = ubnd[ 1 ];
+               if( tile->qlbnd[ 0 ] < tlbnd[ 0 ] ) tile->qlbnd[ 0 ] = tlbnd[ 0 ];
+               if( tile->qlbnd[ 1 ] < tlbnd[ 1 ] ) tile->qlbnd[ 1 ] = tlbnd[ 1 ];
+               if( tile->qubnd[ 0 ] > tubnd[ 0 ] ) tile->qubnd[ 0 ] = tubnd[ 0 ];
+               if( tile->qubnd[ 1 ] > tubnd[ 1 ] ) tile->qubnd[ 1 ] = tubnd[ 1 ];
             }
    
 /* Store the tile area including a spatial border of the requested width. */
@@ -385,10 +408,10 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
             tile->ubnd[ 2 ] = tile->qubnd[ 2 ];
 
             if( trim ) {
-               if( tile->lbnd[ 0 ] < lbnd[ 0 ] ) tile->lbnd[ 0 ] = lbnd[ 0 ];
-               if( tile->lbnd[ 1 ] < lbnd[ 1 ] ) tile->lbnd[ 1 ] = lbnd[ 1 ];
-               if( tile->ubnd[ 0 ] > ubnd[ 0 ] ) tile->ubnd[ 0 ] = ubnd[ 0 ];
-               if( tile->ubnd[ 1 ] > ubnd[ 1 ] ) tile->ubnd[ 1 ] = ubnd[ 1 ];
+               if( tile->lbnd[ 0 ] < tlbnd[ 0 ] ) tile->lbnd[ 0 ] = tlbnd[ 0 ];
+               if( tile->lbnd[ 1 ] < tlbnd[ 1 ] ) tile->lbnd[ 1 ] = tlbnd[ 1 ];
+               if( tile->ubnd[ 0 ] > tubnd[ 0 ] ) tile->ubnd[ 0 ] = tubnd[ 0 ];
+               if( tile->ubnd[ 1 ] > tubnd[ 1 ] ) tile->ubnd[ 1 ] = tubnd[ 1 ];
             }
 
 /* Store the extended tile area (this also includes the above border). */
@@ -396,8 +419,8 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
             tile->eubnd[ 0 ] = tile->ubnd[ 0 ] + extend;
             tile->elbnd[ 1 ] = tile->lbnd[ 1 ] - extend;
             tile->eubnd[ 1 ] = tile->ubnd[ 1 ] + extend;
-            tile->elbnd[ 2 ] = lbnd[ 2 ];
-            tile->eubnd[ 2 ] = ubnd[ 2 ];
+            tile->elbnd[ 2 ] = tlbnd[ 2 ];
+            tile->eubnd[ 2 ] = tubnd[ 2 ];
 
 /* Store the bounds of the basic (bordered but non-extended) tile in a grid 
    coordinate system that has value (1.0,1.0) at the centre of the first pixel 
@@ -413,8 +436,8 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
    caused by extracting the extended tile from the full sized output array. 
    This is the Mapping from the full size GRID coordinate system to the
    tile GRID coordinate system. */
-            shift[ 0 ] = lbnd[ 0 ] - tile->elbnd[ 0 ];
-            shift[ 1 ] = lbnd[ 1 ] - tile->elbnd[ 1 ];
+            shift[ 0 ] = tlbnd[ 0 ] - tile->elbnd[ 0 ];
+            shift[ 1 ] = tlbnd[ 1 ] - tile->elbnd[ 1 ];
             shift[ 2 ] = 0.0;
             tile->map2d = (AstMapping *) astShiftMap( 2, shift, "" );
             tile->map3d = (AstMapping *) astShiftMap( 3, shift, "" );
