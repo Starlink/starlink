@@ -82,6 +82,9 @@
 *        Initialise pointers.
 *     2008-05-29 (TIMJ):
 *        Use smf_accumulate_prov. Do not propagate provenance extension.
+*     2008-06-06 (TIMJ):
+*        Store the input filename in the smfFile even if there is no
+*        output group. This simplifies filename retrieval enormously.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -254,6 +257,18 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
       memcpy( ((*ffdata)->pntr)[0], (data->pntr)[0], npts * sizeof (double) );
     }
 
+  }
+
+  /* For convenience, if we have no output group we still
+     store the name of the input file in the output smfData
+     so that we can tell what is happening in the caller */
+  if (!ogrp && *status == SAI__OK) {
+    file = data->file;
+    if (file) {
+      pname = file->name;
+      (*ffdata)->file = smf_construct_smfFile( NULL, NDF__NOID, 0, 1,
+                                               pname, status);
+    }
   }
 
   /* Free resources for input data */
