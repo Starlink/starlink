@@ -511,14 +511,6 @@ package @PACKAGE@ {
                 helpkey *
             }
 
-            parameter ntile {
-                type _INTEGER
-                access WRITE
-                vpath DEFAULT
-                default 0
-                helpkey *
-            }
-
             parameter method {
                 type _CHAR
                 prompt {Map-making method}
@@ -531,6 +523,23 @@ package @PACKAGE@ {
                 access READ
                 ppath CURRENT
                 prompt {Map-maker tuning parameters}
+                helpkey *
+            }
+
+            parameter ntile {
+                type _INTEGER
+                access WRITE
+                vpath DEFAULT
+                default 0
+                helpkey *
+            }
+
+            parameter outfiles {
+                type LITERAL
+                prompt {Text file in which to put the output NDF names}
+                default !
+                vpath DEFAULT
+                ppath CURRENT DEFAULT
                 helpkey *
             }
 
@@ -560,6 +569,24 @@ package @PACKAGE@ {
                 ppath CURRENT DEFAULT
                 prompt {Celestial coord system for output cube}
                 default TRACKING
+                helpkey *
+            }
+
+            parameter tileborder {
+                type _INTEGER
+                prompt {Width of tile overlap in pixels}
+                ppath CURRENT DEFAULT
+                vpath DEFAULT
+                default 0
+                helpkey *
+            }
+
+            parameter trimtiles {
+                type _LOGICAL
+                vpath DEFAULT
+                prompt {Trim the output tiles?}
+                ppath CURRENT DEFAULT
+                default FALSE
                 helpkey *
             }
 

@@ -227,6 +227,24 @@
 *          had for the first time slice. For any other system, no such 
 *          shifts are applied, even if the base telescope position is
 *          changing through the observation. [TRACKING]
+*     TRIMTILES = _LOGICAL (Read)
+*          Only accessed if the output is being split up into more than
+*          one spatial tile (see parameter TILEDIMS). If TRUE, then the 
+*          tiles around the border will be trimmed to exclude areas that 
+*          fall outside the bounds of the full sized output array. This
+*          will result in the border tiles being smaller than the central 
+*          tiles. [FALSE]
+*     TILEBORDER = _INTEGER (Read)
+*          Only accessed if a non-null value is supplied for parameter
+*          TILEDIMS. It gives the width, in pixels, of a border to add to
+*          each output tile. These borders contain data from the adjacent
+*          tile. This results in an overlap between adjacent tiles equal to
+*          twice the supplied border width. If the default value of zero 
+*          is accepted, then output tiles will abut each other in pixel
+*          space without any overlap. If a non-zero value is supplied,
+*          then each pair of adjacent tiles will overlap by twice the 
+*          given number of pixels. Pixels within the overlap border will
+*          be given a quality name of "BORDER" (see KAPPA:SHOWQUAL). [0]
 *     TILEDIMS( 2 ) = _INTEGER (Read)
 *          For large data sets, it may sometimes be beneficial to break 
 *          the output array up into a number of smaller rectangular tiles, 
@@ -411,6 +429,10 @@
 *     2008-06-05 (TIMJ):
 *        - Add ALIGNSYS parameter.
 *        - Add REF parameter.
+*     2008-06-06 (TIMJ):
+*        - support TILES in REBIN mode
+*        - use smf_find_median
+*        - new interface to smf_open_ndfname
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -462,6 +484,7 @@
 #include "star/ndg.h"
 #include "star/grp.h"
 #include "star/kaplibs.h"
+#include "star/atl.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
@@ -485,6 +508,8 @@ void smurf_makemap( int *status ) {
 
   /* Local Variables */
   int alignsys;              /* Align data in the output system? */
+  char basename[ GRP__SZNAM + 1 ]; /* Output base file name */
+  int blank=0;                 /* Was a blank line just output? */
   smfBox *boxes = NULL;      /* Pointer to array of i/p file bounding boxes */
   Grp *confgrp = NULL;       /* Group containing configuration file */
   smfData *data=NULL;        /* Pointer to SCUBA2 data struct */
@@ -492,31 +517,35 @@ void smurf_makemap( int *status ) {
   double *exp_time = NULL;    /* Exposure time array written to output file */
   AstFitsChan *fchan = NULL; /* FitsChan holding output NDF FITS extension */
   smfFile *file=NULL;        /* Pointer to SCUBA2 data file struct */
+  int first;                 /* Is this the first input file? */
   int flag;                  /* Flag */
-  int haveout=1;             /* Flag indicating presence of OUT parameter */
   int *histogram = NULL;     /* Histogram for calculating exposure statistics */
   unsigned int *hitsmap;     /* Hitsmap array calculated in ITERATE method */
   dim_t i;                   /* Loop counter */
+  int ifile;                 /* Input file index */
   Grp *igrp = NULL;          /* Group of input files */
+  Grp *igrp4 = NULL;         /* Group holding output NDF names */
+  int ilast;                 /* Index of the last input file */
+  int iout;                  /* Index of next output NDF name */
+  int ipbin=0;              /* Index of current polarisation angle bin */
   int iterate=0;             /* Flag to denote ITERATE method */
+  int itile;                 /* Output tile index */
+  int jin;                   /* Input NDF index within igrp */
   AstKeyMap *keymap=NULL;    /* Pointer to keymap of config settings */
   int ksize=0;               /* Size of group containing CONFIG file */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   double *map=NULL;          /* Pointer to the rebinned map data */
-  size_t mapmem;             /* Memory needed for output map */
-  size_t mapsize;            /* Number of pixels in output image */
+  size_t mapmem=0;           /* Memory needed for output map */
   size_t maxmem=0;           /* Max memory usage in bytes */
   int maxmem_mb;             /* Max memory usage in Mb */
-  double meantexp;           /* Mean exposure time */
   double maxtexp = 0.0;      /* Maximum exposure time */
-  double modetexp;           /* Modal exposure time */ 
   double medtexp = 0.0;      /* Median exposure time */
   char method[LEN__METHOD];  /* String for map-making method */
   int moving = 0;            /* Is the telescope base position changing? */
   int nparam = 0;            /* Number of extra parameters for pixel spreading*/
   int ntile;                 /* Number of output tiles */
-  int numbin;                /* Number of exposure time bins in histogram */
   int nval;                  /* Number of parameter values supplied */
+  size_t nxy;                /* Number of pixels in output image */
   smfData *odata=NULL;       /* Pointer to output SCUBA2 data struct */
   Grp *ogrp = NULL;          /* Group containing output file */
   int ondf = NDF__NOID;      /* output NDF identifier */
@@ -524,6 +553,9 @@ void smurf_makemap( int *status ) {
   AstFrameSet *outfset=NULL; /* Frameset containing sky->output mapping */
   char pabuf[ 10 ];          /* Text buffer for parameter value */
   double params[ 4 ];        /* astRebinSeq parameters */
+  char *pname = NULL;        /* Name of currently opened data file */
+  int ***ptime = NULL;       /* Holds time slice indices for each bol bin */
+  int *pt = NULL;            /* Holds time slice indices for each bol bin */
   int rebin=1;               /* Flag to denote whether to use the REBIN method*/
   int size;                  /* Number of files in input group */
   int smfflags=0;            /* Flags for smfData */
@@ -531,18 +563,21 @@ void smurf_makemap( int *status ) {
   AstFrameSet *spacerefwcs = NULL;/* WCS Frameset for spatial reference axes */
   AstFrameSet *specrefwcs = NULL;/* WCS Frameset for spectral reference axis */
   int spread;                /* Code for pixel spreading scheme */
-  double steptime;           /* Integration time per sample, from FITS header */
-  double sumtexp;            /* Total exposure time across all pixels */
+  double steptime = VAL__BADD; /* Integration time per sample, from FITS header */
   char system[10];           /* Celestial coordinate system for output image */
   smfData *tdata=NULL;       /* Exposure time data */
+  int tileborder;            /* Dimensions (in pixels) of tile overlap */
   int tiledims[2];           /* Dimensions (in pixels) of each output tile */
+  smfTile *tile = NULL;      /* Pointer to next output tile description */
   smfTile *tiles=NULL;       /* Pointer to array of output tile descriptions */
-  int tndf = NDF__NOID;      /* NDF identifier for EXP_TIME */
+  int trimtiles;             /* Trim the border tiles to exclude bad pixels? */
+  AstMapping *tskymap = NULL;/* GRID->SkyFrame Mapping from output tile WCS */
   int ubnd_out[2];           /* Upper pixel bounds for output map */
   void *variance=NULL;       /* Pointer to the variance map */
   smfData *wdata=NULL;       /* Pointer to SCUBA2 data struct for weights */
   double *weights=NULL;      /* Pointer to the weights map */
   double *weights3d = NULL;  /* Pointer to 3-D weights array */
+  AstFrameSet *wcstile2d = NULL;/* WCS Frameset describing 2D spatial axes */
   int wndf = NDF__NOID;      /* NDF identifier for WEIGHTS */
 
   struct timeval tv1, tv2;
@@ -625,77 +660,36 @@ void smurf_makemap( int *status ) {
                          status);
   msgBlank( status );
 
-  /* Create an output smfData */
-  ndgCreat ( "OUT", NULL, &ogrp, &outsize, &flag, status );
-
-  /* If OUT is NULL annul the bad status but set a flag so that we
-     know to skip memory checks and actual map-making */
-  if( *status == PAR__NULL ) {
-    errAnnul( status );
-    haveout = 0;
-  }
-
-  /* Check memory requirements for output map -- unless out=! */
-
-  if( haveout ) {
-    smf_checkmem_map( lbnd_out, ubnd_out, rebin, maxmem, &mapmem, status );
-  }
-
   /* See if the output is to be split up into a number of separate tiles,
      each one being stored in a separate output NDF. If a null value is
      supplied for TILEDIMS, annul the error and retain the original NULL 
      pointer for the array of tile structures (this is used as a flag that 
      the entire output grid should be stored in a single output NDF). */
 
-  /*
-    boxes = smf_malloc( size, sizeof(smfBox), 1, status ); 
-  */
-
   if( *status == SAI__OK ) {
     parGet1i( "TILEDIMS", 2, tiledims, &nval, status );
     if( *status == PAR__NULL ) {
       errAnnul( status );
     } else {
-
+      parGet0l( "TRIMTILES", &trimtiles, status );
+      parGet0i( "TILEBORDER", &tileborder, status );
       if( nval == 1 ) tiledims[ 1 ] = tiledims[ 0 ];
-
-      /* KLUDGE: Since tiles aren't actually implemented yet, set 
-         lbnd_out/ubnd_out to tiledims (like ntile=1) */
-      
-      if( *status == SAI__OK ) {
-        ntile = 1;
-        if( tiledims[0] < (ubnd_out[0]-lbnd_out[0]) ) {
-          ubnd_out[0] = lbnd_out[0] + tiledims[0] - 1;
-        }
-
-        if( tiledims[1] < (ubnd_out[1]-lbnd_out[1]) ) {
-          ubnd_out[1] = lbnd_out[1] + tiledims[1] - 1;
-        }
-      }
-
-
-      /*
-        tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes, 
-        spread, params, outfset, 1, tiledims,
-        0, 0, &ntile, status );
-
-      */
-
+      tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes, 
+                               spread, params, outfset, tiledims,
+                               trimtiles, tileborder, &ntile, status );
     }
   }
 
   /* If we are not splitting the output up into tiles, then create an array
      containing a single tile description that encompasses the entire full
      size output grid. */
-
-  /*
-    if( !tiles ) {
+  
+  if( !tiles ) {
     tiledims[ 0 ] = -1;
     tiles = smf_choosetiles( igrp, size, lbnd_out, ubnd_out, boxes, 
-    spread, params, outfset, 1, tiledims, 
-    0, 0, &ntile, status );
-    }
-  */
+                             spread, params, outfset, tiledims, 
+                             0, 0, &ntile, status );
+  }
 
   /* Write the number of tiles being created to an output parameter. */
   parPut0i( "NTILE", ntile, status );
@@ -711,145 +705,393 @@ void smurf_makemap( int *status ) {
     msgOutif(MSG__VERB, " ", "Tracking a stationary object", status);
   }
 
-  /* If OUT is NULL skip map-making */
-  if( !haveout ) {
-    goto L998;
-  }
+/* Create a new group to hold the names of the output NDFs that have been
+   created. This group does not include any NDFs that correspond to tiles
+   that contain no input data. */
+  igrp4 = grpNew( "", status );
 
-  smfflags = 0;
-  smfflags |= SMF__MAP_VAR;
+  /* Create an output smfData */
+  if (*status == SAI__OK) {
+    ndgCreat ( "OUT", NULL, &ogrp, &outsize, &flag, status );
 
-  smf_open_newfile ( ogrp, 1, SMF__DOUBLE, 2, lbnd_out, ubnd_out, smfflags, 
-                     &odata, status );
+    /* If OUT is NULL annul the bad status but set a flag so that we
+       know to skip memory checks and actual map-making */
+    if( *status == PAR__NULL ) {
+      errAnnul( status );
+      goto L998;
+    }
 
-  if ( *status == SAI__OK ) {
-    file = odata->file;
-    ondf = file->ndfid;
-    /* Map the data and variance arrays */
-    map = (odata->pntr)[0];
-    variance = (odata->pntr)[1];
-  }
-
-  /* Compute number of pixels in output map */
-  mapsize = (ubnd_out[0] - lbnd_out[0] + 1) * (ubnd_out[1] - lbnd_out[1] + 1);
-
-  /* Create SMURF extension in the output file and map pointers to
-     WEIGHTS and EXP_TIME arrays */
-  smurfloc = smf_get_xloc ( odata, "SMURF", "SMURF", "WRITE", 0, 0, status );
-
-  /* Create WEIGHTS component in output file */
-  smf_open_ndfname ( smurfloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
-                     2, lbnd_out, ubnd_out, &wdata, status );
-  if ( wdata ) {
-    weights = (wdata->pntr)[0];
-    wndf = wdata->file->ndfid;
-  }
-
-  /* Create EXP_TIME component in output file */
-  smf_open_ndfname ( smurfloc, "WRITE", NULL, "EXP_TIME", "NEW", "_DOUBLE",
-                     2, lbnd_out, ubnd_out, &tdata, status );
-  if ( tdata ) {
-    exp_time = (tdata->pntr)[0];
-    tndf = tdata->file->ndfid;
+/* Expand the group to hold an output NDF name for each tile. */
+    smf_expand_tilegroup( ogrp, ntile, 0, &outsize, status );
   }
 
   /* Create the output map using the chosen METHOD */
   if ( rebin ) {
-    /* Now allocate memory for 3-d work array used by smf_rebinmap -
-       plane 2 of this 3-D array is stored in the weights component
-       later. Initialize to zero. */
-    weights3d = smf_malloc( 2*mapsize, sizeof(double), 1, status);
 
-    /* Simple Regrid of the data */
-    msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using REBIN method", 
-             status);
+    /************************* R E B I N *************************************/
 
-    for(i=1; (*status == SAI__OK) && (i <= size); i++ ) {
-      /* Read data from the ith input file in the group */      
-      smf_open_and_flatfield( igrp, NULL, i, &data, status ); 
+    /* Initialise the index of the next output NDF name to use in "ogrp". */
+    iout = 1;
 
-      /* Check that the data dimensions are 3 (for time ordered data) */
-      if( *status == SAI__OK ) {
-        if( data->ndims != 3 ) {
-          msgSeti("I",i);
-          msgSeti("THEDIMS", data->ndims);
-          *status = SAI__ERROR;
-          errRep(FUNC_NAME, 
-                 "File ^I data has ^THEDIMS dimensions, should be 3.", 
-                 status);
-        }
-      }
-      
-      /* Check that the input data type is double precision */
-      if( *status == SAI__OK ) {
-        if( data->dtype != SMF__DOUBLE) {
-          msgSeti("I",i);
-          msgSetc("DTYPE", smf_dtype_string( data, status ));
-          *status = SAI__ERROR;
-          errRep(FUNC_NAME, 
-                 "File ^I has ^DTYPE data type, should be DOUBLE.",
-                 status);
-        }
+/* Loop round, creating each tile of the output array. Each tile is
+   initially made a little larger than required so that edge effects
+   (caused by the width of the spreading kernel) are avoided. The NDF
+   containing the tile is eventually reshaped to exclude the extra
+   boundary, resulting in a set of tiles that can be assembled edge-to-edge
+   to form the full output array. */
+    tile = tiles;
+    for( itile = 1; itile <= ntile && *status == SAI__OK; itile++, tile++ ) {
+
+      /* Tell the user which tile is being produced. */
+      if( ntile > 1 ) {
+        if( !blank ) msgBlank( status );
+        msgSeti( "I", itile );
+        msgSeti( "N", ntile );
+        msgSeti( "XLO", (int) tile->lbnd[ 0 ] );
+        msgSeti( "XHI", (int) tile->ubnd[ 0 ] );
+        msgSeti( "YLO", (int) tile->lbnd[ 1 ] );
+        msgSeti( "YHI", (int) tile->ubnd[ 1 ] );
+        msgOutif( MSG__NORM, "TILE_MSG1", "   Creating output tile ^I of "
+                  "^N (pixel bounds ^XLO:^XHI, ^YLO:^YHI)...", status );
+        msgOutif( MSG__NORM, "TILE_MSG3", "   -----------------------------------------------------------", status );
+        msgBlank( status );
+        blank = 1;
       }
 
-      /* Check units are consistent */
-      smf_check_units( i, data_units, data->hdr, status);
+      /* If the tile is empty, do not create it. */
+      if( tile->size == 0 ) {
 
-      /* Store steptime for calculating EXP_TIME */
-      if ( i==1 ) {
-        smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
+        /* Issue a warning. */
+        msgOutif( MSG__NORM, "TILE_MSG2", "      No input data "
+                  "contributes to this output tile. The tile "
+                  "will not be created.", status );
+        msgBlank( status );
+        blank = 1;
+
+        /* Skip over the unused output file names. */
+        iout++;
+
+        /* Proceed to the next tile. */
+        continue;
       }
 
-      /* Propagate provenance to the output file */
-      smf_accumulate_prov( data, igrp, i, ondf, "SMURF:MAKEMAP(REBIN)",
-                           status);
+      /* Begin an AST context for the current tile. */
+      astBegin;
 
-      /* Handle output FITS header creation */
-      if (*status == SAI__OK)
-        smf_fits_outhdr( data->hdr->fitshdr, &fchan, NULL, status );
+      /* Begin an NDF context for the current tile. */
+      ndfBegin();
 
-      msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Beginning the REBIN step", 
+      /* Create FrameSets that are appropriate for this tile. This involves
+         remapping the base (GRID) Frame of the full size output WCS so that
+         GRID position (1,1) corresponds to the centre of the first pixel int he
+         tile. */
+      wcstile2d = astCopy( outfset );
+      if( tile->map2d ) astRemapFrame( wcstile2d, AST__BASE, tile->map2d );
+
+      /* Get the Mapping from 2D GRID to SKY coords (the tiles equivalent of
+         "oskymap"). */
+      tskymap = astGetMapping( wcstile2d, AST__BASE, AST__CURRENT );
+
+      /* Invert the output sky mapping so that it goes from sky to pixel
+         coords. */
+      astInvert( tskymap );
+   
+      /* Store the initial number of pixels per spatial plane in the output tile. */
+      nxy = ( tile->eubnd[ 0 ] - tile->elbnd[ 0 ] + 1 )*
+        ( tile->eubnd[ 1 ] - tile->elbnd[ 1 ] + 1 );
+
+      /* Add the name of this output NDF to the group holding the names of the
+         output NDFs that have actually been created. */
+      pname = basename;
+      grpGet( ogrp, iout, 1, &pname, GRP__SZNAM, status );
+      grpPut1( igrp4, basename, 0, status );
+
+      /* Create the output NDF for this tile */
+      smfflags = 0;
+      smfflags |= SMF__MAP_VAR;
+      smf_open_newfile ( ogrp, iout++, SMF__DOUBLE, 2, tile->elbnd, tile->eubnd, smfflags, 
+                         &odata, status );
+
+      /* Abort if an error has occurred. */
+      if( *status != SAI__OK ) goto L999;
+
+      /* Convenience pointers */
+      file = odata->file;
+      ondf = file->ndfid;
+
+      /* Map the data and variance arrays */
+      map = (odata->pntr)[0];
+      variance = (odata->pntr)[1];
+
+      /* Create SMURF extension in the output file and map pointers to
+         WEIGHTS and EXP_TIME arrays */
+      smurfloc = smf_get_xloc ( odata, "SMURF", "SMURF", "WRITE", 0, 0, status );
+
+      /* Create WEIGHTS component in output file */
+      smf_open_ndfname ( smurfloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
+                         2, tile->elbnd, tile->eubnd, "Weight", NULL, wcstile2d, &wdata, status );
+      if ( wdata ) {
+        weights = (wdata->pntr)[0];
+        wndf = wdata->file->ndfid;
+      }
+
+      /* Create EXP_TIME component in output file */
+      smf_open_ndfname ( smurfloc, "WRITE", NULL, "EXP_TIME", "NEW", "_DOUBLE",
+                         2, tile->elbnd, tile->eubnd, "Total exposure time","s", wcstile2d,
+                         &tdata, status );
+      if ( tdata ) {
+        exp_time = (tdata->pntr)[0];
+      }
+
+      /* Now allocate memory for 3-d work array used by smf_rebinmap -
+         plane 2 of this 3-D array is stored in the weights component
+         later. Initialize to zero. */
+      weights3d = smf_malloc( 2*nxy, sizeof(double), 1, status);
+
+      /* Simple Regrid of the data */
+      msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using REBIN method", 
                status);
-      /* Rebin the data onto the output grid */
-      
-      smf_rebinmap(data, i, size, outfset, spread, params, moving, 1,
-                   lbnd_out, ubnd_out, map, variance, weights3d, status );
 
-      /* Close the data file */
-      smf_close_file( &data, status);
-      
-      /* Break out of loop over data files if bad status */
-      if (*status != SAI__OK) {
-        errRep(FUNC_NAME, "Rebinning step failed", status);
-        break;
-      }
-
-    }
-    /* Calculate exposure time per output pixel from weights array -
-       note even if weights is a 3-D array we only use the first
-       mapsize number of values which represent the `hits' per
-       pixel */
-    for (i=0; (i<mapsize) && (*status == SAI__OK); i++) {
-      if ( map[i] == VAL__BADD) {
-        exp_time[i] = VAL__BADD;
-        weights[i] = VAL__BADD;
-      } else {
-        exp_time[i] = steptime * weights3d[i];
-        weights[i] = weights3d[i+mapsize];
-        if ( exp_time[i] > maxtexp ) {
-          maxtexp = exp_time[i];
+      /* Find the last input file that contributes to the current output tile
+         and polarisation bin. */
+      ilast = 0;
+      for( ifile = tile->size; ifile >= 1 && *status == SAI__OK; ifile-- ) {
+        jin = ( tile->jndf ) ? tile->jndf[ ifile - 1 ] : ifile - 1;
+        pt = ptime ?  ptime[ jin ][ ipbin ] : NULL;
+        if( !pt || pt[ 0 ] < VAL__MAXI ) {
+          ilast = ifile;
+          break;
         }
       }
+
+      /* Loop round all the input files that overlap this tile, pasting each one 
+         into the output NDF. */
+      first = 1;
+      for( ifile = 1; ifile <= tile->size && *status == SAI__OK; ifile++ ) {
+
+        /* Get the zero-based index of the current input file (ifile) within the 
+           group of input NDFs (igrp). */
+        jin = ( tile->jndf ) ? tile->jndf[ ifile - 1 ] : ifile - 1;
+
+        /* Does this input NDF have any time slices that fall within the current
+           polarisation bin? Look at the first used time slice index for this
+           input NDF and polarisation angle bin. Only proceed if it is legal.
+           Otherwise, pass on to the next input NDF. */
+        pt = ptime ?  ptime[ jin ][ ipbin ] : NULL;
+        if( !pt || pt[ 0 ] < VAL__MAXI ) {
+
+          /* Read data from the ith input file in the group */      
+          smf_open_and_flatfield( tile->grp, NULL, ifile, &data, status ); 
+
+          /* Check that the data dimensions are 3 (for time ordered data) */
+          if( *status == SAI__OK ) {
+            if( data->ndims != 3 ) {
+              msgSeti("I",ifile);
+              msgSeti("THEDIMS", data->ndims);
+              *status = SAI__ERROR;
+              errRep(FUNC_NAME, 
+                     "File ^I data has ^THEDIMS dimensions, should be 3.", 
+                     status);
+              break;
+            }
+          }
+      
+          /* Check that the input data type is double precision */
+          if( *status == SAI__OK ) {
+            if( data->dtype != SMF__DOUBLE) {
+              msgSeti("I",ifile);
+              msgSetc("DTYPE", smf_dtype_string( data, status ));
+              *status = SAI__ERROR;
+              errRep(FUNC_NAME, 
+                     "File ^I has ^DTYPE data type, should be DOUBLE.",
+                     status);
+              break;
+            }
+          }
+
+          /* Check units are consistent */
+          smf_check_units( ifile, data_units, data->hdr, status);
+
+          /* Store steptime for calculating EXP_TIME first time round*/
+          if ( steptime == VAL__BADD) {
+            smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
+          }
+
+          /* Propagate provenance to the output file */
+          smf_accumulate_prov( data, tile->grp, ifile, ondf, "SMURF:MAKEMAP(REBIN)",
+                               status);
+
+          /* Handle output FITS header creation */
+          if (*status == SAI__OK)
+            smf_fits_outhdr( data->hdr->fitshdr, &fchan, NULL, status );
+
+          /* Report the name of the input file. */
+          if (data->file && data->file->name) {
+            pname =  data->file->name;
+            msgSetc( "FILE", pname );
+            msgSeti( "THISFILE", ifile );
+            msgSeti( "NUMFILES", tile->size );
+            msgOutif( MSG__VERB, " ", "Processing ^FILE (^THISFILE/^NUMFILES)",
+                      status );
+          }
+
+          /* Rebin the data onto the output grid */
+      
+          smf_rebinmap(data, (first ? 1 : ifile), ilast, wcstile2d, spread, params, moving, 1,
+                       tile->elbnd, tile->eubnd, map, variance, weights3d, status );
+          first = 0;
+
+          /* Close the data file */
+          smf_close_file( &data, status);
+
+          blank = 0;
+      
+          /* Break out of loop over data files if bad status */
+          if (*status != SAI__OK) {
+            errRep(FUNC_NAME, "Rebinning step failed", status);
+            break;
+          }
+        }
+      }
+
+    L999:
+
+      /* Calculate exposure time per output pixel from weights array -
+         note even if weights is a 3-D array we only use the first
+         mapsize number of values which represent the `hits' per
+         pixel */
+      for (i=0; (i<nxy) && (*status == SAI__OK); i++) {
+        if ( map[i] == VAL__BADD) {
+          exp_time[i] = VAL__BADD;
+          weights[i] = VAL__BADD;
+        } else {
+          exp_time[i] = steptime * weights3d[i];
+          weights[i] = weights3d[i+nxy];
+          if ( exp_time[i] > maxtexp ) {
+            maxtexp = exp_time[i];
+          }
+        }
+      }
+      weights3d = smf_free( weights3d, status );
+
+      /* Write WCS */
+      if (wcstile2d) ndfPtwcs( wcstile2d, ondf, status );
+
+        /* write units - hack we do not have a smfHead */
+      if (strlen(data_units)) ndfCput( data_units, ondf, "UNITS", status);
+      ndfCput("Flux Density", ondf, "LABEL", status);
+
+        /* Weights are related to data_units */
+      strncat(data_units, "**-2", (SMF__CHARLABEL - 5)); 
+      ndfCput(data_units, wndf, "UNITS", status);
+
+
+      /* Calculate median exposure time - use faster histogram-based
+         method which should be accurate enough for our purposes */
+      /* Note that smf_find_median does not use smf_malloc */
+      msgOutif( MSG__VERB, " ", "Calculating median output exposure time",
+                status );
+      histogram = smf_find_median( NULL, exp_time, nxy, NULL, &medtexp, status );
+      if ( medtexp != VAL__BADR ) {
+        atlPtftr(fchan, "EXP_TIME", medtexp, "[s] Median MAKEMAP exposure time", status);
+      }
+      histogram = astFree( histogram );
+
+/* Store the keywords holding the number of tiles generated and the index
+   of the current tile. */
+      atlPtfti( fchan, "NUMTILES", ntile, 
+                "No. of tiles covering the field", status );
+      atlPtfti( fchan, "TILENUM", itile, 
+                "Index of this tile (1->NUMTILES)", status );
+
+      /* If the FitsChan is not empty, store it in the FITS extension of the
+         output NDF (any existing FITS extension is deleted). */
+      if( astGetI( fchan, "NCard" ) > 0 ) {
+        kpgPtfts( ondf, fchan, status );
+        fchan = astAnnul( fchan );
+      }
+
+/* For each open output NDF (the main tile NDF, and any extension NDFs),
+   first clone the NDF identifier, then close the file (which will unmap
+   the NDF arrays), and then reshape the NDF to exclude the boundary 
+   that was added to the tile to avoid edge effects. */
+      msgOutif( MSG__VERB, " ", "Reshaping output NDFs", status );
+      smf_reshapendf( &tdata, tile, status );
+      smf_reshapendf( &wdata, tile, status );
+      smf_reshapendf( &odata, tile, status );
     }
-    weights3d = smf_free( weights3d, status );
+
+    /* Write out the list of output NDF names, annulling the error if a null
+       parameter value is supplied. */
+    if( *status == SAI__OK ) {
+      grpList( "OUTFILES", 0, 0, NULL, igrp4, status );
+      if( *status == PAR__NULL ) errAnnul( status );
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   } else if ( iterate ) {
+
+    /************************* I T E R A T E *************************************/
+
+    smfflags = 0;
+    smfflags |= SMF__MAP_VAR;
+    smf_open_newfile ( ogrp, 1, SMF__DOUBLE, 2, lbnd_out, ubnd_out, smfflags, 
+                       &odata, status );
+
+    if ( *status == SAI__OK ) {
+      file = odata->file;
+      ondf = file->ndfid;
+      /* Map the data and variance arrays */
+      map = (odata->pntr)[0];
+      variance = (odata->pntr)[1];
+    }
+
+    /* Compute number of pixels in output map */
+    nxy = (ubnd_out[0] - lbnd_out[0] + 1) * (ubnd_out[1] - lbnd_out[1] + 1);
+
+    /* Create SMURF extension in the output file and map pointers to
+       WEIGHTS and EXP_TIME arrays */
+    smurfloc = smf_get_xloc ( odata, "SMURF", "SMURF", "WRITE", 0, 0, status );
+
+    /* Create WEIGHTS component in output file */
+    smf_open_ndfname ( smurfloc, "WRITE", NULL, "WEIGHTS", "NEW", "_DOUBLE",
+                       2, lbnd_out, ubnd_out, "Weight", NULL, outfset, &wdata, status );
+    if ( wdata ) {
+      weights = (wdata->pntr)[0];
+      wndf = wdata->file->ndfid;
+    }
+
+    /* Create EXP_TIME component in output file */
+    smf_open_ndfname ( smurfloc, "WRITE", NULL, "EXP_TIME", "NEW", "_DOUBLE",
+                       2, lbnd_out, ubnd_out, "Total exposure time","s", outfset,
+                       &tdata, status );
+    if ( tdata ) {
+      exp_time = (tdata->pntr)[0];
+    }
+
 
     /* Iterative map-maker */
     msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using ITERATE method", 
              status);
 
     /* Allocate space for hitsmap */
-    hitsmap = smf_malloc( mapsize, sizeof (int), 1, status);
+    hitsmap = smf_malloc( nxy, sizeof (int), 1, status);
 
     /* Loop over all input data files to setup provenance handling */
     if( *status == SAI__OK ) {
@@ -895,7 +1137,7 @@ void smurf_makemap( int *status ) {
                     maxmem-mapmem, map, hitsmap, variance, weights, status );
 
     /* Calculate exposure time per output pixel from hitsmap */
-    for (i=0; (i<mapsize) && (*status == SAI__OK); i++) {
+    for (i=0; (i<nxy) && (*status == SAI__OK); i++) {
       if ( map[i] == VAL__BADD) {
         exp_time[i] = VAL__BADD;
       } else {
@@ -906,6 +1148,44 @@ void smurf_makemap( int *status ) {
       }
     }
     hitsmap = smf_free( hitsmap, status );
+
+    /* Write WCS */
+    ndfPtwcs( outfset, ondf, status );
+
+    /* write units - hack we do not have a smfHead */
+    if (strlen(data_units)) ndfCput( data_units, ondf, "UNITS", status);
+    ndfCput("Flux Density", ondf, "LABEL", status);
+
+    /* Weights are related to data_units */
+    strncat(data_units, "**-2", (SMF__CHARLABEL - 5)); 
+
+    ndfCput(data_units, wndf, "UNITS", status);
+
+
+    /* Calculate median exposure time - use faster histogram-based
+       method which should be accurate enough for our purposes */
+    /* Note that smf_find_median does not use smf_malloc */
+    msgOutif( MSG__VERB, " ", "Calculating median output exposure time",
+              status );
+    histogram = smf_find_median( NULL, exp_time, nxy, NULL, &medtexp, status );
+    if ( medtexp != VAL__BADR ) {
+      atlPtftr(fchan, "EXP_TIME", medtexp, "[s] Median MAKEMAP exposure time", status);
+    }
+    histogram = astFree( histogram );
+
+
+    /* If the FitsChan is not empty, store it in the FITS extension of the
+       output NDF (any existing FITS extension is deleted). */
+    if( astGetI( fchan, "NCard" ) > 0 ) {
+      kpgPtfts( ondf, fchan, status );
+      fchan = astAnnul( fchan );
+    }
+
+    smf_close_file ( &tdata, status );
+    smf_close_file ( &wdata, status );
+    smf_close_file ( &odata, status );
+    
+
   } else {
     /* no idea what mode */
     if (*status == SAI__OK) {
@@ -915,65 +1195,15 @@ void smurf_makemap( int *status ) {
     }
   }
 
-  /* Write WCS */
-  ndfPtwcs( outfset, ondf, status );
-  ndfPtwcs( outfset, tndf, status );
-  ndfPtwcs( outfset, wndf, status );
-
-  /* write units - hack we do not have a smfHead */
-  if (strlen(data_units)) ndfCput( data_units, ondf, "UNITS", status);
-  ndfCput("Flux Density", ondf, "LABEL", status);
-  ndfCput("Weight", wndf, "LABEL", status);
-  ndfCput("s", tndf, "UNITS", status);
-  ndfCput("Exposure time", tndf, "LABEL", status);
-
-  /* Weights are related to data_units */
-  strncat(data_units, "**-2", (SMF__CHARLABEL - 5)); 
-
-  ndfCput(data_units, wndf, "UNITS", status);
-
-
-  /* Calculate median exposure time - use faster histogram-based
-     method which should be accurate enough for our purposes */
-  numbin = (int)(maxtexp / steptime) - 1;
-
-  if( numbin < 1 ) {
-    /* Numbins must always be at least 1 */
-    numbin = 1;
-  }
-
-  histogram = smf_malloc( (size_t)numbin, sizeof(int), 1, status );
-  if ( histogram ) {
-    kpg1Ghstd( 1, (int)mapsize, exp_time, numbin, 0, &maxtexp, &steptime, 
-               histogram, status );
-    kpg1Hsstp( numbin, histogram, maxtexp, steptime, 
-               &sumtexp, &meantexp, &medtexp, &modetexp, status);
-    astSetFitsF(fchan, "MEDTEXP", medtexp, "[s] Median MAKEMAP exposure time",
-                0);
-    histogram = smf_free( histogram, status );
-  }
-
-
-  /* If the FitsChan is not empty, store it in the FITS extension of the
-     output NDF (any existing FITS extension is deleted). */
-  if( astGetI( fchan, "NCard" ) > 0 ) {
-    kpgPtfts( ondf, fchan, status );
-    fchan = astAnnul( fchan );
-  }
-
-  if( outfset != NULL ) {
-    outfset = astAnnul( outfset );
-  }
-  
-  smf_close_file ( &wdata, status );
-  smf_close_file ( &odata, status );
-
   /* Arrive here if no output NDF is being created. */
  L998:;
 
+  if( outfset != NULL ) outfset = astAnnul( outfset );
   if( igrp != NULL ) grpDelet( &igrp, status);
+  if( igrp4 != NULL) grpDelet( &igrp4, status);
   if( ogrp != NULL ) grpDelet( &ogrp, status);
   if( boxes ) boxes = astFree( boxes );
+  if( tiles ) tiles = smf_freetiles( tiles, ntile, status );
 
   ndfEnd( status );
   
