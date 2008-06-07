@@ -1897,13 +1897,6 @@ void smurf_makecube( int *status ) {
          atlPtfti( fchan, "TILENUM", itile, 
                    "Index of this tile (1->NUMTILES)", status );
 
-/* Store the keywords holding the number of tiles generated and the index
-   of the current tile. */
-         atlPtfti( fchan, "NUMTILES", ntile, 
-                      "No. of tiles covering the field", status );
-         atlPtfti( fchan, "TILENUM", itile, 
-                      "Index of this tile (1->NUMTILES)", status );
-   
 /* If the FitsChan is not empty, store it in the FITS extension of the
    output NDF (any existing FITS extension is deleted). */
          if( fchan ){
@@ -1920,7 +1913,6 @@ void smurf_makecube( int *status ) {
    the NDF arrays), and then reshape the NDF to exclude the boundary 
    that was added to the tile to avoid edge effects. */
          msgOutif( MSG__VERB, " ", "Reshaping output NDFs", status );
-         smf_reshapendf( &expdata, tile, status );
          smf_reshapendf( &expdata, tile, status );
          smf_reshapendf( &effdata, tile, status );
          smf_reshapendf( &tsysdata, tile, status );
