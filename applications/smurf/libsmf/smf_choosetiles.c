@@ -138,6 +138,8 @@
 *     06-JUN-2008 (TIMJ):
 *        For the 2d case also make sure that the 3rd bounds are 1. Prevents
 *        overruns in smf_reshapendf
+*     09-JUN-2008 (DSB):
+*        The third element of an array is is [ 2 ], not [ 3 ].
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -225,11 +227,11 @@ smfTile *smf_choosetiles( Grp *igrp,  int size, int *lbnd,
      tubnd[ i ] = ubnd[ i ];
    }
    if (indims == 3) {
-     tlbnd[ 3 ] = lbnd[ 3 ];
-     tubnd[ 3 ] = ubnd[ 3 ];
+     tlbnd[ 2 ] = lbnd[ 2 ];
+     tubnd[ 2 ] = ubnd[ 2 ];
    } else {
-     tlbnd[ 3 ] = 1;
-     tubnd[ 3 ] = 1;
+     tlbnd[ 2 ] = 1;
+     tubnd[ 2 ] = 1;
    }
 
 /* If required, produce a description of a single tile that is just large
