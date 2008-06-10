@@ -28,8 +28,7 @@
 *        Create a implementation for FTS-2
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Copyright (C) University of Lethbridge. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or

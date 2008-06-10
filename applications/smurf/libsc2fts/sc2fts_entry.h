@@ -28,8 +28,7 @@
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2007 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
+*     Copyright (C) 2008 University of Lethbridge.
 *     All Rights Reserved.
 
 *  Licence:
