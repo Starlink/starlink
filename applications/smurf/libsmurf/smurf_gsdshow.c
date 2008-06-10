@@ -274,7 +274,7 @@ void smurf_gsdshow ( int *status ) {
   gsdac_printHdr ( "C4ERA", "CENTRE_RA1950", 2,
                    "Right ascension of source for EPOCH",
                    &(gsdVars.centreRA1950), 0, 0, showDesc, status );
-0, 0, 
+
   gsdac_printHdr ( "C4EDEC", "CENTRE_DEC1950", 2,
                    "Declination of source for EPOCH",
                    &(gsdVars.centreDec1950), 0, 0, showDesc, status );
