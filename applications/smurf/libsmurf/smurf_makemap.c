@@ -843,6 +843,9 @@ void smurf_makemap( int *status ) {
         exp_time = (tdata->pntr)[0];
       }
 
+      /* Free the extension locator */
+      datAnnul( &smurfloc, status );
+
       /* Now allocate memory for 3-d work array used by smf_rebinmap -
          plane 2 of this 3-D array is stored in the weights component
          later. Initialize to zero. */
@@ -1085,6 +1088,8 @@ void smurf_makemap( int *status ) {
       exp_time = (tdata->pntr)[0];
     }
 
+    /* Free the extension locator */
+    datAnnul( &smurfloc, status );
 
     /* Iterative map-maker */
     msgOutif(MSG__VERB, " ", "SMURF_MAKEMAP: Make map using ITERATE method", 
