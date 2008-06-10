@@ -46,6 +46,8 @@
 *        Original version.
 *     21-MAY-2008 (DSB):
 *        Check for undefined MAP_PA values, and use zero instead.
+*     10-JUN-2008 (DSB):
+*        Prevent warnings from being issued about undefined MAP_PA values.
 
 *  Copyright:
 *     Copyright (C) 2008 Science & Technology Facilities Council.
@@ -88,6 +90,7 @@ double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf,
    const char *oldsys = NULL; /* Original System value for supplied Frame */
    const char *trsys = NULL;  /* AST tracking system */
    const char *usesys = NULL; /* AST system for output cube */
+   const char *warnings = NULL;/* List of conditions reported by FitsChan */
    double map_pa;             /* MAP_PA in tracking system (degs) */
    double p1[ 2 ];            /* Base pointing position */
    double p2[ 2 ];            /* A point on the map vertical axis */
@@ -120,8 +123,18 @@ double smf_calc_mappa( smfHead *hdr, const char *system, AstFrame *sf,
    p1[ 1 ] = hdr->state->tcs_az_bc2;
 
 /* Move along the map "vertical" axis (as specified by the MAP_PA FITS
-   header) for 1 arc-minute from the base pointing position. */
+   header) for 1 arc-minute from the base pointing position. It is legal
+   for the MAP_PA value to be udnefined, so stop the FitsChan from
+   issuing warnings about undefined values before we access it. We do
+   this by clearing the Warnings attribute before accessing the keyword, 
+   and then re-instating its original value afterwards. */
+   if( astTest( hdr->fitshdr, "Warnings" ) ) {
+      warnings = astGetC( hdr->fitshdr, "Warnings" );
+      astClear( hdr->fitshdr, "Warnings" );
+   } 
    smf_fits_getD( hdr, "MAP_PA", &map_pa, status );
+   if( warnings ) astSetC( hdr->fitshdr, "Warnings", warnings );
+
    if( map_pa == AST__UNDEFF ) map_pa = 0.0;
    (void) astOffset2( sf, p1, map_pa*AST__DD2R, AST__DD2R/60.0, p2 );
 
