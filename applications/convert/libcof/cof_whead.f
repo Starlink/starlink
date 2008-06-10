@@ -199,6 +199,9 @@
 *        cards.
 *     2008 May 20 (MJC):
 *        Exclude CADC new FILEID provenance header.
+*     10-JUN-2008 (DSB):
+*        Do not propagate ASTWARN cards from FITS extension to output
+*        header.
 *     {enter_further_changes_here}
 
 *-
@@ -483,6 +486,7 @@
 *      written as required dependent on the data type and any scaling.
 *      The END card is written by FITSIO automatically once the header
 *      is closed.
+*    ASTWARN cards are also not propagated.
 
 *  Use more obvious flags to indicate the certain items have been
 *  written to the keywords already.
@@ -533,10 +537,10 @@
 *  Filter the keywords.
 *  --------------------
 *  Leave out SIMPLE, XTENSION, BITPIX, EXTEND, PCOUNT, GCOUNT, NAXIS,
-*  NAXISn keywords.  Also possibly remove LBOUNDn, CDELTn, CRVALn, 
-*  CRPIXn, CRTYPEn, CTYPEn, CUNITn, OBJECT, LABEL, BUNIT, DATE, BLANK, 
-*  HDUCLASn, HDSNAME, HDSTYPE, CHECKSUM, DATASUM, and END as described 
-*  above.  Note CROTAn are also excluded.  To avoid duplicate 
+*  NAXISn, ASTWARN keywords.  Also possibly remove LBOUNDn, CDELTn, 
+*  CRVALn, CRPIXn, CRTYPEn, CTYPEn, CUNITn, OBJECT, LABEL, BUNIT, DATE, 
+*  BLANK, HDUCLASn, HDSNAME, HDSTYPE, CHECKSUM, DATASUM, and END as 
+*  described above.  Note CROTAn are also excluded.  To avoid duplicate 
 *  FITSIO banners these are also omitted, as they are written when 
 *  FITSIO creates the primary headers.
 *
@@ -681,6 +685,7 @@
      :                CADCKY .AND. PRVKEY .AND. PRVCOM .AND.
      :                ( KEYWRD .NE. 'DATE' ) .AND.
      :                ( KEYWRD .NE. 'EXTNAME' ) .AND.
+     :                ( KEYWRD .NE. 'ASTWARN' ) .AND.
      :                ( KEYWRD .NE. 'BLANK' ) ) THEN
 
 *  Look for a rotated axis in the FITS extension (CROTAn is present and
