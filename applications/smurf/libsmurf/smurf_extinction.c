@@ -32,10 +32,13 @@
 *          Flag for applying the Quick method
 *     CSOTAU = REAL (Read)
 *          Value of the 225 GHz zenith optical depth. Only used if
-*          METHOD = CSOTAU
+*          METHOD = CSOTAU. If a null (!) value is given, the task
+*          will use the value of the MEANWVM FITS header for each
+*          file. Note that if a value is entered by the user, that
+*          value is used for all input files.
 *     FILTERTAU = REAL (Read)
 *          Value of the zenith optical depth for the current
-*          wavelength. Only used if METHOD = FILTERTAU
+*          wavelength. Only used if METHOD = FILTERTAU.
 *     OUT = NDF (Write)
 *          Output file(s)
 *     HASSKYREM = LOGICAL (Read)
@@ -90,6 +93,8 @@
 *        Add title to output file.
 *     2008-05-09 (TIMJ):
 *        Enable ability to override remsky nannying.
+*     2008-06-10 (AGG):
+*        Allow null value for CSO tau to use MEANWVM from current header
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -228,6 +233,13 @@ void smurf_extinction( int * status ) {
 	  parDef0d( "CSOTAU", deftau, status );
 	}
 	parGet0d( "CSOTAU", &tau, status);
+	/* If a null value was given, use the MEANWVM from the header
+	   for this file */
+	if ( *status == PAR__NULL ) {
+	  errAnnul(status);
+	  ohdr = odata->hdr;
+	  smf_fits_getD( ohdr, "MEANWVM", &tau, status );
+	}
       } else if ( strncmp( method, "FILT", 4) == 0 ) {
 	/* Now ask for desired Filter-based tau */
 	/* Define the default value first time round */
