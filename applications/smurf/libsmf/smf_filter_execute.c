@@ -40,7 +40,9 @@
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
 *     2008-06-06 (EC):
-*        Renamed from smf_fft_filter to smf_filter_execute
+*        -Renamed from smf_fft_filter to smf_filter_execute
+*        -Modified interface to take external smfFilter
+*        -Handle real and complex filters
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -82,115 +84,125 @@
 
 #define FUNC_NAME "smf_filter_execute"
 
-void smf_filter_execute( smfData *data, double srate, int *status ) {
+void smf_filter_execute( smfData *data, smfFilter *filt, int *status ) {
 
   /* Local Variables */
+  double ac, bd, aPb, cPd;      /* Components for complex multiplication */
   double *base;                 /* Pointer to start of current bolo in array */
   double df;                    /* Width of frequency bin in FFT */
-  double *filter;               /* Filter */
-  fftw_complex *fft;            /* The FFT of the data */
+  fftw_complex *data_fft;       /* The FFT of a single bolometer */
   dim_t i;                      /* Loop counter */
   dim_t icut;                   /* cutoff index for the filter */
   dim_t j;                      /* Loop counter */
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ndata;                  /* Total number of data points */
   dim_t ntslice;                /* Number of time slices */
-  fftw_plan plan;               /* stores method used by FFTW3 */
-
+  fftw_plan plan_forward;       /* plan for forward transformation */
+  fftw_plan plan_inverse;       /* plan for inverse transformation */
 
   /* Main routine */
   if (*status != SAI__OK) return;
 
-  /* If srate == 0 should try to figure it out from the header */
-
-  /* Check for a valid sample rate */
-  if( srate <= 0 ) {
+  /* Check for NULL pointers */
+  if( !data ) {
     *status = SAI__ERROR;
-    msgSetd("SRATE",srate);
-    errRep(FUNC_NAME, "Invalid srate: ^SRATE [Hz]", status);
-    return;
+    errRep( FUNC_NAME, "NULL smfData pointer", status );
+  }
+
+  if( !filt ) {
+    *status = SAI__ERROR;
+    errRep( FUNC_NAME, "NULL smfFilter pointer", status );
   }
 
   /* Ensure that the smfData is ordered correctly (bolo ordered) */
   smf_dataOrder( data, 0, status );
 
   /* Obtain the dimensions of the array being filtered */
-
-  if( data->ndims == 1 ) {
-    /* If 1-dimensional assume the dimension is time */
-    ntslice = data->dims[0];
-    ndata = ntslice;
-    nbolo = 1;
-  } else if( data->ndims == 3 ) {
-    /* If 3-dimensional this should be bolo-ordered at this point */
-    ntslice = data->dims[0];
-    nbolo = data->dims[1]*data->dims[2];
-    ndata = nbolo*ntslice;
-  } else {
-    /* Can't handle other dimensions */
-    *status = SAI__ERROR;
-    msgSeti("NDIMS",data->ndims);
-    errRep(FUNC_NAME, "Can't handle ^NDIMS dimensions.", status);
-    return;
-  }
-
-  /* Allocate array for the FFT of the time-stream data. It's length is
-     ntslice/2+1 because the input array is real; FFTW optimizes memory
-     usage in this case since the negative frequencies in the transform
-     contain the same information as the positive frequencies */
-
-  fft = (fftw_complex *) fftw_malloc(sizeof(fftw_complex)*(ntslice/2+1));
-  filter = smf_malloc( ntslice/2+1, sizeof(*filter), 0, status );
-
-  /* Build the filter array (test with a low-pass filter, 10 Hz) */
-
-  df = srate/(double) ntslice; 
-  icut = (dim_t) 1./df;         /* index of cutoff frequency in filter */
-
-  for( i=0; i<ntslice/2+1; i++ ) {
-    if( i < icut ) {
-      filter[i] = 0;
+  if( *status == SAI__OK ) {
+    if( data->ndims == 1 ) {
+      /* If 1-dimensional assume the dimension is time */
+      ntslice = data->dims[0];
+      ndata = ntslice;
+      nbolo = 1;
+    } else if( data->ndims == 3 ) {
+      /* If 3-dimensional this should be bolo-ordered at this point */
+      ntslice = data->dims[0];
+      nbolo = data->dims[1]*data->dims[2];
+      ndata = nbolo*ntslice;
     } else {
-      filter[i] = 1;
+      /* Can't handle other dimensions */
+      *status = SAI__ERROR;
+      msgSeti("NDIMS",data->ndims);
+      errRep(FUNC_NAME, "Can't handle ^NDIMS dimensions.", status);
+    }
+
+    /* Check that the filter dimensions are appropriate for the data */
+    if( ntslice != filt->ntslice ) {
+      msgSeti("DATALEN",ntslice);
+      msgSeti("FILTLEN",filt->ntslice);
+      errRep(FUNC_NAME, 
+             "Filter for length ^FILTLEN doesn't match data length ^FILTLEN",
+             status);
     }
   }
+
+  if( *status != SAI__OK ) return;
+
+  /* Allocate array for the FFT of the time-stream data. */
+
+  data_fft = smf_malloc( data_fft, sizeof(fftw_complex), filt->dim, status );
 
   /* Filter the data one bolo at a time */
   for( i=0; i<nbolo; i++ ) {
     /* Obtain pointer to the correct chunk of data */
     base = &((double *)data->pntr[0])[i*ntslice];
     
-    /* Setup FFTW */
-    plan = fftw_plan_dft_r2c_1d( ntslice, base, fft, FFTW_ESTIMATE );
+    /* Setup forward FFT */
+    plan_forward = fftw_plan_dft_r2c_1d( ntslice, base, data_fft, 
+                                         FFTW_ESTIMATE );
 
     /* Execute the FFT */
-    fftw_execute( plan );
+    fftw_execute( plan_forward );
 
     /* Destroy the plan */ 
-    fftw_destroy_plan( plan );
+    fftw_destroy_plan( plan_forward );
 
     /* Apply the frequency-domain filter */
-    for( j=0; j<ntslice/2+1; j++ ) {
-      fft[j][0] *= filter[j];
-      fft[j][1] *= filter[j];
+    if( filt->isComplex ) {
+      for( j=0; j<ntslice/2+1; j++ ) {
+        /* Complex times complex */
+        ac = data_fft[j][0] * ((fftw_complex *)filt->buf)[j][0];
+        bd = data_fft[j][1] * ((fftw_complex *)filt->buf)[j][1];
+        aPb = data_fft[j][0] + data_fft[j][1];
+        cPd = ((fftw_complex *)filt->buf)[j][0] + 
+          ((fftw_complex *)filt->buf)[j][1];
+
+        /* This method only needs 3 multiplies */
+        data_fft[j][0] = ac - bd;
+        data_fft[j][1] = aPb*cPd - ac - bd;
+      }
+    } else { 
+      for( j=0; j<ntslice/2+1; j++ ) {
+        /* Complex times real */
+        data_fft[j][0] *= ((double *)filt->buf)[j];
+        data_fft[j][1] *= ((double *)filt->buf)[j];
+      }
     }
 
-    /* Setup FFTW for the inverse transform */
-    plan = fftw_plan_dft_c2r_1d(ntslice, fft, base, FFTW_ESTIMATE);
+    /* Setup inverse FFT */
+    plan_inverse = fftw_plan_dft_c2r_1d(ntslice, data_fft, base, FFTW_ESTIMATE);
 
     /* Perform inverse transform and normalize the result */
-    fftw_execute( plan );
+    fftw_execute( plan_inverse );
 
     for( j=0; j<ntslice; j++ ) {
       base[j] /= (double) ntslice;
     }
 
     /* Destroy the plan */ 
-    fftw_destroy_plan( plan );
+    fftw_destroy_plan( plan_inverse );
   }
 
   /* Clean up */
-
-  fftw_free( fft );
-  filter = smf_free( filter, status );
+  data_fft = smf_free( data_fft, status );
 }

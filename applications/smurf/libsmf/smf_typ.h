@@ -121,6 +121,8 @@
 *        -Added SMF__MB definition
 *     2008-04-30 (EC):
 *        -Added EXT to smfDIMMData
+*     2006-06-06 (EC):
+*        -Add smfFilter definition
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -159,6 +161,8 @@
 #include "ndf.h"
 #include "star/grp.h"
 #include "smurf_typ.h"
+#include "fftw3.h"
+
 #define SMF_PATH_MAX GRP__SZNAM
 #define SMF_NAME_MAX GRP__SZFNM
 #define SMF__MXSMF 8      /* Maximum number of smfDatas in a smfArray */
@@ -376,5 +380,14 @@ typedef struct smfTile {
   AstMapping *map2d;
   AstMapping *map3d;
 } smfTile;
+
+/* Structure to encapsulate frequency-domain filters implemented with FFTW. */
+typedef struct smfFilter {
+  void *buf;            /* either double or fftw_complex -- see isComplex */
+  double df;            /* frequency step for each sample [Hz] */
+  dim_t dim;            /* number of samples in filt */
+  dim_t ntslice;        /* # of time slices in input data */
+  int isComplex;        /* Set if filter is fftw_complex, otherwise double */
+} smfFilter;
 
 #endif /* SMF_TYP_DEFINED */

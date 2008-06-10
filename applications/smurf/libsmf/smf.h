@@ -317,7 +317,8 @@
 *     2008-06-05 (EC):
 *        Removed is2d from smf_choosetiles
 *     2008-06-06 (EC):
-*        Renamed smf_fft_filter to smf_filter_execute
+*        -Renamed smf_fft_filter to smf_filter_execute and changed interface
+*        -Added smf_create_smfFilter, smf_filter_ident, smf_free_smfFilter
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -841,7 +842,7 @@ int ***smf_freepolbins( int nndf, int npbin, double **pangle, int ***ptime,
 
 void smf_polext( int ondf, double angle, int *status );
 
-void smf_filter_execute( smfData *data, double srate, int *status );
+void smf_filter_execute( smfData *data, smfFilter *filt, int *status );
 
 void smf_concat_smfGroup( smfGroup *igrp, int whichchunk, int isTordered, 
 			  AstFrameSet *outfset, int moving, 
@@ -997,5 +998,11 @@ smf_store_outputbounds (const int lbnd_out[3],const int ubnd_out[3],
 void
 smf_expand_tilegroup ( Grp * ogrp, int ntile, int npbin, int * outsize,
                        int * status);
+
+smfFilter *smf_create_smfFilter( smfData *template, int *status );
+
+void smf_filter_ident( smfFilter *filt, int complex, int *status );
+
+smfFilter *smf_free_smfFilter( smfFilter *filt, int *status );
 
 #endif /* SMF_DEFINED */
