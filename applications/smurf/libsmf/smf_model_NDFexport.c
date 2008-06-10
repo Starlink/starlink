@@ -99,6 +99,7 @@
 #include "libsmf/smf.h"
 #include "libsmf/smf_err.h"
 #include "jcmt/state.h"
+#include "sc2da/sc2store.h"
 
 #define FUNC_NAME "smf_model_NDFexport"
 
@@ -109,7 +110,7 @@ void smf_model_NDFexport( const smfData *data, void *variance,
   /* Local Variables */
   int added=0;                  /* Number of names added to group */
   AstMapping *cbmap=NULL;       /* Pointer to current->base mapping */
-  size_t datalen;               /* Length in bytes of data array */
+  size_t datalen=0;             /* Length in bytes of data array */
   int flag=0;                   /* Flag */
   AstFrameSet *fset1d=NULL;    	/* Frameset for 1D data */
   size_t i;                     /* Counter */
@@ -118,9 +119,8 @@ void smf_model_NDFexport( const smfData *data, void *variance,
   Grp *inname=NULL;             /* 1-element group to hold input filename */
   int msize=0;                  /* Number of files in name group */
   dim_t nbolo;                  /* Number of bolometers */
-  size_t ndata;                 /* Number of elements in data array */
-  dim_t ntslice;                /* Number of time slices */
-  int osize=0;                  /* Number of files in model group */
+  size_t ndata=0;               /* Number of elements in data array */
+  dim_t ntslice=0;              /* Number of time slices */
   int out[NDF__MXDIM];          /* Indices outputs of mapping */
   Grp *outname = NULL;          /* 1-element group to hold output filename */
   unsigned char *qual=NULL;     /* Pointer to QUALITY buffer */
