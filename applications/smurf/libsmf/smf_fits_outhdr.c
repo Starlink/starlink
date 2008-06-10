@@ -56,6 +56,8 @@
 *        Use smf_getobsidss to determine the OBSIDSS value.
 *     2008-04-25 (DSB):
 *        Allow a NULL pointer to be supplied for "obsidmap".
+*     2008-06-10 (DSB):
+*        Remove ASTWARN cards form the output header.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -118,6 +120,16 @@ void smf_fits_outhdr( AstFitsChan * inhdr, AstFitsChan ** outhdr,
       atlMgfts( 3, inhdr, *outhdr, &temphdr, status );
       (void) astAnnul( *outhdr );
       *outhdr = temphdr;
+   }
+
+/* Remove any ASTWARN cards from the output header, but retain them 
+   within the input header. Any such warnings in the input header will 
+   be displayed when the input NDF is closed using smf_close_file. This
+   helps to track down bugs caused by keywords unintentionally having
+   undefined values in an input NDF. */
+   astClear( *outhdr, "Card" );
+   while( astFindFits( *outhdr, "ASTWARN", NULL, 0 ) ){
+      astDelFits( *outhdr );
    }
 
 /* Work out the OBSID - note that we obtain the value from the input FITS
