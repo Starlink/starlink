@@ -107,11 +107,8 @@
 #include "prm_par.h"
 #include "mers.h"
 
-
-
-
-
-
+/* System includes */
+#include <string.h>
 
 
 /* Define a macro to do the work for a given data type. */
