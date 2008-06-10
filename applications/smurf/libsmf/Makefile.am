@@ -67,7 +67,9 @@ smf_dump_smfData.c smf_write_clabels.c smf_set_clabels.c \
 smf_check_units.c smf_get_projpar.c smf_calc_mappa.c \
 smf_get_taskname.c smf_display_projpars.c smf_calc_skyframe.c \
 smf_store_outputbounds.c smf_expand_tilegroup.c \
-smf_create_smfFilter.c smf_filter_ident.c smf_free_smfFilter.c
+smf_create_smfFilter.c smf_filter_ident.c smf_free_smfFilter.c \
+smf_filter_r2c.c
+
 
 noinst_INCLUDES = smf.h smf_typ.h
 

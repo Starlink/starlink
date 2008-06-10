@@ -319,6 +319,8 @@
 *     2008-06-06 (EC):
 *        -Renamed smf_fft_filter to smf_filter_execute and changed interface
 *        -Added smf_create_smfFilter, smf_filter_ident, smf_free_smfFilter
+*     2008-06-10 (EC):
+*        -Added smf_filter_r2c
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1004,5 +1006,7 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status );
 void smf_filter_ident( smfFilter *filt, int complex, int *status );
 
 smfFilter *smf_free_smfFilter( smfFilter *filt, int *status );
+
+void smf_filter_r2c( smfFilter *filt, int *status );
 
 #endif /* SMF_DEFINED */
