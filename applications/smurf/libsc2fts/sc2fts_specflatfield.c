@@ -13,7 +13,8 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2fts_specflatfield ( Grp* igrp, Grp* ogrp, AstKeyMap * parKeymap, int *status )
+*     sc2fts_specflatfield ( Grp* igrp, Grp* ogrp, AstKeyMap * parKeymap,
+*                            int *status )
 
 *  Arguments:
 *     igrp = Grp* (Given)
@@ -24,7 +25,6 @@
 *        the parameter Keymap for this operation. Currently, there is one 
 *        parameter in parKeymap:
 *        RESP:  the responsivity data file name.
-
 *     status = int* (Given and Returned)
 *        Pointer to global status.  
 
@@ -53,8 +53,7 @@ End of Trace.
 *        Create a test implementation for FTS-2
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2008 University of Lethbridge. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -82,9 +81,11 @@ End of Trace.
 
 /* STARLINK includes */
 #include "ast.h"
+#include "star/hds.h"
 
 /* SMURF includes */
 #include "libsmf/smf_typ.h"
+#include "libsmf/smf.h"
 
 #include "libsc2sim/sc2sim.h"   /* for constants: BOLCOL, BOLROW */
 
@@ -104,7 +105,7 @@ int *status          /* global status (given and returned) */
    HDSLoc *loc_more = NULL;          /* HDSLoc to RESPONSIVITY More */
    HDSLoc *loc_wn_factor = NULL;     /* HDSLoc to RESPONSIVITY More.FACTOR */
    double resp_wnfactor;             /* wavenumber factor of RESPONSIVITY */  
-   int resp_size;                    /* size of RESPONSIVITY */
+   size_t resp_size;                    /* size of RESPONSIVITY */
 
    /* get the Theta file name */
    if( astMapHasKey( parKeymap, "RESP" ) ==0)

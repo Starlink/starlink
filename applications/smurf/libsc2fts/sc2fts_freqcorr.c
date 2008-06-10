@@ -13,7 +13,8 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2fts_freqcorr ( Grp* igrp, Grp* ogrp, AstKeyMap * parKeymap, int *status )
+*     sc2fts_freqcorr ( Grp* igrp, Grp* ogrp, AstKeyMap * parKeymap,
+*                       int *status )
 
 *  Arguments:
 *     igrp = Grp* (Given)
@@ -24,7 +25,6 @@
 *        the parameter Keymap for this operation. Currently, there is one 
 *        parameter in parKeymap:
 *        THETA:  the THETA data file name.
-
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -52,8 +52,7 @@ End of Trace.
 *        Complete first draft of FreqCorr module
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2008 University of Lethbridge. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -85,6 +84,7 @@ End of Trace.
 
 /* SMURF includes */
 #include "libsmf/smf_typ.h"
+#include "libsmf/smf.h"
 
 #include "libsc2sim/sc2sim.h"   /* for constants: BOLCOL, BOLROW */
 
@@ -101,11 +101,10 @@ int *status          /* global status (given and returned) */
 {
    int i, j, k, index;
    const char* theta_fn;              /* the file name of THETA */
-   int place;                         /* NDF placeholder */
    HDSLoc *loc_theta = NULL;          /* root HDSLoc */
    HDSLoc *loc_da = NULL;             /* HDSLoc to DATA_ARRAY */
    HDSLoc *loc_data = NULL;           /* HDSLoc to DATA of DATA_ARRAY */
-   int theta_size;                    /* size of THETA */
+   size_t theta_size;                 /* size of THETA */
    double theta_vals[BOLROW][BOLCOL]; /* THETA values */
    smfData *data;                     /* Pointer to in/output SCUBA2 data struct */
    float *tstream = NULL;             /* Pointer to input data stream */
@@ -158,9 +157,9 @@ int *status          /* global status (given and returned) */
      tstream = (float*)((data->pntr)[0]);
 
      /* allocate memory */
-     spectrum_orig = (float*)smf_malloc(nwn, sizeof(float), 0, status);
-     spectrum_corr = (float*)smf_malloc(nwn, sizeof(float), 0, status);
-     wn_corr = (double*)smf_malloc(nwn, sizeof(double), 0, status);
+     spectrum_orig = smf_malloc(nwn, sizeof(float), 0, status);
+     spectrum_corr = smf_malloc(nwn, sizeof(float), 0, status);
+     wn_corr = smf_malloc(nwn, sizeof(double), 0, status);
 
      for(i=0; i<BOLROW; i++)
        for(j=0; j<BOLCOL; j++)

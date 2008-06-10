@@ -13,7 +13,8 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2fts_transcorr ( Grp* igrp, Grp* ogrp, AstKeyMap * parKeymap, int *status )
+*     sc2fts_transcorr ( Grp* igrp, Grp* ogrp, AstKeyMap * parKeymap,
+*                        int *status )
 
 *  Arguments:
 *     igrp = Grp* (Given)
@@ -21,21 +22,18 @@
 *     ogrp = Grp* (Given)
 *        the group of output files
 *     parKeymap = AstKeyMap* (Given)
-*        the parameter Keymap for this operation. Currently, there are three parameters
-*        in parKeymap:
-*        AM:  Air Mass
-*        PWV: Precipitable Water Vapor (in mm). 
-*        TAU: the TAU data file name. The values of wet and dry components of TAU are for
-*             PWV=1mm and airmass of 1.
+*        the parameter Keymap for this operation. Currently,
+*        there are three parameters in parKeymap:
+*          AM:  Air Mass
+*          PWV: Precipitable Water Vapor (in mm). 
+*          TAU: the TAU data file name. The values of wet and dry
+*               components of TAU are for PWV=1mm and airmass of 1.
 *     status = int* (Given and Returned)
 *        Pointer to global status.  
 
 *  Description:
-*
-*
-
-* Structure of TAU data file which stores dry and wet components of atmosphere.
-* Output of hdstrace:
+*     Structure of TAU data file which stores dry and wet components of 
+*     atmosphere. Output of hdstrace:
 
 TAU  <NDF>
 
@@ -53,10 +51,9 @@ TAU  <NDF>
 
 End of Trace.
  
-Here, the wavenumber (=1/wavelength) for DRY(n) or WET(n) is n*FACTOR (in UNIT)
-(n starts from 0).
-
-Combinative TAU = (PWV x AM x TAU_wet) + (AM x TAU_dry)
+*     Here, the wavenumber (=1/wavelength) for DRY(n) or WET(n) is n*FACTOR
+*     (in UNIT) (n starts from 0). 
+*     Combinative TAU = (PWV x AM x TAU_wet) + (AM x TAU_dry)
 
 *  Authors:
 *     B.Zhang (UoL)
@@ -66,8 +63,7 @@ Combinative TAU = (PWV x AM x TAU_wet) + (AM x TAU_dry)
 *        Create a test implementation for FTS-2
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2008 University of Lethbridge. All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -95,9 +91,11 @@ Combinative TAU = (PWV x AM x TAU_wet) + (AM x TAU_dry)
 
 /* STARLINK includes */
 #include "ast.h"
+#include "star/hds.h"
 
 /* SMURF includes */
 #include "libsmf/smf_typ.h"
+#include "libsmf/smf.h"
 
 /* FTS-2 includes */
 #include "sc2fts_common.h"
@@ -111,7 +109,6 @@ int *status          /* global status (given and returned) */
 )
 {
   int i, j, k, index;
-  int indf;            /* NDF identifier for a NDF */
   const char* tau_fn;  /* the file name of TAU */
   float airmass;       /* Air Mass */
   float pwv;           /* Precipitable Water Vapor */
@@ -127,7 +124,7 @@ int *status          /* global status (given and returned) */
   float *dry_ptr;               /* pointer to Dry component */
   float *wet_ptr;               /* pointer to Wet component */
   float *tau_ptr;               /* pointer to combinative TAU */
-  int drywet_size;              /* size of dry/wet components of TAU */
+  size_t drywet_size;           /* size of dry/wet components of TAU */
   smfData *data;                /* Pointer to in/output SCUBA2 data struct */
   int nwn;                      /* number of spectral wavenumber in input data */
   float *tsm;                   /* Atomspheric Transmittance */
@@ -186,13 +183,13 @@ int *status          /* global status (given and returned) */
   /* get dry/wet components */
   datSize(loc_dry, &drywet_size, status);
 
-  dry_ptr = (float*)smf_malloc(drywet_size, sizeof(float), 0, status);
-  wet_ptr = (float*)smf_malloc(drywet_size, sizeof(float), 0, status);
+  dry_ptr = smf_malloc(drywet_size, sizeof(float), 0, status);
+  wet_ptr = smf_malloc(drywet_size, sizeof(float), 0, status);
 
    
-  datGetVR(loc_dry, drywet_size, (double*)dry_ptr,
+  datGetVR(loc_dry, drywet_size, dry_ptr,
            &drywet_size, status);
-  datGetVR(loc_wet, drywet_size, (double*)wet_ptr,
+  datGetVR(loc_wet, drywet_size, wet_ptr,
             &drywet_size, status);
 
   /* generate combinative TAU and e^(-tau) */
