@@ -39,6 +39,8 @@
 *  History:
 *     2008-06-05 (EC):
 *        Initial version
+*     2008-06-10 (EC):
+*        Move normalization here from smf_filter_execute
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -85,6 +87,7 @@
 
 void smf_filter_ident( smfFilter *filt, int complex, int *status ) {
   dim_t i;         /* Loop counter */
+  double val;      /* Value to set each element includes normalization */
 
   if (*status != SAI__OK) return;
 
@@ -94,13 +97,23 @@ void smf_filter_ident( smfFilter *filt, int complex, int *status ) {
     return;
   }
 
+  if( !filt->ntslice ) {
+    *status = SAI__ERROR;
+    errRep( FUNC_NAME, "0-length smfFilter supplied.", status );
+    return;
+  }
+
+  /* The filter values are set to 1/ntslice -- this normalization is required
+     given the FFTW convention */
+  val = 1./ (double) filt->ntslice;
+
   if( complex ) {
     filt->buf = smf_realloc( filt->buf, sizeof(fftw_complex), filt->dim, 
                              status );
  
     if( *status == SAI__OK ) {
       for( i=0; i<filt->dim; i++ ) {
-        ((fftw_complex *)filt->buf)[i][0] = 1;
+        ((fftw_complex *)filt->buf)[i][0] = val;
         ((fftw_complex *)filt->buf)[i][1] = 0;
       }
       filt->isComplex = 1;
@@ -110,7 +123,7 @@ void smf_filter_ident( smfFilter *filt, int complex, int *status ) {
     filt->buf = smf_realloc( filt->buf, sizeof(double), filt->dim, status ); 
     if( *status == SAI__OK ) {
       for( i=0; i<filt->dim; i++ ) {
-        ((double *)filt->buf)[i] = 1;
+        ((double *)filt->buf)[i] = val;
       }
       filt->isComplex = 0;
     }

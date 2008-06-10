@@ -28,7 +28,6 @@
 *     Filter the data.
 
 *  Notes:
-*     Currently buggy / not fully implemented.
 
 *  Authors:
 *     Edward Chapin (UBC)
@@ -43,6 +42,8 @@
 *        -Renamed from smf_fft_filter to smf_filter_execute
 *        -Modified interface to take external smfFilter
 *        -Handle real and complex filters
+*     2008-06-10 (EC):
+*        Move normalization to smf_filter_ident
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -194,10 +195,6 @@ void smf_filter_execute( smfData *data, smfFilter *filt, int *status ) {
 
     /* Perform inverse transform and normalize the result */
     fftw_execute( plan_inverse );
-
-    for( j=0; j<ntslice; j++ ) {
-      base[j] /= (double) ntslice;
-    }
 
     /* Destroy the plan */ 
     fftw_destroy_plan( plan_inverse );
