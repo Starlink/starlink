@@ -23,9 +23,9 @@
 *  Description:
 *     This routine fits trends to all lines of data in an NDF that lie
 *     parallel to a chosen axis.  The trends are characterised by
-*     polynomials of order up to 15 and can be restricted to use data
-*     that only lies within a series of co-ordinate ranges along the
-*     selected axis.
+*     polynomials of order up to 15, or by cubic splines.  The fits can
+*     be restricted to use data that only lies within a series of 
+*     co-ordinate ranges along the selected axis.
 *
 *     The ranges may be determined automatically.  There is a choice
 *     of tunable approaches to mask regions to be excluded from the 
@@ -51,7 +51,9 @@
 *     like debiassing a CCD which has bias strips.
 
 *  Usage:
-*     mfittrend in axis ranges order out
+*     mfittrend in axis ranges out { order
+*                                  { knots=?
+*                                  fittype
 
 *  ADAM Parameters:
 *     ARANGES() = _INTEGER (Write)
@@ -68,7 +70,7 @@
 *
 *        - An integer index of an axis within the current Frame of the 
 *        input NDF (in the range 1 to the number of axes in the current
-*	 Frame).
+*        Frame).
 *
 *        - An axis symbol string such as "RA" or "VRAD".
 *
@@ -99,10 +101,61 @@
 *        parameter.  Between one and five values may be supplied. 
 *        Supplying the null value (!), results in 2, 2.5, and 3
 *        clipping factors.  [2,2,2.5,3]
+*     FITTYPE = LITERAL (Read)
+*        The type of fit.  It must be either "Polynomial" for a
+*        polynomial or "Spline" for a bi-cubic B-spline.  ["Polynomial"]
+*     KNOTS = _INTEGER (Read)
+*        The number of interior knots used for the cubic-spline fit
+*        along the trend axis.  Increasing this parameter value
+*        increases the flexibility of the surface.  KNOTS is only 
+*        accessed when FITTYPE="Spline".  See INTERPOL for how the knots
+*        are arranged.  The default is the current value.
+*
+*        For INTERPOL=TRUE, the value must be in the range 1 to 11, and 
+*        4 is a reasonable value for flatish trends.  The initial
+*        default is 4.
+*
+*        For INTERPOL=FALSE the allowed range is 1 to 60 with an initial
+*        default of 8.  In this mode, KNOTS is the maximum number of
+*        interior knots.
+*
+*        The upper limit of acceptable values for a trend axis is no
+*        more than half of the axis dimension.   []
 *     IN = NDF (Read & Write)
 *        The input NDF.  On successful completion this may have the
 *        trends subtracted, but only if SUBTRACT and MODIFYIN are both
 *        set TRUE.
+*     INTERPOL = _LOGICAL (Read)
+*        The type of spline fit to use when FITTYPE="Spline".  
+*
+*        If set TRUE, an interpolating spline is fitted by least squares 
+*        that ensures the fit is exact at the knots.  Therefore the knot 
+*        locations may be set by the POSKNOT parameter.  
+*
+*        If set FALSE, a smoothing spline is fitted.  A smoothing factor
+*        controls the degree of smoothing.  The factor is determined 
+*        iteratively between limits, hence it is the slower option of
+*        the two, but generally gives better fits, especially for curvy
+*        trends.  The location of of the knots is decided automatically
+*        by Dierckx's algorithm, governed where they are most needed.  
+*        Knots are added when the weighted sum of the squared residuals 
+*        exceeds the smoothing factor.  A final fit is made with the 
+*        chosen smoothing, but finding the knots afresh.
+*
+*        The few iterations commence from the upper limit and progress
+*        more slowly at each iteration towards the lower limit.  The
+*        iterations continue until the residuals stabilise or the
+*        maximum number of interior knots is reached or the lower limit
+*        is reached.  The upper limit is the weighted sum of the squares 
+*        of the residuals of the least-squares cubic polynomial fit.  
+*        The lower limit is the estimation of the overall noise obtained
+*        from a clipped mean the standard deviation in short segments 
+*        that diminish bias arising from the shape of the trend.  The 
+*        lower limit prevents too many knots being created and fitting
+*        to the noise or fine features.
+*
+*        The iteration to a smooth fit makes a smoothing spline somewhat
+*        slower.   [FALSE]
 *     MASK = NDF (Write)
 *        The name of the NDF to contain the feature mask.  It is only
 *        accessed for automatic mode and METHOD="Single".  It has the
@@ -142,7 +195,7 @@
 *        using the standard deviation of the whole data array.  This is
 *        more robust than "Single", however it does not perform
 *        rejections well for lines with anomalous noise.
-
+*
 *        ["Single"]
 *     MODIFYIN = _LOGICAL (Read)
 *        Whether or not to modify the input NDF.  It is only used when
@@ -163,21 +216,31 @@
 *     ORDER = _INTEGER (Read)
 *        The order of the polynomials to be used when trend fitting.
 *        A polynomial of order 0 is a constant and 1 a line, 2 a
-*        quadratic etc.  The maximum value is 15.  [3]
+*        quadratic etc.  The maximum value is 15.  ORDER is only 
+*        accessed when FITTYPE="Polynomial".  [3]
 *     OUT = NDF (Read)
 *        The output NDF containing either the difference between the
 *        input NDF and the various trends, or the values of the trends
 *        themselves.  This will not be used if SUBTRACT and MODIFYIN
 *        are TRUE (in that case the input NDF will be modified).
+*     POSKNOT( ) = LITERAL (Read)
+*        The co-ordinates of the interior knots for all trends.  KNOTS 
+*        values should be supplied, or just the null (!) value to 
+*        request equally spaced knots.  The units of these co-ordinates
+*        is determined by the axis of the current world co-ordinate 
+*        system of the input NDF that corresponds to the trend axis.  
+*        Supplying a colon ":" will display details of the current 
+*        co-ordinate Frame.  [!]
 *     RANGES() = LITERAL (Read)
 *        These are the pairs of co-ordinates that define ranges 
 *        along the trend axis.  When given these ranges are used to 
 *        select the values that are used in the fits.  The null value 
 *        (!) causes all the values along each data line to be used.  The
-*        units of these ranges is determined by the current axis of the
+*        units of these ranges is determined by the axis of the current
 *        world co-ordinate system that corresponds to the trend axis.  
-*        Up to ten pairs of values are allowed.  This parameter is not
-*        accessed when AUTO=TRUE.  [!]
+*        Supplying a colon ":" will display details of the current 
+*        co-ordinate Frame.  Up to ten pairs of values are allowed.  
+*        This parameter is not accessed when AUTO=TRUE.  [!]
 *     RMSCLIP = _REAL (Read)
 *        The number of standard deviations exceeding the mean of the 
 *        root-mean-squared residuals of the fits at which a fit is
@@ -208,7 +271,7 @@
 *        instead.  [!]
 *     VARIANCE = _LOGICAL (Read)
 *        If TRUE and the input NDF contains variances, then the
-*        polynomial fits will be weighted by the variances.
+*        polynomial or spline fits will be weighted by the variances.
 
 *  Examples:
 *     mfittrend in=cube axis=3 ranges="1000,2000,3000,4000" order=4 
@@ -223,6 +286,18 @@
 *        As above except the fitting ranges are determined automatically
 *        with 2- then 3-sigma clipping using a representative central
 *        region.
+*     mfittrend in=cube axis=3 auto clip=[2,3] fittype=spline out=detrend
+*               interpol
+*        As the previous example except that interpolation cubic-spline 
+*        fits with four equally spaced interior knots are used to 
+*        characterise the trends.
+*     mfittrend m51 3 out=m51_bsl mask=m51_msk auto fittype=spl
+*        This example fits to trends along the third axis of NDF m51
+*        and writes the evaluated fits to NDF m51_bsl.  The fits use a
+*        smoothing cubic spline with the placement and number of 
+*        interior knots determined automatically.  Features are 
+*        determined automatically, and a mask of excluded features is
+*        written to NDF m51_msk.
 *     mfittrend cube axis=3 auto method=single order=1 subtract 
 *               out=cube_dt mask=cube_mask
 *        This fits linear trends to the spectral axis of a data cube
@@ -246,6 +321,13 @@
 *     may need to determine empirically what are the best
 *     clipping limits, binning factor, and for METHOD="Region" the 
 *     region to average.
+*     -  You are advised to inspect the fits, especially the spline
+*     fits or high-order polynomials.  A given set of trends may require
+*     more than one pass through this task, if they exhibit varied
+*     morphologies.  Use masking or NDF sections to select different 
+*     regions that are fit with different parameters.  The various trend
+*     maps are then integrated with PASTE to form the final composite
+*     set of trends that you can subtract.
 
 *  Related Applications:
 *     FIGARO: FITCONT, FITPOLY; CCDPACK: DEBIAS; KAPPA: SETBAD.
@@ -261,7 +343,10 @@
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
-*     Council.  All Rights reserved.
+*     Council.  
+*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+*     Council.  
+*     All Rights reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -302,14 +387,14 @@
 *        Add code to identify the required pixel axis in cases where the
 *        WCS->pixel transformation is not defined.
 *     12-MAY-2007 (DSB):
-*        Add code to identify the required pixel ranges in cases where the
-*        WCS->pixel transformation is not defined.
+*        Add code to identify the required pixel ranges in cases where
+*        the WCS->pixel transformation is not defined.
 *     2007 July 12 (MJC):
 *        Adapted COLLAPSE code to determine the alignment of pixel with
 *        WCS axes.  This attempts first to split the current Frame into
-*        parallel mappings including one that is solely de-trending axis,
-*        before finding the largest projection of the vector joining
-*        two test points.
+*        parallel mappings including one that is solely de-trending 
+*        axis, before finding the largest projection of the vector 
+*        joining two test points.
 *     2007 July 19 (MJC):
 *        Used new KPG1_ASAPA to identify pixel axis corresponding to
 *        the de-trended WCS axis, rather than inline code.
@@ -317,8 +402,8 @@
 *        Added METHOD and NUMBIN parameters.
 *     2007 September 6 (MJC):
 *        Create a mask for features detected by the automatic Single
-*        method, rather than attempt to store the mask information in the
-*        data.
+*        method, rather than attempt to store the mask information in
+*        the data.
 *     2007 September 10 (MJC):
 *        Allow the feature mask to be stored in an output NDF given by
 *        new parameter MASK.  Output the selected regions in the current
@@ -330,6 +415,14 @@
 *     2007 December 19 (MJC):
 *        Fixed logic bug when using Single mode when no bad pixels are 
 *        present.
+*     2008 May 14 (MJC):
+*        Add cubic-spline-fit option through new FITTYPE and KNOTS
+*        parameters.  Packaged polynomial fitting by data type in 
+*        KPS1_LFTA.
+*     2008 May 21 (MJC):
+*        Added POSKNOT parameter.
+*     2008 May 30 (MJC):
+*        Added smoothing spline and INTERPOL parameter.
 *     {enter_further_changes_here}
 
 *-
@@ -363,47 +456,71 @@
       INTEGER MXCLIP             ! Maximum number of clips of the data
       PARAMETER ( MXCLIP = 5 )
 
-      INTEGER OPTBIN              ! Nominal number of bins
+      INTEGER OPTBIN             ! Nominal number of bins
       PARAMETER ( OPTBIN = 32 )
-            
+
+*  TOKNOT must be at least UPKNOT.  FKNOT dimension uses TOKNOT because
+*  we want to pass NKNOT for a smoothing spline, and it is also the
+*  dimension of the FKNOT array in the fitting subroutine.
+      INTEGER TOKNOT             ! Maximum number of interior knots
+      PARAMETER ( TOKNOT = 60 )  ! smoothing spline
+
+      INTEGER UPKNOT             ! Upper limit to number of interior
+      PARAMETER ( UPKNOT = 11 )  ! knots, interpolating spline
+
 *  Local Variables:
+      INTEGER AREA               ! Area of axes orthogonal to fit axis
       CHARACTER*9 ATTR           ! Name of an AST attribute
+      LOGICAL AUTO               ! Determine regions automatically?
+      INTEGER CFRM               ! Current frame
+      REAL CLIP( MXCLIP )        ! Clipping sigmas during binning
+      LOGICAL CLIPRE             ! Clip the outlier residuals?
+      REAL CLPRMS                ! Clipping sigma for outlier rejection
       CHARACTER*15 COMP          ! List of array components to process
-      CHARACTER*( NDF__SZTYP ) ITYPE ! Numeric type for processing
-      CHARACTER*( DAT__SZLOC ) LOC ! Locator for the input NDF
-      CHARACTER*9 METHOD         ! Method for determining the mode
-      CHARACTER*80 SECT          ! Section specifier
       DOUBLE PRECISION CPOS( 2, NDF__MXDIM ) ! Two current Frame 
                                  ! positions
       DOUBLE PRECISION CURPOS( NDF__MXDIM ) ! A valid current Frame 
                                  ! position
-      DOUBLE PRECISION DRANGE( MAXRNG ) ! Fit ranges world co-ordinates
-      DOUBLE PRECISION PPOS( 2, NDF__MXDIM ) ! Two pixel Frame positions
-      DOUBLE PRECISION PRANGE( MAXRNG ) ! Fit ranges pixel co-ordinates
-      DOUBLE PRECISION PXHIGH    ! High pixel bound of fitted axis 
-      DOUBLE PRECISION PXLOW     ! Low pixel bound of fitted axis 
-      INTEGER AREA               ! Area of axes orthogonal to fit axis
-      INTEGER CFRM               ! Current frame
       INTEGER DIMS( NDF__MXDIM ) ! Dimensions of NDF
+      DOUBLE PRECISION DRANGE( MAXRNG ) ! Fit ranges world co-ordinates
+      DOUBLE PRECISION DKNOTS( UPKNOT ) ! Knots' world co-ordinates
+      INTEGER DSIZE              ! Number of elements in data array
       INTEGER EL                 ! Number of mapped elements
+      CHARACTER*16 FITYPE        ! Type of fit ('POLYNOMIAL'|'SPLINE')
+      REAL FKNOT( TOKNOT )       ! Grid co-ordinates of fixed knots
+      CHARACTER*14 FMT           ! Format string
+      LOGICAL GLOBAL             ! Use the automatic global method?
+      INTEGER GPTR               ! Pointer to sort-positions workspace
+      LOGICAL HASBAD             ! Input NDF may have BAD pixels?
+      LOGICAL HAVVAR             ! Have a variance component?
       INTEGER I                  ! Loop variable
       INTEGER IAXIS              ! Index of axis within current Frame
       INTEGER IERR               ! Position of first error (dummy)
       INTEGER INNDF              ! NDF identifier of input NDF
+      LOGICAL INTERP             ! Interpolation spline?
       INTEGER IPAS               ! Pointer to workspace
       INTEGER IPBS               ! Pointer to coefficients
+      INTEGER IPCO               ! Pointer to co-ordinates
+      INTEGER IPCOEF             ! Pointer to spline coefficients
       INTEGER IPCOL              ! Pointer to collapsed rms residuals
       INTEGER IPDAT( 2 )         ! Pointer to NDF data & variance comp's
+      INTEGER IPGOOD             ! Pointer to numbers of good values
       INTEGER IPIN               ! Pointer to input NDF data
       INTEGER IPIX               ! Index of PIXEL Frame within FrameSet
+      INTEGER IPKNOT             ! Pointer to knots
       INTEGER IPMASK             ! Pointer to feature mask
       INTEGER IPMN               ! Pointer to mask NDF's data array
+      INTEGER IPNC               ! Pointer to number of coefficients
       INTEGER IPRES              ! Pointer to array of residuals
+      INTEGER IPSCAL             ! Pointer to scale factors
       INTEGER IPTMP( 1 )         ! Pointer to temporary NDF component
+      INTEGER IPVAL              ! Pointer to values
       INTEGER IPVAR( 1 )         ! Pointer to NDF variance component
       INTEGER IPWRK1             ! Pointer to workspace
       INTEGER IPWRK2             ! Pointer to workspace
       INTEGER IPWRK3             ! Pointer to workspace
+      INTEGER IPWT               ! Pointer to weights
+      CHARACTER*( NDF__SZTYP ) ITYPE ! Numeric type for processing
       INTEGER IWCS               ! AST FrameSet identifier
       INTEGER J                  ! Loop variable
       INTEGER JAXIS              ! Index of axis within pixel Frame
@@ -411,38 +528,53 @@
       INTEGER JLO                ! Low pixel index for axis
       INTEGER LATTR              ! Used length of ATTR
       INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF
+      CHARACTER*( DAT__SZLOC ) LOC ! Locator for the input NDF
       INTEGER MAP                ! PIXEL Frame to Current Frame Mapping
                                  ! pointer
       INTEGER MAXBIN             ! Maximum number of bins for auto mode
+      CHARACTER*9 METHOD         ! Method for determining the mode
+      LOGICAL MODIN              ! Modify input NDF by subtracting fits?
       INTEGER MSKNDF             ! Identifier of the mask NDF
+      INTEGER MXKNOT             ! Maximum number of knots
       INTEGER NAXC               ! Number of axes in current frame
+      INTEGER NCF                ! Used length of FMT
       INTEGER NCLIP              ! Number of clips of averaged data
       INTEGER NCSECT             ! Number of characters in section
       INTEGER NDFS               ! NDF identifier of section
       INTEGER NDIM               ! Number of NDF dimensions
       INTEGER NERR               ! Number of errors
       INTEGER NFEED              ! Number of pixel axes feeding WCS axis
+      INTEGER NFIT               ! Number of successful fits
+      INTEGER NGOOD              ! Number of good knot positions
+      INTEGER NKNOT              ! Number of interior knots
       INTEGER NRANGE             ! Number of range values (not pairs)
       INTEGER NUMBIN             ! Number of bins in automatic mode
+      INTEGER NWS                ! Size of spline-fitting routine's
+                                 ! workspace
       INTEGER ORDER              ! The order of the polynomial to fit
       INTEGER OTOMAP             ! One-to-one mapping
       INTEGER OUTNDF             ! NDF identifier of output NDF
       INTEGER PLACE              ! Placeholder for temporary NDF
+      DOUBLE PRECISION PKNOTS( UPKNOT ) ! Knots' pixel co-ordinates
+      DOUBLE PRECISION PPOS( 2, NDF__MXDIM ) ! Two pixel Frame positions
+      DOUBLE PRECISION PRANGE( MAXRNG ) ! Fit ranges pixel co-ordinates
+      DOUBLE PRECISION PXHIGH    ! High pixel bound of fitted axis 
+      DOUBLE PRECISION PXLOW     ! Low pixel bound of fitted axis 
+      LOGICAL QUICK              ! Use quicker code?
       INTEGER RANGES( MAXRNG )   ! The fit ranges pixels
-      INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF
-      LOGICAL AUTO               ! Determine regions automatically?
-      LOGICAL CLIPRE             ! Clip the outlier residuals?
-      LOGICAL GLOBAL             ! Use the automatic global method?
-      LOGICAL HASBAD             ! Input NDF may have BAD pixels?
-      LOGICAL HAVVAR             ! Have a variance component?
-      LOGICAL MODIN              ! Modify input NDF by subtracting fits?
       LOGICAL REGION             ! Representative region auto method?
+      CHARACTER*80 SECT          ! Section specifier
       LOGICAL SINGLE             ! Single-line automatic method?
+      INTEGER SIWPTR             ! Pointer to spline-fitting workspace
       LOGICAL SUBTRA             ! Subtract fit from data?
+      INTEGER SWPTR              ! Pointer to spline-fitting workspace
+      CHARACTER*( 10*UPKNOT + 3 ) TOKEN ! List of knot grid positions
+      INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF
       LOGICAL USEALL             ! Use the entire axis?
       LOGICAL USEVAR             ! Use variance as weights in fits?
-      REAL CLIP( MXCLIP )        ! Clipping sigmas during binning
-      REAL CLPRMS                ! Clipping sigma for outlier rejection
+      INTEGER WPTR               ! Pointer to mapped weight array
+      INTEGER XPTR               ! Pointer to mapped x co-ordinate array
+      INTEGER ZPTR               ! Pointer to mapped data value array
 
 *.
 
@@ -458,8 +590,34 @@
 
 *  Obtain the main parameters.
 *  ===========================
+
+*  Obtain the type of the fit ('POLYNOMIAL' or 'SPLINE').
+      CALL PAR_CHOIC( 'FITTYPE', 'Polynomial', 'Polynomial,Spline',
+     :                .TRUE., FITYPE, STATUS )
+
+*  Constrain the number of interior knots given the number of pixels.
+*  This is not perfect, as we really need to know the number of pixels.
+      IF ( FITYPE( 1:3 ) .EQ. 'SPL' ) THEN
+
+*  Obtain the type of spline fitting.
+         CALL PAR_GET0L( 'INTERPOL', INTERP, STATUS )
+
+*  Obtain the number of interior knots.  Defer the number of knots
+*  for the smoothing spline until the number of data values are known,
+*  but set a temporary value to prevent problems.  Allow more knots
+*  for the smoothing spline as the knot positions do not ned to be
+*  supplied.
+         IF ( INTERP ) THEN
+            CALL PAR_GDR0I( 'KNOTS', 4, 1, UPKNOT, .FALSE., NKNOT, 
+     :                      STATUS )
+         ELSE
+            CALL PAR_GDR0I( 'KNOTS', 8, 1, 60, .FALSE., NKNOT, STATUS )
+         END IF
+      ELSE
+
 *  Get the order of the polynomial.
-      CALL PAR_GDR0I( 'ORDER', 3, 0, 15, .FALSE., ORDER, STATUS )
+         CALL PAR_GDR0I( 'ORDER', 3, 0, 15, .FALSE., ORDER, STATUS )
+      END IF
 
 *  See if we should subtract fit from data. Need to do this early as we
 *  may be modifying the input NDF.
@@ -661,7 +819,7 @@
 *  Obtain a locator to the input NDF.
             CALL NDF_LOC( INNDF, 'Read', LOC, STATUS )
 
-*  Create the section in the input array.  Allow dfor a null string
+*  Create the section in the input array.  Allow for a null string
 *  for a one-dimensional NDF.
             IF ( NCSECT .GT. 0 ) THEN
                CALL NDF_FIND( LOC, '(' // SECT( :NCSECT ) // ')', NDFS,
@@ -726,8 +884,8 @@
                JHI = KPG1_CEIL( REAL( MAX( PPOS( 1, JAXIS ),
      :                                     PPOS( 2, JAXIS ) ) ) )
 
-*  Otherwise, we use the single-input single-output Mapping that generates 
-*  the requested WCS axis.
+*  Otherwise, we use the single-input single-output Mapping that 
+*  generates the requested WCS axis.
             ELSE
                CALL AST_TRAN1( OTOMAP, 2, DRANGE( I ), .TRUE., PRANGE, 
      :                         STATUS )
@@ -764,8 +922,9 @@
 *  Report the ranges.
 *  ------------------
 
-*  Tell the user the ranges of pixel being used.  In the Single automatic
-*  method there are no ranges kept only flagged in each line to de-trend.
+*  Tell the user the ranges of pixel being used.  In the Single 
+*  automatic method there are no ranges kept only flagged in each line 
+*  to de-trend.
       IF ( .NOT. SINGLE ) THEN
 
 *  Report the ranges in the current co-ordinate frame too, unless it is
@@ -784,8 +943,8 @@
                   DRANGE( I + 1 ) = CPOS( 1, IAXIS )
                   DRANGE( I ) = CPOS( 2, IAXIS )
 
-*  Otherwise, we use the single-input single-output Mapping that generates 
-*  the requested WCS axis.
+*  Otherwise, we use the single-input single-output Mapping that 
+*  generates the requested WCS axis.
                ELSE
                   PRANGE( I ) = DBLE( RANGES( I ) )
                   PRANGE( I + 1 ) = DBLE( RANGES( I + 1 ) )
@@ -843,6 +1002,77 @@
       DO I = 1, NRANGE
          RANGES( I ) = RANGES( I ) - LBND( JAXIS ) + 1
       END DO
+
+*  Obtain knot locations.
+*  ======================
+
+*  These need to be in grid co-ordinates for the spline-fitting routine.
+      IF ( FITYPE( 1:3 ) .EQ. 'SPL' ) THEN
+
+*  Default to undefined knot positions.  Negative is unphysical.
+         DO I = 1, NKNOT
+            FKNOT( I ) = -1.0
+         END DO
+
+         IF ( INTERP ) THEN
+
+*  Get the ranges to use.  These values are transformed from current
+*  co-ordinates along the fit axis to pixel co-ordinates on the relevant
+*  NDF axis.
+            DKNOTS( 1 ) = AST__BAD
+            CALL KPG1_GTAXV( 'POSKNOT', NKNOT, .TRUE., CFRM, IAXIS,
+     :                       DKNOTS, NGOOD, STATUS )
+
+*  If a null value was supplied then we should use equally spaced
+*  knots.  The default remains in force.  
+            IF ( STATUS .EQ. PAR__NULL ) THEN
+               CALL ERR_ANNUL( STATUS )
+
+*  If MAP has an inverse, we can use MAP directly to obtain pixel
+*  co-ordinates.
+            ELSE IF ( OTOMAP .EQ. AST__NULL ) THEN
+               NKNOT = NGOOD
+
+*  Project the given ranges into pixel co-ordinates.  Transform one at
+*  a time to reuse the CPOS array.
+               DO I = 1, NKNOT
+                  CPOS( 1, IAXIS ) = DKNOTS( I )
+                  CALL AST_TRANN( MAP, 1, NAXC, 2, CPOS, .TRUE., NDIM,
+     :                            2, PPOS, STATUS )
+
+*  Convert to a grid co-ordinate within the allowed range.
+                  FKNOT( I ) = REAL( PPOS( 1, JAXIS ) ) - 
+     :                         REAL( LBND( JAXIS ) ) + 1.5
+                  FKNOT( I ) = MAX( 1.0, MIN( REAL( DIMS( JAXIS ) ), 
+     :                                        FKNOT( I ) ) )
+               END DO
+
+*  Otherwise, we use the single-input single-output Mapping that 
+*  generates the requested WCS axis.
+            ELSE
+               CALL AST_TRAN1( OTOMAP, NKNOT, DKNOTS, .TRUE., PKNOTS,
+     :                         STATUS )
+
+*  Convert to grid co-ordinates within the allowed range.
+               DO I = 1, NKNOT
+                  FKNOT( I ) = REAL( PKNOTS( I ) ) - 
+     :                         REAL( LBND( JAXIS ) ) + 1.5
+                  FKNOT( I ) = MAX( 1.0, MIN( REAL( DIMS( JAXIS ) ), 
+     :                                        FKNOT( I ) ) )
+               END DO
+            END IF
+            CALL MSG_OUTIF ( MSG__VERB, 'MFITTREND_KNOTPOS1',
+     :                       'Knot positions in grid co-ordinates:',
+     :                       STATUS )
+            FMT = '('
+            NCF = 1
+            CALL CHR_PUTI( UPKNOT, FMT, NCF )
+            CALL CHR_APPND( '(1X,F9.2))', FMT, NCF )
+            WRITE( TOKEN, FMT=FMT ) ( FKNOT( I ), I = 1, NKNOT )
+            CALL MSG_OUTIF ( MSG__VERB, 'MFITTREND_KNOTPOS2',
+     :                       TOKEN, STATUS )
+         END IF
+      END IF
 
 *  Create output NDF.
 *  ==================
@@ -919,35 +1149,77 @@
      :                    STATUS )
          END IF
       END IF
+      IF ( .NOT. USEVAR ) IPVAR( 1 ) = IPDAT( 1 )
 
 *  Allocate various workspaces.
 *  ============================
 
 *  The requirements for the workspaces depends on the dimensionality. 
-*  We need space for the cumulative coefficient sums and the 
-*  coefficients themselves (Ax=B).
       AREA = 1
       DO 5 I = 1, NDIM
          IF ( I .NE. JAXIS ) THEN
             AREA = AREA * DIMS( I )
          END IF
- 5    CONTINUE
+   5  CONTINUE
 
-      IF ( USEVAR .OR. HASBAD .OR. SINGLE ) THEN
-         CALL PSX_CALLOC( AREA * ( ORDER + 1 ) * ( ORDER + 1 ),
-     :                    '_DOUBLE', IPAS, STATUS )
-      ELSE
+*  Polynomial
+*  ----------
+      IF ( FITYPE( 1:3 ) .EQ. 'POL' ) THEN
+
+*  We need space for the cumulative coefficient sums and the 
+*  coefficients themselves (Ax=B).
+         IF ( USEVAR .OR. HASBAD .OR. SINGLE ) THEN
+            CALL PSX_CALLOC( AREA * ( ORDER + 1 ) * ( ORDER + 1 ),
+     :                      '_DOUBLE', IPAS, STATUS )
+         ELSE
 
 *  When there are no variances and we also know there are no BAD values
 *  useful savings in memory and speed are available as the cumulative
 *  sums for matrix inversion are fixed.
-         CALL PSX_CALLOC( ( ORDER + 1 ) * ( ORDER + 1 ), '_DOUBLE',
-     :                    IPAS, STATUS )
+            CALL PSX_CALLOC( ( ORDER + 1 ) * ( ORDER + 1 ), '_DOUBLE',
+     :                       IPAS, STATUS )
+         END IF
+         CALL PSX_CALLOC( AREA * ( ORDER + 1 ), '_DOUBLE', IPBS, 
+     :                    STATUS )
+         CALL PSX_CALLOC( AREA * ( ORDER + 1 ), '_DOUBLE', IPWRK1, 
+     :                    STATUS )
+         CALL PSX_CALLOC( AREA * ( ORDER + 1 ), '_INTEGER', IPWRK2,
+     :                    STATUS )
+
+*  Spline
+*  ------
+      ELSE
+
+*  Calculate the total number of pixels to fit and the storage 
+*  requirement for the spline-fitting routine.  We add a couple of 
+*  clamps.
+         DSIZE = AREA * ( DIMS( JAXIS ) + 2 )
+         IF ( INTERP ) THEN
+            MXKNOT = MIN( NKNOT, DIMS( JAXIS ) / 2 ) + 8
+         ELSE
+
+*  This is a guesstimate.  We do not want to fit every wiggle.
+            MXKNOT = MIN( 192, MAX( NKNOT, DIMS( JAXIS ) / 2 ) ) + 8
+         END IF
+
+*  Map some workspace to hold the co-ordinates, values and weights.  The
+*  maximum number of values which may be required is DSIZE, though the 
+*  presence of bad values may mean that not all this workspace is 
+*  needed.
+         CALL PSX_CALLOC( DSIZE, '_REAL', IPCO, STATUS )
+         CALL PSX_CALLOC( DSIZE, '_REAL', IPVAL, STATUS )
+         CALL PSX_CALLOC( DSIZE, '_REAL', IPWT, STATUS )
+
+*  Map some workspace for the coefficients, knots, scale factors,
+*  number of good values.
+         NWS = MXKNOT * AREA
+         CALL PSX_CALLOC( AREA, '_INTEGER', IPGOOD, STATUS )
+         CALL PSX_CALLOC( AREA, '_INTEGER', IPNC, STATUS )
+         CALL PSX_CALLOC( NWS, '_REAL', IPCOEF, STATUS )
+         CALL PSX_CALLOC( NWS, '_REAL', IPKNOT, STATUS )
+         CALL PSX_CALLOC( AREA, '_REAL', IPSCAL, STATUS )
+         
       END IF
-      CALL PSX_CALLOC( AREA * ( ORDER + 1 ), '_DOUBLE', IPBS, STATUS )
-      CALL PSX_CALLOC( AREA * ( ORDER + 1 ), '_DOUBLE', IPWRK1, STATUS )
-      CALL PSX_CALLOC( AREA * ( ORDER + 1 ), '_INTEGER', IPWRK2,
-     :                 STATUS )
 
 *  Make workspace to store a byte mask (to reduce storage required).
       IF ( SINGLE ) THEN
@@ -1008,148 +1280,55 @@
 
 *  Determine the fits.
 *  ===================
+      QUICK = .NOT. ( USEVAR .OR. HASBAD .OR. SINGLE ) 
+      IF ( FITYPE( 1:3 ) .EQ. 'POL' ) THEN
 
 *  N.B. could reduce memory use by NDF blocking though planes for 
 *  higher dimensional data, or just mapping the intersection of ranges, 
 *  or individual ranges, but that would only be good if working with the
-*  last axis (need contiguity).
-      IF ( USEVAR .OR. HASBAD .OR. SINGLE ) THEN
-         IF ( ITYPE .EQ. '_BYTE' ) THEN
-            CALL KPS1_LFTB( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
-     :                      %VAL( CNF_PVAL( IPVAR( 1 ) ) ), 
-     :                      SINGLE, %VAL( CNF_PVAL( IPMASK ) ),
-     :                      DIMS, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
-     :                      %VAL( CNF_PVAL( IPAS ) ),
-     :                      %VAL( CNF_PVAL( IPBS ) ),
-     :                      %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                      %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
-
-         ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-            CALL KPS1_LFTUB( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
-     :                       %VAL( CNF_PVAL( IPVAR( 1 ) ) ), 
-     :                       SINGLE, %VAL( CNF_PVAL( IPMASK ) ),
-     :                       DIMS, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
-     :                       %VAL( CNF_PVAL( IPAS ) ),
-     :                       %VAL( CNF_PVAL( IPBS ) ),
-     :                       %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
-
-         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_LFTD( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
-     :                      %VAL( CNF_PVAL( IPVAR( 1 ) ) ), 
-     :                      SINGLE, %VAL( CNF_PVAL( IPMASK ) ),
-     :                      DIMS, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
-     :                      %VAL( CNF_PVAL( IPAS ) ),
-     :                      %VAL( CNF_PVAL( IPBS ) ),
-     :                      %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                      %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
-
-         ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL KPS1_LFTI( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
-     :                      %VAL( CNF_PVAL( IPVAR( 1 ) ) ), 
-     :                      SINGLE, %VAL( CNF_PVAL( IPMASK ) ),
-     :                      DIMS, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
-     :                      %VAL( CNF_PVAL( IPAS ) ),
-     :                      %VAL( CNF_PVAL( IPBS ) ),
-     :                      %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                      %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
-
-         ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_LFTR( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
-     :                      %VAL( CNF_PVAL( IPVAR( 1 ) ) ), 
-     :                      SINGLE, %VAL( CNF_PVAL( IPMASK ) ),
-     :                      DIMS, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
-     :                      %VAL( CNF_PVAL( IPAS ) ),
-     :                      %VAL( CNF_PVAL( IPBS ) ),
-     :                      %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                      %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
-
-         ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-            CALL KPS1_LFTW( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
-     :                      %VAL( CNF_PVAL( IPVAR( 1 ) ) ), 
-     :                      SINGLE, %VAL( CNF_PVAL( IPMASK ) ),
-     :                      DIMS, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
-     :                      %VAL( CNF_PVAL( IPAS ) ),
-     :                      %VAL( CNF_PVAL( IPBS ) ),
-     :                      %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                      %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
-
-         ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-            CALL KPS1_LFTUW( ORDER, JAXIS, RANGES, NRANGE, USEVAR,
-     :                       %VAL( CNF_PVAL( IPVAR( 1 ) ) ), 
-     :                       SINGLE, %VAL( CNF_PVAL( IPMASK ) ),
-     :                       DIMS, %VAL( CNF_PVAL( IPDAT( 1 ) ) ),
-     :                       %VAL( CNF_PVAL( IPAS ) ),
-     :                       %VAL( CNF_PVAL( IPBS ) ),
-     :                       %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
-         END IF
-      ELSE
-
-*  As there are no variances, no bad values and no mask, we can use 
-*  the fastest method.
-         IF ( ITYPE .EQ. '_BYTE' ) THEN
-            CALL KPS1_LFTQB( ORDER, JAXIS, RANGES, NRANGE,
-     :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
-     :                       %VAL( CNF_PVAL( IPAS ) ),
-     :                       %VAL( CNF_PVAL( IPBS ) ),
-     :                       %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
-
-         ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-            CALL KPS1_LFTQUB( ORDER, JAXIS, RANGES, NRANGE,
-     :                        %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
-     :                        %VAL( CNF_PVAL( IPAS ) ),
-     :                        %VAL( CNF_PVAL( IPBS ) ),
-     :                        %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                        %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
-
-         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL KPS1_LFTQD( ORDER, JAXIS, RANGES, NRANGE,
-     :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
-     :                       %VAL( CNF_PVAL( IPAS ) ),
-     :                       %VAL( CNF_PVAL( IPBS ) ),
-     :                       %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
-
-         ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL KPS1_LFTQI( ORDER, JAXIS, RANGES, NRANGE,
-     :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
-     :                       %VAL( CNF_PVAL( IPAS ) ),
-     :                       %VAL( CNF_PVAL( IPBS ) ),
-     :                       %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
-
-         ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL KPS1_LFTQR( ORDER, JAXIS, RANGES, NRANGE,
-     :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
-     :                       %VAL( CNF_PVAL( IPAS ) ),
-     :                       %VAL( CNF_PVAL( IPBS ) ),
-     :                       %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
-
-         ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-            CALL KPS1_LFTQW( ORDER, JAXIS, RANGES, NRANGE,
-     :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
-     :                       %VAL( CNF_PVAL( IPAS ) ),
-     :                       %VAL( CNF_PVAL( IPBS ) ),
-     :                       %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                       %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
-
-         ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-            CALL KPS1_LFTQUW( ORDER, JAXIS, RANGES, NRANGE,
-     :                        %VAL( CNF_PVAL( IPDAT( 1 ) ) ), DIMS,
-     :                        %VAL( CNF_PVAL( IPAS ) ),
-     :                        %VAL( CNF_PVAL( IPBS ) ),
-     :                        %VAL( CNF_PVAL( IPWRK1 ) ),
-     :                        %VAL( CNF_PVAL( IPWRK2 ) ), STATUS )
-         END IF
-      END IF
+*  last axis (need contiguity).  Use the wrapper routine to make this
+*  code more compact.
+         CALL KPS1_LFTA( QUICK, ITYPE, ORDER, JAXIS, NRANGE, RANGES, 
+     :                   USEVAR, IPVAR( 1 ), SINGLE, 
+     :                   %VAL( CNF_PVAL( IPMASK ) ), DIMS, 
+     :                   IPDAT( 1 ), %VAL( CNF_PVAL( IPAS ) ), 
+     :                   %VAL( CNF_PVAL( IPBS ) ), 
+     :                   %VAL( CNF_PVAL( IPWRK1 ) ), 
+     :                   %VAL( CNF_PVAL( IPWRK2 ) ),
+     :                   STATUS )
 
 *  Free up the workspace at the earliest opportunity.
-      CALL PSX_FREE( IPAS, STATUS )
-      CALL PSX_FREE( IPWRK1, STATUS )
-      CALL PSX_FREE( IPWRK2, STATUS )
+         CALL PSX_FREE( IPAS, STATUS )
+         CALL PSX_FREE( IPWRK1, STATUS )
+         CALL PSX_FREE( IPWRK2, STATUS )
+
+*  Fit a B-spline to each trend vector.
+      ELSE
+         CALL KPS1_MFTA( QUICK, ITYPE, INTERP, MXKNOT, NKNOT, FKNOT, 
+     :                   JAXIS, NRANGE, RANGES, USEVAR, IPVAR( 1 ), 
+     :                   SINGLE, %VAL( CNF_PVAL( IPMASK ) ), DIMS, 
+     :                   IPDAT( 1 ), %VAL( CNF_PVAL( IPCO ) ), 
+     :                   %VAL( CNF_PVAL( IPVAL ) ),
+     :                   %VAL( CNF_PVAL( IPWT ) ), NFIT,
+     :                   %VAL( CNF_PVAL( IPGOOD ) ),
+     :                   %VAL( CNF_PVAL( IPKNOT ) ), 
+     :                   %VAL( CNF_PVAL( IPCOEF ) ), 
+     :                   %VAL( CNF_PVAL( IPNC ) ), 
+     :                   %VAL( CNF_PVAL( IPSCAL ) ), STATUS )
+
+*  Free up the workspace at the earliest opportunity.
+         CALL PSX_FREE( IPGOOD, STATUS )
+         CALL PSX_FREE( IPCO, STATUS )
+         CALL PSX_FREE( IPVAL, STATUS )
+         CALL PSX_FREE( IPWT, STATUS )
+
+*  Report the success rate.
+         CALL MSG_SETI( 'NF', NFIT )
+         CALL MSG_SETI( 'AREA' , AREA )
+         CALL MSG_OUTIF( MSG__NORM, 'MFITTREND_NFIT', 'Successful '/
+     :                   /'spline fits to ^NF of ^AREA trends.',
+     :                   STATUS )
+      END IF
 
 *  Evaluate and optionally subtract the trends.
 *  ============================================
@@ -1174,44 +1353,112 @@
      :                 EL, STATUS )
       END IF
 
-      IF ( ITYPE .EQ. '_BYTE' ) THEN
-         CALL KPS1_LFTSB( ORDER, JAXIS, SUBTRA,
-     :                    DIMS, %VAL( CNF_PVAL( IPBS ) ),
-     :                    %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+      IF ( FITYPE( 1:3 ) .EQ. 'POL' ) THEN
+         IF ( ITYPE .EQ. '_BYTE' ) THEN
+            CALL KPS1_LFTSB( ORDER, JAXIS, SUBTRA,
+     :                       DIMS, %VAL( CNF_PVAL( IPBS ) ),
+     :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
 
-      ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
-         CALL KPS1_LFTSUB( ORDER, JAXIS, SUBTRA,
-     :                     DIMS, %VAL( CNF_PVAL( IPBS ) ),
-     :                     %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+         ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
+            CALL KPS1_LFTSUB( ORDER, JAXIS, SUBTRA,
+     :                        DIMS, %VAL( CNF_PVAL( IPBS ) ),
+     :                        %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
 
-      ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-         CALL KPS1_LFTSD( ORDER, JAXIS, SUBTRA,
-     :                    DIMS, %VAL( CNF_PVAL( IPBS ) ),
-     :                    %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+            CALL KPS1_LFTSD( ORDER, JAXIS, SUBTRA,
+     :                       DIMS, %VAL( CNF_PVAL( IPBS ) ),
+     :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
 
-      ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-         CALL KPS1_LFTSI( ORDER, JAXIS, SUBTRA,
-     :                    DIMS, %VAL( CNF_PVAL( IPBS ) ),
-     :                    %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+         ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+            CALL KPS1_LFTSI( ORDER, JAXIS, SUBTRA,
+     :                       DIMS, %VAL( CNF_PVAL( IPBS ) ),
+     :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
 
-      ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
-         CALL KPS1_LFTSR( ORDER, JAXIS, SUBTRA,
-     :                    DIMS, %VAL( CNF_PVAL( IPBS ) ),
-     :                    %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+         ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+            CALL KPS1_LFTSR( ORDER, JAXIS, SUBTRA,
+     :                       DIMS, %VAL( CNF_PVAL( IPBS ) ),
+     :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
 
-      ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-         CALL KPS1_LFTSW( ORDER, JAXIS, SUBTRA,
-     :                    DIMS, %VAL( CNF_PVAL( IPBS ) ),
-     :                    %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+         ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
+            CALL KPS1_LFTSW( ORDER, JAXIS, SUBTRA,
+     :                       DIMS, %VAL( CNF_PVAL( IPBS ) ),
+     :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
 
-      ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
-         CALL KPS1_LFTSUW( ORDER, JAXIS, SUBTRA,
-     :                     DIMS, %VAL( CNF_PVAL( IPBS ) ),
-     :                     %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
-      END IF
+         ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
+            CALL KPS1_LFTSUW( ORDER, JAXIS, SUBTRA,
+     :                        DIMS, %VAL( CNF_PVAL( IPBS ) ),
+     :                        %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+         END IF
 
 * Free up the remaining workspace at the earliest opportunity.
-      CALL PSX_FREE( IPBS, STATUS )
+         CALL PSX_FREE( IPBS, STATUS )
+
+      ELSE
+
+         IF ( ITYPE .EQ. '_BYTE' ) THEN
+            CALL KPS1_MFTSB( JAXIS, SUBTRA, DIMS, MXKNOT,
+     :                       %VAL( CNF_PVAL( IPNC ) ),
+     :                       %VAL( CNF_PVAL( IPKNOT ) ),
+     :                       %VAL( CNF_PVAL( IPCOEF ) ),
+     :                       %VAL( CNF_PVAL( IPSCAL ) ),
+     :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
+            CALL KPS1_MFTSUB( JAXIS, SUBTRA, DIMS, MXKNOT,
+     :                        %VAL( CNF_PVAL( IPNC ) ),
+     :                        %VAL( CNF_PVAL( IPKNOT ) ),
+     :                        %VAL( CNF_PVAL( IPCOEF ) ),
+     :                        %VAL( CNF_PVAL( IPSCAL ) ),
+     :                        %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
+            CALL KPS1_MFTSD( JAXIS, SUBTRA, DIMS, MXKNOT,
+     :                       %VAL( CNF_PVAL( IPNC ) ),
+     :                       %VAL( CNF_PVAL( IPKNOT ) ),
+     :                       %VAL( CNF_PVAL( IPCOEF ) ),
+     :                       %VAL( CNF_PVAL( IPSCAL ) ),
+     :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
+            CALL KPS1_MFTSI( JAXIS, SUBTRA, DIMS, MXKNOT,
+     :                       %VAL( CNF_PVAL( IPNC ) ),
+     :                       %VAL( CNF_PVAL( IPKNOT ) ),
+     :                       %VAL( CNF_PVAL( IPCOEF ) ),
+     :                       %VAL( CNF_PVAL( IPSCAL ) ),
+     :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_REAL' ) THEN
+            CALL KPS1_MFTSR( JAXIS, SUBTRA, DIMS, MXKNOT,
+     :                       %VAL( CNF_PVAL( IPNC ) ),
+     :                       %VAL( CNF_PVAL( IPKNOT ) ),
+     :                       %VAL( CNF_PVAL( IPCOEF ) ),
+     :                       %VAL( CNF_PVAL( IPSCAL ) ),
+     :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
+            CALL KPS1_MFTSW( JAXIS, SUBTRA, DIMS, MXKNOT,
+     :                       %VAL( CNF_PVAL( IPNC ) ),
+     :                       %VAL( CNF_PVAL( IPKNOT ) ),
+     :                       %VAL( CNF_PVAL( IPCOEF ) ),
+     :                       %VAL( CNF_PVAL( IPSCAL ) ),
+     :                       %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+
+         ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
+            CALL KPS1_MFTSUW( JAXIS, SUBTRA, DIMS, MXKNOT,
+     :                        %VAL( CNF_PVAL( IPNC ) ),
+     :                        %VAL( CNF_PVAL( IPKNOT ) ),
+     :                        %VAL( CNF_PVAL( IPCOEF ) ),
+     :                        %VAL( CNF_PVAL( IPSCAL ) ),
+     :                        %VAL( CNF_PVAL( IPDAT( 1 ) ) ), STATUS )
+         END IF
+
+* Free up the remaining workspace at the earliest opportunity.
+         CALL PSX_FREE( IPNC, STATUS )
+         CALL PSX_FREE( IPKNOT, STATUS )
+         CALL PSX_FREE( IPCOEF, STATUS )
+         CALL PSX_FREE( IPSCAL, STATUS )
+
+      END IF
 
 *  Form residuals.
 *  ===============

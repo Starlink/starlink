@@ -1,0 +1,242 @@
+      SUBROUTINE KPS1_MFNO<T>( EL, ARRAY, GRIDCO, NSEG, SIGMA, WEIGHT,
+     :                         NOISE, STATUS )
+*+
+*  Name:
+*     KPG1_MFNOx
+
+*  Purpose:
+*     Determines the clipped mean local noise within a trend vector.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPS1_MFNO<T>( EL, ARRAY, GRIDCO, NSEG, SIGMA, WEIGHT, NOISE,
+*                        STATUS )
+
+*  Description:
+*     This routine calculates the standard deviation in segments of a
+*     a trend vector to determine the clipped mean noise about the 
+*     curving trend.  This is used by MFITTREND prior to spline fitting
+*     to be able to set a sensible threshold for knot creation.
+
+*  Arguments:
+*     EL = INTEGER (Given)
+*        The number of elements in the trend.
+*     ARRAY( EL ) = ? (Given)
+*        The trend array whose noise is to be determined.
+*     GRIDCO( EL ) = ? (Given)
+*        The original grid co-ordinate of the array elements.  It is
+*        used to ensure that segments contain adjacent or at least 
+*        neighbouring elements.
+*     NSEG = INTEGER (Returned)
+*        The number of segments s to divide the trend array.  Each 
+*        segment should have a gradient that is small compared with the 
+*        noise over the whole of the trend.
+*     SIGMA( NSEG ) = ? (Returned)
+*        The standard deviation in each segment.
+*     WEIGHT( NSEG ) = INTEGER (Returned)
+*        The weight of each segment.
+*     NOISE = ? (Returned)
+*        The clipped mean standard deviation over all the segments.
+*        A bad value is returned if the noise cannot be derived.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     - There is a routine for each numeric data type: replace "x" in
+*     the routine name by D or R as appropriate.  The ARRAY, GRIDCO,
+*     SIGMA, and NOISE arguments supplied to the routine must have the 
+*     data type specified.
+
+*  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     2008 May 29 (MJC):
+*        Original version.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'NDF_PAR'          ! NDF public constants
+
+*  Arguments Given:
+      INTEGER EL
+      <TYPE> ARRAY( EL )
+      <TYPE> GRIDCO( EL )
+      INTEGER NSEG
+
+*  Arguments Returned:
+      <TYPE> SIGMA( NSEG )
+      INTEGER WEIGHT( NSEG )
+      <TYPE> NOISE
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      REAL CLIP                  ! Clipping factor
+      INTEGER I                  ! Loop counter
+      INTEGER K                  ! Segment index
+      INTEGER KP                 ! Previous-segment index
+      DOUBLE PRECISION MEAN      ! Mean rms residual
+      INTEGER NEL                ! Number of elemens in a segmwent
+      DOUBLE PRECISION STDEV     ! Standard deviation rms residual
+      DOUBLE PRECISION SUM       ! Sum of rms residuals
+      DOUBLE PRECISION SUMSQ     ! Sum of rms residuals squared
+      DOUBLE PRECISION SUMW      ! Sum of weights
+      DOUBLE PRECISION THRESH    ! Clipping threshold
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! Declare NUM_ conversion functions
+      INCLUDE 'NUM_DEC_<T>'      ! Declare NUM_ arithmetic functions
+      INCLUDE 'NUM_DEF_CVT'      ! Define NUM_ conversion functions
+      INCLUDE 'NUM_DEF_<T>'      ! Define NUM_ arithmetic functions
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Find the number of elements in each segment, except the last
+*  if there is not an exact multiple.
+      NEL = EL / NSEG
+
+      DO K = 1, NSEG
+         SIGMA( K ) = VAL__BAD<T>
+         WEIGHT( K ) = 0
+      END DO
+      SUM = 0.0D0
+      SUMSQ = 0.0D0
+
+*  Initialise counters.
+      KP = 1
+      DO I = 1, EL
+
+*  Note we use the grid co-ordinates to ensure that the elements are
+*  part of the same region of the trend.
+         K = MIN( ( NINT( GRIDCO( I ) ) - 1 ) / NEL + 1, NSEG )
+
+*  New segment, so compute the standard deviation for the previous
+*  segment.
+         IF ( K .NE. KP .OR. I .EQ. EL ) THEN
+
+*  Before calculating the standard deviation, check for only one
+*  contributing pixel, and rounding errors producing a negative 
+*  variance value.  In all these cases, calculate a standard deviation 
+*  value of zero.
+            IF ( WEIGHT( KP ) .GT. 0 ) MEAN = SUM / DBLE( WEIGHT( KP ) )
+            STDEV = SUMSQ - ( MEAN * MEAN * DBLE( WEIGHT( KP ) ) )
+            IF ( ( WEIGHT( KP ) .EQ. 1 ) .OR. 
+     :           ( STDEV .LT. 0.0D0 ) ) THEN
+               SIGMA( KP ) = VAL__BAD<T>
+ 
+*  Otherwise, calculate the standard deviation normally.
+            ELSE
+               SIGMA( KP ) = SQRT( STDEV / DBLE( WEIGHT( KP ) - 1 ) )
+            END IF
+
+*  Previous segment becomes the current segment.
+            KP = K
+
+*  Initialise for forming statistics in the new segment.
+            SUM = 0.0D0
+            SUMSQ = 0.0D0
+         END IF
+
+         IF ( ARRAY( I ) .NE. VAL__BAD<T> ) THEN
+ 
+*  Convert the array values to double precision, count them, and form
+*  sums for the statistics.
+            WEIGHT( K ) = WEIGHT( K ) + 1
+            SUM = SUM + ARRAY( I )
+            SUMSQ = SUMSQ + ARRAY( I ) * ARRAY( I )
+         END IF
+      END DO
+
+*  Form weighted mean of the standard deviations.
+      SUM = 0.0D0
+      SUMSQ = 0.0D0
+      SUMW = 0.0D0
+      DO K = 1, NSEG
+         IF ( SIGMA( K ) .NE. VAL__BAD<T> ) THEN
+ 
+*  Convert the array values to double precision, count them, and form
+*  sums for the statistics.
+            SUMW = SUMW + WEIGHT( K )
+            SUM = SUM + SIGMA( K ) * WEIGHT( K )
+            SUMSQ = SUMSQ + SIGMA( K ) * WEIGHT( K ) * SIGMA( K )
+         END IF
+      END DO
+
+*  Before calculating the standard deviation, check for only one
+*  contributing segment, and rounding errors producing a negative 
+*  variance value.  In all these cases, calculate a standard deviation 
+*  value of zero.
+      IF ( SUMW .GT. 0 ) MEAN = SUM / DBLE( SUMW )
+      STDEV = SUMSQ - ( MEAN * MEAN * DBLE( SUMW ) )
+      IF ( ( SUMW .EQ. 1 ) .OR. ( STDEV .LT. 0.0D0 ) ) THEN
+         NOISE = VAL__BAD<T>
+ 
+*  Otherwise, calculate the standard deviation normally.
+      ELSE
+         STDEV = SQRT( STDEV / DBLE( SUMW - 1 ) )
+
+*  Reject the outliers.  Note that this is one-sided.
+         CLIP = 3.0
+         THRESH = MEAN + DBLE( CLIP ) * STDEV
+         DO K = 1, NSEG
+            IF ( SIGMA( K ) .GT. THRESH ) THEN
+               SIGMA( K ) = VAL__BAD<T>
+            END IF
+         END DO
+
+*  Form weighted mean of the standard deviations.
+         SUM = 0.0D0
+         SUMW = 0.0D0
+         DO K = 1, NSEG
+            IF ( SIGMA( K ) .NE. VAL__BAD<T> ) THEN
+ 
+*  Convert the array values to double precision, count them, and form
+*  sums for the statistics.
+               SUMW = SUMW + WEIGHT( K )
+               SUM = SUM + SIGMA( K ) * WEIGHT( K )
+            END IF
+         END DO
+
+         IF ( SUMW .GT. 0 ) THEN
+            NOISE = SUM / DBLE( SUMW )
+         ELSE
+            NOISE = VAL__BAD<T>
+         END IF
+      END IF
+
+      END

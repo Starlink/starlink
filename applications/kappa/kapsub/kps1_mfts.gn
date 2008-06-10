@@ -1,25 +1,24 @@
-      SUBROUTINE KPS1_LFTS<T>( ORDER, AXIS, SUBTRA, DIMS, BS, DATS, 
-     :                         STATUS )
+      SUBROUTINE KPS1_MFTS<T>( AXIS, SUBTRA, DIMS, MXKNOT, NCOEF, KNOT,
+     :                         COEFF, SCALE, DATS, STATUS )
 *+
 *  Name:
-*     KPG1_LFTSx
+*     KPG1_MFTSx
 
 *  Purpose:
-*     Evaluate and optionally subtract polynomial line fits.
+*     Evaluates and optionally subtract B-spline line fits.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_LFTS<T>( ORDER, AXIS, SUBTRA, DIMS, BS, DATS, STATUS )
+*     CALL KPS1_MFTS<T>( AXIS, SUBTRA, DIMS, MXKNOT, NCOEF, KNOT,
+*                        COEFF, SCALE, DATS, STATUS )
 
 *  Description:
 *     This routine evaluates and optionally subtracts the fits produced
-*     by the KPS1_LFTx and KPS1_LFTQx routines.
+*     by the KPS1_MFTx and KPS1_MFTQx routines for each trend vector.
 
 *  Arguments:
-*     ORDER = INTEGER (Given)
-*        The order of polynomial to fit used to create the coefficients.
 *     AXIS = INTEGER (Given)
 *        The axis defining the lines that have been fitted.
 *     SUBTRA = LOGICAL (Given)
@@ -28,13 +27,27 @@
 *     DIMS( NDF__MXDIM ) = INTEGER (Given)
 *        The dimensions of the input data.  Extra dimension should have
 *        size 1 up to NDF__MXDIM.
-*     BS( ORDER + 1, * ) = DOUBLE PRECISION (Given)
-*        The polynomial coeffients. This array should be produced by the
-*        KPS1_LFTx routine for polynomials of order ORDER and for data 
-*        with the given dimensions along the given AXIS.
+*     MXKNOT = INTEGER (Given)
+*        The maximum number of knots and coefficients per trend fit.
+*     NCOEF( * ) = INTEGER (Returned)
+*        The number coefficents of the cubic B-splines for each trend.
+*        The dimension of this should be the product of all the 
+*        dimensions that are not the fit axis.
+*     KNOT( MXKNOT, * ) = REAL (Returned)
+*        The knot positions of the cubic B-splines for each trend.  The
+*        size of the last dimension of this should be the product of
+*        all the dimensions that are not the fit axis.
+*     COEFF( MXKNOT, * ) = REAL (Returned)
+*        The coefficients of the cubic B-splines for each trend.  The
+*        size of the last dimension of this should be the product of
+*        all the dimensions that are not the fit axis.
+*     SCALE( * ) = REAL (Returned)
+*        The scale factors of ordered trends that were used to scale
+*        each trend vector to the -1 to +1 range.  The dimension of this 
+*        should be the product of all the dimensions that are not the 
+*        fit axis.
 *     DATS( * ) = ? (Given and Returned)
 *        The data.  The fit will be written to, or subtracted from this.
-
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -45,10 +58,11 @@
 *       the routine name by D, R, I, W, UW, B or UB as appropriate. The
 *       base and arrays supplied to the routine must have the data type
 *       specified.
+*     - Calculations are in single-precision floating point.
 
 *  Copyright:
-*     Copyright (C) 2005, 2007 Particle Physics & Astronomy Research 
-*     Council.  All Rights Reserved.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -67,14 +81,12 @@
 *     02111-1307, USA.
 
 *  Authors:
-*     PWD: Peter W. Draper (JAC, Durham University)
+*     MJC: Malcolm J. Currie (Starlink)
 *     {enter_new_authors_here}
 
 *  History:
-*     16-SEP-2005 (PWD):
-*        Original version based upon KPS1_LFTx.
-*     2007 January 11 (MJC):
-*        Move DATS argument to regulation order.
+*     2008 May 16 (MJC)
+*        Original version based upon KPS1_LFTS.
 *     {enter_further_changes_here}
 
 *-
@@ -88,11 +100,14 @@
       INCLUDE 'NDF_PAR'         ! NDF public constants
 
 *  Arguments Given:
-      INTEGER ORDER
       INTEGER AXIS
       LOGICAL SUBTRA
       INTEGER DIMS( NDF__MXDIM )
-      DOUBLE PRECISION BS( ORDER + 1, * )
+      INTEGER MXKNOT
+      INTEGER NCOEF( * )
+      REAL KNOT( MXKNOT, * )
+      REAL COEFF( MXKNOT, * )
+      REAL SCALE( * )
 
 *  Arguments Given and Returned:
       <TYPE> DATS( * )
@@ -107,22 +122,20 @@
       EXTERNAL NUM_TRAP
       INTEGER NUM_TRAP           ! Numerical error handler
 
-      EXTERNAL KPS1_POLYV
-      DOUBLE PRECISION KPS1_POLYV ! Value of polynomial
-
 *  Local Variables:
-      <TYPE> TVAL                ! The current data value
-      DOUBLE PRECISION DVAL      ! The current data value
       INTEGER B                  ! Pixel index of work arrays
       INTEGER DIMSB( NDF__MXDIM ) ! Dimensions excluding the axis
       INTEGER I( 7 )             ! Equivalences of I1-I7 loop variables
       INTEGER I1, I2, I3, I4, I5, I6, I7 ! Loop variables
+      INTEGER IERR               ! PDA stauts
       INTEGER IP1, IP2, IP3, IP4, IP5, IP6, IP7 ! Loop variables
       INTEGER J                  ! Loop counter
       INTEGER K                  ! Loop counter
       INTEGER STRID( NDF__MXDIM ) ! Dimension strides
       INTEGER STRIDA( NDF__MXDIM ) ! Dimension strides excluding axis
       INTEGER STRIDB( NDF__MXDIM ) ! Dimension strides excluding axis
+      <TYPE> TVAL                ! The current data value
+      REAL VAL                   ! The current data value
       
 *  Equivalences so we can index loop variables by AXIS.
       EQUIVALENCE( I1, I( 1 ) )
@@ -138,6 +151,7 @@
       INCLUDE 'NUM_DEC_<T>'      ! Declare NUM_ arithmetic functions
       INCLUDE 'NUM_DEF_CVT'      ! Define NUM_ conversion functions
       INCLUDE 'NUM_DEF_<T>'      ! Define NUM_ arithmetic functions
+
 *.
 
 *  Check the inherited global status.
@@ -202,22 +216,37 @@
                         DO I1 = 1, DIMS( 1 )
                            IP1 = IP2 + I1
 
-*  Check for BADness and evaluate the polynomial.
+*  Check that there is a fit for the trend, and that the scale factor
+*  is valid.
+                           IF ( NCOEF( B ) .GT. 0 .AND.
+     :                          ABS( SCALE( B ) ) .GT. VAL__SMLR ) THEN
+
+*  Evaluate the cubic B-spline for the single trend element (hence the
+*  "3, 1"), applying the inverse scaling to restore original values.  It 
+*  would be more efficient if we could store all values of the trend in
+*  a single call...
+                              CALL PDA_SPLEV( KNOT( 1, B ), NCOEF( B ),
+     :                                        COEFF( 1, B ), 3, 
+     :                                        REAL( I( AXIS ) ), VAL, 1,
+     :                                        IERR )
+                              VAL = VAL / SCALE( B )
+                           ELSE
+                              VAL = VAL__BADR
+                           END IF
+
+*  Check for BADness.
                            TVAL = DATS( IP1 )
-                           IF ( TVAL .NE. VAL__BAD<T> ) THEN
-                              DVAL = KPS1_POLYV( ORDER, BS( 1, B ),
-     :                                           DBLE( I( AXIS ) ) )
+                           IF ( VAL .NE. VAL__BADR ) THEN
 
 *  Subtract, or not, from data value.
                               IF ( SUBTRA ) THEN 
-                                 DATS( IP1 ) =  NUM_SUB<T>( TVAL, 
-     :                                          NUM_DTO<T>( DVAL ) )
-                              ELSE
-                                 DATS( IP1 ) = NUM_DTO<T>( DVAL )
+                                 DATS( IP1 ) = NUM_SUB<T>( TVAL, 
+     :                                         NUM_RTO<T>( VAL ) )
+                              ELSE 
+                                 DATS( IP1 ) = NUM_RTO<T>( VAL )
                               END IF
 
-*  Failed conversion from double precision, or subtraction so output is
-*  now BAD.
+*  Failed subtraction so output is now BAD.
                               IF ( .NOT. NUM_WASOK() ) THEN
                                  DATS( IP1 ) = VAL__BAD<T>
                                  CALL NUM_CLEARERR()

@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.34}
 \newcommand{\stardocnumber}    {95.34}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2008 May 4}
+\newcommand{\stardocdate}      {2008 June 8}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.9-6}
+\newcommand{\stardocversion}   {1.9-7}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -13126,15 +13126,16 @@ mutually exclusive.  An example should clarify.
 \bigskip
 
 {\ssttt \hspace*{1.0em}
-        contour ndf [comp] mode ncont [key] [device] 
-        \newline\hspace*{2.5em}
+      contour ndf [comp] mode ncont [key] [device]
+        \newline\hspace*{1.5em}
         $\left\{ {\begin{tabular}{l}
-                    firstcnt=? stepcnt=? \\
-                    heights=?
+                  low=? high=? \\
+                  percentiles=? \\
+                  sigmas=?
                   \end{tabular} }
-        \right.$
-        \newline\hspace*{2.9em}
-        \makebox[0mm][c]{\footnotesize mode}
+        \right.$ 
+        \newline\hspace*{1.9em}
+        \makebox[0mm][c]{\small mode}
 }
 \bigskip
 
@@ -33445,9 +33446,9 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
    \sstdescription{
       This routine fits trends to all lines of data in an NDF that lie
       parallel to a chosen axis.  The trends are characterised by
-      polynomials of order up to 15 and can be restricted to use data
-      that only lies within a series of co-ordinate ranges along the
-      selected axis.
+      polynomials of order up to 15, or by cubic splines.  The fits can
+      be restricted to use data that only lies within a series of     
+      co-ordinate ranges along the selected axis.
 
       The ranges may be determined automatically.  There is a choice
       of tunable approaches to mask regions to be excluded from the 
@@ -33473,7 +33474,14 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
       like debiassing a CCD which has bias strips.
    }
    \sstusage{
-      mfittrend in axis ranges order out
+      mfittrend in axis ranges out 
+        $\left\{ {\begin{tabular}{l}
+                  order \\
+                  knots=? \\
+                  \end{tabular} }
+        \right.$
+        \newline\latexhtml{\hspace*{14.1em}}{~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+        \makebox[0mm][c]{\small fittype}
    }
    \sstparameters{
       \sstsubsection{
@@ -33535,11 +33543,74 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          clipping factors.  {\tt [2,2,2.5,3]}
       }
       \sstsubsection{
+         FITTYPE = LITERAL (Read)
+      }{
+         The type of fit.  It must be either {\tt "Polynomial"} for a
+         polynomial or {\tt "Spline"} for a bi-cubic B-spline.  
+         {\tt ["Polynomial"]}
+      }
+      \sstsubsection{
+         KNOTS = \_INTEGER (Read)
+      }{
+         The number of interior knots used for the cubic-spline fit
+	 along the trend axis.  Increasing this parameter value
+	 increases the flexibility of the surface.  KNOTS is only 
+	 accessed when FITTYPE={\tt "Spline"}.  See INTERPOL for how
+	 the knots are arranged.  The default is the current value.
+
+         For INTERPOL={\tt TRUE}, the value must be in the range 1 to
+	 11, and {\tt 4} is a reasonable value for flatish trends.  The
+	 initial default is {\tt 4}.
+
+         For INTERPOL={\tt FALSE} the allowed range is 1 to 60 with an
+	 initial default of {\tt 8}.  In this mode, KNOTS is the 
+         maximum number of interior knots.
+
+         The upper limit of acceptable values for a trend axis is no
+         more than half of the axis dimension.   {\tt []}
+      }
+      \sstsubsection{
          IN = NDF (Read \& Write)
       }{
          The input NDF.  On successful completion this may have the
          trends subtracted, but only if SUBTRACT and MODIFYIN are both
          set {\tt TRUE}.
+      }
+      \sstsubsection{
+         INTERPOL = \_LOGICAL (Read)
+      }{
+         The type of spline fit to use when FITTYPE={\tt "Spline"}. 
+
+         If set {\tt TRUE}, an interpolating spline is fitted by least
+	 squares that ensures the fit is exact at the knots.
+	 Therefore the knot locations may be set by the POSKNOT
+	 parameter.  
+
+         If set {\tt FALSE}, a smoothing spline is fitted.  A
+	 smoothing factor controls the degree of smoothing.  The
+	 factor is determined iteratively between limits, hence it is
+	 the slower option of the two, but generally gives better
+	 fits, especially for curvy trends.  The location of of the
+	 knots is decided automatically by Dierckx's algorithm,
+	 governed where they are most needed.  Knots are added when
+	 the weighted sum of the squared residuals exceeds the
+	 smoothing factor.  A final fit is made with the chosen
+	 smoothing, but finding the knots afresh.
+
+         The few iterations commence from the upper limit and progress
+         more slowly at each iteration towards the lower limit.  The
+         iterations continue until the residuals stabilise or the
+         maximum number of interior knots is reached or the lower limit
+         is reached.  The upper limit is the weighted sum of the squares 
+         of the residuals of the least-squares cubic polynomial fit.  
+         The lower limit is the estimation of the overall noise obtained
+         from a clipped mean the standard deviation in short segments 
+         that diminish bias arising from the shape of the trend.  The 
+         lower limit prevents too many knots being created and fitting
+         to the noise or fine features.
+
+         The iteration to a smooth fit makes a smoothing spline somewhat
+         slower.  {\tt [FALSE]}
       }
       \sstsubsection{
          MASK = NDF (Write)
@@ -33623,7 +33694,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          The order of the polynomials to be used when trend fitting.
          A polynomial of order {\tt 0} is a constant and {\tt 1} a line,
          {\tt 2} a quadratic \emph{etc.}  The maximum value is {\tt 15}.
-         {\tt [3]}
+         ORDER is only accessed when FITTYPE={\tt "Polynomial"}.  {\tt [3]}
       }
       \sstsubsection{
          OUT = NDF (Read)
@@ -33634,15 +33705,28 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          are {\tt TRUE} (in that case the input NDF will be modified).
       }
       \sstsubsection{
+         POSKNOT( ) = LITERAL (Read)
+      }{
+         The co-ordinates of the interior knots for all trends.  KNOTS 
+         values should be supplied, or just the null ({\tt{!}}) value to 
+         request equally spaced knots.  The units of these co-ordinates
+         is determined by the axis of the current world co-ordinate 
+         system of the input NDF that corresponds to the trend axis.  
+         Supplying a colon {\tt ":"} will display details of the current 
+         co-ordinate Frame.  {\tt [!]}
+      }
+      \sstsubsection{
          RANGES() = LITERAL (Read)
       }{
          Pairs of co-ordinates that define ranges along the trend
          axis.  When given these ranges are used to select the values
          that are used in the fits.  The null value ({\tt{!}}), 
          causes all the values along each data line to be used.  
-         The units of these ranges is determined by the current axis of
-         the world co-ordinate system that corresponds to the trend
-         axis.  Up to ten pairs of values are allowed.
+         The units of these ranges is determined by the axis of the
+         current \htmlref{world co-ordinate system}{se:domains}~  of the 
+         input NDF that corresponds to the trend axis.  Supplying a 
+         colon {\tt ":"} will display details of the current co-ordinate 
+         Frame.  Up to ten pairs of values are allowed.
          This parameter is not accessed when AUTO={\tt TRUE}.  {\tt [!]}
       }
       \sstsubsection{
@@ -33690,7 +33774,7 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          VARIANCE = \_LOGICAL (Read)
       }{
          If {\tt TRUE} and the input NDF contains variances, then the
-         polynomial fits will be weighted by the variances.
+         polynomial or spline fits will be weighted by the variances.
       }
    }
    \sstresparameters{
@@ -33718,6 +33802,23 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
       }{
          As above except the fitting ranges are determined automatically
          with 2- then 3-sigma clipping.
+      }
+      \sstexamplesubsection{
+         mfittrend in=cube axis=3 auto clip=[2,3] fittype=spline out=detrend interpol
+      }{
+         As the previous example except that interpolation cubic-spline 
+         fits with four equally spaced interior knots are used
+	 to characterise the trends.
+      }
+      \sstexamplesubsection{
+         mfittrend m51 3 out=m51\_bsl mask=m51\_msk auto fittype=spl
+      }{
+         This example fits to trends along the third axis of NDF m51
+         and writes the evaluated fits to NDF m51\_bsl.  The fits use a
+         smoothing cubic spline with the placement and number of 
+         interior knots determined automatically.  Features are determined
+         automatically, and a mask of excluded features is written to
+         NDF m51\_msk.
       }
       \sstexamplesubsection{
          mfittrend cube axis=3 auto method=single order=1 subtract 
@@ -33751,6 +33852,15 @@ KAPPA: \htmlref{FOURIER}{FOURIER},
          may need to determine empirically what are the best clipping 
          limits, binning factor, and for METHOD={\tt "Region"} the 
          region to average.
+
+         \sstitem
+         You are advised to inspect the fits, especially the spline
+         fits or high-order polynomials.  A given set of trends may require
+         more than one pass through this task, if they exhibit varied
+         morphologies.  Use masking or NDF sections to select different 
+         regions that are fit with different parameters.  The various trend
+         maps are then integrated with \htmlref{PASTE}{PASTE} to form the 
+         final composite set of trends that you can subtract.
       }
    }
    \sstdiytopic{
@@ -55225,6 +55335,19 @@ The following applications have been modified:
          variance array (see new parameter GENVAR).  If the NDF is
          processed as a set of spectra or images, then each individual 
          spectrum or image is assigned its own noise level.
+      \end{itemize}
+
+   \item [\htmlref{MFITTREND}{MFITTREND}] \mbox{}
+      \begin{itemize}
+          \item Cubic-spline fitting is now available, the type of fit
+	  controlled by the new parameter FITTYPE.  There are two
+	  subtypes of fit selected by new parameter INTERPOL:
+	  interpolation through specified or equally spaced knots, or
+	  smoothing at automatically generated knots.  New parameter
+	  KNOTS sets the number or maximum number of knots
+	  respectively for the interpolation and smoothing splines.
+	  For the former, there is an additional parameter POSKNOT to
+	  specify knot locations.
       \end{itemize}
 
    \item [\htmlref{MSTATS}{MSTATS}] \mbox{}

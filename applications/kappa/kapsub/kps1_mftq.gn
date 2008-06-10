@@ -1,0 +1,387 @@
+      SUBROUTINE KPS1_MFTQ<T>( INTERP, MXKNOT, NKNOT, FKNOT, AXIS, 
+     :                         NRANGE, RANGES, DIMS, DATS, X, Z, W,
+     :                         NFIT, NGOOD, KNOT, COEFF, NCOEF, SCALE,
+     :                         STATUS )
+*+
+*  Name:
+*     KPG1_MFTQx
+
+*  Purpose:
+*     Fits cubic B-splines to all lines of data that lie parallel to
+*     an axis, without weights or bad pixels.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL KPS1_MFTQx( INTERP, MXKNOT, NKNOT, FKNOT, AXIS, NRANGE,
+*                      RANGES, DIMS, DATS, X, Z, W, NFIT, NGOOD, KNOT, 
+*                      COEFF, NCOEF, SCALE, STATUS )
+
+*  Description:
+*     This routine fits cubic B-splines to all lines of data that lie 
+*     parallel to a given axis, and lie within ranges along that axis. 
+*     The fits are not weighted and the data must not contain any bad 
+*     pixels.  The spline can be a smoothing or interpolation.  In the 
+*     former case the knots are set automatically; in the latter, the
+*     knots are set through FKNOT or spaced equally.
+*
+*     The spline coefficients and knots are returned in the COEFF and
+*     KNOT arrays respecitvely.
+
+*  Arguments:
+*     INTERP = LOGICAL (Given)
+*        If set to true an interpolating least-squares spline is found
+*        and the NKNOT interior knots are equally spaced.  Otherwise a 
+*        smoothing spline is fit using a smoothing factor equal to the 
+*        number of data points; and the spline fit sets the knots.
+*        The order of polynomial to fit.  Starts at 0 for a constant.
+*     MXKNOT = INTEGER (Given)
+*        The maximum number of knots.  This should be at least NKNOT+8.
+*     NKNOT = INTEGER (Given)
+*        The number of interior knots for an interpolation spline.
+*     FKNOT( NKNOT ) = REAL (Given)
+*        Grid co-ordinates of the user-defined knot positions to be
+*        applied to every trend when using an interpolating spline
+*        (INTERP is true).  If the first element is negative, then
+*        equally spaced knots are used.
+*     AXIS = INTEGER (Given)
+*        The axis defining the lines to be fit.
+*     NRANGE = INTEGER (Given)
+*        The number of values in RANGES, must be an even number.
+*     RANGES( NRANGE ) = INTEGER (Given)
+*        Pairs of array coordinates along the axis.  Only data within
+*        these ranges will be used in the fit.
+*     DIMS( NDF__MXDIM ) = INTEGER (Given)
+*        The dimensions of the input data.  Extra dimension should have
+*        size 1 up to NDF__MXDIM.
+*     DATS( * ) = ? (Given and Returned)
+*        The data with dimensions DIMS.  The fit will be subtracted from
+*        this if requested.
+*     X( DIMS( AXIS ) + 2, * ) = REAL (Returned)
+*        Workspace for the co-ordinates of ordered trends to fit.  The
+*        size of the second dimension of this should be the product of
+*        all the dimensions that are not the fit axis.
+*     Z( DIMS( AXIS ) + 2, * ) = REAL (Returned)
+*        Workspace for the values of ordered trends to fit.  The size of 
+*        the second dimension of this should be the product of all the 
+*        dimensions that are not the fit axis.
+*     W( DIMS( AXIS ) + 2, * ) = REAL (Returned)
+*        Workspace for the co-ordinates of ordered trends to fit.  The
+*        size of the last dimension of this should be the product of
+*        all the dimensions that are not the fit axis.
+*     NFIT = INTEGER (Returned)
+*        The number of trends successfully fitted.
+*     NGOOD( * ) = INTEGER (Returned)
+*        Workspace to store the number of good values in each trend
+*        fit.  The dimension of this should be the product of all the
+*        dimensions that are not the fit axis.
+*     KNOT( MXKNOT, * ) = REAL (Returned)
+*        The knot positions of the cubic B-splines for each trend.  The
+*        size of the last dimension of this should be the product of
+*        all the dimensions that are not the fit axis.
+*     COEFF( MXKNOT, * ) = REAL (Returned)
+*        The coefficients of the cubic B-splines for each trend.  The
+*        size of the last dimension of this should be the product of
+*        all the dimensions that are not the fit axis.
+*     NCOEF( * ) = INTEGER (Returned)
+*        The number coefficents of the cubic B-splines for each trend.
+*        An element is set to zero if a fit could not be made, or if 
+*        there are too few good data within the trend.  The dimension of 
+*        this should be the product of all the dimensions that are not 
+*        the fit axis.
+*     SCALE( * ) = REAL (Returned)
+*        The scale factors of ordered trends that were used to scale
+*        each trend vector to the -1 to +1 range.  The dimension of this 
+*        should be the product of all the dimensions that are not the 
+*        fit axis.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     -  This routine works in n-D, where n is 1 to 7.  Even if the
+*     array has actually fewer dimensions there is negligible loss of
+*     efficiency to supply dummy (=1) higher dimensions.
+*
+*     - To work as quickly as possible the fits are performed by running
+*     over the data in fast order and accumulating the least squares
+*     matrices for each line as and when the data are encountered. The
+*     solutions are then determined in a single separate section. This
+*     requires a lot of workspace (order side**(ndims-1)).
+*
+*     - There is a routine for each numeric data type: replace "x" in
+*     the routine name by D, R, I, W, UW, B or UB as appropriate. The
+*     base and arrays supplied to the routine must have the data type
+*     specified.
+
+*  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     All Rights Reserved.
+
+*  Licence:
+*     This program is free software; you can redistribute it and/or
+*     modify it under the terms of the GNU General Public License as
+*     published by the Free Software Foundation; either Version 2 of
+*     the License, or (at your option) any later version.
+*
+*     This program is distributed in the hope that it will be
+*     useful, but WITHOUT ANY WARRANTY; without even the implied
+*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+*     PURPOSE. See the GNU General Public License for more details.
+*
+*     You should have received a copy of the GNU General Public License
+*     along with this program; if not, write to the Free Software
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
+
+*  Authors:
+*     MJC: Malcolm J. Currie (Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     2008 May 15 (MJC)
+*        Original version based upon KPS1_LFT.
+*     2008 May 21 (MJC):
+*        Added FKNOT argument.
+*     {enter_further_changes_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT constants
+      INCLUDE 'NDF_PAR'          ! NDF public constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+
+*  Arguments Given:
+      LOGICAL INTERP
+      INTEGER MXKNOT
+      INTEGER NKNOT
+      REAL FKNOT( NKNOT )
+      INTEGER AXIS
+      INTEGER NRANGE
+      INTEGER RANGES( NRANGE )
+      INTEGER DIMS( NDF__MXDIM )
+
+*  Arguments Given and Returned:
+      <TYPE> DATS( * )
+
+*  Arguments Returned:
+      REAL X( DIMS( AXIS ) + 2, * )
+      REAL Z( DIMS( AXIS ) + 2, * )
+      REAL W( DIMS( AXIS ) + 2, * )
+      INTEGER NFIT
+      INTEGER NGOOD( * )
+      REAL KNOT( MXKNOT, * )
+      REAL COEFF( MXKNOT, * )
+      INTEGER NCOEF( * )
+      REAL SCALE( * )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER B                  ! Pixel index of work arrays
+      INTEGER DIMSB( NDF__MXDIM ) ! Dimensions excluding the 
+      INTEGER I( 7 )             ! Equivalences of I1-I7 loop variables
+      INTEGER I1, I2, I3, I4, I5, I6, I7 ! Loop variables
+      INTEGER IP1, IP2, IP3, IP4, IP5, IP6, IP7 ! Loop variables
+      INTEGER J                  ! Loop counter
+      INTEGER K                  ! Loop counter
+      INTEGER L                  ! Loop counter
+      INTEGER LB                 ! Bounds loop counter
+      INTEGER LLBND( NDF__MXDIM ) ! Loop lower bounds
+      INTEGER LUBND( NDF__MXDIM ) ! Loop upper bounds
+      INTEGER NDAT               ! Max. no. of data values, trend axis
+      INTEGER NWS                ! Size of workspace
+      INTEGER PRMPTR             ! Pointer to workspace for sorting
+      INTEGER SWPTR              ! Pointer to workspace for fitting
+      INTEGER SIWPTR             ! Pointer to workspace for fitting
+      INTEGER STRID( NDF__MXDIM ) ! Dimension strides
+      INTEGER STRIDA( NDF__MXDIM ) ! Dimension strides excluding axis
+      INTEGER STRIDB( NDF__MXDIM - 1 )! Dimension strides excluding axis
+      <TYPE> TVAL                ! The current data value
+      INTEGER WEL                ! Workspace elements
+      REAL VAL                   ! The current data value
+      REAL VAR                   ! The current variance
+
+*  Equivalences so we can index loop variables by AXIS.
+      EQUIVALENCE( I1, I( 1 ) )
+      EQUIVALENCE( I2, I( 2 ) )
+      EQUIVALENCE( I3, I( 3 ) )
+      EQUIVALENCE( I4, I( 4 ) )
+      EQUIVALENCE( I5, I( 5 ) )
+      EQUIVALENCE( I6, I( 6 ) )
+      EQUIVALENCE( I7, I( 7 ) )
+
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! Declare NUM_ conversion functions
+      INCLUDE 'NUM_DEC_<T>'      ! Declare NUM_ arithmetic functions
+      INCLUDE 'NUM_DEF_CVT'      ! Define NUM_ conversion functions
+      INCLUDE 'NUM_DEF_<T>'      ! Define NUM_ arithmetic functions
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Calculate the strides for each dimension.
+      STRID( 1 ) = 1
+      DO  J = 2, NDF__MXDIM
+         STRID( J ) = STRID( J - 1 ) * DIMS( J - 1 )
+      END DO
+
+*  Calculate the strides for each dimension, this time excluding AXIS
+*  so we can step around the workspace final dimension.  WEL is the
+*  total number of workspace elements or the number of trends to fit.
+*  First copy all dimensions, except that for AXIS.
+      K = 1
+      WEL = 1
+      DO J = 1, NDF__MXDIM
+         IF ( J .NE. AXIS ) THEN
+            DIMSB( K ) = DIMS( J )
+            WEL = WEL * DIMS( J )
+            K = K + 1
+         END IF
+      END DO
+      DIMSB( NDF__MXDIM ) = 0
+
+*  Create strides for this new dimensionality and count workspace 
+*  elements.
+      STRIDB( 1 ) = 1
+      DO J = 2, NDF__MXDIM - 1
+         STRIDB( J ) = STRIDB( J - 1 ) * DIMSB( J - 1 )
+      END DO
+
+*  Create strides that match those of the full array.
+      K = 1
+      DO J = 1, NDF__MXDIM
+         IF ( J .NE. AXIS ) THEN
+            STRIDA( J ) = STRIDB( K )
+            K = K + 1
+         ELSE
+            STRIDA( J ) = 0
+         END IF
+      END DO
+
+*  Initialise the workspaces used for the cumulative sums and the
+*  fit parameters.
+      DO J = 1, WEL
+         NGOOD( J ) = 0
+         SCALE( J ) = 1.0
+         DO L = 1, MXKNOT
+            COEFF( L, J ) = 0.0D0
+            KNOT( L, J ) = 0.0D0
+         END DO
+      END DO
+
+*  Set the loop bounds. These are the dimensions of all axes, except for
+*  the one that defines the ranges.
+      DO J = 1, NDF__MXDIM
+         LLBND( J ) = 1
+         LUBND( J ) = DIMS( J )
+      END DO
+
+*  Get workspace for spline fitting.  NWS is m*(k+1)+nest*(7+3*k),
+*  where k is the order fixed at 3, nest is the maximum number of
+*  knots, and k is the number data points.  There is an extra clamp at
+*  each end beyond the actual data range.
+      NDAT = DIMS( AXIS ) + 2
+      NWS = 4 * NDAT + MXKNOT * 16
+      CALL PSX_CALLOC( NWS, '_REAL', SWPTR, STATUS )
+      CALL PSX_CALLOC( MXKNOT, '_INTEGER', SIWPTR, STATUS )
+
+*  Get some workspace for sorted co-ordinates.
+      CALL PSX_CALLOC( NDAT, '_INTEGER', PRMPTR, STATUS )
+
+*  Check that we obtained the workspace before attempting to use it.
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
+
+*  Loop over all input pixels.  Note we use a fully expanded set of
+*  dimensions as we need to run over the values in fast order and
+*  maintain an additional stepping over the workspace sums.
+
+*  Outer loop is over the bounds along the selected axis.
+      DO LB = 1, NRANGE, 2
+         LLBND( AXIS ) = RANGES( LB )
+         LUBND( AXIS ) = RANGES( LB + 1 )
+
+*  For each possible axis.  Note these outer loops are usually done
+*  NRANGE/2 times only.
+         B = 1
+         DO I7 = LLBND( 7 ), LUBND( 7 )
+            IP7 = ( I7 - 1 ) * STRID( 7 )
+            DO I6 = LLBND( 6 ), LUBND( 6 )
+               IP6 = IP7 + ( I6 - 1 ) * STRID( 6 )
+               DO I5 = LLBND( 5 ), LUBND( 5 )
+                  IP5 = IP6 + ( I5 - 1 ) * STRID( 5 )
+                  DO I4 = LLBND( 4 ), LUBND( 4 )
+                     IP4 = IP5 + ( I4 - 1 ) * STRID( 4 )
+                     DO I3 = LLBND( 3 ), LUBND( 3 )
+                        IP3 = IP4 + ( I3 - 1 ) * STRID( 3 )
+                        DO I2 = LLBND( 2 ), LUBND( 2 )
+                           IP2 = IP3 + ( I2 - 1 ) * STRID( 2 )
+                           DO I1 = LLBND( 1 ), LUBND( 1 )
+                              IP1 = IP2 + I1
+
+*  Increment sums for this pixel.
+                              VAL = NUM_<T>TOR( TVAL )
+                              NGOOD( B ) = NGOOD( B ) + 1
+                              X( NGOOD( B ), B ) = I( AXIS )
+                              Z( NGOOD( B ), B ) = VAL
+                              W( NGOOD( B ), B ) = 1.0
+
+*  Move to the next workspace pixel.
+                              B = B + STRIDA( 1 )
+                           END DO
+                           B = B + STRIDA( 2 ) - STRIDA( 1 ) * DIMS( 1 )
+                        END DO
+                        B = B + STRIDA( 3 ) - STRIDA( 2 ) * DIMS( 2 )
+                     END DO
+                     B = B + STRIDA( 4 ) - STRIDA( 3 ) * DIMS( 3 )
+                  END DO
+                  B = B + STRIDA( 5 ) - STRIDA( 4 ) * DIMS( 4 )
+               END DO
+               B = B + STRIDA( 6 ) - STRIDA( 5 ) * DIMS( 5 )
+            END DO
+            B = B + STRIDA( 7 ) - STRIDA( 6 ) * DIMS( 6 )
+         END DO
+       END DO
+
+*  Fit B-splines to each trend vector and get the coefficients and
+*  knots.  We do not want the process to end as soon as any bad
+*  data are encountered, so encapsulate the fitting inside an error
+*  context.  Also exclude trends containng too few good data,
+      NFIT = 0
+      DO J = 1, WEL
+         IF ( NGOOD( J ) .GT. 4 ) THEN
+            CALL ERR_MARK
+            CALL KPS1_MFSPF( INTERP, MXKNOT, NKNOT, FKNOT, 0.0, 
+     :                       REAL( DIMS( AXIS ) ), .TRUE., NWS, 
+     :                       NGOOD( J ), NDAT, X( 1, J ), Z( 1, J ), 
+     :                       W( 1, J ), %VAL( CNF_PVAL( PRMPTR ) ), 
+     :                       KNOT( 1, J ), COEFF( 1, J ), NCOEF( J ), 
+     :                       SCALE( J ), %VAL( CNF_PVAL( SWPTR ) ), 
+     :                       %VAL( CNF_PVAL( SIWPTR ) ), STATUS )
+
+            IF ( STATUS .NE. SAI__OK ) THEN
+               CALL ERR_ANNUL( STATUS )
+               NCOEF( J ) = 0
+            ELSE
+               NFIT = NFIT + 1
+            END IF
+            CALL ERR_RLSE( STATUS )
+         ELSE
+            NCOEF( J ) = 0
+         END IF
+      END DO
+
+ 999  CONTINUE
+      CALL PSX_FREE( SWPTR, STATUS )
+      CALL PSX_FREE( SIWPTR, STATUS )
+      CALL PSX_FREE( PRMPTR, STATUS )
+
+      END

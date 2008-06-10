@@ -13297,6 +13297,24 @@ iraf! {
             size *
           }
 
+         parameter fittype {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DYNAMIC DEFAULT
+            prompt {Type of the fit}
+            default Polynomial
+            helpkey *
+          }
+
+         parameter knots {
+            type _INTEGER
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Number of interior knots (1-11)}
+            helpkey *
+            default 4
+          }
+
           parameter in {
             position 1
             type NDF
@@ -13305,6 +13323,15 @@ iraf! {
             ppath GLOBAL CURRENT
             association <-GLOBAL.DATA_ARRAY
             prompt {Input NDF}
+            helpkey *
+          }
+
+         parameter interpol {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Use a interpolation spline?}
+            default FALSE
             helpkey *
           }
 
@@ -13345,7 +13372,7 @@ iraf! {
           }
 
          parameter order {
-            position 4
+            position 5
             type _INTEGER
             vpath PROMPT
             ppath CURRENT DEFAULT
@@ -13355,13 +13382,23 @@ iraf! {
           }
 
          parameter out {
-            position 5
+            position 4
             type NDF
             access WRITE
             vpath PROMPT
             association ->GLOBAL.DATA_ARRAY
             prompt {Output NDF}
             helpkey *
+          }
+
+         parameter posknot {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default !
+            prompt {Co-ordinates of knots}
+            helpkey *
+            size *
           }
 
          parameter ranges {

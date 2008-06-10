@@ -37,6 +37,18 @@
       individual spectrum or image is assigned its own noise
       level.
 
+   o  MFITTREND
+
+      - Cubic-spline fitting is now available, the type of fit
+
+      controlled by the new parameter FITTYPE.  There are two subtypes
+      of fit selected by new parameter INTERPOL: interpolation through
+      specified or equally spaced knots, or smoothing at automatically
+      generated knots.  New parameter KNOTS sets the number or maximum
+      number of knots respectively for the interpolation and smoothing
+      splines. For the former, there is an additional parameter
+      POSKNOT to specify knot locations.
+
    o  MSTATS 
    
       - This now offers a wider selection of statistics to combine

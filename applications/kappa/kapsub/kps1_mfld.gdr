@@ -43,7 +43,7 @@
 *     specified.
 
 *  Copyright:
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -67,8 +67,10 @@
 *     {enter_new_authors_here}
 
 *  History:
-*     2007 September 30:
+*     2007 September 30 (MJC):
 *        Original version adapted from KPS1_MFADx.
+*     2008 May 15 (MJC):
+*        Used revised API for KPS1_LFTx.
 *     {enter_changes_here}
 
 *-
@@ -238,7 +240,7 @@
       DO J = 1, NCLIP
 
 *  Fit a linear slope to all the data. 
-         CALL KPS1_LFT<T>( ORDER, DTAXIS, RANGES, MAXRNG, .FALSE., 
+         CALL KPS1_LFT<T>( ORDER, DTAXIS, MAXRNG, RANGES, .FALSE., 
      :                     ARRAY, .FALSE., ARRAY, DIMS, ARRAY,
      :                     %VAL( CNF_PVAL( IPAS ) ),
      :                     %VAL( CNF_PVAL( IPBS ) ),

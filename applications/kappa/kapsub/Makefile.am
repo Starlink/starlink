@@ -27,13 +27,13 @@ kps1_errcl.f kps1_fspe2.f kps1_fspf2.f kps1_fswpe.f kps1_fswse.f \
 kps1_gamln.f \
 kps1_gaups.f kps1_glibd.f kps1_glibr.f kps1_glidd.f kps1_glidr.f kps1_gligt.f \
 kps1_gliwd.f kps1_gliwr.f kps1_grdsc.f kps1_hscem.f kps1_icblu.f kps1_inmat.f \
-kps1_ks2tr.f kps1_kspro.f kps1_lapl.f  kps1_lftps.f kps1_lftsv.f \
+kps1_ks2tr.f kps1_kspro.f kps1_lapl.f  kps1_lfta.f  kps1_lftps.f kps1_lftsv.f \
 kps1_lmkgd.f kps1_lmkpc.f kps1_lmkst.f kps1_look.f  kps1_look1.f \
 kps1_look2.f kps1_lplfs.f kps1_lpllm.f kps1_lplnm.f kps1_lshcp.f \
 kps1_lshct.f kps1_lshfm.f kps1_lshpl.f kps1_ltaba.f kps1_luccp.f \
 kps1_luccs.f kps1_lucdt.f kps1_lucfp.f kps1_lucim.f kps1_lucou.f \
 kps1_lucsm.f kps1_lucy.f  kps1_mdset.f kps1_mfaur.f kps1_mfgns.f \
-kps1_mfsb.f \
+kps1_mfsb.f  kps1_mfspf.f kps1_mfta.f  \
 kps1_mlpcp.f kps1_mlpcv.f kps1_mlpfs.f kps1_mlpky.f kps1_mlplb.f \
 kps1_mlpml.f kps1_mlpmp.f kps1_mlpnd.f kps1_mlpng.f kps1_mlppn.f \
 kps1_msa.f   kps1_msbs.f  kps1_mss.f   kps1_msvp.f  kps1_mthcd.f \
@@ -88,7 +88,7 @@ KPG_DR_GEN = kps1_med.gdr kps1_mmv.gdr kps1_clps.gdr kps1_subi.gdr \
              kps1_foqu.gdr kps1_fore.gdr kps1_fori.gdr kps1_heqp.gdr \
              kps1_mfad.gdr kps1_mfeb.gdr kps1_sucl.gdr kps1_susk.gdr \
              kps1_xyzw.gdr kps1_mfld.gdr kps1_bafn.gdr kps1_msag.gdr \
-             kps1_msgr.gdr
+             kps1_msgr.gdr kps1_mfno.gdr
 
 KPG_DIR_GEN = kps1_trdr.gdir kps1_trnd.gdir kps1_trnv.gdir
 
@@ -97,6 +97,7 @@ KPG_BDIRW_GEN = kps1_dscl.gbdirw kps1_fain.gbdirw
 KPG_GN_GEN = kps1_clns.gn kps1_hsmo.gn kps1_inle.gn kps1_inli.gn \
              kps1_inls.gn kps1_lft.gn  kps1_lftq.gn kps1_lfts.gn \
              kps1_mfrm.gn kps1_mdrf.gn kps1_mdrp.gn kps1_mdwt.gn \
+             kps1_mft.gn  kps1_mftq.gn kps1_mfts.gn \
              kps1_mspa.gn kps1_mssa.gn kps1_nom1.gn kps1_plcp.gn \
              kps1_put.gn  kps1_robl.gn kps1_ronn.gn kps1_rora.gn \
              kps1_rorb.gn kps1_rprf.gn kps1_slae.gn kps1_zprg.gn \
