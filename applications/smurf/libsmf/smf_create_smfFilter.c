@@ -24,11 +24,12 @@
 *  Return Value:
 *     Pointer to newly created smfFilter. NULL on error.
 
-*  Description:
-*     This function allocates memory for a smfFilter structure. The length
-*     and frequency step size are determined, but the buffer itself is
-*     not initialized. Depending on the type of filter it may be either
-*     real- or complex-valued. It will get allocated by smf_filter_* routines.
+*  Description: This function allocates memory for a smfFilter
+*     structure. The length and frequency step size are determined,
+*     but the buffer itself is not initialized. Depending on the type
+*     of filter the buffer may be either real- or complex-valued.
+*     Here it is initialized to NULL - it will get allocated by
+*     smf_filter_* routines.
 
 *  Notes:
 
