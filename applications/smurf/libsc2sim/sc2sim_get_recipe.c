@@ -71,6 +71,7 @@
 
 /* Starlink includes */
 #include "sae_par.h"
+#include "mers.h"
 
 /* SC2SIM includes */
 #include "sc2sim.h"
