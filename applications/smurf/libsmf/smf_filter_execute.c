@@ -139,6 +139,7 @@ void smf_filter_execute( smfData *data, smfFilter *filt, int *status ) {
 
     /* Check that the filter dimensions are appropriate for the data */
     if( ntslice != filt->ntslice ) {
+      *status = SAI__ERROR;
       msgSeti("DATALEN",ntslice);
       msgSeti("FILTLEN",filt->ntslice);
       errRep(FUNC_NAME, 
@@ -154,7 +155,7 @@ void smf_filter_execute( smfData *data, smfFilter *filt, int *status ) {
   data_fft = smf_malloc( data_fft, sizeof(fftw_complex), filt->dim, status );
 
   /* Filter the data one bolo at a time */
-  for( i=0; i<nbolo; i++ ) {
+  for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
     /* Obtain pointer to the correct chunk of data */
     base = &((double *)data->pntr[0])[i*ntslice];
     
@@ -162,42 +163,60 @@ void smf_filter_execute( smfData *data, smfFilter *filt, int *status ) {
     plan_forward = fftw_plan_dft_r2c_1d( ntslice, base, data_fft, 
                                          FFTW_ESTIMATE );
 
-    /* Execute the FFT */
-    fftw_execute( plan_forward );
+    if( !plan_forward ) {
+      *status = SAI__ERROR;
+      errRep(FUNC_NAME, 
+             "FFTW3 could not create plan for forward transformation",
+             status);
+    }
 
-    /* Destroy the plan */ 
-    fftw_destroy_plan( plan_forward );
+    if( *status == SAI__OK ) {
+      /* Execute the FFT */
+      fftw_execute( plan_forward );
 
-    /* Apply the frequency-domain filter */
-    if( filt->isComplex ) {
-      for( j=0; j<ntslice/2+1; j++ ) {
-        /* Complex times complex */
-        ac = data_fft[j][0] * ((fftw_complex *)filt->buf)[j][0];
-        bd = data_fft[j][1] * ((fftw_complex *)filt->buf)[j][1];
-        aPb = data_fft[j][0] + data_fft[j][1];
-        cPd = ((fftw_complex *)filt->buf)[j][0] + 
-          ((fftw_complex *)filt->buf)[j][1];
+      /* Destroy the forward plan */ 
+      fftw_destroy_plan( plan_forward );
 
-        /* This method only needs 3 multiplies */
-        data_fft[j][0] = ac - bd;
-        data_fft[j][1] = aPb*cPd - ac - bd;
-      }
-    } else { 
-      for( j=0; j<ntslice/2+1; j++ ) {
-        /* Complex times real */
-        data_fft[j][0] *= ((double *)filt->buf)[j];
-        data_fft[j][1] *= ((double *)filt->buf)[j];
+      /* Apply the frequency-domain filter */
+      if( filt->isComplex ) {
+        for( j=0; j<ntslice/2+1; j++ ) {
+          /* Complex times complex */
+          ac = data_fft[j][0] * ((fftw_complex *)filt->buf)[j][0];
+          bd = data_fft[j][1] * ((fftw_complex *)filt->buf)[j][1];
+          aPb = data_fft[j][0] + data_fft[j][1];
+          cPd = ((fftw_complex *)filt->buf)[j][0] + 
+            ((fftw_complex *)filt->buf)[j][1];
+          
+          /* This method only needs 3 multiplies */
+          data_fft[j][0] = ac - bd;
+          data_fft[j][1] = aPb*cPd - ac - bd;
+        }
+      } else { 
+        for( j=0; j<ntslice/2+1; j++ ) {
+          /* Complex times real */
+          data_fft[j][0] *= ((double *)filt->buf)[j];
+          data_fft[j][1] *= ((double *)filt->buf)[j];
+        }
+      }    
+
+      /* Setup inverse FFT */
+      plan_inverse = fftw_plan_dft_c2r_1d(ntslice, data_fft, base, 
+                                          FFTW_ESTIMATE);
+      if( !plan_inverse ) {
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, 
+               "FFTW3 could not create plan for forward transformation",
+               status);
       }
     }
 
-    /* Setup inverse FFT */
-    plan_inverse = fftw_plan_dft_c2r_1d(ntslice, data_fft, base, FFTW_ESTIMATE);
-
-    /* Perform inverse transform and normalize the result */
-    fftw_execute( plan_inverse );
-
-    /* Destroy the plan */ 
-    fftw_destroy_plan( plan_inverse );
+    if( *status == SAI__OK ) {
+      /* Perform inverse transform and normalize the result */
+      fftw_execute( plan_inverse );
+      
+      /* Destroy the plan */ 
+      fftw_destroy_plan( plan_inverse );
+    }
   }
 
   /* Clean up */
