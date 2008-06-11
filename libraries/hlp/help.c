@@ -187,7 +187,7 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
  
    int i, nc, ic, j, i1, i2, lipsis, ip, maxbuf,
        iactiv, output, wild, eos, found, subtop;
-   char name [ LKWMAX ], cue [ 9 ];
+   char name [ LKWMAX ], cue [ 12 ];
 
 
  

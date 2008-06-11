@@ -1,5 +1,9 @@
 1 HLP - Portable help system 
 
+HLP version 4.0-3
+
+*  Bug fix for buffer overrun.
+
 HLP version 4.0-2
 
 *  Bug fix so that the user supplied name translation routine

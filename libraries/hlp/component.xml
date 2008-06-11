@@ -3,7 +3,7 @@
 <!-- component.xml.  Generated from component.xml.in by configure. -->
 
 <component id="hlp" support="S">
-  <version>4.0-2</version>
+  <version>4.0-3</version>
   <path>libraries/hlp</path>
   <description>HLP -- interactive help system</description>
   <abstract><p>The Starlink HLP system allows an application program
