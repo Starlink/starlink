@@ -44,6 +44,8 @@
 *        -Handle real and complex filters
 *     2008-06-10 (EC):
 *        Move normalization to smf_filter_ident
+*     2008-06-11 (EC):
+*        Switched to "guru" FFTW interface to facilitate future multi-threading
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -94,6 +96,7 @@ void smf_filter_execute( smfData *data, smfFilter *filt, int *status ) {
   fftw_complex *data_fft;       /* The FFT of a single bolometer */
   dim_t i;                      /* Loop counter */
   dim_t icut;                   /* cutoff index for the filter */
+  fftw_iodim iodim;             /* I/O dimensions for transformations */
   dim_t j;                      /* Loop counter */
   dim_t nbolo;                  /* Number of bolometers */
   dim_t ndata;                  /* Total number of data points */
@@ -151,18 +154,23 @@ void smf_filter_execute( smfData *data, smfFilter *filt, int *status ) {
   if( *status != SAI__OK ) return;
 
   /* Allocate array for the FFT of the time-stream data. */
-
   data_fft = smf_malloc( data_fft, sizeof(fftw_complex), filt->dim, status );
+
+  /* Describe the input and output array dimensions for FFTW guru interface  */
+  iodim.n = filt->ntslice;
+  iodim.is = 1;
+  iodim.os = 1;
+
 
   /* Filter the data one bolo at a time */
   for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
     /* Obtain pointer to the correct chunk of data */
     base = &((double *)data->pntr[0])[i*ntslice];
     
-    /* Setup forward FFT */
-    plan_forward = fftw_plan_dft_r2c_1d( ntslice, base, data_fft, 
-                                         FFTW_ESTIMATE );
-
+    /* Setup forward FFT plan using guru interface */
+    plan_forward = fftw_plan_guru_dft_r2c( 1, &iodim, 0, NULL,
+                                           base, data_fft, 
+                                           FFTW_ESTIMATE | FFTW_UNALIGNED);
     if( !plan_forward ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, 
@@ -171,8 +179,8 @@ void smf_filter_execute( smfData *data, smfFilter *filt, int *status ) {
     }
 
     if( *status == SAI__OK ) {
-      /* Execute the FFT */
-      fftw_execute( plan_forward );
+      /* Execute plan using the guru interface */
+      fftw_execute_dft_r2c( plan_forward, base, data_fft );
 
       /* Destroy the forward plan */ 
       fftw_destroy_plan( plan_forward );
@@ -199,20 +207,22 @@ void smf_filter_execute( smfData *data, smfFilter *filt, int *status ) {
         }
       }    
 
-      /* Setup inverse FFT */
-      plan_inverse = fftw_plan_dft_c2r_1d(ntslice, data_fft, base, 
-                                          FFTW_ESTIMATE);
+      /* Setup inverse FFT plan using guru interface */
+      plan_inverse = fftw_plan_guru_dft_c2r( 1, &iodim, 0, NULL,
+                                             data_fft, base, 
+                                             FFTW_ESTIMATE | FFTW_UNALIGNED);
+
       if( !plan_inverse ) {
         *status = SAI__ERROR;
         errRep(FUNC_NAME, 
-               "FFTW3 could not create plan for forward transformation",
+               "FFTW3 could not create plan for inverse transformation",
                status);
       }
     }
 
     if( *status == SAI__OK ) {
-      /* Perform inverse transform and normalize the result */
-      fftw_execute( plan_inverse );
+      /* Perform inverse transform using guru interface */
+      fftw_execute_dft_c2r( plan_inverse, data_fft, base );
       
       /* Destroy the plan */ 
       fftw_destroy_plan( plan_inverse );
