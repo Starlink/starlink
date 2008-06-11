@@ -113,6 +113,8 @@ F77_SUBROUTINE(kpg1_kymap)( INTEGER(IGRP), INTEGER(KEYMAP), INTEGER(STATUS) ) {
 
    kpg1Kymp1( grp, &keymap, &cstatus );
 
+   grp = grpFree( grp, &cstatus );
+
    F77_EXPORT_INTEGER( astP2I( keymap ), *KEYMAP );
    F77_EXPORT_INTEGER( cstatus, *STATUS );
 
