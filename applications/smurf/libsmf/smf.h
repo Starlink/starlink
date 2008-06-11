@@ -321,6 +321,8 @@
 *        -Added smf_create_smfFilter, smf_filter_ident, smf_free_smfFilter
 *     2008-06-10 (EC):
 *        -Added smf_filter_r2c
+*     2008-06-11 (EC):
+*        Added smf_filter_edge and smf_filter_notch
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -1008,5 +1010,10 @@ void smf_filter_ident( smfFilter *filt, int complex, int *status );
 smfFilter *smf_free_smfFilter( smfFilter *filt, int *status );
 
 void smf_filter_r2c( smfFilter *filt, int *status );
+
+void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status );
+
+void smf_filter_notch( smfFilter *filt, const double *f_low, 
+                       const double *f_high, size_t n, int *status );
 
 #endif /* SMF_DEFINED */
