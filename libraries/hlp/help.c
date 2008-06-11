@@ -1,8 +1,10 @@
 #include <string.h>
+#include "help.h"
 #include "hlpsys.h"
 int hlpRepsub ( int ( * ) ( int, char*, int, char* ),
                 int ( * ) ( char* ), int, int,
                 char*, char*, char*, char* );
+
 int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
               char *lib, int jflags,
               int ( * insub ) ( char*, char*, int* ),
@@ -32,7 +34,7 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
 **               hlp_STRING_OVERFLOW = string overflowed
 **               hlp_TRANSLATE_ERROR = other errors
 **
-**  The error codes are defined in the hlpsys.h #include file.
+**  The error codes are defined in the header file hlpsys.h.
 **
 **  Notes:
 **
@@ -97,10 +99,9 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
 **           hlpComstr, hlpLinout, hlpHreadd, hlpRepsub, hlpHclose,
 **           hlpCopyn
 **
-**  Last revision:   2 January 2004 (PTW)
-**                   7 January 2006 (TIMJ)
+**  Last revision:   11 June 2008
 **
-**  Copyright 2004 P.T.Wallace.  All rights reserved.
+**  Copyright P.T.Wallace.  All rights reserved.
 */
 
 #define TRUE 1
@@ -187,7 +188,7 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
  
    int i, nc, ic, j, i1, i2, lipsis, ip, maxbuf,
        iactiv, output, wild, eos, found, subtop;
-   char name [ LKWMAX ], cue [ 12 ];
+   char name [LKWMAX], cue[11];
 
 
  
@@ -209,20 +210,20 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
 /* Initialize the context. */
 
 /* Reset the "exact match" flags. */
-   for ( levcur = 0; levcur <= LEVMAX; exact [ levcur++ ] = FALSE );
+   for ( levcur = 0; levcur <= LEVMAX; exact[levcur++] = FALSE );
 
 /* Level 0 topic has just been read: note the library name and the */
 /* address.                                                        */
    for ( i = 0; i <= 1; i++ )
-      hlpHtellx ( hlname [ 0 ] [ i ],
-                & levpos [ 0 ] [ i ],
-                & loglev [ 0 ] [ i ] );
+      hlpHtellx ( hlname[0][i],
+                & levpos[0][i],
+                & loglev[0][i] );
 
 /* Read the index entry to get the top-level topic name and check that */
 /* the level is zero.                                                  */
    if ( ( jstat = hlpHreadx ( nametr, 'd', LHBUF, hlpbuf, &nc ) ) )
       return jstat;
-   hlpHchkl ( hlpbuf, &levcur, levels [ 0 ] );
+   hlpHchkl ( hlpbuf, &levcur, levels[0] );
 
 /* Copy the command string, substituting '?' if null. */
    strncpy ( inbuf, ( ( hlpLength ( ipline ) ) ? ipline : "?" ), LIBUF );
@@ -246,9 +247,9 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
       }
  
    /* Position the HELP file index at the last match at this level. */
-      hlpHseekx ( hlname [ levcur ] [ 1 ],
-                  levpos [ levcur ] [ 1 ],
-                  loglev [ levcur ] [ 1 ] );
+      hlpHseekx ( hlname[levcur][1],
+                  levpos[levcur][1],
+                  loglev[levcur][1] );
 
    /* Skip the already-matched record.  Leave the file pointing to */
    /* the next entry down the branch.                              */
@@ -282,7 +283,7 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
             j = ( j < LIBUF ) ? j : LIBUF - 1 ;
             i1 = j - i + 1;
             i2 = LKWMAX - 1;
-            hlpUpcase ( hlpCopyn ( pars [ npars - 1 ],
+            hlpUpcase ( hlpCopyn ( pars[npars-1],
                                    inbuf + i,
                                    ( i1 < i2 ) ? i1 : i2 ) );
          }
@@ -291,7 +292,7 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
       }
 
    /* Endmark the list with a question mark. */
-      strcpy ( pars [ npars ], "?" );
+      strcpy ( pars[npars], "?" );
  
    /* Reset the wildcard/ellipsis flag. */
       wild = FALSE;
@@ -300,10 +301,10 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
       npars = 0;
  
    /* Loop until we reach the end marker. */
-      while ( strcmp ( pars [ npars ], "?" ) ) {
+      while ( strcmp ( pars[npars], "?" ) ) {
 
       /* Pick up the current parameter. */
-         strncpy ( name, pars [ npars ], LKWMAX );
+         strncpy ( name, pars[npars], LKWMAX );
  
       /* Wildcard? */
          if ( ! strncmp ( name, WILDN, 3 ) ) {
@@ -326,14 +327,14 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
                if ( i > 3 ) {
  
                /* Yes: remove it and make it the next parameter. */
-                  hlpCopyn ( pars [ npars ], name, i - 3 );
+                  hlpCopyn ( pars[npars], name, i-3 );
                   npars++;
-                  strcpy ( pars [ npars ], ELLIPS );
+                  strcpy ( pars[npars], ELLIPS );
                }
  
             /* Make the next parameter the end marker. */
                npars++;
-               strcpy ( pars [ npars ], "?" );
+               strcpy ( pars[npars], "?" );
             } else {
  
             /* Neither a wildcard nor an ellipsis: next parameter. */
@@ -358,7 +359,7 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
 
       /* Pick up the name of the topic (uppercase) and check for */
       /* ellipsis.                                               */
-         if ( ! strcmp ( strcpy ( name, pars [ ip ] ), ELLIPS ) ) {
+         if ( ! strcmp ( strcpy ( name, pars[ip] ), ELLIPS ) ) {
 
          /* Yes: has it already been seen? */
             if ( lipsis < 0 ) {
@@ -393,7 +394,7 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
             levcur++;
 
          /* Reset the "perfect match" flag. */
-            exact [ levcur ] = FALSE;
+            exact[levcur] = FALSE;
 
          /* Initialize the "end of subtree" and "subtopic found" flags. */
             eos = FALSE;
@@ -402,9 +403,9 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
 
             /* Satisfy any pending switch to another HELP library. */
                if ( ( jstat = hlpHleap ( nametr, LHBUF, hlpbuf,
-                                         hlname [ levcur ] [ 1 ],
-                                       & levpos [ levcur ] [ 1 ],
-                                       & loglev [ levcur ] [ 1 ] ) ) )
+                                         hlname[levcur][1],
+                                       & levpos[levcur][1],
+                                       & loglev[levcur][1] ) ) )
                   return jstat;
 
             /* Save the context. */
@@ -434,20 +435,20 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
                   /* requested name, ignoring any further matches */
                   /* once a perfect match has been detected.      */
                      hlpUpcase ( strcpy ( name2, name1 ) );
-                     if ( ( ! exact [ levcur ] ) &&
+                     if ( ( ! exact[levcur] ) &&
                         hlpComstr ( name2, name ) ) {
 
                      /* Match: if perfect, set the flag. */
                         if ( ! strcmp ( name2, name ) )
-                           exact [ levcur ] = TRUE;
+                           exact[levcur] = TRUE;
 
                      /* Store the context for this level. */
                         for ( i = 0; i <= 1; i++ ) {
-                           strcpy ( hlname [ levcur ] [ i ], fname );
-                           levpos [ levcur ] [ i ] = iadr;
-                           loglev [ levcur ] [ i ] = logl;
+                           strcpy ( hlname[levcur][i], fname );
+                           levpos[levcur][i] = iadr;
+                           loglev[levcur][i] = logl;
                         }
-                        strcpy ( levels [ levcur ], name1 );
+                        strcpy ( levels[levcur], name1 );
  
                      /* Set flag to show we found the topic. */
                         found = TRUE;
@@ -459,15 +460,15 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
          /* If the topic has not been found, up two levels, */
          /* resetting the most recent "exact match" flag.   */
             if ( ! found ) {
-               exact [ levcur ] = FALSE;
+               exact[levcur] = FALSE;
                ip -= 2;
                levcur -= 2;
  
             /* Unless about to terminate, reposition the file. */
                if ( levcur >= 0 )
-                  hlpHseekx ( hlname [ levcur + 1 ] [ 0 ],
-                              levpos [ levcur + 1 ] [ 0 ],
-                              loglev [ levcur + 1 ] [ 0 ] );
+                  hlpHseekx ( hlname[levcur+1][0],
+                              levpos[levcur+1][0],
+                              loglev[levcur+1][0] );
 
             /* Skip the already-matched record, leaving the file  */
             /* positioned at the next entry at the current level. */
@@ -485,18 +486,18 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
             /* at the start of the next subtree.  Reposition the index  */
             /* one entry down from the latest find, with the data       */
             /* pointer set to the keyword record for the latest find.   */
-               hlpHseekx ( hlname [ levcur ] [ 1 ],
-                           levpos [ levcur ] [ 1 ],
-                           loglev [ levcur ] [ 1 ] );
+               hlpHseekx ( hlname[levcur][1],
+                           levpos[levcur][1],
+                           loglev[levcur][1] );
                if ( ( jstat = hlpHreadx (nametr, 'd', LHBUF,
                                        hlpbuf, &nc ) ) < 0 )
                   return jstat;
 
             /* Satisfy any pending switch to another HELP library. */
                if ( ( jstat = hlpHleap ( nametr, LHBUF, hlpbuf,
-                                         hlname [ levcur ] [ 1 ],
-                                         & levpos [ levcur ] [ 1 ],
-                                         & loglev [ levcur ] [ 1 ] ) ) )
+                                         hlname[levcur][1],
+                                         & levpos[levcur][1],
+                                         & loglev[levcur][1] ) ) )
                   return jstat;
             }
          } else {
@@ -513,9 +514,9 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
                for ( level = 0; level <= levcur; level++ ) {
                   if ( level || ! levcur ) {
                      if ( outsub ( "\0 " ) != 1 ) return hlp_LINE_OUTPUT_BAD;
-                     if ( hlpLinout ( outsub, lout, 2 * ( level - 1 ),
+                     if ( hlpLinout ( outsub, lout, 2 *(level-1),
                                       strncpy ( outbuf,
-                                                levels [ level ],
+                                                levels[level],
                                                 LOBUF ) ) != 1 )
                         return hlp_LINE_OUTPUT_BAD;
                   }
@@ -579,7 +580,7 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
 
             /* Unless wildcarding or handling an ellipsis, list any */
             /* subtopics.                                           */
-               strcpy ( name, pars [ ( ip > 1 ) ? ip - 1 : 0 ] );
+               strcpy ( name, pars[( ip > 1 ) ? ip - 1 : 0] );
                if ( strcmp ( name, WILDN ) &&
                     strcmp ( name, ELLIPS ) &&
                     subtop)
@@ -593,9 +594,9 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
 
             /* Position the HELP library index at the last match at */
             /* this level.                                          */
-               hlpHseekx ( hlname [ levcur ] [ 0 ],
-                           levpos [ levcur ] [ 0 ],
-                           loglev [ levcur ] [ 0 ] );
+               hlpHseekx ( hlname[levcur][0],
+                           levpos[levcur][0],
+                           loglev[levcur][0] );
 
             /* Ellipsis? */
                if ( lipsis < 0 ) {
@@ -646,7 +647,7 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
             if ( outsub ( "\0" ) != 1 ) return hlp_LINE_OUTPUT_BAD;
             if ( hlpLinout ( outsub, lout, 2 * ( level - 1 ),
                              strncpy ( outbuf,
-                                       levels [ level ],
+                                       levels[level],
                                        LOBUF ) ) != 1 )
                return hlp_LINE_OUTPUT_BAD;
          }
@@ -656,19 +657,19 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
          maxbuf = LOBUF - hlpLength ( name ) - 1;
          strcpy ( outbuf, "Sorry, no documentation on" );
          ic = hlpLength ( outbuf ) + 2;
-         outbuf [ ic - 2 ] = (char) ' ';
+         outbuf[ic-2] = (char) ' ';
 
       /* First batch of level names from the HELP library. */
          i = 1;
          while ( i <= levcur && ic <= maxbuf ) {
 
          /* Is there room for the level name? */
-            if ( ( ic + hlpLength ( levels [ i ] ) ) <= maxbuf ) {
+            if ( ( ic + hlpLength ( levels[i] ) ) <= maxbuf ) {
  
             /* There is: load it and convert it to uppercase. */
-               outbuf [ ic - 2 ] = (char) ' ';
+               outbuf[ic-2] = (char) ' ';
                hlpUpcase ( hlpCopyn ( outbuf + ic - 1,
-                                      levels [ i ],
+                                      levels[i],
                                       LOBUF - ic - 1 ) );
  
             /* Advance the pointer. */
@@ -684,12 +685,12 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
          while ( i <= npars && ic <= maxbuf ) {
 
          /* Is there room for the level name? */
-            if ( ( ic + hlpLength ( pars [ i - 1 ] ) ) <= maxbuf ) {
+            if ( ( ic + hlpLength ( pars[i-1] ) ) <= maxbuf ) {
  
             /* There is: load it and convert it to uppercase. */
-               outbuf [ ic - 2 ] = (char) ' ';
+               outbuf[ic-2] = (char) ' ';
                hlpUpcase ( hlpCopyn ( outbuf + ic - 1,
-                                      pars [ i - 1 ],
+                                      pars[i-1],
                                       LOBUF - ic - 1 ) );
  
             /* Advance the pointer. */
@@ -705,9 +706,9 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
                           outbuf) != 1 ) return hlp_LINE_OUTPUT_BAD;
 
       /* Position the HELP file index at the first subtopic. */
-         hlpHseekx ( hlname [ levcur ] [ 1 ],
-                     levpos [ levcur ] [ 1 ],
-                     loglev [ levcur ] [ 1 ] );
+         hlpHseekx ( hlname[levcur][1],
+                     levpos[levcur][1],
+                     loglev[levcur][1] );
          if ( ( jstat = hlpHreadx ( nametr, 'd', LHBUF, hlpbuf, &nc ) ) )
             return jstat;
 
@@ -738,11 +739,11 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
          while ( i <= levcur && ic < LOBUF ) {
 
          /* Is there room for the level name? */
-            if ( ( ic + hlpLength ( levels [ i ] ) ) < LOBUF ) {
+            if ( ( ic + hlpLength ( levels[i] ) ) < LOBUF ) {
  
             /* There is: load it. */
-               if ( ic > 0 ) outbuf [ ic - 1 ] = (char) ' ';
-               hlpCopyn ( outbuf + ic, levels [ i ], LOBUF - ic - 1 );
+               if ( ic > 0 ) outbuf[ic-1] = (char) ' ';
+               hlpCopyn ( outbuf + ic, levels[i], LOBUF - ic - 1 );
             } else {
  
             /* There isn't: overflow to stop the loop. */
@@ -764,7 +765,7 @@ int hlpHelp ( int ( * outsub ) ( char* ), int lout, char *ipline,
 
       /* Eliminate any included nulls. */
          for ( i += ic - 1; i >= 0; i-- ) {
-            if ( ! outbuf [ i ] ) outbuf [ i ] = (char) ' ';
+            if ( ! outbuf[i] ) outbuf[i] = (char) ' ';
          }
 
       /* Ask for the next topic. */
@@ -825,9 +826,9 @@ int hlpRepsub ( int ( * nametr ) ( int, char*, int, char* ),
 **     positioned so that the next record to be input is the first index
 **     entry that is not part of the current subtree.
 **
-**  Last revision:   5 December 1995
+**  Last revision:   14 January 2008
 **
-**  Copyright 1996 P.T.Wallace.   All rights reserved.
+**  Copyright P.T.Wallace.   All rights reserved.
 */
 
 /* Increment between topic names on the output line. */
@@ -860,8 +861,8 @@ int hlpRepsub ( int ( * nametr ) ( int, char*, int, char* ),
 /* or reach end-of-index.                                                */
    levsub = levcur + 1;
    level = levsub;
-   for ( ic = 0; ic < LOBUF - 1; outbuf [ ic++ ] = (char) ' ' );
-   outbuf [ LOBUF - 1 ] = (char) '\0';
+   for ( ic = 0; ic < LOBUF - 1; outbuf[ic++] = (char) ' ' );
+   outbuf[LOBUF-1] = (char) '\0';
    ic = 0;
    while ( jstat == 0 && level >= levsub ) {
 
@@ -878,8 +879,8 @@ int hlpRepsub ( int ( * nametr ) ( int, char*, int, char* ),
                return hlp_LINE_OUTPUT_BAD;
 
          /* Reset the buffer to spaces. */
-            for ( ic = 0; ic < LOBUF - 1; outbuf [ ic++ ] = (char) ' ' );
-            outbuf [ LOBUF - 1 ] = (char) '\0';
+            for ( ic = 0; ic < LOBUF - 1; outbuf[ic++] = (char) ' ' );
+            outbuf[LOBUF-1] = (char) '\0';
             ic = 0;
          }
  
