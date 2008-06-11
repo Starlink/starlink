@@ -11,12 +11,9 @@
   wvmEst  
 
  History: 
-   $Log$
-   Revision 0.1  2006/02/07 22:29:50  agibb
-   WVM files necessary for calculating tau from the WVM temperature measurements
-
-   Revision 0.1  2006/01/25 20:43:37  echapin
-   Initial version
+   $Log: wvmOpt.c,v $
+   Revision 1.3  2006/07/14 18:50:32  rkackley
+   Corrected format specifier and added val to list of quantities printed because it looked like val was intended to be printed bu was not in the argument list
 
    Revision 1.2  2003/04/09 20:22:10  mrippa
    #include wvmCal.h
@@ -135,8 +132,8 @@ void wvmOpt(float aMass, float tAmb, float * tSky, float * waterDens,
     {
 
       if(DEBUG_OPT_FUNC)
-	    printf("In wvmOpt p= %8.4f %8.2f %8.4f q= %9.5f %9.5f %9.5f val = %9.4\n",
-	    p[0], p[1], p[2], q[0], q[1], q[2]);
+	    printf("In wvmOpt p= %8.4f %8.2f %8.4f q= %9.5f %9.5f %9.5f val = %9.4f\n",
+		   p[0], p[1], p[2], q[0], q[1], q[2], val);
 
       X[1] = 0.0;
       Y[1] = 0.0;
@@ -189,7 +186,7 @@ void wvmOpt(float aMass, float tAmb, float * tSky, float * waterDens,
 			  /* going wrong direction put these values one 
 			     down in the stack and leave initial ones 
 			     on top */
-			  X[1] = p[K];    
+			  X[1] = p[K];
 			  Y[1] = val;
 
 			  /* reverse increment */

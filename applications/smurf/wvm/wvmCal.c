@@ -8,12 +8,12 @@
   Functions:
 
  History: 
-   $Log$
-   Revision 0.1  2006/02/07 22:29:50  agibb
-   WVM files necessary for calculating tau from the WVM temperature measurements
+   $Log: wvmCal.c,v $
+   Revision 1.5  2008/04/10 21:04:56  cwalther
+   Make sure the averaging is done in floating point
 
-   Revision 0.1  2006/01/25 20:43:37  echapin
-   Initial version
+   Revision 1.4  2008/04/10 20:06:17  cwalther
+   Fixed sizes of the airmass and temperature prints
 
    Revision 1.3  2003/06/02 21:21:49  mrippa
    Writes glitch occurances to raw file now (passed in).
@@ -229,7 +229,7 @@ void wvmCal(int cycleCnt,float * data,float eta,float tAmb,
       /* Calculate the scale factor (degrees per kHz) for tSys and tSky */
 
       scaleFac = (tHot[i] - tWarm[i]) / avgDif[i];
-      tSys[i] = (avgSum[i] * scaleFac - tHot[i] - tWarm[i]) / 2.0;
+      tSys[i] = (avgSum[i] * scaleFac -tHot[i] - tWarm[i]) / 2.0;
       tSky[i] = avgSky[i] * scaleFac - tSys[i];
     }
 
