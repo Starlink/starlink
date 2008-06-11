@@ -52,7 +52,7 @@ smf_calcmodel_ast.c smf_calcmodel_com.c smf_calcmodel_noi.c \
 smf_labelunit.c smf_sparsebounds.c smf_rebinsparse.c \
 smf_model_getptr.c smf_model_gettype.c smf_calcmodel_ext.c \
 smf_fits_outhdr.c smf_fits_add_prov.c smf_terr.c smf_open_model.c \
-smf_dtype_sz.c smf_model_NDFexport.c smf_accumulate_prov.c \
+smf_dtype_sz.c smf_NDFexport.c smf_accumulate_prov.c \
 smf_open_related_model.c smf_choosetiles.c smf_freetiles.c smf_reshapendf.c \
 smf_dataOrder.c smf_choosepolbins.c smf_freepolbins.c smf_polext.c \
 smf_filter_execute.c smf_concat_smfGroup.c smf_checkdets.c smf_sortd.c \

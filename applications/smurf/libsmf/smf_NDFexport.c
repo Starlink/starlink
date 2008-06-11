@@ -1,10 +1,10 @@
 /*
 *+
 *  Name:
-*     smf_model_NDFexport
+*     smf_NDFexport
 
 *  Purpose:
-*     Export DIMM model component stored in smfData to NDF file
+*     Export smfData to NDF file
 
 *  Language:
 *     Starlink ANSI C
@@ -13,9 +13,9 @@
 *     C function
 
 *  Invocation:
-*     smf_model_NDFexport( const smfData *data, void *variance, 
-*                          unsigned char *quality, smfHead *hdr,
-*                          const char *name, int *status );
+*     smf_NDFexport( const smfData *data, void *variance, 
+*                    unsigned char *quality, smfHead *hdr,
+*                    const char *name, int *status );
 
 *  Arguments:
 *     data = const smfData* (Given)
@@ -32,12 +32,10 @@
 *        Pointer to global status.
 
 *  Description:
-*     This function creates a new smfData struct with associated NDF
-*  contained, with the same dimensions as the input, and memcpy's the DATA
-*  array over. This routine can be used to write any smfData not associated
-*  with a file to an NDF container although it should probably be modified
-*  to check/copy over more information (such as history, or other components if
-*  they exist).
+*     This function creates a new NDF container with the same
+*     dimensions as the input. The following components are
+*     propagated: DATA, QUALITY, VARIANCE, HISTORY, FITS headers,
+*     JCMTSTATE headers, WCS
 *
 *  Authors:
 *     EC: Edward Chapin (UBC)
@@ -59,6 +57,8 @@
 *        Propagate header information to file
 *     2008-04-24 (EC):
 *        Fixed axis index bug in 1-d frameset case using patch from DB
+*     2008-06-11 (EC):
+*        Renamed to smf_NDFexport from smf_model_NDFexport
 
 *  Notes:
 *
@@ -101,9 +101,9 @@
 #include "jcmt/state.h"
 #include "sc2da/sc2store.h"
 
-#define FUNC_NAME "smf_model_NDFexport"
+#define FUNC_NAME "smf_NDFexport"
 
-void smf_model_NDFexport( const smfData *data, void *variance, 
+void smf_NDFexport( const smfData *data, void *variance, 
 			  unsigned char *quality, smfHead *hdr, 
 			  const char *name, int *status ){
 
@@ -313,13 +313,13 @@ void smf_model_NDFexport( const smfData *data, void *variance,
 
 	} else {
 	  msgSeti("NDIMS",data->ndims);
-	  msgOut( " ", "SMF_MODEL_NDFEXPORT: Don't know how to handle WCS for ^NDIMS dimensions", status );
+	  msgOut( " ", "SMF_NDFEXPORT: Don't know how to handle WCS for ^NDIMS dimensions", status );
 	}
       }
 
     } else {
       msgOut(" ",
-	     "SMF_MODEL_NDFEXPORT: Warning: only know how to write SCUBA2 header", status );
+	     "SMF_NDFEXPORT: Warning: only know how to write SCUBA2 header", status );
     }
 
   }

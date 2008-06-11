@@ -322,7 +322,8 @@
 *     2008-06-10 (EC):
 *        -Added smf_filter_r2c
 *     2008-06-11 (EC):
-*        Added smf_filter_edge and smf_filter_notch
+*        -Added smf_filter_edge and smf_filter_notch
+*        -Renamed smf_model_NDFexport to smf_NDFexport
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -817,9 +818,9 @@ void smf_open_model( const Grp *igrp, int index, const char *mode, smfData **dat
 
 size_t smf_dtype_sz( const smf_dtype dtype, int *status );
 
-void smf_model_NDFexport( const smfData *data, void *variance, 
-			  unsigned char *quality, smfHead *hdr, 
-			  const char *name, int *status );
+void smf_NDFexport( const smfData *data, void *variance, 
+                    unsigned char *quality, smfHead *hdr, 
+                    const char *name, int *status );
 
 void smf_open_related_model( const smfGroup *group, const int subindex, 
 			     const char *accmode, smfArray **relfiles, 
