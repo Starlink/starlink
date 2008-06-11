@@ -361,7 +361,7 @@
 *
 *        - An integer index of an axis within the current Frame of the 
 *        input NDF (in the range 1 to the number of axes in the current
-*	 Frame).
+*        Frame).
 *
 *        - An axis symbol string such as "RA", or "VRAD".
 *
@@ -371,7 +371,7 @@
 *        domains present are available as options.
 *
 *        - The special value 0 (zero), asks for the distance along the
-*	 profile from the centre of the first element in the supplied
+*        profile from the centre of the first element in the supplied
 *        NDF to be used to annotate the axis.  This will be measured in 
 *        the current co-ordinate Frame of the NDF.
 *

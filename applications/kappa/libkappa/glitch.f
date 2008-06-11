@@ -173,7 +173,7 @@
       INTEGER STATUS
 
 *  Local Constants:
-      INTEGER MAXPIX	        ! Max. no. of pixels which can be supplied in
+      INTEGER MAXPIX            ! Max. no. of pixels which can be supplied in
       PARAMETER ( MAXPIX = 200 )! interface mode.
 
 *  Local Variables:

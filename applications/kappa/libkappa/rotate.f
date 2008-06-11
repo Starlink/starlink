@@ -484,9 +484,9 @@
 
 *  Transform two points on the second GRID axis into the current Frame.
          XP( 1 ) = 1.0D0
-	 YP( 1 ) = 1.0D0
+         YP( 1 ) = 1.0D0
          XP( 2 ) = 1.0D0
-	 YP( 2 ) = 100.0D0
+         YP( 2 ) = 100.0D0
          CALL AST_TRAN2( IWCS, 2, XP, YP, .TRUE., XP, YP, STATUS )
 
 *  Find another point (C) which is to the north of point 1 (A). The
@@ -502,9 +502,9 @@
 
 *  Convert A and C back into GRID co-ords.
          XP( 1 ) = A( 1 )
-	 YP( 1 ) = A( 2 )
+         YP( 1 ) = A( 2 )
          XP( 2 ) = C( 1 )
-	 YP( 2 ) = C( 2 )
+         YP( 2 ) = C( 2 )
          CALL AST_TRAN2( IWCS, 2, XP, YP, .FALSE., XP, YP, STATUS )
 
 *  Find the angle between the line joining these transformed points in

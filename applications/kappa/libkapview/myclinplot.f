@@ -76,10 +76,10 @@
 *     AXES = _LOGICAL (Read)
 *        TRUE if labelled and annotated axes describing the spatial
 *        are to be drawn around the outer edges of the plot. The
-*	 appearance of the axes can be controlled using the STYLE
-*	 parameter. The dynamic default is to draw axes only if the
-*	 CLEAR parameter indicates that the graphics device is not
-*	 being cleared.  []
+*        appearance of the axes can be controlled using the STYLE
+*        parameter. The dynamic default is to draw axes only if the
+*        CLEAR parameter indicates that the graphics device is not
+*        being cleared.  []
 *     BLANKEDGE = _LOGICAL (Read)
 *        If TRUE then no tick marks or labels are placed on the edges
 *        of line plots that touch the outer spatial axes (other edges

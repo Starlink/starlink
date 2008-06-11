@@ -852,7 +852,7 @@
      :                          %VAL( CNF_PVAL( IPVOUT ) + OFF ), NGOOD,
      :                          SIGMA, %VAL( CNF_PVAL( PNTAS( 1 ) ) ),
      :                          %VAL( CNF_PVAL( PNTNS( 1 ) ) ), STATUS )
-	    
+
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                CALL KPS1_CFF2D( PDIM( 1 ), PDIM( 2 ), 
      :                          %VAL( CNF_PVAL( IPDIN ) + OFF ), VAR,
@@ -864,7 +864,7 @@
      :                          %VAL( CNF_PVAL( IPVOUT ) + OFF ), NGOOD,
      :                          SIGMA, %VAL( CNF_PVAL( PNTAS( 1 ) ) ),
      :                          %VAL( CNF_PVAL( PNTNS( 1 ) ) ), STATUS )
-    	    
+
             END IF
 
 *  If we are processing multiple spectra or pleanes, and an error

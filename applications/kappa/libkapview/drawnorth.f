@@ -170,7 +170,7 @@
 *
 *        - An integer index of an axis within the current Frame of the 
 *        input NDF (in the range 1 to the number of axes in the current
-*	 Frame).
+*        Frame).
 *
 *        - An axis symbol string such as "RA" or "VRAD".
 *
@@ -349,7 +349,7 @@
             I = I - 1
          END IF            
          CALL AST_ANNUL( FRM, STATUS )
-	 I = I + 1
+         I = I + 1
       END DO
 
 *  Delete the Base (GRAPHICS) Frame from the DATA picture Plot.

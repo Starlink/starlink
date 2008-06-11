@@ -540,7 +540,7 @@
 *  Set the dynamic default for QUIET.
       QUIET = ( PLOT .NE. 'NONE' .AND. PLOT .NE. 'BLANK' ) .OR. LABEL
       CALL PAR_DEF0L( 'QUIET', QUIET, STATUS )
-	
+
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 

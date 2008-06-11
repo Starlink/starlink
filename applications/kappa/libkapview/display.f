@@ -1171,7 +1171,7 @@
      :                    'current WCS co-ordinate Frame to pixel '//
      :                    'co-ordinates is undefined at the image '//
      :                    'centre.', STATUS )
-	    
+
             CALL MSG_OUT( 'DISPLAY_NOG2', 'The CENTRE parameter will '//
      :                    'be ignored and the centre of the image '//
      :                    'will be displayed at the centre of the '//
