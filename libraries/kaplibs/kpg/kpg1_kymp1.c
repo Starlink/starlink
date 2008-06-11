@@ -138,7 +138,7 @@ void kpg1Kymp1( Grp *igrp, AstKeyMap **keymap, int *status ){
    accumulation = NULL;
 
 /* Loop round all the strings in the group. */
-   for( i = 0; i < size; i++ ) {
+   for( i = 0; i < size && *status == SAI__OK; i++ ) {
 
 /* Get the i'th string from the group. Note, grp uses 1-based indices. */
       grpGet( igrp, i + 1, 1, &pname, GRP__SZNAM + 1, status );
