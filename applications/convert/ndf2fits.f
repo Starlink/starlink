@@ -435,7 +435,7 @@
 *        "FITS-AIPS++" --- This is an extension to FITS-AIPS which 
 *        allows the use of a wider range of celestial projections, as
 *        used by the AIPS++ project.
-*	    
+*
 *        "FITS-CLASS" --- This uses the conventions of the CLASS 
 *        project.  CLASS is a software package for reducing single-dish
 *        radio and sub-mm spectroscopic data.  It supports double 

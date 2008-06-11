@@ -85,7 +85,7 @@
 *           the FITS Format"  by R.J. Hanisch and D.G. Wells, 1988,
 *           available by ftp from fits.cv.nrao.edu
 *           /fits/documents/wcs/wcs88.ps.Z. 
-*	    
+*
 *        "FITS-WCS" --- This is the FITS standard WCS encoding scheme
 *          described in the paper "Representation of celestial 
 *          coordinates in FITS"
@@ -110,7 +110,7 @@
 *        "FITS-AIPS++" --- This is an extension to FITS-AIPS which 
 *           allows the use of a wider range of celestial projections, 
 *           as used by the AIPS++ project.
-*	    
+*
 *        "FITS-CLASS" --- This uses the conventions of the CLASS
 *           project.  CLASS is a software package for reducing 
 *           single-dish radio and sub-mm spectroscopic data.  It 
@@ -119,7 +119,7 @@
 *
 *        "DSS" --- This is the system used by the Digital Sky Survey,
 *           and uses keywords AMDXn, AMDYn, PLTRAH, etc.
-*	    
+*
 *        "NATIVE" --- This is the native system used by the AST library
 *           (see SUN/210) and provides a loss-free method for 
 *           transferring WCS information between AST-based applications.
