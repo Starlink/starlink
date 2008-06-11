@@ -965,7 +965,7 @@
                   CALL MSG_SETD( 'ZERO', ZERO )
                   CALL MSG_OUT( 'VAR_ZERO',  '         Zero offset :'//
      :                          '  ^ZERO', STATUS )
-	       
+
                ELSE IF( FTYPE .EQ. '_REAL' ) THEN
                   CALL MSG_SETR( 'SCAL', REAL( SCALE ) )
                   CALL MSG_OUT( 'VAR_SCALE', '         Scale factor:'//
@@ -973,7 +973,7 @@
                   CALL MSG_SETR( 'ZERO', REAL( ZERO ) )
                   CALL MSG_OUT( 'VAR_ZERO',  '         Zero offset :'//
      :                          '  ^ZERO', STATUS )
-	       
+
                ELSE 
                   CALL MSG_SETI( 'SCAL', NINT( SCALE ) )
                   CALL MSG_OUT( 'VAR_SCALE', '         Scale factor:'//

@@ -239,16 +239,16 @@
 *  Find the square root of the Variance values (i.e. error estimates),
 *  putting them in new work space.
                CALL PSX_CALLOC( EL, '_DOUBLE', IPW2, STATUS )
-	       CALL VEC_SQRTD( .TRUE., EL, %VAL( CNF_PVAL( IPVAR ) ), 
-     :                  %VAL( CNF_PVAL( IPW2 ) ),
+               CALL VEC_SQRTD( .TRUE., EL, %VAL( CNF_PVAL( IPVAR ) ), 
+     :                         %VAL( CNF_PVAL( IPW2 ) ),
      :                         IERR, NERR, STATUS )
 
 *  Perturb the original DATA values by an amount equal to the error
 *  estimate. Put the result back in the IPW1 workspace.
-	       CALL VEC_ADDD( .TRUE., EL, %VAL( CNF_PVAL( IPW1 ) ), 
-     :                 %VAL( CNF_PVAL( IPW2 ) ),
+               CALL VEC_ADDD( .TRUE., EL, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                        %VAL( CNF_PVAL( IPW2 ) ),
      :                        %VAL( CNF_PVAL( IPW1 ) ), 
-     :                 IERR, NERR, STATUS )
+     :                        IERR, NERR, STATUS )
 
 *  Transform these perturbed data values using the inter-unit Mapping,
 *  putting the result back in the IPW2 array.
@@ -258,17 +258,17 @@
 
 *  Find the difference between the tranformed original and transformed
 *  perturbed data values, putting the result in IPW1.
-	       CALL VEC_SUBD( .TRUE., EL, %VAL( CNF_PVAL( IPDAT ) ), 
-     :                 %VAL( CNF_PVAL( IPW2 ) ),
+               CALL VEC_SUBD( .TRUE., EL, %VAL( CNF_PVAL( IPDAT ) ), 
+     :                        %VAL( CNF_PVAL( IPW2 ) ),
      :                        %VAL( CNF_PVAL( IPW1 ) ), 
-     :                 IERR, NERR, STATUS )
+     :                        IERR, NERR, STATUS )
 
 *  Square these differences, putting the result in the output variance
 *  array.
-	       CALL VEC_MULD( .TRUE., EL, %VAL( CNF_PVAL( IPW1 ) ), 
-     :                 %VAL( CNF_PVAL( IPW1 ) ),
+               CALL VEC_MULD( .TRUE., EL, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                        %VAL( CNF_PVAL( IPW1 ) ),
      :                        %VAL( CNF_PVAL( IPVAR ) ), 
-     :                 IERR, NERR, STATUS )
+     :                        IERR, NERR, STATUS )
 
 *  Release work space.
                CALL PSX_FREE( IPW2, STATUS )

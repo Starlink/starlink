@@ -294,7 +294,7 @@
                END IF
                GO TO 999
             END IF
-	    
+
             TAB( NFIELD + 1 ) = TAB( NFIELD ) + 
      :                          MAX( 9, LEN( KEY ), MXLEN ) + 2
 

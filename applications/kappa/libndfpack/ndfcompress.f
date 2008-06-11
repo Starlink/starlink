@@ -75,14 +75,14 @@
 *        value is "_WORD".   [current value]
 *     VSCALE = _DOUBLE (Read)
 *        The scale factor to use for the VARIANCE component, when
-*	 compressing with METHOD set to SCALE. If a null (!) value is
+*        compressing with METHOD set to SCALE. If a null (!) value is
 *        supplied for VSCALE or VZERO, default values will be used for 
 *        both that cause the scaled variance values to occupy 96% of 
 *        the available range of the data type selected using parameter 
 *        SCALETYPE.  [!]
 *     VZERO = _DOUBLE (Read)
 *        The zero factor to use for the VARIANCE component, when
-*	 compressing with METHOD set to SCALE.  If a null (!) value is
+*        compressing with METHOD set to SCALE.  If a null (!) value is
 *        supplied for VSCALE or VZERO, default values will be used for 
 *        both that cause the scaled variance values to occupy 96% of 
 *        the available range of the data type selected using parameter 
@@ -298,13 +298,13 @@
                IF( TYPE .EQ. '_DOUBLE' ) THEN
                   CALL MSG_SETD( 'S', SCALE )
                   CALL MSG_SETD( 'Z', ZERO )
-	          
+
                ELSE IF( TYPE .EQ. '_REAL' ) THEN
                   SCALE = REAL( SCALE )
                   ZERO = REAL( ZERO )
                   CALL MSG_SETR( 'S', REAL( SCALE ) )
                   CALL MSG_SETR( 'Z', REAL( ZERO ) )
-	          
+
                ELSE 
                   SCALE = NINT( SCALE )
                   ZERO = NINT( ZERO )
@@ -360,7 +360,7 @@
                   CALL NDF_PTSZR( VAL_DTOR( .FALSE., SCALE, STATUS ),
      :                           VAL_DTOR( .FALSE., ZERO, STATUS ),
      :                           INDF2, COMP( I ), STATUS )
-   	       
+
                ELSE 
                   CALL NDF_PTSZI( VAL_DTOI( .FALSE., SCALE, STATUS ),
      :                           VAL_DTOI( .FALSE., ZERO, STATUS ),
