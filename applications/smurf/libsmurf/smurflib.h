@@ -55,6 +55,8 @@
 *        Add SC2CLEAN
 *     2008-04-21 (JB):
 *        Add GSDSHOW.
+*     2008-06-10 (TIMJ):
+*        Add SC2FTS
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -91,6 +93,7 @@ void smurf_qlmakemap( int * );
 void smurf_makecube( int * );
 void smurf_remsky( int * );
 void smurf_scanfit( int * );
+void smurf_sc2fts( int * );
 void smurf_sc2sim( int * );
 void smurf_dreamsolve( int * );
 void smurf_dreamweights( int * );
