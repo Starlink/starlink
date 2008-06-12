@@ -47,6 +47,8 @@
 *  History:
 *     2008-06-11 (EC):
 *        Initial version
+*     2008-06-12 (EC):
+*        -Switch to split real/imaginary arrays for smfFilter
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -93,10 +95,9 @@
 #define FUNC_NAME "smf_filter_edge"
 
 void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status ) {
-  void *base=NULL;      /* Pointer to start of memory to be zero'd */    
+  size_t base;          /* Index to start of memory to be zero'd */    
   size_t iedge;         /* Index corresponding to the edge frequency */
   size_t len;           /* Length of memory to be zero'd */
-  size_t bperel;        /* Size of array element in bytes */
 
   if (*status != SAI__OK) return;
 
@@ -106,8 +107,8 @@ void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status ) {
     return;
   }
 
-  /* If filt->buf is NULL, create a real identity filter first */
-  if( !filt->buf ) {
+  /* If filt->real is NULL, create a real identity filter first */
+  if( !filt->real ) {
     smf_filter_ident( filt, 0, status );
     if( *status != SAI__OK ) return;
   }
@@ -126,23 +127,24 @@ void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status ) {
     /* Bad status if edge above Nyquist frequency */
     *status = SAI__ERROR;
     msgSetd("F",f);
-    errRep( FUNC_NAME, "Filter edge ^F is > Nyquist", status );
+    errRep( FUNC_NAME, "Filter edge ^F Hz is > Nyquist", status );
     return;
   }
 
-  /* Size of array element */
-  if( filt->isComplex ) bperel = sizeof(fftw_complex);
-  else bperel = sizeof(double);
-
   /* Since we're zero'ing a continuous piece of memory, just use memset */
+
   if( lowpass ) { /* Zero frequencies beyond edge */
-    base = filt->buf + iedge*bperel;
-    len = (filt->dim - iedge - 1)*bperel;
+    base = iedge;
+    len = filt->dim - iedge;  
   } else {        /* Zero frequencies from 0 to edge */
-    base = filt->buf;
-    len = iedge*bperel + 1;
+    base = 0;                      
+    len = iedge + 1;
   }
 
-  memset( base, 0, len );
-
+  memset( ((void *) filt->real) + base*sizeof(*filt->real), 0, 
+          len*sizeof(*filt->real) );
+  if( filt->isComplex ) {
+    memset( ((void *) filt->imag) + base*sizeof(*filt->imag), 0, 
+            len*sizeof(*filt->imag) );
+  }
 }

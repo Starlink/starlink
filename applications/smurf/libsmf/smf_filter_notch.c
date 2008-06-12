@@ -49,6 +49,8 @@
 *  History:
 *     2008-06-11 (EC):
 *        Initial version
+*     2008-06-12 (EC):
+*        -Switch to split real/imaginary arrays for smfFilter
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -97,7 +99,7 @@
 void smf_filter_notch( smfFilter *filt, const double *f_low, 
                        const double *f_high, int n, int *status ) {
 
-  void *base=NULL;      /* Pointer to start of memory to be zero'd */    
+  size_t base;          /* Index to start of memory to be zero'd */    
   size_t bperel;        /* Size of array element in bytes */
   size_t i;             /* Loop counter */
   size_t iedge_high;    /* Index corresponding to lower edge frequency */
@@ -120,15 +122,11 @@ void smf_filter_notch( smfFilter *filt, const double *f_low,
     return;
   }
 
-  /* If filt->buf is NULL, create a real identity filter first */
-  if( !filt->buf ) {
+  /* If filt->real is NULL, create a real identity filter first */
+  if( !filt->real ) {
     smf_filter_ident( filt, 0, status );
     if( *status != SAI__OK ) return;
   }
-
-  /* Size of array element */
-  if( filt->isComplex ) bperel = sizeof(fftw_complex);
-  else bperel = sizeof(double);
 
   /* Loop over notches */
   for( i=0; (*status == SAI__OK) && i<n; i++ ) {
@@ -160,9 +158,15 @@ void smf_filter_notch( smfFilter *filt, const double *f_low,
 
     if( *status == SAI__OK ) {
       /* Since we're zero'ing a continuous piece of memory, just use memset */
-      base = filt->buf + iedge_low*bperel;
-      len = (iedge_high - iedge_low)*bperel;
-      memset( base, 0, len );
+
+      len = iedge_high - iedge_low + 1;
+
+      memset( ((void *) filt->real) + iedge_low*sizeof(*filt->real), 0, 
+              len*sizeof(*filt->real) );
+      if( filt->isComplex ) {
+        memset( ((void *) filt->imag) + iedge_low*sizeof(*filt->imag), 0, 
+                len*sizeof(*filt->imag) );
+      }
     }
   }
 

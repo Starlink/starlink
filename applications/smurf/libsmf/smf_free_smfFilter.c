@@ -36,6 +36,8 @@
 *  History:
 *     2008-06-05 (EC):
 *        Initial version
+*     2008-06-12 (EC):
+*        -Switch to split real/imaginary arrays for smfFilter
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -84,7 +86,8 @@ smfFilter *smf_free_smfFilter( smfFilter *filt, int *status ) {
   /* Try to free filt even if bad status on entry */
 
   if( filt ) {
-    filt->buf = smf_free( filt->buf, status );
+    filt->real = smf_free( filt->real, status );
+    filt->imag = smf_free( filt->imag, status );
     filt = smf_free( filt, status );
   }
   

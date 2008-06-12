@@ -41,6 +41,8 @@
 *        Initial version
 *     2008-06-10 (EC):
 *        Move normalization here from smf_filter_execute
+*     2008-06-12 (EC):
+*        -Switch to split real/imaginary arrays for smfFilter
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -107,26 +109,17 @@ void smf_filter_ident( smfFilter *filt, int complex, int *status ) {
      given the FFTW convention */
   val = 1./ (double) filt->ntslice;
 
-  if( complex ) {
-    filt->buf = smf_realloc( filt->buf, sizeof(fftw_complex), filt->dim, 
-                             status );
- 
-    if( *status == SAI__OK ) {
-      for( i=0; i<filt->dim; i++ ) {
-        ((fftw_complex *)filt->buf)[i][0] = val;
-        ((fftw_complex *)filt->buf)[i][1] = 0;
-      }
-      filt->isComplex = 1;
-    }
+  /* Allocate space for real and imaginary parts and initialize */
+  filt->real = smf_malloc( filt->dim, sizeof(*filt->real), 0, status );
 
-  } else {
-    filt->buf = smf_realloc( filt->buf, sizeof(double), filt->dim, status ); 
-    if( *status == SAI__OK ) {
-      for( i=0; i<filt->dim; i++ ) {
-        ((double *)filt->buf)[i] = val;
-      }
-      filt->isComplex = 0;
+  if( *status == SAI__OK ) {
+    for( i=0; i<filt->dim; i++ ) {
+      filt->real[i] = val;
     }
   }
-  
+
+  if( complex ) {
+    filt->imag = smf_malloc( filt->dim, sizeof(*filt->imag), 1, status );
+    filt->isComplex = 1;
+  } 
 }

@@ -38,6 +38,8 @@
 *  History:
 *     2008-06-10 (EC):
 *        Initial version
+*     2008-06-12 (EC):
+*        -Switch to split real/imaginary arrays for smfFilter
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -90,28 +92,17 @@ void smf_filter_r2c( smfFilter *filt, int *status ) {
     return;
   }
   
-  if( !filt->buf ) {
+  if( !filt->real ) {
     *status = SAI__ERROR;
     errRep( FUNC_NAME, "smfFilter contains a NULL buffer", status );
   }
   
   if( filt->isComplex ) return;
 
-  /* Allocate space for a 0-initialized complex array */
-  newbuf = smf_malloc( sizeof(fftw_complex), filt->dim, 1, status );
+  /* Allocate space for the imaginary part */
+  filt->imag = smf_malloc( filt->dim, sizeof(*filt->imag), 1, status );
 
   if( *status == SAI__OK ) {
-    /* Copy over the real part from the old array */
-    for( i=0; i<filt->dim; i++ ) {
-      newbuf[i][0] = ((double *)filt->buf)[i];
-    }
-
-    /* Free the old array, and point the buffer to the new array */
-    filt->buf = smf_free( filt->buf, status );
-
-    if( *status == SAI__OK ) {
-      filt->buf = newbuf;
-      filt->isComplex = 1;
-    }   
-  }
+    filt->isComplex = 1;
+  }   
 }

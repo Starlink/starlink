@@ -121,8 +121,10 @@
 *        -Added SMF__MB definition
 *     2008-04-30 (EC):
 *        -Added EXT to smfDIMMData
-*     2006-06-06 (EC):
+*     2008-06-06 (EC):
 *        -Add smfFilter definition
+*     2008-06-12 (EC):
+*        -Switch to split real/imaginary arrays for smfFilter
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -384,11 +386,13 @@ typedef struct smfTile {
 
 /* Structure to encapsulate frequency-domain filters implemented with FFTW. */
 typedef struct smfFilter {
-  void *buf;            /* either double or fftw_complex -- see isComplex */
   double df;            /* frequency step for each sample [Hz] */
   dim_t dim;            /* number of samples in filt */
-  dim_t ntslice;        /* # of time slices in input data */
+  double *imag;         /* Imaginary part of the filter */
   int isComplex;        /* Set if filter is fftw_complex, otherwise double */
+  dim_t ntslice;        /* # of time slices in input data */
+  double *real;         /* Real part of the filter */
+
 } smfFilter;
 
 #endif /* SMF_TYP_DEFINED */

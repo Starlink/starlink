@@ -42,6 +42,8 @@
 *        Initial version
 *     2008-06-11 (EC):
 *        Enable the use of 1-D templates
+*     2008-06-12 (EC):
+*        -Switch to split real/imaginary arrays for smfFilter
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -95,7 +97,8 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
   filt = smf_malloc( 1, sizeof(smfFilter), 0, status );
 
   if( *status == SAI__OK ) {
-    filt->buf = NULL;
+    filt->real = NULL;
+    filt->imag = NULL;
     filt->isComplex = 0;
 
     if( template ) {
@@ -121,7 +124,6 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
            negative frequencies in the transform contain the same
            information as the positive frequencies */
         filt->dim = filt->ntslice/2+1;
-
 
         if( template->hdr ) {
           /* Figure out length of a sample in order to calculate df */
