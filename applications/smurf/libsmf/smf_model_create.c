@@ -624,15 +624,10 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	      /* In this case run smf_correct_extinction on the input data
 		 (with only the header mapped) and store the gain coefficients
 		 in the model bufffer */
-
-	      /*
-	      smf_correct_extinction( idata, "WVMR", 0, 0, (double *) dataptr, 
-				      status );
-	      */
-
-	       smf_fits_getD( idata->hdr, "MEANWVM", &tau, status );
-	       smf_correct_extinction( idata, "CSOTAU", 1, tau, 
-				       (double *) dataptr, status );
+              
+              smf_fits_getD( idata->hdr, "MEANWVM", &tau, status );
+              smf_correct_extinction( idata, "CSOTAU", 1, tau, 
+                                      (double *) dataptr, status );
 
 	    } else {
 	      /* otherwise zero the buffer */
