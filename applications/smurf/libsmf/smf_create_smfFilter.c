@@ -40,6 +40,8 @@
 *  History:
 *     2008-06-05 (EC):
 *        Initial version
+*     2008-06-11 (EC):
+*        Enable the use of 1-D templates
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -97,7 +99,6 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
     filt->isComplex = 0;
 
     if( template ) {
-      /* need 3D data */
       if( template->ndims == 3 ) {
         if( template->isTordered ) { /* T is 3rd axis if time-ordered */
           filt->ntslice = template->dims[2];
@@ -105,33 +106,39 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
           filt->ntslice = template->dims[0];
         }
 
+      } else if( template->ndims == 1 ) {
+        /* If 1-d data, only one axis to choose from */
+        filt->ntslice = template->dims[0];
+      } else {
+        *status = SAI__ERROR;
+        errRep( FUNC_NAME, "smfData template is not 3d", status );
+      }
+
+      if( *status == SAI__OK ) {
+
         /* The actual length is ntslice/2+1 because the input bolo data is
            real; FFTW optimizes memory usage in this case since the
            negative frequencies in the transform contain the same
            information as the positive frequencies */
         filt->dim = filt->ntslice/2+1;
 
-      } else {
-        *status = SAI__ERROR;
-        errRep( FUNC_NAME, "smfData template is not 3d", status );
-      }
 
-      if( template->hdr ) {
-        /* Figure out length of a sample in order to calculate df */
-        smf_fits_getD(template->hdr, "STEPTIME", &steptime, status);
-
-        if( *status == SAI__OK ) {
-          /* Frequency step in Hz */
-          filt->df = 1. / (steptime * (double) filt->dim); 
+        if( template->hdr ) {
+          /* Figure out length of a sample in order to calculate df */
+          smf_fits_getD(template->hdr, "STEPTIME", &steptime, status);
+          
+          if( *status == SAI__OK ) {
+            /* Frequency step in Hz */
+            filt->df = 1. / (steptime * (double) filt->dim); 
+          }
+          
+        } else {
+          *status = SAI__ERROR;
+          errRep( FUNC_NAME, 
+                  "No hdr associated with template, can't determine step time", 
+                  status );
         }
-
-      } else {
-        *status = SAI__ERROR;
-        errRep( FUNC_NAME, 
-                "No hdr associated with template, can't determine step time", 
-                status );
       }
-
     } else {
       *status = SAI__ERROR;
       errRep( FUNC_NAME, "NULL smfData template", status );
