@@ -99,9 +99,13 @@
 *        - Removed time-ordered data assertion. Handle bolo-ordered case.
 *     2008-05-03 (EC):
 *        - Only write history if applying extinction (!allextcorr case)
+*     2008-06-12 (TIMJ):
+*        - fix compiler warnings. origsystem must be copied in case
+*        another call to astGetC is inserted in the code without thought.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2005-2008 University of British
 *     Columbia. All Rights Reserved.
