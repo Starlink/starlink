@@ -238,19 +238,16 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   double f_notchhigh[SMF__MXNOTCH];/* Array high-freq. edges of notch filters */
   int f_nnotch=0;               /* Number of notch filters in array */
   int f_nnotch2=0;              /* Number of notch filters in array */
-  int flag;                     /* Flag */
   int haveext;                  /* Set if EXT is one of the models */
   int havenoi;                  /* Set if NOI is one of the models */
   smfHead *hdr=NULL;            /* Pointer to smfHead */
   dim_t i;                      /* Loop counter */
   int idx=0;                    /* index within subgroup */
   smfGroup *igroup=NULL;        /* smfGroup corresponding to igrp */
-  int indf;                     /* Input data NDF identifier */
-  dim_t iter;                   /* Iteration number */
+  int iter;                     /* Iteration number */
   int isize;                    /* Number of files in input group */
   dim_t j;                      /* Loop counter */
   dim_t k;                      /* Loop counter */
-  dim_t l;                      /* Loop counter */
   double *lastchisquared=NULL;  /* chisquared for last iter */
   smfArray **lut=NULL;          /* Pointing LUT for each file */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
@@ -268,10 +265,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   char modelname[4];            /* Name of current model component */
   smf_calcmodelptr modelptr=NULL; /* Pointer to current model calc function */
   int msize;                    /* Number of elements in map */
-  int nbolo;                    /* Number of bolometers */
   int nchunks=0;                /* Number of chunks within iteration loop */
   int ncontchunks=0;            /* Number continuous chunks outside iter loop*/
-  int nmap;                     /* Number of elements mapped */
   dim_t nmodels=0;              /* Number of model components / iteration */
   int numiter;                  /* Total number iterations */
   size_t pass;                  /* Two pass parsing of MODELORDER */
@@ -446,7 +441,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
       if( maxlen_s < 0 ) {
 	/* Trap negtive MAXLEN */
-	*status == SAI__ERROR;
+	*status = SAI__ERROR;
 	errRep(FUNC_NAME, "Negative value for MAXLEN supplied.", status);
       } else if( maxlen_s == 0 ) {
 	/* 0 is OK... gets ignored later */
@@ -461,7 +456,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	    maxlen = (dim_t) (maxlen_s / (double) steptime);
 	  } else {
 	    /* Trap invalud sample length in header */
-	    *status == SAI__ERROR;
+	    *status = SAI__ERROR;
 	    errRep(FUNC_NAME, "Invalid STEPTIME in FITS header.", status);
 	  }
 	}
@@ -745,7 +740,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 			  memiter, qua, status );
 
 	/* Since a copy of the LUT is still open in res[0] free it up here */
-	for( i=0; i<res[0]->ndat; i++ ) {
+	for( i=0; i<(dim_t)res[0]->ndat; i++ ) {
 	  if( res[0]->sdata[i] ) {
 	    smf_close_mapcoord( res[0]->sdata[i], status );
 	  }
@@ -850,7 +845,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	  converged = 0;
 	}
 
-	for( i=0; i<nchunks; i++ ) {
+	for( i=0; i<(dim_t)nchunks; i++ ) {
 	  if( !memiter ) {
 	    msgSeti("CHUNK", i+1);
 	    msgSeti("NUMCHUNK", nchunks);
@@ -1016,7 +1011,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 		rebinflags = rebinflags | AST__REBININIT;
 	      }
 	    
-	      if( (i == nchunks-1) && (idx == res[i]->ndat-1) ) {
+	      if( (i == (dim_t)nchunks-1) && (idx == res[i]->ndat-1) ) {
 		/* Final call to rebin re-normalizes */
 		rebinflags = rebinflags | AST__REBINEND;
 	      }
@@ -1078,7 +1073,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	if( *status == SAI__OK ) {
 	  msgOut(" ", "SMF_ITERATEMAP: Calculate ast", status);
 
-	  for( i=0; i<nchunks; i++ ) {
+	  for( i=0; i<(dim_t)nchunks; i++ ) {
 
 	    /* Open files if memiter not set - otherwise they are still open
 	       from earlier call */
@@ -1164,7 +1159,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	msgOut(" ", "SMF_ITERATEMAP: Export model components to NDF files.", 
 	       status);
       
-	for( i=0; i<nchunks; i++ ) {  /* Chunk loop */
+	for( i=0; i<(dim_t)nchunks; i++ ) {  /* Chunk loop */
 	  msgSeti("CHUNK", i+1);
 	  msgSeti("NUMCHUNK", nchunks);
 	  msgOutif(MSG__VERB," ", "  Chunk ^CHUNK / ^NUMCHUNK", status);
@@ -1305,28 +1300,28 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
     /* fixed model smfArrays */
     if( res ) {
-      for( i=0; i<nchunks; i++ ) {
+      for( i=0; i<(dim_t)nchunks; i++ ) {
 	if( res[i] ) smf_close_related( &res[i], status );
       }
       res = smf_free( res, status );
     }
 
     if( ast ) {
-      for( i=0; i<nchunks; i++ ) {
+      for( i=0; i<(dim_t)nchunks; i++ ) {
 	if( ast[i] ) smf_close_related( &ast[i], status );
       }
       ast = smf_free( ast, status );
     }
 
     if( lut ) {
-      for( i=0; i<nchunks; i++ ) {
+      for( i=0; i<(dim_t)nchunks; i++ ) {
 	if( lut[i] ) smf_close_related( &lut[i], status );
       }
       lut = smf_free( lut, status );
     }
   
     if( qua ) {
-      for( i=0; i<nchunks; i++ ) {
+      for( i=0; i<(dim_t)nchunks; i++ ) {
 	if( qua[i] ) smf_close_related( &qua[i], status );
       }
       qua = smf_free( qua, status );
@@ -1346,7 +1341,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     if( model ) {
       for( i=0; i<nmodels; i++ ) {
 	if( model[i] ) {
-	  for( j=0; j<nchunks; j++ ) {
+	  for( j=0; j<(dim_t)nchunks; j++ ) {
 	    /* Close each model component smfArray at each time chunk */
 	    if( model[i][j] ) 
 	      smf_close_related( &(model[i][j]), status );

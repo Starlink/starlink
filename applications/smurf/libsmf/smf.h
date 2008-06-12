@@ -608,7 +608,7 @@ void smf_mapbounds_approx( Grp *igrp, int index, char *system, double pixsize,
 			   int *lbnd_out, int *ubnd_out, AstFrameSet **outframeset, 
 			   int *moving, int *status );
 
-void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
+void smf_model_create( const smfGroup *igroup, smfArray **iarray,
 		       int nchunks, smf_modeltype mtype, int isTordered, 
 		       AstFrameSet *outfset, int moving, 
 		       int *lbnd_out, int *ubnd_out,

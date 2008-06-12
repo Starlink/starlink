@@ -183,7 +183,7 @@
 
 #define FUNC_NAME "smf_model_create"
 
-void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
+void smf_model_create( const smfGroup *igroup, smfArray **iarray,
 		       int nchunks, smf_modeltype mtype, int isTordered,
 		       AstFrameSet *outfset, int moving, 
 		       int *lbnd_out, int *ubnd_out,
@@ -310,7 +310,7 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
   }
 	
   /* Loop over time chunks */
-  if( *status == SAI__OK ) for( i=0; i<nchunks; i++ ) {
+  if( *status == SAI__OK ) for( i=0; i<(dim_t)nchunks; i++ ) {
     
     /* For models that only have one file per subgroup fix up 
        mgroup such that only the first filename in each subgroup
@@ -319,7 +319,7 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 
     if( mtype == SMF__COM ) {
       if (mgroup != NULL) {
-	for( j=1; j<(*mgroup)->nrelated; j++ ) {
+	for( j=1; j<(dim_t)(*mgroup)->nrelated; j++ ) {
 	  (*mgroup)->subgroups[i][j] = 0;
 	}
       }
@@ -331,7 +331,7 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 
     thisnrel = 0;
 
-    for( j=0; j<nrel; j++ ) {
+    for( j=0; j<(dim_t)nrel; j++ ) {
       /* Check mgroup if we're using igroup as a template */
       if( mgroup != NULL ) {
 
@@ -357,7 +357,7 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
     }
 
     /* Loop over subarrays */
-    for( j=0; j<thisnrel; j++ ) {
+    for( j=0; j<(dim_t)thisnrel; j++ ) {
     
       /* Open the relevant template file if using igroup */
       if( igroup ) {
@@ -492,7 +492,7 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 	  if( copyinput ) { /* If copying input, copy data dims directly */
 	    head.dtype = idata->dtype; /* Inherit data type from template */
 	    head.ndims = idata->ndims;
-	    for( k=0; k<head.ndims; k++ ) {
+	    for( k=0; k<(dim_t)head.ndims; k++ ) {
 	      head.dims[k] = (idata->dims)[k];
 	    }
 	  } 
@@ -518,7 +518,7 @@ void smf_model_create( const smfGroup *igroup, const smfArray **iarray,
 
 	  /* Length of data array buffer */
 	  ndata = 1;
-	  for( k=0; k<head.ndims; k++ ) {
+	  for( k=0; k<(dim_t)head.ndims; k++ ) {
 	    ndata *= head.dims[k];
 	  }
 	  datalen = ndata * smf_dtype_sz(head.dtype, status); 
