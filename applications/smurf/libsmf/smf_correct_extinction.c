@@ -153,7 +153,7 @@
 #define FUNC_NAME "smf_correct_extinction"
 
 void smf_correct_extinction(smfData *data, const char *method, const int quick,
-			    double tau, double *allextcorr, int *status) {
+                            double tau, double *allextcorr, int *status) {
 
   /* Local variables */
   double airmass;          /* Airmass */
@@ -171,7 +171,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   dim_t k;                 /* Loop counter */
   size_t ndims;            /* Number of dimensions in input data */
   size_t newtau = 0;       /* Flag to denote whether to calculate a
-			      new tau from the WVM data */
+                              new tau from the WVM data */
   double newtwvm[3];       /* Array of WVM temperatures */
   size_t nframes = 0;      /* Number of frames */
   size_t npts = 0;         /* Number of data points */
@@ -182,7 +182,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   double *vardata = NULL;  /* Pointer to variance array */
   AstFrameSet *wcs = NULL; /* Pointer to AST WCS frameset */
   int wvmr = 0;            /* Flag to denote whether the WVMRAW method
-			      is to be used */
+                              is to be used */
   double *xin = NULL;      /* X coordinates of input mapping */
   double *xout = NULL;     /* X coordinates of output */
   double *yin = NULL;      /* Y coordinates of input */
@@ -198,8 +198,8 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
     if( !allextcorr ) {
       msgSetc("F", FUNC_NAME);
       msgOutif(MSG__VERB," ", 
-	       "^F has already been run on these data, returning to caller", 
-	       status);
+               "^F has already been run on these data, returning to caller", 
+               status);
       return;
     }
   }
@@ -223,15 +223,15 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
       *status = SAI__ERROR;
       msgSeti("ND", data->ndims);
       errRep(FUNC_NAME,
-	     "Number of dimensions of input file is ^ND: should be either 2 or 3",
-	     status);
+             "Number of dimensions of input file is ^ND: should be either 2 or 3",
+             status);
     }
   }
 
   /* Tell user we're correcting for extinction */
   msgSetc("M", method);
   msgOutif(MSG__VERB," ", 
-	   "Correcting for extinction with method ^M", status);
+           "Correcting for extinction with method ^M", status);
 
   /* Should check data type for double */
   smf_dtype_check_fatal( data, NULL, SMF__DOUBLE, status);
@@ -255,8 +255,8 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
     hdr = data->hdr;
     if( hdr == NULL ) {
       if ( *status == SAI__OK ) {
-	*status = SAI__ERROR;
-	errRep( FUNC_NAME, "Input data has no header", status);
+        *status = SAI__ERROR;
+        errRep( FUNC_NAME, "Input data has no header", status);
       }
     }
     smf_fits_getS( hdr, "FILTER", filter, 81, status);
@@ -297,8 +297,8 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
     base = j * nx;
     for (i = 0; i < nx; i++) {
       if (!quick) {
-	xin[z] = (double)i + 1.0;
-	yin[z] = (double)j + 1.0;
+        xin[z] = (double)i + 1.0;
+        yin[z] = (double)j + 1.0;
       }
       indices[z] = base + i; /* index into data array */
       z++;
@@ -324,130 +324,130 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
     } else {
       /* See if we have a new WVM value */
       if (wvmr) {
-	newtwvm[0] = hdr->state->wvm_t12;
-	newtwvm[1] = hdr->state->wvm_t42;
-	newtwvm[2] = hdr->state->wvm_t78;
-	/* Have any of the temperatures changed? */
-	if ( (newtwvm[0] != oldtwvm[0]) || 
-	     (newtwvm[1] != oldtwvm[1]) || 
-	     (newtwvm[2] != oldtwvm[2]) ) {
-	  newtau = 1;
-	  oldtwvm[0] = newtwvm[0];
-	  oldtwvm[1] = newtwvm[1];
-	  oldtwvm[2] = newtwvm[2];
-	} else {
-	  newtau = 0;
-	}
-	if (newtau) {
-	  tau = smf_calc_wvm( hdr, status );
-	  newtau = 0;
-	  /* Check status and/or value of tau */
-	  if ( tau == VAL__BADD ) {
-	    if ( *status == SAI__OK ) {
-	      *status = SAI__ERROR;
-	      errRep("", "Error calculating tau from WVM temperatures", 
-		     status);
-	    }
-	  }
-	}
+        newtwvm[0] = hdr->state->wvm_t12;
+        newtwvm[1] = hdr->state->wvm_t42;
+        newtwvm[2] = hdr->state->wvm_t78;
+        /* Have any of the temperatures changed? */
+        if ( (newtwvm[0] != oldtwvm[0]) || 
+             (newtwvm[1] != oldtwvm[1]) || 
+             (newtwvm[2] != oldtwvm[2]) ) {
+          newtau = 1;
+          oldtwvm[0] = newtwvm[0];
+          oldtwvm[1] = newtwvm[1];
+          oldtwvm[2] = newtwvm[2];
+        } else {
+          newtau = 0;
+        }
+        if (newtau) {
+          tau = smf_calc_wvm( hdr, status );
+          newtau = 0;
+          /* Check status and/or value of tau */
+          if ( tau == VAL__BADD ) {
+            if ( *status == SAI__OK ) {
+              *status = SAI__ERROR;
+              errRep("", "Error calculating tau from WVM temperatures", 
+                     status);
+            }
+          }
+        }
       }
 
       /* If we're using the QUICK application method, we assume a single
-	 airmass and tau for the whole array */
+         airmass and tau for the whole array */
       if (quick) {
-	/* For 2-D data, get airmass from the FITS header rather than
-	   the state structure */
-	if ( ndims == 2 ) {
-	  /* This may change depending on exact FITS keyword */
-	  smf_fits_getD( hdr, "AMSTART", &airmass, status );
-	} else {
-	  /* Else use airmass value in state structure */
-	  airmass = hdr->state->tcs_airmass;
-	}
-	extcorr = exp(airmass*tau);
+        /* For 2-D data, get airmass from the FITS header rather than
+           the state structure */
+        if ( ndims == 2 ) {
+          /* This may change depending on exact FITS keyword */
+          smf_fits_getD( hdr, "AMSTART", &airmass, status );
+        } else {
+          /* Else use airmass value in state structure */
+          airmass = hdr->state->tcs_airmass;
+        }
+        extcorr = exp(airmass*tau);
       } else {
-	/* Not using quick so retrieve WCS to obtain elevation info */
-	wcs = hdr->wcs;
-	/* Check current frame, store it and then select the AZEL
-	   coordinate system */
-	if (wcs != NULL) {
-    one_strlcpy( origsystem, astGetC(wcs,"SYSTEM"),
-                 sizeof(origsystem), status);
-	  astSetC( wcs, "SYSTEM", "AZEL" );
-	  /* Transfrom from pixels to AZEL */
-	  astTran2(wcs, npts, xin, yin, 1, xout, yout );
-	  if (!astOK) {
-	    if (*status == SAI__OK) {
-	      *status = SAI__ERROR;
-	      errRep( FUNC_NAME, "Error from AST when attempting to set SYSTEM to AZEL: WCS is NULL", status);
-	    }
-	  }
-	} else {
-	  /* Throw an error if no WCS */
-	  if ( *status == SAI__OK ) {
-	    *status = SAI__ERROR;
-	    errRep("", "Error: input file has no WCS", status);
-	  }
-	}
+        /* Not using quick so retrieve WCS to obtain elevation info */
+        wcs = hdr->wcs;
+        /* Check current frame, store it and then select the AZEL
+           coordinate system */
+        if (wcs != NULL) {
+          one_strlcpy( origsystem, astGetC(wcs,"SYSTEM"),
+                       sizeof(origsystem), status);
+          astSetC( wcs, "SYSTEM", "AZEL" );
+          /* Transfrom from pixels to AZEL */
+          astTran2(wcs, npts, xin, yin, 1, xout, yout );
+          if (!astOK) {
+            if (*status == SAI__OK) {
+              *status = SAI__ERROR;
+              errRep( FUNC_NAME, "Error from AST when attempting to set SYSTEM to AZEL: WCS is NULL", status);
+            }
+          }
+        } else {
+          /* Throw an error if no WCS */
+          if ( *status == SAI__OK ) {
+            *status = SAI__ERROR;
+            errRep("", "Error: input file has no WCS", status);
+          }
+        }
       } 
       /* Loop over data in time slice. Start counting at 1 since this is
-	 the GRID coordinate frame */
+         the GRID coordinate frame */
       base = npts * k;  /* Offset into 3d data array (time-ordered) */
       indexb = k;       /* Offset into 3d data array (bolo-ordered) */
 
       for (i=0; i < npts && ( *status == SAI__OK ); i++ ) {
-	/* update array indices */
-	index = indices[i] + base;
+        /* update array indices */
+        index = indices[i] + base;
 
-	if (!quick) {
-	  zd = M_PI_2 - yout[indices[i]];
-	  airmass = slaAirmas( zd );
-	  extcorr = exp(airmass*tau);
-	}
+        if (!quick) {
+          zd = M_PI_2 - yout[indices[i]];
+          airmass = slaAirmas( zd );
+          extcorr = exp(airmass*tau);
+        }
 	
-	if( allextcorr ) {
-	  /* Store extinction correction factor */
-	  if( isTordered ) {
-	    allextcorr[index] = extcorr;
-	  } else {
-	    allextcorr[indexb] = extcorr;
-	  }
-	} else {
-	  /* Otherwise Correct the data */
-	  if( indata && (indata[index] != VAL__BADD) ) {
-	    if( isTordered ) {
-	      indata[index] *= extcorr;
-	    } else {
-	      indata[indexb] *= extcorr;
-	    }
-	  }
+        if( allextcorr ) {
+          /* Store extinction correction factor */
+          if( isTordered ) {
+            allextcorr[index] = extcorr;
+          } else {
+            allextcorr[indexb] = extcorr;
+          }
+        } else {
+          /* Otherwise Correct the data */
+          if( indata && (indata[index] != VAL__BADD) ) {
+            if( isTordered ) {
+              indata[index] *= extcorr;
+            } else {
+              indata[indexb] *= extcorr;
+            }
+          }
 
-	  /* Correct the variance */
-	  if( vardata && (vardata[index] != VAL__BADD) ) {
-	    if( isTordered ) {
-	      vardata[index] *= extcorr*extcorr;
-	    } else {
-	      vardata[indexb] *= extcorr*extcorr;
-	    }
-	  }
-	}
+          /* Correct the variance */
+          if( vardata && (vardata[index] != VAL__BADD) ) {
+            if( isTordered ) {
+              vardata[index] *= extcorr*extcorr;
+            } else {
+              vardata[indexb] *= extcorr*extcorr;
+            }
+          }
+        }
 
-	/* Incremeber bolo-ordered data index */
-	indexb += nframes;
+        /* Incremeber bolo-ordered data index */
+        indexb += nframes;
       }
       
       if (!quick) {
-	/* Restore coordinate frame to original */
-	if ( *status == SAI__OK) {
-	  astSetC( wcs, "SYSTEM", origsystem );
-	  /* Check AST status */
-	  if (!astOK) {
-	    if (*status == SAI__OK) {
-	      *status = SAI__ERROR;
-	      errRep( FUNC_NAME, "Error from AST when attempting to return to input coordinate system", status);
-	    }
-	  }
-	}
+        /* Restore coordinate frame to original */
+        if ( *status == SAI__OK) {
+          astSetC( wcs, "SYSTEM", origsystem );
+          /* Check AST status */
+          if (!astOK) {
+            if (*status == SAI__OK) {
+              *status = SAI__ERROR;
+              errRep( FUNC_NAME, "Error from AST when attempting to return to input coordinate system", status);
+            }
+          }
+        }
       }
     }    
   } /* End loop over timeslice */
@@ -455,7 +455,7 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   /* Add history entry if !allextcorr */
   if( (*status == SAI__OK) && !allextcorr ) {
     smf_history_add( data, FUNC_NAME, 
-		       "Extinction correction successful", status);
+                     "Extinction correction successful", status);
   }
 
  CLEANUP:
