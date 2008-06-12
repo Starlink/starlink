@@ -1015,6 +1015,6 @@ void smf_filter_r2c( smfFilter *filt, int *status );
 void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status );
 
 void smf_filter_notch( smfFilter *filt, const double *f_low, 
-                       const double *f_high, size_t n, int *status );
+                       const double *f_high, int n, int *status );
 
 #endif /* SMF_DEFINED */

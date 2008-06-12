@@ -95,7 +95,7 @@
 #define FUNC_NAME "smf_filter_notch"
 
 void smf_filter_notch( smfFilter *filt, const double *f_low, 
-                       const double *f_high, size_t n, int *status ) {
+                       const double *f_high, int n, int *status ) {
 
   void *base=NULL;      /* Pointer to start of memory to be zero'd */    
   size_t bperel;        /* Size of array element in bytes */
