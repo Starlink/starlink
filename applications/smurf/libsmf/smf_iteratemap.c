@@ -149,6 +149,9 @@
 *        - More intelligent auto-sizing of concantenated chunks
 *     2008-05-02 (EC)
 *        - Use different levels of verbosity in messages
+*     2008-06-12 (EC)
+*        - renamed smf_model_NDFexport smf_NDFexport
+*        - added edge and notch frequency-domain filters
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -225,8 +228,16 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   int dcbox;                    /* Box size for fixing DC steps */
   double dcthresh;              /* Threshold for fixing DC steps */
   int dimmflags;                /* Control flags for DIMM model components */
+  int dofft=0;                  /* Set if freq. domain filtering the data */
   dim_t dsize;                  /* Size of data arrays in containers */
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
+  smfFilter *filt=NULL;         /* Pointer to filter struct */
+  double f_edgelow=0;           /* Freq. cutoff for low-pass edge filter */
+  double f_edgehigh=0;          /* Freq. cutoff for high-pass edge filter */
+  double f_notchlow[SMF__MXNOTCH]; /* Array low-freq. edges of notch filters */
+  double f_notchhigh[SMF__MXNOTCH];/* Array high-freq. edges of notch filters */
+  int f_nnotch=0;               /* Number of notch filters in array */
+  int f_nnotch2=0;              /* Number of notch filters in array */
   int flag;                     /* Flag */
   int haveext;                  /* Set if EXT is one of the models */
   int havenoi;                  /* Set if NOI is one of the models */
@@ -399,6 +410,35 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       }
     } else {
       spikeiter = 0;
+    }
+
+    if( !astMapGet0D( keymap, "FILT_EDGELOW", &f_edgelow ) ) {
+      f_edgelow = 0;
+      dofft = 1;
+    }
+
+    if( !astMapGet0D( keymap, "FILT_EDGEHIGH", &f_edgehigh ) ) {
+      f_edgehigh = 0;
+      dofft=1;
+    }
+
+    if( !astMapGet1D( keymap, "FILT_NOTCHLOW", SMF__MXNOTCH, &f_nnotch, 
+                     f_notchlow ) ) {
+      f_nnotch=0;
+    }
+
+    if( !astMapGet1D( keymap, "FILT_NOTCHHIGH", SMF__MXNOTCH, &f_nnotch2, 
+                     f_notchhigh ) ) {
+      f_nnotch2=0;
+    }
+
+    if( f_nnotch ) {
+      /* Number of upper and lower edges must match */
+      if( f_nnotch != f_nnotch2 ) {
+        f_nnotch = 0;
+      } else {
+        dofft = 1;
+      }
     }
 
     /* Maximum length of a continuous chunk */
@@ -871,6 +911,30 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 		msgOutif(MSG__VERB," ", "  ...finished in ^AITER iterations",
 		       status); 
 	      }
+
+              /* filter the data */
+              if( dofft ) {
+
+                msgOutif( MSG__VERB," ", "  frequency domain filter", status );
+              
+                filt = smf_create_smfFilter( data, status );
+                
+                if( f_edgelow ) {
+                  smf_filter_edge( filt, f_edgelow, 1, status );
+                }
+
+                if( f_edgehigh ) {
+                  smf_filter_edge( filt, f_edgehigh, 0, status );
+                }
+
+                if( f_nnotch ) {
+                  smf_filter_notch( filt, f_notchlow, f_notchhigh, f_nnotch,
+                                    status );
+                }
+
+                smf_filter_execute( data, filt, status );
+                filt = smf_free_smfFilter( filt, status );
+              }
 	    }
 	  }
 
@@ -1172,7 +1236,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	      }
 	      
 	      if( (res[i]->sdata[idx]->file->name)[0] ) {
-		smf_model_NDFexport( res[i]->sdata[idx], var_data, 
+		smf_NDFexport( res[i]->sdata[idx], var_data, 
 				     qua[i]->sdata[idx]->pntr[0], hdr,
 				     res[i]->sdata[idx]->file->name, 
 				     status );
@@ -1183,7 +1247,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	      }
 	      
 	      if( (ast[i]->sdata[idx]->file->name)[0] ) {
-		smf_model_NDFexport( ast[i]->sdata[idx], NULL, NULL, hdr, 
+		smf_NDFexport( ast[i]->sdata[idx], NULL, NULL, hdr, 
 				     ast[i]->sdata[idx]->file->name, 
 				   status );
 	      } else {
@@ -1200,7 +1264,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	      if( (*status == SAI__OK) && (modeltyps[j] != SMF__NOI) &&
 		  model[j][i]->sdata[idx] ) {
 		if( (model[j][i]->sdata[idx]->file->name)[0] ) {
-		  smf_model_NDFexport( model[j][i]->sdata[idx], NULL, NULL,  
+		  smf_NDFexport( model[j][i]->sdata[idx], NULL, NULL,  
 				       hdr, 
 				       model[j][i]->sdata[idx]->file->name, 
 				       status);

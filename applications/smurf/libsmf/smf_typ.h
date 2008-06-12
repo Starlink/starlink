@@ -167,6 +167,7 @@
 #define SMF_NAME_MAX GRP__SZFNM
 #define SMF__MXSMF 8      /* Maximum number of smfDatas in a smfArray */
 #define SMF__MB 1048576   /* SMURF definition of a megabyte = 2^20 */
+#define SMF__MXNOTCH 64   /* Arbitrary maximum number of notch filters */
 
 /* Minimum number of time samples for a data chunk to be useful*/
 #define SMF__MINCHUNKSAMP 100
