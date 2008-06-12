@@ -138,6 +138,7 @@
 #include "msg_par.h"
 #include "prm_par.h"
 #include "star/slalib.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "smf.h"
@@ -170,11 +171,10 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
   double newtwvm[3];       /* Array of WVM temperatures */
   size_t nframes = 0;      /* Number of frames */
   size_t npts = 0;         /* Number of data points */
-  dim_t nx;                /* # pixels in x-direction */
-  dim_t ny;                /* # pixels in y-direction */
+  dim_t nx = 0;            /* # pixels in x-direction */
+  dim_t ny = 0;            /* # pixels in y-direction */
   double oldtwvm[3] = {0.0, 0.0, 0.0}; /* Cached value of WVM temperatures */
-  const char *origsystem = '\0';  /* Character string to store the coordinate
-			      system on entry */
+  char origsystem[10];  /* Character string to store the coordinate system */
   double *vardata = NULL;  /* Pointer to variance array */
   AstFrameSet *wcs = NULL; /* Pointer to AST WCS frameset */
   int wvmr = 0;            /* Flag to denote whether the WVMRAW method
@@ -367,7 +367,8 @@ void smf_correct_extinction(smfData *data, const char *method, const int quick,
 	/* Check current frame, store it and then select the AZEL
 	   coordinate system */
 	if (wcs != NULL) {
-	  origsystem = astGetC( wcs, "SYSTEM");
+    one_strlcpy( origsystem, astGetC(wcs,"SYSTEM"),
+                 sizeof(origsystem), status);
 	  astSetC( wcs, "SYSTEM", "AZEL" );
 	  /* Transfrom from pixels to AZEL */
 	  astTran2(wcs, npts, xin, yin, 1, xout, yout );
