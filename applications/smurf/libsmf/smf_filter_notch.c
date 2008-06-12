@@ -143,7 +143,7 @@ void smf_filter_notch( smfFilter *filt, const double *f_low,
     
     /* Check for valid ranges */
     if( iedge_low < 0 ) {
-      /* No negative frequencies */
+      /* No negative frequencies allowed */
       *status = SAI__ERROR;
       msgSetd("F", (f_low[i]<f_high[i]) ? f_low[i]:f_high[i]);
       errRep( FUNC_NAME, "Filter edge ^F Hz cannot be < 0.", status );
