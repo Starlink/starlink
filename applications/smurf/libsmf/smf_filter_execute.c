@@ -47,7 +47,9 @@
 *     2008-06-11 (EC):
 *        Switched to "guru" FFTW interface to facilitate future multi-threading
 *     2008-06-12 (EC):
-*        -Switch to split real/imaginary arrays for smfFilter
+*        Switch to split real/imaginary arrays for smfFilter
+*     2008-06-13 (EC):
+*        Only create plans once since we're using guru interface
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -163,74 +165,69 @@ void smf_filter_execute( smfData *data, smfFilter *filt, int *status ) {
   iodim.is = 1;
   iodim.os = 1;
 
+  /* Setup forward FFT plan using guru interface */
+  plan_forward = fftw_plan_guru_split_dft_r2c( 1, &iodim, 0, NULL,
+                                               data->pntr[0], data_fft_r, 
+                                               data_fft_i, 
+                                               FFTW_ESTIMATE | 
+                                               FFTW_UNALIGNED);
+  
+  if( !plan_forward ) {
+    *status = SAI__ERROR;
+    errRep(FUNC_NAME, 
+           "FFTW3 could not create plan for forward transformation",
+           status);
+  }
+
+  /* Setup inverse FFT plan using guru interface */
+  plan_inverse = fftw_plan_guru_split_dft_c2r( 1, &iodim, 0, NULL,
+                                               data_fft_r, data_fft_i, 
+                                               data->pntr[0], FFTW_ESTIMATE | 
+                                               FFTW_UNALIGNED);
+  
+  if( !plan_inverse ) {
+    *status = SAI__ERROR;
+    errRep(FUNC_NAME, 
+           "FFTW3 could not create plan for inverse transformation",
+           status);
+  }
+   
   /* Filter the data one bolo at a time */
   for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
     /* Obtain pointer to the correct chunk of data */
     base = &((double *)data->pntr[0])[i*ntslice];
     
-    /* Setup forward FFT plan using guru interface */
-    plan_forward = fftw_plan_guru_split_dft_r2c( 1, &iodim, 0, NULL,
-                                                 base, data_fft_r, data_fft_i, 
-                                                 FFTW_ESTIMATE | 
-                                                 FFTW_UNALIGNED);
+    /* Execute forward transformation using the guru interface */
+    fftw_execute_split_dft_r2c( plan_forward, base, data_fft_r, data_fft_i );
 
-    if( !plan_forward ) {
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, 
-             "FFTW3 could not create plan for forward transformation",
-             status);
-    }
-
-    if( *status == SAI__OK ) {
-      /* Execute plan using the guru interface */
-      fftw_execute_split_dft_r2c( plan_forward, base, data_fft_r, data_fft_i );
-
-      /* Destroy the forward plan */ 
-      fftw_destroy_plan( plan_forward );
-
-      /* Apply the frequency-domain filter */
-      if( filt->isComplex ) {
-        for( j=0; j<ntslice/2+1; j++ ) {
-          /* Complex times complex, using only 3 multiplies */
-          ac = data_fft_r[j] * filt->real[j];
-          bd = data_fft_i[j] * filt->imag[j];
-
-          aPb = data_fft_r[j] + data_fft_i[j];
-          cPd = filt->real[j] + filt->imag[j];
-
-          data_fft_r[j] = ac - bd;
-          data_fft_i[j] = aPb*cPd - ac - bd;
-        }
-      } else { 
-        for( j=0; j<ntslice/2+1; j++ ) {
-          /* Complex times real */
-          data_fft_r[j] *= filt->real[j];
-          data_fft_i[j] *= filt->real[j];
-        }
-      }    
-
-      /* Setup inverse FFT plan using guru interface */
-      plan_inverse = fftw_plan_guru_split_dft_c2r( 1, &iodim, 0, NULL,
-                                                   data_fft_r, data_fft_i, 
-                                                   base, FFTW_ESTIMATE | 
-                                                   FFTW_UNALIGNED);
-
-      if( !plan_inverse ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, 
-               "FFTW3 could not create plan for inverse transformation",
-               status);
+    /* Apply the frequency-domain filter */
+    if( filt->isComplex ) {
+      for( j=0; j<ntslice/2+1; j++ ) {
+        /* Complex times complex, using only 3 multiplies */
+        ac = data_fft_r[j] * filt->real[j];
+        bd = data_fft_i[j] * filt->imag[j];
+        
+        aPb = data_fft_r[j] + data_fft_i[j];
+        cPd = filt->real[j] + filt->imag[j];
+        
+        data_fft_r[j] = ac - bd;
+        data_fft_i[j] = aPb*cPd - ac - bd;
       }
-    }
-
-    if( *status == SAI__OK ) {
-      /* Perform inverse transform using guru interface */
-      fftw_execute_split_dft_c2r( plan_inverse, data_fft_r, data_fft_i, base );
-      
-      /* Destroy the plan */ 
-      fftw_destroy_plan( plan_inverse );
-    }
+    } else { 
+      for( j=0; j<ntslice/2+1; j++ ) {
+        /* Complex times real */
+        data_fft_r[j] *= filt->real[j];
+        data_fft_i[j] *= filt->real[j];
+      }
+    }    
+    
+    /* Perform inverse transformation using guru interface */
+    fftw_execute_split_dft_c2r( plan_inverse, data_fft_r, data_fft_i, base );
   }
+
+  /* Destroy the plans */ 
+  fftw_destroy_plan( plan_forward );
+  fftw_destroy_plan( plan_inverse );
 
   /* Clean up */
   data_fft_r = smf_free( data_fft_r, status );
