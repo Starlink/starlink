@@ -94,11 +94,9 @@ void smf_filter_execute( smfData *data, smfFilter *filt, int *status ) {
   /* Local Variables */
   double ac, bd, aPb, cPd;      /* Components for complex multiplication */
   double *base;                 /* Pointer to start of current bolo in array */
-  double df;                    /* Width of frequency bin in FFT */
   double *data_fft_r;           /* Real part of the data FFT */
   double *data_fft_i;           /* Imaginary part of the data FFT */
   dim_t i;                      /* Loop counter */
-  dim_t icut;                   /* cutoff index for the filter */
   fftw_iodim iodim;             /* I/O dimensions for transformations */
   dim_t j;                      /* Loop counter */
   dim_t nbolo;                  /* Number of bolometers */
@@ -157,14 +155,13 @@ void smf_filter_execute( smfData *data, smfFilter *filt, int *status ) {
   if( *status != SAI__OK ) return;
 
   /* Allocate arrays for the FFT of the time-stream data. */
-  data_fft_r = smf_malloc( data_fft_r, sizeof(double), filt->dim, status );
-  data_fft_i = smf_malloc( data_fft_i, sizeof(double), filt->dim, status );
+  data_fft_r = smf_malloc( filt->dim, sizeof(*data_fft_r), 0, status );
+  data_fft_i = smf_malloc( filt->dim, sizeof(*data_fft_i), 0, status );
 
   /* Describe the input and output array dimensions for FFTW guru interface  */
   iodim.n = filt->ntslice;
   iodim.is = 1;
   iodim.os = 1;
-
 
   /* Filter the data one bolo at a time */
   for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
