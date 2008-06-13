@@ -46,11 +46,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2008 February 11 (MJC):
 *        Original version.
+*     2008 June 12 (TIMJ):
+*        Fix valgrind warning.
 *     {enter_changes_here}
 
 *-
@@ -163,6 +166,7 @@
 *  it requires that we read that named card first.  So choose the
 *  the TFORM1 card.  Note that by definition the table only has one
 *  column.
+      CDUMMY = ' '              ! Valgrind warning
       CALL FTGCRD( FUNIT, 'TFORM1', CDUMMY, FSTAT )
 
 *  Insert the TNULL1 card whose value is the bad/null value the integer 

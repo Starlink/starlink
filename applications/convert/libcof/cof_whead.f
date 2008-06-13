@@ -138,6 +138,7 @@
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -202,6 +203,8 @@
 *     10-JUN-2008 (DSB):
 *        Do not propagate ASTWARN cards from FITS extension to output
 *        header.
+*     12-JUN-2008 (TIMJ):
+*        Fix valgrind warning.
 *     {enter_further_changes_here}
 
 *-
@@ -505,6 +508,7 @@
          IF ( .NOT. PROVPR ) THEN
             CADCKY = .TRUE.
             PRVKEY = .TRUE.
+            PRVCOM = .TRUE.
          END IF
 
 *  Obtain the number of dimensions of the NDF.
