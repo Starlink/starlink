@@ -17048,7 +17048,9 @@ from one graphical element to another.
       Frame. The axes to select are determined using the supplied
       environment parameter. Each axis can be specified either by giving
       its index within the Frame in the range 1 to the number of axes in
-      the Frame, or by giving its symbol. If the first value supplied in
+      the Frame, or by giving its symbol. Spectral, time and celestial
+      longitude/latitude axes may also be specified using the options {\tt "}SPEC{\tt "},
+      {\tt "}TIME{\tt "}, {\tt "}SKYLON{\tt "} and {\tt "}SKYLAT{\tt "}. If the first value supplied in
       AXES is not zero, the supplied axes are used as the dynamic default
       for the parameter. The parameter value should be given as a GRP group
       expression, with default GRP control characters.
@@ -17108,7 +17110,9 @@ from one graphical element to another.
       Frame.  The axes to select are determined using the supplied
       environment parameter.  Each axis can be specified either by
       giving its index within the Frame in the range 1 to the number of
-      axes in the Frame, or by giving its symbol.  If the first value
+      axes in the Frame, or by giving its symbol.  Spectral, time and
+      celestial longitude/latitude axes may also be specified using the
+      options {\tt "}SPEC{\tt "}, {\tt "}TIME{\tt "}, {\tt "}SKYLON{\tt "} and {\tt "}SKYLAT{\tt "}.  If the first value
       supplied in AXES is not zero, the supplied axes are used as the
       dynamic default for the parameter.  The parameter value should be
       given as a GRP group expression, with default GRP control
@@ -34930,7 +34934,7 @@ from one graphical element to another.
 
       For example, consider a group containing the following lines:
 
-      gaussclumps.epsilon = 0.001
+      gaussclumps.epsilon = (0.001,0.002)
       gaussclumps.contrast = 2.3
       clumpfind.naxis = 2
       clumpfind.deltat = 2.0
@@ -34938,12 +34942,13 @@ from one graphical element to another.
 
       The returned KeyMap will contain 3 entries with keys {\tt "}gaussclumps{\tt "},
       {\tt "}clumpfind{\tt "} and {\tt "}method{\tt "}. The value associated with the {\tt "}gaussclumps{\tt "}
-      entry will be another KeyMap containing keys {\tt "}epsilon{\tt "} and {\tt "}contrast{\tt "},
-      which will have primitive values {\tt "}0.001{\tt "} and {\tt "}2.3{\tt "}. The value
-      associated with the {\tt "}clumpfind{\tt "} entry will be another KeyMap
-      containing keys {\tt "}naxis{\tt "} and {\tt "}deltat{\tt "}, which will have primitive
-      values {\tt "}2{\tt "} and {\tt "}2.0{\tt "}. The value associated with the {\tt "}method{\tt "} entry
-      will be the primitive value {\tt "}gaussclumps{\tt "}.
+      entry will be another KeyMap containing keys {\tt "}epsilon{\tt "} (a primitive
+      vector entry containing the values 0.001 and 0.002) and {\tt "}contrast{\tt "}
+      (a primitive scalar entry with value {\tt "}2.3{\tt "}). The value associated with
+      the {\tt "}clumpfind{\tt "} entry will be another KeyMap containing keys {\tt "}naxis{\tt "}
+      and {\tt "}deltat{\tt "}, which will have primitive scalar values {\tt "}2{\tt "} and {\tt "}2.0{\tt "}.
+      The value associated with the {\tt "}method{\tt "} entry will be the primitive
+      scalar value {\tt "}gaussclumps{\tt "}.
    }
    \sstinvocation{
       CALL KPG1\_KYMAP( IGRP, KEYMAP, STATUS )
@@ -34969,6 +34974,11 @@ from one graphical element to another.
    }
    \sstnotes{
       \sstitemlist{
+
+         \sstitem
+         Vector elements should be separated by commas and enclosed within
+         parentheses (commas and closing parentheses can be included literally
+         in a vector element by preceeding them with a backslash).
 
          \sstitem
          Component names must contain only alphanumerical characters,

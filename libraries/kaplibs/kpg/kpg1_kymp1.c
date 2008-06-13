@@ -33,7 +33,7 @@ void kpg1Kymp1( Grp *igrp, AstKeyMap **keymap, int *status ){
 *
 *     For example, consider a group containing the following lines:
 *
-*     gaussclumps.epsilon = 0.001
+*     gaussclumps.epsilon = (0.001,0.002)
 *     gaussclumps.contrast = 2.3
 *     clumpfind.naxis = 2
 *     clumpfind.deltat = 2.0
@@ -41,12 +41,13 @@ void kpg1Kymp1( Grp *igrp, AstKeyMap **keymap, int *status ){
 *
 *     The returned KeyMap will contain 3 entries with keys "gaussclumps",
 *     "clumpfind" and "method". The value associated with the "gaussclumps"
-*     entry will be another KeyMap containing keys "epsilon" and "contrast", 
-*     which will have primitive values "0.001" and "2.3". The value 
-*     associated with the "clumpfind" entry will be another KeyMap 
-*     containing keys "naxis" and "deltat", which will have primitive 
-*     values "2" and "2.0". The value associated with the "method" entry 
-*     will be the primitive value "gaussclumps".
+*     entry will be another KeyMap containing keys "epsilon" (a primitive
+*     vector entry containing the values 0.001 and 0.002) and "contrast"
+*     (a primitive scalar entry with value "2.3"). The value associated with 
+*     the "clumpfind" entry will be another KeyMap containing keys "naxis" 
+*     and "deltat", which will have primitive scalar values "2" and "2.0". 
+*     The value associated with the "method" entry will be the primitive 
+*     scalar value "gaussclumps".
 
 *  Arguments:
 *     igrp
@@ -60,6 +61,9 @@ void kpg1Kymp1( Grp *igrp, AstKeyMap **keymap, int *status ){
 *        Pointer to the global status variable.
 
 *  Notes:
+*     - Vector elements should be separated by commas and enclosed within
+*     parentheses (commas and closing parentheses can be included
+*     literally in a vector element by preceeding them with a backslash).
 *     - This function provides a private implementation for the public
 *     KPG1_KYMAP Fortran routine and kpg1Kymap C function.
 *     - Component names must contain only alphanumerical characters,
