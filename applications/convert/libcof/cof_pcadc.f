@@ -62,6 +62,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -79,6 +80,8 @@
 *        the number of parents.
 *     2008 May 19 (MJC):
 *        Write FILEID keyword.
+*     2008 Jun 12 (TIMJ):
+*        Fix some valgrind warnings. FNAME used incorrectly for PATH.
 *     {enter_further_changes_here}
 
 *-
@@ -198,7 +201,7 @@
 *  Extract the name excluding the file extension. 
 *  *** Assume UNIX for the moment. ***
                CALL CHR_LASTO( PATH, '/', CPOS )
-               CALL CHR_LASTO( FNAME, '.', SOE )
+               CALL CHR_LASTO( PATH, '.', SOE )
                IF ( SOE .EQ. 0 ) SOE = CHR_LEN( PATH ) + 1
 
                NAME = PATH( CPOS + 1 : SOE - 1 )
@@ -312,6 +315,7 @@
 *  =============
 
 *  Inquire the filename.
+         FNAME = ' '            ! valgrind warnings
          CALL FTFLNM( FUNIT, FNAME, STATUS )
 
 *  *** Alert!  UNIX assumption. *** We need a generic routine to extract
