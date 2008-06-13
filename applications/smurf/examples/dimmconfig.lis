@@ -1,7 +1,7 @@
 # Number of iterations
 #  postive number  = fixed number of iterations
 #  negative number = maximum iterations if using chi^2 stopping criteria
-numiter = 10
+numiter = 1
 
 # chi^2 tolerance in negative-numiter case (requires noi model component)
 chitol = 1e-6
@@ -38,7 +38,8 @@ memiter = 1
 # data. If 0 attempt to concatenate entire continuous chunks.
 maxlen = 0
 
-# The following are for data cleaning. Disable until we know what we need...
+# ----------------------------------------------------------------------------
+# The following are for data cleaning. 
 
 # fraction of samples to be bad to flag entire bolo as dead
 badfrac = 0.05
@@ -57,4 +58,19 @@ badfrac = 0.05
 
 # Number of iterations for sigma-clipper (0=until convergence)
 # spikeiter = 0
+
+# Hard-edge high-pass frequency-domain filter 
+#   e.g. keep only frequencies >= 0.1 Hz
+filt_edgehigh = 0.1
+
+# Hard-edge low-pass frequency-domain filter
+#   e.g. keep only frequencies <= 90 Hz
+filt_edgelow = 90
+
+# Hard-edge band-cut frequency-domain notch filters.
+# filt_notchlow gives lower edges of frequencies to cut in Hz
+# filt_notchhigh gives upper edges of frequencies to cut in Hz
+#   e.g. remove 25--35 Hz  and 55--65 Hz
+#filt_notchlow  = (25,55)
+#filt_notchhigh = (35,65)
 
