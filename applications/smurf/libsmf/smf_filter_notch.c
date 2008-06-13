@@ -31,7 +31,7 @@
 *  Return Value:
 
 *  Description:
-*     This function applies n hard-edged notch files to a
+*     This function applies n hard-edged notch filters to a
 *     smfFilter. The power at all frequencies in the ranges f_low[i] to
 *     f_hi[i] (inclusive) are set to 0. The conversion of frequencies
 *     to discrete bins in the filter is accomplished by rounding. This
