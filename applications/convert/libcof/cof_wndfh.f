@@ -102,6 +102,9 @@
 *        Use KAPLIBS routines instead of their cloned CON equivalents.
 *     2008 April 1 (MJC):
 *        Do not write blank BUNIT.
+*     2008 June 12 (TIMJ):
+*        When modifying units of variance component, allow for the
+*        possibility of trailing spaces.
 *     {enter_further_changes_here}
 
 *-
@@ -134,6 +137,7 @@
 
 *  External References:
       LOGICAL COF_ISWCS           ! FITS extension contains usable WCS?
+      INTEGER CHR_LEN             ! Length of string
 
 *  Local Constants:
       LOGICAL EXTEND              ! May contain FITS extensions
@@ -560,6 +564,7 @@
             KEYWRD = 'BUNIT  '
 
             IF ( COMP .EQ. 'VARIANCE' ) THEN
+               NCHAR = CHR_LEN( VALUE )
                VALUE = '('//VALUE( :NCHAR )//')**2'
                NCHAR = NCHAR + 5
                UNICOM = 'Units of the Variance array'
