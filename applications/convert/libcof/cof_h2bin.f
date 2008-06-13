@@ -75,6 +75,8 @@
 *     2006 April 7 (MJC):
 *        Use the correct FITISO routine names in two COF_FIOER calls.
 *        Some tidying.
+*     2008 June 13 (MJC):
+*        Only attempt to write null value for integer-valued columns.
 *     {enter_further_changes_here}
 *-
       
@@ -872,7 +874,7 @@
 
 *  Convert the type to the binary-table code.
                      CALL COF_HT2BN( TYPE, SIZE, TFORM( NOPRIM ),
-     :                                STATUS )
+     :                               STATUS )
 
 *  Assign a null units.
                      TUNIT( NOPRIM ) = ' '
@@ -1000,36 +1002,45 @@
                         CALL DAT_TYPE( LCMP, TYPE, STATUS )
                         CALL DAT_ANNUL( LCMP, STATUS )
 
+*  An integer type must have its null value defined before it is used.
+*  Floating-point values take defined NaN values.
+                        IF ( TYPE .EQ. '_BYTE' .OR. 
+     :                       TYPE .EQ. '_UBYTE' .OR.
+     :                       TYPE .EQ. '_WORD' .OR. 
+     :                       TYPE .EQ. '_UWORD' .OR.
+     :                       TYPE .EQ. '_INTEGER' ) THEN
+
 *  Assign the bad/null value for each of the integer data types.
-                        IF ( TYPE .EQ. '_BYTE' ) THEN
-                           INULL = NUM_BTOI( VAL__BADB )
-                        ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
-                           INULL = NUM_UBTOI( VAL__BADUB )
-                        ELSE IF ( TYPE .EQ. '_WORD' ) THEN
-                           INULL = NUM_WTOI( VAL__BADW )
-                        ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
-                           INULL = NUM_UWTOI( VAL__BADUW )
-                        ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
-                           INULL = VAL__BADI
-                        END IF
+                           IF ( TYPE .EQ. '_BYTE' ) THEN
+                              INULL = NUM_BTOI( VAL__BADB )
+                           ELSE IF ( TYPE .EQ. '_UBYTE' ) THEN
+                              INULL = NUM_UBTOI( VAL__BADUB )
+                           ELSE IF ( TYPE .EQ. '_WORD' ) THEN
+                              INULL = NUM_WTOI( VAL__BADW )
+                           ELSE IF ( TYPE .EQ. '_UWORD' ) THEN
+                              INULL = NUM_UWTOI( VAL__BADUW )
+                           ELSE IF ( TYPE .EQ. '_INTEGER' ) THEN
+                              INULL = VAL__BADI
+                           END IF
 
 *  Form the name of the TNULLn keyword.
-                        NC = 5
-                        CRDNAM = 'TNULL'
-                        CALL CHR_APPND( CN, CRDNAM, NC )
+                           NC = 5
+                           CRDNAM = 'TNULL'
+                           CALL CHR_APPND( CN, CRDNAM, NC )
 
 *  Insert the TNULLn card.
-                        CALL FTIKYJ( FUNIT, CRDNAM, INULL,
-     :                               'Starlink bad value', FSTAT )
+                           CALL FTIKYJ( FUNIT, CRDNAM, INULL,
+     :                                  'Starlink bad value', FSTAT )
 
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  Specify from which routine the error arose.
-                        IF ( FSTAT .GT. FITSOK ) THEN
-                           CALL COF_FIOER( FSTAT,
-     :                       'COF_H2BIN_ERR7', 'FTIKYJ',
-     :                       'Error writing '//CRDNAM( :NC )//' card '/
-     :                       /'for a binary table.', STATUS )
-                           GOTO 999
+                           IF ( FSTAT .GT. FITSOK ) THEN
+                              CALL COF_FIOER( FSTAT,
+     :                          'COF_H2BIN_ERR7', 'FTIKYJ',
+     :                          'Error writing '//CRDNAM( :NC )//' '/
+     :                          /'card for a binary table.', STATUS )
+                              GOTO 999
+                           END IF
                         END IF
                      END DO
                   END IF
