@@ -285,6 +285,7 @@
 *  it requires that we read that named card first.  So choose the
 *  the TFORM1 card.  Note that by definition the table only has one
 *  column.
+            CDUMMY = ' '        ! valgrind
             CALL FTGCRD( FUNIT, 'TFORM1', CDUMMY, FSTAT )
 
 *  Assign the bad/null value for each of the integer data types.
@@ -333,6 +334,7 @@
 
 *  FITSIO does not permit cards to be placed after a named card; 
 *  it requires that we read that named card first.
+            CDUMMY = ' '        ! valgrind
             CALL FTGCRD( FUNIT, 'TFORM1', CDUMMY, FSTAT )
 
 *  Insert the TDIM1 card.
@@ -987,6 +989,7 @@
 
 *  FITSIO does not permit cards to be placed after a named card; 
 *  it requires that we read that named card first.
+                        CDUMMY = ' ' ! valgrind
                         CALL FTGCRD( FUNIT, CRDNAM, CDUMMY, FSTAT )
 
 *  Get a locator to the object so that we can determine its data type.
