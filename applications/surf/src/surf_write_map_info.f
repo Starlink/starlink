@@ -2,7 +2,7 @@
      :     OUT_UNITS, MJD_STANDARD, NFILE, FILENAME, OUT_LONG, OUT_LAT,
      :     OUT_PIXEL, I_CENTRE, J_CENTRE, NX_OUT, NY_OUT, WAVELENGTH,
      :     FILTER, WRITE_CHOP, CHOP_CRD, CHOP_PA, CHOP_THROW, 
-     :     WPLATE, ANGROT, TELESCOPE, INSTRUMENT, FITSCHANM,
+     :     WPLATE, ANGROT, TELESCOPE, INSTRUMENT, FITSCHANM, OUTWCS,
      :     STATUS)
 *+
 *  Name:
@@ -19,7 +19,7 @@
 *    :     MJD_STANDARD, NFILE, FILENAME, OUT_LONG, OUT_LAT,
 *    :     OUT_PIXEL, I_CENTRE, J_CENTRE, NX_OUT, NY_OUT, WAVELENGTH
 *    :     FILTER, WRITE_CHOP, CHOP_PA, CHOP_THROW, WPLATE, ANGROT, 
-*    :     TELESCOPE, INSTRUMENT, FITSCHAN, STATUS )
+*    :     TELESCOPE, INSTRUMENT, FITSCHAN, OUTWCS, STATUS )
 
 *  Description:
 *     This routine writes Axis, FITS and WCS information to a rebinned
@@ -81,6 +81,8 @@
 *        Name of instrument to write to FITS header
 *     FITSCHANM = INTEGER (Given)
 *        Merged FITS channel from all input files.
+*     OUTWCS = INTEGER (Returned)
+*        Output Framest. Can be used for WEIGHTS and EXP_TIME
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 
@@ -88,7 +90,6 @@
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
 *     JFL:  John Lightfoot (RoE)
-
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -133,6 +134,8 @@
 *        - Warn if frequency can not be written when Wavelength is zero.
 *     2008 June 14 (TIMJ):
 *        - Write OBSGEO headers. Retain DATE-OBS.
+*        - Now writes merged fits chan from all input files
+*        - Export WCS back to caller so it can be written to extensions
 *     {write_additional_history_here}
 
 *  Bugs:
@@ -174,6 +177,7 @@
       REAL             OUT_PIXEL
       CHARACTER * (*)  OUT_TITLE
       CHARACTER * (*)  OUT_UNITS
+      INTEGER          OUTWCS
       CHARACTER*(*)    TELESCOPE
       LOGICAL          USEWCS
       REAL             WAVELENGTH
@@ -232,13 +236,14 @@
       DOUBLE PRECISION RDEPOCH  ! Julian epoch of given MJD
       CHARACTER * (80) XLAB     ! X axis label
       CHARACTER * (80) YLAB     ! Y axis label 
-      INTEGER          WCSINFO  ! WCS AST information
 
 *  Local Data:
       DATA RETAINFITS / 'DATE-OBS', 'OBSGEO-X', 'OBSGEO-Y',
      :     'OBSGEO-Z' /
 
 *.
+
+      OUTWCS = AST__NULL
 
 *     Check status
       IF (STATUS .NE. SAI__OK) RETURN
@@ -599,14 +604,14 @@
          
 *     Rewind the FitsChan and read WCS information from it.
          CALL AST_CLEAR( FITSCHAN, 'Card', STATUS )
-         WCSINFO = AST_READ( FITSCHAN, STATUS )
+         OUTWCS = AST_READ( FITSCHAN, STATUS )
 
 *     Set the base frame to be GRID
-         FRAME = AST_GETFRAME( WCSINFO, AST__BASE, STATUS )
+         FRAME = AST_GETFRAME( OUTWCS, AST__BASE, STATUS )
          CALL AST_SETC( FRAME, 'Domain', 'GRID', STATUS )
          
 *     Write the channel to the NDF
-         CALL NDF_PTWCS( WCSINFO, OUT_NDF, STATUS )
+         CALL NDF_PTWCS( OUTWCS, OUT_NDF, STATUS )
 
 *     Now copy the remaining FITS keywords from the FITSCHAN
 *     back into the FITS array so that we can write them
@@ -626,7 +631,7 @@
          END DO
 
 *     Shut down AST
-         CALL AST_ANNUL( WCSINFO, STATUS )
+         CALL AST_EXPORT( OUTWCS, STATUS )
          CALL AST_ANNUL( FITSCHAN, STATUS )
          CALL AST_END( STATUS )
 

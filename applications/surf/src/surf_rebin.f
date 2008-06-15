@@ -248,7 +248,8 @@
 
 *  History:
 *     14-JUN-2008 (TIMJ):
-*        Calculate merged output fits header from inputs
+*        - Calculate merged output fits header from inputs
+*        - Write WCS to TIMES and WEIGHTS extensions.
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
@@ -761,6 +762,7 @@ c
       INTEGER          OUT_WEIGHT_NDF  ! NDF identifier for weight array
       INTEGER          OUT_WEIGHT_END  ! Pointer to end weights array
       INTEGER          OUT_WEIGHT_PTR  ! Pointer to weights array
+      INTEGER          OUTWCS          ! Frameset for output pixel grid
       REAL             PARS(3)         ! Dummy array of parameter values
       CHARACTER * (PAR__SZNAM) PARAM   ! Name of input parameter
       INTEGER          PLACE           ! Place holder for output NDF
@@ -2534,7 +2536,7 @@ c
      :                 MAP_SIZE(1), MAP_SIZE(2), WAVELENGTH, STEMP,
      :                 OKAY, CHOP_CRD, CHOP_PA, CHOP_THROW, 
      :                 WPLATE, ANGROT, TELESCOPE, INSTRUMENT, FITSCHAN,
-     :                 STATUS )
+     :                 OUTWCS, STATUS )
                   
 
 *     Create a REDS extension
@@ -2562,6 +2564,12 @@ c
      :                    %VAL(CNF_PVAL(OUT_WEIGHT_PTR)), 
      :                    %VAL(CNF_PVAL(NDF_PTR)), IERR,
      :                    NERR, STATUS)
+
+*     Write WCS
+                     IF (OUTWCS .NE. AST__NULL) THEN
+                        CALL NDF_PTWCS( OUTWCS, OUT_WEIGHT_NDF,
+     :                       STATUS)
+                     END IF
 
 *     Unmap the weights NDF
                      CALL NDF_UNMAP(OUT_WEIGHT_NDF, '*', STATUS)
@@ -2626,6 +2634,12 @@ c
                         CALL SCULIB_FREE('IJs',IJ_PTR, IJ_PTR_END,
      :                       STATUS)
                      END DO
+
+*     Write WCS
+                     IF (OUTWCS .NE. AST__NULL) THEN
+                        CALL NDF_PTWCS( OUTWCS, OUT_WEIGHT_NDF,
+     :                       STATUS)
+                     END IF
 
 *     Free everything
                      CALL SCULIB_FREE('DummyQual', OUT_QUALITY_PTR,
@@ -2708,6 +2722,7 @@ c
 
       CALL NDF_END (STATUS)
 
+      IF (OUTWCS .NE. AST__NULL) CALL AST_ANNUL( OUTWCS, STATUS)
       CALL AST_END(STATUS)
 
       END
