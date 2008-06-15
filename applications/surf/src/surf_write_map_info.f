@@ -94,52 +94,44 @@
 *     Research Council. All Rights Reserved.
 
 *  History:
-*     1997 April 08 (TIMJ)
+*     1997 April 08 (TIMJ):
 *        Extract from reds_wtfn_rebin.f
-*     1997 May 12 (TIMJ)
+*     1997 May 12 (TIMJ):
 *        Remove FITS from input arguments
-* $Log$
-* Revision 1.5  2005/03/18 06:28:50  timj
-* warn if frequency can not be written because wavelength is zero
-*
-* Revision 1.4  2004/11/18 20:37:46  timj
-* Forgot to pass STATUS into PSX_TIME
-*
-* Revision 1.3  2004/11/18 20:37:24  timj
-* Annul AST objects
-*
-* Revision 1.2  2004/09/08 02:03:35  timj
-* Add CNF_PVAL where appropriate
-*
-* Revision 1.1  2004/07/14 02:57:34  timj
-* no fpp in there
-*
-* Revision 1.18  2003/04/02 01:02:42  timj
-* - Units for FITS headers now appear at the start of the comment
-* - Use PSX_GMTIME rather than GMTIME
-*
-* Revision 1.17  2000/07/07 03:24:34  timj
-* Fix typo in FITS comment
-*
-* Revision 1.16  2000/06/23 20:00:05  timj
-* - Add DATE and ORIGIN keywords
-* - Add HH:MM:SS to DATE-OBS field
-*
-* Revision 1.15  1999/08/19 03:37:45  timj
-* Header tweaks to ease production of SSN72 documentation.
-*
-* Revision 1.14  1999/08/03 20:01:44  timj
-* Add copyright message to header.
-* Minor fixes to header style.
-*
-* Revision 1.13  1999/07/14 19:20:49  timj
-* Pass TELESCOPE and INSTRUMENT in from above.
-*
-* Revision 1.12  1999/05/15 01:52:14  timj
-* Remove IRAS90 code.
-* Make sure that WCS extracts FITS keywords before
-* writing them to disk.
-*
+*     1997 May 13 (TIMJ):
+*        Add support for PL.
+*     1998 April 28 (TIMJ):
+*        Write chop information to FITS
+*     1999 May 15 (TIMJ):
+*        - Remove IRAS90 code
+*        - make sure that WCS extracts FITS keywords before writing to disk.
+*     1999 July 14 (TIMJ):
+*        Pass TELESCOPE and INSTRUMENT in from above.
+*     1999 August 3 (TIMJ):
+*        Add copyyright to header.
+*        Minor fixes to header style.
+*     1999 August 19 (TIMJ):
+*        Header tweaks to help SSN/72 creation
+*     2000 June 23 (TIMJ):
+*        - Add DATE and ORIGIN keywords
+*        - Add HH:MM:SS to DATE-OBS field
+*     2000 July 7 (TIMJ):
+*        Fix typo in FITS comment
+*     2003 April 2 (TIMJ):
+*        - Units for FITS headers now appear at start of comment
+*        - Use PSX_GMTIME rather than GMTIME
+*     2004 July 14 (TIMJ):
+*        No FPP so rename file to .f
+*     2004 September 8 (TIMJ):
+*        Add CNF_PVAL where appropriate.
+*     2004 November 18 (TIMJ):
+*        - Annul AST objects
+*        - Forgot to pass STATUS into PSX_TIME
+*     2005 March 18 (TIMJ):
+*        - Warn if frequency can not be written when Wavelength is zero.
+*     2008 June 14 (TIMJ):
+*        - Write OBSGEO headers. Retain DATE-OBS.
+*     {write_additional_history_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
