@@ -242,10 +242,13 @@
 
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 1995-2006 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  History:
+*     14-JUN-2008 (TIMJ):
+*        Calculate merged output fits header from inputs
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
@@ -518,6 +521,7 @@ c
       IMPLICIT NONE
 
 *  Global constants:
+      INCLUDE 'AST_PAR'                ! AST__ constants
       INCLUDE 'DAT_PAR'                ! DAT__ constants
       INCLUDE 'MSG_PAR'                ! MSG__ constants
       INCLUDE 'NDF_PAR'                ! for NDF__xxxx constants
@@ -627,6 +631,9 @@ c
       INTEGER          FILE            ! number of input files read
       CHARACTER*128    FILENAME (MAX_FILE)
                                        ! names of input files read
+      INTEGER          FITSCHAN        ! Merged AST FITS channel
+      INTEGER          FITSTEMP        ! Temporary FITS channel
+      INTEGER          FITSTEMPM       ! Temporary Merged FITS channel
       CHARACTER*80     FITS(SCUBA__MAX_FITS, MAX_FILE)
                                        ! FITS entries for each file
       LOGICAL          HAVE_MODEL      ! .TRUE. if CALCSKY is using a 
@@ -635,6 +642,7 @@ c
       LOGICAL          HOURS           ! .TRUE. if the angle being read in is
                                        ! in units of hours rather than degrees
       INTEGER          I               ! DO loop index
+      INTEGER          ICARD           ! Counter for FITS cards
       INTEGER          IERR            ! For VEC copies
       INTEGER          IJ_PTR_END      ! End of scratch pointer
       INTEGER          IJ_PTR          ! Scratch pointer
@@ -838,6 +846,8 @@ c
       ISNEWPV = .FALSE.
       ISNEWPR = .FALSE.
       ISNEWPC = .FALSE.
+
+      CALL AST_BEGIN( STATUS )
 
 * Setup taskname (can never have BOLREBIN and INTREBIN)
 
@@ -1149,6 +1159,44 @@ c
 
          END IF
       END IF
+
+*     Since this code was written the ATL and AST libraries make header
+*     merging trivial. In the past we were forced to make up an output
+*     FITS header and throw away most of the input information. Now we
+*     go through each fits header and merge it into a single output fitschan
+
+      DO I = 1, FILE
+*     Create a temporary fits chan from this header
+*     (obviously we should replace all SURF use of FITS() and N_FITS
+*     with a FITSCHAN but be reasonable)
+*     First time through use the main fitschan, otherwise create new one
+         
+         FITSTEMP = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS)
+
+*     Skip headers that are SUB_N FILT_N etc
+         DO ICARD = 1, N_FITS(I)
+            IF (.NOT. AST_CHRSUB(FITS(ICARD,I),
+     :           '_\d\s*=', STEMP, STATUS ) .AND.
+     :           FITS(ICARD,I)(1:8) .NE. 'NDFUNITS' .AND.
+     :           FITS(ICARD,I) .NE. 'END'
+     :           ) THEN
+               CALL AST_PUTFITS( FITSTEMP, FITS( ICARD, I ), .FALSE., 
+     :              STATUS )
+            END IF
+         END DO
+
+*     Only merge after first file
+         IF (I .GT. 1) THEN
+            CALL ATL_MGFTS( 3, FITSTEMP, FITSCHAN, FITSTEMPM,
+     :           STATUS)
+            CALL AST_ANNUL( FITSCHAN, STATUS )
+            CALL AST_ANNUL( FITSTEMP, STATUS )
+            FITSCHAN = FITSTEMPM
+         ELSE
+            FITSCHAN = FITSTEMP
+         END IF
+      END DO
+
 
 *     Check that the CHOP_PA matches if we are using SCAN/MAP
 *     with LO chopping
@@ -2485,7 +2533,7 @@ c
      :                 OUT_LONG, OUT_LAT, OUT_PIXEL, I_CENTRE, J_CENTRE,
      :                 MAP_SIZE(1), MAP_SIZE(2), WAVELENGTH, STEMP,
      :                 OKAY, CHOP_CRD, CHOP_PA, CHOP_THROW, 
-     :                 WPLATE, ANGROT, TELESCOPE, INSTRUMENT,
+     :                 WPLATE, ANGROT, TELESCOPE, INSTRUMENT, FITSCHAN,
      :                 STATUS )
                   
 
@@ -2658,7 +2706,8 @@ c
 
       END DO
 
-
       CALL NDF_END (STATUS)
+
+      CALL AST_END(STATUS)
 
       END

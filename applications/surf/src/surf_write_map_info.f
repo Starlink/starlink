@@ -2,7 +2,7 @@
      :     OUT_UNITS, MJD_STANDARD, NFILE, FILENAME, OUT_LONG, OUT_LAT,
      :     OUT_PIXEL, I_CENTRE, J_CENTRE, NX_OUT, NY_OUT, WAVELENGTH,
      :     FILTER, WRITE_CHOP, CHOP_CRD, CHOP_PA, CHOP_THROW, 
-     :     WPLATE, ANGROT, TELESCOPE, INSTRUMENT,
+     :     WPLATE, ANGROT, TELESCOPE, INSTRUMENT, FITSCHANM,
      :     STATUS)
 *+
 *  Name:
@@ -19,7 +19,7 @@
 *    :     MJD_STANDARD, NFILE, FILENAME, OUT_LONG, OUT_LAT,
 *    :     OUT_PIXEL, I_CENTRE, J_CENTRE, NX_OUT, NY_OUT, WAVELENGTH
 *    :     FILTER, WRITE_CHOP, CHOP_PA, CHOP_THROW, WPLATE, ANGROT, 
-*    :     STATUS )
+*    :     TELESCOPE, INSTRUMENT, FITSCHAN, STATUS )
 
 *  Description:
 *     This routine writes Axis, FITS and WCS information to a rebinned
@@ -79,6 +79,8 @@
 *        Name of telescope to write to FITS header
 *     INSTRUMENT = CHARACTER (Given)
 *        Name of instrument to write to FITS header
+*     FITSCHANM = INTEGER (Given)
+*        Merged FITS channel from all input files.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
 
@@ -158,6 +160,7 @@
       REAL             CHOP_THROW
       CHARACTER*(*)    FILENAME (NFILE)
       CHARACTER*(*)    FILTER
+      INTEGER          FITSCHANM
       CHARACTER*(*)    INSTRUMENT
       INTEGER          I_CENTRE
       INTEGER          J_CENTRE
@@ -203,6 +206,7 @@
       INTEGER          FITSCHAN ! AST FITS channel
       INTEGER          FRAME    ! Base frame for WCS/AST
       DOUBLE PRECISION FREQ     ! Frequency of observation
+      INTEGER          FTEMP    ! Temporary fits chan
       INTEGER          I        ! Counter
       INTEGER          ICARD    ! Counter for FITS cards
       INTEGER          ID       ! day of an input observation
@@ -570,13 +574,18 @@
       IF (USEWCS) THEN
          CALL AST_BEGIN( STATUS )
 
-*     Create a FitsChan and fill it with FITS header cards.
-         FITSCHAN = AST_FITSCHAN( AST_NULL, AST_NULL, 
-     :        ' ', STATUS )
+*     Create a new fitschan from these new cards
+         FITSCHAN = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS)
          DO ICARD = 1, N_FITS
             CALL AST_PUTFITS( FITSCHAN, FITS( ICARD ), .FALSE., 
      :           STATUS )
          END DO
+
+*     Merge with the input fitschan giving priority to the newer
+*     header.
+         CALL ATL_MGFTS( 2, FITSCHANM, FITSCHAN, FTEMP, STATUS)
+         CALL AST_ANNUL( FITSCHAN, STATUS )
+         FITSCHAN = FTEMP
 
 *     Retain some keywords in the FITS header itself
          DO I = 1, NRETAIN
