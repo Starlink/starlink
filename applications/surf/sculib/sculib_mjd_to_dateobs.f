@@ -26,6 +26,7 @@
 *     Tim Jenness (JAC, Hawaii)
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2000 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
@@ -34,11 +35,14 @@
 *        First version for SPECX
 *     22-Jun-2000 (TIMJ):
 *        Converted to SCULIB with inherited status
+*     15-JUN-2008 (TIMJ):
+*        Drop Z from suffix (not part of standard).
+*        Always write modern format even in old data.
 
 *  Notes:
-*     The format used for the DATE-OBS keyword depends on the value of the
-*     keyword. For DATE-OBS < 1999.0, use the old "dd/mm/yy" format.
-*     Otherwise, use the new "ccyy-mm-ddThh:mm:ss[.ssss]Z" format.
+*     Always write out the DATE-OBS string in modern format. Originally
+*     this routine would use "dd/mm/yy" for dates earlier than 1999 but this
+*     makes no sense. Now uses ISO8601 as modified by FITS (no Z).
 
 *-
 
@@ -58,8 +62,6 @@
       INTEGER STATUS
 
 *  Local constants:
-      DOUBLE PRECISION MJD99    ! MJD of 1 Jan 1999
-      PARAMETER ( MJD99 = 51179.0D0 )
 
 *  Local Variables:
       INTEGER DD                ! Day in month
@@ -88,28 +90,13 @@
          RETURN
       END IF
 
-*     Is the date above or below the transition
-      IF (MJD .LT. MJD99) THEN
-
-*     Convert year to 2-digit. Note that we already know that
-*     we are less than 2000 because of the above test
-         YY = MOD(YY, 100)
-
-         WRITE (DATE_OBS, '(I2.2,''/'',I2.2,''/'',I2.2)') DD, MM, YY
-
-      ELSE
-*     We are above the transition date so we must use the new FITS
-*     DATE-OBS format
-
 *     First convert the day fraction to Hours, minutes and seconds
          CALL SLA_DD2TF(3, FD, SIGN, IHMSF)
 
 *     Insert the values into the string
          WRITE (DATE_OBS, '(I4.4,''-'',I2.2,''-'',I2.2,''T'',
-     :        I2.2,'':'',I2.2,'':'',I2.2,''.'',I3.3,''Z'')')
+     :        I2.2,'':'',I2.2,'':'',I2.2,''.'',I3.3)')
      :        YY, MM, DD, IHMSF(1), IHMSF(2), IHMSF(3), IHMSF(4)
 
-
-      END IF
 
       END
