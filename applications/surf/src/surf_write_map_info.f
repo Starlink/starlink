@@ -89,7 +89,8 @@
 
 
 *  Copyright:
-*     Copyright (C) 1995,1996,1997,1998,1999 Particle Physics and Astronomy
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 1995-2005 Particle Physics and Astronomy
 *     Research Council. All Rights Reserved.
 
 *  History:
@@ -196,6 +197,8 @@
       PARAMETER (VLIGHT = 299792458.0D0)
       DOUBLE PRECISION MJD99    ! MJD of 1 Jan 1999
       PARAMETER ( MJD99 = 51179.0D0 )
+      INTEGER NRETAIN           ! Number of FITS headers to retain
+      PARAMETER ( NRETAIN = 4 )
 
 *  Local Variables:
       CHARACTER*10     CTYPE1   ! Coordinate type of output FITS
@@ -224,6 +227,7 @@
       CHARACTER*(DAT__SZLOC) OUT_FITSX_LOC
                                 ! locator of FITS extension in output
                                 ! file
+      CHARACTER*(8)    RETAINFITS(NRETAIN) ! FITS headers to retain
       REAL             RTEMP    ! Scratch real
       CHARACTER*30     SCS      ! name of sky coordinate system
       CHARACTER*80     STEMP    ! scratch string
@@ -233,6 +237,10 @@
       CHARACTER * (80) XLAB     ! X axis label
       CHARACTER * (80) YLAB     ! Y axis label 
       INTEGER          WCSINFO  ! WCS AST information
+
+*  Local Data:
+      DATA RETAINFITS / 'DATE-OBS', 'OBSGEO-X', 'OBSGEO-Y',
+     :     'OBSGEO-Z' /
 
 *.
 
@@ -381,6 +389,18 @@
      :        'epoch of mean equator and equinox', STATUS)
          
       END IF
+
+*     Position of the telescope in standard form. Hardwire location.
+      IF (TELESCOPE .EQ. 'JCMT') THEN
+         CALL SCULIB_PUT_FITS_D( SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'OBSGEO-X', -5464587.157627D0, '[m]', STATUS)
+         CALL SCULIB_PUT_FITS_D( SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'OBSGEO-Y', -2493002.332712D0, '[m]', STATUS)
+         CALL SCULIB_PUT_FITS_D( SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'OBSGEO-Z', 2150655.061682D0, '[m]', STATUS)
+
+      END IF
+
 
       CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
      :     'MJD-OBS', MJD_STANDARD, 'MJD of first observation', 
@@ -565,6 +585,16 @@
             CALL AST_PUTFITS( FITSCHAN, FITS( ICARD ), .FALSE., 
      :           STATUS )
          END DO
+
+*     Retain some keywords in the FITS header itself
+         DO I = 1, NRETAIN
+            CALL AST_CLEAR( FITSCHAN, 'Card', STATUS )
+            IF (AST_FINDFITS( FITSCHAN, RETAINFITS(I),STEMP,
+     :           .FALSE., STATUS)) THEN
+               CALL AST_RETAINFITS( FITSCHAN, STATUS )
+            END IF
+         END DO
+
          
 *     Rewind the FitsChan and read WCS information from it.
          CALL AST_CLEAR( FITSCHAN, 'Card', STATUS )
