@@ -51,6 +51,7 @@
 *     comparing the formatted strings for exact equality.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2007 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -72,6 +73,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -80,7 +82,8 @@
 *     8-FEB-2007 (DSB):
 *        Take account of header cards that have no value (e.g. blank
 *        cards, comment cards, etc).
-
+*     15-JUN-2008 (TIMJ):
+*        Fix typo for method 2
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -163,7 +166,7 @@
 
 *  We retain cards from FC1 that do not have a value (i.e. cards which do 
 *  not have an equals sign in column 10 )
-            IF( CARD( 9 : 10 ) .EQ. ' =' ) THEN
+            IF( CARD( 9 : 10 ) .EQ. '= ' ) THEN
 
 *  See if FC2 contains a card for the same keyword used by the current
 *  card in FC3.
