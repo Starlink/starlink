@@ -250,6 +250,8 @@ SUN                            STARLINK USER NOTES                           SUN
 255.01  2006-01-19 DSB   ??   CUPID - A Clump Identification and Analysis Package
 256.01  2005-04-28 MBT   ??   STILTS - STIL Tool Set
 257.01  2006-01-19 DSB   ??   ATL - A library of AST utility routines.
+258.01  2008-MM-DD            SMURF
+259.01  2008-04-09 JB    ??   GSD2ACSIS - Programmer's Guide (SMURF)
 
 AUTHORS                          AUTHORS                                AUTHORS
                                      (Site code)
@@ -314,6 +316,7 @@ AUTHORS                          AUTHORS                                AUTHORS
        JAJ   J A Johnson             (?)
        JAS   Janet Searle            (Kent)
        JB    J Butland               (Bradford)
+       JB    Jen Balfour             (JAC)
        JCS   John Sherman            (RAL)
        JFL   John Lightfoot          (EDI)
        JG    Jack Giddings           (UCL - left)
