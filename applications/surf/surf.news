@@ -1,7 +1,7 @@
 1 SURF - SCUBA User Reduction Facility -update
                                                      Expires: ????.??.??
 
-  This is the release V1.6-13 of SURF.
+  This is the release V1.7-1 of SURF.
 
   The SCUBA User Reduction Facility (SURF) is a collection of applications
   for use in reducing mapping and photometry data from the Submillimetre
@@ -32,6 +32,24 @@
   The list is at scubadr@jach.hawaii.edu.
   To subscribe please send a message to majordomo@jach.hawaii.edu with
   an empty subject and containing the message 'subscribe scubadr <your email>'
+
+2 New_in_version_1_7
+
+  - Headers from input files are merged for the output maps from REBIN
+    and related commands such that headers that differ between inputs
+    are dropped but headers that are identical are retained.
+
+  - The WEIGHTS and TIMES extensions now include world coordinate information.
+
+  - Automatic Provenance tracking is now enabled (if enabled). See the
+    AUTOPROV environment variable and PROVADD command.
+
+  - Always write a DATE-OBS header in output maps from REBIN and
+    always use ISO format.
+
+  - Observatory location is now stored in output maps.
+
+  - Fix segmentation fault in REMIP command
 
 2 New_in_version_1_6_13
 
