@@ -82,8 +82,8 @@
 *     value and comment.
 *
 *     Field 1:  This specifies the editing operation.  Allowed values
-*     are Delete, Exist, Move, Read, Write, and Update, and can be
-*     abbreviated to the initial letter.  Delete removes a named
+*     are Amend, Delete, Exist, Move, Read, Write, and Update, and can
+*     be abbreviated to the initial letter.  Delete removes a named
 *     keyword.  Read causes the value of a named keyword to be
 *     displayed to standard output.  Exist reports TRUE to standard
 *     output if the named keyword exists in the header, and FALSE if
@@ -96,12 +96,13 @@
 *     command.  Update revises the value and/or the comment.  If a
 *     secondary keyword is defined explicitly, the card may be
 *     relocated at the same time.  Update requires that the keyword
-*     exists.
+*     exists.  Amend behaves as Write if the keyword in Field 2 is
+*     not already present, or as Update if the keyword exists.
 
 *     Field 2:  This specifies the keyword to edit, and optionally the
 *     position of that keyword in the header after the edit (for Move,
-*     Write and Update edits).  The new position in the header is
-*     immediately before a positional keyword, whose name is given in
+*     Write, Update, and Amend edits).  The new position in the header
+*     is immediately before a positional keyword, whose name is given in
 *     parentheses concatenated to the edit keyword.  See "Field 1" for
 *     defaulting when the position parameter is not defined or is null.
 *
@@ -203,6 +204,11 @@
 *     This writes a real value to new keyword AIRMASS, which will be
 *     located at the end of the FITS extension.
 *
+*         A AIRMASS 1.379
+*     This writes a real value to keyword AIRMASS if it exists,
+*     otherwise it writes a real value to new keyword AIRMASS located 
+*     at the end of the FITS extension.
+*
 *         W FILTER(AIRMASS) Y
 *     This writes a logical true value to new keyword FILTER, which
 *     will be located just before the AIRMASS keyword, if it exists.
@@ -240,9 +246,9 @@
 *     This moves the second occurrence of keyword OFFSET to just
 *     before the third COMMENT card.
 *
-*  [optional_subroutine_items]...
 *  Copyright:
 *     Copyright (C) 1996 Central Laboratory of the Research Councils.
+*     Copyright (C) 2008 Science and Technology Facilties Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -268,7 +274,9 @@
 *  History:
 *     1996 November 4 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     2008 June 14 (MJC):
+*        Add Amend command.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -438,12 +446,12 @@
 *  Validate the edit command.  Just use the first character, as
 *  subsequent characters are superfluous (but might help the human
 *  reader).
-         IF ( .NOT. CHR_INSET( 'D,E,M,P,R,U,W', EDIT ) ) THEN
+         IF ( .NOT. CHR_INSET( 'A,D,E,M,P,R,U,W', EDIT ) ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'EDIT', LINE( I1( 1 ):I2( 1 ) ) )
             CALL ERR_REP( 'FTS1_RFMOD_BADEDIT',
-     :        'The edit command ^EDIT is not one of Delete, Exist, '/
-     :        /'Move, Rename, Print, Update, Write.', STATUS )
+     :        'The edit command ^EDIT is not one of Amend, Delete, '/
+     :        /'Exist, Move, Print, Rename, Update, or Write.', STATUS )
             GOTO 50
          END IF
 
@@ -460,9 +468,10 @@
             GOTO 50
          END IF
 
-*  Values and comments are only relevant to the U(pdate) and W(rite)
-*  options.
-         NEEDVC = EDIT .EQ. 'W' .OR. EDIT .EQ. 'U' .OR. EDIT .EQ. 'R'
+*  Values and/or comments are only relevant to the U(pdate), W(rite),
+*  and A(mend) options.  A new keyword is required for R(ename).
+         NEEDVC = EDIT .EQ. 'W' .OR. EDIT .EQ. 'U' .OR. 
+     :            EDIT .EQ. 'A' .OR. EDIT .EQ. 'R'
 
 *  Initialise null default values (for other edit commands and null
 *  comment).
@@ -530,9 +539,10 @@
 *  Look for the secondary keyword before which the new card is to be
 *  placed.  Assume initally that there is no positional keyword, except
 *  for writing or moving where a positional keyword must be specified,
-*  and so default it to the END card.  The default occurrence is the
-*  first one.
-         IF ( EDIT .EQ. 'W' .OR. EDIT .EQ. 'M' ) THEN
+*  and so default it to the END card.  For Amend this is a provisional
+*  position, if in fact the keyword already exists.  The default 
+*  occurrence is the first one.
+         IF ( EDIT .EQ. 'W' .OR. EDIT .EQ. 'A' .OR. EDIT .EQ. 'M' ) THEN
             KEYIND = 'END'
          ELSE
             KEYIND = ' '

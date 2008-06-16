@@ -15,9 +15,9 @@
 \newcommand{\stardocsource}    {sun95.34}
 \newcommand{\stardocnumber}    {95.34}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2008 June 8}
+\newcommand{\stardocdate}      {2008 June 14}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.9-7}
+\newcommand{\stardocversion}   {1.9-8}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -24208,14 +24208,16 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          COMMENT = LITERAL (Read)
       }{
          The comments to be written to the KEYWORD keyword for the
-         {\tt "Update"} and {\tt "Write"} editing commands.  A null
-         value ({\tt{!}}) gives a blank comment.  The special value
+         {\tt "Update"}, {\tt "Write"}, and {\tt "Amend"}editing commands.  
+         A null value ({\tt{!}}) gives a blank comment.  The special value
          {\tt "\$C"} means use the current comment.  In addition
          {\tt "\$C(}keyword{\tt)"} requests that the
          comment of the keyword given between the parentheses be
          assigned to the keyword being edited.  If this positional
          keyword does not exist, the comment is unchanged for {\tt "Update"},
-         and is blank for a {\tt "Write"} edit.
+         and is blank for a {\tt "Write"} edit.  The same applies to the
+         {\tt "Amend"} edit, the choice depending on whether or not the
+         KEYWORD keyword exists.
       }
       \sstsubsection{
          EDIT = LITERAL (Read)
@@ -24224,6 +24226,10 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          options are listed below.
 
          \begin{description}
+            \item {\tt "Amend"} --- acts as option {\tt "Update"} if the
+            keyword exists, but as the {\tt "Write"} option should the 
+            keyword be absent.
+
             \item {\tt "Delete"} --- removes a named keyword.
 
             \item {\tt "Exist"} --- reports {\tt TRUE} to standard
@@ -24262,8 +24268,8 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          The name of the keyword to be edited in the FITS extension.  A
          name may be compound to handle hierarchical keywords, and it
          has the form keyword1.keyword2.keyword3 {\em etc.}\  The maximum
-         number of keywords per FITS card is 20.  Each keyword must be
-         no longer than 8 characters, and be a valid FITS keyword
+         number of keywords per FITS card is twenty.  Each keyword must be
+         no longer than eight characters, and be a valid FITS keyword
          comprising only alphanumeric characters, hyphen, and underscore.
          Any lowercase letters are converted to uppercase and blanks
          are removed before insertion, or comparison with the existing
@@ -24272,8 +24278,8 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          The keywords {\tt " "}, {\tt "COMMENT"}, and {\tt "HISTORY"}
          are comment cards and do not have a value.
 
-         The keyword must exist except for the {\tt "Write"} and
-         {\tt "Exist"} commands.
+         The keyword must exist except for the {\tt "Amend"}, 
+         {\tt "Write"}, and {\tt "Exist"} commands.
 
          Both KEYWORD and POSITION keywords may have an occurrence
          specified in brackets {\tt []} following the name. This enables 
@@ -24290,7 +24296,7 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
       }{
          The mode by which the editing instructions are supplied.  The
          alternatives are {\tt "File"}, which uses a text file; and
-         {\tt "Interface"} which uses parameters. {\tt ["Interface"]}
+         {\tt "Interface"} which uses parameters.  {\tt ["Interface"]}
       }
       \sstsubsection{
          NDF = NDF (Read and Write)
@@ -24304,8 +24310,8 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          only accessed when EDIT={\tt "Rename"}.  A name may be compound to
          handle hierarchical keywords, and it has the form
          keyword1.keyword2.keyword3 {\em etc.}\  The maximum number of
-         keywords per FITS card is 20.  Each keyword must be no longer
-         than 8 characters, and be a valid FITS keyword comprising only
+         keywords per FITS card is twenty.  Each keyword must be no longer
+         than eight characters, and be a valid FITS keyword comprising only
          alphanumeric characters, hyphen, and underscore.
       }
       \sstsubsection{
@@ -24314,8 +24320,8 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          The position keyword name.  A position name may be compound to
          handle hierarchical keywords, and it has the form
          keyword1.keyword2.keyword3 {\em etc.}\  The maximum number of
-         keywords per FITS card is 20.  Each keyword must be no longer
-         than 8 characters.  When locating the position card,
+         keywords per FITS card is twenty.  Each keyword must be no longer
+         than eight characters.  When locating the position card,
          comparisons are made in uppercase and with the blanks removed.
          An occurrence may be specified (see parameter KEYWORD for
          details).
@@ -24323,20 +24329,21 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          The new keywords are inserted immediately before each
          corresponding position keyword.  If any name in it does not
          exist in FITS array, or the null value ({\tt{!}}) is supplied the
-         consequences will be as follows.  For a {\tt "Write"} or
+         consequences will be as follows.  For a {\tt "Write"}, 
+         {\tt "Amend"} (new keyword), or
          {\tt "Move"} edit, the KEYWORD keyword will be inserted just
          before the END card or appended to FITS array when the END card
-         does not exist; for an {\tt "Update"} edit, the edit keyword is
-         not relocated.
+         does not exist; for an {\tt "Update"} or {\tt "Amend"} (new
+         keyword) edit, the edit keyword is not relocated.
 
          A positional keyword is only accessed by the {\tt "Move"},
-         {\tt "Write"}, and {\tt "Update"} editing commands.
+         {\tt "Amend"}, {\tt "Write"}, and {\tt "Update"} editing commands.
       }
       \sstsubsection{
          STRING = \_LOGICAL (Read)
       }{
          When STRING is {\tt FALSE}, inferred data typing is used for the
-         {\tt "Write"} and {\tt "Update"} editing commands.  So for
+         {\tt "Write"}, {\tt "Update"}, and {\tt "Amend"} editing commands.  So for
          instance, if parameter VALUE = {\tt "Y"}, it would appears as logical
          {\tt TRUE} rather than the string {\tt 'Y~~~~~~~~~'} in the FITS header.
          See topic {\tt "Value Data Type"}.  When STRING is {\tt TRUE},
@@ -24353,17 +24360,18 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
       \sstsubsection{
          VALUE = LITERAL (Read)
       }{
-         The new value of the KEYWORD keyword for the {\tt "Update"} and
-         {\tt "Write"} editing commands.  The special value {\tt "\$V"}
-         means use the
+         The new value of the KEYWORD keyword for the {\tt "Update"}, 
+         {\tt "Write"}, and {\tt "Amend"} editing commands.  The special 
+         value {\tt "\$V"} means use the
          current value of the KEYWORD keyword.  This makes it possible
          to modify a comment, leaving the value unaltered.  In addition
          {\tt "\$V(}keyword{\tt)"} requests that the value of the
          reference keyword given between the parentheses be assigned
          to the keyword being edited.  This reference keyword must exist
-         and have a value for a {\tt "Write"} edit; whereas the FITS-header
-         value is unchanged for {\tt "Update"} if there are problems
-         with this reference keyword.
+         and have a value for a {\tt "Write"} or {\tt "Amend"} (new keyword)
+         edit; whereas the FITS-header
+         value is unchanged for {\tt "Update"} or {\tt "Amend"}
+         (keyword exists) if there are problems with this reference keyword.
       }
    }
    \sstresparameters{
@@ -24522,31 +24530,51 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          \sstitem
          Field 1:
             This specifies the editing operation.  Allowed values are
-            {\tt Delete}, {\tt Exist}, {\tt Move}, {\tt Read}, {\tt Write},
-            and {\tt Update}, and can be
-            abbreviated to the initial letter.  {\tt Delete} removes a named
-            keyword.  {\tt Read} causes the value of a named keyword to be
-            displayed to standard output.  {\tt Exist} reports {\tt TRUE}
-            to standard output if the named keyword exists in the
-            header, and {\tt FALSE} if the keyword is not present.
-            {\tt Move} relocates a named keyword to
-            be immediately before a second keyword.  When this positional
-            keyword is not supplied, it defaults to the END card, and if
-            the END card is absent, the new location is at the end of the
-            headers.  {\tt Write} creates a new card given a value and an
-            optional comment.  Its location uses the same rules as for the
-            {\tt Move} command.  {\tt Update} revises the value and/or the comment.
-            If a secondary keyword is defined explicitly, the card may be
-            relocated at the same time.  {\tt Update} requires that the keyword
-            exists.
+            {\tt Amend}, {\tt Delete}, {\tt Exist}, {\tt Move}, {\tt Print}, 
+            {\t Rename}, {\tt Write}, and {\tt Update}, and can be
+            abbreviated to the initial letter.
+
+            \sstitemlist{
+
+               \sstitem 
+               {\tt Delete} removes a named keyword.  
+
+               \sstitem {\tt Read} causes the value of a named keyword to be
+               displayed to standard output.
+            
+               \sstitem {\tt Exist} reports {\tt TRUE} to standard output if 
+               the named keyword exists in the header, and {\tt FALSE} if 
+               the keyword is not present.
+
+               \sstitem
+               {\tt Move} relocates a named keyword to be immediately before 
+               a second keyword.  When this positional keyword is not supplied, 
+               it defaults to the END card, and if the END card is absent, the new location is at the end of the
+               headers.  
+               
+               \sstitem 
+               {\tt Write} creates a new card given a value and an optional 
+               comment.  Its location uses the same rules as for the
+               {\tt Move} command.  
+
+               \sstitem
+               {\tt Update} revises the value and/or the comment.
+               If a secondary keyword is defined explicitly, the card may be
+               relocated at the same time.  {\tt Update} requires that the 
+               keyword exists.  
+               
+               \sstitem
+               {\tt Amend} acts like {\tt Update} if the keyword supplied in 
+               {\tt "Field 2"} exists, and like {\tt Write} otherwise. 
+           }
 
          \sstitem
          Field 2:
             This specifies the keyword to edit, and optionally the
             position of that keyword in the header after the edit (for
-            {\tt Move}, {\tt Write} and {\tt Update} edits).  The new
-            position in the header
-            is immediately before a positional keyword, whose name is
+            {\tt Move}, {\tt Write}, {\tt Update}, and {\tt Amend} edits).
+            The new position in the header is immediately before a 
+            positional keyword, whose name is
             given in parentheses concatenated to the edit keyword.  See
             {\tt "Field 1"} for defaulting when the position
             parameter is not defined or is null.
@@ -24555,7 +24583,7 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
             compound to handle hierarchical keywords.  In this case the
             form is keyword1.keyword2.keyword3 {\em etc.}\  All
             keywords must be valid FITS keywords.  This means they must
-            be no more than 8 characters long, and the only permitted
+            be no more than eight characters long, and the only permitted
             characters are uppercase alphabetic, numbers, hyphen,
             and underscore.  Invalid keywords will be rejected.
 
@@ -24579,35 +24607,35 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          \sstitem
          Field 3:
             This specifies the value to assign to the edited keyword in
-            the {\tt Write} and {\tt Update} operations, or the name of the new
-            keyword in the {\tt Rename} modification.  If the keyword exists,
-            the existing value or keyword is replaced, as appropriate.
-            The data type used to store the value is inferred from the
-            value itself.  See topic {\tt "Value Data Type"}.
+            the {\tt Write}, {\tt Update}, and {\tt Amend} operations, or the 
+            name of the new keyword in the {\tt Rename} modification.  If the 
+            keyword exists, the existing value or keyword is replaced, as 
+            appropriate.  The data type used to store the value is inferred 
+            from the value itself.  See topic {\tt "Value Data Type"}.
 
-            For the {\tt Update} and {\tt Write} modifications there is a special
-            value, {\tt \$V}, which means use the current value of the edited
-            keyword, provided that keyword exists.  This makes it possible
-            to modify a comment, leaving the value unaltered.  In addition
-            {\tt \$V(}keyword{\tt)} requests that the value of the keyword given
-            between the parentheses be assigned to the keyword being
-            edited.
+            For the {\tt Update}, {\tt Write}, and {\tt Amend} modifications
+	    there is a special value, {\tt \$V}, which means use the current
+	    value of the edited keyword, provided that keyword exists.  This
+	    makes it possible to modify a comment, leaving the value
+	    unaltered.  In addition {\tt \$V(}keyword{\tt)} requests that
+	    the value of the keyword given between the parentheses be
+	    assigned to the keyword being edited.
 
             The value field is ignored when the keyword is COMMENT,
-            HISTORY or blank, and the modification is to {\tt Update}
-            or {\tt Write}.
+            HISTORY or blank, and the modification is to {\tt Update},
+            {\tt Write}, or {\tt Amend}.
 
          \sstitem
          Field 4:
             This specifies the comment to assign to the edited keyword for
-            the {\tt Write} and {\tt Update} operations.  A leading {\tt "/"} should not be
-            supplied.
+            the {\tt Write}, {\tt Update}, and {\tt Amend} operations.  A 
+            leading {\tt "/"} should not be supplied.
 
             There is a special value, {\tt \$C}, which means use the current
             comment of the edited keyword, provided that keyword exists.
             This makes it possible to modify a value, leaving the comment
-            unaltered.  In addition {\tt \$C(}keyword{\tt)} requests that the comment
-            of the keyword given between the parentheses be assigned to
+            unaltered.  In addition {\tt \$C(}keyword{\tt)} requests that the 
+            comment of the keyword given between the parentheses be assigned to
             the edited keyword.
 
             To obtain leading spaces before some commentary, use a quote
@@ -24683,6 +24711,13 @@ KAPPA: \htmlref{FITSEDIT}{FITSEDIT},
          W AIRMASS 1.379
       }{
          This writes a real value to new keyword AIRMASS, which will be
+         located at the end of the FITS extension.
+      }
+      \sstexamplesubsection{
+         A AIRMASS 1.379
+      }{
+         This writes a real value to keyword AIRMASS if it exists,
+         otherwise it writes a real value to new keyword AIRMASS
          located at the end of the FITS extension.
       }
       \sstexamplesubsection{
@@ -55335,6 +55370,17 @@ The following applications have been modified:
          variance array (see new parameter GENVAR).  If the NDF is
          processed as a set of spectra or images, then each individual 
          spectrum or image is assigned its own noise level.
+      \end{itemize}
+
+   \item [\htmlref{FITSMOD}{FITSMOD}] \mbox{}
+      \begin{itemize}
+         \item Parameter EDIT has a new option {\tt "Amend"}.  This 
+         will write a new header if the keyword does not exist, but 
+         will only modify an existing header.  Using this option, it
+         is now not necessary to know whether or not a header exists.
+
+         \item Likewise there is an {\tt Amend} option for Field 1 of 
+         the file format. 
       \end{itemize}
 
    \item [\htmlref{MFITTREND}{MFITTREND}] \mbox{}

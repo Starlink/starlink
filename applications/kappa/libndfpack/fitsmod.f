@@ -41,17 +41,22 @@
 *  ADAM Parameters:
 *     COMMENT = LITERAL (Read)
 *        The comments to be written to the KEYWORD keyword for the
-*        "Update" and "Write" editing commands.  A null value (!)
-*        gives a blank comment.  The special value "$C" means use the
-*        current comment.  In addition "$C(keyword)" requests that the
-*        comment of the keyword given between the parentheses be
+*        "Update", "Write", and "Amend" editing commands.  A null value 
+*        (!) gives a blank comment.  The special value "$C" means use
+*        the current comment.  In addition "$C(keyword)" requests that
+*        the comment of the keyword given between the parentheses be
 *        assigned to the keyword being edited.  If this positional
-*        keyword does not exist, the comment is unchanged for "Update",
-*        and is blank for a "Write" edit.
+*        keyword does not exist, the comment is unchanged for "Update" 
+*        and is blank for a "Write" edit.  The same applies to the
+*        "Amend" edit, the choice depending on whether or not the
+*        KEYWORD keyword exists.
 *     EDIT = LITERAL (Read)
 *        The editing command to apply to the keyword.  The allowed
 *        options are listed below.
 *
+*        "Amend' acts as option "Update" if the keyword exists, but 
+*        as the "Write" option should the keyword be absent.
+
 *        "Delete" removes a named keyword.
 *
 *        "Exist" reports TRUE to standard output if the named keyword
@@ -87,8 +92,8 @@
 *        The name of the keyword to be edited in the FITS extension.  A
 *        name may be compound to handle hierarchical keywords, and it
 *        has the form keyword1.keyword2.keyword3 etc.  The maximum
-*        number of keywords per FITS card is 20.  Each keyword must be
-*        no longer than 8 characters, and be a valid FITS keyword
+*        number of keywords per FITS card is twenty.  Each keyword must
+*        be no longer than eight characters, and be a valid FITS keyword
 *        comprising only alphanumeric characters, hyphen, and
 *        underscore.  Any lowercase letters are converted to uppercase
 *        and blanks are removed before insertion, or comparison with the
@@ -97,8 +102,8 @@
 *        The keywords " ", "COMMENT", and "HISTORY" are comment cards
 *        and do not have a value.
 *
-*        The keyword must exist except for the "Write" and "Exist"
-*        commands.
+*        The keyword must exist except for the "Amend", "Write", and 
+*        "Exist" commands.
 *
 *        Both KEYWORD and POSITION keywords may have an occurrence
 *        specified in brackets [] following the name.  This enables
@@ -120,15 +125,16 @@
 *        only accessed when EDIT="Rename".  A name may be compound to
 *        handle hierarchical keywords, and it has the form
 *        keyword1.keyword2.keyword3 etc.  The maximum number of
-*        keywords per FITS card is 20.  Each keyword must be no longer
-*        than 8 characters, and be a valid FITS keyword comprising only
-*        alphanumeric characters, hyphen, and underscore.
+*        keywords per FITS card is twenty.  Each keyword must be no 
+*        longer than eight characters, and be a valid FITS keyword 
+*        comprising only alphanumeric characters, hyphen, and 
+*        underscore.
 *     POSITION = LITERAL (Read)
 *        The position keyword name.  A position name may be compound to
 *        handle hierarchical keywords, and it has the form
 *        keyword1.keyword2.keyword3 etc.  The maximum number of
-*        keywords per FITS card is 20.  Each keyword must be no longer
-*        than 8 characters.  When locating the position card,
+*        keywords per FITS card is twenty.  Each keyword must be no 
+*        longer than eight characters.  When locating the position card,
 *        comparisons are made in uppercase and with the blanks removed.
 *        An occurrence may be specified (see parameter KEYWORD for
 *        details).
@@ -136,35 +142,38 @@
 *        The new keywords are inserted immediately before each
 *        corresponding position keyword.  If any name in it does not
 *        exist in FITS array, or the null value (!) is supplied the
-*        consequences will be as follows.  For a "Write" or "Move" edit,
-*        the KEYWORD keyword will be inserted just before the END card
-*        or appended to FITS array when the END card does not exist;
-*        for an "Update" edit, the edit keyword is not relocated.
+*        consequences will be as follows.  For a "Write", "Amend" (new
+*        keyword), or "Move" edit, the KEYWORD keyword will be inserted
+*        just before the END card or appended to FITS array when the END 
+*        card does not exist; for an "Update" or "Amend" (with an 
+*        existing keyword) edit, the edit keyword is not relocated.
 *
 *        A positional keyword is only accessed by the "Move", "Write",
-*        and "Update" editing commands.
+*        "Amend", and "Update" editing commands.
 *     STRING = _LOGICAL (Read)
 *        When STRING is FALSE, inferred data typing is used for the
-*        "Write" and "Update" editing commands.  So for instance, if
-*        parameter VALUE = "Y", it would appears as logical TRUE rather
-*        than the string 'Y       ' in the FITS header.  See topic
-*        "Value Data Type".  When STRING is TRUE, the value will be
-*        treated as a string for the purpose of writing the FITS
-*        header.  [FALSE]
+*        "Write", "Update", and "Amend" editing commands.  So for 
+*        instance, if parameter VALUE = "Y", it would appears as 
+*        logical TRUE rather than the string 'Y       ' in the FITS 
+*        header.  See topic "Value Data Type".  When STRING is TRUE, the
+*        value will be treated as a string for the purpose of writing 
+*        the FITS header.  [FALSE]
 *     TABLE = FILENAME (Read)
 *        The text file containing the keyword translation table.  The
 *        format of this file is described under "File Format".  For
 *        illustrations, see under "Examples of the File Format".
 *     VALUE = LITERAL (Read)
-*        The new value of the KEYWORD keyword for the "Update" and
-*        "Write" editing commands.  The special value "$V" means use the
-*        current value of the KEYWORD keyword.  This makes it possible
-*        to modify a comment, leaving the value unaltered.  In addition
-*        "$V(keyword)" requests that the value of the reference keyword
-*        given between the parentheses be assigned to the keyword being
-*        edited.  This reference keyword must exist and have a value
-*        for a "Write" edit; whereas the FITS-header value is unchanged
-*        for "Update" if there are problems with this reference keyword.
+*        The new value of the KEYWORD keyword for the "Update", "Write"
+*        and "Amend" editing commands.  The special value "$V" means use
+*        the current value of the KEYWORD keyword.  This makes it 
+*        possible to modify a comment, leaving the value unaltered.  In 
+*        addition "$V(keyword)" requests that the value of the reference
+*        keyword given between the parentheses be assigned to the 
+*        keyword being edited.  This reference keyword must exist and 
+*        have a value for a "Write" or "Amend" (new keyword) edit; 
+*        whereas the FITS-header value is unchanged for "Update" or 
+*        "Amend" (keyword exists) if there are problems with this 
+*        reference keyword.
 
 *  Examples:
 *     fitsmod dro42 bscale exist 
@@ -269,6 +278,11 @@
 *     This writes a real value to new keyword AIRMASS, which will be
 *     located at the end of the FITS extension.
 *
+*         A AIRMASS 1.379
+*     This writes a real value to keyword AIRMASS if it exists,
+*     otherwise it writes a real value to new keyword AIRMASS located 
+*     at the end of the FITS extension.
+*
 *         W FILTER(AIRMASS) Y
 *     This writes a logical true value to new keyword FILTER, which
 *     will be located just before the AIRMASS keyword, if it exists.
@@ -324,35 +338,39 @@
 *
 *     -  Field 1:
 *        This specifies the editing operation.  Allowed values are
-*        Delete, Exist, Move, Read, Write, and Update, and can be
-*        abbreviated to the initial letter.  Delete removes a named
-*        keyword.  Read causes the value of a named keyword to be
-*        displayed to standard output.  Exist reports TRUE to standard
-*        output if the named keyword exists in the header, and FALSE if
-*        the keyword is not present.  Move relocates a named keyword to
-*        be immediately before a second keyword.  When this positional
-*        keyword is not supplied, it defaults to the END card, and if
-*        the END card is absent, the new location is at the end of the
-*        headers.  Write creates a new card given a value and an
-*        optional comment.  Its location uses the same rules as for the
-*        Move command.  Update revises the value and/or the comment.
-*        If a secondary keyword is defined explicitly, the card may be
-*        relocated at the same time.  Update requires that the keyword
-*        exists.
+*        Amend, Delete, Exist, Move, Print, Rename, Write, and Update, 
+*        and can be abbreviated to the initial letter.  
+*        -  Delete removes a named keyword.  
+*        -  Print causes the value of a named keyword to be
+*        displayed to standard output.  
+*        -  Exist reports TRUE to standard output if the named keyword 
+*        exists in the header, and FALSE if the keyword is not present.
+*        -  Move relocates a named keyword to be immediately before a 
+*        second keyword.  When this positional keyword is not supplied, 
+*        it defaults to the END card, and if the END card is absent, the 
+*        new location is at the end of the headers.  
+*        -  Write creates a new card given a value and an optional 
+*        comment.  Its location uses the same rules as for the
+*        Move command.  
+*        -  Update revises the value and/or the comment. If a secondary 
+*        keyword is defined explicitly, the card may be relocated at the
+*        same time.  Update requires that the keyword exists.  
+*        -  Amend acts like Update if the keyword supplied in 
+*        "Field 2" exists, and like Write otherwise.  
 *
 *     -  Field 2:
 *        This specifies the keyword to edit, and optionally the
 *        position of that keyword in the header after the edit (for
-*        Move, Write and Update edits).  The new position in the header
-*        is immediately before a positional keyword, whose name is
-*        given in parentheses concatenated to the edit keyword.  See
-*        "Field 1" for defaulting when the position parameter is not
+*        Move, Write, Update, and Amend edits).  The new position in 
+*        the header is immediately before a positional keyword, whose 
+*        name is given in parentheses concatenated to the edit keyword.
+*        See "Field 1" for defaulting when the position parameter is not
 *        defined or is null.
 *
 *        Both the editing keyword and position keyword may be compound
 *        to handle hierarchical keywords.  In this case the form is
 *        keyword1.keyword2.keyword3 etc.  All keywords must be valid
-*        FITS keywords.  This means they must be no more than 8
+*        FITS keywords.  This means they must be no more than eight
 *        characters long, and the only permitted characters are
 *        uppercase alphabetic, numbers, hyphen, and underscore.
 *        Invalid keywords will be rejected.
@@ -375,27 +393,28 @@
 *
 *     -  Field 3:
 *        This specifies the value to assign to the edited keyword in
-*        the Write and Update operations, or the name of the new
-*        keyword in the Rename modification.  If the keyword exists,
-*        the existing value or keyword is replaced, as appropriate.
-*        The data type used to store the value is inferred from the
-*        value itself.  See topic "Value Data Type".
+*        the Write, Update, and Amend operations, or the name of the
+*        new keyword in the Rename modification.  If the keyword
+*        exists, its current value or keyword is replaced, as 
+*        appropriate.  The data type used to store the value is 
+*        inferred from the value itself.  See topic "Value Data Type".
 *
-*        For the Update and Write modifications there is a special
-*        value, $V, which means use the current value of the edited
-*        keyword, provided that keyword exists.  This makes it possible
-*        to modify a comment, leaving the value unaltered.  In addition
-*        $V(keyword) requests that the value of the keyword given
-*        between the parentheses be assigned to the keyword being
+*        For the Update, Write, and Amend modifications there is a 
+*        special value, $V, which means use the current value of the 
+*        edited keyword, provided that keyword exists.  This makes it 
+*        possible to modify a comment, leaving the value unaltered.  In 
+*        addition $V(keyword) requests that the value of the keyword 
+*        given between the parentheses be assigned to the keyword being
 *        edited.
 *
 *        The value field is ignored when the keyword is COMMENT,
-*        HISTORY or blank, and the modification is to Update or Write.
+*        HISTORY or blank, and the modification is to Update, Write, or
+*        Amend.
 *
 *     -  Field 4:
 *        This specifies the comment to assign to the edited keyword for
-*        the Write and Update operations.  A leading "/" should not be
-*        supplied.
+*        the Write, Update, and Amend operations.  A leading "/" 
+*        delimiter should not be supplied.
 *
 *        There is a special value, $C, which means use the current
 *        comment of the edited keyword, provided that keyword exists.
@@ -432,12 +451,14 @@
 
 *  Copyright:
 *     Copyright (C) 1996, 1999-2000, 2004 Central Laboratory of the
-*     Research Councils. All Rights Reserved.
+*     Research Councils.
+*     Copyright (C) 2008 Science and Technology Facilties Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -447,8 +468,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -465,7 +486,10 @@
 *        Increased comment length to 70, allowing for comment or blank
 *        lines.  Removed unused variables.
 *     2004 September 3 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2008 June 14 (MJC):
+*        Add Amend editing option, and make Field 1 options easier to
+*        read.
 *     {enter_further_changes_here}
 
 *-
@@ -678,8 +702,8 @@
          NEDIT = 1
 
 *  Obtain the edit command
-         CALL PAR_CHOIC( 'EDIT', 'Read',
-     :                   'Delete,Exist,Move,Print,Rename,Update,Write',
+         CALL PAR_CHOIC( 'EDIT', 'Read', 'Amend,Delete,Exist,Move,'/
+     :                    /'Print,Rename,Update,Write',
      :                   .FALSE., EDIT, STATUS )
 
 *  Obtain the edit keyword and occurrence.
@@ -736,7 +760,7 @@
 *  initialise a value otherwise to be on the safe side.
          KEYIND = ' '        
          IF ( EDIT .EQ. 'MOVE' .OR. EDIT .EQ. 'UPDATE' .OR.
-     :        EDIT .EQ. 'WRITE' ) THEN
+     :        EDIT .EQ. 'WRITE' .OR. EDIT .EQ. 'AMEND' ) THEN
 
 *  The positional keyword has to be validated and the occurrence
 *  extracted.  So perform a DO WHILE loop, but give up after 5 failed
@@ -752,11 +776,12 @@
 
 *  A null value means insert before at the END card or at the end for
 *  Write and Move edits.  It is null for Update, meaning leave the card
-*  unmoved.
+*  unmoved.  It may also be null for Amend too, but we do not know
+*  whether the header exists at this point, so treat as Write.
                IF ( STATUS .EQ. PAR__NULL ) THEN
                   CALL ERR_ANNUL( STATUS )
                   VALID = .TRUE.
-                  IF ( EDIT .EQ. 'MOVE' .OR.
+                  IF ( EDIT .EQ. 'MOVE' .OR. EDIT .EQ. 'AMEND' .OR.
      :                 EDIT .EQ. 'WRITE' ) KEYIND = 'END'
                   POCCUR = 1
 
@@ -809,7 +834,8 @@
 *  initialise a value otherwise to be on the safe side.
          VALUE = ' '        
          TYPE = ' '        
-         IF ( EDIT .EQ. 'UPDATE' .OR. EDIT .EQ. 'WRITE' ) THEN
+         IF ( EDIT .EQ. 'UPDATE' .OR. EDIT .EQ. 'WRITE' .OR.
+     :        EDIT .EQ. 'AMEND' ) THEN
 
 *  The value is not needed for certain named comment cards.
             IF ( KEYWRD .NE. 'COMMENT' .AND. KEYWRD .NE. 'HISTORY' .AND.

@@ -38,9 +38,12 @@
 *        extension.
 *     EDITS( NKEY ) = CHARACTER * ( * ) (Given)
 *        The editing commands.  These need only be one character per
-*        element.  Allowed values are 'Delete', 'Exist', 'Move',
-*        'Rename', 'Print', 'Update', and 'Write', which can be
+*        element.  Allowed values are 'Amend', 'Delete', 'Exist', 
+*        'Move', 'Rename', 'Print', 'Update', and 'Write', which can be
 *        abbreviated to the initial letter.
+*
+*        'Amend' acts as 'Update' if the keyword exists, but as 'Write'
+*        if the keyword is absent.
 *
 *        'Delete' removes a named keyword.
 *
@@ -85,22 +88,24 @@
 *        The position keyword names.  A position name may be compound
 *        to handle hierarchical keywords, and it has the form
 *        keyword1.keyword2.keyword3 etc.  The maximum number of
-*        keywords per FITS card is 20.  Each keyword must be no longer
-*        than 8 characters.  When locating the position card,
+*        keywords per FITS card is twenty.  Each keyword must be no 
+*        longer than eight characters.  When locating the position card,
 *        comparisons are made in uppercase and with the blanks removed.
 
 *        The new keywords are inserted immediately before each
 *        corresponding position keyword.  If any name in it does not
-*        exist in FITS array, in the Write and Move edits its
+*        exist in FITS array, the consequences will be as follows.  In
+*        the Write, Amend (new keyword), and Move edits its 
 *        corresponding keyword will be inserted just before the END
 *        card or appended to FITS array when the END card does not
-*        exist (for the Write and Move edits); however, the card is not
-*        relocated for the Update edit.  If two or more new cards have
-*        the same position name, they will all be put just before the
-*        position name in the same order as they are in NAMES.
+*        exist; however, the card is not relocated for an Update or 
+*        Amend (with an existing keyword) edit.  If two or more new 
+*        cards have the same position name, they will all be put just  
+*        before the position name in the same order as they are in 
+*        NAMES.
 *
-*        A positional keyword is used by the Move, Write, and Update
-*        editing commands.
+*        A positional keyword is used by the Move, Write, Amend, and 
+*        Update editing commands.
 *     KOCCUR( NKEY ) = INTEGER (Given)
 *        The occurrences of the NAMES keywords to use.  Values less than
 *        or equal to 1 will manipulate the first occurrence of the
@@ -154,6 +159,7 @@
 *  Copyright:
 *     Copyright (C) 1996, 1999, 2004 Central Laboratory of the Research
 *                   Councils.
+*     Copyright (C) 2008 Science and Technology Facilties Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -184,7 +190,9 @@
 *     22-SEP-1999 (DSB):
 *        Added argument THERE.
 *     2004 September 1 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2008 June 14 (MJC):
+*        Document Amend option.
 *     {enter_further_changes_here}
 
 *  Bugs:

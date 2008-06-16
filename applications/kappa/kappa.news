@@ -37,6 +37,16 @@
       individual spectrum or image is assigned its own noise
       level.
 
+   o  FITSMOD
+
+       - Parameter EDIT has a new option "Amend".  This will write a 
+       new header if the keyword does not exist, but will only modify 
+       an existing header.  Using this option, it is now not 
+       necessary to know whether or not a header exists.  
+       
+       - Likewise there is an Amend option for Field 1 of the file
+       format. 
+
    o  MFITTREND
 
       - Cubic-spline fitting is now available, the type of fit
