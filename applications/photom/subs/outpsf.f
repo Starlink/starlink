@@ -58,6 +58,9 @@
 *          Original version
 *     21-FEB-2008 (PWD):
 *        Stop using internal writes to copy constant strings.
+*     17-JUN-2008 (PWD):
+*         Scale "FWHM" by 1.665, corrects from gaussian sigma to FWHM.
+*         Change header to show PSF columns, not ones for a STAR.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -114,10 +117,10 @@
       WRITE( CYCEN, '( F9.2 )' ) YCEN + REAL( ORIGIN( 2 ) - 1 )
 
 *   X-FWHM
-      WRITE( CFWHM1, '( F9.4 )' ) SHAPE(1)
+      WRITE( CFWHM1, '( F9.4 )' ) SHAPE(1) * 1.665
 
 *   Y-FWHM
-      WRITE( CFWHM2, '( F9.4 )' ) SHAPE(2)
+      WRITE( CFWHM2, '( F9.4 )' ) SHAPE(2) * 1.665
       
 *   Rotation
       WRITE( CROT, '( F7.4 )' ) SHAPE(3)      
@@ -138,8 +141,8 @@
 
 *   Write out the header to the terminal
       CALL MSG_OUT( ' ', ' ', STATUS )
-      CALL MSG_OUT( ' ', '           x        y      mag     magerr'//
-     :              '      sky       signal code', STATUS )
+      CALL MSG_OUT( ' ', '          x        y      fwhm     fwhm'//
+     :              '     angle  code', STATUS )
       
       END
 

@@ -39,6 +39,14 @@
   
   Bug Fixes 
   ---------
+
+    Since v1.11
+    -----------
+ 
+    The FWHM reported for the PSF star during optimal photometry has 
+    been increased by a factor 1.665. The previous value reported 
+    was the Gaussian sigma.
+
     Since v1.10
     -----------
 

@@ -45,11 +45,14 @@
 
 *  Authors :
 *     AA: Alasdair Allan (STARLINK, Keele University)
+*     PWD: Peter W. Draper (JAC, Durham University)
 *     {enter_new_authors_here}
 *
 *  History :
 *     1-FEB-1999 (AA):
 *         Original version
+*     17-JUN-2008 (PWD):
+*         Scale "FWHM" by 1.665, corrects from gaussian sigma to FWHM.
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -91,10 +94,10 @@
       WRITE( CYCEN, '( F9.2 )' ) YCEN + REAL( ORIGIN( 2 ) - 1 )
 
 *   X-FWHM
-      WRITE( CFWHM1, '( F9.4 )' ) SHAPE(1)
+      WRITE( CFWHM1, '( F9.4 )' ) SHAPE(1) * 1.665
 
 *   Y-FWHM
-      WRITE( CFWHM2, '( F9.4 )' ) SHAPE(2)
+      WRITE( CFWHM2, '( F9.4 )' ) SHAPE(2) * 1.665
 
 *   Rotation
       WRITE( CROT, '( F7.4 )' ) SHAPE(3)

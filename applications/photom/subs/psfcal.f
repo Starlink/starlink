@@ -99,6 +99,8 @@
 *     19-AUG-2002 (AA):
 *        Added additional centroiding code for PSF star finding
 *        Added SEARCH, POSTVE, MXSHFT, MXITER and TOLER arguements
+*     17-JUN-2008 (PWD):
+*        Correct gaussian sigma to fhwm ratio to 1.665 (was 1.655).
 *     {enter_changes_here}
 *
 *  Bugs :
@@ -179,8 +181,8 @@
       APAR(6)=YCEN
 
 *   Set gaussian width
-      APAR(1)=SEE/1.655
-      APAR(2)=SEE/1.655
+      APAR(1)=SEE/1.665
+      APAR(2)=SEE/1.665
 
 *   Set rotation
       APAR(3)=0.3
