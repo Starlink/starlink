@@ -45,7 +45,7 @@
  
     The FWHM reported for the PSF star during optimal photometry has 
     been increased by a factor 1.665. The previous value reported 
-    was the Gaussian sigma.
+    was sqrt(2)*sigma.
 
     Since v1.10
     -----------
