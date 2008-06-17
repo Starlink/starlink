@@ -135,8 +135,7 @@
 #
 #        -usemags boolean {1}
 #
-#     Whether calculations are in magnitudes or not. This has no
-#     effect at the moment.
+#     Whether calculations are in magnitudes or not.
 #
 #        -phottype (aperture|optimal) {aperture}
 #
@@ -764,7 +763,7 @@ itcl::class gaia::GaiaPhotomList {
       if { [winfo exists $scrollbox] } {
          $scrollbox clear all
          $scrollbox insert 0 [gaia::GaiaPhotomObject::header short \
-                                 $phottype $psf]
+                                 $phottype $psf $usemags]
          for { set i $lowest_index_ } { $i <= $highest_index_ } { incr i } {
             if { [info exists objects_($i)] } {
                $scrollbox insert end [$objects_($i) getvalues short]

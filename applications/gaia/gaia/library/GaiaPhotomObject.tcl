@@ -1270,26 +1270,45 @@ itcl::class gaia::GaiaPhotomObject {
    }
 
    #  Return a header caption for formatted output lists.
-   proc header {mode {phottype aperture} {psf 0}} {
+   proc header {mode {phottype aperture} {psf 0} {usemags 1}} {
       if { $phottype == "aperture" } {
          if { "$mode" == "all" } {
-            return [format {%10s %10s %10s %10s %10s %10s %14s %10s \
-                               %10s %10s %10s %10s %10s} \
-                       Index Xpos Ypos Mag Magerr Sky Signal Code \
-                       Major Eccen Angle Positions Shape]
+            if { $usemags } {
+               return [format {%10s %10s %10s %10s %10s %10s %14s %10s \
+                                  %10s %10s %10s %10s %10s} \
+                          Index Xpos Ypos Mag Magerr Sky Signal Code \
+                          Major Eccen Angle Positions Shape]
+            } else {
+               return [format {%10s %10s %10s %10s %10s %10s %14s %10s \
+                                  %10s %10s %10s %10s %10s} \
+                          Index Xpos Ypos Count Counterr Sky Signal Code \
+                          Major Eccen Angle Positions Shape]
+            }
          } else {
-            return [format {%10s %10s %10s %10s %10s %10s %14s %10s \
-                               %10s %10s %10s} \
-                       Index Xpos Ypos Mag Magerr Sky Signal Code \
-                       Major Eccen Angle]
+            if { $usemags } {
+               return [format {%10s %10s %10s %10s %10s %10s %14s %10s \
+                                  %10s %10s %10s} \
+                          Index Xpos Ypos Mag Magerr Sky Signal Code \
+                          Major Eccen Angle]
+            } else {
+               return [format {%10s %10s %10s %10s %10s %10s %14s %10s \
+                                  %10s %10s %10s} \
+                          Index Xpos Ypos Count Counterr Sky Signal Code \
+                          Major Eccen Angle]
+            }
          }
       } else {
          if { $psf } {
             return [format {%10s %10s %10s %10s %10s %10s %10s %10s %10s %10s} \
                        Index Xpos Ypos Fwhm1 Fwhm2 Rot Code Clip Seeing Positions]
          } else {
-            return [format {%10s %10s %10s %10s %10s %10s %10s %10s %10s} \
-                       Index Xpos Ypos Mag Magerr Sky Signal Code Positions]
+            if { $usemags } {
+               return [format {%10s %10s %10s %10s %10s %10s %10s %10s %10s} \
+                          Index Xpos Ypos Mag Magerr Sky Signal Code Positions]
+            } else {
+               return [format {%10s %10s %10s %10s %10s %10s %10s %10s %10s} \
+                          Index Xpos Ypos Count Counterr Sky Signal Code Positions]
+            }
          }
       }
    }
