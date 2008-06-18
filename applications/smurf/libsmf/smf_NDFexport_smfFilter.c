@@ -35,8 +35,6 @@
 *  History:
 *     2008-06-12 (EC):
 *        Initial version.
-*     2008-06-18 (EC):
-*        Fixed error in calculation of df (frequency steps)
 
 *  Notes:
 *
