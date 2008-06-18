@@ -407,14 +407,16 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       spikeiter = 0;
     }
 
-    if( !astMapGet0D( keymap, "FILT_EDGELOW", &f_edgelow ) ) {
-      f_edgelow = 0;
+    if( astMapGet0D( keymap, "FILT_EDGELOW", &f_edgelow ) ) {
       dofft = 1;
+    } else {
+      f_edgelow = 0;
     }
 
-    if( !astMapGet0D( keymap, "FILT_EDGEHIGH", &f_edgehigh ) ) {
-      f_edgehigh = 0;
+    if( astMapGet0D( keymap, "FILT_EDGEHIGH", &f_edgehigh ) ) {
       dofft=1;
+    } else {
+      f_edgehigh = 0;
     }
 
     if( !astMapGet1D( keymap, "FILT_NOTCHLOW", SMF__MXNOTCH, &f_nnotch, 
@@ -440,7 +442,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     if( astMapGet0D( keymap, "MAXLEN", &maxlen_s ) ) {
 
       if( maxlen_s < 0 ) {
-	/* Trap negtive MAXLEN */
+	/* Trap negative MAXLEN */
 	*status = SAI__ERROR;
 	errRep(FUNC_NAME, "Negative value for MAXLEN supplied.", status);
       } else if( maxlen_s == 0 ) {
