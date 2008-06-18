@@ -14,7 +14,7 @@ dist_pkgdata_DATA = $(RUNTIME_FILES) $(EXAMPLES_FILES) $(COMFILES) \
 RUNTIME_FILES = misc/graphcap.txt misc/init.spx \
 misc/specx_init.dat misc/specx_welcome.txt
 
-INIT_FILES = misc/specxstart
+INIT_FILES = misc/specxstart misc/specxstart.sh
 
 # These are the actual specx command macros
 # Currently should be installed into $SPECX_COMMAND/

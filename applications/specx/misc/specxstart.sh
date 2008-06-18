@@ -68,8 +68,6 @@
 #  use a default one.
 #
    if test -z $SPXINIT; then
-      echo > /dev/null
-   else
       export SPXINIT=$SYS_SPECX/init.spx
    fi
 #
