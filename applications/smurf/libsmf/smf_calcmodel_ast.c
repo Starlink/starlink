@@ -121,7 +121,6 @@ void smf_calcmodel_ast( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   unsigned char *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
-  double sigma;                 /* Array standard deviation */ 
   
   /* Main routine */
   if (*status != SAI__OK) return;

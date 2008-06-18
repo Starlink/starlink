@@ -13,7 +13,7 @@
 *     C function
 
 *  Invocation:
-*     smf_concat_smfGroup( smfGroup *igrp, int whichchunk, int isTordered, 
+*     smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered, 
 *			  AstFrameSet *outfset, int moving, 
 *	        	  int *lbnd_out, int *ubnd_out, int flags,
 *			  smfArray **concat, int *status )
@@ -22,7 +22,7 @@
 *  Arguments:
 *     igrp = smfGroup* (Given)
 *        Group of input data files
-*     whichchunk = int (Given)
+*     whichchunk = size_t (Given)
 *        Which continuous subset of igrp will get concatenated?
 *     isTordered = int (Given)
 *        If 0, ensure concatenated data is ordered by bolometer. If 1 ensure 
@@ -142,10 +142,11 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
+#include "libaztec/aztec.h"
 
 #define FUNC_NAME "smf_concat_smfGroup"
 
-void smf_concat_smfGroup( smfGroup *igrp, int whichchunk, int isTordered, 
+void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered, 
 			  AstFrameSet *outfset, int moving, 
 			  int *lbnd_out, int *ubnd_out, int flags,
 			  smfArray **concat, int *status ) {
@@ -196,7 +197,7 @@ void smf_concat_smfGroup( smfGroup *igrp, int whichchunk, int isTordered,
     firstpiece=-1;
     lastpiece=-1;
     
-    for( i=0; i<igrp->ngroups; i++ ) {
+    for( i=0; i<(dim_t)igrp->ngroups; i++ ) {
       if( (igrp->chunk[i] == whichchunk) && (firstpiece == -1) ) {
 	firstpiece = i;
       }

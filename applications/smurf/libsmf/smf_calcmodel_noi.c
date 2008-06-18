@@ -117,9 +117,7 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   dim_t i;                      /* Loop counter */
   int idx=0;                    /* Index within subgroup */
   dim_t j;                      /* Loop counter */
-  double lastmean;              /* Mean from previous iteration */
   unsigned char mask;           /* Bitmask for quality */
-  double mean;                  /* Array mean */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t nbolo;                  /* Number of bolometers */
@@ -136,7 +134,6 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   double sigma;                 /* Bolometer white level */
-  double sigma_tot;             /* Total rms of bolometer time stream */
   size_t spikeiter;             /* Number of iterations for spike detection */
   int spikeiter_s;              /* signed version of spikeiter */
   double spikethresh;           /* Threshold for spike detection */

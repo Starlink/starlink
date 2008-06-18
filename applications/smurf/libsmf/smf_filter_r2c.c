@@ -81,8 +81,6 @@
 #define FUNC_NAME "smf_filter_r2c"
 
 void smf_filter_r2c( smfFilter *filt, int *status ) {
-  dim_t i;                       /* Loop counter */
-  fftw_complex *newbuf=NULL;     /* New complex-valued buffer */
 
   if (*status != SAI__OK) return;
 

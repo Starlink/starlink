@@ -108,7 +108,7 @@ void smf_checkmem_dimm( dim_t maxlen, inst_t instrument, int nrelated,
 
 
  /* Local Variables */
-  int i;                       /* Loop counter */
+  dim_t i;                       /* Loop counter */
   size_t ndet;                 /* Number of detectors each time step */
   size_t nsamp;                /* ndet*maxlen */
   size_t total;                /* Total bytes required */

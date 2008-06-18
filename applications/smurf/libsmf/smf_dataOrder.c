@@ -118,7 +118,6 @@ void smf_dataOrder( smfData *data, int isTordered, int *status ) {
 
   /* Local Variables */
   dim_t bolobase;               /* base index for time-ordered array offsets */
-  size_t dsize;                 /* Size of data type in bytes */
   smf_dtype dtype;              /* Data array type */
   dim_t i;                      /* loop counter */
   int inPlace=0;                /* If set change array in-place */

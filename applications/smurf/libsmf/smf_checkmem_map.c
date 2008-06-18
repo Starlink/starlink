@@ -94,7 +94,6 @@ void smf_checkmem_map( const int *lbnd, const int *ubnd, int rebin,
 		       size_t available, size_t *necessary, int *status ) {
 
  /* Local Variables */
-  int i;                       /* Loop counter */
   size_t mapsize;              /* Elements in output map */
   size_t total;                /* Total bytes required */
 

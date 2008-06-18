@@ -107,7 +107,6 @@ void smf_open_model( const Grp *igrp, int index, const char *mode, smfData **dat
   
   void *buf=NULL;               /* Pointer to total container buffer */
   size_t datalen=0;             /* Size of data buffer in bytes */
-  double *dataptr=NULL;         /* Pointer to data portion of buffer */
   int fd=0;                     /* File descriptor */
   smfData head;                 /* Header for the file */
   size_t headlen=0;             /* Size of header in bytes */ 
@@ -165,7 +164,7 @@ void smf_open_model( const Grp *igrp, int index, const char *mode, smfData **dat
     /* Length of data array buffer */
     ndata = 1;
     for( i=0; i<head.ndims; i++ ) {
-      ndata *= head.dims[i];
+      ndata *= (size_t) head.dims[i];
     }
     datalen = ndata * smf_dtype_sz(head.dtype,status); 
 

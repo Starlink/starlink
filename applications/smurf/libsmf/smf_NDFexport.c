@@ -166,7 +166,7 @@ void smf_NDFexport( const smfData *data, void *variance,
   /* Create lbnd and ubnd arrays, and calculate buffer size */
   if( *status == SAI__OK ) {
     ndata = 1;
-    for( i=0; i<data->ndims; i++ ) {
+    for( i=0; i<(size_t)data->ndims; i++ ) {
       lbnd[i] = 1;
       ubnd[i] = data->dims[i];
       ndata *= data->dims[i];

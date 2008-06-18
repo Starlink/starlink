@@ -99,9 +99,7 @@
 void smf_filter_notch( smfFilter *filt, const double *f_low, 
                        const double *f_high, int n, int *status ) {
 
-  size_t base;          /* Index to start of memory to be zero'd */    
-  size_t bperel;        /* Size of array element in bytes */
-  size_t i;             /* Loop counter */
+  int i;                /* Loop counter */
   size_t iedge_high;    /* Index corresponding to lower edge frequency */
   size_t iedge_low;     /* Index corresponding to upper edge frequency */
   size_t len;           /* Length of memory to be zero'd */
