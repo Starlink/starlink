@@ -44,6 +44,8 @@
 *        Enable the use of 1-D templates
 *     2008-06-12 (EC):
 *        -Switch to split real/imaginary arrays for smfFilter
+*     2008-06-18 (EC):
+*        Fixed error in calculation of df (frequency steps)
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -131,7 +133,7 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
           
           if( *status == SAI__OK ) {
             /* Frequency step in Hz */
-            filt->df = 1. / (steptime * (double) filt->dim); 
+            filt->df = 1. / (steptime * (double) filt->ntslice); 
           }
           
         } else {
