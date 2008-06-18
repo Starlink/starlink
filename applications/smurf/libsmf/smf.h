@@ -849,7 +849,7 @@ void smf_polext( int ondf, double angle, int *status );
 
 void smf_filter_execute( smfData *data, smfFilter *filt, int *status );
 
-void smf_concat_smfGroup( smfGroup *igrp, int whichchunk, int isTordered, 
+void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered, 
 			  AstFrameSet *outfset, int moving, 
 			  int *lbnd_out, int *ubnd_out, int flags,
 			  smfArray **concat, int *status );
@@ -1016,5 +1016,8 @@ void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status );
 
 void smf_filter_notch( smfFilter *filt, const double *f_low, 
                        const double *f_high, int n, int *status );
+
+void smf_NDFexport_smfFilter( const smfFilter *filt, const char *name, 
+                              int *status );
 
 #endif /* SMF_DEFINED */
