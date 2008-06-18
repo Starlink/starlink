@@ -559,21 +559,26 @@ ndf_aform(indf, comp, iaxis, form, status)
    form
    status
 
+# Use ndfAmap not fortran interface so that we get a real pointer
+
 void
-ndf_amap(indf, comp, iaxis, type, mmod, pntr, el, status)
-  ndfint &indf
+ndf_amap(indf, comp, iaxis, type, mmod, ivpntr, el, status)
+  ndfint indf
   char * comp
-  ndfint &iaxis
+  ndfint iaxis
   char * type
   char * mmod
-  ndfint &pntr = NO_INIT
+  IV ivpntr = NO_INIT
   ndfint &el   = NO_INIT
   ndfint &status
  PROTOTYPE: $$$$$$$$
+ PREINIT:
+  void * pntr[3];
  CODE:
-  ndf_amap_(&indf, comp, &iaxis, type, mmod, &pntr, &el, &status, strlen(comp), strlen(type), strlen(mmod));
+  ndfAmap(indf, comp, iaxis, type, mmod, pntr, &el, &status);
+  ivpntr = PTR2IV( pntr[0] ); /* discard others */
  OUTPUT:
-  pntr
+  ivpntr
   el
   status
 
