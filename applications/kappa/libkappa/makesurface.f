@@ -129,7 +129,7 @@
 *     Copyright (C) 1995, 1997-1998, 2004 Central Laboratory of the
 *     Research Councils. 
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
-*     Copyright (C) 2007, 2008 Science & Technology Facilities Council.
+*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -189,6 +189,8 @@
 *     2008 January 5 (MJC):
 *        Write a constant variance array using the SURFACEFIT.RMS 
 *        component when parameter VARIANCE is TRUE.
+*     2008 June 17 (MJC):
+*        Trim trailing blanks from output NDF character components.
 *     {enter_further_changes_here}
 
 *-
@@ -206,6 +208,9 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
+
+*  External References:
+      INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Constants:
       INTEGER MAXDIM             ! Maximum number of dimensions---only
@@ -255,6 +260,7 @@
       INTEGER LIKEID             ! ID of template NDF
       LOGICAL LIMITS             ! PXMIN, PXMAX, PYMIN and PYMAX are
                                  ! valid?
+      INTEGER NC                 ! Used length of string
       INTEGER NCOEF              ! Number of Chebyshev coefficients used
       INTEGER NDFI               ! ID of NDF containing coefficients
       INTEGER NDFO               ! ID of new NDF to contain surface
@@ -584,11 +590,12 @@
 
 *  Obtain the title of the output NDF, using the title of the input
 *  NDF as the default, where there is one, if the user supplies a null
-*  response.
+*  response.  Note that NDF_CPUT does not truncate trailing blanks.
          CALL NDF_STATE( NDFI, 'TITLE', STATE, STATUS )
          IF ( STATE ) THEN
             CALL NDF_CGET( NDFI, 'TITLE', TITLE, STATUS )
-            CALL NDF_CPUT( TITLE, NDFO, 'TITLE', STATUS )
+            NC = CHR_LEN( TITLE )
+            CALL NDF_CPUT( TITLE( :NC ), NDFO, 'TITLE', STATUS )
          END IF
          CALL NDF_CINP( 'TITLE', NDFO, 'TITLE', STATUS )
 
@@ -597,7 +604,8 @@
          CALL NDF_STATE( NDFI, 'LABEL', STATE, STATUS )
          IF ( STATE ) THEN
             CALL NDF_CGET( NDFI, 'LABEL', LABEL, STATUS )
-            CALL NDF_CPUT( LABEL, NDFO, 'LABEL', STATUS )
+            NC = CHR_LEN( LABEL )
+            CALL NDF_CPUT( LABEL( :NC ), NDFO, 'LABEL', STATUS )
          END IF
 
 *  Propagate the label of the input NDF, if there is one present, to
@@ -605,15 +613,19 @@
          CALL NDF_STATE( NDFI, 'UNITS', STATE, STATUS )
          IF ( STATE ) THEN
             CALL NDF_CGET( NDFI, 'UNITS', UNITS, STATUS )
-            CALL NDF_CPUT( UNITS, NDFO, 'UNITS', STATUS )
+            NC = CHR_LEN( UNITS )
+            CALL NDF_CPUT( UNITS( :NC ), NDFO, 'UNITS', STATUS )
          END IF
 
 *  Propagate the x-axis label of the input NDF, if there is one
-*  present, to the output NDF.
+*  present, to the output NDF.  Note that NDF_ACPUT does not truncate 
+*  trailing blanks.
          CALL NDF_ASTAT( NDFI, 'LABEL', SDIM( 1 ), STATE, STATUS )
          IF ( STATE ) THEN
             CALL NDF_ACGET( NDFI, 'LABEL', SDIM( 1 ), XLABEL, STATUS )
-            CALL NDF_ACPUT( XLABEL, NDFO, 'LABEL', SDIM( 1 ), STATUS )
+            NC = CHR_LEN( XLABEL )
+            CALL NDF_ACPUT( XLABEL( :NC ), NDFO, 'LABEL', SDIM( 1 ),
+     :                      STATUS )
          END IF
 
 *  Propagate the y-axis label of the input NDF, if there is one
@@ -621,7 +633,9 @@
          CALL NDF_ASTAT( NDFI, 'LABEL', SDIM( 2 ), STATE, STATUS )
          IF ( STATE ) THEN
             CALL NDF_ACGET( NDFI, 'LABEL', SDIM( 2 ), YLABEL, STATUS )
-            CALL NDF_ACPUT( YLABEL, NDFO, 'LABEL', SDIM( 2 ), STATUS )
+            NC = CHR_LEN( YLABEL )
+            CALL NDF_ACPUT( YLABEL( :NC ), NDFO, 'LABEL', SDIM( 2 ),
+     :                      STATUS )
          END IF
 
 *  Propagate the x-axis units of the input NDF, if there is one
@@ -629,7 +643,9 @@
          CALL NDF_ASTAT( NDFI, 'UNITS', SDIM( 1 ), STATE, STATUS )
          IF ( STATE ) THEN
             CALL NDF_ACGET( NDFI, 'UNITS', SDIM( 1 ), XUNITS, STATUS )
-            CALL NDF_ACPUT( XUNITS, NDFO, 'UNITS', SDIM( 1 ), STATUS )
+            NC = CHR_LEN( XUNITS )
+            CALL NDF_ACPUT( XUNITS( :NC ), NDFO, 'UNITS', SDIM( 1 ),
+     :                      STATUS )
          END IF
 
 *  Propagate the y-axis label of the input NDF, if there is one
@@ -637,7 +653,9 @@
          CALL NDF_ASTAT( NDFI, 'UNITS', SDIM( 2 ), STATE, STATUS )
          IF ( STATE ) THEN
             CALL NDF_ACGET( NDFI, 'UNITS', SDIM( 2 ), YUNITS, STATUS )
-            CALL NDF_ACPUT( YUNITS, NDFO, 'UNITS', SDIM( 2 ), STATUS )
+            NC = CHR_LEN( YUNITS )
+            CALL NDF_ACPUT( YUNITS( :NC ), NDFO, 'UNITS', SDIM( 2 ),
+     :                      STATUS )
          END IF
 
 *  Obtain the required co-ordinate range for this polynomial, using the

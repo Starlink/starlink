@@ -81,13 +81,15 @@
 *  Copyright:
 *     Copyright (C) 1991-1993 Science & Engineering Research Council.
 *     Copyright (C) 1999-2001, 2004 Central Laboratory of the Research
-*     Councils. Copyright (C) 2005 Particle Physics & Astronomy
-*     Research Council. All Rights Reserved.
+*     Councils. 
+*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2008 Science and Technology Faciities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -97,8 +99,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Durham Univ.)
@@ -133,6 +135,8 @@
 *        Use CNF_PVAL
 *     25-OCT-2005 (DSB):
 *        Free resources allocated by KPG1_ASPSY.
+*     2008 June 17 (MJC):
+*        Trim trailing blanks from output NDF character components.
 *     {enter_further_changes_here}
 
 *-
@@ -170,6 +174,9 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      INTEGER CHR_LEN            ! Used length of a string
+
 *  Local Variables:
       CHARACTER DEFLBX*72        ! Default X axis label
       CHARACTER DEFLBY*72        ! Default Y axis label
@@ -186,7 +193,8 @@
       INTEGER IPDAT              ! Pointer to NDF data array
       INTEGER IPVAR              ! Pointer to NDF variance array
       INTEGER IPLOT              ! AST Plot for plotting
-      INTEGER NDATA              ! Number points to plot in the mean profile
+      INTEGER NC                 ! Number of used characters in string
+      INTEGER NDATA              ! Number points to plot in mean profile
       LOGICAL MINOR              ! Plot profile along the minor axis?
       REAL AXSIG                 ! Sigma along an axis
       REAL DMAX                  ! Maximum data value to plot
@@ -219,7 +227,7 @@
 
       NDFLBX = DEFLBX( : IATX )
 
-      IF( RUNITS .NE. ' ' ) THEN
+      IF ( RUNITS .NE. ' ' ) THEN
          CALL CHR_APPND( ' (', DEFLBX, IATX )
          CALL CHR_APPND( RUNITS, DEFLBX, IATX )
          CALL CHR_APPND( ')', DEFLBX, IATX )
@@ -231,7 +239,7 @@
 
       NDFLBY = DEFLBY( : IATY )
 
-      IF( YUNITS .NE. ' ' ) THEN
+      IF ( YUNITS .NE. ' ' ) THEN
          CALL CHR_APPND( ' (', DEFLBY, IATY )
          CALL CHR_APPND( YUNITS, DEFLBY, IATY )
          CALL CHR_APPND( ')', DEFLBY, IATY )
@@ -259,14 +267,14 @@
       END DO
 
 *  Abort if an error has occurred.
-      IF( STATUS .NE. SAI__OK ) GO TO 999
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Attempt to get an output NDF to hold the profile.
       CALL LPG_CREAT( 'PROFOUT', '_REAL', 1, 1, NDATA + 1, INDF, 
      :                STATUS )
 
 *  If a null was supplied, annul the error.
-      IF( STATUS .EQ. PAR__NULL ) THEN
+      IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
 
 *  Otherwise, produce the NDF.
@@ -283,19 +291,19 @@
 
 *  Map the DATA array, and copy the fit values into it.
          CALL NDF_MAP( INDF, 'DATA', '_DOUBLE', 'WRITE', IPDAT, EL, 
-     :                 STATUS ) 
+     :                 STATUS )
          CALL KPG1_CPNDD( 1, 0, NDATA, WORK( 0, 1 ), 0, NDATA, 
      :                    %VAL( CNF_PVAL( IPDAT ) ), EL, STATUS )
 
 *  Map the VARIANCE array, and copy the squared residuals into it.
          CALL NDF_MAP( INDF, 'VARIANCE', '_DOUBLE', 'WRITE', IPVAR, EL, 
-     :                 STATUS ) 
+     :                 STATUS )
          CALL KPG1_CPNDD( 1, 0, NDATA, WORK( 0, 2 ), 0, NDATA, 
      :                    %VAL( CNF_PVAL( IPVAR ) ), EL, STATUS )
 
 *  Map the AXIS CENTRE array, and copy the radii values to it.
          CALL NDF_AMAP( INDF, 'CENTRE', 1, '_REAL', 'WRITE', IPAX, EL, 
-     :                  STATUS ) 
+     :                  STATUS )
          CALL KPG1_CPNDR( 1, 0, NDATA, PROFR, 0, NDATA, 
      :                    %VAL( CNF_PVAL( IPAX ) ),
      :                    EL, STATUS )
@@ -331,23 +339,23 @@
      :                 DEFLBX( : IATX ), DEFLBY( : IATY ), 
      :                 DEFTTL( : IATTTL ), 'XDATA', 'YDATA', 3, 
      :                 .TRUE., 0.0, VAL__BADR, DMIN, DMAX, 
-     :                 'KAPPA_PSF', .TRUE., .FALSE., IPLOT, STATUS ) 
+     :                 'KAPPA_PSF', .TRUE., .FALSE., IPLOT, STATUS )
 
 *  Only proceed if a plot was produced.
-      IF( IPLOT .NE. AST__NULL ) THEN
+      IF ( IPLOT .NE. AST__NULL ) THEN
 
 *  Save the title actually used.
          DEFTTL = AST_GETC( IPLOT, 'TITLE', STATUS )
 
 *  If the default X axis label has not been overridden, use the version
 *  without the units.
-         IF( DEFLBX .NE. AST_GETC( IPLOT, 'LABEL(1)', STATUS ) ) THEN
+         IF ( DEFLBX .NE. AST_GETC( IPLOT, 'LABEL(1)', STATUS ) ) THEN
             NDFLBX = AST_GETC( IPLOT, 'LABEL(1)', STATUS )
          END IF
 
 *  If the default Y axis label has not been overridden, use the version
 *  without the units.
-         IF( DEFLBY .NE. AST_GETC( IPLOT, 'LABEL(2)', STATUS ) ) THEN
+         IF ( DEFLBY .NE. AST_GETC( IPLOT, 'LABEL(2)', STATUS ) ) THEN
             NDFLBY = AST_GETC( IPLOT, 'LABEL(2)', STATUS )
          END IF
 
@@ -368,16 +376,28 @@
       END IF
 
 *  If an output NDF is being created...
-      IF( INDF .NE. NDF__NOID ) THEN
+      IF ( INDF .NE. NDF__NOID ) THEN
 
-*  Store labels, etc.
-         CALL NDF_CPUT( DEFTTL, INDF, 'TITLE', STATUS ) 
-         CALL NDF_CPUT( NDFLBY, INDF, 'LABEL', STATUS ) 
-         IF( YUNITS .NE. ' ' ) CALL NDF_CPUT( YUNITS, INDF, 'UNITS', 
-     :                                        STATUS ) 
-         CALL NDF_ACPUT( NDFLBX, INDF, 'LABEL', 1, STATUS ) 
-         IF( RUNITS .NE. ' ' ) CALL NDF_ACPUT( RUNITS, INDF, 'UNITS', 1, 
-     :                                         STATUS )
+*  Store labels, etc.  Note that NDF_CPUT and NDF_ACPUT do not truncate
+*  trailing blanks.
+         NC = CHR_LEN( DEFTTL )
+         CALL NDF_CPUT( DEFTTL( :NC ), INDF, 'TITLE', STATUS )
+
+         NC = CHR_LEN( NDFLBY )
+         CALL NDF_CPUT( NDFLBY( :NC ), INDF, 'LABEL', STATUS )
+
+         IF ( YUNITS .NE. ' ' ) THEN
+            NC = CHR_LEN( YUNITS )
+            CALL NDF_CPUT( YUNITS( :NC ), INDF, 'UNITS', STATUS )
+         END IF
+
+         NC = CHR_LEN( NDFLBX )
+         CALL NDF_ACPUT( NDFLBX( :NC ), INDF, 'LABEL', 1, STATUS )
+
+         IF ( RUNITS .NE. ' ' ) THEN
+            NC = CHR_LEN( RUNITS )
+            CALL NDF_ACPUT( RUNITS( :NC ), INDF, 'UNITS', 1, STATUS )
+         END IF
 
 *  Annul the NDF identifier.
          CALL NDF_ANNUL( INDF, STATUS )

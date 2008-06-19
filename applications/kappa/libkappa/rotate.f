@@ -185,13 +185,16 @@
 
 *  Copyright:
 *     Copyright (C) 1995, 1998-1999, 2002, 2004 Central Laboratory of
-*     the Research Councils. Copyright (C) 2005-2006 Particle Physics &
-*     Astronomy Research Council. All Rights Reserved.
+*     the Research Councils. 
+*     Copyright (C) 2005-2006 Particle Physics & Astronomy Research 
+*     Council. 
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -201,8 +204,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -242,6 +245,8 @@
 *        two-dimensional array with an insignificant dimension, or a 
 *        cube with two insignificant dimensions, the wrong bounds were
 *        assigned to the output NDF.
+*     2008 June 17 (MJC):
+*        Trim trailing blanks from output NDF character components.
 *     {enter_further_changes_here}
 
 *-
@@ -259,6 +264,9 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
+
+*  External References:
+      INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Constants:
       DOUBLE PRECISION DTOR      ! Degs to radians factor
@@ -315,6 +323,7 @@
       INTEGER M( 4 )             ! MATRIX indices
       DOUBLE PRECISION MATRIX( NDF__MXDIM*NDF__MXDIM ) ! Rotation matrix
                                  ! for i/p -> o/p mapping
+      INTEGER NC                 ! No. characters in text buffer
       INTEGER NDFI               ! Input NDF identifier
       INTEGER NDFIB              ! Section of input NDF to be rotated
       INTEGER NDFO               ! Output NDF identifier
@@ -1412,21 +1421,24 @@
 *  likely to be erroneous and must be interchanged too.
             IF ( NUMRA .EQ. 1 .OR. NUMRA .EQ. 3 ) THEN
 
-*  Transfer the labels.
+*  Transfer the labels.  Note that NDF_ACPUT does not truncate trailing
+*  blanks.
                CALL NDF_ASTAT( NDFI, 'Label', SDIM( 1 ), THERE, STATUS )
                IF ( THERE ) THEN
                   CALL NDF_ACGET( NDFI, 'Label', SDIM( 1 ), AXCOMP,
      :                            STATUS )
-                  CALL NDF_ACPUT( AXCOMP, NDFO, 'Label', SDIM( 2 ),
-     :                            STATUS )
+                  NC = CHR_LEN( AXCOMP )
+                  CALL NDF_ACPUT( AXCOMP( :NC ), NDFO, 'Label', 
+     :                            SDIM( 2 ), STATUS )
                END IF
 
                CALL NDF_ASTAT( NDFI, 'Label', SDIM( 2 ), THERE, STATUS )
                IF ( THERE ) THEN
                   CALL NDF_ACGET( NDFI, 'Label', SDIM( 2 ), AXCOMP,
      :                            STATUS )
-                  CALL NDF_ACPUT( AXCOMP, NDFO, 'Label', SDIM( 1 ),
-     :                            STATUS )
+                  NC = CHR_LEN( AXCOMP )
+                  CALL NDF_ACPUT( AXCOMP( :NC ), NDFO, 'Label',
+     :                            SDIM( 1 ), STATUS )
                END IF
 
 *  Transfer the units.
@@ -1434,16 +1446,18 @@
                IF ( THERE ) THEN
                   CALL NDF_ACGET( NDFI, 'Units', SDIM( 1 ), AXCOMP,
      :                            STATUS )
-                  CALL NDF_ACPUT( AXCOMP, NDFO, 'Units', SDIM( 2 ),
-     :                            STATUS )
+                  NC = CHR_LEN( AXCOMP )
+                  CALL NDF_ACPUT( AXCOMP( :NC ), NDFO, 'Units',
+     :                            SDIM( 2 ), STATUS )
                END IF
 
                CALL NDF_ASTAT( NDFI, 'Units', SDIM( 2 ), THERE, STATUS )
                IF ( THERE ) THEN
                   CALL NDF_ACGET( NDFI, 'Units', SDIM( 2 ), AXCOMP,
      :                            STATUS )
-                  CALL NDF_ACPUT( AXCOMP, NDFO, 'Units', SDIM( 1 ),
-     :                            STATUS )
+                  NC = CHR_LEN( AXCOMP )
+                  CALL NDF_ACPUT( AXCOMP( :NC ), NDFO, 'Units',
+     :                            SDIM( 1 ), STATUS )
                END IF
 
 *  Transfer the normalisation flag.

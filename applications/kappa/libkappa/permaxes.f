@@ -77,13 +77,16 @@
 
 *  Copyright:
 *     Copyright (C) 2001, 2004 Central Laboratory of the Research
-*     Councils. Copyright (C) 2006 Particle Physics & Astronomy
-*     Research Council. All Rights Reserved.
+*     Councils. 
+*     Copyright (C) 2006 Particle Physics & Astronomy Research 
+*     Council. 
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -93,8 +96,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
@@ -110,6 +113,8 @@
 *        Use CNF_PVAL.
 *     2006 April 12 (MJC):
 *        Remove unused variable and wrapped long lines.
+*     2008 June 17 (MJC):
+*        Trim trailing blanks from output NDF character components.
 *     {enter_further_changes_here}
 
 *-
@@ -125,6 +130,9 @@
 
 *  Status:
       INTEGER STATUS             ! Global status
+
+*  External References:
+      INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Variables:
       BYTE BB                    ! Quality bad-bits value
@@ -158,6 +166,7 @@
       INTEGER LBNDO( NDF__MXDIM )! Lower pixel index bounds in output
       INTEGER MINAX              ! Minimum allowed number of Frame axes
       INTEGER NAX                ! Number of Frame axes
+      INTEGER NC                 ! No. characters in text buffer
       INTEGER NDIM               ! Number of NDF dimensions
       INTEGER NERR               ! Number of numerical errors
       INTEGER PERM( NDF__MXDIM ) ! Axis permutation array
@@ -382,11 +391,13 @@
             CALL NDF_ASTAT( INDF1, ACCOMP( ICOMP ), IDIM, THERE, 
      :                      STATUS )
       
-*  If so, then copy it to the output.
+*  If so, then copy it to the output  Note that NDF_ACPUT does not 
+*  truncate trailing blanks.
             IF ( THERE ) THEN      
                CALL NDF_ACGET( INDF1, ACCOMP( ICOMP ), IDIM, VALUE, 
      :                         STATUS ) 
-               CALL NDF_ACPUT( VALUE, INDF2, ACCOMP( ICOMP ), I, 
+               NC = CHR_LEN( VALUE )
+               CALL NDF_ACPUT( VALUE( :NC ), INDF2, ACCOMP( ICOMP ), I, 
      :                         STATUS ) 
             END IF
 

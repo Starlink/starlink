@@ -258,6 +258,7 @@
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
 *     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2008 Science and Technology Faciities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -324,6 +325,8 @@
 *        Revised KPS1_CLPSx API.
 *     2007 December 10 (MJC):
 *        Newly revised KPS1_CLPSx API.
+*     2008 June 17 (MJC):
+*        Trim trailing blanks from output NDF character components.
 *     {enter_further_changes_here}
 
 *-
@@ -344,6 +347,7 @@
       INTEGER STATUS
 
 *  External References:
+      INTEGER CHR_LEN            ! Used length of a string
       INTEGER KPG1_FLOOR         ! Most positive integer .LE. a given
                                  ! real
       INTEGER KPG1_CEIL          ! Most negative integer .GE. a given
@@ -853,14 +857,16 @@
      :     ESTIM .EQ. 'IWC' .OR. ESTIM .EQ. 'IWD' ) THEN
 
 *  Obtain the collapsed-axis units of the input NDF; these now become
-*  the data units in output NDF.
+*  the data units in output NDF.  Note that NDF_CPUT does not truncate
+*  trailing blanks.
          ATTRIB = 'UNIT('
          NC = 5
          CALL CHR_PUTI( IAXIS, ATTRIB, NC )
          CALL CHR_PUTC( ')', ATTRIB, NC )
          UNITS = AST_GETC( IWCS, ATTRIB( :NC ), STATUS )
 
-         CALL NDF_CPUT( UNITS, INDFO, 'Units', STATUS )
+         NC = CHR_LEN( UNITS )
+         CALL NDF_CPUT( UNITS( :NC ), INDFO, 'Units', STATUS )
 
 *  New unit is the existing unit times the co-ordinate's unit.  So
 *  obtain each unit and concatenate the two inserting a blank between
@@ -879,7 +885,7 @@
          UNITS( NC:NC ) = ' '
          CALL CHR_APPND( AUNITS, UNITS, NC )
 
-         CALL NDF_CPUT( UNITS, INDFO, 'Units', STATUS )
+         CALL NDF_CPUT( UNITS( :NC ), INDFO, 'Units', STATUS )
       END IF
 
 *  Prepare for the channel-map loop.

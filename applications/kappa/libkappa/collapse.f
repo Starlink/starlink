@@ -265,7 +265,7 @@
 *  Copyright:
 *     Copyright (C) 2000-2001, 2004 Central Laboratory of the Research
 *     Councils. Copyright (C) 2005-2006 Particle Physics & Astronomy
-*     Research Council.  Copyright (C) 2007 Science and Technology 
+*     Research Council.  Copyright (C) 2007-2008 Science and Technology 
 *     Facilities Council.  All Rights Reserved.
 
 *  Licence:
@@ -390,6 +390,8 @@
 *     4-APR-2008 (DSB):
 *        Change prologue to emphasise the fact that HIGH and LOW are
 *        formatted axis values.
+*     2008 June 17 (MJC):
+*        Trim trailing blanks from output NDF character components.
 *     {enter_further_changes_here}
 
 *-
@@ -410,6 +412,7 @@
       INTEGER STATUS
 
 *  External References:
+      INTEGER CHR_LEN            ! Used length of a string
       INTEGER KPG1_FLOOR         ! Most positive integer .LE. a given
                                  ! real
       INTEGER KPG1_CEIL          ! Most negative integer .GE. a given
@@ -504,9 +507,9 @@
                                  ! pointer
       INTEGER NAXC               ! Original number of current Frame axes
       INTEGER NBLOCK             ! Number of NDF blocks
+      INTEGER NC                 ! Used length of string
       INTEGER NCOMP              ! No. of components within cell of AXIS
                                  ! array
-      INTEGER NC                 ! Used length of string
       INTEGER NDIM               ! Number of pixel axes in input NDF
       INTEGER NDIMO              ! Number of pixel axes in output NDF
       INTEGER NERR               ! Number of numerical errors
@@ -906,14 +909,16 @@
      :     ESTIM .EQ. 'IWC' .OR. ESTIM .EQ. 'IWD' ) THEN
 
 *  Obtain the collapsed-axis units of the input NDF; these now become
-*  the data units in output NDF.
+*  the data units in output NDF.  Note that NDF_CPUT does not truncate
+*  trailing blanks.
          ATTRIB = 'UNIT('
          NC = 5
          CALL CHR_PUTI( IAXIS, ATTRIB, NC )
          CALL CHR_PUTC( ')', ATTRIB, NC )
          UNITS = AST_GETC( IWCS, ATTRIB( :NC ), STATUS )
 
-         CALL NDF_CPUT( UNITS, INDFO, 'Units', STATUS )
+         NC = CHR_LEN( UNITS )
+         CALL NDF_CPUT( UNITS( :NC ), INDFO, 'Units', STATUS )
 
 *  New unit is the existing unit times the co-ordinate's unit.  So
 *  obtain each unit and concatenate the two inserting a blank between
@@ -932,7 +937,7 @@
          UNITS( NC:NC ) = ' '
          CALL CHR_APPND( AUNITS, UNITS, NC )
 
-         CALL NDF_CPUT( UNITS, INDFO, 'Units', STATUS )
+         CALL NDF_CPUT( UNITS( :NC ), INDFO, 'Units', STATUS )
       END IF
 
 *  Process in blocks.
