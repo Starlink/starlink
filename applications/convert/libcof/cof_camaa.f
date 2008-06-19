@@ -121,7 +121,9 @@
 *        each set of three rows (data, error, exposure) into a single
 *        NDF.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2008 June 18 (MJC):
+*        Trim trailing blanks from output NDF character components.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -194,6 +196,7 @@
       INTEGER NC                 ! Number of characters in observation
                                  ! number
       INTEGER NCF                ! Number of characters in filename
+      INTEGER NCU                ! Used length of string
       CHARACTER * ( 10 ) NDFNAM  ! Component name for an NDF in a
                                  ! multiple-observation HDS file
       INTEGER NDFE               ! Effective NDF identifier
@@ -639,8 +642,10 @@
                GOTO 999
             END IF
 
-            IF ( UNITS .NE. ' ' )
-     :        CALL NDF_CPUT( UNITS, NDFE, 'Units', STATUS )
+            IF ( UNITS .NE. ' ' ) THEN
+               NCU = CHR_LEN( UNITS )
+               CALL NDF_CPUT( UNITS( :NCU ), NDFE, 'Units', STATUS )
+            END IF
 
 *  Set the label for the NDF.
             IF ( ARTYPE .EQ. 'EXPOSURE' ) THEN

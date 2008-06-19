@@ -33,6 +33,7 @@
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -42,8 +43,10 @@
 *        Corrected single precision constants passed to AST_PERMMAP to
 *        double precision. 
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
-*     {enter_changes_here}
+*        Use CNF_PVAL.
+*     2008 June 18 (MJC):
+*        Trim trailing blanks from output NDF character components.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -177,7 +180,8 @@
      :                          STATUS ) ) THEN
                   LAB = AST_GETC( FS, 'Label(' // AXIS( : NC ) // 
      :                               ')', STATUS )
-                  CALL NDF_ACPUT( LAB, INDF, 'Lab', IAX, STATUS )
+                  CALL NDF_ACPUT( LAB( : NC + 7 ), INDF, 'Lab', IAX,
+     :                            STATUS )
                END IF
 
 *  If the Axis has a set value for the Unit attribute, use it as
@@ -186,7 +190,8 @@
      :                          STATUS ) ) THEN
                   UNIT = AST_GETC( FS, 'Unit(' // AXIS( : NC ) // 
      :                               ')', STATUS )
-                  CALL NDF_ACPUT( UNIT, INDF, 'Unit', IAX, STATUS )
+                  CALL NDF_ACPUT( UNIT( : NC + 6 ), INDF, 'Unit', IAX,
+     :                            STATUS )
                END IF
 
 *  End the AST context and do the next axis.

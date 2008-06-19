@@ -16,8 +16,8 @@
 
 *  Description:
 *     This routine converts an ISO SWS AA product stored in a FITS
-*     binary table into a 1-dimensional NDF.  The NDF contains data and
-*     variance arrays, and the detector number is stored in the
+*     binary table into a one-dimensional NDF.  The NDF contains data
+*     and variance arrays, and the detector number is stored in the
 *     quality.  The remaining columns (save two) are written to an
 *     SWSAA extension.  The primary HDU headers may be written to the
 *     standard FITS airlock extension.  See the "Notes" for further
@@ -75,7 +75,9 @@
 *     1996 January 23 (MJC):
 *        Original version.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2008 June 18 (MJC):
+*        Trim trailing blanks from output NDF character components.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -136,6 +138,7 @@
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Processing and actual type for
                                  ! a column array
       CHARACTER * ( 8 ) KEYWRD   ! FITS header keyword
+      INTEGER NC                 ! Used length of string
       INTEGER NCF                ! Number of characters in filename
       INTEGER NERR               ! Number of VEC_ routine errors
       INTEGER NFIELD             ! Number of fields in table
@@ -265,9 +268,13 @@
 
 *  Obtain the units for this column, and place it into the NDF.  To do
 *  this first form the names of the units keyword for this column.
+*  Note that NDF_CPUT does not truncate trailing blanks.
       CALL FTKEYN( 'TUNIT', COLNUM, KEYWRD, FSTAT )
       CALL COF_GKEYC( FUNIT, KEYWRD, THERE, UNITS, COMENT, STATUS )
-      IF ( THERE ) CALL NDF_CPUT( UNITS, NDF, 'Units', STATUS )
+      IF ( THERE ) THEN
+         NC = CHR_LEN( UNITS )
+         CALL NDF_CPUT( UNITS( :NC ), NDF, 'Units', STATUS )
+      END IF
 
 *  Set the label for the NDF.
       CALL NDF_CPUT( 'Flux', NDF, 'Label', STATUS )
@@ -453,7 +460,10 @@
 *  this first form the names of the units keyword for this column.
       CALL FTKEYN( 'TUNIT', COLNUM, KEYWRD, FSTAT )
       CALL COF_GKEYC( FUNIT, KEYWRD, THERE, UNITS, COMENT, STATUS )
-      IF ( THERE ) CALL NDF_ACPUT( UNITS, NDF, 'Units', 1, STATUS )
+      IF ( THERE ) THEN
+         NC = CHR_LEN( UNITS )
+         CALL NDF_ACPUT( UNITS( :NC ), NDF, 'Units', 1, STATUS )
+      END IF
 
 *  Set the label for the axis.
       CALL NDF_ACPUT( 'Wavelength', NDF, 'Label', 1, STATUS )

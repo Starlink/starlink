@@ -1,5 +1,5 @@
       SUBROUTINE COF_INES( FUNIT, FILE, NDF, PROFIT, LOGHDR, FDL,
-     :                      STATUS )
+     :                     STATUS )
 *+
 *  Name:
 *     COF_INES
@@ -72,6 +72,8 @@
 *        Use CNF_PVAL.
 *     2008 March 15 (MJC):
 *        Use KAPLIBS routines instead of their cloned CON equivalents.
+*     2008 June 18 (MJC):
+*        Trim trailing blanks from output NDF character components.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -131,6 +133,7 @@
       INTEGER NC                 ! Number of characters in observation
                                  ! number
       INTEGER NCF                ! Number of characters in filename
+      INTEGER NCU                ! Used length of string
       INTEGER NFIELD             ! Number of fields in table
       INTEGER NREP               ! Number of bad error values replaced
       INTEGER NREPHI             ! Dummy
@@ -283,9 +286,13 @@
 
 *  Obtain the units for this column, and place it into the NDF.  To do
 *  this first form the names of the units keyword for this column.
+*  Note that NDF_CPUT does not truncate trailing blanks.
       CALL FTKEYN( 'TUNIT', COLNUM, KEYWRD, FSTAT )
       CALL COF_GKEYC( FUNIT, KEYWRD, THERE, UNITS, COMENT, STATUS )
-      IF ( THERE ) CALL NDF_CPUT( UNITS, NDF, 'Units', STATUS )
+      IF ( THERE ) THEN
+         NCU = CHR_LEN( UNITS )
+         CALL NDF_CPUT( UNITS( :NCU ), NDF, 'Units', STATUS )
+      END IF
 
 *  Set the label for the NDF.
       CALL NDF_CPUT( 'Flux', NDF, 'Label', STATUS )
@@ -434,9 +441,13 @@
 
 *  Obtain the units for this column, and place it into the NDF.  To do
 *  this first form the names of the units keyword for this column.
+*  Note that NDF_ACPUT does not truncate trailing blanks.
       CALL FTKEYN( 'TUNIT', COLNUM, KEYWRD, FSTAT )
       CALL COF_GKEYC( FUNIT, KEYWRD, THERE, UNITS, COMENT, STATUS )
-      IF ( THERE ) CALL NDF_ACPUT( UNITS, NDF, 'Units', 1, STATUS )
+      IF ( THERE ) THEN
+         NC = CHR_LEN( UNITS )
+         CALL NDF_ACPUT( UNITS( :NCU ), NDF, 'Units', 1, STATUS )
+      END IF
 
 *  Set the label for the axis.
       CALL NDF_ACPUT( 'Wavelength', NDF, 'Label', 1, STATUS )

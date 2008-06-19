@@ -15,10 +15,10 @@
 
 *  Description:
 *     This routine converts an IUE MXHI product stored in a FITS binary
-*     table into a series of 1-dimensional NDFs stored in a single
+*     table into a series of one-dimensional NDFs stored in a single
 *     container file corresponding to the supplied NDF identifier.
 *     Each NDF contains data and quality arrays, axes, label and units.
-*     Only the most-significant 8 bits of the quality flags are
+*     Only the most-significant eight bits of the quality flags are
 *     transferred to the NDF.  Additional columns in the binary table
 *     are written as components of an IUE_MH extension.  The primary
 *     HDU headers may be written to the standard FITS airlock
@@ -82,7 +82,6 @@
 *     reversed in row number, the limits are 768 minus the number
 *     stored, and the resultant background array is flipped.
 
-*  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
 *     DSB: David S. Berry (STARLINK)
@@ -101,6 +100,8 @@
 *        Remove unused variables.
 *     2008 March 15 (MJC):
 *        Use KAPLIBS routines instead of their cloned CON equivalents.
+*     2008 June 18 (MJC):
+*        Trim trailing blanks from output NDF character components.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -173,6 +174,7 @@
       INTEGER NCC                ! Number of characters in component
                                  ! name
       INTEGER NCF                ! Number of characters in filename
+      INTEGER NCU                ! Used length of string
       INTEGER NDFE               ! Identifier of effective NDF
       INTEGER NDFO               ! Identifier for output NDF
       INTEGER NFIELD             ! Number of fields in table
@@ -400,9 +402,13 @@
 
 *  Obtain the units for this column, and place it into the NDF.  To do
 *  this first form the names of the units keyword for this column.
+*  Note that NDF_CPUT does not truncate trailing blanks.
          CALL FTKEYN( 'TUNIT', COLNUM, KEYWRD, FSTAT )
          CALL COF_GKEYC( FUNIT, KEYWRD, THERE, UNITS, COMENT, STATUS )
-         IF ( THERE ) CALL NDF_CPUT( UNITS, NDFO, 'Units', STATUS )
+         IF ( THERE ) THEN
+            NCU = CHR_LEN( UNITS )
+            CALL NDF_CPUT( UNITS( :NCU ), NDFO, 'Units', STATUS )
+         END IF
 
 *  Set the label for the NDF.
          CALL NDF_CPUT( 'Flux', NDFO, 'Label', STATUS )
@@ -489,9 +495,13 @@
 
 *  Obtain the units for this column, and place it into the NDF.  To do
 *  this first form the names of the units keyword for this column.
+*  Note that NDF_ACPUT does not truncate trailing blanks.
          CALL FTKEYN( 'TUNIT', COLNUM, KEYWRD, FSTAT )
          CALL COF_GKEYC( FUNIT, KEYWRD, THERE, UNITS, COMENT, STATUS )
-         IF ( THERE ) CALL NDF_ACPUT( UNITS, NDFO, 'Units', 1, STATUS )
+         IF ( THERE ) THEN
+            NCU = CHR_LEN( UNITS )
+            CALL NDF_ACPUT( UNITS( :NCU ), NDFO, 'Units', 1, STATUS )
+         END IF
 
 *  Set the label for the axis.
          CALL NDF_ACPUT( 'Wavelength', NDFO, 'Label', 1, STATUS )
@@ -678,8 +688,11 @@
                      CALL FTKEYN( 'TUNIT', COLNUM, KEYWRD, FSTAT )
                      CALL COF_GKEYC( FUNIT, KEYWRD, THERE, UNITS,
      :                               COMENT, STATUS )
-                     IF ( THERE )
-     :                 CALL NDF_CPUT( UNITS, NDFE, 'Units', STATUS )
+                     IF ( THERE ) THEN
+                        NCU = CHR_LEN( UNITS )
+                        CALL NDF_CPUT( UNITS( :NCU ), NDFE, 'Units',
+     :                                 STATUS )
+                     END IF
 
 *  Set the label for the NDF.
                      CALL NDF_CPUT( 'Flux', NDFE, 'Label', STATUS )
@@ -717,8 +730,9 @@
                         CALL NDF_ACGET( NDFO, 'Units', 1, UNITS,
      :                                  STATUS )
                         IF ( UNITS .NE. ' ' ) THEN
-                           CALL NDF_ACPUT( UNITS, NDFE, 'Units', 1,
-     :                                     STATUS )
+                           NCU = CHR_LEN( UNITS )
+                           CALL NDF_ACPUT( UNITS( :NCU ), NDFE, 'Units',
+     :                                     1, STATUS )
                         END IF
 
 *  Set the label for the axis.

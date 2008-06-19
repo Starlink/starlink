@@ -16,14 +16,14 @@
 
 *  Description:
 *     This routine converts an ISO LWS AN product stored in a FITS
-*     binary table into a 4-dimensonal NDF.  The NDF contains data and
-*     variance arrays, and has a quality array: the detector number is
-*     stored in the first-four bits and the scan direction in the fifth
-*     bit.  The first two dimensions are the spatial bins, next is the
-*     wavelength axis, and the fourth is the scan count.  The wavelength
-*     axis comprises all the distinct values found in the LWS AN file.
-*     The remaining columns (save the filler) are written to an LWSAN
-*     extension.  The primary HDU headers may be written to the
+*     binary table into a four-dimensonal NDF.  The NDF contains data
+*     and variance arrays, and has a quality array: the detector number
+*     is stored in the first-four bits and the scan direction in the 
+*     fifth bit.  The first two dimensions are the spatial bins, next is 
+*     the wavelength axis, and the fourth is the scan count.  The 
+*     wavelength axis comprises all the distinct values found in the LWS 
+*     AN file.  The remaining columns (save the filler) are written to 
+*     an LWSAN extension.  The primary HDU headers may be written to the
 *     standard FITS airlock extension.  See the "Notes" for further
 *     details.
 
@@ -88,6 +88,8 @@
 *        safety.
 *     2008 March 15 (MJC):
 *        Use KAPLIBS routine instead of its cloned CON equivalent.
+*     2008 June 18 (MJC):
+*        Trim trailing blanks from output NDF character components.
 *     {enter_further_changes_here}
 
 *-
@@ -163,6 +165,7 @@
       INTEGER MINPOS             ! Index of the minimum value of a
                                  ! column
       INTEGER NAXES(1)           ! Size of each dimension
+      INTEGER NC                 ! Used length of string
       INTEGER NCF                ! Number of characters in filename
       INTEGER NFIELD             ! Number of fields in table
       INTEGER NINVAL             ! Number of bad values in a column
@@ -500,7 +503,10 @@
 *  this first form the names of the units keyword for this column.
       CALL FTKEYN( 'TUNIT', COLNUM, KEYWRD, FSTAT )
       CALL COF_GKEYC( FUNIT, KEYWRD, THERE, UNITS, COMENT, STATUS )
-      IF ( THERE ) CALL NDF_ACPUT( UNITS, NDF, 'Units', 3, STATUS )
+      IF ( THERE ) THEN
+         NC = CHR_LEN( UNITS )
+         CALL NDF_ACPUT( UNITS( :NC ), NDF, 'Units', 3, STATUS )
+      END IF
       CALL NDF_ACPUT( 'Pixels', NDF, 'Units', 1, STATUS )
       CALL NDF_ACPUT( 'Pixels', NDF, 'Units', 2, STATUS )
 
