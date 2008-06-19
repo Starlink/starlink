@@ -15,7 +15,7 @@
    Ancestors can be removed by their indices or by pattern matching
    against their names.
 
-   o  WCSSLIDE applies a translational corrrection to the World
+   o  WCSSLIDE applies a translational correction to the World
    Co-ordinate System (WCS) of an NDF so that the WCS position of
    a given pixel is moved by a specified amount along each WCS axis.
    Thus it could be used to correct pointing errors.
@@ -39,18 +39,22 @@
 
    o  FITSMOD
 
-       - Parameter EDIT has a new option "Amend".  This will write a 
-       new header if the keyword does not exist, but will only modify 
-       an existing header.  Using this option, it is now not 
-       necessary to know whether or not a header exists.  
+      - Parameter EDIT has a new option "Amend".  This will write a 
+      new header if the chosen keyword does not exist, but will only 
+      modify an existing header.  Using this option, it is now not 
+      necessary to know whether or not a header exists.  
        
-       - Likewise there is an Amend option for Field 1 of the file
-       format. 
+      - Likewise there is an Amend option for Field 1 of the file
+      format. 
+
+   o  MAKESNR 
+   
+      -  It is now faster when Parameter MINVAR is supplied on the
+      command line.
 
    o  MFITTREND
 
-      - Cubic-spline fitting is now available, the type of fit
-
+      - Cubic-spline fitting is now available, the type of fit is
       controlled by the new parameter FITTYPE.  There are two subtypes
       of fit selected by new parameter INTERPOL: interpolation through
       specified or equally spaced knots, or smoothing at automatically

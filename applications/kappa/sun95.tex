@@ -55345,7 +55345,7 @@ The following new applications have been added:
    processing.
 
    \item [\htmlref{WCSSLIDE}{WCSSLIDE}] \mbox{}
-   This applies a translational corrrection to the
+   This applies a translational correction to the
    \htmlref{WCS}{apndf:WCS} of an NDF so that the WCS position of
    a given pixel is moved by a specified amount along each WCS axis.
    Thus it could be used to correct pointing errors.
@@ -55375,12 +55375,18 @@ The following applications have been modified:
    \item [\htmlref{FITSMOD}{FITSMOD}] \mbox{}
       \begin{itemize}
          \item Parameter EDIT has a new option {\tt "Amend"}.  This 
-         will write a new header if the keyword does not exist, but 
+         will write a new header if the chosen keyword does not exist, but 
          will only modify an existing header.  Using this option, it
          is now not necessary to know whether or not a header exists.
 
          \item Likewise there is an {\tt Amend} option for Field 1 of 
          the file format. 
+      \end{itemize}
+
+   \item [\htmlref{MAKESNR}{MAKESNR}] \mbox{}
+      \begin{itemize}
+         \item Made more efficient by only calculating the default value
+         for Parameter MINVAR if no value is supplied on the command line.
       \end{itemize}
 
    \item [\htmlref{MFITTREND}{MFITTREND}] \mbox{}
