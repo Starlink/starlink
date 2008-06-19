@@ -39,6 +39,7 @@
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
 /*    BKM:  B.K. McIlwrath    (STARLINK)                                    */
+/*    DSB:  David S Berry (JAC, UCLan)                                      */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -46,42 +47,41 @@
 /*       Original version.                                                  */
 /*    19-APR-2004 (BKM):                                                    */
 /*       Revise for 64-bit HDS files.                                       */
+/*    19-JUN-2008 (DSB):                                                    */
+/*       64-bit algorithm made more efficient.                              */
 /*    {@enter_changes_here@}                                                */
 
 /* Bugs:                                                                    */
 /*    {@note_any_bugs_here@}                                                */
 
 /*-                                                                         */
-/* Local Variables:                                                         */
-      INT_BIG temp;                 /* Temporary variable                   */
-      int shift;                    /* Bit-shift count                      */
-      int i;                        /* Loop counter                         */
 
 /*.                                                                         */
 
 /* Check the inherited global status.                                       */
       if ( !_ok( hds_gl_status ) ) return hds_gl_status;
 
-      if ( !hds_gl_64bit )
-      {
+      if ( !hds_gl_64bit ) {
+
 /* Unpack the RID .bloc field from the first 20 bits, and the RID .chip     */
 /* field from the following 4 bits.                                         */
          rid->bloc = ( ( ( ( psrv[ 2 ] & 0xf ) << 8 ) |
                              psrv[ 1 ] ) << 8 ) |
                              psrv[ 0 ];
          rid->chip =  ( psrv[ 2 ] >> 4 ) & 0xf;
-      }
-      else
-      {
-         rid->bloc = 0;
-         shift = 48;
-         for( i = 6; i>=0; i-- )
-         {
-            temp = psrv[ i ] << shift;
-            rid->bloc |= temp;
-            shift -= 8;
-         }
-         rid->chip = psrv[ 7 ];
+
+      } else {
+
+         rid->chip = psrv[7];
+         rid->bloc = (((((((((((
+                      psrv[6]
+                      << 8 ) | psrv[5] )
+                      << 8 ) | psrv[4] ) 
+                      << 8 ) | psrv[3] )
+                      << 8 ) | psrv[2] )
+                      << 8 ) | psrv[1] ) 
+                      << 8 ) | psrv[0];
+
       }
 
 /* Return the current global status value.                                  */

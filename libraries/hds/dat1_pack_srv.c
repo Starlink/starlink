@@ -40,6 +40,7 @@
 /* Authors:                                                                 */
 /*    RFWS: R.F. Warren-Smith (STARLINK)                                    */
 /*    BKM:  B.K. McIlwrath    (STARLINK)                                    */
+/*    DSB:  David S Berry     (JAC, UCLan)                                  */
 /*    {@enter_new_authors_here@}                                            */
 
 /* History:                                                                 */
@@ -47,6 +48,8 @@
 /*       Original version.                                                  */
 /*    19-AUG-2004 (BKM):                                                    */
 /*       Revise for 64-bit HDS files.                                       */
+/*    19-JUN-2008 (DSB):                                                    */
+/*       64-bit algorithm made more efficient.                              */
 /*    {@enter_changes_here@}                                                */
 
 /* Bugs:                                                                    */
@@ -55,6 +58,9 @@
 /*-                                                                         */
 
 /*.                                                                         */
+
+/* Local Variables : */
+   INT_BIG temp;
 
 /* Check the inherited global status.                                       */
       if ( !_ok( hds_gl_status ) ) return hds_gl_status;
@@ -73,13 +79,14 @@
       }
       else
       {
-         psrv[ 0 ] = rid->bloc & 0xff;
-         psrv[ 1 ] = (rid->bloc >> 8 ) & 0xff;
-         psrv[ 2 ] = (rid->bloc >> 16 ) & 0xff;
-         psrv[ 3 ] = (rid->bloc >> 24 ) & 0xff;
-         psrv[ 4 ] = (rid->bloc >> 32 ) & 0xff;
-         psrv[ 5 ] = (rid->bloc >> 40 ) & 0xff;
-         psrv[ 6 ] = (rid->bloc >> 48 ) & 0xff;
+         temp = rid->bloc;
+         psrv[ 0 ] = temp & 0xff;
+         psrv[ 1 ] = ( temp >>= 8 ) & 0xff;
+         psrv[ 2 ] = ( temp >>= 8 ) & 0xff;
+         psrv[ 3 ] = ( temp >>= 8 ) & 0xff;
+         psrv[ 4 ] = ( temp >>= 8 ) & 0xff;
+         psrv[ 5 ] = ( temp >>= 8 ) & 0xff;
+         psrv[ 6 ] = ( temp >>= 8 ) & 0xff;
          psrv[ 7 ] = rid->chip;
       }
 
