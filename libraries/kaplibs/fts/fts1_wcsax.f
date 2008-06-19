@@ -32,12 +32,13 @@
 
 *  Copyright:
 *     Copyright (C) 1997, 2004 Central Laboratory of the Research Councils.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *     
 *     This program is distributed in the hope that it will be
@@ -47,12 +48,13 @@
 *     
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -60,6 +62,8 @@
 *        Original version.
 *     2004 September 1 (TIMJ):
 *        Use CNF_PVAL.
+*     2008 June 18 (MJC):
+*        Trim trailing blanks from output NDF character components.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -191,19 +195,22 @@
                CALL CHR_PUTI( IAX, AXIS, NC )
 
                IF( AST_TEST( FS, 'Label(' // AXIS( : NC ) // ')',
-     :                          STATUS ) ) THEN
-                  LAB = AST_GETC( FS, 'Label(' // AXIS( : NC ) // 
-     :                               ')', STATUS )
-                  CALL NDF_ACPUT( LAB, INDF, 'Lab', IAX, STATUS )
+     :                       STATUS ) ) THEN
+                  LAB = AST_GETC( FS, 'Label(' // AXIS( : NC ) // ')',
+     :                            STATUS )
+                  CALL NDF_ACPUT( LAB( : NC + 7 ), INDF, 'Lab', IAX,
+     :                            STATUS )
                END IF
 
 *  If the Axis has a set value for the Unit attribute, use it as
-*  the NDF AXIS unit.
+*  the NDF AXIS unit.  Note that NDF_ACPUT does not truncate 
+*  trailing blanks.
                IF( AST_TEST( FS, 'Unit(' // AXIS( : NC ) // ')',
-     :                          STATUS ) ) THEN
-                  UNIT = AST_GETC( FS, 'Unit(' // AXIS( : NC ) // 
-     :                               ')', STATUS )
-                  CALL NDF_ACPUT( UNIT, INDF, 'Unit', IAX, STATUS )
+     :                       STATUS ) ) THEN
+                  UNIT = AST_GETC( FS, 'Unit(' // AXIS( : NC ) // ')',
+     :                             STATUS )
+                  CALL NDF_ACPUT( UNIT( : NC + 6 ), INDF, 'Unit', IAX,
+     :                            STATUS )
                END IF
 
 *  End the AST context and do the next axis.

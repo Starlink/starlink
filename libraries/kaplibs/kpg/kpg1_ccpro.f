@@ -40,6 +40,7 @@
 *  Copyright:
 *     Copyright (C) 1994 Science & Engineering Research Council.
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -71,6 +72,8 @@
 *        the output NDF (rather than being set blank) if a null 
 *        parameter value is supplied, and no component exists in the
 *        input NDF.
+*     2008 June 17 (MJC):
+*        Trim trailing blanks from output NDF character components.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -93,9 +96,13 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      INTEGER CHR_LEN            ! Used length of a string
+
 *  Local Variables:
-      CHARACTER * ( 80 ) VALUE   ! Value of the character component
+      INTEGER NC                 ! No. of characters in text
       LOGICAL THERE              ! Component defined in the input NDF?
+      CHARACTER * ( 80 ) VALUE   ! Value of the character component
 
 *.
 
@@ -106,9 +113,10 @@
       CALL NDF_STATE( NDFI, COMP, THERE, STATUS )
 
 *  If so, use the current value as the initial value in the output NDF.
-      IF( THERE ) THEN
-        CALL NDF_CGET( NDFI, COMP, VALUE, STATUS )
-        CALL NDF_CPUT( VALUE, NDFO, COMP, STATUS )
+      IF ( THERE ) THEN
+         CALL NDF_CGET( NDFI, COMP, VALUE, STATUS )
+         NC = CHR_LEN( VALUE )
+         CALL NDF_CPUT( VALUE( :NC ), NDFO, COMP, STATUS )
       END IF
 
 *  Obtain the value for the character component from the parameter
