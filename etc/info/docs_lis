@@ -228,6 +228,7 @@ SUN                            STARLINK USER NOTES                           SUN
 230.06  2004-06-01 aja   30   ORAC-DR - Overview and General Introduction
 231.04  2004-06-01 fe    14   ORAC-DR - SCUBA pipeline data reduction
 232.08  2004-06-01 MJC   154  ORAC-DR - imaging data reduction v1.0 user's guide
+233.04  2004-06-01 TJ    ??   ORAC-DR - Programmer's Guide
 234.01  2000-09-22 RTP   8    ONE - Odds and Ends library
 235.03  2002-09-24 ACD   27   NAOS - finding NAOMI guide stars
 236.04  2004-06-01 PH    20   ORAC-DR - spectroscopy data reduction
@@ -252,6 +253,7 @@ SUN                            STARLINK USER NOTES                           SUN
 257.01  2006-01-19 DSB   ??   ATL - A library of AST utility routines.
 258.01  2008-MM-DD            SMURF
 259.01  2008-04-09 JB    ??   GSD2ACSIS - Programmer's Guide (SMURF)
+260.01  2008-06-20 BC    ??   ORAC-DR - ACSIS pipeline data reduction
 
 AUTHORS                          AUTHORS                                AUTHORS
                                      (Site code)
@@ -267,6 +269,7 @@ AUTHORS                          AUTHORS                                AUTHORS
        AT    Antonio Talavera        (VILSPA)
        AW    A Woollatt              (CAM Univ Press)
        AXF   Andrew Ford             (Thomson Computer Ps)
+       BC    Brad Cavanagh           (JACH)
        BCS   Brian Stewart           (RAL)
        BDK   Dennis Kelly            (EDI)
        BJR   Brian Read              (RAL)
