@@ -30,7 +30,7 @@
 *     3/9/97  (ACD):
 *       First stable version.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
 *     {enter_further_changes_here}
 *  Bugs:
 *     None known
@@ -48,25 +48,28 @@
      :  CUBID
 *  Status:
       INTEGER STATUS             ! Global status
+*  External References:
+      INTEGER CHR_LEN         ! Length of a string less trailing blanks
 *  Local Variables:
       CHARACTER
-     :  AXLOC*(DAT__SZLOC),  ! Locator to the axis component.
-     :  CELLOC*(DAT__SZLOC), !    "    "   "   "   cell (array element).
-     :  ARLOC*(DAT__SZLOC),  !    "    "   "   "   data array.
-     :  SCLLOC*(DAT__SZLOC), !    "    "   "   "   scale factor.
-     :  ESCLOC*(DAT__SZLOC), !    "    "   "  energy axis scale factor.
-     :  EZPLOC*(DAT__SZLOC), !    "    "   "    "     "   zero point.
-     :  LABLOC*(DAT__SZLOC), !    "    "   "    "     "   label.
-     :  UNTLOC*(DAT__SZLOC), !    "    "   "    "     "   units.
-     :  LABEL*80,            ! Energy axis label.
-     :  UNITS*80             !   "     "   units.
+     :  AXLOC*(DAT__SZLOC),  ! Locator to the axis component
+     :  CELLOC*(DAT__SZLOC), !    "    "   "   "   cell (array element)
+     :  ARLOC*(DAT__SZLOC),  !    "    "   "   "   data array
+     :  SCLLOC*(DAT__SZLOC), !    "    "   "   "   scale factor
+     :  ESCLOC*(DAT__SZLOC), !    "    "   "  energy axis scale factor
+     :  EZPLOC*(DAT__SZLOC), !    "    "   "    "     "   zero point
+     :  LABLOC*(DAT__SZLOC), !    "    "   "    "     "   label
+     :  UNTLOC*(DAT__SZLOC), !    "    "   "    "     "   units
+     :  LABEL*80,            ! Energy axis label
+     :  UNITS*80             !   "     "   units
       INTEGER
-     :  AXPTR(3), ! Axis pointers.
-     :  NAXIS(3)  ! Number of elements in each axis.
+     :  AXPTR(3), ! Axis pointers
+     :  NAXIS(3), ! Number of elements in each axis
+     :  NC        ! Used length of string
       REAL
-     :  SCALE,    ! Axis scale factor (arcmin).
-     :  ESCALE,   ! Energy axis scale factor.
-     :  EZEROP    !   "     "   zero point.
+     :  SCALE,    ! Axis scale factor (arcmin)
+     :  ESCALE,   ! Energy axis scale factor
+     :  EZEROP    !   "     "   zero point
 *.
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -94,11 +97,13 @@
 
          CALL DAT_FIND (CELLOC, 'LABEL', LABLOC, STATUS)
          CALL DAT_GET0C (LABLOC, LABEL, STATUS)
-         CALL NDF_ACPUT (LABEL, CUBID, 'LABEL', 1, STATUS)
+         NC = CHR_LEN (LABEL)
+         CALL NDF_ACPUT (LABEL(:NC), CUBID, 'LABEL', 1, STATUS)
 
          CALL DAT_FIND (CELLOC, 'UNITS', UNTLOC, STATUS)
          CALL DAT_GET0C (UNTLOC, UNITS, STATUS)
-         CALL NDF_ACPUT (UNITS, CUBID, 'UNITS', 1, STATUS)
+         NC = CHR_LEN (UNITS)
+         CALL NDF_ACPUT (UNITS(:NC), CUBID, 'UNITS', 1, STATUS)
 
 *
 *       Second axis; X offset.

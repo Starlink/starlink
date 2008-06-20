@@ -88,7 +88,9 @@
 *     1992 September 22 (MJC):
 *        Added Notes and a section on how to create the input file.
 *     2004 September 9 (TIMJ):
-*        Use CNF_PVAL
+*        Use CNF_PVAL.
+*     2008 June 18 (MJC):
+*        Trim trailing blanks from output NDF character components.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,50 +99,55 @@
 *-
       
 *  Type Definitions:
-      IMPLICIT NONE               ! No implicit typing
+      IMPLICIT NONE              ! No implicit typing
 
 *  Global Constants:
-      INCLUDE 'SAE_PAR'           ! Standard SAE constants
-      INCLUDE 'DAT_PAR'           ! Data-system constants
-      INCLUDE 'NDF_PAR'           ! NDF_ public constants
-      INCLUDE 'PRM_PAR'           ! PRIMDAT symbolic constants
-      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! Data-system constants
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'PRM_PAR'          ! PRIMDAT symbolic constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
-      INTEGER STATUS              ! Global status
+      INTEGER STATUS             ! Global status
+
+*  Exterenal References:
+      INTEGER CHR_LEN            ! Effective length of a character
+                                 ! string
 
 *  Local Constants:
-      INTEGER   MAXBRK
-      PARAMETER (MAXBRK = 1000)      ! Max. no. of breaks allowed in
-                                     ! DIPSO data 
+      INTEGER MAXBRK
+      PARAMETER (MAXBRK = 1000)  ! Max. no. of breaks allowed in
+                                 ! DIPSO data 
 
 *  Local Variables:
-      INTEGER   BREAK(MAXBRK)        ! Break array
-      INTEGER   DATPTR               ! Pointer to NDF data
-      INTEGER   DIM(1)               ! Accommodates dimensions
-      INTEGER   FCOR                 ! Pointer to workspace
-      INTEGER   FD                   ! File descriptor
-      INTEGER   FDIP                 ! Pointer to DIPSO flux data
-      CHARACTER FLXCOR*(DAT__SZLOC)  ! Locator to scratch space
-      CHARACTER FLXDIP*(DAT__SZLOC)  ! Locator to scratch space
-      INTEGER   I                    ! Loop variable
-      INTEGER   IOS                  ! I/O status.
-      INTEGER   LBND( 2 )            ! Accommodates NDF lower bounds
-      INTEGER   NBREAK               ! Number of breaks
-      INTEGER   NBYTES               ! No. of bytes to move
-      INTEGER   NCOR                 ! Size of padded arrays
-      INTEGER   NDF                  ! Identifier for NDF
-      INTEGER   NDIM                 ! No. of dimensions
-      INTEGER   NMAX                 ! Size of work array
-      INTEGER   NPTS                 ! Number of elements in DIPSO file
-      CHARACTER TITLE * (50)         ! Title
-      INTEGER   UBND(2)              ! Accommodates NDF upper bounds
-      INTEGER   UNIT                 ! Logical unit no. for Dipso file
-      CHARACTER WAVCOR*(DAT__SZLOC)  ! Locator to scratch space
-      CHARACTER WAVDIP*(DAT__SZLOC)  ! Locator to scratch space
-      INTEGER   WAVPTR               ! Pointer to NDF axis data
-      INTEGER   WCOR                 ! Pointer to workspace
-      INTEGER   WDIP                 ! Pointer to DIPSO axis data
+      INTEGER BREAK(MAXBRK)      ! Break array
+      INTEGER DATPTR             ! Pointer to NDF data
+      INTEGER DIM(1)             ! Accommodates dimensions
+      INTEGER FCOR               ! Pointer to workspace
+      INTEGER FD                 ! File descriptor
+      INTEGER FDIP               ! Pointer to DIPSO flux data
+      CHARACTER FLXCOR*(DAT__SZLOC) ! Locator to scratch space
+      CHARACTER FLXDIP*(DAT__SZLOC) ! Locator to scratch space
+      INTEGER I                  ! Loop variable
+      INTEGER IOS                ! I/O status.
+      INTEGER LBND( 2 )          ! Accommodates NDF lower bounds
+      INTEGER NBREAK             ! Number of breaks
+      INTEGER NBYTES             ! No. of bytes to move
+      INTEGER NC                 ! Used length of string
+      INTEGER NCOR               ! Size of padded arrays
+      INTEGER NDF                ! Identifier for NDF
+      INTEGER NDIM               ! No. of dimensions
+      INTEGER NMAX               ! Size of work array
+      INTEGER NPTS               ! Number of elements in DIPSO file
+      CHARACTER TITLE * (50)     ! Title
+      INTEGER UBND(2)            ! Accommodates NDF upper bounds
+      INTEGER UNIT               ! Logical unit no. for Dipso file
+      CHARACTER WAVCOR*(DAT__SZLOC) ! Locator to scratch space
+      CHARACTER WAVDIP*(DAT__SZLOC) ! Locator to scratch space
+      INTEGER WAVPTR             ! Pointer to NDF axis data
+      INTEGER WCOR               ! Pointer to workspace
+      INTEGER WDIP               ! Pointer to DIPSO axis data
 *.
 
 *  Check inherited global status.
@@ -231,6 +238,7 @@
       CALL NDF_CREP ('OUT', '_REAL', NDIM, DIM, NDF, STATUS)
 
 *   Put the TITLE read from the Dipso file into the NDF title.
+      NC = CHR_LEN (TITLE)
       CALL NDF_CPUT (TITLE, NDF, 'TITLE', STATUS)
 
 *   Map the NDF main data array for WRITE access.

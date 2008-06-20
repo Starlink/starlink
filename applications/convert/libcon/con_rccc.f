@@ -41,24 +41,27 @@
 *  Type Definitions:
       IMPLICIT NONE
 *  Global Constants:
-      INCLUDE 'SAE_PAR'       ! Standard Starlink constants.
-      INCLUDE 'DAT_PAR'       ! HDS constants.
-      INCLUDE 'DAT_ERR'       ! HDS error codes.
+      INCLUDE 'SAE_PAR'       ! Standard Starlink constants
+      INCLUDE 'DAT_PAR'       ! HDS constants
+      INCLUDE 'DAT_ERR'       ! HDS error codes
 *  Arguments Given:
       CHARACTER
      :  INLOC*(*)
       INTEGER
      :  CUBID
 *  Status:
-      INTEGER STATUS          ! Global status.
+      INTEGER STATUS          ! Global status
+*  External References:
+      INTEGER CHR_LEN         ! Length of a string less trailing blanks
 *  Local Variables:
+      INTEGER NC              ! Used length of string
       CHARACTER
-     :  TTLLOC*(DAT__SZLOC),  ! Locator to the input title component.
-     :  LABLOC*(DAT__SZLOC),  !    "    "   "    "   label     "    .
-     :  UNTLOC*(DAT__SZLOC),  !    "    "   "    "   units     "    .
-     :  TITLE*80,             ! Value of the title component.
-     :  LABEL*80,             !   "   "   "  label     "    .
-     :  UNITS*80              !   "   "   "  units     "    .
+     :  TTLLOC*(DAT__SZLOC),  ! Locator to the input title component
+     :  LABLOC*(DAT__SZLOC),  !    "    "   "    "   label     "
+     :  UNTLOC*(DAT__SZLOC),  !    "    "   "    "   units     "
+     :  TITLE*80,             ! Value of the title component
+     :  LABEL*80,             !   "   "   "  label     " 
+     :  UNITS*80              !   "   "   "  units     "
 *.
 
       IF (STATUS .EQ. SAI__OK) THEN
@@ -122,8 +125,13 @@
 *
 *       Set the character components in the output NDF.
 
+         NC = CHR_LEN( TITLE )
          CALL NDF_CPUT (TITLE, CUBID, 'TITLE', STATUS )
+
+         NC = CHR_LEN( LABEL )
          CALL NDF_CPUT (LABEL, CUBID, 'LABEL', STATUS )
+         
+         NC = CHR_LEN( UNITS )
          CALL NDF_CPUT (UNITS, CUBID, 'UNITS', STATUS )
 
       END IF

@@ -170,6 +170,8 @@
 *        Use CNF_PVAL.
 *     2008 March 15 (MJC):
 *        Use KAPLIBS routines instead of their cloned CON equivalents.
+*     2008 June 18 (MJC):
+*        Trim trailing blanks from output NDF character components.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -244,6 +246,7 @@
                                  ! convert
       INTEGER MDIM               ! Number of dimensions of data array
       CHARACTER * ( DAT__SZNAM ) NAME ! Name of a component in OBS
+      INTEGER NC                 ! Used length of string
       INTEGER NCO                ! Number of characters in obs. number
       INTEGER NCOMP              ! Number of components in input OBS
       INTEGER NCONV              ! Number of successful conversions
@@ -661,9 +664,12 @@
                       CALL CMP_GET0C( COLOC, 'OBJECT_NAME', CHACMP,
      :                                STATUS )
 
-                      CALL NDF_CPUT( CHACMP, NDF, 'Title', STATUS )
+                      NC = CHR_LEN( CHACMP )
+                      CALL NDF_CPUT( CHACMP( :NC ), NDF, 'Title',
+     :                               STATUS )
                    END IF
                ELSE
+                  NC = CHR_LEN( CHACMP )
                   CALL NDF_CPUT( CHACMP, NDF, 'Title', STATUS )
                END IF
             END IF
@@ -674,7 +680,8 @@
 *  If it is present, get its value and use it to update the NDF's label.
             IF ( THERE ) THEN
                CALL CMP_GET0C( COLOC, 'DATA_LABEL', CHACMP, STATUS )
-               CALL NDF_CPUT( CHACMP, NDF, 'Label', STATUS )
+               NC = CHR_LEN( CHACMP )
+               CALL NDF_CPUT( CHACMP( :NC ), NDF, 'Label', STATUS )
             END IF
 
 *  Look for the units.
@@ -683,7 +690,8 @@
 *  If it is present, get its value and use it to update the NDF's units.
             IF ( THERE ) THEN
                CALL CMP_GET0C( COLOC, 'DATA_UNITS', CHACMP, STATUS )
-               CALL NDF_CPUT( CHACMP, NDF, 'Units', STATUS )
+               NC = CHR_LEN( CHACMP )
+               CALL NDF_CPUT( CHACMP( :NC ), NDF, 'Units', STATUS )
             END IF
  
 *  Make an IRCAM extension.
@@ -793,7 +801,8 @@
 *  in the NDF.
             IF ( THERE ) THEN
                CALL CMP_GET0C( COLOC, 'AXIS1_LABEL', AXCHAR, STATUS )
-               CALL NDF_ACPUT( AXCHAR, NDF, 'Label', 1, STATUS )
+               NC = CHR_LEN( AXCHAR )
+               CALL NDF_ACPUT( AXCHAR( :NC ), NDF, 'Label', 1, STATUS )
             END IF
  
 *  Now deal with the second axis.
@@ -803,7 +812,8 @@
 *  in the NDF.
             IF ( THERE ) THEN
                CALL CMP_GET0C( COLOC, 'AXIS2_LABEL', AXCHAR, STATUS )
-               CALL NDF_ACPUT( AXCHAR, NDF, 'Label', 2, STATUS )
+               NC = CHR_LEN( AXCHAR )
+               CALL NDF_ACPUT( AXCHAR( :NC ), NDF, 'Label', 2, STATUS )
             END IF
 
 *  Only copy the axis units (usually "pixels") if the centres are not
@@ -817,7 +827,9 @@
 *  in the NDF.
                IF ( THERE ) THEN
                   CALL CMP_GET0C( COLOC, 'AXIS1_UNITS', AXCHAR, STATUS )
-                  CALL NDF_ACPUT( AXCHAR, NDF, 'Units', 1, STATUS )
+                  NC = CHR_LEN( AXCHAR )
+                  CALL NDF_ACPUT( AXCHAR( :NC ), NDF, 'Units', 1,
+     :                            STATUS )
                END IF
  
 *  Now deal with the second axis.
@@ -827,7 +839,9 @@
 *  in the NDF.
                IF ( THERE ) THEN
                   CALL CMP_GET0C( COLOC, 'AXIS2_UNITS', AXCHAR, STATUS )
-                  CALL NDF_ACPUT( AXCHAR, NDF, 'Units', 2, STATUS )
+                  NC = CHR_LEN( AXCHAR )
+                  CALL NDF_ACPUT( AXCHAR( :NC ), NDF, 'Units', 2,
+     :                            STATUS )
                END IF
             END IF
 
