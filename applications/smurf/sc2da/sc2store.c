@@ -2171,8 +2171,8 @@ size_t *nframes,         /* number of frames (returned) */
 size_t *nflat,           /* number of flat coeffs per bol (returned) */
 char *flatname,          /* name of flatfield algorithm (returned) */
 JCMTState *frhead[],     /* header data for each frame (returned) */
-int **outdata,           /* pointer to data array (returned) */
-int **dksquid,           /* pointer to dark SQUID values (returned) */
+int **outdata,           /* pointer to data array (returned), or NULL */
+int **dksquid,           /* pointer to dark SQUID values (returned), or NULL */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
 double **flatpar,        /* pointer to flatfield parameters (returned) */
 int **jigvert,           /* pointer to DREAM jiggle vertices (returned) */
@@ -2187,8 +2187,13 @@ int *status              /* global status (given and returned) */
     from an NDF. The file is left open to allow updating of associated items 
     such as the flatfield or other processed data, in which case access 
     should be specified as "UPDATE".
+
+    If a NULL value is supplied for "outdata" or "dksquid", then neither the 
+    data array nor the dark SQUID values are mapped.
+
    Authors :
     B.D.Kelly (bdk@roe.ac.uk)
+    D.S.Berry (d.berry@jach.hawaii.edu)
 
    History :
     01Oct2005 : original (bdk)
@@ -2203,6 +2208,7 @@ int *status              /* global status (given and returned) */
     31Oct2007 : change name nfits to nrec (bdk)
     11Nov2007 : make compressed data short instead of unsigned short (bdk)
     16Nov2007 : restructure on top of sc2store_readraw() (bdk)
+    20Jun2008 : check for NULL outdata or dksquid pointers (dsb)
 */
 
 {
@@ -2230,11 +2236,15 @@ int *status              /* global status (given and returned) */
    }
    
    
-/* Map all the data arrays */
+/* Map the required data arrays */
 
    sc2store_open ( filename, access, colsize, rowsize, nframes, status );
-   sc2store_readraw ( access, *colsize, *rowsize, *nframes, outdata, dksquid, 
-     status );
+
+   if( outdata && dksquid ) {
+      sc2store_readraw ( access, *colsize, *rowsize, *nframes, outdata, dksquid, 
+        status );
+   }
+
    sc2store_readflatcal ( access, flatlen, nflat, flatname, flatcal, flatpar,
      status );
    sc2store_readjig ( access, jigvert, nvert, jigpath, npath, status );
@@ -2684,7 +2694,7 @@ int *status              /* Global status (given and returned) */
             update = 1;
 
 /* If the lower bound is 1, we check the length of the arrays in the
-   extension. If they are not the saem length as the third NDF axis,
+   extension. If they are not the same length as the third NDF axis,
    then we need to adjust the arrays. We take the array lengths from the
    first array that is present in the extension. */
          } else {

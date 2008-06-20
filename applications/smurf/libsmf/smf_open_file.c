@@ -50,6 +50,7 @@
  *     Andy Gibb (UBC)
  *     Tim Jenness (JAC, Hawaii)
  *     Edward Chapin (UBC)
+ *     David Berry (JAC, UCLan)
  *     {enter_new_authors_here}
 
  *  History:
@@ -164,6 +165,9 @@
  *     2008-05-28 (TIMJ):
  *        Make sure return pointer is initialised to NULL even if status is
  *        bad on entry.
+ *     2008-06-20 (DSB):
+ *        Ensure that sc2store_rdtstream never maps the data array or dark
+ *        squid values if the SMF__NOCREATE_DATA flag is supplied.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -244,7 +248,7 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
   smf_dtype itype = SMF__NULL; /* Data type for DATA (and VARIANCE) array(s) */
   int i;                     /* Loop counter */
   int nout;                  /* Number of output pixels */
-  int *tdata;                /* Pointer to raw time series data (DATA cpt) */
+  int **ptdata;              /* Pointer to raw time series data (DATA cpt) */
 
   smfFile *file = NULL;      /* pointer to smfFile struct */
   smfHead *hdr = NULL;       /* pointer to smfHead struct */
@@ -258,6 +262,7 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
   double * flatcal = NULL;
   double * flatpar = NULL;
   int * dksquid = NULL;
+  int **pdksquid = NULL;
   JCMTState *tmpState = NULL;
 
   /* DREAM parameters */
@@ -601,12 +606,22 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
       /* decide if we are storing header information */
       tmpState = NULL;
 
+      /* If access to the data is not required, pass NULL pointers to
+      sc2store_rdtstream. Otherwise, use pointers to the relavent buffers. */
+      if ( flags & SMF__NOCREATE_DATA ) {
+         ptdata = NULL;
+         pdksquid = NULL;
+      } else {
+         ptdata = (int **) &(outdata[0]);
+         pdksquid = &dksquid;
+      }
+
       /* Read time series data from file */
       sc2store_rdtstream( pname, "READ", SC2STORE_FLATLEN,
                           SC2STORE__MAXFITS, 
                           &nfits, fitsrec, &colsize, &rowsize, 
                           &nframes, &(da->nflat), da->flatname,
-                          &tmpState, &tdata, &dksquid, 
+                          &tmpState, ptdata, pdksquid, 
                           &flatcal, &flatpar, &jigvert, &nvert, &jigpath, 
                           &nsampcycle, status);
 
@@ -618,18 +633,6 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
           tmpState = NULL;
         } else {
           hdr->allState = tmpState;
-        }
-
-        /* Tdata is malloced by rdtstream for our use */
-        if ( flags & SMF__NOCREATE_DATA ) {
-          /* Free the memory used by tdata and set pointer to NULL -
-             note that tdata is checked for non-NULL status by the
-             sc2store routine above so if we get this far tdata should
-             be a valid pointer */
-          free( tdata );
-          tdata = NULL;
-        } else {
-          outdata[0] = tdata;
         }
 
         /* Malloc local copies of the flatfield information.
