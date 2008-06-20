@@ -56,6 +56,8 @@
 *     2008-06-19 (TIMJ):
 *        Make sure the statically malloced buffer is resized if the
 *        number of receptors changes.
+*     20-JUN-2008 (DSB):
+*        Tidy up use of astGrow.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -120,7 +122,6 @@ void smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3],
    static AstPermMap *pmap = NULL;
    static AstFrame *grid = NULL;
    static AstSkyFrame *sky = NULL;
-   static int maxnrec = 0;
 
 /* If a negative index was supplied just free the allocated resources and
    return. */
@@ -130,7 +131,6 @@ void smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3],
       if( pmap ) pmap = astAnnul( pmap );
       if( grid ) grid = astAnnul( grid );
       if( sky ) sky = astAnnul( sky );
-      maxnrec = 0;
       return;
    }
 
@@ -147,17 +147,14 @@ void smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3],
 /* Check there is more than 1 detector. */
    if( nrec > 1 ) {
 
-/* it is possible that we have not allocated enough memory since
+/* It is possible that we have not allocated enough memory since
    this memory is allocated for the first file but subsequent files
    may have more receptors. So we use astGrow. */
 
 /* If required, allocate memory to hold the individual look up tables for
    lon and lat vaues. */
-      if( !lonlut || nrec > maxnrec )
-        lonlut = astGrow( lonlut, nrec, sizeof( double ) );
-      if( !latlut || nrec > maxnrec )
-        latlut = astGrow( latlut, nrec, sizeof( double ) );
-      if( nrec > maxnrec ) maxnrec = nrec;
+      lonlut = astGrow( lonlut, nrec, sizeof( double ) );
+      latlut = astGrow( latlut, nrec, sizeof( double ) );
 
 /* Check the memory was allocated succesfully. */
       if( lonlut && latlut ) {
