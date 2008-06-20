@@ -16,7 +16,12 @@
     05Nov2007 : add sc2store_bscale and sc2store_compflag (bdk)
     09Nov2007 : have separate sc2store_rdbscale and _wrbscale (bdk)
     11Nov2007 : store compressed data as short, not unsigned short (bdk)
+    19Jul2008 : ifdef out kaplibs code not used by DA (timj)
 */
+
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 
 #include <string.h>
 #include <stdio.h>
@@ -2701,6 +2706,10 @@ int *status              /* Global status (given and returned) */
 /* If required, produce a temporary copy of the supplied object. This includes 
    any scalars as well as the arrays. */
       if( update ) {
+        /* only do this code in SMURF. The DA does not care and does not want
+           to have to worry about kaplibs dependencies. No need to bother with an
+           explicit kaplibs existence test since we know the DA will not use config.h */
+#ifdef PACKAGE_UPCASE
          datTemp( JCMT__EXTTYPE, 0, NULL, yloc, status );
          datNcomp( *xloc, &ncomp, status );
          for( j = 1; j <= ncomp; j++ ) {
@@ -2743,6 +2752,10 @@ int *status              /* Global status (given and returned) */
                datAnnul( &xloc2, status );
             }
          }
+#else
+         printf("Oops. Someone other than SMURF is trying to access an NDF section of JCMTSTATE\n");
+         abort();
+#endif
       }
    }
 
