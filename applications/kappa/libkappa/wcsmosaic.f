@@ -287,8 +287,10 @@
 
 *  Notes:
 *     -  WCS information (including the current co-ordinate Frame) is 
-*     propagated from the reference NDF to the output NDF. 
-*     -  QUALITY is not propagated from input to output.
+*     propagated from the reference NDF to the output NDF. All other 
+*     information is propagated form the first input NDF.
+*     -  The QUALITY and AXIS components are not propagated from input 
+*     to output.
 
 *  Related Applications:
 *     KAPPA: WCSFRAME, WCSALIGN, REGRID; CCDPACK: TRANNDF.
@@ -358,6 +360,8 @@
 *        New output parameters FLBND and FUBND.
 *     4-FEB-2008 (DSB):
 *        Allow a null value to be supplied for parameter GENVAR.
+*     23-JUN-2008 (DSB):
+*        Propagate from the first input NDF rather than the reference NDF.
 *     {enter_further_changes_here}
 
 *-
@@ -396,6 +400,7 @@
       INTEGER I              ! Index into input and output groups
       INTEGER IGRP1          ! GRP id. for group holding input NDFs
       INTEGER ILEVEL         ! Information level
+      INTEGER INDF0          ! NDF id. for the first input NDF
       INTEGER INDF1          ! NDF id. for the input NDF
       INTEGER INDF2          ! NDF id. for the output NDF
       INTEGER INDFR          ! NDF id. for the reference NDF
@@ -441,6 +446,9 @@
       CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more NDFs...', 
      :                 IGRP1, SIZE, STATUS )
 
+*  Get an identifier for the fiorst input NDF.
+      CALL NDG_NDFAS( IGRP1, 1, 'READ', INDF0, STATUS )
+
 *  Get the level of screen information to display.
       CALL PAR_GDR0I( 'ILEVEL', 2, 1, 3, .TRUE., ILEVEL, STATUS )
 
@@ -454,7 +462,7 @@
 *  supplied for IN.
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
-         CALL NDG_NDFAS( IGRP1, 1, 'READ', INDFR, STATUS )
+         INDFR = INDF0
       END IF
 
 *  Get the number of pixel axes in the reference NDF.
@@ -635,17 +643,20 @@
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Create the output NDF by propagation from the reference NDF.  The
+*  Create the output NDF by propagation from the first input NDF.  The
 *  default components HISTORY, TITLE, LABEL and all extensions are
-*  propagated, together with the UNITS and WCS component.  The NDF is
-*  initially created with the same bounds as the reference NDF.
-      CALL NDF_PROP( INDFR, 'WCS,UNITS', 'OUT', INDF2, STATUS )
+*  propagated, together with the UNITS component.  The NDF is
+*  initially created with the same bounds as the first input NDF.
+      CALL NDF_PROP( INDF0, 'UNITS', 'OUT', INDF2, STATUS )
 
 *  If a null value was supplied for OUT, annul the error and abort.
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          GO TO 999
       END IF
+
+*  Save the WCS FrameSet from the reference NDF into the output NDF.
+      CALL NDF_PTWCS( IWCSR, INDF2, STATUS )
 
 *  Change the bounds of the output NDF to the required values.
       CALL NDF_SBND( NDIM, LBND, UBND, INDF2, STATUS )
