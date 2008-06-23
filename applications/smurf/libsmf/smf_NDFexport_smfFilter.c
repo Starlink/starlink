@@ -35,6 +35,8 @@
 *  History:
 *     2008-06-12 (EC):
 *        Initial version.
+*     2008-06-23 (EC):
+*        Write WCS information to NDF
 
 *  Notes:
 *
@@ -84,7 +86,6 @@ void smf_NDFexport_smfFilter( const smfFilter *filt, const char *name,
 
   /* Local Variables */
   void *data[3]={NULL,NULL,NULL}; /* Pointer to mapped data array */
-  size_t i;                   /* Counter */
   int lbnd[2];                /* lower dimension bounds */
   int n;                      /* Number of mapped elements */
   size_t nbytes;              /* Number of bytes to copy */
@@ -131,6 +132,11 @@ void smf_NDFexport_smfFilter( const smfFilter *filt, const char *name,
     if( filt->imag ) {
       memcpy( ((char *) data[0])+nbytes, filt->imag, nbytes );
     }
+  }
+  
+  /* Write the WCS information */
+  if( filt->wcs ) {
+    ndfPtwcs( filt->wcs, ndfid, status );
   }
 
   /* Clean up */

@@ -125,6 +125,8 @@
 *        -Add smfFilter definition
 *     2008-06-12 (EC):
 *        -Switch to split real/imaginary arrays for smfFilter
+*     2008-06-23 (EC)
+*        -Added WCS to smfFilter
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -392,7 +394,7 @@ typedef struct smfFilter {
   int isComplex;        /* Set if filter is fftw_complex, otherwise double */
   dim_t ntslice;        /* # of time slices in input data */
   double *real;         /* Real part of the filter */
-
+  AstFrameSet *wcs;     /* Frameset describing filter */
 } smfFilter;
 
 #endif /* SMF_TYP_DEFINED */

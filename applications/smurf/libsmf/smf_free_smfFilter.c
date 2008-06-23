@@ -37,7 +37,9 @@
 *     2008-06-05 (EC):
 *        Initial version
 *     2008-06-12 (EC):
-*        -Switch to split real/imaginary arrays for smfFilter
+*        Switch to split real/imaginary arrays for smfFilter
+*     2008-06-23 (EC):
+*        Free WCS
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -88,6 +90,7 @@ smfFilter *smf_free_smfFilter( smfFilter *filt, int *status ) {
   if( filt ) {
     filt->real = smf_free( filt->real, status );
     filt->imag = smf_free( filt->imag, status );
+    if( filt->wcs) filt->wcs = astAnnul( filt->wcs ); 
     filt = smf_free( filt, status );
   }
   

@@ -46,6 +46,8 @@
 *        -Switch to split real/imaginary arrays for smfFilter
 *     2008-06-18 (EC):
 *        Fixed error in calculation of df (frequency steps)
+*     2008-06-23 (EC):
+*        Generate WCS that can be used when writing filter to an NDF
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -91,8 +93,14 @@
 
 smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
 
-  smfFilter *filt=NULL;    /* Pointer to returned struct */
-  double steptime;         /* Length of a sample in seconds */
+  AstFrame *cframe=NULL;        /* Current real/imag frame */
+  AstUnitMap *cmapping=NULL;    /* Mapping from grid to cframe */
+  AstCmpFrame *curframe2d=NULL; /* Current Frame for 2-d FFT */
+  smfFilter *filt=NULL;         /* Pointer to returned struct */
+  AstCmpMap *fftmapping=NULL;   /* Mapping from GRID to curframe2d */
+  AstSpecFrame *specframe=NULL; /* Current Frame of 1-D spectrum */
+  AstZoomMap *specmapping=NULL; /* Mapping from GRID to FREQ */
+  double steptime;              /* Length of a sample in seconds */
 
   if (*status != SAI__OK) return NULL;
 
@@ -102,6 +110,7 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
     filt->real = NULL;
     filt->imag = NULL;
     filt->isComplex = 0;
+    filt->wcs = NULL;
 
     if( template ) {
       if( template->ndims == 3 ) {
@@ -132,10 +141,42 @@ smfFilter *smf_create_smfFilter( smfData *template, int *status ) {
           smf_fits_getD(template->hdr, "STEPTIME", &steptime, status);
           
           if( *status == SAI__OK ) {
+
+            /* Start an AST context */
+            astBegin;
+
             /* Frequency step in Hz */
             filt->df = 1. / (steptime * (double) filt->ntslice); 
+
+            /* Create a new FrameSet containing a 2d base GRID frame */
+
+            filt->wcs = astFrameSet( astFrame( 2, "Domain=GRID" ), "" );
+
+            /* The output frame will have freq. along first axis, and
+               real/imag coefficients along the other */
+
+            specframe = astSpecFrame( "System=freq,Unit=Hz,StdOfRest=Topocentric" );
+            cframe = astFrame( 1, "Domain=GRID" );
+            curframe2d = astCmpFrame( specframe, cframe, "" ); 
+
+            /* The mapping from 2d grid coordinates to (frequency, coeff) is
+               accomplished with a zoommap for the 1st dimension and a
+               unit mapping for the other */
+
+            specmapping = astZoomMap( 1, filt->df, "" );
+            cmapping = astUnitMap( 1, "" );
+            fftmapping = astCmpMap( specmapping, cmapping, 0, "" );
+
+            /* Add the curframe2d with the fftmapping to the frameset */
+            astAddFrame( filt->wcs, AST__BASE, fftmapping, curframe2d );
+
+            /* Export the frameset before ending the AST context */
+            astExport( filt->wcs );
+            astEnd;
           }
-          
+
+
+
         } else {
           *status = SAI__ERROR;
           errRep( FUNC_NAME, 
