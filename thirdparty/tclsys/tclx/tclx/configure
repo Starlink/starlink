@@ -6200,6 +6200,7 @@ echo "$as_me: error: could not find stub source file '$i'" >&2;}
 	library/setfuncs.tcl	library/showproc.tcl
 	library/stringfile.tcl	library/tcllib.tcl
 	library/fmath.tcl	library/buildhelp.tcl
+        library/tclIndex
 "
     for i in $vars; do
 	# check for existence, be strict because it is installed

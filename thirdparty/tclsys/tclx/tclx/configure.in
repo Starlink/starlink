@@ -61,6 +61,7 @@ TEA_ADD_TCL_SOURCES([
 	library/setfuncs.tcl	library/showproc.tcl
 	library/stringfile.tcl	library/tcllib.tcl
 	library/fmath.tcl	library/buildhelp.tcl
+        library/tclIndex
 ])
 
 #--------------------------------------------------------------------
