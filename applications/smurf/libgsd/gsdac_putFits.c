@@ -66,6 +66,7 @@
 
 *  Authors:
 *     J.Balfour (UBC)
+*     Tim Jenness (JAC)
 *     {enter_new_authors_here}
 
 *  History :
@@ -118,6 +119,8 @@
 *        INSTAP_X = INSTAP_Y = 0.0.
 *     2008-04-30 (JB):
 *        Correct FFT_WIN and BEDEFAC.
+*     2008-06-24 (TIMJ):
+*        Fix compiler warnings.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -182,12 +185,11 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   int hour;                   /* hours for time conversion. */
   int i;                      /* loop counter */
   float IFchanSp;             /* TOPO IF channel spacing (Hz) */
-  double IFfreq;              /* IF frequency (GHz) */
   char instrume[SZFITSCARD];  /* front-end receiver */
   double intTime;             /* total time spent integrating (s) */
   int josMin;                 /* ?? */
   int min;                    /* minutes for time conversion. */
-  char *molecule;             /* target molecular species */
+  const char *molecule;       /* target molecular species */
   int month;                  /* months for time conversion. */
   int nMix;                   /* number of mixers */
   double nRefStep;            /* number of nod sets repeated */
@@ -211,7 +213,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
   char subBands[SZFITSCARD];  /* ACSIS sub-band set-up */
   char tauDatSt[SZFITSCARD];  /* time of tau225St observation in 
                                  format YYYY-MM-DDTHH:MM:SS */
-  char *transiti;  /* target transition for molecule */
+  const char *transiti;       /* target transition for molecule */
   int year;                   /* year for time conversion. */  
 
   /* Check inherited status */
