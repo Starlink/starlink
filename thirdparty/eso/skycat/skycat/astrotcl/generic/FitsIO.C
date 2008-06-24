@@ -41,6 +41,9 @@
  *                           stored in an extension, RICE etc.) as binary
  *                           tables. As images they are garbled anyway.
  *                           (GAIA spots this and decompresses them).
+ *                 24/06/08  Remove restriction that requires a backing file
+ *                           when moving HDU. This operation can be done
+ *                           on memory FITS.
  */
 static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.1.1.1 2006/01/12 16:43:57 abrighto Exp $";
 
@@ -1316,8 +1319,9 @@ int FitsIO::getHDUNum()
  */
 int FitsIO::setHDU(int num)
 {
-    if (checkFitsFile() != 0)
-	return 1;		// error
+    // PWD: this isn't necessary.
+    // if (checkFitsFile() != 0)
+    //	 return 1;		// error
 
     int status = 0, type = 0;
     if (fits_movabs_hdu(fitsio_, num, &type, &status) != 0) 
