@@ -1,3 +1,5 @@
+AM_CFLAGS = -Wall -Wextra -Wcast-qual -Wcast-align -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes \      
+-Wmissing-declarations -Wredundant-decls -fstack-protector
 
 noinst_LTLIBRARIES = libsc2fts.la
 

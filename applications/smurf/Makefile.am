@@ -6,6 +6,8 @@ SUBDIRS = libsmf libsmurf libsc2sim libacsis libaztec libgsd libsc2fts
 
 # can not use surf_mon_FCFLAGS yet
 AM_FCFLAGS = -Isrc -Isc2da -Isc2sim
+AM_CFLAGS = -Wall -Wextra -Wcast-qual -Wcast-align -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes \
+-Wmissing-declarations -Wredundant-decls -fstack-protector
 
 dist_bin_SCRIPTS = $(DYNSCRIPTS) $(STATICSCRIPTS)
 dist_noinst_SCRIPTS = smurf_link_adam
