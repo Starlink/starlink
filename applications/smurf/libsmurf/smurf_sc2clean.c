@@ -31,14 +31,14 @@
 *     as a high-pass or correction of the DA system response.
 
 *  Notes:
-*     Points (iv-vi) are not yet implemented.
+*     Point (v) is not yet implemented.
 
 *  ADAM Parameters:
 *     IN = NDF (Read)
 *          Input files to be uncompressed and flatfielded
 *     OUT = NDF (Write)
 *          Output file
-*     BADFRAC = _DOUBLE (READ)
+*     BADFRAC = _DOUBLE (Read)
 *          Fraction of bad samples in order for entire bolometer to be
 *          flagged as bad
 *     DCTHRESH = _DOUBLE (Read)
@@ -46,6 +46,14 @@
 *     DCBOX = INTEGER (Read)
 *          Width of the box (samples) over which to estimate the mean
 *          signal level for DC step detection
+*     FILT_EDGEHIGH = _DOUBLE (Read)
+*          Apply a hard-edged high-pass filter at this frequency (Hz)
+*     FILT_EDGELOW = _DOUBLE (Read)
+*          Apply a hard-edged low-pass filter at this frequency (Hz)
+*     FILT_NOTCHHIGH = _DOUBLE (Read)
+*          Array of upper-frequency edges for hard notch filters (Hz)
+*     FILT_NOTCHLOW = _DOUBLE (Read)
+*          Array of lower-frequency edges for hard notch filters (Hz)
 *     ORDER = INTEGER (Read)
 *          Fit and remove polynomial baselines of this order
 *     SPIKETHRESH = _DOUBLE (Read)
@@ -135,6 +143,15 @@ void smurf_sc2clean( int *status ) {
   size_t spikeiter;         /* Number of iterations for spike finder */
   int spikeiter_s;          /* Signed int version of spikeiter_s */
 
+  int dofft=0;              /* Set if freq. domain filtering the data */
+  double f_edgelow;         /* Freq. cutoff for low-pass edge filter */
+  double f_edgehigh;        /* Freq. cutoff for high-pass edge filter */
+  int f_nnotch=0;           /* Number of notch filters in array */
+  int f_nnotch2=0;          /* Number of notch filters in array */
+  double f_notchlow[SMF__MXNOTCH]; /* Array low-freq. edges of notch filters */
+  double f_notchhigh[SMF__MXNOTCH];/* Array high-freq. edges of notch filters */
+  smfFilter *filt=NULL;     /* Pointer to filter struct */
+
   /* Main routine */
   ndfBegin();
 
@@ -154,7 +171,6 @@ void smurf_sc2clean( int *status ) {
     dcbox = (dim_t) dcbox_s;
   }
 
-
   /* Order of polynomial for baseline fits */
   parGet0i( "ORDER", &order, status );
 
@@ -163,6 +179,24 @@ void smurf_sc2clean( int *status ) {
   parGdr0i( "SPIKEITER", 0, 0, 32767, 1, &spikeiter_s, status );
   if( *status == SAI__OK ) {
     spikeiter = (size_t) spikeiter_s;
+  }
+
+  /* Frequency-domain filtering */
+  parGet0d( "FILT_EDGELOW", &f_edgelow, status );
+  parGet0d( "FILT_EDGEHIGH", &f_edgehigh, status );
+  if( f_edgelow || f_edgehigh ) {
+    dofft = 1;
+  }
+
+  parGet1d( "FILT_NOTCHLOW", SMF__MXNOTCH, f_notchlow, &f_nnotch, status ); 
+  parGet1d( "FILT_NOTCHHIGH", SMF__MXNOTCH, f_notchhigh, &f_nnotch2, status ); 
+  if( f_nnotch ) {
+    /* Number of upper and lower edges must match */
+    if( f_nnotch != f_nnotch2 ) {
+      f_nnotch = 0;
+    } else {
+      dofft = 1;
+    }
   }
 
   /* Loop over input files */
@@ -232,6 +266,31 @@ void smurf_sc2clean( int *status ) {
 		 status); 
       }
     }
+
+    /* frequency-domain filtering */
+    if( dofft ) {
+      msgOutif( MSG__VERB," ", "Apply frequency domain filter", status );
+      
+      filt = smf_create_smfFilter( ffdata, status );
+      
+      if( f_edgelow ) {
+        smf_filter_edge( filt, f_edgelow, 1, status );
+      }
+      
+      if( f_edgehigh ) {
+        smf_filter_edge( filt, f_edgehigh, 0, status );
+      }
+      
+      if( f_nnotch ) {
+        smf_filter_notch( filt, f_notchlow, f_notchhigh, f_nnotch,
+                          status );
+      }
+      
+      smf_filter_execute( ffdata, filt, status );
+      
+      filt = smf_free_smfFilter( filt, status );
+    }
+
 
     /* Ensure that the data is ICD ordered before closing */
     smf_dataOrder( ffdata, 1, status );

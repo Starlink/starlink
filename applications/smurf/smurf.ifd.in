@@ -1933,6 +1933,28 @@ package @PACKAGE@ {
                 default 1000
                 helpkey *
             }
+            parameter filt_edgehigh {
+                type _DOUBLE
+                prompt {Frequency [Hz] of hard high-pass filter}
+                default 0
+                helpkey *
+            }
+            parameter filt_edgelow {
+                type _DOUBLE
+                prompt {Frequency [Hz] of hard low-pass filter}
+                default 0
+                helpkey *
+            }
+            parameter filt_notchhigh {
+                type _DOUBLE
+                prompt {Array of upper-frequency edges [Hz] for notch filters}
+                helpkey *
+            }
+            parameter filt_notchlow {
+                type _DOUBLE
+                prompt {Array of lower-frequency edges [Hz] for notch filters}
+                helpkey *
+            }
             parameter order {
                 type _INTEGER
                 prompt {Remove baseline polynomial of order}
