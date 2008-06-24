@@ -34,11 +34,14 @@
 
 *  Authors:
 *     Jen Balfour (JAC)
+*     Tim Jenness (JAC)
 *     {enter_new_authors_here}
 
 *  History:
-*     2008-03-31 (JC):
+*     2008-03-31 (JB):
 *        Original.
+*     2008-06-24 (TIMJ):
+*        const goodness
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -82,11 +85,11 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_get_moltrans"
 
-void smf_get_moltrans( double restFreq, char **molecule, 
-                       char **transition, int *status ) {
+void smf_get_moltrans( double restFreq, const char **molecule, 
+                       const char **transition, int *status ) {
 
   /* Local variables. */
-  int i;                      /* Loop counter */
+  size_t i;                      /* Loop counter */
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;

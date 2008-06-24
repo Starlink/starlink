@@ -923,8 +923,8 @@ const char *smf_getobsidss( AstFitsChan *hdr, int *status );
 
 float smf_calc_telres( AstFitsChan *hdr, int *status );
 
-void smf_get_moltrans ( double restFreq, char **molecule, 
-                        char **transition, int *status );
+void smf_get_moltrans ( double restFreq, const char **molecule, 
+                        const char **transition, int *status );
 
 double smf_quick_noise( smfData *data, dim_t bolo, dim_t nsamp, dim_t nchunk, 
 			unsigned char *quality, unsigned char mask, 
