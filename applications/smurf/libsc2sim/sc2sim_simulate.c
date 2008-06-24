@@ -354,14 +354,14 @@
 
 void sc2sim_simulate ( struct sc2sim_obs_struct *inx, 
                        struct sc2sim_sim_struct *sinx, 
-		       double coeffs[], double digcurrent, double digmean, 
-		       double digscale, char filter[], double *heater, 
-		       int maxwrite, obsMode mode, mapCoordframe coordframe,
-		       int nbol, double *pzero, int rseed, double samptime, 
-		       double weights[], double *xbc, double *xbolo, 
-		       double *ybc, double *ybolo, 
+                       double coeffs[], double digcurrent, double digmean, 
+                       double digscale, char filter[], double *heater, 
+                       int maxwrite, obsMode mode, mapCoordframe coordframe,
+                       int nbol, double *pzero, int rseed, double samptime, 
+                       double weights[], double *xbc, double *xbolo, 
+                       double *ybc, double *ybolo, 
                        int hitsonly, int overwrite, int simstats, 
-		       int *status ) {
+                       int *status ) {
 
   double accel[2];                /* telescope accelerations (arcsec) */
   float aeff[3];                  /* output of wvmOpt */
@@ -420,14 +420,14 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double exptime = 0.0;           /* Subimage exposure time */
   AstFitsChan *fc=NULL;           /* FITS channels for tanplane projection */
   int fileexists = 1;             /* Flag to denote whether the named
-				     output file already exists */
+                                     output file already exists */
   char filename[SC2SIM__FLEN];    /* name of output file */
   AstFitsChan *fitschan=NULL;     /* FITS channels for tanplane projection */
   AstFrameSet *fitswcs=NULL;      /* Frameset for input image WCS */
   double *flatcal[8];             /* flatfield calibrations for all
-				     subarrays */
+                                     subarrays */
   char flatname[8][SC2STORE_FLATLEN];/* flatfield algorithm names for
-					all subarrays */
+                                        all subarrays */
   double *flatpar[8];             /* flatfield parameters for all subarrays */
   size_t focidx;                  /* Focus position counter */
   double focposn;                 /* SMU focus position */
@@ -436,7 +436,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int frmperms;                   /* number of frames per microstep */
   AstFrameSet *fs=NULL;           /* frameset for tanplane projection */
   int obscounter=1;               /* Counter for observation number
-				     portion of output filename */
+                                     portion of output filename */
   JCMTState *head = NULL;         /* per-frame headers */
   char heatname[SC2SIM__FLEN];    /* name of flatfield cal file */
   double hourangle;               /* Current hour angle */
@@ -445,7 +445,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double instap[2];               /* Focal plane instrument offsets */
   int j;                          /* loop counter */
   double jigpat[SC2SIM__MXSIM][2]; /* pointing: nas jiggle offsets from cen. 
-				      in ARCSEC */
+                                      in ARCSEC */
   size_t jigsamples=1;            /* number of samples in jiggle pattern */
   double *jig_y_hor=NULL;         /* jiggle y-horizontal tanplane offset (radians) */
   double *jig_x_hor=NULL;         /* jiggle x-horizontal tanplane offset (radians) */
@@ -464,7 +464,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   int noutfiles = 1;              /* Total number of output files per subarray */
   int nterms=0;                   /* number of 1/f noise frequencies */
   int obsend = 0;                 /* Flag to indicate whether current file is last in 
-				     observation */
+                                     observation */
   char obsid[80];                 /* OBSID for each observation */
   char obstype[SZFITSCARD+1];     /* Observation type, e.g. SCIENCE */
   FILE *ofile = NULL;             /* File pointer to check for existing files*/
@@ -502,7 +502,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double timesincestart = 0.0;    /* Time since start of simulation */
   double totaltime;               /* Total integration time */
   double tt;                      /* Terrestrial Time (TT) for
-				     calculating planet position */
+                                     calculating planet position */
   float ttau[3];                  /* output of wvmOpt */
   double twater;                  /* water line temp. for WVM simulation */
   char utdate[SZFITSCARD+1] = "\0";        /* UT date in YYYYMMDD form */
@@ -545,7 +545,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
     /* Get simulation of astronomical and atmospheric images. */
     msgOutif(MSG__VERB," ", 
-	     "Get astronomical and atmospheric images", status); 
+             "Get astronomical and atmospheric images", status); 
 
     /* Create a group to store the sky images, and open them. */
     skygrp = grpNew ( "GRP", status );              
@@ -572,9 +572,9 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       smf_fits_getD ( asthdr, "PIXSIZE", &astscale, status );
       /* If PIXSIZE couldn't be found, then look for CDELT2 */
       if ( *status != SAI__OK ) {
-	errAnnul(status);
-	smf_fits_getD ( asthdr, "CDELT2", &astscale, status );
-	astscale *= 3600.0; /* Convert from deg to arcsec */
+        errAnnul(status);
+        smf_fits_getD ( asthdr, "CDELT2", &astscale, status );
+        astscale *= 3600.0; /* Convert from deg to arcsec */
       }
     }
  
@@ -597,7 +597,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                "^FILENAME should have 2 dimensions, but it does not.",
                status);
         *status = DITS__APP_ERROR;
-	goto CLEANUP;
+        goto CLEANUP;
       }
 
       if ( ( atmdata->ndims ) != 2 ) {
@@ -626,20 +626,20 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       atmnaxes[1] = (atmdata->dims)[1];
     
       /* Extract the Sky->map pixel mapping for the astronomical
-	 image. As noted above, this will have no meaning for planet
-	 observations since the WCS FrameSet is noted created until
-	 later. */
+         image. As noted above, this will have no meaning for planet
+         observations since the WCS FrameSet is noted created until
+         later. */
       if ( planet ) {
-	astSetC( fitswcs, "SYSTEM", "GAPPT" );
+        astSetC( fitswcs, "SYSTEM", "GAPPT" );
       } else {
-	astSetC( fitswcs, "SYSTEM", "ICRS" );
+        astSetC( fitswcs, "SYSTEM", "ICRS" );
       }
       sky2map = astGetMapping( fitswcs, AST__CURRENT, AST__BASE ); 
     
       if( !astOK ) {
         *status = SAI__ERROR;
         errRep(FUNC_NAME, "AST error extracting sky->image pixel mapping", 
-	       status);
+               status);
       }
     }
 
@@ -654,13 +654,13 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   if( *status == SAI__OK ) {
     /*  Re-initialise random number generator to give a different sequence
-	each time by using the given seed. */
+        each time by using the given seed. */
     srand ( rseed );
       
     /* Initialize SMU nasmyth jiggle offsets to 0 */
     for( i=0; i<SC2SIM__MXSIM; i++ ) {
       for( j=0; j<2; j++ ) {
-	jigpat[i][j] = 0;
+        jigpat[i][j] = 0;
       }
     }
 
@@ -675,147 +675,147 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
        larger maps.  The simulator can recreate the following scanning
        patterns :
 
-	   singlescan : Single straight line segment.
+       singlescan : Single straight line segment.
 
-           bous : Simple Boustrophedon (raster) pattern.
+       bous : Simple Boustrophedon (raster) pattern.
 
-           liss : Lissajous pattern.
+       liss : Lissajous pattern.
 
-           pong : StraightPong fills in a rectangular region with 
-                  crosslinking straight line segments at angles of
-                  45 degrees relative to the sides of the box. 
-                  CurvePong approximates the StraightPong pattern
-                  by Fourier-expanding the Lissajous pattern with
-                  five terms, resulting in approximately straight
-                  sweeps across the central region of the map, with
-                  smooth curved turnarounds at the edges of the map. */
+       pong : StraightPong fills in a rectangular region with 
+       crosslinking straight line segments at angles of
+       45 degrees relative to the sides of the box. 
+       CurvePong approximates the StraightPong pattern
+       by Fourier-expanding the Lissajous pattern with
+       five terms, resulting in approximately straight
+       sweeps across the central region of the map, with
+       smooth curved turnarounds at the edges of the map. */
 
     /* Retrieve the map grid coordinates for each step in the 
        pattern, and determine the number of frames required to
        complete the observation */
     switch( mode ) {
       
-      case MODE__STARE:
-        /* Stare just points at a nasmyth offset of 0 from the map centre */
-	msgOutif(MSG__VERB, " ", "Do a STARE observation", status );
-        count = inx->numsamples;
-        posptr = smf_malloc ( count*2, sizeof(*posptr), 1, status );
-        if( *status == SAI__OK ) {
-          memset( posptr, 0, count*2*sizeof(double) );
-        }
+    case MODE__STARE:
+      /* Stare just points at a nasmyth offset of 0 from the map centre */
+      msgOutif(MSG__VERB, " ", "Do a STARE observation", status );
+      count = inx->numsamples;
+      posptr = smf_malloc ( count*2, sizeof(*posptr), 1, status );
+      if( *status == SAI__OK ) {
+        memset( posptr, 0, count*2*sizeof(double) );
+      }
 
-        break;
+      break;
 
-      case MODE__DREAM:
-        /* Call sc2sim_getpat to get the dream pointing solution */
-        msgOutif(MSG__VERB, " ", "Do a DREAM observation", status );
+    case MODE__DREAM:
+      /* Call sc2sim_getpat to get the dream pointing solution */
+      msgOutif(MSG__VERB, " ", "Do a DREAM observation", status );
        
-        /*  Get jiggle pattern.
-            jigpat[*][0] - X-coordinate in arcsec/time of the Jiggle position.
-            jigpat[*][1] - Y-coordinate in arcsec/time of the Jiggle position.
-            The number of values is returned in count, and should be equal
-            to the number of samples per cycle. */
+      /*  Get jiggle pattern.
+          jigpat[*][0] - X-coordinate in arcsec/time of the Jiggle position.
+          jigpat[*][1] - Y-coordinate in arcsec/time of the Jiggle position.
+          The number of values is returned in count, and should be equal
+          to the number of samples per cycle. */
 
-        sc2sim_getpat ( inx->nvert, inx->smu_samples, inx->steptime,
-                        inx->smu_offset+sinx->smu_terr, inx->conv_shape, 
-                        inx->conv_sig, inx->smu_move, inx->jig_step_x, 
-                        inx->jig_step_y, inx->jig_vert, &jigsamples, jigpat,
-                        status );
+      sc2sim_getpat ( inx->nvert, inx->smu_samples, inx->steptime,
+                      inx->smu_offset+sinx->smu_terr, inx->conv_shape, 
+                      inx->conv_sig, inx->smu_move, inx->jig_step_x, 
+                      inx->jig_step_y, inx->jig_vert, &jigsamples, jigpat,
+                      status );
       
-        count = jigsamples*sinx->ncycle;
+      count = jigsamples*sinx->ncycle;
       
-        /* dream uses the SMU to do the jiggle pattern so the posptr
-           is just set to 0 */
-        posptr = smf_malloc ( count*2, sizeof(*posptr), 1, status );
+      /* dream uses the SMU to do the jiggle pattern so the posptr
+         is just set to 0 */
+      posptr = smf_malloc ( count*2, sizeof(*posptr), 1, status );
 
-        if( *status == SAI__OK ) {
-          memset( posptr, 0, count*2*sizeof(double) );    
-        }
+      if( *status == SAI__OK ) {
+        memset( posptr, 0, count*2*sizeof(double) );    
+      }
 
-	break;
+      break;
 
-      case MODE__SINGLESCAN:
-        /* Call sc2sim_getsinglescan to get scan pointing solution */
-	msgOutif(MSG__VERB, " ", "Do a SINGLESCAN observation", status );
-        accel[0] = 432.0;
-        accel[1] = 540.0;
-        vmax[0] = inx->vmax;        /*200.0;*/
-        vmax[1] = inx->vmax;        /*200.0;*/
+    case MODE__SINGLESCAN:
+      /* Call sc2sim_getsinglescan to get scan pointing solution */
+      msgOutif(MSG__VERB, " ", "Do a SINGLESCAN observation", status );
+      accel[0] = 432.0;
+      accel[1] = 540.0;
+      vmax[0] = inx->vmax;        /*200.0;*/
+      vmax[1] = inx->vmax;        /*200.0;*/
       
-        sc2sim_getsinglescan ( inx->scan_angle, inx->width, accel, vmax, 
-                               samptime, &count, &posptr, status );
+      sc2sim_getsinglescan ( inx->scan_angle, inx->width, accel, vmax, 
+                             samptime, &count, &posptr, status );
       
-        break;
+      break;
 
-      case MODE__BOUS:
-        /* Call sc2sim_getbous to get boustrophedon pointing solution */
-	msgOutif(MSG__VERB, " ", "Do a BOUS observation", status );
-        accel[0] = 432.0;
-        accel[1] = 540.0;
-        vmax[0] = inx->vmax;        /*200.0;*/
-        vmax[1] = inx->vmax;        /*200.0;*/
+    case MODE__BOUS:
+      /* Call sc2sim_getbous to get boustrophedon pointing solution */
+      msgOutif(MSG__VERB, " ", "Do a BOUS observation", status );
+      accel[0] = 432.0;
+      accel[1] = 540.0;
+      vmax[0] = inx->vmax;        /*200.0;*/
+      vmax[1] = inx->vmax;        /*200.0;*/
       
-        sc2sim_getbous ( inx->bous_angle, inx->width, inx->height, 
-                         inx->spacing, accel, vmax, samptime, &count, 
-                         &posptr, status );  
+      sc2sim_getbous ( inx->bous_angle, inx->width, inx->height, 
+                       inx->spacing, accel, vmax, samptime, &count, 
+                       &posptr, status );  
       
-        break;
+      break;
 
-      case MODE__LISS:
-        /* Call sc2sim_getliss to get lissjous pointing solution */
-	msgOutif(MSG__VERB, " ", "Do a LISSAJOUS observation", status );
+    case MODE__LISS:
+      /* Call sc2sim_getliss to get lissjous pointing solution */
+      msgOutif(MSG__VERB, " ", "Do a LISSAJOUS observation", status );
 
-        accel[0] = 0.0;
-        accel[1] = 0.0;
+      accel[0] = 0.0;
+      accel[1] = 0.0;
 
-        vmax[0] = inx->vmax;        /*200.0;*/
-        vmax[1] = inx->vmax;        /*200.0;*/
+      vmax[0] = inx->vmax;        /*200.0;*/
+      vmax[1] = inx->vmax;        /*200.0;*/
 
-        sc2sim_getliss ( inx->liss_angle, inx->width, inx->height, 
-                         inx->spacing, accel, vmax, samptime, inx->nmaps, 
-                         &count, &posptr, status ); 
+      sc2sim_getliss ( inx->liss_angle, inx->width, inx->height, 
+                       inx->spacing, accel, vmax, samptime, inx->nmaps, 
+                       &count, &posptr, status ); 
 
-        break; 
+      break; 
       
     
-      case MODE__PONG:
-        /* Get pong pointing solution */
+    case MODE__PONG:
+      /* Get pong pointing solution */
 
-        vmax[0] = inx->vmax;        /*200.0;*/
-        vmax[1] = inx->vmax;        /*200.0;*/
+      vmax[0] = inx->vmax;        /*200.0;*/
+      vmax[1] = inx->vmax;        /*200.0;*/
 
-        accel[0] = 0.0;
-	accel[1] = 0.0;
+      accel[0] = 0.0;
+      accel[1] = 0.0;
 
-        if ( strncmp ( inx->pong_type, "STRAIGHT", 8 ) == 0 ) {
+      if ( strncmp ( inx->pong_type, "STRAIGHT", 8 ) == 0 ) {
 
-	  msgOutif(MSG__VERB, " ", "Do a STRAIGHT PONG observation", status );
+        msgOutif(MSG__VERB, " ", "Do a STRAIGHT PONG observation", status );
 
-	  sc2sim_getstraightpong ( inx->pong_angle, inx->width, inx->height, 
-                                   inx->spacing, accel, vmax, samptime, 
-                                   inx->nmaps, &count, &posptr, status );
+        sc2sim_getstraightpong ( inx->pong_angle, inx->width, inx->height, 
+                                 inx->spacing, accel, vmax, samptime, 
+                                 inx->nmaps, &count, &posptr, status );
 
-        } else if ( strncmp ( inx->pong_type, "CURVE", 5 ) == 0 ) { 
+      } else if ( strncmp ( inx->pong_type, "CURVE", 5 ) == 0 ) { 
 
-	  msgOutif(MSG__VERB, " ", "Do a CURVE PONG observation", status );
+        msgOutif(MSG__VERB, " ", "Do a CURVE PONG observation", status );
 
-	  sc2sim_getcurvepong ( inx->pong_angle, inx->width, inx->height, 
-                                inx->spacing, accel, vmax, samptime,
-                                inx->nmaps, &count, &posptr, status );
-        } else {
+        sc2sim_getcurvepong ( inx->pong_angle, inx->width, inx->height, 
+                              inx->spacing, accel, vmax, samptime,
+                              inx->nmaps, &count, &posptr, status );
+      } else {
 
-          *status = SAI__ERROR;
-          msgSetc( "P", inx->pong_type );
-          errRep( " ", "^P is not a valid PONG type", status );
+        *status = SAI__ERROR;
+        msgSetc( "P", inx->pong_type );
+        errRep( " ", "^P is not a valid PONG type", status );
 
-        }
+      }
 
-        break;
+      break;
 
-      default: /* should never be reached...*/
-        msgSetc( "MODE", inx->obsmode );
-        errRep("", "^MODE is not a supported observation mode", status);
-        break;
+    default: /* should never be reached...*/
+      msgSetc( "MODE", inx->obsmode );
+      errRep("", "^MODE is not a supported observation mode", status);
+      break;
       
     }/* switch */
 
@@ -834,7 +834,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   /* Report simulation properties if requested */
   if ( simstats ) {
     sc2sim_simstats( count, inx->steptime, maxwrite, nbol, narray, inx->nboly, 
-		     status );
+                     status );
     goto CLEANUP;
   }
 
@@ -873,7 +873,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
     if ( sinx->add_fnoise == 1 ) {
       
       msgOutif(MSG__VERB," ", 
-                "Create 1/f coefficients", status );     
+               "Create 1/f coefficients", status );     
       
       for ( bol=0; bol<nbol; bol++ ) {
         
@@ -893,7 +893,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   }/* if not hits-only */
 
   msgOutif(MSG__VERB," ", 
-            "Get flatfield calibrations", status );
+           "Get flatfield calibrations", status );
 
   /* Retrieve the flatfield calibrations for each subarray */
   for ( k = 0; k < narray; k++ ) {
@@ -936,8 +936,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
 
   /* determine number of frames per microstep */
   frmperms = count / inx->nmicstep; /* NOTE: will round down number of
-				       frames simulated if count not
-				       divisable by nmicstep */
+                                       frames simulated if count not
+                                       divisable by nmicstep */
 
   /* adjust maxwrite */
   if ( maxwrite > frmperms ) { maxwrite = frmperms; }
@@ -954,589 +954,589 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   for ( focidx = 0; focidx < inx->nfocstep; focidx++ ) {
     focposn = inx->focstart + (double)focidx * inx->focstep;
 
-  /* loop over microsteps */
-  for ( curms = 0; curms < inx->nmicstep; curms++ ) {
-    sc2sim_instap_calc( inx, curms, instap, status );
+    /* loop over microsteps */
+    for ( curms = 0; curms < inx->nmicstep; curms++ ) {
+      sc2sim_instap_calc( inx, curms, instap, status );
 
-  /* For each chunk, determine the data for the corresponding
-     frames.  At the last frame, write the data for each 
-     subarray to a file */
-  for (curchunk = 0; curchunk < chunks && (*status == SAI__OK); curchunk++) {
+      /* For each chunk, determine the data for the corresponding
+         frames.  At the last frame, write the data for each 
+         subarray to a file */
+      for (curchunk = 0; curchunk < chunks && (*status == SAI__OK); curchunk++) {
 
-    /* Adjust the lastframe value depending on whether this is the
-       last chunk */
-    lastframe = maxwrite;
-
-    /* Sub-scan number to write into filename */
-    subscanno++;
-    if ( subscanno == noutfiles ) {
-      obsend = 1;
-    }
-
-    /* If we have more than 1 chunk, and we are on the final chunk
-       then the number of frames in the last file is the remainder of
-       count divided by maxwrite. This FAILS if maxwrite is a factor
-       of count (ie no remainder), so check if we have zero
-       remainder. */
-    if ( ( chunks != 1 ) && ( curchunk == ( chunks - 1 ) ) ) {
-      lastframe = frmperms % maxwrite;
-      if ( lastframe == 0 ) {
+        /* Adjust the lastframe value depending on whether this is the
+           last chunk */
         lastframe = maxwrite;
-      }
-    }
 
-    /* Increment mjdaystart (UTC) to the beginning of this chunk, then
-       calculate the UT1/LAST at each timestep */
-    totaltime = ((double)(curms * frmperms + curchunk * maxwrite))
-	* samptime;
-    start_time = inx->mjdaystart + (totaltime / SPD);
-    taiutc = slaDat( start_time );
-    sc2sim_calctime( (sinx->telpos[0])*DD2R, start_time, inx->dut1, samptime,
-		     lastframe, mjuldate, lst, status ); 
-
-    /* If we're not simulating a planet observation then we only need
-     to calculate the apparent RA, Dec once */
-    if ( !planet ) {
-      /* Convert BASE RA, Dec to apparent RA, Dec for current epoch.
-         Use quick conversion - should be more than good enough */
-      slaMapqkz( inx->ra, inx->dec, amprms, &raapp, &decapp );
-    }
-
-    /* Retrieve the values for this chunk */
-    frameoffset = ( curms * frmperms ) + ( curchunk * maxwrite );
-    for ( frame = 0; frame < lastframe && (*status == SAI__OK); frame++ ) {
-
-      curframe = frame + frameoffset;
-
-      /* If we are simulating a planet observation, calculate apparent
-         RA, Dec at each time step - actually don't need to do this if
-         the simulation is short, say 1 min or less but in the first
-         instance let's do it the correct way. Update it only every
-         100 frames or 0.5 sec, else use the previous one */
-      if ( planet ) {
-        if ( frame%100 == 0 ) {
-          /* Calculate the TT from UT1 mjuldate, DUT1 and TT-UTC from slaDtt */
-	  tt = mjuldate[frame] + ((dtt - inx->dut1) / SPD);
-
-          slaRdplan( tt, inx->planetnum, -DD2R*(sinx->telpos)[0], 
-		     phi, &raapp, &decapp, &diam );
-
-          /* Store RA Dec in inx struct so they can be written as FITS
-             headers. Note these are APPARENT RA, Dec which are more
-             relevant for planets */
-          inx->ra = raapp;
-          inx->dec = decapp;
-	  /* Create frameset to allow sky2map mapping to be determined */
-	  fitschan = astFitsChan ( NULL, NULL, "" );
-	  sc2ast_makefitschan( astnaxes[0]/2.0, astnaxes[1]/2.0, 
-			       (-astscale*DAS2D), (astscale*DAS2D),
-			       raapp*DR2D, decapp*DR2D,
-			       "RA---TAN", "DEC--TAN", fitschan, status );
-          astClear( fitschan, "Card" );
-          fitswcs = astRead( fitschan );
-          /* Extract the Sky->REF_PIXEL mapping. */
-	  astSetC( fitswcs, "SYSTEM", "GAPPT" );
-          sky2map = astGetMapping( fitswcs, AST__CURRENT, AST__BASE );
+        /* Sub-scan number to write into filename */
+        subscanno++;
+        if ( subscanno == noutfiles ) {
+          obsend = 1;
         }
-      }
 
-      /* Calculate hour angle */
-      hourangle = lst[frame] - raapp;
-
-      /* Calculate the az/el corresponding to the map centre (base) */
-      slaDe2h ( hourangle, decapp, phi, &temp1, &temp2 );
-
-      /* Issue an error if the source is below 20 degrees */
-      if ( temp2 < 0.349066 ) {
-        if ( *status == SAI__OK ) {
-          *status = SAI__ERROR;
-	  msgSetd("E",temp2*57.29);
-          errRep(" ", "Source is below 20 deg elevation (^E)", status);
-          goto CLEANUP;
+        /* If we have more than 1 chunk, and we are on the final chunk
+           then the number of frames in the last file is the remainder of
+           count divided by maxwrite. This FAILS if maxwrite is a factor
+           of count (ie no remainder), so check if we have zero
+           remainder. */
+        if ( ( chunks != 1 ) && ( curchunk == ( chunks - 1 ) ) ) {
+          lastframe = frmperms % maxwrite;
+          if ( lastframe == 0 ) {
+            lastframe = maxwrite;
+          }
         }
-      }
 
-      /* Parallactic angle */
-      temp3 = slaPa ( hourangle, decapp, phi );
+        /* Increment mjdaystart (UTC) to the beginning of this chunk, then
+           calculate the UT1/LAST at each timestep */
+        totaltime = ((double)(curms * frmperms + curchunk * maxwrite))
+          * samptime;
+        start_time = inx->mjdaystart + (totaltime / SPD);
+        taiutc = slaDat( start_time );
+        sc2sim_calctime( (sinx->telpos[0])*DD2R, start_time, inx->dut1, samptime,
+                         lastframe, mjuldate, lst, status ); 
+
+        /* If we're not simulating a planet observation then we only need
+           to calculate the apparent RA, Dec once */
+        if ( !planet ) {
+          /* Convert BASE RA, Dec to apparent RA, Dec for current epoch.
+             Use quick conversion - should be more than good enough */
+          slaMapqkz( inx->ra, inx->dec, amprms, &raapp, &decapp );
+        }
+
+        /* Retrieve the values for this chunk */
+        frameoffset = ( curms * frmperms ) + ( curchunk * maxwrite );
+        for ( frame = 0; frame < lastframe && (*status == SAI__OK); frame++ ) {
+
+          curframe = frame + frameoffset;
+
+          /* If we are simulating a planet observation, calculate apparent
+             RA, Dec at each time step - actually don't need to do this if
+             the simulation is short, say 1 min or less but in the first
+             instance let's do it the correct way. Update it only every
+             100 frames or 0.5 sec, else use the previous one */
+          if ( planet ) {
+            if ( frame%100 == 0 ) {
+              /* Calculate the TT from UT1 mjuldate, DUT1 and TT-UTC from slaDtt */
+              tt = mjuldate[frame] + ((dtt - inx->dut1) / SPD);
+
+              slaRdplan( tt, inx->planetnum, -DD2R*(sinx->telpos)[0], 
+                         phi, &raapp, &decapp, &diam );
+
+              /* Store RA Dec in inx struct so they can be written as FITS
+                 headers. Note these are APPARENT RA, Dec which are more
+                 relevant for planets */
+              inx->ra = raapp;
+              inx->dec = decapp;
+              /* Create frameset to allow sky2map mapping to be determined */
+              fitschan = astFitsChan ( NULL, NULL, "" );
+              sc2ast_makefitschan( astnaxes[0]/2.0, astnaxes[1]/2.0, 
+                                   (-astscale*DAS2D), (astscale*DAS2D),
+                                   raapp*DR2D, decapp*DR2D,
+                                   "RA---TAN", "DEC--TAN", fitschan, status );
+              astClear( fitschan, "Card" );
+              fitswcs = astRead( fitschan );
+              /* Extract the Sky->REF_PIXEL mapping. */
+              astSetC( fitswcs, "SYSTEM", "GAPPT" );
+              sky2map = astGetMapping( fitswcs, AST__CURRENT, AST__BASE );
+            }
+          }
+
+          /* Calculate hour angle */
+          hourangle = lst[frame] - raapp;
+
+          /* Calculate the az/el corresponding to the map centre (base) */
+          slaDe2h ( hourangle, decapp, phi, &temp1, &temp2 );
+
+          /* Issue an error if the source is below 20 degrees */
+          if ( temp2 < 0.349066 ) {
+            if ( *status == SAI__OK ) {
+              *status = SAI__ERROR;
+              msgSetd("E",temp2*57.29);
+              errRep(" ", "Source is below 20 deg elevation (^E)", status);
+              goto CLEANUP;
+            }
+          }
+
+          /* Parallactic angle */
+          temp3 = slaPa ( hourangle, decapp, phi );
       
-      if( *status == SAI__OK ) {
-        base_az[frame] = temp1;
-        base_el[frame] = temp2;
-        base_p[frame] = temp3;
+          if( *status == SAI__OK ) {
+            base_az[frame] = temp1;
+            base_el[frame] = temp2;
+            base_p[frame] = temp3;
 
-        /* The scan pattern (posptr) is defined as a series of offsets
-           in ARCSEC in the map coordinate frame. Depending on the
-           frame chosen, project the pattern into AzEl and RADec so
-           that it can be written to the JCMTState structure */
-	switch( coordframe ) {
+            /* The scan pattern (posptr) is defined as a series of offsets
+               in ARCSEC in the map coordinate frame. Depending on the
+               frame chosen, project the pattern into AzEl and RADec so
+               that it can be written to the JCMTState structure */
+            switch( coordframe ) {
 	  
-	case FRAME__NASMYTH:
-	  /* Get boresight tanplate offsets in Nasmyth coordinates (radians) */
-	  bor_x_nas = (posptr[curframe*2] - instap[0])*DAS2R;
-	  bor_y_nas = (posptr[curframe*2+1] - instap[1])*DAS2R;
+            case FRAME__NASMYTH:
+              /* Get boresight tanplate offsets in Nasmyth coordinates (radians) */
+              bor_x_nas = (posptr[curframe*2] - instap[0])*DAS2R;
+              bor_y_nas = (posptr[curframe*2+1] - instap[1])*DAS2R;
 
-	  /* Calculate boresight offsets in horizontal coord. */
-	  bor_x_hor =  bor_x_nas*cos(base_el[frame]) - 
-	               bor_y_nas*sin(base_el[frame]);
-	  bor_y_hor = bor_x_nas*sin(base_el[frame]) + 
+              /* Calculate boresight offsets in horizontal coord. */
+              bor_x_hor =  bor_x_nas*cos(base_el[frame]) - 
+                bor_y_nas*sin(base_el[frame]);
+              bor_y_hor = bor_x_nas*sin(base_el[frame]) + 
 	              bor_y_nas*cos(base_el[frame]);
 	  
-	  /* Calculate jiggle offsets in horizontal coord. */
-	  /* jigpat is in ARCSEC: jig_x/y_hor must be in RADIANS */
-	  jig_x_hor[frame] = DAS2R*(jigpat[curframe%jigsamples][0]*
-                                    cos(base_el[frame]) -
-				    jigpat[curframe%jigsamples][1]*
-                                    sin(base_el[frame]));
+              /* Calculate jiggle offsets in horizontal coord. */
+              /* jigpat is in ARCSEC: jig_x/y_hor must be in RADIANS */
+              jig_x_hor[frame] = DAS2R*(jigpat[curframe%jigsamples][0]*
+                                        cos(base_el[frame]) -
+                                        jigpat[curframe%jigsamples][1]*
+                                        sin(base_el[frame]));
 	  
-	  jig_y_hor[frame] = DAS2R*(jigpat[curframe%jigsamples][0]*
-                                    sin(base_el[frame]) +
-				    jigpat[curframe%jigsamples][1]*
-                                    cos(base_el[frame]));
+              jig_y_hor[frame] = DAS2R*(jigpat[curframe%jigsamples][0]*
+                                        sin(base_el[frame]) +
+                                        jigpat[curframe%jigsamples][1]*
+                                        cos(base_el[frame]));
 
-	  break;
+              break;
 	  
-	case FRAME__AZEL:
-	  /* posptr and jigpat already give the azel tanplane offsets */
-	  bor_x_hor = (posptr[curframe*2])*DAS2R;
-	  bor_y_hor = (posptr[curframe*2+1])*DAS2R;
+            case FRAME__AZEL:
+              /* posptr and jigpat already give the azel tanplane offsets */
+              bor_x_hor = (posptr[curframe*2])*DAS2R;
+              bor_y_hor = (posptr[curframe*2+1])*DAS2R;
 
-	  /* jigpat is in ARCSEC: jig_x/y_hor must be in RADIANS */
-	  jig_x_hor[frame] = DAS2R*jigpat[curframe%jigsamples][0];
-	  jig_y_hor[frame] = DAS2R*jigpat[curframe%jigsamples][1];
-	  break;
+              /* jigpat is in ARCSEC: jig_x/y_hor must be in RADIANS */
+              jig_x_hor[frame] = DAS2R*jigpat[curframe%jigsamples][0];
+              jig_y_hor[frame] = DAS2R*jigpat[curframe%jigsamples][1];
+              break;
 	  
-	case FRAME__RADEC:
-	  /* posptr and jigpat give the RADec tanplane offsets */
-	  bor_x_cel = (posptr[curframe*2])*DAS2R;
-	  bor_y_cel = (posptr[curframe*2+1])*DAS2R;
+            case FRAME__RADEC:
+              /* posptr and jigpat give the RADec tanplane offsets */
+              bor_x_cel = (posptr[curframe*2])*DAS2R;
+              bor_y_cel = (posptr[curframe*2+1])*DAS2R;
 	  
-	  /* Rotate by the parallactic angle to get offsets in AzEl */
-	  bor_x_hor =  bor_x_cel*cos(-base_p[frame]) - 
-	    bor_y_cel*sin(-base_p[frame]);
+              /* Rotate by the parallactic angle to get offsets in AzEl */
+              bor_x_hor =  bor_x_cel*cos(-base_p[frame]) - 
+                bor_y_cel*sin(-base_p[frame]);
 
-	  bor_y_hor = bor_x_cel*sin(-base_p[frame]) + 
-	    bor_y_cel*cos(-base_p[frame]);
+              bor_y_hor = bor_x_cel*sin(-base_p[frame]) + 
+                bor_y_cel*cos(-base_p[frame]);
 	  
-	  /* jigpat is in ARCSEC: jig_x/y_hor must be in RADIANS */
-	  jig_x_hor[frame] = DAS2R*(jigpat[curframe%jigsamples][0]*
-                                    cos(base_p[frame]) -
-			            jigpat[curframe%jigsamples][1]*
-                                    sin(base_p[frame]));
+              /* jigpat is in ARCSEC: jig_x/y_hor must be in RADIANS */
+              jig_x_hor[frame] = DAS2R*(jigpat[curframe%jigsamples][0]*
+                                        cos(base_p[frame]) -
+                                        jigpat[curframe%jigsamples][1]*
+                                        sin(base_p[frame]));
 	  
-	  jig_y_hor[frame] = DAS2R*(jigpat[curframe%jigsamples][0]*
-                                    sin(base_p[frame]) +
-			            jigpat[curframe%jigsamples][1]*
-                                    cos(base_p[frame]));
-	  break;
+              jig_y_hor[frame] = DAS2R*(jigpat[curframe%jigsamples][0]*
+                                        sin(base_p[frame]) +
+                                        jigpat[curframe%jigsamples][1]*
+                                        cos(base_p[frame]));
+              break;
 
-	default: 
-	  *status = SAI__ERROR;
-	  errRep(FUNC_NAME, "Un-recognised map coordinate frame", status);
-	  break;
-	}/* switch */
+            default: 
+              *status = SAI__ERROR;
+              errRep(FUNC_NAME, "Un-recognised map coordinate frame", status);
+              break;
+            }/* switch */
 
-      }/* if status OK */
+          }/* if status OK */
 
-      /* Calculate boresight spherical horizontal coordinates */
+          /* Calculate boresight spherical horizontal coordinates */
       
-      fc = astFitsChan ( NULL, NULL, "" );
-
-      if( *status == SAI__OK ) {
-        sc2ast_makefitschan( 0.0, 0.0, AST__DR2D, AST__DR2D,
-			     base_az[frame]*AST__DR2D, 
-			     base_el[frame]*AST__DR2D,
-			     "CLON-TAN", "CLAT-TAN", fc, status );
-
-        astClear( fc, "Card" );
-        fs = astRead( fc );
-      }
-
-      if( *status == SAI__OK ) {
-	astTran2( fs, 1, &bor_x_hor, &bor_y_hor, 1, &temp1, &temp2 );
-	if( !astOK ) {
-	  *status = SAI__ERROR;
-	  errRep(FUNC_NAME, "AST error calculating telescope position", 
-		 status);
-	}
-      }
-
-      if( *status == SAI__OK ) {
-        bor_az[frame] = fmod(temp1+2.*AST__DPI,2.*AST__DPI);
-        bor_el[frame] = fmod(temp2+2.*AST__DPI,2.*AST__DPI);
-
-        /* Calculate sky (effective) horiz. coordinates (boresight+jiggle) */
-        sky_x_hor = bor_x_hor + jig_x_hor[frame];
-        sky_y_hor = bor_y_hor + jig_y_hor[frame];
-
-        astTran2( fs, 1, &sky_x_hor, &sky_y_hor, 1, &temp1, &temp2 );
-
-        sky_az = fmod(temp1+2.*AST__DPI,2.*AST__DPI);
-        sky_el = fmod(temp2+2.*AST__DPI,2.*AST__DPI);
-
-	if( !astOK ) {
-	  *status = SAI__ERROR;
-	  errRep(FUNC_NAME, "AST error calculating effective position", 
-		 status);
-	}      if( !astOK ) {
-        *status = SAI__ERROR;
-        errRep(FUNC_NAME, "AST error calculating effective position", 
-               status);
-	}
-
-      }
-      
-      /* Free AST resources required for boresite pointing calculation */
-      if( fs ) fs = astAnnul(fs);
-      if( fc ) fc = astAnnul(fc);
-
-      if( *status == SAI__OK ) {
-        /* Calculate the airmass - note this assumes a PLANE-PARALLEL
-	   atmosphere with no refraction. Set constant below an
-	   elevation of 1 deg. */
-        if( sky_el >= 1.0 * AST__DPI/180. ) {
-          airmass[frame] = 1.0/sin(sky_el);
-        } else {
-	  airmass[frame] = 3283.0;
-	}
-        /* Calculate equatorial from horizontal */
-        slaDh2e( bor_az[frame], bor_el[frame], phi, &raapp1, &decapp1 );
-	raapp1 = fmod(lst[frame] - raapp1 + D2PI, D2PI );
-	/* Convert apparent RA Dec to Mean RA, Dec for current epoch */
-	slaAmpqk( raapp1, decapp1, amprms, &temp1, &temp2 );
-	/* Store the mean RA, Dec */
-        bor_ra[frame] = temp1;
-        bor_dec[frame] = temp2;
-	if ( planet ) {
-	  inx->ra = temp1;
-	  inx->dec = temp2;
-	}
-      }
-
-      if ( !hitsonly ) {
-
-        /* Create an sc2 frameset for this time slice and extract 
-	   bolo->sky mapping */ 
-        state.tcs_az_ac2 = bor_el[frame];
-	state.tcs_az_ac1 = bor_az[frame];
-        state.tcs_tr_dc1 = bor_ra[frame];
-        state.tcs_tr_dc2 = bor_dec[frame]; 
-        state.tcs_tr_ac1 = bor_ra[frame];
-        state.tcs_tr_ac2 = bor_dec[frame]; 
-	/* Set BASE position */
-	if (planet) {
-	  state.tcs_tr_bc1 = raapp;
-	  state.tcs_tr_bc2 = decapp;
-	} else {
-	  state.tcs_tr_bc1 = inx->ra; 
-	  state.tcs_tr_bc2 = inx->dec;
-	}
-        state.smu_az_jig_x = jig_x_hor[frame];
-        state.smu_az_jig_y = jig_y_hor[frame];
-        state.smu_az_chop_x = 0;
-        state.smu_az_chop_y = 0;
-        state.tcs_tai = mjuldate[frame] + (taiutc - inx->dut1 + 0.5*samptime)/SPD;
-        state.rts_end = state.tcs_tai + 0.5*samptime/SPD;
-
-        /* For each subarray, retrieve the wcs frameset, then generate
-           the frame of data */
-	timesincestart = ( mjuldate[frame] - inx->mjdaystart ) * SPD;
-        for ( k = 0; k < narray; k++ ) {
-
-          /* Get the numerical subarray number from the name */
-          sc2ast_name2num( subarrays[k], &subnum, status );
+          fc = astFitsChan ( NULL, NULL, "" );
 
           if( *status == SAI__OK ) {
-            sc2ast_createwcs(subnum, &state, instap, sinx->telpos, &fs, 
-			     status);
+            sc2ast_makefitschan( 0.0, 0.0, AST__DR2D, AST__DR2D,
+                                 base_az[frame]*AST__DR2D, 
+                                 base_el[frame]*AST__DR2D,
+                                 "CLON-TAN", "CLAT-TAN", fc, status );
+
+            astClear( fc, "Card" );
+            fs = astRead( fc );
+          }
+
+          if( *status == SAI__OK ) {
+            astTran2( fs, 1, &bor_x_hor, &bor_y_hor, 1, &temp1, &temp2 );
+            if( !astOK ) {
+              *status = SAI__ERROR;
+              errRep(FUNC_NAME, "AST error calculating telescope position", 
+                     status);
+            }
+          }
+
+          if( *status == SAI__OK ) {
+            bor_az[frame] = fmod(temp1+2.*AST__DPI,2.*AST__DPI);
+            bor_el[frame] = fmod(temp2+2.*AST__DPI,2.*AST__DPI);
+
+            /* Calculate sky (effective) horiz. coordinates (boresight+jiggle) */
+            sky_x_hor = bor_x_hor + jig_x_hor[frame];
+            sky_y_hor = bor_y_hor + jig_y_hor[frame];
+
+            astTran2( fs, 1, &sky_x_hor, &sky_y_hor, 1, &temp1, &temp2 );
+
+            sky_az = fmod(temp1+2.*AST__DPI,2.*AST__DPI);
+            sky_el = fmod(temp2+2.*AST__DPI,2.*AST__DPI);
+
+            if( !astOK ) {
+              *status = SAI__ERROR;
+              errRep(FUNC_NAME, "AST error calculating effective position", 
+                     status);
+            }      if( !astOK ) {
+              *status = SAI__ERROR;
+              errRep(FUNC_NAME, "AST error calculating effective position", 
+                     status);
+            }
+
           }
       
-          /* simulate one frame of data */
+          /* Free AST resources required for boresite pointing calculation */
+          if( fs ) fs = astAnnul(fs);
+          if( fc ) fc = astAnnul(fc);
+
           if( *status == SAI__OK ) {
-            sc2sim_simframe ( *inx, *sinx, astnaxes, astscale, 
-			      astdata->pntr[0], atmnaxes, atmscale, 
-			      atmdata->pntr[0], coeffs, fs, heater, nbol, 
-			      focposn, curframe, nterms, noisecoeffs, pzero, samptime, 
-			      timesincestart, weights, 
-			      sky2map, xbolo, ybolo, xbc, ybc, 
-			      &(posptr[curframe*2]), 
-                              &(dbuf[(k*nbol*maxwrite) + (nbol*frame)]), 
-			      status );
-	  }
-
-          /* Annul sc2 frameset for this time slice */
-          if( fs ) fs = astAnnul( fs );
-          if( fitschan ) fitschan = astAnnul( fitschan );
-
-        }/* for each subarray */
-
-      }/* if not hits-only */
-   
-      /* If this is the last frame, generate the headers for every
-	 frame and write the data to a file for all the subarrays */
-
-      if ( ( frame == ( lastframe - 1 ) ) && ( *status == SAI__OK ) ) {
-
-        for ( j = 0; j < lastframe; j++ ) { 
-
-          /* RTS -------------------------------------------------------*/
-	  /* Sequence number */
-          head[j].rts_num = frameoffset + j;
-	  /* Calculate TAI corresponding to MID-TIME of sample and store */
-	  head[j].tcs_tai = mjuldate[j] + (taiutc - inx->dut1 + 0.5*samptime)/SPD;
-
-	  /* RTS_END is a TAI time, corresponding to END time of sample */
-          head[j].rts_end = head[j].tcs_tai +0.5*samptime/SPD;
-
-          /* TCS - Telescope tracking structure ----------------------- */
-	  /* Coord. system  */
-	  if ( planet ) {
-	    /* Note: the JCMT writes out APP not GAPPT */
-	    snprintf(head[j].tcs_tr_sys,6,"APP");  
-	  } else {
-	    snprintf(head[j].tcs_tr_sys,6,"J2000");  
-	  }
-          /* Angle between "up" in Nasmyth coordinates, and "up"
-             in tracking coordinates at the base telescope
-             positions */
-          head[j].tcs_tr_ang = base_el[j] + base_p[j];
-
-          /* Demand coordinates */
-          head[j].tcs_tr_dc1 = bor_ra[j];
-          head[j].tcs_tr_dc2 = bor_dec[j]; 
-            
-          /* Actual coordinates */
-          head[j].tcs_tr_ac1 = bor_ra[j];
-          head[j].tcs_tr_ac2 = bor_dec[j]; 
-            
-          /* Base coordinates (e.g. tangent point for nominal map) */
-	  if (planet) {
-	    head[j].tcs_tr_bc1 = raapp;
-	    head[j].tcs_tr_bc2 = decapp;
-	  } else {
-	    head[j].tcs_tr_bc1 = inx->ra;
-	    head[j].tcs_tr_bc2 = inx->dec;
-	  }
-
-          /* TCS - Telescope tracking in horizontal coordinates ------- */
-            
-          /* Angle between "up" in Nasmyth coordinates, and "up" in 
-             horizontal coordinates at the base telescope positions */
-          head[j].tcs_az_ang = base_el[j];
-            
-          /* Base coordinates */
-          head[j].tcs_az_bc1 = base_az[j];
-          head[j].tcs_az_bc2 = base_el[j];
-            
-          /* Demand coordinates */
-          head[j].tcs_az_dc1 = bor_az[j];
-          head[j].tcs_az_dc2 = bor_el[j];
-           
-          /* Actual coordinates */
-          head[j].tcs_az_ac1 = bor_az[j];
-          head[j].tcs_az_ac2 = bor_el[j];
-            
-          /* Write airmass into header */
-          head[j].tcs_airmass = airmass[j];
-            
-          /* SMU - Secondary mirror structure ------------------------- */
-          /* Jiggle horizontal offsets */
-          head[j].smu_az_jig_x = jig_x_hor[j];
-          head[j].smu_az_jig_y = jig_y_hor[j];
-           
-	  /* Other headers - more to be added as necessary */
-          strncpy( head[j].smu_chop_phase, "M", 
-                   sizeof(head[j].smu_chop_phase) );
-          (head[j].smu_chop_phase)[JCMT__SZSMU_CHOP_PHASE] = '\0';
-          strncpy( head[j].tcs_beam, "M",
-                   sizeof(head[j].tcs_beam) );
-          (head[j].tcs_beam)[JCMT__SZTCS_BEAM] = '\0';
-          strncpy( head[j].tcs_source, "SCIENCE",
-                   sizeof(head[j].tcs_source));
-          (head[j].tcs_source)[JCMT__SZTCS_SOURCE] = '\0';
+            /* Calculate the airmass - note this assumes a PLANE-PARALLEL
+               atmosphere with no refraction. Set constant below an
+               elevation of 1 deg. */
+            if( sky_el >= 1.0 * AST__DPI/180. ) {
+              airmass[frame] = 1.0/sin(sky_el);
+            } else {
+              airmass[frame] = 3283.0;
+            }
+            /* Calculate equatorial from horizontal */
+            slaDh2e( bor_az[frame], bor_el[frame], phi, &raapp1, &decapp1 );
+            raapp1 = fmod(lst[frame] - raapp1 + D2PI, D2PI );
+            /* Convert apparent RA Dec to Mean RA, Dec for current epoch */
+            slaAmpqk( raapp1, decapp1, amprms, &temp1, &temp2 );
+            /* Store the mean RA, Dec */
+            bor_ra[frame] = temp1;
+            bor_dec[frame] = temp2;
+            if ( planet ) {
+              inx->ra = temp1;
+              inx->dec = temp2;
+            }
+          }
 
           if ( !hitsonly ) {
 
-            /* WVM - Water vapour monitor ------------------------------- */
-            
-            /* Simulate WVM measurements consistent with airmass and
-               pwv using a subroutine from the WVM library used to
-               calculate opacities from the real monitor. drytau183 is
-               the excess broadband opacity, aka the dry component,
-               which is why it's small and independent of the PWV.
-              
-               Using a fixed value of drytau183 and choosing twater to be
-               10 degrees away from the ambient temperature seems to
-               generate WVM observations that can then be "fit" to get
-               the correct (input) values for CSO tau and the PWV using
-               wvmOpt. */
-            
-            /* Determine pwv from tauzen */
-            pwvzen = tau2pwv (sinx->tauzen);
-            
-            /* Line of site pwv      */
-            pwvlos = airmass[j]*pwvzen;
-            
-            /* Effective water temp. */
-            twater = sinx->atstart + 273.15 - 10;
-            
-            /* Not physically unreasonable number... Note it's negative
-               because of a missed -ve sign in the wvmEst */
-            drytau183 = -0.03;        
-            
-            /* Only update once every 240 samples */
-            if( j % 240 == 0 ) {
-              wvmEst( airmass[j], pwvlos, /* model temp. */  
-                      twater, drytau183, tbri, ttau, teff, aeff );
-	    }
-            
-            head[j].wvm_t12 = tbri[0];
-            head[j].wvm_t42 = tbri[1];
-            head[j].wvm_t78 = tbri[2];
+            /* Create an sc2 frameset for this time slice and extract 
+               bolo->sky mapping */ 
+            state.tcs_az_ac2 = bor_el[frame];
+            state.tcs_az_ac1 = bor_az[frame];
+            state.tcs_tr_dc1 = bor_ra[frame];
+            state.tcs_tr_dc2 = bor_dec[frame]; 
+            state.tcs_tr_ac1 = bor_ra[frame];
+            state.tcs_tr_ac2 = bor_dec[frame]; 
+            /* Set BASE position */
+            if (planet) {
+              state.tcs_tr_bc1 = raapp;
+              state.tcs_tr_bc2 = decapp;
+            } else {
+              state.tcs_tr_bc1 = inx->ra; 
+              state.tcs_tr_bc2 = inx->dec;
+            }
+            state.smu_az_jig_x = jig_x_hor[frame];
+            state.smu_az_jig_y = jig_y_hor[frame];
+            state.smu_az_chop_x = 0;
+            state.smu_az_chop_y = 0;
+            state.tcs_tai = mjuldate[frame] + (taiutc - inx->dut1 + 0.5*samptime)/SPD;
+            state.rts_end = state.tcs_tai + 0.5*samptime/SPD;
 
-	  }/* if not hits-only */
+            /* For each subarray, retrieve the wcs frameset, then generate
+               the frame of data */
+            timesincestart = ( mjuldate[frame] - inx->mjdaystart ) * SPD;
+            for ( k = 0; k < narray; k++ ) {
 
-	}/* for each frame in this chunk */
+              /* Get the numerical subarray number from the name */
+              sc2ast_name2num( subarrays[k], &subnum, status );
 
-        if ( !hitsonly ) {
-          
-          /* For now just set to the last airmass calculated */
-          sinx->airmass = airmass[frame-1];
-          
-          /* Calculate `mean' tau CSO from the pwv */
-          tauCSO = 0.5 * ( pwv2tau(airmass[0],pwvzen) + 
-			   pwv2tau(airmass[frame-1],pwvzen) );
-
-	}/* if not hits-only */
-
-        dateobs[0] = '\0'; /* Initialize the dateobs string to NULL */
-	sc2sim_dateobs( start_time, dateobs, status );
-
-        /* For each subarray, digitise the data and write it to 
-           a file */
-        for ( k = 0; k < narray; k++ ) {
-
-	  /* If we haven't calculate parameters for the digitization yet,
-             do it now before the first digitise call. This will override
-             the guess parameters provided by sc2sim_instrinit */
-
-	  if( dodigcalc ) {
-	    
-	    /* Get photon noise level */
-	    sc2sim_calctrans( inx->lambda, &skytrans, sinx->tauzen, status );
-	    sc2sim_atmsky( inx->lambda, skytrans, &zenatm, status );
-	    meanatm = zenatm * ( 1.0 - pow(0.01*skytrans,airmass[0]) ) / 
-	      ( 1.0 - (0.01*skytrans) );
-	    sc2sim_getsigma( sinx->refload, sinx->refnoise, 
-			     sinx->telemission + meanatm, &pnoise, status );
-
-	    /* Calculate scaling coefficients */
-
-	    sc2sim_getscaling ( SC2SIM__NCOEFFS, coeffs, inx->targetpow, 
-				pnoise, &digmean, &digscale, &digcurrent, 
-				status );
-
-	    dodigcalc = 0;
-	  }
-
-	  /* Digitise the numbers */
-          if( !hitsonly && ( *status == SAI__OK ) ) {
-	    sc2sim_digitise ( nbol*(frame+1), &dbuf[k*maxwrite*nbol], 
-                              digmean, digscale,
-			      digcurrent, digits, status );
-	  }
-
-	  /* Compress and store as NDF */
-          if( *status == SAI__OK ) {
-            sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k], 
-		     date_yr, date_mo, date_da, obscounter, subscanno );
-	    /*If we are not overwriting existing files see if the file exists*/
-	    if ( !overwrite ) {
-	      fileexists = 1;
-	      while ( fileexists ) {
-		strncat( filename, ".sdf", 4);
-		ofile = fopen( filename, "r" );
-		/* First see if we can open the file */
-		if ( ofile ) {
-		  /* If yes, close it again, increment counter and set
-		     new file name */
-		  fileexists = 1;
-		  fclose(ofile);
-		  obscounter++;
-		  sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k], 
-			   date_yr, date_mo, date_da, obscounter, subscanno );
-		} else {
-		  /* If not, unset fileexists flag, increment counter
-		     and set new file name */
-		  fileexists = 0;
-		  sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k], 
-			   date_yr, date_mo, date_da, obscounter, subscanno );
-		}
-	      }
-	    }
-
-
-            msgSetc( "FILENAME", filename );
-            msgOutif(MSG__NORM, "", "  Writing ^FILENAME", status ); 
-
-	    /* Calculate OBSID */
-	    date_hr = (int)(date_df * 24);
-	    date_mn = 60 * ((date_df * 24.0) - (float)date_hr);
-	    sprintf(obsid, "%s_%d_%04d%02d%02dT%02d%02d%02d",
-		    INSTRUMENT, obscounter, date_yr, date_mo, date_da,
-		    date_hr,date_mn,0);
-
-	    sprintf( utdate, "%04d%02d%02d", date_yr, date_mo, date_da);
-
-            /* Set the subarray name */
-            strcpy ( sinx->subname, subarrays[k] );
-
-	    /* Number of .In images KLUDGE */
-	    if ( mode == MODE__DREAM || mode == MODE__STARE ) {
-	      nimage = maxwrite / 200;
-	    }
-	    /* LST start/end */
-	    strncpy(sign, "+", sizeof(sign));
-	    slaDr2tf(4, lst[0], sign, ihmsf);
-	    sprintf( lststart, "%02d:%02d:%02d.%04d", 
-		     ihmsf[0], ihmsf[1], ihmsf[2], ihmsf[3]);
-	    slaDr2tf(4, lst[lastframe-1], sign, ihmsf);
-	    sprintf( lstend, "%02d:%02d:%02d.%04d", 
-		     ihmsf[0], ihmsf[1], ihmsf[2], ihmsf[3]);
-	    /* HST start/end */
-
-	    /* Write the data out to a file */
-	    sc2sim_ndfwrdata( inx, sinx, tauCSO, filename, lastframe, nflat[k],
-			      flatname[k], head, digits, dksquid, flatcal[k], 
-			      flatpar[k], INSTRUMENT, filter, dateobs, obsid,
-			      &(posptr[frameoffset*2]), jigsamples, 
-                              &(jigpat[0]), obscounter, focposn, 
-			      subscanno, obsend, utdate, 
-			      head[0].tcs_az_bc1, 
-			      head[lastframe-1].tcs_az_bc1,
-			      head[0].tcs_az_bc2, 
-			      head[lastframe-1].tcs_az_bc2,
-			      lststart, lstend, loclcrd, scancrd, 
-			      totaltime, exptime, nimage, 
-			      sinx->tauzen, sinx->tauzen,
-			      status);
-
-	  }/* if status OK */
-
-	}/* for each subarray */
-
-      }/* if lastframe */
+              if( *status == SAI__OK ) {
+                sc2ast_createwcs(subnum, &state, instap, sinx->telpos, &fs, 
+                                 status);
+              }
       
-      /* exit loop over time slice if bad status */
-      if( *status != SAI__OK ) {
-        frame = lastframe;
-        curchunk = chunks;
-	curms = inx->nmicstep;
-      } 
-     
-    }/* For all frames in this chunk */
+              /* simulate one frame of data */
+              if( *status == SAI__OK ) {
+                sc2sim_simframe ( *inx, *sinx, astnaxes, astscale, 
+                                  astdata->pntr[0], atmnaxes, atmscale, 
+                                  atmdata->pntr[0], coeffs, fs, heater, nbol, 
+                                  focposn, curframe, nterms, noisecoeffs, pzero, samptime, 
+                                  timesincestart, weights, 
+                                  sky2map, xbolo, ybolo, xbc, ybc, 
+                                  &(posptr[curframe*2]), 
+                                  &(dbuf[(k*nbol*maxwrite) + (nbol*frame)]), 
+                                  status );
+              }
+
+              /* Annul sc2 frameset for this time slice */
+              if( fs ) fs = astAnnul( fs );
+              if( fitschan ) fitschan = astAnnul( fitschan );
+
+            }/* for each subarray */
+
+          }/* if not hits-only */
    
-  } /* For each chunk */
-  } /* For each microstep */
+          /* If this is the last frame, generate the headers for every
+             frame and write the data to a file for all the subarrays */
+
+          if ( ( frame == ( lastframe - 1 ) ) && ( *status == SAI__OK ) ) {
+
+            for ( j = 0; j < lastframe; j++ ) { 
+
+              /* RTS -------------------------------------------------------*/
+              /* Sequence number */
+              head[j].rts_num = frameoffset + j;
+              /* Calculate TAI corresponding to MID-TIME of sample and store */
+              head[j].tcs_tai = mjuldate[j] + (taiutc - inx->dut1 + 0.5*samptime)/SPD;
+
+              /* RTS_END is a TAI time, corresponding to END time of sample */
+              head[j].rts_end = head[j].tcs_tai +0.5*samptime/SPD;
+
+              /* TCS - Telescope tracking structure ----------------------- */
+              /* Coord. system  */
+              if ( planet ) {
+                /* Note: the JCMT writes out APP not GAPPT */
+                snprintf(head[j].tcs_tr_sys,6,"APP");  
+              } else {
+                snprintf(head[j].tcs_tr_sys,6,"J2000");  
+              }
+              /* Angle between "up" in Nasmyth coordinates, and "up"
+                 in tracking coordinates at the base telescope
+                 positions */
+              head[j].tcs_tr_ang = base_el[j] + base_p[j];
+
+              /* Demand coordinates */
+              head[j].tcs_tr_dc1 = bor_ra[j];
+              head[j].tcs_tr_dc2 = bor_dec[j]; 
+            
+              /* Actual coordinates */
+              head[j].tcs_tr_ac1 = bor_ra[j];
+              head[j].tcs_tr_ac2 = bor_dec[j]; 
+            
+              /* Base coordinates (e.g. tangent point for nominal map) */
+              if (planet) {
+                head[j].tcs_tr_bc1 = raapp;
+                head[j].tcs_tr_bc2 = decapp;
+              } else {
+                head[j].tcs_tr_bc1 = inx->ra;
+                head[j].tcs_tr_bc2 = inx->dec;
+              }
+
+              /* TCS - Telescope tracking in horizontal coordinates ------- */
+            
+              /* Angle between "up" in Nasmyth coordinates, and "up" in 
+                 horizontal coordinates at the base telescope positions */
+              head[j].tcs_az_ang = base_el[j];
+            
+              /* Base coordinates */
+              head[j].tcs_az_bc1 = base_az[j];
+              head[j].tcs_az_bc2 = base_el[j];
+            
+              /* Demand coordinates */
+              head[j].tcs_az_dc1 = bor_az[j];
+              head[j].tcs_az_dc2 = bor_el[j];
+           
+              /* Actual coordinates */
+              head[j].tcs_az_ac1 = bor_az[j];
+              head[j].tcs_az_ac2 = bor_el[j];
+            
+              /* Write airmass into header */
+              head[j].tcs_airmass = airmass[j];
+            
+              /* SMU - Secondary mirror structure ------------------------- */
+              /* Jiggle horizontal offsets */
+              head[j].smu_az_jig_x = jig_x_hor[j];
+              head[j].smu_az_jig_y = jig_y_hor[j];
+           
+              /* Other headers - more to be added as necessary */
+              strncpy( head[j].smu_chop_phase, "M", 
+                       sizeof(head[j].smu_chop_phase) );
+              (head[j].smu_chop_phase)[JCMT__SZSMU_CHOP_PHASE] = '\0';
+              strncpy( head[j].tcs_beam, "M",
+                       sizeof(head[j].tcs_beam) );
+              (head[j].tcs_beam)[JCMT__SZTCS_BEAM] = '\0';
+              strncpy( head[j].tcs_source, "SCIENCE",
+                       sizeof(head[j].tcs_source));
+              (head[j].tcs_source)[JCMT__SZTCS_SOURCE] = '\0';
+
+              if ( !hitsonly ) {
+
+                /* WVM - Water vapour monitor ------------------------------- */
+            
+                /* Simulate WVM measurements consistent with airmass and
+                   pwv using a subroutine from the WVM library used to
+                   calculate opacities from the real monitor. drytau183 is
+                   the excess broadband opacity, aka the dry component,
+                   which is why it's small and independent of the PWV.
+              
+                   Using a fixed value of drytau183 and choosing twater to be
+                   10 degrees away from the ambient temperature seems to
+                   generate WVM observations that can then be "fit" to get
+                   the correct (input) values for CSO tau and the PWV using
+                   wvmOpt. */
+            
+                /* Determine pwv from tauzen */
+                pwvzen = tau2pwv (sinx->tauzen);
+            
+                /* Line of site pwv      */
+                pwvlos = airmass[j]*pwvzen;
+            
+                /* Effective water temp. */
+                twater = sinx->atstart + 273.15 - 10;
+            
+                /* Not physically unreasonable number... Note it's negative
+                   because of a missed -ve sign in the wvmEst */
+                drytau183 = -0.03;        
+            
+                /* Only update once every 240 samples */
+                if( j % 240 == 0 ) {
+                  wvmEst( airmass[j], pwvlos, /* model temp. */  
+                          twater, drytau183, tbri, ttau, teff, aeff );
+                }
+            
+                head[j].wvm_t12 = tbri[0];
+                head[j].wvm_t42 = tbri[1];
+                head[j].wvm_t78 = tbri[2];
+
+              }/* if not hits-only */
+
+            }/* for each frame in this chunk */
+
+            if ( !hitsonly ) {
+          
+              /* For now just set to the last airmass calculated */
+              sinx->airmass = airmass[frame-1];
+          
+              /* Calculate `mean' tau CSO from the pwv */
+              tauCSO = 0.5 * ( pwv2tau(airmass[0],pwvzen) + 
+                               pwv2tau(airmass[frame-1],pwvzen) );
+
+            }/* if not hits-only */
+
+            dateobs[0] = '\0'; /* Initialize the dateobs string to NULL */
+            sc2sim_dateobs( start_time, dateobs, status );
+
+            /* For each subarray, digitise the data and write it to 
+               a file */
+            for ( k = 0; k < narray; k++ ) {
+
+              /* If we haven't calculate parameters for the digitization yet,
+                 do it now before the first digitise call. This will override
+                 the guess parameters provided by sc2sim_instrinit */
+
+              if( dodigcalc ) {
+	    
+                /* Get photon noise level */
+                sc2sim_calctrans( inx->lambda, &skytrans, sinx->tauzen, status );
+                sc2sim_atmsky( inx->lambda, skytrans, &zenatm, status );
+                meanatm = zenatm * ( 1.0 - pow(0.01*skytrans,airmass[0]) ) / 
+                  ( 1.0 - (0.01*skytrans) );
+                sc2sim_getsigma( sinx->refload, sinx->refnoise, 
+                                 sinx->telemission + meanatm, &pnoise, status );
+
+                /* Calculate scaling coefficients */
+
+                sc2sim_getscaling ( SC2SIM__NCOEFFS, coeffs, inx->targetpow, 
+                                    pnoise, &digmean, &digscale, &digcurrent, 
+                                    status );
+
+                dodigcalc = 0;
+              }
+
+              /* Digitise the numbers */
+              if( !hitsonly && ( *status == SAI__OK ) ) {
+                sc2sim_digitise ( nbol*(frame+1), &dbuf[k*maxwrite*nbol], 
+                                  digmean, digscale,
+                                  digcurrent, digits, status );
+              }
+
+              /* Compress and store as NDF */
+              if( *status == SAI__OK ) {
+                sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k], 
+                         date_yr, date_mo, date_da, obscounter, subscanno );
+                /*If we are not overwriting existing files see if the file exists*/
+                if ( !overwrite ) {
+                  fileexists = 1;
+                  while ( fileexists ) {
+                    strncat( filename, ".sdf", 4);
+                    ofile = fopen( filename, "r" );
+                    /* First see if we can open the file */
+                    if ( ofile ) {
+                      /* If yes, close it again, increment counter and set
+                         new file name */
+                      fileexists = 1;
+                      fclose(ofile);
+                      obscounter++;
+                      sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k], 
+                               date_yr, date_mo, date_da, obscounter, subscanno );
+                    } else {
+                      /* If not, unset fileexists flag, increment counter
+                         and set new file name */
+                      fileexists = 0;
+                      sprintf( filename, "%s%04i%02i%02i_%05d_%04d", subarrays[k], 
+                               date_yr, date_mo, date_da, obscounter, subscanno );
+                    }
+                  }
+                }
+
+
+                msgSetc( "FILENAME", filename );
+                msgOutif(MSG__NORM, "", "  Writing ^FILENAME", status ); 
+
+                /* Calculate OBSID */
+                date_hr = (int)(date_df * 24);
+                date_mn = 60 * ((date_df * 24.0) - (float)date_hr);
+                sprintf(obsid, "%s_%d_%04d%02d%02dT%02d%02d%02d",
+                        INSTRUMENT, obscounter, date_yr, date_mo, date_da,
+                        date_hr,date_mn,0);
+
+                sprintf( utdate, "%04d%02d%02d", date_yr, date_mo, date_da);
+
+                /* Set the subarray name */
+                strcpy ( sinx->subname, subarrays[k] );
+
+                /* Number of .In images KLUDGE */
+                if ( mode == MODE__DREAM || mode == MODE__STARE ) {
+                  nimage = maxwrite / 200;
+                }
+                /* LST start/end */
+                strncpy(sign, "+", sizeof(sign));
+                slaDr2tf(4, lst[0], sign, ihmsf);
+                sprintf( lststart, "%02d:%02d:%02d.%04d", 
+                         ihmsf[0], ihmsf[1], ihmsf[2], ihmsf[3]);
+                slaDr2tf(4, lst[lastframe-1], sign, ihmsf);
+                sprintf( lstend, "%02d:%02d:%02d.%04d", 
+                         ihmsf[0], ihmsf[1], ihmsf[2], ihmsf[3]);
+                /* HST start/end */
+
+                /* Write the data out to a file */
+                sc2sim_ndfwrdata( inx, sinx, tauCSO, filename, lastframe, nflat[k],
+                                  flatname[k], head, digits, dksquid, flatcal[k], 
+                                  flatpar[k], INSTRUMENT, filter, dateobs, obsid,
+                                  &(posptr[frameoffset*2]), jigsamples, 
+                                  &(jigpat[0]), obscounter, focposn, 
+                                  subscanno, obsend, utdate, 
+                                  head[0].tcs_az_bc1, 
+                                  head[lastframe-1].tcs_az_bc1,
+                                  head[0].tcs_az_bc2, 
+                                  head[lastframe-1].tcs_az_bc2,
+                                  lststart, lstend, loclcrd, scancrd, 
+                                  totaltime, exptime, nimage, 
+                                  sinx->tauzen, sinx->tauzen,
+                                  status);
+
+              }/* if status OK */
+
+            }/* for each subarray */
+
+          }/* if lastframe */
+      
+          /* exit loop over time slice if bad status */
+          if( *status != SAI__OK ) {
+            frame = lastframe;
+            curchunk = chunks;
+            curms = inx->nmicstep;
+          } 
+     
+        }/* For all frames in this chunk */
+   
+      } /* For each chunk */
+    } /* For each microstep */
   } /* For each focus position */
 
   /* Release memory */
