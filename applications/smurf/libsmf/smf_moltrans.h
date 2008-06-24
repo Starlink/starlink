@@ -21,11 +21,14 @@
 
 *  Authors:
 *     Jen Balfour (JAC)
+*     Tim Jenness (JAC)
 *     {enter_new_authors_here}
 
 *  History:
 *     2008-03-31 (JB):
 *        Original.
+*     2008-06-24 (TIMJ):
+*        Use const in struct.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -55,8 +58,8 @@
 
 /* Molecular transition information. */
 typedef struct smfMolTrans {
-  char *molecule;           /* molecule species */
-  char *transiti;            /* transition */
+  const char *molecule;           /* molecule species */
+  const char *transiti;            /* transition */
   double freq;               /* frequency of transition */
 } molTrans;
 
