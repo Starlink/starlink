@@ -80,6 +80,7 @@
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -133,7 +134,8 @@
 *        -improved initialization for SMF__NOI and SMF__QUA
 *     2008-04-30 (EC):
 *        -Calculate and store extinction coefficients for SMF__EXT
-
+*     2008-06-24 (TIMJ):
+*        - const mname since smf_model_getname now returns const
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -210,7 +212,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
   dim_t j;                      /* Loop counter */
   dim_t k;                      /* Loop counter */
   Grp *mgrp=NULL;               /* Temporary group to hold model names */
-  char *mname=NULL;             /* String model component name */
+  const char *mname=NULL;       /* String model component name */
   int msize=0;                  /* Number of files in model group */
   char name[GRP__SZNAM+1];      /* Name of container file without suffix */
   size_t ndata=0;               /* Number of elements in data array */

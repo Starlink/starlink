@@ -615,7 +615,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
 		       smfGroup **mgroup, int nofile, int leaveopen,
 		       smfArray **mdata, int *status );
 
-char *smf_model_getname( smf_modeltype type, int *status);
+const char *smf_model_getname( smf_modeltype type, int *status);
 
 smf_modeltype smf_model_gettype( const char *modelname, int *status );
 

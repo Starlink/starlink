@@ -30,6 +30,7 @@
 
 *  Authors:
 *     Edward Chapin (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -44,10 +45,12 @@
 *        Added LUT
 *     2008-03-03 (EC):
 *        Added QUA
+*     2008-06-24 (TIMJ):
+*        Return const
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
+*     Copyright (C) 2006-2008 Particle Physics and Astronomy Research Council.
 *     University of British Columbia.
 *     All Rights Reserved.
 
@@ -87,10 +90,10 @@
 
 #define FUNC_NAME "smf_model_getname"
 
-char *smf_model_getname( smf_modeltype type, int *status) {
+const char *smf_model_getname( smf_modeltype type, int *status) {
 
   /* Local Variables */
-  char *retval = NULL;
+  const char *retval = NULL;
 
   /* Main routine */
   if (*status != SAI__OK) {
