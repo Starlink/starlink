@@ -169,13 +169,12 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
   int pass;                     /* Two passes over list of input files */
   char *pname;                  /* Pointer to input filename */
   smfData *refdata=NULL;        /* Reference smfData */
-  int refdims[2];               /* reference dimensions for array (not time) */
+  dim_t refdims[2];             /* reference dimensions for array (not time) */
   smf_dtype refdtype;           /* reference DATA/VARIANCE type */
   char *refdtypestr;            /* const string for reference data type */
   smfHead *refhdr=NULL;         /* pointer to smfHead in ref data */
   dim_t refndata;               /* Number data points in reference file */
   dim_t reftlen;                /* Number of time slices in reference file */
-  int refTordered;              /* Data order of reference file */
   dim_t tchunk;                 /* Time offset in concat. array this chunk */
   dim_t tlen;                   /* Time length entire concatenated array */
   dim_t sz;                     /* Data type size */
@@ -185,7 +184,7 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
 
   /* Verify that we have a valid whichchunk, and determine the range of
      indices into igrp->chunk */
-  if( (whichchunk < 0) || (whichchunk > igrp->chunk[igrp->ngroups-1] ) ) {
+  if( whichchunk > igrp->chunk[igrp->ngroups-1] ) {
     msgSeti( "WHICHCHUNK", whichchunk );
     msgSeti( "MAXCHUNK", igrp->chunk[igrp->ngroups-1] );
     *status = SAI__ERROR;
@@ -208,21 +207,30 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
     }
   }
 
+  /* Check that a valid range was actually found */
+  if( (firstpiece == -1) || (lastpiece == -1) ) {
+    *status = SAI__ERROR;
+    errRep( FUNC_NAME, 
+	    "Possible programming error, couldn't find valid chunk range", 
+	    status );
+    return;
+  }
+
   /* Allocate space for the smfArray */
   *concat = smf_create_smfArray( status );
 
   /* Determine how many subarrays there actually are in this chunk*/
   nrelated = 0;
-  for( i=0; i<igrp->nrelated; i++ ) {
-    for( j=firstpiece; j<=lastpiece; j++ ) {
-      if( (igrp->subgroups[j][i] > 0) && ((i+1) > nrelated) ) {
+  for( i=0; (*status == SAI__OK) && i<(dim_t)igrp->nrelated; i++ ) {
+    for( j=firstpiece; j<=(dim_t)lastpiece; j++ ) {
+      if( (igrp->subgroups[j][i] > 0) && ((i+1) > (dim_t) nrelated) ) {
 	nrelated = i+1;
       }
     }
   }
 	
   /* Loop over related elements (number of subarrays) */
-  for( i=0; i<nrelated; i++ ) {
+  for( i=0; (*status == SAI__OK) && i<(dim_t)nrelated; i++ ) {
 
     /* Initialize time length of concatenated array */
     tlen = 0; 
@@ -235,7 +243,7 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
       
       /* Loop over subgroups (number of time chunks), continuing only
 	 if the chunk is equal to whichchunk */
-      for( j=firstpiece; j<=lastpiece; j++ ) {
+      for( j=firstpiece; j<=(dim_t)lastpiece; j++ ) {
 
 	/* First pass - get dimensions */
 	if( pass == 0 ) {
@@ -266,7 +274,7 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
 	  }
 
 	  if( *status == SAI__OK ) {
-	    if( j == firstpiece ) {
+	    if( j == (dim_t) firstpiece ) {
 	      /* If this is the first chunk we will use it for refdims
                  - check the number of bolometers! (Assumption is that
                  input data is standard ICD-compliant time-ordered
@@ -361,7 +369,7 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
 	  if( *status == SAI__OK ) {
 
 	    /* If first chunk initialize the concatenated array */
-	    if( j == firstpiece ) {
+	    if( j == (dim_t) firstpiece ) {
 	      tchunk = 0;
  
 	      /* Allocate memory for empty smfData with a smfHead */
@@ -491,7 +499,7 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
 	      hdr = data->hdr;
 	      refhdr = refdata->hdr;	    
 	      
-	      memcpy( &(hdr->allState[tchunk]), refhdr->allState, 
+	      memcpy( (void *) &(hdr->allState[tchunk]), refhdr->allState, 
 		      reftlen*sizeof(*hdr->allState) );
 
 	      /* Copy LUT */
