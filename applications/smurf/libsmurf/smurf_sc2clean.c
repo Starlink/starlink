@@ -134,6 +134,7 @@ void smurf_sc2clean( int *status ) {
   int flag;                 /* Flag for how group is terminated */
   int i = 0;                /* Counter, index */
   Grp *igrp = NULL;         /* Input group of files */
+  unsigned char mask;       /* Bitmask for quality */
   size_t nflag;             /* Number of flagged samples */
   Grp *ogrp = NULL;         /* Output group of files */
   int order;                /* Order of polynomial for baseline fitting */
@@ -205,6 +206,9 @@ void smurf_sc2clean( int *status ) {
     /* Open and flatfield in case we're using raw data */
     smf_open_and_flatfield(igrp, ogrp, i, &ffdata, status);
 
+    /* Which QUALITY bits should be considered for ignoring data */
+    mask = 255 - SMF__Q_JUMP;
+
     /* Check status to see if data are already flatfielded */
     if (*status == SMF__FLATN) {
       errAnnul( status );
@@ -243,7 +247,7 @@ void smurf_sc2clean( int *status ) {
     }
     
     /* Flag spikes */
-    if( spikethresh && (spikeiter>=0) ) {
+    if( spikethresh ) {
       msgSetd("SPIKETHRESH",spikethresh);
       msgSeti("SPIKEITER",spikeiter);
 
@@ -258,8 +262,9 @@ void smurf_sc2clean( int *status ) {
 		 status);
       }
 
-      smf_flag_spikes( ffdata, NULL, SMF__Q_BADS | SMF__Q_BADB | SMF__Q_SPIKE,
-		       spikethresh, spikeiter, 100, &aiter, &nflag, status );
+      smf_flag_spikes( ffdata, NULL, mask, spikethresh, spikeiter, 100, &aiter, 
+                       &nflag, status );
+
       if( *status == SAI__OK ) {
 	msgSeti("AITER",aiter);
 	msgOutif(MSG__VERB," ", "Finished in ^AITER iterations",
