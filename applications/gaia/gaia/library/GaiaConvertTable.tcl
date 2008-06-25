@@ -370,8 +370,9 @@ itcl::class gaia::GaiaConvertTable {
          } else {
 
             #  Check for SExtractor specific names without units. SExtractor
-            #  world coordinates are in degrees.
-            switch -exact $name {
+            #  world coordinates are in degrees. Also allow X/Y and X_*/Y_*
+            #  as generic X and Y columns.
+            switch -glob $name {
                x_world {
                   if { $racol == -1 } {
                      set racol $i
@@ -383,12 +384,14 @@ itcl::class gaia::GaiaConvertTable {
                   }
                }
                x_image - 
+               x_* -
                x {
                   if { $xcol == -1 } {
                      set xcol $i
                   }
                }
                y_image -
+               y_* -
                y {
                   if { $ycol == -1 } {
                      set ycol $i
