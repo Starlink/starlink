@@ -489,6 +489,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   double skytrans;                /* sky transmission */
   JCMTState state;                /* Telescope state at one time slice */
   double start_time=0.0;          /* UTC time of start of current scan */
+  size_t steps_per_map = 0;       /* Number of steps in single pass of scan map */
   char subarrays[8][80];          /* list of parsed subarray names */
   int subnum;                     /* Subarray number */
   int subscanno = 0;              /* Sub-scan number (last number in output filanem)*/
@@ -744,6 +745,10 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       
       sc2sim_getsinglescan ( inx->scan_angle, inx->width, accel, vmax, 
                              samptime, &count, &posptr, status );
+
+      /* indicate that we only have one pass */
+      inx->nmaps = 1;
+      steps_per_map = count;
       
       break;
 
@@ -758,7 +763,11 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       sc2sim_getbous ( inx->bous_angle, inx->width, inx->height, 
                        inx->spacing, accel, vmax, samptime, &count, 
                        &posptr, status );  
-      
+
+      /* indicate that we only have one pass */
+      inx->nmaps = 1;
+      steps_per_map = count;
+
       break;
 
     case MODE__LISS:
@@ -774,6 +783,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
       sc2sim_getliss ( inx->liss_angle, inx->width, inx->height, 
                        inx->spacing, accel, vmax, samptime, inx->nmaps, 
                        &count, &posptr, status ); 
+      steps_per_map = count / inx->nmaps;
 
       break; 
       
@@ -809,6 +819,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
         errRep( " ", "^P is not a valid PONG type", status );
 
       }
+
+      steps_per_map = count / inx->nmaps;
 
       break;
 
@@ -1295,6 +1307,30 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
               } else {
                 snprintf(head[j].tcs_tr_sys,6,"J2000");  
               }
+
+              /* Percentage complete */
+              switch( mode ) {
+                size_t percent;
+                
+              case MODE__STARE:
+              case MODE__DREAM:
+                /* offsets and micro steps - simulator does not seem to do offsetting */
+                percent = 100 * (1 + (head[j].rts_num / frmperms)) / inx->nmicstep;
+                head[j].tcs_percent_cmp = percent;
+                break;
+              case MODE__SINGLESCAN:
+              case MODE__BOUS:
+              case MODE__LISS:
+              case MODE__PONG:
+                /* Assumes steps are spread equally over nmaps */
+                percent = (100 * (head[j].rts_num % steps_per_map)) / steps_per_map;
+                head[j].tcs_percent_cmp = percent;
+                break;
+              default: /* should not get here */
+                printf("Not possible to get here\n");
+                abort();
+              } /* switch */
+
               /* Angle between "up" in Nasmyth coordinates, and "up"
                  in tracking coordinates at the base telescope
                  positions */
