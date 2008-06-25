@@ -149,6 +149,7 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   dim_t thisnbolo=0;            /* Check each file same dims as first */
   dim_t thisndata=0;            /* "                                  */
   dim_t thisntslice=0;          /* "                                  */
+  double thissum;               /* Sum of data at current tslice */
   double *weight;               /* Weight at each point in model */
                                    
   /* Main routine */
@@ -206,6 +207,7 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
       /* Set model_data to 0 now since it will now be re-calculated */
       memset( model_data, 0, (model->sdata[0]->dims)[0] * 
 	      sizeof(*model_data_copy) );
+      
     }
 
 
@@ -249,10 +251,10 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     qua_data = (unsigned char *)(qua->sdata[idx]->pntr)[0];
 
     /* Which QUALITY bits should be checked for correcting samples */
-    mask_cor = SMF__Q_BADS | SMF__Q_BADB;
+    mask_cor = 255 - SMF__Q_JUMP - SMF__Q_SPIKE;
 
     /* Which QUALITY bits should be checked for measuring the mean */
-    mask_meas = SMF__Q_BADS | SMF__Q_BADB | SMF__Q_SPIKE;
+    mask_meas = 255 - SMF__Q_JUMP; 
 
     if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;
@@ -262,7 +264,7 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
       /* Loop over time slice */
       for( i=0; i<ntslice; i++ ) {
 	
-	/* First loop over bolometers to put the previous common-mode
+	/* Loop over bolometers to put the previous common-mode
 	   signal back in at each time-slice, and calculate the sum of
 	   all the detectors with good data. */
 
@@ -270,18 +272,27 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 	sum = 0;
 	base = 0; /* Offset to the start of the j'th bolometer in the buffer */
 
+        thissum = 0; /* Initialize sum to 0 */
+
 	for( j=0; j<nbolo; j++ ) {
 	  if( !(qua_data[base+i]&mask_cor) ) {
 	    res_data[base+i] += lastmean;
 	  }
 
 	  if( !(qua_data[base+i]&mask_meas) ) {
-	    model_data[i] += res_data[base+i];
+            thissum += res_data[base+i];
 	    weight[i]++;
 	  }
 
 	  base += ntslice;
 	}
+
+        /* If we have good data, store it. Otherwise set VAL__BADD */
+        if( thissum ) {
+          model_data[i] = thissum;
+        } else {
+          model_data[i] = VAL__BADD;
+        }
       }
     }
   }
