@@ -118,6 +118,7 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   int idx=0;                    /* Index within subgroup */
   dim_t j;                      /* Loop counter */
   unsigned char mask;           /* Bitmask for quality */
+  unsigned char mask_spike;     /* Bitmask for quality */
   smfArray *model=NULL;         /* Pointer to model at chunk */
   double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t nbolo;                  /* Number of bolometers */
@@ -197,6 +198,9 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   /* Which QUALITY bits should be considered for ignoring data */
   mask = 255 - SMF__Q_JUMP;
 
+  /* Which QUALITY bits should be considered for re-flagging spikes */
+  mask_spike = 255 - SMF__Q_JUMP - SMF__Q_SPIKE;
+
   /* Initialize chisquared */
   dat->chisquared[chunk] = 0;
   nchisq = 0;
@@ -222,8 +226,7 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
       /* Flag spikes in the residual */
       if( spikethresh ) {
 	/* Now re-flag */
-	smf_flag_spikes( res->sdata[idx], qua_data, 
-			 SMF__Q_BADS|SMF__Q_BADB|SMF__Q_SPIKE,
+	smf_flag_spikes( res->sdata[idx], qua_data, mask_spike,
 			 spikethresh, spikeiter, 
 			 100, &aiter, &nflag, status );
 

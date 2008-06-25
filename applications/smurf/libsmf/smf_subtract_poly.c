@@ -124,6 +124,7 @@ void smf_subtract_poly(smfData *data, unsigned char *quality, int rel,
   size_t j;                   /* Timeslice index loop counter */
   double jay;                 /* Double-precision version of j */
   size_t k;                   /* Coefficient index loop counter */
+  unsigned char mask;         /* Bitmask for quality */
   size_t nbol;                /* Number of bolometers */
   size_t ncoeff = 0;          /* Number of polynomial coefficients */
   size_t nframes;             /* Number of time slices */
@@ -163,6 +164,9 @@ void smf_subtract_poly(smfData *data, unsigned char *quality, int rel,
     return;
   }
 
+  /* Which QUALITY bits should be considered for ignoring data */
+  mask = 255 - SMF__Q_JUMP;
+
   /* Calculate the number of bolometers and frames */
   if( data->isTordered ) {
     nbol = (data->dims)[0]*(data->dims)[1];
@@ -201,7 +205,7 @@ void smf_subtract_poly(smfData *data, unsigned char *quality, int rel,
 	   quicker than calling pow() unnecessarily. */
 
 	if ( (outdata[i + nbol*j] != VAL__BADD) && 
-	     !(qual[i + nbol*j] & SMF__Q_BADS) ) {
+	     !(qual[i + nbol*j] & mask) ) {
 
 	  baseline = -firstframe[i];
 
