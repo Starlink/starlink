@@ -263,16 +263,35 @@ int GaiaLocalCatalog::freeCat() {
 //
 int GaiaLocalCatalog::is_foreign( const char *name )
 {
-  const char *type = fileSuffix( name );
-  if ( strncasecmp( type, "fit", 3 )  == 0 ||
-       strncasecmp( type, "fits", 4 ) == 0 ||
-       strncasecmp( type, "gsc", 3 )  == 0 ||
-       strncasecmp( type, "asc", 3 )  == 0 ||
-       strncasecmp( type, "lis", 3 )  == 0 ||
-       strncasecmp( type, "txt", 3 )  == 0 ) {
-    return 1;
-  } 
-  return 0;
+    //  Look for last '/'.
+    const char *basename = strrchr( name, '/' );
+    if ( ! basename ) {
+        //  None, so use whole string.
+        basename = name;
+    }
+
+    //  Search for last '.', note last not first. The tests below only
+    //  check for a trailing type.
+    const char *type = strrchr( basename, '.' );
+    
+    if ( type ) {
+        type++;
+        //  Check for .gz & .Z, these cannot be foreign.
+        if ( strcasecmp( type, "gz" ) == 0 ||
+             strcasecmp( type, "Z," ) == 0 ) {
+            return 0;
+        }
+
+        if ( strncasecmp( type, "fit", 3 )  == 0 ||
+             strncasecmp( type, "fits", 4 ) == 0 ||
+             strncasecmp( type, "gsc", 3 )  == 0 ||
+             strncasecmp( type, "asc", 3 )  == 0 ||
+             strncasecmp( type, "lis", 3 )  == 0 ||
+             strncasecmp( type, "txt", 3 )  == 0 ) {
+            return 1;
+        } 
+    }
+    return 0;
 }
 
 //
