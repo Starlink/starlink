@@ -45,11 +45,10 @@
 
 *  Description:
 *     Measures the rms and mean of each bolometer, excluding data that
-*     has been flagged SMF__Q_BADS | SMF__Q_BADB |
-*     SMF__Q_SPIKE. Samples that lie a factor of thresh * rms away
-*     from the mean are flagged SMF__Q_SPIKE. This process can be run
-*     a fixed number of times, or until the list of flagged samples
-*     converges (niter=0).
+*     has been flagged with bits specified in mask. Samples that lie a
+*     factor of thresh * rms away from the mean are flagged
+*     SMF__Q_SPIKE. This process can be run a fixed number of times,
+*     or until the list of flagged samples converges (niter=0).
 
 *  Notes:
 *     This routine asserts bolo-ordered data.
