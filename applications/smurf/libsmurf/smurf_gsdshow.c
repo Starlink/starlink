@@ -86,6 +86,7 @@
 /* SMURF includes */
 #include "libgsd/gsdac_struct.h"
 #include "libgsd/gsdac.h"
+#include "smurflib.h"
 
 #define FUNC_NAME "smurf_gsdshow"
 #define TASK_NAME "GSDSHOW"
