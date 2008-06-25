@@ -1,0 +1,1027 @@
+/*+
+ *  Name:
+ *     VOTableFunctions
+
+ *  Purpose:
+ *     Utility functions for accessing VOTables, part of the gaia::VOTable
+ *     class.
+
+ *  Description:
+ *     These functions make use of the codesynthesis classes generated using
+ *     the VOTable 1.1 schema. There are two fundamental versions of theses
+ *     classes (sadly not derived from each other, so no common interface,
+ *     which is why these functions are preprocessed using differing C++
+ *     namespaces) one fully namespace qualified, the official schema, and one
+ *     where all the elements are in the default namespace (this latter form
+ *     should become less common, but is always likely to occur).
+ *
+ *     The macro "NS" should be defined before including this file. It
+ *     currently assumes the same classes and methods are available in
+ *     namespace "NS". Clearly if the structure of the VOTable changes this
+ *     may need revisiting.
+ *
+ *     (Note: some of this could be done using templates, but that looks
+ *     untidy as you cannot use a namespace, just types, so each type 
+ *     used would need to be declared, that NS::VOTABLE, NS::TABLE,
+ *     NS::PARAM etc., see emptyTable for a starter if you prefer
+ *     that approach).
+ *
+
+ *  Language:
+ *     C++ include file.
+
+ *  Copyright:
+ *     Copyright (C) 2008 Science and Technology Facilities Council.
+ *     All Rights Reserved.
+
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+ *     of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ *     GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program; if not, write to the Free Software
+ *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+ *     02111-1307, USA
+
+ *  Authors:
+ *     PWD: Peter W. Draper (JAC, Durham University)
+
+ *  History:
+ *     05-JUN-2008 (PWD):
+ *        Original version.
+ *     {enter_changes_here}
+ *-
+ */
+
+/*  Prototypes for local functions that are overloaded by namespace qualified
+ *  types. */
+void votable_enum( NS::VOTABLE &votable );
+int votable_count( NS::VOTABLE &votable );
+NS::TABLE &votable_get( NS::VOTABLE &votable, int index );
+int votable_write( NS::VOTABLE &votable, int index, ofstream &out );
+
+int table_write( const NS::TABLE &table, ofstream &out );
+int table_params( const NS::TABLE &table, ofstream &out );
+int table_data( const NS::TABLE &table, ofstream &out );
+int table_columns( const NS::TABLE &table, ofstream &out,
+                   int &id_index, int &ra_index, bool &ra_radians,
+                   int &dec_index, bool &dec_radians );
+void table_coosys( const NS::COOSYS &coosys, ofstream &out );
+
+int data_tabledata( const NS::TABLE &table, const NS::TABLEDATA &tdata,
+                    ofstream &out, int &id_index, int &ra_index,
+                    bool &ra_radians, int &dec_index, bool &dec_radians );
+int data_binarydata( const NS::TABLE &table, const NS::BINARY &bdata,
+                     ofstream &out, int &id_index, int &ra_index,
+                     bool &ra_radians,int &dec_index, bool &dec_radians );
+int data_fitsdata( const NS::FITS &fdata, ofstream &out, int &id_index,
+                   int &ra_index, bool &ra_radians,int &dec_index,
+                   bool &dec_radians );
+
+int field_arraysize( const NS::FIELD &field );
+
+
+/*  Non-overloaded functions etc., so define these just once. */
+#ifndef VOTABLEFUNCTIONS_PROTO_H
+#define VOTABLEFUNCTIONS_PROTO_H
+
+template <typename T> T *emptyTable();
+
+bool matches_id( string &name, string &ucd, string &utype );
+bool matches_ra( string &name, string &ucd, string &utype );
+bool matches_dec( string &name, string &ucd, string &utype );
+bool matches_x( string &name, string &ucd, string &utype );
+bool matches_y( string &name, string &ucd, string &utype );
+
+/*  Radians to degrees. */
+const double R2D = 57.295779513082323;
+
+#endif
+
+/**
+ *  Simple test for table validity, visit all TABLE elements.
+ */
+void votable_enum( NS::VOTABLE &votable )
+{
+    using namespace NS;
+
+    int ntable = votable_count( votable );
+    TABLE *table;
+    for ( int i = 0; i < ntable; i++ ) {
+        TABLE table( votable_get( votable, i ) );
+        if ( table.name() ) {
+            cout << "Found table : " << table.name() << endl;
+        }
+        else {
+            cout << "No table for index : " << i << endl;
+        }
+    }
+}
+
+/**
+ *  Return the number of TABLE elements in the VOTable. Uses the underlying
+ *  DOM to navigate the document.
+ */
+int votable_count( NS::VOTABLE &votable )
+{
+    using namespace NS;
+
+    DOMNode *node = votable._node();
+    DOMElement *element = static_cast<DOMElement*>( node );
+    XMLCh tempstr[20];
+    XMLString::transcode( "TABLE", tempstr, 20 );
+    DOMNodeList *tables = element->getElementsByTagName( tempstr );
+    return tables->getLength();
+}
+
+/**
+ *  Locate and return an NS::TABLE. Returns emptyTable on error (need to
+ *  return the reference to avoid a copy which would lose the connection to
+ *  any IDREF hooks).
+ */
+NS::TABLE &votable_get( NS::VOTABLE &votable, int index )
+{
+    using namespace NS;
+
+    //  Use the underlying DOM to search for all TABLE elements. These are located 
+    //  in a breath-first search of the whole document.
+    DOMNode *node = votable._node();
+    DOMElement *element = static_cast<DOMElement*>( node );
+    XMLCh tempstr[20];
+    XMLString::transcode( "TABLE", tempstr, 20 );
+    DOMNodeList *tables = element->getElementsByTagName( tempstr );
+    if ( tables->getLength() > index ) {
+
+        //  Convert TABLE DOM node back to TABLE class.
+        DOMElement *tableelement = 
+            static_cast<DOMElement*>( tables->item( index ) );
+
+         xml_schema::type&
+             schema_node( *reinterpret_cast<xml_schema::type*>
+                          ( tableelement->getUserData
+                            ( xml_schema::dom::tree_node_key ) ) );
+         return dynamic_cast<TABLE&>( schema_node );
+    }
+
+    cerr << "No table with index " << index << 
+        " (max " << tables->getLength() << ")" << endl;
+
+    return *emptyTable<NS::TABLE>();
+}
+
+/**
+ *  Convert a TABLE into a Skycat table and write it to the given output
+ *  stream.
+ */
+int votable_write( NS::VOTABLE &votable, int index, ofstream &out )
+{
+    using namespace NS;
+
+    //  Locate the TABLE.
+    NS::TABLE &table( votable_get( votable, index ) );
+    if ( table.name() ) {
+
+        /*  Found table "index", so write it out. */
+        return table_write( table, out );
+    }
+    cerr << "No table with index " << index << endl;
+
+    return 0;
+}
+
+/**
+ *  Extract a TABLE into a Skycat table and write it to the given output
+ *  stream.
+ */
+int table_write( const NS::TABLE &table, ofstream &out )
+{
+    using namespace NS;
+    try{
+
+        //  Table identification.
+        out << table.name() << "\n\n";
+
+        //  Add all parameters (name: value).
+        table_params( table, out );
+
+        //  Now the fields and data values.
+        table_data( table, out );
+
+        return 1;
+    }
+    catch ( const xml_schema::exception &e ) {
+        cerr << "table_write: ";
+        cerr << e << endl;
+    }
+    return 0;
+}
+
+/**
+ *  Write the PARAMs of a TABLE to the given output stream in Skycat format.
+ */
+int table_params( const NS::TABLE &table, ofstream &out )
+{
+    using namespace NS;
+
+    try{
+        out << "#  Table parameters: \n";
+
+        TABLE::PARAM_const_iterator piter( table.PARAM().begin() );
+        TABLE::PARAM_const_iterator pend( table.PARAM().end() );
+        string name;
+        for ( ; piter != pend; ++piter ) {
+            name = piter->name();
+            //  Parameter names may not start with '-'.
+            if ( name.find( '-' ) == 0 ) {
+                name.erase( 0, 1 );
+            }
+            out << name << ": " << piter->value() << '\n';
+        }
+        out << '\n';
+
+        return 1;
+    }
+    catch ( const xml_schema::exception &e ) {
+        cerr << "table_params: ";
+        cerr << e << endl;
+    }
+    return 0;
+}
+
+/**
+ *  Write the data of a table, this includes the FIELD elements as Skycat
+ *  column names and other column metadata such as the units, ucd and utypes.
+ *  The derivation of the column indices for ID, RA, Dec, X and Y (if not
+ *  found they will be set to -1). If the RA or Dec columns require
+ *  transforming to degrees from radians then that will also be done. Finally
+ *  the DATA elements will be expanded into the actual columns.
+ */
+int table_data( const NS::TABLE &table, ofstream &out )
+{
+    using namespace NS;
+
+    try{
+        //  Lower case FIELD meta data.
+        string name;
+        string ucd;
+        string utype;
+        string unit;
+
+        //  Local decs for parameters we want to locate.
+        int dec_index = -1;
+        int id_index = -1;
+        int ra_index = -1;
+        int x_index = -1;
+        int y_index = -1;
+
+        //  Whether RA and Dec need conversion from radians.
+        bool dec_radians = false;
+        bool ra_radians = false;
+
+        //  The column names as a TST header and the separator.
+        string header;
+        string sep;
+
+        //  FIELD meta-data items as TST parameter.
+        string ucds;
+        string utypes;
+        string units;
+
+        //  Iterate over all FIELD elements in this TABLE.
+        TABLE::FIELD_const_iterator fiter( table.FIELD().begin() );
+        TABLE::FIELD_const_iterator fend( table.FIELD().end() );
+
+        //  When an RA or Dec is discovered look for the related COOSYS.
+        bool checkcoosys = false;
+        bool havecoosys = false;
+
+        int ncol = 0;
+        for ( ; fiter != fend; ++fiter ) {
+
+            //  FIELD meta data.
+            //  Get these values as string instances and cast to lower case.
+            make_lower( fiter->name(), name );
+            if ( fiter->ucd() ) {
+                make_lower( fiter->ucd().get(), ucd );
+            }
+            if ( fiter->utype() ) {
+                make_lower( fiter->utype().get(), utype );
+            }
+            if ( fiter->unit() ) {
+                make_lower( fiter->unit().get(), unit );
+            }
+
+            //  Check this column against the possible matches for a Skycat
+            //  special column (ID, RA, DEC, X and Y).
+            if ( id_index == -1 && matches_id( name, ucd, utype ) ) {
+                id_index = ncol;
+            }
+            else if ( ra_index == -1 && matches_ra( name, ucd, utype ) ) {
+                ra_index = ncol;
+                if ( unit.find( "rad" ) == 0 ) {
+                    ra_radians = true;
+                }
+                checkcoosys = true;
+            }
+            else if ( dec_index == -1 && matches_dec( name, ucd, utype ) ) {
+                dec_index = ncol;
+                if ( unit.find( "rad" ) == 0 ) {
+                    dec_radians = true;
+                }
+                checkcoosys = true;
+            }
+            else if ( x_index == -1 && matches_x( name, ucd, utype ) ) {
+                x_index = ncol;
+            }
+            else if ( y_index == -1 && matches_y( name, ucd, utype ) ) {
+                y_index = ncol;
+            }
+
+            //  Write out the COOSYS first time we hit an RA/Dec column.
+            if ( checkcoosys && !havecoosys ) {
+                //  Look up the ref to get at the IDREF object.
+                if ( fiter->ref() ) {
+                    COOSYS const& coosys(dynamic_cast<COOSYS const&>(*(fiter->ref()).get()));
+                    table_coosys( coosys, out );
+
+                    //  Only do this once. Assumes RA and Dec are in same system.
+                    havecoosys = true;
+                }
+            }
+
+            /*  Add column name and gather other meta-data. */
+            if ( ncol == 0 ) {
+                header = fiter->name();
+                sep = "---";
+                if ( fiter->ucd() ) {
+                    ucds = ucd;
+                }
+                if ( fiter->utype() ) {
+                    utypes = utype;
+                }
+                if ( fiter->unit() ) {
+                    units = unit;
+                }
+            }
+            else {
+                header += '\t' + name;
+                sep += "---\t";
+                ucds += '\t';
+                if ( fiter->ucd() ) {
+                    ucds += ucd;
+                }
+                utypes += '\t';
+                if ( fiter->utype() ) {
+                    utypes += utype;
+                }
+                units += '\t';
+                if ( fiter->unit() ) {
+                    units += unit;
+                }
+            }
+
+            //  Iterates in sequence of columns. */
+            ncol++;
+        }
+
+        //  If no ID column has been found add one to the end.
+        int id_col = id_index;
+        if ( id_col == -1 ) {
+            id_index = ncol;
+        }
+
+        //  Write special parameters out.
+        out << "#  Table columns: \n";
+        out << "id_col: " << id_col << '\n';
+        out << "ra_col: " << ra_index << '\n';
+        out << "dec_col: " << dec_index << '\n';
+        out << "x_col: " << x_index << '\n';
+        out << "y_col: " << y_index << '\n';
+        out << '\n';
+
+        //  FIELD meta-data.
+        out << "ucds: " << ucds << '\n';
+        out << "utypes: " << utypes << '\n';
+        out << "units: " << units << '\n';
+
+        //  Column headings and separator to table data.
+        out << header << '\n';
+        out << sep << '\n';
+
+        //  Write the table columns.
+        table_columns( table, out, id_index, ra_index, ra_radians,
+                       dec_index, dec_radians );
+
+        return 1;
+    }
+    catch ( const xml_schema::exception &e ) {
+        cerr << "table_fields: ";
+        cerr << e << endl;
+    }
+    return 0;
+}
+
+/**
+ *  Write a COOSYS element as table parameters. Transforms the VOTable
+ *  system values into AST compatible systems (as best as I can determine).
+ */
+void table_coosys( const NS::COOSYS &coosys, ofstream &out )
+{
+    //    System - ICRS
+    //           - eq_FK5
+    //           - eq_FK4
+    //           - ecl_FK5  (ecliptic, equinox = J2000)
+    //           - ecl_FK4  (ecliptic, equinox = B1950)
+    //           - galactic
+    //           - supergalactic
+    //           - barycentric (I'm guessing that means BCRS, nearly ICRS w/o
+    //                          time, but who knows)
+    //           - geo_app
+    string system;
+    string epoch;
+    string equinox;
+    make_lower( coosys.system(), system );
+    if ( system == "eq_fk5" ) {
+        system = "fk5";
+        equinox = "J2000";
+    }
+    else if ( system == "eq_fk4" ) {
+        system = "fk4";
+        equinox = "B1950";
+    }
+    else if ( system == "ecl_fk5" ) {
+        system = "ecliptic";
+        equinox = "J2000";
+    }
+    else if ( system == "ecl_fk4" ) {
+        system = "ecliptic";
+        equinox = "B1950";
+    }
+    else if ( system == "galactic" ) {
+        system = "galactic";
+    }
+    else if ( system == "supergalactic" ) {
+        system = "supergalactic";
+    }
+    else if ( system == "barycentric" ) {
+        system = "ICRS";
+    }
+    else if ( system == "geo_app" ) {
+        system = "geocentric";
+    }
+    out << "System: " << system << '\n';
+
+    //  Pick out epoch and equinox.
+    if ( coosys.equinox() ) {
+        out << "Equinox: " << coosys.equinox() << '\n';
+    }
+    else if ( equinox != "" ) {
+        out << "Equinox: " << equinox << '\n';
+    }
+
+    if ( coosys.epoch() ) {
+        out << "Epoch: " << coosys.epoch() << '\n';
+    }
+    else if ( epoch != "" ) {
+        out << "Epoch: " << epoch << '\n';
+    }
+    out << '\n';
+}
+
+/**
+ *  Write the DATA element of a table to Skycat format. RA and Dec columns
+ *  are converted from radians to degrees if needed.
+ */
+int table_columns( const NS::TABLE &table, ofstream &out,
+                   int &id_index, int &ra_index, bool &ra_radians,
+                   int &dec_index, bool &dec_radians )
+{
+    using namespace NS;
+
+    //  Locate the DATA element of this TABLE.
+    const TABLE::DATA_optional odata( table.DATA() );
+
+    //  Empty tables are OK.
+    if ( odata ) {
+
+        //  Three variants, TABLEDATA, BINARY and FITS.
+        const DATA::TABLEDATA_optional tdata( odata.get().TABLEDATA() );
+        if ( tdata ) {
+            return data_tabledata( table, tdata.get(), out, id_index, ra_index,
+                                   ra_radians, dec_index, dec_radians );
+        }
+
+        const DATA::BINARY_optional bdata( odata.get().BINARY() );
+        if ( bdata ) {
+            return data_binarydata( table, bdata.get(), out, id_index,
+                                    ra_index, ra_radians, dec_index,
+                                    dec_radians );
+        }
+
+        const DATA::FITS_optional fdata( odata.get().FITS() );
+        if ( fdata ) {
+            return data_fitsdata( fdata.get(), out, id_index, ra_index,
+                                  ra_radians, dec_index, dec_radians );
+        }
+    }
+    return 1;
+}
+
+/**
+ *  Write a TABLEDATA element of a table to Skycat format. RA and Dec columns
+ *  are converted from radians to degrees if needed.
+ */
+int data_tabledata( const NS::TABLE &table, const NS::TABLEDATA &tdata,
+                    ofstream &out, int &id_index, int &ra_index,
+                    bool &ra_radians, int &dec_index, bool &dec_radians )
+{
+    using namespace NS;
+
+    //  Iterate again over all FIELD elements in this TABLE to look for any
+    //  null settings.
+    TABLE::FIELD_const_iterator fiter( table.FIELD().begin() );
+    TABLE::FIELD_const_iterator fend( table.FIELD().end() );
+    vector<string> nullvalues;
+
+    for ( ; fiter != fend; ++fiter ) {
+        FIELD::VALUES_optional values( fiter->VALUES() );
+        if ( values ) {
+            VALUES::null_optional nullv( values.get().null() );
+            if ( ! nullv.get().empty() ) {
+                nullvalues.push_back( nullv.get() );
+            }
+            else {
+                nullvalues.push_back( "" );
+            }
+        }
+        else {
+            nullvalues.push_back( "" );
+        }
+    }
+
+    //  TABLEDATA consists of rows of <TR> with each cell as a <TD> element.
+    TABLEDATA::TR_const_iterator triter( tdata.TR().begin() );
+    TABLEDATA::TR_const_iterator trend( tdata.TR().end() );
+    int nrow = 0;
+    for ( ; triter != trend; ++triter ) {
+        TR::TD_const_iterator tditer( triter->TD().begin() );
+        TR::TD_const_iterator tdend( triter->TD().end() );
+
+        for ( int ncol = 0; tditer != tdend; ++tditer, ncol++ ) {
+
+            //  Test if this is the null value (usually "" for tabledata).
+            if ( *tditer == nullvalues[ncol] ) {
+                out << " \t";
+            }
+            else if ( ( ra_radians && ncol == ra_index ) ||
+                      ( dec_radians && ncol == dec_index ) ) {
+
+                //  RA and Dec in radians, need degrees.
+                double rad;
+                if ( from_string( *tditer, rad, scientific ) ) {
+                    rad *= R2D;
+                    out << scientific << rad << '\t';
+                }
+                else {
+                    out << "*****\t";
+                }
+            }
+            else {
+                out << *tditer << '\t';
+            }
+        }
+        if ( id_index == -1 ) {
+            out << nrow << '\t';
+            nrow++;
+        }
+
+        out << '\n';
+    }
+    return 1;
+}
+
+/**
+ *  Write a BINARY element of a table to Skycat format. RA and Dec columns
+ *  are converted from radians to degrees if needed.
+ */
+int data_binarydata( const NS::TABLE &table, const NS::BINARY &bdata,
+                     ofstream &out, int &id_index, int &ra_index,
+                     bool &ra_radians, int &dec_index, bool &dec_radians )
+{
+    using namespace NS;
+
+    //  See if we need to decode the data. Support base64 and gzip and
+    //  native. See if this is needed by checking the encodingType.
+    BINARY::STREAM_type stream( bdata.STREAM() );
+    string encoding( stream.encoding() );
+    STREAM::href_optional href( stream.href() );
+
+    streambuf *inbuf;
+    stringstream *istr;
+    HTTP http; //  Keep in scope for memory management.
+
+    if ( href ) {
+
+        //  Remote resource. Need to access it. HTTP class supports access to
+        //  file: and http: forms. XXX ftp support?
+        string url = href.get();
+        ostringstream ostring;
+        if ( http.get( url.c_str(), ostring ) ) {
+            return 0;
+        }
+        istr = new stringstream( ostring.str() );
+        inbuf = istr->rdbuf();
+    }
+    else {
+        //  Values in VOTable.
+        istr = new stringstream( stream );
+        inbuf = istr->rdbuf();
+    }
+
+    if ( encoding == "base64" ) {
+
+        //  Wrap into a streambuf that decodes this content.
+        string str = istr->str();
+        size_t length = str.size();
+        char *dest = new char[length];
+        decode_base64( str.c_str(), dest, &length );
+        inbuf = new stringbuf( string( dest, length ) );
+        delete dest;
+    }
+    else if ( encoding == "gzip" ) {
+        //  Wrap into a streambuf that decodes this content.
+        string str = istr->str();
+        size_t length = str.size();
+        char *dest;
+        decode_gzip( str.c_str(), length, length, dest );
+        inbuf = new stringbuf( string( dest, length ) );
+        free_gzip( dest );
+    }
+
+    //  For binary data we need to understand the properties of each column,
+    //  so an additional pass through the FIELD elements is required.
+    vector<VOTableStream::datatype> field_types;
+    vector<int> arraysizes;
+    vector<bool> havenull;
+    vector<string> nullvalues;
+
+    //  Iterate over all FIELD elements in this TABLE.
+    TABLE::FIELD_const_iterator fiter( table.FIELD().begin() );
+    TABLE::FIELD_const_iterator fend( table.FIELD().end() );
+
+    for ( ; fiter != fend; ++fiter ) {
+
+        string type;
+        make_lower( fiter->datatype(), type );
+
+        if ( type == "boolean" ) {
+            field_types.push_back( VOTableStream::BOOLEAN );
+        }
+        else if ( type == "bit" ) {
+            field_types.push_back( VOTableStream::BITARRAY );
+        }
+        else if ( type == "unsignedbyte" ) {
+            field_types.push_back( VOTableStream::BYTE );
+        }
+        else if ( type == "char" ) {
+            field_types.push_back( VOTableStream::CHAR );
+        }
+        else if ( type == "unicodechar" ) {
+            field_types.push_back( VOTableStream::UNICODE );
+        }
+        else if ( type == "short" ) {
+            field_types.push_back( VOTableStream::SHORT );
+        }
+        else if ( type == "int" ) {
+            field_types.push_back( VOTableStream::INT );
+        }
+        else if ( type == "long" ) {
+            field_types.push_back( VOTableStream::LONG );
+        }
+        else if ( type == "double" ) {
+            field_types.push_back( VOTableStream::DOUBLE );
+        }
+        else if ( type == "float" ) {
+            field_types.push_back( VOTableStream::FLOAT );
+        }
+        else if ( type == "floatcomplex" ) {
+            field_types.push_back( VOTableStream::FLOATCOMPLEX );
+        }
+        else if ( type == "doublecomplex" ) {
+            field_types.push_back( VOTableStream::DOUBLECOMPLEX );
+        }
+
+        //  Number of this type required.
+        arraysizes.push_back( field_arraysize( *fiter ) );
+
+        //  Check for a null attribute in the optional VALUES element.
+        FIELD::VALUES_optional values( fiter->VALUES() );
+        if ( values ) {
+            VALUES::null_optional nullv( values.get().null() );
+            if ( ! nullv.get().empty() ) {
+                havenull.push_back( true );
+                nullvalues.push_back( nullv.get() );
+            }
+            else {
+                havenull.push_back( false );
+                nullvalues.push_back( "" );
+            }
+        }
+        else {
+            havenull.push_back( false );
+            nullvalues.push_back( "" );
+        }
+    }
+
+    /*  Now write the rows. */
+    VOTableStream os( inbuf );
+    bool ok = true;
+    int row = 0;
+    while ( ok ) {
+        for ( int i = 0; i < field_types.size(); i++ ) {
+            ok = os.readPrint( field_types[i], arraysizes[i], havenull[i],
+                               nullvalues[i], &out );
+            if ( ok ) {
+                out << '\t';
+            }
+            else {
+                break;
+            }
+        }
+        if ( id_index == -1 ) {
+            out << '\t' << row;
+            row++;
+        }
+        out << '\n';
+    }
+
+    delete istr;
+
+    return 1;
+}
+
+/**
+ *  Write a FITS element of a table to Skycat format. RA and Dec columns
+ *  are converted from radians to degrees if needed.
+ */
+int data_fitsdata( const NS::FITS &fdata, ofstream &out, int &id_index,
+                   int &ra_index, bool &ra_radians, int &dec_index,
+                   bool &dec_radians )
+{
+    using namespace NS;
+
+    //  Check for the extension number. For a table in a file must be 1 or
+    //  greater, not sure what this would be for an inline FITS structure.
+    //  Leave default at 1.
+    int extnum = 1;
+    if ( fdata.extnum() ) {
+        extnum = fdata.extnum().get();
+    }
+
+    //  Keep in scope for later (C string can be used in Mem object).
+    ostringstream ostring;
+
+    //  Access uses a Skycat FitsIO object.
+    FitsIO *fits = NULL;
+
+    //  Usually have a href, when not true the data maybe inline, so
+    //  try that.
+    FITS::STREAM_type stream( fdata.STREAM() );
+    STREAM::href_optional href( stream.href() );
+    if ( href ) {
+        string url = href.get();
+
+        //  Get the FITS file. Note gzip is handled directly.
+        if ( url.find( "file:" ) == 0 ) {
+
+            //  Strip three '/' (legally, file:///, file://localhost/).
+            size_t idx = url.find( '/' );
+            idx = url.find( '/', idx + 1 );
+            idx = url.find( '/', idx + 1 );
+            string file = url.substr( idx );
+            fits = FitsIO::read( file.c_str(), O_RDONLY | S_IRUSR);
+        }
+        else {
+            //  Remote resource, which we read into memory (may need to read
+            //  these to a local file if large, the below would use memory
+            //  mapping in that instance).
+            HTTP http;
+            if ( http.get( url.c_str(), ostring ) ) {
+                return 0;
+            }
+
+            //  Access the FITS data and gunzip if needed. Otherwise just
+            //  create a memory FITS object.
+            char *dest;
+            size_t length = ostring.str().size();
+            Mem *mem;
+
+            if ( stream.encoding() == "base64" ) {
+                dest = (char *) malloc( length );
+                decode_base64( ostring.str().c_str(), dest, &length );
+                mem = new Mem( (void *) dest, length, 1 );
+            }
+            else if ( stream.encoding() == "gzip" ) {
+                decode_gzip( ostring.str().c_str(), length, length, dest );
+                mem = new Mem( (void *) dest, length, 1 );
+            }
+            else {
+                //  Simple file, memory wrap it.
+                dest = (char *) ostring.str().c_str();
+                mem = new Mem( (void *) dest, length, 0 );
+            }
+            fits = FitsIO::initialize( *mem );
+            delete mem; //  Should persist until fits is deleted.
+        }
+    }
+    else {
+        //  No href, data must be inline, hopefully in base64, but let's
+        //  be flexible.
+        char *dest;
+        size_t length = stream.size();
+        Mem *mem;
+
+        if ( stream.encoding() == "base64" ) {
+            dest = (char *) malloc( length );
+            decode_base64( stream.c_str(), dest, &length );
+            mem = new Mem( (void *) dest, length, 1 );
+        }
+        else if ( stream.encoding() == "gzip" ) {
+            decode_gzip( stream.c_str(), length, length, dest );
+            mem = new Mem( (void *) dest, length, 1 );
+        }
+        else {
+            //  Simple inline (probably will not work).
+            dest = (char *) stream.c_str();
+            mem = new Mem( (void *) dest, length, 0 );
+        }
+        fits = FitsIO::initialize( *mem );
+        delete mem; //  Should persist until fits is deleted.
+    }
+
+    if ( !fits || fits->status() != 0 ) {
+        return 0;
+    }
+
+    if ( extnum != 0 ) {
+        fits->setHDU( extnum + 1 );
+    }
+
+    //  Check size of table.
+    long nrows = 0;
+    int ncols = 0;
+    if ( fits->getTableDims( nrows, ncols ) != 0 ) {
+        return 0;
+    }
+
+    //  Write the data.
+    double rascale = 1.0;
+    double decscale = 1.0;
+    if ( ra_radians ) {
+        rascale = R2D;
+    }
+    if ( dec_radians ) {
+        decscale = R2D;
+    }
+
+    char *s;
+    for ( long row = 1; row <= nrows; row++ ) {
+        for ( long col = 1; col <= ncols; col++ ) {
+            if ( col == ( ra_index + 1 ) ) {
+                s = fits->getTableValue( row, col, rascale );
+            }
+            else if ( col == ( dec_index + 1 ) ) {
+                s = fits->getTableValue( row, col, decscale );
+            }
+            else {
+                s = fits->getTableValue( row, col, 1.0 );
+            }
+            if ( ! s ) {
+                return 0;
+            }
+            out << s;
+
+            if ( col < ncols ) {
+                out << '\t';
+            }
+        }
+        if ( id_index == -1 ) {
+            out << '\t' << row;
+        }
+        out << '\n';
+    }
+}
+
+/**
+ *  Determine an arraysizes value. Will be 1 by default and 0 if the arraysize
+ *  is set to "*".
+ */
+int field_arraysize( const NS::FIELD &field )
+{
+    using namespace NS;
+
+    FIELD::arraysize_optional fas( field.arraysize() );
+    int arraysize;
+    if ( fas ) {
+        string as( fas.get() );
+        if ( as == "*" ) {
+            arraysize = 0;
+        }
+        else if ( as == "" ) {
+            arraysize = 1;
+        }
+        else {
+            from_string( as, arraysize, dec );
+        }
+    }
+    else {
+        arraysize = 1;
+    }
+    return arraysize;
+}
+
+//  These are defined just once (see prototypes above as well).
+#ifndef VOTABLEFUNCTIONS_DEFS_H
+#define VOTABLEFUNCTIONS_DEFS_H
+
+/**
+ *  Return an NS::TABLE reference that can be used when no other reference is
+ *  available (in particular for pure functions that return NS:TABLE as a
+ *  reference). Note <T> should be <NS::TABLE> in the function call. Failure
+ *  can be checked by testing for an attribute (name() is a good choice).
+ */
+template <typename T>
+T *emptyTable()
+{
+    static T emptyTable;
+    return &emptyTable;
+}
+
+bool matches_id( string &name, string &ucd, string &utype )
+{
+
+    if ( ( ucd.find( "meta.id" ) == 0 ) ||
+         ( ucd.find( "id_" ) == 0 ) ||
+         ( ucd == "obs_id" ) ||
+         ( name == "id" ) ||
+         ( name.find( "ident" ) == 0 ) ||
+         ( name == "name" ) ) {
+        return true;
+    }
+    return false;
+}
+
+bool matches_ra( string &name, string &ucd, string &utype )
+{
+    if ( ( ucd.find( "pos.eq.ra" ) == 0 ) ||
+         ( ucd.find( "pos_eq_ra" ) == 0 ) ||
+         ( name.find( "ra" ) == 0 ) ||
+         ( name.find( "right" ) == 0 ) ||
+         ( name.find( "r.a." ) == 0 ) ||
+         ( name.find( "x_world" ) == 0 ) ||
+         ( name.find( "alpha" ) == 0 ) ) {
+        return true;
+    }
+    return false;
+}
+
+bool matches_dec( string &name, string &ucd, string &utype )
+{
+    if ( ( ucd.find( "pos.eq.dec" ) == 0 ) ||
+         ( ucd.find( "pos_eq_dec" ) == 0 ) ||
+         ( name.find( "dec" ) == 0 ) ||
+         ( name.find( "y_world" ) == 0 ) ||
+         ( name.find( "delta" ) == 0 ) ) {
+        return true;
+    }
+    return false;
+}
+
+bool matches_x( string &name, string &ucd, string &utype )
+{
+    if ( ( ucd.find( "pos.cartesian.x" ) == 0 ) ||
+         ( name == "x" ) ||
+         ( name == "xpos" ) ) {
+        return true;
+    }
+    return false;
+}
+
+bool matches_y( string &name, string &ucd, string &utype )
+{
+    if ( ( ucd.find( "pos.cartesian.y" ) == 0 ) ||
+         ( name == "y" ) ||
+         ( name == "ypos" ) ) {
+        return true;
+    }
+    return false;
+}
+
+#endif
