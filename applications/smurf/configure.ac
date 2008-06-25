@@ -22,6 +22,7 @@ AC_CONFIG_SRCDIR([smurf_mon.c])
 STAR_DEFAULTS(per-package-dirs)
 
 dnl    Find required versions of the programs we need for configuration
+AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
@@ -39,6 +40,8 @@ AC_CHECK_SIZEOF(int)
 dnl    Library functions - needed for specwriter
 AC_CHECK_FUNCS([mkstemp mkstemps])
 
+dnl    Check for GCC, needed to set warning flags.
+AM_CONDITIONAL([HAVE_GCC], [test "$GCC" = "yes"])
 
 STAR_MESSGEN( [ libsmf/smf_err.msg ] )
 
