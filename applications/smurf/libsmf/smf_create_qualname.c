@@ -43,6 +43,8 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC)
+*     Edward Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -54,6 +56,8 @@
 *     2008-04-09 (TIMJ):
 *        Use const in input args where appropriate.
 *        Fix pointer warning - we need a pointer to IRQLocs*
+*     2008-06-25 (EC):
+*        Added PAD for SMF__Q_PAD
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -157,6 +161,8 @@ void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs, int *stat
 	    status );
   irqAddqn( *qlocs, "DCJUMP", 0, "Set iff a DC jump is present", 
 	    status );
+  irqAddqn( *qlocs, "PAD", 0, "Set iff data is padding", 
+	    status );
 
   /* Now fix the bits to the desired values */
   fixbit = smf_get_fixbit(SMF__Q_BADS, status);
@@ -167,12 +173,15 @@ void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs, int *stat
   irqFxbit( *qlocs, "SPIKE",  fixbit, &fixed, status );
   fixbit = smf_get_fixbit(SMF__Q_JUMP, status);
   irqFxbit( *qlocs, "DCJUMP", fixbit, &fixed, status );
+  fixbit = smf_get_fixbit(SMF__Q_PAD, status);
+  irqFxbit( *qlocs, "PAD", fixbit, &fixed, status );
 
   /* Set names to read only */
   irqRwqn( *qlocs, "BADSAM", 1, 1, &value, status );
   irqRwqn( *qlocs, "BADBOL", 1, 1, &value, status );
   irqRwqn( *qlocs, "SPIKE",  1, 1, &value, status );
   irqRwqn( *qlocs, "DCJUMP", 1, 1, &value, status );
+  irqRwqn( *qlocs, "PAD", 1, 1, &value, status );
 
   if ( smurfloc ) datAnnul( &smurfloc, status);
 

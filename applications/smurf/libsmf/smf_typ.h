@@ -127,6 +127,8 @@
 *        -Switch to split real/imaginary arrays for smfFilter
 *     2008-06-23 (EC)
 *        -Added WCS to smfFilter
+*     2008-06-24 (EC)
+*        -Added SMF__Q_PAD quality flag
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -225,11 +227,12 @@ typedef enum smf_modeltype {
 #define SMF__NOCREATE_QUALITY 32 /* If !SMF__NOCREATE_DATA don't map QUALITY */
 #define SMF__NOCREATE_LUT 64     /* Don't open pointing LUT */
 
-/* Data quality bit mask (single byte for QUALITY arrays */
+/* Data quality bit mask (bits in single byte for QUALITY arrays */
 #define SMF__Q_BADS 1     /* Bad sample (VAL__BADD) flagged by DA system  */
 #define SMF__Q_BADB 2     /* All samples from this bolo should be ignored */
 #define SMF__Q_SPIKE 4    /* Location of a spike */ 
 #define SMF__Q_JUMP 8     /* Location of a DC jump */
+#define SMF__Q_PAD 16     /* Padded data */
 
 /* Flags for smf_open_newfile
    Must be individual bits in a single integer

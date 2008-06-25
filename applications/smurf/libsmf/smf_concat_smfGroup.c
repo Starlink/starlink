@@ -15,9 +15,9 @@
 *  Invocation:
 *     smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered, 
 *			  AstFrameSet *outfset, int moving, 
-*	        	  int *lbnd_out, int *ubnd_out, int flags,
+*	        	  int *lbnd_out, int *ubnd_out, dim_t padStart,
+*                         dim_t padEnd, int flags,
 *			  smfArray **concat, int *status )
-
 
 *  Arguments:
 *     igrp = smfGroup* (Given)
@@ -38,6 +38,10 @@
 *     ubnd_out = double* (Given)
 *        2-element array pixel coord. for the upper bounds of the output map 
 *        (if outfset specified) 
+*     padStart = dim_t (Given)
+*        Pad start of concatenated array with this many samples.
+*     padEnd = dim_t (Given)
+*        Pad start of concatenated array with this many samples.
 *     flags = int (Given)
 *        Additional flags to control processing of individual data files
 *        as they are being concatenated.
@@ -92,6 +96,8 @@
 *        -fixed calculation of number of subarrays
 *     2008-04-23 (EC):
 *        -propagate time series WCS
+*     2008-06-24 (EC):
+*        Added ability to pad start and end of the data (padStart/padEnd)
 
 *  Notes:
 *     If projection information supplied, pointing LUT will not be
@@ -101,7 +107,11 @@
 *     SMF__NOCREATE_QUALITY. Additionally, if VARIANCE and/or QUALITY
 *     is present in the template, prevent propagation to the
 *     concatenated file by setting SMF__NOCREATE_VARIANCE /
-*     SMF__NOCREATE_QUALITY.
+*     SMF__NOCREATE_QUALITY. Specifying padStart and/or padEnd will 
+*     pad the data with the specified number of samples. DATA and VARIANCE
+*     are set to 0 in this region. QUALITY to SMF__Q_PAD | SMF__Q_BADB (if
+*     the BADB flag was set at the start of the real data). LUT is set to
+*     VAL__BADI, and the JCMTState values are all set to 0.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -148,10 +158,12 @@
 
 void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered, 
 			  AstFrameSet *outfset, int moving, 
-			  int *lbnd_out, int *ubnd_out, int flags,
-			  smfArray **concat, int *status ) {
+			  int *lbnd_out, int *ubnd_out, dim_t padStart,
+                          dim_t padEnd, int flags, smfArray **concat, 
+                          int *status ) {
 
   /* Local Variables */
+  dim_t base;                   /* Base for array index */
   smfData *data=NULL;           /* Concatenated smfData */
   char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */
   int firstpiece;               /* index to start of whichchunk */
@@ -165,9 +177,11 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
   int lastpiece;                /* index to end of whichchunk */
   dim_t nbolo;                  /* Number of detectors */
   dim_t ndata;                  /* Total data points: nbolo*tlen */
+  dim_t npad;                   /* Length of padded region in bytes */
   int nrelated;                 /* Number of subarrays */
   int pass;                     /* Two passes over list of input files */
   char *pname;                  /* Pointer to input filename */
+  unsigned char qual;           /* Set quality */
   smfData *refdata=NULL;        /* Reference smfData */
   dim_t refdims[2];             /* reference dimensions for array (not time) */
   smf_dtype refdtype;           /* reference DATA/VARIANCE type */
@@ -175,8 +189,11 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
   smfHead *refhdr=NULL;         /* pointer to smfHead in ref data */
   dim_t refndata;               /* Number data points in reference file */
   dim_t reftlen;                /* Number of time slices in reference file */
+  double steptime;              /* Length of a sample in seconds */
   dim_t tchunk;                 /* Time offset in concat. array this chunk */
+  dim_t tend;                   /* Time at start of padded region */
   dim_t tlen;                   /* Time length entire concatenated array */
+  dim_t tstart;                 /* Time at end of padded region */
   dim_t sz;                     /* Data type size */
 
   /* Main routine */
@@ -232,8 +249,8 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
   /* Loop over related elements (number of subarrays) */
   for( i=0; (*status == SAI__OK) && i<(dim_t)nrelated; i++ ) {
 
-    /* Initialize time length of concatenated array */
-    tlen = 0; 
+    /* Initialize time length of concatenated array to amount of padding */
+    tlen = padStart + padEnd; 
 
     /* Two passes over data for the subarray: first time to identify
        dimensions of each file, second time to actually open each file
@@ -339,7 +356,6 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
 
 	  /* Close the reference file */
 	  smf_close_file( &refdata, status );
-
 	}
       
       	/* Second pass copy data over to new array */
@@ -370,7 +386,8 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
 
 	    /* If first chunk initialize the concatenated array */
 	    if( j == (dim_t) firstpiece ) {
-	      tchunk = 0;
+              /* Copy first data right after the initial padding */
+	      tchunk = padStart;
  
 	      /* Allocate memory for empty smfData with a smfHead */
 	      data = smf_create_smfData( SMF__NOCREATE_DA, status );
@@ -403,7 +420,7 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
 		/* Allocate space for the concatenated allState */
 		hdr->nframes = tlen;
 		hdr->allState = smf_malloc( tlen, sizeof(*(hdr->allState)), 
-					    0, status );
+					    1, status );
 		
 		/* Allocate space in the smfData for DATA/VARAIANCE/QUALITY */
 		if( isTordered ) {
@@ -432,7 +449,7 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
 		for( k=0; k<3; k++ ) if( havearray[k] ) {
 		  if( k == 2 ) sz = smf_dtype_sz( SMF__UBYTE, status );
 		  else sz = smf_dtype_sz(data->dtype, status );
-		  data->pntr[k] = smf_malloc(ndata, sz, 0, status);
+		  data->pntr[k] = smf_malloc(ndata, sz, 1, status);
 		}
 
 		/* Check to see if havearray for QUALITY is not set,
@@ -448,7 +465,7 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
 
 		/* Allocate space for the pointing LUT if needed */
 		if( havelut ) {
-		  data->lut = smf_malloc(ndata, sizeof(*(data->lut)), 0, 
+		  data->lut = smf_malloc(ndata, sizeof(*(data->lut)), 1, 
 					 status);
 		}
 
@@ -565,9 +582,85 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
       }
     }
 
+    /* Full subarray is now concatenated. Finish up by filling the padded
+       regions of the data with something intelligent.  */
+
+    if( *status == SAI__OK ) for( j=0; j<2; j++ ) { /* Loop padded region */
+        
+      tstart = 0;
+      tend = 0;
+      
+      if( (j==0) && padStart ) {
+        tstart = 0;
+        tend = padStart-1;
+      } 
+      
+      if( (j==1) && padEnd ) {
+        tstart = tlen-padEnd;
+        tend = tlen-1;
+      }
+      
+      /* Clean up padded region if nonzero length */
+      if( tend != tstart ) {
+        
+        /* If QUALITY present, set SMF__Q_BADB as needed and SMF__Q_PAD */
+        if( data->pntr[2] ) {
+          /* Loop over bolometer */
+          for( k=0; k<nbolo; k++ ) {
+            /* SMF__Q_PAD always set */
+            qual = SMF__Q_PAD;
+
+            if( isTordered ) {
+              /* Check for SMF__Q_BADB in first sample of this bolo */
+              qual |= ((char *)data->pntr[2])[nbolo*padStart+k] & SMF__Q_BADB;
+
+              /* Need to loop over time slice for time-ordered data */
+              for( l=tstart; l<=tend; l++ ) {
+                ((char *)data->pntr[2])[nbolo*l+k] = qual;
+              }
+
+            } else {
+              /* Check for SMF__Q_BADB in first sample of this bolo */
+              qual |= ((char *)data->pntr[2])[k*tlen+padStart] & SMF__Q_BADB;
+
+              /* Use memset for bolo-ordered data */
+              memset( (char *)data->pntr[2]+k*tlen+tstart, qual, tend-tstart+1);
+            }
+            
+          }
+        }
+
+        /* If LUT present, set data to VAL__BADI */
+        if( data->lut ) {
+          if( isTordered ) {
+            /* Loop over continuous chunk of data if time-ordered */
+            for( l=tstart*nbolo; l<=(tend+1)*nbolo-1; l++ ) {
+              data->lut[l] = VAL__BADI;
+            }
+          } else {
+            /* Loop over bolo if bolo-ordered */
+            for( k=0; k<nbolo; k++ ) {
+              base = k*tlen;
+              for( l=base+tstart; l<=base+tend; l++ ) {
+                data->lut[l] = VAL__BADI;
+              }
+            }
+          }
+        }        
+      }
+    }
+
+    /* Shift the origin of the time axis in the WCS if padStart != 0 */
+    if( padStart && data->hdr && data->hdr->tswcs ) {
+      /* Figure out the length of a sample in seconds */
+      smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
+      
+      /* Not yet implemented */ 
+    }
+
     /* Put this concatenated subarray into the smfArray */
     smf_addto_smfArray( *concat, data, status );
-
   }
+
 }
 

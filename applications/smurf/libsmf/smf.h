@@ -324,6 +324,8 @@
 *     2008-06-11 (EC):
 *        -Added smf_filter_edge and smf_filter_notch
 *        -Renamed smf_model_NDFexport to smf_NDFexport
+*     2008-06-24 (EC):
+*        Added padStart & padEnd to smf_concat_smfGroup
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -851,8 +853,9 @@ void smf_filter_execute( smfData *data, smfFilter *filt, int *status );
 
 void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered, 
 			  AstFrameSet *outfset, int moving, 
-			  int *lbnd_out, int *ubnd_out, int flags,
-			  smfArray **concat, int *status );
+			  int *lbnd_out, int *ubnd_out, dim_t padStart,
+                          dim_t padEnd, int flags, smfArray **concat, 
+                          int *status );
 
 void smf_checkdets( Grp *detgrp, smfData *data, int *status );
 

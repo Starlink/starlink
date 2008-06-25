@@ -697,11 +697,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
 	/* Concatenate (no variance since we calculate it ourselves -- NOI) */
 	smf_concat_smfGroup( igroup, contchunk, 0, outfset, moving, lbnd_out, 
-			     ubnd_out, SMF__NOCREATE_VARIANCE, &res[0], 
-			     status );
+			     ubnd_out, 0, 0, SMF__NOCREATE_VARIANCE, 
+                             &res[0], status );
       } 
     }
-
+    
     /* Allocate space for the chisquared array */
     if( havenoi ) {
       chisquared = smf_malloc( nchunks, sizeof(*chisquared), 1, status );
@@ -900,8 +900,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
 	      if( spikethresh ) {
 		msgOutif(MSG__VERB," ", "  flag spikes...", status);
-		smf_flag_spikes( data, qua_data, 
-				 SMF__Q_BADS|SMF__Q_BADB|SMF__Q_SPIKE,
+		smf_flag_spikes( data, qua_data, 255-SMF__Q_JUMP,
 				 spikethresh, spikeiter, 100, 
 				 &aiter, NULL, status );
 		msgSeti("AITER",aiter);
@@ -930,6 +929,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
                 }
 
                 smf_filter_execute( data, filt, status );
+
                 filt = smf_free_smfFilter( filt, status );
               }
 	    }
