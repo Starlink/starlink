@@ -64,6 +64,8 @@
 *     2008-04-14 (EC):
 *        -added QUALITY masking
 *        -algorithm now smooths with shortened intervals at array ends
+*     2008-06-25 (EC):
+*        -Only evaluate smooth values with good QUALITY / not VAL__BADD
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -118,8 +120,6 @@ void smf_boxcar1( double *series, const size_t ninpts, size_t window,
   size_t off;                 /* offset from loop counter to modified sample */
   size_t count;               /* Number of samples in window */
   size_t i;                   /* Loop counter */
-  size_t j;                   /* Loop counter */
-  double pad=0;               /* Pad value */
   double *seriescopy;         /* Copy of the time series */
   double sum;                 /* Sum of values in the window */
   
@@ -161,7 +161,7 @@ void smf_boxcar1( double *series, const size_t ninpts, size_t window,
 	else off = -window/2;
 	
 	/* As soon as we have at least 2 samples start applying smooth val */
-	if( count > 1 ) {
+	if( (count > 1) && !(qual[i+off]&mask) ) {
 	  series[i+off] = sum / (double) count;      
 	}
 	
@@ -179,7 +179,7 @@ void smf_boxcar1( double *series, const size_t ninpts, size_t window,
       for( i=ninpts-window; i<ninpts; i++ ) {
 	off = (ninpts-i-1)/2;
 	
-	if( count > 1 ) {
+	if( (count > 1) && !(qual[i+off]&mask) ) {
 	  series[i+off] = sum / (double) count;
 	}
 	
@@ -203,7 +203,7 @@ void smf_boxcar1( double *series, const size_t ninpts, size_t window,
 	else off = -window/2;
 	
 	/* As soon as we have at least 2 samples start applying smooth val */
-	if( count > 1 ) {
+	if( (count > 1) && (series[i+off] != VAL__BADD) ) {
 	  series[i+off] = sum / (double) count;      
 	}
 	
@@ -221,7 +221,7 @@ void smf_boxcar1( double *series, const size_t ninpts, size_t window,
       for( i=ninpts-window; i<ninpts; i++ ) {
 	off = (ninpts-i-1)/2;
 	
-	if( count > 1 ) {
+	if( (count > 1) && (series[i+off] != VAL__BADD) ) {
 	  series[i+off] = sum / (double) count;
 	}
 	
