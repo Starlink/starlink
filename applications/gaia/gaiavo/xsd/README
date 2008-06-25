@@ -1,0 +1,3 @@
+This directory contains the files from codesynthesis XSD that are
+necessary to compile and build a program against Xerces. See the
+LICENSE file for details about how it may be used.
