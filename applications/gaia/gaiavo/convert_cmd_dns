@@ -1,0 +1,10 @@
+#!/bin/sh
+
+#  Default namespace version.
+
+xsd cxx-tree --root-element VOTABLE \
+             --namespace-map '=votable_11_dns' \
+             --parser-regex '/VOTABLE/VOTABLE_read/' \
+             --serializer-regex '/VOTABLE/VOTABLE_write/' \
+             VOTable1.1_dns.xsd
+
