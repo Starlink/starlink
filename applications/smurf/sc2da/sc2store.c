@@ -16,7 +16,8 @@
     05Nov2007 : add sc2store_bscale and sc2store_compflag (bdk)
     09Nov2007 : have separate sc2store_rdbscale and _wrbscale (bdk)
     11Nov2007 : store compressed data as short, not unsigned short (bdk)
-    19Jul2008 : ifdef out kaplibs code not used by DA (timj)
+    19Jun2008 : ifdef out kaplibs code not used by DA (timj)
+    24Jun2008 : Add tcs_percent_cmp. Some const warnings.
 */
 
 #if HAVE_CONFIG_H
@@ -933,6 +934,7 @@ int *status                   /* global status (given and returned) */
    RETRIEVE_STATE( tcs_az_bc1, TCS_AZ_BC1, double, VAL__BADD );
    RETRIEVE_STATE( tcs_az_bc2, TCS_AZ_BC2, double, VAL__BADD );
    RETRIEVE_STATE( tcs_index,  TCS_INDEX, int, VAL__BADI );
+   RETRIEVE_STATE( tcs_percent_cmp,  TCS_PERCENT_CMP, int, VAL__BADI );
    RETRIEVE_STATE( tcs_tr_ang, TCS_TR_ANG, double, VAL__BADD );
    RETRIEVE_STATE( tcs_tr_ac1, TCS_TR_AC1, double, VAL__BADD );
    RETRIEVE_STATE( tcs_tr_ac2, TCS_TR_AC2, double, VAL__BADD );
@@ -1144,6 +1146,7 @@ int *status                   /* global status (given and returned) */
    STORE_STATE( tcs_az_bc2, TCS_AZ_BC2, double );
    STORE_CHAR( tcs_beam, TCS_BEAM, JCMT__SZTCS_BEAM );
    STORE_STATE( tcs_index, TCS_INDEX, int );
+   STORE_STATE( tcs_percent_cmp, TCS_PERCENT_CMP, int );
    STORE_CHAR( tcs_source, TCS_SOURCE, JCMT__SZTCS_SOURCE );
    STORE_CHAR( tcs_tr_sys, TCS_TR_SYS, JCMT__SZTCS_TR_SYS );
    STORE_STATE( tcs_tr_ang, TCS_TR_ANG, double );
@@ -2913,7 +2916,7 @@ int *status           /* global status (given and returned) */
    size_t inlen;                          /* number of bytes in XML file */
    hdsdim dims[1];                        /* number of lines to be written */
    char *tempstr;                         /* padded storage */
-   static char *def = "<OCS_CONFIG></OCS_CONFIG>"; /* default string */
+   static const char *def = "<OCS_CONFIG></OCS_CONFIG>"; /* default string */
 
    if ( *status != SAI__OK ) return;
 
@@ -3497,7 +3500,7 @@ int *status              /* global status (given and returned) */
 
       ndfMap ( sc2store_indf, "DATA", "_INTEGER", "WRITE", (void *)(&idata),
         &el, status );
-      memcpy ( (char *)idata, (char *)dbuf, el*sizeof(int) );
+      memcpy ( idata, dbuf, el*sizeof(int) );
    }
 
 /* Dark SQUID values for each frame */

@@ -59,8 +59,11 @@
 *        Add ACS_OFF_EXPOSURE field to state structure. Add FE_DOPPLER and FE_LOFREQ.
 *     08-JAN-2007 (TIMJ):
 *        C++ compilers are much pickier in inst_t usage
+*     24-JUN-2008 (TIMJ):
+*        Add TCS_PERCENT_CMP. Fix a compiler const warning.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2004, 2006, 2007 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -141,6 +144,7 @@ typedef struct JCMTState {
   double tcs_az_bc2;
   char   tcs_beam[JCMT__SZTCS_BEAM+1];
   int    tcs_index;
+  int    tcs_percent_cmp;
   char   tcs_source[JCMT__SZTCS_SOURCE+1];
   char   tcs_tr_sys[JCMT__SZTCS_TR_SYS+1];
   double tcs_tr_ang;
@@ -209,6 +213,7 @@ typedef enum
    TCS_AZ_BC2,
    TCS_BEAM,
    TCS_INDEX,
+   TCS_PERCENT_CMP,
    TCS_SOURCE,
    TCS_TR_SYS,
    TCS_TR_ANG,
@@ -255,8 +260,8 @@ typedef enum
 /* To allow easy grouping, we define a struct */
 typedef struct HDSdataRecord {
   int  position;    /* actual position in list. Used so that JCMT_HEADLIST is not forced to be in same order. */
-  char * type;
-  char * name;
+  const char * type;
+  const char * name;
   inst_t instrument;  /* bit mask indicating whether a particular instrument uses this field */
   inst_t optional;    /* bit mask indicating whether it is an optional component for that instrument */
 } HDSdataRecord;
@@ -279,7 +284,7 @@ static const HDSdataRecord hdsRecords[JCMT_COMP_NUM] =
     { SMU_TR_JIG_Y, "_DOUBLE", "SMU_TR_JIG_Y", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { SMU_TR_CHOP_X, "_DOUBLE", "SMU_TR_CHOP_X", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { SMU_TR_CHOP_Y, "_DOUBLE", "SMU_TR_CHOP_Y", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
-    { TCS_TAI, "_DOUBLE", "TCS_TAI", (inst_t)(INST__ACSIS | INST__SCUBA2), (inst_t)(INST__ACSIS | INST__SCUBA2) },
+    { TCS_TAI, "_DOUBLE", "TCS_TAI", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__SCUBA2 },
     { TCS_AIRMASS, "_DOUBLE", "TCS_AIRMASS", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { TCS_AZ_ANG, "_DOUBLE", "TCS_AZ_ANG", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { TCS_AZ_AC1, "_DOUBLE", "TCS_AZ_AC1", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
@@ -290,6 +295,8 @@ static const HDSdataRecord hdsRecords[JCMT_COMP_NUM] =
     { TCS_AZ_BC2, "_DOUBLE", "TCS_AZ_BC2", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { TCS_BEAM, CHARTYP(JCMT__SZTCS_BEAM), "TCS_BEAM", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { TCS_INDEX, "_INTEGER", "TCS_INDEX", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
+    { TCS_PERCENT_CMP, "_INTEGER", "TCS_PERCENT_CMP", (inst_t)(INST__ACSIS | INST__SCUBA2),
+      (inst_t)(INST__ACSIS|INST__SCUBA2) },
     { TCS_SOURCE, CHARTYP(JCMT__SZTCS_SOURCE), "TCS_SOURCE", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { TCS_TR_SYS, CHARTYP(JCMT__SZTCS_TR_SYS), "TCS_TR_SYS", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { TCS_TR_ANG, "_DOUBLE", "TCS_TR_ANG", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
