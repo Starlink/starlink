@@ -66,7 +66,7 @@
 #include "Ers.h"
 #include "mers.h"
 
-void ErsRep ( int flags, int *status, char *string )
+void ErsRep ( int flags, int *status, const char *string )
 {
   /* Currently ignore flags argument */
   errRep( "ErsRep", string, status );

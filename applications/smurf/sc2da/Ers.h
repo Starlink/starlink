@@ -10,6 +10,6 @@ errors to allow developing code for subsequent use in a DRAMA task */
 
 #define StatusOkP(_value_)  (*(_value_) == STATUS__OK)
 
-void ErsRep ( int flags, int *status, char *string );
+void ErsRep ( int flags, int *status, const char *string );
 
 #endif /* ERS_DEFINED */
