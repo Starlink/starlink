@@ -128,7 +128,7 @@ void gsdac_get0b ( const gsd *gsd,
 }
 
 void gsdac_get0c ( const gsd *gsd, 
-                   char *name, char *value, int *status ) {
+                   const char *name, char *value, int *status ) {
 
   /* Local variables */
   char array;                  /* array flag (should always be false) */ 

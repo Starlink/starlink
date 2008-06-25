@@ -132,7 +132,7 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_get0c
 (
 const gsd *gsd,      /* GSD file access parameters (given) */
-char *name,          /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of 
                         16 characters) (given) */
 char *value,         /* data value.  Should be declared with length 17 at 
                         least.  Returned string is null-terminated in value[16].                        (returned) */
