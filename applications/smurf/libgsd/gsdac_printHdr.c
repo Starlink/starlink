@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     gsdac_printHdr ( const char *nrao, const char *jcmt, const gsdDType dType, 
-*                      char *desc, void *value, int arrayFlag, long arraySize, 
+*                      const char *desc, void *value, int arrayFlag, long arraySize, 
 *                      int descFlag, int *status );
 
 *  Arguments:
@@ -24,7 +24,7 @@
 *        JCMT name.
 *     dType = const gsdDType (Given)
 *        Data type.
-*     desc = char* (Given)
+*     desc = const char* (Given)
 *        Description.
 *     value = void* (Given)
 *        Pointer to GSD value.
@@ -91,7 +91,7 @@
 
 
 void gsdac_printHdr ( const char *nrao, const char *jcmt, const gsdDType dType, 
-                      char *desc, void *value, int arrayFlag, long arraySize, 
+                      const char *desc, void *value, int arrayFlag, long arraySize, 
                       int descFlag, int *status )
 {
 

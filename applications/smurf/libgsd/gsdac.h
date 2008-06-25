@@ -339,7 +339,7 @@ void gsdac_printHdr
 const char *nrao,    /* NRAO name (given) */
 const char *jcmt,    /* JCMT name (given) */
 const gsdDType dType, /* data type (given) */
-char *desc,          /* description (given) */
+const char *desc,     /* description (given) */
 void *value,         /* value(s) (given) */
 int arrayFlag,       /* flag for array data (given) */
 long arraySize,      /* size of array (if array data) (given) */
