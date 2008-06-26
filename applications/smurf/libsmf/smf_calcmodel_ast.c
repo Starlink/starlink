@@ -155,7 +155,7 @@ void smf_calcmodel_ast( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 	(res->sdata[idx]->dims)[2];
 	
       /* Which QUALITY bits should be considered for ignoring data */
-      mask = 255 - SMF__Q_JUMP;
+      mask = ~SMF__Q_JUMP;
 
       /* Loop over data points */ 
       for( i=0; i<ndata; i++ ) {

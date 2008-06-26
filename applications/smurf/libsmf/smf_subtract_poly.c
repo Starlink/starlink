@@ -165,7 +165,7 @@ void smf_subtract_poly(smfData *data, unsigned char *quality, int rel,
   }
 
   /* Which QUALITY bits should be considered for ignoring data */
-  mask = 255 - SMF__Q_JUMP;
+  mask = ~SMF__Q_JUMP;
 
   /* Calculate the number of bolometers and frames */
   if( data->isTordered ) {

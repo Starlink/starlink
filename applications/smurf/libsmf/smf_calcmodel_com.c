@@ -251,10 +251,10 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
     qua_data = (unsigned char *)(qua->sdata[idx]->pntr)[0];
 
     /* Which QUALITY bits should be checked for correcting samples */
-    mask_cor = 255 - SMF__Q_JUMP - SMF__Q_SPIKE;
+    mask_cor = ~(SMF__Q_JUMP | SMF__Q_SPIKE);
 
     /* Which QUALITY bits should be checked for measuring the mean */
-    mask_meas = 255 - SMF__Q_JUMP; 
+    mask_meas = ~SMF__Q_JUMP; 
 
     if( (res_data == NULL) || (model_data == NULL) || (qua_data == NULL) ) {
       *status = SAI__ERROR;

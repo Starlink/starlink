@@ -207,7 +207,7 @@ void smurf_sc2clean( int *status ) {
     smf_open_and_flatfield(igrp, ogrp, i, &ffdata, status);
 
     /* Which QUALITY bits should be considered for ignoring data */
-    mask = 255 - SMF__Q_JUMP;
+    mask = ~SMF__Q_JUMP;
 
     /* Check status to see if data are already flatfielded */
     if (*status == SMF__FLATN) {
