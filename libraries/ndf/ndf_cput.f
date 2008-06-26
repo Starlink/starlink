@@ -50,6 +50,7 @@
 
 *  Copyright:
 *     Copyright (C) 1989, 1990 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -70,6 +71,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     DSB: David S. Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
@@ -77,6 +79,9 @@
 *        Original version.
 *     7-FEB-1990 (RFWS):
 *        Changed the argument order.
+*     26-JUN-2008 (DSB):
+*        - Check for zero length VALUE, and  use a single space instead.
+*        - Include component name in the final context message.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -120,7 +125,7 @@
       INTEGER ICCOMP             ! Identifier for character component
       INTEGER IDCB               ! Index to data object entry in the DCB
       INTEGER L                  ! Length of character component
-
+      INTEGER LV                 ! Used length of VALUE
 *.
 
 *  Check inherited global status.
@@ -144,6 +149,10 @@
          CALL NDF1_DC( IDCB, ICCOMP, STATUS )
          IF ( STATUS .EQ. SAI__OK ) THEN
 
+*  Get the length of the VALUE string. If it has zero length we will
+*  use a single space instead.
+            LV = LEN( VALUE )
+ 
 *  If the component is already present in the NDF, then determine its
 *  length.
             IF ( DCB_CLOC( ICCOMP, IDCB ) .NE. DAT__NOLOC ) THEN
@@ -151,7 +160,7 @@
 
 *  If the length does not match that of the value to be assigned, then
 *  annul the component's locator and erase the component.
-               IF ( L .NE. LEN( VALUE ) ) THEN
+               IF ( L .NE. MAX( LV, 1 ) ) THEN
                   CALL DAT_ANNUL( DCB_CLOC( ICCOMP, IDCB ), STATUS )
                   CALL DAT_ERASE( DCB_LOC( IDCB ), DCB_CCN( ICCOMP ),
      :                            STATUS )
@@ -163,7 +172,7 @@
             IF ( STATUS .EQ. SAI__OK ) THEN
                IF ( DCB_CLOC( ICCOMP, IDCB ) .EQ. DAT__NOLOC ) THEN
                   CALL DAT_NEW0C( DCB_LOC( IDCB ), DCB_CCN( ICCOMP ),
-     :                            LEN( VALUE ), STATUS )
+     :                            MAX( LV, 1 ), STATUS )
 
 *  Obtain a locator to the new component.
                   CALL DAT_FIND( DCB_LOC( IDCB ), DCB_CCN( ICCOMP ),
@@ -171,7 +180,14 @@
                END IF
 
 *  Assign the value.
-               CALL DAT_PUT0C( DCB_CLOC( ICCOMP, IDCB ), VALUE, STATUS )
+               IF( LV .GT. 0 ) THEN
+                  CALL DAT_PUT0C( DCB_CLOC( ICCOMP, IDCB ), VALUE, 
+     :                            STATUS )
+               ELSE
+                  CALL DAT_PUT0C( DCB_CLOC( ICCOMP, IDCB ), ' ', 
+     :                            STATUS )
+               END IF
+
             END IF
          END IF
       END IF
@@ -179,9 +195,10 @@
 *  If an error occurred, then report context information and call the
 *  error tracing routine.
       IF ( STATUS .NE. SAI__OK ) THEN
+         CALL MSG_SETC( 'C', COMP )
          CALL ERR_REP( 'NDF_CPUT_ERR',
-     :   'NDF_CPUT: Error assigning a value to an NDF character ' //
-     :   'component.', STATUS )
+     :   'NDF_CPUT: Error assigning a value to NDF character ' //
+     :   'component ''^C''.', STATUS )
          CALL NDF1_TRACE( 'NDF_CPUT', STATUS )
       END IF
 
