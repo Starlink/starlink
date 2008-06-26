@@ -131,14 +131,14 @@ void smf_flatfield ( const smfData *idata, smfData **odata, const int flags, int
     errAnnul(status);
     /* check *odata */
     if ( *odata == NULL) {
-      msgOutif(MSG__VERB," ", 
+      msgOutif(MSG__DEBUG," ", 
 	       "OK, data are flatfielded and output struct is NULL: cloning input", 
 	       status);
       /* If NULL then we need to clone idata to odata i.e. copy the
 	 pointer ONLY */
       smf_clone_data( idata, odata, status );
     } else {
-      msgOutif(MSG__VERB," ",
+      msgOutif(MSG__DEBUG," ",
 	       "OK, data are flatfielded and odata exists", status);
       /* Check and set */
       smf_check_smfData( idata, *odata, flags, status );
@@ -149,7 +149,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, const int flags, int
        apply flatfield */
     /* Check if *odata exists */
     if ( *odata == NULL) {
-      msgOutif(MSG__VERB," ","Data not FF, no odata", status);
+      msgOutif(MSG__DEBUG," ","Data not FF, no odata", status);
       /* If NULL then we need create odata not associated with a file
 	 (i.e. leave smfFile NULL) */
       /* Allocate space for *odata and all necessary cpts */
@@ -157,7 +157,7 @@ void smf_flatfield ( const smfData *idata, smfData **odata, const int flags, int
       *odata = smf_deepcopy_smfData( idata, 1, flags, status );
     } else {
       /* OK, *odata exists */
-      msgOutif(MSG__VERB," ","Data not FF, odata exists", status);
+      msgOutif(MSG__DEBUG," ","Data not FF, odata exists", status);
       /* Check and set */
       smf_check_smfData( idata, *odata, flags, status );
     }

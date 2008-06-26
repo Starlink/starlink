@@ -111,11 +111,11 @@ smf_inst_get( const smfHead * hdr, int * status ) {
 
   if (*status == SAI__OK) {
     if ( strncmp( instrume, "SCUBA-2", SZFITSCARD) == 0 ) {
-      msgOutif( MSG__VERB, " ", "Data file contains SCUBA-2 data",
+      msgOutif( MSG__DEBUG, " ", "Data file contains SCUBA-2 data",
 		status );
       return INST__SCUBA2;
     } else if ( strncmp( instrume, "AZTEC", SZFITSCARD ) == 0 ) {
-      msgOutif( MSG__VERB, " ", "Data file contains AzTEC data",
+      msgOutif( MSG__DEBUG, " ", "Data file contains AzTEC data",
 		status );
       return INST__AZTEC;
     }
@@ -132,11 +132,12 @@ smf_inst_get( const smfHead * hdr, int * status ) {
     /* did we get something? */
     if (*status == SAI__OK) {
       if (strncmp( backend, "ACSIS", SZFITSCARD) == 0) {
-	msgOutif( MSG__VERB, " ", "Data file contains ACSIS data",
+	msgOutif( MSG__DEBUG, " ", "Data file contains ACSIS data",
 		  status );
 	return INST__ACSIS;
       } else if (strncmp( backend, "DAS", SZFITSCARD) == 0) {
-	msgOutif( MSG__VERB, " ", "Data file contains DAS data, treating as ACSIS",
+	msgOutif( MSG__DEBUG, " ", 
+                  "Data file contains DAS data, treating as ACSIS",
 		  status );
 	return INST__ACSIS;
       }
@@ -146,7 +147,7 @@ smf_inst_get( const smfHead * hdr, int * status ) {
     }
   }
 
-  msgOutif( MSG__VERB, " ", "Did not recognize instrument",
+  msgOutif( MSG__DEBUG, " ", "Did not recognize instrument",
 	    status );
 
   /* only get here if we've run out of choices */

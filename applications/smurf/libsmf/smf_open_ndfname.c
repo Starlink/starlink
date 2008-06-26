@@ -168,7 +168,7 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filen
 
   /* Note: write access clears the contents of the NDF */
   if ( strncmp( accmode, "WRITE", 5 ) == 0 ) {
-    msgOutif(MSG__VERB," ", "Opening NDF with WRITE access: this will clear the current contents if the NDF exists.", status);
+    msgOutif(MSG__DEBUG," ", "Opening NDF with WRITE access: this will clear the current contents if the NDF exists.", status);
     updating = 1;
   } else if ( strncmp( accmode, "UPDATE", 6) == 0) {
     updating = 1;

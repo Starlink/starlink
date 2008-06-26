@@ -173,12 +173,12 @@ HDSLoc * smf_get_xloc ( const smfData *data, const char *extname,
       }
     } else {
       msgSetc("E", extname);
-      msgOutif(MSG__VERB," ", 
+      msgOutif(MSG__DEBUG," ", 
 	       "Found extension named ^E", status);
     }
   } else {
     msgSetc("E", extname);
-    msgOutif(MSG__VERB," ", 
+    msgOutif(MSG__DEBUG," ", 
 	     "Warning: no extension named ^E", status);
     /* Extension doesn't exist - do we want to create a new one? */
     if ( strncmp ( accmode, "WRITE", 5) == 0 || 
@@ -188,14 +188,14 @@ HDSLoc * smf_get_xloc ( const smfData *data, const char *extname,
       ndfIsacc( indf, "WRITE", &isacc, status );
       if (isacc) {
 	msgSetc("E", extname);
-	msgOutif(MSG__VERB," ", "Creating new extension, ^E", status );
+	msgOutif(MSG__DEBUG," ", "Creating new extension, ^E", status );
 	ndfXnew( indf, extname, extype, ndims, dims, &loc, status );
       } else {
 	/* OK not open for WRITE access, try UPDATE */
 	ndfIsacc( indf, "UPDATE", &isacc, status );
 	if (isacc) {
 	  msgSetc("E", extname);
-	  msgOutif(MSG__VERB," ", "Creating new extension, ^E", status );
+	  msgOutif(MSG__DEBUG," ", "Creating new extension, ^E", status );
 	  ndfXnew( indf, extname, extype, ndims, dims, &loc, status );
 	} else {
 	  /* OK file cannot be written to despite the fact we want a
@@ -211,7 +211,7 @@ HDSLoc * smf_get_xloc ( const smfData *data, const char *extname,
 	}
       }
     } else {
-      msgOutif(MSG__VERB," ", 
+      msgOutif(MSG__DEBUG," ", 
 	       "That's OK: we don't need to create a new one", status);
     }
   }

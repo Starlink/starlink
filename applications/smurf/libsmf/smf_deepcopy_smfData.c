@@ -142,7 +142,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   if ( old->history != NULL ) {
     history = astCopy( old->history );
   } else {
-    msgOutif(MSG__VERB," ", "No history to copy. Continuing, but this may cause problems later", status);
+    msgOutif(MSG__DEBUG," ", "No history to copy. Continuing, but this may cause problems later", status);
   }
 
   /* DATA and VARIANCE */
@@ -209,7 +209,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
     }
     memcpy( poly, old->poly, npts*sizeof(double));
   } else {
-    msgOutif(MSG__VERB," ", "Skipping copy of SCANFIT coefficients, ncoeff = 0", status);
+    msgOutif(MSG__DEBUG," ", "Skipping copy of SCANFIT coefficients, ncoeff = 0", status);
   }
 
   /* Copy smfHead if desired */

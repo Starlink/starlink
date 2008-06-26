@@ -112,7 +112,7 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
   /* First check if INPUT WCS is null => we have time series data and
      we can forget about the WCS info for now */
   if (ihdr->wcs == NULL) {
-    msgOutif(MSG__VERB, "", 
+    msgOutif(MSG__DEBUG, "", 
 	     "Input data are time series data: don't copy WCS as it is created later", 
 	     status);
     /* Set output WCS to null */
@@ -120,7 +120,7 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
   } else {
     owcs = ohdr->wcs;
     if ( owcs == NULL ) {
-      msgOutif(MSG__VERB," ", 
+      msgOutif(MSG__DEBUG," ", 
 	       "Output data has no WCS, copying from input", status);
       /* Copy over WCS from input */
       owcs = astCopy(ihdr->wcs);
@@ -131,13 +131,13 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
       skyframe = astFindFrame( owcs, astSkyFrame(""), "");
       /* If no sky frame, copy the input WCS info using astCopy */
       if (skyframe == AST__NULL) {
-	msgOutif(MSG__VERB," ", 
+	msgOutif(MSG__DEBUG," ", 
 		 "Output FrameSet exists but does not have a SKYFRAME; copying WCS from input", 
 		 status);
 	owcs = astCopy(ihdr->wcs);
 	ohdr->wcs = owcs;
       } else {
-	msgOutif(MSG__VERB," ", "Output FrameSet has a SKYFRAME", status);
+	msgOutif(MSG__DEBUG," ", "Output FrameSet has a SKYFRAME", status);
       }
     }
   }
@@ -145,7 +145,7 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
   /* Copy time series WCS if present and not in the output */
   if ( ihdr->tswcs != NULL ) {
     if (ohdr->tswcs == NULL) {
-      msgOutif(MSG__VERB," ", 
+      msgOutif(MSG__DEBUG," ", 
 	       "Output data has no time series WCS, copying from input", status);
       /* Copy over WCS from input */
       ohdr->tswcs = astCopy(ihdr->tswcs);
@@ -174,7 +174,7 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
       /* For 2-D data nframes should always be 1 */
       if ( ohdr->nframes != 1 ) {
 	msgSeti("NF",ohdr->nframes);
-	msgOutif(MSG__VERB," ", "2-D data claims to have ^NF frames: overriding and setting to 1 now", status);
+	msgOutif(MSG__DEBUG," ", "2-D data claims to have ^NF frames: overriding and setting to 1 now", status);
 	ohdr->nframes = 1;
       }
     }
@@ -182,7 +182,7 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
 
   /* Do we have a FITS header? */
   if ( ohdr->fitshdr == NULL) {
-    msgOutif(MSG__VERB," ", "Output has no FITS header, copying from input", status );
+    msgOutif(MSG__DEBUG," ", "Output has no FITS header, copying from input", status );
     if ( ihdr->fitshdr == NULL ) {
       if ( *status == SAI__OK) {
 	*status = SAI__ERROR;

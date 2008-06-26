@@ -141,7 +141,7 @@ void smf_flatten ( smfData *data, int *status ) {
 	 accordingly. Any bad values at this point means that those
 	 samples were flagged as such by the DA system and thus should
 	 be assigned a quality value of SMF__Q_BADS */
-      msgOutif(MSG__VERB, "", 
+      msgOutif(MSG__DEBUG, "", 
 	       "smfData has a valid QUALITY array: setting SMF__Q_BADS flags", 
 	       status);
       ndat = nboll * nframes;
@@ -151,7 +151,7 @@ void smf_flatten ( smfData *data, int *status ) {
 	}
       }
     } else {
-      msgOutif(MSG__VERB, "", "smfData has no QUALITY array", status);
+      msgOutif(MSG__DEBUG, "", "smfData has no QUALITY array", status);
     }
 
   }

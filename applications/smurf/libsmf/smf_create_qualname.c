@@ -134,13 +134,13 @@ void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs, int *stat
 
   /* Check for access mode */
   if (strncmp(mode,"READ",4) == 0 ) {
-    msgOutif(MSG__VERB, "", 
+    msgOutif(MSG__DEBUG, "", 
 	     "Input file is read-only - unable to create quality names extension",
 	     status);
     return;
   }
 
-  msgOutif(MSG__VERB, "", "Creating quality names extension", status);
+  msgOutif(MSG__DEBUG, "", "Creating quality names extension", status);
   ndfXstat( indf, "SMURF", &there, status );
   if (!there) {
     /* Create SMURF extension if it does not already exist */
@@ -151,7 +151,7 @@ void smf_create_qualname( const char *mode, int indf, IRQLocs **qlocs, int *stat
   irqNew( indf, "SMURF", qlocs, status );
 
   /* Add SMURF quality names */
-  msgOutif(MSG__VERB, "", "Adding SMURF quality names", status);
+  msgOutif(MSG__DEBUG, "", "Adding SMURF quality names", status);
   irqAddqn( *qlocs, "BADSAM", 0, 
 	    "Set iff a bolometer is flagged by the DA", status );
   irqAddqn( *qlocs, "BADBOL", 0, 

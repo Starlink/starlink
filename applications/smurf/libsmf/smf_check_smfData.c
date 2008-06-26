@@ -213,7 +213,7 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
 	}
       } else if ( i == 2 && !(flags & SMF__NOCREATE_QUALITY) ) {
 	/* If we are here then create a quality array */
-	msgOutif(MSG__VERB, "", "Allocating memory for QUALITY array", status);
+	msgOutif(MSG__DEBUG, "", "Allocating memory for QUALITY array", status);
 	pntr[i] = smf_malloc( npts, sizeof(unsigned char), 1, status);
 	/* Store pointer to QUALITY in the output smfData */
 	(odata->pntr)[2] = pntr[2];
@@ -241,7 +241,7 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
       }
     }
   } else {
-    msgOutif(MSG__VERB," ", "No polynomial fits in input data", status);
+    msgOutif(MSG__DEBUG," ", "No polynomial fits in input data", status);
   }
 
 
