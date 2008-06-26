@@ -195,18 +195,6 @@ if ( ! ${?PGPLOT_DIR} ) then
 endif
 
 #
-#  TCLSYS
-if ( -e ${exec_prefix}/manifests/tcl ) then
-   set tclsh_names=`grep 'bin/tclsh' ${exec_prefix}/manifests/tcl`
-   set tclsys_install=`echo $tclsh_names[1]:h:h`
-   if ( "${exec_prefix}" != ${tclsys_install} ) then
-      setenv TCL_LIBRARY ${libdir}
-      setenv TK_LIBRARY ${libdir}
-   endif
-   unset tclsys_install tclsh_names
-endif
-
-#
 #  WWW server.  If WWW_HOME is not defined, point it
 #  to the Starlink WWW server at RAL.
 if ( ! ${?WWW_HOME} ) setenv WWW_HOME http://www.starlink.rl.ac.uk/
