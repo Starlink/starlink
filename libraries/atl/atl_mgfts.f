@@ -84,6 +84,8 @@
 *        cards, comment cards, etc).
 *     15-JUN-2008 (TIMJ):
 *        Fix typo for method 2
+*     26-JUN-2008 (DSB):
+*        Correct AST_SET to AST_SETI.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -274,8 +276,8 @@
 
 *  Re-instate the original current Card of the two supplied FitsChans,
 *  and re-dinw the retruend FitsChan (if any).
-      CALL AST_SET( FC1, 'CARD', ICARD1, STATUS )
-      CALL AST_SET( FC2, 'CARD', ICARD2, STATUS )
+      CALL AST_SETI( FC1, 'CARD', ICARD1, STATUS )
+      CALL AST_SETI( FC2, 'CARD', ICARD2, STATUS )
       IF( FC3 .NE. AST__NULL ) CALL AST_CLEAR( FC3, 'CARD', STATUS )
 
 *  If an error occurred, delete any returned FitsCHan.
