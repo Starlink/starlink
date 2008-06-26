@@ -86,10 +86,6 @@ BASE_DIR="$GAIA_DIR/../.."
 BASE_DIR=`(cd $BASE_DIR; pwd)`
 echo "GAIA_DIR = $GAIA_DIR"
 
-#  Locate the Tcl packages.
-TCLLIBPATH="$BASE_DIR/lib"
-export TCLLIBPATH
-
 #  Initialise the CONVERT package if not already done so.
 if test "$CONVERT_DIR" != "" -a "$NDF_FORMATS_IN" = ""; then
    . $CONVERT_DIR/convert.sh > /dev/null
