@@ -10,7 +10,7 @@ AM_FCFLAGS = -Isrc -Isc2da -Isc2sim
 if HAVE_GCC
 GCC_DEBUG_FLAGS = -Wall -Wextra -Wcast-qual -Wcast-align -Wwrite-strings \
 -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations	         \
--Wredundant-decls -fstack-protector
+-Wredundant-decls
 endif
 AM_CFLAGS = $(GCC_DEBUG_FLAGS)
 
