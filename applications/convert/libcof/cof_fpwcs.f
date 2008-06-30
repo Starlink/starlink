@@ -63,6 +63,8 @@
 *        Issue warning if WCS headers cannot be produced.
 *     10-SEP-2004 (TIMJ):
 *        Initialise HEADER to fix valgrind warning
+*     30-JUN-2008 (DSB):
+*        Delete cards from end of list to avoid massive CFITSIO overheads.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -168,9 +170,10 @@
 *  See how many cards there are in the FITSIO header now.
           CALL FTGHPS( FUNIT, NHEAD, KEYADD, FSTAT )
 
-*  Empty the FITSIO header.
-          DO IHEAD = 1, NHEAD
-             CALL FTDREC( FUNIT, 1, FSTAT )
+*  Empty the FITSIO header. For efficiency, delete from the end of the
+*  list to the start of the list.
+          DO IHEAD = NHEAD, 1, -1
+             CALL FTDREC( FUNIT, IHEAD, FSTAT )
              IF( FSTAT .NE. FITSOK ) THEN
                 FSTAT = FITSOK
                 CALL FTCMSG
