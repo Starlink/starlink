@@ -1,7 +1,5 @@
 
-bin_PROGRAMS = readtable_template vot2tab
-
-readtable_template_SOURCES = readtable_template.C $(VOTABLE_ROUTINES)
+bin_PROGRAMS = vot2tab
 
 vot2tab_SOURCES = vot2tab.C $(VOTABLE_ROUTINES)
 
@@ -14,7 +12,12 @@ VOTABLE_ROUTINES =  VOTable.C VOTable1.1.C VOTable1.1_dns.C \
 
 #  Libraries we link against.
 VOTABLE_LIBS = -lastrotcl2.0 -ltclutil2.0 -lxerces-c
-
-readtable_template_LDADD = $(VOTABLE_LIBS)
-
 vot2tab_LDADD = $(VOTABLE_LIBS)
+
+#  Test programs.
+
+TESTS = readtable_template
+check_PROGRAMS = readtable_template
+
+readtable_template_SOURCES = readtable_template.C $(VOTABLE_ROUTINES)
+readtable_template_LDADD = $(VOTABLE_LIBS)
