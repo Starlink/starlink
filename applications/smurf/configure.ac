@@ -40,8 +40,28 @@ AC_CHECK_SIZEOF(int)
 dnl    Library functions - needed for specwriter
 AC_CHECK_FUNCS([mkstemp mkstemps])
 
-dnl    Check for GCC, needed to set warning flags.
-AM_CONDITIONAL([HAVE_GCC], [test "$GCC" = "yes"])
+dnl    Check for GCC, so we can add SMURF compiler warning flags. 
+dnl    Would like to include -fstack-protector, but not all GCC versions 
+dnl    support that, so need to check that. 
+SMURF_CFLAGS="-Wall -Wextra -Wcast-qual -Wcast-align -Wwrite-strings \
+-Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations \
+-Wredundant-decls"
+
+if test "$GCC" = "yes"; then
+    have_fsp=yes
+    AC_MSG_CHECKING([whether ${CC} accepts -fstack-protector])
+    fsp_old_cflags="$CFLAGS"
+    CFLAGS="$CFLAGS -fstack-protector"
+    AC_TRY_COMPILE(,,,[have_fsp=no])
+    echo $have_fsp
+    if test "$have_fsp" = "no"; then
+        CFLAGS="$fsp_old_cflags $SMURF_CFLAGS"
+    else
+        CFLAGS="$CFLAGS $SMURF_CFLAGS"
+    fi
+fi
+
+dnl AM_CONDITIONAL([HAVE_GCC], [test "$GCC" = "yes"])
 
 STAR_MESSGEN( [ libsmf/smf_err.msg ] )
 
