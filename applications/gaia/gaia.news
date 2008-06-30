@@ -127,6 +127,9 @@
     A bug in the calculations of the offsets for extracted spectra has been
     corrected (the offsets where not corrected for latitude).
 
+    A problem reading very large FITS extensions in NDFs has been fixed.
+    This should speed up startup times.
+
   Humu Release
   ============
 

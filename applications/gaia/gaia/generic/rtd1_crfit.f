@@ -167,16 +167,18 @@
       PARAMETER( SZVAL = 70 )   ! Columns 11 to 80
 
 *  Local Variables:
-      CHARACTER * ( SZFITS ) FITSTR ! FITS string
       CHARACTER * ( DAT__SZLOC ) FTLOC ! Locator to NDF FITS extension
       CHARACTER * ( DAT__SZLOC ) FTLOCI ! Locator to element of NDF FITS extension
+      CHARACTER * ( SZFITS ) FITSTR ! FITS string
       CHARACTER * ( SZKEY ) KEYWRD ! Accommodates keyword name
       CHARACTER * ( SZVAL ) VALUE ! Accommodates keyword value
       INTEGER DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
       INTEGER I                 ! Loop variable
+      INTEGER ICARD             ! Position of END card
       INTEGER IWCS              ! NDF WCS identifier
       INTEGER NCOMP             ! No. of components
       INTEGER NDIM              ! Number of dimensions
+      INTEGER NOCCUR            ! Dummy
       LOGICAL BANNER            ! Part of the FITSIO banner header?
       LOGICAL CMPFND( NFLAGS )  ! True if certain special NDF components are present
       LOGICAL EXISTS            ! NDF component exists
@@ -184,6 +186,7 @@
       LOGICAL LABFND            ! True if NDF LABEL found
       LOGICAL MANDAT            ! Not a mandatory header?
       LOGICAL ORIGIN            ! Starlink origin header present?
+      LOGICAL THERE             ! END keyword present
       LOGICAL TITFND            ! True if NDF TITLE found
       LOGICAL UNTFND            ! True if NDF UNITS found
 
@@ -192,13 +195,13 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Create an initial character array.
-      AVAIL = 128
+*  Now create an initial character array.
+      AVAIL = 1024
       NHEAD = 0
       NCOMP = 0
       CALL PSX_MALLOC( AVAIL * SZFITS, IPHEAD, STATUS )
       CALL RTD1_WRFTC( 'END', ' ', ' ', IPHEAD, NHEAD, AVAIL,
-     :     STATUS )
+     :                 STATUS )
 
 *  Write special header cards.
 *  ===========================
@@ -288,6 +291,15 @@
          CALL NDF_XLOC( NDF, 'FITS', 'READ', FTLOC, STATUS )
          CALL DAT_SIZE( FTLOC, NCOMP, STATUS )
 
+*  Locate the END card so we know where to start appending. If search
+*  fails should be positioned at the end of the block.
+         NOCCUR = 1
+         THERE = .FALSE.
+         ICARD = 0
+         CALL RTD1_GKEYC( NHEAD, %VAL( CNF_PVAL( IPHEAD ) ), 0, 'END ', 
+     :                    NOCCUR, THERE, VALUE, ICARD, STATUS, 
+     :                    %VAL( CNF_CVAL( 80 ) ) )
+
 *  Loop for each header in the NDF FITS extension.
          DO I = 1, NCOMP
 
@@ -349,11 +361,18 @@
 *  Write the header card, replacing any non-printing characters
 *  with blanks (yes people do this).
                CALL CHR_CLEAN( FITSTR )
-               CALL RTD1_WRCRD( FITSTR, IPHEAD, NHEAD, AVAIL,
+               CALL GAI1_INCRD( FITSTR, IPHEAD, NHEAD, ICARD, AVAIL,
      :                          STATUS )
+               ICARD = ICARD + 1
             END IF
             CALL DAT_ANNUL( FTLOCI, STATUS )
          END DO
+
+*  Append an 'END' card (overwrites existing if not headers added).
+         FITSTR = 'END'
+         CALL GAI1_INCRD( FITSTR, IPHEAD, NHEAD, ICARD, AVAIL,
+     :                    STATUS )
+
          CALL DAT_ANNUL( FTLOC, STATUS )
       END IF
 
