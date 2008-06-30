@@ -825,6 +825,8 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        mapping to be represented by a CAR projection.
 *     9-MAY-2008 (DSB):
 *        Make class variables IgnoreUsed and MarkNew static.
+*     30-JUN-2008 (DSB):
+*        Improve efficiency of FindWcs.
 *class--
 */
 
@@ -1292,6 +1294,7 @@ static int FindLonLatSpecAxes( FitsStore *, char, int *, int *, int *, const cha
 static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
 static int FitOK( int, double *, double *, double );
 static int FitsEof( AstFitsChan * );
+static int FitsSof( AstFitsChan * );
 static int FitsFromStore( AstFitsChan *, FitsStore *, int, double *, AstFrameSet *, const char *, const char * );
 static int FitsGetCom( AstFitsChan *, const char *, char ** );
 static int FullForm( const char *, const char *, int );
@@ -8780,7 +8783,7 @@ static void FindWcs( AstFitsChan *this, int last, int all, int rewind,
       }
 
 /* Leave the FitsChan at end-of-file if no WCS cards were found. */
-      if( (last && astGetCard( this ) <= 1 ) ||
+      if( (last && FitsSof( this ) ) ||
           (!last && astFitsEof( this ) ) ) {
          astSetCard( this, INT_MAX );
          break;
@@ -12340,6 +12343,51 @@ static int FitsEof( AstFitsChan *this ){
    FitsChan will be NULL. Return an appropriate integer value. */
    return  this->card ? 0 : 1;
 
+}
+static int FitsSof( AstFitsChan *this ){
+/*
+*+
+*  Name:
+*     FitsSof
+
+*  Purpose:
+*     See if the FitsChan is at "start-of-file".
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "fitschan.h"
+*     int FitsSof( AstFitsChan *this )
+
+*  Class Membership:
+*     FitsChan member function.
+
+*  Description:
+*     A value of 1 is returned if the current card is the first card in
+*     the FitsChan. Otherwise a value of zero is returned.  This function
+*     is much more efficient than "astGetCard(this) <= 1" .
+
+*  Parameters:
+*     this
+*        Pointer to the FitsChan.
+
+*  Returned Value:
+*     Zero if the current card is the first card.
+
+*  Notes:
+*     - This function attempts to execute even if an error has already
+*     occurred.
+
+*-
+*/
+
+/* Return if no FitsChan was supplied, or if the FitsChan is empty. */
+   if ( !this || !this->head ) return 0;
+
+/* If the current card is at the head of the linked list, it is the first
+   card. */
+   return  this->card == this->head;
 }
 
 /*
