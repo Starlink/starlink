@@ -135,8 +135,11 @@ sub PDL::rndf {  # Read a piddle from a NDF file
 
   my ($infile, $status, $indf, $entry, @info, $value);
 
-  eval 'use NDF' unless $ndf_loaded++;
-  croak 'Cannot use NDF library' if $@ ne "";
+  if (!$ndf_loaded) {
+    my $retval = eval 'use NDF; 1;';
+    croak "Cannot use NDF library: $@" if $retval != 1;
+    $ndf_loaded++;
+  }
 
   # Strip trailing .sdf if one is present
   # File is the first thing before a .
@@ -252,8 +255,12 @@ sub PDL::wndf {  # Write a PDL to an NDF format file
   my (@lbnd, @ubnd);
 
   my ($pdl, $outfile) = @_;
-  eval 'use NDF' unless $ndf_loaded++;
-  croak 'Cannot use NDF library' if $@ ne "";
+
+  if (!$ndf_loaded) {
+    my $retval = eval 'use NDF; 1;';
+    croak "Cannot use NDF library: $@" if $retval != 1;
+    $ndf_loaded++;
+  }
 
   # Check that we are dealing with a PDL
   croak 'Argument is not a PDL variable' unless $pdl->isa('PDL');
@@ -332,8 +339,12 @@ sub PDL::propndfx {  # Write a PDL to a NDF format file
   my ($indf, $in_place, $status, $outplace, $outndf);
 
   my ($pdl, $infile, $outfile) = @_;
-  eval 'use NDF' unless $ndf_loaded++;
-  croak 'Cannot use NDF library' if $@ ne "";
+
+  if (!$ndf_loaded) {
+    my $retval = eval 'use NDF; 1;';
+    croak "Cannot use NDF library: $@" if $retval != 1;
+    $ndf_loaded++;
+  }
 
   # Set status
   $status = &NDF::SAI__OK;
