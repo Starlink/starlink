@@ -882,7 +882,7 @@ sub err_flush_to_string {
   my ( $oplen, @errs );
   do {
     err_load( my $param, my $parlen, my $opstr, $oplen, $_[0] );
-    push @errs, $opstr;
+    push(@errs, $opstr) if $opstr;
   } until ( $oplen == 1 );
   err_annul($_[0]);
   return (wantarray() ? @errs : join("\n",@errs) );
