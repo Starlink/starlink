@@ -20,7 +20,7 @@
 *              const double fplanex[], const double fplaney[],
 *              const double detpos[], const char *detname, int dpazel, const double tsys[], 
 *              const char title[], const char dlabel[], const char units[],
-*              int * status );
+*              const double telpos[], int * status );
 
 *  Arguments:
 *     tofill = smfHead* (Given)
@@ -66,6 +66,8 @@
 *        Data label associated with header.
 *     units = const char[] (Given)
 *        Data units.
+*     telpos = const double[] (Given)
+*        The telscope position.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -122,6 +124,8 @@
 *        Add instap to API
 *     2008-04-30 (TIMJ):
 *        Add title, units and dlabel.
+*     2008-07-1 (DSB):
+*        Add telpos.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -178,7 +182,7 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 		       const double detpos[], const char *detname, 
                        int dpazel, const double tsys[], const char title[],
 		       const char dlabel[], const char units[],
-		       int * status ) {
+		       const double telpos[], int * status ) {
 
   smfHead * hdr = NULL;   /* Header components */
 
@@ -208,6 +212,9 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
     hdr->isCloned = 1;
     hdr->instap[0] = instap[0];
     hdr->instap[1] = instap[1];
+    hdr->telpos[0] = telpos[0];
+    hdr->telpos[1] = telpos[1];
+    hdr->telpos[2] = telpos[2];
 
     /* Have to copy the string items in since the struct has a slot for them -
        we know these fit in the struct */

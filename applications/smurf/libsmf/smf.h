@@ -452,7 +452,8 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 		       const double fplanex[], const double fplaney[],
 		       const double detpos[], const char *detname, int rpazel, 
 		       const double tsys[], const char title[], 
-		       const char dlabel[], const char units[], int * status );
+		       const char dlabel[], const char units[], 
+                       const double telpos[], int * status );
 
 smfGroup * 
 smf_construct_smfGroup( Grp *igrp, int **subgroups, size_t *chunk,

@@ -64,6 +64,8 @@
 *        Add instap
 *     2008-04-30 (TIMJ):
 *        Add units, label and title
+*     2007-07-1 (DSB):
+*        Add telpos.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -200,7 +202,7 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
 			       nframes, ndet, fplanex, fplaney, detpos,
                                detname, old->dpazel, tsys,
 			       old->title, old->dlabel, old->units,
-			       status );
+			       old->telpos, status );
 
   /* set isCloned to 0 since we have allocated this memory */
   if (new) new->isCloned = 0;
