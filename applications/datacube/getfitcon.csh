@@ -79,9 +79,13 @@
 #  History:
 #     2007 May 5 (MJC):
 #       Original version derived from a peakmap.csh extract.
+#     2008 June 29 (MJC):
+#       Fixed bug with -z option that ignored its value, insisting on 
+#       zooming.
 #
 #  Copyright:
-#     Copyright (C) 2007 Science and Technology Research Council
+#     Copyright (C) 2007-2008 Science and Technology Research Council.
+#     All Rights Reserved.
 #-
 
 # Preliminaries
@@ -121,7 +125,7 @@ while ( $#args > 0 )
       breaksw 
    case -z:    # zoom mode
       shift args
-      set gfc_gotzoom = "TRUE"
+      set gfc_gotzoom = $args[1]
       shift args
       breaksw 
    case *:     # rubbish disposal
@@ -133,19 +137,19 @@ end
 # Obtain the spectral range interactively.
 # ========================================
 
+# Plot the ripped spectrum.
+linplot "${gfc_infile} device=${gfc_graphdev}" mode=histogram \
+         style="Colour(curves)=1" >& /dev/null
+
 # Skip the zooming if just want to redo fitting.
 if ( ${gfc_refit} != "TRUE" ) then
-
-# Plot the ripped spectrum.
-   linplot "${gfc_infile} device=${gfc_graphdev}" mode=histogram \
-            style="Colour(curves)=1" >& /dev/null
 
 # Zoom if required.
    if ( ${gfc_gotzoom} == "ASK") then
       echo " "
       echo -n "Zoom in (yes/no): "
       set zoomit = $<
-   else if ( ${gfc_gotzoom} == "TRUE") then
+   else if ( ${gfc_gotzoom} == "TRUE" ) then
       set zoomit = "yes"
    else
       set zoomit = "no"
@@ -170,13 +174,13 @@ if ( ${gfc_refit} != "TRUE" ) then
       echo "      Zooming:"
       echo "        Lower Boundary: ${low_z}"
       echo "        Upper Boundary: ${upp_z}"
-   endif   
-endif
  
 # Replot the spectrum.
 # --------------------
-linplot ${gfc_infile} xleft=${low_z} xright=${upp_z} \
-        mode=histogram device=${gfc_graphdev} >& /dev/null
+      linplot ${gfc_infile} xleft=${low_z} xright=${upp_z} \
+              mode=histogram device=${gfc_graphdev} >& /dev/null
+   endif
+endif
 
 # Grab the information needed by the FITGAUSS routine.
 # ====================================================
