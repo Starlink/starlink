@@ -827,6 +827,8 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        Make class variables IgnoreUsed and MarkNew static.
 *     30-JUN-2008 (DSB):
 *        Improve efficiency of FindWcs.
+*     2-JUL-2008 (DSB):
+*        FitsSof now returns non-zero if the FitsChan is empty.
 *class--
 */
 
@@ -12378,12 +12380,12 @@ static int FitsSof( AstFitsChan *this ){
 *  Notes:
 *     - This function attempts to execute even if an error has already
 *     occurred.
-
+*     - A non-zero value is returned if the FitsChan is empty.
 *-
 */
 
 /* Return if no FitsChan was supplied, or if the FitsChan is empty. */
-   if ( !this || !this->head ) return 0;
+   if ( !this || !this->head ) return 1;
 
 /* If the current card is at the head of the linked list, it is the first
    card. */
