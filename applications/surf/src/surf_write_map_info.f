@@ -136,6 +136,8 @@
 *        - Write OBSGEO headers. Retain DATE-OBS.
 *        - Now writes merged fits chan from all input files
 *        - Export WCS back to caller so it can be written to extensions
+*     2008 July 2 (TIMJ):
+*        - fix so that merged header is written in PL mode
 *     {write_additional_history_here}
 
 *  Bugs:
@@ -351,6 +353,7 @@
       IF (OUT_COORDS  .EQ. 'PL') THEN
          CTYPE1 = 'RA---TAN'
          CTYPE2 = 'DEC--TAN'
+         OUT_EPOCH = SLA_EPJ( MJD_STANDARD )
       END IF
 
 *     and write out the same information to a .MORE.FITS section
@@ -574,23 +577,25 @@
 
       END IF
 
-*     Create the AST extension
+*     Create a Fits channel so that we can merge from the primary
+      CALL AST_BEGIN( STATUS )
 
-      IF (USEWCS) THEN
-         CALL AST_BEGIN( STATUS )
-
-*     Create a new fitschan from these new cards
-         FITSCHAN = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS)
-         DO ICARD = 1, N_FITS
-            CALL AST_PUTFITS( FITSCHAN, FITS( ICARD ), .FALSE., 
-     :           STATUS )
-         END DO
+*     Create a new fitschan from the crruently modified FITS cards array
+      FITSCHAN = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS)
+      DO ICARD = 1, N_FITS
+         CALL AST_PUTFITS( FITSCHAN, FITS( ICARD ), .FALSE., 
+     :        STATUS )
+      END DO
 
 *     Merge with the input fitschan giving priority to the newer
 *     header.
-         CALL ATL_MGFTS( 2, FITSCHANM, FITSCHAN, FTEMP, STATUS)
-         CALL AST_ANNUL( FITSCHAN, STATUS )
-         FITSCHAN = FTEMP
+      CALL ATL_MGFTS( 2, FITSCHANM, FITSCHAN, FTEMP, STATUS)
+      CALL AST_ANNUL( FITSCHAN, STATUS )
+      FITSCHAN = FTEMP
+
+*     Create the AST extension
+
+      IF (USEWCS) THEN
 
 *     Retain some keywords in the FITS header itself
          DO I = 1, NRETAIN
@@ -600,7 +605,6 @@
                CALL AST_RETAINFITS( FITSCHAN, STATUS )
             END IF
          END DO
-
          
 *     Rewind the FitsChan and read WCS information from it.
          CALL AST_CLEAR( FITSCHAN, 'Card', STATUS )
@@ -613,29 +617,28 @@
 *     Write the channel to the NDF
          CALL NDF_PTWCS( OUTWCS, OUT_NDF, STATUS )
 
-*     Now copy the remaining FITS keywords from the FITSCHAN
-*     back into the FITS array so that we can write them
-*     We do this so that the information in the WCS-AST structure
-*     is not duplicated by information in the FITS array
-*     This would lead to confusion
+*     Retain the WCS
+         CALL AST_EXPORT( OUTWCS, STATUS )
+      END IF
+
+*     Now copy the newly merged FITS keywords from the FITSCHAN
+*     back into the FITS array so that we can write them.
+*     WCS headers should have been stripped at this point.
 
 *     Rewind the FITSCHAN
-         CALL AST_CLEAR (FITSCHAN, 'Card', STATUS)
+      CALL AST_CLEAR (FITSCHAN, 'Card', STATUS)
 
 *     Loop over all fits cards and copy back into the FITS array
-         N_FITS = 0
-         DO WHILE (AST_FINDFITS( FITSCHAN, '%f', STEMP, .TRUE.,
-     :        STATUS))
-            N_FITS = N_FITS + 1
-            FITS(N_FITS) = STEMP
-         END DO
+      N_FITS = 0
+      DO WHILE (AST_FINDFITS( FITSCHAN, '%f', STEMP, .TRUE.,
+     :     STATUS))
+         N_FITS = N_FITS + 1
+         FITS(N_FITS) = STEMP
+      END DO
 
 *     Shut down AST
-         CALL AST_EXPORT( OUTWCS, STATUS )
-         CALL AST_ANNUL( FITSCHAN, STATUS )
-         CALL AST_END( STATUS )
-
-      END IF
+      CALL AST_ANNUL( FITSCHAN, STATUS )
+      CALL AST_END( STATUS )
 
 *     write out the FITS extension
 
