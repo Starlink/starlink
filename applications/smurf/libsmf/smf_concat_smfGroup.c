@@ -98,6 +98,8 @@
 *        -propagate time series WCS
 *     2008-06-24 (EC):
 *        Added ability to pad start and end of the data (padStart/padEnd)
+*     2008-07-03 (EC):
+*        Correct time origin in tswcs if padStart set.
 
 *  Notes:
 *     If projection information supplied, pointing LUT will not be
@@ -193,7 +195,9 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
   double steptime;              /* Length of a sample in seconds */
   dim_t tchunk;                 /* Time offset in concat. array this chunk */
   dim_t tend;                   /* Time at start of padded region */
+  AstFrame *tframe=NULL;        /* Pointer to TimeFrame */
   dim_t tlen;                   /* Time length entire concatenated array */
+  double torigin;               /* Origin of TimeFrame */
   dim_t tstart;                 /* Time at end of padded region */
   dim_t sz;                     /* Data type size */
 
@@ -659,7 +663,24 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
       /* Figure out the length of a sample in seconds */
       smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
       
-      /* Not yet implemented */ 
+      if( *status == SAI__OK ) {
+        /* Obtain pointer to TimeFrame */
+        tframe = astGetFrame( data->hdr->tswcs, AST__CURRENT );
+        
+        /* Subtract off padStart*steptime seconds from current TimeOrigin */
+        torigin = astGetD( tframe, "TimeOrigin" );
+        torigin -= padStart*steptime / (3600.*24.); /* Measured in days */
+        astSetD( tframe, "TimeOrigin", torigin );
+        tframe = astAnnul( tframe );
+        
+        /* Trap AST errors */
+        if( !astOK ) {
+          *status = SAI__ERROR;
+          errRep( FUNC_NAME, 
+                  "AST error correcting TimeOrigin in concatenated data.", 
+                  status );
+        }
+      }
     }
 
     /* Put this concatenated subarray into the smfArray */
