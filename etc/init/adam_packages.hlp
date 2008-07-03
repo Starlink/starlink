@@ -4,7 +4,8 @@ The following ADAM applications packages are available from Starlink:
 +ASTERIX - X-ray data analysis.         *CATPAC  - Catalogue applications.
  CCDPACK - CCD data reduction.          *CGS4DR  - CGS4 data reduction.
  CONVERT - Data format conversion.       DAOPHOT - Stellar photometry.
- ESP - Extended Surface Photometry.  EXTRACTOR - Astronomical source detection.
+ DATACUBE - Spectral-cube analysis.      ESP - Extended Surface Photometry.
+ EXTRACTOR - Astronomical source detection.
  FIGARO  - General data-reduction.       HDSTOOLS - HDS file editing   
  *IRAS90  - IRAS data analysis.         *IRCAMDR - IRCAM3 data reduction.       
  JCMTDR  - JCMT data reduction.          KAPPA   - Image processing.            
@@ -267,6 +268,37 @@ obtained with DAOPHOT to be displayed on an image device.
 
 DAOPHOT is normally run from the Unix shell, more details may be found 
 in SUN/42.
+
+1 DATACUBE
+
+DATACUBE is a collection of C-shell scripts layered on top of various 
+pieces of the Starlink Software Collection (SSC) for the analysis of
+spectral datacubes, such as from integral-field spectrometers.
+They permit graphical selection of spatial and spectral regions and 
+features using the cursor.
+
+DATACUBE provides facilities:
+  o  to view a `white-light' image of the whole and/or part of the 
+     spectral range (squash, passband); 
+  o  to view a grid of channel maps of defined spectral width (step); 
+  o  to extract individual spectra (ripper); 
+  o  to compare spectra (compare, stacker); 
+  o  to average and compare groups of spectra (multistack); 
+  o  to plot a grid of spectra with spatial averaging (gridspec)
+  o  to build a velocity map from an emission line by line
+     fitting (velmap) or by intensity-weighted moments (velmoment);
+  o  to build an emmision-line strength map (peakmap); and
+  o  to plot multiple spectra from a cube overlaying fitted baselines
+     and spectral feature mask (trendview).
+
+
+The C-Shell approach was a deliberate design decision.  One reason
+being the still-developing nature of the field makes it difficult to
+pin down exactly which visualisation tasks will be necessary, and the 
+choice of C-shell means that the existing scripts can be easily 
+modified by users to do exactly the job required using the wealth of
+existing applications.
+
 
 1 ESP
 

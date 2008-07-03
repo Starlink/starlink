@@ -34,6 +34,7 @@
 {    AJC: A J Chipperfield  (Starlink)
 {    BLY: M J Bly (Starlink, RAL)
 {    TIMJ: Tim Jenness (JAC, Hawaii)
+{    MJC: Malcolm J. Currie (Starlink, RAL)
 {
 {  History:
 {    12.09.1994 (AJC):
@@ -68,6 +69,8 @@
 {       Removed TWODSPEC definitions.
 {    21.08.2005 (TIMJ):
 {       Photom now uses photom.icl
+{    2008 July 2 (MJC):
+{       Added DATACUBE definitions.
 
 {  Display ICL Version
 VERSION
@@ -205,6 +208,16 @@ if file_exists("$DAOPHOT_DIR/daophot_init")
    defstring daophot print " DAOPHOT should be run from the shell"
 else
    defstring daophot notinstalled DAOPHOT
+endif
+
+{  DATACUBE
+defhelp datacube $ADAM_PACKAGES DATACUBE
+if file_exists("$DATACUBE_DIR/datacube.icl")
+   defstring datacube(start) load $DATACUBE_DIR/datacube.icl
+elseif file_exists("$DATACUBE_DIR/datacube.csh")
+   defstring datacube(start) notavailable DATACUBE
+else
+   defstring datacube(start) notinstalled DATACUBE
 endif
 
 {  ESP
