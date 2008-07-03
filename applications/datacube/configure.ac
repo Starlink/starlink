@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
  
 dnl    Initialisation: package name and version number
-AC_INIT(datacube, 1.1-1, ussc@star.rl.ac.uk)
+AC_INIT(datacube, 1.2, ussc@star.rl.ac.uk)
  
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -24,6 +24,7 @@ AC_PROG_LIBTOOL
 STAR_MONOLITHS
 
 STAR_CHECK_PROGS([hlib])
+STAR_CHECK_PROGS(prohlp,sst)
 
 dnl    Conditional compile for missing symbols on Mac OSX. Using this in
 dnl    an odd way, essentially to check whether we're on a Mac. If we are
