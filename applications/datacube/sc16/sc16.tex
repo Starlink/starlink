@@ -63,7 +63,9 @@
 \newcommand{\stardocnumber}    {16.2}
 \newcommand{\stardocauthors}   {A.~Allan \& Malcolm J. Currie}
 \newcommand{\stardocdate}      {2006 June 16}
+\newcommand{\stardocversion}   {Version 1.2}
 \newcommand{\stardoctitle}     {The IFU Data-Product Cookbook}
+\newcommand{\stardocmanual}    {}
 \newcommand{\stardocabstract}
 {This cookbook is a collection of material covering IFU data reduction and analysis. Along 
 with this material are pointers to more advanced documents dealing with the various packages,
@@ -170,6 +172,12 @@ and hints and tips about how to deal with commonly occurring problems.}
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+
+% Define commands for HTML-only or LaTeX-only text.
+\newcommand{\html}[1]{}
+\newcommand{\latex}[1]{#1}
+
+% Use latex2html 98.2.
 \newcommand{\latexhtml}[2]{#1}
 
 %  Starlink cross-references and labels.
@@ -182,7 +190,6 @@ and hints and tips about how to deal with commonly occurring problems.}
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\newcommand{\latex}[1]{#1}
 \newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
 \latex{\setunderscore}
 
@@ -195,7 +202,7 @@ and hints and tips about how to deal with commonly occurring problems.}
 % -----------------------------------------------------------------------------
 %  Debugging.
 %  =========
-%  Remove % on the following to debug links in the HTML version using Latex.
+%  Remove % from the following to debug links in the HTML version using Latex.
 
 % \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
 % \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
@@ -205,7 +212,7 @@ and hints and tips about how to deal with commonly occurring problems.}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
 %end{latexonly}
 % -----------------------------------------------------------------------------
-% ? Document specific \newcommand or \newenvironment commands.
+% ? Document-specific \newcommand or \newenvironment commands.
 
 % Figure environment. Defined for latex2html. #1 is postscript file
 % #2 the qualifiers, #3 the gif file, #4 the label, #5 the caption.
@@ -247,6 +254,7 @@ and hints and tips about how to deal with commonly occurring problems.}
    \vspace{5mm}
    \begin{center}
    {\Huge\bf  \stardoctitle \\ [2.5ex]}
+   {\LARGE\bf \stardocversion \\ [4ex]}
    \end{center}
    \vspace{5mm}
 
@@ -282,7 +290,7 @@ and hints and tips about how to deal with commonly occurring problems.}
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
@@ -306,8 +314,8 @@ and hints and tips about how to deal with commonly occurring problems.}
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
-%  \htmladdtonavigation{\htmlref{\htmladdimg{sc15_cover.gif}}
+  \newcommand{\latexonlytoc}[0]{}
+%  \htmladdtonavigation{\htmlref{\htmladdimg{sc16_cover.gif}}
 %        {stardoccontents}}
 
 % ? New section for abstract if used.
@@ -408,8 +416,8 @@ and hints and tips about how to deal with commonly occurring problems.}
  \vspace{10cm}
  \copyright \underline{1999-2001} Starlink, CCLRC
 
- \cleardoublepage
  \begin{latexonly}
+   \cleardoublepage
    \setlength{\parskip}{0mm}
    \latexonlytoc
 
@@ -423,7 +431,7 @@ and hints and tips about how to deal with commonly occurring problems.}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
 
-\cleardoublepage
+\latex{\cleardoublepage}
 \newpage
 \renewcommand{\thepage}{\arabic{page}}
 \setcounter{page}{1}
