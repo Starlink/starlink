@@ -4,7 +4,7 @@
 #     datacube.sh
 #
 #  Purpose:
-#     Start the DATACUBE system from sh shell.
+#     Starts the DATACUBE system from sh shell.
 #
 #  Type of Module:
 #     sh shell script.
@@ -13,9 +13,28 @@
 #     source datacube.sh
 #
 #  Description:
-#     This procedure defines the aliases needed to run 
-#     each application monolith.
+#     This procedure defines the aliases needed to run each application monolith.
 #
+#  Copyright:
+#     Copyright (C) 2000-2005 Central Laboratory of the Research Councils.
+#     Copyright (C) 2008 Science & Technology Facilities Council. 
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either Version 2 of
+#     the License, or (at your option) any later version.
+#
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+#     02111-1307, USA.
 #
 #  Authors:
 #     BLY: M.J.Bly (Starlink, RAL)
@@ -67,10 +86,10 @@
 #        Add maths and setunits definitions.
 #     2006 August 30 (BC):
 #        Adapted from datacube.csh.in.
+#     2008 June 30 (MJC):
+#        Add settype, sub, and trendview definitions.
 #     {enter_further_changes_here}
 #
-#  Copyright:
-#     Copyright (C) 2000-2006 Central Laboratory of the Research Councils
 #-
 #
 
@@ -93,6 +112,8 @@ stacker () {         csh ${DATACUBE_DIR}/stacker.csh ${1+"$@"}; }
 dat_stacker () {     csh ${DATACUBE_DIR}/stacker.csh ${1+"$@"}; }
 step () {            csh ${DATACUBE_DIR}/step.csh ${1+"$@"}; }
 dat_step () {        csh ${DATACUBE_DIR}/step.csh ${1+"$@"}; }
+trendview () {       csh ${DATACUBE_DIR}/trendview.csh ${1+"$@"}; }
+dat_trendview () {   csh ${DATACUBE_DIR}/trendview.csh ${1+"$@"}; }
 velmap () {          csh ${DATACUBE_DIR}/velmap.csh ${1+"$@"}; }
 dat_velmap () {      csh ${DATACUBE_DIR}/velmap.csh ${1+"$@"}; }
 velmoment () {       csh ${DATACUBE_DIR}/velmoment.csh ${1+"$@"}; }
@@ -122,7 +143,7 @@ linplot () {         ${KAPPA_DIR}/linplot  ${1+"$@"}; }
 lutcol () {          ${KAPPA_DIR}/lutable mapping=linear coltab=colour ${1+"$@"}; }
 lutgrey () {         ${KAPPA_DIR}/lutable mapping=linear coltab=grey ${1+"$@"}; }
 lutspec () {         ${KAPPA_DIR}/lutable mapping=linear coltab=external lut=$KAPPA_DIR/spectrum_lut ${1+"$@"}; }
-maths () {         ${KAPPA_DIR}/maths ${1+"$@"}; }
+maths () {           ${KAPPA_DIR}/maths ${1+"$@"}; }
 ndfcopy () {         ${KAPPA_DIR}/ndfcopy ${1+"$@"}; }
 ndftrace () {        ${KAPPA_DIR}/ndftrace ${1+"$@"}; }
 paldef () {          ${KAPPA_DIR}/paldef ${1+"$@"}; }
@@ -135,8 +156,10 @@ setaxis () {         ${KAPPA_DIR}/setaxis ${1+"$@"}; }
 setorigin () {       ${KAPPA_DIR}/setorigin ${1+"$@"}; }
 setmagic () {        ${KAPPA_DIR}/setmagic ${1+"$@"}; }
 settitle () {        ${KAPPA_DIR}/settitle ${1+"$@"}; }
+settype () {         ${KAPPA_DIR}/settype ${1+"$@"}; }
 setunits () {        ${KAPPA_DIR}/settitle ${1+"$@"}; }
 stats () {           ${KAPPA_DIR}/stats ${1+"$@"}; }
+sub () {             ${KAPPA_DIR}/sub ${1+"$@"}; }
 wcsadd () {          ${KAPPA_DIR}/wcsadd ${1+"$@"}; }
 wcsattrib () {       ${KAPPA_DIR}/wcsattrib ${1+"$@"}; }
 wcscopy () {         ${KAPPA_DIR}/wcscopy ${1+"$@"}; }

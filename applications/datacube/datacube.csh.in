@@ -4,7 +4,7 @@
 #     datacube.csh
 #
 #  Purpose:
-#     Start the DATACUBE system from Unix shell.
+#     Starts the DATACUBE system from Unix shell.
 #
 #  Type of Module:
 #     C shell script.
@@ -13,10 +13,29 @@
 #     source datacube.csh
 #
 #  Description:
-#     This procedure defines the aliases needed to run 
-#     each application monolith.
+#     This procedure defines the aliases needed to run each application monolith.
 #
+#  Copyright:
+#     Copyright (C) 2000-2005 Central Laboratory of the Research Councils.
+#     Copyright (C) 2008 Science & Technology Facilities Council. 
+#     All Rights Reserved.
+
+#  Licence:
+#     This program is free software; you can redistribute it and/or
+#     modify it under the terms of the GNU General Public License as
+#     published by the Free Software Foundation; either Version 2 of
+#     the License, or (at your option) any later version.
 #
+#     This program is distributed in the hope that it will be
+#     useful, but WITHOUT ANY WARRANTY; without even the implied
+#     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#     PURPOSE. See the GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software
+#     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+#     02111-1307, USA.
+
 #  Authors:
 #     BLY: M.J.Bly (Starlink, RAL)
 #     PDRAPER: Peter W. Draper (Starlink, Durham University)
@@ -64,10 +83,10 @@
 #        Add lutspec definition.
 #     2006 March 22 (MJC):
 #        Add maths and setunits definitions.
+#     2008 June 30 (MJC):
+#        Add settype, sub, and trendview definitions.
 #     {enter_further_changes_here}
 #
-#  Copyright:
-#     Copyright (C) 2000-2005 Central Laboratory of the Research Councils
 #-
 #
 
@@ -90,6 +109,8 @@ alias stacker         source ${DATACUBE_DIR}/stacker.csh
 alias dat_stacker     source ${DATACUBE_DIR}/stacker.csh
 alias step            source ${DATACUBE_DIR}/step.csh
 alias dat_step        source ${DATACUBE_DIR}/step.csh
+alias trendview       source ${DATACUBE_DIR}/trendview.csh
+alias dat_trendview   source ${DATACUBE_DIR}/trendview.csh
 alias velmap          source ${DATACUBE_DIR}/velmap.csh
 alias dat_velmap      source ${DATACUBE_DIR}/velmap.csh
 alias velmoment       source ${DATACUBE_DIR}/velmoment.csh
@@ -119,7 +140,7 @@ alias linplot         ${KAPPA_DIR}/linplot
 alias lutcol          ${KAPPA_DIR}/lutable mapping=linear coltab=colour
 alias lutgrey         ${KAPPA_DIR}/lutable mapping=linear coltab=grey
 alias lutspec         ${KAPPA_DIR}/lutable mapping=linear coltab=external lut=$KAPPA_DIR/spectrum_lut
-alias maths         ${KAPPA_DIR}/maths
+alias maths           ${KAPPA_DIR}/maths
 alias ndfcopy         ${KAPPA_DIR}/ndfcopy
 alias ndftrace        ${KAPPA_DIR}/ndftrace
 alias paldef          ${KAPPA_DIR}/paldef
@@ -132,8 +153,10 @@ alias setaxis         ${KAPPA_DIR}/setaxis
 alias setorigin       ${KAPPA_DIR}/setorigin
 alias setmagic        ${KAPPA_DIR}/setmagic
 alias settitle        ${KAPPA_DIR}/settitle
+alias settype         ${KAPPA_DIR}/settype
 alias setunits        ${KAPPA_DIR}/settitle
 alias stats           ${KAPPA_DIR}/stats
+alias sub             ${KAPPA_DIR}/sub
 alias wcsadd          ${KAPPA_DIR}/wcsadd
 alias wcsattrib       ${KAPPA_DIR}/wcsattrib
 alias wcscopy         ${KAPPA_DIR}/wcscopy
