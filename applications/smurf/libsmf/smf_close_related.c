@@ -95,7 +95,7 @@ void smf_close_related ( smfArray **relfiles, int *status ) {
 
   /* Local variables */
   int i;                    /* Loop counter */
-  int nrelated;             /* Number of related files */
+  dim_t nrelated;           /* Number of related files */
   smfData *data;            /* Current smfData */
 
   /* Always attempt to free resources regardless of status */
