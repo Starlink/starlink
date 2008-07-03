@@ -10,7 +10,7 @@
 #     C-shell script.
 #
 #  Usage:
-#     compare
+#     compare [-i filename]
 #
 #  Description:
 #     This shell script reads a three-dimensional IFU NDF as input and
