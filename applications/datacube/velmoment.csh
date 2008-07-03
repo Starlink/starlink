@@ -120,7 +120,7 @@
 #       the velocity map.  Retain any supplied spectral-axis section
 #       if a spatial region is selected by cursor.  Corrected the logic
 #       when deciding whether or not to create a new SpecFrame. 
-#     {enter_further changes_here}
+#     {enter_further_changes_here}
 #
 #  Copyright:
 #     Copyright (C) 2000-2006 Central Laboratory of the Research Councils

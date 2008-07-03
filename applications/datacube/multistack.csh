@@ -79,7 +79,7 @@
 #       spectra fully regardless of the offsets.  Also allow a 2-percent 
 #       margin at the top and bottom of the plot to separate the spectra 
 #       from the axes.
-#     {enter_further changes_here}
+#     {enter_further_changes_here}
 #
 #  Copyright:
 #     Copyright (C) 2000-2006 Central Laboratory of the Research Councils
