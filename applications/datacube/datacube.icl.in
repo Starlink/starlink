@@ -1,16 +1,146 @@
+{+
+{  Name:
+{     datacube.icl
 {
-{             DATACUBE UNIX ICL startup file
+{  Purpose:
+{     Starts the DATACUBE system from ICL.
 {
-{  Define commands to run the DATACUBE software
+{  Type of Module:
+{     ICL script.
 {
-define ripper        $DATACUBE_DIR/ripper.csh
-defhelp ripper       $DATACUBE_HELP
+{  Usage:
+{     source datacube.csh
+{
+{  Description:
+{     This procedure defines the aliases needed to run each application monolith.
+{
+{  Copyright:
+{     Copyright (C) 2000-2005 Central Laboratory of the Research Councils.
+{     Copyright (C) 2008 Science & Technology Facilities Council. 
+{     All Rights Reserved.
+
+{  Licence:
+{     This program is free software; you can redistribute it and/or
+{     modify it under the terms of the GNU General Public License as
+{     published by the Free Software Foundation; either Version 2 of
+{     the License, or (at your option) any later version.
+{
+{     This program is distributed in the hope that it will be
+{     useful, but WITHOUT ANY WARRANTY; without even the implied
+{     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+{     PURPOSE. See the GNU General Public License for more details.
+{
+{     You should have received a copy of the GNU General Public License
+{     along with this program; if not, write to the Free Software
+{     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+{     02111-1307, USA.
+
+{  Authors:
+{     AALLAN: Alasdair Allan (Starlink, Keele University)
+{     MJC: Malcolm J. Currie (Starlink, RAL)
+{     {enter_new_authors_here}
+
+{  History:
+{     2000 (AALLAN):
+{        Original incompleteversion.
+{     2008 June 30 (MJC):
+{        Add the prolgoue, and all the defintions (except ripper that was 
+{        already present).
+{     {enter_further_changes_here}
+
+{
+{-
+
+{  Define commands to run the DATACUBE software.  Actually
+{  runs from the shell.
+{
+defstring compare     ! ${DATACUBE_DIR}/compare.csh
+defstring gridspec    ! ${DATACUBE_DIR}/gridspec.csh
+defstring multistack  ! ${DATACUBE_DIR}/multistack.csh
+defstring passband    ! ${DATACUBE_DIR}/passband.csh
+defstring peakmap     ! ${DATACUBE_DIR}/peakmap.csh
+defstring ripper      ! ${DATACUBE_DIR}/ripper.csh
+defstring squash      ! ${DATACUBE_DIR}/squash.csh
+defstring stacker     ! ${DATACUBE_DIR}/stacker.csh
+defstring step        ! ${DATACUBE_DIR}/step.csh
+defstring trendview   ! ${DATACUBE_DIR}/trendview.csh
+defstring velmap      ! ${DATACUBE_DIR}/velmap.csh
+defstring velmoment   ! ${DATACUBE_DIR}/velmoment.csh
+
+defhelp compare       $DATACUBE_HELP
+defhelp gridspec      $DATACUBE_HELP
+defhelp multistack    $DATACUBE_HELP
+defhelp passband      $DATACUBE_HELP
+defhelp peakmap       $DATACUBE_HELP
+defhelp ripper        $DATACUBE_HELP
+defhelp squash        $DATACUBE_HELP
+defhelp stacker       $DATACUBE_HELP
+defhelp step          $DATACUBE_HELP
+defhelp trendview     $DATACUBE_HELP
+defhelp velmap        $DATACUBE_HELP
+defhelp velmoment     $DATACUBE_HELP
+
+{  Define commands for scripts dependant on XDialog an GTK+
+defstring xcompare       ${DATACUBE_DIR}/compare_x.csh
+
+{  Define alias for the DATACUBE test script.
+defstring datacube_demo  ${DATACUBE_DIR}/datacube_demo.csh
+defstring datacube_test  ${DATACUBE_DIR}/datacube_demo.csh
+
+{  Define commands for external applications used by the scripts.
+define add            ${KAPPA_DIR}/add
+define calc           ${KAPPA_DIR}/calc
+define cadd           ${KAPPA_DIR}/cadd
+define cdiv           ${KAPPA_DIR}/cdiv 
+define chpix          ${KAPPA_DIR}/chpix
+define collapse       ${KAPPA_DIR}/collapse
+define clinplot       ${KAPPA_DIR}/clinplot
+define compave        ${KAPPA_DIR}/compave
+define contour        ${KAPPA_DIR}/contour
+define cursor         ${KAPPA_DIR}/cursor
+define display        ${KAPPA_DIR}/display 
+define gdclear        ${KAPPA_DIR}/gdclear
+define linplot        ${KAPPA_DIR}/linplot 
+defstring lutcol      ${KAPPA_DIR}/lutable mapping=linear coltab=colour
+defstring lutgrey     ${KAPPA_DIR}/lutable mapping=linear coltab=grey
+defstring lutspec     ${KAPPA_DIR}/lutable mapping=linear coltab=external lut=$KAPPA_DIR/spectrum_lut
+define maths          ${KAPPA_DIR}/maths
+define ndfcopy        ${KAPPA_DIR}/ndfcopy
+define ndftrace       ${KAPPA_DIR}/ndftrace
+define paldef         ${KAPPA_DIR}/paldef
+define parget         ${KAPPA_DIR}/parget
+defstring picbase     ${KAPPA_DIR}/piclist picnum=1
+define picdef         ${KAPPA_DIR}/picdef
+define piclabel       ${KAPPA_DIR}/piclabel
+define picsel         ${KAPPA_DIR}/picsel
+define setaxis        ${KAPPA_DIR}/setaxis
+define setorigin      ${KAPPA_DIR}/setorigin
+define setmagic       ${KAPPA_DIR}/setmagic
+define settitle       ${KAPPA_DIR}/settitle
+define settype        ${KAPPA_DIR}/settype
+define setunits       ${KAPPA_DIR}/settitle
+define stats          ${KAPPA_DIR}/stats
+define sub            ${KAPPA_DIR}/sub
+define wcsadd         ${KAPPA_DIR}/wcsadd
+define wcsattrib      ${KAPPA_DIR}/wcsattrib
+define wcscopy        ${KAPPA_DIR}/wcscopy
+define wcsframe       ${KAPPA_DIR}/wcsframe
+define wcstran        ${KAPPA_DIR}/wcstran
+
+define fitgauss       ${FIG_DIR}/fitgauss
+define specplot       ${FIG_DIR}/specplot
+
+define ascii2ndf      ${CONVERT_DIR}/ascii2ndf
 
 {
 { Print welcome message
 {
 print " "
-print "   DATACUBE commands are now available - (Version @PACKAGE_VERSION@)"
+print "   DATACUBE applications are now available -- (Version @PACKAGE_VERSION@)"
+print "    Support is available by emailing datacube@star.rl.ac.uk"
 print " "
 print "   For help use the command 'help datacube'"
+print "   Type 'showme sun237' to browse the hypertext documentation"
+print "   or 'showme sc16' to consult the IFU data product cookbook."
 print " "
+
