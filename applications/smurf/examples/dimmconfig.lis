@@ -41,6 +41,10 @@ maxlen = 0
 # ----------------------------------------------------------------------------
 # The following are for data cleaning. 
 
+# Number of samples of padding to add to start and end before filtering
+#padstart = 1000
+#padend = 1000
+
 # fraction of samples to be bad to flag entire bolo as dead
 badfrac = 0.05
 

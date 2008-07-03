@@ -152,6 +152,8 @@
 *     2008-06-12 (EC)
 *        - renamed smf_model_NDFexport smf_NDFexport
 *        - added edge and notch frequency-domain filters
+*     2008-07-03 (EC)
+*        - Added padstart/padend to config files
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -225,7 +227,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   int converged=0;              /* Has stopping criteria been met? */
   smfDIMMData dat;              /* Struct passed around to model components */
   smfData *data=NULL;           /* Temporary smfData pointer */
-  int dcbox;                    /* Box size for fixing DC steps */
+  dim_t dcbox;                  /* Box size for fixing DC steps */
   double dcthresh;              /* Threshold for fixing DC steps */
   int dimmflags;                /* Control flags for DIMM model components */
   int dofft=0;                  /* Set if freq. domain filtering the data */
@@ -256,7 +258,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   dim_t maxconcat;              /* Longest continuous chunk length in samples*/
   int maxiter=0;                /* Maximum number of iterations */
   dim_t maxlen;                 /* Max chunk length in samples */
-  double maxlen_s;              /* Max chunk length in seconds */  
   int memiter=0;                /* If set iterate completely in memory */
   size_t memneeded;             /* Memory required for map-maker */
   smfArray ***model=NULL;       /* Array of pointers smfArrays for ea. model */
@@ -269,6 +270,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   size_t ncontchunks=0;         /* Number continuous chunks outside iter loop*/
   dim_t nmodels=0;              /* Number of model components / iteration */
   int numiter;                  /* Total number iterations */
+  dim_t padEnd=0;               /* How many samples of padding at the end */
+  dim_t padStart=0;             /* How many samples of padding at the start */
   size_t pass;                  /* Two pass parsing of MODELORDER */
   smfArray **qua=NULL;          /* Quality flags for each file */
   unsigned char *qua_data=NULL; /* Pointer to DATA component of qua */
@@ -278,10 +281,10 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   smfArray **res=NULL;          /* Residual signal */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   smfGroup *resgroup=NULL;      /* smfGroup of model residual files */
-  unsigned int spikeiter;       /* Number of iterations for spike detection */
-  int spikeiter_s;              /* signed version of spikeiter */
+  size_t spikeiter;             /* Number of iterations for spike detection */
   double spikethresh;           /* Threshold for spike detection */
   double steptime;              /* Length of a sample in seconds */
+  int temp;                     /* temporary signed integer */
   unsigned int *thishits=NULL;  /* Pointer to this hits map */
   double *thismap=NULL;         /* Pointer to this map */
   smf_modeltype thismodel;      /* Type of current model */
@@ -395,7 +398,14 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       dcthresh = 0;
     }
 
-    if( !astMapGet0I( keymap, "DCBOX", &dcbox ) ) {
+    if( astMapGet0I( keymap, "DCBOX", &temp ) ) {
+      if( temp < 0 ) {
+	*status = SAI__ERROR;
+	errRep(FUNC_NAME, "dcbox cannot be < 0.", status );
+      } else {
+	dcbox = (dim_t) temp;
+      }
+    } else {
       dcbox = 0;
     }
 
@@ -407,12 +417,12 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
       spikethresh = 0;
     }
 
-    if( astMapGet0I( keymap, "SPIKEITER", &spikeiter_s ) ) {
-      if( spikeiter_s < 0 ) {
+    if( astMapGet0I( keymap, "SPIKEITER", &temp ) ) {
+      if( temp < 0 ) {
 	*status = SAI__ERROR;
 	errRep(FUNC_NAME, "spikeiter cannot be < 0.", status );
       } else {
-	spikeiter = (unsigned int) spikeiter_s;
+	spikeiter = (size_t) temp;
       }
     } else {
       spikeiter = 0;
@@ -443,20 +453,23 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     if( f_nnotch ) {
       /* Number of upper and lower edges must match */
       if( f_nnotch != f_nnotch2 ) {
-        f_nnotch = 0;
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, 
+               "Elements in FILT_NOTCHHIGH != number in FILT_NOTCHLOW", 
+               status);      
       } else {
         dofft = 1;
       }
     }
 
     /* Maximum length of a continuous chunk */
-    if( astMapGet0D( keymap, "MAXLEN", &maxlen_s ) ) {
+    if( astMapGet0D( keymap, "MAXLEN", &temp ) ) {
 
-      if( maxlen_s < 0 ) {
+      if( temp < 0 ) {
 	/* Trap negative MAXLEN */
 	*status = SAI__ERROR;
 	errRep(FUNC_NAME, "Negative value for MAXLEN supplied.", status);
-      } else if( maxlen_s == 0 ) {
+      } else if( temp == 0 ) {
 	/* 0 is OK... gets ignored later */
 	maxlen = 0;
       } else {
@@ -466,7 +479,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	  smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
 
 	  if( steptime > 0 ) {
-	    maxlen = (dim_t) (maxlen_s / (double) steptime);
+	    maxlen = (dim_t) (temp / (double) steptime);
 	  } else {
 	    /* Trap invalud sample length in header */
 	    *status = SAI__ERROR;
@@ -478,6 +491,30 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
     } else {
       maxlen = 0;
+    }
+
+    /* Padding */
+
+    if( astMapGet0I( keymap, "PADSTART", &temp ) ) {
+      if( temp < 0 ) {
+	*status = SAI__ERROR;
+	errRep(FUNC_NAME, "PADSTART cannot be < 0.", status );
+      } else {
+	padStart = (dim_t) temp;
+      }
+    } else {
+      padStart = 0;
+    }
+
+    if( astMapGet0I( keymap, "PADEND", &temp ) ) {
+      if( temp < 0 ) {
+	*status = SAI__ERROR;
+	errRep(FUNC_NAME, "PADEND cannot be < 0.", status );
+      } else {
+	padEnd = (dim_t) temp;
+      }
+    } else {
+      padEnd = 0;
     }
 
     /* Type and order of models to fit from MODELORDER keyword */
@@ -708,8 +745,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
 	/* Concatenate (no variance since we calculate it ourselves -- NOI) */
 	smf_concat_smfGroup( igroup, contchunk, 0, outfset, moving, lbnd_out, 
-			     ubnd_out, 0, 0, SMF__NOCREATE_VARIANCE, 
-                             &res[0], status );
+			     ubnd_out, padStart, padEnd, 
+                             SMF__NOCREATE_VARIANCE, &res[0], status );
       } 
     }
     
@@ -816,7 +853,6 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	}
       }
     }
-
  
     /* Start the main iteration loop */
     if( *status == SAI__OK ) {
