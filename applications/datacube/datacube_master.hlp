@@ -1,0 +1,13 @@
+0 Help
+
+ Welcome to the DATACUBE online help system.  DATACUBE is a package 
+ for analysing NDF spectral datacubes.  Here you can display details 
+ about specific DATACUBE commands.  Hypertext documentation is also
+ available by entering "showme sun237".  Illustrated tutorial 
+ information is available in a cookbook accessed by the command
+ "showme sc/16".
+  
+ For more general information, such as using this help system, 
+ consult SUN/95.  This can be most easily done using the command 
+ "showme sun95".
+
