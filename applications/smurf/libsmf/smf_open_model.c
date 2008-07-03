@@ -102,15 +102,15 @@
 
 #define FUNC_NAME "smf_open_model"
 
-void smf_open_model( const Grp *igrp, int index, const char *mode, smfData **data,
-		     int *status ) {
+void smf_open_model( const Grp *igrp, int index, const char *mode, 
+                     smfData **data, int *status ) {
   
   void *buf=NULL;               /* Pointer to total container buffer */
   size_t datalen=0;             /* Size of data buffer in bytes */
   int fd=0;                     /* File descriptor */
   smfData head;                 /* Header for the file */
   size_t headlen=0;             /* Size of header in bytes */ 
-  dim_t i;                      /* Loop counter */
+  int i;                        /* Loop counter */
   int mflags=0;                 /* bit flags for mmap */
   char name[GRP__SZNAM+1];      /* Name of container file */
   size_t ndata=0;               /* Number of elements in data array */

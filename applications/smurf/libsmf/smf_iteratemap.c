@@ -221,7 +221,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   int baseorder;                /* Order of poly for baseline fitting */
   double *chisquared=NULL;      /* chisquared for each chunk each iter */
   double chitol=0;              /* chisquared change tolerance for stopping */
-  int contchunk;                /* Which chunk in outer loop */
+  size_t contchunk;             /* Which chunk in outer loop */
   int converged=0;              /* Has stopping criteria been met? */
   smfDIMMData dat;              /* Struct passed around to model components */
   smfData *data=NULL;           /* Temporary smfData pointer */
@@ -242,7 +242,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   int havenoi;                  /* Set if NOI is one of the models */
   smfHead *hdr=NULL;            /* Pointer to smfHead */
   dim_t i;                      /* Loop counter */
-  int idx=0;                    /* index within subgroup */
+  dim_t idx=0;                  /* index within subgroup */
   smfGroup *igroup=NULL;        /* smfGroup corresponding to igrp */
   int iter;                     /* Iteration number */
   int isize;                    /* Number of files in input group */
@@ -264,9 +264,9 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   smf_modeltype *modeltyps=NULL;/* Array of model types */
   char modelname[4];            /* Name of current model component */
   smf_calcmodelptr modelptr=NULL; /* Pointer to current model calc function */
-  int msize;                    /* Number of elements in map */
-  int nchunks=0;                /* Number of chunks within iteration loop */
-  int ncontchunks=0;            /* Number continuous chunks outside iter loop*/
+  dim_t msize;                  /* Number of elements in map */
+  dim_t nchunks=0;              /* Number of chunks within iteration loop */
+  size_t ncontchunks=0;         /* Number continuous chunks outside iter loop*/
   dim_t nmodels=0;              /* Number of model components / iteration */
   int numiter;                  /* Total number iterations */
   size_t pass;                  /* Two pass parsing of MODELORDER */
@@ -298,7 +298,18 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   if (*status != SAI__OK) return;
 
   /* Calculate number of elements in the map */
-  msize = (ubnd_out[0]-lbnd_out[0]+1)*(ubnd_out[1]-lbnd_out[1]+1);
+  if( (ubnd_out[0]-lbnd_out[0] < 0) || (ubnd_out[1]-lbnd_out[1] < 0) ) {
+    *status = SAI__ERROR;
+    msgSeti("L0",lbnd_out[0]);
+    msgSeti("L1",lbnd_out[1]);
+    msgSeti("U0",ubnd_out[0]);
+    msgSeti("U1",ubnd_out[1]);
+    errRep(FUNC_NAME, "Invalid mapbounds: LBND=[^L0,^L1] UBND=[^U0,^U1]", 
+           status);      
+  }
+
+  msize = (dim_t) (ubnd_out[0]-lbnd_out[0]+1) * 
+    (dim_t) (ubnd_out[1]-lbnd_out[1]+1);
 
   /* Get size of the input group */
   grpGrpsz( igrp, &isize, status );
@@ -313,7 +324,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
     if( numiter == 0 ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "SMF_ITERATEMAP: NUMITER cannot be 0", status);      
+      errRep(FUNC_NAME, "NUMITER cannot be 0", status);      
     } else {
       if( numiter < 0 ) {
 	/* If negative, iterate to convergence or abs(numiter), whichever comes
@@ -742,7 +753,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 			  memiter, qua, status );
 
 	/* Since a copy of the LUT is still open in res[0] free it up here */
-	for( i=0; i<(dim_t)res[0]->ndat; i++ ) {
+	for( i=0; i<res[0]->ndat; i++ ) {
 	  if( res[0]->sdata[i] ) {
 	    smf_close_mapcoord( res[0]->sdata[i], status );
 	  }
@@ -847,7 +858,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	  converged = 0;
 	}
 
-	for( i=0; i<(dim_t)nchunks; i++ ) {
+	for( i=0; i<nchunks; i++ ) {
 	  if( !memiter ) {
 	    msgSeti("CHUNK", i+1);
 	    msgSeti("NUMCHUNK", nchunks);
@@ -1013,7 +1024,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 		rebinflags = rebinflags | AST__REBININIT;
 	      }
 	    
-	      if( (i == (dim_t)nchunks-1) && (idx == res[i]->ndat-1) ) {
+	      if( (i == nchunks-1) && (idx == res[i]->ndat-1) ) {
 		/* Final call to rebin re-normalizes */
 		rebinflags = rebinflags | AST__REBINEND;
 	      }
@@ -1075,7 +1086,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	if( *status == SAI__OK ) {
 	  msgOut(" ", "SMF_ITERATEMAP: Calculate ast", status);
 
-	  for( i=0; i<(dim_t)nchunks; i++ ) {
+	  for( i=0; i<nchunks; i++ ) {
 
 	    /* Open files if memiter not set - otherwise they are still open
 	       from earlier call */
@@ -1161,7 +1172,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	msgOut(" ", "SMF_ITERATEMAP: Export model components to NDF files.", 
 	       status);
       
-	for( i=0; i<(dim_t)nchunks; i++ ) {  /* Chunk loop */
+	for( i=0; i<nchunks; i++ ) {  /* Chunk loop */
 	  msgSeti("CHUNK", i+1);
 	  msgSeti("NUMCHUNK", nchunks);
 	  msgOutif(MSG__VERB," ", "  Chunk ^CHUNK / ^NUMCHUNK", status);
@@ -1302,28 +1313,28 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 
     /* fixed model smfArrays */
     if( res ) {
-      for( i=0; i<(dim_t)nchunks; i++ ) {
+      for( i=0; i<nchunks; i++ ) {
 	if( res[i] ) smf_close_related( &res[i], status );
       }
       res = smf_free( res, status );
     }
 
     if( ast ) {
-      for( i=0; i<(dim_t)nchunks; i++ ) {
+      for( i=0; i<nchunks; i++ ) {
 	if( ast[i] ) smf_close_related( &ast[i], status );
       }
       ast = smf_free( ast, status );
     }
 
     if( lut ) {
-      for( i=0; i<(dim_t)nchunks; i++ ) {
+      for( i=0; i<nchunks; i++ ) {
 	if( lut[i] ) smf_close_related( &lut[i], status );
       }
       lut = smf_free( lut, status );
     }
   
     if( qua ) {
-      for( i=0; i<(dim_t)nchunks; i++ ) {
+      for( i=0; i<nchunks; i++ ) {
 	if( qua[i] ) smf_close_related( &qua[i], status );
       }
       qua = smf_free( qua, status );
@@ -1343,7 +1354,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     if( model ) {
       for( i=0; i<nmodels; i++ ) {
 	if( model[i] ) {
-	  for( j=0; j<(dim_t)nchunks; j++ ) {
+	  for( j=0; j<nchunks; j++ ) {
 	    /* Close each model component smfArray at each time chunk */
 	    if( model[i][j] ) 
 	      smf_close_related( &(model[i][j]), status );

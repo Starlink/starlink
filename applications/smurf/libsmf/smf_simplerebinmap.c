@@ -14,10 +14,10 @@
 
 *  Invocation:
 *     smf_simplerebinmap( double *data, double *variance, int *lut, 
-*                         unsigned char *qual, unsigned char mask, int
-*                         dsize, int sampvar, int flags, double *map,
+*                         unsigned char *qual, unsigned char mask,
+*                         dim_t dsize, int sampvar, int flags, double *map,
 *                         double *mapweight, unsigned int *hitsmap,
-*                         double *mapvar, int msize, int *status ) {
+*                         double *mapvar, dim_t msize, int *status ) {
 
 *  Arguments:
 *     data = double* (Given)
@@ -33,7 +33,7 @@
 *     mask = unsigned char (Given)
 *        Use with qual to define which bits in quality are relevant to
 *        ignore data in the calculation.
-*     dsize = int (Given)
+*     dsize = dim_t (Given)
 *        Number of elements in data stream
 *     int sampvar (Given)
 *        If set, calculate mapvar from the (weighted) sample variance of data
@@ -49,7 +49,7 @@
 *        Number of samples that land in a pixel.
 *     mapvar = double* (Returned)
 *        Variance of each pixel in map 
-*     msize = int (Given)
+*     msize = dim_t (Given)
 *        Number of pixels in map
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -76,6 +76,8 @@
 *        Added sample variance calculation 
 *     2008-04-29 (EC):
 *        Flag map/weight/variance pixels with < SMF__MINSTATSAMP hits as bad
+*     2008-07-03 (EC):
+*        Use dim_t for dsize/msize
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -124,14 +126,13 @@
 #define FUNC_NAME "smf_simplerebin"
 
 void smf_simplerebinmap( double *data, double *variance, int *lut, 
-			 unsigned char *qual, unsigned char mask, int dsize, 
+			 unsigned char *qual, unsigned char mask, dim_t dsize, 
 			 int sampvar, int flags, double *map, 
 			 double *mapweight, unsigned int *hitsmap, 
-			 double *mapvar, int msize, int *status ) {
+			 double *mapvar, dim_t msize, int *status ) {
 
   /* Local Variables */
   dim_t i;                   /* Loop counter */
-  double temp;               /* Temporary variable */
   double thisweight;         /* The weight at this point */
 
   /* Main routine */

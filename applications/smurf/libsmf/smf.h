@@ -326,6 +326,11 @@
 *        -Renamed smf_model_NDFexport to smf_NDFexport
 *     2008-06-24 (EC):
 *        Added padStart & padEnd to smf_concat_smfGroup
+*     2008-07-03 (EC):
+*        Switched to using dim_t in a number of function interfaces:
+*        smf_calc_stats, smf_construct_smfGroup, smf_model_create,
+*        smf_open_related, smf_simplerebinmap, smf_open_related_model,
+*        smf_simpleaddmap
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -378,8 +383,8 @@ void smf_boxcar1 ( double *series, const size_t ninpts, size_t window,
 		   unsigned char *qual, unsigned char mask, 
 		   int *status);
 
-void smf_calc_stats( const smfData *data, const char *mode, const int index,
-                     int lo, int hi, double *mean, double *sigma, 
+void smf_calc_stats( const smfData *data, const char *mode, const dim_t index,
+                     dim_t lo, dim_t hi, double *mean, double *sigma, 
 		     int *status);
 
 double smf_calc_covar ( const smfData *data, const int i, const int j,
@@ -457,8 +462,8 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 
 smfGroup * 
 smf_construct_smfGroup( Grp *igrp, int **subgroups, size_t *chunk,
-			const int ngroups, 
-                        const int nrelated, const int copysubgroups, 
+			const dim_t ngroups, 
+                        const dim_t nrelated, const int copysubgroups, 
 			int *status );
 
 void smf_create_lutwcs( int clearcache, const double *fplane_x, 
@@ -612,7 +617,7 @@ void smf_mapbounds_approx( Grp *igrp, int index, char *system, double pixsize,
 			   int *moving, int *status );
 
 void smf_model_create( const smfGroup *igroup, smfArray **iarray,
-		       int nchunks, smf_modeltype mtype, int isTordered, 
+		       dim_t nchunks, smf_modeltype mtype, int isTordered, 
 		       AstFrameSet *outfset, int moving, 
 		       int *lbnd_out, int *ubnd_out,
 		       smfGroup **mgroup, int nofile, int leaveopen,
@@ -646,7 +651,7 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype,
 		       const int ndims, const int *lbnd, const int *ubnd, 
 		       int flags, smfData ** data, int *status);
 
-void smf_open_related( const smfGroup *group, const int subindex, const char *accmode,
+void smf_open_related( const smfGroup *group, const dim_t subindex, const char *accmode,
 		       smfArray **relfiles, int *status );
 
 void * smf_realloc( void * pntr, size_t nelem, size_t bytes_per_elem,
@@ -664,10 +669,10 @@ void smf_scanfit( smfData *data, unsigned char *quality, int order,
 		  int *status );
 
 void smf_simplerebinmap( double *data, double *variance, int *lut, 
-			 unsigned char *qual, unsigned char mask, int dsize, 
+			 unsigned char *qual, unsigned char mask, dim_t dsize, 
 			 int sampvar, int flags, double *map, 
 			 double *mapweight, unsigned int *hitsmap, 
-			 double *mapvar, int msize, int *status );
+			 double *mapvar, dim_t msize, int *status );
 
 void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim, 
 		      int dims[], int nsampcycle, int vxmin, int vymin, 
@@ -825,7 +830,7 @@ void smf_NDFexport( const smfData *data, void *variance,
                     unsigned char *quality, smfHead *hdr, 
                     const char *name, int *status );
 
-void smf_open_related_model( const smfGroup *group, const int subindex, 
+void smf_open_related_model( const smfGroup *group, const dim_t subindex, 
 			     const char *accmode, smfArray **relfiles, 
 			     int *status );
 
@@ -953,7 +958,7 @@ void smf_kmmerge( const char *xname, AstKeyMap *keymap, int from, int into, int 
 void smf_simpleaddmap( double *map1, double *mapweight1, 
                        unsigned int *hitsmap1, double *mapvar1, 
                        double *map2, double *mapweight2, 
-                       unsigned int *hitsmap2, double *mapvar2, int msize, 
+                       unsigned int *hitsmap2, double *mapvar2, dim_t msize, 
                        int *status );
 
 

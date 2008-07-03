@@ -13,8 +13,8 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_calc_stats ( const smfData *data, const char *mode, const int index,
-*                      int lo, int hi, double *mean, double *stdev,
+*     smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
+*                      dim_t lo, dim_t hi, double *mean, double *stdev,
 *                      int *status ) 
 
 *  Arguments:
@@ -70,6 +70,8 @@
 *        Delete weight-setting code
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-07-03 (EC):
+*        Use dim_t for index, lo and hi
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -120,17 +122,17 @@
 /* Maximum number of sigma-clipping values */
 #define MXCLIP 5
 
-void smf_calc_stats ( const smfData *data, const char *mode, const int index,
-                      int lo, int hi, double *mean, double *stdev, 
+void smf_calc_stats ( const smfData *data, const char *mode, const dim_t index,
+                      dim_t lo, dim_t hi, double *mean, double *stdev, 
 		      int *status) {
 
   /* Local variables */
   double *indata = NULL;      /* Pointer to input data array */
   size_t k;                   /* Loop counter */
   size_t npts;                /* Number of data points in range */
-  int nbol;                   /* Number of bolometers */
-  int nmax;                   /* Max value for index */
-  int nsamp;                  /* Number of samples */
+  dim_t nbol;                 /* Number of bolometers */
+  dim_t nmax;                 /* Max value for index */
+  dim_t nsamp;                  /* Number of samples */
   double *statsdata = NULL;   /* Pointer to array for computing stats */
   int temp;                   /* Temporary variable */
 
@@ -206,7 +208,7 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
   }
 
   /* Check index is in range */
-  if ( index >= nmax || index < 0 ) {
+  if ( index >= nmax ) {
     if ( *status == SAI__OK) {
       msgSeti("I", index);
       msgSeti("N", nmax);
@@ -218,7 +220,7 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
   }
 
   /* Check requested range is valid */
-  if ( lo >= nsamp || lo < 0 ) {
+  if ( lo >= nsamp ) {
     if ( *status == SAI__OK) {
       msgSeti("J", lo);
       msgSeti("N", nsamp);
@@ -228,7 +230,7 @@ void smf_calc_stats ( const smfData *data, const char *mode, const int index,
       return;
     }
   }
-  if ( hi >= nsamp || hi < 0 ) {
+  if ( hi >= nsamp ) {
     if ( *status == SAI__OK) {
       msgSeti("J", hi);
       msgSeti("N", nsamp);

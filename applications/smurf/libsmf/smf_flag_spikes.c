@@ -178,13 +178,6 @@ void smf_flag_spikes( smfData *data, unsigned char *quality,
 	     status);
     }
 
-    /* Valid maxiter */
-    if( iter == 0 ) if( maxiter < 0 ) {
-      *status = SAI__ERROR;
-      msgSetd("MAXITER",maxiter);
-      errRep(FUNC_NAME, "Can't find spikes: maxiter=^MAXITER must be >= 0",
-	     status);
-    }
   }
 
   /* Iteratively find spikes */
@@ -232,7 +225,8 @@ void smf_flag_spikes( smfData *data, unsigned char *quality,
     }
 
     /* Check that the exit condition has been met */
-    if( (niter && (iter >= niter)) || (*status != SAI__OK) ) {
+    if( (niter && (iter >= niter)) || (maxiter && (iter > maxiter)) || 
+                                       (*status != SAI__OK) ) {
       done = 1;
     }
   }

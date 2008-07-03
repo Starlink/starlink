@@ -101,7 +101,7 @@ smfArray *smf_create_smfArray( int * status ) {
   /* Need to make sure that any memory we malloc will be freed on error 
      so make sure we NULL all pointers first. */
   smfArray *ary = NULL;    /* Main struct */
-  int i;
+  dim_t i;
 
   if (*status != SAI__OK) return NULL;
 

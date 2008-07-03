@@ -15,8 +15,8 @@
 *  Invocation:
 *     smfGroup* = smf_construct_smfGroup( Grp *igrp, int **subgroups, 
 *                                         size_t *chunk,
-*				          const int ngroups, 
-*                                         const int nrelated,
+*				          const dim_t ngroups, 
+*                                         const dim_t nrelated,
 *                                         const int copy, 
 *                                         int *status );
 
@@ -27,9 +27,9 @@
 *        Pointer to array of pointers to arrays of indices into Grp
 *     chunk = size_t* (Given)
 *        Array of length ngroups flagging which subgroups are continuous
-*     ngroups = int (Given)
+*     ngroups = dim_t (Given)
 *        Number of subgroups in the smfGroup
-*     nrelated = int (Given)
+*     nrelated = dim_t (Given)
 *        Maximum number of related files in the smfGroup
 *     copy = int (Given)
 *        If non-zero copy subgroups & chunk. Otherwise use in-place.
@@ -63,6 +63,8 @@
 *        Update to use new smf_free behaviour
 *     2008-04-16 (EC):
 *        -added chunk to smfGroup
+*     2008-07-03 (EC):
+*        Changed ngroups/nrelated to dim_t
 
 *  Copyright:
 *     Copyright (C) 2006 University of British Columbia.  All Rights
@@ -114,13 +116,13 @@
 #define FUNC_NAME "smf_construct_smfGroup"
 
 smfGroup *smf_construct_smfGroup( Grp *igrp, int **subgroups, size_t *chunk,
-				  const int ngroups,  const int nrelated, 
+				  const dim_t ngroups,  const dim_t nrelated, 
 				  const int copy, int *status ) {
 
   /* Local variables */
   smfGroup *group = NULL;
   int isize;
-  dim_t i, j;
+  dim_t i;
   int **newsubgroups=NULL;
   
   if ( *status != SAI__OK ) return NULL;

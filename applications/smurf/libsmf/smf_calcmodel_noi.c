@@ -115,7 +115,7 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   size_t aiter;                 /* Actual iterations of sigma clipper */
   dim_t base;                   /* Base index of bolometer */
   dim_t i;                      /* Loop counter */
-  int idx=0;                    /* Index within subgroup */
+  dim_t idx=0;                  /* Index within subgroup */
   dim_t j;                      /* Loop counter */
   unsigned char mask;           /* Bitmask for quality */
   unsigned char mask_spike;     /* Bitmask for quality */

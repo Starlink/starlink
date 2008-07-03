@@ -110,7 +110,7 @@ void smf_calcmodel_ast( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
 
   /* Local Variables */
   dim_t i;                      /* Loop counter */
-  int idx=0;                    /* Index within subgroup */
+  dim_t idx=0;                  /* Index within subgroup */
   smfArray *lut=NULL;           /* Pointer to LUT at chunk */
   int *lut_data=NULL;           /* Pointer to DATA component of lut */
   unsigned char mask;           /* Bitmask for quality */

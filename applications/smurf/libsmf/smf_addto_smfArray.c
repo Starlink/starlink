@@ -90,8 +90,7 @@
 
 void smf_addto_smfArray( smfArray *ary, const smfData *data, int *status ) {
 
-  size_t ndat;         /* Number of smfDatas that can be added */
-  int i;               /* Loop counter */
+  dim_t ndat;         /* Number of smfDatas that can be added */
 
   if (*status != SAI__OK) return;
 
@@ -99,7 +98,7 @@ void smf_addto_smfArray( smfArray *ary, const smfData *data, int *status ) {
   ndat = ary->ndat;
 
   /* Check for valid number of smfData pointers */
-  if ( ndat < 0 || ndat >= SMF__MXSMF ) {
+  if ( ndat >= SMF__MXSMF ) {
     if ( *status == SAI__OK ) {
       msgSeti("N",ndat);
       *status = SAI__ERROR;

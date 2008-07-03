@@ -13,14 +13,14 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_open_related_model( const smfGroup *group, const int subindex, 
+*     smf_open_related_model( const smfGroup *group, const dim_t subindex, 
 *                             const char *accmode, smfArray **relfiles,
 *                             int *status );
 
 *  Arguments:
 *     group = const smfGroup* (Given)
 *        Input smfGroup of model component filenames
-*     subindex = const int (Given)
+*     subindex = const dim_t (Given)
 *        Subgroup index
 *     accmode = const char* (Given)
 *        Access mode for opened files
@@ -44,6 +44,8 @@
 *  History:
 *     2007-07-10 (EC):
 *        Initial version cloned from smf_open_related
+*     2008-07-03 (EC):
+*        Changed subindex to dim_t
 
 *  Copyright:
 *     Copyright (C) 2006 University of British Columbia.  All Rights
@@ -94,18 +96,18 @@
 
 #define FUNC_NAME "smf_open_related_model"
 
-void smf_open_related_model( const smfGroup *group, const int subindex, 
+void smf_open_related_model( const smfGroup *group, const dim_t subindex, 
 			     const char *accmode, smfArray **relfiles, 
 			     int *status ) {
 
   /* Local variables */
   smfData *data = NULL;     /* Data struct for file */
   Grp *grp = NULL;          /* Grp stored within smfGroup */
-  int i;                    /* Loop counter */
+  dim_t i;                  /* Loop counter */
   int *indices = NULL;      /* Array of indices */
-  int nrelated;             /* Number of related files */
+  dim_t nrelated;           /* Number of related files */
   int index;                /* Index into the subgroups within the group */
-  int **subgroups = NULL;   /* Pointer to array of subgroups */
+  int **subgroups=NULL;     /* Pointer to array of subgroups */
 
   if ( *status != SAI__OK ) return;
 

@@ -322,7 +322,7 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
       return;
     }
     msgSetc( "F", filename );
-    msgOutif(MSG__VERB, "", "Opening file ^F", status);
+    msgOutif(MSG__DEBUG, "", "Opening file ^F", status);
   }
 
   /* Determine the dimensions of the DATA component */
@@ -335,7 +335,7 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
   if (ndims == 2) {
     if (strncmp(dtype, "_REAL", 5) == 0) {
       /* Change _REAL to _DOUBLE */
-      msgOutif( MSG__VERB, "", 
+      msgOutif( MSG__DEBUG, "", 
                 "Input file is _REAL, will map as _DOUBLE for internal handling", 
                 status );
       strncpy( dtype, "_DOUBLE", NDF__SZTYP+1 );
@@ -358,7 +358,7 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
     /* Report a warning due to non-standard dimensions for file */
     if ( *status == SAI__OK) {
       msgSeti( "NDIMS", ndims);
-      msgOutif(MSG__VERB," ", 
+      msgOutif(MSG__DEBUG," ", 
                "Number of dimensions in output, ^NDIMS is not equal to 2 or 3",
                status);
       /* Data is neither flat-fielded nor standard time-series data. However
@@ -417,14 +417,15 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
           /* If status is bad, then the SCANFIT extension does not
              exist. This is not fatal so annul the error */
           errAnnul(status);
-          msgOutif(MSG__VERB," ", "SCU2RED exists, but not SCANFIT - continuing", 
+          msgOutif(MSG__DEBUG," ", 
+                   "SCU2RED exists, but not SCANFIT - continuing", 
                    status);
         }
         /* Annul the locator */
         datAnnul( &xloc, status );
 
       } else {
-        msgOutif(MSG__VERB," ", 
+        msgOutif(MSG__DEBUG," ", 
                  "File has no SCU2RED extension: no DA-processed data present", 
                  status);
       }
@@ -449,10 +450,10 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
           if ( qexists ) {
             irqFind( indf, &qlocs, xname, status );
             if ( *status == SAI__OK ) {
-              msgOutif(MSG__VERB, "", "Quality names defined in file", status);
+              msgOutif(MSG__DEBUG, "", "Quality names defined in file", status);
             } else if (*status == IRQ__NOQNI) {
               errAnnul( status );
-              msgOutif( MSG__VERB, "", 
+              msgOutif( MSG__DEBUG, "", 
                         "QUALITY present but no quality names extension in file", 
                         status );
               smf_create_qualname( mode, indf, &qlocs, status );
@@ -468,8 +469,9 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
               errAnnul(status);
               smf_create_qualname( mode, indf, &qlocs, status );
             } else {
-              msgOutif(MSG__VERB, "", 
-                       "File has quality names extension but no QUALITY", status);
+              msgOutif(MSG__DEBUG, "", 
+                       "File has quality names extension but no QUALITY", 
+                       status);
             }
             /* Attempt to create QUALITY component - assume we have
                write or update access at this point */
@@ -834,7 +836,7 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
       smf_fits_getD( hdr, "STEPTIME", &steptime, status );
       if (*status == SMF__NOKWRD) {
         errAnnul( status );
-        msgOut( " ","Could not determine step time when correcting TCS_TAI from RTS_END", status );
+        msgOutif(MSG__DEBUG," ","Could not determine step time when correcting TCS_TAI from RTS_END", status );
         steptime = 0.0;
       }
       /* correct TCS_TAI by half step time corrected to days */

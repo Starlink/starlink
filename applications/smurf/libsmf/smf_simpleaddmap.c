@@ -16,7 +16,7 @@
 *     smf_simpleaddmap( double *map1, double *mapweight1, 
 *                       unsigned int *hitsmap1, double *mapvar1, 
 *                       double *map2, double *mapweight2, 
-*                       unsigned int *hitsmap2, double *mapvar2, int msize, 
+*                       unsigned int *hitsmap2, double *mapvar2, dim_t msize, 
 *                       int *status ) {
 
 *  Arguments:
@@ -36,7 +36,7 @@
 *        Number of samples that land in map2 pixels
 *     mapvar2 = double* (Given and Returned)
 *        Variance of each pixel in map2
-*     msize = int (Given)
+*     msize = dim_t (Given)
 *        Number of pixels in the maps
 *     status = int* (Given and Returned)
 *        Pointer to global status.
@@ -52,6 +52,8 @@
 *  History:
 *     2008-04-16 (EC):
 *        Initial version.
+*     2008-07-03 (EC):
+*        Use dim_t for msize
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -101,7 +103,7 @@
 void smf_simpleaddmap( double *map1, double *mapweight1, 
                        unsigned int *hitsmap1, double *mapvar1, 
                        double *map2, double *mapweight2, 
-                       unsigned int *hitsmap2, double *mapvar2, int msize, 
+                       unsigned int *hitsmap2, double *mapvar2, dim_t msize, 
                        int *status ) {
 
   /* Local Variables */

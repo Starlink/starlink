@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_model_create( const smfGroup *igroup, const smfArray **iarray,
-*                       int nchunks, smf_modeltype mtype, int isTordered, 
+*                       dim_t nchunks, smf_modeltype mtype, int isTordered, 
 *		        AstFrameSet *outfset, int moving, 
 *		        int *lbnd_out, int *ubnd_out,
 *                       smfGroup **mgroup, int nofile, int leaveopen,
@@ -26,7 +26,7 @@
 *     iarray = const smfArray ** (Given)
 *        If igroup unspecified, use an array of smfArrays as the template
 *        instead. In this case nchunks must also be specified.
-*     nchunks = int (Given)
+*     nchunks = dim_t (Given)
 *        If iarray specified instead of igroup, nchunks gives number of
 *        smfArrays in iarray (otherwise it is derived from igroup).
 *     mtype = smf_modeltype (Given)
@@ -136,6 +136,8 @@
 *        -Calculate and store extinction coefficients for SMF__EXT
 *     2008-06-24 (TIMJ):
 *        - const mname since smf_model_getname now returns const
+*     2008-07-03 (EC):
+*        Changed nchunks to dim_t
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -186,7 +188,7 @@
 #define FUNC_NAME "smf_model_create"
 
 void smf_model_create( const smfGroup *igroup, smfArray **iarray,
-		       int nchunks, smf_modeltype mtype, int isTordered,
+		       dim_t nchunks, smf_modeltype mtype, int isTordered,
 		       AstFrameSet *outfset, int moving, 
 		       int *lbnd_out, int *ubnd_out,
 		       smfGroup **mgroup, int nofile, int leaveopen,
@@ -210,20 +212,21 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
   int idx=0;                    /* Index within subgroup */
   int isize=0;                  /* Number of files in input group */
   dim_t j;                      /* Loop counter */
-  dim_t k;                      /* Loop counter */
+  int k;                        /* Loop counter */
+  dim_t l;                      /* Loop counter */
   Grp *mgrp=NULL;               /* Temporary group to hold model names */
   const char *mname=NULL;       /* String model component name */
   int msize=0;                  /* Number of files in model group */
   char name[GRP__SZNAM+1];      /* Name of container file without suffix */
   size_t ndata=0;               /* Number of elements in data array */
-  int nrel=0;                   /* Number of related elements (subarrays) */
+  dim_t nrel=0;                 /* Number of related elements (subarrays) */
   int oflag=0;                  /* Flags for opening template file */
   long pagesize=0;              /* Size of memory page used by mmap */
   char *pname=NULL;             /* Poiner to fname */
   long remainder=0;             /* Extra length beyond integer pagesize */
   char suffix[] = SMF__DIMM_SUFFIX; /* String containing model suffix */
   double tau;                   /* 225 GHz optical depth */
-  int thisnrel;                 /* Number of related items for this model */
+  dim_t thisnrel;               /* Number of related items for this model */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -312,7 +315,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
   }
 	
   /* Loop over time chunks */
-  if( *status == SAI__OK ) for( i=0; i<(dim_t)nchunks; i++ ) {
+  if( *status == SAI__OK ) for( i=0; i<nchunks; i++ ) {
     
     /* For models that only have one file per subgroup fix up 
        mgroup such that only the first filename in each subgroup
@@ -321,7 +324,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
 
     if( mtype == SMF__COM ) {
       if (mgroup != NULL) {
-	for( j=1; j<(dim_t)(*mgroup)->nrelated; j++ ) {
+	for( j=1; j<(*mgroup)->nrelated; j++ ) {
 	  (*mgroup)->subgroups[i][j] = 0;
 	}
       }
@@ -333,7 +336,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
 
     thisnrel = 0;
 
-    for( j=0; j<(dim_t)nrel; j++ ) {
+    for( j=0; j<nrel; j++ ) {
       /* Check mgroup if we're using igroup as a template */
       if( mgroup != NULL ) {
 
@@ -359,7 +362,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
     }
 
     /* Loop over subarrays */
-    for( j=0; j<(dim_t)thisnrel; j++ ) {
+    for( j=0; j<thisnrel; j++ ) {
     
       /* Open the relevant template file if using igroup */
       if( igroup ) {
@@ -494,7 +497,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
 	  if( copyinput ) { /* If copying input, copy data dims directly */
 	    head.dtype = idata->dtype; /* Inherit data type from template */
 	    head.ndims = idata->ndims;
-	    for( k=0; k<(dim_t)head.ndims; k++ ) {
+	    for( k=0; k<head.ndims; k++ ) {
 	      head.dims[k] = (idata->dims)[k];
 	    }
 	  } 
@@ -520,7 +523,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
 
 	  /* Length of data array buffer */
 	  ndata = 1;
-	  for( k=0; k<(dim_t)head.ndims; k++ ) {
+	  for( k=0; k<head.ndims; k++ ) {
 	    ndata *= head.dims[k];
 	  }
 	  datalen = ndata * smf_dtype_sz(head.dtype, status); 
@@ -605,8 +608,8 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
 	    } else if( mtype == SMF__NOI ) {
 	      /* If this is a NOI, set to 1 to avoid divide-by-zeros */
 	      if( head.dtype == SMF__DOUBLE ) {
-		for( k=0; k<ndata; k++ ) {
-		  ((double *) dataptr)[k] = 1;
+		for( l=0; l<ndata; l++ ) {
+		  ((double *) dataptr)[l] = 1;
 		}
 	      } else {
 		/* Generate error message if NOI is not double... */

@@ -129,7 +129,7 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   int do_boxfact=0;             /* flag to damp boxcar width */
   int do_boxmin=0;              /* flag for minimum boxcar */
   dim_t i;                      /* Loop counter */
-  int idx=0;                    /* Index within subgroup */
+  dim_t idx=0;                  /* Index within subgroup */
   dim_t j;                      /* Loop counter */
   double lastmean;              /* Mean from previous iteration */
   unsigned char mask_cor;       /* Ignore quality mask for correction */
@@ -144,7 +144,6 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   unsigned char *qua_data=NULL; /* Pointer to quality data */
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
-  double sigma=0;               /* Array standard deviation */ 
   double sum=0;                 /* Array sum */
   dim_t thisnbolo=0;            /* Check each file same dims as first */
   dim_t thisndata=0;            /* "                                  */

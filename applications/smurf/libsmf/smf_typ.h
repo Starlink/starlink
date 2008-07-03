@@ -129,6 +129,9 @@
 *        -Added WCS to smfFilter
 *     2008-06-24 (EC)
 *        -Added SMF__Q_PAD quality flag
+*     2008-07-03 (EC)
+*        -Changed type to dim_t from int for smfArray.ndat and 
+*         smfGroup.ngroups/nrelated
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -335,7 +338,7 @@ typedef struct smfData {
 
 typedef struct smfArray {
   smfData *sdata[SMF__MXSMF];/* Pointers to smfDatas */
-  int ndat;                  /* Number of smfDatas in current smfArray */
+  dim_t ndat;                /* Number of smfDatas in current smfArray */
 } smfArray;
 
 /* This struct is used to group related files together */
@@ -344,8 +347,8 @@ typedef struct smfGroup {
   Grp *grp;                  /* Copy of input Grp */
   int **subgroups;           /* Array of indices into Grp */
   size_t *chunk;             /* Flag for continuous chunks in time (ngroups)*/
-  int ngroups;               /* Number of subgroups */
-  int nrelated;              /* Maximum number of related files */
+  dim_t ngroups;             /* Number of subgroups */
+  dim_t nrelated;            /* Maximum number of related files */
 } smfGroup;
 
 /* Structure containing pointers to data required for DIMM component 

@@ -125,25 +125,25 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
   size_t fitplane = 0;     /* Flag to specify if the fit is a 2-D plane */
   size_t fitslope = 0;     /* Flag to specify if the fit is a 1-D elev slope */
   smfHead *hdr = NULL;     /* Pointer to full header struct */
-  int i;                   /* Loop counter */
+  size_t i;                /* Loop counter */
   double *indata = NULL;   /* Pointer to data array */
   dim_t index;             /* index into vectorized data array */
   size_t *indices = NULL;  /* Array of indices for data points within
 			      a given smfData */
-  int ioff;                /* Index into azelmatx array */
-  int j;                   /* Loop counter */
+  dim_t ioff;                /* Index into azelmatx array */
+  size_t j;                   /* Loop counter */
   size_t k;                /* Loop counter over timeslice */
   size_t kk;               /* Loop counter of number of smfDatas in smfArray */
   int lbnd[2];             /* Lower bound */
-  gsl_matrix *mcov = NULL;  /* Covariance matrix */
+  gsl_matrix *mcov = NULL; /* Covariance matrix */
   size_t ncoeff = 2;       /* Number of coefficients to fit for; default straight line */
-  int ndat;                /* Number of related data files in the smfArray */
+  dim_t ndat;              /* Number of related data files in the smfArray */
   size_t needast = 0;      /* Flag to specify if astrometry is needed for fit */
   size_t nframes = 0;      /* Number of frames/timeslices */
-  int npts = 0;            /* Total Number of data points */
-  int nptsdat = 0;         /* Number of points per data file */
+  dim_t npts = 0;          /* Total Number of data points */
+  dim_t nptsdat = 0;       /* Number of points per data file */
   size_t numgood = 0;      /* Number of good values for calculating mean */
-  int offset;              /* Offset into azelmatx array */
+  dim_t offset;            /* Offset into azelmatx array */
   const char *origsystem = '\0';  /* Character string to store the coordinate
 			      system on entry */
   gsl_vector *psky = NULL; /* Vector containing sky brightness */
@@ -154,7 +154,7 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
   AstFrameSet *wcs = NULL; /* Pointer to AST WCS frameset */
   gsl_vector *weight = NULL; /* Weights for sky brightness vector */
   gsl_multifit_linear_workspace *work = NULL; /* Workspace */
-  int z;                   /* Index counter for 2-d array */
+  dim_t z;                 /* Index counter for 2-d array */
 
   /* Check status */
   if (*status != SAI__OK) return;

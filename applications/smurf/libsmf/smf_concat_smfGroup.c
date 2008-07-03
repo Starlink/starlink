@@ -166,7 +166,9 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
   dim_t base;                   /* Base for array index */
   smfData *data=NULL;           /* Concatenated smfData */
   char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */
-  int firstpiece;               /* index to start of whichchunk */
+  dim_t firstpiece;             /* index to start of whichchunk */
+  int foundfirst=0;             /* Flag indicates if first index found */
+  int foundlast=0;              /* Flag indicates if last index found */
   int havearray[3];             /* flags for DATA/QUALITY/VARIANCE present */
   int havelut;                  /* flag for pointing LUT present */
   smfHead *hdr;                 /* pointer to smfHead in concat data */
@@ -174,11 +176,10 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
   dim_t j;                      /* Loop counter */
   dim_t k;                      /* Loop counter */
   dim_t l;                      /* Loop counter */
-  int lastpiece;                /* index to end of whichchunk */
+  dim_t lastpiece;                /* index to end of whichchunk */
   dim_t nbolo;                  /* Number of detectors */
   dim_t ndata;                  /* Total data points: nbolo*tlen */
-  dim_t npad;                   /* Length of padded region in bytes */
-  int nrelated;                 /* Number of subarrays */
+  dim_t nrelated;                 /* Number of subarrays */
   int pass;                     /* Two passes over list of input files */
   char *pname;                  /* Pointer to input filename */
   unsigned char qual;           /* Set quality */
@@ -210,22 +211,25 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
 	    status );
   } else {
     /* Find the range of indices */
-    firstpiece=-1;
-    lastpiece=-1;
+
+    foundfirst = 0;
+    foundlast = 0;
     
-    for( i=0; i<(dim_t)igrp->ngroups; i++ ) {
-      if( (igrp->chunk[i] == whichchunk) && (firstpiece == -1) ) {
+    for( i=0; i<igrp->ngroups; i++ ) {
+      if( (igrp->chunk[i] == whichchunk) && (!foundfirst) ) {
 	firstpiece = i;
+        foundfirst = 1;
       }
 
       if( igrp->chunk[i] == whichchunk ) {
 	lastpiece = i;
+        foundlast = 1;
       }
     }
   }
 
   /* Check that a valid range was actually found */
-  if( (firstpiece == -1) || (lastpiece == -1) ) {
+  if( (!foundfirst) || (!foundlast) ) {
     *status = SAI__ERROR;
     errRep( FUNC_NAME, 
 	    "Possible programming error, couldn't find valid chunk range", 
@@ -238,16 +242,16 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
 
   /* Determine how many subarrays there actually are in this chunk*/
   nrelated = 0;
-  for( i=0; (*status == SAI__OK) && i<(dim_t)igrp->nrelated; i++ ) {
-    for( j=firstpiece; j<=(dim_t)lastpiece; j++ ) {
-      if( (igrp->subgroups[j][i] > 0) && ((i+1) > (dim_t) nrelated) ) {
+  for( i=0; (*status == SAI__OK) && i<igrp->nrelated; i++ ) {
+    for( j=firstpiece; j<=lastpiece; j++ ) {
+      if( (igrp->subgroups[j][i] > 0) && ((i+1) > nrelated) ) {
 	nrelated = i+1;
       }
     }
   }
 	
   /* Loop over related elements (number of subarrays) */
-  for( i=0; (*status == SAI__OK) && i<(dim_t)nrelated; i++ ) {
+  for( i=0; (*status == SAI__OK) && i<nrelated; i++ ) {
 
     /* Initialize time length of concatenated array to amount of padding */
     tlen = padStart + padEnd; 
@@ -260,7 +264,7 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
       
       /* Loop over subgroups (number of time chunks), continuing only
 	 if the chunk is equal to whichchunk */
-      for( j=firstpiece; j<=(dim_t)lastpiece; j++ ) {
+      for( j=firstpiece; j<=lastpiece; j++ ) {
 
 	/* First pass - get dimensions */
 	if( pass == 0 ) {
@@ -291,7 +295,7 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
 	  }
 
 	  if( *status == SAI__OK ) {
-	    if( j == (dim_t) firstpiece ) {
+	    if( j == firstpiece ) {
 	      /* If this is the first chunk we will use it for refdims
                  - check the number of bolometers! (Assumption is that
                  input data is standard ICD-compliant time-ordered
@@ -385,7 +389,7 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
 	  if( *status == SAI__OK ) {
 
 	    /* If first chunk initialize the concatenated array */
-	    if( j == (dim_t) firstpiece ) {
+	    if( j == firstpiece ) {
               /* Copy first data right after the initial padding */
 	      tchunk = padStart;
  
