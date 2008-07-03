@@ -113,15 +113,15 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
      we can forget about the WCS info for now */
   if (ihdr->wcs == NULL) {
     msgOutif(MSG__DEBUG, "", 
-	     "Input data are time series data: don't copy WCS as it is created later", 
-	     status);
+             "Input data are time series data: don't copy WCS as it is created later", 
+             status);
     /* Set output WCS to null */
     ohdr->wcs = NULL;
   } else {
     owcs = ohdr->wcs;
     if ( owcs == NULL ) {
       msgOutif(MSG__DEBUG," ", 
-	       "Output data has no WCS, copying from input", status);
+               "Output data has no WCS, copying from input", status);
       /* Copy over WCS from input */
       owcs = astCopy(ihdr->wcs);
       ohdr->wcs = owcs;
@@ -131,13 +131,13 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
       skyframe = astFindFrame( owcs, astSkyFrame(""), "");
       /* If no sky frame, copy the input WCS info using astCopy */
       if (skyframe == AST__NULL) {
-	msgOutif(MSG__DEBUG," ", 
-		 "Output FrameSet exists but does not have a SKYFRAME; copying WCS from input", 
-		 status);
-	owcs = astCopy(ihdr->wcs);
-	ohdr->wcs = owcs;
+        msgOutif(MSG__DEBUG," ", 
+                 "Output FrameSet exists but does not have a SKYFRAME; copying WCS from input", 
+                 status);
+        owcs = astCopy(ihdr->wcs);
+        ohdr->wcs = owcs;
       } else {
-	msgOutif(MSG__DEBUG," ", "Output FrameSet has a SKYFRAME", status);
+        msgOutif(MSG__DEBUG," ", "Output FrameSet has a SKYFRAME", status);
       }
     }
   }
@@ -146,7 +146,7 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
   if ( ihdr->tswcs != NULL ) {
     if (ohdr->tswcs == NULL) {
       msgOutif(MSG__DEBUG," ", 
-	       "Output data has no time series WCS, copying from input", status);
+               "Output data has no time series WCS, copying from input", status);
       /* Copy over WCS from input */
       ohdr->tswcs = astCopy(ihdr->tswcs);
     }
@@ -163,19 +163,19 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
     if ( odata->ndims > 2) {
       /* Can only do this check if we have 3-d data */
       if ( ohdr->nframes != (odata->dims)[2]) {
-	if ( *status == SAI__OK) {
-	  *status = SAI__ERROR;
-	  msgSeti("NF1", (odata->dims)[2]);
-	  msgSeti("NF2", ohdr->nframes);
-	  errRep(FUNC_NAME, "Number of frames, ^NF2, does not equal size of third dimension of data array, ^NF1. Possible programming error.", status);
-	}
+        if ( *status == SAI__OK) {
+          *status = SAI__ERROR;
+          msgSeti("NF1", (odata->dims)[2]);
+          msgSeti("NF2", ohdr->nframes);
+          errRep(FUNC_NAME, "Number of frames, ^NF2, does not equal size of third dimension of data array, ^NF1. Possible programming error.", status);
+        }
       }
     } else {
       /* For 2-D data nframes should always be 1 */
       if ( ohdr->nframes != 1 ) {
-	msgSeti("NF",ohdr->nframes);
-	msgOutif(MSG__DEBUG," ", "2-D data claims to have ^NF frames: overriding and setting to 1 now", status);
-	ohdr->nframes = 1;
+        msgSeti("NF",ohdr->nframes);
+        msgOutif(MSG__DEBUG," ", "2-D data claims to have ^NF frames: overriding and setting to 1 now", status);
+        ohdr->nframes = 1;
       }
     }
   }
@@ -185,8 +185,8 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
     msgOutif(MSG__DEBUG," ", "Output has no FITS header, copying from input", status );
     if ( ihdr->fitshdr == NULL ) {
       if ( *status == SAI__OK) {
-	*status = SAI__ERROR;
-	errRep(FUNC_NAME, "Input FITS header is NULL, possible programming error", status);
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "Input FITS header is NULL, possible programming error", status);
       }
     } else {
       ohdr->fitshdr = astCopy(ihdr->fitshdr);
@@ -197,20 +197,20 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
   if ( ohdr->allState == NULL) {
     if ( ihdr->allState == NULL ) {
       if ( *status == SAI__OK) {
-	*status = SAI__ERROR;
-	errRep(FUNC_NAME, "Input allState is NULL, possible programming error",
-	       status);
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "Input allState is NULL, possible programming error",
+               status);
       }
     } else {
       nframes = ohdr->nframes;
       if (*status == SAI__OK) {
-	allState = smf_malloc( nframes, sizeof(*allState), 0, status);
-	if ( allState == NULL) {
-	  if (*status == SAI__OK) *status = SAI__ERROR;
-	  errRep(FUNC_NAME,"Unable to allocate memory for allState", status);
-	} else {
-	  memcpy( allState, ihdr->allState, nframes*sizeof(*allState) );
-	}
+        allState = smf_malloc( nframes, sizeof(*allState), 0, status);
+        if ( allState == NULL) {
+          if (*status == SAI__OK) *status = SAI__ERROR;
+          errRep(FUNC_NAME,"Unable to allocate memory for allState", status);
+        } else {
+          memcpy( allState, ihdr->allState, nframes*sizeof(*allState) );
+        }
       }
     }
   }
@@ -219,39 +219,39 @@ void smf_check_smfHead( const smfData *idata, smfData *odata, int * status ) {
   if (ohdr->ndet == 0 && ihdr->ndet > 0) {
     if (ohdr->fplanex == NULL && ohdr->fplaney == NULL) {
       ohdr->fplanex = smf_malloc( ihdr->ndet, sizeof(*(ohdr->fplanex)), 0,
-				  status );
+                                  status );
       if (ohdr->fplanex) {
-	memcpy( ohdr->fplanex, ihdr->fplanex, 
-		ihdr->ndet * sizeof(*(ohdr->fplanex)));
+        memcpy( ohdr->fplanex, ihdr->fplanex, 
+                ihdr->ndet * sizeof(*(ohdr->fplanex)));
       }
       ohdr->fplaney = smf_malloc( ihdr->ndet, sizeof(*(ohdr->fplaney)), 0,
-				  status );
+                                  status );
       if (ohdr->fplaney) {
-	memcpy( ohdr->fplaney, ihdr->fplaney, 
-		ihdr->ndet * sizeof(*(ohdr->fplaney)));
+        memcpy( ohdr->fplaney, ihdr->fplaney, 
+                ihdr->ndet * sizeof(*(ohdr->fplaney)));
       }
       ohdr->ndet = ihdr->ndet;
     }
 
-  /* Detector positions */
+    /* Detector positions */
     if (ohdr->detpos == NULL ){
       ohdr->detpos = smf_malloc( 2*ihdr->ndet*ihdr->nframes, 
-                                   sizeof(*(ohdr->detpos)), 0,
-				   status );
+                                 sizeof(*(ohdr->detpos)), 0,
+                                 status );
       if (ohdr->detpos) {
-	memcpy( ohdr->detpos, ihdr->detpos, 
-		2*ihdr->ndet*ihdr->nframes * sizeof(*(ohdr->detpos)));
+        memcpy( ohdr->detpos, ihdr->detpos, 
+                2*ihdr->ndet*ihdr->nframes * sizeof(*(ohdr->detpos)));
       }
     }
 
-  /* Detector names */
+    /* Detector names */
     if (ohdr->detname == NULL ){
       ohdr->detname = smf_malloc( ihdr->ndet, 
                                   ( strlen( ohdr->detname ) + 1 ), 0,
-				  status );
+                                  status );
       if( ohdr->detname ) {
-         memcpy( ohdr->detname, ihdr->detname, 
-		ihdr->ndet*( strlen( ohdr->detname ) + 1 ) );
+        memcpy( ohdr->detname, ihdr->detname, 
+                ihdr->ndet*( strlen( ohdr->detname ) + 1 ) );
       }
     }
 
