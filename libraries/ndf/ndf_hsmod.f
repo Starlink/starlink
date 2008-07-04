@@ -22,7 +22,11 @@
 *     HMODE = CHARACTER * ( * ) (Given)
 *        The history update mode required: 'DISABLED', 'QUIET',
 *        'NORMAL' or 'VERBOSE'. This value may be abbreviated, to no
-*        less than three characters.
+*        less than three characters. In addition, 'SKIP' may be supplied.
+*        This is similar to 'DISABLED', in that no history record will 
+*        be added to the NDF when the NDF is closed. However, 'SKIP' makes
+*        no permanent change to the update mode - the next time the NDF
+*        is accessed it will have its original update mode.
 *     INDF = INTEGER (Given)
 *        NDF identifier.
 *     STATUS = INTEGER (Given and Returned)
@@ -30,6 +34,8 @@
 
 *  Copyright:
 *     Copyright (C) 1993 Science & Engineering Research Council
+*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -49,11 +55,14 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     DSB: David S Berry (JAC, UCLan)
 *     {enter_new_authors_here}
 
 *  History:
 *     18-MAY-1993 (RFWS):
 *        Original version.
+*     4-JUL-2008 (DSB):
+*        Added SKIP mode.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -93,13 +102,14 @@
       LOGICAL NDF1_SIMLR         ! String comparison with abbreviation
 
 *  Local Variables:
+      CHARACTER * ( NDF__SZHUM ) MODE ! Required mode 
       CHARACTER * ( NDF__SZHUM ) TEXT ! UPDATE_MODE value
       INTEGER DIM( 1 )           ! Dummy dimension size array
       INTEGER HUM                ! History update mode code
       INTEGER IACB               ! Index of NDF entry in the ACB
       INTEGER IDCB               ! Index to data object entry in the DCB
       INTEGER NC                 ! Number of characters in TEXT
-
+      LOGICAL SKIP               ! Was SKIP supplied?
 *.
 
 *  Check inherited global status.
@@ -109,10 +119,18 @@
       CALL NDF1_IMPID( INDF, IACB, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
+*  If the history update mode is SKIP, set a flag and use DISABLED instead.
+         SKIP = NDF1_SIMLR( HMODE, 'SKIP', 3 )
+         IF( SKIP ) THEN
+            MODE = 'DISABLED'
+         ELSE
+            MODE = HMODE
+         END IF             
+
 *  Check that WRITE access to the NDF is available and validate the
 *  history update mode string.
          CALL NDF1_CHACC( IACB, 'WRITE', STATUS )
-         CALL NDF1_CHHUM( HMODE, HUM, STATUS )
+         CALL NDF1_CHHUM( MODE, HUM, STATUS )
 
 *  Obtain an index to the data object entry in the DCB and ensure that
 *  DCB history information is available.
@@ -157,11 +175,15 @@
 
 *  Ensure that an UPDATE_MODE component of the required type and shape
 *  exists in the NDF history structure and write the new value to it.
+*  Skip this bit if SKIP was supplied, so that no permanent change is made
+*  to the NDF.
             IF ( STATUS .EQ. SAI__OK ) THEN
-               CALL CMP_MODC( DCB_HLOC( IDCB ), 'UPDATE_MODE', NC,
-     :                        0, DIM, STATUS )
-               CALL CMP_PUT0C( DCB_HLOC( IDCB ), 'UPDATE_MODE',
-     :                         TEXT( : NC ), STATUS )
+               IF( .NOT. SKIP ) THEN
+                  CALL CMP_MODC( DCB_HLOC( IDCB ), 'UPDATE_MODE', NC,
+     :                           0, DIM, STATUS )
+                  CALL CMP_PUT0C( DCB_HLOC( IDCB ), 'UPDATE_MODE',
+     :                            TEXT( : NC ), STATUS )
+               END IF
 
 *  Modify the corresponding DCB update mode value.
                IF ( STATUS .EQ. SAI__OK ) THEN

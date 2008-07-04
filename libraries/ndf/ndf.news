@@ -4,6 +4,12 @@ NDF Library
    Subsecond accuracy has been restored to history recording
    (was lost in the switch to Unix)
 
+V1.8
+   - New routine NDF_HGMOD retrieves the current history update mode from
+   an NDF.
+   - Routine NDF_HSMOD now allows temporary disabling of history recording
+   via a new update mode called 'SKIP'.
+
 V1.7
    NDF sections may now be given in terms of WCS coordinates.
 

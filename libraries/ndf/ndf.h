@@ -423,6 +423,11 @@ void ndfHput( const char *hmode,
               int indf,
               int *status );
 
+void ndfHgmod( int indf,   
+               char *hmode,  
+               int hmode_length,
+               int *status );
+
 void ndfHsmod( const char *hmode,
                int indf,
                int *status );

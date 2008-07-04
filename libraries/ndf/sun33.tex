@@ -14,11 +14,11 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {33.8}
 \newcommand{\stardocauthors}   {R.F.~Warren-Smith \& D.S.~Berry}
-\newcommand{\stardocdate}      {1st November 2007}
+\newcommand{\stardocdate}      {4th July 2008}
 \newcommand{\stardoctitle}     {NDF \\ [\latex{1ex}]
                                 Routines for Accessing the\\
                                 Extensible N-Dimensional Data Format}
-\newcommand{\stardocversion}   {Version 1.7}
+\newcommand{\stardocversion}   {Version 1.8}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -8209,6 +8209,9 @@ NDF, as follows:
 
 The update mode string may be abbreviated (to not less than 3 characters).
 
+The update mode can be retrieved from an NDF using
+\htmlref{NDF\_HGMOD}{NDF_HGMOD}.
+
 The \st{history update mode\/} is a permanent attribute of the
 \st{history\/} component and remains with it to affect subsequent
 recording 
@@ -10749,6 +10752,8 @@ The following is an example \xref{ADAM}{sg4}{} interface file
             {End NDF history recording for the current application}
 \noteroutine{NDF\_HFIND( INDF, YMDHM, SEC, EQ, IREC, STATUS )}
             {Find an NDF history record by date and time}
+\noteroutine{NDF\_HGMOD( INDF, HMODE, STATUS )}
+            {Get the history update mode for an NDF}
 \noteroutine{NDF\_HINFO( INDF, ITEM, IREC, VALUE, STATUS )}
             {Obtain information about an NDF's history component}
 \noteroutine{NDF\_HNREC( INDF, NREC, STATUS )}
@@ -11154,6 +11159,8 @@ locator}{sun92}{using_locators}}
             {End NDF history recording for the current application}
 \noteroutine{\htmlref{NDF\_HFIND}{NDF_HFIND}( INDF, YMDHM, SEC, EQ, IREC, STATUS )}
             {Find an NDF history record by date and time}
+\noteroutine{\htmlref{NDF\_HGMOD}{NDF_HSMOD}( INDF, HMODE, STATUS )}
+            {Get the history update mode for an NDF}
 \noteroutine{\htmlref{NDF\_HINFO}{NDF_HINFO}( INDF, ITEM, IREC, VALUE, STATUS )}
             {Obtain information about an NDF's history component}
 \noteroutine{\htmlref{NDF\_HNREC}{NDF_HNREC}( INDF, NREC, STATUS )}
@@ -13880,6 +13887,43 @@ locator}{sun92}{using_locators}}
    }
 }
 \sstroutine{
+   NDF\_HGMOD
+}{
+   Get the history update mode for an NDF
+}{
+   \sstdescription{
+      The routine returns the current history component update mode of
+      an NDF. See NDF\_HSMOD.
+   }
+   \sstinvocation{
+      CALL NDF\_HGMOD( INDF, HMODE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         NDF identifier.
+      }
+      \sstsubsection{
+         HMODE = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The history update mode: {\tt '}DISABLED{\tt '}, {\tt '}QUIET{\tt '}, {\tt '}NORMAL{\tt '} or {\tt '}VERBOSE{\tt '}.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         An error is reported if the NDF has no HISTORY component.
+      }
+   }
+}
+\sstroutine{
    NDF\_HINFO
 }{
    Obtain information about an NDF\hi{'}s history component
@@ -14361,9 +14405,13 @@ locator}{sun92}{using_locators}}
       \sstsubsection{
          HMODE = CHARACTER $*$ ( $*$ ) (Given)
       }{
-         The history update mode required: \hi{'}DISABLED\hi{'}, \hi{'}QUIET\hi{'},
-         \hi{'}NORMAL\hi{'} or \hi{'}VERBOSE\hi{'}. This value may be abbreviated, to no
-         less than three characters.
+         The history update mode required: {\tt '}DISABLED{\tt '}, {\tt '}QUIET{\tt '},
+         {\tt '}NORMAL{\tt '} or {\tt '}VERBOSE{\tt '}. This value may be abbreviated, to no
+         less than three characters. In addition, {\tt '}SKIP{\tt '} may be supplied.
+         This is similar to {\tt '}DISABLED{\tt '}, in that no history record will
+         be added to the NDF when the NDF is closed. However, {\tt '}SKIP{\tt '} makes
+         no permanent change to the update mode - the next time the NDF
+         is accessed it will have its original update mode.
       }
       \sstsubsection{
          INDF = INTEGER (Given)
@@ -18440,6 +18488,8 @@ Appendix~\ref{ss:cinterface}.\\[1.0ex]
             {End NDF history recording for the current application}
 \noteroutineC{\xlabel{ndfHfind}void \htmlref{ndfHfind}{NDF_HFIND}}{( int indf, const int ymdhm[ 5 ], float sec, int eq, int $*$irec, int $*$status );}
             {Find an NDF history record by date and time}
+\noteroutineC{\xlabel{ndfHgmod}void \htmlref{ndfHgmod}{NDF_HGMOD}}{( int indf, char $*$hmode, int $*$status );}
+            {Get the history update mode for an NDF}
 \noteroutineC{\xlabel{ndfHinfo}void \htmlref{ndfHinfo}{NDF_HINFO}}{( int indf, const char $*$item, int irec, char $*$value, int value\_length,\argbrk\ int $*$status );}
             {Obtain information about an NDF's history component}
 \noteroutineC{\xlabel{ndfHnrec}void \htmlref{ndfHnrec}{NDF_HNREC}}{( int indf, int $*$nrec, int $*$status );}

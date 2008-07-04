@@ -1851,6 +1851,37 @@ DECLARE_INTEGER(fstatus);
    return;
 }
 
+F77_SUBROUTINE(ndf_hgmod)( INTEGER(indf),
+                           CHARACTER(hmode),
+                           INTEGER(status)
+                           TRAIL(hmode) );
+
+void ndfHgmod( int indf,   
+               char *hmode,  
+               int hmode_length,
+               int *status ) {
+
+DECLARE_INTEGER(findf);
+DECLARE_CHARACTER_DYN(fhmode);
+DECLARE_INTEGER(fstatus);
+
+   F77_EXPORT_INTEGER( indf, findf );
+   F77_CREATE_CHARACTER( fhmode, hmode_length-1 );
+   F77_EXPORT_CHARACTER( hmode, fhmode, fhmode_length );
+   F77_EXPORT_INTEGER( *status, fstatus );
+
+   F77_CALL(ndf_hgmod)( INTEGER_ARG(&findf),
+                        CHARACTER_ARG(fhmode),
+                        INTEGER_ARG(&fstatus)
+                        TRAIL_ARG(fhmode) );
+
+   F77_IMPORT_CHARACTER( fhmode, fhmode_length, hmode );
+   F77_FREE_CHARACTER( fhmode );
+   F77_IMPORT_INTEGER( fstatus, *status );
+
+   return;
+}
+
 F77_SUBROUTINE(ndf_isacc)( INTEGER(indf),
                            CHARACTER(access),
                            LOGICAL(isacc),
