@@ -27,7 +27,6 @@
 *     Starlink ANSI C
 
 *  Invocation:
-*     CALL KPG_PTFTS( INDF, FCHAN, STATUS )
 *     kpgPtfts( int indf, AstFitsChan * fchan, int * status );
 
 *  Description:
