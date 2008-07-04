@@ -77,8 +77,12 @@
 *        Add CREATR argument.
 *     2-JUN-2008 (DSB):
 *        Use a pair of AST KeyMaps to hold the NDF names rather than a
-*        pair of GRP groups (avoids the need to purgew duplicate NDF
+*        pair of GRP groups (avoids the need to purge duplicate NDF
 *        names, which can be very slow for large numbers of NDFs).
+*     4-JUL-2008 (DSB):
+*        Set the history update mode of the output NDF to SKIP, in
+*        order to prevent a new history record being added to the output 
+*        NDF as a consequence of it being re-opened.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -121,6 +125,7 @@
       INTEGER NR
       INTEGER NW
       INTEGER PLACE
+      LOGICAL HASHIS
       LOGICAL INPRV
       LOGICAL THERE
 *.
@@ -192,6 +197,14 @@
                   ELSE
                      CALL NDF_XSTAT( INDF1, 'PROVENANCE', THERE, 
      :                               STATUS )
+
+*  If the NDF has a history component, set its histpry update mode to
+*  SKIP. This means that no history record will be added to the NDF when
+*  it is closed, but the history update mode stored in the NDF structure
+*  on disk will not be changed.
+                     CALL NDF_STATE( INDF1, 'History', HASHIS, STATUS )
+                     IF( HASHIS ) CALL NDF_HSMOD( 'SKIP', INDF1, 
+     :                                            STATUS )
                   END IF
 
 *  Only modify this output NDF if is exists and has no provenance
@@ -247,7 +260,7 @@
 
                   END IF
    
-                  IF( INDF1 .NE. NDF__NOID ) CALL NDF_ANNUL( INDF1,
+                  IF( INDF1 .NE. NDF__NOID ) CALL NDF_ANNUL( INDF1, 
      :                                                       STATUS )
                END IF
             END DO
