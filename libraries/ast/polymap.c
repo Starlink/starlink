@@ -65,6 +65,8 @@ f     The PolyMap class does not define any new routines beyond those
 *        Guard against undefined transformations in Copy.
 *     10-MAY-2006 (DSB):
 *        Override astEqual.
+*     4-JUL-2008 (DSB):
+*        Fixed loop indexing problems in Equal function.
 *class--
 */
 
@@ -220,7 +222,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
             if( this->coeff_f && that->coeff_f ) {
                for( i = 0; i < nout && result; i++ ) {
-                  for( j = 0; j < this->ncoeff_f[ i ] && result; i++ ) {
+                  for( j = 0; j < this->ncoeff_f[ i ] && result; j++ ) {
                      if( !EQUAL( this->coeff_f[ i ][ j ],
                                  that->coeff_f[ i ][ j ] ) ) {
                         result = 0;
@@ -231,7 +233,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
             if( this->power_f && that->power_f ) {
                for( i = 0; i < nout && result; i++ ) {
-                  for( j = 0; j < this->ncoeff_f[ i ] && result; i++ ) {
+                  for( j = 0; j < this->ncoeff_f[ i ] && result; j++ ) {
                      for( k = 0; k < nin && result; k++ ) {
                         if( !EQUAL( this->power_f[ i ][ j ][ k ],
                                     that->power_f[ i ][ j ][ k ] ) ) {
@@ -252,7 +254,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
             if( this->coeff_i && that->coeff_i ) {
                for( i = 0; i < nin && result; i++ ) {
-                  for( j = 0; j < this->ncoeff_i[ i ] && result; i++ ) {
+                  for( j = 0; j < this->ncoeff_i[ i ] && result; j++ ) {
                      if( !EQUAL( this->coeff_i[ i ][ j ],
                                  that->coeff_i[ i ][ j ] ) ) {
                         result = 0;
@@ -263,7 +265,7 @@ static int Equal( AstObject *this_object, AstObject *that_object ) {
 
             if( this->power_i && that->power_i ) {
                for( i = 0; i < nin && result; i++ ) {
-                  for( j = 0; j < this->ncoeff_i[ i ] && result; i++ ) {
+                  for( j = 0; j < this->ncoeff_i[ i ] && result; j++ ) {
                      for( k = 0; k < nout && result; k++ ) {
                         if( !EQUAL( this->power_i[ i ][ j ][ k ],
                                     that->power_i[ i ][ j ][ k ] ) ) {
