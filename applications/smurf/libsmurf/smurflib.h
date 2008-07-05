@@ -108,5 +108,6 @@ void smurf_unmakecube( int * );
 void smurf_rawunpress( int * );
 void smurf_sc2clean( int * );
 void smurf_gsdshow( int * );
+void smurf_sc2concat( int * );
 
 #endif /* SMURF_LIB_DEFINED */

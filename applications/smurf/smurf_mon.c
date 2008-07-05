@@ -250,6 +250,8 @@ void smurf_mon( int * status ) {
     smurf_sc2clean( status );
   } else if (strcmp( taskname, "GSDSHOW" ) == 0 ) {
     smurf_gsdshow( status );
+  } else if (strcmp( taskname, "SC2CONCAT" ) == 0 ) {
+    smurf_sc2concat( status );
   } else {
     *status = SAI__ERROR;
     msgSetc( "TASK", taskname );
