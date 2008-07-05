@@ -36,10 +36,12 @@
 *        Added ndgGtsup
 *     2-NOV-2007 (DSB):
 *        Added ndgPtprv, ndgBegpv and ndgEndpv.
+*     4-JUL-2008 (TIMJ):
+*        Add some sprinkling of const-ness.
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -72,8 +74,8 @@
 /* Public function prototypes */
 /* -------------------------- */
 void ndgAsexp( const char grpexp[], int verb, const Grp *igrp1, Grp **igrp2, int *size, int *flag, int *status );
-void ndgAssoc( char *param, int verb, Grp **igrp, int *size, int *flag, int *status );
-void ndgCreat( char *param, const Grp *igrp0, Grp **igrp, int *size, int *flag, int *status);
+void ndgAssoc( const char *param, int verb, Grp **igrp, int *size, int *flag, int *status );
+void ndgCreat( const char *param, const Grp *igrp0, Grp **igrp, int *size, int *flag, int *status);
 void ndgNdfas( const Grp *igrp, int index, const char mode[], int *indf, int *status );
 void ndgNdfcr( const Grp *igrp, int index, const char ftype[], int ndim,
 	       const hdsdim lbnd[], const hdsdim ubnd[], int *indf, int *status );

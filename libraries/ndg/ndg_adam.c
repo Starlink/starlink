@@ -31,9 +31,12 @@
 *        Use grpF2C and grpC2F.
 *     11-JUL-2006 (TIMJ):
 *        Add some const-ing
+*     4-JUL-2008 (TIMJ):
+*        More const-ing goodness.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -69,7 +72,7 @@
 
 F77_SUBROUTINE(ndg_assoc)( CHARACTER(PARAM), LOGICAL(VERB), INTEGER(IGRP), INTEGER(SIZE), LOGICAL(FLAG), INTEGER(STATUS) TRAIL(PARAM) );
 
-void ndgAssoc( char * param, int verb, Grp ** igrp, int *size, int * flag, int *status 
+void ndgAssoc( const char * param, int verb, Grp ** igrp, int *size, int * flag, int *status 
 ){
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(SIZE);
@@ -101,7 +104,7 @@ void ndgAssoc( char * param, int verb, Grp ** igrp, int *size, int * flag, int *
 
 F77_SUBROUTINE(ndg_creat)( CHARACTER(PARAM), INTEGER(IGRP0), INTEGER(IGRP), INTEGER(SIZE), LOGICAL(FLAG), INTEGER(STATUS) TRAIL(PARAM) );
 
-void ndgCreat( char * param, const Grp *igrp0, Grp ** igrp, int *size, int * flag, int *status 
+void ndgCreat( const char * param, const Grp *igrp0, Grp ** igrp, int *size, int * flag, int *status 
 ){
    DECLARE_INTEGER(IGRP0);
    DECLARE_INTEGER(IGRP);
