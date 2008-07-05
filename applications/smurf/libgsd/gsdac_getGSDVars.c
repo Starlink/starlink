@@ -97,7 +97,6 @@ void gsdac_getGSDVars ( const gsd *gsd, const dasFlag dasFlag,
 
   /* Local variables.*/
   long i;                     /* loop counter */
-  char tempString[MAXSTRING]; /* temporary string */ 
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;

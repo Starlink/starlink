@@ -14,12 +14,12 @@
 
 *  Invocation:
 *     gsdac_get1{blwirdc} ( const gsd *gsd,
-*                           char *name, <type> *values , int *status )
+*                           const char *name, <type> *values , int *status )
 
 *  Arguments:
 *     gsd = const gsd* (Given)
 *        GSD file access parameters
-*     name = char* (Given)
+*     name = const char* (Given)
 *        The name of the item. This should be an array of 16 characters (char
 *        name[16]) and a null-terminated string.
 *     values = <type>* (Returned)
@@ -47,6 +47,7 @@
 
 *  Authors:
 *     J.Balfour (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History :
@@ -56,6 +57,8 @@
 *        Removed unused variables.
 *     2008-04-04 (JB):
 *        Wrap gsd calls in macro for error checking.
+*     2008-07-04 (TIMJ):
+*        Use const.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -93,7 +96,7 @@
 #define MAXDIMS 3
 
 void gsdac_get1b ( const gsd *gsd,
-                   char *name, char *values, int *status ) {
+                   const char *name, char *values, int *status ) {
 
   /* Local variables */
   int actDims;                 /* actual number of dimensions */
@@ -167,7 +170,7 @@ void gsdac_get1b ( const gsd *gsd,
 }
 
 void gsdac_get1c ( const gsd *gsd,
-                   char *name, char *values, int *status ) {
+                   const char *name, char *values, int *status ) {
 
   /* Local variables */
   int actDims;                 /* actual number of dimensions */
@@ -241,7 +244,7 @@ void gsdac_get1c ( const gsd *gsd,
 }
 
 void gsdac_get1d ( const gsd *gsd,
-                   char *name, double *values, int *status ) {
+                   const char *name, double *values, int *status ) {
 
   /* Local variables */
   int actDims;                 /* actual number of dimensions */
@@ -315,7 +318,7 @@ void gsdac_get1d ( const gsd *gsd,
 }
 
 void gsdac_get1i ( const gsd *gsd,
-                   char *name, int *values, int *status ) {
+                   const char *name, int *values, int *status ) {
 
   /* Local variables */
   int actDims;                 /* actual number of dimensions */
@@ -390,7 +393,7 @@ void gsdac_get1i ( const gsd *gsd,
 
 
 void gsdac_get1l ( const gsd *gsd,
-                   char *name, char *values, int *status ) {
+                   const char *name, char *values, int *status ) {
 
   /* Local variables */
   int actDims;                 /* actual number of dimensions */
@@ -464,7 +467,7 @@ void gsdac_get1l ( const gsd *gsd,
 }
 
 void gsdac_get1r ( const gsd *gsd,
-                   char *name, float *values, int *status ) {
+                   const char *name, float *values, int *status ) {
 
   /* Local variables */
   int actDims;                 /* actual number of dimensions */
@@ -538,7 +541,7 @@ void gsdac_get1r ( const gsd *gsd,
 }
 
 void gsdac_get1w ( const gsd *gsd,
-                   char *name, short *values, int *status ) {
+                   const char *name, short *values, int *status ) {
 
   /* Local variables */
   int actDims;                 /* actual number of dimensions */

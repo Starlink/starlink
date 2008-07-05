@@ -123,7 +123,7 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_get0b
 ( 
 const gsd *gsd,      /* GSD file access parameters (given) */
-char *name,          /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of 
                         16 characters) (given) */
 char *value,         /* data value (returned) */
 int *status          /* pointer to global status (given and returned) */
@@ -142,7 +142,7 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_get0d
 (
 const gsd *gsd,      /* GSD file access parameters (given) */ 
-char *name,          /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of 
                         16 characters) (given) */
 double *value,       /* data value (returned) */
 int *status          /* pointer to global status (given and returned) */
@@ -151,7 +151,7 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_get0i
 ( 
 const gsd *gsd,      /* GSD file access parameters (given) */
-char *name,          /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of 
                         16 characters) (given) */
 int *value,          /* data value (returned) */
 int *status          /* pointer to global status (given and returned) */
@@ -160,7 +160,7 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_get0l
 ( 
 const gsd *gsd,      /* GSD file access parameters  (given)*/
-char *name,          /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of 
                         16 characters) (given) */
 char *value,         /* data value (returned) */
 int *status          /* pointer to global status (given and returned) */
@@ -169,7 +169,7 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_get0r
 (
 const gsd *gsd,      /* GSD file access parameters (given) */ 
-char *name,          /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of 
                         16 characters) (given) */
 float *value,        /* data value (returned) */
 int *status          /* pointer to global status (given and returned) */
@@ -178,7 +178,7 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_get0w
 ( 
 const gsd *gsd,      /* GSD file access parameters (given) */
-char *name,          /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of 
                         16 characters) (given) */
 short *value,        /* data value (returned) */
 int *status          /* pointer to global status (given and returned) */
@@ -187,7 +187,7 @@ int *status          /* pointer to global status (given and returned) */
 void gsdac_get1b
 (
 const gsd *gsd,      /* GSD file access parameters (given) */
-char *name,          /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of 
                         16 characters) (given) */
 char *values,        /* data values (returned) */
 int *statuss         /* pointer to global status (given and returned) */ 
@@ -196,7 +196,7 @@ int *statuss         /* pointer to global status (given and returned) */
 void gsdac_get1c
 (
 const gsd *gsd,      /* GSD file access parameters (given) */
-char *name,          /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of 
                         16 characters) (given) */
 char *values,        /* data values (returned) */
 int *statuss         /* pointer to global status (given and returned) */ 
@@ -205,7 +205,7 @@ int *statuss         /* pointer to global status (given and returned) */
 void gsdac_get1d
 (
 const gsd *gsd,      /* GSD file access parameters (given) */
-char *name,          /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of 
                         16 characters) (given) */
 double *values,      /* data values (returned) */
 int *statuss         /* pointer to global status (given and returned) */ 
@@ -214,7 +214,7 @@ int *statuss         /* pointer to global status (given and returned) */
 void gsdac_get1i
 (
 const gsd *gsd,      /* GSD file access parameters (given) */
-char *name,          /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of 
                         16 characters) (given) */
 int *values,         /* data values (returned) */
 int *statuss         /* pointer to global status (given and returned) */ 
@@ -223,7 +223,7 @@ int *statuss         /* pointer to global status (given and returned) */
 void gsdac_get1l
 (
 const gsd *gsd,      /* GSD file access parameters (given) */
-char *name,          /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of 
                         16 characters) (given) */
 char *values,        /* data values (returned) */
 int *statuss         /* pointer to global status (given and returned) */ 
@@ -232,7 +232,7 @@ int *statuss         /* pointer to global status (given and returned) */
 void gsdac_get1r
 (
 const gsd *gsd,      /* GSD file access parameters (given) */
-char *name,          /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of 
                         16 characters) (given) */
 float *values,       /* data values (returned) */
 int *statuss         /* pointer to global status (given and returned) */ 
@@ -241,7 +241,7 @@ int *statuss         /* pointer to global status (given and returned) */
 void gsdac_get1w
 (
 const gsd *gsd,      /* GSD file access parameters (given) */
-char *name,          /* name of the item (should be an array of 
+const char *name,    /* name of the item (should be an array of 
                         16 characters) (given) */
 short *values,       /* data values (returned) */
 int *statuss         /* pointer to global status (given and returned) */ 

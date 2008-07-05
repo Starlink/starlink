@@ -14,12 +14,12 @@
 
 *  Invocation:
 *     gsdac_get0{blwirdc} ( const gsd *gsd,
-*                           char *name, <type> *value , int *status )
+*                           const char *name, <type> *value , int *status )
 
 *  Arguments:
 *     gsd = const gsd* (Given)
 *        GSD file access parameters
-*     name = char* (Given)
+*     name = const char* (Given)
 *        The name of the item. This should be an array of 16 characters (char
 *        name[16]) and a null-terminated string.
 *     value = <type>* (Returned)
@@ -44,6 +44,7 @@
 
 *  Authors:
 *     J.Balfour (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History :
@@ -53,6 +54,8 @@
 *        Removed unused variables.
 *     2008-04-04 (JB):
 *        Wrap gsd calls in macro for error checking.
+*     2008-07-04 (TIMJ):
+*        Use const.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -88,7 +91,7 @@
 #include "gsdac.h"
 
 void gsdac_get0b ( const gsd *gsd,
-                   char *name, char *value, int *status ) {
+                   const char *name, char *value, int *status ) {
 
   /* Local variables */
   char array;                  /* array flag (should always be false) */ 
@@ -168,7 +171,7 @@ void gsdac_get0c ( const gsd *gsd,
 }
 
 void gsdac_get0d ( const gsd *gsd,
-                   char *name, double *value, int *status ) {
+                   const char *name, double *value, int *status ) {
 
   /* Local variables */
   char array;                  /* array flag (should always be false) */ 
@@ -208,7 +211,7 @@ void gsdac_get0d ( const gsd *gsd,
 }
 
 void gsdac_get0i ( const gsd *gsd, 
-                   char *name, int *value, int *status ) {
+                   const char *name, int *value, int *status ) {
 
   /* Local variables */
   char array;                  /* array flag (should always be false) */ 
@@ -248,7 +251,7 @@ void gsdac_get0i ( const gsd *gsd,
 }
 
 void gsdac_get0l ( const gsd *gsd, 
-                   char *name, char *value, int *status ) {
+                   const char *name, char *value, int *status ) {
 
   /* Local variables */
   char array;                  /* array flag (should always be false) */ 
@@ -288,7 +291,7 @@ void gsdac_get0l ( const gsd *gsd,
 }
 
 void gsdac_get0r ( const gsd *gsd,
-                   char *name, float *value, int *status ) {
+                   const char *name, float *value, int *status ) {
 
   /* Local variables */
   char array;                  /* array flag (should always be false) */ 
@@ -328,7 +331,7 @@ void gsdac_get0r ( const gsd *gsd,
 }
 
 void gsdac_get0w ( const gsd *gsd, 
-                   char *name, short *value, int *status ) {
+                   const char *name, short *value, int *status ) {
 
   /* Local variables */
   char array;                  /* array flag (should always be false) */ 

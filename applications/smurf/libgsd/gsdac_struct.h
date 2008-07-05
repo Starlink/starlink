@@ -18,6 +18,7 @@
 
  *  Authors:
  *     J. Balfour (j.balfour@jach.hawaii.edu)
+ *     Tim Jenness (JAC, Hawaii)
 
  *  History:
  *     2008-01-28 (JB):
@@ -36,6 +37,8 @@
  *        Move lookup tables to smf_moltrans.h and gsdac_standard_sources.h.
  *     2008-04-21 (JB):
  *        Add gsdDType.
+ *     2008-07-04 (TIMJ):
+ *        GSD library now uses real types.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -60,6 +63,7 @@
  *-
 */
 
+#include "gsd.h"
 #include "smurf_par.h"
 
 #define MAXSTRING 17
@@ -81,8 +85,8 @@ typedef enum {GSD_INT = 1, GSD_DOUBLE = 2, GSD_FLOAT = 3, GSD_CHAR = 4, GSD_CHAR
 typedef struct gsdac_gsd_struct  /* GSD file access parameters */
 {
   char *dataPtr;              /* GSD data */
-  void *fileDsc;              /* GSD file descriptor */
-  void *itemDsc;              /* GSD item descriptors */
+  GSDFileDesc *fileDsc;       /* GSD file descriptor */
+  GSDItemDesc *itemDsc;       /* GSD item descriptors */
 } gsd;
 
 typedef struct gsdac_gsdVars_struct /* GSD header and array data */
