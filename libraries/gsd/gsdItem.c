@@ -13,12 +13,14 @@
 *    C function.
 
 * Invocation:
-*    int gsdItem( void *file_dsc, void *item_dsc, int itemno, char *name,
+*    int gsdItem( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+*       int itemno, char *name,
 *       char *unit, char *type, char *array );
 
 * Prototype:
 *    available via #include "gsd.h"
- *    int gsdItem( void *file_dsc, void *item_dsc, int itemno, char *name,
+ *    int gsdItem( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+ *       int itemno, char *name,
  *       char *unit, char *type, char *array );
 
 * Description:
@@ -27,12 +29,10 @@
 *    specification and the array flag.
 
 * Arguments:
-*    void *file_dsc (Given)
+*    const GSDFileDesc *file_dsc (Given)
 *       The GSD file descriptor related to the file opened on fptr.
-*    void *item_dsc (Given)
+*    const GSDItemDesc *item_dsc (Given)
 *       The array of GSD item descriptors related to the file opened on fptr.
-*    char *data_ptr (Given)
-*       The buffer with all the data from the GSD file opened on fptr.
 *    int itemno (Given)
 *       The number of the item in the GSD file.
 *    char *name (Returned)
@@ -73,6 +73,7 @@
 * Authors:
 *    jhf: Jon Fairclough (UKTH)
 *    hme: Horst Meyerdierks (UoE, Starlink)
+*    timj: Tim Jenness (JAC, Hawaii)
 
 * History:
 *    08 Sep 1986 (jhf):
@@ -81,8 +82,11 @@
 *       Improve code modularisation.
 *    02 Dec 1994 (hme):
 *       Translation to C. Interface revised. Adapted from gsdFind.
+*    04 Jul 2008 (timj):
+*       use proper GSD structs rather than void. use const.
 
 * Copyright:
+*    Copyright (C) 2008 Science and Technology Facilities Council.
 *    Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
 *    All Rights Reserved. 
 *-
@@ -96,22 +100,15 @@
 /*:
  */
 
-int gsdItem( void *file_dsc_arg, void *item_dsc_arg, int itemno, char *name,
-   char *unit, char *type, char *array )
+int gsdItem( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+             int itemno, char *name,
+             char *unit, char *type, char *array )
 {
    static char dtypes[] = "BLWIRDC";
-   struct file_descriptor *file_dsc;
-   struct item_descriptor *item_dsc;
-
    int  status;
 
 /*.
  */
-
-/* Cast given pointers.
- */
-   file_dsc = (struct file_descriptor *) file_dsc_arg;
-   item_dsc = (struct item_descriptor *) item_dsc_arg;
 
 /* Only access the header in this routine with MODE=3 --- i.e. Remo's
  * route for finding the item name given the number. Then use MODE=2

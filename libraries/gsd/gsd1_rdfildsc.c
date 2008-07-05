@@ -61,6 +61,7 @@
  * Authors:
  *    rpt: Remo Tilanus (JACH)
  *    hme: Horst Meyerdierks (UoE, Starlink)
+ *    timj: Tim Jenness (JAC, Hawaii)
 
  * History:
  *    04 Feb 1994 or 02 Apr 1994 (rpt):
@@ -70,8 +71,12 @@
  *       structure.
  *    08 Dec 1994 (hme):
  *       Use gsd2_nativx routines.
+ *    04 Jul 2008 (timj):
+ *       use size_t rather than casting
+
 
  * Copyright:
+ *    Copyright (C) 2008 Science and Technology Facilities Council.
  *    Copyright (C) 1994-1999 Particle Physics and Astronomy Research Council.
  *    All Rights Reserved. 
 
@@ -86,12 +91,12 @@
 
 int gsd1_rdfildsc( FILE *fptr, struct file_descriptor *file_dsc )
 {
-   int size_of_fdsc;
+   size_t size_of_fdsc;
 
 /*.
  */
 
-   size_of_fdsc = (int) sizeof( struct file_descriptor );
+   size_of_fdsc = sizeof( struct file_descriptor );
 
    if ( fread( file_dsc, size_of_fdsc, 1, fptr) != 1 ) return -1;
 

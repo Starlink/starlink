@@ -75,9 +75,9 @@
  *            enddo
 
  * Arguments:
- *    FILE *fptr (Given)
+ *    const FILE *fptr (Given)
  *       C file descriptor.
- *    struct item_descriptor *item_ptr (Given)
+ *    const struct item_descriptor *item_ptr (Given)
  *       Array of item descriptors.
  *    char *data_ptr (Returned)
  *       The data. The buffer must be provided by the calling routine and large
@@ -117,6 +117,8 @@
  * Authors:
  *    rpt: Remo Tilanus (JACH)
  *    hme: Horst Meyerdierks (UoE, Starlink)
+ *    timj: Tim Jenness (JAC, Hawaii)
+
 
  * History:
  *    04 Feb 1994 or 02 Apr 1994 (rpt):
@@ -126,8 +128,12 @@
  *       ANSI C. Change the two given integers to be passed by value.
  *    08 Dec 1994 (hme):
  *       Use gsd2_nativa routine.
+ *    04 Jul 2008 (timj):
+ *       use const and fix warnings
+
 
  * Copyright:
+ *    Copyright (C) 2008 Science and Technology Facilities Council.
  *    Copyright (C) 1994-1999 Particle Physics and Astronomy Research Council.
  *    All Rights Reserved. 
 
@@ -140,19 +146,22 @@
 /*:
  */
 
-int gsd1_rddata( FILE *fptr, struct item_descriptor *item_ptr,
+int gsd1_rddata( FILE *fptr, const struct item_descriptor *item_ptr,
    char *data_ptr, int startitem, int noitems )
 {
-   struct item_descriptor *item_ptr2;
+   const struct item_descriptor *item_ptr2;
    enum type_tag d_type;
 
    int   i;
-   int   start_item, no_items, start_byte, bytes, last_item;
+   int   start_item, no_items, start_byte, last_item;
    int   d_length;
    char *ch_ptr;
+   size_t bytes;
 
 /*.
  */
+
+   last_item = 0;
 
    if ( startitem == 0 ) startitem = 1;          /* Just to make sure */
 

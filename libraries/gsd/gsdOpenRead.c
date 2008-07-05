@@ -13,14 +13,16 @@
 *    C function.
 
 * Invocation:
-*    int gsdOpenRead( char *file, float *version, char *label, int *no_items,
-*       FILE **fptr, void **file_dsc, void **item_dsc, char **data_ptr );
+*    int gsdOpenRead( const char *file, float *version, char *label,
+*       int *no_items, FILE **fptr, void **file_dsc, void **item_dsc,
+*       char **data_ptr );
 
 * Prototype:
 *    available via #include "gsd.h"
 
- *    int gsdOpenRead( char *file, float *version, char *label, int *no_items,
- *       FILE **fptr, void **file_dsc, void **item_dsc, char **data_ptr );
+ *    int gsdOpenRead( const char *file, float *version, char *label,
+ *        int *no_items, FILE **fptr, void **file_dsc, void **item_dsc,
+ *        char **data_ptr );
 
 * Description:
 *    This routine opens the named GSD file and reads its contents into memory.
@@ -35,7 +37,7 @@
 *    close the file and release the memory allocated by this routine.
 
 * Arguments:
-*    char *file (Given)
+*    const char *file (Given)
 *       The name of the GSD file to be opened.
 *    float *version (Returned)
 *       The GSD file version number.
@@ -117,10 +119,13 @@
 *       Support for DATADIR variable and upper/lower case file suffix
 *    26 Jul 1996 (sec):
 *       Support for the actual given filename. 
-*    01 Apr 1997 (timj)
+*    01 Apr 1997 (timj):
 *       Support for actual given filename in remote DATADIR
+*    03 Jul 2008 (TIMJ):
+*       Use const
 
 * Copyright:
+*    Copyright (C) 2008 Science and Technology Facilities Council.
 *    Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
 *    All Rights Reserved. 
 *-
@@ -135,15 +140,13 @@
 /*:
  */
 
-int gsdOpenRead( char *file, float *version, char *label, int *nitem,
-   FILE **fptr, void **file_dsc_arg, void **item_dsc_arg, char **data_ptr )
+int gsdOpenRead( const char *file, float *version, char *label, int *nitem,
+   FILE **fptr, GSDFileDesc **file_dsc, GSDItemDesc **item_dsc, char **data_ptr )
 {
-   struct file_descriptor **file_dsc;
-   struct item_descriptor **item_dsc;
    size_t nbytes;
 
    int status;
-   int ier, inr, no_items, start_item, start_byte, bytes;
+   int ier, inr, no_items, start_item, start_byte;
 
    char dfile[128], *datadir;
 /*.
@@ -153,7 +156,10 @@ int gsdOpenRead( char *file, float *version, char *label, int *nitem,
  * The returned generic pointers are by default NULL.
  */
    status = 0;
-   *fptr = *file_dsc_arg = *item_dsc_arg = *data_ptr = NULL;
+   *fptr = NULL;
+   *file_dsc = NULL;
+   *item_dsc = NULL;
+   *data_ptr = NULL;
 
 /* Get environment variable DATADIR
  */
@@ -191,18 +197,16 @@ int gsdOpenRead( char *file, float *version, char *label, int *nitem,
 
 /* Read the GSD file into memory.
  */
-   *file_dsc_arg = malloc( sizeof( struct file_descriptor ) );
-   if ( !*file_dsc_arg ) { status = 2; goto abort; }
-   file_dsc = (struct file_descriptor **) file_dsc_arg;
+   *file_dsc = malloc( sizeof( GSDFileDesc ) );
+   if ( !*file_dsc ) { status = 2; goto abort; }
    ier = gsd1_rdfildsc( *fptr, *file_dsc );
    if ( ier ) { status = 2; goto abort; }
 
 /* Get the memory for the items and the data.
  */
-   nbytes = sizeof( struct item_descriptor ); nbytes *= (**file_dsc).no_items;
-   *item_dsc_arg = malloc( nbytes );
-   if ( !*item_dsc_arg ) { status = 3; goto abort; }
-   item_dsc = (struct item_descriptor **) item_dsc_arg;
+   nbytes = sizeof( GSDItemDesc ); nbytes *= (**file_dsc).no_items;
+   *item_dsc = malloc( nbytes );
+   if ( !*item_dsc ) { status = 3; goto abort; }
    nbytes = (size_t) ( (**file_dsc).end_data - (**file_dsc).str_data + 1 );
    *data_ptr = (char *) malloc( nbytes );
    if ( !*data_ptr ) { status = 7; goto abort; }
@@ -235,8 +239,8 @@ int gsdOpenRead( char *file, float *version, char *label, int *nitem,
  */
    abort:
    if ( status && *fptr         ) (void) fclose( *fptr );
-   if ( status && *file_dsc_arg ) (void) free( *file_dsc_arg );
-   if ( status && *item_dsc_arg ) (void) free( *item_dsc_arg );
+   if ( status && *file_dsc ) (void) free( *file_dsc );
+   if ( status && *item_dsc ) (void) free( *item_dsc );
    if ( status && *data_ptr     ) (void) free( *data_ptr );
    return status;
 }

@@ -13,14 +13,16 @@
 *    C function.
 
 * Invocation:
-*    int gsdInqSize( void *file_dsc, void *item_dsc, char *data_ptr,
+*    int gsdInqSize( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+*       const char *data_ptr,
 *       int itemno, int maxdims,
 *       char **dimnames, char **dimunits, int *dimvals,
 *       int *actdims, int *size );
 
 * Prototype:
 *    available via #include "gsd.h"
- *    int gsdInqSize( void *file_dsc, void *item_dsc, char *data_ptr,
+ *    int gsdInqSize( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+ *       const char *data_ptr,
  *       int itemno, int maxdims,
  *       char **dimnames, char **dimunits, int *dimvals,
  *       int *actdims, int *size );
@@ -31,11 +33,11 @@
 *    the overall size.
 
 * Arguments:
-*    void *file_dsc (Given)
+*    const GSDFileDesc *file_dsc (Given)
 *       The GSD file descriptor.
-*    void *item_dsc (Given)
+*    const GSDItemDesc *item_dsc (Given)
 *       The array of GSD item descriptors related to the GSD file.
-*    char *data_ptr (Given)
+*    const char *data_ptr (Given)
 *       The buffer with all the data from the GSD file.
 *    int itemno (Given)
 *       The number of the item in the GSD file.
@@ -108,6 +110,8 @@
 *    jhf: Jon Fairclough (UKTH)
 *    rp: Rachael Padman (MRAO)
 *    hme: Horst Meyerdierks (UoE, Starlink)
+*    timj: Tim Jenness (JAC, Hawaii)
+
 
 * History:
 *    08 Sep 1986 (jhf):
@@ -118,8 +122,12 @@
 *       Adaption to Remo's C code.
 *    02 Dec 1994 (hme):
 *       Translation to C. Interface revised.
+*    04 Jul 2008 (timj):
+*       use proper GSD structs rather than void. use const.
+
 
 * Copyright:
+*    Copyright (C) 2008 Science and Technology Facilities Council.
 *    Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
 *    All Rights Reserved. 
 
@@ -134,28 +142,21 @@
 /*:
  */
 
-int gsdInqSize( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, int maxdims,
-   char **dimnames, char **dimunits, int *dimvals, int *actdims, int *size )
+int gsdInqSize( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+                const char *data_ptr,
+                int itemno, int maxdims, char **dimnames,
+                char **dimunits, int *dimvals, int *actdims, int *size )
 {
    const int gsd_byte[GSD_NTYPES] =  /* Size for each type. */
    {  GSD_SZBYTE, GSD_SZLOGICAL, GSD_SZWORD, GSD_SZINTEGER,
       GSD_SZREAL, GSD_SZDOUBLE,  GSD_SZCHAR
    };
 
-   struct file_descriptor *file_dsc;
-   struct item_descriptor *item_dsc;
-
    int  status;
    int  i, dimitemno;
 
 /*.
  */
-
-/* Cast given descriptor pointers.
- */
-   file_dsc = (struct file_descriptor *) file_dsc_arg;
-   item_dsc = (struct item_descriptor *) item_dsc_arg;
 
 /* Check item number is valid.
  */

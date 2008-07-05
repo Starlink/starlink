@@ -13,8 +13,8 @@
 
  * Prototype:
  *    (available via #include "gsd1.h")
- *    int gsd1_getval( struct file_descriptor *file_dsc,
- *       struct item_descriptor *item_dsc, char *data_ptr,
+ *    int gsd1_getval( const struct file_descriptor *file_dsc,
+ *       const struct item_descriptor *item_dsc, const char *data_ptr,
  *       int mode, short data_type, char *name, int *itemno,
  *       int first, int last, char *gsdval );
 
@@ -44,11 +44,11 @@
  *    type differs from the type used in the file.
 
  * Arguments:
- *    struct file_descriptor *file_dsc (Given)
+ *    const struct file_descriptor *file_dsc (Given)
  *       The GSD file descriptor.
- *    struct item_descriptor *item_dsc (Given)
+ *    const struct item_descriptor *item_dsc (Given)
  *       The array of GSD item descriptors.
- *    char *data_ptr (Given)
+ *    const char *data_ptr (Given)
  *       The pointer to the data previously read from the GSD file into memory.
  *       This argument is unused in mode 1.
  *    int mode (Given)
@@ -103,6 +103,7 @@
  * Authors:
  *    rpt: Remo Tilanus (JACH)
  *    hme: Horst Meyerdierks (UoE, Starlink)
+ *    timj: Tim Jenness (JAC, Hawaii)
 
  * History:
  *    04 Feb 1994 or 02 Apr 1994 (rpt):
@@ -118,8 +119,11 @@
  *    07 Dec 1994 (hme):
  *       Check that last item is within array.
  *       Convert numeric types.
+ *    04 Jul 2008 (timj):
+ *       use const
 
  * Copyright:
+ *    Copyright (C) 2008 Science and Technology Facilities Council. 
  *    Copyright (C) 1994-1999 Particle Physics and Astronomy Research Council.
  *    All Rights Reserved. 
 
@@ -133,8 +137,8 @@
 /*:
  */
 
-int gsd1_getval( struct file_descriptor *file_dsc,
-   struct item_descriptor *item_dsc, char *data_ptr,
+int gsd1_getval( const struct file_descriptor *file_dsc,
+   const struct item_descriptor *item_dsc, const char *data_ptr,
    int mode, short data_type, char *name, int *itemno,
    int first, int last, char *gsdval )
 { 
@@ -143,14 +147,12 @@ int gsd1_getval( struct file_descriptor *file_dsc,
       GSD_SZREAL, GSD_SZDOUBLE,  GSD_SZCHAR
    };
 
-   struct item_descriptor *item_dsc2, *dim_ptr;
+   const struct item_descriptor *item_dsc2;
 
-   char  *byte_ptr;
+   const char  *byte_ptr;
    char   upper_name[16];
    int    i, j, status;
    int    dlength;
-   size_t nbytes;
-   double buffer[4];
 
 /*.
  */

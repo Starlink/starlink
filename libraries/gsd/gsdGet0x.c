@@ -13,12 +13,14 @@
 *    C function.
 
 * Invocation:
-*    int gsdGet0{blwirdc}( void *file_dsc, void *item_dsc, char *data_ptr,
+*    int gsdGet0{blwirdc}( const GSDFileDesc *file_dsc,
+*       const  GSDItemDesc *item_dsc, const char *data_ptr,
 *       int itemno, <type> *value );
 
 * Prototype:
 *    available via #include "gsd.h"
- *    int gsdGet0{blwirdc}( void *file_dsc, void *item_dsc, char *data_ptr,
+ *    int gsdGet0{blwirdc}( const GSDFileDesc *file_dsc,
+ *       const GSDItemDesc *item_dsc, char *data_ptr,
  *       int itemno, <type> *value );
 
 * Description:
@@ -43,11 +45,11 @@
 *    performed.
 
 * Arguments:
-*    void *file_dsc (Given)
+*    const GSDFileDesc *file_dsc (Given)
 *       The GSD file descriptor.
-*    void *item_dsc (Given)
+*    const GSDItemDesc *item_dsc (Given)
 *       The array of GSD item descriptors related to the GSD file.
-*    char *data_ptr (Given)
+*    const char *data_ptr (Given)
 *       The buffer with all the data from the GSD file.
 *    int itemno (Given)
 *       The number of the item in the GSD file.
@@ -83,6 +85,8 @@
 *    jhf: Jon Fairclough (UKTH)
 *    rp: Rachael Padman (MRAO)
 *    hme: Horst Meyerdierks (UoE, Starlink)
+*    timj: Tim Jenness (JAC, Hawaii)
+
 
 * History:
 *    08 Sep 1986 (jhf):
@@ -97,8 +101,11 @@
 *       Let gsd1_getval do the type conversion.
 *       Do not abort when the item is an array. But always specify to
 *       gsd1_getval, that element 1 is the first and last.
+*    04 Jul 2008 (timj):
+*       use proper GSD structs rather than void. use const.
 
 * Copyright:
+*    Copyright (C) 2008 Science and Technology Facilities Council.
 *    Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
 *    All Rights Reserved. 
 *-
@@ -112,22 +119,15 @@
 /*:
  */
 
-int gsdGet0b( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, char *value )
+int gsdGet0b( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+              const char *data_ptr,
+              int itemno, char *value )
 {
-   struct file_descriptor *file_dsc;
-   struct item_descriptor *item_dsc;
-
    int    status;
    char   name[16];
 
 /*.
  */
-
-/* Cast given descriptor pointers.
- */
-   file_dsc = (struct file_descriptor *) file_dsc_arg;
-   item_dsc = (struct item_descriptor *) item_dsc_arg;
 
 /* Check item number is valid.
  */
@@ -149,22 +149,15 @@ int gsdGet0b( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
 /*:
  */
 
-int gsdGet0l( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, char *value )
+int gsdGet0l( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+              const char *data_ptr,
+              int itemno, char *value )
 {
-   struct file_descriptor *file_dsc;
-   struct item_descriptor *item_dsc;
-
    int    status;
    char   name[16];
 
 /*.
  */
-
-/* Cast given descriptor pointers.
- */
-   file_dsc = (struct file_descriptor *) file_dsc_arg;
-   item_dsc = (struct item_descriptor *) item_dsc_arg;
 
 /* Check item number is valid.
  */
@@ -186,22 +179,15 @@ int gsdGet0l( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
 /*:
  */
 
-int gsdGet0w( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, short *value )
+int gsdGet0w( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+              const char *data_ptr,
+              int itemno, short *value )
 {
-   struct file_descriptor *file_dsc;
-   struct item_descriptor *item_dsc;
-
    int    status;
    char   name[16];
 
 /*.
  */
-
-/* Cast given descriptor pointers.
- */
-   file_dsc = (struct file_descriptor *) file_dsc_arg;
-   item_dsc = (struct item_descriptor *) item_dsc_arg;
 
 /* Check item number is valid.
  */
@@ -223,22 +209,15 @@ int gsdGet0w( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
 /*:
  */
 
-int gsdGet0i( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, int *value )
+int gsdGet0i( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+              const char *data_ptr,
+              int itemno, int *value )
 {
-   struct file_descriptor *file_dsc;
-   struct item_descriptor *item_dsc;
-
    int    status;
    char   name[16];
 
 /*.
  */
-
-/* Cast given descriptor pointers.
- */
-   file_dsc = (struct file_descriptor *) file_dsc_arg;
-   item_dsc = (struct item_descriptor *) item_dsc_arg;
 
 /* Check item number is valid.
  */
@@ -260,22 +239,15 @@ int gsdGet0i( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
 /*:
  */
 
-int gsdGet0r( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, float *value )
+int gsdGet0r( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+              const char *data_ptr,
+              int itemno, float *value )
 {
-   struct file_descriptor *file_dsc;
-   struct item_descriptor *item_dsc;
-
    int    status;
    char   name[16];
 
 /*.
  */
-
-/* Cast given descriptor pointers.
- */
-   file_dsc = (struct file_descriptor *) file_dsc_arg;
-   item_dsc = (struct item_descriptor *) item_dsc_arg;
 
 /* Check item number is valid.
  */
@@ -297,22 +269,15 @@ int gsdGet0r( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
 /*:
  */
 
-int gsdGet0d( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, double *value )
+int gsdGet0d( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+              const char *data_ptr,
+              int itemno, double *value )
 {
-   struct file_descriptor *file_dsc;
-   struct item_descriptor *item_dsc;
-
    int    status;
    char   name[16];
 
 /*.
  */
-
-/* Cast given descriptor pointers.
- */
-   file_dsc = (struct file_descriptor *) file_dsc_arg;
-   item_dsc = (struct item_descriptor *) item_dsc_arg;
 
 /* Check item number is valid.
  */
@@ -334,22 +299,15 @@ int gsdGet0d( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
 /*:
  */
 
-int gsdGet0c( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, char *value )
+int gsdGet0c( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+              const char *data_ptr,
+              int itemno, char *value )
 {
-   struct file_descriptor *file_dsc;
-   struct item_descriptor *item_dsc;
-
    int    status;
    char   name[16];
 
 /*.
  */
-
-/* Cast given descriptor pointers.
- */
-   file_dsc = (struct file_descriptor *) file_dsc_arg;
-   item_dsc = (struct item_descriptor *) item_dsc_arg;
 
 /* Check item number is valid.
  */

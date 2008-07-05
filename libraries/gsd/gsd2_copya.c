@@ -14,7 +14,7 @@
  * Prototype:
  *    (available via #include "gsd1.h")
  *    int gsd2_copya( enum type_tag itype, enum type_tag otype,
- *       int size, unsigned char *in, unsigned char *out );
+ *       int size, const unsigned char *in, unsigned char *out );
 
  * Description:
  *    This routine converts an array from the given data type to the same or a
@@ -35,7 +35,7 @@
  *    int size (Given)
  *       The size of the arrays. This is the number of elements in the array,
  *       _not_ the size of the in and out buffers in bytes.
- *    unsigned char *in (Given)
+ *    const unsigned char *in (Given)
  *       The array to be converted. This need not be aligned, since it is
  *       treated only as a byte array.
  *    unsigned char *out (Returned)
@@ -114,12 +114,17 @@
 
  * Authors:
  *    hme: Horst Meyerdierks (UoE, Starlink)
+ *    timj: Tim Jenness (JAC, Hawaii)
 
  * History:
  *    12 Dec 1994 (hme):
  *       Original.
+ *    04 Jul 2008 (timj):
+ *       use const. Fix warnings (size_t)
+
 
  * Copyright:
+ *    Copyright (C) 2008 Science and Technology Facilities Council.
  *    Copyright (C) 1994-1999 Particle Physics and Astronomy Research Council.
  *    All Rights Reserved. 
 
@@ -137,7 +142,7 @@
  */
 
 int gsd2_copya( enum type_tag itype, enum type_tag otype,
-   int size, unsigned char *in, unsigned char *out )
+   size_t size, const unsigned char *in, unsigned char *out )
 {
    const int gsd_byte[GSD_NTYPES] =  /* Size for each type. */
    {  GSD_SZBYTE, GSD_SZLOGICAL, GSD_SZWORD, GSD_SZINTEGER,
@@ -145,7 +150,7 @@ int gsd2_copya( enum type_tag itype, enum type_tag otype,
    };
 
    int status;      /* Counts conversion errors */
-   int i, j, k, l;  /* Count bytes in steps of 1, icell, ocell, 1 */
+   size_t i, j, k, l;  /* Count bytes in steps of 1, icell, ocell, 1 */
 
    double       dibuf[1];  /* Buffer for input element */
    void        *vibuf =        (void *) dibuf;

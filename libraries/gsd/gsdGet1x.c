@@ -13,14 +13,18 @@
 *    C function.
 
 * Invocation:
-*    int gsdGet1{blwird}( void *file_dsc, void *item_dsc, char *data_ptr,
-*       int itemno, int ndims, int *dimvals, int *start, int *end,
+*    int gsdGet1{blwird}( const GSDFileDesc *file_dsc,
+*       const GSDItemDesc *item_dsc, const char *data_ptr,
+*       int itemno, int ndims, const int dimvals[], const int start[],
+*       const int end[],
 *       <type> *values, int *actvals );
 
 * Prototype:
 *    available via #include "gsd.h"
- *    int gsdGet1{blwird}( void *file_dsc, void *item_dsc, char *data_ptr,
- *       int itemno, int ndims, int *dimvals, int *start, int *end,
+ *    int gsdGet1{blwird}( const GSDFileDesc *file_dsc,
+ *       const GSDItemDesc *item_dsc, const char *data_ptr,
+ *       int itemno, int ndims, const int dimvals[], const int start[],
+ *       const int end[],
  *       <type> *values, int *actvals );
 
 * Description:
@@ -49,22 +53,22 @@
 *    parts of 1-D arrays, parts of rows, or single pixels.
 
 * Arguments:
-*    void *file_dsc (Given)
+*    const GSDFileDesc *file_dsc (Given)
 *       The GSD file descriptor.
-*    void *item_dsc (Given)
+*    const GSDItemDesc *item_dsc (Given)
 *       The array of GSD item descriptors related to the GSD file.
-*    char *data_ptr (Given)
+*    const char *data_ptr (Given)
 *       The buffer with all the data from the GSD file.
 *    int itemno (Given)
 *       The number of the item in the GSD file.
 *    int ndims (Given)
 *       The dimensionality the calling routine uses to specify the start and
 *       end elements.
-*    int *dimvals (Given)
+*    const int dimvals[] (Given)
 *       The array of ndims dimensions (array sizes along each axis).
-*    int *start (Given)
+*    const int start[] (Given)
 *       The array indices for the first element.
-*    int *end
+*    const int end[]
 *       The array indices for the last element.
 *    <type> *value (Returned)
 *       The data values. The calling routine must make sure that sufficient
@@ -106,6 +110,7 @@
 *    jhf: Jon Fairclough (UKTH)
 *    rp: Rachael Padman (MRAO)
 *    hme: Horst Meyerdierks (UoE, Starlink)
+*    timj: Tim Jenness (JAC, Hawaii)
 
 * History:
 *    08 Sep 1986 (jhf):
@@ -116,8 +121,12 @@
 *       Adaption to Remo's C code.
 *    02 Dec 1994 (hme):
 *       Translation to C. Interface revised.
+*    04 Jul 2008 (timj):
+*       use proper GSD structs rather than void. use const.
+
 
 * Copyright:
+*    Copyright (C) 2008 Science and Technology Facilities Council.
 *    Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
 *    All Rights Reserved. 
 *-
@@ -128,30 +137,22 @@
 #include "gsd1.h"
 #include "gsd.h"
 
-static int ndindex( int ndims, int *dimvals, int *start );
+static int ndindex( int ndims, const int dimvals[], const int start[] );
 
 /*:
  */
 
-int gsdGet1b( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, int ndims, int *dimvals, int *start, int *end,
+int gsdGet1b( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+              const char *data_ptr,
+   int itemno, int ndims, const int dimvals[], const int start[], const int end[],
    char *values, int *actvals )
 {
-   struct file_descriptor *file_dsc;
-   struct item_descriptor *item_dsc;
-
    int    status;
    int    first, last;
-   int    size;
    char   name[16];
 
 /*.
  */
-
-/* Cast given descriptor pointers.
- */
-   file_dsc = (struct file_descriptor *) file_dsc_arg;
-   item_dsc = (struct item_descriptor *) item_dsc_arg;
 
 /* Check item number is valid.
  */
@@ -180,25 +181,17 @@ int gsdGet1b( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
 /*:
  */
 
-int gsdGet1l( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, int ndims, int *dimvals, int *start, int *end,
-   char *values, int *actvals )
+int gsdGet1l( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+              const char *data_ptr, int itemno, int ndims, const int dimvals[],
+              const int start[], const int end[],
+              char *values, int *actvals )
 {
-   struct file_descriptor *file_dsc;
-   struct item_descriptor *item_dsc;
-
    int    status;
    int    first, last;
-   int    size;
    char   name[15];
 
 /*.
  */
-
-/* Cast given descriptor pointers.
- */
-   file_dsc = (struct file_descriptor *) file_dsc_arg;
-   item_dsc = (struct item_descriptor *) item_dsc_arg;
 
 /* Check item number is valid.
  */
@@ -227,25 +220,18 @@ int gsdGet1l( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
 /*:
  */
 
-int gsdGet1w( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, int ndims, int *dimvals, int *start, int *end,
-   short *values, int *actvals )
+int gsdGet1w( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+              const char *data_ptr,
+              int itemno, int ndims, const int dimvals[], const int start[],
+              const int end[],
+              short *values, int *actvals )
 {
-   struct file_descriptor *file_dsc;
-   struct item_descriptor *item_dsc;
-
    int    status;
    int    first, last;
-   int    size;
    char   name[15];
 
 /*.
  */
-
-/* Cast given descriptor pointers.
- */
-   file_dsc = (struct file_descriptor *) file_dsc_arg;
-   item_dsc = (struct item_descriptor *) item_dsc_arg;
 
 /* Check item number is valid.
  */
@@ -274,25 +260,17 @@ int gsdGet1w( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
 /*:
  */
 
-int gsdGet1i( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, int ndims, int *dimvals, int *start, int *end,
-   int *values, int *actvals )
+int gsdGet1i( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+              const char *data_ptr, int itemno, int ndims, const int dimvals[],
+              const int start[], const int end[],
+              int *values, int *actvals )
 {
-   struct file_descriptor *file_dsc;
-   struct item_descriptor *item_dsc;
-
    int    status;
    int    first, last;
-   int    size;
    char   name[15];
 
 /*.
  */
-
-/* Cast given descriptor pointers.
- */
-   file_dsc = (struct file_descriptor *) file_dsc_arg;
-   item_dsc = (struct item_descriptor *) item_dsc_arg;
 
 /* Check item number is valid.
  */
@@ -321,25 +299,17 @@ int gsdGet1i( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
 /*:
  */
 
-int gsdGet1r( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, int ndims, int *dimvals, int *start, int *end,
-   float *values, int *actvals )
+int gsdGet1r( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+              const char *data_ptr, int itemno, int ndims, const int dimvals[],
+              const int start[], const int end[],
+              float *values, int *actvals )
 {
-   struct file_descriptor *file_dsc;
-   struct item_descriptor *item_dsc;
-
    int    status;
    int    first, last;
-   int    size;
    char   name[15];
 
 /*.
  */
-
-/* Cast given descriptor pointers.
- */
-   file_dsc = (struct file_descriptor *) file_dsc_arg;
-   item_dsc = (struct item_descriptor *) item_dsc_arg;
 
 /* Check item number is valid.
  */
@@ -368,25 +338,17 @@ int gsdGet1r( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
 /*:
  */
 
-int gsdGet1d( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, int ndims, int *dimvals, int *start, int *end,
-   double *values, int *actvals )
+int gsdGet1d( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+              const char *data_ptr, int itemno, int ndims, const int dimvals[],
+              const int start[], const int end[],
+              double *values, int *actvals )
 {
-   struct file_descriptor *file_dsc;
-   struct item_descriptor *item_dsc;
-
    int    status;
    int    first, last;
-   int    size;
    char   name[15];
 
 /*.
  */
-
-/* Cast given descriptor pointers.
- */
-   file_dsc = (struct file_descriptor *) file_dsc_arg;
-   item_dsc = (struct item_descriptor *) item_dsc_arg;
 
 /* Check item number is valid.
  */
@@ -415,25 +377,17 @@ int gsdGet1d( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
 /*:
  */
 
-int gsdGet1c( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, int ndims, int *dimvals, int *start, int *end,
-   char *values, int *actvals )
+int gsdGet1c( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc, 
+              const char *data_ptr, int itemno, int ndims, const int dimvals[],
+              const int start[], const int end[],
+              char *values, int *actvals )
 {
-   struct file_descriptor *file_dsc;
-   struct item_descriptor *item_dsc;
-
    int    status;
    int    first, last;
-   int    size;
    char   name[16];
 
 /*.
  */
-
-/* Cast given descriptor pointers.
- */
-   file_dsc = (struct file_descriptor *) file_dsc_arg;
-   item_dsc = (struct item_descriptor *) item_dsc_arg;
 
 /* Check item number is valid.
  */
@@ -465,7 +419,7 @@ int gsdGet1c( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
 /* Translation of the old gsd_sys_location.
  */
 
-static int ndindex( int no_dims, int *bounds, int *subscripts )
+static int ndindex( int no_dims, const int bounds[], const int subscripts[] )
 {
    int cell_count, i, j;
    int index;

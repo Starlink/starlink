@@ -13,12 +13,14 @@
 *    C function.
 
 * Invocation:
-*    int gsdFind( void *file_dsc, void *item_dsc, char *name, int *itemno,
+*    int gsdFind( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+*       char *name, int *itemno,
 *       char *unit, char *type, char *array );
 
 * Prototype:
 *    available via #include "gsd.h"
- *    int gsdFind( void *file_dsc, void *item_dsc, char *name, int *itemno,
+ *    int gsdFind( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+ *       char *name, int *itemno,
  *       char *unit, char *type, char *array );
 
 * Description:
@@ -27,9 +29,9 @@
 *    specification and the array flag.
 
 * Arguments:
-*    void *file_dsc (Given)
+*    const GSDFileDesc *file_dsc (Given)
 *       The GSD file descriptor related to the file opened on fptr.
-*    void *item_dsc (Given)
+*    const GSDItemDesc *item_dsc (Given)
 *       The array of GSD item descriptors related to the file opened on fptr.
 *    char *data_ptr (Given)
 *       The buffer with all the data from the GSD file opened on fptr.
@@ -74,6 +76,7 @@
 *    jhf: Jon Fairclough (UKTH)
 *    rp: Rachael Padman (MRAO)
 *    hme: Horst Meyerdierks (UoE, Starlink)
+*    timj: Tim Jenness (JAC, Hawaii)
 
 * History:
 *    08 Sep 1986 (jhf):
@@ -86,8 +89,11 @@
 *       Adaption to Remo's C code.
 *    02 Dec 1994 (hme):
 *       Translation to C. Interface revised.
+*    04 Jul 2008 (timj):
+*       use proper GSD structs rather than void. use const.
 
 * Copyright:
+*    Copyright (C) 2008 Science and Technology Facilities Council.
 *    Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
 *    All Rights Reserved. 
 *-
@@ -101,29 +107,28 @@
 /*:
  */
 
-int gsdFind( void *file_dsc_arg, void *item_dsc_arg, char *name, int *itemno,
-   char *unit, char *type, char *array )
+int gsdFind( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+             const char name[], int *itemno,
+             char *unit, char *type, char *array )
 {
    static char dtypes[] = "BLWIRDC";
-   struct file_descriptor *file_dsc;
-   struct item_descriptor *item_dsc;
-
    int  status;
+   char tname[GSD_SZCHAR+1]; /* temp string for consting */
 
 /*.
  */
 
-/* Cast given pointers.
- */
-   file_dsc = (struct file_descriptor *) file_dsc_arg;
-   item_dsc = (struct item_descriptor *) item_dsc_arg;
+   /* Copy from input const string to temporary buffer for use by
+      gsd1_getval */
+   strncpy(tname, name, GSD_SZCHAR );
+   tname[GSD_SZCHAR] = '\0';
 
 /* Only access the header in this routine with MODE=1 --- i.e. Remo's
  * route for finding the item number given the name. Then use MODE=2
  * access in GSD_GET... routines.  Possibly more complicated than
  * necessary, but retains compatibility with the GSD library itself.
  */
-   status = gsd1_getval( file_dsc, item_dsc, NULL, 1, 0, name,
+   status = gsd1_getval( file_dsc, item_dsc, NULL, 1, 0, tname,
       itemno, 0, 0, NULL );
    if ( status < 0 ) { status = 1; goto abort; }
    else                status = 0;

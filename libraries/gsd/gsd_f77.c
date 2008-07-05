@@ -42,8 +42,12 @@
 *       Fix prototype warning in gsdGet1b
 *    20 Sep 2005 (timj):
 *       Update CNF usage and fix cnfFree vs free usage.
+*    04 Jul 2008 (timj):
+*       use proper GSD structs rather than void. use const.
+
 
 * Copyright:
+*    Copyright (C) 2008 Science and Technology Facilities Council.
 *    Copyright (C) 1994-2005 Particle Physics and Astronomy Research Council.
 *    All Rights Reserved. 
 
@@ -52,7 +56,6 @@
 
 #include <stdlib.h>
 #include "f77.h"
-#include "cnf.h"
 #include "gsd.h"
 
 F77_SUBROUTINE(gsd_open_read)( CHARACTER(file), INTEGER(fd), REAL(version),
@@ -115,8 +118,8 @@ F77_SUBROUTINE(gsd_get1c)( INTEGER_ARRAY(index), INTEGER(no_dims),
 #define GSD__MAXDIM        5
 
 static FILE *gsd_fptr[GSD__MAXFILE];   /* C file descriptors         */
-static void *gsd_fdsc[GSD__MAXFILE];   /* GSD file descriptors       */
-static void *gsd_idsc[GSD__MAXFILE];   /* GSD item descriptor arrays */
+static GSDFileDesc *gsd_fdsc[GSD__MAXFILE];   /* GSD file descriptors       */
+static GSDItemDesc *gsd_idsc[GSD__MAXFILE];   /* GSD item descriptor arrays */
 static char *gsd_dptr[GSD__MAXFILE];   /* Data pointers              */
 static int   gsd_used[GSD__MAXFILE] =  /* Flags whether slot used    */
 {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
@@ -187,8 +190,8 @@ F77_SUBROUTINE(gsd_open_read)( CHARACTER(file), INTEGER(fd), REAL(version),
    GENPTR_INTEGER(status)
 
    extern FILE *gsd_fptr[];
-   extern void *gsd_fdsc[];
-   extern void *gsd_idsc[];
+   extern GSDFileDesc *gsd_fdsc[];
+   extern GSDItemDesc *gsd_idsc[];
    extern char *gsd_dptr[];
    extern int   gsd_used[];
 
@@ -277,8 +280,8 @@ F77_SUBROUTINE(gsd_close)( INTEGER(fd), INTEGER(status) )
    GENPTR_INTEGER(status)
 
    extern FILE *gsd_fptr[];
-   extern void *gsd_fdsc[];
-   extern void *gsd_idsc[];
+   extern GSDFileDesc *gsd_fdsc[];
+   extern GSDItemDesc *gsd_idsc[];
    extern char *gsd_dptr[];
    extern int   gsd_used[];
 
@@ -369,8 +372,8 @@ F77_SUBROUTINE(gsd_find)( INTEGER(fd), CHARACTER(name), INTEGER(number),
    GENPTR_INTEGER_ARRAY(index)
    GENPTR_INTEGER(status)
 
-   extern void *gsd_fdsc[];
-   extern void *gsd_idsc[];
+   extern GSDFileDesc *gsd_fdsc[];
+   extern GSDItemDesc *gsd_idsc[];
    extern int   gsd_used[];
 
    char  carray;     /* Arrayness       */
@@ -480,8 +483,8 @@ F77_SUBROUTINE(gsd_item)( INTEGER(fd), INTEGER(number), CHARACTER(name),
    GENPTR_INTEGER_ARRAY(index)
    GENPTR_INTEGER(status)
 
-   extern void *gsd_fdsc[];
-   extern void *gsd_idsc[];
+   extern GSDFileDesc *gsd_fdsc[];
+   extern GSDItemDesc *gsd_idsc[];
    extern int   gsd_used[];
 
    char  carray;     /* Arrayness       */
@@ -594,8 +597,8 @@ F77_SUBROUTINE(gsd_inq_size)( INTEGER(fd), INTEGER(number), INTEGER(maxdims),
    GENPTR_INTEGER(size)
    GENPTR_INTEGER(status)
 
-   extern void *gsd_fdsc[];
-   extern void *gsd_idsc[];
+   extern GSDFileDesc *gsd_fdsc[];
+   extern GSDItemDesc *gsd_idsc[];
    extern char *gsd_dptr[];
    extern int   gsd_used[];
 
@@ -708,8 +711,8 @@ F77_SUBROUTINE(gsd_get0b)( INTEGER_ARRAY(index), BYTE(bvalue),
    GENPTR_BYTE(bvalue)
    GENPTR_INTEGER(status)
 
-   extern void *gsd_fdsc[];
-   extern void *gsd_idsc[];
+   extern GSDFileDesc *gsd_fdsc[];
+   extern GSDItemDesc *gsd_idsc[];
    extern char *gsd_dptr[];
    extern int   gsd_used[];
 
@@ -757,8 +760,8 @@ F77_SUBROUTINE(gsd_get0l)( INTEGER_ARRAY(index), BYTE(lvalue),
    GENPTR_BYTE(lvalue)
    GENPTR_INTEGER(status)
 
-   extern void *gsd_fdsc[];
-   extern void *gsd_idsc[];
+   extern GSDFileDesc *gsd_fdsc[];
+   extern GSDItemDesc *gsd_idsc[];
    extern char *gsd_dptr[];
    extern int   gsd_used[];
 
@@ -806,8 +809,8 @@ F77_SUBROUTINE(gsd_get0w)( INTEGER_ARRAY(index), WORD(wvalue),
    GENPTR_WORD(wvalue)
    GENPTR_INTEGER(status)
 
-   extern void *gsd_fdsc[];
-   extern void *gsd_idsc[];
+   extern GSDFileDesc *gsd_fdsc[];
+   extern GSDItemDesc *gsd_idsc[];
    extern char *gsd_dptr[];
    extern int   gsd_used[];
 
@@ -855,8 +858,8 @@ F77_SUBROUTINE(gsd_get0i)( INTEGER_ARRAY(index), INTEGER(ivalue),
    GENPTR_INTEGER(ivalue)
    GENPTR_INTEGER(status)
 
-   extern void *gsd_fdsc[];
-   extern void *gsd_idsc[];
+   extern GSDFileDesc *gsd_fdsc[];
+   extern GSDItemDesc *gsd_idsc[];
    extern char *gsd_dptr[];
    extern int   gsd_used[];
 
@@ -904,8 +907,8 @@ F77_SUBROUTINE(gsd_get0r)( INTEGER_ARRAY(index), REAL(rvalue),
    GENPTR_REAL(rvalue)
    GENPTR_INTEGER(status)
 
-   extern void *gsd_fdsc[];
-   extern void *gsd_idsc[];
+   extern GSDFileDesc *gsd_fdsc[];
+   extern GSDItemDesc *gsd_idsc[];
    extern char *gsd_dptr[];
    extern int   gsd_used[];
 
@@ -953,8 +956,8 @@ F77_SUBROUTINE(gsd_get0d)( INTEGER_ARRAY(index), DOUBLE(dvalue),
    GENPTR_DOUBLE(dvalue)
    GENPTR_INTEGER(status)
 
-   extern void *gsd_fdsc[];
-   extern void *gsd_idsc[];
+   extern GSDFileDesc *gsd_fdsc[];
+   extern GSDItemDesc *gsd_idsc[];
    extern char *gsd_dptr[];
    extern int   gsd_used[];
 
@@ -1002,8 +1005,8 @@ F77_SUBROUTINE(gsd_get0c)( INTEGER_ARRAY(index), CHARACTER(cvalue),
    GENPTR_CHARACTER(cvalue)
    GENPTR_INTEGER(status)
 
-   extern void *gsd_fdsc[];
-   extern void *gsd_idsc[];
+   extern GSDFileDesc *gsd_fdsc[];
+   extern GSDItemDesc *gsd_idsc[];
    extern char *gsd_dptr[];
    extern int   gsd_used[];
 
@@ -1115,8 +1118,8 @@ F77_SUBROUTINE(gsd_get1b)( INTEGER_ARRAY(index), INTEGER(no_dims),
    GENPTR_INTEGER(actvals)
    GENPTR_INTEGER(status)
 
-   extern void *gsd_fdsc[];
-   extern void *gsd_idsc[];
+   extern GSDFileDesc *gsd_fdsc[];
+   extern GSDItemDesc *gsd_idsc[];
    extern char *gsd_dptr[];
    extern int   gsd_used[];
 
@@ -1166,8 +1169,8 @@ F77_SUBROUTINE(gsd_get1l)( INTEGER_ARRAY(index), INTEGER(no_dims),
    GENPTR_INTEGER(actvals)
    GENPTR_INTEGER(status)
 
-   extern void *gsd_fdsc[];
-   extern void *gsd_idsc[];
+   extern GSDFileDesc *gsd_fdsc[];
+   extern GSDItemDesc *gsd_idsc[];
    extern char *gsd_dptr[];
    extern int   gsd_used[];
 
@@ -1217,8 +1220,8 @@ F77_SUBROUTINE(gsd_get1w)( INTEGER_ARRAY(index), INTEGER(no_dims),
    GENPTR_INTEGER(actvals)
    GENPTR_INTEGER(status)
 
-   extern void *gsd_fdsc[];
-   extern void *gsd_idsc[];
+   extern GSDFileDesc *gsd_fdsc[];
+   extern GSDItemDesc *gsd_idsc[];
    extern char *gsd_dptr[];
    extern int   gsd_used[];
 
@@ -1268,8 +1271,8 @@ F77_SUBROUTINE(gsd_get1i)( INTEGER_ARRAY(index), INTEGER(no_dims),
    GENPTR_INTEGER(actvals)
    GENPTR_INTEGER(status)
 
-   extern void *gsd_fdsc[];
-   extern void *gsd_idsc[];
+   extern GSDFileDesc *gsd_fdsc[];
+   extern GSDItemDesc *gsd_idsc[];
    extern char *gsd_dptr[];
    extern int   gsd_used[];
 
@@ -1319,8 +1322,8 @@ F77_SUBROUTINE(gsd_get1r)( INTEGER_ARRAY(index), INTEGER(no_dims),
    GENPTR_INTEGER(actvals)
    GENPTR_INTEGER(status)
 
-   extern void *gsd_fdsc[];
-   extern void *gsd_idsc[];
+   extern GSDFileDesc *gsd_fdsc[];
+   extern GSDItemDesc *gsd_idsc[];
    extern char *gsd_dptr[];
    extern int   gsd_used[];
 
@@ -1370,8 +1373,8 @@ F77_SUBROUTINE(gsd_get1d)( INTEGER_ARRAY(index), INTEGER(no_dims),
    GENPTR_INTEGER(actvals)
    GENPTR_INTEGER(status)
 
-   extern void *gsd_fdsc[];
-   extern void *gsd_idsc[];
+   extern GSDFileDesc *gsd_fdsc[];
+   extern GSDItemDesc *gsd_idsc[];
    extern char *gsd_dptr[];
    extern int   gsd_used[];
 
@@ -1422,8 +1425,8 @@ F77_SUBROUTINE(gsd_get1c)( INTEGER_ARRAY(index), INTEGER(no_dims),
    GENPTR_INTEGER(actvals)
    GENPTR_INTEGER(status)
 
-   extern void *gsd_fdsc[];
-   extern void *gsd_idsc[];
+   extern GSDFileDesc *gsd_fdsc[];
+   extern GSDItemDesc *gsd_idsc[];
    extern char *gsd_dptr[];
    extern int   gsd_used[];
 

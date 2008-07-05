@@ -13,7 +13,7 @@
 
  * Prototype:
  *    (available via #include "gsd1.h")
- *    int gsd1_rdhead( FILE *fptr, struct file_descriptor *file_dsc,
+ *    int gsd1_rdhead( FILE *fptr, const struct file_descriptor *file_dsc,
  *       struct item_descriptor *item_ptr );
 
  * Description:
@@ -23,7 +23,7 @@
  * Arguments:
  *    FILE *fptr (Given)
  *       C file descriptor.
- *    struct file_descriptor *file_dsc (Given)
+ *    const struct file_descriptor *file_dsc (Given)
  *       GSD header file descriptor.
  *    struct item_descriptor *item_ptr (Returned)
  *       Array of item descriptors. This should be of size file_dsc->no_items
@@ -66,6 +66,7 @@
  * Authors:
  *    rpt: Remo Tilanus (JACH)
  *    hme: Horst Meyerdierks (UoE, Starlink)
+ *    timj: Tim Jenness (JAC, Hawaii)
 
  * History:
  *    04 Feb 1994 or 02 Apr 1994 (rpt):
@@ -78,8 +79,11 @@
  *       Null-terminate name and unit.
  *    08 Dec 1994 (hme):
  *       Use gsd2_nativx routines.
+ *    04 Jul 2008 (timj):
+ *       use const
 
  * Copyright:
+ *    Copyright (C) 2008 Science and Technology Facilities Council.
  *    Copyright (C) 1994-1999 Particle Physics and Astronomy Research Council.
  *    All Rights Reserved. 
 
@@ -93,18 +97,18 @@
 /*:
  */
 
-int gsd1_rdhead( FILE *fptr, struct file_descriptor *file_dsc,
+int gsd1_rdhead( FILE *fptr, const struct file_descriptor *file_dsc,
    struct item_descriptor *item_ptr )
 {
    struct item_descriptor *item_ptr2;
-   int size_of_item;
+   size_t size_of_item;
    int i, j;
 
 /*.
  */
 
    item_ptr2 = item_ptr;
-   size_of_item = (int) sizeof( struct item_descriptor );
+   size_of_item = sizeof( struct item_descriptor );
 
    for ( i = 0; i < file_dsc->no_items; i++, item_ptr2++ )
    {

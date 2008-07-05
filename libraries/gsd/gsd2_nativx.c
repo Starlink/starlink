@@ -65,12 +65,16 @@
 
  * Authors:
  *    hme: Horst Meyerdierks (UoE, Starlink)
+ *    timj: Tim Jenness (JAC, Hawaii)
 
  * History:
  *    08 Dec 1994 (hme):
  *       Original.
+ *    04 Jul 2008 (timj):
+ *       Fix some compiler warnings.
 
  * Copyright:
+ *    Copyright (C) 2008 Science and Technology Facilities Council.
  *    Copyright (C) 1994-1999 Particle Physics and Astronomy Research Council.
  *    All Rights Reserved.
 
@@ -150,7 +154,6 @@ void gsd2_nativi( unsigned char *bytes )
 
 void gsd2_nativr( unsigned char *bytes )
 {
-   unsigned char temp;
    unsigned char tmp[4];
    unsigned int  e, f;
    int           i;
@@ -244,7 +247,6 @@ void gsd2_nativr( unsigned char *bytes )
 
 void gsd2_nativd( unsigned char *bytes )
 {
-   unsigned char temp;
    unsigned char tmp[8];
    unsigned int  e;
    int           i;
@@ -331,7 +333,7 @@ void gsd2_nativc( unsigned char *bytes ) { return; }
 void gsd2_nativa( char *ch_ptr, enum type_tag d_type, int d_length )
 {
    unsigned char *ch;
-   int            i, k, num;
+   int            k, num;
 
 /*.
  */

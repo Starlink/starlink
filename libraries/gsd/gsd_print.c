@@ -55,14 +55,18 @@
 * Authors:
 *    jhf: Jon Fairclough (UKTH)
 *    hme: Horst Meyerdierks (UoE, Starlink)
+*    timj: Tim Jenness (JAC, Hawaii)
 
 * History:
 *    11 Nov 1986 (jhf):
 *       Original version.
 *    01 Dec 1994 (hme):
 *       Translation to C. Use Unix-ported GSD library.
+*    04 Jul 2008 (timj):
+*       use proper GSD structs rather than void.
 
 * Copyright:
+*    Copyright (C) 2008 Science and Technology Facilities Council.
 *    Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
 *    All Rights Reserved. 
 
@@ -91,8 +95,8 @@ int main( int argc, char *argv[] )
 {
    FILE  *fptr = NULL;      /* C file descriptor */
 
-   void  *file_dsc = NULL;  /* GSD file descriptor */
-   void  *item_dsc = NULL;  /* GSD item descriptors */
+   GSDFileDesc *file_dsc = NULL;  /* GSD file descriptor */
+   GSDItemDesc *item_dsc = NULL;  /* GSD item descriptors */
    char  *data_ptr = NULL;  /* Collective data from GSD file */
 
    char  *message[] =

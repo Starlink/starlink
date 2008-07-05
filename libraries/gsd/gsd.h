@@ -38,12 +38,16 @@
 
  * Authors:
  *    hme: Horst Meyerdierks (UoE, Starlink)
+ *    timj: Tim Jenness (JAC, Hawaii)
 
  * History:
  *    30 Nov 1994 (hme):
  *       Original version.
+ *    04 Jul 2008 (timj):
+ *       use proper GSD structs rather than void. use const.
 
  * Copyright:
+ *    Copyright (C) 2008 Science and Technology Facilities Council.
  *    Copyright (C) 1994-1999 Particle Physics and Astronomy Research Council.
  *    All Rights Reserved. 
 
@@ -52,53 +56,90 @@
 
 #include <stdio.h>
 
-int gsdOpenRead( char *file, float *version, char *label, int *nitem,
-   FILE **fptr, void **file_dsc, void **item_dsc, char **data_ptr );
-int gsdClose( FILE *fptr, void *file_dsc, void *item_dsc, char *data_ptr );
-int gsdFind( void *file_dsc, void *item_dsc, char *name, int *itemno,
-   char *unit, char *type, char *array );
-int gsdItem( void *file_dsc, void *item_dsc, int itemno, char *name,
-   char *unit, char *type, char *array );
-int gsdInqSize( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, int maxdims,
-   char **dimnames, char **dimunits, int *dimvals, int *actdims, int *size );
+/* Public view of GSD structs - do not define if we are internal build */
+#ifndef GSD1_H
+typedef struct file_descriptor GSDFileDesc;
+typedef struct item_descriptor GSDItemDesc;
+#endif
 
-int gsdGet0b( void *file_dsc, void *item_dsc, char *data_ptr,
-   int itemno, char *value );
-int gsdGet0l( void *file_dsc, void *item_dsc, char *data_ptr,
-   int itemno, char *value );
-int gsdGet0w( void *file_dsc, void *item_dsc, char *data_ptr,
-   int itemno, short *value );
-int gsdGet0i( void *file_dsc, void *item_dsc, char *data_ptr,
-   int itemno, int *value );
-int gsdGet0r( void *file_dsc, void *item_dsc, char *data_ptr,
-   int itemno, float *value );
-int gsdGet0d( void *file_dsc, void *item_dsc, char *data_ptr,
-   int itemno, double *value );
-int gsdGet0c( void *file_dsc, void *item_dsc, char *data_ptr,
-   int itemno, char *value );
+int gsdOpenRead( const char *file, float *version, char *label, int *nitem,
+                 FILE **fptr, GSDFileDesc **file_dsc, GSDItemDesc **item_dsc,
+                 char **data_ptr );
+int gsdClose( FILE *fptr, GSDFileDesc *file_dsc, GSDItemDesc *item_dsc, char *data_ptr );
 
-int gsdGet1b( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, int ndims, int *dimvals, int *start, int *end,
-   char *values, int *actvals );
-int gsdGet1l( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, int ndims, int *dimvals, int *start, int *end,
-   char *values, int *actvals );
-int gsdGet1w( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, int ndims, int *dimvals, int *start, int *end,
-   short *values, int *actvals );
-int gsdGet1i( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, int ndims, int *dimvals, int *start, int *end,
-   int *values, int *actvals );
-int gsdGet1r( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, int ndims, int *dimvals, int *start, int *end,
-   float *values, int *actvals );
-int gsdGet1d( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, int ndims, int *dimvals, int *start, int *end,
-   double *values, int *actvals );
-int gsdGet1c( void *file_dsc_arg, void *item_dsc_arg, char *data_ptr,
-   int itemno, int ndims, int *dimvals, int *start, int *end,
-   char *values, int *actvals );
+int gsdFind( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc, const char name[],
+             int *itemno, char *unit, char *type, char *array );
+
+int gsdItem( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc, int itemno,
+             char *name, char *unit, char *type, char *array );
+
+int gsdInqSize( const GSDFileDesc *file_dsc_arg, const GSDItemDesc *item_dsc_arg,
+                const char *data_ptr,
+                int itemno, int maxdims,
+                char **dimnames, char **dimunits, int *dimvals, int *actdims, int *size );
+
+int gsdGet0b( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+              const char *data_ptr,
+              int itemno, char *value );
+
+int gsdGet0l( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+              const char *data_ptr,
+              int itemno, char *value );
+
+int gsdGet0w( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+              const char *data_ptr,
+              int itemno, short *value );
+
+int gsdGet0i( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+              const char *data_ptr,
+              int itemno, int *value );
+
+int gsdGet0r( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+              const char *data_ptr,
+              int itemno, float *value );
+
+int gsdGet0d( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+              const char *data_ptr,
+              int itemno, double *value );
+
+int gsdGet0c( const GSDFileDesc *file_dsc, const GSDItemDesc *item_dsc,
+              const char *data_ptr,
+              int itemno, char *value );
+
+int gsdGet1b( const GSDFileDesc *file_dsc_arg, const GSDItemDesc *item_dsc_arg,
+              const char *data_ptr, int itemno,
+              int ndims, const int dimvals[], const int start[], const int end[],
+              char *values, int *actvals );
+
+int gsdGet1l( const GSDFileDesc *file_dsc_arg, const GSDItemDesc *item_dsc_arg,
+              const char *data_ptr, int itemno,
+              int ndims, const int dimvals[], const int start[], const int end[],
+              char *values, int *actvals );
+
+int gsdGet1w( const GSDFileDesc *file_dsc_arg, const GSDItemDesc *item_dsc_arg,
+              const char *data_ptr, int itemno,
+              int ndims, const int dimvals[], const int start[], const int end[],
+              short *values, int *actvals );
+
+int gsdGet1i( const GSDFileDesc *file_dsc_arg, const GSDItemDesc *item_dsc_arg,
+              const char *data_ptr, int itemno,
+              int ndims, const int dimvals[], const int start[], const int end[],
+              int *values, int *actvals );
+
+int gsdGet1r( const GSDFileDesc *file_dsc_arg, const GSDItemDesc *item_dsc_arg,
+              const char *data_ptr, int itemno,
+              int ndims, const int dimvals[], const int start[], const int end[],
+              float *values, int *actvals );
+
+int gsdGet1d( const GSDFileDesc *file_dsc_arg, const GSDItemDesc *item_dsc_arg,
+              const char *data_ptr, int itemno,
+              int ndims, const int dimvals[], const int start[], const int end[],
+              double *values, int *actvals );
+
+int gsdGet1c( const GSDFileDesc *file_dsc_arg, const GSDItemDesc *item_dsc_arg,
+              const char *data_ptr, int itemno,
+              int ndims, const int dimvals[], const int start[], const int end[],
+              char *values, int *actvals );
 
 #endif
 /* Bottom of gsd.h */

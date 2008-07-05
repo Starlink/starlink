@@ -39,6 +39,7 @@
  * Authors:
  *    rpt: Remo Tilanus (JACH)
  *    hme: Horst Meyerdierks (UoE, Starlink)
+ *    timj: Tim Jenness (JAC, Hawaii)
 
  * History:
  *    04 Feb 1994 or 02 Apr 1994 (rpt):
@@ -46,8 +47,11 @@
  *    29 Nov 1994 (hme):
  *       Remove the system-dependent static external host_order from this file.
  *       Remove the static external gsd_byte as well, used only in one routine.
+ *    3 Jul 2008 (timj):
+ *       Use typedef for struct. Consting.
 
  * Copyright:
+ *    Copyright (C) 2008 Science and Technology Facilities Council.
  *    Copyright (C) 1994-1999 Particle Physics and Astronomy Research Council.
  *    All Rights Reserved.
 
@@ -83,7 +87,7 @@ enum type_tag
 /* Define the GSD file descriptor.
  */
 
-struct file_descriptor
+typedef struct file_descriptor
 {  float version;         /* GSD file format version for SPECX         */
    int   max_no_items;    /* Maximum number of items in file ?         */
    int   no_items;        /* Number of items in this file    ?         */
@@ -91,12 +95,12 @@ struct file_descriptor
    int   end_data;        /* End of data area - byte number            */
    char  comment[40];      
    int size;              
-};
+} GSDFileDesc;
 
 /* Define the GSD item descriptor.
  */
 
-struct item_descriptor
+typedef struct item_descriptor
 {  char  array;
    char  name[15];
    short namelen;
@@ -107,7 +111,7 @@ struct item_descriptor
    int   length;
    int   no_dims;
    int   dimnumbers[5];
-};
+} GSDItemDesc;
 
 /* Collection of prototypes for the internal routines.
  */
@@ -128,16 +132,16 @@ void gsd2_nativc( unsigned char *bytes );
 void gsd2_nativa( char *ch_ptr, enum type_tag d_type, int d_length );
 
 int gsd2_copya( enum type_tag itype, enum type_tag otype,
-		int size, unsigned char *in, unsigned char *out );
+		size_t size, const unsigned char *in, unsigned char *out );
 
 
 int gsd1_rdfildsc( FILE *fptr, struct file_descriptor *file_dsc );
-int gsd1_rdhead(   FILE *fptr, struct file_descriptor *file_dsc,
+int gsd1_rdhead(   FILE *fptr, const struct file_descriptor *file_dsc,
    struct item_descriptor *item_ptr );
-int gsd1_rddata(   FILE *fptr, struct item_descriptor *item_ptr,
+int gsd1_rddata( FILE *fptr, const struct item_descriptor *item_ptr,
    char *data_ptr, int startitem, int noitems );
-int gsd1_getval( struct file_descriptor *file_dsc,
-   struct item_descriptor *item_dsc, char *data_ptr,
+int gsd1_getval( const struct file_descriptor *file_dsc,
+   const struct item_descriptor *item_dsc, const char *data_ptr,
    int mode, short data_type, char *name, int *itemno,
    int first, int last, char *gsdval );
 

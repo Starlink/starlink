@@ -13,12 +13,12 @@
 *    C function.
 
 * Invocation:
-*    int gsdClose( FILE *fptr, void *file_dsc, void *item_dsc,
+*    int gsdClose( FILE *fptr, GSDFileDesc *file_dsc, GSDItemDesc *item_dsc,
 *       char *data_ptr );
 
 * Prototype:
 *    available via #include "gsd.h"
- *    int gsdClose( FILE *fptr, void *file_dsc, void *item_dsc,
+ *    int gsdClose( FILE *fptr, GSDFileDesc *file_dsc, GSDItemDesc *item_dsc,
  *       char *data_ptr );
 
 * Description:
@@ -31,9 +31,9 @@
 * Arguments:
 *    FILE *fptr (Given)
 *       The file descriptor for the GSD file to be closed.
-*    void *file_dsc (Given)
+*    GSDFileDesc *file_dsc (Given)
 *       The GSD file descriptor related to the file opened on fptr.
-*    void *item_dsc (Given)
+*    GSDItemDesc *item_dsc (Given)
 *       The array of GSD item descriptors related to the file opened on fptr.
 *    char *data_ptr (Given)
 *       The buffer with all the data from the GSD file opened on fptr.
@@ -62,6 +62,8 @@
 *    jhf: Jon Fairclough (UKTH)
 *    rp: Rachael Padman (MRAO)
 *    hme: Horst Meyerdierks (UoE, Starlink)
+*    timj: Tim Jenness (JAC, Hawaii)
+
 
 * History:
 *    08 Sep 1986 (jhf):
@@ -72,8 +74,12 @@
 *       Adaption to Remo's C code.
 *    30 Nov 1994 (hme):
 *       Translation to C. Renamed from GSD_CLOSE. Interface revised.
+*    04 Jul 2008 (timj):
+*       use proper GSD structs rather than void
+
 
 * Copyright:
+*    Copyright (C) 2008 Science and Technology Facilities Council.
 *    Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
 *    All Rights Reserved. 
 
@@ -88,7 +94,8 @@
 /*:
  */
 
-int gsdClose( FILE *fptr, void *file_dsc, void *item_dsc, char *data_ptr )
+int gsdClose( FILE *fptr, GSDFileDesc *file_dsc, GSDItemDesc *item_dsc,
+              char *data_ptr )
 {
    int status;
 
