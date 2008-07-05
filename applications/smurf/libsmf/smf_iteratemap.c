@@ -616,9 +616,11 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   /* Create an ordered smfGrp which keeps track of files corresponding to
      different subarrays (observed simultaneously), as well as time-ordering
      the files. Now added "chunk" to smfGroup as well -- this is used to
-     concatenate _only_ continuous pieces of data */
+     concatenate _only_ continuous pieces of data. We subtract padStart
+     and padEnd from maxlen since these also add to the file length. */
 
-  smf_grp_related( igrp, isize, 1, maxlen, &maxconcat, &igroup, status );
+  smf_grp_related( igrp, isize, 1, maxlen-padStart-padEnd, &maxconcat, 
+                   &igroup, status );
 
   /* Once we've run smf_grp_related we know how many subarrays there
      are.  We also know the maximum length of a concatenated piece of
