@@ -385,7 +385,9 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
 
 	    smf_calc_mapcoord( refdata, outfset, moving, lbnd_out, ubnd_out, 
 			       SMF__NOCREATE_FILE, status );
-	  }
+	  } else {
+            havelut = 0;
+          }
 
 	  /* Change data order if required */
 	  smf_dataOrder( refdata, isTordered, status );
