@@ -539,7 +539,7 @@ void smurf_makemap( int *status ) {
   size_t maxmem=0;           /* Max memory usage in bytes */
   int maxmem_mb;             /* Max memory usage in Mb */
   double maxtexp = 0.0;      /* Maximum exposure time */
-  double medtexp = 0.0;      /* Median exposure time */
+  float medtexp = 0.0;       /* Median exposure time */
   char method[LEN__METHOD];  /* String for map-making method */
   int moving = 0;            /* Is the telescope base position changing? */
   int nparam = 0;            /* Number of extra parameters for pixel spreading*/
