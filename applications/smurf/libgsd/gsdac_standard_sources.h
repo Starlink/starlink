@@ -50,7 +50,7 @@
 #define GSDAC_STANDARDS_DEFINED
 
 /* Spectral standard sources. */
-static char* standards[] = {
+static const char* standards[] = {
   "W3(OH)",
   "L1551-IRS5",
   "CRL618",

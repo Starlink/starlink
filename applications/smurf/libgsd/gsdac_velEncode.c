@@ -94,8 +94,8 @@ void gsdac_velEncode ( const char *vframe, const char *vdef,
   int j;                      /* index for vframe */
   int k;                      /* loop counter */
   char upper[3];              /* uppercase string */
-  char *vdefs[4] = { "", "RAD", "OPT", "REL" };
-  char *vframes[7] = { "", "TOPO", "LSR", "HELI", "GEO", "BARY", "TELL" };
+  const char *vdefs[] = { "", "RAD", "OPT", "REL" };
+  const char *vframes[] = { "", "TOPO", "LSR", "HELI", "GEO", "BARY", "TELL" };
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;

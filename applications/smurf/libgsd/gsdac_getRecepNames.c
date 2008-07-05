@@ -144,7 +144,7 @@ void gsdac_getRecepNames ( const gsdVars *gsdVars, char *recepNames[],
     
     } else {
 
-      if ( recepFlags[1] = 1 ) {
+      if ( recepFlags[1] == 1 ) {
 
         sprintf ( recepNames[0], "%cB", frontendLetter );
 

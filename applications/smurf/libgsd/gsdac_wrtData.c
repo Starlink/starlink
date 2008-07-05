@@ -77,6 +77,8 @@
 *        Pass special flag to getWCS.
 *     2008-04-23 (JB):
 *        Use matchFreqs instead of special flag.
+*     2008-07-03 (TIMJ):
+*        Fix some warnings.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -131,18 +133,17 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
 {
 
   /* Local variables */
-  float amEnd;                /* airmass at end of observation */
-  float amStart;              /* airmass at start of observation */
-  double azEnd;               /* Azimuth at observation end (deg) */
-  double azStart;             /* Azimuth at observation start (deg) */
+  float amEnd = 0.0;          /* airmass at end of observation */
+  float amStart = 0.0;        /* airmass at start of observation */
+  double azEnd = -1.0;        /* Azimuth at observation end (deg) */
+  double azStart = -1.0;      /* Azimuth at observation start (deg) */
   char backend[SZFITSCARD];   /* name of the backend */
   char card[81];              /* FITS card for updating headers */
   dateVars dateVars;          /* date/time variables */
-  double elEnd;               /* elevation at observation end (deg) */
-  double elStart;             /* elevation at observation start (deg) */
-  const AstFitsChan *fitschan[gsdVars->nBESections];  
+  double elEnd = -1.0;        /* elevation at observation end (deg) */
+  double elStart = -1.0;      /* elevation at observation start (deg) */
+  AstFitsChan *fitschan[MAXSUBSYS];  
                               /* Array of FITS headers */
-  char *focalStation = NULL;  /* focal station of the instrument */
   float fPlaneX[MAXRECEP]; 
   float fPlaneY[MAXRECEP];
   int i;                      /* loop counter */
@@ -167,11 +168,21 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
   unsigned int stepNum;       /* current step */
   int subBandNum;             /* subband number of current spectrum */
   unsigned int utDate;        /* UT date in YYYYMMDD format */
-  gsdWCS wcs[nSteps];         /* pointing and time values for JCMTState */
+  gsdWCS wcs;                 /* pointing and time values for JCMTState */
   AstFrameSet *WCSFrame;      /* WCS frameset */
 
   /* Check inherited status */
   if ( *status != SAI__OK ) return;
+
+  /* Sanity check */
+  if (gsdVars->nBESections > MAXSUBSYS) {
+    *status = SAI__ERROR;
+    msgSeti( "NB", gsdVars->nBESections );
+    msgSeti( "MAX", MAXSUBSYS );
+    errRep(" ", "Number of backend sections in obs (^NB)"
+           " exceeds statically allocated buffer (^MAX)"
+           " (possible programming error)", status);
+  }
 
   /* Get the UTDate and convert to YYYYMMDD format. */
   msgOutif(MSG__VERB," ", 
@@ -188,9 +199,6 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
     parGet0i ( "OBSNUM", &obsNum, status ); 
   else 
     obsNum = (int)gsdVars->nObs;
-
-  /* Get the focal station. */
-  focalStation = "DIRECT";
 
   for ( i = 0; i < gsdVars->nFEChans; i++ ) { 
     recepNames[i] = smf_malloc ( 3, sizeof( char ), 0, status );
@@ -233,11 +241,12 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
     return;
   }
 
+  /* DAS era instruments were always in the cabin */
   acsSpecOpenTS ( directory, utDate, obsNum, recepsUsed, 
-                  nSubsys, recepNames, focalStation, 
+                  nSubsys, recepNames, "DIRECT",
                   fPlaneX, fPlaneY, OCSConfig, status );
 
-  /* Allocate memory for JCMTState, and SpecHdr. */
+  /* Allocate memory for JCMTState, and SpecHdr */
   record = smf_malloc ( 1, sizeof ( *record ), 0, status );
   specHdr = smf_malloc ( 1, sizeof ( *specHdr ), 0, status );
 
@@ -281,27 +290,27 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
 
       /* Get the pointing and time values. */
       gsdac_getWCS ( gsdVars, stepNum, subBandNum, dasFlag, lineFreqs, 
-                     IFFreqs, wcs, &WCSFrame, status );
+                     IFFreqs, &wcs, &WCSFrame, status );
 
       /* If this is the first spectrum, get the amStart, 
          azStart and elStart. */
       if ( stepNum == 0 && subBandNum == 0 ) {
-        amStart = wcs->airmass;
-        azStart = wcs->acAz / AST__DD2R;
-        elStart = wcs->acEl / AST__DD2R;
+        amStart = wcs.airmass;
+        azStart = wcs.acAz / AST__DD2R;
+        elStart = wcs.acEl / AST__DD2R;
       }
 
       /* For each step, update the amEnd, azEnd, and elEnd, so that the 
          final values are those for the last time step. */
       if ( stepNum == nSteps-1 && subBandNum == 0 ) {
-        amEnd = wcs->airmass;
-        azEnd = wcs->acAz / AST__DD2R;
-        elEnd = wcs->acEl / AST__DD2R;
+        amEnd = wcs.airmass;
+        azEnd = wcs.acAz / AST__DD2R;
+        elEnd = wcs.acEl / AST__DD2R;
       }      
 
       /* Get the subsystem-dependent JCMTState values. */
       gsdac_putJCMTStateS ( gsdVars, stepNum, subBandNum, dasFlag, 
-      	                    wcs, record, status );
+      	                    &wcs, record, status );
 
       /* Get the ACSIS SpecHdr. */
       gsdac_putSpecHdr ( gsdVars, nSteps, stepNum, subBandNum, recepFlags, 
@@ -334,7 +343,7 @@ void gsdac_wrtData ( const gsdVars *gsdVars, const char *directory,
 
       specIndex = specIndex + gsdVars->BEChans[subBandNum];
 
-      astAnnul ( WCSFrame );
+      WCSFrame = astAnnul ( WCSFrame );
 
     }
 

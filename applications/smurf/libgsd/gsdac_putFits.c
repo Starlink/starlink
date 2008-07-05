@@ -22,7 +22,7 @@
 *                     const char *obsType, const dateVars *dateVars,
 *                     const mapVars *mapVars, const double *lineFreqs,
 *                     const double *IFFreqs,
-*                     const AstFitsChan *fitschan, int *status )
+*                     AstFitsChan *fitschan, int *status )
 
 *  Arguments:
 *     gsdVars = const gsdVars* (Given)
@@ -55,7 +55,7 @@
 *        Frequencies for line transitions for each subband.
 *     IFFreqs = const double* (Given)
 *        IFs for each subband.
-*     fitschan = const AstFitsChan* (Given and Returned)
+*     fitschan = AstFitsChan* (Given and Returned)
 *        FITS headers.
 *     status = int* (Given and Returned)
 *        Pointer to global status.  
@@ -171,7 +171,7 @@ void gsdac_putFits ( const gsdVars *gsdVars, const int subBandNum,
                      const char *obsType, const dateVars *dateVars,
                      const mapVars *mapVars, const double *lineFreqs,
                      const double *IFFreqs,
-                     const AstFitsChan *fitschan, int *status )
+                     AstFitsChan *fitschan, int *status )
 
 {
 

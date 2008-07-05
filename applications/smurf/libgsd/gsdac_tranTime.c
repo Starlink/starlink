@@ -89,8 +89,8 @@ void gsdac_tranTime ( const char *dTime, char *iDate, char *iTime,
   int hour;                   /* hour */
   int min;                    /* min */
   int month;                  /* month */
-  char *months[12] = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL",
-                       "AUG", "SEP", "OCT", "NOV", "DEC" };  
+  const char *months[] = { "JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL",
+                           "AUG", "SEP", "OCT", "NOV", "DEC" };  
   int sec;                    /* second */
   int year;                   /* year */
 
