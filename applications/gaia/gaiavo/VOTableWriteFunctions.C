@@ -1,24 +1,26 @@
 /*+
  *  Name:
- *     VOTableFunctions
+ *     VOTableWriteFunctions
 
  *  Purpose:
- *     Utility functions for accessing VOTables, part of the gaia::VOTable
- *     class.
+ *     Utility functions for converting a VOTable into a tab table.
 
  *  Description:
  *     These functions make use of the codesynthesis classes generated using
- *     the VOTable 1.1 schema. There are two fundamental versions of theses
- *     classes (sadly not derived from each other, so no common interface,
- *     which is why these functions are preprocessed using differing C++
- *     namespaces) one fully namespace qualified, the official schema, and one
- *     where all the elements are in the default namespace (this latter form
- *     should become less common, but is always likely to occur).
+ *     the VOTable 1.1 schema to read a VOTable and write it out as a
+ *     tab table. 
  *
- *     (Note: some of this could be done using templates, but that looks
- *     untidy as you cannot use a namespace, just types, so each type 
- *     used would need to be declared, that NS::VOTABLE, NS::TABLE,
- *     NS::PARAM etc., see emptyTable for a starter if you prefer
+ *     There are two fundamental versions of theses schema derived classes
+ *     (sadly not derived from each other, so no common interface, which is
+ *     why these functions are preprocessed using differing C++ namespaces)
+ *     one fully namespace qualified, the official schema, and one where all
+ *     the elements are in the default namespace (it happens, in fact may
+ *     be standard).
+ *
+ *     (Note in passing: some of this could be done using templates, but that
+ *     looks untidy as you cannot use a namespace as a template, just types,
+ *     so each type used would need to be declared, that's NS::VOTABLE,
+ *     NS::TABLE, NS::PARAM etc., see emptyTable for a starter if you prefer
  *     that approach).
 
  *  Language:
@@ -91,12 +93,13 @@ XERCES_CPP_NAMESPACE_USE
 
 namespace gaia {
 
+    // Actual members are defined elsewhere.
 #define NS votable_11_dns
 #include "VOTableWriteFunctions.icc"
 #undef NS
-        
+    
 #define NS votable_11
 #include "VOTableWriteFunctions.icc"
 #undef NS
-
+    
 }

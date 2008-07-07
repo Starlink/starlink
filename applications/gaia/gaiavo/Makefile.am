@@ -9,7 +9,7 @@ AM_CXXFLAGS = -I. -I$(STARLINK)/include/tclutil \
    -I$(STARLINK)/include/astrotcl -I$(STARLINK)/include/cat
 
 #  Common source code.
-VOTABLE_ROUTINES =  VOTable.C VOTableFunctions.C VOTableReadFunctions.C \
+VOTABLE_ROUTINES =  VOTable.C VOTableWriteFunctions.C VOTableReadFunctions.C \
    VOTable1.1.C VOTable1.1_dns.C VOTableStream.C GaiaBase64.C GaiaGzip.C \
    GaiaUtils.C
 
