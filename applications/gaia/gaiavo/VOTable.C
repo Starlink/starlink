@@ -57,18 +57,13 @@
 #include <HTTP.h>
 #include <Fits_IO.h>
 #include <Mem.h>
-#include <CatalogInfo.h>
-#include <LocalCatalog.h>
 
 /*  Local includes. */
-#include "VOTable1.1_dns.hxx"
-#include "VOTable1.1.hxx"
 #include "VOTable.h"
 #include "VOTableStream.h"
 #include "GaiaUtils.h"
 #include "gaiabase64.h"
 #include "gaiagzip.h"
-
 
 using namespace std;
 
@@ -76,22 +71,6 @@ using namespace std;
 XERCES_CPP_NAMESPACE_USE
 
 namespace gaia {
-
-    //  Create namespace qualified versions of VOTable functions for the
-    //  differing Schema (in this case version 1.1. with and without XML
-    //  namespace qualifications, dns means everything in the default
-    //  namespace).  Note these functions are in the gaia:: namespace, but are
-    //  not part of this class.
-#define NS votable_11_dns
-#include "VOTableFunctions.C"
-#undef NS
-
-#define NS votable_11
-#include "VOTableFunctions.C"
-#undef NS
-
-    //  Other utilities for reading AstroCat objects.
-#include "VOTableReadFunctions.C"
 
     /**
      *  Namespace qualifiers for checking XML declaration.

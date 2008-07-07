@@ -3,7 +3,7 @@
  *     gaia::GaiaUtils
 
  *  Purpose:
- *     Utility functions for GAIA.
+ *     Utility functions for GAIA-VO.
 
  *  Language:
  *     C++ include file.
@@ -40,8 +40,28 @@
 
 #include <sstream>
 #include <string>
+#include <vector>
+
+using namespace std;
 
 namespace gaia {
+
+    /*  Radians to degrees. */
+    const double R2D = 57.295779513082323;
+
+    /*  Functions for testing column name, ucd and utype values
+     *  to see if they are a likely special column.
+     */
+    bool matches_id( string& name, string& ucd, string& utype );
+    bool matches_ra( string& name, string& ucd, string& utype );
+    bool matches_dec( string& name, string& ucd, string& utype );
+    bool matches_x( string& name, string& ucd, string& utype );
+    bool matches_y( string& name, string& ucd, string& utype );
+
+    /**
+     *  Split a string to it parts. The separator is the tab character.
+     */
+    void split_tabbed( const char *pval, vector<string>& words );
 
     /**
      *  Convert a string into a numeric value (defined by std::ios_base

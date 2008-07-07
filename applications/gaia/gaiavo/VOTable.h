@@ -91,6 +91,56 @@ namespace gaia
 
         //  Convert an extended Skycat catalogue into a VOTable.
         int readTST( AstroCatalog *cat );
+
+    protected:
+
+        //  Create namespace qualified versions of VOTable members for the
+        //  differing Schema (in this case version 1.1. with and without XML
+        //  namespace qualifications, dns means everything in the default
+        //  namespace). These read a VOTable and write a tab table.
+#define NS votable_11_dns
+#include "VOTableFunctions.h"
+#undef NS
+        
+#define NS votable_11
+#include "VOTableFunctions.h"
+#undef NS
+
+        //  Similar functions for reading a tab table and writing a VOTable.
+        //  Only support writing in the VOTable namespace so no need for
+        //  macro funnies.
+        int votable_read( AstroCatalog *cat, votable_11::VOTABLE &votable );
+        void resource_coosys( votable_11::RESOURCE &resource, 
+                              AstroCatalog *cat );
+        void table_params( votable_11::TABLE &table, AstroCatalog *cat );
+        void table_data( votable_11::TABLE &table, AstroCatalog *cat );
+
+        //  Split a param representing all columns into it parts.
+        static void table_split_param( const char *pval, 
+                                       vector<string>& words );
+
+        //  Functions for testing column name, ucd and utype values
+        //  to see if they are a likely special column.
+        bool matches_id( string& name, string& ucd, string& utype );
+        bool matches_ra( string& name, string& ucd, string& utype );
+        bool matches_dec( string& name, string& ucd, string& utype );
+        bool matches_x( string& name, string& ucd, string& utype );
+        bool matches_y( string& name, string& ucd, string& utype );
+
+        /**
+         *  Return an NS::TABLE reference that can be used when no other
+         *  reference is available (in particular for pure functions that
+         *  return NS:TABLE as a reference). Note <T> should be <NS::TABLE> in
+         *  the function call. Failure can be checked by testing for an
+         *  attribute (name() is a good choice).
+         */
+        template <typename T>
+            T *emptyTable()
+        {
+            static T emptyTable;
+            return &emptyTable;
+        }
+
     };
 }
 

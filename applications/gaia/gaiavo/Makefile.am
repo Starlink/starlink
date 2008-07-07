@@ -9,11 +9,12 @@ AM_CXXFLAGS = -I. -I$(STARLINK)/include/tclutil \
    -I$(STARLINK)/include/astrotcl -I$(STARLINK)/include/cat
 
 #  Common source code.
-VOTABLE_ROUTINES =  VOTable.C VOTable1.1.C VOTable1.1_dns.C \
-   VOTableStream.C GaiaBase64.C GaiaGzip.C GaiaUtils.C
+VOTABLE_ROUTINES =  VOTable.C VOTableFunctions.C VOTableReadFunctions.C \
+   VOTable1.1.C VOTable1.1_dns.C VOTableStream.C GaiaBase64.C GaiaGzip.C \
+   GaiaUtils.C
 
 #  Explicit dependencies.
-VOTable.C: VOTableFunctions.C VOTableReadFunctions.C VOTable1.1.C VOTable1.1_dns.C
+VOTableFunctions.C: VOTableWriteFunctions.icc
 
 #  Libraries we link against.
 VOTABLE_LIBS = -lastrotcl2.0 -ltclutil2.0 -lxerces-c -lcat4.0

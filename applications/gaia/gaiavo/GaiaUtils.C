@@ -41,13 +41,132 @@
  *-
  */
 
-#include <iostream>
-#include <sstream>
-#include <string>
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "GaiaUtils.h"
 
 using namespace std;
 
 namespace gaia {
+
+    /**
+     *  Check name, ucd and utype for a match to an ID column.
+     */
+    bool matches_id( string& name, string& ucd, string& utype )
+    {
+
+        if ( ( ucd.find( "meta.id" ) == 0 ) ||
+             ( ucd.find( "id_" ) == 0 ) ||
+             ( ucd == "obs_id" ) ||
+             ( name == "id" ) ||
+             ( name.find( "ident" ) == 0 ) ||
+             ( name == "name" ) ) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     *  Check name, ucd and utype for a match to an RA column.
+     */
+    bool matches_ra( string& name, string& ucd, string& utype )
+    {
+        if ( ( ucd.find( "pos.eq.ra" ) == 0 ) ||
+             ( ucd.find( "pos_eq_ra" ) == 0 ) ||
+             ( name.find( "ra" ) == 0 ) ||
+             ( name.find( "right" ) == 0 ) ||
+             ( name.find( "r.a." ) == 0 ) ||
+             ( name.find( "x_world" ) == 0 ) ||
+             ( name.find( "alpha" ) == 0 ) ) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     *  Check name, ucd and utype for a match to a Dec column.
+     */
+    bool matches_dec( string& name, string& ucd, string& utype )
+    {
+        if ( ( ucd.find( "pos.eq.dec" ) == 0 ) ||
+             ( ucd.find( "pos_eq_dec" ) == 0 ) ||
+             ( name.find( "dec" ) == 0 ) ||
+             ( name.find( "y_world" ) == 0 ) ||
+             ( name.find( "delta" ) == 0 ) ) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     *  Check name, ucd and utype for a match to an X column.
+     */
+    bool matches_x( string& name, string& ucd, string& utype )
+    {
+        if ( ( ucd.find( "pos.cartesian.x" ) == 0 ) ||
+             ( name == "x" ) ||
+             ( name == "xpos" ) ) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     *  Check name, ucd and utype for a match to a Y column.
+     */
+    bool matches_y( string& name, string& ucd, string& utype )
+    {
+        if ( ( ucd.find( "pos.cartesian.y" ) == 0 ) ||
+             ( name == "y" ) ||
+             ( name == "ypos" ) ) {
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     *  Split a string with tab separated values into it component
+     *  parts. Usually such a string is a multivalued column parameter (like a
+     *  series of UCD, UTYPE or UNIT values, one per column). If the string is
+     *  null or empty nothing is done.
+     */
+    void split_tabbed( const char *pval, vector<string>& words )
+    {
+        if ( pval && pval[0] != '\0' ) {
+            
+            //  Position in string.
+            const char *p = pval;
+            
+            //  Position of current start.
+            const char *s = p;
+            
+            //  Loop over string until end (so must be \0 terminated).
+            while( *p ) {
+                
+                //  Skip forward until end of string or see a tab.
+                while ( *p && *p != '\t' ) p++;
+                
+                //  No movement, first char is another tab, means no value.
+                if ( p == s ) {
+                    words.push_back( string( "---" ) );
+                }
+                else {
+                    //  Extract value and save.
+                    words.push_back( string( s, p - s ) );
+                }
+                
+                //  Forward over tab and star new substring, unless this is the
+                //  end of string.
+                if ( *p ) {
+                    p++;
+                    s = p;
+                }
+            }
+        }
+    }
 
     /**
      *  Create a lower case version of a string.

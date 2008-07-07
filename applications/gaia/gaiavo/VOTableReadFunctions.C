@@ -3,17 +3,18 @@
  *     VOTableReadFunctions
 
  *  Purpose:
- *     Utility functions for reading a Skycat catalog
+ *     Member unctions for reading a Skycat catalog and converting
+ *     it into a VOTable.
 
  *  Description:
- *     Utility functions for reading an AstroCat catalog and populating a
+ *     Member functions for reading an AstroCat catalog and populating a
  *     votable_11::VOTABLE element with a RESOURCE and TABLE element that
  *     describes the content (along with the required PARAM, FIELD and COOSYS
  *     elements). The DATA element is populated using a TABLEDATA, no BINARY
- *     streams are supported.
+ *     or FITS streams are supported. Part of the VOTable class.
 
  *  Language:
- *     C++ include file.
+ *     C++ .
 
  *  Copyright:
  *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -45,400 +46,377 @@
  *-
  */
 
-/*  Prototypes for functions. */
-int votable_read( AstroCatalog *cat, votable_11::VOTABLE &votable );
-void resource_coosys( votable_11::RESOURCE &resource, AstroCatalog *cat );
-void table_params( votable_11::TABLE &table, AstroCatalog *cat );
-void table_data( votable_11::TABLE &table, AstroCatalog *cat );
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
 
-/*  Local functions. */
-static void table_split_param( const char *pval, vector<string>& words );
+/*  System includes. */
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <memory>
+#include <string>
 
-/**
- *  Main routine. Translate contents of a Skycat tab table into a DOM
- *  rooted at the given VOTABLE.
- */
-int votable_read( AstroCatalog *cat, votable_11::VOTABLE &votable )
-{
-    using namespace votable_11;
+/*  Skycat includes. */
+#include <AstroCatalog.h>
+#include <CatalogInfo.h>
+#include <LocalCatalog.h>
 
-    //  RESOURCE to hold everything.
-    RESOURCE resource;
+/*  Local includes. */
+#include "VOTable.h"
+#include "GaiaUtils.h"
 
-    //  Add a COOSYS to RESOURCE, note we use the AST system name for the ID.
-    resource_coosys( resource, cat );
+using namespace std;
 
-    //  Create TABLE.
-    TABLE table;
-    table.name( cat->name() );
-    
-    //  Add description. XXX how?
-    //auto_ptr<type> value( "Create by GAIA" );
-    //auto_ptr<TABLE::DESCRIPTION_optional> d( value );
-    //TABLE::DESCRIPTION_optional& desc( table.DESCRIPTION() );
+namespace gaia {
 
-    //  Add any standard PARAMs to TABLE.
-    table_params( table, cat );
+    /**
+     *  Main routine for reading. Translate contents of a Skycat tab table
+     *  into a DOM rooted at the given VOTABLE.
+     */
+    int VOTable::votable_read( AstroCatalog *cat, 
+                               votable_11::VOTABLE &votable )
+    {
+        using namespace votable_11;
 
-    //  Add FIELDs describing the columns and the data itself to TABLE.
-    table_data( table, cat );
+        //  RESOURCE to hold everything.
+        RESOURCE resource;
 
-    //  Add TABLE to RESOURCE.
-    RESOURCE::TABLE_sequence& tseq( resource.TABLE() );
-    tseq.push_back( table );
+        //  Add a COOSYS to RESOURCE, note we use the AST system name for the
+        //  ID.
+        resource_coosys( resource, cat );
 
-    //  Add RESOURCE to the VOTABLE.
-    VOTABLE::RESOURCE_sequence& rseq( votable.RESOURCE() );
-    resource.name( cat->name() );
-    rseq.push_back( resource );
+        //  Create TABLE.
+        TABLE table;
+        table.name( cat->name() );
 
-    cout << resource.name() << endl;
+        //  Add description. XXX how couldn't work that out?
+        //auto_ptr<type> value( "Create by GAIA" );
+        //auto_ptr<TABLE::DESCRIPTION_optional> d( value );
+        //TABLE::DESCRIPTION_optional& desc( table.DESCRIPTION() );
 
-    return 1;
-}
+        //  Add any standard PARAMs to TABLE.
+        table_params( table, cat );
 
-/**
- *  Add a COOSYS element to a RESOURCE.
- */
-void resource_coosys( votable_11::RESOURCE &resource, AstroCatalog *cat )
-{
-    using namespace votable_11;
+        //  Add FIELDs describing the columns and the data itself to TABLE.
+        table_data( table, cat );
 
-    //    VOTABLE System values:
-    //           - ICRS
-    //           - eq_FK5
-    //           - eq_FK4
-    //           - ecl_FK5  (ecliptic, equinox = J2000)
-    //           - ecl_FK4  (ecliptic, equinox = B1950)
-    //           - galactic
-    //           - supergalactic
-    //           - geo_app
-    CatalogInfoEntry *e = cat->entry();
-    string astsystem( e->system() );
-    string system;
-    string equinox;
+        //  Add TABLE to RESOURCE.
+        RESOURCE::TABLE_sequence& tseq( resource.TABLE() );
+        tseq.push_back( table );
 
-    //  ID is set as the AST system.
-    COOSYS coosys( astsystem );
+        //  Add RESOURCE to the VOTABLE.
+        VOTABLE::RESOURCE_sequence& rseq( votable.RESOURCE() );
+        resource.name( cat->name() );
+        rseq.push_back( resource );
 
-    //  Translate AST system into VOTable version.
-    to_lower( astsystem, system );
-    if ( system == "fk5" ) {
-        system = "eq_FK5";
-        equinox = "J2000";
-    }
-    else if ( system == "fk4" ) {
-        system = "eq_FK4";
-        equinox = "B1950";
-    }
-    else if ( system == "ecliptic" ) {
-        system = "ecl_FK5";
-        equinox = "J2000";
-    }
-    else if ( system == "galactic" ) {
-        system = "galactic";
-    }
-    else if ( system == "supergalactic" ) {
-        system = "supergalactic";
-    }
-    else if ( system == "icrs" ) {
-        system = "ICRS";
-    }
-    else if ( system == "geocentric" ) {
-        system = "geo_app";
-    }
-    coosys.system( system );
-    coosys.equinox( equinox );
-
-    //  Pick out equinox and epoch, if set.
-    ostringstream oss;
-    if ( e->equinoxprefix() ) {
-        oss << e->equinoxprefix();
-    }
-    oss << e->equinox();
-    coosys.equinox( oss.str() );
-
-    oss.str("");
-
-    //  Only set if we have a prefix.
-    if ( e->epochprefix() ) {
-        oss << e->epochprefix();
-        oss << e->epoch();
-        coosys.epoch( oss.str() );
+        return 1;
     }
 
-    //  Add to the RESOURCE.
-    RESOURCE::COOSYS_sequence& cseq( resource.COOSYS() );
-    cseq.push_back( coosys );
-}
+    /**
+     *  Add a COOSYS element to a RESOURCE.
+     */
+    void VOTable::resource_coosys( votable_11::RESOURCE &resource,
+                                   AstroCatalog *cat )
+    {
+        using namespace votable_11;
 
-/**
- *  Add known PARAMs to a TABLE.
- */
-void table_params( votable_11::TABLE &table, AstroCatalog *cat )
-{
-    using namespace votable_11;
+        //    VOTABLE System values:
+        //           - ICRS
+        //           - eq_FK5
+        //           - eq_FK4
+        //           - ecl_FK5  (ecliptic, equinox = J2000)
+        //           - ecl_FK4  (ecliptic, equinox = B1950)
+        //           - galactic
+        //           - supergalactic
+        //           - geo_app
+        CatalogInfoEntry *e = cat->entry();
+        string astsystem( e->system() );
+        string system;
+        string equinox;
 
-    CatalogInfoEntry *e = cat->entry();
+        //  ID is set as the AST system.
+        COOSYS coosys( astsystem );
 
-    TABLE::PARAM_sequence& pseq( table.PARAM() );
-
-    const char *value = e->symbol();
-    if ( value && value[0] != '\0' ) {
-        pseq.push_back( PARAM( "char", "symbol", value ) );
-    }
-
-    value = e->longName();
-    if ( value && value[0] != '\0' ) {
-        pseq.push_back( PARAM( "char", "long_name", value ) );
-    }
-
-    value = e->shortName();
-    if ( value && value[0] != '\0' ) {
-        pseq.push_back( PARAM( "char", "short_name", value ) );
-    }
-
-    value = e->url();
-    if ( value && value[0] != '\0' ) {
-        pseq.push_back( PARAM( "char", "url", value ) );
-    }
-
-    value = e->searchCols();
-    if ( value && value[0] != '\0' ) {
-        pseq.push_back( PARAM( "char", "search_cols", value ) );
-    }
-
-    value = e->sortCols();
-    if ( value && value[0] != '\0' ) {
-        pseq.push_back( PARAM( "char", "sort_cols", value ) );
-    }
-
-    value = e->sortOrder();
-    if ( value && value[0] != '\0' ) {
-        pseq.push_back( PARAM( "char", "sort_order", value ) );
-    }
-
-    value = e->showCols();
-    if ( value && value[0] != '\0' ) {
-        pseq.push_back( PARAM( "char", "show_cols", value ) );
-    }
-
-    value = e->copyright();
-    if ( value && value[0] != '\0' ) {
-        pseq.push_back( PARAM( "char", "copyright", value ) );
-    }
-
-    value = e->help();
-    if ( value && value[0] != '\0' ) {
-        pseq.push_back( PARAM( "char", "help", value ) );
-    }
-}
-
-/**
- *  Add the FIELD and DATA.
- */
-void table_data( votable_11::TABLE &table, AstroCatalog *cat )
-{
-    using namespace votable_11;
-
-    CatalogInfoEntry *e = cat->entry();
-
-    //  Locate special columns, these will be identified using a suitable UCD
-    //  values.
-    const int id_col = e->id_col();
-    const int ra_col = e->ra_col();
-    const int dec_col = e->dec_col();
-    const int x_col = e->x_col();
-    const int y_col = e->y_col();
-
-    //  UCDs, UNITSs, UTYPEs and DATATYPEs, if present parse these into one per field.
-    vector<string> ucd;
-    table_split_param( e->ucd(), ucd );
-    vector<string> unit;
-    table_split_param( e->unit(), unit );
-    vector<string> utype;
-    table_split_param( e->utype(), utype );
-    vector<string> datatype;
-    table_split_param( e->datatype(), datatype );
-
-    //  Whether units for RA and Dec have been established.
-    bool ra_set = false;
-    bool dec_set = false;
-
-    //  Loop over the fields.
-    int ncols = cat->numCols();
-    string lunit;
-    TABLE::FIELD_sequence& fseq( table.FIELD() );
-    for ( int i = 0; i < ncols; i++ ) {
-
-        //  Basic FIELD element.
-        FIELD field( "char", cat->colName( i ) );
-
-        //  UCD, unit and utype.
-        if ( ucd.size() > i && ucd[i] != "---" ) {
-            field.ucd( ucd[i] );
+        //  Translate AST system into VOTable version.
+        to_lower( astsystem, system );
+        if ( system == "fk5" ) {
+            system = "eq_FK5";
+            equinox = "J2000";
         }
-        if ( unit.size() > i && unit[i] != "---") {
-            field.unit( unit[i] );
+        else if ( system == "fk4" ) {
+            system = "eq_FK4";
+            equinox = "B1950";
         }
-        if ( utype.size() > i && utype[i] != "---") {
-            field.utype( utype[i] );
+        else if ( system == "ecliptic" ) {
+            system = "ecl_FK5";
+            equinox = "J2000";
+        }
+        else if ( system == "galactic" ) {
+            system = "galactic";
+        }
+        else if ( system == "supergalactic" ) {
+            system = "supergalactic";
+        }
+        else if ( system == "icrs" ) {
+            system = "ICRS";
+        }
+        else if ( system == "geocentric" ) {
+            system = "geo_app";
+        }
+        coosys.system( system );
+        coosys.equinox( equinox );
+
+        //  Pick out equinox and epoch, if set.
+        ostringstream oss;
+        if ( e->equinoxprefix() ) {
+            oss << e->equinoxprefix();
+        }
+        oss << e->equinox();
+        coosys.equinox( oss.str() );
+
+        oss.str( "" );
+
+        //  Only set if we have a prefix.
+        if ( e->epochprefix() ) {
+            oss << e->epochprefix();
+            oss << e->epoch();
+            coosys.epoch( oss.str() );
         }
 
-        //  Ref to COOSYS, and make sure UCDs to those columns are defined.
-        //  These will always be in degrees or hh/dd:mm:ss format.
-        if ( i == ra_col || i == dec_col ) {
-            field.ref( e->system() );
-            if ( i == ra_col ) {
-                field.ucd( "POS_EQ_RA_MAIN" );
-                if ( unit.size() > i ) {
-                    to_lower( unit[i], lunit );
-                    if ( lunit.find( "hms" ) != string::npos ||
-                         lunit.find( "h:m:s" ) != string::npos ) {
-                        field.unit( "HMS" );
+        //  Add to the RESOURCE.
+        RESOURCE::COOSYS_sequence& cseq( resource.COOSYS() );
+        cseq.push_back( coosys );
+    }
+
+    /**
+     *  Add known PARAMs to a TABLE.
+     */
+    void VOTable::table_params( votable_11::TABLE &table, AstroCatalog *cat )
+    {
+        using namespace votable_11;
+
+        CatalogInfoEntry *e = cat->entry();
+
+        TABLE::PARAM_sequence& pseq( table.PARAM() );
+
+        const char *value = e->symbol();
+        if ( value && value[0] != '\0' ) {
+            pseq.push_back( PARAM( "char", "symbol", value ) );
+        }
+
+        value = e->longName();
+        if ( value && value[0] != '\0' ) {
+            pseq.push_back( PARAM( "char", "long_name", value ) );
+        }
+
+        value = e->shortName();
+        if ( value && value[0] != '\0' ) {
+            pseq.push_back( PARAM( "char", "short_name", value ) );
+        }
+
+        value = e->url();
+        if ( value && value[0] != '\0' ) {
+            pseq.push_back( PARAM( "char", "url", value ) );
+        }
+
+        value = e->searchCols();
+        if ( value && value[0] != '\0' ) {
+            pseq.push_back( PARAM( "char", "search_cols", value ) );
+        }
+
+        value = e->sortCols();
+        if ( value && value[0] != '\0' ) {
+            pseq.push_back( PARAM( "char", "sort_cols", value ) );
+        }
+
+        value = e->sortOrder();
+        if ( value && value[0] != '\0' ) {
+            pseq.push_back( PARAM( "char", "sort_order", value ) );
+        }
+
+        value = e->showCols();
+        if ( value && value[0] != '\0' ) {
+            pseq.push_back( PARAM( "char", "show_cols", value ) );
+        }
+
+        value = e->copyright();
+        if ( value && value[0] != '\0' ) {
+            pseq.push_back( PARAM( "char", "copyright", value ) );
+        }
+
+        value = e->help();
+        if ( value && value[0] != '\0' ) {
+            pseq.push_back( PARAM( "char", "help", value ) );
+        }
+    }
+
+    /**
+     *  Add the FIELD and DATA.
+     */
+    void VOTable::table_data( votable_11::TABLE &table, AstroCatalog *cat )
+    {
+        using namespace votable_11;
+
+        CatalogInfoEntry *e = cat->entry();
+
+        //  Locate special columns, these will be identified using a suitable
+        //  UCD values.
+        const int id_col = e->id_col();
+        const int ra_col = e->ra_col();
+        const int dec_col = e->dec_col();
+        const int x_col = e->x_col();
+        const int y_col = e->y_col();
+
+        //  UCDs, UNITSs, UTYPEs and DATATYPEs, if present parse these into
+        //  one per field.
+        vector<string> ucd;
+        split_tabbed( e->ucd(), ucd );
+        vector<string> unit;
+        split_tabbed( e->unit(), unit );
+        vector<string> utype;
+        split_tabbed( e->utype(), utype );
+        vector<string> datatype;
+        split_tabbed( e->datatype(), datatype );
+
+        //  Whether units for RA and Dec have been established.
+        bool ra_set = false;
+        bool dec_set = false;
+
+        //  Loop over the fields.
+        int ncols = cat->numCols();
+        string lunit;
+        TABLE::FIELD_sequence& fseq( table.FIELD() );
+        for ( int i = 0; i < ncols; i++ ) {
+
+            //  Basic FIELD element.
+            FIELD field( "char", cat->colName( i ) );
+
+            //  UCD, unit and utype.
+            if ( ucd.size() > i && ucd[i] != "---" ) {
+                field.ucd( ucd[i] );
+            }
+            if ( unit.size() > i && unit[i] != "---") {
+                field.unit( unit[i] );
+            }
+            if ( utype.size() > i && utype[i] != "---") {
+                field.utype( utype[i] );
+            }
+
+            //  Ref to COOSYS, and make sure UCDs to those columns are defined.
+            //  These will always be in degrees or hh/dd:mm:ss format.
+            if ( i == ra_col || i == dec_col ) {
+                field.ref( e->system() );
+                if ( i == ra_col ) {
+                    field.ucd( "POS_EQ_RA_MAIN" );
+                    if ( unit.size() > i ) {
+                        to_lower( unit[i], lunit );
+                        if ( lunit.find( "hms" ) != string::npos ||
+                             lunit.find( "h:m:s" ) != string::npos ) {
+                            field.unit( "HMS" );
+                            ra_set = true;
+                        }
+                    }
+                    else {
+                        field.unit( "degrees" );
+                        field.datatype( "double" );
+                    }
+                }
+                else {
+                    field.ucd( "POS_EQ_DEC_MAIN" );
+                    if ( unit.size() > i ) {
+                        to_lower( unit[i], lunit );
+                        if ( lunit.find( "dms" ) != string::npos ||
+                             lunit.find( "d:m:s" ) != string::npos ) {
+                            field.unit( "DMS" );
+                            dec_set = true;
+                        }
+                    }
+                    else {
+                        field.unit( "degrees" );
+                        field.datatype( "double" );
+                    }
+                }
+            }
+            else if ( i == x_col || i == y_col ) {
+                //  X and Y coordinate will be doubles, unless we know better.
+                if ( datatype.size() > i ) {
+                    field.datatype( datatype[i] );
+                }
+                else {
+                    field.datatype( "double" );
+                }
+            }
+            else {
+                //  Everything else is a char, unless explicitly set.
+                if ( datatype.size() > i && datatype[i] != "char" ) {
+                    field.datatype( datatype[i] );
+                }
+                else {
+                    field.arraysize( "*" );
+                }
+            }
+
+            //  Add FIELD.
+            fseq.push_back( field );
+        }
+
+        //  Create DATA element and TABLEDATA objects. These will be given to
+        //  the TABLE (not copied), so use auto_ptr and do not assign until
+        //  finished.
+        auto_ptr<DATA> dataptr( new DATA );
+        auto_ptr<TABLEDATA> tabledataptr( new TABLEDATA );
+
+        //  TR sequence for adding rows.
+        TABLEDATA::TR_sequence& trseq( tabledataptr->TR() );
+
+        //  Perform the query, this reads the data.
+        QueryResult& r( static_cast<LocalCatalog *>(cat)->getQuery() );
+
+        //  Loop adding data, <TR/> for a row, with <TD/> for each cell.
+        int nrows = r.numRows();
+        table.nrows( nrows );
+        char *value;
+        for ( int j = 0; j < nrows; j++ ) {
+            TR tr;
+            TR::TD_sequence& tdseq( tr.TD() );
+            for ( int i = 0; i < ncols; i++ ) {
+
+                //  If not set then check RA and Dec columns for data format,
+                //  if hh/dd:mm:ss then set the units.
+                if ( ! ra_set && i == ra_col ) {
+                    if ( r.get( j, i, value ) == 0 ) {
+                        if ( strchr( value, ':' ) ) {
+                            fseq[i].unit( "HMS" );
+                            fseq[i].datatype( "char" );
+                            fseq[i].arraysize( "*" );
+                        }
                         ra_set = true;
                     }
                 }
-                else {
-                    field.unit( "degrees" );
-                    field.datatype( "double" );
-                }
-            }
-            else {
-                field.ucd( "POS_EQ_DEC_MAIN" );
-                if ( unit.size() > i ) {
-                    to_lower( unit[i], lunit );
-                    if ( lunit.find( "dms" ) != string::npos ||
-                         lunit.find( "d:m:s" ) != string::npos ) {
-                        field.unit( "DMS" );
+                else if ( ! dec_set && i == dec_col ) {
+                    if ( r.get( j, i, value ) == 0 ) {
+                        if ( strchr( value, ':' ) ) {
+                            fseq[i].unit( "DMS" );
+                            fseq[i].datatype( "char" );
+                            fseq[i].arraysize( "*" );
+                        }
                         dec_set = true;
                     }
                 }
+
+                if ( r.get( j, i, value ) == 0 ) {
+                    tdseq.push_back( TD( value ) );
+                }
                 else {
-                    field.unit( "degrees" );
-                    field.datatype( "double" );
+                    tdseq.push_back( TD( "" ) );
                 }
             }
-        }
-        else if ( i == x_col || i == y_col ) {
-            //  X and Y coordinate will be doubles, unless we know better.
-            if ( datatype.size() > i ) {
-                field.datatype( datatype[i] );
-            }
-            else {
-                field.datatype( "double" );
-            }
-        }
-        else {
-            //  Everything else is a char, unless explicitly set.
-            if ( datatype.size() > i && datatype[i] != "char" ) {
-                field.datatype( datatype[i] );
-            }
-            else {
-                field.arraysize( "*" );
-            }
+            trseq.push_back( tr );
         }
 
-        //  Add FIELD.
-        fseq.push_back( field );
-    }
-
-    //  Create DATA element and TABLEDATA objects. These will be given to 
-    //  the TABLE (not copied), so use auto_ptr and do not assign until finished.
-    auto_ptr<DATA> dataptr( new DATA );
-    auto_ptr<TABLEDATA> tabledataptr( new TABLEDATA );
-
-    //  TR sequence for adding rows.
-    TABLEDATA::TR_sequence& trseq( tabledataptr->TR() );
-
-    //  Perform the query, this reads the data.
-    QueryResult& r( static_cast<LocalCatalog *>(cat)->getQuery() );
-
-    //  Loop adding data, <TR/> for a row, with <TD/> for each cell.
-    int nrows = r.numRows();
-    table.nrows( nrows );
-    char *value;
-    for ( int j = 0; j < nrows; j++ ) {
-        TR tr;
-        TR::TD_sequence& tdseq( tr.TD() );
-        for ( int i = 0; i < ncols; i++ ) {
-
-            //  If not set then check RA and Dec columns for data format, if
-            //  hh/dd:mm:ss then set the units.
-            if ( ! ra_set && i == ra_col ) {
-                if ( r.get( j, i, value ) == 0 ) {
-                    if ( strchr( value, ':' ) ) {
-                        fseq[i].unit( "HMS" );
-                        fseq[i].datatype( "char" );
-                        fseq[i].arraysize( "*" );
-                    }
-                    ra_set = true;
-                }
-            }
-            else if ( ! dec_set && i == dec_col ) {
-                if ( r.get( j, i, value ) == 0 ) {
-                    if ( strchr( value, ':' ) ) {
-                        fseq[i].unit( "DMS" );
-                        fseq[i].datatype( "char" );
-                        fseq[i].arraysize( "*" );
-                    }
-                    dec_set = true;
-                }
-            }
-
-            if ( r.get( j, i, value ) == 0 ) {
-                tdseq.push_back( TD( value ) );
-            }
-            else {
-                tdseq.push_back( TD( "" ) );
-            }
-        }
-        trseq.push_back( tr );
-    }
-
-    //  Structures complete, relinquish to DOM.
-    dataptr->TABLEDATA( tabledataptr );
-    table.DATA( dataptr );
-}
-
- 
-/**
- *  Given a character string representing a tab separated parameter
- *  (like a series of UCD, UTYPE or UNIT values, one per column)
- *  populate a vector with the extracted values. If the string
- *  is null or empty nothing is done.
- */
-static void table_split_param( const char *pval, vector<string>& words )
-{
-    if ( pval && pval[0] != '\0' ) {
-
-        //  Position in string.
-        const char *p = pval;
-
-        //  Position of current start.
-        const char *s = p;
-
-        //  Loop over string until end (so must be \0 terminated).
-        while( *p ) {
-
-            //  Skip forward until end of string or see a tab.
-            while ( *p && *p != '\t' ) p++;
-
-            //  No movement, first char is another tab, means no value.
-            if ( p == s ) {
-                words.push_back( string( "---" ) );
-            }
-            else {
-                //  Extract value and save.
-                words.push_back( string( s, p - s ) );
-            }
-
-            //  Forward over tab and star new substring, unless this is the
-            //  end of string.
-            if ( *p ) {
-                p++;
-                s = p;
-            }
-        }
+        //  Structures complete, relinquish to DOM.
+        dataptr->TABLEDATA( tabledataptr );
+        table.DATA( dataptr );
     }
 }
