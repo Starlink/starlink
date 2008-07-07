@@ -270,7 +270,7 @@ namespace gaia {
         //  Extract the null value.
         unsigned char nullvalue;
         if ( havenull ) {
-            havenull = convert( nullstring, nullvalue );
+            havenull = from_string( nullstring, nullvalue );
         }
 
         if ( havenull ) {
@@ -469,7 +469,7 @@ namespace gaia {
 
         T nullvalue;
         if ( havenull ) {
-            havenull = convert( nullstring, nullvalue );
+            havenull = from_string( nullstring, nullvalue );
         }
 
         if ( havenull ) {
@@ -519,7 +519,7 @@ namespace gaia {
 
         T nullvalue;
         if ( havenull ) {
-            havenull = convert( nullstring, nullvalue );
+            havenull = from_string( nullstring, nullvalue );
         }
 
         if ( havenull ) {

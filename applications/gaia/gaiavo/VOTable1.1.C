@@ -8381,6 +8381,2077 @@ namespace votable_11
   }
 }
 
+#include <ostream>
+#include <xsd/cxx/xml/dom/serialization-source.hxx>
+#include <xsd/cxx/tree/error-handler.hxx>
+
+namespace votable_11
+{
+  void
+  operator<< (::xercesc::DOMElement& e, const anyTEXT& i)
+  {
+    e << static_cast< const ::xml_schema::type& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const astroYear& i)
+  {
+    e << static_cast< const ::xml_schema::token& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMAttr& a,const astroYear& i)
+  {
+    a << static_cast< const ::xml_schema::token& > (i);
+  }
+
+  void
+  operator<< (::xml_schema::list_stream& l,
+              const astroYear& i)
+  {
+    l << static_cast< const ::xml_schema::token& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const ucdType& i)
+  {
+    e << static_cast< const ::xml_schema::token& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMAttr& a,const ucdType& i)
+  {
+    a << static_cast< const ::xml_schema::token& > (i);
+  }
+
+  void
+  operator<< (::xml_schema::list_stream& l,
+              const ucdType& i)
+  {
+    l << static_cast< const ::xml_schema::token& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const arrayDEF& i)
+  {
+    e << static_cast< const ::xml_schema::token& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMAttr& a,const arrayDEF& i)
+  {
+    a << static_cast< const ::xml_schema::token& > (i);
+  }
+
+  void
+  operator<< (::xml_schema::list_stream& l,
+              const arrayDEF& i)
+  {
+    l << static_cast< const ::xml_schema::token& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const encodingType& i)
+  {
+    e << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMAttr& a, const encodingType& i)
+  {
+    a << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xml_schema::list_stream& l,
+              const encodingType& i)
+  {
+    l << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const dataType& i)
+  {
+    e << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMAttr& a, const dataType& i)
+  {
+    a << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xml_schema::list_stream& l,
+              const dataType& i)
+  {
+    l << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const precType& i)
+  {
+    e << static_cast< const ::xml_schema::token& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMAttr& a,const precType& i)
+  {
+    a << static_cast< const ::xml_schema::token& > (i);
+  }
+
+  void
+  operator<< (::xml_schema::list_stream& l,
+              const precType& i)
+  {
+    l << static_cast< const ::xml_schema::token& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const yesno& i)
+  {
+    e << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMAttr& a, const yesno& i)
+  {
+    a << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xml_schema::list_stream& l,
+              const yesno& i)
+  {
+    l << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  VOTABLE_write (::std::ostream& o,
+                 const ::votable_11::VOTABLE& s,
+                 const ::xml_schema::namespace_infomap& m,
+                 const ::std::string& e,
+                 ::xml_schema::flags f)
+  {
+    ::xsd::cxx::xml::auto_initializer i (
+      (f & ::xml_schema::flags::dont_initialize) == 0);
+
+    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+      ::votable_11::VOTABLE_write (s, m, f));
+
+    ::xsd::cxx::tree::error_handler< char > h;
+
+    ::xsd::cxx::xml::dom::ostream_format_target t (o);
+    if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
+    {
+      h.throw_if_failed< ::xsd::cxx::tree::serialization< char > > ();
+    }
+  }
+
+  void
+  VOTABLE_write (::std::ostream& o,
+                 const ::votable_11::VOTABLE& s,
+                 const ::xml_schema::namespace_infomap& m,
+                 ::xml_schema::error_handler& h,
+                 const ::std::string& e,
+                 ::xml_schema::flags f)
+  {
+    ::xsd::cxx::xml::auto_initializer i (
+      (f & ::xml_schema::flags::dont_initialize) == 0);
+
+    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+      ::votable_11::VOTABLE_write (s, m, f));
+    ::xsd::cxx::xml::dom::ostream_format_target t (o);
+    if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
+    {
+      throw ::xsd::cxx::tree::serialization< char > ();
+    }
+  }
+
+  void
+  VOTABLE_write (::std::ostream& o,
+                 const ::votable_11::VOTABLE& s,
+                 const ::xml_schema::namespace_infomap& m,
+                 ::xercesc::DOMErrorHandler& h,
+                 const ::std::string& e,
+                 ::xml_schema::flags f)
+  {
+    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+      ::votable_11::VOTABLE_write (s, m, f));
+    ::xsd::cxx::xml::dom::ostream_format_target t (o);
+    if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
+    {
+      throw ::xsd::cxx::tree::serialization< char > ();
+    }
+  }
+
+  void
+  VOTABLE_write (::xercesc::XMLFormatTarget& t,
+                 const ::votable_11::VOTABLE& s,
+                 const ::xml_schema::namespace_infomap& m,
+                 const ::std::string& e,
+                 ::xml_schema::flags f)
+  {
+    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+      ::votable_11::VOTABLE_write (s, m, f));
+
+    ::xsd::cxx::tree::error_handler< char > h;
+
+    if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
+    {
+      h.throw_if_failed< ::xsd::cxx::tree::serialization< char > > ();
+    }
+  }
+
+  void
+  VOTABLE_write (::xercesc::XMLFormatTarget& t,
+                 const ::votable_11::VOTABLE& s,
+                 const ::xml_schema::namespace_infomap& m,
+                 ::xml_schema::error_handler& h,
+                 const ::std::string& e,
+                 ::xml_schema::flags f)
+  {
+    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+      ::votable_11::VOTABLE_write (s, m, f));
+    if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
+    {
+      throw ::xsd::cxx::tree::serialization< char > ();
+    }
+  }
+
+  void
+  VOTABLE_write (::xercesc::XMLFormatTarget& t,
+                 const ::votable_11::VOTABLE& s,
+                 const ::xml_schema::namespace_infomap& m,
+                 ::xercesc::DOMErrorHandler& h,
+                 const ::std::string& e,
+                 ::xml_schema::flags f)
+  {
+    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+      ::votable_11::VOTABLE_write (s, m, f));
+    if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
+    {
+      throw ::xsd::cxx::tree::serialization< char > ();
+    }
+  }
+
+  void
+  VOTABLE_write (::xercesc::DOMDocument& d,
+                 const ::votable_11::VOTABLE& s,
+                 ::xml_schema::flags)
+  {
+    ::xercesc::DOMElement& e (*d.getDocumentElement ());
+    const ::xsd::cxx::xml::qualified_name< char > n (
+      ::xsd::cxx::xml::dom::name< char > (e));
+
+    if (n.name () == "VOTABLE" &&
+        n.namespace_ () == "http://www.ivoa.net/xml/VOTable/v1.1")
+    {
+      e << s;
+    }
+    else
+    {
+      throw ::xsd::cxx::tree::unexpected_element < char > (
+        n.name (),
+        n.namespace_ (),
+        "VOTABLE",
+        "http://www.ivoa.net/xml/VOTable/v1.1");
+    }
+  }
+
+  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >
+  VOTABLE_write (const ::votable_11::VOTABLE& s,
+                 const ::xml_schema::namespace_infomap& m,
+                 ::xml_schema::flags f)
+  {
+    try
+    {
+      ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+        ::xsd::cxx::xml::dom::serialize< char > (
+          "VOTABLE",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          m, f));
+
+      ::votable_11::VOTABLE_write (*d, s, f);
+      return d;
+    }
+    catch (const ::xsd::cxx::xml::dom::mapping< char >& e)
+    {
+      throw ::xsd::cxx::tree::no_namespace_mapping< char > (e.name ());
+    }
+    catch (const ::xsd::cxx::xml::dom::xsi_already_in_use&)
+    {
+      throw ::xsd::cxx::tree::xsi_already_in_use< char > ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const VOTABLE& i)
+  {
+    e << static_cast< const ::xml_schema::type& > (i);
+
+    // DESCRIPTION
+    //
+    if (i.DESCRIPTION ())
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "DESCRIPTION",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *i.DESCRIPTION ();
+    }
+
+    // DEFINITIONS
+    //
+    if (i.DEFINITIONS ())
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "DEFINITIONS",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *i.DEFINITIONS ();
+    }
+
+    // COOSYS
+    //
+    for (VOTABLE::COOSYS_const_iterator
+         b (i.COOSYS ().begin ()), n (i.COOSYS ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "COOSYS",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // PARAM
+    //
+    for (VOTABLE::PARAM_const_iterator
+         b (i.PARAM ().begin ()), n (i.PARAM ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "PARAM",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // INFO
+    //
+    for (VOTABLE::INFO_const_iterator
+         b (i.INFO ().begin ()), n (i.INFO ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "INFO",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // RESOURCE
+    //
+    for (VOTABLE::RESOURCE_const_iterator
+         b (i.RESOURCE ().begin ()), n (i.RESOURCE ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "RESOURCE",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // ID
+    //
+    if (i.ID ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "ID",
+          e));
+
+      a << *i.ID ();
+    }
+
+    // version
+    //
+    if (i.version ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "version",
+          e));
+
+      a << *i.version ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const RESOURCE& i)
+  {
+    e << static_cast< const ::xml_schema::type& > (i);
+
+    // DESCRIPTION
+    //
+    if (i.DESCRIPTION ())
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "DESCRIPTION",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *i.DESCRIPTION ();
+    }
+
+    // INFO
+    //
+    for (RESOURCE::INFO_const_iterator
+         b (i.INFO ().begin ()), n (i.INFO ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "INFO",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // COOSYS
+    //
+    for (RESOURCE::COOSYS_const_iterator
+         b (i.COOSYS ().begin ()), n (i.COOSYS ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "COOSYS",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // PARAM
+    //
+    for (RESOURCE::PARAM_const_iterator
+         b (i.PARAM ().begin ()), n (i.PARAM ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "PARAM",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // LINK
+    //
+    for (RESOURCE::LINK_const_iterator
+         b (i.LINK ().begin ()), n (i.LINK ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "LINK",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // TABLE
+    //
+    for (RESOURCE::TABLE_const_iterator
+         b (i.TABLE ().begin ()), n (i.TABLE ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "TABLE",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // RESOURCE
+    //
+    for (RESOURCE::RESOURCE1_const_iterator
+         b (i.RESOURCE1 ().begin ()), n (i.RESOURCE1 ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "RESOURCE",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // name
+    //
+    if (i.name ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "name",
+          e));
+
+      a << *i.name ();
+    }
+
+    // ID
+    //
+    if (i.ID ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "ID",
+          e));
+
+      a << *i.ID ();
+    }
+
+    // utype
+    //
+    if (i.utype ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "utype",
+          e));
+
+      a << *i.utype ();
+    }
+
+    // type
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "type",
+          e));
+
+      a << i.type ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const DEFINITIONS& i)
+  {
+    e << static_cast< const ::xml_schema::type& > (i);
+
+    // COOSYS
+    //
+    for (DEFINITIONS::COOSYS_const_iterator
+         b (i.COOSYS ().begin ()), n (i.COOSYS ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "COOSYS",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // PARAM
+    //
+    for (DEFINITIONS::PARAM_const_iterator
+         b (i.PARAM ().begin ()), n (i.PARAM ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "PARAM",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const INFO& i)
+  {
+    e << static_cast< const ::xml_schema::string& > (i);
+
+    // ID
+    //
+    if (i.ID ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "ID",
+          e));
+
+      a << *i.ID ();
+    }
+
+    // name
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "name",
+          e));
+
+      a << i.name ();
+    }
+
+    // value
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "value",
+          e));
+
+      a << i.value ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const PARAM& i)
+  {
+    e << static_cast< const ::xml_schema::type& > (i);
+
+    // DESCRIPTION
+    //
+    if (i.DESCRIPTION ())
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "DESCRIPTION",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *i.DESCRIPTION ();
+    }
+
+    // VALUES
+    //
+    if (i.VALUES ())
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "VALUES",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *i.VALUES ();
+    }
+
+    // LINK
+    //
+    for (PARAM::LINK_const_iterator
+         b (i.LINK ().begin ()), n (i.LINK ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "LINK",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // ID
+    //
+    if (i.ID ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "ID",
+          e));
+
+      a << *i.ID ();
+    }
+
+    // unit
+    //
+    if (i.unit ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "unit",
+          e));
+
+      a << *i.unit ();
+    }
+
+    // datatype
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "datatype",
+          e));
+
+      a << i.datatype ();
+    }
+
+    // precision
+    //
+    if (i.precision ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "precision",
+          e));
+
+      a << *i.precision ();
+    }
+
+    // width
+    //
+    if (i.width ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "width",
+          e));
+
+      a << *i.width ();
+    }
+
+    // ref
+    //
+    if (i.ref ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "ref",
+          e));
+
+      a << *i.ref ();
+    }
+
+    // name
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "name",
+          e));
+
+      a << i.name ();
+    }
+
+    // ucd
+    //
+    if (i.ucd ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "ucd",
+          e));
+
+      a << *i.ucd ();
+    }
+
+    // utype
+    //
+    if (i.utype ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "utype",
+          e));
+
+      a << *i.utype ();
+    }
+
+    // value
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "value",
+          e));
+
+      a << i.value ();
+    }
+
+    // arraysize
+    //
+    if (i.arraysize ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "arraysize",
+          e));
+
+      a << *i.arraysize ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const TABLE& i)
+  {
+    e << static_cast< const ::xml_schema::type& > (i);
+
+    // DESCRIPTION
+    //
+    if (i.DESCRIPTION ())
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "DESCRIPTION",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *i.DESCRIPTION ();
+    }
+
+    // FIELD
+    //
+    for (TABLE::FIELD_const_iterator
+         b (i.FIELD ().begin ()), n (i.FIELD ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "FIELD",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // PARAM
+    //
+    for (TABLE::PARAM_const_iterator
+         b (i.PARAM ().begin ()), n (i.PARAM ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "PARAM",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // GROUP
+    //
+    for (TABLE::GROUP_const_iterator
+         b (i.GROUP ().begin ()), n (i.GROUP ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "GROUP",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // LINK
+    //
+    for (TABLE::LINK_const_iterator
+         b (i.LINK ().begin ()), n (i.LINK ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "LINK",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // DATA
+    //
+    if (i.DATA ())
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "DATA",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *i.DATA ();
+    }
+
+    // ID
+    //
+    if (i.ID ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "ID",
+          e));
+
+      a << *i.ID ();
+    }
+
+    // name
+    //
+    if (i.name ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "name",
+          e));
+
+      a << *i.name ();
+    }
+
+    // ref
+    //
+    if (i.ref ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "ref",
+          e));
+
+      a << *i.ref ();
+    }
+
+    // ucd
+    //
+    if (i.ucd ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "ucd",
+          e));
+
+      a << *i.ucd ();
+    }
+
+    // utype
+    //
+    if (i.utype ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "utype",
+          e));
+
+      a << *i.utype ();
+    }
+
+    // nrows
+    //
+    if (i.nrows ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "nrows",
+          e));
+
+      a << *i.nrows ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const FIELD& i)
+  {
+    e << static_cast< const ::xml_schema::type& > (i);
+
+    // DESCRIPTION
+    //
+    if (i.DESCRIPTION ())
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "DESCRIPTION",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *i.DESCRIPTION ();
+    }
+
+    // VALUES
+    //
+    if (i.VALUES ())
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "VALUES",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *i.VALUES ();
+    }
+
+    // LINK
+    //
+    for (FIELD::LINK_const_iterator
+         b (i.LINK ().begin ()), n (i.LINK ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "LINK",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // ID
+    //
+    if (i.ID ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "ID",
+          e));
+
+      a << *i.ID ();
+    }
+
+    // unit
+    //
+    if (i.unit ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "unit",
+          e));
+
+      a << *i.unit ();
+    }
+
+    // datatype
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "datatype",
+          e));
+
+      a << i.datatype ();
+    }
+
+    // precision
+    //
+    if (i.precision ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "precision",
+          e));
+
+      a << *i.precision ();
+    }
+
+    // width
+    //
+    if (i.width ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "width",
+          e));
+
+      a << *i.width ();
+    }
+
+    // ref
+    //
+    if (i.ref ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "ref",
+          e));
+
+      a << *i.ref ();
+    }
+
+    // name
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "name",
+          e));
+
+      a << i.name ();
+    }
+
+    // ucd
+    //
+    if (i.ucd ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "ucd",
+          e));
+
+      a << *i.ucd ();
+    }
+
+    // utype
+    //
+    if (i.utype ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "utype",
+          e));
+
+      a << *i.utype ();
+    }
+
+    // arraysize
+    //
+    if (i.arraysize ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "arraysize",
+          e));
+
+      a << *i.arraysize ();
+    }
+
+    // type
+    //
+    if (i.type ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "type",
+          e));
+
+      a << *i.type ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const GROUP& i)
+  {
+    e << static_cast< const ::xml_schema::type& > (i);
+
+    // DESCRIPTION
+    //
+    if (i.DESCRIPTION ())
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "DESCRIPTION",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *i.DESCRIPTION ();
+    }
+
+    // FIELDref
+    //
+    for (GROUP::FIELDref_const_iterator
+         b (i.FIELDref ().begin ()), n (i.FIELDref ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "FIELDref",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // PARAMref
+    //
+    for (GROUP::PARAMref_const_iterator
+         b (i.PARAMref ().begin ()), n (i.PARAMref ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "PARAMref",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // PARAM
+    //
+    for (GROUP::PARAM_const_iterator
+         b (i.PARAM ().begin ()), n (i.PARAM ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "PARAM",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // GROUP
+    //
+    for (GROUP::GROUP1_const_iterator
+         b (i.GROUP1 ().begin ()), n (i.GROUP1 ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "GROUP",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // ID
+    //
+    if (i.ID ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "ID",
+          e));
+
+      a << *i.ID ();
+    }
+
+    // name
+    //
+    if (i.name ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "name",
+          e));
+
+      a << *i.name ();
+    }
+
+    // ref
+    //
+    if (i.ref ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "ref",
+          e));
+
+      a << *i.ref ();
+    }
+
+    // ucd
+    //
+    if (i.ucd ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "ucd",
+          e));
+
+      a << *i.ucd ();
+    }
+
+    // utype
+    //
+    if (i.utype ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "utype",
+          e));
+
+      a << *i.utype ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const FIELDref& i)
+  {
+    e << static_cast< const ::xml_schema::type& > (i);
+
+    // ref
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "ref",
+          e));
+
+      a << i.ref ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const PARAMref& i)
+  {
+    e << static_cast< const ::xml_schema::type& > (i);
+
+    // ref
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "ref",
+          e));
+
+      a << i.ref ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const VALUES& i)
+  {
+    e << static_cast< const ::xml_schema::type& > (i);
+
+    // MIN
+    //
+    if (i.MIN ())
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "MIN",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *i.MIN ();
+    }
+
+    // MAX
+    //
+    if (i.MAX ())
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "MAX",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *i.MAX ();
+    }
+
+    // OPTION
+    //
+    for (VALUES::OPTION_const_iterator
+         b (i.OPTION ().begin ()), n (i.OPTION ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "OPTION",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // ID
+    //
+    if (i.ID ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "ID",
+          e));
+
+      a << *i.ID ();
+    }
+
+    // type
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "type",
+          e));
+
+      a << i.type ();
+    }
+
+    // null
+    //
+    if (i.null ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "null",
+          e));
+
+      a << *i.null ();
+    }
+
+    // ref
+    //
+    if (i.ref ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "ref",
+          e));
+
+      a << *i.ref ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const MIN& i)
+  {
+    e << static_cast< const ::xml_schema::type& > (i);
+
+    // value
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "value",
+          e));
+
+      a << i.value ();
+    }
+
+    // inclusive
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "inclusive",
+          e));
+
+      a << i.inclusive ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const MAX& i)
+  {
+    e << static_cast< const ::xml_schema::type& > (i);
+
+    // value
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "value",
+          e));
+
+      a << i.value ();
+    }
+
+    // inclusive
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "inclusive",
+          e));
+
+      a << i.inclusive ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const OPTION& i)
+  {
+    e << static_cast< const ::xml_schema::type& > (i);
+
+    // OPTION
+    //
+    for (OPTION::OPTION1_const_iterator
+         b (i.OPTION1 ().begin ()), n (i.OPTION1 ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "OPTION",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+
+    // name
+    //
+    if (i.name ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "name",
+          e));
+
+      a << *i.name ();
+    }
+
+    // value
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "value",
+          e));
+
+      a << i.value ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const LINK& i)
+  {
+    e << static_cast< const ::xml_schema::type& > (i);
+
+    // ID
+    //
+    if (i.ID ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "ID",
+          e));
+
+      a << *i.ID ();
+    }
+
+    // content-role
+    //
+    if (i.content_role ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "content-role",
+          e));
+
+      a << *i.content_role ();
+    }
+
+    // content-type
+    //
+    if (i.content_type ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "content-type",
+          e));
+
+      a << *i.content_type ();
+    }
+
+    // title
+    //
+    if (i.title ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "title",
+          e));
+
+      a << *i.title ();
+    }
+
+    // value
+    //
+    if (i.value ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "value",
+          e));
+
+      a << *i.value ();
+    }
+
+    // href
+    //
+    if (i.href ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "href",
+          e));
+
+      a << *i.href ();
+    }
+
+    // gref
+    //
+    if (i.gref ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "gref",
+          e));
+
+      a << *i.gref ();
+    }
+
+    // action
+    //
+    if (i.action ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "action",
+          e));
+
+      a << *i.action ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const DATA& i)
+  {
+    e << static_cast< const ::xml_schema::type& > (i);
+
+    // TABLEDATA
+    //
+    if (i.TABLEDATA ())
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "TABLEDATA",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *i.TABLEDATA ();
+    }
+
+    // BINARY
+    //
+    if (i.BINARY ())
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "BINARY",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *i.BINARY ();
+    }
+
+    // FITS
+    //
+    if (i.FITS ())
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "FITS",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *i.FITS ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const TABLEDATA& i)
+  {
+    e << static_cast< const ::xml_schema::type& > (i);
+
+    // TR
+    //
+    for (TABLEDATA::TR_const_iterator
+         b (i.TR ().begin ()), n (i.TR ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "TR",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const TD& i)
+  {
+    e << static_cast< const ::xml_schema::string& > (i);
+
+    // encoding
+    //
+    if (i.encoding ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "encoding",
+          e));
+
+      a << *i.encoding ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const TR& i)
+  {
+    e << static_cast< const ::xml_schema::type& > (i);
+
+    // TD
+    //
+    for (TR::TD_const_iterator
+         b (i.TD ().begin ()), n (i.TD ().end ());
+         b != n; ++b)
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "TD",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << *b;
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const FITS& i)
+  {
+    e << static_cast< const ::xml_schema::type& > (i);
+
+    // STREAM
+    //
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "STREAM",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << i.STREAM ();
+    }
+
+    // extnum
+    //
+    if (i.extnum ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "extnum",
+          e));
+
+      a << *i.extnum ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const BINARY& i)
+  {
+    e << static_cast< const ::xml_schema::type& > (i);
+
+    // STREAM
+    //
+    {
+      ::xercesc::DOMElement& s (
+        ::xsd::cxx::xml::dom::create_element (
+          "STREAM",
+          "http://www.ivoa.net/xml/VOTable/v1.1",
+          e));
+
+      s << i.STREAM ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const STREAM& i)
+  {
+    e << static_cast< const ::xml_schema::string& > (i);
+
+    // type
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "type",
+          e));
+
+      a << i.type ();
+    }
+
+    // href
+    //
+    if (i.href ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "href",
+          e));
+
+      a << *i.href ();
+    }
+
+    // actuate
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "actuate",
+          e));
+
+      a << i.actuate ();
+    }
+
+    // encoding
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "encoding",
+          e));
+
+      a << i.encoding ();
+    }
+
+    // expires
+    //
+    if (i.expires ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "expires",
+          e));
+
+      a << *i.expires ();
+    }
+
+    // rights
+    //
+    if (i.rights ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "rights",
+          e));
+
+      a << *i.rights ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const COOSYS& i)
+  {
+    e << static_cast< const ::xml_schema::string& > (i);
+
+    // ID
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "ID",
+          e));
+
+      a << i.ID ();
+    }
+
+    // equinox
+    //
+    if (i.equinox ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "equinox",
+          e));
+
+      a << *i.equinox ();
+    }
+
+    // epoch
+    //
+    if (i.epoch ())
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "epoch",
+          e));
+
+      a << *i.epoch ();
+    }
+
+    // system
+    //
+    {
+      ::xercesc::DOMAttr& a (
+        ::xsd::cxx::xml::dom::create_attribute (
+          "system",
+          e));
+
+      a << i.system ();
+    }
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const version& i)
+  {
+    e << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMAttr& a, const version& i)
+  {
+    a << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xml_schema::list_stream& l,
+              const version& i)
+  {
+    l << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const type& i)
+  {
+    e << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMAttr& a, const type& i)
+  {
+    a << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xml_schema::list_stream& l,
+              const type& i)
+  {
+    l << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const type1& i)
+  {
+    e << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMAttr& a, const type1& i)
+  {
+    a << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xml_schema::list_stream& l,
+              const type1& i)
+  {
+    l << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const type2& i)
+  {
+    e << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMAttr& a, const type2& i)
+  {
+    a << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xml_schema::list_stream& l,
+              const type2& i)
+  {
+    l << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const content_role& i)
+  {
+    e << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMAttr& a, const content_role& i)
+  {
+    a << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xml_schema::list_stream& l,
+              const content_role& i)
+  {
+    l << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const type3& i)
+  {
+    e << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMAttr& a, const type3& i)
+  {
+    a << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xml_schema::list_stream& l,
+              const type3& i)
+  {
+    l << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const actuate& i)
+  {
+    e << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMAttr& a, const actuate& i)
+  {
+    a << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xml_schema::list_stream& l,
+              const actuate& i)
+  {
+    l << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMElement& e, const system& i)
+  {
+    e << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xercesc::DOMAttr& a, const system& i)
+  {
+    a << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+
+  void
+  operator<< (::xml_schema::list_stream& l,
+              const system& i)
+  {
+    l << static_cast< const ::xml_schema::nmtoken& > (i);
+  }
+}
+
 #include <xsd/cxx/post.hxx>
 
 // Begin epilogue.

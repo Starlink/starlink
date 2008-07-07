@@ -42,6 +42,8 @@
 #ifndef VOTABLE_H
 #define VOTABLE_H
 
+//  Includes that are used in this file.
+#include <AstroCatalog.h>
 #include "VOTable1.1.hxx"
 #include "VOTable1.1_dns.hxx"
 
@@ -72,6 +74,12 @@ namespace gaia
         //  Open a file containing a VOTable.
         int open( const char *file );
 
+        //  Create an empty VOTable for populating. Namespace qualified.
+        void create();
+
+        //  Save VOTable to a file. Namespace qualified only.
+        void save( const char *file );
+
         //  Simple list (testing purposes only).
         void list();
 
@@ -79,9 +87,11 @@ namespace gaia
         int nTable();
 
         //  Extract a TABLE and convert into an extended Skycat catalogue.
-        int saveTable( int n, const char *file );
+        int saveAsTST( int n, const char *file );
+
+        //  Convert an extended Skycat catalogue into a VOTable.
+        int readTST( AstroCatalog *cat );
     };
 }
 
 #endif // VOTABLE_H
-

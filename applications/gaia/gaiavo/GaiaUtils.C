@@ -52,7 +52,7 @@ namespace gaia {
     /**
      *  Create a lower case version of a string.
      */
-    void make_lower( const string &in, string &out )
+    void to_lower( const string &in, string &out )
     {
         string::const_iterator i = in.begin();
         string::const_iterator e = in.end();
@@ -62,4 +62,19 @@ namespace gaia {
             i++;
         }
     }
+
+    /**
+     *  Create an upper case version of a string.
+     */
+    void to_upper( const string &in, string &out )
+    {
+        string::const_iterator i = in.begin();
+        string::const_iterator e = in.end();
+        out.clear();
+        while ( i != e ) {
+            out += toupper( *i );
+            i++;
+        }
+    }
+
 }

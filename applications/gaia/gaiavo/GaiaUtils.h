@@ -60,7 +60,7 @@ namespace gaia {
      *  Quicker conversion of string to any type.
      */
     template <typename T>
-        inline bool convert( const std::string &s, T &t )
+        inline bool from_string( const std::string &s, T &t )
     {
         std::istringstream iss( s );
         return !( iss >> t ).fail();
@@ -69,5 +69,35 @@ namespace gaia {
     /**
      *  Convert string to lower case.
      */
-    void make_lower( const std::string &in, std::string &out );
+    void to_lower( const std::string &in, std::string &out );
+
+    /**
+     *  Convert string to upper case.
+     */
+    void to_upper( const std::string &in, std::string &out );
+
+    /**
+     *  Convert a numeric value into a string (defined by std::ios_base
+     *  derived class, dec, scientific, hex, oct, can use precision on stream
+     *  for finer control if that's needed).
+     */
+    template <typename T>
+        inline std::string to_string
+        ( const T &t, std::ios_base &(*f)( std::ios_base &fmt ) )
+    {
+        std::ostringstream oss;
+        oss << f << t;
+        return oss.str();
+    }
+
+    /**
+     *  Quicker conversion of any type to string.
+     */
+    template <typename T>
+        inline std::string to_string( const T &t )
+    {
+        std::ostringstream oss;
+        oss << t;
+        return oss.str();
+    }
 }

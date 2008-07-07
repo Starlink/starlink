@@ -7,7 +7,7 @@
 
 ##  Subdirectories that we build etc. as normal, note order is
 ##  important. See the Makefile.am in teagaia for its rationale.
-SUBDIRS = teagaia gaia gaia3d tasks scripts
+SUBDIRS = teagaia gaia gaia3d tasks gaiavo scripts
 
 ##  Documentation.
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun214fig.ps

@@ -28,6 +28,7 @@ STAR_MONOLITHS
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
+AC_PROG_CXX
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
@@ -48,6 +49,11 @@ STAR_PATH_TCLTK(8.4, [tk])
 
 dnl    Define support for large files.
 STAR_LARGEFILE_SUPPORT
+
+dnl    We require a version of Xerces-c to be installed for VOTable support.
+dnl    Difficult to check for library linkage, so just use header check.
+AC_CHECK_HEADER([xercesc/util/XercesVersion.hpp], [], 
+    AC_MSG_ERROR([Couldn't find xerces-c headers. Need xerces-c.]))
 
 dnl    Declare dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [ard atl ast blt cat cfitsio generic dnl
@@ -103,6 +109,7 @@ AC_SUBST(TCL_PACKAGE_VERSION)
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 AC_CONFIG_FILES([Makefile tasks/Makefile scripts/Makefile teagaia/Makefile])
+AC_CONFIG_FILES([gaiavo/Makefile])
 AC_CONFIG_FILES([component.xml])
 AC_CONFIG_FILES([gaia/configure.in gaia3d/configure.in])
 

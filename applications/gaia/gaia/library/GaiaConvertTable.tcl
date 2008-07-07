@@ -11,7 +11,7 @@
 #  Description:
 #     This class defines a object that controls a series of defined
 #     filters for converting to and from FITS, other CAT and ASCII 
-#     supported formats.
+#     supported formats and VOTable.
 
 #  Invocations:
 #
@@ -39,7 +39,7 @@
 #  Copyright:
 #     Copyright (C) 1998-2001 Central Laboratory of the Research Councils
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council
-#     Copyright (C) 2007 Science and Technology Research Council
+#     Copyright (C) 2007-2008 Science and Technology Research Council
 #     All Rights Reserved.
 
 #  Licence:
@@ -73,6 +73,8 @@
 #        is Skycat, plus some GAIA changes for backwards compatibility in 
 #        dealing with the meta-data. Export of FITS still uses CAT, but
 #        that's quite lossy.
+#     01-JUL-2008 (PWD):
+#        Add VOTable support.
 #     {enter_further_changes_here}
 
 #-
@@ -103,6 +105,12 @@ itcl::class gaia::GaiaConvertTable {
           set to_filter_($type) {}
           set from_filter_($type) {}
        }
+       foreach type $votypes_ {
+          set to_app_($type) "$gaia_dir/vot2tab"
+          set from_app_($type) "$gaia_dir/tab2vot"
+          set to_filter_($type) {}
+          set from_filter_($type) {}
+       }
    }
 
    #  Destructor:
@@ -125,6 +133,10 @@ itcl::class gaia::GaiaConvertTable {
          
          #  Use native support for FITS files.
          lassign [get_hdu_ $in] in hdu
+         if { $hdu == -1 } {
+            #  FITS table, so always pick first extension.
+            set hdu 2
+         }
          set rtdimage [::image create rtdimage -file "$in"]
 
          #  Move to the HDU.
@@ -135,7 +147,7 @@ itcl::class gaia::GaiaConvertTable {
          }
 
          #  Make sure we revisit the disk file, otherwise uses cached version.
-         $rtdimage update;#  Doesn't work...????
+         $rtdimage update
 
          #  Get the catalog config entry.
          set entry [create_config_entry $rtdimage $in $hdu]
@@ -157,9 +169,21 @@ itcl::class gaia::GaiaConvertTable {
                                       -show_output 0]
          }
          
-         #  Now attempt the conversion.
-         set cmd [format $to_cmd_ $in $out]
-         catch {eval $to_filter_($type) runnow $cmd} msg
+         #  Now attempt the conversion. Note VOTables may contain more
+         #  than one table, so a HDU concept is supported.
+         if { $type == ".xml" || $type == ".vot" } {
+            lassign [get_hdu_ $in] in hdu
+            if { $hdu == -1 } {
+               set hdu 0
+            } else {
+               incr hdu -1
+            }
+            set cmd "$in $hdu $out"
+            catch {$to_filter_($type) runnows $cmd} msg
+         } else {
+            set cmd [format $to_cmd_ $in $out]
+            catch {eval $to_filter_($type) runnow $cmd} msg
+         }
          if { $msg == "1" || $msg == "0" } {
             set msg {}
          }
@@ -186,15 +210,20 @@ itcl::class gaia::GaiaConvertTable {
                                      -application $from_app_($type) \
                                      -show_output 0]
       }
+
+      #  The signature for VOTables is slightly different.
+      if { $type == ".xml" || $type == ".vot" } {
+         set cmd "$in $out"
+         set res [catch {$from_filter_($type) runnows $cmd} msg]
+      } else {
       
-      #  CAT will not overwrite existing files, so do this ourselves.
-      if { [file exists $out] } {
-         file delete $out
+         #  CAT will not overwrite existing files, so do this ourselves.
+         if { [file exists $out] } {
+            file delete $out
+         }
+         set cmd [format $from_cmd_ $in $out]
+         set res [catch {eval $from_filter_($type) runnow $cmd} msg]
       }
-      
-      #  Now attempt the conversion.
-      set cmd [format $from_cmd_ $in $out]
-      set res [catch {eval $from_filter_($type) runnow $cmd} msg]
       if { $msg == "1" || $msg == "0" } {
          set msg {}
       }
@@ -225,13 +254,13 @@ itcl::class gaia::GaiaConvertTable {
       return $type
    }
    
-   #  Return the HDU for the given FITS filename specification. The HDU
-   #  is given as a number in {} or in []. The {} format supports backwards
+   #  Return the HDU for the given FITS or VOTable filename specification. The
+   #  HDU is given as a number in {} or in []. The {} format supports backwards
    #  compatibility with CAT. The result is two values, the input name without
-   #  the HDU specification and the hdu number (this defaults to 2 so that
-   #  the first extension will be picked up).
+   #  the HDU specification and the hdu number (this defaults to -1 so that
+   #  it's absence can be spotted).
    protected method get_hdu_ {in} {
-      set hdu 2
+      set hdu -1
       set i1 [string last "\[" $in]
       set i2 [string last "\]" $in]
       if { $i1 == -1 } {
@@ -450,10 +479,11 @@ itcl::class gaia::GaiaConvertTable {
    #  Known file types. These are mapped to lower case.
    protected variable cattypes_ ".fits .fit .gsc .txt"
    protected variable asciitypes_ ".asc .lis"
+   protected variable votypes_ ".xml .vot"
 
    #  Command strings to run the convert to/from a tab-table. This
    #  contains "format" specifiers for the input and output names.
-   protected variable to_cmd_   "in=%s out=%s accept"
+   protected variable to_cmd_ "in=%s out=%s accept"
    protected variable from_cmd_ "in=%s out=%s accept"
 
    #  Names of the objects used to control the filters.

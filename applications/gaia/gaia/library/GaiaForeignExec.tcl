@@ -87,6 +87,7 @@
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -292,6 +293,19 @@ itcl::class gaia::GaiaForeignExec {
    public method runnow {args} {
       if { $args != {}  } {
          catch {exec $application $args} msg
+         if { $msg != "0" && $msg != {} } {
+            info_dialog "$msg"
+            return 0
+         }
+      }
+      return 1
+   }
+
+   #  Method to run a job immediately and wait for completion. Same as
+   #  runnow, except arguments are a single string that will be eval'd.
+   public method runnows {qual} {
+      if { $qual != {}  } {
+         catch {eval exec $application $qual} msg
          if { $msg != "0" && $msg != {} } {
             info_dialog "$msg"
             return 0

@@ -53,6 +53,13 @@
 
 #include <xercesc/dom/DOM.hpp>
 
+/*  Skycat includes. */
+#include <HTTP.h>
+#include <Fits_IO.h>
+#include <Mem.h>
+#include <CatalogInfo.h>
+#include <LocalCatalog.h>
+
 /*  Local includes. */
 #include "VOTable1.1_dns.hxx"
 #include "VOTable1.1.hxx"
@@ -62,10 +69,6 @@
 #include "gaiabase64.h"
 #include "gaiagzip.h"
 
-/*  Skycat includes. */
-#include <HTTP.h>
-#include <Fits_IO.h>
-#include <Mem.h>
 
 using namespace std;
 
@@ -74,11 +77,11 @@ XERCES_CPP_NAMESPACE_USE
 
 namespace gaia {
 
-//  Create namespace qualified versions of VOTable functions for the differing
-//  Schema (in this case version 1.1. with and without XML namespace
-//  qualifications, dns means everything in the default namespace).
-//  Note these functions are in the gaia:: namespace, but are not part of this
-//  class.
+    //  Create namespace qualified versions of VOTable functions for the
+    //  differing Schema (in this case version 1.1. with and without XML
+    //  namespace qualifications, dns means everything in the default
+    //  namespace).  Note these functions are in the gaia:: namespace, but are
+    //  not part of this class.
 #define NS votable_11_dns
 #include "VOTableFunctions.C"
 #undef NS
@@ -86,6 +89,9 @@ namespace gaia {
 #define NS votable_11
 #include "VOTableFunctions.C"
 #undef NS
+
+    //  Other utilities for reading AstroCat objects.
+#include "VOTableReadFunctions.C"
 
     /**
      *  Namespace qualifiers for checking XML declaration.
@@ -152,6 +158,43 @@ namespace gaia {
             return 1;
         }
         return 0;
+    }
+
+    /**
+     *  Create an instance for modification. Only supports the namespace
+     *  qualified version.
+     */
+    void VOTable::create()
+    {
+        using namespace votable_11;
+
+        //  Release any currently open tables.
+        if ( votable1_ ) {
+            delete votable1_;
+            votable1_ = NULL;
+        }
+        if ( votable2_ ) {
+            delete votable2_;
+            votable2_ = NULL;
+        }
+
+        //  Create new instance.
+        votable2_ = new VOTABLE();
+    }
+
+    /**
+     *  Save the current VOTable to a file. Namespace qualified only.
+     */
+    void VOTable::save( const char *file )
+    {
+        using namespace votable_11;
+        if ( votable2_ != NULL ) {
+            ofstream out( file, ios::out );
+            xml_schema::namespace_infomap map;
+            map[""].name = "http://www.ivoa.net/xml/VOTable/v1.1";
+            map[""].schema = "VOTable1.1.xsd";
+            VOTABLE_write( out, *votable2_, map );
+        }
     }
 
     /**
@@ -246,7 +289,7 @@ namespace gaia {
      *  Convert a TABLE element into an extended Skycat catalogue.
      *  Returns false if the extraction fails.
      */
-    int VOTable::saveTable( int index, const char *file )
+    int VOTable::saveAsTST( int index, const char *file )
     {
         ofstream out( file, ios::out );
         if ( out == NULL ) {
@@ -264,5 +307,21 @@ namespace gaia {
         out.close();
 
         return result;
+    }
+
+    /**
+     *  Convert a Skycat catalogue into a VOTABLE TABLE.
+     */
+    int VOTable::readTST( AstroCatalog *cat )
+    {
+        using namespace votable_11;
+
+        //  Create an empty votable_1.1::VOTABLE.
+        create();
+
+        //  Populate this from cat.
+        votable_read( cat, *votable2_ );
+
+        return 1;
     }
 }

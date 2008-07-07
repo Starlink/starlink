@@ -62,30 +62,31 @@
 
 /*  Prototypes for local functions that are overloaded by namespace qualified
  *  types. */
-void votable_enum( NS::VOTABLE &votable );
-int votable_count( NS::VOTABLE &votable );
-NS::TABLE &votable_get( NS::VOTABLE &votable, int index );
-int votable_write( NS::VOTABLE &votable, int index, ofstream &out );
+void votable_enum( NS::VOTABLE& votable );
+int votable_count( NS::VOTABLE& votable );
+NS::TABLE &votable_get( NS::VOTABLE& votable, int index );
+int votable_write( NS::VOTABLE& votable, int index, ofstream& out );
 
-int table_write( const NS::TABLE &table, ofstream &out );
-int table_params( const NS::TABLE &table, ofstream &out );
-int table_data( const NS::TABLE &table, ofstream &out );
-int table_columns( const NS::TABLE &table, ofstream &out,
-                   int &id_index, int &ra_index, bool &ra_radians,
-                   int &dec_index, bool &dec_radians );
-void table_coosys( const NS::COOSYS &coosys, ofstream &out );
+int table_write( const NS::TABLE& table, ofstream& out );
+int table_params( const NS::TABLE& table, ofstream& out );
+int table_data( const NS::TABLE& table, ofstream& out );
+int table_columns( const NS::TABLE& table, ofstream& out, int& id_index, 
+                   int& ra_index, bool& ra_radians, string& ra_unit,
+                   int& dec_index, bool& dec_radians, string& dec_unit  ); 
+void table_coosys( const NS::COOSYS& coosys, ofstream& out );
 
-int data_tabledata( const NS::TABLE &table, const NS::TABLEDATA &tdata,
-                    ofstream &out, int &id_index, int &ra_index,
-                    bool &ra_radians, int &dec_index, bool &dec_radians );
-int data_binarydata( const NS::TABLE &table, const NS::BINARY &bdata,
-                     ofstream &out, int &id_index, int &ra_index,
-                     bool &ra_radians,int &dec_index, bool &dec_radians );
-int data_fitsdata( const NS::FITS &fdata, ofstream &out, int &id_index,
-                   int &ra_index, bool &ra_radians,int &dec_index,
-                   bool &dec_radians );
+int data_tabledata( const NS::TABLE& table, const NS::TABLEDATA& tdata,
+                    ofstream& out, int& id_index, 
+                    int& ra_index, bool& ra_radians, string& ra_unit, 
+                    int& dec_index, bool& dec_radians, string& dec_unit );
+int data_binarydata( const NS::TABLE& table, const NS::BINARY& bdata,
+                     ofstream& out, int& id_index, int& ra_index,
+                     bool& ra_radians, int& dec_index, bool& dec_radians );
+int data_fitsdata( const NS::FITS& fdata, ofstream& out, int& id_index,
+                   int& ra_index, bool& ra_radians, int& dec_index,
+                   bool& dec_radians );
 
-int field_arraysize( const NS::FIELD &field );
+int field_arraysize( const NS::FIELD& field );
 
 
 /*  Non-overloaded functions etc., so define these just once. */
@@ -94,11 +95,11 @@ int field_arraysize( const NS::FIELD &field );
 
 template <typename T> T *emptyTable();
 
-bool matches_id( string &name, string &ucd, string &utype );
-bool matches_ra( string &name, string &ucd, string &utype );
-bool matches_dec( string &name, string &ucd, string &utype );
-bool matches_x( string &name, string &ucd, string &utype );
-bool matches_y( string &name, string &ucd, string &utype );
+bool matches_id( string& name, string& ucd, string& utype );
+bool matches_ra( string& name, string& ucd, string& utype );
+bool matches_dec( string& name, string& ucd, string& utype );
+bool matches_x( string& name, string& ucd, string& utype );
+bool matches_y( string& name, string& ucd, string& utype );
 
 /*  Radians to degrees. */
 const double R2D = 57.295779513082323;
@@ -108,7 +109,7 @@ const double R2D = 57.295779513082323;
 /**
  *  Simple test for table validity, visit all TABLE elements.
  */
-void votable_enum( NS::VOTABLE &votable )
+void votable_enum( NS::VOTABLE& votable )
 {
     using namespace NS;
 
@@ -129,7 +130,7 @@ void votable_enum( NS::VOTABLE &votable )
  *  Return the number of TABLE elements in the VOTable. Uses the underlying
  *  DOM to navigate the document.
  */
-int votable_count( NS::VOTABLE &votable )
+int votable_count( NS::VOTABLE& votable )
 {
     using namespace NS;
 
@@ -146,7 +147,7 @@ int votable_count( NS::VOTABLE &votable )
  *  return the reference to avoid a copy which would lose the connection to
  *  any IDREF hooks).
  */
-NS::TABLE &votable_get( NS::VOTABLE &votable, int index )
+NS::TABLE& votable_get( NS::VOTABLE& votable, int index )
 {
     using namespace NS;
 
@@ -180,12 +181,12 @@ NS::TABLE &votable_get( NS::VOTABLE &votable, int index )
  *  Convert a TABLE into a Skycat table and write it to the given output
  *  stream.
  */
-int votable_write( NS::VOTABLE &votable, int index, ofstream &out )
+int votable_write( NS::VOTABLE& votable, int index, ofstream& out )
 {
     using namespace NS;
 
     //  Locate the TABLE.
-    NS::TABLE &table( votable_get( votable, index ) );
+    NS::TABLE& table( votable_get( votable, index ) );
     if ( table.name() ) {
 
         /*  Found table "index", so write it out. */
@@ -200,7 +201,7 @@ int votable_write( NS::VOTABLE &votable, int index, ofstream &out )
  *  Extract a TABLE into a Skycat table and write it to the given output
  *  stream.
  */
-int table_write( const NS::TABLE &table, ofstream &out )
+int table_write( const NS::TABLE& table, ofstream& out )
 {
     using namespace NS;
     try{
@@ -216,7 +217,7 @@ int table_write( const NS::TABLE &table, ofstream &out )
 
         return 1;
     }
-    catch ( const xml_schema::exception &e ) {
+    catch ( const xml_schema::exception& e ) {
         cerr << "table_write: ";
         cerr << e << endl;
     }
@@ -226,7 +227,7 @@ int table_write( const NS::TABLE &table, ofstream &out )
 /**
  *  Write the PARAMs of a TABLE to the given output stream in Skycat format.
  */
-int table_params( const NS::TABLE &table, ofstream &out )
+int table_params( const NS::TABLE& table, ofstream& out )
 {
     using namespace NS;
 
@@ -248,7 +249,7 @@ int table_params( const NS::TABLE &table, ofstream &out )
 
         return 1;
     }
-    catch ( const xml_schema::exception &e ) {
+    catch ( const xml_schema::exception& e ) {
         cerr << "table_params: ";
         cerr << e << endl;
     }
@@ -263,7 +264,7 @@ int table_params( const NS::TABLE &table, ofstream &out )
  *  transforming to degrees from radians then that will also be done. Finally
  *  the DATA elements will be expanded into the actual columns.
  */
-int table_data( const NS::TABLE &table, ofstream &out )
+int table_data( const NS::TABLE& table, ofstream& out )
 {
     using namespace NS;
 
@@ -281,9 +282,11 @@ int table_data( const NS::TABLE &table, ofstream &out )
         int x_index = -1;
         int y_index = -1;
 
-        //  Whether RA and Dec need conversion from radians.
+        //  Whether RA and Dec need conversion from radians, raw units.
         bool dec_radians = false;
         bool ra_radians = false;
+        string ra_unit;
+        string dec_unit;
 
         //  The column names as a TST header and the separator.
         string header;
@@ -293,6 +296,7 @@ int table_data( const NS::TABLE &table, ofstream &out )
         string ucds;
         string utypes;
         string units;
+        string datatypes;
 
         //  Iterate over all FIELD elements in this TABLE.
         TABLE::FIELD_const_iterator fiter( table.FIELD().begin() );
@@ -307,15 +311,15 @@ int table_data( const NS::TABLE &table, ofstream &out )
 
             //  FIELD meta data.
             //  Get these values as string instances and cast to lower case.
-            make_lower( fiter->name(), name );
+            to_lower( fiter->name(), name );
             if ( fiter->ucd() ) {
-                make_lower( fiter->ucd().get(), ucd );
+                to_lower( fiter->ucd().get(), ucd );
             }
             if ( fiter->utype() ) {
-                make_lower( fiter->utype().get(), utype );
+                to_lower( fiter->utype().get(), utype );
             }
             if ( fiter->unit() ) {
-                make_lower( fiter->unit().get(), unit );
+                to_lower( fiter->unit().get(), unit );
             }
 
             //  Check this column against the possible matches for a Skycat
@@ -325,6 +329,7 @@ int table_data( const NS::TABLE &table, ofstream &out )
             }
             else if ( ra_index == -1 && matches_ra( name, ucd, utype ) ) {
                 ra_index = ncol;
+                ra_unit = unit;
                 if ( unit.find( "rad" ) == 0 ) {
                     ra_radians = true;
                 }
@@ -332,6 +337,7 @@ int table_data( const NS::TABLE &table, ofstream &out )
             }
             else if ( dec_index == -1 && matches_dec( name, ucd, utype ) ) {
                 dec_index = ncol;
+                dec_unit = unit;
                 if ( unit.find( "rad" ) == 0 ) {
                     dec_radians = true;
                 }
@@ -348,11 +354,16 @@ int table_data( const NS::TABLE &table, ofstream &out )
             if ( checkcoosys && !havecoosys ) {
                 //  Look up the ref to get at the IDREF object.
                 if ( fiter->ref() ) {
-                    COOSYS const& coosys(dynamic_cast<COOSYS const&>(*(fiter->ref()).get()));
-                    table_coosys( coosys, out );
+                    if ( fiter->ref().get() ) {
+                        COOSYS const& coosys(dynamic_cast<COOSYS const&>(*(fiter->ref()).get()));
+                        table_coosys( coosys, out );
 
-                    //  Only do this once. Assumes RA and Dec are in same system.
-                    havecoosys = true;
+                        //  Only do this once. Assumes RA and Dec are in same system.
+                        havecoosys = true;
+                    }
+                    else {
+                        cerr << "Missing COOSYS for reference: " << fiter->ref() << endl;
+                    }
                 }
             }
 
@@ -361,29 +372,60 @@ int table_data( const NS::TABLE &table, ofstream &out )
                 header = fiter->name();
                 sep = "---";
                 if ( fiter->ucd() ) {
-                    ucds = ucd;
+                    ucds = fiter->ucd().get();
+                }
+                else {
+                    ucds = "---";
                 }
                 if ( fiter->utype() ) {
-                    utypes = utype;
+                    utypes = fiter->utype().get();
+                }
+                else {
+                    utypes = "---";
                 }
                 if ( fiter->unit() ) {
-                    units = unit;
+                    units = fiter->unit().get();
+                }
+                else {
+                    units = "---";
+                }
+                if ( fiter->datatype() ) {
+                    datatypes = fiter->datatype();
+                }
+                else {
+                    datatypes = "---";
                 }
             }
             else {
-                header += '\t' + name;
+                header += '\t' + fiter->name();
                 sep += "---\t";
                 ucds += '\t';
                 if ( fiter->ucd() ) {
-                    ucds += ucd;
+                    ucds += fiter->ucd().get();
+                }
+                else {
+                    ucds += "---";
                 }
                 utypes += '\t';
                 if ( fiter->utype() ) {
-                    utypes += utype;
+                    utypes += fiter->utype().get();
+                }
+                else {
+                    utypes += "---";
                 }
                 units += '\t';
                 if ( fiter->unit() ) {
-                    units += unit;
+                    units += fiter->unit().get();
+                }
+                else {
+                    units += "---";
+                }
+                datatypes += '\t';
+                if ( fiter->datatype() ) {
+                    datatypes += fiter->datatype();
+                }
+                else {
+                    datatypes += "---";
                 }
             }
 
@@ -407,21 +449,22 @@ int table_data( const NS::TABLE &table, ofstream &out )
         out << '\n';
 
         //  FIELD meta-data.
-        out << "ucds: " << ucds << '\n';
-        out << "utypes: " << utypes << '\n';
-        out << "units: " << units << '\n';
+        out << "ucd: " << ucds << '\n';
+        out << "utype: " << utypes << '\n';
+        out << "unit: " << units << '\n';
+        out << "datatype: " << datatypes << '\n';
 
         //  Column headings and separator to table data.
         out << header << '\n';
         out << sep << '\n';
 
         //  Write the table columns.
-        table_columns( table, out, id_index, ra_index, ra_radians,
-                       dec_index, dec_radians );
+        table_columns( table, out, id_index, ra_index, ra_radians, ra_unit,
+                       dec_index, dec_radians, dec_unit );
 
         return 1;
     }
-    catch ( const xml_schema::exception &e ) {
+    catch ( const xml_schema::exception& e ) {
         cerr << "table_fields: ";
         cerr << e << endl;
     }
@@ -432,7 +475,7 @@ int table_data( const NS::TABLE &table, ofstream &out )
  *  Write a COOSYS element as table parameters. Transforms the VOTable
  *  system values into AST compatible systems (as best as I can determine).
  */
-void table_coosys( const NS::COOSYS &coosys, ofstream &out )
+void table_coosys( const NS::COOSYS& coosys, ofstream& out )
 {
     //    System - ICRS
     //           - eq_FK5
@@ -447,50 +490,50 @@ void table_coosys( const NS::COOSYS &coosys, ofstream &out )
     string system;
     string epoch;
     string equinox;
-    make_lower( coosys.system(), system );
+    to_lower( coosys.system(), system );
     if ( system == "eq_fk5" ) {
-        system = "fk5";
+        system = "FK5";
         equinox = "J2000";
     }
     else if ( system == "eq_fk4" ) {
-        system = "fk4";
+        system = "FK4";
         equinox = "B1950";
     }
     else if ( system == "ecl_fk5" ) {
-        system = "ecliptic";
+        system = "ECLIPTIC";
         equinox = "J2000";
     }
     else if ( system == "ecl_fk4" ) {
-        system = "ecliptic";
+        system = "ECLIPTIC";
         equinox = "B1950";
     }
     else if ( system == "galactic" ) {
-        system = "galactic";
+        system = "GALACTIC";
     }
     else if ( system == "supergalactic" ) {
-        system = "supergalactic";
+        system = "SUPERGALACTIC";
     }
     else if ( system == "barycentric" ) {
         system = "ICRS";
     }
     else if ( system == "geo_app" ) {
-        system = "geocentric";
+        system = "GEOCENTRIC";
     }
-    out << "System: " << system << '\n';
+    out << "system: " << system << '\n';
 
     //  Pick out epoch and equinox.
     if ( coosys.equinox() ) {
-        out << "Equinox: " << coosys.equinox() << '\n';
+        out << "equinox: " << coosys.equinox() << '\n';
     }
     else if ( equinox != "" ) {
-        out << "Equinox: " << equinox << '\n';
+        out << "equinox: " << equinox << '\n';
     }
 
     if ( coosys.epoch() ) {
-        out << "Epoch: " << coosys.epoch() << '\n';
+        out << "epoch: " << coosys.epoch() << '\n';
     }
     else if ( epoch != "" ) {
-        out << "Epoch: " << epoch << '\n';
+        out << "epoch: " << epoch << '\n';
     }
     out << '\n';
 }
@@ -499,9 +542,9 @@ void table_coosys( const NS::COOSYS &coosys, ofstream &out )
  *  Write the DATA element of a table to Skycat format. RA and Dec columns
  *  are converted from radians to degrees if needed.
  */
-int table_columns( const NS::TABLE &table, ofstream &out,
-                   int &id_index, int &ra_index, bool &ra_radians,
-                   int &dec_index, bool &dec_radians )
+int table_columns( const NS::TABLE& table, ofstream& out,
+                   int& id_index, int& ra_index, bool& ra_radians, string& ra_unit,
+                   int& dec_index, bool& dec_radians, string& dec_unit )
 {
     using namespace NS;
 
@@ -514,8 +557,9 @@ int table_columns( const NS::TABLE &table, ofstream &out,
         //  Three variants, TABLEDATA, BINARY and FITS.
         const DATA::TABLEDATA_optional tdata( odata.get().TABLEDATA() );
         if ( tdata ) {
-            return data_tabledata( table, tdata.get(), out, id_index, ra_index,
-                                   ra_radians, dec_index, dec_radians );
+            return data_tabledata( table, tdata.get(), out, id_index, 
+                                   ra_index, ra_radians, ra_unit, 
+                                   dec_index, dec_radians, dec_unit );
         }
 
         const DATA::BINARY_optional bdata( odata.get().BINARY() );
@@ -536,11 +580,13 @@ int table_columns( const NS::TABLE &table, ofstream &out,
 
 /**
  *  Write a TABLEDATA element of a table to Skycat format. RA and Dec columns
- *  are converted from radians to degrees if needed.
+ *  are converted from radians to degrees if needed and the HMS & DMS forms
+ *  may be normalised.
  */
-int data_tabledata( const NS::TABLE &table, const NS::TABLEDATA &tdata,
-                    ofstream &out, int &id_index, int &ra_index,
-                    bool &ra_radians, int &dec_index, bool &dec_radians )
+int data_tabledata( const NS::TABLE& table, const NS::TABLEDATA& tdata,
+                    ofstream& out, int& id_index, 
+                    int& ra_index, bool& ra_radians, string& ra_unit, 
+                    int& dec_index, bool& dec_radians, string& dec_unit )
 {
     using namespace NS;
 
@@ -580,17 +626,48 @@ int data_tabledata( const NS::TABLE &table, const NS::TABLEDATA &tdata,
             if ( *tditer == nullvalues[ncol] ) {
                 out << " \t";
             }
-            else if ( ( ra_radians && ncol == ra_index ) ||
-                      ( dec_radians && ncol == dec_index ) ) {
+            if ( ncol == ra_index || ncol == dec_index ) {
+                if ( ra_radians || dec_radians ) {
 
-                //  RA and Dec in radians, need degrees.
-                double rad;
-                if ( from_string( *tditer, rad, scientific ) ) {
-                    rad *= R2D;
-                    out << scientific << rad << '\t';
+                    //  RA and Dec in radians, need degrees.
+                    double rad;
+                    if ( from_string( *tditer, rad, scientific ) ) {
+                        rad *= R2D;
+                        out << scientific << rad << '\t';
+                    }
+                    else {
+                        out << "*****\t";
+                    }
+                }
+                else if ( ra_unit.find( "hms" ) != string::npos ||
+                          ra_unit.find( "h:m:s" ) != string::npos ||
+                          dec_unit.find( "dms" ) !=  string::npos ||
+                          dec_unit.find( "d:m:s" ) != string::npos ) {
+
+                    //  Check we have hh:mm:ss.ss and dd:mm:ss.ss, if not try
+                    //  to normalize.
+                    istringstream hms( *tditer );
+                    string tmp;
+                    string norm;
+                    if ( hms.str().find( ':' ) == string::npos ) {
+                        while ( std::getline( hms, tmp, ' ' ) ) {
+                            norm += tmp;
+                            norm += ':';
+                        }
+                        if ( norm.size() > 0 ) {
+                            norm.erase( norm.size() - 1 );
+                        }
+                        else {
+                            norm = hms.str();
+                        }
+                        out << norm << '\t';
+                    }
+                    else {
+                        out << *tditer << '\t';
+                    }
                 }
                 else {
-                    out << "*****\t";
+                    out << *tditer << '\t';
                 }
             }
             else {
@@ -611,9 +688,9 @@ int data_tabledata( const NS::TABLE &table, const NS::TABLEDATA &tdata,
  *  Write a BINARY element of a table to Skycat format. RA and Dec columns
  *  are converted from radians to degrees if needed.
  */
-int data_binarydata( const NS::TABLE &table, const NS::BINARY &bdata,
-                     ofstream &out, int &id_index, int &ra_index,
-                     bool &ra_radians, int &dec_index, bool &dec_radians )
+int data_binarydata( const NS::TABLE& table, const NS::BINARY& bdata,
+                     ofstream& out, int& id_index, int& ra_index,
+                     bool& ra_radians, int& dec_index, bool& dec_radians )
 {
     using namespace NS;
 
@@ -679,7 +756,7 @@ int data_binarydata( const NS::TABLE &table, const NS::BINARY &bdata,
     for ( ; fiter != fend; ++fiter ) {
 
         string type;
-        make_lower( fiter->datatype(), type );
+        to_lower( fiter->datatype(), type );
 
         if ( type == "boolean" ) {
             field_types.push_back( VOTableStream::BOOLEAN );
@@ -771,9 +848,9 @@ int data_binarydata( const NS::TABLE &table, const NS::BINARY &bdata,
  *  Write a FITS element of a table to Skycat format. RA and Dec columns
  *  are converted from radians to degrees if needed.
  */
-int data_fitsdata( const NS::FITS &fdata, ofstream &out, int &id_index,
-                   int &ra_index, bool &ra_radians, int &dec_index,
-                   bool &dec_radians )
+int data_fitsdata( const NS::FITS& fdata, ofstream& out, int& id_index,
+                   int& ra_index, bool& ra_radians, int& dec_index,
+                   bool& dec_radians )
 {
     using namespace NS;
 
@@ -923,7 +1000,7 @@ int data_fitsdata( const NS::FITS &fdata, ofstream &out, int &id_index,
  *  Determine an arraysizes value. Will be 1 by default and 0 if the arraysize
  *  is set to "*".
  */
-int field_arraysize( const NS::FIELD &field )
+int field_arraysize( const NS::FIELD& field )
 {
     using namespace NS;
 
@@ -964,7 +1041,7 @@ T *emptyTable()
     return &emptyTable;
 }
 
-bool matches_id( string &name, string &ucd, string &utype )
+bool matches_id( string& name, string& ucd, string& utype )
 {
 
     if ( ( ucd.find( "meta.id" ) == 0 ) ||
@@ -978,7 +1055,7 @@ bool matches_id( string &name, string &ucd, string &utype )
     return false;
 }
 
-bool matches_ra( string &name, string &ucd, string &utype )
+bool matches_ra( string& name, string& ucd, string& utype )
 {
     if ( ( ucd.find( "pos.eq.ra" ) == 0 ) ||
          ( ucd.find( "pos_eq_ra" ) == 0 ) ||
@@ -992,7 +1069,7 @@ bool matches_ra( string &name, string &ucd, string &utype )
     return false;
 }
 
-bool matches_dec( string &name, string &ucd, string &utype )
+bool matches_dec( string& name, string& ucd, string& utype )
 {
     if ( ( ucd.find( "pos.eq.dec" ) == 0 ) ||
          ( ucd.find( "pos_eq_dec" ) == 0 ) ||
@@ -1004,7 +1081,7 @@ bool matches_dec( string &name, string &ucd, string &utype )
     return false;
 }
 
-bool matches_x( string &name, string &ucd, string &utype )
+bool matches_x( string& name, string& ucd, string& utype )
 {
     if ( ( ucd.find( "pos.cartesian.x" ) == 0 ) ||
          ( name == "x" ) ||
@@ -1014,7 +1091,7 @@ bool matches_x( string &name, string &ucd, string &utype )
     return false;
 }
 
-bool matches_y( string &name, string &ucd, string &utype )
+bool matches_y( string& name, string& ucd, string& utype )
 {
     if ( ( ucd.find( "pos.cartesian.y" ) == 0 ) ||
          ( name == "y" ) ||

@@ -25,7 +25,8 @@
  *     in = string 
  *        Filename of the VOTable.
  *     ntab = integer
- *        Index of the table to extract from the VOTable.
+ *        Index of the table to extract from the VOTable. Starts from 
+ *        0.
  *     out = string
  *        Filename for the extracted table in "tab table" format.
 
@@ -89,8 +90,8 @@ int main( int argc, char* argv[] )
 
         /*  Table index. */
         int ncol;
-        if ( gaia::convert( string( argv[2] ), ncol ) ) {
-            if ( table->saveTable( ncol, argv[3] ) ) {
+        if ( gaia::from_string( string( argv[2] ), ncol ) ) {
+            if ( table->saveAsTST( ncol, argv[3] ) ) {
                 return 0;
             }
             cerr << "Failed to extract table to file " << argv[3] << endl;
