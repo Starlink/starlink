@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "gaiabase64.h"
+#include "GaiaBase64.h"
 
 namespace gaia {
 

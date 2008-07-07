@@ -47,7 +47,7 @@
 
 #include "DCompress.h"
 
-#include "gaiagzip.h"
+#include "GaiaGzip.h"
 
 namespace gaia {
 

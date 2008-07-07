@@ -83,8 +83,8 @@
 #include "VOTable.h"
 #include "VOTableStream.h"
 #include "GaiaUtils.h"
-#include "gaiabase64.h"
-#include "gaiagzip.h"
+#include "GaiaBase64.h"
+#include "GaiaGzip.h"
 
 using namespace std;
 
