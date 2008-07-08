@@ -1684,8 +1684,8 @@ int *status              /* global status (given and returned) */
 {
 
    HDSLoc *bz_imloc = NULL;/* HDS locator */
-   int bsc2store_zindf;             /* NDF identifier */
-   double *bzptr;          /* pointer to mapped space for zero points */
+   int bsc2store_zindf;    /* NDF identifier */
+   double *bzptr = NULL;   /* pointer to mapped space for zero points */
    int el;                 /* number of elements mapped */
    char imname[DAT__SZNAM];/* name of structure for image */
    double *imptr;          /* pointer to mapped space for image */
