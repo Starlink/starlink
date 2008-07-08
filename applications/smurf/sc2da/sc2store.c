@@ -949,15 +949,12 @@ int *status                   /* global status (given and returned) */
    RETRIEVE_STATE( enviro_pressure, ENVIRO_PRESSURE, float, VAL__BADR );
    RETRIEVE_STATE( enviro_air_temp, ENVIRO_AIR_TEMP, float, VAL__BADR );
 
-   RETRIEVE_STATE( wvm_th, WVM_TH, float, VAL__BADR );
    RETRIEVE_STATE( wvm_t12, WVM_T12, float, VAL__BADR );
    RETRIEVE_STATE( wvm_t42, WVM_T42, float, VAL__BADR );
    RETRIEVE_STATE( wvm_t78, WVM_T78, float, VAL__BADR );
-   RETRIEVE_STATE( wvm_tw, WVM_TW, float, VAL__BADR );
-   RETRIEVE_STATE( wvm_qual, WVM_QUAL, int, VAL__BADI );
-   RETRIEVE_STATE( wvm_time, WVM_TIME, float, VAL__BADR );
+   RETRIEVE_STATE( wvm_time, WVM_TIME, double, VAL__BADR );
 
-   RETRIEVE_STATE( sc2_heat, SC2_HEAT, double, VAL__BADD );
+   RETRIEVE_STATE( sc2_heat, SC2_HEAT, int, VAL__BADD );
 
    RETRIEVE_STATE( acs_exposure, ACS_EXPOSURE, float, VAL__BADR );
    RETRIEVE_STATE( acs_offexposure, ACS_OFFEXPOSURE, float, VAL__BADR );
