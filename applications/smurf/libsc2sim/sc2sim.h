@@ -141,7 +141,7 @@
 /* Given a value in Jy multiply by this constant, and the bandwidth in
    GHz (35 for 850um) to calculate pW */
 
-//#define JY2PW (1.0e-5*AST__DPI*0.25*DIAMETER*DIAMETER)
+/* #define JY2PW (1.0e-5*AST__DPI*0.25*DIAMETER*DIAMETER) */
 
 void sc2sim_addpnoise( double flux_0, double sig_0, double integ_time,
 		       double *flux, int *status );
