@@ -59,11 +59,11 @@ namespace gaia
 
         //  Open a VOTable 1.1, all elements in the default namespace.
         votable_11_dns::VOTABLE *votable1_;
-        votable_11_dns::VOTABLE *openVOTable1( ifstream *in );
+        votable_11_dns::VOTABLE *openVOTable1( istream *in );
 
         //  Open a VOTable 1.1.
         votable_11::VOTABLE *votable2_;
-        votable_11::VOTABLE *openVOTable2( ifstream *in );
+        votable_11::VOTABLE *openVOTable2( istream *in );
 
     public:
 

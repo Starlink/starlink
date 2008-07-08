@@ -44,6 +44,7 @@
 #endif
 
 /*  System includes. */
+#include <istream>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -96,20 +97,40 @@ namespace gaia {
     {
         //  Open the table and check if this has the appropriate namespace
         //  information, that determines the version of the parsing classes we
-        //  use.
-        ifstream in( file, ios::in );
-        if ( in == NULL ) {
-            cerr << "Cannot open input file " << file << endl;
-            return 0;
+        //  use. If file is a URL then use the HTTP class to retrive it.
+        string url( file );
+        istream *in;
+        if ( url.find( "file:" ) == 0 || url.find( "http:" ) == 0 ) {
+
+            //  HTTP doesn't like localhost, so strip that out.
+            if ( url.find( "file://localhost" ) == 0 ) {
+                url = "file://" + url.substr( 16 );
+            }
+
+            ostringstream ostring;
+            HTTP http;
+            if ( http.get( url.c_str(), ostring ) ) {
+                cerr << "Cannot download file: " << url << endl;
+                return 0;
+            }
+            in = new istringstream( ostring.str() );
+        }
+        else {
+            ifstream *ifin = new ifstream( file, ios::in );
+            if ( ! ifin->is_open() ) {
+                cerr << "Cannot open input file: " << file << endl;
+                return 0;
+            }
+            in = ifin;
         }
 
-        filebuf *fb = in.rdbuf();
+        streambuf *fb = in->rdbuf();
         char line[2048];
         fb->sgetn( line, 2048 );
 
         //  Need to rewind.
-        in.clear();
-        in.seekg( 0, ios::beg );
+        in->clear();
+        in->seekg( 0, ios::beg );
 
         //  Release any currently open tables.
         if ( votable1_ ) {
@@ -125,14 +146,14 @@ namespace gaia {
         //  just scans for the namespace qualifying string in the first 2048
         //  characters of the file.
         if ( strstr( line, VOTABLE_NS ) == NULL ) {
-            votable1_ = openVOTable1( &in );
+            votable1_ = openVOTable1( in );
         }
         else {
-            votable2_ = openVOTable2( &in );
+            votable2_ = openVOTable2( in );
         }
 
         //  Close and release file.
-        in.close();
+        delete in;
         if ( votable1_ || votable2_ ) {
             return 1;
         }
@@ -193,7 +214,7 @@ namespace gaia {
      *  Read stream for a VOTable version 1.1 without any namespace
      *  qualification.
      */
-    votable_11_dns::VOTABLE *VOTable::openVOTable1( ifstream *in )
+    votable_11_dns::VOTABLE *VOTable::openVOTable1( istream *in )
     {
         using namespace votable_11_dns;
         try {
@@ -217,7 +238,7 @@ namespace gaia {
      *  Read stream for a VOTable version 1.1 using fully qualified
      *  namespace.
      */
-    votable_11::VOTABLE *VOTable::openVOTable2( ifstream *in )
+    votable_11::VOTABLE *VOTable::openVOTable2( istream *in )
     {
         using namespace votable_11;
         try {
