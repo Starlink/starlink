@@ -462,23 +462,23 @@ void smurf_impaztec( int *status ) {
 
     {
       double range;
-      range = tel_lst[nframes-1] - tel_lst[0]; // range in decimal hours
-      range /= (int)nframes;  // length of frame 
-      range /= SOLSID; // UT
-      range /= 24.0;  // fraction of day
-      range *= SPD;  // seconds
+      range = tel_lst[nframes-1] - tel_lst[0]; /* range in decimal hours */
+      range /= (int)nframes;  /* length of frame  */
+      range /= SOLSID; /* UT */
+      range /= 24.0;  /* fraction of day */
+      range *= SPD;  /* seconds */
       printf("length of step = %f\n",range);
-      range = tempbuff[nframes-1] - tempbuff[0]; // range in decimal hours
-      range /= (int)nframes;  // length of frame 
-      range /= SOLSID; // UT
+      range = tempbuff[nframes-1] - tempbuff[0]; /* range in decimal hours */
+      range /= (int)nframes;  /* length of frame */
+      range /= SOLSID; /* UT */
       range *= DR2H;
-      range /= 24.0;  // fraction of day
-      range *= SPD;  // seconds
+      range /= 24.0;  /* fraction of day */
+      range *= SPD;  /* seconds */
       printf("length of step = %f\n",range);
-      range = mjuldate[nframes-1] - mjuldate[0]; // range in decimal hours
-      range /= (int)nframes;  // length of frame 
-      //      range /= SOLSID; // UT
-      range *= SPD;  // seconds
+      range = mjuldate[nframes-1] - mjuldate[0]; /* range in decimal hours */
+      range /= (int)nframes;  /* length of frame  */
+      /*      range /= SOLSID; */ /* UT */
+      range *= SPD;  /* seconds */
       printf("length of step = %f\n",range);
     }
 
@@ -504,12 +504,13 @@ void smurf_impaztec( int *status ) {
     /* and then to a fraction of a day */
     lst_err /= SPD;
 
-    // with correction of lst_diff - slaDtt =  -1058 arcsec error
+    /* with correction of lst_diff - slaDtt =  -1058 arcsec error
     // with no correction error = 141 arcsec
     // with just DTT (64 sec) = -1108
     // with correction of 157 error = -2506
     // with correction of 32.184  error = -626
     // with correction of 10 error = -292
+    */
 
     /* and correct the UTC values */
     for (i=0; i < nframes; i++) {
@@ -603,15 +604,15 @@ void smurf_impaztec( int *status ) {
       lst_coord_prev = lst_coord;
       slaDh2e( azelactc1[i], azelactc2[i], telpos[1]*2*3.1415926536/360.0,
 	       &ha, &tmp);
-      lst_coord = ha + trackactc1[i]; // LST derived from coordinates
-				      // (az, el, and ra)
+      lst_coord = ha + trackactc1[i]; /* LST derived from coordinates */
+      /* (az, el, and ra) */
 
       if( (lst_coord - lst_coord_prev)>0.0 && i!=0) {
 
 	if(ngframes==0) { startframe=i; }
 	quality[i]=1;
 	ngframes++;
-	//printf("IMPAZTEC i: %5i nconst: %5i\n", i, nconst);
+	/* printf("IMPAZTEC i: %5i nconst: %5i\n", i, nconst); */
 	nconst=0;
 
       }
@@ -637,7 +638,7 @@ void smurf_impaztec( int *status ) {
 
     /* DIAGNOSTIC */
     double tel_lat, lst, ha_azel, ha_tr, dec_fr_azel;
-    tel_lat = telpos[1]*2*3.1415926536/360.0; // telescope lat in radians
+    tel_lat = telpos[1]*2*3.1415926536/360.0; /* telescope lat in radians */
     slaDh2e(azelactc1[startframe], azelactc2[startframe], tel_lat,
 	    &ha_azel, &dec_fr_azel);
     lst = tempbuff[startframe];
