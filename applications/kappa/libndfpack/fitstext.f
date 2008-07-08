@@ -114,6 +114,9 @@
 *        Uses improved validation routine.
 *     4-JUN-1998 (DSB):
 *        Corrected typo in final context error message.
+*     8-JUL-2008 (DSB):
+*        Make the file read buffer bigger to allow lines that are longer
+*        than 80 chars to be read (e.g. lines padded with spaces).
 *     {enter_further_changes_here}
 
 *-
@@ -134,7 +137,7 @@
       PARAMETER ( FITSLN = 80 )
 
 *  Local Variables:
-      CHARACTER * ( FITSLN ) BUFFER ! Buffer for reading the file
+      CHARACTER * 255 BUFFER     ! Buffer for reading the file
       CHARACTER * ( FITSLN ) CARD ! Reconsistituted header card
       INTEGER FD                 ! File descriptor
       INTEGER FDIM( 1 )          ! Dimension of the FITS extension
