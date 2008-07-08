@@ -1,4 +1,10 @@
 
+/* Needed for fdopen declaration */
+#define _POSIX_C_SOURCE 200112L
+
+/* Need for fchmod and mkstemp */
+#define _XOPEN_SOURCE 600
+
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif
@@ -224,9 +230,9 @@ void writeFlagFile (const obsData * obsinfo, const subSystem subsystems[],
                     int * status);
 
 void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
-                      const AstFitsChan * fits[], int badfits[], char errbuff[], int * status);
+                      AstFitsChan * const fits[], int badfits[], char errbuff[], int * status);
 
-AstFrameSet *specWcs( const AstFrameSet *fs, const char veldef[], int ntime, const double times[], int * status );
+AstFrameSet *specWcs( AstFrameSet *fs, const char veldef[], int ntime, const double times[], int * status );
 
 static void checkNoFileExists( const char * file, int * status );
 
@@ -235,7 +241,7 @@ static double duration ( struct timeval * tp1, struct timeval * tp2 );
 #endif
 
 /* Stolen code */
-static int acs_kpgPtfts( int indf, const AstFitsChan * fchan, int * status );
+static int acs_kpgPtfts( int indf, AstFitsChan * fchan, int * status );
 
 /* Function to put quotes around a symbol so that we can do
    CPP string concatenation */
@@ -375,7 +381,11 @@ static double maxsequence = 131072;
 
 int
 acsSpecWriterVersion() {
+#ifdef PACKAGE_VERSION_INTEGE
   return PACKAGE_VERSION_INTEGER;
+#else
+  return 0;
+#endif
 }
 
 /*
@@ -483,7 +493,7 @@ acsSpecWriterVersion() {
 void
 acsSpecOpenTS( const char * dir, unsigned int yyyymmdd, unsigned int obsnum,
                unsigned int nrecep, unsigned int nsubsys, 
-               const char *recepnames[],
+               const char * const recepnames[],
                const char * focal_station,
                const float fplanex[], const float fplaney[], const char *ocsconfig,
                int * status ) {
@@ -1252,7 +1262,7 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
  *     Write FITS header and close HDS file.
 
  *  Invocation:
- *     acsSpecCloseTS( const AstFitsChan * fits[], int incArchiveBounds, int *status );
+ *     acsSpecCloseTS( AstFitsChan * fits[], int incArchiveBounds, int *status );
 
  *  Language:
  *     Starlink ANSI C
@@ -1313,7 +1323,7 @@ acsSpecWriteTS( unsigned int subsysnum, unsigned int nchans, const float spectru
  */
 
 void
-acsSpecCloseTS( const AstFitsChan * fits[], int incArchiveBounds, int * status ) {
+acsSpecCloseTS( AstFitsChan * const fits[], int incArchiveBounds, int * status ) {
 
   unsigned int i;           /* Loop counter */
   int found = 0;            /* Found an open NDF? */
@@ -1635,7 +1645,7 @@ openNDF( const obsData * obsinfo, const subSystem * template, subSystem * file,
   unsigned int ngrow;          /* Initial size to grow array */
   int place;                   /* NDF placeholder */
   int ubnd[NDIMS];             /* upper pixel bounds */
-  char * history[1] = { "Initial writing of raw data." };
+  const char * history[1] = { "Initial writing of raw data." };
 
   if (*status != SAI__OK) return;
 
@@ -3077,7 +3087,7 @@ void writeFlagFile (const obsData * obsinfo, const subSystem subsystems[],
 }
 
 void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
-                      const AstFitsChan * fits[], int badfits[], 
+                      AstFitsChan * const fits[], int badfits[], 
                       char errbuff[], int * status) {
 
   char * fname;             /* file name of a given subscan */
@@ -3099,7 +3109,7 @@ void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
   char * stemp = NULL;     /* temporary pointer to string */
   int sysstat;             /* status from system call */
   char units[72];          /* Unit string from fits header BUNIT */
-  char * history[1] = { "Finalise headers and make ICD compliant." };
+  const char * history[1] = { "Finalise headers and make ICD compliant." };
   int   parlen = 0;        /* returned length of param */
   char  param[EMS__SZPAR+1]; /* temp buffer for EMS param name */
   int   oplen  = 0;       /* returned length of errbuff */
@@ -3108,7 +3118,7 @@ void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
   char receppos_sys[16];  /* Coordinate frame for RECEPPOS */
 
   /* headers to be retained */
-  char * retainfits[] = {
+  const char * retainfits[] = {
     "DATE-OBS", "OBSGEO-X", "OBSGEO-Y", "OBSGEO-Z", "SSYSOBS", "DUT1", NULL
   };
 
@@ -3259,7 +3269,7 @@ void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
 
       /* need the time information */
       ndfXloc( indf, STATEEXT, "READ", &xloc, status );
-      datFind( xloc, "RTS_END", &tloc, status );
+      datFind( xloc, "TCS_TAI", &tloc, status );
       
       datMapV( tloc, "_DOUBLE", "READ", &tpntr, &tsize, status );
       tdata = tpntr;
@@ -3352,7 +3362,7 @@ static double duration ( struct timeval * tp1, struct timeval * tp2 ) {
 #endif
 
 
-AstFrameSet *specWcs( const AstFrameSet *fs, const char veldef[], int ntime, const double times[], int * status ){
+AstFrameSet *specWcs( AstFrameSet * fs, const char veldef[], int ntime, const double times[], int * status ){
 
   /*
    *+
@@ -3765,7 +3775,7 @@ void acsSpecSetMem ( const int nBytes, int *status ) {
  *-
  */
 
-static int acs_kpgPtfts( int indf, const AstFitsChan * fchan, int * status ) {
+static int acs_kpgPtfts( int indf, AstFitsChan * fchan, int * status ) {
 
   char card[SZFITSCARD+1];            /* A single FITS header card */
   int  fitsdim[1];  /* dimensions of FITS extension */

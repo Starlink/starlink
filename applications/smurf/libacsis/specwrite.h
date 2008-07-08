@@ -97,7 +97,7 @@ void acsSpecOpenTS( const char * dir,
 		    unsigned int obsnum,
 		    unsigned int nrecep,
 		    unsigned int nsubsys,
-		    const char* recepnames[],
+		    const char * const recepnames[],
 		    const char* focal_station,
 		    const float fplanex[],  /* Arcsec offsets in X, Y of */
 		    const float fplaney[],  /* each receptor. */
@@ -113,7 +113,7 @@ int acsSpecWriteTS( unsigned int subsys,
 		    int * status );
 
 /* Close the file */
-void acsSpecCloseTS( const AstFitsChan * fits[],
+void acsSpecCloseTS( AstFitsChan * const fits[],
 		     int incArchiveBounds,
 		     int * status );
 
