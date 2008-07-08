@@ -361,10 +361,10 @@ void smurf_timesort( int *status ) {
    void *ptr[2];              
 
 /* NDF array component names */
-   static char *comp[2] = {"DATA", "VARIANCE"}; 
+   static const char *comp[2] = {"DATA", "VARIANCE"}; 
 
 /* ACSIS arrays to be masked and re-ordered */
-   static char *acsis[NACSIS] = { "RECEPPOS", "TSYS", "TRX" };
+   static const char *acsis[NACSIS] = { "RECEPPOS", "TSYS", "TRX" };
 
 /* Check inherited status */
    if( *status != SAI__OK ) return;

@@ -166,6 +166,7 @@ void smurf_skynoise ( int *status ) {
    /* Local variables */
    struct sc2sim_obs_struct inx;   /* structure for values from XML */
    struct sc2sim_sim_struct sinx;  /* structure for sim values from XML */
+   void *atmpntr[3];               /* for ndfMap */
    double *atmsim;                 /* simulated image */
    double corner;                  /* corner frequency of the noise spectrum */
    double exp;                     /* power-law exponent */
@@ -240,7 +241,8 @@ void smurf_skynoise ( int *status ) {
 
    parPut0c ( "FILENAME", file_name, status );
    ndfCreat ( "FILENAME", "_DOUBLE", 2, lbnd, ubnd, &indf, status );
-   ndfMap ( indf, "DATA", "_DOUBLE", "WRITE", &atmsim, &n, status );
+   ndfMap ( indf, "DATA", "_DOUBLE", "WRITE", atmpntr, &n, status );
+   atmsim = atmpntr[0];
 
    /* Calculate the 2-D noise field */
    sc2sim_invf2d ( corner, exp, pixsize, size, atmsim, spectrum, status );

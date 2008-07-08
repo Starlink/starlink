@@ -157,6 +157,7 @@ void smurf_badbolos( int *status ) {
    int bndf;                      /* NDF identifier of bad pixel
                                      extension */
    int *bolos = NULL;             /* Array of all bolometers */
+   void *bolpntr[3];              /* ndfMap array */
    HDSLoc *bbmloc=NULL;           /* HDS locator of bad pixel extension */      
    int curbad;                    /* The current bad object */
    int i;                         /* Loop counter */
@@ -215,7 +216,8 @@ void smurf_badbolos( int *status ) {
    bndf = smf_get_ndfid ( bbmloc, "", "WRITE", "NEW", 
                          "_INTEGER", 2, lbnd, ubnd, status );
 
-   ndfMap ( bndf, "DATA", "_INTEGER", "WRITE", &bolos, &n, status );
+   ndfMap ( bndf, "DATA", "_INTEGER", "WRITE", bolpntr, &n, status );
+   bolos = bolpntr[0];
 
    if ( *status == SAI__OK ) {
      memset ( bolos, 0, n*sizeof(*bolos) );

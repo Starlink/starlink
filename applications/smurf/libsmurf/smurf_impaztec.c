@@ -173,7 +173,7 @@
 
 #if HAVE_LIBNETCDF
 /* Prototypes for local functions that wrap netcdf messages */
-void nc_getSignal(int ncid, char* signalname, double* signal, int* status);
+void nc_getSignal(int ncid, const char* signalname, double* signal, int* status);
 void nc_error(int nc_status, int *status);
 
 #endif
@@ -910,7 +910,7 @@ void smurf_impaztec( int *status ) {
 #ifdef HAVE_LIBNETCDF
 
 /* get a signal specified by name from the netCDF file identified by ncid */
-void nc_getSignal(int ncid, char* signalname, double* signal,int* status){
+void nc_getSignal(int ncid, const char* signalname, double* signal,int* status){
 
   int sigid, nc_status;
   if (*status != SAI__OK) return;
