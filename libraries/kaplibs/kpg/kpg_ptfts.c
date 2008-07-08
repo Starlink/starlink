@@ -3,45 +3,37 @@
 #include "ast.h"
 #include "sae_par.h"
 
-F77_SUBROUTINE(kpg1_gtfts)( INTEGER(INDF), INTEGER(FCHAN), INTEGER(STATUS) ) {
+F77_SUBROUTINE(kpg_ptfts)( INTEGER(INDF), INTEGER(FCHAN), INTEGER(STATUS) ) {
 /*
 *+
 *  Name:
-*     KPG1_GTFTS
+*     KPG_PTFTS
 
 *  Purpose:
-*     Obtain FITS header information from an NDF
+*     Store FITS header information into an NDF
 
 *  Language:
 *     C, designed to be called from Fortran.
 
 *  Invocation:
-*     CALL KPG1_GTFTS( INDF, FCHAN, STATUS )
+*     CALL KPG_PTFTS( INDF, FCHAN, STATUS )
 
 *  Description:
-*     The routine reads the FITS extension from an NDF and returns an
-*     AST pointer to a FitsChan which contains this information. The 
-*     information may then be accessed using routines from the AST 
-*     library (SUN/211).
+*     The routine stores the contents of an AST FitsChan into an
+*     NDF by creating (or replacing) the FITS extension in the NDF.
 
 *  Arguments:
 *     INDF = INTEGER (Given)
-*        NDF identifier.
-*     FCHAN = INTEGER (Returned)
+*        Identifier of NDF to receive the .FITS extension.
+*     FCHAN = INTEGER (Given)
 *        An AST pointer to a FitsChan which contains information about
-*        the FITS headers associated with the NDF.
+*        the FITS header to be associated with the NDF.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
-*     - It is the caller's responsibility to annul the AST pointer
-*     issued by this routine (e.g. by calling AST_ANNUL) when it is no
-*     longer required.
-*     - If this routine is called with STATUS set, then a value of
-*     AST__NULL will be returned for the FCHAN argument, although no
-*     further processing will occur. The same value will also be
-*     returned if the routine should fail for any reason.
-*     - Status is set to KPG__NOFTS if no FITS extension is found.
+*     - If a .MORE.FITS extension already exists it will be completely
+*     replaced by this routine.
 
 *  Copyright:
 *     Copyright (C) 2008 Science & Technology Facilities Council.
@@ -85,10 +77,10 @@ F77_SUBROUTINE(kpg1_gtfts)( INTEGER(INDF), INTEGER(FCHAN), INTEGER(STATUS) ) {
 
    F77_IMPORT_INTEGER( *STATUS, cstatus );
    F77_IMPORT_INTEGER( *INDF, indf );
+   fchan = astI2P( *FCHAN );
 
-   (void) kpgGtfts( indf, fchan, &cstatus );
+   (void) kpgPtfts( indf, fchan, &cstatus );
 
-   *FCHAN = astP2I( fchan );
    F77_EXPORT_INTEGER( cstatus, *STATUS );
 
 }
