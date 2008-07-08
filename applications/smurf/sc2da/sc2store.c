@@ -1103,6 +1103,8 @@ int *status                   /* global status (given and returned) */
     18Aug2004 : original (bdk)
     17Feb2005 : add sc2_heat (bdk)
     27Jul2006 : use JCMTState (timj)
+    7Jul2008  : fix type of WVM_TIME and SC2_HEAT. Do not store SMU_XYZ or JOS_DRCONTROL.
+                WVM_TH/TW/QUAL not used any more.
 */
 {
    if ( *status != SAI__OK ) return;
@@ -1119,9 +1121,6 @@ int *status                   /* global status (given and returned) */
    STORE_STATE( rts_end, RTS_END, double );
 
    /* Secondary Mirror */
-   STORE_STATE( smu_x, SMU_X, double );
-   STORE_STATE( smu_y, SMU_Y, double );
-   STORE_STATE( smu_z, SMU_Z, double );
    STORE_CHAR( smu_chop_phase, SMU_CHOP_PHASE, JCMT__SZSMU_CHOP_PHASE );
    STORE_STATE( smu_jig_index, SMU_JIG_INDEX, int );
 
@@ -1157,20 +1156,14 @@ int *status                   /* global status (given and returned) */
    STORE_STATE( tcs_tr_bc1, TCS_TR_BC1, double );
    STORE_STATE( tcs_tr_bc2, TCS_TR_BC2, double );
 
-   /* JOS control */
-   STORE_STATE( jos_drcontrol, JOS_DRCONTROL, int );
-
    /* Water Vapour Monitor */
-   STORE_STATE( wvm_th, WVM_TH, float );
    STORE_STATE( wvm_t12, WVM_T12, float );
    STORE_STATE( wvm_t42, WVM_T42, float );
    STORE_STATE( wvm_t78, WVM_T78, float );
-   STORE_STATE( wvm_tw, WVM_TW, float );
-   STORE_STATE( wvm_qual, WVM_QUAL, int );
-   STORE_STATE( wvm_time, WVM_TIME, float );
+   STORE_STATE( wvm_time, WVM_TIME, double );
 
    /* SCUBA-2 specific */
-   STORE_STATE( sc2_heat, SC2_HEAT, double );
+   STORE_STATE( sc2_heat, SC2_HEAT, int );
 
    /* FTS and polarimeter */
    STORE_STATE( fts_pos, FTS_POS, float );

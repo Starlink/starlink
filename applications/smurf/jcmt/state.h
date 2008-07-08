@@ -61,6 +61,10 @@
 *        C++ compilers are much pickier in inst_t usage
 *     24-JUN-2008 (TIMJ):
 *        Add TCS_PERCENT_CMP. Fix a compiler const warning.
+*     07-JUL-2008 (TIMJ):
+*        - Remove WVM_TW/TH/QUAL
+*        - Do not write JOS_DRCONTROL or SMU_XYZ to SCUBA-2 files
+*        - Change type of SC2_HEAT to _INTEGER and WVM_TIME to _DOUBLE.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -158,14 +162,11 @@ typedef struct JCMTState {
   float  enviro_rel_hum;
   float  enviro_pressure;
   float  enviro_air_temp;
-  float  wvm_th;
   float  wvm_t12;
   float  wvm_t42;
   float  wvm_t78;
-  float  wvm_tw;
-  int    wvm_qual;
-  float  wvm_time;
-  double sc2_heat;
+  double wvm_time;
+  int    sc2_heat;
   float  acs_exposure;
   float  acs_offexposure;
   int    acs_no_prev_ref;
@@ -227,12 +228,9 @@ typedef enum
    ENVIRO_REL_HUM,
    ENVIRO_PRESSURE,
    ENVIRO_AIR_TEMP,
-   WVM_TH,
    WVM_T12,
    WVM_T42,
    WVM_T78,
-   WVM_TW,
-   WVM_QUAL,
    WVM_TIME,
    SC2_HEAT,
    ACS_EXPOSURE,
@@ -271,9 +269,9 @@ static const HDSdataRecord hdsRecords[JCMT_COMP_NUM] =
     { RTS_NUM, "_INTEGER", "RTS_NUM", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { RTS_END, "_DOUBLE", "RTS_END", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { RTS_TASKS, CHARTYP(JCMT__SZRTS_TASKS), "RTS_TASKS", INST__ACSIS, INST__NONE },
-    { SMU_X, "_DOUBLE", "SMU_X", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
-    { SMU_Y, "_DOUBLE", "SMU_Y", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
-    { SMU_Z, "_DOUBLE", "SMU_Z", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
+    { SMU_X, "_DOUBLE", "SMU_X", INST__ACSIS, INST__NONE },
+    { SMU_Y, "_DOUBLE", "SMU_Y", INST__ACSIS, INST__NONE },
+    { SMU_Z, "_DOUBLE", "SMU_Z", INST__ACSIS, INST__NONE },
     { SMU_CHOP_PHASE, CHARTYP(JCMT__SZSMU_CHOP_PHASE), "SMU_CHOP_PHASE", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { SMU_JIG_INDEX, "_INTEGER", "SMU_JIG_INDEX", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { SMU_AZ_JIG_X, "_DOUBLE", "SMU_AZ_JIG_X", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
@@ -306,18 +304,15 @@ static const HDSdataRecord hdsRecords[JCMT_COMP_NUM] =
     { TCS_TR_DC2, "_DOUBLE", "TCS_TR_DC2", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { TCS_TR_BC1, "_DOUBLE", "TCS_TR_BC1", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
     { TCS_TR_BC2, "_DOUBLE", "TCS_TR_BC2", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
-    { JOS_DRCONTROL, "_INTEGER", "JOS_DRCONTROL", (inst_t)(INST__ACSIS | INST__SCUBA2), INST__NONE },
+    { JOS_DRCONTROL, "_INTEGER", "JOS_DRCONTROL", INST__ACSIS, INST__NONE },
     { ENVIRO_REL_HUM, "_REAL", "ENVIRO_REL_HUM", INST__ACSIS, INST__NONE },
     { ENVIRO_PRESSURE, "_REAL", "ENVIRO_PRESSURE", INST__ACSIS, INST__NONE },
     { ENVIRO_AIR_TEMP, "_REAL", "ENVIRO_AIR_TEMP", INST__ACSIS, INST__NONE },
-    { WVM_TH, "_REAL", "WVM_TH", INST__SCUBA2, INST__NONE },
     { WVM_T12, "_REAL", "WVM_T12", INST__SCUBA2, INST__NONE },
     { WVM_T42, "_REAL", "WVM_T42", INST__SCUBA2, INST__NONE },
     { WVM_T78, "_REAL", "WVM_T78", INST__SCUBA2, INST__NONE },
-    { WVM_TW, "_REAL", "WVM_TW", INST__SCUBA2, INST__NONE },
-    { WVM_QUAL, "_INTEGER", "WVM_QUAL", INST__SCUBA2, INST__NONE },
     { WVM_TIME, "_REAL", "WVM_TIME", INST__SCUBA2, INST__NONE },
-    { SC2_HEAT, "_DOUBLE", "SC2_HEAT", INST__SCUBA2, INST__NONE },
+    { SC2_HEAT, "_INTEGER", "SC2_HEAT", INST__SCUBA2, INST__NONE },
     { ACS_SOURCE_RO, CHARTYP(JCMT__SZACS_SOURCE_RO), "ACS_SOURCE_RO", INST__ACSIS, INST__NONE },
     { ACS_NO_PREV_REF, "_INTEGER", "ACS_NO_PREV_REF", INST__ACSIS, INST__NONE },
     { ACS_NO_NEXT_REF, "_INTEGER", "ACS_NO_NEXT_REF", INST__ACSIS, INST__NONE },
