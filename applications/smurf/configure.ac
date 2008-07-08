@@ -7,10 +7,6 @@ PACKAGE_UPCASE='SMURF'
 AC_DEFINE( [PACKAGE_UPCASE], "SMURF", [Upper cased package name] )
 AC_SUBST(PACKAGE_UPCASE)
 
-dnl    Would like the version number as an integer
-AC_DEFINE_UNQUOTED([PACKAGE_VERSION_INTEGER], $PACKAGE_VERSION_INTEGER,
-                    [Integer version number, in the form major*1e6+minor*1e3+release])
-
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
 AM_INIT_AUTOMAKE(1.8.2-starlink)
@@ -20,6 +16,10 @@ dnl    isn't found then configure will complain
 AC_CONFIG_SRCDIR([smurf_mon.c])
 
 STAR_DEFAULTS(per-package-dirs)
+
+dnl    Would like the version number as an integer
+AC_DEFINE_UNQUOTED([PACKAGE_VERSION_INTEGER], $PACKAGE_VERSION_INTEGER,
+                    [Integer version number, in the form major*1e6+minor*1e3+release])
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
