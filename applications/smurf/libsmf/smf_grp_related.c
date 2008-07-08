@@ -162,7 +162,8 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   smfHead *hdr=NULL;          /* Header for current file */
   smfHead *hdr2=NULL;         /* Second header */
   int i;                      /* Loop counter for index into Grp */
-  int *indices = NULL;        /* Array of indices to be stored in subgroup */
+  dim_t isub;                 /* loop counter over subgroup */
+  dim_t *indices = NULL;      /* Array of indices to be stored in subgroup */
   int j;                      /* Loop counter */
   int k = 0;                  /* Incremental counter for subgroup indices */
   int *keepchunk=NULL;        /* Flag for chunks that will be kept */
@@ -174,8 +175,8 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   dim_t *nboly = NULL;        /* Number of bolometers in Y direction */
   int nelem;                  /* Number of elements in index array */
   size_t *new_chunk=NULL;     /* chunks associated with new_subgroups */
-  int new_ngroups=0;          /* counter for new_subgroups */
-  int **new_subgroups=NULL;   /* subgroups that are long enough */
+  dim_t new_ngroups=0;        /* counter for new_subgroups */
+  dim_t **new_subgroups=NULL; /* subgroups that are long enough */
   int ngroups = 0;            /* Counter for subgroups to be stored */
   dim_t nx;                   /* (data->dims)[0] */
   dim_t ny;                   /* (data->dims)[1] */
@@ -185,7 +186,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   double *starts = NULL;      /* Array of starting RTS_END values */
   double steptime;            /* Length of a sample */
   char subarray[81];          /* Subarray name */
-  int **subgroups = NULL;     /* Array containing index arrays to parent Grp */
+  dim_t **subgroups = NULL;   /* Array containing index arrays to parent Grp */
   int subsysnum;              /* Subsystem numeric id. 0 - 8 */
   size_t thischunk;           /* Current chunk that we're on */
   dim_t thislen;              /* Length of current time chunk */
@@ -605,8 +606,8 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
     new_chunk = smf_free(new_chunk, status);
 
     if( new_subgroups ) {
-      for( i=0; i<new_ngroups; i++ ) {
-	new_subgroups[i] = smf_free( new_subgroups[i], status );
+      for( isub=0; isub<new_ngroups; i++ ) {
+	new_subgroups[isub] = smf_free( new_subgroups[isub], status );
       }
       new_subgroups = smf_free( new_subgroups, status );
     }

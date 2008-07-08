@@ -461,7 +461,7 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
                        const double telpos[], int * status );
 
 smfGroup * 
-smf_construct_smfGroup( Grp *igrp, int **subgroups, size_t *chunk,
+smf_construct_smfGroup( Grp *igrp, dim_t **subgroups, size_t *chunk,
 			const dim_t ngroups, 
                         const dim_t nrelated, const int copysubgroups, 
 			int *status );

@@ -95,7 +95,7 @@ void smf_close_smfGroup ( smfGroup **group, int *status ) {
 
   /* Local variables */
   dim_t i;                      /* Loop counter */
-  int **subgroups = NULL;       /* Array of pointers to arrays of Grp indices */
+  dim_t **subgroups = NULL;     /* Array of pointers to arrays of Grp indices */
   dim_t *indices = NULL;        /* Pointer to array of Grp indices */
 
   /* We need to be able to clean up even if input status is bad - this

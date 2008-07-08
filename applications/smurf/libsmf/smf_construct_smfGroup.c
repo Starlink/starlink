@@ -115,7 +115,7 @@
 
 #define FUNC_NAME "smf_construct_smfGroup"
 
-smfGroup *smf_construct_smfGroup( Grp *igrp, int **subgroups, size_t *chunk,
+smfGroup *smf_construct_smfGroup( Grp *igrp, dim_t **subgroups, size_t *chunk,
 				  const dim_t ngroups,  const dim_t nrelated, 
 				  const int copy, int *status ) {
 
@@ -123,7 +123,7 @@ smfGroup *smf_construct_smfGroup( Grp *igrp, int **subgroups, size_t *chunk,
   smfGroup *group = NULL;
   int isize;
   dim_t i;
-  int **newsubgroups=NULL;
+  dim_t **newsubgroups=NULL;
   
   if ( *status != SAI__OK ) return NULL;
 
