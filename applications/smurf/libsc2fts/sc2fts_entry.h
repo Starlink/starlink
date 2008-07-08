@@ -70,6 +70,6 @@ void sc2fts_groupcoadd ( Grp *igrp, Grp *ogrp, AstKeyMap* parKeymap, int *status
 /* a structure for storing calibration info */
 struct sc2fts_fun
 {
-  char *name;
+  const char *name;
   void (*op)( Grp *igrp, Grp *ogrp, AstKeyMap* parKeymap, int *status );
 };

@@ -78,7 +78,7 @@
 #define FUNC_NAME "sc2fts_entry"
 
 /* define all fts-2-related calibration operations */
-struct sc2fts_fun sc2fts_cal[] =
+const struct sc2fts_fun sc2fts_cal[] =
 {
   { "IFGMFLATFIELD", sc2fts_ifgmflatfield },  /* keywords:  */
   { "ADDWCS",        sc2fts_addwcs },         /* keywords: none */
