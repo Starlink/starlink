@@ -59,6 +59,9 @@
  *                           by decoupling when needed and adding a new 
  *                           growAndShrink() member to handle this when
  *                           resampling/picking.
+ *                 08/07/08  When clearing in updateOffset (for zoomed images)
+ *                           clear to black, not the blank color, which
+ *                           can be another color.
  */
 static const char* const rcsId="@(#) $Id: ImageData.C,v 1.1.1.1 2006/01/12 16:38:59 abrighto Exp $";
 
@@ -92,7 +95,7 @@ static const char* const rcsId="@(#) $Id: ImageData.C,v 1.1.1.1 2006/01/12 16:38
 // or bias frame for all images of this class
 int ImageData::ncolors_ = 0;	         // number of available colors
 unsigned long* ImageData::colors_ = NULL; // array of color values
-unsigned long ImageData::color0_ = 0;     // reserved color for black pixels
+unsigned long ImageData::color0_ = 0;     // reserved color for blank pixels
 unsigned long ImageData::colorn_ = 0;     // reserved color for saturated pixels
 
 biasINFO* ImageData::biasInfo_ = NULL;    // ptr to description of bias frame
@@ -1142,7 +1145,7 @@ void ImageData::updateOffset(double x, double y)
 	return;
 
     if (clear_) {		// temp clear image
-	xImage_->clear(color0_);
+	xImage_->clear(0);      // PWD: clear to black, not blank pixel color.
 	clear_ = 0;
 	return;
     }
@@ -1169,7 +1172,7 @@ void ImageData::updateOffset(double x, double y)
     if (dest_x || dest_y || x1-x0 < xImageMaxX_ || y1-y0 < xImageMaxY_) {
 	// if (verbose_)
 	//    printf("%s: clear ximage before update\n", name_);
-	xImage_->clear(color0_);
+	xImage_->clear(0); //  PWD: clear to black, not blank pixel color.
     }
 
     // copy raw to X image while doing transformations
