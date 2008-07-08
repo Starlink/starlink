@@ -187,7 +187,7 @@ void smf_open_model( const Grp *igrp, int index, const char *mode,
     memcpy( (*data)->dims, head.dims, sizeof( head.dims ) );
     
     /* Data pointer points to memory AFTER HEADER */
-    (*data)->pntr[0] = buf + headlen;
+    (*data)->pntr[0] = (unsigned char*)buf + headlen;
 
     /* Store the file descriptor to enable us to unmap when we close */
     (*data)->file->fd = fd;

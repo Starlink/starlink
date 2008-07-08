@@ -8,7 +8,7 @@
 
 *  Synopsis:
 *     #include "smf.h"
-*     void smf_geod( double pos[3], double *phi, double *h, double *lambda )
+*     void smf_geod( const double pos[3],double *phi, double *h,double *lambda )
 
 *  Description:
 *     This function converts a position supplied as terrestrial Cartesian
@@ -23,7 +23,7 @@
 *     Explanatory Supplement to the Astronomical Almanac (p206).
 
 *  Parameters:
-*     pos
+*     const pos
 *        Array holding the (x,y,z) values, in metres.
 *     phi
 *        Pointer at a location at which to return the geodetic latitude,
@@ -41,6 +41,8 @@
 *  History:
 *     2-NOV-2006 (DSB):
 *        Initial version (copied from ast/fitschan.c).
+*     7-JUL-2008 (TIMJ):
+*        Use const.
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
@@ -77,7 +79,7 @@
 #define FL  1.0/298.257  /*  Reference spheroid flattening factor */
 #define A0  6378140.0    /*  Earth equatorial radius (metres) */
 
-void smf_geod( double pos[3], double *phi, double *h, double *lambda ){
+void smf_geod( const double pos[3], double *phi, double *h, double *lambda ){
 
 /* Local Variables... */
    double r, e, f, p, q, d, n, g, t, rp, rd, sn, b0, boa, ab2oa;

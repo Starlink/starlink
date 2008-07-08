@@ -142,6 +142,7 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
   int err;                    /* Error in reducing */
   int *gridext;               /* Min/max extent of reconstruction grid */
   int gridndf;                /* NDF identifier for grid parameters */
+  void *gridpntr[3];          /* Some where for ndfMap */
   smfData *gwtdata = NULL;    /* Grid weights */
   int gwtndf;                 /* NDF identifier for grid weights */
   smfHead *hdr = NULL;        /* Header for input data */
@@ -343,8 +344,9 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
 	ubnd[0] = 4;
 	gridndf = smf_get_ndfid( weightsloc, "GRIDEXT", "WRITE", "NEW", 
 				 "_INTEGER", 1, lbnd, ubnd, status);
-	ndfMap( gridndf, "DATA", "_INTEGER", "WRITE", &gridext, &nelem, 
+	ndfMap( gridndf, "DATA", "_INTEGER", "WRITE", gridpntr, &nelem, 
 		status);
+  gridext = gridpntr[0];
 	/* If all is well, copy gridminmax into gridext */
 	if ( *status == SAI__OK ) {
 	  for (j=0; j<nelem; j++) {

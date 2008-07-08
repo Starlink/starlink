@@ -8,7 +8,7 @@
 *     a telescope (telpos) in a smfHead given information in its FITS header
 
 *  Invocation:
-*     smf_telpos_get( const smfHead *hdr, int * status );
+*     smf_telpos_get( smfHead *hdr, int * status );
 
 *  Language:
 *     ANSI C
@@ -73,7 +73,7 @@
 
 #define SZFITSCARD 81
 
-void smf_telpos_get( const smfHead * hdr, int * status ) {
+void smf_telpos_get( smfHead * hdr, int * status ) {
 
   /* Variables */
   char telescop[SZFITSCARD];     /* contents of TELESCOP header */

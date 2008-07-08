@@ -115,8 +115,8 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
    char *pname = NULL;
    char filename[GRP__SZNAM + 1];    
    const char *key = NULL;
-   const char *obsid = NULL;
-   const char *subsysnr = NULL;
+   char *obsid = NULL;
+   char *subsysnr = NULL;
    int ifile;
    int indf1;             
    int iobs;
@@ -194,14 +194,16 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
 
 /* Get the value of the NSUBSCAN keyword. Use a null string if it was not
    found. */
-      if( !astGetFitsS( fc, "NSUBSCAN", &nsubscan ) ) nsubscan = "";
-
+      if( !astGetFitsS( fc, "NSUBSCAN", &nsubscan ) ) {
 /* Store the NDF index in the keymap. */
-      astMapPut0I( sysmap, nsubscan, ifile, NULL );
+        astMapPut0I( sysmap, nsubscan, ifile, NULL );
+      } else {
+        astMapPut0I( sysmap, "", ifile, NULL );
+      }
 
 /* Free resources */
-      obsid = astFree( (void *) obsid );
-      subsysnr = astFree( (void *) subsysnr );
+      obsid = astFree(  obsid );
+      subsysnr = astFree( subsysnr );
       parts = astFree( parts );
       sysmap = astAnnul( sysmap );
       obsmap = astAnnul( obsmap );

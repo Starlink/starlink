@@ -119,11 +119,12 @@ void smf_scanfit( smfData *data, unsigned char *quality, int order,
   int cliptype;             /* Type of sigma clipping */
   int i;                    /* Loop counter */
   int lbnd[3];              /* Lower bound for coeff array (poly) */
-  int nbol;                 /* Number of bolometers */
+  int nbol = 0;             /* Number of bolometers */
   int ncoeff;               /* Number of coefficients in baseline fit */
   int nframes = 1;          /* Number of frames in a scan */
   int npts;                 /* Number of data points in coefficient array */
   HDSLoc *ploc = NULL;      /* Locator for SCANFIT coeffs */
+  void *pntr[3];            /* Pointers to mapped data */
   int pndf;                 /* NDF identifier for SCANFIT */
   double *poly = NULL;      /* Array of polynomial coefficients */
   int ubnd[3];              /* Upper bound for coeff array (poly) */
@@ -234,7 +235,8 @@ void smf_scanfit( smfData *data, unsigned char *quality, int order,
 	     status );
     } else {
       /* Map the pointer for polynomial coefficients */
-      ndfMap( pndf, "DATA", "_DOUBLE", "WRITE", &poly, &npts, status );
+      ndfMap( pndf, "DATA", "_DOUBLE", "WRITE", pntr, &npts, status );
+      poly = pntr[0];
     }
   } else {
     /* Otherwise smfData not associated with file. Simply point poly to

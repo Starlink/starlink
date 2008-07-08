@@ -88,7 +88,7 @@
 
 #define FUNC_NAME "smf_addto_smfArray"
 
-void smf_addto_smfArray( smfArray *ary, const smfData *data, int *status ) {
+void smf_addto_smfArray( smfArray *ary, smfData *data, int *status ) {
 
   dim_t ndat;         /* Number of smfDatas that can be added */
 

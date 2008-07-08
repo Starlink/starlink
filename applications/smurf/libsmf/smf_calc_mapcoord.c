@@ -127,10 +127,12 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
   AstSkyFrame *abskyfrm = NULL;/* Output SkyFrame (always absolute) */
   AstMapping *bolo2map=NULL;   /* Combined mapping bolo->map coordinates */
   int bndndf=NDF__NOID;        /* NDF identifier for map bounds */
-  void *data_index[1];         /* Array of pointers to mapped arrays in ndf */
+  void *data_pntr[1];          /* Array of pointers to mapped arrays in ndf */
+  int *data_index;             /* Mapped DATA_ARRAY part of NDF */
   int docalc=1;                /* If set calculate the LUT */
   int doextension=0;           /* Try to write LUT to MAPCOORD extension */
   smfFile *file=NULL;          /* smfFile pointer */
+  AstObject *fstemp = NULL;    /* AstObject version of outfset */
   dim_t i;                     /* loop counter */
   dim_t j;                     /* loop counter */
   int lbnd[1];                 /* Pixel bounds for 1d pointing array */
@@ -248,7 +250,8 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
     if( *status == SAI__OK ) {
 
       /* Try reading in the WCS information */
-      kpg1Wread( mapcoordloc, "WCS", &oldfset, status );
+      kpg1Wread( mapcoordloc, "WCS", &fstemp, status );
+      oldfset = (AstFrameSet*)fstemp;
 
       if( *status == SAI__OK ) {
 
@@ -273,12 +276,13 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
 				  status );
 	  
 	  if( *status == SAI__OK ) {
-	    ndfMap( bndndf, "DATA", "_INTEGER", "READ", data_index, &nmap, 
+	    ndfMap( bndndf, "DATA", "_INTEGER", "READ", data_pntr, &nmap, 
 		    status );    
-	    
+	    data_index = data_pntr[0];
+
 	    if( *status == SAI__OK ) {
-	      lbnd_old[0] = ((int *)data_index[0])[0];
-	      lbnd_old[1] = ((int *)data_index[0])[1];
+	      lbnd_old[0] = data_index[0];
+	      lbnd_old[1] = data_index[1];
 	    } 
 	    ndfAnnul( &bndndf, status );
 	  }
@@ -288,12 +292,13 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
 				  status );
 	  
 	  if( *status == SAI__OK ) {
-	    ndfMap( bndndf, "DATA", "_INTEGER", "READ", data_index, &nmap, 
-		    status );    
-	    
+	    ndfMap( bndndf, "DATA", "_INTEGER", "READ", data_pntr, &nmap, 
+		    status );
+      data_index = data_pntr[0];
+
 	    if( *status == SAI__OK ) {
-	      ubnd_old[0] = ((int *)data_index[0])[0];
-	      ubnd_old[1] = ((int *)data_index[0])[1];
+	      ubnd_old[0] = data_index[0];
+	      ubnd_old[1] = data_index[1];
 	    } 
 	    ndfAnnul( &bndndf, status );
 	  }
@@ -332,10 +337,11 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
 
     if( doextension ) {
       /* Map the LUT array */
-      ndfMap( lutndf, "DATA", "_INTEGER", "WRITE", data_index, &nmap, 
-	      status );    
+      ndfMap( lutndf, "DATA", "_INTEGER", "WRITE", data_pntr, &nmap, 
+	      status );
+      data_index = data_pntr[0];
       if( *status == SAI__OK ) {
-	lut = data_index[0];
+        lut = data_index;
       } else {
 	errRep( FUNC_NAME, "Unable to map LUT in MAPCOORD extension",
 		status);
@@ -408,7 +414,7 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
 
       /* Write the WCS for the projection to the extension */
       if( doextension ) {
-	kpg1Wwrt( outfset, "WCS", mapcoordloc, status ); 
+        kpg1Wwrt( (AstObject*)outfset, "WCS", mapcoordloc, status ); 
 	
 	/* Write the pixel bounds for the map to the extension */
 	
@@ -418,12 +424,12 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
 	bndndf = smf_get_ndfid( mapcoordloc, "LBND", "UPDATE", "UNKNOWN",
 				"_INTEGER", 1, lbnd_temp, ubnd_temp, status );
       
-	ndfMap( bndndf, "DATA", "_INTEGER", "WRITE", data_index, &nmap, 
+	ndfMap( bndndf, "DATA", "_INTEGER", "WRITE", data_pntr, &nmap, 
 		status );    
-      
+  data_index = data_pntr[0];
 	if( *status == SAI__OK ) {
-	  ((int *)data_index[0])[0] = lbnd_out[0];
-	  ((int *)data_index[0])[1] = lbnd_out[1];
+	  data_index[0] = lbnd_out[0];
+	  data_index[1] = lbnd_out[1];
 	} else {
 	  errRep( FUNC_NAME, "Unable to map LBND in MAPCOORD extension",
 		  status);
@@ -433,11 +439,12 @@ void smf_calc_mapcoord( smfData *data, AstFrameSet *outfset, int moving,
 	
 	bndndf = smf_get_ndfid( mapcoordloc, "UBND", "UPDATE", "UNKNOWN",
 				"_INTEGER", 1, lbnd_temp, ubnd_temp, status );
-	ndfMap( bndndf, "DATA", "_INTEGER", "WRITE", data_index, &nmap, 
+	ndfMap( bndndf, "DATA", "_INTEGER", "WRITE", data_pntr, &nmap, 
 		status );    
+  data_index = data_pntr[0];
 	if( *status == SAI__OK ) {
-	  ((int *)data_index[0])[0] = ubnd_out[0];
-	  ((int *)data_index[0])[1] = ubnd_out[1];
+	  data_index[0] = ubnd_out[0];
+	  data_index[1] = ubnd_out[1];
 	} else {
 	  errRep( FUNC_NAME, "Unable to map UBND in MAPCOORD extension",
 		  status);

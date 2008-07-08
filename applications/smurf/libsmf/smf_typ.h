@@ -266,13 +266,13 @@ typedef struct smfHead {
   dim_t nframes;            /* Number of frames in smfData */
   int isCloned;             /* If false, allState is owned by this
 			       struct, if true it should not be freed */
-  const JCMTState *allState;/* Array of STATE for every time slice */ 
-  unsigned int ndet;        /* Number of focal plane detectors */
-  const double * fplanex;   /* X coords (radians) of focal plane detectors */
-  const double * fplaney;   /* Y coords (radians) of focal plane detectors */
-  const double * detpos;    /* Tracking coords (radians) of detectors */
-  const double * tsys;      /* System Noise temperatures */
-  const char * detname;     /* Concatenated list of null-terminated detector names */
+  JCMTState *allState;     /* Array of STATE for every time slice */ 
+  unsigned int ndet;       /* Number of focal plane detectors */
+  double * fplanex;   /* X coords (radians) of focal plane detectors */
+  double * fplaney;   /* Y coords (radians) of focal plane detectors */
+  double * detpos;    /* Tracking coords (radians) of detectors */
+  double * tsys;      /* System Noise temperatures */
+  char * detname;     /* Concatenated list of null-terminated detector names */
   int dpazel;               /* Flag: does "detpos" hold AZEL values? */
   double instap[2];         /* instrument aperture (focal plane offsets)  */
   double telpos[3];         /* West LON/LAT/Alt of telescope (deg/deg/m) */

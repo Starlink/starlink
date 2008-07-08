@@ -155,11 +155,11 @@ void smf_filter_notch( smfFilter *filt, const double f_low[],
 
       len = iedge_high - iedge_low + 1;
 
-      memset( ((void *) filt->real) + iedge_low*sizeof(*filt->real), 0, 
-              len*sizeof(*filt->real) );
+      memset( ((unsigned char *) filt->real) + iedge_low*sizeof(*filt->real),
+              0, len*sizeof(*filt->real) );
       if( filt->isComplex ) {
-        memset( ((void *) filt->imag) + iedge_low*sizeof(*filt->imag), 0, 
-                len*sizeof(*filt->imag) );
+        memset( ((unsigned char *) filt->imag) + iedge_low*sizeof(*filt->imag),
+                0, len*sizeof(*filt->imag) );
       }
     }
   }

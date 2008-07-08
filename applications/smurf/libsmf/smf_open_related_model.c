@@ -104,10 +104,10 @@ void smf_open_related_model( const smfGroup *group, const dim_t subindex,
   smfData *data = NULL;     /* Data struct for file */
   Grp *grp = NULL;          /* Grp stored within smfGroup */
   dim_t i;                  /* Loop counter */
-  int *indices = NULL;      /* Array of indices */
+  dim_t *indices = NULL;      /* Array of indices */
   dim_t nrelated;           /* Number of related files */
-  int index;                /* Index into the subgroups within the group */
-  int **subgroups=NULL;     /* Pointer to array of subgroups */
+  dim_t index;                /* Index into the subgroups within the group */
+  dim_t **subgroups=NULL;     /* Pointer to array of subgroups */
 
   if ( *status != SAI__OK ) return;
 

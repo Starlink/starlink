@@ -120,6 +120,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
   char drmwghts[LEN__METHOD+1];    /* Name of DREAM weights file */
   int *gridext = NULL;             /* Pointer to grid min/max X/Y extent */
   int gridndf;                     /* NDF identifier for GRID parameters */
+  void *gridpntr[3];               /* Mapped pointers */
   smfHead *hdr = NULL;             /* Header information for input data */
   int i;                           /* Loop counter */
   double *interpwt = NULL;         /* Interpolation weights */
@@ -244,8 +245,9 @@ void smf_dreamsolve( smfData *data, int *status ) {
     ubnd[0] = 4;
     gridndf = smf_get_ndfid( drmloc, "GRIDEXT", "WRITE", "NEW", 
 			     "_INTEGER", 1, lbnd, ubnd, status);
-    ndfMap( gridndf, "DATA", "_INTEGER", "WRITE", &gridext, &npts, 
+    ndfMap( gridndf, "DATA", "_INTEGER", "WRITE", gridpntr, &npts, 
 	    status);
+    gridext = gridpntr[0];
     if ( *status == SAI__OK ) {
       /* Initialize min/max values - remember the grid may not
 	 necessarily be symmetric about 0 */

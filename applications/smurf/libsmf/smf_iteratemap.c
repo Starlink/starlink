@@ -232,6 +232,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   int dimmflags;                /* Control flags for DIMM model components */
   int dofft=0;                  /* Set if freq. domain filtering the data */
   dim_t dsize;                  /* Size of data arrays in containers */
+  double dtemp;                 /* temporary double */
   int exportNDF=0;              /* If set export DIMM files to NDF at end */
   smfFilter *filt=NULL;         /* Pointer to filter struct */
   double f_edgelow=0;           /* Freq. cutoff for low-pass edge filter */
@@ -463,13 +464,13 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     }
 
     /* Maximum length of a continuous chunk */
-    if( astMapGet0D( keymap, "MAXLEN", &temp ) ) {
+    if( astMapGet0D( keymap, "MAXLEN", &dtemp ) ) {
 
-      if( temp < 0 ) {
+      if( dtemp < 0.0 ) {
 	/* Trap negative MAXLEN */
 	*status = SAI__ERROR;
 	errRep(FUNC_NAME, "Negative value for MAXLEN supplied.", status);
-      } else if( temp == 0 ) {
+      } else if( dtemp == 0 ) {
 	/* 0 is OK... gets ignored later */
 	maxlen = 0;
       } else {
@@ -479,7 +480,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
 	  smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
 
 	  if( steptime > 0 ) {
-	    maxlen = (dim_t) (temp / (double) steptime);
+	    maxlen = (dim_t) (dtemp / steptime);
 	  } else {
 	    /* Trap invalud sample length in header */
 	    *status = SAI__ERROR;

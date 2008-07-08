@@ -176,11 +176,11 @@ smfHead *
 smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 		       AstFrameSet * wcs, AstFrameSet * tswcs,
 		       AstFitsChan * fitshdr,
-		       const JCMTState * allState, dim_t curframe,
-		       double instap[], dim_t nframes, unsigned int ndet,
-		       const double fplanex[], const double fplaney[],
-		       const double detpos[], const char *detname, 
-                       int dpazel, const double tsys[], const char title[],
+		       JCMTState * allState, dim_t curframe,
+		       const double instap[], dim_t nframes, unsigned int ndet,
+		       double fplanex[], double fplaney[],
+		       double detpos[], char *detname, 
+           int dpazel, double tsys[], const char title[],
 		       const char dlabel[], const char units[],
 		       const double telpos[], int * status ) {
 

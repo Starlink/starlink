@@ -172,6 +172,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/types.h>
 
 /* Starlink includes */
 #include "mers.h"

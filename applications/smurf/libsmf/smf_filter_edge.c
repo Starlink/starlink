@@ -141,10 +141,10 @@ void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status ) {
     len = iedge + 1;
   }
 
-  memset( ((void *) filt->real) + base*sizeof(*filt->real), 0, 
+  memset( ((unsigned char *) filt->real) + base*sizeof(*filt->real), 0, 
           len*sizeof(*filt->real) );
   if( filt->isComplex ) {
-    memset( ((void *) filt->imag) + base*sizeof(*filt->imag), 0, 
+    memset( ((unsigned char *) filt->imag) + base*sizeof(*filt->imag), 0, 
             len*sizeof(*filt->imag) );
   }
 }

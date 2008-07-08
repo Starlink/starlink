@@ -224,7 +224,7 @@ void smf_close_file( smfData ** data, int * status ) {
          but headlen bytes earlier. Point temphead to this location and
          update relevant header values before closing */
 
-      buf = ((*data)->pntr[0] - headlen);
+      buf = ((char*)((*data)->pntr[0]) - headlen);
 
       temphead = (smfData *) buf;
       temphead->isTordered = (*data)->isTordered;

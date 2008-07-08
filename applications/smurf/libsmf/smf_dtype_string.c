@@ -85,7 +85,7 @@
 const char * smf_dtype_string( const smfData* data, int * status ) {
 
   /* Set a default value */
-  char * retval = NULL;
+  const char * retval = NULL;
   
   /* Check entry status */
   if (*status != SAI__OK) return retval;

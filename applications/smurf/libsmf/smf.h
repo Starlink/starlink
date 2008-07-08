@@ -374,7 +374,7 @@
 /* Returns nearest integer to "x" */
 #define NINT(x) ( ( (x) > 0 ) ? (int)( (x) + 0.5 ) : (int)( (x) - 0.5 ) )
 
-void smf_addto_smfArray( smfArray *ary, const smfData *data, int *status );
+void smf_addto_smfArray( smfArray *ary, smfData *data, int *status );
 
 void smf_average_data( const smfData *data, int start, int nslice, 
 		       const int interval, double **avdata, size_t *nelem, int *status);
@@ -397,7 +397,8 @@ void smf_calc_skyrot( smfData *data, double maxangle, int *nsamples, int *status
 
 void smf_calc_stareimage( smfData *data, const int naver, int *status);
 
-void smf_calc_telpos( double obsgeo[3], char telName[], double telpos[3],
+void smf_calc_telpos( const double obsgeo[3], const char telName[],
+                      double telpos[3],
 		      int *status );
 
 double smf_calc_wvm( const smfHead *hdr, int *status );
@@ -452,11 +453,11 @@ smfHead *
 smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 		       AstFrameSet * wcs, AstFrameSet * tswcs,
                        AstFitsChan * fitshdr,
-		       const JCMTState * allState, dim_t curframe, 
-		       double instap[], dim_t nframes, unsigned int ndet,
-		       const double fplanex[], const double fplaney[],
-		       const double detpos[], const char *detname, int rpazel, 
-		       const double tsys[], const char title[], 
+		       JCMTState * allState, dim_t curframe, 
+		       const double instap[], dim_t nframes, unsigned int ndet,
+		       double fplanex[], double fplaney[],
+		       double detpos[], char *detname, int rpazel, 
+		       double tsys[], const char title[], 
 		       const char dlabel[], const char units[], 
                        const double telpos[], int * status );
 
@@ -693,7 +694,7 @@ void smf_subtract_plane2( smfArray *array, const char *fittype, double *meansky,
 void smf_subtract_poly( smfData *data, unsigned char *quality, int rel, 
 			int *status );
 
-void smf_telpos_get( const smfHead * hdr, int * status );
+void smf_telpos_get( smfHead * hdr, int * status );
 
 void smf_tslice_ast (smfData * data, int index, int needwcs, int * status );
 
@@ -788,7 +789,7 @@ void smf_makefitschan( const char *system, double crval[2], double cdelt[2],
 void smf_detpos_wcs( smfHead *hdr, int index, const double telpos[3],
                      AstFrameSet **fset, int *status );
 
-void smf_geod( double pos[3], double *phi, double *h, double *lambda );
+void smf_geod( const double pos[3], double *phi, double *h, double *lambda );
 
 void smf_terr( double phi, double h, double lambda, double pos[3] );
 

@@ -9,7 +9,8 @@
 *     coordinates.
 
 *  Invocation:
-*     smf_calc_telpos( double obsgeo[3], char telName[], double telpos[3],
+*     smf_calc_telpos( const double obsgeo[3], const char telName[],
+*                      double telpos[3],
 *                      int *status );
 
 *  Language:
@@ -20,9 +21,9 @@
 *     telpos. Otherwise try to determine telpos from the telescope name.
 
 *  Arguments:
-*     obsgeo = double[3] (Given)
+*     obsgeo = const double[3] (Given)
 *        Geocentric (x,y,z) coordinates of the telescope or NULL.
-*     telName = char[] (Given)
+*     telName = const char[] (Given)
 *        Name of the telescope (ignored if obsgeo non-NULL)
 *     telpos = double[3] (Returned)
 *        The geodetic West longitude/latitude/altitude (deg/deg/m)
@@ -41,8 +42,11 @@
 *        Original version.
 *     2-NOV-2006 (DSB):
 *        Added support for calculation based on supplied obsgeo values.
+*     7-JUL-2008 (TIMJ):
+*        Use const.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -80,8 +84,9 @@
 
 #define FUNC_NAME "smf_calc_telpos"
 
-void smf_calc_telpos( double obsgeo[3], char telName[], double telpos[3],
-		      int *status ) {
+void smf_calc_telpos( const double obsgeo[3], const char telName[],
+                      double telpos[3],
+                      int *status ) {
 
   /* Local variables */
 
@@ -89,7 +94,7 @@ void smf_calc_telpos( double obsgeo[3], char telName[], double telpos[3],
   double lat;           /* Latitude (rad) */
   double lon;           /* West Longitude (rad) */ 
   char retname[41];     /* Returned name of the telescope */
-  
+  char name[11];      /* name for supplied buffer */
 
   if (*status != SAI__OK) return;
 
@@ -108,7 +113,9 @@ void smf_calc_telpos( double obsgeo[3], char telName[], double telpos[3],
 
   /* Otherwise, calculate telpos from telName */
   } else if( telName != NULL ) {
-    slaObs( 0, telName, retname, &lon, &lat, &height );
+    /* Note that slaObs does not promise constness */
+    one_strlcpy( name, telName, 11 );
+    slaObs( 0, name, retname, &lon, &lat, &height );
 
     if( retname[0] == '?' ) {
       *status = SAI__ERROR;
