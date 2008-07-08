@@ -168,7 +168,7 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
   dim_t base;                   /* Base for array index */
   smfData *data=NULL;           /* Concatenated smfData */
   char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */
-  dim_t firstpiece;             /* index to start of whichchunk */
+  dim_t firstpiece = 0;         /* index to start of whichchunk */
   int foundfirst=0;             /* Flag indicates if first index found */
   int foundlast=0;              /* Flag indicates if last index found */
   int havearray[3];             /* flags for DATA/QUALITY/VARIANCE present */
@@ -178,22 +178,22 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
   dim_t j;                      /* Loop counter */
   dim_t k;                      /* Loop counter */
   dim_t l;                      /* Loop counter */
-  dim_t lastpiece;                /* index to end of whichchunk */
-  dim_t nbolo;                  /* Number of detectors */
+  dim_t lastpiece = 0;          /* index to end of whichchunk */
+  dim_t nbolo = 0;              /* Number of detectors */
   dim_t ndata;                  /* Total data points: nbolo*tlen */
-  dim_t nrelated;                 /* Number of subarrays */
+  dim_t nrelated;               /* Number of subarrays */
   int pass;                     /* Two passes over list of input files */
   char *pname;                  /* Pointer to input filename */
   unsigned char qual;           /* Set quality */
   smfData *refdata=NULL;        /* Reference smfData */
   dim_t refdims[2];             /* reference dimensions for array (not time) */
   smf_dtype refdtype;           /* reference DATA/VARIANCE type */
-  char *refdtypestr;            /* const string for reference data type */
+  const char *refdtypestr;      /* const string for reference data type */
   smfHead *refhdr=NULL;         /* pointer to smfHead in ref data */
   dim_t refndata;               /* Number data points in reference file */
   dim_t reftlen;                /* Number of time slices in reference file */
   double steptime;              /* Length of a sample in seconds */
-  dim_t tchunk;                 /* Time offset in concat. array this chunk */
+  dim_t tchunk = 0;             /* Time offset in concat. array this chunk */
   dim_t tend;                   /* Time at start of padded region */
   AstFrame *tframe=NULL;        /* Pointer to TimeFrame */
   dim_t tlen;                   /* Time length entire concatenated array */
@@ -203,6 +203,10 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
 
   /* Main routine */
   if (*status != SAI__OK) return;
+
+  /* Compiler warnings */
+  refdims[0] = 1;
+  refdims[1] = 1;
 
   /* Verify that we have a valid whichchunk, and determine the range of
      indices into igrp->chunk */

@@ -13,15 +13,15 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_filter_notch( smfFilter *filt, const double *f_low, 
-*                       const double *f_high, size_t n, int *status );
+*     smf_filter_notch( smfFilter *filt, const double f_low[], 
+*                       const double f_high[], size_t n, int *status );
 
 *  Arguments:
 *     filt = smfFilter * (Given and Returned)
 *        Pointer to smfFilter to be modified
-*     f_low = double* (Given)
+*     f_low = const double[] (Given)
 *        Array of n lower frequency edges (Hz) for the notches
-*     f_high = double* (Given)
+*     f_high = const double[] (Given)
 *        Array of n upper frequency edges (Hz) for the notches
 *     n = size_t (Given)
 *        Number of notches in the filter (elements in f_low/f_high)
@@ -51,11 +51,14 @@
 *        Initial version
 *     2008-06-12 (EC):
 *        -Switch to split real/imaginary arrays for smfFilter
+*     2008-07-07 (TIMJ):
+*        - const + use lround instead of round (requires c99)
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Council. Copyright (C) 2008 University of British Columbia.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -96,10 +99,10 @@
 
 #define FUNC_NAME "smf_filter_notch"
 
-void smf_filter_notch( smfFilter *filt, const double *f_low, 
-                       const double *f_high, int n, int *status ) {
+void smf_filter_notch( smfFilter *filt, const double f_low[], 
+                       const double f_high[], size_t n, int *status ) {
 
-  int i;                /* Loop counter */
+  size_t i;             /* Loop counter */
   size_t iedge_high;    /* Index corresponding to lower edge frequency */
   size_t iedge_low;     /* Index corresponding to upper edge frequency */
   size_t len;           /* Length of memory to be zero'd */
@@ -130,11 +133,11 @@ void smf_filter_notch( smfFilter *filt, const double *f_low,
   for( i=0; (*status == SAI__OK) && i<n; i++ ) {
     /* Calculate edge offsets for notch, checking for reversed inputs */
     if( f_high[i] > f_low[i] ) {
-      iedge_low = (size_t) round( f_low[i]/filt->df ); 
-      iedge_high = (size_t) round( f_high[i]/filt->df ); 
+      iedge_low = (size_t) lround( f_low[i]/filt->df ); 
+      iedge_high = (size_t) lround( f_high[i]/filt->df ); 
     } else {
-      iedge_low = (size_t) round( f_high[i]/filt->df ); 
-      iedge_high = (size_t) round( f_low[i]/filt->df ); 
+      iedge_low = (size_t) lround( f_high[i]/filt->df ); 
+      iedge_high = (size_t) lround( f_low[i]/filt->df ); 
     }
     
     /* Check for valid ranges */

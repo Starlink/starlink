@@ -95,7 +95,7 @@ int smf_dtype_check(const smfData* data, const char * type, smf_dtype itype,
 
   /* Set a default value */
   int retval = 0;
-  char * this = NULL;
+  const char * this = NULL;
   
   /* Check entry status */
   if (*status != SAI__OK) return retval;

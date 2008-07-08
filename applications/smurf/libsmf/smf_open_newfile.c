@@ -13,7 +13,8 @@
 *     Library routine
 
 *  Invocation:
-*     smf_open_newfile( Grp * ingrp, int index, smf_dtype dtype, int ndims, 
+*     smf_open_newfile( const Grp * ingrp, int index, smf_dtype dtype,
+*                       int ndims, 
 *                       const dim_t dims[], int flags, smfData ** data, 
 *                       int *status);
 
@@ -134,7 +135,7 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
 		       int *status) {
 
   /* Local variables */
-  char *datatype;               /* String for data type */
+  const char *datatype;         /* String for data type */
   dim_t dims[NDF__MXDIM];       /* Dimensions of NDf to be created */
   smfFile *file = NULL;         /* Pointer to smfFile struct */
   char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */

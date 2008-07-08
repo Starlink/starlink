@@ -95,9 +95,8 @@
 #include <string.h>
 #include "smf.h"
 
-void smf_fits_crchan( int nfits, const char * headrec, AstFitsChan ** fits, 
+void smf_fits_crchan( size_t nfits, const char * headrec, AstFitsChan ** fits, 
 		      int *status ) {
-  size_t len;
   
   /* Sc2store header records are each null terminated at the last non-whitespace
      character so we need to search for a null in the first 81 characters to
@@ -106,9 +105,10 @@ void smf_fits_crchan( int nfits, const char * headrec, AstFitsChan ** fits,
   */
 
   const char *card = NULL;
-  int i;
-  int step = 0;
-  int single_buffer = 0;
+  size_t i;
+  size_t step = 0;
+  size_t single_buffer = 0;
+  size_t len;
 
   if (*status != SAI__OK) return;
 

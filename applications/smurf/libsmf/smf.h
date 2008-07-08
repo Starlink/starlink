@@ -517,7 +517,7 @@ void smf_dtype_check_fatal( const smfData* data, const char * type,
 
 smf_dtype smf_dtype_fromstring( const char * dtype, int * status );
 
-char *smf_dtype_string( const smfData* data, int * status );
+const char *smf_dtype_string( const smfData* data, int * status );
 
 size_t smf_dtype_size( const smfData* data, int * status );
 
@@ -535,7 +535,7 @@ void
 smf_accumulate_prov( const smfData * data, const Grp* igrp, int index, 
                      int ondf, const char *creator, int * status );
 
-void smf_fits_crchan( int nfits, const char * headrec, AstFitsChan ** fits, 
+void smf_fits_crchan( size_t nfits, const char * headrec, AstFitsChan ** fits, 
                       int *status);
 
 void smf_fits_export2DA ( const AstFitsChan *fitschan, size_t *ncards, 
@@ -635,7 +635,8 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int withHdr,
 
 void smf_open_mapcoord( smfData *data, const char *mode, int *status );
 
-void smf_open_ndf( const int newndf, char *accmode, char *filename, 
+void smf_open_ndf( const int newndf, const char accmode[],
+                   const char filename[],
 		   smf_dtype dtype, smfData **ndata, int *status);
 
 void smf_open_ndfname( const HDSLoc *loc, const char accmode[],
@@ -1023,8 +1024,8 @@ void smf_filter_r2c( smfFilter *filt, int *status );
 
 void smf_filter_edge( smfFilter *filt, double f, int lowpass, int *status );
 
-void smf_filter_notch( smfFilter *filt, const double *f_low, 
-                       const double *f_high, int n, int *status );
+void smf_filter_notch( smfFilter *filt, const double f_low[], 
+                       const double f_high[], size_t n, int *status );
 
 void smf_NDFexport_smfFilter( const smfFilter *filt, const char *name, 
                               int *status );

@@ -13,15 +13,16 @@
 *     Library routine
 
 *  Invocation:
-*     smf_open_ndf( const int newndf, char *accmode, char *filename
+*     smf_open_ndf( const int newndf, const char accmode[],
+*       const char filename[]
 *		    smf_dtype dtype, smfData **ndfdata, * int *status);
 
 *  Arguments:
 *     newndf = int (Given)
 *        NDF identififer for the requested NDF
-*     accmode = char * (Given)
+*     accmode = const char[] (Given)
 *        Access mode for data array (READ, WRITE or UPDATE)
-*     filename = char * (Given)
+*     filename = const char[] (Given)
 *        Name of disk file which holds the requested NDF
 *     dtype = smf_dtype (Given) 
 *        Data type (see smf_typ.h)
@@ -99,12 +100,13 @@
 
 #define FUNC_NAME "smf_open_ndf"
 
-void smf_open_ndf( const int newndf, char *accmode, char *filename, 
-		   smf_dtype dtype, smfData **ndfdata, int *status) {
+void smf_open_ndf( const int newndf, const char accmode[], 
+                   const char filename[], 
+                   smf_dtype dtype, smfData **ndfdata, int *status) {
 
   /* Local variables */
   void *datarr[3] = { NULL, NULL, NULL }; /* Pointers for data */
-  char *datatype;               /* String for data type */
+  const char *datatype;         /* String for data type */
   int dims[NDF__MXDIM];         /* Extent of each dimension */
   dim_t ddims[NDF__MXDIM];      /* dim_t version of dimensions */
   int flags = 0;                /* Flags for creating smfDA, smfFile and 
