@@ -39,9 +39,12 @@
 *        Add LEN__METHOD & SZFITSCARD
 *     2006-12-12 (AGG):
 *        Add SPD
+*     2008-07-07 (TIMJ):
+*        GSL is available always.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     University of British Columbia.
 *     All Rights Reserved.
@@ -79,9 +82,9 @@
 #if HAVE_MATH_H
 #  include <math.h>
 #endif
-#if HAVE_GSL_GSL_MATH_H
-#  include <gsl/gsl_math.h>
-#endif
+
+/* We know we have GSL installed */
+#include <gsl/gsl_math.h>
 
 #ifndef M_PI_2
 #  ifdef M_PI
