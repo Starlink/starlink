@@ -283,6 +283,9 @@ namespace gaia {
         bool ra_set = false;
         bool dec_set = false;
 
+        //  Whether UCD is currently set.
+        bool ucd_set = false;
+
         //  Loop over the fields.
         int ncols = cat->numCols();
         string lunit;
@@ -293,8 +296,10 @@ namespace gaia {
             FIELD field( "char", cat->colName( i ) );
 
             //  UCD, unit and utype.
+            ucd_set = false;
             if ( ucd.size() > i && ucd[i] != "---" ) {
                 field.ucd( ucd[i] );
+                ucd_set == true;
             }
             if ( unit.size() > i && unit[i] != "---") {
                 field.unit( unit[i] );
@@ -346,6 +351,15 @@ namespace gaia {
                 else {
                     field.datatype( "double" );
                 }
+
+                if ( ! ucd_set ) {
+                    if ( i == x_col ) {
+                        field.ucd( "POS_PLATE_X" );
+                    }
+                    else {
+                        field.ucd( "POS_PLATE_Y" );
+                    }
+                }
             }
             else {
                 //  Everything else is a char, unless explicitly set.
@@ -354,6 +368,9 @@ namespace gaia {
                 }
                 else {
                     field.arraysize( "*" );
+                }
+                if ( ! ucd_set && i == id_col ) {
+                    field.ucd( "ID_TARGET" );
                 }
             }
 
