@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(smurf, 0.3.1, t.jenness@jach.hawaii.edu)
+AC_INIT(smurf, 0.3.2, t.jenness@jach.hawaii.edu)
 PACKAGE_UPCASE='SMURF'
 AC_DEFINE( [PACKAGE_UPCASE], "SMURF", [Upper cased package name] )
 AC_SUBST(PACKAGE_UPCASE)
@@ -51,7 +51,8 @@ if test "$GCC" = "yes"; then
     have_fsp=yes
     AC_MSG_CHECKING([whether ${CC} accepts -fstack-protector])
     fsp_old_cflags="$CFLAGS"
-    CFLAGS="$CFLAGS -fstack-protector"
+dnl  Assume that any gcc that can take stack-protector also knows about c99
+    CFLAGS="$CFLAGS -fstack-protector -std=c99 -pedantic-errors"
     AC_TRY_COMPILE(,,,[have_fsp=no])
     echo $have_fsp
     if test "$have_fsp" = "no"; then
