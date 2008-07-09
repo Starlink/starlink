@@ -5,7 +5,7 @@ vot2tab_SOURCES = vot2tab.C $(VOTABLE_ROUTINES)
 tab2vot_SOURCES = tab2vot.C $(VOTABLE_ROUTINES)
 
 #  Include files.
-AM_CXXFLAGS = -I. -I$(STARLINK)/include/tclutil \
+AM_CXXFLAGS = -I. -I.. -I$(STARLINK)/include/tclutil \
    -I$(STARLINK)/include/astrotcl -I$(STARLINK)/include/cat
 
 #  Common source code.

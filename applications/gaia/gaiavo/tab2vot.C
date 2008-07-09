@@ -23,6 +23,11 @@
  *     out = string
  *        Filename for the VOTable.
 
+ *  Notes:
+ *     Requires access to the internet if the input table is specified
+ *     using a URL with HTTP protocol. May require that the variable
+ *     http_proxy is set when behind a proxy server.
+
  *  Authors:
  *     PWD: Peter Draper (JAC, Durham University)
  *     {enter_new_authors_here}
@@ -53,10 +58,14 @@
  *     {enter_changes_here}
  *-
  */
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include <iostream>
 #include <fstream>
 #include <memory>
+#include <cstdlib>
 
 using namespace std;
 
@@ -72,8 +81,22 @@ int main( int argc, char* argv[] )
         return 1;
     }
 
-    //  Open the tab table. XXX full scale query, so supports remote
-    //  tables..., but requires internet access, unless wrapped by GAIA.
+    //  Open the tab table. By default this is a full query using the catalog
+    //  info services. Avoid trip to ESO by making sure CATLIB_CONFIG is
+    //  set. Assumes we're part of GAIA.
+    const char *catlib = getenv( "CATLIB_CONFIG" );
+    if ( ! catlib ) {
+        const char *home = getenv( "HOME" );
+#if HAVE_SETENV
+        string confile = "file://" + string( home ) + "/.skycat/skycat.cfg";
+        setenv( "CATLIB_CONFIG", confile.c_str(), 1 );
+#else
+        string confile = "CATLIB_CONFIG=file://" + string( home ) + 
+                         "/.skycat/skycat.cfg";
+        putenv( (char *) confile.c_str() );
+#endif
+    }
+
     AstroCatalog *cat = AstroCatalog::open( argv[1] );
     if ( cat ) {
         CatalogInfoEntry *entry = cat->entry();
