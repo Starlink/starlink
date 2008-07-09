@@ -381,7 +381,7 @@ static double maxsequence = 131072;
 
 int
 acsSpecWriterVersion() {
-#ifdef PACKAGE_VERSION_INTEGE
+#ifdef PACKAGE_VERSION_INTEGER
   return PACKAGE_VERSION_INTEGER;
 #else
   return 0;
