@@ -5,7 +5,7 @@
 *     smf_calc_fcon
 
 *  Purpose:
-*     Calculate the factor for converting input Tsys values into 
+*     Calculate a factor needed for converting input Tsys values into 
 *     Variance values.
 
 *  Language:
@@ -35,8 +35,11 @@
 *        Pointer to the inherited status.
 
 *  Description:
-*     This function returns the factor that converts input Tsys values
-*     into variance values.
+*     This function returns a factor needed for converting input Tsys values
+*     into variance values. It is independent of the time slice. The
+*     total factor for converting Tsys to Variance is the product of the
+*     factor returned by this function, and the time-slice dependent factor
+*     returned by smf_rebincube_tcon.
 
 *  Authors:
 *     David S Berry (JAC, UClan)
