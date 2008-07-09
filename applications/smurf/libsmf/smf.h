@@ -527,11 +527,6 @@ void smf_dump_smfData( const smfData *data, int showflags, int *status );
 void smf_fit_poly(const smfData *data, unsigned char *quality, 
 		  const int order, double *poly, int *status);
 
-void smf_fits_add_prov( AstFitsChan * hdr, const char * keyroot,
-			const AstKeyMap * idmap,
-			int * status);
-
-
 void
 smf_accumulate_prov( const smfData * data, const Grp* igrp, int index, 
                      int ondf, const char *creator, int * status );

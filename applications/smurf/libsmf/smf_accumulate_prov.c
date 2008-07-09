@@ -53,12 +53,8 @@
 *        Now a wrapper around smf_updateprov
 *     {enter_further_changes_here}
 
-*  Notes:
-*     - See smf_fits_add_prov for a routine on adding provenance information
-*     to the output FITS header.
-
 *  Copyright:
-*     Copyright (C) 2007 Science and Technology Facilities Council.
+*     Copyright (C) 2007, 2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:

@@ -60,10 +60,6 @@
 *        Remove ASTWARN cards form the output header.
 *     {enter_further_changes_here}
 
-*  Notes:
-*     - See smf_fits_add_prov for a routine on adding provenance information
-*     to the output FITS header.
-
 *  Copyright:
 *     Copyright (C) 2007 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2007 Science and Technology Facilities Council.
