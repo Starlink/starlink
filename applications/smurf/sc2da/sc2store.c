@@ -3893,5 +3893,5 @@ static double sc2store_tzoffset( void ) {
 
   diff = difftime( now, gmt_t );
   /* need answer in hours for AST */
-  return (diff/3600);
+  return (diff/3600.0);
 }
