@@ -111,9 +111,9 @@
 #include "mers.h"
 
 /* SC2SIM includes */
+#include "smurf_par.h"
 #include "sc2sim.h"
 #include "sc2sim_par.h"
-
 
 #define FUNC_NAME "sc2sim_smu_path"
 

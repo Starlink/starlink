@@ -82,6 +82,7 @@
 #include <math.h>
 
 /* Sc2sim includes */
+#include "smurf_par.h"
 #include "sc2sim.h"
 
 
