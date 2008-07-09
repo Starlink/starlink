@@ -20,6 +20,8 @@
     24Jun2008 : Add tcs_percent_cmp. Some const warnings.
 */
 
+#define _POSIX_C_SOURCE 200112L
+
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif
@@ -27,6 +29,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
+#include <time.h>
 
 #include "sae_par.h"
 #include "prm_par.h"
@@ -51,6 +54,7 @@
 /* Private functions */
 static AstFrameSet *timeWcs( int subnum, int ntime,const SC2STORETelpar* telpar,
                              const double times[], int * status );
+static double sc2store_tzoffset(void);
 
 /* Private globals */
 
@@ -3693,7 +3697,7 @@ int *status                 /* global status (given and returned) */
 }
 
 
-
+static
 AstFrameSet *timeWcs( int subnum, int ntime, const SC2STORETelpar* telpar,
                       const double times[], int * status ){
 
@@ -3791,6 +3795,11 @@ AstFrameSet *timeWcs( int subnum, int ntime, const SC2STORETelpar* telpar,
      astSetD(timefrm, "dut1", telpar->dut1);
      astSetD(timefrm, "obslat", telpar->latdeg);
      astSetD(timefrm, "obslon", telpar->longdeg);
+
+     /* Local time offset - assume the system running the acquisition
+        is in the same time zone as the telescope running it :-) */
+     astSetD(timefrm, "LToffset", sc2store_tzoffset() );
+
    }
 
    malloced = 0;
@@ -3865,4 +3874,24 @@ AstFrameSet *timeWcs( int subnum, int ntime, const SC2STORETelpar* telpar,
 /* Return the resulting FrameSet. */
    return result;
 
+}
+
+
+/* Routine to calculate the time zone offset in hours. */
+static double sc2store_tzoffset( void ) {
+  time_t now;
+  double diff;
+  struct tm gmt;
+  time_t gmt_t;
+
+  /* Portable POSIX compliant code. Convert epoch time to UTC
+     then use mktime to convert it back to local time. Calculate
+     the difference */
+  now = time( NULL );
+  (void)gmtime_r(&now, &gmt);
+  gmt_t = mktime( &gmt );
+
+  diff = difftime( now, gmt_t );
+  /* need answer in hours for AST */
+  return (diff/3600);
 }
