@@ -1511,6 +1511,7 @@ void smurf_timesort( int *status ) {
    if( genvar ) {
       for( ifile = 1; ifile <= totout && *status == SAI__OK; ifile++ ) {
          smf_open_file( igrp4, ifile, "UPDATE", 0, &data, status );
+         if( *status != SAI__OK ) break;
          nchan = data->dims[0];
          ndet = data->dims[1];
          nslice = data->dims[2];
