@@ -28,6 +28,7 @@
 *                prototypes to be created in the data acquisition
 *                system, but this is hidden from smurf.
 *     2008-05-15 (BDK) add SC2STORETelpar structure.
+*     2008-05-28 (BDK) add sc2store_par.h.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -73,7 +74,9 @@ struct SC2STORETelpar
 
 typedef struct SC2STORETelpar SC2STORETelpar;
 
+/* constants */
 
+#include "sc2store_par.h"
 
 /* The function prototypes */
 #include "sc2store_pro.h"
