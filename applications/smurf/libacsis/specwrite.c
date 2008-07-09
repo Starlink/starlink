@@ -493,7 +493,7 @@ acsSpecWriterVersion() {
 void
 acsSpecOpenTS( const char * dir, unsigned int yyyymmdd, unsigned int obsnum,
                unsigned int nrecep, unsigned int nsubsys, 
-               const char * const recepnames[],
+               char * const recepnames[],
                const char * focal_station,
                const float fplanex[], const float fplaney[], const char *ocsconfig,
                int * status ) {

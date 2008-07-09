@@ -97,7 +97,7 @@ void acsSpecOpenTS( const char * dir,
 		    unsigned int obsnum,
 		    unsigned int nrecep,
 		    unsigned int nsubsys,
-		    const char * const recepnames[],
+		    char * const recepnames[],
 		    const char* focal_station,
 		    const float fplanex[],  /* Arcsec offsets in X, Y of */
 		    const float fplaney[],  /* each receptor. */
