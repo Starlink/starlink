@@ -15,16 +15,15 @@
 #include "Ers.h"
 #include "sae_par.h"
 #include "prm_par.h"
-#include "f77.h"
-#include "sc2math.h"
-#include "dream_par.h"
-
-/* Not needed */
 #include "dat_par.h"
 #include "star/hds.h"
 #include "ast.h"
 #include "ndf.h"
 #include "mers.h"
+#include "f77.h"
+#include "sc2math.h"
+#include "dream_par.h"
+
 
 #define EPS 1.0e-20                      /* near-zero trap */
 
@@ -56,7 +55,8 @@ double jig_stepy,       /* The step size in -Y- direction between Jiggle
 int smu_move,           /* The code for the SMU waveform that determines the
                            SMU motion (given) */
 double smu_offset,      /* smu timing offset in msec (given) */
-int gridpts[][2],       /* relative grid coordinates */
+int ngrid,              /* number of grid coordinates (given) */
+int gridpts[][2],       /* relative grid coordinates (given) */
 int gridwtsdim[],       /* dimensions of gridwts array (returned) */
 double **gridwts,       /* Pointer to array of sky grid weights (returned) */
 int *invmatdim,         /* dimension of inverted matrix (returned) */
@@ -108,13 +108,14 @@ int *status             /* global status (given and returned) */
      22May2005 : fix orientation calculation for "b" and "d" arrays (bdk)
      07Aug2006 : add bolometer quality mask (bdk)
      01May2008 : put into sc2math library (bdk)
+     21May2008 : remove unnecessary variables, free par space and add ngrid to
+                 the argument list (bdk)
 */
 
 
 {
 
    int bolnum;                   /* bolometer counter */
-   double calc_t;                /* Time per calculated point */
    double dmin;                  /* minimum found during inversion */
    int err;                      /* Error in reducing */
    int i;                        /* Loop variable */
@@ -127,13 +128,12 @@ int *status             /* global status (given and returned) */
    int k;                        /* Loop variable */
    int l;                        /* Loop variable */
    int loc;                      /* Matrix location */
-   int ngrid;                    /* number of grid points */
    int npath;                    /* Nr of points in jigpath */
    int nrvout;                   /* Nr of R8 values out matrix */
    int nrvswt;                   /* Nr of R8 values swt matrix */
    int numbad;                   /* Nr of bad bolometers */
    int nunkno;                   /* Nr of unknowns */
-   double *par = NULL;                  /* Pointer to array for problem eqns */
+   double *par;                  /* Pointer to array for problem eqns */
    int skyheight;                /* height of reconstructed map */
    int skywid;                   /* width of reconstructed map */
    int smu_samples;              /* number of samples between vertices */
@@ -152,13 +152,11 @@ int *status             /* global status (given and returned) */
 /* Calculate all the relative SMU positions on the sky during
    the cycle. */
 
-   calc_t = sample_t;
    smu_samples = (int) ( 0.5 + (double)leg_len / sample_t );
    npath = nvert * smu_samples;
-   vertex_t = leg_len;
-
+   vertex_t = (double)leg_len;
    sc2math_smupath ( nvert, vertex_t, jig_vert, jig_stepx,
-     jig_stepy, smu_move, smu_samples, calc_t,
+     jig_stepy, smu_move, smu_samples, sample_t,
      smu_offset, DREAM__MXSAM, jigpath, status );
 
 /* Convert jiggle arcsec coordinates to units of the reconstruction grid */
@@ -183,7 +181,6 @@ int *status             /* global status (given and returned) */
 
 /* Prepare information for making matrices. */
 
-   ngrid = 81;
    gridwtsdim[0] = ngrid;
    gridwtsdim[1] = npath;
    nrvout = npath * ngrid;
@@ -199,9 +196,8 @@ int *status             /* global status (given and returned) */
 /* Put in gridwts all the sky grid weights for all measurements with a
    single bolometer */
 
-   sc2math_interpwt ( npath, ngrid, conv_shape, conv_sig, calc_t, tbol, jiggrid,
-     gridpts, *gridwts, status );
-
+   sc2math_interpwt ( npath, ngrid, conv_shape, conv_sig, sample_t, tbol, 
+     jiggrid, gridpts, *gridwts, status );
 
 /* Calculate the size of the sky map which includes all the grid points
    contributing to all the bolometers */
@@ -306,7 +302,7 @@ int *status             /* global status (given and returned) */
       ErsRep ( 0, status, errmess );
    }
 
-
+   free ( par );
 
 }
 
@@ -1266,10 +1262,10 @@ int *status          /* global status (given and returned) */
 void sc2math_interpwt 
 (
 int npath,           /* Nr of rows (given) */
-int ngrid,            /* Nr of columns (given) */
+int ngrid,           /* Nr of columns (given) */
 int conv_shape,      /* Code for convolution function (given) */
 double conv_sig,     /* Convolution function parameter (given) */
-double calc_t,       /* Time per path point in millisec (given) */
+double sample_t,     /* Time per path point in millisec (given) */
 double tbol,         /* Bolometer time constant in millisec (given) */
 double jigpath[][2], /* Table with jiggle path pos (given) */
 int jigpts[][2],     /* Table with grid positions (given) */
@@ -1317,7 +1313,8 @@ int *status          /* (given and returned) */
     05Dec2002 : C translation (bdk)
     20Jun2003 : change constant name to DREAM__MXGRID (bdk)
     05Aug2003 : interpwt version of weight_pixwt (bdk)
-    15Mar2006:  copied from map.c into sc2math (agg)
+    15Mar2006 : copied from map.c into sc2math (agg)
+    21May2008 : change sample time argument name to sample_t (bdk)
 */
 {
    int nrv;                       /* Nr of values in b(*) */
@@ -1385,7 +1382,7 @@ int *status          /* (given and returned) */
    {
       irf[i] = fb * exp(-x*fb);
       sumirf = sumirf + irf[i];
-      x = x + calc_t;
+      x = x + sample_t;
    }
 
    if ( sc2math_trace(4) )
@@ -1828,6 +1825,7 @@ int *status
 
 {
 
+   int actbol;               /* number of operational bolometers */
    int bolnum;               /* bolometer counter */
    int i;                    /* loop counter */
    int ipos;                 /* position in reconstructed map */
@@ -1842,7 +1840,6 @@ int *status
    double lssum;             /* sum of square of known values */
    int m;                    /* loop counter */
    int n;                    /* loop counter */
-   int nbol;                 /* number of observed bolometers */
    int ngrid;                /* number of points in grid for a bolometer */
    int numbad;               /* number of bad bolometers */
    int nunkno;               /* number of unknowns in solution */ 
@@ -1851,8 +1848,8 @@ int *status
    double *par;              /* Pointer to parameters of problem eqn. */
    int skyheight;            /* height of reconstructed map */
    int skywid;               /* width of reconstructed map */
-   double *sme = NULL;              /* rms errors solutions */
-   double *sint =NULL;             /* solved parameters */
+   double *sme;              /* rms errors solutions */
+   double *sint;             /* solved parameters */
    int zx;                   /* x offset of output map in solution */
    int zy;                   /* y offset of output map in solution */
 
@@ -1879,8 +1876,8 @@ int *status
    skyheight = nboly + gridext[3] - gridext[2];
    ngrid = ( 1 + gridext[1] - gridext[0] ) * ( 1 + gridext[3] - gridext[2] );
 
-   nbol = nbolx * nboly;
-   nunkno = skywid * skyheight + nbolx * nboly - numbad;
+   actbol = nbolx * nboly - numbad;
+   nunkno = skywid * skyheight + actbol;
 
 /* Calculate the number of pixels around the edge of the solved map which
    should be discarded because they lie outside the area observed
@@ -1904,6 +1901,7 @@ int *status
 
       sme = (double *)calloc ( nunkno, sizeof(double) );
       sint = (double *)calloc ( nunkno, sizeof(double) );
+
 /* Create the parameters of the problem equation for each measurement for
    each bolometer */
 
@@ -1937,14 +1935,14 @@ int *status
    of this bolometer */
 
                   l = 0;
-	          for ( m=gridext[0]; m<=gridext[1]; m++ )
+	          for ( n=gridext[2]; n<=gridext[3]; n++ )
 	          {
-	             for ( n=gridext[2]; n<=gridext[3]; n++ )
+	             for ( m=gridext[0]; m<=gridext[1]; m++ )
 	             {
 	                ipos = i - gridext[0] + m;
                         jpos = j - gridext[2] + n;
 		        jgrid = jpos * skywid + ipos;
-		        par[nbolx*nboly-numbad+jgrid] = interpwt[ngrid*k+l];
+		        par[actbol+jgrid] = interpwt[ngrid*k+l];
 		        l++;
                      }
                   }
@@ -1954,18 +1952,20 @@ int *status
 
                   sc2math_vec ( nunkno, par, psbuf[k*nbolx*nboly+j*nbolx+i], 
 		    kvec, &lssum );
-
+if ( bolnum==660 )
+  printf ( "bolnum = %d  frame = %d psbuf = %e\n", 
+  bolnum, k, psbuf[k*nbolx*nboly+j*nbolx+i] );
 /* Unset the weight for all the sky grid points relevant at this path point
    of this bolometer */
 
-                  for ( m=gridext[0]; m<=gridext[1]; m++ )
-                  {
-	             for ( n=gridext[2]; n<=gridext[3]; n++ )
-	             {
+	          for ( n=gridext[2]; n<=gridext[3]; n++ )
+	          {
+                     for ( m=gridext[0]; m<=gridext[1]; m++ )
+                     {
 	                ipos = i - gridext[0] + m;
 		        jpos = j - gridext[2] + n;
 		        jgrid = jpos * skywid + ipos;
-		        par[nbolx*nboly-numbad+jgrid] = 0.0;
+		        par[actbol+jgrid] = 0.0;
                      }
                   }
                }
@@ -1979,7 +1979,7 @@ int *status
 
 /* Solve for the pixel values and their rms values */
 
-      sc2math_sol ( nunkno, nframes*(nbol-numbad), invmat, kvec, lssum, &lme, 
+      sc2math_sol ( nunkno, nframes*actbol, invmat, kvec, lssum, &lme, 
         sme, sint );
 
 /* Extract the intensities - sint and sme contain both the solved
@@ -1989,7 +1989,7 @@ int *status
       {
          for ( i=0; i<outwid; i++ )
          {
-            map[j*outwid+i] = sint[nbol+(j+zy)*skywid+zx+i];
+            map[j*outwid+i] = sint[actbol+(j+zy)*skywid+zx+i];
          }
       }
 
@@ -3313,6 +3313,65 @@ int *status          /* global status (given and returned) */
    *phase = (double) atan2 ( (double) sumcos, (double) sumsine );
 }
 
+
+
+/*+ sc2math_smooth - apply smoothing kernel */
+
+void sc2math_smooth 
+( 
+int nweights,      /* number of values in kernel (given) */
+double weights[],  /* smoothing kernel (given) */
+int numvals,       /* number of values in dataset (given) */
+double output[],   /* dataset to be smoothed (given and returned) */
+int *status        /* global status (given and returned) */
+)
+
+/*  Description :
+     A dataset is convolved with a kernel representing an impulse
+     response function. This means the kernel is not time symmetrical
+     (the smoothed value doesn't depend on raw values which haven't
+     happened yet), and so the smooth can be performed without a work
+     array.
+
+    Authors :
+     B.D.Kelly (ROE)
+    History :
+     21Aug2001:  original (bdk@roe.ac.uk)
+     21Aug2002:  C version (bdk)
+     16Jun2008:  rewritten (bdk)
+*/
+
+{
+   int j;
+   int k;
+   double temp;
+
+   if ( !StatusOkP(status) ) return;
+
+
+/* Perform the smooth starting at the end of the data */
+
+   for ( k=numvals-1; k>=0; k-- )
+   {
+      temp = 0.0;
+      for ( j=0; j<nweights; j++ )
+      {
+         if ( k >= nweights )
+	 {
+            temp = temp + output[k-j] * weights[j];
+	 }
+	 else
+	 {
+	    temp = temp + output[0] * weights[j];
+	 }
+      }
+      output[k] = temp;
+   }
+
+
+}
+
+
 /*+ sc2math_smupath - Calculate the path positions of the SMU */
 
 void sc2math_smupath 
@@ -3383,6 +3442,7 @@ int *status          /* global status (given and returned) */
         np, pathsz );
       ErsRep ( 0, status, errmess );
    }
+
 
    if ( nvert > 1)
    {

@@ -25,7 +25,8 @@ double jig_stepy,       /* The step size in -Y- direction between Jiggle
 int smu_move,           /* The code for the SMU waveform that determines the
                            SMU motion (given) */
 double smu_offset,      /* smu timing offset in msec (given) */
-int gridpts[][2],       /* relative grid coordinates */
+int ngrid,              /* number of grid coordinates (given) */
+int gridpts[][2],       /* relative grid coordinates (given) */
 int gridwtsdim[],       /* dimensions of gridwts array (returned) */
 double **gridwts,       /* Pointer to array of sky grid weights (returned) */
 int *invmatdim,         /* dimension of inverted matrix (returned) */
@@ -186,10 +187,10 @@ int *status          /* global status (given and returned) */
 void sc2math_interpwt 
 (
 int npath,           /* Nr of rows (given) */
-int ngrid,            /* Nr of columns (given) */
+int ngrid,           /* Nr of columns (given) */
 int conv_shape,      /* Code for convolution function (given) */
 double conv_sig,     /* Convolution function parameter (given) */
-double calc_t,       /* Time per path point in millisec (given) */
+double sample_t,     /* Time per path point in millisec (given) */
 double tbol,         /* Bolometer time constant in millisec (given) */
 double jigpath[][2], /* Table with jiggle path pos (given) */
 int jigpts[][2],     /* Table with grid positions (given) */
@@ -452,6 +453,17 @@ double *signal,        /* signal (given) */
 double *amplitude,     /* modulation amplitude (returned) */
 double *phase,         /* phase of signal (returned) */
 int *status          /* global status (given and returned) */
+);
+
+/*+ sc2math_smooth - apply smoothing kernel */
+
+void sc2math_smooth 
+( 
+int nweights,      /* number of values in kernel (given) */
+double weights[],  /* smoothing kernel (given) */
+int numvals,       /* number of values in dataset (given) */
+double output[],   /* dataset to be smoothed (given and returned) */
+int *status        /* global status (given and returned) */
 );
 
 /*+ sc2math_smupath - Calculate the path positions of the SMU */
