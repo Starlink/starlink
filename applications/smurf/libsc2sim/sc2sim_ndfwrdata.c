@@ -363,9 +363,6 @@ int *status              /* Global status (given and returned) */
    double zero[2*DREAM__MXBOL];    /* Bolometer zero points */
    char imdateobs[30];             /* DATE-OBS for IMAGE header */
 
-   const double *jig_patp;
-   jig_patp = &(jigptr[0][0]);
-
    /* Check status */
    if ( !StatusOkP(status) ) return;
 
