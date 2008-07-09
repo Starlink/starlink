@@ -6,6 +6,9 @@
     22Feb2005 : original adapted from SCUBA transputer system (bdk)
 */
 
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,6 +27,17 @@
 #include "sc2math.h"
 #include "dream_par.h"
 
+/* The C99 standard does not define M_PI so we have to have a fallback.
+   If we are running within SMURF we can include smurf_par.h
+ */
+#ifndef M_PI
+#  ifdef PACKAGE
+#    include "smurf_par.h"
+#  endif
+#  ifndef M_PI
+#    define M_PI 3.1415926535897932384626433832795028841971693993751
+#  endif
+#endif
 
 #define EPS 1.0e-20                      /* near-zero trap */
 
