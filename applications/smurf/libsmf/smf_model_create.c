@@ -166,6 +166,9 @@
 *-
 */
 
+/* Need ftruncate to be prototyped */
+#define _POSIX_C_SOURCE 200112L
+
 /* General includes */
 #include <sys/mman.h>
 #include <sys/stat.h>
