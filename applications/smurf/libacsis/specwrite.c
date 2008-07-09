@@ -19,6 +19,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <math.h>
+#include <time.h>
 
 /* Starlink includes */
 #include "sae_par.h"
@@ -232,7 +233,10 @@ void writeFlagFile (const obsData * obsinfo, const subSystem subsystems[],
 void writeWCSandFITS (const obsData * obsinfo, const subSystem subsystems[],
                       AstFitsChan * const fits[], int badfits[], char errbuff[], int * status);
 
+static
 AstFrameSet *specWcs( AstFrameSet *fs, const char veldef[], int ntime, const double times[], int * status );
+
+static double acs_tzoffset( void );
 
 static void checkNoFileExists( const char * file, int * status );
 
@@ -3565,6 +3569,9 @@ AstFrameSet *specWcs( AstFrameSet * fs, const char veldef[], int ntime, const do
   /* similarly if DUT1 is defined */
   if (astTest( fs, "dut1" )) astSet( timefrm, "dut1=%s", astGetC(fs, "dut1"));
 
+  /* set local time offset */
+  astSetD( timefrm, "LToffset", acs_tzoffset() );
+
   if (malloced) starFree( ltimes );
 
   /* We now have the Frames and Mappings describing all the individual
@@ -3861,4 +3868,22 @@ static int acs_kpgPtfts( int indf, AstFitsChan * fchan, int * status ) {
   return *status;
 }
 
+/* Routine to calculate the time zone offset in hours. */
+static double acs_tzoffset( void ) {
+  time_t now;
+  double diff;
+  struct tm gmt;
+  time_t gmt_t;
+
+  /* Portable POSIX compliant code. Convert epoch time to UTC
+     then use mktime to convert it back to local time. Calculate
+     the difference */
+  now = time( NULL );
+  (void)gmtime_r(&now, &gmt);
+  gmt_t = mktime( &gmt );
+
+  diff = difftime( now, gmt_t );
+  /* need answer in hours for AST */
+  return (diff/3600.0);
+}
 
