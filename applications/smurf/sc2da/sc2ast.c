@@ -540,7 +540,7 @@ int *status               /* global status (given and returned) */
          frameno = j;
          break;
       }
-      astAnnul ( frame );
+      frame = astAnnul ( frame );
    }
 
    astEnd;
@@ -713,7 +713,7 @@ int *status             /* global status (given and returned) */
 
 void sc2ast_polframeset
 (
-const AstFrameSet *frameset,  /* 2-D frameset (given) */
+AstFrameSet *frameset,  /* 2-D frameset (given) */
 AstFrameSet **fset,     /* constructed 3-D frameset (returned) */
 int *status             /* global status (given and returned) */
 )
@@ -795,6 +795,9 @@ int *status              /* global status (given and returned) */
    AstWcsMap *wcsmap;
    double mat[ 3 ][ 3 ];
 
+/* SLA does not use const so we have to copy from const to a temporary */
+   char eul[4];
+
 /* Check the inherited status. */
    if ( *status != SAI__OK ) return NULL;
 
@@ -832,7 +835,8 @@ int *status              /* global status (given and returned) */
    pole, the X axis points to (lon,lat)=(0,0) and the Y axis points to 
    (lon,lat) = (90 degs,0) (the slalib convention). */
 
-   slaDeuler( "ZYZ", -rot, -(PIBY2-lat), -lon, mat ); 
+   strcpy(eul, "ZYZ" );
+   slaDeuler( eul, -rot, -(PIBY2-lat), -lon, mat ); 
    matmap = astMatrixMap( 3, 3, 0, (double *) mat, "" );
 
 /* Create the required compound Mapping. */

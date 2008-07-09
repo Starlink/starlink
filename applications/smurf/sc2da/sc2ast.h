@@ -125,11 +125,11 @@ int *subnum,            /* subarray number, 0-7 (returned) */
 int *status             /* global status (given and returned) */
 );
 
-/*+ sc2ast_polframest - create a frameset for polarimetry */
+/*+ sc2ast_polframeset - create a frameset for polarimetry */
 
 void sc2ast_polframeset
 (
-const AstFrameSet *frameset,  /* 2-D frameset (given) */
+AstFrameSet *frameset,  /* 2-D frameset (given) */
 AstFrameSet **fset,     /* constructed 3-D frameset (returned) */
 int *status             /* global status (given and returned) */
 );
