@@ -69,6 +69,11 @@
 *          DETPURGE takes precedence over DETECTORS. That is, if DETPURGE
 *          is set TRUE, then bad detectors will be excluded even if the 
 *          DETECTORS parameter indicates that they should be included. [FALSE]
+*     GENVAR = _LOGICAL (Read)
+*          If TRUE, then the Variance component in each output file is
+*          filled with values determined from the Tsys values in the input 
+*          files. These variances values replace any inherited from the
+*          Variance component of the input NDFs. [FALSE]
 *     IN = NDF (Read)
 *          A group of input NDFs, each holding raw time series data.
 *     LIMITTYPE = LITERAL (Read)
@@ -237,6 +242,7 @@ void smurf_timesort( int *status ) {
 /* Local Variables */
    AstFitsChan *fc = NULL;
    AstFrame *cfrm = NULL;     
+   AstFrame *specframe;
    AstFrameSet *wcs = NULL;   
    AstKeyMap *km1;
    AstKeyMap *km2;
@@ -246,6 +252,7 @@ void smurf_timesort( int *status ) {
    AstLutMap *lut = NULL;     
    AstMapping *map = NULL;    
    AstMapping *omap = NULL;   
+   AstMapping *specmap;
    AstMapping *tmap = NULL;   
    AstObject *obj = NULL;
    Grp *detgrp = NULL;        
@@ -273,14 +280,24 @@ void smurf_timesort( int *status ) {
    const char *timescl = NULL;
    const char *timesys = NULL;
    const char *timeunt = NULL;
+   const double *tsys;
+   dim_t irec;
+   dim_t jrec;
+   dim_t nslice;
    double *grid = NULL;       
    double *tai = NULL;        
    double *tai_ptr = NULL;    
    double *taiout = NULL;
+   double *vp;
+   double fcon;
+   double invar;                      
+   double tcon;
    float *dts_in;
    float *dts_out;
    float *vts_in;
    float *vts_out;
+   float teff;
+   float texp;
    int **sysrts = NULL;
    int *file_index = NULL;
    int *first = NULL;         
@@ -297,6 +314,7 @@ void smurf_timesort( int *status ) {
    int dims[ 3 ];             
    int el;                    
    int found;
+   int genvar;
    int hasqual;
    int hasvar;
    int i;                     
@@ -312,7 +330,6 @@ void smurf_timesort( int *status ) {
    int iobs;
    int iout;
    int ioutname;
-   int irec;
    int isubscan;
    int isubsys;
    int j;
@@ -359,6 +376,8 @@ void smurf_timesort( int *status ) {
    void *ipin;                
    void *ipout;               
    void *ptr[2];              
+
+
 
 /* NDF array component names */
    static const char *comp[2] = {"DATA", "VARIANCE"}; 
@@ -439,7 +458,7 @@ void smurf_timesort( int *status ) {
             if( !mask ) {
                mask = astMalloc( sizeof( int )*(data->dims)[ 1 ] );
                if( mask ) {
-                  for( i = 0; i < (data->dims)[ 1 ]; i++ ) mask[ i ] = 1;
+                  for( jrec = 0; jrec < (data->dims)[ 1 ]; jrec++ ) mask[ jrec ] = 1;
                }
             }
 /* If we now have a mask, and if the mask indicates that the current
@@ -458,7 +477,7 @@ void smurf_timesort( int *status ) {
    }   
 
 /* Abort if there are no detectors to included. */
-   if( *status == SAI__OK && nbaddet == (data->dims)[ 1 ] ) {
+   if( *status == SAI__OK && nbaddet == (int) (data->dims)[ 1 ] ) {
       *status = SAI__ERROR;
       errRep( "", "The values supplied for the DETECTORS and DETPURGE "
               "parameters would result in all detectors being rejected.",
@@ -1483,6 +1502,69 @@ void smurf_timesort( int *status ) {
       grpDelet( &igrp2, status);
 
    }
+
+/* See if Variance components are to be added to the output NDFs, based
+   on the input Tsys values. */
+   parGet0l( "GENVAR", &genvar, status );
+
+/* If so, loop round all the output NDFs. */
+   if( genvar ) {
+      for( ifile = 1; ifile <= totout && *status == SAI__OK; ifile++ ) {
+         smf_open_file( igrp4, ifile, "UPDATE", 0, &data, status );
+         nchan = data->dims[0];
+         ndet = data->dims[1];
+         nslice = data->dims[2];
+
+/* Get the time-slice independent factor needed for converting input Tsys 
+   values into Variance values. */
+         fcon = smf_calc_fcon( data, nchan, 1, &specmap, &specframe,
+                               status );
+
+/* We do not need the returned AST pointers. */
+         specframe = astAnnul( specframe ); 
+         specmap = astAnnul( specmap ); 
+
+/* Get a pointer to the variance value for the first channel of the first
+   detector in the first time slice. */
+         vp = (data->pntr)[ 1 ];
+
+/* If the Variance array has not been mapped, map it now. */
+         if( !vp && *status == SAI__OK ) {
+            void *p[1];
+            ndfMap( data->file->ndfid, "Variance", "_DOUBLE", "Write", 
+                    p, &el, status ); 
+            vp = p[0];
+         }
+
+/* Loop round all time slices in the current output file. */
+         for( j = 0; j < (int) nslice; j++ ) {
+
+/* Get a pointer to the TSYS values for this time slice (one value per
+   detector), and the total factor needed for converting Tsys values
+   to variance values. */
+            tsys = smf_rebincube_tcon( data->hdr, j, fcon, &texp, &teff, 
+                                       &tcon, status );
+
+/* Loop round all detectors in the current time slice. */
+            for( idet = 0; idet < ndet; idet++ ) {
+
+/* Calculate the variance for this detector. */
+               if( (float) tsys[ idet ] != VAL__BADR && tcon != VAL__BADD ) {
+                  invar = tcon*tsys[ idet ]*tsys[ idet ];
+               } else {
+                  invar = VAL__BADR;
+               }
+
+/* Fill the output spectrum variance with this value. */
+               for( ichan = 0; ichan < nchan; ichan++ ) *(vp++) = invar;
+            }
+         }
+
+/* Close the current output file. */
+         smf_close_file( &data, status);
+      }
+   }
+
 
 /* Write out the number of output NDFs. */
    parPut0i( "NOUT", totout, status );

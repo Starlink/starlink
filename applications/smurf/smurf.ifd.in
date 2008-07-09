@@ -1719,6 +1719,13 @@ package @PACKAGE@ {
                 helpkey *
             }
 
+            parameter genvar {
+                type _LOGICAL
+                vpath DEFAULT
+                default 0
+                helpkey *
+            }
+
             parameter in {
                 position 1
                 type NDF
