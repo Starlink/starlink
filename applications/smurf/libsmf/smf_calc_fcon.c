@@ -35,9 +35,10 @@
 *        Pointer to the inherited status.
 
 *  Description:
-*     This function returns a factor needed for converting input Tsys values
-*     into variance values. It is independent of the time slice. The
-*     total factor for converting Tsys to Variance is the product of the
+*     This function returns the ratio of the squared backend degradation 
+*     factor to the input spectral channel width, needed for calculating 
+*     the variances from the Tsys value. It is independent of the time slice. 
+*     The total factor for converting Tsys to Variance is the product of the
 *     factor returned by this function, and the time-slice dependent factor
 *     returned by smf_rebincube_tcon.
 
