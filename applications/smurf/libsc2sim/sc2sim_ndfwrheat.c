@@ -158,8 +158,10 @@ int *status        /* global status (given and returned) */
   char dateobs[SZFITSCARD+1] = "\0"; /* DATE-OBS string for observation */
   AstFitsChan *fitschan;           /* FITS headers */
   char fitsrec[SC2STORE__MAXFITS*80+1]; /* Store for FITS records */  
+  int jigvert[SC2SIM__MXVERT][2]; /* Temp array to jig_vert */
   size_t nrec = 0;                 /* number of FITS header records */
   int subnum;                      /* subarray index */
+  int i, j;
 
   /* Check status */
   if ( *status != SAI__OK ) return;
@@ -195,11 +197,22 @@ int *status        /* global status (given and returned) */
   /* Calculate the sub array index */
   sc2ast_name2num( sinx->subname, &subnum, status );
 
+  /* There are "issues" handling const for arrays in call to wrtstream
+     partly caused by the input struct being const and the jig_vert
+     member therefore also being const. Rather than try to work out how
+     to fix it properly we just copy the data from the struct to a local
+     variable before calling wrtstream */
+  for (i=0; i < inx->nvert; i++) {
+    for (j=0; j < 2; j++) {
+      jigvert[i][j] = inx->jig_vert[i][j];
+    }
+  }
+
   /* Store the timestream data */
   sc2store_wrtstream ( file_name, subnum, nrec, fitsrec, inx->nbolx, 
 		       inx->nboly, numsamples, nflat, flatname, head, 
 		       dbuf, dksquid, fcal, fpar, inx->obsmode, 
-		       NULL, 0, inx->jig_vert, inx->nvert, NULL, 0,
+		       NULL, 0, jigvert, inx->nvert, NULL, 0,
 		       NULL, status );
 
   /* Close the file */

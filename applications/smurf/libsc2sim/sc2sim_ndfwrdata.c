@@ -327,6 +327,7 @@ int *status              /* Global status (given and returned) */
    int i;                          /* Loop counter */
    double instap[2];               /* Instrument aperture */
    int j;                          /* Loop counter */
+   int jigvert[SC2SIM__MXVERT][2]; /* Temp array to jig_vert */
    int k;                          /* Loop counter */
    int naver;                      /* Number of frames to average */
    int ndim;                       /* Dimensionality of output image */
@@ -361,6 +362,9 @@ int *status              /* Global status (given and returned) */
    double y_min =  1.0e38;         /* Y extent of pointing centre offsets */
    double zero[2*DREAM__MXBOL];    /* Bolometer zero points */
    char imdateobs[30];             /* DATE-OBS for IMAGE header */
+
+   const double *jig_patp;
+   jig_patp = &(jigptr[0][0]);
 
    /* Check status */
    if ( !StatusOkP(status) ) return;
@@ -654,11 +658,22 @@ int *status              /* Global status (given and returned) */
    /* Calculate the sub array index */
    sc2ast_name2num( sinx->subname, &subnum, status );
 
+   /* There are "issues" handling const for arrays in call to wrtstream
+      partly caused by the input struct being const and the jig_vert
+      member therefore also being const. Rather than try to work out how
+      to fix it properly we just copy the data from the struct to a local
+      variable before calling wrtstream */
+   for (i=0; i < inx->nvert; i++) {
+     for (j=0; j < 2; j++) {
+       jigvert[i][j] = inx->jig_vert[i][j];
+     }
+   }
+
    /* Store the timestream data */
    sc2store_wrtstream ( file_name, subnum, nrec, fitsrec, inx->nbolx, 
                         inx->nboly, numsamples, nflat, flatname, head, 
                         dbuf, dksquid, fcal, fpar, inx->obsmode, 
-                        NULL, 0, inx->jig_vert, inx->nvert, jigptr, jigsamples, 
+                        NULL, 0, jigvert, inx->nvert, jigptr, jigsamples, 
                         NULL, status );
 
    /* Create SCU2RED extension for storing polynomial fits and
