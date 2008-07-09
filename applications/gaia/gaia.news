@@ -130,6 +130,9 @@
     A problem reading very large FITS extensions in NDFs has been fixed.
     This should speed up startup times.
 
+    Local time "LT" has been added as a possible timescale for extracted
+    timeseries spectra.
+
   Humu Release
   ============
 

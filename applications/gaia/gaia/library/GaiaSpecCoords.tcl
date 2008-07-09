@@ -48,6 +48,7 @@
 
 #  Copyright:
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2008 Science and Technology Facilities Council.
 #     All Rights Reserved.
 
 #  Licence:
@@ -333,6 +334,7 @@ itcl::class gaia::GaiaSpecCoords {
       "Terrestrial Time (TT)" "TT" 
       "Barycentric Dynamical Time (TDB)" "TDB" 
       "Barycentric Coordinate Time (TCB)" "TCB" 
-      "Geocentric Coordinate Time (TCG)" "TCG" 
+      "Geocentric Coordinate Time (TCG)" "TCG"
+      "Local Time" "LT"
    }
 }
