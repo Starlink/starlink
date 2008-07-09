@@ -199,6 +199,15 @@ itcl::class gaia::GaiaSearch {
       $w_.cat symbol $args
    }
 
+   #  Method to set the symbol used when plotting. This is the same
+   #  format as a line in a local catalogue. This version only sets
+   #  symbol, if not already set.
+   public method maybe_set_symbol {args} {
+      if { [$w_.cat symbol] == {} } {
+         $w_.cat symbol $args
+      }
+   }
+
    #  Set the columns in which the various parameters occur.
    public method set_dec_col {col} {
       $w_.cat entry update [list "dec_col $col"]

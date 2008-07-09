@@ -255,7 +255,7 @@ itcl::class gaia::GaiaPlastic {
 
       #  Set symbol, after realization of window.
       set next_symbol [next_symbol_spec_]
-      after idle "$window set_symbol $next_symbol"
+      after idle "$window maybe_set_symbol $next_symbol"
       return $window 
    }
 
