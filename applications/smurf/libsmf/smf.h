@@ -539,7 +539,7 @@ smf_accumulate_prov( const smfData * data, const Grp* igrp, int index,
 void smf_fits_crchan( size_t nfits, const char * headrec, AstFitsChan ** fits, 
                       int *status);
 
-void smf_fits_export2DA ( const AstFitsChan *fitschan, size_t *ncards, 
+void smf_fits_export2DA ( AstFitsChan *fitschan, size_t *ncards, 
                           char * fitsrec,
                           int *status );
 

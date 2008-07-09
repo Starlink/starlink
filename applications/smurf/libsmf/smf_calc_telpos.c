@@ -75,6 +75,7 @@
 #include "sae_par.h"
 #include "mers.h"
 #include "star/slalib.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "smf.h"
@@ -114,7 +115,7 @@ void smf_calc_telpos( const double obsgeo[3], const char telName[],
   /* Otherwise, calculate telpos from telName */
   } else if( telName != NULL ) {
     /* Note that slaObs does not promise constness */
-    one_strlcpy( name, telName, 11 );
+    one_strlcpy( name, telName, 11, status );
     slaObs( 0, name, retname, &lon, &lat, &height );
 
     if( retname[0] == '?' ) {

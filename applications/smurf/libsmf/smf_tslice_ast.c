@@ -226,7 +226,7 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
     /* For now take the inefficient and simpler approach and annul
        the previous calculation of the wcs before creating a new one */
     if( hdr->wcs ) {
-      astAnnul( hdr->wcs );
+      hdr->wcs = astAnnul( hdr->wcs );
     }
 
     /* Decide which createwcs routine to call based on the instrument */

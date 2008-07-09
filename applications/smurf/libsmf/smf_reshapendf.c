@@ -96,6 +96,7 @@ void smf_reshapendf( smfData **data, smfTile *tile, int *status ){
    int tndf;
    int ubnd[ 3 ];
    unsigned char *ipq;
+   void *ipqpntr[1];
    unsigned char *q;
    unsigned char qval;
 
@@ -147,8 +148,9 @@ void smf_reshapendf( smfData **data, smfTile *tile, int *status ){
                qval = pow( 2, bit - 1 );
             
 /* Map the quality array of the output NDF. */
-               ndfMap( tndf, "Quality", "_UBYTE", "WRITE", (void **) &ipq, &nel, 
+               ndfMap( tndf, "Quality", "_UBYTE", "WRITE", ipqpntr, &nel, 
                        status );
+               ipq = ipqpntr[0];
 
 /* Check the pointer can be used safely. */
                if( *status == SAI__OK ) {

@@ -90,7 +90,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_fits_export2DA"
 
-void smf_fits_export2DA ( const AstFitsChan *fitschan, size_t *ncards, 
+void smf_fits_export2DA ( AstFitsChan *fitschan, size_t *ncards, 
                           char *fitsrec,
                           int *status ) {
 

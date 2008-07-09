@@ -246,10 +246,10 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
   int isTseries = 0;         /* Flag to specify whether the data are
                                 in time series format */
   smf_dtype itype = SMF__NULL; /* Data type for DATA (and VARIANCE) array(s) */
-  int i;                     /* Loop counter */
+  size_t i;                  /* Loop counter */
   int nout;                  /* Number of output pixels */
   int **ptdata;              /* Pointer to raw time series data (DATA cpt) */
-
+  int *rawts;                /* Raw time series via sc2store */
   smfFile *file = NULL;      /* pointer to smfFile struct */
   smfHead *hdr = NULL;       /* pointer to smfHead struct */
   smfDA *da = NULL;          /* pointer to smfDA struct, initialize to NULL */
@@ -614,7 +614,7 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
          ptdata = NULL;
          pdksquid = NULL;
       } else {
-         ptdata = (int **) &(outdata[0]);
+         ptdata = &rawts;
          pdksquid = &dksquid;
       }
 
@@ -626,6 +626,7 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
                           &tmpState, ptdata, pdksquid, 
                           &flatcal, &flatpar, &jigvert, &nvert, &jigpath, 
                           &nsampcycle, status);
+      if (ptdata) outdata[0] = rawts;
 
       if (*status == SAI__OK) {
         /* Free header info if no longer needed */
