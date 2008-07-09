@@ -347,6 +347,7 @@ int *status              /* Global status (given and returned) */
    double *poly;                   /* Pointer to polynomial fit solution */
    double *rdata;                  /* Pointer to flatfielded data */
    char recipe[30];                /* Name of default ORAC-DR recipe */
+   SC2STORETelpar telpar;          /* Struct for telescope info */
    int seqend;                     /* RTS index of last frame in output image */
    int seqoffset;                  /* Sequence number offset from beginning of 
 				      observation */
@@ -666,10 +667,15 @@ int *status              /* Global status (given and returned) */
      }
    }
 
+   /* Telescope parameters */
+   telpar.latdeg = (sinx->telpos)[1];
+   telpar.longdeg = -(sinx->telpos)[0];
+   telpar.dut1 = SPD * inx->dut1;
+
    /* Store the timestream data */
    sc2store_wrtstream ( file_name, subnum, nrec, fitsrec, inx->nbolx, 
                         inx->nboly, numsamples, nflat, flatname, head, 
-                        dbuf, dksquid, fcal, fpar, inx->obsmode, 
+                        &telpar, dbuf, dksquid, fcal, fpar, inx->obsmode, 
                         NULL, 0, jigvert, inx->nvert, jigptr, jigsamples, 
                         NULL, status );
 

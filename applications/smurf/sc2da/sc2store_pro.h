@@ -494,6 +494,7 @@ size_t nframes,             /* number of frames (given) */
 size_t nflat,               /* number of flat coeffs per bol (given) */
 const char *flatname,       /* name of flatfield algorithm (given) */
 const JCMTState head[],     /* header data for each frame (given) */
+const SC2STORETelpar* telpar, /* Additional telescope information (given) */
 const int *dbuf,            /* time stream data (given) */
 const int *dksquid,         /* dark SQUID time stream data (given) */
 const double *flatcal,      /* flat-field calibration (given) */

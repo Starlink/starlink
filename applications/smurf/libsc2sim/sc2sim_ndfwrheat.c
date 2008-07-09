@@ -210,7 +210,7 @@ int *status        /* global status (given and returned) */
 
   /* Store the timestream data */
   sc2store_wrtstream ( file_name, subnum, nrec, fitsrec, inx->nbolx, 
-		       inx->nboly, numsamples, nflat, flatname, head, 
+           inx->nboly, numsamples, nflat, flatname, head, NULL,
 		       dbuf, dksquid, fcal, fpar, inx->obsmode, 
 		       NULL, 0, jigvert, inx->nvert, NULL, 0,
 		       NULL, status );

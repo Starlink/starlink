@@ -49,7 +49,8 @@
 #include "sc2store.h"
 
 /* Private functions */
-static AstFrameSet *timeWcs( int subnum, int ntime, const double times[], int * status );
+static AstFrameSet *timeWcs( int subnum, int ntime,const SC2STORETelpar* telpar,
+                             const double times[], int * status );
 
 /* Private globals */
 
@@ -3587,6 +3588,7 @@ size_t nframes,             /* number of frames (given) */
 size_t nflat,               /* number of flat coeffs per bol (given) */
 const char *flatname,       /* name of flatfield algorithm (given) */
 const JCMTState head[],     /* header data for each frame (given) */
+const SC2STORETelpar* telpar, /* Additional telescope information (given) */
 const int *dbuf,            /* time stream data (given) */
 const int *dksquid,         /* dark SQUID time stream data (given) */
 const double *flatcal,      /* flat-field calibration (given) */
@@ -3672,7 +3674,7 @@ int *status                 /* global status (given and returned) */
 
 /* And create a convenience frameset for focal plane and time coordinates */
 
-   wcs = timeWcs ( subnum, nframes, ((double*)sc2store_ptr[RTS_END]),
+   wcs = timeWcs ( subnum, nframes, telpar, ((double*)sc2store_ptr[RTS_END]),
      status );
    ndfPtwcs ( wcs, sc2store_indf, status );
    wcs = astAnnul ( wcs );
@@ -3692,7 +3694,8 @@ int *status                 /* global status (given and returned) */
 
 
 
-AstFrameSet *timeWcs( int subnum, int ntime, const double times[], int * status ){
+AstFrameSet *timeWcs( int subnum, int ntime, const SC2STORETelpar* telpar,
+                      const double times[], int * status ){
 
 /*
 *+
@@ -3703,7 +3706,8 @@ AstFrameSet *timeWcs( int subnum, int ntime, const double times[], int * status 
 *     Calculate frameset for time series.
 
 *  Prototype:
-*     AstFrameSet *timeWcs( int subnum, int ntime, const double times[],
+*     AstFrameSet *timeWcs( int subnum, int ntime,
+*                const SC2STORETelpar * telpar,const double times[],
 *                int * status );
 
 *  Description:
@@ -3721,6 +3725,8 @@ AstFrameSet *timeWcs( int subnum, int ntime, const double times[], int * status 
 *        Subarray index
 *     ntime = int (Given)
 *        The number of time values supplied in "times".
+*     telpar = const SC2STORETelpar* (Given)
+*        Additional telescope information needed to flesh out the frameset.
 *     times = const double [] (Given)
 *        An array of "ntime" MJD values (in the TAI timescale), one for
 *        each pixel along the time axis.
@@ -3779,6 +3785,14 @@ AstFrameSet *timeWcs( int subnum, int ntime, const double times[], int * status 
    To give AST some help with formatting axes we use a TimeOrigin.
 */
    timefrm = astTimeFrame( "" );
+
+   /* If telpar is defined, add additional info */
+   if (telpar) {
+     astSetD(timefrm, "dut1", telpar->dut1);
+     astSetD(timefrm, "obslat", telpar->latdeg);
+     astSetD(timefrm, "obslon", telpar->longdeg);
+   }
+
    malloced = 0;
    if (ntime == 1) {
      /* a LutMap needs two numbers in its mapping so double up the
