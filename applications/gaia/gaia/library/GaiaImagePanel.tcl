@@ -641,12 +641,22 @@ itcl::class gaia::GaiaImagePanel {
    protected method set_colormap_ {map} {
       global gaia_library
       $image_ cmap file $gaia_library/colormaps/$map.lasc
+	
+      #  If the colormap is read-only, we need to regenerate the colour ramp.
+      if { [$image_ cmap isreadonly] } {
+         catch {$itk_option(-image) component colorramp update_colors}
+      }
    }
 
    #  Set the ITT map.
    protected method set_ittmap_ {map} {
       global gaia_library
       $image_ itt file $gaia_library/colormaps/$map.iasc
+
+      #  If the colormap is read-only, we need to regenerate the colour ramp.
+      if { [$image_ cmap isreadonly] } {
+         catch {$itk_option(-image) component colorramp update_colors}
+      }
    }
 
    #  Update the display with the current image values (overriden for

@@ -133,6 +133,9 @@
     Local time "LT" has been added as a possible timescale for extracted
     timeseries spectra.
 
+    The colour ramp shown at the bottom of the main window will now
+    correctly update when a new colour or intensity map is selected.
+
   Humu Release
   ============
 
