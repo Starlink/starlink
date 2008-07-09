@@ -1026,4 +1026,8 @@ void smf_filter_notch( smfFilter *filt, const double f_low[],
 void smf_NDFexport_smfFilter( const smfFilter *filt, const char *name, 
                               int *status );
 
+double smf_calc_fcon( smfData *data, dim_t nchan, int report, 
+                      AstMapping **specmap, AstFrame **specframe,
+                      int *status );
+
 #endif /* SMF_DEFINED */

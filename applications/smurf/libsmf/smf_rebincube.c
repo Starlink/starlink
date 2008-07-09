@@ -237,15 +237,10 @@ void  smf_rebincube( smfData *data, int first, int last,
                      int *nreject, int *naccept, int *status ){
 
 /* Local Variables */
-   AstCmpMap *fmap = NULL;     /* Mapping from spectral grid to topo freq Hz */
    AstCmpMap *ssmap = NULL;    /* Input GRID->output GRID Mapping for spectral axis */
-   AstFitsChan *fc = NULL;     /* FitsChan used to get spectral WCS from input */           
    AstFrame *specframe = NULL; /* SpecFrame in input WCS */
-   AstFrame *specframe2 = NULL;/* Temporary copy of SpecFrame in input WCS */
    AstFrameSet *fs = NULL;     /* WCS FramesSet from input */           
-   AstMapping *fsmap = NULL;   /* Mapping extracted from FrameSet */
    AstMapping *specmap = NULL; /* GRID->Spectral Mapping for current input file */
-   char *fftwin = NULL;        /* Name of FFT windowing function */
    dim_t ndet;                 /* No of detectors in the input */
    dim_t dim[ 3 ];             /* Output array dimensions */
    dim_t iv;                   /* Vector index into output 3D array */
@@ -254,18 +249,11 @@ void  smf_rebincube( smfData *data, int first, int last,
    dim_t nout;                 /* Total number of elements in output cube */
    dim_t nslice;               /* No of time slices in the input */
    dim_t nxy;                  /* No of elements in an output spatial plane */
-   double at;                  /* Frequency at which to take the gradient */
-   double dnu;                 /* Channel width in Hz */
    double fcon2;               /* Variance factor for file */
    double gin[2];              /* Input grid coords */
    double gout[2];             /* Output grid coords */
-   double k;                   /* Back-end degradation factor */
    double tfac;                /* Factor describing spectral overlap */
    int good_tsys;              /* Flag indicating some good Tsys values found */
-   int gotbf;                  /* Have required FITS keywords been obtained? */
-   int gotdnu = 0;             /* Has spectral channel width been obtained? */
-   int pixax[ 3 ];             /* Pixel axis indices */
-   int specax;                 /* The index of the input spectral axis */
    smfHead *hdr = NULL;        /* Pointer to data header for this time slice */
 
 /* Check the inherited status. */
@@ -296,49 +284,34 @@ void  smf_rebincube( smfData *data, int first, int last,
 /* Store the total number of input elements. */
    nel = nchan*ndet*nslice;
 
-/* We want a description of the spectral WCS axis in the input file. If 
-   the input file has a WCS FrameSet containing a SpecFrame, use it,
-   otherwise we will obtain it from the FITS header later. NOTE, if we knew 
-   that all the input NDFs would have the same spectral axis calibration, 
-   then the spectral WCS need only be obtained from the first NDF. However, 
-   in the general case, I presume that data files may be combined that use 
-   different spectral axis calibrations, and so these differences need to 
-   be taken into account. */
-   if( hdr->tswcs ) {   
-      fs = astClone( hdr->tswcs );
-   
-/* The first axis should be a SpecFrame. See if this is so. If not annul
-   the specframe pointer. */
-      specax = 1;
-      specframe = astPickAxes( fs, 1, &specax, NULL );
-      if( !astIsASpecFrame( specframe ) ) specframe = astAnnul( specframe );
-   } 
+/* Get the conversion factor for converting input Tsys values into input
+   variance values. */
+   fcon2 = smf_calc_fcon( data, nchan, ( usewgt || genvar == 2 ), &specmap,
+                          &specframe, status );
 
-/* If the above did not yield a SpecFrame, use the FITS-WCS headers in the 
-   FITS extension of the input NDF. Take a copy of the FITS header (so that 
-   the contents of the header are not changed), and then read a FrameSet 
-   out of it. */
-   if( !specframe ) {
-      fc = astCopy( hdr->fitshdr );
-      astClear( fc, "Card" );
-      fs = astRead( fc );
+/* Return the factor needed for calculating Tsys from the variance. */
+   if( *fcon == -1.0 ) {
+      *fcon = fcon2;
 
-/* Extract the SpecFrame that describes the spectral axis from the current 
-   Frame of this FrameSet. This is assumed to be the third WCS axis (NB
-   the different axis number). */
-      specax = 3;
-      specframe = astPickAxes( fs, 1, &specax, NULL );
+   } else if( fcon2 == VAL__BADD ) {
+      *fcon = VAL__BADD;
+
+   } else if( fcon2 != *fcon && *fcon != VAL__BADD) {
+
+/* fcon can be different by fraction of a percent and still be accurate enough 
+   for our purposes */
+      double percent = 100.0 * fabs(*fcon - fcon2 ) / *fcon;
+      if ( percent > 0.001) {
+        msgSetd( "ORI", *fcon );
+        msgSetd( "NEW", fcon2 );
+        msgSetc( "FILE", data->file->name );
+        msgSetd( "PC", percent );
+        msgOutif( MSG__NORM," ", "WARNING: Tsys conversion factor has "
+                  "changed from ^ORI to ^NEW (^PC %) in file ^FILE",
+                  status );
+        *fcon = VAL__BADD;
+      }
    }
-
-/* Split off the 1D Mapping for this single axis from the 3D Mapping for
-   the whole WCS. This results in "specmap" holding the Mapping from 
-   SpecFrame value to GRID value. */
-   fsmap = astGetMapping( fs, AST__CURRENT, AST__BASE );
-   astMapSplit( fsmap, 1, &specax, pixax, &specmap );
-
-/* Invert the Mapping for the spectral axis so that it goes from input GRID
-   coord to spectral coord. */
-   astInvert( specmap );
 
 /* Get a Mapping that converts values in the input spectral system to the 
    corresponding values in the output spectral system. */
@@ -363,111 +336,6 @@ void  smf_rebincube( smfData *data, int first, int last,
    if( gout[ 0 ] < 0.5 ) gout[ 0 ] = 0.5;
    if( gout[ 1 ] > (double) dim[ 2 ] + 0.5 ) gout[ 1 ] = (double) dim[ 2 ] + 0.5;
    tfac = ( fabs( gout[ 1 ] - gout[ 0 ] ) + 1.0  )/( (double) dim[ 2 ] + 1 );
-
-/* Find the constant factor associated with the current input file, used
-   when converting Tsys values to variance values. This is the squared 
-   backend degradation factor, divided by the noise bandwidth. Get the 
-   required FITS headers, checking they were found. */
-   if( astGetFitsF( hdr->fitshdr, "BEDEGFAC", &k ) &&
-       astGetFitsS( hdr->fitshdr, "FFT_WIN", &fftwin ) ){
-      gotbf = 1;
-
-/* Get a Mapping that converts values in the input spectral system to
-   topocentric frequency in Hz, and concatenate this Mapping with the
-   Mapping from input GRID coord to the input spectral system. The result 
-   is a Mapping from input GRID coord to topocentric frequency in Hz. */
-      specframe2 = astCopy( specframe );
-      astSet( specframe2, "system=freq,stdofrest=topo,unit=Hz" );
-      fmap = astCmpMap( specmap, astGetMapping( astConvert( specframe, 
-                                                            specframe2, 
-                                                            "" ),
-                                                AST__BASE, AST__CURRENT ),
-                        1, "" );
-
-/* Find the topocentric channel width in Hz at the mid channel. */
-      at = 0.5*( 1.0 + nchan );
-      gin[ 0 ] = at - 0.5;
-      gin[ 1 ] = at + 0.5;
-      astTran1( fmap, 2, gin, 1, gout );
-      if( gout[ 0 ] != AST__BAD && gout[ 1 ] != AST__BAD ) {
-         dnu = abs( gout[ 0 ] - gout[ 1 ] );
-         gotdnu = 1;
-
-/* Modify the channel width to take account of the effect of the FFT windowing 
-   function. Allow undef value because FFT_WIN for old data had a broken value 
-   in hybrid subband modes. */
-         dnu = fabs( dnu );
-
-         if( !strcmp( fftwin, "truncate" ) ) {
-            dnu *= 1.0;
-
-         } else if( !strcmp( fftwin, "hanning" ) ) {
-            dnu *= 1.5;
-
-         } else if( !strcmp( fftwin, "<undefined>" ) ) {
-            dnu *= 1.0;
-
-         } else if( *status == SAI__OK ) {
-            *status = SAI__ERROR;
-            msgSetc( "W", fftwin );
-            msgSetc( "F", data->file->name );
-            errRep( FUNC_NAME, "FITS header FFT_WIN has unknown value "
-                    "'^W' in ^F (programming error).", status );
-         }
-
-/* Form the required constant. */
-         fcon2 = k*k/dnu;  
-
-      } else {
-         gotdnu = 0;
-         fcon2 = VAL__BADD;
-      }
-
-   } else {
-      gotbf = 0;
-      fcon2 = VAL__BADD;
-   }
-
-/* Return the factor needed for calculating Tsys from the variance. */
-   if( *fcon == -1.0 ) {
-      *fcon = fcon2;
-
-   } else if (fcon2 == VAL__BADD) {
-      *fcon = VAL__BADD;
-
-   } else if( fcon2 != *fcon && *fcon != VAL__BADD) {
-
-/* fcon can be different by fraction of a percent and still be accurate enough 
-   for our purposes */
-      double percent = 100.0 * fabs(*fcon - fcon2 ) / *fcon;
-      if ( percent > 0.001) {
-        msgSetd("ORI", *fcon);
-        msgSetd("NEW", fcon2);
-        msgSetc("FILE", data->file->name);
-        msgSetd("PC", percent);
-        msgOutif(MSG__NORM," ",
-          "WARNING: Tsys conversion factor has changed from ^ORI to ^NEW (^PC %) in file ^FILE",
-          status);
-        *fcon = VAL__BADD;
-      }
-   }
-
-/* If we need the input variances, but we cannot calculate the input
-   variances, report an error. */
-   if( ( usewgt || genvar == 2 ) && fcon2 == VAL__BADD ) {
-      if( *status == SAI__OK ) {
-         msgSetc( "F", data->file->name );
-         errRep( "", "Cannot calculate input variances for ^F", 
-                 status );
-         if( !gotbf ) {
-            errRep( "", "BEDEGFAC and/or FFT_WIN is missing from the FITS "
-                    "header", status );
-         } else if( !gotdnu ) {
-            errRep( "", "The topocentric spectral channel width cannot be "
-                    "found.", status );
-         }
-      }
-   }
 
 /* Indicate we have not yet found any good Tsys values in the input NDF. */
    good_tsys = 0;
