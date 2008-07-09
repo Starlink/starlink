@@ -51,6 +51,9 @@
 *     2006-07-05 (AGG):
 *        Check for presence of history component before attempting to
 *        write
+*     2008-07-08 (TIMJ):
+*        Need to copy input text to internal buffer to avoid const warning
+*        from NDF API.
 
 *  Notes:
 *     - SMURF subroutines should choose history "application" names
@@ -65,6 +68,7 @@
 *       same file that you just called smf_history_write on.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council
 *     and University of British Coulmbia. All Rights Reserved.
 
@@ -96,6 +100,7 @@
 #include "ast.h"
 #include "sae_par.h"
 #include "mers.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "smf.h"
@@ -110,6 +115,7 @@ void smf_history_write( const smfData* data, const char * appl,
   smfFile *file = NULL;  /* data->file */
   char *linarr[1];       /* Pointer to char * text */
   int state;             /* State of history component in NDF */
+  char buffer[NDF__SZHMX+1]; /* Temp buffer for copy of const text */
 
   /* Check entry status */
   if (*status != SAI__OK) return;
@@ -152,7 +158,7 @@ void smf_history_write( const smfData* data, const char * appl,
   ndfState( file->ndfid, "HISTORY", &state, status );
   if ( state == 1 ) {
     /* If present, write the information to the file */
-    linarr[0] = (char *)text; /* fix warning when const passed to linarr */
+    one_strlcpy( linarr[0], text, sizeof(buffer), status);
     ndfHput("NORMAL", appl, 0, 1, linarr, 1, 1, 1, file->ndfid, status );
     /* Needed to write a separate line for each call of ndfHput */
     ndfHend( status ); 
