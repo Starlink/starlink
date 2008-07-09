@@ -106,6 +106,9 @@ const double *smf_rebincube_tcon( smfHead *hdr, dim_t itime, double fcon,
 /* Check the inherited status. */
    if( *status != SAI__OK ) return NULL;
 
+/* Assign state to the correct slice of allState */
+   hdr->state = &((hdr->allState)[itime]);
+
 /* Note the total exposure time (texp), and the total effective time
    (texp), for all the input spectra produced by this time slice. */
    ton = hdr->state->acs_exposure;
