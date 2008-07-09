@@ -233,6 +233,7 @@
 
 /* SMURF includes */
 #include "libsmf/smf.h"
+#include "smurflib.h"
 
 /* Number of ACSIS extension components that need to be re-ordered. */
 #define NACSIS 3
