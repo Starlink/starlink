@@ -70,10 +70,9 @@ void VOTable::votable_enum( NS::VOTABLE& votable )
     using namespace NS;
 
     int ntable = votable_count( votable );
-    TABLE *table;
     for ( int i = 0; i < ntable; i++ ) {
         TABLE table( votable_get( votable, i ) );
-        if ( table.name() ) {
+        if ( ! ( table.name() && table.name().get() == "empty" ) ) {
             cout << "Found table : " << table.name() << endl;
         }
         else {
@@ -142,8 +141,8 @@ int VOTable::votable_write( NS::VOTABLE& votable, int index, ofstream& out )
     using namespace NS;
 
     //  Locate the TABLE.
-    NS::TABLE& table( votable_get( votable, index ) );
-    if ( table.name() ) {
+    TABLE& table( votable_get( votable, index ) );
+    if ( ! ( table.name() && table.name().get() == "empty" ) ) {
 
         /*  Found table "index", so write it out. */
         return table_write( table, out );
@@ -283,7 +282,7 @@ int VOTable::table_data( const NS::TABLE& table, ofstream& out )
             if ( id_index == -1 && gaia::matches_id( name, ucd, utype ) ) {
                 id_index = ncol;
             }
-            else if ( ra_index == -1 && gaia::matches_ra( name, ucd, utype ) ) {
+            else if ( ra_index == -1 && gaia::matches_ra( name, ucd, unit, utype ) ) {
                 ra_index = ncol;
                 ra_unit = unit;
                 if ( unit.find( "rad" ) == 0 ) {
@@ -291,7 +290,7 @@ int VOTable::table_data( const NS::TABLE& table, ofstream& out )
                 }
                 checkcoosys = true;
             }
-            else if ( dec_index == -1 && gaia::matches_dec( name, ucd, utype ) ) {
+            else if ( dec_index == -1 && gaia::matches_dec( name, ucd, unit, utype ) ) {
                 dec_index = ncol;
                 dec_unit = unit;
                 if ( unit.find( "rad" ) == 0 ) {
@@ -392,7 +391,8 @@ int VOTable::table_data( const NS::TABLE& table, ofstream& out )
         //  If no ID column has been found add one to the end.
         int id_col = id_index;
         if ( id_col == -1 ) {
-            id_index = ncol;
+            id_col = ncol;
+            header += "\tID";
         }
 
         //  Write special parameters out.
@@ -582,7 +582,7 @@ int VOTable::data_tabledata( const NS::TABLE& table, const NS::TABLEDATA& tdata,
             if ( *tditer == nullvalues[ncol] ) {
                 out << " \t";
             }
-            if ( ncol == ra_index || ncol == dec_index ) {
+            else if ( ncol == ra_index || ncol == dec_index ) {
                 if ( ra_radians || dec_radians ) {
 
                     //  RA and Dec in radians, need degrees.

@@ -53,8 +53,8 @@ namespace gaia {
      *  to see if they are a likely special column.
      */
     bool matches_id( string& name, string& ucd, string& utype );
-    bool matches_ra( string& name, string& ucd, string& utype );
-    bool matches_dec( string& name, string& ucd, string& utype );
+    bool matches_ra( string& name, string& ucd, string &unit, string& utype );
+    bool matches_dec( string& name, string& ucd, string &unit, string& utype );
     bool matches_x( string& name, string& ucd, string& utype );
     bool matches_y( string& name, string& ucd, string& utype );
 

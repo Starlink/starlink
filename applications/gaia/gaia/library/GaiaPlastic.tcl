@@ -22,6 +22,7 @@
 
 #  Copyright:
 #     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
+#     Copyright (C) 2008 Science and Technology Facilities Council.     
 #     All Rights Reserved.
 
 #  Licence:
@@ -50,6 +51,8 @@
 #        Original version.
 #     18-AUG-2006 (PWD):
 #        Modified to run the stilts process in the background.
+#     09-JUL-2008 (PWD):
+#        Removed stilts dependency, use GAIA facilities instead.
 #     {enter_further_changes_here}
 
 #-
@@ -145,28 +148,41 @@ itcl::class gaia::GaiaPlastic {
    #  Load a VOTable as a catalogue.
    public method ivo://votech.org/votable/loadFromURL {sender_id url args} {
 
-      #  Second argument, if present, is a tag for the table.  If not
-      #  present, use the URL.
-      if {$args == ""} {
-         set table_id_ $url
-      } else {
-         set table_id_ [lindex $args 0]
-      }
+      set failure 0
+      catch {
+         #  Second argument, if present, is a tag for the table.  If not
+         #  present, use the URL.
+         if {$args == ""} {
+            set table_id_ $url
+         } else {
+            set table_id_ [lindex $args 0]
+         }
 
-      #  Convert the VOTable to TST format and display it when the
-      #  conversion is completed.
-      set failure [catch {
+         #  Convert the VOTable to TST format and display it when the
+         #  conversion is completed.
          set tst_file_ [get_temp_file_ .TAB]
-         [get_stilts_] execute tpipe \
-                       ifmt=votable ofmt=tst in=$url out=$tst_file_ \
-                       "cmd=setparam symbol '[next_symbol_spec_]'"
+         if { $vot2tab_ == {} } {
+            set vot2tab_ [GaiaForeignExec \#auto \
+                             -notify [code $this completed_] \
+                             -application $::gaia_dir/vot2tab]
+         }
+         $vot2tab_ runwiths "$url 0 $tst_file_"
 
          #  Wait for long running conversion to complete as we need the status
-         #  return. 
+         #  return.
          if { $tst_file_ != {} } {
             tkwait variable [scope tst_file_]
          }
-      } msg]
+
+         if { $tst_file_ == {} } {
+            set msg "Conversion failed"
+            set failure 1
+         }
+      } msg
+
+      if { $msg != {} && $msg != 1 } {
+         set failure 1
+      }
 
       #  Return as appropriate.
       if { ! $failure } {
@@ -177,16 +193,17 @@ itcl::class gaia::GaiaPlastic {
       }
    }
 
-   #  Called when the STILTS command completes. Only job is to display
+   #  Called when the conversion command completes. Only job is to display
    #  the table, if conversion was successful.
-   protected method stilts_completed_ {} {
+   protected method completed_ {} {
       if { $tst_file_ != {}  && [file exists $tst_file_] } {
          set window [display_table_ $tst_file_ $table_id_]
          set cat_windows_($table_id_) $window
+         set tst_file_ $tst_file_
       } else {
          error "Failed to load catalogue from PLASTIC message"
+         set tst_file_ {}
       }
-      set tst_file_ {}
    }
 
    #  Display only a selection of the rows from a previously loaded catalogue.
@@ -235,18 +252,12 @@ itcl::class gaia::GaiaPlastic {
       set window [::cat::AstroCat::open_catalog_window \
                     $filename $ctrlwidget ::gaia::PlasticSearch 0 $gaia]
       $window configure -table_id $table_id
-      return $window
-   }
 
-   #  Return a Stilts instance belonging to this object.
-   protected method get_stilts_ {} {
-      if {$stilts_ == ""} {
-         set stilts_ [gaia::Stilts \#auto -debug 0 \
-                         -notify_cmd [code $this stilts_completed_]]
-      }
-      return $stilts_
+      #  Set symbol, after realization of window.
+      set next_symbol [next_symbol_spec_]
+      after idle "$window set_symbol $next_symbol"
+      return $window 
    }
-
 
    #  Utility procs:
    #  --------------
@@ -278,9 +289,9 @@ itcl::class gaia::GaiaPlastic {
    protected proc get_temp_file_ {exten} {
       set tmpdir ""
       if { [info exists ::env(GAIA_TEMP_DIR)] } {
-         set trydirs "$::env(GAIA_TEMP_DIR) /tmp /usr/tmp ."
+         set trydirs "$::env(GAIA_TEMP_DIR) /tmp /var/tmp ."
       } else {
-         set trydirs "/tmp /usr/tmp ."
+         set trydirs "/tmp /var/tmp ."
       }
       foreach trydir $trydirs {
          if {[file isdirectory $trydir] && [file writable $trydir]} {
@@ -325,8 +336,8 @@ itcl::class gaia::GaiaPlastic {
    #  Name of the active instance of GaiaUrlGet.
    protected variable urlget_ {}
 
-   #  Stilts object for executing STILTS commands.
-   protected variable stilts_ {}
+   #  Command for converting VOTable to TST.
+   protected variable vot2tab_ {}
 
    #  Name of the TST we're generating.
    protected variable tst_file_ {}

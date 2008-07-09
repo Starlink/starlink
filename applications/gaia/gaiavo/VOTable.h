@@ -121,12 +121,13 @@ namespace gaia
          *  reference is available (in particular for pure functions that
          *  return NS:TABLE as a reference). Note <T> should be <NS::TABLE> in
          *  the function call. Failure can be checked by testing for an
-         *  attribute (name() is a good choice).
+         *  attribute (name() == "empty" is a good choice).
          */
         template <typename T>
             T *emptyTable()
         {
             static T emptyTable;
+            emptyTable.name( "empty" );
             return &emptyTable;
         }
 

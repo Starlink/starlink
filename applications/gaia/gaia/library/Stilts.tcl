@@ -11,6 +11,9 @@
 #  Description:
 #     Provides methods for invoking the external STILTS script.
 #     It is assumed to be present in $::env(STILTS_DIR).
+#
+#     Note not currently used. Kept for reference and possible
+#     future utility. 
 
 #  Configuration options:
 #

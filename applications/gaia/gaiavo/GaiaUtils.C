@@ -71,7 +71,7 @@ namespace gaia {
     /**
      *  Check name, ucd and utype for a match to an RA column.
      */
-    bool matches_ra( string& name, string& ucd, string& utype )
+    bool matches_ra( string& name, string& ucd, string& unit, string& utype )
     {
         if ( ( ucd.find( "pos.eq.ra" ) == 0 ) ||
              ( ucd.find( "pos_eq_ra" ) == 0 ) ||
@@ -79,7 +79,8 @@ namespace gaia {
              ( name.find( "right" ) == 0 ) ||
              ( name.find( "r.a." ) == 0 ) ||
              ( name.find( "x_world" ) == 0 ) ||
-             ( name.find( "alpha" ) == 0 ) ) {
+             ( name.find( "alpha" ) == 0 ) ||
+             ( unit.find( "h:m:s" ) != string::npos ) ) {
             return true;
         }
         return false;
@@ -88,13 +89,14 @@ namespace gaia {
     /**
      *  Check name, ucd and utype for a match to a Dec column.
      */
-    bool matches_dec( string& name, string& ucd, string& utype )
+    bool matches_dec( string& name, string& ucd, string& unit, string& utype )
     {
         if ( ( ucd.find( "pos.eq.dec" ) == 0 ) ||
              ( ucd.find( "pos_eq_dec" ) == 0 ) ||
              ( name.find( "dec" ) == 0 ) ||
              ( name.find( "y_world" ) == 0 ) ||
-             ( name.find( "delta" ) == 0 ) ) {
+             ( name.find( "delta" ) == 0 ) ||
+             ( unit.find( "d:m:s" ) != string::npos ) ) {
             return true;
         }
         return false;
