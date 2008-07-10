@@ -14,6 +14,9 @@
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  29 Sep 95  Created
+ * Peter W. Draper 01 Jul 08  Added system, epoch, unit, ucd, utype
+ *                            and datatype support, plus equinox as string. 
+ *                            Needed for VO interop.
  */
 
 
@@ -130,6 +133,13 @@ private:
 	SHOW_COLS,		// list of columns to display (default: all)
 	COPYRIGHT_,		// copyright notice for server
 	HELP_,		        // URL pointing to help page fpr catalog
+        SYSTEM_,                // system of the celestial coordinates (FK5, FK4 etc.)
+	EQUINOX_,               // equinox qualifying string (J or B)
+	EPOCH_,		        // epoch qualifying string (J or B)
+	UNIT_,		        // units for all columns "unit1 \t unit2 \t \t unit4 \t..."
+	UCD_,		        // UCDs for all columns "ucd1 \t ucd2 \t \t ucd4 \t..."
+	UTYPE_,		        // utypes for all columns "utype1 \t utype2 \t \t utype4 \t..."
+        DATATYPE_,              // datatypes of columns, if interpreted
 
 	NUM_KEY_STRINGS_	// dummy last entry, number of keywords
     };
@@ -146,6 +156,7 @@ private:
 
     // double keyword values
     double equinox_;		// equinox of wcs coords (default: J2000)
+    double epoch_;              // epoch of wcs coords (default: 2000)
 
     CatalogInfoEntry* link_;	// If the url is a catalog config file or URL
                                 // this points to the first entry in that list.
@@ -182,10 +193,17 @@ public:
     void symbol(const char* s)    {setVal_(SYMBOL_, s);}
     void searchCols(const char* s){setVal_(SEARCH_COLS, s);}
     void sortCols(const char* s)  {setVal_(SORT_COLS, s);}
-    void sortOrder(const char* s)  {setVal_(SORT_ORDER, s);}
+    void sortOrder(const char* s) {setVal_(SORT_ORDER, s);}
     void showCols(const char* s)  {setVal_(SHOW_COLS, s);}
     void copyright(const char* s) {setVal_(COPYRIGHT_, s);}
     void help(const char* s)      {setVal_(HELP_, s);}
+    void system(const char* s)    {setVal_(SYSTEM_, s);}
+    void equinoxprefix(const char* s) {setVal_(EQUINOX_, s);}
+    void epochprefix(const char* s) {setVal_(EPOCH_, s);}
+    void unit(const char* s)      {setVal_(UNIT_, s);}
+    void ucd(const char* s)       {setVal_(UCD_, s);}
+    void utype(const char* s)     {setVal_(UTYPE_, s);}
+    void datatype(const char* s)  {setVal_(DATATYPE_, s);}
 
     // set int keyword values
     void id_col(int i)  {id_col_  = i;}
@@ -197,6 +215,7 @@ public:
 
     // set double keyword values
     void equinox(double d)  {equinox_  = d;}
+    void epoch(double d)  {epoch_  = d;}
 
     // get string keyword values
     const char* servType() const  {return val_[SERVTYPE_];}
@@ -213,6 +232,15 @@ public:
     const char* copyright() const {return val_[COPYRIGHT_];}
     const char* help() const      {return val_[HELP_];}
 
+    const char* system() const    {return val_[SYSTEM_] ? val_[SYSTEM_] : "fk5";}
+    const char* equinoxprefix() const {return val_[EQUINOX_];}
+    const char* epochprefix() const {return val_[EPOCH_];}
+
+    const char* unit() const      {return val_[UNIT_];}
+    const char* ucd() const       {return val_[UCD_];}
+    const char* utype() const     {return val_[UTYPE_];}
+    const char* datatype() const  {return val_[DATATYPE_];}
+
     // get int keyword values
     int id_col() const;
     int ra_col()  const;
@@ -223,6 +251,7 @@ public:
 
     // get double keyword values
     double equinox() const {return equinox_;}
+    double epoch() const {return epoch_;}
     
     // return true if the catalog uses word coordinates
     int isWcs() {return ra_col() >= 0 && dec_col() >= 0;}
