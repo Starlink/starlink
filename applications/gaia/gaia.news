@@ -80,6 +80,9 @@
     pointing an axis out of the screen. Note that the existing binding
     to "3" has been moved to "7" (switch to stereo mode).
 
+    A new interaction for key "c" has been added to the 3D display. This
+    centres the scene without changing the zoom.
+
     The cube toolbox can now display the data variances as standard
     deviations (ERROR component).
 

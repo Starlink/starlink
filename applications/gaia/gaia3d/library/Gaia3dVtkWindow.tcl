@@ -285,6 +285,19 @@ itcl::class gaia3d::Gaia3dVtkWindow {
       render
    }
 
+   #  Centre the camera on the middle of all the visible props.
+   public method centre {} {
+
+      #  Position we want for camera is fx,fy,[fz+d] (corrected for axis).
+      #  That points back at fx,fy,fz.
+      set camera [$renderer_ GetActiveCamera]
+      lassign [$renderer_ ComputeVisiblePropBounds] x0 x1 y0 y1 z0 z1
+      $camera SetFocalPoint [expr ($x1-$x0)*0.5] [expr ($y1-$y0)*0.5] [expr ($y1-$y0)*0.5]
+
+      #$renderer_ ResetCameraClippingRange
+      render
+   }
+
    #  Create a widget to display the renderer image, adding a renderer
    #  and setting up the default interactions.
    protected method create_renderer_widget_ {} {
@@ -408,6 +421,9 @@ itcl::class gaia3d::Gaia3dVtkWindow {
       ::bind $itk_component(renwidget) <KeyPress-1> [code $this point_axis_at_camera 1]
       ::bind $itk_component(renwidget) <KeyPress-2> [code $this point_axis_at_camera 2]
       ::bind $itk_component(renwidget) <KeyPress-3> [code $this point_axis_at_camera 3]
+
+      #  Centre without changing zoom.
+      ::bind $itk_component(renwidget) <KeyPress-c> [code $this centre]
    }
 
    #  Rotate the camera position in up direction by incr degrees.
