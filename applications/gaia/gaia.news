@@ -211,35 +211,6 @@
     A description of the type of each cube axis will now be shown
     in the cube toolbox.
 
-    When sending spectra to SPLAT it should now be possible to restart
-    GAIA without restarting SPLAT (previously spectra open in SPLAT
-    would not be superceded by new spectra sent from GAIA).
-
-    A bug in the 3D toolboxes that meant reloading a cube with the same
-    name under certain circumstances would fail. This issue should now
-    be resolved (although re-using files with the same name remains 
-    unsupported).
-
-    A problem reading coordinates from FITS tables has been fixed. These 
-    where being read without enough precision leading to alignment errors
-    when displayed.
-
-    A bug that stopped cube rebining using a factor of 5 has been fixed.
-
-    Bugs in the code estimating the image scale, width and height have
-    been fixed. This only affected images with swapped WCS axes (i.e.
-    when Dec was the first axis and RA the second).
-
-    Typing <return> in the low: and high: entry fields has always fixed
-    the display limits. This fact is now made clear by changing the 
-    labels of these two fields to display in blue. Several issues 
-    have also been fixed that should make this work more reliably.
-
-    When a new astrometry has been created by the GAIA fit to reference
-    stars an existing DATE-OBS or MJD-OBS value will now be preserved,
-    when an EPOCH is not required as part of the system. Previously
-    these values were set to the year 2000.
-
   Humu Release
   ============
 
