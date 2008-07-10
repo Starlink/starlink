@@ -1,8 +1,10 @@
 
-bin_PROGRAMS = vot2tab tab2vot
+bin_PROGRAMS = vot2tab tab2vot listvot
 
 vot2tab_SOURCES = vot2tab.C $(VOTABLE_ROUTINES)
 tab2vot_SOURCES = tab2vot.C $(VOTABLE_ROUTINES)
+listvot_SOURCES = listvot.C $(VOTABLE_ROUTINES)
+
 
 #  Include files.
 AM_CXXFLAGS = -I. -I.. -I$(STARLINK)/include/tclutil \
@@ -20,6 +22,7 @@ VOTableFunctions.C: VOTableWriteFunctions.icc
 VOTABLE_LIBS = -lastrotcl2.0 -ltclutil2.0 -lxerces-c -lcat4.0
 vot2tab_LDADD = $(VOTABLE_LIBS)
 tab2vot_LDADD = $(VOTABLE_LIBS)
+listvot_LDADD = $(VOTABLE_LIBS)
 
 #  Test programs.
 

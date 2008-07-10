@@ -66,6 +66,7 @@
 #include <sstream>
 #include <memory>
 #include <string>
+#include <iomanip>
 #include <fcntl.h>
 
 #include <xercesc/dom/DOM.hpp>

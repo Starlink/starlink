@@ -61,7 +61,6 @@
  *-
  */
 
-
 /**
  *  Simple test for table validity, visit all TABLE elements.
  */
@@ -73,10 +72,11 @@ void VOTable::votable_enum( NS::VOTABLE& votable )
     for ( int i = 0; i < ntable; i++ ) {
         TABLE table( votable_get( votable, i ) );
         if ( ! ( table.name() && table.name().get() == "empty" ) ) {
-            cout << "Found table : " << table.name() << endl;
-        }
-        else {
-            cout << "No table for index : " << i << endl;
+            cout << setw(6) << left << i << ": " << table.name();
+            if ( table.nrows() ) {
+                cout << " " << table.nrows();
+            }
+            cout << endl;
         }
     }
 }
@@ -106,8 +106,8 @@ NS::TABLE& VOTable::votable_get( NS::VOTABLE& votable, int index )
 {
     using namespace NS;
 
-    //  Use the underlying DOM to search for all TABLE elements. These are located 
-    //  in a breath-first search of the whole document.
+    //  Use the underlying DOM to search for all TABLE elements. These are 
+    //  located in a breath-first search of the whole document.
     DOMNode *node = votable._node();
     DOMElement *element = static_cast<DOMElement*>( node );
     XMLCh tempstr[20];
@@ -188,6 +188,8 @@ int VOTable::table_params( const NS::TABLE& table, ofstream& out )
 
     try{
         out << "#  Table parameters: \n";
+        
+        out << "long_name: " << table.name() << '\n';
 
         TABLE::PARAM_const_iterator piter( table.PARAM().begin() );
         TABLE::PARAM_const_iterator pend( table.PARAM().end() );
