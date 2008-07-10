@@ -92,6 +92,8 @@ static int GaiaUtilsAstTran2( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsAstTranN( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
+static int GaiaUtilsDescribeAxes( ClientData clientData, Tcl_Interp *interp,
+                                  int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsFrameIsA( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] );
 static int GaiaUtilsGrfAddColour( ClientData clientData, Tcl_Interp *interp,
@@ -172,6 +174,10 @@ int GaiaUtils_Init( Tcl_Interp *interp )
 
     Tcl_CreateObjCommand( interp, "gaiautils::asttrann", GaiaUtilsAstTranN,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
+
+    Tcl_CreateObjCommand( interp, "gaiautils::describeaxes", 
+                          GaiaUtilsDescribeAxes, (ClientData) NULL, 
+                          (Tcl_CmdDeleteProc *) NULL );
 
     Tcl_CreateObjCommand( interp, "gaiautils::frameisa", GaiaUtilsFrameIsA,
                           (ClientData) NULL, (Tcl_CmdDeleteProc *) NULL );
@@ -268,13 +274,13 @@ static int GaiaUtilsAstGet( ClientData clientData, Tcl_Interp *interp,
         return TCL_ERROR;
     }
 
-    /* Get the frameset */
+    /* Get the object. */
     if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
         return TCL_ERROR;
     }
     object = (AstObject *) adr;
 
-    /* Get the value */
+    /* Get the value. */
     value = astGetC( object, Tcl_GetString( objv[2] ) );
     if ( ! astOK ) {
         char *buf = ckalloc( 1024 );
@@ -306,7 +312,7 @@ static int GaiaUtilsAstSet( ClientData clientData, Tcl_Interp *interp,
         return TCL_ERROR;
     }
 
-    /* Get the frameset */
+    /* Get the object. */
     if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
         return TCL_ERROR;
     }
@@ -546,11 +552,10 @@ static int GaiaUtilsAstGetRefPos( ClientData clientData, Tcl_Interp *interp,
 }
 
 /**
- * Check if a given AST FrameSet has an axis of a given frame type.
+ * Check if the current frame of a FrameSet has an axis of a given frame type.
  *
- * Note we only support a pre-defined set of comparison frame types,
- * at present these are "specframe", "dsbspecframe", "fluxframe"
- * and "timeframe".
+ * Note we only support a pre-defined set of comparison frame types, at
+ * present these are "specframe", "dsbspecframe", "fluxframe" and "timeframe".
  */
 static int GaiaUtilsFrameIsA( ClientData clientData, Tcl_Interp *interp,
                               int objc, Tcl_Obj *CONST objv[] )
@@ -608,6 +613,82 @@ static int GaiaUtilsFrameIsA( ClientData clientData, Tcl_Interp *interp,
 
     Tcl_SetObjResult( interp, Tcl_NewBooleanObj( isa ) );
     astAnnul( picked );
+    return TCL_OK;
+}
+
+/**
+ * Return a list describing the current axes of a given FrameSet.
+ *
+ * The list will consist of the KAPPA friendly axes descriptions, "spec",
+ * "skylon", "skylat" and "time". Unrecognised axes will just be given the
+ * name "unknown".
+ */
+static int GaiaUtilsDescribeAxes( ClientData clientData, Tcl_Interp *interp,
+                                  int objc, Tcl_Obj *CONST objv[] )
+{
+    AstFrameSet *wcs;
+    Tcl_Obj *resultObj;
+    char buffer[16];
+    const char *domain;
+    int lataxis;
+    int naxes;
+    long adr;
+
+    /* Check arguments, only allow one, the frameset. */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "frameset" );
+        return TCL_ERROR;
+    }
+
+    /* Get the frameset */
+    if ( Tcl_GetLongFromObj( interp, objv[1], &adr ) != TCL_OK ) {
+        return TCL_ERROR;
+    }
+    wcs = (AstFrameSet *) adr;
+
+    /*  Get the number of axes in the supplied Frame. */
+    naxes = astGetI( wcs, "naxes" );
+    
+    resultObj = Tcl_GetObjResult( interp );
+
+    /*  For each axis get the domain. */
+    for ( int i = 1; i <= naxes; i++ ) {
+        sprintf( buffer, "domain(%d)", i );
+        domain = astGetC( wcs, buffer );
+        if ( strcmp( domain, "SPECTRUM" ) == 0 || 
+             strcmp( domain, "DSBSPECTRUM" ) == 0 ) {
+            Tcl_ListObjAppendElement( interp, resultObj, 
+                                      Tcl_NewStringObj( "spec", -1 ) );
+        }
+        else if ( strcmp( domain, "TIME" ) == 0 ) {
+            Tcl_ListObjAppendElement( interp, resultObj, 
+                                      Tcl_NewStringObj( "time", -1 ) );
+        }
+        else if ( strcmp( domain, "SKY" ) == 0 ) {
+
+            /*  Latitude or longitude? */
+            sprintf( buffer, "lataxis(%d)", i );
+            lataxis = astGetI( wcs, buffer );
+            if ( i == lataxis ) {
+                Tcl_ListObjAppendElement( interp, resultObj, 
+                                          Tcl_NewStringObj( "skylat", -1 ) );
+            }
+            else {
+                Tcl_ListObjAppendElement( interp, resultObj, 
+                                          Tcl_NewStringObj( "skylon", -1 ) );
+            }
+        }
+        else {
+            Tcl_ListObjAppendElement( interp, resultObj, 
+                                      Tcl_NewStringObj( "unknown", -1 ) );
+        }
+    }
+    if ( ! astOK ) {
+        astClearStatus;
+        Tcl_SetResult( interp, "Failed to describe frameset axes",
+                       TCL_VOLATILE );
+        return TCL_ERROR;
+    }
     return TCL_OK;
 }
 
@@ -1044,7 +1125,6 @@ static int GaiaUtilsGtROIPlots( ClientData clientData, Tcl_Interp *interp,
 
     return TCL_OK;
 }
-
 
 /**
  * Get a file from a specified URL and return its content as the result.

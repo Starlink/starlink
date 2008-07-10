@@ -136,6 +136,9 @@
     The colour ramp shown at the bottom of the main window will now
     correctly update when a new colour or intensity map is selected.
 
+    A description of the type of each cube axis will now be shown
+    in the cube toolbox.
+
   Humu Release
   ============
 

@@ -608,6 +608,14 @@ itcl::class gaia::GaiaNDAccess {
       return [gaiautils::frameisa $wcs $axis $type]
    }
 
+   #  Get descriptions for all the axis of the frameset. These are generic
+   #  labels "spec", "time", "skylat" and "skylon", axis which are not one of
+   #  these will be described as "unknown".
+   public method axisdescriptions {} {
+      set wcs [${type_}::getwcs $handle_]
+      return [gaiautils::describeaxes $wcs]
+   }
+
    #  Get the value of a property. A property is a primitive value stored
    #  in a named extension. Normally an extension follows the NDF concept and
    #  the name is the HDS component within the extension, for other formats

@@ -682,6 +682,22 @@ itcl::class gaia::GaiaCube {
             set axis 3
          }
 
+         #  And label the menu items helpfully.
+         $itk_component(axis) clear
+         set axisdesc [$cubeaccessor_ axisdescriptions]
+         set i 0
+         foreach {label value} { one 1 two 2 three 3 } {
+            set desc [lindex $axisdesc $i]
+            incr i
+            if { $desc != "unknown" } {
+               set label "$label : $desc"
+            }
+            $itk_component(axis) add \
+               -command [code $this set_step_axis_ $value] \
+               -label $label \
+               -value $value
+         }
+
          #  Set up object to control units. Do this before axis change
          #  so that cube is available for units query.
          $spec_coords_ configure -accessor $cubeaccessor_
@@ -1530,16 +1546,9 @@ itcl::class gaia::GaiaCube {
             raise $itk_component($basename)
          } else {
             busy {
-               global ::gaiascreen
-               set gaiascreen "starpc1:0.0"
                make_${type}_toolbox $basename $clone
             }
          }
-
-         #  Make sure we get the notifications about spectral extraction
-         #  from GaiaCubeSpectrum (do this now to avoid overhead of callback).
-         #$itk_component(spectrum) configure -notify_cmd \
-         #   [code $this spectrum_moved_]
       }
    }
 
