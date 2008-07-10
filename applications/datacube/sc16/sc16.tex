@@ -12,8 +12,9 @@
 %     MJC: Malcolm J. Currie (Starlink)
 
 %  Copyright:
-%     Copyright (C) 1997-2005 Particle Physics and Astronomy
-%     Research Council. All Rights Reserved.
+%     Copyright (C) 1997-2006 Particle Physics and Astronomy Research Council. Copyright (C) 1997-2005 Particle Physics and Astronomy Research Council. 
+%     Copyright (C) 2008 Science and Technology Facilities Council. 
+%     All Rights Reserved.
 %
 %  History:
 %     01-SEP-2000 (AALLAN):
@@ -42,6 +43,11 @@
 %        Add CHANMAP, and smoothing of planes by BLOCK and GAUSMOOTH.
 %        Introduce GAIA `3D' in a new illustrated subsection.  Enlarge
 %        LateX graphics 25%.  Revise figure placement from default.
+%    2008 July 4 (MJC):
+%        Added section on locating features with CUPID and STILTS.
+%        Update GAIA section and graphics; add new illustrated subsection 
+%        on three-dimensional rendering.  Mention PLUCK and PERMAXES.  
+%        Various minor updates.
 %
 %-
 
@@ -62,8 +68,8 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {16.2}
 \newcommand{\stardocauthors}   {A.~Allan \& Malcolm J. Currie}
-\newcommand{\stardocdate}      {2006 June 16}
-\newcommand{\stardocversion}   {Version 1.2}
+\newcommand{\stardocdate}      {2008 July 4}
+\newcommand{\stardocversion}   {Version 1.3}
 \newcommand{\stardoctitle}     {The IFU Data-Product Cookbook}
 \newcommand{\stardocmanual}    {}
 \newcommand{\stardocabstract}
@@ -329,6 +335,8 @@ and hints and tips about how to deal with commonly occurring problems.}
 \newcommand{\CCDPACKref}{\xref{\CCDPACK}{sun139}{}}
 \newcommand{\CONVERT}{{\footnotesize CONVERT}\normalsize}
 \newcommand{\CONVERTref}{\xref{\CONVERT}{sun55}{}}
+\newcommand{\CUPID}{{\footnotesize CUPID}\normalsize}
+\newcommand{\CUPIDref}{\xref{\CUPID}{sun237}{}}
 \newcommand{\DATACUBE}{{\footnotesize DATACUBE}\normalsize}
 \newcommand{\DATACUBEref}{\xref{\DATACUBE}{sun237}{}}
 \newcommand{\FIGARO}{{\footnotesize FIGARO}\normalsize}
@@ -345,6 +353,8 @@ and hints and tips about how to deal with commonly occurring problems.}
 \newcommand{\PGPLOTref}{\htmladdnormallink{\PGPLOT}{http://astro.caltech.edu/\~{}tjp/pgplot/}}
 \newcommand{\SPECDRE}{{\footnotesize SPECDRE}\normalsize}
 \newcommand{\SPECDREref}{\xref{\SPECDRE}{sun86}{}}
+\newcommand{\STILTS}{{\footnotesize STILTS}\normalsize}
+\newcommand{\STILTSref}{\xref{\STILTS}{sun256}{}}
 
 \newcommand{\ATV}{\footnotesize{ATV}\normalsize}
 \newcommand{\CCDRED}{\footnotesize{CCDRED}\normalsize}
@@ -410,11 +420,20 @@ and hints and tips about how to deal with commonly occurring problems.}
    \item 30th September 2002; Version 1.0-1 Minor changes (AA)
    \item 2005 October; Version 1.1  Updated for DATACUBE version 1.1
                                     and major tidy. (MJC)
+  \item 2006 March 17; Version 1.1-1 Add illustrated velmoment and gridspec 
+                       sections; mention CLINPLOT. (MJC)
+  \item 2006 June 16; Version 1.1.-2 Introduce GAIA `3D' in a new 
+                      illustrated subsection.  List CHANMAP, and smoothing 
+                      of planes by BLOCK and GAUSMOOTH. (MJC)
+  \item 2008 July 4;  Version 1.2  Add section on locating features with CUPID 
+                      and STILTS.  Update GAIA section and graphics; add new 
+                      illustrated subsection on three-dimensional rendering.  
+                      Mention PLUCK and PERMAXES.  (MJC)
 
  \end{enumerate}
 
  \vspace{10cm}
- \copyright \underline{1999-2001} Starlink, CCLRC
+ \copyright \underline{1999--2008} Starlink, CCLRC, PPARC, STFC
 
  \begin{latexonly}
    \cleardoublepage
@@ -1442,15 +1461,21 @@ Edits an NDF such that array values below and above two thresholds take constant
 \subsubsection{Cube manipulation}
 
 Slightly more complex is manipulation and resampling of the data cube
-itself.  The twhree most important utilities available to do this within
+itself.  The most important utilities available to do this within
 \KAPPA\ are the \xref{{\bf collapse}}{sun95}{COLLAPSE}, 
-\xref{{\bf chanmap}}{sun95}{CHANMAP}, and
-\xref{{\bf ndfcopy}}{sun95}{NDFCOPY} applications.  {\bf collapse} can
-be used to produce \htmlref{white-light and passband}{sc16_vis} images\latex{ (see 
-Section~\ref{sc16_vis})} and velocity maps, {\bf chanmap} creates an
-image of multiple passbands, while {\bf ndfcopy} can extract a single spectrum or 
-\htmlref{arbitrary cube sections}{sc16_vis} \latex{ (again see Section~\ref{sc16_vis} for
-details)}.
+\xref{{\bf chanmap}}{sun95}{CHANMAP}, \xref{{\bf ndfcopy}}{sun95}{NDFCOPY},
+and \xref{{\bf pluck}}{sun95}{PLUCK} applications.  {\bf collapse} can
+produce \htmlref{white-light and passband}{sc16_vis} images\latex{ (see 
+Section~\ref{sc16_vis})} and velocity maps by the appropriate
+selection of statistic.  {\bf chanmap} creates a grid of passbands.
+{\bf ndfcopy} can extract a single spectrum (along pixel axes) or 
+\htmlref{arbitrary cube sections}{sc16_vis} \latex{ (again see 
+Section~\ref{sc16_vis} for details)}, while {\bf pluck} uses
+interpolation to extract at {\em arbitrary} positions, such as a 
+spectrum at nominated equatorial co-ordinates, or an image at a given
+wavelength or frequency.  Some applications require the spectral
+axis to be the first or the third axis; {\bf permaxes} allows
+shuffling of the pixel axes.
 
 \begin{itemize}
 \item{\xref{{\bf chanmap}}{sun95}{CHANMAP}}\\
@@ -1467,8 +1492,12 @@ Reduces the size of an NDF by picking equally spaced pixels
 Reverses an NDF's pixels along a specified dimension 
 \item{\xref{{\bf ndfcopy}}{sun95}{NDFCOPY}}\\
 Copies an NDF, or an NDF section, to a new location 
+\item{\xref{{\bf permaxes}}{sun95}{PERMAXES}}\\
+Permutes an NDF's pixel axes
 \item{\xref{{\bf pixdupe}}{sun95}{PIXDUPE}}\\
 Expands an NDF by pixel duplication 
+\item{\xref{{\bf pluck}}{sun95}{PLUCK}}\\
+Plucks slices from an NDF at arbitrary positions
 \item{\xref{{\bf regrid}}{sun95}{REGRID}}\\
 Applies a geometrical transformation to an NDF
 \item{\xref{{\bf segment}}{sun95}{SEGMENT}}\\
@@ -1490,8 +1519,6 @@ are
 Outputs the values of a sub-array of a two-dimensional data array to the screen or a text file
 \item{\xref{{\bf median}}{sun95}{MEDIAN}}\\ 
 Smooths a two-dimensional data array using a weighted median filter 
-\item{\xref{{\bf rotate}}{sun95}{ROTATE}}\\
-Rotates two-dimensional NDF about its centre through any angle 
 \end{itemize}
 
 Some tasks operate in two dimensions, but apply processing to a series
@@ -1503,6 +1530,8 @@ while retaining the spectral resolution.
 Smooths an NDF using a one- or two-dimensional square or rectangular box filter
 \item{\xref{{\bf gausmooth}}{sun95}{GAUSMOOTH}}\\
 Smooths a one- or two-dimensional NDF using a Gaussian filter
+\item{\xref{{\bf rotate}}{sun95}{ROTATE}}\\
+Rotates two-dimensional NDF about its centre through any angle 
 \end{itemize}
 
 
@@ -1520,7 +1549,7 @@ Replaces the values of selected pixels in an NDF
 \item{\xref{{\bf errclip}}{sun95}{ERRCLIP}}\\ 
 Removes pixels with large errors from an NDF 
 \item{\xref{{\bf fillbad}}{sun95}{FILLBAD}}\\ 
-Removes regions of bad values from a two-dimensional NDF 
+Removes regions of bad values from an NDF 
 \item{\xref{{\bf nomagic}}{sun95}{NOMAGIC}}\\ 
 Replaces all occurrences of \xref{magic value}{sun95}{se_masking}\latex{(see SUN/95 for details)} 
 pixels in an NDF array with a new value 
@@ -1591,7 +1620,7 @@ Combined with the \htmlref{graphics devices commands}{sc16_graphics}\latex{ (see
 Section~\ref{sc16_graphics})} the following applications, especially
 {\bf clinplot}, {\bf display}, {\bf linplot} and {\bf contour} act as the backbone
 for image display, and some complex effects can be generated using
-these simple tasks.
+these elemental tasks.
 
 \begin{itemize}
 \item{\xref{{\bf clinplot}}{sun95}{CLINPLOT}}\\
@@ -1633,7 +1662,7 @@ Makes a mosaic by combining and (optionally) normalising a set of images
 Resamples and mosaics using the drizzling algorithm
 \end{itemize}
 
-\subsubsection{Spectral fitting}
+\subsubsection{Spectral fitting\label{spectral_fitting}}
 
 Some of the most useful applications available for spectral fitting
 and manipulation live inside \FIGAROref\ as part of \SPECDREref.  Some
@@ -1694,7 +1723,109 @@ peakmap}}{sun237}{peakmap} scripts are based around the \SPECDRE\
 
 For data with a significantly varying continuum \xref{{\bf
 mfittrend}}{sun95}{MFITTREND} is available in \KAPPA\ to fit and
-remove the continuum signal thereby making {\bf fitgauss}'s job easier.
+remove the continuum signal, thereby making {\bf fitgauss}'s job easier.
+
+\subsection{\label{sc16_features}Locating Features\xlabel{sc16_features}}
+
+The ability to identify and measure the properties of features can
+play an important role in spectral-cube analysis.  For example, you
+may wish to locate emission lines and obtain their widths as initial
+guesses to \htmlref{spectral fitting}{spectral_fitting}, or to mask
+the lines in order to determine the baseline or continuum.  Extending
+to three dimensions you may want to identify and measure the
+properties of clumps of comoving emission in a velocity cube.
+The \CUPIDref\ package addresses these needs.
+
+The \xref{{\bf findclumps}}{sun255}{FINDCLUMPS} is the main command.
+It offers a choice of clump-finding algorithms with detailed
+configuration control, and generates a catalogue in FITS format
+storing for each peak its centre and centroid co-ordinates, its width,
+peak value, total flux and number of contributing pixels.  Information
+from the catalogue can be extracted into scripts using \STILTSref\ and 
+in particular its powerful \xref{{\bf tpipe}}{sun256}{} command.
+
+\begin{verbatim}
+   findclumps in=cube out=clumps outcat=cubeclump perspectrum \
+              config="^ClumpFind.par" accept
+   set peak = `stilts tpipe in=cubeclump.FIT cmd="select index==1" \
+              cmd='keepcols Cen3' omode=out ofmt=csv-nohead`
+\end{verbatim}
+
+Here we find the clumps in the three-dimensional NDF called cube using
+the configuration stored in the text file {\tt ClumpFind.par} that
+will specify things like the minimum number of pixels in a clump, the
+instruments's beam FWHM, and tuning of the particular clump-finding
+algorithm chosen.  The PERSPECTRUM parameter requests that the spectra
+be analysed independently.  It would be absent if you were looking for
+features in a velocity cube.  The contents of output NDF clumps is
+algorithm dependent, but in most cases its data array stores the index
+of the clump in which each pixel resides, and all contain clump
+information and cut-outs of the original data about each clump in an
+extension called CUPID; and its QUALITY array has flags to indicate if
+the pixel is part of a clump or background.  The last is useful for
+masking and inspecting the located clumps.
+
+Some experimentation with {\bf findclumps} algorithms and
+configuration to obtain a suitable segmentation for your data's
+characteristics is expected.  That is why we have not listed any
+configuration parameters or even chosen a clump-finding algorithm in
+the example.
+
+Continuing with the example, the catalogue of clumps detected and
+passing any threshold criteria are stored in {\tt cubeclump.FIT}. (See
+the \xref{\CUPID\ manual}{sun255}{FINDCLUMPS} for details of all the
+column names.) We then use {\bf tpipe} to select the third axis
+centroid co-ordinate ({\tt Cen3}) of the first clump ({\tt index==1})
+and store the numerical value in shell variable {\tt peak}.  The
+commands {\tt cmd=} are executed in the order they appear.
+
+This could be extended to keep other columns {\tt keepcols} and return
+them in an array of the line with most flux given in column Sum.
+
+\begin{verbatim}
+   set parline = `stilts tpipe in=cubeclump.FIT cmd='sort -down Sum' \
+                 cmd="select index==1" cmd='keepcols "Cen3 Width3"' \
+                 omode=out ofmt=ascii`
+   set centre = $parline[3]
+   set width = $parline[4]
+\end{verbatim}
+
+Here {\bf tpipe} sorts the fluxes, picks that clump, and writes an
+ASCII catalogue containing the centroid and width along the third axis
+storing the one-line catalogue to shell variable {\tt parline}.  In
+this format the names of the columns appear first, hence the required
+values are in the third and fourth elements.  We could have used the
+csv-nohead output format to give a comma-separated list of values as
+in the previous example, and \xref{split these with {\bf
+awk}}{sc4}{sc4_se_string_split}.
+
+{\bf tpipe} has many command options that for example permit the
+selection, addition, and deletion of columns; and the statistics of
+columns.  The selections can be complex boolean expressions involving
+many columns.  There are even functions to compute angular distances on
+the sky, to say select a spatial region.  See the \STILTS\ manual for
+many examples.
+
+\CUPID\ also includes a background-tracing and subtraction application \xref{{\bf
+findback}}{sun255}{FINDBACK}.  You may need to run this or \xref{{\bf
+mfittrend}}{sun95}{MFITTREND} to remove the background before feature
+detection.  Note the if you are applying {\bf findback} to the spectra
+independently, the spectral axis must be first, even if this demands a 
+re-orient the cube.
+
+\begin{verbatim}
+   $KAPPA_DIR/permaxes in=scube out=cubeperm perm=\[3,1,2\]
+   $CUPID_DIR/findback in=scubeperm sub=no out=backperm box=\[$box,1,1\] \
+                       ilevel=0 rms=$noise $
+   $KAPPA_DIR/permaxes in=backperm out=back perm=\[2,3,1\]
+   $KAPPA_DIR/sub in1=cube in2=back out=cube_bs
+\end{verbatim}
+
+In this example, the spectral axis is the third axis of NDF cube. {\bf
+findback} removes structure smaller than {\tt \$box} pixels along each
+spectrum independently.  The resulting estimated backgrounds for each
+spectrum are stored in NDF backperm, which is re-oriented to the
+original axis permutation to allow subtraction from cube.
 
 \subsection{\label{sc16_graphics}Dealing with Graphical Devices\xlabel{sc16_graphics}}
 
@@ -1954,14 +2085,17 @@ declination, and 345.762 to 345.8139 Ghz in frequency.
 \newpage
 \subsection{\xlabel{sc16_gaia}GAIA data visualisation\label{sc16_gaia}}
 
-\GAIAref\ is a display and analysis tool widely used for two-dimensional
-data.  For many years the \GAIA\ tool had little to offer for cube
-visualisation.  Then came a toolbox for cubes to permit inspection of
-planes individually, or as an animation, or as a passband image by
-collapsing.  At the appropriately named Version 3.0, \GAIA\ offers
-further and growing facilities for cube analysis.  Check the {\tt
-\$GAIA\_DIR/gaia.news} file for the latest features that may extend
-upon those summarised below.
+\GAIAref\ is a display and analysis tool widely used for
+two-dimensional data.  For many years the \GAIA\ tool had little to
+offer for cube visualisation.  At the appropriately named Version 3.0,
+came a toolbox for cubes to permit inspection of planes individually,
+or as an animation, or as a passband image by collapsing.  Now at the
+time of writing, Version 4.2 \GAIA\ offers further facilities, such as 
+rendering, for cube analysis.  \GAIA\ is also under active delevopment.
+Check the {\tt \$GAIA\_DIR/gaia.news} file for the latest features
+extending upon those summarised below.
+
+\subsubsection{Cube toolbox\label{sc16_cube_toolbox}}
 
 If you start up \GAIA\ with a cube
 
@@ -1972,49 +2106,155 @@ the cube toolbox appears (see
 \begin{htmlonly}
 the figure below)
 \end{htmlonly}
-\latex{Figure~\ref{sc16_gaia_cubetool_fig})} offering a choice of 
-axis to step along or collapse, and a selection of methods.  You can
-select a plane by giving its index or adjust the slider.  This could,
-for instance, let you define lower and upper limits of interest that
-are applied to the animation, or passband image (Collapse tab), tiled
-image of several passbands (Chanmap tab). The chosen limits apply to
-subsequent steps. If you need to access the Cube toolbox, go to the
-{\tt Open cube...} option in the {\tt File menu}.
+\latex{Figure~\ref{sc16_gaia_cubetool_fig})}.
 
-\myfig{sc16_gaia_cubetool.eps}{height=0.45\textheight}{sc16_gaia_cubetool.gif}{sc16_gaia_cubetool_fig}{The
+In the upper portion you may choose the axis perpendicular to the axes
+visible in the regular two-dimensional display; this will normally be
+the spectral axis, and that is what is assumed this manual.  You can
+select a plane to view in the main display by giving its index or
+adjusting the slider.  
+
+\myfig{sc16_gaia_cubetool.eps}{height=0.4\textheight}{sc16_gaia_cubetool.gif}{sc16_gaia_cubetool_fig}{The
 \GAIA\ toolbox for displaying a cube.}
 
-Once an image, be it a plane, passband image or map, you can use
-\GAIA's wide selection of 
+The lower portion of the toolbox has a tabbed interface to a selection
+of methods.  The controls change for each method.  Of particular note
+are the following methods.
+
+\begin{description}
+
+\item[{\tt Animation} tab]
+This steps through a range of planes automataically at a controlled rate.
+The animation can be captured to a GIF.
+
+\item[{\tt Spectrum} tab]
+This extends the basic behaviour of the \htmlref{spectrum
+plot}{sc16_spectral_plot} \latex{(see Section~\ref{sc16_spectral_plot}} 
+including defining the spectral limits.  You can also define spatial
+regions graphically, and thereby form a composite spectrum for an
+object.
+
+\item[{\tt Collapse} tab]
+This allows you collapse along the spectral axis over a defined range
+and offers a wide selection of combination options.  Most will form
+a `white-light' image in some form, but {\tt Iwc} gives a form of 
+velocity map, and {\tt Iwd} estimates the line dispersions.
+
+\item[{\tt Chanmap} tab]
+This forms a channel map comprising a grid of passband tiles, each tile
+being the result of collapsing a range of planes using one of the
+Collapse methods.  You can inspect the spectral co-ordinate of each 
+plane and with the cursor mark equivalent positions in every tile.
+
+\item[{\tt Rebin} tab]
+This allows you to increase the signal-to-noise by rebinning along one or
+more dimensions.
+ 
+\item[{\tt Filter} tab]
+This controls smoothing of image planes.
+
+\end{description}
+
+If you need to access the Cube toolbox, go to the {\tt Open cube...}
+option in the {\tt File} menu of the main display.
+
+Once you have an image displayed, be it a plane, passband image or
+channel map, you can then use \GAIA's wide selection of 
 \xref{image-display facilities}{sun214}{image_display_capabilities}
-\latex{described in SUN/214} (also see \xref{SC/17}{sc17}{}) to enhance 
-the elements under investigation.  There are also many \xref{analysis
-capabilities}{sun214}{image_analysis_capabilities} mostly through the
-({\tt Image-Analysis} menu), including masking and flux measurement.
+\latex{described in SUN/214} (also see \xref{SC/17}{sc17}{}) to
+enhance the elements under investigation.  There are also many
+\xref{analysis capabilities}{sun214}{image_analysis_capabilities}
+mostly through the ({\tt Image-Analysis} menu), including masking and
+flux measurement.
 
-For cubes the main additional feature (at the time of writing) is a
-dynamic spectrum display.  Once you have a representative image 
-displayed, if you click on the mouse over the image a line plot along
-the collapsed axis appears.  That will normally be a spectrum.
-As you drag the cursor holding down the first mouse button, the
-spectrum display updates to dynamically to reflect the current spatial
-location.  If you single click, the scaling limis adjust for the current
-pixel.  If you double-click at a location \GAIA\ creates a reference
-spectrum.  Then as you subsequently drag the mouse you can compare any
-of the spectra with the reference spectrum.   See 
-\begin{htmlonly}
+\subsubsection{Spectral plot\label{sc16_spectral_plot}}
+
+One of the most useful facilities for cube analysis is a dynamic
+spectrum display.  Once you have a representative image displayed,
+click on the mouse over the image a line plot along the spectral axis
+appears.  As you drag the cursor holding down the first mouse button,
+the spectrum display updates to dynamically to reflect the current
+spatial location while the data limits are unchanged.  If you click
+again the range will reset to the current spectrum.  You can enforce
+autoscaling as you drag too by enabling {\tt
+Options$\rightarrow$Autoscale} in the spectral plot's control bar.
+This is slower although it allows an intensity independent comparison
+of the spectra.  The {\bf Spectrum} tab \htmlref{mentioned
+earlier}{sc16_cube_toolbox} also allows control of the plotting range
+along both axes. The {\tt Reference: Set} button lets you nominate the
+current spectrum as a reference spectrum.  Then as you subsequently
+drag the mouse you can compare any of the spectra with the reference
+spectrum.  See 
+\begin{htmlonly} 
 the figure below.
-\end{htmlonly}
+\end{htmlonly} 
 \latex{Figure~\ref{sc16_gaia_spectrum_fig}.}
+\newpage
 
-\myfig{sc16_gaia_spectrum.eps}{height=0.7\textheight}{sc16_gaia_spectrum.gif}{sc16_gaia_spectrum_fig}{\GAIA\ 
-displays a logarithmically scaled, collapsed cube, from which
-two spectra are shown.  The green reference spectrum is from the spatial position
-marked by the green cross, and the other spectrum corresponds to the
-blue cross.}
+\myfig{sc16_gaia_spectrum.eps}{height=0.7\textheight}{sc16_gaia_spectrum.gif}{sc16_gaia_spectrum_fig}{\GAIA\
+displays a logarithmically scaled, collapsed cube, from which two
+spectra are shown.  The \latexhtml{lighter}{green} reference spectrum
+is from the spatial position marked by the \latexhtml{central}{green}
+cross, and the other spectrum corresponds to the
+\latexhtml{left}{blue} cross.}
+
+The vertical red line shows the plane being displayed in the main
+viewer.  You can drag that line with the mouse to adjust the plane on view,
+say to inspect where emission at a chosen velocity lies spatially.
 
 Further features of the spectral viewer can be found in the online help.
 
+\subsubsection{Volume Visualisation}
+The {\tt View} menu in the \htmlref{cube toolbox}{sc16_cube_toolbox}
+offers two interactive rendering functions that let you explore your
+cube in three dimensions.
+
+The first of these is iso-surface.  It's akin to contouring of an image
+extended to three dimensions.  Each coloured surface corresponds to a constant data
+value.  In order to see inside a surface, each surface should have an opacity
+that is less than 1.0.  An example using the same Orion dataset is in
+\begin{htmlonly}
+the figure below.
+\end{htmlonly}
+\latex{Figure~\ref{sc16_gaia_isosurface_fig}.}
+
+\myfig{sc16_gaia_isosurface.eps}{height=0.46\textheight}{sc16_gaia_isosurface.gif}{sc16_gaia_isosurface_fig}{Isophotal
+contours with various colours and opacities allows you to see different depths. }
+
+Just as with the contouring in \GAIA, there are different methods to
+generate iso-surface levels authomatically, as well as manually.
+
+You can adjust the viewing angle and zoom factor either with the
+mouse, or with the keyboard for finer control.  The online help lists
+the various controls.  There are many options to control the
+appearance, such as directional and annotated axes.  \GAIA\ can also
+display the current slice and displayed spectrum.  It is also possible
+to display two cubes simultaneously, say to compare data from
+different wavelengths measuring different molecular species.  \GAIA\
+provides a number of alignment options in this regard.
+\medskip
+
+The second function is volume rendering.  It displays all the data within
+two data limits as a single volume.  You assign a colour and opacity to each
+limit.  The controls and options are the same as for the iso-surfaces.
+See 
+\begin{htmlonly}
+the figure below.
+\end{htmlonly}
+\latex{Figure~\ref{sc16_gaia_volume_fig}.}
+
+\myfig{sc16_gaia_volume.eps}{height=0.6\textheight}{sc16_gaia_volume.gif}{sc16_gaia_volume_fig}{Volume
+rendering of the Orion dataset.  The colour transfer function is a
+simple mapping between two selected colours between a supplied data
+range.}
+
+These visualisation functions place heavy demands on computer memory
+and CPU.  Also a modern graphics card with hardware support for OpenGL
+makes a huge difference in interactive performance.  So you will need
+a modern machine to get the best out of these tools.  Of the two tools,
+iso-surface is quicker to render and uses less memory.
+
+\newpage
 \subsection{\xlabel{sc16_idl}IDL and data visualisation\label{sc16_idl}}
 
 \htmladdnormallink{IDL}{http://www.rsinc.com/} has extensive
@@ -2418,10 +2658,12 @@ wavelength direction a pixel at a time.
 
 There is now a \KAPPA\ command \xref{{\bf chanmap}}{sun95}{CHANMAP} task
 that forms an image of abutting channels or passbands of equal depth.
-Once created you may view the passband image with \GAIAref\ or
+It is also available from the \htmlref{cube toolbox}{sc16_cube_toolbox} 
+in \GAIAref.  Once created you may view the passband image with \GAIA\ or
 \xref{{\bf display}}{sun95}{DISPLAY}.  To read off the
-three-dimensional co-ordinates of features, the latter requires 
-\xref{{\bf display}}{sun95}{CURSOR}.
+three-dimensional co-ordinates of features, in \GAIA\ use
+{\tt Image-Analysis$\rightarrow$Change Coordinates$\rightarrow$Show
+All Coordinates\ldots}, and in \KAPPA\ run \xref{{\bf cursor}}{sun95}{CURSOR}.
 
 \subsubsection{How do I extract individual spectra?}
 
@@ -2564,6 +2806,9 @@ button to terminate.  However, if we carried on and selected a further
 spectrum it would replace our original in the upper-right panel of the
 display window.  Selecting a further spectrum would replace the
 lower-right panel.  The location of each new spectrum plot alternates.
+
+Also see \htmlref{how \GAIA compares spectra}{sc16_spectral_plot}
+\latex{Section~\ref{sc16_spectral_plot}}.
 
 \subsubsection{How do I plot stacked spectra?}
 
@@ -2891,6 +3136,10 @@ routine.  However, you are not restricted to just refitting those points
 where the script was unable to obtain a fit, you may manually refit
 any data point in the velocity map.
 
+There is a {\tt -a} option where you can review each fit at each
+spatial pixel.   The fit parameters can be logged to a 
+\xref{Small Text List}{sun190}{} with the {\tt -l} option.
+
 \paragraph{\label{sc16_velmoment}\latex{\vspace*{0.8em}}By
 moments\latex{\newline}\xlabel{sc16_velmoment}}
 
@@ -3040,17 +3289,19 @@ white-light image of a mosaic of two data cubes created using {\bf makemos};
 a dashed line has been drawn on to the image for clarity.}
 
 Unfortunately mosaicking therefore relies critically on WCS
-information provided in the cube \FITSref\ headers.  Currently the form
-this information takes varies between cubes from different
+information provided in the cube \FITSref\ headers.  Currently the
+form this information takes varies between cubes from different
 instruments; and sometimes where active development work is ongoing,
 between different cubes produced by the same instrument.  It is
 therefore very difficult to provide a `catch all' script or even
 recipe to allow you to mosaic two cubes together as yet.  The
 agreement of a standard for the spectroscopic world co-ordinates
-promulgated in FITS {\tt astro-ph/0507293} should diminish the problem.
-At the time of writing the Starlink \xref{AST}{sun210}{} already
-supports spectral frames (these are used to compute the velocities in
-{\bf velmap}), and most features of this FITS standard.
+promulgated in FITS (Greisen {\em et al.}, 2006, {\em Representations 
+of spectral coordinates in FITS}, Astronomy \& Astrophysics 446,747)
+should diminish the problem. At the time of writing the Starlink
+\xref{AST}{sun210}{} already supports spectral frames (these are used
+to compute the velocities in {\bf velmap}), and most features of this
+FITS standard.
 
 If the data cubes to be combined have valid WCS information,
 you should try the \xref{{\bf wcsmosaic}}{sun95}{WCSMOSAIC} task.
@@ -3496,7 +3747,7 @@ http://www.roe.ac.uk/ukatc/projects/uist/}}{http://www.roe.ac.uk/ukatc/projects/
 
 \section*{\xlabel{sc16_acks}Acknowledgments\label{sc16_acks}}
 
-In compiling this document I have again leant heavily on already
+In compiling this document I (AA) have again leant heavily on already
 available material, and the help of many people in the IFS community.
 However, special thanks should go to \htmladdnormallink{Rachel
 Johnston}{http://www.ast.cam.ac.uk/~raj/}, \htmladdnormallink{Jeremy
