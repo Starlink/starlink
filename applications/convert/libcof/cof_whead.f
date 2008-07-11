@@ -603,8 +603,8 @@
      :              ( KEYWRD .NE. 'DATASUM' )
 
 
-*  Cannot use provenance keywords in the airlock when there a
-*  ROVENANCE extension to supersede them.
+*  Cannot use provenance keywords in the airlock when there is a
+*  PROVENANCE extension to supersede them.
             IF ( PROVPR ) THEN
 
 *  Test for CADC provenance keywords.  While these may not be unique, 
