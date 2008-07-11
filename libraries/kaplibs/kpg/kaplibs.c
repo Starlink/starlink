@@ -20,7 +20,8 @@
 *     not already included.
 
 *  Copyright:
-*     Copyright (C) 2005 Particle Physics & Astronomy Research Council.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2005-2007 Particle Physics & Astronomy Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -59,6 +60,8 @@
 *        Added kpg1_gtwcs.
 *     7-FEB-2007 (DSB):
 *        Added kpg1_medur.
+*     10-JUL-2008 (TIMJ):
+*        Use starmem
 *     {enter_further_changes_here}
 
 *-
@@ -70,6 +73,7 @@
 #include "sae_par.h"
 #include "mers.h"
 #include "star/grp.h"
+#include "star/mem.h"
 #include "star/hds_fortran.h"
 #include "kaplibs.h"
 #include "kaplibs_private.h"
@@ -443,7 +447,7 @@ void irqRlse( IRQLocs **locs, int *status ){
    datExportFloc( &( (*locs)->loc[2] ), 1, DAT__SZLOC, LOCS[2], status );
    datExportFloc( &( (*locs)->loc[3] ), 1, DAT__SZLOC, LOCS[3], status );
    datExportFloc( &( (*locs)->loc[4] ), 1, DAT__SZLOC, LOCS[4], status );
-   free( *locs );
+   starFree( *locs );
    *locs = NULL;
 
 /* Free the DAT__SZLOC character locators, etc. */
@@ -491,7 +495,7 @@ void irqNew( int indf, const char *xname, IRQLocs **locs, int *status ){
    F77_IMPORT_INTEGER( STATUS, *status );
 
    if( *status == SAI__OK ) {
-      *locs = malloc( sizeof( IRQLocs ) );
+      *locs = starMalloc( sizeof( IRQLocs ) );
       if( *locs ) {
          for( j = 0; j < 5; j++ ) (*locs)->loc[j] = NULL;
          for( j = 0; j < 5; j++ ) {
@@ -546,7 +550,7 @@ void irqFind( int indf, IRQLocs **locs, char xname[DAT__SZNAM + 1], int *status 
    F77_IMPORT_CHARACTER( XNAME, XNAME_length, xname );
 
    if( *status == SAI__OK ) {
-      *locs = malloc( sizeof( IRQLocs ) );
+      *locs = starMalloc( sizeof( IRQLocs ) );
       if( *locs ) {
          for( j = 0; j < 5; j++ ) (*locs)->loc[j] = NULL;
          for( j = 0; j < 5; j++ ) {
