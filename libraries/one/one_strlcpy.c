@@ -49,6 +49,8 @@
 *  History:
 *     2008-05-29 (TIMJ):
 *        Initial version.
+*     2008-07-10 (TIMJ):
+*        Trap null pointers.
 
 *  Notes:
 *     - This is for use from C only. 
@@ -84,6 +86,7 @@
 #include <config.h>
 #endif
 
+#include "ems.h"
 #include "one.h"
 #include "one_err.h"
 #include "sae_par.h"
@@ -108,6 +111,18 @@ one_strlcpy( char * dest, const char * src, size_t size, int * status ) {
   }
 
   if (*status != SAI__OK) return retval;
+
+  /* Trap null pointers - since strlcpy won't */
+  if (!dest) {
+    *status = SAI__ERROR;
+    emsRep( " ", "one_strlcpy: Destination string is a NULL pointer "
+            "(possible programming error)", status);
+  }
+  if (!src) {
+    *status = SAI__ERROR;
+    emsRep( " ", "one_strlcpy: Source string is a NULL pointer "
+            "(possible programming error)", status);
+  }
 
   /* BSD function */
   retval = strlcpy( dest, src, size );
