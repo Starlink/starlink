@@ -214,12 +214,14 @@
 
 *  Copyright:
 *     Copyright (C) 1995, 2000-2001, 2004 Central Laboratory of the
-*     Research Councils. All Rights Reserved.
+*     Research Councils. 
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
 *     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
+*     published by the Free Software Foundation; either Version 2 of
 *     the License, or (at your option) any later version.
 *
 *     This program is distributed in the hope that it will be
@@ -229,8 +231,8 @@
 *
 *     You should have received a copy of the GNU General Public License
 *     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+*     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+*     02111-1307, USA.
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -250,6 +252,8 @@
 *        Use CNF_PVAL
 *     30-SEP-2004 (PWD):
 *        Moved CNF_PAR to declaration section.
+*     2008 June 17 (MJC):
+*        Trim trailing blanks from output NDF character components.
 *     {enter_further_changes_here}
 
 *-
@@ -313,6 +317,7 @@
       INTEGER MAP                ! Base->Current Mapping (1->1)
       INTEGER MAP0               ! Base->Current Mapping (nin->nout)
       INTEGER NBAD               ! No. of bad values produced
+      INTEGER NC                 ! Used length of string
       INTEGER NDF                ! Input NDF identifier
       INTEGER NDF2               ! NDF identifier for the LIKE parameter
       INTEGER NDIM               ! Number of dimensions of NDF
@@ -351,18 +356,18 @@
       CALL LPG_ASSOC( 'NDF', 'UPDATE', NDF, STATUS )
 
 *  Abort if an error occurred. 
-      IF( STATUS .NE. SAI__OK ) GO TO 999
+      IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Obtain an identifier for an NDF containing AXIS structures to be
 *  copied to the first NDF.
       CALL LPG_ASSOC( 'LIKE', 'READ', NDF2, STATUS )
 
 *  If an NDF was supplied, use it.
-      IF( STATUS .EQ. SAI__OK ) THEN 
+      IF ( STATUS .EQ. SAI__OK ) THEN 
          CALL KPS1_SAXLK( NDF, NDF2, STATUS )
 
 *  If no LIKE NDF was supplied, annul the error and continue.
-      ELSE IF( STATUS .EQ. PAR__NULL ) THEN
+      ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )      
 
 *  Find the number of dimensions, and bounds in the NDF.
@@ -851,10 +856,10 @@
             NOUT = AST_GETI( MAP0, 'NOUT', STATUS )
 
 *  Abort if the output Frame does not include the requested axis index.
-            IF( NOUT .LT. IAXIS .AND. STATUS .EQ. SAI__OK ) THEN
+            IF ( NOUT .LT. IAXIS .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI( 'NOUT', NOUT )
-               IF( NOUT .EQ. 1 ) THEN
+               IF ( NOUT .EQ. 1 ) THEN
                   CALL MSG_SETC( 'NOUT', ' axis' )
                ELSE
                   CALL MSG_SETC( 'NOUT', ' axes' )
@@ -920,7 +925,7 @@
      :                       NBAD, STATUS )
 
 *  Report an error if they are all bad.
-            IF( NBAD .EQ. EL .AND. STATUS .EQ. SAI__OK ) THEN
+            IF ( NBAD .EQ. EL .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI( 'I', IAXIS )
                CALL NDF_MSG( 'NDF', NDF )
@@ -945,21 +950,29 @@
      :                          %VAL( CNF_PVAL( AXPNTR( 1 ) ) ), 
      :                          EL, STATUS )
 
-*  Set up the axis label and units.
+*  Set up the axis label and units.  Note that NDF_ACPUT does not 
+*  truncate trailing blanks.
                ATTR = 'LABEL('
                IAT = 6
                CALL CHR_PUTI( IAXIS, ATTR, IAT )
                CALL CHR_APPND( ')', ATTR, IAT )
                CVAL = AST_GETC( IWCS, ATTR( : IAT ), STATUS )
-               IF( CVAL .NE. ' ' ) CALL NDF_ACPUT( CVAL, NDF, 'LABEL', 
-     :                                          IAXIS, STATUS )
+               IF ( CVAL .NE. ' ' ) THEN
+                  NC = CHR_LEN( CVAL )
+                  CALL NDF_ACPUT( CVAL( :NC ), NDF, 'LABEL', IAXIS,
+     :                            STATUS )
+               END IF
+
                ATTR = 'UNIT('
                IAT = 6
                CALL CHR_PUTI( IAXIS, ATTR, IAT )
                CALL CHR_APPND( ')', ATTR, IAT )
                CVAL = AST_GETC( IWCS, ATTR( : IAT ), STATUS )
-               IF( CVAL .NE. ' ' ) CALL NDF_ACPUT( CVAL, NDF, 'UNITS', 
-     :                                          IAXIS, STATUS )
+               IF ( CVAL .NE. ' ' ) THEN
+                  NC = CHR_LEN( CVAL )
+                  CALL NDF_ACPUT( CVAL( :NC ), NDF, 'UNITS', IAXIS,
+     :                            STATUS )
+               END IF
 
             END IF
 
