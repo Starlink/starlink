@@ -77,6 +77,7 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -86,8 +87,10 @@
 *        Check that NDF extension is an HDS Structure before using
 *        it with HDS routines which require a structure.
 *     7-MAR-2008 (DSB):
-*        Check that NDF extension is an scalar before using it with HDS 
+*        Check that NDF extension is a scalar before using it with HDS 
 *        routines which require a scalar.
+*     10-JUL-2008 (TIMJ):
+*        Initialise QNLOC and XNAME to resolve valgrind warnings.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -139,6 +142,8 @@
 
 *  Initialise the number of QUALITY_NAMES structures found to zero.
       NFOUND = 0
+      QNLOC = DAT__NOLOC
+      XNAME = ' '
 
 *  Check that the supplied character variables LOCS are long enough to
 *  hold HDS locators.
