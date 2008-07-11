@@ -89,6 +89,8 @@
 *        Remove debugging printf statements.
 *     2008-5-01 (DSB):
 *        Display any warnings placed in the FitsChan by AST.
+*     2008-07-10 (TIMJ):
+*        Free dark squid information.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -288,6 +290,7 @@ void smf_close_file( smfData ** data, int * status ) {
     da = (*data)->da;
     da->flatcal = smf_free( da->flatcal, status );
     da->flatpar = smf_free( da->flatpar, status );
+    da->dksquid = smf_free( da->dksquid, status );
     da = smf_free( da, status );
   }
 

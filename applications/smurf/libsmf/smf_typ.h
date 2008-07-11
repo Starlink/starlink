@@ -132,6 +132,8 @@
 *     2008-07-03 (EC)
 *        -Changed type to dim_t from int for smfArray.ndat and 
 *         smfGroup.ngroups/nrelated
+*     2008-07-10 (TIMJ):
+*        DA struct now includes dark squid
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -291,6 +293,7 @@ typedef struct smfDA {
   double *flatpar;           /* pointer to flatfield parameters */
   char flatname[SC2STORE_FLATLEN]; /* name of flatfield algorithm */
   size_t nflat;              /* number of flat coeffs per bol */
+  int *dksquid;              /* dark squid for each column */
 } smfDA;
 
 /* This struct stores DREAM parameters */

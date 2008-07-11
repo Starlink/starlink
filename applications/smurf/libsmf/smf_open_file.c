@@ -168,6 +168,8 @@
  *     2008-06-20 (DSB):
  *        Ensure that sc2store_rdtstream never maps the data array or dark
  *        squid values if the SMF__NOCREATE_DATA flag is supplied.
+ *     2008-07-10 (TIMJ):
+ *        Read dark squid information.
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -652,6 +654,15 @@ void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
                                         rowsize* da->nflat);
         if (da->flatpar != NULL) memcpy(da->flatpar, flatpar,
                                         sizeof(double)* da->nflat);
+
+        /* and dark squid */
+        if (dksquid) {
+          da->dksquid = smf_malloc( colsize * nframes, sizeof(int), 0,
+                                    status );
+          if (da->dksquid) memcpy( da->dksquid, dksquid,
+                                   sizeof(int) * colsize * nframes );
+
+        }
 
         /* Create a FitsChan from the FITS headers */
         if ( !(flags & SMF__NOCREATE_HEAD) ) {
