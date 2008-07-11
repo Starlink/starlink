@@ -158,6 +158,7 @@ void smf_history_write( const smfData* data, const char * appl,
   ndfState( file->ndfid, "HISTORY", &state, status );
   if ( state == 1 ) {
     /* If present, write the information to the file */
+    linarr[0] = buffer;
     one_strlcpy( linarr[0], text, sizeof(buffer), status);
     ndfHput("NORMAL", appl, 0, 1, linarr, 1, 1, 1, file->ndfid, status );
     /* Needed to write a separate line for each call of ndfHput */
