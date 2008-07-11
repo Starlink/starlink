@@ -207,7 +207,7 @@
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
 *     12-MAY-2005 (PWD):
-*        Normalise coordinates written to logfile.
+*        Normalise co-ordinates written to logfile.
 *     15-FEB-2007 (TIMJ):
 *        - Use parameters rather than bare numbers
 *        - write centre position of first star to STDOUT and parameter
@@ -307,7 +307,7 @@
       DOUBLE PRECISION SIGOUT    ! Sigma in Current Frame 
       DOUBLE PRECISION XOUT      ! Current Frame axis 1 centre
       DOUBLE PRECISION YOUT      ! Current Frame axis 2 centre
-      DOUBLE PRECISION NORMS( 2 ) ! Normalized axis centres.
+      DOUBLE PRECISION NORMS( 2 ) ! Normalized axis centres
       INTEGER BINPTS             ! Number of pixels in to be considered
       INTEGER DAPTR              ! Pointer to the workspace for the radial-bin pixels
       INTEGER FRM2               ! FWHM reporting Frame
@@ -369,7 +369,7 @@
 
 *  Is the Current Frame a SkyFrame? If so, set an appropriate Format 
       GOTSKY = AST_ISASKYFRAME( CFRM, STATUS ) 
-      IF( GOTSKY ) THEN
+      IF ( GOTSKY ) THEN
 
 *  We need to know if the axes are swapped so that we can tell which axis
 *  is latitude and which is longitude. This is far more complex than it
@@ -392,8 +392,8 @@
          FRM2 = AST_COPY( CFRM, STATUS )
 
 *  Set the Format attribute of Axis 1 of the SkyFrame so that
-*  the FWHM values are displayed as arc-seconds, with 2 decimal places.
-         FWHMUN = 'arc-seconds'
+*  the FWHM values are displayed as arcseconds, with two decimal places.
+         FWHMUN = 'arcseconds'
          CALL AST_SETC( FRM2, 'FORMAT(1)', 's.2', STATUS )
 
 *  If the Current Frame is not a SkyFrame, arbitrarily use axis 1. Get its
@@ -414,7 +414,7 @@
          CALL CHR_APPND( AST_GETC( CFRM, 'LABEL(1)', STATUS ), BUFFER,
      :                  IAT )
          UNIT = AST_GETC( CFRM, 'UNIT(1)', STATUS )
-         IF( UNIT .NE. ' ' ) THEN
+         IF ( UNIT .NE. ' ' ) THEN
             CALL CHR_APPND( ' ( units: ''', BUFFER, IAT )
             CALL CHR_APPND( UNIT, BUFFER, IAT )
             CALL CHR_APPND( ''' )', BUFFER, IAT )
@@ -428,7 +428,7 @@
          CALL CHR_APPND( AST_GETC( CFRM, 'LABEL(2)', STATUS ), BUFFER,
      :                  IAT )
          UNIT = AST_GETC( CFRM, 'UNIT(2)', STATUS )
-         IF( UNIT .NE. ' ' ) THEN
+         IF ( UNIT .NE. ' ' ) THEN
             CALL CHR_APPND( ' ( units: ''', BUFFER, IAT )
             CALL CHR_APPND( UNIT, BUFFER, IAT )
             CALL CHR_APPND( ''' )', BUFFER, IAT )
@@ -436,7 +436,7 @@
          CALL FIO_WRITE( FD, BUFFER( :IAT ), STATUS )
 
 *  Print description of FWHM units
-         IF( FWHMUN .NE. ' ' ) THEN
+         IF ( FWHMUN .NE. ' ' ) THEN
             BUFFER = ' '
             IAT = 0
             CALL CHR_APPND( '   FWHM units: ''', BUFFER, IAT )
@@ -446,7 +446,7 @@
          END IF
 
 *  Print description of angles.
-         IF( GOTSKY ) THEN
+         IF ( GOTSKY ) THEN
             CALL FIO_WRITE( FD, '   Angles measured in degrees, from '//
      :                      'north through east.', STATUS )
          ELSE
@@ -478,7 +478,7 @@
          DO I = 1, NXY
 
 *  Get its identifier.
-            IF( GOTIDS ) THEN
+            IF ( GOTIDS ) THEN
                ID = IDS( I )
             ELSE
                ID = I
@@ -521,7 +521,7 @@
                CALL CHR_LDBLK( FMTVAL )
                FVAL = FMTVAL
 
-*  If this is the first star we need to store the coordinates
+*  If this is the first star we need to store the co-ordinates
 *  Only write out to screen if this is the only star
                IF ( I .EQ. 1 ) THEN
                   XVAL1 = XVAL
@@ -678,10 +678,10 @@
  10   CONTINUE
 
 *  Write to log file if required.
-      IF( LOGF ) THEN
+      IF ( LOGF ) THEN
 
 *  Print the mean results.
-         IF( AXROUT .NE. VAL__BADR ) THEN
+         IF ( AXROUT .NE. VAL__BADR ) THEN
             WRITE ( BUFFER, '( ''   Mean axis ratio ='', SS, G11.4 )' ) 
      :              AXROUT
             CALL FIO_WRITE( FD, BUFFER( :31 ), STATUS )
@@ -693,7 +693,7 @@
          BUFFER = ' '
          CALL FIO_WRITE( FD, BUFFER( 1:1 ), STATUS )
 
-         IF( ANGOUT  .NE. VAL__BADR ) THEN
+         IF ( ANGOUT  .NE. VAL__BADR ) THEN
             WRITE ( BUFFER, '( ''   Mean orientation of major axis ='','
      :              //'SS, G11.4, '' degrees'' )' ) ANGOUT * REAL(DR2D)
             CALL FIO_WRITE( FD, BUFFER( :54 ), STATUS )
@@ -708,7 +708,7 @@
       END IF
 
 *  Now display them on the screen.
-      IF( AXROUT  .NE. VAL__BADR ) THEN
+      IF ( AXROUT  .NE. VAL__BADR ) THEN
          CALL MSG_FMTR( 'A', 'G11.4', AXROUT )
       ELSE
          CALL MSG_SETC( 'A', '(undefined)' )
@@ -716,7 +716,7 @@
 
       CALL MSG_OUT( ' ', '   Mean axis ratio = ^A', STATUS )
 
-      IF( ANGOUT  .NE. VAL__BADR ) THEN
+      IF ( ANGOUT  .NE. VAL__BADR ) THEN
          CALL MSG_FMTR( 'A', 'G11.4', ANGOUT*REAL(DR2D) )
          CALL MSG_SETC( 'A', ' degrees' )
       ELSE
@@ -726,8 +726,8 @@
       CALL MSG_OUT( ' ', '   Mean orientation of major axis = ^A', 
      :              STATUS )
 
-      IF( ANGOUT  .NE. VAL__BADR ) THEN
-         IF( GOTSKY ) THEN
+      IF ( ANGOUT  .NE. VAL__BADR ) THEN
+         IF ( GOTSKY ) THEN
             CALL MSG_OUT( ' ', '     (measured from north through '//
      :                    'east)', STATUS )
          ELSE
@@ -746,16 +746,16 @@
 
 *  Determine the scale factor for converting minor axis distances expressed 
 *  in pixels into equivalent distances in the Current Frame.
-         IF( SIG0 .NE. 0.0 ) THEN
+         IF ( SIG0 .NE. 0.0 ) THEN
             SCALE = SIGOUT/SIG0
          ELSE
             SCALE = 1.0
          END IF
 
 *  If the current Frame is a SkyFrame, radial distances are displayed in
-*  arc-seconds. but SIGOUT will be in radians. Add a factor to convert
-*  radians into arc-seconds.
-         IF( GOTSKY ) SCALE = SCALE*REAL(DAS2R)
+*  arcseconds, but SIGOUT will be in radians. Add a factor to convert
+*  radians into arcseconds.
+         IF ( GOTSKY ) SCALE = SCALE * REAL( DAS2R )
 
 *  Calculate the scale factors for converting radial distance to bins.
          RSCALE = RESOL1 * 2.0 / MIN( 2.0, SIG0 )
@@ -769,7 +769,7 @@
 
 *  The limits on WIDTH above may have caused a change in the effective
 *  value of LIMIT. Calculate a new value for LIMIT.
-         IF( AXISR .NE. 0.0 .AND. SIG0 .NE. 0.0 ) THEN
+         IF ( AXISR .NE. 0.0 .AND. SIG0 .NE. 0.0 ) THEN
             LIMIT = REAL( WIDTH - 1 )/( 2.0*AXISR )
 
 *  Find and return the value of range implied by this new LIMIT.
@@ -851,7 +851,7 @@
 
 *  Set the scale factor for the Y axis to give either a peak value of 1.0
 *  or a peak value equal to the first usable star.
-         IF( NM ) THEN
+         IF ( NM ) THEN
             YSCALE = 1.0/AMP
             YUNITS = ' '
          ELSE
@@ -897,7 +897,7 @@
             CALL MSG_OUT( 'GAMMAREP', BUFFER, STATUS )
             IF ( LOGF ) CALL FIO_WRITE( FD, BUFFER( :21 ), STATUS )
 
-            IF( .NOT. NM ) THEN
+            IF ( .NOT. NM ) THEN
                WRITE ( BUFFER, '( ''   Peak value ='', SS, G11.4 )' ) 
      :               AMP1
                CALL MSG_OUT( 'AMPREP', BUFFER, STATUS )
@@ -906,7 +906,7 @@
             END IF
 
             CALL MSG_OUT( 'BLANK', ' ', STATUS )
-            IF( LOGF ) CALL FIO_WRITE( FD, ' ', STATUS )
+            IF ( LOGF ) CALL FIO_WRITE( FD, ' ', STATUS )
 
          END IF
 
