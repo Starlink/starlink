@@ -959,7 +959,7 @@ void smf_simpleaddmap( double *map1, double *mapweight1,
                        int *status );
 
 
-int *smf_find_median( float *farray, double *darray, int nel, 
+int *smf_find_median( float *farray, double *darray, size_t nel, 
                       int *hist, float *median, int *status );
 
 void smf_checkmem_map( const int *lbnd, const int *ubnd, int rebin, 

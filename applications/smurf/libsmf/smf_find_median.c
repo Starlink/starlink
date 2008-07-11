@@ -33,10 +33,10 @@
 *        supplied, a new array is allocated.
 *     median = float * (Returned)
 *        Pointer to a float in which to returned the median value in
-*        farray or darray (which ever is supplied).
+*        farray or darray (which ever is supplied). Will be set to VAL__BADR
+*        on error.
 *     status = int * (Given and Returned)
-*        Inherited status value. This function attempts to execute even
-*        if status is set to an error value on entry.
+*        Inherited status value.
 
 *  Returned Value:
 *     A pointer to the histogram array that was used. This will be a copy
@@ -56,6 +56,10 @@
 *  History:
 *     23-APR-2008 (DSB):
 *        Initial version.
+*     10-JUL-2008 (TIMJ):
+*        - Fix bug and optimize when nel == 1
+*        - Report error if result can not be allocated
+*        - Use size_t in API
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -88,8 +92,10 @@
 #include "prm_par.h"
 #include "mers.h"
 #include "star/kaplibs.h"
+#include "smf.h"
+#include "smf_err.h"
 
-int *smf_find_median( float *farray, double *darray, int nel, 
+int *smf_find_median( float *farray, double *darray, size_t nel, 
                       int *hist, float *median, int *status ){
 
 /* Local Variables */
@@ -102,10 +108,31 @@ int *smf_find_median( float *farray, double *darray, int nel,
    float fvalmax;
    float fvalmin;
    int *result;
-   int numbin;
+   size_t numbin;
+
+/* pre-fill */
+   *median = VAL__BADR;
 
 /* Check the inherited status */
    if( *status != SAI__OK ) return hist;
+
+/* Sanity check */
+   if (!farray && !darray) {
+     *status = SAI__ERROR;
+     errRep(" ", "smf_find_median called with both darray and farray NULL"
+            " (possible programming error)", status);
+     return NULL;
+   }
+
+/* Special case a single bin */
+   if (nel == 1) {
+     if (farray) {
+       *median = farray[0];
+     } else {
+       if (darray[0] != VAL__BADD) *median = darray[0];
+     }
+     return hist;
+   }
 
 /* Decide on the number of bins in the histogram. This is chosen so that
    each bin has an average population of 2 points. */
@@ -159,6 +186,11 @@ int *smf_find_median( float *farray, double *darray, int nel,
 
 /* Convert the median value to single precision. */
       *median = ( dmedian != VAL__BADD ) ? dmedian : VAL__BADR;
+   } else {
+       *status = SMF__NOMEM;
+       msgSeti( "NB", numbin);
+       errRep(" ", "smf_find_median unable to allocate memory for histogram"
+              " of ^NB bins", status);  
    }
 
 /* Return a pointer to the histogram array. */
