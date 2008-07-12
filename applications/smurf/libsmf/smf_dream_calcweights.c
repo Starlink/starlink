@@ -69,10 +69,12 @@
 *        smooth error reporting
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-07-11 (AGG):
+*        Hand off heavy lifting to calcmapwt routine in sc2math
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006-2007 University of British Columbia. All
+*     Copyright (C) 2006-2008 University of British Columbia. All
 *     Rights Reserved.
 
 *  Licence:
@@ -130,59 +132,36 @@
 
 void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index, 
 			    const double gridstep, const int ngrid,
-			    const int *gridminmax, int gridpts[][2],
+			    int *gridminmax, int gridpts[][2],
 			    int *status) {
 
   /* Local Variables */
-  int conv_shape = CONV__SINCTAP; /* Code for convolution function */
-  double conv_sig = 1.0;      /* Convolution function parameter */
-  dim_t dims[2];              /* Dimensions of output NDFs */
-  double dmin;                /* Minimum found during inversion */
-  smfDream *dream = NULL;     /* DREAM parameters obtained from input data file */
-  int err;                    /* Error in reducing */
-  int *gridext;               /* Min/max extent of reconstruction grid */
-  int gridndf;                /* NDF identifier for grid parameters */
-  void *gridpntr[3];          /* Some where for ndfMap */
-  smfData *gwtdata = NULL;    /* Grid weights */
-  int gwtndf;                 /* NDF identifier for grid weights */
-  smfHead *hdr = NULL;        /* Header for input data */
-  int i;                      /* Loop counter */
-  smfData *invdata = NULL;    /* Inverse matrix */
-  int invndf;                 /* NDF identifier for inverse matrix */
-  int ipos;                   /* Position in reconstructed map */
-  int j;                      /* Loop counter */
-  int jgrid;                  /* Counter through reconstructed map */
-  int jpos;                   /* Position in reconstructed map */
-  int k;                      /* Loop counter */
-  int l;                      /* Loop counter */
-  int lbnd[2];                /* Lower bounds */
-  int loc;                    /* Matrix location */
-  int nbol;                   /* Total number of bolometers */
-  int nbolx;                  /* Number of bolometers in X direction */
-  int nboly;                  /* Number of bolometers in Y direction */
-  int nelem;                  /* Number of elements in mapped array */
-  int nframes;                /* Number of timeslices in input data */
-  int nsampcycle;             /* Number of samples in a jiggle cycle */
-  int numsamples;             /* Number of time samples in input data */
-  int nunkno;                 /* Number of unknowns to sovle for */
-  char obsmode[LEN__METHOD+1]; /* Observing mode */
-  smfData *odata = NULL;      /* Output data */
-  smfFile *ofile = NULL;      /* File information for output file */
-  double *par = NULL;         /* Pointer to array for problem equations */
-  double *pout = NULL;        /* Pointer to grid weights array */
-  double *pswt = NULL;        /* Pointer to array for normal equations */
-  int skyheight;              /* Height of DREAM footprint on sky */
-  int skywid;                 /* Width of DREAM footprint on sky */
+  int conv_shape = CONV__SINCTAP;/* Code for convolution function */
+  double conv_sig = 1.0;        /* Convolution function parameter */
+  smfDream *dream = NULL;       /* DREAM parameters obtained from input data file */
+  char filename[GRP__SZNAM+1];  /* Input filename, derived from GRP */
+  double *gridwts = NULL;       /* Pointer to array of grid weights */
+  int gridwtsdim[DREAM__MXGRID];/* Dimensions of grid weights array*/
+  smfHead *hdr = NULL;          /* Header for input data */
+  double *invmat = NULL;        /* Pointer to inverted matrix */
+  int invmatdim;                /* Size of inverted matrix */
+  int jigext[4] = {-1, 1, -1, 1}; /* Extents in the X, Y directions of the
+				     jiggle pattern */
+  int nbol;                     /* Total number of bolometers */
+  int nbolx;                    /* Number of bolometers in X direction */
+  int nboly;                    /* Number of bolometers in Y direction */
+  int nframes;                  /* Number of timeslices in input data */
+  int nsampcycle;               /* Number of samples in a jiggle cycle */
+  char obsmode[LEN__METHOD+1];  /* Observing mode */
+  char *pname = NULL;           /* Pointer to filename string */
+  int *qual = NULL;             /* True/false `quality' array (not NDF quality) */
+  int qualdim[2];               /* Dimensions of quality array */
+  int smu_move = 8;             /* Code for SMU motion*/
+  double smu_offset = 0.0;      /* SMU timing offset in ms */
   char subarray[SUB__MAXNAM+1]; /* Name of subarray */
-  double tbol;                /* Bolometer time constant */
-  int *tmpptr = NULL;         /* Temporary pointer */
-  double tsamp;               /* Sample time */
-  int ubnd[2];                /* Upper bounds */
-  HDSLoc *weightsloc = NULL;  /* Locator for writing out weights */
-  int xmax;                   /* Maximum X extent of array */
-  int xmin;                   /* Minimum X extent of array */
-  int ymax;                   /* Maximum Y extent of array */
-  int ymin;                   /* Minimum Y extent of array */
+  double tsamp;                 /* Sample/step time in seconds */
+  int tvert;			/* Time between vertices in ms (aka leg length) */
+  int windext[4];               /* Size of the window for constructing a DREAM image */
 
   if ( *status != SAI__OK) return;
 
@@ -196,176 +175,58 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
     if ( strncmp( obsmode, "DREAM", 5) == 0 ) {
       /* OK we have DREAM data */
       dream = data->dream;
-      /* BEGIN processing */
       /* Read DREAM parameters from input file */
       smf_fits_getS( hdr, "SUBARRAY", subarray, SUB__MAXNAM+1, status);
       smf_fits_getD( hdr, "STEPTIME", &tsamp, status);
+      /* Convert steptime into millisec */
       tsamp *= 1000.0;
+      nsampcycle = dream->nsampcycle;
+      tvert = tsamp*nsampcycle/(dream->nvert);
 
-      nsampcycle = (int)(dream->nsampcycle);
-      dream->gridstep = gridstep;
-      dream->ngrid = (size_t)ngrid;
+      msgSeti("I",index);
+      msgOutif(MSG__VERB," ", "Beginning weights calculation for file ^I: this will take some time (~5-10 mins)", status);
 
-      /* Rescale the jigpath array in terms of the reconstruction grid */
-      smf_dream_setjig( subarray, nsampcycle, gridstep, dream->jigpath, status );
-	  
-      /* Open the output file and map arrays */
-      lbnd[0] = 0;
-      lbnd[1] = 1;
-      ubnd[0] = 0;
-      ubnd[1] = 1;
-      smf_open_newfile( ogrp, index, SMF__INTEGER, 2, lbnd, ubnd, 0, &odata, status);
-      tmpptr = smf_malloc( 1, sizeof(int), 0, status );
-      (odata->pntr)[0] = tmpptr;
-      memset( tmpptr, 1, sizeof(int));
-      if ( odata == NULL ) {
-	if ( *status == SAI__OK) {
-	  *status = SAI__ERROR;
-	  errRep(FUNC_NAME, "Unable to open new output file", status);
-	}
-      } else {
-	msgSeti("I",index);
-	msgOutif(MSG__VERB," ", "Beginning weights calculation for file ^I: this will take some time (~5-10 mins)", status);
-	ofile = odata->file;
-	weightsloc = smf_get_xloc( odata, "DREAM", "DREAM_WEIGHTS", "WRITE",
-				   0, NULL, status );
-	/* Create NDF for GRIDWTS array */
-	lbnd[0] = 1;
-	lbnd[1] = 1;
-	ubnd[0] = ngrid;
-	ubnd[1] = nsampcycle;
-	gwtndf = smf_get_ndfid( weightsloc, "GRIDWTS", "WRITE", "NEW", 
-				"_DOUBLE", 2, lbnd, ubnd, status );
-	smf_open_ndf( gwtndf, "WRITE", ofile->name, SMF__DOUBLE, &gwtdata, 
-		      status );
-	
-	pout = (gwtdata->pntr)[0];
-	/* Calculate the pixel equation coefficients. It is ASSUMED
-	   that all bolometer time constants are the same! */
-	tbol = 5.0;
+      /* Determine the grid of jiggle patterns */
+      sc2math_jig2grid( subarray, gridstep, nsampcycle, 
+			dream->jigpath, &(dream->jiggrid[0]), status );
 
-	/* Put in pout all the sky grid weights for all measurements
-	   with a single bolometer */
-	sc2math_interpwt ( nsampcycle, ngrid, conv_shape, conv_sig, 
-			   tsamp, tbol, dream->jigpath, &(gridpts[0]), pout, 
-			   status );
 
-	/* Calculate the size of the sky map which includes all the
-	   grid points contributing to all the bolometers */
-	nbolx = (data->dims)[0];
-	nboly = (data->dims)[1];
-	nbol = nbolx * nboly;
-	sc2math_gridext ( ngrid, &(gridpts[0]), &xmin, &xmax, &ymin, &ymax,
-			  status );
-	skywid = nbolx + xmax - xmin;
-	skyheight = nboly + ymax - ymin;
-	
-	nunkno = skywid * skyheight + nbol;
-	  
-	/* Create NDF for INVMATX array */
-	lbnd[0] = 1;
-	ubnd[0] = ( nunkno * ( nunkno + 1 ) ) / 2;
-	invndf = smf_get_ndfid( weightsloc, "INVMATX", "WRITE", "NEW",
-				"_DOUBLE", 1, lbnd, ubnd, status );
-	smf_open_ndf( invndf, "WRITE", ofile->name, SMF__DOUBLE, &invdata, 
-		      status );
+      /* Some useful shortcuts. Maybe. */
+      nbolx = (data->dims)[0];
+      nboly = (data->dims)[1];
+      nbol = nbolx * nboly;
 
-	/* Initialise the parameter array to zero */
-	par = smf_malloc( nunkno, sizeof(double), 1, status );
-	/* Initialise the array to hold the parameters of the normal
-	   equations to zero */
-	pswt = (invdata->pntr)[0];
-	for ( j=0; j<ubnd[0]; j++ ) {
-	  pswt[j] = 0.0;
-	}
-	
-	/* Generate the parameters of one problem equation at a time
-	   and collect them into the normal equation array */
-	for ( j=0; j<nboly; j++ ) {
-	  for ( i=0; i<nbolx; i++ ) {
-	    /* Set the flag corresponding to the zero point of
-	       this bolometer */
-	    par[j*nbolx+i] = 1.0;
-	    for ( k=0; k<nsampcycle; k++ ) {
-	      /* Set the weight for all the sky grid points relevant
-		 at this path point of this bolometer */
-	      for ( l=0; l<ngrid; l++ ) {
-		ipos = i - xmin + gridpts[l][0];
-		jpos = j - ymin + gridpts[l][1];
-		jgrid = jpos * skywid + ipos;
-		par[nbol+jgrid] = pout[ngrid*k+l];
-	      }
-	      /* Insert the parameters into the accumulating normal
-		 equations */
-	      sc2math_eq0 ( nunkno, par, pswt );
-	      /* Unset the weight for all the sky grid points relevant
-		 at this path point of this bolometer */
-	      for ( l=0; l<ngrid; l++ ) {
-		ipos = i - xmin + gridpts[l][0];
-		jpos = j - ymin + gridpts[l][1];
-		jgrid = jpos * skywid + ipos;
-		par[nbol+jgrid] = 0.0;
-	      }
-	    }
-	    /* Unset the flag corresponding to the zero point of this
-	       bolometer */
-	    par[j*nbolx+i] = 0.0;
-	  }
-	}
-	/* Provide the constraint that the sum of all bolometer zero
-	   points is zero */
-	for ( j=0; j<nbol; j++ ) {
-	  par[j] = 1.0;
-	}
-	sc2math_eq0 ( nunkno, par, pswt );
-	/* Invert the normal equation matrix */
-	sc2math_cholesky ( nunkno, pswt, &loc, &dmin, &err );
-	/* Check return error flag */
-	if ( err == -1 ) {
-	  if ( *status == SAI__OK ) {
-	    *status = SAI__ERROR;
-	    msgSeti("D", loc);
-	    msgSetd("E", dmin);
-	    errRep( FUNC_NAME, "Matrix not positive definite: "
-		    "element ^D cannot be replaced by SQRT ^E", status);
-	  }
-	} else if ( err == 1 ) {
-	  if ( *status == SAI__OK ) {
-	    *status = SAI__ERROR;
-	    msgSeti("D", loc);
-	    msgSetd("E", dmin);
-	    errRep( FUNC_NAME, "Warning - loss of significance: "
-		    "matrix element ^D is replaced by ^E. This is too unreliable to continue", status);
-	  }
-	}
-		
-	/* Create new extension to store grid parameters */
-	lbnd[0] = 1;
-	ubnd[0] = 4;
-	gridndf = smf_get_ndfid( weightsloc, "GRIDEXT", "WRITE", "NEW", 
-				 "_INTEGER", 1, lbnd, ubnd, status);
-	ndfMap( gridndf, "DATA", "_INTEGER", "WRITE", gridpntr, &nelem, 
-		status);
-  gridext = gridpntr[0];
-	/* If all is well, copy gridminmax into gridext */
-	if ( *status == SAI__OK ) {
-	  for (j=0; j<nelem; j++) {
-	    gridext[j] = gridminmax[j];
-	  }
-	}
-	/* Write grid size into output file */
-	ndfXpt0d( gridstep, ofile->ndfid, "DREAM", "GRID_SIZE", status);
-	ndfAnnul( &gridndf, status );
+      /* Allocate quality array */
+      qualdim[0] = nbolx;
+      qualdim[1] = nboly;
+      qual = smf_malloc( qualdim[0]*qualdim[1], sizeof(int), 1, status );
 
-	par = smf_free( par, status );
-	smf_close_file( &gwtdata, status );
-	smf_close_file( &invdata, status );
-	datAnnul( &weightsloc, status );
+
+      sc2math_calcmapwt( subarray, nbolx, nboly,
+			 qual, conv_shape, conv_sig, gridstep, 
+			 dream->nvert, tvert, tsamp, 
+			 dream->jigvert, dream->jigscal, dream->jigscal, smu_move, 
+			 smu_offset, ngrid, gridpts, &(gridwtsdim[0]), &gridwts, 
+			 &invmatdim, &invmat, status);
+
+      /* Dummy definition of window - this must be derived somehow TBD */
+      windext[0] = 0;
+      windext[1] = (data->dims)[0] - 1;
+      windext[2] = 0;
+      windext[3] = (data->dims)[1] - 1;
+
+      /* Obtain filename to write weights into */
+      pname = filename;
+      grpGet( ogrp, index, 1, &pname, SMF_PATH_MAX, status);
+      if ( *status != SAI__OK ) {
+	errRep(FUNC_NAME, "Unable to retrieve file name in which to store weights solution", status);
       }
 
-      /* Close output file */
-      smf_close_file( &odata, status );
-      /* END processing */
+      /* Store DREAM weights in output file */
+      sc2store_cremapwts ( pname, windext, gridminmax, gridstep, jigext,
+			   dream->jigscal, gridwtsdim, gridwts, invmatdim, invmat, 
+			   qualdim, qual, status );
+
     } else {
       msgSeti("I", index);
       msgOutif(MSG__VERB," ", 
@@ -374,7 +235,7 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
   } else {
     if ( *status == SAI__OK ) {
       *status = SAI__ERROR;
-      errRep(FUNC_NAME, "Data are not in timeseries format", status);
+      errRep(FUNC_NAME, "Data must be in timeseries format to calculate DREAM weights", status);
     }
   }
 }
