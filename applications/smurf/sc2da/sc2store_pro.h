@@ -302,8 +302,8 @@ size_t *nframes,         /* number of frames (returned) */
 size_t *nflat,           /* number of flat coeffs per bol (returned) */
 char *flatname,          /* name of flatfield algorithm (returned) */
 JCMTState *frhead[],     /* header data for each frame (returned) */
-int **outdata,           /* pointer to data array (returned) */
-int **dksquid,           /* pointer to dark SQUID values (returned) */
+int **outdata,           /* pointer to data array (returned), or NULL */
+int **dksquid,           /* pointer to dark SQUID values (returned), or NULL */
 double **flatcal,        /* pointer to flatfield calibration (returned) */
 double **flatpar,        /* pointer to flatfield parameters (returned) */
 int **jigvert,           /* pointer to DREAM jiggle vertices (returned) */
