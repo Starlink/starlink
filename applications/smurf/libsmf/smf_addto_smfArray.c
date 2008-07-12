@@ -13,12 +13,12 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_addto_smfArray( smfArray *ary, const smfData *data, int * status );
+*     smf_addto_smfArray( smfArray *ary, smfData *data, int * status );
 
 *  Arguments:
 *     ary = smfArray* (Given and Returned)
 *        Pointer to smfArray to populate
-*     data = const smfData* (Given)
+*     data = smfData* (Given)
 *        Pointer to smfData to be added
 *     status = int* (Given and Returned)
 *        Pointer to global status.

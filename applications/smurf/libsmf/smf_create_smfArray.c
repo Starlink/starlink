@@ -13,22 +13,20 @@
 *     Subroutine
 
 *  Invocation:
-*     pntr = smf_create_smfArray( const size_t size, int * status );
+*     pntr = smf_create_smfArray(  int * status );
 
 *  Arguments:
-*     size = size_t (Given)
-*        Number of smfDatas to allocate pointers for
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Return Value:
 *     smf_create_smfArray = smfArray*
-*        Pointer to newly created smfArray. NULL on error.
+*        Pointer to newly created smfArray. NULL on error. Must be
+*        freed using smf_free.
 
 *  Description:
 *     This function allocates memory for a smfArray structure, sets
-*     the pointers to smfDatas to NULL and sets the number of smfDatas
-*     to be stored.
+*     the pointers to smfDatas to NULL.
 
 *  Notes:
 *     This routine makes the assumption that there cannot be more than
