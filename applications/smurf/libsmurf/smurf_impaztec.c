@@ -157,6 +157,8 @@
 #include "libsc2sim/sc2sim_struct.h"
 #include "libsc2sim/sc2sim.h"
 
+#include "libaztec/aztec.h"
+
 /* netCDF includes */
 #if HAVE_LIBNETCDF
 #include "netcdf.h"
