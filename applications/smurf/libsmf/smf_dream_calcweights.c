@@ -133,7 +133,7 @@
 
 void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index, 
 			    const double gridstep, const int ngrid,
-			    int *gridminmax, int gridpts[][2],
+			    const int *gridminmax, int gridpts[][2],
 			    int *status) {
 
   /* Local Variables */
