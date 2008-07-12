@@ -65,6 +65,8 @@ main () {
 
   dest1[0] = '\0';
   
+  /* Test strlcpy */
+
   len = one_strlcpy( dest1, src1, ONEBUFSIZ, &status );
   printf("Copied %d characters to destination\n", (int)len);
   if (len != strlen(src1)) {
@@ -72,7 +74,7 @@ main () {
     exstat = EXIT_FAILURE;
   }
   if (status != SAI__OK) {
-    printf("Status bad on first srlcpy\n");
+    printf("Status bad on first strlcpy\n");
     exstat = EXIT_FAILURE;
   }
 
@@ -80,12 +82,37 @@ main () {
   len = one_strlcpy( dest1, src2, ONEBUFSIZ, &status );
   if (status == ONE__TRUNC) {
     printf("Correctly truncated string to %d characters\n",(int)len);
+    printf("--->%s<---\n", dest1);
     emsAnnul( &status );
   } else {
     printf("Did not set status to ONE__TRUNC. Copied %d characters\n",
            (int)len);
     exstat = EXIT_FAILURE;
   }
+
+  /* Appending */
+  len = one_strlcpy( dest1, src1, ONEBUFSIZ, &status );
+  len = one_strlcat( dest1, "XX", ONEBUFSIZ, &status );
+  if (len != strlen(dest1)) {
+    printf("Did not append string correctly\n");
+    exstat = EXIT_FAILURE;
+  }
+  if (status != SAI__OK) {
+    printf("Status bad on first strncat\n");
+    exstat = EXIT_FAILURE;
+  }
+
+  len = one_strlcat( dest1, src2, ONEBUFSIZ, &status );
+  if (status == ONE__TRUNC) {
+    printf("Correctly truncated string to %d characters\n", (int)len);
+    printf("--->%s<---\n", dest1);
+    emsAnnul( &status );
+  } else {
+    printf("Did not get truncation status. Copied %d characters\n",
+           (int)len);
+    exstat = EXIT_FAILURE;
+  }
+
   return exstat;
 
 }

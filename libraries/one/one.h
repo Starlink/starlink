@@ -50,6 +50,8 @@
 
 size_t
 one_strlcpy( char * dest, const char * src, size_t size, int * status );
+size_t
+one_strlcat( char * dest, const char * src, size_t size, int * status );
 
 
 /* STAR_ONE_H_INCLUDED */

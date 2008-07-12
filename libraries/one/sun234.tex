@@ -575,6 +575,9 @@ The contents of the library are (in alphabetical order):\\
     Taken from CONVERT, KAPPA and IRCAMPACK.}
 \noteroutine{ONE\_SHELL\_ECHO( FILESPEC, FILENAME, STATUS )}
     {Expands shell metacharacters in a string without file globbing.}
+\noteroutine{one\_strlcat( dest, src, sizedest, status )}
+    {Wrapper around the standard BSD strlcat C function (safer variant
+      of strncat).}
 \noteroutine{one\_strlcpy( dest, src, sizedest, status )}
     {Wrapper around the standard BSD strlcpy C function (safer variant of strncpy).}
 \section{Routines descriptions}
@@ -831,6 +834,66 @@ There follows a full description of the library routines in alphabetical order:
             \sstitem
             ONE\_\_MALLOCERR - Malloc error
          }
+      }
+   }
+}
+\sstroutine{
+   one\_strlcat
+}{
+   Starlink compliant wrapper around the BSD strlcat function
+}{
+   \sstdescription{
+      The strlcat function is similar to the strncpy function except
+      that it guarantees to nul terminate the destination string
+      and returns the number of characters that will have been copied.
+      This wrapper function provides standard Starlink inherited status
+      semantics.
+   }
+   \sstinvocation{
+      len = one\_strlcat( char $*$ dest, const char $*$ src,
+                         size\_t sizedest, int $*$ status );
+   }
+   \sstarguments{
+      \sstsubsection{
+         dest = char $*$ (Returned)
+      }{
+         Destination buffer for {\tt "}src{\tt "}. Must be nul-terminated.
+         If status is bad on entry ''dest'' will not be touched.
+      }
+      \sstsubsection{
+         src = const char $*$ (Given)
+      }{
+         String to be copied.
+      }
+      \sstsubsection{
+         sizedest = size\_t (Given)
+      }{
+         The actual buffer size of {\tt "}dest{\tt "} including space for a nul.
+      }
+      \sstsubsection{
+         status = int $*$ (Given and Returned)
+      }{
+         Inherited status. Will be set to ONE\_\_TRUNC if the string
+         was truncated on copy.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         size\_t retval
+      }{
+         Length of the string after appending. Will either be
+         the length of the source string or one less than the
+         size of the destination buffer.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This is for use from C only.
+
+         \sstitem
+         If available the system strlcat routine will be used.
       }
    }
 }

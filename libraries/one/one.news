@@ -24,6 +24,9 @@
    - one_strlcpy: C wrapper around the BSD strlcpy function which itself
       is a safer replacement for the standard strncpy function.
 
+   - one_strlcat: C wrapper around the BSD strlcat function which itself
+      is a safer replacement for the standard strncat function.
+
 2 Changes_in_ONE
 
 3 V1.2
