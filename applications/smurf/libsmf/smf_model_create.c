@@ -138,11 +138,13 @@
 *        - const mname since smf_model_getname now returns const
 *     2008-07-03 (EC):
 *        Changed nchunks to dim_t
+*     2008-07-11 (TIMJ):
+*        Use one_strlcpy/strlcat
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2006-2008 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -184,6 +186,7 @@
 #include "star/ndg.h"
 #include "prm_par.h"
 #include "par_par.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
@@ -218,6 +221,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
   dim_t j;                      /* Loop counter */
   int k;                        /* Loop counter */
   dim_t l;                      /* Loop counter */
+  size_t len = 0;               /* size of buffer */
   Grp *mgrp=NULL;               /* Temporary group to hold model names */
   const char *mname=NULL;       /* String model component name */
   int msize=0;                  /* Number of files in model group */
@@ -277,11 +281,10 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
     mname = smf_model_getname( mtype, status );
 
     /* Form a group expression for the filename */
-    if( *status == SAI__OK ) {
-      strncpy( fname_grpex, "*_", GRP__SZNAM );
-      strncat( fname_grpex, mname, GRP__SZNAM );
-      strncat( fname_grpex, suffix, GRP__SZNAM );
-    }
+    len = sizeof(fname_grpex);
+    one_strlcpy( fname_grpex, "*_", len, status );
+    one_strlcat( fname_grpex, mname, len, status );
+    one_strlcat( fname_grpex, suffix, len, status );
 
     grpGrpex( fname_grpex, igroup->grp, mgrp, &msize, &added, &flag, status );
 
@@ -541,9 +544,10 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
 	    /* Otherwise get the name from the smfArray */
 	    mname = smf_model_getname( mtype, status );
 
-	    strncpy( name, idata->file->name, GRP__SZNAM );
-	    strncat( name, "_", GRP__SZNAM );
-	    strncat( name, mname, GRP__SZNAM );
+      len = sizeof(name);
+	    one_strlcpy( name, idata->file->name, len, status );
+	    one_strlcat( name, "_", len, status );
+	    one_strlcat( name, mname, len, status );
 	  }
 
 	  if( nofile ) {
@@ -680,7 +684,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
                    there may not be an associated file on disk we store
                    the name here in case we wish to export the data
                    to an NDF file at a later point. */
-		strncpy( data->file->name, name, SMF_PATH_MAX );
+		one_strlcpy( data->file->name, name, sizeof(data->file->name), status );
 		
 		/* Add the smfData to the smfArray */
 		smf_addto_smfArray( mdata[i], data, status );
