@@ -195,11 +195,11 @@
 #define FUNC_NAME "smf_model_create"
 
 void smf_model_create( const smfGroup *igroup, smfArray **iarray,
-		       dim_t nchunks, smf_modeltype mtype, int isTordered,
-		       AstFrameSet *outfset, int moving, 
-		       int *lbnd_out, int *ubnd_out,
-		       smfGroup **mgroup, int nofile, int leaveopen,
-		       smfArray **mdata, int *status ) {
+                       dim_t nchunks, smf_modeltype mtype, int isTordered,
+                       AstFrameSet *outfset, int moving, 
+                       int *lbnd_out, int *ubnd_out,
+                       smfGroup **mgroup, int nofile, int leaveopen,
+                       smfArray **mdata, int *status ) {
 
   /* Local Variables */
   int added=0;                  /* Number of names added to group */
@@ -244,19 +244,19 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
     if( iarray == NULL ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Neither igroup nor iarray specified", 
-	     status);        
+             status);        
     } else if( nchunks <= 0 ) {
       *status = SAI__ERROR;
       msgSeti("NCHUNKS",nchunks);
       errRep(FUNC_NAME, 
-	     "iarray specified but invalid number of chunks, ^NCHUNKS",
-	     status);        
+             "iarray specified but invalid number of chunks, ^NCHUNKS",
+             status);        
     } else {
       /* Since we're using smfArrays as template, no associated files */
       nofile = 1;
 
       /* We have at most SMF__MXSMF related objects (subarrays) at each time 
-	 chunk */
+         chunk */
       nrel = SMF__MXSMF;
 
       /* NULL mgroup since we won't be using it */
@@ -291,7 +291,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
     if( (*status == SAI__OK) && (msize != isize) ) {
       *status = SAI__ERROR;
       errRep(FUNC_NAME, "Couldn't create group of NDF model containers.", 
-	     status);        
+             status);        
     }
 
     /* Now that we have the Grp of names, create a new smfGroup with the same
@@ -299,8 +299,8 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
        mgrp afterward. */
 
     *mgroup = smf_construct_smfGroup( mgrp, igroup->subgroups, igroup->chunk,
-				      igroup->ngroups, igroup->nrelated, 1, 
-				      status );
+                                      igroup->ngroups, igroup->nrelated, 1, 
+                                      status );
 
     if( mgrp ) grpDelet( &mgrp, status );
   }
@@ -324,410 +324,410 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
   /* Loop over time chunks */
   if( *status == SAI__OK ) for( i=0; i<nchunks; i++ ) {
     
-    /* For models that only have one file per subgroup fix up 
-       mgroup such that only the first filename in each subgroup
-       is used. Do this by setting remaining elements of mgroup->subgroups
-       to 0. nrel is 1. */
+      /* For models that only have one file per subgroup fix up 
+         mgroup such that only the first filename in each subgroup
+         is used. Do this by setting remaining elements of mgroup->subgroups
+         to 0. nrel is 1. */
 
-    if( mtype == SMF__COM ) {
-      if (mgroup != NULL) {
-	for( j=1; j<(*mgroup)->nrelated; j++ ) {
-	  (*mgroup)->subgroups[i][j] = 0;
-	}
+      if( mtype == SMF__COM ) {
+        if (mgroup != NULL) {
+          for( j=1; j<(*mgroup)->nrelated; j++ ) {
+            (*mgroup)->subgroups[i][j] = 0;
+          }
+        }
+
+        nrel = 1;
       }
 
-      nrel = 1;
-    }
+      /* Check to see how many related elements in this chunk */
 
-    /* Check to see how many related elements in this chunk */
+      thisnrel = 0;
 
-    thisnrel = 0;
+      for( j=0; j<nrel; j++ ) {
+        /* Check mgroup if we're using igroup as a template */
+        if( mgroup != NULL ) {
 
-    for( j=0; j<nrel; j++ ) {
-      /* Check mgroup if we're using igroup as a template */
-      if( mgroup != NULL ) {
-
-	/* Check for non-zero grp index at this position */
-	if( (*mgroup)->subgroups[i][j] != 0 ) {
-	  thisnrel = j+1;
-	} else {
-	  /* If grp index is 0 we've reached the end of the subarrays. Set
-             the exit condition */
-	  j=nrel;
-	}
+          /* Check for non-zero grp index at this position */
+          if( (*mgroup)->subgroups[i][j] != 0 ) {
+            thisnrel = j+1;
+          } else {
+            /* If grp index is 0 we've reached the end of the subarrays. Set
+               the exit condition */
+            j=nrel;
+          }
+        }
       }
-    }
 
-    if( mgroup == NULL ) {
-      /* Otherwise just check the iarray */
-      thisnrel = iarray[i]->ndat;
+      if( mgroup == NULL ) {
+        /* Otherwise just check the iarray */
+        thisnrel = iarray[i]->ndat;
 
-      /* Ensure that thisnrel isn't bigger than nrel */
-      if( thisnrel > nrel ) {
-	thisnrel = nrel;
+        /* Ensure that thisnrel isn't bigger than nrel */
+        if( thisnrel > nrel ) {
+          thisnrel = nrel;
+        }
       }
-    }
 
-    /* Loop over subarrays */
-    for( j=0; j<thisnrel; j++ ) {
+      /* Loop over subarrays */
+      for( j=0; j<thisnrel; j++ ) {
     
-      /* Open the relevant template file if using igroup */
-      if( igroup ) {
+        /* Open the relevant template file if using igroup */
+        if( igroup ) {
 	
-	/* obtain grp idx for j'th element of i'th subgroup */
-	idx=(*mgroup)->subgroups[i][j];
+          /* obtain grp idx for j'th element of i'th subgroup */
+          idx=(*mgroup)->subgroups[i][j];
 	
-	/* Only continue if there is a valid idx */
-	if( idx > 0 ) {
+          /* Only continue if there is a valid idx */
+          if( idx > 0 ) {
 	  
-	  /* Open the template file - flags are set above depending
-             on the type of model. If we're propagating input, then
-             do an open_and_flatfield */
+            /* Open the template file - flags are set above depending
+               on the type of model. If we're propagating input, then
+               do an open_and_flatfield */
 
-	  if( copyinput ) {
-	    smf_open_and_flatfield( igroup->grp, NULL, idx, &idata, status );
-	  } else {
-	    smf_open_file( igroup->grp, idx, "READ", oflag, &idata, status );
-	  }
+            if( copyinput ) {
+              smf_open_and_flatfield( igroup->grp, NULL, idx, &idata, status );
+            } else {
+              smf_open_file( igroup->grp, idx, "READ", oflag, &idata, status );
+            }
 	
-	  /* Calculate the LUT if necessary */
+            /* Calculate the LUT if necessary */
 	  
-	  if( mtype == SMF__LUT ) {
-	    smf_calc_mapcoord( idata, outfset, moving, lbnd_out, 
-			       ubnd_out, SMF__NOCREATE_FILE, status );
-	  }
+            if( mtype == SMF__LUT ) {
+              smf_calc_mapcoord( idata, outfset, moving, lbnd_out, 
+                                 ubnd_out, SMF__NOCREATE_FILE, status );
+            }
 
-	}
+          }
 
-      } else {
-	/* Otherwise obtain a pointer to the relevant smfData in the
-	   template smfArray at this time chunk */
-	idata = iarray[i]->sdata[j];
-      }
+        } else {
+          /* Otherwise obtain a pointer to the relevant smfData in the
+             template smfArray at this time chunk */
+          idata = iarray[i]->sdata[j];
+        }
 
-      /* Assert the data order in the template */
-      smf_dataOrder( idata, isTordered, status );
+        /* Assert the data order in the template */
+        smf_dataOrder( idata, isTordered, status );
 
-      /* Check that the template is time-varying data */
+        /* Check that the template is time-varying data */
 
-      if( *status == SAI__OK ) {
-	if( idata->ndims != 3 ) {
-	  *status = SAI__ERROR;
-	  errRep(FUNC_NAME, "Template data is not time-varying!", 
-		 status);      
-	}
+        if( *status == SAI__OK ) {
+          if( idata->ndims != 3 ) {
+            *status = SAI__ERROR;
+            errRep(FUNC_NAME, "Template data is not time-varying!", 
+                   status);      
+          }
 	
-      }
+        }
       
-      if( *status == SAI__OK ) {
+        if( *status == SAI__OK ) {
 	  
-	  /* initialize the header */
+          /* initialize the header */
 	  
-	  memset( &head, 0, sizeof(head) );
-	  head.dtype=SMF__NULL;
+          memset( &head, 0, sizeof(head) );
+          head.dtype=SMF__NULL;
 	  
-	  /* Determine dimensions of model component */
+          /* Determine dimensions of model component */
 	  
-	  switch( mtype ) {
+          switch( mtype ) {
 	    
-	  case SMF__CUM: /* Cumulative model */
-	    head.dtype = SMF__DOUBLE;
-	    head.ndims = 3;
-	    head.dims[0] = (idata->dims)[0];
-	    head.dims[1] = (idata->dims)[1];
-	    head.dims[2] = (idata->dims)[2];
-	    break;
+          case SMF__CUM: /* Cumulative model */
+            head.dtype = SMF__DOUBLE;
+            head.ndims = 3;
+            head.dims[0] = (idata->dims)[0];
+            head.dims[1] = (idata->dims)[1];
+            head.dims[2] = (idata->dims)[2];
+            break;
 	    
-	  case SMF__RES: /* Model residual */
-	    /* Nothing here since copyinput set */
-	    break;
+          case SMF__RES: /* Model residual */
+            /* Nothing here since copyinput set */
+            break;
 	    
-	  case SMF__AST: /* Time-domain projection of map */
-	    head.dtype = SMF__DOUBLE;
-	    head.ndims = 3;
-	    head.dims[0] = (idata->dims)[0];
-	    head.dims[1] = (idata->dims)[1];
-	    head.dims[2] = (idata->dims)[2];
-	    break;
+          case SMF__AST: /* Time-domain projection of map */
+            head.dtype = SMF__DOUBLE;
+            head.ndims = 3;
+            head.dims[0] = (idata->dims)[0];
+            head.dims[1] = (idata->dims)[1];
+            head.dims[2] = (idata->dims)[2];
+            break;
 	    
-	  case SMF__COM: /* Common-mode at each time step */
-	    head.dtype = SMF__DOUBLE;
-	    head.ndims = 1;
+          case SMF__COM: /* Common-mode at each time step */
+            head.dtype = SMF__DOUBLE;
+            head.ndims = 1;
 
-	    if( isTordered ) { /* T is 3rd axis if time-ordered */
-	      head.dims[0] = (idata->dims)[2]; 
-	    } else {           /* T is 1st axis if bolo-ordered */
-	      head.dims[0] = (idata->dims)[0]; 
-	    }
-	    break;
+            if( isTordered ) { /* T is 3rd axis if time-ordered */
+              head.dims[0] = (idata->dims)[2]; 
+            } else {           /* T is 1st axis if bolo-ordered */
+              head.dims[0] = (idata->dims)[0]; 
+            }
+            break;
 	
-	  case SMF__NOI: /* Noise model */
-	    head.dtype = SMF__DOUBLE;
-	    head.ndims = 3;
-	    head.dims[0] = (idata->dims)[0];
-	    head.dims[1] = (idata->dims)[1];
-	    head.dims[2] = (idata->dims)[2];
-	    break;
+          case SMF__NOI: /* Noise model */
+            head.dtype = SMF__DOUBLE;
+            head.ndims = 3;
+            head.dims[0] = (idata->dims)[0];
+            head.dims[1] = (idata->dims)[1];
+            head.dims[2] = (idata->dims)[2];
+            break;
 
-	  case SMF__EXT: /* Extinction correction - gain for each bolo/time */
-	    head.dtype = SMF__DOUBLE;
-	    head.ndims = 3;
-	    head.dims[0] = (idata->dims)[0];
-	    head.dims[1] = (idata->dims)[1];
-	    head.dims[2] = (idata->dims)[2];
-	    break;
+          case SMF__EXT: /* Extinction correction - gain for each bolo/time */
+            head.dtype = SMF__DOUBLE;
+            head.ndims = 3;
+            head.dims[0] = (idata->dims)[0];
+            head.dims[1] = (idata->dims)[1];
+            head.dims[2] = (idata->dims)[2];
+            break;
 
-	  case SMF__LUT: /* Pointing LookUp Table for each data point */
-	    head.dtype = SMF__INTEGER;
-	    head.ndims = 3;
-	    head.dims[0] = (idata->dims)[0];
-	    head.dims[1] = (idata->dims)[1];
-	    head.dims[2] = (idata->dims)[2];
-	    break;
+          case SMF__LUT: /* Pointing LookUp Table for each data point */
+            head.dtype = SMF__INTEGER;
+            head.ndims = 3;
+            head.dims[0] = (idata->dims)[0];
+            head.dims[1] = (idata->dims)[1];
+            head.dims[2] = (idata->dims)[2];
+            break;
 
-	  case SMF__QUA: /* Quality byte for each data point */
-	    head.dtype = SMF__UBYTE;
-	    head.ndims = 3;
-	    head.dims[0] = (idata->dims)[0];
-	    head.dims[1] = (idata->dims)[1];
-	    head.dims[2] = (idata->dims)[2];
-	    break;
+          case SMF__QUA: /* Quality byte for each data point */
+            head.dtype = SMF__UBYTE;
+            head.ndims = 3;
+            head.dims[0] = (idata->dims)[0];
+            head.dims[1] = (idata->dims)[1];
+            head.dims[2] = (idata->dims)[2];
+            break;
 
-	  default:
-	    *status = SAI__ERROR;
-	    msgSetc( "TYPE", smf_model_getname(mtype, status) );
-	    errRep(FUNC_NAME, "Don't know how to handle model type ^TYPE",
-		   status);
-	  }
+          default:
+            *status = SAI__ERROR;
+            msgSetc( "TYPE", smf_model_getname(mtype, status) );
+            errRep(FUNC_NAME, "Don't know how to handle model type ^TYPE",
+                   status);
+          }
 
-	  /* Propagate information from template if copying */
-	  if( copyinput ) { /* If copying input, copy data dims directly */
-	    head.dtype = idata->dtype; /* Inherit data type from template */
-	    head.ndims = idata->ndims;
-	    for( k=0; k<head.ndims; k++ ) {
-	      head.dims[k] = (idata->dims)[k];
-	    }
-	  } 
+          /* Propagate information from template if copying */
+          if( copyinput ) { /* If copying input, copy data dims directly */
+            head.dtype = idata->dtype; /* Inherit data type from template */
+            head.ndims = idata->ndims;
+            for( k=0; k<head.ndims; k++ ) {
+              head.dims[k] = (idata->dims)[k];
+            }
+          } 
 
-	  /* Set the data-ordering flag in the header */
-	  head.isTordered = idata->isTordered;
+          /* Set the data-ordering flag in the header */
+          head.isTordered = idata->isTordered;
 
-	  /* Calculate the size of the data buffer. Format:
+          /* Calculate the size of the data buffer. Format:
 
-	  Header:
-	  smfData struct 
+             Header:
+             smfData struct 
 
-	  Data:
-	  buf   = [smf_dtype] * dims[0] * dims[1] * ...
-	  */
+             Data:
+             buf   = [smf_dtype] * dims[0] * dims[1] * ...
+          */
 
-	  /* Header must fit into integer multiple of pagesize so that the 
-	     data array starts on a page boundary (for later mmap) */
-	  pagesize = sysconf(_SC_PAGESIZE);
-	  headlen = sizeof(head);
-	  remainder = headlen % pagesize;
-	  if( remainder  ) headlen = headlen - remainder + pagesize;
+          /* Header must fit into integer multiple of pagesize so that the 
+             data array starts on a page boundary (for later mmap) */
+          pagesize = sysconf(_SC_PAGESIZE);
+          headlen = sizeof(head);
+          remainder = headlen % pagesize;
+          if( remainder  ) headlen = headlen - remainder + pagesize;
 
-	  /* Length of data array buffer */
-	  ndata = 1;
-	  for( k=0; k<head.ndims; k++ ) {
-	    ndata *= head.dims[k];
-	  }
-	  datalen = ndata * smf_dtype_sz(head.dtype, status); 
+          /* Length of data array buffer */
+          ndata = 1;
+          for( k=0; k<head.ndims; k++ ) {
+            ndata *= head.dims[k];
+          }
+          datalen = ndata * smf_dtype_sz(head.dtype, status); 
 
-	  if( mgroup != NULL ) {
-	    /* Obtain a character string corresponding to the file name 
-	       if we used a group as the template */
-	    pname = name;
-	    grpGet( (*mgroup)->grp, idx, 1, &pname, GRP__SZNAM, status );
-	  } else {
-	    /* Otherwise get the name from the smfArray */
-	    mname = smf_model_getname( mtype, status );
+          if( mgroup != NULL ) {
+            /* Obtain a character string corresponding to the file name 
+               if we used a group as the template */
+            pname = name;
+            grpGet( (*mgroup)->grp, idx, 1, &pname, GRP__SZNAM, status );
+          } else {
+            /* Otherwise get the name from the smfArray */
+            mname = smf_model_getname( mtype, status );
 
-      len = sizeof(name);
-	    one_strlcpy( name, idata->file->name, len, status );
-	    one_strlcat( name, "_", len, status );
-	    one_strlcat( name, mname, len, status );
-	  }
+            len = sizeof(name);
+            one_strlcpy( name, idata->file->name, len, status );
+            one_strlcat( name, "_", len, status );
+            one_strlcat( name, mname, len, status );
+          }
 
-	  if( nofile ) {
-	    /* If there is no file associated with the data, use smf_malloc 
-	       to allocate memory but don't initialize since we do that
+          if( nofile ) {
+            /* If there is no file associated with the data, use smf_malloc 
+               to allocate memory but don't initialize since we do that
                later */
 
-	    dataptr = smf_malloc( datalen, 1, 0, status );
+            dataptr = smf_malloc( datalen, 1, 0, status );
 	    
-	  } else {
-	    /* If we are writing a file create and map it here */
+          } else {
+            /* If we are writing a file create and map it here */
 	    
-	    if( (fd = open( name, O_RDWR | O_CREAT | O_TRUNC, 
-			    S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH )) == -1 ) {
-	      *status = SAI__ERROR;
-	      errRep( FUNC_NAME, "Unable to open model container file", 
-		      status );
-	    }
+            if( (fd = open( name, O_RDWR | O_CREAT | O_TRUNC, 
+                            S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH )) == -1 ) {
+              *status = SAI__ERROR;
+              errRep( FUNC_NAME, "Unable to open model container file", 
+                      status );
+            }
 	    
-	    /* First truncate the file to make it the correct size, and then
-	       map it (without the ftruncate bus errors are generated under
-	       linux when the memory is subsequently accessed...) */
+            /* First truncate the file to make it the correct size, and then
+               map it (without the ftruncate bus errors are generated under
+               linux when the memory is subsequently accessed...) */
 
-	    if( *status == SAI__OK ) {
-	      if( ftruncate( fd, datalen+headlen ) == -1 ) {
-		*status = SAI__ERROR;
-		errRep( FUNC_NAME, "Unable to re-size container file", 
-			status ); 
-	      } else if( (buf = mmap( 0, datalen+headlen, 
-				      PROT_READ | PROT_WRITE,
-				      MAP_SHARED, fd, 0 ) ) == MAP_FAILED ) {
-		*status = SAI__ERROR;
-		errRep( FUNC_NAME, "Unable to map model container file", 
-			status ); 
-	      }
-	    } 
+            if( *status == SAI__OK ) {
+              if( ftruncate( fd, datalen+headlen ) == -1 ) {
+                *status = SAI__ERROR;
+                errRep( FUNC_NAME, "Unable to re-size container file", 
+                        status ); 
+              } else if( (buf = mmap( 0, datalen+headlen, 
+                                      PROT_READ | PROT_WRITE,
+                                      MAP_SHARED, fd, 0 ) ) == MAP_FAILED ) {
+                *status = SAI__ERROR;
+                errRep( FUNC_NAME, "Unable to map model container file", 
+                        status ); 
+              }
+            } 
 
-	    if( *status == SAI__OK ) {
-	      headptr = buf;
-	      dataptr = (char *)buf + headlen;
+            if( *status == SAI__OK ) {
+              headptr = buf;
+              dataptr = (char *)buf + headlen;
 
-	      /* Fill the header. memset to 0 first since much of this space is
-		 padding to make it a multiple of the page size */
-	      memset( headptr, 0, headlen );
-	      memcpy( headptr, &head, sizeof(head) ); 
-	    }
-	  }
+              /* Fill the header. memset to 0 first since much of this space is
+                 padding to make it a multiple of the page size */
+              memset( headptr, 0, headlen );
+              memcpy( headptr, &head, sizeof(head) ); 
+            }
+          }
 
-	  /* Initialize the data buffer */
-	  if( *status == SAI__OK ) {
-	    if( copyinput ) {
-	      /* memcpy because target and source are same type */
-	      memcpy( dataptr, (idata->pntr)[0], datalen );
+          /* Initialize the data buffer */
+          if( *status == SAI__OK ) {
+            if( copyinput ) {
+              /* memcpy because target and source are same type */
+              memcpy( dataptr, (idata->pntr)[0], datalen );
 
-	    } else if( mtype == SMF__LUT ) {
-	      /* If this is a LUT copy it over from the template */
-	      if( idata->lut ) {	  
-		/* dataptr can be mmap'd or malloc'd memory */
-		memcpy( dataptr, idata->lut, datalen );
-	      } else {
-		*status = SAI__ERROR;
-		errRep(FUNC_NAME, "No LUT present in template for LUT model", 
-		       status);      
-	      }
+            } else if( mtype == SMF__LUT ) {
+              /* If this is a LUT copy it over from the template */
+              if( idata->lut ) {	  
+                /* dataptr can be mmap'd or malloc'd memory */
+                memcpy( dataptr, idata->lut, datalen );
+              } else {
+                *status = SAI__ERROR;
+                errRep(FUNC_NAME, "No LUT present in template for LUT model", 
+                       status);      
+              }
 	      
-	    } else if( mtype == SMF__NOI ) {
-	      /* If this is a NOI, set to 1 to avoid divide-by-zeros */
-	      if( head.dtype == SMF__DOUBLE ) {
-		for( l=0; l<ndata; l++ ) {
-		  ((double *) dataptr)[l] = 1;
-		}
-	      } else {
-		/* Generate error message if NOI is not double... */
-		*status = SAI__ERROR;
-		errRep(FUNC_NAME,
-		       "Possible programming error. NOI should be DOUBLE.", 
-		       status);
-	      }
+            } else if( mtype == SMF__NOI ) {
+              /* If this is a NOI, set to 1 to avoid divide-by-zeros */
+              if( head.dtype == SMF__DOUBLE ) {
+                for( l=0; l<ndata; l++ ) {
+                  ((double *) dataptr)[l] = 1;
+                }
+              } else {
+                /* Generate error message if NOI is not double... */
+                *status = SAI__ERROR;
+                errRep(FUNC_NAME,
+                       "Possible programming error. NOI should be DOUBLE.", 
+                       status);
+              }
 	      
-	    } else if( mtype == SMF__QUA ) {
-	      /* If this is a QUA, and quality available in template copy it */
-	      if( (idata->pntr)[2] ) {
-		memcpy( dataptr, (idata->pntr)[2], datalen );
-	      }
+            } else if( mtype == SMF__QUA ) {
+              /* If this is a QUA, and quality available in template copy it */
+              if( (idata->pntr)[2] ) {
+                memcpy( dataptr, (idata->pntr)[2], datalen );
+              }
 
-	    } else if( mtype == SMF__EXT ) {
-	      /* In this case run smf_correct_extinction on the input data
-		 (with only the header mapped) and store the gain coefficients
-		 in the model bufffer */
+            } else if( mtype == SMF__EXT ) {
+              /* In this case run smf_correct_extinction on the input data
+                 (with only the header mapped) and store the gain coefficients
+                 in the model bufffer */
               
               smf_fits_getD( idata->hdr, "MEANWVM", &tau, status );
               smf_correct_extinction( idata, "CSOTAU", 1, tau, 
                                       (double *) dataptr, status );
 
-	    } else {
-	      /* otherwise zero the buffer */
-	      memset( dataptr, 0, datalen );
-	    }
-	  }
+            } else {
+              /* otherwise zero the buffer */
+              memset( dataptr, 0, datalen );
+            }
+          }
 	
 	
-	  if( *status == SAI__OK ) {
+          if( *status == SAI__OK ) {
 	  
-	    /* If leaveopen set, pack the data into a smfArray */
-	    if( leaveopen ) {
+            /* If leaveopen set, pack the data into a smfArray */
+            if( leaveopen ) {
 	      
-	      /* If this is the first element of the subgroup create
-		 the smfArray */
-	      if( j == 0 ) {
-		mdata[i] = smf_create_smfArray( status );
-	      }
+              /* If this is the first element of the subgroup create
+                 the smfArray */
+              if( j == 0 ) {
+                mdata[i] = smf_create_smfArray( status );
+              }
 	      
-	      /* Create a smfData for this element of the subgroup */
-	      flag = SMF__NOCREATE_HEAD | SMF__NOCREATE_DA;
+              /* Create a smfData for this element of the subgroup */
+              flag = SMF__NOCREATE_HEAD | SMF__NOCREATE_DA;
 
-	      data = smf_create_smfData( flag, status );
+              data = smf_create_smfData( flag, status );
 
-	      if( *status == SAI__OK ) {
-		data->isTordered = head.isTordered; 
-		data->dtype = head.dtype;
-		data->ndims = head.ndims;
-		memcpy( data->dims, head.dims, sizeof( head.dims ) );
+              if( *status == SAI__OK ) {
+                data->isTordered = head.isTordered; 
+                data->dtype = head.dtype;
+                data->ndims = head.ndims;
+                memcpy( data->dims, head.dims, sizeof( head.dims ) );
 		
-		/* Data pointer points to mmap'd memory AFTER HEADER */
-		data->pntr[0] = dataptr;
+                /* Data pointer points to mmap'd memory AFTER HEADER */
+                data->pntr[0] = dataptr;
 		
-		/* Store the file descriptor to enable us to unmap when we 
-		   close */
-		if( !nofile ) {
-		  data->file->fd = fd;
-		}
+                /* Store the file descriptor to enable us to unmap when we 
+                   close */
+                if( !nofile ) {
+                  data->file->fd = fd;
+                }
 		
-		/* Copy the DIMM filename into the smfFile. Even though
+                /* Copy the DIMM filename into the smfFile. Even though
                    there may not be an associated file on disk we store
                    the name here in case we wish to export the data
                    to an NDF file at a later point. */
-		one_strlcpy( data->file->name, name, sizeof(data->file->name), status );
+                one_strlcpy( data->file->name, name, sizeof(data->file->name), status );
 		
-		/* Add the smfData to the smfArray */
-		smf_addto_smfArray( mdata[i], data, status );
-	      }
+                /* Add the smfData to the smfArray */
+                smf_addto_smfArray( mdata[i], data, status );
+              }
 	      
-	    } else if (!nofile) {
+            } else if (!nofile) {
 	      
-	      /* If leaveopen not set (and there is a file) write buffer to 
-		 file and close container */
+              /* If leaveopen not set (and there is a file) write buffer to 
+                 file and close container */
 	      
-	      if( msync( buf, headlen+datalen, MS_ASYNC ) == -1 ) {
-		*status = SAI__ERROR;
-		errRep( FUNC_NAME, "Unable to sync model container file", 
-			status ); 
-	      } else if( munmap( buf, headlen+datalen ) == -1 ) {
-		*status = SAI__ERROR;
-		errRep( FUNC_NAME, "Unable to unmap model container file", 
-			status ); 
-	      } else if( close( fd ) == -1 ) {
-		*status = SAI__ERROR;
-		errRep( FUNC_NAME, "Unable to close model container file", 
-			status ); 
-	      }
-	    }
-	  }
+              if( msync( buf, headlen+datalen, MS_ASYNC ) == -1 ) {
+                *status = SAI__ERROR;
+                errRep( FUNC_NAME, "Unable to sync model container file", 
+                        status ); 
+              } else if( munmap( buf, headlen+datalen ) == -1 ) {
+                *status = SAI__ERROR;
+                errRep( FUNC_NAME, "Unable to unmap model container file", 
+                        status ); 
+              } else if( close( fd ) == -1 ) {
+                *status = SAI__ERROR;
+                errRep( FUNC_NAME, "Unable to close model container file", 
+                        status ); 
+              }
+            }
+          }
 	  
-	  /* Close the input template file if it was opened here */
-	  if( igroup ) {
-	    smf_close_file( &idata, status );
-	  }
-      }
+          /* Close the input template file if it was opened here */
+          if( igroup ) {
+            smf_close_file( &idata, status );
+          }
+        }
 
+        /* Set loop exit condition if bad status was set */
+        if( *status != SAI__OK ) {
+          j = thisnrel;
+        }
+      }
+    
       /* Set loop exit condition if bad status was set */
       if( *status != SAI__OK ) {
-	j = thisnrel;
+        i = nchunks;
       }
     }
-    
-    /* Set loop exit condition if bad status was set */
-    if( *status != SAI__OK ) {
-      i = nchunks;
-    }
-  }
 }
 
 
