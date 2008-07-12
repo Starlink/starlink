@@ -215,8 +215,8 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
     msgSeti( "MAXCHUNK", igrp->chunk[igrp->ngroups-1] );
     *status = SAI__ERROR;
     errRep( FUNC_NAME, 
-	    "Invalid whichchunk: ^WHICHCHUNK. Must be 0 - ^MAXCHUNK", 
-	    status );
+            "Invalid whichchunk: ^WHICHCHUNK. Must be 0 - ^MAXCHUNK", 
+            status );
   } else {
     /* Find the range of indices */
 
@@ -225,12 +225,12 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
     
     for( i=0; i<igrp->ngroups; i++ ) {
       if( (igrp->chunk[i] == whichchunk) && (!foundfirst) ) {
-	firstpiece = i;
+        firstpiece = i;
         foundfirst = 1;
       }
 
       if( igrp->chunk[i] == whichchunk ) {
-	lastpiece = i;
+        lastpiece = i;
         foundlast = 1;
       }
     }
@@ -240,8 +240,8 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
   if( (!foundfirst) || (!foundlast) ) {
     *status = SAI__ERROR;
     errRep( FUNC_NAME, 
-	    "Possible programming error, couldn't find valid chunk range", 
-	    status );
+            "Possible programming error, couldn't find valid chunk range", 
+            status );
     return;
   }
 
@@ -253,7 +253,7 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
   for( i=0; (*status == SAI__OK) && i<igrp->nrelated; i++ ) {
     for( j=firstpiece; j<=lastpiece; j++ ) {
       if( (igrp->subgroups[j][i] > 0) && ((i+1) > nrelated) ) {
-	nrelated = i+1;
+        nrelated = i+1;
       }
     }
   }
@@ -271,327 +271,327 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
     for( pass=0; pass<2; pass++ ) {
       
       /* Loop over subgroups (number of time chunks), continuing only
-	 if the chunk is equal to whichchunk */
+         if the chunk is equal to whichchunk */
       for( j=firstpiece; j<=lastpiece; j++ ) {
 
-	/* First pass - get dimensions */
-	if( pass == 0 ) {
+        /* First pass - get dimensions */
+        if( pass == 0 ) {
 
-	  smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ", 
-			 flags, &refdata, status );
+          smf_open_file( igrp->grp, igrp->subgroups[j][i], "READ", 
+                         flags, &refdata, status );
 
-	  /* Verify that the array is 3-dimensional and compatible with the
-	     reference array dimensions. */
+          /* Verify that the array is 3-dimensional and compatible with the
+             reference array dimensions. */
 
-	  if( *status == SAI__OK ) {
-	    msgSetc( "FILE", refdata->file->name );
+          if( *status == SAI__OK ) {
+            msgSetc( "FILE", refdata->file->name );
 
-	    if( refdata->ndims != 3 ) {
-	      *status = SAI__ERROR;
-	      errRep( FUNC_NAME, "^FILE does not contain 3-dimensional data!", 
-		      status );
-	    }
-	  }
+            if( refdata->ndims != 3 ) {
+              *status = SAI__ERROR;
+              errRep( FUNC_NAME, "^FILE does not contain 3-dimensional data!", 
+                      status );
+            }
+          }
 
-	  /* If data order is 0 (bolo-ordered) then fail since that case
+          /* If data order is 0 (bolo-ordered) then fail since that case
              is not currently handled. */
 
-	  if( (*status == SAI__OK) && (refdata->isTordered == 0) ) {
-	    *status = SAI__ERROR;
-	    errRep(FUNC_NAME, "^FILE contains bolo-ordered data (unsupported)",
-	  	   status);
-	  }
+          if( (*status == SAI__OK) && (refdata->isTordered == 0) ) {
+            *status = SAI__ERROR;
+            errRep(FUNC_NAME, "^FILE contains bolo-ordered data (unsupported)",
+                   status);
+          }
 
-	  if( *status == SAI__OK ) {
-	    if( j == firstpiece ) {
-	      /* If this is the first chunk we will use it for refdims
+          if( *status == SAI__OK ) {
+            if( j == firstpiece ) {
+              /* If this is the first chunk we will use it for refdims
                  - check the number of bolometers! (Assumption is that
                  input data is standard ICD-compliant time-ordered
                  data) */
 
-	      refdims[0] = refdata->dims[0];
-	      refdims[1] = refdata->dims[1];
-	      nbolo = refdims[0]*refdims[1];
+              refdims[0] = refdata->dims[0];
+              refdims[1] = refdata->dims[1];
+              nbolo = refdims[0]*refdims[1];
 
-	      /* Check for DATA/VARIANCE/QUALITY and data type */
-	      for( k=0; k<3; k++ ) {
-		havearray[k] = (refdata->pntr[k] != NULL);
-	      }
+              /* Check for DATA/VARIANCE/QUALITY and data type */
+              for( k=0; k<3; k++ ) {
+                havearray[k] = (refdata->pntr[k] != NULL);
+              }
 
-	      /* Concatenated data is always double precision */
-	      refdtype = SMF__DOUBLE;
-	      refdtypestr = smf_dtype_string(refdata, status);
+              /* Concatenated data is always double precision */
+              refdtype = SMF__DOUBLE;
+              refdtypestr = smf_dtype_string(refdata, status);
 
-	    } else {
-	      /* Check these dims against refdims */
-	      if( (refdata->dims[0] != refdims[0]) || 
-		  (refdata->dims[1] != refdims[1]) ) {
+            } else {
+              /* Check these dims against refdims */
+              if( (refdata->dims[0] != refdims[0]) || 
+                  (refdata->dims[1] != refdims[1]) ) {
 
-	  	*status = SAI__ERROR;
-	  	msgSeti( "XREF", refdims[0] );
-	  	msgSeti( "YREF", refdims[1] );
-	  	msgSeti( "X", refdata->dims[0] );
-	  	msgSeti( "Y", refdata->dims[1] );
+                *status = SAI__ERROR;
+                msgSeti( "XREF", refdims[0] );
+                msgSeti( "YREF", refdims[1] );
+                msgSeti( "X", refdata->dims[0] );
+                msgSeti( "Y", refdata->dims[1] );
 		
-	  	errRep( FUNC_NAME, "Detector dimensions (^X,^Y) in ^FILE do not match reference (^XREF,^YREF)", status );
-	      }
+                errRep( FUNC_NAME, "Detector dimensions (^X,^Y) in ^FILE do not match reference (^XREF,^YREF)", status );
+              }
 	      
-	      /* Check existence of DATA/QUALITY/VARIANCE */
+              /* Check existence of DATA/QUALITY/VARIANCE */
 
-	      if( (refdata->pntr[0] != NULL) != havearray[0] ) {
-		*status = SAI__ERROR;
-		if( havearray[0] ) msgSetc( "FLAG", "is missing" );
-		else msgSetc( "FLAG", "has extra" );
-		errRep( FUNC_NAME, "^FILE ^FLAG component DATA", status );
-	     }
+              if( (refdata->pntr[0] != NULL) != havearray[0] ) {
+                *status = SAI__ERROR;
+                if( havearray[0] ) msgSetc( "FLAG", "is missing" );
+                else msgSetc( "FLAG", "has extra" );
+                errRep( FUNC_NAME, "^FILE ^FLAG component DATA", status );
+              }
 
-	      if( (refdata->pntr[1] != NULL) != havearray[1] ) {
-		*status = SAI__ERROR;
-		if( havearray[1] ) msgSetc( "FLAG", "is missing" );
-		else msgSetc( "FLAG", "has extra" );
-		errRep( FUNC_NAME, "^FILE ^FLAG component VARIANCE", status );
-	      }
+              if( (refdata->pntr[1] != NULL) != havearray[1] ) {
+                *status = SAI__ERROR;
+                if( havearray[1] ) msgSetc( "FLAG", "is missing" );
+                else msgSetc( "FLAG", "has extra" );
+                errRep( FUNC_NAME, "^FILE ^FLAG component VARIANCE", status );
+              }
 
-	      if( (refdata->pntr[2] != NULL) != havearray[2] ) {
-		*status = SAI__ERROR;
-		if( havearray[2] ) msgSetc( "FLAG", "is missing" );
-		else msgSetc( "FLAG", "has extra" );
-		errRep( FUNC_NAME, "^FILE ^FLAG component QUALITY", status );
-	      }
-	    }
-	  }
+              if( (refdata->pntr[2] != NULL) != havearray[2] ) {
+                *status = SAI__ERROR;
+                if( havearray[2] ) msgSetc( "FLAG", "is missing" );
+                else msgSetc( "FLAG", "has extra" );
+                errRep( FUNC_NAME, "^FILE ^FLAG component QUALITY", status );
+              }
+            }
+          }
 
-	  if( *status == SAI__OK ) {
-	    /* At this stage increment tlen for this chunk */	  
-	    tlen += refdata->dims[2];
-	  }
+          if( *status == SAI__OK ) {
+            /* At this stage increment tlen for this chunk */	  
+            tlen += refdata->dims[2];
+          }
 
-	  /* Close the reference file */
-	  smf_close_file( &refdata, status );
-	}
+          /* Close the reference file */
+          smf_close_file( &refdata, status );
+        }
       
       	/* Second pass copy data over to new array */
-	if( (pass == 1) && (*status == SAI__OK) ) {
+        if( (pass == 1) && (*status == SAI__OK) ) {
 
-	  /* Open the file corresponding to this chunk. Data may
+          /* Open the file corresponding to this chunk. Data may
              require flat-fielding. */
 
-	  smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i], 
-				  &refdata, status );
+          smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i], 
+                                  &refdata, status );
 
-	  /* Calculate the pointing LUT if requested */
-	  if( !(flags & SMF__NOCREATE_LUT) && outfset ) {
+          /* Calculate the pointing LUT if requested */
+          if( !(flags & SMF__NOCREATE_LUT) && outfset ) {
 	    
-	    /* Set havelut flag */
-	    havelut = 1;
+            /* Set havelut flag */
+            havelut = 1;
 
-	    /* Calculate the LUT for this chunk */
+            /* Calculate the LUT for this chunk */
 
-	    smf_calc_mapcoord( refdata, outfset, moving, lbnd_out, ubnd_out, 
-			       SMF__NOCREATE_FILE, status );
-	  } else {
+            smf_calc_mapcoord( refdata, outfset, moving, lbnd_out, ubnd_out, 
+                               SMF__NOCREATE_FILE, status );
+          } else {
             havelut = 0;
           }
 
-	  /* Change data order if required */
-	  smf_dataOrder( refdata, isTordered, status );
+          /* Change data order if required */
+          smf_dataOrder( refdata, isTordered, status );
 
-	  if( *status == SAI__OK ) {
+          if( *status == SAI__OK ) {
 
-	    /* If first chunk initialize the concatenated array */
-	    if( j == firstpiece ) {
+            /* If first chunk initialize the concatenated array */
+            if( j == firstpiece ) {
               /* Copy first data right after the initial padding */
-	      tchunk = padStart;
+              tchunk = padStart;
  
-	      /* Allocate memory for empty smfData with a smfHead */
-	      data = smf_create_smfData( SMF__NOCREATE_DA, status );
+              /* Allocate memory for empty smfData with a smfHead */
+              data = smf_create_smfData( SMF__NOCREATE_DA, status );
 
-	      if( *status == SAI__OK ) {
-		/* Copy over basic header information from the reference */
-		hdr = data->hdr;
-		refhdr = refdata->hdr;	    
-		hdr->instrument = refhdr->instrument;
+              if( *status == SAI__OK ) {
+                /* Copy over basic header information from the reference */
+                hdr = data->hdr;
+                refhdr = refdata->hdr;	    
+                hdr->instrument = refhdr->instrument;
 
-		switch ( hdr->instrument ) {
-		case INST__AZTEC:
-		  aztec_fill_smfHead( hdr, NDF__NOID, status );
-		  break;
-		default:
-		  break;
-		  /* SCUBA-2 has nothing special here because the focal plane
-		     coordinates are derived using an AST polyMap */
-		}
+                switch ( hdr->instrument ) {
+                case INST__AZTEC:
+                  aztec_fill_smfHead( hdr, NDF__NOID, status );
+                  break;
+                default:
+                  break;
+                  /* SCUBA-2 has nothing special here because the focal plane
+                     coordinates are derived using an AST polyMap */
+                }
 
-		/* Copy over the name of the first file in subarray. Add
+                /* Copy over the name of the first file in subarray. Add
                    the suffix "_con" to denote concatenated data */
 
-		pname = filename;
-		grpGet( igrp->grp, igrp->subgroups[j][i], 1, &pname, 
-			SMF_PATH_MAX, status);		
-		strncpy( data->file->name, filename, SMF_PATH_MAX );
-		strncat( data->file->name, "_con", SMF_PATH_MAX );
+                pname = filename;
+                grpGet( igrp->grp, igrp->subgroups[j][i], 1, &pname, 
+                        SMF_PATH_MAX, status);		
+                strncpy( data->file->name, filename, SMF_PATH_MAX );
+                strncat( data->file->name, "_con", SMF_PATH_MAX );
 
-		/* Allocate space for the concatenated allState */
-		hdr->nframes = tlen;
-		hdr->allState = smf_malloc( tlen, sizeof(*(hdr->allState)), 
-					    1, status );
+                /* Allocate space for the concatenated allState */
+                hdr->nframes = tlen;
+                hdr->allState = smf_malloc( tlen, sizeof(*(hdr->allState)), 
+                                            1, status );
 		
-		/* Allocate space in the smfData for DATA/VARAIANCE/QUALITY */
-		if( isTordered ) {
-		  data->dims[0] = refdims[0];
-		  data->dims[1] = refdims[1];
-		  data->dims[2] = tlen;
-		} else {
-		  data->dims[0] = tlen;
-		  data->dims[1] = refdims[0];
-		  data->dims[2] = refdims[1];
-		}
-		data->ndims = 3;
+                /* Allocate space in the smfData for DATA/VARAIANCE/QUALITY */
+                if( isTordered ) {
+                  data->dims[0] = refdims[0];
+                  data->dims[1] = refdims[1];
+                  data->dims[2] = tlen;
+                } else {
+                  data->dims[0] = tlen;
+                  data->dims[1] = refdims[0];
+                  data->dims[2] = refdims[1];
+                }
+                data->ndims = 3;
 		
-		/* Set the data type and order */
-		data->dtype = refdtype;
-		data->isTordered = isTordered;
+                /* Set the data type and order */
+                data->dtype = refdtype;
+                data->isTordered = isTordered;
 
-		ndata = nbolo*tlen;
+                ndata = nbolo*tlen;
 
-		/* Un-set havearray values corresponding to flags */
-		havearray[0] = havearray[0] && !(flags&SMF__NOCREATE_DATA);
-		havearray[1] = havearray[1] && !(flags&SMF__NOCREATE_VARIANCE);
-		havearray[2] = havearray[2] && !(flags&SMF__NOCREATE_QUALITY);
+                /* Un-set havearray values corresponding to flags */
+                havearray[0] = havearray[0] && !(flags&SMF__NOCREATE_DATA);
+                havearray[1] = havearray[1] && !(flags&SMF__NOCREATE_VARIANCE);
+                havearray[2] = havearray[2] && !(flags&SMF__NOCREATE_QUALITY);
 
-		/* Allocate space for arrays being propagated from template */
-		for( k=0; k<3; k++ ) if( havearray[k] ) {
-		  if( k == 2 ) sz = smf_dtype_sz( SMF__UBYTE, status );
-		  else sz = smf_dtype_sz(data->dtype, status );
-		  data->pntr[k] = smf_malloc(ndata, sz, 1, status);
-		}
+                /* Allocate space for arrays being propagated from template */
+                for( k=0; k<3; k++ ) if( havearray[k] ) {
+                    if( k == 2 ) sz = smf_dtype_sz( SMF__UBYTE, status );
+                    else sz = smf_dtype_sz(data->dtype, status );
+                    data->pntr[k] = smf_malloc(ndata, sz, 1, status);
+                  }
 
-		/* Check to see if havearray for QUALITY is not set,
+                /* Check to see if havearray for QUALITY is not set,
                    but SMF__NOCREATE_QUALITY is also not set. In this
                    case, allocate a fresh QUALITY component that will
                    not require propagation from the template */
 		
-		if( !havearray[2] && !(flags & SMF__NOCREATE_QUALITY) ) {
-		  data->pntr[2] = smf_malloc(ndata, 
-					     smf_dtype_sz(SMF__UBYTE,status),
-					     1, status);
-		}
+                if( !havearray[2] && !(flags & SMF__NOCREATE_QUALITY) ) {
+                  data->pntr[2] = smf_malloc(ndata, 
+                                             smf_dtype_sz(SMF__UBYTE,status),
+                                             1, status);
+                }
 
-		/* Allocate space for the pointing LUT if needed */
-		if( havelut ) {
-		  data->lut = smf_malloc(ndata, sizeof(*(data->lut)), 1, 
-					 status);
-		}
+                /* Allocate space for the pointing LUT if needed */
+                if( havelut ) {
+                  data->lut = smf_malloc(ndata, sizeof(*(data->lut)), 1, 
+                                         status);
+                }
 
-		/* Copy over the FITS header */
-		if( (*status == SAI__OK) && (refhdr->fitshdr) ) {
-		  hdr->fitshdr = astCopy( refhdr->fitshdr );
-		  if (!astOK) {
-		    if (*status == SAI__OK) {
-		      *status = SAI__ERROR;
-		      errRep( FUNC_NAME, "AST error copying FITS header", 
-			      status);
-		    }
-		  }
-		}
+                /* Copy over the FITS header */
+                if( (*status == SAI__OK) && (refhdr->fitshdr) ) {
+                  hdr->fitshdr = astCopy( refhdr->fitshdr );
+                  if (!astOK) {
+                    if (*status == SAI__OK) {
+                      *status = SAI__ERROR;
+                      errRep( FUNC_NAME, "AST error copying FITS header", 
+                              status);
+                    }
+                  }
+                }
 
-		/* Copy over the TSWCS */
-		if( (*status == SAI__OK) && (refhdr->tswcs) ) {
-		  hdr->tswcs = astCopy( refhdr->tswcs );
-		  if (!astOK) {
-		    if (*status == SAI__OK) {
-		      *status = SAI__ERROR;
-		      errRep( FUNC_NAME, 
-			      "AST error copying time series WCS", 
-			      status);
-		    }
-		  }
-		}		
+                /* Copy over the TSWCS */
+                if( (*status == SAI__OK) && (refhdr->tswcs) ) {
+                  hdr->tswcs = astCopy( refhdr->tswcs );
+                  if (!astOK) {
+                    if (*status == SAI__OK) {
+                      *status = SAI__ERROR;
+                      errRep( FUNC_NAME, 
+                              "AST error copying time series WCS", 
+                              status);
+                    }
+                  }
+                }		
 
-	      }
-	    }
+              }
+            }
 
-	    /* Copy DATA/QUALITY/VARIANCE and JCMTstate information into
+            /* Copy DATA/QUALITY/VARIANCE and JCMTstate information into
                concatenated smfData */
 
-	    if( *status == SAI__OK ) {
+            if( *status == SAI__OK ) {
 
-	      /* Which dimension contains reference time slices depends on
-		 ordering */
-	      if( isTordered ) {
-		reftlen = refdata->dims[2]; 
-	      } else {
-		reftlen = refdata->dims[0];
-	      }
+              /* Which dimension contains reference time slices depends on
+                 ordering */
+              if( isTordered ) {
+                reftlen = refdata->dims[2]; 
+              } else {
+                reftlen = refdata->dims[0];
+              }
 
-	      refndata = reftlen*nbolo;
+              refndata = reftlen*nbolo;
 
-	      /* Copy over JCMTstate */
-	      hdr = data->hdr;
-	      refhdr = refdata->hdr;	    
+              /* Copy over JCMTstate */
+              hdr = data->hdr;
+              refhdr = refdata->hdr;	    
 	      
-	      memcpy( (void *) &(hdr->allState[tchunk]), refhdr->allState, 
-		      reftlen*sizeof(*hdr->allState) );
+              memcpy( (void *) &(hdr->allState[tchunk]), refhdr->allState, 
+                      reftlen*sizeof(*hdr->allState) );
 
-	      /* Copy LUT */
+              /* Copy LUT */
 
-	      if( havelut ) {
-		sz = sizeof( *(refdata->lut) );
-		if( isTordered ) {
-		  /* If concatenating time-ordered data just copy entire
-		     chunk over at once */
+              if( havelut ) {
+                sz = sizeof( *(refdata->lut) );
+                if( isTordered ) {
+                  /* If concatenating time-ordered data just copy entire
+                     chunk over at once */
 
-		  memcpy( (char *)data->lut + tchunk*nbolo*sz,
-			  refdata->lut, refndata*sz );
-		} else {
-		  /* If concatenating bolo-ordered data need to copy
-		     one chunk of bolometer data over at a time */
+                  memcpy( (char *)data->lut + tchunk*nbolo*sz,
+                          refdata->lut, refndata*sz );
+                } else {
+                  /* If concatenating bolo-ordered data need to copy
+                     one chunk of bolometer data over at a time */
 		  
-		  for( l=0; l<nbolo; l++ ) {
-		    memcpy( (char *)data->lut + l*tlen*sz + tchunk*sz,
-			    (char *)refdata->lut + l*reftlen*sz,
-			    reftlen*sz );
-		  }
-		}
-	      }
+                  for( l=0; l<nbolo; l++ ) {
+                    memcpy( (char *)data->lut + l*tlen*sz + tchunk*sz,
+                            (char *)refdata->lut + l*reftlen*sz,
+                            reftlen*sz );
+                  }
+                }
+              }
 
-	      /* Now do DATA/QUALITY/VARIANCE */
-	      for( k=0; k<3; k++ ) if( havearray[k] ) {
-		if( k == 2 ) sz = smf_dtype_sz( SMF__UBYTE, status );
-		else sz = smf_dtype_sz(data->dtype, status );
+              /* Now do DATA/QUALITY/VARIANCE */
+              for( k=0; k<3; k++ ) if( havearray[k] ) {
+                  if( k == 2 ) sz = smf_dtype_sz( SMF__UBYTE, status );
+                  else sz = smf_dtype_sz(data->dtype, status );
 	      
-		if( *status == SAI__OK ) {
+                  if( *status == SAI__OK ) {
 
-		  if( isTordered ) {
-		    /* If concatenating time-ordered data just copy entire
-		       chunk over at once */
+                    if( isTordered ) {
+                      /* If concatenating time-ordered data just copy entire
+                         chunk over at once */
 
-		    memcpy( (char *)data->pntr[k] + tchunk*nbolo*sz,
-			    refdata->pntr[k], refndata*sz );
+                      memcpy( (char *)data->pntr[k] + tchunk*nbolo*sz,
+                              refdata->pntr[k], refndata*sz );
 
-		  } else {
-		    /* If concatenating bolo-ordered data need to copy
-                       one chunk of bolometer data over at a time */
+                    } else {
+                      /* If concatenating bolo-ordered data need to copy
+                         one chunk of bolometer data over at a time */
 
-		    for( l=0; l<nbolo; l++ ) {
-		      memcpy( (char *)data->pntr[k] + l*tlen*sz + tchunk*sz,
-			      (char *)refdata->pntr[k] + l*reftlen*sz,
-			      reftlen*sz );
-		    }
+                      for( l=0; l<nbolo; l++ ) {
+                        memcpy( (char *)data->pntr[k] + l*tlen*sz + tchunk*sz,
+                                (char *)refdata->pntr[k] + l*reftlen*sz,
+                                reftlen*sz );
+                      }
 
-		  }
-		}
+                    }
+                  }
 
-	      }
+                }
 	    
-	      /* increment tchunk */
-	      tchunk += reftlen;
-	    }
-	  }
+              /* increment tchunk */
+              tchunk += reftlen;
+            }
+          }
 
-	  /* Close the file we had open */
-	  smf_close_file( &refdata, status );
-	}
+          /* Close the file we had open */
+          smf_close_file( &refdata, status );
+        }
 	
       }
     }
@@ -601,68 +601,68 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
 
     if( *status == SAI__OK ) for( j=0; j<2; j++ ) { /* Loop padded region */
         
-      tstart = 0;
-      tend = 0;
-      
-      if( (j==0) && padStart ) {
         tstart = 0;
-        tend = padStart-1;
-      } 
+        tend = 0;
       
-      if( (j==1) && padEnd ) {
-        tstart = tlen-padEnd;
-        tend = tlen-1;
-      }
+        if( (j==0) && padStart ) {
+          tstart = 0;
+          tend = padStart-1;
+        } 
       
-      /* Clean up padded region if nonzero length */
-      if( tend != tstart ) {
-        
-        /* If QUALITY present, set SMF__Q_BADB as needed and SMF__Q_PAD */
-        if( data->pntr[2] ) {
-          /* Loop over bolometer */
-          for( k=0; k<nbolo; k++ ) {
-            /* SMF__Q_PAD always set */
-            qual = SMF__Q_PAD;
-
-            if( isTordered ) {
-              /* Check for SMF__Q_BADB in first sample of this bolo */
-              qual |= ((char *)data->pntr[2])[nbolo*padStart+k] & SMF__Q_BADB;
-
-              /* Need to loop over time slice for time-ordered data */
-              for( l=tstart; l<=tend; l++ ) {
-                ((char *)data->pntr[2])[nbolo*l+k] = qual;
-              }
-
-            } else {
-              /* Check for SMF__Q_BADB in first sample of this bolo */
-              qual |= ((char *)data->pntr[2])[k*tlen+padStart] & SMF__Q_BADB;
-
-              /* Use memset for bolo-ordered data */
-              memset( (char *)data->pntr[2]+k*tlen+tstart, qual, tend-tstart+1);
-            }
-            
-          }
+        if( (j==1) && padEnd ) {
+          tstart = tlen-padEnd;
+          tend = tlen-1;
         }
-
-        /* If LUT present, set data to VAL__BADI */
-        if( data->lut ) {
-          if( isTordered ) {
-            /* Loop over continuous chunk of data if time-ordered */
-            for( l=tstart*nbolo; l<=(tend+1)*nbolo-1; l++ ) {
-              data->lut[l] = VAL__BADI;
-            }
-          } else {
-            /* Loop over bolo if bolo-ordered */
+      
+        /* Clean up padded region if nonzero length */
+        if( tend != tstart ) {
+        
+          /* If QUALITY present, set SMF__Q_BADB as needed and SMF__Q_PAD */
+          if( data->pntr[2] ) {
+            /* Loop over bolometer */
             for( k=0; k<nbolo; k++ ) {
-              base = k*tlen;
-              for( l=base+tstart; l<=base+tend; l++ ) {
+              /* SMF__Q_PAD always set */
+              qual = SMF__Q_PAD;
+
+              if( isTordered ) {
+                /* Check for SMF__Q_BADB in first sample of this bolo */
+                qual |= ((char *)data->pntr[2])[nbolo*padStart+k] & SMF__Q_BADB;
+
+                /* Need to loop over time slice for time-ordered data */
+                for( l=tstart; l<=tend; l++ ) {
+                  ((char *)data->pntr[2])[nbolo*l+k] = qual;
+                }
+
+              } else {
+                /* Check for SMF__Q_BADB in first sample of this bolo */
+                qual |= ((char *)data->pntr[2])[k*tlen+padStart] & SMF__Q_BADB;
+
+                /* Use memset for bolo-ordered data */
+                memset( (char *)data->pntr[2]+k*tlen+tstart, qual, tend-tstart+1);
+              }
+            
+            }
+          }
+
+          /* If LUT present, set data to VAL__BADI */
+          if( data->lut ) {
+            if( isTordered ) {
+              /* Loop over continuous chunk of data if time-ordered */
+              for( l=tstart*nbolo; l<=(tend+1)*nbolo-1; l++ ) {
                 data->lut[l] = VAL__BADI;
               }
+            } else {
+              /* Loop over bolo if bolo-ordered */
+              for( k=0; k<nbolo; k++ ) {
+                base = k*tlen;
+                for( l=base+tstart; l<=base+tend; l++ ) {
+                  data->lut[l] = VAL__BADI;
+                }
+              }
             }
-          }
-        }        
+          }        
+        }
       }
-    }
 
     /* Shift the origin of the time axis in the WCS if padStart != 0 */
     if( padStart && data->hdr && data->hdr->tswcs ) {
