@@ -63,7 +63,7 @@
 *     2006-03-29 (AGG):
 *        Use smf_create_smfDA to create an empty smfDA
 *     2008-07-11 (TIMJ):
-*        use one_strlcpy.
+*        use one_strlcpy. Add dksquid.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -109,7 +109,7 @@
 #define FUNC_NAME "smf_construct_smfDA"
 
 smfDA *
-smf_construct_smfDA( smfDA * tofill, double * flatcal,
+smf_construct_smfDA( smfDA * tofill, int *dksquid, double * flatcal,
 		     double * flatpar, const char * flatname, int nflat,
 		     int * status ) {
 
@@ -125,6 +125,7 @@ smf_construct_smfDA( smfDA * tofill, double * flatcal,
   }
 
   if (*status == SAI__OK) {
+    da->dksquid = dksquid;
     da->flatcal = flatcal;
     da->flatpar = flatpar;
     da->nflat = nflat;

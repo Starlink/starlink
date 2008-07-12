@@ -41,10 +41,14 @@
 *     2006-03-29 (AGG):
 *        Initial version.
 *     2006-04-05 (AGG):
-*        Change API to accept a smfData instead of smfDA
+*        Change API to accept a smfData instead of smfDA so that the
+*        size of the allocated buffers can be determined.
+*     2008-07-11 (TIMJ):
+*        Propagate dark squid. Use one_strlcpy.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
@@ -76,7 +80,7 @@
 /* Starlink includes */
 #include "sae_par.h"
 #include "mers.h"
-#include "ndf.h"
+#include "star/one.h"
 
 /* SMURF routines */
 #include "smf.h"
@@ -88,7 +92,7 @@
 smfDA *
 smf_deepcopy_smfDA( const smfData *old, int * status ) {
 
-
+  int *dksquid = NULL;    /* pointer to dark squid */
   double *flatcal;        /* pointer to flatfield calibration */
   double *flatpar;        /* pointer to flatfield parameters */
   char flatname[SC2STORE_FLATLEN];/* name of flatfield algorithm */
@@ -108,6 +112,7 @@ smf_deepcopy_smfDA( const smfData *old, int * status ) {
 
   /* Need the number of bolometers */
   nbol = (old->dims)[0] * (old->dims)[1];
+
   /* Allocate space for and copy contents of pointers */
   flatcal = smf_malloc( nbol * nflat, sizeof(double), 0, status );
   if ( flatcal != NULL ) {
@@ -118,15 +123,22 @@ smf_deepcopy_smfDA( const smfData *old, int * status ) {
     memcpy( flatpar, oldda->flatpar, sizeof(double)*nflat);
   }
 
+  if (oldda->dksquid) {
+    dksquid = smf_malloc( (old->dims)[2], sizeof(*dksquid), 0, status );
+    if (dksquid) {
+      memcpy( dksquid, oldda->dksquid, sizeof(*dksquid) * (old->dims)[2] );
+    }
+  }
+
   if (oldda->flatname != NULL) {
-    strncpy(flatname, oldda->flatname, SC2STORE_FLATLEN);
-    flatname[SC2STORE_FLATLEN-1] = '\0';
+    one_strlcpy(flatname, oldda->flatname, sizeof(flatname), status);
   } else {
     flatname[0] = '\0';
   }
 
   /* Construct the new smfData */
-  newda = smf_construct_smfDA( newda, flatcal, flatpar, flatname, nflat, status);
+  newda = smf_construct_smfDA( newda, dksquid, flatcal, flatpar, flatname,
+                               nflat, status);
 
   return newda;
 }

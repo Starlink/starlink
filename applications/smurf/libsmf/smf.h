@@ -431,7 +431,7 @@ void smf_correct_extinction( smfData *data, const char *method,
 			     double *allextcorr, int *status);
 
 smfDA *
-smf_construct_smfDA( smfDA * tofill, double * flatcal,
+smf_construct_smfDA( smfDA * tofill, int *dksquid, double * flatcal,
 		     double * flatpar, const char * flatname, int nflat,
 		     int * status );
 smfData *
