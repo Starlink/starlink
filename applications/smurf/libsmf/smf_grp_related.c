@@ -57,6 +57,7 @@
  *  Authors:
  *     Andy Gibb (UBC)
  *     Tim Jenness (JAC, Hawaii)
+ *     Ed Chapin (UBC)
  *     {enter_new_authors_here}
 
  *  History:
@@ -91,9 +92,13 @@
  *        -Fixed bug in calculation of actual nrelated (subarrays)
  *     2008-05-03 (EC):
  *        Check absolute value of time step to find discontinuities
+ *     2008-07-11 (TIMJ):
+ *        sizeof(int) does not work when your ints are changed to longs.
+ *        Always use sizeof(*var).
  *     {enter_further_changes_here}
 
  *  Copyright:
+ *     Copyright (C) 2008 Science and Technology Facilities Council.
  *     Copyright (C) 2006 University of British Columbia.
  *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
  *     All Rights Reserved.
@@ -208,13 +213,13 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
 
   /* Allocate space for groups array - can't be any bigger than
      grpsize so use that. Initialize everything to NULL */
-  subgroups = smf_malloc( grpsize, sizeof(int*), 1, status );
-  starts = smf_malloc( grpsize, sizeof(double), 1, status );
-  ends = smf_malloc( grpsize, sizeof(double), 1, status );
-  nbolx = smf_malloc( grpsize, sizeof(dim_t), 1, status );
-  nboly = smf_malloc( grpsize, sizeof(dim_t), 1, status );
+  subgroups = smf_malloc( grpsize, sizeof(*subgroups), 1, status );
+  starts = smf_malloc( grpsize, sizeof(*starts), 1, status );
+  ends = smf_malloc( grpsize, sizeof(*ends), 1, status );
+  nbolx = smf_malloc( grpsize, sizeof(*nbolx), 1, status );
+  nboly = smf_malloc( grpsize, sizeof(*nboly), 1, status );
   chunk = smf_malloc( grpsize, sizeof(*chunk), 1, status );
-  new_subgroups = smf_malloc( grpsize, sizeof(int*), 1, status );
+  new_subgroups = smf_malloc( grpsize, sizeof(*new_subgroups), 1, status );
   new_chunk = smf_malloc( grpsize, sizeof(*new_chunk) , 1, status );
 
   if ( *status != SAI__OK ) goto CLEANUP;
@@ -224,7 +229,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
     /* If yes, then we only need to allocate space for 4 elements */
     nelem = SMF__MXSMF;
     /* And define the wavelength array */
-    lambda = smf_malloc( grpsize, sizeof(double), 1, status );
+    lambda = smf_malloc( grpsize, sizeof(*lambda), 1, status );
   } else {
     /* OK we might have data from up to 8 subarrays so allocate
        twice as much space */
@@ -295,7 +300,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
       } else {
         /* If not, there's nothing to match so create it and add the
            current index */
-        indices = smf_malloc( nelem, sizeof(int), 1, status);
+        indices = smf_malloc( nelem, sizeof(*indices), 1, status);
         /* Initialize the pointers to NULL */
         if ( *status != SAI__OK ) {
           errRep(FUNC_NAME, "Unable to allocate memory to store index array", status);
@@ -565,9 +570,9 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
 
     for( i=0; i<ngroups; i++ ) {
       if( keepchunk[i] ) {
-        indices = smf_malloc( maxnelem, sizeof(int), 1, status);
+        indices = smf_malloc( maxnelem, sizeof(*indices), 1, status);
         if( *status == SAI__OK ) {
-          memcpy( indices, subgroups[i], maxnelem*sizeof(int) );
+          memcpy( indices, subgroups[i], maxnelem*sizeof(*indices) );
           new_subgroups[new_ngroups] = indices;
           new_chunk[new_ngroups] = chunk[i];
           new_ngroups++;
