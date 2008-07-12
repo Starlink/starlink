@@ -58,11 +58,14 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     18-AUG-1992 (DSB):
 *        Original version
+*     11-JUL-2008 (TIMJ):
+*        Report upper bound when exceeding it.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -130,9 +133,11 @@
 *  If the index is outside the bounds of the group, report an error.
          IF( I .LE. 0 .OR. I .GT. CMN_GSIZE( SLOT ) ) THEN
             STATUS = GRP__OUTBN
+            CALL MSG_SETI( 'I', I )
+            CALL MSG_SETI( 'MX', CMN_GSIZE( SLOT ) )
             CALL ERR_REP( 'GRP_GET_ERR1',
      :      'GRP_GET: Attempt to access a name outside the bounds of'//
-     :      ' the group.', STATUS )
+     :      ' the group. (^I/^MX)', STATUS )
             GO TO 999
 
 *  Otherwise, call GRP1_GETC to do the work.  NB, the final argument
