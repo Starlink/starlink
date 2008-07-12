@@ -62,6 +62,7 @@
 *     
 *  Authors:
 *     EC: Edward Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -100,6 +101,8 @@
 *        Added ability to pad start and end of the data (padStart/padEnd)
 *     2008-07-03 (EC):
 *        Correct time origin in tswcs if padStart set.
+*     2008-07-11 (TIMJ):
+*        Use strlcat/strlcpy
 
 *  Notes:
 *     If projection information supplied, pointing LUT will not be
@@ -428,8 +431,10 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
                 pname = filename;
                 grpGet( igrp->grp, igrp->subgroups[j][i], 1, &pname, 
                         SMF_PATH_MAX, status);		
-                strncpy( data->file->name, filename, SMF_PATH_MAX );
-                strncat( data->file->name, "_con", SMF_PATH_MAX );
+                one_strlcpy( data->file->name, filename,
+                             sizeof(data->file->name), status );
+                one_strlcat( data->file->name, "_con",
+                             sizeof(data->file->name), status );
 
                 /* Allocate space for the concatenated allState */
                 hdr->nframes = tlen;
