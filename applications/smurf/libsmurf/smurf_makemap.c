@@ -433,6 +433,8 @@
 *        - support TILES in REBIN mode
 *        - use smf_find_median
 *        - new interface to smf_open_ndfname
+*     2008-07-11 (TIMJ):
+*        use strlcat
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -485,6 +487,7 @@
 #include "star/grp.h"
 #include "star/kaplibs.h"
 #include "star/atl.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "smurf_par.h"
@@ -985,7 +988,7 @@ void smurf_makemap( int *status ) {
       ndfCput("Flux Density", ondf, "LABEL", status);
 
         /* Weights are related to data_units */
-      strncat(data_units, "**-2", (SMF__CHARLABEL - 5)); 
+      one_strlcat(data_units, "**-2", sizeof(data_units), status);
       ndfCput(data_units, wndf, "UNITS", status);
 
 
@@ -1162,8 +1165,7 @@ void smurf_makemap( int *status ) {
     ndfCput("Flux Density", ondf, "LABEL", status);
 
     /* Weights are related to data_units */
-    strncat(data_units, "**-2", (SMF__CHARLABEL - 5)); 
-
+    one_strlcat(data_units, "**-2", sizeof(data_units), status);
     ndfCput(data_units, wndf, "UNITS", status);
 
 
