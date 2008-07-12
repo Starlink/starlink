@@ -59,11 +59,13 @@
 *        Update to use new smf_free behaviour
 *     2008-05-28 (TIMJ):
 *        Allow CONFIG=!
+*     2008-07-11 (AGG):
+*        Tidy up, ensure all pointers are freed
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
-*     Copyright (C) 2006, 2007 the University of British Columbia. All
+*     Copyright (C) 2006-2008 the University of British Columbia. All
 *     Rights Reserved.
 
 *  Licence:
@@ -120,21 +122,20 @@
 void smurf_dreamweights ( int *status ) {
 
   /* Local Variables */
-  int i;                      /* Loop counter */
+  Grp *confgrp = NULL;        /* Group containing configuration file */
+  smfData *data = NULL;       /* Input data */
   int flag;                   /* Flag for Grp handling */
+  int *gridminmax = NULL;     /* Extent of grid points array */
+  int gridpts[DREAM__MXGRID][2]; /* Array of points for reconstruction grid */
+  double gridstep;            /* Size of reconstruction grid in arcsec */
+  int i;                      /* Loop counter */
   Grp *igrp = NULL;           /* Input group of NDFs */
   int isize;                  /* Size of input Grp of files */
+  AstKeyMap *keymap = NULL;   /* Pointer to keymap of config settings */
+  int ksize;                  /* Size of group containing CONFIG file */
+  int ngrid;                  /* Number of points in reconstruction grid */
   Grp *ogrp = NULL;           /* Group of output weights files */
   int osize;                  /* Size of output Grp of files */
-  smfData *data = NULL;       /* Input data */
-  AstKeyMap *keymap=NULL;     /* Pointer to keymap of config settings */
-  Grp *confgrp = NULL;        /* Group containing configuration file */
-  int ksize;                  /* Size of group containing CONFIG file */
-  int parstate;               /* State of ADAM parameters */
-  double gridstep;            /* Size of reconstruction grid in arcsec */
-  int gridpts[DREAM__MXGRID][2]; /* Array of points for reconstruction grid */
-  int ngrid;                  /* Number of points in reconstruction grid */
-  int *gridminmax = NULL;     /* Extent of grid points array */
 
   /* Main routine */
   ndfBegin();
@@ -161,7 +162,7 @@ void smurf_dreamweights ( int *status ) {
     if (*status == PAR__NULL) {
       /* NULL value so provide defaults */
       errAnnul( status );
-      msgOut(" ", "Assuming some default configuration parameters", status);
+      msgOutif(MSG__VERB, " ", "No config file specified - assuming default configuration parameters", status);
       keymap = astKeyMap("");
       astMapPut0I( keymap, "GRIDXMIN", -4, "" );
       astMapPut0I( keymap, "GRIDXMAX", 4, "" );
@@ -174,17 +175,21 @@ void smurf_dreamweights ( int *status ) {
     }
   }
 
-  /* Retrieve grid parameters */
+  /* Determine grid parameters from inputs given above */
   smf_dream_getgrid( keymap, &gridstep, &ngrid, &gridminmax, gridpts, status);
+  /* Annul keymap immediately as it is no longer required */
+  if (keymap) keymap = astAnnul( keymap );
 
   /* Loop over number of files */
-  for ( i=1; i<= isize; i++) {
+  for ( i=1; (i<= isize) && (*status == SAI__OK); i++) {
     /* Open file */
     smf_open_file( igrp, i, "READ", 0, &data, status );
 
+    /* Calculate weights based on this file */
     smf_dream_calcweights( data, ogrp, i, gridstep, ngrid, gridminmax, 
 			   &(gridpts[0]), status);
 
+    /* Immediately check status on return and abort if an error occured */
     if ( *status != SAI__OK ) {
       msgSeti("I",i);
       msgSeti("N",isize);
@@ -207,5 +212,6 @@ void smurf_dreamweights ( int *status ) {
   }
   ndfEnd( status );
   
-  msgOutif(MSG__VERB," ", "DONE", status);
+  msgOutif(MSG__VERB," ", "DREAM weights calculation completed successfully", 
+	   status);
 }
