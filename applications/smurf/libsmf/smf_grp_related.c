@@ -470,8 +470,10 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
 	    /* Otherwise open header in new file */
 	    smf_open_file( igrp, subgroups[i][j], "READ", SMF__NOCREATE_DATA, 
 			   &data2, status );
-	    hdr2 = data2->hdr;
-	    smf_fits_getS( hdr2, "SUBARRAY", subarray, 81, status );
+      if (*status == SAI__OK) {
+        hdr2 = data2->hdr;
+        smf_fits_getS( hdr2, "SUBARRAY", subarray, 81, status );
+      }
 	  }	
 	  sc2ast_name2num( subarray, &subsysnum, status);	
 	  if( *status == SAI__OK ) {
