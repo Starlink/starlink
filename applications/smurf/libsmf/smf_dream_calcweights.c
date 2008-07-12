@@ -70,7 +70,8 @@
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
 *     2008-07-11 (AGG):
-*        Hand off heavy lifting to calcmapwt routine in sc2math
+*        Hand off heavy lifting to calcmapwt routine in sc2math, allow
+*        for lower-case obsmode string
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -172,7 +173,8 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
     /* Check we have a DREAM observation */
     hdr = data->hdr;
     smf_fits_getS( hdr, "SAM_MODE", obsmode, LEN__METHOD, status);
-    if ( strncmp( obsmode, "DREAM", 5) == 0 ) {
+    if ( strncmp( obsmode, "DREAM", 5) == 0 ||
+	 strncmp( obsmode, "dream", 5) == 0 ) {
       /* OK we have DREAM data */
       dream = data->dream;
       /* Read DREAM parameters from input file */

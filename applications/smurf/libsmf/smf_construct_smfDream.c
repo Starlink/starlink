@@ -70,10 +70,12 @@
 *        Modified interface to smf_open_file.
 *     2007-10-31 (TIMJ):
 *        Consistently use size_t
+*     2008-07-11 (AGG):
+*        Allow for lower-case SAM_MODE
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006-2007 University of British Columbia.
+*     Copyright (C) 2006-2008 University of British Columbia.
 *     Copyright (C) 2007 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
@@ -172,7 +174,8 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
     return NULL;
   }
 
-  if ( strncmp( obsmode, "DREAM", 5) == 0 ) {
+  if ( strncmp( obsmode, "DREAM", 5) == 0 ||
+       strncmp( obsmode, "dream", 5) == 0 ) {
     /* Check we have valid pointers to the SMU path and jiggle vertices */
     if ( jigpath != NULL && jigvert != NULL ) {
       dream = smf_create_smfDream( status );

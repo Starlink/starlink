@@ -13,11 +13,13 @@
 *     Library routine
 
 *  Invocation:
-*     smf_calc_stareimage( smfData *data, int *status);
+*     smf_calc_stareimage( smfData *data, const int naver, int *status);
 
 *  Arguments:
 *     data = smfData * (Given)
-*        Input data
+*        Input data struct
+*     naver = const int (Given)
+*        Number of frames/samples to average to produce a STARE image
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -46,10 +48,12 @@
 *        Update to use new smf_free behaviour
 *     2008-05-29 (TIMJ):
 *        Free avdata to prevent memory leak.
+*     2008-07-11 (AGG):
+*        Allow for lower-case SAM_MODE
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 University of British Columbia.
+*     Copyright (C) 2006-2008 University of British Columbia.
 *     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2007 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
@@ -128,7 +132,8 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
   /* Do we have STARE data? */
   hdr = data->hdr;
   smf_fits_getS( hdr, "SAM_MODE", obsmode, LEN__METHOD+1, status );
-  if ( strncmp( obsmode, "STARE", 5) == 0 ) {
+  if ( strncmp( obsmode, "STARE", 5) == 0 || 
+       strncmp( obsmode, "stare", 5) == 0 ) {
     msgOutif(MSG__VERB," ", "Processing STARE data", status);
 
     if (smf_history_check( data, "smf_calc_stareimage", status) ) {
