@@ -13,18 +13,20 @@
 *     Subroutine
 
 *  Invocation:
-*     sc2sim_get_drgroup ( struct sc2sim_obs_struct *inx, char filter,
-*                          char object, char *drgroup, int *status )
+*     sc2sim_get_drgroup ( struct sc2sim_obs_struct *inx, const char *filter,
+*                          const char *object, char *drgroup, int *status )
 
 *  Arguments:
 *     inx = const sc2sim_obs_struct* (Given)
 *        Pointer to observation struct
-*     filter = char* (Given)
+*     filter = const char* (Given)
 *        Name of filter used in this observation
-*     object = char* (Given)
+*     object = const char* (Given)
 *        Name of object observed
 *     drgroup = char* (Returned)
-*        Name of data-reduction group
+*        Name of data-reduction group. Must be at least 40 characters.
+*        If the drgroup does not fit in the buffer, an empty string
+*        is returned and status remains good.
 *     status = int* (Given and Returned)
 *        Pointer to global status.  
 
@@ -39,13 +41,17 @@
 
 *  Authors:
 *     A.G. Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2008-03-19 (AGG):
 *        Original
+*     2008-07-11 (TIMJ):
+*        Use strl*
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2008 University of British Columbia. All Rights Reserved.
 
 *  Licence:
@@ -78,6 +84,9 @@
 #include "sae_par.h"
 #include "ast.h"
 #include "star/slalib.h"
+#include "star/one.h"
+#include "one_err.h"
+#include "mers.h"
 
 /* SC2SIM includes */
 #include "sc2sim.h"
@@ -86,9 +95,7 @@ void sc2sim_get_drgroup ( const struct sc2sim_obs_struct *inx, const char *filte
 			  const char *object, char *drgroup, int *status ) {
 
   /* Local variables */
-  size_t curlength;           /* Length of current queried string */
   char decstr[8];             /* Dec as sDDMMSS where s is + or - */
-  size_t length = 0;          /* Length of string to copy into drgroup */
   size_t maxlen = 40;         /* Maximum length of DRGROUP string 
                                  This should really be a constant! */
   char sign[2];               /* Sign of declination */
@@ -107,36 +114,28 @@ void sc2sim_get_drgroup ( const struct sc2sim_obs_struct *inx, const char *filte
     sprintf( drgroup, "%02d%02d%02d", iamsf[0], iamsf[1], iamsf[2] );
     /* Return Dec as DDMMSS */
     slaDr2af( 0, inx->dec, sign, iamsf );
-    length = 1;
-    strncat( drgroup, sign, length);
+    one_strlcat( drgroup, sign, maxlen, status );
     sprintf( decstr, "%02d%02d%02d", iamsf[0], iamsf[1], iamsf[2] );
-    length = 7;
-    strncat( drgroup, decstr, length);
+    one_strlcat( drgroup, decstr, maxlen, status);
   } else {
     /* We have a planet so use supplied object name */
-    curlength = strlen( object );
-    length += curlength;
-    strncpy( drgroup, object, curlength);
+    one_strlcpy( drgroup, object, maxlen, status);
   }
 
   /* obsmode */
-  curlength = strlen( inx->obsmode );
-  length += curlength;
+  one_strlcat( drgroup, inx->obsmode, maxlen, status );
   /* obstype */
-  curlength = strlen( inx->obstype );
-  length += curlength;
+  one_strlcat( drgroup, inx->obstype, maxlen, status );
   /* filter */
-  curlength = strlen( filter );
-  length += curlength;
+  one_strlcat( drgroup, filter, maxlen, status );
 
-  /* The length has been checked so just use strcat */
-  if ( length <= maxlen ) {
-    strcat( drgroup, inx->obsmode );
-    strcat( drgroup, inx->obstype );
-    strcat( drgroup, filter );
-  } else {
+  /* if we ran out of buffer (note that maxlen is currently not known
+     to be right so we could still buffer overflow) return empty string
+     rather than die */
+  if (*status == ONE__TRUNC) {
     /* Else set a blank group and allow the pipeline to make one up later */
-    drgroup = '\0';
+    errAnnul( status );
+    drgroup[0] = '\0';
   }
 
   return;
