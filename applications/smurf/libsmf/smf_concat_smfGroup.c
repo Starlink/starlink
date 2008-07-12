@@ -154,6 +154,7 @@
 #include "prm_par.h"
 #include "par_par.h"
 #include "kpg_err.h"
+#include "star/one.h"
 
 /* SMURF includes */
 #include "libsmf/smf.h"
