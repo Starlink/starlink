@@ -391,21 +391,21 @@ int *status              /* global status (given and returned) */
 void sc2store_cremapwts
 (
 const char *filename,      /* name of HDS container file (given) */
-int *windext,              /* Table of window extents for the DREAM
+const int *windext,              /* Table of window extents for the DREAM
                               solution (given) */
-int *gridext,              /* Table of grid extents for a single
+const int *gridext,              /* Table of grid extents for a single
                               bolometer (given) */
 double gridsize,           /* size in arcsec of grid step (given) */
-int *jigext,               /* Table of SMU pattern extents for a single
+const int *jigext,               /* Table of SMU pattern extents for a single
                               bolometer (given) */
 double jigsize,            /* size in arcsec of SMU step (given) */
-int gridwtsdim[],          /* dimensions of grid interpolation weights 
+const int gridwtsdim[],          /* dimensions of grid interpolation weights 
                               (given) */
-double *gridwts,           /* grid interpolation weights (given) */
+const double *gridwts,           /* grid interpolation weights (given) */
 int invmatdim,             /* dimension of inverted matrix (given) */
-double *invmat,            /* inverted matrix (given) */
-int qualdim[],             /* dimensions of quality mask (given) */
-int *qual,                 /* bolometer quality mask (given) */
+const double *invmat,            /* inverted matrix (given) */
+const int qualdim[],             /* dimensions of quality mask (given) */
+const int *qual,                 /* bolometer quality mask (given) */
 int *status                /* global status (given and returned) */
 )
 /*
