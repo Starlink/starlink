@@ -60,11 +60,14 @@
 *        Initial version.
 *     2006-01-26 (TIMJ):
 *        No longer have dksquid.
-*     2006-03-29 (AGG)
+*     2006-03-29 (AGG):
 *        Use smf_create_smfDA to create an empty smfDA
+*     2008-07-11 (TIMJ):
+*        use one_strlcpy.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
@@ -96,7 +99,7 @@
 /* Starlink includes */
 #include "sae_par.h"
 #include "mers.h"
-#include "ndf.h"
+#include "star/one.h"
 
 /* SMURF routines */
 #include "smf.h"
@@ -126,8 +129,7 @@ smf_construct_smfDA( smfDA * tofill, double * flatcal,
     da->flatpar = flatpar;
     da->nflat = nflat;
     if (flatname != NULL) {
-      strncpy(da->flatname, flatname, SC2STORE_FLATLEN);
-      (da->flatname)[SC2STORE_FLATLEN-1] = '\0';
+      one_strlcpy(da->flatname, flatname, sizeof(da->flatname), status);
     } else {
       (da->flatname)[0] = '\0';
     }
