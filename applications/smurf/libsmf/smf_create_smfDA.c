@@ -42,9 +42,12 @@
 *        Initial version.
 *     2006-01-27 (TIMJ):
 *        Remove dksquid entry for now
+*     2008-07-11 (TIMJ):
+*        Add dksquid.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
@@ -103,6 +106,7 @@ smf_create_smfDA( int * status ) {
   /* Initialise smfDA */
   da->flatcal = NULL;
   da->flatpar = NULL;
+  da->dksquid = NULL;
   (da->flatname)[0] = '\0';
   da->nflat = 0;
 
