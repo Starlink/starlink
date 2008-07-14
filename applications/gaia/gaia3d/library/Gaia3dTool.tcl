@@ -1241,6 +1241,7 @@ itcl::class gaia3d::Gaia3dTool {
       if { $fullrelease && $imagedata_ != {} } {
          ::delete object $imagedata_
          set imagedata_ {}
+         set cubename_ {}
       }
 
       if { $plane_ != {} } {

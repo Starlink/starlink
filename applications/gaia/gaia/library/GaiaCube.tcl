@@ -657,7 +657,7 @@ itcl::class gaia::GaiaCube {
          }
 
          #  Clear the iso and volume renderers before changing data.
-         renderers_clear_ 0
+         renderers_clear_ 1
 
          #  Map in all data, this makes it immediately available within
          #  application
