@@ -750,7 +750,8 @@ itcl::class gaia::GaiaCubeSpectrum {
 
       if { $temp_files_ == {} } {
          set temp_files_ [gaia::GaiaTempName \#auto \
-                             -prefix "GaiaTempSpectrum" -type ".sdf"]
+                             -prefix "GaiaTempSpectrum" -type ".sdf"\
+                             -exists 0]
       }
       set filename [$temp_files_ get_name]
       $spec_writer_ write_as_ndf $filename

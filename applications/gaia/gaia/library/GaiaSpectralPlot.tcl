@@ -1294,7 +1294,7 @@ itcl::class gaia::GaiaSpectralPlot {
             if { $temp_files_ == {} } {
                set temp_files_ [gaia::GaiaTempName \#auto \
                                    -prefix "GaiaTempPlasticSpectrum" \
-                                   -type ".fits"]
+                                   -type ".fits" -exists 0]
             }
             set filename [$temp_files_ get_name]
             $itk_option(-spec_writer) write_as_fits $filename

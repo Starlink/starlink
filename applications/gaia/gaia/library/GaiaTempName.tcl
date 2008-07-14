@@ -13,6 +13,9 @@
 #     for a particular purpose. For instance if the prefix is set to
 #     "GaiaClass" and type to ".sdf" then each call to get_name will return a
 #     filename "GaiaClass<n>.sdf", where <n> is some unique integer.
+#     If the exists configuration option is set then it is acceptable
+#     for the given file to exist already (this is the default), 
+#     otherwise the name returned will not be that of an existing file.
 #
 #     All the names generated are stored and the associated disk files
 #     can be deleted using the "clear" method (note the unique integer
@@ -109,8 +112,20 @@ itcl::class gaia::GaiaTempName {
 
    #  Get the next temporary name.
    public method get_name {} {
-      incr unique_
-      set tmpname [gaia::GaiaTempName::make_name $prefix $unique_ $type]
+
+      #  If we need a name for a non-existent file keep looking until
+      #  a free name is found.
+      set loop 1
+      while { $loop } {
+         incr unique_
+         set loop 0
+         set tmpname [gaia::GaiaTempName::make_name $prefix $unique_ $type]
+         if { ! $exists } {
+            if { [::file exists $tmpname] } {
+               set loop 1
+            }
+         }
+      }
       add_name $tmpname
       return $tmpname
    }
@@ -148,12 +163,16 @@ itcl::class gaia::GaiaTempName {
 
    #  The file type.
    public variable type ".sdf"
+
+   #  Whether it is OK to return the name of a file that exists.
+   public variable exists 1
    
    #  Protected variables: (available to instance)
    #  --------------------
 
-   #  Unique counter for generating names.
-   protected variable unique_ 0
+   #  Unique counter for generating names. Starts from the process
+   #  ID to reduce name clashes.
+   protected variable unique_ [pid]
 
    #  List of valid names.
    protected variable tmpnames_ {}
