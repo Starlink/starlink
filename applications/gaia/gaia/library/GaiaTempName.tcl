@@ -171,8 +171,8 @@ itcl::class gaia::GaiaTempName {
    #  --------------------
 
    #  Unique counter for generating names. Starts from the process
-   #  ID to reduce name clashes.
-   protected variable unique_ [pid]
+   #  ID to reduce name clashes, with 1000 spare slots.
+   protected variable unique_ [expr int([pid]*1000)]
 
    #  List of valid names.
    protected variable tmpnames_ {}

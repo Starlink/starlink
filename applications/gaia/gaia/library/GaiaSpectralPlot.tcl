@@ -1293,7 +1293,7 @@ itcl::class gaia::GaiaSpectralPlot {
 
             if { $temp_files_ == {} } {
                set temp_files_ [gaia::GaiaTempName \#auto \
-                                   -prefix "GaiaTempPlasticSpectrum" \
+                                   -prefix "GaiaTempPlasticSpec" \
                                    -type ".fits" -exists 0]
             }
             set filename [$temp_files_ get_name]
