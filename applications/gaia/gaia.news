@@ -142,6 +142,15 @@
     A description of the type of each cube axis will now be shown
     in the cube toolbox.
 
+    When sending spectra to SPLAT it should now be possible to restart
+    GAIA without restarting SPLAT (previously spectra open in SPLAT
+    would not be superceded by new spectra sent from GAIA).
+
+    A bug in the 3D toolboxes that meant reloading a cube with the same
+    name under certain circumstances would fail. This issue should now
+    be resolved (although re-using files with the same name remains 
+    unsupported).
+
   Humu Release
   ============
 
