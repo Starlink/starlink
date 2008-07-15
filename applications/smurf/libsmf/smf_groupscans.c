@@ -193,9 +193,8 @@ AstKeyMap *smf_groupscans( Grp *igrp,  int size, int *maxsyspop,
       }
 
 /* Get the value of the NSUBSCAN keyword. Use a null string if it was not
-   found. */
-      if( !astGetFitsS( fc, "NSUBSCAN", &nsubscan ) ) {
-/* Store the NDF index in the keymap. */
+   found. Store the NDF index in the keymap. */
+      if( astGetFitsS( fc, "NSUBSCAN", &nsubscan ) ) {
         astMapPut0I( sysmap, nsubscan, ifile, NULL );
       } else {
         astMapPut0I( sysmap, "", ifile, NULL );
