@@ -56,6 +56,8 @@
 *        Speed optimisations.
 *     12-JUL-2007 (EC):
 *        Changed name to smf_rebin_totmap from smf_rebincube_totmap
+*     15-JUL-2008 (DSB):
+*        Annull the "fs" pointer before leaving.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -229,6 +231,7 @@ AstMapping *smf_rebin_totmap( smfData *data, dim_t itime,
    loop, and so relying on astBegin/End would be inefficient. */
    grid2sky = astAnnul( grid2sky );
    skyin = astAnnul( skyin );
+   fs = astAnnul( fs );
 
 /* Return the required mapping. */
    return result;
