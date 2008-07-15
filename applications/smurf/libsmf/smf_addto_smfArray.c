@@ -17,18 +17,24 @@
 
 *  Arguments:
 *     ary = smfArray* (Given and Returned)
-*        Pointer to smfArray to populate
+*        Pointer to smfArray to populate. Should be freed using
+*        smf_close_related.
 *     data = smfData* (Given)
 *        Pointer to smfData to be added
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-*     This function adds a given smfData to a smfArray structure. A
-*     check is made that the smfArray is not filled already before
-*     adding the smfData.
+*     This function adds a given smfData to a smfArray structure. The structure
+*     will resize if required but is efficient in the normal usage pattern
+*     of storing data from a shared time slice.
 
 *  Notes:
+*     For the normal case where the smfArray contains related data
+*     from the same time slice but different subarrays, a pre-sized
+*     is used. If more than SMF__MXSMF (usually 8) data files are added
+*     to the array a dynamically allocated buffer is used. It will be resized
+*     on demand.
 *     This routine makes the assumption that there cannot be more than
 *     SMF__MXSMF smfDatas in a smfArray, essentially allowing the
 *     grouping of all four SCUBA-2 subarrays at both
@@ -37,6 +43,7 @@
 *  Authors:
 *     Andy Gibb (UBC)
 *     Ed Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -45,11 +52,15 @@
 *     2007-07-10 (EC):
 *        Changed smfArray.sdata to static array and altered behaviour
 *        so that smfArray.ndat reflects true number of allocated smfData. 
+*     2008-07-14 (TIMJ):
+*        Use dynamically resizing buffer.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Council. Copyright (C) 2006, 2007 University of British Columbia.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -90,34 +101,50 @@
 
 void smf_addto_smfArray( smfArray *ary, smfData *data, int *status ) {
 
-  dim_t ndat;         /* Number of smfDatas that can be added */
+  dim_t i;            /* loop counter */
+  dim_t ndat;         /* Number of smfDatas that have been added */
+  dim_t newsize;      /* Required number of smfDatas */
 
   if (*status != SAI__OK) return;
 
-  /* Retrieve number of smfDatas */
+  /* Retrieve current number of smfDatas */
   ndat = ary->ndat;
+  newsize = ndat + 1;
 
-  /* Check for valid number of smfData pointers */
-  if ( ndat >= SMF__MXSMF ) {
-    if ( *status == SAI__OK ) {
-      msgSeti("N",ndat);
-      *status = SAI__ERROR;
-      errRep(FUNC_NAME, 
-	     "Invalid number of smfDatas, ^N. Possible programming error?", 
-	     status);
-      return;
+  /* we need to switch from static to dynamic buffer */
+  if (ndat == SMF__MXSMF && ary->dyndata == NULL) {
+    ary->dyndata = smf_malloc( 2 * ndat, sizeof(smfData*),1,status );
+
+    /* copy from the static to dynamic buffer */
+    for (i=0; i<ndat; i++) {
+      (ary->dyndata)[i] = (ary->stdata)[i];
+      (ary->stdata)[i] = NULL; /* remove confusion */
+    }
+
+    /* repoint the main data pointer */
+    ary->sdata = ary->dyndata;
+  }
+
+  /* Make sure we have enough space in dynamic buffer */
+  if (ary->dyndata && ary->dynsize < newsize) {
+    smfData **newbuf = NULL;
+    size_t nbins = 1;
+
+    /* double size of buffer each time rather than increment by one
+       each time*/
+    nbins = 2 * ndat;
+    newbuf = smf_realloc( ary->dyndata, nbins, sizeof(smfData*),
+                          status);
+    if (*status == SAI__OK && newbuf ) {
+      ary->dyndata = newbuf;
+      ary->dynsize = nbins;
     }
   }
 
-  /* add pointer to sdata if there is enough space */
-  if( ndat < SMF__MXSMF-1 ) {
+  /* add pointer to sdata  */
+  if (*status == SAI__OK) {
     (ary->sdata)[ndat] = data;
     (ary->ndat)++;
-  } else if( *status == SAI__OK ) {
-    *status = SAI__ERROR;
-    errRep(FUNC_NAME, 
-	   "Unable to add smfData to current smfArray: all pointers set", 
-	   status);
   }
 
   return;

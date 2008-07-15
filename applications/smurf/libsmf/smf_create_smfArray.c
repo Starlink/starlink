@@ -22,7 +22,7 @@
 *  Return Value:
 *     smf_create_smfArray = smfArray*
 *        Pointer to newly created smfArray. NULL on error. Must be
-*        freed using smf_free.
+*        freed using smf_close_related.
 
 *  Description:
 *     This function allocates memory for a smfArray structure, sets
@@ -37,6 +37,7 @@
 *  Authors:
 *     Andy Gibb (UBC)
 *     Ed Chapin (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -51,11 +52,14 @@
 *        smf_addto_smfArray call)
 *     2007-12-18 (AGG):
 *        Update to use new smf_free behaviour
+*     2008-07-14 (TIMJ):
+*        Initialise to take into account new dynamic behaviour.
 *     {enter_further_changes_here}
 
 *  Copyright:
-*     Copyright (C) 2006 Particle Physics and Astronomy Research
-*     Council. University of British Columbia. All Rights Reserved.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2006, 2007 University of British Columbia.
+*     All Rights Reserved.
 
 *  Licence:
 *     This program is free software; you can redistribute it and/or
@@ -112,6 +116,10 @@ smfArray *smf_create_smfArray( int * status ) {
     goto CLEANUP;
   }
 
+  /* Point the default content to static buffer */
+  ary->sdata = ary->stdata;
+  ary->dyndata = NULL;
+
   /* Set each smfData pointer to NULL */
   for ( i=0; i<SMF__MXSMF; i++) {
     (ary->sdata)[i] = NULL;
@@ -119,6 +127,7 @@ smfArray *smf_create_smfArray( int * status ) {
 
   /* Initialize number of smfDatas */
   ary->ndat = 0;
+  ary->dynsize = 0;
 
   return ary;
 

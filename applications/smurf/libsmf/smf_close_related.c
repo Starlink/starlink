@@ -22,16 +22,17 @@
 *        Pointer to global status.
 
 *  Description:
-
 *     This routine retrieves all of the smfDatas stored in the given
 *     smfArray and frees up the resources for each one in turn. The
-*     input smfArray is set to NULL on success.
+*     input smfArray is also freed and set to NULL on success.
 
 *  Notes:
-*      - This is the companion routine to smf_open_related.c
+*      - This is the companion routine to smf_open_related.c and
+*        smf_create_smfArray.c.
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -41,8 +42,11 @@
 *        Update to use new smf_free behaviour
 *     2008-04-03 (AGG):
 *        Free resources even if status is bad
+*     2008-07-14 (TIMJ):
+*        Free dynamic memory.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2008 University of British Columbia.  All
 *     Rights Reserved.
 
@@ -110,5 +114,12 @@ void smf_close_related ( smfArray **relfiles, int *status ) {
       smf_close_file( &data, status );
     }
   }
+
+  /* Free dynamically allocated buffer */
+  if ((*relfiles)->dyndata) {
+    (*relfiles)->dyndata = smf_free((*relfiles)->dyndata, status);
+  }
+
+  /* Free resources of struct */
   *relfiles = smf_free( *relfiles, status );
 }

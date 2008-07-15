@@ -134,11 +134,14 @@
 *         smfGroup.ngroups/nrelated
 *     2008-07-10 (TIMJ):
 *        DA struct now includes dark squid
+*     2008-07-14 (TIMJ):
+*        smfArray can be dynamic
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
+*     Copyright (C) 2005-2008 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -340,8 +343,11 @@ typedef struct smfData {
    smfDatas */
 
 typedef struct smfArray {
-  smfData *sdata[SMF__MXSMF];/* Pointers to smfDatas */
-  dim_t ndat;                /* Number of smfDatas in current smfArray */
+  smfData **sdata;            /* pointers to smfData, static or dynamic */
+  smfData *stdata[SMF__MXSMF];/* Pointers to pre-allocated smfDatas */
+  smfData **dyndata;          /* pointer to dynamically allocated array */
+  dim_t ndat;                 /* Number of smfDatas in current smfArray */
+  dim_t dynsize;              /* Size of dynamically allocated array */
 } smfArray;
 
 /* This struct is used to group related files together */
