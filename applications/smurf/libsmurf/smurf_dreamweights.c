@@ -61,6 +61,8 @@
 *        Allow CONFIG=!
 *     2008-07-11 (AGG):
 *        Tidy up, ensure all pointers are freed
+*     2008-07-14 (AGG):
+*        Make sure Grp for config is always freed
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -171,8 +173,8 @@ void smurf_dreamweights ( int *status ) {
       astMapPut0D( keymap, "GRIDSTEP", 6.28, "" );
     } else {
       kpg1Kymap( confgrp, &keymap, status );
-      if( confgrp ) grpDelet( &confgrp, status );      
     }
+    if( confgrp ) grpDelet( &confgrp, status );      
   }
 
   /* Determine grid parameters from inputs given above */
