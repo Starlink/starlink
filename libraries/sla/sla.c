@@ -79,6 +79,8 @@
 *     12-MAR-2008 (TIMJ):
 *        Add slaOap, slaDr2af, slaAmp, slaPertel, slaPlanet, slaCldj
 *        to enable elements test.
+*     14-JUL-2008 (TIMJ):
+*        Allowed to use const.
 *-
 */
 
@@ -1562,7 +1564,7 @@ F77_SUBROUTINE(sla_deuler)( CHARACTER(ORDER),
                             DOUBLE_ARRAY(RMAT)
                             TRAIL(ORDER) );
 
-void slaDeuler ( char *order, double phi, double theta, double psi,
+void slaDeuler ( const char *order, double phi, double theta, double psi,
                  double rmat[3][3] ) {
 
    DECLARE_CHARACTER(ORDER,4);
@@ -1790,7 +1792,7 @@ F77_SUBROUTINE(sla_dafin)( CHARACTER(STRING), INTEGER(IPTR), DOUBLE(A),
 			   INTEGER(J) TRAIL(STRING) );
 
 void
-slaDafin( char * string, int * iptr, double *a, int *j ) {
+slaDafin( const char * string, int * iptr, double *a, int *j ) {
 
   DECLARE_CHARACTER_DYN(STRING);
   DECLARE_DOUBLE(A);
@@ -1829,7 +1831,7 @@ F77_SUBROUTINE(sla_oap)( CHARACTER(TYPE),
                          DOUBLE(DAP)
                          TRAIL(TYPE) );
 
-void slaOap ( char *type, double ob1, double ob2, double date,
+void slaOap ( const char *type, double ob1, double ob2, double date,
               double dut, double elongm, double phim, double hm,
               double xp, double yp, double tdk, double pmb,
               double rh, double wl, double tlr,
