@@ -72,6 +72,8 @@
 *     2008-07-11 (AGG):
 *        Hand off heavy lifting to calcmapwt routine in sc2math, allow
 *        for lower-case obsmode string
+*     2008-07-14 (AGG):
+*        Remove unnecessary call to calculate jiggrid array
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -187,11 +189,6 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
 
       msgSeti("I",index);
       msgOutif(MSG__VERB," ", "Beginning weights calculation for file ^I: this will take some time (~5-10 mins)", status);
-
-      /* Determine the grid of jiggle patterns */
-      sc2math_jig2grid( subarray, gridstep, nsampcycle, 
-			dream->jigpath, &(dream->jiggrid[0]), status );
-
 
       /* Some useful shortcuts. Maybe. */
       nbolx = (data->dims)[0];
