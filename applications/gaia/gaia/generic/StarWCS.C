@@ -15,7 +15,7 @@
  *  Copyright:
  *     Copyright (C) 1997-1999 Central Laboratory of the Research Councils
  *     Copyright (C) 2006 Particle Physics & Astronomy Research Council.
- *     Copyright (C) 2007 Science and Technology Facilities Council.
+ *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
  *  Licence:
@@ -295,8 +295,7 @@ StarWCS::StarWCS( const char *header, const size_t lheader )
             //  cards.
             astClear( fitschan, "Card" );
             constructWarning( default_encoding, wcs_ == NULL, fitschan );
-            astClear( fitschan, "Warnings" );
-            
+
             //  Release the fitschan.
             fitschan = (AstFitsChan *) astAnnul( fitschan );
         }
