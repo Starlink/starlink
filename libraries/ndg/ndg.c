@@ -39,11 +39,13 @@
 *        Added ndgPtprv, ndgBegpv and ndgEndpv.
 *     23-NOV-2007 (DSB):
 *        Removed ndgPtprv (now in ndg_provenance.c) and modified ndgEndpv.
+*     15-JUL-2008 (TIMJ):
+*        Use size_t for index to match new Grp interface.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -81,7 +83,7 @@
 F77_SUBROUTINE(ndg_ndfas)( INTEGER(IGRP), INTEGER(INDEX), CHARACTER(MODE), INTEGER(INDF), 
 INTEGER(STATUS) TRAIL(MODE) );
 
-void ndgNdfas( const Grp *igrp, int index, const char mode[], int * indf, int * status ) {
+void ndgNdfas( const Grp *igrp, size_t index, const char mode[], int * indf, int * status ) {
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(INDEX);
    DECLARE_CHARACTER(MODE, 10);
@@ -107,7 +109,7 @@ F77_SUBROUTINE(ndg_ndfcr)( INTEGER(IGRP), INTEGER(INDEX), CHARACTER(FTYPE), INTE
 			   INTEGER(LBND), INTEGER(UBND), INTEGER(INDF), INTEGER(STATUS)
 			   TRAIL(FTYPE) );
 
-void ndgNdfcr( const Grp* igrp, int index, const char ftype[], int ndim,
+void ndgNdfcr( const Grp* igrp, size_t index, const char ftype[], int ndim,
 	       const hdsdim lbnd[], const hdsdim ubnd[], int * indf, int * status ) {
 
   DECLARE_INTEGER(IGRP);
@@ -143,7 +145,7 @@ void ndgNdfcr( const Grp* igrp, int index, const char ftype[], int ndim,
 
 F77_SUBROUTINE(ndg_ndfpr)( INTEGER(INDF1), CHARACTER(CLIST), INTEGER(IGRP), INTEGER(INDEX), INTEGER(INDF2), INTEGER(STATUS) TRAIL(CLIST));
 
-void ndgNdfpr( int indf1, const char clist[], const Grp *igrp, int index, int * indf2, int * status) {
+void ndgNdfpr( int indf1, const char clist[], const Grp *igrp, size_t index, int * indf2, int * status) {
 
   DECLARE_INTEGER(INDF1);
   DECLARE_CHARACTER(CLIST, 128);
@@ -171,7 +173,7 @@ void ndgNdfpr( int indf1, const char clist[], const Grp *igrp, int index, int * 
 F77_SUBROUTINE(ndg_asexp)( CHARACTER(GRPEXP), LOGICAL(VERB), INTEGER(IGRP1), INTEGER(IGRP2),
 			   INTEGER(SIZE), LOGICAL(FLAG), INTEGER(STATUS) TRAIL(GRPEXP) );
 
-void ndgAsexp( const char grpexp[], int verb, const Grp *igrp1, Grp ** igrp2, int *size, int * flag,
+void ndgAsexp( const char grpexp[], int verb, const Grp *igrp1, Grp ** igrp2, size_t *size, int * flag,
 	       int *status ){
    DECLARE_INTEGER(IGRP1);
    DECLARE_INTEGER(IGRP2);
@@ -213,7 +215,7 @@ F77_SUBROUTINE(ndg_gtsup)( INTEGER(IGRP), INTEGER(I), CHARACTER_ARRAY(FIELDS),
    string for which a pointer has been supplied in "fields". This length
    should include room for the trailing null. */
 
-void ndgGtsup( const Grp *grp, int i, char const *fields[6], int len, int *status ){
+void ndgGtsup( const Grp *grp, size_t i, const char const *fields[6], size_t len, int *status ){
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(I);
    DECLARE_CHARACTER_ARRAY_DYN(FIELDS);
@@ -231,7 +233,7 @@ void ndgGtsup( const Grp *grp, int i, char const *fields[6], int len, int *statu
                         INTEGER_ARG(&STATUS) 
                         TRAIL_ARG(FIELDS) );
 
-   F77_IMPORT_CHARACTER_ARRAY_P(FIELDS,FIELDS_length,((char *const *)fields),
+   F77_IMPORT_CHARACTER_ARRAY_P(FIELDS,FIELDS_length,fields,
                                 len,6);
    F77_FREE_CHARACTER(FIELDS);
    F77_IMPORT_INTEGER( STATUS, *status );
@@ -242,7 +244,7 @@ void ndgGtsup( const Grp *grp, int i, char const *fields[6], int len, int *statu
 F77_SUBROUTINE(ndg_cpsup)( INTEGER(IGRP1), INTEGER(I), INTEGER(IGRP2), 
                            INTEGER(STATUS) );
 
-void ndgCpsup( const Grp *igrp1, int i, Grp *igrp2, int * status ) {
+void ndgCpsup( const Grp *igrp1, size_t i, Grp *igrp2, int * status ) {
    DECLARE_INTEGER(IGRP1);
    DECLARE_INTEGER(I);
    DECLARE_INTEGER(IGRP2);

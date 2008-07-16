@@ -104,6 +104,7 @@
  *     AJC: Alan Chipperfield (STARLINK, RAL)
  *     BC: Brad Cavanagh (JAC, Hawaii)
  *     PWD: Peter Draper (STARLINK - Durham University)
+ *     TIMJ: Tim Jenness (JAC, Hawaii)
  *     {enter_new_authors_here}
 
  *  History:
@@ -119,6 +120,8 @@
  *        Previously only worked for 2D images (by chance).
  *     23-AUG-2006 (BC):
  *        Replace C++-style comments with C-style.
+ *     15-JUL-2008 (TIMJ):
+ *        Tweak NDG API to use size_t
  *     {enter_changes_here}
  
  *  Bugs:
@@ -168,7 +171,7 @@ void real_extractor( int *status ) {
     int narg;                /*  Number of parameters */
     int nim;                 /*  Number of images given (max=2) */
     Grp *igrp;               /*  Group identifier for input NDFs */
-    int size;                /*  Number of NDFs returned */
+    size_t size;                /*  Number of NDFs returned */
     int flag;                /*  Status of NDFs returned */
 
     if ( setjmp( env ) == 0 ) {

@@ -38,6 +38,8 @@
 *        Added ndgPtprv, ndgBegpv and ndgEndpv.
 *     4-JUL-2008 (TIMJ):
 *        Add some sprinkling of const-ness.
+*     15-JUL-2008 (TIMJ):
+*        Use size_t for index to match new Grp interface.
 
 *  Copyright:
 *     Copyright (C) 2005 Particle Physics and Astronomy Research Council.
@@ -73,15 +75,15 @@
 
 /* Public function prototypes */
 /* -------------------------- */
-void ndgAsexp( const char grpexp[], int verb, const Grp *igrp1, Grp **igrp2, int *size, int *flag, int *status );
-void ndgAssoc( const char *param, int verb, Grp **igrp, int *size, int *flag, int *status );
-void ndgCreat( const char *param, const Grp *igrp0, Grp **igrp, int *size, int *flag, int *status);
-void ndgNdfas( const Grp *igrp, int index, const char mode[], int *indf, int *status );
-void ndgNdfcr( const Grp *igrp, int index, const char ftype[], int ndim,
+void ndgAsexp( const char grpexp[], int verb, const Grp *igrp1, Grp **igrp2, size_t *size, int *flag, int *status );
+void ndgAssoc( const char *param, int verb, Grp **igrp, size_t *size, int *flag, int *status );
+void ndgCreat( const char *param, const Grp *igrp0, Grp **igrp, size_t *size, int *flag, int *status);
+void ndgNdfas( const Grp *igrp, size_t index, const char mode[], int *indf, int *status );
+void ndgNdfcr( const Grp *igrp, size_t index, const char ftype[], int ndim,
 	       const hdsdim lbnd[], const hdsdim ubnd[], int *indf, int *status );
-void ndgNdfpr( int indf1, const char clist[], const Grp *igrp, int index, int *indf2, int *status);
-void ndgGtsup( const Grp *grp, int i, char const *fields[6], int len, int *status );
-void ndgCpsup( const Grp *igrp1, int i, Grp *igrp2, int * status );
+void ndgNdfpr( int indf1, const char clist[], const Grp *igrp, size_t index, int *indf2, int *status);
+void ndgGtsup( const Grp *grp, size_t i, const char const *fields[6], size_t len, int *status );
+void ndgCpsup( const Grp *igrp1, size_t i, Grp *igrp2, int * status );
 void ndgBegpv( int *status );
 void ndgEndpv( const char *creator, int *status );
 void ndgPtprv( int indf1, int indf2, HDSLoc *more, int isroot, const char *creator, int *status );

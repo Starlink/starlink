@@ -49,6 +49,8 @@
 *     NDG-expanded version of group.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
+*     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     Copyright (C) 2001 Central Laboratory of the Research Councils.
 *     All Rights Reserved.
 
@@ -71,13 +73,16 @@
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
 *     DSB: David S Berry (JAC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     14-JUN-2001 (MBT):
 *        Original version.
-*     15-AUG-2006 (MBT):
+*     15-AUG-2006 (DSB):
 *        Changed to use C interface for GRP and NDG.
+*     15-JUL-2008 (TIMJ):
+*        Tweak NDG interace.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -118,7 +123,7 @@
       int i;                        /* Loop variable */
       int j;                        /* Loop variable */
       int nflag;                    /* Number of flags supplied */
-      int size;                     /* Number of items in output group */
+      size_t size;                     /* Number of items in output group */
       int unblank;                  /* Pattern string is not empty */
 
 /* Process flags. */
