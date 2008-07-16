@@ -829,6 +829,9 @@ f     - AST_RETAINFITS: Ensure current card is retained in a FitsChan
 *        Improve efficiency of FindWcs.
 *     2-JUL-2008 (DSB):
 *        FitsSof now returns non-zero if the FitsChan is empty.
+*     16-JUL-2008 (DSB):
+*        Plug memory leak caused by failure to free the Warnings
+*        attribute string when a FitsChan is deleted.
 *class--
 */
 
@@ -33429,6 +33432,7 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
    out->source_wrap = NULL;
    out->sink = NULL;
    out->sink_wrap = NULL;
+   out->warnings = NULL;
 
 /* Store the object class. */
    class = astGetClass( in );
@@ -33466,6 +33470,10 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 
 /* Copy the list of keyword sequence numbers used. */
    if( in->keyseq ) out->keyseq = astCopy( in->keyseq );
+
+/* Copy the Warnings attribute value */
+   if( in->warnings ) out->warnings = astStore( NULL, in->warnings, 
+                                                strlen( in->warnings ) + 1 );
 
 /* Reinstate the original setting of the external IgnoreUsed variable. */
    IgnoreUsed = old_ignoreused;
@@ -33514,6 +33522,9 @@ static void Delete( AstObject *obj ) {
 
 /* Remove all cards from the FitsChan. */
    Empty( this );
+
+/* Free any memory used to hold the Warnings attribute value. */
+   this->warnings = astFree( this->warnings );
 
    return;
 }
