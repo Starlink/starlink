@@ -37,7 +37,7 @@ if test "$GCC" = "yes"; then
 ])],,[have_fsc=no])
     AC_LANG_POP([Fortran])
     echo $have_fsc
-    if test "$have_fsp" = "no"; then
+    if test "$have_fsc" = "no"; then
         FCFLAGS="$fsc_old_fcflags"
     fi
 fi
