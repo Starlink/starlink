@@ -943,7 +943,7 @@ void smurf_timesort( int *status ) {
    file. */
                first[ isubscan ] = nts_in;
       
-/* Increment the total number of time slices recorded.· */
+/* Increment the total number of time slices recorded. */
                nts_in += dims[ 2 ];
       
 /* Extend the "file_index" array and store the file index in every new 
@@ -1301,7 +1301,7 @@ void smurf_timesort( int *status ) {
                      jel = 0;
 
 /* Loop round all detectors in the input NDF. */
-                     for( idet = 0; idet < ndet; idet++ ) {
+                     for( idet = 0; idet < ndet && *status == SAI__OK; idet++ ) {
 
 /* Initialise a flag to indicate that the spectrum from this input detector 
    contains no good data values. */
