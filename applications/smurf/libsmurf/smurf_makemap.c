@@ -1214,7 +1214,7 @@ void smurf_makemap( int *status ) {
   if( igrp != NULL ) grpDelet( &igrp, status);
   if( igrp4 != NULL) grpDelet( &igrp4, status);
   if( ogrp != NULL ) grpDelet( &ogrp, status);
-  if( boxes ) boxes = astFree( boxes );
+  if( boxes ) boxes = smf_free( boxes, status );
   if( tiles ) tiles = smf_freetiles( tiles, ntile, status );
 
   ndfEnd( status );
