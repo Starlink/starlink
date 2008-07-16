@@ -601,6 +601,7 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   keepchunk = smf_free( keepchunk, status );
   chunk = smf_free( chunk, status );
   all_len = smf_free( all_len, status); 
+  lambda = smf_free( lambda, status );
 
   if( subgroups ) {
     for( i=0; i<ngroups; i++ ) {
