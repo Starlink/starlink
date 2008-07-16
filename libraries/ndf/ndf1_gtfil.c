@@ -174,60 +174,60 @@
 
 /* We only need to perform this on the first invocation.		    */
       if ( first )
-      {
+        {
 
 /* Initialise a dynamic character string descriptor to describe the	    */
 /* returned value.							    */
-         dsc.dsc$a_pointer = NULL;
-         dsc.dsc$b_class = DSC$K_CLASS_D;
-         dsc.dsc$b_dtype = DSC$K_DTYPE_T;
-         dsc.dsc$w_length = (unsigned short int) 0;
+          dsc.dsc$a_pointer = NULL;
+          dsc.dsc$b_class = DSC$K_CLASS_D;
+          dsc.dsc$b_dtype = DSC$K_DTYPE_T;
+          dsc.dsc$w_length = (unsigned short int) 0;
 
 /* Obtain the file name of the currently executing image.		    */
-         code = JPI$_IMAGNAME;
-         systat = lib$getjpi( &code, (unsigned int) 0,
-                              (struct dsc$descriptor *) 0, (void *) 0,
-			      &dsc, &len );
+          code = JPI$_IMAGNAME;
+          systat = lib$getjpi( &code, (unsigned int) 0,
+                               (struct dsc$descriptor *) 0, (void *) 0,
+                               &dsc, &len );
 
 /* Check for and report any errors - also trap string truncation (normally  */
 /* regarded as a success status).					    */
-         if ( !( systat & STS$M_SUCCESS ) || ( systat == LIB$_STRTRU ) )
-         {
-            *STATUS = NDF__FATIN;
-	    ems_syser_c( "MESSAGE", systat );
-	    ems_rep_c( "NDF1_GTFIL_1",
-	               "Error determining the file name of the currently \
+          if ( !( systat & STS$M_SUCCESS ) || ( systat == LIB$_STRTRU ) )
+            {
+              *STATUS = NDF__FATIN;
+              ems_syser_c( "MESSAGE", systat );
+              ems_rep_c( "NDF1_GTFIL_1",
+                         "Error determining the file name of the currently \
 executing VMS image - ^MESSAGE.", STATUS );
-         }
+            }
 
 /* Obtain a pointer to the resulting file name and save its length. Note    */
 /* that the first invocation completed successfully.			    */
-	 else
-	 {
-            result = (char *) dsc.dsc$a_pointer;
-	    length = (int) len;
-	    first = 0;
-	 }
-      }
+          else
+            {
+              result = (char *) dsc.dsc$a_pointer;
+              length = (int) len;
+              first = 0;
+            }
+        }
 
 /* If OK, copy the result into the caller's buffer, truncating if	    */
 /* necessary.								    */
       if ( *STATUS == SAI__OK )
-      {
-         for ( i = 0; ( i < length ) && ( i < NAME_length ); i++ )
-	 {
-	    NAME[ i ] = result[ i ];
-	 }
+        {
+          for ( i = 0; ( i < length ) && ( i < NAME_length ); i++ )
+            {
+              NAME[ i ] = result[ i ];
+            }
 
 /* Return the file name length.						    */
-	 *LNAME = (F77_INTEGER_TYPE) i;
+          *LNAME = (F77_INTEGER_TYPE) i;
 
 /* Pad the caller's buffer with blanks if necessary.			    */
-	 for ( ; i < NAME_length; i++ )
-	 {
-	    NAME[ i ] = (F77_CHARACTER_TYPE) ' ';
-	 }
-      }
+          for ( ; i < NAME_length; i++ )
+            {
+              NAME[ i ] = (F77_CHARACTER_TYPE) ' ';
+            }
+        }
 
 /* POSIX version:							    */
 /* =============							    */
@@ -235,256 +235,258 @@ executing VMS image - ^MESSAGE.", STATUS );
 
 /* We only need to perform this on the first invocation.		    */
       if ( first )
-      {
+        {
 
 /* Get the value of the zero'th argument (the name of the command being	    */
 /* executed).								    */
-         iarg = (F77_INTEGER_TYPE) 0;
-         F77_CALL(ndf1_gtarg)( INTEGER_ARG(&iarg), CHARACTER_ARG(arg0),
-                               INTEGER_ARG(&larg), INTEGER_ARG(STATUS)
-			       TRAIL_ARG(arg0) );
+          iarg = (F77_INTEGER_TYPE) 0;
+          F77_CALL(ndf1_gtarg)( INTEGER_ARG(&iarg), CHARACTER_ARG(arg0),
+                                INTEGER_ARG(&larg), INTEGER_ARG(STATUS)
+                                TRAIL_ARG(arg0) );
 
 /* If OK, allocate space to hold the argument value as a C string and check */
 /* for errors.								    */
-         if ( *STATUS == SAI__OK )
-         {
-	    size = (size_t) larg + (size_t) 1;
-            name = (char *) malloc( size );
-	    if ( name == NULL )
-	    {
-	       *STATUS = NDF__NOMEM;
-	       ems_seti_c( "NBYTES", (int) size );
-	       ems_errno_c( "MESSAGE", errno );
-	       ems_rep_c( "NDF1_GTFIL_2",
-	                  "Unable to allocate a block of ^NBYTES bytes of \
+          if ( *STATUS == SAI__OK )
+            {
+              size = (size_t) larg + (size_t) 1;
+              name = (char *) malloc( size );
+              if ( name == NULL )
+                {
+                  *STATUS = NDF__NOMEM;
+                  ems_seti_c( "NBYTES", (int) size );
+                  ems_errno_c( "MESSAGE", errno );
+                  ems_rep_c( "NDF1_GTFIL_2",
+                             "Unable to allocate a block of ^NBYTES bytes of \
 memory - ^MESSAGE",
-                          STATUS );
-	    }
+                             STATUS );
+                }
 
 /* Copy the argument value into the allocated space, appending a null. This */
 /* forms the first guess at the required file path name.		    */
-	    else
-	    {
-	       for ( i = 0; i < (int) larg; i++ )
-	       {
-	          name[ i ] = (char) arg0[ i ];
-	       }
-	       name[ i ] = '\0';
+              else
+                {
+                  for ( i = 0; i < (int) larg; i++ )
+                    {
+                      name[ i ] = (char) arg0[ i ];
+                    }
+                  name[ i ] = '\0';
+                }
             }
-         }
 
 /* If the path name is blank, then return a blank result.		    */
-         if ( *STATUS == SAI__OK )
-         {
-            if ( name[ 0 ] == '\0' )
+          if ( *STATUS == SAI__OK )
             {
-	       result = name;
-	    }
+              if ( name[ 0 ] == '\0' )
+                {
+                  result = name;
+                }
 
 /* Otherwise, if the path name starts with ~, then expand this into the	    */
 /* appropriate user's initial working directory name and free the original  */
 /* string.								    */
-            else
-            {
-	       if ( name[ 0 ] == '~' )
-	       {
-	          tmp = ndf1_tilde( name, STATUS );
-	          free( (void *) name );
-	          name = tmp;
-	       }
+              else
+                {
+                  if ( name[ 0 ] == '~' )
+                    {
+                      tmp = ndf1_tilde( name, STATUS );
+                      free( (void *) name );
+                      name = tmp;
+                    }
 
 /* If the path name does not contain a "/", we must identify the file by    */
 /* duplicating the directory search performed when the current program was  */
 /* invoked. Note the file has not yet been found. Also record the current   */
 /* path name length.							    */
-	       if ( *STATUS == SAI__OK )
-	       {
-	          found = 1;
-	          if ( strchr( name, '/' ) == NULL )
-	          {
-		     found = 0;
-	             szname = strlen( name );
+                  if ( *STATUS == SAI__OK )
+                    {
+                      found = 1;
+                      if ( strchr( name, '/' ) == NULL )
+                        {
+                          found = 0;
+                          szname = strlen( name );
 
 /* Translate the PATH environment variable to give the directory search	    */
 /* path string. Use an empty string if it has no translation.		    */
-	             path = getenv( "PATH" );
-	             if ( path == NULL ) path = "";
+                          path = getenv( "PATH" );
+                          if ( path == NULL ) path = "";
 
 /* Since the path string will be modified (by the strtok function), we must */
 /* allocate space for a local copy, checking for errors.		    */
-	             size = strlen( path ) + (size_t) 1;
-	             localpath = (char *) malloc( size );
-	             if ( localpath == NULL )
-	             {
-	                *STATUS = NDF__NOMEM;
-			ems_seti_c( "NBYTES", (int) size );
-		        ems_errno_c( "MESSAGE", errno );
-		        ems_rep_c( "NDF1_GTFIL_3",
-	                           "Unable to allocate a block of ^NBYTES \
+                          size = strlen( path ) + (size_t) 1;
+                          localpath = (char *) malloc( size );
+                          if ( localpath == NULL )
+                            {
+                              *STATUS = NDF__NOMEM;
+                              ems_seti_c( "NBYTES", (int) size );
+                              ems_errno_c( "MESSAGE", errno );
+                              ems_rep_c( "NDF1_GTFIL_3",
+                                         "Unable to allocate a block of ^NBYTES \
 bytes of memory - ^MESSAGE",
-                                   STATUS );
-	             }
+                                         STATUS );
+                            }
 
 /* Make a local copy of the search path string and loop to process each	    */
 /* directory field within it.						    */
-	             else
-	             {
-	                (void) strcpy( localpath, path );
-	                for ( dir = strtok( localpath, ":" );
-		              ( *STATUS == SAI__OK ) && ( dir != NULL ) &&
-			      !found; dir = strtok( (char *) NULL, ":" ) )
-	                {
+                          else
+                            {
+                              (void) strcpy( localpath, path );
+                              for ( dir = strtok( localpath, ":" );
+                                    ( *STATUS == SAI__OK ) && ( dir != NULL ) &&
+                                      !found; dir = strtok( (char *) NULL, ":" ) )
+                                {
 
 /* Allocate space to hold the full file name and check for errors.	    */
-		           size = strlen( dir ) + (size_t) 1 + szname +
-			          (size_t) 1;
-		           file = (char *) malloc( size );
-			   if ( file == NULL )
-		           {
-			      *STATUS = NDF__NOMEM;
-			      ems_seti_c( "NBYTES", (int) size );
-			      ems_errno_c( "MESSAGE", errno );
-			      ems_rep_c( "NDF1_GTFIL_4",
-				         "Unable to allocate a block of \
+                                  size = strlen( dir ) + (size_t) 1 + szname +
+                                    (size_t) 1;
+                                  file = (char *) malloc( size );
+                                  if ( file == NULL )
+                                    {
+                                      *STATUS = NDF__NOMEM;
+                                      ems_seti_c( "NBYTES", (int) size );
+                                      ems_errno_c( "MESSAGE", errno );
+                                      ems_rep_c( "NDF1_GTFIL_4",
+                                                 "Unable to allocate a block of \
 ^NBYTES bytes of memory - ^MESSAGE",
-                                         STATUS );
-		           }
+                                                 STATUS );
+                                    }
 
 /* Concatenate the directory name and the file name with a separating "/".  */
-		           else
-		           {
-		              (void) strcpy( file, dir );
-			      (void) strcat( file, "/" );
-			      (void) strcat( file, name );
-
+                                  else
+                                    {
+                                      (void) strcpy( file, dir );
+                                      (void) strcat( file, "/" );
+                                      (void) strcat( file, name );
+                                      
 /* If the resulting path name starts with ~ (because this appeared in the   */
 /* search path), then expand it into the name of the appropriate user's	    */
 /* initial working directory and free the original string.		    */
-		              if ( dir[ 0 ] == '~' )
-		              {
-		                 tmp = ndf1_tilde( file, STATUS );
-			         free( (void *) file );
-			         file = tmp;
-		              }
+                                      if ( dir[ 0 ] == '~' )
+                                        {
+                                          tmp = ndf1_tilde( file, STATUS );
+                                          free( (void *) file );
+                                          file = tmp;
+                                        }
 
 /* If file status information is available, the file is not a directory and */
 /* it is executable, then it has been found. Note this fact.		    */
-			      if ( *STATUS == SAI__OK )
-			      {
-			         if ( !stat( file, &statbuf ) &&
-			              !S_ISDIR( statbuf.st_mode ) &&
-			              !access( file, X_OK ) )
-			         {
-			            found = 1;
+                                      if ( *STATUS == SAI__OK )
+                                        {
+                                          if ( !stat( file, &statbuf ) &&
+                                               !S_ISDIR( statbuf.st_mode ) &&
+                                               !access( file, X_OK ) )
+                                            {
+                                              found = 1;
 
 /* Save the full file name string (which may still be relative and need the */
 /* current working directory prepending). Set file to NULL to prevent this  */
 /* string from being deallocated.					    */
-				    free( (void *) name );
-				    name = file;
-				    file = NULL;
-			         }
-			      }
-
+                                              free( (void *) name );
+                                              name = file;
+                                              file = NULL;
+                                            }
+                                        }
+                                      
 /* Free the full file name string before returning to search the next	    */
 /* directory on the search path.					    */
-			      free( (void *) file );
-			   }
-		        }
+                                      free( (void *) file );
+                                    }
+                                }
 
 /* Deallocate the local copy of the search path.			    */
-		        free( (void *) localpath );
-	             }
-	          }
-	       }
+                              free( (void *) localpath );
+                            }
+                        }
+                    }
 
 /* If the path name is absolute, or a search to identify the file was made  */
 /* which was not successful, then use the current value directly.	    */
-	       if ( *STATUS == SAI__OK )
-	       {
-	          if ( ( name[ 0 ] == '/' ) || !found )
-	          {
-		     result = name;
-	          }
+                  if ( *STATUS == SAI__OK )
+                    {
+                      if ( ( name[ 0 ] == '/' ) || !found )
+                        {
+                          result = name;
+                        }
 
 /* Otherwise, obtain the name of the current working directory, checking    */
 /* for errors.								    */
-	          else
-	          {
-	             if ( getcwd( cwd, (size_t) FILENAME_MAX ) == NULL )
-		     {
-	                *STATUS = NDF__FATIN;
-	                ems_errno_c( "MESSAGE", errno );
-	                ems_rep_c( "NDF1_GTFIL_5",
-	                           "Unable to determine the path name of the \
+                      else
+                        {
+                          if ( getcwd( cwd, (size_t) FILENAME_MAX ) == NULL )
+                            {
+                              *STATUS = NDF__FATIN;
+                              ems_errno_c( "MESSAGE", errno );
+                              ems_rep_c( "NDF1_GTFIL_5",
+                                         "Unable to determine the path name of the \
 current working directory - ^MESSAGE",
-                                   STATUS );
-		     }
+                                         STATUS );
+                            }
 
 /* Loop to repeatedly remove any redundant occurrences of ./ at the start   */
 /* of the relative path name.						    */
-		     else
-		     {
-			for ( szname = strlen( name );
-                              ( szname >= (size_t) 2 ) &&
-			      ( name[ 0 ] == '.' ) && ( name[ 1 ] == '/' );
-			      szname -= (size_t) 2 )
-			{
-			   (void) memmove( (void *) name, (void *) ( name + 2 ),
-					   szname - (size_t) 1 );
-			}
+                          else
+                            {
+                              for ( szname = strlen( name );
+                                    ( szname >= (size_t) 2 ) &&
+                                      ( name[ 0 ] == '.' ) &&
+                                      ( name[ 1 ] == '/' );
+                                    szname -= (size_t) 2 )
+                                {
+                                  (void) memmove( (void *) name, 
+                                                  (void *) ( name + 2 ),
+                                                  szname - (size_t) 1 );
+                                }
 
 /* Allocate space to hold the final path name and check for errors.	    */
-		        size = strlen( cwd ) + (size_t) 1 + szname +
-			       (size_t) 1;
-		        result = (char *) malloc( size );
-		        if ( result == NULL )
-		        {
-		           *STATUS = NDF__NOMEM;
-		           ems_seti_c( "NBYTES", (int) size );
-			   ems_errno_c( "MESSAGE", errno );
-			   ems_rep_c( "NDF1_GTFIL_6",
-	                              "Unable to allocate a block of ^NBYTES \
+                              size = strlen( cwd ) + (size_t) 1 + szname +
+                                (size_t) 1;
+                              result = (char *) malloc( size );
+                              if ( result == NULL )
+                                {
+                                  *STATUS = NDF__NOMEM;
+                                  ems_seti_c( "NBYTES", (int) size );
+                                  ems_errno_c( "MESSAGE", errno );
+                                  ems_rep_c( "NDF1_GTFIL_6",
+                                             "Unable to allocate a block of ^NBYTES \
 bytes of memory - ^MESSAGE",
-                                      STATUS );
-		        }
+                                             STATUS );
+                                }
 
 /* Prepend the current working directory name to the file path name (with a */
 /* separating "/") and deallocate the previous version of the path name.    */
-		        else
-		        {
-		           (void) strcpy( result, cwd );
-			   (void) strcat( result, "/" );
-			   (void) strcat( result, name );
-			   free( (void *) name );
-			}
-		     }
-		  }
-	       }
-	    }
-         }
+                              else
+                                {
+                                  (void) strcpy( result, cwd );
+                                  (void) strcat( result, "/" );
+                                  (void) strcat( result, name );
+                                  free( (void *) name );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
 /* Note if the first invocation of this routine has completed successfully. */
-	 if ( *STATUS == SAI__OK ) first = 0;
-      }
+          if ( *STATUS == SAI__OK ) first = 0;
+        }
 
 /* If OK, copy the result to the caller's buffer, truncating if necessary.  */
       if ( *STATUS == SAI__OK )
-      {
-         for ( i = 0; ( result[ i ] != '\0' ) && ( i < NAME_length ); i++ )
-	 {
-	    NAME[ i ] = (F77_CHARACTER_TYPE) result[ i ];
-	 }
-
+        {
+          for ( i = 0; ( result[ i ] != '\0' ) && ( i < NAME_length ); i++ )
+            {
+              NAME[ i ] = (F77_CHARACTER_TYPE) result[ i ];
+            }
+          
 /* Return the length of the returned path name.				    */
-	 *LNAME = (F77_INTEGER_TYPE) i;
+          *LNAME = (F77_INTEGER_TYPE) i;
 
 /* Pad the caller's buffer with blanks if necessary.			    */
-	 for ( ; i < NAME_length; i++ )
-	 {
-	    NAME[ i ] = (F77_CHARACTER_TYPE) ' ';
-	 }
-      }
+          for ( ; i < NAME_length; i++ )
+            {
+              NAME[ i ] = (F77_CHARACTER_TYPE) ' ';
+            }
+        }
 #endif
 
 /* If necessary, call the error tracing function. */
