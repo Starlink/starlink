@@ -118,8 +118,8 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
     if ( odata->dtype != SMF__DOUBLE ) {
       *status = SAI__ERROR;
       errRep( FUNC_NAME, 
-	      "Output data type is not set to _DOUBLE, possible programming error",
-	      status);
+              "Output data type is not set to _DOUBLE, possible programming error",
+              status);
     }
   }
 
@@ -132,7 +132,7 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
       msgSeti( "IDIMS", idata->ndims);
       *status = SAI__ERROR;
       errRep( FUNC_NAME, 
-	      "Number of dimensions in output, ^NDIMS, is not equal to number in input, ^IDIMS", status);
+              "Number of dimensions in output, ^NDIMS, is not equal to number in input, ^IDIMS", status);
     }
   }
 
@@ -143,12 +143,12 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
   } else {
     for (i=0; i<odata->ndims; i++) {
       if ( (odata->dims)[i] != (idata->dims)[i] ) {
-	msgSeti( "ODIM", (odata->dims)[i] );
-	msgSeti( "IDIM", (idata->dims)[i] );
-	msgSeti( "I", i+1 );
-	*status = SAI__ERROR;
-	errRep( FUNC_NAME, 
-		"Size of axis ^I in output, ^ODIM, is not equal to size in input, ^IDIM", status);
+        msgSeti( "ODIM", (odata->dims)[i] );
+        msgSeti( "IDIM", (idata->dims)[i] );
+        msgSeti( "I", i+1 );
+        *status = SAI__ERROR;
+        errRep( FUNC_NAME, 
+                "Size of axis ^I in output, ^ODIM, is not equal to size in input, ^IDIM", status);
       }
     }
   }
@@ -162,61 +162,61 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
     pntr[i] = (odata->pntr)[i];
     if ( (idata->pntr)[i] != NULL ) {
       if ( i < 2 ) {
-	/* Check if we are converting from integer to double */
-	if ( idata->dtype == SMF__INTEGER ) {
-	  nbytes = sizeof(double);
-	  odata->dtype = SMF__DOUBLE;
-	  /* Check if output pntr is null and allocate memory */
-	  if ( (odata->pntr)[i] == NULL ) {
-	    orignull = 1;
-	    pntr[i] = smf_malloc( npts, nbytes, 0, status);
-	  }
-	  outdata = pntr[i];
-	  tstream = (idata->pntr)[i];
-	  /* Input data are ints: must re-cast as double */
-	  for (j=0; j<npts; j++) {
-	    outdata[j] = (double)tstream[j];
-	  }
-	  /* Copy over recast input data */
-	  if ( orignull ) {
-	    memcpy( pntr[i], outdata, npts*nbytes);
-	  }
-	} else {
-	  /* Check if output pntr[] is null. If so allocate memory and
-	     copy over input */
-	  if ( (odata->pntr)[i] == NULL) {
-	    nbytes = smf_dtype_size(idata, status);
-	    pntr[i] = smf_malloc( npts, nbytes, 0, status);
-	    memcpy( pntr[i], (idata->pntr)[i], nbytes*npts);
-	    /* Store pointer to DATA/VARIANCE in output smfData */
-	    (odata->pntr)[i] = pntr[i];
-	  }
-	}
+        /* Check if we are converting from integer to double */
+        if ( idata->dtype == SMF__INTEGER ) {
+          nbytes = sizeof(double);
+          odata->dtype = SMF__DOUBLE;
+          /* Check if output pntr is null and allocate memory */
+          if ( (odata->pntr)[i] == NULL ) {
+            orignull = 1;
+            pntr[i] = smf_malloc( npts, nbytes, 0, status);
+          }
+          outdata = pntr[i];
+          tstream = (idata->pntr)[i];
+          /* Input data are ints: must re-cast as double */
+          for (j=0; j<npts; j++) {
+            outdata[j] = (double)tstream[j];
+          }
+          /* Copy over recast input data */
+          if ( orignull ) {
+            memcpy( pntr[i], outdata, npts*nbytes);
+          }
+        } else {
+          /* Check if output pntr[] is null. If so allocate memory and
+             copy over input */
+          if ( (odata->pntr)[i] == NULL) {
+            nbytes = smf_dtype_size(idata, status);
+            pntr[i] = smf_malloc( npts, nbytes, 0, status);
+            memcpy( pntr[i], (idata->pntr)[i], nbytes*npts);
+            /* Store pointer to DATA/VARIANCE in output smfData */
+            (odata->pntr)[i] = pntr[i];
+          }
+        }
       } else {
-	/* Check if output pntr[] is null. If so allocate memory and
-	   copy over input. NOTE: to arrive here, i=2 so this will be
-	   the QUALITY array */
-	if ( (odata->pntr)[2] == NULL) {
-	  pntr[2] = smf_malloc( npts, sizeof(unsigned char), 0, status);
-	  memcpy( pntr[2], (idata->pntr)[2], npts*sizeof(unsigned char) );
-	  /* Store pointer to QUALITY in output smfData */
-	  (odata->pntr)[2] = pntr[2];
-	}
+        /* Check if output pntr[] is null. If so allocate memory and
+           copy over input. NOTE: to arrive here, i=2 so this will be
+           the QUALITY array */
+        if ( (odata->pntr)[2] == NULL) {
+          pntr[2] = smf_malloc( npts, sizeof(unsigned char), 0, status);
+          memcpy( pntr[2], (idata->pntr)[2], npts*sizeof(unsigned char) );
+          /* Store pointer to QUALITY in output smfData */
+          (odata->pntr)[2] = pntr[2];
+        }
       }
     } else {
       /* Report an error if there's no input data pntr */
       /* Others can be NULL */
       if ( i == 0 ) {
-	if ( *status == SAI__OK) {
-	  *status = SAI__ERROR;
-	  errRep(FUNC_NAME, "Input data pointer is NULL", status);
-	}
+        if ( *status == SAI__OK) {
+          *status = SAI__ERROR;
+          errRep(FUNC_NAME, "Input data pointer is NULL", status);
+        }
       } else if ( i == 2 && !(flags & SMF__NOCREATE_QUALITY) ) {
-	/* If we are here then create a quality array */
-	msgOutif(MSG__DEBUG, "", "Allocating memory for QUALITY array", status);
-	pntr[i] = smf_malloc( npts, sizeof(unsigned char), 1, status);
-	/* Store pointer to QUALITY in the output smfData */
-	(odata->pntr)[2] = pntr[2];
+        /* If we are here then create a quality array */
+        msgOutif(MSG__DEBUG, "", "Allocating memory for QUALITY array", status);
+        pntr[i] = smf_malloc( npts, sizeof(unsigned char), 1, status);
+        /* Store pointer to QUALITY in the output smfData */
+        (odata->pntr)[2] = pntr[2];
       }
     }
   }
@@ -234,10 +234,11 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
       npoly = (odata->dims)[0] * (odata->dims)[1] * odata->ncoeff;
       opoly = smf_malloc( npoly, sizeof( double ), 0, status);
       if ( *status == SAI__OK ) {
-	memcpy( opoly, idata->poly, npoly*sizeof( double ) );
-	odata->poly = opoly;
+        memcpy( opoly, idata->poly, npoly*sizeof( double ) );
+        odata->poly = opoly;
       } else {
-	errRep(FUNC_NAME, "Unable to allocate memory for polynomial coefficients", status);
+        errRep(FUNC_NAME,
+               "Unable to allocate memory for polynomial coefficients", status);
       }
     }
   } else {
@@ -256,9 +257,9 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
     if ( odata->hdr == NULL ) {
       hdr = smf_deepcopy_smfHead( idata->hdr, status);
       if ( *status == SAI__OK ) {
-	odata->hdr = hdr;
+        odata->hdr = hdr;
       } else {
-	errRep(FUNC_NAME, "Unable to allocate memory for new smfHead", status);
+        errRep(FUNC_NAME, "Unable to allocate memory for new smfHead", status);
       }
     } else {
       smf_check_smfHead( idata, odata, status );
@@ -269,9 +270,9 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
     if ( odata->file == NULL ) {
       file = smf_deepcopy_smfFile( idata->file, status);
       if ( *status == SAI__OK ) {
-	odata->file = file;
+        odata->file = file;
       } else {
-	errRep(FUNC_NAME, "Unable to allocate memory for new smfFile", status);
+        errRep(FUNC_NAME, "Unable to allocate memory for new smfFile", status);
       }
     } else {
       smf_check_smfFile( idata, odata, status );
@@ -283,9 +284,9 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
     if ( odata->da == NULL && idata->da != NULL ) {
       da = smf_deepcopy_smfDA( idata, status );
       if ( *status == SAI__OK ) {
-	odata->da = da;
+        odata->da = da;
       } else {
-	errRep(FUNC_NAME, "Unable to allocate memory for new smfDA", status);
+        errRep(FUNC_NAME, "Unable to allocate memory for new smfDA", status);
       }
     } else {
       smf_check_smfDA( idata, odata, status );
