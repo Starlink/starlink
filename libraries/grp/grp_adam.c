@@ -24,6 +24,8 @@
 *  History:
 *     4-APR-2008 (DSB):
 *        Original version.
+*     15-JUL-2008 (TIMJ):
+*        Use size_t for index argument.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -74,8 +76,8 @@ F77_SUBROUTINE(grp_list)( CHARACTER(PARAM),
                           TRAIL(PARAM)
                           TRAIL(COMMNT) );
 
-void grpList( const char *param, int indxlo, int indxhi, const char *comnt, 
-              Grp *grp, int *status ){
+void grpList( const char *param, size_t indxlo, size_t indxhi,
+               const char *comnt, Grp *grp, int *status ){
    DECLARE_CHARACTER_DYN(PARAM);
    DECLARE_INTEGER(INDXLO);
    DECLARE_INTEGER(INDXHI);

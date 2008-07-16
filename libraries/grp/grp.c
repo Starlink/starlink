@@ -64,11 +64,16 @@
 *     6-NOV-2007 (TIMJ):
 *        Fix compiler error from confusion of C GRP__NOID with Fortran
 *        GRP__NOID.
+*     15-JUL-2008 (TIMJ):
+*        - use size_t for index
+*        - return result for grpValid, grpIndex and grpGrpsz rather than
+*          passing in a pointer. More flexible that way.
+*        - grpGrpex now passes in a size_t*
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -232,10 +237,11 @@ int grpSlot( int igrp, int *status ){
 
 F77_SUBROUTINE(grp_grpsz)( INTEGER(IGRP), INTEGER(SIZE), INTEGER(STATUS) );
 
-void grpGrpsz( const Grp *grp, int *size, int *status ){
+size_t grpGrpsz( const Grp *grp, int *status ){
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(SIZE);
    DECLARE_INTEGER(STATUS);
+   size_t size;
 
    IGRP = grpC2F( grp, status );
 
@@ -245,15 +251,15 @@ void grpGrpsz( const Grp *grp, int *size, int *status ){
                         INTEGER_ARG(&SIZE),
                         INTEGER_ARG(&STATUS) );
 
-   F77_IMPORT_INTEGER( SIZE, *size );
+   F77_IMPORT_INTEGER( SIZE, size );
    F77_IMPORT_INTEGER( STATUS, *status );
 
-   return;
+   return size;
 }
 
 F77_SUBROUTINE(grp_setsz)( INTEGER(IGRP), INTEGER(SIZE), INTEGER(STATUS) );
 
-void grpSetsz( Grp *grp, int size, int *status ){
+void grpSetsz( Grp *grp, size_t size, int *status ){
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(SIZE);
    DECLARE_INTEGER(STATUS);
@@ -304,8 +310,8 @@ F77_SUBROUTINE(grp_get)( INTEGER(IGRP), INTEGER(INDEX), INTEGER(SIZE),
    string for which a pointer has been supplied in "names". This length
    should include room for the trailing null. */
 
-void grpGet( const Grp *grp, int index, int size, char *const *names, int len, 
-             int *status ){
+void grpGet( const Grp *grp, size_t index, size_t size, char *const *names,
+             size_t len, int *status ){
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(INDEX);
    DECLARE_INTEGER(SIZE);
@@ -340,10 +346,11 @@ F77_SUBROUTINE(grp_valid)( INTEGER(IGRP),
                            LOGICAL(VALID),
                            INTEGER(STATUS) );
 
-void grpValid( const Grp *grp, int *valid, int *status ){
+int grpValid( const Grp *grp, int *status ){
    DECLARE_INTEGER(IGRP);
    DECLARE_LOGICAL(VALID);
    DECLARE_INTEGER(STATUS);
+   int valid;
 
    IGRP = grpC2F( grp, status );
 
@@ -353,10 +360,10 @@ void grpValid( const Grp *grp, int *valid, int *status ){
                         LOGICAL_ARG(&VALID),
                         INTEGER_ARG(&STATUS) );
 
-   F77_IMPORT_LOGICAL( VALID, *valid );
+   F77_IMPORT_LOGICAL( VALID, valid );
    F77_IMPORT_INTEGER( STATUS, *status );
 
-   return;
+   return valid;
 }
 
 
@@ -399,7 +406,7 @@ F77_SUBROUTINE(grp_put1)( INTEGER(IGRP),
                           TRAIL(NAME) );
 
 
-void grpPut1( Grp *grp, const char *name, int index, int *status ){
+void grpPut1( Grp *grp, const char *name, size_t index, int *status ){
    DECLARE_INTEGER(IGRP);
    DECLARE_CHARACTER_DYN(NAME);
    DECLARE_INTEGER(INDEX);
@@ -430,7 +437,7 @@ F77_SUBROUTINE(grp_infoi)(INTEGER(IGRP),
 			  INTEGER(STATUS)
 			  TRAIL(ITEM));
 
-void grpInfoi( const Grp *grp, int index, const char *item, int *value, 
+void grpInfoi( const Grp *grp, size_t index, const char *item, int *value, 
 	       int *status) {
   DECLARE_INTEGER(IGRP);
   DECLARE_INTEGER(INDEX);
@@ -462,7 +469,7 @@ F77_SUBROUTINE(grp_infoc)( INTEGER(igrp), INTEGER(index),
                            CHARACTER(item), CHARACTER(value),
                            INTEGER(status) TRAIL(item) TRAIL(value) );
 
-void grpInfoc( const Grp *grp, int index, const char *item, char *value, 
+void grpInfoc( const Grp *grp, size_t index, const char *item, char *value, 
 	       size_t value_len, int *status) {
   DECLARE_INTEGER(IGRP);
   DECLARE_INTEGER(INDEX);
@@ -505,7 +512,7 @@ F77_SUBROUTINE(grp_grpex)( CHARACTER(grpexp), INTEGER(igrp1),
                            INTEGER(status) TRAIL(grpexp) );
 
 void grpGrpex( const char *grpexp, const Grp *grp1, Grp *grp2,
-               int *size, int *added, int *flag, int *status ) {
+               size_t *size, int *added, int *flag, int *status ) {
 
   DECLARE_INTEGER(IGRP1);
   DECLARE_INTEGER(IGRP2);
@@ -541,13 +548,14 @@ F77_SUBROUTINE(grp_index)( CHARACTER(NAME), INTEGER(IGRP),
                            INTEGER(START), INTEGER(INDEX),
                            INTEGER(STATUS) TRAIL(NAME) );
 
-void grpIndex( const char *name, const Grp *grp, int start, int *index, 
+size_t grpIndex( const char *name, const Grp *grp, size_t start, 
                int *status ){
   DECLARE_CHARACTER_DYN(NAME);
   DECLARE_INTEGER(IGRP);
   DECLARE_INTEGER(START);
   DECLARE_INTEGER(INDEX);
   DECLARE_INTEGER(STATUS);
+  size_t index;
 
   IGRP = grpC2F( (Grp *) grp, status );
 
@@ -562,8 +570,8 @@ void grpIndex( const char *name, const Grp *grp, int start, int *index,
 
   F77_FREE_CHARACTER( NAME );
   F77_IMPORT_INTEGER( STATUS, *status );
-  F77_IMPORT_INTEGER( INDEX, *index );
-
+  F77_IMPORT_INTEGER( INDEX, index );
+  return index;
 }
 
 
@@ -571,7 +579,7 @@ F77_SUBROUTINE(grp_copy)( INTEGER(IGRP1), INTEGER(INDXLO),
 			  INTEGER(INDXHI), LOGICAL(REJECT),
 			  INTEGER(IGRP2), INTEGER(STATUS));
 
-Grp * grpCopy( const Grp* grp1, int indxlo, int indxhi, int reject,
+Grp * grpCopy( const Grp* grp1, size_t indxlo, size_t indxhi, int reject,
 	       int * status ) {
   DECLARE_INTEGER(IGRP1);
   DECLARE_INTEGER(IGRP2);

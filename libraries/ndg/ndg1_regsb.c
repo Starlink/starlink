@@ -69,6 +69,8 @@ F77_SUBROUTINE(ndg1_regsb)( CHARACTER(RE), INTEGER(IGRP0),
 *        file. Safer than removing a file and re-opening it.
 *     28-FEB-2006 (DSB):
 *        Use grpF2C.
+*     15-JUL-2008 (TIMJ):
+*        Tweak to GRP C API.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -95,11 +97,11 @@ F77_SUBROUTINE(ndg1_regsb)( CHARACTER(RE), INTEGER(IGRP0),
    char outfile_name[255];
    int added;
    int flag;
-   int i;
+   size_t i;
    int ifd = 0;
    int istat;
    int ofd = 0;
-   int size;
+   size_t size;
 
 /* initialise return value */
    *SIZE = 0;
@@ -152,7 +154,7 @@ F77_SUBROUTINE(ndg1_regsb)( CHARACTER(RE), INTEGER(IGRP0),
    } 
 
 /* Get the number of names to store in the file. */
-   grpGrpsz( igrp0, &size, STATUS );
+   size = grpGrpsz( igrp0, STATUS );
 
 /* Write the supplied names to the text file. */
    for( i = 1; i <= size && *STATUS == SAI__OK; i++ ){
@@ -243,7 +245,7 @@ F77_SUBROUTINE(ndg1_regsb)( CHARACTER(RE), INTEGER(IGRP0),
             fclose( fd );
 
 /* Get the number of names now in the returned group. */
-	    grpGrpsz( igrp, &size, STATUS );
+            size = grpGrpsz( igrp, STATUS );
 	    *SIZE = size;
          }     
       }

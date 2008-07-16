@@ -56,10 +56,15 @@
 *        Add grpSetsz
 *     4-APR-2008 (DSB):
 *        Add grpList.
+*     15-JUL-2008 (TIMJ):
+*        - use size_t for index
+*        - return result for grpValid, grpIndex and grpGrpsz rather than
+*          passing in a pointer. More flexible that way.
+*        - grpGrpex now passes in a size_t*
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     Copyright (C) 2007 Science & Technology Facilities Council.
+*     Copyright (C) 2007, 2008 Science & Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -122,20 +127,20 @@ typedef struct Grp Grp;
 
 /* Public function prototypes */
 /* -------------------------- */
-Grp * grpCopy( const Grp *, int, int, int, int * );
+Grp * grpCopy( const Grp *, size_t, size_t, int, int * );
 void grpDelet( Grp **, int * );
-void grpGrpex( const char *, const Grp *, Grp *, int *, int *, int *, int * );
-void grpGrpsz( const Grp *, int *, int * );
-void grpGet( const Grp *, int, int, char *const *, int, int * );
-void grpInfoc( const Grp *, int , const char *, char *, size_t, int * );
-void grpInfoi( const Grp *, int, const char *, int *, int * );
+void grpGrpex( const char *, const Grp *, Grp *, size_t *, int *, int *, int * );
+size_t grpGrpsz( const Grp *, int * );
+void grpGet( const Grp *, size_t, size_t, char *const *, size_t, int * );
+void grpInfoc( const Grp *, size_t, const char *, char *, size_t, int * );
+void grpInfoi( const Grp *, size_t, const char *, int *, int * );
 Grp *grpNew( const char *, int * );
-void grpPut1( Grp *, const char *, int, int * );
-void grpValid( const Grp *, int *, int * );
-void grpIndex( const char *, const Grp *, int, int *, int * );
+void grpPut1( Grp *, const char *, size_t, int * );
+int grpValid( const Grp *, int * );
+size_t grpIndex( const char *, const Grp *, size_t, int * );
 void grpSetcs( Grp *, int, int * );
-void grpSetsz( Grp *, int, int * );
-void grpList( const char *, int, int, const char *, Grp *, int * );
+void grpSetsz( Grp *, size_t, int * );
+void grpList( const char *, size_t, size_t, const char *, Grp *, int * );
 
 /* Semi-Public function prototypes: For Fortran interface wrappers only */
 /* -------------------------------------------------------------------- */

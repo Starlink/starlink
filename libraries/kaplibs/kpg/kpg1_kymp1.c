@@ -96,11 +96,14 @@ void kpg1Kymp1( Grp *igrp, AstKeyMap **keymap, int *status ){
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     30-SEP-2005 (DSB):
 *        Original version.
+*     15-JUL-2008 (TIMJ):
+*        Tweak to GRP C API.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -132,7 +135,7 @@ void kpg1Kymp1( Grp *igrp, AstKeyMap **keymap, int *status ){
    *keymap = astKeyMap( "" );
 
 /* Get the number of strings in the group. */
-   grpGrpsz( igrp, &size, status );
+   size = grpGrpsz( igrp, status );
 
 /* We need to pass a pointer to the "name" variable to grpGet */
    pname = name;

@@ -737,6 +737,7 @@ void findclumps( int *status ) {
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -760,6 +761,8 @@ void findclumps( int *status ) {
 *        Added adam parameter PERSPECTRUM.
 *     18-MAR-2008 (DSB):
 *        Added adam parameter BACKOFF.
+*     15-JUL-2008 (TIMJ):
+*        Tweak to GRP C API.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1341,7 +1344,7 @@ void findclumps( int *status ) {
    if( confgrp ) {     
 
 /* Get the number of entries in the group. */
-      grpGrpsz( confgrp, &size, status );
+      size = grpGrpsz( confgrp, status );
 
 /* Report the configuration (if any). */
       parGet0l( "REPCONF", &repconf, status );

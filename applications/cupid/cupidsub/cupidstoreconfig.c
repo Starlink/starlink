@@ -55,11 +55,14 @@ void cupidStoreConfig( HDSLoc *loc, AstKeyMap *config, int *status ){
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     9-NOV-2005 (DSB):
 *        Original version.
+*     15-JUL-2008 (TIMJ):
+*        Tweak to GRP C API.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -96,7 +99,7 @@ void cupidStoreConfig( HDSLoc *loc, AstKeyMap *config, int *status ){
    kpg1Kygrp( config, &grp, status );
 
 /* Get the number of values in the group. Pass on if it is zero. */
-   grpGrpsz( grp, &n, status );
+   n = grpGrpsz( grp, status );
    if( n ) {
 
 /* We need to pass a pointer to the "name" variable to grpGet */

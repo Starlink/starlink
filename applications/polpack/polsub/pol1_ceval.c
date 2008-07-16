@@ -1432,6 +1432,7 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
  
 *  Authors:
 *     DSB: David S. Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -1440,6 +1441,8 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
 *     8-AUG-2006 (DSB):
 *        Change to use GRP C interface.
 *        Fix bug that caused mis-interpretation of quoted strings.
+*     15-JUL-2008 (TIMJ):
+*        Tweak to GRP C API.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -1581,7 +1584,7 @@ unsigned char *pol1Seval( unsigned char *t0, unsigned char *t1,
    type over-rides the natural type. */
                dtype = AST__NOTYPE;
                if( grp1 != NULL && grp2 != NULL ) {
-                  grpIndex( name, grp2, 1, &idec, status );
+                  idec = grpIndex( name, grp2, 1, status );
                   if( idec > 0 ) {
 
 /* Get it using grpInfoc, which converts the name to upper case. */

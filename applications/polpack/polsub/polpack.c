@@ -178,6 +178,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -195,6 +196,8 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 *        Replaced tmpnam calls with mkstemp.
 *     8-AUG-2006 (DSB):
 *        Use C interface for GRP.
+*     15-JUL-2008 (TIMJ):
+*        Tweak to GRP C API.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -301,7 +304,7 @@ F77_SUBROUTINE(doplka)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    grps = grpF2C( *IGRPS, STATUS );
 
 /* Get the number of images to process. */
-   grpGrpsz( grp1, &size, STATUS );
+   size = grpGrpsz( grp1, STATUS );
 
 /* Append the name of the input images in the file to variable "in_list". */
    for( i = 1; i <= size && *STATUS == SAI__OK; i++ ){

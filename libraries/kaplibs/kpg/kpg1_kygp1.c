@@ -73,11 +73,14 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
 
 *  Authors:
 *     DSB: David S. Berry
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     7-NOV-2005 (DSB):
 *        Original version.
+*     15-JUL-2008 (TIMJ):
+*        Tweak to GRP C API.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -108,7 +111,7 @@ void kpg1Kygp1( AstKeyMap *keymap, Grp **igrp, const char *prefix,
    old_status = astWatch( status );
 
 /* Create a new GRP group if required. */
-   grpValid( *igrp, &valid, status );
+   valid = grpValid( *igrp, status );
    if( !valid ) *igrp = grpNew( "Created by kpg1_Kygp1", status );      
 
 /* Get the number of entries in the KeyMap. */
