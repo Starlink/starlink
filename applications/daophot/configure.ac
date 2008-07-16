@@ -18,8 +18,29 @@ STAR_DEFAULTS(per-package-dirs)
 STAR_MONOLITHS
 
 dnl    Find required versions of the programs we need for configuration
+AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
+
+dnl    Some code requires the G95 flag -fsloppy-char, see if the current
+dnl    compiler supports this (could improve this check by including
+dnl    some broken code if necessary, see internal reads and writes
+dnl    from a text string to real array in sorter.f).
+if test "$GCC" = "yes"; then
+    have_fsc=yes
+    AC_MSG_CHECKING([whether ${FC} accepts -fsloppy-char])
+    fsc_old_fcflags="$FCFLAGS"
+    FCFLAGS="$FCFLAGS -fsloppy-char"
+    AC_LANG_PUSH([Fortran])
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([],[
+      PRINT *,'Hello World'
+])],,[have_fsc=no])
+    AC_LANG_POP([Fortran])
+    echo $have_fsc
+    if test "$have_fsp" = "no"; then
+        FCFLAGS="$fsc_old_fcflags"
+    fi
+fi
 
 STAR_DECLARE_DEPENDENCIES([build], [sae mers pcs ndf psx chr agi gks cnf], [link])
 STAR_LATEX_DOCUMENTATION(sun42)
