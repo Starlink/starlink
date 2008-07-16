@@ -178,14 +178,14 @@ void smurf_skynoise ( int *status ) {
    int n;                          /* Number of elements mapped */
    Grp *obsGrp = NULL;             /* Group containing obs parameter file */
    AstKeyMap *obskeymap=NULL;      /* AstKeyMap for obs parameters */
-   int osize = 0;                  /* Size of obsGrp */
+   size_t osize = 0;               /* Size of obsGrp */
    double pixsize;                 /* simulate pixel size */
    int rseed;                      /* seed for random number generator */
    Grp *simGrp = NULL;             /* Group containing sim parameter file */
    AstKeyMap *simkeymap=NULL;      /* AstKeyMap for sim parameters */
    int size;                       /* width of square area in pixels */
    double *spectrum;               /* complex array for holding 2D spectrum */
-   int ssize = 0;                  /* Size of simGrp */
+   size_t ssize = 0;               /* Size of simGrp */
    struct timeval time;            /* Structure for system time */
    int ubnd[2];                    /* Upper bounds of pixel array */
 

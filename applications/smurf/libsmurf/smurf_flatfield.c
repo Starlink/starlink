@@ -120,11 +120,11 @@ void smurf_flatfield( int *status ) {
 
   smfData *ffdata = NULL;   /* Pointer to output data struct */
   int flag;                 /* Flag for how group is terminated */
-  int i = 0;                /* Counter, index */
+  size_t i = 0;             /* Counter, index */
   Grp *igrp = NULL;         /* Input group of files */
   Grp *ogrp = NULL;         /* Output group of files */
-  int outsize;              /* Total number of NDF names in the output group */
-  int size;                 /* Number of files in input group */
+  size_t outsize;           /* Total number of NDF names in the output group */
+  size_t size;              /* Number of files in input group */
 
   /* Main routine */
   ndfBegin();

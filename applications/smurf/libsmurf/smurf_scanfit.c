@@ -96,12 +96,12 @@ void smurf_scanfit( int * status ) {
 
   smfData *ffdata = NULL;    /* Pointer to output data struct */
   int flag;                  /* Flag for how group is terminated */
-  int i = 0;                 /* Loop counter */
+  size_t i = 0;              /* Loop counter */
   Grp *igrp = NULL;          /* Input group */
   Grp *ogrp = NULL;          /* Input group */
   int order;                 /* Order of polynomial to fit */
-  int outsize;               /* Total number of NDF names in the output group */
-  int size;                  /* Number of files in input group */
+  size_t outsize;            /* Total number of NDF names in the output group */
+  size_t size;               /* Number of files in input group */
 
   /* Main routine */
   ndfBegin();

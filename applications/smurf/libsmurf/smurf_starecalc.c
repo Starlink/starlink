@@ -104,13 +104,13 @@
 void smurf_starecalc ( int *status ) {
 
   /* Local Variables */
-  int i;                           /* Loop counter */
+  size_t i;                        /* Loop counter */
   int flag;                        /* Grp flag */
   Grp *igrp = NULL;                /* Input files */
   Grp *ogrp = NULL;                /* Output files */
-  int isize;                       /* Size of input Grp */
+  size_t isize;                    /* Size of input Grp */
   int naver;                       /* Averaging window */
-  int osize;                       /* Size of output Grp */
+  size_t osize;                    /* Size of output Grp */
   smfData *data = NULL;            /* Input data */
 
   /* Main routine */

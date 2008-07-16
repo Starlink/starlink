@@ -114,7 +114,7 @@ void smurf_sc2concat( int *status ) {
   size_t idx;                /* Subarray counter */
   Grp *igrp = NULL;          /* Group of input files */
   smfGroup *igroup=NULL;     /* smfGroup corresponding to igrp */
-  int isize;                 /* Number of files in input group */
+  size_t isize;              /* Number of files in input group */
   dim_t maxconcat=0;         /* Longest continuous chunk length in samples */
   dim_t maxlen=0;            /* Constrain maxconcat to this many samples */
   double maxlen_s;           /* Constrain maxconcat to this many seconds */

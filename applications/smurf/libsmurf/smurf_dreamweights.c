@@ -130,14 +130,14 @@ void smurf_dreamweights ( int *status ) {
   int *gridminmax = NULL;     /* Extent of grid points array */
   int gridpts[DREAM__MXGRID][2]; /* Array of points for reconstruction grid */
   double gridstep;            /* Size of reconstruction grid in arcsec */
-  int i;                      /* Loop counter */
+  size_t i;                   /* Loop counter */
   Grp *igrp = NULL;           /* Input group of NDFs */
-  int isize;                  /* Size of input Grp of files */
+  size_t isize;               /* Size of input Grp of files */
   AstKeyMap *keymap = NULL;   /* Pointer to keymap of config settings */
-  int ksize;                  /* Size of group containing CONFIG file */
+  size_t ksize;               /* Size of group containing CONFIG file */
   int ngrid;                  /* Number of points in reconstruction grid */
   Grp *ogrp = NULL;           /* Group of output weights files */
-  int osize;                  /* Size of output Grp of files */
+  size_t osize;               /* Size of output Grp of files */
 
   /* Main routine */
   ndfBegin();

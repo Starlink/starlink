@@ -264,12 +264,12 @@ void smurf_qlmakemap( int *status ) {
   Grp *ogrp = NULL;          /* Group containing output file */
   int ondf = NDF__NOID;      /* output NDF identifier */
   AstFrameSet *outframeset = NULL; /* Frameset containing sky->output map mapping */
-  int outsize;               /* Number of files in output group */
+  size_t outsize;            /* Number of files in output group */
   double overallmeansky = 0.0; /* Mean sky level across all input files */
   char pabuf[ 10 ];          /* Text buffer for parameter value */
   double params[ 4 ];        /* astRebinSeq parameters */
   double pixsize = 3.0;      /* Size of an output map pixel in arcsec */
-  int size;                  /* Number of files in input group */
+  size_t size;               /* Number of files in input group */
   int smfflags = 0;          /* Flags for creating a new smfData */
   int spread;                /* Code for pixel spreading scheme */
   char system[10];           /* Celestial coordinate system for output image */

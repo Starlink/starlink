@@ -103,15 +103,15 @@ void smurf_rawunpress( int *status ) {
   smfData *data = NULL;     /* Pointer to input data struct */
   smfData *odata = NULL;    /* Pointer to output data struct */
   int flag;                 /* Flag for how group is terminated */
-  int i = 0;                /* Counter, index */
+  size_t i = 0;             /* Counter, index */
   int indf;                 /* NDF identifier for input file */
   int nout;                 /* Number of data points in output data file */
   Grp *igrp = NULL;         /* Input group of files */
   Grp *ogrp = NULL;         /* Output group of files */
   void *outdata[1];         /* Pointer to array of output mapped pointers*/
   int outndf;               /* Output NDF identifier */
-  int outsize;              /* Total number of NDF names in the output group */
-  int size;                 /* Number of files in input group */
+  size_t outsize;           /* Total number of NDF names in the output group */
+  size_t size;              /* Number of files in input group */
 
   /* Main routine */
   ndfBegin();

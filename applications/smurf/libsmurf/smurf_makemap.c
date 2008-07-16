@@ -535,7 +535,7 @@ void smurf_makemap( int *status ) {
   int itile;                 /* Output tile index */
   int jin;                   /* Input NDF index within igrp */
   AstKeyMap *keymap=NULL;    /* Pointer to keymap of config settings */
-  int ksize=0;               /* Size of group containing CONFIG file */
+  size_t ksize=0;            /* Size of group containing CONFIG file */
   int lbnd_out[2];           /* Lower pixel bounds for output map */
   double *map=NULL;          /* Pointer to the rebinned map data */
   size_t mapmem=0;           /* Memory needed for output map */
@@ -552,7 +552,7 @@ void smurf_makemap( int *status ) {
   smfData *odata=NULL;       /* Pointer to output SCUBA2 data struct */
   Grp *ogrp = NULL;          /* Group containing output file */
   int ondf = NDF__NOID;      /* output NDF identifier */
-  int outsize;               /* Number of files in output group */
+  size_t outsize;            /* Number of files in output group */
   AstFrameSet *outfset=NULL; /* Frameset containing sky->output mapping */
   char pabuf[ 10 ];          /* Text buffer for parameter value */
   double params[ 4 ];        /* astRebinSeq parameters */
@@ -560,7 +560,7 @@ void smurf_makemap( int *status ) {
   int ***ptime = NULL;       /* Holds time slice indices for each bol bin */
   int *pt = NULL;            /* Holds time slice indices for each bol bin */
   int rebin=1;               /* Flag to denote whether to use the REBIN method*/
-  int size;                  /* Number of files in input group */
+  size_t size;               /* Number of files in input group */
   int smfflags=0;            /* Flags for smfData */
   HDSLoc *smurfloc=NULL;     /* HDS locator of SMURF extension */
   AstFrameSet *spacerefwcs = NULL;/* WCS Frameset for spatial reference axes */

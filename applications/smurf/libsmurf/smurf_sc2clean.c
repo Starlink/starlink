@@ -132,14 +132,14 @@ void smurf_sc2clean( int *status ) {
   double dcthresh=0;        /* n-sigma threshold for DC steps */
   smfData *ffdata = NULL;   /* Pointer to output data struct */
   int flag;                 /* Flag for how group is terminated */
-  int i = 0;                /* Counter, index */
+  size_t i = 0;             /* Counter, index */
   Grp *igrp = NULL;         /* Input group of files */
   unsigned char mask;       /* Bitmask for quality */
   size_t nflag;             /* Number of flagged samples */
   Grp *ogrp = NULL;         /* Output group of files */
   int order;                /* Order of polynomial for baseline fitting */
-  int outsize;              /* Total number of NDF names in the output group */
-  int size;                 /* Number of files in input group */
+  size_t outsize;           /* Total number of NDF names in the output group */
+  size_t size;              /* Number of files in input group */
   double spikethresh;       /* Threshold for finding spikes */
   size_t spikeiter;         /* Number of iterations for spike finder */
   int spikeiter_s;          /* Signed int version of spikeiter_s */

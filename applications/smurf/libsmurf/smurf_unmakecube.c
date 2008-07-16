@@ -233,16 +233,16 @@ void smurf_unmakecube( int *status ) {
    int ifile;                 /* Input file index */
    int interp = 0;            /* Pixel interpolation method */
    int iskycube;              /* Index of current sky cube */
-   int ndet;                  /* Number of detectors supplied for "DETECTORS" */
+   size_t ndet;               /* Number of detectors supplied for "DETECTORS" */
    int nel;                   /* Number of elements in 3D array */
    int nparam = 0;            /* No. of parameters required for interpolation scheme */
-   int nskycube;              /* Number of supplied sky cubes */
+   size_t nskycube;           /* Number of supplied sky cubes */
    int ondf;                  /* Output time series NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
-   int outsize;               /* Number of files in output group */
+   size_t outsize;            /* Number of files in output group */
    int overlap;               /* Does time series overlap sky cube? */
    int sdim[3];               /* Array of significant pixel axes */
-   int size;                  /* Number of files in input group */
+   size_t size;               /* Number of files in input group */
    int usedetpos;             /* Should the detpos array be used? */
    smfData *data = NULL;      /* Pointer to data struct */
    void *in_data = NULL;      /* Pointer to the input cube data array */

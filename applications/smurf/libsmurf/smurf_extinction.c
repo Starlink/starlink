@@ -161,16 +161,16 @@ void smurf_extinction( int * status ) {
   char filter[81];           /* Name of filter */
   int flag;                  /* Flag for how group is terminated */
   int has_been_sky_removed = 0;/* Data are sky-removed */
-  int i;                     /* Loop counter */
+  size_t i;                  /* Loop counter */
   Grp *igrp = NULL;          /* Input group */
   char method[LEN__METHOD];  /* String for optical depth method */
   smfData *odata = NULL;     /* Output data struct */
   Grp *ogrp = NULL;          /* Output group */
   smfHead *ohdr = NULL;      /* Pointer to header in odata */
-  int outsize;               /* Total number of NDF names in the output group */
+  size_t outsize;            /* Total number of NDF names in the output group */
   int quick;                 /* Flag to denote whether to assume a
                                 single airmass for all bolometers */
-  int size;                  /* Number of files in input group */
+  size_t size;               /* Number of files in input group */
   double tau = 0.0;          /* Zenith tau at this wavelength */
 
   /* Main routine */

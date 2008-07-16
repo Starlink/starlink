@@ -897,7 +897,7 @@ void smurf_makecube( int *status ) {
    int moving;                /* Is the telescope base position changing? */
    int naccept;               /* Number of accepted input spectra */
    int nbad;                  /* No. of o/p pixels with good data but bad variance */
-   int ndet;                  /* Number of detectors supplied for "DETECTORS" */
+   size_t ndet;               /* Number of detectors supplied for "DETECTORS" */
    int nel;                   /* Number of elements in 3D array */
    int ngood;                 /* No. of o/p pixels with good data */
    int nparam = 0;            /* No. of parameters required for spreading scheme */
@@ -911,10 +911,10 @@ void smurf_makecube( int *status ) {
    int nxy;                   /* Number of elements in a 2D output tile */
    int ondf = NDF__NOID;      /* Output NDF identifier */
    int outax[ 2 ];            /* Indices of corresponding output axes */
-   int outsize;               /* Number of files in output group */
+   size_t outsize;            /* Number of files in output group */
    int polobs;                /* Do the input files contain polarisation data? */
    int savewgt;               /* Should weights be saved in the output NDF? */
-   int size;                  /* Number of files in input group */
+   size_t size;               /* Number of files in input group */
    int smfflags;              /* Flags for smfData */
    int sparse;                /* Create a sparse output array? */
    int specunion;             /* O/p spec range = union of i/p spec ranges? */

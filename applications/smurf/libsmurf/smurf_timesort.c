@@ -345,7 +345,7 @@ void smurf_timesort( int *status ) {
    int ncomp;                 
    int ndet;
    int ndet_out;
-   int ndetgrp;
+   size_t ndetgrp;
    int ndim;                  
    int nnout[ NDF__MXDIM ];     
    int nobs;
@@ -357,12 +357,12 @@ void smurf_timesort( int *status ) {
    int nts_out;
    int nullsizelimit;
    int ok;
-   int outsize;               
+   size_t outsize;               
    int place;
    int rts_num0;
    int rts_num;
    int rts_num_last;
-   int size;                  
+   size_t size;                  
    int sizelimit;
    int slbnd[ 3 ];
    int sorted;                 
@@ -448,7 +448,7 @@ void smurf_timesort( int *status ) {
 
 /* See if the label for the current detector is present in the group holding 
    the detectors to be included in the output cube. */
-         grpIndex( lab, detgrp, 1, &found, status );
+         found = grpIndex( lab, detgrp, 1, status );
 
 /* If it is, pass on to the next detector. Otherwise we modify the
    detector mask to exclude the current detector. */
@@ -777,7 +777,7 @@ void smurf_timesort( int *status ) {
    subscan in each observation/sub-system. Get a group of output base NDF
    names based on these files. These base names will be edited to create 
    the name to be used for each output subscan NDF. */
-      grpGrpsz( igrp3, &outsize, status );
+      outsize = grpGrpsz( igrp3, status );
       kpg1Wgndf( "OUT", igrp3, outsize, outsize, "", &igrp2, &outsize, 
                  status );
 

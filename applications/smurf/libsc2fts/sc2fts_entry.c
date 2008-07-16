@@ -101,7 +101,7 @@ void sc2fts_entry ( int *status )         /* status: global status (given and re
   Grp *parsgrp = NULL;                 /* Group containing parameters for each operation */
   AstKeyMap *parsKeymap = NULL;        /* KeyMap of PARSLIST */
   AstKeyMap *subParsKeymap = NULL;     /* KeyMap for each operation */
-  int ksize = 0;                       /* Number of items in a group */
+  size_t ksize = 0;                   /* Number of items in a group */
   char iname[GRP__SZNAM+1];           /* name of input file */
   char oname[GRP__SZNAM+1];           /* name of output file */
   char *pname = NULL;                  /* pointer to file name */

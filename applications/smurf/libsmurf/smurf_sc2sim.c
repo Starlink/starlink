@@ -586,7 +586,7 @@ void smurf_sc2sim( int *status ) {
   int nbol;                       /* total number of bolometers */
   Grp *obsGrp = NULL;             /* Group containing obs parameter file */
   AstKeyMap *obskeymap = NULL;    /* AstKeyMap for obs parameters */
-  int osize = 0;                  /* Size of obsGrp */
+  size_t osize = 0;               /* Size of obsGrp */
   int overwrite = 0;              /* Flag to specify whether existing
 				     files are overwritten */
   double *pzero = NULL;           /* bolometer power offsets */
@@ -596,7 +596,7 @@ void smurf_sc2sim( int *status ) {
   int simstats = 0;               /* Flag to denote whether just to
 				     list simulation statistics */
   char simtype[LEN__METHOD];      /* String for simulation type */
-  int ssize = 0;                  /* Size of simGrp */
+  size_t ssize = 0;               /* Size of simGrp */
   struct timeval time;            /* Structure for system time */
   static double weights[SC2SIM__MXIRF]; /* impulse response */
   double *xbc = NULL;             /* projected NAS X offsets of bolometers 

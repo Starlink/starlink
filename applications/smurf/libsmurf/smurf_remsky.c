@@ -121,12 +121,12 @@ void smurf_remsky( int * status ) {
 
   /* Local Variables */
   int flag;                  /* Flag for how group is terminated */
-  int i;                     /* Loop counter */
+  size_t i;                  /* Loop counter */
   Grp *igrp = NULL;          /* Input group */
   smfData *odata = NULL;     /* Output data struct */
   Grp *ogrp = NULL;          /* Output group */
-  int outsize;               /* Total number of NDF names in the output group */
-  int size;                  /* Number of files in input group */
+  size_t outsize;            /* Total number of NDF names in the output group */
+  size_t size;               /* Number of files in input group */
 
   char method[LEN__METHOD];  /* String for sky subtraction method */
   char fittype[LEN__METHOD]; /* String for PLANE method fit type */
