@@ -65,7 +65,7 @@
 /* Starlink includes */
 #include "ndf.h"
 #include "sae_par.h"
-
+#include "smf.h"
 #include "smf_typ.h"
 
 void smf_write_clabels( const smfData* data, int * status ) {
