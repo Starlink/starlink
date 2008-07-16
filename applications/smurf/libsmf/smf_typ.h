@@ -330,11 +330,11 @@ typedef struct smfData {
   void * pntr[3];            /* Array of pointers to DATA/VARIANCE/QUALITY */
   dim_t dims[NDF__MXDIM];    /* Dimensions of data array */
   int isTordered;            /* 0=order by bolo, 1=order by tslice (default) */
-  int ndims;                 /* Number of active dimensions in "dims" */
+  size_t ndims;              /* Number of active dimensions in "dims" */
   int refcount;              /* Reference count for data object */
   int virtual;               /* Flag for extracted timeslices */
   double *poly;              /* Polynomial scan fits */
-  int ncoeff;                /* Number of coefficients in polynomial */
+  size_t ncoeff;             /* Number of coefficients in polynomial */
   int * lut;                 /* Pointing lookup table */
   AstKeyMap *history;        /* History entries */
 } smfData;
