@@ -457,7 +457,7 @@
 
 *  Get a group containing the names of the object frames to be used.
 *  Tell the user how many are found.
-      CALL RDNDF( 'IN', 0, 1, '  Give more image names...', IGRP1, 
+      CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more image names...', IGRP1, 
      :            SIZE, STATUS )
 
 *  Tell the user how many images were supplied.
@@ -470,8 +470,8 @@
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Attempt to get a reference image. Gets its name if supplied.
-      CALL RDNDF( 'REFIN', 1, 0, '  Give a reference image...', IGRPR, 
-     :            SIZER, STATUS )
+      CALL KPG1_RGNDF( 'REFIN', 1, 0, '  Give a reference image...',
+     :             IGRPR, SIZER, STATUS )
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          SIZER = 0
@@ -496,7 +496,8 @@
       DO WHILE( AGAIN .AND. STATUS .EQ. SAI__OK )
 
          IGRPS = GRP__NOID
-         CALL RDNDF( 'SKYFRAMES', SIZE, 0, '  Give more sky frames...', 
+         CALL KPG1_RGNDF( 'SKYFRAMES', SIZE, 0,
+     :        '  Give more sky frames...', 
      :                IGRPS, SSIZE, STATUS )
          IF ( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )
@@ -527,7 +528,7 @@
          CALL PAR_GET0L( 'DUALBEAM', DBEAM, STATUS )
 
 *  Get a group holding the name of the output cube to hold Stokes parameters.
-         CALL WRNDF( 'OUT_S', GRP__NOID, 1, 0, ' ', IGRP4, SIZEO,
+         CALL KPG1_WGNDF( 'OUT_S', GRP__NOID, 1, 0, ' ', IGRP4, SIZEO,
      :                STATUS )
 
 *  If not processing polarimetry data, always use single-beam mode, and do
@@ -571,7 +572,7 @@
 *  Get a group containing the names of the output NDFs to hold the
 *  registered O-ray areas. Base modification elements on the group 
 *  containing the input NDFs.
-         CALL WRNDF( 'OUT_O', IGRP1, SIZE, SIZE, 
+         CALL KPG1_WGNDF( 'OUT_O', IGRP1, SIZE, SIZE, 
      :               '  Give more image names...', IGRP2, SIZEO, 
      :               STATUS )
 
@@ -584,7 +585,7 @@
 *  Get a group containing the names of the output NDFs to hold the
 *  registered E-ray areas. Base modification elements on the group 
 *  containing the input NDFs.
-         CALL WRNDF( 'OUT_E', IGRP1, SIZE, SIZE, 
+         CALL KPG1_WGNDF( 'OUT_E', IGRP1, SIZE, SIZE, 
      :               '  Give more image names...', IGRP3, SIZEO, 
      :               STATUS )
 *  If a null value is supplied, the aligned intensity images are not saved.
@@ -597,7 +598,7 @@
 *  parameter OUT. The second group identifier is set equal to the first
 *  to indicate this.
       ELSE
-         CALL WRNDF( 'OUT', IGRP1, SIZE, SIZE, 
+         CALL KPG1_WGNDF( 'OUT', IGRP1, SIZE, SIZE, 
      :               '  Give more image names...', IGRP2, SIZEO, 
      :               STATUS )
          IGRP3 = GRP__NOID

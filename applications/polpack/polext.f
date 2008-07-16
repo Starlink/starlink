@@ -316,7 +316,7 @@
       CALL NDF_BEGIN
 
 *  Access a group of NDFs for processing.
-      CALL RDNDF( 'IN', 0, 1, '  Give more image names...', IGRP1, 
+      CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more image names...', IGRP1, 
      :            NNDF, STATUS )
 
 *  Tell the user how many NDFs there are to process.

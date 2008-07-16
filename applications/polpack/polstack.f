@@ -205,7 +205,7 @@
 
 *  Get a group containing the names of the template intensity frames to be 
 *  used.
-      CALL RDNDF( 'IN', 0, 1, '  Give more image names...', 
+      CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more image names...', 
      :            IGRP1, NNDF, STATUS )
 
 *  Tell the user how many NDFs there are to process.
@@ -292,7 +292,7 @@
       END DO
 
 *  Get the group of output images.
-      CALL WRNDF( 'OUT', IGRP2, NOUT, 1, '  Give more image '//
+      CALL KPG1_WGNDF( 'OUT', IGRP2, NOUT, 1, '  Give more image '//
      :            'names...', IGRP3, NOUT, STATUS )
 
 *  Space the screen output.

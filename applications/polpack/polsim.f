@@ -197,13 +197,13 @@
 
 *  Get a group containing the names of the template intensity frames to be 
 *  used.
-      CALL RDNDF( 'IN', 0, 1, '  Give more image names...', 
+      CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more image names...', 
      :            IGRP1, NNDF, STATUS )
 
 *  In single beam mode, we just get a single set of output images, using
 *  parameter OUT. The second group identifier is set equal to the first
 *  to indicate this.
-      CALL WRNDF( 'OUT', IGRP1, NNDF, NNDF, 
+      CALL KPG1_WGNDF( 'OUT', IGRP1, NNDF, NNDF, 
      :            '  Give more image names...', IGRP2, SIZEO, 
      :            STATUS )
 

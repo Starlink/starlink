@@ -495,7 +495,7 @@
       CALL NDF_BEGIN
 
 *  Get a group containing the names of the object frames to be used.
-      CALL RDNDF( 'IN', 0, 1, '  Give more image names...', 
+      CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more image names...', 
      :            IGRP, NNDF, STATUS )
 
 *  Get the amount of information to be displayed on the screen.

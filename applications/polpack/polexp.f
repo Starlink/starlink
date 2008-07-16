@@ -160,7 +160,7 @@
 
 *  Access a group of NDFs for processing.
       CALL NDF_BEGIN
-      CALL RDNDF( 'IN', 0, 1, '  Give more image names...', IGRP1, 
+      CALL KPG1_RGNDF( 'IN', 0, 1, '  Give more image names...', IGRP1, 
      :            NNDF, STATUS )
 
 *  Create a group to hold the names of the NDFs which were processed
