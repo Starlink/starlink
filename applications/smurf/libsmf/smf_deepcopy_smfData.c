@@ -157,36 +157,36 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
     if ( (old->pntr)[i] != NULL ) {
       /* Check if we are converting from integer to double */
       if (rawconvert && (old->dtype == SMF__INTEGER) ) {
-	nbytes = sizeof(double);
-	dtype = SMF__DOUBLE;
-	pntr[i] = smf_malloc( npts, nbytes, 0, status);
-	outdata = pntr[i];
-	tstream = (old->pntr)[i];
-	/* Input data are ints: must re-cast as double */
-	for (j=0; j<npts; j++) {
-	  outdata[j] = (double)tstream[j];
-	}
-	pntr[i] = outdata;
+        nbytes = sizeof(double);
+        dtype = SMF__DOUBLE;
+        pntr[i] = smf_malloc( npts, nbytes, 0, status);
+        outdata = pntr[i];
+        tstream = (old->pntr)[i];
+        /* Input data are ints: must re-cast as double */
+        for (j=0; j<npts; j++) {
+          outdata[j] = (double)tstream[j];
+        }
+        pntr[i] = outdata;
       } else {
-	nbytes = smf_dtype_size(old, status);
-	pntr[i] = smf_malloc( npts, nbytes, 0, status);
-	if ( pntr[i] == NULL ) {
-	  if ( i == 0) {
-	    msgSetc("C", "Data");
-	  } else if ( i == 1 ) {
-	    msgSetc("C", "Variance");
-	  } else {
-	    if ( *status == SAI__OK ) {
-	      *status = SAI__ERROR;
-	      errRep(FUNC_NAME, "Loop counter out of range. Possible programming error?", status);
-	      return NULL;
-	    }
-	  }
-	  *status = SAI__ERROR;
-	  errRep(FUNC_NAME, "Unable to allocate memory for ^C component", status);
-	  return NULL;
-	}
-	memcpy( pntr[i], (old->pntr)[i], nbytes*npts);
+        nbytes = smf_dtype_size(old, status);
+        pntr[i] = smf_malloc( npts, nbytes, 0, status);
+        if ( pntr[i] == NULL ) {
+          if ( i == 0) {
+            msgSetc("C", "Data");
+          } else if ( i == 1 ) {
+            msgSetc("C", "Variance");
+          } else {
+            if ( *status == SAI__OK ) {
+              *status = SAI__ERROR;
+              errRep(FUNC_NAME, "Loop counter out of range. Possible programming error?", status);
+              return NULL;
+            }
+          }
+          *status = SAI__ERROR;
+          errRep(FUNC_NAME, "Unable to allocate memory for ^C component", status);
+          return NULL;
+        }
+        memcpy( pntr[i], (old->pntr)[i], nbytes*npts);
       }
     } else {
       pntr[i] = NULL;
@@ -211,7 +211,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
     poly = smf_malloc( npts, sizeof(double), 0, status);
     if ( *status != SAI__OK ) {
       errRep(FUNC_NAME, 
-	     "Unable to allocate memory for polynomial coefficients", status);
+             "Unable to allocate memory for polynomial coefficients", status);
       return NULL;
     }
     memcpy( poly, old->poly, npts*sizeof(double));
@@ -231,7 +231,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
 
   /* Construct the new smfData */
   new = smf_construct_smfData( new, file, hdr, da, dtype, pntr, dims, ndims, 
-			       virtual, ncoeff, poly, history, status);
+                               virtual, ncoeff, poly, history, status);
 
   return new;
 }
