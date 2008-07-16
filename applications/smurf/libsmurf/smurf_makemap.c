@@ -1025,6 +1025,10 @@ void smurf_makemap( int *status ) {
       smf_reshapendf( &tdata, tile, status );
       smf_reshapendf( &wdata, tile, status );
       smf_reshapendf( &odata, tile, status );
+
+      /* End contexts for current tile*/
+      ndfEnd(status);
+      astEnd;
     }
 
     /* Write out the list of output NDF names, annulling the error if a null
