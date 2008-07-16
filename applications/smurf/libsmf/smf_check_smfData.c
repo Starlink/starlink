@@ -13,18 +13,25 @@
 *     Subroutine
 
 *  Invocation:
-*     smf_check_smfData( const smfData *idata, smfData *odata, int * status );
+*     smf_check_smfData( const smfData *idata, smfData *odata, const int flags,
+*                        int * status );
 
 *  Arguments:
 *     idata = const smfData* (Given)
 *        Pointer to input smfData
 *     odata = smfData * (Given)
 *        Pointer to output smfData
+*     flags = const int (Given)
+*        Flags to control whether additional components are created.
+*        Supported flags are:
+*          - SMF__NOCREATE_QUALITY Do not create quality component if it is missing
+*          - SMF__NOCREATE_HEAD    Ignore smfHead
+*          - SMF__NOCREATE_FILE    Ignore smfFile
+*          - SMF__NOCREATE_DA      Ignore smfDA
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
 *  Description:
-
 *     This function checks all elements of a smfData structure and
 *     copies values from the input structure if necessary
 
