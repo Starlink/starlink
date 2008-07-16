@@ -90,8 +90,10 @@
 *     {enter_new_authors_here}
 
 *  History:
+*     15-SEP-1993 (DSB):
+*        Original version, copied from IRAS90 routine IRM_WRNDF.FOR
 *     6-OCT-1998 (DSB):
-*        Orginal version, copied from POLPACK routine WRNDF.
+*        Copied from POLPACK routine WRNDF.
 *     {enter_further_changes_here}
 
 *  Bugs:

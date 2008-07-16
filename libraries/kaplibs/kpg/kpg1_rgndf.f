@@ -84,6 +84,8 @@
 *     {enter_new_authors_here}
 
 *  History:
+*     15-SEP-1993 (DSB):
+*        Original version copied from IRAS90 routine IRM_RDNDF.FOR
 *     6-SEP-1998 (DSB):
 *        Original version copied from POLPACK routine RDNDF.FOR
 *     10-APR-2000 (DSB):
