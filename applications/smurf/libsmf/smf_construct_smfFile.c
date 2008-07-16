@@ -23,7 +23,7 @@
 *        are assigned to this struct and no struct is malloced.
 *        This can be used to fill a previously malloced struct.
 *     ndfid = int (Given)
-*        NDF identifier
+*        NDF identifier. Will be stored directly and not cloned.
 *     isSc2store = int (Given)
 *        True if the file is under "sc2store" control.
 *     isTstream = int (Given)
@@ -62,9 +62,12 @@
 *        Initial version.
 *     2006-01-27 (TIMJ):
 *        No longer have smfFile.xloc
+*     2008-07-16 (TIMJ):
+*        Use one_strlcpy.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
@@ -97,6 +100,7 @@
 #include "sae_par.h"
 #include "mers.h"
 #include "ndf.h"
+#include "star/one.h"
 
 /* SMURF routines */
 #include "smf.h"
@@ -125,8 +129,7 @@ smf_construct_smfFile(smfFile * tofill, int ndfid, int isSc2store,
     file->isSc2store = isSc2store;
     file->isTstream = isTstream;
     if (name != NULL) {
-      strncpy(file->name, name, SMF_PATH_MAX);
-      (file->name)[SMF_PATH_MAX] = '\0';
+      one_strlcpy( file->name, name, sizeof(file->name), status);
     } else {
       (file->name)[0] = '\0';
     }
