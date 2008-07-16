@@ -13,13 +13,20 @@
 *     Subroutine
 
 *  Invocation:
-*     new = smf_deepcopy_smfData( const smfData *old, const int rawconvert, int * status );
+*     new = smf_deepcopy_smfData( const smfData *old, const int rawconvert,
+*              const int flags,  int * status );
 
 *  Arguments:
 *     old = const smfData* (Given)
 *        Pointer to smfData to be copied
 *     rawconvert = const int (Given)
 *        Flag to denote whether to convert integer to double
+*     flags = const int (Given)
+*        Control which items are copied. The following flag values
+*        are supported (and can be combined):
+*          - SMF__NOCREATE_HEAD   Do not copy the smfHead
+*          - SMF__NOCREATE_FILE   Do not copy the smfFile
+*          - SMF__NOCREATE_DA     Do not copy the smfDA
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
