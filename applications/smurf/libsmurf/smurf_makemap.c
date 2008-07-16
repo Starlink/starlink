@@ -643,6 +643,7 @@ void smurf_makemap( int *status ) {
   /* Calculate the map bounds */
 
   smf_getrefwcs( "REF", &specrefwcs, &spacerefwcs, status );
+  if ( specrefwcs ) specrefwcs = astAnnul( specrefwcs );
 
   /* See if the input data is to be aligned in the output coordinate system
      rather than the default of ICRS. */
@@ -1208,7 +1209,7 @@ void smurf_makemap( int *status ) {
 
   /* Arrive here if no output NDF is being created. */
  L998:;
-
+  if( spacerefwcs ) spacerefwcs = astAnnul( spacerefwcs );
   if( outfset != NULL ) outfset = astAnnul( outfset );
   if( igrp != NULL ) grpDelet( &igrp, status);
   if( igrp4 != NULL) grpDelet( &igrp4, status);
