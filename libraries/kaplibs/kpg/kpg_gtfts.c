@@ -70,6 +70,8 @@ F77_SUBROUTINE(kpg_gtfts)( INTEGER(INDF), INTEGER(FCHAN), INTEGER(STATUS) ) {
 *  History:
 *     4-JUL-2008 (DSB):
 *        Original version.
+*     15-JUL-2008 (TIMJ):
+*        Pass in pointer to fchan
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -80,13 +82,13 @@ F77_SUBROUTINE(kpg_gtfts)( INTEGER(INDF), INTEGER(FCHAN), INTEGER(STATUS) ) {
    GENPTR_INTEGER(FCHAN)
    GENPTR_INTEGER(STATUS)
 
-   AstFitsChan *fchan;
+   AstFitsChan *fchan = NULL;
    int cstatus, indf;
 
    F77_IMPORT_INTEGER( *STATUS, cstatus );
    F77_IMPORT_INTEGER( *INDF, indf );
 
-   (void) kpgGtfts( indf, fchan, &cstatus );
+   (void) kpgGtfts( indf, &fchan, &cstatus );
 
    *FCHAN = astP2I( fchan );
    F77_EXPORT_INTEGER( cstatus, *STATUS );
