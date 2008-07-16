@@ -121,10 +121,10 @@ void smf_checkdets( Grp *detgrp, smfData *data, int *status ){
    were not found in the data. */
    baddets = NULL;
    buf = detname;
-   grpGrpsz( detgrp, &ndetgrp, status );
+   ndetgrp = grpGrpsz( detgrp, status );
    for( irec = 1; irec <= ndetgrp; irec++ ) {
       grpGet( detgrp, irec, 1, &buf, GRP__SZNAM, status );
-      grpIndex( detname, alldets, 1, &found, status );
+      found = grpIndex( detname, alldets, 1, status );
       if( !found ) {
          baddets = astAppendString( baddets, &baddetslen, " " );
          baddets = astAppendString( baddets, &baddetslen, detname );
@@ -146,7 +146,7 @@ void smf_checkdets( Grp *detgrp, smfData *data, int *status ){
    if( exclude ) {
       for( irec = 1; irec <= (data->dims)[ 1 ]; irec++ ) {
          grpGet( alldets, irec, 1, &buf, GRP__SZNAM, status );
-         grpIndex( detname, detgrp, 1, &found, status );
+         found = grpIndex( detname, detgrp, 1, status );
          if( found ) grpPut1( alldets, "REMOVE", irec, status );
       }
 

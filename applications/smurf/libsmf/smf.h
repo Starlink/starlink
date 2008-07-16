@@ -1007,7 +1007,7 @@ smf_store_outputbounds (const int lbnd_out[3],const int ubnd_out[3],
                         const AstMapping *oskymap, int *status);
 
 void
-smf_expand_tilegroup ( Grp * ogrp, int ntile, int npbin, int * outsize,
+smf_expand_tilegroup ( Grp * ogrp, int ntile, int npbin, size_t * outsize,
                        int * status);
 
 smfFilter *smf_create_smfFilter( smfData *template, int *status );

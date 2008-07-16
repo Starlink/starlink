@@ -316,7 +316,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
     (dim_t) (ubnd_out[1]-lbnd_out[1]+1);
 
   /* Get size of the input group */
-  grpGrpsz( igrp, &isize, status );
+  isize = grpGrpsz( igrp, status );
 
   /* Parse the CONFIG parameters stored in the keymap */
 

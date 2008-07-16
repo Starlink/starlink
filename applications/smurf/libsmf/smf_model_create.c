@@ -217,14 +217,14 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
   dim_t i;                      /* Loop counter */
   smfData *idata=NULL;          /* Pointer to input smfdata data */
   int idx=0;                    /* Index within subgroup */
-  int isize=0;                  /* Number of files in input group */
+  size_t isize=0;               /* Number of files in input group */
   dim_t j;                      /* Loop counter */
   int k;                        /* Loop counter */
   dim_t l;                      /* Loop counter */
   size_t len = 0;               /* size of buffer */
   Grp *mgrp=NULL;               /* Temporary group to hold model names */
   const char *mname=NULL;       /* String model component name */
-  int msize=0;                  /* Number of files in model group */
+  size_t msize=0;               /* Number of files in model group */
   char name[GRP__SZNAM+1];      /* Name of container file without suffix */
   size_t ndata=0;               /* Number of elements in data array */
   dim_t nrel=0;                 /* Number of related elements (subarrays) */
@@ -274,7 +274,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
   /* If using igroup as a template use group expressions to make filenames */
   if( igroup != NULL ) {
     /* Get size of the input group */
-    grpGrpsz( igroup->grp, &isize, status );
+    isize = grpGrpsz( igroup->grp, status );
 
     /* Create group of NDF names with model name suffix */
     mgrp = grpNew( "model component", status );

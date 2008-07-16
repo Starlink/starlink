@@ -340,7 +340,7 @@ void smf_rebincube_nn( smfData *data, int first, int last,
    the name of the current detector. If not found, set the GRID coord
    bad. */
       if( detgrp ) {    
-         grpIndex( name, detgrp, 1, &found, status );
+         found = grpIndex( name, detgrp, 1, status );
          if( !found ) {
             detxin[ idet ] = AST__BAD;
             detyin[ idet ] = AST__BAD;

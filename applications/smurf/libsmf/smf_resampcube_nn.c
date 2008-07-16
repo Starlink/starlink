@@ -197,7 +197,7 @@ void smf_resampcube_nn( smfData *data, int index, int size, dim_t nchan,
    the name of the current detector. If not found, set the GRID coord
    bad. */
       if( detgrp ) {    
-         grpIndex( name, detgrp, 1, &found, status );
+         found = grpIndex( name, detgrp, 1, status );
          if( !found ) {
             detxtemplt[ idet ] = AST__BAD;
             detytemplt[ idet ] = AST__BAD;

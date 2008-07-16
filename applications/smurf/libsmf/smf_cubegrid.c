@@ -529,7 +529,7 @@ void smf_cubegrid( Grp *igrp,  int size, char *system, int usedetpos,
 
 /* See if this detector is included in the group of detectors to be used. */
             if( detgrp ) {    
-               grpIndex( lab, detgrp, 1, &found, status );
+               found = grpIndex( lab, detgrp, 1, status );
             } else {
                found = 1;
             }

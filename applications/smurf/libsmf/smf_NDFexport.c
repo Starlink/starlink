@@ -117,7 +117,7 @@ void smf_NDFexport( const smfData *data, void *variance,
   HDSLoc *jcmtstateloc=NULL;    /* HDS Locator for JCMT headers */
   int lbnd[NDF__MXDIM];         /* Dimensions of container */
   Grp *inname=NULL;             /* 1-element group to hold input filename */
-  int msize=0;                  /* Number of files in name group */
+  size_t msize=0;               /* Number of files in name group */
   dim_t nbolo;                  /* Number of bolometers */
   size_t ndata=0;               /* Number of elements in data array */
   dim_t ntslice=0;              /* Number of time slices */

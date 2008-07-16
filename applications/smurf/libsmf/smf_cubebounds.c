@@ -806,7 +806,7 @@ void smf_cubebounds( Grp *igrp,  int size, AstSkyFrame *oskyframe,
    false in order to skip this detector. */
             good = 1;
             if( detgrp ) {    
-               grpIndex( name, detgrp, 1, &found, status );
+               found = grpIndex( name, detgrp, 1, status );
                if( !found ) good = 0;
             }
 

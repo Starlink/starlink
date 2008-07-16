@@ -331,7 +331,7 @@ void smf_rebinsparse( smfData *data, int first, int *ptime, AstFrame *ospecfrm,
 /* If a group of detectors to be used was supplied, search the group for
    the name of the current detector. If not found, set the GRID coords bad. */
       if( detgrp ) {    
-         grpIndex( name, detgrp, 1, &found, status );
+         found = grpIndex( name, detgrp, 1, status );
          if( !found ) {
             xin[ irec ] = AST__BAD;
             yin[ irec ] = AST__BAD;

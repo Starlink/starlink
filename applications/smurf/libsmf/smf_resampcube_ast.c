@@ -231,7 +231,7 @@ void smf_resampcube_ast( smfData *data, int index, int size, dim_t nchan,
    the name of the current detector. If not found, set the GRID coord bad. 
    This will cause astResample to ignore data from the detector. */
          if( detgrp ) {    
-            grpIndex( name, detgrp, 1, &found, status );
+            found = grpIndex( name, detgrp, 1, status );
             if( !found ) detlut[ idet ] = AST__BAD;
          }
 

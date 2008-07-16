@@ -83,7 +83,7 @@
 #include "smf.h"
 
 void
-smf_expand_tilegroup ( Grp * ogrp, int ntile, int npbin, int * outsize,
+smf_expand_tilegroup ( Grp * ogrp, int ntile, int npbin, size_t * outsize,
                        int * status) {
 
   char basename[ GRP__SZNAM + 1 ]; /* Output base file name */
@@ -138,6 +138,6 @@ smf_expand_tilegroup ( Grp * ogrp, int ntile, int npbin, int * outsize,
   }
 
   /* finalize size of output group */
-  grpGrpsz( ogrp, outsize, status );
+  *outsize = grpGrpsz( ogrp, status );
 
 }
