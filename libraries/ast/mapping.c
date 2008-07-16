@@ -10814,6 +10814,8 @@ f        grid dimensions given by the value of NDIM_IN
 *        attribute) should match the number of output grid dimensions
 c        given by "ndim_out".
 f        given by NDIM_OUT.
+c        If "in" is NULL, the Mapping will not be used, but a valid
+c        Mapping must still be supplied.
 c     wlim
 f     WLIM = DOUBLE PRECISION (Given)
 *        This value is only used if the AST__REBINEND flag is specified
@@ -10834,12 +10836,14 @@ c     ndim_in
 f     NDIM_IN = INTEGER (Given)
 *        The number of dimensions in the input grid. This should be at
 *        least one.
+c        Not used if "in" is NULL.
 c     lbnd_in
 f     LBND_IN( NDIM_IN ) = INTEGER (Given)
 c        Pointer to an array of integers, with "ndim_in" elements,
 f        An array
 *        containing the coordinates of the centre of the first pixel
 *        in the input grid along each dimension.
+c        Not used if "in" is NULL.
 c     ubnd_in
 f     UBND_IN( NDIM_IN ) = INTEGER (Given)
 c        Pointer to an array of integers, with "ndim_in" elements,
@@ -10856,6 +10860,7 @@ f        (J'th) dimension being UBND_IN(J)-LBND_IN(J)+1. They also define
 *        the input grid's coordinate system, each pixel having unit
 *        extent along each dimension with integral coordinate values
 *        at its centre.
+c        Not used if "in" is NULL.
 c     in
 f     IN( * ) = <Xtype> (Given)
 c        Pointer to an array, with one element for each pixel in the
@@ -10910,6 +10915,7 @@ c        astRebin<X> functions.
 f        AST_REBIN<X> routines.
 *        If a value of zero is supplied, then the default linear spreading 
 *        scheme is used (equivalent to supplying the value AST__LINEAR).
+c        Not used if "in" is NULL.
 c     params
 f     PARAMS( * ) = DOUBLE PRECISION (Given)
 c        An optional pointer to an array of double which should contain
@@ -10925,6 +10931,7 @@ c        If no additional parameters are required, this array is not
 c        used and a NULL pointer may be given.
 f        If no additional parameters are required, this array is not
 f        used. A dummy (e.g. one-element) array may then be supplied.
+c        Not used if "in" is NULL.
 c     flags
 f     FLAGS = INTEGER (Given)
 c        The bitwise OR of a set of flag values which may be used to
@@ -10951,6 +10958,7 @@ f     TOL = DOUBLE PRECISION (Given)
 *        cause the edges of the panel to be visible when viewing the output 
 *        image at high contrast. If this is a problem, reduce the
 *        tolerance value used.
+c        Not used if "in" is NULL.
 c     maxpix
 f     MAXPIX = INTEGER (Given)
 *        A value which specifies an initial scale size (in pixels) for
@@ -10980,6 +10988,7 @@ f        divided into sub-regions whose size does not exceed MAXPIX
 c        setting "tol" to zero). Although this may degrade
 f        setting TOL to zero). Although this may degrade
 *        performance, accurate results will still be obtained.
+c        Not used if "in" is NULL.
 c     badval
 f     BADVAL = <Xtype> (Given)
 *        This argument should have the same type as the elements of
@@ -11031,6 +11040,7 @@ f        An array
 *        containing the coordinates of the first pixel in the region
 *        of the input grid which is to be included in the rebined output
 *        array.
+c        Not used if "in" is NULL.
 c     ubnd
 f     UBND( NDIM_IN ) = INTEGER (Given)
 c        Pointer to an array of integers, with "ndim_in" elements,
@@ -11047,6 +11057,7 @@ f        Note that LBND and UBND together define the shape and
 c        defined by the "lbnd_in" and "ubnd_in" arrays). Regions of
 f        defined by the LBND_IN and UBND_IN arrays). Regions of
 *        the input grid lying outside this region will not be used.
+c        Not used if "in" is NULL.
 c     out
 f     OUT( * ) = <Xtype> (Given and Returned)
 c        Pointer to an array, with one element for each pixel in the
@@ -11260,225 +11271,228 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
 /* Check the global error status. */ \
    if ( !astOK ) return; \
 \
+/* Loop to determine how many pixels the output array contains. */ \
+   npix_out = 1; \
+   for ( idim = 0; idim < ndim_out; idim++ ) { \
+      npix_out *= ubnd_out[ idim ] - lbnd_out[ idim ] + 1; \
+   } \
+\
+/* If no input data was supplied, jump to the normalisation section. */ \
+   if( in ) { \
+\
 /* Ensure any supplied "in_var" pointer is ignored if no input variances are \
    needed. */ \
-   if( !( flags & AST__USEVAR ) && !( flags & AST__VARWGT ) ) { \
-      in_var = NULL; \
-   } \
+      if( !( flags & AST__USEVAR ) && !( flags & AST__VARWGT ) ) { \
+         in_var = NULL; \
+      } \
 \
 /* Ensure any supplied "out_var" pointer is ignored if no output variances \
    being created. */ \
-   if( !( flags & AST__USEVAR ) && !( flags & AST__GENVAR ) ) { \
-      out_var = NULL; \
-   } \
+      if( !( flags & AST__USEVAR ) && !( flags & AST__GENVAR ) ) { \
+         out_var = NULL; \
+      } \
 \
 /* Obtain values for the Nin and Nout attributes of the Mapping. */ \
-   nin = astGetNin( this ); \
-   nout = astGetNout( this ); \
+      nin = astGetNin( this ); \
+      nout = astGetNout( this ); \
 \
 /* If OK, check that the number of input grid dimensions matches the \
    number required by the Mapping and is at least 1. Report an error \
    if necessary. */ \
-   if ( astOK && ( ( ndim_in != nin ) || ( ndim_in < 1 ) ) ) { \
-      astError( AST__NGDIN, "astRebinSeq"#X"(%s): Bad number of input grid " \
-                "dimensions (%d).", astGetClass( this ), ndim_in ); \
-      if ( ndim_in != nin ) { \
-         astError( AST__NGDIN, "The %s given requires %d coordinate value%s " \
-                   "to specify an input position.", \
-                   astGetClass( this ), nin, ( nin == 1 ) ? "" : "s" ); \
+      if ( astOK && ( ( ndim_in != nin ) || ( ndim_in < 1 ) ) ) { \
+         astError( AST__NGDIN, "astRebinSeq"#X"(%s): Bad number of input grid " \
+                   "dimensions (%d).", astGetClass( this ), ndim_in ); \
+         if ( ndim_in != nin ) { \
+            astError( AST__NGDIN, "The %s given requires %d coordinate value%s " \
+                      "to specify an input position.", \
+                      astGetClass( this ), nin, ( nin == 1 ) ? "" : "s" ); \
+         } \
       } \
-   } \
 \
 /* If OK, also check that the number of output grid dimensions matches \
    the number required by the Mapping and is at least 1. Report an \
    error if necessary. */ \
-   if ( astOK && ( ( ndim_out != nout ) || ( ndim_out < 1 ) ) ) { \
-      astError( AST__NGDIN, "astRebinSeq"#X"(%s): Bad number of output grid " \
-                "dimensions (%d).", astGetClass( this ), ndim_out ); \
-      if ( ndim_out != nout ) { \
-         astError( AST__NGDIN, "The %s given generates %s%d coordinate " \
-                   "value%s for each output position.", astGetClass( this ), \
-                   ( nout < ndim_out ) ? "only " : "", nout, \
-                   ( nout == 1 ) ? "" : "s" ); \
+      if ( astOK && ( ( ndim_out != nout ) || ( ndim_out < 1 ) ) ) { \
+         astError( AST__NGDIN, "astRebinSeq"#X"(%s): Bad number of output grid " \
+                   "dimensions (%d).", astGetClass( this ), ndim_out ); \
+         if ( ndim_out != nout ) { \
+            astError( AST__NGDIN, "The %s given generates %s%d coordinate " \
+                      "value%s for each output position.", astGetClass( this ), \
+                      ( nout < ndim_out ) ? "only " : "", nout, \
+                      ( nout == 1 ) ? "" : "s" ); \
+         } \
       } \
-   } \
 \
 /* Check that the lower and upper bounds of the input grid are \
    consistent. Report an error if any pair is not. */ \
-   if ( astOK ) { \
-      for ( idim = 0; idim < ndim_in; idim++ ) { \
-         if ( lbnd_in[ idim ] > ubnd_in[ idim ] ) { \
-            astError( AST__GBDIN, "astRebinSeq"#X"(%s): Lower bound of " \
-                      "input grid (%d) exceeds corresponding upper bound " \
-                      "(%d).", astGetClass( this ), \
-                      lbnd_in[ idim ], ubnd_in[ idim ] ); \
-            astError( AST__GBDIN, "Error in input dimension %d.", \
-                      idim + 1 ); \
-            break; \
+      if ( astOK ) { \
+         for ( idim = 0; idim < ndim_in; idim++ ) { \
+            if ( lbnd_in[ idim ] > ubnd_in[ idim ] ) { \
+               astError( AST__GBDIN, "astRebinSeq"#X"(%s): Lower bound of " \
+                         "input grid (%d) exceeds corresponding upper bound " \
+                         "(%d).", astGetClass( this ), \
+                         lbnd_in[ idim ], ubnd_in[ idim ] ); \
+               astError( AST__GBDIN, "Error in input dimension %d.", \
+                         idim + 1 ); \
+               break; \
+            } \
          } \
       } \
-   } \
 \
 /* Check that the positional accuracy tolerance supplied is valid and \
    report an error if necessary. */ \
-   if ( astOK && ( tol < 0.0 ) ) { \
-      astError( AST__PATIN, "astRebinSeq"#X"(%s): Invalid positional " \
-                "accuracy tolerance (%.*g pixel).", \
-                astGetClass( this ), DBL_DIG, tol ); \
-      astError( AST__PATIN, "This value should not be less than zero." ); \
-   } \
+      if ( astOK && ( tol < 0.0 ) ) { \
+         astError( AST__PATIN, "astRebinSeq"#X"(%s): Invalid positional " \
+                   "accuracy tolerance (%.*g pixel).", \
+                   astGetClass( this ), DBL_DIG, tol ); \
+         astError( AST__PATIN, "This value should not be less than zero." ); \
+      } \
 \
 /* Check that the initial scale size in pixels supplied is valid and \
    report an error if necessary. */ \
-   if ( astOK && ( maxpix < 0 ) ) { \
-      astError( AST__SSPIN, "astRebinSeq"#X"(%s): Invalid initial scale " \
-                "size in pixels (%d).", astGetClass( this ), maxpix ); \
-      astError( AST__SSPIN, "This value should not be less than zero." ); \
-   } \
+      if ( astOK && ( maxpix < 0 ) ) { \
+         astError( AST__SSPIN, "astRebinSeq"#X"(%s): Invalid initial scale " \
+                   "size in pixels (%d).", astGetClass( this ), maxpix ); \
+         astError( AST__SSPIN, "This value should not be less than zero." ); \
+      } \
 \
 /* Check that the lower and upper bounds of the output grid are \
    consistent. Report an error if any pair is not. */ \
-   if ( astOK ) { \
-      for ( idim = 0; idim < ndim_out; idim++ ) { \
-         if ( lbnd_out[ idim ] > ubnd_out[ idim ] ) { \
-            astError( AST__GBDIN, "astRebinSeq"#X"(%s): Lower bound of " \
-                      "output grid (%d) exceeds corresponding upper bound " \
-                      "(%d).", astGetClass( this ), \
-                      lbnd_out[ idim ], ubnd_out[ idim ] ); \
-            astError( AST__GBDIN, "Error in output dimension %d.", \
-                      idim + 1 ); \
-            break; \
+      if ( astOK ) { \
+         for ( idim = 0; idim < ndim_out; idim++ ) { \
+            if ( lbnd_out[ idim ] > ubnd_out[ idim ] ) { \
+               astError( AST__GBDIN, "astRebinSeq"#X"(%s): Lower bound of " \
+                         "output grid (%d) exceeds corresponding upper bound " \
+                         "(%d).", astGetClass( this ), \
+                         lbnd_out[ idim ], ubnd_out[ idim ] ); \
+               astError( AST__GBDIN, "Error in output dimension %d.", \
+                         idim + 1 ); \
+               break; \
+            } \
          } \
       } \
-   } \
 \
 /* Similarly check the bounds of the input region. */ \
-   if ( astOK ) { \
-      for ( idim = 0; idim < ndim_in; idim++ ) { \
-         if ( lbnd[ idim ] > ubnd[ idim ] ) { \
-            astError( AST__GBDIN, "astRebinSeq"#X"(%s): Lower bound of " \
-                      "input region (%d) exceeds corresponding upper " \
-                      "bound (%d).", astGetClass( this ), \
-                      lbnd[ idim ], ubnd[ idim ] ); \
+      if ( astOK ) { \
+         for ( idim = 0; idim < ndim_in; idim++ ) { \
+            if ( lbnd[ idim ] > ubnd[ idim ] ) { \
+               astError( AST__GBDIN, "astRebinSeq"#X"(%s): Lower bound of " \
+                         "input region (%d) exceeds corresponding upper " \
+                         "bound (%d).", astGetClass( this ), \
+                         lbnd[ idim ], ubnd[ idim ] ); \
 \
 /* Also check that the input region lies wholly within the input \
    grid. */ \
-         } else if ( lbnd[ idim ] < lbnd_in[ idim ] ) { \
-            astError( AST__GBDIN, "astRebinSeq"#X"(%s): Lower bound of " \
-                      "input region (%d) is less than corresponding " \
-                      "bound of input grid (%d).", astGetClass( this ), \
-                      lbnd[ idim ], lbnd_in[ idim ] ); \
-         } else if ( ubnd[ idim ] > ubnd_in[ idim ] ) { \
-            astError( AST__GBDIN, "astRebinSeq"#X"(%s): Upper bound of " \
-                      "input region (%d) exceeds corresponding " \
-                      "bound of input grid (%d).", astGetClass( this ), \
-                      ubnd[ idim ], ubnd_in[ idim ] ); \
-         } \
+            } else if ( lbnd[ idim ] < lbnd_in[ idim ] ) { \
+               astError( AST__GBDIN, "astRebinSeq"#X"(%s): Lower bound of " \
+                         "input region (%d) is less than corresponding " \
+                         "bound of input grid (%d).", astGetClass( this ), \
+                         lbnd[ idim ], lbnd_in[ idim ] ); \
+            } else if ( ubnd[ idim ] > ubnd_in[ idim ] ) { \
+               astError( AST__GBDIN, "astRebinSeq"#X"(%s): Upper bound of " \
+                         "input region (%d) exceeds corresponding " \
+                         "bound of input grid (%d).", astGetClass( this ), \
+                         ubnd[ idim ], ubnd_in[ idim ] ); \
+            } \
 \
 /* Say which dimension produced the error. */ \
-         if ( !astOK ) { \
-            astError( AST__GBDIN, "Error in output dimension %d.", \
-                      idim + 1 ); \
-            break; \
+            if ( !astOK ) { \
+               astError( AST__GBDIN, "Error in output dimension %d.", \
+                         idim + 1 ); \
+               break; \
+            } \
          } \
       } \
-   } \
 \
 /* Check that only one of AST__USEVAR and ASR__GENVAR has been supplied. */ \
-   if( ( flags & AST__USEVAR ) && ( flags & AST__GENVAR ) ) { \
-      if( astOK ) { \
-         astError( AST__BDPAR, "astRebinSeq"#X"(%s): Incompatible flags " \
-                   "AST__GENVAR and AST__USEVAR have been specified " \
-                   "together (programming error).", astGetClass( this ) ); \
+      if( ( flags & AST__USEVAR ) && ( flags & AST__GENVAR ) ) { \
+         if( astOK ) { \
+            astError( AST__BDPAR, "astRebinSeq"#X"(%s): Incompatible flags " \
+                      "AST__GENVAR and AST__USEVAR have been specified " \
+                      "together (programming error).", astGetClass( this ) ); \
+         } \
       } \
-   } \
 \
 /* If AST__USEVAR or AST_VARWGT has been specified, check we have an \
    input variance array. */ \
-   if( !in_var && astOK ) { \
-      if( ( flags & AST__USEVAR ) ) { \
-         astError( AST__BDPAR, "astRebinSeq"#X"(%s): The AST__USEVAR flag " \
-                   "was specified but no input variance array was supplied " \
-                   "(programming error).", astGetClass( this )  ); \
-      } else if( ( flags & AST__VARWGT ) ) { \
-         astError( AST__BDPAR, "astRebinSeq"#X"(%s): The AST__VARWGT flag " \
-                   "was specified but no input variance array was supplied " \
-                   "(programming error).", astGetClass( this )  ); \
+      if( !in_var && astOK ) { \
+         if( ( flags & AST__USEVAR ) ) { \
+            astError( AST__BDPAR, "astRebinSeq"#X"(%s): The AST__USEVAR flag " \
+                      "was specified but no input variance array was supplied " \
+                      "(programming error).", astGetClass( this )  ); \
+         } else if( ( flags & AST__VARWGT ) ) { \
+            astError( AST__BDPAR, "astRebinSeq"#X"(%s): The AST__VARWGT flag " \
+                      "was specified but no input variance array was supplied " \
+                      "(programming error).", astGetClass( this )  ); \
+         } \
       } \
-   } \
 \
 /* If AST__USEVAR or AST_GENVAR has been specified, check we have an \
    output variance array. */ \
-   if( !out_var && astOK ) { \
-      if( ( flags & AST__USEVAR ) ) { \
-         astError( AST__BDPAR, "astRebinSeq"#X"(%s): The AST__USEVAR flag " \
-                   "was specified but no output variance array was supplied " \
-                   "(programming error).", astGetClass( this )  ); \
-      } else if( ( flags & AST__GENVAR ) ) { \
-         astError( AST__BDPAR, "astRebinSeq"#X"(%s): The AST__GENVAR flag " \
-                   "was specified but no output variance array was supplied " \
-                   "(programming error).", astGetClass( this )  ); \
+      if( !out_var && astOK ) { \
+         if( ( flags & AST__USEVAR ) ) { \
+            astError( AST__BDPAR, "astRebinSeq"#X"(%s): The AST__USEVAR flag " \
+                      "was specified but no output variance array was supplied " \
+                      "(programming error).", astGetClass( this )  ); \
+         } else if( ( flags & AST__GENVAR ) ) { \
+            astError( AST__BDPAR, "astRebinSeq"#X"(%s): The AST__GENVAR flag " \
+                      "was specified but no output variance array was supplied " \
+                      "(programming error).", astGetClass( this )  ); \
+         } \
       } \
-   } \
 \
 /* If OK, loop to determine how many input pixels are to be binned. */ \
-   simple = NULL; \
-   npix = 1; \
-   npix_out = 1; \
-   unsimplified_mapping = this; \
-   if ( astOK ) { \
-      for ( idim = 0; idim < ndim_in; idim++ ) { \
-         npix *= ubnd[ idim ] - lbnd[ idim ] + 1; \
-      } \
-\
-/* Loop to determine how many pixels the output array contains. */ \
-      for ( idim = 0; idim < ndim_out; idim++ ) { \
-         npix_out *= ubnd_out[ idim ] - lbnd_out[ idim ] + 1; \
-      } \
+      simple = NULL; \
+      npix = 1; \
+      unsimplified_mapping = this; \
+      if ( astOK ) { \
+         for ( idim = 0; idim < ndim_in; idim++ ) { \
+            npix *= ubnd[ idim ] - lbnd[ idim ] + 1; \
+         } \
 \
 /* If there are sufficient pixels to make it worthwhile, simplify the \
    Mapping supplied to improve performance. Otherwise, just clone the \
    Mapping pointer. Note we have already saved a pointer to the original \
    Mapping so that lower-level functions can use it if they need to report \
    an error. */ \
-      if ( npix > 1024 ) { \
-         simple = astSimplify( this ); \
-      } else { \
-         simple = astClone( this ); \
+         if ( npix > 1024 ) { \
+            simple = astSimplify( this ); \
+         } else { \
+            simple = astClone( this ); \
+         } \
       } \
-   } \
 \
 /* Report an error if the forward transformation of this simplified \
    Mapping is not defined. */ \
-   if ( !astGetTranForward( simple ) && astOK ) { \
-      astError( AST__TRNND, "astRebinSeq"#X"(%s): An forward coordinate " \
-                "transformation is not defined by the %s supplied.", \
-                astGetClass( unsimplified_mapping ), \
-                astGetClass( unsimplified_mapping ) ); \
-   } \
+      if ( !astGetTranForward( simple ) && astOK ) { \
+         astError( AST__TRNND, "astRebinSeq"#X"(%s): An forward coordinate " \
+                   "transformation is not defined by the %s supplied.", \
+                   astGetClass( unsimplified_mapping ), \
+                   astGetClass( unsimplified_mapping ) ); \
+      } \
 \
 /* If required, initialise the output arrays to hold zeros. */ \
-   if( flags & AST__REBININIT ) { \
-      w = weights; \
-      d = out; \
-      if( out_var ) { \
-         v = out_var; \
-         for( ipix_out = 0; ipix_out < npix_out; ipix_out++, d++, v++, w++ ) { \
-            *d = 0; \
-            *v = 0; \
-            *w = 0; \
+      if( flags & AST__REBININIT ) { \
+         w = weights; \
+         d = out; \
+         if( out_var ) { \
+            v = out_var; \
+            for( ipix_out = 0; ipix_out < npix_out; ipix_out++, d++, v++, w++ ) { \
+               *d = 0; \
+               *v = 0; \
+               *w = 0; \
+            } \
+         } else { \
+            for( ipix_out = 0; ipix_out < npix_out; ipix_out++, d++, w++ ) { \
+               *d = 0; \
+               *w = 0; \
+            } \
          } \
-      } else { \
-         for( ipix_out = 0; ipix_out < npix_out; ipix_out++, d++, w++ ) { \
-            *d = 0; \
-            *w = 0; \
+         if( flags & AST__GENVAR ) { \
+            w = weights + npix_out; \
+            for( ipix_out = 0; ipix_out < npix_out; ipix_out++, w++ ) *w = 0; \
          } \
       } \
-      if( flags & AST__GENVAR ) { \
-         w = weights + npix_out; \
-         for( ipix_out = 0; ipix_out < npix_out; ipix_out++, w++ ) *w = 0; \
-      } \
-   } \
 \
 /* Perform the rebinning. Note that we pass all gridded data, the \
    spread function and the bad pixel value by means of pointer \
@@ -11486,7 +11500,6 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
    having to replicate functions unnecessarily for each data \
    type. However, we also pass an argument that identifies the data \
    type we have obscured. */ \
-   if( in ) { \
       RebinAdaptively( simple, ndim_in, lbnd_in, ubnd_in, \
                        (const void *) in, (const void *) in_var, \
                        TYPE_##X, spread, \
@@ -11568,7 +11581,7 @@ static void RebinSeq##X( AstMapping *this, double wlim, int ndim_in, \
 
 /* Expand the above macro to generate a function for each required
    data type. */
-#if HAVE_LONG_DOUBLE     /* Not normally implemented */
+#if HAVE_LONG_DOUBLE  /* Not normally implemented */
 MAKE_REBINSEQ(LD,long double,0)
 #endif
 MAKE_REBINSEQ(D,double,0)  
