@@ -217,7 +217,7 @@ void extractclumps( int *status ) {
    int nskyax;                  /* No. of sky axes in current WCS Frame */
    int nspecax;                 /* No. of spectral axes in current WCS Frame */
    int sdim[ NDF__MXDIM ];      /* The indices of the significant pixel axes */
-   int size;                    /* Number of elements in "grp" */
+   size_t size;                 /* Number of elements in "grp" */
    int skip[ 3 ];               /* Pixel axis skips */
    int slbnd[ NDF__MXDIM ];     /* The lower bounds of the significant pixel axes */
    int subnd[ NDF__MXDIM ];     /* The upper bounds of the significant pixel axes */

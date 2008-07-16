@@ -172,7 +172,7 @@ void findback( int *status ){
    int nystep;               /* Number of independent y slices */
    int nzstep;               /* Number of slices in z direction */
    int sdim[ 3 ];            /* Dimensions of each significant NDF axis */
-   int size;                 /* Size of GRP group */
+   size_t size;              /* Size of GRP group */
    int slice_dim[ 3 ];       /* Dimensions of each significant slice axis */
    int slice_size;           /* Number of pixels in each slice */
    int sub;                  /* Output the background-subtracted input data? */

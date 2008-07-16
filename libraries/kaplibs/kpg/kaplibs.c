@@ -62,6 +62,8 @@
 *        Added kpg1_medur.
 *     10-JUL-2008 (TIMJ):
 *        Use starmem
+*     15-JUL-2008 (TIMJ):
+*        const and size_t to match Grp
 *     {enter_further_changes_here}
 
 *-
@@ -208,7 +210,7 @@ void kpg1Kygrp( AstKeyMap *keymap, Grp **igrp, int *status ){
 
 /* ------------------------------- */
 
-void kpg1Kymap( Grp *igrp, AstKeyMap **keymap, int *status ){
+void kpg1Kymap( const Grp *igrp, AstKeyMap **keymap, int *status ){
   kpg1Kymp1( igrp, keymap, status );
 }
 
@@ -584,7 +586,7 @@ F77_SUBROUTINE(irq_addqn)( CHARACTER_ARRAY(LOCS),
                            TRAIL(QNAME)
                            TRAIL(COMMNT) );
 
-void irqAddqn( IRQLocs *locs, const char *qname, int deflt,
+void irqAddqn( const IRQLocs *locs, const char *qname, int deflt,
                const char *commnt, int *status ){
    DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
    DECLARE_CHARACTER_DYN(QNAME);  
@@ -631,7 +633,7 @@ F77_SUBROUTINE(irq_setqm)( CHARACTER_ARRAY(LOCS),
                            TRAIL(LOCS)
                            TRAIL(QNAME) );
 
-void irqSetqm( IRQLocs *locs, int bad, const char *qname, int size,
+void irqSetqm( const IRQLocs *locs, int bad, const char *qname, int size,
                float *mask, int *set, int *status ){
 
    DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
@@ -684,7 +686,7 @@ F77_SUBROUTINE(irq_rwqn)( CHARACTER_ARRAY(LOCS),
                           TRAIL(LOCS)
                           TRAIL(QNAME) );
 
-void irqRwqn( IRQLocs *locs, const char *qname, int set, int newval,
+void irqRwqn( const IRQLocs *locs, const char *qname, int set, int newval,
               int *oldval, int *status ){
 
    DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
@@ -733,7 +735,7 @@ F77_SUBROUTINE(irq_fxbit)( CHARACTER_ARRAY(LOCS),
                            TRAIL(LOCS)
                            TRAIL(QNAME) );
 
-void irqFxbit( IRQLocs *locs, const char *qname, int bit, int *fixbit, 
+void irqFxbit( const IRQLocs *locs, const char *qname, int bit, int *fixbit, 
                int *status ){
 
    DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
@@ -780,8 +782,8 @@ F77_SUBROUTINE(irq_getqn)( CHARACTER_ARRAY(LOCS),
                            TRAIL(QNAME)
                            TRAIL(COMMNT) );
 
-void irqGetqn( IRQLocs *locs, char *qname, int *fixed, int *value, int *bit, 
-               char *commnt, int commnt_len, int *status ){
+void irqGetqn( const IRQLocs *locs, const char *qname, int *fixed, int *value,
+                int *bit, char *commnt, int commnt_len, int *status ){
 
    DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
    DECLARE_CHARACTER_DYN(QNAME);
@@ -833,7 +835,7 @@ F77_SUBROUTINE(irq_rbit)( CHARACTER_ARRAY(LOCS),
                           TRAIL(LOCS)
                           TRAIL(QNAME) );
 
-void irqRbit( IRQLocs *locs, const char *qname, int *bit, int *status ){
+void irqRbit( const IRQLocs *locs, const char *qname, int *bit, int *status ){
 
    DECLARE_CHARACTER_ARRAY(LOCS,DAT__SZLOC,5);  
    DECLARE_CHARACTER_DYN(QNAME);

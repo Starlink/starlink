@@ -55,6 +55,8 @@
 *        Added kpg1Gtaxv.
 *     22-MAR-2007 (DSB):
 *        Added kpg1Gilst.
+*     15-JUL-2008 (TIMJ):
+*        const and size_t to match Grp
 *     {enter_further_changes_here}
 
 *-
@@ -141,7 +143,7 @@ void kpg1Asget( int indf, int ndim, int exact, int trim, int reqinv,
 F77_SUBROUTINE(kpg1_gtgrp)( CHARACTER(PARAM), INTEGER(IGRP), INTEGER(SIZE),
                             INTEGER(STATUS) TRAIL(PARAM) );
 
-void kpg1Gtgrp( const char *param, Grp **grp, int *size, int *status ){
+void kpg1Gtgrp( const char *param, Grp **grp, size_t *size, int *status ){
    DECLARE_CHARACTER_DYN(PARAM);
    DECLARE_INTEGER(IGRP);
    DECLARE_INTEGER(SIZE);
@@ -317,8 +319,8 @@ F77_SUBROUTINE(kpg1_rgndf)( CHARACTER(PARAM), INTEGER(MAXSIZ), INTEGER(MINSIZ),
                             CHARACTER(TEXT), INTEGER(IGRP), INTEGER(SIZE), 
                             INTEGER(STATUS) TRAIL(PARAM) TRAIL(TEXT) );
 
-void kpg1Rgndf( const char *param, int maxsiz, int minsiz, const char *text, 
-                Grp **grp, int *size, int *status ){
+void kpg1Rgndf( const char *param, size_t maxsiz, size_t minsiz,
+                 const char *text, Grp **grp, size_t *size, int *status ){
 
    DECLARE_CHARACTER_DYN(PARAM);  
    DECLARE_INTEGER(MAXSIZ);
@@ -367,8 +369,9 @@ F77_SUBROUTINE(kpg1_wgndf)( CHARACTER(PARAM), INTEGER(IGRP0), INTEGER(MAXSIZ),
                             INTEGER(SIZE), INTEGER(STATUS) TRAIL(PARAM) 
                             TRAIL(TEXT) );
 
-void kpg1Wgndf( const char *param, Grp *grp0, int maxsiz, int minsiz,  
-                const char *text, Grp **grp, int *size, int *status ){
+void kpg1Wgndf( const char *param, const Grp *grp0, size_t maxsiz, 
+                size_t minsiz, const char *text, Grp **grp, size_t *size,
+                int *status ){
 
    DECLARE_CHARACTER_DYN(PARAM);  
    DECLARE_INTEGER(IGRP0);

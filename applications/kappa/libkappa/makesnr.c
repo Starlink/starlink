@@ -135,7 +135,7 @@ F77_SUBROUTINE(makesnr)( INTEGER(STATUS) ){
    int minbin = 0;           /* Index of bin with smallest population */
    int minpop;               /* Smallest bin population found so far */
    int nbad;                 /* Number of rejected pixels */
-   int size;                 /* Size of GRP group */
+   size_t size;              /* Size of GRP group */
    int state;                /* Parameter state */
 
 /* Abort if an error has already occurred. */

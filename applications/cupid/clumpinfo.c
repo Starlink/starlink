@@ -144,7 +144,7 @@ void clumpinfo( int *status ) {
    int nuse;            /* Number of clumps to be used */
    int primary;         /* Value for locator primary flag */
    int quiet;           /* Supress screen output? */
-   int size;            /* Number of values in group "*grp" */
+   size_t size;         /* Number of values in group "*grp" */
    int there;           /* Does the enquired object exist? */
 
 /* Abort if an error has already occurred. */

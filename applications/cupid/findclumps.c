@@ -839,7 +839,7 @@ void findclumps( int *status ) {
    int perspectrum;             /* Process spectra independently? */
    int repconf;                 /* Report configuration? */
    int sdim[ NDF__MXDIM ];      /* The indices of the significant pixel axes */
-   int size;                    /* Size of a group */
+   size_t size;                 /* Size of a group */
    int confpar;                 /* Is this line a config parameter setting? */
    int skip[3];                 /* Pointer to array of axis skips */
    int slbnd[ NDF__MXDIM ];     /* The lower bounds of the significant pixel axes */

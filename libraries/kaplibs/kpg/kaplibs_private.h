@@ -36,6 +36,8 @@
 *        Original version.
 *     03-NOV-2004 (TIMJ):
 *        GRP now uses Grp* rather than int
+*     15-JUL-2008 (TIMJ):
+*        const.
 
 *-
 */
@@ -44,7 +46,7 @@
 
 /* Templates for internal C functions. */
 /* ----------------------------------- */
-void kpg1Kymp1( Grp *, AstKeyMap **, int * );
+void kpg1Kymp1( const Grp *, AstKeyMap **, int * );
 void kpg1Kymp2( const char *, AstKeyMap *, int * );
 void kpg1Kygp1( AstKeyMap *, Grp **, const char *, int * );
 

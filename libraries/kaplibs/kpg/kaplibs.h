@@ -69,6 +69,8 @@
 *        Added kpg1_gilst.
 *     7-MAR-2008 (DSB):
 *        Added IRQ constants.
+*     15-JUL-2008 (TIMJ):
+*        const and size_t to match Grp
 *-
 */
 
@@ -121,27 +123,27 @@ typedef struct IRQLocs {
 void kpg1Asget( int, int, int, int, int, int *, int *, int *, AstFrameSet **, int * );
 void kpg1Fillr( float, int, float *, int * );
 void kpg1Gausr( float, int, int, float, int, int, int, int, float *, float *, int *, float *, float *, float *, int * );
-void kpg1Gtgrp( const char *, Grp **, int*, int *);
+void kpg1Gtgrp( const char *, Grp **, size_t*, int *);
 void kpg1Gtwcs( int, AstFrameSet **, int * );
 void kpg1Kygrp( AstKeyMap *, Grp **, int * );
-void kpg1Kymap( Grp *, AstKeyMap **, int * );
+void kpg1Kymap( const Grp *, AstKeyMap **, int * );
 void kpg1Manir( int, int *, float *, int, int *, int *, int *, int *, float *, int * );
 void kpg1Pseed( int * );
-void kpg1Rgndf( const char *, int, int, const char *, Grp **, int *, int * );
-void kpg1Wgndf( const char *, Grp *, int, int, const char *, Grp **, int *, int * );
+void kpg1Rgndf( const char *, size_t, size_t, const char *, Grp **, size_t *, int * );
+void kpg1Wgndf( const char *, const Grp *, size_t, size_t, const char *, Grp **, size_t *, int * );
 void kpg1Wrlst( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, int, int * );
 void kpg1Wrtab( const char *, int, int, int, double *, int, AstFrameSet *, const char *, int, int *, Grp *, Grp *, int, int * );
 
-void irqAddqn( IRQLocs *, const char *, int, const char *, int * );
+void irqAddqn( const IRQLocs *, const char *, int, const char *, int * );
 void irqDelet( int, int * );
 void irqFind( int, IRQLocs **, char[DAT__SZNAM + 1], int * );
-void irqGetqn( IRQLocs *, char *, int *, int *, int *, char *, int, int * );
+void irqGetqn( const IRQLocs *, const char *, int *, int *, int *, char *, int, int * );
 void irqNew( int, const char *, IRQLocs **, int * );
-void irqRbit( IRQLocs *, const char *, int *, int * );
+void irqRbit( const IRQLocs *, const char *, int *, int * );
 void irqRlse( IRQLocs **, int * );
-void irqRwqn( IRQLocs *, const char *, int, int, int *, int * );
-void irqSetqm( IRQLocs *, int, const char *, int, float *, int *, int * );
-void irqFxbit( IRQLocs *, const char *, int, int *, int * );
+void irqRwqn( const IRQLocs *, const char *, int, int, int *, int * );
+void irqSetqm( const IRQLocs *, int, const char *, int, float *, int *, int * );
+void irqFxbit( const IRQLocs *, const char *, int, int *, int * );
 
 int kpgGtfts( int, AstFitsChan ** fchan, int * status );
 int kpgPtfts( int, const AstFitsChan * fchan, int * status );
