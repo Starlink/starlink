@@ -42,6 +42,8 @@
 *  Notes:
 *     - Free this memory using smf_close_file, via a smfData structure.
 *     - Can be freed with a smf_free if header resources are freed first.
+*     - The mapped smfData is no longer associated with a file so the
+*       output smfFile component will not include an NDF identifier.
 
 *  Authors:
 *     Tim Jenness (TIMJ)
@@ -64,9 +66,13 @@
 *     2006-05-16 (AGG):
 *        Check that ncoeff is non-zero before attempting to copy poly
 *        coefficients, add checking of malloc'ed pointers
+*     2008-07-16 (TIMJ):
+*        Document flags. Do not copy the NDF id (otherwise smf_close_file
+*        will not try to free the malloced memory)
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
@@ -120,9 +126,9 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   size_t j;                   /* Loop counter */
   size_t nbytes;              /* Number of bytes in data type */
   dim_t ncoeff = 0;           /* Number of coefficients */
-  int ndims;                  /* Number of dimensions in data array */
+  size_t ndims;               /* Number of dimensions in data array */
   smfData *new = NULL;        /* New smfData */
-  int npts;                   /* Number of data points */
+  size_t npts;                /* Number of data points */
   double *outdata;            /* Pointer to output DATA */
   void *pntr[3];              /* Data, variance and quality arrays */
   double *poly = NULL;        /* Polynomial coefficients */
@@ -223,8 +229,12 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   if (! (flags & SMF__NOCREATE_HEAD) )
     hdr = smf_deepcopy_smfHead( old->hdr, status );
   /* Copy smfFile if desired */
-  if (! (flags & SMF__NOCREATE_FILE) )
+  if (! (flags & SMF__NOCREATE_FILE) ) {
     file = smf_deepcopy_smfFile( old->file, status );
+    /* annul the cloned NDF identifier if it is there */
+    if (file->ndfid != NDF__NOID) ndfAnnul( &(file->ndfid), status );
+  }
+
   /* Copy smfDA if desired */
   if (! (flags & SMF__NOCREATE_DA) )
     da = smf_deepcopy_smfDA( old, status );

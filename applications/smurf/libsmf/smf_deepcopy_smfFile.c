@@ -28,7 +28,7 @@
 *  Description:
 *     This function copies all information from an existing smfFile
 *     structure and all the internal structures to a new smfFile
-*     structure.
+*     structure. The NDF identifier (if present) is cloned.
 
 *  Notes:
 *     - Free this memory using smf_close_file, via a smfData structure.
@@ -40,9 +40,13 @@
 *  History:
 *     2006-03-29 (AGG):
 *        Initial version.
+*     2008-07-16 (TIMJ):
+*        Clone the NDF identifier so it can be closed separately.
+*        Use one_strlcpy.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research
 *     Council. University of British Columbia. All Rights Reserved.
 
@@ -75,6 +79,7 @@
 #include "sae_par.h"
 #include "mers.h"
 #include "ndf.h"
+#include "star/one.h"
 
 /* SMURF routines */
 #include "smf.h"
@@ -97,15 +102,16 @@ smf_deepcopy_smfFile( const smfFile *old, int * status ) {
   if (*status != SAI__OK) return NULL;
 
   /* Copy elements */
-  ndfid = old->ndfid;
   isTstream = old->isTstream;
+
+  ndfid = NDF__NOID;
+  if (old->ndfid != NDF__NOID) ndfClone( old->ndfid, &ndfid, status );
 
   /* Set isSc2store to zero because we're now dealing with a copy */
   isSc2store = 0;
 
   if (old->name != NULL) {
-    strncpy(name, old->name, SMF_PATH_MAX+1);
-    name[SMF_PATH_MAX] = '\0';
+    one_strlcpy( name, old->name, sizeof(name), status );
   } else {
     name[0] = '\0';
   }
