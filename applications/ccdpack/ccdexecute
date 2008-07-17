@@ -76,6 +76,8 @@
 #         to try to communicate with ICL when run from the Tcl GUI! Also
 #         unset ADAM_TASK_TYPE which might make future TCL tasks not
 #         reset the parameter system (probably not important for C-shell).
+#      17-JUL-2008 (TIMJ):
+#         Use $STARLINK_DIR for relocation, not $STARLINK
 #      {enter_changes_here}
 
 #  Bugs:
@@ -181,8 +183,8 @@ check_script:
 #  Make sure that ccdpack is ready to go.
       set ccdpack_defined = `alias ccdpack`
       if ( "$ccdpack_defined" == "" ) then
-         if ( $?STARLINK && -e $STARLINK/etc/cshrc ) then
-            source $STARLINK/etc/cshrc
+         if ( $?STARLINK_DIR && -e ${STARLINK_DIR}/etc/cshrc ) then
+            source ${STARLINK_DIR}/etc/cshrc
          else if ( -e /star/etc/cshrc ) then
             source /star/etc/cshrc
          else if ( -e /stardev/etc/cshrc ) then
