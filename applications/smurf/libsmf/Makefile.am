@@ -70,7 +70,7 @@ smf_store_outputbounds.c smf_expand_tilegroup.c \
 smf_create_smfFilter.c smf_filter_ident.c smf_free_smfFilter.c \
 smf_filter_r2c.c smf_filter_edge.c smf_filter_notch.c \
 smf_NDFexport_smfFilter.c smf_calc_fcon.c \
-smf_dtype_str.c
+smf_dtype_str.c smf_map_or_malloc.c
 
 
 noinst_INCLUDES = smf.h smf_typ.h

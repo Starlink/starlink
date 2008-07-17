@@ -1030,4 +1030,9 @@ double smf_calc_fcon( smfData *data, dim_t nchan, int report,
                       AstMapping **specmap, AstFrame **specframe,
                       int *status );
 
+void * smf_map_or_malloc( size_t nelem, smf_dtype type, int zero, int indf,
+                          const char * comp, int * status );
+
+const char * smf_dtype_str( smf_dtype type, int * status );
+
 #endif /* SMF_DEFINED */
