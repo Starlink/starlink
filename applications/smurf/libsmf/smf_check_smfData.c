@@ -55,9 +55,11 @@
 *     2008-07-16 (TIMJ):
 *        use ndfMap if other components were mapped.
 *        Do not malloc QUALITY if output smfData already has it but input doesn't.
+*        Separate QUALITY logic from DATA,VARIANCE logic.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2008 University of British Columbia. All
 *     Rights Reserved.
 
@@ -109,11 +111,9 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
   size_t nbytes;          /* Number of bytes in data type */
   int npoly;              /* Number of points in the polynomial array */
   size_t npts;            /* Number of data points */
-  int orignull = 0;       /* Flag set if odata pntr arrays were null on entry */
   int ondf = NDF__NOID;   /* Output NDF identifier if set */
   double *opoly;          /* Polynomial coefficients */
   double *outdata = NULL; /* Pointer to output DATA */
-  void *pntr = NULL;      /* Data, variance and quality pointers inside loop */
   int *tstream;           /* Pointer to raw time series data */
   AstKeyMap *history;
   const char *comps[] = { "DATA", "VARIANCE", "QUALITY" };
@@ -194,69 +194,58 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
     npts *= (odata->dims)[2];
   }
 
-  for (i=0; i<3; i++) {
-    pntr = (odata->pntr)[i];
+  for (i=0; i<2; i++) {
     if ( (idata->pntr)[i] != NULL ) {
-      if ( i < 2 ) {
-        /* Check if we are converting from integer to double */
-        if ( idata->dtype == SMF__INTEGER ) {
-          odata->dtype = SMF__DOUBLE;
-          /* Check if output pntr is null and allocate memory */
-          if ( (odata->pntr)[i] == NULL ) {
-            orignull = 1;
-            pntr = smf_map_or_malloc( npts, odata->dtype, 0, ondf, comps[i], status );
-          }
-          outdata = pntr;
-          tstream = (idata->pntr)[i];
-          /* Input data are ints: must re-cast as double */
-          for (j=0; j<npts; j++) {
-            outdata[j] = (double)tstream[j];
-          }
-          /* Copy over recast input data */
-          if ( orignull ) {
-            if (pntr == outdata) printf("copying data onto ourselves in check_smfData!\n");
-            nbytes = smf_dtype_sz( odata->dtype, status);
-            memcpy( pntr, outdata, npts*nbytes);
-          }
-        } else {
-          /* Check if output pntr is null. If so allocate memory and
-             copy over input */
-          if ( (odata->pntr)[i] == NULL) {
-            nbytes = smf_dtype_size(idata, status);
-            pntr = smf_map_or_malloc( npts, odata->dtype, 0, ondf, comps[i], status);
-            memcpy( pntr, (idata->pntr)[i], nbytes*npts);
-            /* Store pointer to DATA/VARIANCE in output smfData */
-            (odata->pntr)[i] = pntr;
-          }
+
+      /* Check if we are converting from integer to double */
+      if ( idata->dtype == SMF__INTEGER ) {
+        odata->dtype = SMF__DOUBLE;
+        /* Check if output pntr is null and allocate memory */
+        if ( (odata->pntr)[i] == NULL ) {
+          (odata->pntr)[i] = smf_map_or_malloc( npts, odata->dtype, 0, ondf,
+                                                comps[i], status );
+        }
+        outdata = (odata->pntr)[i]; /* void* is now double* */
+        tstream = (idata->pntr)[i];
+        /* Input data are ints: must re-cast as double */
+        for (j=0; j<npts; j++) {
+          outdata[j] = (double)tstream[j];
         }
       } else {
         /* Check if output pntr is null. If so allocate memory and
-           copy over input. NOTE: to arrive here, i=2 so this will be
-           the QUALITY array */
-        if ( (odata->pntr)[2] == NULL) {
-          pntr = smf_map_or_malloc( npts, SMF__UBYTE, 0, ondf, comps[2], status );
-          memcpy( pntr, (idata->pntr)[2], npts*sizeof(unsigned char) );
-          /* Store pointer to QUALITY in output smfData */
-          (odata->pntr)[2] = pntr;
+           copy over input */
+        if ( (odata->pntr)[i] == NULL) {
+          nbytes = smf_dtype_size(idata, status);
+          (odata->pntr)[i] = smf_map_or_malloc( npts, odata->dtype, 0, ondf,
+                                                comps[i], status);
+          memcpy( (odata->pntr)[i], (idata->pntr)[i], nbytes*npts);
         }
       }
-    } else {
+    } else if (i==0) {
       /* Report an error if there's no input data pntr */
       /* Others can be NULL */
-      if ( i == 0 ) {
-        if ( *status == SAI__OK) {
-          *status = SAI__ERROR;
-          errRep(FUNC_NAME, "Input data pointer is NULL", status);
-        }
-      } else if ( i == 2 && !(flags & SMF__NOCREATE_QUALITY) && !pntr) {
-        /* If we are here then create a quality array if needed */
-        msgOutif(MSG__DEBUG, "", "Allocating memory for QUALITY array", status);
-        pntr = smf_map_or_malloc( npts, SMF__UBYTE, 1, ondf, comps[2], status);
-        /* Store pointer to QUALITY in the output smfData */
-        (odata->pntr)[2] = pntr;
+      if ( *status == SAI__OK) {
+        *status = SAI__ERROR;
+        errRep(FUNC_NAME, "Input data pointer is NULL", status);
+        break;
       }
     }
   }
+
+  /* Handle QUALITY separately */
+  if ( (idata->pntr)[2] != NULL ) {
+    if ( (odata->pntr)[2] == NULL ) {
+    /* Check if output quality pntr is null. If so allocate memory and
+       copy over input QUALITY array */
+      (odata->pntr)[2] = smf_map_or_malloc( npts, SMF__UBYTE, 0, ondf, comps[2], status );
+      memcpy( (odata->pntr)[2], (idata->pntr)[2], npts*sizeof(unsigned char) );
+    }
+  } else if ( !(flags & SMF__NOCREATE_QUALITY) && (odata->pntr)[2] == NULL ) {
+    /* If we are here then create a quality array if needed */
+    msgOutif(MSG__DEBUG, "", "Allocating memory for QUALITY array", status);
+    (odata->pntr)[2] = smf_map_or_malloc( npts, SMF__UBYTE, 1, ondf, comps[2], status);
+  }
+
 
   /* Check scanfit polynomial coefficients */
   /* Is there an easy way of checking consistency? */
