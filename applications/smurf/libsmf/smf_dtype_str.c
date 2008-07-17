@@ -35,7 +35,7 @@
 
 *  History:
 *     2008-07-16 (TIMJ):
-*        Initial version, copied from smf_dtype_string.
+*        Initial version, copied from smf_dtype_string. Add _UBYTE
 
 *  Notes:
 *     - See also smf_dtype_string
@@ -106,6 +106,9 @@ const char * smf_dtype_str( smf_dtype type, int * status ) {
     break;
   case SMF__USHORT:
     retval = "_UWORD";
+    break;
+  case SMF__UBYTE:
+    retval = "_UBYTE";
     break;
   default:
     retval = NULL;
