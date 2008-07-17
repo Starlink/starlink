@@ -272,6 +272,9 @@
 *        Take focus step into account for setting obsend flag
 *     2008-05-23 (AGG):
 *        Pass focposn to sc2sim_ndfwrdata
+*     2008-07-17 (TIMJ):
+*        - initialise scancrd
+*        - use one_strlcpy
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -325,6 +328,7 @@
 #include "star/hds.h"
 #include "star/ndg.h"
 #include "star/grp.h"
+#include "star/one.h"
 #include "f77.h"
 
 /* JCMT includes */
@@ -647,8 +651,8 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
   }/* if not hits-only */
 
   /* Set some static FITS headers */
-  strncpy( obstype, "SCIENCE", sizeof(obstype) );
-  obstype[SZFITSCARD] = '\0'; /* pedant */
+  one_strlcpy( obstype, "SCIENCE", sizeof(obstype), status );
+  one_strlcpy( scancrd, "TRACKING", sizeof(scancrd), status );
 
   /* KLUDGE !!! */
   exptime = 200.0 * inx->steptime;
@@ -1380,15 +1384,12 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
               head[j].smu_az_jig_y = jig_y_hor[j];
            
               /* Other headers - more to be added as necessary */
-              strncpy( head[j].smu_chop_phase, "M", 
-                       sizeof(head[j].smu_chop_phase) );
-              (head[j].smu_chop_phase)[JCMT__SZSMU_CHOP_PHASE] = '\0';
-              strncpy( head[j].tcs_beam, "M",
-                       sizeof(head[j].tcs_beam) );
-              (head[j].tcs_beam)[JCMT__SZTCS_BEAM] = '\0';
-              strncpy( head[j].tcs_source, "SCIENCE",
-                       sizeof(head[j].tcs_source));
-              (head[j].tcs_source)[JCMT__SZTCS_SOURCE] = '\0';
+              one_strlcpy( head[j].smu_chop_phase, "M", 
+                           sizeof(head[j].smu_chop_phase), status );
+              one_strlcpy( head[j].tcs_beam, "M",
+                           sizeof(head[j].tcs_beam), status );
+              one_strlcpy( head[j].tcs_source, "SCIENCE",
+                           sizeof(head[j].tcs_source), status);
 
               if ( !hitsonly ) {
 
@@ -1489,7 +1490,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                 if ( !overwrite ) {
                   fileexists = 1;
                   while ( fileexists ) {
-                    strncat( filename, ".sdf", 4);
+                    one_strlcat( filename, ".sdf", sizeof(filename), status );
                     ofile = fopen( filename, "r" );
                     /* First see if we can open the file */
                     if ( ofile ) {
@@ -1530,8 +1531,7 @@ void sc2sim_simulate ( struct sc2sim_obs_struct *inx,
                 if ( mode == MODE__DREAM || mode == MODE__STARE ) {
                   nimage = maxwrite / 200;
                 }
-                /* LST start/end */
-                strncpy(sign, "+", sizeof(sign));
+                /* LST start/end */                
                 slaDr2tf(4, lst[0], sign, ihmsf);
                 sprintf( lststart, "%02d:%02d:%02d.%04d", 
                          ihmsf[0], ihmsf[1], ihmsf[2], ihmsf[3]);
