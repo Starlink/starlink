@@ -13,11 +13,11 @@
 *     C function
 
 *  Invocation:
-*     const char * smf_dtype_string( const smfData * data, int * status );
+*     const char * smf_dtype_str( smf_dtype type, int * status );
 
 *  Arguments:
-*     data = const smfData* (Given)
-*        Data struct to examine
+*     type = smf_dtype (Given)
+*        Type code to convert to string.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -27,21 +27,18 @@
 
 *  Description:
 *     This function returns a string representation of the underlying
-*     data type associated with the smfData struct. Returns NULL pointer
-*     if the data type is not recognized.
+*     data type. Returns NULL pointer if the data type is not recognized.
 
 *  Authors:
 *     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
-*     2006-01-24 (TIMJ):
-*        Initial version.
 *     2008-07-16 (TIMJ):
-*        Call smf_dtype_str
+*        Initial version, copied from smf_dtype_string.
 
 *  Notes:
-*     - See also smf_dtype_check, smf_dtype_str
+*     - See also smf_dtype_string
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -85,7 +82,7 @@
 /* Simple default string for errRep */
 #define FUNC_NAME "smf_dtype_string"
 
-const char * smf_dtype_string( const smfData* data, int * status ) {
+const char * smf_dtype_str( smf_dtype type, int * status ) {
 
   /* Set a default value */
   const char * retval = NULL;
@@ -93,15 +90,26 @@ const char * smf_dtype_string( const smfData* data, int * status ) {
   /* Check entry status */
   if (*status != SAI__OK) return retval;
 
-  /* check that we have a smfData */
-  if ( data == NULL ) {
-    *status = SAI__ERROR;
-    errRep( FUNC_NAME,
-	    "Supplied smfData is a NULL pointer. Possible programming error.",
-	    status);
-    return retval;
+  /* now switch on data type */
+  switch( type ) {
+  case SMF__NULL:
+    retval = NULL;
+    break;
+  case SMF__INTEGER:
+    retval = "_INTEGER";
+    break;
+  case SMF__FLOAT:
+    retval = "_REAL";
+    break;
+  case SMF__DOUBLE:
+    retval = "_DOUBLE";
+    break;
+  case SMF__USHORT:
+    retval = "_UWORD";
+    break;
+  default:
+    retval = NULL;
   }
 
-  retval = smf_dtype_str( data->dtype, status );
   return retval;
 }
