@@ -8,7 +8,7 @@
 # be sourced rather than executed. It is suitable for use from a bash
 # shell
 
-# This can be achieved by addinf the line:
+# This can be achieved by adding the line:
 #
 #    source @staretcdir@/profile
 #
@@ -234,6 +234,13 @@ fi
 if test -f ${bindir}/datacube/datacube.csh; then
    export DATACUBE_DIR=${bindir}/datacube
    export DATACUBE_HELP=${starhelpdir}/datacube/datacube
+fi
+
+#  ESP
+
+if test -f ${bindir}/esp/esp.sh; then
+  export ESP_DIR=${bindir}/esp
+  export ESP_HELP=${starhelpdir}/esp/esp
 fi
 
 #
@@ -497,6 +504,15 @@ else
   dipso () { ${staretcdir}/notinst dipso; }
 fi
 
+# ESP
+
+if test -f ${bindir}/esp/esp.sh; then
+ esp () { . $ESP_DIR/esp.sh; }
+ espsetup () { . $ESP_DIR/esp.sh; }
+else
+ esp () { ${staretcdir}/notinst esp; }
+ espsetup () { ${staretcdir}/notinst esp; }
+fi
 
 #
 #   Extractor
