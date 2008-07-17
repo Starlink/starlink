@@ -33,7 +33,9 @@
 
 *  Description:
 *     This function checks all elements of a smfData structure and
-*     copies values from the input structure if necessary
+*     copies values from the input structure if necessary. If the output smfData
+*     is associated with an open file, the memory will be mapped rather than
+*     malloced.
 
 *  Authors:
 *     Andy Gibb (UBC)
@@ -50,6 +52,9 @@
 *        Add check for existence of ncoeff/poly pointer in input smfData
 *     2008-03-14 (AGG):
 *        Allocate memory for quality array, store pointers in output smfData
+*     2008-07-16 (TIMJ):
+*        use ndfMap if other components were mapped.
+*        Do not malloc QUALITY if output smfData already has it but input doesn't.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -103,13 +108,15 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
   size_t j;               /* Loop counter */
   size_t nbytes;          /* Number of bytes in data type */
   int npoly;              /* Number of points in the polynomial array */
-  int npts;               /* Number of data points */
+  size_t npts;            /* Number of data points */
   int orignull = 0;       /* Flag set if odata pntr arrays were null on entry */
+  int ondf = NDF__NOID;   /* Output NDF identifier if set */
   double *opoly;          /* Polynomial coefficients */
   double *outdata = NULL; /* Pointer to output DATA */
-  void *pntr[3];          /* Data, variance and quality arrays */
+  void *pntr = NULL;      /* Data, variance and quality pointers inside loop */
   int *tstream;           /* Pointer to raw time series data */
   AstKeyMap *history;
+  const char *comps[] = { "DATA", "VARIANCE", "QUALITY" };
 
   if (*status != SAI__OK) return;
 
@@ -128,6 +135,27 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
               "Output data type is not set to _DOUBLE, possible programming error",
               status);
     }
+  }
+
+  /* Check File if desired - this is important because we need to know that
+     the smfData is associated with memory mapped information.
+   */
+  if (! (flags & SMF__NOCREATE_FILE) ) {
+    if ( odata->file == NULL ) {
+      file = smf_deepcopy_smfFile( idata->file, status);
+      if ( *status == SAI__OK ) {
+        odata->file = file;
+      } else {
+        errRep(FUNC_NAME, "Unable to allocate memory for new smfFile", status);
+      }
+    } else {
+      smf_check_smfFile( idata, odata, status );
+    }
+  }
+
+  /* Note that mmap is not supported in this test */
+  if (odata->file && odata->file->ndfid != NDF__NOID) {
+    ondf = odata->file->ndfid;
   }
 
   /* Check dimensions and number */
@@ -165,20 +193,20 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
   if ( odata->ndims == 3 ) {
     npts *= (odata->dims)[2];
   }
+
   for (i=0; i<3; i++) {
-    pntr[i] = (odata->pntr)[i];
+    pntr = (odata->pntr)[i];
     if ( (idata->pntr)[i] != NULL ) {
       if ( i < 2 ) {
         /* Check if we are converting from integer to double */
         if ( idata->dtype == SMF__INTEGER ) {
-          nbytes = sizeof(double);
           odata->dtype = SMF__DOUBLE;
           /* Check if output pntr is null and allocate memory */
           if ( (odata->pntr)[i] == NULL ) {
             orignull = 1;
-            pntr[i] = smf_malloc( npts, nbytes, 0, status);
+            pntr = smf_map_or_malloc( npts, odata->dtype, 0, ondf, comps[i], status );
           }
-          outdata = pntr[i];
+          outdata = pntr;
           tstream = (idata->pntr)[i];
           /* Input data are ints: must re-cast as double */
           for (j=0; j<npts; j++) {
@@ -186,28 +214,30 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
           }
           /* Copy over recast input data */
           if ( orignull ) {
-            memcpy( pntr[i], outdata, npts*nbytes);
+            if (pntr == outdata) printf("copying data onto ourselves in check_smfData!\n");
+            nbytes = smf_dtype_sz( odata->dtype, status);
+            memcpy( pntr, outdata, npts*nbytes);
           }
         } else {
-          /* Check if output pntr[] is null. If so allocate memory and
+          /* Check if output pntr is null. If so allocate memory and
              copy over input */
           if ( (odata->pntr)[i] == NULL) {
             nbytes = smf_dtype_size(idata, status);
-            pntr[i] = smf_malloc( npts, nbytes, 0, status);
-            memcpy( pntr[i], (idata->pntr)[i], nbytes*npts);
+            pntr = smf_map_or_malloc( npts, odata->dtype, 0, ondf, comps[i], status);
+            memcpy( pntr, (idata->pntr)[i], nbytes*npts);
             /* Store pointer to DATA/VARIANCE in output smfData */
-            (odata->pntr)[i] = pntr[i];
+            (odata->pntr)[i] = pntr;
           }
         }
       } else {
-        /* Check if output pntr[] is null. If so allocate memory and
+        /* Check if output pntr is null. If so allocate memory and
            copy over input. NOTE: to arrive here, i=2 so this will be
            the QUALITY array */
         if ( (odata->pntr)[2] == NULL) {
-          pntr[2] = smf_malloc( npts, sizeof(unsigned char), 0, status);
-          memcpy( pntr[2], (idata->pntr)[2], npts*sizeof(unsigned char) );
+          pntr = smf_map_or_malloc( npts, SMF__UBYTE, 0, ondf, comps[2], status );
+          memcpy( pntr, (idata->pntr)[2], npts*sizeof(unsigned char) );
           /* Store pointer to QUALITY in output smfData */
-          (odata->pntr)[2] = pntr[2];
+          (odata->pntr)[2] = pntr;
         }
       }
     } else {
@@ -218,12 +248,12 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
           *status = SAI__ERROR;
           errRep(FUNC_NAME, "Input data pointer is NULL", status);
         }
-      } else if ( i == 2 && !(flags & SMF__NOCREATE_QUALITY) ) {
-        /* If we are here then create a quality array */
+      } else if ( i == 2 && !(flags & SMF__NOCREATE_QUALITY) && !pntr) {
+        /* If we are here then create a quality array if needed */
         msgOutif(MSG__DEBUG, "", "Allocating memory for QUALITY array", status);
-        pntr[i] = smf_malloc( npts, sizeof(unsigned char), 1, status);
+        pntr = smf_map_or_malloc( npts, SMF__UBYTE, 1, ondf, comps[2], status);
         /* Store pointer to QUALITY in the output smfData */
-        (odata->pntr)[2] = pntr[2];
+        (odata->pntr)[2] = pntr;
       }
     }
   }
@@ -270,19 +300,6 @@ void smf_check_smfData( const smfData *idata, smfData *odata, const int flags, i
       }
     } else {
       smf_check_smfHead( idata, odata, status );
-    }
-  }
-  /* Check File if desired */
-  if (! (flags & SMF__NOCREATE_FILE) ) {
-    if ( odata->file == NULL ) {
-      file = smf_deepcopy_smfFile( idata->file, status);
-      if ( *status == SAI__OK ) {
-        odata->file = file;
-      } else {
-        errRep(FUNC_NAME, "Unable to allocate memory for new smfFile", status);
-      }
-    } else {
-      smf_check_smfFile( idata, odata, status );
     }
   }
 
