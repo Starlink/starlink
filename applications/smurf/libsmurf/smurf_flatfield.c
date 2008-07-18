@@ -64,11 +64,14 @@
 *        Updated to use new smf_open_and_flatfield routine.
 *     2006-01-27 (TIMJ):
 *        Can now smf_close_file
+*     2008-07-18 (TIMJ):
+*        Use kaplibs routine to get in and out files so that the counts match properly.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
+*     Copyright (C) 2006 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -119,7 +122,6 @@
 void smurf_flatfield( int *status ) {
 
   smfData *ffdata = NULL;   /* Pointer to output data struct */
-  int flag;                 /* Flag for how group is terminated */
   size_t i = 0;             /* Counter, index */
   Grp *igrp = NULL;         /* Input group of files */
   Grp *ogrp = NULL;         /* Output group of files */
@@ -130,10 +132,11 @@ void smurf_flatfield( int *status ) {
   ndfBegin();
 
   /* Get input file(s) */
-  ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
+  kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Get output file(s) */
-  ndgCreat( "OUT", igrp, &ogrp, &outsize, &flag, status );
+  kpg1Wgndf( "OUT", igrp, size, size, "More output files required...",
+             &ogrp, &outsize, status );
 
   for (i=1; i<=size; i++ ) {
 
