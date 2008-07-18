@@ -1035,4 +1035,9 @@ void * smf_map_or_malloc( size_t nelem, smf_dtype type, int zero, int indf,
 
 const char * smf_dtype_str( smf_dtype type, int * status );
 
+void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
+                     smfArray ** darks, int * status );
+
+int smf_isdark( const smfData *data, int * status );
+
 #endif /* SMF_DEFINED */
