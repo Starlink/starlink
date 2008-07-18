@@ -38,6 +38,7 @@ if test "$use_pthreads" = "yes"; then
 AC_CHECK_LIB([pthread], [pthread_create], ,[use_pthreads="no"])
    if test "$use_pthreads" = "yes"; then
       AC_DEFINE([USE_PTHREADS], [1], [Build with POSIX threads support])
+      AC_DEFINE([_REENTRANT], [1], [Make reentrant functions available])
    fi
 fi
 
