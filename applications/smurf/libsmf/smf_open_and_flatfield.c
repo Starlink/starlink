@@ -194,10 +194,10 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
        because automatic provenance propagation becomes really slow
        for raw data with many INCOMPS NDFs. */
     if (ogrp != NULL) {
-        /* need an ndfid */
-        smf_get_taskname( NULL, prvname, status );
-        smf_accumulate_prov( data, igrp, index, (*ffdata)->file->ndfid,
-                             prvname, status );
+      /* need an ndfid */
+      smf_get_taskname( NULL, prvname, status );
+      smf_accumulate_prov( data, igrp, index, (*ffdata)->file->ndfid,
+                           prvname, status );
     }
 
   }
@@ -227,12 +227,12 @@ void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata,
       *ffdata = smf_deepcopy_smfData( data, 1, flags, status );
       /* Change data type to DOUBLE */
       if ( *status == SAI__OK) {
-	((*ffdata)->pntr)[0] = smf_realloc( ((*ffdata)->pntr)[0], npts, 
-					    sizeof(double), status );
-	(*ffdata)->dtype = SMF__DOUBLE;
+        ((*ffdata)->pntr)[0] = smf_realloc( ((*ffdata)->pntr)[0], npts, 
+                                            sizeof(double), status );
+        (*ffdata)->dtype = SMF__DOUBLE;
       } else {
-	errRep(FUNC_NAME, "Error: unable to allocate memory for new smfData", 
-	       status);
+        errRep(FUNC_NAME, "Error: unable to allocate memory for new smfData", 
+               status);
       }
     }
     /* Flatfield the data */
