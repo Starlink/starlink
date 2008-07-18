@@ -72,6 +72,22 @@ if cmp -s random.F random.Fdefault; then
     fi
 fi
 
+dnl    Conditional defining whether we build the thread-safe C wrappers
+AC_ARG_WITH([pthreads],
+            [ --with-pthreads   Build package with POSIX threads support],
+        if test "$withval" = "yes"; then
+           use_pthreads="yes"
+        else
+           use_pthreads="no"
+        fi,
+        use_pthreads="no")
+if test "$use_pthreads" = "yes"; then
+AC_CHECK_LIB([pthread], [pthread_create], ,[use_pthreads="no"])
+   if test "$use_pthreads" = "yes"; then
+      AC_DEFINE([USE_PTHREADS], [1], [Build with POSIX threads support])
+   fi
+fi
+
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 dnl   We need this for the tests
