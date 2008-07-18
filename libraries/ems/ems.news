@@ -1,3 +1,9 @@
+2.2-0
+  * Support for using EMS together with POSIX threads has been added.
+    SSN/4 has been updated to describe this change. Note that EMS
+    must be built with the --with-pthreads configuration option for this
+    to be enabled. Currently this is not the default.
+
 2.1-2
   * A memory overrun bug storing and retrieving parameter names has been 
     fixed. Note this only concerned the C interface.

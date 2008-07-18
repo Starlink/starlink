@@ -108,8 +108,9 @@
 */
 
 #include <string.h>
-#include "ems1.h"                    /* EMS_ Internal functions */
 #include "ems_sys.h"
+#include "ems_par.h"                 /* EMS_ public constants */
+#include "ems1.h"                    /* EMS_ internal functions */
 
 void ems1Rform( const char *text, const int maxlen, int *iposn, char *string,
                 int *strlength  ) {

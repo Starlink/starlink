@@ -1,23 +1,14 @@
-/*
- *+
+/*+
  *  Name:
- *     ems1Tblk
+ *     ems1Imsgtab
  
  *  Purpose:
- *     Initialise contents of the message token table.
+ *     Initialize an error message table.
 
  *  Language:
  *     Starlink ANSI C
- 
- *  Type of module:
- *     External data initialisation
- 
- *  Description:
- *     This routine initialises the global token table.
- 
+
  *  Copyright:
- *     Copyright (C) 1987 Science & Engineering Research Council.
- *     Copyright (C) 2001 Central Laboratory of the Research Councils.
  *     Copyright (C) 2008 Science and Technology Facilities Council.
  *     All Rights Reserved.
 
@@ -38,42 +29,42 @@
  *     02111-1307, USA
  
  *  Authors:
- *     BDK: B.D. Kelly (ROE)
- *     PCTR: P.C.T. Rees (STARLINK)
- *     RTP: R.T. Platon (STARLINK)
  *     PWD: Peter W. Draper (JAC, Durham University)
  *     {enter_new_authors_here}
- 
+
  *  History:
- *     10-JUN-1987 (BDK):
- *        Original FORTRAN version.
- *     14-FEB-2001 (RTP)
- *        Rewritten in C based on the Fortran routine EMS1_MBLK
- *     14-MAY-2008 (PWD):
- *        Changed to use a struct.
+ *     15-MAY-2008 (PWD):
+ *        Original version.
  *     {enter_further_changes_here}
  
  *-
  */
+#include <string.h>
 
+#include "sae_par.h"                 /* Standard SAE constants */
 #include "ems_par.h"                 /* EMS_ public constants */
 #include "ems_sys.h"                 /* EMS_ private constants */
-#include "ems1.h"                    /* EMS_ private function prototypes */
-#include "ems_defs.h"                /* EMS_ token table */
+#include "ems_err.h"                 /* EMS_ error codes */
+#include "ems1.h"                    /* EMS_ private functions prototypes */
+#include "ems_defs.h"                /* EMS_ message table */
 
-/* The table struct. */
-static ems_toktab_t ems_toktab_base = {
-    EMS__BASE,       /* toklev */
-    EMS__BASE,       /* tokmrk */
-    {0},             /* tokcnt */
-    {0},             /* tokhiw */
-    {0},             /* toklen */
-    {""},            /* toknam */
-    {""},            /* tokstr */
-    0                /* userdata, spare for additional context */
-};
+void ems1Imsgtab( ems_msgtab_t *msgtab )
+{
+    int i;
 
-ems_toktab_t *ems_toktab = &ems_toktab_base;
+    /*  Initialize all to zero, and set parts as needed. */
+    memset( msgtab, 0, sizeof( ems_msgtab_t ) );
 
-void ems1Tblk() {
+    msgtab->msgdef = EMS__BASE;    /* Default error reporting context */
+    msgtab->msglev = EMS__BASE;    /* Error context level */
+    msgtab->msglst = SAI__OK;      /* Last reported status (level 1 only) */
+    msgtab->msgmrk = EMS__BASE;    /* Number of markers */
+    msgtab->msgwsz = EMS__SZOUT;   /* Line wrapping length */
+    msgtab->msgrvl = FALSE;        /* Whether EMS tuning is REVEAL */
+    msgtab->msgslt = FALSE;        /* Whether EMS tuning is SILENT */
+    msgtab->msgstm = FALSE;        /* Whether EMS tuning is STREAM */
+
+    for ( i = 0; i < EMS__MXLEV+1; i++ ) {
+        msgtab->msgbgs[i] = EMS__NSTER; /* Given status values to EMS_BEGIN */
+    }
 }

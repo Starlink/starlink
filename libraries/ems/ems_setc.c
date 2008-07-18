@@ -31,9 +31,9 @@
 */
 #include <string.h>
 #include "ems.h"                       /* ems_ function prototypes */
-#include "ems1.h"                      /* ems1_ function prototypes */
 #include "ems_par.h"                   /* EMS constants */
 #include "ems_sys.h"                   /* EMS internal constants */
+#include "ems1.h"                      /* ems1_ function prototypes */
 #include "f77.h"                       /* CNF macros and prototypes */
 
 F77_SUBROUTINE(ems_setc) ( CHARACTER(token), CHARACTER(cvalue)

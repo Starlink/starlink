@@ -1,103 +1,106 @@
 /*
-*      SUBROUTINE EMS_FIOER( TOKEN, IOSTAT )
-*+
-*  Name:
-*     EMS_FIOER
+ *      SUBROUTINE EMS_FIOER( TOKEN, IOSTAT )
+ *+
+ *  Name:
+ *     EMS_FIOER
 
-*  Purpose:
-*     Assign a Fortran I/O error message to a token.
+ *  Purpose:
+ *     Assign a Fortran I/O error message to a token.
 
-*  Language:
-*     ANSI C
+ *  Language:
+ *     ANSI C
 
-*  Invocation:
-*     CALL EMS_FIOER( TOKEN, IOSTAT )
+ *  Invocation:
+ *     CALL EMS_FIOER( TOKEN, IOSTAT )
 
-*  Description:
-*     The text of the error message associated with the Fortran I/O status 
-*     value, IOSTAT, is assigned to the message token, TOKEN. This token may
-*     then be included in an error message. 
+ *  Description:
+ *     The text of the error message associated with the Fortran I/O status
+ *     value, IOSTAT, is assigned to the message token, TOKEN. This token may
+ *     then be included in an error message.
 
-*  Implementation Notes:
-*     This function is only expected to be called from Fortran, so there is
-*     not a C function emsFioer underlying this Fortran interface.
+ *  Implementation Notes:
+ *     This function is only expected to be called from Fortran, so there is
+ *     not a C function emsFioer underlying this Fortran interface.
 
-*     The set of IOSTAT codes and their meanings is
-*     implementation-specified, and there is no mandated mechanism for
-*     retrieving messages associated with them.  The mapping
-*     instantiated in this function is therefore based on the
-*     documentation for specific compilers, and cannot be made
-*     generic.  This is full of heuristics.
+ *     The set of IOSTAT codes and their meanings is
+ *     implementation-specified, and there is no mandated mechanism for
+ *     retrieving messages associated with them.  The mapping
+ *     instantiated in this function is therefore based on the
+ *     documentation for specific compilers, and cannot be made
+ *     generic.  This is full of heuristics.
 
-*     (***) Also note that this function is fundamentally flawed, in
-*     that the the messages we pick are those for the compiler
-*     determined when _this_ function was compiled, and there is no
-*     guarantee that this is the same as the compiler which was used
-*     to compile the Fortran which actually calls this function.  They
-*     will more likely match than not, since there is likely to be one
-*     obvious compiler for a platform, but that's all we can hope for,
-*     short of requiring some sort of compiler identification as a
-*     calling argument.  The returned messages report the compiler
-*     they are for, in the hope that if this is wrong, some alert user
-*     will notice it.  When the routine does not recognise the
-*     configured compiler, or when it receives an impossible IOSTAT
-*     error, it returns a message which begins `ems_fioer:'.
+ *     (***) Also note that this function is fundamentally flawed, in
+ *     that the the messages we pick are those for the compiler
+ *     determined when _this_ function was compiled, and there is no
+ *     guarantee that this is the same as the compiler which was used
+ *     to compile the Fortran which actually calls this function.  They
+ *     will more likely match than not, since there is likely to be one
+ *     obvious compiler for a platform, but that's all we can hope for,
+ *     short of requiring some sort of compiler identification as a
+ *     calling argument.  The returned messages report the compiler
+ *     they are for, in the hope that if this is wrong, some alert user
+ *     will notice it.  When the routine does not recognise the
+ *     configured compiler, or when it receives an impossible IOSTAT
+ *     error, it returns a message which begins `ems_fioer:'.
 
-*  Arguments:
-*     TOKEN = CHARACTER * ( * ) (Given)
-*        The message token name.
-*     IOSTAT = INTEGER (Given)
-*        The Fortran I/O status value.
+ *  Arguments:
+ *     TOKEN = CHARACTER * ( * ) (Given)
+ *        The message token name.
+ *     IOSTAT = INTEGER (Given)
+ *        The Fortran I/O status value.
 
-*  Authors:
-*     A.J.Chipperfield (Starlink, RAL)
-*     Norman Gray (Starlink, Glasgow)
-*     Tim Jenness (JAC, Hawaii)
-*     Peter W. Draper (JAC, Durham University)
-*     {enter_new_authors_here}
+ *  Authors:
+ *     A.J.Chipperfield (Starlink, RAL)
+ *     Norman Gray (Starlink, Glasgow)
+ *     Tim Jenness (JAC, Hawaii)
+ *     Peter W. Draper (JAC, Durham University)
+ *     {enter_new_authors_here}
 
-*  History:
-*     14-MAR-2001 (AJC):
-*        Original version, based upon Fortran version.
-*     13-AUG-2000 (AJC):
-*        #include ems1.h
-*     25-Feb-2004 (NG):
-*        Converted to a more generic version, merging three
-*        platform-dependent versions.
-*      9-AUG-2004 (TIMJ):
-*        Reinstate the fallback to emsSyser (at least for g77 case)
-*     20-FEB-2007 (PWD):
-*        Add gfortran support.
-*     17-APR-2008 (PWD):
-*        Support for PC Solaris.
-*     {enter_changes_here}
+ *  History:
+ *     14-MAR-2001 (AJC):
+ *        Original version, based upon Fortran version.
+ *     13-AUG-2000 (AJC):
+ *        #include ems1.h
+ *     25-Feb-2004 (NG):
+ *        Converted to a more generic version, merging three
+ *        platform-dependent versions.
+ *      9-AUG-2004 (TIMJ):
+ *        Reinstate the fallback to emsSyser (at least for g77 case)
+ *     20-FEB-2007 (PWD):
+ *        Add gfortran support.
+ *     17-APR-2008 (PWD):
+ *        Support for PC Solaris.
+ *     20-MAY-2008 (PWD):
+ *        Support use in threads by protecting initialisation of static variables.
+ *        Replace msg_printf with sprintf to avoid a static buffer. 
+ *        Various code normalisations.
+ *     {enter_changes_here}
 
-*  Bugs:
-*     The limitation described above in the (***) paragraph is
-*     arguably a bug rather than a limitation.
-*     {note_any_bugs_here}
+ *  Bugs:
+ *     The limitation described above in the (***) paragraph is
+ *     arguably a bug rather than a limitation.
+ *     {note_any_bugs_here}
 
-*-
+ *-
+ */
 
-#include <stdio.h>
+#if HAVE_CONFIG_H
+#include <config.h>
+#endif
 
-*/
+#include <stdlib.h>
+#include <string.h>
+
+#if USE_PTHREADS
+#include <pthread.h>
+#endif
+
 #include "f77.h"
 #include "ems_par.h"                  /* EMS_ parameters */
 #include "ems_sys.h"                  /* EMS_ System constants */
 #include "ems.h"                      /* EMS_ function prototypes */
 #include "ems1.h"                     /* EMS_ function prototypes */
 
-/* Include the autoconf configure output (for const, if nothing else) */
-#include <config.h>
-
-#include <stdlib.h>                     /* for bsearch */
-#if STDC_HEADERS
-#  include <string.h>
-#  include <stdarg.h>
-#elif !HAVE_DECL_STRCMP
-int strcmp(const char*, const char*);
-#endif
 
 #define STRING_EQ(a,b) (strcmp((a), (b)) == 0)
 #define STRING_NEQ(a,b,n) (strncmp((a), (b), (n)) == 0)
@@ -111,125 +114,133 @@ int strcmp(const char*, const char*);
 
 /* Stores information about messages for one compiler. */
 typedef struct {
-   const char* name;          /* compiler name */
-   const char** msgs;         /* array of messages, with
-                                 last_iostat-first_iostat+1 entries,
-                                 or zero if we should try the lookup
-                                 function instead */ 
-   int first_iostat;          /* lowest-numbered message */
-   int last_iostat;           /* highest-numbered message */
-   const char*(*lookup)(const int iostat);
-                              /* iostat lookup function; if non-zero,
-                                 this is a function which returns the
-                                 message corresponding to the
-                                 iostat number argument, or zero if
-                                 none can be found */
+    const char* name;          /* compiler name */
+    const char** msgs;         /* array of messages, with
+                                * last_iostat-first_iostat+1 entries,
+                                * or zero if we should try the lookup
+                                * function instead */
+    int first_iostat;          /* lowest-numbered message */
+    int last_iostat;           /* highest-numbered message */
+    const char*(*lookup)(const int iostat); /* iostat lookup function; if non-zero,
+                                             * this is a function which returns the
+                                             * message corresponding to the
+                                             * iostat number argument, or zero if
+                                             * none can be found */
 } MessageInfo;
 
-/* number-message pair */
+/* Number-message pair */
 typedef struct {
    int iostat;
    const char* msg;
 } IostatMessagePair;
 
-static const MessageInfo *getMessageInfo();
+static void initMessageInfo();
 static const char* alpha_iostat_lookup( const int iostat );
 static int compareIostatMessagePair(const void*, const void*);
-static const char* msg_printf(const char*, ...);
 
-/* We use snprintf below if we have it, and sprintf otherwise.  If we
-   don't have snprintf, we can only hope that the message isn't too
-   long for the (generously sized) buffer.  It would be nice to define
-   a SNPRINTF macro, but the __VA_ARGS__ mechanism seems to outwit
-   some preprocessors (gcc3.3 can cope, gcc3.1 can't). */
+#if USE_PTHREADS
+static pthread_once_t message_info_initialised = PTHREAD_ONCE_INIT;
+#else
+static int message_info_initialised = 0;
+#endif
+
+/*  The MessageInfo struct. */
+static MessageInfo msgInfo_real;
+static MessageInfo *msgInfo = &msgInfo_real;
 
 F77_SUBROUTINE (ems_fioer)( CHARACTER(token), INTEGER(iostat) TRAIL(token) )
 {
-   static const MessageInfo* msgInfo = (const MessageInfo*)0;
-   char ctok[ EMS__SZMSG + 1 ];     /* Imported token name */
+    char ctok[ EMS__SZTOK + 1 ];     /* Imported token name */
+    char buffer[ EMS__SZTOK + 1];    /* Buffer for token value */
 
-   GENPTR_CHARACTER(token);
-   GENPTR_INTEGER(iostat);
+    GENPTR_CHARACTER( token );
+    GENPTR_INTEGER( iostat );
 
-   /* Import the token name */
-   cnfImpn( token, token_length, EMS__SZMSG, ctok );
+    /* Import the token name */
+    cnfImpn( token, token_length, EMS__SZTOK, ctok );
 
-   if (msgInfo == (MessageInfo*)0)
-      msgInfo = getMessageInfo();
+    /* Initialise the message lookup struct. Globally shared so we need to use
+     * pthread constructs when necessary. */
+#if USE_PTHREADS
+    (void) pthread_once( &message_info_initialised, initMessageInfo );
+#else
+    if ( ! message_info_initialised ) {
+        initMessageInfo();
+        message_info_initialised = 1;
+    }
+#endif
 
-   if ( *iostat == 0 ) {
-      ems1Stok( ctok, "No error" );
+    if ( *iostat == 0 ) {
+        ems1Stok( ctok, "No error" );
 
-   } else if ( *iostat < 0 ) {
-      ems1Stok( ctok, "End-of-file");
-      
-   } else if ( msgInfo->msgs == 0 ) {
-      const char* tokenvalue;
+    } else if ( *iostat < 0 ) {
+        ems1Stok( ctok, "End-of-file");
 
-      /* The compiler wasn't recognised, or there is a lookup function */
-      if ( msgInfo->lookup == 0 ) {
-         /* unrecognised compiler */
-         tokenvalue = msg_printf("ems_fioer: unrecognized IOSTAT value %d"
-                                 " (can't recognise compiler: %s %s)",
-                                 *iostat, AC_vendor, AC_FC );
-         
-      } else {
-         const char* msg = (*msgInfo->lookup)( *iostat );
-         if ( msg == 0 ) {
-            /* message wasn't found */
-            tokenvalue = msg_printf("ems_fioer: unrecognized IOSTAT value %d"
-                                    " (compiler=%s)",
-                                    *iostat, msgInfo->name );
-         } else {
-            tokenvalue = msg;
-         }
-      }
-      ems1Stok( ctok, tokenvalue );
-      
-   } else if ( ( *iostat >= msgInfo->first_iostat )
-               && ( *iostat <= msgInfo->last_iostat ) ) {
-      ems1Stok( ctok,
-                msg_printf("%s [%s]",
-                           msgInfo->msgs[ *iostat - msgInfo->first_iostat ],
-                           msgInfo->name ) );
+    } else if ( msgInfo->msgs == 0 ) {
+        const char* tokenvalue;
 
-   } else {
-      /* The iostat value was not recognised.  It does not seem useful
-         to translate this to a system error code using emsSyser, as
-         was done before: if we've failed to recognise the error code,
-         it's more likely that we've mixed up our compilers than that
-         the system error code will be useful. */
+        /* The compiler wasn't recognised, or there is a lookup function */
+        if ( msgInfo->lookup == 0 ) {
+            /* unrecognised compiler */
+            sprintf( buffer, "ems_fioer: unrecognized IOSTAT value %d"
+                     " (can't recognise compiler: %s %s)",
+                     *iostat, AC_vendor, AC_FC );
+            tokenvalue = buffer;
+        } else {
+            const char* msg = (*msgInfo->lookup)( *iostat );
+            if ( msg == 0 ) {
+                /* message wasn't found */
+                sprintf( buffer, "ems_fioer: unrecognized IOSTAT value %d"
+                         " (compiler=%s)",
+                         *iostat, msgInfo->name );
+                tokenvalue = buffer;
+            } else {
+                tokenvalue = msg;
+            }
+        }
+        ems1Stok( ctok, tokenvalue );
 
-     /*  Unless that is, we know we are on a Gnu compiler where
-	 g77 is known to return errno for less than 100. It is easier
-	 to put the test here rather than extending the g77 lookup
-	 code to act like the alpha version (ie an external lookup
-	 routine). Of course, the external look up function is 
-	 more correct than this hack... Same for Solaris it seems...
-     */
-     if ( STRING_EQ( AC_is_gnu, "yes") && *iostat < 100 ||
-          STRING_NEQ( AC_os, "solaris", 7 ) && *iostat < 1000 ) {
-       emsSyser( ctok, *iostat );
-     } else {	   
-       ems1Stok( ctok,
-		 msg_printf( "ems_fioer: unrecognised IOSTAT value %d "
-			     "(compiler=%s)",
-			     *iostat, msgInfo->name ) );
-     }
-   }
+    } else if ( ( *iostat >= msgInfo->first_iostat )
+                && ( *iostat <= msgInfo->last_iostat ) ) {
+        sprintf( buffer, "%s [%s]", msgInfo->msgs[ *iostat - msgInfo->first_iostat ],
+                 msgInfo->name );
+        ems1Stok( ctok, buffer );
 
-   return;
+    } else {
+        /* The iostat value was not recognised.  It does not seem useful to
+         * translate this to a system error code using emsSyser, as was done
+         * before: if we've failed to recognise the error code, it's more
+         * likely that we've mixed up our compilers than that the system error
+         * code will be useful. */
+
+        /*  Unless that is, we know we are on a Gnu compiler where g77 is
+         *  known to return errno for less than 100. It is easier to put the
+         *  test here rather than extending the g77 lookup code to act like
+         *  the alpha version (ie an external lookup routine). Of course, the
+         *  external look up function is more correct than this hack...
+         *  Same for Solaris it seems...
+         */
+        if ( ( STRING_EQ( AC_is_gnu, "yes") && *iostat < 100 ) ||
+             ( STRING_NEQ( AC_os, "solaris", 7 ) && *iostat < 1000 ) ) {
+            emsSyser( ctok, *iostat );
+        } else {
+            sprintf( buffer, "ems_fioer: unrecognised IOSTAT value %d "
+                     "(compiler=%s)", *iostat, msgInfo->name );
+            ems1Stok( ctok, buffer );
+        }
+    }
+    return;
 }
 
-/*    Determine the Fortran compiler, and return a pointer to a
- *    MessageInfo struct containing the IOSTAT messages.
+/*    Determine the Fortran compiler, and return a pointer to a MessageInfo
+ *    struct containing the IOSTAT messages.
  *
  *    If we cannot find a compiler, then return zero.
  *
- *    In each case, return a pointer
- *    to a static filled-in MessageInfo struct.  The list of compilers
- *    currently (February 2004, autoconf-2.59) in the autoconf `known'
- *    list is as follows:
+ *    In each case, return a pointer to a static filled-in MessageInfo struct.
+ *    The list of compilers currently (February 2004, autoconf-2.59) in the
+ *    autoconf `known' list is as follows:
+ *
  *      f77/f90/f95: generic compiler names
  *      g95: Unofficial Gnu Fortran 95 compiler
  *      g77: GNU Fortran 77 compiler
@@ -246,366 +257,333 @@ F77_SUBROUTINE (ems_fioer)( CHARACTER(token), INTEGER(iostat) TRAIL(token) )
  *      ifc: Intel Fortran 95 compiler for Linux/x86
  *      efc: Intel Fortran 95 compiler for IA64*
  *
- *    However since it is reasonable for a Fortran compiler to be
- *    installed as just `f77' or the like, we can't necessarily go on
- *    just the name.
+ *    However since it is reasonable for a Fortran compiler to be installed as
+ *    just `f77' or the like, we can't necessarily go on just the name.
  *
- *    All the information we require is available in the AC_* defines
- *    above, at compile time.  However it is not feasible to work
- *    through the necessary logic in the preprocessor.
+ *    All the information we require is available in the AC_* defines above,
+ *    at compile time.  However it is not feasible to work through the
+ *    necessary logic in the preprocessor.
  */
 
-static const MessageInfo* getMessageInfo(void)
+static void initMessageInfo( void )
 {
-   static MessageInfo info;
-   static int got_answer = 0;
+    if ( STRING_EQ( AC_is_gnu, "yes" ) ) {
+        static int nmsg;
 
-   if (got_answer)            /* been here before */
-      return &info;
-   
+        if (STRING_EQ( AC_FC, "g77" ) ) {
+            /* These messages are from
+             * http://gcc.gnu.org/cgi-bin/cvsweb.cgi/gcc/libf2c/libI77/err.c
+             * as of 2004 February 25
+             */
+            static const char *msgs[] = {
+                "error in format",                       /* 100 */
+                "illegal unit number",                   /* 101 */
+                "formatted io not allowed",              /* 102 */
+                "unformatted io not allowed",            /* 103 */
+                "direct io not allowed",                 /* 104 */
+                "sequential io not allowed",             /* 105 */
+                "can't backspace file",                  /* 106 */
+                "null file name",                        /* 107 */
+                "can't stat file",                       /* 108 */
+                "unit not connected",                    /* 109 */
+                "off end of record",                     /* 110 */
+                "truncation failed in endfile",          /* 111 */
+                "incomprehensible list input",           /* 112 */
+                "out of free space",                     /* 113 */
+                "unit not connected",                    /* 114 */
+                "read unexpected character",             /* 115 */
+                "bad logical input field",               /* 116 */
+                "bad variable type",                     /* 117 */
+                "bad namelist name",                     /* 118 */
+                "variable not in namelist",              /* 119 */
+                "no end record",                         /* 120 */
+                "variable count incorrect",              /* 121 */
+                "subscript for scalar variable",         /* 122 */
+                "invalid array section",                 /* 123 */
+                "substring out of bounds",               /* 124 */
+                "subscript out of bounds",               /* 125 */
+                "can't read file",                       /* 126 */
+                "can't write file",                      /* 127 */
+                "'new' file exists",                     /* 128 */
+                "can't append to file",                  /* 129 */
+                "non-positive record number",            /* 130 */
+                "I/O started while already doing I/O",   /* 131 */
+                "Temporary file name (TMPDIR?) too long",/* 132 */
+            };
+            msgInfo->first_iostat = 100;
+            nmsg = sizeof(msgs)/sizeof(msgs[0]);
+            msgInfo->msgs = &msgs[0];
+        } else if ( STRING_EQ( AC_FC, "g95" ) ) {
+            static const char *msgs[] = {
+                "conflicting statement options",         /* 200 */
+                "bad statement option",                  /* 201 */
+                "missing statement option",              /* 202 */
+                "File already opened in another unit",   /* 203 */
+                "Unattached unit",                       /* 204 */
+                "FORMAT error",                          /* 205 */
+                "Incorrect ACTION specified",            /* 206 */
+                "Read past ENDFILE record",              /* 207 */
+                "Bad value during read",                 /* 208 */
+                "Numeric overflow on read",              /* 209 */
+                "Out of memory",                         /* 210 */
+                "Array already allocated",               /* 211 */
+                "Deallocated a bad pointer",             /* 212 */
+                "Bad record number in direct-access file", /* 213 */
+                "Corrupt record in unformatted sequential access file", /* 214 */
+                "Reading more data than the record size (RECL)", /* 215 */
+                "Writing more data than the record size (RECL)", /* 216 */
+            };
+            msgInfo->first_iostat = 200;
+            nmsg = sizeof(msgs)/sizeof(msgs[0]);
+            msgInfo->msgs = &msgs[0];
+        } else {
+            /* gfortran codes, used as default */
+            static const char *msgs[] = {
+                "Operating system error",          /* ERROR_OS, 5000 */
+                "Conflicting statement options",   /* ERROR_OPTION_CONFLICT */
+                "Bad statement option",            /* ERROR_BAD_OPTION */
+                "Missing statement option",        /* ERROR_MISSING_OPTION */
+                "File already opened in another unit", /* ERROR_ALREADY_OPEN */
+                "Unattached unit",                 /* ERROR_BAD_UNIT */
+                "FORMAT error",                    /* ERROR_FORMAT */
+                "Incorrect ACTION specified",      /* ERROR_BAD_ACTION */
+                "Read past ENDFILE record",        /* ERROR_ENDFILE */
+                "Corrupt unformatted sequential file", /* ERROR_BAD_US */
+                "Bad value during read",           /* ERROR_READ_VALUE */
+                "Numeric overflow on read",        /* ERROR_READ_OVERFLOW */
+                "Internal error in run-time library" /* ERROR_INTERNAL */
+                "Internal unit I/O error"          /* ERROR_INTERNAL_UNIT */
+                "Error in allocation",             /* ERROR_ALLOCATION */
+                "Write exceeds length of DIRECT access record", /* ERROR_DIRECT_EOR */
+                "I/O past end of record on unformatted file", /* ERROR_SHORT_RECORD */
+                "Unformatted file structure has been corrupted" /* ERROR_CORRUPT_FILE */
+            };
+            msgInfo->first_iostat = 5000;
+            nmsg = sizeof(msgs)/sizeof(msgs[0]);
+            msgInfo->msgs = &msgs[0];
+        }
+        
+        /* shared information */
+        msgInfo->name = AC_FC;
+        msgInfo->last_iostat = msgInfo->first_iostat + nmsg - 1;
+        msgInfo->lookup = 0;
+        
+    } else if ( STRING_EQ( AC_FC, "f77" )
+                && ( STRING_EQ( AC_vendor, "sun" ) ||
+                     STRING_NEQ( AC_os, "solaris", 7 ) ) ) {
+        /* These values obtained from Solaris 9 `Sun Fortran Users' Guide' */
+        static const char* msgs[] = {
+            "Error in format",                       /* 1000 */
+            "Illegal unit number",                   /* 1001 */
+            "Formatted I/O not allowed",             /* 1002 */
+            "Unformatted I/O not allowed",           /* 1003 */
+            "Direct I/O not allowed",                /* 1004 */
+            "Sequential I/O not allowed",            /* 1005 */
+            "Cannot backspace file",                 /* 1006 */
+            "Off beginning of record",               /* 1007 */
+            "Cannot stat file",                      /* 1008 */
+            "No * after repeat count",               /* 1009 */
+            "Off end of record",                     /* 1010 */
+            "IOSTAT error 1011 is unused",           /* 1011 */
+            "Incomprehensible list input",           /* 1012 */
+            "Out of free space",                     /* 1013 */
+            "Unit not connected",                    /* 1014 */
+            "Read unexpected character",             /* 1015 */
+            "Illegal logical input field",           /* 1016 */
+            "NEW file exists",                       /* 1017 */
+            "Cannot find OLD file",                  /* 1018 */
+            "Unknown System error (shouldn\'t happen)", /* 1019 */
+            "Requires seek ability",                 /* 1020 */
+            "Illegal argument",                      /* 1021 */
+            "Negative repeat count",                 /* 1022 */
+            "Illegal operation for unit",            /* 1023 */
+            "IOSTAT error 1024 is unused",           /* 1024 */
+            "Incompatible specifiers in OPEN",       /* 1025 */
+            "Illegal input for namelist",            /* 1026 */
+            "Error in FILEOPT parameter",            /* 1027 */
+            "WRITE to readonly file",                /* 1028 */
+            "READ from writeonly file",              /* 1029 */
+            "overflow converting numeric input",     /* 1030 */
+            "IOSTAT error 1031 is unused?",          /* 1031 -- omitted
+                                                        in Sun doc. */
+            "exponent overflow on numeric input",    /* 1032 */
+        };
+        static int nmsg = sizeof(msgs)/sizeof(msgs[0]);
+        
+        msgInfo->msgs = &msgs[0];
+        msgInfo->name = "Sun f77";
+        msgInfo->first_iostat = 1000;
+        msgInfo->last_iostat = msgInfo->first_iostat + nmsg - 1;
+        msgInfo->lookup = 0;
+        
+    } else if ( STRING_EQ( AC_vendor, "dec" ) ) {
+        /* These are alpha codes.  There isn't a continuous sequence, so
+           use a function to hold the map. */
+        
+        msgInfo->msgs = 0;                    /* signal to use lookup */
+        msgInfo->name = "Alpha f77";
+        msgInfo->first_iostat = 0;            /* ignored */
+        msgInfo->last_iostat = 0;             /* ignored */
+        msgInfo->lookup = alpha_iostat_lookup;
+        
+    } else {
+        msgInfo->msgs = 0;
+        msgInfo->name = "UNKNOWN";
+        msgInfo->first_iostat = 0;
+        msgInfo->last_iostat = 0;
+        
+    }
 
-   if ( STRING_EQ( AC_is_gnu, "yes" ) ) {
-     static int nmsg;
-
-     if (STRING_EQ( AC_FC, "g77" ) ) {
-      /* These messages are from
-       * http://gcc.gnu.org/cgi-bin/cvsweb.cgi/gcc/libf2c/libI77/err.c 
-       * as of 2004 February 25
-       */
-       static const char *msgs[] = {
-         "error in format",                       /* 100 */
-         "illegal unit number",                   /* 101 */
-         "formatted io not allowed",              /* 102 */
-         "unformatted io not allowed",            /* 103 */
-         "direct io not allowed",                 /* 104 */
-         "sequential io not allowed",             /* 105 */
-         "can't backspace file",                  /* 106 */
-         "null file name",                        /* 107 */
-         "can't stat file",                       /* 108 */
-         "unit not connected",                    /* 109 */
-         "off end of record",                     /* 110 */
-         "truncation failed in endfile",          /* 111 */
-         "incomprehensible list input",           /* 112 */
-         "out of free space",                     /* 113 */
-         "unit not connected",                    /* 114 */
-         "read unexpected character",             /* 115 */
-         "bad logical input field",               /* 116 */
-         "bad variable type",                     /* 117 */
-         "bad namelist name",                     /* 118 */
-         "variable not in namelist",              /* 119 */
-         "no end record",                         /* 120 */
-         "variable count incorrect",              /* 121 */
-         "subscript for scalar variable",         /* 122 */
-         "invalid array section",                 /* 123 */
-         "substring out of bounds",               /* 124 */
-         "subscript out of bounds",               /* 125 */
-         "can't read file",                       /* 126 */
-         "can't write file",                      /* 127 */
-         "'new' file exists",                     /* 128 */
-         "can't append to file",                  /* 129 */
-         "non-positive record number",            /* 130 */
-         "I/O started while already doing I/O",   /* 131 */
-         "Temporary file name (TMPDIR?) too long",/* 132 */
-       };
-       info.first_iostat = 100;
-       nmsg = sizeof(msgs)/sizeof(msgs[0]);
-       info.msgs = &msgs[0];
-     } else if ( STRING_EQ( AC_FC, "g95" ) ) {
-       static const char *msgs[] = {
-	 "conflicting statement options",         /* 200 */
-	 "bad statement option",                  /* 201 */
-	 "missing statement option",              /* 202 */
-	 "File already opened in another unit",   /* 203 */
-	 "Unattached unit",                       /* 204 */
-	 "FORMAT error",                          /* 205 */
-	 "Incorrect ACTION specified",            /* 206 */
-	 "Read past ENDFILE record",              /* 207 */
-	 "Bad value during read",                 /* 208 */
-	 "Numeric overflow on read",              /* 209 */
-	 "Out of memory",                         /* 210 */
-	 "Array already allocated",               /* 211 */
-	 "Deallocated a bad pointer",             /* 212 */
-	 "Bad record number in direct-access file", /* 213 */
-	 "Corrupt record in unformatted sequential access file", /* 214 */
-	 "Reading more data than the record size (RECL)", /* 215 */
-	 "Writing more data than the record size (RECL)", /* 216 */
-       };
-       info.first_iostat = 200;
-       nmsg = sizeof(msgs)/sizeof(msgs[0]);
-       info.msgs = &msgs[0];
-     } else {
-        /* gfortran codes, used as default */
-        static const char *msgs[] = {
-           "Operating system error",          /* ERROR_OS, 5000 */
-           "Conflicting statement options",   /* ERROR_OPTION_CONFLICT */
-           "Bad statement option",            /* ERROR_BAD_OPTION */
-           "Missing statement option",        /* ERROR_MISSING_OPTION */
-           "File already opened in another unit", /* ERROR_ALREADY_OPEN */
-           "Unattached unit",                 /* ERROR_BAD_UNIT */
-           "FORMAT error",                    /* ERROR_FORMAT */
-           "Incorrect ACTION specified",      /* ERROR_BAD_ACTION */
-           "Read past ENDFILE record",        /* ERROR_ENDFILE */
-           "Corrupt unformatted sequential file", /* ERROR_BAD_US */
-           "Bad value during read",           /* ERROR_READ_VALUE */
-           "Numeric overflow on read",        /* ERROR_READ_OVERFLOW */
-           "Internal error in run-time library" /* ERROR_INTERNAL */
-           "Internal unit I/O error"          /* ERROR_INTERNAL_UNIT */
-           "Error in allocation",             /* ERROR_ALLOCATION */
-           "Write exceeds length of DIRECT access record", /* ERROR_DIRECT_EOR */
-           "I/O past end of record on unformatted file", /* ERROR_SHORT_RECORD */
-           "Unformatted file structure has been corrupted" /* ERROR_CORRUPT_FILE */
-       };
-       info.first_iostat = 5000;
-       nmsg = sizeof(msgs)/sizeof(msgs[0]);
-       info.msgs = &msgs[0];
-     }
-
-     /* shared information */
-     info.name = AC_FC;
-     info.last_iostat = info.first_iostat + nmsg - 1;
-     info.lookup = 0;
-
-   } else if ( STRING_EQ( AC_FC, "f77" )
-               && ( STRING_EQ( AC_vendor, "sun" ) || 
-                    STRING_NEQ( AC_os, "solaris", 7 ) ) ) {
-      /* These values obtained from Solaris 9 `Sun Fortran Users' Guide' */
-      static const char* msgs[] = {
-         "Error in format",                       /* 1000 */
-         "Illegal unit number",                   /* 1001 */
-         "Formatted I/O not allowed",             /* 1002 */
-         "Unformatted I/O not allowed",           /* 1003 */
-         "Direct I/O not allowed",                /* 1004 */
-         "Sequential I/O not allowed",            /* 1005 */
-         "Cannot backspace file",                 /* 1006 */
-         "Off beginning of record",               /* 1007 */
-         "Cannot stat file",                      /* 1008 */
-         "No * after repeat count",               /* 1009 */
-         "Off end of record",                     /* 1010 */
-         "IOSTAT error 1011 is unused",           /* 1011 */
-         "Incomprehensible list input",           /* 1012 */
-         "Out of free space",                     /* 1013 */
-         "Unit not connected",                    /* 1014 */
-         "Read unexpected character",             /* 1015 */
-         "Illegal logical input field",           /* 1016 */
-         "NEW file exists",                       /* 1017 */
-         "Cannot find OLD file",                  /* 1018 */
-         "Unknown System error (shouldn\'t happen)", /* 1019 */
-         "Requires seek ability",                 /* 1020 */
-         "Illegal argument",                      /* 1021 */
-         "Negative repeat count",                 /* 1022 */
-         "Illegal operation for unit",            /* 1023 */
-         "IOSTAT error 1024 is unused",           /* 1024 */
-         "Incompatible specifiers in OPEN",       /* 1025 */
-         "Illegal input for namelist",            /* 1026 */
-         "Error in FILEOPT parameter",            /* 1027 */
-         "WRITE to readonly file",                /* 1028 */
-         "READ from writeonly file",              /* 1029 */
-         "overflow converting numeric input",     /* 1030 */
-         "IOSTAT error 1031 is unused?",          /* 1031 -- omitted
-                                                     in Sun doc. */
-         "exponent overflow on numeric input",    /* 1032 */
-      };
-      static int nmsg = sizeof(msgs)/sizeof(msgs[0]);
-
-      info.msgs = &msgs[0];
-      info.name = "Sun f77";
-      info.first_iostat = 1000;
-      info.last_iostat = info.first_iostat + nmsg - 1;
-      info.lookup = 0;
-      
-   } else if ( STRING_EQ( AC_vendor, "dec" ) ) {
-      /* These are alpha codes.  There isn't a continuous sequence, so
-         use a function to hold the map. */
-
-      info.msgs = 0;                    /* signal to use lookup */
-      info.name = "Alpha f77";
-      info.first_iostat = 0;            /* ignored */
-      info.last_iostat = 0;             /* ignored */
-      info.lookup = alpha_iostat_lookup;
-
-   } else {
-      info.msgs = 0;
-      info.name = "UNKNOWN";
-      info.first_iostat = 0;
-      info.last_iostat = 0;
-      
-   }
-
-   got_answer = 1;
-
-   return &info;
+    return;
 }
 
 /*
- * Lookup function for alpha Fortran compilers.  This is a suitable
- * function for the MessageInfo.lookup field: given an iostat number,
- * it returns a pointer to a string containing the corresponding
- * message, or zero if none can be found.
+ * Lookup function for alpha Fortran compilers.  This is a suitable function
+ * for the MessageInfo.lookup field: given an iostat number, it returns a
+ * pointer to a string containing the corresponding message, or zero if none
+ * can be found.
  *
- * This list was obtained by merging the error codes in
- * foriosdef_alpha.h (which file was in turn obtained from
- * /usr/include/foriosdef.f for Alpha platforms) with the error
- * messages in ems_fioer.c_dec_osf, omitting those codes which didn't
- * have a corresponding error message, and the IOS_EOF code, which is
- * negative.  The list MUST remain in numerical order of the iostat
- * codes, if bsearch(3) is to work.
- */ 
+ * This list was obtained by merging the error codes in foriosdef_alpha.h
+ * (which file was in turn obtained from /usr/include/foriosdef.f for Alpha
+ * platforms) with the error messages in ems_fioer.c_dec_osf, omitting those
+ * codes which didn't have a corresponding error message, and the IOS_EOF
+ * code, which is negative.  The list MUST remain in numerical order of the
+ * iostat codes, if bsearch(3) is to work.
+*/
 static const char* alpha_iostat_lookup( const int iostat )
 {
-   static IostatMessagePair msgs[] = {
-      { 0X001, /* IOS_NOTFORSPE */
-        "Not a FORTRAN-specific error" },
-      { 0X009, /* IOS_PERACCFIL */
-        "Permission to access file denied" },
-      { 0X00A, /* IOS_CANOVEEXI */
-        "Cannot overwrite existing file" },
-      { 0X00B, /* IOS_UNINOTCON */
-        "Unit not connected" },
-      { 0X011, /* IOS_SYNERRNAM */
-        "Syntax error in NAMELIST input" },
-      { 0X012, /* IOS_TOOMANVAL */
-        "Too many values for NAMELIST variable" },
-      { 0X013, /* IOS_INVREFVAR */
-        "Invalid reference to variable in NAMELIST input" },
-      { 0X014, /* IOS_REWERR */
-        "REWIND error" },
-      { 0X015, /* IOS_DUPFILSPE */
-        "Duplicate file specifications" },
-      { 0X016, /* IOS_INPRECTOO */
-        "Input record too long" },
-      { 0X017, /* IOS_BACERR */
-        "BACKSPACE error" },
-      { 0X018, /* IOS_ENDDURREA */
-        "End-of-file during read" },
-      { 0X019, /* IOS_RECNUMOUT */
-        "Record number outside range" },
-      { 0X01A, /* IOS_OPEDEFREQ */
-        "OPEN or DEFINE FILE required" },
-      { 0X01B, /* IOS_TOOMANREC */
-        "Too many records in I/O statement" },
-      { 0X01C, /* IOS_CLOERR */
-        "CLOSE error" },
-      { 0X01D, /* IOS_FILNOTFOU */
-        "File not found" },
-      { 0X01E, /* IOS_OPEFAI */
-        "Open failure" },
-      { 0X01F, /* IOS_MIXFILACC */
-        "Mixed file access modes" },
-      { 0X020, /* IOS_INVLOGUNI */
-        "Invalid logical unit number" },
-      { 0X021, /* IOS_ENDFILERR */
-        "ENDFILE error" },
-      { 0X022, /* IOS_UNIALROPE */
-        "Unit already open" },
-      { 0X023, /* IOS_SEGRECFOR */
-        "Segmented record format error" },
-      { 0X024, /* IOS_ATTACCNON */
-        "Attempt to access non-existent record" },
-      { 0X025, /* IOS_INCRECLEN */
-        "Inconsistent record length" },
-      { 0X026, /* IOS_ERRDURWRI */
-        "Error during write" },
-      { 0X027, /* IOS_ERRDURREA */
-        "Error during read" },
-      { 0X028, /* IOS_RECIO_OPE */
-        "Recursive I/O operation" },
-      { 0X029, /* IOS_INSVIRMEM */
-        "Insufficient virtual memory" },
-      { 0X02A, /* IOS_NO_SUCDEV */
-        "No such device" },
-      { 0X02B, /* IOS_FILNAMSPE */
-        "File name specification error" },
-      { 0X02C, /* IOS_INCRECTYP */
-        "Inconsistent record type" },
-      { 0X02D, /* IOS_KEYVALERR */
-        "Keyword value error in OPEN statement" },
-      { 0X02E, /* IOS_INCOPECLO */
-        "Inconsistent OPEN/CLOSE parameters" },
-      { 0X02F, /* IOS_WRIREAFIL */
-        "Write to READONLY file" },
-      { 0X030, /* IOS_INVARGFOR */
-        "Invalid argument to FORTRAN Run-Time Library" },
-      { 0X033, /* IOS_INCFILORG */
-        "Inconsistent file organisation" },
-      { 0X037, /* IOS_DELERR */
-        "DELETE error" },
-      { 0X039, /* IOS_FINERR */
-        "FIND error" },
-      { 0X03B, /* IOS_LISIO_SYN */
-        "List-directed I/O syntax error" },
-      { 0X03C, /* IOS_INFFORLOO */
-        "Infinite format loop" },
-      { 0X03D, /* IOS_FORVARMIS */
-        "Format/variable-type mismatch" },
-      { 0X03E, /* IOS_SYNERRFOR */
-        "Syntax error in format" },
-      { 0X03F, /* IOS_OUTCONERR */
-        "Output conversion error" },
-      { 0X040, /* IOS_INPCONERR */
-        "Input conversion error" },
-      { 0X041, /* IOS_FLTINV */
-        "Floating invalid" },
-      { 0X042, /* IOS_OUTSTAOVE */
-        "Output statement overflows record" },
-      { 0X043, /* IOS_INPSTAREQ */
-        "Input statement requires too much data" },
-      { 0X044, /* IOS_VFEVALERR */
-        "Variable format expression value error" },
-      { 0X05D, /* IOS_ADJARRDIM */
-        "Adjustable array dimension error" },
-      { 0X06C, /* IOS_CANSTAFIL */
-        "Cannot stat file" },
-      { 0X078, /* IOS_OPEREQSEE */
-        "Operation requires seek ability" },
-      { 0X100, /* IOS_UNFIO_FMT */
-        "Unformatted I/O to unit open for formatted transfers" },
-      { 0X101, /* IOS_FMTIO_UNF */
-        "Formatted I/O to unit open for unformatted transfers" },
-   };
-   static int nmsgs = sizeof(msgs)/sizeof(msgs[0]);
-   IostatMessagePair *p;
-
-   p = (IostatMessagePair*) bsearch ( &iostat,
-                                      (void*)msgs,
-                                      nmsgs,
+    static IostatMessagePair msgs[] = {
+        { 0X001, /* IOS_NOTFORSPE */
+          "Not a FORTRAN-specific error" },
+        { 0X009, /* IOS_PERACCFIL */
+          "Permission to access file denied" },
+        { 0X00A, /* IOS_CANOVEEXI */
+          "Cannot overwrite existing file" },
+        { 0X00B, /* IOS_UNINOTCON */
+          "Unit not connected" },
+        { 0X011, /* IOS_SYNERRNAM */
+          "Syntax error in NAMELIST input" },
+        { 0X012, /* IOS_TOOMANVAL */
+          "Too many values for NAMELIST variable" },
+        { 0X013, /* IOS_INVREFVAR */
+          "Invalid reference to variable in NAMELIST input" },
+        { 0X014, /* IOS_REWERR */
+          "REWIND error" },
+        { 0X015, /* IOS_DUPFILSPE */
+          "Duplicate file specifications" },
+        { 0X016, /* IOS_INPRECTOO */
+          "Input record too long" },
+        { 0X017, /* IOS_BACERR */
+          "BACKSPACE error" },
+        { 0X018, /* IOS_ENDDURREA */
+          "End-of-file during read" },
+        { 0X019, /* IOS_RECNUMOUT */
+          "Record number outside range" },
+        { 0X01A, /* IOS_OPEDEFREQ */
+          "OPEN or DEFINE FILE required" },
+        { 0X01B, /* IOS_TOOMANREC */
+          "Too many records in I/O statement" },
+        { 0X01C, /* IOS_CLOERR */
+          "CLOSE error" },
+        { 0X01D, /* IOS_FILNOTFOU */
+          "File not found" },
+        { 0X01E, /* IOS_OPEFAI */
+          "Open failure" },
+        { 0X01F, /* IOS_MIXFILACC */
+          "Mixed file access modes" },
+        { 0X020, /* IOS_INVLOGUNI */
+          "Invalid logical unit number" },
+        { 0X021, /* IOS_ENDFILERR */
+          "ENDFILE error" },
+        { 0X022, /* IOS_UNIALROPE */
+          "Unit already open" },
+        { 0X023, /* IOS_SEGRECFOR */
+          "Segmented record format error" },
+        { 0X024, /* IOS_ATTACCNON */
+          "Attempt to access non-existent record" },
+        { 0X025, /* IOS_INCRECLEN */
+          "Inconsistent record length" },
+        { 0X026, /* IOS_ERRDURWRI */
+          "Error during write" },
+        { 0X027, /* IOS_ERRDURREA */
+          "Error during read" },
+        { 0X028, /* IOS_RECIO_OPE */
+          "Recursive I/O operation" },
+        { 0X029, /* IOS_INSVIRMEM */
+          "Insufficient virtual memory" },
+        { 0X02A, /* IOS_NO_SUCDEV */
+          "No such device" },
+        { 0X02B, /* IOS_FILNAMSPE */
+          "File name specification error" },
+        { 0X02C, /* IOS_INCRECTYP */
+          "Inconsistent record type" },
+        { 0X02D, /* IOS_KEYVALERR */
+          "Keyword value error in OPEN statement" },
+        { 0X02E, /* IOS_INCOPECLO */
+          "Inconsistent OPEN/CLOSE parameters" },
+        { 0X02F, /* IOS_WRIREAFIL */
+          "Write to READONLY file" },
+        { 0X030, /* IOS_INVARGFOR */
+          "Invalid argument to FORTRAN Run-Time Library" },
+        { 0X033, /* IOS_INCFILORG */
+          "Inconsistent file organisation" },
+        { 0X037, /* IOS_DELERR */
+          "DELETE error" },
+        { 0X039, /* IOS_FINERR */
+          "FIND error" },
+        { 0X03B, /* IOS_LISIO_SYN */
+          "List-directed I/O syntax error" },
+        { 0X03C, /* IOS_INFFORLOO */
+          "Infinite format loop" },
+        { 0X03D, /* IOS_FORVARMIS */
+          "Format/variable-type mismatch" },
+        { 0X03E, /* IOS_SYNERRFOR */
+          "Syntax error in format" },
+        { 0X03F, /* IOS_OUTCONERR */
+          "Output conversion error" },
+        { 0X040, /* IOS_INPCONERR */
+          "Input conversion error" },
+        { 0X041, /* IOS_FLTINV */
+          "Floating invalid" },
+        { 0X042, /* IOS_OUTSTAOVE */
+          "Output statement overflows record" },
+        { 0X043, /* IOS_INPSTAREQ */
+          "Input statement requires too much data" },
+        { 0X044, /* IOS_VFEVALERR */
+          "Variable format expression value error" },
+        { 0X05D, /* IOS_ADJARRDIM */
+          "Adjustable array dimension error" },
+        { 0X06C, /* IOS_CANSTAFIL */
+          "Cannot stat file" },
+        { 0X078, /* IOS_OPEREQSEE */
+          "Operation requires seek ability" },
+        { 0X100, /* IOS_UNFIO_FMT */
+          "Unformatted I/O to unit open for formatted transfers" },
+        { 0X101, /* IOS_FMTIO_UNF */
+          "Formatted I/O to unit open for unformatted transfers" },
+    };
+    static int nmsgs = sizeof(msgs)/sizeof(msgs[0]);
+    IostatMessagePair *p;
+    
+    p = (IostatMessagePair*) bsearch( &iostat, (void*)msgs, nmsgs,
                                       sizeof(IostatMessagePair),
                                       &compareIostatMessagePair );
-   if ( p == 0 )
-      return 0;
-   else
-      return p->msg;
+    if ( p == 0 ) {
+        return 0;
+    }
+    return p->msg;
 }
 
 /*
- * Comparison function for bsearch, which takes IostatMessagePair
- * elements and returns negative, zero or positive, depending on
- * whether the key IostatMessagePair's iostat field is less than,
- * equal to, or greater than the element's iostat field.
+ * Comparison function for bsearch, which takes IostatMessagePair elements and
+ * returns negative, zero or positive, depending on whether the key
+ * IostatMessagePair's iostat field is less than, equal to, or greater than
+ * the element's iostat field.
  */
 static int compareIostatMessagePair(const void* key, const void* element)
 {
-   IostatMessagePair *p1 = (IostatMessagePair*)key;
-   IostatMessagePair *p2 = (IostatMessagePair*)element;
-   return p1->iostat - p2->iostat;
+    IostatMessagePair *p1 = (IostatMessagePair*)key;
+    IostatMessagePair *p2 = (IostatMessagePair*)element;
+    return p1->iostat - p2->iostat;
 }
 
-/*
- * Like sprintf, but prints to an internal static buffer, which it
- * returns a pointer to.
- */
-static const char* msg_printf(const char* format, ...)
-{
-   va_list args;
-   static char buf[100];
-
-   va_start(args, format);
-#ifdef HAVE_VSNPRINTF
-   vsnprintf(buf, sizeof(buf), format, args);
-#elif defined HAVE_VSPRINTF
-   vsprintf(buf, format, args);
-#else
-#  error help! we have neither vsnprintf nor vsprintf
-#endif
-   va_end(args);
-   return (const char*)buf;
-}

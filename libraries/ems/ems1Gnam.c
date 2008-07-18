@@ -83,9 +83,9 @@
 
 #include <ctype.h>
 #include "sae_par.h"          /* Standard SAE constants */
-#include "ems1.h"
 #include "ems_par.h"
 #include "ems_sys.h"
+#include "ems1.h"
               
 void ems1Gnam( const char *string, int *iposn,
                 char *name, int *namlen, int *status ) {

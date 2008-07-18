@@ -2,28 +2,28 @@
 #  N.B. the previous line should be blank.
 #+
 #  Name:
-#     ems_link_adam
+#     ems_link [Conly]
 
 #  Purpose:
-#     Generate linker (ld) arguments for linking against adam EMS.
+#     Generate linker (ld) arguments for linking against standalone EMS.
 
 #  Type of Module:
 #     Shell script.
 
 #  Description:
-#     This script should be invoked by those building ADAM applications
-#     which use EMS in order to generate the correct arguments for the 
-#     compiler (or ld) command. The arguments generated are written to 
-#     the standard output.
+#     This script should be invoked by those building standalone
+#     applications which use EMS in order to generate the correct
+#     arguments for the compiler (or ld) command. The arguments
+#     generated are written to the standard output.
+#
+#     If the `Conly' argument is specified, no attempt is made to
+#     link with the C/Fortran interface library, CNF.
 
 #  Invocation:
 #     The script is normally invoked as part of a compiler command line,
 #     such as:
 #
-#        alink program.f -L/star/lib `ems_link_adam`
-
-#     although the ADAM "alink" command will normally link against EMS
-#     anyway.
+#        f77 -o program -L/star/lib `ems_link` program.f
 
 #  Copyright:
 #     Copyright (C) 1995 Rutherford Appleton Laboratory
@@ -32,6 +32,7 @@
 #     RFWS: R.F. Warren-Smith (STARLINK, RAL)
 #     BLY:  M.J. Bly (Starlink, RAL)
 #     AJC:  A.J. Chipperfield (Starlink, RAL)
+#     PWD:  Peter W. Draper (JAC, Durham University)
 #     {enter_new_authors_here}
 
 #  History:
@@ -43,10 +44,14 @@
 #        Generic version.
 #     18-JUL-1995 (AJC):
 #        Mod for EMS
-#     20-MAR-2001 (AJC):
+#     12-MAR-2001 (AJC):
 #        Mod for C EMS
-#     13-AUG-2001 (AJC):
+#      6-Aug-2001 (AJC):
+#        Add the Conly argument
+#     13-Aug-2001 (AJC)
 #        EMS now two libraries
+#     16-MAY-2008 (PWD):
+#        Add autoconf LIBS to include pthread when needed.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -54,7 +59,10 @@
 
 #-
 
-      echo -lemsf -lems `cnf_link_adam`\
+      if test "$1" != "Conly"; then emslink="-lemsf -lems `cnf_link`"; \
+      else emslink="-lems";fi
+
+      echo $emslink @LIBS@ \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'

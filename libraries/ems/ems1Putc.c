@@ -93,8 +93,9 @@
 */
 
 #include "sae_par.h"                 /* SAE public constants */
-#include "ems1.h"                    /* EMS_ Internal functions */
 #include "ems_sys.h"                 /* SAE public constants */
+#include "ems_par.h"                 /* EMS_ public constants */
+#include "ems1.h"                    /* EMS_ internal functions */
 
 void ems1Putc( const char *cvalue, const int maxlen, char *string, int *iposn,
                int *status ) {

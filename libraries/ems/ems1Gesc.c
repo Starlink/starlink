@@ -72,9 +72,9 @@
 */
 
 #include <string.h>
-#include "ems1.h"        /* EMS1_ function prototypes */
 #include "ems_par.h"     /* EMS constants */
 #include "ems_sys.h"     /* EMS internal functions */
+#include "ems1.h"        /* EMS1_ function prototypes */
 
 void ems1Gesc( const char *escchr, const char *string, int *iposn ) {
    int esclen;             /* Length of the escape char string */

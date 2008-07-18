@@ -1,23 +1,25 @@
 /*
  *+
  *  Name:
- *     ems1Estor
+ *     ems1Estor1
  
  *  Purpose:
- *     Store an error message in the current context of the error table.
+ *     Store an error message in the current context of an error table.
  
  *  Language:
  *     Starlink ANSI C
  
  *  Invocation:
- *     ems1Estor( param, plen, msg, mlen, status )
+ *     ems1Estor1( msgtab, param, plen, msg, mlen, status )
  
  *  Description:
- *     This routine stores an error message in the current context of the 
- *     error table. If there is no room in the error table, then the last
- *     reported error message is replaced by a fault message.
+ *     This routine stores an error message in the current context of a 
+ *     given error table. If there is no room in the error table, then the
+ *     last reported error message is replaced by a fault message.
  
  *  Arguments:
+ *     msgtab = ems_msgtb_t* (Given)
+ *        A message table struct.
  *     param = char* (Given)
  *        The error message name.
  *     plen = char* (Given)
@@ -28,14 +30,6 @@
  *        The length of error message text.
  *     status = int (Given and returned)
  *        The global status. 
- 
- *  Algorithm:
- *     -  Find a slot in the error table: if the error message table
- *     is full, then replace the last reported error message an EMS_ 
- *     fault message.
- *     -  Stack the message for output in the error table.
- *     -  Check if the error context level is the lowest: if it is, 
- *     store the last reported status value and flush the error table.
  
  *  Copyright:
  *     Copyright (C) 1990 Science & Engineering Research Council.
@@ -79,6 +73,9 @@
  *        had a length greater than could be stored, and they overran).
  *     13-MAY-2008 (PWD):
  *        Use struct to access message table.
+ *     16-MAY-2008 (PWD):
+ *        Copied from ems1Estor and adapted to work with a given table, 
+ *        rather than the current table.
  *     {enter_further_changes_here}
  
  *  Bugs:
@@ -95,16 +92,59 @@
 #include "ems1.h"                    /* EMS_ private functions prototypes */
 #include "ems_defs.h"                /* EMS_ message table */
 
-void ems1Estor( const char *param, int plen, const char *msg,
-                int mlen, int *status ) 
+void ems1Estor1( ems_msgtab_t *msgtab, const char *param, int plen, 
+                 const char *msg, int mlen, int *status ) 
 {
-    ems_msgtab_t *msgtab = ems1Gmsgtab();  /* Current message table */
+    int index;                     /* Table index */
+    int istat;                     /* Local status */
     
-    TRACE( "ems1Estor" );
-    DEBUG( "ems1Estor", "msglev = %d", msgtab->msglev );
+    TRACE( "ems1Estor1" );
+    DEBUG( "ems1Estor1", "msglev = %d", msgtab->msglev );
  
-    /*  Use this message table for storage. */
-    ems1Estor1( msgtab, param, plen, msg, mlen, status );
-
+    /*  If the message table is full, then replace the last reported error
+     *  message with an EMS_ fault message. */
+    if ( msgtab->msgcnt[ msgtab->msgmrk ] == EMS__MXMSG ) {
+        strcpy( msgtab->msgstr[ EMS__MXMSG ], 
+                "Error stack overflow (EMS fault)." );
+        msgtab->msglen[ EMS__MXMSG ] = 
+            (int) strlen( msgtab->msgstr[ EMS__MXMSG ] );
+        strcpy( msgtab->msgpar[ EMS__MXMSG ], "ems_estor_ovflo" );
+        msgtab->msgpln[ EMS__MXMSG ] = 
+            (int) strlen( msgtab->msgpar[ EMS__MXMSG ] );
+        msgtab->msgsta[ EMS__MXMSG ] = EMS__EROVF;
+        
+    } else {
+        /*  Increment the message count for the current context. */
+        msgtab->msgcnt[ msgtab->msgmrk ]++;
+        
+        /*  Store the STATUS. */
+        index = msgtab->msgcnt[ msgtab->msgmrk ];
+        msgtab->msgsta[ index ] = *status;
+        
+        /*  Store the error message name in the error table. */
+        msgtab->msgpln[ index ] = MIN( plen, EMS__SZPAR );
+        strncpy( msgtab->msgpar[ index ], param, EMS__SZPAR );
+        msgtab->msgpar[ index ][ EMS__SZPAR ] = '\0';
+        
+        /*  Store the error message text in the error table. */
+        msgtab->msglen[ index ] = MIN( mlen, EMS__SZMSG );
+        strncpy( msgtab->msgstr[ index ], msg, EMS__SZMSG );
+        msgtab->msgstr[ index ][ EMS__SZMSG ] = '\0';
+    }
+    
+    /*  Check the error context and flush the error table if it is at the base 
+     *  level (i.e. EMS__BASE). */
+    if ( msgtab->msglev == EMS__BASE ) {
+        
+        /*  Flush the error table. */
+        istat = *status;
+        ems1Flush( &istat );
+        
+        /*  Store the last reported status. */
+        msgtab->msglst = *status;
+        
+        /*  Set the returned status, STATUS, on output error. */
+        if ( istat != SAI__OK ) *status = istat;
+    }
     return;
 }

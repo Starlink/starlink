@@ -15,16 +15,18 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardoccopyright} 
 {Copyright \copyright\ 2001 Council for the Central Laboratory of the Research
-Councils}
+ Councils \newline\
+Copyright \copyright\ 2008 Science and Technology Facilities Council}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {4.13}
-\newcommand{\stardocauthors}   {P C T Rees \\
-                                A J Chipperfield}
-\newcommand{\stardocdate}      {28 September 2001}
-\newcommand{\stardoctitle}     {EMS \\ [1ex]
+\newcommand{\stardocnumber}    {4.14}
+\newcommand{\stardocauthors}   {P.C.T. Rees \\
+                                A.J. Chipperfield \\
+                                P.W. Draper}
+\newcommand{\stardocdate}      {20 May 2008}
+\newcommand{\stardoctitle}     {EMS \\ [\latex{1ex}]
                                 Error Message Service}
-\newcommand{\stardocversion}   {Version 2.0-4}
+\newcommand{\stardocversion}   {Version 2.2-0}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 \newcommand{\stardocabstract}  {This document describes the Error Message
 Service, EMS, and its use in system software.
@@ -188,6 +190,7 @@ ignored by applications programmers and users.}
 \begin{htmlonly}
   \newcommand{\listline}{}
 \end{htmlonly}
+
 %+
 %  Name:
 %     SST.TEX
@@ -493,7 +496,7 @@ ignored by applications programmers and users.}
 %  ==========================
 \begin{htmlonly}
    \xlabel{}
-   \begin{rawhtml} <H1> \end{rawhtml}
+   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
       \stardoctitle\\
       \stardocversion\\
       \stardocmanual
@@ -586,6 +589,8 @@ In doing so, it also provides many of the facilities required by
 \xref{MSG and ERR}{sun104}{}. Indeed, in many cases the MSG and ERR routines
 are implemented as straight-through calls to EMS routines.
 
+EMS can also be used in the threaded parts of applications and libraries
+when compiled with POSIX threads support, see Appendix \ref{threading}.
 
 The hierarchical relationship between MSG, ERR and EMS is illustrated in 
 \textit{Figure~\ref{fig_hier}}.
@@ -634,6 +639,12 @@ hierarchical level above the environment system software.
 This subroutine library cannot then be called from other libraries purporting
 to exist at lower levels within the subroutine hierarchy --
 to do so could result in unpredictable behaviour when an error occurs.
+
+An exception to the above is when working with a threaded application. For
+these EMS should be used in the threaded portions and in general any error
+reporting via ERR should be deferred until the threaded sections complete.
+This avoids problems with global variable access in the ERR and ADAM
+libraries. See Appendix \ref{threading}.
 
 \section{\xlabel{reporting_errors}Reporting Errors}
 The subroutine used to report errors is \texttt{EMS\_REP}. 
@@ -972,13 +983,13 @@ the function \texttt{emsSetl} is that defined by the ANSI C language.
 
 \section{\xlabel{compiling_and_linking_with_the_error_message_service}Compiling
 and Linking with the Error Message Service}\label{comp_sect}
+
 There are three Fortran include files available for use with the Error Message 
 Service: \texttt{SAE\_PAR}, \texttt{EMS\_PAR} and \texttt{EMS\_ERR}
 (see Appendix \ref{incl_sect} for details of the symbolic constants which they 
 define).
-The Starlink convention
-is that the name in upper case with no path or extension is specified when 
-including these files within Fortran code, 
+The Starlink convention is that the name in upper case with no path or
+extension is specified when including these files within Fortran code,
 \textit{e.g.}:
 \begin{quote}
 \begin{verbatim}
@@ -988,19 +999,7 @@ including these files within Fortran code,
 \end{verbatim}
 \end{quote}
 
-Assuming that the software has been installed in the standard way and
-\texttt{/star/bin} has been added to the environment variable
-\texttt{PATH}, soft links with these upper-case names pointing to the required 
-Fortran include files are set up in the user's working directory by the
-commands:
-\begin {quote}
-\begin{verbatim}
-% star_dev
-% ems_dev
-\end{verbatim}
-\end {quote}
-
-Equivalent header files are installed in \texttt{-I/star/include} for use in C
+Equivalent header files are installed in \texttt{/star/include} for use in C
 code which is calling EMS -- they are named \texttt{sae\_par.h},
 \texttt{ems\_par.h} and \texttt{ems\_err.h}.
 In addition, \texttt{ems.h} contains the function prototypes for each of the C 
@@ -1013,49 +1012,33 @@ The syntax
 \end{verbatim}
 \end{quote}
 should be used within the C code, and the compiler option
-\texttt{-I/star/include} used.
-
+\texttt{-I/star/include} used when compiling C and Fortran code.
 
 The Error Message Service is included automatically when
 programs are linked using the ADAM application linking commands,
 \texttt{alink} \textit{etc}.
 
 To link a non-ADAM Fortran program with the the Error Message Service, the
-command line would be:
+command line would be something like:
 \begin {quote}
 \begin{verbatim}
-% f77 program.o -L/star/lib `ems_link` -o program.out
+% f77 -I$STARLINK_DIR/include program.f -L$STARLINK_DIR/lib `ems_link` \
+      -o program.out
 \end{verbatim}
 \end {quote}
-On platforms with shareable libraries, \texttt{-L/star/lib} might be replaced 
-by \texttt{-L/star/share}.
-
-If it is necessary to link explicitly with the ADAM version of EMS and any
-libraries which it uses (\textit{e.g.}\ to produce a shareable library), the 
-script \texttt{ems\_link\_adam} is available in \texttt{/star/bin}. 
-The link command might be:
-\begin {quote}
-\begin {small}
-\begin{verbatim}
-% ld -shared -o libmypkg.so.1.0 -L/star/share -lmypkg `ems_link_adam`
-\end{verbatim}
-\end {small}
-\end {quote}
-(In fact, \texttt{ems\_link} and \texttt{ems\_link\_adam} are now functionally
-identical.)
 
 The command to compile and link a C program might be:
 \begin {quote}
 \begin{verbatim}
-% cc -o program -I/star/include -L/star/lib program.c `ems_link`
+% cc -o program -I$STARLINK_DIR/include -L$STARLINK_DIR/lib program.c \
+     `ems_link`
 \end{verbatim}
 \end {quote}
 
 \begin {quote}
-\emph{Note that the command used to invoke the C compiler varies from 
-one UNIX implementation to another (indeed, there may be more than one C
-compiler available on the same machine) -- you should therefore check this
-with your Site Manager before proceeding.}
+\emph{Note that the commands used to invoke the C and Fortran compilers vary
+from one UNIX implementation to another (indeed, there may be more than
+compiler of each type on the same machine).}
 \end {quote}
 
 If the C program makes no use of the EMS Fortran interface, the
@@ -1155,6 +1138,66 @@ ADAM parameter system, data system and user interface and so depend
 upon the working state of these parts of the ADAM environment.
 These features preclude the use of MSG and ERR in the development of any 
 subroutine library used by the parameter system, data system or user interface.
+
+\newpage
+\section{\xlabel{threading}Using EMS together with POSIX threads
+\label{threading}}
+When built using the \texttt{--with-pthreads} configuration option, EMS can
+be used in a POSIX threads application or library. The only requirement is
+that the sections of the application that use threads are wrapped in
+\texttt{emsMark}/\texttt{emsRlse} blocks, as in:
+\begin{verbatim}
+
+void *make_report( void *threadid )
+{
+    int tid;
+    int status = SAI__ERROR;
+
+    tid = (int) threadid;
+    emsSeti( "THREADID", tid );
+    emsRep( "THREAD", "Oh no an error in thread ^THREADID", &status );
+    return NULL;
+}
+
+int main ( int argc, char *argv[] )
+{
+    pthread_t threads[ NUM_THREADS ];
+    int rc;
+    int t;
+    int status = SAI__OK;
+
+    emsMark();
+
+    for ( t = 0; t < NUM_THREADS; t++ ) {
+        pthread_create( &threads[ t ], NULL, make_report, (void *)t );
+    }
+
+    /*  Wait for threads to complete. */
+    for ( t = 0; t < NUM_THREADS; t++ ) {
+        pthread_join( threads[ t ], NULL );
+    }
+
+    /* Check for the exit status */
+    emsStat( &status );
+
+    emsRlse();
+}
+
+\end{verbatim}
+
+The error messages can then be delivered or loaded as normal (when using ERR
+it is important not to make any calls to it in the threaded section, as this
+may access unprotected global data). The status return recovered by
+\texttt{emsStat} will be one from one of the threads, it is not possible to
+find out the status from all threads using EMS. In a standalone program as
+shown the error messages:
+\begin{verbatim}
+!! Oh no an error in thread 1
+!  Oh no an error in thread 2
+!  Oh no an error in thread 4
+\end{verbatim}
+will be shown using the default delivery \texttt{printf} mechanism during the
+\texttt{emsRlse} call (since the error stack context falls to the base level).
 
 \newpage
 \section{\xlabel{using_ems_within_adam_system_software}Using EMS within ADAM

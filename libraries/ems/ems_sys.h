@@ -44,7 +44,7 @@
 #define EMS_SYS_DEFINED
 #include <stdio.h>
 #include <string.h>
-         
+
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -65,7 +65,8 @@ typedef short Logical;
 #if DEBUG
 #   undef DEBUG
 #   define DEBUG(x,y,z)  (void) fprintf(OP_STREAM, "Debug (%s): ", x );\
-       (void) fprintf(OP_STREAM, y, z ); (void) fprintf(OP_STREAM, "\n" )
+    (void) fprintf(OP_STREAM, y, z ); (void) fprintf(OP_STREAM, "\n" ); \
+    fflush(OP_STREAM);
 #else
 #   undef DEBUG
 #   define DEBUG(x,y,z)
@@ -73,20 +74,23 @@ typedef short Logical;
 
 #if TRACE
 #   undef TRACE
-#   define TRACE(x)(void) fprintf(OP_STREAM,"Entering Function '%s'...\n", x );
+#   define TRACE(x)(void) fprintf(OP_STREAM,"Entering Function '%s'...\n", x );\
+    fflush(OP_STREAM);
 #else
 #   undef TRACE
 #   define TRACE(x) 
 #endif
 
-#define EMS__MXLEV  256            /* Maximum context level */
+#define EMS__MXLEV 256            /* Maximum context level */
 
-#define EMS__MXTOK  64             /* Maximum number of tokens */
+#define EMS__MXTOK 64             /* Maximum number of tokens */
 
-#define EMS__SZFMT  200            /* Size of FORMAT text */
+#define EMS__SZFMT 200            /* Size of FORMAT text */
 
-#define EMS__SZNAM 15              /* Size of message token name */
+#define EMS__SZNAM 15             /* Size of message token name */
 
-#define EMS__SZOUT  79             /* Size of an output string */
+#define EMS__SZOUT 79             /* Size of an output string */
+
+#define EMS__SZBUF 512            /* Size of static buffer */
 
 #endif

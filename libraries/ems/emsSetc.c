@@ -35,33 +35,34 @@
  *     maxchar = int (Given)
  *        The maximum desired length of the token.
 
-*  Copyright:
-*     Copyright (C) 2007 Science and Technology Facilities Council.
-*     Copyright (C) 1990, 1991 Science & Engineering Research Council.
-*     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
-*     All Rights Reserved.
+ *  Copyright:
+ *     Copyright (C) 1990, 1991 Science & Engineering Research Council.
+ *     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
+ *     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+ *     All Rights Reserved.
 
-*  Licence:
-*     This program is free software; you can redistribute it and/or
-*     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
-*     the License, or (at your option) any later version.
-*     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
-*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
-*     
-*     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
-
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of
+ *     the License, or (at your option) any later version.
+ *     
+ *     This program is distributed in the hope that it will be
+ *     useful,but WITHOUT ANY WARRANTY; without even the implied
+ *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *     PURPOSE. See the GNU General Public License for more details.
+ *     
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program; if not, write to the Free Software
+ *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+ *     02111-1307, USA
+ 
  *  Authors:
  *     PCTR: P.C.T. Rees (STARLINK)
  *     AJC: A.J. Chipperfield (STARLINK)
  *     RTP: R.T.Platon (STARLINK)
  *     TIMJ: Tim Jenness (JAC, Hawaii)
+ *     PWD: Peter W. Draper (JAC, Durham University)
  *     {enter_new_authors_here}
 
  *  History:
@@ -81,6 +82,8 @@
  *        Restrict string length to EMS__SZTOK
  *     01-NOV-2007 (TIMJ):
  *        Trap null pointer.
+ *     15-MAY-2008 (PWD):
+ *        Remove unused variable.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -97,33 +100,31 @@
 #include "ems1.h"                      /* ems_ internal function prototypes */
 
 /* Function Definitons: */
-void emsSetc( const char *token, const char *cvalue, ... ){
-   
-   int vallen;
-   int i;
-   char valbuf[ EMS__SZTOK + 1 ];
+void emsSetc( const char *token, const char *cvalue, ... )
+{
+    int i;
+    char valbuf[ EMS__SZTOK + 1 ];
 
-   TRACE("emsSetc");
-   DEBUG("emsSetc", "emsSetc: '%s'", token);
+    TRACE( "emsSetc" );
+    DEBUG( "emsSetc", "emsSetc: '%s'", token );
 
-/*  Find the used length of the string */
-   valbuf[0] = '\0';
-   if (cvalue) strncpy( valbuf, cvalue, EMS__SZTOK );
-   valbuf[EMS__SZTOK] = '\0';
+    /*  Find the used length of the string */
+    valbuf[0] = '\0';
+    if ( cvalue ) strncpy( valbuf, cvalue, EMS__SZTOK );
+    valbuf[ EMS__SZTOK ] = '\0';
 
-   for ( i=strlen(valbuf); i>0 ; i-- ) {
-      if ( cvalue[ i-1 ] != ' ' ) break;
-   }
-   valbuf[i] = '\0';
+    for ( i = strlen( valbuf ); i > 0 ; i-- ) {
+        if ( cvalue[ i - 1 ] != ' ' ) break;
+    }
+    valbuf[ i ] = '\0';
 
-/*  Ensure minimum one space */
-   if ( !i ) {
-      strcpy( valbuf, " " );
-   }
+    /*  Ensure minimum one space */
+    if ( ! i ) {
+        strcpy( valbuf, " " );
+    }
 
-/*  Set the token value. */
-   ems1Stok( token, valbuf );
+    /*  Set the token value. */
+    ems1Stok( token, valbuf );
  
-   return;
-
+    return;
 }

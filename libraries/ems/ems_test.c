@@ -36,6 +36,7 @@
 
 /* ensure it doesn't look in this directory for the header files */
 #include <stdio.h>
+#include <errno.h>
 #include <sae_par.h>
 #include <ems.h>
 #include <ems_par.h>
@@ -92,5 +93,9 @@ int main(){
    F77_CALL(ems_rlse)();
    printf( "\n" );
 
+   /*  System error. */
+   printf( "Fake system call error lookup, Argument list too long\n" );
+   emsSyser( "ERRNO", E2BIG );
+   emsRep( "ERR10", "System error message: ^ERRNO", &status );
    exit( 0 );
 }   

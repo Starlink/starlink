@@ -12,7 +12,7 @@
  *     emsEload( param, parlen, opstr, oplen, status )
 
  *  Description:
- *     This function provides a C interface for the Error Message 
+ *     This function provides a C interface for the Error Message
  *     Service routine EMS_ELOAD (written in Fortran).
 
  *  Arguments:
@@ -27,31 +27,33 @@
  *     status = int * (Given and Returned)
  *        The global status.
 
-*  Copyright:
-*     Copyright (C) 1990 Science & Engineering Research Council.
-*     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
-*     All Rights Reserved.
+ *  Copyright:
+ *     Copyright (C) 1990 Science & Engineering Research Council.
+ *     Copyright (C) 1999, 2001 Central Laboratory of the Research Councils.
+ *     Copyright (C) 2008 Science and Technology Facilities Council.
+ *     All Rights Reserved.
 
-*  Licence:
-*     This program is free software; you can redistribute it and/or
-*     modify it under the terms of the GNU General Public License as
-*     published by the Free Software Foundation; either version 2 of
-*     the License, or (at your option) any later version.
-*     
-*     This program is distributed in the hope that it will be
-*     useful,but WITHOUT ANY WARRANTY; without even the implied
-*     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-*     PURPOSE. See the GNU General Public License for more details.
-*     
-*     You should have received a copy of the GNU General Public License
-*     along with this program; if not, write to the Free Software
-*     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
-*     02111-1307, USA
+ *  Licence:
+ *     This program is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of
+ *     the License, or (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be
+ *     useful,but WITHOUT ANY WARRANTY; without even the implied
+ *     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ *     PURPOSE. See the GNU General Public License for more details.
+ *
+ *     You should have received a copy of the GNU General Public License
+ *     along with this program; if not, write to the Free Software
+ *     Foundation, Inc., 59 Temple Place,Suite 330, Boston, MA
+ *     02111-1307, USA
 
  *  Authors:
  *     PCTR: P.C.T. Rees (STARLINK)
  *     AJC: A.J. Chipperfield (STARLINK)
  *     RTP: R.T.Platon (STARLINK)
+ *     PWD: Peter W. Draper (JAC, Durham University)
  *     {enter_new_authors_here}
 
  *  History:
@@ -70,6 +72,10 @@
  *        Correct message names length
  *     13-AUG-2001 (AJC):
  *        Remove unused variables
+ *     13-MAY-2008 (PWD):
+ *        Use struct to access message table.
+ *     19-MAY-2008 (PWD):
+ *        Use thread specific data to store table copy.
  *     {enter_further_changes_here}
 
  *  Bugs:
@@ -84,130 +90,131 @@
 #include "ems.h"                     /* EMS_ function prototypes */
 #include "ems_sys.h"                 /* EMS_ private macro definitions */
 #include "ems_err.h"
-#include "ems_msgtb.h"               /* Error message tables */
+#include "ems1.h"                      /* EMS_ private functions prototypes */
+#include "ems_defs.h"                  /* EMS_ message table */
 
 /* Function Definitons: */
-void emsEload( char *param, int *parlen, char *opstr, int *oplen, 
-                  int *status ) {
+void emsEload( char *param, int *parlen, char *opstr, int *oplen,
+               int *status )
+{
+    int *nerbuf;                   /* Number of error messages */
+    int *old;                      /* Whether to start a new context. */
+    int *opcnt;                    /* Message output counter */
+    int i;                         /* Loop index   */
+    int iend;                      /* Ending loop value */
+    int istart;                    /* Starting loop value  */
+    int istat;                     /* Local status */
+    int leng;                      /* String length */
+    int nerpnt;                    /* Error message pointer */
+    short tmprvl;                  /* Temporary storage for MSGRVL */
 
-   static short new = TRUE;            /* Whether a new context active */
+    ems_msgtab_t *msgtab = ems1Gmsgtab();  /* Current active message table */
+    ems_msgtab_t *contab = ems1Gmsgtab2(); /* Thread specific spare message table */
 
-/* Temporary holding area for message table */
-   static int nerbuf;                      /* Number of error messages */
-   static int opcnt;                       /* Message output counter */
-   static int erblen[ EMS__MXMSG + 1 ];    /* Error message string lengths */
-   static int prblen[ EMS__MXMSG + 1 ];    /* Message name string lengths */
-   static int stabuf[ EMS__MXMSG + 1 ];    /* Status values */
+    TRACE( "emsEload" );
 
-   static char parbuf[ EMS__MXMSG + 1 ][ EMS__SZPAR+1 ];  /* Message names */
-   static char errbuf[ EMS__MXMSG + 1 ][ EMS__SZMSG+1 ];  /* Message strings */
+    /*  Use userdata part of table to carry additional context between calls
+     *  when threading. These values are guaranteed to be 0 when the thread
+     *  starts. */
+    old = &contab->userdata[0];
+    nerbuf = &contab->userdata[1];
+    opcnt = &contab->userdata[2];
 
-   int i;                         /* Loop index   */  
-   int iend;                      /* Ending loop value */
-   int istart;                    /* Starting loop value  */   
-   int istat;                     /* Local status */
-   int leng;                      /* String length */
-   int nerpnt;                    /* Error message pointer */
-   short tmprvl;                  /* Temporary storage for MSGRVL */
+    /*  Is this a new error flush? */
+    if ( ! *old  ) {
 
-   TRACE("emsEload");
+        /*  Unset the 'reload holding area' flag */
+        *old = 1;
 
-/*  Is this a new error flush? */
-   if ( new ) {
+        /*  A new error flush, so initialise output counter. */
+        *opcnt = 1;
 
-/*     Unset the 'reload holding area' flag */
-      new = FALSE;
+        /*  Find the first message to flush. */
+        if ( msgtab->msgmrk > EMS__BASE ) {
+            istart = msgtab->msgcnt[ msgtab->msgmrk - 1 ] + 1;
+        } else {
+            istart = 1;
+        }
 
-/*     A new error flush, so initialise output counter. */
-      opcnt = 1;
+        /*  Find the last message. */
+        iend = msgtab->msgcnt[ msgtab->msgmrk ];
 
-/*     Find the first message to flush. */
-      if ( msgmrk > EMS__BASE ) {
-         istart = msgcnt[ msgmrk - 1 ] + 1;
-      } else {
-         istart = 1;
-      }
+        /*  If there are messages to flush, loop to load error buffer. */
+        if ( iend >= istart ) {
 
-/*     Find the last message. */
-      iend = msgcnt[ msgmrk ];
+            /*  Set nerbuf (the number of messages in the context). */
+            *nerbuf = iend - istart + 1;
 
-/*     if there are messages to flush, { loop to load error buffer. */
-      if ( iend >= istart ) {
+            for ( i = 1; i<= *nerbuf; i++ ) {
+                nerpnt = istart + i - 1;
 
-/*       Set NERBUF (the number of messages in the context). */
-         nerbuf = iend - istart + 1;
+                /*  Construct the output line. */
+                strcpy( contab->msgpar[ i ], msgtab->msgpar[ nerpnt ] );
+                contab->msgpln[ i ] = msgtab->msgpln[ nerpnt ];
+                strcpy( contab->msgstr[ i ], msgtab->msgstr[ nerpnt ] );
+                contab->msglen[ i ] = msgtab->msglen[ nerpnt ];
+                contab->msgsta[ i ] = msgtab->msgsta[ nerpnt ];
+            }
 
-         for ( i = 1; i<= nerbuf; i++ ) {
-            nerpnt = istart + i - 1;
+        } else {
 
-/*           Construct the output line. */
-            strcpy( parbuf[ i ], msgpar[ nerpnt ] );
-            prblen[ i ] = msgpln[ nerpnt ];
-            strcpy( errbuf[ i ], msgstr[ nerpnt ] );
-            erblen[ i ] = msglen[ nerpnt ];
-            stabuf[ i ] = msgsta[ nerpnt ];
-         }
+            /*  If there are no messages to flush, load a warning. */
+            *nerbuf = 1;
+            nerpnt = 1;
+            strcpy ( contab->msgpar[ nerpnt ], "EMS_ELOAD_NOMSG" );
+            contab->msgpln[ nerpnt ] = strlen( contab->msgpar[ nerpnt ] );
+            strcpy ( contab->msgstr[ nerpnt ],
+                     "No error to report (improper use of EMS)." );
+            contab->msglen[ nerpnt ] = strlen( contab->msgstr[ nerpnt ] );
+            contab->msgsta[ nerpnt ] = EMS__NOMSG;
+        }
 
-      } else {
+        /*  Annul the error table at the current context. Switch off MSGRVL
+         *  whilst doing it as messages have been handled. */
+        tmprvl = msgtab->msgrvl;
+        msgtab->msgrvl = FALSE;
+        emsAnnul( &istat );
+        msgtab->msgrvl = tmprvl;
 
-/*        if there are no messages to flush, { load a warning. */
-         nerbuf = 1;
-         nerpnt = 1;
-         strcpy ( parbuf[ nerpnt ], "EMS_ELOAD_NOMSG");
-         prblen[ nerpnt ] = strlen( parbuf[ nerpnt ] );
-         strcpy ( errbuf[ nerpnt ], 
-                    "No error to report (improper use of EMS)." );
-         erblen[ nerpnt ] = strlen( errbuf[ nerpnt ] );
-         stabuf[ nerpnt ] = EMS__NOMSG;
+    } else {
 
-      }
+        /*  Increment output counter. */
+        (*opcnt)++;
+    }
 
-/*     Annul the error table at the current context.
- *     Switch off MSGRVL whilst doing it as messages have been handled */
-      tmprvl = msgrvl;
-      msgrvl = FALSE;
-      emsAnnul( &istat );
-      msgrvl = tmprvl;
+    /*  Initialize the return values. These values also serve as the return
+     *  values if there are no more messages.  */
+    strcpy( param, " ");
+    *parlen = 1;
+    strcpy( opstr, " ");
+    *oplen = 1;
+    *status = SAI__OK;
 
-   } else {
+    /*  Now, if there are any messages left to output - return the next one. */
+    if ( *opcnt <= *nerbuf ) {
 
-/*     Increment output counter. */
-      opcnt++;
-   }
+        /*  There are more messages - return the message name. */
+        leng = contab->msgpln[ *opcnt ];
+        if ( leng  > 0 ) {
+            strcpy( param, contab->msgpar[ *opcnt ] );
+            *parlen = leng;
+        }
 
-/*  Initialize the return values
- *  These values also serve as the return values if there are no more messages  */
-   strcpy (param, " ");
-   *parlen = 1;
-   strcpy (opstr, " ");
-   *oplen = 1;
-   *status = SAI__OK;
+        /*  Return the message string. */
+        leng = contab->msglen[ *opcnt ];
+        if ( leng > 0 ) {
+            strcpy( opstr, contab->msgstr[ *opcnt ] );
+            *oplen = leng;
+        }
 
-/*  Now, if there are any messages left to output - return the next one */
-   if ( opcnt <= nerbuf ) {
-/*     There are more messages - Return the message name */
-      leng = prblen[ opcnt ];
-      if ( leng  > 0 ) {
-/*         *parlen= sprintf( param, "%s%s", param, parbuf[ opcnt ] );*/
-         strcpy( param, parbuf[ opcnt ] );
-         *parlen = leng;
-      }
+        /*  Return the associated status */
+        *status = contab->msgsta[ *opcnt ];
 
-/*     Return the message string. */
-      leng = erblen[ opcnt ];
-      if ( leng > 0 ) {
-/*         *oplen = sprintf( opstr, "%s%s", errbuf[ opcnt ] );*/
-         strcpy( opstr, errbuf[ opcnt ] );
-         *oplen = leng;
-      }
+    } else {
 
-/*     Return the associated status */
-      *status = stabuf[ opcnt ];
-
-   } else {
-/*     There are no more messages
- *     Force the holding area to be updated again on the next call */
-      new = TRUE;
-   }
-   return;
+        /*  There are no more messages, force the holding area to be updated
+         *  again on the next call */
+        *old = 0;
+    }
+    return;
 }

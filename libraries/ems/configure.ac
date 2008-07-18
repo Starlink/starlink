@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
 
 dnl    Initialisation: package name and version number
-AC_INIT(ems, 2.1-2, ussc@star.rl.ac.uk)
+AC_INIT(ems, 2.2-0, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -20,12 +20,30 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_C_CONST
 AC_HEADER_STDC
-AC_CHECK_FUNCS([strcmp vsnprintf vsprintf])
-AC_CHECK_DECLS([strcmp])
 AC_PROG_LIBTOOL
 
 dnl    If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
+
+dnl    Conditional defining whether we build with POSIX thread support.
+AC_ARG_WITH([pthreads],
+            [ --with-pthreads   Build package with POSIX threads support],
+        if test "$withval" = "yes"; then
+           use_pthreads="yes"
+        else
+           use_pthreads="no"
+        fi,
+        use_pthreads="no")
+if test "$use_pthreads" = "yes"; then
+AC_CHECK_LIB([pthread], [pthread_create], ,[use_pthreads="no"])
+   if test "$use_pthreads" = "yes"; then
+      AC_DEFINE([USE_PTHREADS], [1], [Build with POSIX threads support])
+   fi
+fi
+
+dnl    Check for reentrant versions of functions.
+AC_FUNC_STRERROR_R
+AC_CHECK_FUNCS([strtok_r])
 
 dnl    The function ems_fioer.c provides a mapping from Fortran IOSTAT
 dnl    codes to error messages.  The only way we can do this is by
@@ -56,7 +74,8 @@ AC_CONFIG_HEADERS(config.h)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES(Makefile component.xml ems_fioer.c)
+AC_CONFIG_FILES([Makefile component.xml ems_fioer.c])
+AC_CONFIG_FILES([ems_link ems_link_adam])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT

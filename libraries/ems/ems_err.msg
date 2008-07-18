@@ -19,4 +19,5 @@ NOENV	<Error encountered reading environment variable EMS_TUNE.>
 .BASE		400
 EROVF	<Error stack overflow (EMS fault).>
 CXOVF	<Context stack overflow (EMS fault).>
+TEST    <Test facility error check.>
 .END
