@@ -1,8 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
-##  GAIA is a little different in that it contains a TEA-based gaia
-##  and gaia3d subdirectories which needs to be handled as if thirdparty
-##  packages for some operations.
+##  GAIA is a little different in that it contains a TEA-based gaia,
+##  gaia3d and gaiavo subdirectories which needs to be handled as 
+##  if thirdparty packages for some operations.
 @SET_MAKE@
 
 ##  Subdirectories that we build etc. as normal, note order is
@@ -19,7 +19,7 @@ starhelp_DATA = gaia.htx/*.html gaia.htx/*.gif
 dist_starnews_DATA = gaia.news
 
 ##  Need all the source code in the sub-directories.
-EXTRA_DIST = teagaia gaia gaia3d gaia.news sun214fig.ps gaia.htx
+EXTRA_DIST = teagaia gaia gaia3d gaiavo gaia.news sun214fig.ps gaia.htx
 
 ##  Additional files. These have traditionally gone into bindir.
 gaiasupportdir = $(bindir)

@@ -53,11 +53,6 @@ STAR_PATH_TCLTK(8.4, [tk])
 dnl    Define support for large files.
 STAR_LARGEFILE_SUPPORT
 
-dnl    We require a version of Xerces-c to be installed for VOTable support.
-dnl    Difficult to check for library linkage, so just use header check.
-AC_CHECK_HEADER([xercesc/util/XercesVersion.hpp], [], 
-    AC_MSG_ERROR([Couldn't find xerces-c headers. Need xerces-c.]))
-
 dnl    Declare dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [ard atl ast blt cat cfitsio generic dnl
 fio img itcl pcs pda sae skycat startcl sla tcl tclx tk tcllibs vtk], link)
@@ -86,6 +81,7 @@ AC_SUBST(CONFIGURE_ARGS)
 dnl    Make sure configure is ran in sub-directories.
 test -f "gaia/Makefile" && rm -f "gaia/Makefile"
 test -f "gaia3d/Makefile" && rm -f "gaia3d/Makefile"
+test -f "gaiavo/Makefile" && rm -f "gaiavo/Makefile"
 
 dnl    Need to determine the suffix for shareable libraries, as used by
 dnl    Tcl, so we can link against the GAIA dynamic library.
@@ -112,9 +108,8 @@ AC_SUBST(TCL_PACKAGE_VERSION)
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
 AC_CONFIG_FILES([Makefile tasks/Makefile scripts/Makefile teagaia/Makefile])
-AC_CONFIG_FILES([gaiavo/Makefile])
 AC_CONFIG_FILES([component.xml])
-AC_CONFIG_FILES([gaia/configure.in gaia3d/configure.in])
+AC_CONFIG_FILES([gaia/configure.in gaia3d/configure.in gaiavo/configure.in])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
