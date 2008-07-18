@@ -13,13 +13,13 @@
  *     Library routine
 
  *  Invocation:
- *     smf_open_file( const Grp * ingrp, int index, const char * mode, 
+ *     smf_open_file( const Grp * ingrp, size_t index, const char * mode, 
  *                    int flags, smfData ** data, int *status);
 
  *  Arguments:
  *     ingrp = const Grp * (Given)
  *        NDG group identifier
- *     index = int (Given)
+ *     index = size_t (Given)
  *        Index corresponding to required file in group
  *     mode = const char * (Given)
  *        File access mode
@@ -170,6 +170,8 @@
  *        squid values if the SMF__NOCREATE_DATA flag is supplied.
  *     2008-07-10 (TIMJ):
  *        Read dark squid information.
+ *     2008-07-18 (TIMJ):
+ *        Use size_t
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -228,8 +230,8 @@
 
 #define FUNC_NAME "smf_open_file"
 
-void smf_open_file( const Grp * igrp, int index, const char * mode, int flags,
-                    smfData ** data, int *status) {
+void smf_open_file( const Grp * igrp, size_t index, const char * mode,
+                     int flags, smfData ** data, int *status) {
 
   char dtype[NDF__SZTYP+1];  /* String for DATA type */
   int indf;                  /* NDF identified for input file */

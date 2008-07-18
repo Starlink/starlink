@@ -623,11 +623,11 @@ const char *smf_model_getname( smf_modeltype type, int *status);
 
 smf_modeltype smf_model_gettype( const char *modelname, int *status );
 
-void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, 
+void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index, 
 			      smfData **ffdata, int *status);
 
-void smf_open_file( const Grp * igrp, int index, const char * mode, int withHdr,
-		    smfData ** data, int *status);
+void smf_open_file( const Grp * igrp, size_t index, const char * mode,
+		    int withHdr, smfData ** data, int *status);
 
 void smf_open_mapcoord( smfData *data, const char *mode, int *status );
 

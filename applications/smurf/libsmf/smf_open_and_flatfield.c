@@ -13,15 +13,15 @@
 *     SMURF subroutine
 
 *  Invocation:
-*     smf_open_and_flatfield( Grp *igrp, Grp *ogrp, int index,
+*     smf_open_and_flatfield( const Grp *igrp, const Grp *ogrp, size_t index,
 *                             smfData **data, int *status );
 
 *  Arguments:
-*     igrp = Grp* (Given)
+*     igrp = const Grp* (Given)
 *        Pointer to an input group
-*     ogrp = Grp* (Given)
+*     ogrp = const Grp* (Given)
 *        Pointer to an output group
-*     index = int (Given)
+*     index = size_t (Given)
 *        Index into the group
 *     data = smfData** (Returned)
 *        Pointer to a pointer to smfData struct containing flatfielded data.
@@ -84,7 +84,9 @@
 *        Use smf_accumulate_prov. Do not propagate provenance extension.
 *     2008-06-06 (TIMJ):
 *        Store the input filename in the smfFile even if there is no
-*        output group. This simplifies filename retrieval enormously.
+*        output group. This simplifies filename retrieval enormously
+ *     2008-07-18 (TIMJ):
+ *        Use size_t and const.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -139,7 +141,8 @@
 
 #define FUNC_NAME "smf_open_and_flatfield"
 
-void smf_open_and_flatfield ( Grp *igrp, Grp *ogrp, int index, smfData **ffdata, int *status) {
+void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
+                              smfData **ffdata, int *status) {
 
   smfData *data = NULL;     /* Pointer to input data struct */
   smfFile *file = NULL;     /* Pointer to input file struct */
