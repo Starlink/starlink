@@ -1,4 +1,4 @@
-#if !defined( SLA_R_INCLUDED ) && defined( USE_PTHREADS ) /* Include this file only once */
+#if !defined( SLA_R_INCLUDED ) /* Include this file only once */
 #define SLA_R_INCLUDED
 /*
 *  Name:
@@ -41,6 +41,12 @@
 *        Original version.
 *-
 */
+
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#if USE_PTHREADS
 
 void slaAddet_r( double rm, double dm, double eq, double *rc, double *dc );
 double slaAirmas_r( double zd );
@@ -145,4 +151,5 @@ void slaSvd_r( int m, int n, int mp, int np,
 void slaSvdsol_r( int m, int n, int mp, int np,
                  double *b, double *u, double *w, double *v,
                  double *work, double *x );
+#endif
 #endif

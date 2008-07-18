@@ -1,4 +1,3 @@
-#if defined(USE_PTHREADS)
 /*
 *  Name:
 *     sla_r.c
@@ -39,9 +38,15 @@
 *-
 */
 
+#if HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#if USE_PTHREADS
+
 /* Header files. */
 /* ============= */
-#include "sla.h"                
+#include "slalib.h"                
 #include "sla_r.h"                
 #include <pthread.h>
 
