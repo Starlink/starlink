@@ -121,6 +121,8 @@ dnl    Difficult to check for library linkage, so just use header check.
 AC_CHECK_HEADER([xercesc/util/XercesVersion.hpp], [], 
     AC_MSG_ERROR([Couldn't find xerces-c headers. Need xerces-c.]))
 
+PKG_LIBS="${PKG_LIBS} -lxerces-c"
+
 #  Restore full tcl.m4 CFLAGS.
 CFLAGS="$old_CFLAGS"
 

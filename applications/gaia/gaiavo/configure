@@ -11546,6 +11546,8 @@ fi
 
 
 
+PKG_LIBS="${PKG_LIBS} -lxerces-c"
+
 #  Restore full tcl.m4 CFLAGS.
 CFLAGS="$old_CFLAGS"
 
