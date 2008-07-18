@@ -1,7 +1,12 @@
 1 DAOPHOT - DAO photometry package
                                                             Expires: **.**.**
 
- This is DAOPHOT v1.3-3.
+ This is DAOPHOT v1.3-4.
+
+ Changes at v1.3-4:
+
+   o A problem using the daophot sort function when compiled using g95
+     has been fixed (this problem caused daophot to abort).
 
  Changes at v1.3-3:
 
