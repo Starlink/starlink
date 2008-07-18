@@ -29,10 +29,9 @@
 *     the pointers to smfDatas to NULL.
 
 *  Notes:
-*     This routine makes the assumption that there cannot be more than
-*     SMF__MXSMF smfDatas in a smfArray, essentially allowing the
-*     grouping of all four SCUBA-2 subarrays at both
-*     wavelengths. Something a little more flexible is desireable.
+*     - if smf_addto_smfArray is used to populate the smfArray,
+*       it will be dynamically resized if more than SMF__MXSMF items
+*       are stored in it.
 
 *  Authors:
 *     Andy Gibb (UBC)
