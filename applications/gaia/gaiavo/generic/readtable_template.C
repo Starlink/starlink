@@ -26,7 +26,7 @@ int main( int argc, char* argv[] )
     char name[20];
     for ( int i = 0; i < ntables; i++ ) {
         sprintf( name, "mytab%d.TAB", i );
-        table->saveTable( i, name );
+        table->saveAsTST( i, name );
     }
 
     return 0;
