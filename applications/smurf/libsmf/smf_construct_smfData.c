@@ -17,7 +17,8 @@
 *                      smfHead * hdr, smfDA * da, 
 *		       smf_dtype dtype, void * pntr[3], 
 *		       const dim_t dims[], int ndims,
-*		       int virtual, int ncoeff, double *poly, int * status );
+*		       int virtual, int ncoeff, double *poly, AstKeyMap * history,
+*          int * status );
 
 *  Arguments:
 *     tofill = smfData * (Given)
@@ -49,6 +50,8 @@
 *        Number of coefficients in scanfit polynomial
 *     poly = double * (Given)
 *        Pointer to array of polynomial coefficients
+*     history = AstKeyMap * (Given)
+*        history tracking.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
