@@ -1,16 +1,16 @@
-      SUBROUTINE MSG_SETR( TOKEN, RVALUE )
+/*
 *+
 *  Name:
-*     MSG_SETR
+*     MSG_SETL
 
 *  Purpose:
-*     Assign a REAL value to a message token (concise).
+*     Assign an LOGICAL value to a message token (concise).
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL MSG_SETR( TOKEN, RVALUE )
+*     CALL MSG_SETL( TOKEN, LVALUE )
 
 *  Description:
 *     A given value is encoded using a concise format and the
@@ -31,10 +31,11 @@
 *  Arguments:
 *     TOKEN = CHARACTER * ( * ) (Given)
 *        The message token name. 
-*     RVALUE = REAL (Given)
+*     LVALUE = LOGICAL (Given)
 *        The value to be assigned to the message token.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1983, 1984, 1989 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -58,6 +59,7 @@
 *     JRG: Jack Giddings (UCL)
 *     BDK: Dennis Kelly (ROE)
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -68,25 +70,36 @@
 *     20-SEP-1989 (PCTR):
 *        Converted to new prologue and layout.
 *     15-DEC-1989 (PCTR):
-*        Converted to call EMS_SETR.
+*        Converted to call EMS_SETD.
+*     18-JUL-2008 (TIMJ):
+*        C wrapper around msgSetd
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
+#include "f77.h"
+#include "merswrap.h"
+#include "star/mem.h"
+#include "mers_f77.h"
 
-*  Arguments Given:
-      CHARACTER * ( * ) TOKEN
+F77_SUBROUTINE(msg_setl)( CHARACTER(TOKEN), LOGICAL(LVALUE) TRAIL(TOKEN) ) {
 
-      REAL RVALUE
+      int lvalue;
+      char *token;
 
-*.
+      GENPTR_CHARACTER(TOKEN);
 
-*  Construct the message token string.
-      CALL EMS_SETR( TOKEN, RVALUE )
- 
-      END
+      F77_IMPORT_LOGICAL( *LVALUE, lvalue );
+      token = starMallocAtomic( TOKEN_length + 1 );
+      F77_IMPORT_CHARACTER( TOKEN, TOKEN_length, token );
+
+/*  Construct the message token string. */
+      msgSetl( token, lvalue );
+
+      starFree(token);
+
+}

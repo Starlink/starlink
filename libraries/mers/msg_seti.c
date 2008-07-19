@@ -1,16 +1,16 @@
-      SUBROUTINE MSG_SETD( TOKEN, DVALUE )
+/*
 *+
 *  Name:
-*     MSG_SETD
+*     MSG_SETI
 
 *  Purpose:
-*     Assign a DOUBLE PRECISION value to a message token (concise).
+*     Assign an INTEGER value to a message token (concise).
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL MSG_SETD( TOKEN, DVALUE )
+*     CALL MSG_SETI( TOKEN, IVALUE )
 
 *  Description:
 *     A given value is encoded using a concise format and the
@@ -31,10 +31,11 @@
 *  Arguments:
 *     TOKEN = CHARACTER * ( * ) (Given)
 *        The message token name. 
-*     DVALUE = DOUBLE PRECISION (Given)
+*     IVALUE = INTEGER (Given)
 *        The value to be assigned to the message token.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1983, 1984, 1989 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -58,6 +59,7 @@
 *     JRG: Jack Giddings (UCL)
 *     BDK: Dennis Kelly (ROE)
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -69,24 +71,35 @@
 *        Converted to new prologue and layout.
 *     15-DEC-1989 (PCTR):
 *        Converted to call EMS_SETD.
+*     18-JUL-2008 (TIMJ):
+*        C wrapper around msgSetd
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
+#include "f77.h"
+#include "merswrap.h"
+#include "star/mem.h"
+#include "mers_f77.h"
 
-*  Arguments Given:
-      CHARACTER * ( * ) TOKEN
+F77_SUBROUTINE(msg_seti)( CHARACTER(TOKEN), INTEGER(IVALUE) TRAIL(TOKEN) ) {
 
-      DOUBLE PRECISION DVALUE
+      int ivalue;
+      char *token;
 
-*.
+      GENPTR_CHARACTER(TOKEN);
 
-*  Construct the message token string.
-      CALL EMS_SETD( TOKEN, DVALUE )
+      F77_IMPORT_INTEGER( *IVALUE, ivalue );
+      token = starMallocAtomic( TOKEN_length + 1 );
+      F77_IMPORT_CHARACTER( TOKEN, TOKEN_length, token );
 
-      END
+/*  Construct the message token string. */
+      msgSeti( token, ivalue );
+
+      starFree(token);
+
+}

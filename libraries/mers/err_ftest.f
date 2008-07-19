@@ -63,7 +63,12 @@
 *  Call MSG_OUT.
       CALL MSG_BELL( STATUS )
       CALL MSG_SETC( 'TOK', '(SETC)')
-      CALL MSG_OUT( ' ', 'MSG is installed and working. - ^TOK',
+      CALL MSG_SETD( 'DTK', 0.0D0 )
+      CALL MSG_SETR( 'RTK', 0.0 )
+      CALL MSG_SETI( 'ITK', 0 )
+      CALL MSG_SETL( 'LTK', .FALSE. )
+      CALL MSG_OUT( ' ', 'MSG is installed and working. - ^TOK' /
+     :/ ' ^DTK - ^RTK - ^ITK - ^LTK',
      :     STATUS )
 
 *  Call ERR_REP and ERR_FLUSH.

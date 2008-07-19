@@ -1,16 +1,16 @@
-      SUBROUTINE MSG_SETI( TOKEN, IVALUE )
+/*
 *+
 *  Name:
-*     MSG_SETI
+*     msgSetd
 
 *  Purpose:
-*     Assign an INTEGER value to a message token (concise).
+*     Assign a DOUBLE PRECISION value to a message token (concise).
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Invocation:
-*     CALL MSG_SETI( TOKEN, IVALUE )
+*     msgSetd( const char * token, double dvalue );
 
 *  Description:
 *     A given value is encoded using a concise format and the
@@ -19,22 +19,23 @@
 *     The given value may be one of the following Fortran 77 data types
 *     and there is one routine provided for each data type:
 *
-*        MSG_SETD   DOUBLE PRECISION
-*        MSG_SETR   REAL
-*        MSG_SETI   INTEGER
-*        MSG_SETL   LOGICAL
-*        MSG_SETC   CHARACTER
+*        msgSetd   DOUBLE PRECISION
+*        msgSetr   REAL
+*        msgSeti   INTEGER
+*        msgSetl   LOGICAL
+*        msgSetc   CHARACTER
 *
 *     If this subroutine fails, the token remains unmodified - this will
 *     be apparent in any messages which refer to this token.
 
 *  Arguments:
-*     TOKEN = CHARACTER * ( * ) (Given)
+*     token = const char * (Given)
 *        The message token name. 
-*     IVALUE = INTEGER (Given)
+*     dvalue = double (Given)
 *        The value to be assigned to the message token.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1983, 1984, 1989 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -58,6 +59,7 @@
 *     JRG: Jack Giddings (UCL)
 *     BDK: Dennis Kelly (ROE)
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -68,25 +70,20 @@
 *     20-SEP-1989 (PCTR):
 *        Converted to new prologue and layout.
 *     15-DEC-1989 (PCTR):
-*        Converted to call EMS_SETI.
+*        Converted to call EMS_SETD.
+*     18-JUL-2008 (TIMJ):
+*        Now written in C.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
+#include "merswrap.h"
+#include "ems.h"
 
-*  Arguments Given:
-      CHARACTER * ( * ) TOKEN
-
-      INTEGER IVALUE
-
-*.
-
-*  Construct the message token string.
-      CALL EMS_SETI( TOKEN, IVALUE )
- 
-      END
+void msgSetd( const char * token, double dvalue ) {
+  emsSetd( token, dvalue );
+}
