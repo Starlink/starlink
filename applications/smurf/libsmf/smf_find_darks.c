@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_find_darks(const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
-*                     smfArray ** darks, int * status );
+*                     int reduce, smfArray ** darks, int * status );
 
 *  Arguments:
 *     ingrp = const Grp* (Given)
@@ -23,11 +23,16 @@
 *        Output group consisting of all the non-dark observations. Can be
 *        NULL.
 *     darkgrp = Grp ** (Returned)
-*        If non-null, will contain the group of dark files.
+*        If non-null, will contain the group of dark files. Will not be
+*        created if no darks were found.
+*     reduce = int (Given)
+*        Logical, if true the darks are reduced (if needed) and converted
+*        to 2d images from the time series. If false, the darks are not
+*        touched. Only accessed if "darks" is true.
 *     darks = smfArray ** (Returned)
 *        Pointer to smfArray* to be created and filled with darks. Must
 *        be freed using smf_close_related. Can be NULL pointer if the darks
-*        do not need to be used.
+*        do not need to be used. *darks will be NULL if no darks were found.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -119,7 +124,7 @@ static int sortbytime( const void *in1, const void *in2);
 #define FUNC_NAME "smf_find_darks"
 
 void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
-                     smfArray ** darks, int * status ) {
+                     int reduce, smfArray ** darks, int * status ) {
 
   smfSortInfo *alldarks; /* array of sort structs */
   size_t dkcount = 0; /* Dark counter */
@@ -184,7 +189,7 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
   }
 
   /* no need to do any more if neither darks nor darkgrp are defined */
-  if (darks || darkgrp) {
+  if (dkcount > 0 && (darks || darkgrp) ) {
     Grp *dgrp = grpNew( "DarkFiles", status );
 
     /* sort darks into order */
@@ -201,6 +206,17 @@ void smf_find_darks( const Grp * ingrp, Grp **outgrp, Grp **darkgrp,
       if (*status == SAI__OK) {
         for (i = 1; i <= dkcount; i++ ) {
           smf_open_file( dgrp, i, "READ", 0, &infile, status );
+
+          /* do we have to process these darks? */
+          if (reduce) {
+            smfData *outfile = NULL;
+            smf_reduce_dark( infile, &outfile, status );
+            if (outfile) {
+              smf_close_file( &infile, status );
+              infile = outfile;
+            }
+          }
+
           smf_addto_smfArray( array, infile, status );
         }
       }
