@@ -50,8 +50,11 @@
 *     2008-04-02 (BZ):
 *        With the advice from Tim (TJ) and David (DB),
 *        set attributes of WCS.
+*     2008-07-18 (TIMJ):
+*        Use smf_find_subarray.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2008 University of Lethbridge. All Rights Reserved.
 
 *  Licence:
@@ -89,6 +92,7 @@
 #include "libsmf/smf.h"
 
 #include "sc2da/sc2ast.h"
+#include "sc2fts_entry.h"
 
 void sc2fts_addwcs 
 (
@@ -113,7 +117,6 @@ int   *status          /* global status (given and returned) */
   AstSkyFrame *gridframe;       /* Current Frame for 2-D sky */
   AstFrameSet *speccubewcs;     /* WCS for 3-D spectrum cube */
   double ftswn_factor;          /* Factor for FTS spectrum */
-  char subname[SZFITSCARD+1];   /* Subarray name */
   int subnum;                   /* Subarray index number */
   double refra, refdec;         /* Attributes: RefRA, RefDec */
 
@@ -144,8 +147,7 @@ int   *status          /* global status (given and returned) */
   astBegin;
 
   /* create 2-D WCS from sc2ast_createwcs */
-  smf_fits_getS( data->hdr, "SUBARRAY", subname, SZFITSCARD+1, status );
-  sc2ast_name2num ( subname, &subnum, status );
+  smf_find_subarray( data->hdr, NULL, 0, &subnum, status );
   sc2ast_createwcs( subnum, data->hdr->state, data->hdr->instap, data->hdr->telpos, &gridfset, status );
 
   /* get frame of 2-D grid WCS */

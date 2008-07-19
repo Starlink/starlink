@@ -91,6 +91,8 @@
 *        - STEPTIME handled elsewhere.
 *     2008-04-30 (EC):
 *        - Handle bolo-ordered data
+*     2008-07-18 (TIMJ):
+*        Use smf_find_subarray
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -153,7 +155,6 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
   const JCMTState *tmpState; /* Local pointer to STATE */
   double dut1;               /* UT1-UTC correction, in days */ 
   int subsysnum;             /* Subsystem numeric id. 0 - 8 */
-  char subarray[81];         /* Subarray name */
 
   if (*status != SAI__OK) return;
 
@@ -234,11 +235,8 @@ void smf_tslice_ast (smfData * data, int index, int needwcs, int * status ) {
     switch( hdr->instrument ) {
 
     case INST__SCUBA2:
-      /* Need to get the subarray name */
-      smf_fits_getS( hdr, "SUBARRAY", subarray, 81, status );
-
-      /* Convert to a number */
-      sc2ast_name2num( subarray, &subsysnum, status);
+      /* Need to get the subarray number */
+      smf_find_subarray( hdr, NULL, 0, &subsysnum, status );
 
       sc2ast_createwcs( subsysnum, tmpState, hdr->instap, hdr->telpos,
 			&(hdr->wcs), status );

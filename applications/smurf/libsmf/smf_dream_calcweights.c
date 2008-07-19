@@ -74,9 +74,12 @@
 *        for lower-case obsmode string
 *     2008-07-14 (AGG):
 *        Remove unnecessary call to calculate jiggrid array
+*     2008-07-18 (TIMJ):
+*        Use smf_find_subarray
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2008 University of British Columbia. All
 *     Rights Reserved.
 
@@ -180,7 +183,7 @@ void smf_dream_calcweights( smfData *data, const Grp *ogrp, const int index,
       /* OK we have DREAM data */
       dream = data->dream;
       /* Read DREAM parameters from input file */
-      smf_fits_getS( hdr, "SUBARRAY", subarray, SUB__MAXNAM+1, status);
+      smf_find_subarray( hdr, subarray, sizeof(subarray), NULL, status );
       smf_fits_getD( hdr, "STEPTIME", &tsamp, status);
       /* Convert steptime into millisec */
       tsamp *= 1000.0;

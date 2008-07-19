@@ -95,6 +95,8 @@
  *     2008-07-11 (TIMJ):
  *        sizeof(int) does not work when your ints are changed to longs.
  *        Always use sizeof(*var).
+ *     2008-07-18 (TIMJ):
+ *        Use smf_find_subarray
  *     {enter_further_changes_here}
 
  *  Copyright:
@@ -190,7 +192,6 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
   int *refsubsys=NULL;        /* Array of template subarrays */
   double *starts = NULL;      /* Array of starting RTS_END values */
   double steptime;            /* Length of a sample */
-  char subarray[81];          /* Subarray name */
   dim_t **subgroups = NULL;   /* Array containing index arrays to parent Grp */
   int subsysnum;              /* Subsystem numeric id. 0 - 8 */
   size_t thischunk;           /* Current chunk that we're on */
@@ -413,17 +414,16 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
 
             if( j==0 ) {
               /* Look at header of file that is already opened */
-              smf_fits_getS( hdr, "SUBARRAY", subarray, 81, status );
+              smf_find_subarray( hdr, NULL, 0, &subsysnum, status );
             } else {
               /* Otherwise open header in new file */
               smf_open_file( igrp, subgroups[i][j], "READ", 
                              SMF__NOCREATE_DATA, &data2, status );
               if( *status == SAI__OK ) {
                 hdr2 = data2->hdr;
-                smf_fits_getS( hdr2, "SUBARRAY", subarray, 81, status );
+                smf_find_subarray( hdr2, NULL, 0, &subsysnum, status );
               }
             }	
-            sc2ast_name2num( subarray, &subsysnum, status);	
 
             /* Close the new file that we've opened */
             if( j>0 ) {
@@ -470,17 +470,16 @@ void smf_grp_related(  Grp *igrp, const int grpsize, const int grpbywave,
         if( subgroups[i][j] > 0 ) {
           if( j==0 ) {
             /* Look at header of file that is already opened */
-            smf_fits_getS( hdr, "SUBARRAY", subarray, 81, status );
+            smf_find_subarray( hdr, NULL, 0, &subsysnum, status );
           } else {
             /* Otherwise open header in new file */
             smf_open_file( igrp, subgroups[i][j], "READ", SMF__NOCREATE_DATA, 
                            &data2, status );
             if (*status == SAI__OK) {
               hdr2 = data2->hdr;
-              smf_fits_getS( hdr2, "SUBARRAY", subarray, 81, status );
+              smf_find_subarray( hdr2, NULL, 0, &subsysnum, status );
             }
           }	
-          sc2ast_name2num( subarray, &subsysnum, status);	
           if( *status == SAI__OK ) {
             refsubsys[j] = subsysnum;
           }

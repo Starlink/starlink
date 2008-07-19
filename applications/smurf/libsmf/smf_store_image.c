@@ -65,9 +65,12 @@
 *        Remove creation of MAPDATA extension, rename BZ_IMAGE to BOLZERO
 *     2007-07-10 (AGG):
 *        Remove unnecessary HDS locator variable 
+*     2008-07-18 (TIMJ):
+*        Use smf_find_subarray
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006-2007 University of British Columbia. All Rights
 *     Reserved.
 
@@ -147,7 +150,6 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
   int seqstart;                    /* Starting index */
   int slice;                       /* Index of current time slice */
   int strnum;                      /* Structure element number */
-  char subname[SZFITSCARD+1];      /* Subarray name */
   int subnum;                      /* Subarray index number */
   int ubnd[2];                     /* Upper dimension bounds */
   int uindf;                       /* NDF identifier */
@@ -194,9 +196,7 @@ void smf_store_image( smfData *data, HDSLoc *scu2redloc, int cycle, int ndim,
 
   /* Derive WCS */
   hdr = data->hdr;
-  smf_fits_getS( hdr, "SUBARRAY", subname, SZFITSCARD+1, status );
-  sc2ast_name2num ( subname, &subnum, status );
-
+  smf_find_subarray(hdr, NULL, 0, &subnum, status );
   sc2ast_createwcs( subnum, hdr->state, hdr->instap, hdr->telpos, &wcs, status );
 
   /* Shift the coord frame is either vxmin or vymin is non-zero */
