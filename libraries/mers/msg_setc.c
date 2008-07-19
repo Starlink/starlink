@@ -35,6 +35,7 @@
 *        The value to be assiged to the message token.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1983, 1984, 1989 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -84,16 +85,14 @@
 #include "merswrap.h"
 #include "ems_par.h"
 #include "star/mem.h"
+#include "mers_f77.h"
 
-#include <string.h>
 
 F77_SUBROUTINE(msg_setc)( CHARACTER(TOKEN), CHARACTER(CVALUE)
                           TRAIL(TOKEN) TRAIL(CVALUE) ) {
 
-
   char *token;
   char cvalue[EMS__SZTOK+1];
-  size_t toklen;
 
   GENPTR_CHARACTER(TOKEN);
   GENPTR_CHARACTER(CVALUE);
@@ -105,6 +104,6 @@ F77_SUBROUTINE(msg_setc)( CHARACTER(TOKEN), CHARACTER(CVALUE)
 /*  Construct the message token string. */
   msgSetc( token, cvalue );
 
-  F77_FREE_CHARACTER(token);
+  starFree( token );
 
 }
