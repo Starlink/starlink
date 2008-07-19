@@ -171,10 +171,10 @@
       CALL NDF_MBND( 'TRIM', IN, REF, STATUS )
 
 *  Create a new output NDF based on the first input NDF. Propagate the
-*  data, WCS, and axis components. (Use if neither variance or quality 
-*  arrays are present.)
-      CALL LPG_PROP( IN, 'Data,WCS,Axis,Variance,Quality', 'OUT', OUT, 
-     :               STATUS )
+*  data, WCS, axis, and unit components. (Use if neither variance nor
+*  quality arrays are present.)
+      CALL LPG_PROP( IN, 'Data,WCS,Axis,Variance,Quality,Units', 'OUT',
+     :               OUT, STATUS )
 
 *  Determine which data type to use to process the input data/variance
 *  arrays. Also find and set an appropriate data type for these components 
