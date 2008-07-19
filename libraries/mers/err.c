@@ -41,32 +41,7 @@
 #include "f77.h"
 #include "merswrap.h"
 
-F77_SUBROUTINE(err_begin)( INTEGER(status) );
 
-void errBegin( int *status ) {
-
-DECLARE_INTEGER(fstatus);
-
-   F77_EXPORT_INTEGER(*status,fstatus);
-
-   F77_CALL(err_begin)( INTEGER_ARG(&fstatus) );
-
-   F77_IMPORT_INTEGER(fstatus,*status);
-
-   return;
-}
-F77_SUBROUTINE(err_end)( INTEGER(status) );
-
-void errEnd( int *status ) {
-
-DECLARE_INTEGER(fstatus);
-
-   F77_CALL(err_end)( INTEGER_ARG(&fstatus) );
-
-   F77_IMPORT_INTEGER(fstatus,*status);
-
-   return;
-}
 F77_SUBROUTINE(err_facer)( CHARACTER(token),
                            INTEGER(status)
                            TRAIL(token) );

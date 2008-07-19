@@ -1,31 +1,32 @@
-      SUBROUTINE ERR_BEGIN( STATUS )
+/*
 *+
 *  Name:
-*     ERR_BEGIN
+*     errBegin
 
 *  Purpose:
 *     Create a new error reporting environment.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Invocation:
-*     CALL ERR_BEGIN( STATUS )
+*     errBegin( int * status );
 
 *  Description:
 *     Begin a new error reporting environment by marking a new error 
 *     reporting context and then resetting the status argument to SAI__OK.
-*     If ERR_BEGIN is called with the status argument set to an error 
+*     If errBegin is called with the status argument set to an error 
 *     value, a check is made to determine if there are any messages 
 *     pending output in the current context: if there are none, an 
 *     error report to this effect is made on behalf of the calling
 *     application.
 
 *  Arguments:
-*     STATUS = INTEGER (Given and Returned)
+*     status = int * (Given & Returned)
 *        The global status.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1990, 1991 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -47,6 +48,7 @@
 
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -59,22 +61,18 @@
 *        on error.
 *     14-AUG-1991 (PCTR):
 *        Changed to call EMS_BEGIN.
+*     19-JUL-2008 (TIMJ):
+*        Rewrite in C.
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
-*  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+*/
+#include "ems.h"
+#include "merswrap.h"
 
-*  Status:
-      INTEGER STATUS
-
-*.
-
-*  Call EMS_BEGIN.
-      CALL EMS_BEGIN( STATUS )
-
-      END
+void errBegin( int * status ) {
+  emsBegin( status );
+}

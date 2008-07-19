@@ -1,16 +1,16 @@
-      SUBROUTINE ERR_END( STATUS )
+/*
 *+
 *  Name:
-*     ERR_END
+*     errEnd
 
 *  Purpose:
 *     End the current error reporting environment.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Invocation:
-*     CALL ERR_END( STATUS )
+*     errEnd( int * status );
 
 *  Description:
 *     Check if any error messages are pending output in the previous 
@@ -19,10 +19,11 @@
 *     released. The last reported status value is returned on exit.
 
 *  Arguments:
-*     STATUS = INTEGER (Returned)
+*     status = int * (Returned)
 *        The global status.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -44,6 +45,7 @@
 
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -51,22 +53,19 @@
 *        Original version.
 *     15-JAN-1990 (PCTR):
 *        Changed to call EMS_END.
+*     19-JUL-2008 (TIMJ):
+*        Rewrite in C. Call emsEnd.
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
-*  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+*/
 
-*  Status:
-      INTEGER STATUS
+#include "ems.h"
+#include "merswrap.h"
 
-*.
-
-*  Call EMS_END.
-      CALL EMS_END( STATUS )
-
-      END
+void errEnd( int * status ) {
+  emsEnd( status );
+}
