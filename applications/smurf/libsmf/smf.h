@@ -1044,4 +1044,7 @@ int smf_isdark( const smfData *data, int * status );
 void smf_reduce_dark( const smfData *indark, smfData **outdark, 
                       int *status );
 
+void smf_find_subarray ( const smfHead * hdr, char subarray[],
+                         size_t buflen, int *subnum, int *status );
+
 #endif /* SMF_DEFINED */
