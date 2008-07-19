@@ -20,11 +20,12 @@
 *     hdr = const smfHead * (Given)
 *        Header from which to obtain the FITS information
 *     subarray = char[] (Given and Returned)
-*        Buffer to receive the subarray name. Of size "buflen"
+*        Buffer to receive the subarray name. Of size "buflen". Can be
+*        NULL.
 *     buflen = size_t (Given)
 *        Allocate size of "subarray", including nul.
 *     subnum = int* (Returned)
-*        Pointer to int to contain the subarray number.
+*        Pointer to int to contain the subarray number. Can be NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -41,7 +42,8 @@
 *        Initial version.
 
 *  Notes:
-*     Use sc2ast_name2num
+*     - Uses sc2ast_name2num
+*     - At least one of "subnum" and "subarray" should be non-NULL.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -85,14 +87,23 @@
 #include "libsmf/smf.h"
 #include "sc2da/sc2ast.h"
 
+#define FUNC_NAME "smf_find_subarray"
+
 void smf_find_subarray ( const smfHead * hdr, char subarray[],
                          size_t buflen, int *subnum, int *status ) {
   char buffer[81];  /* for FITS header */
 
   if (*status != SAI__OK) return;
 
+  if (subnum == NULL && subarray == NULL) {
+    *status = SAI__ERROR;
+    errRep( " ", FUNC_NAME ": Both 'subnum' and 'subarray' are NULL "
+            "(possible programming error)", status);
+    return;
+  }
+
   smf_fits_getS( hdr, "SUBARRAY", buffer, sizeof(buffer), status );
-  one_strlcpy( subarray, buffer, buflen, status );
-  sc2ast_name2num( subarray, subnum, status);
+  if (subarray) one_strlcpy( subarray, buffer, buflen, status );
+  if (subnum) sc2ast_name2num( buffer, subnum, status);
   return;
 }
