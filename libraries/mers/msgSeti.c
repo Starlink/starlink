@@ -70,7 +70,7 @@
 *     20-SEP-1989 (PCTR):
 *        Converted to new prologue and layout.
 *     15-DEC-1989 (PCTR):
-*        Converted to call EMS_SETD.
+*        Converted to call EMS_SETI.
 *     18-JUL-2008 (TIMJ):
 *        Now written in C.
 *     {enter_further_changes_here}
