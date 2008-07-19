@@ -17,7 +17,8 @@
 
 *  Arguments:
 *     relfiles = smfArray** (Given and Returned)
-*        Pointer to smfArray containing files to be closed
+*        Pointer to smfArray containing files to be closed. No action
+*        performed if *relfiles is NULL.
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -44,6 +45,8 @@
 *        Free resources even if status is bad
 *     2008-07-14 (TIMJ):
 *        Free dynamic memory.
+*     2008-07-18 (TIMJ):
+*        Check for NULL pointer.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -103,6 +106,7 @@ void smf_close_related ( smfArray **relfiles, int *status ) {
   smfData *data;            /* Current smfData */
 
   /* Always attempt to free resources regardless of status */
+  if (*relfiles == NULL) return;
 
   /* Retrieve number of data files */
   nrelated = (*relfiles)->ndat;
