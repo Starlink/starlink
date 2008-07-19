@@ -78,4 +78,8 @@
       CALL ERR_FLBEL( STATUS )
       CALL ERR_RLSE
 
+      STATUS = SAI__ERROR
+      CALL ERR_REP( ' ','Will annul this', STATUS )
+      CALL ERR_ANNUL( STATUS )
+
       END

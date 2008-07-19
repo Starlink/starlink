@@ -1,4 +1,4 @@
-      SUBROUTINE ERR_ANNUL( STATUS )
+/*
 *+
 *  Name:
 *     ERR_ANNUL
@@ -23,6 +23,7 @@
 *        The global status: it is set to SAI__OK on return.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 1983, 1989 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -47,6 +48,7 @@
 *     SLW: Sid Wright (UCL)
 *     RFWS: R.F. Warren-Smith (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -60,22 +62,23 @@
 *        Completed code tidy-up.
 *     15-DEC-1989 (PCTR):
 *        Converted to call EMS_ANNUL.
+*     18-JUL-2008 (TIMJ):
+*        Now in C. Calls errAnnul.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
+#include "f77.h"
+#include "merswrap.h"
+#include "mers_f77.h"
 
-*  Status:
-      INTEGER STATUS
-
-*.
-
-*  Annul the error message table.
-      CALL EMS_ANNUL( STATUS )
- 
-      END
+F77_SUBROUTINE(err_annul)( INTEGER(STATUS) ) {
+  int status;
+  F77_IMPORT_INTEGER( *STATUS, status );
+  errAnnul( &status );
+  F77_EXPORT_INTEGER( status, *STATUS );
+}

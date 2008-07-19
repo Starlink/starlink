@@ -40,18 +40,7 @@
 #include <string.h>
 #include "f77.h"
 #include "merswrap.h"
-F77_SUBROUTINE(err_annul)( INTEGER(status) );
 
-void errAnnul( int *status ) {
-
-DECLARE_INTEGER(fstatus);
-
-   F77_CALL(err_annul)( INTEGER_ARG(&fstatus) );
-
-   F77_IMPORT_INTEGER(fstatus,*status);
-
-   return;
-}
 F77_SUBROUTINE(err_begin)( INTEGER(status) );
 
 void errBegin( int *status ) {
