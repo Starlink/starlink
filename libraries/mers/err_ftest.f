@@ -62,7 +62,9 @@
 
 *  Call MSG_OUT.
       CALL MSG_BELL( STATUS )
-      CALL MSG_OUT( ' ', 'MSG is installed and working.', STATUS )
+      CALL MSG_SETC( 'TOK', '(SETC)')
+      CALL MSG_OUT( ' ', 'MSG is installed and working. - ^TOK',
+     :     STATUS )
 
 *  Call ERR_REP and ERR_FLUSH.
       STATUS = SAI__ERROR

@@ -671,32 +671,7 @@ void msgRenew( void ) {
 
    return;
 }
-F77_SUBROUTINE(msg_setc)( CHARACTER(token),
-                          CHARACTER(cvalue)
-                          TRAIL(token)
-                          TRAIL(cvalue) );
 
-void msgSetc( const char *token,
-              const char *cvalue ) {
-
-DECLARE_CHARACTER_DYN(ftoken);
-DECLARE_CHARACTER_DYN(fcvalue);
-
-   F77_CREATE_CHARACTER(ftoken,strlen( token ));
-   F77_EXPORT_CHARACTER(token,ftoken,ftoken_length);
-   F77_CREATE_CHARACTER(fcvalue,strlen( cvalue ));
-   F77_EXPORT_CHARACTER(cvalue,fcvalue,fcvalue_length);
-
-   F77_CALL(msg_setc)( CHARACTER_ARG(ftoken),
-                       CHARACTER_ARG(fcvalue)
-                       TRAIL_ARG(ftoken)
-                       TRAIL_ARG(fcvalue) );
-
-   F77_FREE_CHARACTER(ftoken);
-   F77_FREE_CHARACTER(fcvalue);
-
-   return;
-}
 F77_SUBROUTINE(msg_setd)( CHARACTER(token),
                           DOUBLE(dvalue)
                           TRAIL(token) );
