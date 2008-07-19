@@ -85,8 +85,9 @@
 *     2008-06-06 (TIMJ):
 *        Store the input filename in the smfFile even if there is no
 *        output group. This simplifies filename retrieval enormously
- *     2008-07-18 (TIMJ):
- *        Use size_t and const.
+*     2008-07-18 (TIMJ):
+*        Use size_t and const.
+*        Pass in smfArray of darks.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -142,7 +143,7 @@
 #define FUNC_NAME "smf_open_and_flatfield"
 
 void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
-                              smfData **ffdata, int *status) {
+                              const smfArray *darks, smfData **ffdata, int *status) {
 
   smfData *data = NULL;     /* Pointer to input data struct */
   smfFile *file = NULL;     /* Pointer to input file struct */
@@ -238,6 +239,19 @@ void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
                status);
       }
     }
+
+    if (darks) {
+      size_t dark1;
+      size_t dark2;
+
+      /* work out which darks are suitable */
+      /* smf_choose_darks( darks, ffdata, &dark1, &dark2, status ); */
+
+      /* and correct for dark */
+      /* smf_subtract_dark( ffdata, darks->sdata[dark1], darks->sdata[dark2],
+         SMF__DKSUB_PREV, status );  */
+    }
+
     /* Flatfield the data */
     smf_flatfield( data, ffdata, flags, status );
 

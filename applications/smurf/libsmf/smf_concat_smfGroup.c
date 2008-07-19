@@ -381,7 +381,7 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
              require flat-fielding. */
 
           smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i], 
-                                  &refdata, status );
+                                  NULL, &refdata, status );
 
           /* Calculate the pointing LUT if requested */
           if( !(flags & SMF__NOCREATE_LUT) && outfset ) {

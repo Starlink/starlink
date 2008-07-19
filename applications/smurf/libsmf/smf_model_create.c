@@ -385,7 +385,8 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
                do an open_and_flatfield */
 
             if( copyinput ) {
-              smf_open_and_flatfield( igroup->grp, NULL, idx, &idata, status );
+              smf_open_and_flatfield( igroup->grp, NULL, idx, NULL,
+                                      &idata, status );
             } else {
               smf_open_file( igroup->grp, idx, "READ", oflag, &idata, status );
             }

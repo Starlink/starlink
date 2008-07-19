@@ -66,6 +66,7 @@
 *        Can now smf_close_file
 *     2008-07-18 (TIMJ):
 *        Use kaplibs routine to get in and out files so that the counts match properly.
+*        Locate darks in input list.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -121,7 +122,9 @@
 
 void smurf_flatfield( int *status ) {
 
+  smfArray *darks = NULL;   /* Dark data */
   smfData *ffdata = NULL;   /* Pointer to output data struct */
+  Grp *fgrp = NULL;         /* Filtered group, no darks */
   size_t i = 0;             /* Counter, index */
   Grp *igrp = NULL;         /* Input group of files */
   Grp *ogrp = NULL;         /* Output group of files */
@@ -134,6 +137,16 @@ void smurf_flatfield( int *status ) {
   /* Get input file(s) */
   kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
+  /* Filter out darks */
+  smf_find_darks( igrp, &fgrp, NULL, 1, &darks, status );
+
+  /* input group is now the filtered group so we can use that and
+     free the old input group */
+  size = grpGrpsz( fgrp, status );
+  grpDelet( &igrp, status);
+  igrp = fgrp;
+  fgrp = NULL;
+
   /* Get output file(s) */
   kpg1Wgndf( "OUT", igrp, size, size, "More output files required...",
              &ogrp, &outsize, status );
@@ -143,7 +156,7 @@ void smurf_flatfield( int *status ) {
     if (*status != SAI__OK) break;
 
     /* Call flatfield routine */
-    smf_open_and_flatfield(igrp, ogrp, i, &ffdata, status);
+    smf_open_and_flatfield(igrp, ogrp, i, NULL, &ffdata, status);
 
     /* Check status to see if data are already flatfielded */
     if (*status == SMF__FLATN) {
@@ -167,7 +180,7 @@ void smurf_flatfield( int *status ) {
   /* Tidy up after ourselves: release the resources used by the grp routines  */
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
-
+  smf_close_related( &darks, status );
   ndfEnd( status );
 }
 

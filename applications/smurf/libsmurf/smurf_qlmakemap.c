@@ -359,7 +359,7 @@ void smurf_qlmakemap( int *status ) {
   msgOutif( MSG__VERB," ", "SMURF_QLMAKEMAP: Process data files", status );
   for ( i=1; i<=size && *status == SAI__OK; i++ ) {
     /* Read data from the ith input file in the group */
-    smf_open_and_flatfield( igrp, NULL, i, &data, status );
+    smf_open_and_flatfield( igrp, NULL, i, NULL, &data, status );
 
     /* Check units are consistent */
     smf_check_units( i, data_units, data->hdr, status);

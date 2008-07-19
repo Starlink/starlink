@@ -888,7 +888,7 @@ void smurf_makemap( int *status ) {
         if( !pt || pt[ 0 ] < VAL__MAXI ) {
 
           /* Read data from the ith input file in the group */      
-          smf_open_and_flatfield( tile->grp, NULL, ifile, &data, status ); 
+          smf_open_and_flatfield( tile->grp, NULL, ifile, NULL, &data, status ); 
 
           /* Check that the data dimensions are 3 (for time ordered data) */
           if( *status == SAI__OK ) {

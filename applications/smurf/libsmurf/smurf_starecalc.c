@@ -125,7 +125,7 @@ void smurf_starecalc ( int *status ) {
   /* Loop over number of files */
   for ( i=1; i<=isize; i++) {
     /* Open file and flatfield the data */
-    smf_open_and_flatfield( igrp, ogrp, i, &data, status );
+    smf_open_and_flatfield( igrp, ogrp, i, NULL, &data, status );
 
     naver = 200; /* Average every 1 second */
 

@@ -118,7 +118,7 @@ void smurf_scanfit( int * status ) {
   /* Loop over all files */
   for (i=1; i<=size; i++) {
     /* Flatfield - if necessary */
-    smf_open_and_flatfield( igrp, ogrp, i, &ffdata, status );
+    smf_open_and_flatfield( igrp, ogrp, i, NULL, &ffdata, status );
     if (*status == SMF__FLATN) {
       errAnnul( status );
       msgOutif(MSG__VERB, "",
