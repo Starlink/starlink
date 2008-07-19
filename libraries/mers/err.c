@@ -40,11 +40,7 @@
 #include <string.h>
 #include "f77.h"
 #include "merswrap.h"
-
-
-F77_SUBROUTINE(err_facer)( CHARACTER(token),
-                           INTEGER(status)
-                           TRAIL(token) );
+#include "mers_f77.h"
 
 void errFacer( const char *token,
                int *status ) {
@@ -64,9 +60,6 @@ DECLARE_INTEGER(fstatus);
 
    return;
 }
-F77_SUBROUTINE(err_fioer)( CHARACTER(token),
-                           INTEGER(iostat)
-                           TRAIL(token) );
 
 void errFioer( const char *token,
                int iostat ) {
@@ -86,7 +79,6 @@ DECLARE_INTEGER(fiostat);
 
    return;
 }
-F77_SUBROUTINE(err_flbel)( INTEGER(status) );
 
 void errFlbel( int *status ) {
 
@@ -98,7 +90,6 @@ DECLARE_INTEGER(fstatus);
 
    return;
 }
-F77_SUBROUTINE(err_flush)( INTEGER(status) );
 
 void errFlush( int *status ) {
 
@@ -110,7 +101,6 @@ DECLARE_INTEGER(fstatus);
 
    return;
 }
-F77_SUBROUTINE(err_level)( INTEGER(level) );
 
 void errLevel( int *level ) {
 
@@ -122,13 +112,6 @@ DECLARE_INTEGER(flevel);
 
    return;
 }
-F77_SUBROUTINE(err_load)( CHARACTER(param),
-                          INTEGER(parlen),
-                          CHARACTER(opstr),
-                          INTEGER(oplen),
-                          INTEGER(status)
-                          TRAIL(param)
-                          TRAIL(opstr) );
 
 void errLoad( char *param,
               int param_length,
@@ -166,7 +149,6 @@ DECLARE_INTEGER(fstatus);
 
    return;
 }
-F77_SUBROUTINE(err_mark)( void );
 
 void errMark( void ) {
 
@@ -174,11 +156,6 @@ void errMark( void ) {
 
    return;
 }
-F77_SUBROUTINE(err_out)( CHARACTER(param),
-                         CHARACTER(text),
-                         INTEGER(status)
-                         TRAIL(param)
-                         TRAIL(text) );
 
 void errOut( const char *param,
              const char *text,
@@ -206,11 +183,6 @@ DECLARE_INTEGER(fstatus);
 
    return;
 }
-F77_SUBROUTINE(err_rep)( CHARACTER(param),
-                         CHARACTER(text),
-                         INTEGER(status)
-                         TRAIL(param)
-                         TRAIL(text) );
 
 void errRep( const char *param,
              const char *text,
@@ -237,7 +209,6 @@ DECLARE_INTEGER(fstatus);
 
    return;
 }
-F77_SUBROUTINE(err_rlse)( void );
 
 void errRlse( void ) {
 
@@ -245,7 +216,6 @@ void errRlse( void ) {
 
    return;
 }
-F77_SUBROUTINE(err_stat)( INTEGER(status) );
 
 void errStat( int *status ) {
 
@@ -257,9 +227,6 @@ DECLARE_INTEGER(fstatus);
 
    return;
 }
-F77_SUBROUTINE(err_syser)( CHARACTER(token),
-                           INTEGER(systat)
-                           TRAIL(token) );
 
 void errSyser( const char *token,
                int systat ) {
@@ -279,10 +246,6 @@ DECLARE_INTEGER(fsystat);
 
    return;
 }
-F77_SUBROUTINE(err_tune)( CHARACTER(param),
-                          INTEGER(value),
-                          INTEGER(status)
-                          TRAIL(param) );
 
 void errTune( const char *param,
               int value,
@@ -307,7 +270,6 @@ DECLARE_INTEGER(fstatus);
 
    return;
 }
-F77_SUBROUTINE(msg_blank)( INTEGER(status) );
 
 void msgBlank( int *status ) {
 
@@ -321,12 +283,6 @@ DECLARE_INTEGER(fstatus);
 
    return;
 }
-F77_SUBROUTINE(msg_fmtc)( CHARACTER(token),
-                          CHARACTER(format),
-                          CHARACTER(cvalue)
-                          TRAIL(token)
-                          TRAIL(format)
-                          TRAIL(cvalue) );
 
 void msgFmtc( const char *token,
               const char *format,
@@ -356,11 +312,6 @@ DECLARE_CHARACTER_DYN(fcvalue);
 
    return;
 }
-F77_SUBROUTINE(msg_fmtd)( CHARACTER(token),
-                          CHARACTER(format),
-                          DOUBLE(dvalue)
-                          TRAIL(token)
-                          TRAIL(format) );
 
 void msgFmtd( const char *token,
               const char *format,
@@ -387,11 +338,6 @@ DECLARE_DOUBLE(fdvalue);
 
    return;
 }
-F77_SUBROUTINE(msg_fmti)( CHARACTER(token),
-                          CHARACTER(format),
-                          INTEGER(ivalue)
-                          TRAIL(token)
-                          TRAIL(format) );
 
 void msgFmti( const char *token,
               const char *format,
@@ -418,11 +364,6 @@ DECLARE_INTEGER(fivalue);
 
    return;
 }
-F77_SUBROUTINE(msg_fmtl)( CHARACTER(token),
-                          CHARACTER(format),
-                          LOGICAL(lvalue)
-                          TRAIL(token)
-                          TRAIL(format) );
 
 void msgFmtl( const char *token,
               const char *format,
@@ -449,11 +390,6 @@ DECLARE_LOGICAL(flvalue);
 
    return;
 }
-F77_SUBROUTINE(msg_fmtr)( CHARACTER(token),
-                          CHARACTER(format),
-                          REAL(rvalue)
-                          TRAIL(token)
-                          TRAIL(format) );
 
 void msgFmtr( const char *token,
               const char *format,
@@ -480,7 +416,6 @@ DECLARE_REAL(frvalue);
 
    return;
 }
-F77_SUBROUTINE(msg_iflev)( INTEGER(filter) );
 
 void msgIflev( int *filter ) {
 
@@ -492,8 +427,6 @@ DECLARE_INTEGER(ffilter);
 
    return;
 }
-F77_SUBROUTINE(msg_ifset)( INTEGER(filter),
-                           INTEGER(status) );
 
 void msgIfset( int filter,
                int *status ) {
@@ -511,14 +444,6 @@ DECLARE_INTEGER(fstatus);
 
    return;
 }
-F77_SUBROUTINE(msg_load)( CHARACTER(param),
-                          CHARACTER(text),
-                          CHARACTER(opstr),
-                          INTEGER(oplen),
-                          INTEGER(status)
-                          TRAIL(param)
-                          TRAIL(text)
-                          TRAIL(opstr) );
 
 void msgLoad( const char *param,
               const char *text,
@@ -558,11 +483,6 @@ DECLARE_INTEGER(fstatus);
 
    return;
 }
-F77_SUBROUTINE(msg_out)( CHARACTER(param),
-                         CHARACTER(text),
-                         INTEGER(status)
-                         TRAIL(param)
-                         TRAIL(text) );
 
 void msgOut( const char *param,
              const char *text,
@@ -590,12 +510,6 @@ DECLARE_INTEGER(fstatus);
 
    return;
 }
-F77_SUBROUTINE(msg_outif)( INTEGER(prior),
-                           CHARACTER(param),
-                           CHARACTER(text),
-                           INTEGER(status)
-                           TRAIL(param)
-                           TRAIL(text) );
 
 void msgOutif( int prior,
                const char *param,
@@ -627,7 +541,6 @@ DECLARE_INTEGER(fstatus);
 
    return;
 }
-F77_SUBROUTINE(msg_renew)( void );
 
 void msgRenew( void ) {
 
@@ -635,11 +548,6 @@ void msgRenew( void ) {
 
    return;
 }
-
-F77_SUBROUTINE(msg_tune)( CHARACTER(param),
-                          INTEGER(value),
-                          INTEGER(status)
-                          TRAIL(param) );
 
 void msgTune( const char *param,
               int value,
