@@ -53,7 +53,7 @@ PRIVATE_INCLUDES = ERR_CMN ERR_SYS MSG_CMN MSG_SYS
 F_ROUTINES = err1_bell.f err1_print.f \
              err_facer.f err_fioer.f err_flbel.f err_flush.f err_level.f \
              err_load.f err_mark.f err_out.f err_rep.f err_rlse.f err_stat.f \
-             err_syser.f err_tune.f \
+             err_tune.f \
              msg_blank.f msg_fmtc.f msg_fmtd.f msg_fmti.f msg_fmtl.f \
              msg_fmtr.f msg_iflev.f msg_ifset.f msg_load.f msg_out.f \
              msg_outif.f msg_renew.f \
@@ -76,14 +76,14 @@ F_ROUTINES_UT = msg1_gesc.f msg1_gnam.f msg1_putc.f msg1_ktok.f msg1_rform.f
 F_BLOCK_DATA_FILES = msg1_blk.f err1_blk.f
 
 C_INTERFACE_ROUTINES = err.c msgSetc.c msgSetd.c msgSetr.c msgSeti.c \
-msgSetl.c errAnnul.c errBegin.c errEnd.c
+msgSetl.c errAnnul.c errBegin.c errEnd.c errSyser.c
 
 C_INTERFACE_ADAM = err_adam.c
 
 C_INTERFACE_STAND = err_stand.c
 
 F_INTERFACE_ROUTINES = msg_setc.c msg_setd.c msg_setr.c msg_seti.c \
-msg_setl.c err_annul.c err_begin.c err_end.c
+msg_setl.c err_annul.c err_begin.c err_end.c err_syser.c
 
 #  The installation test source
 TEST_SOURCE = err_test.f err_test.c err_test.ifl

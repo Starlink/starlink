@@ -67,8 +67,9 @@
       CALL MSG_SETR( 'RTK', 0.0 )
       CALL MSG_SETI( 'ITK', 0 )
       CALL MSG_SETL( 'LTK', .FALSE. )
+      CALL ERR_SYSER( 'ERR', 32 )
       CALL MSG_OUT( ' ', 'MSG is installed and working. - ^TOK' /
-     :/ ' ^DTK - ^RTK - ^ITK - ^LTK',
+     :/ ' ^DTK - ^RTK - ^ITK - ^LTK - ^ERR',
      :     STATUS )
 
 *  Call ERR_REP and ERR_FLUSH.

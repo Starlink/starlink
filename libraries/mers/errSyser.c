@@ -1,26 +1,26 @@
-      SUBROUTINE ERR_SYSER( TOKEN, SYSTAT )
+/*
 *+
 *  Name:
-*     ERR_SYSER
+*     errSyser
 
 *  Purpose:
 *     Assign an operating system error message to a token.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Invocation:
-*     CALL ERR_SYSER( TOKEN, SYSTAT )
+*     errSyser( const char * token, int systat);
 
 *  Description:
 *     The text of the error message associated with the operating system 
-*     status value, SYSTAT, is assigned to the named message token. This
+*     status value, "systat", is assigned to the named message token. This
 *     token may then be included in an error message.
 
 *  Arguments:
-*     TOKEN = CHARACTER * ( * ) (Given)
+*     token = const char * (Given)
 *        The message token name.
-*     SYSTAT = INTEGER (Given)
+*     systat= int (Given)
 *        The operating system status value.
 
 *  System-specific:
@@ -28,6 +28,7 @@
 *     computer system upon which the library is implemented.
 
 *  Copyright:
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     Copyright (C) 1989 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -49,6 +50,7 @@
 
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -56,24 +58,19 @@
 *        Original version.
 *     15-DEC-1989 (PCTR):
 *        Converted to call EMS_SYSER.
+*     19-JUL-2008 (TIMJ):
+*        Rewrite in C to call emsSyser.
 *     {enter_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
-      
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
+*/
 
-*  Arguments Given:
-      CHARACTER * ( * ) TOKEN
+#include "merswrap.h"
+#include "ems.h"
 
-      INTEGER SYSTAT
-
-*.
-
-*  Load message string for TOKEN.
-      CALL EMS_SYSER( TOKEN, SYSTAT )
-
-      END
+void errSyser( const char * token, int systat) {
+  emsSyser( token, systat );
+}

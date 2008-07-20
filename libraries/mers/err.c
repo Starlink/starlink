@@ -228,25 +228,6 @@ DECLARE_INTEGER(fstatus);
    return;
 }
 
-void errSyser( const char *token,
-               int systat ) {
-
-DECLARE_CHARACTER_DYN(ftoken);
-DECLARE_INTEGER(fsystat);
-
-   F77_CREATE_CHARACTER(ftoken,strlen( token ));
-   F77_EXPORT_CHARACTER(token,ftoken,ftoken_length);
-   F77_EXPORT_INTEGER(systat,fsystat);
-
-   F77_CALL(err_syser)( CHARACTER_ARG(ftoken),
-                        INTEGER_ARG(&fsystat)
-                        TRAIL_ARG(ftoken) );
-
-   F77_FREE_CHARACTER(ftoken);
-
-   return;
-}
-
 void errTune( const char *param,
               int value,
               int *status ) {
