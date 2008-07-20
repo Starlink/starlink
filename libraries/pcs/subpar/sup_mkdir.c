@@ -104,8 +104,8 @@ struct stat statb;
              if ( ! ( statb.st_mode & S_IFDIR ) ) {
 /* Not a directory */
                 status = SAI__ERROR;
-                ems_setc_c("PATH", path, EMS__SZTOK);
-                ems_rep_c("MKDIR1",
+                emsSetnc("PATH", path, EMS__SZTOK);
+                emsRep("MKDIR1",
                           "mkdir error: ^PATH exists and is not a directory", 
                            &status );
              }
@@ -117,11 +117,11 @@ struct stat statb;
              if ( mkdir ( path, S_IRWXU | S_IRWXG | S_IRWXO ) ) {
 /*         error in creating dir */
                 status = SAI__ERROR;
-                ems_syser_c("ERRNO", errno );
-                ems_rep_c("MKDIR2",
+                emsSyser("ERRNO", errno );
+                emsRep("MKDIR2",
                           "^ERRNO", &status );
-                ems_setc_c("PATH", path, EMS__SZTOK);
-                ems_rep_c("MKDIR3",
+                emsSetnc("PATH", path, EMS__SZTOK);
+                emsRep("MKDIR3",
                           "mkdir error: creating ^PATH", &status );
              } else {
                 stat( path, &statb );
@@ -136,8 +136,8 @@ struct stat statb;
    } else {
 /* malloc failed */
       status = SAI__ERROR;
-      ems_syser_c("ERRNO", errno );
-      ems_rep_c("MKDIR4",
+      emsSyser("ERRNO", errno );
+      emsRep("MKDIR4",
                 "^ERRNO", &status );
    }          
 

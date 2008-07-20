@@ -281,7 +281,7 @@ struct stat statb;
                      else
                         {
                         *status = SUBPAR__IFNF;
-                        ems_rep_c("SUP_FIFIL1",
+                        emsRep("SUP_FIFIL1",
                         "malloc failed for name construction", status );
                         }
                      }
@@ -292,7 +292,7 @@ struct stat statb;
 */
                   {
                   *status = SUBPAR__IFNF;
-                  ems_rep_c("SUP_FIFIL2",
+                  emsRep("SUP_FIFIL2",
                   "malloc failed for directory construction", status );
                   }
                }
@@ -303,33 +303,33 @@ struct stat statb;
 /* Failed to malloc for path
 */
             *status = SUBPAR__IFNF;
-            ems_setc_c( "PATH", path_c, EMS__SZTOK);
-            ems_rep_c("SUP_FIFIL3",
+            emsSetnc( "PATH", path_c, EMS__SZTOK);
+            emsRep("SUP_FIFIL3",
             "malloc failed for ^PATH translation", status );
             }
          }
       else
          {
          *status = SUBPAR__IFNF;
-         ems_setc_c( "PATH", path_c, EMS__SZTOK);
-         ems_rep_c("SUP_FIFIL4",
+         emsSetnc( "PATH", path_c, EMS__SZTOK);
+         emsRep("SUP_FIFIL4",
          "Environment variable ^PATH not defined", status );
          }
       }
    else
       {
       *status = SUBPAR__IFNF;
-      ems_rep_c("SUP_FIFIL5",
+      emsRep("SUP_FIFIL5",
       "Failed importing arguments for FIFIL", status );
       }
 
    if ( notfound )
       {
       *status = SUBPAR__IFNF;
-      ems_setc_c( "NAME", name_c, EMS__SZTOK);
-      ems_setc_c( "EXT", ext_c, EMS__SZTOK);
-      ems_setc_c( "PATH", path_c, EMS__SZTOK);
-      ems_rep_c("SUP_FIFIL6",
+      emsSetnc( "NAME", name_c, EMS__SZTOK);
+      emsSetnc( "EXT", ext_c, EMS__SZTOK);
+      emsSetnc( "PATH", path_c, EMS__SZTOK);
+      emsRep("SUP_FIFIL6",
       " SUBPAR: Failed to find file ^NAME^EXT on path ^PATH", status );
       }
       

@@ -115,10 +115,10 @@ struct stat statb;
          if ( ! ( statb.st_mode & S_IFDIR ) ) {
 /* Not a directory */
             *status = SAI__ERROR;
-            ems_rep_c("ADMUS1",
+            emsRep("ADMUS1",
                    "Failed to create ADAM_USER directory", status );
-            ems_setc_c("PATH", buffer, EMS__SZTOK);
-            ems_rep_c("ADMUS2",
+            emsSetnc("PATH", buffer, EMS__SZTOK);
+            emsRep("ADMUS2",
                    "^PATH exists and is not a directory", status );
          }
       } else {
@@ -128,9 +128,9 @@ struct stat statb;
  */
          if ( subpar_mkdir( buffer ) ) {
             *status = SAI__ERROR;
-            ems_rep_c("ADMUS3","Failed to create ADAM_USER directory",status);
-            ems_setc_c( "DIR", buffer, EMS__SZTOK );
-            ems_rep_c("ADMUS4", "^DIR", status);
+            emsRep("ADMUS3","Failed to create ADAM_USER directory",status);
+            emsSetnc( "DIR", buffer, EMS__SZTOK );
+            emsRep("ADMUS4", "^DIR", status);
          }
       }
       if( *(buffer + *aulen -1) != '/' ) {
@@ -146,7 +146,7 @@ struct stat statb;
  */
       buffer[0] = '\0';
       *status = SAI__ERROR;
-      ems_rep_c("ADMUS3","Failed to create ADAM_USER directory",status);
-      ems_rep_c("ADMUS4", "Neither $ADAM_USER nor $HOME are defined", status);
+      emsRep("ADMUS3","Failed to create ADAM_USER directory",status);
+      emsRep("ADMUS4", "Neither $ADAM_USER nor $HOME are defined", status);
    }
 }
