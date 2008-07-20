@@ -83,5 +83,5 @@ F77_SUBROUTINE(err_syser)( CHARACTER(TOKEN), INTEGER(SYSTAT) TRAIL(TOKEN)) {
   F77_IMPORT_CHARACTER( TOKEN, TOKEN_length, token );
 
   errSyser( token, systat );
-
+  starFree( token );
 }
