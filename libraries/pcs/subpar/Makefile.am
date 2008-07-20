@@ -199,11 +199,12 @@ F_ROUTINES = sup_accpt.f \
 C_ROUTINES = sup_admus.c \
              sup_fifil.c \
              sup_mkdir.c \
-             sup_trmsz.c
+             sup_trmsz.c \
+	     subpar.c
 
 # SUBPAR_{CMN,PARERR,SYS} are private to subpar, but they're used additionally
 # by parsecon, dtask and task, by adding a -I../subpar.
-PUBLIC_INCLUDES = SUBPAR_PAR
+PUBLIC_INCLUDES = SUBPAR_PAR subpar.h
 PRIVATE_INCLUDES = SUBPAR_CMN SUBPAR_PARERR SUBPAR_SYS
 
 BUILT_SOURCES = $(include_MESSAGES)
