@@ -5,12 +5,15 @@ dist_bin_SCRIPTS = subpar_link_adam
 include_HEADERS = $(PUBLIC_INCLUDES)
 include_MESSAGES = SUBPAR_ERR subpar_err.h
 
+cincludedir = $(includedir)/star
+cinclude_HEADERS = $(PUBLIC_C_INCLUDES)
+
 noinst_LTLIBRARIES = libsubpar_convenience.la
 libsubpar_convenience_la_SOURCES =	\
 	$(F_ROUTINES)		\
 	$(FPP_ROUTINES)		\
 	$(C_ROUTINES)		\
-	$(PUBLIC_INCLUDES)	\
+	$(PUBLIC_INCLUDES) $(PUBLIC_C_INCLUDES)	\
 	$(include_MESSAGES)	\
 	$(PRIVATE_INCLUDES)
 libsubpar_convenience_la_FCFLAGS = $(AM_FCFLAGS) -I../lex -I../adam -I../messys
@@ -204,7 +207,8 @@ C_ROUTINES = sup_admus.c \
 
 # SUBPAR_{CMN,PARERR,SYS} are private to subpar, but they're used additionally
 # by parsecon, dtask and task, by adding a -I../subpar.
-PUBLIC_INCLUDES = SUBPAR_PAR subpar.h
+PUBLIC_INCLUDES = SUBPAR_PAR
+PUBLIC_C_INCLUDES = subpar.h
 PRIVATE_INCLUDES = SUBPAR_CMN SUBPAR_PARERR SUBPAR_SYS
 
 BUILT_SOURCES = $(include_MESSAGES)
