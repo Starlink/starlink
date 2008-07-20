@@ -1,4 +1,4 @@
-      SUBROUTINE ERR_STAT( STATUS )
+/*
 *+
 *  Name:
 *     ERR_STAT
@@ -7,7 +7,7 @@
 *     Inquire the last reported error status.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Invocation:
 *     CALL ERR_STAT( STATUS )
@@ -25,6 +25,7 @@
 *        it is returned set to SAI__OK.
 
 *  Copyright:
+*     Copyright (C) 2008 Science & Technology Facilities Council.
 *     Copyright (C) 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
 
@@ -46,27 +47,29 @@
 
 *  Authors:
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     25-SEP-1990 (PCTR):
 *        Original version.
+*     19-JUL-2008 (TIMJ):
+*        Rewrite in C.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
+#include "f77.h"
+#include "merswrap.h"
+#include "mers_f77.h"
 
-*  Status:
-      INTEGER STATUS
+F77_SUBROUTINE(err_stat)( INTEGER(STATUS) ) {
+  int status;
 
-*.
-
-*  Call EMS_STAT.
-      CALL EMS_STAT( STATUS )
-
-      END
+  errStat( &status );
+  F77_EXPORT_INTEGER( status, *STATUS );
+}

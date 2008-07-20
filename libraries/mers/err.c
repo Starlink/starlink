@@ -150,13 +150,6 @@ DECLARE_INTEGER(fstatus);
    return;
 }
 
-void errMark( void ) {
-
-   F77_CALL(err_mark)(  );
-
-   return;
-}
-
 void errOut( const char *param,
              const char *text,
              int *status ) {
@@ -206,24 +199,6 @@ DECLARE_INTEGER(fstatus);
 
    F77_FREE_CHARACTER(fparam);
    F77_FREE_CHARACTER(ftext);
-
-   return;
-}
-
-void errRlse( void ) {
-
-   F77_CALL(err_rlse)(  );
-
-   return;
-}
-
-void errStat( int *status ) {
-
-DECLARE_INTEGER(fstatus);
-
-   F77_CALL(err_stat)( INTEGER_ARG(&fstatus) );
-
-   F77_IMPORT_INTEGER(fstatus,*status);
 
    return;
 }

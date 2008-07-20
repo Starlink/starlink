@@ -1,26 +1,32 @@
-      SUBROUTINE ERR_MARK
+/*
 *+
 *  Name:
-*     ERR_MARK
+*     errStat
 
 *  Purpose:
-*     Mark (start) a new error context. 
+*     Inquire the last reported error status.
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink ANSI C
 
 *  Invocation:
-*     CALL ERR_MARK
+*     errStat( int * status );
 
 *  Description:
-*     Begin a new error reporting context so that delivery of subsequently 
-*     reported error messages is deferred and the messages held in the 
-*     error table. Calls to ERR_ANNUL, ERR_FLUSH and ERR_LOAD will only 
-*     flush or annul the contents of the error table within this new 
-*     context.
+*     The current error context is checked for any error messages pending 
+*     output. If none exist, the status argument is returned set to 
+*     SAI__OK. If any messages have been reported, the status argument is 
+*     returned set to the last reported value.
+
+*  Arguments:
+*     status = int * (Returned)
+*        The global status: it returned set to the last reported
+*        error status within the current error context; if none exist,
+*        it is returned set to SAI__OK.
 
 *  Copyright:
-*     Copyright (C) 1983, 1989 Science & Engineering Research Council.
+*     Copyright (C) 2008 Science & Technology Facilities Council.
+*     Copyright (C) 1990 Science & Engineering Research Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -40,33 +46,26 @@
 *     02111-1307, USA
 
 *  Authors:
-*     SLW: Sid Wright (UCL)
-*     RFWS: R.F. Warren-Smith (STARLINK)
 *     PCTR: P.C.T. Rees (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
-*     17-APR-1983 (SLW):
+*     25-SEP-1990 (PCTR):
 *        Original version.
-*     7-AUG-1989 (RFWS):
-*        Converted to new prologue layout and added comments.
-*     12-SEP-1989 (PCTR):
-*        Completed code tidy-up.
-*     15-DEC-1989 (PCTR):
-*        Converted to use EMS_ calls.
+*     19-JUL-2008 (TIMJ):
+*        Rewrite in C.
 *     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
 
 *-
+*/
 
-*  Type Definitions:
-      IMPLICIT NONE                     ! No implicit typing
+#include "merswrap.h"
+#include "ems.h"
 
-*.
- 
-*  Create a new error context.
-      CALL EMS_MARK
-
-      END
+void errStat( int * status ) {
+  emsStat(status);
+}
