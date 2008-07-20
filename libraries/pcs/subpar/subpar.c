@@ -130,3 +130,40 @@ void subParSync( int * status ) {
   return;
 }
 
+F77_SUBROUTINE(subpar_wrerr)(CHARACTER(STRING),INTEGER(STATUS) TRAIL(STRING));
+
+void subParWrerr( const char * string, int * status ) {
+  DECLARE_CHARACTER_DYN(STRING);
+  DECLARE_INTEGER(STATUS);
+
+  F77_CREATE_EXPORT_CHARACTER(string, STRING);
+  F77_EXPORT_INTEGER( *status, STATUS );
+
+  F77_CALL(subpar_wrerr)( CHARACTER_ARG(STRING),
+			  INTEGER_ARG(&STATUS)
+			  TRAIL_ARG(STRING) );
+
+  F77_FREE_CHARACTER(STRING);
+  F77_IMPORT_INTEGER( STATUS, *status );
+
+  return;
+}
+
+F77_SUBROUTINE(subpar_wrmsg)(CHARACTER(STRING),INTEGER(STATUS) TRAIL(STRING));
+
+void subParWrmsg( const char * string, int * status ) {
+  DECLARE_CHARACTER_DYN(STRING);
+  DECLARE_INTEGER(STATUS);
+
+  F77_CREATE_EXPORT_CHARACTER(string, STRING);
+  F77_EXPORT_INTEGER( *status, STATUS );
+
+  F77_CALL(subpar_wrmsg)( CHARACTER_ARG(STRING),
+			  INTEGER_ARG(&STATUS)
+			  TRAIL_ARG(STRING) );
+
+  F77_FREE_CHARACTER(STRING);
+  F77_IMPORT_INTEGER( STATUS, *status );
+
+  return;
+}
