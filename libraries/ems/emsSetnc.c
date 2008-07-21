@@ -99,7 +99,7 @@ void emsSetnc( const char *token, const char *cvalue, int maxchar ){
 /*  Find the used length of the string */
    vallen = maxchar > EMS__SZTOK ? EMS__SZTOK : maxchar;
 
-   (void *)strncpy( valbuf, cvalue, vallen );
+   strncpy( valbuf, cvalue, vallen );
    valbuf[vallen] = '\0';
 
    for ( i=strlen(valbuf); i>0 ; i-- ) {

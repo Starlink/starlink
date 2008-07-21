@@ -130,6 +130,12 @@
 #include "ems_par.h"
 #include "ems_sys.h"
 #include "ems1.h"
+#include "ems.h"
+
+void ems1_starf_( const char *envar, const char *relpath, const char *acmode,
+                  char *filename, int *pathlen,
+                  int envar_len, int relpath_len, int acmode_len,
+                  int filename_len );
 
 #if USE_PTHREADS
 static pthread_mutex_t foo_mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -143,7 +149,7 @@ static pthread_mutex_t foo_mutex = PTHREAD_MUTEX_INITIALIZER;
  *
  ****************************************************************************
  */
-int ems1Starf( char *envar, char *relpath, char *acmode,
+int ems1Starf( const char *envar, const char *relpath, const char *acmode,
                char **filename, int *pathlen )
 {
    char *dir;
@@ -294,7 +300,7 @@ int ems1Starf( char *envar, char *relpath, char *acmode,
  *
  *************************************************************************
  */
-static char *ems1_creim( char *source_f, int source_len )
+static char *ems1_creim( const char *source_f, int source_len )
 {
     /* Local Variables:*/
     int i;			 /* Loop counter */
@@ -331,7 +337,7 @@ static char *ems1_creim( char *source_f, int source_len )
  *
  ***************************************************************************
  */
-void ems1_starf_( char *envar, char *relpath, char *acmode,
+void ems1_starf_( const char *envar, const char *relpath, const char *acmode,
                   char *filename, int *pathlen,
                   int envar_len, int relpath_len, int acmode_len,
                   int filename_len )

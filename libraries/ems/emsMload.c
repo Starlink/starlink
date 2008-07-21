@@ -114,7 +114,7 @@ void emsMload( const char *msg, const char *text, char *opstr, int *oplen,
     } else {
 
         /*  Form output message string. */
-        ems1Form( (char*)text, EMS__SZMSG, !msgtab->msgstm, opstr, oplen, 
+        ems1Form( text, EMS__SZMSG, !msgtab->msgstm, opstr, oplen, 
                   status );
     }
     return;

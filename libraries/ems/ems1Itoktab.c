@@ -46,6 +46,7 @@
 #include "ems_sys.h"                 /* EMS_ private constants */
 #include "ems_err.h"                 /* EMS_ error codes */
 #include "ems_defs.h"                /* Error table definitions */
+#include "ems1.h"
 
 void ems1Itoktab( ems_toktab_t *toktab )
 {

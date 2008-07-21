@@ -85,7 +85,10 @@
 void ems1Serr( char *errstr, int errlen, int *errnum ) 
 {
     /*  Local Variables: */
+#if HAVE_STRERROR_R
+#else
     char *strerr;             /* Pointer for system error message string */
+#endif
 
     /*  Load string. */
     if ( *errnum >= 0 ) {

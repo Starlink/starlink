@@ -144,8 +144,8 @@ void emsTune( const char *key, const int value, int *status );
 
 /* Internal Functions */
 /* Not for general use */
-int ems1Starf( char *envar,       
-              char *relpath, char *acmode, 
+int ems1Starf( const char *envar,       
+              const char *relpath, const char *acmode, 
               char **filename, int *pathlen );
 
 void ems1_get_facility_error( unsigned int errcode,

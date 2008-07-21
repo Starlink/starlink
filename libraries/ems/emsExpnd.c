@@ -100,7 +100,7 @@ void emsExpnd( const char *text, char *opstr, const int maxlen, int *oplen,
     } else {
 
         /*  Form output message string. */
-        ems1Form( (char*)text, maxlen, !msgtab->msgstm, opstr, oplen, status );
+        ems1Form( text, maxlen, !msgtab->msgstm, opstr, oplen, status );
     }
 
     return;

@@ -160,7 +160,7 @@ void ems1Rform( const char *text, const int maxlen, int *iposn, char *string,
  *        length and character pointer. */
          *iposn = *iposn + 1;
          (void)strncpy(
-                string, (char*)&text[ istart ],(size_t)(*iposn-istart) );
+                string, &text[ istart ],(size_t)(*iposn-istart) );
          string[*iposn-istart] = '\0';
          *strlength = *iposn - istart;
       }
@@ -168,7 +168,7 @@ void ems1Rform( const char *text, const int maxlen, int *iposn, char *string,
    else if ( ( iplen > 0 ) && ( *iposn >= iplen ) ) {
 /*     Cannot print beyond end of string, set result to blank and iposn to
  *     zero as per contract */
-       string = "";
+       strcpy(string,"");
        *iposn = 0;
    }
 

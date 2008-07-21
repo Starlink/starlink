@@ -16,6 +16,7 @@
  *     RTP: R.T.Platon (STARLINK)
  *     AJC: A.J. Chipperfield (STARLINK)
  *     PWD: Peter W. Draper (JAC, Durham University)
+ *     TIMJ: Tim Jenness (JAC, Hawaii)
  *     {enter_new_authors_here}
 
  *  History:
@@ -28,6 +29,8 @@
  *        Correct ems1Flush(int status) to (int *status)
  *     15-MAY-2008 (PWD):
  *        Add various new functions to support threading.
+ *     21-JUL-2008 (TIMJ):
+ *        Fix void prototypes
  *     {enter_changes_here}
 
  *  Bugs:
@@ -44,12 +47,12 @@
 
 Logical ems1Gepnd ( void );
 Logical ems1Gtok( const char *namstr, char *tokval, int *tkvlen );
-char *ems1Gthreadbuf();
-ems_msgtab_t *ems1Gmsgtab();
-ems_msgtab_t *ems1Gmsgtab2();
-ems_thread_data_t *ems1Ithreaddata();
-ems_toktab_t *ems1Gtoktab();
-int ems1Starf( char *envar, char *relpath, char *acmode, char **filename, int *pathlen );
+char *ems1Gthreadbuf( void );
+ems_msgtab_t *ems1Gmsgtab( void );
+ems_msgtab_t *ems1Gmsgtab2( void );
+ems_thread_data_t *ems1Ithreaddata( void );
+ems_toktab_t *ems1Gtoktab( void );
+
 void ems1Emark( void );
 void ems1Erlse( void );
 void ems1Estor( const char *param, int plen, const char *msg, int mlen,int *status);
@@ -74,5 +77,8 @@ void ems1Putc( const char *cvalue, const int maxlen, char *string, int *iposn, i
 void ems1Rform( const char *text, const int maxlen, int *iposn, char *string, int *strlength  );
 void ems1Serr( char *errstr, int errlen, int *errnum_p );
 void ems1Stok( const char *token, const char *string );
+void ems1Tblk( void );
+void ems1Eblk( void );
+Logical ems1Iepnd( void );
 
 #endif	/* EMS1_DEFINED */

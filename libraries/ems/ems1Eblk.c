@@ -112,8 +112,6 @@ static ems_msgtab_t ems_msgtab_base_spare = {
 
 ems_msgtab_t *ems_msgtab_spare = &ems_msgtab_base_spare;
 
-extern void ems1Tblk();
-
 void ems1Eblk()
 {
     /* A dummy call to force loading of ems1Tblk as we can't do it within

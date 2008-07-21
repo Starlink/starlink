@@ -140,12 +140,12 @@ void emsRep( const char *err, const char *text, int *status )
 
     /*  Now form the given error message.  Status is not altered by this
      *  routine. */
-    ems1Form( (char*) text, EMS__SZMSG, !msgtab->msgstm, mstr, &mlen, 
+    ems1Form( text, EMS__SZMSG, !msgtab->msgstm, mstr, &mlen, 
               &istat );
 
     /*  Use EMS1_ESTOR to store the error message in the error table. */
     plen = MAX( 1, strlen( err ) );
-    ems1Estor( (char*)err, plen, mstr, mlen, &istat );
+    ems1Estor( err, plen, mstr, mlen, &istat );
 
     /*  Check the returned status for message output errors and attempt to
      *  report an additional error in the case of failure - but only on the
