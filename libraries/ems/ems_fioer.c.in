@@ -134,7 +134,7 @@ typedef struct {
    const char* msg;
 } IostatMessagePair;
 
-static void initMessageInfo();
+static void initMessageInfo(void);
 static const char* alpha_iostat_lookup( const int iostat );
 static int compareIostatMessagePair(const void*, const void*);
 
@@ -582,8 +582,8 @@ static const char* alpha_iostat_lookup( const int iostat )
  */
 static int compareIostatMessagePair(const void* key, const void* element)
 {
-    IostatMessagePair *p1 = (IostatMessagePair*)key;
-    IostatMessagePair *p2 = (IostatMessagePair*)element;
+    const IostatMessagePair *p1 = (const IostatMessagePair*)key;
+    const IostatMessagePair *p2 = (const IostatMessagePair*)element;
     return p1->iostat - p2->iostat;
 }
 
