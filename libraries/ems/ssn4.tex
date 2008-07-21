@@ -23,7 +23,7 @@ Copyright \copyright\ 2008 Science and Technology Facilities Council}
 \newcommand{\stardocauthors}   {P.C.T. Rees \\
                                 A.J. Chipperfield \\
                                 P.W. Draper}
-\newcommand{\stardocdate}      {20 May 2008}
+\newcommand{\stardocdate}      {21 Jul 2008}
 \newcommand{\stardoctitle}     {EMS \\ [\latex{1ex}]
                                 Error Message Service}
 \newcommand{\stardocversion}   {Version 2.2-0}
@@ -1142,9 +1142,10 @@ subroutine library used by the parameter system, data system or user interface.
 \newpage
 \section{\xlabel{threading}Using EMS together with POSIX threads
 \label{threading}}
-When built using the \texttt{--with-pthreads} configuration option, EMS can
-be used in a POSIX threads application or library. The only requirement is
-that the sections of the application that use threads are wrapped in
+When built using the \texttt{--with-pthreads} configuration option, which is
+the default on platforms supporting POSIX threads, EMS can be used in a
+threaded application or library. The only requirement is that the sections of
+the application that use threads are wrapped in
 \texttt{emsMark}/\texttt{emsRlse} blocks, as in:
 \begin{verbatim}
 
@@ -1194,6 +1195,7 @@ shown the error messages:
 \begin{verbatim}
 !! Oh no an error in thread 1
 !  Oh no an error in thread 2
+!  Oh no an error in thread 3
 !  Oh no an error in thread 4
 \end{verbatim}
 will be shown using the default delivery \texttt{printf} mechanism during the

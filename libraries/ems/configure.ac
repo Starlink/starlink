@@ -26,16 +26,17 @@ dnl    If --with-pic=no is set we should honour that.
 AM_CONDITIONAL(NOPIC, test x$pic_mode = xno)
 
 dnl    Conditional defining whether we build with POSIX thread support.
+dnl    We do this by default.
 AC_ARG_WITH([pthreads],
             [ --with-pthreads   Build package with POSIX threads support],
-        if test "$withval" = "yes"; then
-           use_pthreads="yes"
-        else
-           use_pthreads="no"
-        fi,
-        use_pthreads="no")
+            [if test "$withval" = "yes"; then
+               use_pthreads="yes"
+             else
+               use_pthreads="no"
+             fi],
+            [use_pthreads="yes"])
 if test "$use_pthreads" = "yes"; then
-AC_CHECK_LIB([pthread], [pthread_create], ,[use_pthreads="no"])
+   AC_CHECK_LIB([pthread], [pthread_create], ,[use_pthreads="no"])
    if test "$use_pthreads" = "yes"; then
       AC_DEFINE([USE_PTHREADS], [1], [Build with POSIX threads support])
       AC_DEFINE([_REENTRANT], [1], [Make reentrant functions available])

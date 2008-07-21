@@ -1,8 +1,7 @@
 2.2-0
   * Support for using EMS together with POSIX threads has been added.
-    SSN/4 has been updated to describe this change. Note that EMS
-    must be built with the --with-pthreads configuration option for this
-    to be enabled. Currently this is not the default.
+    SSN/4 has been updated to describe this change. This is enabled 
+    by default on platforms with POSIX threads support.
 
 2.1-2
   * A memory overrun bug storing and retrieving parameter names has been 
