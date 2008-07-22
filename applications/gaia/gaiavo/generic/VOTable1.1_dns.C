@@ -45,6 +45,36 @@ namespace votable_11_dns
   // anyTEXT
   // 
 
+  const anyTEXT::any_sequence& anyTEXT::
+  any () const
+  {
+    return this->any_;
+  }
+
+  anyTEXT::any_sequence& anyTEXT::
+  any ()
+  {
+    return this->any_;
+  }
+
+  void anyTEXT::
+  any (const any_sequence& s)
+  {
+    this->any_ = s;
+  }
+
+  const ::xercesc::DOMDocument& anyTEXT::
+  dom_document () const
+  {
+    return *dom_document_;
+  }
+
+  ::xercesc::DOMDocument& anyTEXT::
+  dom_document ()
+  {
+    return *dom_document_;
+  }
+
 
   // astroYear
   // 
@@ -534,6 +564,24 @@ namespace votable_11_dns
     this->RESOURCE1_ = s;
   }
 
+  const RESOURCE::any_sequence& RESOURCE::
+  any () const
+  {
+    return this->any_;
+  }
+
+  RESOURCE::any_sequence& RESOURCE::
+  any ()
+  {
+    return this->any_;
+  }
+
+  void RESOURCE::
+  any (const any_sequence& s)
+  {
+    this->any_ = s;
+  }
+
   const RESOURCE::name_optional& RESOURCE::
   name () const
   {
@@ -652,6 +700,36 @@ namespace votable_11_dns
   type_default_value ()
   {
     return type_default_value_;
+  }
+
+  const RESOURCE::any_attribute_set& RESOURCE::
+  any_attribute () const
+  {
+    return this->any_attribute_;
+  }
+
+  RESOURCE::any_attribute_set& RESOURCE::
+  any_attribute ()
+  {
+    return this->any_attribute_;
+  }
+
+  void RESOURCE::
+  any_attribute (const any_attribute_set& s)
+  {
+    this->any_attribute_ = s;
+  }
+
+  const ::xercesc::DOMDocument& RESOURCE::
+  dom_document () const
+  {
+    return *dom_document_;
+  }
+
+  ::xercesc::DOMDocument& RESOURCE::
+  dom_document ()
+  {
+    return *dom_document_;
   }
 
 
@@ -3733,6 +3811,8 @@ namespace votable_11_dns
   }
 }
 
+#include <xsd/cxx/xml/dom/wildcard-source.hxx>
+
 #include <xsd/cxx/xml/dom/parsing-source.hxx>
 
 namespace votable_11_dns
@@ -3742,7 +3822,9 @@ namespace votable_11_dns
 
   anyTEXT::
   anyTEXT ()
-  : ::xml_schema::type ()
+  : ::xml_schema::type (),
+    dom_document_ (::xsd::cxx::xml::dom::create_document< char > ()),
+    any_ (this->dom_document ())
   {
   }
 
@@ -3750,7 +3832,9 @@ namespace votable_11_dns
   anyTEXT (const anyTEXT& x,
            ::xml_schema::flags f,
            ::xml_schema::container* c)
-  : ::xml_schema::type (x, f, c)
+  : ::xml_schema::type (x, f, c),
+    dom_document_ (::xsd::cxx::xml::dom::create_document< char > ()),
+    any_ (x.any_, this->dom_document ())
   {
   }
 
@@ -3758,7 +3842,9 @@ namespace votable_11_dns
   anyTEXT (const ::xercesc::DOMElement& e,
            ::xml_schema::flags f,
            ::xml_schema::container* c)
-  : ::xml_schema::type (e, f | ::xml_schema::flags::base, c)
+  : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+    dom_document_ (::xsd::cxx::xml::dom::create_document< char > ()),
+    any_ (this->dom_document ())
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
@@ -3776,6 +3862,18 @@ namespace votable_11_dns
       const ::xercesc::DOMElement& i (p.cur_element ());
       const ::xsd::cxx::xml::qualified_name< char > n (
         ::xsd::cxx::xml::dom::name< char > (i));
+
+      // any
+      //
+      if (true)
+      {
+        ::xercesc::DOMElement* r (
+          static_cast< ::xercesc::DOMElement* > (
+            this->dom_document ().importNode (
+              const_cast< ::xercesc::DOMElement* > (&i), true)));
+        this->any ().push_back (r);
+        continue;
+      }
 
       break;
     }
@@ -4501,6 +4599,7 @@ namespace votable_11_dns
   RESOURCE::
   RESOURCE ()
   : ::xml_schema::type (),
+    dom_document_ (::xsd::cxx::xml::dom::create_document< char > ()),
     DESCRIPTION_ (::xml_schema::flags (), this),
     INFO_ (::xml_schema::flags (), this),
     COOSYS_ (::xml_schema::flags (), this),
@@ -4508,10 +4607,12 @@ namespace votable_11_dns
     LINK_ (::xml_schema::flags (), this),
     TABLE_ (::xml_schema::flags (), this),
     RESOURCE1_ (::xml_schema::flags (), this),
+    any_ (this->dom_document ()),
     name_ (::xml_schema::flags (), this),
     ID_ (::xml_schema::flags (), this),
     utype_ (::xml_schema::flags (), this),
-    type_ (type_default_value (), ::xml_schema::flags (), this)
+    type_ (type_default_value (), ::xml_schema::flags (), this),
+    any_attribute_ (this->dom_document ())
   {
   }
 
@@ -4520,6 +4621,7 @@ namespace votable_11_dns
             ::xml_schema::flags f,
             ::xml_schema::container* c)
   : ::xml_schema::type (x, f, c),
+    dom_document_ (::xsd::cxx::xml::dom::create_document< char > ()),
     DESCRIPTION_ (x.DESCRIPTION_, f, this),
     INFO_ (x.INFO_, f, this),
     COOSYS_ (x.COOSYS_, f, this),
@@ -4527,10 +4629,12 @@ namespace votable_11_dns
     LINK_ (x.LINK_, f, this),
     TABLE_ (x.TABLE_, f, this),
     RESOURCE1_ (x.RESOURCE1_, f, this),
+    any_ (x.any_, this->dom_document ()),
     name_ (x.name_, f, this),
     ID_ (x.ID_, f, this),
     utype_ (x.utype_, f, this),
-    type_ (x.type_, f, this)
+    type_ (x.type_, f, this),
+    any_attribute_ (x.any_attribute_, this->dom_document ())
   {
   }
 
@@ -4539,6 +4643,7 @@ namespace votable_11_dns
             ::xml_schema::flags f,
             ::xml_schema::container* c)
   : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+    dom_document_ (::xsd::cxx::xml::dom::create_document< char > ()),
     DESCRIPTION_ (f, this),
     INFO_ (f, this),
     COOSYS_ (f, this),
@@ -4546,10 +4651,12 @@ namespace votable_11_dns
     LINK_ (f, this),
     TABLE_ (f, this),
     RESOURCE1_ (f, this),
+    any_ (this->dom_document ()),
     name_ (f, this),
     ID_ (f, this),
     utype_ (f, this),
-    type_ (f, this)
+    type_ (f, this),
+    any_attribute_ (this->dom_document ())
   {
     if ((f & ::xml_schema::flags::base) == 0)
     {
@@ -4648,6 +4755,18 @@ namespace votable_11_dns
         continue;
       }
 
+      // any
+      //
+      if (!n.namespace_ ().empty ())
+      {
+        ::xercesc::DOMElement* r (
+          static_cast< ::xercesc::DOMElement* > (
+            this->dom_document ().importNode (
+              const_cast< ::xercesc::DOMElement* > (&i), true)));
+        this->any ().push_back (r);
+        continue;
+      }
+
       break;
     }
 
@@ -4690,6 +4809,20 @@ namespace votable_11_dns
           type_traits::create (i, f, this));
 
         this->type (r);
+        continue;
+      }
+
+      // any_attribute
+      //
+      if ((!n.namespace_ ().empty () &&
+           n.namespace_ () != ::xsd::cxx::xml::bits::xmlns_namespace< char > () &&
+           n.namespace_ () != ::xsd::cxx::xml::bits::xsi_namespace< char > ()))
+      {
+        ::xercesc::DOMAttr* r (
+          static_cast< ::xercesc::DOMAttr* > (
+            this->dom_document ().importNode (
+              const_cast< ::xercesc::DOMAttr* > (&i), true)));
+        this->any_attribute ().insert (r);
         continue;
       }
     }

@@ -298,11 +298,36 @@ namespace votable_11
 
 #include <xsd/cxx/xml/dom/parsing-header.hxx>
 
+#include <xsd/cxx/tree/containers-wildcard.hxx>
+
 namespace votable_11
 {
   class anyTEXT: public ::xml_schema::type
   {
     public:
+    // any
+    // 
+    typedef ::xsd::cxx::tree::element_sequence any_sequence;
+    typedef any_sequence::iterator any_iterator;
+    typedef any_sequence::const_iterator any_const_iterator;
+
+    const any_sequence&
+    any () const;
+
+    any_sequence&
+    any ();
+
+    void
+    any (const any_sequence& s);
+
+    // DOMDocument for wildcard content.
+    //
+    const ::xercesc::DOMDocument&
+    dom_document () const;
+
+    ::xercesc::DOMDocument&
+    dom_document ();
+
     // Constructors.
     //
     anyTEXT ();
@@ -330,6 +355,9 @@ namespace votable_11
            ::xml_schema::flags);
 
     protected:
+    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > dom_document_;
+
+    any_sequence any_;
   };
 
   class astroYear: public ::xml_schema::token
@@ -982,6 +1010,21 @@ namespace votable_11
     void
     RESOURCE1 (const RESOURCE1_sequence& s);
 
+    // any
+    // 
+    typedef ::xsd::cxx::tree::element_sequence any_sequence;
+    typedef any_sequence::iterator any_iterator;
+    typedef any_sequence::const_iterator any_const_iterator;
+
+    const any_sequence&
+    any () const;
+
+    any_sequence&
+    any ();
+
+    void
+    any (const any_sequence& s);
+
     // name
     // 
     typedef ::xml_schema::token name_type;
@@ -1065,6 +1108,29 @@ namespace votable_11
     static const type_type&
     type_default_value ();
 
+    // any_attribute
+    // 
+    typedef ::xsd::cxx::tree::attribute_set< char > any_attribute_set;
+    typedef any_attribute_set::iterator any_attribute_iterator;
+    typedef any_attribute_set::const_iterator any_attribute_const_iterator;
+
+    const any_attribute_set&
+    any_attribute () const;
+
+    any_attribute_set&
+    any_attribute ();
+
+    void
+    any_attribute (const any_attribute_set& s);
+
+    // DOMDocument for wildcard content.
+    //
+    const ::xercesc::DOMDocument&
+    dom_document () const;
+
+    ::xercesc::DOMDocument&
+    dom_document ();
+
     // Constructors.
     //
     RESOURCE ();
@@ -1092,6 +1158,8 @@ namespace votable_11
            ::xml_schema::flags);
 
     protected:
+    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > dom_document_;
+
     DESCRIPTION_optional DESCRIPTION_;
     INFO_sequence INFO_;
     COOSYS_sequence COOSYS_;
@@ -1099,11 +1167,13 @@ namespace votable_11
     LINK_sequence LINK_;
     TABLE_sequence TABLE_;
     RESOURCE1_sequence RESOURCE1_;
+    any_sequence any_;
     name_optional name_;
     ID_optional ID_;
     utype_optional utype_;
     ::xsd::cxx::tree::one< type_type > type_;
     static const type_type type_default_value_;
+    any_attribute_set any_attribute_;
   };
 
   class DEFINITIONS: public ::xml_schema::type

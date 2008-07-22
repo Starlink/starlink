@@ -74,7 +74,7 @@ PKG_HEADERS	= @PKG_HEADERS@
 PKG_LIB_FILE	= @PKG_LIB_FILE@
 PKG_STUB_LIB_FILE = @PKG_STUB_LIB_FILE@
 
-PKG_BIN_FILE	= vot2tab$(EXEEXT) tab2vot$(EXEEXT) listvot$(EXEEXT) 
+PKG_BIN_FILE	= vot2tab$(EXEEXT) tab2vot$(EXEEXT) listvot$(EXEEXT)
 
 bin_BINARIES	= $(PKG_BIN_FILE) $(PROGS)
 lib_BINARIES	= $(PKG_LIB_FILE)
@@ -433,7 +433,7 @@ Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(top_builddir)/c
 	cd $(top_builddir) \
 	  && CONFIG_FILES=$@ CONFIG_HEADERS= $(SHELL) ./config.status
 
-#  Reconfigure when configure is younger than config.status. Sign of 
+#  Reconfigure when configure is younger than config.status. Sign of
 #  update from svn of build system.
 config.status: $(top_builddir)/configure
 	cd $(top_builddir) \
@@ -489,18 +489,24 @@ VOTable1.1.C: VOTable1.1.xsd
 	    --namespace-map http://www.ivoa.net/xml/VOTable/v1.1=votable_11 \
 	    --parser-regex '/VOTABLE/VOTABLE_read/' \
 	    --serializer-regex '/VOTABLE/VOTABLE_write/' \
+	    --generate-wildcard \
 	    VOTable1.1.xsd
-	rm -f VOTable1.1.C
-	mv VOTable1.1.cxx VOTable1.1.C
+	rm -f generic/VOTable1.1.C
+	mv VOTable1.1.cxx generic/VOTable1.1.C
+	rm -f generic/VOTable1.1.hxx
+	mv VOTable1.1.hxx generic/VOTable1.1.hxx
 
 #  Note no serialization support for this. Do not want to write these.
 VOTable1.1_dns.C: VOTable1.1_dns.xsd
 	xsd cxx-tree --root-element VOTABLE \
 	    --namespace-map '=votable_11_dns' \
 	    --parser-regex '/VOTABLE/VOTABLE_read/' \
+	    --generate-wildcard \
 	    VOTable1.1_dns.xsd
-	rm -f VOTable1.1_dns.C
-	mv VOTable1.1_dns.cxx VOTable1.1_dns.C
+	rm -f generic/VOTable1.1_dns.C
+	mv VOTable1.1_dns.cxx generic/VOTable1.1_dns.C
+	rm -f generic/VOTable1.1_dns.hxx
+	mv VOTable1.1_dns.hxx generic/VOTable1.1_dns.hxx
 
 #  Local dependencies.
 VOTableWriteFunctions.o: ./generic/VOTableWriteFunctions.icc
