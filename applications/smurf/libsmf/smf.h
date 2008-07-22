@@ -1055,4 +1055,7 @@ void smf_find_subarray ( const smfHead * hdr, char subarray[],
 void smf_choose_darks( const smfArray *darks, const smfData *indata,
                        size_t *dark1, size_t *dark2, int * status );
 
+void smf_subtract_dark ( smfData * indata, const smfData * dark1, 
+  const smfData * dark2, smf_dark_sub_meth method, int *status );
+
 #endif /* SMF_DEFINED */

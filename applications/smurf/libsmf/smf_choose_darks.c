@@ -85,12 +85,15 @@ typedef struct {
 void smf_choose_darks( const smfArray *darks, const smfData *indata,
                        size_t *dark1, size_t *dark2, int * status ) {
   size_t i;          /* loop counter */
-  const double maxdiff = 10.0; /* maximum gap between dark and science */
+  const double maxdiff = 15.0; /* maximum gap between dark and science */
   double reftime;    /* MJD of input science data */
   int refsubnum;     /* Subarray number of science data */
 
   smf_timediff prev; /* information on closest previous */
   smf_timediff next; /* information on closest next */
+
+  *dark1 = (size_t)-1;
+  *dark2 = (size_t)-1;
 
   if (*status  != SAI__OK) return;
 
@@ -115,13 +118,13 @@ void smf_choose_darks( const smfArray *darks, const smfData *indata,
     if (thissubnum == refsubnum) {
       double thistime = (thisdark->hdr->allState)[0].rts_end;
       double diff = reftime - thistime;
-      if (diff < 0) {
-        diff = fabs(diff);
+      if (diff > 0) {
         if (prev.diff > diff) {
           prev.diff = diff;
           prev.index = i;
         }
-      } else if (diff > 0) {
+      } else if (diff < 0) {
+        diff = fabs(diff);
         if (next.diff > diff) {
           next.diff = diff;
           next.index = i;
@@ -138,6 +141,9 @@ void smf_choose_darks( const smfArray *darks, const smfData *indata,
     }
   }
 
+  printf("PREV: %d - %f\n", (int)prev.index, prev.diff);
+  printf("NEXT: %d - %f\n", (int)next.index, next.diff);
+
   /* if we found a previous, see how close it really was
       - reduced darks still have all JCMTState if processed by
       SMURF internally.
@@ -152,13 +158,14 @@ void smf_choose_darks( const smfArray *darks, const smfData *indata,
     difftime *= SPD;
     if ( difftime > maxdiff ) {
       /* dark is no good */
+      printf(" Dark is no good. Diff is %f\n",difftime);
       prev.index = -1;
     }
 
   }
 
   if (next.index != (size_t)-1) {
-    smfData *thisdark = (darks->sdata)[prev.index];
+    smfData *thisdark = (darks->sdata)[next.index];
     size_t endframe = indata->hdr->nframes - 1;
     double starttime = (thisdark->hdr->allState)[0].rts_end;
     double refendtime = (indata->hdr->allState)[endframe].rts_end;

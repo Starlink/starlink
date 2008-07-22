@@ -14,7 +14,8 @@
 
 *  Invocation:
 *     smf_open_and_flatfield( const Grp *igrp, const Grp *ogrp, size_t index,
-*                             smfData **data, int *status );
+*                             const smfArray* darks,smfData **data,
+*                             int *status );
 
 *  Arguments:
 *     igrp = const Grp* (Given)
@@ -23,6 +24,8 @@
 *        Pointer to an output group
 *     index = size_t (Given)
 *        Index into the group
+*     darks = const smfArray* (Given)
+*        Set of darks that could be applied. Can be NULL.
 *     data = smfData** (Returned)
 *        Pointer to a pointer to smfData struct containing flatfielded data.
 *        Will be created by this routine, or NULL on error.
@@ -158,6 +161,9 @@ void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
 
   if ( *status != SAI__OK ) return;
 
+  /* might be useful later on for provenance */
+  smf_get_taskname( NULL, prvname, status );
+
   if ( ogrp != NULL ) {
     /* Open the input file solely to propagate it to the output file */
     ndgNdfas( igrp, index, "READ", &indf, status );
@@ -199,7 +205,6 @@ void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
        for raw data with many INCOMPS NDFs. */
     if (ogrp != NULL) {
       /* need an ndfid */
-      smf_get_taskname( NULL, prvname, status );
       smf_accumulate_prov( data, igrp, index, (*ffdata)->file->ndfid,
                            prvname, status );
     }
@@ -248,8 +253,9 @@ void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
       smf_choose_darks( darks, *ffdata, &dark1, &dark2, status );
 
       /* and correct for dark */
-      /* smf_subtract_dark( ffdata, darks->sdata[dark1], darks->sdata[dark2],
-         SMF__DKSUB_PREV, status );  */
+      smf_subtract_dark( data, darks->sdata[dark1], darks->sdata[dark2],
+         SMF__DKSUB_PREV, status );
+
     }
 
     /* Flatfield the data */
