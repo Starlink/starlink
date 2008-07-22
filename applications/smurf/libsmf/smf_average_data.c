@@ -155,8 +155,14 @@ void smf_average_data( const smfData *data, int start,  int nslice,
 
   /* check type */
   if (data->dtype != SMF__DOUBLE) {
+    const char * typestr = NULL;
+    typestr = smf_dtype_str( data->dtype, status);
     *status = SAI__ERROR;
-    msgSetc( "TYP", smf_dtype_str(data->dtype, status ) );
+    if (typestr) {
+      msgSetc( "TYP", typestr );
+    } else {
+      msgSetc( "TYP", "UNDEF" );
+    }
     errRep(" ", FUNC_NAME ": This function averages _DOUBLE only not ^TYP",
            status );
     return;
