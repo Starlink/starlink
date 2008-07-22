@@ -1,10 +1,10 @@
 /*
 *+
 *  Name:
-*     smf_average_data
+*     smf_average_dataD
 
 *  Purpose:
-*     Average SCUBA-2 timestream data
+*     Average SCUBA-2 timestream data _DOUBLEs
 
 *  Language:
 *     Starlink ANSI C
@@ -46,7 +46,8 @@
 *     to 0, irrespective of the value of interval.
 
 *  Notes:
-*     The caller should free the memory allocated in avdata by this routine
+*     - Should only be used on _DOUBLE (flatfielded) data.
+*     - The caller should free the memory allocated in avdata by this routine
 *     by using smf_free.
 
 *  Authors:

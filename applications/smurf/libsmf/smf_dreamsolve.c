@@ -329,7 +329,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
       if ( naver == 1 ) {
 	tstream = (data->pntr)[0];
       } else {
-	smf_average_data( data, 0, naver, nsampcycle, &tstream, &nelem, status );
+	smf_average_dataD( data, 0, naver, nsampcycle, &tstream, &nelem, status );
       }
       for ( cycle=0; cycle<ncycles/naver; cycle++ ) {
 	/* Extract the raw data of a cycle. */

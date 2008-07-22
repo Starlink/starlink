@@ -46,7 +46,7 @@ smf_dream_setjig.c smf_dreamsolve.c smf_store_image.c\
 smf_open_ndfname.c smf_string_to_dtype.c smf_create_lutwcs.c \
 smf_calc_telpos.c smf_telpos_get.c smf_dream_getgrid.c smf_dream_calcweights.c\
 smf_cubebounds.c smf_cubegrid.c smf_convert_system.c smf_makefitschan.c smf_detpos_wcs.c\
-smf_subtract_plane1.c smf_subtract_plane2.c smf_average_data.c \
+smf_subtract_plane1.c smf_subtract_plane2.c smf_average_dataD.c \
 smf_calc_stareimage.c smf_fits_export2DA.c smf_geod.c smf_instap_get.c \
 smf_calcmodel_ast.c smf_calcmodel_com.c smf_calcmodel_noi.c \
 smf_labelunit.c smf_sparsebounds.c smf_rebinsparse.c \

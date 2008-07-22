@@ -156,7 +156,7 @@ void smf_calc_stareimage( smfData *data, const int naver, int *status) {
     /* Loop over the number of output images */
     for ( j=0; j<numimages; j++) {
       /* Average the time stream data over the desired interval */
-      smf_average_data( data, j*naver, naver, 1, &avdata, &npts, status );
+      smf_average_dataD( data, j*naver, naver, 1, &avdata, &npts, status );
 
       /* Temporary */
       zero = smf_malloc( npts, sizeof(double), 1, status );
