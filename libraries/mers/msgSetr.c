@@ -84,6 +84,6 @@
 #include "merswrap.h"
 #include "ems.h"
 
-void msgSetr( const char * token, double rvalue ) {
-  emsSetd( token, rvalue );
+void msgSetr( const char * token, float rvalue ) {
+  emsSetr( token, rvalue );
 }
