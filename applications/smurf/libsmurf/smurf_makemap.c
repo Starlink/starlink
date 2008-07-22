@@ -435,6 +435,9 @@
 *        - new interface to smf_open_ndfname
 *     2008-07-11 (TIMJ):
 *        use strlcat
+*     2008-07-22 (AGG):
+*        Refactor provenance handling loop, initialize spread
+*        parameter to AST__NEAREST
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -565,7 +568,7 @@ void smurf_makemap( int *status ) {
   HDSLoc *smurfloc=NULL;     /* HDS locator of SMURF extension */
   AstFrameSet *spacerefwcs = NULL;/* WCS Frameset for spatial reference axes */
   AstFrameSet *specrefwcs = NULL;/* WCS Frameset for spectral reference axis */
-  int spread;                /* Code for pixel spreading scheme */
+  int spread = AST__NEAREST; /* Code for pixel spreading scheme */
   double steptime = VAL__BADD; /* Integration time per sample, from FITS header */
   char system[10];           /* Celestial coordinate system for output image */
   smfData *tdata=NULL;       /* Exposure time data */
@@ -596,7 +599,7 @@ void smurf_makemap( int *status ) {
   /* Get group of input files */
   ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
 
-  /* Get the celestial coordinate system for the output cube. */
+  /* Get the celestial coordinate system for the output map */
   parChoic( "SYSTEM", "TRACKING", "TRACKING,FK5,ICRS,AZEL,GALACTIC,"
             "GAPPT,FK4,FK4-NO-E,ECLIPTIC", 1, system, 10, status );
   
@@ -611,13 +614,12 @@ void smurf_makemap( int *status ) {
   }
 
   /* Get METHOD - set rebin/iterate flags */
-  parChoic( "METHOD", "REBIN", 
-            "REBIN, ITERATE.", 1,
-            method, LEN__METHOD, status);
+  parChoic( "METHOD", "REBIN", "REBIN, ITERATE.", 1,
+	    method, LEN__METHOD, status);
   if( strncmp( method, "REBIN", 5 ) == 0 ) {
     rebin = 1;
     iterate = 0;
-  } else if ( strncmp( method, "ITERATE", 5 ) == 0 ) {
+  } else if ( strncmp( method, "ITERATE", 7 ) == 0 ) {
     rebin = 0;
     iterate = 1;
   }
@@ -717,7 +719,6 @@ void smurf_makemap( int *status ) {
   /* Create an output smfData */
   if (*status == SAI__OK) {
     ndgCreat ( "OUT", NULL, &ogrp, &outsize, &flag, status );
-
     /* If OUT is NULL annul the bad status but set a flag so that we
        know to skip memory checks and actual map-making */
     if( *status == PAR__NULL ) {
@@ -960,7 +961,6 @@ void smurf_makemap( int *status ) {
           }
         }
       }
-
     L999:
 
       /* Calculate exposure time per output pixel from weights array -
@@ -1107,42 +1107,32 @@ void smurf_makemap( int *status ) {
     hitsmap = smf_malloc( nxy, sizeof (int), 1, status);
 
     /* Loop over all input data files to setup provenance handling */
-    if( *status == SAI__OK ) {
-      for(i=1; i<=size; i++ ) {	
-
-        if (*status == SAI__OK) {
-          smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data,status );
-          if( *status != SAI__OK) {
-            errRep(FUNC_NAME, "Bad status opening smfData", status);      
-          }
-        }
-        
-        /* Store steptime for calculating EXP_TIME */
-        if( (i==1) && (*status == SAI__OK) ) {
-          smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
-        }
-
-        /* Check units are consistent */
-        if( *status == SAI__OK ) {
-          smf_check_units( i, data_units, data->hdr, status);
-        }
-
-        /* Propagate provenance to the output file */
-        smf_accumulate_prov( data, igrp, i, ondf, "SMURF:MAKEMAP(ITER)",
-                             status);
-
-        /* Handle output FITS header creation (since the file is open and
-           the header is available) */
-        if( *status == SAI__OK ) {
-          smf_fits_outhdr( data->hdr->fitshdr, &fchan, NULL, status );
-        }
-
-        /* close the input file */
-        smf_close_file( &data, status );
-
-        /* Exit loop if error status */
-        if( *status != SAI__OK ) break;
+    for(i=1; (i<=size) && ( *status == SAI__OK ); i++ ) {	
+      smf_open_file( igrp, i, "READ", SMF__NOCREATE_DATA, &data, status );
+      if( *status != SAI__OK) {
+	msgSeti("I",i);
+	msgSeti("S",size);
+	errRep(FUNC_NAME, "Error opening input file ^I of ^S for provenance tracking", status);
       }
+        
+      /* Store steptime for calculating EXP_TIME */
+      if ( i==1 ) {
+	smf_fits_getD(data->hdr, "STEPTIME", &steptime, status);
+      }
+
+      /* Check units are consistent */
+      smf_check_units( i, data_units, data->hdr, status);
+
+      /* Propagate provenance to the output file */
+      smf_accumulate_prov( data, igrp, i, ondf, "SMURF:MAKEMAP(ITER)",
+			   status);
+
+      /* Handle output FITS header creation (since the file is open and
+	 the header is available) */
+      smf_fits_outhdr( data->hdr->fitshdr, &fchan, NULL, status );
+
+      /* close the input file */
+      smf_close_file( &data, status );
     }
 
     /* Call the low-level iterative map-maker */
@@ -1197,7 +1187,6 @@ void smurf_makemap( int *status ) {
     smf_close_file ( &wdata, status );
     smf_close_file ( &odata, status );
     
-
   } else {
     /* no idea what mode */
     if (*status == SAI__OK) {
