@@ -258,8 +258,8 @@ void smf_open_newfile( const Grp * igrp, int index, smf_dtype dtype, const int n
   }
 
   /* Fill the smfData */
-  *data = smf_construct_smfData( *data, file, NULL, NULL, dtype, pntr, dims, ndims, 
-				 0, 0, NULL, NULL, status);
+  *data = smf_construct_smfData( *data, file, NULL, NULL, dtype, pntr, 1, dims,
+                                 ndims, 0, 0, NULL, NULL, status);
 
   if ( *data == NULL ) {
     if ( *status == SAI__OK ) {

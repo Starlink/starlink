@@ -15,10 +15,10 @@
 *  Invocation:
 *     pntr = smf_construct_smfData( smfData * tofill, smfFile * file, 
 *                      smfHead * hdr, smfDA * da, 
-*		       smf_dtype dtype, void * pntr[3], 
+*		       smf_dtype dtype, void * pntr[3], int isTordered, 
 *		       const dim_t dims[], int ndims,
-*		       int virtual, int ncoeff, double *poly, AstKeyMap * history,
-*          int * status );
+*		       int virtual, int ncoeff, double *poly, 
+*                      AstKeyMap * history, int * status );
 
 *  Arguments:
 *     tofill = smfData * (Given)
@@ -40,6 +40,8 @@
 *     pntr[3] = void* (Given)
 *        Array of pointers to data, variance and quality. Pointers will
 *        be copied from this array.
+*     isTordered = int (Given)
+*        If set, data is ICD-compliant time-ordered. Otherwise bolom-ordered.
 *     dims[] = const dim_t (Given)
 *        Array of dimensions. Values will be copied from this array.
 *     ndims = int (Given)
@@ -77,6 +79,7 @@
 *  Authors:
 *     Tim Jenness (TIMJ)
 *     Andy Gibb (UBC)
+*     Edward Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -88,6 +91,8 @@
 *        Add history AstKeyMap
 *     2006-08-08 (TIMJ):
 *        Should use dim_t not int (again)!
+*     2008-07-21 (EC):
+*        Add isTordered flag
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -134,8 +139,8 @@
 smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr, 
 		       smfDA * da, smf_dtype dtype, 
-		       void * pntr[3], const dim_t dims[], int ndims,
-		       int virtual, int ncoeff, double *poly, 
+		       void * pntr[3], int isTordered, const dim_t dims[], 
+                       int ndims, int virtual, int ncoeff, double *poly, 
 		       AstKeyMap *history, int * status ) {
 
   /* need to make sure that any memory we malloc will be freed on error 
@@ -199,6 +204,7 @@ smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr,
       data->ncoeff = ncoeff;
       data->poly = poly;
       data->history = history;
+      data->isTordered = isTordered;
     }
   }
 

@@ -14,7 +14,7 @@
 
 *  Invocation:
 *     smf_open_ndf( const int newndf, const char accmode[],
-*       const char filename[]
+*                   const char filename[]
 *		    smf_dtype dtype, smfData **ndfdata, * int *status);
 
 *  Arguments:
@@ -169,7 +169,8 @@ void smf_open_ndf( const int newndf, const char accmode[],
   }
 
   /* And populate the new smfData */
-  *ndfdata = smf_construct_smfData( *ndfdata, newfile, NULL, NULL, dtype, datarr, 
-				    ddims, ndims, 0, 0, NULL, NULL, status );
+  *ndfdata = smf_construct_smfData( *ndfdata, newfile, NULL, NULL, dtype, 
+                                    datarr, 1, ddims, ndims, 0, 0, NULL, NULL, 
+                                    status );
 
 }

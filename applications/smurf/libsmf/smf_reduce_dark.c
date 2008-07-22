@@ -128,7 +128,7 @@ void smf_reduce_dark( const smfData *indark, smfData **outdark,
   if (indark->history) history = astCopy( indark->history );
 
   *outdark = smf_construct_smfData( NULL, NULL,  hdr, NULL,
-                                    indark->dtype, pntr, dims, 2, 0, 0,
+                                    indark->dtype, pntr, 1, dims, 2, 0, 0,
                                     NULL, history, status );
 
   return;

@@ -24,9 +24,13 @@
 *     flags = const int (Given)
 *        Control which items are copied. The following flag values
 *        are supported (and can be combined):
-*          - SMF__NOCREATE_HEAD   Do not copy the smfHead
-*          - SMF__NOCREATE_FILE   Do not copy the smfFile
-*          - SMF__NOCREATE_DA     Do not copy the smfDA
+*          - SMF__NOCREATE_HEAD     Do not copy the smfHead
+*          - SMF__NOCREATE_FILE     Do not copy the smfFile
+*          - SMF__NOCREATE_DA       Do not copy the smfDA
+*          - SMF__NOCREATE_DATA     Do not copy DATA component
+*          - SMF__NOCREATE_VARIANCE Do not copy VARIANCE component
+*          - SMF__NOCREATE_QUALITY  Do not copy QUALITY component
+*    
 *     status = int* (Given and Returned)
 *        Pointer to global status.
 
@@ -48,6 +52,7 @@
 *  Authors:
 *     Tim Jenness (TIMJ)
 *     Andy Gibb (UBC)
+*     Ed Chapin (UBC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -69,6 +74,9 @@
 *     2008-07-16 (TIMJ):
 *        Document flags. Do not copy the NDF id (otherwise smf_close_file
 *        will not try to free the malloced memory)
+*     2008-08-22 (EC):
+*        -Implements SMF__NOCREATE_DATA/VARIANCE/QUALITY
+*        -Copy isTordered flag
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -117,12 +125,14 @@ smfData *
 smf_deepcopy_smfData( const smfData *old, const int rawconvert, 
 		      const int flags, int * status ) {
 
+  int create[3];              /* Flag for copying each component */
   smfDA *da = NULL;           /* New smfDA */
   dim_t dims[NDF__MXDIM];     /* Dimensions of each axis of data array */
   smf_dtype dtype;            /* Data type */
   smfFile *file = NULL;       /* New smfFile */
   smfHead *hdr = NULL;        /* New smfHead */
   size_t i;                   /* Loop counter */
+  int isTordered;             /* Data order */
   size_t j;                   /* Loop counter */
   size_t nbytes;              /* Number of bytes in data type */
   dim_t ncoeff = 0;           /* Number of coefficients */
@@ -143,6 +153,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
   ncoeff = old->ncoeff;
   virtual = old->virtual;
   dtype = old->dtype;
+  isTordered = old->isTordered;
   for (i=0; i<ndims; i++) {
     dims[i] = (old->dims)[i];
   }
@@ -158,9 +169,29 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
     msgOutif(MSG__DEBUG," ", "No history to copy. Continuing, but this may cause problems later", status);
   }
 
+  /* Set elements of create to reflect SMF__NOCREATE flags */
+  
+  if( flags & SMF__NOCREATE_DATA ) {
+    create[0] = 0;
+  } else {
+    create[0] = 1;
+  }
+
+  if( flags & SMF__NOCREATE_VARIANCE ) {
+    create[1] = 0;
+  } else {
+    create[1] = 1;
+  }
+
+  if( flags & SMF__NOCREATE_QUALITY ) {
+    create[2] = 0;
+  } else {
+    create[2] = 1;
+  }
+
   /* DATA and VARIANCE */
   for (i=0; i<2; i++) {
-    if ( (old->pntr)[i] != NULL ) {
+    if ( ((old->pntr)[i] != NULL) && create[i] ) {
       /* Check if we are converting from integer to double */
       if (rawconvert && (old->dtype == SMF__INTEGER) ) {
         nbytes = sizeof(double);
@@ -199,7 +230,7 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
     }
   }
   /* Quality */
-  if ( (old->pntr)[2] != NULL ) {
+  if ( ((old->pntr)[2] != NULL) && create[2] ) {
     pntr[2] = smf_malloc( npts, 1, 0, status);
     if ( pntr[2] == NULL ) {
       *status = SAI__ERROR;
@@ -240,8 +271,9 @@ smf_deepcopy_smfData( const smfData *old, const int rawconvert,
     da = smf_deepcopy_smfDA( old, status );
 
   /* Construct the new smfData */
-  new = smf_construct_smfData( new, file, hdr, da, dtype, pntr, dims, ndims, 
-                               virtual, ncoeff, poly, history, status);
+  new = smf_construct_smfData( new, file, hdr, da, dtype, pntr, isTordered, 
+                               dims, ndims, virtual, ncoeff, poly, history, 
+                               status);
 
   return new;
 }

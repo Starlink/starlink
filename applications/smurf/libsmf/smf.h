@@ -441,8 +441,8 @@ smf_construct_smfDA( smfDA * tofill, int *dksquid, double * flatcal,
 		     int * status );
 smfData *
 smf_construct_smfData( smfData * tofill, smfFile * file, smfHead * hdr, 
-		       smfDA * da, smf_dtype dtype, 
-		       void * pntr[3], const dim_t dims[], int ndims,
+		       smfDA * da, smf_dtype dtype, void * pntr[3], 
+                       int isTordered, const dim_t dims[], int ndims,
 		       int virtual, int ncoeff, double *poly, 
 		       AstKeyMap *history, int * status );
 

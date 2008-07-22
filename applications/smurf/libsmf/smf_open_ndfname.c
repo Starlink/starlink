@@ -240,7 +240,8 @@ void smf_open_ndfname( const HDSLoc *loc, const char accmode[], const char filen
   }
 
   /* And populate the new smfData */
-  *ndfdata = smf_construct_smfData( *ndfdata, newfile, NULL, NULL, dtype, datarr, 
-				    dimens, ndims, 0, 0, NULL, NULL, status );
+  *ndfdata = smf_construct_smfData( *ndfdata, newfile, NULL, NULL, dtype, 
+                                    datarr, 1, dimens, ndims, 0, 0, NULL, NULL,
+                                    status );
 
 }
