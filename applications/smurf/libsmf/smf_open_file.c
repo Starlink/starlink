@@ -716,19 +716,19 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
 
         /* Verify that ndfdims matches row, col, nframes */
         /* Should probably inform user of the filename too */
-        if (ndfdims[0] != colsize) {
+        if (ndfdims[0] != (int)colsize) {
           msgSeti( "NC", colsize);
           msgSeti( "DIMS", ndfdims[0]);
           *status = SAI__ERROR;
           errRep( "smf_open_file", "Number of input columns not equal to the number of output columns (^NC != ^DIMS)",status);
         }
-        if (ndfdims[1] != rowsize) {
+        if (ndfdims[1] != (int)rowsize) {
           msgSeti( "NR", rowsize);
           msgSeti( "DIMS", ndfdims[1]);
           *status = SAI__ERROR;
           errRep( "smf_open_file", "Number of input rows not equal to the number of output rows (^NR != ^DIMS)",status);
         }
-        if (ndfdims[2] != nframes) {
+        if (ndfdims[2] != (int)nframes) {
           msgSeti( "NF", nframes);
           msgSeti( "DIMS", ndfdims[2]);
           *status = SAI__ERROR;
@@ -770,7 +770,7 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
       }
       /* Store the dimensions and the size of each axis */
       (*data)->ndims = ndims;
-      for (i=0; i<ndims; i++) {
+      for (i=0; i< (size_t)ndims; i++) {
         ((*data)->dims)[i] = (dim_t)ndfdims[i];
       }
     }
