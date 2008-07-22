@@ -261,13 +261,13 @@ namespace gaia {
     /**
      *  Simple listing of VOTable contents.
      */
-    void VOTable::list()
+    void VOTable::list( ostream& str )
     {
         if ( votable1_ ) {
-            votable_enum( *votable1_ );
+            votable_enum( *votable1_, str );
         }
         else if ( votable2_ ) {
-            votable_enum( *votable2_ );
+            votable_enum( *votable2_, str );
         }
     }
 

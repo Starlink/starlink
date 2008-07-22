@@ -250,6 +250,15 @@ itcl::class gaia::GaiaConvertTable {
          set type ".fits"
       } elseif { [string match {.fit*} "$type"] } {
          set type ".fit"
+      } else {
+
+         #  Same for VOTable.
+         if { [string match {.xml*} "$type"] } {
+            set type ".xml"
+         } elseif { [string match {.vot*} "$type"] } {
+            set type ".vot"
+         }
+
       }
       return $type
    }

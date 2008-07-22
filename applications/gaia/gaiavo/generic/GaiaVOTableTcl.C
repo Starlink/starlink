@@ -49,14 +49,40 @@ using namespace gaia;
 
 /* Local prototypes */
 /* ================ */
+static int GaiaVOTableTclClose( ClientData clientData, Tcl_Interp *interp,
+                                int objc, Tcl_Obj *CONST objv[] );
+static int GaiaVOTableTclNumTables( ClientData clientData, Tcl_Interp *interp,
+                                    int objc, Tcl_Obj *CONST objv[] );
+static int GaiaVOTableTclList( ClientData clientData, Tcl_Interp *interp,
+                                int objc, Tcl_Obj *CONST objv[] );
+static int GaiaVOTableTclListHeadings( ClientData clientData, Tcl_Interp *interp,
+                                       int objc, Tcl_Obj *CONST objv[] );
 static int GaiaVOTableTclOpen( ClientData clientData, Tcl_Interp *interp,
+                               int objc, Tcl_Obj *CONST objv[] );
+static int GaiaVOTableTclSave( ClientData clientData, Tcl_Interp *interp,
                                int objc, Tcl_Obj *CONST objv[] );
 
 /* Register all the commands (local entry point). */
 /* ============================================== */
 int GaiaVOTable_Init( Tcl_Interp *interp )
 {
+    Tcl_CreateObjCommand( interp, "gaiavotable::close", GaiaVOTableTclClose,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+    Tcl_CreateObjCommand( interp, "gaiavotable::numtables", 
+                          GaiaVOTableTclNumTables, (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+    Tcl_CreateObjCommand( interp, "gaiavotable::list", GaiaVOTableTclList,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+    Tcl_CreateObjCommand( interp, "gaiavotable::listheadings", 
+                          GaiaVOTableTclListHeadings,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
     Tcl_CreateObjCommand( interp, "gaiavotable::open", GaiaVOTableTclOpen,
+                          (ClientData) NULL,
+                          (Tcl_CmdDeleteProc *) NULL );
+    Tcl_CreateObjCommand( interp, "gaiavotable::save", GaiaVOTableTclSave,
                           (ClientData) NULL,
                           (Tcl_CmdDeleteProc *) NULL );
     return TCL_OK;
@@ -66,14 +92,15 @@ int GaiaVOTable_Init( Tcl_Interp *interp )
 /**
  * Import a VOTable back from a Tcl_Obj. Returns TCL_ERROR if fails.
  */
-static int importVOTableHandle( Tcl_Interp *interp, Tcl_Obj *obj, 
-                         VOTable *& table  )
+static int importVOTableHandle( Tcl_Interp *interp, Tcl_Obj *obj,
+                                VOTable *& table  )
 {
     Tcl_Obj *resultObj;
     long adr;
-    
-    if ( Tcl_GetLongFromObj( interp, obj, &adr ) != TCL_OK ) {
-        
+
+    if ( Tcl_GetLongFromObj( interp, obj, &adr ) != TCL_OK ||
+         adr == 0 ) {
+
         /* Replace result with our message */
         resultObj = Tcl_GetObjResult( interp );
         Tcl_SetStringObj( resultObj, Tcl_GetString( obj ), -1 );
@@ -81,7 +108,7 @@ static int importVOTableHandle( Tcl_Interp *interp, Tcl_Obj *obj,
                                 (char *)NULL );
         return TCL_ERROR;
     }
-    
+
     /* Cast to a VOTable. */
     table = reinterpret_cast<VOTable *>( adr );
     return TCL_OK;
@@ -104,14 +131,14 @@ static int GaiaVOTableTclOpen( ClientData clientData, Tcl_Interp *interp,
     Tcl_Obj *resultObj;
     char *name;
     VOTable *table;
-    
+
     /*  Check arguments, only allow one, the name of the VOTable. */
     if ( objc != 2 ) {
         Tcl_WrongNumArgs( interp, 1, objv, "votable" );
         return TCL_ERROR;
     }
     name = Tcl_GetString( objv[1] );
-    
+
     /*  Create instance of VOTable and open the table. */
     table = new gaia::VOTable();
     if ( table->open( name ) ) {
@@ -119,7 +146,125 @@ static int GaiaVOTableTclOpen( ClientData clientData, Tcl_Interp *interp,
         Tcl_SetLongObj( resultObj, exportVOTableHandle( table ) );
         return TCL_OK;
     }
-    Tcl_SetResult( interp, const_cast<char *>( "Failed to open VOTable" ), 
+    Tcl_SetResult( interp, const_cast<char *>( "Failed to open VOTable" ),
                    TCL_VOLATILE );
+    return TCL_ERROR;
+}
+
+/**
+ * Close a VOTable.
+ */
+static int GaiaVOTableTclClose( ClientData clientData, Tcl_Interp *interp,
+                                int objc, Tcl_Obj *CONST objv[] )
+{
+    VOTable *table;
+
+    /*  Check arguments, only allow one, the address of the VOTable. */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "votable_reference" );
+        return TCL_ERROR;
+    }
+
+    /*  Import the table. */
+    if ( importVOTableHandle( interp, objv[1], table ) == TCL_OK ) {
+
+        /*  Close by deleting the object. */
+        delete table;
+        return TCL_OK;
+    }
+
+    Tcl_SetResult( interp, const_cast<char *>( "Failed to close VOTable" ),
+                   TCL_VOLATILE );
+    return TCL_ERROR;
+}
+
+/**
+ * Output a list of the names of the various TABLEs in the VOTABLE.
+ */
+static int GaiaVOTableTclList( ClientData clientData, Tcl_Interp *interp,
+                               int objc, Tcl_Obj *CONST objv[] )
+{
+    VOTable *table;
+    ostringstream str;
+
+    /*  Check arguments, only allow one, the address of the VOTable. */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "votable_reference" );
+        return TCL_ERROR;
+    }
+
+    /*  Import the table. */
+    if ( importVOTableHandle( interp, objv[1], table ) == TCL_OK ) {
+        table->list( str );
+        Tcl_SetResult( interp, const_cast<char *>( str.str().c_str() ), 
+                       TCL_VOLATILE );
+        return TCL_OK;
+    }
+    return TCL_ERROR;
+}
+
+/**
+ * Output a list of the headings of the data that will be returned by
+ * the "list" command.
+ */
+static int GaiaVOTableTclListHeadings( ClientData clientData, Tcl_Interp *interp,
+                                       int objc, Tcl_Obj *CONST objv[] )
+{
+    char *headings = const_cast<char *>( "Table Description nrows ncols" );
+    Tcl_SetResult( interp, headings, TCL_VOLATILE );
+    return TCL_OK;
+}
+
+/**
+ * Return number of tables in a VOTable.
+ */
+static int GaiaVOTableTclNumTables( ClientData clientData, Tcl_Interp *interp,
+                                    int objc, Tcl_Obj *CONST objv[] )
+{
+    VOTable *table;
+
+    /*  Check arguments, only allow one, the address of the VOTable. */
+    if ( objc != 2 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "votable_reference" );
+        return TCL_ERROR;
+    }
+
+    /*  Import the table. */
+    if ( importVOTableHandle( interp, objv[1], table ) == TCL_OK ) {
+        Tcl_SetObjResult( interp, Tcl_NewIntObj( table->nTable() ) );
+        return TCL_OK;
+    }
+    return TCL_ERROR;
+}
+
+/**
+ * Save a TABLE to a Skycat tst. The table is selected as an index into all
+ * the TABLEs in the VOTable.
+ */
+static int GaiaVOTableTclSave( ClientData clientData, Tcl_Interp *interp,
+                               int objc, Tcl_Obj *CONST objv[] )
+{
+    VOTable *table;
+    const char *file;
+    int ntable = 0;
+
+    /*  Check arguments, need three, the address of the VOTable, the
+     *  index of the table to extract and the file to save into. */
+    if ( objc != 4 ) {
+        Tcl_WrongNumArgs( interp, 1, objv, "votable_reference index file" );
+        return TCL_ERROR;
+    }
+
+    /*  Import the table. */
+    if ( importVOTableHandle( interp, objv[1], table ) == TCL_OK ) {
+        if ( Tcl_GetIntFromObj( interp, objv[2], &ntable ) == TCL_OK ) {
+            file = Tcl_GetString( objv[3] );
+            if ( table->saveAsTST( ntable, file ) ) {
+                return TCL_OK;
+            }
+            Tcl_SetResult( interp, const_cast<char *>( "Failed to save TABLE" ), 
+                           TCL_VOLATILE );
+        }
+    }
     return TCL_ERROR;
 }

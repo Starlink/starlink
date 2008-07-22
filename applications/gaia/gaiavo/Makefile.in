@@ -501,3 +501,6 @@ VOTable1.1_dns.C: VOTable1.1_dns.xsd
 	    VOTable1.1_dns.xsd
 	rm -f VOTable1.1_dns.C
 	mv VOTable1.1_dns.cxx VOTable1.1_dns.C
+
+#  Local dependencies.
+VOTableWriteFunctions.o: ./generic/VOTableWriteFunctions.icc

@@ -60,8 +60,8 @@ namespace gaia {
      *             set to inbufsz if 0.
      *  outbuf   - the decompressed buffer, use free_gzip to release it.
      */
-    int decode_gzip( const char *inbuf, size_t inbufsz, size_t &outbufsz,
-                     char *&outbuf )
+    void decode_gzip( const char *inbuf, size_t inbufsz, size_t &outbufsz,
+                      char *&outbuf )
     {
         Compress compressor;
         int insize = (int) inbufsz;

@@ -42,8 +42,8 @@
 #define GAIA_GZIP_H
 
 namespace gaia {
-    int decode_gzip( const char *inbuf, size_t inbufsz, size_t &outbufsz,
-                     char *&outbuf );
+    void decode_gzip( const char *inbuf, size_t inbufsz, size_t &outbufsz,
+                      char *&outbuf );
     void free_gzip( const char *inbuf );
 }
 #endif

@@ -297,14 +297,14 @@ namespace gaia {
 
             //  UCD, unit and utype.
             ucd_set = false;
-            if ( ucd.size() > i && ucd[i] != "---" ) {
+            if ( (int) ucd.size() > i && ucd[i] != "---" ) {
                 field.ucd( ucd[i] );
                 ucd_set == true;
             }
-            if ( unit.size() > i && unit[i] != "---") {
+            if ( (int) unit.size() > i && unit[i] != "---") {
                 field.unit( unit[i] );
             }
-            if ( utype.size() > i && utype[i] != "---") {
+            if ( (int) utype.size() > i && utype[i] != "---") {
                 field.utype( utype[i] );
             }
 
@@ -314,7 +314,7 @@ namespace gaia {
                 field.ref( e->system() );
                 if ( i == ra_col ) {
                     field.ucd( "POS_EQ_RA_MAIN" );
-                    if ( unit.size() > i ) {
+                    if ( (int) unit.size() > i ) {
                         to_lower( unit[i], lunit );
                         if ( lunit.find( "hms" ) != string::npos ||
                              lunit.find( "h:m:s" ) != string::npos ) {
@@ -329,7 +329,7 @@ namespace gaia {
                 }
                 else {
                     field.ucd( "POS_EQ_DEC_MAIN" );
-                    if ( unit.size() > i ) {
+                    if ( (int) unit.size() > i ) {
                         to_lower( unit[i], lunit );
                         if ( lunit.find( "dms" ) != string::npos ||
                              lunit.find( "d:m:s" ) != string::npos ) {
@@ -345,7 +345,7 @@ namespace gaia {
             }
             else if ( i == x_col || i == y_col ) {
                 //  X and Y coordinate will be doubles, unless we know better.
-                if ( datatype.size() > i ) {
+                if ( (int) datatype.size() > i ) {
                     field.datatype( datatype[i] );
                 }
                 else {
@@ -363,7 +363,7 @@ namespace gaia {
             }
             else {
                 //  Everything else is a char, unless explicitly set.
-                if ( datatype.size() > i && datatype[i] != "char" ) {
+                if ( (int) datatype.size() > i && datatype[i] != "char" ) {
                     field.datatype( datatype[i] );
                 }
                 else {

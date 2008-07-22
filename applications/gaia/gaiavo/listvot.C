@@ -77,7 +77,7 @@ int main( int argc, char* argv[] )
     if ( table->open( argv[1] ) ) {
 
         /*  Output table descriptions. */
-        table->list();
+        table->list( cout );
     }
     else {
         cerr << "Failed to open VOTable " << argv[1] << endl;

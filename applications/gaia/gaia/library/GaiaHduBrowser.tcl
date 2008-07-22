@@ -6,11 +6,12 @@
 #     [incr Tk] class
 
 #  Purpose:
-#     Browser for HDUs in FITS or HDS container files.
+#     Browser for HDUs in FITS, HDS and VOTable container files.
 
 #  Description:
 #     This class provides an interface for browsing all the extensions
-#     available in a FITS MEF file or NDFs in an HDS container file.
+#     available in a FITS MEF file, NDFs in an HDS container file,
+#     or TABLEs in a VOTable.
 #
 #     When selected for opening an open command will be executed. This
 #     will be appended by the type of data selected (image or table), a
@@ -90,8 +91,8 @@ itcl::class gaia::GaiaHduBrowser {
       eval itk_initialize $args
 
       #  Decoration.
-      wm title $w_ "FITS HDUs/NDFs ($itk_option(-number))"
-      wm iconname $w_ "FITS HDUs/NDFs ($itk_option(-number))"
+      wm title $w_ "FITS HDUs/NDFs/VOTables ($itk_option(-number))"
+      wm iconname $w_ "FITS HDUs/NDFs/VOTables ($itk_option(-number))"
 
       #  Close always destroys the window.
       wm protocol $w_ WM_DELETE_WINDOW [code $this quit]
@@ -118,6 +119,9 @@ itcl::class gaia::GaiaHduBrowser {
 
    #  This method is called after the options have been evaluated.
    protected method init {} {
+      if { $accessor_ == {} } {
+         return
+      }
 
       set headings [$accessor_ hdu listheadings]
       set nc [string length $headings]
@@ -125,7 +129,7 @@ itcl::class gaia::GaiaHduBrowser {
       #  TableList(n) widget for displaying the list of HDUs.
       itk_component add table {
          util::TableList $w_.table \
-            -title {FITS HDUs/NDFs} \
+            -title {FITS HDUs/NDFs/VOTables} \
             -headings $headings \
             -width $nc
       }
@@ -195,13 +199,17 @@ itcl::class gaia::GaiaHduBrowser {
       if { $itk_option(-open_cmd) != {} } {
          set sel [$itk_component(table) get_selected]
          if {[llength $sel]} {
-            lassign [lindex $sel 0] hdu type name
-            if { "$type" == "image" || "$type" == "NDF" } {
-               open_image_ $name $hdu
-            } elseif { "$type" == "ascii" || "$type" == "binary" } {
-               open_table_ $name $hdu
+            if { $isvotable_ } {
+               lassign [lindex $sel 0] hdu title
+               open_table_ $itk_option(-file) $hdu
+            } else {
+               lassign [lindex $sel 0] hdu type name
+               if { "$type" == "image" || "$type" == "NDF" } {
+                  open_image_ $name $hdu
+               } elseif { "$type" == "ascii" || "$type" == "binary" } {
+                  open_table_ $name $hdu
+               }
             }
-
             #  Close window after open.
             quit
          } else {
@@ -333,16 +341,47 @@ itcl::class gaia::GaiaHduBrowser {
    #  Configuration options: (public variables)
    #  ----------------------
 
-   #  The file we're browsing.
+   #  The file we're browsing. Can be FITS, HDS or XML.
    itk_option define -file file File {} {
-      if { $accessor_ == {} } {
-         set accessor_ [uplevel \#0 GaiaNDAccess \#auto]
-      }
+      set isvotable_ 0
       if { $itk_option(-file) != {} } {
-         $accessor_ configure -dataset $itk_option(-file)
-         if { [$accessor_ exists "DATA"] } {
+         set ext [::file extension $itk_option(-file)]
+         if { [gaia::GaiaVOTableAccess::check_for_gaiavo] && 
+              ( $ext == ".xml" || $ext == ".vot" ) } {
+
+            #  VOTable and support available.
+            set isvotable_ 1
+            if { $accessor_ != {} } {
+               if { ! [$accessor_ isa GaiaVOTableAccess] } {
+                  catch {::delete object $accessor_}
+                  set accessor_ {}
+               }
+            }
+            if { $accessor_ == {} } {
+               set accessor_ [uplevel \#0 GaiaVOTableAccess \#auto]
+            }
+            $accessor_ configure -dataset $itk_option(-file)
             if { [info exists itk_component(table)] } {
                show_hdu_list
+            }
+
+         } else {
+
+            #  NDF or FITS.
+            if { $accessor_ != {} } {
+               if { ! [$accessor_ isa GaiaNDAccess] } {
+                  catch {::delete object $accessor_}
+                  set accessor_ {}
+               }
+            }
+            if { $accessor_ == {} } {
+               set accessor_ [uplevel \#0 GaiaNDAccess \#auto]
+            }
+            $accessor_ configure -dataset $itk_option(-file)
+            if { [$accessor_ exists "DATA"] } {
+               if { [info exists itk_component(table)] } {
+                  show_hdu_list
+               }
             }
          }
       }
@@ -366,6 +405,9 @@ itcl::class gaia::GaiaHduBrowser {
    
    #  The filename handler.
    protected variable namer_ {}
+
+   #  Whether this is a VOTable.
+   protected variable isvotable_ 0
    
    #  Common variables: (shared by all instances)
    #  -----------------

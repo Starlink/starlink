@@ -80,8 +80,8 @@ namespace gaia
         //  Save VOTable to a file. Namespace qualified only.
         void save( const char *file );
 
-        //  Simple list.
-        void list();
+        //  Simple list to a stream.
+        void list( ostream& str );
 
         //  Number of TABLE elements in whole VOTable.
         int nTable();

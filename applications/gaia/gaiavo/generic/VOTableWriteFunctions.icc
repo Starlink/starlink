@@ -62,21 +62,31 @@
  */
 
 /**
- *  Simple test for table validity, visit all TABLE elements.
+ *  Visit all TABLE elements and construct a informative listing of 
+ *  its contents. Constructed as a Tcl list using {} delimeters.
  */
-void VOTable::votable_enum( NS::VOTABLE& votable )
+void VOTable::votable_enum( NS::VOTABLE& votable, ostream& str )
 {
     using namespace NS;
 
     int ntable = votable_count( votable );
     for ( int i = 0; i < ntable; i++ ) {
-        TABLE table( votable_get( votable, i ) );
+        TABLE& table( votable_get( votable, i ) );
         if ( ! ( table.name() && table.name().get() == "empty" ) ) {
-            cout << setw(6) << left << i << ": " << table.name();
+            str << "{ ";
+            str << "{" << i << "} ";
+            str << "{" << table.name() << "} ";
+
             if ( table.nrows() ) {
-                cout << " " << table.nrows();
+                str << "{" << table.nrows() << "} ";
             }
-            cout << endl;
+            else {
+                str << "{?} ";
+            }
+
+            //  Count the fields.
+            str << "{" << table_nfields( table ) << "} ";
+            str << "} ";
         }
     }
 }
@@ -98,6 +108,22 @@ int VOTable::votable_count( NS::VOTABLE& votable )
 }
 
 /**
+ *  Return the number of FIELD elements in a TABLE. Uses the underlying
+ *  DOM to navigate the document.
+ */
+int VOTable::table_nfields( NS::TABLE& table )
+{
+    using namespace NS;
+
+    DOMNode *node = table._node();
+    DOMElement *element = static_cast<DOMElement*>( node );
+    XMLCh tempstr[20];
+    XMLString::transcode( "FIELD", tempstr, 20 );
+    DOMNodeList *fields = element->getElementsByTagName( tempstr );
+    return fields->getLength();
+}
+
+/**
  *  Locate and return an NS::TABLE. Returns emptyTable on error (need to
  *  return the reference to avoid a copy which would lose the connection to
  *  any IDREF hooks).
@@ -113,7 +139,7 @@ NS::TABLE& VOTable::votable_get( NS::VOTABLE& votable, int index )
     XMLCh tempstr[20];
     XMLString::transcode( "TABLE", tempstr, 20 );
     DOMNodeList *tables = element->getElementsByTagName( tempstr );
-    if ( tables->getLength() > index ) {
+    if ( (int) tables->getLength() > index ) {
 
         //  Convert TABLE DOM node back to TABLE class.
         DOMElement *tableelement = 
@@ -780,7 +806,7 @@ int VOTable::data_binarydata( const NS::TABLE& table, const NS::BINARY& bdata,
     bool ok = true;
     int row = 0;
     while ( ok ) {
-        for ( int i = 0; i < field_types.size(); i++ ) {
+        for ( int i = 0; i < (int) field_types.size(); i++ ) {
             ok = os.readPrint( field_types[i], arraysizes[i], havenull[i],
                                nullvalues[i], &out );
             if ( ok ) {
@@ -952,6 +978,7 @@ int VOTable::data_fitsdata( const NS::FITS& fdata, ofstream& out, int& id_index,
         }
         out << '\n';
     }
+    return 1;
 }
 
 /**

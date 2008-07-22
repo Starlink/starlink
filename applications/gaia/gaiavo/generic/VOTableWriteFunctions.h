@@ -42,7 +42,7 @@
 
 /*  Prototypes for members that are overloaded by namespace qualified
  *  types. */
-void votable_enum( NS::VOTABLE& votable );
+void votable_enum( NS::VOTABLE& votable, ostream& str );
 
 int votable_count( NS::VOTABLE& votable );
 
@@ -61,6 +61,8 @@ int table_columns( const NS::TABLE& table, ofstream& out, int& id_index,
                    int& dec_index, bool& dec_radians, string& dec_unit  ); 
 
 void table_coosys( const NS::COOSYS& coosys, ofstream& out );
+
+int table_nfields( NS::TABLE& table );
 
 int data_tabledata( const NS::TABLE& table, const NS::TABLEDATA& tdata,
                     ofstream& out, int& id_index, 

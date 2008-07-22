@@ -567,9 +567,9 @@ namespace gaia {
         //  We do not check each read for success as a byte can have any
         //  pattern when it represents part of another value. So see if at
         //  least sizeof(T) bytes are available.
-        if ( in_->in_avail() >= sizeof(T) ) {
+        if ( in_->in_avail() >= (int) sizeof(T) ) {
             if ( bigendian_ ) {
-                for ( int j = 0; j < sizeof(T); j++ ) {
+                for ( int j = 0; j < (int) sizeof(T); j++ ) {
                     u.b[j] = in_->sbumpc();
                 }
             }
