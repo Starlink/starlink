@@ -50,6 +50,8 @@
 *        Switch to split real/imaginary arrays for smfFilter
 *     2008-06-13 (EC):
 *        Only create plans once since we're using guru interface
+*     2008-07-21 (EC):
+*        Only filter bolo if SMF__Q_BADB isn't set.
 
 *  Copyright:
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
@@ -106,6 +108,7 @@ void smf_filter_execute( smfData *data, smfFilter *filt, int *status ) {
   dim_t ntslice;                /* Number of time slices */
   fftw_plan plan_forward;       /* plan for forward transformation */
   fftw_plan plan_inverse;       /* plan for inverse transformation */
+  unsigned char *qua=NULL;      /* pointer to quality */
 
   /* Main routine */
   if (*status != SAI__OK) return;
@@ -156,6 +159,9 @@ void smf_filter_execute( smfData *data, smfFilter *filt, int *status ) {
 
   if( *status != SAI__OK ) return;
 
+  /* Obtain a pointer to the QUALITY component */
+  qua=data->pntr[2];
+
   /* Allocate arrays for the FFT of the time-stream data. */
   data_fft_r = smf_malloc( filt->dim, sizeof(*data_fft_r), 0, status );
   data_fft_i = smf_malloc( filt->dim, sizeof(*data_fft_i), 0, status );
@@ -193,7 +199,9 @@ void smf_filter_execute( smfData *data, smfFilter *filt, int *status ) {
   }
    
   /* Filter the data one bolo at a time */
-  for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) {
+  for( i=0; (*status==SAI__OK) && (i<nbolo); i++ ) 
+    if( !qua || !(qua[i*ntslice]&SMF__Q_BADB) ) { /* Check for bad bolo flag */
+
     /* Obtain pointer to the correct chunk of data */
     base = &((double *)data->pntr[0])[i*ntslice];
     
