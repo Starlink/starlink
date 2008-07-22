@@ -13,7 +13,7 @@
 *     Library routine
 
 *  Invocation:
-*     smf_average_data( const smfData *data, int start,  int nslice, 
+*     smf_average_dataD( const smfData *data, int start,  int nslice, 
 *                       const int interval, double **avdata, size_t *nelem,
 *                       int *status);
 
@@ -47,6 +47,7 @@
 
 *  Notes:
 *     - Should only be used on _DOUBLE (flatfielded) data.
+*     - See also smf_average_dataI
 *     - The caller should free the memory allocated in avdata by this routine
 *     by using smf_free.
 
@@ -99,14 +100,8 @@
 
 /* Starlink includes */
 #include "sae_par.h"
-#include "star/ndg.h"
-#include "ndf.h"
-#include "ast.h"
 #include "mers.h"
 #include "prm_par.h"
-#include "dat_par.h"
-#include "star/hds.h"
-#include "star/kaplibs.h"
 
 /* SMURF includes */
 #include "smf.h"
@@ -114,16 +109,9 @@
 #include "smf_err.h"
 #include "smurf_par.h"
 
-/* SC2DA includes */
-#include "sc2da/sc2store_par.h"
-#include "sc2da/sc2math.h"
-#include "sc2da/sc2store.h"
-#include "sc2da/sc2ast.h"
-#include "sc2da/dream_par.h"
+#define FUNC_NAME "smf_average_dataD"
 
-#define FUNC_NAME "smf_average_data"
-
-void smf_average_data( const smfData *data, int start,  int nslice, 
+void smf_average_dataD( const smfData *data, int start,  int nslice, 
                        const int interval, double **avdata, size_t *nelem, int *status) {
 
   int base;                 /* Base index */
