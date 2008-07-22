@@ -216,6 +216,15 @@ typedef enum smf_modeltype {
   SMF__QUA=8              /* Quality flags */
 } smf_modeltype;
 
+/* Ways of removing dark */
+typedef enum smf_dark_sub_meth {
+  SMF__DKSUB_NONE,        /* Ignore the dark */
+  SMF__DKSUB_MEAN,        /* Use mean of previous and next dark */
+  SMF__DKSUB_INTERP,      /* Interpolate dark over time */
+  SMF__DKSUB_PREV,        /* Use previous dark */
+  SMF__DKSUB_NEXT         /* Use following dark */
+} smf_dark_sub_meth;
+
 /* suffix for simple binary files that store DIMM model components */
 #define SMF__DIMM_SUFFIX ".dimm"
 

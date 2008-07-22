@@ -245,7 +245,7 @@ void smf_open_and_flatfield ( const Grp *igrp, const Grp *ogrp, size_t index,
       size_t dark2;
 
       /* work out which darks are suitable */
-      /* smf_choose_darks( darks, ffdata, &dark1, &dark2, status ); */
+      smf_choose_darks( darks, *ffdata, &dark1, &dark2, status );
 
       /* and correct for dark */
       /* smf_subtract_dark( ffdata, darks->sdata[dark1], darks->sdata[dark2],

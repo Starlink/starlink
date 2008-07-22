@@ -47,6 +47,7 @@ smf_open_ndfname.c smf_string_to_dtype.c smf_create_lutwcs.c \
 smf_calc_telpos.c smf_telpos_get.c smf_dream_getgrid.c smf_dream_calcweights.c\
 smf_cubebounds.c smf_cubegrid.c smf_convert_system.c smf_makefitschan.c smf_detpos_wcs.c\
 smf_subtract_plane1.c smf_subtract_plane2.c smf_average_dataD.c \
+smf_average_dataI.c \
 smf_calc_stareimage.c smf_fits_export2DA.c smf_geod.c smf_instap_get.c \
 smf_calcmodel_ast.c smf_calcmodel_com.c smf_calcmodel_noi.c \
 smf_labelunit.c smf_sparsebounds.c smf_rebinsparse.c \
@@ -71,7 +72,7 @@ smf_create_smfFilter.c smf_filter_ident.c smf_free_smfFilter.c \
 smf_filter_r2c.c smf_filter_edge.c smf_filter_notch.c \
 smf_NDFexport_smfFilter.c smf_calc_fcon.c \
 smf_dtype_str.c smf_map_or_malloc.c smf_find_darks.c smf_isdark.c \
-smf_reduce_dark.c smf_find_subarray.c
+smf_reduce_dark.c smf_find_subarray.c smf_choose_darks.c
 
 
 noinst_INCLUDES = smf.h smf_typ.h

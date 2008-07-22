@@ -147,9 +147,14 @@ void smurf_flatfield( int *status ) {
   igrp = fgrp;
   fgrp = NULL;
 
-  /* Get output file(s) */
-  kpg1Wgndf( "OUT", igrp, size, size, "More output files required...",
-             &ogrp, &outsize, status );
+  if (size > 0) {
+    /* Get output file(s) */
+    kpg1Wgndf( "OUT", igrp, size, size, "More output files required...",
+               &ogrp, &outsize, status );
+  } else {
+    msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
+       " nothing to flatfield", status );
+  }
 
   for (i=1; i<=size; i++ ) {
 
@@ -178,8 +183,8 @@ void smurf_flatfield( int *status ) {
   }
 
   /* Tidy up after ourselves: release the resources used by the grp routines  */
-  grpDelet( &igrp, status);
-  grpDelet( &ogrp, status);
+  if (igrp) grpDelet( &igrp, status);
+  if (ogrp) grpDelet( &ogrp, status);
   smf_close_related( &darks, status );
   ndfEnd( status );
 }

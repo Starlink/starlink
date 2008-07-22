@@ -93,7 +93,7 @@
 void smf_reduce_dark( const smfData *indark, smfData **outdark, 
                       int *status ) {
 
-  double *avg = NULL; /* average */
+  int *avg = NULL; /* average */
   dim_t dims[2];      /* dimensions of data array */
   smfHead *hdr = NULL; /* copy of header */
   AstKeyMap * history = NULL; /* history */
@@ -118,7 +118,7 @@ void smf_reduce_dark( const smfData *indark, smfData **outdark,
     return;
   }
 
-  smf_average_data( indark, 0, 0, 1, &avg, &nelem, status );
+  smf_average_dataI( indark, 0, 0, 1, &avg, &nelem, status );
 
   /* now create a new smfData - we need to copy the header info */
   hdr = smf_deepcopy_smfHead( indark->hdr, status );

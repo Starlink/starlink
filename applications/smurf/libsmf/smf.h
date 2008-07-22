@@ -376,8 +376,13 @@
 
 void smf_addto_smfArray( smfArray *ary, smfData *data, int *status );
 
-void smf_average_data( const smfData *data, int start, int nslice, 
-		       const int interval, double **avdata, size_t *nelem, int *status);
+void smf_average_dataD( const smfData *data, int start, int nslice, 
+		       const int interval, double **avdata, size_t *nelem,
+                       int *status);
+
+void smf_average_dataI( const smfData *data, int start, int nslice, 
+		       const int interval, int **avdata, size_t *nelem,
+                       int *status);
 
 void smf_boxcar1 ( double *series, const size_t ninpts, size_t window, 
 		   unsigned char *qual, unsigned char mask, 
@@ -1046,5 +1051,8 @@ void smf_reduce_dark( const smfData *indark, smfData **outdark,
 
 void smf_find_subarray ( const smfHead * hdr, char subarray[],
                          size_t buflen, int *subnum, int *status );
+
+void smf_choose_darks( const smfArray *darks, const smfData *indata,
+                       size_t *dark1, size_t *dark2, int * status );
 
 #endif /* SMF_DEFINED */
