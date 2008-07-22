@@ -124,18 +124,19 @@ itcl::class gaia::GaiaHduBrowser {
       }
 
       set headings [$accessor_ hdu listheadings]
-      set nc [string length $headings]
+      set nc [expr min([string length $headings],80)]
 
       #  TableList(n) widget for displaying the list of HDUs.
       itk_component add table {
          util::TableList $w_.table \
             -title {FITS HDUs/NDFs/VOTables} \
             -headings $headings \
-            -width $nc
+            -hscroll 1 \
+            -width $nc \
+            -height 50
       }
       add_short_help $itk_component(table) \
          {Table: Click to select HDU, double-click to open}
-      pack $itk_component(table) -side top -fill both -expand 1
 
       #  Double-click opens HDU.
       bind $itk_component(table).listbox <Double-ButtonPress-1> \
@@ -145,7 +146,6 @@ itcl::class gaia::GaiaHduBrowser {
       itk_component add buttons {
          frame $w_.buttons -borderwidth 2
       }
-      pack $itk_component(buttons) -side top -fill x -expand 1
 
       #  Open selected HDU.
       itk_component add open {
@@ -154,7 +154,6 @@ itcl::class gaia::GaiaHduBrowser {
             -command [code $this select_hdu_]
       }
       add_short_help $itk_component(open) {Open the selected HDU}
-      pack $itk_component(open) -side left -expand 1 -padx 1m -ipadx 1m
 
       #  Add a Cancel button if required.
       if { $itk_option(-cancel_cmd) != {} } {
@@ -165,7 +164,6 @@ itcl::class gaia::GaiaHduBrowser {
          }
          add_short_help $itk_component(cancel) \
             {Close the window, cancelling action}
-         pack $itk_component(cancel) -side left -expand 1 -padx 1m -ipadx 1m
       }
 
       itk_component add close {
@@ -174,6 +172,14 @@ itcl::class gaia::GaiaHduBrowser {
             -command [code $this quit]
       }
       add_short_help $itk_component(close) {Just close the window}
+
+      #  Packing. Make sure buttons are always visible by packing first.
+      pack $itk_component(buttons) -side bottom -fill x -expand 1
+      pack $itk_component(table) -side top -fill both -expand 1
+      pack $itk_component(open) -side left -expand 1 -padx 1m -ipadx 1m
+      if { $itk_option(-cancel_cmd) != {} } {
+         pack $itk_component(cancel) -side left -expand 1 -padx 1m -ipadx 1m
+      }
       pack $itk_component(close) -side left -expand 1 -padx 1m -ipadx 1m
 
       #  Populate.
@@ -187,7 +193,10 @@ itcl::class gaia::GaiaHduBrowser {
       #  Update the table listing
       set hdu_list [$accessor_ hdu list]
       $itk_component(table) clear
-      $itk_component(table) config -height [llength $hdu_list] -info $hdu_list
+      $itk_component(table) config \
+         -width 50 \
+         -height [llength $hdu_list] \
+         -info $hdu_list
       $itk_component(table) select_row 0
 
       #  And table title.
@@ -222,7 +231,7 @@ itcl::class gaia::GaiaHduBrowser {
    #  execute a command first.
    public method cancel {} {
       if { $itk_option(-cancel_cmd) != {} } {
-         #  Start close now as next command may block (by starting 
+         #  Start close now as next command may block (by starting
          #  up a dialog window).
          after idle [code $this quit]
          eval $itk_option(-cancel_cmd)
@@ -308,7 +317,7 @@ itcl::class gaia::GaiaHduBrowser {
       $namer_ configure -imagename $dataset
 
       if { "$Type" == "NDF" } {
-         if { $ExtName != "" && $ExtName != "." } { 
+         if { $ExtName != "" && $ExtName != "." } {
             $namer_ setpath "${ExtName}"
          }
       } else {
@@ -346,7 +355,7 @@ itcl::class gaia::GaiaHduBrowser {
       set isvotable_ 0
       if { $itk_option(-file) != {} } {
          set ext [::file extension $itk_option(-file)]
-         if { [gaia::GaiaVOTableAccess::check_for_gaiavo] && 
+         if { [gaia::GaiaVOTableAccess::check_for_gaiavo] &&
               ( $ext == ".xml" || $ext == ".vot" ) } {
 
             #  VOTable and support available.
@@ -402,13 +411,13 @@ itcl::class gaia::GaiaHduBrowser {
 
    #  The accessor.
    protected variable accessor_ {}
-   
+
    #  The filename handler.
    protected variable namer_ {}
 
    #  Whether this is a VOTable.
    protected variable isvotable_ 0
-   
+
    #  Common variables: (shared by all instances)
    #  -----------------
 

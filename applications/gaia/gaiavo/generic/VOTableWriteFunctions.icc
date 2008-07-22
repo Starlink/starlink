@@ -21,7 +21,7 @@
  *     may need revisiting.
  *
  *     (Note: some of this could be done using templates, but that looks
- *     untidy as you cannot use a namespace, just types, so each type 
+ *     untidy as you cannot use a namespace, just types, so each type
  *     used would need to be declared, that NS::VOTABLE, NS::TABLE,
  *     NS::PARAM etc., see emptyTable for a starter if you prefer
  *     that approach).
@@ -62,7 +62,7 @@
  */
 
 /**
- *  Visit all TABLE elements and construct a informative listing of 
+ *  Visit all TABLE elements and construct a informative listing of
  *  its contents. Constructed as a Tcl list using {} delimeters.
  */
 void VOTable::votable_enum( NS::VOTABLE& votable, ostream& str )
@@ -70,12 +70,31 @@ void VOTable::votable_enum( NS::VOTABLE& votable, ostream& str )
     using namespace NS;
 
     int ntable = votable_count( votable );
+    string description;
+
     for ( int i = 0; i < ntable; i++ ) {
         TABLE& table( votable_get( votable, i ) );
         if ( ! ( table.name() && table.name().get() == "empty" ) ) {
             str << "{ ";
+
             str << "{" << i << "} ";
+
             str << "{" << table.name() << "} ";
+
+            table_description( table, description);
+            if ( description == "" ) {
+                str << "{?} ";
+            }
+            else {
+                str << "{" << description << "} ";
+            }
+
+            if ( table.ID() ) {
+                str << "{" << table.ID() << "} ";
+            }
+            else {
+                str << "{?} ";
+            }
 
             if ( table.nrows() ) {
                 str << "{" << table.nrows() << "} ";
@@ -124,6 +143,34 @@ int VOTable::table_nfields( NS::TABLE& table )
 }
 
 /**
+ *  Return the DESCRIPTION of a TABLE. Can be any textual content, but we just
+ *  want a string, so just look for children with name DESCRIPTION.
+ */
+void VOTable::table_description( NS::TABLE& table, string& description )
+{
+    using namespace NS;
+
+    description = "";
+
+    DOMNode *node = table._node();
+    DOMElement *element = static_cast<DOMElement*>( node );
+    XMLCh tempstr[20];
+    XMLString::transcode( "DESCRIPTION", tempstr, 20 );
+    DOMNodeList *nodes = element->getChildNodes();
+    if ( nodes->getLength() > 0 ) {
+        int n = nodes->getLength();
+        for ( int i = 0; i < n; i++ ) {
+            DOMElement *element = static_cast<DOMElement*>( nodes->item( i ) );
+            if ( XMLString::compareString( element->getNodeName(), 
+                                           tempstr ) == 0 ) {
+                const XMLCh *content = element->getTextContent();
+                description += XMLString::transcode( content );
+            }
+        }
+    }
+}
+
+/**
  *  Locate and return an NS::TABLE. Returns emptyTable on error (need to
  *  return the reference to avoid a copy which would lose the connection to
  *  any IDREF hooks).
@@ -132,7 +179,7 @@ NS::TABLE& VOTable::votable_get( NS::VOTABLE& votable, int index )
 {
     using namespace NS;
 
-    //  Use the underlying DOM to search for all TABLE elements. These are 
+    //  Use the underlying DOM to search for all TABLE elements. These are
     //  located in a breath-first search of the whole document.
     DOMNode *node = votable._node();
     DOMElement *element = static_cast<DOMElement*>( node );
@@ -142,7 +189,7 @@ NS::TABLE& VOTable::votable_get( NS::VOTABLE& votable, int index )
     if ( (int) tables->getLength() > index ) {
 
         //  Convert TABLE DOM node back to TABLE class.
-        DOMElement *tableelement = 
+        DOMElement *tableelement =
             static_cast<DOMElement*>( tables->item( index ) );
 
          xml_schema::type&
@@ -152,7 +199,7 @@ NS::TABLE& VOTable::votable_get( NS::VOTABLE& votable, int index )
          return dynamic_cast<TABLE&>( schema_node );
     }
 
-    cerr << "No table with index " << index << 
+    cerr << "No table with index " << index <<
         " (max " << tables->getLength() << ")" << endl;
 
     return *emptyTable<NS::TABLE>();
@@ -214,7 +261,7 @@ int VOTable::table_params( const NS::TABLE& table, ofstream& out )
 
     try{
         out << "#  Table parameters: \n";
-        
+
         out << "long_name: " << table.name() << '\n';
 
         TABLE::PARAM_const_iterator piter( table.PARAM().begin() );
@@ -541,8 +588,8 @@ int VOTable::table_columns( const NS::TABLE& table, ofstream& out,
         //  Three variants, TABLEDATA, BINARY and FITS.
         const DATA::TABLEDATA_optional tdata( odata.get().TABLEDATA() );
         if ( tdata ) {
-            return data_tabledata( table, tdata.get(), out, id_index, 
-                                   ra_index, ra_radians, ra_unit, 
+            return data_tabledata( table, tdata.get(), out, id_index,
+                                   ra_index, ra_radians, ra_unit,
                                    dec_index, dec_radians, dec_unit );
         }
 
@@ -568,8 +615,8 @@ int VOTable::table_columns( const NS::TABLE& table, ofstream& out,
  *  may be normalised.
  */
 int VOTable::data_tabledata( const NS::TABLE& table, const NS::TABLEDATA& tdata,
-                    ofstream& out, int& id_index, 
-                    int& ra_index, bool& ra_radians, string& ra_unit, 
+                    ofstream& out, int& id_index,
+                    int& ra_index, bool& ra_radians, string& ra_unit,
                     int& dec_index, bool& dec_radians, string& dec_unit )
 {
     using namespace NS;

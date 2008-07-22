@@ -210,7 +210,8 @@ static int GaiaVOTableTclList( ClientData clientData, Tcl_Interp *interp,
 static int GaiaVOTableTclListHeadings( ClientData clientData, Tcl_Interp *interp,
                                        int objc, Tcl_Obj *CONST objv[] )
 {
-    char *headings = const_cast<char *>( "Table Description nrows ncols" );
+    char *headings = 
+        const_cast<char *>( "Table Name Description ID Rows(est) Columns" );
     Tcl_SetResult( interp, headings, TCL_VOLATILE );
     return TCL_OK;
 }

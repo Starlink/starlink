@@ -64,6 +64,8 @@ void table_coosys( const NS::COOSYS& coosys, ofstream& out );
 
 int table_nfields( NS::TABLE& table );
 
+void table_description( NS::TABLE& table, string& description );
+
 int data_tabledata( const NS::TABLE& table, const NS::TABLEDATA& tdata,
                     ofstream& out, int& id_index, 
                     int& ra_index, bool& ra_radians, string& ra_unit, 

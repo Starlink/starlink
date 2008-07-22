@@ -78,6 +78,9 @@ namespace gaia {
      */
     const char *VOTABLE_NS ="http://www.ivoa.net/xml/VOTable/v1.1";
 
+    /**  Static member initializations. */
+    bool VOTable::initialized = false;
+
     /**
      *  Constructor.
      *
@@ -87,7 +90,11 @@ namespace gaia {
         votable1_(NULL),
         votable2_(NULL)
     {
-        //  Do nothing.
+        // Initialise Xerces runtime
+        if ( !VOTable::initialized ) {
+            XMLPlatformUtils::Initialize();
+            VOTable::initialized = true;
+        }
     }
 
     /**
@@ -221,6 +228,7 @@ namespace gaia {
             auto_ptr<VOTABLE> table =
                 VOTABLE_read( *in,
                               xml_schema::flags::dont_validate |
+                              xml_schema::flags::dont_initialize |
                               xml_schema::flags::keep_dom );
             return table.release();
         }
@@ -245,6 +253,7 @@ namespace gaia {
             auto_ptr<VOTABLE> table =
                 VOTABLE_read( *in,
                               xml_schema::flags::dont_validate |
+                              xml_schema::flags::dont_initialize |
                               xml_schema::flags::keep_dom );
             return table.release();
         }

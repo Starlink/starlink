@@ -65,6 +65,9 @@ namespace gaia
         votable_11::VOTABLE *votable2_;
         votable_11::VOTABLE *openVOTable2( istream *in );
 
+        // Whether Xerces has been initialized.
+        static bool initialized;
+
     public:
 
         //  Constructor and destructor.
