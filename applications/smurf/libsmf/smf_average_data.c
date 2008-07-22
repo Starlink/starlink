@@ -153,6 +153,15 @@ void smf_average_data( const smfData *data, int start,  int nslice,
     }
   }
 
+  /* check type */
+  if (data->dtype != SMF__DOUBLE) {
+    *status = SAI__ERROR;
+    msgSetc( "TYP", smf_dtype_str(data->dtype, status ) );
+    errRep(" ", FUNC_NAME ": This function averages _DOUBLE only not ^TYP",
+           status );
+    return;
+  }
+
   /* OK we have 3-D data so retrieve the number of time slices */
   nframes = (data->dims)[2];
   /* Check that the starting value is valid */
