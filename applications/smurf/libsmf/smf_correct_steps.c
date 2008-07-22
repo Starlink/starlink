@@ -111,10 +111,10 @@ void smf_correct_steps( smfData *data, unsigned char *quality,
   dim_t maxind;                 /* index to location of maxdiff */
   double mean1;                 /* Box means to search for DC steps */
   double mean2;                 /* "    "                           */
-  dim_t nbolo;                  /* Number of bolometers */
+  dim_t nbolo=0;                /* Number of bolometers */
   dim_t nmean1;                 /* Number of samples in mean1 */
   dim_t nmean2;                 /* Number of samples in mean1 */
-  dim_t ntslice;                /* Number of time slices */
+  dim_t ntslice=0;              /* Number of time slices */
   unsigned char *qua=NULL;      /* Pointer to quality flags */
   unsigned char mask;           /* bitmask for quality */
 

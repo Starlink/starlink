@@ -103,9 +103,9 @@ void smf_filter_execute( smfData *data, smfFilter *filt, int *status ) {
   dim_t i;                      /* Loop counter */
   fftw_iodim iodim;             /* I/O dimensions for transformations */
   dim_t j;                      /* Loop counter */
-  dim_t nbolo;                  /* Number of bolometers */
-  dim_t ndata;                  /* Total number of data points */
-  dim_t ntslice;                /* Number of time slices */
+  dim_t nbolo=0;                /* Number of bolometers */
+  dim_t ndata=0;                /* Total number of data points */
+  dim_t ntslice=0;              /* Number of time slices */
   fftw_plan plan_forward;       /* plan for forward transformation */
   fftw_plan plan_inverse;       /* plan for inverse transformation */
   unsigned char *qua=NULL;      /* pointer to quality */

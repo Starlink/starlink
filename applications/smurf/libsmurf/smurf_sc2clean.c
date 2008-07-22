@@ -141,7 +141,7 @@ void smurf_sc2clean( int *status ) {
   size_t outsize;           /* Total number of NDF names in the output group */
   size_t size;              /* Number of files in input group */
   double spikethresh;       /* Threshold for finding spikes */
-  size_t spikeiter;         /* Number of iterations for spike finder */
+  size_t spikeiter=0;       /* Number of iterations for spike finder */
   int spikeiter_s;          /* Signed int version of spikeiter_s */
 
   int dofft=0;              /* Set if freq. domain filtering the data */

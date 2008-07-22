@@ -123,11 +123,11 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   double *model_data=NULL;      /* Pointer to DATA component of model */
   dim_t nbolo;                  /* Number of bolometers */
   size_t nchisq;                /* Number of data points in chisq calc */
-  dim_t nchunk;                 /* Number of spots to measure white level */
+  dim_t nchunk=0;               /* Number of spots to measure white level */
   int nchunk_s;                 /* Signed version of nchunk */
   dim_t ndata;                  /* Total number of data points */
   size_t nflag;                 /* Number of new flags */
-  dim_t nsamp;                  /* Length of window to measure white level */
+  dim_t nsamp=0;                /* Length of window to measure white level */
   int nsamp_s;                  /* Signed version of nsamp */
   dim_t ntslice;                /* Number of time slices */
   smfArray *qua=NULL;           /* Pointer to RES at chunk */
@@ -135,7 +135,7 @@ void smf_calcmodel_noi( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   smfArray *res=NULL;           /* Pointer to RES at chunk */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   double sigma;                 /* Bolometer white level */
-  size_t spikeiter;             /* Number of iterations for spike detection */
+  size_t spikeiter=0;           /* Number of iterations for spike detection */
   int spikeiter_s;              /* signed version of spikeiter */
   double spikethresh;           /* Threshold for spike detection */
   double var;                   /* Sample variance */

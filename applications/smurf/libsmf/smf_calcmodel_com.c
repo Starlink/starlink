@@ -149,7 +149,7 @@ void smf_calcmodel_com( smfDIMMData *dat, int chunk, AstKeyMap *keymap,
   dim_t thisndata=0;            /* "                                  */
   dim_t thisntslice=0;          /* "                                  */
   double thissum;               /* Sum of data at current tslice */
-  double *weight;               /* Weight at each point in model */
+  double *weight=NULL;          /* Weight at each point in model */
                                    
   /* Main routine */
   if (*status != SAI__OK) return;

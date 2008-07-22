@@ -120,7 +120,7 @@ void smf_fit_poly( const smfData *data, unsigned char *quality,
   dim_t k;                 /* Loop counter */
   unsigned char mask;      /* QUALITY bit mask */
   gsl_matrix *mcov=NULL;   /* Covariance matrix */
-  size_t nbol;             /* Number of bolometers */
+  size_t nbol=0;           /* Number of bolometers */
   size_t ncoeff = 2;       /* Number of coefficients to fit for; def. line */
   size_t nframes = 0;      /* Number of frames */
   gsl_vector *psky=NULL;   /* Vector containing sky brightness */

@@ -125,10 +125,10 @@ void smf_flag_spikes( smfData *data, unsigned char *quality,
   dim_t j;                      /* Loop Counter */
   unsigned char *qua=NULL;      /* Pointer to quality flags */
   double mean;                  /* Bolometer signal mean */
-  dim_t nbolo;                  /* Number of bolometers */
+  dim_t nbolo=0;                /* Number of bolometers */
   size_t nflag;                 /* Number of samples flagged */
   dim_t ngood;                  /* How many good samples in measurement */
-  dim_t ntslice;                /* Number of time slices */
+  dim_t ntslice=0;              /* Number of time slices */
   double sig;                   /* Bolometer signal mean */
 
   /* Main routine */

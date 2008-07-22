@@ -227,7 +227,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   int converged=0;              /* Has stopping criteria been met? */
   smfDIMMData dat;              /* Struct passed around to model components */
   smfData *data=NULL;           /* Temporary smfData pointer */
-  dim_t dcbox;                  /* Box size for fixing DC steps */
+  dim_t dcbox=0;                /* Box size for fixing DC steps */
   double dcthresh;              /* Threshold for fixing DC steps */
   int dimmflags;                /* Control flags for DIMM model components */
   int dofft=0;                  /* Set if freq. domain filtering the data */
@@ -241,8 +241,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   double f_notchhigh[SMF__MXNOTCH];/* Array high-freq. edges of notch filters */
   int f_nnotch=0;               /* Number of notch filters in array */
   int f_nnotch2=0;              /* Number of notch filters in array */
-  int haveext;                  /* Set if EXT is one of the models */
-  int havenoi;                  /* Set if NOI is one of the models */
+  int haveext=0;                /* Set if EXT is one of the models */
+  int havenoi=0;                /* Set if NOI is one of the models */
   smfHead *hdr=NULL;            /* Pointer to smfHead */
   dim_t i;                      /* Loop counter */
   dim_t idx=0;                  /* index within subgroup */
@@ -258,7 +258,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   unsigned char mask;           /* Bitmask for QUALITY flags */
   dim_t maxconcat;              /* Longest continuous chunk length in samples*/
   int maxiter=0;                /* Maximum number of iterations */
-  dim_t maxlen;                 /* Max chunk length in samples */
+  dim_t maxlen=0;               /* Max chunk length in samples */
   int memiter=0;                /* If set iterate completely in memory */
   size_t memneeded;             /* Memory required for map-maker */
   smfArray ***model=NULL;       /* Array of pointers smfArrays for ea. model */
@@ -282,7 +282,7 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   smfArray **res=NULL;          /* Residual signal */
   double *res_data=NULL;        /* Pointer to DATA component of res */
   smfGroup *resgroup=NULL;      /* smfGroup of model residual files */
-  size_t spikeiter;             /* Number of iterations for spike detection */
+  size_t spikeiter=0;           /* Number of iter for spike detection */
   double spikethresh;           /* Threshold for spike detection */
   double steptime;              /* Length of a sample in seconds */
   int temp;                     /* temporary signed integer */
@@ -295,8 +295,8 @@ void smf_iteratemap( Grp *igrp, AstKeyMap *keymap,
   int untilconverge=0;          /* Set if iterating to convergence */
   double *var_data=NULL;        /* Pointer to DATA component of NOI */
   int varmapmethod=0;           /* Method for calculating varmap */
-  dim_t whichext;               /* Model index of EXT if present */
-  dim_t whichnoi;               /* Model index of NOI if present */
+  dim_t whichext=0;             /* Model index of EXT if present */
+  dim_t whichnoi=0;             /* Model index of NOI if present */
 
   /* Main routine */
   if (*status != SAI__OK) return;

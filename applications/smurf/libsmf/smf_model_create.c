@@ -219,7 +219,7 @@ void smf_model_create( const smfGroup *igroup, smfArray **iarray,
   int idx=0;                    /* Index within subgroup */
   size_t isize=0;               /* Number of files in input group */
   dim_t j;                      /* Loop counter */
-  int k;                        /* Loop counter */
+  size_t k;                     /* Loop counter */
   dim_t l;                      /* Loop counter */
   size_t len = 0;               /* size of buffer */
   Grp *mgrp=NULL;               /* Temporary group to hold model names */
