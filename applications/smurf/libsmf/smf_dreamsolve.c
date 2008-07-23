@@ -117,7 +117,7 @@ void smf_dreamsolve( smfData *data, int *status ) {
   int dims[2];                     /* Dimensions of output image */
   smfDream *dream = NULL;          /* DREAM parameters */
   HDSLoc *drmloc;                  /* Locator to DEAM extension */
-  char drmwghts[LEN__METHOD+1];    /* Name of DREAM weights file */
+  char drmwghts[SZFITSCARD+1];     /* Name of DREAM weights file */
   int *gridext = NULL;             /* Pointer to grid min/max X/Y extent */
   int gridndf;                     /* NDF identifier for GRID parameters */
   void *gridpntr[3];               /* Mapped pointers */
@@ -198,8 +198,8 @@ void smf_dreamsolve( smfData *data, int *status ) {
 
   /* Check we have a DREAM observation. */
   hdr = data->hdr;
-  smf_fits_getS( hdr, "SAM_MODE", obsmode, LEN__METHOD+1, status );
-  if ( strncmp( obsmode, "DREAM", 5) == 0 ) {
+  smf_fits_getS( hdr, "SAM_MODE", obsmode, sizeof(obsmode), status );
+  if ( strncmp( obsmode, "dream", 5) == 0 ) {
     msgOutif(MSG__VERB," ", "Processing DREAM data", status);
     /* Have we done this before? If so it's not fatal as new processed
        images will just be added onto the end of the current stack of
@@ -229,7 +229,8 @@ void smf_dreamsolve( smfData *data, int *status ) {
     
     if ( interpwt == NULL || invmat == NULL ) {
       if ( *status == SAI__OK ) {
-        smf_fits_getS( data->hdr, "DRMWGHTS", drmwghts, SZFITSCARD+1, status );
+        smf_fits_getS( data->hdr, "DRMWGHTS", drmwghts, sizeof(drmwghts),
+                       status );
         msgSetc("W",drmwghts);
         *status = SAI__ERROR;
         errRep(FUNC_NAME, "Unable to read WEIGHTS file, ^W", status);
