@@ -45,6 +45,8 @@
 *        Write out NDF title.
 *     2008-05-23 (TIMJ):
 *        Add provenance propagation.
+*     2008-07-22 (TIMJ):
+*        Use kaplibs for param IN/OUT
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -101,8 +103,6 @@
 void smurf_rawunpress( int *status ) {
 
   smfData *data = NULL;     /* Pointer to input data struct */
-  smfData *odata = NULL;    /* Pointer to output data struct */
-  int flag;                 /* Flag for how group is terminated */
   size_t i = 0;             /* Counter, index */
   int indf;                 /* NDF identifier for input file */
   int nout;                 /* Number of data points in output data file */
@@ -117,10 +117,11 @@ void smurf_rawunpress( int *status ) {
   ndfBegin();
 
   /* Get input file(s) */
-  ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
+  kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Get output file(s) */
-  ndgCreat( "OUT", igrp, &ogrp, &outsize, &flag, status );
+  kpg1Wgndf( "OUT", igrp, size, size, "More output files required...",
+             &ogrp, &outsize, status );
 
   for (i=1; i<=size; i++ ) {
 
