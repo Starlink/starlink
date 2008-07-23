@@ -161,7 +161,7 @@ void smurf_remsky( int * status ) {
                &ogrp, &outsize, status );
   } else {
     msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
-       " nothing to flatfield", status );
+       " nothing to sky remove", status );
   }
 
   /* Get sky subtraction METHOD */
