@@ -34,6 +34,17 @@ double **invmat,        /* pointer to inverted matrix (returned) */
 int *status             /* global status (given and returned) */
 );
 
+/*+ sc2math_calcmean - calculate the mean and dispersion of numbers */
+
+void sc2math_calcmean
+(
+int num,                /* number of values (given)*/
+double *values,         /* set of numbers (given) */
+double *meanvalue,      /* mean of dataset (returned) */
+double *sigma,          /* dispersion of dataset (returned) */
+int *status             /* global status (given and returned) */
+);
+
 /*+ sc2math_choles - Factorize symmetric positive definite matrix */
 
 void sc2math_choles 
@@ -67,6 +78,17 @@ int *loc,       /* Index nr in LMAT giving the lowest value.
 double *dmin,   /* Lowest value or problem value of the diagonal element
                    with index nr LOC (returned) */
 int *err        /* Possible error code in factorizing the matrix (returned) */
+);
+
+/*+ sc2math_clipmean - calculate a sigma-clipped mean of data */
+
+void sc2math_clipmean
+(
+double sigfac,          /* rejection number of times sigma (given) */
+int num,                /* number of values (given)*/
+double *values,         /* data values (given) */
+double *mean,           /* clipped mean of data values (returned) */
+int *status             /* global status (given and returned) */
 );
 
 /*+ sc2math_conval - Calculate a value of the convolution function */

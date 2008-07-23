@@ -321,6 +321,71 @@ int *status             /* global status (given and returned) */
 }
 
 
+
+/*+ sc2math_calcmean - calculate the mean and dispersion of numbers */
+
+void sc2math_calcmean
+(
+int num,                /* number of values (given)*/
+double *values,         /* set of numbers (given) */
+double *meanvalue,      /* mean of dataset (returned) */
+double *sigma,          /* dispersion of dataset (returned) */
+int *status             /* global status (given and returned) */
+)
+/* Method :
+    Calculate mean and dispersion in a single pass.
+   History :
+    01Aug2007 : original (bdk)
+    29Jun2008 : fix calculation of sigma (bdk) 
+    22Jul2008 : move into sc2math library (bdk)   
+*/
+{
+   int count;              /* count of number used in mean */
+   int k;                  /* loop counter */
+   double sumsq;           /* sum of squared values */
+
+   if ( !StatusOkP(status) ) return;
+
+/* Initialise mean */
+
+    *meanvalue = VAL__BADD;
+    sumsq = VAL__BADD;
+    count = 0;
+
+/* Calculate sum */
+
+   for ( k=0; k<num; k++ )
+   {
+      if ( values[k] != VAL__BADD )
+      {
+         if ( count != 0 )
+	 {
+            *meanvalue += values[k];
+	    sumsq += values[k] * values[k];
+            count++;
+         }
+         else
+         {
+            *meanvalue = values[k];
+	    sumsq = values[k] * values[k];
+            count = 1;
+         }
+      }
+
+   }
+
+/* Calculate mean */
+
+   if ( count != 0 )
+   {
+      *meanvalue /= (double)count;
+      *sigma = sqrt ( sumsq/(double)count - (*meanvalue) * (*meanvalue) );
+   }
+
+}
+
+
+
 /*+ sc2math_choles - Factorize symmetric positive definite matrix */
 
 void sc2math_choles 
@@ -515,6 +580,74 @@ int *err        /* Possible error code in factorizing the matrix (returned) */
    sc2math_invpdm ( nunkno, lmat );
 
 }
+
+
+
+/*+ sc2math_clipmean - calculate a sigma-clipped mean of data */
+
+void sc2math_clipmean
+(
+double sigfac,          /* rejection number of times sigma (given) */
+int num,                /* number of values (given)*/
+double *values,         /* data values (given) */
+double *mean,           /* clipped mean of data values (returned) */
+int *status             /* global status (given and returned) */
+)
+/* Method :
+    Produce a mean from the data values by repeated evaluation and rejection of
+    outliers.
+   History :
+    01Aug2007 : original (bdk)
+    13Aug2007 : make into more general utility (bdk) 
+    17Aug2007 : trap very small sigma (ie noise-free data) (bdk)
+    22Jul2008 : move into sc2math library (bdk)
+*/
+{
+   int done;               /* loop controlller */
+   int k;                  /* loop counter */
+   double sigma;           /* sigma of a timeseries */
+   double *datacopy;       /* copy of data */
+
+   if ( !StatusOkP(status) ) return;
+
+/* Get workspace */
+
+   datacopy = (double *)calloc ( num, sizeof(double) );
+
+
+/* Calculate sums */
+
+   for ( k=0; k<num; k++ )
+   {
+      datacopy[k] = values[k];
+   }
+
+/* Calculate the mean rejecting outliers */
+
+   done = 0;
+   while ( done == 0 )
+   {
+      sc2math_calcmean ( num, datacopy, mean, &sigma, status );
+      done = 1;
+      if ( sigma > 1.0e-10 )
+      {
+         for ( k=0; k<num; k++ )
+         {
+            if ( ( datacopy[k] != VAL__BADD ) && 
+              ( fabs ( datacopy[k] - *mean ) > sigfac*sigma ) )
+            {
+               datacopy[k] = VAL__BADD;
+               done = 0;
+            }
+         }
+      }
+   }
+
+   free ( datacopy );
+
+}
+
+
 
 /*+ sc2math_conval - Calculate a value of the convolution function */
 
