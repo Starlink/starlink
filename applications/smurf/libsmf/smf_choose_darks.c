@@ -141,9 +141,6 @@ void smf_choose_darks( const smfArray *darks, const smfData *indata,
     }
   }
 
-  printf("PREV: %d - %f\n", (int)prev.index, prev.diff);
-  printf("NEXT: %d - %f\n", (int)next.index, next.diff);
-
   /* if we found a previous, see how close it really was
       - reduced darks still have all JCMTState if processed by
       SMURF internally.
