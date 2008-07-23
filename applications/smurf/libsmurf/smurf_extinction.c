@@ -95,6 +95,8 @@
 *        Enable ability to override remsky nannying.
 *     2008-06-10 (AGG):
 *        Allow null value for CSO tau to use MEANWVM from current header
+*     2008-07-22 (TIMJ):
+*        Use kaplibs for group param in/out. Handle darks.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -157,9 +159,10 @@
 void smurf_extinction( int * status ) {
 
   /* Local Variables */
+  smfArray *darks = NULL;   /* Dark data */
   double deftau = 0.0;       /* Default value for the zenith tau */
+  Grp *fgrp = NULL;          /* Filtered group, no darks */
   char filter[81];           /* Name of filter */
-  int flag;                  /* Flag for how group is terminated */
   int has_been_sky_removed = 0;/* Data are sky-removed */
   size_t i;                  /* Loop counter */
   Grp *igrp = NULL;          /* Input group */
@@ -177,11 +180,26 @@ void smurf_extinction( int * status ) {
   ndfBegin();
 
   /* Read the input file */
-  ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
+  kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
-  /* Get output file(s): assumes a 1:1 correspondence between input
-     and output files */
-  ndgCreat( "OUT", igrp, &ogrp, &outsize, &flag, status );
+  /* Filter out darks */
+  smf_find_darks( igrp, &fgrp, NULL, 1, &darks, status );
+
+  /* input group is now the filtered group so we can use that and
+     free the old input group */
+  size = grpGrpsz( fgrp, status );
+  grpDelet( &igrp, status);
+  igrp = fgrp;
+  fgrp = NULL;
+
+  if (size > 0) {
+    /* Get output file(s) */
+    kpg1Wgndf( "OUT", igrp, size, size, "More output files required...",
+               &ogrp, &outsize, status );
+  } else {
+    msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
+       " nothing to extinction correct", status );
+  }
 
   /* Get METHOD */
   parChoic( "METHOD", "CSOTAU", 
@@ -195,18 +213,11 @@ void smurf_extinction( int * status ) {
 
     /* Flatfield - if necessary */
     smf_open_and_flatfield( igrp, ogrp, i, NULL, &odata, status );
-    /* Check flatfield status */
-    if (*status == SMF__FLATN) {
-      errAnnul( status );
-      msgOutif(MSG__VERB, "",
-	     TASK_NAME ": Data are already flatfielded", status);
-    } else if ( *status == SAI__OK) {
-      msgOutif(MSG__VERB," ","Flatfield applied", status);
-    } else {
+
+    if (*status != SAI__OK) {
       /* Error flatfielding: tell the user which file it was */
       msgSeti("I",i);
-      msgSeti("N",size);
-      errRep(TASK_NAME, "Unable to flatfield data from file ^I of ^N", status);
+      errRep(TASK_NAME, "Unable to open the ^I th file", status);
     }
 
     /* Now check that the data are sky-subtracted */
@@ -271,6 +282,7 @@ void smurf_extinction( int * status ) {
     smf_close_file( &odata, status );
   }
   /* Tidy up after ourselves: release the resources used by the grp routines  */
+  if (darks) smf_close_related( &darks, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
 

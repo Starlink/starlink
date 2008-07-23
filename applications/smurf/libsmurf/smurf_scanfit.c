@@ -25,22 +25,29 @@
 *    of the fit added to the NDF.
 
 *  ADAM Parameters:
-*     NDF = NDF (Read/Write)
-*          Input file(s)
+*     IN = NDF (Read)
+*          Input file(s). Can include darks. If relevant darks are located
+*          they will be subtracted from the non-dark observations.
 *     ORDER = INTEGER (Read)
 *          Order of the polynomial to fit. Default 1 (linear).
+*     OUT = NDF (Write)
+*          Dark subtracted and flatfielded output file for each input file.
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-04-26 (AGG):
 *        Initial test version, modified from simulator written by BDK.
+*     2008-07-22 (TIMJ):
+*        Use kaplibs and do dark subtraction.
 
 *  Notes:
 
 *  Copyright: 
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006 University of British Columbia. All Rights
 *     Reserved.
 
@@ -94,8 +101,9 @@
 
 void smurf_scanfit( int * status ) {
 
+  smfArray *darks = NULL;   /* Dark data */
   smfData *ffdata = NULL;    /* Pointer to output data struct */
-  int flag;                  /* Flag for how group is terminated */
+  Grp *fgrp = NULL;          /* Filtered group, no darks */
   size_t i = 0;              /* Loop counter */
   Grp *igrp = NULL;          /* Input group */
   Grp *ogrp = NULL;          /* Input group */
@@ -107,10 +115,26 @@ void smurf_scanfit( int * status ) {
   ndfBegin();
 
   /* Read the input file */
-  ndgAssoc( "NDF", 1, &igrp, &size, &flag, status );
+  kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
-  /* Get output file(s) */
-  ndgCreat( "OUT", igrp, &ogrp, &outsize, &flag, status );
+  /* Filter out darks */
+  smf_find_darks( igrp, &fgrp, NULL, 1, &darks, status );
+
+  /* input group is now the filtered group so we can use that and
+     free the old input group */
+  size = grpGrpsz( fgrp, status );
+  grpDelet( &igrp, status);
+  igrp = fgrp;
+  fgrp = NULL;
+
+  if (size > 0) {
+    /* Get output file(s) */
+    kpg1Wgndf( "OUT", igrp, size, size, "More output files required...",
+               &ogrp, &outsize, status );
+  } else {
+    msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
+       " nothing to do.", status );
+  }
 
   /* Get order of polynomial */
   parGet0i( "ORDER", &order, status);
@@ -141,6 +165,7 @@ void smurf_scanfit( int * status ) {
   }
 
   /* Tidy up after ourselves */
+  if (darks) smf_close_related( &darks, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
   ndfEnd( status );
