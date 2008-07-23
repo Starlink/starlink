@@ -45,7 +45,7 @@
 *     padStart = dim_t (Given)
 *        Pad start of concatenated array with this many samples.
 *     padEnd = dim_t (Given)
-*        Pad start of concatenated array with this many samples.
+*        Pad end of concatenated array with this many samples.
 *     flags = int (Given)
 *        Additional flags to control processing of individual data files
 *        as they are being concatenated.
