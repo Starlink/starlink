@@ -56,6 +56,8 @@
 *     2008-04-30 (TIMJ):
 *        Tidy up logic (no longer need to trap for SMF__FLATN.
 *        Update data file title.
+*     2008-07-22 (TIMJ):
+*        Use kaplibs for group param in/out. Handle darks.
 *     {enter_further_changes_here}
 
 *  Notes:
@@ -120,7 +122,8 @@
 void smurf_remsky( int * status ) {
 
   /* Local Variables */
-  int flag;                  /* Flag for how group is terminated */
+  smfArray *darks = NULL;   /* Dark data */
+  Grp *fgrp = NULL;          /* Filtered group, no darks */
   size_t i;                  /* Loop counter */
   Grp *igrp = NULL;          /* Input group */
   smfData *odata = NULL;     /* Output data struct */
@@ -136,20 +139,30 @@ void smurf_remsky( int * status ) {
 				to group related files */
   smfGroup *ogroup = NULL;   /* Group storing related files */
 
-  int indf;
-  int outndf;
-  void *outdata[1];         /* Pointer to array of output mapped pointers*/
-  int nout;
-
   /* Main routine */
   ndfBegin();
 
   /* Read the input file */
-  ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
+  kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
-  /* Get output file(s): assumes a 1:1 correspondence between input
-     and output files */
-  ndgCreat( "OUT", igrp, &ogrp, &outsize, &flag, status );
+  /* Filter out darks */
+  smf_find_darks( igrp, &fgrp, NULL, 1, &darks, status );
+
+  /* input group is now the filtered group so we can use that and
+     free the old input group */
+  size = grpGrpsz( fgrp, status );
+  grpDelet( &igrp, status);
+  igrp = fgrp;
+  fgrp = NULL;
+
+  if (size > 0) {
+    /* Get output file(s) */
+    kpg1Wgndf( "OUT", igrp, size, size, "More output files required...",
+               &ogrp, &outsize, status );
+  } else {
+    msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
+       " nothing to flatfield", status );
+  }
 
   /* Check the Grp sizes are the same */
   if ( outsize != size ) {
@@ -177,7 +190,7 @@ void smurf_remsky( int * status ) {
     /* Propagate input files to output */
     for (i=1; i<=size; i++) {
       /* This seems inefficient but it works */
-      smf_open_and_flatfield( igrp, ogrp, i, NULL, &odata, status );
+      smf_open_and_flatfield( igrp, ogrp, i, darks, &odata, status );
       smf_close_file( &odata, status);
     }
     /* Group output files together now that they exist */
@@ -194,26 +207,26 @@ void smurf_remsky( int * status ) {
   } else {
     for (i=1; i<=size; i++) {
       /* Flatfield - if necessary */
-      smf_open_and_flatfield( igrp, ogrp, i, NULL, &odata, status );
+      smf_open_and_flatfield( igrp, ogrp, i, darks, &odata, status );
 
       if (*status != SAI__OK) {
-	/* Tell the user which file it was... */
-	msgSeti("I",i);
-	errRep(TASK_NAME, "Unable to open the ^I th file", status);
+        /* Tell the user which file it was... */
+        msgSeti("I",i);
+        errRep(TASK_NAME, "Unable to open the ^I th file", status);
       }
       if ( *status == SAI__OK ) {
-	if ( strncmp( method, "POLY", 4 ) == 0 ) {
-	  /* Bolometer-based sky removal */
-	  smf_subtract_poly( odata, NULL, 0, status );
-	  /* Check status */
-	} else if ( strncmp( method, "PLAN", 4 ) == 0 ) {
-	  /* Timeslice-based sky removal */
-	  smf_subtract_plane( odata, NULL, fittype, status );
-	} else {
-	  *status = SAI__ERROR;
-	  msgSetc("M", method);
-	  errRep(TASK_NAME, "Unsupported method, ^M. Possible programming error.", status);
-	}
+        if ( strncmp( method, "POLY", 4 ) == 0 ) {
+          /* Bolometer-based sky removal */
+          smf_subtract_poly( odata, NULL, 0, status );
+          /* Check status */
+        } else if ( strncmp( method, "PLAN", 4 ) == 0 ) {
+          /* Timeslice-based sky removal */
+          smf_subtract_plane( odata, NULL, fittype, status );
+        } else {
+          *status = SAI__ERROR;
+          msgSetc("M", method);
+          errRep(TASK_NAME, "Unsupported method, ^M. Possible programming error.", status);
+        }
       }
 
       /* Set character labels */
@@ -226,6 +239,7 @@ void smurf_remsky( int * status ) {
   }
 
   /* Tidy up after ourselves: release the resources used by the grp routines  */
+  if (darks) smf_close_related( &darks, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
 
