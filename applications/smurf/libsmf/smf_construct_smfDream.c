@@ -165,7 +165,7 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
 
   /* Check we have DREAM data */
   hdr = data->hdr;
-  smf_fits_getS( hdr, "SAM_MODE", obsmode, SZFITSCARD, status );
+  smf_fits_getS( hdr, "SAM_MODE", obsmode, sizeof(obsmode), status );
 
   /* Lab data does not have a SAM_MODE (and absence should be treated
      as proof that we are not in DREAM mode */
@@ -198,7 +198,7 @@ smfDream *smf_construct_smfDream( smfData *data, size_t nvert,
 
 	/* Now read reconstruction grid parameters */
 	/* Get weights file name from hdr */
-	smf_fits_getS( hdr, "DRMWGHTS", weightsfile, SZFITSCARD, status );
+	smf_fits_getS( hdr, "DRMWGHTS", weightsfile, sizeof(weightsfile), status );
 	if ( *status == SAI__OK ) {
 	  /* Open file: place it in a Grp */
 	  wtgrp = grpNew("DREAM weights", status);
