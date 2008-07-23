@@ -47,12 +47,14 @@
 *  History:
 *     2008-07-03 (EC):
 *        Initial version.
+*     2008-07-22 (TIMJ):
+*        Handle darks. USe kaplibs for groups. Free memory leak.
 *     {enter_further_changes_here}
 
 *  Copyright:
 *     Copyright (C) 2005-2007 Particle Physics and Astronomy Research
 *     Council. Copyright (C) 2005-2008 University of British Columbia.
-*     Copyright (C) 2007-2008 Science and Technology Facilities Council.
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     All Rights Reserved.
 
 *  Licence:
@@ -109,18 +111,19 @@ void smurf_sc2concat( int *status ) {
   /* Local Variables */
   smfArray *concat=NULL;     /* Pointer to a smfArray */
   size_t contchunk;          /* Continuous chunk counter */
+  smfArray *darks = NULL;    /* dark frames */
   smfData *data=NULL;        /* Pointer to a smfData */
-  int flag;                  /* Flag for how group is terminated */
+  Grp *fgrp = NULL;          /* Filtered group, no darks */
   size_t idx;                /* Subarray counter */
   Grp *igrp = NULL;          /* Group of input files */
   smfGroup *igroup=NULL;     /* smfGroup corresponding to igrp */
-  size_t isize;              /* Number of files in input group */
   dim_t maxconcat=0;         /* Longest continuous chunk length in samples */
   dim_t maxlen=0;            /* Constrain maxconcat to this many samples */
   double maxlen_s;           /* Constrain maxconcat to this many seconds */
   size_t ncontchunks=0;      /* Number continuous chunks outside iter loop */
   dim_t padStart=0;          /* How many samples padding at start */
   dim_t padEnd=0;            /* How many samples padding at end */
+  size_t size;               /* Number of files in input group */
   double steptime;           /* Length of an individual sample */
   int temp;                  /* Temporary signed integer */
 
@@ -129,8 +132,24 @@ void smurf_sc2concat( int *status ) {
   /* Main routine */
   ndfBegin();
 
-  /* Get group of input files */
-  ndgAssoc( "IN", 1, &igrp, &isize, &flag, status );
+  /* Read the input file */
+  kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
+
+  /* Filter out darks */
+  smf_find_darks( igrp, &fgrp, NULL, 1, &darks, status );
+
+  /* input group is now the filtered group so we can use that and
+     free the old input group */
+  size = grpGrpsz( fgrp, status );
+  grpDelet( &igrp, status);
+  igrp = fgrp;
+  fgrp = NULL;
+
+  if (size == 0) {
+        msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
+                 " nothing to concatenate", status );
+    goto CLEANUP;
+  }
 
   /* Parse ADAM parameters */
 
@@ -186,7 +205,7 @@ void smurf_sc2concat( int *status ) {
   }
 
   /* Group the input files by subarray and continuity */
-  smf_grp_related( igrp, isize, 1, maxlen, &maxconcat, &igroup, status );
+  smf_grp_related( igrp, size, 1, maxlen, &maxconcat, &igroup, status );
 
   /* Obtain the number of continuous chunks and subarrays */
   if( *status == SAI__OK ) {
@@ -198,7 +217,7 @@ void smurf_sc2concat( int *status ) {
 
     /* Concatenate. Note that smf_concat_smfGroup stores filenames for
        each piece in concat->sdata[*]->file->name */
-    smf_concat_smfGroup( igroup, contchunk, 1, NULL, 0, NULL, 
+    smf_concat_smfGroup( igroup, darks, contchunk, 1, NULL, 0, NULL, 
                          NULL, padStart, padEnd, 0, &concat, status );
     
     /* Export concatenated data for each subarray to NDF file */
@@ -219,7 +238,10 @@ void smurf_sc2concat( int *status ) {
   
   }
 
+ CLEANUP:
+  if (darks) smf_close_related( &darks, status );
   if( igrp != NULL ) grpDelet( &igrp, status);
+  if (igroup) smf_close_smfGroup( &igroup, status );
 
   ndfEnd( status );
   
