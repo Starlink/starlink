@@ -241,8 +241,8 @@ itcl::class gaia::Gaia {
    destructor {
 
       #  If this is the final remaining instance of this class, do some
-      #  application-wide clear up.
-      #  to clear any current registration with a PLASTIC hub.
+      #  application-wide clear up to clear any current registration with a
+      #  PLASTIC hub.
       if {"[itcl::find objects -class gaia::Gaia]" == "$this"} {
 
          #  Inform the PLASTIC hub that we are ceasing operations.
@@ -280,6 +280,7 @@ itcl::class gaia::Gaia {
    # Restore the position of the top level window from the previous
    # session, or not depending on mode and whether an explicit value
    # has been given on the command-line (0x0 resets to default size).
+   #  Overridden from Skycat.
    protected method load_toplevel_geometry {} {
       if { $itk_option(-tabbedgaia) } {
          return
@@ -883,33 +884,6 @@ itcl::class gaia::Gaia {
 	       {See a demonstration of GAIA (needs an empty directory)} \
 	       -command [code $this make_toolbox demo]
       }
-   }
-
-   #  Add a menubutton for PLASTIC activities.
-   public method add_interop_menu {} {
-
-      set interopmenu_ [add_menubutton Interop]
-      set m $interopmenu_
-      configure_menubutton Interop -underline 6
-      add_short_help $itk_component(menubar).interop \
-         {Interop menu: control application interoperability with PLASTIC}
-
-      add_menuitem $m command "Register" \
-         {Register GAIA with a running PLASTIC hub} \
-         -command [code start_plastic_]
-      add_menuitem $m command "Unregister" \
-         {Unregister GAIA with the PLASTIC hub} \
-         -command [code stop_plastic_]
-
-      $m add separator
-
-      set plastic_send_image_menu_ [menu $m.send_image]
-      add_menuitem $m command "Broadcast Image" \
-         {Send the current image to all PLASTIC-registered applications} \
-         -command [code $this plastic_send_image_]
-      add_menuitem $m cascade "Send Image" \
-         {Send the current image to a selected PLASTIC-registered application} \
-         -menu $plastic_send_image_menu_
    }
 
    #  Saving graphics with the image doesn't work so disable it.
@@ -1861,6 +1835,268 @@ itcl::class gaia::Gaia {
       set after_id_ [after 10000 [code $this loaded_eso_config_ 1 "timed out"]]
    }
 
+   #  Start the application with the above class as the main window.
+   #  This proc is called from tkAppInit.c when we are running the single
+   #  binary version.
+   #
+   #  Note that the binary version doesn't need to set auto_path or look for
+   #  Tcl sources or colormaps at run-time, since they are already loaded in
+   #  the binary.
+   public proc startGaia {} {
+      global ::gaia_usage ::tk_strictMotif ::tcl_precision \
+         ::argv0 ::argv ::argc ::env
+
+      #  Where to look for catalog config file:
+      #    use CATLIB_CONFIG, if set (assume this is deliberate)
+      #    next use ~/.skycat/skycat.cfg if it exists (this contains
+      #    the user's preferences), finally use $SKYCAT_CONFIG if set
+      #    (note native implementation ignores SKYCAT_CONFIG as this
+      #    may be set by CURSA, which is bad).
+      if { ! [info exists env(CATLIB_CONFIG)] } {
+
+         #  Make sure ~/.skycat exists.
+         set config_file [utilGetConfigFilename .skycat skycat.cfg]
+         if {[file exists $config_file]} {
+            set env(CATLIB_CONFIG) "file:$config_file"
+            check_config_file $config_file
+         } elseif {[info exists env(SKYCAT_CONFIG)]  && ! $native} {
+            set env(CATLIB_CONFIG) $env(SKYCAT_CONFIG)
+         } else {
+            copy_default_config_file_ $config_file
+            set env(CATLIB_CONFIG) "file:$config_file"
+         }
+      }
+
+      #  Initialise any proxy server.
+      cat::AstroCat::check_proxies
+
+      #  Set some application options
+      tk appname GAIA
+      set tk_strictMotif 1
+      set tcl_precision 15
+
+      #  Insert some default options
+      set argv [linsert $argv 0 -disp_image_icon 1]
+      set argc [llength $argv]
+
+      #  Start the application
+      util::TopLevelWidget::start gaia::Gaia "-file" "$gaia_usage"
+   }
+
+   #  Copy the default config file to another file. If the target file
+   #  already exists a backup copy is made.
+   protected proc copy_default_config_file_ { config_file } {
+      global ::gaia_library
+      if { [file exists $gaia_library/skycat2.0.cfg] } {
+         set backupname ""
+         set today ""
+         if { [file exists $config_file] } {
+            set today [clock format [clock seconds] -format "%d-%b-%Y"]
+            set backupname ${config_file}_${today}
+            file copy -force $config_file ${backupname}
+         }
+         file copy -force $gaia_library/skycat2.0.cfg $config_file
+
+         #  Make a directory entry that accesses the old configs.
+         if { $backupname != "" } {
+            ::astrocat tmpcat
+            tmpcat load ${backupname} "Configuration of $today"
+            ::cat::CatalogInfo::save {} {}
+            destroy tmpcat
+         }
+      }
+   }
+
+   #  If user has a local config file then this may need to be updated
+   #  from time to time as features are added to the default file.
+   #  The match string should be set to something new in the
+   #  default file.
+   public proc check_config_file { config_file } {
+      set newmatch "*Tycho-2*"
+
+      #  Search the file for the string match.
+      set ok 0
+      set fileid [::open $config_file "r"]
+      while { [gets $fileid line] >= 0 } {
+         if { [string match $newmatch $line] } {
+            set ok 1
+            break;
+         }
+      }
+      ::close $fileid
+      if { !$ok } {
+         set msg \
+            "Your local catalogue configuration file '$config_file'
+is out of date. Do you want to update it?"
+         set choice [choice_dialog $msg {OK Details Cancel} {OK}]
+
+         if { $choice == "Details" } {
+            set detailsmsg \
+               "The local catalogue configuration file '$config_file'
+contains a description of catalogues that are shown in the
+Data-Servers menus. It appears that this file is now out of date with
+respect to the system default version (which may contain new
+catalogues and image servers) and you should probably allow it to be
+updated.
+When you open local catalogues of your own, or have ones created for
+you locally (the object detection toolbox does this), or apply
+configuration changes (such as changing the colour of the overlay
+markers) these preferences are recorded in this configuration
+file. Since you may not want to loose these changes a copy of your
+existing configuration file will be made (stamped with todays date)
+and added as a directory to the list of catalogue directories before
+applying the update. Using the \"Browse Catalog Directories...\"
+window gives you access to this."
+            info_dialog $detailsmsg
+
+            # After details re-choose.
+            set choice [choice_dialog $msg {OK Cancel} {OK}]
+         }
+         if { $choice == "OK" } {
+            copy_default_config_file_ $config_file
+         }
+      }
+   }
+
+   #  Retrieve the ESO config file, returning its content as the result.
+   protected method get_eso_config_ {} {
+      return [gaiautils::urlget $itk_option(-eso_config_file)]
+   }
+
+   #  Invoked an attempt to load ESO config file is completed. If
+   #  successful overwrite the local ~/.skycat/skycat.cfg file and
+   #  force a local reload.
+   protected method loaded_eso_config_ {status msg} {
+      blt::busy release $w_
+      if { $status } {
+         error_dialog "Failed to get ESO config file: $msg"
+      } else {
+
+         #  msg is file contents, need to make this the local file.
+         global ::env
+         set file $env(HOME)/.skycat/skycat.cfg
+         if {[file exists $file]} {
+            if {[catch {::file rename -force $file $file.BAK} error]} {
+               error_dialog $error
+               return
+            }
+         }
+         set fd [::open $file w]
+         puts $fd $msg
+         ::close $fd
+
+         #  Finally force this to be loaded.
+         AstroCat::reload_config_file $w_
+      }
+      delete object $w_.bg_proc
+      if { $after_id_ != {} } {
+         catch [after cancel $after_id_]
+         set after_id_ {}
+      }
+   }
+
+   #  Print a copy of the colorramp to postscript.
+   private method print_ramp_ {} {
+      utilReUseWidget gaia::GaiaRampPrint $w_.printramp \
+	 -image $image_.colorramp.image \
+	 -show_footer 0 \
+	 -whole_canvas 1 \
+	 -transient 1 \
+	 -mainimage [$image_ get_image] \
+	 -maincanvas [$image_ get_canvas]
+   }
+
+   #  Import a text file as a catalogue.
+   protected method import_catalogue_ {} {
+      #  Start import dialog. The output file is fixed and the user
+      #  chooses the input file. The format of the output file is a
+      #  TAB table.
+      utilReUseWidget gaia::GaiaTextImport $importer_ \
+         -title "Import text file to catalogue" \
+         -outfile "GaiaTextImport.TAB" \
+         -format tab \
+         -show_infile 1 \
+         -show_outfile 1
+
+      #  Wait for import to complete and get the catalogue name.
+      lassign [$importer_ activate] outfile
+      if { $outfile != {} && [file exists $outfile] } {
+         cat::AstroCat::open_catalog_window \
+            $outfile \
+            [code $image_] \
+            ::gaia::GaiaSearch \
+            0 $this
+      }
+   }
+
+   #  Apply the autoscale value. Need to also manage autofill, which
+   #  requires autoscale to be true.
+   protected method autoscale_ {} {
+      global ::$w_.autoscale
+      if { ! [set $w_.autoscale] } {
+         if { $itk_option(-autofill) } {
+            configure -autofill 0
+            autofill_ 0
+         }
+      }
+      $image_ autoscale $w_.autoscale
+   }
+
+   #  Apply the autofit value.
+   protected method autofit_ {} {
+      $image_ configure -autofit $itk_option(-autofit)
+   }
+
+   #  Apply the autofill value, also make sure autoscale is set or unset 
+   #  as needed.
+   protected method autofill_ {autoscale} {
+      if { $autoscale } {
+         global ::$w_.autoscale
+         if { $itk_option(-autofill) } {
+            if { ! [set $w_.autoscale] } {
+               set $w_.autoscale 1
+               autoscale_
+            }
+         } else {
+            if { [set $w_.autoscale] } {
+               set $w_.autoscale 0
+               autoscale_
+            }
+         }
+      }
+      $image_ configure -autofill $itk_option(-autofill)
+   }
+
+   #  PLASTIC support
+   #  ---------------
+
+   #  Add a menubutton for PLASTIC activities.
+   public method add_interop_menu {} {
+
+      set interopmenu_ [add_menubutton Interop]
+      set m $interopmenu_
+      configure_menubutton Interop -underline 6
+      add_short_help $itk_component(menubar).interop \
+         {Interop menu: control application interoperability with PLASTIC}
+
+      add_menuitem $m command "Register" \
+         {Register GAIA with a running PLASTIC hub} \
+         -command [code start_plastic_]
+      add_menuitem $m command "Unregister" \
+         {Unregister GAIA with the PLASTIC hub} \
+         -command [code stop_plastic_]
+
+      $m add separator
+
+      set plastic_send_image_menu_ [menu $m.send_image]
+      add_menuitem $m command "Broadcast Image" \
+         {Send the current image to all PLASTIC-registered applications} \
+         -command [code $this plastic_send_image_]
+      add_menuitem $m cascade "Send Image" \
+         {Send the current image to a selected PLASTIC-registered application} \
+         -menu $plastic_send_image_menu_
+   }
+
    #  Sends the currently displayed image via PLASTIC to other listening
    #  applications.  If a non-empty recipients list is supplied, it gives
    #  the IDs of applications to which th image will be sent.  Otherwise,
@@ -2024,129 +2260,6 @@ itcl::class gaia::Gaia {
       }
    }
 
-   #  Start the application with the above class as the main window.
-   #  This proc is called from tkAppInit.c when we are running the single
-   #  binary version.
-   #
-   #  Note that the binary version doesn't need to set auto_path or look for
-   #  Tcl sources or colormaps at run-time, since they are already loaded in
-   #  the binary.
-   public proc startGaia {} {
-      global ::gaia_usage ::tk_strictMotif ::tcl_precision \
-         ::argv0 ::argv ::argc ::env
-
-      #  Where to look for catalog config file:
-      #    use CATLIB_CONFIG, if set (assume this is deliberate)
-      #    next use ~/.skycat/skycat.cfg if it exists (this contains
-      #    the user's preferences), finally use $SKYCAT_CONFIG if set
-      #    (note native implementation ignores SKYCAT_CONFIG as this
-      #    may be set by CURSA, which is bad).
-      if { ! [info exists env(CATLIB_CONFIG)] } {
-
-         #  Make sure ~/.skycat exists.
-         set config_file [utilGetConfigFilename .skycat skycat.cfg]
-         if {[file exists $config_file]} {
-            set env(CATLIB_CONFIG) "file:$config_file"
-            check_config_file $config_file
-         } elseif {[info exists env(SKYCAT_CONFIG)]  && ! $native} {
-            set env(CATLIB_CONFIG) $env(SKYCAT_CONFIG)
-         } else {
-            copy_default_config_file_ $config_file
-            set env(CATLIB_CONFIG) "file:$config_file"
-         }
-      }
-
-      #  Initialise any proxy server.
-      cat::AstroCat::check_proxies
-
-      #  Set some application options
-      tk appname GAIA
-      set tk_strictMotif 1
-      set tcl_precision 15
-
-      #  Insert some default options
-      set argv [linsert $argv 0 -disp_image_icon 1]
-      set argc [llength $argv]
-
-      #  Start the application
-      util::TopLevelWidget::start gaia::Gaia "-file" "$gaia_usage"
-   }
-
-   #  Copy the default config file to another file. If the target file
-   #  already exists a backup copy is made.
-   protected proc copy_default_config_file_ { config_file } {
-      global ::gaia_library
-      if { [file exists $gaia_library/skycat2.0.cfg] } {
-         set backupname ""
-         set today ""
-         if { [file exists $config_file] } {
-            set today [clock format [clock seconds] -format "%d-%b-%Y"]
-            set backupname ${config_file}_${today}
-            file copy -force $config_file ${backupname}
-         }
-         file copy -force $gaia_library/skycat2.0.cfg $config_file
-
-         #  Make a directory entry that accesses the old configs.
-         if { $backupname != "" } {
-            ::astrocat tmpcat
-            tmpcat load ${backupname} "Configuration of $today"
-            ::cat::CatalogInfo::save {} {}
-            destroy tmpcat
-         }
-      }
-   }
-
-   #  If user has a local config file then this may need to be updated
-   #  from time to time as features are added to the default file.
-   #  The match string should be set to something new in the
-   #  default file.
-   public proc check_config_file { config_file } {
-      set newmatch "*Tycho-2*"
-
-      #  Search the file for the string match.
-      set ok 0
-      set fileid [::open $config_file "r"]
-      while { [gets $fileid line] >= 0 } {
-         if { [string match $newmatch $line] } {
-            set ok 1
-            break;
-         }
-      }
-      ::close $fileid
-      if { !$ok } {
-         set msg \
-            "Your local catalogue configuration file '$config_file'
-is out of date. Do you want to update it?"
-         set choice [choice_dialog $msg {OK Details Cancel} {OK}]
-
-         if { $choice == "Details" } {
-            set detailsmsg \
-               "The local catalogue configuration file '$config_file'
-contains a description of catalogues that are shown in the
-Data-Servers menus. It appears that this file is now out of date with
-respect to the system default version (which may contain new
-catalogues and image servers) and you should probably allow it to be
-updated.
-When you open local catalogues of your own, or have ones created for
-you locally (the object detection toolbox does this), or apply
-configuration changes (such as changing the colour of the overlay
-markers) these preferences are recorded in this configuration
-file. Since you may not want to loose these changes a copy of your
-existing configuration file will be made (stamped with todays date)
-and added as a directory to the list of catalogue directories before
-applying the update. Using the \"Browse Catalog Directories...\"
-window gives you access to this."
-            info_dialog $detailsmsg
-
-            # After details re-choose.
-            set choice [choice_dialog $msg {OK Cancel} {OK}]
-         }
-         if { $choice == "OK" } {
-            copy_default_config_file_ $config_file
-         }
-      }
-   }
-
    #  Returns the PLASTIC sender object, if there is one.
    public proc get_plastic_sender {} {
       return [code $plastic_sender_]
@@ -2157,116 +2270,8 @@ window gives you access to this."
       return [code $plastic_app_]
    }
 
-   #  Retrieve the ESO config file, returning its content as the result.
-   protected method get_eso_config_ {} {
-      return [gaiautils::urlget $itk_option(-eso_config_file)]
-   }
-
-   #  Invoked an attempt to load ESO config file is completed. If
-   #  successful overwrite the local ~/.skycat/skycat.cfg file and
-   #  force a local reload.
-   protected method loaded_eso_config_ {status msg} {
-      blt::busy release $w_
-      if { $status } {
-         error_dialog "Failed to get ESO config file: $msg"
-      } else {
-
-         #  msg is file contents, need to make this the local file.
-         global ::env
-         set file $env(HOME)/.skycat/skycat.cfg
-         if {[file exists $file]} {
-            if {[catch {::file rename -force $file $file.BAK} error]} {
-               error_dialog $error
-               return
-            }
-         }
-         set fd [::open $file w]
-         puts $fd $msg
-         ::close $fd
-
-         #  Finally force this to be loaded.
-         AstroCat::reload_config_file $w_
-      }
-      delete object $w_.bg_proc
-      if { $after_id_ != {} } {
-         catch [after cancel $after_id_]
-         set after_id_ {}
-      }
-   }
-
-   #  Print a copy of the colorramp to postscript.
-   private method print_ramp_ {} {
-      utilReUseWidget gaia::GaiaRampPrint $w_.printramp \
-	 -image $image_.colorramp.image \
-	 -show_footer 0 \
-	 -whole_canvas 1 \
-	 -transient 1 \
-	 -mainimage [$image_ get_image] \
-	 -maincanvas [$image_ get_canvas]
-   }
-
-   #  Import a text file as a catalogue.
-   protected method import_catalogue_ {} {
-      #  Start import dialog. The output file is fixed and the user
-      #  chooses the input file. The format of the output file is a
-      #  TAB table.
-      utilReUseWidget gaia::GaiaTextImport $importer_ \
-         -title "Import text file to catalogue" \
-         -outfile "GaiaTextImport.TAB" \
-         -format tab \
-         -show_infile 1 \
-         -show_outfile 1
-
-      #  Wait for import to complete and get the catalogue name.
-      lassign [$importer_ activate] outfile
-      if { $outfile != {} && [file exists $outfile] } {
-         cat::AstroCat::open_catalog_window \
-            $outfile \
-            [code $image_] \
-            ::gaia::GaiaSearch \
-            0 $this
-      }
-   }
-
-   #  Apply the autoscale value. Need to also manage autofill, which
-   #  requires autoscale to be true.
-   protected method autoscale_ {} {
-      global ::$w_.autoscale
-      if { ! [set $w_.autoscale] } {
-         if { $itk_option(-autofill) } {
-            configure -autofill 0
-            autofill_ 0
-         }
-      }
-      $image_ autoscale $w_.autoscale
-   }
-
-   #  Apply the autofit value.
-   protected method autofit_ {} {
-      $image_ configure -autofit $itk_option(-autofit)
-   }
-
-   #  Apply the autofill value, also make sure autoscale is set or unset 
-   #  as needed.
-   protected method autofill_ {autoscale} {
-      if { $autoscale } {
-         global ::$w_.autoscale
-         if { $itk_option(-autofill) } {
-            if { ! [set $w_.autoscale] } {
-               set $w_.autoscale 1
-               autoscale_
-            }
-         } else {
-            if { [set $w_.autoscale] } {
-               set $w_.autoscale 0
-               autoscale_
-            }
-         }
-      }
-      $image_ configure -autofill $itk_option(-autofill)
-   }
-
-   # -- public variables (also program options) --
+   #  Configuration options: (public variables)
+   #  ----------------------
 
    #  Is this controlled from the tabbed interface?
    itk_option define -tabbedgaia tabbedgaia TabbedGaia 0
@@ -2479,7 +2484,8 @@ window gives you access to this."
       gaia::GaiaNDAccess::set_deep_search $itk_option(-deep_search)
    }
 
-   # -- Protected variables --
+   #  Protected variables: (available to instance)
+   #  --------------------
 
    #  Application name.
    protected variable appname_ "Starlink GAIA::Skycat"
@@ -2535,7 +2541,8 @@ window gives you access to this."
    #  GaiaCookie object.
    protected variable cookie_ {}
 
-   # -- Common variables --
+   #  Common variables: (shared by all instances)
+   #  -----------------
 
    #  Maximum clone number so far
    common clone_max_ 0
@@ -2554,15 +2561,16 @@ window gives you access to this."
 
    #  Boolean variable which keeps track of whether we are registered with hub.
    common is_plastic_registered_ 0
+
+#  End of class definition.
 }
 
 #  Make sure our HelpWin class is used by TopLevelWidget.
 set util::TopLevelWidget::help_window_class gaia::HelpWin
 
-#
-#  Need to override this proc so we use the browser version of the
-#  open dialog (and we need it here so that it is used in preference).
-#
+#  Need to override this proc so we use the browser version of the open dialog
+#  for local catalogues (and we need it here so that it is used in preference
+#  to the autoload version).
 itcl::body ::cat::AstroCat::local_catalog {{id ""} {classname AstroCat} {debug 0} {w ""}} {
    gaia::GaiaSearch::get_local_catalog $id $w
 }
