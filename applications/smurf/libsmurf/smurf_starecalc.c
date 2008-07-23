@@ -35,14 +35,18 @@
 
 *  Authors:
 *     Andy Gibb (UBC)
+*     Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     2006-10-26 (AGG):
 *        Clone from smurf_dreamsolve
+*     2008-07-22 (TIMJ):
+*        Use kaplibs and support dark subtraction.
 *     {enter_further_changes_here}
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2006 University of British Columbia. All Rights
 *     Reserved.
 
@@ -104,28 +108,45 @@
 void smurf_starecalc ( int *status ) {
 
   /* Local Variables */
+  smfArray *darks = NULL;   /* Dark data */
+  Grp *fgrp = NULL;          /* Filtered group, no darks */
   size_t i;                        /* Loop counter */
-  int flag;                        /* Grp flag */
   Grp *igrp = NULL;                /* Input files */
   Grp *ogrp = NULL;                /* Output files */
-  size_t isize;                    /* Size of input Grp */
+  size_t size;                    /* Size of input Grp */
   int naver;                       /* Averaging window */
-  size_t osize;                    /* Size of output Grp */
+  size_t outsize;                    /* Size of output Grp */
   smfData *data = NULL;            /* Input data */
 
   /* Main routine */
   ndfBegin();
-  
-  /* Get group of input NDFs */
-  ndgAssoc( "IN", 1, &igrp, &isize, &flag, status);
 
-  /* Propagate input NDFs to output */
-  ndgCreat("OUT", igrp, &ogrp, &osize, &flag, status);
+  /* Read the input file */
+  kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
+
+  /* Filter out darks */
+  smf_find_darks( igrp, &fgrp, NULL, 1, &darks, status );
+
+  /* input group is now the filtered group so we can use that and
+     free the old input group */
+  size = grpGrpsz( fgrp, status );
+  grpDelet( &igrp, status);
+  igrp = fgrp;
+  fgrp = NULL;
+
+  if (size > 0) {
+    /* Get output file(s) */
+    kpg1Wgndf( "OUT", igrp, size, size, "More output files required...",
+               &ogrp, &outsize, status );
+  } else {
+    msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
+       " nothing to do", status );
+  }
 
   /* Loop over number of files */
-  for ( i=1; i<=isize; i++) {
+  for ( i=1; i<=size; i++) {
     /* Open file and flatfield the data */
-    smf_open_and_flatfield( igrp, ogrp, i, NULL, &data, status );
+    smf_open_and_flatfield( igrp, ogrp, i, darks, &data, status );
 
     naver = 200; /* Average every 1 second */
 
@@ -135,7 +156,7 @@ void smurf_starecalc ( int *status ) {
     if (*status != SAI__OK) {
       /* Tell the user which file it was... */
       msgSeti("I",i);
-      msgSeti("N",isize);
+      msgSeti("N",size);
       errRep(FUNC_NAME, 
 	     "Unable to produce STARE images for data from file ^I of ^N", status);
     } else {
@@ -148,6 +169,7 @@ void smurf_starecalc ( int *status ) {
   }
 
   /* Free up resources */
+  if (darks) smf_close_related( &darks, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
 
