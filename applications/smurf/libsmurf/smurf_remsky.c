@@ -164,14 +164,6 @@ void smurf_remsky( int * status ) {
        " nothing to flatfield", status );
   }
 
-  /* Check the Grp sizes are the same */
-  if ( outsize != size ) {
-    msgSeti("S",size);
-    msgSeti("O",outsize);
-    *status = SAI__ERROR;
-    errRep( FUNC_NAME, "Size of output group, ^O != size of input group, ^S", status);
-  }
-
   /* Get sky subtraction METHOD */
   parChoic( "METHOD", "PLANE", "Plane, Polynomial", 1,  method, 
 	    LEN__METHOD, status);
