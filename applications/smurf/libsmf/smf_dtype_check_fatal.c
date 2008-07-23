@@ -95,7 +95,6 @@ void smf_dtype_check_fatal(const smfData* data, const char * type, smf_dtype ity
 
   /* Set a default value */
   int retval = 0;
-  smfData tmpdata;
   
   /* Check entry status */
   if (*status != SAI__OK) return;
@@ -114,7 +113,7 @@ void smf_dtype_check_fatal(const smfData* data, const char * type, smf_dtype ity
         msgSetc("TYP",type);
       } else {
         /* Con... */
-        const char *dstr = smf_dtype_string(itype, status );
+        const char *dstr = smf_dtype_str(itype, status );
         if (dstr) {
           msgSetc("TYP",dstr);
         } else {
