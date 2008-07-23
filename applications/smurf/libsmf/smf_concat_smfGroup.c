@@ -13,15 +13,19 @@
 *     C function
 
 *  Invocation:
-*     smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered, 
-*			  AstFrameSet *outfset, int moving, 
-*	        	  int *lbnd_out, int *ubnd_out, dim_t padStart,
-*                         dim_t padEnd, int flags,
-*			  smfArray **concat, int *status )
+*     smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
+*                          size_t whichchunk, int isTordered, 
+*                   			 AstFrameSet *outfset, int moving, 
+*	        	               int *lbnd_out, int *ubnd_out, dim_t padStart,
+*                          dim_t padEnd, int flags,
+*                  			  smfArray **concat, int *status )
 
 *  Arguments:
 *     igrp = smfGroup* (Given)
 *        Group of input data files
+*     darks = const smfArray * (Given)
+*        Collection of darks that can be applied to non-flatfielded data.
+*        Can be NULL.
 *     whichchunk = size_t (Given)
 *        Which continuous subset of igrp will get concatenated?
 *     isTordered = int (Given)
@@ -103,6 +107,8 @@
 *        Correct time origin in tswcs if padStart set.
 *     2008-07-11 (TIMJ):
 *        Use strlcat/strlcpy
+*     2008-07-22 (TIMJ):
+*        Apply darks.
 
 *  Notes:
 *     If projection information supplied, pointing LUT will not be
@@ -119,6 +125,7 @@
 *     VAL__BADI, and the JCMTState values are all set to 0.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -162,9 +169,10 @@
 
 #define FUNC_NAME "smf_concat_smfGroup"
 
-void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered, 
-			  AstFrameSet *outfset, int moving, 
-			  int *lbnd_out, int *ubnd_out, dim_t padStart,
+void smf_concat_smfGroup( smfGroup *igrp, const smfArray *darks,
+                          size_t whichchunk, int isTordered, 
+                          AstFrameSet *outfset, int moving, 
+                          int *lbnd_out, int *ubnd_out, dim_t padStart,
                           dim_t padEnd, int flags, smfArray **concat, 
                           int *status ) {
 
@@ -381,7 +389,7 @@ void smf_concat_smfGroup( smfGroup *igrp, size_t whichchunk, int isTordered,
              require flat-fielding. */
 
           smf_open_and_flatfield( igrp->grp, NULL, igrp->subgroups[j][i], 
-                                  NULL, &refdata, status );
+                                  darks, &refdata, status );
 
           /* Calculate the pointing LUT if requested */
           if( !(flags & SMF__NOCREATE_LUT) && outfset ) {
