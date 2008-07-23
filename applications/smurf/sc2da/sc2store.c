@@ -891,6 +891,7 @@ int *status                   /* global status (given and returned) */
     19Aug2004 : original (bdk)
     17Feb2005 : add sc2_heat (bdk)
     27Jul2006 : need to check for NULL-ness and handle all JCMTState (timj)
+    15Jul2008 : fix types in macro calls for wvm_time and sc2_heat (bdk)
 */
 {
    if ( *status != SAI__OK ) return;
@@ -957,9 +958,9 @@ int *status                   /* global status (given and returned) */
    RETRIEVE_STATE( wvm_t12, WVM_T12, float, VAL__BADR );
    RETRIEVE_STATE( wvm_t42, WVM_T42, float, VAL__BADR );
    RETRIEVE_STATE( wvm_t78, WVM_T78, float, VAL__BADR );
-   RETRIEVE_STATE( wvm_time, WVM_TIME, double, VAL__BADR );
+   RETRIEVE_STATE( wvm_time, WVM_TIME, double, VAL__BADD );
 
-   RETRIEVE_STATE( sc2_heat, SC2_HEAT, int, VAL__BADD );
+   RETRIEVE_STATE( sc2_heat, SC2_HEAT, int, VAL__BADI );
 
    RETRIEVE_STATE( acs_exposure, ACS_EXPOSURE, float, VAL__BADR );
    RETRIEVE_STATE( acs_offexposure, ACS_OFFEXPOSURE, float, VAL__BADR );
@@ -2650,23 +2651,29 @@ int *status              /* Global status (given and returned) */
     is annulled before returning. 
    History :
     18Jan2008 : original (dsb)
+    15Jul2008 : use ifdef on SMURF-specific variable declarations (bdk)
 */
 {
 
 /* Local Variables: */
-   HDSLoc *xloc3 = NULL;
    HDSLoc *xloc2 = NULL;
-   char name[ DAT__SZNAM + 1 ];
-   hdsdim lower[ 1 ];
-   hdsdim upper[ 1 ];
    int isthere;
    int j;
    int lbnd[ 3 ];
-   int ncomp;
    int ndim;
    int ubnd[ 3 ];
    int update;
    size_t nslice;
+
+/* variables only needed in SMURF */
+   
+#ifdef PACKAGE_UPCASE
+   HDSLoc *xloc3 = NULL;
+   char name[ DAT__SZNAM + 1 ];
+   hdsdim lower[ 1 ];
+   hdsdim upper[ 1 ];
+   int ncomp;
+#endif
 
 /* Initialise the returned pointer. */
    *yloc = NULL;
