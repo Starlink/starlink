@@ -39,6 +39,8 @@
 *  History:
 *     2008-07-17 (TIMJ):
 *        Initial version
+*     2008-07-22 (TIMJ):
+*        SHUTTER is now a float.
 
 *  Copyright:
 *     Copyright (C) 2008 Science and Technology Facilities Council.
@@ -90,7 +92,7 @@
 
 int smf_isdark( const smfData * indata, int * status ) {
   smfHead * hdr;
-  char shutval[81];
+  double shutval;
 
   if (*status != SAI__OK) return 0;
 
@@ -103,11 +105,10 @@ int smf_isdark( const smfData * indata, int * status ) {
 
   hdr = indata->hdr;
 
-  /* Currently SHUTTER is a string */
-  smf_fits_getS( indata->hdr, "SHUTTER", shutval, sizeof(shutval),
-                 status );
+  /* Currently SHUTTER used to be a string */
+  smf_fits_getD( indata->hdr, "SHUTTER", &shutval, status );
 
-  if (strcmp( "CLOSED", shutval) == 0) {
+  if (shutval < 0.00001 ) {
     return 1;
   }
 
