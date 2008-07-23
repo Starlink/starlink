@@ -155,7 +155,6 @@ void smf_choose_darks( const smfArray *darks, const smfData *indata,
     difftime *= SPD;
     if ( difftime > maxdiff ) {
       /* dark is no good */
-      printf(" Dark is no good. Diff is %f\n",difftime);
       prev.index = -1;
     }
 
