@@ -71,10 +71,13 @@
 *        Initial version - based on flatfield task
 *     2008-04-02 (EC):
 *        Added spike flagging
+*     2008-07-22 (TIMJ):
+*        Use kaplibs for IN OUT params. Filter darks.
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilities Council.
 *     Copyright (C) 2005-2006 Particle Physics and Astronomy Research Council.
-*     University of British Columbia.
+*     Copyright (C) 2008 University of British Columbia.
 *     All Rights Reserved.
 
 *  Licence:
@@ -127,11 +130,12 @@ void smurf_sc2clean( int *status ) {
 
   size_t aiter;             /* Number of iterations in sigma-clipper */
   double badfrac=0;         /* Fraction of bad samples to flag bad bolo */
+  smfArray *darks = NULL;          /* Dark data */
   dim_t dcbox=0;            /* width of box for measuring DC steps */
   int dcbox_s=0;            /* signed int version of dcbox */
   double dcthresh=0;        /* n-sigma threshold for DC steps */
   smfData *ffdata = NULL;   /* Pointer to output data struct */
-  int flag;                 /* Flag for how group is terminated */
+  Grp *fgrp = NULL;         /* Filtered group, no darks */
   size_t i = 0;             /* Counter, index */
   Grp *igrp = NULL;         /* Input group of files */
   unsigned char mask;       /* Bitmask for quality */
@@ -156,11 +160,27 @@ void smurf_sc2clean( int *status ) {
   /* Main routine */
   ndfBegin();
 
-  /* Get input file(s) */
-  ndgAssoc( "IN", 1, &igrp, &size, &flag, status );
+  /* Read the input file */
+  kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
-  /* Get output file(s) */
-  ndgCreat( "OUT", igrp, &ogrp, &outsize, &flag, status );
+  /* Filter out darks */
+  smf_find_darks( igrp, &fgrp, NULL, 1, &darks, status );
+
+  /* input group is now the filtered group so we can use that and
+     free the old input group */
+  size = grpGrpsz( fgrp, status );
+  grpDelet( &igrp, status);
+  igrp = fgrp;
+  fgrp = NULL;
+
+  if (size > 0) {
+    /* Get output file(s) */
+    kpg1Wgndf( "OUT", igrp, size, size, "More output files required...",
+               &ogrp, &outsize, status );
+  } else {
+    msgOutif(MSG__NORM, " ","All supplied input frames were DARK,"
+       " nothing to do", status );
+  }
 
   /* Check for badfrac threshold for flagging bad bolos */
   parGet0d( "BADFRAC", &badfrac, status );
@@ -204,7 +224,7 @@ void smurf_sc2clean( int *status ) {
   if( *status == SAI__OK ) for( i=1; i<=size; i++ ) {
 
     /* Open and flatfield in case we're using raw data */
-    smf_open_and_flatfield(igrp, ogrp, i, NULL, &ffdata, status);
+    smf_open_and_flatfield(igrp, ogrp, i, darks, &ffdata, status);
 
     /* Which QUALITY bits should be considered for ignoring data */
     mask = ~SMF__Q_JUMP;
@@ -305,6 +325,7 @@ void smurf_sc2clean( int *status ) {
   }
 
   /* Tidy up after ourselves: release the resources used by the grp routines */
+  if (darks) smf_close_related( &darks, status );
   grpDelet( &igrp, status);
   grpDelet( &ogrp, status);
 
