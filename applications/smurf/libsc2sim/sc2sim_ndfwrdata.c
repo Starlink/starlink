@@ -220,6 +220,8 @@
 *        - Fix strncpy issues
 *        - Correct call to sc2sim_get_recipe
 *        - use one_strlcpy
+*     2008-07-23 (AGG):
+*        Write out BASEC1, BASEC2 and TRACKSYS
 
 *  Copyright:
 *     Copyright (C) 2007, 2008 Science and Technology Facilities Council.
@@ -584,6 +586,16 @@ int *status              /* Global status (given and returned) */
 		   "[deg] Scan PA relative to N in SCAN_CRD system", 0 );
      astSetFitsS ( fitschan, "SCAN_PAT", "", "Scanning pattern", 0 );
    }
+   /* Write out BASE position and tracking coordinate system */
+
+   astSetFitsS ( fitschan, "TRACKSYS", head[0].tcs_tr_sys, 
+		 "TCS Tracking coordinate system", 0 );
+   astSetFitsF ( fitschan, "BASEC1", (head[0].tcs_tr_bc1)*AST__DR2D, 
+		 "[deg] TCS BASE position (longitude) in TRACKSYS", 0 );
+   astSetFitsF ( fitschan, "BASEC2", (head[0].tcs_tr_bc2)*AST__DR2D, 
+		 "[deg] TCS BASE position (latitude) in TRACKSYS", 0 );
+
+
 
    /* JOS parameters */
    astSetFitsCN ( fitschan, "COMMENT", "", "-- JOS parameters --", 0 );
