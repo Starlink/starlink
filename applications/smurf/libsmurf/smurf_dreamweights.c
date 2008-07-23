@@ -63,6 +63,8 @@
 *        Tidy up, ensure all pointers are freed
 *     2008-07-14 (AGG):
 *        Make sure Grp for config is always freed
+*     2008-07-22 (TIMJ):
+*        Use kaplibs instead of ndgAssoc
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -126,37 +128,28 @@ void smurf_dreamweights ( int *status ) {
   /* Local Variables */
   Grp *confgrp = NULL;        /* Group containing configuration file */
   smfData *data = NULL;       /* Input data */
-  int flag;                   /* Flag for Grp handling */
   int *gridminmax = NULL;     /* Extent of grid points array */
   int gridpts[DREAM__MXGRID][2]; /* Array of points for reconstruction grid */
   double gridstep;            /* Size of reconstruction grid in arcsec */
   size_t i;                   /* Loop counter */
   Grp *igrp = NULL;           /* Input group of NDFs */
-  size_t isize;               /* Size of input Grp of files */
+  size_t size;                /* Size of input Grp of files */
   AstKeyMap *keymap = NULL;   /* Pointer to keymap of config settings */
   size_t ksize;               /* Size of group containing CONFIG file */
   int ngrid;                  /* Number of points in reconstruction grid */
   Grp *ogrp = NULL;           /* Group of output weights files */
-  size_t osize;               /* Size of output Grp of files */
+  size_t outsize;             /* Size of output Grp of files */
 
   /* Main routine */
   ndfBegin();
   
   /* Get group of input raw data NDFs */
-  ndgAssoc( "NDF", 1, &igrp, &isize, &flag, status );
+  kpg1Rgndf( "IN", 0, 1, "", &igrp, &size, status );
 
   /* Get group of output files from user: assume 1 output file for
      every input file */
-  ndgCreat( "OUT", igrp, &ogrp, &osize, &flag, status );
-  if ( osize != isize ) {
-    if ( *status == SAI__OK ) {
-      *status = SAI__ERROR;
-      msgSeti("^I",isize);
-      msgSeti("^O",osize);
-      errRep(FUNC_NAME, "Number of output files, ^O, not equal to number of input files, ^I",
-	     status);
-    }
-  }
+  kpg1Wgndf( "OUT", igrp, size, size, "More output files required...",
+             &ogrp, &outsize, status );
 
   /* Read configuration settings into keymap */
   if (*status == SAI__OK) {
@@ -183,7 +176,7 @@ void smurf_dreamweights ( int *status ) {
   if (keymap) keymap = astAnnul( keymap );
 
   /* Loop over number of files */
-  for ( i=1; (i<= isize) && (*status == SAI__OK); i++) {
+  for ( i=1; (i<= size) && (*status == SAI__OK); i++) {
     /* Open file */
     smf_open_file( igrp, i, "READ", 0, &data, status );
 
@@ -194,7 +187,7 @@ void smurf_dreamweights ( int *status ) {
     /* Immediately check status on return and abort if an error occured */
     if ( *status != SAI__OK ) {
       msgSeti("I",i);
-      msgSeti("N",isize);
+      msgSeti("N",size);
       errRep(FUNC_NAME,	"Unable to determine DREAM weights for file ^I of ^N", 
 	     status);
     }
