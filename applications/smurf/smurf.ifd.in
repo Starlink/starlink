@@ -759,7 +759,7 @@ package @PACKAGE@ {
 
             helplib {$SMURF_HELP}
 
-            parameter ndf {
+            parameter in {
                 position 1
                 type NDF
                 access READ
