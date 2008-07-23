@@ -278,7 +278,7 @@ void smf_mapbounds_approx( Grp *igrp,  int index, char *system, double pixsize,
        values in the tracking coordinate frame */
     c = cos(theta);
     s = sin(fabs(theta));
-    if ( instapx && instapy ) {
+    if ( instapx || instapy ) {
       instap = 1;
       origval = instapx;
       instapx = instapx*c - instapy*s;
