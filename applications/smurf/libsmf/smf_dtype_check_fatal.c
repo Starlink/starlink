@@ -42,11 +42,14 @@
 *  History:
 *     2006-01-25 (TIMJ):
 *        Initial version.
+*     2008-07-22 (TIMJ):
+*        Can not set status to bad and then call smf_dtype_string
 
 *  Notes:
 *     - See also smf_dtype_check
 
 *  Copyright:
+*     Copyright (C) 2008 Science and Technology Facilties Council.
 *     Copyright (C) 2006 Particle Physics and Astronomy Research Council.
 *     All Rights Reserved.
 
@@ -101,17 +104,26 @@ void smf_dtype_check_fatal(const smfData* data, const char * type, smf_dtype ity
 
   if (!retval) {
     if ( *status == SAI__OK) {
-      *status = SMF__BDTYP;
-      msgSetc("ACTYP",smf_dtype_string( data, status));
-      if (type != NULL) {
-	msgSetc("TYP",type);
+      const char * curtyp = smf_dtype_string( data, status );
+      if (curtyp) {
+        msgSetc("ACTYP",curtyp);
       } else {
-	/* Con... */
-	tmpdata.dtype = itype;
-	msgSetc("TYP",smf_dtype_string(&tmpdata, status));
+        msgSetc("ACTYP", "<NULL>");
       }
-      errRep(FUNC_NAME, "Data type not as requested. Expected ^TYP, got ^ACTYP", 
-	     status);
+      if (type != NULL) {
+        msgSetc("TYP",type);
+      } else {
+        /* Con... */
+        const char *dstr = smf_dtype_string(itype, status );
+        if (dstr) {
+          msgSetc("TYP",dstr);
+        } else {
+          msgSetc("TYP", "<NULL>");
+        }
+      }
+      *status = SMF__BDTYP;
+      errRep(FUNC_NAME, "Data type not as requested. Expected ^TYP,"
+             "got ^ACTYP", status);
     }
   }
 
