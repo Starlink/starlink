@@ -16,9 +16,11 @@
 *     pntr = smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 *              AstFrameSet * wcs, AstFrameSet * tswcs,
 *              AstFitsChan * fitshdr, const JCMTState * allState,
-*              dim_t curframe, unsigned int ndet,
+*              dim_t curframe, smf_obsmode obsmode, smf_obstype obstype,
+*              unsigned int ndet,
 *              const double fplanex[], const double fplaney[],
-*              const double detpos[], const char *detname, int dpazel, const double tsys[], 
+*              const double detpos[], const char *detname, int dpazel,
+*              const double tsys[], 
 *              const char title[], const char dlabel[], const char units[],
 *              const double telpos[], int * status );
 
@@ -44,6 +46,10 @@
 *        will be set to this location.
 *     nframes = dim_t (Given)
 *        Number of frames (timeslices) in data.
+*     obsmode = smf_obsmode (Given)
+*        Observing mode.
+*     obstype = smf_obstype (Given)
+*        Observation type
 *     ndet = unsigned int (Given)
 *        Number of positions in fplanex, fplaney arrays. Number of detectors.
 *     fplanex = const double[] (Given)
@@ -114,9 +120,9 @@
 *        Add tswcs.
 *     2006-07-31 (TIMJ):
 *        Add instrument code. Add fplanex and fplaney.
-*     2006-10-2 (DSB):
+*     2006-10-02 (DSB):
 *        Add detpos.
-*     2006-11-6 (DSB):
+*     2006-11-06 (DSB):
 *        Add detname.
 *     2007-02-06 (AGG):
 *        Add tsys
@@ -124,8 +130,10 @@
 *        Add instap to API
 *     2008-04-30 (TIMJ):
 *        Add title, units and dlabel.
-*     2008-07-1 (DSB):
+*     2008-07-01 (DSB):
 *        Add telpos.
+*     2008-07-24 (TIMJ):
+*        Add obsmode, obstype.
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -177,7 +185,8 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 		       AstFrameSet * wcs, AstFrameSet * tswcs,
 		       AstFitsChan * fitshdr,
 		       JCMTState * allState, dim_t curframe,
-		       const double instap[], dim_t nframes, unsigned int ndet,
+		       const double instap[], dim_t nframes,
+           smf_obsmode obsmode, smf_obstype obstype, unsigned int ndet,
 		       double fplanex[], double fplaney[],
 		       double detpos[], char *detname, 
            int dpazel, double tsys[], const char title[],
@@ -215,6 +224,8 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
     hdr->telpos[0] = telpos[0];
     hdr->telpos[1] = telpos[1];
     hdr->telpos[2] = telpos[2];
+    hdr->obsmode = obsmode;
+    hdr->obstype = obstype;
 
     /* Have to copy the string items in since the struct has a slot for them -
        we know these fit in the struct */

@@ -510,6 +510,9 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
           errAnnul( status );
         }
 
+        /* and work out the observing mode */
+        if (hdr->fitshdr) smf_calc_mode( hdr, status );
+
         /* Ensure we get warnings about undefined values read by
            astGetFits. */
         if( hdr->fitshdr ) astSet( hdr->fitshdr, "Warnings=UndefRead" );   
@@ -669,6 +672,9 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
         /* Create a FitsChan from the FITS headers */
         if ( !(flags & SMF__NOCREATE_HEAD) ) {
           smf_fits_crchan( nfits, fitsrec, &(hdr->fitshdr), status); 
+
+          /* and work out the observing mode */
+          if (hdr->fitshdr) smf_calc_mode( hdr, status );
 
           /* Instrument must be SCUBA-2 */
           /* hdr->instrument = INST__SCUBA2; */
@@ -862,6 +868,8 @@ void smf_open_file( const Grp * igrp, size_t index, const char * mode,
       }
     }
   }
+
+  smf_dump_smfData( *data, 0, status );
 
 }
 

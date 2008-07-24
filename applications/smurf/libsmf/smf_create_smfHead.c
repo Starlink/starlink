@@ -61,6 +61,8 @@
 *        Add tsys
 *     2008-04-30 (TIMJ):
 *        Add units, title and dlabel.
+*     2008-07-24 (TIMJ):
+*        initialise obsmode and obstype
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -143,6 +145,8 @@ smf_create_smfHead( int * status ) {
   hdr->instap[0] = 0;
   hdr->instap[1] = 0;
   hdr->tsys = NULL;
+  hdr->obsmode = SMF__OBS_NULL;
+  hdr->obstype = SMF__TYP_NULL;
   (hdr->units)[0] = '\0';
   (hdr->dlabel)[0] = '\0';
   (hdr->title)[0] = '\0';

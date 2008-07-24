@@ -44,6 +44,8 @@
 *        Initial version
 *     2008-04-30 (TIMJ):
 *        Add units, title and label.
+*     2008-07-24 (TIMJ):
+*        Support obstype and obsmode
 *     {enter_further_changes_here}
 
 *  Copyright:
@@ -104,6 +106,7 @@ void smf_dump_smfData( const smfData *data, int showflags, int *status) {
   size_t i;                     /* Loop counter */
   size_t ndims;                 /* Number of dimensions in data */
   char string[SZFITSCARD];      /* General purpose string used for printing */
+  const char * tempstr = NULL;  /* temp string for obsmode and type */
 
   /* Check status */
   if (*status != SAI__OK) return;
@@ -257,6 +260,22 @@ void smf_dump_smfData( const smfData *data, int showflags, int *status) {
     /* Number of frames in time series */
     msgSeti("I",(int)(hdr->nframes));
     msgOut("", "    nframes = ^I", status);
+
+    /* obs mode and type */
+    tempstr = smf_obsmode_str( hdr->obsmode, status );
+    if (tempstr) {
+      msgSetc( "MOD", tempstr );
+    } else {
+      msgSetc( "MOD", "<NULL>" );
+    }
+    tempstr = smf_obstype_str( hdr->obstype, status );
+    if (tempstr) {
+      msgSetc( "TYP", tempstr );
+    } else {
+      msgSetc( "TYP", "<NULL>" );
+    }
+    msgOut(" ", "    obsmode = ^MOD  obstype = ^TYP", status );
+
     /* Flag to indicate whether we have control of overall state structure */
     msgSeti("I",hdr->isCloned);
     msgOut("", "    isCloned = ^I", status);

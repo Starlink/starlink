@@ -297,6 +297,8 @@ typedef struct smfHead {
   AstFitsChan * fitshdr;    /* FITS header from the file */
   dim_t curframe;           /* Index corresponding to current frame */
   dim_t nframes;            /* Number of frames in smfData */
+  smf_obstype obstype;      /* Observation type */
+  smf_obsmode obsmode;      /* observing mode */
   int isCloned;             /* If false, allState is owned by this
 			       struct, if true it should not be freed */
   JCMTState *allState;     /* Array of STATE for every time slice */ 

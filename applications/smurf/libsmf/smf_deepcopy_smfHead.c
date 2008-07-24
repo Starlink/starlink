@@ -198,11 +198,11 @@ smf_deepcopy_smfHead( const smfHead *old, int * status ) {
 
   /* Insert elements into new smfHead */
   new = smf_construct_smfHead( new, instrument, wcs, tswcs, fitshdr,
-			       allState, curframe, instap,
-			       nframes, ndet, fplanex, fplaney, detpos,
-                               detname, old->dpazel, tsys,
-			       old->title, old->dlabel, old->units,
-			       old->telpos, status );
+                               allState, curframe, instap, nframes,
+                               old->obsmode, old->obstype,ndet, fplanex,
+                               fplaney, detpos,detname, old->dpazel, tsys,
+                               old->title, old->dlabel, old->units,
+                               old->telpos, status );
 
   /* set isCloned to 0 since we have allocated this memory */
   if (new) new->isCloned = 0;

@@ -459,7 +459,8 @@ smf_construct_smfHead( smfHead * tofill, inst_t instrument,
 		       AstFrameSet * wcs, AstFrameSet * tswcs,
                        AstFitsChan * fitshdr,
 		       JCMTState * allState, dim_t curframe, 
-		       const double instap[], dim_t nframes, unsigned int ndet,
+		       const double instap[], dim_t nframes,
+           smf_obsmode obsmode, smf_obstype obstype, unsigned int ndet,
 		       double fplanex[], double fplaney[],
 		       double detpos[], char *detname, int rpazel, 
 		       double tsys[], const char title[], 
@@ -1064,5 +1065,7 @@ void smf_subtract_dark ( smfData * indata, const smfData * dark1,
 smfData *smf_fft_data( const smfData *indata, int inverse, int *status );
 
 int smf_isfft( const smfData *data, int * status );
+
+void smf_calc_mode( smfHead * hdr, int * status );
 
 #endif /* SMF_DEFINED */
