@@ -862,3 +862,115 @@ int *status              /* global status (given and returned) */
 
 }
 
+/* sc2ast_set_output_system - set the output SYSTEM to match the
+                              equivalent JCMT tracking system
+ */
+
+void sc2ast_set_output_system
+(
+ const char *trsys,      /* JCMT tracking system (given) */
+ AstFrameSet *fset,      /* Frameset to update (updated) */
+ int * status            /* inherited status (given & returned ) */
+ )
+/*
+ *  Purpose:
+ *    Sets the SYSTEM attribute based on JCMT naming convention.
+
+ *  Authors:
+ *     TIMJ: Tim Jenness (JAC, Hawaii)
+
+ *  History:
+ *     23-JUL-2008 (TIMJ):
+ *        Original version.
+
+ */
+{
+  const char * astsys = NULL;
+
+  if (*status != SAI__OK) return;
+
+  astsys = sc2ast_convert_system( trsys, status );
+  if ( *status == SAI__OK) {
+    astSetC( fset, "SYSTEM", astsys );
+  }
+
+}
+
+
+
+/* sc2ast_convert_system - convert JCMT coordinate system to AST coordinate
+                           system
+ */
+const char * sc2ast_convert_system 
+(
+ const char *label,   /* Input JCMT coordinate system (given) */
+ int * status         /* Inherited status (given & returned) */
+ )
+/*
+*  Purpose:
+*     Convert a JCMT label for a celestial coordinate system into the
+*     corresponding AST SkyFrame System value.
+
+*  Returned Value:
+*     A point to a static string holding the equivalent AST value, or
+*     "" if there is no equivalent AST value.
+
+*  Description:
+*     This function converts a JCMT label for a celestial coordinate system 
+*     into the corresponding AST SkyFrame System value. It reports an error
+*     if the system is not supported by AST.
+
+*  Authors:
+*     DSB: David S. Berry (JAC, UCLan)
+*     EC: Ed Chapin (UBC)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+
+*  History:
+*     25-SEP-2006 (DSB):
+*        Original version.
+*     13-DEC-2007 (EC):
+*        Use strncmp instead of strcmp
+*     23-JUL-2008 (TIMJ):
+*        Copy from smf_convert_system (now deleted) so that the
+*        DA can do the conversion
+*/
+
+{
+
+/* Local Variables */
+   const char *result = "";   /* Returned pointer */
+
+/* Check inherited status */
+   if (*status != SAI__OK) return result;
+
+/* Compare the supplied labelwith each known type. */
+   if( !strncmp( label, "AZEL", 4 ) ) {
+      result = "AZEL";
+
+   } else if( !strncmp( label, "APP", 3 ) ) {
+      result = "GAPPT";
+
+   } else if( !strncmp( label, "GAL", 3 ) ) {
+      result = "GALACTIC";
+
+   } else if( !strncmp( label, "ICRS", 4 ) ||
+              !strncmp( label, "ICRF", 4 ) ) {
+      result = "ICRS";
+
+   } else if( !strncmp( label, "B1950", 5 ) ) {
+      result = "FK4";
+
+   } else if( !strncmp( label, "J2000", 5 ) ) {
+      result = "FK5";
+
+   } else {
+      *status = SAI__ERROR;
+      sprintf( errmess,
+               "The JCMT coordinate system %s does not "
+               "have an equivalent AST System value.", label );
+      ErsRep( 0, status, errmess);
+   }
+
+   return result;
+}
+

@@ -80,6 +80,25 @@ double rot,              /* Rotation needed to align input Y axis with North */
 int *status              /* global status (given and returned) */
 );
 
- 
+
+/* sc2ast_set_output_system - set the output SYSTEM to match the
+                              equivalent JCMT tracking system
+ */
+
+void sc2ast_set_output_system
+(
+ const char *trsys,      /* JCMT tracking system (given) */
+ AstFrameSet *fset,      /* Frameset to update (updated) */
+ int * status            /* inherited status (given & returned ) */
+ );
+
+/* sc2ast_convert_system - convert JCMT coordinate system to AST coordinate
+                           system
+ */
+const char * sc2ast_convert_system 
+(
+ const char *label,   /* Input JCMT coordinate system (given) */
+ int * status         /* Inherited status (given & returned) */
+ );
  
 #endif
