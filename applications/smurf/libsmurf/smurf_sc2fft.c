@@ -131,22 +131,32 @@ void smurf_sc2fft( int *status ) {
     smf_open_file( igrp, i, "READ", SMF__NOCREATE_VARIANCE | 
                    SMF__NOCREATE_QUALITY, &idata, status );
 
-    /* Tranform the data */
-    odata = smf_fft_data( idata, inverse, status );
+    /* Check whether we need to transform the data at all */
+    if( smf_isfft(idata,status) == inverse ) {
 
-    /* If output is time-domain, ensure that it is ICD bolo-ordered */
-    if( inverse ) {
-      smf_dataOrder( odata, 1, status );
+      /* Tranform the data */
+      odata = smf_fft_data( idata, inverse, status );
+      
+      /* If output is time-domain, ensure that it is ICD bolo-ordered */
+      if( inverse ) {
+        smf_dataOrder( odata, 1, status );
+      }
+      
+      /* Export the data to a new file */
+      pname = fname;
+      grpGet( ogrp, i, 1, &pname, GRP__SZNAM, status );
+      smf_NDFexport( odata, NULL, NULL, NULL, fname, status );
+
+      /* Free resources */
+      smf_close_file( &odata, status );
+    } else {
+      msgOutif( MSG__NORM, " ", 
+                "Data are already transformed. No output will be produced",
+                status );
     }
-
-    /* Export the data to a new file */
-    pname = fname;
-    grpGet( ogrp, i, 1, &pname, GRP__SZNAM, status );
-    smf_NDFexport( odata, NULL, NULL, NULL, fname, status );
-
+    
     /* Free resources */
     smf_close_file( &idata, status );
-    smf_close_file( &odata, status );
   }
 
   /* Tidy up after ourselves: release the resources used by the grp routines */
